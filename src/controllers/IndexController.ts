@@ -24,12 +24,29 @@ export class IndexController {
   @Get('login')
   private async login(req: Request, res: Response) {
     if (req.session.user) return res.redirect('/')
-    return res.status(200).render('login')
+    return res.status(200).render('login', { password: true, username: true })
+  }
+
+  @Get('logout')
+  private async logout(req: Request, res: Response) {
+    if (!req.session.user) return res.redirect('/')
+    req.session.user = null;
+    res.redirect('/login');
   }
 
   @Post('login')
   private async postLogin(req: Request, res: Response) {
     if (req.session.user) return res.redirect('/');
+    if (req.body.username == 'administrator' && req.body.password === config.administrator.password) {
+      req.session.user = {
+        id: 0,
+        username: 'administrator',
+        password: config.administrator.password,
+        token: config.administrator.authorization,
+        administrator: true
+      }
+      return res.redirect('/')
+    }
     const user = await this.orm.repos.user.findOne({ where: { username: req.body.username } });
     if (!user) return res.status(200).render('login', { username: false, password: false })
     if (req.body.password !== user.password) return res.status(200).render('login', { password: false, username: false })

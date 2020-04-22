@@ -1,5 +1,5 @@
 import { OK, BAD_REQUEST, FORBIDDEN } from 'http-status-codes';
-import { Controller, Middleware, Get, Post, Put, Delete } from '@overnightjs/core';
+import { Controller, Middleware, Get, Post, Put, Delete, Patch } from '@overnightjs/core';
 import { Request, Response } from 'express';
 import config from '../../config.json';
 import { ORMHandler } from '..';
@@ -45,6 +45,49 @@ export class APIController {
       return res.status(200).json(user);
     } catch (e) {
       return res.status(BAD_REQUEST).json({ error: "Could not create user: " + e.message })
+    }
+  }
+
+  @Patch('user')
+  private async patchUser(req: Request, res: Response) {
+    if (!req.session.user) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: 'Unauthorized' });
+    const data = req.body;
+    try {
+      let user = await this.orm.repos.user.findOne({ id: req.session.user.id })
+      if (!user) return res.status(BAD_REQUEST).json({ error: "Could not edit user: user doesnt exist" })
+      this.orm.repos.user.update({ id: req.session.user.id }, data)
+      return res.status(200).json(user);
+    } catch (e) {
+      return res.status(BAD_REQUEST).json({ error: "Could not edit user: " + e.message })
+    }
+  }
+
+  @Delete('user')
+  private async deleteUser(req: Request, res: Response) {
+    if (!req.session.user) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: 'Unauthorized' });
+    const q = req.query.user;
+    try {
+      let user = await this.orm.repos.user.findOne({ id: q || req.session.user.id })
+      if (!user) return res.status(BAD_REQUEST).json({ error: "Could not delete user: user doesnt exist" })
+      this.orm.repos.user.delete({ id: q || req.session.user.id })
+      return res.status(200).json(user);
+    } catch (e) {
+      return res.status(BAD_REQUEST).json({ error: "Could not delete user: " + e.message })
+    }
+  }
+
+  @Post('token')
+  private async postToken(req: Request, res: Response) {
+    if (!req.session.user) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: 'Unauthorized' });
+    const data = req.body;
+    try {
+      let user = await this.orm.repos.user.findOne({ id: req.session.user.id })
+      if (!user) return res.status(BAD_REQUEST).json({ error: "Could not regen token: user doesnt exist" })
+      user.token = randomId(32);
+      await this.orm.repos.user.save(user);
+      return res.status(200).json(user);
+    } catch (e) {
+      return res.status(BAD_REQUEST).json({ error: "Could not regen token: " + e.message })
     }
   }
 

@@ -7,6 +7,11 @@
         html {
             height: 100%;
         }
+
+        /* 
+        #copyToken {
+            transition: backgroundColor .3s;
+        } */
     </style>
     <%- include('./partials/head') %>
     <title>TypeX</title>
@@ -36,6 +41,16 @@
                     <h2>Welcome back, <%= user.username %></h2>
                     <p>You have <b><%= images.length %></b> images saved, and you
                         <%= user.administrator ? 'are an administrator' : 'are not an administrator' %></p>
+                    <h4>API Token</h4>
+                    <div class="btn-group" role="group" aria-label="API Token">
+                        <button type="button" class="btn btn-success" id="copyToken"
+                            style="border-top-left-radius: 50px; border-bottom-left-radius: 50px;">Copy</button>
+                        <button type="button" class="btn btn-danger" id="regenToken"
+                            style="border-top-right-radius: 50px; border-bottom-right-radius: 50px;">Regenerate</button>
+                    </div>
+                    <textarea style="display:none" id="apiBox">
+                    <%=user.token%>
+                    </textarea>
                 </div>
                 <div class="tab-pane fade m-3" id="images" role="tabpanel" aria-labelledby="images-tab">
                     <h3>Your Images</h3>
@@ -136,15 +151,95 @@
             </div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
     <script>
         function whitespace(str) {
             return str === null || str.match(/^ *$/) !== null;
         }
 
-        document.getElementById('createUser').addEventListener('click', async () => {
+        function showAlert(type, message) {
+            if (type === 'error') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: message,
+                    footer: 'Try again later...'
+                })
+            } else if (type === 'success') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: message,
+                    footer: 'You did it!'
+                })
+            }
+        }
+
+        document.getElementById('copyToken').addEventListener('click', async () => {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You are proceeding to copy your token, make sure NO ONE sees it.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, copy it!'
+            }).then((result) => {
+                if (result.value) {
+                    const el = document.createElement('textarea');
+                    el.value = "<%= user.token %>";
+                    document.body.appendChild(el);
+                    el.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(el);
+                    Swal.fire(
+                        'Copied!',
+                        'Your API Token has been copied.',
+                        'success'
+                    );
+                }
+            });
+        });
+        document.getElementById('regenToken').addEventListener('click', async () => {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You are proceeding to regenerate your token, remember all apps using your current one will stop working.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, regenerate it!'
+            }).then(async (result) => {
+                if (result.value) {
+                    const res = await fetch('/api/token', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    try {
+                        const json = await res.json();
+                        if (json.error || json.code) return showAlert('error', json.error)
+                        else {
+                            Swal.fire(
+                                'Regenerated!',
+                                'Your API Token has been regenerated.',
+                                'success'
+                            );
+                            return window.location.href = '/'
+                        }
+                    } catch (e) {
+                        console.error(e)
+                    }
+
+                }
+            });
+
+        })
+        async function createUser() {
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
-            if (whitespace(username)) return alert('Please provide a username!')
+            if (whitespace(username)) return showAlert('error', 'Please input a username.')
             const res = await fetch('/api/user', {
                 method: 'POST',
                 headers: {
@@ -158,14 +253,33 @@
             });
             try {
                 const json = await res.json();
-                if (json.error || json.code) return alert(json.error || json.message);
+                if (json.error || json.code) return showAlert('error', json.error)
                 else {
-                    $('#modal').modal('toggle')
-                    alert(`Created user ${json.username} with ID ${json.id}`)
+                    $('#modal').modal('toggle');
+                    showAlert('success', `Created user ${json.username} (${json.id})`)
                     return window.location.href = '/'
                 }
             } catch (e) {
                 console.error(e)
+            }
+        }
+        document.getElementById('createUser').addEventListener('click', async () => {
+            if (document.getElementById('administrator').checked) {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You are proceeding to create a user with administrator permissions, they can do whatever they want!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, create user!'
+                }).then(async (result) => {
+                    if (result.value) {
+                        createUser()
+                    }
+                });
+            } else {
+                createUser();
             }
         })
     </script>
