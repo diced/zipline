@@ -40,7 +40,8 @@
                 <div class="tab-pane fade show active m-3" id="home" role="tabpanel" aria-labelledby="home-tab">
                     <h2>Welcome back, <%= user.username %></h2>
                     <p>You have <b><%= images.length %></b> images saved, and you
-                        <%= user.administrator ? 'are an administrator' : 'are not an administrator' %></p>
+                        <%= user.administrator ? 'are an administrator' : 'are not an administrator' %>. (<a
+                            href="/logout">Logout</a> from <%= user.username %>)</p>
                     <h4>API Token</h4>
                     <div class="btn-group" role="group" aria-label="API Token">
                         <button type="button" class="btn btn-success" id="copyToken"
@@ -48,9 +49,21 @@
                         <button type="button" class="btn btn-danger" id="regenToken"
                             style="border-top-right-radius: 50px; border-bottom-right-radius: 50px;">Regenerate</button>
                     </div>
-                    <textarea style="display:none" id="apiBox">
-                    <%=user.token%>
-                    </textarea>
+                    <h4 style="margin-top:12px">Update your Profile</h4>
+                    <form>
+                        <div class="form-group">
+                            <label for="usernameSave">Username</label>
+                            <input value="<%= user.username %>" type="text" class="form-control" id="usernameSave"
+                                placeholder="Username">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="passwordSave">Password</label>
+                            <input value="<%= user.password %>" type="password" class="form-control" id="passwordSave"
+                                placeholder="Password">
+                        </div>
+                        <button type="button" class="btn btn-primary" id="saveUser">Save</button>
+                    </form>
                 </div>
                 <div class="tab-pane fade m-3" id="images" role="tabpanel" aria-labelledby="images-tab">
                     <h3>Your Images</h3>
@@ -174,6 +187,47 @@
                 })
             }
         }
+
+        document.getElementById('saveUser').addEventListener('click', async () => {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You are proceeding to edit your user.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, save changes!'
+            }).then(async (result) => {
+                if (result.value) {
+                    const username = document.getElementById('usernameSave').value;
+                    const password = document.getElementById('passwordSave').value;
+                    if (whitespace(username)) return showAlert('error', 'Please input a username.')
+                    const res = await fetch('/api/user', {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            username,
+                            password
+                        })
+                    });
+                    try {
+                        const json = await res.json();
+                        if (json.error || json.code) return showAlert('error', json.error)
+                        else {
+                            Swal.fire(
+                                'Saved Changes!',
+                                'Changes were saved successfully!',
+                                'success'
+                            );
+                        }
+                    } catch (e) {
+                        console.error(e)
+                    }
+                }
+            });
+        });
 
         document.getElementById('copyToken').addEventListener('click', async () => {
             Swal.fire({
