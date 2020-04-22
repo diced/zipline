@@ -1,0 +1,60 @@
+import { OK, BAD_REQUEST, FORBIDDEN } from 'http-status-codes';
+import { Controller, Middleware, Get, Post, Put, Delete } from '@overnightjs/core';
+import { Request, Response } from 'express';
+import config from '../../config.json';
+import { ORMHandler } from '..';
+import { randomId, getUser, getImage } from '../util';
+import { createReadStream, createWriteStream, unlinkSync, existsSync, mkdirSync } from 'fs'
+import multer from 'multer'
+import { getExtension } from 'mime';
+const upload = multer({ dest: 'temp/' });
+
+@Controller('api')
+export class APIController {
+  public orm: ORMHandler;
+
+  @Post('upload')
+  @Middleware(upload.single('file'))
+  private async upload(req: Request, res: Response) {
+    if (req.headers['authorization'] !== (await this.orm.repos.user.find({ where: { token: req.headers['authorization'] } }))[0].token) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: "Unauthorized" })
+    const user = (await this.orm.repos.user.find({ where: { token: req.headers['authorization'] } }))[0];
+    const file = req.file;
+    const id = randomId(5);
+    const extension = getExtension(file.mimetype);
+    const source = createReadStream(file.path);
+    if (!existsSync('./uploads')) mkdirSync('./uploads');
+    const destination = createWriteStream(`./uploads/${id}.${extension}`);
+    source.pipe(destination, { end: false });
+    source.on("end", function () {
+      unlinkSync(file.path);
+    });
+    getImage(this.orm, `${req.protocol}://${config.site.domain}/u/${id}.${extension}`, user.id)
+    return res.status(200).send(`${req.protocol}://${config.site.domain}/u/${id}.${extension}`)
+  }
+
+  @Post('user')
+  private async newUser(req: Request, res: Response) {
+    if (!req.session.user) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: 'Unauthorized' });
+    const user = await this.orm.repos.user.findOne({ where: { username: req.session.user.id } });
+    if (!user) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: 'Unauthorized' });
+    if (!user.administrator) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: 'Unauthorized' });
+    const data = req.body;
+    try {
+      const user = await getUser(this.orm, data.username, data.password, data.administrator);
+      return res.status(200).json(user);
+    } catch (e) {
+      return res.status(BAD_REQUEST).json({ error: "Could not create user: " + e.message })
+    }
+  }
+
+  @Get('images')
+  private async images(req: Request, res: Response) {
+    const all = await this.orm.repos.image.find();
+    return res.status(200).json(all)
+  }
+
+  public set(orm: ORMHandler) {
+    this.orm = orm;
+    return this;
+  }
+}

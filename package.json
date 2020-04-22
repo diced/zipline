@@ -1,0 +1,22 @@
+{
+  "name": "typex",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {},
+  "dependencies": {
+    "@ayanaware/logger": "^2.2.1",
+    "@forevolve/bootstrap-dark": "^1.0.0-alpha.981",
+    "@overnightjs/core": "^1.6.15",
+    "@types/express-session": "^1.17.0",
+    "@types/mime": "^2.0.1",
+    "@types/multer": "^1.4.3",
+    "ejs": "^3.0.2",
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
+    "http-status-codes": "^1.4.0",
+    "mime": "^2.4.4",
+    "multer": "^1.4.2",
+    "pg": "^8.0.2",
+    "typeorm": "^0.2.24"
+  }
+}

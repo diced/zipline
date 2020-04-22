@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <style>
+        body,
+        html {
+            height: 100%;
+        }
+    </style>
+    <%- include('./partials/head') %>
+    <title>TypeX</title>
+</head>
+
+<body>
+    <div class="container h-100 d-flex justify-content-center">
+        <div class="jumbotron my-auto">
+            <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                <li class="nav-item">
+                    <a style="border-radius: 50px;" class="nav-link active" id="home-tab" data-toggle="tab" href="#home"
+                        role="tab" aria-controls="home" aria-selected="true">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a style="border-radius: 50px;" class="nav-link" id="profile-tab" data-toggle="tab" href="#images"
+                        role="tab" aria-controls="images" aria-selected="false">Your Images</a>
+                </li>
+                <li class="nav-item">
+                    <a style="border-radius: 50px;" class="nav-link" id="contact-tab" data-toggle="tab" href="#users"
+                        role="tab" aria-controls="users" aria-selected="false">Users</a>
+                </li>
+            </ul>
+            <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active m-3" id="home" role="tabpanel" aria-labelledby="home-tab">
+                    <h2>Welcome back, <%= user.username %></h2>
+                    <p>You have <b><%= images.length %></b> images saved, and you <%= user.administrator ? 'are an administrator' : 'are not an administrator' %></p>
+                </div>
+                <div class="tab-pane fade m-3" id="images" role="tabpanel" aria-labelledby="images-tab">
+                    <h3>Your Images</h3>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">ID</th>
+                                <th scope="col">URL</th>
+                                <th scope="col">Preview</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% images.forEach(image => { %>
+                            <tr>
+                                <th scope="row"><%= image.id %></th>
+                                <td><a href="<%= image.url %>"><%=image.url%></td>
+                                <td><img src="<%= image.url %>" height="48"></td>
+                            </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="tab-pane fade" id="users" role="tabpanel" aria-labelledby="users-tab">...</div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
