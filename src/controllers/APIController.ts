@@ -7,6 +7,7 @@ import { randomId, getUser, getImage } from '../util';
 import { createReadStream, createWriteStream, unlinkSync, existsSync, mkdirSync } from 'fs'
 import multer from 'multer'
 import { getExtension } from 'mime';
+import { User } from '../entities/User';
 const upload = multer({ dest: 'temp/' });
 
 @Controller('api')
@@ -35,12 +36,12 @@ export class APIController {
   @Post('user')
   private async newUser(req: Request, res: Response) {
     if (!req.session.user) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: 'Unauthorized' });
-    const user = await this.orm.repos.user.findOne({ where: { username: req.session.user.id } });
-    if (!user) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: 'Unauthorized' });
-    if (!user.administrator) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: 'Unauthorized' });
+    if (!req.session.user.administrator) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: 'Unauthorized' });
     const data = req.body;
     try {
-      const user = await getUser(this.orm, data.username, data.password, data.administrator);
+      let user = await this.orm.repos.user.findOne({ username: data.username })
+      if (user) return res.status(BAD_REQUEST).json({ error: "Could not create user: user exists already" })
+      user = await this.orm.repos.user.save(new User().set({ username: data.username, password: data.password, administrator: data.administrator }))
       return res.status(200).json(user);
     } catch (e) {
       return res.status(BAD_REQUEST).json({ error: "Could not create user: " + e.message })

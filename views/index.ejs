@@ -15,7 +15,7 @@
 <body>
     <div class="container h-100 d-flex justify-content-center">
         <div class="jumbotron my-auto">
-            <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+            <ul class="nav nav-pills mb-3" id="main-view-tab-list" role="tablist">
                 <li class="nav-item">
                     <a style="border-radius: 50px;" class="nav-link active" id="home-tab" data-toggle="tab" href="#home"
                         role="tab" aria-controls="home" aria-selected="true">Home</a>
@@ -24,15 +24,18 @@
                     <a style="border-radius: 50px;" class="nav-link" id="profile-tab" data-toggle="tab" href="#images"
                         role="tab" aria-controls="images" aria-selected="false">Your Images</a>
                 </li>
+                <% if (user.administrator) { %>
                 <li class="nav-item">
                     <a style="border-radius: 50px;" class="nav-link" id="contact-tab" data-toggle="tab" href="#users"
                         role="tab" aria-controls="users" aria-selected="false">Users</a>
                 </li>
+                <% } %>
             </ul>
-            <div class="tab-content" id="myTabContent">
+            <div class="tab-content" id="main-view">
                 <div class="tab-pane fade show active m-3" id="home" role="tabpanel" aria-labelledby="home-tab">
                     <h2>Welcome back, <%= user.username %></h2>
-                    <p>You have <b><%= images.length %></b> images saved, and you <%= user.administrator ? 'are an administrator' : 'are not an administrator' %></p>
+                    <p>You have <b><%= images.length %></b> images saved, and you
+                        <%= user.administrator ? 'are an administrator' : 'are not an administrator' %></p>
                 </div>
                 <div class="tab-pane fade m-3" id="images" role="tabpanel" aria-labelledby="images-tab">
                     <h3>Your Images</h3>
@@ -55,10 +58,117 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="tab-pane fade" id="users" role="tabpanel" aria-labelledby="users-tab">...</div>
+                <% if (user.administrator) { %>
+                <div class="tab-pane fade m-3" id="users" role="tabpanel" aria-labelledby="users-tab">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">ID</th>
+                                <th scope="col">Username</th>
+                                <th scope="col">Administrator</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% users.forEach(user => { %>
+                            <tr>
+                                <th scope="row"><%= user.id %></th>
+                                <td><%= user.username %></td>
+                                <% if (user.administrator) { %>
+                                <td class="text-success">Yes</td>
+                                <% } else { %>
+                                <td class="text-danger">No</td>
+                                <% }%>
+                            </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal">Create new
+                        User</button>
+                    <div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                        aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">New User</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form>
+                                        <div class="form-group">
+                                            <label for="username">Username</label>
+                                            <input type="text" class="form-control" id="username" name="username"
+                                                placeholder="Username">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="password">Password</label>
+                                            <input type="password" class="form-control" id="password" name="password"
+                                                placeholder="Password">
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="administrator">
+                                                <label class="custom-control-label"
+                                                    for="administrator">Administrator?</label>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <div class="row" style="width:100%;">
+                                        <div class="col-sm-6">
+                                            <button type="button" id="createUser" class="btn btn-primary"
+                                                style="border-radius: 50px; width:100%;">Create</button>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <button type="button" class="btn btn-danger" data-dismiss="modal"
+                                                style="border-radius: 50px; width:100%;">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
             </div>
         </div>
     </div>
+    <script>
+        function whitespace(str) {
+            return str === null || str.match(/^ *$/) !== null;
+        }
+
+        document.getElementById('createUser').addEventListener('click', async () => {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            if (whitespace(username)) return alert('Please provide a username!')
+            const res = await fetch('/api/user', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username,
+                    password,
+                    administrator: document.getElementById('administrator').checked
+                })
+            });
+            try {
+                const json = await res.json();
+                if (json.error || json.code) return alert(json.error || json.message);
+                else {
+                    $('#modal').modal('toggle')
+                    alert(`Created user ${json.username} with ID ${json.id}`)
+                    return window.location.href = '/'
+                }
+            } catch (e) {
+                console.error(e)
+            }
+        })
+    </script>
 </body>
 
 </html>
