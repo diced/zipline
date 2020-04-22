@@ -67,9 +67,9 @@ export class APIController {
     if (!req.session.user) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: 'Unauthorized' });
     const q = req.query.user;
     try {
-      let user = await this.orm.repos.user.findOne({ id: q || req.session.user.id })
+      let user = await this.orm.repos.user.findOne({ id: Number(q) || req.session.user.id })
       if (!user) return res.status(BAD_REQUEST).json({ error: "Could not delete user: user doesnt exist" })
-      this.orm.repos.user.delete({ id: q || req.session.user.id })
+      this.orm.repos.user.delete({ id: Number(q) || req.session.user.id })
       return res.status(200).json(user);
     } catch (e) {
       return res.status(BAD_REQUEST).json({ error: "Could not delete user: " + e.message })

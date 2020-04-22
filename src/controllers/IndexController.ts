@@ -7,6 +7,7 @@ import { randomId, getUser, getImage } from '../util';
 import { createReadStream, createWriteStream, unlinkSync, existsSync, mkdirSync } from 'fs'
 import multer from 'multer'
 import { getExtension } from 'mime';
+import { User } from '../entities/User';
 const upload = multer({ dest: 'temp/' });
 
 @Controller('')
@@ -17,7 +18,7 @@ export class IndexController {
   private async index(req: Request, res: Response) {
     if (!req.session.user) return res.redirect('/login');
     const images = await this.orm.repos.image.find({ where: { user: req.session.user.id } });
-    const users = await this.orm.repos.user.find();
+    const users = await this.orm.repos.user.find({ order: { id: 'ASC' } });
     return res.render('index', { user: req.session.user, images, users })
   }
 
@@ -38,6 +39,7 @@ export class IndexController {
   private async postLogin(req: Request, res: Response) {
     if (req.session.user) return res.redirect('/');
     if (req.body.username == 'administrator' && req.body.password === config.administrator.password) {
+      //@ts-ignore
       req.session.user = {
         id: 0,
         username: 'administrator',

@@ -5,6 +5,16 @@ import config from '../config.json';
 import Logger from "@ayanaware/logger";
 import { Image } from "./entities/Image";
 
+export interface ExpressSession {
+  user: User
+}
+
+declare module 'express' {
+  class Request {
+    public session: ExpressSession
+  }
+}
+
 export interface ORMRepos {
   user?: Repository<User>;
   image?: Repository<Image>;

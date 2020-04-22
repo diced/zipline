@@ -62,7 +62,8 @@
                             <input value="<%= user.password %>" type="password" class="form-control" id="passwordSave"
                                 placeholder="Password">
                         </div>
-                        <button type="button" class="btn btn-primary" id="saveUser">Save</button>
+                        <button type="button" class="btn btn-primary" id="saveUser"
+                            style="border-radius: 50px; width:100%;">Save</button>
                     </form>
                 </div>
                 <div class="tab-pane fade m-3" id="images" role="tabpanel" aria-labelledby="images-tab">
@@ -97,17 +98,23 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <% users.forEach(user => { %>
+                            <% users.forEach(u => { %>
                             <tr>
-                                <th scope="row"><%= user.id %></th>
-                                <td><%= user.username %></td>
-                                <% if (user.administrator) { %>
+                                <th scope="row"><%= u.id %></th>
+                                <td><%= u.username %></td>
+                                <% if (u.administrator) { %>
                                 <td class="text-success">Yes</td>
                                 <% } else { %>
                                 <td class="text-danger">No</td>
-                                <% }%>
+                                <% } %>
+                                <td>
+                                    <% if (!u.administrator) { %>
+                                    <button type="button" class="btn btn-danger"
+                                        style="border-radius: 50px;">Delete</button>
+                                    <% } %>
+                                </td>
                             </tr>
-                            <% }) %>
+                            <% }); %>
                         </tbody>
                     </table>
                     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal">Create new
@@ -152,7 +159,7 @@
                                         </div>
                                         <div class="col-sm-6">
                                             <button type="button" class="btn btn-danger" data-dismiss="modal"
-                                                style="border-radius: 50px; width:100%;">Close</button>
+                                                style="border-radius: 50px; width:100%;">Cancel</button>
                                         </div>
                                     </div>
                                 </div>
@@ -164,7 +171,6 @@
             </div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
     <script>
         function whitespace(str) {
             return str === null || str.match(/^ *$/) !== null;
@@ -290,6 +296,52 @@
             });
 
         })
+        // async function editUser() {
+        //     const username = document.getElementById('usernameEdit').value;
+        //     const password = document.getElementById('passwordEdit').value;
+        //     if (whitespace(username)) return showAlert('error', 'Please input a username.')
+        //     const res = await fetch('/api/user', {
+        //         method: 'PATCH',
+        //         headers: {
+        //             'Content-Type': 'application/json'
+        //         },
+        //         body: JSON.stringify({
+        //             username,
+        //             password,
+        //             administrator: document.getElementById('administratorEdit').checked
+        //         })
+        //     });
+        //     try {
+        //         const json = await res.json();
+        //         if (json.error || json.code) return showAlert('error', json.error)
+        //         else {
+        //             $('#edit-modal').modal('toggle');
+        //             showAlert('success', `Edited user ${json.username} (${json.id})`)
+        //             return window.location.href = '/'
+        //         }
+        //     } catch (e) {
+        //         console.error(e)
+        //     }
+        // }
+        // document.getElementById('editUser').addEventListener('click', async () => {
+        //     if (document.getElementById('administratorEdit').checked) {
+        //         Swal.fire({
+        //             title: 'Are you sure?',
+        //             text: "You are proceeding to save a user with administrator permissions, they can do whatever they want!",
+        //             icon: 'warning',
+        //             showCancelButton: true,
+        //             confirmButtonColor: '#3085d6',
+        //             cancelButtonColor: '#d33',
+        //             confirmButtonText: 'Yes, edit user!'
+        //         }).then(async (result) => {
+        //             if (result.value) {
+        //                 editUser()
+        //             }
+        //         });
+        //     } else {
+        //         editUser();
+        //     }
+        // })
         async function createUser() {
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
