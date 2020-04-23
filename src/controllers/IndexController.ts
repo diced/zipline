@@ -16,6 +16,7 @@ export class IndexController {
 
   @Get('')
   private async index(req: Request, res: Response) {
+    if (req.cookies.typex_user) req.session.user = req.cookies.typex_user;
     if (!req.session.user) return res.redirect('/login');
     const images = await this.orm.repos.image.find({ where: { user: req.session.user.id } });
     const users = await this.orm.repos.user.find({ order: { id: 'ASC' } });
@@ -24,12 +25,14 @@ export class IndexController {
 
   @Get('login')
   private async login(req: Request, res: Response) {
-    if (req.session.user) return res.redirect('/')
+    if (req.cookies.typex_user) req.session.user = req.cookies.typex_user;
+    if (req.session.user) return res.redirect('/');
     return res.status(200).render('login', { password: true, username: true })
   }
 
   @Get('logout')
   private async logout(req: Request, res: Response) {
+    if (req.cookies.typex_user) req.session.user = req.cookies.typex_user;
     if (!req.session.user) return res.redirect('/')
     req.session.user = null;
     res.redirect('/login');
@@ -37,6 +40,7 @@ export class IndexController {
 
   @Post('login')
   private async postLogin(req: Request, res: Response) {
+    if (req.cookies.typex_user) req.session.user = req.cookies.typex_user;
     if (req.session.user) return res.redirect('/');
     if (req.body.username == 'administrator' && req.body.password === config.administrator.password) {
       //@ts-ignore
@@ -47,12 +51,15 @@ export class IndexController {
         token: config.administrator.authorization,
         administrator: true
       }
+      res.cookie('typex_user', req.session.user, { maxAge: 1036800000 });
       return res.redirect('/')
     }
     const user = await this.orm.repos.user.findOne({ where: { username: req.body.username } });
     if (!user) return res.status(200).render('login', { username: false, password: false })
     if (req.body.password !== user.password) return res.status(200).render('login', { password: false, username: false })
     req.session.user = user;
+    console.log(req.cookies);
+    res.cookie('typex_user', req.session.user, { maxAge: 1036800000 });
     return res.redirect('/')
   }
 

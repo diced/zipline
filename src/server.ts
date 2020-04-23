@@ -6,6 +6,7 @@ import Logger from '@ayanaware/logger';
 import config from '../config.json';
 import * as express from 'express';
 import session from 'express-session';
+import cookies from 'cookie-parser';
 import { APIController } from './controllers/APIController';
 import { IndexController } from './controllers/IndexController';
 
@@ -18,6 +19,7 @@ export class TypeXServer extends Server {
       resave: false,
       saveUninitialized: false
     }))
+    this.app.use(cookies())
     this.app.set('view engine', 'ejs');
     this.app.use('/u', express.static('uploads'))
     this.app.use('/public', express.static('public'))

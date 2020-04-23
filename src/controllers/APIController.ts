@@ -36,6 +36,7 @@ export class APIController {
 
   @Post('user')
   private async newUser(req: Request, res: Response) {
+    if (req.cookies.typex_user) req.session.user = req.cookies.typex_user;
     if (!req.session.user) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: 'Unauthorized' });
     if (!req.session.user.administrator) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: 'Unauthorized' });
     const data = req.body;
@@ -51,6 +52,7 @@ export class APIController {
 
   @Patch('user')
   private async patchUser(req: Request, res: Response) {
+    if (req.cookies.typex_user) req.session.user = req.cookies.typex_user;
     if (!req.session.user) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: 'Unauthorized' });
     const data = req.body;
     try {
@@ -65,6 +67,7 @@ export class APIController {
 
   @Delete('user')
   private async deleteUser(req: Request, res: Response) {
+    if (req.cookies.typex_user) req.session.user = req.cookies.typex_user;
     if (!req.session.user) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: 'Unauthorized' });
     const q = req.query.user;
     try {
