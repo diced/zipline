@@ -8,7 +8,8 @@ import { createReadStream, createWriteStream, unlinkSync, existsSync, mkdirSync 
 import multer from 'multer'
 import { getExtension } from 'mime';
 import { User } from '../entities/User';
-const upload = multer({ dest: 'temp/' });
+import { sep } from 'path';
+const upload = multer({ dest: config.upload.tempDir });
 
 @Controller('api')
 export class APIController {
@@ -23,8 +24,8 @@ export class APIController {
     const id = randomId(5);
     const extension = getExtension(file.mimetype);
     const source = createReadStream(file.path);
-    if (!existsSync('./uploads')) mkdirSync('./uploads');
-    const destination = createWriteStream(`./uploads/${id}.${extension}`);
+    if (!existsSync(config.upload.uploadDir)) mkdirSync(config.upload.uploadDir);
+    const destination = createWriteStream(`${config.upload.uploadDir}${sep}${id}.${extension}`);
     source.pipe(destination, { end: false });
     source.on("end", function () {
       unlinkSync(file.path);
