@@ -35,6 +35,7 @@ export class IndexController {
     if (req.cookies.typex_user) req.session.user = req.cookies.typex_user;
     if (!req.session.user) return res.redirect('/')
     req.session.user = null;
+    res.clearCookie('typex_user');
     res.redirect('/login');
   }
 
