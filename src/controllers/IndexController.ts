@@ -59,7 +59,6 @@ export class IndexController {
     if (!user) return res.status(200).render('login', { username: false, password: false })
     if (req.body.password !== user.password) return res.status(200).render('login', { password: false, username: false })
     req.session.user = user;
-    console.log(req.cookies);
     res.cookie('typex_user', req.session.user, { maxAge: 1036800000 });
     return res.redirect('/')
   }
