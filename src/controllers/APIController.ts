@@ -30,8 +30,8 @@ export class APIController {
     source.on("end", function () {
       unlinkSync(file.path);
     });
-    getImage(this.orm, `${req.protocol}://${config.site.domain}/u/${id}.${extension}`, user.id)
-    return res.status(200).send(`${req.protocol}://${config.site.domain}/u/${id}.${extension}`)
+    getImage(this.orm, `${req.protocol}://${req.headers['host']}/u/${id}.${extension}`, user.id)
+    return res.status(200).send(`${req.protocol}://${req.headers['host']}/u/${id}.${extension}`)
   }
 
   @Post('user')
