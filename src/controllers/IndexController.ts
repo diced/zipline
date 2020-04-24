@@ -18,7 +18,7 @@ export class IndexController {
   private async index(req: Request, res: Response) {
     if (req.cookies.typex_user) req.session.user = req.cookies.typex_user;
     if (!req.session.user) return res.redirect('/login');
-    if (req.session.user.id !== 0) if (!(await this.orm.repos.user.findOne({ id: req.session.user.id }))) {
+    if (req.session.user && req.session.user.id !== 0) if (!(await this.orm.repos.user.findOne({ id: req.session.user.id }))) {
       res.clearCookie('typex_user');
       req.session.user = null;
       return res.redirect('/login')
@@ -32,7 +32,7 @@ export class IndexController {
   private async login(req: Request, res: Response) {
     if (req.cookies.typex_user) req.session.user = req.cookies.typex_user;
     if (req.session.user) return res.redirect('/');
-    if (req.session.user.id !== 0) if (!(await this.orm.repos.user.findOne({ id: req.session.user.id }))) {
+    if (req.session.user && req.session.user.id !== 0) if (!(await this.orm.repos.user.findOne({ id: req.session.user.id }))) {
       res.clearCookie('typex_user');
       req.session.user = null;
       return res.redirect('/login')
@@ -44,7 +44,7 @@ export class IndexController {
   private async logout(req: Request, res: Response) {
     if (req.cookies.typex_user) req.session.user = req.cookies.typex_user;
     if (!req.session.user) return res.redirect('/')
-    if (req.session.user.id !== 0) if (!(await this.orm.repos.user.findOne({ id: req.session.user.id }))) {
+    if (req.session.user && req.session.user.id !== 0) if (!(await this.orm.repos.user.findOne({ id: req.session.user.id }))) {
       res.clearCookie('typex_user');
       req.session.user = null;
       return res.redirect('/login')
@@ -58,7 +58,7 @@ export class IndexController {
   private async postLogin(req: Request, res: Response) {
     if (req.cookies.typex_user) req.session.user = req.cookies.typex_user;
     if (req.session.user) return res.redirect('/');
-    if (req.session.user.id !== 0) if (!(await this.orm.repos.user.findOne({ id: req.session.user.id }))) {
+    if (req.session.user && req.session.user.id !== 0) if (!(await this.orm.repos.user.findOne({ id: req.session.user.id }))) {
       res.clearCookie('typex_user');
       req.session.user = null;
       return res.redirect('/login')

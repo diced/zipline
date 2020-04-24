@@ -13,11 +13,7 @@
 </head>
 
 <body>
-    <% if (!username) { %>
-    <div style="display:none;" id="check">
-        true
-    </div>
-    <% } %>
+    <div id="particles-js"></div>
     <div class="container h-100 d-flex justify-content-center">
         <div class="jumbotron my-auto">
             <h1 class="display-4" style="text-align: center;">Login</h1>
@@ -36,6 +32,20 @@
             </form>
         </div>
     </div>
+    <p style="display:none" id="partenabled"><%=config.particles.enabled%></p>
+    <p style="display:none" id="part"><%=JSON.stringify(config.particles.settings) %></p>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@9/dist/sweetalert2.min.js"></script>
+    <script src="http://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>if (document.getElementById('partenabled').innerText === "true") particlesJS("particles-js", JSON.parse(document.getElementById('part').innerText));</script>
     <script>
         if (document.getElementById('check').value === 'true') {
             Swal.fire({
