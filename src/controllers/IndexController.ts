@@ -20,14 +20,14 @@ export class IndexController {
     if (!req.session.user) return res.redirect('/login');
     const images = await this.orm.repos.image.find({ where: { user: req.session.user.id } });
     const users = await this.orm.repos.user.find({ order: { id: 'ASC' } });
-    return res.render('index', { user: req.session.user, images, users })
+    return res.render('index', { user: req.session.user, images, users, config })
   }
 
   @Get('login')
   private async login(req: Request, res: Response) {
     if (req.cookies.typex_user) req.session.user = req.cookies.typex_user;
     if (req.session.user) return res.redirect('/');
-    return res.status(200).render('login', { password: true, username: true })
+    return res.status(200).render('login', { password: true, username: true, config })
   }
 
   @Get('logout')
