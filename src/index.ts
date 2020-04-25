@@ -1,8 +1,13 @@
-import './core/Console';
-import { Repository, Connection, createConnection, ConnectionOptions } from "typeorm";
+import "./core/Console";
+import {
+  Repository,
+  Connection,
+  createConnection,
+  ConnectionOptions,
+} from "typeorm";
 import { User } from "./entities/User";
 import { TypeXServer } from "./server";
-import config from '../config.json';
+import config from "../config.json";
 import Logger from "@ayanaware/logger";
 import { Image } from "./entities/Image";
 
@@ -17,15 +22,18 @@ export interface ORMHandler {
 }
 
 (async () => {
-  const connection = await createConnection(config.orm as ConnectionOptions)
+  const connection = await createConnection(config.orm as ConnectionOptions);
   const orm: ORMHandler = {
     connection,
     repos: {
       user: connection.getRepository(User),
-      image: connection.getRepository(Image)
-    }
+      image: connection.getRepository(Image),
+    },
   };
-  if (orm.connection.isConnected) Logger.get(Connection).info(`Successfully initialized database type: ${config.orm.type}`)
+  if (orm.connection.isConnected)
+    Logger.get(Connection).info(
+      `Successfully initialized database type: ${config.orm.type}`
+    );
   const server = new TypeXServer(orm);
-  server.start(config.port)
+  server.start();
 })();
