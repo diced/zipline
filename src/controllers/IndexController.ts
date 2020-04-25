@@ -24,13 +24,12 @@ export class IndexController {
   }
 
   @Get('login')
-  @Middleware(cookies)
   private async login(req: Request, res: Response) {
-    return res.status(200).render('login', { password: true, username: true, config })
+    if (req.session.user || req.cookies.typex_user) return res.redirect('/');
+    return res.status(200).render('login', { failed: false, config })
   }
 
   @Get('logout')
-  @Middleware(cookies)
   private async logout(req: Request, res: Response) {
     req.session.user = null;
     res.clearCookie('typex_user');
@@ -38,8 +37,8 @@ export class IndexController {
   }
 
   @Post('login')
-  @Middleware(cookies)
   private async postLogin(req: Request, res: Response) {
+    if (req.session.user || req.cookies.typex_user) return res.redirect('/');
     if (req.body.username == 'administrator' && req.body.password === config.administrator.password) {
       //@ts-ignore
       req.session.user = {
@@ -53,8 +52,8 @@ export class IndexController {
       return res.redirect('/')
     }
     const user = await this.orm.repos.user.findOne({ where: { username: req.body.username } });
-    if (!user) return res.status(200).render('login', { username: false, password: false, config })
-    if (req.body.password !== user.password) return res.status(200).render('login', { password: false, username: false, config })
+    if (!user) return res.status(200).render('login', { failed: true, config })
+    if (req.body.password !== user.password) return res.status(200).render('login', { failed: true, config })
     req.session.user = user;
     res.cookie('typex_user', req.session.user.id, { maxAge: 1036800000 });
     return res.redirect('/')

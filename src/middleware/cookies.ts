@@ -5,7 +5,6 @@ import { User } from "../entities/User";
 
 export async function cookies(req: Request, res: Response, next: any) {
     if (req.cookies.typex_user) {
-        console.log(typeof req.cookies.typex_user);
         if (typeof req.cookies.typex_user !== 'string') return res.send('Please clear your browser cookies and refresh this page.')
         if (req.cookies.typex_user === 0) req.session.user = {
             id: 0,

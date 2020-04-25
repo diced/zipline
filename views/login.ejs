@@ -47,7 +47,7 @@
     <script src="http://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script>if (document.getElementById('partenabled').innerText === "true") particlesJS("particles-js", JSON.parse(document.getElementById('part').innerText));</script>
     <script>
-        if (document.getElementById('check').value === 'true') {
+        if ("<%=failed%>" === 'true') {
             Swal.fire({
                 icon: 'error',
                 title: 'Oops...',
