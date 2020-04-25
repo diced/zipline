@@ -18,6 +18,7 @@ export class APIController {
   @Post('upload')
   @Middleware(upload.single('file'))
   private async upload(req: Request, res: Response) {
+    if (req.headers['authorization'] === config.administrator.authorization) return res.status(BAD_REQUEST).json({ code: BAD_REQUEST, message: "You can't upload files with the administrator account." })
     if (req.headers['authorization'] !== (await this.orm.repos.user.find({ where: { token: req.headers['authorization'] } }))[0].token) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: "Unauthorized" })
     const user = (await this.orm.repos.user.find({ where: { token: req.headers['authorization'] } }))[0];
     const file = req.file;

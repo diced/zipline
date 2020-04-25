@@ -25,7 +25,7 @@ export interface ORMHandler {
       image: connection.getRepository(Image)
     }
   };
-  if (orm.connection.isConnected) Logger.get(Connection).info(`Successfully initialized postgres`)
+  if (orm.connection.isConnected) Logger.get(Connection).info(`Successfully initialized database type: ${config.orm.type}`)
   const server = new TypeXServer(orm);
   server.start(config.port)
 })();

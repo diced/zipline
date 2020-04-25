@@ -14,7 +14,7 @@
         } */
     </style>
     <%- include('./partials/head') %>
-    <title>TypeX</title>
+    <title><%= config.meta.title %> - Dashboard</title>
 </head>
 
 <body>
@@ -39,10 +39,11 @@
             </ul>
             <div class="tab-content" id="main-view">
                 <div class="tab-pane fade show active m-3" id="home" role="tabpanel" aria-labelledby="home-tab">
-                    <h2>Welcome back, <%= user.username %></h2>
+                    <h2>Welcome back, <%= user.username %> <a class="btn btn-sm btn-danger" href="/logout"
+                            style="border-radius: 50px;">Logout</a>
+                    </h2>
                     <p>You have <b><%= images.length %></b> images saved, and you
-                        <%= user.administrator ? 'are an administrator' : 'are not an administrator' %>. (<a
-                            href="/logout">Logout</a> from <%= user.username %>)</p>
+                        <%= user.administrator ? 'are an administrator' : 'are not an administrator' %>.</p>
                     <h4>API Token</h4>
                     <button type="button" class="btn btn-sm btn-primary" id="copyToken"
                         style="border-radius: 50px;">Copy</button>
