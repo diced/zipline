@@ -48,16 +48,16 @@ export class TypeXServer extends Server {
       const creds = { key, cert };
 
       const httpsServer = https.createServer(creds, this.app);
-      httpsServer.listen(config.site.https_port, () => {
+      httpsServer.listen(config.site.httpsPort, () => {
         Logger.get(TypeXServer).info(
-          "Started https server on port " + config.site.https_port
+          "Started https server on port " + config.site.httpsPort
         );
       });
     } else {
       const httpServer = http.createServer(this.app);
-      httpServer.listen(config.site.http_port, () => {
+      httpServer.listen(config.site.httpPort, () => {
         Logger.get(TypeXServer).info(
-          "Started http server on port " + config.site.http_port
+          "Started http server on port " + config.site.httpPort
         );
       });
     }

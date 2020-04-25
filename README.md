@@ -7,15 +7,21 @@ A TypeScript based Image/File uploading server. Fast and Elegant.
 1. Prerequisites
    1. Node
    2. Common Databases
+   3. Installing Database Drivers
+      1. PostgreSQL
+      2. CockroachDB
+      3. MySQL
+      4. MariaDB
+      5. Microsoft SQL Server
 2. Installation
    1. Get the Source
    2. Setting up configurations
       1. Upload Size
       2. Site Settings
-      3. Administrator user
-      4. Database configuration
-      5. Session Secret
-      6. Web server port
+      3. SSL Settings
+      4. Administrator user
+      5. Database configuration
+      6. Session Secret
       7. Particles.JS
    3. Example Config
    4. Compiling Source
@@ -56,14 +62,58 @@ v13.13.0
 
 ### Common Databases
 
-- MariaDB
-- MySQL
 - PostgreSQL
 - CockroachDB
+- MySQL
+- MariaDB
 - Microsoft SQL Server
 - MongoDB (Coming soon!)
 
 (check out [this](https://github.com/typeorm/typeorm/blob/master/docs/connection-options.md) for all types, you will need to use a different ORM config later on, view [this](https://github.com/typeorm/typeorm/blob/master/docs/connection-options.md#common-connection-options) for every option, more on this on Database configuration setup step)
+
+### Installing Database Drivers
+
+In this installation step, you will be installing the drivers of your choice database.
+
+#### Getting PostgreSQL Drivers
+
+Run the following command in order to get PostgreSQL drivers
+
+```sh
+npm i pg --save-dev
+```
+
+#### Getting CockroachDB Drivers
+
+Run the following command in order to get CockroachDB drivers
+
+```sh
+npm i cockroachdb --save-dev
+```
+
+#### Getting MySQL Drivers
+
+Run the following command in order to get MySQL drivers
+
+```sh
+npm i mysql --save-dev
+```
+
+#### Getting MariaDB Drivers
+
+Run the following command in order to get MariaDB drivers
+
+```sh
+npm i mariadb --save-dev
+```
+
+#### Getting Microsoft SQL Drivers
+
+Run the following command in order to get Microsoft SQL drivers
+
+```sh
+npm i mssql --save-dev
+```
 
 ## Installation
 
@@ -101,16 +151,17 @@ Every single configuration option will be listed here
 | Config Property | Type    | Description / Expected Values                          |
 | --------------- | ------- | ------------------------------------------------------ |
 | `site.protocol` | integer | protocol (http or https)                               |
-| `site.domain`   | string  | domain of server (ex. `localhost:8080`, `example.com`) |
+| `site.serveHTTP`   | string  | Port to run the web server on with HTTP (can be used with nginx + CloudFlare as a reverse proxy and let CloudFlare take care of SSL) |
+| `site.serveHTTPS`   | string  | Port to run the web server on with HTTPS (only will be used if `site.protocol` is `https`) (you will need SSL certificates! See [this](#ssl-settings)) |
 
 #### SSL Settings
 
-**Config Property:** `ssl`
+**Config Property:** `site.ssl`
 
 | Config Property | Type   | Description / Expected Values                   |
 | --------------- | ------ | ----------------------------------------------- |
-| `ssl.key`       | string | path to ssl private key. ex: `./ssl/server.key` |
-| `ssl.cert`      | string | path to ssl certificate. ex: `./ssl/cert.crt`   |
+| `site.ssl.key`       | string | path to ssl private key. ex: `./ssl/server.key` |
+| `site.ssl.cert`      | string | path to ssl certificate. ex: `./ssl/cert.crt`   |
 
 #### Administrator User
 
@@ -143,16 +194,6 @@ Every single configuration option will be listed here
 
 A Random string of characters (anything)
 
-#### Ports
-
-**Config Property:** `http_port`
-
-Port to run the http server on
-
-**Config Property:** `https_port`
-
-Port to run the https server on
-
 #### Meta Configuration
 
 **Config Property:** `meta`
@@ -173,7 +214,7 @@ Particles.JS, can be enabled and it's config can be changed willingly.
 | Config Property     | Type            | Description / Expected Values                                                                                                |
 | ------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | `particles.enabled` | boolean         | Whether particles should show up on routes                                                                                   |
-| `particles.config`  | particlesconfig | Config from [this](https://vincentgarreau.com/particles.js/) play around with the configuration, then paste the json to here |
+| `particles.config`  | particles config | Config from [this](https://vincentgarreau.com/particles.js/) play around with the configuration, then paste the JSON to here |
 
 ### Example Config
 
@@ -194,9 +235,9 @@ Particles.JS, can be enabled and it's config can be changed willingly.
       "key": "./ssl/server.key",
       "cert": "./ssl/server.crt"
     },
-    "https_port": 443,
-    "http_port": 80
-  },
+    "serveHTTPS": 443, // https port to serve on (will be used if protocol is https)
+    "serveHTTP": 8000 // http port to serve on (will be used if protocol is http)
+  }
   "administrator": {
     "password": "1234",
     "authorization": "Administrator 1234"
