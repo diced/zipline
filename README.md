@@ -140,6 +140,17 @@ A Random string of characters (anything)
 
 Port to run the webserver on
 
+#### Meta Configuration
+
+**Config Property:** `meta`
+
+Particles.JS, can be enabled and it's config can be changed willingly.
+
+| Config Property    | Type     | Description / Expected Values                        |
+|--------------------|----------|------------------------------------------------------|
+| `meta.favicon`| string  | has to be in /public/assets folder and should be formatted as `"/public/assets/<file name>"` |
+| `meta.title` | string   | title of your server shows up like `<title> - Login` or `<title> - Dashboard` |
+
 #### Particles.JS Configuration
 
 **Config Property:** `particles`
