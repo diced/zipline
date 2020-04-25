@@ -1,5 +1,9 @@
 node_modules
 temp
+tmp
 uploads
 config.json
 out
+public/assets/pd_logo.png
+ssl/localhost.key
+ssl/localhost.crt
