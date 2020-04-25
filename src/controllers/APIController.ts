@@ -9,6 +9,7 @@ import multer from 'multer'
 import { getExtension } from 'mime';
 import { User } from '../entities/User';
 import { sep } from 'path';
+import { cookiesForAPI } from '../middleware/cookiesForAPI';
 const upload = multer({ dest: config.upload.tempDir });
 
 @Controller('api')
@@ -24,7 +25,7 @@ export class APIController {
     if (req.headers['authorization'] !== users[0].token) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: "Unauthorized" })
     const user = users[0];
     const file = req.file;
-    const id = randomId(5);
+    const id = randomId(config.upload.fileLength);
     const extension = getExtension(file.mimetype);
     const source = createReadStream(file.path);
     if (!existsSync(config.upload.uploadDir)) mkdirSync(config.upload.uploadDir);
@@ -38,9 +39,8 @@ export class APIController {
   }
 
   @Post('user')
+  @Middleware(cookiesForAPI)
   private async newUser(req: Request, res: Response) {
-    if (req.cookies.typex_user) req.session.user = req.cookies.typex_user;
-    if (!req.session.user) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: 'Unauthorized' });
     if (!req.session.user.administrator) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: 'Unauthorized' });
     const data = req.body;
     try {
@@ -54,9 +54,8 @@ export class APIController {
   }
 
   @Patch('user')
+  @Middleware(cookiesForAPI)
   private async patchUser(req: Request, res: Response) {
-    if (req.cookies.typex_user) req.session.user = req.cookies.typex_user;
-    if (!req.session.user) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: 'Unauthorized' });
     const data = req.body;
     try {
       let user = await this.orm.repos.user.findOne({ id: req.session.user.id })
@@ -69,9 +68,8 @@ export class APIController {
   }
 
   @Delete('user')
+  @Middleware(cookiesForAPI)
   private async deleteUser(req: Request, res: Response) {
-    if (req.cookies.typex_user) req.session.user = req.cookies.typex_user;
-    if (!req.session.user) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: 'Unauthorized' });
     const q = req.query.user;
     try {
       let user = await this.orm.repos.user.findOne({ id: Number(q) || req.session.user.id })
@@ -84,13 +82,13 @@ export class APIController {
   }
 
   @Post('token')
+  @Middleware(cookiesForAPI)
   private async postToken(req: Request, res: Response) {
-    if (!req.session.user) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: 'Unauthorized' });
-    const data = req.body;
     try {
       let user = await this.orm.repos.user.findOne({ id: req.session.user.id })
       if (!user) return res.status(BAD_REQUEST).json({ error: "Could not regen token: user doesnt exist" })
-      user.token = randomId(32);
+      user.token = randomId(config.user.tokenLength);
+      req.session.user = user;
       await this.orm.repos.user.save(user);
       return res.status(200).json(user);
     } catch (e) {
