@@ -19,10 +19,10 @@ export class APIController {
   @Middleware(upload.single('file'))
   private async upload(req: Request, res: Response) {
     if (req.headers['authorization'] === config.administrator.authorization) return res.status(BAD_REQUEST).json({ code: BAD_REQUEST, message: "You can't upload files with the administrator account." })
-    const u = await this.orm.repos.user.find({ where: { token: req.headers['authorization'] } })[0];
-    if (!u) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: "Unauthorized" })
-    if (req.headers['authorization'] !== u.token) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: "Unauthorized" })
-    const user = (await this.orm.repos.user.find({ where: { token: req.headers['authorization'] } }))[0];
+    const users = await this.orm.repos.user.find({ where: { token: req.headers['authorization'] } });
+    if (!users[0]) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: "Unauthorized" })
+    if (req.headers['authorization'] !== users[0].token) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: "Unauthorized" })
+    const user = users[0];
     const file = req.file;
     const id = randomId(5);
     const extension = getExtension(file.mimetype);
