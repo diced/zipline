@@ -76,8 +76,8 @@ export class IndexController {
       return res.redirect('/')
     }
     const user = await this.orm.repos.user.findOne({ where: { username: req.body.username } });
-    if (!user) return res.status(200).render('login', { username: false, password: false })
-    if (req.body.password !== user.password) return res.status(200).render('login', { password: false, username: false })
+    if (!user) return res.status(200).render('login', { username: false, password: false, config })
+    if (req.body.password !== user.password) return res.status(200).render('login', { password: false, username: false, config })
     req.session.user = user;
     res.cookie('typex_user', req.session.user, { maxAge: 1036800000 });
     return res.redirect('/')
