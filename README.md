@@ -237,7 +237,7 @@ Particles.JS, can be enabled and it's config can be changed willingly.
     },
     "serveHTTPS": 443, // https port to serve on (will be used if protocol is https)
     "serveHTTP": 8000 // http port to serve on (will be used if protocol is http)
-  }
+  },
   "administrator": {
     "password": "1234",
     "authorization": "Administrator 1234"

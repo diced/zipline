@@ -42,24 +42,24 @@ export class TypeXServer extends Server {
     // this.app.listen(port, () => {
     //   Logger.get(TypeXServer).info('Started server on port ' + port);
     // })
+    let server;
     if (config.site.protocol === "https") {
-      const key = fs.readFileSync(config.site.ssl.key, "utf-8");
-      const cert = fs.readFileSync(config.site.ssl.cert, "utf-8");
-      const creds = { key, cert };
+      try {
+        const creds = {
+          key: fs.readFileSync(config.site.ssl.key, "utf-8"),
+          cert: fs.readFileSync(config.site.ssl.cert, "utf-8")
+        };
+        server = https.createServer(creds, this.app);
+      } catch (e) {
+        if (e.code === 'ENOENT') {
+          Logger.get('TypeXServer.FS').error(`No file/directory found for ${e.path}`);
+          process.exit(1);
+        }
+      }
+    } else server = http.createServer(this.app);
 
-      const httpsServer = https.createServer(creds, this.app);
-      httpsServer.listen(config.site.httpsPort, () => {
-        Logger.get(TypeXServer).info(
-          "Started https server on port " + config.site.httpsPort
-        );
-      });
-    } else {
-      const httpServer = http.createServer(this.app);
-      httpServer.listen(config.site.httpPort, () => {
-        Logger.get(TypeXServer).info(
-          "Started http server on port " + config.site.httpPort
-        );
-      });
-    }
+    server.listen(config.site.protocol === 'https' ? config.site.serveHTTPS : config.site.serveHTTP, () => {
+      Logger.get(TypeXServer).info('Started server on port ' + String(config.site.protocol === 'https' ? config.site.serveHTTPS : config.site.serveHTTP));
+    })
   }
 }
