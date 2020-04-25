@@ -1,5 +1,6 @@
 import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 import { randomId } from "../util";
+import config from '../../config.json';
 
 @Entity()
 export class User {
@@ -22,7 +23,7 @@ export class User {
     this.username = options.username;
     this.password = options.password;
     this.administrator = options.administrator;
-    this.token = randomId(32)
+    this.token = randomId(config.user.randomIDSize)
     return this;
   }
 }
