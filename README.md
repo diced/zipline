@@ -213,7 +213,6 @@ Particles.JS, can be enabled and it's config can be changed willingly.
     "entities": ["out/src/entities/**/*.js"]
   },
   "sessionSecret": "qwertyuiopasdfghjklzxcvbnm",
-  "port": 8000,
   "particles": {
     "enabled": true,
     "settings": {
