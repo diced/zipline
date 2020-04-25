@@ -5,21 +5,21 @@ A TypeScript based Image/File uploading server. Fast and Elegant.
 ## Table of Contents
 
 1. Prerequisites
-    1. Node
-    2. Common Databases
+   1. Node
+   2. Common Databases
 2. Installation
-    1. Get the Source
-    2. Setting up configurations
-        1. Upload Size
-        2. Site Settings
-        3. Administrator user
-        4. Database configuration
-        5. Session Secret
-        6. Web server port
-        7. Particles.JS
-    3. Example Config
-    4. Compiling Source
-    5. Running Compiled Source
+   1. Get the Source
+   2. Setting up configurations
+      1. Upload Size
+      2. Site Settings
+      3. Administrator user
+      4. Database configuration
+      5. Session Secret
+      6. Web server port
+      7. Particles.JS
+   3. Example Config
+   4. Compiling Source
+   5. Running Compiled Source
 
 ## Prerequisites
 
@@ -56,12 +56,12 @@ v13.13.0
 
 ### Common Databases
 
-* MariaDB
-* MySQL
-* PostgreSQL
-* CockroachDB
-* Microsoft SQL Server
-* MongoDB (Coming soon!)
+- MariaDB
+- MySQL
+- PostgreSQL
+- CockroachDB
+- Microsoft SQL Server
+- MongoDB (Coming soon!)
 
 (check out [this](https://github.com/typeorm/typeorm/blob/master/docs/connection-options.md) for all types, you will need to use a different ORM config later on, view [this](https://github.com/typeorm/typeorm/blob/master/docs/connection-options.md#common-connection-options) for every option, more on this on Database configuration setup step)
 
@@ -89,7 +89,7 @@ Every single configuration option will be listed here
 **Config Property:** `upload`
 
 | Config Property     | Type    | Description / Expected Values                                |
-|---------------------|---------|--------------------------------------------------------------|
+| ------------------- | ------- | ------------------------------------------------------------ |
 | `upload.fileLength` | integer | how long the random id for a file should be                  |
 | `upload.tempDir`    | string  | temporary directory, files are stored here and then deleted. |
 | `upload.uploadDir`  | string  | upload directory (where all uploads are stored)              |
@@ -99,16 +99,25 @@ Every single configuration option will be listed here
 **Config Property:** `site`
 
 | Config Property | Type    | Description / Expected Values                          |
-|-----------------|---------|--------------------------------------------------------|
+| --------------- | ------- | ------------------------------------------------------ |
 | `site.protocol` | integer | protocol (http or https)                               |
 | `site.domain`   | string  | domain of server (ex. `localhost:8080`, `example.com`) |
+
+#### SSL Settings
+
+**Config Property:** `ssl`
+
+| Config Property | Type   | Description / Expected Values                   |
+| --------------- | ------ | ----------------------------------------------- |
+| `ssl.key`       | string | path to ssl private key. ex: `./ssl/server.key` |
+| `ssl.cert`      | string | path to ssl certificate. ex: `./ssl/cert.crt`   |
 
 #### Administrator User
 
 **Config Property:** `administrator`
 
 | Config Property               | Type   | Description / Expected Values                                                                            |
-|-------------------------------|--------|----------------------------------------------------------------------------------------------------------|
+| ----------------------------- | ------ | -------------------------------------------------------------------------------------------------------- |
 | `administrator.password`      | string | password of administrator user (NOT RECOMENDED to use administrator user, set this to a SECURE password) |
 | `administrator.authorization` | string | authorization token that could be used for uploading (NOT RECOMENDED, set this to a SECURE master token) |
 
@@ -116,17 +125,17 @@ Every single configuration option will be listed here
 
 **Config Property:** `orm`
 
-| Config Property   | Type     | Description / Expected Values                        |
-|-------------------|----------|------------------------------------------------------|
-| `orm.type`        | string   | `mariadb`, `mysql`, `postgres`, `cockroach`, `mssql` |
-| `orm.host`        | string   | `localhost` or different IP                          |
-| `orm.port`        | integer  | `5432` or different pot                              |
-| `orm.username`    | string   | username                                             |
-| `orm.password`    | string   | password                                             |
-| `orm.database`    | string   | database to use                                      |
-| `orm.synchronize` | boolean  | synchronize database to database, or not             |
-| `orm.logging`     | boolean  | log all queries                                      |
-| `orm.entities`    | string[] | entity paths (should not be edited, and should be `["out/src/entities/**/*.js"]`)                  |
+| Config Property   | Type     | Description / Expected Values                                                     |
+| ----------------- | -------- | --------------------------------------------------------------------------------- |
+| `orm.type`        | string   | `mariadb`, `mysql`, `postgres`, `cockroach`, `mssql`                              |
+| `orm.host`        | string   | `localhost` or different IP                                                       |
+| `orm.port`        | integer  | `5432` or different pot                                                           |
+| `orm.username`    | string   | username                                                                          |
+| `orm.password`    | string   | password                                                                          |
+| `orm.database`    | string   | database to use                                                                   |
+| `orm.synchronize` | boolean  | synchronize database to database, or not                                          |
+| `orm.logging`     | boolean  | log all queries                                                                   |
+| `orm.entities`    | string[] | entity paths (should not be edited, and should be `["out/src/entities/**/*.js"]`) |
 
 #### Session Secret
 
@@ -134,11 +143,15 @@ Every single configuration option will be listed here
 
 A Random string of characters (anything)
 
-#### Port
+#### Ports
 
-**Config Property:** `port`
+**Config Property:** `http_port`
 
-Port to run the webserver on
+Port to run the http server on
+
+**Config Property:** `https_port`
+
+Port to run the https server on
 
 #### Meta Configuration
 
@@ -146,10 +159,10 @@ Port to run the webserver on
 
 Particles.JS, can be enabled and it's config can be changed willingly.
 
-| Config Property    | Type     | Description / Expected Values                        |
-|--------------------|----------|------------------------------------------------------|
-| `meta.favicon`| string  | has to be in /public/assets folder and should be formatted as `"/public/assets/<file name>"` |
-| `meta.title` | string   | title of your server shows up like `<title> - Login` or `<title> - Dashboard` |
+| Config Property | Type   | Description / Expected Values                                                                |
+| --------------- | ------ | -------------------------------------------------------------------------------------------- |
+| `meta.favicon`  | string | has to be in /public/assets folder and should be formatted as `"/public/assets/<file name>"` |
+| `meta.title`    | string | title of your server shows up like `<title> - Login` or `<title> - Dashboard`                |
 
 #### Particles.JS Configuration
 
@@ -157,10 +170,10 @@ Particles.JS, can be enabled and it's config can be changed willingly.
 
 Particles.JS, can be enabled and it's config can be changed willingly.
 
-| Config Property    | Type     | Description / Expected Values                        |
-|--------------------|----------|------------------------------------------------------|
-| `particles.enabled`| boolean  | Whether particles should show up on routes |
-| `particles.config` | particlesconfig   | Config from [this](https://vincentgarreau.com/particles.js/) play around with the configuration, then paste the json to here |
+| Config Property     | Type            | Description / Expected Values                                                                                                |
+| ------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `particles.enabled` | boolean         | Whether particles should show up on routes                                                                                   |
+| `particles.config`  | particlesconfig | Config from [this](https://vincentgarreau.com/particles.js/) play around with the configuration, then paste the json to here |
 
 ### Example Config
 
@@ -170,6 +183,19 @@ Particles.JS, can be enabled and it's config can be changed willingly.
     "fileLength": 6,
     "tempDir": "./temp",
     "uploadDir": "./uploads"
+  },
+  "meta": {
+    "favicon": "/public/assets/typex_small.png",
+    "title": "TypeX"
+  },
+  "site": {
+    "protocol": "https",
+    "ssl": {
+      "key": "./ssl/server.key",
+      "cert": "./ssl/server.crt"
+    },
+    "https_port": 443,
+    "http_port": 80
   },
   "administrator": {
     "password": "1234",
@@ -184,9 +210,7 @@ Particles.JS, can be enabled and it's config can be changed willingly.
     "database": "typex",
     "synchronize": true,
     "logging": false,
-    "entities": [
-      "out/src/entities/**/*.js"
-    ]
+    "entities": ["out/src/entities/**/*.js"]
   },
   "sessionSecret": "qwertyuiopasdfghjklzxcvbnm",
   "port": 8000,
@@ -308,7 +332,7 @@ Particles.JS, can be enabled and it's config can be changed willingly.
 
 ### Compiling Typescript for running
 
-Compile the Typescript code before running the code, or you can run it with `ts-node` which is not recommended. ***MAKE SURE YOU ARE IN THE PROJECT DIR!***
+Compile the Typescript code before running the code, or you can run it with `ts-node` which is not recommended. **_MAKE SURE YOU ARE IN THE PROJECT DIR!_**
 
 ```sh
 tsc -p .
