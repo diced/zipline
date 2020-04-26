@@ -96,18 +96,12 @@ export class APIController {
     }
   }
 
-  @Get('images')
-  private async images(req: Request, res: Response) {
-    const all = await this.orm.repos.image.find();
-    return res.status(200).json(all)
-  }
-
-  @Get('images')
+  @Get('images/user')
   @Middleware(cookiesForAPI)
   private async imagesUser(req: Request, res: Response) {
     const userId = req.query.user;
-    const all = await this.orm.repos.image.find({ where: { user: userId }, order: { id: 'ASC' }});
-    return res.status(200).json(all)
+    const all = await this.orm.repos.image.find({ where: { user: req.session.user.id }, order: { id: 'ASC' } });
+    return res.status(200).json(all);
   }
 
   @Delete('images')
