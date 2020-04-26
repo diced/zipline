@@ -1,15 +1,18 @@
-import { OK, BAD_REQUEST, FORBIDDEN } from 'http-status-codes';
-import { Controller, Middleware, Get, Post, Put, Delete } from '@overnightjs/core';
+import { Controller, Middleware, Get, Post } from '@overnightjs/core';
 import { Request, Response } from 'express';
-import config from '../../config.json';
 import { ORMHandler } from '..';
-import { randomId, getUser, getImage } from '../util';
-import { createReadStream, createWriteStream, unlinkSync, existsSync, mkdirSync } from 'fs'
-import multer from 'multer'
-import { getExtension } from 'mime';
-import { User } from '../entities/User';
+import { findFile } from '../util';
+import { readFileSync } from 'fs'
+import multer from 'multer';
 import { cookies } from '../middleware/cookies';
-const upload = multer({ dest: 'temp/' });
+import Logger from '@ayanaware/logger';
+
+if (!findFile('config.json', process.cwd())) {
+  Logger.get('FS').error(`No config.json exists in the ${__dirname}, exiting...`)
+  process.exit(1);
+}
+
+const config = JSON.parse(readFileSync(findFile('config.json', process.cwd()), 'utf8'))
 
 @Controller('')
 export class IndexController {

@@ -1,15 +1,23 @@
 import { OK, BAD_REQUEST, FORBIDDEN } from 'http-status-codes';
 import { Controller, Middleware, Get, Post, Put, Delete, Patch } from '@overnightjs/core';
 import { Request, Response } from 'express';
-import config from '../../config.json';
 import { ORMHandler } from '..';
-import { randomId, getUser, getImage } from '../util';
-import { createReadStream, createWriteStream, unlinkSync, existsSync, mkdirSync } from 'fs'
+import { randomId, getUser, getImage, findFile } from '../util';
+import { createReadStream, createWriteStream, unlinkSync, existsSync, mkdirSync, readFileSync } from 'fs'
 import multer from 'multer'
 import { getExtension } from 'mime';
 import { User } from '../entities/User';
 import { sep } from 'path';
 import { cookiesForAPI } from '../middleware/cookiesForAPI';
+import Logger from '@ayanaware/logger';
+
+if (!findFile('config.json', process.cwd())) {
+  Logger.get('FS').error(`No config.json exists in the ${__dirname}, exiting...`)
+  process.exit(1);
+}
+
+const config = JSON.parse(readFileSync(findFile('config.json', process.cwd()), 'utf8'))
+
 const upload = multer({ dest: config.upload.tempDir });
 
 @Controller('api')
@@ -99,7 +107,6 @@ export class APIController {
   @Get('images/user')
   @Middleware(cookiesForAPI)
   private async imagesUser(req: Request, res: Response) {
-    const userId = req.query.user;
     const all = await this.orm.repos.image.find({ where: { user: req.session.user.id }, order: { id: 'ASC' } });
     return res.status(200).json(all);
   }

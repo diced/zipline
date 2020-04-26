@@ -7,9 +7,18 @@ import {
 } from "typeorm";
 import { User } from "./entities/User";
 import { TypeXServer } from "./server";
-import config from "../config.json";
 import Logger from "@ayanaware/logger";
 import { Image } from "./entities/Image";
+import { findFile } from "./util";
+import { readFileSync } from 'fs';
+
+if (!findFile('config.json', process.cwd())) {
+  Logger.get('FS').error(`No config.json exists in the ${__dirname}, exiting...`)
+  process.exit(1);
+}
+
+const config = JSON.parse(readFileSync(findFile('config.json', process.cwd()), 'utf8'))
+
 
 export interface ORMRepos {
   user?: Repository<User>;

@@ -24,6 +24,7 @@
         } */
     </style>
     <%- include('./partials/head') %>
+    <link rel="icon" href="<%=config.meta.favicon%>" type="image/png">
     <title><%= config.meta.title %> - Dashboard</title>
 </head>
 
@@ -212,15 +213,15 @@
             const res = await fetch('/api/images/user', {
                 method: 'GET',
                 headers: {
-                'Content-Type': 'application/json'
-            }
+                    'Content-Type': 'application/json'
+                }
             });
-        try {
-            const json = await res.json();
-            if (json.error || json.code) return showAlert('error', json.error)
-            else {
-                json.forEach(image => {
-                    $('#typexImages').append(`
+            try {
+                const json = await res.json();
+                if (json.error || json.code) return showAlert('error', json.error)
+                else {
+                    json.forEach(image => {
+                        $('#typexImages').append(`
             <div class="card typex-image-actions typex-image-buttons"
                                 style="background-color: transparent;">
                                 <img class="card-img-top" src="${image.url}" onclick="window.location.href='${image.url}'"/>
@@ -228,11 +229,11 @@
                                     value="${image.id}" />
                             </div>
             `)
-                });
+                    });
+                }
+            } catch (e) {
+                console.error(e)
             }
-        } catch (e) {
-            console.error(e)
-        }
         });
 
         const copyText = (text) => {

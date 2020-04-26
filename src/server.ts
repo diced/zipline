@@ -16,6 +16,7 @@ import { IndexController } from "./controllers/IndexController";
 export class TypeXServer extends Server {
   constructor(orm: ORMHandler) {
     super();
+    this.app.set("view engine", "ejs");
     this.app.use(
       session({
         secret: config.sessionSecret,
@@ -24,8 +25,8 @@ export class TypeXServer extends Server {
       })
     );
     this.app.use(cookies());
-    this.app.set("view engine", "ejs");
-    this.app.use("/u", express.static("uploads"));
+    this.app.use(config.upload.route, express.static(config.upload.uploadDir));
+    this.app.use(config.forever.route, express.static(config.forever.directory));
     this.app.use("/public", express.static("public"));
     this.app.use(bodyParser.json());
     this.app.use(bodyParser.urlencoded({ extended: true }));
@@ -36,6 +37,13 @@ export class TypeXServer extends Server {
     const api = new APIController().set(orm);
     const index = new IndexController().set(orm);
     super.addControllers([index, api]);
+    this.app.get('*', (req, res) => {
+      return res.status(200).render('404');
+    })
+    this.app.use((err, req, res, next) => {
+      Logger.get(this.app).error(err);
+      return res.status(500).render('error');
+    })
   }
 
   public start(): void {
