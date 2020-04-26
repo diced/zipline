@@ -8,6 +8,16 @@
             height: 100%;
         }
 
+        .typex-image-actions {
+            display: inline-block;
+            position: relative;
+        }
+
+        .typex-image-action {
+            position: absolute;
+            bottom: 0;
+        }
+
         /* 
         #copyToken {
             transition: backgroundColor .3s;
@@ -26,9 +36,10 @@
                     <a style="border-radius: 50px;" class="nav-link active" id="home-tab" data-toggle="tab" href="#home"
                         role="tab" aria-controls="home" aria-selected="true">Home</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" id="updateImages">
                     <a style="border-radius: 50px;" class="nav-link" id="profile-tab" data-toggle="tab" href="#images"
-                        role="tab" aria-controls="images" aria-selected="false">Your Images</a>
+                        role="tab" aria-controls="images" aria-selected="false">Your
+                        Images</a>
                 </li>
                 <% if (user.administrator) { %>
                 <li class="nav-item">
@@ -66,26 +77,14 @@
                             style="border-radius: 50px; width:100%;">Save</button>
                     </form>
                 </div>
-                <div class="tab-pane fade m-3" id="images" role="tabpanel" aria-labelledby="images-tab">
+                <div class="tab-pane fade" id="images" role="tabpanel" aria-labelledby="images-tab">
                     <h3>Your Images</h3>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th scope="col">ID</th>
-                                <th scope="col">URL</th>
-                                <th scope="col">Preview</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% images.forEach(image => { %>
-                            <tr>
-                                <th scope="row"><%= image.id %></th>
-                                <td><a href="<%= image.url %>"><%=image.url%></td>
-                                <td><img src="<%= image.url %>" height="48"></td>
-                            </tr>
-                            <% }) %>
-                        </tbody>
-                    </table>
+                    <div class="container-fluid pt-2">
+                        <div class="card-columns" id="typexImages">
+
+                        </div>
+                    </div>
+
                 </div>
                 <% if (user.administrator) { %>
                 <div class="tab-pane fade m-3" id="users" role="tabpanel" aria-labelledby="users-tab">
@@ -190,7 +189,6 @@
         function whitespace(str) {
             return str === null || str.match(/^ *$/) !== null;
         }
-
         function showAlert(type, message) {
             if (type === 'error') {
                 Swal.fire({
@@ -209,6 +207,92 @@
             }
         }
 
+        document.getElementById('updateImages').addEventListener('click', async () => {
+            document.getElementById('typexImages').innerHTML = '';
+            const res = await fetch('/api/images?user=' + "<%=user.id%>", {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            try {
+                const json = await res.json();
+                if (json.error || json.code) return showAlert('error', json.error)
+                else {
+                    json.forEach(image => {
+                        $('#typexImages').append(`
+            <div class="card typex-image-actions typex-image-buttons"
+                                style="background-color: transparent;">
+                                <img class="card-img-top" src="${image.url}" onclick="window.location.href='${image.url}'"/>
+                                <input disabled type="button" class="typex-image-action btn btn-sm"
+                                    value="${image.id}" />
+                            </div>
+            `)
+                    });
+                }
+            } catch (e) {
+                console.error(e)
+            }
+        });
+
+        const copyText = (text) => {
+            const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
+        }
+
+        const deleteImage = (id, url) => {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: `You are proceeding to delete image (${id}), you will not be able to recover it!`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it.'
+            }).then(async (result) => {
+                if (result.value) {
+                    const username = document.getElementById('usernameSave').value;
+                    const password = document.getElementById('passwordSave').value;
+                    if (whitespace(username)) return showAlert('error', 'Please input a username.')
+                    const res = await fetch('/api/user', {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            username,
+                            password
+                        })
+                    });
+                    try {
+                        const json = await res.json();
+                        if (json.error || json.code) return showAlert('error', json.error)
+                        else {
+                            const res = await fetch('/api/images?image=' + id, {
+                                method: 'DELETE',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                }
+                            });
+                            try {
+                                const json = await res.json();
+                                if (json.error || json.code) return showAlert('error', json.error)
+                                else {
+                                    Swal.fire(
+                                        'Deleted!',
+                                        `Deleted image (${id}) successfully.`,
+                                        'success'
+                                    );
+                                }
+                            } catch (e) {
+                                console.error(e)
+                            }
+                        }
+                    } catch (e) {
+                        console.error(e)
+                    }
+                }
+            });
+        }
         document.getElementById('saveUser').addEventListener('click', async () => {
             Swal.fire({
                 title: 'Are you sure?',
@@ -261,12 +345,7 @@
                 confirmButtonText: 'Yes, copy it!'
             }).then((result) => {
                 if (result.value) {
-                    const el = document.createElement('textarea');
-                    el.value = "<%= user.token %>";
-                    document.body.appendChild(el);
-                    el.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(el);
+                    copyText("<%= user.token %>");
                     Swal.fire(
                         'Copied!',
                         'Your API Token has been copied.',
@@ -310,53 +389,7 @@
                 }
             });
 
-        })
-        // async function editUser() {
-        //     const username = document.getElementById('usernameEdit').value;
-        //     const password = document.getElementById('passwordEdit').value;
-        //     if (whitespace(username)) return showAlert('error', 'Please input a username.')
-        //     const res = await fetch('/api/user', {
-        //         method: 'PATCH',
-        //         headers: {
-        //             'Content-Type': 'application/json'
-        //         },
-        //         body: JSON.stringify({
-        //             username,
-        //             password,
-        //             administrator: document.getElementById('administratorEdit').checked
-        //         })
-        //     });
-        //     try {
-        //         const json = await res.json();
-        //         if (json.error || json.code) return showAlert('error', json.error)
-        //         else {
-        //             $('#edit-modal').modal('toggle');
-        //             showAlert('success', `Edited user ${json.username} (${json.id})`)
-        //             return window.location.href = '/'
-        //         }
-        //     } catch (e) {
-        //         console.error(e)
-        //     }
-        // }
-        // document.getElementById('editUser').addEventListener('click', async () => {
-        //     if (document.getElementById('administratorEdit').checked) {
-        //         Swal.fire({
-        //             title: 'Are you sure?',
-        //             text: "You are proceeding to save a user with administrator permissions, they can do whatever they want!",
-        //             icon: 'warning',
-        //             showCancelButton: true,
-        //             confirmButtonColor: '#3085d6',
-        //             cancelButtonColor: '#d33',
-        //             confirmButtonText: 'Yes, edit user!'
-        //         }).then(async (result) => {
-        //             if (result.value) {
-        //                 editUser()
-        //             }
-        //         });
-        //     } else {
-        //         editUser();
-        //     }
-        // })
+        });
         async function createUser() {
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;

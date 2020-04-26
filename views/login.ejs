@@ -32,7 +32,6 @@
             </form>
         </div>
     </div>
-    <p style="display:none" id="partenabled"><%=config.particles.enabled%></p>
     <p style="display:none" id="part"><%=JSON.stringify(config.particles.settings) %></p>
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
         integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
@@ -45,7 +44,7 @@
         crossorigin="anonymous"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@9/dist/sweetalert2.min.js"></script>
     <script src="http://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-    <script>if (document.getElementById('partenabled').innerText === "true") particlesJS("particles-js", JSON.parse(document.getElementById('part').innerText));</script>
+    <script>if ("<%=config.particles.enabled%>" === "true") particlesJS("particles-js", JSON.parse(document.getElementById('part').innerText));</script>
     <script>
         if ("<%=failed%>" === 'true') {
             Swal.fire({

@@ -102,6 +102,31 @@ export class APIController {
     return res.status(200).json(all)
   }
 
+  @Get('images')
+  @Middleware(cookiesForAPI)
+  private async imagesUser(req: Request, res: Response) {
+    const userId = req.query.user;
+    const all = await this.orm.repos.image.find({ where: { user: userId }, order: { id: 'ASC' }});
+    return res.status(200).json(all)
+  }
+
+  @Delete('images')
+  @Middleware(cookiesForAPI)
+  private async deleteImage(req: Request, res: Response) {
+    const img = req.query.image;
+    try {
+      let image = await this.orm.repos.image.findOne({ id: Number(img) })
+      if (!image) return res.status(BAD_REQUEST).json({ error: "Could not delete image: image doesnt exist in database" })
+      this.orm.repos.image.delete({ id: Number(img) });
+      const url = new URL(image.url);
+      unlinkSync(`${config.upload.uploadDir}${sep}${url.pathname.slice(3)}`);
+      return res.status(200).json(image);
+    } catch (e) {
+      return res.status(BAD_REQUEST).json({ error: "Could not delete user: " + e.message })
+    }
+  }
+
+
   public set(orm: ORMHandler) {
     this.orm = orm;
     return this;
