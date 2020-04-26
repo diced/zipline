@@ -13,16 +13,18 @@ A TypeScript based Image/File uploading server. Fast and Elegant.
       3. MySQL
       4. MariaDB
       5. Microsoft SQL Server
-2. Installation
+2. Updating TypeX
+3. Installation
    1. Get the Source
    2. Setting up configurations
       1. Upload Size
-      2. Site Settings
-      3. SSL Settings
-      4. Administrator user
-      5. Database configuration
-      6. Session Secret
-      7. Particles.JS
+      2. User Settings
+      3. Site Settings
+      4. SSL Settings
+      5. Administrator user
+      6. Database configuration
+      7. Session Secret
+      8. Particles.JS
    3. Example Config
    4. Compiling Source
    5. Running Compiled Source
@@ -115,6 +117,18 @@ Run the following command in order to get Microsoft SQL drivers
 npm i mssql --save-dev
 ```
 
+## Updating TypeX
+
+Updating TypeX, is very simple. You can use this one-liner to update and compile code.
+
+1. Run the following in the `typex` directory, if there were config changes, you should change them before this command.
+
+```sh
+git pull && tsc -p .
+```
+
+2. After that, you just need to restart the process for changes to take effect.
+
 ## Installation
 
 Now that you have considered what prerequisites you would like, lets actually install this! This installation is based on Linux systems, yet will work on both MacOSX and Windows with their respective commands
@@ -143,6 +157,15 @@ Every single configuration option will be listed here
 | `upload.fileLength` | integer | how long the random id for a file should be                  |
 | `upload.tempDir`    | string  | temporary directory, files are stored here and then deleted. |
 | `upload.uploadDir`  | string  | upload directory (where all uploads are stored)              |
+| `upload.route`      | string  | Route for uploads, default is /u, ex.`/u/hd27ua.png`              |
+
+#### User Settings
+
+**Config Property:** `user`
+
+| Config Property     | Type    | Description / Expected Values                                |
+| ------------------- | ------- | ------------------------------------------------------------ |
+| `user.tokenLength`  | integer | How long the randomly generated user token should be         |
 
 #### Site Settings
 
@@ -154,7 +177,7 @@ Every single configuration option will be listed here
 | `site.serveHTTP`   | string  | Port to run the web server on with HTTP (can be used with nginx + CloudFlare as a reverse proxy and let CloudFlare take care of SSL) |
 | `site.serveHTTPS`   | string  | Port to run the web server on with HTTPS (only will be used if `site.protocol` is `https`) (you will need SSL certificates! See [this](#ssl-settings)) |
 
-#### SSL Settings
+#### Site SSL Settings
 
 **Config Property:** `site.ssl`
 
@@ -170,7 +193,6 @@ Every single configuration option will be listed here
 | Config Property               | Type   | Description / Expected Values                                                                            |
 | ----------------------------- | ------ | -------------------------------------------------------------------------------------------------------- |
 | `administrator.password`      | string | password of administrator user (NOT RECOMENDED to use administrator user, set this to a SECURE password) |
-| `administrator.authorization` | string | authorization token that could be used for uploading (NOT RECOMENDED, set this to a SECURE master token) |
 
 #### Database Configuration
 
@@ -223,20 +245,20 @@ Particles.JS, can be enabled and it's config can be changed willingly.
   "upload": {
     "fileLength": 6,
     "tempDir": "./temp",
-    "uploadDir": "./uploads"
+    "uploadDir": "./uploads",
+    "route": "/u"
   },
-  "meta": {
-    "favicon": "/public/assets/typex_small.png",
-    "title": "TypeX"
+  "user": {
+    "tokenLength": 32
   },
   "site": {
-    "protocol": "https",
+    "protocol": "http",
     "ssl": {
       "key": "./ssl/server.key",
       "cert": "./ssl/server.crt"
     },
-    "serveHTTPS": 443, // https port to serve on (will be used if protocol is https)
-    "serveHTTP": 8000 // http port to serve on (will be used if protocol is http)
+    "serveHTTPS": 8000,
+    "serveHTTP": 8000
   },
   "administrator": {
     "password": "1234",
@@ -251,9 +273,15 @@ Particles.JS, can be enabled and it's config can be changed willingly.
     "database": "typex",
     "synchronize": true,
     "logging": false,
-    "entities": ["out/src/entities/**/*.js"]
+    "entities": [
+      "out/src/entities/**/*.js"
+    ]
   },
-  "sessionSecret": "qwertyuiopasdfghjklzxcvbnm",
+  "sessionSecret": "qwerty",
+  "meta": {
+    "favicon": "/public/assets/typex_small_circle.png",
+    "title": "TypeX"
+  },
   "particles": {
     "enabled": true,
     "settings": {
