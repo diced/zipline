@@ -2,7 +2,8 @@ import { Request, Response } from 'express';
 import { ORMHandler } from '.';
 import { User } from './entities/User';
 import { Image } from './entities/Image';
-
+import { statSync, readdirSync } from 'fs';
+import { join, basename } from 'path';
 
 
 export function randomId(length) {
@@ -35,4 +36,24 @@ export async function getImage(orm: ORMHandler, url: string, user: number) {
   const image = await orm.repos.image.findOne({ url, user });
   if (!image) return orm.repos.image.save(new Image().set({ url, user }));
   return image;
+}
+
+export function findFile(file, directory) {
+  const result = [];
+  (function read(dir) {
+    const files = readdirSync(dir);
+    for (const file of files) {
+      const filepath = join(dir, file);
+      if (file !== '.git' && file !== 'node_modules' && statSync(filepath).isDirectory()) {
+        read(filepath);
+      } else {
+        result.push(filepath);
+      }
+    }
+  }(directory));
+  for (const f of result) {
+    const base = basename(f);
+    if (base === file) return f;
+  }
+  return null;
 }
