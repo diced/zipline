@@ -1,1 +1,0 @@
-const startP = config => particlesJS("particles-js", JSON.parse(config));
