@@ -15,7 +15,7 @@ A TypeScript based Image/File uploading server. Fast and Elegant.
       5. Microsoft SQL Server
 2. [Updating TypeX](#updating-typex)
 3. [Installation](#installation)
-   1. [Get the Source](/#get-the-source--install-dependencies)
+   1. [Get the Source](#get-the-source--install-dependencies)
    2. [Setting up configurations](#configuration-options)
       1. Upload Size
       2. User Settings
