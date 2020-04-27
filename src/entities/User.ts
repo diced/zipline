@@ -1,6 +1,14 @@
 import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
-import { randomId } from "../util";
-import config from '../../config.json';
+import { randomId, findFile } from "../util";
+import Logger from "@ayanaware/logger";
+import { readFileSync } from 'fs';
+
+if (!findFile('config.json', process.cwd())) {
+  Logger.get('FS').error(`No config.json exists in the ${__dirname}, exiting...`)
+  process.exit(1);
+}
+
+const config = JSON.parse(readFileSync(findFile('config.json', process.cwd()), 'utf8'))
 
 @Entity()
 export class User {

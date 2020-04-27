@@ -42,7 +42,8 @@ export class APIController {
     source.on("end", function () {
       unlinkSync(file.path);
     });
-    getImage(this.orm, `${req.protocol}://${req.headers['host']}/u/${id}.${extension}`, user.id)
+    const img = await getImage(this.orm, `${req.protocol}://${req.headers['host']}/u/${id}.${extension}`, user.id)
+    Logger.get('TypeX.Uploader').info(`New image uploaded ${img.url} (${img.id}) by ${user.username} (${user.id})`)
     return res.status(200).send(`${req.protocol}://${req.headers['host']}/u/${id}.${extension}`)
   }
 
@@ -55,6 +56,7 @@ export class APIController {
       let user = await this.orm.repos.user.findOne({ username: data.username })
       if (user) return res.status(BAD_REQUEST).json({ error: "Could not create user: user exists already" })
       user = await this.orm.repos.user.save(new User().set({ username: data.username, password: data.password, administrator: data.administrator }))
+      Logger.get('TypeX.User.Create').info(`User ${user.username} (${user.id}) was created`)
       return res.status(200).json(user);
     } catch (e) {
       return res.status(BAD_REQUEST).json({ error: "Could not create user: " + e.message })
@@ -68,7 +70,8 @@ export class APIController {
     try {
       let user = await this.orm.repos.user.findOne({ id: req.session.user.id })
       if (!user) return res.status(BAD_REQUEST).json({ error: "Could not edit user: user doesnt exist" })
-      this.orm.repos.user.update({ id: req.session.user.id }, data)
+      this.orm.repos.user.update({ id: req.session.user.id }, data);
+      Logger.get('TypeX.User.Edit').info(`User ${user.username} (${user.id}) was edited`)
       return res.status(200).json(user);
     } catch (e) {
       return res.status(BAD_REQUEST).json({ error: "Could not edit user: " + e.message })
@@ -82,7 +85,8 @@ export class APIController {
     try {
       let user = await this.orm.repos.user.findOne({ id: Number(q) || req.session.user.id })
       if (!user) return res.status(BAD_REQUEST).json({ error: "Could not delete user: user doesnt exist" })
-      this.orm.repos.user.delete({ id: Number(q) || req.session.user.id })
+      this.orm.repos.user.delete({ id: Number(q) || req.session.user.id });
+      Logger.get('TypeX.User.Delete').info(`User ${user.username} (${user.id}) was deleted`)
       return res.status(200).json(user);
     } catch (e) {
       return res.status(BAD_REQUEST).json({ error: "Could not delete user: " + e.message })
@@ -98,6 +102,7 @@ export class APIController {
       user.token = randomId(config.user.tokenLength);
       req.session.user = user;
       await this.orm.repos.user.save(user);
+      Logger.get('TypeX.User.Token').info(`User ${user.username} (${user.id}) token was regenerated`)
       return res.status(200).json(user);
     } catch (e) {
       return res.status(BAD_REQUEST).json({ error: "Could not regen token: " + e.message })
@@ -121,6 +126,7 @@ export class APIController {
       this.orm.repos.image.delete({ id: Number(img) });
       const url = new URL(image.url);
       unlinkSync(`${config.upload.uploadDir}${sep}${url.pathname.slice(3)}`);
+      Logger.get('TypeX.Images.Delete').info(`Image ${image.url} (${image.id}) was deleted from ${config.upload.uploadDir}${sep}${url.pathname.slice(3)}`)
       return res.status(200).json(image);
     } catch (e) {
       return res.status(BAD_REQUEST).json({ error: "Could not delete user: " + e.message })

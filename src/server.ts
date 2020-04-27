@@ -3,7 +3,6 @@ import { Server } from "@overnightjs/core";
 import { Connection } from "typeorm";
 import { ORMHandler } from ".";
 import Logger from "@ayanaware/logger";
-import config from "../config.json";
 import * as express from "express";
 import * as http from "http";
 import * as https from "https";
@@ -12,6 +11,14 @@ import session from "express-session";
 import cookies from "cookie-parser";
 import { APIController } from "./controllers/APIController";
 import { IndexController } from "./controllers/IndexController";
+import { findFile } from "./util";
+
+if (!findFile('config.json', process.cwd())) {
+  Logger.get('FS').error(`No config.json exists in the ${__dirname}, exiting...`)
+  process.exit(1);
+}
+
+const config = JSON.parse(fs.readFileSync(findFile('config.json', process.cwd()), 'utf8'))
 
 export class TypeXServer extends Server {
   constructor(orm: ORMHandler) {
@@ -30,6 +37,16 @@ export class TypeXServer extends Server {
     this.app.use("/public", express.static("public"));
     this.app.use(bodyParser.json());
     this.app.use(bodyParser.urlencoded({ extended: true }));
+    this.app.use(async (req, res, next) => {
+      if (!config.site.logRoutes) return next();
+      if (req.url.startsWith(config.upload.route)) return next();
+      if (req.url.startsWith(config.forever.route)) return next();
+      let user = req.session.user;
+      const users = await orm.repos.user.find({ where: { token: req.headers['authorization'] } });
+      if (users[0]) user = users[0]
+      Logger.get('TypeX.Route').info(`Route ${req.url} was accessed by ${user ? user.username : '<no user found>'}`)
+      return next();
+    })
     this.setupControllers(orm);
   }
 
@@ -43,13 +60,10 @@ export class TypeXServer extends Server {
     this.app.use((err, req, res, next) => {
       Logger.get(this.app).error(err);
       return res.status(500).render('error');
-    })
+    });
   }
 
   public start(): void {
-    // this.app.listen(port, () => {
-    //   Logger.get(TypeXServer).info('Started server on port ' + port);
-    // })
     let server;
     if (config.site.protocol === "https") {
       try {
