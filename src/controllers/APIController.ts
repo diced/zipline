@@ -133,7 +133,6 @@ export class APIController {
     }
   }
 
-
   public set(orm: ORMHandler) {
     this.orm = orm;
     return this;

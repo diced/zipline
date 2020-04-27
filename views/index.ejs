@@ -17,11 +17,6 @@
             position: absolute;
             bottom: 0;
         }
-
-        /* 
-        #copyToken {
-            transition: backgroundColor .3s;
-        } */
     </style>
     <%- include('./partials/head') %>
     <link rel="icon" href="<%=config.meta.favicon%>" type="image/png">
@@ -208,6 +203,16 @@
             }
         }
 
+        function copyText(text) {
+            var input = document.createElement('textarea');
+            input.innerHTML = text;
+            document.body.appendChild(input);
+            input.select();
+            var result = document.execCommand('copy');
+            document.body.removeChild(input);
+            return result;
+        }
+
         document.getElementById('updateImages').addEventListener('click', async () => {
             document.getElementById('typexImages').innerHTML = '';
             const res = await fetch('/api/images/user', {
@@ -222,12 +227,34 @@
                 else {
                     json.forEach(image => {
                         $('#typexImages').append(`
-            <div class="card typex-image-actions typex-image-buttons"
-                                style="background-color: transparent;">
-                                <img class="card-img-top" src="${image.url}" onclick="window.location.href='${image.url}'"/>
-                                <input disabled type="button" class="typex-image-action btn btn-sm"
-                                    value="${image.id}" />
-                            </div>
+<div class="card typex-image-actions" style="background-color: transparent;" data-toggle="modal" data-target="#typeximg${image.id}">
+    <img class="card-img-top" src="${image.url}"/>
+    <input disabled type="button" class="btn btn-sm typex-image-action" value="${image.id}" />
+    <div class="modal fade" id="typeximg${image.id}" tabindex="-1" role="dialog" aria-labelledby="imagelabel${image.id}" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="imagelabel${image.id}">Currenting Managing Image ${image.id}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button> 
+                </div>
+                <div class="modal-footer">
+                    <div class="row" style="width:100%;">
+                        <div class="col-sm-6">
+                            <button type="button" onclick="window.location.href='${image.url}'" class="btn btn-primary"
+                                style="border-radius: 50px; width:100%;">View Image</button>
+                        </div>
+                        <div class="col-sm-6">
+                            <button type="button" class="btn btn-danger" data-dismiss="modal"
+                                style="border-radius: 50px; width:100%;" onclick="deleteImage('${image.id}', '${image.url}')">Delete Image</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
             `)
                     });
                 }
@@ -236,9 +263,7 @@
             }
         });
 
-        const copyText = (text) => {
-            const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
-        }
+
 
         const deleteImage = (id, url) => {
             Swal.fire({
