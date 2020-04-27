@@ -12,6 +12,7 @@ import cookies from "cookie-parser";
 import { APIController } from "./controllers/APIController";
 import { IndexController } from "./controllers/IndexController";
 import { findFile } from "./util";
+import { ImageUtil } from "./structures/ImageUtil";
 
 if (!findFile('config.json', process.cwd())) {
   Logger.get('FS').error(`No config.json exists in the ${__dirname}, exiting...`)

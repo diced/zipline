@@ -42,9 +42,9 @@ export class APIController {
     source.on("end", function () {
       unlinkSync(file.path);
     });
-    const img = await getImage(this.orm, `${req.protocol}://${req.headers['host']}/u/${id}.${extension}`, user.id)
+    const img = await getImage(this.orm, `${config.site.returnProtocol}://${req.headers['host']}/u/${id}.${extension}`, user.id)
     Logger.get('TypeX.Uploader').info(`New image uploaded ${img.url} (${img.id}) by ${user.username} (${user.id})`)
-    return res.status(200).send(`${req.protocol}://${req.headers['host']}/u/${id}.${extension}`)
+    return res.status(200).send(`${config.site.returnProtocol}://${req.headers['host']}/u/${id}.${extension}`)
   }
 
   @Post('user')
