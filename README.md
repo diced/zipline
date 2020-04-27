@@ -176,6 +176,7 @@ Every single configuration option will be listed here
 | `site.protocol` | integer | protocol (http or https)                               |
 | `site.serveHTTP`   | string  | Port to run the web server on with HTTP (can be used with nginx + CloudFlare as a reverse proxy and let CloudFlare take care of SSL) |
 | `site.serveHTTPS`   | string  | Port to run the web server on with HTTPS (only will be used if `site.protocol` is `https`) (you will need SSL certificates! See [this](#ssl-settings)) |
+| `site.logRoutes` | boolean | Wether or not to log routes when they are requested      |
 
 #### Site SSL Settings
 
