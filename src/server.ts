@@ -32,8 +32,13 @@ export class TypeXServer extends Server {
       })
     );
     this.app.use(cookies());
-    this.app.use(config.upload.route, express.static(config.upload.uploadDir));
-    this.app.use(config.forever.route, express.static(config.forever.directory));
+    try {
+      this.app.use(config.upload.route, express.static(config.upload.uploadDir));
+      this.app.use(config.forever.route, express.static(config.forever.directory));
+    } catch (e) {
+      Logger.get('TypeX.Routes').error(`Could not formulate upload and forever static routes`)
+      process.exit(1);
+    }
     this.app.use("/public", express.static("public"));
     this.app.use(bodyParser.json());
     this.app.use(bodyParser.urlencoded({ extended: true }));

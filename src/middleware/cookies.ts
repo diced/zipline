@@ -10,7 +10,6 @@ export async function cookies(req: Request, res: Response, next: any) {
             id: 0,
             username: 'administrator',
             password: config.administrator.password,
-            token: config.administrator.authorization,
             administrator: true
         }
         else req.session.user = await getConnection().getRepository(User).findOne({ id: req.cookies.typex_user });

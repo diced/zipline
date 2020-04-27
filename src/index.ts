@@ -19,6 +19,12 @@ if (!findFile('config.json', process.cwd())) {
 
 const config = JSON.parse(readFileSync(findFile('config.json', process.cwd()), 'utf8'))
 
+if (!config.upload?.route) {
+  Logger.get('TypeX.Config').error(`Missing needed property on configuration: upload.route`)
+  process.exit(1);
+} else if (!config.forever?.route) {
+  Logger.get('TypeX.Config').error(`Missing needed property on configuration: forever.route`)
+}
 
 export interface ORMRepos {
   user?: Repository<User>;

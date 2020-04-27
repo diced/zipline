@@ -34,6 +34,7 @@ export class IndexController {
 
   @Get('logout')
   private async logout(req: Request, res: Response) {
+    Logger.get('TypeX.Auth').info(`User ${req.session.user?.username} (${req.session.user?.id}) logged out`)
     req.session.user = null;
     res.clearCookie('typex_user');
     res.redirect('/login');
@@ -52,6 +53,7 @@ export class IndexController {
         administrator: true
       }
       res.cookie('typex_user', req.session.user.id, { maxAge: 1036800000 });
+      Logger.get('TypeX.Auth').info(`Administrator has logged in from IP ${req.headers['x-forwarded-for'] || req.connection.remoteAddress}`)
       return res.redirect('/')
     }
     const user = await this.orm.repos.user.findOne({ where: { username: req.body.username } });
