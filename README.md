@@ -4,19 +4,19 @@ A TypeScript based Image/File uploading server. Fast and Elegant.
 
 ## Table of Contents
 
-1. Prerequisites
-   1. Node
-   2. Common Databases
-   3. Installing Database Drivers
+1. [Prerequisites](#prerequisites)
+   1. [Node](#node--typescript)
+   2. [Common Databases](#common-databases)
+   3. [Installing Database Drivers](#installing-database-drivers)
       1. PostgreSQL
       2. CockroachDB
       3. MySQL
       4. MariaDB
       5. Microsoft SQL Server
-2. Updating TypeX
-3. Installation
-   1. Get the Source
-   2. Setting up configurations
+2. [Updating TypeX](#updating-typex)
+3. [Installation](#installation)
+   1. [Get the Source](/#get-the-source--install-dependencies)
+   2. [Setting up configurations](#configuration-options)
       1. Upload Size
       2. User Settings
       3. Site Settings
@@ -25,9 +25,9 @@ A TypeScript based Image/File uploading server. Fast and Elegant.
       6. Database configuration
       7. Session Secret
       8. Particles.JS
-   3. Example Config
-   4. Compiling Source
-   5. Running Compiled Source
+   3. [Example Config](#example-config)
+   4. [Compiling Source](#compiling-typescript-for-running)
+   5. [Running Compiled Source](#running-compiled-source)
 
 ## Prerequisites
 
