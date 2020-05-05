@@ -2,7 +2,7 @@ import { OK, BAD_REQUEST, FORBIDDEN } from 'http-status-codes';
 import { Controller, Middleware, Get, Post, Put, Delete, Patch } from '@overnightjs/core';
 import { Request, Response } from 'express';
 import { ORMHandler } from '..';
-import { randomId, getUser, getImage, findFile } from '../util';
+import { randomId, getUser, getImage, findFile, getShorten } from '../util';
 import { createReadStream, createWriteStream, unlinkSync, existsSync, mkdirSync, readFileSync } from 'fs'
 import multer from 'multer'
 import { getExtension } from 'mime';
@@ -10,6 +10,9 @@ import { User } from '../entities/User';
 import { sep } from 'path';
 import { cookiesForAPI } from '../middleware/cookiesForAPI';
 import Logger from '@ayanaware/logger';
+import { DiscordWebhook } from '../structures/DiscordWebhook';
+import { ImageUtil } from '../structures/ImageUtil';
+import { ShortenUtil } from '../structures/ShortenUtil';
 
 if (!findFile('config.json', process.cwd())) {
   Logger.get('FS').error(`No config.json exists in the ${__dirname}, exiting...`)
@@ -42,9 +45,24 @@ export class APIController {
     source.on("end", function () {
       unlinkSync(file.path);
     });
-    const img = await getImage(this.orm, `${config.site.returnProtocol}://${req.headers['host']}/u/${id}.${extension}`, user.id)
+    const img = await getImage(this.orm, `${config.site.returnProtocol}://${req.headers['host']}${config.upload.route}/${id}.${extension}`, user.id)
     Logger.get('TypeX.Uploader').info(`New image uploaded ${img.url} (${img.id}) by ${user.username} (${user.id})`)
-    return res.status(200).send(`${config.site.returnProtocol}://${req.headers['host']}/u/${id}.${extension}`)
+    if (config.discordWebhook.enabled) new DiscordWebhook(config.discordWebhook.url).sendImageUpdate(user, ImageUtil.parseURL(img.url), config);
+    return res.status(200).send(`${config.site.returnProtocol}://${req.headers['host']}${config.upload.route}/${id}.${extension}`)
+  }
+
+  @Post('shorten')
+  private async shorten(req: Request, res: Response) {
+    if (req.headers['authorization'] === config.administrator.authorization) return res.status(BAD_REQUEST).json({ code: BAD_REQUEST, message: "You can't upload files with the administrator account." })
+    const users = await this.orm.repos.user.find({ where: { token: req.headers['authorization'] } });
+    if (!users[0]) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: "Unauthorized" })
+    if (req.headers['authorization'] !== users[0].token) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: "Unauthorized" })
+    const user = users[0];
+    const id = randomId(config.shorten.idLength)
+    const shrt = await getShorten(this.orm, id, req.body.url, `${config.site.returnProtocol}://${req.headers['host']}${config.shorten.route}/${id}`, user.id);
+    Logger.get('TypeX.Shortener').info(`New url shortened ${shrt.url} (${req.body.url}) (${shrt.id}) by ${user.username} (${user.id})`)
+    if (config.discordWebhook.enabled) new DiscordWebhook(config.discordWebhook.url).sendShortenUpdate(user, shrt, ShortenUtil.parseURL(shrt.url), config);
+    return res.status(200).send(`${config.site.returnProtocol}://${req.headers['host']}${config.shorten.route}/${id}`)
   }
 
   @Post('user')

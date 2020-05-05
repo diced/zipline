@@ -3,7 +3,7 @@ import {
   Repository,
   Connection,
   createConnection,
-  ConnectionOptions,
+  ConnectionOptions
 } from "typeorm";
 import { User } from "./entities/User";
 import { TypeXServer } from "./server";
@@ -11,6 +11,7 @@ import Logger from "@ayanaware/logger";
 import { Image } from "./entities/Image";
 import { findFile } from "./util";
 import { readFileSync } from 'fs';
+import { Shorten } from "./entities/Shorten";
 
 if (!findFile('config.json', process.cwd())) {
   Logger.get('FS').error(`No config.json exists in the ${__dirname}, exiting...`)
@@ -22,19 +23,22 @@ const config = JSON.parse(readFileSync(findFile('config.json', process.cwd()), '
 if (!config.upload?.route) {
   Logger.get('TypeX.Config').error(`Missing needed property on configuration: upload.route`)
   process.exit(1);
-} else if (!config.forever?.route) {
-  Logger.get('TypeX.Config').error(`Missing needed property on configuration: forever.route`)
 }
 
 export interface ORMRepos {
   user?: Repository<User>;
   image?: Repository<Image>;
+  shorten?: Repository<Shorten>;
 }
 
 export interface ORMHandler {
   repos?: ORMRepos;
   connection: Connection;
 }
+
+const pk = JSON.parse(readFileSync(findFile('package.json', process.cwd()), 'utf8'));
+
+Logger.get('TypeX').info(`Starting TypeX ${pk.version}`);
 
 (async () => {
   const connection = await createConnection(config.orm as ConnectionOptions);
@@ -43,6 +47,7 @@ export interface ORMHandler {
     repos: {
       user: connection.getRepository(User),
       image: connection.getRepository(Image),
+      shorten: connection.getRepository(Shorten)
     },
   };
   if (orm.connection.isConnected)

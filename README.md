@@ -243,159 +243,170 @@ Particles.JS, can be enabled and it's config can be changed willingly.
 
 ```json
 {
-  "upload": {
-    "fileLength": 6,
-    "tempDir": "./temp",
-    "uploadDir": "./uploads",
-    "route": "/u"
-  },
-  "user": {
-    "tokenLength": 32
-  },
-  "site": {
-    "protocol": "http",
-    "ssl": {
-      "key": "./ssl/server.key",
-      "cert": "./ssl/server.crt"
+    "upload": {
+        "fileLength": 6,
+        "tempDir": "./temp",
+        "uploadDir": "./uploads",
+        "route": "/u"
     },
-    "serveHTTPS": 8000,
-    "serveHTTP": 8000
-  },
-  "administrator": {
-    "password": "1234",
-    "authorization": "Administrator 1234"
-  },
-  "orm": {
-    "type": "postgres",
-    "host": "localhost",
-    "port": 5432,
-    "username": "user",
-    "password": "1234",
-    "database": "typex",
-    "synchronize": true,
-    "logging": false,
-    "entities": [
-      "out/src/entities/**/*.js"
-    ]
-  },
-  "sessionSecret": "qwerty",
-  "meta": {
-    "favicon": "/public/assets/typex_small_circle.png",
-    "title": "TypeX"
-  },
-  "particles": {
-    "enabled": true,
-    "settings": {
-      "particles": {
-        "number": {
-          "value": 52,
-          "density": {
-            "enable": true,
-            "value_area": 800
-          }
+    "shorten": {
+        "idLength": 4,
+        "route": "/s"
+    },
+    "user": {
+        "tokenLength": 32
+    },
+    "site": {
+        "protocol": "http",
+        "returnProtocol": "https",
+        "ssl": {
+            "key": "./ssl/server.key",
+            "cert": "./ssl/server.crt"
         },
-        "color": {
-          "value": "#cd4c4c"
-        },
-        "shape": {
-          "type": "circle",
-          "stroke": {
-            "width": 0,
-            "color": "#000000"
-          },
-          "polygon": {
-            "nb_sides": 9
-          },
-          "image": {
-            "src": "img/github.svg",
-            "width": 60,
-            "height": 100
-          }
-        },
-        "opacity": {
-          "value": 0.5,
-          "random": false,
-          "anim": {
-            "enable": false,
-            "speed": 1,
-            "opacity_min": 0.1,
-            "sync": false
-          }
-        },
-        "size": {
-          "value": 0,
-          "random": true,
-          "anim": {
-            "enable": false,
-            "speed": 40,
-            "size_min": 0.1,
-            "sync": false
-          }
-        },
-        "line_linked": {
-          "enable": true,
-          "distance": 150,
-          "color": "#ffffff",
-          "opacity": 0.4,
-          "width": 1
-        },
-        "move": {
-          "enable": true,
-          "speed": 6,
-          "direction": "none",
-          "random": false,
-          "straight": false,
-          "out_mode": "out",
-          "bounce": false,
-          "attract": {
-            "enable": false,
-            "rotateX": 600,
-            "rotateY": 1200
-          }
+        "serveHTTPS": 8000,
+        "serveHTTP": 443,
+        "logRoutes": true
+    },
+    "administrator": {
+        "password": "1234"
+    },
+    "orm": {
+        "type": "postgres",
+        "host": "localhost",
+        "port": 5432,
+        "username": "user",
+        "password": "1234",
+        "database": "typex",
+        "synchronize": true,
+        "logging": false,
+        "entities": [
+            "out/src/entities/**/*.js"
+        ]
+    },
+    "sessionSecret": "1234",
+    "meta": {
+        "favicon": "/public/assets/typex_small_circle.png",
+        "title": "TypeX"
+    },
+    "discordWebhook": {
+        "enabled": true,
+        "url": "https://canary.discordapp.com/api/webhooks/id/token",
+        "username": "TypeX Logs",
+        "avatarURL": "https://domain/public/assets/typex_small_circle.png"
+    },
+    "particles": {
+        "enabled": true,
+        "settings": {
+            "particles": {
+                "number": {
+                    "value": 52,
+                    "density": {
+                        "enable": true,
+                        "value_area": 800
+                    }
+                },
+                "color": {
+                    "value": "#cd4c4c"
+                },
+                "shape": {
+                    "type": "circle",
+                    "stroke": {
+                        "width": 0,
+                        "color": "#000000"
+                    },
+                    "polygon": {
+                        "nb_sides": 9
+                    },
+                    "image": {
+                        "src": "img/github.svg",
+                        "width": 60,
+                        "height": 100
+                    }
+                },
+                "opacity": {
+                    "value": 0.5,
+                    "random": false,
+                    "anim": {
+                        "enable": false,
+                        "speed": 1,
+                        "opacity_min": 0.1,
+                        "sync": false
+                    }
+                },
+                "size": {
+                    "value": 0,
+                    "random": true,
+                    "anim": {
+                        "enable": false,
+                        "speed": 40,
+                        "size_min": 0.1,
+                        "sync": false
+                    }
+                },
+                "line_linked": {
+                    "enable": true,
+                    "distance": 150,
+                    "color": "#ffffff",
+                    "opacity": 0.4,
+                    "width": 1
+                },
+                "move": {
+                    "enable": true,
+                    "speed": 6,
+                    "direction": "none",
+                    "random": false,
+                    "straight": false,
+                    "out_mode": "out",
+                    "bounce": false,
+                    "attract": {
+                        "enable": false,
+                        "rotateX": 600,
+                        "rotateY": 1200
+                    }
+                }
+            },
+            "interactivity": {
+                "detect_on": "canvas",
+                "events": {
+                    "onhover": {
+                        "enable": false,
+                        "mode": "grab"
+                    },
+                    "onclick": {
+                        "enable": false,
+                        "mode": "repulse"
+                    },
+                    "resize": true
+                },
+                "modes": {
+                    "grab": {
+                        "distance": 400,
+                        "line_linked": {
+                            "opacity": 1
+                        }
+                    },
+                    "bubble": {
+                        "distance": 400,
+                        "size": 40,
+                        "duration": 2,
+                        "opacity": 8,
+                        "speed": 3
+                    },
+                    "repulse": {
+                        "distance": 200,
+                        "duration": 0.4
+                    },
+                    "push": {
+                        "particles_nb": 4
+                    },
+                    "remove": {
+                        "particles_nb": 2
+                    }
+                }
+            },
+            "retina_detect": true
         }
-      },
-      "interactivity": {
-        "detect_on": "canvas",
-        "events": {
-          "onhover": {
-            "enable": false,
-            "mode": "grab"
-          },
-          "onclick": {
-            "enable": false,
-            "mode": "repulse"
-          },
-          "resize": true
-        },
-        "modes": {
-          "grab": {
-            "distance": 400,
-            "line_linked": {
-              "opacity": 1
-            }
-          },
-          "bubble": {
-            "distance": 400,
-            "size": 40,
-            "duration": 2,
-            "opacity": 8,
-            "speed": 3
-          },
-          "repulse": {
-            "distance": 200,
-            "duration": 0.4
-          },
-          "push": {
-            "particles_nb": 4
-          },
-          "remove": {
-            "particles_nb": 2
-          }
-        }
-      },
-      "retina_detect": true
     }
-  }
 }
 ```
 

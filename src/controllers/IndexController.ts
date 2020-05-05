@@ -6,6 +6,8 @@ import { readFileSync } from 'fs'
 import multer from 'multer';
 import { cookies } from '../middleware/cookies';
 import Logger from '@ayanaware/logger';
+import { ShortenUtil } from '../structures/ShortenUtil';
+import { ImageUtil } from '../structures/ImageUtil';
 
 if (!findFile('config.json', process.cwd())) {
   Logger.get('FS').error(`No config.json exists in the ${__dirname}, exiting...`)
@@ -61,7 +63,14 @@ export class IndexController {
     if (req.body.password !== user.password) return res.status(200).render('login', { failed: true, config })
     req.session.user = user;
     res.cookie('typex_user', req.session.user.id, { maxAge: 1036800000 });
-    return res.redirect('/')
+    return res.redirect('/');
+  }
+
+  @Get(`${config.shorten.route.slice(1)}/:id`)
+  private async getShorten(req: Request, res: Response) {
+    const shorten = await this.orm.repos.shorten.findOne({ key: req.params.id });
+    if (!shorten) return res.render('404');
+    return res.redirect(shorten.origin)
   }
 
   public set(orm: ORMHandler) {

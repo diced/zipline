@@ -32,12 +32,23 @@ export class TypeXServer extends Server {
         saveUninitialized: false,
       })
     );
+    this.app.use(async (req, res, next) => {
+      console.log(req.url, req.baseUrl, req.originalUrl)
+      if (!req.url.startsWith(config.upload.route)) return next();
+      console.log(`${config.site.returnProtocol}://${req.headers['host']}${req.url}`)
+      const upload = await orm.repos.image.findOne({ url: `${config.site.returnProtocol}://${req.headers['host']}${req.url}` });
+      console.log(upload);
+      if (!upload) return next();
+      upload.views++;
+      console.log(upload.views);
+      orm.repos.image.save(upload);
+      return next();
+    })
     this.app.use(cookies());
     try {
       this.app.use(config.upload.route, express.static(config.upload.uploadDir));
-      this.app.use(config.forever.route, express.static(config.forever.directory));
     } catch (e) {
-      Logger.get('TypeX.Routes').error(`Could not formulate upload and forever static routes`)
+      Logger.get('TypeX.Routes').error(`Could not formulate upload static route`)
       process.exit(1);
     }
     this.app.use("/public", express.static("public"));
@@ -46,13 +57,13 @@ export class TypeXServer extends Server {
     this.app.use(async (req, res, next) => {
       if (!config.site.logRoutes) return next();
       if (req.url.startsWith(config.upload.route)) return next();
-      if (req.url.startsWith(config.forever.route)) return next();
       let user = req.session.user;
       const users = await orm.repos.user.find({ where: { token: req.headers['authorization'] } });
       if (users[0]) user = users[0]
       Logger.get('TypeX.Route').info(`Route ${req.url} was accessed by ${user ? user.username : '<no user found>'}`)
       return next();
-    })
+    });
+
     this.setupControllers(orm);
   }
 
