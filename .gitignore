@@ -4,6 +4,7 @@ tmp
 uploads
 config.json
 out
-public/assets/pd_logo.png
+.idea
+.vscode
 ssl/localhost.key
 ssl/localhost.crt

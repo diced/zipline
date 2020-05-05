@@ -33,14 +33,10 @@ export class TypeXServer extends Server {
       })
     );
     this.app.use(async (req, res, next) => {
-      console.log(req.url, req.baseUrl, req.originalUrl)
       if (!req.url.startsWith(config.upload.route)) return next();
-      console.log(`${config.site.returnProtocol}://${req.headers['host']}${req.url}`)
       const upload = await orm.repos.image.findOne({ url: `${config.site.returnProtocol}://${req.headers['host']}${req.url}` });
-      console.log(upload);
       if (!upload) return next();
       upload.views++;
-      console.log(upload.views);
       orm.repos.image.save(upload);
       return next();
     })

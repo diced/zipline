@@ -7,7 +7,7 @@ import { User } from "../entities/User";
 export async function cookiesForAPI(req: Request, res: Response, next: any) {
     if (req.cookies.typex_user) {
         if (typeof req.cookies.typex_user !== 'string') return res.status(BAD_REQUEST).send({ code: BAD_REQUEST, message: "Please clear browser cookies." })
-        if (req.cookies.typex_user === 0) req.session.user = {
+        if (Number(req.cookies.typex_user) === 0) req.session.user = {
             id: 0,
             username: 'administrator',
             password: config.administrator.password,

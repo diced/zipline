@@ -30,6 +30,7 @@ export class IndexController {
 
   @Get('login')
   private async login(req: Request, res: Response) {
+    console.log(req.session.user);
     if (req.session.user || req.cookies.typex_user) return res.redirect('/');
     return res.status(200).render('login', { failed: false, config })
   }
@@ -45,13 +46,12 @@ export class IndexController {
   @Post('login')
   private async postLogin(req: Request, res: Response) {
     if (req.session.user || req.cookies.typex_user) return res.redirect('/');
-    if (req.body.username == 'administrator' && req.body.password === config.administrator.password) {
+    if (req.body.username === 'administrator' && req.body.password === config.administrator.password) {
       //@ts-ignore
       req.session.user = {
         id: 0,
         username: 'administrator',
         password: config.administrator.password,
-        token: config.administrator.authorization,
         administrator: true
       }
       res.cookie('typex_user', req.session.user.id, { maxAge: 1036800000 });
