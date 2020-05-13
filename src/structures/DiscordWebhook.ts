@@ -27,7 +27,7 @@ export class DiscordWebhook {
                 body: JSON.stringify({
                     user: config.discordWebhook.username,
                     avatar_url: config.discordWebhook.avatarURL,
-                    content: `New image uploaded to ${image.origin} by ${user.username} (${user.id}). [View Image](${image.url})`
+                    content: `New image uploaded to< ${image.origin}> by ${user.username} (${user.id}). [View Image](${image.url})`
                 })
             }));
         } catch (e) {
@@ -44,7 +44,7 @@ export class DiscordWebhook {
                 body: JSON.stringify({
                     user: config.discordWebhook.username,
                     avatar_url: config.discordWebhook.avatarURL,
-                    content: `New shortened url added to ${ex.origin} by ${user.username} (${user.id}). ${shorten.origin} -> ${shorten.url}`
+                    content: `New shortened url added to <${ex.origin}> by ${user.username} (${user.id}). <${shorten.origin}> -> <${shorten.url}>`
                 })
             }));
         } catch (e) {

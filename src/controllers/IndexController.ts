@@ -1,7 +1,7 @@
 import { Controller, Middleware, Get, Post } from '@overnightjs/core';
 import { Request, Response } from 'express';
 import { ORMHandler } from '..';
-import { findFile } from '../util';
+import { findFile, checkPassword } from '../util';
 import { readFileSync } from 'fs'
 import multer from 'multer';
 import { cookies } from '../middleware/cookies';
@@ -30,7 +30,6 @@ export class IndexController {
 
   @Get('login')
   private async login(req: Request, res: Response) {
-    console.log(req.session.user);
     if (req.session.user || req.cookies.typex_user) return res.redirect('/');
     return res.status(200).render('login', { failed: false, config })
   }
@@ -59,8 +58,8 @@ export class IndexController {
       return res.redirect('/')
     }
     const user = await this.orm.repos.user.findOne({ where: { username: req.body.username } });
-    if (!user) return res.status(200).render('login', { failed: true, config })
-    if (req.body.password !== user.password) return res.status(200).render('login', { failed: true, config })
+    if (!user) return res.status(200).render('login', { failed: true, config });
+    if (!checkPassword(req.body.password, user.password)) return res.status(200).render('login', { failed: true, config })
     req.session.user = user;
     res.cookie('typex_user', req.session.user.id, { maxAge: 1036800000 });
     return res.redirect('/');

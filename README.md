@@ -217,6 +217,12 @@ Every single configuration option will be listed here
 
 A Random string of characters (anything)
 
+#### Session Secret
+
+**Config Property:** `saltRounds`
+
+The ammount of salt rounds needed to salt a password! (used for password encryption)
+
 #### Meta Configuration
 
 **Config Property:** `meta`

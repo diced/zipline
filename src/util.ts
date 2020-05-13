@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import bcrypt from 'bcrypt';
 import { ORMHandler } from '.';
 import { User } from './entities/User';
 import { Image } from './entities/Image';
@@ -63,4 +63,14 @@ export function findFile(file, directory) {
     if (base === file) return f;
   }
   return null;
+}
+
+
+export function checkPassword(pass: string, hash: string): boolean {
+  return bcrypt.compareSync(pass, hash);
+}
+
+export function hashPassword(pass: string, saltRounds: number): string {
+  // console.log(bcrypt.hashSync(pass,saltRounds));
+  return bcrypt.hashSync(pass, saltRounds);
 }
