@@ -25,7 +25,11 @@ export class IndexController {
   private async index(req: Request, res: Response) {
     const images = await this.orm.repos.image.find({ where: { user: req.session.user.id } });
     const users = await this.orm.repos.user.find({ order: { id: 'ASC' } });
-    return res.render('index', { user: req.session.user, images, users, config })
+    const userImages = [];
+    for (let i = 0; i < users.length; i++) {
+      userImages[i] = await (await this.orm.repos.image.find({where:{user:users[i].id}})).length
+    }
+    return res.render('index', { user: req.session.user, images, users, userImages, config })
   }
 
   @Get('login')
