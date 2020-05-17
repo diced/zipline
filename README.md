@@ -135,13 +135,11 @@ Now that you have considered what prerequisites you would like, lets actually in
 
 ### Get the Source & Install Dependencies
 
-You can get the source from the releases
-
 ```sh
-wget <RELEASE TAR BALL>
-tar -xvf <REALASE>
-cd <REALASE>
-npm i
+git clone https://github.com/dicedtomatoreal/typex
+cd typex
+tsc -p .
+npm start
 ```
 
 ### Configuration Options
@@ -234,16 +232,6 @@ Particles.JS, can be enabled and it's config can be changed willingly.
 | `meta.favicon`  | string | has to be in /public/assets folder and should be formatted as `"/public/assets/<file name>"` |
 | `meta.title`    | string | title of your server shows up like `<title> - Login` or `<title> - Dashboard`                |
 
-#### Particles.JS Configuration
-
-**Config Property:** `particles`
-
-Particles.JS, can be enabled and it's config can be changed willingly.
-
-| Config Property     | Type            | Description / Expected Values                                                                                                |
-| ------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `particles.enabled` | boolean         | Whether particles should show up on routes                                                                                   |
-| `particles.config`  | particles config | Config from [this](https://vincentgarreau.com/particles.js/) play around with the configuration, then paste the JSON to here |
 
 ### Example Config
 
@@ -290,6 +278,7 @@ Particles.JS, can be enabled and it's config can be changed willingly.
         ]
     },
     "sessionSecret": "1234",
+    "saltRounds": 10, // You might get an error if its over a certain number, so choose carefully.
     "meta": {
         "favicon": "/public/assets/typex_small_circle.png",
         "title": "TypeX"
@@ -299,119 +288,6 @@ Particles.JS, can be enabled and it's config can be changed willingly.
         "url": "https://canary.discordapp.com/api/webhooks/id/token",
         "username": "TypeX Logs",
         "avatarURL": "https://domain/public/assets/typex_small_circle.png"
-    },
-    "particles": {
-        "enabled": true,
-        "settings": {
-            "particles": {
-                "number": {
-                    "value": 52,
-                    "density": {
-                        "enable": true,
-                        "value_area": 800
-                    }
-                },
-                "color": {
-                    "value": "#cd4c4c"
-                },
-                "shape": {
-                    "type": "circle",
-                    "stroke": {
-                        "width": 0,
-                        "color": "#000000"
-                    },
-                    "polygon": {
-                        "nb_sides": 9
-                    },
-                    "image": {
-                        "src": "img/github.svg",
-                        "width": 60,
-                        "height": 100
-                    }
-                },
-                "opacity": {
-                    "value": 0.5,
-                    "random": false,
-                    "anim": {
-                        "enable": false,
-                        "speed": 1,
-                        "opacity_min": 0.1,
-                        "sync": false
-                    }
-                },
-                "size": {
-                    "value": 0,
-                    "random": true,
-                    "anim": {
-                        "enable": false,
-                        "speed": 40,
-                        "size_min": 0.1,
-                        "sync": false
-                    }
-                },
-                "line_linked": {
-                    "enable": true,
-                    "distance": 150,
-                    "color": "#ffffff",
-                    "opacity": 0.4,
-                    "width": 1
-                },
-                "move": {
-                    "enable": true,
-                    "speed": 6,
-                    "direction": "none",
-                    "random": false,
-                    "straight": false,
-                    "out_mode": "out",
-                    "bounce": false,
-                    "attract": {
-                        "enable": false,
-                        "rotateX": 600,
-                        "rotateY": 1200
-                    }
-                }
-            },
-            "interactivity": {
-                "detect_on": "canvas",
-                "events": {
-                    "onhover": {
-                        "enable": false,
-                        "mode": "grab"
-                    },
-                    "onclick": {
-                        "enable": false,
-                        "mode": "repulse"
-                    },
-                    "resize": true
-                },
-                "modes": {
-                    "grab": {
-                        "distance": 400,
-                        "line_linked": {
-                            "opacity": 1
-                        }
-                    },
-                    "bubble": {
-                        "distance": 400,
-                        "size": 40,
-                        "duration": 2,
-                        "opacity": 8,
-                        "speed": 3
-                    },
-                    "repulse": {
-                        "distance": 200,
-                        "duration": 0.4
-                    },
-                    "push": {
-                        "particles_nb": 4
-                    },
-                    "remove": {
-                        "particles_nb": 2
-                    }
-                }
-            },
-            "retina_detect": true
-        }
     }
 }
 ```
@@ -431,3 +307,24 @@ Run the webserver by running
 ```sh
 node out/src
 ```
+
+## How you can upload
+
+These are the options you must pass when uploading a url or image/file
+
+### Uploader
+
+| Property  | Value                               |
+|-----------|-------------------------------------|
+| URL       | `https://<DOMAIN>/api/upload`       |
+| Header    | `authorization: <TOKEN>`            |
+| Header    | `content-type: multipart/form-data` |
+| File name | `file`                              |
+
+### URL Shortener
+| Property  | Value                               |
+|-----------|-------------------------------------|
+| URL       | `https://<DOMAIN>/api/shorten`      |
+| Header    | `authorization: <TOKEN>`            |
+| Header    | `content-type: application/json`    |
+| Data      | `{"url": "<URL>"}`                  |

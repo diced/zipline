@@ -1,8 +1,10 @@
 {
   "name": "typex",
-  "version": "0.4",
+  "version": "0.4.2",
   "private": true,
-  "scripts": {},
+  "scripts": {
+    "start": "node out/src"
+  },
   "dependencies": {
     "@ayanaware/logger": "^2.2.1",
     "@forevolve/bootstrap-dark": "^1.0.0-alpha.981",
