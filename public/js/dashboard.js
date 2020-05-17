@@ -200,18 +200,53 @@ document.getElementById('saveUser').addEventListener('click', async () => {
     });
 });
 
-document.getElementById('copyToken').addEventListener('click', async () => {
+async function shortURL(token, url) {
+    if (whitespace(url)) return showAlert('error', 'Please input a URL.')
+    const res = await fetch('/api/shorten', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'authorization': token
+        },
+        body: JSON.stringify({
+            url
+        })
+    });
+    try {
+            let te = await res.text();
+            Swal.fire(
+                'URL Shortened!',
+                `Shorten: <a target="_blank" href="${te}">${te}</a>`,
+                'success'
+            );
+                return;
+    } catch (e) {
+        if (e.message.startsWith('Unexpected token < in JSON at position')) {
+            let te = await res.text();
+            Swal.fire(
+                'URL Shortened!',
+                `Shorten: <a target="_blank" href="${te}">${te}</a>`,
+                'success'
+            );
+            return;
+        } else {
+            console.error(e)
+        }
+    }
+};
+
+const copyToken = (token) => {
     Swal.fire({
         title: 'Are you sure?',
         text: "You are proceeding to copy your token, make sure NO ONE sees it.",
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#3085d6',
+        confirmButtonColor: '#3`085d6',
         cancelButtonColor: '#d33',
         confirmButtonText: 'Yes, copy it!'
     }).then((result) => {
         if (result.value) {
-            copyText("<%= user.token %>");
+            copyText(token);
             Swal.fire(
                 'Copied!',
                 'Your API Token has been copied.',
@@ -219,7 +254,7 @@ document.getElementById('copyToken').addEventListener('click', async () => {
             );
         }
     });
-});
+};
 document.getElementById('regenToken').addEventListener('click', async () => {
     Swal.fire({
         title: 'Are you sure?',

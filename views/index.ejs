@@ -31,6 +31,10 @@
                     <a style="border-radius: 50px;" class="nav-link active" id="home-tab" data-toggle="tab" href="#home"
                         role="tab" aria-controls="home" aria-selected="true">Home</a>
                 </li>
+                <li class="nav-item">
+                    <a style="border-radius: 50px;" class="nav-link" id="urls-tab" data-toggle="tab" href="#urls"
+                        role="tab" aria-controls="urls" aria-selected="false">URL Shortener</a>
+                </li>
                 <li class="nav-item" id="updateImages">
                     <a style="border-radius: 50px;" class="nav-link" id="profile-tab" data-toggle="tab" href="#images"
                         role="tab" aria-controls="images" aria-selected="false">Your
@@ -51,7 +55,7 @@
                     <p>You have <b><%= images.length %></b> images saved, and you
                         <%= user.administrator ? 'are an administrator' : 'are not an administrator' %>.</p>
                     <h4>API Token</h4>
-                    <button type="button" class="btn btn-sm btn-primary" id="copyToken"
+                    <button type="button" class="btn btn-sm btn-primary" onclick="copyToken('<%=user.token%>')"
                         style="border-radius: 50px;">Copy</button>
                     <button type="button" class="btn btn-sm btn-danger" id="regenToken"
                         style="border-radius: 50px;">Regenerate</button>
@@ -80,6 +84,25 @@
                         </div>
                     </div>
 
+                </div>
+                <div class="tab-pane fade m-3" id="urls" role="tabpanel" aria-labelledby="urls-tab">
+                    <h3>Shorten a URL</h3>
+                    <form>
+                        <div class="form-group">
+                            <label for="urlToShorten">URL</label>
+                            <input type="text" class="form-control" id="urlToShorten"
+                                placeholder="URL">
+                        </div>
+
+                        <button type="button"
+                            class="btn btn-primary"
+                            id="shortenURL"
+                            onclick="shortURL('<%=user.token%>', document.getElementById('urlToShorten').value)"
+                            style="border-radius: 50px; width:100%;"
+                            >Shorten</button>
+                    </form>
+                    <h3>Your Shortens</h3>
+                    <p>Comming soon &trade;</p>
                 </div>
                 <% if (user.administrator) { %>
                 <div class="tab-pane fade m-3" id="users" role="tabpanel" aria-labelledby="users-tab">
