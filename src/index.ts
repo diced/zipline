@@ -14,7 +14,7 @@ import { readFileSync } from 'fs';
 import { Shorten } from "./entities/Shorten";
 
 if (!findFile('config.json', process.cwd())) {
-  Logger.get('FS').error(`No config.json exists in the ${__dirname}, exiting...`)
+  Logger.get('FS').error(`No config.json exists in ${__dirname}, exiting...`)
   process.exit(1);
 }
 
