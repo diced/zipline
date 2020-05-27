@@ -1,3 +1,6 @@
+const TypeX = {
+    currentImagePage: 0
+}
 function whitespace(str) {
     return str === null || str.match(/^ *$/) !== null;
 }
@@ -30,51 +33,74 @@ function copyText(text) {
     return result;
 }
 
-document.getElementById('updateImages').addEventListener('click', async () => {
+async function redoImageGrid(page) {
+    if (!page) return;
     document.getElementById('typexImages').innerHTML = '';
-    const res = await fetch('/api/images/user', {
+    const resp = await fetch('/api/images/user/pages?page=' + page, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
         }
     });
-    try {
-        const json = await res.json();
-        if (json.error || json.code) return showAlert('error', json.error)
-        else {
-            json.forEach(image => {
+    const json = await resp.json();
+    console.log(json);
+    if (json.error || json.code) return showAlert('error', json.error);
+        try {
+            json.page.forEach(image => {
                 $('#typexImages').append(`
-<div class="card typex-image-actions" style="background-color: transparent;" data-toggle="modal" data-target="#typeximg${image.id}">
-<img class="card-img-top" src="${image.url}"/>
-<input disabled type="button" class="btn btn-sm typex-image-action" value="${image.id}" />
-<div class="modal fade" id="typeximg${image.id}" tabindex="-1" role="dialog" aria-labelledby="imagelabel${image.id}" aria-hidden="true">
-<div class="modal-dialog modal-dialog-centered" role="document">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title" id="imagelabel${image.id}">Currenting Managing Image ${image.id}</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button> 
-        </div>
-        <div class="modal-footer">
-            <div class="row" style="width:100%;">
-                <div class="col-sm-6">
-                    <button type="button" onclick="window.open('${image.url}', '_blank')" class="btn btn-primary"
-                        style="border-radius: 50px; width:100%;">View Image</button>
-                </div>
-                <div class="col-sm-6">
-                    <button type="button" class="btn btn-danger" data-dismiss="modal"
-                        style="border-radius: 50px; width:100%;" onclick="deleteImage('${image.id}', '${image.url}')">Delete Image</button>
+<div class="col-sm-4">
+    <div class="card m-2" data-toggle="modal" data-target="#typeximg${image.id}">
+        <img class="card-img-top" src="${image.url}" alt="Image ${image.id}">
+        <div class="modal fade" id="typeximg${image.id}" tabindex="-1" role="dialog" aria-labelledby="imagelabel${image.id}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="imagelabel${image.id}">Currenting Managing Image ${image.id}</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button> 
+                    </div>
+                    <div class="modal-footer">
+                        <div class="row" style="width:100%;">
+                            <div class="col-sm-6">
+                                <button type="button" onclick="window.open('${image.url}', '_blank')" class="btn btn-primary"
+                                    style="border-radius: 50px; width:100%;">View Image</button>
+                            </div>
+                            <div class="col-sm-6">
+                                <button type="button" class="btn btn-danger" data-dismiss="modal"
+                                    style="border-radius: 50px; width:100%;" onclick="deleteImage('${image.id}', '${image.url}')">Delete Image</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-</div>
-</div>
     `)
             });
+    } catch (e) {
+        console.error(e)
+    }
+}
+
+document.getElementById('updateImages').addEventListener('click', async () => {
+    redoImageGrid('0');
+    document.getElementById('typexImagePagination').innerHTML = '';
+
+    const resp = await fetch('/api/images/user/pages', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
         }
+    });
+    const json = await resp.json();
+    try {
+            json.pagedNums.forEach(p => {
+                $('#typexImagePagination').append(`
+                <li class="page-item"><a class="page-link" href="#" onclick="redoImageGrid('${p}')">${p+1}</a></li>
+                `)
+            });
     } catch (e) {
         console.error(e)
     }

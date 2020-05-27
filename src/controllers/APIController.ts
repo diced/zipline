@@ -134,6 +134,17 @@ export class APIController {
     const all = await this.orm.repos.image.find({ where: { user: req.session.user.id }, order: { id: 'ASC' } });
     return res.status(200).json(all);
   }
+  @Get('images/user/pages')
+  @Middleware(cookiesForAPI)
+  private async pagedUser(req: Request, res: Response) {
+    const all = await this.orm.repos.image.find({ where: { user: req.session.user.id }, order: { id: 'ASC' } });
+    const paged = [];
+    const pagedNums = [];
+    while (all.length) paged.push(all.splice(0, 25));
+    for (let x = 0; x < paged.length; x++) pagedNums.push(x);
+    if (!req.query.page) return res.status(200).json({pagedNums});
+    else return res.status(200).json({page: paged[Number(req.query.page)]});
+  }
 
   @Delete('images')
   @Middleware(cookiesForAPI)
