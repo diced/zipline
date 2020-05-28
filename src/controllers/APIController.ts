@@ -156,7 +156,7 @@ export class APIController {
   @Get('images')
   @Middleware(cookiesForAPI)
   private async allImages(req: Request, res: Response) {
-    const all = await this.orm.repos.image.find({ order: { id: 'ASC' } });
+    const all = await this.orm.repos.image.find({ where: { user: req.session.user.id }, order: { id: 'ASC' } });
     return res.status(200).json(all);
   }
 
@@ -193,6 +193,20 @@ export class APIController {
     for (let x = 0; x < paged.length; x++) pagedNums.push(x);
     if (!req.query.page) return res.status(200).json({pagedNums});
     else return res.status(200).json({page: paged[Number(req.query.page)]});
+  }
+
+  @Get('shortens')
+  @Middleware(cookiesForAPI)
+  private async allShortens(req: Request, res: Response) {
+    const all = await this.orm.repos.shorten.find({ where: { user: req.session.user.id }, order: { id: 'ASC' } });
+    return res.status(200).json(all);
+  }
+
+  @Get('shortens/:id')
+  @Middleware(cookiesForAPI)
+  private async getShorten(req: Request, res: Response) {
+    const all = await this.orm.repos.shorten.find({ where: { user: req.session.user.id, id: Number(req.params.id) }, order: { id: 'ASC' } });
+    return res.status(200).json(all);
   }
 
   public set(orm: ORMHandler) {
