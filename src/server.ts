@@ -37,7 +37,6 @@ export class TypeXServer extends Server {
       const upload = await orm.repos.image.findOne({ url: `${config.site.returnProtocol}://${req.headers['host']}${req.url}` });
       if (!upload) return next();
       upload.views++;
-      console.log(upload);
       orm.repos.image.save(upload);
       return next();
     })
