@@ -85,6 +85,7 @@ export class APIController {
   @Middleware(cookiesForAPI)
   private async patchUser(req: Request, res: Response) {
     const data = req.body;
+    if (data.id !== req.session.user.id) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: 'Unauthorized' });
     data.password = hashPassword(data.password, config.saltRounds)
     try {
       let user = await this.orm.repos.user.findOne({ id: req.session.user.id })
@@ -94,6 +95,23 @@ export class APIController {
       return res.status(200).json(user);
     } catch (e) {
       return res.status(BAD_REQUEST).json({ error: "Could not edit user: " + e.message })
+    }
+  }
+
+  @Patch('user/password')
+  @Middleware(cookiesForAPI)
+  private async patchPassword(req: Request, res: Response) {
+    if (!req.session.user.administrator) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: 'Unauthorized' });
+    const data = req.body;
+    data.password = hashPassword(data.password, config.saltRounds)
+    try {
+      let user = await this.orm.repos.user.findOne({ id: data.id })
+      if (!user) return res.status(BAD_REQUEST).json({ error: "Could not reset password: user doesnt exist" })
+      this.orm.repos.user.update({ id: data.id }, { password: data.password });
+      Logger.get('TypeX.User.Edit.ResetPassword').info(`User ${user.username} (${user.id}) had their password reset.`)
+      return res.status(200).json(user);
+    } catch (e) {
+      return res.status(BAD_REQUEST).json({ error: "Could not reset password: " + e.message })
     }
   }
 
