@@ -13,36 +13,38 @@
             <ul class="nav nav-pills mb-3" id="main-view-tab-list" role="tablist" style="margin-top: 50px;">
                 <li class="nav-item">
                     <a style="border-radius: 50px;" class="nav-link active" id="home-tab" data-toggle="tab" href="#home"
-                        role="tab" aria-controls="home" aria-selected="true">Home</a>
+                        role="tab" aria-controls="home" aria-selected="true"><i class="fas fa-home"></i> Home</a>
                 </li>
                 <li class="nav-item">
                     <a style="border-radius: 50px;" class="nav-link" id="urls-tab" data-toggle="tab" href="#urls"
-                        role="tab" aria-controls="urls" aria-selected="false">URL Shortener</a>
+                        role="tab" aria-controls="urls" aria-selected="false"><i class="fas fa-compress-alt"></i> URL
+                        Shortener</a>
                 </li>
                 <li class="nav-item" id="updateImages">
                     <a style="border-radius: 50px;" class="nav-link" id="profile-tab" data-toggle="tab" href="#images"
-                        role="tab" aria-controls="images" aria-selected="false">Your
+                        role="tab" aria-controls="images" aria-selected="false"><i class="fas fa-images"></i> Your
                         Images</a>
                 </li>
                 <% if (user.administrator) { %>
                 <li class="nav-item">
                     <a style="border-radius: 50px;" class="nav-link" id="contact-tab" data-toggle="tab" href="#users"
-                        role="tab" aria-controls="users" aria-selected="false">Users</a>
+                        role="tab" aria-controls="users" aria-selected="false"><i class="fas fa-user-friends"></i>
+                        Users</a>
                 </li>
                 <% } %>
             </ul>
             <div class="tab-content" id="main-view">
                 <div class="tab-pane fade show active m-3" id="home" role="tabpanel" aria-labelledby="home-tab">
-                    <h2>Welcome back, <%= user.username %> <a class="btn btn-sm btn-danger" href="/logout"
-                            style="border-radius: 50px;">Logout</a>
+                    <h2>
+                        Welcome back, <%= user.username %>
+                        <% if (user.administrator) <a class="btn btn-sm btn-danger" style="border-radius: 50px;">Admin</a> %>
                     </h2>
-                    <p>You have <b><%= images.length %></b> images saved, and you
-                        <%= user.administrator ? 'are an administrator' : 'are not an administrator' %>.</p>
+                    <p>You have <b><%= images.length %></b> images saved.</p>
                     <h4>API Token</h4>
                     <button type="button" class="btn btn-sm btn-primary" onclick="copyToken('<%=user.token%>')"
                         style="border-radius: 50px;">Copy</button>
-                    <button type="button" class="btn btn-sm btn-danger" onclick="regenToken('<%=user.id%>')" id="regenToken"
-                        style="border-radius: 50px;">Regenerate</button>
+                    <button type="button" class="btn btn-sm btn-danger" onclick="regenToken('<%=user.id%>')"
+                        id="regenToken" style="border-radius: 50px;"><i class="fas fa-cog"></i> Regenerate</button>
                     <h4 style="margin-top:12px">Update your Profile</h4>
                     <form>
                         <div class="form-group">
@@ -53,12 +55,15 @@
 
                         <div class="form-group">
                             <label for="passwordSave">Password</label>
-                            <input type="password" class="form-control" id="passwordSave"
-                                placeholder="Password">
+                            <input type="password" class="form-control" id="passwordSave" placeholder="Password">
                         </div>
                         <button type="button" class="btn btn-primary" id="saveUser"
-                            style="border-radius: 50px; width:100%;">Save</button>
+                            style="border-radius: 50px; width:100%;"><i class="fas fa-pen"></i> Save
+                        </button>
                     </form>
+                    <br>
+                    <a class="btn btn-danger" href="/logout" style="border-radius: 50px; width:100%;"><i
+                            class="fas fa-sign-out-alt"></i> Logout</a>
                 </div>
                 <div class="tab-pane fade m-3" id="images" role="tabpanel" aria-labelledby="images-tab">
                     <h3>Your Images</h3>
@@ -69,7 +74,7 @@
                     </div>
                     <nav aria-label="TypeX Images" class="m-2">
                         <ul class="pagination justify-content-center" id="typexImagePagination">
-                            
+
                         </ul>
                     </nav>
 
@@ -79,42 +84,42 @@
                     <form>
                         <div class="form-group">
                             <label for="urlToShorten">URL</label>
-                            <input type="url" class="form-control" id="urlToShorten"
-                                placeholder="URL">
+                            <input type="url" class="form-control" id="urlToShorten" placeholder="URL">
                         </div>
 
-                        <button type="button"
-                            class="btn btn-primary"
-                            id="shortenURL"
+                        <button type="button" class="btn btn-primary" id="shortenURL"
                             onclick="shortURL('<%=user.token%>', document.getElementById('urlToShorten').value)"
-                            style="border-radius: 50px; width:100%;"
-                            >Shorten</button>
+                            style="border-radius: 50px; width:100%;">Shorten</button>
                     </form>
                     <h3>Your Shortens</h3>
                     <p>Comming soon &trade;</p>
                 </div>
                 <% if (user.administrator) { %>
                 <div class="tab-pane fade m-3" id="users" role="tabpanel" aria-labelledby="users-tab">
-                    <button style="border-radius: 50px; margin-bottom: 10px;" type="button" class="btn btn-primary" data-toggle="modal"
-                        data-target="#modal">Create new
-                        User</button>
+                    <button style="border-radius: 50px; margin-bottom: 10px;" type="button" class="btn btn-primary"
+                        data-toggle="modal" data-target="#modal">Create New User</button>
                     <div class="row">
                         <% for (let b = 0; b < users.length; b++) { let u = users[b]; let imgs = userImages[b]; %>
-                            <div class="col-sm-4">
-                                <div class="card m-2">
-                                    <div class="card-body">
-                                        <%if(u.administrator){%>
-                                            <h5 class="card-title"><%=u.username%> <span class="badge badge-pill badge-danger">Admin</span></h5>
-                                        <%}else{%>
-                                            <h5 class="card-title"><%=u.username%> <span class="badge badge-pill badge-primary">User</span> <button class="badge badge-pill badge-danger" onclick="deleteSpecificUser('<%=u.id%>', '<%=u.username%>')" style="border:none;">Delete</button></h5>
-                                        <%}%>
+                        <div class="col-sm-4">
+                            <div class="card m-2">
+                                <div class="card-body">
+                                    <%if(u.administrator){%>
+                                    <h5 class="card-title"><%=u.username%> <span
+                                            class="badge badge-pill badge-danger">Admin</span></h5>
+                                    <%}else{%>
+                                    <h5 class="card-title"><%=u.username%> <span
+                                            class="badge badge-pill badge-primary">User</span> <button
+                                            class="badge badge-pill badge-danger"
+                                            onclick="deleteSpecificUser('<%=u.id%>', '<%=u.username%>')"
+                                            style="border:none;">Delete</button></h5>
+                                    <%}%>
                                             <p class="card-text">
                                                 <b>ID:</b> <%=u.id%><br>
-                                                <b>Images:</b> <%=imgs%>
-                                            </p>
-                                        </div>
-                                  </div>
+                                    <b>Images:</b> <%=imgs%>
+                                    </p>
+                                </div>
                             </div>
+                        </div>
                         <%}%>
                     </div>
                     <div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
@@ -166,21 +171,21 @@
                     </div>
                 </div>
                 <% } %>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-        crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-        crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-        crossorigin="anonymous"></script>
-    <script src="//cdn.jsdelivr.net/npm/sweetalert2@9/dist/sweetalert2.min.js"></script>
-    <script src="/public/js/dashboard.js"></script>
-    <script>TypeX.currentID = '<%=user.id%>'</script>
+            <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+                integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+                crossorigin="anonymous"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+                integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+                crossorigin="anonymous"></script>
+            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+                integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+                crossorigin="anonymous"></script>
+            <script src="//cdn.jsdelivr.net/npm/sweetalert2@9/dist/sweetalert2.min.js"></script>
+            <script src="/public/js/dashboard.js"></script>
+            <script>TypeX.currentID = '<%=user.id%>'</script>
 </body>
 
 </html>
