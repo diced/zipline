@@ -1,0 +1,12 @@
+{
+	"Version": "13.1.0",
+	"Name": "<YOUR UPLOADER NAME>",
+	"DestinationType": "URLShortener",
+	"RequestMethod": "POST",
+	"RequestURL": "https://<YOUR DOMAIN>/api/shorten",
+	"Headers": {
+		"authorization": "<YOUR TOKEN>"
+	},
+	"Body": "JSON",
+	"Data": "{\n  \"url\": \"$input$\"\n}"
+}
