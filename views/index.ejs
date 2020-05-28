@@ -41,7 +41,7 @@
                     <h4>API Token</h4>
                     <button type="button" class="btn btn-sm btn-primary" onclick="copyToken('<%=user.token%>')"
                         style="border-radius: 50px;">Copy</button>
-                    <button type="button" class="btn btn-sm btn-danger" id="regenToken"
+                    <button type="button" class="btn btn-sm btn-danger" onclick="regenToken('<%=user.id%>')" id="regenToken"
                         style="border-radius: 50px;">Regenerate</button>
                     <h4 style="margin-top:12px">Update your Profile</h4>
                     <form>
@@ -180,6 +180,7 @@
         crossorigin="anonymous"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@9/dist/sweetalert2.min.js"></script>
     <script src="/public/js/dashboard.js"></script>
+    <script>TypeX.currentID = '<%=user.id%>'</script>
 </body>
 
 </html>

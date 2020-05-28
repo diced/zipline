@@ -1,6 +1,7 @@
 const TypeX = {
     currentImagePage: 0,
-    pagedNumbers: []
+    pagedNumbers: [],
+    currentID: null
 }
 function whitespace(str) {
     return str === null || str.match(/^ *$/) !== null;
@@ -177,7 +178,7 @@ const deleteImage = (id, url) => {
                 const json = await res.json();
                 if (json.error || json.code) return showAlert('error', json.error)
                 else {
-                    const res = await fetch('/api/images?image=' + id, {
+                    const res = await fetch('/api/images/' + id, {
                         method: 'DELETE',
                         headers: {
                             'Content-Type': 'application/json'
@@ -215,7 +216,7 @@ const deleteSpecificUser = (id, username) => {
     }).then(async (result) => {
         if (result.value) {
             try {
-                const res = await fetch('/api/user?user=' + id, {
+                const res = await fetch('/api/user/' + id, {
                     method: 'DELETE'
                 });
                 try {
@@ -238,7 +239,7 @@ const deleteSpecificUser = (id, username) => {
         }
     });
 }
-document.getElementById('saveUser').addEventListener('click', async () => {
+document.getElementById('saveUser').addEventListener('click', () => {
     Swal.fire({
         title: 'Are you sure?',
         text: "You are proceeding to edit your user.",
@@ -252,12 +253,13 @@ document.getElementById('saveUser').addEventListener('click', async () => {
             const username = document.getElementById('usernameSave').value;
             const password = document.getElementById('passwordSave').value;
             if (whitespace(username)) return showAlert('error', 'Please input a username.')
-            const res = await fetch('/api/user', {
+            const res = await fetch(`/api/users/${TypeX.currentID}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
+                    payload: 'USER_EDIT',
                     username,
                     password
                 })
@@ -335,7 +337,7 @@ const copyToken = (token) => {
         }
     });
 };
-document.getElementById('regenToken').addEventListener('click', async () => {
+function regenToken(id) {
     Swal.fire({
         title: 'Are you sure?',
         text: "You are proceeding to regenerate your token, remember all apps using your current one will stop working.",
@@ -346,11 +348,15 @@ document.getElementById('regenToken').addEventListener('click', async () => {
         confirmButtonText: 'Yes, regenerate it!'
     }).then(async (result) => {
         if (result.value) {
-            const res = await fetch('/api/token', {
-                method: 'POST',
+            console.log(`/api/users/${id}`);
+            const res = await fetch(`/api/users/${id}`, {
+                method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json'
-                }
+                },
+                body: JSON.stringify({
+                    payload: 'USER_TOKEN_RESET'
+                })
             });
             try {
                 const json = await res.json();
@@ -370,7 +376,7 @@ document.getElementById('regenToken').addEventListener('click', async () => {
         }
     });
 
-});
+};
 async function createUser() {
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;

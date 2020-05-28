@@ -100,12 +100,12 @@ export class APIController {
     const data = req.body;
     if (!data.payload) return res.status(FORBIDDEN).json({ code: BAD_REQUEST, message: 'No payload specified.' });
     if (data.payload === 'USER_EDIT') {
-      if (req.body.id !== req.session.user.id) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: 'Unauthorized' });
+      if (Number(req.params.id) !== Number(req.session.user.id)) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: 'Unauthorized' });
       data.password = hashPassword(data.password, config.saltRounds)
       try {
-        let user = await this.orm.repos.user.findOne({ id: req.session.user.id })
+        let user = await this.orm.repos.user.findOne({ id: Number(req.params.id) })
         if (!user) return res.status(BAD_REQUEST).json({ error: "Could not edit user: user doesnt exist" })
-        this.orm.repos.user.update({ id: req.session.user.id }, data);
+        this.orm.repos.user.update({ id: Number(req.params.id) }, { username: data.username, password: data.password });
         Logger.get('TypeX.User.Edit').info(`User ${user.username} (${user.id}) was edited`)
         return res.status(200).json(user);
       } catch (e) {
@@ -114,9 +114,9 @@ export class APIController {
     } else if (data.payload === 'USER_RESET_PASSWORD') {
       data.password = hashPassword(data.password, config.saltRounds)
       try {
-        let user = await this.orm.repos.user.findOne({ id: data.id })
+        let user = await this.orm.repos.user.findOne({ id: Number(req.params.id) })
         if (!user) return res.status(BAD_REQUEST).json({ error: "Could not reset password: user doesnt exist" })
-        this.orm.repos.user.update({ id: data.id }, { password: data.password });
+        this.orm.repos.user.update({ id: Number(req.params.id) }, { password: data.password });
         Logger.get('TypeX.User.Edit.ResetPassword').info(`User ${user.username} (${user.id}) had their password reset.`)
         return res.status(200).json(user);
       } catch (e) {
@@ -134,6 +134,8 @@ export class APIController {
       } catch (e) {
         return res.status(BAD_REQUEST).json({ error: "Could not regen token: " + e.message })
       }
+    } else {
+      console.log(data);
     }
   }
 
