@@ -67,7 +67,7 @@ v13.13.0
 - [PostgreSQL](https://www.postgresql.org/ "PostgresSQL")
 - [CockroachDB](https://www.cockroachlabs.com/ "Cockroach Labs")
 - [MySQL](https://www.mysql.com/ "MySQL")
-- [MariaDB](https://mariadb.com/ "MariaDB")
+- [MariaDB](https://www.mariadb.com/ "MariaDB")
 - [Microsoft SQL Server](https://www.microsoft.com/en-us/sql-server/ "Microsoft SQL Server")
 - [MongoDB](https://www.mongodb.com/ "MongoDB") (Coming soon!)
 
