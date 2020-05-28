@@ -15,6 +15,10 @@
                     <a style="border-radius: 50px;" class="nav-link active" id="home-tab" data-toggle="tab" href="#home"
                         role="tab" aria-controls="home" aria-selected="true"><i class="fas fa-home"></i> Home</a>
                 </li>
+                <li class="nav-item" id="updateStatistics">
+                    <a style="border-radius: 50px;" class="nav-link" id="stats-tab" data-toggle="tab" href="#stats"
+                        role="tab" aria-controls="stats" aria-selected="false"><i class="fas fa-server"></i> Statistics</a>
+                </li>
                 <li class="nav-item">
                     <a style="border-radius: 50px;" class="nav-link" id="urls-tab" data-toggle="tab" href="#urls"
                         role="tab" aria-controls="urls" aria-selected="false"><i class="fas fa-compress-alt"></i> URL
@@ -36,14 +40,18 @@
             <div class="tab-content" id="main-view">
                 <div class="tab-pane fade show active m-3" id="home" role="tabpanel" aria-labelledby="home-tab">
                     <h2>
-                        Welcome back, <%= user.username %>
-                        <% if (user.administrator) <a class="btn btn-sm btn-danger" style="border-radius: 50px;">Admin</a> %>
+                        Welcome back, <%= user.username %>!
+                        <%if(user.administrator){%><span
+                                    class="badge badge-pill badge-danger">Admin</span>
+                        <%}else{%><span
+                                class="badge badge-pill badge-primary">User</span>
+                        <%}%>
                     </h2>
                     <p>You have <b><%= images.length %></b> images saved.</p>
                     <h4>API Token</h4>
                     <button type="button" class="btn btn-sm btn-primary" onclick="copyToken('<%=user.token%>')"
-                        style="border-radius: 50px;">Copy</button>
-                    <button type="button" class="btn btn-sm btn-danger" onclick="regenToken('<%=user.id%>')"
+                        style="border-radius: 50px;"><i class="fas fa-copy"></i> Copy</button>
+                    <button type="button" class="btn btn-sm btn-danger"
                         id="regenToken" style="border-radius: 50px;"><i class="fas fa-cog"></i> Regenerate</button>
                     <h4 style="margin-top:12px">Update your Profile</h4>
                     <form>
@@ -64,6 +72,54 @@
                     <br>
                     <a class="btn btn-danger" href="/logout" style="border-radius: 50px; width:100%;"><i
                             class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+                <div class="tab-pane fade m-3" id="stats" role="tabpanel" aria-labelledby="stats-tab">
+                    <h3>Statistics</h3>
+                    <h5 id="statsDescription"></h5>
+                    <div class="container-fluid pt-2">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="card m-2">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Leaderboard (Images)</h5>
+                                        <p class="card-text">
+                                            <table class="table">
+                                                <thead>
+                                                  <tr>
+                                                    <th scope="col">#</th>
+                                                    <th scope="col">Username</th>
+                                                    <th scope="col">Images</th>
+                                                  </tr>
+                                                </thead>
+                                                <tbody id="statsLeaderboardImages">
+                                                </tbody>
+                                            </table>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="card m-2">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Leaderboard (Views)</h5>
+                                        <p class="card-text">
+                                            <table class="table">
+                                                <thead>
+                                                  <tr>
+                                                    <th scope="col">#</th>
+                                                    <th scope="col">Username</th>
+                                                    <th scope="col">Views</th>
+                                                  </tr>
+                                                </thead>
+                                                <tbody id="statsLeaderboardImageViews">
+                                                </tbody>
+                                            </table>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="tab-pane fade m-3" id="images" role="tabpanel" aria-labelledby="images-tab">
                     <h3>Your Images</h3>
