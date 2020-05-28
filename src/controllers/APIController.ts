@@ -169,7 +169,7 @@ export class APIController {
     const images = [];
     const views = [];
     for (const user of users) {
-      const i = await this.orm.repos.image.find({where:{user:user.id}, order: {id:'ASC'}});
+      const i = await this.orm.repos.image.find({where:{user:user.id}, order: {views:'ASC'}});
       images.push({ 
         username: user.username,
         count: i.length

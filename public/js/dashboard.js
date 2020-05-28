@@ -177,7 +177,6 @@ document.getElementById('updateStatistics').addEventListener('click', async () =
         document.getElementById('statsLeaderboardImageViews').innerHTML = '';
         for (let i = 0; i < json.table.images.length; i++) {
             const c = json.table.images[i];
-            const v = json.table.views[i];
             $('#statsLeaderboardImages').append(`
             <tr>
             <th scope="row">${i+1}</th>
