@@ -6,9 +6,10 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-    - name: Discord notification
-      env:
-        DISCORD_WEBHOOK: https://canary.discordapp.com/api/webhooks/${{ secrets.WEBHOOK_ID }}/${{ secrets.WEBHOOK_token }}
-      uses: Ilshidur/action-discord@master
+    - uses: actions/checkout@master
+    - name: send custom message with args
+      uses: appleboy/discord-action@master
       with:
-        args: 'The project {{ EVENT_PAYLOAD.repository.full_name }} has been deployed.'
+        webhook_id: ${{ secrets.WEBHOOK_ID }}
+        webhook_token: ${{ secrets.WEBHOOK_TOKEN }}
+        args: The ${{ github.event_name }} event triggered first step.
