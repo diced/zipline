@@ -161,6 +161,46 @@ $('#typexImagePagination').append(`
     }
 });
 
+document.getElementById('updateStatistics').addEventListener('click', async () => {
+    const resp = await fetch('/api/images/statistics', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+    const json = await resp.json();
+
+    console.log(json);
+    try {
+        document.getElementById('statsDescription').innerHTML = `You have an average of <b>${Math.floor(json.average)} views</b> on your images, you have <b>${json.totalViews} views total</b>, you currently have <b>${json.images} images</b>!`
+        document.getElementById('statsLeaderboardImages').innerHTML = '';
+        document.getElementById('statsLeaderboardImageViews').innerHTML = '';
+        for (let i = 0; i < json.table.images.length; i++) {
+            const c = json.table.images[i];
+            const v = json.table.views[i];
+            $('#statsLeaderboardImages').append(`
+            <tr>
+            <th scope="row">${i+1}</th>
+            <td>${c.username}</td>
+            <td>${c.count}</td>
+            </tr>
+            `)
+        }
+        for (let i = 0; i < json.table.views.length; i++) {
+            const c = json.table.views[i];
+            $('#statsLeaderboardImageViews').append(`
+            <tr>
+            <th scope="row">${i+1}</th>
+            <td>${c.username}</td>
+            <td>${c.count}</td>
+            </tr>
+            `)
+        }
+    } catch (e) {
+        console.error(e)
+    }
+});
+
 
 
 const deleteImage = (id, url) => {
