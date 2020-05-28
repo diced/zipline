@@ -65,9 +65,22 @@ export class APIController {
     return res.status(200).send(`${config.site.returnProtocol}://${req.headers['host']}${config.shorten.route}/${id}`)
   }
 
-  @Post('user')
+  @Get('users')
   @Middleware(cookiesForAPI)
-  private async newUser(req: Request, res: Response) {
+  private async getUsers(req: Request, res: Response) {
+    if (!req.session.user.administrator) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: 'Unauthorized' });
+    const data = req.body;
+    try {
+      let users = await this.orm.repos.user.find({ order: { id: 'ASC' } })
+      return res.status(200).json(users);
+    } catch (e) {
+      return res.status(BAD_REQUEST).json({ error: "Could not create user: " + e.message })
+    }
+  }
+
+  @Post('users')
+  @Middleware(cookiesForAPI)
+  private async createUser(req: Request, res: Response) {
     if (!req.session.user.administrator) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: 'Unauthorized' });
     const data = req.body;
     try {
@@ -81,68 +94,61 @@ export class APIController {
     }
   }
 
-  @Patch('user')
+  @Patch('users/:id')
   @Middleware(cookiesForAPI)
   private async patchUser(req: Request, res: Response) {
     const data = req.body;
-    if (data.id !== req.session.user.id) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: 'Unauthorized' });
-    data.password = hashPassword(data.password, config.saltRounds)
-    try {
-      let user = await this.orm.repos.user.findOne({ id: req.session.user.id })
-      if (!user) return res.status(BAD_REQUEST).json({ error: "Could not edit user: user doesnt exist" })
-      this.orm.repos.user.update({ id: req.session.user.id }, data);
-      Logger.get('TypeX.User.Edit').info(`User ${user.username} (${user.id}) was edited`)
-      return res.status(200).json(user);
-    } catch (e) {
-      return res.status(BAD_REQUEST).json({ error: "Could not edit user: " + e.message })
+    if (!data.payload) return res.status(FORBIDDEN).json({ code: BAD_REQUEST, message: 'No payload specified.' });
+    if (data.payload === 'USER_EDIT') {
+      if (req.body.id !== req.session.user.id) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: 'Unauthorized' });
+      data.password = hashPassword(data.password, config.saltRounds)
+      try {
+        let user = await this.orm.repos.user.findOne({ id: req.session.user.id })
+        if (!user) return res.status(BAD_REQUEST).json({ error: "Could not edit user: user doesnt exist" })
+        this.orm.repos.user.update({ id: req.session.user.id }, data);
+        Logger.get('TypeX.User.Edit').info(`User ${user.username} (${user.id}) was edited`)
+        return res.status(200).json(user);
+      } catch (e) {
+        return res.status(BAD_REQUEST).json({ error: "Could not edit user: " + e.message })
+      }
+    } else if (data.payload === 'USER_RESET_PASSWORD') {
+      data.password = hashPassword(data.password, config.saltRounds)
+      try {
+        let user = await this.orm.repos.user.findOne({ id: data.id })
+        if (!user) return res.status(BAD_REQUEST).json({ error: "Could not reset password: user doesnt exist" })
+        this.orm.repos.user.update({ id: data.id }, { password: data.password });
+        Logger.get('TypeX.User.Edit.ResetPassword').info(`User ${user.username} (${user.id}) had their password reset.`)
+        return res.status(200).json(user);
+      } catch (e) {
+        return res.status(BAD_REQUEST).json({ error: "Could not reset password: " + e.message })
+      }
+    } else if (data.payload === 'USER_TOKEN_RESET') {
+      try {
+        let user = await this.orm.repos.user.findOne({ id: req.session.user.id })
+        if (!user) return res.status(BAD_REQUEST).json({ error: "Could not regen token: user doesnt exist" })
+        user.token = randomId(config.user.tokenLength);
+        req.session.user = user;
+        await this.orm.repos.user.save(user);
+        Logger.get('TypeX.User.Token').info(`User ${user.username} (${user.id}) token was regenerated`)
+        return res.status(200).json(user);
+      } catch (e) {
+        return res.status(BAD_REQUEST).json({ error: "Could not regen token: " + e.message })
+      }
     }
   }
 
-  @Patch('user/password')
-  @Middleware(cookiesForAPI)
-  private async patchPassword(req: Request, res: Response) {
-    if (!req.session.user.administrator) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: 'Unauthorized' });
-    const data = req.body;
-    data.password = hashPassword(data.password, config.saltRounds)
-    try {
-      let user = await this.orm.repos.user.findOne({ id: data.id })
-      if (!user) return res.status(BAD_REQUEST).json({ error: "Could not reset password: user doesnt exist" })
-      this.orm.repos.user.update({ id: data.id }, { password: data.password });
-      Logger.get('TypeX.User.Edit.ResetPassword').info(`User ${user.username} (${user.id}) had their password reset.`)
-      return res.status(200).json(user);
-    } catch (e) {
-      return res.status(BAD_REQUEST).json({ error: "Could not reset password: " + e.message })
-    }
-  }
-
-  @Delete('user')
+  @Delete('user/:id')
   @Middleware(cookiesForAPI)
   private async deleteUser(req: Request, res: Response) {
-    const q = req.query.user;
+    if (!req.session.user.administrator) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: 'Unauthorized' });
     try {
-      let user = await this.orm.repos.user.findOne({ id: Number(q) || req.session.user.id })
+      let user = await this.orm.repos.user.findOne({ id: Number(req.params.id) })
       if (!user) return res.status(BAD_REQUEST).json({ error: "Could not delete user: user doesnt exist" })
-      this.orm.repos.user.delete({ id: Number(q) || req.session.user.id });
+      this.orm.repos.user.delete({ id: Number(req.params.id) });
       Logger.get('TypeX.User.Delete').info(`User ${user.username} (${user.id}) was deleted`)
       return res.status(200).json(user);
     } catch (e) {
       return res.status(BAD_REQUEST).json({ error: "Could not delete user: " + e.message })
-    }
-  }
-
-  @Post('token')
-  @Middleware(cookiesForAPI)
-  private async postToken(req: Request, res: Response) {
-    try {
-      let user = await this.orm.repos.user.findOne({ id: req.session.user.id })
-      if (!user) return res.status(BAD_REQUEST).json({ error: "Could not regen token: user doesnt exist" })
-      user.token = randomId(config.user.tokenLength);
-      req.session.user = user;
-      await this.orm.repos.user.save(user);
-      Logger.get('TypeX.User.Token').info(`User ${user.username} (${user.id}) token was regenerated`)
-      return res.status(200).json(user);
-    } catch (e) {
-      return res.status(BAD_REQUEST).json({ error: "Could not regen token: " + e.message })
     }
   }
 

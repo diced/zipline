@@ -398,6 +398,7 @@ async function createUser() {
         console.error(e)
     }
 }
+
 document.getElementById('createUser').addEventListener('click', async () => {
     if (document.getElementById('administrator').checked) {
         Swal.fire({
