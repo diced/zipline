@@ -151,13 +151,36 @@ export class APIController {
       return res.status(BAD_REQUEST).json({ error: "Could not delete user: " + e.message })
     }
   }
-
-  @Get('images/user')
+  @Get('images')
   @Middleware(cookiesForAPI)
-  private async imagesUser(req: Request, res: Response) {
-    const all = await this.orm.repos.image.find({ where: { user: req.session.user.id }, order: { id: 'ASC' } });
+  private async allImages(req: Request, res: Response) {
+    const all = await this.orm.repos.image.find({ order: { id: 'ASC' } });
     return res.status(200).json(all);
   }
+
+  @Delete('images/:id')
+  @Middleware(cookiesForAPI)
+  private async deleteImage(req: Request, res: Response) {
+    try {
+      let image = await this.orm.repos.image.findOne({ id: Number(req.params.id) })
+      if (!image) return res.status(BAD_REQUEST).json({ error: "Could not delete image: image doesnt exist in database" })
+      this.orm.repos.image.delete({ id: Number(req.params.id) });
+      const url = new URL(image.url);
+      unlinkSync(`${config.upload.uploadDir}${sep}${url.pathname.slice(3)}`);
+      Logger.get('TypeX.Images.Delete').info(`Image ${image.url} (${image.id}) was deleted from ${config.upload.uploadDir}${sep}${url.pathname.slice(3)}`)
+      return res.status(200).json(image);
+    } catch (e) {
+      return res.status(BAD_REQUEST).json({ error: "Could not delete image: " + e.message })
+    }
+  }
+
+  @Get('images/:id')
+  @Middleware(cookiesForAPI)
+  private async imagesUser(req: Request, res: Response) {
+    const all = await this.orm.repos.image.find({ where: { id: req.params.id }, order: { id: 'ASC' } });
+    return res.status(200).json(all);
+  }
+  
   @Get('images/user/pages')
   @Middleware(cookiesForAPI)
   private async pagedUser(req: Request, res: Response) {
@@ -168,23 +191,6 @@ export class APIController {
     for (let x = 0; x < paged.length; x++) pagedNums.push(x);
     if (!req.query.page) return res.status(200).json({pagedNums});
     else return res.status(200).json({page: paged[Number(req.query.page)]});
-  }
-
-  @Delete('images')
-  @Middleware(cookiesForAPI)
-  private async deleteImage(req: Request, res: Response) {
-    const img = req.query.image;
-    try {
-      let image = await this.orm.repos.image.findOne({ id: Number(img) })
-      if (!image) return res.status(BAD_REQUEST).json({ error: "Could not delete image: image doesnt exist in database" })
-      this.orm.repos.image.delete({ id: Number(img) });
-      const url = new URL(image.url);
-      unlinkSync(`${config.upload.uploadDir}${sep}${url.pathname.slice(3)}`);
-      Logger.get('TypeX.Images.Delete').info(`Image ${image.url} (${image.id}) was deleted from ${config.upload.uploadDir}${sep}${url.pathname.slice(3)}`)
-      return res.status(200).json(image);
-    } catch (e) {
-      return res.status(BAD_REQUEST).json({ error: "Could not delete user: " + e.message })
-    }
   }
 
   public set(orm: ORMHandler) {
