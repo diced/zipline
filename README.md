@@ -8,23 +8,23 @@ A TypeScript based Image/File uploading server. Fast and Elegant.
    1. [Node](#node--typescript)
    2. [Common Databases](#common-databases)
    3. [Installing Database Drivers](#installing-database-drivers)
-      1. PostgreSQL
-      2. CockroachDB
-      3. MySQL
-      4. MariaDB
-      5. Microsoft SQL Server
+      1. [PostgreSQL](#getting-postgresql-drivers)
+      2. [CockroachDB](#getting-cockroachdb-drivers)
+      3. [MySQL](#getting-mysql-drivers)
+      4. [MariaDB](#getting-mariadb-drivers)
+      5. [Microsoft SQL Server](#getting-microsoft-sql-drivers)
 2. [Updating TypeX](#updating-typex)
 3. [Installation](#installation)
    1. [Get the Source](#get-the-source--install-dependencies)
    2. [Setting up configurations](#configuration-options)
-      1. Upload Size
-      2. User Settings
-      3. Site Settings
-      4. SSL Settings
-      5. Administrator user
-      6. Database configuration
-      7. Session Secret
-      8. Particles.JS
+      1. [Upload Size](#upload)
+      2. [User Settings](#user-settings)
+      3. [Site Settings](#site-settings)
+      4. [SSL Settings](#site-ssl-settings)
+      5. [Administrator user](#administrator-user)
+      6. [Database configuration](#database-configuration)
+      7. [Session Secret](#session-secret)
+      8. [Particles.JS](#meta-configuration)
    3. [Example Config](#example-config)
    4. [Compiling Source](#compiling-typescript-for-running)
    5. [Running Compiled Source](#running-compiled-source)
@@ -64,12 +64,12 @@ v13.13.0
 
 ### Common Databases
 
-- PostgreSQL
-- CockroachDB
-- MySQL
-- MariaDB
-- Microsoft SQL Server
-- MongoDB (Coming soon!)
+- [PostgreSQL](https://www.postgresql.org/ "PostgresSQL")
+- [CockroachDB](https://www.cockroachlabs.com/ "Cockroach Labs")
+- [MySQL](https://www.mysql.com/ "MySQL")
+- [MariaDB](https://mariadb.com/ "MariaDB")
+- [Microsoft SQL Server](https://www.microsoft.com/en-us/sql-server/ "Microsoft SQL Server")
+- [MongoDB](https://www.mongodb.com/ "MongoDB") (Coming soon!)
 
 (check out [this](https://github.com/typeorm/typeorm/blob/master/docs/connection-options.md) for all types, you will need to use a different ORM config later on, view [this](https://github.com/typeorm/typeorm/blob/master/docs/connection-options.md#common-connection-options) for every option, more on this on Database configuration setup step)
 
@@ -173,7 +173,7 @@ Every single configuration option will be listed here
 | --------------- | ------- | ------------------------------------------------------ |
 | `site.protocol` | integer | protocol (http or https)                               |
 | `site.serveHTTP`   | string  | Port to run the web server on with HTTP (can be used with nginx + CloudFlare as a reverse proxy and let CloudFlare take care of SSL) |
-| `site.serveHTTPS`   | string  | Port to run the web server on with HTTPS (only will be used if `site.protocol` is `https`) (you will need SSL certificates! See [this](#ssl-settings)) |
+| `site.serveHTTPS`   | string  | Port to run the web server on with HTTPS (only will be used if `site.protocol` is `https`) (you will need SSL certificates! See [this](#site-ssl-settings)) |
 | `site.logRoutes` | boolean | Wether or not to log routes when they are requested      |
 
 #### Site SSL Settings
