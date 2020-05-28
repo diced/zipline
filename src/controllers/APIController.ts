@@ -1,8 +1,8 @@
-import { OK, BAD_REQUEST, FORBIDDEN } from 'http-status-codes';
-import { Controller, Middleware, Get, Post, Put, Delete, Patch } from '@overnightjs/core';
+import { BAD_REQUEST, FORBIDDEN } from 'http-status-codes';
+import { Controller, Middleware, Get, Post, Delete, Patch } from '@overnightjs/core';
 import { Request, Response } from 'express';
 import { ORMHandler } from '..';
-import { randomId, getUser, getImage, findFile, getShorten, hashPassword } from '../util';
+import { randomId, getImage, findFile, getShorten, hashPassword } from '../util';
 import { createReadStream, createWriteStream, unlinkSync, existsSync, mkdirSync, readFileSync } from 'fs'
 import multer from 'multer'
 import { getExtension } from 'mime';
@@ -158,6 +158,37 @@ export class APIController {
   private async allImages(req: Request, res: Response) {
     const all = await this.orm.repos.image.find({ where: { user: req.session.user.id }, order: { id: 'ASC' } });
     return res.status(200).json(all);
+  }
+
+  @Get('images/statistics')
+  @Middleware(cookiesForAPI)
+  private async statistics(req: Request, res: Response) {
+    const all = await this.orm.repos.image.find({ where: { user: req.session.user.id }, order: { id: 'ASC' } });
+    const totalViews = all.map(i=>i.views).length !== 0 ? all.map(i=>i.views).reduce((a,b) => Number(a)+Number(b)) : 0
+    const users = await this.orm.repos.user.find();
+    const images = [];
+    const views = [];
+    for (const user of users) {
+      const i = await this.orm.repos.image.find({where:{user:user.id}, order: {id:'ASC'}});
+      images.push({ 
+        username: user.username,
+        count: i.length
+      });
+      views.push({
+        username: user.username,
+        count: i.map(i=>i.views).length !== 0 ? i.map(i=>i.views).reduce((a,b) => Number(a)+Number(b)) : 0
+      })
+    }
+    return res.status(200).json({
+      totalViews,
+      images: all.length,
+      average: totalViews/all.length,
+      table: {
+        images: images.sort((a,b) => a+b),
+        views: views.sort((a,b) => a+b)
+      }
+    });
+    
   }
 
   @Delete('images/:id')
