@@ -42,7 +42,16 @@
         integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
         crossorigin="anonymous"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@9/dist/sweetalert2.min.js"></script>
-    <script src="/public/js/login.js"></script>
+    <script>
+        if ("<%=failed%>" === 'true') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'You entered a wrong username or password',
+                footer: 'Try again later...'
+            })
+        }
+    </script>
 </body>
 
 </html>

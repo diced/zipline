@@ -1,5 +1,6 @@
 const TypeX = {
-    currentImagePage: 0
+    currentImagePage: 0,
+    pagedNumbers: []
 }
 function whitespace(str) {
     return str === null || str.match(/^ *$/) !== null;
@@ -33,17 +34,38 @@ function copyText(text) {
     return result;
 }
 
-async function redoImageGrid(page) {
-    if (!page) return;
+async function redoImageGrid(page, mode = null) {
+    if (!page && !mode) return;
     document.getElementById('typexImages').innerHTML = '';
-    const resp = await fetch('/api/images/user/pages?page=' + page, {
+    let url = '';
+    if (mode === 'prev') {
+        if (TypeX.currentImagePage === 0) {
+            url = '/api/images/user/pages?page=0';
+            TypeX.currentImagePage = 0;
+        } else {
+            url = `/api/images/user/pages?page=${TypeX.currentImagePage - 1}`;
+            TypeX.currentImagePage--;
+        } //could be better :DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
+    } else if (mode === 'next') {
+        if (TypeX.pagedNumbers[TypeX.pagedNumbers.length-1] <= TypeX.currentImagePage + 1) {
+            url = `/api/images/user/pages?page=${TypeX.pagedNumbers[TypeX.pagedNumbers.length-1]}`
+            TypeX.currentImagePage = TypeX.pagedNumbers[TypeX.pagedNumbers.length-1];
+        } else {
+            url = `/api/images/user/pages?page=${TypeX.currentImagePage+1}`
+            TypeX.currentImagePage++;
+        }
+    } else if (mode === 'normal') {
+        url = `/api/images/user/pages?page=${page}`;
+        TypeX.currentImagePage = Number(page);
+    }
+    $("#typexImagePaginationDropdown").val(TypeX.currentImagePage);
+    const resp = await fetch(url, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
         }
     });
     const json = await resp.json();
-    console.log(json);
     if (json.error || json.code) return showAlert('error', json.error);
         try {
             json.page.forEach(image => {
@@ -77,7 +99,7 @@ async function redoImageGrid(page) {
         </div>
     </div>
 </div>
-    `)
+    `);
             });
     } catch (e) {
         console.error(e)
@@ -85,7 +107,7 @@ async function redoImageGrid(page) {
 }
 
 document.getElementById('updateImages').addEventListener('click', async () => {
-    redoImageGrid('0');
+    redoImageGrid('0', 'normal');
     document.getElementById('typexImagePagination').innerHTML = '';
 
     const resp = await fetch('/api/images/user/pages', {
@@ -96,11 +118,43 @@ document.getElementById('updateImages').addEventListener('click', async () => {
     });
     const json = await resp.json();
     try {
+$('#typexImagePagination').append(`
+<li class="page-item">
+  <a class="page-link" aria-label="First" onclick="redoImageGrid('0', 'normal')">
+    First
+  </a>
+</li>`);
+$('#typexImagePagination').append(`
+<li class="page-item">
+    <a class="page-link" aria-label="Previous" onclick="redoImageGrid(null, 'prev')">
+        <span aria-hidden="true">&laquo;</span>
+        <span class="sr-only">Previous</span>
+    </a>
+</li>`);
+$('#typexImagePagination').append(`
+<li class="page-item">
+    <select class="custom-select" id="typexImagePaginationDropdown">
+    </select>
+</li>`)
+            TypeX.pagedNumbers = json.pagedNums;
             json.pagedNums.forEach(p => {
-                $('#typexImagePagination').append(`
-                <li class="page-item"><a class="page-link" href="#" onclick="redoImageGrid('${p}')">${p+1}</a></li>
+                $('#typexImagePaginationDropdown').append(`
+                <option onclick="redoImageGrid('${p}', 'normal')" value="${p}">${p+1}</option>
                 `)
             });
+$('#typexImagePagination').append(`
+<li class="page-item">
+    <a class="page-link" aria-label="Next" onclick="redoImageGrid(null, 'next')">
+        <span aria-hidden="true">&raquo;</span>
+        <span class="sr-only">Next</span>
+    </a>
+</li>`);
+$('#typexImagePagination').append(`
+<li class="page-item">
+  <a class="page-link" aria-label="First" onclick="redoImageGrid(TypeX.pagedNumbers[TypeX.pagedNumbers.length-1], 'normal')">
+    Last
+  </a>
+</li>`);
     } catch (e) {
         console.error(e)
     }
