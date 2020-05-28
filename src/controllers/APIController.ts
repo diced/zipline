@@ -137,7 +137,7 @@ export class APIController {
     }
   }
 
-  @Delete('user/:id')
+  @Delete('users/:id')
   @Middleware(cookiesForAPI)
   private async deleteUser(req: Request, res: Response) {
     if (!req.session.user.administrator) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: 'Unauthorized' });
