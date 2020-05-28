@@ -184,8 +184,8 @@ export class APIController {
       images: all.length,
       average: totalViews/all.length,
       table: {
-        images: images.sort((a,b) => b.count-a.count),
-        views: views.sort((a,b) =>b.count-a.count)
+        images: images.map(i=>i.count).sort((a,b) => b-a),
+        views: views.map(i=>i.count).sort((a,b) =>b-a)
       }
     });
     
