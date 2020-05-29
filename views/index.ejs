@@ -15,6 +15,11 @@
                     <a style="border-radius: 50px;" class="nav-link active" id="home-tab" data-toggle="tab" href="#home"
                         role="tab" aria-controls="home" aria-selected="true"><i class="fas fa-home"></i> Home</a>
                 </li>
+                <li class="nav-item" id="updateStatistics">
+                    <a style="border-radius: 50px;" class="nav-link" id="stats-tab" data-toggle="tab" href="#stats"
+                        role="tab" aria-controls="stats" aria-selected="false"><i class="fas fa-server"></i>
+                        Statistics</a>
+                </li>
                 <li class="nav-item" id="updateShortens">
                     <a style="border-radius: 50px;" class="nav-link" id="urls-tab" data-toggle="tab" href="#urls"
                         role="tab" aria-controls="urls" aria-selected="false"><i class="fas fa-compress-alt"></i> URL
@@ -24,11 +29,6 @@
                     <a style="border-radius: 50px;" class="nav-link" id="profile-tab" data-toggle="tab" href="#images"
                         role="tab" aria-controls="images" aria-selected="false"><i class="fas fa-images"></i> Your
                         Images</a>
-                </li>
-                <li class="nav-item" id="updateStatistics">
-                    <a style="border-radius: 50px;" class="nav-link" id="stats-tab" data-toggle="tab" href="#stats"
-                        role="tab" aria-controls="stats" aria-selected="false"><i class="fas fa-server"></i>
-                        Statistics</a>
                 </li>
                 <% if (user.administrator) { %>
                 <li class="nav-item">
