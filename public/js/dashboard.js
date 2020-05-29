@@ -200,6 +200,32 @@ document.getElementById('updateStatistics').addEventListener('click', async () =
     }
 });
 
+document.getElementById('updateShortens').addEventListener('click', async () => {
+    const resp = await fetch('/api/shortens', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+    const json = await resp.json();
+
+    console.log(json);
+    try {
+        document.getElementById('shortensTable').innerHTML = '';
+        for (const shorten of json) {
+            $('#shortensTableShortens').append(`
+            <tr>
+            <th scope="row">${shorten.id}</th>
+            <td><a href="${c.origin}">${c.origin}</a></td>
+            <td><a href="${c.url}">${c.url}</a></td>
+            </tr>
+            `)
+        }
+    } catch (e) {
+        console.error(e)
+    }
+});
+
 
 
 const deleteImage = (id, url) => {
