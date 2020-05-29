@@ -211,13 +211,13 @@ document.getElementById('updateShortens').addEventListener('click', async () => 
 
     console.log(json);
     try {
-        document.getElementById('shortensTable').innerHTML = '';
+        document.getElementById('shortensTableShortens').innerHTML = '';
         for (const shorten of json) {
             $('#shortensTableShortens').append(`
             <tr>
             <th scope="row">${shorten.id}</th>
-            <td><a href="${c.origin}">${c.origin}</a></td>
-            <td><a href="${c.url}">${c.url}</a></td>
+            <td><a href="${shorten.origin}">${shorten.origin}</a></td>
+            <td><a href="${shorten.url}">${shorten.url}</a></td>
             </tr>
             `)
         }

@@ -19,7 +19,7 @@
                     <a style="border-radius: 50px;" class="nav-link" id="stats-tab" data-toggle="tab" href="#stats"
                         role="tab" aria-controls="stats" aria-selected="false"><i class="fas fa-server"></i> Statistics</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" id="updateShortens">
                     <a style="border-radius: 50px;" class="nav-link" id="urls-tab" data-toggle="tab" href="#urls"
                         role="tab" aria-controls="urls" aria-selected="false"><i class="fas fa-compress-alt"></i> URL
                         Shortener</a>
@@ -147,8 +147,18 @@
                             onclick="shortURL('<%=user.token%>', document.getElementById('urlToShorten').value)"
                             style="border-radius: 50px; width:100%;">Shorten</button>
                     </form>
-                    <h3>Your Shortens</h3>
-                    <p>Comming soon &trade;</p>
+                    <h3 style="margin-top:5px;">Your Shortens</h3>
+                    <table class="table m-2">
+                        <thead>
+                          <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Origin</th>
+                            <th scope="col">Shortened</th>
+                          </tr>
+                        </thead>
+                        <tbody id="shortensTableShortens">
+                        </tbody>
+                    </table>
                 </div>
                 <% if (user.administrator) { %>
                 <div class="tab-pane fade m-3" id="users" role="tabpanel" aria-labelledby="users-tab">
