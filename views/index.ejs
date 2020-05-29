@@ -46,7 +46,7 @@
                         <%}else{%><span class="badge badge-pill badge-primary">User</span>
                         <%}%>
                     </h2>
-                    <p>You have <b><%= images.length %></b> images saved.</p>
+                    <p>You have <b><%= images.length.toLocaleString() %></b> images saved.</p>
                         <hr>
                         <h4>API Token</h4>
                         <button type="button" class="btn btn-sm btn-primary" onclick="copyToken('<%=user.token%>')"

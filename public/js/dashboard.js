@@ -48,11 +48,11 @@ async function redoImageGrid(page, mode = null) {
             TypeX.currentImagePage--;
         } //could be better :DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
     } else if (mode === 'next') {
-        if (TypeX.pagedNumbers[TypeX.pagedNumbers.length-1] <= TypeX.currentImagePage + 1) {
-            url = `/api/images/user/pages?page=${TypeX.pagedNumbers[TypeX.pagedNumbers.length-1]}`
-            TypeX.currentImagePage = TypeX.pagedNumbers[TypeX.pagedNumbers.length-1];
+        if (TypeX.pagedNumbers[TypeX.pagedNumbers.length - 1] <= TypeX.currentImagePage + 1) {
+            url = `/api/images/user/pages?page=${TypeX.pagedNumbers[TypeX.pagedNumbers.length - 1]}`
+            TypeX.currentImagePage = TypeX.pagedNumbers[TypeX.pagedNumbers.length - 1];
         } else {
-            url = `/api/images/user/pages?page=${TypeX.currentImagePage+1}`
+            url = `/api/images/user/pages?page=${TypeX.currentImagePage + 1}`
             TypeX.currentImagePage++;
         }
     } else if (mode === 'normal') {
@@ -68,9 +68,9 @@ async function redoImageGrid(page, mode = null) {
     });
     const json = await resp.json();
     if (json.error || json.code) return showAlert('error', json.error);
-        try {
-            json.page.forEach(image => {
-                $('#typexImages').append(`
+    try {
+        json.page.forEach(image => {
+            $('#typexImages').append(`
 <div class="col-sm-4">
     <div class="card m-2" data-toggle="modal" data-target="#typeximg${image.id}">
         <img class="card-img-top" src="${image.url}" alt="Image ${image.id}">
@@ -101,7 +101,7 @@ async function redoImageGrid(page, mode = null) {
     </div>
 </div>
     `);
-            });
+        });
     } catch (e) {
         console.error(e)
     }
@@ -119,38 +119,38 @@ document.getElementById('updateImages').addEventListener('click', async () => {
     });
     const json = await resp.json();
     try {
-$('#typexImagePagination').append(`
+        $('#typexImagePagination').append(`
 <li class="page-item">
   <a class="page-link" aria-label="First" onclick="redoImageGrid('0', 'normal')">
     First
   </a>
 </li>`);
-$('#typexImagePagination').append(`
+        $('#typexImagePagination').append(`
 <li class="page-item">
     <a class="page-link" aria-label="Previous" onclick="redoImageGrid(null, 'prev')">
         <span aria-hidden="true">&laquo;</span>
         <span class="sr-only">Previous</span>
     </a>
 </li>`);
-$('#typexImagePagination').append(`
+        $('#typexImagePagination').append(`
 <li class="page-item">
     <select class="custom-select" id="typexImagePaginationDropdown">
     </select>
 </li>`)
-            TypeX.pagedNumbers = json.pagedNums;
-            json.pagedNums.forEach(p => {
-                $('#typexImagePaginationDropdown').append(`
-                <option onclick="redoImageGrid('${p}', 'normal')" value="${p}">${p+1}</option>
+        TypeX.pagedNumbers = json.pagedNums;
+        json.pagedNums.forEach(p => {
+            $('#typexImagePaginationDropdown').append(`
+                <option onclick="redoImageGrid('${p}', 'normal')" value="${p}">${p + 1}</option>
                 `)
-            });
-$('#typexImagePagination').append(`
+        });
+        $('#typexImagePagination').append(`
 <li class="page-item">
     <a class="page-link" aria-label="Next" onclick="redoImageGrid(null, 'next')">
         <span aria-hidden="true">&raquo;</span>
         <span class="sr-only">Next</span>
     </a>
 </li>`);
-$('#typexImagePagination').append(`
+        $('#typexImagePagination').append(`
 <li class="page-item">
   <a class="page-link" aria-label="First" onclick="redoImageGrid(TypeX.pagedNumbers[TypeX.pagedNumbers.length-1], 'normal')">
     Last
@@ -172,16 +172,16 @@ document.getElementById('updateStatistics').addEventListener('click', async () =
 
     console.log(json);
     try {
-        document.getElementById('statsDescription').innerHTML = `You have an average of <b>${Math.floor(json.average)} views</b> on your images, you have <b>${json.totalViews} views total</b>, you currently have <b>${json.images} images</b>!`
+        document.getElementById('statsDescription').innerHTML = `You have an average of <b>${Math.floor(json.average).toLocaleString()} views</b> on your images, you have <b>${json.totalViews.toLocaleString()} views total</b>, you currently have <b>${json.images.toLocaleString()} images</b>!`
         document.getElementById('statsLeaderboardImages').innerHTML = '';
         document.getElementById('statsLeaderboardImageViews').innerHTML = '';
         for (let i = 0; i < json.table.images.length; i++) {
             const c = json.table.images[i];
             $('#statsLeaderboardImages').append(`
             <tr>
-            <th scope="row">${i+1}</th>
+            <th scope="row">${i + 1}</th>
             <td>${c.username}</td>
-            <td>${c.count}</td>
+            <td>${c.count.toLocaleString()}</td>
             </tr>
             `)
         }
@@ -189,9 +189,9 @@ document.getElementById('updateStatistics').addEventListener('click', async () =
             const c = json.table.views[i];
             $('#statsLeaderboardImageViews').append(`
             <tr>
-            <th scope="row">${i+1}</th>
+            <th scope="row">${i + 1}</th>
             <td>${c.username}</td>
-            <td>${c.count}</td>
+            <td>${c.count.toLocaleString()}</td>
             </tr>
             `)
         }
@@ -216,7 +216,7 @@ document.getElementById('updateShortens').addEventListener('click', async () => 
             $('#shortensTableShortens').append(`
             <tr>
             <th scope="row">${shorten.id}</th>
-            <td><a href="${shorten.origin}">${shorten.origin}</a></td>
+            <td><a href="${shorten.origin}">${shorten.origin.replace('https://')}</a></td>
             <td><a href="${shorten.url}">${shorten.url}</a></td>
             </tr>
             `)
@@ -360,13 +360,13 @@ async function shortURL(token, url) {
         })
     });
     try {
-            let te = await res.text();
-            Swal.fire(
-                'URL Shortened!',
-                `Shorten: <a target="_blank" href="${te}">${te}</a>`,
-                'success'
-            );
-                return;
+        let te = await res.text();
+        Swal.fire(
+            'URL Shortened!',
+            `Shorten: <a target="_blank" href="${te}">${te}</a>`,
+            'success'
+        );
+        return;
     } catch (e) {
         if (e.message.startsWith('Unexpected token < in JSON at position')) {
             let te = await res.text();
