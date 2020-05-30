@@ -12,6 +12,7 @@ import { Image } from "./entities/Image";
 import { findFile } from "./util";
 import { readFileSync } from 'fs';
 import { Shorten } from "./entities/Shorten";
+import { Note } from "./entities/Note";
 
 if (!findFile('config.json', process.cwd())) {
   Logger.get('FS').error(`No config.json exists in ${__dirname}, exiting...`)
@@ -29,6 +30,7 @@ export interface ORMRepos {
   user?: Repository<User>;
   image?: Repository<Image>;
   shorten?: Repository<Shorten>;
+  note?: Repository<Note>;
 }
 
 export interface ORMHandler {
@@ -47,7 +49,8 @@ Logger.get('TypeX').info(`Starting TypeX ${pk.version}`);
     repos: {
       user: connection.getRepository(User),
       image: connection.getRepository(Image),
-      shorten: connection.getRepository(Shorten)
+      shorten: connection.getRepository(Shorten),
+      note: connection.getRepository(Note)
     },
   };
   if (orm.connection.isConnected)

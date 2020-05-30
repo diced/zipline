@@ -26,6 +26,7 @@
     "typeorm": "^0.2.24"
   },
   "devDependencies": {
+    "mongodb": "^3.5.8",
     "pg": "^8.0.3"
   }
 }

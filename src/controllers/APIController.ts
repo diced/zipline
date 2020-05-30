@@ -13,6 +13,7 @@ import Logger from '@ayanaware/logger';
 import { DiscordWebhook } from '../structures/DiscordWebhook';
 import { ImageUtil } from '../structures/ImageUtil';
 import { ShortenUtil } from '../structures/ShortenUtil';
+import { Note } from "../entities/Note";
 
 if (!findFile('config.json', process.cwd())) {
   Logger.get('FS').error(`No config.json exists in the ${__dirname}, exiting...`)
@@ -63,6 +64,20 @@ export class APIController {
     Logger.get('TypeX.Shortener').info(`New url shortened ${shrt.url} (${req.body.url}) (${shrt.id}) by ${user.username} (${user.id})`)
     if (config.discordWebhook.enabled) new DiscordWebhook(config.discordWebhook.url).sendShortenUpdate(user, shrt, ShortenUtil.parseURL(shrt.url), config);
     return res.status(200).send(`${config.site.returnProtocol}://${req.headers['host']}${config.shorten.route}/${id}`)
+  }
+
+  @Post('note')
+  private async note(req: Request, res: Response) {
+    if (req.headers['authorization'] === config.administrator.authorization) return res.status(BAD_REQUEST).json({ code: BAD_REQUEST, message: "You can't upload files with the administrator account." })
+    const users = await this.orm.repos.user.find({ where: { token: req.headers['authorization'] } });
+    if (!users[0]) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: "Unauthorized" })
+    if (req.headers['authorization'] !== users[0].token) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: "Unauthorized" })
+    const user = users[0];
+    const id = randomId(config.notes.idLength)
+    const note = await this.orm.repos.note.save(new Note().set({key:id,user:user.id,content:req.body.content,expiration:req.body.expiration?req.body.expiration:null}));
+    Logger.get('TypeX.Notes').info(`New note created ${note.id} and ${note.expriation ? `will expire in ${note.expriation},` : `will not expire,`} by ${user.username} (${user.id})`)
+    // if (config.discordWebhook.enabled) new DiscordWebhook(config.discordWebhook.url).sendShortenUpdate(user, shrt, ShortenUtil.parseURL(shrt.url), config);
+    return res.status(200).send(`${config.site.returnProtocol}://${req.headers['host']}${config.note.route}/${id}`)
   }
 
   @Get('users')
@@ -237,6 +252,20 @@ export class APIController {
   @Middleware(cookiesForAPI)
   private async getShorten(req: Request, res: Response) {
     const all = await this.orm.repos.shorten.find({ where: { user: req.session.user.id, id: Number(req.params.id) }, order: { id: 'ASC' } });
+    return res.status(200).json(all);
+  }
+
+  @Get('notes')
+  @Middleware(cookiesForAPI)
+  private async allNotes(req: Request, res: Response) {
+    const all = await this.orm.repos.note.find({ where: { user: req.session.user.id }, order: { id: 'ASC' } });
+    return res.status(200).json(all);
+  }
+
+  @Get('notes/:id')
+  @Middleware(cookiesForAPI)
+  private async getNote(req: Request, res: Response) {
+    const all = await this.orm.repos.note.find({ where: { user: req.session.user.id, id: Number(req.params.id) }, order: { id: 'ASC' } });
     return res.status(200).json(all);
   }
 
