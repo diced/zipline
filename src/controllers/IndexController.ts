@@ -76,6 +76,13 @@ export class IndexController {
     return res.redirect(shorten.origin)
   }
 
+  @Get(`${config.note.route.slice(1)}/:id`)
+  private async getNote(req: Request, res: Response) {
+    const note = await this.orm.repos.note.findOne({ key: req.params.id });
+    if (!note) return res.render('404');
+    return res.send(note.content);
+  }
+
   public set(orm: ORMHandler) {
     this.orm = orm;
     return this;

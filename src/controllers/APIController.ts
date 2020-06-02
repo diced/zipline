@@ -73,8 +73,13 @@ export class APIController {
     if (!users[0]) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: "Unauthorized" })
     if (req.headers['authorization'] !== users[0].token) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: "Unauthorized" })
     const user = users[0];
-    const id = randomId(config.notes.idLength)
-    const note = await this.orm.repos.note.save(new Note().set({key:id,user:user.id,content:req.body.content,expiration:req.body.expiration?req.body.expiration:null}));
+    const id = randomId(config.note.idLength)
+    const note = await this.orm.repos.note.save(new Note().set({
+      key: id,
+      user: user.id,
+      content: req.body.content,
+      expiration: req.body.expiration ? req.body.expiration : null
+    }));
     Logger.get('TypeX.Notes').info(`New note created ${note.id} and ${note.expriation ? `will expire in ${note.expriation},` : `will not expire,`} by ${user.username} (${user.id})`)
     // if (config.discordWebhook.enabled) new DiscordWebhook(config.discordWebhook.url).sendShortenUpdate(user, shrt, ShortenUtil.parseURL(shrt.url), config);
     return res.status(200).send(`${config.site.returnProtocol}://${req.headers['host']}${config.note.route}/${id}`)

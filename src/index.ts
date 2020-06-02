@@ -13,6 +13,7 @@ import { findFile } from "./util";
 import { readFileSync } from 'fs';
 import { Shorten } from "./entities/Shorten";
 import { Note } from "./entities/Note";
+import { notes } from "./interval";
 
 if (!findFile('config.json', process.cwd())) {
   Logger.get('FS').error(`No config.json exists in ${__dirname}, exiting...`)
@@ -59,4 +60,6 @@ Logger.get('TypeX').info(`Starting TypeX ${pk.version}`);
     );
   const server = new TypeXServer(orm);
   server.start();
+  Logger.get('Interval').info('Starting Notes interval');
+  const notesInterval = notes(orm);
 })();

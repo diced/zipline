@@ -17,12 +17,13 @@ export class Note {
     @Column("bigint", { nullable: true, default: null })
     expriation: number;
 
-    @Column("text", { default: 0 })
+    @Column("text")
     content: string;
 
     set(options: { user: number, key: string, content: string, expiration?: number }) {
         this.user = options.user;
         this.key = options.key;
+        this.content = options.content;
         this.creation = Date.now();
         this.expriation = options.expiration ? options.expiration : null;
         return this;
