@@ -158,7 +158,7 @@ document.getElementById('updateStatistics').addEventListener('click', async () =
 
     console.log(json);
     try {
-        document.getElementById('statsDescription').innerHTML = `You have an average of <b>${Math.floor(json.average)} views</b> on your images, you have <b>${json.totalViews} views total</b>, you currently have <b>${json.images} images</b>!`
+        document.getElementById('statsDescription').innerHTML = `You have an average of <b>${Math.floor(json.average).toLocaleString()} views</b> on your images, you have <b>${json.totalViews.toLocaleString()} views total</b>, you currently have <b>${json.images.toLocaleString()} images</b>!`
         document.getElementById('statsLeaderboardImages').innerHTML = '';
         document.getElementById('statsLeaderboardImageViews').innerHTML = '';
         for (let i = 0; i < json.table.images.length; i++) {
@@ -167,7 +167,7 @@ document.getElementById('updateStatistics').addEventListener('click', async () =
             <tr>
             <th>${i + 1}</th>
             <td>${c.username}</td>
-            <td>${c.count}</td>
+            <td>${c.count.toLocaleString()}</td>
             </tr>
             `)
         }
@@ -177,7 +177,7 @@ document.getElementById('updateStatistics').addEventListener('click', async () =
             <tr>
             <th>${i + 1}</th>
             <td>${c.username}</td>
-            <td>${c.count}</td>
+            <td>${c.count.toLocaleString()}</td>
             </tr>
             `)
         }
