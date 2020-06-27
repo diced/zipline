@@ -1,11 +1,42 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="/public/css/bootstrap-dark.min.css" />
+<link rel="stylesheet" href="/public/css/spectre.css" />
+<link rel="stylesheet" href="/public/css/spectre-exp.css" />
+<link rel="stylesheet" href="/public/css/spectre-icons.css" />
 <link href="//cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@3/dark.css" rel="stylesheet">
+
 <script src="https://kit.fontawesome.com/583a38381a.js" crossorigin="anonymous"></script>
 <style>
     body,
     html {
         height: 100%;
+        background: #21212c
+    }
+
+    .tab-item>label:hover {
+        cursor: pointer;
+    }
+
+    .tab-content {
+        display: none;
+    }
+
+    .tab-locator:nth-of-type(1):checked~.tab-block>.tab-item:nth-of-type(1)>label>a,
+    .tab-locator:nth-of-type(2):checked~.tab-block>.tab-item:nth-of-type(2)>label>a,
+    .tab-locator:nth-of-type(3):checked~.tab-block>.tab-item:nth-of-type(3)>label>a,
+    .tab-locator:nth-of-type(4):checked~.tab-block>.tab-item:nth-of-type(4)>label>a,
+    .tab-locator:nth-of-type(5):checked~.tab-block>.tab-item:nth-of-type(5)>label>a,
+    .tab-locator:nth-of-type(6):checked~.tab-block>.tab-item:nth-of-type(6)>label>a {
+        border-bottom-color: #5764c6;
+        color: #5764c6;
+    }
+
+    .tab-locator:nth-of-type(1):checked~.tabs>.tab-content:nth-of-type(1),
+    .tab-locator:nth-of-type(2):checked~.tabs>.tab-content:nth-of-type(2),
+    .tab-locator:nth-of-type(3):checked~.tabs>.tab-content:nth-of-type(3),
+    .tab-locator:nth-of-type(4):checked~.tabs>.tab-content:nth-of-type(4),
+    .tab-locator:nth-of-type(5):checked~.tabs>.tab-content:nth-of-type(5),
+    .tab-locator:nth-of-type(6):checked~.tabs>.tab-content:nth-of-type(6) {
+        display: block;
     }
 </style>

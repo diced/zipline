@@ -48,11 +48,11 @@ async function redoImageGrid(page, mode = null) {
             TypeX.currentImagePage--;
         } //could be better :DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
     } else if (mode === 'next') {
-        if (TypeX.pagedNumbers[TypeX.pagedNumbers.length-1] <= TypeX.currentImagePage + 1) {
-            url = `/api/images/user/pages?page=${TypeX.pagedNumbers[TypeX.pagedNumbers.length-1]}`
-            TypeX.currentImagePage = TypeX.pagedNumbers[TypeX.pagedNumbers.length-1];
+        if (TypeX.pagedNumbers[TypeX.pagedNumbers.length - 1] <= TypeX.currentImagePage + 1) {
+            url = `/api/images/user/pages?page=${TypeX.pagedNumbers[TypeX.pagedNumbers.length - 1]}`
+            TypeX.currentImagePage = TypeX.pagedNumbers[TypeX.pagedNumbers.length - 1];
         } else {
-            url = `/api/images/user/pages?page=${TypeX.currentImagePage+1}`
+            url = `/api/images/user/pages?page=${TypeX.currentImagePage + 1}`
             TypeX.currentImagePage++;
         }
     } else if (mode === 'normal') {
@@ -68,47 +68,35 @@ async function redoImageGrid(page, mode = null) {
     });
     const json = await resp.json();
     if (json.error || json.code) return showAlert('error', json.error);
-        try {
-            json.page.forEach(image => {
-                $('#typexImages').append(`
-<div class="col-sm-4">
-    <div class="card m-2" data-toggle="modal" data-target="#typeximg${image.id}">
-        <img class="card-img-top" src="${image.url}" alt="Image ${image.id}">
-        <div class="modal fade" id="typeximg${image.id}" tabindex="-1" role="dialog" aria-labelledby="imagelabel${image.id}" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="imagelabel${image.id}">Currenting Managing Image ${image.id}</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button> 
-                    </div>
-                    <div class="modal-footer">
-                        <div class="row" style="width:100%;">
-                            <div class="col-sm-6">
-                                <button type="button" onclick="window.open('${image.url}', '_blank')" class="btn btn-primary"
-                                    style="border-radius: 50px; width:100%;">View Image</button>
-                            </div>
-                            <div class="col-sm-6">
-                                <button type="button" class="btn btn-danger" data-dismiss="modal"
-                                    style="border-radius: 50px; width:100%;" onclick="deleteImage('${image.id}', '${image.url}')">Delete Image</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    try {
+        json.page.forEach(image => {
+            $('#typexImages').append(`
+<div class="column col-4">
+<div class="card">
+  <div class="card-image">
+    <img src="${image.url}" class="img-responsive">
+  </div>
+</div>
 </div>
     `);
-            });
+        });
     } catch (e) {
-        console.error(e)
+        document.getElementById('emptyImages').innerHTML = `
+        <div class="empty bg-dark">
+  <div class="empty-icon">
+    <i class="icon icon-photo"></i>
+  </div>
+  <p class="empty-title h5">You have no imaages</p>
+  <p class="empty-subtitle">Use the API to start uploading!</p>
+</div>
+        `;
+        document.getElementById('typexImagePagination').innerHTML = '';
     }
 }
 
 document.getElementById('updateImages').addEventListener('click', async () => {
     redoImageGrid('0', 'normal');
+    document.getElementById('emptyImages').innerHTML = '';
     document.getElementById('typexImagePagination').innerHTML = '';
 
     const resp = await fetch('/api/images/user/pages', {
@@ -119,40 +107,38 @@ document.getElementById('updateImages').addEventListener('click', async () => {
     });
     const json = await resp.json();
     try {
-$('#typexImagePagination').append(`
+        $('#typexImagePagination').append(`
 <li class="page-item">
   <a class="page-link" aria-label="First" onclick="redoImageGrid('0', 'normal')">
     First
   </a>
 </li>`);
-$('#typexImagePagination').append(`
+        $('#typexImagePagination').append(`
 <li class="page-item">
     <a class="page-link" aria-label="Previous" onclick="redoImageGrid(null, 'prev')">
-        <span aria-hidden="true">&laquo;</span>
-        <span class="sr-only">Previous</span>
+       Prev
     </a>
 </li>`);
-$('#typexImagePagination').append(`
+        $('#typexImagePagination').append(`
 <li class="page-item">
-    <select class="custom-select" id="typexImagePaginationDropdown">
+    <select class="form-select" id="typexImagePaginationDropdown">
     </select>
 </li>`)
-            TypeX.pagedNumbers = json.pagedNums;
-            json.pagedNums.forEach(p => {
-                $('#typexImagePaginationDropdown').append(`
-                <option onclick="redoImageGrid('${p}', 'normal')" value="${p}">${p+1}</option>
+        TypeX.pagedNumbers = json.pagedNums;
+        json.pagedNums.forEach(p => {
+            $('#typexImagePaginationDropdown').append(`
+                <option onclick="redoImageGrid('${p}', 'normal')" value="${p}">${p + 1}</option>
                 `)
-            });
-$('#typexImagePagination').append(`
+        });
+        $('#typexImagePagination').append(`
 <li class="page-item">
-    <a class="page-link" aria-label="Next" onclick="redoImageGrid(null, 'next')">
-        <span aria-hidden="true">&raquo;</span>
-        <span class="sr-only">Next</span>
+    <a onclick="redoImageGrid(null, 'next')">
+        Next
     </a>
 </li>`);
-$('#typexImagePagination').append(`
+        $('#typexImagePagination').append(`
 <li class="page-item">
-  <a class="page-link" aria-label="First" onclick="redoImageGrid(TypeX.pagedNumbers[TypeX.pagedNumbers.length-1], 'normal')">
+  <a onclick="redoImageGrid(TypeX.pagedNumbers[TypeX.pagedNumbers.length-1], 'normal')">
     Last
   </a>
 </li>`);
@@ -179,7 +165,7 @@ document.getElementById('updateStatistics').addEventListener('click', async () =
             const c = json.table.images[i];
             $('#statsLeaderboardImages').append(`
             <tr>
-            <th scope="row">${i+1}</th>
+            <th>${i + 1}</th>
             <td>${c.username}</td>
             <td>${c.count}</td>
             </tr>
@@ -189,7 +175,7 @@ document.getElementById('updateStatistics').addEventListener('click', async () =
             const c = json.table.views[i];
             $('#statsLeaderboardImageViews').append(`
             <tr>
-            <th scope="row">${i+1}</th>
+            <th>${i + 1}</th>
             <td>${c.username}</td>
             <td>${c.count}</td>
             </tr>
@@ -215,7 +201,7 @@ document.getElementById('updateShortens').addEventListener('click', async () => 
         for (const shorten of json) {
             $('#shortensTableShortens').append(`
             <tr>
-            <th scope="row">${shorten.id}</th>
+            <th>${shorten.id}</th>
             <td><a href="${shorten.origin}">${shorten.origin}</a></td>
             <td><a href="${shorten.url}">${shorten.url}</a></td>
             </tr>
@@ -225,7 +211,6 @@ document.getElementById('updateShortens').addEventListener('click', async () => 
         console.error(e)
     }
 });
-
 
 
 const deleteImage = (id, url) => {
@@ -360,13 +345,13 @@ async function shortURL(token, url) {
         })
     });
     try {
-            let te = await res.text();
-            Swal.fire(
-                'URL Shortened!',
-                `Shorten: <a target="_blank" href="${te}">${te}</a>`,
-                'success'
-            );
-                return;
+        let te = await res.text();
+        Swal.fire(
+            'URL Shortened!',
+            `Shorten: <a target="_blank" href="${te}">${te}</a>`,
+            'success'
+        );
+        return;
     } catch (e) {
         if (e.message.startsWith('Unexpected token < in JSON at position')) {
             let te = await res.text();
@@ -446,7 +431,7 @@ async function createUser() {
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
     if (whitespace(username)) return showAlert('error', 'Please input a username.')
-    const res = await fetch('/api/user', {
+    const res = await fetch('/api/users', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -461,7 +446,6 @@ async function createUser() {
         const json = await res.json();
         if (json.error || json.code) return showAlert('error', json.error)
         else {
-            $('#modal').modal('toggle');
             showAlert('success', `Created user ${json.username} (${json.id})`)
             return window.location.href = '/'
         }
@@ -470,7 +454,7 @@ async function createUser() {
     }
 }
 
-document.getElementById('createUser').addEventListener('click', async () => {
+document.getElementById('addUser').addEventListener('click', async () => {
     if (document.getElementById('administrator').checked) {
         Swal.fire({
             title: 'Are you sure?',

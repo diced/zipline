@@ -8,250 +8,249 @@
 </head>
 
 <body>
-    <div class="container h-100 d-flex justify-content-center">
-        <div class="container my-auto">
-            <ul class="nav nav-pills mb-3" id="main-view-tab-list" role="tablist" style="margin-top: 50px;">
-                <li class="nav-item">
-                    <a style="border-radius: 50px;" class="nav-link active" id="home-tab" data-toggle="tab" href="#home"
-                        role="tab" aria-controls="home" aria-selected="true"><i class="fas fa-home"></i> Home</a>
-                </li>
-                <li class="nav-item" id="updateStatistics">
-                    <a style="border-radius: 50px;" class="nav-link" id="stats-tab" data-toggle="tab" href="#stats"
-                        role="tab" aria-controls="stats" aria-selected="false"><i class="fas fa-server"></i> Statistics</a>
-                </li>
-                <li class="nav-item" id="updateShortens">
-                    <a style="border-radius: 50px;" class="nav-link" id="urls-tab" data-toggle="tab" href="#urls"
-                        role="tab" aria-controls="urls" aria-selected="false"><i class="fas fa-compress-alt"></i> URL
-                        Shortener</a>
-                </li>
-                <li class="nav-item" id="updateImages">
-                    <a style="border-radius: 50px;" class="nav-link" id="profile-tab" data-toggle="tab" href="#images"
-                        role="tab" aria-controls="images" aria-selected="false"><i class="fas fa-images"></i> Your
-                        Images</a>
-                </li>
-                <% if (user.administrator) { %>
-                <li class="nav-item">
-                    <a style="border-radius: 50px;" class="nav-link" id="contact-tab" data-toggle="tab" href="#users"
-                        role="tab" aria-controls="users" aria-selected="false"><i class="fas fa-user-friends"></i>
-                        Users</a>
-                </li>
-                <% } %>
-            </ul>
-            <div class="tab-content" id="main-view">
-                <div class="tab-pane fade show active m-3" id="home" role="tabpanel" aria-labelledby="home-tab">
-                    <h2>
-                        Welcome back, <%= user.username %>!
-                        <%if(user.administrator){%><span
-                                    class="badge badge-pill badge-danger">Admin</span>
-                        <%}else{%><span
-                                class="badge badge-pill badge-primary">User</span>
-                        <%}%>
-                    </h2>
-                    <p>You have <b><%= images.length %></b> images saved.</p>
-                    <h4>API Token</h4>
-                    <button type="button" class="btn btn-sm btn-primary" onclick="copyToken('<%=user.token%>')"
-                        style="border-radius: 50px;"><i class="fas fa-copy"></i> Copy</button>
-                    <button type="button" class="btn btn-sm btn-danger"
-                        id="regenToken" style="border-radius: 50px;"><i class="fas fa-cog"></i> Regenerate</button>
-                    <h4 style="margin-top:12px">Update your Profile</h4>
-                    <form>
-                        <div class="form-group">
-                            <label for="usernameSave">Username</label>
-                            <input value="<%= user.username %>" type="text" class="form-control" id="usernameSave"
+    <div class="text-light">
+        <input type="radio" id="home-tab" name="tabs" class="tab-locator" hidden checked />
+        <input type="radio" id="stats-tab" name="tabs" class="tab-locator" hidden />
+        <input type="radio" id="urls-tab" name="tabs" class="tab-locator" hidden />
+        <input type="radio" id="notes-tab" name="tabs" class="tab-locator" hidden />
+        <input type="radio" id="images-tab" name="tabs" class="tab-locator" hidden />
+        <% if (user.administrator) { %>
+        <input type="radio" id="users-tab" name="tabs" class="tab-locator" hidden />
+        <% } %>
+        <ul class="tab tab-block" style="border:none;">
+            <li class="tab-item text-light"><label for="home-tab"><a><i class="icon icon-apps"></i> Home</a></label>
+            </li>
+            <li class="tab-item text-light" id="updateStatistics"><label for="stats-tab"><a><i
+                            class="icon icon-message"></i> Statistics</a></label></li>
+            <li class="tab-item text-light" id="updateShortens"><label for="urls-tab"><a><i class="icon icon-link"></i>
+                        URLS</a></label></li>
+            <li class="tab-item text-light" id="updateNotes"><label for="notes-tab"><a><i class="icon icon-copy"></i>
+                        Notes</a></label></li>
+            <li class="tab-item text-light" id="updateImages"><label for="images-tab"><a><i class="icon icon-photo"></i>
+                        Images</a></label></li>
+            <% if (user.administrator) { %>
+            <li class="tab-item text-light"><label for="users-tab"><a><i class="icon icon-people"></i> Users</a></label>
+            </li>
+            <% } %>
+        </ul>
+
+        <div class="tabs">
+            <div class="tab-content" style="margin: 50px;">
+                <div class="card bg-dark" style="border-color: #303742;">
+                    <div class="card-header">
+                        <div class="card-title h5">Welcome back, <%=user.username%>!</div>
+                        <% if (user.username === "administrator") { %>
+                        <div class="card-subtitle text-gray"><b>This account is not designed for general usage, only to
+                                create a user for uploading, and other administrator duties.</b></div>
+                        <% } else { %>
+                        <div class="card-subtitle text-gray">You have <b><%=images.length%></b> images.</div>
+                        <% } %>
+                    </div>
+                    <div class="card-body">
+                        <% if (user.username !== "administrator") { %>
+                        <div class="card-title h5">Token</div>
+                        <div class="container">
+                            <div class="columns">
+                                <div class="column col-6">
+                                    <button style="margin-top:12px;width:100%" type="button"
+                                        class="btn btn-primary input-group-btn" id="copyToken"
+                                        onclick="copyToken('<%=user.token%>')">Copy Token</button>
+                                </div>
+                                <div class="column col-6">
+                                    <button style="margin-top:12px;width:100%" type="button"
+                                        class="btn btn-primary input-group-btn" id="regenToken"
+                                        onclick="regenToken('<%=user.id%>')">Regen Token</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-title h5">Update your profile</div>
+                        <form>
+                            <label class="form-label" for="usernameSave">Username</label>
+                            <input class="form-input" type="text" id="usernameSave" name="username"
                                 placeholder="Username">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="passwordSave">Password</label>
-                            <input type="password" class="form-control" id="passwordSave" placeholder="Password">
-                        </div>
-                        <button type="button" class="btn btn-primary" id="saveUser"
-                            style="border-radius: 50px; width:100%;"><i class="fas fa-pen"></i> Save
-                        </button>
-                    </form>
-                    <br>
-                    <a class="btn btn-danger" href="/logout" style="border-radius: 50px; width:100%;"><i
-                            class="fas fa-sign-out-alt"></i> Logout</a>
-                </div>
-                <div class="tab-pane fade m-3" id="stats" role="tabpanel" aria-labelledby="stats-tab">
-                    <h3>Statistics</h3>
-                    <h5 id="statsDescription"></h5>
-                    <div class="container-fluid pt-2">
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <div class="card m-2">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Leaderboard (Images)</h5>
-                                        <p class="card-text">
-                                            <table class="table">
-                                                <thead>
-                                                  <tr>
-                                                    <th scope="col">#</th>
-                                                    <th scope="col">Username</th>
-                                                    <th scope="col">Images</th>
-                                                  </tr>
-                                                </thead>
-                                                <tbody id="statsLeaderboardImages">
-                                                </tbody>
-                                            </table>
-                                        </p>
-                                    </div>
+                            <label class="form-label" for="passwordSave">Password</label>
+                            <input class="form-input" type="password" id="passwordSave" name="password"
+                                placeholder="Password">
+                        </form>
+                        <% } %>
+                    </div>
+                    <div class="card-footer">
+                        <% if (user.username === "administrator") { %>
+                        <a href="/logout" style="margin-top:12px;width:100%" type="button"
+                            class="btn btn-error input-group-btn">Logout</a>
+                        <% } else { %>
+                        <div class="container">
+                            <div class="columns">
+                                <div class="column col-6">
+                                    <button style="margin-top:12px;width:100%" type="button"
+                                        class="btn btn-primary input-group-btn" id="saveUser">Update</button>
                                 </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="card m-2">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Leaderboard (Views)</h5>
-                                        <p class="card-text">
-                                            <table class="table">
-                                                <thead>
-                                                  <tr>
-                                                    <th scope="col">#</th>
-                                                    <th scope="col">Username</th>
-                                                    <th scope="col">Views</th>
-                                                  </tr>
-                                                </thead>
-                                                <tbody id="statsLeaderboardImageViews">
-                                                </tbody>
-                                            </table>
-                                        </p>
-                                    </div>
+                                <div class="column col-6">
+                                    <a href="/logout" style="margin-top:12px;width:100%" type="button"
+                                        class="btn btn-error input-group-btn">Logout</a>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-                <div class="tab-pane fade m-3" id="images" role="tabpanel" aria-labelledby="images-tab">
-                    <h3>Your Images</h3>
-                    <div class="container-fluid pt-2">
-                        <div class="row" id="typexImages">
-
-                        </div>
-                    </div>
-                    <nav aria-label="TypeX Images" class="m-2">
-                        <ul class="pagination justify-content-center" id="typexImagePagination">
-
-                        </ul>
-                    </nav>
-
-                </div>
-                <div class="tab-pane fade m-3" id="urls" role="tabpanel" aria-labelledby="urls-tab">
-                    <h3>Shorten a URL</h3>
-                    <form>
-                        <div class="form-group">
-                            <label for="urlToShorten">URL</label>
-                            <input type="url" class="form-control" id="urlToShorten" placeholder="URL">
-                        </div>
-
-                        <button type="button" class="btn btn-primary" id="shortenURL"
-                            onclick="shortURL('<%=user.token%>', document.getElementById('urlToShorten').value)"
-                            style="border-radius: 50px; width:100%;">Shorten</button>
-                    </form>
-                    <h3 style="margin-top:5px;">Your Shortens</h3>
-                    <table class="table m-2">
-                        <thead>
-                          <tr>
-                            <th scope="col">ID</th>
-                            <th scope="col">Origin</th>
-                            <th scope="col">Shortened</th>
-                          </tr>
-                        </thead>
-                        <tbody id="shortensTableShortens">
-                        </tbody>
-                    </table>
-                </div>
-                <% if (user.administrator) { %>
-                <div class="tab-pane fade m-3" id="users" role="tabpanel" aria-labelledby="users-tab">
-                    <button style="border-radius: 50px; margin-bottom: 10px;" type="button" class="btn btn-primary"
-                        data-toggle="modal" data-target="#modal">Create New User</button>
-                    <div class="row">
-                        <% for (let b = 0; b < users.length; b++) { let u = users[b]; let imgs = userImages[b]; %>
-                        <div class="col-sm-4">
-                            <div class="card m-2">
-                                <div class="card-body">
-                                    <%if(u.administrator){%>
-                                    <h5 class="card-title"><%=u.username%> <span
-                                            class="badge badge-pill badge-danger">Admin</span></h5>
-                                    <%}else{%>
-                                    <h5 class="card-title"><%=u.username%> <span
-                                            class="badge badge-pill badge-primary">User</span> <button
-                                            class="badge badge-pill badge-danger"
-                                            onclick="deleteSpecificUser('<%=u.id%>', '<%=u.username%>')"
-                                            style="border:none;">Delete</button></h5>
-                                    <%}%>
-                                            <p class="card-text">
-                                                <b>ID:</b> <%=u.id%><br>
-                                    <b>Images:</b> <%=imgs%>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <%}%>
-                    </div>
-                    <div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-                        aria-hidden="true">
-                        <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="exampleModalLabel">New User</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    <form>
-                                        <div class="form-group">
-                                            <label for="username">Username</label>
-                                            <input type="text" class="form-control" id="username" name="username"
-                                                placeholder="Username">
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label for="password">Password</label>
-                                            <input type="password" class="form-control" id="password" name="password"
-                                                placeholder="Password">
-                                        </div>
-                                        <div class="form-group">
-                                            <div class="custom-control custom-checkbox">
-                                                <input type="checkbox" class="custom-control-input" id="administrator">
-                                                <label class="custom-control-label"
-                                                    for="administrator">Administrator?</label>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
-                                <div class="modal-footer">
-                                    <div class="row" style="width:100%;">
-                                        <div class="col-sm-6">
-                                            <button type="button" id="createUser" class="btn btn-primary"
-                                                style="border-radius: 50px; width:100%;">Create</button>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <button type="button" class="btn btn-danger" data-dismiss="modal"
-                                                style="border-radius: 50px; width:100%;">Cancel</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <% } %>
+                        <% } %>
                     </div>
                 </div>
             </div>
-            <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-                integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-                crossorigin="anonymous"></script>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-                integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-                crossorigin="anonymous"></script>
-            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-                integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-                crossorigin="anonymous"></script>
-            <script src="//cdn.jsdelivr.net/npm/sweetalert2@9/dist/sweetalert2.min.js"></script>
-            <script src="/public/js/dashboard.js"></script>
-            <script>TypeX.currentID = '<%=user.id%>'</script>
+            <div class="tab-content" style="margin:50px;">
+                <h3>Statistics</h3>
+                <h5 id="statsDescription"></h5>
+                <div class="container">
+                    <div class="columns">
+                        <div class="column col-6">
+                            <div class="card bg-dark" style="border-color: #303742; margin:12px;">
+                                <div class="card-header">
+                                    <div class="card-title h5">Leaderboard (Image)</div>
+                                </div>
+                                <div class="card-body">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">#</th>
+                                                <th scope="col">Username</th>
+                                                <th scope="col">Images</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="statsLeaderboardImages">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="column col-6">
+                            <div class="card bg-dark" style="border-color: #303742; margin:12px;">
+                                <div class="card-header">
+                                    <div class="card-title h5">Leaderboard (Views)</div>
+                                </div>
+                                <div class="card-body">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">#</th>
+                                                <th scope="col">Username</th>
+                                                <th scope="col">Views</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="statsLeaderboardImageViews">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-content" style="margin:50px;">
+                <h3>Shorten a URL</h3>
+                <form>
+                    <div class="form-group">
+                        <label class="form-label" for="urlToShorten">Name</label>
+                        <input class="form-input" type="text" id="urlToShorten" placeholder="URL">
+                    </div>
+
+                    <button type="button" class="btn btn-primary" id="shortenURL"
+                        onclick="shortURL('<%=user.token%>', document.getElementById('urlToShorten').value)"
+                        style="width:100%;">Shorten</button>
+                </form>
+                <h3 style="margin-top:5px;">Your Shortens</h3>
+                <table class="table" style="margin:12px;">
+                    <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Origin</th>
+                            <th scope="col">Shortened</th>
+                        </tr>
+                    </thead>
+                    <tbody id="shortensTableShortens">
+                    </tbody>
+                </table>
+            </div>
+            <div class="tab-content" style="margin:50px;">
+                <h3>Create a Note</h3>
+                <p>Comming Soon!</p>
+            </div>
+            <div class="tab-content" style="margin:50px;">
+                <h3>Your Images</h3>
+                <div id="emptyImages"></div>
+                <div class="container" style="padding:12px;">
+                    <div class="container">
+                        <div id="typexImages" class="columns">
+
+                        </div>
+                    </div>
+                </div>
+                <ul class="pagination" style="justify-content: center;margin:12px;" id="typexImagePagination">
+
+                </ul>
+            </div>
+            <div class="tab-content" style="margin:50px;">
+                <div class="container">
+                    <button class="btn btn-primary"
+                        onclick="document.getElementById('modal-create-user').classList.add('active')">Create new
+                        user</button>
+                    <div class="modal" id="modal-create-user">
+                        <a href="#close" class="modal-overlay" aria-label="Close"></a>
+                        <div class="modal-container bg-dark">
+                            <div class="modal-header">
+                                <a href="#close" class="btn btn-clear float-right" aria-label="Close"></a>
+                                <div class="modal-title text-light h5">Create new user</div>
+                            </div>
+                            <div class="modal-body">
+                                <div class="content">
+                                    <form>
+                                        <label class="form-label" for="username">Username</label>
+                                        <input class="form-input" type="text" id="username" name="username"
+                                            placeholder="Username">
+                                        <label class="form-label" for="password">Password</label>
+                                        <input class="form-input" type="password" id="password" name="password"
+                                            placeholder="Password">
+                                        <label class="form-switch">
+                                            <input type="checkbox" id="administrator">
+                                            <i class="form-icon"></i> Administrator
+                                        </label>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-primary" id="addUser" type="button">Create</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="columns">
+                        <% for (let b = 0; b < users.length; b++) { let u = users[b]; let imgs = userImages[b]; %>
+                        <div class="column col-4">
+                            <div class="card bg-dark" style="border-color: #303742; margin:12px;">
+                                <div class="card-header">
+                                    <div class="card-title h5"><%=u.username%></div>
+                                    <div class="card-subtitle text-gray">
+                                        <%=u.administrator ? 'Administrator' : 'User'%>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <b>ID: </b> <%=u.id%><br>
+                                    <b>Images: </b> <%=imgs%>
+                                </div>
+                            </div>
+                        </div>
+                        <%}%>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@9/dist/sweetalert2.min.js"></script>
+    <script src="/public/js/dashboard.js"></script>
+    <script>TypeX.currentID = '<%=user.id%>';
+        document.getElementById('createUserButton').addEventListener("click", ()
+            => { document.getElementById("modal-create-user").classList.add("active") })
+    </script>
 </body>
 
 </html>

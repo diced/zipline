@@ -8,32 +8,26 @@
 </head>
 
 <body>
-    <div class="container h-100 d-flex justify-content-center">
-        <div class="jumbotron my-auto" style="background:none;">
-            <h1 class="display-4" style="text-align: center;">Login</h1>
-            <form action="/login" method="post">
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" class="form-control" id="username" name="username" placeholder="Your Username">
-                </div>
-
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" class="form-control" id="password" name="password"
-                        placeholder="Your Password">
-                </div>
-                <button type="submit" class="btn btn-primary" style="border-radius: 50px; width: 100%;">Login</button>
-            </form>
+    <div style="display:flex;align-items:center;justify-content:center;height:100%">
+        <div class="card bg-dark" style="border-color: #303742;">
+            <div class="card-header">
+                <div class="card-title h5">Login</div>
+                <div class="card-subtitle text-gray">Please enter in your username and password.</div>
+            </div>
+            <div class="card-body">
+                <form action="/login" method="post">
+                    <label class="form-label" for="username">Username</label>
+                    <input class="form-input" type="text" id="username" name="username" placeholder="Username">
+                    <label class="form-label" for="username">Password</label>
+                    <input class="form-input" type="password" id="password" name="password" placeholder="Password">
+                    <button style="margin-top:12px;width:100%" type="submit"
+                        class="btn btn-primary input-group-btn">Login</button>
+                </form>
+            </div>
         </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
         integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-        crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-        crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
         crossorigin="anonymous"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@9/dist/sweetalert2.min.js"></script>
     <script>

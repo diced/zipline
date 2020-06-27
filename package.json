@@ -1,13 +1,12 @@
 {
   "name": "typex",
-  "version": "0.5.0",
+  "version": "2.0.0",
   "private": true,
   "scripts": {
     "start": "node out/src"
   },
   "dependencies": {
     "@ayanaware/logger": "^2.2.1",
-    "@forevolve/bootstrap-dark": "^1.0.0-alpha.981",
     "@overnightjs/core": "^1.6.15",
     "@types/bcrypt": "^3.0.0",
     "@types/cookie-parser": "^1.4.2",
@@ -23,6 +22,7 @@
     "mime": "^2.4.4",
     "multer": "^1.4.2",
     "node-fetch": "^2.6.0",
+    "spectre.css": "^0.5.8",
     "typeorm": "^0.2.24"
   },
   "devDependencies": {
