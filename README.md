@@ -1,5 +1,5 @@
-# TypeX
-TypeX is an elegant, simple, uploader!
+# Zipline
+Zipline is a Typescript based image/file uploading service & URL shortening service! Simple, and elegant.
 
 # Images
 ![](https://cdn.diced.wtf/u/F1vtRX.png)
