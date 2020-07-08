@@ -1,7 +1,6 @@
 {
   "name": "typex",
-  "version": "2.0.0",
-  "private": true,
+  "version": "2.0.1",
   "scripts": {
     "start": "node out/src"
   },
@@ -13,6 +12,7 @@
     "@types/express-session": "^1.17.0",
     "@types/mime": "^2.0.1",
     "@types/multer": "^1.4.3",
+    "@types/semver": "^7.3.1",
     "bcrypt": "^4.0.1",
     "cookie-parser": "^1.4.5",
     "ejs": "^3.0.2",
@@ -22,6 +22,7 @@
     "mime": "^2.4.4",
     "multer": "^1.4.2",
     "node-fetch": "^2.6.0",
+    "semver": "^7.3.2",
     "spectre.css": "^0.5.8",
     "typeorm": "^0.2.24"
   },

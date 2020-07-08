@@ -21,7 +21,7 @@ if (!findFile('config.json', process.cwd())) {
 
 const config = JSON.parse(fs.readFileSync(findFile('config.json', process.cwd()), 'utf8'))
 
-export class TypeXServer extends Server {
+export class ZiplineServer extends Server {
   constructor(orm: ORMHandler) {
     super();
     this.app.set("view engine", "ejs");
@@ -87,14 +87,14 @@ export class TypeXServer extends Server {
         server = https.createServer(creds, this.app);
       } catch (e) {
         if (e.code === 'ENOENT') {
-          Logger.get('TypeXServer.FS').error(`No file/directory found for ${e.path}`);
+          Logger.get('ZiplineServer.FS').error(`No file/directory found for ${e.path}`);
           process.exit(1);
         }
       }
     } else server = http.createServer(this.app);
 
     server.listen(config.site.protocol === 'https' ? config.site.serveHTTPS : config.site.serveHTTP, () => {
-      Logger.get(TypeXServer).info('Started server on port ' + String(config.site.protocol === 'https' ? config.site.serveHTTPS : config.site.serveHTTP));
+      Logger.get(ZiplineServer).info('Started server on port ' + String(config.site.protocol === 'https' ? config.site.serveHTTPS : config.site.serveHTTP));
     })
   }
 }
