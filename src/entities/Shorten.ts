@@ -20,12 +20,16 @@ export class Shorten {
     @Column("bigint", { default: 0 })
     views: number
 
+    @Column("bigint", { default: 0 })
+    clicks: number;
+
     set(options: { key: string, origin: string, url: string, user: number }) {
         this.key = options.key;
         this.origin = options.origin;
         this.url = options.url;
         this.user = options.user;
         this.views = 0;
+        this.clicks = 0;
         return this;
     }
 }
