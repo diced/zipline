@@ -4,16 +4,16 @@ import { Request, Response } from 'express';
 import { ORMHandler } from '..';
 import { randomId, getImage, findFile, getShorten, hashPassword } from '../util';
 import { createReadStream, createWriteStream, unlinkSync, existsSync, mkdirSync, readFileSync } from 'fs'
-import multer from 'multer'
 import { getExtension } from 'mime';
 import { User } from '../entities/User';
 import { sep } from 'path';
 import { cookiesForAPI } from '../middleware/cookiesForAPI';
-import Logger from '@ayanaware/logger';
 import { DiscordWebhook } from '../structures/DiscordWebhook';
 import { ImageUtil } from '../structures/ImageUtil';
 import { ShortenUtil } from '../structures/ShortenUtil';
 import { Note } from "../entities/Note";
+import Logger from '@ayanaware/logger';
+import multer from 'multer'
 
 if (!findFile('config.json', process.cwd())) {
   Logger.get('FS').error(`No config.json exists in the ${__dirname}, exiting...`)
@@ -22,7 +22,7 @@ if (!findFile('config.json', process.cwd())) {
 
 const config = JSON.parse(readFileSync(findFile('config.json', process.cwd()), 'utf8'))
 
-const upload = multer({ dest: config.upload.tempDir });
+const upload = multer({ dest: config.uploader.temp });
 
 @Controller('api')
 export class APIController {
@@ -31,49 +31,46 @@ export class APIController {
   @Post('upload')
   @Middleware(upload.single('file'))
   private async upload(req: Request, res: Response) {
-    if (req.headers['authorization'] === config.administrator.authorization) return res.status(BAD_REQUEST).json({ code: BAD_REQUEST, message: "You can't upload files with the administrator account." })
     const users = await this.orm.repos.user.find({ where: { token: req.headers['authorization'] } });
     if (!users[0]) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: "Unauthorized" })
     if (req.headers['authorization'] !== users[0].token) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: "Unauthorized" })
     const user = users[0];
     const file = req.file;
-    const id = randomId(config.upload.fileLength);
+    const id = randomId(config.uploader.length);
     const extension = getExtension(file.mimetype);
     const source = createReadStream(file.path);
-    if (!existsSync(config.upload.uploadDir)) mkdirSync(config.upload.uploadDir);
+    if (!existsSync(config.uploader.upload)) mkdirSync(config.uploader.upload);
     const destination = createWriteStream(`${config.upload.uploadDir}${sep}${id}.${extension}`);
     source.pipe(destination, { end: false });
     source.on("end", function () {
       unlinkSync(file.path);
     });
-    const img = await getImage(this.orm, `${config.site.returnProtocol}://${req.headers['host']}${config.upload.route}/${id}.${extension}`, user.id)
+    const img = await getImage(this.orm, `${req.protocol}://${req.headers['host']}${config.uploader.route}/${id}.${extension}`, user.id)
     Logger.get('TypeX.Uploader').info(`New image uploaded ${img.url} (${img.id}) by ${user.username} (${user.id})`)
     if (config.discordWebhook.enabled) new DiscordWebhook(config.discordWebhook.url).sendImageUpdate(user, ImageUtil.parseURL(img.url), config);
-    return res.status(200).send(`${config.site.returnProtocol}://${req.headers['host']}${config.upload.route}/${id}.${extension}`)
+    return res.status(200).send(`${req.protocol}://${req.headers['host']}${config.uploader.route}/${id}.${extension}`)
   }
 
   @Post('shorten')
   private async shorten(req: Request, res: Response) {
-    if (req.headers['authorization'] === config.administrator.authorization) return res.status(BAD_REQUEST).json({ code: BAD_REQUEST, message: "You can't upload files with the administrator account." })
     const users = await this.orm.repos.user.find({ where: { token: req.headers['authorization'] } });
     if (!users[0]) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: "Unauthorized" })
     if (req.headers['authorization'] !== users[0].token) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: "Unauthorized" })
     const user = users[0];
-    const id = randomId(config.shorten.idLength)
-    const shrt = await getShorten(this.orm, id, req.body.url, `${config.site.returnProtocol}://${req.headers['host']}${config.shorten.route}/${id}`, user.id);
+    const id = randomId(config.shortener.length)
+    const shrt = await getShorten(this.orm, id, req.body.url, `${req.protocol}://${req.headers['host']}${config.shortener.route}/${id}`, user.id);
     Logger.get('TypeX.Shortener').info(`New url shortened ${shrt.url} (${req.body.url}) (${shrt.id}) by ${user.username} (${user.id})`)
     if (config.discordWebhook.enabled) new DiscordWebhook(config.discordWebhook.url).sendShortenUpdate(user, shrt, ShortenUtil.parseURL(shrt.url), config);
-    return res.status(200).send(`${config.site.returnProtocol}://${req.headers['host']}${config.shorten.route}/${id}`)
+    return res.status(200).send(`${req.protocol}://${req.headers['host']}${config.shortener.route}/${id}`)
   }
 
   @Post('note')
   private async note(req: Request, res: Response) {
-    if (req.headers['authorization'] === config.administrator.authorization) return res.status(BAD_REQUEST).json({ code: BAD_REQUEST, message: "You can't upload files with the administrator account." })
     const users = await this.orm.repos.user.find({ where: { token: req.headers['authorization'] } });
     if (!users[0]) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: "Unauthorized" })
     if (req.headers['authorization'] !== users[0].token) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: "Unauthorized" })
     const user = users[0];
-    const id = randomId(config.note.idLength)
+    const id = randomId(config.notes.length)
     const note = await this.orm.repos.note.save(new Note().set({
       key: id,
       user: user.id,
@@ -82,14 +79,13 @@ export class APIController {
     }));
     Logger.get('TypeX.Notes').info(`New note created ${note.id} and ${note.expriation ? `will expire in ${note.expriation},` : `will not expire,`} by ${user.username} (${user.id})`)
     // if (config.discordWebhook.enabled) new DiscordWebhook(config.discordWebhook.url).sendShortenUpdate(user, shrt, ShortenUtil.parseURL(shrt.url), config);
-    return res.status(200).send(`${config.site.returnProtocol}://${req.headers['host']}${config.note.route}/${id}`)
+    return res.status(200).send(`${req.protocol}://${req.headers['host']}${config.notes.route}/${id}`)
   }
 
   @Get('users')
   @Middleware(cookiesForAPI)
   private async getUsers(req: Request, res: Response) {
     if (!req.session.user.administrator) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: 'Unauthorized' });
-    const data = req.body;
     try {
       let users = await this.orm.repos.user.find({ order: { id: 'ASC' } })
       return res.status(200).json(users);
@@ -106,7 +102,7 @@ export class APIController {
     try {
       let user = await this.orm.repos.user.findOne({ username: data.username })
       if (user) return res.status(BAD_REQUEST).json({ error: "Could not create user: user exists already" })
-      user = await this.orm.repos.user.save(new User().set({ username: data.username, password: hashPassword(data.password, config.saltRounds), administrator: data.administrator }))
+      user = await this.orm.repos.user.save(new User().set({ username: data.username, password: hashPassword(data.password, config.core.saltRounds), administrator: data.administrator }))
       Logger.get('TypeX.User.Create').info(`User ${user.username} (${user.id}) was created`)
       return res.status(200).json(user);
     } catch (e) {
@@ -121,7 +117,7 @@ export class APIController {
     if (!data.payload) return res.status(FORBIDDEN).json({ code: BAD_REQUEST, message: 'No payload specified.' });
     if (data.payload === 'USER_EDIT') {
       if (Number(req.params.id) !== Number(req.session.user.id)) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: 'Unauthorized' });
-      data.password = hashPassword(data.password, config.saltRounds)
+      data.password = hashPassword(data.password, config.core.saltRounds)
       try {
         let user = await this.orm.repos.user.findOne({ id: Number(req.params.id) })
         if (!user) return res.status(BAD_REQUEST).json({ error: "Could not edit user: user doesnt exist" })
@@ -132,7 +128,7 @@ export class APIController {
         return res.status(BAD_REQUEST).json({ error: "Could not edit user: " + e.message })
       }
     } else if (data.payload === 'USER_RESET_PASSWORD') {
-      data.password = hashPassword(data.password, config.saltRounds)
+      data.password = hashPassword(data.password, config.core.saltRounds)
       try {
         let user = await this.orm.repos.user.findOne({ id: Number(req.params.id) })
         if (!user) return res.status(BAD_REQUEST).json({ error: "Could not reset password: user doesnt exist" })
@@ -146,7 +142,7 @@ export class APIController {
       try {
         let user = await this.orm.repos.user.findOne({ id: req.session.user.id })
         if (!user) return res.status(BAD_REQUEST).json({ error: "Could not regen token: user doesnt exist" })
-        user.token = randomId(config.user.tokenLength);
+        user.token = randomId(config.core.userTokenLength);
         req.session.user = user;
         await this.orm.repos.user.save(user);
         Logger.get('TypeX.User.Token').info(`User ${user.username} (${user.id}) token was regenerated`)
@@ -219,8 +215,8 @@ export class APIController {
       if (!image) return res.status(BAD_REQUEST).json({ error: "Could not delete image: image doesnt exist in database" })
       this.orm.repos.image.delete({ id: Number(req.params.id) });
       const url = new URL(image.url);
-      unlinkSync(`${config.upload.uploadDir}${sep}${url.pathname.slice(3)}`);
-      Logger.get('TypeX.Images.Delete').info(`Image ${image.url} (${image.id}) was deleted from ${config.upload.uploadDir}${sep}${url.pathname.slice(3)}`)
+      unlinkSync(`${config.uploader.upload}${sep}${url.pathname.slice(3)}`);
+      Logger.get('TypeX.Images.Delete').info(`Image ${image.url} (${image.id}) was deleted from ${config.uploader.upload}${sep}${url.pathname.slice(3)}`)
       return res.status(200).json(image);
     } catch (e) {
       return res.status(BAD_REQUEST).json({ error: "Could not delete image: " + e.message })

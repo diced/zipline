@@ -2,12 +2,9 @@ import { Controller, Middleware, Get, Post } from '@overnightjs/core';
 import { Request, Response } from 'express';
 import { ORMHandler } from '..';
 import { findFile, checkPassword } from '../util';
-import { readFileSync } from 'fs'
-import multer from 'multer';
+import { readFileSync } from 'fs';
 import { cookies } from '../middleware/cookies';
 import Logger from '@ayanaware/logger';
-import { ShortenUtil } from '../structures/ShortenUtil';
-import { ImageUtil } from '../structures/ImageUtil';
 
 if (!findFile('config.json', process.cwd())) {
   Logger.get('FS').error(`No config.json exists in the ${__dirname}, exiting...`)
@@ -49,12 +46,12 @@ export class IndexController {
   @Post('login')
   private async postLogin(req: Request, res: Response) {
     if (req.session.user || req.cookies.typex_user) return res.redirect('/');
-    if (req.body.username === 'administrator' && req.body.password === config.administrator.password) {
+    if (req.body.username === 'administrator' && req.body.password === config.core.adminPassword) {
       //@ts-ignore
       req.session.user = {
         id: 0,
         username: 'administrator',
-        password: config.administrator.password,
+        password: config.core.adminPassword,
         administrator: true
       }
       res.cookie('typex_user', req.session.user.id, { maxAge: 1036800000 });
@@ -69,7 +66,7 @@ export class IndexController {
     return res.redirect('/');
   }
 
-  @Get(`${config.shorten.route.slice(1)}/:id`)
+  @Get(`${config.shortener.route.slice(1)}/:id`)
   private async getShorten(req: Request, res: Response) {
     const shorten = await this.orm.repos.shorten.findOne({ key: req.params.id });
     if (!shorten) return res.render('404');
@@ -78,7 +75,7 @@ export class IndexController {
     return res.redirect(shorten.origin)
   }
 
-  @Get(`${config.note.route.slice(1)}/:id`)
+  @Get(`${config.notes.route.slice(1)}/:id`)
   private async getNote(req: Request, res: Response) {
     const note = await this.orm.repos.note.findOne({ key: req.params.id });
     if (!note) return res.render('404');
