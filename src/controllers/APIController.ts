@@ -35,20 +35,19 @@ export class APIController {
     if (!users[0]) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: "Unauthorized" })
     if (req.headers['authorization'] !== users[0].token) return res.status(FORBIDDEN).json({ code: FORBIDDEN, message: "Unauthorized" })
     const user = users[0];
-    const file = req.file;
     const id = randomId(config.uploader.length);
-    const extension = getExtension(file.mimetype);
-    const source = createReadStream(file.path);
+    if (config.uploader.blacklistedExt.includes(req.file.originalname.split('.').pop())) return res.status(BAD_REQUEST).json({ code: BAD_REQUEST, message: 'The extension used in this file is blacklisted.' })
+    const source = createReadStream(req.file.path);
     if (!existsSync(config.uploader.upload)) mkdirSync(config.uploader.upload);
-    const destination = createWriteStream(`${config.upload.uploadDir}${sep}${id}.${extension}`);
+    const destination = createWriteStream(`${config.upload.uploadDir}${sep}${id}.${req.file.originalname.split('.').pop()}`);
     source.pipe(destination, { end: false });
     source.on("end", function () {
-      unlinkSync(file.path);
+      unlinkSync(req.file.path);
     });
-    const img = await getImage(this.orm, `${req.protocol}://${req.headers['host']}${config.uploader.route}/${id}.${extension}`, user.id)
+    const img = await getImage(this.orm, `${req.protocol}://${req.headers['host']}${config.uploader.route}/${id}.${req.file.originalname.split('.').pop()}`, user.id)
     Logger.get('TypeX.Uploader').info(`New image uploaded ${img.url} (${img.id}) by ${user.username} (${user.id})`)
     if (config.discordWebhook.enabled) new DiscordWebhook(config.discordWebhook.url).sendImageUpdate(user, ImageUtil.parseURL(img.url), config);
-    return res.status(200).send(`${req.protocol}://${req.headers['host']}${config.uploader.route}/${id}.${extension}`)
+    return res.status(200).send(`${req.protocol}://${req.headers['host']}${config.uploader.route}/${id}.${req.file.originalname.split('.').pop()}`)
   }
 
   @Post('shorten')
