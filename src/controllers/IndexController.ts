@@ -73,6 +73,8 @@ export class IndexController {
   private async getShorten(req: Request, res: Response) {
     const shorten = await this.orm.repos.shorten.findOne({ key: req.params.id });
     if (!shorten) return res.render('404');
+    shorten.clicks++;
+    this.orm.repos.shorten.save(shorten);
     return res.redirect(shorten.origin)
   }
 
