@@ -2,7 +2,7 @@ node_modules
 temp
 tmp
 uploads
-config.json
+config*.json
 out
 .idea
 .vscode

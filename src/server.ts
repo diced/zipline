@@ -27,14 +27,14 @@ export class ZiplineServer extends Server {
     this.app.set("view engine", "ejs");
     this.app.use(
       session({
-        secret: config.sessionSecret,
+        secret: config.core.sessionSecret,
         resave: false,
         saveUninitialized: false,
       })
     );
     this.app.use(async (req, res, next) => {
-      if (!req.url.startsWith(config.upload.route)) return next();
-      const upload = await orm.repos.image.findOne({ url: `${config.site.returnProtocol}://${req.headers['host']}${req.url}` });
+      if (!req.url.startsWith(config.uploader.route)) return next();
+      const upload = await orm.repos.image.findOne({ url: `${config.secure ? "https" : "http"}://${req.headers['host']}${req.url}` });
       if (!upload) return next();
       upload.views++;
       orm.repos.image.save(upload);
@@ -42,7 +42,7 @@ export class ZiplineServer extends Server {
     })
     this.app.use(cookies());
     try {
-      this.app.use(config.upload.route, express.static(config.upload.uploadDir));
+      this.app.use(config.upload.route, express.static(config.uploader.upload));
     } catch (e) {
       Logger.get('TypeX.Routes').error(`Could not formulate upload static route`)
       process.exit(1);
@@ -51,7 +51,7 @@ export class ZiplineServer extends Server {
     this.app.use(bodyParser.json());
     this.app.use(bodyParser.urlencoded({ extended: true }));
     this.app.use(async (req, res, next) => {
-      if (!config.site.logRoutes) return next();
+      if (!config.core.log) return next();
       if (req.url.startsWith(config.upload.route)) return next();
       let user = req.session.user;
       const users = await orm.repos.user.find({ where: { token: req.headers['authorization'] } });
@@ -78,11 +78,11 @@ export class ZiplineServer extends Server {
 
   public start(): void {
     let server;
-    if (config.site.protocol === "https") {
+    if (config.core.secure) {
       try {
         const creds = {
-          key: fs.readFileSync(config.site.ssl.key, "utf-8"),
-          cert: fs.readFileSync(config.site.ssl.cert, "utf-8")
+          key: fs.readFileSync(config.core.ssl.key, "utf-8"),
+          cert: fs.readFileSync(config.core.ssl.cert, "utf-8")
         };
         server = https.createServer(creds, this.app);
       } catch (e) {
@@ -93,8 +93,8 @@ export class ZiplineServer extends Server {
       }
     } else server = http.createServer(this.app);
 
-    server.listen(config.site.protocol === 'https' ? config.site.serveHTTPS : config.site.serveHTTP, () => {
-      Logger.get(ZiplineServer).info('Started server on port ' + String(config.site.protocol === 'https' ? config.site.serveHTTPS : config.site.serveHTTP));
+    server.listen(config.core.secure ? config.core.port.secure : config.core.port.unsecure, () => {
+      Logger.get(ZiplineServer).info('Started server on port ' + String(config.core.secure ? config.core.port.secure : config.core.port.unsecure));
     })
   }
 }
