@@ -70,7 +70,6 @@ async function redoImageGrid(page, mode = null) {
     if (json.error || json.code) return showAlert('error', json.error);
     try {
         json.page.forEach(image => {
-            console.log(image)
             $('#typexImages').append(`
 <div class="column col-4">
 <div class="card">
@@ -408,7 +407,6 @@ function regenToken(id) {
         confirmButtonText: 'Yes, regenerate it!'
     }).then(async (result) => {
         if (result.value) {
-            console.log(`/api/users/${id}`);
             const res = await fetch(`/api/users/${id}`, {
                 method: 'PATCH',
                 headers: {
