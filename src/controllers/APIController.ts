@@ -289,6 +289,10 @@ export class APIController {
         note: await this.orm.repos.note.count(),
         shorten: await this.orm.repos.shorten.count(),
         user: await this.orm.repos.user.count()
+      },
+      zipline: {
+        version: JSON.parse(readFileSync(findFile('package.json', process.cwd()), 'utf8')).version,
+        database: this.orm.connection.options.type
       }
     })
   }
