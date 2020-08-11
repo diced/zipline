@@ -1,7 +1,8 @@
 {
   "name": "typex",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "scripts": {
+    "build": "tsc -p .",
     "start": "node out/src"
   },
   "dependencies": {

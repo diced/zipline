@@ -70,11 +70,27 @@ async function redoImageGrid(page, mode = null) {
     if (json.error || json.code) return showAlert('error', json.error);
     try {
         json.page.forEach(image => {
+            console.log(image)
             $('#typexImages').append(`
 <div class="column col-4">
 <div class="card">
   <div class="card-image">
-    <img src="${image.url}" class="img-responsive">
+    <img src="${image.url}" class="img-responsive" onclick="document.getElementById('modal-image-mngt-${image.id}').classList.add('active')">
+    <div class="modal" id="modal-image-mngt-${image.id}">
+    <a href="#close" class="modal-overlay" aria-label="Close" onclick="document.getElementById('modal-image-mngt-${image.id}').classList.remove('active')"></a>
+    <div class="modal-container bg-dark">
+            <div class="modal-header">
+                <a href="#close" class="btn btn-clear float-right text-light" aria-label="Close"  onclick="document.getElementById('modal-image-mngt-${image.id}').classList.remove('active')"></a>
+                <div class="modal-title text-light h5">Manage Image ${image.id}</div>
+            </div>
+            <div class="modal-body">
+                This image is viewable at <a href="${image.url}">${image.url}</a> and has <b>${image.views}</b> views.
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" type="button" onclick="deleteImage('${image.id}')">Delete Image</button>
+            </div>
+        </div>
+    </div>
   </div>
 </div>
 </div>
@@ -155,8 +171,6 @@ document.getElementById('updateStatistics').addEventListener('click', async () =
         }
     });
     const json = await resp.json();
-
-    console.log(json);
     try {
         document.getElementById('statsDescription').innerHTML = `You have an average of <b>${Math.floor(json.average).toLocaleString()} views</b> on your images, you have <b>${json.totalViews.toLocaleString()} views total</b>, you currently have <b>${json.images.toLocaleString()} images</b>!`
         document.getElementById('statsLeaderboardImages').innerHTML = '';
@@ -194,8 +208,6 @@ document.getElementById('updateShortens').addEventListener('click', async () => 
         }
     });
     const json = await resp.json();
-
-    console.log(json);
     try {
         document.getElementById('shortensTableShortens').innerHTML = '';
         for (const shorten of json) {
@@ -225,28 +237,26 @@ const deleteImage = (id, url) => {
     }).then(async (result) => {
         if (result.value) {
             try {
-                const json = await res.json();
-                if (json.error || json.code) return showAlert('error', json.error)
-                else {
-                    const res = await fetch('/api/images/' + id, {
-                        method: 'DELETE',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    });
-                    try {
-                        const json = await res.json();
-                        if (json.error || json.code) return showAlert('error', json.error)
-                        else {
-                            Swal.fire(
-                                'Deleted!',
-                                `Deleted image (${id}) successfully.`,
-                                'success'
-                            );
-                        }
-                    } catch (e) {
-                        console.error(e)
+                const res = await fetch('/api/images/' + id, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
                     }
+                });
+                try {
+                    const json = await res.json();
+                    if (json.error || json.code) return showAlert('error', json.error)
+                    else {
+                        Swal.fire(
+                            'Deleted!',
+                            `Deleted image (${id}) successfully.`,
+                            'success'
+                        );
+                        document.getElementById(`modal-image-mngt-${id}`).classList.remove('active')
+                        redoImageGrid('0', 'normal')
+                    }
+                } catch (e) {
+                    console.error(e)
                 }
             } catch (e) {
                 console.error(e)
@@ -289,7 +299,7 @@ const deleteSpecificUser = (id, username) => {
         }
     });
 }
-document.getElementById('saveUser').addEventListener('click', () => {
+const saveUser = (id) => {
     Swal.fire({
         title: 'Are you sure?',
         text: "You are proceeding to edit your user.",
@@ -303,7 +313,7 @@ document.getElementById('saveUser').addEventListener('click', () => {
             const username = document.getElementById('usernameSave').value;
             const password = document.getElementById('passwordSave').value;
             if (whitespace(username)) return showAlert('error', 'Please input a username.')
-            const res = await fetch(`/api/users/${TypeX.currentID}`, {
+            const res = await fetch(`/api/users/${id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json'
@@ -330,7 +340,7 @@ document.getElementById('saveUser').addEventListener('click', () => {
             }
         }
     });
-});
+};
 
 async function shortURL(token, url) {
     if (whitespace(url)) return showAlert('error', 'Please input a URL.')

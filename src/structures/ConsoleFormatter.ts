@@ -11,7 +11,7 @@ export class ConsoleFormatter extends Formatter {
   }
 
   public formatName(name: string): string {
-    return `[${chalk.greenBright(name)}]`
+    return `${chalk.greenBright(name)}`
   }
 
   public formatTimestamp(): string {

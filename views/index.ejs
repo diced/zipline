@@ -83,7 +83,8 @@
                             <div class="columns">
                                 <div class="column col-6">
                                     <button style="margin-top:12px;width:100%" type="button"
-                                        class="btn btn-primary input-group-btn" id="saveUser">Update</button>
+                                        class="btn btn-primary input-group-btn"
+                                        onclick="saveUser('<%=user.id%>')">Update</button>
                                 </div>
                                 <div class="column col-6">
                                     <a href="/logout" style="margin-top:12px;width:100%" type="button"
@@ -225,7 +226,9 @@
                         <div class="column col-4">
                             <div class="card bg-dark" style="border-color: #303742; margin:12px;">
                                 <div class="card-header">
-                                    <div class="card-title h5"><%=u.username%></div>
+                                    <div class="card-title h5"><%=u.username%> <button class="btn btn-error btn-sm"
+                                            onclick="deleteSpecificUser('<%=u.id%>', '<%=u.username%>')">Delete</button>
+                                    </div>
                                     <div class="card-subtitle text-gray">
                                         <%=u.administrator ? 'Administrator' : 'User'%>
                                     </div>
@@ -247,7 +250,7 @@
         crossorigin="anonymous"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@9/dist/sweetalert2.min.js"></script>
     <script src="/public/js/dashboard.js"></script>
-    <script>TypeX.currentID = '<%=user.id%>';
+    <script>
         document.getElementById('createUserButton').addEventListener("click", ()
             => { document.getElementById("modal-create-user").classList.add("active") })
     </script>
