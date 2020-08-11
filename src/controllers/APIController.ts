@@ -184,31 +184,31 @@ export class APIController {
   @Middleware(cookiesForAPI)
   private async statistics(req: Request, res: Response) {
     const all = await this.orm.repos.image.find({ where: { user: req.session.user.id }, order: { id: 'ASC' } });
-    const totalViews = all.map(i=>i.views).length !== 0 ? all.map(i=>i.views).reduce((a,b) => Number(a)+Number(b)) : 0
+    const totalViews = all.map(i => i.views).length !== 0 ? all.map(i => i.views).reduce((a, b) => Number(a) + Number(b)) : 0
     const users = await this.orm.repos.user.find();
     const images = [];
     const views = [];
     for (const user of users) {
-      const i = await this.orm.repos.image.find({where:{user:user.id}, order: {views:'ASC'}});
-      images.push({ 
+      const i = await this.orm.repos.image.find({ where: { user: user.id }, order: { views: 'ASC' } });
+      images.push({
         username: user.username,
         count: i.length
       });
       views.push({
         username: user.username,
-        count: i.map(i=>i.views).length !== 0 ? i.map(i=>i.views).reduce((a,b) => Number(a)+Number(b)) : 0
+        count: i.map(i => i.views).length !== 0 ? i.map(i => i.views).reduce((a, b) => Number(a) + Number(b)) : 0
       })
     }
     return res.status(200).json({
       totalViews,
       images: all.length,
-      average: totalViews/all.length,
+      average: totalViews / all.length,
       table: {
-        images: images.sort((a,b) => b.count-a.count),
-        views: views.sort((a,b) =>b.count-a.count)
+        images: images.sort((a, b) => b.count - a.count),
+        views: views.sort((a, b) => b.count - a.count)
       }
     });
-    
+
   }
 
   @Delete('images/:id')
@@ -233,7 +233,7 @@ export class APIController {
     const all = await this.orm.repos.image.find({ where: { id: req.params.id }, order: { id: 'ASC' } });
     return res.status(200).json(all);
   }
-  
+
   @Get('images/user/pages')
   @Middleware(cookiesForAPI)
   private async pagedUser(req: Request, res: Response) {
@@ -242,8 +242,8 @@ export class APIController {
     const pagedNums = [];
     while (all.length) paged.push(all.splice(0, 25));
     for (let x = 0; x < paged.length; x++) pagedNums.push(x);
-    if (!req.query.page) return res.status(200).json({pagedNums});
-    else return res.status(200).json({page: paged[Number(req.query.page)]});
+    if (!req.query.page) return res.status(200).json({ pagedNums });
+    else return res.status(200).json({ page: paged[Number(req.query.page)] });
   }
 
   @Get('shortens')
@@ -272,6 +272,25 @@ export class APIController {
   private async getNote(req: Request, res: Response) {
     const all = await this.orm.repos.note.find({ where: { user: req.session.user.id, id: Number(req.params.id) }, order: { id: 'ASC' } });
     return res.status(200).json(all);
+  }
+
+  @Get('stats')
+  private async getStats(req: Request, res: Response) {
+    const memory = process.memoryUsage();
+    const views: number = (await this.orm.repos.image.find()).map((a) => a.views).reduce((a, b) => Number(a) + Number(b));
+    const clicks: number = (await this.orm.repos.shorten.find()).map((a) => a.clicks).reduce((a, b) => Number(a) + Number(b));
+    return res.status(200).json({
+      memory,
+      uploadedStatistics: {
+        views, clicks
+      },
+      count: {
+        image: await this.orm.repos.image.count(),
+        note: await this.orm.repos.note.count(),
+        shorten: await this.orm.repos.shorten.count(),
+        user: await this.orm.repos.user.count()
+      }
+    })
   }
 
   public set(orm: ORMHandler) {
