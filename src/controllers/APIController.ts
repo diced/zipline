@@ -272,8 +272,8 @@ export class APIController {
   @Get('stats')
   private async getStats(req: Request, res: Response) {
     const memory = process.memoryUsage();
-    const views: number = (await this.orm.repos.image.find()).map((a) => a.views).reduce((a, b) => Number(a) + Number(b));
-    const clicks: number = (await this.orm.repos.shorten.find()).map((a) => a.clicks).reduce((a, b) => Number(a) + Number(b));
+    const views: number = (await this.orm.repos.image.find()).map((a) => a.views).reduce((a, b) => Number(a) + Number(b), 0);
+    const clicks: number = (await this.orm.repos.shorten.find()).map((a) => a.clicks).reduce((a, b) => Number(a) + Number(b), 0);
     return res.status(200).json({
       memory,
       uploadedStatistics: {

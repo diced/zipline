@@ -26,7 +26,7 @@ if (!findFile('config.json', process.cwd())) {
 
 const config = JSON.parse(readFileSync(findFile('config.json', process.cwd()), 'utf8'))
 
-if (!config.upload?.route) {
+if (!config.uploader?.route) {
   Logger.get('Zipline.Config').error(`Missing needed property on configuration: upload.route`)
   process.exit(1);
 }
@@ -46,12 +46,7 @@ export interface ORMHandler {
 const pk = JSON.parse(readFileSync(findFile('package.json', process.cwd()), 'utf8'));
 
 (async () => {
-  const gitPackage = JSON.parse(await GitHub.getFile('package.json'));
-  const comparedVersion = compare(gitPackage.version, pk.version);
-  if (comparedVersion == 1) {
-    Logger.get(`Zipline`).info(`Zipline is ${chalk.bold.redBright('outdated')}, you should run ${chalk.bold.whiteBright('./scripts/update.sh')} to get the best features.`);
-    process.exit(0);
-  }
+  if (compare(JSON.parse(await GitHub.getFile('package.json')).version, pk.version) == 1) Logger.get(`Zipline`).info(`Zipline is ${chalk.bold.redBright('outdated')}, you should run ${chalk.bold.whiteBright('./scripts/update.sh')} to get the best features.`);
   Logger.get('Zipline').info(`Starting Zipline ${pk.version}`);
   const connection = await createConnection(config.orm as ConnectionOptions);
   const orm: ORMHandler = {
