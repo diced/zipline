@@ -1,8 +1,14 @@
 import { Request, Response } from "express";
-import config from '../../config.json';
 import { BAD_REQUEST, INTERNAL_SERVER_ERROR, FORBIDDEN } from 'http-status-codes'
 import { getConnection } from 'typeorm';
 import { User } from "../entities/User";
+
+if (!findFile('config.json', process.cwd())) {
+  Logger.get('FS').error(`No config.json exists in ${__dirname}, exiting...`)
+  process.exit(1);
+}
+
+const config = JSON.parse(readFileSync(findFile('config.json', process.cwd()), 'utf8'))
 
 export async function cookiesForAPI(req: Request, res: Response, next: any) {
     if (req.cookies.typex_user) {
