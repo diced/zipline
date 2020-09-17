@@ -109,6 +109,20 @@ export class APIController {
     }
   }
 
+  @Post('users/register')
+  private async registerUser(req: Request, res: Response) {
+    const data = req.body;
+    if (!config.core.public) return res.status(BAD_REQUEST).json({ error: 'This zipline server does not have public enabled, therefore can\'t create a user.' });
+    try {
+      let user = await this.orm.repos.user.findOne({ username: data.username })
+      if (user) return res.status(BAD_REQUEST).json({ error: "Could not create user: user exists already" });
+      user = await this.orm.repos.user.save(new User().set({ username: data.username, password: hashPassword(data.password, config.core.saltRounds), administrator: false }));
+      return res.status(200).json({ success: true });
+    } catch (e) {
+      return res.status(BAD_REQUEST).json({ error: `Couldn't create user: ${e.message}` })
+    } 
+  }
+
   @Patch('users/:id')
   @Middleware(cookiesForAPI)
   private async patchUser(req: Request, res: Response) {
