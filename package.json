@@ -14,7 +14,7 @@
     "@types/mime": "^2.0.1",
     "@types/multer": "^1.4.3",
     "@types/semver": "^7.3.1",
-    "bcrypt": "^4.0.1",
+    "bcrypt": "^5.0.0",
     "cookie-parser": "^1.4.5",
     "ejs": "^3.0.2",
     "express": "^4.17.1",
