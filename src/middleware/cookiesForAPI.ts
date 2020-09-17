@@ -1,7 +1,10 @@
+import Logger from "@ayanaware/logger";
 import { Request, Response } from "express";
 import { BAD_REQUEST, INTERNAL_SERVER_ERROR, FORBIDDEN } from 'http-status-codes'
 import { getConnection } from 'typeorm';
 import { User } from "../entities/User";
+import { findFile } from "../util";
+import { readFileSync } from 'fs';
 
 if (!findFile('config.json', process.cwd())) {
   Logger.get('FS').error(`No config.json exists in ${__dirname}, exiting...`)
