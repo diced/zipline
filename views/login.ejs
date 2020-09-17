@@ -22,6 +22,10 @@
                     <input class="form-input" type="password" id="password" name="password" placeholder="Password">
                     <button style="margin-top:12px;width:100%" type="submit"
                         class="btn btn-primary input-group-btn">Login</button>
+                    <% if (config.core.public)  { %>
+                        <button style="margin-top:12px;width:100%" type="submit"
+                        class="btn btn-primary input-group-btn" href="/register">Register (Beta)</button> 
+                    <% } %>
                 </form>
             </div>
         </div>
