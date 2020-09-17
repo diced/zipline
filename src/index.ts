@@ -48,7 +48,8 @@ const pk = JSON.parse(readFileSync(findFile('package.json', process.cwd()), 'utf
 (async () => {
   if (compare(JSON.parse(await GitHub.getFile('package.json')).version, pk.version) == 1) Logger.get(`Zipline`).info(`Zipline is ${chalk.bold.redBright('outdated')}, you should run ${chalk.bold.whiteBright('./scripts/update.sh')} to get the best features.`);
   Logger.get('Zipline').info(`Starting Zipline ${pk.version}`);
-  const connection = await createConnection(config.orm as ConnectionOptions);
+  if (!config.database) return Logger.get('Config').error("Database is not found in config.")
+  const connection = await createConnection(config.database);
   const orm: ORMHandler = {
     connection,
     repos: {
