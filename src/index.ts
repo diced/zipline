@@ -61,7 +61,7 @@ const pk = JSON.parse(readFileSync(findFile('package.json', process.cwd()), 'utf
   };
   if (orm.connection.isConnected)
     Logger.get(Connection).info(
-      `Successfully initialized database type: ${config.orm.type}`
+      `Successfully initialized database type: ${config.database.type}`
     );
   const server = new ZiplineServer(orm);
   server.start();
