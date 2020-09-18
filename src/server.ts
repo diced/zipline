@@ -42,7 +42,7 @@ export class ZiplineServer extends Server {
     })
     this.app.use(cookies());
     try {
-      this.app.use(config.upload.route, express.static(config.uploader.upload));
+      this.app.use(config.uploader.route, express.static(config.uploader.upload));
     } catch (e) {
       Logger.get('TypeX.Routes').error(`Could not formulate upload static route`)
       process.exit(1);
@@ -52,7 +52,7 @@ export class ZiplineServer extends Server {
     this.app.use(bodyParser.urlencoded({ extended: true }));
     this.app.use(async (req, res, next) => {
       if (!config.core.log) return next();
-      if (req.url.startsWith(config.upload.route)) return next();
+      if (req.url.startsWith(config.uploader.route)) return next();
       let user = req.session.user;
       const users = await orm.repos.user.find({ where: { token: req.headers['authorization'] } });
       if (users[0]) user = users[0]
