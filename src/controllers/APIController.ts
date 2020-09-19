@@ -5,7 +5,7 @@ import { ORMHandler } from '..';
 import { randomId, getImage, findFile, getShorten, hashPassword } from '../util';
 import { createReadStream, createWriteStream, unlinkSync, existsSync, mkdirSync, readFileSync } from 'fs'
 import { getExtension } from 'mime';
-import { User } from '../entities/User';
+import { Users } from '../entities/User';
 import { sep } from 'path';
 import { cookiesForAPI } from '../middleware/cookiesForAPI';
 import { DiscordWebhook } from '../structures/DiscordWebhook';
@@ -101,7 +101,7 @@ export class APIController {
     try {
       let user = await this.orm.repos.user.findOne({ username: data.username })
       if (user) return res.status(BAD_REQUEST).json({ error: "Could not create user: user exists already" })
-      user = await this.orm.repos.user.save(new User().set({ username: data.username, password: hashPassword(data.password, config.core.saltRounds), administrator: data.administrator }))
+      user = await this.orm.repos.user.save(new Users().set({ username: data.username, password: hashPassword(data.password, config.core.saltRounds), administrator: data.administrator }))
       Logger.get('TypeX.User.Create').info(`User ${user.username} (${user.id}) was created`)
       return res.status(200).json(user);
     } catch (e) {
@@ -116,7 +116,7 @@ export class APIController {
     try {
       let user = await this.orm.repos.user.findOne({ username: data.username })
       if (user) return res.status(BAD_REQUEST).json({ error: "Could not create user: user exists already" });
-      user = await this.orm.repos.user.save(new User().set({ username: data.username, password: hashPassword(data.password, config.core.saltRounds), administrator: false }));
+      user = await this.orm.repos.user.save(new Users().set({ username: data.username, password: hashPassword(data.password, config.core.saltRounds), administrator: false }));
       return res.status(200).json({ success: true });
     } catch (e) {
       return res.status(BAD_REQUEST).json({ error: `Couldn't create user: ${e.message}` })

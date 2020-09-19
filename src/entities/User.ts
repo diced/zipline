@@ -11,7 +11,7 @@ if (!findFile('config.json', process.cwd())) {
 const config = JSON.parse(readFileSync(findFile('config.json', process.cwd()), 'utf8'))
 
 @Entity()
-export class User {
+export class Users {
   @PrimaryGeneratedColumn({ type: 'bigint' })
   id: number;
 
@@ -31,7 +31,7 @@ export class User {
     this.username = options.username;
     this.password = options.password;
     this.administrator = options.administrator;
-    this.token = randomId(config.user.tokenLength)
+    this.token = randomId(config.core.userTokenLength)
     return this;
   }
 }

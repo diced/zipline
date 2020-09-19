@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import { ORMHandler } from '.';
-import { User } from './entities/User';
+import { Users } from './entities/User';
 import { Image } from './entities/Image';
 import { statSync, readdirSync } from 'fs';
 import { join, basename } from 'path';
@@ -27,7 +27,7 @@ export function renderTemplate(res, req, template, data = {}) {
 
 export async function getUser(orm: ORMHandler, username: string, password: string, administrator: boolean = false) {
   const user = await orm.repos.user.findOne({ username });
-  if (!user) return orm.repos.user.save(new User().set({ username, password, administrator }));
+  if (!user) return orm.repos.user.save(new Users().set({ username, password, administrator }));
   return user;
 }
 

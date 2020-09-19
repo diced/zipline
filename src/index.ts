@@ -5,7 +5,7 @@ import {
   createConnection,
   ConnectionOptions
 } from "typeorm";
-import { User } from "./entities/User";
+import { Users } from "./entities/User";
 import { ZiplineServer } from "./server";
 import Logger from "@ayanaware/logger";
 import { Image } from "./entities/Image";
@@ -32,7 +32,7 @@ if (!config.uploader?.route) {
 }
 
 export interface ORMRepos {
-  user?: Repository<User>;
+  user?: Repository<Users>;
   image?: Repository<Image>;
   shorten?: Repository<Shorten>;
   note?: Repository<Note>;
@@ -53,7 +53,7 @@ const pk = JSON.parse(readFileSync(findFile('package.json', process.cwd()), 'utf
   const orm: ORMHandler = {
     connection,
     repos: {
-      user: connection.getRepository(User),
+      user: connection.getRepository(Users),
       image: connection.getRepository(Image),
       shorten: connection.getRepository(Shorten),
       note: connection.getRepository(Note)

@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import { User } from '../entities/User';
+import { Users } from '../entities/User';
 import { Shorten } from '../entities/Shorten';
 import { Imaged } from './ImageUtil';
 import { Shortened } from './ShortenUtil';
@@ -17,7 +17,7 @@ export class DiscordWebhook {
         else if (json.code) throw new Error(`DiscordAPIError[${json.code}]: ${json.message}`);
         return json.code ? false : true;
     }
-    async sendImageUpdate(user: User, image: Imaged, config: any) {
+    async sendImageUpdate(user: Users, image: Imaged, config: any) {
         try {
             await (await fetch(this.url, {
                 method: 'POST',
@@ -34,7 +34,7 @@ export class DiscordWebhook {
             throw new Error(`Coulndn't send webhook: ${e.message}`)
         }
     }
-    async sendShortenUpdate(user: User, shorten: Shorten, ex: Shortened, config: any) {
+    async sendShortenUpdate(user: Users, shorten: Shorten, ex: Shortened, config: any) {
         try {
             await (await fetch(this.url, {
                 method: 'POST',

@@ -1,7 +1,7 @@
 import Logger from "@ayanaware/logger";
 import { Request, Response } from "express";
 import { getConnection } from 'typeorm';
-import { User } from "../entities/User";
+import { Users } from "../entities/User";
 import { findFile } from "../util";
 import { readFileSync } from 'fs';
 
@@ -22,7 +22,7 @@ export async function cookies(req: Request, res: Response, next: any) {
                 password: config.core.adminPassword,
                 administrator: true
             }
-        } else req.session.user = await getConnection().getRepository(User).findOne({ id: req.cookies.typex_user });
+        } else req.session.user = await getConnection().getRepository(Users).findOne({ id: req.cookies.typex_user });
         if (!req.session.user) {
             res.clearCookie('typex_user');
             req.session.user = null;

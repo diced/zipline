@@ -2,7 +2,7 @@ import Logger from "@ayanaware/logger";
 import { Request, Response } from "express";
 import { BAD_REQUEST, INTERNAL_SERVER_ERROR, FORBIDDEN } from 'http-status-codes'
 import { getConnection } from 'typeorm';
-import { User } from "../entities/User";
+import { Users } from "../entities/User";
 import { findFile } from "../util";
 import { readFileSync } from 'fs';
 
@@ -22,7 +22,7 @@ export async function cookiesForAPI(req: Request, res: Response, next: any) {
             password: config.core.adminPassword,
             administrator: true
         }
-        else req.session.user = await getConnection().getRepository(User).findOne({ id: req.cookies.typex_user });
+        else req.session.user = await getConnection().getRepository(Users).findOne({ id: req.cookies.typex_user });
         if (!req.session.user) return res.status(INTERNAL_SERVER_ERROR).send({ code: INTERNAL_SERVER_ERROR, message: "The user that is logged in does not exist" })
     } else return res.status(FORBIDDEN).send({ code: FORBIDDEN, message: "Unauthorized" })
     return next();
