@@ -31,7 +31,7 @@ export class User {
     this.username = options.username;
     this.password = options.password;
     this.administrator = options.administrator;
-    this.token = randomId(config.user.tokenLength)
+    this.token = randomId(config.core.userTokenLengt)
     return this;
   }
 }
