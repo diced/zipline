@@ -39,7 +39,7 @@ export class APIController {
     if (config.uploader.blacklistedExt.includes(req.file.originalname.split('.').pop())) return res.status(BAD_REQUEST).json({ code: BAD_REQUEST, message: 'The extension used in this file is blacklisted.' })
     const source = createReadStream(req.file.path);
     if (!existsSync(config.uploader.upload)) mkdirSync(config.uploader.upload);
-    const destination = createWriteStream(`${config.upload.uploadDir}${sep}${id}.${req.file.originalname.split('.').pop()}`);
+    const destination = createWriteStream(`${config.uploader.upload}${sep}${id}.${req.file.originalname.split('.').pop()}`);
     source.pipe(destination, { end: false });
     source.on("end", function () {
       unlinkSync(req.file.path);
