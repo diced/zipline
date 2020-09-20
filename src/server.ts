@@ -24,11 +24,11 @@ const config = JSON.parse(fs.readFileSync(findFile('config.json', process.cwd())
 export class ZiplineServer extends Server {
   constructor(orm: ORMHandler) {
     super();
-    var proxy = 'loopback';
+    var p = 'loopback';
     if (config.core.trustedProxy) {
-      proxy += ',' + config.core.trustedProxy;
+      p += ',' + config.core.trustedProxy;
     }
-    this.app.set("trust proxy", proxy);
+    this.app.set("trust proxy", p);
 	this.app.set("view engine", "ejs");
     this.app.use(
       session({
