@@ -31,7 +31,7 @@ export class ZiplineServer extends Server {
        app.set('trust proxy', 'loopback')
 	}
     this.app.set("trust proxy", p);
-	this.app.set("view engine", "ejs");
+    this.app.set("view engine", "ejs");
     this.app.use(
       session({
         secret: config.core.sessionSecret,
