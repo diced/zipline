@@ -29,8 +29,8 @@ export class ZiplineServer extends Server {
     }
     else {
        app.set('trust proxy', 'loopback')
-    }
-    this.app.set("trust proxy", proxy);
+	}
+    this.app.set("trust proxy", p);
 	this.app.set("view engine", "ejs");
     this.app.use(
       session({
