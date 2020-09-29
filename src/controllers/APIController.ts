@@ -4,7 +4,6 @@ import { Request, Response } from 'express';
 import { ORMHandler } from '..';
 import { randomId, getImage, findFile, getShorten, hashPassword } from '../util';
 import { createReadStream, createWriteStream, unlinkSync, existsSync, mkdirSync, readFileSync } from 'fs'
-import { getExtension } from 'mime';
 import { User } from '../entities/User';
 import { sep } from 'path';
 import { cookiesForAPI } from '../middleware/cookiesForAPI';

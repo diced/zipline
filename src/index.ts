@@ -2,8 +2,7 @@ import "./core/Console";
 import {
   Repository,
   Connection,
-  createConnection,
-  ConnectionOptions
+  createConnection
 } from "typeorm";
 import { User } from "./entities/User";
 import { ZiplineServer } from "./server";
@@ -17,7 +16,6 @@ import { notes } from "./interval";
 import { GitHub } from "./structures/GitHub";
 import { compare, } from 'semver';
 import chalk from 'chalk';
-import { execFileSync } from 'child_process';
 
 if (!findFile('config.json', process.cwd())) {
   Logger.get('FS').error(`No config.json exists in ${__dirname}, exiting...`)
@@ -59,6 +57,7 @@ const pk = JSON.parse(readFileSync(findFile('package.json', process.cwd()), 'utf
       note: connection.getRepository(Note)
     },
   };
+
   if (orm.connection.isConnected)
     Logger.get(Connection).info(
       `Successfully initialized database type: ${config.database.type}`

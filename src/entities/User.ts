@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 import { randomId, findFile } from "../util";
 import Logger from "@ayanaware/logger";
 import { readFileSync } from 'fs';
