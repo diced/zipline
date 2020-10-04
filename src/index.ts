@@ -9,6 +9,7 @@ import { AddressInfo } from 'net';
 import { ConsoleFormatter } from './lib/ConsoleFormatter';
 import { bold, green, reset } from '@dicedtomato/colors';
 import { Config, Configuration } from './lib/Config';
+import { decrypt, encrypt } from './lib/Encryption';
 
 Console.setFormatter(new ConsoleFormatter());
 
@@ -47,7 +48,7 @@ server.register(fastifyMongodb, {
 });
 
 server.register(fastifyCookies, {
-  secret: config.core.cookies
+  secret: config.core.secret
 });
 
 

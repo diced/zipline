@@ -13,7 +13,7 @@ export interface ConfigMongo {
 }
 
 export interface ConfigCore {
-  cookies: string;
+  secret: string;
   port: number;
 }
 

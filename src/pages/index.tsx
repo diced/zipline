@@ -1,5 +1,4 @@
-import React from 'react';
-import { useLogin } from '../lib/hooks';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import UI from '../components/UI';
 import UIPlaceholder from '../components/UIPlaceholder';
@@ -10,6 +9,8 @@ import Divider from '@material-ui/core/Divider';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core';
+import { store } from '../lib/store';
+import { useDispatch } from 'react-redux';
 
 
 const useStyles = makeStyles({
@@ -24,14 +25,15 @@ const useStyles = makeStyles({
 export default function IndexPage() {
   const classes = useStyles();
   const router = useRouter();
-  const { loggedIn } = useLogin(false);
+  const dispatch = useDispatch();
+  const state = store.getState();
 
-  if (typeof window !== 'undefined' && !loggedIn) router.push('/login');
+  if (typeof window !== 'undefined' && !state.loggedIn) router.push('/login');
   else {
     return (
       <UI>
         <Paper elevation={3} className={classes.padding}>
-          <Typography variant="h5">Welcome back, user</Typography>
+          <Typography variant="h5">Welcome back, {state.user.username}</Typography>
           <Typography color="textSecondary">You have <b>2</b> images</Typography>
           <div className={classes.margin}>
             <Typography variant="h5">Token</Typography>
