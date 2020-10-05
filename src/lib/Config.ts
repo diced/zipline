@@ -23,6 +23,7 @@ export class Configuration {
       const data = readFileSync(resolve(process.cwd(), "Zipline.toml"), 'utf8');
       return parse(data) as Config;
     } catch (e) {
+      console.log(e);
       return null;
     }
   }

@@ -37,8 +37,18 @@ export class UserController {
     if (!checkPassword(req.body.password, user.password)) throw new LoginError(`Wrong credentials!`);
     delete user.password;
     return reply
-      .setCookie("zipline", user._id)
+      .setCookie("zipline", user._id, { path: '/' })
       .send(user);
+  }
+
+  @POST('/logout')
+  async logout(req: FastifyRequest, reply: FastifyReply) {
+    if (!req.cookies.zipline) throw new LoginError(`Not logged in.`);
+    try {
+      reply.clearCookie('zipline', { path: '/' }).send({ clearStore: true })
+    } catch (e) {
+      reply.send({ clearStore: false });
+    }
   }
 
   @POST('/reset-token')

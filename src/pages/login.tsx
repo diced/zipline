@@ -75,7 +75,7 @@ export default function Index() {
               Login
               </Typography>
               <TextField label="Username" className={classes.field} onChange={(e) => setUsername(e.target.value)} />
-              <TextField label="Password" className={classes.field} onChange={(e) => setPassword(e.target.value)} />
+              <TextField label="Password" type="password" className={classes.field} onChange={(e) => setPassword(e.target.value)} />
             </CardContent>
             <CardActions>
               <Button color="primary" variant="contained" className={classes.field} onClick={handleLogin}>Login</Button>

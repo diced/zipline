@@ -16,6 +16,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Alert from '@material-ui/lab/Alert';
 import Snackbar from '@material-ui/core/Snackbar';
 import copy from 'copy-to-clipboard';
+import { LOGOUT, UPDATE_USER } from '../lib/reducer';
 import { makeStyles } from '@material-ui/core';
 import { store } from '../lib/store';
 import { useDispatch } from 'react-redux';
@@ -33,6 +34,7 @@ const useStyles = makeStyles({
 export default function IndexPage() {
   const classes = useStyles();
   const router = useRouter();
+  const dispatch = useDispatch();
   const state = store.getState();
   const [alertMessage, setAlertMessage] = useState('Copied token!');
   const [tokenOpen, setTokenOpen] = useState(false);
@@ -58,6 +60,16 @@ export default function IndexPage() {
     }
   };
 
+  const handleLogout = async () => {
+    const data = await (await fetch('/api/user/logout', { method: 'POST' })).json();
+    if (!data.error && data.clearStore) {
+      dispatch({ type: LOGOUT });
+      dispatch({ type: UPDATE_USER, payload: null });
+      setAlertMessage('Logged out!');
+      setAlertOpen(true);
+      router.push('/login');
+    }
+  };
 
   if (typeof window !== 'undefined' && !state.loggedIn) router.push('/login');
   else {
@@ -143,7 +155,7 @@ export default function IndexPage() {
                 <Button variant="contained" color="primary" fullWidth>Update</Button>
               </Grid>
               <Grid item xs={6}>
-                <Button variant="contained" style={{ backgroundColor: "#d6381c", color: "white" }} fullWidth>Logout</Button>
+                <Button variant="contained" style={{ backgroundColor: "#d6381c", color: "white" }} fullWidth onClick={handleLogout}>Logout</Button>
               </Grid>
             </Grid>
           </div>
