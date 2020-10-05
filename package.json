@@ -16,6 +16,7 @@
     "fastify-cors": "^4.1.0",
     "fastify-decorators": "^3.2.3",
     "fastify-mongodb": "^2.0.1",
+    "fastify-multipart": "^3.2.0",
     "next": "^9.5.3",
     "next-redux-wrapper": "^6.0.2",
     "react": "^16.13.1",

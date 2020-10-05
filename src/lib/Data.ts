@@ -5,3 +5,10 @@ export interface User {
   administrator: boolean;
   _id?: any;
 }
+
+export interface Image {
+  id: string;
+  user: any;
+  views: number;
+  _id?: any;
+}
