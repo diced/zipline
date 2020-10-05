@@ -155,26 +155,26 @@ Every single configuration option will be listed here
 | `upload.fileLength` | integer | how long the random id for a file should be                  |
 | `upload.tempDir`    | string  | temporary directory, files are stored here and then deleted. |
 | `upload.uploadDir`  | string  | upload directory (where all uploads are stored)              |
-| `upload.route`      | string  | Route for uploads, default is /u, ex.`/u/hd27ua.png`              |
+| `upload.route`      | string  | Route for uploads, default is /u, ex.`/u/hd27ua.png`         |
 
 #### User Settings
 
 **Config Property:** `user`
 
-| Config Property     | Type    | Description / Expected Values                                |
-| ------------------- | ------- | ------------------------------------------------------------ |
-| `user.tokenLength`  | integer | How long the randomly generated user token should be         |
+| Config Property    | Type    | Description / Expected Values                        |
+| ------------------ | ------- | ---------------------------------------------------- |
+| `user.tokenLength` | integer | How long the randomly generated user token should be |
 
 #### Site Settings
 
 **Config Property:** `site`
 
-| Config Property | Type    | Description / Expected Values                          |
-| --------------- | ------- | ------------------------------------------------------ |
-| `site.protocol` | integer | protocol (http or https)                               |
-| `site.serveHTTP`   | string  | Port to run the web server on with HTTP (can be used with nginx + CloudFlare as a reverse proxy and let CloudFlare take care of SSL) |
-| `site.serveHTTPS`   | string  | Port to run the web server on with HTTPS (only will be used if `site.protocol` is `https`) (you will need SSL certificates! See [this](#site-ssl-settings)) |
-| `site.logRoutes` | boolean | Wether or not to log routes when they are requested      |
+| Config Property   | Type    | Description / Expected Values                                                                                                                               |
+| ----------------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `site.protocol`   | integer | protocol (http or https)                                                                                                                                    |
+| `site.serveHTTP`  | string  | Port to run the web server on with HTTP (can be used with nginx + CloudFlare as a reverse proxy and let CloudFlare take care of SSL)                        |
+| `site.serveHTTPS` | string  | Port to run the web server on with HTTPS (only will be used if `site.protocol` is `https`) (you will need SSL certificates! See [this](#site-ssl-settings)) |
+| `site.logRoutes`  | boolean | Wether or not to log routes when they are requested                                                                                                         |
 
 #### Site SSL Settings
 
@@ -182,16 +182,16 @@ Every single configuration option will be listed here
 
 | Config Property | Type   | Description / Expected Values                   |
 | --------------- | ------ | ----------------------------------------------- |
-| `site.ssl.key`       | string | path to ssl private key. ex: `./ssl/server.key` |
-| `site.ssl.cert`      | string | path to ssl certificate. ex: `./ssl/cert.crt`   |
+| `site.ssl.key`  | string | path to ssl private key. ex: `./ssl/server.key` |
+| `site.ssl.cert` | string | path to ssl certificate. ex: `./ssl/cert.crt`   |
 
 #### Administrator User
 
 **Config Property:** `administrator`
 
-| Config Property               | Type   | Description / Expected Values                                                                            |
-| ----------------------------- | ------ | -------------------------------------------------------------------------------------------------------- |
-| `administrator.password`      | string | password of administrator user (NOT RECOMENDED to use administrator user, set this to a SECURE password) |
+| Config Property          | Type   | Description / Expected Values                                                                            |
+| ------------------------ | ------ | -------------------------------------------------------------------------------------------------------- |
+| `administrator.password` | string | password of administrator user (NOT RECOMENDED to use administrator user, set this to a SECURE password) |
 
 #### Database Configuration
 
@@ -232,63 +232,60 @@ Particles.JS, can be enabled and it's config can be changed willingly.
 | `meta.favicon`  | string | has to be in /public/assets folder and should be formatted as `"/public/assets/<file name>"` |
 | `meta.title`    | string | title of your server shows up like `<title> - Login` or `<title> - Dashboard`                |
 
-
 ### Example Config
 
 ```json
 {
-    "upload": {
-        "fileLength": 6,
-        "tempDir": "./temp",
-        "uploadDir": "./uploads",
-        "route": "/u"
+  "upload": {
+    "fileLength": 6,
+    "tempDir": "./temp",
+    "uploadDir": "./uploads",
+    "route": "/u"
+  },
+  "shorten": {
+    "idLength": 4,
+    "route": "/s"
+  },
+  "user": {
+    "tokenLength": 32
+  },
+  "site": {
+    "protocol": "http",
+    "returnProtocol": "https",
+    "ssl": {
+      "key": "./ssl/server.key",
+      "cert": "./ssl/server.crt"
     },
-    "shorten": {
-        "idLength": 4,
-        "route": "/s"
-    },
-    "user": {
-        "tokenLength": 32
-    },
-    "site": {
-        "protocol": "http",
-        "returnProtocol": "https",
-        "ssl": {
-            "key": "./ssl/server.key",
-            "cert": "./ssl/server.crt"
-        },
-        "serveHTTPS": 8000,
-        "serveHTTP": 443,
-        "logRoutes": true
-    },
-    "administrator": {
-        "password": "1234"
-    },
-    "orm": {
-        "type": "postgres",
-        "host": "localhost",
-        "port": 5432,
-        "username": "user",
-        "password": "1234",
-        "database": "typex",
-        "synchronize": true,
-        "logging": false,
-        "entities": [
-            "out/src/entities/**/*.js"
-        ]
-    },
-    "sessionSecret": "1234",
-    "saltRounds": 10, // You might get an error if its over a certain number, so choose carefully.
-    "meta": {
-        "favicon": "/public/assets/typex_small_circle.png",
-        "title": "TypeX"
-    },
-    "discordWebhook": {
-        "enabled": true,
-        "url": "https://canary.discordapp.com/api/webhooks/id/token",
-        "username": "TypeX Logs",
-        "avatarURL": "https://domain/public/assets/typex_small_circle.png"
-    }
+    "serveHTTPS": 8000,
+    "serveHTTP": 443,
+    "logRoutes": true
+  },
+  "administrator": {
+    "password": "1234"
+  },
+  "orm": {
+    "type": "postgres",
+    "host": "localhost",
+    "port": 5432,
+    "username": "user",
+    "password": "1234",
+    "database": "typex",
+    "synchronize": true,
+    "logging": false,
+    "entities": ["out/src/entities/**/*.js"]
+  },
+  "sessionSecret": "1234",
+  "saltRounds": 10, // You might get an error if its over a certain number, so choose carefully.
+  "meta": {
+    "favicon": "/public/assets/typex_small_circle.png",
+    "title": "TypeX"
+  },
+  "discordWebhook": {
+    "enabled": true,
+    "url": "https://canary.discordapp.com/api/webhooks/id/token",
+    "username": "TypeX Logs",
+    "avatarURL": "https://domain/public/assets/typex_small_circle.png"
+  }
 }
 ```
 
@@ -315,16 +312,17 @@ These are the options you must pass when uploading a url or image/file
 ### Uploader
 
 | Property  | Value                               |
-|-----------|-------------------------------------|
+| --------- | ----------------------------------- |
 | URL       | `https://<DOMAIN>/api/upload`       |
 | Header    | `authorization: <TOKEN>`            |
 | Header    | `content-type: multipart/form-data` |
 | File name | `file`                              |
 
 ### URL Shortener
-| Property  | Value                               |
-|-----------|-------------------------------------|
-| URL       | `https://<DOMAIN>/api/shorten`      |
-| Header    | `authorization: <TOKEN>`            |
-| Header    | `content-type: application/json`    |
-| Data      | `{"url": "<URL>"}`                  |
+
+| Property | Value                            |
+| -------- | -------------------------------- |
+| URL      | `https://<DOMAIN>/api/shorten`   |
+| Header   | `authorization: <TOKEN>`         |
+| Header   | `content-type: application/json` |
+| Data     | `{"url": "<URL>"}`               |

@@ -1,84 +1,112 @@
-import { Controller, Middleware, Get, Post } from '@overnightjs/core';
-import { Request, Response } from 'express';
-import { ORMHandler } from '..';
-import { findFile, checkPassword } from '../util';
-import { readFileSync } from 'fs';
-import { cookies } from '../middleware/cookies';
-import Logger from '@ayanaware/logger';
+import { Controller, Middleware, Get, Post } from "@overnightjs/core";
+import { Request, Response } from "express";
+import { ORMHandler } from "..";
+import { findFile, checkPassword } from "../util";
+import { readFileSync } from "fs";
+import { cookies } from "../middleware/cookies";
+import Logger from "@ayanaware/logger";
 
-if (!findFile('config.json', process.cwd())) {
-  Logger.get('FS').error(`No config.json exists in the ${__dirname}, exiting...`)
+if (!findFile("config.json", process.cwd())) {
+  Logger.get("FS").error(
+    `No config.json exists in the ${__dirname}, exiting...`
+  );
   process.exit(1);
 }
 
-const config = JSON.parse(readFileSync(findFile('config.json', process.cwd()), 'utf8'))
+const config = JSON.parse(
+  readFileSync(findFile("config.json", process.cwd()), "utf8")
+);
 
-@Controller('')
+@Controller("")
 export class IndexController {
   public orm: ORMHandler;
 
-  @Get('')
+  @Get("")
   @Middleware(cookies)
   private async index(req: Request, res: Response) {
-    const images = await this.orm.repos.image.find({ where: { user: req.session.user.id } });
-    const users = await this.orm.repos.user.find({ order: { id: 'ASC' } });
+    const images = await this.orm.repos.image.find({
+      where: { user: req.session.user.id },
+    });
+    const users = await this.orm.repos.user.find({ order: { id: "ASC" } });
     const userImages = [];
     for (let i = 0; i < users.length; i++) {
-      userImages[i] = await (await this.orm.repos.image.find({where:{user:users[i].id}})).length
+      userImages[i] = await (
+        await this.orm.repos.image.find({ where: { user: users[i].id } })
+      ).length;
     }
-    return res.render('index', { user: req.session.user, images, users, userImages, config })
+    return res.render("index", {
+      user: req.session.user,
+      images,
+      users,
+      userImages,
+      config,
+    });
   }
 
-  @Get('login')
+  @Get("login")
   private async login(req: Request, res: Response) {
-    if (req.session.user || req.cookies.typex_user) return res.redirect('/');
-    return res.status(200).render('login', { failed: false, config })
+    if (req.session.user || req.cookies.typex_user) return res.redirect("/");
+    return res.status(200).render("login", { failed: false, config });
   }
 
-  @Get('logout')
+  @Get("logout")
   private async logout(req: Request, res: Response) {
-    Logger.get('TypeX.Auth').info(`User ${req.session.user?.username} (${req.session.user?.id}) logged out`)
+    Logger.get("TypeX.Auth").info(
+      `User ${req.session.user?.username} (${req.session.user?.id}) logged out`
+    );
     req.session.user = null;
-    res.clearCookie('typex_user');
-    res.redirect('/login');
+    res.clearCookie("typex_user");
+    res.redirect("/login");
   }
 
-  @Post('login')
+  @Post("login")
   private async postLogin(req: Request, res: Response) {
-    if (req.session.user || req.cookies.typex_user) return res.redirect('/');
-    if (req.body.username === 'administrator' && req.body.password === config.core.adminPassword) {
+    if (req.session.user || req.cookies.typex_user) return res.redirect("/");
+    if (
+      req.body.username === "administrator" &&
+      req.body.password === config.core.adminPassword
+    ) {
       //@ts-ignore
       req.session.user = {
         id: 0,
-        username: 'administrator',
+        username: "administrator",
         password: config.core.adminPassword,
-        administrator: true
-      }
-      res.cookie('typex_user', req.session.user.id, { maxAge: 1036800000 });
-      Logger.get('TypeX.Auth').info(`Administrator has logged in from IP ${req.headers['x-forwarded-for'] || req.connection.remoteAddress}`)
-      return res.redirect('/')
+        administrator: true,
+      };
+      res.cookie("typex_user", req.session.user.id, { maxAge: 1036800000 });
+      Logger.get("TypeX.Auth").info(
+        `Administrator has logged in from IP ${
+          req.headers["x-forwarded-for"] || req.connection.remoteAddress
+        }`
+      );
+      return res.redirect("/");
     }
-    const user = await this.orm.repos.user.findOne({ where: { username: req.body.username } });
-    if (!user) return res.status(200).render('login', { failed: true, config });
-    if (!checkPassword(req.body.password, user.password)) return res.status(200).render('login', { failed: true, config })
+    const user = await this.orm.repos.user.findOne({
+      where: { username: req.body.username },
+    });
+    if (!user) return res.status(200).render("login", { failed: true, config });
+    if (!checkPassword(req.body.password, user.password))
+      return res.status(200).render("login", { failed: true, config });
     req.session.user = user;
-    res.cookie('typex_user', req.session.user.id, { maxAge: 1036800000 });
-    return res.redirect('/');
+    res.cookie("typex_user", req.session.user.id, { maxAge: 1036800000 });
+    return res.redirect("/");
   }
 
   @Get(`${config.shortener.route.slice(1)}/:id`)
   private async getShorten(req: Request, res: Response) {
-    const shorten = await this.orm.repos.shorten.findOne({ key: req.params.id });
-    if (!shorten) return res.render('404');
+    const shorten = await this.orm.repos.shorten.findOne({
+      key: req.params.id,
+    });
+    if (!shorten) return res.render("404");
     shorten.clicks++;
     this.orm.repos.shorten.save(shorten);
-    return res.redirect(shorten.origin)
+    return res.redirect(shorten.origin);
   }
 
   @Get(`${config.notes.route.slice(1)}/:id`)
   private async getNote(req: Request, res: Response) {
     const note = await this.orm.repos.note.findOne({ key: req.params.id });
-    if (!note) return res.render('404');
+    if (!note) return res.render("404");
     return res.send(note.content);
   }
 

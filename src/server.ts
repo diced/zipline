@@ -12,22 +12,26 @@ import { APIController } from "./controllers/APIController";
 import { IndexController } from "./controllers/IndexController";
 import { findFile } from "./util";
 
-if (!findFile('config.json', process.cwd())) {
-  Logger.get('FS').error(`No config.json exists in the ${__dirname}, exiting...`)
+if (!findFile("config.json", process.cwd())) {
+  Logger.get("FS").error(
+    `No config.json exists in the ${__dirname}, exiting...`
+  );
   process.exit(1);
 }
 
-const config = JSON.parse(fs.readFileSync(findFile('config.json', process.cwd()), 'utf8'))
+const config = JSON.parse(
+  fs.readFileSync(findFile("config.json", process.cwd()), "utf8")
+);
 
 export class ZiplineServer extends Server {
   constructor(orm: ORMHandler) {
     super();
-    var p = 'loopback';
+    var p = "loopback";
     if (config.core.trustedProxy) {
-      p += ',' + config.core.trustedProxy;
+      p += "," + config.core.trustedProxy;
     }
     this.app.set("trust proxy", p);
-	this.app.set("view engine", "ejs");
+    this.app.set("view engine", "ejs");
     this.app.use(
       session({
         secret: config.core.sessionSecret,
@@ -37,17 +41,26 @@ export class ZiplineServer extends Server {
     );
     this.app.use(async (req, res, next) => {
       if (!req.url.startsWith(config.uploader.route)) return next();
-      const upload = await orm.repos.image.findOne({ url: `${config.secure ? "https" : "http"}://${req.headers['host']}${req.url}` });
+      const upload = await orm.repos.image.findOne({
+        url: `${config.secure ? "https" : "http"}://${req.headers["host"]}${
+          req.url
+        }`,
+      });
       if (!upload) return next();
       upload.views++;
       orm.repos.image.save(upload);
       return next();
-    })
+    });
     this.app.use(cookies());
     try {
-      this.app.use(config.uploader.route, express.static(config.uploader.upload));
+      this.app.use(
+        config.uploader.route,
+        express.static(config.uploader.upload)
+      );
     } catch (e) {
-      Logger.get('TypeX.Routes').error(`Could not formulate upload static route`)
+      Logger.get("TypeX.Routes").error(
+        `Could not formulate upload static route`
+      );
       process.exit(1);
     }
     this.app.use("/public", express.static("public"));
@@ -57,9 +70,15 @@ export class ZiplineServer extends Server {
       if (!config.core.log) return next();
       if (req.url.startsWith(config.uploader.route)) return next();
       let user = req.session.user;
-      const users = await orm.repos.user.find({ where: { token: req.headers['authorization'] } });
-      if (users[0]) user = users[0]
-      Logger.get('TypeX.Route').info(`Route ${req.url} was accessed by ${user ? user.username : '<no user found>'}`)
+      const users = await orm.repos.user.find({
+        where: { token: req.headers["authorization"] },
+      });
+      if (users[0]) user = users[0];
+      Logger.get("TypeX.Route").info(
+        `Route ${req.url} was accessed by ${
+          user ? user.username : "<no user found>"
+        }`
+      );
       return next();
     });
 
@@ -70,12 +89,12 @@ export class ZiplineServer extends Server {
     const api = new APIController().set(orm);
     const index = new IndexController().set(orm);
     super.addControllers([index, api]);
-    this.app.get('*', (req, res) => {
-      return res.status(200).render('404');
-    })
+    this.app.get("*", (req, res) => {
+      return res.status(200).render("404");
+    });
     this.app.use((err, req, res, next) => {
       Logger.get(this.app).error(err);
-      return res.status(500).render('error');
+      return res.status(500).render("error");
     });
   }
 
@@ -85,19 +104,31 @@ export class ZiplineServer extends Server {
       try {
         const creds = {
           key: fs.readFileSync(config.core.ssl.key, "utf-8"),
-          cert: fs.readFileSync(config.core.ssl.cert, "utf-8")
+          cert: fs.readFileSync(config.core.ssl.cert, "utf-8"),
         };
         server = https.createServer(creds, this.app);
       } catch (e) {
-        if (e.code === 'ENOENT') {
-          Logger.get('ZiplineServer.FS').error(`No file/directory found for ${e.path}`);
+        if (e.code === "ENOENT") {
+          Logger.get("ZiplineServer.FS").error(
+            `No file/directory found for ${e.path}`
+          );
           process.exit(1);
         }
       }
     } else server = http.createServer(this.app);
 
-    server.listen(config.core.secure ? config.core.port.secure : config.core.port.unsecure, () => {
-      Logger.get(ZiplineServer).info('Started server on port ' + String(config.core.secure ? config.core.port.secure : config.core.port.unsecure));
-    })
+    server.listen(
+      config.core.secure ? config.core.port.secure : config.core.port.unsecure,
+      () => {
+        Logger.get(ZiplineServer).info(
+          "Started server on port " +
+            String(
+              config.core.secure
+                ? config.core.port.secure
+                : config.core.port.unsecure
+            )
+        );
+      }
+    );
   }
 }

@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "mongodb": "^3.5.8",
-    "pg": "^8.0.3"
+    "pg": "^8.0.3",
+    "prettier": "2.1.2"
   }
 }
