@@ -5,12 +5,8 @@ import { Configuration } from './Config';
 const config = Configuration.readConfig();
 if (!config) process.exit(0);
 
-export function encrypt(data: any) {
-  return aes.encrypt(JSON.stringify(data), config.core.secret).toString();
-}
-
-export function decrypt(data: string) {
-  return aes.decrypt(data, config.core.secret).toString();
+export function createToken() {
+  return aes.encrypt(Math.random().toString(36).substr(2) + Date.now(), config.core.secret).toString();
 }
 
 export function encryptPassword(pass: string) {

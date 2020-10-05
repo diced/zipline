@@ -9,6 +9,7 @@
     "@material-ui/lab": "^4.0.0-alpha.56",
     "bcrypt": "^5.0.0",
     "clsx": "^1.1.1",
+    "copy-to-clipboard": "^3.3.1",
     "crypto-js": "^4.0.0",
     "fastify": "^3.5.0",
     "fastify-cookie": "^4.1.0",

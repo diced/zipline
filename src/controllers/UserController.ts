@@ -2,7 +2,7 @@ import { FastifyReply, FastifyRequest, FastifyInstance } from 'fastify';
 import { Controller, GET, POST, FastifyInstanceToken, Inject, Hook } from 'fastify-decorators';
 import { UserNotFoundError, MissingBodyData, LoginError, UserExistsError, NotAdministratorError } from '../lib/api/APIErrors';
 import { User } from '../lib/Data';
-import { checkPassword, decrypt, encrypt, encryptPassword } from '../lib/Encryption';
+import { checkPassword, createToken, encryptPassword } from '../lib/Encryption';
 
 @Controller('/api/user')
 export class UserController {
@@ -41,6 +41,18 @@ export class UserController {
       .send(user);
   }
 
+  @POST('/reset-token')
+  async resetToken(req: FastifyRequest, reply: FastifyReply) {
+    if (!req.cookies.zipline) throw new LoginError(`Not logged in.`);
+
+    const users = this.instance.mongo.db.collection('zipline_users');
+    const user: User = await users.findOne({ _id: new this.instance.mongo.ObjectId(req.cookies.zipline) });
+    if (!user) throw new UserNotFoundError(`User was not found.`);
+
+    users.updateOne({ _id: new this.instance.mongo.ObjectId(req.cookies.zipline) }, { $set: { token: createToken() } });
+    return reply.send({ updated: true });
+  }
+
   @POST('/create')
   async create(req: FastifyRequest<{ Body: { username: string, password: string, administrator: boolean } }>, reply: FastifyReply) {
     if (!req.body.username) throw new MissingBodyData(`Missing username.`);
@@ -54,6 +66,7 @@ export class UserController {
     const newUser: User = {
       username: req.body.username,
       password: encryptPassword(req.body.password),
+      token: createToken(),
       administrator: req.body.administrator
     };
 
