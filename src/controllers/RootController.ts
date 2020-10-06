@@ -4,13 +4,13 @@ import { UserNotFoundError, MissingBodyData, LoginError, UserExistsError, NotAdm
 import { User } from '../lib/Data';
 import { checkPassword, createToken, encryptPassword } from '../lib/Encryption';
 
-@Controller('/api/user')
-export class UserController {
+@Controller('/api')
+export class RootController {
   @Inject(FastifyInstanceToken)
   private instance!: FastifyInstance;
 
-  @GET('/login-status')
+  @POST('/upload')
   async loginStatus(req: FastifyRequest, reply: FastifyReply) {
-    return reply.send({ user: !!req.cookies.zipline });
+    console.log(req);
   }
 }

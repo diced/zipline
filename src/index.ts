@@ -2,13 +2,16 @@ import next from 'next';
 import fastify from 'fastify';
 import fastifyMongodb from 'fastify-mongodb';
 import fastifyCookies from 'fastify-cookie';
+import fasifyMultipart from 'fastify-multipart';
 import { bootstrap } from 'fastify-decorators';
-import { UserController } from './controllers/UserController';
+import { RootController } from './controllers/RootController';
 import { Console } from './lib/logger';
 import { AddressInfo } from 'net';
 import { ConsoleFormatter } from './lib/ConsoleFormatter';
 import { bold, green, reset } from '@dicedtomato/colors';
 import { Config, Configuration } from './lib/Config';
+import { UserController } from './controllers/UserController';
+import fastifyMultipart from 'fastify-multipart';
 
 Console.setFormatter(new ConsoleFormatter());
 
@@ -34,9 +37,11 @@ server.setNotFoundHandler((req, reply) => {
   return app.render404(req.raw, reply.raw).then(() => reply.sent = true);
 })
 
+
 server.register(bootstrap, {
   controllers: [
-    UserController
+    UserController,
+    RootController
   ],
 });
 
@@ -50,6 +55,8 @@ server.register(fastifyCookies, {
   secret: config.core.secret
 });
 
+//@ts-ignore
+server.register(fastifyMultipart);
 
 server.listen(config.core.port, err => {
   if (err) throw err;
