@@ -1,9 +1,9 @@
-import { REHYDRATE } from "redux-persist";
-import { User } from "./Data";
+/* eslint-disable indent */
+import { User } from '../entities/User';
 
-export const LOGIN = "LOGIN";
-export const LOGOUT = "LOGOUT";
-export const UPDATE_USER = "UPDATE_USER";
+export const LOGIN = 'LOGIN';
+export const LOGOUT = 'LOGOUT';
+export const UPDATE_USER = 'UPDATE_USER';
 export interface State {
   loggedIn: boolean;
   user: User;

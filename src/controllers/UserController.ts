@@ -1,64 +1,61 @@
-import { FastifyReply, FastifyRequest, FastifyInstance } from "fastify";
+import { FastifyReply, FastifyRequest, FastifyInstance } from 'fastify';
 import {
   Controller,
   GET,
   POST,
   FastifyInstanceToken,
   Inject,
-  Hook,
-} from "fastify-decorators";
-import { Repository } from "typeorm";
-import { User } from "../entities/User";
+} from 'fastify-decorators';
+import { Repository } from 'typeorm';
+import { User } from '../entities/User';
 import {
   UserNotFoundError,
   MissingBodyData,
   LoginError,
   UserExistsError,
-  NotAdministratorError,
-} from "../lib/api/APIErrors";
+} from '../lib/api/APIErrors';
 import {
   checkPassword,
   createBaseCookie,
   createToken,
-  encryptPassword,
   readBaseCookie,
-} from "../lib/Encryption";
+} from '../lib/Encryption';
 
-@Controller("/api/user")
+@Controller('/api/user')
 export class UserController {
   @Inject(FastifyInstanceToken)
   private instance!: FastifyInstance;
 
   private users: Repository<User> = this.instance.orm.getRepository(User);
 
-  @GET("/login-status")
+  @GET('/login-status')
   async loginStatus(req: FastifyRequest, reply: FastifyReply) {
     return reply.send({
       user: !!req.cookies.zipline,
     });
   }
 
-  @GET("/current")
+  @GET('/current')
   async currentUser(req: FastifyRequest, reply: FastifyReply) {
-    if (!req.cookies.zipline) throw new LoginError(`Not logged in.`);
+    if (!req.cookies.zipline) throw new LoginError('Not logged in.');
     const user = await this.users.findOne({
       where: {
         id: readBaseCookie(req.cookies.zipline),
       },
     });
-    if (!user) throw new UserExistsError(`User doesn't exist`);
+    if (!user) throw new UserExistsError('User doesn\'t exist');
     delete user.password;
     return reply.send(user);
   }
 
-  @POST("/login")
+  @POST('/login')
   async login(
     req: FastifyRequest<{ Body: { username: string; password: string } }>,
     reply: FastifyReply
   ) {
-    if (req.cookies.zipline) throw new LoginError(`Already logged in.`);
-    if (!req.body.username) throw new MissingBodyData(`Missing username.`);
-    if (!req.body.password) throw new MissingBodyData(`Missing uassword.`);
+    if (req.cookies.zipline) throw new LoginError('Already logged in.');
+    if (!req.body.username) throw new MissingBodyData('Missing username.');
+    if (!req.body.password) throw new MissingBodyData('Missing uassword.');
 
     const user = await this.users.findOne({
       where: {
@@ -69,27 +66,27 @@ export class UserController {
     if (!user)
       throw new UserNotFoundError(`User "${req.body.username}" was not found.`);
     if (!checkPassword(req.body.password, user.password))
-      throw new LoginError(`Wrong credentials!`);
+      throw new LoginError('Wrong credentials!');
     delete user.password;
 
     return reply
-      .setCookie("zipline", createBaseCookie(user.id), { path: "/" })
+      .setCookie('zipline', createBaseCookie(user.id), { path: '/' })
       .send(user);
   }
 
-  @POST("/logout")
+  @POST('/logout')
   async logout(req: FastifyRequest, reply: FastifyReply) {
-    if (!req.cookies.zipline) throw new LoginError(`Not logged in.`);
+    if (!req.cookies.zipline) throw new LoginError('Not logged in.');
     try {
-      reply.clearCookie("zipline", { path: "/" }).send({ clearStore: true });
+      reply.clearCookie('zipline', { path: '/' }).send({ clearStore: true });
     } catch (e) {
       reply.send({ clearStore: false });
     }
   }
 
-  @POST("/reset-token")
+  @POST('/reset-token')
   async resetToken(req: FastifyRequest, reply: FastifyReply) {
-    if (!req.cookies.zipline) throw new LoginError(`Not logged in.`);
+    if (!req.cookies.zipline) throw new LoginError('Not logged in.');
 
     const user = await this.users.findOne({
       where: {
@@ -97,7 +94,7 @@ export class UserController {
       },
     });
 
-    if (!user) throw new UserNotFoundError(`User was not found.`);
+    if (!user) throw new UserNotFoundError('User was not found.');
 
     user.token = createToken();
     this.users.save(user);
@@ -105,20 +102,20 @@ export class UserController {
     return reply.send({ updated: true });
   }
 
-  @POST("/create")
+  @POST('/create')
   async create(
     req: FastifyRequest<{
       Body: { username: string; password: string; administrator: boolean };
     }>,
     reply: FastifyReply
   ) {
-    if (!req.body.username) throw new MissingBodyData(`Missing username.`);
-    if (!req.body.password) throw new MissingBodyData(`Missing uassword.`);
+    if (!req.body.username) throw new MissingBodyData('Missing username.');
+    if (!req.body.password) throw new MissingBodyData('Missing uassword.');
 
     const existing = await this.users.findOne({
       where: { username: req.body.username },
     });
-    if (existing) throw new UserExistsError("User exists already");
+    if (existing) throw new UserExistsError('User exists already');
 
     try {
       const user = await this.users.save(
@@ -136,15 +133,15 @@ export class UserController {
     }
   }
 
-  @Hook("preValidation")
-  public async preValidation(req: FastifyRequest, reply: FastifyReply) {
-    // const adminRoutes = ['/api/user/create'];
-    // if (adminRoutes.includes(req.routerPath)) {
-    //   if (!req.cookies.zipline) return reply.send({ error: "You are not logged in" });
-    //   const admin = await this.instance.mongo.db.collection('zipline_users').findOne({ _id: req.cookies.zipline });
-    //   if (!admin) return reply.send({ error: "You are not an administrator" });
-    //   return;
-    // }
-    // return;
-  }
+  // @Hook('preValidation')
+  // public async preValidation(req: FastifyRequest, reply: FastifyReply) {
+  //   // const adminRoutes = ['/api/user/create'];
+  //   // if (adminRoutes.includes(req.routerPath)) {
+  //   //   if (!req.cookies.zipline) return reply.send({ error: "You are not logged in" });
+  //   //   const admin = await this.instance.mongo.db.collection('zipline_users').findOne({ _id: req.cookies.zipline });
+  //   //   if (!admin) return reply.send({ error: "You are not an administrator" });
+  //   //   return;
+  //   // }
+  //   // return;
+  // }
 }

@@ -1,2 +1,2 @@
-export * from "./Console";
-export * from "./Formatter";
+export * from './Console';
+export * from './Formatter';

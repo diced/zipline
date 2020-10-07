@@ -28,6 +28,8 @@
     "typeorm": "^0.2.28"
   },
   "scripts": {
+    "format": "prettier --write .",
+    "lint": "eslint .",
     "dev": "ts-node src",
     "build": "next build && tsc -p .",
     "start": "NODE_ENV=production node dist"
@@ -39,6 +41,10 @@
     "@types/node": "^14.11.2",
     "@types/react": "^16.9.49",
     "@types/react-redux": "^7.1.9",
+    "@typescript-eslint/eslint-plugin": "^4.4.0",
+    "@typescript-eslint/parser": "^4.4.0",
+    "eslint": "^7.10.0",
+    "eslint-plugin-react": "^7.21.3",
     "mongodb": "^3.6.2",
     "pg": "^8.4.0",
     "prettier": "2.1.2",

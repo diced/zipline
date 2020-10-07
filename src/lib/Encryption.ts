@@ -1,15 +1,15 @@
-import aes from "crypto-js/aes";
-import { compareSync, hashSync } from "bcrypt";
-import { Configuration } from "./Config";
+import aes from 'crypto-js/aes';
+import { compareSync, hashSync } from 'bcrypt';
+import { Configuration } from './Config';
 
 const config = Configuration.readConfig();
 if (!config) process.exit(0);
 
 export function createRandomId(
   length: number,
-  charset: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+  charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
 ) {
-  let result = "";
+  let result = '';
   for (let i = 0; i < length; i++)
     result += charset.charAt(Math.floor(Math.random() * charset.length));
   return result;
@@ -21,18 +21,18 @@ export function createToken() {
     .toString();
 }
 
-export function encryptPassword(pass: string) {
+export function encryptPassword(pass) {
   return hashSync(pass, 10);
 }
 
-export function checkPassword(will: string, equal: string) {
+export function checkPassword(will, equal) {
   return compareSync(will, equal);
 }
 
 export function createBaseCookie(id: number) {
-  return Buffer.from(id.toString()).toString("base64");
+  return Buffer.from(id.toString()).toString('base64');
 }
 
-export function readBaseCookie(data: string) {
-  return Buffer.from(data, "base64").toString();
+export function readBaseCookie(data) {
+  return Buffer.from(data, 'base64').toString();
 }

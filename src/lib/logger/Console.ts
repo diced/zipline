@@ -1,6 +1,7 @@
-import { Formatter, DefaultFormatter } from "./Formatter";
+import { Formatter, DefaultFormatter } from './Formatter';
 
 declare global {
+  // eslint-disable-next-line
   module NodeJS {
     interface Global {
       logr: { formatter: Formatter };
@@ -25,36 +26,37 @@ export class Console {
     this.name = name;
   }
 
-  public debug(message: string) {
+  public debug(message: string): string {
     return this.log(ConsoleLevel.DEBUG, message);
   }
 
-  public error(message: string) {
+  public error(message: string): string {
     return this.log(ConsoleLevel.ERROR, message);
   }
 
-  public info(message: string) {
+  public info(message: string): string {
     return this.log(ConsoleLevel.INFO, message);
   }
 
-  public trace(message: string) {
+  public trace(message: string): string {
     return this.log(ConsoleLevel.TRACE, message);
   }
 
-  public warn(message: string) {
+  public warn(message: string): string {
     return this.log(ConsoleLevel.WARN, message);
   }
 
-  public log(level: ConsoleLevel, message: string) {
+  public log(level: ConsoleLevel, message: string): string {
     const formatter = global.logr.formatter || new DefaultFormatter();
     console.log(formatter.format(message, this.name, level, new Date()));
     return formatter.format(message, this.name, level, new Date());
   }
 
-  public static setFormatter(formatter: Formatter) {
+  public static setFormatter(formatter: Formatter): void {
     global.logr.formatter = formatter;
   }
-  public static logger(o: string | Function) {
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  public static logger(o: string | Function): Console {
     const name = o instanceof Function ? o.name : o;
     return new Console(name);
   }

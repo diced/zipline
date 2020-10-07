@@ -1,5 +1,5 @@
-import { ConsoleLevel } from "./Console";
-import { brightGreen, blue } from "@dicedtomato/colors";
+import { ConsoleLevel } from './Console';
+import { brightGreen, blue } from '@dicedtomato/colors';
 
 export interface Formatter {
   format(
@@ -16,7 +16,7 @@ export class DefaultFormatter implements Formatter {
     origin: string,
     level: ConsoleLevel,
     time: Date
-  ) {
+  ): string {
     return `[${time.toLocaleString()}] ${brightGreen(origin)} - ${blue(
       ConsoleLevel[level]
     )}: ${message}`;
