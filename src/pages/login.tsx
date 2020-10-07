@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useRouter } from 'next/router';
 import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
@@ -7,13 +8,13 @@ import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
 import Snackbar from '@material-ui/core/Snackbar';
 import Grid from '@material-ui/core/Grid';
+import Alert from '@material-ui/lab/Alert';
+import UIPlaceholder from '../components/UIPlaceholder';
 import { makeStyles } from '@material-ui/core';
-import { useDispatch } from 'react-redux';
-import Router from 'next/router';
 import { store } from '../lib/store';
 import { UPDATE_USER, LOGIN } from '../lib/reducer';
-import UIPlaceholder from '../components/UIPlaceholder';
-import Alert from '@material-ui/lab/Alert';
+import { useDispatch } from 'react-redux';
+
 const useStyles = makeStyles({
   field: {
     width: '100%',
@@ -26,6 +27,7 @@ const useStyles = makeStyles({
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export default function LoginPage() {
   const classes = useStyles();
+  const router = useRouter();
   const dispatch = useDispatch();
   const state = store.getState();
   const [username, setUsername] = useState('');
@@ -48,13 +50,13 @@ export default function LoginPage() {
     if (!d.error) {
       dispatch({ type: UPDATE_USER, payload: d });
       dispatch({ type: LOGIN });
-      Router.push('/');
+      router.push('/');
     } else {
       setOpen(true);
     }
   };
 
-  if (state.loggedIn) Router.push('/');
+  if (state.loggedIn) router.push('/');
   else
     return (
       <div>

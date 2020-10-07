@@ -5,15 +5,13 @@ import Hidden from '@material-ui/core/Hidden';
 import IconButton from '@material-ui/core/IconButton';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
-import MenuIcon from '@material-ui/icons/Menu';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
+import MenuIcon from '@material-ui/icons/Menu';
 import Skeleton from '@material-ui/lab/Skeleton';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
-
-const drawerWidth = 240;
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -21,14 +19,14 @@ const useStyles = makeStyles(theme => ({
   },
   drawer: {
     [theme.breakpoints.up('sm')]: {
-      width: drawerWidth,
+      width: 240,
       flexShrink: 0,
     },
   },
   appBar: {
     [theme.breakpoints.up('sm')]: {
       width: 'calc(100%)',
-      marginLeft: drawerWidth,
+      marginLeft: 240,
     },
   },
   menuButton: {
@@ -40,7 +38,7 @@ const useStyles = makeStyles(theme => ({
   // necessary for content to be below app bar
   toolbar: theme.mixins.toolbar,
   drawerPaper: {
-    width: drawerWidth,
+    width: 240,
   },
   content: {
     flexGrow: 1,

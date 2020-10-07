@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Head from 'next/head';
-import { ThemeProvider } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
+import UIPlaceholder from '../components/UIPlaceholder';
+import { ThemeProvider } from '@material-ui/core/styles';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
-import theme from '../lib/theme';
 import { store, persistor } from '../lib/store';
-import UIPlaceholder from '../components/UIPlaceholder';
+import theme from '../lib/theme';
 
 export default function MyApp(props) {
   const { Component, pageProps } = props;
