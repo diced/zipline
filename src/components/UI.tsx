@@ -120,7 +120,7 @@ export default function UI({ children }) {
   );
 
   const container =
-    window !== undefined ? () => window.document.body : undefined;
+    typeof window !== 'undefined' ? () => window.document.body : undefined;
 
   return (
     <div className={classes.root}>
