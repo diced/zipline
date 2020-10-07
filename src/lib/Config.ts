@@ -1,9 +1,10 @@
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { parse } from 'toml';
+import { ConnectionOptions } from 'typeorm';
 
 export interface Config {
-  mongo: ConfigMongo;
+  database: ConnectionOptions;
   core: ConfigCore;
 }
 

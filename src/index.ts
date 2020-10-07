@@ -1,17 +1,17 @@
 import next from 'next';
 import fastify from 'fastify';
-import fastifyMongodb from 'fastify-mongodb';
+import fastifyTypeorm from 'fastify-typeorm-plugin';
 import fastifyCookies from 'fastify-cookie';
-import fasifyMultipart from 'fastify-multipart';
+import fastifyMultipart from 'fastify-multipart';
 import { bootstrap } from 'fastify-decorators';
 import { RootController } from './controllers/RootController';
 import { Console } from './lib/logger';
 import { AddressInfo } from 'net';
 import { ConsoleFormatter } from './lib/ConsoleFormatter';
 import { bold, green, reset } from '@dicedtomato/colors';
-import { Config, Configuration } from './lib/Config';
-import { UserController } from './controllers/UserController';
-import fastifyMultipart from 'fastify-multipart';
+import { Configuration } from './lib/Config';
+// import { UserController } from './controllers/UserController';
+
 
 Console.setFormatter(new ConsoleFormatter());
 
@@ -37,26 +37,31 @@ server.setNotFoundHandler((req, reply) => {
   return app.render404(req.raw, reply.raw).then(() => reply.sent = true);
 })
 
+server.register(fastifyMultipart);
+
+server.register(fastifyTypeorm, {
+  ...config.database,
+  entities: [dev ? './src/entities/**/*.ts' : './dist/entities/**/*.js'],
+  synchronize: true,
+  logging: false
+});
 
 server.register(bootstrap, {
   controllers: [
-    UserController,
+    // UserController,
     RootController
   ],
 });
 
-server.register(fastifyMongodb, {
-  forceClose: true,
-  url: config.mongo.url,
-  database: config.mongo.database
-});
+// server.register(fastifyMongodb, {
+//   forceClose: true,
+//   url: config.mongo.url,
+//   database: config.mongo.database
+// });
 
 server.register(fastifyCookies, {
   secret: config.core.secret
 });
-
-//@ts-ignore
-server.register(fastifyMultipart);
 
 server.listen(config.core.port, err => {
   if (err) throw err;
