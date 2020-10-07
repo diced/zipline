@@ -17,6 +17,7 @@
     "fastify-decorators": "^3.2.3",
     "fastify-mongodb": "^2.0.1",
     "fastify-multipart": "^3.2.0",
+    "fastify-static": "^3.2.1",
     "fastify-typeorm-plugin": "^2.1.2",
     "next": "^9.5.3",
     "react": "^16.13.1",

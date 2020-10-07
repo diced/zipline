@@ -10,11 +10,13 @@ import { ConsoleFormatter } from './lib/ConsoleFormatter';
 import { bold, green, reset } from '@dicedtomato/colors';
 import { Configuration } from './lib/Config';
 import { UserController } from './controllers/UserController';
+import { RootController } from './controllers/RootController';
 
 Console.setFormatter(new ConsoleFormatter());
 
 const config = Configuration.readConfig();
 if (!config) process.exit(0);
+
 const server = fastify({});
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev, quiet: dev });
@@ -24,16 +26,19 @@ Console.logger('Next').info('Preparing app');
 app.prepare();
 
 if (dev)
-  server.get('/_next/*', (req, reply) => {
-    return handle(req.raw, reply.raw).then(() => (reply.sent = true));
+  server.get('/_next/*', async (req, reply) => {
+    await handle(req.raw, reply.raw);
+    return (reply.sent = true);
   });
 
-server.all('/*', (req, reply) => {
-  return handle(req.raw, reply.raw).then(() => (reply.sent = true));
+server.all('/*', async (req, reply) => {
+  await handle(req.raw, reply.raw);
+  return (reply.sent = true);
 });
 
-server.setNotFoundHandler((req, reply) => {
-  return app.render404(req.raw, reply.raw).then(() => (reply.sent = true));
+server.setNotFoundHandler(async (req, reply) => {
+  await app.render404(req.raw, reply.raw);
+  return (reply.sent = true);
 });
 
 server.register(fastifyMultipart);
@@ -46,7 +51,7 @@ server.register(fastifyTypeorm, {
 });
 
 server.register(bootstrap, {
-  controllers: [UserController],
+  controllers: [UserController, RootController],
 });
 
 server.register(fastifyCookies, {
