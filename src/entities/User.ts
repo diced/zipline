@@ -2,7 +2,6 @@ import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 
 @Entity()
 export class User {
-
   @PrimaryGeneratedColumn()
   public id: number;
 
@@ -18,7 +17,12 @@ export class User {
   @Column("text")
   public token: string;
 
-  public constructor(username: string, password: string, token: string, administrator: boolean = false) {
+  public constructor(
+    username: string,
+    password: string,
+    token: string,
+    administrator: boolean = false
+  ) {
     this.username = username;
     this.password = password;
     this.administrator = administrator;

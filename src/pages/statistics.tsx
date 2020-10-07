@@ -1,5 +1,5 @@
-import UI from '../components/UI';
-import { Typography } from '@material-ui/core';
+import UI from "../components/UI";
+import { Typography } from "@material-ui/core";
 
 export default function MyApp(props) {
   return (
@@ -8,5 +8,5 @@ export default function MyApp(props) {
         <Typography>stater</Typography>
       </UI>
     </div>
-  )
+  );
 }

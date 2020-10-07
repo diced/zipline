@@ -1,0 +1,4 @@
+.next
+dist
+node_modules
+Zipline.toml

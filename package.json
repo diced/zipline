@@ -41,6 +41,7 @@
     "@types/react-redux": "^7.1.9",
     "mongodb": "^3.6.2",
     "pg": "^8.4.0",
+    "prettier": "2.1.2",
     "ts-node": "^9.0.0",
     "typescript": "^4.0.3"
   }

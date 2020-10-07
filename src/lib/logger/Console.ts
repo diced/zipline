@@ -15,9 +15,8 @@ export enum ConsoleLevel {
   ERROR,
   INFO,
   TRACE,
-  WARN
+  WARN,
 }
-
 
 export class Console {
   public name: string;

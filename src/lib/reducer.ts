@@ -6,13 +6,12 @@ export const LOGOUT = "LOGOUT";
 export const UPDATE_USER = "UPDATE_USER";
 export interface State {
   loggedIn: boolean;
-  user: User
+  user: User;
 }
-
 
 const initialState: State = {
   loggedIn: false,
-  user: null
+  user: null,
 };
 
 export function reducer(state: State = initialState, action) {

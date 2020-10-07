@@ -1,7 +1,7 @@
-import { readFileSync } from 'fs';
-import { resolve } from 'path';
-import { parse } from 'toml';
-import { ConnectionOptions } from 'typeorm';
+import { readFileSync } from "fs";
+import { resolve } from "path";
+import { parse } from "toml";
+import { ConnectionOptions } from "typeorm";
 
 export interface Config {
   database: ConnectionOptions;
@@ -21,7 +21,7 @@ export interface ConfigCore {
 export class Configuration {
   static readConfig(): Config {
     try {
-      const data = readFileSync(resolve(process.cwd(), "Zipline.toml"), 'utf8');
+      const data = readFileSync(resolve(process.cwd(), "Zipline.toml"), "utf8");
       return parse(data) as Config;
     } catch (e) {
       console.log(e);
