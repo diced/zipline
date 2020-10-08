@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import AppBar from '@material-ui/core/AppBar';
 import Drawer from '@material-ui/core/Drawer';
@@ -38,7 +36,7 @@ const useStyles = makeStyles(theme => ({
     },
   },
   rightButton: {
-    marginLeft: 'auto'
+    marginLeft: 'auto',
   },
   // necessary for content to be below app bar
   toolbar: theme.mixins.toolbar,
@@ -175,4 +173,3 @@ export default function UIPlaceholder() {
     </div>
   );
 }
-

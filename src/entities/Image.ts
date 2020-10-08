@@ -11,10 +11,7 @@ export class Image {
   @Column('bigint', { default: '0' })
   public views: number;
 
-  public constructor(
-    id: string,
-    user: number
-  ) {
+  public constructor(id: string, user: number) {
     this.id = id;
     this.user = user;
     this.views = 0;

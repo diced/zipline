@@ -18,11 +18,11 @@ const theme = createMuiTheme({
     MuiListItem: {
       root: {
         '&$selected': {
-          backgroundColor: '#0c051c80'
-        }
-      }
-    }
-  }
+          backgroundColor: '#0c051c80',
+        },
+      },
+    },
+  },
 });
 
 export default theme;

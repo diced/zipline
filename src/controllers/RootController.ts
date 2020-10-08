@@ -28,12 +28,13 @@ export class RootController {
 
   @POST('/upload')
   async loginStatus(req: FastifyRequest, reply: FastifyReply) {
-    if (!req.headers.authorization) return new AuthError('No authorization header!');
+    if (!req.headers.authorization)
+      return new AuthError('No authorization header!');
 
     const user = await this.users.findOne({
       where: {
-        token: req.headers.authorization
-      }
+        token: req.headers.authorization,
+      },
     });
     if (!user) return new AuthError('Incorrect token!');
 
@@ -41,7 +42,8 @@ export class RootController {
     //@ts-ignore stupid multipart types smh
     const data: Multipart = await req.file();
 
-    if (!existsSync(config.uploader.directory)) mkdirSync(config.uploader.directory);
+    if (!existsSync(config.uploader.directory))
+      mkdirSync(config.uploader.directory);
 
     const ext = data.filename.split('.')[1];
     const fileName = createRandomId(config.uploader.length);
@@ -50,6 +52,8 @@ export class RootController {
     this.images.save(new Image(fileName, user.id));
 
     data.file.pipe(createWriteStream(path));
-    reply.send(`${req.protocol}://${req.hostname}${config.uploader.route}/${fileName}.${ext}`);
+    reply.send(
+      `${req.protocol}://${req.hostname}${config.uploader.route}/${fileName}.${ext}`
+    );
   }
 }

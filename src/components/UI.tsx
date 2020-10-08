@@ -27,22 +27,24 @@ import LinkIcon from '@material-ui/icons/Link';
 import MenuIcon from '@material-ui/icons/Menu';
 import ProfileIcon from '@material-ui/icons/AccountCircle';
 import copy from 'copy-to-clipboard';
+import { LOGOUT, UPDATE_USER } from '../lib/reducer';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { useRouter } from 'next/router';
+import { useDispatch } from 'react-redux';
 
 const drawerWidth = 240;
 
 const useStyles = makeStyles(theme => ({
   root: {
     display: 'flex',
-    flexGrow: 1
+    flexGrow: 1,
   },
   drawer: {
     [theme.breakpoints.up('sm')]: {
       width: drawerWidth,
-      flexShrink: 0
+      flexShrink: 0,
     },
-    outlineColor: '#fff'
+    outlineColor: '#fff',
   },
   appBar: {
     display: 'flex',
@@ -58,7 +60,7 @@ const useStyles = makeStyles(theme => ({
     },
   },
   rightButton: {
-    marginLeft: 'auto'
+    marginLeft: 'auto',
   },
   // necessary for content to be below app bar
   toolbar: theme.mixins.toolbar,
@@ -75,6 +77,7 @@ export default function UI({ children }) {
   const classes = useStyles();
   const theme = useTheme();
   const router = useRouter();
+  const dispatch = useDispatch();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [alertMessage, setAlertMessage] = useState('Copied token!');
@@ -136,21 +139,19 @@ export default function UI({ children }) {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant='h6'>
-            Zipline
-          </Typography>
+          <Typography variant='h6'>Zipline</Typography>
           <IconButton
-            aria-label="account of current user"
-            aria-controls="menu-appbar"
-            aria-haspopup="true"
-            onClick={(event) => setAnchorEl(event.currentTarget)}
-            color="inherit"
+            aria-label='account of current user'
+            aria-controls='menu-appbar'
+            aria-haspopup='true'
+            onClick={event => setAnchorEl(event.currentTarget)}
+            color='inherit'
             className={classes.rightButton}
           >
             <ProfileIcon className={classes.rightButton} />
           </IconButton>
           <Menu
-            id="menu-appbar"
+            id='menu-appbar'
             anchorEl={anchorEl}
             anchorOrigin={{
               vertical: 'top',
@@ -164,11 +165,14 @@ export default function UI({ children }) {
             open={open}
             onClose={() => setAnchorEl(null)}
           >
-            <Link href="/manage">
-              <MenuItem onClick={() => setAnchorEl(null)}>Manage Profile</MenuItem>
+            <Link href='/manage'>
+              <MenuItem onClick={() => setAnchorEl(null)}>
+                Manage Profile
+              </MenuItem>
             </Link>
             <MenuItem onClick={() => setTokenOpen(true)}>Copy Token</MenuItem>
             <MenuItem onClick={() => setResetToken(true)}>Reset Token</MenuItem>
+            <MenuItem onClick={handleLogout}>Logout</MenuItem>
           </Menu>
         </Toolbar>
       </AppBar>
@@ -183,7 +187,11 @@ export default function UI({ children }) {
           </ListItem>
         </Link>
         <Link href='/statistics'>
-          <ListItem button key='Statistics' selected={router.pathname === '/statistics'}>
+          <ListItem
+            button
+            key='Statistics'
+            selected={router.pathname === '/statistics'}
+          >
             <ListItemIcon>
               <DataUsageIcon />
             </ListItemIcon>
@@ -191,7 +199,11 @@ export default function UI({ children }) {
           </ListItem>
         </Link>
         <Link href='/images'>
-          <ListItem button key='Images' selected={router.pathname === '/images'}>
+          <ListItem
+            button
+            key='Images'
+            selected={router.pathname === '/images'}
+          >
             <ListItemIcon>
               <PhotoIcon />
             </ListItemIcon>
@@ -207,7 +219,7 @@ export default function UI({ children }) {
           </ListItem>
         </Link>
       </List>
-    </div >
+    </div>
   );
 
   const container =
@@ -237,21 +249,17 @@ export default function UI({ children }) {
         <DialogTitle id='alert-dialog-title'>Are you sure?</DialogTitle>
         <DialogContent>
           <DialogContentText id='alert-dialog-description'>
-            This token is used to upload images to Zipline, and should not
-            be shared!
-                </DialogContentText>
+            This token is used to upload images to Zipline, and should not be
+            shared!
+          </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setTokenOpen(false)} color='primary'>
             Close
-                </Button>
-          <Button
-            onClick={handleCopyTokenThenClose}
-            color='primary'
-            autoFocus
-          >
+          </Button>
+          <Button onClick={handleCopyTokenThenClose} color='primary' autoFocus>
             Yes, copy!
-                </Button>
+          </Button>
         </DialogActions>
       </Dialog>
       <Dialog
@@ -263,22 +271,18 @@ export default function UI({ children }) {
         <DialogTitle id='alert-dialog-title'>Are you sure?</DialogTitle>
         <DialogContent>
           <DialogContentText id='alert-dialog-description'>
-            This token is used to upload images to Zipline, resetting your
-            token will cause any uploading actions to not work until you
-            update them your self.
-                </DialogContentText>
+            This token is used to upload images to Zipline, resetting your token
+            will cause any uploading actions to not work until you update them
+            your self.
+          </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setResetToken(false)} color='primary'>
             Close
-                </Button>
-          <Button
-            onClick={handleResetTokenThenClose}
-            color='primary'
-            autoFocus
-          >
+          </Button>
+          <Button onClick={handleResetTokenThenClose} color='primary' autoFocus>
             Yes, reset!
-                </Button>
+          </Button>
         </DialogActions>
       </Dialog>
       <AppBar position='fixed' className={classes.appBar} elevation={0}>
@@ -292,9 +296,7 @@ export default function UI({ children }) {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant='h6'>
-            Zipline
-          </Typography>
+          <Typography variant='h6'>Zipline</Typography>
         </Toolbar>
       </AppBar>
       <nav className={classes.drawer} aria-label='mailbox folders'>
@@ -337,4 +339,3 @@ export default function UI({ children }) {
     </div>
   );
 }
-

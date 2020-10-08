@@ -64,8 +64,10 @@ export class UserController {
       },
     });
 
-    if (!user) throw new UserNotFoundError(`User "${req.body.username}" was not found.`);
-    if (!checkPassword(req.body.password, user.password)) throw new LoginError('Wrong credentials!');
+    if (!user)
+      throw new UserNotFoundError(`User "${req.body.username}" was not found.`);
+    if (!checkPassword(req.body.password, user.password))
+      throw new LoginError('Wrong credentials!');
     delete user.password;
 
     reply.setCookie('zipline', createBaseCookie(user.id), { path: '/' });

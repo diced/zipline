@@ -62,7 +62,7 @@ server.register(fastifyCookies, {
 
 server.register(fastifyStatic, {
   root: join(process.cwd(), config.uploader.directory),
-  prefix: config.uploader.route
+  prefix: config.uploader.route,
 });
 
 server.listen(config.core.port, err => {
