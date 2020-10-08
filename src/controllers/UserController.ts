@@ -18,6 +18,7 @@ import {
   checkPassword,
   createBaseCookie,
   createToken,
+  encryptPassword,
   readBaseCookie,
 } from '../lib/Encryption';
 
@@ -59,26 +60,24 @@ export class UserController {
 
     const user = await this.users.findOne({
       where: {
-        id: readBaseCookie(req.cookies.zipline),
+        username: req.body.username,
       },
     });
 
-    if (!user)
-      throw new UserNotFoundError(`User "${req.body.username}" was not found.`);
-    if (!checkPassword(req.body.password, user.password))
-      throw new LoginError('Wrong credentials!');
+    if (!user) throw new UserNotFoundError(`User "${req.body.username}" was not found.`);
+    if (!checkPassword(req.body.password, user.password)) throw new LoginError('Wrong credentials!');
     delete user.password;
 
-    return reply
-      .setCookie('zipline', createBaseCookie(user.id), { path: '/' })
-      .send(user);
+    reply.setCookie('zipline', createBaseCookie(user.id), { path: '/' });
+    return reply.send(user);
   }
 
   @POST('/logout')
   async logout(req: FastifyRequest, reply: FastifyReply) {
     if (!req.cookies.zipline) throw new LoginError('Not logged in.');
     try {
-      reply.clearCookie('zipline', { path: '/' }).send({ clearStore: true });
+      reply.clearCookie('zipline', { path: '/' });
+      return reply.send({ clearStore: true });
     } catch (e) {
       reply.send({ clearStore: false });
     }
@@ -121,7 +120,7 @@ export class UserController {
       const user = await this.users.save(
         new User(
           req.body.username,
-          req.body.password,
+          encryptPassword(req.body.password),
           createToken(),
           req.body.administrator || false
         )

@@ -1,21 +1,28 @@
 import { createMuiTheme } from '@material-ui/core/styles';
-import { red } from '@material-ui/core/colors';
 
-// Create a theme instance.
 const theme = createMuiTheme({
   palette: {
     type: 'dark',
     primary: {
-      main: '#1a237e',
+      main: '#2f2c8a',
     },
     secondary: {
       main: '#4a148c',
     },
     background: {
-      default: '#091030',
-      paper: '#0d1640'
+      default: '#0c051c',
+      paper: '#190c36',
     },
   },
+  overrides: {
+    MuiListItem: {
+      root: {
+        '&$selected': {
+          backgroundColor: '#0c051c80'
+        }
+      }
+    }
+  }
 });
 
 export default theme;

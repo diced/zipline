@@ -3,6 +3,7 @@ import Link from 'next/link';
 import AppBar from '@material-ui/core/AppBar';
 import Drawer from '@material-ui/core/Drawer';
 import Hidden from '@material-ui/core/Hidden';
+import Button from '@material-ui/core/Button';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
@@ -15,21 +16,26 @@ import DataUsageIcon from '@material-ui/icons/DataUsage';
 import PhotoIcon from '@material-ui/icons/Photo';
 import LinkIcon from '@material-ui/icons/Link';
 import MenuIcon from '@material-ui/icons/Menu';
+import ProfileIcon from '@material-ui/icons/AccountCircle';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { useRouter } from 'next/router';
 
 const drawerWidth = 240;
 
 const useStyles = makeStyles(theme => ({
   root: {
     display: 'flex',
+    flexGrow: 1
   },
   drawer: {
     [theme.breakpoints.up('sm')]: {
       width: drawerWidth,
-      flexShrink: 0,
+      flexShrink: 0
     },
+    outlineColor: '#fff'
   },
   appBar: {
+    display: 'flex',
     [theme.breakpoints.up('sm')]: {
       width: 'calc(100%)',
       marginLeft: drawerWidth,
@@ -55,6 +61,7 @@ const useStyles = makeStyles(theme => ({
 export default function UI({ children }) {
   const classes = useStyles();
   const theme = useTheme();
+  const router = useRouter();
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
   const handleDrawerToggle = () => {
@@ -63,68 +70,8 @@ export default function UI({ children }) {
 
   const drawer = (
     <div>
-      <Toolbar>
-        <AppBar position='fixed' className={classes.appBar}>
-          <Toolbar>
-            <IconButton
-              color='inherit'
-              aria-label='open drawer'
-              edge='start'
-              onClick={handleDrawerToggle}
-              className={classes.menuButton}
-            >
-              <MenuIcon />
-            </IconButton>
-            <Typography variant='h6' noWrap>
-              Zipline
-            </Typography>
-          </Toolbar>
-        </AppBar>
-      </Toolbar>
-
-      <List>
-        <Link href='/'>
-          <ListItem button key='Home'>
-            <ListItemIcon>
-              <HomeIcon />
-            </ListItemIcon>
-            <ListItemText primary='Home' />
-          </ListItem>
-        </Link>
-        <Link href='/statistics'>
-          <ListItem button key='Statistics'>
-            <ListItemIcon>
-              <DataUsageIcon />
-            </ListItemIcon>
-            <ListItemText primary='Statistics' />
-          </ListItem>
-        </Link>
-        <Link href='/images'>
-          <ListItem button key='Images'>
-            <ListItemIcon>
-              <PhotoIcon />
-            </ListItemIcon>
-            <ListItemText primary='Images' />
-          </ListItem>
-        </Link>
-        <Link href='/urls'>
-          <ListItem button key='URLs'>
-            <ListItemIcon>
-              <LinkIcon />
-            </ListItemIcon>
-            <ListItemText primary='URLs' />
-          </ListItem>
-        </Link>
-      </List>
-    </div>
-  );
-
-  const container =
-    typeof window !== 'undefined' ? () => window.document.body : undefined;
-
-  return (
-    <div className={classes.root}>
-      <AppBar position='fixed' className={classes.appBar}>
+      <Toolbar />
+      <AppBar position='fixed' className={classes.appBar} elevation={0}>
         <Toolbar>
           <IconButton
             color='inherit'
@@ -135,9 +82,74 @@ export default function UI({ children }) {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant='h6' noWrap>
+          <Typography variant='h6'>
             Zipline
           </Typography>
+          <Typography variant='h6' style={{ float: 'right' }}>
+            Zipline
+          </Typography>
+        </Toolbar>
+      </AppBar>
+
+      <List>
+        <Link href='/'>
+          <ListItem button key='Home' selected={router.pathname === '/'}>
+            <ListItemIcon>
+              <HomeIcon />
+            </ListItemIcon>
+            <ListItemText primary='Home' />
+          </ListItem>
+        </Link>
+        <Link href='/statistics'>
+          <ListItem button key='Statistics' selected={router.pathname === '/statistics'}>
+            <ListItemIcon>
+              <DataUsageIcon />
+            </ListItemIcon>
+            <ListItemText primary='Statistics' />
+          </ListItem>
+        </Link>
+        <Link href='/images'>
+          <ListItem button key='Images' selected={router.pathname === '/images'}>
+            <ListItemIcon>
+              <PhotoIcon />
+            </ListItemIcon>
+            <ListItemText primary='Images' />
+          </ListItem>
+        </Link>
+        <Link href='/urls'>
+          <ListItem button key='URLs' selected={router.pathname === '/urls'}>
+            <ListItemIcon>
+              <LinkIcon />
+            </ListItemIcon>
+            <ListItemText primary='URLs' />
+          </ListItem>
+        </Link>
+      </List>
+    </div >
+  );
+
+  const container =
+    typeof window !== 'undefined' ? () => window.document.body : undefined;
+
+  return (
+    <div className={classes.root}>
+      <AppBar position='fixed' className={classes.appBar} elevation={0}>
+        <Toolbar>
+          <IconButton
+            color='inherit'
+            aria-label='open drawer'
+            edge='start'
+            onClick={handleDrawerToggle}
+            className={classes.menuButton}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Typography variant='h6'>
+            Zipline
+          </Typography>
+          <IconButton style={{ float: 'right' }}>
+            <ProfileIcon />
+          </IconButton>
         </Toolbar>
       </AppBar>
       <nav className={classes.drawer} aria-label='mailbox folders'>
@@ -151,6 +163,7 @@ export default function UI({ children }) {
             classes={{
               paper: classes.drawerPaper,
             }}
+            style={{ border: 'none' }}
             ModalProps={{
               keepMounted: true, // Better open performance on mobile.
             }}
@@ -163,6 +176,7 @@ export default function UI({ children }) {
             classes={{
               paper: classes.drawerPaper,
             }}
+            PaperProps={{ style: { border: 'none' } }}
             variant='permanent'
             open
           >

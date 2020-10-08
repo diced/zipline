@@ -21,7 +21,7 @@ export function createToken() {
     .toString();
 }
 
-export function encryptPassword(pass) {
+export function encryptPassword(pass: string) {
   return hashSync(pass, 10);
 }
 

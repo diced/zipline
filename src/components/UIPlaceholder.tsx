@@ -61,7 +61,7 @@ export default function UIPlaceholder() {
   const drawer = (
     <div>
       <Toolbar>
-        <AppBar position='fixed' className={classes.appBar}>
+        <AppBar position='fixed' className={classes.appBar} elevation={0}>
           <Toolbar>
             <IconButton
               color='inherit'
@@ -101,7 +101,7 @@ export default function UIPlaceholder() {
 
   return (
     <div className={classes.root}>
-      <AppBar position='fixed' className={classes.appBar}>
+      <AppBar position='fixed' className={classes.appBar} elevation={0}>
         <Toolbar>
           <IconButton
             color='inherit'
@@ -142,6 +142,7 @@ export default function UIPlaceholder() {
             }}
             variant='permanent'
             open
+            PaperProps={{ style: { border: 'none' } }}
           >
             {drawer}
           </Drawer>

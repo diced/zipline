@@ -3,6 +3,7 @@ import fastify from 'fastify';
 import fastifyTypeorm from 'fastify-typeorm-plugin';
 import fastifyCookies from 'fastify-cookie';
 import fastifyMultipart from 'fastify-multipart';
+import fastifyStatic from 'fastify-static';
 import { bootstrap } from 'fastify-decorators';
 import { Console } from './lib/logger';
 import { AddressInfo } from 'net';
@@ -11,6 +12,7 @@ import { bold, green, reset } from '@dicedtomato/colors';
 import { Configuration } from './lib/Config';
 import { UserController } from './controllers/UserController';
 import { RootController } from './controllers/RootController';
+import { join } from 'path';
 
 Console.setFormatter(new ConsoleFormatter());
 
@@ -56,6 +58,11 @@ server.register(bootstrap, {
 
 server.register(fastifyCookies, {
   secret: config.core.secret,
+});
+
+server.register(fastifyStatic, {
+  root: join(process.cwd(), config.uploader.directory),
+  prefix: config.uploader.route
 });
 
 server.listen(config.core.port, err => {

@@ -6,11 +6,13 @@ import { ConnectionOptions } from 'typeorm';
 export interface Config {
   database: ConnectionOptions;
   core: ConfigCore;
+  uploader: ConfigUploader;
 }
 
-export interface ConfigMongo {
-  url: string;
-  database: string;
+export interface ConfigUploader {
+  directory: string;
+  route: string;
+  length: number;
 }
 
 export interface ConfigCore {
