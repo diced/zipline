@@ -25,7 +25,10 @@ import DataUsageIcon from '@material-ui/icons/DataUsage';
 import PhotoIcon from '@material-ui/icons/Photo';
 import LinkIcon from '@material-ui/icons/Link';
 import MenuIcon from '@material-ui/icons/Menu';
-import ProfileIcon from '@material-ui/icons/AccountCircle';
+import AccountCircleIcon from '@material-ui/icons/AccountCircle';
+import FileCopyIcon from '@material-ui/icons/FileCopy';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import RotateLeftIcon from '@material-ui/icons/RotateLeft';
 import copy from 'copy-to-clipboard';
 import { LOGOUT, UPDATE_USER } from '../lib/reducer';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
@@ -71,6 +74,9 @@ const useStyles = makeStyles(theme => ({
     flexGrow: 1,
     padding: theme.spacing(3),
   },
+  menuIcon: {
+    marginRight: '10px'
+  }
 }));
 
 export default function UI({ children }) {
@@ -148,7 +154,7 @@ export default function UI({ children }) {
             color='inherit'
             className={classes.rightButton}
           >
-            <ProfileIcon className={classes.rightButton} />
+            <AccountCircleIcon className={classes.rightButton} />
           </IconButton>
           <Menu
             id='menu-appbar'
@@ -167,12 +173,13 @@ export default function UI({ children }) {
           >
             <Link href='/manage'>
               <MenuItem onClick={() => setAnchorEl(null)}>
+                <AccountCircleIcon className={classes.menuIcon} />
                 Manage Profile
               </MenuItem>
             </Link>
-            <MenuItem onClick={() => setTokenOpen(true)}>Copy Token</MenuItem>
-            <MenuItem onClick={() => setResetToken(true)}>Reset Token</MenuItem>
-            <MenuItem onClick={handleLogout}>Logout</MenuItem>
+            <MenuItem onClick={() => setTokenOpen(true)}><FileCopyIcon className={classes.menuIcon} /> Copy Token</MenuItem>
+            <MenuItem onClick={() => setResetToken(true)}><RotateLeftIcon className={classes.menuIcon} /> Reset Token</MenuItem>
+            <MenuItem onClick={handleLogout}><ExitToAppIcon className={classes.menuIcon} /> Logout</MenuItem>
           </Menu>
         </Toolbar>
       </AppBar>
