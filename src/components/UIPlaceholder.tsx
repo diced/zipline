@@ -1,3 +1,5 @@
+
+
 import React from 'react';
 import AppBar from '@material-ui/core/AppBar';
 import Drawer from '@material-ui/core/Drawer';
@@ -34,6 +36,9 @@ const useStyles = makeStyles(theme => ({
     [theme.breakpoints.up('sm')]: {
       display: 'none',
     },
+  },
+  rightButton: {
+    marginLeft: 'auto'
   },
   // necessary for content to be below app bar
   toolbar: theme.mixins.toolbar,
@@ -75,6 +80,9 @@ export default function UIPlaceholder() {
             <Typography variant='h6' noWrap>
               Zipline
             </Typography>
+            <div className={classes.rightButton}>
+              <Skeleton animation='wave' className={classes.fullWidth} />
+            </div>
           </Toolbar>
         </AppBar>
       </Toolbar>
@@ -167,3 +175,4 @@ export default function UIPlaceholder() {
     </div>
   );
 }
+

@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import AppBar from '@material-ui/core/AppBar';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 import Drawer from '@material-ui/core/Drawer';
 import Hidden from '@material-ui/core/Hidden';
-import Button from '@material-ui/core/Button';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
@@ -11,12 +12,21 @@ import ListItemText from '@material-ui/core/ListItemText';
 import IconButton from '@material-ui/core/IconButton';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
+import Snackbar from '@material-ui/core/Snackbar';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Button from '@material-ui/core/Button';
+import Alert from '@material-ui/lab/Alert';
 import HomeIcon from '@material-ui/icons/Home';
 import DataUsageIcon from '@material-ui/icons/DataUsage';
 import PhotoIcon from '@material-ui/icons/Photo';
 import LinkIcon from '@material-ui/icons/Link';
 import MenuIcon from '@material-ui/icons/Menu';
 import ProfileIcon from '@material-ui/icons/AccountCircle';
+import copy from 'copy-to-clipboard';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { useRouter } from 'next/router';
 
@@ -47,6 +57,9 @@ const useStyles = makeStyles(theme => ({
       display: 'none',
     },
   },
+  rightButton: {
+    marginLeft: 'auto'
+  },
   // necessary for content to be below app bar
   toolbar: theme.mixins.toolbar,
   drawerPaper: {
@@ -62,7 +75,48 @@ export default function UI({ children }) {
   const classes = useStyles();
   const theme = useTheme();
   const router = useRouter();
-  const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [alertMessage, setAlertMessage] = useState('Copied token!');
+  const [tokenOpen, setTokenOpen] = useState(false);
+  const [resetToken, setResetToken] = useState(false);
+  const [alertOpen, setAlertOpen] = useState(false);
+  const open = Boolean(anchorEl);
+
+  const handleCopyTokenThenClose = async () => {
+    const data = await (await fetch('/api/user/current')).json();
+    if (!data.error) {
+      copy(data.token);
+      setAlertMessage('Copied token!');
+      setTokenOpen(false);
+      setAlertOpen(true);
+      setAnchorEl(null);
+    }
+  };
+
+  const handleResetTokenThenClose = async () => {
+    const data = await (
+      await fetch('/api/user/reset-token', { method: 'POST' })
+    ).json();
+    if (!data.error && data.updated) {
+      setAlertMessage('Reset token!');
+      setResetToken(false);
+      setAlertOpen(true);
+    }
+  };
+
+  const handleLogout = async () => {
+    const data = await (
+      await fetch('/api/user/logout', { method: 'POST' })
+    ).json();
+    if (!data.error && data.clearStore) {
+      dispatch({ type: LOGOUT });
+      dispatch({ type: UPDATE_USER, payload: null });
+      setAlertMessage('Logged out!');
+      setAlertOpen(true);
+      router.push('/login');
+    }
+  };
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -85,9 +139,37 @@ export default function UI({ children }) {
           <Typography variant='h6'>
             Zipline
           </Typography>
-          <Typography variant='h6' style={{ float: 'right' }}>
-            Zipline
-          </Typography>
+          <IconButton
+            aria-label="account of current user"
+            aria-controls="menu-appbar"
+            aria-haspopup="true"
+            onClick={(event) => setAnchorEl(event.currentTarget)}
+            color="inherit"
+            className={classes.rightButton}
+          >
+            <ProfileIcon className={classes.rightButton} />
+          </IconButton>
+          <Menu
+            id="menu-appbar"
+            anchorEl={anchorEl}
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+            keepMounted
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+            open={open}
+            onClose={() => setAnchorEl(null)}
+          >
+            <Link href="/manage">
+              <MenuItem onClick={() => setAnchorEl(null)}>Manage Profile</MenuItem>
+            </Link>
+            <MenuItem onClick={() => setTokenOpen(true)}>Copy Token</MenuItem>
+            <MenuItem onClick={() => setResetToken(true)}>Reset Token</MenuItem>
+          </Menu>
         </Toolbar>
       </AppBar>
 
@@ -133,6 +215,72 @@ export default function UI({ children }) {
 
   return (
     <div className={classes.root}>
+      <Snackbar
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'center',
+        }}
+        open={alertOpen}
+        autoHideDuration={6000}
+        onClose={() => setAlertOpen(false)}
+      >
+        <Alert severity='success' variant='filled'>
+          {alertMessage}
+        </Alert>
+      </Snackbar>
+      <Dialog
+        open={tokenOpen}
+        onClose={() => setTokenOpen(false)}
+        aria-labelledby='alert-dialog-title'
+        aria-describedby='alert-dialog-description'
+      >
+        <DialogTitle id='alert-dialog-title'>Are you sure?</DialogTitle>
+        <DialogContent>
+          <DialogContentText id='alert-dialog-description'>
+            This token is used to upload images to Zipline, and should not
+            be shared!
+                </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setTokenOpen(false)} color='primary'>
+            Close
+                </Button>
+          <Button
+            onClick={handleCopyTokenThenClose}
+            color='primary'
+            autoFocus
+          >
+            Yes, copy!
+                </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={resetToken}
+        onClose={() => setResetToken(false)}
+        aria-labelledby='alert-dialog-title'
+        aria-describedby='alert-dialog-description'
+      >
+        <DialogTitle id='alert-dialog-title'>Are you sure?</DialogTitle>
+        <DialogContent>
+          <DialogContentText id='alert-dialog-description'>
+            This token is used to upload images to Zipline, resetting your
+            token will cause any uploading actions to not work until you
+            update them your self.
+                </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setResetToken(false)} color='primary'>
+            Close
+                </Button>
+          <Button
+            onClick={handleResetTokenThenClose}
+            color='primary'
+            autoFocus
+          >
+            Yes, reset!
+                </Button>
+        </DialogActions>
+      </Dialog>
       <AppBar position='fixed' className={classes.appBar} elevation={0}>
         <Toolbar>
           <IconButton
@@ -147,9 +295,6 @@ export default function UI({ children }) {
           <Typography variant='h6'>
             Zipline
           </Typography>
-          <IconButton style={{ float: 'right' }}>
-            <ProfileIcon />
-          </IconButton>
         </Toolbar>
       </AppBar>
       <nav className={classes.drawer} aria-label='mailbox folders'>
@@ -192,3 +337,4 @@ export default function UI({ children }) {
     </div>
   );
 }
+
