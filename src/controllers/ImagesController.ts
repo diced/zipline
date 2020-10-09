@@ -31,8 +31,6 @@ export class ImagesController {
       },
     });
 
-    const recent = images.slice(1).slice(-3);
-
-    return reply.send(recent);
+    return reply.send(images.slice(1).slice(-3).reverse());
   }
 }

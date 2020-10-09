@@ -21,13 +21,22 @@ const useStyles = makeStyles({
   },
 });
 
-export default function Index({ images, config }: { images: Image[], config: ConfigUploader }) {
-  console.log(images, config);
+export default function Index({ config }: { config: ConfigUploader }) {
   const classes = useStyles();
   const router = useRouter();
   const state = store.getState();
+  const [images, setImages] = React.useState([]);
+
   if (typeof window !== 'undefined' && !state.loggedIn) router.push('/login');
   else {
+
+    React.useEffect(() => {
+      (async () => {
+        const images = await (await fetch('/api/images/recent')).json();
+        if (!images.error) setImages(images);
+      })();
+    }, []);
+
     return (
       <UI>
         <Card elevation={3} className={classes.padding}>
@@ -40,7 +49,7 @@ export default function Index({ images, config }: { images: Image[], config: Con
           <Typography variant='h5'>
             Recent Images
           </Typography>
-          <GridList cellHeight={160} cols={3}>
+          <GridList cols={3}>
             {images.map(d => {
               const t = new URL(window.location.href);
               t.pathname = `${config ? config.route : '/u'}/${d.file}`;
@@ -62,11 +71,11 @@ export default function Index({ images, config }: { images: Image[], config: Con
   return <UIPlaceholder />;
 }
 
-Index.getInitialProps = async ({ req }) => {
-  console.log(req);
-  const baseUrl = req ? `http://${req.headers.host}` : '';
-  const images = await (await fetch(baseUrl + '/api/images/recent')).json();
-  const config = await (await fetch(baseUrl + '/api/config/uploader')).json();
-  if (images.error || config.error) return { images: [], config: null };
-  return { images, config };
-};
+// Index.getInitialProps = async ({ req }) => {
+//   console.log(req);
+//   const baseUrl = req ? `http://${req.headers.host}` : '';
+//   const images = await (await fetch(baseUrl + '/api/images/recent')).json();
+//   const config = await (await fetch(baseUrl + '/api/config/uploader')).json();
+//   if (images.error || config.error) return { images: [], config: null };
+//   return { images, config };
+// };
