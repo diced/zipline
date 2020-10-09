@@ -11,7 +11,9 @@ import Alert from '@material-ui/lab/Alert';
 import UI from '../components/UI';
 import UIPlaceholder from '../components/UIPlaceholder';
 import { makeStyles } from '@material-ui/core';
+import { UPDATE_USER } from '../lib/reducer';
 import { store } from '../lib/store';
+import { useDispatch } from 'react-redux';
 
 const useStyles = makeStyles({
   margin: {
@@ -30,11 +32,24 @@ const useStyles = makeStyles({
 
 export default function Manage() {
   const classes = useStyles();
+  const dispatch = useDispatch();
   const router = useRouter();
   const state = store.getState();
   const [alertOpen, setAlertOpen] = useState(false);
   const [username, setUsername] = useState(state.user.username);
   const [password, setPassword] = useState('');
+
+  const handleUpdateUser = async () => {
+    const d = await (await fetch('/api/user', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    })).json();
+    if (!d.error) {
+      dispatch({ type: UPDATE_USER, payload: d });
+      setAlertOpen(true);
+    }
+  };
 
   if (typeof window !== 'undefined' && !state.loggedIn) router.push('/login');
   else {
@@ -78,6 +93,7 @@ export default function Manage() {
               variant='contained'
               className={classes.button}
               color='primary'
+              onClick={handleUpdateUser}
             >
               Update
             </Button>
