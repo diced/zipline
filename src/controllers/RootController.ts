@@ -4,6 +4,7 @@ import {
   POST,
   FastifyInstanceToken,
   Inject,
+  GET,
 } from 'fastify-decorators';
 import { Multipart } from 'fastify-multipart';
 import { createWriteStream, existsSync, mkdirSync } from 'fs';
@@ -25,6 +26,11 @@ export class RootController {
 
   private users: Repository<User> = this.instance.orm.getRepository(User);
   private images: Repository<Image> = this.instance.orm.getRepository(Image);
+
+  @GET('/config/uploader')
+  async uploaderConfig() {
+    return Configuration.readConfig().uploader;
+  }
 
   @POST('/upload')
   async loginStatus(req: FastifyRequest, reply: FastifyReply) {
@@ -49,7 +55,7 @@ export class RootController {
     const fileName = createRandomId(config.uploader.length);
     const path = join(config.uploader.directory, `${fileName}.${ext}`);
 
-    this.images.save(new Image(fileName, user.id));
+    this.images.save(new Image(fileName, ext, user.id));
 
     data.file.pipe(createWriteStream(path));
     reply.send(

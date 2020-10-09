@@ -13,6 +13,7 @@ import { Configuration } from './lib/Config';
 import { UserController } from './controllers/UserController';
 import { RootController } from './controllers/RootController';
 import { join } from 'path';
+import { ImagesController } from './controllers/ImagesController';
 
 Console.setFormatter(new ConsoleFormatter());
 
@@ -53,7 +54,7 @@ server.register(fastifyTypeorm, {
 });
 
 server.register(bootstrap, {
-  controllers: [UserController, RootController],
+  controllers: [UserController, RootController, ImagesController],
 });
 
 server.register(fastifyCookies, {
