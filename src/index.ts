@@ -4,6 +4,7 @@ import fastifyTypeorm from 'fastify-typeorm-plugin';
 import fastifyCookies from 'fastify-cookie';
 import fastifyMultipart from 'fastify-multipart';
 import fastifyStatic from 'fastify-static';
+import fastifyFavicon from 'fastify-favicon';
 import { bootstrap } from 'fastify-decorators';
 import { Console } from './lib/logger';
 import { AddressInfo } from 'net';
@@ -65,6 +66,8 @@ server.register(fastifyStatic, {
   root: join(process.cwd(), config.uploader.directory),
   prefix: config.uploader.route,
 });
+
+server.register(fastifyFavicon);
 
 server.listen(config.core.port, err => {
   if (err) throw err;
