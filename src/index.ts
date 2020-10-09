@@ -67,6 +67,12 @@ server.register(fastifyStatic, {
   prefix: config.uploader.route,
 });
 
+server.register(fastifyStatic, {
+  root: join(process.cwd(), 'public'),
+  prefix: '/public',
+  decorateReply: false
+});
+
 server.register(fastifyFavicon);
 
 server.listen(config.core.port, err => {
