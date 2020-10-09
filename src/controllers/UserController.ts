@@ -3,6 +3,7 @@ import {
   Controller,
   GET,
   POST,
+  PATCH,
   FastifyInstanceToken,
   Inject,
 } from 'fastify-decorators';
@@ -36,7 +37,7 @@ export class UserController {
     });
   }
 
-  @GET('/current')
+  @GET('/')
   async currentUser(req: FastifyRequest, reply: FastifyReply) {
     if (!req.cookies.zipline) throw new LoginError('Not logged in.');
     const user = await this.users.findOne({
@@ -45,6 +46,25 @@ export class UserController {
       },
     });
     if (!user) throw new UserExistsError('User doesn\'t exist');
+    delete user.password;
+    return reply.send(user);
+  }
+
+  @PATCH('/')
+  async editUser(req: FastifyRequest<{ Body: { username: string, password: string } }>, reply: FastifyReply) {
+    if (!req.cookies.zipline) throw new LoginError('Not logged in.');
+
+    const user = await this.users.findOne({
+      where: {
+        id: readBaseCookie(req.cookies.zipline),
+      },
+    });
+    if (!user) throw new UserExistsError('User doesn\'t exist');
+
+    user.username = req.body.username;
+    user.password = encryptPassword(req.body.password);
+    this.users.save(user);
+
     delete user.password;
     return reply.send(user);
   }

@@ -93,7 +93,7 @@ export default function UI({ children }) {
   const open = Boolean(anchorEl);
 
   const handleCopyTokenThenClose = async () => {
-    const data = await (await fetch('/api/user/current')).json();
+    const data = await (await fetch('/api/user')).json();
     if (!data.error) {
       copy(data.token);
       setAlertMessage('Copied token!');
