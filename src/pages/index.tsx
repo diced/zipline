@@ -11,6 +11,8 @@ import { makeStyles } from '@material-ui/core';
 import { store } from '../lib/store';
 import { Image } from '../entities/Image';
 import { ConfigUploader } from '../lib/Config';
+import { useDispatch } from 'react-redux';
+import { UPDATE_USER, LOGOUT } from '../lib/reducer';
 
 const useStyles = makeStyles({
   margin: {
@@ -25,15 +27,19 @@ export default function Index({ config }: { config: ConfigUploader }) {
   const classes = useStyles();
   const router = useRouter();
   const state = store.getState();
+  const [recentImages, setRecentImages] = React.useState([]);
   const [images, setImages] = React.useState([]);
 
-  if (typeof window !== 'undefined' && !state.loggedIn) router.push('/login');
+  if (typeof window === 'undefined') return <UIPlaceholder />;
+  if (!state.loggedIn) router.push('/login');
   else {
-
     React.useEffect(() => {
       (async () => {
-        const images = await (await fetch('/api/images/recent')).json();
-        if (!images.error) setImages(images);
+        const recentImages = await (await fetch('/api/images/recent')).json();
+        if (!recentImages.error) setRecentImages(recentImages);
+
+        const allImages = await (await fetch('/api/images')).json();
+        if (!allImages.error) setImages(allImages);
       })();
     }, []);
 
@@ -44,13 +50,13 @@ export default function Index({ config }: { config: ConfigUploader }) {
             Welcome back, {state.user.username}
           </Typography>
           <Typography color='textSecondary'>
-            You have <b>2</b> images
+            You have <b>{images.length}</b> images
           </Typography>
           <Typography variant='h5'>
             Recent Images
           </Typography>
           <GridList cols={3}>
-            {images.map(d => {
+            {recentImages.map(d => {
               const t = new URL(window.location.href);
               t.pathname = `${config ? config.route : '/u'}/${d.file}`;
               return (
@@ -70,12 +76,3 @@ export default function Index({ config }: { config: ConfigUploader }) {
   }
   return <UIPlaceholder />;
 }
-
-// Index.getInitialProps = async ({ req }) => {
-//   console.log(req);
-//   const baseUrl = req ? `http://${req.headers.host}` : '';
-//   const images = await (await fetch(baseUrl + '/api/images/recent')).json();
-//   const config = await (await fetch(baseUrl + '/api/config/uploader')).json();
-//   if (images.error || config.error) return { images: [], config: null };
-//   return { images, config };
-// };
