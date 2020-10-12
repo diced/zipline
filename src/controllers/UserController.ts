@@ -77,7 +77,7 @@ export class UserController {
     if (req.cookies.zipline) throw new LoginError('Already logged in.');
     if (!req.body.username) throw new MissingBodyData('Missing username.');
     if (!req.body.password) throw new MissingBodyData('Missing uassword.');
-
+    console.log(await this.users.find());
     const user = await this.users.findOne({
       where: {
         username: req.body.username,

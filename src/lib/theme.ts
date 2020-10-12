@@ -22,6 +22,11 @@ const theme = createMuiTheme({
         },
       },
     },
+    MuiCard: {
+      root: {
+        backgroundColor: '#100724'
+      }
+    }
   },
 });
 

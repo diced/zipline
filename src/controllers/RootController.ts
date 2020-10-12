@@ -32,6 +32,54 @@ export class RootController {
     return Configuration.readConfig().uploader;
   }
 
+  @GET('/users')
+  async allUsers(req: FastifyRequest, reply: FastifyReply) {
+    if (!req.cookies.zipline) throw new Error('Not logged in.');
+    const users = await this.users.find();
+    const final = [];
+
+    for (const user of users) {
+      delete user.password;
+      delete user.token;
+      final.push(user);
+    }
+
+    return reply.send(final);
+  }
+
+  @GET('/statistics')
+  async stats(req: FastifyRequest, reply: FastifyReply) {
+    if (!req.cookies.zipline) throw new Error('Not logged in.');
+
+    const images = await this.images.find();
+    const users = await this.users.find();
+
+    const totalViews = images.map(x => x.views).reduce((a, b) => Number(a) + Number(b), 0);
+    const leaderboardImages = [];
+    const leaderboardViews = [];
+
+    for (const user of users) {
+      const usersImages = await this.images.find({
+        where: { user: user.id },
+      });
+      leaderboardImages.push({
+        username: user.username,
+        images: usersImages.length
+      });
+      leaderboardViews.push({
+        username: user.username,
+        views: usersImages.map(x => x.views).reduce((a, b) => Number(a) + Number(b), 0)
+      });
+    }
+
+    return reply.send({
+      images: images.length,
+      totalViews,
+      leaderboardImages: leaderboardImages.sort((a, b) => b.images - a.images),
+      leaderboardViews: leaderboardViews.sort((a, b) => b.views - a.views)
+    });
+  }
+
   @POST('/upload')
   async loginStatus(req: FastifyRequest, reply: FastifyReply) {
     if (!req.headers.authorization)

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import AppBar from '@material-ui/core/AppBar';
 import Menu from '@material-ui/core/Menu';
@@ -26,6 +26,7 @@ import PhotoIcon from '@material-ui/icons/Photo';
 import LinkIcon from '@material-ui/icons/Link';
 import MenuIcon from '@material-ui/icons/Menu';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
+import GroupIcon from '@material-ui/icons/Group';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import RotateLeftIcon from '@material-ui/icons/RotateLeft';
@@ -85,12 +86,20 @@ export default function UI({ children }) {
   const router = useRouter();
   const dispatch = useDispatch();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [admin, setAdmin] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [alertMessage, setAlertMessage] = useState('Copied token!');
   const [tokenOpen, setTokenOpen] = useState(false);
   const [resetToken, setResetToken] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
   const open = Boolean(anchorEl);
+
+  useEffect(() => {
+    (async () => {
+      const d = await (await fetch('/api/user')).json();
+      if (!d.error) setAdmin(d.administrator);
+    })();
+  }, []);
 
   const handleCopyTokenThenClose = async () => {
     const data = await (await fetch('/api/user')).json();
@@ -225,6 +234,14 @@ export default function UI({ children }) {
             <ListItemText primary='URLs' />
           </ListItem>
         </Link>
+        {admin ? (<Link href='/users'>
+          <ListItem button key='Users' selected={router.pathname === '/users'}>
+            <ListItemIcon>
+              <GroupIcon />
+            </ListItemIcon>
+            <ListItemText primary='Users' />
+          </ListItem>
+        </Link>) : null}
       </List>
     </div>
   );

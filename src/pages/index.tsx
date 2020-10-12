@@ -1,18 +1,14 @@
 import React from 'react';
 import { useRouter } from 'next/router';
 import Typography from '@material-ui/core/Typography';
-import Card from '@material-ui/core/Card';
+import Paper from '@material-ui/core/Paper';
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
-import GridListTileBar from '@material-ui/core/GridListTileBar';
 import UI from '../components/UI';
 import UIPlaceholder from '../components/UIPlaceholder';
 import { makeStyles } from '@material-ui/core';
 import { store } from '../lib/store';
-import { Image } from '../entities/Image';
 import { ConfigUploader } from '../lib/Config';
-import { useDispatch } from 'react-redux';
-import { UPDATE_USER, LOGOUT } from '../lib/reducer';
 
 const useStyles = makeStyles({
   margin: {
@@ -45,7 +41,7 @@ export default function Index({ config }: { config: ConfigUploader }) {
 
     return (
       <UI>
-        <Card elevation={3} className={classes.padding}>
+        <Paper elevation={3} className={classes.padding}>
           <Typography variant='h5'>
             Welcome back, {state.user.username}
           </Typography>
@@ -62,15 +58,11 @@ export default function Index({ config }: { config: ConfigUploader }) {
               return (
                 <GridListTile key={d.id} cols={1}>
                   <img src={t.toString()} />
-                  <GridListTileBar
-                    title={d.id}
-                    subtitle={<span>uploaded at x time</span>}
-                  />
                 </GridListTile>
               );
             })}
           </GridList>
-        </Card>
+        </Paper>
       </UI>
     );
   }

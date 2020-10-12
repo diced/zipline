@@ -1,6 +1,6 @@
 import React from 'react';
 import { useRouter } from 'next/router';
-import Card from '@material-ui/core/Card';
+import Paper from '@material-ui/core/Paper';
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import Popover from '@material-ui/core/Popover';
@@ -38,7 +38,6 @@ export default function Images({ config }: { config: ConfigUploader }) {
 
     const getChunkedImages = async () => {
       const chunks = await (await fetch('/api/images/chunk')).json();
-      console.log(chunks);
       if (!chunks.error) setChunks(chunks);
     };
 
@@ -71,7 +70,7 @@ export default function Images({ config }: { config: ConfigUploader }) {
 
     return (
       <UI>
-        <Card elevation={3} className={classes.padding}>
+        <Paper elevation={3} className={classes.padding}>
           <GridList cols={3}>
             {images.map(d => {
               const t = new URL(window.location.href);
@@ -84,7 +83,7 @@ export default function Images({ config }: { config: ConfigUploader }) {
             })}
           </GridList>
           <Pagination count={chunks.length} onChange={changePage} />
-        </Card>
+        </Paper>
         <Popover
           open={Boolean(anchorEl)}
           anchorEl={anchorEl}
