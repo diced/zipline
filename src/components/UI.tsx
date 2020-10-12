@@ -97,7 +97,12 @@ export default function UI({ children }) {
   useEffect(() => {
     (async () => {
       const d = await (await fetch('/api/user')).json();
-      if (!d.error) setAdmin(d.administrator);
+      if (d.error) {
+        dispatch({ type: LOGOUT });
+        dispatch({ type: UPDATE_USER, payload: null });
+        router.push('/login');
+      }
+      else setAdmin(d.administrator)
     })();
   }, []);
 

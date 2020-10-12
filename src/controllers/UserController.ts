@@ -77,20 +77,18 @@ export class UserController {
     if (req.cookies.zipline) throw new LoginError('Already logged in.');
     if (!req.body.username) throw new MissingBodyData('Missing username.');
     if (!req.body.password) throw new MissingBodyData('Missing uassword.');
-    console.log(await this.users.find());
+
     const user = await this.users.findOne({
       where: {
         username: req.body.username,
       },
     });
 
-    if (!user)
-      throw new UserNotFoundError(`User "${req.body.username}" was not found.`);
-    if (!checkPassword(req.body.password, user.password))
-      throw new LoginError('Wrong credentials!');
+    if (!user) throw new UserNotFoundError(`User "${req.body.username}" was not found.`);
+    if (!checkPassword(req.body.password, user.password)) throw new LoginError('Wrong credentials!');
     delete user.password;
 
-    reply.setCookie('zipline', createBaseCookie(user.id), { path: '/' });
+    reply.setCookie('zipline', createBaseCookie(user.id), { path: '/', maxAge: 1036800000 });
     return reply.send(user);
   }
 
