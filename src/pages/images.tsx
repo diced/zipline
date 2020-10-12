@@ -1,6 +1,8 @@
 import React from 'react';
 import { useRouter } from 'next/router';
 import Paper from '@material-ui/core/Paper';
+import Backdrop from '@material-ui/core/Backdrop';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import Popover from '@material-ui/core/Popover';
@@ -14,39 +16,50 @@ import { store } from '../lib/store';
 import { Image } from '../entities/Image';
 import { ConfigUploader } from '../lib/Config';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
   margin: {
     margin: '5px',
   },
   padding: {
     padding: '10px',
   },
-});
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: '#fff',
+  },
+}));
 
 export default function Images({ config }: { config: ConfigUploader }) {
   const classes = useStyles();
   const router = useRouter();
   const state = store.getState();
+  const [loading, setLoading] = React.useState(true);
   const [chunks, setChunks] = React.useState([]);
   const [images, setImages] = React.useState<Image[]>([]);
   const [selectedImage, setSelectedImage] = React.useState<Image>(null);
   const [anchorEl, setAnchorEl] = React.useState(null);
+
+  console.log('1', chunks);
 
   if (typeof window === 'undefined') return <UIPlaceholder />;
   if (!state.loggedIn) router.push('/login');
   else {
 
     const getChunkedImages = async () => {
-      const chunks = await (await fetch('/api/images/chunk')).json();
-      if (!chunks.error) setChunks(chunks);
+      const c = await (await fetch('/api/images/chunk')).json();
+      if (!c.error) return c;
+      return [];
     };
 
     React.useEffect(() => {
-      getChunkedImages();
-      changePage(null, 1);
+      (async () => {
+        changePage(null, 1);
+        setLoading(false);
+      })()
     }, []);
 
-    const changePage = (event, p: number) => {
+    const changePage = async (event, p: number) => {
+      const chunks = await getChunkedImages();
       const page = chunks[p - 1];
       if (page) setImages(page);
     };
@@ -70,20 +83,25 @@ export default function Images({ config }: { config: ConfigUploader }) {
 
     return (
       <UI>
-        <Paper elevation={3} className={classes.padding}>
-          <GridList cols={3}>
-            {images.map(d => {
-              const t = new URL(window.location.href);
-              t.pathname = `${config ? config.route : '/u'}/${d.file}`;
-              return (
-                <GridListTile key={d.id} cols={1}>
-                  <img src={t.toString()} onClick={(e) => setImageOpenPopover(e, d)} />
-                </GridListTile>
-              );
-            })}
-          </GridList>
-          <Pagination count={chunks.length} onChange={changePage} />
-        </Paper>
+        <Backdrop className={classes.backdrop} open={loading}>
+          <CircularProgress color="inherit" />
+        </Backdrop>
+        {!loading ? (
+          <Paper elevation={3} className={classes.padding}>
+            <GridList cols={3}>
+              {images.map(d => {
+                const t = new URL(window.location.href);
+                t.pathname = `${config ? config.route : '/u'}/${d.file}`;
+                return (
+                  <GridListTile key={d.id} cols={1}>
+                    <img src={t.toString()} onClick={(e) => setImageOpenPopover(e, d)} />
+                  </GridListTile>
+                );
+              })}
+            </GridList>
+            <Pagination count={chunks.length} onChange={changePage} />
+          </Paper>
+        ) : null}
         <Popover
           open={Boolean(anchorEl)}
           anchorEl={anchorEl}
