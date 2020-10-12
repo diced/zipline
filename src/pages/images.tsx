@@ -15,6 +15,7 @@ import { makeStyles } from '@material-ui/core';
 import { store } from '../lib/store';
 import { Image } from '../entities/Image';
 import { ConfigUploader } from '../lib/Config';
+import { truncate } from 'fs';
 
 const useStyles = makeStyles(theme => ({
   margin: {
@@ -47,21 +48,25 @@ export default function Images({ config }: { config: ConfigUploader }) {
 
     const getChunkedImages = async () => {
       const c = await (await fetch('/api/images/chunk')).json();
-      if (!c.error) return c;
+      if (!c.error) {
+
+        setChunks(c);
+        return c
+      };
       return [];
     };
 
     React.useEffect(() => {
       (async () => {
+        setLoading(true);
         changePage(null, 1);
-        setLoading(false);
       })()
     }, []);
 
     const changePage = async (event, p: number) => {
       const chunks = await getChunkedImages();
       const page = chunks[p - 1];
-      if (page) setImages(page);
+      if (page) { setImages(page); setLoading(false); }
     };
 
     const setImageOpenPopover = (e, d: Image) => {
