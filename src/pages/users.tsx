@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Typography from '@material-ui/core/Typography';
+import Backdrop from '@material-ui/core/Backdrop';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
 import Snackbar from '@material-ui/core/Snackbar';
@@ -19,14 +21,19 @@ import UI from '../components/UI';
 import UIPlaceholder from '../components/UIPlaceholder';
 import { makeStyles } from '@material-ui/core';
 import { store } from '../lib/store';
-const useStyles = makeStyles({
+
+const useStyles = makeStyles(theme => ({
   margin: {
     margin: '5px',
   },
   padding: {
     padding: '10px',
   },
-});
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: '#fff',
+  },
+}));
 
 export default function Index() {
   const classes = useStyles();
@@ -34,6 +41,7 @@ export default function Index() {
   const state = store.getState();
   const [users, setUsers] = useState([]);
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [alertOpen, setAlertOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
@@ -45,7 +53,10 @@ export default function Index() {
         if (!d.error) {
           if (!d.administrator) router.push('/');
           const us = await (await fetch('/api/users')).json();
-          if (!us.error) setUsers(us);
+          if (!us.error) {
+            setUsers(us);
+            setLoading(false);
+          }
         }
       })();
     }, []);
@@ -62,6 +73,9 @@ export default function Index() {
 
     return (
       <UI>
+        <Backdrop className={classes.backdrop} open={loading}>
+          <CircularProgress color="inherit" />
+        </Backdrop>
         <Snackbar
           anchorOrigin={{
             vertical: 'top',
