@@ -110,28 +110,30 @@ export default function Index() {
             </Button>
           </DialogActions>
         </Dialog>
-        <Paper elevation={3} className={classes.padding}>
-          <Typography variant='h5'>
-            Users
+        {!loading ? (
+          <Paper elevation={3} className={classes.padding}>
+            <Typography variant='h5'>
+              Users
           </Typography>
-          <Grid container spacing={2}>
-            {users.map(u => (
-              <Grid item xs={4} key={u.id}>
-                <Card elevation={3}>
-                  <CardHeader
-                    action={
-                      <IconButton aria-label="Delete Forever" onClick={() => handleDeleteUser(u)}>
-                        <DeleteForeverIcon />
-                      </IconButton>
-                    }
-                    title={`${u.username} (${u.id})`}
-                    subheader={`${u.administrator ? 'Administrator' : 'User'}`}
-                  />
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        </Paper>
+            <Grid container spacing={2}>
+              {users.map(u => (
+                <Grid item xs={4} key={u.id}>
+                  <Card elevation={3}>
+                    <CardHeader
+                      action={
+                        <IconButton aria-label="Delete Forever" onClick={() => handleDeleteUser(u)}>
+                          <DeleteForeverIcon />
+                        </IconButton>
+                      }
+                      title={`${u.username} (${u.id})`}
+                      subheader={`${u.administrator ? 'Administrator' : 'User'}`}
+                    />
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          </Paper>
+        ) : null}
       </UI>
     );
   }
