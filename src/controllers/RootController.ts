@@ -11,6 +11,7 @@ import { createWriteStream, existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import { Repository } from 'typeorm';
 import { Image } from '../entities/Image';
+import { URL } from '../entities/URL';
 import { User } from '../entities/User';
 import { AuthError } from '../lib/api/APIErrors';
 import { Configuration } from '../lib/Config';
@@ -26,10 +27,31 @@ export class RootController {
 
   private users: Repository<User> = this.instance.orm.getRepository(User);
   private images: Repository<Image> = this.instance.orm.getRepository(Image);
+  private urls: Repository<URL> = this.instance.orm.getRepository(URL);
+
 
   @GET('/config/uploader')
   async uploaderConfig() {
     return Configuration.readConfig().uploader;
+  }
+
+  @GET('/s/:id')
+  async getShorten(req: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
+    const urlId = await this.urls.findOne({
+      where: {
+        id: req.params.id
+      }
+    });
+
+    const urlVanity = await this.urls.findOne({
+      where: {
+        vanity: req.params.id
+      }
+    });
+
+    if (urlVanity) return reply.redirect(urlVanity.url);
+    if (!urlId) reply.send('Not found');
+    return reply.redirect(urlId.url);
   }
 
   @GET('/users')
