@@ -56,6 +56,7 @@ const useStyles = makeStyles(theme => ({
       width: 'calc(100%)',
       marginLeft: drawerWidth,
     },
+    borderBottom: '1px solid #1f1f1f',
   },
   menuButton: {
     marginRight: theme.spacing(2),

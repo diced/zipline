@@ -2,6 +2,7 @@ import React from 'react';
 import { useRouter } from 'next/router';
 import Typography from '@material-ui/core/Typography';
 import Backdrop from '@material-ui/core/Backdrop';
+import Box from '@material-ui/core/Box';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Paper from '@material-ui/core/Paper';
 import GridList from '@material-ui/core/GridList';
@@ -17,7 +18,8 @@ const useStyles = makeStyles(theme => ({
     margin: '5px',
   },
   padding: {
-    padding: '10px',
+    border: '1px solid #1f1f1f',
+    padding: '10px'
   },
   backdrop: {
     zIndex: theme.zIndex.drawer + 1,

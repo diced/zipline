@@ -4,13 +4,13 @@ const theme = createMuiTheme({
   palette: {
     type: 'dark',
     primary: {
-      main: '#2f2c8a',
+      main: '#000',
     },
     secondary: {
       main: '#4a148c',
     },
     background: {
-      default: '#000000',
+      default: '#030303',
       paper: '#000000',
     },
   },
@@ -18,18 +18,13 @@ const theme = createMuiTheme({
     MuiListItem: {
       root: {
         '&$selected': {
-          backgroundColor: '#1f1f1f',
+          backgroundColor: '#1F1F1F',
         },
       },
     },
-    MuiPaper: {
-      root: {
-
-      }
-    },
     MuiCard: {
       root: {
-        backgroundColor: '#100724',
+        backgroundColor: '#080808',
       },
     },
   },
