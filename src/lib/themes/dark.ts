@@ -10,17 +10,22 @@ const theme = createMuiTheme({
       main: '#4a148c',
     },
     background: {
-      default: '#0c051c',
-      paper: '#190c36',
+      default: '#000000',
+      paper: '#000000',
     },
   },
   overrides: {
     MuiListItem: {
       root: {
         '&$selected': {
-          backgroundColor: '#0c051c80',
+          backgroundColor: '#1f1f1f',
         },
       },
+    },
+    MuiPaper: {
+      root: {
+
+      }
     },
     MuiCard: {
       root: {

@@ -350,7 +350,7 @@ export default function UI({ children }) {
             classes={{
               paper: classes.drawerPaper,
             }}
-            style={{ border: 'none' }}
+
             ModalProps={{
               keepMounted: true, // Better open performance on mobile.
             }}
@@ -363,7 +363,6 @@ export default function UI({ children }) {
             classes={{
               paper: classes.drawerPaper,
             }}
-            PaperProps={{ style: { border: 'none' } }}
             variant='permanent'
             open
           >

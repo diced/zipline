@@ -7,7 +7,7 @@ import { ThemeProvider } from '@material-ui/core/styles';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from '../lib/store';
-import theme from '../lib/theme';
+import theme from '../lib/themes/dark';
 
 export default function MyApp(props) {
   const { Component, pageProps } = props;
