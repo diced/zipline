@@ -40,11 +40,13 @@ export default function Manage() {
   const [password, setPassword] = useState('');
 
   const handleUpdateUser = async () => {
-    const d = await (await fetch('/api/user', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
-    })).json();
+    const d = await (
+      await fetch('/api/user', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      })
+    ).json();
     if (!d.error) {
       dispatch({ type: UPDATE_USER, payload: d });
       setAlertOpen(true);

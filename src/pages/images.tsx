@@ -15,7 +15,6 @@ import { makeStyles } from '@material-ui/core';
 import { store } from '../lib/store';
 import { Image } from '../entities/Image';
 import { ConfigUploader } from '../lib/Config';
-import { truncate } from 'fs';
 
 const useStyles = makeStyles(theme => ({
   margin: {
@@ -45,14 +44,12 @@ export default function Images({ config }: { config: ConfigUploader }) {
   if (typeof window === 'undefined') return <UIPlaceholder />;
   if (!state.loggedIn) router.push('/login');
   else {
-
     const getChunkedImages = async () => {
       const c = await (await fetch('/api/images/chunk')).json();
       if (!c.error) {
-
         setChunks(c);
-        return c
-      };
+        return c;
+      }
       return [];
     };
 
@@ -60,13 +57,16 @@ export default function Images({ config }: { config: ConfigUploader }) {
       (async () => {
         setLoading(true);
         changePage(null, 1);
-      })()
+      })();
     }, []);
 
     const changePage = async (event, p: number) => {
       const chunks = await getChunkedImages();
       const page = chunks[p - 1];
-      if (page) { setImages(page); setLoading(false); }
+      if (page) {
+        setImages(page);
+        setLoading(false);
+      }
     };
 
     const setImageOpenPopover = (e, d: Image) => {
@@ -77,9 +77,11 @@ export default function Images({ config }: { config: ConfigUploader }) {
     const handleDeleteImage = async () => {
       setAnchorEl(null);
       if (!selectedImage) return;
-      const d = await (await fetch(`/api/images/${selectedImage.id}`, {
-        method: 'DELETE'
-      })).json();
+      const d = await (
+        await fetch(`/api/images/${selectedImage.id}`, {
+          method: 'DELETE',
+        })
+      ).json();
       if (!d.error) {
         getChunkedImages();
         changePage(null, 1);
@@ -89,7 +91,7 @@ export default function Images({ config }: { config: ConfigUploader }) {
     return (
       <UI>
         <Backdrop className={classes.backdrop} open={loading}>
-          <CircularProgress color="inherit" />
+          <CircularProgress color='inherit' />
         </Backdrop>
         {!loading ? (
           <Paper elevation={3} className={classes.padding}>
@@ -99,7 +101,10 @@ export default function Images({ config }: { config: ConfigUploader }) {
                 t.pathname = `${config ? config.route : '/u'}/${d.file}`;
                 return (
                   <GridListTile key={d.id} cols={1}>
-                    <img src={t.toString()} onClick={(e) => setImageOpenPopover(e, d)} />
+                    <img
+                      src={t.toString()}
+                      onClick={e => setImageOpenPopover(e, d)}
+                    />
                   </GridListTile>
                 );
               })}
@@ -122,15 +127,15 @@ export default function Images({ config }: { config: ConfigUploader }) {
           disableRestoreFocus
         >
           <Button
-            variant="contained"
-            color="secondary"
+            variant='contained'
+            color='secondary'
             startIcon={<DeleteIcon />}
             onClick={handleDeleteImage}
           >
             Delete
           </Button>
         </Popover>
-      </UI >
+      </UI>
     );
   }
   return <UIPlaceholder />;

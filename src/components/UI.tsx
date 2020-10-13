@@ -76,8 +76,8 @@ const useStyles = makeStyles(theme => ({
     padding: theme.spacing(3),
   },
   menuIcon: {
-    marginRight: '10px'
-  }
+    marginRight: '10px',
+  },
 }));
 
 export default function UI({ children }) {
@@ -101,8 +101,7 @@ export default function UI({ children }) {
         dispatch({ type: LOGOUT });
         dispatch({ type: UPDATE_USER, payload: null });
         router.push('/login');
-      }
-      else setAdmin(d.administrator)
+      } else setAdmin(d.administrator);
     })();
   }, []);
 
@@ -191,9 +190,15 @@ export default function UI({ children }) {
                 Manage Profile
               </MenuItem>
             </Link>
-            <MenuItem onClick={() => setTokenOpen(true)}><FileCopyIcon className={classes.menuIcon} /> Copy Token</MenuItem>
-            <MenuItem onClick={() => setResetToken(true)}><RotateLeftIcon className={classes.menuIcon} /> Reset Token</MenuItem>
-            <MenuItem onClick={handleLogout}><ExitToAppIcon className={classes.menuIcon} /> Logout</MenuItem>
+            <MenuItem onClick={() => setTokenOpen(true)}>
+              <FileCopyIcon className={classes.menuIcon} /> Copy Token
+            </MenuItem>
+            <MenuItem onClick={() => setResetToken(true)}>
+              <RotateLeftIcon className={classes.menuIcon} /> Reset Token
+            </MenuItem>
+            <MenuItem onClick={handleLogout}>
+              <ExitToAppIcon className={classes.menuIcon} /> Logout
+            </MenuItem>
           </Menu>
         </Toolbar>
       </AppBar>
@@ -239,14 +244,20 @@ export default function UI({ children }) {
             <ListItemText primary='URLs' />
           </ListItem>
         </Link>
-        {admin ? (<Link href='/users'>
-          <ListItem button key='Users' selected={router.pathname === '/users'}>
-            <ListItemIcon>
-              <GroupIcon />
-            </ListItemIcon>
-            <ListItemText primary='Users' />
-          </ListItem>
-        </Link>) : null}
+        {admin ? (
+          <Link href='/users'>
+            <ListItem
+              button
+              key='Users'
+              selected={router.pathname === '/users'}
+            >
+              <ListItemIcon>
+                <GroupIcon />
+              </ListItemIcon>
+              <ListItemText primary='Users' />
+            </ListItem>
+          </Link>
+        ) : null}
       </List>
     </div>
   );

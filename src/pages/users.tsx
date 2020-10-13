@@ -59,7 +59,7 @@ export default function Index() {
       })();
     }, []);
 
-    const handleDeleteUser = (d) => {
+    const handleDeleteUser = d => {
       setDeleteOpen(true);
       setUser(d);
     };
@@ -72,7 +72,7 @@ export default function Index() {
     return (
       <UI>
         <Backdrop className={classes.backdrop} open={loading}>
-          <CircularProgress color="inherit" />
+          <CircularProgress color='inherit' />
         </Backdrop>
         <Snackbar
           anchorOrigin={{
@@ -110,21 +110,24 @@ export default function Index() {
         </Dialog>
         {!loading ? (
           <Paper elevation={3} className={classes.padding}>
-            <Typography variant='h5'>
-              Users
-            </Typography>
+            <Typography variant='h5'>Users</Typography>
             <Grid container spacing={2}>
               {users.map(u => (
-                <Grid item xs={12} sm={4} key={u.id} >
+                <Grid item xs={12} sm={4} key={u.id}>
                   <Card elevation={3}>
                     <CardHeader
                       action={
-                        <IconButton aria-label="Delete Forever" onClick={() => handleDeleteUser(u)}>
+                        <IconButton
+                          aria-label='Delete Forever'
+                          onClick={() => handleDeleteUser(u)}
+                        >
                           <DeleteForeverIcon />
                         </IconButton>
                       }
                       title={`${u.username} (${u.id})`}
-                      subheader={`${u.administrator ? 'Administrator' : 'User'}`}
+                      subheader={`${
+                        u.administrator ? 'Administrator' : 'User'
+                      }`}
                     />
                   </Card>
                 </Grid>

@@ -39,14 +39,17 @@ export default function Index() {
     useEffect(() => {
       (async () => {
         const d = await (await fetch('/api/urls')).json();
-        if (!d.error) { setURLS(d); setLoading(false); }
+        if (!d.error) {
+          setURLS(d);
+          setLoading(false);
+        }
       })();
     }, []);
 
     return (
       <UI>
         <Backdrop className={classes.backdrop} open={loading}>
-          <CircularProgress color="inherit" />
+          <CircularProgress color='inherit' />
         </Backdrop>
         <Snackbar
           anchorOrigin={{
@@ -63,20 +66,18 @@ export default function Index() {
         </Snackbar>
         {!loading ? (
           <Paper elevation={3} className={classes.padding}>
-            <Typography variant='h5'>
-              URLs
-            </Typography>
+            <Typography variant='h5'>URLs</Typography>
             <Grid container spacing={2}>
               {urls.map(u => (
-                <Grid item xs={12} sm={4} key={u.id} >
+                <Grid item xs={12} sm={4} key={u.id}>
                   <Card elevation={3}>
                     <CardHeader
                       action={
                         <div>
-                          <IconButton aria-label="Copy URL">
+                          <IconButton aria-label='Copy URL'>
                             <FileCopyIcon />
                           </IconButton>
-                          <IconButton aria-label="Delete Forever">
+                          <IconButton aria-label='Delete Forever'>
                             <DeleteForeverIcon />
                           </IconButton>
                         </div>

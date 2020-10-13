@@ -56,7 +56,12 @@ server.register(fastifyTypeorm, {
 });
 
 server.register(bootstrap, {
-  controllers: [UserController, RootController, ImagesController, URLSController],
+  controllers: [
+    UserController,
+    RootController,
+    ImagesController,
+    URLSController,
+  ],
 });
 
 server.register(fastifyCookies, {
@@ -71,7 +76,7 @@ server.register(fastifyStatic, {
 server.register(fastifyStatic, {
   root: join(process.cwd(), 'public'),
   prefix: '/public',
-  decorateReply: false
+  decorateReply: false,
 });
 
 server.register(fastifyFavicon);

@@ -52,7 +52,7 @@ export default function Index({ config }: { config: ConfigUploader }) {
     return (
       <UI>
         <Backdrop className={classes.backdrop} open={loading}>
-          <CircularProgress color="inherit" />
+          <CircularProgress color='inherit' />
         </Backdrop>
         {!loading ? (
           <Paper elevation={3} className={classes.padding}>
@@ -61,10 +61,8 @@ export default function Index({ config }: { config: ConfigUploader }) {
             </Typography>
             <Typography color='textSecondary'>
               You have <b>{images.length}</b> images
-          </Typography>
-            <Typography variant='h5'>
-              Recent Images
-          </Typography>
+            </Typography>
+            <Typography variant='h5'>Recent Images</Typography>
             <GridList cols={3}>
               {recentImages.map(d => {
                 const t = new URL(window.location.href);

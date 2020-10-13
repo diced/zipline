@@ -29,24 +29,26 @@ export class RootController {
   private images: Repository<Image> = this.instance.orm.getRepository(Image);
   private urls: Repository<URL> = this.instance.orm.getRepository(URL);
 
-
   @GET('/config/uploader')
   async uploaderConfig() {
     return Configuration.readConfig().uploader;
   }
 
   @GET('/s/:id')
-  async getShorten(req: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
+  async getShorten(
+    req: FastifyRequest<{ Params: { id: string } }>,
+    reply: FastifyReply
+  ) {
     const urlId = await this.urls.findOne({
       where: {
-        id: req.params.id
-      }
+        id: req.params.id,
+      },
     });
 
     const urlVanity = await this.urls.findOne({
       where: {
-        vanity: req.params.id
-      }
+        vanity: req.params.id,
+      },
     });
 
     if (urlVanity) return reply.redirect(urlVanity.url);
@@ -76,7 +78,9 @@ export class RootController {
     const images = await this.images.find();
     const users = await this.users.find();
 
-    const totalViews = images.map(x => x.views).reduce((a, b) => Number(a) + Number(b), 0);
+    const totalViews = images
+      .map(x => x.views)
+      .reduce((a, b) => Number(a) + Number(b), 0);
     const leaderboardImages = [];
     const leaderboardViews = [];
 
@@ -86,11 +90,13 @@ export class RootController {
       });
       leaderboardImages.push({
         username: user.username,
-        images: usersImages.length
+        images: usersImages.length,
       });
       leaderboardViews.push({
         username: user.username,
-        views: usersImages.map(x => x.views).reduce((a, b) => Number(a) + Number(b), 0)
+        views: usersImages
+          .map(x => x.views)
+          .reduce((a, b) => Number(a) + Number(b), 0),
       });
     }
 
@@ -98,7 +104,7 @@ export class RootController {
       images: images.length,
       totalViews,
       leaderboardImages: leaderboardImages.sort((a, b) => b.images - a.images),
-      leaderboardViews: leaderboardViews.sort((a, b) => b.views - a.views)
+      leaderboardViews: leaderboardViews.sort((a, b) => b.views - a.views),
     });
   }
 

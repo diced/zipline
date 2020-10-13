@@ -17,7 +17,12 @@ export class URL {
   @Column('bigint', { default: 0 })
   public clicks: 0;
 
-  public constructor(id: string, user: number, url: string, vanity: string = null) {
+  public constructor(
+    id: string,
+    user: number,
+    url: string,
+    vanity: string = null
+  ) {
     this.id = id;
     this.user = user;
     this.url = url;

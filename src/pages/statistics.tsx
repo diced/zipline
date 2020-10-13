@@ -28,8 +28,8 @@ const useStyles = makeStyles(theme => ({
     color: '#fff',
   },
   tableBorder: {
-    borderColor: '#130929'
-  }
+    borderColor: '#130929',
+  },
 }));
 
 export default function Index() {
@@ -55,13 +55,11 @@ export default function Index() {
     return (
       <UI>
         <Backdrop className={classes.backdrop} open={loading}>
-          <CircularProgress color="inherit" />
+          <CircularProgress color='inherit' />
         </Backdrop>
         {!loading ? (
           <Paper elevation={3} className={classes.padding}>
-            <Typography variant='h5'>
-              Statistics
-          </Typography>
+            <Typography variant='h5'>Statistics</Typography>
             {stats ? (
               <Grid container spacing={3}>
                 <Grid item xs={6}>
@@ -69,17 +67,33 @@ export default function Index() {
                     <Table style={{ border: 'none' }}>
                       <TableHead>
                         <TableRow>
-                          <TableCell className={classes.tableBorder}>User</TableCell>
-                          <TableCell className={classes.tableBorder} align="right">Images</TableCell>
+                          <TableCell className={classes.tableBorder}>
+                            User
+                          </TableCell>
+                          <TableCell
+                            className={classes.tableBorder}
+                            align='right'
+                          >
+                            Images
+                          </TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {stats.leaderboardImages.map((data) => (
+                        {stats.leaderboardImages.map(data => (
                           <TableRow key={data.username}>
-                            <TableCell className={classes.tableBorder} component="th" scope="row">
+                            <TableCell
+                              className={classes.tableBorder}
+                              component='th'
+                              scope='row'
+                            >
                               {data.username}
                             </TableCell>
-                            <TableCell className={classes.tableBorder} align="right">{data.images.toLocaleString()}</TableCell>
+                            <TableCell
+                              className={classes.tableBorder}
+                              align='right'
+                            >
+                              {data.images.toLocaleString()}
+                            </TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
@@ -91,17 +105,33 @@ export default function Index() {
                     <Table>
                       <TableHead>
                         <TableRow>
-                          <TableCell className={classes.tableBorder}>User</TableCell>
-                          <TableCell className={classes.tableBorder} align="right">Views</TableCell>
+                          <TableCell className={classes.tableBorder}>
+                            User
+                          </TableCell>
+                          <TableCell
+                            className={classes.tableBorder}
+                            align='right'
+                          >
+                            Views
+                          </TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {stats.leaderboardViews.map((data) => (
+                        {stats.leaderboardViews.map(data => (
                           <TableRow key={data.username}>
-                            <TableCell className={classes.tableBorder} component="th" scope="row">
+                            <TableCell
+                              className={classes.tableBorder}
+                              component='th'
+                              scope='row'
+                            >
                               {data.username}
                             </TableCell>
-                            <TableCell className={classes.tableBorder} align="right">{data.views.toLocaleString()}</TableCell>
+                            <TableCell
+                              className={classes.tableBorder}
+                              align='right'
+                            >
+                              {data.views.toLocaleString()}
+                            </TableCell>
                           </TableRow>
                         ))}
                       </TableBody>

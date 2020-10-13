@@ -4,7 +4,7 @@ import {
   FastifyInstanceToken,
   Inject,
   GET,
-  DELETE
+  DELETE,
 } from 'fastify-decorators';
 import { Repository } from 'typeorm';
 import { Image } from '../entities/Image';
@@ -36,20 +36,23 @@ export class ImagesController {
   }
 
   @DELETE('/:id')
-  async deleteImage(req: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
+  async deleteImage(
+    req: FastifyRequest<{ Params: { id: string } }>,
+    reply: FastifyReply
+  ) {
     if (!req.cookies.zipline) throw new LoginError('Not logged in.');
 
     const image = await this.images.findOne({
       where: {
         user: readBaseCookie(req.cookies.zipline),
-        id: req.params.id
-      }
+        id: req.params.id,
+      },
     });
 
     if (!image) throw new Error('No image');
-    
+
     this.images.delete({
-      id: req.params.id
+      id: req.params.id,
     });
 
     return reply.send(image);

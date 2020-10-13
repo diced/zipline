@@ -5,7 +5,7 @@ import {
   Inject,
   GET,
   DELETE,
-  POST
+  POST,
 } from 'fastify-decorators';
 import { Repository } from 'typeorm';
 import { URL } from '../entities/URL';
@@ -39,49 +39,55 @@ export class URLSController {
   }
 
   @DELETE('/:id')
-  async deleteURL(req: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
+  async deleteURL(
+    req: FastifyRequest<{ Params: { id: string } }>,
+    reply: FastifyReply
+  ) {
     if (!req.cookies.zipline) throw new LoginError('Not logged in.');
 
     const url = await this.urls.findOne({
       where: {
         user: readBaseCookie(req.cookies.zipline),
-        id: req.params.id
-      }
+        id: req.params.id,
+      },
     });
 
     if (!url) throw new Error('No url');
 
     this.urls.delete({
-      id: req.params.id
+      id: req.params.id,
     });
 
     return reply.send(url);
   }
 
   @POST('/')
-  async createURL(req: FastifyRequest<{ Body: { vanity: string, url: string } }>, reply: FastifyReply) {
+  async createURL(
+    req: FastifyRequest<{ Body: { vanity: string; url: string } }>,
+    reply: FastifyReply
+  ) {
     if (!req.cookies.zipline) throw new LoginError('Not logged in.');
 
     if (req.body.vanity) {
       const existingVanity = await this.urls.findOne({
         where: {
-          vanity: req.body.vanity
-        }
+          vanity: req.body.vanity,
+        },
       });
       if (existingVanity) throw new Error('There is an existing vanity!');
     }
 
     const user = await this.users.findOne({
       where: {
-        id: readBaseCookie(req.cookies.zipline)
-      }
+        id: readBaseCookie(req.cookies.zipline),
+      },
     });
 
     if (!user) throw new LoginError('No user');
 
     const url = await this.urls.save(
       new URL(createRandomId(4), user.id, req.body.url, req.body.vanity || null)
-    )
+    );
     return reply.send(url);
   }
 }

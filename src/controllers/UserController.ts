@@ -45,13 +45,16 @@ export class UserController {
         id: readBaseCookie(req.cookies.zipline),
       },
     });
-    if (!user) throw new UserExistsError('User doesn\'t exist');
+    if (!user) throw new UserExistsError("User doesn't exist");
     delete user.password;
     return reply.send(user);
   }
 
   @PATCH('/')
-  async editUser(req: FastifyRequest<{ Body: { username: string, password: string } }>, reply: FastifyReply) {
+  async editUser(
+    req: FastifyRequest<{ Body: { username: string; password: string } }>,
+    reply: FastifyReply
+  ) {
     if (!req.cookies.zipline) throw new LoginError('Not logged in.');
 
     const user = await this.users.findOne({
@@ -59,7 +62,7 @@ export class UserController {
         id: readBaseCookie(req.cookies.zipline),
       },
     });
-    if (!user) throw new UserExistsError('User doesn\'t exist');
+    if (!user) throw new UserExistsError("User doesn't exist");
 
     user.username = req.body.username;
     user.password = encryptPassword(req.body.password);
@@ -84,11 +87,16 @@ export class UserController {
       },
     });
 
-    if (!user) throw new UserNotFoundError(`User "${req.body.username}" was not found.`);
-    if (!checkPassword(req.body.password, user.password)) throw new LoginError('Wrong credentials!');
+    if (!user)
+      throw new UserNotFoundError(`User "${req.body.username}" was not found.`);
+    if (!checkPassword(req.body.password, user.password))
+      throw new LoginError('Wrong credentials!');
     delete user.password;
 
-    reply.setCookie('zipline', createBaseCookie(user.id), { path: '/', maxAge: 1036800000 });
+    reply.setCookie('zipline', createBaseCookie(user.id), {
+      path: '/',
+      maxAge: 1036800000,
+    });
     return reply.send(user);
   }
 
