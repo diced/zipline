@@ -1,3 +1,9 @@
+# Stop using Zipline!
+This current branch is discontinued, and will not be getting any updates. So...
+Switch to [Zipline-Next](https://github.com/ziplineproject/zipline/tree/next)!<br>
+Switch to [Zipline-Next](https://github.com/ziplineproject/zipline/tree/next)!<br>
+Switch to [Zipline-Next](https://github.com/ziplineproject/zipline/tree/next)!<br>
+Switch to [Zipline-Next](https://github.com/ziplineproject/zipline/tree/next)!<br>
 # Zipline
 
 Zipline is a Typescript based image/file uploading service & URL shortening service! Simple, and elegant.
