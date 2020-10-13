@@ -20,7 +20,7 @@
     "fastify-multipart": "^3.2.0",
     "fastify-static": "^3.2.1",
     "fastify-typeorm-plugin": "^2.1.2",
-    "next": "^9.5.3",
+    "next": "^9.5.4",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-redux": "^7.2.1",
