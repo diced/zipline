@@ -35,12 +35,16 @@ export default function MyApp(props) {
               name='viewport'
               content='minimum-scale=1, initial-scale=1, width=device-width'
             />
-            <meta name="theme-color" content={metas.color} />
-            <meta name="title" content={metas.title} />
-            <meta name="description" content={metas.description} />
-            <meta property="og:title" content={metas.title} />
-            <meta property="og:thumbnail" content={metas.thumbnail} />
           </Head>
+          {metas ? (
+            <Head>
+              <meta name="theme-color" content={metas.color} />
+              <meta name="title" content={metas.title} />
+              <meta name="description" content={metas.description} />
+              <meta property="og:title" content={metas.title} />
+              <meta property="og:thumbnail" content={metas.thumbnail} />
+            </Head>
+          ) : null}
           <ThemeProvider theme={theme}>
             <CssBaseline />
             <Component {...pageProps} />
