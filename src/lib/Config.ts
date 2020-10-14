@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
-import { parse } from 'toml';
+import { parse } from 'toml-patch';
 import { ConnectionOptions } from 'typeorm';
 
 export interface Config {
@@ -41,7 +41,7 @@ export class Configuration {
   static readConfig(): Config {
     try {
       const data = readFileSync(resolve(process.cwd(), 'Zipline.toml'), 'utf8');
-      console.log(parse(data) as Config);
+      return parse(data);
     } catch (e) {
       console.log(e);
       return null;

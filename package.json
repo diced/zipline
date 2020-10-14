@@ -26,7 +26,7 @@
     "react-redux": "^7.2.1",
     "redux": "^4.0.5",
     "redux-persist": "^6.0.0",
-    "toml": "^3.0.0",
+    "toml-patch": "^0.2.3",
     "typeorm": "^0.2.28"
   },
   "scripts": {

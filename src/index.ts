@@ -23,6 +23,8 @@ Console.setFormatter(new ConsoleFormatter());
 const config = Configuration.readConfig();
 if (!config) process.exit(0);
 
+console.log(config);
+
 const server = fastify({});
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev, quiet: dev });
