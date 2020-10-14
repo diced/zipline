@@ -11,7 +11,6 @@ import { createWriteStream, existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import { Repository } from 'typeorm';
 import { Image } from '../entities/Image';
-import { URL } from '../entities/URL';
 import { User } from '../entities/User';
 import { AuthError } from '../lib/api/APIErrors';
 import { Configuration } from '../lib/Config';
@@ -27,33 +26,10 @@ export class RootController {
 
   private users: Repository<User> = this.instance.orm.getRepository(User);
   private images: Repository<Image> = this.instance.orm.getRepository(Image);
-  private urls: Repository<URL> = this.instance.orm.getRepository(URL);
 
-  @GET('/config/uploader')
+  @GET('/config/meta')
   async uploaderConfig() {
-    return Configuration.readConfig().uploader;
-  }
-
-  @GET('/s/:id')
-  async getShorten(
-    req: FastifyRequest<{ Params: { id: string } }>,
-    reply: FastifyReply
-  ) {
-    const urlId = await this.urls.findOne({
-      where: {
-        id: req.params.id,
-      },
-    });
-
-    const urlVanity = await this.urls.findOne({
-      where: {
-        vanity: req.params.id,
-      },
-    });
-
-    if (urlVanity) return reply.redirect(urlVanity.url);
-    if (!urlId) reply.send('Not found');
-    return reply.redirect(urlId.url);
+    return Configuration.readConfig().meta;
   }
 
   @GET('/users')
@@ -124,12 +100,13 @@ export class RootController {
     //@ts-ignore stupid multipart types smh
     const data: Multipart = await req.file();
 
-    if (!existsSync(config.uploader.directory))
-      mkdirSync(config.uploader.directory);
+    if (!existsSync(config.uploader.directory)) mkdirSync(config.uploader.directory);
 
     const ext = data.filename.split('.')[1];
+    if (config.uploader.blacklisted.includes(ext)) throw new Error('Blacklisted file extension!');
+
     const fileName = createRandomId(config.uploader.length);
-    const path = join(config.uploader.directory, `${fileName}.${ext}`);
+    const path = join(config.uploader.directory, config.uploader.original ? data.filename : `${fileName}.${ext}`);
 
     this.images.save(new Image(fileName, ext, user.id));
 

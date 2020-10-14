@@ -6,13 +6,30 @@ import { ConnectionOptions } from 'typeorm';
 export interface Config {
   database: ConnectionOptions;
   core: ConfigCore;
+  meta: ConfigMeta;
   uploader: ConfigUploader;
+  urls: ConfigUrls;
+}
+
+export interface ConfigMeta {
+  title: string;
+  description: string;
+  thumbnail: string;
+  color: string;
 }
 
 export interface ConfigUploader {
   directory: string;
   route: string;
   length: number;
+  blacklisted: string[];
+  original: boolean;
+}
+
+export interface ConfigUrls {
+  route: string;
+  length: number;
+  vanity: boolean;
 }
 
 export interface ConfigCore {

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import Head from 'next/head';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -8,14 +8,21 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from '../lib/store';
 import theme from '../lib/themes/dark';
+import { ConfigMeta } from '../lib/Config';
 
 export default function MyApp(props) {
   const { Component, pageProps } = props;
+  const [metas, setMetas] = useState<ConfigMeta>(null);
+
   useEffect(() => {
     const jssStyles = document.querySelector('#jss-server-side');
     if (jssStyles) {
       jssStyles.parentElement.removeChild(jssStyles);
     }
+    (async () => {
+      const d = await (await fetch('/api/config/meta')).json();
+      if (!d.error) setMetas(d);
+    })();
   }, []);
 
   return (
@@ -28,6 +35,11 @@ export default function MyApp(props) {
               name='viewport'
               content='minimum-scale=1, initial-scale=1, width=device-width'
             />
+            <meta name="theme-color" content={metas.color} />
+            <meta name="title" content={metas.title} />
+            <meta name="description" content={metas.description} />
+            <meta property="og:title" content={metas.title} />
+            <meta property="og:thumbnail" content={metas.thumbnail} />
           </Head>
           <ThemeProvider theme={theme}>
             <CssBaseline />

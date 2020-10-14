@@ -25,7 +25,7 @@ export function encryptPassword(pass: string) {
   return hashSync(pass, 10);
 }
 
-export function checkPassword(will, equal) {
+export function checkPassword(will: string, equal: string) {
   return compareSync(will, equal);
 }
 

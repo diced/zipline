@@ -45,7 +45,7 @@ export class UserController {
         id: readBaseCookie(req.cookies.zipline),
       },
     });
-    if (!user) throw new UserExistsError("User doesn't exist");
+    if (!user) throw new UserExistsError('User doesn\'t exist');
     delete user.password;
     return reply.send(user);
   }
@@ -62,7 +62,7 @@ export class UserController {
         id: readBaseCookie(req.cookies.zipline),
       },
     });
-    if (!user) throw new UserExistsError("User doesn't exist");
+    if (!user) throw new UserExistsError('User doesn\'t exist');
 
     user.username = req.body.username;
     user.password = encryptPassword(req.body.password);

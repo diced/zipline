@@ -68,7 +68,7 @@ export class URLSController {
   ) {
     if (!req.cookies.zipline) throw new LoginError('Not logged in.');
 
-    if (req.body.vanity) {
+    if (config.urls.vanity && req.body.vanity) {
       const existingVanity = await this.urls.findOne({
         where: {
           vanity: req.body.vanity,
@@ -86,7 +86,7 @@ export class URLSController {
     if (!user) throw new LoginError('No user');
 
     const url = await this.urls.save(
-      new URL(createRandomId(4), user.id, req.body.url, req.body.vanity || null)
+      new URL(createRandomId(config.urls.length), user.id, req.body.url, req.body.vanity || null)
     );
     return reply.send(url);
   }

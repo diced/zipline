@@ -141,9 +141,7 @@ export default function UI({ children }) {
     }
   };
 
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-  };
+  const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
 
   const drawer = (
     <div>
