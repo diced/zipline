@@ -52,6 +52,8 @@ const useStyles = makeStyles(theme => ({
   },
   appBar: {
     display: 'flex',
+    backgroundColor: '#000',
+    color: '#fff',
     [theme.breakpoints.up('sm')]: {
       width: 'calc(100%)',
       marginLeft: drawerWidth,

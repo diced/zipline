@@ -12,10 +12,14 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Alert from '@material-ui/lab/Alert';
+import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
+import Switch from '@material-ui/core/Switch';
 import IconButton from '@material-ui/core/IconButton';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import AddIcon from '@material-ui/icons/Add';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import UI from '../components/UI';
 import UIPlaceholder from '../components/UIPlaceholder';
@@ -28,6 +32,9 @@ const useStyles = makeStyles(theme => ({
   padding: {
     border: '1px solid #1f1f1f',
     padding: '10px',
+  },
+  field: {
+    width: '100%',
   },
   backdrop: {
     zIndex: theme.zIndex.drawer + 1,
@@ -42,25 +49,34 @@ export default function Index() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [administrator, setAdministrator] = useState(false);
 
   if (typeof window === 'undefined') return <UIPlaceholder />;
   else {
+    const doUsers = async () => {
+      const us = await (await fetch('/api/users')).json();
+      if (!us.error) {
+        setUsers(us);
+        setLoading(false);
+      }
+    };
+
     useEffect(() => {
       (async () => {
         const d = await (await fetch('/api/user')).json();
         if (!d.error) {
           if (!d.administrator) router.push('/');
-          const us = await (await fetch('/api/users')).json();
-          if (!us.error) {
-            setUsers(us);
-            setLoading(false);
-          }
+          doUsers();
         }
       })();
     }, []);
 
-    const handleDeleteUser = d => {
+    const handleDeleteUser = () => {
       setDeleteOpen(true);
       setUser(d);
     };
@@ -68,6 +84,23 @@ export default function Index() {
     const deleteUserThenClose = () => {
       setDeleteOpen(false);
       setAlertOpen(true);
+      setAlertMessage(`Deleted ${user ? user.username : ''}`);
+    };
+
+    const createUserThenClose = async () => {
+      const d = await (await fetch('/api/user/create', {
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+        body: JSON.stringify({
+          username, password, administrator
+        })
+      })).json();
+      if (!d.error) {
+        setCreateOpen(false);
+        setAlertOpen(true);
+        doUsers();
+        setAlertMessage(`Created ${username}`);
+      }
     };
 
     return (
@@ -85,18 +118,18 @@ export default function Index() {
           onClose={() => setAlertOpen(false)}
         >
           <Alert severity='success' variant='filled'>
-            Deleted <b>{user ? user.username : ''}</b>
+            {alertMessage}
           </Alert>
         </Snackbar>
         <Dialog
           open={deleteOpen}
           onClose={() => setDeleteOpen(false)}
-          aria-labelledby='alert-dialog-title'
-          aria-describedby='alert-dialog-description'
+          aria-labelledby='are-you-sure'
+          aria-describedby='deleted-forever'
         >
-          <DialogTitle id='alert-dialog-title'>Are you sure?</DialogTitle>
+          <DialogTitle id='are-you-sure'>Are you sure?</DialogTitle>
           <DialogContent>
-            <DialogContentText id='alert-dialog-description'>
+            <DialogContentText id='deleted-forever'>
               This user will be deleted <b>forever</b>.
             </DialogContentText>
           </DialogContent>
@@ -109,9 +142,49 @@ export default function Index() {
             </Button>
           </DialogActions>
         </Dialog>
+        <Dialog
+          open={createOpen}
+          onClose={() => setCreateOpen(false)}
+          aria-labelledby='create-user-title'
+          aria-describedby='create-user-desc'
+        >
+          <DialogTitle id='create-user-title'>Create User</DialogTitle>
+          <DialogContent>
+            <DialogContentText id='create-user-desc'>
+              <TextField
+                label='Username'
+                className={classes.field}
+                onChange={e => setUsername(e.target.value)}
+              />
+              <TextField
+                label='Password'
+                type='password'
+                className={classes.field}
+                onChange={e => setPassword(e.target.value)}
+              />
+              <FormControlLabel
+                control={<Switch checked={administrator} onChange={() => setAdministrator(!administrator)} name="admin" />}
+                label="Administrator"
+              />
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setCreateOpen(false)} color='primary'>
+              Cancel
+            </Button>
+            <Button onClick={createUserThenClose} color='primary' autoFocus>
+              Create
+            </Button>
+          </DialogActions>
+        </Dialog>
         {!loading ? (
           <Paper elevation={3} className={classes.padding}>
-            <Typography variant='h5'>Users</Typography>
+            <Typography variant='h5'>
+              User
+              <IconButton aria-label='Create User' onClick={() => setCreateOpen(true)}>
+                <AddIcon />
+              </IconButton>
+            </Typography>
             <Grid container spacing={2}>
               {users.map(u => (
                 <Grid item xs={12} sm={4} key={u.id}>
@@ -126,9 +199,8 @@ export default function Index() {
                         </IconButton>
                       }
                       title={`${u.username} (${u.id})`}
-                      subheader={`${
-                        u.administrator ? 'Administrator' : 'User'
-                      }`}
+                      subheader={`${u.administrator ? 'Administrator' : 'User'
+                        }`}
                     />
                   </Card>
                 </Grid>
