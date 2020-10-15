@@ -100,13 +100,18 @@ export class RootController {
     //@ts-ignore stupid multipart types smh
     const data: Multipart = await req.file();
 
-    if (!existsSync(config.uploader.directory)) mkdirSync(config.uploader.directory);
+    if (!existsSync(config.uploader.directory))
+      mkdirSync(config.uploader.directory);
 
     const ext = data.filename.split('.')[1];
-    if (config.uploader.blacklisted.includes(ext)) throw new Error('Blacklisted file extension!');
+    if (config.uploader.blacklisted.includes(ext))
+      throw new Error('Blacklisted file extension!');
 
     const fileName = createRandomId(config.uploader.length);
-    const path = join(config.uploader.directory, config.uploader.original ? data.filename : `${fileName}.${ext}`);
+    const path = join(
+      config.uploader.directory,
+      config.uploader.original ? data.filename : `${fileName}.${ext}`
+    );
 
     this.images.save(new Image(fileName, ext, user.id));
 

@@ -86,7 +86,12 @@ export class URLSController {
     if (!user) throw new LoginError('No user');
 
     const url = await this.urls.save(
-      new URL(createRandomId(config.urls.length), user.id, req.body.url, req.body.vanity || null)
+      new URL(
+        createRandomId(config.urls.length),
+        user.id,
+        req.body.url,
+        req.body.vanity || null
+      )
     );
     return reply.send(url);
   }

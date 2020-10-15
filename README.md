@@ -5,7 +5,7 @@ Speed & reliable
 - Configurable
 - Fast (API)
 - Built with Next.js & React
-- Support for multible database types (mongo soon)
+- Support for multible database types (mongo soon) 
 
 # Documentation
 You can view current documentation [here](https://zipline.diced.wtf/)

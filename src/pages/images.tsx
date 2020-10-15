@@ -1,14 +1,12 @@
 import React from 'react';
 import { useRouter } from 'next/router';
 import Paper from '@material-ui/core/Paper';
-import Typography from '@material-ui/core/Typography';
 import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
 import CardMedia from '@material-ui/core/CardMedia';
 import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
-import CardContent from '@material-ui/core/CardContent';
 import Popover from '@material-ui/core/Popover';
 import Button from '@material-ui/core/Button';
 import Pagination from '@material-ui/lab/Pagination';
@@ -26,7 +24,7 @@ const useStyles = makeStyles(theme => ({
   },
   padding: {
     border: '1px solid #1f1f1f',
-    padding: '10px'
+    padding: '10px',
   },
   backdrop: {
     zIndex: theme.zIndex.drawer + 1,
@@ -110,12 +108,18 @@ export default function Images({ config }: { config: ConfigUploader }) {
                 const t = new URL(window.location.href);
                 t.pathname = `${config ? config.route : '/u'}/${d.file}`;
                 return (
-                  <Grid item xs={12} sm={6} key={d.id} onClick={e => setImageOpenPopover(e, d)}>
+                  <Grid
+                    item
+                    xs={12}
+                    sm={6}
+                    key={d.id}
+                    onClick={e => setImageOpenPopover(e, d)}
+                  >
                     <Card>
                       <CardActionArea>
                         <CardMedia
-                          component="img"
-                          height="140"
+                          component='img'
+                          height='140'
                           image={t.toString()}
                         />
                       </CardActionArea>

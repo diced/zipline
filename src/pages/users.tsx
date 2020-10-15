@@ -27,7 +27,7 @@ const useStyles = makeStyles(theme => ({
   },
   padding: {
     border: '1px solid #1f1f1f',
-    padding: '10px'
+    padding: '10px',
   },
   backdrop: {
     zIndex: theme.zIndex.drawer + 1,

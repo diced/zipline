@@ -49,7 +49,10 @@ server.setNotFoundHandler(async (req, reply) => {
   return (reply.sent = true);
 });
 
-server.get(`${config.urls.route}/:id`, async function (req: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
+server.get(`${config.urls.route}/:id`, async function (
+  req: FastifyRequest<{ Params: { id: string } }>,
+  reply: FastifyReply
+) {
   const urls = this.orm.getRepository(URL);
 
   const urlId = await urls.findOne({
@@ -110,7 +113,7 @@ server.register(fastifyFavicon);
 server.listen(config.core.port, err => {
   if (err) throw err;
   const info = server.server.address() as AddressInfo;
-  
+
   Console.logger('Server').info(
     `server listening on ${bold(
       `${green(info.address)}${reset(':')}${bold(green(info.port.toString()))}`
