@@ -11,9 +11,12 @@ import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
+import copy from 'copy-to-clipboard';
 import UI from '../components/UI';
 import UIPlaceholder from '../components/UIPlaceholder';
 import { makeStyles } from '@material-ui/core';
+import { URL as URLEntity } from '../entities/URL';
+import { ConfigUploader } from '../lib/Config';
 
 const useStyles = makeStyles(theme => ({
   margin: {
@@ -29,23 +32,35 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function Index() {
+export default function Urls({ config }: { config: ConfigUploader }) {
   const classes = useStyles();
-  const [urls, setURLS] = useState([]);
+  const [urls, setURLS] = useState<URLEntity[]>([]);
   const [loading, setLoading] = useState(true);
   const [alertOpen, setAlertOpen] = useState(false);
 
   if (typeof window === 'undefined') return <UIPlaceholder />;
   else {
+
+    const doUrls = async () => {
+      const d = await (await fetch('/api/urls')).json();
+      if (!d.error) {
+        setURLS(d);
+        setLoading(false);
+      }
+    };
+
     useEffect(() => {
       (async () => {
-        const d = await (await fetch('/api/urls')).json();
-        if (!d.error) {
-          setURLS(d);
-          setLoading(false);
-        }
+        doUrls();
       })();
     }, []);
+
+    const deleteUrl = async (u: URLEntity) => {
+      const d = await (await fetch('/api/urls/' + u.id, { method: 'DELETE' })).json();
+      if (!d.error) {
+        doUrls();
+      }
+    };
 
     return (
       <UI>
@@ -69,25 +84,29 @@ export default function Index() {
           <Paper elevation={3} className={classes.padding}>
             <Typography variant='h5'>URLs</Typography>
             <Grid container spacing={2}>
-              {urls.map(u => (
-                <Grid item xs={12} sm={4} key={u.id}>
-                  <Card elevation={3}>
-                    <CardHeader
-                      action={
-                        <div>
-                          <IconButton aria-label='Copy URL'>
-                            <FileCopyIcon />
-                          </IconButton>
-                          <IconButton aria-label='Delete Forever'>
-                            <DeleteForeverIcon />
-                          </IconButton>
-                        </div>
-                      }
-                      title={u.vanity ? u.vanity : u.id}
-                    />
-                  </Card>
-                </Grid>
-              ))}
+              {urls.map(u => {
+                const url = new URL(window.location.href);
+                url.pathname = `${config ? config.route : '/u'}/${u.id}`;
+                return (
+                  <Grid item xs={12} sm={4} key={u.id}>
+                    <Card elevation={3}>
+                      <CardHeader
+                        action={
+                          <div>
+                            <IconButton aria-label='Copy URL'>
+                              <FileCopyIcon onClick={() => copy(url.toString())} />
+                            </IconButton>
+                            <IconButton aria-label='Delete Forever'>
+                              <DeleteForeverIcon onClick={() => deleteUrl(u)} />
+                            </IconButton>
+                          </div>
+                        }
+                        title={u.vanity ? u.vanity : u.id}
+                      />
+                    </Card>
+                  </Grid>
+                );
+              })}
             </Grid>
           </Paper>
         ) : null}
