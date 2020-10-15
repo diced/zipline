@@ -6,6 +6,7 @@ import {
   PATCH,
   FastifyInstanceToken,
   Inject,
+  DELETE,
 } from 'fastify-decorators';
 import { Repository } from 'typeorm';
 import { User } from '../entities/User';
@@ -87,10 +88,8 @@ export class UserController {
       },
     });
 
-    if (!user)
-      throw new UserNotFoundError(`User "${req.body.username}" was not found.`);
-    if (!checkPassword(req.body.password, user.password))
-      throw new LoginError('Wrong credentials!');
+    if (!user) throw new UserNotFoundError(`User "${req.body.username}" was not found.`);
+    if (!checkPassword(req.body.password, user.password)) throw new LoginError('Wrong credentials!');
     delete user.password;
 
     reply.setCookie('zipline', createBaseCookie(user.id), {
@@ -157,6 +156,30 @@ export class UserController {
       return reply.send(user);
     } catch (e) {
       throw new Error(`Could not create user: ${e.message}`);
+    }
+  }
+
+  @DELETE('/:id')
+  async delete(
+    req: FastifyRequest<{
+      Params: {
+        id: string
+      }
+    }>,
+    reply: FastifyReply
+  ) {
+    const existing = await this.users.findOne({
+      where: { id: req.params.id },
+    });
+    if (!existing) throw new UserExistsError('User doesnt exist');
+
+    try {
+      await this.users.delete({
+        id: existing.id
+      });
+      return reply.send({ ok: true });
+    } catch (e) {
+      throw new Error(`Could not delete user: ${e.message}`);
     }
   }
 

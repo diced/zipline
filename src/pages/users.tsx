@@ -81,10 +81,14 @@ export default function Index() {
       setUser(d);
     };
 
-    const deleteUserThenClose = () => {
-      setDeleteOpen(false);
-      setAlertOpen(true);
-      setAlertMessage(`Deleted ${user ? user.username : ''}`);
+    const deleteUserThenClose = async () => {
+      const d = await (await fetch('/api/user/' + user.id, { method: 'DELETE' })).json();
+      if (!d.error) {
+        setDeleteOpen(false);
+        setAlertOpen(true);
+        doUsers();
+        setAlertMessage(`Deleted ${user ? user.username : ''}`);
+      }
     };
 
     const createUserThenClose = async () => {
