@@ -76,7 +76,7 @@ export default function Index() {
       })();
     }, []);
 
-    const handleDeleteUser = () => {
+    const handleDeleteUser = d => {
       setDeleteOpen(true);
       setUser(d);
     };
@@ -199,8 +199,7 @@ export default function Index() {
                         </IconButton>
                       }
                       title={`${u.username} (${u.id})`}
-                      subheader={`${u.administrator ? 'Administrator' : 'User'
-                        }`}
+                      subheader={`${u.administrator ? 'Administrator' : 'User'}`}
                     />
                   </Card>
                 </Grid>
