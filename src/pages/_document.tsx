@@ -5,36 +5,30 @@ import theme from '../lib/themes/dark';
 import { Configuration } from '../lib/Config';
 import PropTypes from 'prop-types';
 
-export default class MyDocument extends Document {
-  static propTypes: { config: PropTypes.Requireable<any> };
+export default function MyDocument() {
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  render() {
-    return (
-      <Html lang='en'>
-        <Head>
-          <meta name='theme-color' content={theme.palette.primary.main} />
-          <meta name='title' content={this.props.config.meta.title} />
-          <meta
-            name='description'
-            content={this.props.config.meta.description}
-          />
-          <meta property='og:title' content={this.props.config.meta.title} />
-          <meta
-            property='og:thumbnail'
-            content={this.props.config.meta.thumbnail}
-          />
-          <link
-            rel='stylesheet'
-            href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap'
-          />
-        </Head>
-        <body>
-          <Main />
-          <NextScript />
-        </body>
-      </Html>
-    );
-  }
+  return (
+    <Html lang='en'>
+      <Head>
+        <meta name='theme-color' content={theme.palette.primary.main} />
+        <meta name='title' content={this.props.config.meta.title} />
+        <meta name='description' content={this.props.config.meta.description} />
+        <meta property='og:title' content={this.props.config.meta.title} />
+        <meta
+          property='og:thumbnail'
+          content={this.props.config.meta.thumbnail}
+        />
+        <link
+          rel='stylesheet'
+          href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap'
+        />
+      </Head>
+      <body>
+        <Main />
+        <NextScript />
+      </body>
+    </Html>
+  );
 }
 
 MyDocument.propTypes = {
