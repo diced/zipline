@@ -8,21 +8,14 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from '../lib/store';
 import theme from '../lib/themes/dark';
-import { ConfigMeta } from '../lib/Config';
+import { Configuration } from '../lib/Config';
 
-export default function MyApp(props) {
-  const { Component, pageProps } = props;
-  const [metas, setMetas] = useState<ConfigMeta>(null);
-
+function MyApp({ Component, pageProps }) {
   useEffect(() => {
     const jssStyles = document.querySelector('#jss-server-side');
     if (jssStyles) {
       jssStyles.parentElement.removeChild(jssStyles);
     }
-    (async () => {
-      const d = await (await fetch('/api/config/meta')).json();
-      if (!d.error) setMetas(d);
-    })();
   }, []);
 
   return (
@@ -36,15 +29,7 @@ export default function MyApp(props) {
               content='minimum-scale=1, initial-scale=1, width=device-width'
             />
           </Head>
-          {metas ? (
-            <Head>
-              <meta name='theme-color' content={metas.color} />
-              <meta name='title' content={metas.title} />
-              <meta name='description' content={metas.description} />
-              <meta property='og:title' content={metas.title} />
-              <meta property='og:thumbnail' content={metas.thumbnail} />
-            </Head>
-          ) : null}
+
           <ThemeProvider theme={theme}>
             <CssBaseline />
             <Component {...pageProps} />
@@ -59,3 +44,5 @@ MyApp.propTypes = {
   Component: PropTypes.elementType.isRequired,
   pageProps: PropTypes.object.isRequired,
 };
+
+export default MyApp;
