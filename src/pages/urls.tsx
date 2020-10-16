@@ -49,11 +49,7 @@ export default function Urls({ config }: { config: ConfigUploader }) {
       }
     };
 
-    useEffect(() => {
-      (async () => {
-        doUrls();
-      })();
-    }, []);
+    useEffect(() => (async () => doUrls())(), []);
 
     const deleteUrl = async (u: URLEntity) => {
       const d = await (await fetch('/api/urls/' + u.id, { method: 'DELETE' })).json();
@@ -113,5 +109,4 @@ export default function Urls({ config }: { config: ConfigUploader }) {
       </UI>
     );
   }
-  return <UIPlaceholder />;
 }

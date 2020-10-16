@@ -4,8 +4,10 @@ import Typography from '@material-ui/core/Typography';
 import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Paper from '@material-ui/core/Paper';
-import GridList from '@material-ui/core/GridList';
-import GridListTile from '@material-ui/core/GridListTile';
+import Grid from '@material-ui/core/Grid';
+import Card from '@material-ui/core/Card';
+import CardActionArea from '@material-ui/core/CardActionArea';
+import CardMedia from '@material-ui/core/CardMedia';
 import UI from '../components/UI';
 import UIPlaceholder from '../components/UIPlaceholder';
 import { makeStyles } from '@material-ui/core';
@@ -64,20 +66,29 @@ export default function Index({ config }: { config: ConfigUploader }) {
               You have <b>{images.length}</b> images
             </Typography>
             <Typography variant='h5'>Recent Images</Typography>
-            <GridList cols={3}>
+            <Grid container spacing={2}>
               {recentImages.map(d => {
                 const t = new URL(window.location.href);
                 t.pathname = `${config ? config.route : '/u'}/${d.file}`;
                 return (
-                  <GridListTile key={d.id} cols={1}>
-                    <img src={t.toString()} />
-                  </GridListTile>
+                  <Grid item key={d.id} xs={12} sm={4}>
+                    <Card>
+                      <CardActionArea>
+                        <CardMedia
+                          component='img'
+                          height='140'
+                          image={t.toString()}
+                        />
+                      </CardActionArea>
+                    </Card>
+                  </Grid>
                 );
               })}
-            </GridList>
+            </Grid>
           </Paper>
-        ) : null}
-      </UI>
+        ) : null
+        }
+      </UI >
     );
   }
   return <UIPlaceholder />;
