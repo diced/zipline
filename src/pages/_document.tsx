@@ -3,8 +3,10 @@ import Document, { Html, Head, Main, NextScript } from 'next/document';
 import { ServerStyleSheets } from '@material-ui/core/styles';
 import theme from '../lib/themes/dark';
 import { Configuration } from '../lib/Config';
+import PropTypes from 'prop-types';
 
 export default class MyDocument extends Document {
+  static propTypes: { config: PropTypes.Requireable<any> };
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   render() {
     return (
@@ -34,6 +36,10 @@ export default class MyDocument extends Document {
     );
   }
 }
+
+MyDocument.propTypes = {
+  config: PropTypes.any,
+};
 
 MyDocument.getInitialProps = async ctx => {
   const sheets = new ServerStyleSheets();
