@@ -63,7 +63,7 @@ export default function Index() {
             <Typography variant='h5'>Statistics</Typography>
             {stats ? (
               <Grid container spacing={3}>
-                <Grid item xs={6}>
+                <Grid item xs={12} sm={6}>
                   <TableContainer>
                     <Table style={{ border: 'none' }}>
                       <TableHead>
@@ -101,7 +101,7 @@ export default function Index() {
                     </Table>
                   </TableContainer>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={12} sm={6}>
                   <TableContainer>
                     <Table>
                       <TableHead>
