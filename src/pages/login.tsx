@@ -11,8 +11,8 @@ import Grid from '@material-ui/core/Grid';
 import Alert from '@material-ui/lab/Alert';
 import UIPlaceholder from '../components/UIPlaceholder';
 import { makeStyles } from '@material-ui/core';
-import { store } from '../lib/store';
-import { UPDATE_USER, LOGIN } from '../lib/reducer';
+import { store } from '../store';
+import { UPDATE_USER, LOGIN } from '../reducer';
 import { useDispatch } from 'react-redux';
 
 const useStyles = makeStyles({

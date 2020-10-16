@@ -11,8 +11,8 @@ import Alert from '@material-ui/lab/Alert';
 import UI from '../components/UI';
 import UIPlaceholder from '../components/UIPlaceholder';
 import { makeStyles } from '@material-ui/core';
-import { UPDATE_USER } from '../lib/reducer';
-import { store } from '../lib/store';
+import { UPDATE_USER } from '../reducer';
+import { store } from '../store';
 import { useDispatch } from 'react-redux';
 
 const useStyles = makeStyles({

@@ -15,18 +15,22 @@ export default class MyDocument extends Document<DocumentProps> {
       <Html lang='en'>
         <Head>
           <meta name='theme-color' content={theme.palette.primary.main} />
-          <meta name='title' content={this.props.config.meta.title} />
-          <meta name='description' content='Zipline' />
-          <meta property='og:title' content={this.props.config.meta.title} />
-          <meta
-            property='og:thumbnail'
-            content={this.props.config.meta.thumbnail}
-          />
           <link
             rel='stylesheet'
             href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap'
           />
         </Head>
+        {this.props.config ? (
+          <Head>
+            <meta name='title' content={this.props.config.meta.title} />
+            <meta name='description' content='Zipline' />
+            <meta property='og:title' content={this.props.config.meta.title} />
+            <meta
+              property='og:thumbnail'
+              content={this.props.config.meta.thumbnail}
+            />
+          </Head>
+        ) : null}
         <body>
           <Main />
           <NextScript />

@@ -11,7 +11,7 @@ import CardMedia from '@material-ui/core/CardMedia';
 import UI from '../components/UI';
 import UIPlaceholder from '../components/UIPlaceholder';
 import { makeStyles } from '@material-ui/core';
-import { store } from '../lib/store';
+import { store } from '../store';
 import { ConfigUploader } from '../lib/Config';
 
 const useStyles = makeStyles(theme => ({

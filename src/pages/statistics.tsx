@@ -14,7 +14,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import UI from '../components/UI';
 import UIPlaceholder from '../components/UIPlaceholder';
 import { makeStyles } from '@material-ui/core';
-import { store } from '../lib/store';
+import { store } from '../store';
 
 const useStyles = makeStyles(theme => ({
   margin: {

@@ -31,7 +31,7 @@ import FileCopyIcon from '@material-ui/icons/FileCopy';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import RotateLeftIcon from '@material-ui/icons/RotateLeft';
 import copy from 'copy-to-clipboard';
-import { LOGOUT, UPDATE_USER } from '../lib/reducer';
+import { LOGOUT, UPDATE_USER } from '../reducer';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { useRouter } from 'next/router';
 import { useDispatch } from 'react-redux';

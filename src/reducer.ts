@@ -1,5 +1,5 @@
 /* eslint-disable indent */
-import { User } from '../entities/User';
+import { User } from './entities/User';
 
 export const LOGIN = 'LOGIN';
 export const LOGOUT = 'LOGOUT';
