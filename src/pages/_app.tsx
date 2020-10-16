@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Head from 'next/head';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -7,8 +7,7 @@ import { ThemeProvider } from '@material-ui/core/styles';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from '../store';
-import theme from '../lib/themes/dark';
-import { Configuration } from '../lib/Config';
+import dark from '../lib/themes/dark';
 
 function MyApp({ Component, pageProps }) {
   useEffect(() => {
@@ -30,7 +29,8 @@ function MyApp({ Component, pageProps }) {
             />
           </Head>
 
-          <ThemeProvider theme={theme}>
+
+          <ThemeProvider theme={dark}>
             <CssBaseline />
             <Component {...pageProps} />
           </ThemeProvider>

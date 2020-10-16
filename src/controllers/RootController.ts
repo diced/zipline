@@ -57,19 +57,16 @@ export class RootController {
     const totalViews = images
       .map(x => x.views)
       .reduce((a, b) => Number(a) + Number(b), 0);
-    const leaderboardImages = [];
-    const leaderboardViews = [];
+    const lb = [];
 
     for (const user of users) {
       const usersImages = await this.images.find({
         where: { user: user.id },
       });
-      leaderboardImages.push({
+
+      lb.push({
         username: user.username,
         images: usersImages.length,
-      });
-      leaderboardViews.push({
-        username: user.username,
         views: usersImages
           .map(x => x.views)
           .reduce((a, b) => Number(a) + Number(b), 0),
@@ -79,8 +76,7 @@ export class RootController {
     return reply.send({
       images: images.length,
       totalViews,
-      leaderboardImages: leaderboardImages.sort((a, b) => b.images - a.images),
-      leaderboardViews: leaderboardViews.sort((a, b) => b.views - a.views),
+      leaderboard: lb.sort((a, b) => b.images - a.images),
     });
   }
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
@@ -8,7 +8,6 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import Grid from '@material-ui/core/Grid';
 import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import UI from '../components/UI';
@@ -37,13 +36,13 @@ export default function Index() {
   const classes = useStyles();
   const router = useRouter();
   const state = store.getState();
-  const [loading, setLoading] = React.useState(true);
-  const [stats, setStats] = React.useState(null);
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState(null);
 
   if (typeof window === 'undefined') return <UIPlaceholder />;
   if (!state.loggedIn) router.push('/login');
   else {
-    React.useEffect(() => {
+    useEffect(() => {
       (async () => {
         const data = await (await fetch('/api/statistics')).json();
         if (!data.error) {
@@ -62,84 +61,54 @@ export default function Index() {
           <Paper elevation={3} className={classes.padding}>
             <Typography variant='h5'>Statistics</Typography>
             {stats ? (
-              <Grid container spacing={3}>
-                <Grid item xs={12} sm={6}>
-                  <TableContainer>
-                    <Table style={{ border: 'none' }}>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell className={classes.tableBorder}>
-                            User
-                          </TableCell>
-                          <TableCell
-                            className={classes.tableBorder}
-                            align='right'
-                          >
-                            Images
-                          </TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {stats.leaderboardImages.map(data => (
-                          <TableRow key={data.username}>
-                            <TableCell
-                              className={classes.tableBorder}
-                              component='th'
-                              scope='row'
-                            >
-                              {data.username}
-                            </TableCell>
-                            <TableCell
-                              className={classes.tableBorder}
-                              align='right'
-                            >
-                              {data.images.toLocaleString()}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TableContainer>
-                    <Table>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell className={classes.tableBorder}>
-                            User
-                          </TableCell>
-                          <TableCell
-                            className={classes.tableBorder}
-                            align='right'
-                          >
-                            Views
-                          </TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {stats.leaderboardViews.map(data => (
-                          <TableRow key={data.username}>
-                            <TableCell
-                              className={classes.tableBorder}
-                              component='th'
-                              scope='row'
-                            >
-                              {data.username}
-                            </TableCell>
-                            <TableCell
-                              className={classes.tableBorder}
-                              align='right'
-                            >
-                              {data.views.toLocaleString()}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </Grid>
-              </Grid>
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell className={classes.tableBorder}>
+                        User
+                      </TableCell>
+                      <TableCell
+                        className={classes.tableBorder}
+                        align='right'
+                      >
+                        Images
+                      </TableCell>
+                      <TableCell
+                        className={classes.tableBorder}
+                        align='right'
+                      >
+                        Views
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {stats.leaderboard.map(data => (
+                      <TableRow key={data.username}>
+                        <TableCell
+                          className={classes.tableBorder}
+                          component='th'
+                          scope='row'
+                        >
+                          {data.username}
+                        </TableCell>
+                        <TableCell
+                          className={classes.tableBorder}
+                          align='right'
+                        >
+                          {data.images.toLocaleString()}
+                        </TableCell>
+                        <TableCell
+                          className={classes.tableBorder}
+                          align='right'
+                        >
+                          {data.views.toLocaleString()}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
             ) : null}
           </Paper>
         ) : null}
