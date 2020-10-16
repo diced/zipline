@@ -16,10 +16,7 @@ export default class MyDocument extends Document<DocumentProps> {
         <Head>
           <meta name='theme-color' content={theme.palette.primary.main} />
           <meta name='title' content={this.props.config.meta.title} />
-          <meta
-            name='description'
-            content={this.props.config.meta.description}
-          />
+          <meta name='description' content='Zipline' />
           <meta property='og:title' content={this.props.config.meta.title} />
           <meta
             property='og:thumbnail'
