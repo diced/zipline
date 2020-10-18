@@ -10,11 +10,15 @@ import { Multipart } from 'fastify-multipart';
 import { createWriteStream, existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import { Repository } from 'typeorm';
+import { pipeline } from 'stream';
+import { promisify } from 'util';
 import { Image } from '../entities/Image';
 import { User } from '../entities/User';
 import { AuthError } from '../lib/api/APIErrors';
 import { Configuration } from '../lib/Config';
 import { createRandomId } from '../lib/Encryption';
+const pump = promisify(pipeline);
+
 
 const config = Configuration.readConfig();
 if (!config) process.exit(0);
@@ -111,7 +115,7 @@ export class RootController {
 
     this.images.save(new Image(fileName, ext, user.id));
 
-    data.file.pipe(createWriteStream(path));
+    await pump(data.file, createWriteStream(path));
     reply.send(
       `${req.protocol}://${req.hostname}${config.uploader.route}/${fileName}.${ext}`
     );
