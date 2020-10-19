@@ -1,6 +1,7 @@
 import aes from 'crypto-js/aes';
 import { compareSync, hashSync } from 'bcrypt';
 import { Configuration } from './Config';
+import { Repository } from 'typeorm';
 
 const config = Configuration.readConfig();
 if (!config) process.exit(0);

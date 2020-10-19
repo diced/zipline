@@ -31,11 +31,6 @@ export class RootController {
   private users: Repository<User> = this.instance.orm.getRepository(User);
   private images: Repository<Image> = this.instance.orm.getRepository(Image);
 
-  @GET('/config/meta')
-  async uploaderConfig() {
-    return Configuration.readConfig().meta;
-  }
-
   @GET('/users')
   async allUsers(req: FastifyRequest, reply: FastifyReply) {
     if (!req.cookies.zipline) throw new Error('Not logged in.');
