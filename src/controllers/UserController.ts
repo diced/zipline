@@ -22,7 +22,7 @@ import {
   createToken,
   encryptPassword,
   readBaseCookie,
-} from '../lib/Encryption';
+} from '../lib/Util';
 
 @Controller('/api/user')
 export class UserController {

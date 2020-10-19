@@ -12,7 +12,7 @@ import { URL } from '../entities/URL';
 import { User } from '../entities/User';
 import { LoginError } from '../lib/api/APIErrors';
 import { Configuration } from '../lib/Config';
-import { createRandomId, readBaseCookie } from '../lib/Encryption';
+import { createRandomId, readBaseCookie } from '../lib/Util';
 
 const config = Configuration.readConfig();
 if (!config) process.exit(0);

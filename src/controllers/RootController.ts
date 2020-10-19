@@ -16,7 +16,7 @@ import { Image } from '../entities/Image';
 import { User } from '../entities/User';
 import { AuthError } from '../lib/api/APIErrors';
 import { Configuration } from '../lib/Config';
-import { createRandomId } from '../lib/Encryption';
+import { createRandomId } from '../lib/Util';
 const pump = promisify(pipeline);
 
 
