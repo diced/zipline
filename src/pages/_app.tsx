@@ -7,14 +7,12 @@ import { ThemeProvider } from '@material-ui/core/styles';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from '../store';
-import dark from '../lib/themes/dark';
+import theme from '../lib/themes/dark';
 
 function MyApp({ Component, pageProps }) {
   useEffect(() => {
     const jssStyles = document.querySelector('#jss-server-side');
-    if (jssStyles) {
-      jssStyles.parentElement.removeChild(jssStyles);
-    }
+    if (jssStyles) jssStyles.parentElement.removeChild(jssStyles);
   }, []);
 
   return (
@@ -30,7 +28,7 @@ function MyApp({ Component, pageProps }) {
           </Head>
 
 
-          <ThemeProvider theme={dark}>
+          <ThemeProvider theme={theme}>
             <CssBaseline />
             <Component {...pageProps} />
           </ThemeProvider>

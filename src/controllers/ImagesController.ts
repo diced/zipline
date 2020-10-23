@@ -10,7 +10,7 @@ import { Repository } from 'typeorm';
 import { Image } from '../entities/Image';
 import { LoginError } from '../lib/api/APIErrors';
 import { Configuration } from '../lib/Config';
-import { readBaseCookie } from '../lib/Encryption';
+import { readBaseCookie } from '../lib/Util';
 
 const config = Configuration.readConfig();
 if (!config) process.exit(0);
