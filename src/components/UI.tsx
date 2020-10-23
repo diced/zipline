@@ -364,7 +364,7 @@ export default function UI({ children }) {
               paper: classes.drawerPaper,
             }}
             variant='permanent'
-            open
+          // open
           >
             {drawer}
           </Drawer>

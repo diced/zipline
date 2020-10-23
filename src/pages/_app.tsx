@@ -16,24 +16,21 @@ function MyApp({ Component, pageProps }) {
   }, []);
 
   return (
-    <React.Fragment>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Provider store={store}>
-          <PersistGate loading={<UIPlaceholder />} persistor={persistor}>
-            <Head>
-              <title>Zipline</title>
-              <meta
-                name='viewport'
-                content='minimum-scale=1, initial-scale=1, width=device-width'
-              />
-            </Head>
-
-            <Component {...pageProps} />
-          </PersistGate>
-        </Provider>
-      </ThemeProvider>
-    </React.Fragment >
+    <ThemeProvider theme={theme}>
+      <Head>
+        <title>Zipline</title>
+        <meta
+          name='viewport'
+          content='minimum-scale=1, initial-scale=1, width=device-width'
+        />
+      </Head>
+      <CssBaseline />
+      <Provider store={store}>
+        <PersistGate loading={<UIPlaceholder />} persistor={persistor}>
+          <Component {...pageProps} />
+        </PersistGate>
+      </Provider>
+    </ThemeProvider>
   );
 }
 
