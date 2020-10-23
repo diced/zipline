@@ -17,24 +17,22 @@ function MyApp({ Component, pageProps }) {
 
   return (
     <React.Fragment>
-      <Provider store={store}>
-        <PersistGate loading={<UIPlaceholder />} persistor={persistor}>
-          <Head>
-            <title>Zipline</title>
-            <meta
-              name='viewport'
-              content='minimum-scale=1, initial-scale=1, width=device-width'
-            />
-          </Head>
-
-
-          <ThemeProvider theme={theme}>
+      <ThemeProvider theme={theme}>
+        <Provider store={store}>
+          <PersistGate loading={<UIPlaceholder />} persistor={persistor}>
+            <Head>
+              <title>Zipline</title>
+              <meta
+                name='viewport'
+                content='minimum-scale=1, initial-scale=1, width=device-width'
+              />
+            </Head>
             <CssBaseline />
             <Component {...pageProps} />
-          </ThemeProvider>
-        </PersistGate>
-      </Provider>
-    </React.Fragment>
+          </PersistGate>
+        </Provider>
+      </ThemeProvider>
+    </React.Fragment >
   );
 }
 
