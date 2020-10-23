@@ -18,6 +18,7 @@ function MyApp({ Component, pageProps }) {
   return (
     <React.Fragment>
       <ThemeProvider theme={theme}>
+        <CssBaseline />
         <Provider store={store}>
           <PersistGate loading={<UIPlaceholder />} persistor={persistor}>
             <Head>
@@ -27,7 +28,7 @@ function MyApp({ Component, pageProps }) {
                 content='minimum-scale=1, initial-scale=1, width=device-width'
               />
             </Head>
-            <CssBaseline />
+
             <Component {...pageProps} />
           </PersistGate>
         </Provider>
