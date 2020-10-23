@@ -2,6 +2,7 @@ import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { parse } from 'toml-patch';
 import { ConnectionOptions } from 'typeorm';
+import { WebhookHelper, WebhookSendType } from './Webhooks';
 
 export interface Config {
   database: ConnectionOptions;
@@ -9,6 +10,7 @@ export interface Config {
   meta: ConfigMeta;
   uploader: ConfigUploader;
   urls: ConfigUrls;
+  webhooks: ConfigWebhooks;
 }
 
 export interface ConfigMeta {
@@ -37,11 +39,21 @@ export interface ConfigCore {
   port: number;
 }
 
+export interface ConfigWebhooks {
+  enabled: boolean;
+  url: string;
+  events: WebhookSendType[];
+  username?: string;
+  avatar?: string;
+}
+
 export class Configuration {
   static readConfig(): Config {
     try {
       const data = readFileSync(resolve(process.cwd(), 'Zipline.toml'), 'utf8');
-      return parse(data);
+      const parsed = parse(data);
+      if (parsed.webhooks) parsed.webhooks.events = WebhookHelper.convert(parsed.webhooks.events);
+      return parsed;
     } catch (e) {
       return null;
     }
