@@ -114,5 +114,5 @@ const base = {
     uploader: { ...base.uploader, ...uploader },
     urls: { ...base.urls, ...urls },
   };
-  writeFileSync('Zipliner.toml', stringify(config));
+  writeFileSync('Zipline.toml', stringify(config));
 })();
