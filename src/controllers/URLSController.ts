@@ -12,10 +12,10 @@ import { URL } from '../entities/URL';
 import { User } from '../entities/User';
 import { LoginError } from '../lib/api/APIErrors';
 import { Configuration } from '../lib/Config';
+import { Console } from '../lib/logger';
 import { createRandomId, readBaseCookie } from '../lib/Util';
 
 const config = Configuration.readConfig();
-if (!config) process.exit(0);
 
 @Controller('/api/urls')
 export class URLSController {
@@ -54,10 +54,13 @@ export class URLSController {
 
     if (!url) throw new Error('No url');
 
+    Console.logger(URL).verbose(`attempting to delete url ${url.id}`);
     this.urls.delete({
       id: req.params.id,
     });
+    Console.logger(URL).verbose(`deleted url ${url.id}`);
 
+    Console.logger(URL).info(`url ${url.id} was deleted`);
     return reply.send(url);
   }
 

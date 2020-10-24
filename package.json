@@ -20,6 +20,7 @@
     "fastify-multipart": "^3.2.0",
     "fastify-static": "^3.2.1",
     "fastify-typeorm-plugin": "^2.1.2",
+    "figlet": "^1.5.0",
     "next": "^9.5.4",
     "pg": "^8.4.1",
     "react": "^16.13.1",
@@ -35,8 +36,10 @@
     "format": "prettier --write .",
     "lint": "eslint .",
     "dev": "ts-node src",
+    "dev:verbose": "VERBOSE=true ts-node src",
     "build": "next build && tsc -p .",
-    "start": "NODE_ENV=production node dist"
+    "start": "NODE_ENV=production node dist",
+    "start:verbose": "NODE_ENV=production VERBOSE=true node dist"
   },
   "devDependencies": {
     "@types/bcrypt": "^3.0.0",

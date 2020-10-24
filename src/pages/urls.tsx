@@ -40,7 +40,6 @@ export default function Urls({ config }: { config: ConfigUploader }) {
 
   if (typeof window === 'undefined') return <UIPlaceholder />;
   else {
-
     const doUrls = async () => {
       const d = await (await fetch('/api/urls')).json();
       if (!d.error) {
@@ -49,10 +48,14 @@ export default function Urls({ config }: { config: ConfigUploader }) {
       }
     };
 
-    useEffect(() => { (async () => doUrls())(); }, []);
+    useEffect(() => {
+      (async () => doUrls())();
+    }, []);
 
     const deleteUrl = async (u: URLEntity) => {
-      const d = await (await fetch('/api/urls/' + u.id, { method: 'DELETE' })).json();
+      const d = await (
+        await fetch('/api/urls/' + u.id, { method: 'DELETE' })
+      ).json();
       if (!d.error) doUrls();
     };
 
@@ -88,10 +91,15 @@ export default function Urls({ config }: { config: ConfigUploader }) {
                         action={
                           <div>
                             <IconButton aria-label='Copy URL'>
-                              <FileCopyIcon onClick={() => copy(url.toString())} />
+                              <FileCopyIcon
+                                onClick={() => copy(url.toString())}
+                              />
                             </IconButton>
-                            <IconButton aria-label='Delete Forever'>
-                              <DeleteForeverIcon onClick={() => deleteUrl(u)} />
+                            <IconButton
+                              aria-label='Delete Forever'
+                              onClick={() => deleteUrl(u)}
+                            >
+                              <DeleteForeverIcon />
                             </IconButton>
                           </div>
                         }

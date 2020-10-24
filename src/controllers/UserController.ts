@@ -16,6 +16,7 @@ import {
   LoginError,
   UserExistsError,
 } from '../lib/api/APIErrors';
+import { Console } from '../lib/logger';
 import {
   checkPassword,
   createBaseCookie,
@@ -30,6 +31,7 @@ export class UserController {
   private instance!: FastifyInstance;
 
   private users: Repository<User> = this.instance.orm.getRepository(User);
+  private logger: Console = Console.logger(User);
 
   @GET('/login-status')
   async loginStatus(req: FastifyRequest, reply: FastifyReply) {
@@ -65,9 +67,11 @@ export class UserController {
     });
     if (!user) throw new UserExistsError('User doesn\'t exist');
 
+    this.logger.verbose(`attempting to save ${user.username} (${user.id})`);
     user.username = req.body.username;
     user.password = encryptPassword(req.body.password);
-    this.users.save(user);
+    await this.users.save(user);
+    this.logger.verbose(`saved ${user.username} (${user.id})`);
 
     delete user.password;
     return reply.send(user);
@@ -88,14 +92,23 @@ export class UserController {
       },
     });
 
-    if (!user) throw new UserNotFoundError(`User "${req.body.username}" was not found.`);
-    if (!checkPassword(req.body.password, user.password)) throw new LoginError('Wrong credentials!');
+    if (!user)
+      throw new UserNotFoundError(`User "${req.body.username}" was not found.`);
+    if (!checkPassword(req.body.password, user.password)) {
+      this.logger.error(
+        `${user.username} (${user.id}) tried to login but failed`
+      );
+      throw new LoginError('Wrong credentials!');
+    }
     delete user.password;
 
+    this.logger.verbose(`set cookie for ${user.username} (${user.id})`);
     reply.setCookie('zipline', createBaseCookie(user.id), {
       path: '/',
       maxAge: 1036800000,
     });
+
+    this.logger.info(`${user.username} (${user.id}) logged in`);
     return reply.send(user);
   }
 
@@ -122,8 +135,12 @@ export class UserController {
 
     if (!user) throw new UserNotFoundError('User was not found.');
 
+    this.logger.verbose(
+      `attempting to reset token ${user.username} (${user.id})`
+    );
     user.token = createToken();
-    this.users.save(user);
+    await this.users.save(user);
+    this.logger.info(`reset token ${user.username} (${user.id})`);
 
     return reply.send({ updated: true });
   }
@@ -144,6 +161,7 @@ export class UserController {
     if (existing) throw new UserExistsError('User exists already');
 
     try {
+      this.logger.verbose(`attempting to create ${req.body.username}`);
       const user = await this.users.save(
         new User(
           req.body.username,
@@ -152,6 +170,7 @@ export class UserController {
           req.body.administrator || false
         )
       );
+      this.logger.info(`created user ${user.username} (${user.id})`);
       delete user.password;
       return reply.send(user);
     } catch (e) {
@@ -163,8 +182,8 @@ export class UserController {
   async delete(
     req: FastifyRequest<{
       Params: {
-        id: string
-      }
+        id: string;
+      };
     }>,
     reply: FastifyReply
   ) {
@@ -174,9 +193,13 @@ export class UserController {
     if (!existing) throw new UserExistsError('User doesnt exist');
 
     try {
+      this.logger.verbose(
+        `attempting to delete ${existing.username} (${existing.id})`
+      );
       await this.users.delete({
-        id: existing.id
+        id: existing.id,
       });
+      this.logger.info(`deleted ${existing.username} (${existing.id})`);
       return reply.send({ ok: true });
     } catch (e) {
       throw new Error(`Could not delete user: ${e.message}`);
