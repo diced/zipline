@@ -27,7 +27,7 @@ const base = {
   const database = await inquirer.prompt([
     {
       type: 'list',
-      name: 'database',
+      name: 'type',
       message: 'What database type?',
       choices: [
         { name: 'postgres', extra: 'This is what we recomend using.' },
@@ -52,6 +52,11 @@ const base = {
     },
     {
       type: 'input',
+      name: 'database',
+      message: 'Database Name',
+    },
+    {
+      type: 'input',
       name: 'username',
       message: 'Database User',
     },
@@ -59,11 +64,6 @@ const base = {
       type: 'password',
       name: 'password',
       message: 'Database Password',
-    },
-    {
-      type: 'input',
-      name: 'database',
-      message: 'Database',
     },
   ]);
 
@@ -114,5 +114,5 @@ const base = {
     uploader: { ...base.uploader, ...uploader },
     urls: { ...base.urls, ...urls },
   };
-  writeFileSync('Zipliner.toml', stringify(config));
+  writeFileSync('Zipline.toml', stringify(config));
 })();

@@ -16,7 +16,7 @@ export enum ConsoleLevel {
   ERROR,
   INFO,
   TRACE,
-  WARN,
+  VERBOSE,
 }
 
 export class Console {
@@ -42,8 +42,8 @@ export class Console {
     return this.log(ConsoleLevel.TRACE, message);
   }
 
-  public warn(message: string): string {
-    return this.log(ConsoleLevel.WARN, message);
+  public verbose(message: string): string {
+    if (process.env.VERBOSE) return this.log(ConsoleLevel.VERBOSE, message);
   }
 
   public log(level: ConsoleLevel, message: string): string {

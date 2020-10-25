@@ -1,4 +1,5 @@
 import next from 'next';
+import { textSync as text } from 'figlet';
 import fastify, { FastifyReply, FastifyRequest } from 'fastify';
 import fastifyTypeorm from 'fastify-typeorm-plugin';
 import fastifyCookies from 'fastify-cookie';
@@ -8,8 +9,7 @@ import fastifyFavicon from 'fastify-favicon';
 import { bootstrap } from 'fastify-decorators';
 import { Console } from './lib/logger';
 import { AddressInfo } from 'net';
-import { ConsoleFormatter } from './lib/ConsoleFormatter';
-import { bold, green, reset } from '@dicedtomato/colors';
+import { magenta, bold, green, reset, blue, red } from '@dicedtomato/colors';
 import { Configuration } from './lib/Config';
 import { UserController } from './controllers/UserController';
 import { RootController } from './controllers/RootController';
@@ -17,19 +17,34 @@ import { join } from 'path';
 import { ImagesController } from './controllers/ImagesController';
 import { URLSController } from './controllers/URLSController';
 import { URL } from './entities/URL';
+const dev = process.env.NODE_ENV !== 'production';
 
-Console.setFormatter(new ConsoleFormatter());
+console.log(`
+${magenta(text('Zipline'))}
 
+GitHub  : ${blue('https://github.com/ZiplineProject/zipline')}
+Issues  : ${blue('https://github.com/ZiplineProject/zipline/issues')}
+Docs    : ${blue('https://zipline.diced.wtf/')}
+Mode    : ${bold(dev ? red('dev') : green('production'))}
+Verbose : ${bold(process.env.VERBOSE ? red('yes') : green('no'))}
+`);
+
+Console.logger(Configuration).verbose('searching for config...');
 const config = Configuration.readConfig();
-if (!config) process.exit(0);
+if (!config) {
+  Console.logger(Configuration).error(
+    `could not find a Zipline.toml file in ${process.cwd()}`
+  );
+  process.exit(0);
+}
 
 const server = fastify({});
-const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev, quiet: dev });
 const handle = app.getRequestHandler();
 
-Console.logger('Next').info('Preparing app');
+Console.logger('Next').info('Preparing app...');
 app.prepare();
+Console.logger('Next').verbose('Prepared app');
 
 if (dev)
   server.get('/_next/*', async (req, reply) => {

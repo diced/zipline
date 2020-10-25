@@ -17,11 +17,10 @@ import { User } from '../entities/User';
 import { AuthError } from '../lib/api/APIErrors';
 import { Configuration } from '../lib/Config';
 import { createRandomId } from '../lib/Util';
+import { Console } from '../lib/logger';
 const pump = promisify(pipeline);
 
-
 const config = Configuration.readConfig();
-if (!config) process.exit(0);
 
 @Controller('/api')
 export class RootController {
@@ -108,9 +107,17 @@ export class RootController {
       config.uploader.original ? data.filename : `${fileName}.${ext}`
     );
 
-    this.images.save(new Image(fileName, ext, user.id));
+    Console.logger(Image).verbose(`attempting to save ${fileName} to db`);
+    const image = await this.images.save(new Image(fileName, ext, user.id));
+    Console.logger(Image).verbose(`saved image ${image.id} to db`);
 
+    Console.logger(Image).verbose(`attempting to save file ${path}`);
     await pump(data.file, createWriteStream(path));
+    Console.logger(Image).verbose(`saved ${path}`);
+
+    Console.logger(Image).info(
+      `image ${fileName}.${ext} was uploaded by ${user.username} (${user.id})`
+    );
     reply.send(
       `${req.protocol}://${req.hostname}${config.uploader.route}/${fileName}.${ext}`
     );

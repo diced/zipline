@@ -1,5 +1,12 @@
-import { ConsoleLevel } from './Console';
-import { brightGreen, blue } from '@dicedtomato/colors';
+import { ConsoleLevel } from '.';
+import {
+  blue,
+  red,
+  reset,
+  white,
+  yellow
+} from '@dicedtomato/colors';
+
 
 export interface Formatter {
   format(
@@ -11,14 +18,24 @@ export interface Formatter {
 }
 
 export class DefaultFormatter implements Formatter {
-  public format(
+  formatLevel(level: ConsoleLevel) {
+    return {
+      0: yellow('debug') + ':',
+      1: red('error') + ':',
+      2: blue('info') + ':',
+      3: white('trace') + ':',
+      4: yellow('verbose') + ':',
+    }[level];
+  }
+
+  format(
     message: string,
     origin: string,
     level: ConsoleLevel,
     time: Date
   ): string {
-    return `[${time.toLocaleString()}] ${brightGreen(origin)} - ${blue(
-      ConsoleLevel[level]
-    )}: ${message}`;
+    return `[${time.toLocaleString().replace(',', '')}] ${this.formatLevel(
+      level
+    )} ${reset(message)}`;
   }
 }
