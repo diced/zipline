@@ -134,3 +134,10 @@ server.listen(config.core.port, err => {
     )}`
   );
 });
+
+server.addHook('preHandler', async (req, reply) => {
+  if (config.core.blacklisted_ips && config.core.blacklisted_ips.includes(req.ip)) {
+    await app.render404(req.raw, reply.raw);
+    return (reply.sent = true);
+  }
+});
