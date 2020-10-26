@@ -76,7 +76,7 @@ const useStyles = makeStyles(theme => ({
   },
   content: {
     flexGrow: 1,
-    padding: theme.spacing(3),
+    padding: theme.spacing(1),
   },
   menuIcon: {
     marginRight: '10px',
@@ -364,7 +364,7 @@ export default function UI({ children }) {
               paper: classes.drawerPaper,
             }}
             variant='permanent'
-          // open
+            open
           >
             {drawer}
           </Drawer>

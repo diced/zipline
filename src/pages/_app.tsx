@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Head from 'next/head';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import UIPlaceholder from '../components/UIPlaceholder';
 import { ThemeProvider } from '@material-ui/core/styles';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
@@ -24,9 +23,10 @@ function MyApp({ Component, pageProps }) {
           content='minimum-scale=1, initial-scale=1, width=device-width'
         />
       </Head>
-      <CssBaseline />
+
       <Provider store={store}>
-        <PersistGate loading={<UIPlaceholder />} persistor={persistor}>
+        <PersistGate loading={<div>loading</div>} persistor={persistor}>
+          <CssBaseline />
           <Component {...pageProps} />
         </PersistGate>
       </Provider>

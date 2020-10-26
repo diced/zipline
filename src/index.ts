@@ -17,8 +17,6 @@ import { join } from 'path';
 import { ImagesController } from './controllers/ImagesController';
 import { URLSController } from './controllers/URLSController';
 import { URL } from './entities/URL';
-import { Image } from './entities/Image';
-import { WebhookHelper } from './lib/Webhooks';
 const dev = process.env.NODE_ENV !== 'production';
 
 console.log(`
