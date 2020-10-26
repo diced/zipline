@@ -16,6 +16,7 @@ import {
   LoginError,
   UserExistsError,
 } from '../lib/api/APIErrors';
+import { Configuration } from '../lib/Config';
 import { Console } from '../lib/logger';
 import {
   checkPassword,
@@ -24,6 +25,9 @@ import {
   encryptPassword,
   readBaseCookie,
 } from '../lib/Util';
+import { WebhookType, WebhookHelper } from '../lib/Webhooks';
+
+const config = Configuration.readConfig();
 
 @Controller('/api/user')
 export class UserController {
@@ -71,7 +75,12 @@ export class UserController {
     user.username = req.body.username;
     user.password = encryptPassword(req.body.password);
     await this.users.save(user);
-    this.logger.verbose(`saved ${user.username} (${user.id})`);
+
+    this.logger.info(`saved ${user.username} (${user.id})`);
+    if (config.webhooks.events.includes(WebhookType.USER_EDIT))
+      WebhookHelper.sendWebhook(config.webhooks.user_edit.content, {
+        user,
+      });
 
     delete user.password;
     return reply.send(user);
@@ -109,6 +118,11 @@ export class UserController {
     });
 
     this.logger.info(`${user.username} (${user.id}) logged in`);
+    if (config.webhooks.events.includes(WebhookType.LOGIN))
+      WebhookHelper.sendWebhook(config.webhooks.login.content, {
+        user,
+      });
+
     return reply.send(user);
   }
 
@@ -140,7 +154,12 @@ export class UserController {
     );
     user.token = createToken();
     await this.users.save(user);
+
     this.logger.info(`reset token ${user.username} (${user.id})`);
+    if (config.webhooks.events.includes(WebhookType.TOKEN_RESET))
+      WebhookHelper.sendWebhook(config.webhooks.token_reset.content, {
+        user,
+      });
 
     return reply.send({ updated: true });
   }
@@ -171,6 +190,11 @@ export class UserController {
         )
       );
       this.logger.info(`created user ${user.username} (${user.id})`);
+      if (config.webhooks.events.includes(WebhookType.CREATE_USER))
+        WebhookHelper.sendWebhook(config.webhooks.create_user.content, {
+          user,
+        });
+
       delete user.password;
       return reply.send(user);
     } catch (e) {
@@ -199,7 +223,13 @@ export class UserController {
       await this.users.delete({
         id: existing.id,
       });
+
       this.logger.info(`deleted ${existing.username} (${existing.id})`);
+      if (config.webhooks.events.includes(WebhookType.USER_DELETE))
+        WebhookHelper.sendWebhook(config.webhooks.user_delete.content, {
+          user: existing,
+        });
+
       return reply.send({ ok: true });
     } catch (e) {
       throw new Error(`Could not delete user: ${e.message}`);

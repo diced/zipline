@@ -2,7 +2,7 @@ import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { parse } from 'toml-patch';
 import { ConnectionOptions } from 'typeorm';
-import { WebhookHelper, WebhookSendType } from './Webhooks';
+import { WebhookHelper, WebhookType } from './Webhooks';
 
 export interface Config {
   database: ConnectionOptions;
@@ -42,9 +42,23 @@ export interface ConfigCore {
 export interface ConfigWebhooks {
   enabled: boolean;
   url: string;
-  events: WebhookSendType[];
+  events: WebhookType[];
   username?: string;
   avatar?: string;
+
+  upload?: ConfigWebhooksEvent;
+  create_user?: ConfigWebhooksEvent;
+  delete_image?: ConfigWebhooksEvent;
+  delete_url?: ConfigWebhooksEvent;
+  shorten?: ConfigWebhooksEvent;
+  login?: ConfigWebhooksEvent;
+  token_reset?: ConfigWebhooksEvent;
+  user_edit?: ConfigWebhooksEvent;
+  user_delete?: ConfigWebhooksEvent;
+}
+
+export interface ConfigWebhooksEvent {
+  content: string;
 }
 
 export class Configuration {

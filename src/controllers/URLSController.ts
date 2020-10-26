@@ -14,6 +14,7 @@ import { LoginError } from '../lib/api/APIErrors';
 import { Configuration } from '../lib/Config';
 import { Console } from '../lib/logger';
 import { createRandomId, readBaseCookie } from '../lib/Util';
+import { WebhookType, WebhookHelper } from '../lib/Webhooks';
 
 const config = Configuration.readConfig();
 
@@ -24,6 +25,7 @@ export class URLSController {
 
   private urls: Repository<URL> = this.instance.orm.getRepository(URL);
   private users: Repository<User> = this.instance.orm.getRepository(User);
+  private logger: Console = Console.logger(URL);
 
   @GET('/')
   async allURLS(req: FastifyRequest, reply: FastifyReply) {
@@ -54,13 +56,18 @@ export class URLSController {
 
     if (!url) throw new Error('No url');
 
-    Console.logger(URL).verbose(`attempting to delete url ${url.id}`);
+    this.logger.verbose(`attempting to delete url ${url.id}`);
     this.urls.delete({
       id: req.params.id,
     });
-    Console.logger(URL).verbose(`deleted url ${url.id}`);
 
-    Console.logger(URL).info(`url ${url.id} was deleted`);
+    this.logger.info(`url ${url.id} was deleted`);
+    if (config.webhooks.events.includes(WebhookType.DELETE_URL))
+      WebhookHelper.sendWebhook(config.webhooks.delete_url.content, {
+        url,
+        host: `${req.protocol}://${req.hostname}${config.urls.route}/`,
+      });
+
     return reply.send(url);
   }
 
@@ -88,14 +95,20 @@ export class URLSController {
 
     if (!user) throw new LoginError('No user');
 
+    const id = createRandomId(config.urls.length);
+
+    this.logger.verbose(`attempting to save url ${id}`);
     const url = await this.urls.save(
-      new URL(
-        createRandomId(config.urls.length),
-        user.id,
-        req.body.url,
-        req.body.vanity || null
-      )
+      new URL(id, user.id, req.body.url, req.body.vanity || null)
     );
+
+    this.logger.info(`saved url ${url.id}`);
+    if (config.webhooks.events.includes(WebhookType.SHORTEN))
+      WebhookHelper.sendWebhook(config.webhooks.shorten.content, {
+        url,
+        host: `${req.protocol}://${req.hostname}${config.urls.route}/`,
+      });
+
     return reply.send(url);
   }
 }

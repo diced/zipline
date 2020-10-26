@@ -17,6 +17,8 @@ import { join } from 'path';
 import { ImagesController } from './controllers/ImagesController';
 import { URLSController } from './controllers/URLSController';
 import { URL } from './entities/URL';
+import { Image } from './entities/Image';
+import { WebhookHelper } from './lib/Webhooks';
 const dev = process.env.NODE_ENV !== 'production';
 
 console.log(`
@@ -28,6 +30,7 @@ Docs    : ${blue('https://zipline.diced.wtf/')}
 Mode    : ${bold(dev ? red('dev') : green('production'))}
 Verbose : ${bold(process.env.VERBOSE ? red('yes') : green('no'))}
 `);
+
 
 Console.logger(Configuration).verbose('searching for config...');
 const config = Configuration.readConfig();
@@ -42,9 +45,9 @@ const server = fastify({});
 const app = next({ dev, quiet: dev });
 const handle = app.getRequestHandler();
 
-Console.logger('Next').info('Preparing app...');
+Console.logger(next).info('Preparing app...');
 app.prepare();
-Console.logger('Next').verbose('Prepared app');
+Console.logger(next).verbose('Prepared app');
 
 if (dev)
   server.get('/_next/*', async (req, reply) => {

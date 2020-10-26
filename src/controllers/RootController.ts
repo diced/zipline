@@ -18,6 +18,7 @@ import { AuthError } from '../lib/api/APIErrors';
 import { Configuration } from '../lib/Config';
 import { createRandomId } from '../lib/Util';
 import { Console } from '../lib/logger';
+import { WebhookHelper, WebhookType } from '../lib/Webhooks';
 const pump = promisify(pipeline);
 
 const config = Configuration.readConfig();
@@ -118,6 +119,13 @@ export class RootController {
     Console.logger(Image).info(
       `image ${fileName}.${ext} was uploaded by ${user.username} (${user.id})`
     );
+
+    if (config.webhooks.events.includes(WebhookType.UPLOAD))
+      WebhookHelper.sendWebhook(config.webhooks.upload.content, {
+        image,
+        host: `${req.protocol}://${req.hostname}${config.uploader.route}/`,
+      });
+
     reply.send(
       `${req.protocol}://${req.hostname}${config.uploader.route}/${fileName}.${ext}`
     );

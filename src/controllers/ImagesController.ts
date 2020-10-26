@@ -9,8 +9,12 @@ import {
 import { Repository } from 'typeorm';
 import { Image } from '../entities/Image';
 import { LoginError } from '../lib/api/APIErrors';
+import { Configuration } from '../lib/Config';
 import { Console } from '../lib/logger';
 import { readBaseCookie } from '../lib/Util';
+import { WebhookHelper, WebhookType } from '../lib/Webhooks';
+
+const config = Configuration.readConfig();
 
 @Controller('/api/images')
 export class ImagesController {
@@ -51,7 +55,14 @@ export class ImagesController {
     this.images.delete({
       id: req.params.id,
     });
+
     Console.logger(Image).info(`image ${image.id} was deleted`);
+    if (config.webhooks.events.includes(WebhookType.DELETE_IMAGE))
+      WebhookHelper.sendWebhook(config.webhooks.upload.content, {
+        image,
+        host: `${req.protocol}://${req.hostname}${config.uploader.route}/`,
+      }); 
+    
     return reply.send(image);
   }
 

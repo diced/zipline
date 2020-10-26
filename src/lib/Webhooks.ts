@@ -1,15 +1,20 @@
 import { Image } from '../entities/Image';
 import { URL } from '../entities/URL';
 import { User } from '../entities/User';
+import { Configuration } from './Config';
+import { Console } from './logger';
 
 /* eslint-disable indent */
-export enum WebhookSendType {
+export enum WebhookType {
   UPLOAD,
+  DELETE_IMAGE,
   SHORTEN,
+  DELETE_URL,
   LOGIN,
   TOKEN_RESET,
   USER_DELETE,
-  USER_EDIT
+  USER_EDIT,
+  CREATE_USER
 }
 
 export enum WebhookParseTokens {
@@ -31,33 +36,51 @@ export interface WebhookData {
 }
 
 export type WebhookSendText =
-  'upload' |
-  'shorten' |
-  'login' |
-  'token_reset' |
-  'user_delete' |
-  'user_edit';
+  | 'upload'
+  | 'shorten'
+  | 'login'
+  | 'create_user'
+  | 'delete_image'
+  | 'delete_url'
+  | 'token_reset'
+  | 'user_delete'
+  | 'user_edit';
 
 export class WebhookHelper {
   public static convert(strings: WebhookSendText[]) {
-    return strings.map(x => WebhookSendType[x.toUpperCase()]);
-  }
-
-  public static enabledEvent(want: WebhookSendType, events: WebhookSendType[]) {
-    return events.includes(want);
+    return strings.map(x => WebhookType[x.toUpperCase()]);
   }
 
   public static parseContent(content: string, data: WebhookData) {
     return content
       .replace(WebhookParseTokens.IMAGE_ID, data.image?.id)
-      .replace(WebhookParseTokens.IMAGE_URL, data.host + data.image?.id)
+      .replace(WebhookParseTokens.IMAGE_URL, `${data.host}${data.image?.file}`)
       .replace(WebhookParseTokens.URL_ID, data.url?.id)
       .replace(WebhookParseTokens.URL_URL, data.host + data.url?.id)
       .replace(WebhookParseTokens.URL_VANITY, data.url?.vanity)
-      .replace(WebhookParseTokens.USER_ADMIN, data.user?.administrator ? 'Admin' : 'User')
+      .replace(
+        WebhookParseTokens.USER_ADMIN,
+        data.user?.administrator ? 'Admin' : 'User'
+      )
       .replace(WebhookParseTokens.USER_ID, data.user?.id.toString())
       .replace(WebhookParseTokens.USER_NAME, data.user?.username);
   }
 
-  public static
-}   
+  public static async sendWebhook(content: string, data: WebhookData) {
+    const config = Configuration.readConfig();
+    try {
+      await fetch(config.webhooks.url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: config.webhooks.username,
+          content: WebhookHelper.parseContent(content, data),
+        }),
+      });
+    } catch (e) {
+      Console.logger(WebhookHelper).error(e);
+    }
+  }
+}
