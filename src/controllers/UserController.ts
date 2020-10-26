@@ -16,7 +16,7 @@ import {
   LoginError,
   UserExistsError,
 } from '../lib/api/APIErrors';
-import { Configuration } from '../lib/Config';
+import { Configuration, ConfigWebhooks } from '../lib/Config';
 import { Console } from '../lib/logger';
 import {
   checkPassword,
@@ -36,6 +36,7 @@ export class UserController {
 
   private users: Repository<User> = this.instance.orm.getRepository(User);
   private logger: Console = Console.logger(User);
+  private webhooks: ConfigWebhooks = WebhookHelper.conf(config);
 
   @GET('/login-status')
   async loginStatus(req: FastifyRequest, reply: FastifyReply) {
@@ -77,8 +78,8 @@ export class UserController {
     await this.users.save(user);
 
     this.logger.info(`saved ${user.username} (${user.id})`);
-    if (config.webhooks.events.includes(WebhookType.USER_EDIT))
-      WebhookHelper.sendWebhook(config.webhooks.user_edit.content, {
+    if (this.webhooks.events.includes(WebhookType.USER_EDIT))
+      WebhookHelper.sendWebhook(this.webhooks.user_edit.content, {
         user,
       });
 
@@ -118,8 +119,8 @@ export class UserController {
     });
 
     this.logger.info(`${user.username} (${user.id}) logged in`);
-    if (config.webhooks.events.includes(WebhookType.LOGIN))
-      WebhookHelper.sendWebhook(config.webhooks.login.content, {
+    if (this.webhooks.events.includes(WebhookType.LOGIN))
+      WebhookHelper.sendWebhook(this.webhooks.login.content, {
         user,
       });
 
@@ -156,8 +157,8 @@ export class UserController {
     await this.users.save(user);
 
     this.logger.info(`reset token ${user.username} (${user.id})`);
-    if (config.webhooks.events.includes(WebhookType.TOKEN_RESET))
-      WebhookHelper.sendWebhook(config.webhooks.token_reset.content, {
+    if (this.webhooks.events.includes(WebhookType.TOKEN_RESET))
+      WebhookHelper.sendWebhook(this.webhooks.token_reset.content, {
         user,
       });
 
@@ -190,8 +191,8 @@ export class UserController {
         )
       );
       this.logger.info(`created user ${user.username} (${user.id})`);
-      if (config.webhooks.events.includes(WebhookType.CREATE_USER))
-        WebhookHelper.sendWebhook(config.webhooks.create_user.content, {
+      if (this.webhooks.events.includes(WebhookType.CREATE_USER))
+        WebhookHelper.sendWebhook(this.webhooks.create_user.content, {
           user,
         });
 
@@ -225,8 +226,8 @@ export class UserController {
       });
 
       this.logger.info(`deleted ${existing.username} (${existing.id})`);
-      if (config.webhooks.events.includes(WebhookType.USER_DELETE))
-        WebhookHelper.sendWebhook(config.webhooks.user_delete.content, {
+      if (this.webhooks.events.includes(WebhookType.USER_DELETE))
+        WebhookHelper.sendWebhook(this.webhooks.user_delete.content, {
           user: existing,
         });
 

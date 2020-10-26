@@ -1,7 +1,7 @@
 import { Image } from '../entities/Image';
 import { URL } from '../entities/URL';
 import { User } from '../entities/User';
-import { Configuration } from './Config';
+import { Config, Configuration, ConfigWebhooks } from './Config';
 import { Console } from './logger';
 
 /* eslint-disable indent */
@@ -49,6 +49,11 @@ export type WebhookSendText =
 export class WebhookHelper {
   public static convert(strings: WebhookSendText[]) {
     return strings.map(x => WebhookType[x.toUpperCase()]);
+  }
+
+  public static conf(config: Config): ConfigWebhooks {
+    if (!config.webhooks) return { events: [] };
+    return config.webhooks;
   }
 
   public static parseContent(content: string, data: WebhookData) {

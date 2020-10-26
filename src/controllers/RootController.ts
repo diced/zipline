@@ -15,7 +15,7 @@ import { promisify } from 'util';
 import { Image } from '../entities/Image';
 import { User } from '../entities/User';
 import { AuthError } from '../lib/api/APIErrors';
-import { Configuration } from '../lib/Config';
+import { Configuration, ConfigWebhooks } from '../lib/Config';
 import { createRandomId } from '../lib/Util';
 import { Console } from '../lib/logger';
 import { WebhookHelper, WebhookType } from '../lib/Webhooks';
@@ -30,6 +30,8 @@ export class RootController {
 
   private users: Repository<User> = this.instance.orm.getRepository(User);
   private images: Repository<Image> = this.instance.orm.getRepository(Image);
+  private webhooks: ConfigWebhooks = WebhookHelper.conf(config);
+  private logger: Console = Console.logger(Image);
 
   @GET('/users')
   async allUsers(req: FastifyRequest, reply: FastifyReply) {
@@ -108,20 +110,20 @@ export class RootController {
       config.uploader.original ? data.filename : `${fileName}.${ext}`
     );
 
-    Console.logger(Image).verbose(`attempting to save ${fileName} to db`);
+    this.logger.verbose(`attempting to save ${fileName} to db`);
     const image = await this.images.save(new Image(fileName, ext, user.id));
-    Console.logger(Image).verbose(`saved image ${image.id} to db`);
+    this.logger.verbose(`saved image ${image.id} to db`);
 
-    Console.logger(Image).verbose(`attempting to save file ${path}`);
+    this.logger.verbose(`attempting to save file ${path}`);
     await pump(data.file, createWriteStream(path));
-    Console.logger(Image).verbose(`saved ${path}`);
+    this.logger.verbose(`saved ${path}`);
 
-    Console.logger(Image).info(
+    this.logger.info(
       `image ${fileName}.${ext} was uploaded by ${user.username} (${user.id})`
     );
 
-    if (config.webhooks.events.includes(WebhookType.UPLOAD))
-      WebhookHelper.sendWebhook(config.webhooks.upload.content, {
+    if (this.webhooks.events.includes(WebhookType.UPLOAD))
+      WebhookHelper.sendWebhook(this.webhooks.upload.content, {
         image,
         host: `${req.protocol}://${req.hostname}${config.uploader.route}/`,
       });

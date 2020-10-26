@@ -11,7 +11,7 @@ import { Repository } from 'typeorm';
 import { URL } from '../entities/URL';
 import { User } from '../entities/User';
 import { LoginError } from '../lib/api/APIErrors';
-import { Configuration } from '../lib/Config';
+import { Configuration, ConfigWebhooks } from '../lib/Config';
 import { Console } from '../lib/logger';
 import { createRandomId, readBaseCookie } from '../lib/Util';
 import { WebhookType, WebhookHelper } from '../lib/Webhooks';
@@ -26,6 +26,7 @@ export class URLSController {
   private urls: Repository<URL> = this.instance.orm.getRepository(URL);
   private users: Repository<User> = this.instance.orm.getRepository(User);
   private logger: Console = Console.logger(URL);
+  private webhooks: ConfigWebhooks = WebhookHelper.conf(config);
 
   @GET('/')
   async allURLS(req: FastifyRequest, reply: FastifyReply) {
@@ -62,8 +63,8 @@ export class URLSController {
     });
 
     this.logger.info(`url ${url.id} was deleted`);
-    if (config.webhooks.events.includes(WebhookType.DELETE_URL))
-      WebhookHelper.sendWebhook(config.webhooks.delete_url.content, {
+    if (this.webhooks.events.includes(WebhookType.DELETE_URL))
+      WebhookHelper.sendWebhook(this.webhooks.delete_url.content, {
         url,
         host: `${req.protocol}://${req.hostname}${config.urls.route}/`,
       });
@@ -103,8 +104,8 @@ export class URLSController {
     );
 
     this.logger.info(`saved url ${url.id}`);
-    if (config.webhooks.events.includes(WebhookType.SHORTEN))
-      WebhookHelper.sendWebhook(config.webhooks.shorten.content, {
+    if (this.webhooks.events.includes(WebhookType.SHORTEN))
+      WebhookHelper.sendWebhook(this.webhooks.shorten.content, {
         url,
         host: `${req.protocol}://${req.hostname}${config.urls.route}/`,
       });

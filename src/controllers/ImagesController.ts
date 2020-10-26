@@ -9,7 +9,7 @@ import {
 import { Repository } from 'typeorm';
 import { Image } from '../entities/Image';
 import { LoginError } from '../lib/api/APIErrors';
-import { Configuration } from '../lib/Config';
+import { Configuration, ConfigWebhooks } from '../lib/Config';
 import { Console } from '../lib/logger';
 import { readBaseCookie } from '../lib/Util';
 import { WebhookHelper, WebhookType } from '../lib/Webhooks';
@@ -22,6 +22,7 @@ export class ImagesController {
   private instance!: FastifyInstance;
 
   private images: Repository<Image> = this.instance.orm.getRepository(Image);
+  private webhooks: ConfigWebhooks = WebhookHelper.conf(config);
 
   @GET('/')
   async allImages(req: FastifyRequest, reply: FastifyReply) {
@@ -57,12 +58,12 @@ export class ImagesController {
     });
 
     Console.logger(Image).info(`image ${image.id} was deleted`);
-    if (config.webhooks.events.includes(WebhookType.DELETE_IMAGE))
-      WebhookHelper.sendWebhook(config.webhooks.upload.content, {
+    if (this.webhooks.events.includes(WebhookType.DELETE_IMAGE))
+      WebhookHelper.sendWebhook(this.webhooks.upload.content, {
         image,
         host: `${req.protocol}://${req.hostname}${config.uploader.route}/`,
-      }); 
-    
+      });
+
     return reply.send(image);
   }
 

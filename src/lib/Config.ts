@@ -10,7 +10,7 @@ export interface Config {
   meta: ConfigMeta;
   uploader: ConfigUploader;
   urls: ConfigUrls;
-  webhooks: ConfigWebhooks;
+  webhooks?: ConfigWebhooks;
 }
 
 export interface ConfigMeta {
@@ -40,9 +40,9 @@ export interface ConfigCore {
 }
 
 export interface ConfigWebhooks {
-  enabled: boolean;
-  url: string;
-  events: WebhookType[];
+  enabled?: boolean;
+  url?: string;
+  events?: WebhookType[];
   username?: string;
   avatar?: string;
 
