@@ -20,23 +20,21 @@ import { ConfigUploader } from '../lib/Config';
 
 const useStyles = makeStyles(theme => ({
   margin: {
-    margin: '5px',
+    margin: '5px'
   },
   padding: {
     border: '1px solid #1f1f1f',
-    padding: '10px',
+    padding: '10px'
   },
   backdrop: {
     zIndex: theme.zIndex.drawer + 1,
-    color: '#fff',
+    color: '#fff'
   },
   gridList: {
     width: theme.zIndex.drawer + 1,
-    height: 450,
-  },
+    height: 450
+  }
 }));
-
-
 
 export default function Images({ config }: { config: ConfigUploader }) {
   const classes = useStyles();
@@ -89,7 +87,7 @@ export default function Images({ config }: { config: ConfigUploader }) {
       if (!selectedImage) return;
       const d = await (
         await fetch(`/api/images/${selectedImage.id}`, {
-          method: 'DELETE',
+          method: 'DELETE'
         })
       ).json();
       if (!d.error) {
@@ -138,11 +136,11 @@ export default function Images({ config }: { config: ConfigUploader }) {
           anchorEl={anchorEl}
           anchorOrigin={{
             vertical: 'center',
-            horizontal: 'center',
+            horizontal: 'center'
           }}
           transformOrigin={{
             vertical: 'center',
-            horizontal: 'center',
+            horizontal: 'center'
           }}
           onClose={() => setAnchorEl(null)}
           disableRestoreFocus

@@ -5,7 +5,7 @@ import {
   Inject,
   GET,
   DELETE,
-  POST,
+  POST
 } from 'fastify-decorators';
 import { Repository } from 'typeorm';
 import { URL } from '../entities/URL';
@@ -34,8 +34,8 @@ export class URLSController {
 
     const all = await this.urls.find({
       where: {
-        user: readBaseCookie(req.cookies.zipline),
-      },
+        user: readBaseCookie(req.cookies.zipline)
+      }
     });
 
     return reply.send(all);
@@ -51,22 +51,22 @@ export class URLSController {
     const url = await this.urls.findOne({
       where: {
         user: readBaseCookie(req.cookies.zipline),
-        id: req.params.id,
-      },
+        id: req.params.id
+      }
     });
 
     if (!url) throw new Error('No url');
 
     this.logger.verbose(`attempting to delete url ${url.id}`);
     this.urls.delete({
-      id: req.params.id,
+      id: req.params.id
     });
 
     this.logger.info(`url ${url.id} was deleted`);
     if (this.webhooks.events.includes(WebhookType.DELETE_URL))
       WebhookHelper.sendWebhook(this.webhooks.delete_url.content, {
         url,
-        host: `${req.protocol}://${req.hostname}${config.urls.route}/`,
+        host: `${req.protocol}://${req.hostname}${config.urls.route}/`
       });
 
     return reply.send(url);
@@ -82,16 +82,16 @@ export class URLSController {
     if (config.urls.vanity && req.body.vanity) {
       const existingVanity = await this.urls.findOne({
         where: {
-          vanity: req.body.vanity,
-        },
+          vanity: req.body.vanity
+        }
       });
       if (existingVanity) throw new Error('There is an existing vanity!');
     }
 
     const user = await this.users.findOne({
       where: {
-        id: readBaseCookie(req.cookies.zipline),
-      },
+        id: readBaseCookie(req.cookies.zipline)
+      }
     });
 
     if (!user) throw new LoginError('No user');
@@ -107,7 +107,7 @@ export class URLSController {
     if (this.webhooks.events.includes(WebhookType.SHORTEN))
       WebhookHelper.sendWebhook(this.webhooks.shorten.content, {
         url,
-        host: `${req.protocol}://${req.hostname}${config.urls.route}/`,
+        host: `${req.protocol}://${req.hostname}${config.urls.route}/`
       });
 
     return reply.send(url);

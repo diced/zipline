@@ -14,17 +14,17 @@ import { useDispatch } from 'react-redux';
 
 const useStyles = makeStyles({
   margin: {
-    margin: '5px',
+    margin: '5px'
   },
   padding: {
-    padding: '10px',
+    padding: '10px'
   },
   field: {
-    width: '100%',
+    width: '100%'
   },
   button: {
-    marginLeft: 'auto',
-  },
+    marginLeft: 'auto'
+  }
 });
 
 export default function ManageUser() {
@@ -40,7 +40,7 @@ export default function ManageUser() {
       await fetch('/api/user', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username, password })
       })
     ).json();
     if (!d.error) {
@@ -53,7 +53,7 @@ export default function ManageUser() {
       <Snackbar
         anchorOrigin={{
           vertical: 'top',
-          horizontal: 'center',
+          horizontal: 'center'
         }}
         open={alertOpen}
         autoHideDuration={6000}

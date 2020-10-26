@@ -17,19 +17,19 @@ import { store } from '../store';
 
 const useStyles = makeStyles(theme => ({
   margin: {
-    margin: '5px',
+    margin: '5px'
   },
   padding: {
     border: '1px solid #1f1f1f',
-    padding: '10px',
+    padding: '10px'
   },
   backdrop: {
     zIndex: theme.zIndex.drawer + 1,
-    color: '#fff',
+    color: '#fff'
   },
   tableBorder: {
-    borderColor: '#130929',
-  },
+    borderColor: '#130929'
+  }
 }));
 
 export default function Index() {
@@ -68,16 +68,10 @@ export default function Index() {
                       <TableCell className={classes.tableBorder}>
                         User
                       </TableCell>
-                      <TableCell
-                        className={classes.tableBorder}
-                        align='right'
-                      >
+                      <TableCell className={classes.tableBorder} align='right'>
                         Images
                       </TableCell>
-                      <TableCell
-                        className={classes.tableBorder}
-                        align='right'
-                      >
+                      <TableCell className={classes.tableBorder} align='right'>
                         Views
                       </TableCell>
                     </TableRow>

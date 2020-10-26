@@ -14,11 +14,11 @@ import { useDispatch } from 'react-redux';
 
 const useStyles = makeStyles({
   field: {
-    width: '100%',
+    width: '100%'
   },
   padding: {
-    padding: '10px',
-  },
+    padding: '10px'
+  }
 });
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -40,7 +40,7 @@ export default function Login() {
       await fetch('/api/user/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username, password })
       })
     ).json();
     if (!d.error) {
@@ -55,7 +55,7 @@ export default function Login() {
       <Snackbar
         anchorOrigin={{
           vertical: 'top',
-          horizontal: 'center',
+          horizontal: 'center'
         }}
         open={open}
         autoHideDuration={6000}

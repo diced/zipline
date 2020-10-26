@@ -4,7 +4,7 @@ import {
   POST,
   FastifyInstanceToken,
   Inject,
-  GET,
+  GET
 } from 'fastify-decorators';
 import { Multipart } from 'fastify-multipart';
 import { createWriteStream, existsSync, mkdirSync } from 'fs';
@@ -62,7 +62,7 @@ export class RootController {
 
     for (const user of users) {
       const usersImages = await this.images.find({
-        where: { user: user.id },
+        where: { user: user.id }
       });
 
       lb.push({
@@ -70,14 +70,14 @@ export class RootController {
         images: usersImages.length,
         views: usersImages
           .map(x => x.views)
-          .reduce((a, b) => Number(a) + Number(b), 0),
+          .reduce((a, b) => Number(a) + Number(b), 0)
       });
     }
 
     return reply.send({
       images: images.length,
       totalViews,
-      leaderboard: lb.sort((a, b) => b.images - a.images),
+      leaderboard: lb.sort((a, b) => b.images - a.images)
     });
   }
 
@@ -88,8 +88,8 @@ export class RootController {
 
     const user = await this.users.findOne({
       where: {
-        token: req.headers.authorization,
-      },
+        token: req.headers.authorization
+      }
     });
     if (!user) return new AuthError('Incorrect token!');
 
@@ -125,7 +125,7 @@ export class RootController {
     if (this.webhooks.events.includes(WebhookType.UPLOAD))
       WebhookHelper.sendWebhook(this.webhooks.upload.content, {
         image,
-        host: `${req.protocol}://${req.hostname}${config.uploader.route}/`,
+        host: `${req.protocol}://${req.hostname}${config.uploader.route}/`
       });
 
     reply.send(

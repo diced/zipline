@@ -16,7 +16,7 @@ export interface State {
 const initialState: State = {
   loggedIn: false,
   user: null,
-  loading: true,
+  loading: true
 };
 
 export function reducer(state: State = initialState, action) {

@@ -6,7 +6,7 @@ import {
   PATCH,
   FastifyInstanceToken,
   Inject,
-  DELETE,
+  DELETE
 } from 'fastify-decorators';
 import { Repository } from 'typeorm';
 import { User } from '../entities/User';
@@ -14,7 +14,7 @@ import {
   UserNotFoundError,
   MissingBodyData,
   LoginError,
-  UserExistsError,
+  UserExistsError
 } from '../lib/api/APIErrors';
 import { Configuration, ConfigWebhooks } from '../lib/Config';
 import { Console } from '../lib/logger';
@@ -23,7 +23,7 @@ import {
   createBaseCookie,
   createToken,
   encryptPassword,
-  readBaseCookie,
+  readBaseCookie
 } from '../lib/Util';
 import { WebhookType, WebhookHelper } from '../lib/Webhooks';
 
@@ -41,7 +41,7 @@ export class UserController {
   @GET('/login-status')
   async loginStatus(req: FastifyRequest, reply: FastifyReply) {
     return reply.send({
-      user: !!req.cookies.zipline,
+      user: !!req.cookies.zipline
     });
   }
 
@@ -50,10 +50,11 @@ export class UserController {
     if (!req.cookies.zipline) throw new LoginError('Not logged in.');
     const user = await this.users.findOne({
       where: {
-        id: readBaseCookie(req.cookies.zipline),
-      },
+        id: readBaseCookie(req.cookies.zipline)
+      }
     });
-    if (!user) throw new UserExistsError('User doesn\'t exist');
+    // eslint-disable-next-line quotes
+    if (!user) throw new UserExistsError("User doesn't exist");
     delete user.password;
     return reply.send(user);
   }
@@ -67,10 +68,11 @@ export class UserController {
 
     const user = await this.users.findOne({
       where: {
-        id: readBaseCookie(req.cookies.zipline),
-      },
+        id: readBaseCookie(req.cookies.zipline)
+      }
     });
-    if (!user) throw new UserExistsError('User doesn\'t exist');
+    // eslint-disable-next-line quotes
+    if (!user) throw new UserExistsError("User doesn't exist");
 
     this.logger.verbose(`attempting to save ${user.username} (${user.id})`);
     user.username = req.body.username;
@@ -80,7 +82,7 @@ export class UserController {
     this.logger.info(`saved ${user.username} (${user.id})`);
     if (this.webhooks.events.includes(WebhookType.USER_EDIT))
       WebhookHelper.sendWebhook(this.webhooks.user_edit.content, {
-        user,
+        user
       });
 
     delete user.password;
@@ -98,8 +100,8 @@ export class UserController {
 
     const user = await this.users.findOne({
       where: {
-        username: req.body.username,
-      },
+        username: req.body.username
+      }
     });
 
     if (!user)
@@ -115,13 +117,13 @@ export class UserController {
     this.logger.verbose(`set cookie for ${user.username} (${user.id})`);
     reply.setCookie('zipline', createBaseCookie(user.id), {
       path: '/',
-      maxAge: 1036800000,
+      maxAge: 1036800000
     });
 
     this.logger.info(`${user.username} (${user.id}) logged in`);
     if (this.webhooks.events.includes(WebhookType.LOGIN))
       WebhookHelper.sendWebhook(this.webhooks.login.content, {
-        user,
+        user
       });
 
     return reply.send(user);
@@ -144,8 +146,8 @@ export class UserController {
 
     const user = await this.users.findOne({
       where: {
-        id: readBaseCookie(req.cookies.zipline),
-      },
+        id: readBaseCookie(req.cookies.zipline)
+      }
     });
 
     if (!user) throw new UserNotFoundError('User was not found.');
@@ -159,7 +161,7 @@ export class UserController {
     this.logger.info(`reset token ${user.username} (${user.id})`);
     if (this.webhooks.events.includes(WebhookType.TOKEN_RESET))
       WebhookHelper.sendWebhook(this.webhooks.token_reset.content, {
-        user,
+        user
       });
 
     return reply.send({ updated: true });
@@ -176,7 +178,7 @@ export class UserController {
     if (!req.body.password) throw new MissingBodyData('Missing uassword.');
 
     const existing = await this.users.findOne({
-      where: { username: req.body.username },
+      where: { username: req.body.username }
     });
     if (existing) throw new UserExistsError('User exists already');
 
@@ -193,7 +195,7 @@ export class UserController {
       this.logger.info(`created user ${user.username} (${user.id})`);
       if (this.webhooks.events.includes(WebhookType.CREATE_USER))
         WebhookHelper.sendWebhook(this.webhooks.create_user.content, {
-          user,
+          user
         });
 
       delete user.password;
@@ -213,7 +215,7 @@ export class UserController {
     reply: FastifyReply
   ) {
     const existing = await this.users.findOne({
-      where: { id: req.params.id },
+      where: { id: req.params.id }
     });
     if (!existing) throw new UserExistsError('User doesnt exist');
 
@@ -222,13 +224,13 @@ export class UserController {
         `attempting to delete ${existing.username} (${existing.id})`
       );
       await this.users.delete({
-        id: existing.id,
+        id: existing.id
       });
 
       this.logger.info(`deleted ${existing.username} (${existing.id})`);
       if (this.webhooks.events.includes(WebhookType.USER_DELETE))
         WebhookHelper.sendWebhook(this.webhooks.user_delete.content, {
-          user: existing,
+          user: existing
         });
 
       return reply.send({ ok: true });

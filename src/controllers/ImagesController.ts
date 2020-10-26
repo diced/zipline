@@ -4,7 +4,7 @@ import {
   FastifyInstanceToken,
   Inject,
   GET,
-  DELETE,
+  DELETE
 } from 'fastify-decorators';
 import { Repository } from 'typeorm';
 import { Image } from '../entities/Image';
@@ -30,8 +30,8 @@ export class ImagesController {
 
     const images = await this.images.find({
       where: {
-        user: readBaseCookie(req.cookies.zipline),
-      },
+        user: readBaseCookie(req.cookies.zipline)
+      }
     });
 
     return reply.send(images);
@@ -47,21 +47,21 @@ export class ImagesController {
     const image = await this.images.findOne({
       where: {
         user: readBaseCookie(req.cookies.zipline),
-        id: req.params.id,
-      },
+        id: req.params.id
+      }
     });
 
     if (!image) throw new Error('No image');
 
     this.images.delete({
-      id: req.params.id,
+      id: req.params.id
     });
 
     Console.logger(Image).info(`image ${image.id} was deleted`);
     if (this.webhooks.events.includes(WebhookType.DELETE_IMAGE))
       WebhookHelper.sendWebhook(this.webhooks.upload.content, {
         image,
-        host: `${req.protocol}://${req.hostname}${config.uploader.route}/`,
+        host: `${req.protocol}://${req.hostname}${config.uploader.route}/`
       });
 
     return reply.send(image);
@@ -73,8 +73,8 @@ export class ImagesController {
 
     const images = await this.images.find({
       where: {
-        user: readBaseCookie(req.cookies.zipline),
-      },
+        user: readBaseCookie(req.cookies.zipline)
+      }
     });
 
     return reply.send(images.slice(1).slice(-3).reverse());
@@ -86,8 +86,8 @@ export class ImagesController {
 
     const images = await this.images.find({
       where: {
-        user: readBaseCookie(req.cookies.zipline),
-      },
+        user: readBaseCookie(req.cookies.zipline)
+      }
     });
 
     function chunk(array: Image[], size: number) {

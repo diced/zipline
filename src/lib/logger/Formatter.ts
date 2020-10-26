@@ -1,12 +1,5 @@
 import { ConsoleLevel } from '.';
-import {
-  blue,
-  red,
-  reset,
-  white,
-  yellow
-} from '@dicedtomato/colors';
-
+import { blue, red, reset, white, yellow } from '@dicedtomato/colors';
 
 export interface Formatter {
   format(
@@ -24,7 +17,7 @@ export class DefaultFormatter implements Formatter {
       1: red('error') + ':',
       2: blue('info') + ':',
       3: white('trace') + ':',
-      4: yellow('verbose') + ':',
+      4: yellow('verbose') + ':'
     }[level];
   }
 

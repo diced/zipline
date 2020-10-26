@@ -41,14 +41,14 @@ const drawerWidth = 240;
 const useStyles = makeStyles(theme => ({
   root: {
     display: 'flex',
-    flexGrow: 1,
+    flexGrow: 1
   },
   drawer: {
     [theme.breakpoints.up('sm')]: {
       width: drawerWidth,
-      flexShrink: 0,
+      flexShrink: 0
     },
-    outlineColor: '#fff',
+    outlineColor: '#fff'
   },
   appBar: {
     display: 'flex',
@@ -56,31 +56,31 @@ const useStyles = makeStyles(theme => ({
     color: '#fff',
     [theme.breakpoints.up('sm')]: {
       width: 'calc(100%)',
-      marginLeft: drawerWidth,
+      marginLeft: drawerWidth
     },
-    borderBottom: '1px solid #1f1f1f',
+    borderBottom: '1px solid #1f1f1f'
   },
   menuButton: {
     marginRight: theme.spacing(2),
     [theme.breakpoints.up('sm')]: {
-      display: 'none',
-    },
+      display: 'none'
+    }
   },
   rightButton: {
-    marginLeft: 'auto',
+    marginLeft: 'auto'
   },
   // necessary for content to be below app bar
   toolbar: theme.mixins.toolbar,
   drawerPaper: {
-    width: drawerWidth,
+    width: drawerWidth
   },
   content: {
     flexGrow: 1,
-    padding: theme.spacing(1),
+    padding: theme.spacing(1)
   },
   menuIcon: {
-    marginRight: '10px',
-  },
+    marginRight: '10px'
+  }
 }));
 
 export default function UI({ children }) {
@@ -175,12 +175,12 @@ export default function UI({ children }) {
             anchorEl={anchorEl}
             anchorOrigin={{
               vertical: 'top',
-              horizontal: 'right',
+              horizontal: 'right'
             }}
             keepMounted
             transformOrigin={{
               vertical: 'top',
-              horizontal: 'right',
+              horizontal: 'right'
             }}
             open={open}
             onClose={() => setAnchorEl(null)}
@@ -271,7 +271,7 @@ export default function UI({ children }) {
       <Snackbar
         anchorOrigin={{
           vertical: 'top',
-          horizontal: 'center',
+          horizontal: 'center'
         }}
         open={alertOpen}
         autoHideDuration={6000}
@@ -349,10 +349,10 @@ export default function UI({ children }) {
             open={mobileOpen}
             onClose={handleDrawerToggle}
             classes={{
-              paper: classes.drawerPaper,
+              paper: classes.drawerPaper
             }}
             ModalProps={{
-              keepMounted: true, // Better open performance on mobile.
+              keepMounted: true // Better open performance on mobile.
             }}
           >
             {drawer}
@@ -361,7 +361,7 @@ export default function UI({ children }) {
         <Hidden xsDown implementation='css'>
           <Drawer
             classes={{
-              paper: classes.drawerPaper,
+              paper: classes.drawerPaper
             }}
             variant='permanent'
             open

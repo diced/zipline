@@ -25,7 +25,7 @@ export enum WebhookParseTokens {
   USER_ADMIN = '{user_admin}',
   URL_ID = '{url_id}',
   URL_URL = '{url}',
-  URL_VANITY = '{url_vanity}',
+  URL_VANITY = '{url_vanity}'
 }
 
 export interface WebhookData {
@@ -77,12 +77,12 @@ export class WebhookHelper {
       await fetch(config.webhooks.url, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           username: config.webhooks.username,
-          content: WebhookHelper.parseContent(content, data),
-        }),
+          content: WebhookHelper.parseContent(content, data)
+        })
       });
     } catch (e) {
       Console.logger(WebhookHelper).error(e);

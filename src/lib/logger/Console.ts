@@ -16,7 +16,7 @@ export enum ConsoleLevel {
   ERROR,
   INFO,
   TRACE,
-  VERBOSE,
+  VERBOSE
 }
 
 export class Console {

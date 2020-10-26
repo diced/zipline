@@ -29,7 +29,6 @@ Mode    : ${bold(dev ? red('dev') : green('production'))}
 Verbose : ${bold(process.env.VERBOSE ? red('yes') : green('no'))}
 `);
 
-
 Console.logger(Configuration).verbose('searching for config...');
 const config = Configuration.readConfig();
 if (!config) {
@@ -71,14 +70,14 @@ server.get(`${config.urls.route}/:id`, async function (
 
   const urlId = await urls.findOne({
     where: {
-      id: req.params.id,
-    },
+      id: req.params.id
+    }
   });
 
   const urlVanity = await urls.findOne({
     where: {
-      vanity: req.params.id,
-    },
+      vanity: req.params.id
+    }
   });
 
   if (config.urls.vanity && urlVanity) return reply.redirect(urlVanity.url);
@@ -95,7 +94,7 @@ server.register(fastifyTypeorm, {
   ...config.database,
   entities: [dev ? './src/entities/**/*.ts' : './dist/entities/**/*.js'],
   synchronize: true,
-  logging: false,
+  logging: false
 });
 
 server.register(bootstrap, {
@@ -103,23 +102,23 @@ server.register(bootstrap, {
     UserController,
     RootController,
     ImagesController,
-    URLSController,
-  ],
+    URLSController
+  ]
 });
 
 server.register(fastifyCookies, {
-  secret: config.core.secret,
+  secret: config.core.secret
 });
 
 server.register(fastifyStatic, {
   root: join(process.cwd(), config.uploader.directory),
-  prefix: config.uploader.route,
+  prefix: config.uploader.route
 });
 
 server.register(fastifyStatic, {
   root: join(process.cwd(), 'public'),
   prefix: '/public',
-  decorateReply: false,
+  decorateReply: false
 });
 
 server.register(fastifyFavicon);
@@ -136,7 +135,10 @@ server.listen(config.core.port, err => {
 });
 
 server.addHook('preHandler', async (req, reply) => {
-  if (config.core.blacklisted_ips && config.core.blacklisted_ips.includes(req.ip)) {
+  if (
+    config.core.blacklisted_ips &&
+    config.core.blacklisted_ips.includes(req.ip)
+  ) {
     await app.render404(req.raw, reply.raw);
     return (reply.sent = true);
   }

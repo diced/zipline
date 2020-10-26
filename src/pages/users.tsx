@@ -27,19 +27,19 @@ import { makeStyles } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
   margin: {
-    margin: '5px',
+    margin: '5px'
   },
   padding: {
     border: '1px solid #1f1f1f',
-    padding: '10px',
+    padding: '10px'
   },
   field: {
-    width: '100%',
+    width: '100%'
   },
   backdrop: {
     zIndex: theme.zIndex.drawer + 1,
-    color: '#fff',
-  },
+    color: '#fff'
+  }
 }));
 
 export default function Index() {
@@ -82,7 +82,9 @@ export default function Index() {
     };
 
     const deleteUserThenClose = async () => {
-      const d = await (await fetch('/api/user/' + user.id, { method: 'DELETE' })).json();
+      const d = await (
+        await fetch('/api/user/' + user.id, { method: 'DELETE' })
+      ).json();
       if (!d.error) {
         setDeleteOpen(false);
         setAlertOpen(true);
@@ -92,13 +94,17 @@ export default function Index() {
     };
 
     const createUserThenClose = async () => {
-      const d = await (await fetch('/api/user/create', {
-        headers: { 'Content-Type': 'application/json' },
-        method: 'POST',
-        body: JSON.stringify({
-          username, password, administrator
+      const d = await (
+        await fetch('/api/user/create', {
+          headers: { 'Content-Type': 'application/json' },
+          method: 'POST',
+          body: JSON.stringify({
+            username,
+            password,
+            administrator
+          })
         })
-      })).json();
+      ).json();
       if (!d.error) {
         setCreateOpen(false);
         setAlertOpen(true);
@@ -115,7 +121,7 @@ export default function Index() {
         <Snackbar
           anchorOrigin={{
             vertical: 'top',
-            horizontal: 'center',
+            horizontal: 'center'
           }}
           open={alertOpen}
           autoHideDuration={6000}
@@ -167,8 +173,14 @@ export default function Index() {
                 onChange={e => setPassword(e.target.value)}
               />
               <FormControlLabel
-                control={<Switch checked={administrator} onChange={() => setAdministrator(!administrator)} name="admin" />}
-                label="Administrator"
+                control={
+                  <Switch
+                    checked={administrator}
+                    onChange={() => setAdministrator(!administrator)}
+                    name='admin'
+                  />
+                }
+                label='Administrator'
               />
             </DialogContentText>
           </DialogContent>
@@ -185,7 +197,10 @@ export default function Index() {
           <Paper elevation={3} className={classes.padding}>
             <Typography variant='h5'>
               User
-              <IconButton aria-label='Create User' onClick={() => setCreateOpen(true)}>
+              <IconButton
+                aria-label='Create User'
+                onClick={() => setCreateOpen(true)}
+              >
                 <AddIcon />
               </IconButton>
             </Typography>
@@ -203,7 +218,9 @@ export default function Index() {
                         </IconButton>
                       }
                       title={`${u.username} (${u.id})`}
-                      subheader={`${u.administrator ? 'Administrator' : 'User'}`}
+                      subheader={`${
+                        u.administrator ? 'Administrator' : 'User'
+                      }`}
                     />
                   </Card>
                 </Grid>

@@ -16,16 +16,16 @@ import { ConfigUploader } from '../lib/Config';
 
 const useStyles = makeStyles(theme => ({
   margin: {
-    margin: '5px',
+    margin: '5px'
   },
   padding: {
     border: '1px solid #1f1f1f',
-    padding: '10px',
+    padding: '10px'
   },
   backdrop: {
     zIndex: theme.zIndex.drawer + 1,
-    color: '#fff',
-  },
+    color: '#fff'
+  }
 }));
 
 export default function Index({ config }: { config: ConfigUploader }) {
@@ -86,9 +86,8 @@ export default function Index({ config }: { config: ConfigUploader }) {
               })}
             </Grid>
           </Paper>
-        ) : null
-        }
-      </UI >
+        ) : null}
+      </UI>
     );
   }
   return <UIPlaceholder />;
