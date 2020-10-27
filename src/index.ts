@@ -41,18 +41,7 @@ if (!config) {
 const server = fastify({});
 const app = next({
   dev,
-  quiet: dev,
-  conf: {
-    redirects: () => {
-      return [
-        {
-          source: '/',
-          destination: '/dash',
-          permanent: true
-        }
-      ];
-    }
-  }
+  quiet: dev
 });
 const handle = app.getRequestHandler();
 

@@ -28,7 +28,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function Index({ config }: { config: ConfigUploader }) {
+export default function Dashboard({ config }: { config: ConfigUploader }) {
   const classes = useStyles();
   const router = useRouter();
   const state = store.getState();
