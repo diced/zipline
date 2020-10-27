@@ -110,11 +110,10 @@ export class RootController {
     if (config.uploader.blacklisted.includes(ext))
       throw new Error('Blacklisted file extension!');
 
-    const fileName = createRandomId(config.uploader.length);
-    const path = join(
-      config.uploader.directory,
-      config.uploader.original ? data.filename : `${fileName}.${ext}`
-    );
+    const fileName = config.uploader.original
+      ? data.filename.split('.')[0]
+      : createRandomId(config.uploader.length);
+    const path = join(config.uploader.directory, `${fileName}.${ext}`);
 
     this.logger.verbose(`attempting to save ${fileName} to db`);
     const image = await this.images.save(new Image(fileName, ext, user.id));
