@@ -39,7 +39,21 @@ if (!config) {
 }
 
 const server = fastify({});
-const app = next({ dev, quiet: dev });
+const app = next({
+  dev,
+  quiet: dev,
+  conf: {
+    redirects: () => {
+      return [
+        {
+          source: '/',
+          destination: '/dash',
+          permanent: true
+        }
+      ];
+    }
+  }
+});
 const handle = app.getRequestHandler();
 
 Console.logger(next).info('Preparing app...');

@@ -103,7 +103,7 @@ export default function UI({ children }) {
       if (d.error) {
         dispatch({ type: LOGOUT });
         dispatch({ type: UPDATE_USER, payload: null });
-        router.push('/login');
+        router.push('/user/login');
       } else setAdmin(d.administrator);
     })();
   }, []);
@@ -139,7 +139,7 @@ export default function UI({ children }) {
       dispatch({ type: UPDATE_USER, payload: null });
       setAlertMessage('Logged out!');
       setAlertOpen(true);
-      router.push('/login');
+      router.push('/user/login');
     }
   };
 
@@ -185,7 +185,7 @@ export default function UI({ children }) {
             open={open}
             onClose={() => setAnchorEl(null)}
           >
-            <Link href='/manage'>
+            <Link href='/user/manage'>
               <MenuItem onClick={() => setAnchorEl(null)}>
                 <AccountCircleIcon className={classes.menuIcon} />
                 Manage Profile
@@ -205,19 +205,19 @@ export default function UI({ children }) {
       </AppBar>
 
       <List>
-        <Link href='/'>
-          <ListItem button key='Home' selected={router.pathname === '/'}>
+        <Link href='/dash'>
+          <ListItem button key='Home' selected={router.pathname === '/dash'}>
             <ListItemIcon>
               <HomeIcon />
             </ListItemIcon>
             <ListItemText primary='Home' />
           </ListItem>
         </Link>
-        <Link href='/statistics'>
+        <Link href='/dash/statistics'>
           <ListItem
             button
             key='Statistics'
-            selected={router.pathname === '/statistics'}
+            selected={router.pathname === '/dash/statistics'}
           >
             <ListItemIcon>
               <DataUsageIcon />
@@ -225,11 +225,11 @@ export default function UI({ children }) {
             <ListItemText primary='Statistics' />
           </ListItem>
         </Link>
-        <Link href='/images'>
+        <Link href='/dash/images'>
           <ListItem
             button
             key='Images'
-            selected={router.pathname === '/images'}
+            selected={router.pathname === '/dash/images'}
           >
             <ListItemIcon>
               <PhotoIcon />
@@ -237,8 +237,12 @@ export default function UI({ children }) {
             <ListItemText primary='Images' />
           </ListItem>
         </Link>
-        <Link href='/urls'>
-          <ListItem button key='URLs' selected={router.pathname === '/urls'}>
+        <Link href='/dash/urls'>
+          <ListItem
+            button
+            key='URLs'
+            selected={router.pathname === '/dash/urls'}
+          >
             <ListItemIcon>
               <LinkIcon />
             </ListItemIcon>
@@ -246,11 +250,11 @@ export default function UI({ children }) {
           </ListItem>
         </Link>
         {admin ? (
-          <Link href='/users'>
+          <Link href='/dash/users'>
             <ListItem
               button
               key='Users'
-              selected={router.pathname === '/users'}
+              selected={router.pathname === '/dash/users'}
             >
               <ListItemIcon>
                 <GroupIcon />

@@ -21,8 +21,8 @@ import Paper from '@material-ui/core/Paper';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import AddIcon from '@material-ui/icons/Add';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
-import UI from '../components/UI';
-import UIPlaceholder from '../components/UIPlaceholder';
+import UI from '../../components/UI';
+import UIPlaceholder from '../../components/UIPlaceholder';
 import { makeStyles } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
@@ -70,7 +70,7 @@ export default function Index() {
       (async () => {
         const d = await (await fetch('/api/user')).json();
         if (!d.error) {
-          if (!d.administrator) router.push('/');
+          if (!d.administrator) router.push('/dash');
           doUsers();
         }
       })();

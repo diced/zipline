@@ -11,12 +11,12 @@ import Popover from '@material-ui/core/Popover';
 import Button from '@material-ui/core/Button';
 import Pagination from '@material-ui/lab/Pagination';
 import DeleteIcon from '@material-ui/icons/Delete';
-import UI from '../components/UI';
-import UIPlaceholder from '../components/UIPlaceholder';
+import UI from '../../components/UI';
+import UIPlaceholder from '../../components/UIPlaceholder';
 import { makeStyles } from '@material-ui/core';
-import { store } from '../store';
-import { Image } from '../entities/Image';
-import { ConfigUploader } from '../lib/Config';
+import { store } from '../../store';
+import { Image } from '../../entities/Image';
+import { ConfigUploader } from '../../lib/Config';
 
 const useStyles = makeStyles(theme => ({
   margin: {
@@ -50,7 +50,7 @@ export default function Images({ config }: { config: ConfigUploader }) {
   console.log('1', chunks);
 
   if (typeof window === 'undefined') return <UIPlaceholder />;
-  if (!state.loggedIn) router.push('/login');
+  if (!state.loggedIn) router.push('/user/login');
   else {
     const getChunkedImages = async () => {
       const c = await (await fetch('/api/images/chunk')).json();

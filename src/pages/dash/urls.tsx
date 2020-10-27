@@ -12,11 +12,11 @@ import Paper from '@material-ui/core/Paper';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
 import copy from 'copy-to-clipboard';
-import UI from '../components/UI';
-import UIPlaceholder from '../components/UIPlaceholder';
+import UI from '../../components/UI';
+import UIPlaceholder from '../../components/UIPlaceholder';
 import { makeStyles } from '@material-ui/core';
-import { URL as URLEntity } from '../entities/URL';
-import { ConfigUploader } from '../lib/Config';
+import { URL as URLEntity } from '../../entities/URL';
+import { ConfigUploader } from '../../lib/Config';
 
 const useStyles = makeStyles(theme => ({
   margin: {

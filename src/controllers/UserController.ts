@@ -10,6 +10,7 @@ import {
 } from 'fastify-decorators';
 import { Repository } from 'typeorm';
 import { User } from '../entities/User';
+import { Zipline } from '../entities/Zipline';
 import {
   UserNotFoundError,
   MissingBodyData,
@@ -23,6 +24,7 @@ import {
   createBaseCookie,
   createToken,
   encryptPassword,
+  getFirst,
   readBaseCookie
 } from '../lib/Util';
 import { WebhookType, WebhookHelper } from '../lib/Webhooks';
@@ -197,6 +199,17 @@ export class UserController {
         WebhookHelper.sendWebhook(this.webhooks.create_user.content, {
           user
         });
+
+      const firstSetup = await getFirst(this.instance.orm);
+      if (firstSetup)
+        await this.instance.orm.getRepository(Zipline).update(
+          {
+            id: 'zipline'
+          },
+          {
+            first: false
+          }
+        );
 
       delete user.password;
       return reply.send(user);

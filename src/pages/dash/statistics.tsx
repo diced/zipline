@@ -10,10 +10,10 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import UI from '../components/UI';
-import UIPlaceholder from '../components/UIPlaceholder';
+import UI from '../../components/UI';
+import UIPlaceholder from '../../components/UIPlaceholder';
 import { makeStyles } from '@material-ui/core';
-import { store } from '../store';
+import { store } from '../../store';
 
 const useStyles = makeStyles(theme => ({
   margin: {
@@ -40,7 +40,7 @@ export default function Index() {
   const [stats, setStats] = useState(null);
 
   if (typeof window === 'undefined') return <UIPlaceholder />;
-  if (!state.loggedIn) router.push('/login');
+  if (!state.loggedIn) router.push('/user/login');
   else {
     useEffect(() => {
       (async () => {

@@ -1,6 +1,8 @@
 import aes from 'crypto-js/aes';
 import { compareSync, hashSync } from 'bcrypt';
 import { Configuration } from './Config';
+import { Connection } from 'typeorm';
+import { Zipline } from '../entities/Zipline';
 
 const config = Configuration.readConfig();
 
@@ -34,4 +36,11 @@ export function createBaseCookie(id: number) {
 
 export function readBaseCookie(data) {
   return Buffer.from(data, 'base64').toString();
+}
+
+export async function getFirst(orm: Connection): Promise<boolean> {
+  const zipline = orm.getRepository(Zipline);
+  let d = await zipline.findOne({ id: 'zipline' });
+  if (!d) d = await zipline.save(new Zipline());
+  return d.first;
 }

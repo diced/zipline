@@ -37,16 +37,29 @@ export default function Login() {
 
   const handleLogin = async () => {
     const d = await (
-      await fetch('/api/user/login', {
+      await fetch('/api/user/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
+        body: JSON.stringify({
+          username,
+          password,
+          administrator: true
+        })
       })
     ).json();
     if (!d.error) {
-      dispatch({ type: UPDATE_USER, payload: d });
-      dispatch({ type: LOGIN });
-      router.push('/dash');
+      const payload = await (
+        await fetch('/api/user/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        })
+      ).json();
+      if (!payload.error) {
+        dispatch({ type: UPDATE_USER, payload });
+        dispatch({ type: LOGIN });
+        router.push('/dash');
+      } else setOpen(true);
     } else setOpen(true);
   };
 
@@ -62,12 +75,13 @@ export default function Login() {
         onClose={handleClose}
       >
         <Alert severity='error' variant='filled'>
-          Could not login!
+          Could not create!
         </Alert>
       </Snackbar>
       <Card>
         <CardContent>
-          <Typography variant='h4'>Login</Typography>
+          <Typography variant='h4'>Setup</Typography>
+          <Typography color='textSecondary'>Create your first user!</Typography>
           <TextField
             label='Username'
             className={classes.field}
@@ -87,7 +101,7 @@ export default function Login() {
             className={classes.field}
             onClick={handleLogin}
           >
-            Login
+            Create
           </Button>
         </CardActions>
       </Card>

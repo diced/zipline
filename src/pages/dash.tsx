@@ -37,7 +37,7 @@ export default function Index({ config }: { config: ConfigUploader }) {
   const [images, setImages] = React.useState([]);
 
   if (typeof window === 'undefined') return <UIPlaceholder />;
-  if (!state.loggedIn) router.push('/login');
+  if (!state.loggedIn) router.push('/user/login');
   else {
     React.useEffect(() => {
       (async () => {

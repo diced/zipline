@@ -16,7 +16,7 @@ import { Image } from '../entities/Image';
 import { User } from '../entities/User';
 import { AuthError } from '../lib/api/APIErrors';
 import { Configuration, ConfigWebhooks } from '../lib/Config';
-import { createRandomId } from '../lib/Util';
+import { createRandomId, getFirst } from '../lib/Util';
 import { Console } from '../lib/logger';
 import { WebhookHelper, WebhookType } from '../lib/Webhooks';
 const pump = promisify(pipeline);
@@ -32,6 +32,12 @@ export class RootController {
   private images: Repository<Image> = this.instance.orm.getRepository(Image);
   private webhooks: ConfigWebhooks = WebhookHelper.conf(config);
   private logger: Console = Console.logger(Image);
+
+  @GET('/first')
+  async getFirstSetup() {
+    const first = await getFirst(this.instance.orm);
+    return first;
+  }
 
   @GET('/users')
   async allUsers(req: FastifyRequest, reply: FastifyReply) {
