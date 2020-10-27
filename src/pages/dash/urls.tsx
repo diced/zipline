@@ -9,8 +9,16 @@ import Alert from '@material-ui/lab/Alert';
 import IconButton from '@material-ui/core/IconButton';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
+import AddIcon from '@material-ui/icons/Add';
 import copy from 'copy-to-clipboard';
 import UI from '../../components/UI';
 import UIPlaceholder from '../../components/UIPlaceholder';
@@ -29,6 +37,9 @@ const useStyles = makeStyles(theme => ({
   backdrop: {
     zIndex: theme.zIndex.drawer + 1,
     color: '#fff'
+  },
+  field: {
+    width: '100%'
   }
 }));
 
@@ -37,6 +48,9 @@ export default function Urls({ config }: { config: ConfigUploader }) {
   const [urls, setURLS] = useState<URLEntity[]>([]);
   const [loading, setLoading] = useState(true);
   const [alertOpen, setAlertOpen] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [url, setURL] = useState('');
+  const [vanity, setVanity] = useState('');
 
   if (typeof window === 'undefined') return <UIPlaceholder />;
   else {
@@ -59,6 +73,23 @@ export default function Urls({ config }: { config: ConfigUploader }) {
       if (!d.error) doUrls();
     };
 
+    const createURLThenClose = async () => {
+      const d = await (
+        await fetch('/api/urls', {
+          headers: { 'Content-Type': 'application/json' },
+          method: 'POST',
+          body: JSON.stringify({
+            url,
+            vanity: vanity == '' ? null : vanity
+          })
+        })
+      ).json();
+      if (!d.error) {
+        setCreateOpen(false);
+        doUrls();
+      }
+    };
+
     return (
       <UI>
         <Backdrop className={classes.backdrop} open={loading}>
@@ -77,9 +108,47 @@ export default function Urls({ config }: { config: ConfigUploader }) {
             Deleted URL
           </Alert>
         </Snackbar>
+        <Dialog
+          open={createOpen}
+          onClose={() => setCreateOpen(false)}
+          aria-labelledby='create-user-title'
+          aria-describedby='create-user-desc'
+        >
+          <DialogTitle id='create-user-title'>Create User</DialogTitle>
+          <DialogContent>
+            <DialogContentText id='create-user-desc'>
+              <TextField
+                label='URL'
+                className={classes.field}
+                onChange={e => setURL(e.target.value)}
+              />
+              <TextField
+                label='Vanity'
+                className={classes.field}
+                onChange={e => setVanity(e.target.value)}
+              />
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setCreateOpen(false)} color='primary'>
+              Cancel
+            </Button>
+            <Button onClick={createURLThenClose} color='primary' autoFocus>
+              Create
+            </Button>
+          </DialogActions>
+        </Dialog>
         {!loading ? (
           <Paper elevation={3} className={classes.padding}>
-            <Typography variant='h5'>URLs</Typography>
+            <Typography variant='h5'>
+              URLs
+              <IconButton
+                aria-label='Create User'
+                onClick={() => setCreateOpen(true)}
+              >
+                <AddIcon />
+              </IconButton>
+            </Typography>
             <Grid container spacing={2}>
               {urls.map(u => {
                 const url = new URL(window.location.href);

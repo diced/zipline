@@ -47,8 +47,6 @@ export default function Images({ config }: { config: ConfigUploader }) {
   const [selectedImage, setSelectedImage] = React.useState<Image>(null);
   const [anchorEl, setAnchorEl] = React.useState(null);
 
-  console.log('1', chunks);
-
   if (typeof window === 'undefined') return <UIPlaceholder />;
   if (!state.loggedIn) router.push('/user/login');
   else {
