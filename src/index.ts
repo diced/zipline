@@ -126,7 +126,10 @@ server.register(fastifyStatic, {
 
 server.register(fastifyFavicon);
 
-server.listen(config.core.port, err => {
+server.listen({
+  port: config.core.port,
+  host: config.core.host
+}, err => {
   if (err) throw err;
   const info = server.server.address() as AddressInfo;
 
