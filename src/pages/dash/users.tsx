@@ -219,7 +219,7 @@ export default function Users() {
                       }
                       title={`${u.username} (${u.id})`}
                       subheader={`${u.administrator ? 'Administrator' : 'User'
-                        }`}
+                      }`}
                     />
                   </Card>
                 </Grid>
@@ -230,5 +230,4 @@ export default function Users() {
       </UI>
     );
   }
-  return <UIPlaceholder />;
 }

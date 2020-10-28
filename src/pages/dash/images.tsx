@@ -16,7 +16,7 @@ import UIPlaceholder from '../../components/UIPlaceholder';
 import { makeStyles } from '@material-ui/core';
 import { store } from '../../store';
 import { Image } from '../../entities/Image';
-import { ConfigUploader, Configuration } from '../../lib/Config';
+import { Configuration } from '../../lib/Config';
 
 const useStyles = makeStyles(theme => ({
   margin: {
@@ -36,7 +36,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function Images({ config }: { config: ConfigUploader }) {
+export default function Images({ config }) {
   const classes = useStyles();
   const router = useRouter();
   const state = store.getState();
@@ -157,9 +157,3 @@ export default function Images({ config }: { config: ConfigUploader }) {
   }
   return <UIPlaceholder />;
 }
-
-Images.getInitialProps = async () => {
-  return {
-    config: Configuration.readConfig().uploader
-  };
-};

@@ -24,7 +24,7 @@ import UI from '../../components/UI';
 import UIPlaceholder from '../../components/UIPlaceholder';
 import { makeStyles } from '@material-ui/core';
 import { URL as URLEntity } from '../../entities/URL';
-import { Configuration, ConfigUrls } from '../../lib/Config';
+import * as ZiplineConfig from '../../lib/Config';
 
 const useStyles = makeStyles(theme => ({
   margin: {
@@ -43,7 +43,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function Urls({ config }: { config: ConfigUrls }) {
+export default function Urls({ config }: { config: ZiplineConfig.ConfigUrls }) {
   const classes = useStyles();
   const [urls, setURLS] = useState<URLEntity[]>([]);
   const [loading, setLoading] = useState(true);
@@ -185,9 +185,3 @@ export default function Urls({ config }: { config: ConfigUrls }) {
     );
   }
 }
-
-Urls.getInitialProps = async () => {
-  return {
-    config: Configuration.readConfig().uploader
-  };
-};

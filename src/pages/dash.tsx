@@ -92,9 +92,3 @@ export default function Dashboard({ config }: { config: ConfigUploader }) {
   }
   return <UIPlaceholder />;
 }
-
-Dashboard.getInitialProps = async () => {
-  return {
-    config: Configuration.readConfig().uploader
-  };
-};
