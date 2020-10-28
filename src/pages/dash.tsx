@@ -12,7 +12,7 @@ import UI from '../components/UI';
 import UIPlaceholder from '../components/UIPlaceholder';
 import { makeStyles } from '@material-ui/core';
 import { store } from '../store';
-import { ConfigUploader } from '../lib/Config';
+import { ConfigUploader, Configuration } from '../lib/Config';
 
 const useStyles = makeStyles(theme => ({
   margin: {
@@ -92,3 +92,9 @@ export default function Dashboard({ config }: { config: ConfigUploader }) {
   }
   return <UIPlaceholder />;
 }
+
+Dashboard.getInitialProps = async () => {
+  return {
+    config: Configuration.readConfig().uploader
+  };
+};

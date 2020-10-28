@@ -32,7 +32,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function Index() {
+export default function Statistics() {
   const classes = useStyles();
   const router = useRouter();
   const state = store.getState();

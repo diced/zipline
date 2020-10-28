@@ -42,7 +42,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function Index() {
+export default function Users() {
   const classes = useStyles();
   const router = useRouter();
   const [users, setUsers] = useState([]);
@@ -218,9 +218,8 @@ export default function Index() {
                         </IconButton>
                       }
                       title={`${u.username} (${u.id})`}
-                      subheader={`${
-                        u.administrator ? 'Administrator' : 'User'
-                      }`}
+                      subheader={`${u.administrator ? 'Administrator' : 'User'
+                        }`}
                     />
                   </Card>
                 </Grid>
