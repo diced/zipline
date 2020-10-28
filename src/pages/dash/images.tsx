@@ -16,7 +16,6 @@ import UIPlaceholder from '../../components/UIPlaceholder';
 import { makeStyles } from '@material-ui/core';
 import { store } from '../../store';
 import { Image } from '../../entities/Image';
-import { Configuration } from '../../lib/Config';
 
 const useStyles = makeStyles(theme => ({
   margin: {
