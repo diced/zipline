@@ -12,7 +12,7 @@ import UI from '../components/UI';
 import UIPlaceholder from '../components/UIPlaceholder';
 import { makeStyles } from '@material-ui/core';
 import { store } from '../store';
-import { ConfigUploader, Configuration } from '../lib/Config';
+import { Configuration } from '../lib/Config';
 
 const useStyles = makeStyles(theme => ({
   margin: {
@@ -28,7 +28,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function Dashboard({ config }: { config: ConfigUploader }) {
+export default function Dashboard({ config }) {
   const classes = useStyles();
   const router = useRouter();
   const state = store.getState();
@@ -69,7 +69,7 @@ export default function Dashboard({ config }: { config: ConfigUploader }) {
             <Grid container spacing={2}>
               {recentImages.map(d => {
                 const t = new URL(window.location.href);
-                t.pathname = `${config ? config.route : '/u'}/${d.file}`;
+                t.pathname = `${config ? config.uploader.route : '/u'}/${d.file}`;
                 return (
                   <Grid item key={d.id} xs={12} sm={4}>
                     <Card>
@@ -91,4 +91,9 @@ export default function Dashboard({ config }: { config: ConfigUploader }) {
     );
   }
   return <UIPlaceholder />;
+}
+
+export async function getStaticProps() {
+  const config = Configuration.readConfig();
+  return { props: { config: config } };
 }

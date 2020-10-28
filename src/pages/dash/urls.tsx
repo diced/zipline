@@ -24,7 +24,7 @@ import UI from '../../components/UI';
 import UIPlaceholder from '../../components/UIPlaceholder';
 import { makeStyles } from '@material-ui/core';
 import { URL as URLEntity } from '../../entities/URL';
-import * as ZiplineConfig from '../../lib/Config';
+import { Configuration } from '../../lib/Config';
 
 const useStyles = makeStyles(theme => ({
   margin: {
@@ -43,7 +43,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function Urls({ config }: { config: ZiplineConfig.ConfigUrls }) {
+export default function Urls({ config }) {
   const classes = useStyles();
   const [urls, setURLS] = useState<URLEntity[]>([]);
   const [loading, setLoading] = useState(true);
@@ -152,7 +152,7 @@ export default function Urls({ config }: { config: ZiplineConfig.ConfigUrls }) {
             <Grid container spacing={2}>
               {urls.map(u => {
                 const url = new URL(window.location.href);
-                url.pathname = `${config ? config.route : '/u'}/${u.id}`;
+                url.pathname = `${config ? config.urls.route : '/go'}/${u.id}`;
                 return (
                   <Grid item xs={12} sm={4} key={u.id}>
                     <Card elevation={3}>
@@ -184,4 +184,9 @@ export default function Urls({ config }: { config: ZiplineConfig.ConfigUrls }) {
       </UI>
     );
   }
+}
+
+export async function getStaticProps() {
+  const config = Configuration.readConfig();
+  return { props: { config } };
 }
