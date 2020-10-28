@@ -61,7 +61,7 @@ export class ImagesController {
     if (this.webhooks.events.includes(WebhookType.DELETE_IMAGE))
       WebhookHelper.sendWebhook(this.webhooks.upload.content, {
         image,
-        host: `${req.protocol}://${req.hostname}${config.uploader.route}/`
+        host: `${config.core.secure ? 'https' : 'http'}://${req.hostname}${config.uploader.route}/`
       });
 
     return reply.send(image);

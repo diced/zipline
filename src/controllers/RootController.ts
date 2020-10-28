@@ -130,11 +130,11 @@ export class RootController {
     if (this.webhooks.events.includes(WebhookType.UPLOAD))
       WebhookHelper.sendWebhook(this.webhooks.upload.content, {
         image,
-        host: `${req.protocol}://${req.hostname}${config.uploader.route}/`
+        host: `${config.core.secure ? 'https' : 'http'}://${req.hostname}${config.uploader.route}/`
       });
 
     reply.send(
-      `${req.protocol}://${req.hostname}${config.uploader.route}/${fileName}.${ext}`
+      `${config.core.secure ? 'https' : 'http'}://${req.hostname}${config.uploader.route}/${fileName}.${ext}`
     );
   }
 }

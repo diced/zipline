@@ -37,6 +37,7 @@ export interface ConfigUrls {
 export interface ConfigCore {
   secret: string;
   port: number;
+  secure?: boolean;
   blacklisted_ips?: string[];
 }
 

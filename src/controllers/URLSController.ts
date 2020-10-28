@@ -66,7 +66,7 @@ export class URLSController {
     if (this.webhooks.events.includes(WebhookType.DELETE_URL))
       WebhookHelper.sendWebhook(this.webhooks.delete_url.content, {
         url,
-        host: `${req.protocol}://${req.hostname}${config.urls.route}/`
+        host: `${config.core.secure ? 'https' : 'http'}://${req.hostname}${config.urls.route}/`
       });
 
     return reply.send(url);
@@ -107,7 +107,7 @@ export class URLSController {
     if (this.webhooks.events.includes(WebhookType.SHORTEN))
       WebhookHelper.sendWebhook(this.webhooks.shorten.content, {
         url,
-        host: `${req.protocol}://${req.hostname}${config.urls.route}/`
+        host: `${config.core.secure ? 'https' : 'http'}://${req.hostname}${config.urls.route}/`
       });
 
     return reply.send(url);
