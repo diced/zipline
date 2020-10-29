@@ -14,5 +14,3 @@ Speed & reliable
 # Documentation
 
 You can view current documentation [here](https://zipline.diced.wtf/)
-
-_Note: Topics like Migrations are not implemented, but will soon exist._

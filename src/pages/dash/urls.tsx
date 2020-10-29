@@ -49,6 +49,7 @@ export default function Urls({ config }) {
   const [loading, setLoading] = useState(true);
   const [alertOpen, setAlertOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
+  const [error, setError] = useState(false);
   const [url, setURL] = useState('');
   const [vanity, setVanity] = useState('');
 
@@ -90,6 +91,16 @@ export default function Urls({ config }) {
       }
     };
 
+    const handleChangeURLCreate = async (e) => {
+      try {
+        new URL(e.target.value);
+        setURL(e.target.value);
+        setError(false);
+      } catch (e) {
+        setError(true);
+      }
+    };
+
     return (
       <UI>
         <Backdrop className={classes.backdrop} open={loading}>
@@ -118,9 +129,11 @@ export default function Urls({ config }) {
           <DialogContent>
             <DialogContentText id='create-user-desc'>
               <TextField
+                error={error}
+                helperText={error ? 'Invalid URL' : ''}
                 label='URL'
                 className={classes.field}
-                onChange={e => setURL(e.target.value)}
+                onChange={handleChangeURLCreate}
               />
               <TextField
                 label='Vanity'
