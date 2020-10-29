@@ -2,6 +2,19 @@
 const inquirer = require('inquirer');
 const { stringify } = require('toml-patch');
 const { writeFileSync } = require('fs');
+const { join } = require('path');
+
+const createDockerCompose = (port) => {
+  return `version: "3"
+services:
+  zipline:
+    ports:
+      - "${port}:${port}"
+    volumes:
+      - "${join(process.cwd(), 'uploads')}:/opt/zipline/uploads"
+    build: .
+    tty: true`;
+};
 
 const base = {
   database: {},
@@ -107,6 +120,16 @@ const base = {
     }
   ]);
 
+  console.log('\nDocker\n');
+
+  const docker = await inquirer.prompt([
+    {
+      type: 'confirm',
+      name: 'useDocker',
+      message: 'Use Docker?'
+    }
+  ]);
+
   const config = {
     database: { ...database },
     meta: { ...base.meta },
@@ -114,5 +137,11 @@ const base = {
     uploader: { ...base.uploader, ...uploader },
     urls: { ...base.urls, ...urls }
   };
+
   writeFileSync('Zipline.toml', stringify(config));
+
+  if (docker.useDocker) {
+    console.log('Generating docker-compose.yml...');
+    writeFileSync('docker-compose.yml', createDockerCompose(config.core.port));
+  }
 })();

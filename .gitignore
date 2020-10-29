@@ -25,3 +25,5 @@ Zipline.toml
 # dev
 uploads/
 testImage.*
+# this is ignored because setup.js can generate a docker-compose.yml
+docker-compose.yml
