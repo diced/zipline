@@ -22,6 +22,7 @@
     "fastify-typeorm-plugin": "^2.1.2",
     "figlet": "^1.5.0",
     "inquirer": "^7.3.3",
+    "material-ui-dropzone": "^3.5.0",
     "next": "^9.5.4",
     "pg": "^8.4.1",
     "react": "^16.13.1",

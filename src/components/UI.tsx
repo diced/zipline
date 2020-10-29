@@ -29,6 +29,7 @@ import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import GroupIcon from '@material-ui/icons/Group';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import PublishIcon from '@material-ui/icons/Publish';
 import RotateLeftIcon from '@material-ui/icons/RotateLeft';
 import copy from 'copy-to-clipboard';
 import { LOGOUT, UPDATE_USER } from '../reducer';
@@ -223,6 +224,18 @@ export default function UI({ children }) {
               <DataUsageIcon />
             </ListItemIcon>
             <ListItemText primary='Statistics' />
+          </ListItem>
+        </Link>
+        <Link href='/dash/upload'>
+          <ListItem
+            button
+            key='Upload'
+            selected={router.pathname === '/dash/upload'}
+          >
+            <ListItemIcon>
+              <PublishIcon />
+            </ListItemIcon>
+            <ListItemText primary='Upload' />
           </ListItem>
         </Link>
         <Link href='/dash/images'>

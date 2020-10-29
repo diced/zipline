@@ -1,9 +1,0 @@
-version: "3"
-services:
-  zipline:
-    ports:
-      - "8000:8000"
-    volumes:
-      - "/home/diced/zipline/uploads:/opt/zipline/uploads"
-    build: .
-    tty: true
