@@ -28,7 +28,7 @@ const useStyles = makeStyles(theme => ({
     color: '#fff'
   },
   tableBorder: {
-    borderColor: '#130929'
+    borderColor: '#121212'
   }
 }));
 

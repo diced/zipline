@@ -83,7 +83,6 @@ export default function Login() {
         <CardActions>
           <Button
             color='primary'
-            variant='contained'
             className={classes.field}
             onClick={handleLogin}
           >

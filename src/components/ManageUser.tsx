@@ -85,7 +85,6 @@ export default function ManageUser() {
         </CardContent>
         <CardActions>
           <Button
-            variant='contained'
             className={classes.button}
             color='primary'
             onClick={handleUpdateUser}

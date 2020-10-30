@@ -26,6 +26,11 @@ const darkTheme = createMuiTheme({
       root: {
         backgroundColor: '#080808'
       }
+    },
+    MuiButton: {
+      root: {
+        margin: '1320000'
+      }
     }
   }
 });

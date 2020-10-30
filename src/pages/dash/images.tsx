@@ -11,6 +11,7 @@ import Popover from '@material-ui/core/Popover';
 import Button from '@material-ui/core/Button';
 import Pagination from '@material-ui/lab/Pagination';
 import DeleteIcon from '@material-ui/icons/Delete';
+import AddToPhotosIcon from '@material-ui/icons/AddToPhotos';
 import UI from '../../components/UI';
 import UIPlaceholder from '../../components/UIPlaceholder';
 import { makeStyles } from '@material-ui/core';
@@ -42,6 +43,7 @@ export default function Images({ config }) {
   const state = store.getState();
 
   const [loading, setLoading] = React.useState(true);
+  const [showPagination, setShowPagination] = React.useState(true);
   const [chunks, setChunks] = React.useState([]);
   const [images, setImages] = React.useState<Image[]>([]);
   const [selectedImage, setSelectedImage] = React.useState<Image>(null);
@@ -53,8 +55,8 @@ export default function Images({ config }) {
     const getChunkedImages = async () => {
       const c = await (await fetch('/api/images/chunk')).json();
       if (!c.error) {
-        setChunks(c);
-        return c;
+        setChunks([]);
+        return [];
       }
       return [];
     };
@@ -72,6 +74,9 @@ export default function Images({ config }) {
       if (page) {
         setImages(page);
         setLoading(false);
+      } else if (chunks.length === 0) {
+        setLoading(false);
+        setShowPagination(false);
       }
     };
 
@@ -101,32 +106,48 @@ export default function Images({ config }) {
         </Backdrop>
         {!loading ? (
           <Paper elevation={3} className={classes.padding}>
-            <Grid container spacing={2}>
-              {images.map(d => {
-                const t = new URL(window.location.href);
-                t.pathname = `${config ? config.uploader.route : '/u'}/${d.file}`;
-                return (
-                  <Grid
-                    item
-                    xs={12}
-                    sm={6}
-                    key={d.id}
-                    onClick={e => setImageOpenPopover(e, d)}
-                  >
-                    <Card>
-                      <CardActionArea>
-                        <CardMedia
-                          component='img'
-                          height='140'
-                          image={t.toString()}
-                        />
-                      </CardActionArea>
-                    </Card>
-                  </Grid>
-                );
-              })}
-            </Grid>
-            <Pagination count={chunks.length} onChange={changePage} />
+            {showPagination ? (
+              <>
+                <Grid container spacing={2}>
+                  {images.map(d => {
+                    const t = new URL(window.location.href);
+                    t.pathname = `${config ? config.uploader.route : '/u'}/${d.file}`;
+                    return (
+                      <Grid
+                        item
+                        xs={12}
+                        sm={6}
+                        key={d.id}
+                        onClick={e => setImageOpenPopover(e, d)}
+                      >
+                        <Card>
+                          <CardActionArea>
+                            <CardMedia
+                              component='img'
+                              height='140'
+                              image={t.toString()}
+                            />
+                          </CardActionArea>
+                        </Card>
+                      </Grid>
+                    );
+                  })}
+                </Grid>
+                <Pagination count={chunks.length} onChange={changePage} />
+              </>
+            ) : (
+              <Grid
+                container
+                spacing={0}
+                direction='column'
+                alignItems='center'
+                justify='center'
+              >
+                <Grid item xs={6} sm={12}>
+                  <AddToPhotosIcon style={{ fontSize: 100 }} />
+                </Grid>
+              </Grid>
+            )}
           </Paper>
         ) : null}
         <Popover

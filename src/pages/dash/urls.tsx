@@ -17,6 +17,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import AddToPhotosIcon from '@material-ui/icons/AddToPhotos';
 import FileCopyIcon from '@material-ui/icons/FileCopy';
 import AddIcon from '@material-ui/icons/Add';
 import copy from 'copy-to-clipboard';
@@ -163,7 +164,7 @@ export default function Urls({ config }) {
               </IconButton>
             </Typography>
             <Grid container spacing={2}>
-              {urls.map(u => {
+              {urls.length > 0 ? urls.map(u => {
                 const url = new URL(window.location.href);
                 url.pathname = `${config ? config.urls.route : '/go'}/${u.id}`;
                 return (
@@ -190,7 +191,19 @@ export default function Urls({ config }) {
                     </Card>
                   </Grid>
                 );
-              })}
+              }) : (
+                <Grid
+                  container
+                  spacing={0}
+                  direction='column'
+                  alignItems='center'
+                  justify='center'
+                >
+                  <Grid item xs={6} sm={12}>
+                    <AddToPhotosIcon style={{ fontSize: 100 }} />
+                  </Grid>
+                </Grid>
+              )}
             </Grid>
           </Paper>
         ) : null}
