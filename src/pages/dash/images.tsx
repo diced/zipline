@@ -55,8 +55,8 @@ export default function Images({ config }) {
     const getChunkedImages = async () => {
       const c = await (await fetch('/api/images/chunk')).json();
       if (!c.error) {
-        setChunks([]);
-        return [];
+        setChunks(c);
+        return c;
       }
       return [];
     };
@@ -136,18 +136,18 @@ export default function Images({ config }) {
                 <Pagination count={chunks.length} onChange={changePage} />
               </>
             ) : (
-              <Grid
-                container
-                spacing={0}
-                direction='column'
-                alignItems='center'
-                justify='center'
-              >
-                <Grid item xs={6} sm={12}>
-                  <AddToPhotosIcon style={{ fontSize: 100 }} />
+                <Grid
+                  container
+                  spacing={0}
+                  direction='column'
+                  alignItems='center'
+                  justify='center'
+                >
+                  <Grid item xs={6} sm={12}>
+                    <AddToPhotosIcon style={{ fontSize: 100 }} />
+                  </Grid>
                 </Grid>
-              </Grid>
-            )}
+              )}
           </Paper>
         ) : null}
         <Popover
