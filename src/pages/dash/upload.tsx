@@ -76,6 +76,7 @@ export default function Upload() {
               acceptedFiles={['image/*']}
               dropzoneText={'Drag an image or click to upload an image.'}
               onChange={f => setFiles(f)}
+              maxFileSize={1073741824} // 1gb in byte
             />
           </Box>
           <Button onClick={handleFileUpload}>Submit</Button>
