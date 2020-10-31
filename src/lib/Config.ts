@@ -34,12 +34,18 @@ export interface ConfigUrls {
   vanity: boolean;
 }
 
+export interface ConfigCoreRateLimiter {
+  requests: number;
+  retry_after: number;
+}
+
 export interface ConfigCore {
   secret: string;
   host: string;
   port: number;
   secure?: boolean;
   blacklisted_ips?: string[];
+  ratelimiter?: ConfigCoreRateLimiter;
 }
 
 export interface ConfigWebhooks {

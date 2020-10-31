@@ -4,6 +4,7 @@ import fastify, { FastifyReply, FastifyRequest } from 'fastify';
 import fastifyTypeorm from 'fastify-typeorm-plugin';
 import fastifyCookies from 'fastify-cookie';
 import fastifyMultipart from 'fastify-multipart';
+import fastifyRateLimit from 'fastify-rate-limit';
 import fastifyStatic from 'fastify-static';
 import fastifyFavicon from 'fastify-favicon';
 import { bootstrap } from 'fastify-decorators';
@@ -48,6 +49,12 @@ const handle = app.getRequestHandler();
 Console.logger(next).info('Preparing app...');
 app.prepare();
 Console.logger(next).verbose('Prepared app');
+
+server.register(fastifyRateLimit, {
+  timeWindow: 5000,
+  max: 1,
+  global: false
+});
 
 if (dev)
   server.get('/_next/*', async (req, reply) => {

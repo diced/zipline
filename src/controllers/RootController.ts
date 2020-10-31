@@ -22,6 +22,9 @@ import { WebhookHelper, WebhookType } from '../lib/Webhooks';
 const pump = promisify(pipeline);
 
 const config = Configuration.readConfig();
+const rateLimiterConfig = config.core.ratelimiter
+  ? { config: { rateLimit: { max: config.core.ratelimiter.requests, timeWindow: config.core.ratelimiter.retry_after } } }
+  : {};
 
 @Controller('/api')
 export class RootController {
@@ -87,7 +90,7 @@ export class RootController {
     });
   }
 
-  @POST('/upload')
+  @POST('/upload', rateLimiterConfig)
   async loginStatus(req: FastifyRequest, reply: FastifyReply) {
     if (!req.headers.authorization)
       return new AuthError('No authorization header!');

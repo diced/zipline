@@ -18,6 +18,7 @@
     "fastify-favicon": "^3.0.0",
     "fastify-mongodb": "^2.0.1",
     "fastify-multipart": "^3.2.0",
+    "fastify-rate-limit": "github:dicedtomatoreal/fastify-rate-limit",
     "fastify-static": "^3.2.1",
     "fastify-typeorm-plugin": "^2.1.2",
     "figlet": "^1.5.0",
