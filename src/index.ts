@@ -117,7 +117,7 @@ server.register(fastifyCookies, {
 });
 
 server.register(fastifyStatic, {
-  root: root: path,
+  root: path,
   prefix: config.uploader.route
 });
 
