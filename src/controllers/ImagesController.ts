@@ -1,3 +1,5 @@
+import fs from 'fs';
+import { join } from 'path';
 import { FastifyReply, FastifyRequest, FastifyInstance } from 'fastify';
 import {
   Controller,
@@ -55,6 +57,12 @@ export class ImagesController {
 
     this.images.delete({
       id: req.params.id
+    });
+
+    const dir = config.uploader.directory ? config.uploader.directory : 'uploads';
+    const path = join(dir.charAt(0) == '/' ? dir : join(process.cwd(), dir), image.file);
+    fs.unlink(path, (err) => {
+        if (err) throw new Error('No image file');
     });
 
     Console.logger(Image).info(`image ${image.id} was deleted`);
