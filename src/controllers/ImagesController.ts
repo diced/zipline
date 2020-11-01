@@ -1,3 +1,5 @@
+import { unlinkSync } from 'fs';
+import { join } from 'path';
 import { FastifyReply, FastifyRequest, FastifyInstance } from 'fastify';
 import {
   Controller,
@@ -57,14 +59,24 @@ export class ImagesController {
       id: req.params.id
     });
 
-    Console.logger(Image).info(`image ${image.id} was deleted`);
-    if (this.webhooks.events.includes(WebhookType.DELETE_IMAGE))
-      WebhookHelper.sendWebhook(this.webhooks.upload.content, {
-        image,
-        host: `${config.core.secure ? 'https' : 'http'}://${req.hostname}${config.uploader.route}/`
-      });
+    const dir = config.uploader.directory ? config.uploader.directory : 'uploads';
+    const path = join(dir.charAt(0) == '/' ? dir : join(process.cwd(), dir), image.file);
+    
+    try {
+      unlinkSync(path);
+      
+      Console.logger(Image).info(`image ${image.id} was deleted`);
+      if (this.webhooks.events.includes(WebhookType.DELETE_IMAGE))
+        WebhookHelper.sendWebhook(this.webhooks.upload.content, {
+          image,
+          host: `${config.core.secure ? 'https' : 'http'}://${req.hostname}${config.uploader.route}/`
+        });
 
-    return reply.send(image);
+      return reply.send(image);
+    } catch (e) {
+      Console.logger(Image).error(`image ${image.id} could not be deleted...`);
+      return reply.status(401).send({ error: 'Could not delete image.' })
+    }
   }
 
   @GET('/recent')

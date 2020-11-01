@@ -39,6 +39,9 @@ if (!config) {
   process.exit(0);
 }
 
+const dir = config.uploader.directory ? config.uploader.directory : 'uploads';;
+const path = dir.charAt(0) == '/' ? dir : join(process.cwd(), dir);
+
 const server = fastify({});
 const app = next({
   dev,
@@ -121,7 +124,7 @@ server.register(fastifyCookies, {
 });
 
 server.register(fastifyStatic, {
-  root: join(process.cwd(), config.uploader.directory),
+  root: path,
   prefix: config.uploader.route
 });
 
