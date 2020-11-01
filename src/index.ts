@@ -18,7 +18,10 @@ import { join } from 'path';
 import { ImagesController } from './controllers/ImagesController';
 import { URLSController } from './controllers/URLSController';
 import { URL } from './entities/URL';
+import { checkVersion } from './lib/Util';
 const dev = process.env.NODE_ENV !== 'production';
+
+(async () => { if (await checkVersion()) Console.logger('Zipline').info('running an outdated version of zipline, please update soon!'); })();
 
 console.log(`
 ${magenta(text('Zipline'))}

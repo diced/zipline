@@ -2,7 +2,10 @@ import aes from 'crypto-js/aes';
 import { compareSync, hashSync } from 'bcrypt';
 import { Configuration } from './Config';
 import { Connection } from 'typeorm';
+import { compare } from 'semver';
 import { Zipline } from '../entities/Zipline';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 
 const config = Configuration.readConfig();
 
@@ -43,4 +46,16 @@ export async function getFirst(orm: Connection): Promise<boolean> {
   let d = await zipline.findOne({ id: 'zipline' });
   if (!d) d = await zipline.save(new Zipline());
   return d.first;
+}
+
+export async function checkVersion(): Promise<boolean> {
+  const res = await fetch('https://raw.githubusercontent.com/dicedtomatoreal/zipline/next/package.json');
+  if (!res.ok) return true;
+
+  const latestVersion = (await res.json()).version;
+  const currentVersion = process.env.npm_package_version || readFileSync(join(process.cwd(), 'package.json'), 'utf8');
+
+  const compared = compare(currentVersion, latestVersion);
+
+  return compared == 0 || compared == 1 ? false : true;
 }
