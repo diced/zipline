@@ -6,6 +6,7 @@ export const LOGOUT = 'LOGOUT';
 export const UPDATE_USER = 'UPDATE_USER';
 export const STOP_LOADING = 'STOP_LOADING';
 export const START_LOADING = 'START_LOADING';
+export const SET_THEME = 'SET_THEME';
 
 export interface State {
   loggedIn: boolean;

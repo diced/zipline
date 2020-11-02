@@ -24,7 +24,7 @@ const useStyles = makeStyles(theme => ({
     margin: '5px'
   },
   padding: {
-    border: '1px solid #1f1f1f',
+    border: theme.palette.type === 'dark' ? '1px solid #1f1f1f' : '1px solid #e0e0e0',
     padding: '10px'
   },
   backdrop: {
@@ -136,18 +136,18 @@ export default function Images({ config }) {
                 <Pagination count={chunks.length} onChange={changePage} />
               </>
             ) : (
-                <Grid
-                  container
-                  spacing={0}
-                  direction='column'
-                  alignItems='center'
-                  justify='center'
-                >
-                  <Grid item xs={6} sm={12}>
-                    <AddToPhotosIcon style={{ fontSize: 100 }} />
-                  </Grid>
+              <Grid
+                container
+                spacing={0}
+                direction='column'
+                alignItems='center'
+                justify='center'
+              >
+                <Grid item xs={6} sm={12}>
+                  <AddToPhotosIcon style={{ fontSize: 100 }} />
                 </Grid>
-              )}
+              </Grid>
+            )}
           </Paper>
         ) : null}
         <Popover

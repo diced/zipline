@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 
 import React from 'react';
 import Document, { Html, Head, Main, NextScript } from 'next/document';
@@ -33,7 +34,7 @@ export default class MyDocument extends Document<DocumentProps> {
           </Head>
         ) : null}
         <body>
-          <Main />
+          <Main/>
           <NextScript />
         </body>
       </Html>
@@ -43,17 +44,18 @@ export default class MyDocument extends Document<DocumentProps> {
 
 MyDocument.getInitialProps = async ctx => {
   const sheets = new ServerStyleSheets();
+  const config = Configuration.readConfig();
   const originalRenderPage = ctx.renderPage;
 
   ctx.renderPage = () =>
     originalRenderPage({
-      enhanceApp: App => props => sheets.collect(<App {...props} />)
+      enhanceApp: App => props => sheets.collect(<App {...props}/>)
     });
 
   const initialProps = await Document.getInitialProps(ctx);
   return {
     ...initialProps,
-    config: Configuration.readConfig(),
+    config,
     styles: [
       ...React.Children.toArray(initialProps.styles),
       sheets.getStyleElement()

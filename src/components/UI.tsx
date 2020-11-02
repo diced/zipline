@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import AppBar from '@material-ui/core/AppBar';
+import Box from '@material-ui/core/Box';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import Drawer from '@material-ui/core/Drawer';
@@ -31,11 +32,13 @@ import FileCopyIcon from '@material-ui/icons/FileCopy';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import PublishIcon from '@material-ui/icons/Publish';
 import RotateLeftIcon from '@material-ui/icons/RotateLeft';
+import Divider from '@material-ui/core/Divider';
 import copy from 'copy-to-clipboard';
 import { LOGOUT, UPDATE_USER } from '../reducer';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { makeStyles, useTheme, withStyles } from '@material-ui/core/styles';
 import { useRouter } from 'next/router';
 import { useDispatch } from 'react-redux';
+import { store } from '../store';
 
 const drawerWidth = 240;
 
@@ -53,13 +56,13 @@ const useStyles = makeStyles(theme => ({
   },
   appBar: {
     display: 'flex',
-    backgroundColor: '#000',
-    color: '#fff',
+    backgroundColor: theme.palette.type === 'dark' ? '#000' : '#fff',
+    color: theme.palette.type !== 'dark' ? '#000' : '#fff',
     [theme.breakpoints.up('sm')]: {
       width: 'calc(100%)',
       marginLeft: drawerWidth
     },
-    borderBottom: '1px solid #1f1f1f'
+    borderBottom: theme.palette.type === 'dark' ? '1px solid #1f1f1f' : '1px solid #e0e0e0'
   },
   menuButton: {
     marginRight: theme.spacing(2),
@@ -84,9 +87,18 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
+const NoFocusMenuItem = withStyles(theme => ({
+  root: {
+    '&:hover': {
+      backgroundColor: theme.palette.type === 'dark' ? '#000' : '#f7f7f7'
+    }
+  }
+}))(MenuItem);
+
 export default function UI({ children }) {
   const classes = useStyles();
   const theme = useTheme();
+  const state = store.getState();
   const router = useRouter();
   const dispatch = useDispatch();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -161,16 +173,19 @@ export default function UI({ children }) {
             <MenuIcon />
           </IconButton>
           <Typography variant='h6'>Zipline</Typography>
-          <IconButton
-            aria-label='account of current user'
-            aria-controls='menu-appbar'
-            aria-haspopup='true'
-            onClick={event => setAnchorEl(event.currentTarget)}
-            color='inherit'
-            className={classes.rightButton}
-          >
-            <AccountCircleIcon className={classes.rightButton} />
-          </IconButton>
+          <Box className={classes.rightButton}>
+            <IconButton
+              aria-label='account of current user'
+              aria-controls='menu-appbar'
+              aria-haspopup='true'
+              onClick={event => setAnchorEl(event.currentTarget)}
+              color='inherit'
+              className={classes.rightButton}
+            >
+              <AccountCircleIcon className={classes.rightButton} />
+            </IconButton>
+          </Box>
+
           <Menu
             id='menu-appbar'
             anchorEl={anchorEl}
@@ -186,6 +201,12 @@ export default function UI({ children }) {
             open={open}
             onClose={() => setAnchorEl(null)}
           >
+            <NoFocusMenuItem>
+              <Typography variant='h6'>
+                {state.user.username}
+              </Typography>
+            </NoFocusMenuItem>
+            <Divider />
             <Link href='/user/manage'>
               <MenuItem onClick={() => setAnchorEl(null)}>
                 <AccountCircleIcon className={classes.menuIcon} />

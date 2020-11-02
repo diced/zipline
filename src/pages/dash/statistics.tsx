@@ -20,7 +20,7 @@ const useStyles = makeStyles(theme => ({
     margin: '5px'
   },
   padding: {
-    border: '1px solid #1f1f1f',
+    border: theme.palette.type === 'dark' ? '1px solid #1f1f1f' : '1px solid #e0e0e0',
     padding: '10px'
   },
   backdrop: {
@@ -28,7 +28,7 @@ const useStyles = makeStyles(theme => ({
     color: '#fff'
   },
   tableBorder: {
-    borderColor: '#121212'
+    borderColor: theme.palette.type === 'dark' ? '#1f1f1f' : '#e0e0e0'
   }
 }));
 

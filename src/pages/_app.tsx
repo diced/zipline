@@ -1,21 +1,26 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import Head from 'next/head';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import { ThemeProvider } from '@material-ui/core/styles';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from '../store';
-import theme from '../lib/themes/dark';
+import ZiplineTheming from '../components/ZiplineTheming';
+
 
 function MyApp({ Component, pageProps }) {
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   useEffect(() => {
     const jssStyles = document.querySelector('#jss-server-side');
     if (jssStyles) jssStyles.parentElement.removeChild(jssStyles);
-  }, []);
 
+    (async () => {
+      const d = await (await fetch('/api/theme')).json();
+      if (!d.error) setTheme(d.theme);
+    })();
+  }, []);
   return (
-    <ThemeProvider theme={theme}>
+
+    <React.Fragment>
       <Head>
         <title>Zipline</title>
         <meta
@@ -25,12 +30,11 @@ function MyApp({ Component, pageProps }) {
       </Head>
 
       <Provider store={store}>
-        <PersistGate loading={<div>loading</div>} persistor={persistor}>
-          <CssBaseline />
-          <Component {...pageProps} />
+        <PersistGate loading={<div>Loading...</div>} persistor={persistor}>
+          <ZiplineTheming Component={Component} pageProps={pageProps} theme={theme} />
         </PersistGate>
       </Provider>
-    </ThemeProvider>
+    </React.Fragment>
   );
 }
 
