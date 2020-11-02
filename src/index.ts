@@ -19,6 +19,7 @@ import { ImagesController } from './controllers/ImagesController';
 import { URLSController } from './controllers/URLSController';
 import { URL } from './entities/URL';
 import { checkVersion } from './lib/Util';
+import { readFileSync } from 'fs';
 const dev = process.env.NODE_ENV !== 'production';
 
 (async () => { if (await checkVersion()) Console.logger('Zipline').info('running an outdated version of zipline, please update soon!'); })();
@@ -26,6 +27,7 @@ const dev = process.env.NODE_ENV !== 'production';
 console.log(`
 ${magenta(text('Zipline'))}
 
+Version : ${blue(process.env.npm_package_version || readFileSync(join(process.cwd(), 'package.json'), 'utf8'))}
 GitHub  : ${blue('https://github.com/ZiplineProject/zipline')}
 Issues  : ${blue('https://github.com/ZiplineProject/zipline/issues')}
 Docs    : ${blue('https://zipline.diced.wtf/')}
