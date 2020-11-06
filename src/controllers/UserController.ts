@@ -236,9 +236,7 @@ export class UserController {
       this.logger.verbose(
         `attempting to delete ${existing.username} (${existing.id})`
       );
-      await this.users.delete({
-        id: existing.id
-      });
+      await this.users.remove(existing);
 
       this.logger.info(`deleted ${existing.username} (${existing.id})`);
       if (this.webhooks.events.includes(WebhookType.USER_DELETE))

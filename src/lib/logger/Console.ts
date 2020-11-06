@@ -9,6 +9,7 @@ declare global {
   }
 }
 
+
 if (!global.logr) global.logr = { formatter: null };
 
 export enum ConsoleLevel {

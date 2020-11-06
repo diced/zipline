@@ -11,15 +11,19 @@ import { bootstrap } from 'fastify-decorators';
 import { Console } from './lib/logger';
 import { AddressInfo } from 'net';
 import { magenta, bold, green, reset, blue, red } from '@dicedtomato/colors';
+import Redis from 'ioredis';
 import { Configuration } from './lib/Config';
 import { UserController } from './controllers/UserController';
 import { RootController } from './controllers/RootController';
 import { join } from 'path';
 import { ImagesController } from './controllers/ImagesController';
 import { URLSController } from './controllers/URLSController';
-import { URL } from './entities/URL';
 import { checkVersion } from './lib/Util';
 import { readFileSync } from 'fs';
+import { Image } from './entities/Image';
+import { User } from './entities/User';
+import { Zipline } from './entities/Zipline';
+import { URL } from './entities/URL';
 const dev = process.env.NODE_ENV !== 'production';
 
 (async () => { if (await checkVersion()) Console.logger('Zipline').info('running an outdated version of zipline, please update soon!'); })();
@@ -110,7 +114,7 @@ server.register(fastifyMultipart);
 
 server.register(fastifyTypeorm, {
   ...config.database,
-  entities: [dev ? './src/entities/**/*.ts' : './dist/entities/**/*.js'],
+  entities: [Image, URL, User, Zipline],
   synchronize: true,
   logging: false
 });
@@ -156,6 +160,7 @@ server.listen({
 });
 
 server.addHook('preHandler', async (req, reply) => {
+
   if (
     config.core.blacklisted_ips &&
     config.core.blacklisted_ips.includes(req.ip)
