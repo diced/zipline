@@ -63,7 +63,7 @@ export class UserController {
 
   @PATCH('/')
   async editUser(
-    req: FastifyRequest<{ Body: { username: string; password: string } }>,
+    req: FastifyRequest<{ Body: { username: string; password: string, email: string; } }>,
     reply: FastifyReply
   ) {
     if (!req.cookies.zipline) throw new LoginError('Not logged in.');
@@ -78,7 +78,8 @@ export class UserController {
 
     this.logger.verbose(`attempting to save ${user.username} (${user.id})`);
     user.username = req.body.username;
-    user.password = encryptPassword(req.body.password);
+    if (req.body.password) user.password = encryptPassword(req.body.password);
+    if (req.body.email) user.email = req.body.email;
     await this.users.save(user);
 
     this.logger.info(`saved ${user.username} (${user.id})`);

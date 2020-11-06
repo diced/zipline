@@ -11,6 +11,9 @@ export class User {
   @Column('text')
   public password: string;
 
+  @Column('text', { default: null }) /* used for gravatar avatar! */ 
+  public email: string;
+
   @Column('boolean', { default: false })
   public administrator: boolean;
 
@@ -25,6 +28,7 @@ export class User {
   ) {
     this.username = username;
     this.password = password;
+    this.email = null;
     this.administrator = administrator;
     this.token = token;
   }

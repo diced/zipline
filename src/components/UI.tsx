@@ -5,6 +5,7 @@ import Box from '@material-ui/core/Box';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import Drawer from '@material-ui/core/Drawer';
+import Avatar from '@material-ui/core/Avatar';
 import Hidden from '@material-ui/core/Hidden';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -39,6 +40,7 @@ import { makeStyles, useTheme, withStyles } from '@material-ui/core/styles';
 import { useRouter } from 'next/router';
 import { useDispatch } from 'react-redux';
 import { store } from '../store';
+import { MD5 } from 'crypto-js';
 
 const drawerWidth = 240;
 
@@ -101,6 +103,7 @@ export default function UI({ children }) {
   const state = store.getState();
   const router = useRouter();
   const dispatch = useDispatch();
+  const [emailHash, setEmailHash] = useState('');
   const [mobileOpen, setMobileOpen] = useState(false);
   const [admin, setAdmin] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -119,6 +122,8 @@ export default function UI({ children }) {
         router.push('/user/login');
       } else setAdmin(d.administrator);
     })();
+
+    setEmailHash(MD5(state.user.email).toString());
   }, []);
 
   const handleCopyTokenThenClose = async () => {
@@ -174,16 +179,31 @@ export default function UI({ children }) {
           </IconButton>
           <Typography variant='h6'>Zipline</Typography>
           <Box className={classes.rightButton}>
-            <IconButton
-              aria-label='account of current user'
-              aria-controls='menu-appbar'
-              aria-haspopup='true'
-              onClick={event => setAnchorEl(event.currentTarget)}
-              color='inherit'
-              className={classes.rightButton}
-            >
-              <AccountCircleIcon className={classes.rightButton} />
-            </IconButton>
+            {state.user.email ? (
+              <Button
+                aria-label='account of current user'
+                aria-controls='menu-appbar'
+                aria-haspopup='true'
+                onClick={event => setAnchorEl(event.currentTarget)}
+                color='inherit'
+                className={classes.rightButton}
+              >
+                <Avatar src={`https://www.gravatar.com/avatar/${emailHash}.jpg`}>
+                  {state.user.username[0].toUpperCase()}
+                </Avatar>
+              </Button>
+            ) : (
+              <IconButton
+                aria-label='account of current user'
+                aria-controls='menu-appbar'
+                aria-haspopup='true'
+                onClick={event => setAnchorEl(event.currentTarget)}
+                color='inherit'
+                className={classes.rightButton}
+              >
+                <AccountCircleIcon className={classes.rightButton} />
+              </IconButton>
+            )}
           </Box>
 
           <Menu

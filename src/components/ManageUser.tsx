@@ -34,13 +34,14 @@ export default function ManageUser() {
   const [alertOpen, setAlertOpen] = useState(false);
   const [username, setUsername] = useState(state.user.username);
   const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
 
   const handleUpdateUser = async () => {
     const d = await (
       await fetch('/api/user', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
+        body: JSON.stringify({ username, password: password.trim() === '' ? null : password, email })
       })
     ).json();
     if (!d.error) {
@@ -81,6 +82,14 @@ export default function ManageUser() {
             value={password}
             className={classes.field}
             onChange={e => setPassword(e.target.value)}
+          />
+          <TextField
+            label='Email'
+            type='email'
+            helperText='Used for a Gravatar Avatar'
+            value={email}
+            className={classes.field}
+            onChange={e => setEmail(e.target.value)}
           />
         </CardContent>
         <CardActions>
