@@ -25,7 +25,7 @@ const base = {
       'https://github.githubassets.com/images/modules/open_graph/github-mark.png',
     color: '#128377'
   },
-  core: { secret: 'my-secret', port: 3000 },
+  core: { secret: 'my-secret', port: 3000, host: '127.0.0.1', theme: 'dark', secure: false },
   uploader: {
     directory: './uploads',
     route: '/u',
