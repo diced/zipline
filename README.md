@@ -10,8 +10,6 @@
 ![David](https://img.shields.io/david/dicedtomatoreal/zipline)
 ![David](https://img.shields.io/david/dev/dicedtomatoreal/zipline)
 ![GitHub package.json dependency version (prod)](https://img.shields.io/github/package-json/dependency-version/dicedtomatoreal/zipline/react)
-![GitHub package.json dependency version (prod)](https://img.shields.io/github/package-json/dependency-version/dicedtomatoreal/zipline/next)
-![GitHub package.json dependency version (prod)](https://img.shields.io/github/package-json/dependency-version/dicedtomatoreal/zipline/fastify)
 
 # Zipline
 The best and only **React + Next.js** ShareX / File Uploader you would ever want.
