@@ -11,7 +11,6 @@ import { bootstrap } from 'fastify-decorators';
 import { Console } from './lib/logger';
 import { AddressInfo } from 'net';
 import { magenta, bold, green, reset, blue, red } from '@dicedtomato/colors';
-import Redis from 'ioredis';
 import { Configuration } from './lib/Config';
 import { UserController } from './controllers/UserController';
 import { RootController } from './controllers/RootController';
@@ -160,7 +159,6 @@ server.listen({
 });
 
 server.addHook('preHandler', async (req, reply) => {
-
   if (
     config.core.blacklisted_ips &&
     config.core.blacklisted_ips.includes(req.ip)

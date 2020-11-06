@@ -1,3 +1,4 @@
 module.exports = async (markdown, metaData) => {
-	return markdown;
+  console.log(metaData);
+  return markdown;
 };
