@@ -1,6 +1,6 @@
-import { Image } from '../entities/Image';
-import { URL } from '../entities/URL';
-import { User } from '../entities/User';
+import { Image } from './entities/Image';
+import { URL } from './entities/URL';
+import { User } from './entities/User';
 import { Config, Configuration, ConfigWebhooks } from './Config';
 import { Console } from './logger';
 

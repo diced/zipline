@@ -3,7 +3,7 @@ import { compareSync, hashSync } from 'bcrypt';
 import { Configuration } from './Config';
 import { Connection } from 'typeorm';
 import { compare } from 'semver';
-import { Zipline } from '../entities/Zipline';
+import { Zipline } from './entities/Zipline';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 

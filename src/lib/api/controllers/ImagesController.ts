@@ -9,12 +9,12 @@ import {
   DELETE
 } from 'fastify-decorators';
 import { Repository } from 'typeorm';
-import { Image } from '../entities/Image';
-import { LoginError } from '../lib/api/APIErrors';
-import { Configuration, ConfigWebhooks } from '../lib/Config';
-import { Console } from '../lib/logger';
-import { readBaseCookie } from '../lib/Util';
-import { WebhookHelper, WebhookType } from '../lib/Webhooks';
+import { Image } from '../../entities/Image';
+import { LoginError } from '../APIErrors';
+import { Configuration, ConfigWebhooks } from '../../Config';
+import { Console } from '../../logger';
+import { readBaseCookie } from '../../Util';
+import { WebhookHelper, WebhookType } from '../../Webhooks';
 
 const config = Configuration.readConfig();
 

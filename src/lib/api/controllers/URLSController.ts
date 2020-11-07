@@ -8,13 +8,13 @@ import {
   POST
 } from 'fastify-decorators';
 import { Repository } from 'typeorm';
-import { URL } from '../entities/URL';
-import { User } from '../entities/User';
-import { LoginError } from '../lib/api/APIErrors';
-import { Configuration, ConfigWebhooks } from '../lib/Config';
-import { Console } from '../lib/logger';
-import { createRandomId, readBaseCookie } from '../lib/Util';
-import { WebhookType, WebhookHelper } from '../lib/Webhooks';
+import { URL } from '../../entities/URL';
+import { User } from '../../entities/User';
+import { LoginError } from '../APIErrors';
+import { Configuration, ConfigWebhooks } from '../../Config';
+import { Console } from '../../logger';
+import { createRandomId, readBaseCookie } from '../../Util';
+import { WebhookType, WebhookHelper } from '../../Webhooks';
 
 const config = Configuration.readConfig();
 

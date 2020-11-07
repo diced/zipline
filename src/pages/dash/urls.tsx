@@ -24,7 +24,7 @@ import copy from 'copy-to-clipboard';
 import UI from '../../components/UI';
 import UIPlaceholder from '../../components/UIPlaceholder';
 import { makeStyles } from '@material-ui/core';
-import { URL as URLEntity } from '../../entities/URL';
+import { URL as URLEntity } from '../../lib/entities/URL';
 import { Configuration } from '../../lib/Config';
 
 const useStyles = makeStyles(theme => ({

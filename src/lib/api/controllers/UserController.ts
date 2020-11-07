@@ -9,16 +9,16 @@ import {
   DELETE
 } from 'fastify-decorators';
 import { Repository } from 'typeorm';
-import { User } from '../entities/User';
-import { Zipline } from '../entities/Zipline';
+import { User } from '../../entities/User';
+import { Zipline } from '../../entities/Zipline';
 import {
   UserNotFoundError,
   MissingBodyData,
   LoginError,
   UserExistsError
-} from '../lib/api/APIErrors';
-import { Configuration, ConfigWebhooks } from '../lib/Config';
-import { Console } from '../lib/logger';
+} from '../APIErrors';
+import { Configuration, ConfigWebhooks } from '../../Config';
+import { Console } from '../../logger';
 import {
   checkPassword,
   createBaseCookie,
@@ -26,8 +26,8 @@ import {
   encryptPassword,
   getFirst,
   readBaseCookie
-} from '../lib/Util';
-import { WebhookType, WebhookHelper } from '../lib/Webhooks';
+} from '../../Util';
+import { WebhookType, WebhookHelper } from '../../Webhooks';
 
 const config = Configuration.readConfig();
 
