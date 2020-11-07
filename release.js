@@ -1,4 +1,3 @@
-module.exports = async (markdown, metaData) => {
-  console.log(metaData);
+module.exports = async (markdown) => {
   return markdown;
 };

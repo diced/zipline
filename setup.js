@@ -48,35 +48,33 @@ const base = {
         { name: 'mysql' },
         { name: 'mariadb' },
         { name: 'mssql' },
-        { name: 'sqlite' },
-        { name: 'sqlite3' },
-        { name: 'mongodb', extra: 'No support yet' }
+        { name: 'sqlite3' }
       ]
     },
     {
       type: 'input',
       name: 'host',
-      message: 'Database Host'
+      message: 'Database Host (leave blank if sqlite3)'
     },
     {
       type: 'number',
       name: 'port',
-      message: 'Database Port'
+      message: 'Database Port (leave blank if sqlite3)'
     },
     {
       type: 'input',
       name: 'database',
-      message: 'Database Name'
+      message: 'Database Name (db path if sqlite3)'
     },
     {
       type: 'input',
       name: 'username',
-      message: 'Database User'
+      message: 'Database User (leave blank if sqlite3)'
     },
     {
       type: 'password',
       name: 'password',
-      message: 'Database Password'
+      message: 'Database Password (leave blank if sqlite3)'
     }
   ]);
 
@@ -106,7 +104,7 @@ const base = {
     {
       type: 'confirm',
       name: 'original',
-      message: 'Keep Original?'
+      message: 'Keep Original File names?'
     }
   ]);
 
@@ -138,7 +136,7 @@ const base = {
     urls: { ...base.urls, ...urls }
   };
 
-  writeFileSync('Zipline.toml', stringify(config));
+  writeFileSync('Ziplined.toml', stringify(config));
 
   if (docker.useDocker) {
     console.log('Generating docker-compose.yml...');
