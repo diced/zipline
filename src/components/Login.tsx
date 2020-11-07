@@ -66,29 +66,39 @@ export default function Login() {
         </Alert>
       </Snackbar>
       <Card>
-        <CardContent>
-          <Typography variant='h4'>Login</Typography>
-          <TextField
-            label='Username'
-            className={classes.field}
-            onChange={e => setUsername(e.target.value)}
-          />
-          <TextField
-            label='Password'
-            type='password'
-            className={classes.field}
-            onChange={e => setPassword(e.target.value)}
-          />
-        </CardContent>
-        <CardActions>
-          <Button
-            color='primary'
-            className={classes.field}
-            onClick={handleLogin}
-          >
-            Login
-          </Button>
-        </CardActions>
+        <form>
+          <CardContent>
+            <Typography variant='h4'>Login</Typography>
+            <TextField
+              label='Username'
+              InputLabelProps={{
+                htmlFor: 'username'
+              }}
+              id='username'
+              className={classes.field}
+              onChange={e => setUsername(e.target.value)}
+            />
+            <TextField
+              label='Password'
+              type='password'
+              InputLabelProps={{
+                htmlFor: 'password'
+              }}
+              id='password'
+              className={classes.field}
+              onChange={e => setPassword(e.target.value)}
+            />
+          </CardContent>
+          <CardActions>
+            <Button
+              color='primary'
+              className={classes.field}
+              onClick={handleLogin}
+            >
+              Login
+            </Button>
+          </CardActions>
+        </form>
       </Card>
     </React.Fragment>
   );
