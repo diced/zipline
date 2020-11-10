@@ -23,7 +23,14 @@ const pump = promisify(pipeline);
 
 const config = Configuration.readConfig();
 const rateLimiterConfig = config.core.ratelimiter
-  ? { config: { rateLimit: { max: config.core.ratelimiter.requests, timeWindow: config.core.ratelimiter.retry_after } } }
+  ? {
+    config: {
+      rateLimit: {
+        max: config.core.ratelimiter.requests,
+        timeWindow: config.core.ratelimiter.retry_after
+      }
+    }
+  }
   : {};
 
 @Controller('/api')
@@ -135,14 +142,18 @@ export class RootController {
       `image ${fileName}.${ext} was uploaded by ${user.username} (${user.id})`
     );
 
+    const host = `${config.core.secure ? 'https' : 'http'}://${req.hostname}${
+      config.uploader.rich_content_route
+        ? config.uploader.rich_content_route
+        : config.uploader.route
+    }/`;
+
     if (this.webhooks.events.includes(WebhookType.UPLOAD))
       WebhookHelper.sendWebhook(this.webhooks.upload.content, {
         image,
-        host: `${config.core.secure ? 'https' : 'http'}://${req.hostname}${config.uploader.route}/`
+        host
       });
 
-    reply.send(
-      `${config.core.secure ? 'https' : 'http'}://${req.hostname}${config.uploader.route}/${fileName}.${ext}`
-    );
+    reply.send(host);
   }
 }

@@ -23,6 +23,7 @@ export interface ConfigMeta {
 export interface ConfigUploader {
   directory: string;
   route: string;
+  rich_content_route?: string;
   length: number;
   blacklisted: string[];
   original: boolean;

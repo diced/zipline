@@ -18,19 +18,28 @@ import { join } from 'path';
 import { ImagesController } from './lib/api/controllers/ImagesController';
 import { URLSController } from './lib/api/controllers/URLSController';
 import { checkVersion } from './lib/Util';
-import { readFileSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import { Image } from './lib/entities/Image';
 import { User } from './lib/entities/User';
 import { Zipline } from './lib/entities/Zipline';
 import { URL } from './lib/entities/URL';
 const dev = process.env.NODE_ENV !== 'production';
 
-(async () => { if (await checkVersion()) Console.logger('Zipline').info('running an outdated version of zipline, please update soon!'); })();
+(async () => {
+  if (await checkVersion())
+    Console.logger('Zipline').info(
+      'running an outdated version of zipline, please update soon!'
+    );
+})();
 
 console.log(`
 ${magenta(text('Zipline'))}
 
-Version : ${blue(process.env.npm_package_version || readFileSync(join(process.cwd(), 'package.json'), 'utf8'))}
+Version : ${blue(
+    process.env.npm_package_version ||
+    JSON.parse(readFileSync(join(process.cwd(), 'package.json'), 'utf8'))
+      .version
+  )}
 GitHub  : ${blue('https://github.com/ZiplineProject/zipline')}
 Issues  : ${blue('https://github.com/ZiplineProject/zipline/issues')}
 Docs    : ${blue('https://zipline.diced.wtf/')}
@@ -109,6 +118,33 @@ server.get(`${config.urls.route}/:id`, async function (
   return reply.redirect(urlId.url);
 });
 
+server.get(`${config.uploader.rich_content_route || '/a'}/:id`, async function (
+  req: FastifyRequest<{ Params: { id: string } }>,
+  reply: FastifyReply
+) {
+  if (!existsSync(join(config.uploader.directory, req.params.id))) {
+    await app.render404(req.raw, reply.raw);
+    return (reply.sent = true);
+  }
+
+  return reply.type('text/html').send(`
+  <html>
+  <head>
+      <meta property="theme-color" content="${config.meta.color}">
+      <meta property="og:title" content="${req.params.id}">
+      <meta property="og:url" content="${config.uploader.route}/${req.params.id}">
+      <meta property="og:image" content="${config.uploader.route}/${req.params.id}">
+      <meta property="twitter:card" content="summary_large_image">
+  </head>
+  <body>
+    <div style="text-align:center;vertical-align:middle;">
+      <img src="${config.uploader.route}/${req.params.id}" >
+    </div>
+  </body>
+  </html>
+  `);
+});
+
 server.register(fastifyMultipart);
 
 server.register(fastifyTypeorm, {
@@ -144,19 +180,24 @@ server.register(fastifyStatic, {
 
 server.register(fastifyFavicon);
 
-server.listen({
-  port: config.core.port,
-  host: config.core.host
-}, err => {
-  if (err) throw err;
-  const info = server.server.address() as AddressInfo;
+server.listen(
+  {
+    port: config.core.port,
+    host: config.core.host
+  },
+  err => {
+    if (err) throw err;
+    const info = server.server.address() as AddressInfo;
 
-  Console.logger('Server').info(
-    `server listening on ${bold(
-      `${green(info.address)}${reset(':')}${bold(green(info.port.toString()))}`
-    )}`
-  );
-});
+    Console.logger('Server').info(
+      `server listening on ${bold(
+        `${green(info.address)}${reset(':')}${bold(
+          green(info.port.toString())
+        )}`
+      )}`
+    );
+  }
+);
 
 server.addHook('preHandler', async (req, reply) => {
   if (
