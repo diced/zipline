@@ -136,7 +136,7 @@ const base = {
     urls: { ...base.urls, ...urls }
   };
 
-  writeFileSync('Ziplined.toml', stringify(config));
+  writeFileSync('Zipline.toml', stringify(config));
 
   if (docker.useDocker) {
     console.log('Generating docker-compose.yml...');
