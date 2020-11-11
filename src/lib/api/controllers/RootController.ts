@@ -146,7 +146,7 @@ export class RootController {
       config.uploader.rich_content_route
         ? config.uploader.rich_content_route
         : config.uploader.route
-    }/`;
+    }/${fileName}.${ext}`;
 
     if (this.webhooks.events.includes(WebhookType.UPLOAD))
       WebhookHelper.sendWebhook(this.webhooks.upload.content, {
