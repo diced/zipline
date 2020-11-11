@@ -23,6 +23,7 @@ import { Image } from './lib/entities/Image';
 import { User } from './lib/entities/User';
 import { Zipline } from './lib/entities/Zipline';
 import { URL } from './lib/entities/URL';
+import { MultiFactorController } from './lib/api/controllers/MultiFactorController';
 const dev = process.env.NODE_ENV !== 'production';
 
 (async () => {
@@ -159,7 +160,8 @@ server.register(bootstrap, {
     UserController,
     RootController,
     ImagesController,
-    URLSController
+    URLSController,
+    MultiFactorController
   ]
 });
 

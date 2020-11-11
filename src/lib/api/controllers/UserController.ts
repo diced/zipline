@@ -63,7 +63,9 @@ export class UserController {
 
   @PATCH('/')
   async editUser(
-    req: FastifyRequest<{ Body: { username: string; password: string, email: string; } }>,
+    req: FastifyRequest<{
+      Body: { username: string; password: string; email: string };
+    }>,
     reply: FastifyReply
   ) {
     if (!req.cookies.zipline) throw new LoginError('Not logged in.');
@@ -90,6 +92,35 @@ export class UserController {
 
     delete user.password;
     return reply.send(user);
+  }
+
+  @POST('/verify-login')
+  async verify(
+    req: FastifyRequest<{ Body: { username: string; password: string } }>,
+    reply: FastifyReply
+  ) {
+    if (req.cookies.zipline) throw new LoginError('Already logged in.');
+    if (!req.body.username) throw new MissingBodyData('Missing username.');
+    if (!req.body.password) throw new MissingBodyData('Missing uassword.');
+
+    const user = await this.users.findOne({
+      where: {
+        username: req.body.username
+      }
+    });
+
+    if (!user)
+      throw new UserNotFoundError(`User "${req.body.username}" was not found.`);
+    if (!checkPassword(req.body.password, user.password)) {
+      this.logger.error(
+        `${user.username} (${user.id}) tried to verify their credentials but failed`
+      );
+      throw new LoginError('Wrong credentials!');
+    }
+
+    reply.send({
+      mfa: !!user.secretMfaKey
+    });
   }
 
   @POST('/login')
@@ -250,7 +281,6 @@ export class UserController {
       throw new Error(`Could not delete user: ${e.message}`);
     }
   }
-
   // @Hook('preValidation')
   // public async preValidation(req: FastifyRequest, reply: FastifyReply) {
   //   // const adminRoutes = ['/api/user/create'];

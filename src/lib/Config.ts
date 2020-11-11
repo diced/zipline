@@ -48,6 +48,7 @@ export interface ConfigCore {
   blacklisted_ips?: string[];
   ratelimiter?: ConfigCoreRateLimiter;
   theme?: 'dark' | 'light';
+  mfa?: boolean;
 }
 
 export interface ConfigWebhooks {
