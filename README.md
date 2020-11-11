@@ -30,6 +30,9 @@ Wondering how Zipline compares to other popular uploaders? We have done some ben
 - Fast (API)
 - Built with Next.js & React
 - Support for **multible database types** (*literally the only one that supports multiple dbs*, mongo soon)
+- Token protected uploading
+- MFA with Authy/Google Authenticator
+- Easy setup instructions on [docs](https://zipline.diced.wtf/docs)
 
 # Installing
 [See how to install here](https://zipline.diced.wtf/docs/)
