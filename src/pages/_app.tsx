@@ -5,7 +5,7 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from '../store';
 import ZiplineTheming from '../components/ZiplineTheming';
-
+import UIPlaceholder from '../components/UIPlaceholder';
 
 function MyApp({ Component, pageProps }) {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
@@ -19,7 +19,6 @@ function MyApp({ Component, pageProps }) {
     })();
   }, []);
   return (
-
     <React.Fragment>
       <Head>
         <title>Zipline</title>
@@ -30,8 +29,12 @@ function MyApp({ Component, pageProps }) {
       </Head>
 
       <Provider store={store}>
-        <PersistGate loading={<div>Loading...</div>} persistor={persistor}>
-          <ZiplineTheming Component={Component} pageProps={pageProps} theme={theme} />
+        <PersistGate loading={<UIPlaceholder />} persistor={persistor}>
+          <ZiplineTheming
+            Component={Component}
+            pageProps={pageProps}
+            theme={theme}
+          />
         </PersistGate>
       </Provider>
     </React.Fragment>
