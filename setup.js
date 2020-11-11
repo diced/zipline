@@ -4,7 +4,7 @@ const { stringify } = require('toml-patch');
 const { writeFileSync } = require('fs');
 const { join } = require('path');
 
-const createDockerCompose = (port) => {
+const createDockerCompose = port => {
   return `version: "3"
 services:
   zipline:
@@ -25,7 +25,14 @@ const base = {
       'https://github.githubassets.com/images/modules/open_graph/github-mark.png',
     color: '#128377'
   },
-  core: { secret: 'my-secret', port: 3000, host: '127.0.0.1', theme: 'dark', secure: false },
+  core: {
+    secret: 'my-secret',
+    port: 3000,
+    host: '127.0.0.1',
+    theme: 'dark',
+    secure: false,
+    mfa: false
+  },
   uploader: {
     directory: './uploads',
     route: '/u',
@@ -33,7 +40,7 @@ const base = {
     original: false,
     blacklisted: []
   },
-  urls: { route: '/s', length: 4, vanity: false }
+  urls: { route: '/go', length: 4, vanity: true }
 };
 
 (async () => {
@@ -90,6 +97,20 @@ const base = {
       type: 'number',
       name: 'port',
       message: 'Serve on Port'
+    },
+    {
+      type: 'list',
+      name: 'theme',
+      message: 'Theme',
+      choices: [
+        { name: 'Dark Theme (recomended)' },
+        { name: 'Light Theme (warning for eyes)' }
+      ]
+    },
+    {
+      type: 'confirm',
+      name: 'mfa',
+      message: 'Enable MFA with Authy/Google Authenticator'
     }
   ]);
 
@@ -136,10 +157,14 @@ const base = {
     urls: { ...base.urls, ...urls }
   };
 
-  writeFileSync('Zipline.toml', stringify(config));
-
   if (docker.useDocker) {
+    config.core.host = '0.0.0.0';
     console.log('Generating docker-compose.yml...');
     writeFileSync('docker-compose.yml', createDockerCompose(config.core.port));
+    console.log(
+      'Head to https://zipline.diced.wtf/docs/docker to learn how to run with docker.'
+    );
   }
+
+  writeFileSync('Zipline.toml', stringify(config));
 })();
