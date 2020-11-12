@@ -14,7 +14,7 @@ import { LoginError } from '../APIErrors';
 import { Configuration, ConfigWebhooks } from '../../Config';
 import { Console } from '../../logger';
 import { readBaseCookie } from '../../Util';
-import { WebhookHelper, WebhookType } from '../../Webhooks';
+import { Webhooks, WebhookType } from '../../Webhooks';
 
 const config = Configuration.readConfig();
 
@@ -24,7 +24,7 @@ export class ImagesController {
   private instance!: FastifyInstance;
 
   private images: Repository<Image> = this.instance.orm.getRepository(Image);
-  private webhooks: ConfigWebhooks = WebhookHelper.conf(config);
+  private webhooks: ConfigWebhooks = Webhooks.conf(config);
 
   @GET('/')
   async allImages(req: FastifyRequest, reply: FastifyReply) {
@@ -59,17 +59,24 @@ export class ImagesController {
       id: req.params.id
     });
 
-    const dir = config.uploader.directory ? config.uploader.directory : 'uploads';
-    const path = join(dir.charAt(0) == '/' ? dir : join(process.cwd(), dir), image.file);
+    const dir = config.uploader.directory
+      ? config.uploader.directory
+      : 'uploads';
+    const path = join(
+      dir.charAt(0) == '/' ? dir : join(process.cwd(), dir),
+      image.file
+    );
 
     try {
       unlinkSync(path);
 
       Console.logger(Image).info(`image ${image.id} was deleted`);
       if (this.webhooks.events.includes(WebhookType.DELETE_IMAGE))
-        WebhookHelper.sendWebhook(this.webhooks.upload.content, {
+        Webhooks.sendWebhook(this.webhooks.upload.content, {
           image,
-          host: `${config.core.secure ? 'https' : 'http'}://${req.hostname}${config.uploader.route}/`
+          host: `${config.core.secure ? 'https' : 'http'}://${req.hostname}${
+            config.uploader.route
+          }/`
         });
 
       return reply.send(image);

@@ -27,7 +27,7 @@ import {
   getFirst,
   readBaseCookie
 } from '../../Util';
-import { WebhookType, WebhookHelper } from '../../Webhooks';
+import { WebhookType, Webhooks } from '../../Webhooks';
 
 const config = Configuration.readConfig();
 
@@ -38,7 +38,7 @@ export class UserController {
 
   private users: Repository<User> = this.instance.orm.getRepository(User);
   private logger: Console = Console.logger(User);
-  private webhooks: ConfigWebhooks = WebhookHelper.conf(config);
+  private webhooks: ConfigWebhooks = Webhooks.conf(config);
 
   @GET('/login-status')
   async loginStatus(req: FastifyRequest, reply: FastifyReply) {
@@ -86,7 +86,7 @@ export class UserController {
 
     this.logger.info(`saved ${user.username} (${user.id})`);
     if (this.webhooks.events.includes(WebhookType.USER_EDIT))
-      WebhookHelper.sendWebhook(this.webhooks.user_edit.content, {
+      Webhooks.sendWebhook(this.webhooks.user_edit.content, {
         user
       });
 
@@ -156,7 +156,7 @@ export class UserController {
 
     this.logger.info(`${user.username} (${user.id}) logged in`);
     if (this.webhooks.events.includes(WebhookType.LOGIN))
-      WebhookHelper.sendWebhook(this.webhooks.login.content, {
+      Webhooks.sendWebhook(this.webhooks.login.content, {
         user
       });
 
@@ -194,7 +194,7 @@ export class UserController {
 
     this.logger.info(`reset token ${user.username} (${user.id})`);
     if (this.webhooks.events.includes(WebhookType.TOKEN_RESET))
-      WebhookHelper.sendWebhook(this.webhooks.token_reset.content, {
+      Webhooks.sendWebhook(this.webhooks.token_reset.content, {
         user
       });
 
@@ -228,7 +228,7 @@ export class UserController {
       );
       this.logger.info(`created user ${user.username} (${user.id})`);
       if (this.webhooks.events.includes(WebhookType.CREATE_USER))
-        WebhookHelper.sendWebhook(this.webhooks.create_user.content, {
+        Webhooks.sendWebhook(this.webhooks.create_user.content, {
           user
         });
 
@@ -272,7 +272,7 @@ export class UserController {
 
       this.logger.info(`deleted ${existing.username} (${existing.id})`);
       if (this.webhooks.events.includes(WebhookType.USER_DELETE))
-        WebhookHelper.sendWebhook(this.webhooks.user_delete.content, {
+        Webhooks.sendWebhook(this.webhooks.user_delete.content, {
           user: existing
         });
 

@@ -13,7 +13,7 @@ import { toDataURL } from 'qrcode';
 import { checkPassword, createBaseCookie, readBaseCookie } from '../../Util';
 import { LoginError, MissingBodyData, UserNotFoundError } from '../APIErrors';
 import { Console } from '../../logger';
-import { WebhookType, WebhookHelper } from '../../Webhooks';
+import { WebhookType, Webhooks } from '../../Webhooks';
 import { Configuration, ConfigWebhooks } from '../../Config';
 
 const config = Configuration.readConfig();
@@ -25,7 +25,7 @@ export class MultiFactorController {
 
   private users: Repository<User> = this.instance.orm.getRepository(User);
   private logger: Console = Console.logger(User);
-  private webhooks: ConfigWebhooks = WebhookHelper.conf(config);
+  private webhooks: ConfigWebhooks = Webhooks.conf(config);
 
   @GET('/qrcode')
   async qrcode(req: FastifyRequest, reply: FastifyReply) {
@@ -73,6 +73,7 @@ export class MultiFactorController {
 
     this.users.save(user);
 
+    this.logger.info(`disabled mfa ${user.username} (${user.id})`);
     reply.send({ disabled: true });
   }
 
@@ -98,7 +99,7 @@ export class MultiFactorController {
       throw new UserNotFoundError(`User "${req.body.username}" was not found.`);
     if (!checkPassword(req.body.password, user.password)) {
       this.logger.error(
-        `${user.username} (${user.id}) tried to login but failed`
+        `${user.username} (${user.id}) tried to login but failed with mfa`
       );
       throw new LoginError('Wrong credentials!');
     }
@@ -116,9 +117,9 @@ export class MultiFactorController {
       maxAge: 1036800000
     });
 
-    this.logger.info(`${user.username} (${user.id}) logged in`);
+    this.logger.info(`${user.username} (${user.id}) logged in with mfa`);
     if (this.webhooks.events.includes(WebhookType.LOGIN))
-      WebhookHelper.sendWebhook(this.webhooks.login.content, {
+      Webhooks.sendWebhook(this.webhooks.login.content, {
         user
       });
 

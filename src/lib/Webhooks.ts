@@ -46,7 +46,7 @@ export type WebhookSendText =
   | 'user_delete'
   | 'user_edit';
 
-export class WebhookHelper {
+export class Webhooks {
   public static convert(strings: WebhookSendText[]) {
     return strings.map(x => WebhookType[x.toUpperCase()]);
   }
@@ -81,11 +81,11 @@ export class WebhookHelper {
         },
         body: JSON.stringify({
           username: config.webhooks.username,
-          content: WebhookHelper.parseContent(content, data)
+          content: Webhooks.parseContent(content, data)
         })
       });
     } catch (e) {
-      Console.logger(WebhookHelper).error(e);
+      Console.logger(Webhooks).error(e);
     }
   }
 }

@@ -18,7 +18,7 @@ import { AuthError } from '../APIErrors';
 import { Configuration, ConfigWebhooks } from '../../Config';
 import { createRandomId, getFirst } from '../../Util';
 import { Console } from '../../logger';
-import { WebhookHelper, WebhookType } from '../../Webhooks';
+import { Webhooks, WebhookType } from '../../Webhooks';
 const pump = promisify(pipeline);
 
 const config = Configuration.readConfig();
@@ -40,7 +40,7 @@ export class RootController {
 
   private users: Repository<User> = this.instance.orm.getRepository(User);
   private images: Repository<Image> = this.instance.orm.getRepository(Image);
-  private webhooks: ConfigWebhooks = WebhookHelper.conf(config);
+  private webhooks: ConfigWebhooks = Webhooks.conf(config);
   private logger: Console = Console.logger(Image);
 
   @GET('/first')
@@ -149,7 +149,7 @@ export class RootController {
     }/${fileName}.${ext}`;
 
     if (this.webhooks.events.includes(WebhookType.UPLOAD))
-      WebhookHelper.sendWebhook(this.webhooks.upload.content, {
+      Webhooks.sendWebhook(this.webhooks.upload.content, {
         image,
         host
       });

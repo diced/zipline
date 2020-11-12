@@ -2,7 +2,7 @@ import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { parse } from 'toml-patch';
 import { ConnectionOptions } from 'typeorm';
-import { WebhookHelper, WebhookType } from './Webhooks';
+import { Webhooks, WebhookType } from './Webhooks';
 
 export interface Config {
   database: ConnectionOptions;
@@ -79,7 +79,7 @@ export class Configuration {
       const data = readFileSync(resolve(process.cwd(), 'Zipline.toml'), 'utf8');
       const parsed = parse(data);
       if (parsed.webhooks)
-        parsed.webhooks.events = WebhookHelper.convert(parsed.webhooks.events);
+        parsed.webhooks.events = Webhooks.convert(parsed.webhooks.events);
       return parsed;
     } catch (e) {
       return null;
