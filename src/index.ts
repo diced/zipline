@@ -12,18 +12,18 @@ import { Console } from './lib/logger';
 import { AddressInfo } from 'net';
 import { magenta, bold, green, reset, blue, red } from '@dicedtomato/colors';
 import { Configuration } from './lib/Config';
-import { UserController } from './lib/api/controllers/UserController';
-import { RootController } from './lib/api/controllers/RootController';
+import { UserController } from './lib/controllers/UserController';
+import { RootController } from './lib/controllers/RootController';
 import { join } from 'path';
-import { ImagesController } from './lib/api/controllers/ImagesController';
-import { URLSController } from './lib/api/controllers/URLSController';
+import { ImagesController } from './lib/controllers/ImagesController';
+import { URLSController } from './lib/controllers/URLSController';
 import { checkVersion } from './lib/Util';
 import { existsSync, readFileSync } from 'fs';
 import { Image } from './lib/entities/Image';
 import { User } from './lib/entities/User';
 import { Zipline } from './lib/entities/Zipline';
 import { URL } from './lib/entities/URL';
-import { MultiFactorController } from './lib/api/controllers/MultiFactorController';
+import { MultiFactorController } from './lib/controllers/MultiFactorController';
 const dev = process.env.NODE_ENV !== 'production';
 
 (async () => {
@@ -217,4 +217,21 @@ server.addHook('preHandler', async (req, reply) => {
     await app.render404(req.raw, reply.raw);
     return (reply.sent = true);
   }
+});
+
+server.addHook('onResponse', (req, res, done) => {
+  if (
+    !req.url.startsWith('/_next') &&
+    !req.url.startsWith('/api/upload') &&
+    !req.url.startsWith('/api/shorten') &&
+    !req.url.startsWith('/api/user') &&
+    !req.url.startsWith('/api/theme')
+  ) {
+    const status =
+      res.statusCode !== 200
+        ? bold(red(res.statusCode.toString()))
+        : bold(green(res.statusCode.toString()));
+    Console.logger('server').info(`${status} ${req.url} was accessed`);
+  }
+  done();
 });
