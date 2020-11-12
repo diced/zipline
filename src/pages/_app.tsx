@@ -7,7 +7,7 @@ import { store, persistor } from '../store';
 import ZiplineTheming from '../components/ZiplineTheming';
 import UIPlaceholder from '../components/UIPlaceholder';
 
-function MyApp({ Component, pageProps }) {
+function App({ Component, pageProps }) {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   useEffect(() => {
     const jssStyles = document.querySelector('#jss-server-side');
@@ -41,9 +41,9 @@ function MyApp({ Component, pageProps }) {
   );
 }
 
-MyApp.propTypes = {
+App.propTypes = {
   Component: PropTypes.elementType.isRequired,
   pageProps: PropTypes.object.isRequired
 };
 
-export default MyApp;
+export default App;

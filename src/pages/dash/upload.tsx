@@ -32,6 +32,8 @@ export default function Upload() {
   const state = store.getState();
   const [files, setFiles] = React.useState<File[]>([]);
   const [alertOpen, setAlertOpen] = React.useState<boolean>(false);
+  const [alertSev, setAlertSev] = React.useState('success');
+  const [alertMsg, setAlertMsg] = React.useState('Uploaded Image!');
 
   const handleFileUpload = async () => {
     const file = files[0];
@@ -46,7 +48,16 @@ export default function Upload() {
       body
     });
 
-    if (res.ok) setAlertOpen(true);
+    if (res.ok) {
+      setAlertOpen(true);
+      setAlertMsg('Uploaded Image!');
+      setAlertSev('success');
+    } else {
+      const d = await res.json();
+      setAlertOpen(true);
+      setAlertMsg(`Couldn't upload: ${d.error}`);
+      setAlertSev('error');
+    }
   };
 
   if (typeof window === 'undefined') return <UIPlaceholder />;
@@ -63,8 +74,10 @@ export default function Upload() {
           autoHideDuration={6000}
           onClose={() => setAlertOpen(false)}
         >
-          <Alert severity='success' variant='filled'>
-            Uploaded image!
+          {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+          {/* @ts-ignore */}
+          <Alert severity={alertSev} variant='filled'>
+            {alertMsg}
           </Alert>
         </Snackbar>
         <Paper elevation={3} className={classes.padding}>
@@ -76,10 +89,11 @@ export default function Upload() {
               acceptedFiles={['image/*']}
               dropzoneText={'Drag an image or click to upload an image.'}
               onChange={f => setFiles(f)}
+              filesLimit={1}
               maxFileSize={1073741824} // 1gb in byte
             />
           </Box>
-          <Button onClick={handleFileUpload}>Submit</Button>
+          <Button onClick={handleFileUpload}>Upload</Button>
         </Paper>
       </UI>
     );
