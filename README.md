@@ -36,4 +36,3 @@ Wondering how Zipline compares to other popular uploaders? We have done some ben
 
 # Installing
 [See how to install here](https://zipline.diced.wtf/docs/)
-

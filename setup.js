@@ -4,14 +4,14 @@ const { stringify } = require('toml-patch');
 const { writeFileSync } = require('fs');
 const { join } = require('path');
 
-const createDockerCompose = port => {
+const createDockerCompose = (port, dir) => {
   return `version: "3"
 services:
   zipline:
     ports:
       - "${port}:${port}"
     volumes:
-      - "${join(process.cwd(), 'uploads')}:/opt/zipline/uploads"
+      - "${join(process.cwd(), dir)}:${join('/opt/zipline', dir)}"
     build: .
     tty: true`;
 };
@@ -160,7 +160,7 @@ const base = {
   if (docker.useDocker) {
     config.core.host = '0.0.0.0';
     console.log('Generating docker-compose.yml...');
-    writeFileSync('docker-compose.yml', createDockerCompose(config.core.port));
+    writeFileSync('docker-compose.yml', createDockerCompose(config.core.port, config.uploader.directory));
     console.log(
       'Head to https://zipline.diced.wtf/docs/docker to learn how to run with docker.'
     );
