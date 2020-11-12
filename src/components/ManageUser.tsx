@@ -98,6 +98,12 @@ export default function ManageUser({ config }: { config: Config }) {
     }
   };
 
+  const disableMfaAndClose = async () => {
+    const d = await (await fetch('/api/mfa/disable')).json();
+
+    if (!d.error) setMfaDialogOpen(false);
+  };
+
   return (
     <React.Fragment>
       <Snackbar
@@ -115,7 +121,7 @@ export default function ManageUser({ config }: { config: Config }) {
       </Snackbar>
       <Dialog
         open={mfaDialogOpen}
-        onClose={() => setMfaDialogOpen(false)}
+        onClose={disableMfaAndClose}
         aria-labelledby='enable-mfa'
         aria-describedby='mfa-desc'
       >
@@ -143,6 +149,9 @@ export default function ManageUser({ config }: { config: Config }) {
           </Grid>
         </DialogContent>
         <DialogActions>
+          <Button color='primary' autoFocus onClick={disableMfaAndClose}>
+            Disable
+          </Button>
           <Button color='primary' autoFocus onClick={tryEnablingMfa}>
             Enable
           </Button>
