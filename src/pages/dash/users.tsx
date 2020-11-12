@@ -219,7 +219,7 @@ export default function Users() {
                       }
                       title={`${u.username} (${u.id})`}
                       subheader={`${u.administrator ? 'Administrator' : 'User'
-                        }`}
+                      }`}
                     />
                   </Card>
                 </Grid>

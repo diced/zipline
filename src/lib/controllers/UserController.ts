@@ -80,10 +80,9 @@ export class UserController {
     await this.users.save(user);
 
     this.logger.info(`saved ${user.username} (${user.id})`);
-    if (this.webhooks.events.includes(WebhookType.USER_EDIT))
-      Webhooks.sendWebhook(this.webhooks.user_edit.content, {
-        user
-      });
+    if (this.webhooks.events.includes(WebhookType.USER_EDIT)) Webhooks.sendWebhook(this.webhooks.user_edit.content, {
+      user
+    });
 
     delete user.password;
     return reply.send(user);
@@ -104,8 +103,7 @@ export class UserController {
       }
     });
 
-    if (!user)
-      return sendError(reply, `User "${req.body.username}" was not found.`);
+    if (!user) return sendError(reply, `User "${req.body.username}" was not found.`);
     if (!checkPassword(req.body.password, user.password)) {
       this.logger.error(
         `${user.username} (${user.id}) tried to verify their credentials but failed`
@@ -133,8 +131,7 @@ export class UserController {
       }
     });
 
-    if (!user)
-      return sendError(reply, `User "${req.body.username}" was not found.`);
+    if (!user) return sendError(reply, `User "${req.body.username}" was not found.`);
     if (!checkPassword(req.body.password, user.password)) {
       this.logger.error(
         `${user.username} (${user.id}) tried to login but failed`
@@ -150,10 +147,9 @@ export class UserController {
     });
 
     this.logger.info(`${user.username} (${user.id}) logged in`);
-    if (this.webhooks.events.includes(WebhookType.LOGIN))
-      Webhooks.sendWebhook(this.webhooks.login.content, {
-        user
-      });
+    if (this.webhooks.events.includes(WebhookType.LOGIN)) Webhooks.sendWebhook(this.webhooks.login.content, {
+      user
+    });
 
     return reply.send(user);
   }
@@ -188,10 +184,9 @@ export class UserController {
     await this.users.save(user);
 
     this.logger.info(`reset token ${user.username} (${user.id})`);
-    if (this.webhooks.events.includes(WebhookType.TOKEN_RESET))
-      Webhooks.sendWebhook(this.webhooks.token_reset.content, {
-        user
-      });
+    if (this.webhooks.events.includes(WebhookType.TOKEN_RESET)) Webhooks.sendWebhook(this.webhooks.token_reset.content, {
+      user
+    });
 
     return reply.send({ updated: true });
   }
@@ -222,21 +217,19 @@ export class UserController {
         )
       );
       this.logger.info(`created user ${user.username} (${user.id})`);
-      if (this.webhooks.events.includes(WebhookType.CREATE_USER))
-        Webhooks.sendWebhook(this.webhooks.create_user.content, {
-          user
-        });
+      if (this.webhooks.events.includes(WebhookType.CREATE_USER)) Webhooks.sendWebhook(this.webhooks.create_user.content, {
+        user
+      });
 
       const firstSetup = await getFirst(this.instance.orm);
-      if (firstSetup)
-        await this.instance.orm.getRepository(Zipline).update(
-          {
-            id: 'zipline'
-          },
-          {
-            first: false
-          }
-        );
+      if (firstSetup) await this.instance.orm.getRepository(Zipline).update(
+        {
+          id: 'zipline'
+        },
+        {
+          first: false
+        }
+      );
 
       delete user.password;
       return reply.send(user);
@@ -266,10 +259,9 @@ export class UserController {
       await this.users.remove(existing);
 
       this.logger.info(`deleted ${existing.username} (${existing.id})`);
-      if (this.webhooks.events.includes(WebhookType.USER_DELETE))
-        Webhooks.sendWebhook(this.webhooks.user_delete.content, {
-          user: existing
-        });
+      if (this.webhooks.events.includes(WebhookType.USER_DELETE)) Webhooks.sendWebhook(this.webhooks.user_delete.content, {
+        user: existing
+      });
 
       return reply.send({ ok: true });
     } catch (e) {

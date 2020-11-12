@@ -10,8 +10,7 @@ export default function Manage({ config }) {
   const router = useRouter();
   const state = store.getState();
 
-  if (typeof window !== 'undefined' && !state.loggedIn)
-    router.push('/user/login');
+  if (typeof window !== 'undefined' && !state.loggedIn) router.push('/user/login');
   else {
     return (
       <UI>

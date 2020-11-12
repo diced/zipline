@@ -99,8 +99,7 @@ export class MultiFactorController {
       }
     });
 
-    if (!user)
-      return sendError(reply, `User "${req.body.username}" was not found.`);
+    if (!user) return sendError(reply, `User "${req.body.username}" was not found.`);
     if (!checkPassword(req.body.password, user.password)) {
       this.logger.error(
         `${user.username} (${user.id}) tried to login but failed with mfa`
@@ -122,10 +121,9 @@ export class MultiFactorController {
     });
 
     this.logger.info(`${user.username} (${user.id}) logged in with mfa`);
-    if (this.webhooks.events.includes(WebhookType.LOGIN))
-      Webhooks.sendWebhook(this.webhooks.login.content, {
-        user
-      });
+    if (this.webhooks.events.includes(WebhookType.LOGIN)) Webhooks.sendWebhook(this.webhooks.login.content, {
+      user
+    });
 
     return reply.send({ user, passed });
   }

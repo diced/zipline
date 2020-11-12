@@ -109,8 +109,7 @@ export class RootController {
 
   @POST('/upload', rateLimiterConfig)
   async loginStatus(req: FastifyRequest, reply: FastifyReply) {
-    if (!req.headers.authorization)
-      return sendError(reply, 'No authorization header!');
+    if (!req.headers.authorization) return sendError(reply, 'No authorization header!');
 
     const user = await this.users.findOne({
       where: {
@@ -123,12 +122,10 @@ export class RootController {
     //@ts-ignore stupid multipart types smh
     const data: Multipart = await req.file();
 
-    if (!existsSync(config.uploader.directory))
-      mkdirSync(config.uploader.directory);
+    if (!existsSync(config.uploader.directory)) mkdirSync(config.uploader.directory);
 
     const ext = data.filename.split('.')[1];
-    if (config.uploader.blacklisted.includes(ext))
-      return sendError(reply, 'Blacklisted file extension!');
+    if (config.uploader.blacklisted.includes(ext)) return sendError(reply, 'Blacklisted file extension!');
 
     const fileName = config.uploader.original
       ? data.filename.split('.')[0]
@@ -153,11 +150,10 @@ export class RootController {
         : config.uploader.route
     }/${fileName}.${ext}`;
 
-    if (this.webhooks.events.includes(WebhookType.UPLOAD))
-      Webhooks.sendWebhook(this.webhooks.upload.content, {
-        image,
-        host
-      });
+    if (this.webhooks.events.includes(WebhookType.UPLOAD)) Webhooks.sendWebhook(this.webhooks.upload.content, {
+      image,
+      host
+    });
 
     reply.send(host);
   }

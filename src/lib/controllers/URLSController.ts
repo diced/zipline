@@ -62,13 +62,12 @@ export class URLSController {
     });
 
     this.logger.info(`url ${url.id} was deleted`);
-    if (this.webhooks.events.includes(WebhookType.DELETE_URL))
-      Webhooks.sendWebhook(this.webhooks.delete_url.content, {
-        url,
-        host: `${config.core.secure ? 'https' : 'http'}://${req.hostname}${
-          config.urls.route
-        }/`
-      });
+    if (this.webhooks.events.includes(WebhookType.DELETE_URL)) Webhooks.sendWebhook(this.webhooks.delete_url.content, {
+      url,
+      host: `${config.core.secure ? 'https' : 'http'}://${req.hostname}${
+        config.urls.route
+      }/`
+    });
 
     return reply.send(url);
   }
@@ -86,8 +85,7 @@ export class URLSController {
           vanity: req.body.vanity
         }
       });
-      if (existingVanity)
-        return sendError(reply, 'There is an existing vanity!');
+      if (existingVanity) return sendError(reply, 'There is an existing vanity!');
     }
 
     const user = await this.users.findOne({
@@ -106,13 +104,12 @@ export class URLSController {
     );
 
     this.logger.info(`saved url ${url.id}`);
-    if (this.webhooks.events.includes(WebhookType.SHORTEN))
-      Webhooks.sendWebhook(this.webhooks.shorten.content, {
-        url,
-        host: `${config.core.secure ? 'https' : 'http'}://${req.hostname}${
-          config.urls.route
-        }/`
-      });
+    if (this.webhooks.events.includes(WebhookType.SHORTEN)) Webhooks.sendWebhook(this.webhooks.shorten.content, {
+      url,
+      host: `${config.core.secure ? 'https' : 'http'}://${req.hostname}${
+        config.urls.route
+      }/`
+    });
 
     return reply.send(url);
   }

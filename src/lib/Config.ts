@@ -79,8 +79,7 @@ export class Configuration {
     try {
       const data = readFileSync(resolve(process.cwd(), 'Zipline.toml'), 'utf8');
       const parsed = parse(data);
-      if (parsed.webhooks)
-        parsed.webhooks.events = Webhooks.convert(parsed.webhooks.events);
+      if (parsed.webhooks) parsed.webhooks.events = Webhooks.convert(parsed.webhooks.events);
       return parsed;
     } catch (e) {
       return null;

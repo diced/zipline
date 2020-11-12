@@ -70,13 +70,12 @@ export class ImagesController {
       unlinkSync(path);
 
       Console.logger(Image).info(`image ${image.id} was deleted`);
-      if (this.webhooks.events.includes(WebhookType.DELETE_IMAGE))
-        Webhooks.sendWebhook(this.webhooks.upload.content, {
-          image,
-          host: `${config.core.secure ? 'https' : 'http'}://${req.hostname}${
-            config.uploader.route
-          }/`
-        });
+      if (this.webhooks.events.includes(WebhookType.DELETE_IMAGE)) Webhooks.sendWebhook(this.webhooks.upload.content, {
+        image,
+        host: `${config.core.secure ? 'https' : 'http'}://${req.hostname}${
+          config.uploader.route
+        }/`
+      });
 
       return reply.send(image);
     } catch (e) {

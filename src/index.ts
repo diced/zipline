@@ -27,10 +27,9 @@ import { MultiFactorController } from './lib/controllers/MultiFactorController';
 const dev = process.env.NODE_ENV !== 'production';
 
 (async () => {
-  if (await checkVersion())
-    Console.logger('Zipline').info(
-      'running an outdated version of zipline, please update soon!'
-    );
+  if (await checkVersion()) Console.logger('Zipline').info(
+    'running an outdated version of zipline, please update soon!'
+  );
 })();
 
 console.log(`
@@ -85,11 +84,10 @@ server.register(fastifyRateLimit, {
   global: false
 });
 
-if (dev)
-  server.get('/_next/*', async (req, reply) => {
-    await handle(req.raw, reply.raw);
-    return (reply.sent = true);
-  });
+if (dev) server.get('/_next/*', async (req, reply) => {
+  await handle(req.raw, reply.raw);
+  return (reply.sent = true);
+});
 
 server.all('/*', async (req, reply) => {
   await handle(req.raw, reply.raw);
