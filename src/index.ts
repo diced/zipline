@@ -220,13 +220,7 @@ server.addHook('preHandler', async (req, reply) => {
 });
 
 server.addHook('onResponse', (req, res, done) => {
-  if (
-    !req.url.startsWith('/_next') &&
-    !req.url.startsWith('/api/upload') &&
-    !req.url.startsWith('/api/shorten') &&
-    !req.url.startsWith('/api/user') &&
-    !req.url.startsWith('/api/theme')
-  ) {
+  if (!req.url.startsWith('/_next') && config.core.log) {
     const status =
       res.statusCode !== 200
         ? bold(red(res.statusCode.toString()))

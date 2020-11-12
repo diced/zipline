@@ -49,6 +49,7 @@ export interface ConfigCore {
   ratelimiter?: ConfigCoreRateLimiter;
   theme?: 'dark' | 'light';
   mfa?: boolean;
+  log?: boolean;
 }
 
 export interface ConfigWebhooks {
