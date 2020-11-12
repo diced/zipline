@@ -22,6 +22,12 @@ import { Webhooks, WebhookType } from '../../Webhooks';
 const pump = promisify(pipeline);
 
 const config = Configuration.readConfig();
+if (!config.core || !config.database) {
+  Console.logger('Zipline').error(
+    'configuration seems to be invalid, did you generate a config? https://zipline.diced.wtf/docs/auto'
+  );
+  process.exit(0);
+}
 const rateLimiterConfig = config.core.ratelimiter
   ? {
     config: {

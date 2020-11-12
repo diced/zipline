@@ -50,9 +50,17 @@ Verbose : ${bold(process.env.VERBOSE ? red('yes') : green('no'))}
 
 Console.logger(Configuration).verbose('searching for config...');
 const config = Configuration.readConfig();
+
 if (!config) {
   Console.logger(Configuration).error(
     `could not find a Zipline.toml file in ${process.cwd()}`
+  );
+  process.exit(0);
+}
+
+if (!config.core || !config.database) {
+  Console.logger('Zipline').error(
+    'configuration seems to be invalid, did you generate a config? https://zipline.diced.wtf/docs/auto'
   );
   process.exit(0);
 }
