@@ -32,21 +32,6 @@ const dev = process.env.NODE_ENV !== 'production';
   );
 })();
 
-console.log(`
-${magenta(text('Zipline'))}
-
-Version : ${blue(
-    process.env.npm_package_version ||
-    JSON.parse(readFileSync(join(process.cwd(), 'package.json'), 'utf8'))
-      .version
-  )}
-GitHub  : ${blue('https://github.com/ZiplineProject/zipline')}
-Issues  : ${blue('https://github.com/ZiplineProject/zipline/issues')}
-Docs    : ${blue('https://zipline.diced.wtf/')}
-Mode    : ${bold(dev ? red('dev') : green('production'))}
-Verbose : ${bold(process.env.VERBOSE ? red('yes') : green('no'))}
-`);
-
 Console.logger(Configuration).verbose('searching for config...');
 const config = Configuration.readConfig();
 
@@ -63,6 +48,21 @@ if (!config.core || !config.database) {
   );
   process.exit(0);
 }
+
+if (config.core.log) console.log(`
+${magenta(text('Zipline'))}
+
+Version : ${blue(
+    process.env.npm_package_version ||
+    JSON.parse(readFileSync(join(process.cwd(), 'package.json'), 'utf8'))
+      .version
+  )}
+GitHub  : ${blue('https://github.com/ZiplineProject/zipline')}
+Issues  : ${blue('https://github.com/ZiplineProject/zipline/issues')}
+Docs    : ${blue('https://zipline.diced.wtf/')}
+Mode    : ${bold(dev ? red('dev') : green('production'))}
+Verbose : ${bold(process.env.VERBOSE ? red('yes') : green('no'))}
+`);
 
 const dir = config.uploader.directory ? config.uploader.directory : 'uploads';
 const path = dir.charAt(0) == '/' ? dir : join(process.cwd(), dir);
