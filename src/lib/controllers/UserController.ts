@@ -9,25 +9,20 @@ import {
   DELETE
 } from 'fastify-decorators';
 import { Repository } from 'typeorm';
-import { User } from '../../entities/User';
-import { Zipline } from '../../entities/Zipline';
-import {
-  UserNotFoundError,
-  MissingBodyData,
-  LoginError,
-  UserExistsError
-} from '../APIErrors';
-import { Configuration, ConfigWebhooks } from '../../Config';
-import { Console } from '../../logger';
+import { User } from '../entities/User';
+import { Zipline } from '../entities/Zipline';
+import { Configuration, ConfigWebhooks } from '../Config';
+import { Console } from '../logger';
 import {
   checkPassword,
   createBaseCookie,
   createToken,
   encryptPassword,
   getFirst,
-  readBaseCookie
-} from '../../Util';
-import { WebhookType, Webhooks } from '../../Webhooks';
+  readBaseCookie,
+  sendError
+} from '../Util';
+import { WebhookType, Webhooks } from '../Webhooks';
 
 const config = Configuration.readConfig();
 
@@ -49,14 +44,14 @@ export class UserController {
 
   @GET('/')
   async currentUser(req: FastifyRequest, reply: FastifyReply) {
-    if (!req.cookies.zipline) throw new LoginError('Not logged in.');
+    if (!req.cookies.zipline) return sendError(reply, 'Not logged in.');
     const user = await this.users.findOne({
       where: {
         id: readBaseCookie(req.cookies.zipline)
       }
     });
     // eslint-disable-next-line quotes
-    if (!user) throw new UserExistsError("User doesn't exist");
+    if (!user) return sendError(reply, "User doesn't exist");
     delete user.password;
     return reply.send(user);
   }
@@ -68,7 +63,7 @@ export class UserController {
     }>,
     reply: FastifyReply
   ) {
-    if (!req.cookies.zipline) throw new LoginError('Not logged in.');
+    if (!req.cookies.zipline) return sendError(reply, 'Not logged in.');
 
     const user = await this.users.findOne({
       where: {
@@ -76,7 +71,7 @@ export class UserController {
       }
     });
     // eslint-disable-next-line quotes
-    if (!user) throw new UserExistsError("User doesn't exist");
+    if (!user) return sendError(reply, "User doesn't exist");
 
     this.logger.verbose(`attempting to save ${user.username} (${user.id})`);
     user.username = req.body.username;
@@ -99,9 +94,9 @@ export class UserController {
     req: FastifyRequest<{ Body: { username: string; password: string } }>,
     reply: FastifyReply
   ) {
-    if (req.cookies.zipline) throw new LoginError('Already logged in.');
-    if (!req.body.username) throw new MissingBodyData('Missing username.');
-    if (!req.body.password) throw new MissingBodyData('Missing uassword.');
+    if (req.cookies.zipline) return sendError(reply, 'Already logged in.');
+    if (!req.body.username) return sendError(reply, 'Missing username.');
+    if (!req.body.password) return sendError(reply, 'Missing uassword.');
 
     const user = await this.users.findOne({
       where: {
@@ -110,12 +105,12 @@ export class UserController {
     });
 
     if (!user)
-      throw new UserNotFoundError(`User "${req.body.username}" was not found.`);
+      return sendError(reply, `User "${req.body.username}" was not found.`);
     if (!checkPassword(req.body.password, user.password)) {
       this.logger.error(
         `${user.username} (${user.id}) tried to verify their credentials but failed`
       );
-      throw new LoginError('Wrong credentials!');
+      return sendError(reply, 'Wrong credentials!');
     }
 
     reply.send({
@@ -128,9 +123,9 @@ export class UserController {
     req: FastifyRequest<{ Body: { username: string; password: string } }>,
     reply: FastifyReply
   ) {
-    if (req.cookies.zipline) throw new LoginError('Already logged in.');
-    if (!req.body.username) throw new MissingBodyData('Missing username.');
-    if (!req.body.password) throw new MissingBodyData('Missing uassword.');
+    if (req.cookies.zipline) return sendError(reply, 'Already logged in.');
+    if (!req.body.username) return sendError(reply, 'Missing username.');
+    if (!req.body.password) return sendError(reply, 'Missing uassword.');
 
     const user = await this.users.findOne({
       where: {
@@ -139,12 +134,12 @@ export class UserController {
     });
 
     if (!user)
-      throw new UserNotFoundError(`User "${req.body.username}" was not found.`);
+      return sendError(reply, `User "${req.body.username}" was not found.`);
     if (!checkPassword(req.body.password, user.password)) {
       this.logger.error(
         `${user.username} (${user.id}) tried to login but failed`
       );
-      throw new LoginError('Wrong credentials!');
+      return sendError(reply, 'Wrong credentials!');
     }
     delete user.password;
 
@@ -165,7 +160,7 @@ export class UserController {
 
   @POST('/logout')
   async logout(req: FastifyRequest, reply: FastifyReply) {
-    if (!req.cookies.zipline) throw new LoginError('Not logged in.');
+    if (!req.cookies.zipline) return sendError(reply, 'Not logged in.');
     try {
       reply.clearCookie('zipline', { path: '/' });
       return reply.send({ clearStore: true });
@@ -176,7 +171,7 @@ export class UserController {
 
   @POST('/reset-token')
   async resetToken(req: FastifyRequest, reply: FastifyReply) {
-    if (!req.cookies.zipline) throw new LoginError('Not logged in.');
+    if (!req.cookies.zipline) return sendError(reply, 'Not logged in.');
 
     const user = await this.users.findOne({
       where: {
@@ -184,7 +179,7 @@ export class UserController {
       }
     });
 
-    if (!user) throw new UserNotFoundError('User was not found.');
+    if (!user) return sendError(reply, 'User was not found.');
 
     this.logger.verbose(
       `attempting to reset token ${user.username} (${user.id})`
@@ -208,13 +203,13 @@ export class UserController {
     }>,
     reply: FastifyReply
   ) {
-    if (!req.body.username) throw new MissingBodyData('Missing username.');
-    if (!req.body.password) throw new MissingBodyData('Missing uassword.');
+    if (!req.body.username) return sendError(reply, 'Missing username.');
+    if (!req.body.password) return sendError(reply, 'Missing uassword.');
 
     const existing = await this.users.findOne({
       where: { username: req.body.username }
     });
-    if (existing) throw new UserExistsError('User exists already');
+    if (existing) return sendError(reply, 'User exists already');
 
     try {
       this.logger.verbose(`attempting to create ${req.body.username}`);
@@ -246,7 +241,7 @@ export class UserController {
       delete user.password;
       return reply.send(user);
     } catch (e) {
-      throw new Error(`Could not create user: ${e.message}`);
+      return sendError(reply, `Could not create user: ${e.message}`);
     }
   }
 
@@ -262,7 +257,7 @@ export class UserController {
     const existing = await this.users.findOne({
       where: { id: req.params.id }
     });
-    if (!existing) throw new UserExistsError('User doesnt exist');
+    if (!existing) return sendError(reply, 'User doesnt exist');
 
     try {
       this.logger.verbose(
@@ -278,7 +273,7 @@ export class UserController {
 
       return reply.send({ ok: true });
     } catch (e) {
-      throw new Error(`Could not delete user: ${e.message}`);
+      return sendError(reply, `Could not delete user: ${e.message}`);
     }
   }
   // @Hook('preValidation')

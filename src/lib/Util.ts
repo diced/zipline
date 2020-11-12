@@ -6,6 +6,7 @@ import { compare } from 'semver';
 import { Zipline } from './entities/Zipline';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { FastifyReply } from 'fastify';
 
 const config = Configuration.readConfig();
 
@@ -58,4 +59,11 @@ export async function checkVersion(): Promise<boolean> {
   const compared = compare(currentVersion, latestVersion);
 
   return compared == 0 || compared == 1 ? false : true;
+}
+
+export async function sendError(reply: FastifyReply, error: string) {
+  return reply.code(400).send({
+    code: 400,
+    error
+  });
 }

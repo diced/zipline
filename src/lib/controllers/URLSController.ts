@@ -8,13 +8,12 @@ import {
   POST
 } from 'fastify-decorators';
 import { Repository } from 'typeorm';
-import { URL } from '../../entities/URL';
-import { User } from '../../entities/User';
-import { LoginError } from '../APIErrors';
-import { Configuration, ConfigWebhooks } from '../../Config';
-import { Console } from '../../logger';
-import { createRandomId, readBaseCookie } from '../../Util';
-import { WebhookType, Webhooks } from '../../Webhooks';
+import { URL } from '../entities/URL';
+import { User } from '../entities/User';
+import { Configuration, ConfigWebhooks } from '../Config';
+import { Console } from '../logger';
+import { createRandomId, readBaseCookie, sendError } from '../Util';
+import { WebhookType, Webhooks } from '../Webhooks';
 
 const config = Configuration.readConfig();
 
@@ -30,7 +29,7 @@ export class URLSController {
 
   @GET('/')
   async allURLS(req: FastifyRequest, reply: FastifyReply) {
-    if (!req.cookies.zipline) throw new LoginError('Not logged in.');
+    if (!req.cookies.zipline) return sendError(reply, 'Not logged in.');
 
     const all = await this.urls.find({
       where: {
@@ -46,7 +45,7 @@ export class URLSController {
     req: FastifyRequest<{ Params: { id: string } }>,
     reply: FastifyReply
   ) {
-    if (!req.cookies.zipline) throw new LoginError('Not logged in.');
+    if (!req.cookies.zipline) return sendError(reply, 'Not logged in.');
 
     const url = await this.urls.findOne({
       where: {
@@ -55,7 +54,7 @@ export class URLSController {
       }
     });
 
-    if (!url) throw new Error('No url');
+    if (!url) return sendError(reply, 'No url');
 
     this.logger.verbose(`attempting to delete url ${url.id}`);
     this.urls.delete({
@@ -66,7 +65,9 @@ export class URLSController {
     if (this.webhooks.events.includes(WebhookType.DELETE_URL))
       Webhooks.sendWebhook(this.webhooks.delete_url.content, {
         url,
-        host: `${config.core.secure ? 'https' : 'http'}://${req.hostname}${config.urls.route}/`
+        host: `${config.core.secure ? 'https' : 'http'}://${req.hostname}${
+          config.urls.route
+        }/`
       });
 
     return reply.send(url);
@@ -77,7 +78,7 @@ export class URLSController {
     req: FastifyRequest<{ Body: { vanity: string; url: string } }>,
     reply: FastifyReply
   ) {
-    if (!req.cookies.zipline) throw new LoginError('Not logged in.');
+    if (!req.cookies.zipline) return sendError(reply, 'Not logged in.');
 
     if (config.urls.vanity && req.body.vanity) {
       const existingVanity = await this.urls.findOne({
@@ -85,7 +86,8 @@ export class URLSController {
           vanity: req.body.vanity
         }
       });
-      if (existingVanity) throw new Error('There is an existing vanity!');
+      if (existingVanity)
+        return sendError(reply, 'There is an existing vanity!');
     }
 
     const user = await this.users.findOne({
@@ -94,7 +96,7 @@ export class URLSController {
       }
     });
 
-    if (!user) throw new LoginError('No user');
+    if (!user) return sendError(reply, 'No user');
 
     const id = createRandomId(config.urls.length);
 
@@ -107,7 +109,9 @@ export class URLSController {
     if (this.webhooks.events.includes(WebhookType.SHORTEN))
       Webhooks.sendWebhook(this.webhooks.shorten.content, {
         url,
-        host: `${config.core.secure ? 'https' : 'http'}://${req.hostname}${config.urls.route}/`
+        host: `${config.core.secure ? 'https' : 'http'}://${req.hostname}${
+          config.urls.route
+        }/`
       });
 
     return reply.send(url);

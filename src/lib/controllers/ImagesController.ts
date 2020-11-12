@@ -9,12 +9,11 @@ import {
   DELETE
 } from 'fastify-decorators';
 import { Repository } from 'typeorm';
-import { Image } from '../../entities/Image';
-import { LoginError } from '../APIErrors';
-import { Configuration, ConfigWebhooks } from '../../Config';
-import { Console } from '../../logger';
-import { readBaseCookie } from '../../Util';
-import { Webhooks, WebhookType } from '../../Webhooks';
+import { Image } from '../entities/Image';
+import { Configuration, ConfigWebhooks } from '../Config';
+import { Console } from '../logger';
+import { readBaseCookie, sendError } from '../Util';
+import { Webhooks, WebhookType } from '../Webhooks';
 
 const config = Configuration.readConfig();
 
@@ -28,7 +27,7 @@ export class ImagesController {
 
   @GET('/')
   async allImages(req: FastifyRequest, reply: FastifyReply) {
-    if (!req.cookies.zipline) throw new LoginError('Not logged in.');
+    if (!req.cookies.zipline) return sendError(reply, 'Not logged in.');
 
     const images = await this.images.find({
       where: {
@@ -44,7 +43,7 @@ export class ImagesController {
     req: FastifyRequest<{ Params: { id: string } }>,
     reply: FastifyReply
   ) {
-    if (!req.cookies.zipline) throw new LoginError('Not logged in.');
+    if (!req.cookies.zipline) return sendError(reply, 'Not logged in.');
 
     const image = await this.images.findOne({
       where: {
@@ -53,7 +52,7 @@ export class ImagesController {
       }
     });
 
-    if (!image) throw new Error('No image');
+    if (!image) return sendError(reply, 'No image');
 
     this.images.delete({
       id: req.params.id
@@ -88,7 +87,7 @@ export class ImagesController {
 
   @GET('/recent')
   async recentImages(req: FastifyRequest, reply: FastifyReply) {
-    if (!req.cookies.zipline) throw new LoginError('Not logged in.');
+    if (!req.cookies.zipline) return sendError(reply, 'Not logged in.');
 
     const images = await this.images.find({
       where: {
@@ -101,7 +100,7 @@ export class ImagesController {
 
   @GET('/chunk')
   async pages(req: FastifyRequest, reply: FastifyReply) {
-    if (!req.cookies.zipline) throw new LoginError('Not logged in.');
+    if (!req.cookies.zipline) return sendError(reply, 'Not logged in.');
 
     const images = await this.images.find({
       where: {

@@ -7,14 +7,18 @@ import {
   POST
 } from 'fastify-decorators';
 import { Repository } from 'typeorm';
-import { User } from '../../entities/User';
+import { User } from '../entities/User';
 import { totp, generateSecret, otpauthURL } from 'speakeasy';
 import { toDataURL } from 'qrcode';
-import { checkPassword, createBaseCookie, readBaseCookie } from '../../Util';
-import { LoginError, MissingBodyData, UserNotFoundError } from '../APIErrors';
-import { Console } from '../../logger';
-import { WebhookType, Webhooks } from '../../Webhooks';
-import { Configuration, ConfigWebhooks } from '../../Config';
+import {
+  checkPassword,
+  createBaseCookie,
+  readBaseCookie,
+  sendError
+} from '../Util';
+import { Console } from '../logger';
+import { WebhookType, Webhooks } from '../Webhooks';
+import { Configuration, ConfigWebhooks } from '../Config';
 
 const config = Configuration.readConfig();
 
@@ -29,7 +33,7 @@ export class MultiFactorController {
 
   @GET('/qrcode')
   async qrcode(req: FastifyRequest, reply: FastifyReply) {
-    if (!req.cookies.zipline) throw new LoginError('Not logged in.');
+    if (!req.cookies.zipline) return sendError(reply, 'Not logged in.');
     let user = await this.users.findOne({
       where: {
         id: readBaseCookie(req.cookies.zipline)
@@ -62,7 +66,7 @@ export class MultiFactorController {
 
   @GET('/disable')
   async disable(req: FastifyRequest, reply: FastifyReply) {
-    if (!req.cookies.zipline) throw new LoginError('Not logged in.');
+    if (!req.cookies.zipline) return sendError(reply, 'Not logged in.');
     const user = await this.users.findOne({
       where: {
         id: readBaseCookie(req.cookies.zipline)
@@ -85,9 +89,9 @@ export class MultiFactorController {
     }>,
     reply: FastifyReply
   ) {
-    if (req.cookies.zipline) throw new LoginError('Already logged in.');
-    if (!req.body.username) throw new MissingBodyData('Missing username.');
-    if (!req.body.password) throw new MissingBodyData('Missing uassword.');
+    if (req.cookies.zipline) return sendError(reply, 'Already logged in.');
+    if (!req.body.username) return sendError(reply, 'Missing username.');
+    if (!req.body.password) return sendError(reply, 'Missing uassword.');
 
     const user = await this.users.findOne({
       where: {
@@ -96,12 +100,12 @@ export class MultiFactorController {
     });
 
     if (!user)
-      throw new UserNotFoundError(`User "${req.body.username}" was not found.`);
+      return sendError(reply, `User "${req.body.username}" was not found.`);
     if (!checkPassword(req.body.password, user.password)) {
       this.logger.error(
         `${user.username} (${user.id}) tried to login but failed with mfa`
       );
-      throw new LoginError('Wrong credentials!');
+      return sendError(reply, 'Wrong credentials!');
     }
     delete user.password;
 

@@ -12,13 +12,12 @@ import { join } from 'path';
 import { Repository } from 'typeorm';
 import { pipeline } from 'stream';
 import { promisify } from 'util';
-import { Image } from '../../entities/Image';
-import { User } from '../../entities/User';
-import { AuthError } from '../APIErrors';
-import { Configuration, ConfigWebhooks } from '../../Config';
-import { createRandomId, getFirst } from '../../Util';
-import { Console } from '../../logger';
-import { Webhooks, WebhookType } from '../../Webhooks';
+import { Image } from '../entities/Image';
+import { User } from '../entities/User';
+import { Configuration, ConfigWebhooks } from '../Config';
+import { createRandomId, getFirst, sendError } from '../Util';
+import { Console } from '../logger';
+import { Webhooks, WebhookType } from '../Webhooks';
 const pump = promisify(pipeline);
 
 const config = Configuration.readConfig();
@@ -62,7 +61,7 @@ export class RootController {
 
   @GET('/users')
   async allUsers(req: FastifyRequest, reply: FastifyReply) {
-    if (!req.cookies.zipline) throw new Error('Not logged in.');
+    if (!req.cookies.zipline) return sendError(reply, 'Not logged in.');
     const users = await this.users.find();
     const final = [];
 
@@ -77,7 +76,7 @@ export class RootController {
 
   @GET('/statistics')
   async stats(req: FastifyRequest, reply: FastifyReply) {
-    if (!req.cookies.zipline) throw new Error('Not logged in.');
+    if (!req.cookies.zipline) return sendError(reply, 'Not logged in.');
 
     const images = await this.images.find();
     const users = await this.users.find();
@@ -111,14 +110,14 @@ export class RootController {
   @POST('/upload', rateLimiterConfig)
   async loginStatus(req: FastifyRequest, reply: FastifyReply) {
     if (!req.headers.authorization)
-      return new AuthError('No authorization header!');
+      return sendError(reply, 'No authorization header!');
 
     const user = await this.users.findOne({
       where: {
         token: req.headers.authorization
       }
     });
-    if (!user) return new AuthError('Incorrect token!');
+    if (!user) return sendError(reply, 'Incorrect token!');
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     //@ts-ignore stupid multipart types smh
@@ -129,7 +128,7 @@ export class RootController {
 
     const ext = data.filename.split('.')[1];
     if (config.uploader.blacklisted.includes(ext))
-      throw new Error('Blacklisted file extension!');
+      return sendError(reply, 'Blacklisted file extension!');
 
     const fileName = config.uploader.original
       ? data.filename.split('.')[0]
