@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-nocheck
+
 import React from 'react';
 import { useRouter } from 'next/router';
 import Typography from '@material-ui/core/Typography';
@@ -60,41 +63,45 @@ export default function Upload() {
     }
   };
 
+  const snack = (
+    <Snackbar
+      anchorOrigin={{
+        vertical: 'top',
+        horizontal: 'center'
+      }}
+      open={alertOpen}
+      autoHideDuration={6000}
+      onClose={() => setAlertOpen(false)}
+    >
+      <Alert severity={alertSev} variant='filled'>
+        {alertMsg}
+      </Alert>
+    </Snackbar>
+  );
+
   if (typeof window === 'undefined') return <UIPlaceholder />;
   if (!state.loggedIn) router.push('/user/login');
   else {
     return (
       <UI>
-        <Snackbar
-          anchorOrigin={{
-            vertical: 'top',
-            horizontal: 'center'
-          }}
-          open={alertOpen}
-          autoHideDuration={6000}
-          onClose={() => setAlertOpen(false)}
-        >
-          {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
-          {/* @ts-ignore */}
-          <Alert severity={alertSev} variant='filled'>
-            {alertMsg}
-          </Alert>
-        </Snackbar>
-        <Paper elevation={3} className={classes.padding}>
-          <Typography variant='h5'>
-            Upload
-          </Typography>
-          <Box m={1}>
-            <DropzoneArea
-              acceptedFiles={['image/*']}
-              dropzoneText={'Drag an image or click to upload an image.'}
-              onChange={f => setFiles(f)}
-              filesLimit={1}
-              maxFileSize={1073741824} // 1gb in byte
-            />
-          </Box>
-          <Button onClick={handleFileUpload}>Upload</Button>
-        </Paper>
+        <>
+          {snack}
+          <Paper elevation={3} className={classes.padding}>
+            <Typography variant='h5'>
+              Upload
+            </Typography>
+            <Box m={1}>
+              <DropzoneArea
+                acceptedFiles={['image/*']}
+                dropzoneText={'Drag an image or click to upload an image.'}
+                onChange={f => setFiles(f)}
+                filesLimit={1}
+                maxFileSize={1073741824} // 1gb in byte
+              />
+            </Box>
+            <Button onClick={handleFileUpload}>Upload</Button>
+          </Paper>
+        </>
       </UI>
     );
   }
