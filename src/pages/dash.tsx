@@ -33,8 +33,8 @@ export default function Dashboard({ config }) {
   const router = useRouter();
   const state = store.getState();
   const [loading, setLoading] = React.useState(true);
+  const [stats, setStats] = React.useState<{totalViews:number, averageViews:number, images: number}>(null);
   const [recentImages, setRecentImages] = React.useState([]);
-  const [images, setImages] = React.useState([]);
 
   if (typeof window === 'undefined') return <UIPlaceholder />;
   if (!state.loggedIn) router.push('/user/login');
@@ -44,9 +44,9 @@ export default function Dashboard({ config }) {
         const recentImages = await (await fetch('/api/images/recent')).json();
         if (!recentImages.error) setRecentImages(recentImages);
 
-        const allImages = await (await fetch('/api/images')).json();
-        if (!allImages.error) {
-          setImages(allImages);
+        const stats = await (await fetch('/api/user/stats')).json();
+        if (!stats.error) {
+          setStats(stats);
           setLoading(false);
         }
       })();
@@ -59,11 +59,11 @@ export default function Dashboard({ config }) {
         </Backdrop>
         {!loading ? (
           <Paper elevation={3} className={classes.padding}>
-            <Typography variant='h5'>
-              Welcome back, {state.user.username}
+            <Typography variant='h4'>
+              Welcome back, {state.user.username} 
             </Typography>
             <Typography color='textSecondary'>
-              You have <b>{images.length}</b> images
+              You have <b>{stats.images}</b> images, with <b>{stats.totalViews}</b> ({Math.round(stats.averageViews)}) collectively.
             </Typography>
             <Typography variant='h5'>Recent Images</Typography>
             <Grid container spacing={2}>

@@ -10,6 +10,7 @@ import {
 } from 'fastify-decorators';
 import { Repository } from 'typeorm';
 import { User } from '../entities/User';
+import { Image } from '../entities/Image';
 import { Zipline } from '../entities/Zipline';
 import { Configuration, ConfigWebhooks } from '../Config';
 import { Console } from '../logger';
@@ -32,6 +33,7 @@ export class UserController {
   private instance!: FastifyInstance;
 
   private users: Repository<User> = this.instance.orm.getRepository(User);
+  private images: Repository<Image> = this.instance.orm.getRepository(Image);
   private logger: Console = Console.logger(User);
   private webhooks: ConfigWebhooks = Webhooks.conf(config);
 
@@ -54,6 +56,30 @@ export class UserController {
     if (!user) return sendError(reply, "User doesn't exist");
     delete user.password;
     return reply.send(user);
+  }
+
+  @GET('/stats')
+  async stats(req: FastifyRequest, reply: FastifyReply) {
+    if (!req.cookies.zipline) return sendError(reply, 'Not logged in.');
+    const user = await this.users.findOne({
+      where: {
+        id: readBaseCookie(req.cookies.zipline)
+      }
+    });
+
+    const images = await this.images.find({
+      where: {
+        user: user.id
+      }
+    });
+
+    const totalViews = images.map(x => x.views).reduce((a, b) => Number(a) + Number(b), 0);
+
+    return reply.send({
+      totalViews,
+      images: images.length,
+      averageViews: totalViews / images.length
+    });
   }
 
   @PATCH('/')
