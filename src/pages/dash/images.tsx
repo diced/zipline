@@ -18,6 +18,7 @@ import { makeStyles } from '@material-ui/core';
 import { store } from '../../store';
 import { Image } from '../../lib/entities/Image';
 import { Configuration } from '../../lib/Config';
+import { createURL } from '../../lib/WebUtil';
 
 const useStyles = makeStyles(theme => ({
   margin: {
@@ -109,29 +110,25 @@ export default function Images({ config }) {
             {showPagination ? (
               <>
                 <Grid container spacing={2}>
-                  {images.map(d => {
-                    const t = new URL(window.location.href);
-                    t.pathname = `${config ? config.uploader.route : '/u'}/${d.file}`;
-                    return (
-                      <Grid
-                        item
-                        xs={12}
-                        sm={6}
-                        key={d.id}
-                        onClick={e => setImageOpenPopover(e, d)}
-                      >
-                        <Card>
-                          <CardActionArea>
-                            <CardMedia
-                              component='img'
-                              height='140'
-                              image={t.toString()}
-                            />
-                          </CardActionArea>
-                        </Card>
-                      </Grid>
-                    );
-                  })}
+                  {images.map(d => ((
+                    <Grid
+                      item
+                      xs={12}
+                      sm={4}
+                      key={d.id}
+                      onClick={e => setImageOpenPopover(e, d)}
+                    >
+                      <Card>
+                        <CardActionArea>
+                          <CardMedia
+                            component='img'
+                            height='140'
+                            image={createURL(window.location.href, config ? config.uploader.route : '/u', d.file)}
+                          />
+                        </CardActionArea>
+                      </Card>
+                    </Grid>
+                  )))}
                 </Grid>
                 <Pagination count={chunks.length} onChange={changePage} />
               </>

@@ -12,6 +12,7 @@ import UI from '../components/UI';
 import UIPlaceholder from '../components/UIPlaceholder';
 import { makeStyles } from '@material-ui/core';
 import { store } from '../store';
+import { createURL } from '../lib/WebUtil';
 import { Configuration } from '../lib/Config';
 
 const useStyles = makeStyles(theme => ({
@@ -68,8 +69,6 @@ export default function Dashboard({ config }) {
             <Typography variant='h5'>Recent Images</Typography>
             <Grid container spacing={2}>
               {recentImages.map(d => {
-                const t = new URL(window.location.href);
-                t.pathname = `${config ? config.uploader.route : '/u'}/${d.file}`;
                 return (
                   <Grid item key={d.id} xs={12} sm={4}>
                     <Card>
@@ -77,7 +76,7 @@ export default function Dashboard({ config }) {
                         <CardMedia
                           component='img'
                           height='140'
-                          image={t.toString()}
+                          image={createURL(window.location.href, config ? config.uploader.route : '/u', d.file)}
                         />
                       </CardActionArea>
                     </Card>

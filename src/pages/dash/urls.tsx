@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import Typography from '@material-ui/core/Typography';
 import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -23,9 +24,11 @@ import AddIcon from '@material-ui/icons/Add';
 import copy from 'copy-to-clipboard';
 import UI from '../../components/UI';
 import UIPlaceholder from '../../components/UIPlaceholder';
+import OpenInNewIcon from '@material-ui/icons/OpenInNew';
 import { makeStyles } from '@material-ui/core';
 import { URL as URLEntity } from '../../lib/entities/URL';
 import { Configuration } from '../../lib/Config';
+import { createURL } from '../../lib/WebUtil';
 
 const useStyles = makeStyles(theme => ({
   margin: {
@@ -157,41 +160,46 @@ export default function Urls({ config }) {
             <Typography variant='h5'>
               URLs
               <IconButton
-                aria-label='Create User'
+                aria-label='Create URL'
                 onClick={() => setCreateOpen(true)}
               >
                 <AddIcon />
               </IconButton>
             </Typography>
             <Grid container spacing={2}>
-              {urls.length > 0 ? urls.map(u => {
-                const url = new URL(window.location.href);
-                url.pathname = `${config ? config.urls.route : '/go'}/${u.id}`;
-                return (
-                  <Grid item xs={12} sm={4} key={u.id}>
-                    <Card elevation={3}>
-                      <CardHeader
-                        action={
-                          <div>
-                            <IconButton aria-label='Copy URL'>
-                              <FileCopyIcon
-                                onClick={() => copy(url.toString())}
-                              />
-                            </IconButton>
-                            <IconButton
-                              aria-label='Delete Forever'
-                              onClick={() => deleteUrl(u)}
-                            >
-                              <DeleteForeverIcon />
-                            </IconButton>
-                          </div>
-                        }
-                        title={u.vanity ? u.vanity : u.id}
-                      />
-                    </Card>
-                  </Grid>
-                );
-              }) : (
+              {urls.length > 0 ? urls.map(u => ((
+                <Grid item xs={12} sm={4} key={u.id}>
+                  <Card elevation={3}>
+                    <CardHeader
+                      action={
+                        <div>
+                          <IconButton aria-label='Copy URL'>
+                            <FileCopyIcon
+                              onClick={() => copy(createURL(window.location.href, config ? config.urls.route : '/go', u.vanity || u.id))}
+                            />
+                          </IconButton>
+                          <Link href={u.url}>
+                            <a target='_blank'>
+                              <IconButton
+                                aria-label='Open URL in new Tab'
+                              >
+                                <OpenInNewIcon />
+                              </IconButton>
+                            </a>
+                          </Link>
+                          <IconButton
+                            aria-label='Delete Forever'
+                            onClick={() => deleteUrl(u)}
+                          >
+                            <DeleteForeverIcon />
+                          </IconButton>
+                        </div>
+                      }
+                      title={u.vanity ? u.vanity : u.id}
+                    />
+                  </Card>
+                </Grid>
+              ))) : (
                 <Grid
                   container
                   spacing={0}
