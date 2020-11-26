@@ -1,6 +1,6 @@
 {
   "name": "zipline-next",
-  "version": "2.5.5",
+  "version": "2.5.6",
   "private": true,
   "dependencies": {
     "@dicedtomato/colors": "^1.0.3",
@@ -62,6 +62,7 @@
     "eslint-plugin-react": "^7.21.3",
     "mongodb": "^3.6.2",
     "prettier": "2.1.2",
+    "release": "^6.3.0",
     "ts-node": "^9.0.0",
     "typescript": "^4.0.3"
   }
