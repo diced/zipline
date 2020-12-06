@@ -128,7 +128,7 @@ export class RootController {
     if (config.uploader.blacklisted.includes(ext)) return sendError(reply, 'Blacklisted file extension!');
 
     const fileName = config.uploader.original
-      ? data.filename.split('.')[0]
+      ? data.filename.split('.').pop()
       : createRandomId(config.uploader.length);
     const path = join(config.uploader.directory, `${fileName}.${ext}`);
 
