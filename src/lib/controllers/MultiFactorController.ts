@@ -127,4 +127,30 @@ export class MultiFactorController {
 
     return reply.send({ user, passed });
   }
+
+  @GET('/verify')
+  async verifyOn(
+    req: FastifyRequest<{
+      Querystring: { token: string };
+    }>,
+    reply: FastifyReply
+  ) {
+    if (!req.cookies.zipline) return sendError(reply, 'Not logged in.');
+
+    const user = await this.users.findOne({
+      where: {
+        id: readBaseCookie(req.cookies.zipline)
+      }
+    });
+
+    if (!user) return sendError(reply, `User that was signed in was not found, and guess what you should probably clear your cookies.`);
+
+    const passed = totp.verify({
+      encoding: 'base32',
+      token: req.query.token,
+      secret: user.secretMfaKey
+    });
+
+    return reply.send(passed);
+  }
 }

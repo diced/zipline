@@ -34,7 +34,7 @@ export default function Dashboard({ config }) {
   const router = useRouter();
   const state = store.getState();
   const [loading, setLoading] = React.useState(true);
-  const [stats, setStats] = React.useState<{totalViews:number, averageViews:number, images: number}>(null);
+  const [stats, setStats] = React.useState<{ totalViews: number, averageViews: number, images: number }>(null);
   const [recentImages, setRecentImages] = React.useState([]);
 
   if (typeof window === 'undefined') return <UIPlaceholder />;
@@ -61,7 +61,7 @@ export default function Dashboard({ config }) {
         {!loading ? (
           <Paper elevation={3} className={classes.padding}>
             <Typography variant='h4'>
-              Welcome back, {state.user.username} 
+              Welcome back, {state.user.username}
             </Typography>
             <Typography color='textSecondary'>
               You have <b>{stats.images}</b> images, with <b>{stats.totalViews}</b> ({Math.round(stats.averageViews)}) collectively.

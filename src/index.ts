@@ -1,37 +1,23 @@
 import next from 'next';
-import { textSync as text } from 'figlet';
-import fastify, { FastifyReply, FastifyRequest } from 'fastify';
-import fastifyTypeorm from 'fastify-typeorm-plugin';
-import fastifyCookies from 'fastify-cookie';
-import fastifyMultipart from 'fastify-multipart';
-import fastifyRateLimit from 'fastify-rate-limit';
+import fastify from 'fastify';
 import fastifyStatic from 'fastify-static';
-import fastifyFavicon from 'fastify-favicon';
-import { bootstrap } from 'fastify-decorators';
+import fastifyTypeorm from 'fastify-typeorm-plugin';
 import { Console } from './lib/logger';
 import { AddressInfo } from 'net';
-import { magenta, bold, green, reset, blue, red } from '@dicedtomato/colors';
+import { bold, green, reset } from '@dicedtomato/colors';
 import { Configuration } from './lib/Config';
-import { UserController } from './lib/controllers/UserController';
-import { RootController } from './lib/controllers/RootController';
 import { join } from 'path';
-import { ImagesController } from './lib/controllers/ImagesController';
-import { URLSController } from './lib/controllers/URLSController';
 import { checkVersion } from './lib/Util';
-import { existsSync, readFileSync } from 'fs';
-import { Image } from './lib/entities/Image';
-import { User } from './lib/entities/User';
-import { Zipline } from './lib/entities/Zipline';
-import { URL } from './lib/entities/URL';
-import { MultiFactorController } from './lib/controllers/MultiFactorController';
+import { PluginLoader } from './lib/plugin';
+
 const dev = process.env.NODE_ENV !== 'production';
+const server = fastify({});
+const app = next({
+  dev,
+  quiet: dev
+});
 
-(async () => {
-  if (await checkVersion()) Console.logger('Zipline').info(
-    'running an outdated version of zipline, please update soon!'
-  );
-})();
-
+const pluginLoader = new PluginLoader(server, process.cwd(), dev ? './src/plugins' : './dist/plugins');
 Console.logger(Configuration).verbose('searching for config...');
 const config = Configuration.readConfig();
 
@@ -42,188 +28,71 @@ if (!config) {
   process.exit(0);
 }
 
-if (!config.core || !config.database) {
-  Console.logger('Zipline').error(
-    'configuration seems to be invalid, did you generate a config? https://zipline.diced.wtf/docs/auto'
-  );
-  process.exit(0);
-}
-
-if (config.core.log) console.log(`
-${magenta(text('Zipline'))}
-
-Version : ${blue(
-    process.env.npm_package_version ||
-    JSON.parse(readFileSync(join(process.cwd(), 'package.json'), 'utf8'))
-      .version
-  )}
-GitHub  : ${blue('https://github.com/ZiplineProject/zipline')}
-Issues  : ${blue('https://github.com/ZiplineProject/zipline/issues')}
-Docs    : ${blue('https://zipline.diced.wtf/')}
-Mode    : ${bold(dev ? red('dev') : green('production'))}
-Verbose : ${bold(process.env.VERBOSE ? red('yes') : green('no'))}
-`);
-
-const dir = config.uploader.directory ? config.uploader.directory : 'uploads';
-const path = dir.charAt(0) == '/' ? dir : join(process.cwd(), dir);
-
-const server = fastify({});
-const app = next({
-  dev,
-  quiet: dev
-});
-const handle = app.getRequestHandler();
-
-Console.logger(next).info('Preparing app...');
-app.prepare();
-Console.logger(next).verbose('Prepared app');
-
-server.register(fastifyRateLimit, {
-  timeWindow: 5000,
-  max: 1,
-  global: false
-});
-
-if (dev) server.get('/_next/*', async (req, reply) => {
-  await handle(req.raw, reply.raw);
-  return (reply.sent = true);
-});
-
-server.all('/*', async (req, reply) => {
-  await handle(req.raw, reply.raw);
-  return (reply.sent = true);
-});
-
-server.setNotFoundHandler(async (req, reply) => {
-  await app.render404(req.raw, reply.raw);
-  return (reply.sent = true);
-});
-
-server.get(`${config.urls.route}/:id`, async function (
-  req: FastifyRequest<{ Params: { id: string } }>,
-  reply: FastifyReply
-) {
-  const urls = this.orm.getRepository(URL);
-
-  const urlId = await urls.findOne({
-    where: {
-      id: req.params.id
+(async () => {
+  const builtInPlugins = await pluginLoader.loadPlugins(true);
+  for (const plugin of builtInPlugins) {
+    try {
+      plugin.onLoad(server, null, app, config);
+    } catch (e) {
+      Console.logger(PluginLoader).error(`failed to load built-in plugin: ${plugin.name}, ${e.message}`);
+      process.exit(0);
     }
-  });
-
-  const urlVanity = await urls.findOne({
-    where: {
-      vanity: req.params.id
-    }
-  });
-
-  if (config.urls.vanity && urlVanity) return reply.redirect(urlVanity.url);
-  if (!urlId) {
-    await app.render404(req.raw, reply.raw);
-    return (reply.sent = true);
-  }
-  return reply.redirect(urlId.url);
-});
-
-server.get(`${config.uploader.rich_content_route || '/a'}/:id`, async function (
-  req: FastifyRequest<{ Params: { id: string } }>,
-  reply: FastifyReply
-) {
-  if (!existsSync(join(config.uploader.directory, req.params.id))) {
-    await app.render404(req.raw, reply.raw);
-    return (reply.sent = true);
   }
 
-  return reply.type('text/html').send(`
-  <html>
-  <head>
-      <meta property="theme-color" content="${config.meta.color}">
-      <meta property="og:title" content="${req.params.id}">
-      <meta property="og:url" content="${config.uploader.route}/${req.params.id}">
-      <meta property="og:image" content="${config.uploader.route}/${req.params.id}">
-      <meta property="twitter:card" content="summary_large_image">
-  </head>
-  <body>
-    <div style="text-align:center;vertical-align:middle;">
-      <img src="${config.uploader.route}/${req.params.id}" >
-    </div>
-  </body>
-  </html>
-  `);
-});
+  const dir = config.uploader.directory ? config.uploader.directory : 'uploads';
+  const path = dir.charAt(0) == '/' ? dir : join(process.cwd(), dir);
+  const handle = app.getRequestHandler();
 
-server.register(fastifyMultipart);
+  if (dev) server.get('/_next/*', async (req, reply) => {
+    await handle(req.raw, reply.raw);
+    return (reply.sent = true);
+  });
 
-server.register(fastifyTypeorm, {
-  ...config.database,
-  entities: [Image, URL, User, Zipline],
-  synchronize: true,
-  logging: false
-});
+  server.all('/*', async (req, reply) => {
+    await handle(req.raw, reply.raw);
+    return (reply.sent = true);
+  });
 
-server.register(bootstrap, {
-  controllers: [
-    UserController,
-    RootController,
-    ImagesController,
-    URLSController,
-    MultiFactorController
-  ]
-});
+  server.setNotFoundHandler(async (req, reply) => {
+    await app.render404(req.raw, reply.raw);
+    return (reply.sent = true);
+  });
 
-server.register(fastifyCookies, {
-  secret: config.core.secret
-});
+  server.register(fastifyStatic, {
+    root: path,
+    prefix: config.uploader.route
+  });
 
-server.register(fastifyStatic, {
-  root: path,
-  prefix: config.uploader.route
-});
 
-server.register(fastifyStatic, {
-  root: join(process.cwd(), 'public'),
-  prefix: '/public',
-  decorateReply: false
-});
+  // done after everything so plugins can overwrite routes, etc.
+  server.register(async () => {
+    const plugins = await pluginLoader.loadPlugins();
+    for (const plugin of plugins) {
+      try {
+        plugin.onLoad(server, server.orm, app, config);
+        Console.logger(PluginLoader).info(`loaded plugin: ${plugin.name}`);
+      } catch (e) {
+        Console.logger(PluginLoader).error(`failed to load plugin: ${plugin.name}, ${e.message}`)
+      }
+    }
+  })
 
-server.register(fastifyFavicon);
+  server.listen(
+    {
+      port: config.core.port,
+      host: config.core.host
+    },
+    async err => {
+      if (err) throw err;
+      const info = server.server.address() as AddressInfo;
 
-server.listen(
-  {
-    port: config.core.port,
-    host: config.core.host
-  },
-  err => {
-    if (err) throw err;
-    const info = server.server.address() as AddressInfo;
-
-    Console.logger('Server').info(
-      `server listening on ${bold(
-        `${green(info.address)}${reset(':')}${bold(
-          green(info.port.toString())
+      Console.logger('Server').info(
+        `server listening on ${bold(
+          `${green(info.address)}${reset(':')}${bold(
+            green(info.port.toString())
+          )}`
         )}`
-      )}`
-    );
-  }
-);
-
-server.addHook('preHandler', async (req, reply) => {
-  if (
-    config.core.blacklisted_ips &&
-    config.core.blacklisted_ips.includes(req.ip)
-  ) {
-    await app.render404(req.raw, reply.raw);
-    return (reply.sent = true);
-  }
-});
-
-server.addHook('onResponse', (req, res, done) => {
-  if (!req.url.startsWith('/_next') && config.core.log) {
-    const status =
-      res.statusCode !== 200
-        ? bold(red(res.statusCode.toString()))
-        : bold(green(res.statusCode.toString()));
-    Console.logger('server').info(`${status} ${req.url} was accessed`);
-  }
-  done();
-});
+      );
+    }
+  );
+})();

@@ -1,5 +1,5 @@
 import { ConsoleLevel } from '.';
-import { blue, red, reset, white, yellow } from '@dicedtomato/colors';
+import { blue, green, red, reset, white, yellow } from '@dicedtomato/colors';
 
 export interface Formatter {
   format(
@@ -27,7 +27,7 @@ export class DefaultFormatter implements Formatter {
     level: ConsoleLevel,
     time: Date
   ): string {
-    return `[${time.toLocaleString().replace(',', '')}] ${this.formatLevel(
+    return `[${time.toLocaleString().replace(',', '')}] [${green(origin.toLowerCase())}] ${this.formatLevel(
       level
     )} ${reset(message)}`;
   }

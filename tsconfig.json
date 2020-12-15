@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "outDir": "./dist",
     "allowJs": true,
     "skipLibCheck": true,
@@ -16,6 +20,13 @@
     "experimentalDecorators": true,
     "noEmit": false
   },
-  "include": ["next-env.d.ts", "src"],
-  "exclude": ["node_modules", ".next"]
+  "include": [
+    "next-env.d.ts",
+    "src",
+    "Zipline.toml"
+  ],
+  "exclude": [
+    "node_modules",
+    ".next"
+  ]
 }
