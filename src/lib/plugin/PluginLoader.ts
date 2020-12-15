@@ -27,7 +27,7 @@ export class PluginLoader {
       }
     };
 
-    r(builtIn ? join(process.cwd(), process.env.NODE_ENV == 'development' ? 'dist/src' : 'src', 'lib', 'plugin', 'builtins') : this.directory);
+    r(builtIn ? join(process.cwd(), process.env.NODE_ENV !== 'development' ? 'dist' : 'src', 'lib', 'plugin', 'builtins') : this.directory);
 
     return result;
   }
