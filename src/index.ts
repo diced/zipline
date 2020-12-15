@@ -17,6 +17,8 @@ const app = next({
   quiet: dev
 });
 
+app.prepare();
+
 const pluginLoader = new PluginLoader(server, process.cwd(), dev ? './src/plugins' : './dist/plugins');
 Console.logger(Configuration).verbose('searching for config...');
 const config = Configuration.readConfig();
