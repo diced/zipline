@@ -17,6 +17,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: docker.pkg.github.com
-          repository: diced/zipline
+          repository: diced/zipline/zipline
           dockerfile: Dockerfile
           tag_with_ref: true
