@@ -1,10 +1,9 @@
 name: Publish Zipline Docker Image
 on:
   push:
-    branches:
-      - master
-    paths:
-      - '**'
+    branches: [next]
+  pull_request:
+    branches: [next]
 jobs:
   push_to_registry:
     name: Push Docker Image to Github Packages
