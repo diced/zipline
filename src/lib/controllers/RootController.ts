@@ -123,17 +123,18 @@ export class RootController {
     const data: Multipart = await req.file();
 
     if (!existsSync(config.uploader.directory)) mkdirSync(config.uploader.directory);
-
-    const ext = data.mimetype === 'application/octet-stream' ? 'bin' : data.filename.split('.')[1];
+    
+    const og = data.filename;
+    const ext = data.filename.split('.').pop();
     if (config.uploader.blacklisted.includes(ext)) return sendError(reply, 'Blacklisted file extension!');
-
+    console.log(data.filename);
     const fileName = config.uploader.original
-      ? data.filename.split('.').pop()
+      ? og
       : createRandomId(config.uploader.length);
-    const path = join(config.uploader.directory, `${fileName}.${ext}`);
+    const path = join(config.uploader.directory, config.uploader.original ? fileName : `${fileName}.${ext}`);
 
     this.logger.verbose(`attempting to save ${fileName} to db`);
-    const image = await this.images.save(new Image(fileName, ext, user.id));
+    const image = await this.images.save(new Image(config.uploader.original, fileName, ext, user.id));
     this.logger.verbose(`saved image ${image.id} to db`);
 
     this.logger.verbose(`attempting to save file ${path}`);
@@ -148,7 +149,7 @@ export class RootController {
       config.uploader.rich_content_route
         ? config.uploader.rich_content_route
         : config.uploader.route
-    }/${fileName}.${ext}`;
+    }/${config.uploader.original ? og : `${fileName}.${ext}`}`;
 
     if (this.webhooks.events.includes(WebhookType.UPLOAD)) Webhooks.sendWebhook(this.webhooks.upload.content, {
       image,

@@ -14,9 +14,10 @@ export class Image {
   @Column('bigint', { default: '0' })
   public views: number;
 
-  public constructor(id: string, ext: string, user: number) {
+  public constructor(original: boolean, id: string, ext: string, user: number) {
     this.id = id;
-    this.file = `${id}.${ext}`;
+    if (original) this.file = id;
+    else this.file = `${id}.${ext}`;
     this.user = user;
     this.views = 0;
   }
