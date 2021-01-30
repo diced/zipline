@@ -59,7 +59,7 @@ export class Webhooks {
   public static parseContent(content: string, data: WebhookData) {
     return content
       .replace(WebhookParseTokens.IMAGE_ID, data.image?.id)
-      .replace(WebhookParseTokens.IMAGE_URL, `${data.host}${data.image?.file}`)
+      .replace(WebhookParseTokens.IMAGE_URL, data.host)
       .replace(WebhookParseTokens.URL_ID, data.url?.id)
       .replace(WebhookParseTokens.URL_URL, data.host + data.url?.id)
       .replace(WebhookParseTokens.URL_VANITY, data.url?.vanity)

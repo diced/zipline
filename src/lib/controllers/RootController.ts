@@ -152,6 +152,7 @@ export class RootController {
 
     if (this.webhooks.events.includes(WebhookType.UPLOAD)) Webhooks.sendWebhook(this.webhooks.upload.content, {
       image,
+      user,
       host
     });
 
