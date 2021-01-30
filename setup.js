@@ -48,14 +48,14 @@ const base = {
     {
       type: 'list',
       name: 'type',
-      message: 'What database type?',
+      message: 'What database type? (you will have to install the drivers)',
       choices: [
         { name: 'postgres', extra: 'This is what we recomend using.' },
         { name: 'cockroachdb' },
         { name: 'mysql' },
         { name: 'mariadb' },
         { name: 'mssql' },
-        { name: 'sqlite3' }
+        { name: 'sqlite' }
       ]
     },
     {
@@ -103,14 +103,14 @@ const base = {
       name: 'theme',
       message: 'Theme',
       choices: [
-        { name: 'Dark Theme (recomended)' },
-        { name: 'Light Theme (warning for eyes)' }
+        { name: 'dark' },
+        { name: 'light' }
       ]
     },
     {
       type: 'confirm',
       name: 'mfa',
-      message: 'Enable MFA with Authy/Google Authenticator'
+      message: 'Enable 2 Factor Authentication with Authy/Google Authenticator'
     }
   ]);
 
@@ -165,6 +165,7 @@ const base = {
       'Head to https://zipline.diced.wtf/docs/docker to learn how to run with docker.'
     );
   }
+  if (config.database.type !== "postgres") console.log(`please head to https://zipline.diced.wtf/docs/config/getting-started#database to see what drivers you need to install for ${config.database.type}`);
 
   writeFileSync('Zipline.toml', stringify(config));
 })();
