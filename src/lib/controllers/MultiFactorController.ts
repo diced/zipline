@@ -143,7 +143,7 @@ export class MultiFactorController {
       }
     });
 
-    if (!user) return sendError(reply, `User that was signed in was not found, and guess what you should probably clear your cookies.`);
+    if (!user) return sendError(reply, 'User that was signed in was not found, and guess what you should probably clear your cookies.');
 
     const passed = totp.verify({
       encoding: 'base32',
