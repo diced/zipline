@@ -92,7 +92,7 @@ export default function Upload() {
             </Typography>
             <Box m={1}>
               <DropzoneArea
-                acceptedFiles={['image/*']}
+                acceptedFiles={['image/*', 'video/*']}
                 dropzoneText={'Drag an image or click to upload an image.'}
                 onChange={f => setFiles(f)}
                 filesLimit={1}
