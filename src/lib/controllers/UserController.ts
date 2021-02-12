@@ -169,7 +169,8 @@ export class UserController {
     this.logger.verbose(`set cookie for ${user.username} (${user.id})`);
     reply.setCookie('zipline', createBaseCookie(user.id), {
       path: '/',
-      maxAge: 1036800000
+      maxAge: 1036800000,
+      signed: true
     });
 
     this.logger.info(`${user.username} (${user.id}) logged in`);
@@ -193,7 +194,6 @@ export class UserController {
 
   @POST('/reset-token')
   async resetToken(req: FastifyRequest, reply: FastifyReply) {
-    if (!req.cookies.zipline) return sendError(reply, 'Not logged in.');
 
     const user = await this.users.findOne({
       where: {
@@ -224,6 +224,10 @@ export class UserController {
     }>,
     reply: FastifyReply
   ) {
+    const firstSetup = await getFirst(this.instance.orm);
+
+    if (!firstSetup && !req.cookies.zipline) return sendError(reply, 'Not logged in.');
+
     if (!req.body.username) return sendError(reply, 'Missing username.');
     if (!req.body.password) return sendError(reply, 'Missing uassword.');
 
@@ -247,7 +251,6 @@ export class UserController {
         user
       });
 
-      const firstSetup = await getFirst(this.instance.orm);
       if (firstSetup) await this.instance.orm.getRepository(Zipline).update(
         {
           id: 'zipline'
