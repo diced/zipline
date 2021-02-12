@@ -9,6 +9,7 @@ import { Configuration } from './lib/Config';
 import { join } from 'path';
 import { checkVersion } from './lib/Util';
 import { PluginLoader } from './lib/plugin';
+import { readdirSync, statSync } from 'fs';
 
 const dev = process.env.NODE_ENV !== 'production';
 const server = fastify({});
@@ -45,14 +46,15 @@ if (!config) {
   const path = dir.charAt(0) == '/' ? dir : join(process.cwd(), dir);
   const handle = app.getRequestHandler();
 
-  if (dev) server.get('/_next/*', async (req, reply) => {
-    await handle(req.raw, reply.raw);
-    return (reply.sent = true);
-  });
-
-  server.all('/*', async (req, reply) => {
-    await handle(req.raw, reply.raw);
-    return (reply.sent = true);
+  server.get('/*', async (req, reply) => {
+    const routeRegex = /\/_next\/static|\/((dash|user)(\/)?(.+)?)?/gi;
+    if (routeRegex.test(req.url)) {
+      await handle(req.raw, reply.raw);
+      return (reply.sent = true);
+    } else {
+      await app.render404(req.raw, reply.raw);
+      return (reply.sent = true);
+    }
   });
 
   server.setNotFoundHandler(async (req, reply) => {
@@ -74,10 +76,10 @@ if (!config) {
         plugin.onLoad(server, server.orm, app, config);
         Console.logger(PluginLoader).info(`loaded plugin: ${plugin.name}`);
       } catch (e) {
-        Console.logger(PluginLoader).error(`failed to load plugin: ${plugin.name}, ${e.message}`)
+        Console.logger(PluginLoader).error(`failed to load plugin: ${plugin.name}, ${e.message}`);
       }
     }
-  })
+  });
 
   server.listen(
     {

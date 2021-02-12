@@ -1,7 +1,7 @@
-import { FastifyInstance } from "fastify";
-import { readdirSync, statSync } from "fs";
-import { join } from "path";
-import { Plugin } from "./Plugin";
+import { FastifyInstance } from 'fastify';
+import { readdirSync, statSync } from 'fs';
+import { join } from 'path';
+import { Plugin } from './Plugin';
 
 export class PluginLoader {
   public directory: string;
@@ -15,7 +15,7 @@ export class PluginLoader {
     this.fastify = fastify;
   }
 
-  public getAllFiles(builtIn: boolean = false): string[] {
+  public getAllFiles(builtIn = false): string[] {
     const result = [];
 
     const r = (dir: string) => {
@@ -32,7 +32,7 @@ export class PluginLoader {
     return result;
   }
 
-  public async loadPlugins(builtIn: boolean = false): Promise<Plugin[]> {
+  public async loadPlugins(builtIn = false): Promise<Plugin[]> {
     const files = this.getAllFiles(builtIn);
 
     for (const pluginFile of files) {
