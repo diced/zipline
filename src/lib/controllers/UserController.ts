@@ -236,6 +236,8 @@ export class UserController {
     });
     if (existing) return sendError(reply, 'User exists already');
 
+    if (req.body.username.length > 25) return sendError(reply, 'Limit 25');
+
     try {
       this.logger.verbose(`attempting to create ${req.body.username}`);
       const user = await this.users.save(
