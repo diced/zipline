@@ -5,10 +5,10 @@ export class URL {
   @PrimaryColumn('text')
   public id: string;
 
-  @Column('text', { default: null })
+  @Column('varchar', { default: null, length: 255 })
   public url: string;
 
-  @Column('text', { default: null, nullable: true })
+  @Column('varchar', { default: null, nullable: true, length: 255 })
   public vanity: string;
 
   @Column('bigint')

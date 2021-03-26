@@ -5,19 +5,19 @@ export class User {
   @PrimaryGeneratedColumn()
   public id: number;
 
-  @Column('text')
+  @Column('varchar', { length: 255 })
   public username: string;
 
-  @Column('text')
+  @Column('varchar', { length: 255 })
   public password: string;
 
-  @Column('text', { default: null }) /* used for gravatar avatar! */
+  @Column('varchar', { default: null, length: 255 }) /* used for gravatar avatar! */
   public email: string;
 
   @Column('boolean', { default: false })
   public administrator: boolean;
 
-  @Column('text')
+  @Column('varchar', { length: 255 })
   public token: string;
 
   @Column('simple-json', { default: null })

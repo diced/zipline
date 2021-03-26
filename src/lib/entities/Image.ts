@@ -2,10 +2,10 @@ import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 @Entity({ name: 'zipline_images' })
 export class Image {
-  @PrimaryColumn('text')
+  @PrimaryColumn('varchar', { length: 255 })
   public id: string;
 
-  @Column('text', { default: null })
+  @Column('varchar', { default: null, length: 255 })
   public file: string;
 
   @Column('bigint')

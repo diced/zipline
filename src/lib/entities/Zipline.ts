@@ -3,7 +3,7 @@ import { Entity, Column, PrimaryColumn } from 'typeorm';
 // this will be used for more stuff other than first setups
 @Entity({ name: 'zipline_data' })
 export class Zipline {
-  @PrimaryColumn('text')
+  @PrimaryColumn('varchar', { length: 255 })
   public id: string;
 
   @Column('boolean', { default: true })
