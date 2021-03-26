@@ -45,6 +45,8 @@
     "dev:verbose": "VERBOSE=true ts-node src",
     "build": "next build && tsc -p .",
     "start": "NODE_ENV=production node dist",
+    "start:powershell": "$env:NODE_ENV='production'; node dist",
+    "start:powershell:verbose": "$env:NODE_ENV='production'; $env:VERBOSE='true'; node dist",
     "start:verbose": "NODE_ENV=production VERBOSE=true node dist"
   },
   "devDependencies": {
