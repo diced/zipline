@@ -1,43 +1,49 @@
 import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
 
-const lightTheme = createMuiTheme({
+const blueDarkTheme = createMuiTheme({
   palette: {
-    type: 'light',
+    type: 'dark',
     primary: {
-      main: '#000000'
+      main: '#fff'
     },
     secondary: {
       main: '#4a5bb0'
     },
     background: {
-      default: '#fff',
-      paper: '#f7f7f7'
+      default: '#0b1524',
+      paper: '#0a1930'
     }
   },
   overrides: {
     MuiListItem: {
       root: {
         '&$selected': {
-          backgroundColor: '#e0e0e0'
+          backgroundColor: '#182f52'
         }
       }
     },
     MuiAppBar: {
       root: {
-        borderBottom: '#1f1f1f'
+        borderBottom: '#1f1f1f',
+        backgroundColor: '#162946'
+      }
+    },
+    MuiPaper: {
+      outlined: {
+        borderColor: '#ffffff'
       }
     },
     MuiCard: {
       root: {
-        backgroundColor: '#fff'
+        backgroundColor: '#182f52'
       }
     },
     MuiButton: {
       root: {
-        margin: '132'
+        margin: '1320000'
       }
     }
   }
 });
 
-export default lightTheme;
+export default blueDarkTheme;

@@ -58,13 +58,13 @@ const useStyles = makeStyles(theme => ({
   },
   appBar: {
     display: 'flex',
-    backgroundColor: theme.palette.type === 'dark' ? '#000' : '#fff',
-    color: theme.palette.type !== 'dark' ? '#000' : '#fff',
+    backgroundColor: theme.palette.background.default,
+    color: theme.palette.text.primary,
+    ...theme.overrides.MuiAppBar.root,
     [theme.breakpoints.up('sm')]: {
       width: 'calc(100%)',
       marginLeft: drawerWidth
-    },
-    borderBottom: theme.palette.type === 'dark' ? '1px solid #1f1f1f' : '1px solid #e0e0e0'
+    }
   },
   menuButton: {
     marginRight: theme.spacing(2),
@@ -188,7 +188,9 @@ export default function UI({ children }) {
                 color='inherit'
                 className={classes.rightButton}
               >
-                <Avatar src={`https://www.gravatar.com/avatar/${emailHash}.jpg`}>
+                <Avatar
+                  src={`https://www.gravatar.com/avatar/${emailHash}.jpg`}
+                >
                   {state.user.username[0].toUpperCase()}
                 </Avatar>
               </Button>
@@ -222,9 +224,7 @@ export default function UI({ children }) {
             onClose={() => setAnchorEl(null)}
           >
             <NoFocusMenuItem>
-              <Typography variant='h6'>
-                {state.user.username}
-              </Typography>
+              <Typography variant='h6'>{state.user.username}</Typography>
             </NoFocusMenuItem>
             <Divider />
             <Link href='/user/manage'>

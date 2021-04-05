@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Typography from '@material-ui/core/Typography';
-import Card from '@material-ui/core/Card';
+import Paper from '@material-ui/core/Paper';
 import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
 import Dialog from '@material-ui/core/Dialog';
@@ -12,12 +12,15 @@ import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Snackbar from '@material-ui/core/Snackbar';
 import Grid from '@material-ui/core/Grid';
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
 import Alert from '@material-ui/lab/Alert';
 import { makeStyles } from '@material-ui/core';
-import { UPDATE_USER } from '../reducer';
+import { SET_THEME, UPDATE_USER } from '../reducer';
 import { store } from '../store';
 import { useDispatch } from 'react-redux';
 import { Config } from '../lib/Config';
+import { useRouter } from 'next/router';
 
 const useStyles = makeStyles({
   margin: {
@@ -37,7 +40,12 @@ const useStyles = makeStyles({
 export default function ManageUser({ config }: { config: Config }) {
   const classes = useStyles();
   const dispatch = useDispatch();
+  const router = useRouter();
+
   const state = store.getState();
+  const [theme, setTheme] = useState(
+    state.theme === '' ? 'dark-dark' : state.theme
+  );
   const [alertOpen, setAlertOpen] = useState(false);
   const [mfaDialogOpen, setMfaDialogOpen] = useState(false);
   const [qrcode, setQRCode] = useState(null);
@@ -64,6 +72,12 @@ export default function ManageUser({ config }: { config: Config }) {
       dispatch({ type: UPDATE_USER, payload: d });
       setAlertOpen(true);
     }
+  };
+
+  const handleUpdateTheme = evt => {
+    setTheme(evt.target.value);
+    dispatch({ type: SET_THEME, payload: evt.target.value });
+    router.replace('/user/manage');
   };
 
   const disableMFA = async () => {
@@ -157,11 +171,21 @@ export default function ManageUser({ config }: { config: Config }) {
           </Button>
         </DialogActions>
       </Dialog>
-      <Card>
+      <Paper>
         <CardContent>
           <Typography color='textSecondary' variant='h4' gutterBottom>
             Manage
           </Typography>
+          <Select
+            id='select-theme-zipline'
+            value={theme}
+            onChange={handleUpdateTheme}
+            className={classes.field}
+          >
+            <MenuItem value={'dark-dark'}>Very Dark</MenuItem>
+            <MenuItem value={'blue-dark'}>Dark Blue</MenuItem>
+            <MenuItem value={'light'}>Light</MenuItem>
+          </Select>
           <TextField
             label='Username'
             className={classes.field}
@@ -189,6 +213,13 @@ export default function ManageUser({ config }: { config: Config }) {
           <Button
             className={classes.button}
             color='primary'
+            onClick={handleUpdateTheme}
+          >
+            settheme
+          </Button>
+          <Button
+            className={classes.button}
+            color='primary'
             onClick={handleUpdateUser}
           >
             Update
@@ -203,7 +234,7 @@ export default function ManageUser({ config }: { config: Config }) {
             </Button>
           ) : null}
         </CardActions>
-      </Card>
+      </Paper>
     </React.Fragment>
   );
 }

@@ -1,6 +1,6 @@
 import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
 
-const darkTheme = createMuiTheme({
+const darkdarkTheme = createMuiTheme({
   palette: {
     type: 'dark',
     primary: {
@@ -22,6 +22,12 @@ const darkTheme = createMuiTheme({
         }
       }
     },
+    MuiAppBar: {
+      root: {
+        borderBottom: '#1f1f1f',
+        backgroundColor: '#000000'
+      }
+    },
     MuiCard: {
       root: {
         backgroundColor: '#080808'
@@ -35,4 +41,4 @@ const darkTheme = createMuiTheme({
   }
 });
 
-export default darkTheme;
+export default darkdarkTheme;

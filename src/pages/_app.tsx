@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Head from 'next/head';
 import { Provider } from 'react-redux';
@@ -8,15 +8,11 @@ import ZiplineTheming from '../components/ZiplineTheming';
 import UIPlaceholder from '../components/UIPlaceholder';
 
 function App({ Component, pageProps }) {
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const state = store.getState();
+
   useEffect(() => {
     const jssStyles = document.querySelector('#jss-server-side');
     if (jssStyles) jssStyles.parentElement.removeChild(jssStyles);
-
-    (async () => {
-      const d = await (await fetch('/api/theme')).json();
-      if (!d.error) setTheme(d.theme);
-    })();
   }, []);
   return (
     <React.Fragment>
@@ -33,7 +29,7 @@ function App({ Component, pageProps }) {
           <ZiplineTheming
             Component={Component}
             pageProps={pageProps}
-            theme={theme}
+            theme={state.theme}
           />
         </PersistGate>
       </Provider>

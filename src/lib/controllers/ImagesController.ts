@@ -113,7 +113,7 @@ export class ImagesController {
       if (!f.length) return array;
       return [f].concat(chunk(array.slice(size, array.length), size));
     }
-    const chunks = chunk(images, 20);
+    const chunks = chunk(images, 26);
     return reply.send(chunks);
   }
 }

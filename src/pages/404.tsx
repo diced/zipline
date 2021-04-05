@@ -4,7 +4,7 @@ import Typography from '@material-ui/core/Typography';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Grid from '@material-ui/core/Grid';
 import { ThemeProvider } from '@material-ui/core/styles';
-import dark from '../lib/themes/dark';
+import dark from '../lib/themes/darkdark';
 
 export default function NotFound() {
   useEffect(() => {

@@ -20,7 +20,6 @@ const useStyles = makeStyles(theme => ({
     margin: '5px'
   },
   padding: {
-    border: theme.palette.type === 'dark' ? '1px solid #1f1f1f' : '1px solid #e0e0e0',
     padding: '10px'
   },
   backdrop: {
@@ -34,7 +33,11 @@ export default function Dashboard({ config }) {
   const router = useRouter();
   const state = store.getState();
   const [loading, setLoading] = React.useState(true);
-  const [stats, setStats] = React.useState<{ totalViews: number, averageViews: number, images: number }>(null);
+  const [stats, setStats] = React.useState<{
+    totalViews: number;
+    averageViews: number;
+    images: number;
+  }>(null);
   const [recentImages, setRecentImages] = React.useState([]);
 
   if (typeof window === 'undefined') return <UIPlaceholder />;
@@ -64,7 +67,9 @@ export default function Dashboard({ config }) {
               Welcome back, {state.user.username}
             </Typography>
             <Typography color='textSecondary'>
-              You have <b>{stats.images}</b> images, with <b>{stats.totalViews}</b> ({Math.round(stats.averageViews)}) collectively.
+              You have <b>{stats.images}</b> images, with{' '}
+              <b>{stats.totalViews}</b> ({Math.round(stats.averageViews)})
+              collectively.
             </Typography>
             <Typography variant='h5'>Recent Images</Typography>
             <Grid container spacing={2}>
@@ -76,7 +81,11 @@ export default function Dashboard({ config }) {
                         <CardMedia
                           component='img'
                           height='140'
-                          image={createURL(window.location.href, config ? config.uploader.route : '/u', d.file)}
+                          image={createURL(
+                            window.location.href,
+                            config ? config.uploader.route : '/u',
+                            d.file
+                          )}
                         />
                       </CardActionArea>
                     </Card>

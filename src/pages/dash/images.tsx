@@ -25,7 +25,8 @@ const useStyles = makeStyles(theme => ({
     margin: '5px'
   },
   padding: {
-    border: theme.palette.type === 'dark' ? '1px solid #1f1f1f' : '1px solid #e0e0e0',
+    border:
+      theme.palette.type === 'dark' ? '1px solid #1f1f1f' : '1px solid #e0e0e0',
     padding: '10px'
   },
   backdrop: {
@@ -57,6 +58,7 @@ export default function Images({ config }) {
       const c = await (await fetch('/api/images/chunk')).json();
       if (!c.error) {
         setChunks(c);
+        console.log(c);
         return c;
       }
       return [];
@@ -110,7 +112,7 @@ export default function Images({ config }) {
             {showPagination ? (
               <>
                 <Grid container spacing={2}>
-                  {images.map(d => ((
+                  {images.map(d => (
                     <Grid
                       item
                       xs={12}
@@ -123,12 +125,16 @@ export default function Images({ config }) {
                           <CardMedia
                             component='img'
                             height='140'
-                            image={createURL(window.location.href, config ? config.uploader.route : '/u', d.file)}
+                            image={createURL(
+                              window.location.href,
+                              config ? config.uploader.route : '/u',
+                              d.file
+                            )}
                           />
                         </CardActionArea>
                       </Card>
                     </Grid>
-                  )))}
+                  ))}
                 </Grid>
                 <Pagination count={chunks.length} onChange={changePage} />
               </>
@@ -140,7 +146,7 @@ export default function Images({ config }) {
                 alignItems='center'
                 justify='center'
               >
-                <Grid item xs={6} sm={12}>
+                <Grid item xs>
                   <AddToPhotosIcon style={{ fontSize: 100 }} />
                 </Grid>
               </Grid>
