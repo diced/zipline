@@ -1,6 +1,6 @@
 {
   "name": "zipline-next",
-  "version": "2.8.1",
+  "version": "2.9.0",
   "private": true,
   "dependencies": {
     "@dicedtomato/colors": "^1.0.3",
