@@ -2,7 +2,7 @@ import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 @Entity({ name: 'zipline_images' })
 export class Image {
-  @PrimaryColumn('varchar', { length: 255 })
+  @PrimaryColumn('text')
   public id: string;
 
   @Column('text', { default: null })
