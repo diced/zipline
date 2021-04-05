@@ -5,7 +5,7 @@ export class Image {
   @PrimaryColumn('varchar', { length: 255 })
   public id: string;
 
-  @Column('varchar', { default: null, length: 255 })
+  @Column('text', { default: null })
   public file: string;
 
   @Column('bigint')
