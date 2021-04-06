@@ -34,6 +34,7 @@ import FileCopyIcon from '@material-ui/icons/FileCopy';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import PublishIcon from '@material-ui/icons/Publish';
 import RotateLeftIcon from '@material-ui/icons/RotateLeft';
+import BrushIcon from '@material-ui/icons/Brush';
 import Divider from '@material-ui/core/Divider';
 import copy from 'copy-to-clipboard';
 import { LOGOUT, SET_THEME, Theme, UPDATE_USER } from '../reducer';
@@ -250,10 +251,8 @@ export default function UI({ children }) {
             <MenuItem onClick={() => setResetToken(true)}>
               <RotateLeftIcon className={classes.menuIcon} /> Reset Token
             </MenuItem>
-            <MenuItem onClick={handleLogout}>
-              <ExitToAppIcon className={classes.menuIcon} /> Logout
-            </MenuItem>
             <MenuItem>
+              <BrushIcon className={classes.menuIcon} />
               <Select
                 label='Theme'
                 id='select-theme-zipline'
@@ -267,6 +266,9 @@ export default function UI({ children }) {
                   </MenuItem>
                 ))}
               </Select>
+            </MenuItem>
+            <MenuItem onClick={handleLogout}>
+              <ExitToAppIcon className={classes.menuIcon} /> Logout
             </MenuItem>
           </Menu>
         </Toolbar>
