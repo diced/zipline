@@ -67,9 +67,7 @@ export default function Dashboard({ config }) {
               Welcome back, {state.user.username}
             </Typography>
             <Typography color='textSecondary'>
-              You have <b>{stats.images}</b> images, with{' '}
-              <b>{stats.totalViews}</b> ({Math.round(stats.averageViews)})
-              collectively.
+              You have <b>{stats.images}</b> images.
             </Typography>
             <Typography variant='h5'>Recent Images</Typography>
             <Grid container spacing={2}>

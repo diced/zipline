@@ -10,22 +10,22 @@ const purpleDarkTheme = createMuiTheme({
       main: '#4a5bb0'
     },
     background: {
-      default: '#0b1524',
-      paper: '#0a1930'
+      default: '#240f2e',
+      paper: '#2b0e38'
     }
   },
   overrides: {
     MuiListItem: {
       root: {
         '&$selected': {
-          backgroundColor: '#182f52'
+          backgroundColor: '#461c59'
         }
       }
     },
     MuiAppBar: {
       root: {
         borderBottom: '#1f1f1f',
-        backgroundColor: '#162946'
+        backgroundColor: '#5b2b70'
       }
     },
     MuiPaper: {
