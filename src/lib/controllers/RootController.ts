@@ -54,11 +54,6 @@ export class RootController {
     return first;
   }
 
-  @GET('/theme')
-  async getTheme() {
-    return { theme: config.core.theme || 'dark' };
-  }
-
   @GET('/users')
   async allUsers(req: FastifyRequest, reply: FastifyReply) {
     if (!req.cookies.zipline) return sendError(reply, 'Not logged in.');

@@ -47,7 +47,6 @@ export interface ConfigCore {
   secure?: boolean;
   blacklisted_ips?: string[];
   ratelimiter?: ConfigCoreRateLimiter;
-  theme?: 'dark' | 'light';
   mfa?: boolean;
   log?: boolean;
 }
