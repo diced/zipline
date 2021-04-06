@@ -20,6 +20,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import Select from '@material-ui/core/Select';
 import Button from '@material-ui/core/Button';
 import Alert from '@material-ui/lab/Alert';
 import HomeIcon from '@material-ui/icons/Home';
@@ -35,12 +36,13 @@ import PublishIcon from '@material-ui/icons/Publish';
 import RotateLeftIcon from '@material-ui/icons/RotateLeft';
 import Divider from '@material-ui/core/Divider';
 import copy from 'copy-to-clipboard';
-import { LOGOUT, UPDATE_USER } from '../reducer';
+import { LOGOUT, SET_THEME, Theme, UPDATE_USER } from '../reducer';
 import { makeStyles, useTheme, withStyles } from '@material-ui/core/styles';
 import { useRouter } from 'next/router';
 import { useDispatch } from 'react-redux';
 import { store } from '../store';
 import { MD5 } from 'crypto-js';
+import { friendlyThemeName, themes } from './ZiplineTheming';
 
 const drawerWidth = 240;
 
@@ -104,6 +106,9 @@ export default function UI({ children }) {
   const router = useRouter();
   const dispatch = useDispatch();
   const [emailHash, setEmailHash] = useState('');
+  const [zipTheme, setZipTheme] = useState<Theme>(
+    state.theme === '' ? 'dark-dark' : state.theme
+  );
   const [mobileOpen, setMobileOpen] = useState(false);
   const [admin, setAdmin] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -125,6 +130,12 @@ export default function UI({ children }) {
 
     setEmailHash(MD5(state.user.email).toString());
   }, []);
+
+  const handleUpdateTheme = evt => {
+    setZipTheme(evt.target.value);
+    dispatch({ type: SET_THEME, payload: evt.target.value });
+    router.replace(router.pathname);
+  };
 
   const handleCopyTokenThenClose = async () => {
     const data = await (await fetch('/api/user')).json();
@@ -241,6 +252,21 @@ export default function UI({ children }) {
             </MenuItem>
             <MenuItem onClick={handleLogout}>
               <ExitToAppIcon className={classes.menuIcon} /> Logout
+            </MenuItem>
+            <MenuItem>
+              <Select
+                label='Theme'
+                id='select-theme-zipline'
+                value={zipTheme}
+                onChange={handleUpdateTheme}
+                fullWidth
+              >
+                {Object.keys(themes).map(t => (
+                  <MenuItem value={t} key={t}>
+                    {friendlyThemeName[t]}
+                  </MenuItem>
+                ))}
+              </Select>
             </MenuItem>
           </Menu>
         </Toolbar>

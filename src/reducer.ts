@@ -7,7 +7,7 @@ export const UPDATE_USER = 'UPDATE_USER';
 export const STOP_LOADING = 'STOP_LOADING';
 export const START_LOADING = 'START_LOADING';
 export const SET_THEME = 'SET_THEME';
-export type Theme = 'dark-dark' | 'light' | 'blue-dark';
+export type Theme = 'dark-dark' | 'light' | 'blue-dark' | 'purple-dark';
 
 export interface State {
   loggedIn: boolean;
