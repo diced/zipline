@@ -2,7 +2,7 @@
 
 ![Version](https://img.shields.io/github/package-json/v/diced/zipline)
 ![LICENCE](https://img.shields.io/github/license/diced/zipline)
-[![Discord](https://img.shields.io/discord/729771078196527176)](https://discord.gg/AtTSecwqeV)
+[![Discord](https://img.shields.io/discord/729771078196527176)](https://discord.gg/hCAS87WaQz)
 ![Stars](https://img.shields.io/github/stars/diced/zipline)
 ![GitHub repo size](https://img.shields.io/github/repo-size/diced/zipline)
 ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/diced/zipline/next)
