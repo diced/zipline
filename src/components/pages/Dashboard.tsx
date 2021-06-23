@@ -205,26 +205,29 @@ export default function Dashboard() {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Card>
+      {stats && (
+        <>
+          <Card name='Images per User' sx={{ height: '100%', my: 2 }} elevation={0} variant='outlined'>
+            <StatTable
+              columns={[
+                { id: 'username', name: 'Name' },
+                { id: 'count', name: 'Images' }
+              ]}
+              rows={stats.count_by_user}
+            />
+          </Card>
 
-      <Card name='Images per User' sx={{ height: '100%', my: 2 }} elevation={0} variant='outlined'>
-        <StatTable
-          columns={[
-            { id: 'username', name: 'Name' },
-            { id: 'count', name: 'Images' }
-          ]}
-          rows={stats.count_by_user}
-        />
-      </Card>
-
-      <Card name='Types' sx={{ height: '100%', my: 2 }} elevation={0} variant='outlined'>
-        <StatTable
-          columns={[
-            { id: 'mimetype', name: 'Type' },
-            { id: 'count', name: 'Count' }
-          ]}
-          rows={stats.types_count}
-        />
-      </Card>
+          <Card name='Types' sx={{ height: '100%', my: 2 }} elevation={0} variant='outlined'>
+            <StatTable
+              columns={[
+                { id: 'mimetype', name: 'Type' },
+                { id: 'count', name: 'Count' }
+              ]}
+              rows={stats.types_count}
+            />
+          </Card>
+        </>
+      )}
     </>
   );
 }
