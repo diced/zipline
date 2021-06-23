@@ -3,16 +3,12 @@ const { existsSync } = require('fs');
 const { join, extname } = require('path');
 const validateConfig = require('../server/validateConfig');
 const Logger = require('../src/lib/logger');
+const readConfig = require('../src/lib/readConfig');
 const mimes = require('./mimes');
 const { PrismaClient } = require('@prisma/client');
 
 (async () => {
-  const str = await readFile('./config.toml');
-  const config = require('@iarna/toml/parse-string')(str);
-  if (!existsSync(join(process.cwd(), 'prisma', 'migrations'))) {
-    Logger.get('server').info('detected an uncreated database - creating...');
-    await require('../scripts/deploy-db')(config);
-  }
+  const config = readConfig();
 
   await validateConfig(config);
 

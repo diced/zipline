@@ -3,6 +3,10 @@ name: 'CD: Push Docker Images'
 on:
   push:
     branches: [ trunk ]
+    paths:
+      - 'src/**'
+      - 'server/**'
+      - 'prisma/**'
   workflow_dispatch:
 
 jobs:
