@@ -1,0 +1,24 @@
+[core]
+secure = true
+secret = 'some secret'
+host = '0.0.0.0'
+port = 3000
+
+[database]
+# postgresql
+type = 'psql'
+url = 'postgres://postgres:postgres@postgres/postgres'
+
+# mysql
+# type = 'mysql'
+# url = 'mysql://postgres:postgres@mysql/mysql'
+
+# sqlite
+# type = 'sqlite'
+# url = 'file:sqlite.db'
+
+[uploader]
+route = '/u'
+embed_route = '/a'
+length = 6
+directory = './uploads'

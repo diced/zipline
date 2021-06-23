@@ -1,0 +1,34 @@
+name: 'CI: Build'
+
+on:
+  push:
+    branches: [ trunk ]
+  pull_request:
+    branches: [ trunk ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '16.x'
+      - name: 'Restore dependency cache'
+        id: cache-restore
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node${{ matrix.node }}-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Create mock config
+        run: echo -e "[uploader]\nroute = '/u'\nembed_route = '/a'\nlength = 6\ndirectory = './uploads'" > config.toml
+      
+      - name: Install dependencies
+        if: steps.cache-restore.outputs.cache-hit != 'true'
+        run: yarn install
+      
+      - name: Build
+        run: yarn build
+      

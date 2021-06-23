@@ -1,0 +1,55 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            Int     @id @default(autoincrement())
+  username      String
+  password      String
+  token         String
+  administrator Boolean @default(false)
+  embedTitle    String?
+  embedColor    String  @default("#2f3136")
+  images        Image[]
+  urls          Url[]
+}
+
+model Image {
+  id         Int             @id @default(autoincrement())
+  file       String
+  mimetype   String          @default("image/png")
+  created_at DateTime        @default(now())
+  views      Int             @default(0)
+  invisible  InvisibleImage?
+  user       User            @relation(fields: [userId], references: [id])
+  userId     Int
+}
+
+model InvisibleImage {
+  id     Int
+  image  Image @relation(fields: [id], references: [id])
+
+  invis  String @unique
+}
+
+model Url {
+  id         Int      @id @default(autoincrement())
+  to         String
+  created_at DateTime @default(now())
+  views      Int      @default(0)
+  invisible  InvisibleUrl?
+  user       User     @relation(fields: [userId], references: [id])
+  userId     Int
+}
+
+model InvisibleUrl {
+  id     Int
+  url    Url    @relation(fields: [id], references: [id])
+
+  invis  String @unique
+}
