@@ -7,10 +7,20 @@ import { sign64, unsign64 } from '../util';
 import config from 'lib/config';
 import prisma from 'lib/prisma';
 
+export interface NextApiFile {
+  fieldname: string;
+  originalname: string;
+  encoding: string;
+  mimetype: string;
+  buffer: string;
+  size: number;
+}
+
 export type NextApiReq = NextApiRequest & {
   user: () => Promise<User | null | void>;
   getCookie: (name: string) => string | null;
   cleanCookie: (name: string) => void;
+  file?: NextApiFile;
 }
 
 export type NextApiRes = NextApiResponse & {

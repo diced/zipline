@@ -1,4 +1,4 @@
-import Busboy from 'busboy';
+import multer from 'multer';
 import prisma from 'lib/prisma';
 import zconfig from 'lib/config';
 import { NextApiReq, NextApiRes, withZipline } from 'lib/middleware/withZipline';
@@ -6,6 +6,7 @@ import { randomChars } from 'lib/util';
 import { writeFile } from 'fs/promises';
 import { join } from 'path';
 import Logger from 'lib/logger';
+import { NextApiRequest } from 'next';
 
 interface FileData {
   data: Buffer;
@@ -13,23 +14,9 @@ interface FileData {
   mimetype: string;
 }
 
-function file(req: NextApiReq): Promise<FileData> {
-  return new Promise((res, rej) => {
-    const busboy = new Busboy({ headers: req.headers });
-    const files = [];
-  
-    busboy.on('file', (_, file, name, __, mimetype) => {
-      const ext = name.split('.').pop();
-      file.on('data', data => files.push({ data, ext, mimetype }));
-    });
-  
-    busboy.on('finish', () => {
-      res(files[0]);
-    });
-  
-    req.pipe(busboy);
-  });
-}
+const uploader = multer({
+  storage: multer.memoryStorage(),
+});
 
 async function handler(req: NextApiReq, res: NextApiRes) {
   if (req.method !== 'POST') return res.send(JSON.stringify({error:'no aloow'}));
@@ -42,18 +29,21 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   });
   if (!user) return res.forbid('authorization incorect');
 
-  const data = await file(req);
+  if (!req.file) return res.error('no file');
+
+  const ext = req.file.originalname.split('.').pop();
+
   const rand = randomChars(zconfig.uploader.length);
 
   const image = await prisma.image.create({
     data: {
-      file: `${rand}.${data.ext}`,
-      mimetype: data.mimetype,
+      file: `${rand}.${ext}`,
+      mimetype: req.file.mimetype,
       userId: user.id
     }
   });
 
-  await writeFile(join(process.cwd(), zconfig.uploader.directory, image.file), data.data);
+  await writeFile(join(process.cwd(), zconfig.uploader.directory, image.file), req.file.buffer);
 
   Logger.get('image').info(`User ${user.username} (${user.id}) uploaded an image ${image.file} (${image.id})`);
 
@@ -62,7 +52,21 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   });
 }
 
-export default withZipline(handler);
+function run(middleware: any) {
+  return (req, res) =>
+    new Promise((resolve, reject) => {
+      middleware(req, res, (result) => {
+        if (result instanceof Error) reject(result);
+        resolve(result);
+      });
+    });
+}
+
+export default async function handlers(req, res) {
+  await run(uploader.single('file'))(req, res);
+  
+  return withZipline(handler)(req, res);
+};
 
 export const config = {
   api: {
