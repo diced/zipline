@@ -51,6 +51,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
   return res.json({
     size: bytesToRead(size),
+    size_num: size,
     count,
     count_by_user,
     count_users,

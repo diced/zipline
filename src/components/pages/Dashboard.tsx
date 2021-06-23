@@ -132,7 +132,7 @@ export default function Dashboard() {
             <Card name='Size' sx={{ height: '100%' }}>
               <StatText>{stats.size}</StatText>
               <Typography variant='h3'>Average Size</Typography>
-              <StatText>{bytesToRead(stats.size / stats.count)}</StatText>
+              <StatText>{bytesToRead(stats.size_num / stats.count)}</StatText>
             </Card>
           </Grid>
           <Grid item xs={12} sm={4}>
