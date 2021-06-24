@@ -6,7 +6,8 @@ import config from 'lib/config';
 import prisma from 'lib/prisma';
 
 export default function EmbeddedImage({ image, title, username, color, normal, embed }) {
-  const dataURL = (route: string) => `/${route}/${image.file}`;
+  console.log(normal, embed);
+  const dataURL = (route: string) => `${route}/${image.file}`;
 
   return (
     <>
@@ -69,6 +70,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   if (!image) return {
     notFound: true
+  };
+
+  if (!image.mimetype.startsWith('image')) return {
+    redirect: {
+      permanent: true,
+      destination: `${config.uploader.route}/${image.file}`,
+    }
   };
 
   return {
