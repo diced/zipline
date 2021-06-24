@@ -3,13 +3,15 @@ const { createServer } = require('http');
 const { readFile, stat, mkdir } = require('fs/promises');
 const { existsSync } = require('fs');
 const { execSync } = require('child_process');
-const { join } = require('path');
+const { join, extname } = require('path');
 const { red, green, bold } = require('colorette');
 const { PrismaClient } = require('@prisma/client');
 const validateConfig = require('./validateConfig');
 const Logger = require('../src/lib/logger');
 const getFile = require('./static');
 const readConfig = require('../src/lib/readConfig');
+const mimes = require('../scripts/mimes');
+
 
 Logger.get('server').info('starting zipline server');
 
@@ -89,6 +91,9 @@ function shouldUseYarn() {
               }
             });
             res.setHeader('Content-Type', image.mimetype);
+          } else {
+            const mimetype = mimes[extname(parts[2])] ?? 'application/octet-stream';
+            res.setHeader('Content-Type', mimetype);
           }
 
           res.end(data);
