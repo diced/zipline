@@ -10,7 +10,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
   if (req.method !== 'POST') return res.status(405).end();
 
-  const { username, password } = req.body as { username: string, password: string };
+  const { username, password, administrator } = req.body as { username: string, password: string, administrator: boolean };
 
   if (!username) return res.bad('no username');
   if (!password) return res.bad('no auth');
@@ -28,7 +28,8 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     data: {
       password: hashed,
       username,
-      token: createToken()
+      token: createToken(),
+      administrator
     }
   });
 
