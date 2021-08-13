@@ -6,20 +6,13 @@ import { randomChars } from 'lib/util';
 import { writeFile } from 'fs/promises';
 import { join } from 'path';
 import Logger from 'lib/logger';
-import { NextApiRequest } from 'next';
-
-interface FileData {
-  data: Buffer;
-  ext: string;
-  mimetype: string;
-}
 
 const uploader = multer({
   storage: multer.memoryStorage(),
 });
 
 async function handler(req: NextApiReq, res: NextApiRes) {
-  if (req.method !== 'POST') return res.send(JSON.stringify({error:'no aloow'}));
+  if (req.method !== 'POST') return res.forbid('no allow');
   if (!req.headers.authorization) return res.forbid('no authorization');
   
   const user = await prisma.user.findFirst({
@@ -28,8 +21,8 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     }
   });
   if (!user) return res.forbid('authorization incorect');
-
   if (!req.file) return res.error('no file');
+  console.log(req.file);
 
   const ext = req.file.originalname.split('.').pop();
 

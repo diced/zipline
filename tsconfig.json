@@ -28,6 +28,7 @@
   },
   "include": [
     "next-env.d.ts",
+    "zip-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
     "prisma/seed.ts"

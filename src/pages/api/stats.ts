@@ -2,12 +2,13 @@ import { join } from 'path';
 import { NextApiReq, NextApiRes, withZipline } from 'middleware/withZipline';
 import prisma from 'lib/prisma';
 import { bytesToRead, sizeOfDir } from 'lib/util';
+import config from 'lib/config';
 
 async function handler(req: NextApiReq, res: NextApiRes) {
   const user = await req.user();
   if (!user) return res.forbid('not logged in');
 
-  const size = await sizeOfDir(join(process.cwd(), 'uploads'));
+  const size = await sizeOfDir(join(process.cwd(), config.uploader.directory));
   const byUser = await prisma.image.groupBy({
     by: ['userId'],
     _count: {
