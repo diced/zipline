@@ -2,7 +2,7 @@ import { join } from 'path';
 import { NextApiReq, NextApiRes, withZipline } from 'middleware/withZipline';
 import prisma from 'lib/prisma';
 import { bytesToRead, sizeOfDir } from 'lib/util';
-import { tryGetPreviewData } from 'next/dist/next-server/server/api-utils';
+import { tryGetPreviewData } from 'next/dist/server/api-utils';
 
 async function handler(req: NextApiReq, res: NextApiRes) {
   const user = await req.user();

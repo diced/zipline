@@ -24,7 +24,6 @@
     "@prisma/client": "2.25.0",
     "@reduxjs/toolkit": "^1.6.0",
     "argon2": "^0.28.2",
-    "busboy": "^0.3.1",
     "colorette": "^1.2.2",
     "cookie": "^0.4.1",
     "copy-to-clipboard": "^3.3.1",
@@ -45,8 +44,6 @@
   "devDependencies": {
     "@commitlint/cli": "^12.1.4",
     "@commitlint/config-conventional": "^12.1.4",
-    "@types/bcryptjs": "^2.4.2",
-    "@types/busboy": "^0.2.3",
     "@types/cookie": "^0.4.0",
     "@types/multer": "^1.4.6",
     "@types/node": "^15.12.2",
