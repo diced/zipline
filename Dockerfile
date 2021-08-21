@@ -6,7 +6,7 @@ COPY server ./server
 COPY scripts ./scripts
 COPY prisma/schema.shared.prisma ./prisma/schema.shared.prisma
 
-COPY package.json yarn.lock next.config.js next-env.d.ts tsconfig.json ./
+COPY package.json yarn.lock next.config.js next-env.d.ts zip-env.d.ts tsconfig.json ./
 
 RUN yarn install
 

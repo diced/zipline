@@ -36,6 +36,7 @@ module.exports = async (config) => {
     await prismaRun(config.database.url, ['generate', `--schema=prisma/schema.${config.database.type}.prisma`]);
     await prismaRun(config.database.url, ['db', 'seed', '--preview-feature', `--schema=prisma/schema.${config.database.type}.prisma`]);
   } catch (e) {
+    console.log(e);
     Logger.get('db').error('there was an error.. exiting..');
     rimraf.sync(join(process.cwd(), 'prisma', 'migrations'));
     process.exit(1);
