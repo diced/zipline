@@ -1,4 +1,4 @@
-# Stop using Zipline 1!
+# Stop using Zipline 2!
 This current branch is discontinued, and will not be getting any updates. So...
 Switch to [Zipline 3](https://github.com/diced/zipline/tree/trunk)!<br>
 Switch to [Zipline 3](https://github.com/diced/zipline/tree/trunk)!<br>
