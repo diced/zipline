@@ -1,13 +1,12 @@
-<p align="center"><img src="https://raw.githubusercontent.com/diced/zipline/next/public/zipline_small.png"/></p>
-
-![Version](https://img.shields.io/github/package-json/v/diced/zipline)
-[![Discord](https://img.shields.io/discord/729771078196527176)](https://discord.gg/hCAS87WaQz)
-![Stars](https://img.shields.io/github/stars/diced/zipline)
-![GitHub last commit (branch)](https://img.shields.io/github/last-commit/diced/zipline/next)
+# Stop using Zipline 1!
+This current branch is discontinued, and will not be getting any updates. So...
+Switch to [Zipline 3](https://github.com/diced/zipline/tree/trunk)!<br>
+Switch to [Zipline 3](https://github.com/diced/zipline/tree/trunk)!<br>
+Switch to [Zipline 3](https://github.com/diced/zipline/tree/trunk)!<br>
+Switch to [Zipline 3](https://github.com/diced/zipline/tree/trunk)!<br>
 
 # Zipline
-
-The best **React/Next.js** ShareX / File Uploader you would ever want.
+Switch to [Zipline 3](https://github.com/diced/zipline/tree/trunk)!<br>
 
 # Features
 
@@ -17,8 +16,7 @@ The best **React/Next.js** ShareX / File Uploader you would ever want.
 - Support for **multible database types** (_literally the only one that supports multiple dbs_, mongo soon)
 - Token protected uploading
 - MFA with Authy/Google Authenticator
-- Easy setup instructions on [docs](https://zipline.diced.me/docs)
+- Easy setup instructions on nope
 
 # Installing
-
-[See how to install here](https://zipline.diced.me/docs/)
+nope
