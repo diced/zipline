@@ -1,4 +1,4 @@
-# Stop using Zipline!
+# Stop using Zipline 1!
 This current branch is discontinued, and will not be getting any updates. So...
 Switch to [Zipline-Next](https://github.com/ziplineproject/zipline/tree/next)!<br>
 Switch to [Zipline-Next](https://github.com/ziplineproject/zipline/tree/next)!<br>
