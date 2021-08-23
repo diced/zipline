@@ -30,7 +30,7 @@ export default function Manage({ route }) {
       },
       body
     });
-
+    const json = await res.json();
     if (res.ok && json.error === undefined) {
       setOpen(true);
       setSeverity('success');
