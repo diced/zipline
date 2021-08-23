@@ -30,13 +30,12 @@ export default function Manage({ route }) {
       },
       body
     });
-
-    if (res.ok) {
+    const json = await res.json();
+    if (res.ok && json.error === undefined) {
       setOpen(true);
       setSeverity('success');
-      setMessage(`File uploaded! ${window.location.protocol}//${window.location.host}${route}/${await res.text()}`);
+      setMessage(`File uploaded! ${json.url}`);
     } else {
-      const json = await res.json();
       setOpen(true);
       setSeverity('error');
       setMessage('Could not upload file: ' + json.error);
