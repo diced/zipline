@@ -6,7 +6,7 @@
     "dev": "NODE_ENV=development node server",
     "build": "npm-run-all build:schema build:next",
     "build:next": "next build",
-    "build:schema": "prisma generate --schema=prisma/schema.shared.prisma",
+    "build:schema": "prisma generate --schema=prisma/schema.sqlite.prisma",
     "start": "node server",
     "lint": "next lint",
     "ts-node": "./node_modules/.bin/ts-node --compiler-options \"{\\\"module\\\":\\\"commonjs\\\"}\" --transpile-only",

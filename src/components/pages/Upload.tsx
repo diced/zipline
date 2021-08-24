@@ -3,13 +3,13 @@ import { Typography, Button, CardActionArea, Paper, Box } from '@material-ui/cor
 import { Upload as UploadIcon } from '@material-ui/icons';
 import Dropzone from 'react-dropzone';
 
-import useFetch from 'hooks/useFetch';
 import Backdrop from 'components/Backdrop';
 import Alert from 'components/Alert';
 import { useStoreSelector } from 'lib/redux/store';
 import CenteredBox from 'components/CenteredBox';
+import copy from 'copy-to-clipboard';
 
-export default function Manage({ route }) {
+export default function Upload({ route }) {
   const user = useStoreSelector(state => state.user);
 
   const [file, setFile] = useState(null);
@@ -34,7 +34,8 @@ export default function Manage({ route }) {
     if (res.ok && json.error === undefined) {
       setOpen(true);
       setSeverity('success');
-      setMessage(`File uploaded! ${json.url}`);
+      setMessage(`Copied to clipboard! ${json.url}`);
+      copy(json.url);
     } else {
       setOpen(true);
       setSeverity('error');

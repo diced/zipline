@@ -22,7 +22,6 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   });
   if (!user) return res.forbid('authorization incorect');
   if (!req.file) return res.error('no file');
-  console.log(req.file);
 
   const ext = req.file.originalname.split('.').pop();
 
