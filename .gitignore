@@ -37,4 +37,3 @@ yarn-error.log*
 config.toml
 uploads/
 data.db*
-migrations/
