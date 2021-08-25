@@ -9,7 +9,7 @@
     "build:schema": "prisma generate --schema=prisma/schema.prisma",
     "start": "node server",
     "lint": "next lint",
-    "ts-node": "./node_modules/.bin/ts-node --compiler-options \"{\\\"module\\\":\\\"commonjs\\\"}\" --transpile-only",
+    "ts-node": "ts-node --compiler-options \"{\\\"module\\\":\\\"commonjs\\\"}\" --transpile-only",
     "create-all-migrations": "node scripts/create-migrations",
     "semantic-release": "semantic-release"
   },

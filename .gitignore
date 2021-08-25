@@ -36,6 +36,5 @@ yarn-error.log*
 # zipline
 config.toml
 uploads/
-prisma/schema.prisma
 data.db*
 migrations/
