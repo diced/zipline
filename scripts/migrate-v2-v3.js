@@ -1,6 +1,5 @@
-const { readFile, readdir } = require('fs/promises');
-const { existsSync } = require('fs');
-const { join, extname } = require('path');
+const { readdir } = require('fs/promises');
+const { extname } = require('path');
 const validateConfig = require('../server/validateConfig');
 const Logger = require('../src/lib/logger');
 const readConfig = require('../src/lib/readConfig');

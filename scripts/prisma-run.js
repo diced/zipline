@@ -10,14 +10,17 @@ module.exports = (url, args) => {
       },
     });
 
-    proc.stdout.on('data', d => console.log(d.toString()));
+    let a = '';
+
+    proc.stdout.on('data', d => {
+      console.log(d.toString());
+      a += d.toString();
+    });
     proc.stderr.on('data', d => {
       console.log(d.toString());
-
       rej(d.toString());
     });
-
-    proc.stdout.on('close', () => res());
-    
+    proc.stdout.on('end', () => res(a));
+    proc.stdout.on('close', () => res(a));
   });
 };

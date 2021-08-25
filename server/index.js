@@ -1,16 +1,17 @@
 const next = require('next');
 const { createServer } = require('http');
-const { readFile, stat, mkdir } = require('fs/promises');
-const { existsSync } = require('fs');
+const { stat, mkdir } = require('fs/promises');
 const { execSync } = require('child_process');
-const { join, extname } = require('path');
+const { extname } = require('path');
 const { red, green, bold } = require('colorette');
 const { PrismaClient } = require('@prisma/client');
 const validateConfig = require('./validateConfig');
 const Logger = require('../src/lib/logger');
 const getFile = require('./static');
+const prismaRun = require('../scripts/prisma-run');
 const readConfig = require('../src/lib/readConfig');
 const mimes = require('../scripts/mimes');
+const deployDb = require('../scripts/deploy-db');
 
 
 Logger.get('server').info('starting zipline server');
@@ -34,14 +35,14 @@ function shouldUseYarn() {
 (async () => {
   try {
     const config = readConfig();
-    
-    if (!existsSync(join(process.cwd(), 'prisma', 'migrations'))) {
-      Logger.get('server').info('detected an uncreated database - creating...');
-      require('../scripts/deploy-db')(config);
-    }
-
     await validateConfig(config);
 
+    const data = await prismaRun(config.database.url, ['migrate', 'status']);
+    if (data.includes('Following migration have not yet been applied:')) {
+      Logger.get('database').info('some migrations are not applied, applying them now...');
+      await deployDb(config);
+      Logger.get('database').info('finished applying migrations');
+    }
     process.env.DATABASE_URL = config.database.url;
 
     await stat('./.next');
@@ -115,7 +116,6 @@ function shouldUseYarn() {
     });
 
     srv.listen(config.core.port, config.core.host ?? '0.0.0.0');
-    
   } catch (e) {
     if (e.message && e.message.startsWith('Could not find a production')) {
       Logger.get('web').error(`there is no production build - run \`${shouldUseYarn() ? 'yarn build' : 'npm build'}\``);

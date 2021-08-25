@@ -13,7 +13,7 @@ export interface ConfigCore {
 }
 
 export interface ConfigDatabase {
-  type: 'psql' | 'mysql' | 'sqlite';
+  type: 'psql';
   url: string;
 }
 
