@@ -6,7 +6,6 @@ import config from 'lib/config';
 import prisma from 'lib/prisma';
 
 export default function EmbeddedImage({ image, title, username, color, normal, embed }) {
-  console.log(normal, embed);
   const dataURL = (route: string) => `${route}/${image.file}`;
 
   return (
