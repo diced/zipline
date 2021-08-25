@@ -4,7 +4,7 @@ WORKDIR /build
 COPY src ./src
 COPY server ./server
 COPY scripts ./scripts
-COPY prisma/schema.prisma ./prisma/schema.prisma
+COPY prisma ./prisma
 
 COPY package.json yarn.lock next.config.js next-env.d.ts zip-env.d.ts tsconfig.json ./
 
@@ -23,6 +23,7 @@ COPY --from=builder /build/node_modules ./node_modules
 COPY --from=builder /build/src ./src
 COPY --from=builder /build/server ./server
 COPY --from=builder /build/scripts ./scripts
+COPY --from=builder /build/prisma ./prisma
 COPY --from=builder /build/.next ./.next
 COPY --from=builder /build/tsconfig.json ./tsconfig.json
 COPY --from=builder /build/package.json ./package.json
