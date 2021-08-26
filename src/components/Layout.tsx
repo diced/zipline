@@ -210,12 +210,12 @@ export default function Layout({ children, user, loading, noPaper }) {
                   id='zipline-user-menu'
                   anchorEl={anchorEl}
                   open={open}
-                  onClose={handleClose}
+                  onClose={handleClose(null)}
                   MenuListProps={{
                     'aria-labelledby': 'basic-button',
                   }}
                 >
-                  <MenuItem>
+                  <MenuItem disableRipple>
                     <Typography variant='h5'>
                       <b>{user.username}</b>
                     </Typography>
@@ -335,12 +335,12 @@ export default function Layout({ children, user, loading, noPaper }) {
                 id='zipline-user-menu'
                 anchorEl={anchorEl}
                 open={open}
-                onClose={handleClose}
+                onClose={handleClose(null)}
                 MenuListProps={{
                   'aria-labelledby': 'basic-button',
                 }}
               >
-                <MenuItem>
+                <MenuItem disableRipple>
                   <Typography variant='h5'>
                     <b>{user.username}</b>
                   </Typography>
