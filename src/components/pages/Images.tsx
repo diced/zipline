@@ -4,18 +4,15 @@ import { Grid, Pagination, Box, Typography } from '@material-ui/core';
 import Backdrop from 'components/Backdrop';
 import ZiplineImage from 'components/Image';
 import useFetch from 'hooks/useFetch';
-import { useStoreSelector } from 'lib/redux/store';
 
 export default function Upload() {
-  const user = useStoreSelector(state => state.user);
-
   const [pages, setPages] = useState([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
 
   const updatePages = async () => {
     setLoading(true);
-    const pages = await useFetch('/api/user/images?paged=true');
+    const pages = await useFetch('/api/user/images?paged=true&filter=image');
     setPages(pages);
     setLoading(false);
   };

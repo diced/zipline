@@ -25,7 +25,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
     return res.json(image);
   } else {
-    const images = await prisma.image.findMany({
+    let images = await prisma.image.findMany({
       where: {
         userId: user.id
       },
@@ -40,6 +40,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   
     // @ts-ignore
     images.map(image => image.url = `${config.uploader.route}/${image.file}`);
+    if (req.query.filter && req.query.filter === 'image') images = images.filter(x => x.mimetype.startsWith('image'));
   
     return res.json(req.query.paged ? chunk(images, 16) : images);
   }
