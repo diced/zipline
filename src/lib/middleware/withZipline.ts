@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { CookieSerializeOptions } from 'cookie';
-import type { User } from '@prisma/client';
+import type { Image, Theme, User } from '@prisma/client';
 
 import { serialize } from 'cookie';
 import { sign64, unsign64 } from '../util';
@@ -17,7 +17,18 @@ export interface NextApiFile {
 }
 
 export type NextApiReq = NextApiRequest & {
-  user: () => Promise<User | null | void>;
+  user: () => Promise<{
+    username: string;
+    token: string;
+    embedTitle: string;
+    embedColor: string;
+    systemTheme: string;
+    customTheme?: Theme;
+    administrator: boolean;
+    id: number;
+    images: Image[];
+    password: string;
+  } | null | void>;
   getCookie: (name: string) => string | null;
   cleanCookie: (name: string) => void;
   file?: NextApiFile;
@@ -83,6 +94,18 @@ export const withZipline = (handler: (req: NextApiRequest, res: NextApiResponse)
       const user = await prisma.user.findFirst({
         where: {
           id: Number(userId)
+        },
+        select: {
+          administrator: true,
+          embedColor: true,
+          embedTitle: true,
+          id: true,
+          images: true,
+          password: true,
+          systemTheme: true,
+          customTheme: true,
+          token: true,
+          username: true
         }
       });
 

@@ -31,13 +31,48 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       data: { embedColor: req.body.embedColor }
     });
 
+    if (req.body.systemTheme) await prisma.user.update({
+      where: { id: user.id },
+      data: { systemTheme: req.body.systemTheme }
+    });
+
+    if (req.body.customTheme) {
+      if (user.customTheme) await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          customTheme: {
+            update: {
+              ...req.body.customTheme
+            }
+          }
+        }
+      }); else await prisma.theme.create({
+        data: {
+          userId: user.id,
+          ...req.body.customTheme
+        }
+      });
+    }
+
     const newUser = await prisma.user.findFirst({
-      where: { id: user.id }
+      where: {
+        id: Number(user.id)
+      },
+      select: {
+        administrator: true,
+        embedColor: true,
+        embedTitle: true,
+        id: true,
+        images: false,
+        password: false,
+        systemTheme: true,
+        customTheme: true,
+        token: true,
+        username: true
+      }
     });
 
     Logger.get('user').info(`User ${user.username} (${newUser.username}) (${newUser.id}) was updated`);
-
-    delete newUser.password;
 
     return res.json(newUser);
   } else {

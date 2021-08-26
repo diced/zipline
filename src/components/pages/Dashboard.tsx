@@ -24,6 +24,7 @@ type Aligns = 'inherit' | 'right' | 'left' | 'center' | 'justify';
 
 export function bytesToRead(bytes: number) {
   if (isNaN(bytes)) return '0.0 B';
+  if (bytes === Infinity) return '0.0 B';
   const units = ['B', 'kB', 'MB', 'GB', 'TB', 'PB'];
   let num = 0;
 
@@ -96,7 +97,7 @@ export default function Dashboard() {
     const imgs = await useFetch('/api/user/images');
     const stts = await useFetch('/api/stats');
     setImages(imgs);
-    setStats(stts);
+    setStats(stts);console.log(stts);
 
     setApiLoading(false);
   };

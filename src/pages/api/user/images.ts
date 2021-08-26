@@ -27,7 +27,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   } else {
     const images = await prisma.image.findMany({
       where: {
-        user
+        userId: user.id
       },
       select: {
         created_at: true,
