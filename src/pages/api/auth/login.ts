@@ -20,10 +20,10 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     }
   });
 
-  if (!user) return res.status(404).end(JSON.stringify({ message: 'not found' }));
+  if (!user) return res.status(404).end(JSON.stringify({ error: 'User not found' }));
 
   const valid = await checkPassword(password, user.password);
-  if (!valid) return res.forbid('wrong password');
+  if (!valid) return res.forbid('Wrong password');
 
   res.setCookie('user', user.id, { sameSite: true, maxAge: 10000000, path: '/' });
 

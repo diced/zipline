@@ -3,15 +3,15 @@
 import createTheme from '.';
 
 export default createTheme({
-  type: 'dark',
-  primary: '#E6B450',
-  secondary: '#FFEE99',
-  error: '#F07178',
-  warning: '#F29668',
+  type: 'light',
+  primary: '#FF9940',
+  secondary: '#E6BA7E',
+  error: '#F07171',
+  warning: '#ED9366',
   info: '#95E6CB',
-  border: '#0D1016',
+  border: '#FFFFFF',
   background: {
-    main: '#0A0E14',
-    paper: '#0D1016'
+    main: '#FAFAFA',
+    paper: '#FFFFFF'
   }
 });
