@@ -4,19 +4,31 @@ import { CssBaseline } from '@material-ui/core';
 import dark_blue from 'lib/themes/dark_blue';
 import dark from 'lib/themes/dark';
 import ayu_dark from 'lib/themes/ayu_dark';
+import ayu_mirage from 'lib/themes/ayu_mirage';
+import ayu_light from 'lib/themes/ayu_light';
+import nord from 'lib/themes/nord';
+import polar from 'lib/themes/polar';
 import { useStoreSelector } from 'lib/redux/store';
 import createTheme from 'lib/themes';
 
 export const themes = {
   'dark_blue': dark_blue,
   'dark': dark,
-  'ayu_dark': ayu_dark
+  'ayu_dark': ayu_dark,
+  'ayu_mirage': ayu_mirage,
+  'ayu_light': ayu_light,
+  'nord': nord,
+  'polar': polar
 };
 
 export const friendlyThemeName = {
   'dark_blue': 'Dark Blue',
   'dark': 'Very Dark',
-  'ayu_dark': 'Ayu Dark'
+  'ayu_dark': 'Ayu Dark',
+  'ayu_mirage': 'Ayu Mirage',
+  'ayu_light': 'Ayu Light',
+  'nord': 'Nord',
+  'polar': 'Polar'
 };
 
 export default function ZiplineTheming({ Component, pageProps }) {

@@ -4,14 +4,14 @@ import createTheme from '.';
 
 export default createTheme({
   type: 'dark',
-  primary: '#E6B450',
-  secondary: '#FFEE99',
-  error: '#F07178',
-  warning: '#F29668',
+  primary: '#FFCC66',
+  secondary: '#FFD580',
+  error: '#F28779',
+  warning: '#F29E74',
   info: '#95E6CB',
-  border: '#0D1016',
+  border: '#232834',
   background: {
-    main: '#0A0E14',
-    paper: '#0D1016'
+    main: '#1F2430',
+    paper: '#232834'
   }
 });
