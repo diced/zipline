@@ -2,10 +2,17 @@ import prisma from 'lib/prisma';
 import { NextApiReq, NextApiRes, withZipline } from 'middleware/withZipline';
 import { checkPassword } from 'lib/util';
 import Logger from 'lib/logger';
+import prismaRun from '../../../../scripts/prisma-run';
+import config from 'lib/config';
 
 async function handler(req: NextApiReq, res: NextApiRes) {
   if (req.method !== 'POST') return res.status(405).end();
   const { username, password } = req.body as { username: string, password: string };
+
+  const users = await prisma.user.findMany();
+  if (users.length === 0) {
+    await prismaRun(config.database.url, ['db', 'seed', '--preview-feature']);
+  }
 
   const user = await prisma.user.findFirst({
     where: {

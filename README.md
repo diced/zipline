@@ -17,9 +17,8 @@ Fast & lightweight file uploading.
 - Configurable
 - Fast
 - Built with Next.js & React
-- Support for **multible database types**
 - Token protected uploading
-- Easy setup instructions on [docs](https://zipline.diced.me)
+- Easy setup instructions on [docs](https://zipline.diced.me) (One command install `docker-compose up`)
 
 # Installing
 

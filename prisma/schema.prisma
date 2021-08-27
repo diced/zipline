@@ -13,10 +13,27 @@ model User {
   password      String
   token         String
   administrator Boolean @default(false)
+  systemTheme   String  @default("dark_blue")
+  customTheme   Theme?
   embedTitle    String?
   embedColor    String  @default("#2f3136")
   images        Image[]
   urls          Url[]
+}
+
+model Theme {
+  id              Int    @id @default(autoincrement())
+  type            String
+  primary         String
+  secondary       String
+  error           String
+  warning         String
+  info            String
+  border          String
+  mainBackground  String
+  paperBackground String
+  user            User   @relation(fields: [userId], references: [id])
+  userId          Int
 }
 
 model Image {
@@ -31,25 +48,25 @@ model Image {
 }
 
 model InvisibleImage {
-  id     Int
-  image  Image @relation(fields: [id], references: [id])
+  id    Int
+  image Image @relation(fields: [id], references: [id])
 
-  invis  String @unique
+  invis String @unique
 }
 
 model Url {
-  id         Int      @id @default(autoincrement())
+  id         Int           @id @default(autoincrement())
   to         String
-  created_at DateTime @default(now())
-  views      Int      @default(0)
+  created_at DateTime      @default(now())
+  views      Int           @default(0)
   invisible  InvisibleUrl?
-  user       User     @relation(fields: [userId], references: [id])
+  user       User          @relation(fields: [userId], references: [id])
   userId     Int
 }
 
 model InvisibleUrl {
-  id     Int
-  url    Url    @relation(fields: [id], references: [id])
+  id  Int
+  url Url @relation(fields: [id], references: [id])
 
-  invis  String @unique
+  invis String @unique
 }

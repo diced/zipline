@@ -23,6 +23,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Select,
 } from '@material-ui/core';
 import {
   Menu as MenuIcon,
@@ -33,10 +34,15 @@ import {
   ContentCopy as CopyIcon,
   Autorenew as ResetIcon,
   Logout as LogoutIcon,
-  PeopleAlt as UsersIcon
+  PeopleAlt as UsersIcon,
+  Brush as BrushIcon
 } from '@material-ui/icons';
 import copy from 'copy-to-clipboard';
 import Backdrop from './Backdrop';
+import { friendlyThemeName, themes } from './Theming';
+import { useRouter } from 'next/router';
+import { useStoreDispatch } from 'lib/redux/store';
+import { updateUser } from 'lib/redux/reducers/user';
 
 const items = [
   {
@@ -122,11 +128,14 @@ function ResetTokenDialog({ open, setOpen, setToken }) {
 }
 
 export default function Layout({ children, user, loading, noPaper }) {
+  const [systemTheme, setSystemTheme] = useState(user.systemTheme || 'dark_blue');
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [copyOpen, setCopyOpen] = useState(false);
   const [resetOpen, setResetOpen] = useState(false);
   const [token, setToken] = useState(user?.token);
+  const router = useRouter();
+  const dispatch = useStoreDispatch();
 
   const open = Boolean(anchorEl);
   const handleClick = e => setAnchorEl(e.currentTarget);
@@ -140,6 +149,17 @@ export default function Layout({ children, user, loading, noPaper }) {
       break;
     }
     setAnchorEl(null);
+  };
+
+  const handleUpdateTheme = async (event: React.ChangeEvent<{ value: string }>) => {
+    const newUser = await useFetch('/api/user', 'PATCH', {
+      systemTheme: event.target.value || 'dark_blue'
+    });
+
+    setSystemTheme(newUser.systemTheme);
+    dispatch(updateUser(newUser));
+
+    router.replace(router.pathname);
   };
 
   const drawer = (
@@ -221,6 +241,22 @@ export default function Layout({ children, user, loading, noPaper }) {
                       </MenuItem>
                     </a>
                   </Link>
+                  <MenuItem>
+                    <BrushIcon sx={{ mr: 2 }} />
+                    <Select
+                      variant='standard'
+                      label='Theme'
+                      value={systemTheme}
+                      onChange={handleUpdateTheme}
+                      fullWidth
+                    >
+                      {Object.keys(themes).map(t => (
+                        <MenuItem value={t} key={t}>
+                          {friendlyThemeName[t]}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </MenuItem>
                 </Menu>
               </Box>
             )}

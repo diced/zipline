@@ -56,6 +56,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
   });
 
+  if (!image) return {
+    notFound: true
+  };
+
   const user = await prisma.user.findFirst({
     select: {
       embedTitle: true,
@@ -66,11 +70,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       id: image.userId
     }
   });
-
-  if (!image) return {
-    notFound: true
-  };
-
+  
   if (!image.mimetype.startsWith('image')) return {
     redirect: {
       permanent: true,

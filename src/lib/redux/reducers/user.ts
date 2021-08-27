@@ -1,3 +1,4 @@
+import { Theme } from '@prisma/client';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export interface User {
@@ -5,6 +6,8 @@ export interface User {
   token: string;
   embedTitle: string;
   embedColor: string;
+  systemTheme: string;
+  customTheme?: Theme;
 }
 
 const initialState: User = null;
