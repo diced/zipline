@@ -97,7 +97,7 @@ export default function Dashboard() {
     const imgs = await useFetch('/api/user/images');
     const stts = await useFetch('/api/stats');
     setImages(imgs);
-    setStats(stts);console.log(stts);
+    setStats(stts);
 
     setApiLoading(false);
   };

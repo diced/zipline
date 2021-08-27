@@ -24,16 +24,31 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     Logger.get('image').info(`User ${user.username} (${user.id}) deleted an image ${image.file} (${image.id})`);
 
     return res.json(image);
+  } else if (req.method === 'PATCH') {
+    if (!req.body.id) return res.error('no file id');
+
+    let image;
+
+    if (req.body.favorite !== null) image = await prisma.image.update({
+      where: { id: req.body.id },
+      data: {
+        favorite: req.body.favorite
+      }
+    });
+
+    return res.json(image);
   } else {
     let images = await prisma.image.findMany({
       where: {
-        userId: user.id
+        userId: user.id,
+        favorite: !!req.query.favorite
       },
       select: {
         created_at: true,
         file: true,
         mimetype: true,
-        id: true
+        id: true,
+        favorite: true
       }
     });
 

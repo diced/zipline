@@ -142,7 +142,6 @@ export default function Manage() {
       setLoading(true);
 
       const newUser = await useFetch('/api/user', 'PATCH', { customTheme: values });
-      console.log(newUser);
 
       if (newUser.error) {
         setLoading(false);

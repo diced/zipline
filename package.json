@@ -10,7 +10,6 @@
     "start": "node server",
     "lint": "next lint",
     "ts-node": "ts-node --compiler-options \"{\\\"module\\\":\\\"commonjs\\\"}\" --transpile-only",
-    "create-all-migrations": "node scripts/create-migrations",
     "semantic-release": "semantic-release"
   },
   "dependencies": {

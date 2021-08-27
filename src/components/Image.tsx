@@ -16,7 +16,7 @@ export default function Image({ image, updateImages }) {
   
   const handleDelete = async () => {
     const res = await useFetch('/api/user/images', 'DELETE', { id: image.id });
-    if (!res.error) updateImages();
+    if (!res.error) updateImages(true);
     
     setAnchorEl(null);
   };
@@ -24,6 +24,11 @@ export default function Image({ image, updateImages }) {
   const handleCopy = () => {
     copy(`${window.location.protocol}//${window.location.host}${image.url}`);
     setAnchorEl(null);
+  };
+
+  const handleFavorite = async () => {
+    const data = await useFetch('/api/user/images', 'PATCH', { id: image.id, favorite: !image.favorite });
+    if (!data.error) updateImages(true);
   };
 
   return (
@@ -54,6 +59,7 @@ export default function Image({ image, updateImages }) {
         <ButtonGroup variant='contained'>
           <Button onClick={handleDelete} color='primary'>Delete</Button>
           <Button onClick={handleCopy} color='primary'>Copy URL</Button>
+          <Button onClick={handleFavorite} color='primary'>{image.favorite ? 'Unfavorite' : 'Favorite'}</Button>
         </ButtonGroup>
       </Popover>
     </>
