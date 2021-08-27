@@ -8,6 +8,7 @@ import ayu_mirage from 'lib/themes/ayu_mirage';
 import ayu_light from 'lib/themes/ayu_light';
 import nord from 'lib/themes/nord';
 import polar from 'lib/themes/polar';
+import dracula from 'lib/themes/dracula';
 import { useStoreSelector } from 'lib/redux/store';
 import createTheme from 'lib/themes';
 
@@ -18,7 +19,8 @@ export const themes = {
   'ayu_mirage': ayu_mirage,
   'ayu_light': ayu_light,
   'nord': nord,
-  'polar': polar
+  'polar': polar,
+  'dracula': dracula
 };
 
 export const friendlyThemeName = {
@@ -28,7 +30,8 @@ export const friendlyThemeName = {
   'ayu_mirage': 'Ayu Mirage',
   'ayu_light': 'Ayu Light',
   'nord': 'Nord',
-  'polar': 'Polar'
+  'polar': 'Polar',
+  'dracula': 'Dracula'
 };
 
 export default function ZiplineTheming({ Component, pageProps }) {
