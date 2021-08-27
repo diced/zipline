@@ -9,7 +9,7 @@ export default createTheme({
   error: '#F28779',
   warning: '#F29E74',
   info: '#95E6CB',
-  border: '#232834',
+  border: '#363c4d',
   background: {
     main: '#1F2430',
     paper: '#232834'

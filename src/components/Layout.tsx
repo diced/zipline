@@ -221,12 +221,10 @@ export default function Layout({ children, user, loading, noPaper }) {
                     </Typography>
                   </MenuItem>
                   <Divider />
-                  <Link href='/dashboard/manage'>
-                    <a style={{ color: 'white', textDecoration: 'none' }}>
-                      <MenuItem onClick={handleClose(null)}>
-                        <AccountIcon sx={{ mr: 2 }} /> Manage Account
-                      </MenuItem>
-                    </a>
+                  <Link href='/dashboard/manage' passHref>
+                    <MenuItem onClick={handleClose(null)}>
+                      <AccountIcon sx={{ mr: 2 }} /> Manage Account
+                    </MenuItem>
                   </Link>
                   <MenuItem onClick={handleClose('copy')}>
                     <CopyIcon sx={{ mr: 2 }} /> Copy Token
@@ -234,12 +232,10 @@ export default function Layout({ children, user, loading, noPaper }) {
                   <MenuItem onClick={handleClose('reset')}>
                     <ResetIcon sx={{ mr: 2 }} /> Reset Token
                   </MenuItem>
-                  <Link href='/auth/logout'>
-                    <a style={{ color: 'white', textDecoration: 'none' }}>
-                      <MenuItem onClick={handleClose(null)}>
-                        <LogoutIcon sx={{ mr: 2 }} /> Logout
-                      </MenuItem>
-                    </a>
+                  <Link href='/auth/logout' passHref>
+                    <MenuItem onClick={handleClose(null)}>
+                      <LogoutIcon sx={{ mr: 2 }} /> Logout
+                    </MenuItem>
                   </Link>
                   <MenuItem>
                     <BrushIcon sx={{ mr: 2 }} />
@@ -266,23 +262,19 @@ export default function Layout({ children, user, loading, noPaper }) {
       <Divider />
       <List>
         {items.map((item, i) => (
-          <Link key={i} href={item.link}>
-            <a href={item.link} style={{ color: 'white', textDecoration: 'none' }}>
-              <ListItem button>
-                <ListItemIcon>{item.icon}</ListItemIcon>
-                <ListItemText primary={item.text} />
-              </ListItem>
-            </a>
+          <Link key={i} href={item.link} passHref>
+            <ListItem button>
+              <ListItemIcon>{item.icon}</ListItemIcon>
+              <ListItemText primary={item.text} />
+            </ListItem>
           </Link>
         ))}
         {user && user.administrator && (
           <Link href='/dashboard/users' passHref>
-            <a style={{ color: 'white', textDecoration: 'none' }}>
-              <ListItem button>
-                <ListItemIcon><UsersIcon /></ListItemIcon>
-                <ListItemText primary='Users' />
-              </ListItem>
-            </a>
+            <ListItem button>
+              <ListItemIcon><UsersIcon /></ListItemIcon>
+              <ListItemText primary='Users' />
+            </ListItem>
           </Link>
         )}
       </List>
@@ -346,12 +338,10 @@ export default function Layout({ children, user, loading, noPaper }) {
                   </Typography>
                 </MenuItem>
                 <Divider />
-                <Link href='/dash/manage'>
-                  <a style={{ color: 'white', textDecoration: 'none' }}>
-                    <MenuItem onClick={handleClose(null)}>
-                      <AccountIcon sx={{ mr: 2 }} /> Manage Account
-                    </MenuItem>
-                  </a>
+                <Link href='/dash/manage' passHref>
+                  <MenuItem onClick={handleClose(null)}>
+                    <AccountIcon sx={{ mr: 2 }} /> Manage Account
+                  </MenuItem>
                 </Link>
                 <MenuItem onClick={handleClose('copy')}>
                   <CopyIcon sx={{ mr: 2 }} /> Copy Token
@@ -359,12 +349,10 @@ export default function Layout({ children, user, loading, noPaper }) {
                 <MenuItem onClick={handleClose('reset')}>
                   <ResetIcon sx={{ mr: 2 }} /> Reset Token
                 </MenuItem>
-                <Link href='/auth/logout'>
-                  <a style={{ color: 'white', textDecoration: 'none' }}>
-                    <MenuItem onClick={handleClose(null)}>
-                      <LogoutIcon sx={{ mr: 2 }} /> Logout
-                    </MenuItem>
-                  </a>
+                <Link href='/auth/logout' passHref>
+                  <MenuItem onClick={handleClose(null)}>
+                    <LogoutIcon sx={{ mr: 2 }} /> Logout
+                  </MenuItem>
                 </Link>
               </Menu>
             </Box>
