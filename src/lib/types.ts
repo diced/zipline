@@ -10,11 +10,9 @@ export interface ConfigCore {
 
   // The port Zipline will run on
   port: number;
-}
 
-export interface ConfigDatabase {
-  type: 'psql';
-  url: string;
+  // The PostgreSQL database url
+  database_url: string
 }
 
 export interface ConfigUploader {
@@ -33,6 +31,5 @@ export interface ConfigUploader {
 
 export interface Config {
   core: ConfigCore;
-  database: ConfigDatabase;
   uploader: ConfigUploader;
 }

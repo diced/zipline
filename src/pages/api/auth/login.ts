@@ -11,7 +11,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
   const users = await prisma.user.findMany();
   if (users.length === 0) {
-    await prismaRun(config.database.url, ['db', 'seed', '--preview-feature']);
+    await prismaRun(config.core.database_url, ['db', 'seed', '--preview-feature']);
   }
 
   const user = await prisma.user.findFirst({

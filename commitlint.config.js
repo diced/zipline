@@ -40,6 +40,7 @@ module.exports = {
         'scripts',
         'server',
         'pages',
+        'config',
         'api',
         'hooks',
         'components',

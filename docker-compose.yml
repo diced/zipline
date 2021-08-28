@@ -24,7 +24,6 @@ services:
       - SECRET=changethis
       - HOST=0.0.0.0
       - PORT=3000
-      - DATABASE_TYPE=psql
       - DATABASE_URL=postgresql://postgres:postgres@postgres/postgres/
       - UPLOADER_ROUTE=/u
       - UPLOADER_EMBED_ROUTE=/a

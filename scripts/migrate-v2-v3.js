@@ -11,7 +11,7 @@ const { PrismaClient } = require('@prisma/client');
 
   await validateConfig(config);
 
-  process.env.DATABASE_URL = config.database.url;
+  process.env.DATABASE_URL = config.core.database_url;
 
   const files = await readdir(process.argv[2]);
   const data = files.map(x => {

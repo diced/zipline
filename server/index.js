@@ -37,13 +37,13 @@ function shouldUseYarn() {
     const config = readConfig();
     await validateConfig(config);
 
-    const data = await prismaRun(config.database.url, ['migrate', 'status']);
+    const data = await prismaRun(config.core.database_url, ['migrate', 'status'], true);
     if (data.includes('Following migration have not yet been applied:')) {
       Logger.get('database').info('some migrations are not applied, applying them now...');
       await deployDb(config);
       Logger.get('database').info('finished applying migrations');
     }
-    process.env.DATABASE_URL = config.database.url;
+    process.env.DATABASE_URL = config.core.database_url;
 
     await stat('./.next');
     await mkdir(config.uploader.directory, { recursive: true });

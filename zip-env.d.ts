@@ -5,7 +5,7 @@ declare global {
   namespace NodeJS {
     interface Global {
       prisma: PrismaClient;
-      config: Config
+      config: Config;
     }
   }
 }

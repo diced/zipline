@@ -3,10 +3,7 @@ secure = true
 secret = 'some secret'
 host = '0.0.0.0'
 port = 3000
-
-[database]
-type = 'psql'
-url = 'postgres://postgres:postgres@postgres/postgres'
+database_url = 'postgres://postgres:postgres@postgres/postgres'
 
 [uploader]
 route = '/u'
