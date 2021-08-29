@@ -57,7 +57,7 @@ function tryReadEnv() {
     let value = process.env[envValue.val];
 
     if (envValue.required && !value) {
-      Logger.get('config').error('there is no config file or required environment variables... exiting...');
+      Logger.get('config').error(`there is no config file or required environment variables (${envValue.val})... exiting...`);
 
       process.exit(1);
     }

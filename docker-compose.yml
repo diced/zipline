@@ -29,6 +29,9 @@ services:
       - UPLOADER_EMBED_ROUTE=/a
       - UPLOADER_LENGTH=6
       - UPLOADER_DIRECTORY=./uploads
+      - UPLOADER_ADMIN_LIMIT=104900000
+      - UPLOADER_USER_LIMIT=104900000
+      - UPLOADER_DISABLED_EXTS=
     volumes:
       - '$PWD/uploads:/zipline/uploads'
       - '$PWD/prisma:/zipline/prisma'
