@@ -26,7 +26,6 @@ export type NextApiReq = NextApiRequest & {
     customTheme?: Theme;
     administrator: boolean;
     id: number;
-    images: Image[];
     password: string;
   } | null | void>;
   getCookie: (name: string) => string | null;
@@ -100,7 +99,6 @@ export const withZipline = (handler: (req: NextApiRequest, res: NextApiResponse)
           embedColor: true,
           embedTitle: true,
           id: true,
-          images: true,
           password: true,
           systemTheme: true,
           customTheme: true,
