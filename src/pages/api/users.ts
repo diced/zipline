@@ -35,7 +35,9 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         administrator: true,
         token: true,
         embedColor: true,
-        embedTitle: true
+        embedTitle: true,
+        customTheme: true,
+        systemTheme: true
       }
     });
     return res.json(all_users);

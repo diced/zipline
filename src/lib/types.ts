@@ -27,6 +27,15 @@ export interface ConfigUploader {
 
   // Where uploads are stored
   directory: string;
+
+  // Admin file upload limit
+  admin_limit: number;
+
+  // User file upload limit
+  user_limit: number;
+
+  // Disabled extensions to block from uploading
+  disabled_extentions: string[];
 }
 
 export interface Config {

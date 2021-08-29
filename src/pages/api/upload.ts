@@ -22,11 +22,12 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   });
   if (!user) return res.forbid('authorization incorect');
   if (!req.file) return res.error('no file');
+  if (req.file.size > zconfig.uploader[user.administrator ? 'admin_limit' : 'user_limit']) return res.error('file size too big');
 
   const ext = req.file.originalname.split('.').pop();
-
+  if (zconfig.uploader.disabled_extentions.includes(ext)) return res.error('disabled extension recieved: ' + ext);
+  
   const rand = randomChars(zconfig.uploader.length);
-
   const image = await prisma.image.create({
     data: {
       file: `${rand}.${ext}`,

@@ -10,3 +10,6 @@ route = '/u'
 embed_route = '/a'
 length = 6
 directory = './uploads'
+user_limit = 104900000 # 100mb
+admin_limit = 104900000 # 100mb
+disabled_extentions = ['jpg']

@@ -16,7 +16,10 @@ module.exports = async config => {
     path('uploader.route', 'string'),
     path('uploader.embed_route', 'string'),
     path('uploader.length', 'number'),
-    path('uploader.directory', 'string')
+    path('uploader.directory', 'string'),
+    path('uploader.admin_limit', 'number'),
+    path('uploader.user_limit', 'number'),
+    path('uploader.disabled_extentions', 'object'),
   ];
 
   let errors = 0;
@@ -25,11 +28,11 @@ module.exports = async config => {
     const path = paths[i];
     const value = dot(path.path, config);
     if (value === undefined) {
-      Logger.get('config').error(`there was no ${path.path} in config`);
+      Logger.get('config').error(`there was no ${path.path} in config which was required`);
       ++errors;
     }
-    const type = typeof value;
 
+    const type = typeof value;
     if (value !== undefined && type !== path.type) {
       Logger.get('config').error(`expected ${path.type} on ${path.path}, but got ${type}`);
       ++errors;

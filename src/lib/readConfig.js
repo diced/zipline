@@ -2,7 +2,7 @@ const { existsSync, readFileSync } = require('fs');
 const { join } = require('path');
 const Logger = require('./logger');
 
-const e = (val, type, fn) => ({ val, type, fn });
+const e = (val, type, fn, required = true) => ({ val, type, fn, required });
 
 const envValues = [
   e('SECURE', 'boolean', (c, v) => c.core.secure = v),
@@ -13,7 +13,10 @@ const envValues = [
   e('UPLOADER_ROUTE', 'string', (c, v) => c.uploader.route = v),
   e('UPLOADER_EMBED_ROUTE', 'string', (c, v) => c.uploader.embed_route = v),
   e('UPLOADER_LENGTH', 'number', (c, v) => c.uploader.length = v),
-  e('UPLOADER_DIRECTORY', 'string', (c, v) => c.uploader.directory = v)
+  e('UPLOADER_DIRECTORY', 'string', (c, v) => c.uploader.directory = v),
+  e('UPLOADER_ADMIN_LIMIT', 'number', (c, v) => c.uploader.admin_limit = v),
+  e('UPLOADER_USER_LIMIT', 'number', (c, v) => c.uploader.user_limit = v),
+  e('UPLOADER_DISABLED_EXTS', 'array', (c, v) => c.uploader.disabled_extentions = v),
 ];
 
 module.exports = () => {
@@ -35,17 +38,17 @@ function tryReadEnv() {
       secure: undefined,
       secret: undefined,
       host: undefined,
-      port: undefined
-    },
-    database: {
-      type: undefined,
-      url: undefined
+      port: undefined,
+      database_url: undefined,
     },
     uploader: {
       route: undefined,
       embed_route: undefined,
       length: undefined,
-      directory: undefined
+      directory: undefined,
+      admin_limit: undefined,
+      user_limit: undefined,
+      disabled_extentions: undefined
     }
   };
 
@@ -53,7 +56,7 @@ function tryReadEnv() {
     const envValue = envValues[i];
     let value = process.env[envValue.val];
 
-    if (!value) {
+    if (envValue.required && !value) {
       Logger.get('config').error('there is no config file or required environment variables... exiting...');
 
       process.exit(1);
@@ -62,6 +65,7 @@ function tryReadEnv() {
     envValues[i].fn(config, value);
     if (envValue.type === 'number') value = parseToNumber(value);
     else if (envValue.type === 'boolean') value = parseToBoolean(value);
+    else if (envValue.type === 'array') value = parseToArray(value);
     envValues[i].fn(config, value);
   }
 
@@ -79,4 +83,8 @@ function parseToBoolean(value) {
   // infer that it is a string since env values are only strings
   if (!value || value === 'false') return false;
   else return true;
+}
+
+function parseToArray(value) {
+  return value.split(',');
 }
