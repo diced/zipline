@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { TextField, Button, Box, Typography, Select, MenuItem } from '@material-ui/core';
+import Download from '@material-ui/icons/Download';
 
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -82,6 +83,30 @@ export default function Manage() {
   const [open, setOpen] = useState(false);
   const [severity, setSeverity] = useState('success');
   const [message, setMessage] = useState('Saved');
+
+  const genShareX = withEmbed => {
+    let config = {
+      Version: '13.2.1',
+      Name: 'Zipline',
+      DestinationType: 'ImageUploader, TextUploader',
+      RequestMethod: 'POST',
+      RequestURL: `${window.location.protocol + '//' + window.location.hostname + (window.location.port ? ':' + window.location.port : '')}/api/upload`,
+      Headers: {
+        Authorization: user?.token,
+        ...(withEmbed && {Embed: 'true'})
+      },
+      URL: '$json:url$',
+      Body: 'MultipartFormData',
+      FileFormName: 'file'
+    };
+    var pseudoElement = document.createElement('a');
+    pseudoElement.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(JSON.stringify(config, null, '\t')));
+    pseudoElement.setAttribute('download', `zipline${withEmbed ? '_embed' : ''}.sxcu`);
+    pseudoElement.style.display = 'none';
+    document.body.appendChild(pseudoElement);
+    pseudoElement.click();
+    pseudoElement.parentNode.removeChild(pseudoElement);
+  };
 
   const formik = useFormik({
     initialValues: {
@@ -217,6 +242,9 @@ export default function Manage() {
           >Save Theme</Button>
         </Box>
       </form>
+      <Typography variant='h4' py={2}>ShareX Config</Typography>
+      <Button variant='contained' onClick={() => genShareX(false)} startIcon={<Download />}>ShareX Config</Button>
+      <Button variant='contained' sx={{ marginLeft: 1 }} onClick={() => genShareX(true)} startIcon={<Download />}>ShareX Config with Embed</Button>
     </>
   );
 }
