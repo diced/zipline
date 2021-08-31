@@ -84,8 +84,8 @@ export default function Manage() {
   const [severity, setSeverity] = useState('success');
   const [message, setMessage] = useState('Saved');
 
-  const genShareX = withEmbed => {
-    let config = {
+  const genShareX = (withEmbed: boolean = false, withZws: boolean = false) => {
+    const config = {
       Version: '13.2.1',
       Name: 'Zipline',
       DestinationType: 'ImageUploader, TextUploader',
@@ -93,15 +93,17 @@ export default function Manage() {
       RequestURL: `${window.location.protocol + '//' + window.location.hostname + (window.location.port ? ':' + window.location.port : '')}/api/upload`,
       Headers: {
         Authorization: user?.token,
-        ...(withEmbed && {Embed: 'true'})
+        ...(withEmbed && {Embed: 'true'}),
+        ...(withZws && {ZWS: 'true'})
       },
       URL: '$json:url$',
       Body: 'MultipartFormData',
       FileFormName: 'file'
     };
-    var pseudoElement = document.createElement('a');
-    pseudoElement.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(JSON.stringify(config, null, '\t')));
-    pseudoElement.setAttribute('download', `zipline${withEmbed ? '_embed' : ''}.sxcu`);
+
+    const pseudoElement = document.createElement('a');
+    pseudoElement.setAttribute('href', 'data:application/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(config, null, '\t')));
+    pseudoElement.setAttribute('download', `zipline${withEmbed ? '_embed' : ''}${withZws ? '_zws' : ''}.sxcu`);
     pseudoElement.style.display = 'none';
     document.body.appendChild(pseudoElement);
     pseudoElement.click();
@@ -245,6 +247,7 @@ export default function Manage() {
       <Typography variant='h4' py={2}>ShareX Config</Typography>
       <Button variant='contained' onClick={() => genShareX(false)} startIcon={<Download />}>ShareX Config</Button>
       <Button variant='contained' sx={{ marginLeft: 1 }} onClick={() => genShareX(true)} startIcon={<Download />}>ShareX Config with Embed</Button>
+      <Button variant='contained' sx={{ marginLeft: 1 }} onClick={() => genShareX(false, true)} startIcon={<Download />}>ShareX Config with ZWS</Button>
     </>
   );
 }

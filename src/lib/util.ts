@@ -1,8 +1,9 @@
-import { createHmac, timingSafeEqual } from 'crypto';
+import { createHmac, randomBytes, timingSafeEqual } from 'crypto';
 import { hash, verify } from 'argon2';
 import { readdir, stat } from 'fs/promises';
 import { join } from 'path';
 import prisma from './prisma';
+import { InvisibleImage } from '@prisma/client';
 
 export async function hashPassword(s: string): Promise<string> {
   return await hash(s);
@@ -89,13 +90,14 @@ export function bytesToRead(bytes: number) {
 }
 
 export function createInvisURL(length: number) {
+  // some parts from https://github.com/tycrek/ass/blob/master/generators/lengthGen.js
   const invisibleCharset = ['\u200B', '\u2060', '\u200C', '\u200D'];
-  for (var i = 0, output = ''; i <= length; ++i) output += invisibleCharset[Math.floor(Math.random() * 4)];
-  return output;
+  
+  return [...randomBytes(length)].map((byte) => invisibleCharset[Number(byte) % invisibleCharset.length]).join('').slice(1).concat(invisibleCharset[0]);
 }
 
 export function createInvis(length: number, imageId: number) {
-  const retry = async () => {
+  const retry = async (): Promise<InvisibleImage> => {
     const invis = createInvisURL(length);
 
     const existing = await prisma.invisibleImage.findUnique({
@@ -109,7 +111,7 @@ export function createInvis(length: number, imageId: number) {
     const inv = await prisma.invisibleImage.create({
       data: {
         invis,
-        id: imageId
+        imageId
       }
     });
 

@@ -64,40 +64,46 @@ function shouldUseYarn() {
         const parts = req.url.split('/');
         if (!parts[2] || parts[2] === '') return;
 
-        const data = await getFile(config.uploader.directory, parts[2]);
-        if (!data) {
-          app.render404(req, res);
+        let image = await prisma.image.findFirst({
+          where: {
+            OR: { file: parts[2] },
+            OR: { invisible: { invis: decodeURI(parts[2]) } }
+          },
+          select: {
+            mimetype: true,
+            id: true,
+            file: true,
+            invisible: true
+          }
+        });
+
+        if (!image) {
+          const data = await getFile(config.uploader.directory, parts[2]);
+          if (!data) return app.render404(req, res);
+
+          const mimetype = mimes[extname(parts[2])] ?? 'application/octet-stream';
+          res.setHeader('Content-Type', mimetype);
+          res.end(data);
         } else {
-          let image = await prisma.image.findFirst({
-            where: {
-              OR: {
-                file: parts[2],
-              },
-              OR: {
-                invisible: {
-                  invis: decodeURI(parts[2])
-                }
-              }
-            }
-          });
           if (image) {
+            const data = await getFile(config.uploader.directory, image.file);
+            if (!data) return app.render404(req, res);
+
             await prisma.image.update({
-              where: {
-                id: image.id,
-              },
-              data: {
-                views: {
-                  increment: 1
-                }
-              }
+              where: { id: image.id },
+              data: { views: { increment: 1 } }
             });
             res.setHeader('Content-Type', image.mimetype);
+            res.end(data);
           } else {
+            const data = await getFile(config.uploader.directory, parts[2]);
+            if (!data) return app.render404(req, res);
+  
             const mimetype = mimes[extname(parts[2])] ?? 'application/octet-stream';
             res.setHeader('Content-Type', mimetype);
+            res.end(data);
           }
 
-          res.end(data);
         }
       } else {
         handle(req, res);

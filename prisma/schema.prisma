@@ -49,10 +49,11 @@ model Image {
 }
 
 model InvisibleImage {
-  id    Int
-  image Image @relation(fields: [id], references: [id])
-
+  id Int    @id @default(autoincrement())
   invis String @unique
+
+  imageId Int
+  image Image @relation(fields: [imageId], references: [id])
 }
 
 model Url {

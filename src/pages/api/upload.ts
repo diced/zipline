@@ -2,7 +2,7 @@ import multer from 'multer';
 import prisma from 'lib/prisma';
 import zconfig from 'lib/config';
 import { NextApiReq, NextApiRes, withZipline } from 'lib/middleware/withZipline';
-import { randomChars } from 'lib/util';
+import { createInvis, randomChars } from 'lib/util';
 import { writeFile } from 'fs/promises';
 import { join } from 'path';
 import Logger from 'lib/logger';
@@ -26,8 +26,9 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
   const ext = req.file.originalname.split('.').pop();
   if (zconfig.uploader.disabled_extentions.includes(ext)) return res.error('disabled extension recieved: ' + ext);
-  
   const rand = randomChars(zconfig.uploader.length);
+
+  let invis;
   const image = await prisma.image.create({
     data: {
       file: `${rand}.${ext}`,
@@ -35,13 +36,15 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       userId: user.id
     }
   });
+  
+  if (req.headers.zws) invis = await createInvis(zconfig.uploader.length, image.id);
 
   await writeFile(join(process.cwd(), zconfig.uploader.directory, image.file), req.file.buffer);
 
   Logger.get('image').info(`User ${user.username} (${user.id}) uploaded an image ${image.file} (${image.id})`);
 
   return res.json({
-    url: `${zconfig.core.secure ? 'https' : 'http'}://${req.headers.host}${req.headers.embed ? zconfig.uploader.embed_route : zconfig.uploader.route}/${image.file}`
+    url: `${zconfig.core.secure ? 'https' : 'http'}://${req.headers.host}${req.headers.embed ? zconfig.uploader.embed_route : zconfig.uploader.route}/${invis ? invis.invis : image.file}`
   });
 }
 
