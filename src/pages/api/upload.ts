@@ -33,7 +33,8 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     data: {
       file: `${rand}.${ext}`,
       mimetype: req.file.mimetype,
-      userId: user.id
+      userId: user.id,
+      embed: !!req.headers.embed
     }
   });
   
@@ -44,7 +45,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   Logger.get('image').info(`User ${user.username} (${user.id}) uploaded an image ${image.file} (${image.id})`);
 
   return res.json({
-    url: `${zconfig.core.secure ? 'https' : 'http'}://${req.headers.host}${req.headers.embed ? zconfig.uploader.embed_route : zconfig.uploader.route}/${invis ? invis.invis : image.file}`
+    url: `${zconfig.core.secure ? 'https' : 'http'}://${req.headers.host}${zconfig.uploader.route}/${invis ? invis.invis : image.file}`
   });
 }
 

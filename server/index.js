@@ -60,14 +60,16 @@ function shouldUseYarn() {
     const prisma = new PrismaClient();
   
     const srv = createServer(async (req, res) => {
-      if (req.url.startsWith(config.uploader.route)) {
+      if (req.url.startsWith('/raw')) {
         const parts = req.url.split('/');
         if (!parts[2] || parts[2] === '') return;
 
         let image = await prisma.image.findFirst({
           where: {
-            OR: { file: parts[2] },
-            OR: { invisible: { invis: decodeURI(parts[2]) } }
+            OR: [
+              { file: parts[2] },
+              { invisible:{ invis: decodeURI(parts[2]) } }
+            ]
           },
           select: {
             mimetype: true,

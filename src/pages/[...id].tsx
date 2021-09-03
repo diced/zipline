@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Head from 'next/head';
 import { GetServerSideProps } from 'next';
 import { Box } from '@material-ui/core';
@@ -8,31 +8,47 @@ import prisma from 'lib/prisma';
 export default function EmbeddedImage({ image, title, username, color, normal, embed }) {
   const dataURL = (route: string) => `${route}/${image.file}`;
 
+  const updateImage = () => {
+    const original = new Image;
+    original.src = dataURL('/raw');
+
+    const imageEl = document.getElementById('image_content') as HTMLImageElement;
+    imageEl.width = Math.floor(original.width * Math.min((innerHeight / original.height), (innerWidth / original.width)));
+    imageEl.height = innerHeight;
+  };
+
+  if (typeof window !== 'undefined') window.onresize = () => updateImage();
+
+  useEffect(() => updateImage(), []);
+
   return (
     <>
       <Head>
-        {title ? (
+        {embed && (
           <>
-            <meta property='og:site_name' content={`${image.file} • ${username}`} />
-            <meta property='og:title' content={title} />
+            {title ? (
+              <>
+                <meta property='og:site_name' content={`${image.file} • ${username}`} />
+                <meta property='og:title' content={title} />
+              </>
+            ) : (
+              <meta property='og:title' content={`${image.file} • ${username}`} />
+            )}
+            <meta property='theme-color' content={color}/>
+            <meta property='og:url' content={dataURL(normal)} />
+            <meta property='og:image' content={dataURL('/raw')} />
+            <meta property='twitter:card' content='summary_large_image' />
           </>
-        ) : (
-          <meta property='og:title' content={`${image.file} • ${username}`} />
         )}
-        <meta property='theme-color' content={color}/>
-        <meta property='og:url' content={dataURL(embed)} />
-        <meta property='og:image' content={dataURL(normal)} />
-        <meta property='twitter:card' content='summary_large_image' />
         <title>{image.file}</title>
       </Head>
-
       <Box
         display='flex'
         justifyContent='center'
         alignItems='center'
         minHeight='100vh'
       >
-        <img src={dataURL(normal)} alt={dataURL(normal)}/>
+        <img src={dataURL('/raw')} alt={dataURL('/raw')} id='image_content' />
       </Box>
     </>
   );
@@ -41,24 +57,28 @@ export default function EmbeddedImage({ image, title, username, color, normal, e
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const id = context.params.id[1];
   const route = context.params.id[0];
-  if (route !== config.uploader.embed_route.substr(1)) return {
+  if (route !== config.uploader.route.substring(1)) return {
     notFound: true
   };
 
   const image = await prisma.image.findFirst({
     where: {
-      file: id
+      OR: [
+        { file: id },
+        { invisible: { invis: id } }
+      ]
     },
     select: {
-      file: true,
       mimetype: true,
-      userId: true
+      id: true,
+      file: true,
+      invisible: true,
+      userId: true,
+      embed: true
     }
   });
 
-  if (!image) return {
-    notFound: true
-  };
+  if (!image) return { notFound: true };
 
   const user = await prisma.user.findFirst({
     select: {
@@ -74,7 +94,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   if (!image.mimetype.startsWith('image')) return {
     redirect: {
       permanent: true,
-      destination: `${config.uploader.route}/${image.file}`,
+      destination: `raw/${image.file}`,
     }
   };
 
@@ -85,7 +105,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       color: user.embedColor,
       username: user.username,
       normal: config.uploader.route,
-      embed: config.uploader.embed_route
+      embed: image.embed
     }
   };
 };

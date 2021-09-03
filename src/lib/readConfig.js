@@ -11,12 +11,11 @@ const envValues = [
   e('PORT', 'number', (c, v) => c.core.port = v),
   e('DATABASE_URL', 'string', (c, v) => c.core.database_url = v),
   e('UPLOADER_ROUTE', 'string', (c, v) => c.uploader.route = v),
-  e('UPLOADER_EMBED_ROUTE', 'string', (c, v) => c.uploader.embed_route = v),
   e('UPLOADER_LENGTH', 'number', (c, v) => c.uploader.length = v),
   e('UPLOADER_DIRECTORY', 'string', (c, v) => c.uploader.directory = v),
   e('UPLOADER_ADMIN_LIMIT', 'number', (c, v) => c.uploader.admin_limit = v),
   e('UPLOADER_USER_LIMIT', 'number', (c, v) => c.uploader.user_limit = v),
-  e('UPLOADER_DISABLED_EXTS', 'array', (c, v) => c.uploader.disabled_extentions = v),
+  e('UPLOADER_DISABLED_EXTS', 'array', (c, v) => v ? c.uploader.disabled_extentions = v : c.uploader.disabled_extentions = [], false),
 ];
 
 module.exports = () => {
@@ -43,7 +42,6 @@ function tryReadEnv() {
     },
     uploader: {
       route: undefined,
-      embed_route: undefined,
       length: undefined,
       directory: undefined,
       admin_limit: undefined,
@@ -63,10 +61,12 @@ function tryReadEnv() {
     }
 
     envValues[i].fn(config, value);
-    if (envValue.type === 'number') value = parseToNumber(value);
-    else if (envValue.type === 'boolean') value = parseToBoolean(value);
-    else if (envValue.type === 'array') value = parseToArray(value);
-    envValues[i].fn(config, value);
+    if (envValue.required) {
+      if (envValue.type === 'number') value = parseToNumber(value);
+      else if (envValue.type === 'boolean') value = parseToBoolean(value);
+      else if (envValue.type === 'array') value = parseToArray(value);
+      envValues[i].fn(config, value);
+    }
   }
 
   return config;

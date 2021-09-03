@@ -43,6 +43,7 @@ model Image {
   created_at DateTime        @default(now())
   views      Int             @default(0)
   favorite   Boolean         @default(false)
+  embed      Boolean         @default(false)
   invisible  InvisibleImage?
   user       User            @relation(fields: [userId], references: [id])
   userId     Int

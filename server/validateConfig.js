@@ -14,7 +14,6 @@ module.exports = async config => {
     path('core.port', 'number'),
     path('core.database_url', 'string'),
     path('uploader.route', 'string'),
-    path('uploader.embed_route', 'string'),
     path('uploader.length', 'number'),
     path('uploader.directory', 'string'),
     path('uploader.admin_limit', 'number'),
