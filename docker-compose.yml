@@ -15,7 +15,7 @@ services:
       retries: 5
 
   zipline:
-    image: diced/zipline:trunk
+    image: ghcr.io/diced/zipline/zipline:trunk
     ports:
       - '3000:3000'
     restart: unless-stopped
@@ -34,7 +34,6 @@ services:
       - UPLOADER_DISABLED_EXTS=
     volumes:
       - '$PWD/uploads:/zipline/uploads'
-      - '$PWD/prisma:/zipline/prisma'
       - '$PWD/public:/zipline/public'
     depends_on:
       - 'postgres'

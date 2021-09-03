@@ -17,7 +17,6 @@ export default function MyApp({ Component, pageProps }) {
     <Provider store={store}>
       <Head>
         <title>{Component.title}</title>
-        <meta name='description' content='Zipline' />
         <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
       </Head>
       <Theming
