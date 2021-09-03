@@ -12,7 +12,7 @@ export default function EmbeddedImage({ image, title, username, color, normal, e
     const imageEl = document.getElementById('image_content') as HTMLImageElement;
 
     const original = new Image;
-    original.src = dataURL('/raw');
+    original.src = dataURL('/r');
 
     if (original.width > innerWidth) { 
       imageEl.width = Math.floor(original.width * Math.min((innerHeight / original.height), (innerWidth / original.width)));
@@ -44,7 +44,7 @@ export default function EmbeddedImage({ image, title, username, color, normal, e
             <meta property='og:url' content={dataURL(normal)} />
           </>
         )}
-        <meta property='og:image' content={dataURL('/raw')} />
+        <meta property='og:image' content={dataURL('/r')} />
         <meta property='twitter:card' content='summary_large_image' />
         <title>{image.file}</title>
       </Head>
@@ -54,7 +54,7 @@ export default function EmbeddedImage({ image, title, username, color, normal, e
         alignItems='center'
         minHeight='100vh'
       >
-        <img src={dataURL('/raw')} alt={dataURL('/raw')} id='image_content' />
+        <img src={dataURL('/r')} alt={dataURL('/r')} id='image_content' />
       </Box>
     </>
   );

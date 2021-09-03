@@ -60,7 +60,7 @@ function shouldUseYarn() {
     const prisma = new PrismaClient();
   
     const srv = createServer(async (req, res) => {
-      if (req.url.startsWith('/raw')) {
+      if (req.url.startsWith('/r')) {
         const parts = req.url.split('/');
         if (!parts[2] || parts[2] === '') return;
 
