@@ -86,6 +86,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   if (!image) return { notFound: true };
 
+  if (!image.embed) return { redirect: {
+    permanent: true,
+    destination: '/r/' + image.file,
+  } };
+
   const user = await prisma.user.findFirst({
     select: {
       embedTitle: true,
@@ -100,7 +105,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   if (!image.mimetype.startsWith('image')) return {
     redirect: {
       permanent: true,
-      destination: `raw/${image.file}`,
+      destination: '/r/' + image.file,
     }
   };
 

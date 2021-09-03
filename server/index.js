@@ -45,7 +45,7 @@ function shouldUseYarn() {
     }
     process.env.DATABASE_URL = config.core.database_url;
 
-    await stat('./.next');
+    // await stat('./.next');
     await mkdir(config.uploader.directory, { recursive: true });
 
     const app = next({
