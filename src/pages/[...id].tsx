@@ -14,17 +14,11 @@ export default function EmbeddedImage({ image, title, username, color, normal, e
     const original = new Image;
     original.src = dataURL('/r');
 
-    if (original.width > innerWidth) { 
-      imageEl.width = Math.floor(original.width * Math.min((innerHeight / original.height), (innerWidth / original.width)));
-      imageEl.height = innerHeight;
-    } else {
-      imageEl.width = original.width;
-      imageEl.height = original.height;
-    }
+    if (original.width > innerWidth) imageEl.width = Math.floor(original.width * Math.min((innerHeight / original.height), (innerWidth / original.width)));
+    else imageEl.width = original.width;
   };
 
   if (typeof window !== 'undefined') window.onresize = () => updateImage();
-
   useEffect(() => updateImage(), []);
 
   return (
