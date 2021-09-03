@@ -54,7 +54,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
   
     // @ts-ignore
-    images.map(image => image.url = `${config.uploader.route}/${image.file}`);
+    images.map(image => image.url = `/raw/${image.file}`);
     if (req.query.filter && req.query.filter === 'image') images = images.filter(x => x.mimetype.startsWith('image'));
   
     return res.json(req.query.paged ? chunk(images, 16) : images);

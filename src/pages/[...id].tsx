@@ -9,12 +9,18 @@ export default function EmbeddedImage({ image, title, username, color, normal, e
   const dataURL = (route: string) => `${route}/${image.file}`;
 
   const updateImage = () => {
+    const imageEl = document.getElementById('image_content') as HTMLImageElement;
+
     const original = new Image;
     original.src = dataURL('/raw');
 
-    const imageEl = document.getElementById('image_content') as HTMLImageElement;
-    imageEl.width = Math.floor(original.width * Math.min((innerHeight / original.height), (innerWidth / original.width)));
-    imageEl.height = innerHeight;
+    if (original.width > innerWidth) { 
+      imageEl.width = Math.floor(original.width * Math.min((innerHeight / original.height), (innerWidth / original.width)));
+      imageEl.height = innerHeight;
+    } else {
+      imageEl.width = original.width;
+      imageEl.height = original.height;
+    }
   };
 
   if (typeof window !== 'undefined') window.onresize = () => updateImage();
@@ -36,10 +42,10 @@ export default function EmbeddedImage({ image, title, username, color, normal, e
             )}
             <meta property='theme-color' content={color}/>
             <meta property='og:url' content={dataURL(normal)} />
-            <meta property='og:image' content={dataURL('/raw')} />
-            <meta property='twitter:card' content='summary_large_image' />
           </>
         )}
+        <meta property='og:image' content={dataURL('/raw')} />
+        <meta property='twitter:card' content='summary_large_image' />
         <title>{image.file}</title>
       </Head>
       <Box
