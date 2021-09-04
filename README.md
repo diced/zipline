@@ -1,25 +1,28 @@
-<p align="center"><img src="https://raw.githubusercontent.com/diced/zipline/trunk/public/zipline_small.png"/></p>
+<div align="center">
+  <img src="https://raw.githubusercontent.com/diced/zipline/trunk/public/zipline_small.png"/>
+  
+  Zipline is a file sharing, URL sharing, lightweight and easy to use!
+  
+  ![Build](https://img.shields.io/github/workflow/status/diced/zipline/CD:%20Push%20Docker%20Images?logo=github&style=flat-square)
+  ![Stars](https://img.shields.io/github/stars/diced/zipline?logo=github&style=flat-square)
+  ![Version](https://img.shields.io/github/package-json/v/diced/zipline?logo=git&logoColor=white&style=flat-square)
+  ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/diced/zipline/trunk?logo=git&logoColor=white&style=flat-square)
+  [![Discord](https://img.shields.io/discord/729771078196527176?color=%23777ed3&label=discord&logo=discord&logoColor=white&style=flat-square)](https://discord.gg/EAhCRfGxCF)
+  
+</div>
 
-![Version](https://img.shields.io/github/package-json/v/diced/zipline)
-![LICENCE](https://img.shields.io/github/license/diced/zipline)
-[![Discord](https://img.shields.io/discord/729771078196527176)](https://discord.gg/EAhCRfGxCF)
-![Stars](https://img.shields.io/github/stars/diced/zipline)
-![GitHub repo size](https://img.shields.io/github/repo-size/diced/zipline)
-![GitHub last commit (branch)](https://img.shields.io/github/last-commit/diced/zipline/trunk)
-<br>
-
-# Zipline
-
-Fast & lightweight file uploading.
-
-# Features
-
+## Features
 - Configurable
 - Fast
 - Built with Next.js & React
 - Token protected uploading
 - Easy setup instructions on [docs](https://zipline.diced.me) (One command install `docker-compose up`)
 
-# Installing
+## Installing
+[See how to install here](https://zipline.diced.me/get-started)
 
-[See how to install here](https://zipline.diced.me/docs/getting-started)
+## Configuration
+[See how to configure here](https://zipline.diced.me/configuration/overview)
+
+## Theming
+[See how to theme here](https://zipline.diced.me/themes)
