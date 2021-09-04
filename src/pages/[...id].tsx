@@ -4,6 +4,7 @@ import { GetServerSideProps } from 'next';
 import { Box } from '@material-ui/core';
 import config from 'lib/config';
 import prisma from 'lib/prisma';
+import getFile from '../../server/static';
 
 export default function EmbeddedImage({ image, title, username, color, normal, embed }) {
   const dataURL = (route: string) => `${route}/${image.file}`;
@@ -80,10 +81,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   if (!image) return { notFound: true };
 
-  if (!image.embed) return { redirect: {
-    permanent: true,
-    destination: '/r/' + image.file,
-  } };
+  if (!image.embed) {
+    const data = await getFile(config.uploader.directory, id);
+    if (!data) return { notFound: true };
+
+    context.res.end(data);
+    return { props: {} };
+  };
 
   const user = await prisma.user.findFirst({
     select: {
@@ -96,11 +100,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
   });
   
-  if (!image.mimetype.startsWith('image')) return {
-    redirect: {
-      permanent: true,
-      destination: '/r/' + image.file,
-    }
+  if (!image.mimetype.startsWith('image')) {
+    const data = await getFile(config.uploader.directory, id);
+    if (!data) return { notFound: true };
+
+    context.res.end(data);
+    return { props: {} };
   };
 
   return {
