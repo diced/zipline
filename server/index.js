@@ -12,9 +12,9 @@ const prismaRun = require('../scripts/prisma-run');
 const readConfig = require('../src/lib/readConfig');
 const mimes = require('../scripts/mimes');
 const deployDb = require('../scripts/deploy-db');
+const { version } = require('../package.json');
 
-
-Logger.get('server').info('starting zipline server');
+Logger.get('server').info(`starting zipline@${version} server`);
 
 const dev = process.env.NODE_ENV === 'development';
 
@@ -42,10 +42,11 @@ function shouldUseYarn() {
       Logger.get('database').info('some migrations are not applied, applying them now...');
       await deployDb(config);
       Logger.get('database').info('finished applying migrations');
+    } else {
+      Logger.get('database').info('migrations up to date');
     }
     process.env.DATABASE_URL = config.core.database_url;
 
-    // await stat('./.next');
     await mkdir(config.uploader.directory, { recursive: true });
 
     const app = next({
@@ -55,6 +56,7 @@ function shouldUseYarn() {
     }, config.core.port, config.core.host);
 
     await app.prepare();
+    await stat('./.next');
 
     const handle = app.getRequestHandler();
     const prisma = new PrismaClient();

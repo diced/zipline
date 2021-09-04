@@ -19,9 +19,6 @@ export interface ConfigUploader {
   // The route uploads will be served on
   route: string;
 
-  // The route embedded routes will be served on
-  embed_route: string;
-
   // Length of random chars to generate for file names
   length: number;
 
