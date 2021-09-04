@@ -47,7 +47,8 @@ module.exports = {
         'middleware',
         'redux',
         'themes',
-        'lib'
+        'lib',
+        'assets'
       ],
     ],
   },
