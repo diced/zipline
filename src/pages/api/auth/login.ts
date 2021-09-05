@@ -1,6 +1,6 @@
 import prisma from 'lib/prisma';
 import { NextApiReq, NextApiRes, withZipline } from 'middleware/withZipline';
-import { checkPassword } from 'lib/util';
+import { checkPassword, createToken, hashPassword } from 'lib/util';
 import Logger from 'lib/logger';
 import prismaRun from '../../../../scripts/prisma-run';
 import config from 'lib/config';
@@ -11,7 +11,16 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
   const users = await prisma.user.findMany();
   if (users.length === 0) {
-    await prismaRun(config.core.database_url, ['db', 'seed', '--preview-feature']);
+    Logger.get('database').info('no users found... creating default user...');
+    await prisma.user.create({
+      data: {
+        username: 'administrator',
+        password: await hashPassword('password'),
+        token: createToken(),
+        administrator: true
+      }
+    });
+    Logger.get('database').info('created default user:\nUsername: "administrator"\nPassword: "password"');
   }
 
   const user = await prisma.user.findFirst({
