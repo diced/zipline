@@ -30,7 +30,7 @@ export type NextApiReq = NextApiRequest & {
   } | null | void>;
   getCookie: (name: string) => string | null;
   cleanCookie: (name: string) => void;
-  file?: NextApiFile;
+  files?: NextApiFile[];
 }
 
 export type NextApiRes = NextApiResponse & {

@@ -20,33 +20,41 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       token: req.headers.authorization
     }
   });
+
+
   if (!user) return res.forbid('authorization incorect');
-  if (!req.file) return res.error('no file');
-  if (req.file.size > zconfig.uploader[user.administrator ? 'admin_limit' : 'user_limit']) return res.error('file size too big');
+  if (!req.files) return res.error('no files');
+  if (req.files && req.files.length === 0) return res.error('no files');
 
-  const ext = req.file.originalname.split('.').pop();
-  if (zconfig.uploader.disabled_extentions.includes(ext)) return res.error('disabled extension recieved: ' + ext);
-  const rand = randomChars(zconfig.uploader.length);
+  const files = [];
 
-  let invis;
-  const image = await prisma.image.create({
-    data: {
-      file: `${rand}.${ext}`,
-      mimetype: req.file.mimetype,
-      userId: user.id,
-      embed: !!req.headers.embed
-    }
-  });
-  
-  if (req.headers.zws) invis = await createInvis(zconfig.uploader.length, image.id);
+  for (let i = 0; i !== req.files.length; ++i) {
+    const file = req.files[i];
+    if (file.size > zconfig.uploader[user.administrator ? 'admin_limit' : 'user_limit']) return res.error('file size too big');
 
-  await writeFile(join(process.cwd(), zconfig.uploader.directory, image.file), req.file.buffer);
+    const ext = file.originalname.split('.').pop();
+    if (zconfig.uploader.disabled_extentions.includes(ext)) return res.error('disabled extension recieved: ' + ext);
+    const rand = randomChars(zconfig.uploader.length);
 
-  Logger.get('image').info(`User ${user.username} (${user.id}) uploaded an image ${image.file} (${image.id})`);
+    let invis;
+    const image = await prisma.image.create({
+      data: {
+        file: `${rand}.${ext}`,
+        mimetype: file.mimetype,
+        userId: user.id,
+        embed: !!req.headers.embed
+      }
+    });
+    
+    if (req.headers.zws) invis = await createInvis(zconfig.uploader.length, image.id);
 
-  return res.json({
-    url: `${zconfig.core.secure ? 'https' : 'http'}://${req.headers.host}${zconfig.uploader.route}/${invis ? invis.invis : image.file}`
-  });
+    await writeFile(join(process.cwd(), zconfig.uploader.directory, image.file), file.buffer);
+    Logger.get('image').info(`User ${user.username} (${user.id}) uploaded an image ${image.file} (${image.id})`); 
+    files.push(`${zconfig.core.secure ? 'https' : 'http'}://${req.headers.host}${zconfig.uploader.route}/${invis ? invis.invis : image.file}`);
+  }
+
+  // url will be deprecated soon
+  return res.json({ files, url: files[0] });
 }
 
 function run(middleware: any) {
@@ -60,7 +68,7 @@ function run(middleware: any) {
 }
 
 export default async function handlers(req, res) {
-  await run(uploader.single('file'))(req, res);
+  await run(uploader.array('file'))(req, res);
   
   return withZipline(handler)(req, res);
 };

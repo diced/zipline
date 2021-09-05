@@ -8,19 +8,21 @@ import Alert from 'components/Alert';
 import { useStoreSelector } from 'lib/redux/store';
 import CenteredBox from 'components/CenteredBox';
 import copy from 'copy-to-clipboard';
+import Link from 'components/Link';
 
 export default function Upload({ route }) {
   const user = useStoreSelector(state => state.user);
 
-  const [file, setFile] = useState(null);
+  const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [severity, setSeverity] = useState('success');
   const [message, setMessage] = useState('Saved');
-
+  console.log(files);
   const handleUpload = async () => {
     const body = new FormData();
-    body.append('file', file);
+
+    for (let i = 0; i !== files.length; ++i) body.append('file', files[i]);
 
     setLoading(true);
     const res = await fetch('/api/upload', {
@@ -34,8 +36,11 @@ export default function Upload({ route }) {
     if (res.ok && json.error === undefined) {
       setOpen(true);
       setSeverity('success');
-      setMessage(`Copied to clipboard! ${json.url}`);
+
+      //@ts-ignore
+      setMessage(<>Copied first image to clipboard! <br/>{json.files.map(x => (<Link key={x} href={x}>{x}<br/></Link>))}</>);
       copy(json.url);
+      setFiles([]);
     } else {
       setOpen(true);
       setSeverity('error');
@@ -50,7 +55,7 @@ export default function Upload({ route }) {
       <Alert open={open} setOpen={setOpen} message={message} severity={severity} />
 
       <Typography variant='h4' pb={2}>Upload file</Typography>
-      <Dropzone onDrop={acceptedFiles => setFile(acceptedFiles[0])}>
+      <Dropzone onDrop={acceptedFiles => setFiles([...files, ...acceptedFiles])}>
         {({getRootProps, getInputProps}) => (
           <CardActionArea>
             <Paper 
@@ -67,7 +72,9 @@ export default function Upload({ route }) {
               <input {...getInputProps()} />
               <CenteredBox><UploadIcon sx={{ fontSize: 100 }} /></CenteredBox>
               <CenteredBox><Typography variant='h5'>Drag an image or click to upload an image.</Typography></CenteredBox>
-              <CenteredBox><Typography variant='h6'>{file && file.name}</Typography></CenteredBox>
+              {files.map(file => (
+                <CenteredBox key={file.name}><Typography variant='h6'>{file.name}</Typography></CenteredBox>
+              ))}
             </Paper>
           </CardActionArea>
         )}
