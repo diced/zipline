@@ -2,8 +2,6 @@ import prisma from 'lib/prisma';
 import { NextApiReq, NextApiRes, withZipline } from 'middleware/withZipline';
 import { checkPassword, createToken, hashPassword } from 'lib/util';
 import Logger from 'lib/logger';
-import prismaRun from '../../../../scripts/prisma-run';
-import config from 'lib/config';
 
 async function handler(req: NextApiReq, res: NextApiRes) {
   if (req.method !== 'POST') return res.status(405).end();
@@ -34,7 +32,8 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   const valid = await checkPassword(password, user.password);
   if (!valid) return res.forbid('Wrong password');
 
-  res.setCookie('user', user.id, { sameSite: true, maxAge: 10000000, path: '/' });
+  // 604800 seconds is 1 week
+  res.setCookie('user', user.id, { sameSite: true, maxAge: 604800, path: '/' });
 
   Logger.get('user').info(`User ${user.username} (${user.id}) logged in`);
 
