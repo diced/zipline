@@ -43,21 +43,19 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     by: ['mimetype'],
     _count: {
       mimetype: true
-    }
+    },
   });
   const types_count = [];
-  for (let i = 0, L = typesCount.length; i !== L; ++i) {
-    types_count.push({ mimetype: typesCount[i].mimetype, count: typesCount[i]._count.mimetype });
-  }
+  for (let i = 0, L = typesCount.length; i !== L; ++i) types_count.push({ mimetype: typesCount[i].mimetype, count: typesCount[i]._count.mimetype });
 
   return res.json({
     size: bytesToRead(size),
     size_num: size,
     count,
-    count_by_user,
+    count_by_user: count_by_user.sort((a,b) => b.count-a.count),
     count_users,
     views_count: (viewsCount[0]?._sum?.views ?? 0),
-    types_count
+    types_count: types_count.sort((a,b) => b.count-a.count)
   });
 }
 
