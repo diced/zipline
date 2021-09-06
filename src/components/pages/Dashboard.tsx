@@ -11,7 +11,10 @@ import {
   ButtonGroup,
   Typography,
   Grid,
-  Skeleton
+  Skeleton,
+  CardActionArea,
+  CardMedia,
+  Card as MuiCard
 } from '@material-ui/core';
 
 import Link from 'components/Link';
@@ -85,15 +88,18 @@ export default function Dashboard() {
   const user = useStoreSelector(state => state.user);
 
   const [images, setImages] = useState([]);
+  const [recent, setRecent] = useState([]);
   const [page, setPage] = useState(0);
   const [stats, setStats] = useState(null);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const updateImages = async () => {
     const imgs = await useFetch('/api/user/images');
+    const recent = await useFetch('/api/user/recent');
     const stts = await useFetch('/api/stats');
     setImages(imgs);
     setStats(stts);
+    setRecent(recent);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -119,6 +125,26 @@ export default function Dashboard() {
       <Typography variant='h4'>Welcome back {user?.username}</Typography>
       <Typography color='GrayText' pb={2}>You have <b>{images.length ? images.length : '...'}</b> images</Typography>
       
+      <Typography variant='h4'>Recent Images</Typography>
+      <Grid container spacing={4} py={2}>
+        {recent.length ? recent.map(image => (
+          <Grid item xs={12} sm={3} key={image.id}>
+            <MuiCard sx={{ minWidth: '100%' }}>
+              <CardActionArea>
+                <CardMedia
+                  sx={{ height: 220 }}
+                  image={image.url}
+                  title={image.file}
+                />
+              </CardActionArea>
+            </MuiCard>
+          </Grid>
+        )) : [1,2,3,4].map(x => (
+          <Grid item xs={12} sm={3} key={x}>
+            <Skeleton variant='rectangular' width='100%' height={220} sx={{ borderRadius: 1 }}/>
+          </Grid>
+        ))}
+      </Grid>
       <Typography variant='h4'>Stats</Typography>
       <Grid container spacing={4} py={2}>
         <Grid item xs={12} sm={4}>
@@ -140,7 +166,8 @@ export default function Dashboard() {
             <StatText>{stats ? stats.count_users : <Skeleton variant='text' />}</StatText>
           </Card>
         </Grid>
-      </Grid><Card name='Images' sx={{ my: 2 }} elevation={0} variant='outlined'>
+      </Grid>
+      <Card name='Images' sx={{ my: 2 }} elevation={0} variant='outlined'>
         <Link href='/dashboard/images' pb={2}>View Gallery</Link>
         <TableContainer sx={{ maxHeight: 440 }}>
           <Table size='small'>

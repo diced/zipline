@@ -5,7 +5,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   const user = await req.user();
   if (!user) return res.forbid('not logged in');
   
-  const take = Number(req.query.take ?? 3);
+  const take = Number(req.query.take ?? 4);
 
   if (take > 50) return res.error('take can\'t be more than 50');
 
@@ -20,6 +20,9 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       mimetype: true
     }
   });
+
+  // @ts-ignore
+  images.map(image => image.url = `/r/${image.file}`);
 
   return res.json(images);
 }
