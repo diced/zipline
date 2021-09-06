@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Paper,
   Table,
   TableBody,
   TableCell,
@@ -11,12 +10,12 @@ import {
   Button,
   ButtonGroup,
   Typography,
-  Grid
+  Grid,
+  Skeleton
 } from '@material-ui/core';
 
 import Link from 'components/Link';
 import Card from 'components/Card';
-import Backdrop from 'components/Backdrop';
 import useFetch from 'lib/hooks/useFetch';
 import { useStoreSelector } from 'lib/redux/store';
 
@@ -88,18 +87,13 @@ export default function Dashboard() {
   const [images, setImages] = useState([]);
   const [page, setPage] = useState(0);
   const [stats, setStats] = useState(null);
-  const [apiLoading, setApiLoading] = useState(true);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const updateImages = async () => {
-    setApiLoading(true);
-
     const imgs = await useFetch('/api/user/images');
     const stts = await useFetch('/api/stats');
     setImages(imgs);
     setStats(stts);
-
-    setApiLoading(false);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -122,36 +116,31 @@ export default function Dashboard() {
   
   return (
     <>
-      <Backdrop open={apiLoading} />
       <Typography variant='h4'>Welcome back {user?.username}</Typography>
-      <Typography color='GrayText' pb={2}>You have <b>{images.length}</b> images</Typography>
-
+      <Typography color='GrayText' pb={2}>You have <b>{images.length ? images.length : '...'}</b> images</Typography>
+      
       <Typography variant='h4'>Stats</Typography>
-      {stats && (
-        <Grid container spacing={4} py={2}>
-          <Grid item xs={12} sm={4}>
-            <Card name='Size' sx={{ height: '100%' }}>
-              <StatText>{stats.size}</StatText>
-              <Typography variant='h3'>Average Size</Typography>
-              <StatText>{bytesToRead(stats.size_num / stats.count)}</StatText>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <Card name='Images' sx={{ height: '100%' }}>
-              <StatText>{stats.count}</StatText>
-              <Typography variant='h3'>Views</Typography>
-              <StatText>{stats.views_count} ({isNaN(stats.views_count / stats.count) ? '0' : stats.views_count / stats.count})</StatText>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <Card name='Users' sx={{ height: '100%' }}>
-              <StatText>{stats.count_users}</StatText>
-            </Card>
-          </Grid>
+      <Grid container spacing={4} py={2}>
+        <Grid item xs={12} sm={4}>
+          <Card name='Size' sx={{ height: '100%' }}>
+            <StatText>{stats ? stats.size : <Skeleton variant='text' />}</StatText>
+            <Typography variant='h3'>Average Size</Typography>
+            <StatText>{stats ? bytesToRead(stats.size_num / stats.count) : <Skeleton variant='text' />}</StatText>
+          </Card>
         </Grid>
-      )}
-
-      <Card name='Images' sx={{ my: 2 }} elevation={0} variant='outlined'>
+        <Grid item xs={12} sm={4}>
+          <Card name='Images' sx={{ height: '100%' }}>
+            <StatText>{stats ? stats.count : <Skeleton variant='text' />}</StatText>
+            <Typography variant='h3'>Views</Typography>
+            <StatText>{stats ? `${stats.views_count} (${isNaN(stats.views_count / stats.count) ? '0' : stats.views_count / stats.count})` : <Skeleton variant='text' />}</StatText>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={4}>
+          <Card name='Users' sx={{ height: '100%' }}>
+            <StatText>{stats ? stats.count_users : <Skeleton variant='text' />}</StatText>
+          </Card>
+        </Grid>
+      </Grid><Card name='Images' sx={{ my: 2 }} elevation={0} variant='outlined'>
         <Link href='/dashboard/images' pb={2}>View Gallery</Link>
         <TableContainer sx={{ maxHeight: 440 }}>
           <Table size='small'>
@@ -167,7 +156,7 @@ export default function Dashboard() {
                   </TableCell>
                 ))}
                 <TableCell sx={{ minWidth: 200 }} align='right'>
-                Actions
+                  Actions
                 </TableCell>
               </TableRow>
             </TableHead>
@@ -203,32 +192,24 @@ export default function Dashboard() {
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
+          onRowsPerPageChange={handleChangeRowsPerPage} />
       </Card>
-      {stats && (
-        <>
-          <Card name='Images per User' sx={{ height: '100%', my: 2 }} elevation={0} variant='outlined'>
-            <StatTable
-              columns={[
-                { id: 'username', name: 'Name' },
-                { id: 'count', name: 'Images' }
-              ]}
-              rows={stats.count_by_user}
-            />
-          </Card>
-
-          <Card name='Types' sx={{ height: '100%', my: 2 }} elevation={0} variant='outlined'>
-            <StatTable
-              columns={[
-                { id: 'mimetype', name: 'Type' },
-                { id: 'count', name: 'Count' }
-              ]}
-              rows={stats.types_count}
-            />
-          </Card>
-        </>
-      )}
+      <Card name='Images per User' sx={{ height: '100%', my: 2 }} elevation={0} variant='outlined'>
+        <StatTable
+          columns={[
+            { id: 'username', name: 'Name' },
+            { id: 'count', name: 'Images' }
+          ]}
+          rows={stats ? stats.count_by_user : []} />
+      </Card>
+      <Card name='Types' sx={{ height: '100%', my: 2 }} elevation={0} variant='outlined'>
+        <StatTable
+          columns={[
+            { id: 'mimetype', name: 'Type' },
+            { id: 'count', name: 'Count' }
+          ]}
+          rows={stats ? stats.types_count : []} />
+      </Card>
     </>
   );
 }
