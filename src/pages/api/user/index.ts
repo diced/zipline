@@ -16,10 +16,20 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       });
     }
 
-    if (req.body.username) await prisma.user.update({
-      where: { id: user.id },
-      data: { username: req.body.username }
-    });
+    if (req.body.username) {
+      const existing = await prisma.user.findFirst({
+        where: {
+          username: req.body.username
+        }
+      });
+      if (existing && user.username !== req.body.username) { 
+        return res.forbid('Username already exists.');
+      }
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { username: req.body.username }
+      });
+    }
 
     if (req.body.embedTitle) await prisma.user.update({
       where: { id: user.id },
