@@ -11,6 +11,9 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
   let images = await prisma.image.findMany({
     take,
+    where: {
+      userId: user.id,
+    },
     orderBy: {
       created_at: 'desc'
     },
