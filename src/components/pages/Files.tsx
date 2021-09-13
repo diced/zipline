@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Grid, Pagination, Box, Typography, Accordion, AccordionSummary, AccordionDetails } from '@material-ui/core';
+import { ExpandMore } from '@material-ui/icons';
 
 import Backdrop from 'components/Backdrop';
 import ZiplineImage from 'components/Image';
 import useFetch from 'hooks/useFetch';
-import { ExpandMore } from '@material-ui/icons';
 
-export default function Upload() {
+export default function Files() {
   const [pages, setPages] = useState([]);
   const [page, setPage] = useState(1);
   const [favoritePages, setFavoritePages] = useState([]);
@@ -15,9 +15,9 @@ export default function Upload() {
 
   const updatePages = async favorite => {
     setLoading(true);
-    const pages = await useFetch('/api/user/images?paged=true&filter=image');
+    const pages = await useFetch('/api/user/files?paged=true&filter=media');
     if (favorite) {
-      const fPages = await useFetch('/api/user/images?paged=true&favorite=true');
+      const fPages = await useFetch('/api/user/files?paged=true&favorite=media');
       setFavoritePages(fPages);
     } 
     setPages(pages);
@@ -39,13 +39,13 @@ export default function Upload() {
           pt={2}
           pb={3}
         >
-          <Typography variant='h4'>No Images</Typography>
+          <Typography variant='h4'>No Files</Typography>
         </Box>
-      ) : <Typography variant='h4'>Images</Typography>}
+      ) : <Typography variant='h4'>Files</Typography>}
       {favoritePages.length ? (
         <Accordion sx={{ my: 2, border: 1, borderColor: t => t.palette.divider }} elevation={0}>
           <AccordionSummary expandIcon={<ExpandMore />}>
-            <Typography variant='h4'>Favorite Images</Typography>
+            <Typography variant='h4'>Favorite Files</Typography>
           </AccordionSummary>
           <AccordionDetails>
             <Grid container spacing={2}>

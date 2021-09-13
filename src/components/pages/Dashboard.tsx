@@ -16,6 +16,7 @@ import {
   CardMedia,
   Card as MuiCard
 } from '@material-ui/core';
+import AudioIcon from '@material-ui/icons/Audiotrack';
 
 import Link from 'components/Link';
 import Card from 'components/Card';
@@ -61,18 +62,19 @@ function StatTable({ rows, columns }) {
         <TableHead>
           <TableRow>
             {columns.map(col => (
-              <TableCell key={col.name}>{col.name}</TableCell>
+              <TableCell key={col.name} sx={{ borderColor: t => t.palette.divider }}>{col.name}</TableCell>
             ))}
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row, i) => (
+          {rows.map(row => (
             <TableRow
+              hover
               key={row.username}
               sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
             >
               {columns.map(col => (
-                <TableCell key={col.id}>
+                <TableCell key={col.id} sx={{ borderColor: t => t.palette.divider }}>
                   {col.format ? col.format(row[col.id]) : row[col.id]}
                 </TableCell>
               ))}
@@ -94,8 +96,8 @@ export default function Dashboard() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const updateImages = async () => {
-    const imgs = await useFetch('/api/user/images');
-    const recent = await useFetch('/api/user/recent');
+    const imgs = await useFetch('/api/user/files');
+    const recent = await useFetch('/api/user/recent?filter=media');
     const stts = await useFetch('/api/stats');
     setImages(imgs);
     setStats(stts);
@@ -106,13 +108,13 @@ export default function Dashboard() {
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (event) => {
+  const handleChangeRowsPerPage = event => {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
 
   const handleDelete = async image => {
-    const res = await useFetch('/api/user/images', 'DELETE', { id: image.id });
+    const res = await useFetch('/api/user/files', 'DELETE', { id: image.id });
     if (!res.error) updateImages();
   };
 
@@ -135,6 +137,8 @@ export default function Dashboard() {
                   sx={{ height: 220 }}
                   image={image.url}
                   title={image.file}
+                  controls
+                  component={image.mimetype.split('/')[0] === 'audio' ? AudioIcon : image.mimetype.split('/')[0]} // this is done because audio without controls is hidden
                 />
               </CardActionArea>
             </MuiCard>
@@ -173,16 +177,16 @@ export default function Dashboard() {
           <Table size='small'>
             <TableHead>
               <TableRow>
-                {columns.map((column) => (
+                {columns.map(column => (
                   <TableCell
                     key={column.id}
                     align={column.align}
-                    sx={{ minWidth: column.minWidth }}
+                    sx={{ minWidth: column.minWidth, borderColor: t => t.palette.divider }}
                   >
                     {column.label}
                   </TableCell>
                 ))}
-                <TableCell sx={{ minWidth: 200 }} align='right'>
+                <TableCell sx={{ minWidth: 200, borderColor: t => t.palette.divider }} align='right'>
                   Actions
                 </TableCell>
               </TableRow>
@@ -190,18 +194,18 @@ export default function Dashboard() {
             <TableBody>
               {images
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row) => {
+                .map(row => {
                   return (
                     <TableRow hover role='checkbox' tabIndex={-1} key={row.id}>
-                      {columns.map((column) => {
+                      {columns.map(column => {
                         const value = row[column.id];
                         return (
-                          <TableCell key={column.id} align={column.align}>
+                          <TableCell key={column.id} align={column.align} sx={{ borderColor: t => t.palette.divider }}>
                             {column.format ? column.format(value) : value}
                           </TableCell>
                         );
                       })}
-                      <TableCell align='right'>
+                      <TableCell align='right'  sx={{ borderColor: t => t.palette.divider }}>
                         <ButtonGroup variant='outlined'>
                           <Button onClick={() => handleDelete(row)} color='error' size='small'>Delete</Button>
                         </ButtonGroup>

@@ -1,6 +1,8 @@
 import React from 'react';
 import { ThemeProvider } from '@emotion/react';
 import { CssBaseline } from '@material-ui/core';
+
+// themes
 import dark_blue from 'lib/themes/dark_blue';
 import dark from 'lib/themes/dark';
 import ayu_dark from 'lib/themes/ayu_dark';
@@ -9,6 +11,7 @@ import ayu_light from 'lib/themes/ayu_light';
 import nord from 'lib/themes/nord';
 import polar from 'lib/themes/polar';
 import dracula from 'lib/themes/dracula';
+
 import { useStoreSelector } from 'lib/redux/store';
 import createTheme from 'lib/themes';
 

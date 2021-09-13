@@ -1,7 +1,7 @@
 import React from 'react';
 import useLogin from 'hooks/useLogin';
 import Layout from 'components/Layout';
-import Images from 'components/pages/Images';
+import Files from 'components/pages/Files';
 
 export default function ImagesPage() {
   const { user, loading } = useLogin();
@@ -14,7 +14,7 @@ export default function ImagesPage() {
       loading={loading}
       noPaper={false}
     >
-      <Images />
+      <Files />
     </Layout>
   );
 }

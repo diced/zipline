@@ -123,6 +123,7 @@ function shouldUseYarn() {
     });
     srv.on('listening', () => {
       Logger.get('server').info(`listening on ${config.core.host}:${config.core.port}`);
+      if (process.platform === 'linux' && dev) execSync(`xdg-open ${config.core.secure ? 'https' : 'http'}://${config.core.host === '0.0.0.0' ? 'localhost' : config.core.host}:${config.core.port}`);
     });
 
     srv.listen(config.core.port, config.core.host ?? '0.0.0.0');

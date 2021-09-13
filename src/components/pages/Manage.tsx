@@ -167,7 +167,6 @@ export default function Manage() {
     validationSchema: themeValidationSchema,
     onSubmit: async values => {
       setLoading(true);
-
       const newUser = await useFetch('/api/user', 'PATCH', { customTheme: values });
 
       if (newUser.error) {

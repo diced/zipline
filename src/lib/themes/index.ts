@@ -48,7 +48,7 @@ export default function createTheme(o: ThemeOptions) {
             backgroundColor: o.border
           }
         }
-      }
-    }
+      },
+    },
   });
 }

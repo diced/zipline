@@ -9,7 +9,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
   if (take > 50) return res.error('take can\'t be more than 50');
 
-  const images = await prisma.image.findMany({
+  let images = await prisma.image.findMany({
     take,
     orderBy: {
       created_at: 'desc'
@@ -23,6 +23,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
   // @ts-ignore
   images.map(image => image.url = `/r/${image.file}`);
+  if (req.query.filter && req.query.filter === 'media') images = images.filter(x => /^(video|audio|image)/.test(x.mimetype));
 
   return res.json(images);
 }

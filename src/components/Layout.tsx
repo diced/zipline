@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
-import useFetch from '../lib/hooks/useFetch';
 
 import {
   AppBar,
@@ -29,13 +28,13 @@ import {
   Menu as MenuIcon,
   Home as HomeIcon,
   AccountCircle as AccountIcon,
-  Image as ImageIcon,
+  Folder as FolderIcon,
   Upload as UploadIcon,
   ContentCopy as CopyIcon,
   Autorenew as ResetIcon,
   Logout as LogoutIcon,
   PeopleAlt as UsersIcon,
-  Brush as BrushIcon
+  Brush as BrushIcon,
 } from '@material-ui/icons';
 import copy from 'copy-to-clipboard';
 import Backdrop from './Backdrop';
@@ -43,6 +42,7 @@ import { friendlyThemeName, themes } from './Theming';
 import { useRouter } from 'next/router';
 import { useStoreDispatch } from 'lib/redux/store';
 import { updateUser } from 'lib/redux/reducers/user';
+import useFetch from 'hooks/useFetch';
 
 const items = [
   {
@@ -51,9 +51,9 @@ const items = [
     link: '/dashboard'
   },
   {
-    icon: <ImageIcon />,
-    text: 'Images',
-    link: '/dashboard/images'
+    icon: <FolderIcon />,
+    text: 'Files',
+    link: '/dashboard/files'
   },
   {
     icon: <UploadIcon />,

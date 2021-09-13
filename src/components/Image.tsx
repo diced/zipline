@@ -4,64 +4,80 @@ import {
   Card,
   CardMedia,
   CardActionArea,
-  Popover,
   Button,
-  ButtonGroup
+  Dialog,
+  DialogTitle,
+  DialogActions,
+  DialogContent
 } from '@material-ui/core';
+import AudioIcon from '@material-ui/icons/Audiotrack';
 import copy from 'copy-to-clipboard';
-import useFetch from '../lib/hooks/useFetch';
+import useFetch from 'hooks/useFetch';
 
 export default function Image({ image, updateImages }) {
-  const [anchorEl, setAnchorEl] = useState(null);
+  const [open, setOpen] = useState(false);
+  const [t,] = useState(image.mimetype.split('/')[0]);
   
   const handleDelete = async () => {
-    const res = await useFetch('/api/user/images', 'DELETE', { id: image.id });
+    const res = await useFetch('/api/user/files', 'DELETE', { id: image.id });
     if (!res.error) updateImages(true);
     
-    setAnchorEl(null);
+    setOpen(false);
   };
 
   const handleCopy = () => {
     copy(`${window.location.protocol}//${window.location.host}${image.url}`);
-    setAnchorEl(null);
+    setOpen(false);
   };
 
   const handleFavorite = async () => {
-    const data = await useFetch('/api/user/images', 'PATCH', { id: image.id, favorite: !image.favorite });
+    const data = await useFetch('/api/user/files', 'PATCH', { id: image.id, favorite: !image.favorite });
     if (!data.error) updateImages(true);
+  };
+
+  const Type = (props) => {
+    return {
+      'video': <video controls {...props} />,
+      // eslint-disable-next-line jsx-a11y/alt-text
+      'image': <img {...props} />,
+      'audio': <audio controls {...props} />
+    }[t];
   };
 
   return (
     <>
       <Card sx={{ maxWidth: '100%' }}>
-        <CardActionArea>
+        <CardActionArea sx={t === 'audio' ? { justifyContent: 'center', display: 'flex', alignItems: 'center' } : {}}>
           <CardMedia
-            sx={{ height: 320 }}
+            sx={{ height: 320, fontSize: 70, width: '100%' }}
             image={image.url}
             title={image.file}
-            onClick={e => setAnchorEl(e.currentTarget)}
+            component={t === 'audio' ? AudioIcon : t} // this is done because audio without controls is hidden
+            onClick={() => setOpen(true)}
           />
         </CardActionArea>
       </Card>
-      <Popover
-        open={Boolean(anchorEl)}
-        anchorEl={anchorEl}
-        onClose={() => setAnchorEl(null)}
-        anchorOrigin={{
-          vertical: 'center',
-          horizontal: 'center',
-        }}
-        transformOrigin={{
-          vertical: 'center',
-          horizontal: 'center',
-        }}
+      <Dialog
+        open={open}
+        onClose={() => setOpen(false)}
       >
-        <ButtonGroup variant='contained'>
-          <Button onClick={handleDelete} color='primary'>Delete</Button>
-          <Button onClick={handleCopy} color='primary'>Copy URL</Button>
-          <Button onClick={handleFavorite} color='primary'>{image.favorite ? 'Unfavorite' : 'Favorite'}</Button>
-        </ButtonGroup>
-      </Popover>
+        <DialogTitle id='alert-dialog-title'>
+          {image.file}
+          
+        </DialogTitle>
+        <DialogContent>
+          <Type
+            style={{ width: '100%' }}
+            src={image.url}
+            alt={image.url}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDelete} color='inherit'>Delete</Button>
+          <Button onClick={handleCopy} color='inherit'>Copy URL</Button>
+          <Button onClick={handleFavorite} color='inherit'>{image.favorite ? 'Unfavorite' : 'Favorite'}</Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }

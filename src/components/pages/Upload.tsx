@@ -18,7 +18,7 @@ export default function Upload({ route }) {
   const [open, setOpen] = useState(false);
   const [severity, setSeverity] = useState('success');
   const [message, setMessage] = useState('Saved');
-  console.log(files);
+  
   const handleUpload = async () => {
     const body = new FormData();
 

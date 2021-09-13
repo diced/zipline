@@ -1,3 +1,5 @@
-prisma/migrations
+prisma
 node_modules
 .next
+uploads
+.git
