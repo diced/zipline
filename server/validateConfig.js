@@ -1,45 +1,29 @@
 const Logger = require('../src/lib/logger');
+const yup = require('yup');
 
-function dot(str, obj) {
-  return str.split('.').reduce((a,b) => a[b], obj);
-}
 
-const path = (path, type) => ({ path, type });
+const validator = yup.object({
+  core: yup.object({
+    secure: yup.bool().default(false),
+    secret: yup.string().min(8).required(),
+    host: yup.string().default('0.0.0.0'),
+    port: yup.number().default(3000),
+    database_url: yup.string().required(),
+  }).required(),
+  uploader: yup.object({
+    route: yup.string().required(),
+    length: yup.number().default(6),
+    directory: yup.string().required(),
+    admin_limit: yup.number().default(104900000),
+    user_limit: yup.number().default(104900000),
+    disabled_extensions: yup.array().default([]),
+  }).required(),
+});
 
 module.exports = async config => {
-  const paths = [
-    path('core.secure', 'boolean'),
-    path('core.secret', 'string'),
-    path('core.host', 'string'),
-    path('core.port', 'number'),
-    path('core.database_url', 'string'),
-    path('uploader.route', 'string'),
-    path('uploader.length', 'number'),
-    path('uploader.directory', 'string'),
-    path('uploader.admin_limit', 'number'),
-    path('uploader.user_limit', 'number'),
-    path('uploader.disabled_extentions', 'object'),
-  ];
-
-  let errors = 0;
-
-  for (let i = 0, L = paths.length; i !== L; ++i) {
-    const path = paths[i];
-    const value = dot(path.path, config);
-    if (value === undefined) {
-      Logger.get('config').error(`there was no ${path.path} in config which was required`);
-      ++errors;
-    }
-
-    const type = typeof value;
-    if (value !== undefined && type !== path.type) {
-      Logger.get('config').error(`expected ${path.type} on ${path.path}, but got ${type}`);
-      ++errors;
-    }
-  }
-
-  if (errors !== 0) {
-    Logger.get('config').error(`exiting due to ${errors} errors`);
-    process.exit(1);
-  }  
+  try {
+    return await validator.validate(config, { abortEarly: false });
+  } catch (e) {
+    throw `${e.errors.length} errors occured\n${e.errors.map(x => '\t' + x).join('\n')}`;
+  } 
 };

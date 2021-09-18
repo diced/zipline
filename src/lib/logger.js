@@ -19,7 +19,7 @@ class Logger {
   }
 
   error(error) {
-    console.log(this.formatMessage('ERROR', this.name, error.toString()));
+    console.log(this.formatMessage('ERROR', this.name, error.stack ?? error));
   }
 
   formatMessage(level, name, message) {

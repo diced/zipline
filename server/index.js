@@ -34,8 +34,7 @@ function shouldUseYarn() {
 
 (async () => {
   try {
-    const config = readConfig();
-    await validateConfig(config);
+    const config = await validateConfig(readConfig());
 
     const data = await prismaRun(config.core.database_url, ['migrate', 'status'], true);
     if (data.includes('Following migration have not yet been applied:')) {
