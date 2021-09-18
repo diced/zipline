@@ -1,7 +1,7 @@
 <div align="center">
   <img src="https://raw.githubusercontent.com/diced/zipline/trunk/public/zipline_small.png"/>
   
-  Zipline is a file sharing, URL sharing, lightweight and easy to use!
+  Zipline is a ShareX/file upload server that is easy to use, packed with features and can be setup in one command!
   
   ![Build](https://img.shields.io/github/workflow/status/diced/zipline/CD:%20Push%20Docker%20Images?logo=github&style=flat-square)
   ![Stars](https://img.shields.io/github/stars/diced/zipline?logo=github&style=flat-square)
