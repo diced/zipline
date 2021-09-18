@@ -1,6 +1,8 @@
 FROM node:16-alpine3.11 AS builder
 WORKDIR /build
 
+ENV NEXT_TELEMETRY_DISABLED=1
+
 COPY src ./src
 COPY server ./server
 COPY scripts ./scripts
@@ -11,7 +13,7 @@ COPY package.json yarn.lock next.config.js next-env.d.ts zip-env.d.ts tsconfig.j
 RUN yarn install
 
 # create a mock config.toml to spoof next build!
-RUN echo -e "[uploader]\nroute = '/u'\nembed_route = '/a'\nlength = 6\ndirectory = './uploads'" > config.toml
+RUN echo -e "[uploader]\nroute = '/u'" > config.toml
 
 RUN yarn build
 

@@ -55,6 +55,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/diced/workflow-testing.git"
+    "url": "https://github.com/diced/zipline.git"
   }
 }

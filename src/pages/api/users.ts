@@ -7,7 +7,7 @@ import { tryGetPreviewData } from 'next/dist/server/api-utils';
 async function handler(req: NextApiReq, res: NextApiRes) {
   const user = await req.user();
   if (!user) return res.forbid('not logged in');
-  if (!user.administrator) return res.forbid('you arent an administrator');
+  if (!user.administrator) return res.forbid('you aren\'t an administrator');
 
   if (req.method === 'DELETE') {
     if (req.body.id === user.id) return res.forbid('you can\'t delete your own account');
@@ -28,7 +28,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     delete deleteUser.password;
     return res.json(deleteUser);
   } else {
-    const all_users = await prisma.user.findMany({
+    const users = await prisma.user.findMany({
       select: {
         username: true,
         id: true,
@@ -40,7 +40,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         systemTheme: true
       }
     });
-    return res.json(all_users);
+    return res.json(users);
   }
 }
 

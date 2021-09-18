@@ -19,4 +19,4 @@ export default function UsersPage() {
   );
 }
 
-UsersPage.title = 'Zipline - User';
+UsersPage.title = 'Zipline - Users';

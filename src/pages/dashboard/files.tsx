@@ -3,7 +3,7 @@ import useLogin from 'hooks/useLogin';
 import Layout from 'components/Layout';
 import Files from 'components/pages/Files';
 
-export default function ImagesPage() {
+export default function FilesPage() {
   const { user, loading } = useLogin();
 
   if (loading) return null;
@@ -19,4 +19,4 @@ export default function ImagesPage() {
   );
 }
 
-ImagesPage.title = 'Zipline - Gallery';
+FilesPage.title = 'Zipline - Gallery';

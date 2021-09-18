@@ -31,10 +31,6 @@ class Logger {
     switch (level) {
     case 'INFO':
       return cyan('INFO ');
-    case 'DEBUG':
-      return yellow('DEBUG');
-    case 'WARN':
-      return magenta('WARN ');
     case 'ERROR':
       return red('ERROR');
     }

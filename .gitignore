@@ -18,6 +18,7 @@
 # misc
 .DS_Store
 *.pem
+.idea
 
 # debug
 npm-debug.log*
@@ -36,4 +37,3 @@ yarn-error.log*
 # zipline
 config.toml
 uploads/
-data.db*

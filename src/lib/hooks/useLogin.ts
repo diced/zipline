@@ -14,21 +14,17 @@ export default function login() {
 
   async function load() {
     setLoading(true);
+    
     const res = await useFetch('/api/user');
-
     if (res.error) return router.push('/auth/login');
 
     dispatch(updateUser(res));
-
     setUser(res);
     setLoading(false);
   }
 
   useEffect(() => {
-    if (!loading && user) {
-      return;
-    }
-
+    if (!loading && user) return;
     load();
   }, []);
 

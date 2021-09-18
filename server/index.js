@@ -42,9 +42,7 @@ function shouldUseYarn() {
       Logger.get('database').info('some migrations are not applied, applying them now...');
       await deployDb(config);
       Logger.get('database').info('finished applying migrations');
-    } else {
-      Logger.get('database').info('migrations up to date');
-    }
+    } else Logger.get('database').info('migrations up to date');
     process.env.DATABASE_URL = config.core.database_url;
 
     await mkdir(config.uploader.directory, { recursive: true });

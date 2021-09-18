@@ -58,9 +58,7 @@ export default function EmbeddedImage({ image, title, username, color, normal, e
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const id = context.params.id[1];
   const route = context.params.id[0];
-  if (route !== config.uploader.route.substring(1)) return {
-    notFound: true
-  };
+  if (route !== config.uploader.route.substring(1)) return { notFound: true };
 
   const image = await prisma.image.findFirst({
     where: {
