@@ -45,7 +45,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: docker.pkg.github.com
           repository: diced/zipline/zipline-arm
-          platforms: linux/arm64
+          platforms: linux/amd64,linux/arm64
           dockerfile: Dockerfile.arm
           tag_with_ref: true
 
