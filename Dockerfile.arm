@@ -1,7 +1,32 @@
+FROM arm64v8/rust:1-alpine AS engine
+
+ENV USER root
+
+RUN apk add openssl git
+
+ENV WORKSPACE_ROOT=/engine
+ENV RUST_LOG_FORMAT=devel
+ENV RUST_BACKTRACE=1
+ENV RUST_LOG=query_engine=debug,quaint=debug,query_core=debug,query_connector=debug,sql_query_connector=debug,prisma_models=debug,engineer=debug
+ENV PATH="/root/.cargo/bin:${PATH}"
+
+RUN git clone https://github.com/prisma/prisma-engines.git /engine
+WORKDIR /engine
+
+RUN cargo --release
+
 FROM arm64v8/node:16-alpine3.11 AS builder
 WORKDIR /build
 
+COPY --from=engine /engine/target/release/query-engine ./
+COPY --from=engine /engine/target/release/migration-engine ./
+COPY --from=engine /engine/target/release/introspection-engine ./
+
 ENV NEXT_TELEMETRY_DISABLED=1
+
+ENV PRISMA_QUERY_ENGINE_BINARY=query-engine
+ENV PRISMA_MIGRATION_ENGINE_BINARY=migration-engine
+ENV PRISMA_INTROSPECTION_ENGINE_BINARY=introspection-engine
 
 RUN apk add openssl
 
