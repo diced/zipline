@@ -3,6 +3,8 @@ WORKDIR /build
 
 ENV NEXT_TELEMETRY_DISABLED=1
 
+RUN apk add openssl
+
 COPY src ./src
 COPY server ./server
 COPY scripts ./scripts
