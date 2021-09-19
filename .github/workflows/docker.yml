@@ -27,6 +27,23 @@ jobs:
           dockerfile: Dockerfile
           tag_with_ref: true
 
+  push_arm_to_ghcr:
+    name: Push arm64 Image to GitHub Packages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+
+      - name: Push to GitHub Packages
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: docker.pkg.github.com
+          repository: diced/zipline/zipline-arm
+          dockerfile: Dockerfile.arm
+          tag_with_ref: true
+
   push_to_dockerhub:
     name: Push Image to Docker Hub
     runs-on: ubuntu-latest
