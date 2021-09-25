@@ -45,9 +45,9 @@ export default function createTheme(o: ThemeOptions) {
       MuiTableHead: {
         styleOverrides: {
           root: {
-            backgroundColor: o.border
-          }
-        }
+            backgroundColor: o.border,
+          },
+        },
       },
     },
   });

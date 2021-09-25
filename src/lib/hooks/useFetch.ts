@@ -5,7 +5,7 @@ export default async function useFetch(url: string, method: 'GET' | 'POST' | 'PA
   const res = await global.fetch(url, {
     body: body ? JSON.stringify(body) : null,
     method,
-    headers
+    headers,
   });
 
   return res.json();

@@ -14,7 +14,7 @@ import {
   Skeleton,
   CardActionArea,
   CardMedia,
-  Card as MuiCard
+  Card as MuiCard,
 } from '@material-ui/core';
 import AudioIcon from '@material-ui/icons/Audiotrack';
 
@@ -48,7 +48,7 @@ const columns = [
     minWidth: 170,
     align: 'right' as Aligns,
     format: (value) => new Date(value).toLocaleString(),
-  }
+  },
 ];
 
 function StatText({ children }) {
@@ -229,7 +229,7 @@ export default function Dashboard() {
         <StatTable
           columns={[
             { id: 'username', name: 'Name' },
-            { id: 'count', name: 'Images' }
+            { id: 'count', name: 'Images' },
           ]}
           rows={stats ? stats.count_by_user : []} />
       </Card>
@@ -237,7 +237,7 @@ export default function Dashboard() {
         <StatTable
           columns={[
             { id: 'mimetype', name: 'Type' },
-            { id: 'count', name: 'Count' }
+            { id: 'count', name: 'Count' },
           ]}
           rows={stats ? stats.types_count : []} />
       </Card>

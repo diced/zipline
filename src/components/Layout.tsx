@@ -48,18 +48,18 @@ const items = [
   {
     icon: <HomeIcon />,
     text: 'Home',
-    link: '/dashboard'
+    link: '/dashboard',
   },
   {
     icon: <FolderIcon />,
     text: 'Files',
-    link: '/dashboard/files'
+    link: '/dashboard/files',
   },
   {
     icon: <UploadIcon />,
     text: 'Upload',
-    link: '/dashboard/upload'
-  }
+    link: '/dashboard/upload',
+  },
 ];
 
 const drawerWidth = 240;
@@ -153,7 +153,7 @@ export default function Layout({ children, user, loading, noPaper }) {
 
   const handleUpdateTheme = async (event: React.ChangeEvent<{ value: string }>) => {
     const newUser = await useFetch('/api/user', 'PATCH', {
-      systemTheme: event.target.value || 'dark_blue'
+      systemTheme: event.target.value || 'dark_blue',
     });
 
     setSystemTheme(newUser.systemTheme);
@@ -168,7 +168,7 @@ export default function Layout({ children, user, loading, noPaper }) {
       <ResetTokenDialog open={resetOpen} setOpen={setResetOpen} setToken={setToken} />
       <Toolbar
         sx={{
-          width: { xs: drawerWidth }
+          width: { xs: drawerWidth },
         }}
       >
         <AppBar
@@ -177,7 +177,7 @@ export default function Layout({ children, user, loading, noPaper }) {
           sx={{
             borderBottom: 1,
             borderBottomColor: t => t.palette.divider,
-            display: { xs: 'none', sm: 'block' }
+            display: { xs: 'none', sm: 'block' },
           }}
         >
           <Toolbar>
@@ -293,7 +293,7 @@ export default function Layout({ children, user, loading, noPaper }) {
         elevation={0}
         sx={{
           width: { sm: `calc(100% - ${drawerWidth}px)` },
-          ml: { sm: `${drawerWidth}px` }
+          ml: { sm: `${drawerWidth}px` },
         }}
       >
         <Toolbar>
@@ -363,7 +363,7 @@ export default function Layout({ children, user, loading, noPaper }) {
         component='nav'
         sx={{
           width: { sm: drawerWidth },
-          flexShrink: { sm: 0 }
+          flexShrink: { sm: 0 },
         }}
       >
         <Drawer
@@ -373,11 +373,11 @@ export default function Layout({ children, user, loading, noPaper }) {
           open={mobileOpen}
           elevation={0}
           ModalProps={{
-            keepMounted: true
+            keepMounted: true,
           }}
           sx={{
             display: { xs: 'block', sm: 'none' },
-            '* .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth }
+            '* .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
           }}
         >
           {drawer}
@@ -386,7 +386,7 @@ export default function Layout({ children, user, loading, noPaper }) {
           variant='permanent'
           sx={{
             display: { xs: 'none', sm: 'block' },
-            '* .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth }
+            '* .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
           }}
           open
         >

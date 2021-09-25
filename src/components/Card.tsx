@@ -2,7 +2,7 @@ import React from 'react';
 import {
   Card as MuiCard,
   CardContent,
-  Typography
+  Typography,
 } from '@material-ui/core';
 
 export default function Card(props) {

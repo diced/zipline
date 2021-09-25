@@ -15,16 +15,16 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         username: 'administrator',
         password: await hashPassword('password'),
         token: createToken(),
-        administrator: true
-      }
+        administrator: true,
+      },
     });
     Logger.get('database').info('created default user:\nUsername: "administrator"\nPassword: "password"');
   }
 
   const user = await prisma.user.findFirst({
     where: {
-      username 
-    }
+      username, 
+    },
   });
 
   if (!user) return res.status(404).end(JSON.stringify({ error: 'User not found' }));

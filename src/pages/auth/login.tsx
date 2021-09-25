@@ -37,7 +37,7 @@ export default function Login() {
   const formik = useFormik({
     initialValues: {
       username: '',
-      password: ''
+      password: '',
     },
     onSubmit: async values => {
       const username = values.username.trim();
@@ -47,7 +47,7 @@ export default function Login() {
 
       setLoadingOpen(true);
       const res = await useFetch('/api/auth/login', 'POST', {
-        username, password
+        username, password,
       });
   
       if (res.error) {
@@ -61,7 +61,7 @@ export default function Login() {
         setMessage('Logged in');
         router.push('/dashboard');
       }
-    }
+    },
   });
 
   useEffect(() => {

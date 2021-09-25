@@ -45,7 +45,7 @@ export const withZipline = (handler: (req: NextApiRequest, res: NextApiResponse)
   res.error = (message: string) => {
     res.setHeader('Content-Type', 'application/json');
     res.json({
-      error: message
+      error: message,
     });
   };
 
@@ -53,7 +53,7 @@ export const withZipline = (handler: (req: NextApiRequest, res: NextApiResponse)
     res.setHeader('Content-Type', 'application/json');
     res.status(403);
     res.json({
-      error: '403: ' + message
+      error: '403: ' + message,
     });
   };
 
@@ -61,7 +61,7 @@ export const withZipline = (handler: (req: NextApiRequest, res: NextApiResponse)
     res.setHeader('Content-Type', 'application/json');
     res.status(401);
     res.json({
-      error: '403: ' + message
+      error: '403: ' + message,
     });
   };
 
@@ -82,7 +82,7 @@ export const withZipline = (handler: (req: NextApiRequest, res: NextApiResponse)
     res.setHeader('Set-Cookie', serialize(name, '', {
       path: '/',
       expires: new Date(1),
-      maxAge: undefined
+      maxAge: undefined,
     }));
   };
   req.user = async () => {
@@ -92,7 +92,7 @@ export const withZipline = (handler: (req: NextApiRequest, res: NextApiResponse)
       
       const user = await prisma.user.findFirst({
         where: {
-          id: Number(userId)
+          id: Number(userId),
         },
         select: {
           administrator: true,
@@ -103,8 +103,8 @@ export const withZipline = (handler: (req: NextApiRequest, res: NextApiResponse)
           systemTheme: true,
           customTheme: true,
           token: true,
-          username: true
-        }
+          username: true,
+        },
       });
 
       if (!user) return null;

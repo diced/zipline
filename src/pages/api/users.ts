@@ -14,15 +14,15 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     
     const deleteUser = await prisma.user.findFirst({
       where: {
-        id: req.body.id
-      }
+        id: req.body.id,
+      },
     });
     if (!deleteUser) return res.forbid('user doesn\'t exist');
 
     await prisma.user.delete({
       where: {
-        id: deleteUser.id
-      }
+        id: deleteUser.id,
+      },
     });
 
     delete deleteUser.password;
@@ -37,8 +37,8 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         embedColor: true,
         embedTitle: true,
         customTheme: true,
-        systemTheme: true
-      }
+        systemTheme: true,
+      },
     });
     return res.json(users);
   }

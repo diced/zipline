@@ -12,8 +12,8 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   const byUser = await prisma.image.groupBy({
     by: ['userId'],
     _count: {
-      _all: true
-    }
+      _all: true,
+    },
   });
   const count_users = await prisma.user.count();
 
@@ -21,13 +21,13 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   for (let i = 0, L = byUser.length; i !== L; ++i) {
     const user = await prisma.user.findFirst({
       where: {
-        id: byUser[i].userId
-      }
+        id: byUser[i].userId,
+      },
     });
 
     count_by_user.push({
       username: user.username,
-      count: byUser[i]._count._all
+      count: byUser[i]._count._all,
     });
   }
 
@@ -35,14 +35,14 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   const viewsCount = await prisma.image.groupBy({
     by: ['views'],
     _sum: {
-      views: true
-    }
+      views: true,
+    },
   });
 
   const typesCount = await prisma.image.groupBy({
     by: ['mimetype'],
     _count: {
-      mimetype: true
+      mimetype: true,
     },
   });
   const types_count = [];
@@ -55,7 +55,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     count_by_user: count_by_user.sort((a,b) => b.count-a.count),
     count_users,
     views_count: (viewsCount[0]?._sum?.views ?? 0),
-    types_count: types_count.sort((a,b) => b.count-a.count)
+    types_count: types_count.sort((a,b) => b.count-a.count),
   });
 }
 

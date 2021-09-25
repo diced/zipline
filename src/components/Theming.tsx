@@ -23,7 +23,7 @@ export const themes = {
   'ayu_light': ayu_light,
   'nord': nord,
   'polar': polar,
-  'dracula': dracula
+  'dracula': dracula,
 };
 
 export const friendlyThemeName = {
@@ -34,7 +34,7 @@ export const friendlyThemeName = {
   'ayu_light': 'Ayu Light',
   'nord': 'Nord',
   'polar': 'Polar',
-  'dracula': 'Dracula'
+  'dracula': 'Dracula',
 };
 
 export default function ZiplineTheming({ Component, pageProps }) {
@@ -54,8 +54,8 @@ export default function ZiplineTheming({ Component, pageProps }) {
         border: user.customTheme.border,
         background: {
           main: user.customTheme.mainBackground,
-          paper: user.customTheme.paperBackground
-        }
+          paper: user.customTheme.paperBackground,
+        },
       });
     } else {
       t = themes[user.systemTheme] ?? themes.dark_blue;

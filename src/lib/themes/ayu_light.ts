@@ -12,6 +12,6 @@ export default createTheme({
   border: '#e3e3e3',
   background: {
     main: '#FAFAFA',
-    paper: '#FFFFFF'
-  }
+    paper: '#FFFFFF',
+  },
 });

@@ -8,7 +8,7 @@ import {
   Dialog,
   DialogTitle,
   DialogActions,
-  DialogContent
+  DialogContent,
 } from '@material-ui/core';
 import AudioIcon from '@material-ui/icons/Audiotrack';
 import copy from 'copy-to-clipboard';
@@ -16,7 +16,7 @@ import useFetch from 'hooks/useFetch';
 
 export default function Image({ image, updateImages }) {
   const [open, setOpen] = useState(false);
-  const [t,] = useState(image.mimetype.split('/')[0]);
+  const [t] = useState(image.mimetype.split('/')[0]);
   
   const handleDelete = async () => {
     const res = await useFetch('/api/user/files', 'DELETE', { id: image.id });
@@ -40,7 +40,7 @@ export default function Image({ image, updateImages }) {
       'video': <video controls {...props} />,
       // eslint-disable-next-line jsx-a11y/alt-text
       'image': <img {...props} />,
-      'audio': <audio controls {...props} />
+      'audio': <audio controls {...props} />,
     }[t];
   };
 

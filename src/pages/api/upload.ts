@@ -17,8 +17,8 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   
   const user = await prisma.user.findFirst({
     where: {
-      token: req.headers.authorization
-    }
+      token: req.headers.authorization,
+    },
   });
 
 
@@ -42,8 +42,8 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         file: `${rand}.${ext}`,
         mimetype: file.mimetype,
         userId: user.id,
-        embed: !!req.headers.embed
-      }
+        embed: !!req.headers.embed,
+      },
     });
     
     if (req.headers.zws) invis = await createInvisImage(zconfig.uploader.length, image.id);

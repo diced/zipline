@@ -13,7 +13,7 @@ import {
   Button,
   TextField,
   Switch,
-  FormControlLabel
+  FormControlLabel,
 } from '@material-ui/core';
 import { Delete as DeleteIcon, Add as AddIcon } from '@material-ui/icons';
 
@@ -59,7 +59,7 @@ function CreateUserDialog({ open, setOpen, updateUsers, setSeverity, setMessage,
     initialValues: {
       username: '',
       password: '',
-      administrator: false
+      administrator: false,
     },
     onSubmit: async (values) => {
       const cleanUsername = values.username.trim();
@@ -70,7 +70,7 @@ function CreateUserDialog({ open, setOpen, updateUsers, setSeverity, setMessage,
       const data = {
         username: cleanUsername,
         password: cleanPassword,
-        administrator: values.administrator
+        administrator: values.administrator,
       };
 
       setOpen(false);
@@ -87,7 +87,7 @@ function CreateUserDialog({ open, setOpen, updateUsers, setSeverity, setMessage,
         updateUsers();
       }
       setLoading(false);
-    }
+    },
   });
   
   return (
@@ -96,7 +96,7 @@ function CreateUserDialog({ open, setOpen, updateUsers, setSeverity, setMessage,
         open={open}
         onClose={() => setOpen(false)}
         PaperProps={{
-          elevation: 1
+          elevation: 1,
         }}
       >
         <DialogTitle>
@@ -151,7 +151,7 @@ export default function Users() {
 
   const handleDelete = async (user) => {
     const res = await useFetch('/api/users', 'DELETE', {
-      id: user.id
+      id: user.id,
     });
     if (res.error) {
       setMessage(`Could not delete ${user.username}`);

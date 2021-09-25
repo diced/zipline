@@ -15,8 +15,8 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
     const image = await prisma.image.delete({
       where: {
-        id: req.body.id 
-      }
+        id: req.body.id,
+      },
     });
 
     await rm(join(process.cwd(), config.uploader.directory, image.file));
@@ -32,8 +32,8 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     if (req.body.favorite !== null) image = await prisma.image.update({
       where: { id: req.body.id },
       data: {
-        favorite: req.body.favorite
-      }
+        favorite: req.body.favorite,
+      },
     });
 
     return res.json(image);
@@ -41,15 +41,15 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     let images = await prisma.image.findMany({
       where: {
         userId: user.id,
-        favorite: !!req.query.favorite
+        favorite: !!req.query.favorite,
       },
       select: {
         created_at: true,
         file: true,
         mimetype: true,
         id: true,
-        favorite: true
-      }
+        favorite: true,
+      },
     });
 
   

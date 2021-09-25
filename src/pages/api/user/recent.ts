@@ -15,13 +15,13 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       userId: user.id,
     },
     orderBy: {
-      created_at: 'desc'
+      created_at: 'desc',
     },
     select: {
       created_at: true,
       file: true,
-      mimetype: true
-    }
+      mimetype: true,
+    },
   });
 
   // @ts-ignore

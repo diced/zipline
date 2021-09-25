@@ -10,6 +10,6 @@ export default createTheme({
   border: '#2b2b2b',
   background: {
     main: '#000000',
-    paper: '#060606'
-  }
+    paper: '#060606',
+  },
 });

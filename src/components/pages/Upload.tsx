@@ -28,9 +28,9 @@ export default function Upload({ route }) {
     const res = await fetch('/api/upload', {
       method: 'POST',
       headers: {
-        'Authorization': user.token
+        'Authorization': user.token,
       },
-      body
+      body,
     });
     const json = await res.json();
     if (res.ok && json.error === undefined) {
@@ -65,7 +65,7 @@ export default function Upload({ route }) {
                 justifyContent: 'center',
                 alignItems: 'center',
                 display: 'block',
-                p: 5
+                p: 5,
               }}
               {...getRootProps()}
             >

@@ -14,7 +14,7 @@ import { useRouter } from 'next/router';
 const validationSchema = yup.object({
   username: yup
     .string()
-    .required('Username is required')
+    .required('Username is required'),
 });
 
 const themeValidationSchema = yup.object({
@@ -94,11 +94,11 @@ export default function Manage() {
       Headers: {
         Authorization: user?.token,
         ...(withEmbed && {Embed: 'true'}),
-        ...(withZws && {ZWS: 'true'})
+        ...(withZws && {ZWS: 'true'}),
       },
       URL: '$json:url$',
       Body: 'MultipartFormData',
-      FileFormName: 'file'
+      FileFormName: 'file',
     };
 
     const pseudoElement = document.createElement('a');
@@ -115,7 +115,7 @@ export default function Manage() {
       username: user.username,
       password: '',
       embedTitle: user.embedTitle ?? '',
-      embedColor: user.embedColor
+      embedColor: user.embedColor,
     },
     validationSchema,
     onSubmit: async values => {
@@ -132,7 +132,7 @@ export default function Manage() {
         username: cleanUsername,
         password: cleanPassword === '' ? null : cleanPassword,
         embedTitle: cleanEmbedTitle === '' ? null : cleanEmbedTitle,
-        embedColor: cleanEmbedColor === '' ? null : cleanEmbedColor
+        embedColor: cleanEmbedColor === '' ? null : cleanEmbedColor,
       };
 
       const newUser = await useFetch('/api/user', 'PATCH', data);
@@ -149,7 +149,7 @@ export default function Manage() {
         setSeverity('success');
         setOpen(true);
       }
-    }
+    },
   });
 
   const customThemeFormik = useFormik({
@@ -182,7 +182,7 @@ export default function Manage() {
         setSeverity('success');
         setOpen(true);
       }
-    }
+    },
   });
 
   return (

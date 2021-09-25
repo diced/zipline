@@ -10,11 +10,11 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   if (req.method === 'PATCH') {
     const updated = await prisma.user.update({
       where: {
-        id: user.id
+        id: user.id,
       },
       data: {
-        token: createToken()
-      }
+        token: createToken(),
+      },
     });
 
     Logger.get('user').info(`User ${user.username} (${user.id}) reset their token`);

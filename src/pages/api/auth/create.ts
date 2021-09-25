@@ -17,8 +17,8 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
   const existing = await prisma.user.findFirst({
     where: {
-      username
-    }
+      username,
+    },
   });
   if (existing) return res.forbid('user exists');
 
@@ -29,8 +29,8 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       password: hashed,
       username,
       token: createToken(),
-      administrator
-    }
+      administrator,
+    },
   });
 
   delete newUser.password;
