@@ -21,9 +21,6 @@ jobs:
         with:
           path: node_modules
           key: ${{ runner.os }}-node${{ matrix.node }}-${{ hashFiles('**/yarn.lock') }}
-
-      - name: Create mock config
-        run: echo -e "[uploader]\nroute = '/u'\nembed_route = '/a'\nlength = 6\ndirectory = './uploads'" > config.toml
       
       - name: Install dependencies
         if: steps.cache-restore.outputs.cache-hit != 'true'
@@ -31,4 +28,9 @@ jobs:
       
       - name: Build
         run: yarn build
-      
+        env:
+          CORE_SECRET=12345678
+          DATABASE_URL=postgres://postgres:postgres@postgres/postgres
+          UPLOADER_ROUTE=/u
+          UPLOADER_DIRECTORY=./uploads
+          URLS_ROUTE=/go
