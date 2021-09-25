@@ -1,5 +1,5 @@
 const { format } = require('fecha');
-const { yellow, blueBright, magenta, red, cyan } = require('colorette');
+const { blueBright, red, cyan } = require('colorette');
 
 class Logger {
   static get(clas) {

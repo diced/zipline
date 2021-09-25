@@ -3,7 +3,7 @@ import { hash, verify } from 'argon2';
 import { readdir, stat } from 'fs/promises';
 import { join } from 'path';
 import prisma from './prisma';
-import { InvisibleImage } from '@prisma/client';
+import { InvisibleImage, InvisibleUrl } from '@prisma/client';
 
 export async function hashPassword(s: string): Promise<string> {
   return await hash(s);
@@ -89,21 +89,21 @@ export function bytesToRead(bytes: number) {
   return `${bytes.toFixed(1)} ${units[num]}`;
 }
 
-export function createInvisURL(length: number) {
+export function randomInvis(length: number) {
   // some parts from https://github.com/tycrek/ass/blob/master/generators/lengthGen.js
   const invisibleCharset = ['\u200B', '\u2060', '\u200C', '\u200D'];
   
   return [...randomBytes(length)].map((byte) => invisibleCharset[Number(byte) % invisibleCharset.length]).join('').slice(1).concat(invisibleCharset[0]);
 }
 
-export function createInvis(length: number, imageId: number) {
+export function createInvisImage(length: number, imageId: number) {
   const retry = async (): Promise<InvisibleImage> => {
-    const invis = createInvisURL(length);
+    const invis = randomInvis(length);
 
     const existing = await prisma.invisibleImage.findUnique({
       where: {
-        invis
-      }
+        invis,
+      },
     });
 
     if (existing) return retry();
@@ -111,11 +111,36 @@ export function createInvis(length: number, imageId: number) {
     const inv = await prisma.invisibleImage.create({
       data: {
         invis,
-        imageId
-      }
+        imageId,
+      },
     });
 
     return inv;
+  };
+
+  return retry();
+}
+
+export function createInvisURL(length: number, urlId: string) {
+  const retry = async (): Promise<InvisibleUrl> => {
+    const invis = randomInvis(length);
+
+    const existing = await prisma.invisibleUrl.findUnique({
+      where: {
+        invis,
+      },
+    });
+
+    if (existing) return retry();
+    
+    const ur = await prisma.invisibleUrl.create({
+      data: {
+        invis,
+        urlId,
+      },
+    });
+
+    return ur;
   };
 
   return retry();

@@ -18,11 +18,16 @@ const validator = yup.object({
     user_limit: yup.number().default(104900000),
     disabled_extensions: yup.array().default([]),
   }).required(),
+  urls: yup.object({
+    route: yup.string().required(),
+    length: yup.number().default(6),
+  }).required(),
 });
 
-module.exports = async config => {
+
+module.exports = config => {
   try {
-    return await validator.validate(config, { abortEarly: false });
+    return validator.validateSync(config, { abortEarly: false });
   } catch (e) {
     throw `${e.errors.length} errors occured\n${e.errors.map(x => '\t' + x).join('\n')}`;
   } 

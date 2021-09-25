@@ -10,12 +10,16 @@ const envValues = [
   e('HOST', 'string', (c, v) => c.core.host = v),
   e('PORT', 'number', (c, v) => c.core.port = v),
   e('DATABASE_URL', 'string', (c, v) => c.core.database_url = v),
+
   e('UPLOADER_ROUTE', 'string', (c, v) => c.uploader.route = v),
   e('UPLOADER_LENGTH', 'number', (c, v) => c.uploader.length = v),
   e('UPLOADER_DIRECTORY', 'string', (c, v) => c.uploader.directory = v),
   e('UPLOADER_ADMIN_LIMIT', 'number', (c, v) => c.uploader.admin_limit = v),
   e('UPLOADER_USER_LIMIT', 'number', (c, v) => c.uploader.user_limit = v),
   e('UPLOADER_DISABLED_EXTS', 'array', (c, v) => v ? c.uploader.disabled_extentions = v : c.uploader.disabled_extentions = []),
+
+  e('URLS_ROUTE', 'string', (c, v) => c.urls.route = v),
+  e('URLS_LENGTH', 'number', (c, v) => c.urls.length = v),
 ];
 
 module.exports = () => {
@@ -46,8 +50,12 @@ function tryReadEnv() {
       directory: undefined,
       admin_limit: undefined,
       user_limit: undefined,
-      disabled_extentions: undefined
-    }
+      disabled_extentions: undefined,
+    },
+    urls: {
+      route: undefined,
+      length: undefined,
+    },
   };
 
   for (let i = 0, L = envValues.length; i !== L; ++i) {

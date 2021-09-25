@@ -57,17 +57,19 @@ model InvisibleImage {
 }
 
 model Url {
-  id         Int           @id @default(autoincrement())
-  to         String
-  created_at DateTime      @default(now())
-  views      Int           @default(0)
-  invisible  InvisibleUrl?
-  user       User          @relation(fields: [userId], references: [id])
-  userId     Int
+  id          String        @id @unique
+  destination String
+  vanity      String?
+  created_at  DateTime      @default(now())
+  views       Int           @default(0)
+  invisible   InvisibleUrl?
+  user        User          @relation(fields: [userId], references: [id])
+  userId      Int
 }
 
 model InvisibleUrl {
-  id    Int
-  url   Url    @relation(fields: [id], references: [id])
+  id    Int    @id @default(autoincrement())
   invis String @unique
+  urlId String
+  url   Url    @relation(fields: [urlId], references: [id])
 }

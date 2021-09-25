@@ -58,62 +58,86 @@ export default function EmbeddedImage({ image, title, username, color, normal, e
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const id = context.params.id[1];
   const route = context.params.id[0];
-  if (route !== config.uploader.route.substring(1)) return { notFound: true };
+  const routes = [config.uploader.route.substring(1), config.urls.route.substring(1)];
+  if (!routes.includes(route)) return { notFound: true };
 
-  const image = await prisma.image.findFirst({
-    where: {
-      OR: [
-        { file: id },
-        { invisible: { invis: id } }
-      ]
-    },
-    select: {
-      mimetype: true,
-      id: true,
-      file: true,
-      invisible: true,
-      userId: true,
-      embed: true
-    }
-  });
+  if (route === routes[1]) {
+    const url = await prisma.url.findFirst({
+      where: {
+        OR: [
+          { id },
+          { vanity: id },
+          { invisible: { invis: id } },
+        ],
+      },
+      select: {
+        destination: true,
+      },
+    });
+    if (!url) return { notFound: true };
 
-  if (!image) return { notFound: true };
+    return {
+      props: {},
+      redirect: {
+        destination: url.destination,
+      }, 
+    };
 
-  if (!image.embed) {
-    const data = await getFile(config.uploader.directory, id);
-    if (!data) return { notFound: true };
+  } else {
+    const image = await prisma.image.findFirst({
+      where: {
+        OR: [
+          { file: id },
+          { invisible: { invis: id } },
+        ],
+      },
+      select: {
+        mimetype: true,
+        id: true,
+        file: true,
+        invisible: true,
+        userId: true,
+        embed: true,
+      },
+    });
+    if (!image) return { notFound: true };
 
-    context.res.end(data);
-    return { props: {} };
-  };
+    if (!image.embed) {
+      const data = await getFile(config.uploader.directory, id);
+      if (!data) return { notFound: true };
 
-  const user = await prisma.user.findFirst({
-    select: {
-      embedTitle: true,
-      embedColor: true,
-      username: true
-    },
-    where: {
-      id: image.userId
-    }
-  });
+      context.res.end(data);
+      return { props: {} };
+    };
+
+    const user = await prisma.user.findFirst({
+      select: {
+        embedTitle: true,
+        embedColor: true,
+        username: true,
+      },
+      where: {
+        id: image.userId,
+      },
+    });
   
-  if (!image.mimetype.startsWith('image')) {
-    const data = await getFile(config.uploader.directory, id);
-    if (!data) return { notFound: true };
+    if (!image.mimetype.startsWith('image')) {
+      const data = await getFile(config.uploader.directory, id);
+      if (!data) return { notFound: true };
 
-    context.res.end(data);
-    return { props: {} };
-  };
+      context.res.end(data);
+      return { props: {} };
+    };
 
-  return {
-    props: {
-      image,
-      title: user.embedTitle,
-      color: user.embedColor,
-      username: user.username,
-      normal: config.uploader.route,
-      embed: image.embed
-    }
-  };
+    return {
+      props: {
+        image,
+        title: user.embedTitle,
+        color: user.embedColor,
+        username: user.username,
+        normal: config.uploader.route,
+        embed: image.embed,
+      },
+    };
+  }
 };

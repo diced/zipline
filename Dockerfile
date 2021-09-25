@@ -13,7 +13,7 @@ COPY package.json yarn.lock next.config.js next-env.d.ts zip-env.d.ts tsconfig.j
 RUN yarn install
 
 # create a mock config.toml to spoof next build!
-RUN echo -e "[uploader]\nroute = '/u'" > config.toml
+RUN echo -e "[core]\nsecret = '12345678'\ndatabase_url = 'postgres://postgres:postgres@postgres/postgres'\n[uploader]\nroute = '/u'\ndirectory = './uploads'\n[urls]\nroute = '/go'" > config.toml
 
 RUN yarn build
 

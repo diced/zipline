@@ -24,8 +24,8 @@ export default function UploadPage({ route }) {
 export const getStaticProps: GetStaticProps = async (context) => {
   return {
     props: {
-      route: config.uploader.route
-    }
+      route: config.uploader.route,
+    },
   };
 };
 

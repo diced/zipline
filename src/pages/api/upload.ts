@@ -2,7 +2,7 @@ import multer from 'multer';
 import prisma from 'lib/prisma';
 import zconfig from 'lib/config';
 import { NextApiReq, NextApiRes, withZipline } from 'lib/middleware/withZipline';
-import { createInvis, randomChars } from 'lib/util';
+import { createInvisImage, randomChars } from 'lib/util';
 import { writeFile } from 'fs/promises';
 import { join } from 'path';
 import Logger from 'lib/logger';
@@ -46,7 +46,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       }
     });
     
-    if (req.headers.zws) invis = await createInvis(zconfig.uploader.length, image.id);
+    if (req.headers.zws) invis = await createInvisImage(zconfig.uploader.length, image.id);
 
     await writeFile(join(process.cwd(), zconfig.uploader.directory, image.file), file.buffer);
     Logger.get('image').info(`User ${user.username} (${user.id}) uploaded an image ${image.file} (${image.id})`); 

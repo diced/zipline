@@ -35,7 +35,16 @@ export interface ConfigUploader {
   disabled_extentions: string[];
 }
 
+export interface ConfigUrls {
+  // The route urls will be served on
+  route: string;
+
+  // Length of random chars to generate for urls
+  length: number;
+}
+
 export interface Config {
   core: ConfigCore;
   uploader: ConfigUploader;
+  urls: ConfigUrls;
 }

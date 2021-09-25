@@ -34,10 +34,11 @@ function shouldUseYarn() {
 
 (async () => {
   try {
-    const config = await validateConfig(readConfig());
+    const a = readConfig();
+    const config = await validateConfig(a);
 
     const data = await prismaRun(config.core.database_url, ['migrate', 'status'], true);
-    if (data.includes('Following migration have not yet been applied:')) {
+    if (data.includes('Following migrations have not yet been applied:')) {
       Logger.get('database').info('some migrations are not applied, applying them now...');
       await deployDb(config);
       Logger.get('database').info('finished applying migrations');
@@ -49,7 +50,7 @@ function shouldUseYarn() {
     const app = next({
       dir: '.',
       dev,
-      quiet: dev
+      quiet: dev,
     }, config.core.port, config.core.host);
 
     await app.prepare();
@@ -67,15 +68,15 @@ function shouldUseYarn() {
           where: {
             OR: [
               { file: parts[2] },
-              { invisible:{ invis: decodeURI(parts[2]) } }
-            ]
+              { invisible:{ invis: decodeURI(parts[2]) } },
+            ],
           },
           select: {
             mimetype: true,
             id: true,
             file: true,
-            invisible: true
-          }
+            invisible: true,
+          },
         });
 
         if (!image) {
@@ -92,7 +93,7 @@ function shouldUseYarn() {
 
             await prisma.image.update({
               where: { id: image.id },
-              data: { views: { increment: 1 } }
+              data: { views: { increment: 1 } },
             });
             res.setHeader('Content-Type', image.mimetype);
             res.end(data);

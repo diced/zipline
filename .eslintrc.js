@@ -5,6 +5,7 @@ module.exports = {
     'linebreak-style': ['error', 'unix'],
     'quotes': ['error', 'single'],
     'semi': ['error', 'always'],
+    'comma-dangle': ['error', 'always-multiline'],
     'jsx-quotes': ['error', 'prefer-single'],
     'react/prop-types': 'off',
     'react-hooks/rules-of-hooks': 'off',
@@ -19,6 +20,6 @@ module.exports = {
     'react/react-in-jsx-scope': 'error',
     'react/require-render-return': 'error',
     'react/style-prop-object': 'warn',
-    '@next/next/no-img-element': 'off'
-  }
+    '@next/next/no-img-element': 'off',
+  },
 };
