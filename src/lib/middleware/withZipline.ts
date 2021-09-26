@@ -130,7 +130,7 @@ export const setCookie = (
 ) => {
   
   if ('maxAge' in options) {
-    options.expires = new Date(Date.now() + options.maxAge);
+    options.expires = new Date(Date.now() + options.maxAge * 1000);
     options.maxAge /= 1000;
   }
 
