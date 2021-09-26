@@ -35,6 +35,7 @@ import {
   Logout as LogoutIcon,
   PeopleAlt as UsersIcon,
   Brush as BrushIcon,
+  Link as URLIcon,
 } from '@material-ui/icons';
 import copy from 'copy-to-clipboard';
 import Backdrop from './Backdrop';
@@ -54,6 +55,11 @@ const items = [
     icon: <FolderIcon />,
     text: 'Files',
     link: '/dashboard/files',
+  },
+  {
+    icon: <URLIcon />,
+    text: 'URLs',
+    link: '/dashboard/urls',
   },
   {
     icon: <UploadIcon />,
