@@ -19,10 +19,10 @@
 - Easy setup instructions on [docs](https://zipline.diced.me) (One command install `docker-compose up`)
 
 ## Installing
-[See how to install here](https://zipline.diced.me/get-started)
+[See how to install here](https://zipline.diced.me/docs/get-started)
 
 ## Configuration
-[See how to configure here](https://zipline.diced.me/configuration/overview)
+[See how to configure here](https://zipline.diced.me/docs/config/overview)
 
 ## Theming
-[See how to theme here](https://zipline.diced.me/themes)
+[See how to theme here](https://zipline.diced.me/docs/themes/reference)
