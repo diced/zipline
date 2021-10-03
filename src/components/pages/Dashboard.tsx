@@ -15,8 +15,8 @@ import {
   CardActionArea,
   CardMedia,
   Card as MuiCard,
-} from '@material-ui/core';
-import AudioIcon from '@material-ui/icons/Audiotrack';
+} from '@mui/material';
+import AudioIcon from '@mui/icons-material/Audiotrack';
 
 import Link from 'components/Link';
 import Card from 'components/Card';

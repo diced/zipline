@@ -9,8 +9,8 @@ import {
   DialogTitle,
   DialogActions,
   DialogContent,
-} from '@material-ui/core';
-import AudioIcon from '@material-ui/icons/Audiotrack';
+} from '@mui/material';
+import AudioIcon from '@mui/icons-material/Audiotrack';
 import copy from 'copy-to-clipboard';
 import useFetch from 'hooks/useFetch';
 

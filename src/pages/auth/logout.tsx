@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { Backdrop, CircularProgress } from '@material-ui/core';
+import { Backdrop, CircularProgress } from '@mui/material';
 
 export default function Logout() {
   const router = useRouter();

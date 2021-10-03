@@ -2,7 +2,7 @@ import React from 'react';
 import {
   Backdrop as MuiBackdrop,
   CircularProgress,
-} from '@material-ui/core';
+} from '@mui/material';
 
 export default function Backdrop({ open }) {
   return (

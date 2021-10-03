@@ -1,35 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Typography, Box, TextField, Stack, Button } from '@material-ui/core';
-import { Color } from '@material-ui/core/Alert/Alert';
+import { Typography, Box, TextField, Stack, Button, styled } from '@mui/material';
 import { useRouter } from 'next/router';
 import Alert from 'components/Alert';
 import Backdrop from 'components/Backdrop';
+import TextInput from 'components/input/TextInput';
 import useFetch from 'hooks/useFetch';
 import { useFormik } from 'formik';
 
-
-function TextInput({ id, label, formik, ...other }) {
-  return (
-    <Box>
-      <TextField
-        id={id}
-        name={id}
-        label={label}
-        value={formik.values[id]}
-        onChange={formik.handleChange}
-        error={formik.touched[id] && Boolean(formik.errors[id])}
-        helperText={formik.touched[id] && formik.errors[id]}
-        variant='standard'
-        sx={{ pb: 0.5 }}
-        {...other}
-      />
-    </Box>
-  );
-}
-
 export default function Login() {
   const [open, setOpen] = useState(false);
-  const [severity, setSeverity] = useState<Color>('success');
+  const [severity, setSeverity] = useState('success');
   const [message, setMessage] = useState('');
   const [loadingOpen, setLoadingOpen] = useState(false);
   const router = useRouter();

@@ -17,6 +17,7 @@ model User {
   customTheme   Theme?
   embedTitle    String?
   embedColor    String  @default("#2f3136")
+  embedSiteName String? @default("{image.file} • {user.name}")
   images        Image[]
   urls          Url[]
 }

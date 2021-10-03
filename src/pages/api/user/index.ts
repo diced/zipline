@@ -41,6 +41,11 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       data: { embedColor: req.body.embedColor },
     });
 
+    if (req.body.embedSiteName) await prisma.user.update({
+      where: { id: user.id },
+      data: { embedSiteName: req.body.embedSiteName },
+    });
+
     if (req.body.systemTheme) await prisma.user.update({
       where: { id: user.id },
       data: { systemTheme: req.body.systemTheme },
@@ -72,6 +77,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         administrator: true,
         embedColor: true,
         embedTitle: true,
+        embedSiteName: true,
         id: true,
         images: false,
         password: false,

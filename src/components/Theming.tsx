@@ -1,6 +1,6 @@
 import React from 'react';
 import { ThemeProvider } from '@emotion/react';
-import { CssBaseline } from '@material-ui/core';
+import { CssBaseline } from '@mui/material';
 
 // themes
 import dark_blue from 'lib/themes/dark_blue';

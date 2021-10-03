@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Typography, Button, CardActionArea, Paper, Box } from '@material-ui/core';
-import { Upload as UploadIcon } from '@material-ui/icons';
+import { Typography, Button, CardActionArea, Paper, Box } from '@mui/material';
+import { Upload as UploadIcon } from '@mui/icons-material';
 import Dropzone from 'react-dropzone';
 
 import Backdrop from 'components/Backdrop';

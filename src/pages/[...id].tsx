@@ -1,13 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Head from 'next/head';
 import { GetServerSideProps } from 'next';
-import { Box } from '@material-ui/core';
+import { Box } from '@mui/material';
 import config from 'lib/config';
 import prisma from 'lib/prisma';
 import getFile from '../../server/static';
+import { parse } from 'lib/clientUtils';
 
-export default function EmbeddedImage({ image, title, username, color, normal, embed }) {
+export default function EmbeddedImage({ image, user, normal }) {
   const dataURL = (route: string) => `${route}/${image.file}`;
+
+  // reapply date from workaround
+  image.created_at = new Date(image.created_at);
 
   const updateImage = () => {
     const imageEl = document.getElementById('image_content') as HTMLImageElement;
@@ -25,18 +29,11 @@ export default function EmbeddedImage({ image, title, username, color, normal, e
   return (
     <>
       <Head>
-        {embed && (
+        {image.embed && (
           <>
-            {title ? (
-              <>
-                <meta property='og:site_name' content={`${image.file} • ${username}`} />
-                <meta property='og:title' content={title} />
-              </>
-            ) : (
-              <meta property='og:title' content={`${image.file} • ${username}`} />
-            )}
-            <meta property='theme-color' content={color}/>
-            <meta property='og:url' content={dataURL(normal)} />
+            {user.embedSiteName && (<meta property='og:site_name' content={parse(user.embedSiteName, image, user)} />)}
+            {user.embedTitle && (<meta property='og:title' content={parse(user.embedTitle, image, user)} />)}
+            <meta property='theme-color' content={user.embedColor}/>
           </>
         )}
         <meta property='og:image' content={dataURL('/r')} />
@@ -98,6 +95,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         invisible: true,
         userId: true,
         embed: true,
+        created_at: true,
       },
     });
     if (!image) return { notFound: true };
@@ -114,12 +112,17 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       select: {
         embedTitle: true,
         embedColor: true,
+        embedSiteName: true,
         username: true,
+        id: true,
       },
       where: {
         id: image.userId,
       },
     });
+
+    //@ts-ignore workaround because next wont allow date
+    image.created_at = image.created_at.toString();
   
     if (!image.mimetype.startsWith('image')) {
       const data = await getFile(config.uploader.directory, id);
@@ -132,11 +135,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return {
       props: {
         image,
-        title: user.embedTitle,
-        color: user.embedColor,
-        username: user.username,
+        user,
         normal: config.uploader.route,
-        embed: image.embed,
       },
     };
   }

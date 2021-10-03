@@ -22,8 +22,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Select,
-} from '@material-ui/core';
+} from '@mui/material';
 import {
   Menu as MenuIcon,
   Home as HomeIcon,
@@ -36,10 +35,11 @@ import {
   PeopleAlt as UsersIcon,
   Brush as BrushIcon,
   Link as URLIcon,
-} from '@material-ui/icons';
+} from '@mui/icons-material';
 import copy from 'copy-to-clipboard';
 import Backdrop from './Backdrop';
-import { friendlyThemeName, themes } from './Theming';
+import { friendlyThemeName, themes } from 'components/Theming';
+import Select from 'components/input/Select';
 import { useRouter } from 'next/router';
 import { useStoreDispatch } from 'lib/redux/store';
 import { updateUser } from 'lib/redux/reducers/user';
@@ -157,7 +157,7 @@ export default function Layout({ children, user, loading, noPaper }) {
     setAnchorEl(null);
   };
 
-  const handleUpdateTheme = async (event: React.ChangeEvent<{ value: string }>) => {
+  const handleUpdateTheme = async event => {
     const newUser = await useFetch('/api/user', 'PATCH', {
       systemTheme: event.target.value || 'dark_blue',
     });

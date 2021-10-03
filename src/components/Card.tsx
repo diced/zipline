@@ -3,7 +3,7 @@ import {
   Card as MuiCard,
   CardContent,
   Typography,
-} from '@material-ui/core';
+} from '@mui/material';
 
 export default function Card(props) {
   const { name, children, ...other } = props;

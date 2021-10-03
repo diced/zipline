@@ -6,6 +6,7 @@ export interface User {
   token: string;
   embedTitle: string;
   embedColor: string;
+  embedSiteName: string;
   systemTheme: string;
   customTheme?: Theme;
 }

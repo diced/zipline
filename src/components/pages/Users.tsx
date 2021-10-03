@@ -14,8 +14,8 @@ import {
   TextField,
   Switch,
   FormControlLabel,
-} from '@material-ui/core';
-import { Delete as DeleteIcon, Add as AddIcon } from '@material-ui/icons';
+} from '@mui/material';
+import { Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
 
 import { useStoreSelector } from 'lib/redux/store';
 import Backdrop from 'components/Backdrop';

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Snackbar, Alert as MuiAlert } from '@material-ui/core';
+import { Snackbar, Alert as MuiAlert } from '@mui/material';
 
 export default function Alert({ open, setOpen, severity, message }) {
   return (

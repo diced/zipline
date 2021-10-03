@@ -1,4 +1,4 @@
-import { createTheme as muiCreateTheme } from '@material-ui/core/styles';
+import { createTheme as muiCreateTheme } from '@mui/material/styles';
 
 export interface ThemeOptions {
   type: 'dark' | 'light';

@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
-import { TextField, Button, Box, Typography, Select, MenuItem } from '@material-ui/core';
-import Download from '@material-ui/icons/Download';
+import { Button, Box, Typography, MenuItem, Tooltip } from '@mui/material';
+import Download from '@mui/icons-material/Download';
 
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import useFetch from 'hooks/useFetch';
 import Backdrop from 'components/Backdrop';
 import Alert from 'components/Alert';
+import TextInput from 'components/input/TextInput';
+import Select from 'components/input/Select';
+import Link from 'components/Link';
 import { useStoreDispatch, useStoreSelector } from 'lib/redux/store';
 import { updateUser } from 'lib/redux/reducers/user';
 import { useRouter } from 'next/router';
@@ -56,21 +59,19 @@ const themeValidationSchema = yup.object({
 
 });
 
-function TextInput({ id, label, formik, ...other }) {
+function VarsTooltip({ children }) {
   return (
-    <TextField
-      id={id}
-      name={id}
-      label={label}
-      value={formik.values[id]}
-      onChange={formik.handleChange}
-      error={formik.touched[id] && Boolean(formik.errors[id])}
-      helperText={formik.touched[id] && formik.errors[id]}
-      variant='standard'
-      fullWidth
-      sx={{ pb: 0.5 }}
-      {...other}
-    />
+    <Tooltip title={
+      <>
+        <Typography><b>{'{image.file}'}</b> - file name</Typography>
+        <Typography><b>{'{image.mimetype}'}</b> - mimetype</Typography>
+        <Typography><b>{'{image.id}'}</b> - id of the image</Typography>
+        <Typography><b>{'{user.name}'}</b> - your username</Typography>
+        visit <Link href='https://zipline.diced.me/docs/variables'>the docs</Link> for more variables
+      </>
+    }>
+      {children}
+    </Tooltip>
   );
 }
 
@@ -116,6 +117,7 @@ export default function Manage() {
       password: '',
       embedTitle: user.embedTitle ?? '',
       embedColor: user.embedColor,
+      embedSiteName: user.embedSiteName ?? '',
     },
     validationSchema,
     onSubmit: async values => {
@@ -123,6 +125,7 @@ export default function Manage() {
       const cleanPassword = values.password.trim();
       const cleanEmbedTitle = values.embedTitle.trim();
       const cleanEmbedColor = values.embedColor.trim();
+      const cleanEmbedSiteName = values.embedSiteName.trim();
 
       if (cleanUsername === '') return formik.setFieldError('username', 'Username can\'t be nothing');
 
@@ -133,6 +136,7 @@ export default function Manage() {
         password: cleanPassword === '' ? null : cleanPassword,
         embedTitle: cleanEmbedTitle === '' ? null : cleanEmbedTitle,
         embedColor: cleanEmbedColor === '' ? null : cleanEmbedColor,
+        embedSiteName: cleanEmbedSiteName === '' ? null : cleanEmbedSiteName,
       };
 
       const newUser = await useFetch('/api/user', 'PATCH', data);
@@ -190,12 +194,16 @@ export default function Manage() {
       <Backdrop open={loading}/>
       <Alert open={open} setOpen={setOpen} message={message} severity={severity} />
 
-      <Typography variant='h4' pb={2}>Manage User</Typography>
+      <Typography variant='h4'>Manage User</Typography>
+      <VarsTooltip>
+        <Typography variant='caption' color='GrayText'>Want to use variables in embed text? Hover on this or visit <Link href='https://zipline.diced.me/docs/variables'>the docs</Link> for more variables</Typography>
+      </VarsTooltip>
       <form onSubmit={formik.handleSubmit}>
-        <TextInput id='username' label='Username' formik={formik} />
-        <TextInput id='password' label='Password' formik={formik} type='password' />
-        <TextInput id='embedTitle' label='Embed Title' formik={formik} />
-        <TextInput id='embedColor' label='Embed Color' formik={formik} />
+        <TextInput fullWidth id='username' label='Username' formik={formik} />
+        <TextInput fullWidth id='password' label='Password' formik={formik} type='password' />
+        <TextInput fullWidth id='embedTitle' label='Embed Title' formik={formik} />
+        <TextInput fullWidth id='embedColor' label='Embed Color' formik={formik} />
+        <TextInput fullWidth id='embedSiteName' label='Embed Site Name' formik={formik} />
         <Box
           display='flex'
           justifyContent='right'
@@ -223,14 +231,14 @@ export default function Manage() {
           <MenuItem value='dark'>Dark Theme</MenuItem>
           <MenuItem value='light'>Light Theme</MenuItem>
         </Select>
-        <TextInput id='primary' label='Primary Color' formik={customThemeFormik} />
-        <TextInput id='secondary' label='Secondary Color' formik={customThemeFormik} />
-        <TextInput id='error' label='Error Color' formik={customThemeFormik} />
-        <TextInput id='warning' label='Warning Color' formik={customThemeFormik} />
-        <TextInput id='info' label='Info Color' formik={customThemeFormik} />
-        <TextInput id='border' label='Border Color' formik={customThemeFormik} />
-        <TextInput id='mainBackground' label='Main Background' formik={customThemeFormik} />
-        <TextInput id='paperBackground' label='Paper Background' formik={customThemeFormik} />
+        <TextInput fullWidth id='primary' label='Primary Color' formik={customThemeFormik} />
+        <TextInput fullWidth id='secondary' label='Secondary Color' formik={customThemeFormik} />
+        <TextInput fullWidth id='error' label='Error Color' formik={customThemeFormik} />
+        <TextInput fullWidth id='warning' label='Warning Color' formik={customThemeFormik} />
+        <TextInput fullWidth id='info' label='Info Color' formik={customThemeFormik} />
+        <TextInput fullWidth id='border' label='Border Color' formik={customThemeFormik} />
+        <TextInput fullWidth id='mainBackground' label='Main Background' formik={customThemeFormik} />
+        <TextInput fullWidth id='paperBackground' label='Paper Background' formik={customThemeFormik} />
         <Box
           display='flex'
           justifyContent='right'
