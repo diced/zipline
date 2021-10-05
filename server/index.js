@@ -38,7 +38,7 @@ function shouldUseYarn() {
     const config = await validateConfig(a);
 
     const data = await prismaRun(config.core.database_url, ['migrate', 'status'], true);
-    if (data.match(/Following migration[s]? have not yet been applied/)) {
+    if (data.match(/Following migrations? have not yet been applied/)) {
       Logger.get('database').info('some migrations are not applied, applying them now...');
       await deployDb(config);
       Logger.get('database').info('finished applying migrations');
