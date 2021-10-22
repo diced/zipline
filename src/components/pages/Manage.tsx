@@ -255,6 +255,7 @@ export default function Manage() {
       <Button variant='contained' onClick={() => genShareX(false)} startIcon={<Download />}>ShareX Config</Button>
       <Button variant='contained' sx={{ marginLeft: 1 }} onClick={() => genShareX(true)} startIcon={<Download />}>ShareX Config with Embed</Button>
       <Button variant='contained' sx={{ marginLeft: 1 }} onClick={() => genShareX(false, true)} startIcon={<Download />}>ShareX Config with ZWS</Button>
+      <Button variant='contained' sx={{ marginLeft: 1 }} onClick={() => genShareX(true, true)} startIcon={<Download />}>ShareX Config with ZWS and Embed</Button>
     </>
   );
 }
