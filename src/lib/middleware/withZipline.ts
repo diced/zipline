@@ -48,11 +48,11 @@ export type NextApiRes = NextApiResponse & {
 // }
 
 export const withZipline = (handler: (req: NextApiRequest, res: NextApiResponse) => unknown) => (req: NextApiReq, res: NextApiRes) => {
+  res.setHeader('Content-Type', 'application/json');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Content-Allow-Methods', 'GET,HEAD,POST,OPTIONS');
   res.setHeader('Access-Control-Max-Age', '86400');
   res.error = (message: string) => {
-    res.setHeader('Content-Type', 'application/json');
     res.json({
       error: message,
     });
@@ -67,7 +67,6 @@ export const withZipline = (handler: (req: NextApiRequest, res: NextApiResponse)
   };
 
   res.bad = (message: string) => {
-    res.setHeader('Content-Type', 'application/json');
     res.status(401);
     res.json({
       error: '403: ' + message,
@@ -75,7 +74,6 @@ export const withZipline = (handler: (req: NextApiRequest, res: NextApiResponse)
   };
 
   res.json = (json: any) => {
-    res.setHeader('Content-Type', 'application/json');
     res.end(JSON.stringify(json));
   };
 
