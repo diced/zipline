@@ -16,6 +16,9 @@ export interface ConfigCore {
 
   // Whether or not to log stuff
   logger: boolean;
+
+  // The interval to store stats
+  stats_interval: number;
 }
 
 export interface ConfigUploader {

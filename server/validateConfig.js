@@ -10,6 +10,7 @@ const validator = yup.object({
     port: yup.number().default(3000),
     database_url: yup.string().required(),
     logger: yup.boolean().default(true),
+    stats_interval: yup.number().default(1800),
   }).required(),
   uploader: yup.object({
     route: yup.string().required(),

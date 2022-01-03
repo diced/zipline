@@ -1,9 +1,8 @@
 const next = require('next');
 const { createServer } = require('http');
-const { stat, mkdir } = require('fs/promises');
+const { stat, mkdir, readdir } = require('fs/promises');
 const { execSync } = require('child_process');
-const { extname } = require('path');
-const { red, green, bold } = require('colorette');
+const { extname, join } = require('path');
 const { PrismaClient } = require('@prisma/client');
 const validateConfig = require('./validateConfig');
 const Logger = require('../src/lib/logger');
@@ -125,6 +124,22 @@ function shouldUseYarn() {
     });
 
     srv.listen(config.core.port, config.core.host ?? '0.0.0.0');
+
+    const stats = await getStats(prisma, config);
+    await prisma.stats.create({
+      data: {
+        data: stats,
+      },
+    });
+    setInterval(async () => {
+      const stats = await getStats(prisma, config);
+      await prisma.stats.create({
+        data: {
+          data: stats,
+        },
+      });
+      if (config.core.logger) Logger.get('server').info('stats updated');
+    }, config.core.stats_interval * 1000);
   } catch (e) {
     if (e.message && e.message.startsWith('Could not find a production')) {
       Logger.get('web').error(`there is no production build - run \`${shouldUseYarn() ? 'yarn build' : 'npm build'}\``);
@@ -136,3 +151,80 @@ function shouldUseYarn() {
     }
   }
 })();
+
+async function sizeOfDir(directory) {
+  const files = await readdir(directory);
+  
+  let size = 0;
+  for (let i = 0, L = files.length; i !== L; ++i) {
+    const sta = await stat(join(directory, files[i]));
+    size += sta.size;
+  }
+
+  return size;
+}
+
+function bytesToRead(bytes) {
+  const units = ['B', 'kB', 'MB', 'GB', 'TB', 'PB'];
+  let num = 0;
+
+  while (bytes > 1024) {
+    bytes /= 1024;
+    ++num;
+  }
+
+  return `${bytes.toFixed(1)} ${units[num]}`;
+}
+
+
+async function getStats(prisma, config) {
+  const size = await sizeOfDir(join(process.cwd(), config.uploader.directory));
+  const byUser = await prisma.image.groupBy({
+    by: ['userId'],
+    _count: {
+      _all: true,
+    },
+  });
+  const count_users = await prisma.user.count();
+
+  const count_by_user = [];
+  for (let i = 0, L = byUser.length; i !== L; ++i) {
+    const user = await prisma.user.findFirst({
+      where: {
+        id: byUser[i].userId,
+      },
+    });
+
+    count_by_user.push({
+      username: user.username,
+      count: byUser[i]._count._all,
+    });
+  }
+
+  const count = await prisma.image.count();
+  const viewsCount = await prisma.image.groupBy({
+    by: ['views'],
+    _sum: {
+      views: true,
+    },
+  });
+
+  const typesCount = await prisma.image.groupBy({
+    by: ['mimetype'],
+    _count: {
+      mimetype: true,
+    },
+  });
+  const types_count = [];
+  for (let i = 0, L = typesCount.length; i !== L; ++i) types_count.push({ mimetype: typesCount[i].mimetype, count: typesCount[i]._count.mimetype });
+
+  return {
+    size: bytesToRead(size),
+    size_num: size,
+    count,
+    count_by_user: count_by_user.sort((a,b) => b.count-a.count),
+    count_users,
+    views_count: (viewsCount[0]?._sum?.views ?? 0),
+    types_count: types_count.sort((a,b) => b.count-a.count),
+  };
+}

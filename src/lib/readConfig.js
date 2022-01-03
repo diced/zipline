@@ -11,6 +11,7 @@ const envValues = [
   e('PORT', 'number', (c, v) => c.core.port = v),
   e('DATABASE_URL', 'string', (c, v) => c.core.database_url = v),
   e('LOGGER', 'boolean', (c, v) => c.core.logger = v ?? true),
+  e('STATS_INTERVAL', 'number', (c, v) => c.core.stats_interval = v),
 
   e('UPLOADER_ROUTE', 'string', (c, v) => c.uploader.route = v),
   e('UPLOADER_LENGTH', 'number', (c, v) => c.uploader.length = v),
@@ -48,6 +49,7 @@ function tryReadEnv() {
       port: undefined,
       database_url: undefined,
       logger: undefined,
+      stats_interval: undefined,
     },
     uploader: {
       route: undefined,

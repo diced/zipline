@@ -87,7 +87,7 @@ function CopyTokenDialog({ open, setOpen, token }) {
         </DialogTitle>
         <DialogContent>
           <DialogContentText id='copy-dialog-description'>
-              Make sure you don&apos;t share this token with anyone as they will be able to upload images on your behalf.
+              Make sure you don&apos;t share this token with anyone as they will be able to upload files on your behalf.
           </DialogContentText>
         </DialogContent>
         <DialogActions>

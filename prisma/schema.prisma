@@ -75,3 +75,9 @@ model InvisibleUrl {
   urlId String
   url   Url    @relation(fields: [urlId], references: [id])
 }
+
+model Stats {
+  id         Int @id @default(autoincrement())
+  created_at DateTime @default(now())
+  data       Json
+}

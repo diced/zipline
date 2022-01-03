@@ -4,6 +4,7 @@ import { readdir, stat } from 'fs/promises';
 import { join } from 'path';
 import prisma from './prisma';
 import { InvisibleImage, InvisibleUrl } from '@prisma/client';
+import config from './config';
 
 export async function hashPassword(s: string): Promise<string> {
   return await hash(s);
