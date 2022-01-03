@@ -125,9 +125,9 @@ export default function Dashboard() {
   return (
     <>
       <Typography variant='h4'>Welcome back {user?.username}</Typography>
-      <Typography color='GrayText' pb={2}>You have <b>{images.length ? images.length : '...'}</b> images</Typography>
+      <Typography color='GrayText' pb={2}>You have <b>{images.length ? images.length : '...'}</b> files</Typography>
       
-      <Typography variant='h4'>Recent Images</Typography>
+      <Typography variant='h4'>Recent Files</Typography>
       <Grid container spacing={4} py={2}>
         {recent.length ? recent.map(image => (
           <Grid item xs={12} sm={3} key={image.id}>
@@ -172,7 +172,7 @@ export default function Dashboard() {
         </Grid>
       </Grid>
       <Card name='Images' sx={{ my: 2 }} elevation={0} variant='outlined'>
-        <Link href='/dashboard/images' pb={2}>View Gallery</Link>
+        <Link href='/dashboard/files' pb={2}>View Files</Link>
         <TableContainer sx={{ maxHeight: 440 }}>
           <Table size='small'>
             <TableHead>
@@ -225,11 +225,11 @@ export default function Dashboard() {
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage} />
       </Card>
-      <Card name='Images per User' sx={{ height: '100%', my: 2 }} elevation={0} variant='outlined'>
+      <Card name='Files per User' sx={{ height: '100%', my: 2 }} elevation={0} variant='outlined'>
         <StatTable
           columns={[
             { id: 'username', name: 'Name' },
-            { id: 'count', name: 'Images' },
+            { id: 'count', name: 'Files' },
           ]}
           rows={stats ? stats.count_by_user : []} />
       </Card>

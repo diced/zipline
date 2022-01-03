@@ -38,20 +38,16 @@ export type NextApiRes = NextApiResponse & {
   forbid: (message: string) => void;
   bad: (message: string) => void;
   json: (json: any) => void;
+  ratelimited: () => void;
   setCookie: (name: string, value: unknown, options: CookieSerializeOptions) => void;
 }
-
-// {
-//   'Access-Control-Allow-Origin': '*',
-//   'Access-Control-Allow-Methods': 'GET,HEAD,POST,OPTIONS',
-//   'Access-Control-Max-Age': '86400'
-// }
 
 export const withZipline = (handler: (req: NextApiRequest, res: NextApiResponse) => unknown) => (req: NextApiReq, res: NextApiRes) => {
   res.setHeader('Content-Type', 'application/json');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Content-Allow-Methods', 'GET,HEAD,POST,OPTIONS');
   res.setHeader('Access-Control-Max-Age', '86400');
+
   res.error = (message: string) => {
     res.json({
       error: message,
@@ -70,6 +66,14 @@ export const withZipline = (handler: (req: NextApiRequest, res: NextApiResponse)
     res.status(401);
     res.json({
       error: '403: ' + message,
+    });
+  };
+
+  res.ratelimited = () => {
+    res.status(429);
+
+    res.json({
+      error: '429: ratelimited',
     });
   };
 

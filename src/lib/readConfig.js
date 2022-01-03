@@ -10,6 +10,7 @@ const envValues = [
   e('HOST', 'string', (c, v) => c.core.host = v),
   e('PORT', 'number', (c, v) => c.core.port = v),
   e('DATABASE_URL', 'string', (c, v) => c.core.database_url = v),
+  e('LOGGER', 'boolean', (c, v) => c.core.logger = v ?? true),
 
   e('UPLOADER_ROUTE', 'string', (c, v) => c.uploader.route = v),
   e('UPLOADER_LENGTH', 'number', (c, v) => c.uploader.length = v),
@@ -20,6 +21,9 @@ const envValues = [
 
   e('URLS_ROUTE', 'string', (c, v) => c.urls.route = v),
   e('URLS_LENGTH', 'number', (c, v) => c.urls.length = v),
+
+  e('RATELIMIT_USER', 'number', (c, v) => c.ratelimit.user = v ?? 0),
+  e('RATELIMIT_ADMIN', 'number', (c, v) => c.ratelimit.user = v ?? 0),
 ];
 
 module.exports = () => {
@@ -43,6 +47,7 @@ function tryReadEnv() {
       host: undefined,
       port: undefined,
       database_url: undefined,
+      logger: undefined,
     },
     uploader: {
       route: undefined,
@@ -55,6 +60,10 @@ function tryReadEnv() {
     urls: {
       route: undefined,
       length: undefined,
+    },
+    ratelimit: {
+      user: undefined,
+      admin: undefined,
     },
   };
 

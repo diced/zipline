@@ -12,7 +12,7 @@ const uploader = multer({
 });
 
 async function handler(req: NextApiReq, res: NextApiRes) {
-  if (req.method !== 'POST') return res.forbid('no allow');
+  if (req.method !== 'POST') return res.forbid('invalid method');
   if (!req.headers.authorization) return res.forbid('no authorization');
   
   const user = await prisma.user.findFirst({
@@ -21,8 +21,10 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     },
   });
 
-
   if (!user) return res.forbid('authorization incorect');
+
+  if (user.ratelimited) return res.ratelimited();
+
   if (!req.files) return res.error('no files');
   if (req.files && req.files.length === 0) return res.error('no files');
 
@@ -53,8 +55,31 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     files.push(`${zconfig.core.secure ? 'https' : 'http'}://${req.headers.host}${zconfig.uploader.route}/${invis ? invis.invis : image.file}`);
   }
 
-  // url will be deprecated soon
-  return res.json({ files, url: files[0] });
+  if (user.administrator && zconfig.ratelimit.admin !== 0) {
+    await prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        ratelimited: true,
+      },
+    });
+    setTimeout(async () => await prisma.user.update({ where: { id: user.id }, data: { ratelimited: false } }), zconfig.ratelimit.admin * 1000).unref();
+  }
+
+  if (!user.administrator && zconfig.ratelimit.user !== 0) {
+    await prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        ratelimited: true,
+      },
+    });
+    setTimeout(async () => await prisma.user.update({ where: { id: user.id }, data: { ratelimited: false } }), zconfig.ratelimit.user * 1000).unref();
+  }
+
+  return res.json({ files });
 }
 
 function run(middleware: any) {

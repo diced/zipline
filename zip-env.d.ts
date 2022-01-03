@@ -6,6 +6,7 @@ declare global {
     interface Global {
       prisma: PrismaClient;
       config: Config;
+      ratelimit: Set<string>;
     }
   }
 }

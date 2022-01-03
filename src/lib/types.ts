@@ -13,6 +13,9 @@ export interface ConfigCore {
 
   // The PostgreSQL database url
   database_url: string
+
+  // Whether or not to log stuff
+  logger: boolean;
 }
 
 export interface ConfigUploader {
@@ -43,8 +46,18 @@ export interface ConfigUrls {
   length: number;
 }
 
+// Ratelimiting for users/admins, setting them to 0 disables ratelimiting
+export interface ConfigRatelimit {
+  // Ratelimit for users
+  user: number;
+
+  // Ratelimit for admins
+  admin: number;
+}
+
 export interface Config {
   core: ConfigCore;
   uploader: ConfigUploader;
   urls: ConfigUrls;
+  ratelimit: ConfigRatelimit;
 }

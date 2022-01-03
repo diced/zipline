@@ -20,7 +20,7 @@ const dev = process.env.NODE_ENV === 'development';
 
 function log(url, status) {
   if (url.startsWith('/_next') || url.startsWith('/__nextjs')) return;
-  return Logger.get('url').info(`${status === 200 ? bold(green(status)) : bold(red(status))}: ${url}`);
+  return Logger.get('url').info(url);
 }
 
 function shouldUseYarn() {
@@ -111,7 +111,7 @@ function shouldUseYarn() {
         handle(req, res);
       }
 
-      log(req.url, res.statusCode);
+      if (config.core.logger) log(req.url, res.statusCode);
     });
 
     srv.on('error', (e) => {

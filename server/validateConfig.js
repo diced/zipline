@@ -9,6 +9,7 @@ const validator = yup.object({
     host: yup.string().default('0.0.0.0'),
     port: yup.number().default(3000),
     database_url: yup.string().required(),
+    logger: yup.boolean().default(true),
   }).required(),
   uploader: yup.object({
     route: yup.string().required(),
@@ -22,6 +23,10 @@ const validator = yup.object({
     route: yup.string().required(),
     length: yup.number().default(6),
   }).required(),
+  ratelimit: yup.object({
+    user: yup.number().default(0),
+    admin: yup.number().default(0),
+  }),
 });
 
 
