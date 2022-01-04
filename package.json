@@ -1,6 +1,6 @@
 {
   "name": "zip3",
-  "version": "3.2.5",
+  "version": "3.3.0",
   "scripts": {
     "prepare": "husky install",
     "dev": "NODE_ENV=development node server",
