@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect } from 'react';
 import Head from 'next/head';
 import { GetServerSideProps } from 'next';
 import { Box } from '@mui/material';
@@ -57,7 +57,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const route = context.params.id[0];
   const routes = [config.uploader.route.substring(1), config.urls.route.substring(1)];
   if (!routes.includes(route)) return { notFound: true };
-
   if (route === routes[1]) {
     const url = await prisma.url.findFirst({
       where: {
@@ -99,14 +98,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       },
     });
     if (!image) return { notFound: true };
-
-    if (!image.embed) {
-      const data = await getFile(config.uploader.directory, id);
-      if (!data) return { notFound: true };
-
-      context.res.end(data);
-      return { props: {} };
-    };
 
     const user = await prisma.user.findFirst({
       select: {

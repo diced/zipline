@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Typography, Button, CardActionArea, Paper, Box } from '@mui/material';
 import { Upload as UploadIcon } from '@mui/icons-material';
 import Dropzone from 'react-dropzone';
@@ -18,9 +18,18 @@ export default function Upload({ route }) {
   const [open, setOpen] = useState(false);
   const [severity, setSeverity] = useState('success');
   const [message, setMessage] = useState('Saved');
+
+  useEffect(() => {
+    window.addEventListener('paste', (e: ClipboardEvent) => {
+      const item = Array.from(e.clipboardData.items).find(x => /^image/.test(x.type));
+      const blob = item.getAsFile();
+      setFiles([...files, new File([blob], blob.name, { type: blob.type })]);
+    });
+  });
   
   const handleUpload = async () => {
     const body = new FormData();
+
 
     for (let i = 0; i !== files.length; ++i) body.append('file', files[i]);
 

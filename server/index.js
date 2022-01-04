@@ -86,25 +86,55 @@ function shouldUseYarn() {
           res.setHeader('Content-Type', mimetype);
           res.end(data);
         } else {
-          if (image) {
-            const data = await getFile(config.uploader.directory, image.file);
-            if (!data) return app.render404(req, res);
+          const data = await getFile(config.uploader.directory, image.file);
+          if (!data) return app.render404(req, res);
 
-            await prisma.image.update({
-              where: { id: image.id },
-              data: { views: { increment: 1 } },
-            });
-            res.setHeader('Content-Type', image.mimetype);
-            res.end(data);
-          } else {
-            const data = await getFile(config.uploader.directory, parts[2]);
-            if (!data) return app.render404(req, res);
+          await prisma.image.update({
+            where: { id: image.id },
+            data: { views: { increment: 1 } },
+          });
+          res.setHeader('Content-Type', image.mimetype);
+          res.end(data);
+        }
+      } else if (req.url.startsWith(config.uploader.route)) {
+        const parts = req.url.split('/');
+        if (!parts[2] || parts[2] === '') return;
+
+        let image = await prisma.image.findFirst({
+          where: {
+            OR: [
+              { file: parts[2] },
+              { invisible:{ invis: decodeURI(parts[2]) } },
+            ],
+          },
+          select: {
+            mimetype: true,
+            id: true,
+            file: true,
+            invisible: true,
+            embed: true,
+          },
+        });
+
+        if (!image) {
+          const data = await getFile(config.uploader.directory, parts[2]);
+          if (!data) return app.render404(req, res);
   
-            const mimetype = mimes[extname(parts[2])] ?? 'application/octet-stream';
-            res.setHeader('Content-Type', mimetype);
-            res.end(data);
-          }
+          const mimetype = mimes[extname(parts[2])] ?? 'application/octet-stream';
+          res.setHeader('Content-Type', mimetype);
+          res.end(data);
+        } else if (image.embed) {
+          handle(req, res);
+        } else {
+          const data = await getFile(config.uploader.directory, image.file);
+          if (!data) return app.render404(req, res);
 
+          await prisma.image.update({
+            where: { id: image.id },
+            data: { views: { increment: 1 } },
+          });
+          res.setHeader('Content-Type', image.mimetype);
+          res.end(data);
         }
       } else {
         handle(req, res);
