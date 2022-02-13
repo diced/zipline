@@ -32,6 +32,8 @@ module.exports = () => {
     Logger.get('config').info('reading environment');
     return tryReadEnv();
   } else {
+    if (process.env.JEST_WORKER_ID) return;
+    
     Logger.get('config').info('reading config file');
     const str = readFileSync(join(process.cwd(), 'config.toml'), 'utf8');
     const parsed = require('@iarna/toml/parse-string')(str);

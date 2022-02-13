@@ -67,7 +67,7 @@ function VarsTooltip({ children }) {
         <Typography><b>{'{image.mimetype}'}</b> - mimetype</Typography>
         <Typography><b>{'{image.id}'}</b> - id of the image</Typography>
         <Typography><b>{'{user.name}'}</b> - your username</Typography>
-        visit <Link href='https://zipline.diced.me/docs/variables'>the docs</Link> for more variables
+        visit <Link href='https://zipline.diced.cf/docs/variables'>the docs</Link> for more variables
       </>
     }>
       {children}
@@ -97,7 +97,7 @@ export default function Manage() {
         ...(withEmbed && {Embed: 'true'}),
         ...(withZws && {ZWS: 'true'}),
       },
-      URL: '$json:url$',
+      URL: '$json:files[0]$',
       Body: 'MultipartFormData',
       FileFormName: 'file',
     };
@@ -196,7 +196,7 @@ export default function Manage() {
 
       <Typography variant='h4'>Manage User</Typography>
       <VarsTooltip>
-        <Typography variant='caption' color='GrayText'>Want to use variables in embed text? Hover on this or visit <Link href='https://zipline.diced.me/docs/variables'>the docs</Link> for more variables</Typography>
+        <Typography variant='caption' color='GrayText'>Want to use variables in embed text? Hover on this or visit <Link href='https://zipline.diced.cf/docs/variables'>the docs</Link> for more variables</Typography>
       </VarsTooltip>
       <form onSubmit={formik.handleSubmit}>
         <TextInput fullWidth id='username' label='Username' formik={formik} />

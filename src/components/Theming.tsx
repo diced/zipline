@@ -11,6 +11,8 @@ import ayu_light from 'lib/themes/ayu_light';
 import nord from 'lib/themes/nord';
 import polar from 'lib/themes/polar';
 import dracula from 'lib/themes/dracula';
+import matcha_dark_azul from 'lib/themes/matcha_dark_azul';
+import qogir_dark from 'lib/themes/qogir_dark';
 
 import { useStoreSelector } from 'lib/redux/store';
 import createTheme from 'lib/themes';
@@ -24,6 +26,8 @@ export const themes = {
   'nord': nord,
   'polar': polar,
   'dracula': dracula,
+  'matcha_dark_azul': matcha_dark_azul,
+  'qogir_dark': qogir_dark,
 };
 
 export const friendlyThemeName = {
@@ -35,6 +39,8 @@ export const friendlyThemeName = {
   'nord': 'Nord',
   'polar': 'Polar',
   'dracula': 'Dracula',
+  'matcha_dark_azul': 'Matcha Dark Azul',
+  'qogir_dark': 'Qogir Dark',
 };
 
 export default function ZiplineTheming({ Component, pageProps }) {

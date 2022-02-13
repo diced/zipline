@@ -22,8 +22,7 @@ export default function EmbeddedImage({ image, user, normal }) {
     if (original.width > innerWidth) imageEl.width = Math.floor(original.width * Math.min((innerHeight / original.height), (innerWidth / original.width)));
     else imageEl.width = original.width;
   };
-
-  if (typeof window !== 'undefined') window.onresize = () => updateImage();
+  
   useEffect(() => updateImage(), []);
 
   return (

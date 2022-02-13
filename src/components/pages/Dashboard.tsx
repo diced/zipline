@@ -17,9 +17,14 @@ import {
   Card as MuiCard,
 } from '@mui/material';
 import AudioIcon from '@mui/icons-material/Audiotrack';
+import DeleteIcon from '@mui/icons-material/Delete';
+import CopyIcon from '@mui/icons-material/FileCopy';
+import OpenIcon from '@mui/icons-material/OpenInNew';
 
 import Link from 'components/Link';
 import Card from 'components/Card';
+import Alert from 'components/Alert';
+import copy from 'copy-to-clipboard';
 import useFetch from 'lib/hooks/useFetch';
 import { useStoreSelector } from 'lib/redux/store';
 
@@ -95,6 +100,10 @@ export default function Dashboard() {
   const [stats, setStats] = useState(null);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
+  const [open, setOpen] = useState(false);
+  const [severity, setSeverity] = useState('success');
+  const [message, setMessage] = useState('Saved');
+
   const updateImages = async () => {
     const imgs = await useFetch('/api/user/files');
     const recent = await useFetch('/api/user/recent?filter=media');
@@ -124,6 +133,8 @@ export default function Dashboard() {
   
   return (
     <>
+      <Alert open={open} setOpen={setOpen} message={message} severity={severity} />
+
       <Typography variant='h4'>Welcome back {user?.username}</Typography>
       <Typography color='GrayText' pb={2}>You have <b>{images.length ? images.length : '...'}</b> files</Typography>
       
@@ -162,7 +173,7 @@ export default function Dashboard() {
           <Card name='Images' sx={{ height: '100%' }}>
             <StatText>{stats ? stats.count : <Skeleton variant='text' />}</StatText>
             <Typography variant='h3'>Views</Typography>
-            <StatText>{stats ? `${stats.views_count} (${isNaN(stats.views_count / stats.count) ? '0' : stats.views_count / stats.count})` : <Skeleton variant='text' />}</StatText>
+            <StatText>{stats ? `${stats.views_count} (${isNaN(stats.views_count / stats.count) ? 0 : Math.round(stats.views_count / stats.count)})` : <Skeleton variant='text' />}</StatText>
           </Card>
         </Grid>
         <Grid item xs={12} sm={4}>
@@ -206,8 +217,15 @@ export default function Dashboard() {
                         );
                       })}
                       <TableCell align='right'  sx={{ borderColor: t => t.palette.divider }}>
-                        <ButtonGroup variant='outlined'>
-                          <Button onClick={() => handleDelete(row)} color='error' size='small'>Delete</Button>
+                        <ButtonGroup variant='text'>
+                          <Button onClick={() => handleDelete(row)} color='error' size='small'><DeleteIcon /></Button>
+                          <Button onClick={() => window.open(row.url, '_blank')} color='warning' size='small'><OpenIcon /></Button>
+                          <Button onClick={() => {
+                            copy(window.location.origin + row.url);
+                            setOpen(true);
+                            setSeverity('success');
+                            setMessage('Copied to clipboard');
+                          }} color='info' size='small'><CopyIcon /></Button>
                         </ButtonGroup>
                       </TableCell>
                     </TableRow>

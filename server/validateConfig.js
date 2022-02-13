@@ -13,15 +13,16 @@ const validator = yup.object({
     stats_interval: yup.number().default(1800),
   }).required(),
   uploader: yup.object({
-    route: yup.string().required(),
+    route: yup.string().default('/u'),
+    embed_route: yup.string().default('/a'),
     length: yup.number().default(6),
-    directory: yup.string().required(),
+    directory: yup.string().default('./uploads'),
     admin_limit: yup.number().default(104900000),
     user_limit: yup.number().default(104900000),
     disabled_extensions: yup.array().default([]),
   }).required(),
   urls: yup.object({
-    route: yup.string().required(),
+    route: yup.string().default('/go'),
     length: yup.number().default(6),
   }).required(),
   ratelimit: yup.object({
