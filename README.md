@@ -16,13 +16,13 @@
 - Fast
 - Built with Next.js & React
 - Token protected uploading
-- Easy setup instructions on [docs](https://zipline.diced.cf) (One command install `docker-compose up`)
+- Easy setup instructions on [docs](https://zipline.diced.tech/) (One command install `docker-compose up`)
 
 ## Installing
-[See how to install here](https://zipline.diced.cf/docs/get-started)
+[See how to install here](https://zipline.diced.tech/docs/get-started)
 
 ## Configuration
-[See how to configure here](https://zipline.diced.cf/docs/config/overview)
+[See how to configure here](https://zipline.diced.tech/docs/config/overview)
 
 ## Theming
-[See how to theme here](https://zipline.diced.cf/docs/themes/reference)
+[See how to theme here](https://zipline.diced.tech/docs/themes/reference)
