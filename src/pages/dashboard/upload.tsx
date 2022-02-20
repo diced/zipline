@@ -21,10 +21,10 @@ export default function UploadPage({ route }) {
   );
 }
 
-export const getStaticProps: GetStaticProps = async (context) => {
+export const getStaticProps: GetStaticProps = async () => {
   return {
     props: {
-      route: config.uploader.route,
+      route: process.env.ZIPLINE_DOCKER_BUILD === '1' ? '/u' : config.uploader.route,
     },
   };
 };

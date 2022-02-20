@@ -9,8 +9,8 @@ async function main() {
       username: 'administrator',
       password: await hashPassword('password'),
       token: createToken(),
-      administrator: true
-    }
+      administrator: true,
+    },
   });
 
   console.log(`

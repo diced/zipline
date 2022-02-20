@@ -1,6 +1,7 @@
 const { existsSync, readFileSync } = require('fs');
 const { join } = require('path');
-const Logger = require('./logger');
+const parse = require('@iarna/toml/parse-string.js');
+const Logger = require('./logger.js');
 
 const e = (val, type, fn) => ({ val, type, fn });
 
@@ -27,16 +28,16 @@ const envValues = [
   e('RATELIMIT_ADMIN', 'number', (c, v) => c.ratelimit.user = v ?? 0),
 ];
 
-module.exports = () => {
+module.exports = function readConfig() {
   if (!existsSync(join(process.cwd(), 'config.toml'))) {
-    Logger.get('config').info('reading environment');
+    if (!process.env.ZIPLINE_DOCKER_BUILD) Logger.get('config').info('reading environment');
     return tryReadEnv();
   } else {
-    if (process.env.JEST_WORKER_ID) return;
+    if (process.env.ZIPLINE_DOCKER_BUILD) return;
     
     Logger.get('config').info('reading config file');
     const str = readFileSync(join(process.cwd(), 'config.toml'), 'utf8');
-    const parsed = require('@iarna/toml/parse-string')(str);
+    const parsed = parse(str);
 
     return parsed;
   }

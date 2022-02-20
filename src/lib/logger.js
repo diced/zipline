@@ -1,7 +1,7 @@
 const { format } = require('fecha');
 const { blueBright, red, cyan } = require('colorette');
 
-class Logger {
+module.exports = class Logger {
   static get(clas) {
     if (typeof clas !== 'function') if (typeof clas !== 'string') throw new Error('not string/function');
 
@@ -35,6 +35,4 @@ class Logger {
       return red('ERROR');
     }
   }
-}
-
-module.exports = Logger;
+};

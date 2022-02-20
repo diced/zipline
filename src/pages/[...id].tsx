@@ -4,7 +4,7 @@ import { GetServerSideProps } from 'next';
 import { Box } from '@mui/material';
 import config from 'lib/config';
 import prisma from 'lib/prisma';
-import getFile from '../../server/static';
+import { getFile } from '../../server/util';
 import { parse } from 'lib/clientUtils';
 
 export default function EmbeddedImage({ image, user, normal }) {

@@ -20,7 +20,7 @@ const { PrismaClient } = require('@prisma/client');
     return {
       file: x,
       mimetype: mime,
-      userId: 1
+      userId: 1,
     };
   });
 
@@ -28,7 +28,7 @@ const { PrismaClient } = require('@prisma/client');
 
   Logger.get('migrator').info('starting migrations...');
   await prisma.image.createMany({
-    data
+    data,
   });
   Logger.get('migrator').info('finished migrations! It is recomended to move your old uploads folder (' + process.argv[2] + ') to the current one which is ' + config.uploader.directory);
   process.exit();

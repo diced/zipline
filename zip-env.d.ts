@@ -6,7 +6,10 @@ declare global {
     interface Global {
       prisma: PrismaClient;
       config: Config;
-      ratelimit: Set<string>;
+    }
+
+    interface ProcessEnv {
+      ZIPLINE_DOCKER_BUILD: string | '1';
     }
   }
 }
