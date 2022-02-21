@@ -1,6 +1,6 @@
 {
   "name": "zip3",
-  "version": "3.3.1",
+  "version": "3.3.2",
   "license": "MIT",
   "scripts": {
     "dev": "NODE_ENV=development node server",
