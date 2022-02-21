@@ -91,6 +91,9 @@ async function run() {
         res.end(data);
       }
     } else if (req.url.startsWith(config.uploader.route)) {
+      const data = await getFile(config.uploader.directory, parts[2]);
+      if (!data) return app.render404(req, res);
+      
       let image = await prisma.image.findFirst({
         where: {
           OR: [
