@@ -1,4 +1,4 @@
-const NextServer = require('next/dist/server/next-server').default;
+const next = require('next').default;
 const defaultConfig = require('next/dist/server/config-shared').defaultConfig;
 const { createServer } = require('http');
 const { stat, mkdir } = require('fs/promises');
@@ -41,18 +41,17 @@ async function run() {
   await migrations();
 
   await mkdir(config.uploader.directory, { recursive: true });
-  const app = new NextServer({
+
+  const app = next({
     dir: '.',
     dev,
-    quiet: dev,
-    customServer: false,
-    host: config.core.host,
+    quiet: !dev,
+    hostname: config.core.host,
     port: config.core.port,
     conf: Object.assign(defaultConfig, nextConfig),
   });
 
   await app.prepare();
-  await stat('./.next');
 
   const handle = app.getRequestHandler();
   const prisma = new PrismaClient();

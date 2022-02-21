@@ -126,4 +126,5 @@ module.exports = {
   getStats,
   log,
   sizeOfDir,
+  shouldUseYarn,
 };

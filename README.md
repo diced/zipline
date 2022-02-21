@@ -16,6 +16,9 @@
 - Fast
 - Built with Next.js & React
 - Token protected uploading
+- Image uploading
+- URL shortening
+- Text uploading
 - Easy setup instructions on [docs](https://zipline.diced.tech/) (One command install `docker-compose up`)
 
 ## Installing

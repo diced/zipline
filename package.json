@@ -8,6 +8,7 @@
     "build": "npm-run-all build:schema build:next",
     "build:next": "next build",
     "build:schema": "prisma generate --schema=prisma/schema.prisma",
+    "migrate:dev": "prisma migrate dev --create-only",
     "start": "node server",
     "lint": "next lint",
     "seed": "ts-node --compiler-options \"{\\\"module\\\":\\\"commonjs\\\"}\" --transpile-only prisma/seed.ts"
@@ -39,6 +40,7 @@
     "react-redux": "^7.2.4",
     "redux": "^4.1.0",
     "redux-thunk": "^2.3.0",
+    "uuid": "^8.3.2",
     "yup": "^0.32.9"
   },
   "devDependencies": {

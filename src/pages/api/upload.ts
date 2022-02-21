@@ -6,6 +6,9 @@ import { createInvisImage, randomChars } from 'lib/util';
 import { writeFile } from 'fs/promises';
 import { join } from 'path';
 import Logger from 'lib/logger';
+import { ImageFormat, InvisibleImage } from '@prisma/client';
+import { format as formatDate } from 'fecha';
+import { v4 } from 'uuid';
 
 const uploader = multer({
   storage: multer.memoryStorage(),
@@ -22,29 +25,46 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   });
 
   if (!user) return res.forbid('authorization incorect');
-
   if (user.ratelimited) return res.ratelimited();
-
   if (!req.files) return res.error('no files');
   if (req.files && req.files.length === 0) return res.error('no files');
 
+  const rawFormat = ((req.headers.format || '') as string).toUpperCase() || 'RANDOM';
+  const format: ImageFormat = Object.keys(ImageFormat).includes(rawFormat) && ImageFormat[rawFormat];
   const files = [];
 
   for (let i = 0; i !== req.files.length; ++i) {
     const file = req.files[i];
-    if (file.size > zconfig.uploader[user.administrator ? 'admin_limit' : 'user_limit']) return res.error('file size too big');
+    if (file.size > zconfig.uploader[user.administrator ? 'admin_limit' : 'user_limit']) return res.error(`file[${i}] size too big`);
 
     const ext = file.originalname.split('.').pop();
     if (zconfig.uploader.disabled_extentions.includes(ext)) return res.error('disabled extension recieved: ' + ext);
-    const rand = randomChars(zconfig.uploader.length);
+    let fileName: string;
 
-    let invis;
+    switch (format) {
+    case ImageFormat.RANDOM:
+      fileName = randomChars(zconfig.uploader.length);
+      break;
+    case ImageFormat.DATE:
+      fileName = formatDate(new Date(), 'YYYY-MM-DD_HH:mm:ss');
+      break;
+    case ImageFormat.UUID:
+      fileName = v4();
+      break;
+    case ImageFormat.NAME:
+      fileName = file.originalname.split('.')[0];
+      break;
+    }
+
+
+    let invis: InvisibleImage;
     const image = await prisma.image.create({
       data: {
-        file: `${rand}.${ext}`,
+        file: `${fileName}.${ext}`,
         mimetype: file.mimetype,
         userId: user.id,
         embed: !!req.headers.embed,
+        format,
       },
     });
     
