@@ -19,7 +19,10 @@
 - Image uploading
 - URL shortening
 - Text uploading
-- Easy setup instructions on [docs](https://zipline.diced.tech/) (One command install `docker-compose up`)
+- URL Formats (uuid, dates, random alphanumeric, original name, zws)
+- Discord embeds (OG metadata)
+- Gallery viewer, and multiple file format support
+- Easy setup instructions on [docs](https://zipline.diced.tech/) (One command install `docker-compose up -d`)
 
 ## Installing
 [See how to install here](https://zipline.diced.tech/docs/get-started)
