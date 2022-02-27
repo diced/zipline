@@ -1,16 +1,18 @@
 import React from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Text } from '@mantine/core';
 
 export default function FourOhFour() {
   return (
     <>
       <Box
-        display='flex'
-        justifyContent='center'
-        alignItems='center'
-        minHeight='100vh'
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          minHeight: '100vh',
+          justifyContent: 'center',
+        }}
       >
-        <Typography variant='h2'>404 - Not Found</Typography>
+        <Text size='xl'>404 - Not Found</Text>
       </Box>
     </>
   );

@@ -21,6 +21,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       created_at: true,
       file: true,
       mimetype: true,
+      id: true,
     },
   });
 

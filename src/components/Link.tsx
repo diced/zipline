@@ -4,7 +4,7 @@ import React, { forwardRef } from 'react';
 import clsx from 'clsx';
 import { useRouter } from 'next/router';
 import NextLink from 'next/link';
-import MuiLink from '@mui/material/Link';
+import { Text } from '@mantine/core';
 
 export const NextLinkComposed = forwardRef(function NextLinkComposed(props: any, ref) {
   const { to, linkAs, href, replace, scroll, passHref, shallow, prefetch, locale, ...other } =
@@ -50,10 +50,10 @@ const Link = forwardRef(function Link(props: any, ref) {
 
   if (isExternal) {
     if (noLinkStyle) {
-      return <a className={className} href={href} ref={ref} {...other} />;
+      return <Text variant='link' component='a' className={className} href={href} ref={ref} {...other} />;
     }
 
-    return <MuiLink className={className} href={href} ref={ref} {...other} />;
+    return <Text component='a' variant='link' href={href} ref={ref} {...other} />;
   }
 
   if (noLinkStyle) {
@@ -61,8 +61,9 @@ const Link = forwardRef(function Link(props: any, ref) {
   }
 
   return (
-    <MuiLink
+    <Text
       component={NextLinkComposed}
+      variant='link'
       linkAs={linkAs}
       className={className}
       ref={ref}

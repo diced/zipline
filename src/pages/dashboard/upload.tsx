@@ -13,8 +13,6 @@ export default function UploadPage({ route }) {
   return (
     <Layout
       user={user}
-      loading={loading}
-      noPaper={false}
     >
       <Upload route={route}/>
     </Layout>

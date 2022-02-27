@@ -1,13 +1,16 @@
 import React, { useEffect } from 'react';
 import Head from 'next/head';
 import { GetServerSideProps } from 'next';
-import { Box } from '@mui/material';
+import { Box, useMantineTheme } from '@mantine/core';
 import config from 'lib/config';
 import prisma from 'lib/prisma';
 import { getFile } from '../../server/util';
 import { parse } from 'lib/clientUtils';
+import * as exts from '../../scripts/exts';
+import { Prism } from '@mantine/prism';
+import ZiplineTheming from 'components/Theming';
 
-export default function EmbeddedImage({ image, user, normal }) {
+export default function EmbeddedImage({ image, user }) {
   const dataURL = (route: string) => `${route}/${image.file}`;
 
   // reapply date from workaround
@@ -40,10 +43,12 @@ export default function EmbeddedImage({ image, user, normal }) {
         <title>{image.file}</title>
       </Head>
       <Box
-        display='flex'
-        justifyContent='center'
-        alignItems='center'
-        minHeight='100vh'
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          minHeight: '100vh',
+          justifyContent: 'center',
+        }}
       >
         <img src={dataURL('/r')} alt={dataURL('/r')} id='image_content' />
       </Box>
@@ -113,20 +118,29 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     //@ts-ignore workaround because next wont allow date
     image.created_at = image.created_at.toString();
-  
+
+    const prismRender = Object.keys(exts).includes(image.file.split('.').pop());
+    // let prismRenderCode;/
+    // if (prismRender) prismRenderCode = (await getFile(config.uploader.directory, id)).toString();
+    if (prismRender) return {
+      redirect: {
+        destination: `/code/${image.file}`,
+        permanent: true,
+      },
+    };
+
     if (!image.mimetype.startsWith('image')) {
       const data = await getFile(config.uploader.directory, id);
       if (!data) return { notFound: true };
 
       context.res.end(data);
       return { props: {} };
-    };
+    }
 
     return {
       props: {
         image,
         user,
-        normal: config.uploader.route,
       },
     };
   }

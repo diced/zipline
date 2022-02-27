@@ -11,8 +11,6 @@ export default function ManagePage() {
   return (
     <Layout
       user={user}
-      loading={loading}
-      noPaper={false}
     >
       <Manage />
     </Layout>

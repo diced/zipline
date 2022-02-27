@@ -13,29 +13,13 @@ model User {
   password      String
   token         String
   administrator Boolean @default(false)
-  systemTheme   String  @default("dark_blue")
-  customTheme   Theme?
+  systemTheme   String  @default("system")
   embedTitle    String?
   embedColor    String  @default("#2f3136")
   embedSiteName String? @default("{image.file} • {user.name}")
   ratelimited   Boolean @default(false)
   images        Image[]
   urls          Url[]
-}
-
-model Theme {
-  id              Int    @id @default(autoincrement())
-  type            String
-  primary         String
-  secondary       String
-  error           String
-  warning         String
-  info            String
-  border          String
-  mainBackground  String
-  paperBackground String
-  user            User   @relation(fields: [userId], references: [id])
-  userId          Int
 }
 
 enum ImageFormat {

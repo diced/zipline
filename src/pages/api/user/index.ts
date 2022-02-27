@@ -51,24 +51,6 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       data: { systemTheme: req.body.systemTheme },
     });
 
-    if (req.body.customTheme) {
-      if (user.customTheme) await prisma.user.update({
-        where: { id: user.id },
-        data: {
-          customTheme: {
-            update: {
-              ...req.body.customTheme,
-            },
-          },
-        },
-      }); else await prisma.theme.create({
-        data: {
-          userId: user.id,
-          ...req.body.customTheme,
-        },
-      });
-    }
-
     const newUser = await prisma.user.findFirst({
       where: {
         id: Number(user.id),
@@ -82,7 +64,6 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         images: false,
         password: false,
         systemTheme: true,
-        customTheme: true,
         token: true,
         username: true,
       },

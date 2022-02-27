@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { CookieSerializeOptions } from 'cookie';
-import type { Image, Theme, User } from '@prisma/client';
 
 import { serialize } from 'cookie';
 import { sign64, unsign64 } from '../util';
@@ -23,7 +22,6 @@ export type NextApiReq = NextApiRequest & {
     embedTitle: string;
     embedColor: string;
     systemTheme: string;
-    customTheme?: Theme;
     administrator: boolean;
     id: number;
     password: string;
@@ -111,7 +109,6 @@ export const withZipline = (handler: (req: NextApiRequest, res: NextApiResponse)
           id: true,
           password: true,
           systemTheme: true,
-          customTheme: true,
           token: true,
           username: true,
         },

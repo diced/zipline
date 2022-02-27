@@ -7,7 +7,7 @@ const validator = object({
     host: string().default('0.0.0.0'),
     port: number().default(3000),
     database_url: string().required(),
-    logger: boolean().default(true),
+    logger: boolean().default(false),
     stats_interval: number().default(1800),
   }).required(),
   uploader: object({

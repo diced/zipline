@@ -1,9 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { Backdrop, CircularProgress } from '@mui/material';
+import { LoadingOverlay } from '@mantine/core';
 
 export default function Logout() {
   const router = useRouter();
+  const [visible, setVisible] = useState(true);
+
 
   useEffect(() => {
     (async () => {
@@ -18,12 +20,7 @@ export default function Logout() {
   }, []);
 
   return (
-    <Backdrop
-      sx={{ color: '#fff', zIndex: t => t.zIndex.drawer + 1 }}
-      open
-    >
-      <CircularProgress color='inherit' />
-    </Backdrop>
+    <LoadingOverlay visible={visible} />
   );
 }
 

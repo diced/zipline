@@ -1,25 +1,13 @@
 import createTheme from '.';
 
 export default createTheme({
-  colorScheme: 'dark',
+  colorScheme: 'light',
   primaryColor: 'blue',
   other: {
-    AppShell_backgroundColor: '#05070f',
-    hover: '#181c28',
+    AppShell_backgroundColor: '#FAFAFA',
+    hover: '#FAFAFA',
   },
   colors: {
-    dark: [
-      '#FFFFFF',
-      '#293747',
-      '#6C7A8D',
-      '#232F41',
-      '#41566e',
-      '#171F35',
-      '#181c28',
-      '#0c101c',
-      '#060824',
-      '#00001E',
-    ],
     blue: [
       '#FFFFFF',
       '#7C7DC2',

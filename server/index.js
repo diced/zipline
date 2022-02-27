@@ -1,18 +1,16 @@
 const next = require('next').default;
-const defaultConfig = require('next/dist/server/config-shared').defaultConfig;
 const { createServer } = require('http');
-const { stat, mkdir } = require('fs/promises');
+const { mkdir } = require('fs/promises');
 const { extname } = require('path');
 const validateConfig = require('./validateConfig');
 const Logger = require('../src/lib/logger');
 const readConfig = require('../src/lib/readConfig');
 const mimes = require('../scripts/mimes');
-const { log, getStats, shouldUseYarn, getFile, migrations } = require('./util');
+const { log, getStats, getFile, migrations } = require('./util');
 const { PrismaClient } = require('@prisma/client');
 const { version } = require('../package.json');
-const nextConfig = require('../next.config');
+const exts = require('../scripts/exts');
 const serverLog = Logger.get('server');
-const webLog = Logger.get('web');
 
 serverLog.info(`starting zipline@${version} server`);
 
@@ -42,7 +40,6 @@ async function run() {
     quiet: !dev,
     hostname: config.core.host,
     port: config.core.port,
-    conf: Object.assign(defaultConfig, nextConfig),
   });
 
   await app.prepare();
@@ -51,15 +48,15 @@ async function run() {
   const prisma = new PrismaClient();
   
   const srv = createServer(async (req, res) => {
-    const parts = req.url.split('/');
-    if (!parts[2] || parts[2] === '') return;
-    
     if (req.url.startsWith('/r')) {
+      const parts = req.url.split('/');
+      if (!parts[2] || parts[2] === '') return;
+
       let image = await prisma.image.findFirst({
         where: {
           OR: [
             { file: parts[2] },
-            { invisible: { invis: decodeURI(parts[2]) } },
+            { invisible:{ invis: decodeURI(parts[2]) } },
           ],
         },
         select: {
@@ -70,19 +67,17 @@ async function run() {
         },
       });
 
-      image && await prisma.image.update({
-        where: { id: image.id },
-        data: { views: { increment: 1 } },
-      });
+      if (!image) {
+        const data = await getFile(config.uploader.directory, parts[2]);
+        if (!data) return app.render404(req, res);
 
-      const data = await getFile(config.uploader.directory, parts[2]);
-      if (!data) return app.render404(req, res);
-
-      if (!image) { // raw image
         const mimetype = mimes[extname(parts[2])] ?? 'application/octet-stream';
         res.setHeader('Content-Type', mimetype);
         res.end(data);
-      } else { // raw image & update db
+      } else {
+        const data = await getFile(config.uploader.directory, image.file);
+        if (!data) return app.render404(req, res);
+
         await prisma.image.update({
           where: { id: image.id },
           data: { views: { increment: 1 } },
@@ -91,14 +86,14 @@ async function run() {
         res.end(data);
       }
     } else if (req.url.startsWith(config.uploader.route)) {
-      const data = await getFile(config.uploader.directory, parts[2]);
-      if (!data) return app.render404(req, res);
-      
+      const parts = req.url.split('/');
+      if (!parts[2] || parts[2] === '') return;
+
       let image = await prisma.image.findFirst({
         where: {
           OR: [
             { file: parts[2] },
-            { invisible: { invis: decodeURI(parts[2]) } },
+            { invisible:{ invis: decodeURI(parts[2]) } },
           ],
         },
         select: {
@@ -110,18 +105,25 @@ async function run() {
         },
       });
 
-      image && await prisma.image.update({
-        where: { id: image.id },
-        data: { views: { increment: 1 } },
-      });
+      if (!image) {
+        const data = await getFile(config.uploader.directory, parts[2]);
+        if (!data) return app.render404(req, res);
 
-      if (!image) { // raw image
         const mimetype = mimes[extname(parts[2])] ?? 'application/octet-stream';
         res.setHeader('Content-Type', mimetype);
         res.end(data);
-      } else if (image.embed) { // embed image
+      } else if (image.embed) {
         handle(req, res);
-      } else { // raw image fallback
+      } else {
+        const ext = image.file.split('.').pop();
+        if (Object.keys(exts).includes(ext)) return handle(req, res);
+        const data = await getFile(config.uploader.directory, image.file);
+        if (!data) return app.render404(req, res);
+
+        await prisma.image.update({
+          where: { id: image.id },
+          data: { views: { increment: 1 } },
+        });
         res.setHeader('Content-Type', image.mimetype);
         res.end(data);
       }
@@ -137,6 +139,7 @@ async function run() {
 
     process.exit(1);
   });
+
   srv.on('listening', () => {
     serverLog.info(`listening on ${config.core.host}:${config.core.port}`);
   });

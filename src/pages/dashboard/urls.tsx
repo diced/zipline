@@ -11,8 +11,6 @@ export default function UrlsPage() {
   return (
     <Layout
       user={user}
-      loading={loading}
-      noPaper={false}
     >
       <Urls />
     </Layout>

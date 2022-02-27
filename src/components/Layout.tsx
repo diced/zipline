@@ -1,49 +1,67 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 
-import {
-  AppBar,
-  Box,
-  Divider,
-  Drawer,
-  IconButton,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Toolbar,
-  Typography,
-  Button,
-  Menu,
-  MenuItem,
-  Paper,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-} from '@mui/material';
-import {
-  Menu as MenuIcon,
-  Home as HomeIcon,
-  AccountCircle as AccountIcon,
-  Folder as FolderIcon,
-  Upload as UploadIcon,
-  ContentCopy as CopyIcon,
-  Autorenew as ResetIcon,
-  Logout as LogoutIcon,
-  PeopleAlt as UsersIcon,
-  Brush as BrushIcon,
-  Link as URLIcon,
-} from '@mui/icons-material';
-import copy from 'copy-to-clipboard';
-import Backdrop from './Backdrop';
-import { friendlyThemeName, themes } from 'components/Theming';
-import Select from 'components/input/Select';
 import { useRouter } from 'next/router';
 import { useStoreDispatch } from 'lib/redux/store';
 import { updateUser } from 'lib/redux/reducers/user';
 import useFetch from 'hooks/useFetch';
+import { CheckIcon, CopyIcon, Cross1Icon, FileIcon, GearIcon, HomeIcon, Link1Icon, ResetIcon, UploadIcon, PinRightIcon, PersonIcon, Pencil1Icon, MixerHorizontalIcon } from '@modulz/radix-icons';
+import { AppShell, Burger, Divider, Group, Header, MediaQuery, Navbar, Paper, Popover, ScrollArea, Select, Text, ThemeIcon, Title, UnstyledButton, useMantineTheme, Box } from '@mantine/core';
+import { useModals } from '@mantine/modals';
+import { useNotifications } from '@mantine/notifications';
+import { useClipboard } from '@mantine/hooks';
+import { friendlyThemeName, themes } from './Theming';
+
+function MenuItemLink(props) {
+  return (
+    <Link href={props.href} passHref>
+      <MenuItem {...props} />
+    </Link>
+  );
+}
+
+function MenuItem(props) {
+  return (
+    <UnstyledButton
+      sx={theme => ({ 
+        display: 'block',
+        width: '100%',
+        padding: 5,
+        borderRadius: theme.radius.sm,
+        color: props.color
+          ? theme.fn.themeColor(props.color, theme.colorScheme === 'dark' ? 5 : 7)
+          : theme.colorScheme === 'dark'
+            ? theme.colors.dark[0]
+            : theme.black,  
+        '&:hover': {
+          backgroundColor: props.color
+            ? theme.fn.rgba(
+              theme.fn.themeColor(props.color, theme.colorScheme === 'dark' ? 9 : 0),
+              theme.colorScheme === 'dark' ? 0.2 : 1
+            )
+            : theme.colorScheme === 'dark'
+              ? theme.fn.rgba(theme.colors.dark[3], 0.35)
+              : theme.colors.gray[0],
+        },
+      })}
+      {...props}
+    >
+      <Group noWrap>
+        <Box sx={theme => ({
+          marginRight: theme.spacing.xs / 4,
+          paddingLeft: theme.spacing.xs / 2,
+
+          '& *': {
+            display: 'block',
+          },
+        })}>
+          {props.icon}
+        </Box>
+        <Text size='sm'>{props.children}</Text>
+      </Group>
+    </UnstyledButton>
+  );
+}
 
 const items = [
   {
@@ -52,12 +70,17 @@ const items = [
     link: '/dashboard',
   },
   {
-    icon: <FolderIcon />,
+    icon: <FileIcon />,
     text: 'Files',
     link: '/dashboard/files',
   },
   {
-    icon: <URLIcon />,
+    icon: <MixerHorizontalIcon />,
+    text: 'Stats',
+    link: '/dashboard/stats',
+  },
+  {
+    icon: <Link1Icon />,
     text: 'URLs',
     link: '/dashboard/urls',
   },
@@ -68,344 +91,239 @@ const items = [
   },
 ];
 
-const drawerWidth = 240;
-
-function CopyTokenDialog({ open, setOpen, token }) {
-  const handleCopyToken = () => {
-    copy(token);
-    setOpen(false);
-  };
-
-  return (
-    <div>
-      <Dialog
-        open={open}
-        onClose={() => setOpen(false)}
-      >
-        <DialogTitle id='copy-dialog-title'>
-          Copy Token
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id='copy-dialog-description'>
-              Make sure you don&apos;t share this token with anyone as they will be able to upload files on your behalf.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpen(false)} color='inherit' autoFocus>Cancel</Button>
-          <Button onClick={handleCopyToken} color='inherit'>
-              Copy
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </div>
-  );
-}
-
-function ResetTokenDialog({ open, setOpen, setToken }) {
-  const handleResetToken = async () => {
-    const a = await useFetch('/api/user/token', 'PATCH');
-    if (a.success) setToken(a.success);
-    setOpen(false);
-  };
-  
-  return (
-    <div>
-      <Dialog
-        open={open}
-        onClose={() => setOpen(false)}
-      >
-        <DialogTitle id='reset-dialog-title'>
-          Reset Token
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id='reset-dialog-description'>
-            Once you reset your token, you will have to update any uploaders to use this new token.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpen(false)} color='inherit' autoFocus>Cancel</Button>
-          <Button onClick={handleResetToken} color='inherit'>
-            Reset
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </div>
-  );
-}
-
-export default function Layout({ children, user, loading, noPaper }) {
-  const [systemTheme, setSystemTheme] = useState(user.systemTheme || 'dark_blue');
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [copyOpen, setCopyOpen] = useState(false);
-  const [resetOpen, setResetOpen] = useState(false);
+export default function Layout({ children, user }) {
   const [token, setToken] = useState(user?.token);
+  const [systemTheme, setSystemTheme] = useState(user.systemTheme ?? 'system');
+  const [opened, setOpened] = useState(false); // navigation open
+  const [open, setOpen] = useState(false); // manage acc dropdown
   const router = useRouter();
   const dispatch = useStoreDispatch();
+  const theme = useMantineTheme();
+  const modals = useModals();
+  const notif = useNotifications();
+  const clipboard = useClipboard();
 
-  const open = Boolean(anchorEl);
-  const handleClick = e => setAnchorEl(e.currentTarget);
-  const handleClose = (cmd: 'copy' | 'reset') => () => {
-    switch (cmd) {
-    case 'copy':
-      setCopyOpen(true);
-      break;
-    case 'reset':
-      setResetOpen(true);
-      break;
-    }
-    setAnchorEl(null);
-  };
-
-  const handleUpdateTheme = async event => {
+  const handleUpdateTheme = async value => {
     const newUser = await useFetch('/api/user', 'PATCH', {
-      systemTheme: event.target.value || 'dark_blue',
+      systemTheme: value || 'dark_blue',
     });
 
     setSystemTheme(newUser.systemTheme);
     dispatch(updateUser(newUser));
-
     router.replace(router.pathname);
+
+    notif.showNotification({
+      title: `Theme changed to ${friendlyThemeName[value]}`,
+      message: '',
+      color: 'green',
+      icon: <Pencil1Icon />,
+    });
   };
 
-  const drawer = (
-    <div>
-      <CopyTokenDialog open={copyOpen} setOpen={setCopyOpen} token={token} />
-      <ResetTokenDialog open={resetOpen} setOpen={setResetOpen} setToken={setToken} />
-      <Toolbar
-        sx={{
-          width: { xs: drawerWidth },
-        }}
-      >
-        <AppBar
-          position='fixed'
-          elevation={0}
-          sx={{
-            borderBottom: 1,
-            borderBottomColor: t => t.palette.divider,
-            display: { xs: 'none', sm: 'block' },
-          }}
-        >
-          <Toolbar>
-            <IconButton
-              color='inherit'
-              aria-label='open drawer'
-              edge='start'
-              onClick={() => setMobileOpen(true)}
-              sx={{ mr: 2, display: { sm: 'none' } }}
-            >
-              <MenuIcon />
-            </IconButton>
-            <Typography 
-              variant='h5'
-              noWrap
-              component='div'
-            >
-              Zipline
-            </Typography>
-            {user && (
-              <Box sx={{ marginLeft: 'auto' }}>
-                <Button
-                  color='inherit'
-                  aria-expanded={open ? 'true' : undefined}
-                  onClick={handleClick}
-                >
-                  <AccountIcon />
-                </Button>
-                <Menu
-                  id='zipline-user-menu'
-                  anchorEl={anchorEl}
-                  open={open}
-                  onClose={handleClose(null)}
-                  MenuListProps={{
-                    'aria-labelledby': 'basic-button',
-                  }}
-                >
-                  <MenuItem disableRipple>
-                    <Typography variant='h5'>
-                      <b>{user.username}</b>
-                    </Typography>
-                  </MenuItem>
-                  <Divider />
-                  <Link href='/dashboard/manage' passHref>
-                    <MenuItem onClick={handleClose(null)}>
-                      <AccountIcon sx={{ mr: 2 }} /> Manage Account
-                    </MenuItem>
-                  </Link>
-                  <MenuItem onClick={handleClose('copy')}>
-                    <CopyIcon sx={{ mr: 2 }} /> Copy Token
-                  </MenuItem>
-                  <MenuItem onClick={handleClose('reset')}>
-                    <ResetIcon sx={{ mr: 2 }} /> Reset Token
-                  </MenuItem>
-                  <Link href='/auth/logout' passHref>
-                    <MenuItem onClick={handleClose(null)}>
-                      <LogoutIcon sx={{ mr: 2 }} /> Logout
-                    </MenuItem>
-                  </Link>
-                  <MenuItem>
-                    <BrushIcon sx={{ mr: 2 }} />
-                    <Select
-                      variant='standard'
-                      label='Theme'
-                      value={systemTheme}
-                      onChange={handleUpdateTheme}
-                      fullWidth
-                    >
-                      {Object.keys(themes).map(t => (
-                        <MenuItem value={t} key={t}>
-                          {friendlyThemeName[t]}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </MenuItem>
-                </Menu>
-              </Box>
-            )}
-          </Toolbar>
-        </AppBar>
-      </Toolbar>
-      <Divider />
-      <List>
-        {items.map((item, i) => (
-          <Link key={i} href={item.link} passHref>
-            <ListItem button>
-              <ListItemIcon>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.text} />
-            </ListItem>
-          </Link>
-        ))}
-        {user && user.administrator && (
-          <Link href='/dashboard/users' passHref>
-            <ListItem button>
-              <ListItemIcon><UsersIcon /></ListItemIcon>
-              <ListItemText primary='Users' />
-            </ListItem>
-          </Link>
-        )}
-      </List>
-      
-    </div>
-  );
+  const openResetToken = () => modals.openConfirmModal({
+    title: 'Reset Token',
+    children: (
+      <Text size='sm'>
+        Once you reset your token, you will have to update any uploaders to use this new token.
+      </Text>
+    ),
+    labels: { confirm: 'Reset', cancel: 'Cancel' },
+    onConfirm: async () => {
+      const a = await useFetch('/api/user/token', 'PATCH');
+      if (!a.success) {
+        setToken(a.success);
+        notif.showNotification({
+          title: 'Token Reset Failed',
+          message: a.error,
+          color: 'red',
+          icon: <Cross1Icon />,
+        });
+      } else {
+        notif.showNotification({
+          title: 'Token Reset',
+          message: 'Your token has been reset. You will need to update any uploaders to use this new token.',
+          color: 'green',
+          icon: <CheckIcon />,
+        });
+      }
 
-  const container = typeof window !== 'undefined' ? window.document.body : undefined;
+      modals.closeAll();
+    },
+  });
+
+  const openCopyToken = () => modals.openConfirmModal({
+    title: 'Copy Token',
+    children: (
+      <Text size='sm'>
+        Make sure you don&apos;t share this token with anyone as they will be able to upload files on your behalf.
+      </Text>
+    ),
+    labels: { confirm: 'Copy', cancel: 'Cancel' },
+    onConfirm: async () => {
+      clipboard.copy(token);
+
+      notif.showNotification({
+        title: 'Token Copied',
+        message: 'Your token has been copied to your clipboard.',
+        color: 'green',
+        icon: <CheckIcon />,
+      });
+
+      modals.closeAll();
+    },
+  });
 
   return (
-    <Box sx={{ display: 'flex' }}>
-      <Backdrop open={loading} />
+    <AppShell
+      navbarOffsetBreakpoint='sm'
+      fixed
+      navbar={
+        <Navbar
+          padding='md'
+          hiddenBreakpoint='sm'
+          hidden={!opened}
+          width={{ sm: 200, lg: 230 }}
+        >
+          <Navbar.Section
+            grow
+            component={ScrollArea}
+            ml={-10}
+            mr={-10}
+            sx={{ paddingLeft: 10, paddingRight: 10 }}
+          >
+            {items.map(({ icon, text, link }) => (
+              <Link href={link} key={text} passHref>
+                <UnstyledButton
+                  sx={{ 
+                    display: 'block',
+                    width: '100%',
+                    padding: theme.spacing.xs,
+                    borderRadius: theme.radius.sm,
+                    color: theme.colorScheme === 'dark' ? theme.colors.dark[0] : theme.black,
+                
+                    '&:hover': {
+                      backgroundColor: theme.other.hover,
+                    },
+                  }}
+                >
+                  <Group>
+                    <ThemeIcon color='primary' variant='filled'>
+                      {icon}
+                    </ThemeIcon>
 
-      <AppBar
-        position='fixed'
-        elevation={0}
-        sx={{
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
-          ml: { sm: `${drawerWidth}px` },
-        }}
-      >
-        <Toolbar>
-          <IconButton
-            color='inherit'
-            aria-label='open drawer'
-            edge='start'
-            onClick={() => setMobileOpen(true)}
-            sx={{ mr: 2, display: { sm: 'none' } }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography 
-            variant='h5'
-            noWrap
-            component='div'
-            sx={{ display: { sm: 'none' } }}
-          >
-            Zipline
-          </Typography>
-          {user && (
-            <Box sx={{ marginLeft: 'auto' }}>
-              <Button
-                color='inherit'
-                aria-expanded={open ? 'true' : undefined}
-                onClick={handleClick}
+                    <Text size='lg'>{text}</Text>
+                  </Group>
+                </UnstyledButton>
+              </Link>
+            ))}
+            {user.administrator && (
+              <Link href='/dashboard/users' passHref>
+                <UnstyledButton
+                  sx={{ 
+                    display: 'block',
+                    width: '100%',
+                    padding: theme.spacing.xs,
+                    borderRadius: theme.radius.sm,
+                    color: theme.colorScheme === 'dark' ? theme.colors.dark[0] : theme.black,
+              
+                    '&:hover': {
+                      backgroundColor: theme.other.hover,
+                    },
+                  }}
+                >
+                  <Group>
+                    <ThemeIcon color='primary' variant='filled'>
+                      <PersonIcon />
+                    </ThemeIcon>
+
+                    <Text size='lg'>Users</Text>
+                  </Group>
+                </UnstyledButton>
+              </Link>
+            )}
+          </Navbar.Section>
+        </Navbar>
+      }
+      header={
+        <Header height={70} padding='md'>
+          <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
+            <MediaQuery largerThan='sm' styles={{ display: 'none' }}>
+              <Burger
+                opened={opened}
+                onClick={() => setOpened((o) => !o)}
+                size='sm'
+                color={theme.colors.gray[6]}
+              />
+            </MediaQuery>
+            <Title sx={{ marginLeft: 12 }}>Zipline</Title>
+            <Box sx={{ marginLeft: 'auto', marginRight: 0 }}>
+              <Popover
+                position='top'
+                placement='end'
+                spacing={4}
+                opened={open}
+                onClose={() => setOpen(false)}
+                target={
+                  <UnstyledButton
+                    onClick={() => setOpen(!open)}
+                    sx={{ 
+                      display: 'block',
+                      width: '100%',
+                      padding: theme.spacing.xs,
+                      borderRadius: theme.radius.sm,
+                      color: theme.other.color,
+                
+                      '&:hover': {
+                        backgroundColor: theme.other.hover,
+                      },
+                    }}
+                  >
+                    <Group>
+                      <ThemeIcon color='primary' variant='filled'>
+                        <GearIcon />
+                      </ThemeIcon>
+                      <Text>{user.username}</Text>
+                    </Group>
+                  </UnstyledButton>
+                }
               >
-                <AccountIcon />
-              </Button>
-              <Menu
-                id='zipline-user-menu'
-                anchorEl={anchorEl}
-                open={open}
-                onClose={handleClose(null)}
-                MenuListProps={{
-                  'aria-labelledby': 'basic-button',
-                }}
-              >
-                <MenuItem disableRipple>
-                  <Typography variant='h5'>
-                    <b>{user.username}</b>
-                  </Typography>
-                </MenuItem>
-                <Divider />
-                <Link href='/dash/manage' passHref>
-                  <MenuItem onClick={handleClose(null)}>
-                    <AccountIcon sx={{ mr: 2 }} /> Manage Account
+                <Group direction='column' spacing={2}>
+                  <Text sx={{
+                    color: theme.colorScheme === 'dark' ? theme.colors.dark[2] : theme.colors.gray[6],
+                    fontWeight: 500,
+                    fontSize: theme.fontSizes.xs,
+                    padding: `${theme.spacing.xs / 2}px ${theme.spacing.sm}px`,
+                    cursor: 'default',
+                  }}>User: {user.username}</Text>
+                  <MenuItemLink icon={<GearIcon />} href='/dashboard/manage'>Manage Account</MenuItemLink>
+                  <MenuItem icon={<CopyIcon />} onClick={() => {setOpen(false);openCopyToken();}}>Copy Token</MenuItem>
+                  <MenuItem icon={<ResetIcon />} onClick={() => {setOpen(false);openResetToken();}} color='red'>Reset Token</MenuItem>
+                  <MenuItemLink icon={<PinRightIcon />} href='/auth/logout' color='red'>Logout</MenuItemLink>
+                  <Divider
+                    variant='solid'
+                    my={theme.spacing.xs / 2}
+                    sx={theme => ({
+                      width: '110%',
+                      borderTopColor: theme.colorScheme === 'dark' ? theme.colors.dark[7] : theme.colors.gray[2],
+                      margin: `${theme.spacing.xs / 2}px -4px`,
+                    })}
+                  />
+                  <MenuItem icon={<Pencil1Icon />}>
+                    <Select           
+                      size='xs'    
+                      data={Object.keys(themes).map(t => ({ value: t, label: friendlyThemeName[t] }))}
+                      value={systemTheme}
+                      onChange={handleUpdateTheme}
+                    />
                   </MenuItem>
-                </Link>
-                <MenuItem onClick={handleClose('copy')}>
-                  <CopyIcon sx={{ mr: 2 }} /> Copy Token
-                </MenuItem>
-                <MenuItem onClick={handleClose('reset')}>
-                  <ResetIcon sx={{ mr: 2 }} /> Reset Token
-                </MenuItem>
-                <Link href='/auth/logout' passHref>
-                  <MenuItem onClick={handleClose(null)}>
-                    <LogoutIcon sx={{ mr: 2 }} /> Logout
-                  </MenuItem>
-                </Link>
-              </Menu>
+                </Group>
+              </Popover>
             </Box>
-          )}
-        </Toolbar>
-      </AppBar>
-      <Box
-        component='nav'
-        sx={{
-          width: { sm: drawerWidth },
-          flexShrink: { sm: 0 },
-        }}
-      >
-        <Drawer
-          container={container}
-          variant='temporary'
-          onClose={() => setMobileOpen(false)}
-          open={mobileOpen}
-          elevation={0}
-          ModalProps={{
-            keepMounted: true,
-          }}
-          sx={{
-            display: { xs: 'block', sm: 'none' },
-            '* .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
-          }}
-        >
-          {drawer}
-        </Drawer>
-        <Drawer
-          variant='permanent'
-          sx={{
-            display: { xs: 'none', sm: 'block' },
-            '* .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
-          }}
-          open
-        >
-          {drawer}
-        </Drawer>
-      </Box>
-      <Box component='main' sx={{ flexGrow: 1, p: 3, mt: 8 }}>
-        {user && noPaper ? children : (
-          <Paper elevation={0} sx={{ p: 2 }} variant='outlined'>
-            {children}
-          </Paper>
-        )}
-      </Box>
-    </Box>
+          </div>
+        </Header>
+      }
+    >
+      <Paper withBorder padding='md' shadow='xs'>{children}</Paper>
+    </AppShell>
   );
 }

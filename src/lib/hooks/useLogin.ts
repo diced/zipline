@@ -16,7 +16,7 @@ export default function login() {
     setLoading(true);
     
     const res = await useFetch('/api/user');
-    if (res.error) return router.push('/auth/login');
+    if (res.error) return router.push('/auth/login?url=' + router.route);
 
     dispatch(updateUser(res));
     setUser(res);
