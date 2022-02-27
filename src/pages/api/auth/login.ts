@@ -32,8 +32,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   const valid = await checkPassword(password, user.password);
   if (!valid) return res.forbid('Wrong password');
 
-  // 604800 seconds is 1 week
-  res.setCookie('user', user.id, { sameSite: true, maxAge: 604800, path: '/' });
+  res.setCookie('user', user.id, { sameSite: true, expires: new Date(Date.now() + (6.048e+8 * 2)), path: '/' });
 
   Logger.get('user').info(`User ${user.username} (${user.id}) logged in`);
 

@@ -1,20 +1,19 @@
 import React from 'react';
 import useLogin from 'hooks/useLogin';
 import Layout from 'components/Layout';
-import Files from 'components/pages/Files';
+import Stats from 'components/pages/Stats';
 
-export default function FilesPage() {
+export default function StatsPage() {
   const { user, loading } = useLogin();
-
   if (loading) return null;
   
   return (
     <Layout
       user={user}
     >
-      <Files />
+      <Stats />
     </Layout>
   );
 }
 
-FilesPage.title = 'Zipline - Gallery';
+StatsPage.title = 'Zipline - Stats';

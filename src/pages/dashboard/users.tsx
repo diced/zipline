@@ -11,8 +11,6 @@ export default function UsersPage() {
   return (
     <Layout
       user={user}
-      loading={loading}
-      noPaper={false}
     >
       <Users />
     </Layout>

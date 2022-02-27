@@ -1,39 +1,65 @@
 import React, { useEffect, useState } from 'react';
-import { Typography, Button, CardActionArea, Paper, Box } from '@mui/material';
-import { Upload as UploadIcon } from '@mui/icons-material';
-import Dropzone from 'react-dropzone';
 
-import Backdrop from 'components/Backdrop';
-import Alert from 'components/Alert';
 import { useStoreSelector } from 'lib/redux/store';
-import CenteredBox from 'components/CenteredBox';
-import copy from 'copy-to-clipboard';
 import Link from 'components/Link';
+import { Button, Group, Text, useMantineTheme } from '@mantine/core';
+import { ImageIcon, UploadIcon, CrossCircledIcon } from '@modulz/radix-icons';
+import { Dropzone } from '@mantine/dropzone';
+import { useNotifications } from '@mantine/notifications';
+import { useClipboard } from '@mantine/hooks';
+
+function ImageUploadIcon({ status, ...props }) {
+  if (status.accepted) {
+    return <UploadIcon {...props} />;
+  }
+
+  if (status.rejected) {
+    return <CrossCircledIcon {...props} />;
+  }
+
+  return <ImageIcon {...props} />;
+}
+
+function getIconColor(status, theme) {
+  return status.accepted
+    ? theme.colors[theme.primaryColor][6]
+    : status.rejected
+      ? theme.colors.red[6]
+      : theme.colorScheme === 'dark'
+        ? theme.colors.dark[0]
+        : theme.black;
+}
 
 export default function Upload({ route }) {
+  const theme = useMantineTheme();
+  const notif = useNotifications();
+  const clipboard = useClipboard();
   const user = useStoreSelector(state => state.user);
 
   const [files, setFiles] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [open, setOpen] = useState(false);
-  const [severity, setSeverity] = useState('success');
-  const [message, setMessage] = useState('Saved');
 
   useEffect(() => {
     window.addEventListener('paste', (e: ClipboardEvent) => {
       const item = Array.from(e.clipboardData.items).find(x => /^image/.test(x.type));
       const blob = item.getAsFile();
       setFiles([...files, new File([blob], blob.name, { type: blob.type })]);
+      notif.showNotification({
+        title: 'Image Imported',
+        message: '',
+      });
     });
   });
   
   const handleUpload = async () => {
     const body = new FormData();
-
-
     for (let i = 0; i !== files.length; ++i) body.append('file', files[i]);
 
-    setLoading(true);
+    const id = notif.showNotification({
+      title: 'Uploading Images...',
+      message: '',
+      loading: true,
+    });
+
     const res = await fetch('/api/upload', {
       method: 'POST',
       headers: {
@@ -43,63 +69,52 @@ export default function Upload({ route }) {
     });
     const json = await res.json();
     if (res.ok && json.error === undefined) {
-      setOpen(true);
-      setSeverity('success');
-
-      //@ts-ignore
-      setMessage(<>Copied first image to clipboard! <br/>{json.files.map(x => (<Link key={x} href={x}>{x}<br/></Link>))}</>);
-      copy(json.url);
+      notif.updateNotification(id, {
+        title: 'Upload Successful',
+        message: <>Copied first image to clipboard! <br/>{json.files.map(x => (<Link key={x} href={x}>{x}<br/></Link>))}</>,
+        color: 'green',
+        icon: <UploadIcon />,
+      });
+      clipboard.copy(json.url);
       setFiles([]);
     } else {
-      setOpen(true);
-      setSeverity('error');
-      setMessage('Could not upload file: ' + json.error);
+      notif.updateNotification(id, {
+        title: 'Upload Failed',
+        message: json.error,
+        color: 'red',
+        icon: <CrossCircledIcon />,
+      });
     }
-    setLoading(false);
   };
 
   return (
     <>
-      <Backdrop open={loading}/>
-      <Alert open={open} setOpen={setOpen} message={message} severity={severity} />
+      <Dropzone
+        onDrop={(f) => setFiles([...files, ...f])}
+      >
+        {(status) => (
+          <>
+            <Group position='center' spacing='xl' style={{ minHeight: 220, pointerEvents: 'none' }}>
+              <ImageUploadIcon
+                status={status}
+                style={{ width: 80, height: 80, color: getIconColor(status, theme) }}
+              />
 
-      <Typography variant='h4' pb={2}>Upload file</Typography>
-      <Dropzone onDrop={acceptedFiles => setFiles([...files, ...acceptedFiles])}>
-        {({getRootProps, getInputProps}) => (
-          <CardActionArea>
-            <Paper 
-              elevation={0}
-              variant='outlined'
-              sx={{
-                justifyContent: 'center',
-                alignItems: 'center',
-                display: 'block',
-                p: 5,
-              }}
-              {...getRootProps()}
-            >
-              <input {...getInputProps()} />
-              <CenteredBox><UploadIcon sx={{ fontSize: 100 }} /></CenteredBox>
-              <CenteredBox><Typography variant='h5'>Drag an image or click to upload an image.</Typography></CenteredBox>
-              {files.map(file => (
-                <CenteredBox key={file.name}><Typography variant='h6'>{file.name}</Typography></CenteredBox>
-              ))}
-            </Paper>
-          </CardActionArea>
+              <div>
+                <Text size='xl' inline>
+                  Drag images here or click to select files
+                </Text>
+              </div>
+            </Group>
+            <Group position='center' spacing='xl' style={{ pointerEvents: 'none' }}>
+              {files.map(file => (<Text key={file.name} weight='bold'>{file.name}</Text>))}
+            </Group>
+          </>
         )}
       </Dropzone>
-
-      <Box
-        display='flex'
-        justifyContent='right'
-        alignItems='right'
-        pt={2}
-      >
-        <Button
-          variant='contained'
-          onClick={handleUpload}
-        >Upload</Button>
-      </Box>
+      <Group position='right'>
+        <Button leftIcon={<UploadIcon />} mt={12} onClick={handleUpload}>Upload</Button>
+      </Group>
     </>
   );
 }

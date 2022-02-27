@@ -61,84 +61,20 @@ function StatTable({ rows, columns }) {
 export default function Dashboard() {
   const user = useStoreSelector(state => state.user);
 
-  const [images, setImages] = useState([]);
-  const [recent, setRecent] = useState([]);
   const [stats, setStats] = useState(null);
-  const clipboard = useClipboard();
-  const notif = useNotifications();
 
-  const updateImages = async () => {
-    const imgs = await useFetch('/api/user/files');
-    const recent = await useFetch('/api/user/recent?filter=media');
+  const update = async () => {
     const stts = await useFetch('/api/stats');
-    setImages(imgs.map(x => ({ ...x, created_at: new Date(x.created_at).toLocaleString() })));
     setStats(stts);
-    setRecent(recent);
-  };
-
-  const deleteImage = async ({ original }) => {
-    const res = await useFetch('/api/user/files', 'DELETE', { id: original.id });
-    if (!res.error) {
-      updateImages();
-      notif.showNotification({
-        title: 'Image Deleted',
-        message: '',
-        color: 'green',
-        icon: <TrashIcon />,
-      });
-    } else {
-      notif.showNotification({
-        title: 'Failed to delete image',
-        message: res.error,
-        color: 'red',
-        icon: <Cross1Icon />,
-      });
-    }
-    
-  };
-
-  const copyImage = async ({ original }) => {
-    clipboard.copy(`${window.location.protocol}//${window.location.host}${original.url}`);
-    notif.showNotification({
-      title: 'Copied to clipboard',
-      message: '',
-      icon: <CopyIcon />,
-    });
-  };
-
-  const viewImage = async ({ original }) => {
-    window.open(`${window.location.protocol}//${window.location.host}${original.url}`);
   };
 
   useEffect(() => {
-    updateImages();
+    update();
   }, []);
   
   return (
     <>
-      <Title>Welcome back {user?.username}</Title>
-      <Text color='gray' sx={{ paddingBottom: 4 }}>You have <b>{images.length ? images.length : '...'}</b> files</Text>
-
-      <Title>Recent Files</Title>
-      <SimpleGrid
-        cols={4}
-        spacing='lg'
-        breakpoints={[
-          { maxWidth: 'sm', cols: 1, spacing: 'sm' },
-        ]}
-      >
-        {recent.length ? recent.map(image => (
-          // eslint-disable-next-line jsx-a11y/alt-text
-          <Image key={randomId()} image={image} updateImages={updateImages} />
-        )) : [1,2,3,4].map(x => (
-          <div key={x}>
-            <Skeleton width='100%' height={220} sx={{ borderRadius: 1 }}/>
-          </div>
-        ))}
-      </SimpleGrid>
-
-      <Title mt='md'>Stats</Title>
-      <Text>View more stats here <Link href='/dashboard/stats'>here</Link>.</Text>
+      <Title>Stats</Title>
       <SimpleGrid
         cols={3}
         spacing='lg'
@@ -161,29 +97,6 @@ export default function Dashboard() {
         </Card>
       </SimpleGrid>
 
-      <ImagesTable
-        columns={[
-          { accessor: 'file', Header: 'Name', minWidth: 170, align: 'inherit' as Aligns },
-          { accessor: 'mimetype', Header: 'Type', minWidth: 100, align: 'inherit' as Aligns },
-          { accessor: 'created_at', Header: 'Date' },
-        ]}
-        data={images}
-        deleteImage={deleteImage}
-        copyImage={copyImage}
-        viewImage={viewImage}
-      />
-
-      {/* <Title mt='md'>Files</Title>
-      <Text>View previews of your files in the <Link href='/dashboard/files'>browser</Link>.</Text>
-      <ReactTable
-        columns={[
-          { accessor: 'file', Header: 'Name', minWidth: 170, align: 'inherit' as Aligns },
-          { accessor: 'mimetype', Header: 'Type', minWidth: 100, align: 'inherit' as Aligns },
-          { accessor: 'created_at', Header: 'Date' },
-        ]}
-        data={images}
-        pagination
-      />
       <Card name='Files per User' mt={22}>
         <StatTable
           columns={[
@@ -199,7 +112,7 @@ export default function Dashboard() {
             { id: 'count', name: 'Count' },
           ]}
           rows={stats ? stats.types_count : []} />
-      </Card> */}
+      </Card>
     </>
   );
 }

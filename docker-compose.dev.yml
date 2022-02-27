@@ -1,0 +1,46 @@
+version: '3'
+services:
+  postgres:
+    image: postgres
+    environment: 
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DATABASE=postgres
+    volumes: 
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  zipline:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000'
+    restart: unless-stopped
+    environment: 
+      - SECURE=false
+      - SECRET=changethis
+      - HOST=0.0.0.0
+      - PORT=3000
+      - DATABASE_URL=postgresql://postgres:postgres@postgres/postgres/
+      - UPLOADER_ROUTE=/u
+      - UPLOADER_EMBED_ROUTE=/a
+      - UPLOADER_LENGTH=6
+      - UPLOADER_DIRECTORY=./uploads
+      - UPLOADER_ADMIN_LIMIT=104900000
+      - UPLOADER_USER_LIMIT=104900000
+      - UPLOADER_DISABLED_EXTS=
+      - URLS_ROUTE=/go
+      - URLS_LENGTH=6
+    volumes:
+      - '$PWD/uploads:/zipline/uploads'
+      - '$PWD/public:/zipline/public'
+    depends_on:
+      - 'postgres'
+
+volumes:
+  pg_data:

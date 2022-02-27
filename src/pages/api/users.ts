@@ -33,7 +33,6 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         token: true,
         embedColor: true,
         embedTitle: true,
-        customTheme: true,
         systemTheme: true,
       },
     });

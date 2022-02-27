@@ -3,15 +3,24 @@
 import createTheme from '.';
 
 export default createTheme({
-  type: 'light',
-  primary: '#FF9940',
-  secondary: '#E6BA7E',
-  error: '#F07171',
-  warning: '#ED9366',
-  info: '#95E6CB',
-  border: '#e3e3e3',
-  background: {
-    main: '#FAFAFA',
-    paper: '#FFFFFF',
+  colorScheme: 'light',
+  primaryColor: 'orange',
+  other: {
+    AppShell_backgroundColor: '#FAFAFA',
+    hover: '#FAFAFA',
+  },
+  colors: {
+    orange: [
+      '#FFFFFF',
+      '#FCF6EA',
+      '#F9EDD4',
+      '#F3DAA8',
+      '#F2D69D',
+      '#F0D192',
+      '#EFCC87',
+      '#EDC77C',
+      '#EABE66',
+      '#E6B450',
+    ],
   },
 });
