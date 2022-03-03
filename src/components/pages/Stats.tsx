@@ -1,17 +1,11 @@
 import React, { useEffect, useState } from 'react';
 
 import Card from 'components/Card';
-import Image from 'components/Image';
-import ImagesTable from 'components/ImagesTable';
+import StatText from 'components/StatText';
 import useFetch from 'lib/hooks/useFetch';
 import { useStoreSelector } from 'lib/redux/store';
 import { Box, Text, Table, Skeleton, Title, SimpleGrid } from '@mantine/core';
-import { randomId, useClipboard } from '@mantine/hooks';
-import Link from 'components/Link';
-import { CopyIcon, Cross1Icon, TrashIcon } from '@modulz/radix-icons';
-import { useNotifications } from '@mantine/notifications';
-
-type Aligns = 'inherit' | 'right' | 'left' | 'center' | 'justify';
+import { randomId } from '@mantine/hooks';
 
 export function bytesToRead(bytes: number) {
   if (isNaN(bytes)) return '0.0 B';
@@ -25,10 +19,6 @@ export function bytesToRead(bytes: number) {
   }
 
   return `${bytes.toFixed(1)} ${units[num]}`;
-}
-
-function StatText({ children }) {
-  return <Text color='gray' size='xl'>{children}</Text>;
 }
 
 function StatTable({ rows, columns }) {
@@ -58,9 +48,7 @@ function StatTable({ rows, columns }) {
   );
 }
 
-export default function Dashboard() {
-  const user = useStoreSelector(state => state.user);
-
+export default function Stats() {
   const [stats, setStats] = useState(null);
 
   const update = async () => {

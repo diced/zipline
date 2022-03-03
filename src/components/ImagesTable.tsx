@@ -8,7 +8,6 @@ import {
 } from 'react-table';
 import {
   ActionIcon,
-  Checkbox,
   createStyles,
   Divider,
   Group,

@@ -11,7 +11,7 @@ export interface NextApiFile {
   originalname: string;
   encoding: string;
   mimetype: string;
-  buffer: string;
+  buffer: Buffer;
   size: number;
 }
 

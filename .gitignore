@@ -37,3 +37,5 @@ yarn-error.log*
 # zipline
 config.toml
 uploads/
+dist/
+docker-compose.local.yml

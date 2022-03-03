@@ -1,14 +1,11 @@
 import React, { useEffect } from 'react';
 import Head from 'next/head';
 import { GetServerSideProps } from 'next';
-import { Box, useMantineTheme } from '@mantine/core';
+import { Box } from '@mantine/core';
 import config from 'lib/config';
 import prisma from 'lib/prisma';
-import { getFile } from '../../server/util';
 import { parse } from 'lib/clientUtils';
 import * as exts from '../../scripts/exts';
-import { Prism } from '@mantine/prism';
-import ZiplineTheming from 'components/Theming';
 
 export default function EmbeddedImage({ image, user }) {
   const dataURL = (route: string) => `${route}/${image.file}`;
@@ -120,8 +117,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     image.created_at = image.created_at.toString();
 
     const prismRender = Object.keys(exts).includes(image.file.split('.').pop());
-    // let prismRenderCode;/
-    // if (prismRender) prismRenderCode = (await getFile(config.uploader.directory, id)).toString();
     if (prismRender) return {
       redirect: {
         destination: `/code/${image.file}`,
@@ -130,7 +125,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
 
     if (!image.mimetype.startsWith('image')) {
-      const data = await getFile(config.uploader.directory, id);
+      const { default: datasource } = await import('lib/ds');
+
+      const data = await datasource.get(image.file);
       if (!data) return { notFound: true };
 
       context.res.end(data);

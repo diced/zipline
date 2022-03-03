@@ -30,7 +30,7 @@ function getIconColor(status, theme) {
         : theme.black;
 }
 
-export default function Upload({ route }) {
+export default function Upload() {
   const theme = useMantineTheme();
   const notif = useNotifications();
   const clipboard = useClipboard();
@@ -89,10 +89,8 @@ export default function Upload({ route }) {
 
   return (
     <>
-      <Dropzone
-        onDrop={(f) => setFiles([...files, ...f])}
-      >
-        {(status) => (
+      <Dropzone onDrop={(f) => setFiles([...files, ...f])}>
+        {status => (
           <>
             <Group position='center' spacing='xl' style={{ minHeight: 220, pointerEvents: 'none' }}>
               <ImageUploadIcon

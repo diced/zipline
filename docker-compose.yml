@@ -24,11 +24,12 @@ services:
       - SECRET=changethis
       - HOST=0.0.0.0
       - PORT=3000
+      - DATASOURCE_TYPE=local
+      - DATASOURCE_DIRECTORY=./uploads
       - DATABASE_URL=postgresql://postgres:postgres@postgres/postgres/
       - UPLOADER_ROUTE=/u
       - UPLOADER_EMBED_ROUTE=/a
       - UPLOADER_LENGTH=6
-      - UPLOADER_DIRECTORY=./uploads
       - UPLOADER_ADMIN_LIMIT=104900000
       - UPLOADER_USER_LIMIT=104900000
       - UPLOADER_DISABLED_EXTS=

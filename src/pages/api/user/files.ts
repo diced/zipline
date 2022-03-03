@@ -43,6 +43,9 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         userId: user.id,
         favorite: !!req.query.favorite,
       },
+      orderBy: {
+        created_at: 'desc',
+      },
       select: {
         created_at: true,
         file: true,

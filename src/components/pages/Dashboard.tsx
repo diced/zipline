@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
 
 import Card from 'components/Card';
-import Image from 'components/Image';
+import ZiplineImage from 'components/Image';
 import ImagesTable from 'components/ImagesTable';
 import useFetch from 'lib/hooks/useFetch';
 import { useStoreSelector } from 'lib/redux/store';
-import { Box, Text, Table, Skeleton, Title, SimpleGrid } from '@mantine/core';
+import { Text, Skeleton, Title, SimpleGrid } from '@mantine/core';
 import { randomId, useClipboard } from '@mantine/hooks';
 import Link from 'components/Link';
 import { CopyIcon, Cross1Icon, TrashIcon } from '@modulz/radix-icons';
 import { useNotifications } from '@mantine/notifications';
+import StatText from 'components/StatText';
 
 type Aligns = 'inherit' | 'right' | 'left' | 'center' | 'justify';
 
@@ -25,37 +26,6 @@ export function bytesToRead(bytes: number) {
   }
 
   return `${bytes.toFixed(1)} ${units[num]}`;
-}
-
-function StatText({ children }) {
-  return <Text color='gray' size='xl'>{children}</Text>;
-}
-
-function StatTable({ rows, columns }) {
-  return (
-    <Box sx={{ pt: 1 }}>
-      <Table highlightOnHover>
-        <thead>
-          <tr>
-            {columns.map(col => (
-              <th key={randomId()}>{col.name}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map(row => (
-            <tr key={randomId()}>
-              {columns.map(col => (
-                <td key={randomId()}>
-                  {col.format ? col.format(row[col.id]) : row[col.id]}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </Table>
-    </Box>
-  );
 }
 
 export default function Dashboard() {
@@ -128,8 +98,7 @@ export default function Dashboard() {
         ]}
       >
         {recent.length ? recent.map(image => (
-          // eslint-disable-next-line jsx-a11y/alt-text
-          <Image key={randomId()} image={image} updateImages={updateImages} />
+          <ZiplineImage key={randomId()} image={image} updateImages={updateImages} />
         )) : [1,2,3,4].map(x => (
           <div key={x}>
             <Skeleton width='100%' height={220} sx={{ borderRadius: 1 }}/>

@@ -1,9 +1,11 @@
-const { readFile, readdir, stat } = require('fs/promises');
-const { join } = require('path');
-const { Migrate } = require('@prisma/migrate/dist/Migrate.js');
-const Logger = require('../src/lib/logger.js');
+import { readFile, readdir, stat } from 'fs/promises';
+import { join } from 'path';
+import { Migrate } from '@prisma/migrate/dist/Migrate';
+import Logger from '../lib/logger';
+import { execSync } from 'child_process';
+import { Datasource } from '../lib/datasource/index';
 
-async function migrations() {
+export async function migrations() {
   const migrate = new Migrate('./prisma/schema.prisma');
   const diagnose = await migrate.diagnoseMigrationHistory({
     optInToShadowDatabase: false,
@@ -18,12 +20,12 @@ async function migrations() {
   migrate.stop();
 }
 
-function log(url) {
+export function log(url) {
   if (url.startsWith('/_next') || url.startsWith('/__nextjs')) return;
   return Logger.get('url').info(url);
 }
 
-function shouldUseYarn() {
+export function shouldUseYarn() {
   try {
     execSync('yarnpkg --version', { stdio: 'ignore' });
     return true;
@@ -32,17 +34,7 @@ function shouldUseYarn() {
   }
 }
 
-
-async function getFile(dir, file) {
-  try {
-    const data = await readFile(join(process.cwd(), dir, file));
-    return data;
-  } catch (e) {
-    return null;
-  }
-}
-
-async function sizeOfDir(directory) {
+export async function sizeOfDir(directory) {
   const files = await readdir(directory);
   
   let size = 0;
@@ -54,7 +46,7 @@ async function sizeOfDir(directory) {
   return size;
 }
 
-function bytesToRead(bytes) {
+export function bytesToRead(bytes) {
   const units = ['B', 'kB', 'MB', 'GB', 'TB', 'PB'];
   let num = 0;
 
@@ -67,8 +59,8 @@ function bytesToRead(bytes) {
 }
 
 
-async function getStats(prisma, config) {
-  const size = await sizeOfDir(join(process.cwd(), config.uploader.directory));
+export async function getStats(prisma, datasource: Datasource) {
+  const size = await datasource.size();
   const byUser = await prisma.image.groupBy({
     by: ['userId'],
     _count: {
@@ -118,13 +110,3 @@ async function getStats(prisma, config) {
     types_count: types_count.sort((a,b) => b.count-a.count),
   };
 }
-
-module.exports = {
-  migrations,
-  bytesToRead,
-  getFile,
-  getStats,
-  log,
-  sizeOfDir,
-  shouldUseYarn,
-};

@@ -4,7 +4,7 @@ import { useStoreSelector } from 'lib/redux/store';
 import useFetch from 'hooks/useFetch';
 import { useRouter } from 'next/router';
 import { useForm } from '@mantine/hooks';
-import { Avatar, Modal, Title, TextInput, Group, Button, Card, Grid, ActionIcon, SimpleGrid, Switch, Skeleton } from '@mantine/core';
+import { Avatar, Modal, Title, TextInput, Group, Button, Card, ActionIcon, SimpleGrid, Switch, Skeleton } from '@mantine/core';
 import { Cross1Icon, PlusIcon, TrashIcon } from '@modulz/radix-icons';
 import { useNotifications } from '@mantine/notifications';
 

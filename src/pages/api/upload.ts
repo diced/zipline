@@ -3,12 +3,11 @@ import prisma from 'lib/prisma';
 import zconfig from 'lib/config';
 import { NextApiReq, NextApiRes, withZipline } from 'lib/middleware/withZipline';
 import { createInvisImage, randomChars } from 'lib/util';
-import { writeFile } from 'fs/promises';
-import { join } from 'path';
 import Logger from 'lib/logger';
 import { ImageFormat, InvisibleImage } from '@prisma/client';
 import { format as formatDate } from 'fecha';
 import { v4 } from 'uuid';
+import datasource from 'lib/ds';
 
 const uploader = multer({
   storage: multer.memoryStorage(),
@@ -70,7 +69,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     
     if (req.headers.zws) invis = await createInvisImage(zconfig.uploader.length, image.id);
 
-    await writeFile(join(process.cwd(), zconfig.uploader.directory, image.file), file.buffer);
+    await datasource.save(image.file, file.buffer);
     Logger.get('image').info(`User ${user.username} (${user.id}) uploaded an image ${image.file} (${image.id})`); 
     files.push(`${zconfig.core.secure ? 'https' : 'http'}://${req.headers.host}${zconfig.uploader.route}/${invis ? invis.invis : image.file}`);
   }

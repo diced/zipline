@@ -1,15 +1,15 @@
-const next = require('next').default;
-const { createServer } = require('http');
-const { mkdir } = require('fs/promises');
-const { extname } = require('path');
-const validateConfig = require('./validateConfig');
-const Logger = require('../src/lib/logger');
-const readConfig = require('../src/lib/readConfig');
-const mimes = require('../scripts/mimes');
-const { log, getStats, getFile, migrations } = require('./util');
-const { PrismaClient } = require('@prisma/client');
-const { version } = require('../package.json');
-const exts = require('../scripts/exts');
+import next from 'next';
+import { createServer } from 'http';
+import { extname } from 'path';
+import Logger from '../lib/logger';
+import mimes from '../../scripts/mimes';
+import { log, getStats, migrations } from './util';
+import { PrismaClient } from '@prisma/client';
+import { version } from '../../package.json';
+import exts from '../../scripts/exts';
+import datasource from '../lib/ds';
+import config from '../lib/config';
+import { mkdir } from 'fs/promises';
 const serverLog = Logger.get('server');
 
 serverLog.info(`starting zipline@${version} server`);
@@ -26,13 +26,12 @@ const dev = process.env.NODE_ENV === 'development';
 })();
 
 async function run() {
-  const a = readConfig();
-  const config = validateConfig(a);
-
   process.env.DATABASE_URL = config.core.database_url;
   await migrations();
 
-  await mkdir(config.uploader.directory, { recursive: true });
+  if (config.datasource.type === 'local') {
+    await mkdir(config.datasource.local.directory, { recursive: true });
+  }
 
   const app = next({
     dir: '.',
@@ -68,14 +67,14 @@ async function run() {
       });
 
       if (!image) {
-        const data = await getFile(config.uploader.directory, parts[2]);
+        const data = await datasource.get(parts[2]);
         if (!data) return app.render404(req, res);
 
         const mimetype = mimes[extname(parts[2])] ?? 'application/octet-stream';
         res.setHeader('Content-Type', mimetype);
         res.end(data);
       } else {
-        const data = await getFile(config.uploader.directory, image.file);
+        const data = await datasource.get(parts[2]);
         if (!data) return app.render404(req, res);
 
         await prisma.image.update({
@@ -106,7 +105,7 @@ async function run() {
       });
 
       if (!image) {
-        const data = await getFile(config.uploader.directory, parts[2]);
+        const data = await datasource.get(parts[2]);
         if (!data) return app.render404(req, res);
 
         const mimetype = mimes[extname(parts[2])] ?? 'application/octet-stream';
@@ -117,7 +116,8 @@ async function run() {
       } else {
         const ext = image.file.split('.').pop();
         if (Object.keys(exts).includes(ext)) return handle(req, res);
-        const data = await getFile(config.uploader.directory, image.file);
+        
+        const data = await datasource.get(parts[2]);
         if (!data) return app.render404(req, res);
 
         await prisma.image.update({
@@ -131,7 +131,7 @@ async function run() {
       handle(req, res);
     }
 
-    if (config.core.logger) log(req.url, res.statusCode);
+    if (config.core.logger) log(req.url);
   });
 
   srv.on('error', (e) => {
@@ -146,14 +146,14 @@ async function run() {
 
   srv.listen(config.core.port, config.core.host ?? '0.0.0.0');
 
-  const stats = await getStats(prisma, config);
+  const stats = await getStats(prisma, datasource);
   await prisma.stats.create({
     data: {
       data: stats,
     },
   });
   setInterval(async () => {
-    const stats = await getStats(prisma, config);
+    const stats = await getStats(prisma, datasource);
     await prisma.stats.create({
       data: {
         data: stats,

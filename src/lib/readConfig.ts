@@ -1,7 +1,8 @@
-const { existsSync, readFileSync } = require('fs');
-const { join } = require('path');
-const parse = require('@iarna/toml/parse-string.js');
-const Logger = require('./logger.js');
+import { existsSync, readFileSync } from 'fs';
+import { join } from 'path';
+import parse from '@iarna/toml/parse-string';
+import Logger from './logger';
+import { Config } from './types';
 
 const e = (val, type, fn) => ({ val, type, fn });
 
@@ -14,9 +15,14 @@ const envValues = [
   e('LOGGER', 'boolean', (c, v) => c.core.logger = v ?? true),
   e('STATS_INTERVAL', 'number', (c, v) => c.core.stats_interval = v),
 
+  e('DATASOURCE_TYPE', 'string', (c, v) => c.datasource.type = v),
+  e('DATASOURCE_LOCAL_DIRECTORY', 'string', (c, v) => c.datasource.local.directory = v),
+  e('DATASOURCE_S3_ACCESS_KEY_ID', 'string', (c, v) => c.datasource.s3.access_key_id = v ),
+  e('DATASOURCE_S3_SECRET_ACCESS_KEY', 'string', (c, v) => c.datasource.s3.secret_access_key = v),
+  e('DATASOURCE_S3_BUCKET', 'string', (c, v) => c.datasource.s3.bucket = v),
+
   e('UPLOADER_ROUTE', 'string', (c, v) => c.uploader.route = v),
   e('UPLOADER_LENGTH', 'number', (c, v) => c.uploader.length = v),
-  e('UPLOADER_DIRECTORY', 'string', (c, v) => c.uploader.directory = v),
   e('UPLOADER_ADMIN_LIMIT', 'number', (c, v) => c.uploader.admin_limit = v),
   e('UPLOADER_USER_LIMIT', 'number', (c, v) => c.uploader.user_limit = v),
   e('UPLOADER_DISABLED_EXTS', 'array', (c, v) => v ? c.uploader.disabled_extentions = v : c.uploader.disabled_extentions = []),
@@ -28,7 +34,7 @@ const envValues = [
   e('RATELIMIT_ADMIN', 'number', (c, v) => c.ratelimit.user = v ?? 0),
 ];
 
-module.exports = function readConfig() {
+export default function readConfig(): Config {
   if (!existsSync(join(process.cwd(), 'config.toml'))) {
     if (!process.env.ZIPLINE_DOCKER_BUILD) Logger.get('config').info('reading environment');
     return tryReadEnv();
@@ -43,7 +49,7 @@ module.exports = function readConfig() {
   }
 };
 
-function tryReadEnv() {
+function tryReadEnv(): Config {
   const config = {
     core: {
       secure: undefined,
@@ -54,10 +60,20 @@ function tryReadEnv() {
       logger: undefined,
       stats_interval: undefined,
     },
+    datasource: {
+      type: undefined,
+      local: {
+        directory: undefined,
+      },
+      s3: {
+        access_key_id: undefined,
+        secret_access_key: undefined,
+        bucket: undefined,
+      },
+    },
     uploader: {
       route: undefined,
       length: undefined,
-      directory: undefined,
       admin_limit: undefined,
       user_limit: undefined,
       disabled_extentions: undefined,
@@ -74,7 +90,7 @@ function tryReadEnv() {
 
   for (let i = 0, L = envValues.length; i !== L; ++i) {
     const envValue = envValues[i];
-    let value = process.env[envValue.val];
+    let value: any = process.env[envValue.val];
 
     if (!value) {
       envValues[i].fn(config, undefined);
