@@ -7,6 +7,7 @@ export interface User {
   embedColor: string;
   embedSiteName: string;
   systemTheme: string;
+  domains: string[];
 }
 
 const initialState: User = null;

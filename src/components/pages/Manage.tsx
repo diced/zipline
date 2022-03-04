@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import useFetch from 'hooks/useFetch';
 import Link from 'components/Link';
 import { useStoreDispatch, useStoreSelector } from 'lib/redux/store';
 import { updateUser } from 'lib/redux/reducers/user';
-import { useForm } from '@mantine/hooks';
-import { Tooltip, TextInput, Button, Text, Title, Group, ColorInput } from '@mantine/core';
-import { DownloadIcon } from '@modulz/radix-icons';
+import { randomId, useForm } from '@mantine/hooks';
+import { Tooltip, TextInput, Button, Text, Title, Group, ColorInput, MultiSelect, Space } from '@mantine/core';
+import { DownloadIcon, Cross1Icon } from '@modulz/radix-icons';
+import { useNotifications } from '@mantine/notifications';
 
 function VarsTooltip({ children }) {
   return (
@@ -27,6 +28,9 @@ function VarsTooltip({ children }) {
 export default function Manage() {
   const user = useStoreSelector(state => state.user);
   const dispatch = useStoreDispatch();
+  const notif = useNotifications();
+
+  const [domains, setDomains] = useState(user.domains ?? []);
 
   const genShareX = (withEmbed: boolean = false, withZws: boolean = false) => {
     const config = {
@@ -61,6 +65,7 @@ export default function Manage() {
       embedTitle: user.embedTitle ?? '',
       embedColor: user.embedColor,
       embedSiteName: user.embedSiteName ?? '',
+      domains: user.domains ?? [],
     },
   });
 
@@ -73,19 +78,51 @@ export default function Manage() {
 
     if (cleanUsername === '') return form.setFieldError('username', 'Username can\'t be nothing');
 
+    const id = notif.showNotification({
+      title: 'Updating user...',
+      message: '',
+      loading: true,
+    });
+
     const data = {
       username: cleanUsername,
       password: cleanPassword === '' ? null : cleanPassword,
       embedTitle: cleanEmbedTitle === '' ? null : cleanEmbedTitle,
       embedColor: cleanEmbedColor === '' ? null : cleanEmbedColor,
       embedSiteName: cleanEmbedSiteName === '' ? null : cleanEmbedSiteName,
+      domains,
     };
 
     const newUser = await useFetch('/api/user', 'PATCH', data);
 
     if (newUser.error) {
+      if (newUser.invalidDomains) {
+        notif.updateNotification(id, {
+          message: <>
+            <Text mt='xs'>The following domains are invalid:</Text>
+            {newUser.invalidDomains.map(err => (
+              <>
+                <Text color='gray' key={randomId()}>{err.domain}: {err.reason}</Text>
+                <Space h='md' />
+              </>
+            ))}
+          </>,
+          color: 'red',
+          icon: <Cross1Icon />,
+        });
+      }
+      notif.updateNotification(id, {
+        title: 'Couldn\'t save user',
+        message: newUser.error,
+        color: 'red',
+        icon: <Cross1Icon />,
+      });
     } else {
       dispatch(updateUser(newUser));
+      notif.updateNotification(id, {
+        title: 'Saved User',
+        message: '',
+      });
     }
   };
 
@@ -97,10 +134,23 @@ export default function Manage() {
       </VarsTooltip>
       <form onSubmit={form.onSubmit((v) => onSubmit(v))}>
         <TextInput id='username' label='Username' {...form.getInputProps('username')} />
-        <TextInput id='password' label='Password'type='password' {...form.getInputProps('password')} />
+        <TextInput id='password' label='Password' type='password' {...form.getInputProps('password')} />
         <TextInput id='embedTitle' label='Embed Title' {...form.getInputProps('embedTitle')} />
         <ColorInput id='embedColor' label='Embed Color' {...form.getInputProps('embedColor')} />
         <TextInput id='embedSiteName' label='Embed Site Name' {...form.getInputProps('embedSiteName')} />
+        <MultiSelect
+          id='domains'
+          label='Domains'
+          data={domains}
+          placeholder='Leave blank if you dont want random domain selection.'
+          creatable
+          searchable
+          clearable
+          getCreateLabel={query => `Add ${query}`}
+          onCreate={query => setDomains((current) => [...current, query])}
+          {...form.getInputProps('domains')}
+        />
+
         <Group position='right' sx={{ paddingTop: 12 }}>
           <Button
             type='submit'

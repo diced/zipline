@@ -71,7 +71,12 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
     await datasource.save(image.file, file.buffer);
     Logger.get('image').info(`User ${user.username} (${user.id}) uploaded an image ${image.file} (${image.id})`); 
-    files.push(`${zconfig.core.secure ? 'https' : 'http'}://${req.headers.host}${zconfig.uploader.route}/${invis ? invis.invis : image.file}`);
+    if (user.domains.length) {
+      const domain = user.domains[Math.floor(Math.random() * user.domains.length)];
+      files.push(`${domain}${zconfig.uploader.route}/${invis ? invis.invis : image.file}`);
+    } else {
+      files.push(`${zconfig.core.secure ? 'https' : 'http'}://${req.headers.host}${zconfig.uploader.route}/${invis ? invis.invis : image.file}`);
+    }
   }
 
   if (user.administrator && zconfig.ratelimit.admin !== 0) {

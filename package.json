@@ -1,6 +1,6 @@
 {
   "name": "zip3",
-  "version": "3.4.1",
+  "version": "3.4.2",
   "license": "MIT",
   "scripts": {
     "dev": "node esbuild.config.js && REACT_EDITOR=code-insiders NODE_ENV=development node dist/server",

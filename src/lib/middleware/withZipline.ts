@@ -25,6 +25,7 @@ export type NextApiReq = NextApiRequest & {
     administrator: boolean;
     id: number;
     password: string;
+    domains: string[];
   } | null | void>;
   getCookie: (name: string) => string | null;
   cleanCookie: (name: string) => void;
@@ -33,7 +34,7 @@ export type NextApiReq = NextApiRequest & {
 
 export type NextApiRes = NextApiResponse & {
   error: (message: string) => void;
-  forbid: (message: string) => void;
+  forbid: (message: string, extra?: any) => void;
   bad: (message: string) => void;
   json: (json: any) => void;
   ratelimited: () => void;
@@ -52,11 +53,12 @@ export const withZipline = (handler: (req: NextApiRequest, res: NextApiResponse)
     });
   };
 
-  res.forbid = (message: string) => {
+  res.forbid = (message: string, extra: any = {}) => {
     res.setHeader('Content-Type', 'application/json');
     res.status(403);
     res.json({
       error: '403: ' + message,
+      ...extra,
     });
   };
 
@@ -93,6 +95,7 @@ export const withZipline = (handler: (req: NextApiRequest, res: NextApiResponse)
       maxAge: undefined,
     }));
   };
+
   req.user = async () => {
     try {
       const userId = req.getCookie('user');
@@ -111,6 +114,7 @@ export const withZipline = (handler: (req: NextApiRequest, res: NextApiResponse)
           systemTheme: true,
           token: true,
           username: true,
+          domains: true,
         },
       });
 

@@ -8,16 +8,17 @@ generator client {
 }
 
 model User {
-  id            Int     @id @default(autoincrement())
+  id            Int      @id @default(autoincrement())
   username      String
   password      String
   token         String
-  administrator Boolean @default(false)
-  systemTheme   String  @default("system")
+  administrator Boolean  @default(false)
+  systemTheme   String   @default("system")
   embedTitle    String?
-  embedColor    String  @default("#2f3136")
-  embedSiteName String? @default("{image.file} • {user.name}")
-  ratelimited   Boolean @default(false)
+  embedColor    String   @default("#2f3136")
+  embedSiteName String?  @default("{image.file} • {user.name}")
+  ratelimited   Boolean  @default(false)
+  domains       String[]
   images        Image[]
   urls          Url[]
 }

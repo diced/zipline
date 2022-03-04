@@ -2,6 +2,7 @@ import prisma from 'lib/prisma';
 import { hashPassword } from 'lib/util';
 import { NextApiReq, NextApiRes, withZipline } from 'middleware/withZipline';
 import Logger from 'lib/logger';
+import pkg from '../../../../package.json';
 
 async function handler(req: NextApiReq, res: NextApiRes) {
   const user = await req.user();
@@ -51,6 +52,36 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       data: { systemTheme: req.body.systemTheme },
     });
 
+    if (req.body.domains) {
+      if (!req.body.domains) await prisma.user.update({
+        where: { id: user.id },
+        data: { domains: [] },
+      });
+      
+      const invalidDomains = [];
+
+      for (const domain of req.body.domains) {
+        try {
+          const url = new URL(domain);
+          url.pathname = '/api/version';
+          const res = await fetch(url.toString());
+          if (!res.ok) invalidDomains.push({ domain, reason: 'Got a non OK response' });
+          else {
+            const body = await res.json();
+            if (body?.local !== pkg.version) invalidDomains.push({ domain, reason: 'Version mismatch' });
+            else await prisma.user.update({
+              where: { id: user.id },
+              data: { domains: { push: url.origin } },
+            });
+          }
+        } catch (e) {
+          invalidDomains.push({ domain, reason: e.message });
+        }
+      }
+
+      if (invalidDomains.length) return res.forbid('Invalid domains', { invalidDomains });
+    }
+
     const newUser = await prisma.user.findFirst({
       where: {
         id: Number(user.id),
@@ -66,6 +97,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         systemTheme: true,
         token: true,
         username: true,
+        domains: true,
       },
     });
 
