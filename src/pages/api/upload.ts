@@ -9,9 +9,7 @@ import { format as formatDate } from 'fecha';
 import { v4 } from 'uuid';
 import datasource from 'lib/ds';
 
-const uploader = multer({
-  storage: multer.memoryStorage(),
-});
+const uploader = multer();
 
 async function handler(req: NextApiReq, res: NextApiRes) {
   if (req.method !== 'POST') return res.forbid('invalid method');
@@ -25,13 +23,16 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
   if (!user) return res.forbid('authorization incorect');
   if (user.ratelimited) return res.ratelimited();
+
+  await run(uploader.array('file'))(req, res);
+
   if (!req.files) return res.error('no files');
+
   if (req.files && req.files.length === 0) return res.error('no files');
 
   const rawFormat = ((req.headers.format || '') as string).toUpperCase() || 'RANDOM';
   const format: ImageFormat = Object.keys(ImageFormat).includes(rawFormat) && ImageFormat[rawFormat];
   const files = [];
-
   for (let i = 0; i !== req.files.length; ++i) {
     const file = req.files[i];
     if (file.size > zconfig.uploader[user.administrator ? 'admin_limit' : 'user_limit']) return res.error(`file[${i}] size too big`);
@@ -116,9 +117,7 @@ function run(middleware: any) {
     });
 }
 
-export default async function handlers(req, res) {
-  await run(uploader.array('file'))(req, res);
-  
+export default async function handlers(req, res) {  
   return withZipline(handler)(req, res);
 };
 

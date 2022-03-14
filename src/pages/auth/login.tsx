@@ -36,14 +36,14 @@ export default function Login() {
         icon: <Cross1Icon />,
       });
     } else {
-      router.push(router.query.url as string || '/dashboard');
+      await router.push(router.query.url as string || '/dashboard');
     }
   };
 
   useEffect(() => {
     (async () => {
       const a = await fetch('/api/user');
-      if (a.ok) router.push('/dashboard');
+      if (a.ok) await router.push('/dashboard');
       else {
         const v = await useFetch('/api/version');
         setVersions(v);

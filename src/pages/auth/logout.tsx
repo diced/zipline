@@ -4,8 +4,6 @@ import { LoadingOverlay } from '@mantine/core';
 
 export default function Logout() {
   const router = useRouter();
-  const [visible, setVisible] = useState(true);
-
 
   useEffect(() => {
     (async () => {
@@ -20,7 +18,7 @@ export default function Logout() {
   }, []);
 
   return (
-    <LoadingOverlay visible={visible} />
+    <LoadingOverlay visible={true} />
   );
 }
 

@@ -1,7 +1,10 @@
 const esbuild = require('esbuild');
+const { rm } = require('fs/promises');
 
 (async () => {
   const watch = process.argv[2] === '--watch';
+
+  await rm('./dist', { recursive: true });
 
   await esbuild.build({
     tsconfig: 'tsconfig.json',
@@ -11,6 +14,7 @@ const esbuild = require('esbuild');
     treeShaking: true,
     entryPoints: [
       'src/server/index.ts',
+      'src/server/server.ts',
       'src/server/util.ts',
       'src/server/validateConfig.ts',
       'src/lib/logger.ts',

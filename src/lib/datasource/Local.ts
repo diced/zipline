@@ -1,4 +1,5 @@
-import { readdir, readFile, stat, writeFile } from 'fs/promises';
+import { createReadStream, ReadStream } from 'fs';
+import { readdir, stat, writeFile } from 'fs/promises';
 import { join } from 'path';
 import { Datasource } from './datasource';
 
@@ -13,10 +14,9 @@ export class Local extends Datasource {
     await writeFile(join(process.cwd(), this.path, file), data);
   }
 
-  public async get(file: string): Promise<Buffer> {
+  public get(file: string): ReadStream {
     try {
-      const data = await readFile(join(process.cwd(), this.path, file));
-      return data;
+      return createReadStream(join(process.cwd(), this.path, file));
     } catch (e) {
       return null;
     }

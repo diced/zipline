@@ -1,9 +1,6 @@
-import { readFile, readdir, stat } from 'fs/promises';
-import { join } from 'path';
 import { Migrate } from '@prisma/migrate/dist/Migrate';
 import Logger from '../lib/logger';
-import { execSync } from 'child_process';
-import { Datasource } from '../lib/datasource/index';
+import { Datasource } from 'lib/datasource';
 
 export async function migrations() {
   const migrate = new Migrate('./prisma/schema.prisma');
@@ -23,27 +20,6 @@ export async function migrations() {
 export function log(url) {
   if (url.startsWith('/_next') || url.startsWith('/__nextjs')) return;
   return Logger.get('url').info(url);
-}
-
-export function shouldUseYarn() {
-  try {
-    execSync('yarnpkg --version', { stdio: 'ignore' });
-    return true;
-  } catch (e) {
-    return false;
-  }
-}
-
-export async function sizeOfDir(directory) {
-  const files = await readdir(directory);
-  
-  let size = 0;
-  for (let i = 0, L = files.length; i !== L; ++i) {
-    const sta = await stat(join(directory, files[i]));
-    size += sta.size;
-  }
-
-  return size;
 }
 
 export function bytesToRead(bytes) {

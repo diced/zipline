@@ -1,5 +1,6 @@
 import { Datasource } from './datasource';
 import AWS from 'aws-sdk';
+import { Readable } from 'stream';
 
 export class S3 extends Datasource {
   public name: string = 'S3';
@@ -33,20 +34,12 @@ export class S3 extends Datasource {
     });
   }
 
-  public async get(file: string): Promise<Buffer> {
-    return new Promise((resolve, reject) => {
-      this.s3.getObject({
-        Bucket: this.bucket,
-        Key: file,
-      }, (err, data) => {
-        if (err) {
-          reject(err);
-        } else {
-          // @ts-ignore
-          resolve(Buffer.from(data.Body));
-        }
-      });
-    });
+  public get(file: string): Readable {
+    // Unfortunately, aws-sdk is bad and the stream still loads everything into memory.
+    return this.s3.getObject({
+      Bucket: this.bucket,
+      Key: file,
+    }).createReadStream();
   }
 
   public async size(): Promise<number> {

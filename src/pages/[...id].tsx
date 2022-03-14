@@ -127,10 +127,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     if (!image.mimetype.startsWith('image')) {
       const { default: datasource } = await import('lib/ds');
 
-      const data = await datasource.get(image.file);
+      const data = datasource.get(image.file);
       if (!data) return { notFound: true };
 
-      context.res.end(data);
+      data.pipe(context.res);
       return { props: {} };
     }
 

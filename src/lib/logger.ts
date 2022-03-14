@@ -21,12 +21,12 @@ export default class Logger {
     this.name = name;
   }
 
-  info(message: string) {
-    console.log(this.formatMessage(LoggerLevel.INFO, this.name, message));
+  info(...args) {
+    console.log(this.formatMessage(LoggerLevel.INFO, this.name, args.join(' ')));
   }
 
-  error(error: any) {
-    console.log(this.formatMessage(LoggerLevel.ERROR, this.name, error.stack ?? error));
+  error(...args: any[]) {
+    console.log(this.formatMessage(LoggerLevel.ERROR, this.name, args.map(error => error.stack ?? error).join(' ')));
   }
 
   formatMessage(level: LoggerLevel, name, message) {

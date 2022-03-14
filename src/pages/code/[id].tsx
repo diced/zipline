@@ -11,7 +11,7 @@ export default function Code() {
   useEffect(() => {
     (async () => {
       const res = await fetch('/r/' + id);
-      if (id && !res.ok) router.push('/404');
+      if (id && !res.ok) await router.push('/404');
       const data = await res.text();
       if (id) setPrismRenderCode(data);
     })();
