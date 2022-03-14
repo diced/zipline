@@ -1,4 +1,4 @@
-FROM node:17-alpine AS deps
+FROM node:16-alpine AS deps
 WORKDIR /build
 
 COPY package.json yarn.lock ./
@@ -6,7 +6,7 @@ COPY package.json yarn.lock ./
 RUN apk add --no-cache libc6-compat
 RUN yarn install --frozen-lockfile
 
-FROM node:17-alpine AS builder
+FROM node:16-alpine AS builder
 WORKDIR /build
 
 COPY --from=deps /build/node_modules ./node_modules
@@ -20,7 +20,7 @@ ENV NEXT_TELEMETRY_DISABLED 1
 
 RUN yarn build
 
-FROM node:17-alpine AS runner
+FROM node:16-alpine AS runner
 WORKDIR /zipline
 
 ENV NODE_ENV production

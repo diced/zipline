@@ -1,11 +1,11 @@
-FROM node:17 AS deps
+FROM node:16 AS deps
 WORKDIR /build
 
 COPY package.json yarn.lock ./
 
 RUN yarn install --frozen-lockfile
 
-FROM node:17 AS builder
+FROM node:16 AS builder
 WORKDIR /build
 
 COPY --from=deps /build/node_modules ./node_modules
@@ -19,7 +19,7 @@ ENV NEXT_TELEMETRY_DISABLED 1
 
 RUN yarn build
 
-FROM node:17 AS runner
+FROM node:16 AS runner
 WORKDIR /zipline
 
 ENV NODE_ENV production
