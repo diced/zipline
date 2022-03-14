@@ -1,10 +1,13 @@
 const esbuild = require('esbuild');
+const { existsSync } = require('fs');
 const { rm } = require('fs/promises');
 
 (async () => {
   const watch = process.argv[2] === '--watch';
 
-  await rm('./dist', { recursive: true });
+  if (existsSync('./dist')) {
+    await rm('./dist', { recursive: true });
+  }
 
   await esbuild.build({
     tsconfig: 'tsconfig.json',
