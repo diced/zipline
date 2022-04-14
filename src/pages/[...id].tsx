@@ -16,11 +16,12 @@ export default function EmbeddedImage({ image, user }) {
   const updateImage = () => {
     const imageEl = document.getElementById('image_content') as HTMLImageElement;
 
-    const original = new Image;
-    original.src = dataURL('/r');
-
-    if (original.width > innerWidth) imageEl.width = Math.floor(original.width * Math.min((innerHeight / original.height), (innerWidth / original.width)));
-    else imageEl.width = original.width;
+    const img = new Image();
+    img.addEventListener("load", function() {
+      if (this.naturalWidth > innerWidth) imageEl.width = Math.floor(this.naturalWidth * Math.min((innerHeight / this.naturalHeight), (innerWidth / this.naturalWidth)));
+      else imageEl.width = this.naturalWidth;
+    });
+    img.src = dataURL('/r');
   };
   
   useEffect(() => updateImage(), []);
