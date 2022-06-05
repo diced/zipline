@@ -17,18 +17,19 @@
 - Built with Next.js & React
 - Token protected uploading
 - Image uploading
+- Password Protected Uploads
 - URL shortening
 - Text uploading
 - URL Formats (uuid, dates, random alphanumeric, original name, zws)
 - Discord embeds (OG metadata)
 - Gallery viewer, and multiple file format support
-- Easy setup instructions on [docs](https://zipline.diced.tech/) (One command install `docker-compose up -d`)
+- Easy setup instructions on [docs](https://zipl.vercel.app/) (One command install `docker-compose up -d`)
 
 ## Installing
-[See how to install here](https://zipline.diced.tech/docs/get-started)
+[See how to install here](https://zipl.vercel.app/docs/get-started)
 
 ## Configuration
-[See how to configure here](https://zipline.diced.tech/docs/config/overview)
+[See how to configure here](https://zipl.vercel.app/docs/config/overview)
 
 ## Theming
-[See how to theme here](https://zipline.diced.tech/docs/themes/reference)
+[See how to theme here](https://zipl.vercel.app/docs/themes/reference)

@@ -1,5 +1,6 @@
 import { NextApiReq, NextApiRes, withZipline } from 'middleware/withZipline';
 import prisma from 'lib/prisma';
+import Logger from 'lib/logger';
 
 async function handler(req: NextApiReq, res: NextApiRes) {
   const user = await req.user();
@@ -15,6 +16,15 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       },
     });
     if (!deleteUser) return res.forbid('user doesn\'t exist');
+
+    if (req.body.delete_images) {
+      const { count } = await prisma.image.deleteMany({
+        where: {
+          userId: deleteUser.id,
+        },
+      });
+      Logger.get('image').info(`User ${user.username} (${user.id}) deleted ${count} images of user ${deleteUser.username} (${deleteUser.id})`);
+    }
 
     await prisma.user.delete({
       where: {

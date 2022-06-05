@@ -1,5 +1,5 @@
 import { createReadStream, ReadStream } from 'fs';
-import { readdir, stat, writeFile } from 'fs/promises';
+import { readdir, rm, stat, writeFile } from 'fs/promises';
 import { join } from 'path';
 import { Datasource } from './datasource';
 
@@ -12,6 +12,10 @@ export class Local extends Datasource {
 
   public async save(file: string, data: Buffer): Promise<void> {
     await writeFile(join(process.cwd(), this.path, file), data);
+  }
+
+  public async delete(file: string): Promise<void> {
+    await rm(join(process.cwd(), this.path, file));
   }
 
   public get(file: string): ReadStream {

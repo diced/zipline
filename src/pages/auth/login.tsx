@@ -9,7 +9,6 @@ import { Cross1Icon, DownloadIcon } from '@modulz/radix-icons';
 export default function Login() {
   const router = useRouter();
   const notif = useNotifications();
-  const [versions, setVersions] = React.useState<{ upstream: string, local: string }>(null);
 
   const form = useForm({
     initialValues: {
@@ -44,17 +43,6 @@ export default function Login() {
     (async () => {
       const a = await fetch('/api/user');
       if (a.ok) await router.push('/dashboard');
-      else {
-        const v = await useFetch('/api/version');
-        setVersions(v);
-        if (v.local !== v.upstream) {
-          notif.showNotification({
-            title: 'Update available',
-            message: `A new version of Zipline is available. You are running ${v.local} and the latest version is ${v.upstream}.`,
-            icon: <DownloadIcon />,
-          });
-        }
-      }
     })();
   }, []);
 
@@ -71,27 +59,6 @@ export default function Login() {
           </form>
         </div>
       </Center>
-      <Box
-        sx={{
-          zIndex: 99,
-          position: 'fixed',
-          bottom: '10px',
-          right: '20px',
-
-        }}
-      >
-        {versions && (
-          <Tooltip
-            wrapLines
-            width={220}
-            transition='rotate-left'
-            transitionDuration={200}
-            label={versions.local !== versions.upstream ? 'Looks like you are running an outdated version of Zipline. Please update to the latest version.' : 'You are running the latest version of Zipline.'}
-          >
-            <Badge radius='md' size='lg' variant='dot' color={versions.local !== versions.upstream ? 'red' : 'primary'}>{versions.local}</Badge>
-          </Tooltip>
-        )}
-      </Box>
     </>
   );
 }

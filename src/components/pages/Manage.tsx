@@ -82,6 +82,7 @@ export default function Manage() {
       title: 'Updating user...',
       message: '',
       loading: true,
+      autoClose: false,
     });
 
     const data = {

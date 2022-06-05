@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-
 import { useStoreSelector } from 'lib/redux/store';
 import useFetch from 'hooks/useFetch';
 import { useRouter } from 'next/router';
 import { useForm } from '@mantine/hooks';
-import { Avatar, Modal, Title, TextInput, Group, Button, Card, ActionIcon, SimpleGrid, Switch, Skeleton } from '@mantine/core';
+import { Avatar, Modal, Title, TextInput, Group, Button, Card, ActionIcon, SimpleGrid, Switch, Skeleton, Checkbox } from '@mantine/core';
 import { Cross1Icon, PlusIcon, TrashIcon } from '@modulz/radix-icons';
 import { useNotifications } from '@mantine/notifications';
+import { useModals } from '@mantine/modals';
 
 
 function CreateUserModal({ open, setOpen, updateUsers }) {
@@ -51,7 +51,7 @@ function CreateUserModal({ open, setOpen, updateUsers }) {
 
     updateUsers();
   };
-  
+
   return (
     <Modal
       opened={open}
@@ -76,22 +76,15 @@ export default function Users() {
   const user = useStoreSelector(state => state.user);
   const router = useRouter();
   const notif = useNotifications();
+  const modals = useModals();
 
   const [users, setUsers] = useState([]);
   const [open, setOpen] = useState(false);
 
-  const updateUsers = async () => {
-    const us = await useFetch('/api/users');
-    if (!us.error) {
-      setUsers(us);
-    } else {
-      router.push('/dashboard');
-    };
-  };
-
-  const handleDelete = async (user) => {
+  const handleDelete = async (user, delete_images) => {
     const res = await useFetch('/api/users', 'DELETE', {
       id: user.id,
+      delete_images,
     });
     if (res.error) {
       notif.showNotification({
@@ -107,9 +100,39 @@ export default function Users() {
         color: 'green',
         icon: <TrashIcon />,
       });
+      updateUsers();
     }
+  };
 
-    updateUsers();
+  // 2-step modal for deleting user if they want to delete their images too.
+  const openDeleteModal = user => modals.openConfirmModal({
+    title: `Delete ${user.username}?`,
+    closeOnConfirm: false,
+    centered: true,
+    labels: { confirm: 'Yes', cancel: 'No' },
+    onConfirm: () => {
+      modals.openConfirmModal({
+        title: `Delete ${user.username}'s images?`,
+        labels: { confirm: 'Yes', cancel: 'No' },
+        onConfirm: () => {
+          handleDelete(user, true);
+          modals.closeAll();
+        },
+        onCancel: () => {
+          handleDelete(user, false);
+          modals.closeAll();
+        },
+      });
+    },
+  });
+
+  const updateUsers = async () => {
+    const us = await useFetch('/api/users');
+    if (!us.error) {
+      setUsers(us);
+    } else {
+      router.push('/dashboard');
+    };
   };
 
   useEffect(() => {
@@ -121,7 +144,7 @@ export default function Users() {
       <CreateUserModal open={open} setOpen={setOpen} updateUsers={updateUsers} />
       <Group>
         <Title sx={{ marginBottom: 12 }}>Users</Title>
-        <ActionIcon variant='filled' color='primary' onClick={() => setOpen(true)}><PlusIcon/></ActionIcon>
+        <ActionIcon variant='filled' color='primary' onClick={() => setOpen(true)}><PlusIcon /></ActionIcon>
       </Group>
       <SimpleGrid
         cols={3}
@@ -130,23 +153,23 @@ export default function Users() {
           { maxWidth: 'sm', cols: 1, spacing: 'sm' },
         ]}
       >
-        {users.length ? users.filter(x => x.username !== user.username).map((user, i) => (
+        {users.length ? users.filter(x => x.username !== user.username).map(user => (
           <Card key={user.id} sx={{ maxWidth: '100%' }}>
             <Group position='apart'>
               <Group position='left'>
-                <Avatar  color={user.administrator ? 'primary' : 'dark'}>{user.username[0]}</Avatar>
+                <Avatar color={user.administrator ? 'primary' : 'dark'}>{user.username[0]}</Avatar>
                 <Title>{user.username}</Title>
               </Group>
               <Group position='right'>
-                <ActionIcon aria-label='delete' onClick={() => handleDelete(user)}>
+                <ActionIcon aria-label='delete' onClick={() => openDeleteModal(user)}>
                   <TrashIcon />
                 </ActionIcon>
               </Group>
             </Group>
           </Card>
-        )): [1,2,3,4].map(x => (
+        )) : [1, 2, 3, 4].map(x => (
           <div key={x}>
-            <Skeleton width='100%' height={220} sx={{ borderRadius: 1 }}/>
+            <Skeleton width='100%' height={220} sx={{ borderRadius: 1 }} />
           </div>
         ))}
       </SimpleGrid>
