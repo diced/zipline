@@ -2,11 +2,12 @@ version: '3'
 services:
   postgres:
     image: postgres
-    environment: 
+    restart: always
+    environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DATABASE=postgres
-    volumes: 
+    volumes:
       - pg_data:/var/lib/postgresql/data
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U postgres']
@@ -21,7 +22,7 @@ services:
     ports:
       - '3000:3000'
     restart: unless-stopped
-    environment: 
+    environment:
       - SECURE=false
       - SECRET=changethis
       - HOST=0.0.0.0
