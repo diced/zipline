@@ -33,12 +33,12 @@ export default function EmbeddedImage({ image, user, pass }) {
     const imageEl = document.getElementById('image_content') as HTMLImageElement;
 
     const img = new Image();
-    img.addEventListener("load", function() {
+    img.addEventListener('load', function() {
       if (this.naturalWidth > innerWidth) imageEl.width = Math.floor(this.naturalWidth * Math.min((innerHeight / this.naturalHeight), (innerWidth / this.naturalWidth)));
       else imageEl.width = this.naturalWidth;
     });
     
-    img.src = url || dataURL('/r')
+    img.src = url || dataURL('/r');
     if (url) {
       imageEl.src = url;
     };
