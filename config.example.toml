@@ -1,6 +1,6 @@
 [core]
 secure = true
-secret = 'some secret'
+secret = 'changethis'
 host = '0.0.0.0'
 port = 3000
 database_url = 'postgres://postgres:postgres@postgres/postgres'

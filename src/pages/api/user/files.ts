@@ -1,10 +1,8 @@
 import { NextApiReq, NextApiRes, withZipline } from 'middleware/withZipline';
 import prisma from 'lib/prisma';
-import config from 'lib/config';
 import { chunk } from 'lib/util';
-import { rm } from 'fs/promises';
-import { join } from 'path';
 import Logger from 'lib/logger';
+import datasource from 'lib/ds';
 
 async function handler(req: NextApiReq, res: NextApiRes) {
   const user = await req.user();
@@ -19,10 +17,11 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       },
     });
 
-    await rm(join(process.cwd(), config.uploader.directory, image.file));
+    await datasource.delete(image.file);
 
     Logger.get('image').info(`User ${user.username} (${user.id}) deleted an image ${image.file} (${image.id})`);
 
+    delete image.password;
     return res.json(image);
   } else if (req.method === 'PATCH') {
     if (!req.body.id) return res.error('no file id');
@@ -36,6 +35,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       },
     });
 
+    delete image.password;
     return res.json(image);
   } else {
     let images = await prisma.image.findMany({

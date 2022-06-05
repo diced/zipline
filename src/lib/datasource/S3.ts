@@ -34,6 +34,21 @@ export class S3 extends Datasource {
     });
   }
 
+  public async delete(file: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.s3.deleteObject({
+        Bucket: this.bucket,
+        Key: file,
+      }, err => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
+
   public get(file: string): Readable {
     // Unfortunately, aws-sdk is bad and the stream still loads everything into memory.
     return this.s3.getObject({

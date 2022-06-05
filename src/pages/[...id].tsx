@@ -1,19 +1,35 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
 import { GetServerSideProps } from 'next';
-import { Box } from '@mantine/core';
+import { Box, Button, Modal, PasswordInput } from '@mantine/core';
 import config from 'lib/config';
 import prisma from 'lib/prisma';
 import { parse } from 'lib/clientUtils';
 import * as exts from '../../scripts/exts';
 
-export default function EmbeddedImage({ image, user }) {
+export default function EmbeddedImage({ image, user, pass }) {
   const dataURL = (route: string) => `${route}/${image.file}`;
+
+  const [opened, setOpened] = useState(pass);
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
   // reapply date from workaround
   image.created_at = new Date(image.created_at);
 
-  const updateImage = () => {
+  const check = async () => {
+    const res = await fetch(`/api/auth/image?id=${image.id}&password=${password}`);
+
+    if (res.ok) {
+      setError('');
+      updateImage(`/api/auth/image?id=${image.id}&password=${password}`);
+      setOpened(false);
+    } else {
+      setError('Invalid password');
+    }
+  };
+
+  const updateImage = async (url?: string) => {
     const imageEl = document.getElementById('image_content') as HTMLImageElement;
 
     const img = new Image();
@@ -21,25 +37,49 @@ export default function EmbeddedImage({ image, user }) {
       if (this.naturalWidth > innerWidth) imageEl.width = Math.floor(this.naturalWidth * Math.min((innerHeight / this.naturalHeight), (innerWidth / this.naturalWidth)));
       else imageEl.width = this.naturalWidth;
     });
-    img.src = dataURL('/r');
+    
+    img.src = url || dataURL('/r')
+    if (url) {
+      imageEl.src = url;
+    };
   };
-  
-  useEffect(() => updateImage(), []);
+
+  useEffect(() => {
+    if (pass) {
+      setOpened(true);
+    } else {
+      updateImage();
+    }
+  }, []);
 
   return (
     <>
       <Head>
         {image.embed && (
           <>
-            {user.embedSiteName && (<meta property='og:site_name' content={parse(user.embedSiteName, image, user)} />)}
-            {user.embedTitle && (<meta property='og:title' content={parse(user.embedTitle, image, user)} />)}
-            <meta property='theme-color' content={user.embedColor}/>
+            {user.embedSiteName && <meta property='og:site_name' content={parse(user.embedSiteName, image, user)} />}
+            {user.embedTitle && <meta property='og:title' content={parse(user.embedTitle, image, user)} />}
+            <meta property='theme-color' content={user.embedColor} />
           </>
         )}
         <meta property='og:image' content={dataURL('/r')} />
         <meta property='twitter:card' content='summary_large_image' />
         <title>{image.file}</title>
       </Head>
+      <Modal
+        opened={opened}
+        onClose={() => setOpened(false)}
+        title='Password Protected'
+        centered={true}
+        hideCloseButton={true}
+        closeOnEscape={false}
+        closeOnClickOutside={false}
+      >
+        <PasswordInput label='Password' placeholder='Password' error={error} value={password} onChange={e => setPassword(e.target.value)} />
+        <Button fullWidth onClick={() => check()} mt='md'>
+          Submit
+        </Button>
+      </Modal>
       <Box
         sx={{
           display: 'flex',
@@ -78,7 +118,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       props: {},
       redirect: {
         destination: url.destination,
-      }, 
+      },
     };
 
   } else {
@@ -97,6 +137,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         userId: true,
         embed: true,
         created_at: true,
+        password: true,
       },
     });
     if (!image) return { notFound: true };
@@ -134,11 +175,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       data.pipe(context.res);
       return { props: {} };
     }
-
+    const pass = image.password ? true : false;
+    delete image.password;
     return {
       props: {
         image,
         user,
+        pass,
       },
     };
   }

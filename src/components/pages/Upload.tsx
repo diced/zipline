@@ -58,6 +58,7 @@ export default function Upload() {
       title: 'Uploading Images...',
       message: '',
       loading: true,
+      autoClose: false,
     });
 
     const res = await fetch('/api/upload', {

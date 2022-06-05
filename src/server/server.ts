@@ -11,7 +11,6 @@ import Logger from '../lib/logger';
 import mimes from '../../scripts/mimes';
 import { extname } from 'path';
 import exts from '../../scripts/exts';
-import { version } from '../../package.json';
 
 const serverLog = Logger.get('server');
 
@@ -24,12 +23,20 @@ export default class Server {
   private http: HttpServer;
 
   public constructor() {
-    serverLog.info(`starting zipline@${version} server`);
-
     this.start();
   }
 
   private async start() {
+    // annoy user if they didnt change secret from default "changethis"
+    if (config.core.secret === 'changethis') {
+      serverLog.error('Secret is not set!');
+      serverLog.error('Running Zipline as is, without a randomized secret is not recommended and leaves your instance at risk!');
+      serverLog.error('Please change your secret in the config file or environment variables.');
+      serverLog.error('The config file is located at `config.toml`, or if using docker-compose you can change the variables in the `docker-compose.yml` file.');
+      serverLog.error('It is recomended to use a secret that is alphanumeric and randomized. A way you can generate this is through a password manager you may have.');
+      process.exit(1);
+    };
+
     const dev = process.env.NODE_ENV === 'development';
 
     process.env.DATABASE_URL = config.core.database_url;
@@ -64,16 +71,11 @@ export default class Server {
             { invisible: { invis: decodeURI(params.id) } },
           ],
         },
-        select: {
-          mimetype: true,
-          id: true,
-          file: true,
-          invisible: true,
-          embed: true,
-        },
       });
 
       if (!image) await this.rawFile(req, res, params.id);
+
+      if (image.password) await this.handle(req, res);
       else if (image.embed) await this.handle(req, res);
       else await this.fileDb(req, res, image);
     });
@@ -86,16 +88,11 @@ export default class Server {
             { invisible: { invis: decodeURI(params.id) } },
           ],
         },
-        select: {
-          mimetype: true,
-          id: true,
-          file: true,
-          invisible: true,
-          embed: true,
-        },
       });
 
       if (!image) await this.rawFile(req, res, params.id);
+
+      if (image.password) await this.handle(req, res);
       else await this.rawFileDb(req, res, image);
     });
 
@@ -123,7 +120,6 @@ export default class Server {
   private async rawFile(req: IncomingMessage, res: OutgoingMessage, id: string) {
     const data = datasource.get(id);
     if (!data) return this.nextServer.render404(req, res as ServerResponse);
-
     const mimetype = mimes[extname(id)] ?? 'application/octet-stream';
     res.setHeader('Content-Type', mimetype);
 
@@ -132,7 +128,7 @@ export default class Server {
     data.on('end', () => res.end());
   }
 
-  private async rawFileDb(req: IncomingMessage, res: OutgoingMessage, image: any) {
+  private async rawFileDb(req: IncomingMessage, res: OutgoingMessage, image: Image) {
     const data = datasource.get(image.file);
     if (!data) return this.nextServer.render404(req, res as ServerResponse);
 
@@ -147,7 +143,7 @@ export default class Server {
     });
   }
 
-  private async fileDb(req: IncomingMessage, res: OutgoingMessage, image: any) {
+  private async fileDb(req: IncomingMessage, res: OutgoingMessage, image: Image) {
     const ext = image.file.split('.').pop();
     if (Object.keys(exts).includes(ext)) return this.handle(req, res as ServerResponse);
 

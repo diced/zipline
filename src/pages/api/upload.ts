@@ -2,7 +2,7 @@ import multer from 'multer';
 import prisma from 'lib/prisma';
 import zconfig from 'lib/config';
 import { NextApiReq, NextApiRes, withZipline } from 'lib/middleware/withZipline';
-import { createInvisImage, randomChars } from 'lib/util';
+import { createInvisImage, randomChars, hashPassword } from 'lib/util';
 import Logger from 'lib/logger';
 import { ImageFormat, InvisibleImage } from '@prisma/client';
 import { format as formatDate } from 'fecha';
@@ -14,7 +14,7 @@ const uploader = multer();
 async function handler(req: NextApiReq, res: NextApiRes) {
   if (req.method !== 'POST') return res.forbid('invalid method');
   if (!req.headers.authorization) return res.forbid('no authorization');
-  
+
   const user = await prisma.user.findFirst({
     where: {
       token: req.headers.authorization,
@@ -56,6 +56,10 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       break;
     }
 
+    let password = null;
+    if (req.headers.password) {
+      password = await hashPassword(req.headers.password as string);
+    }
 
     let invis: InvisibleImage;
     const image = await prisma.image.create({
@@ -65,13 +69,14 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         userId: user.id,
         embed: !!req.headers.embed,
         format,
+        password,
       },
     });
-    
+
     if (req.headers.zws) invis = await createInvisImage(zconfig.uploader.length, image.id);
 
     await datasource.save(image.file, file.buffer);
-    Logger.get('image').info(`User ${user.username} (${user.id}) uploaded an image ${image.file} (${image.id})`); 
+    Logger.get('image').info(`User ${user.username} (${user.id}) uploaded an image ${image.file} (${image.id})`);
     if (user.domains.length) {
       const domain = user.domains[Math.floor(Math.random() * user.domains.length)];
       files.push(`${domain}${zconfig.uploader.route}/${invis ? invis.invis : image.file}`);
@@ -117,7 +122,7 @@ function run(middleware: any) {
     });
 }
 
-export default async function handlers(req, res) {  
+export default async function handlers(req, res) {
   return withZipline(handler)(req, res);
 };
 

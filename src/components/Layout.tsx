@@ -122,6 +122,7 @@ export default function Layout({ children, user }) {
 
   const openResetToken = () => modals.openConfirmModal({
     title: 'Reset Token',
+    centered: true,
     children: (
       <Text size='sm'>
         Once you reset your token, you will have to update any uploaders to use this new token.
@@ -153,6 +154,7 @@ export default function Layout({ children, user }) {
 
   const openCopyToken = () => modals.openConfirmModal({
     title: 'Copy Token',
+    centered: true,
     children: (
       <Text size='sm'>
         Make sure you don&apos;t share this token with anyone as they will be able to upload files on your behalf.
