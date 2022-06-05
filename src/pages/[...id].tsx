@@ -32,16 +32,16 @@ export default function EmbeddedImage({ image, user, pass }) {
   const updateImage = async (url?: string) => {
     const imageEl = document.getElementById('image_content') as HTMLImageElement;
 
-    const original = new Image;
-    original.src = url || dataURL('/r');
-
+    const img = new Image();
+    img.addEventListener('load', function() {
+      if (this.naturalWidth > innerWidth) imageEl.width = Math.floor(this.naturalWidth * Math.min((innerHeight / this.naturalHeight), (innerWidth / this.naturalWidth)));
+      else imageEl.width = this.naturalWidth;
+    });
+    
+    img.src = url || dataURL('/r');
     if (url) {
       imageEl.src = url;
-    }
-
-    // Sometimes gives blank image on first load
-    if (original.width > innerWidth) imageEl.width = Math.floor(original.width * Math.min((innerHeight / original.height), (innerWidth / original.width)));
-    else imageEl.width = original.width;
+    };
   };
 
   useEffect(() => {
