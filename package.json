@@ -64,5 +64,6 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/diced/zipline.git"
-  }
+  },
+  "packageManager": "yarn@3.2.1"
 }

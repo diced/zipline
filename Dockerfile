@@ -1,10 +1,11 @@
 FROM node:16-alpine AS deps
 WORKDIR /build
 
-COPY package.json yarn.lock ./
+COPY .yarn .yarn
+COPY package.json yarn.lock .yarnrc.yml ./
 
 RUN apk add --no-cache libc6-compat
-RUN yarn install --frozen-lockfile
+RUN yarn install --immutable
 
 FROM node:16-alpine AS builder
 WORKDIR /build
@@ -13,7 +14,8 @@ COPY --from=deps /build/node_modules ./node_modules
 COPY src ./src
 COPY scripts ./scripts
 COPY prisma ./prisma
-COPY package.json yarn.lock esbuild.config.js next.config.js next-env.d.ts zip-env.d.ts tsconfig.json ./
+COPY .yarn .yarn
+COPY package.json yarn.lock .yarnrc.yml esbuild.config.js next.config.js next-env.d.ts zip-env.d.ts tsconfig.json ./
 
 ENV ZIPLINE_DOCKER_BUILD 1
 ENV NEXT_TELEMETRY_DISABLED 1
