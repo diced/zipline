@@ -63,7 +63,7 @@ export default class Server {
       },
     });
 
-    this.router.on('GET', `${config.uploader.route}/:id`, async (req, res, params) => {
+    this.router.on('GET', config.uploader.route === '/' ? '/:id(^[^\\.]+\\.[^\\.]+)' : `${config.uploader.route}/:id`, async (req, res, params) => {
       const image = await this.prisma.image.findFirst({
         where: {
           OR: [
