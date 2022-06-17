@@ -71,7 +71,7 @@ export default function EmbeddedImage({ image, user, pass }) {
         onClose={() => setOpened(false)}
         title='Password Protected'
         centered={true}
-        hideCloseButton={true}
+        withCloseButton={true}
         closeOnEscape={false}
         closeOnClickOutside={false}
       >
