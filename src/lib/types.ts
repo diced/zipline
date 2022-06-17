@@ -38,6 +38,7 @@ export interface ConfigLocalDatasource {
 export interface ConfigS3Datasource {
   access_key_id: string;
   secret_access_key: string;
+  endpoint: string;
   bucket: string;
 }
 

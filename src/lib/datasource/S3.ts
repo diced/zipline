@@ -9,11 +9,13 @@ export class S3 extends Datasource {
   public constructor(
     public accessKey: string,
     public secretKey: string,
+    public endpoint: string,
     public bucket: string,
   ) {
     super();
     this.s3 = new AWS.S3({
       accessKeyId: accessKey,
+      endpoint: endpoint,
       secretAccessKey: secretKey,
     });
   }
