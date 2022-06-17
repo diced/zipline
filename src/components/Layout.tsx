@@ -181,7 +181,7 @@ export default function Layout({ children, user }) {
       fixed
       navbar={
         <Navbar
-          padding='md'
+          p='md'
           hiddenBreakpoint='sm'
           hidden={!opened}
           width={{ sm: 200, lg: 230 }}
@@ -247,7 +247,7 @@ export default function Layout({ children, user }) {
         </Navbar>
       }
       header={
-        <Header height={70} padding='md'>
+        <Header height={70} p='md'>
           <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
             <MediaQuery largerThan='sm' styles={{ display: 'none' }}>
               <Burger
@@ -325,7 +325,7 @@ export default function Layout({ children, user }) {
         </Header>
       }
     >
-      <Paper withBorder padding='md' shadow='xs'>{children}</Paper>
+      <Paper withBorder p='md' shadow='xs'>{children}</Paper>
     </AppShell>
   );
 }
