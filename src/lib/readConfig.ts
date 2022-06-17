@@ -68,6 +68,7 @@ function tryReadEnv(): Config {
       s3: {
         access_key_id: undefined,
         secret_access_key: undefined,
+        endpoint: undefined,
         bucket: undefined,
       },
     },
