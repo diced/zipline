@@ -79,9 +79,9 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     Logger.get('image').info(`User ${user.username} (${user.id}) uploaded an image ${image.file} (${image.id})`);
     if (user.domains.length) {
       const domain = user.domains[Math.floor(Math.random() * user.domains.length)];
-      files.push(`${domain}${zconfig.uploader.route}/${invis ? invis.invis : image.file}`);
+      files.push(`${domain}${zconfig.uploader.route === '/' ? '' : zconfig.uploader.route}/${invis ? invis.invis : image.file}`);
     } else {
-      files.push(`${zconfig.core.secure ? 'https' : 'http'}://${req.headers.host}${zconfig.uploader.route}/${invis ? invis.invis : image.file}`);
+      files.push(`${zconfig.core.secure ? 'https' : 'http'}://${req.headers.host}${zconfig.uploader.route === '/' ? '' : zconfig.uploader.route}/${invis ? invis.invis : image.file}`);
     }
   }
 
