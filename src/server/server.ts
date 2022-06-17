@@ -72,6 +72,7 @@ export default class Server {
           ],
         },
       });
+      console.log(image);
 
       if (!image) await this.rawFile(req, res, params.id);
 

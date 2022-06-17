@@ -33,11 +33,11 @@ export default function EmbeddedImage({ image, user, pass }) {
     const imageEl = document.getElementById('image_content') as HTMLImageElement;
 
     const img = new Image();
-    img.addEventListener('load', function() {
+    img.addEventListener('load', function () {
       if (this.naturalWidth > innerWidth) imageEl.width = Math.floor(this.naturalWidth * Math.min((innerHeight / this.naturalHeight), (innerWidth / this.naturalWidth)));
       else imageEl.width = this.naturalWidth;
     });
-    
+
     img.src = url || dataURL('/r');
     if (url) {
       imageEl.src = url;
@@ -95,11 +95,13 @@ export default function EmbeddedImage({ image, user, pass }) {
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const id = context.params.id[1];
   const route = context.params.id[0];
-  const routes = [config.uploader.route.substring(1), config.urls.route.substring(1)];
-  if (!routes.includes(route)) return { notFound: true };
-  if (route === routes[1]) {
+  const serve_on_root = /(^[^\\.]+\.[^\\.]+)/.test(route);
+
+  const id = serve_on_root ? route : context.params.id[1];
+  const uploader_route = config.uploader.route.substring(1);
+
+  if (route === config.urls.route.substring(1)) {
     const url = await prisma.url.findFirst({
       where: {
         OR: [
@@ -121,7 +123,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       },
     };
 
-  } else {
+  } else if (uploader_route === '' ? /(^[^\\.]+\.[^\\.]+)/.test(route) : route === uploader_route) {
     const image = await prisma.image.findFirst({
       where: {
         OR: [
@@ -184,5 +186,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         pass,
       },
     };
+  } else {
+    return { notFound: true };
   }
 };

@@ -20,11 +20,20 @@
     "noEmit": true,
     "baseUrl": "src",
     "paths": {
-      "components/*": ["components/*"],
-      "hooks/*": ["lib/hooks/*"],
-      "middleware/*": ["lib/middleware/*"],
-      "lib/*": ["lib/*"]
-    }
+      "components/*": [
+        "components/*"
+      ],
+      "hooks/*": [
+        "lib/hooks/*"
+      ],
+      "middleware/*": [
+        "lib/middleware/*"
+      ],
+      "lib/*": [
+        "lib/*"
+      ]
+    },
+    "incremental": true
   },
   "include": [
     "next-env.d.ts",
