@@ -6,7 +6,7 @@ if (!global.datasource) {
   switch (config.datasource.type) {
   case 's3':
     Logger.get('datasource').info(`Using S3(${config.datasource.s3.bucket}) datasource`);
-    global.datasource = new S3(config.datasource.s3.access_key_id, config.datasource.s3.secret_access_key,config.datasource.s3.endpoint, config.datasource.s3.bucket);
+    global.datasource = new S3(config.datasource.s3.access_key_id, config.datasource.s3.secret_access_key, config.datasource.s3.endpoint, config.datasource.s3.bucket);
     break;
   case 'local':
     Logger.get('datasource').info(`Using local(${config.datasource.local.directory}) datasource`);
