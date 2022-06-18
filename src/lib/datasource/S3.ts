@@ -1,29 +1,28 @@
 import { Datasource } from './datasource';
 import AWS from 'aws-sdk';
 import { Readable } from 'stream';
+import { ConfigS3Datasource } from 'lib/types';
 
 export class S3 extends Datasource {
   public name: string = 'S3';
   public s3: AWS.S3;
 
   public constructor(
-    public accessKey: string,
-    public secretKey: string,
-    public endpoint: string,
-    public bucket: string,
+    public config: ConfigS3Datasource,
   ) {
     super();
     this.s3 = new AWS.S3({
-      accessKeyId: accessKey,
-      endpoint: endpoint,
-      secretAccessKey: secretKey,
+      accessKeyId: config.access_key_id,
+      endpoint: config.endpoint || null,
+      s3ForcePathStyle: config.force_s3_path,
+      secretAccessKey: config.secret_access_key,
     });
   }
 
   public async save(file: string, data: Buffer): Promise<void> {
     return new Promise((resolve, reject) => {
       this.s3.upload({
-        Bucket: this.bucket,
+        Bucket: this.config.bucket,
         Key: file,
         Body: data,
       }, err => {
@@ -39,7 +38,7 @@ export class S3 extends Datasource {
   public async delete(file: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.s3.deleteObject({
-        Bucket: this.bucket,
+        Bucket: this.config.bucket,
         Key: file,
       }, err => {
         if (err) {
@@ -54,7 +53,7 @@ export class S3 extends Datasource {
   public get(file: string): Readable {
     // Unfortunately, aws-sdk is bad and the stream still loads everything into memory.
     return this.s3.getObject({
-      Bucket: this.bucket,
+      Bucket: this.config.bucket,
       Key: file,
     }).createReadStream();
   }
@@ -62,7 +61,7 @@ export class S3 extends Datasource {
   public async size(): Promise<number> {
     return new Promise((resolve, reject) => {
       this.s3.listObjects({
-        Bucket: this.bucket,
+        Bucket: this.config.bucket,
       }, (err, data) => {
         if (err) {
           reject(err);
