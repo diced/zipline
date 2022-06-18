@@ -19,7 +19,7 @@ const validator = object({
     s3: object({
       access_key_id: string(),
       secret_access_key: string(),
-      endpoint: string().notRequired().default(null),
+      endpoint: string().notRequired().nullable(),
       bucket: string(),
       force_s3_path: boolean().default(false),
     }).notRequired(),
