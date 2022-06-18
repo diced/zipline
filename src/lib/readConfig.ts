@@ -19,6 +19,7 @@ const envValues = [
   e('DATASOURCE_LOCAL_DIRECTORY', 'string', (c, v) => c.datasource.local.directory = v),
   e('DATASOURCE_S3_ACCESS_KEY_ID', 'string', (c, v) => c.datasource.s3.access_key_id = v ),
   e('DATASOURCE_S3_SECRET_ACCESS_KEY', 'string', (c, v) => c.datasource.s3.secret_access_key = v),
+  e('DATASOURCE_S3_ENDPOINT', 'string', (c, v) => c.datasource.s3.endpoint = v), 
   e('DATASOURCE_S3_BUCKET', 'string', (c, v) => c.datasource.s3.bucket = v),
 
   e('UPLOADER_ROUTE', 'string', (c, v) => c.uploader.route = v),
