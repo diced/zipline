@@ -51,12 +51,12 @@ export default function validate(config): Config {
       if (!validated.datasource.s3.access_key_id) errors.push('datasource.s3.access_key_id is a required field');
       if (!validated.datasource.s3.secret_access_key) errors.push('datasource.s3.secret_access_key is a required field');
       if (!validated.datasource.s3.bucket) errors.push('datasource.s3.bucket is a required field');
-      if (errors.length) throw { errors }; 
+      if (errors.length) throw { errors };
     }
-
+    
     return validated as unknown as Config;
   } catch (e) {
     if (process.env.ZIPLINE_DOCKER_BUILD) return null;
     throw `${e.errors.length} errors occured\n${e.errors.map(x => '\t' + x).join('\n')}`;
-  } 
+  }
 };

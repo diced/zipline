@@ -38,7 +38,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     if (file.size > zconfig.uploader[user.administrator ? 'admin_limit' : 'user_limit']) return res.error(`file[${i}] size too big`);
 
     const ext = file.originalname.split('.').pop();
-    if (zconfig.uploader.disabled_extentions.includes(ext)) return res.error('disabled extension recieved: ' + ext);
+    if (zconfig.uploader.disabled_extensions.includes(ext)) return res.error('disabled extension recieved: ' + ext);
     let fileName: string;
 
     switch (format) {

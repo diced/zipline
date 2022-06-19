@@ -57,7 +57,7 @@ export interface ConfigUploader {
   user_limit: number;
 
   // Disabled extensions to block from uploading
-  disabled_extentions: string[];
+  disabled_extensions: string[];
 }
 
 export interface ConfigUrls {

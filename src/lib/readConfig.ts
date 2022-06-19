@@ -27,7 +27,7 @@ const envValues = [
   e('UPLOADER_LENGTH', 'number', (c, v) => c.uploader.length = v),
   e('UPLOADER_ADMIN_LIMIT', 'number', (c, v) => c.uploader.admin_limit = v),
   e('UPLOADER_USER_LIMIT', 'number', (c, v) => c.uploader.user_limit = v),
-  e('UPLOADER_DISABLED_EXTS', 'array', (c, v) => v ? c.uploader.disabled_extentions = v : c.uploader.disabled_extentions = []),
+  e('UPLOADER_DISABLED_EXTS', 'array', (c, v) => v ? c.uploader.disabled_extensions = v : c.uploader.disabled_extensions = []),
 
   e('URLS_ROUTE', 'string', (c, v) => c.urls.route = v),
   e('URLS_LENGTH', 'number', (c, v) => c.urls.length = v),
@@ -80,7 +80,7 @@ function tryReadEnv(): Config {
       length: undefined,
       admin_limit: undefined,
       user_limit: undefined,
-      disabled_extentions: undefined,
+      disabled_extensions: undefined,
     },
     urls: {
       route: undefined,
