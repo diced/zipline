@@ -86,6 +86,7 @@ export default function EmbeddedImage({ image, user, pass }) {
         withCloseButton={true}
         closeOnEscape={false}
         closeOnClickOutside={false}
+        overlayBlur={3}
       >
         <PasswordInput label='Password' placeholder='Password' error={error} value={password} onChange={e => setPassword(e.target.value)} />
         <Button fullWidth onClick={() => check()} mt='md'>
