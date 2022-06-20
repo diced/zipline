@@ -1,8 +1,8 @@
 import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
 import parse from '@iarna/toml/parse-string';
-import Logger from './logger';
-import { Config } from './types';
+import Logger from '../logger';
+import { Config } from './Config';
 
 const e = (val, type, fn) => ({ val, type, fn });
 
@@ -17,10 +17,10 @@ const envValues = [
 
   e('DATASOURCE_TYPE', 'string', (c, v) => c.datasource.type = v),
   e('DATASOURCE_LOCAL_DIRECTORY', 'string', (c, v) => c.datasource.local.directory = v),
-  e('DATASOURCE_S3_ACCESS_KEY_ID', 'string', (c, v) => c.datasource.s3.access_key_id = v ),
+  e('DATASOURCE_S3_ACCESS_KEY_ID', 'string', (c, v) => c.datasource.s3.access_key_id = v),
   e('DATASOURCE_S3_SECRET_ACCESS_KEY', 'string', (c, v) => c.datasource.s3.secret_access_key = v),
   e('DATASOURCE_S3_ENDPOINT', 'string', (c, v) => c.datasource.s3.endpoint = v ?? null),
-  e('DATASOURCE_S3_FORCE_S3_PATH', 'string', (c, v) => c.datasource.s3.force_s3_path = v ?? false),
+  e('DATASOURCE_S3_FORCE_S3_PATH', 'boolean', (c, v) => c.datasource.s3.force_s3_path = v ?? false),
   e('DATASOURCE_S3_BUCKET', 'string', (c, v) => c.datasource.s3.bucket = v),
 
   e('UPLOADER_ROUTE', 'string', (c, v) => c.uploader.route = v),
@@ -42,7 +42,7 @@ export default function readConfig(): Config {
     return tryReadEnv();
   } else {
     if (process.env.ZIPLINE_DOCKER_BUILD) return;
-    
+
     Logger.get('config').info('reading config file');
     const str = readFileSync(join(process.cwd(), 'config.toml'), 'utf8');
     const parsed = parse(str);

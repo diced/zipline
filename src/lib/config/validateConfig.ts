@@ -1,4 +1,4 @@
-import { Config } from 'lib/types';
+import { Config } from 'lib/config/Config';
 import { object, bool, string, number, boolean, array } from 'yup';
 
 const validator = object({
