@@ -3,7 +3,7 @@
   "version": "3.4.5",
   "license": "MIT",
   "scripts": {
-    "dev": "node esbuild.config.js && REACT_EDITOR=code-insiders NODE_ENV=development node dist/server",
+    "dev": "node esbuild.config.js && REACT_EDITOR=code NODE_ENV=development node dist/server",
     "build": "npm-run-all build:server build:schema build:next",
     "build:server": "node esbuild.config.js",
     "build:next": "next build",

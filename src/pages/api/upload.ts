@@ -7,7 +7,7 @@ import Logger from 'lib/logger';
 import { ImageFormat, InvisibleImage } from '@prisma/client';
 import { format as formatDate } from 'fecha';
 import { v4 } from 'uuid';
-import datasource from 'lib/ds';
+import datasource from 'lib/datasource';
 
 const uploader = multer();
 

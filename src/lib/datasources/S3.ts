@@ -1,4 +1,4 @@
-import { Datasource } from './datasource';
+import { Datasource } from './';
 import AWS from 'aws-sdk';
 import { Readable } from 'stream';
 import { ConfigS3Datasource } from 'lib/types';

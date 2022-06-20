@@ -4,7 +4,7 @@ import { Image, PrismaClient } from '@prisma/client';
 import { createServer, IncomingMessage, OutgoingMessage, Server as HttpServer, ServerResponse } from 'http';
 import next from 'next';
 import config from '../lib/config';
-import datasource from '../lib/ds';
+import datasource from '../lib/datasource';
 import { getStats, log, migrations } from './util';
 import { mkdir } from 'fs/promises';
 import Logger from '../lib/logger';

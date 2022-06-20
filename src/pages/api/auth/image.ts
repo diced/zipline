@@ -1,7 +1,7 @@
 import prisma from 'lib/prisma';
 import { NextApiReq, NextApiRes, withZipline } from 'middleware/withZipline';
 import { checkPassword } from 'lib/util';
-import datasource from 'lib/ds';
+import datasource from 'lib/datasource';
 import mimes from '../../../../scripts/mimes';
 import { extname } from 'path';
 

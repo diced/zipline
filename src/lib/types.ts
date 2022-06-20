@@ -25,8 +25,10 @@ export interface ConfigDatasource {
   // The type of datasource
   type: 'local' | 's3';
 
-  // The local datasource
+  // The local datasource, the default
   local: ConfigLocalDatasource;
+  
+  // The s3 datasource
   s3?: ConfigS3Datasource;
 }
 
@@ -36,10 +38,20 @@ export interface ConfigLocalDatasource {
 }
 
 export interface ConfigS3Datasource {
+  // The access key id for the s3 bucket
   access_key_id: string;
+
+  // The secret access key for the s3 bucket
   secret_access_key: string;
+
+  // Not required, but if using a non-aws S3 service you can specify the endpoint
   endpoint?: string;
+
+  // The S3 bucket to store files in
   bucket: string;
+
+  // If true Zipline will attempt to connect to the bucket via the url "https://s3.amazonaws.com/{bucket}/stuff"
+  // If false Zipline will attempt to connect to the bucket via the url "http://{bucket}.s3.amazonaws.com/stuff"
   force_s3_path: boolean;
 }
 
