@@ -37,7 +37,7 @@ export type NextApiRes = NextApiResponse & {
   forbid: (message: string, extra?: any) => void;
   bad: (message: string) => void;
   json: (json: any) => void;
-  ratelimited: () => void;
+  ratelimited: (remaining: number) => void;
   setCookie: (name: string, value: unknown, options: CookieSerializeOptions) => void;
 }
 
@@ -69,9 +69,9 @@ export const withZipline = (handler: (req: NextApiRequest, res: NextApiResponse)
     });
   };
 
-  res.ratelimited = () => {
+  res.ratelimited = (remaining: number) => {
     res.status(429);
-
+    res.setHeader('X-Ratelimit-Remaining', Math.floor(remaining / 1000));
     res.json({
       error: '429: ratelimited',
     });

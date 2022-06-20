@@ -17,7 +17,7 @@ model User {
   embedTitle    String?
   embedColor    String    @default("#2f3136")
   embedSiteName String?   @default("{image.file} • {user.name}")
-  ratelimited   Boolean   @default(false)
+  ratelimit     DateTime?
   domains       String[]
   images        Image[]
   urls          Url[]
