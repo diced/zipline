@@ -9,20 +9,41 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   if (!user) return res.forbid('not logged in');
 
   if (req.method === 'DELETE') {
-    if (!req.body.id) return res.error('no file id');
+    if (req.body.all) {
+      const files = await prisma.image.findMany({
+        where: {
+          userId: user.id,
+        },
+      });
 
-    const image = await prisma.image.delete({
-      where: {
-        id: req.body.id,
-      },
-    });
+      for (let i = 0; i !== files.length; ++i) {
+        await datasource.delete(files[i].file);
+      }
 
-    await datasource.delete(image.file);
+      const { count } = await prisma.image.deleteMany({
+        where: {
+          userId: user.id,
+        },
+      });
+      Logger.get('image').info(`User ${user.username} (${user.id}) deleted ${count} images.`);
 
-    Logger.get('image').info(`User ${user.username} (${user.id}) deleted an image ${image.file} (${image.id})`);
+      return res.json({ count });
+    } else {
+      if (!req.body.id) return res.error('no file id');
 
-    delete image.password;
-    return res.json(image);
+      const image = await prisma.image.delete({
+        where: {
+          id: req.body.id,
+        },
+      });
+
+      await datasource.delete(image.file);
+
+      Logger.get('image').info(`User ${user.username} (${user.id}) deleted an image ${image.file} (${image.id})`);
+
+      delete image.password;
+      return res.json(image);
+    }
   } else if (req.method === 'PATCH') {
     if (!req.body.id) return res.error('no file id');
 

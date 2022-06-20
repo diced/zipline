@@ -1,4 +1,4 @@
-import { createReadStream, ReadStream } from 'fs';
+import { createReadStream, existsSync, ReadStream } from 'fs';
 import { readdir, rm, stat, writeFile } from 'fs/promises';
 import { join } from 'path';
 import { Datasource } from './datasource';
@@ -19,8 +19,11 @@ export class Local extends Datasource {
   }
 
   public get(file: string): ReadStream {
+    const full = join(process.cwd(), this.path, file);
+    if (!existsSync(full)) return null;
+
     try {
-      return createReadStream(join(process.cwd(), this.path, file));
+      return createReadStream(full);
     } catch (e) {
       return null;
     }

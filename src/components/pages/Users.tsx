@@ -109,11 +109,14 @@ export default function Users() {
     title: `Delete ${user.username}?`,
     closeOnConfirm: false,
     centered: true,
+    overlayBlur: 3,
     labels: { confirm: 'Yes', cancel: 'No' },
     onConfirm: () => {
       modals.openConfirmModal({
         title: `Delete ${user.username}'s images?`,
         labels: { confirm: 'Yes', cancel: 'No' },
+        centered: true,
+        overlayBlur: 3,
         onConfirm: () => {
           handleDelete(user, true);
           modals.closeAll();
