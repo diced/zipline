@@ -19,6 +19,7 @@ const { rm } = require('fs/promises');
       'src/server/index.ts',
       'src/server/util.ts',
       'src/lib/logger.ts',
+      'src/lib/config.ts',
       'src/lib/config/Config.ts',
       'src/lib/config/readConfig.ts',
       'src/lib/config/validateConfig.ts',
