@@ -26,6 +26,7 @@ const { rm } = require('fs/promises');
       'src/lib/datasource/index.ts',
       'src/lib/datasource/Local.ts',
       'src/lib/datasource/S3.ts',
+      'src/lib/datasource/Openstack.ts',
       'src/lib/ds.ts',
       'src/lib/config.ts',
     ],

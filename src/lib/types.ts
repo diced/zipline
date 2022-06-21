@@ -12,7 +12,7 @@ export interface ConfigCore {
   port: number;
 
   // The PostgreSQL database url
-  database_url: string
+  database_url: string;
 
   // Whether or not to log stuff
   logger: boolean;
@@ -23,11 +23,12 @@ export interface ConfigCore {
 
 export interface ConfigDatasource {
   // The type of datasource
-  type: 'local' | 's3';
+  type: 'local' | 's3' | 'openstack';
 
   // The local datasource
   local: ConfigLocalDatasource;
   s3?: ConfigS3Datasource;
+  openstack?: ConfigOpenstackDatasource;
 }
 
 export interface ConfigLocalDatasource {
@@ -41,6 +42,15 @@ export interface ConfigS3Datasource {
   endpoint?: string;
   bucket: string;
   force_s3_path: boolean;
+}
+
+export interface ConfigOpenstackDatasource {
+  container: string;
+  endpoint: string;
+  username: string;
+  password: string;
+  project_id: string
+  domain_id: string
 }
 
 export interface ConfigUploader {
