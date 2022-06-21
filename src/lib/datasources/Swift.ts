@@ -1,5 +1,5 @@
 import { Datasource } from '.';
-import { Readable, Writable } from 'stream';
+import { Readable } from 'stream';
 import { ConfigSwiftDatasource } from 'lib/config/Config';
 
 interface SwiftContainerOptions {
@@ -72,14 +72,23 @@ class SwiftContainer {
         },
       },
     };
-    const { json, headers } = await fetch(`${this.options.auth_endpoint_url}/auth/tokens`, {
+    const { json, headers, error } = await fetch(`${this.options.auth_endpoint_url}/auth/tokens`, {
       body: JSON.stringify(payload),
       method: 'POST',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
-    }).then(async (e) => ({ json: await e.json(), headers: e.headers }));
+    }).then(async (e) => {
+      try {
+        const json = await e.json();
+        return { json, headers: e.headers, error: null };
+      } catch (e) {
+        return { json: null, headers: null, error: e };
+      }
+    });
+    if (error || !json || !headers || json.error)
+      throw new Error('Could not retrieve credentials from OpenStack, check your config file');
     const catalog = json.token.catalog;
     const swiftURL =
       this.findEndpointURL(catalog, 'swift') || this.findEndpointURL(catalog, 'radosgw-swift'); // many Swift clouds use ceph radosgw to provide swift
@@ -176,11 +185,11 @@ export class Swift extends Datasource {
     }
   }
 
-  public get(file: string): Promise<Readable> {
+  public get(file: string): Promise<Readable> | Readable {
     try {
       return this.container.getObject(file);
     } catch {
-      return null;
+      return Readable.from(Buffer.from(Object()));
     }
   }
 
@@ -188,6 +197,6 @@ export class Swift extends Datasource {
     return this.container
       .listObjects()
       .then((objects) => objects.reduce((acc, object) => acc + object.bytes, 0))
-      .catch(() => null);
+      .catch(() => 0);
   }
 }
