@@ -17,7 +17,6 @@ const { rm } = require('fs/promises');
     treeShaking: true,
     entryPoints: [
       'src/server/index.ts',
-      'src/server/server.ts',
       'src/server/util.ts',
       'src/lib/logger.ts',
       'src/lib/config.ts',
@@ -36,6 +35,6 @@ const { rm } = require('fs/promises');
     watch,
     incremental: watch,
     sourcemap: false,
-    minify: process.env.NODE_ENV === 'production',
+    minify: true,
   });
 })();
