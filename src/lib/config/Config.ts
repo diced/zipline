@@ -27,9 +27,10 @@ export interface ConfigDatasource {
 
   // The local datasource, the default
   local: ConfigLocalDatasource;
-  
+
   // The s3 datasource
   s3?: ConfigS3Datasource;
+  // The Openstack datasource
   openstack?: ConfigOpenstackDatasource;
 }
 
@@ -58,11 +59,12 @@ export interface ConfigS3Datasource {
 
 export interface ConfigOpenstackDatasource {
   container: string;
-  endpoint: string;
+  auth_endpoint: string;
   username: string;
   password: string;
-  project_id: string
-  domain_id: string
+  project_id: string;
+  domain_id?: string;
+  region_id?: string;
 }
 
 export interface ConfigUploader {
