@@ -26,7 +26,7 @@ services:
       - HOST=0.0.0.0
       - PORT=3000
       - DATASOURCE_TYPE=local
-      - DATASOURCE_DIRECTORY=./uploads
+      - DATASOURCE_LOCAL_DIRECTORY=./uploads
       - DATABASE_URL=postgresql://postgres:postgres@postgres/postgres/
       - UPLOADER_ROUTE=/u
       - UPLOADER_EMBED_ROUTE=/a

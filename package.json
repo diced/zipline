@@ -1,6 +1,6 @@
 {
   "name": "zipline",
-  "version": "3.4.5",
+  "version": "3.4.6",
   "license": "MIT",
   "scripts": {
     "dev": "node esbuild.config.js && REACT_EDITOR=code NODE_ENV=development node dist/server",
@@ -11,7 +11,6 @@
     "migrate:dev": "prisma migrate dev --create-only",
     "start": "node dist/server",
     "lint": "next lint",
-    "seed": "ts-node --compiler-options \"{\\\"module\\\":\\\"commonjs\\\"}\" --transpile-only prisma/seed.ts",
     "docker:run": "docker-compose up -d",
     "docker:down": "docker-compose down",
     "docker:build-dev": "docker-compose --file docker-compose.dev.yml up --build"

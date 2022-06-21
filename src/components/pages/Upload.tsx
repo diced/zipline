@@ -131,6 +131,7 @@ export default function Upload() {
           icon: <CrossCircledIcon />,
         });
       }
+      setProgress(0);
     }, false);
 
     req.open('POST', '/api/upload');
@@ -155,8 +156,8 @@ export default function Upload() {
                 </Text>
               </div>
             </Group>
-            
-            
+
+
           </>
         )}
       </Dropzone>
