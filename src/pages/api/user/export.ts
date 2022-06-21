@@ -2,7 +2,7 @@ import { NextApiReq, NextApiRes, withZipline } from 'middleware/withZipline';
 import prisma from 'lib/prisma';
 import Logger from 'lib/logger';
 import { Zip, ZipPassThrough } from 'fflate';
-import datasource from 'lib/ds';
+import datasource from 'lib/datasource';
 import { readdir } from 'fs/promises';
 import { createReadStream, createWriteStream } from 'fs';
 

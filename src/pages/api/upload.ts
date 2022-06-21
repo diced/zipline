@@ -7,7 +7,7 @@ import Logger from 'lib/logger';
 import { ImageFormat, InvisibleImage } from '@prisma/client';
 import { format as formatDate } from 'fecha';
 import { v4 } from 'uuid';
-import datasource from 'lib/ds';
+import datasource from 'lib/datasource';
 
 const uploader = multer();
 
@@ -22,7 +22,21 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   });
 
   if (!user) return res.forbid('authorization incorect');
-  if (user.ratelimited) return res.ratelimited();
+  if (user.ratelimit) {
+    const remaining = user.ratelimit.getTime() - Date.now();
+    if (remaining <= 0) {
+      await prisma.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          ratelimit: null,
+        },
+      });
+    } else {
+      return res.ratelimited(remaining);
+    }
+  }
 
   await run(uploader.array('file'))(req, res);
 
@@ -85,28 +99,26 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     }
   }
 
-  if (user.administrator && zconfig.ratelimit.admin !== 0) {
+  if (user.administrator && zconfig.ratelimit.admin > 0) {
     await prisma.user.update({
       where: {
         id: user.id,
       },
       data: {
-        ratelimited: true,
+        ratelimit: new Date(Date.now() + (zconfig.ratelimit.admin * 1000)),
       },
     });
-    setTimeout(async () => await prisma.user.update({ where: { id: user.id }, data: { ratelimited: false } }), zconfig.ratelimit.admin * 1000).unref();
-  }
-
-  if (!user.administrator && zconfig.ratelimit.user !== 0) {
-    await prisma.user.update({
-      where: {
-        id: user.id,
-      },
-      data: {
-        ratelimited: true,
-      },
-    });
-    setTimeout(async () => await prisma.user.update({ where: { id: user.id }, data: { ratelimited: false } }), zconfig.ratelimit.user * 1000).unref();
+  } else if (!user.administrator && zconfig.ratelimit.user > 0) {
+    if (user.administrator && zconfig.ratelimit.user > 0) {
+      await prisma.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          ratelimit: new Date(Date.now() + (zconfig.ratelimit.user * 1000)),
+        },
+      });
+    }
   }
 
   return res.json({ files });

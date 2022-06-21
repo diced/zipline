@@ -21,7 +21,7 @@ export default class Logger {
     this.name = name;
   }
 
-  info(...args) {
+  info(...args: any[]) {
     console.log(this.formatMessage(LoggerLevel.INFO, this.name, args.join(' ')));
   }
 
@@ -29,7 +29,7 @@ export default class Logger {
     console.log(this.formatMessage(LoggerLevel.ERROR, this.name, args.map(error => error.stack ?? error).join(' ')));
   }
 
-  formatMessage(level: LoggerLevel, name, message) {
+  formatMessage(level: LoggerLevel, name: string, message: string) {
     const time = format(new Date(), 'YYYY-MM-DD hh:mm:ss,SSS A');
     return `${time} ${this.formatLevel(level)} [${blueBright(name)}] ${message}`;
   }

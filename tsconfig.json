@@ -43,6 +43,10 @@
     "prisma/seed.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "dist",
+    ".yarn",
+    ".next",
+    "scripts"
   ]
 }

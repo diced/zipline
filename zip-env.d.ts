@@ -1,5 +1,5 @@
 import type { PrismaClient } from '@prisma/client';
-import type { Datasource } from 'lib/datasource';
+import type { Datasource } from 'lib/datasources';
 import type { Config } from '.lib/types';
 
 declare global {

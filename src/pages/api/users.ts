@@ -1,7 +1,7 @@
 import { NextApiReq, NextApiRes, withZipline } from 'middleware/withZipline';
 import prisma from 'lib/prisma';
 import Logger from 'lib/logger';
-import datasource from 'lib/ds';
+import datasource from 'lib/datasource';
 
 async function handler(req: NextApiReq, res: NextApiRes) {
   const user = await req.user();

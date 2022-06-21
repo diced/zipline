@@ -30,6 +30,7 @@ export default function EmbeddedImage({ image, user, pass }) {
   };
 
   const updateImage = async (url?: string) => {
+
     const imageEl = document.getElementById('image_content') as HTMLImageElement;
 
     const img = new Image();
@@ -62,8 +63,19 @@ export default function EmbeddedImage({ image, user, pass }) {
             <meta property='theme-color' content={user.embedColor} />
           </>
         )}
-        <meta property='og:image' content={dataURL('/r')} />
-        <meta property='twitter:card' content='summary_large_image' />
+        {image.mimetype.startsWith('image') && (
+          <>
+            <meta property='og:image' content={dataURL('/r')} />
+            <meta property='twitter:card' content='summary_large_image' />
+          </>
+        )}
+        {image.mimetype.startsWith('video') && (
+          <>
+            <meta property='og:video' content={dataURL('/r')} />
+            <meta property='og:video:url' content={dataURL('/r')} />
+            <meta property='og:video:type' content={image.mimetype} />
+          </>
+        )}
         <title>{image.file}</title>
       </Head>
       <Modal
@@ -74,6 +86,7 @@ export default function EmbeddedImage({ image, user, pass }) {
         withCloseButton={true}
         closeOnEscape={false}
         closeOnClickOutside={false}
+        overlayBlur={3}
       >
         <PasswordInput label='Password' placeholder='Password' error={error} value={password} onChange={e => setPassword(e.target.value)} />
         <Button fullWidth onClick={() => check()} mt='md'>
@@ -88,7 +101,18 @@ export default function EmbeddedImage({ image, user, pass }) {
           justifyContent: 'center',
         }}
       >
-        <img src={dataURL('/r')} alt={dataURL('/r')} id='image_content' />
+        {image.mimetype.startsWith('image') && (
+          <img src={dataURL('/r')} alt={dataURL('/r')} id='image_content' />
+        )}
+
+        {image.mimetype.startsWith('video') && (
+          <video
+            src={dataURL('/r')}
+            controls={true}
+            autoPlay={true}
+            id='image_content'
+          />
+        )}
       </Box>
     </>
   );
@@ -168,8 +192,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       },
     };
 
-    if (!image.mimetype.startsWith('image')) {
-      const { default: datasource } = await import('lib/ds');
+    if (!image.mimetype.startsWith('image') && !image.mimetype.startsWith('video')) {
+      const { default: datasource } = await import('lib/datasource');
 
       const data = datasource.get(image.file);
       if (!data) return { notFound: true };

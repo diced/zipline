@@ -1,7 +1,7 @@
 import { Migrate } from '@prisma/migrate/dist/Migrate';
 import { ensureDatabaseExists } from '@prisma/migrate/dist/utils/ensureDatabaseExists';
 import Logger from '../lib/logger';
-import { Datasource } from 'lib/datasource';
+import { Datasource } from 'lib/datasources';
 import { PrismaClient } from '@prisma/client';
 
 export async function migrations() {
@@ -20,6 +20,8 @@ export async function migrations() {
       migrate.stop();
       Logger.get('database').info('finished migrating database');
     }
+  } else {
+    migrate.stop();
   }
 }
 

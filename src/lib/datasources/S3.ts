@@ -1,7 +1,7 @@
-import { Datasource } from './datasource';
+import { Datasource } from './';
 import AWS from 'aws-sdk';
 import { Readable } from 'stream';
-import { ConfigS3Datasource } from 'lib/types';
+import { ConfigS3Datasource } from 'lib/config/Config';
 
 export class S3 extends Datasource {
   public name: string = 'S3';

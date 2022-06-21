@@ -1,5 +1,5 @@
-import readConfig from './readConfig';
-import validateConfig from '../server/validateConfig';
+import readConfig from './config/readConfig';
+import validateConfig from './config/validateConfig';
 
 if (!global.config) global.config = validateConfig(readConfig());
 
