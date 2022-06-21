@@ -195,7 +195,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     if (!image.mimetype.startsWith('image') && !image.mimetype.startsWith('video')) {
       const { default: datasource } = await import('lib/datasource');
 
-      const data = datasource.get(image.file);
+      const data = await datasource.get(image.file);
       if (!data) return { notFound: true };
 
       data.pipe(context.res);

@@ -1,7 +1,7 @@
-import { Datasource } from './datasource';
+import { Datasource } from './';
 import SwiftClient from 'openstack-swift-client';
 import { Readable, Writable } from 'stream';
-import { ConfigOpenstackDatasource } from 'lib/types';
+import { ConfigOpenstackDatasource } from 'lib/config/Config';
 import Logger from '../logger';
 
 export class Openstack extends Datasource {

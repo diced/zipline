@@ -116,7 +116,7 @@ async function rawFile(
   nextServer: NextServer,
   id: string,
 ) {
-  const data = datasource.get(id);
+  const data = await datasource.get(id);
   if (!data) return nextServer.render404(req, res as ServerResponse);
   const mimetype = mimes[extname(id)] ?? 'application/octet-stream';
   res.setHeader('Content-Type', mimetype);
@@ -133,7 +133,7 @@ async function rawFileDb(
   prisma: PrismaClient,
   image: Image,
 ) {
-  const data = datasource.get(image.file);
+  const data = await datasource.get(image.file);
   if (!data) return nextServer.render404(req, res as ServerResponse);
 
   res.setHeader('Content-Type', image.mimetype);
@@ -158,7 +158,7 @@ async function fileDb(
   const ext = image.file.split('.').pop();
   if (Object.keys(exts).includes(ext)) return handle(req, res as ServerResponse);
 
-  const data = datasource.get(image.file);
+  const data = await datasource.get(image.file);
   if (!data) return this.nextServer.render404(req, res as ServerResponse);
 
   res.setHeader('Content-Type', image.mimetype);
