@@ -1,6 +1,6 @@
-import { Datasource } from './';
+import { Datasource } from '.';
 import { Readable, Writable } from 'stream';
-import { ConfigOpenstackDatasource } from 'lib/config/Config';
+import { ConfigSwiftDatasource } from 'lib/config/Config';
 
 interface SwiftContainerOptions {
   auth_endpoint_url: string;
@@ -82,7 +82,7 @@ class SwiftContainer {
     }).then(async (e) => ({ json: await e.json(), headers: e.headers }));
     const catalog = json.token.catalog;
     const swiftURL =
-      this.findEndpointURL(catalog, 'swift') || this.findEndpointURL(catalog, 'radosgw-swift'); // many OpenStack clouds use ceph radosgw to provide swift
+      this.findEndpointURL(catalog, 'swift') || this.findEndpointURL(catalog, 'radosgw-swift'); // many Swift clouds use ceph radosgw to provide swift
     if (!swiftURL)
       throw new Error('Couldn\'t find any "swift" or "radosgw-swift" service in the catalog');
     return {
@@ -141,11 +141,11 @@ class SwiftContainer {
   }
 }
 
-export class Openstack extends Datasource {
-  public name: string = 'Openstack';
+export class Swift extends Datasource {
+  public name: string = 'Swift';
   container: SwiftContainer;
 
-  public constructor(public config: ConfigOpenstackDatasource) {
+  public constructor(public config: ConfigSwiftDatasource) {
     super();
     this.container = new SwiftContainer({
       auth_endpoint_url: config.auth_endpoint,

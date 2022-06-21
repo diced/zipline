@@ -1,5 +1,5 @@
 import config from './config';
-import { Openstack, Local, S3 } from './datasources';
+import { Swift, Local, S3 } from './datasources';
 import Logger from './logger';
 
 if (!global.datasource) {
@@ -12,11 +12,9 @@ if (!global.datasource) {
       global.datasource = new Local(config.datasource.local.directory);
       Logger.get('datasource').info(`Using local(${config.datasource.local.directory}) datasource`);
       break;
-    case 'openstack':
-      global.datasource = new Openstack(config.datasource.openstack);
-      Logger.get('datasource').info(
-        `Using Openstack(${config.datasource.openstack.container}) datasource`
-      );
+    case 'swift':
+      global.datasource = new Swift(config.datasource.swift);
+      Logger.get('datasource').info(`Using Swift(${config.datasource.swift.container}) datasource`);
       break;
     default:
       throw new Error('Invalid datasource type');

@@ -23,15 +23,15 @@ export interface ConfigCore {
 
 export interface ConfigDatasource {
   // The type of datasource
-  type: 'local' | 's3' | 'openstack';
+  type: 'local' | 's3' | 'swift';
 
   // The local datasource, the default
   local: ConfigLocalDatasource;
 
   // The s3 datasource
   s3?: ConfigS3Datasource;
-  // The Openstack datasource
-  openstack?: ConfigOpenstackDatasource;
+  // The Swift datasource
+  swift?: ConfigSwiftDatasource;
 }
 
 export interface ConfigLocalDatasource {
@@ -57,7 +57,7 @@ export interface ConfigS3Datasource {
   force_s3_path: boolean;
 }
 
-export interface ConfigOpenstackDatasource {
+export interface ConfigSwiftDatasource {
   container: string;
   auth_endpoint: string;
   username: string;

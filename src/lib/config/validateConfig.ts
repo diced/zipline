@@ -12,7 +12,7 @@ const validator = object({
     stats_interval: number().default(1800),
   }).required(),
   datasource: object({
-    type: string().oneOf(['local', 's3', 'openstack']).default('local'),
+    type: string().oneOf(['local', 's3', 'swift']).default('local'),
     local: object({
       directory: string().default('./uploads'),
     }),
@@ -23,7 +23,7 @@ const validator = object({
       bucket: string(),
       force_s3_path: boolean().default(false),
     }).notRequired(),
-    openstack: object({
+    swift: object({
       username: string(),
       password: string(),
       auth_endpoint: string(),
@@ -66,18 +66,18 @@ export default function validate(config): Config {
         if (errors.length) throw { errors };
         break;
       }
-      case 'openstack': {
+      case 'swift': {
         const errors = [];
-        if (!validated.datasource.openstack.container)
-          errors.push('datasource.openstack.container is a required field');
-        if (!validated.datasource.openstack.project_id)
-          errors.push('datasource.openstack.project_id is a required field');
-        if (!validated.datasource.openstack.auth_endpoint)
-          errors.push('datasource.openstack.auth_endpoint is a required field');
-        if (!validated.datasource.openstack.password)
-          errors.push('datasource.openstack.password is a required field');
-        if (!validated.datasource.openstack.username)
-          errors.push('datasource.openstack.username is a required field');
+        if (!validated.datasource.swift.container)
+          errors.push('datasource.swift.container is a required field');
+        if (!validated.datasource.swift.project_id)
+          errors.push('datasource.swift.project_id is a required field');
+        if (!validated.datasource.swift.auth_endpoint)
+          errors.push('datasource.swift.auth_endpoint is a required field');
+        if (!validated.datasource.swift.password)
+          errors.push('datasource.swift.password is a required field');
+        if (!validated.datasource.swift.username)
+          errors.push('datasource.swift.username is a required field');
         if (errors.length) throw { errors };
         break;
       }
