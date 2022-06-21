@@ -161,20 +161,33 @@ export class Swift extends Datasource {
   }
 
   public async save(file: string, data: Buffer): Promise<void> {
-    return this.container.uploadObject(file, data);
+    try {
+      return this.container.uploadObject(file, data);
+    } catch {
+      return null;
+    }
   }
 
   public async delete(file: string): Promise<void> {
-    return this.container.deleteObject(file);
+    try {
+      return this.container.deleteObject(file);
+    } catch {
+      return null;
+    }
   }
 
   public get(file: string): Promise<Readable> {
-    return this.container.getObject(file);
+    try {
+      return this.container.getObject(file);
+    } catch {
+      return null;
+    }
   }
 
   public async size(): Promise<number> {
     return this.container
       .listObjects()
-      .then((objects) => objects.reduce((acc, object) => acc + object.bytes, 0));
+      .then((objects) => objects.reduce((acc, object) => acc + object.bytes, 0))
+      .catch(() => null);
   }
 }
