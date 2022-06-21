@@ -56,18 +56,18 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     let fileName: string;
 
     switch (format) {
-    case ImageFormat.RANDOM:
-      fileName = randomChars(zconfig.uploader.length);
-      break;
-    case ImageFormat.DATE:
-      fileName = formatDate(new Date(), 'YYYY-MM-DD_HH:mm:ss');
-      break;
-    case ImageFormat.UUID:
-      fileName = v4();
-      break;
-    case ImageFormat.NAME:
-      fileName = file.originalname.split('.')[0];
-      break;
+      case ImageFormat.RANDOM:
+        fileName = randomChars(zconfig.uploader.length);
+        break;
+      case ImageFormat.DATE:
+        fileName = formatDate(new Date(), 'YYYY-MM-DD_HH:mm:ss');
+        break;
+      case ImageFormat.UUID:
+        fileName = v4();
+        break;
+      case ImageFormat.NAME:
+        fileName = file.originalname.split('.')[0];
+        break;
     }
 
     let password = null;
