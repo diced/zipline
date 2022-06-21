@@ -20,6 +20,8 @@ export async function migrations() {
       migrate.stop();
       Logger.get('database').info('finished migrating database');
     }
+  } else {
+    migrate.stop();
   }
 }
 
