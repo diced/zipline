@@ -12,7 +12,7 @@ export interface ConfigCore {
   port: number;
 
   // The PostgreSQL database url
-  database_url: string
+  database_url: string;
 
   // Whether or not to log stuff
   logger: boolean;
@@ -23,13 +23,15 @@ export interface ConfigCore {
 
 export interface ConfigDatasource {
   // The type of datasource
-  type: 'local' | 's3';
+  type: 'local' | 's3' | 'swift';
 
   // The local datasource, the default
   local: ConfigLocalDatasource;
-  
+
   // The s3 datasource
   s3?: ConfigS3Datasource;
+  // The Swift datasource
+  swift?: ConfigSwiftDatasource;
 }
 
 export interface ConfigLocalDatasource {
@@ -53,6 +55,16 @@ export interface ConfigS3Datasource {
   // If true Zipline will attempt to connect to the bucket via the url "https://s3.amazonaws.com/{bucket}/stuff"
   // If false Zipline will attempt to connect to the bucket via the url "http://{bucket}.s3.amazonaws.com/stuff"
   force_s3_path: boolean;
+}
+
+export interface ConfigSwiftDatasource {
+  container: string;
+  auth_endpoint: string;
+  username: string;
+  password: string;
+  project_id: string;
+  domain_id?: string;
+  region_id?: string;
 }
 
 export interface ConfigUploader {

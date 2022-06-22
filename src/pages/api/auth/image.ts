@@ -20,7 +20,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   const valid = await checkPassword(password as string, image.password);
   if (!valid) return res.forbid('Wrong password');
 
-  const data = datasource.get(image.file);
+  const data = await datasource.get(image.file);
   if (!data) return res.error('Image not found');
   const mimetype = mimes[extname(image.file)] ?? 'application/octet-stream';
   res.setHeader('Content-Type', mimetype);

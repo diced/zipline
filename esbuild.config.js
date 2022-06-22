@@ -27,6 +27,7 @@ const { rm } = require('fs/promises');
       'src/lib/datasources/index.ts',
       'src/lib/datasources/Local.ts',
       'src/lib/datasources/S3.ts',
+      'src/lib/datasources/Swift.ts',
       'src/lib/datasource.ts',
     ],
     format: 'cjs',
