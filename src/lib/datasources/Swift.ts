@@ -15,11 +15,13 @@ interface SwiftContainerOptions {
   };
   refreshMargin?: number;
 }
-interface IAuth {
+
+interface SwiftAuth {
   token: string;
   expires: Date;
   swiftURL: string;
 }
+
 interface SwiftObject {
   bytes: number;
   content_type: string;
@@ -29,10 +31,12 @@ interface SwiftObject {
 }
 
 class SwiftContainer {
-  auth: IAuth | null;
+  auth: SwiftAuth | null;
+
   constructor(private options: SwiftContainerOptions) {
     this.auth = null;
   }
+
   private findEndpointURL(catalog: any[], service: string): string | null {
     const catalogEntry = catalog.find((x) => x.name === service);
     if (!catalogEntry) return null;
@@ -47,7 +51,8 @@ class SwiftContainer {
 
     return endpoint ? endpoint.url : null;
   }
-  private async getCredentials(): Promise<IAuth> {
+
+  private async getCredentials(): Promise<SwiftAuth> {
     const payload = {
       auth: {
         identity: {
@@ -72,6 +77,7 @@ class SwiftContainer {
         },
       },
     };
+
     const { json, headers, error } = await fetch(`${this.options.auth_endpoint_url}/auth/tokens`, {
       body: JSON.stringify(payload),
       method: 'POST',
@@ -87,43 +93,46 @@ class SwiftContainer {
         return { json: null, headers: null, error: e };
       }
     });
-    if (error || !json || !headers || json.error)
-      throw new Error('Could not retrieve credentials from OpenStack, check your config file');
+
+    if (error || !json || !headers || json.error) throw new Error('Could not retrieve credentials from OpenStack, check your config file');
+
     const catalog = json.token.catalog;
-    const swiftURL =
-      this.findEndpointURL(catalog, 'swift') || this.findEndpointURL(catalog, 'radosgw-swift'); // many Swift clouds use ceph radosgw to provide swift
-    if (!swiftURL)
-      throw new Error('Couldn\'t find any "swift" or "radosgw-swift" service in the catalog');
+    // many Swift clouds use ceph radosgw to provide swift
+    const swiftURL = this.findEndpointURL(catalog, 'swift') || this.findEndpointURL(catalog, 'radosgw-swift');
+    if (!swiftURL) throw new Error('Couldn\'t find any "swift" or "radosgw-swift" service in the catalog');
+
     return {
       token: headers.get('x-subject-token'),
       expires: new Date(json.token.expires_at),
       swiftURL,
     };
   }
+
   private async authenticate() {
     if (!this.auth) this.auth = await this.getCredentials();
     const authExpiry = new Date(Date.now() + this.options.refreshMargin || 10_000);
+
     if (authExpiry > this.auth.expires) this.auth = await this.getCredentials();
     const validAuth = this.auth;
+
     return { swiftURL: validAuth.swiftURL, token: validAuth.token };
   }
+
   private generateHeaders(token: string, extra?: any) {
     return { accept: 'application/json', 'x-auth-token': token, ...extra };
   }
+
   public async listObjects(query?: string): Promise<SwiftObject[]> {
     const auth = await this.authenticate();
-    return await fetch(
-      `${auth.swiftURL}/${this.options.credentials.container}${
-        query ? `${query.startsWith('?') ? '' : '?'}${query}` : ''
-      }`,
-      {
-        method: 'GET',
-        headers: this.generateHeaders(auth.token),
-      }
-    ).then((e) => e.json());
+    return await fetch(`${auth.swiftURL}/${this.options.credentials.container}${query ? `${query.startsWith('?') ? '' : '?'}${query}` : ''}`, {
+      method: 'GET',
+      headers: this.generateHeaders(auth.token),
+    }).then((e) => e.json());
   }
+
   public async uploadObject(name: string, data: Buffer): Promise<any> {
     const auth = await this.authenticate();
+
     return fetch(`${auth.swiftURL}/${this.options.credentials.container}/${name}`, {
       method: 'PUT',
       headers: this.generateHeaders(auth.token),
@@ -132,6 +141,7 @@ class SwiftContainer {
   }
   public async deleteObject(name: string): Promise<any> {
     const auth = await this.authenticate();
+
     return fetch(`${auth.swiftURL}/${this.options.credentials.container}/${name}`, {
       method: 'DELETE',
       headers: this.generateHeaders(auth.token),
@@ -139,13 +149,11 @@ class SwiftContainer {
   }
   public async getObject(name: string): Promise<Readable> {
     const auth = await this.authenticate();
-    const arrayBuffer = await fetch(
-      `${auth.swiftURL}/${this.options.credentials.container}/${name}`,
-      {
-        method: 'GET',
-        headers: this.generateHeaders(auth.token, { Accept: '*/*' }),
-      }
-    ).then((e) => e.arrayBuffer());
+    const arrayBuffer = await fetch(`${auth.swiftURL}/${this.options.credentials.container}/${name}`, {
+      method: 'GET',
+      headers: this.generateHeaders(auth.token, { Accept: '*/*' }),
+    }).then((e) => e.arrayBuffer());
+
     return Readable.from(Buffer.from(arrayBuffer));
   }
 }
@@ -189,7 +197,7 @@ export class Swift extends Datasource {
     try {
       return this.container.getObject(file);
     } catch {
-      return Readable.from(Buffer.from(Object()));
+      return null;
     }
   }
 
