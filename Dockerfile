@@ -1,16 +1,32 @@
-FROM frolvlad/alpine-glibc AS deps
+FROM rust:1.58.1-alpine3.14 as prisma
+ENV RUSTFLAGS="-C target-feature=-crt-static"
+RUN apk --no-cache add openssl direnv git musl-dev openssl-dev build-base perl protoc
+RUN git clone --depth=1 --branch=3.15.x https://github.com/prisma/prisma-engines.git /prisma
+WORKDIR /prisma
+RUN cargo build --release
+
+FROM alpine:3.16 AS deps
+RUN mkdir -p /prisma-engines
 WORKDIR /build
 
 COPY .yarn .yarn
 COPY package.json yarn.lock .yarnrc.yml ./
 
-RUN apk add --no-cache libc6-compat nodejs yarn
+RUN apk add --no-cache nodejs yarn
 RUN yarn install --immutable
 
-FROM frolvlad/alpine-glibc AS builder
+FROM alpine:3.16 AS builder
 WORKDIR /build
 
-RUN apk add --no-cache nodejs yarn libc6-compat openssl openssl-dev
+COPY --from=prisma /prisma/target/release/query-engine /prisma/target/release/migration-engine /prisma/target/release/introspection-engine /prisma/target/release/prisma-fmt /prisma-engines/
+ENV PRISMA_QUERY_ENGINE_BINARY=/prisma-engines/query-engine \
+  PRISMA_MIGRATION_ENGINE_BINARY=/prisma-engines/migration-engine \
+  PRISMA_INTROSPECTION_ENGINE_BINARY=/prisma-engines/introspection-engine \
+  PRISMA_FMT_BINARY=/prisma-engines/prisma-fmt \
+  PRISMA_CLI_QUERY_ENGINE_TYPE=binary \
+  PRISMA_CLIENT_ENGINE_TYPE=binary
+
+RUN apk add --no-cache nodejs yarn openssl openssl-dev
 
 COPY --from=deps /build/node_modules ./node_modules
 COPY src ./src
@@ -22,14 +38,20 @@ COPY package.json yarn.lock .yarnrc.yml esbuild.config.js next.config.js next-en
 ENV ZIPLINE_DOCKER_BUILD 1
 ENV NEXT_TELEMETRY_DISABLED 1
 
-RUN cat prisma/schema.prisma
-
 RUN yarn build
 
-FROM frolvlad/alpine-glibc AS runner
+FROM alpine:3.16 AS runner
 WORKDIR /zipline
 
-RUN apk add --no-cache nodejs yarn libc6-compat openssl openssl-dev
+COPY --from=prisma /prisma/target/release/query-engine /prisma/target/release/migration-engine /prisma/target/release/introspection-engine /prisma/target/release/prisma-fmt /prisma-engines/
+ENV PRISMA_QUERY_ENGINE_BINARY=/prisma-engines/query-engine \
+  PRISMA_MIGRATION_ENGINE_BINARY=/prisma-engines/migration-engine \
+  PRISMA_INTROSPECTION_ENGINE_BINARY=/prisma-engines/introspection-engine \
+  PRISMA_FMT_BINARY=/prisma-engines/prisma-fmt \
+  PRISMA_CLI_QUERY_ENGINE_TYPE=binary \
+  PRISMA_CLIENT_ENGINE_TYPE=binary
+
+RUN apk add --no-cache nodejs yarn openssl openssl-dev
 
 ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
