@@ -22,6 +22,7 @@ const validator = object({
       endpoint: string().notRequired().nullable(),
       bucket: string(),
       force_s3_path: boolean().default(false),
+      region: string().default('us-east-1'),
     }).notRequired(),
     swift: object({
       username: string(),

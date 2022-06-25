@@ -1,74 +1,51 @@
-import { Datasource } from './';
-import AWS from 'aws-sdk';
+import { Datasource } from '.';
 import { Readable } from 'stream';
 import { ConfigS3Datasource } from 'lib/config/Config';
+import { Client } from 'minio';
 
 export class S3 extends Datasource {
   public name: string = 'S3';
-  public s3: AWS.S3;
+  public s3: Client;
 
   public constructor(
     public config: ConfigS3Datasource,
   ) {
     super();
-    this.s3 = new AWS.S3({
-      accessKeyId: config.access_key_id,
-      endpoint: config.endpoint || null,
-      s3ForcePathStyle: config.force_s3_path,
-      secretAccessKey: config.secret_access_key,
+    this.s3 = new Client({
+      endPoint: config.endpoint,
+      accessKey: config.access_key_id,
+      secretKey: config.secret_access_key,
+      pathStyle: config.force_s3_path,
+      region: config.region,
     });
   }
 
   public async save(file: string, data: Buffer): Promise<void> {
-    return new Promise((resolve, reject) => {
-      this.s3.upload({
-        Bucket: this.config.bucket,
-        Key: file,
-        Body: data,
-      }, err => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
-    });
+    await this.s3.putObject(this.config.bucket, file, data);
   }
 
   public async delete(file: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-      this.s3.deleteObject({
-        Bucket: this.config.bucket,
-        Key: file,
-      }, err => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
+    await this.s3.removeObject(this.config.bucket, file);
+  }
+
+  public get(file: string): Promise<Readable> {
+    return new Promise((res, rej) => {
+      this.s3.getObject(this.config.bucket, file, (err, stream) => {
+        if (err) res(null);
+        else res(stream);
       });
     });
   }
 
-  public get(file: string): Readable {
-    // Unfortunately, aws-sdk is bad and the stream still loads everything into memory.
-    return this.s3.getObject({
-      Bucket: this.config.bucket,
-      Key: file,
-    }).createReadStream();
-  }
-
   public async size(): Promise<number> {
-    return new Promise((resolve, reject) => {
-      this.s3.listObjects({
-        Bucket: this.config.bucket,
-      }, (err, data) => {
-        if (err) {
-          reject(err);
-        } else {
-          const size = data.Contents.reduce((acc, cur) => acc + cur.Size, 0);
-          resolve(size);
-        }
+    return new Promise((res, rej) => {
+      const objects = this.s3.listObjectsV2(this.config.bucket, '', true);
+      let size = 0;
+
+      objects.on('data', item => size += item.size);
+      objects.on('end', err => {
+        if (err) rej(err);
+        else res(size);
       });
     });
   }

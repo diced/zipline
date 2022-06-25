@@ -36,6 +36,6 @@ const { rm } = require('fs/promises');
     watch,
     incremental: watch,
     sourcemap: false,
-    minify: true,
+    minify: false,
   });
 })();

@@ -22,6 +22,7 @@ const envValues = [
   e('DATASOURCE_S3_ENDPOINT', 'string', (c, v) => c.datasource.s3.endpoint = v ?? null),
   e('DATASOURCE_S3_FORCE_S3_PATH', 'boolean', (c, v) => c.datasource.s3.force_s3_path = v ?? false),
   e('DATASOURCE_S3_BUCKET', 'string', (c, v) => c.datasource.s3.bucket = v),
+  e('DATASOURCE_S3_REGION', 'string', (c, v) => c.datasource.s3.region = v ?? 'us-east-1'),
 
   e('UPLOADER_ROUTE', 'string', (c, v) => c.uploader.route = v),
   e('UPLOADER_LENGTH', 'number', (c, v) => c.uploader.length = v),
@@ -73,6 +74,7 @@ function tryReadEnv(): Config {
         endpoint: undefined,
         bucket: undefined,
         force_s3_path: undefined,
+        region: undefined,
       },
     },
     uploader: {

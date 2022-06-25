@@ -55,6 +55,10 @@ export interface ConfigS3Datasource {
   // If true Zipline will attempt to connect to the bucket via the url "https://s3.amazonaws.com/{bucket}/stuff"
   // If false Zipline will attempt to connect to the bucket via the url "http://{bucket}.s3.amazonaws.com/stuff"
   force_s3_path: boolean;
+
+  // Region
+  // aws region, default will be us-east-1 (if using a non-aws S3 service this might work for you)
+  region?: string;
 }
 
 export interface ConfigSwiftDatasource {

@@ -1,7 +1,7 @@
 import { createReadStream, existsSync, ReadStream } from 'fs';
 import { readdir, rm, stat, writeFile } from 'fs/promises';
 import { join } from 'path';
-import { Datasource } from './';
+import { Datasource } from '.';
 
 export class Local extends Datasource {
   public name: string = 'local';
