@@ -1,14 +1,14 @@
 <div align="center">
   <img src="https://raw.githubusercontent.com/diced/zipline/trunk/public/zipline_small.png"/>
-  
+
   Zipline is a ShareX/file upload server that is easy to use, packed with features and can be setup in one command!
-  
+
   ![Build](https://img.shields.io/github/workflow/status/diced/zipline/CD:%20Push%20Docker%20Images?logo=github&style=flat-square)
   ![Stars](https://img.shields.io/github/stars/diced/zipline?logo=github&style=flat-square)
   ![Version](https://img.shields.io/github/package-json/v/diced/zipline?logo=git&logoColor=white&style=flat-square)
   ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/diced/zipline/trunk?logo=git&logoColor=white&style=flat-square)
   [![Discord](https://img.shields.io/discord/729771078196527176?color=%23777ed3&label=discord&logo=discord&logoColor=white&style=flat-square)](https://discord.gg/EAhCRfGxCF)
-  
+
 </div>
 
 ## Features
@@ -83,7 +83,7 @@ This section requires [ShareX](https://www.getsharex.com/).
 After navigating to Zipline, click on the top right corner where it says your username and click Manage Account. Scroll down to see "ShareX Config", select the one you would prefer using. After this you can import the .sxcu into sharex. [More information here](https://zipl.vercel.app/docs/uploaders/sharex)
 
 # Flameshot (Linux)
-This section requires [Flameshot](https://www.flameshot.org/), [jq](https://stedolan.github.io/jq/) and xsel.
+This section requires [Flameshot](https://www.flameshot.org/), [jq](https://stedolan.github.io/jq/), and [xsel](https://github.com/kfish/xsel).
 
 To upload files using flameshot we will use a script. Replace $TOKEN and $HOST with your own values, you probably know how to do this if you use linux.
 
@@ -95,7 +95,7 @@ curl -H "Content-Type: multipart/form-data" -H "authorization: $TOKEN" -F file=@
 ```
 
 # Contributing
- 
+
 ## Bug reports
 Create an issue on GitHub, please include the following:
 * The steps to reproduce the bug
