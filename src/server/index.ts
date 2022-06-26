@@ -67,8 +67,7 @@ async function start() {
     console.log(image);
 
     if (!image) await rawFile(req, res, nextServer, params.id);
-
-    if (image.password) await handle(req, res);
+    else if (image.password) await handle(req, res);
     else if (image.embed) await handle(req, res);
     else await fileDb(req, res, nextServer, prisma, handle, image);
   });
@@ -84,8 +83,7 @@ async function start() {
     });
 
     if (!image) await rawFile(req, res, nextServer, params.id);
-
-    if (image.password) await handle(req, res);
+    else if (image.password) await handle(req, res);
     else await rawFileDb(req, res, nextServer, prisma, image);
   });
 
