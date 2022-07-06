@@ -6,8 +6,8 @@ import { createInvisImage, randomChars, hashPassword } from 'lib/util';
 import Logger from 'lib/logger';
 import { ImageFormat, InvisibleImage } from '@prisma/client';
 import { format as formatDate } from 'fecha';
-import { v4 } from 'uuid';
 import datasource from 'lib/datasource';
+import { randomUUID } from 'crypto';
 
 const uploader = multer();
 
@@ -63,7 +63,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         fileName = formatDate(new Date(), 'YYYY-MM-DD_HH:mm:ss');
         break;
       case ImageFormat.UUID:
-        fileName = v4();
+        fileName = randomUUID({ disableEntropyCache: true });
         break;
       case ImageFormat.NAME:
         fileName = file.originalname.split('.')[0];

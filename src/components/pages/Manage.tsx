@@ -1,14 +1,15 @@
-import React, { useEffect, useState } from 'react';
-
-import useFetch from 'hooks/useFetch';
-import Link from 'components/Link';
-import { useStoreDispatch, useStoreSelector } from 'lib/redux/store';
-import { updateUser } from 'lib/redux/reducers/user';
+import { Box, Button, Card, ColorInput, Group, MultiSelect, Space, Text, TextInput, PasswordInput, Title, Tooltip } from '@mantine/core';
 import { randomId, useForm, useInterval } from '@mantine/hooks';
-import { Card, Tooltip, TextInput, Button, Text, Title, Group, ColorInput, MultiSelect, Space, Box, Table } from '@mantine/core';
-import { DownloadIcon, Cross1Icon, TrashIcon } from '@modulz/radix-icons';
-import { useNotifications } from '@mantine/notifications';
 import { useModals } from '@mantine/modals';
+import { useNotifications } from '@mantine/notifications';
+import { Cross1Icon, DownloadIcon, TrashIcon } from '@modulz/radix-icons';
+import Link from 'components/Link';
+import { SmallTable } from 'components/SmallTable';
+import useFetch from 'hooks/useFetch';
+import { bytesToRead } from 'lib/clientUtils';
+import { updateUser } from 'lib/redux/reducers/user';
+import { useStoreDispatch, useStoreSelector } from 'lib/redux/store';
+import { useEffect, useState } from 'react';
 
 function VarsTooltip({ children }) {
   return (
@@ -18,7 +19,7 @@ function VarsTooltip({ children }) {
         <Text><b>{'{image.mimetype}'}</b> - mimetype</Text>
         <Text><b>{'{image.id}'}</b> - id of the image</Text>
         <Text><b>{'{user.name}'}</b> - your username</Text>
-        visit <Link href='https://zipline.diced.cf/docs/variables'>the docs</Link> for more variables
+        visit <Link href='https://zipl.vercel.app/docs/variables'>the docs</Link> for more variables
       </>
     }>
       {children}
@@ -28,33 +29,6 @@ function VarsTooltip({ children }) {
 
 function ExportDataTooltip({ children }) {
   return <Tooltip position='top' placement='center' color='' label='After clicking, if you have a lot of files the export can take a while to complete. A list of previous exports will be below to download.'>{children}</Tooltip>;
-}
-
-function ExportTable({ rows, columns }) {
-  return (
-    <Box sx={{ pt: 1 }} >
-      <Table highlightOnHover>
-        <thead>
-          <tr>
-            {columns.map(col => (
-              <th key={randomId()}>{col.name}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map(row => (
-            <tr key={randomId()}>
-              {columns.map(col => (
-                <td key={randomId()}>
-                  {col.format ? col.format(row[col.id]) : row[col.id]}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </Table>
-    </Box>
-  );
 }
 
 export default function Manage() {
@@ -176,8 +150,9 @@ export default function Manage() {
     const res = await useFetch('/api/user/export');
 
     setExports(res.exports.map(s => ({
-      date: new Date(Number(s.split('_')[3].slice(0, -4))),
-      full: s,
+      date: new Date(Number(s.name.split('_')[3].slice(0, -4))),
+      size: s.size,
+      full: s.name,
     })).sort((a, b) => a.date.getTime() - b.date.getTime()));
   };
 
@@ -226,7 +201,6 @@ export default function Manage() {
     },
   });
 
-
   const interval = useInterval(() => getExports(), 30000);
   useEffect(() => {
     getExports();
@@ -241,7 +215,7 @@ export default function Manage() {
       </VarsTooltip>
       <form onSubmit={form.onSubmit((v) => onSubmit(v))}>
         <TextInput id='username' label='Username' {...form.getInputProps('username')} />
-        <TextInput id='password' label='Password' type='password' {...form.getInputProps('password')} />
+        <PasswordInput id='password' label='Password' description='Leave blank to keep your old password' {...form.getInputProps('password')} />
         <TextInput id='embedTitle' label='Embed Title' {...form.getInputProps('embedTitle')} />
         <ColorInput id='embedColor' label='Embed Color' {...form.getInputProps('embedColor')} />
         <TextInput id='embedSiteName' label='Embed Site Name' {...form.getInputProps('embedSiteName')} />
@@ -258,32 +232,37 @@ export default function Manage() {
           {...form.getInputProps('domains')}
         />
 
-        <Group position='right' sx={{ paddingTop: 12 }}>
+        <Group position='right' mt='md'>
           <Button
             type='submit'
           >Save User</Button>
         </Group>
       </form>
 
-      <Title sx={{ paddingTop: 12 }}>Manage Data</Title>
-      <Text color='gray' sx={{ paddingBottom: 12 }}>Delete, or export your data into a zip file.</Text>
+      <Box mb='md'>
+        <Title>Manage Data</Title>
+        <Text color='gray'>Delete, or export your data into a zip file.</Text>
+      </Box>
+
       <Group>
         <Button onClick={openDeleteModal} rightIcon={<TrashIcon />}>Delete All Data</Button>
         <ExportDataTooltip><Button onClick={exportData} rightIcon={<DownloadIcon />}>Export Data</Button></ExportDataTooltip>
       </Group>
       <Card mt={22}>
-        <ExportTable
+        <SmallTable
           columns={[
             { id: 'name', name: 'Name' },
             { id: 'date', name: 'Date' },
+            { id: 'size', name: 'Size' },
           ]}
           rows={exports ? exports.map((x, i) => ({
             name: <Link href={'/api/user/export?name=' + x.full}>Export {i + 1}</Link>,
             date: x.date.toLocaleString(),
+            size: bytesToRead(x.size),
           })) : []} />
       </Card>
 
-      <Title sx={{ paddingTop: 12, paddingBottom: 12 }}>ShareX Config</Title>
+      <Title my='md'>ShareX Config</Title>
       <Group>
         <Button onClick={() => genShareX(false)} rightIcon={<DownloadIcon />}>ShareX Config</Button>
         <Button onClick={() => genShareX(true)} rightIcon={<DownloadIcon />}>ShareX Config with Embed</Button>

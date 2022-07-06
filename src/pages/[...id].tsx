@@ -5,7 +5,7 @@ import { Box, Button, Modal, PasswordInput } from '@mantine/core';
 import config from 'lib/config';
 import prisma from 'lib/prisma';
 import { parse } from 'lib/clientUtils';
-import * as exts from '../../scripts/exts';
+import exts from 'lib/exts';
 
 export default function EmbeddedImage({ image, user, pass }) {
   const dataURL = (route: string) => `${route}/${image.file}`;

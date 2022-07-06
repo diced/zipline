@@ -1,14 +1,9 @@
-import React from 'react';
-import {
-  Card as MCard,
-  Title,
-} from '@mantine/core';
+import { Card as MCard, Title } from '@mantine/core';
 
-export default function Card(props) {
-  const { name, children, ...other } = props;
+export default function Card({ name, children, ...other }) {
 
   return (
-    <MCard padding='md' shadow='sm' {...other}>
+    <MCard p='md' shadow='sm' {...other}>
       <Title order={2}>{name}</Title>
       {children}
     </MCard>

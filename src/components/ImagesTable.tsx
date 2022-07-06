@@ -1,17 +1,12 @@
+/* eslint-disable jsx-a11y/alt-text */
 /* eslint-disable react/jsx-key */
 /* eslint-disable react/display-name */
 // Code taken from https://codesandbox.io/s/eojw8 and is modified a bit (the entire src/components/table directory)
-import React from 'react';
-import {
-  usePagination,
-  useTable,
-} from 'react-table';
 import {
   ActionIcon,
   createStyles,
   Divider,
-  Group,
-  Pagination,
+  Group, Image, Pagination,
   Select,
   Table,
   Text,
@@ -22,6 +17,10 @@ import {
   EnterIcon,
   TrashIcon,
 } from '@modulz/radix-icons';
+import {
+  usePagination,
+  useTable,
+} from 'react-table';
 
 const pageSizeOptions = ['10', '25', '50'];
 
@@ -41,6 +40,26 @@ const useStyles = createStyles((t) => ({
   disableSortIcon: { color: t.colors.gray[5] },
   sortDirectionIcon: { transition: 'transform 200ms ease' },
 }));
+
+export function FilePreview({ url, type }) {
+  const Type = props => {
+    return {
+      'video': <video autoPlay controls {...props} />,
+      'image': <Image {...props} />,
+      'audio': <audio autoPlay controls {...props} />,
+    }[type.split('/')[0]];
+  };
+
+  return (
+    <Type
+      sx={{ maxWidth: '10vw', maxHeight: '100vh' }}
+      style={{ maxWidth: '10vw', maxHeight: '100vh' }}
+      mr='sm'
+      src={url}
+      alt={'Unable to preview file'}
+    />
+  );
+}
 
 export default function ImagesTable({
   columns,

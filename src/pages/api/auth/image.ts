@@ -2,7 +2,7 @@ import prisma from 'lib/prisma';
 import { NextApiReq, NextApiRes, withZipline } from 'middleware/withZipline';
 import { checkPassword } from 'lib/util';
 import datasource from 'lib/datasource';
-import mimes from '../../../../scripts/mimes';
+import mimes from 'lib/mimes';
 import { extname } from 'path';
 
 async function handler(req: NextApiReq, res: NextApiRes) {

@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { useStoreSelector } from 'lib/redux/store';
-import useFetch from 'hooks/useFetch';
-import { useRouter } from 'next/router';
+import { ActionIcon, Avatar, Button, Card, Group, Modal, SimpleGrid, Skeleton, Switch, TextInput, Title } from '@mantine/core';
 import { useForm } from '@mantine/hooks';
-import { Avatar, Modal, Title, TextInput, Group, Button, Card, ActionIcon, SimpleGrid, Switch, Skeleton, Checkbox } from '@mantine/core';
-import { Cross1Icon, PlusIcon, TrashIcon } from '@modulz/radix-icons';
-import { useNotifications } from '@mantine/notifications';
 import { useModals } from '@mantine/modals';
+import { useNotifications } from '@mantine/notifications';
+import { Cross1Icon, PlusIcon, TrashIcon } from '@modulz/radix-icons';
+import useFetch from 'hooks/useFetch';
+import { useStoreSelector } from 'lib/redux/store';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 
 
 function CreateUserModal({ open, setOpen, updateUsers }) {
@@ -19,7 +19,7 @@ function CreateUserModal({ open, setOpen, updateUsers }) {
   });
   const notif = useNotifications();
 
-  const onSubmit = async (values) => {
+  const onSubmit = async values => {
     const cleanUsername = values.username.trim();
     const cleanPassword = values.password.trim();
     if (cleanUsername === '') return form.setFieldError('username', 'Username can\'t be nothing');
@@ -58,7 +58,7 @@ function CreateUserModal({ open, setOpen, updateUsers }) {
       onClose={() => setOpen(false)}
       title={<Title>Create User</Title>}
     >
-      <form onSubmit={form.onSubmit((v) => onSubmit(v))}>
+      <form onSubmit={form.onSubmit(v => onSubmit(v))}>
         <TextInput id='username' label='Username' {...form.getInputProps('username')} />
         <TextInput id='password' label='Password' type='password' {...form.getInputProps('password')} />
         <Switch mt={12} id='administrator' label='Administrator' {...form.getInputProps('administrator')} />

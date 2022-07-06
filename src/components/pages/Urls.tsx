@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react';
-
+import { ActionIcon, Button, Card, Group, Modal, SimpleGrid, Skeleton, TextInput, Title } from '@mantine/core';
+import { useClipboard, useForm } from '@mantine/hooks';
+import { useNotifications } from '@mantine/notifications';
+import { CopyIcon, Cross1Icon, Link1Icon, PlusIcon, TrashIcon } from '@modulz/radix-icons';
 import useFetch from 'hooks/useFetch';
 import { useStoreSelector } from 'lib/redux/store';
-import { useClipboard, useForm } from '@mantine/hooks';
-import { CopyIcon, Cross1Icon, Link1Icon, PlusIcon, TrashIcon } from '@modulz/radix-icons';
-import { useNotifications } from '@mantine/notifications';
-import { Modal, Title, Group, Button, Box, Card, TextInput, ActionIcon, SimpleGrid, Skeleton } from '@mantine/core';
+import { useEffect, useState } from 'react';
 
 export default function Urls() {
   const user = useStoreSelector(state => state.user);
@@ -58,11 +57,17 @@ export default function Urls() {
     },
   });
 
-  const onSubmit = async (values) => {
+  const onSubmit = async values => {
     const cleanURL = values.url.trim();
     const cleanVanity = values.vanity.trim();
 
     if (cleanURL === '') return form.setFieldError('url', 'URL can\'t be nothing');
+
+    try {
+      new URL(cleanURL);
+    } catch (e) {
+      return form.setFieldError('url', 'Invalid URL');
+    }
 
     const data = {
       url: cleanURL,
@@ -121,8 +126,8 @@ export default function Urls() {
         </form>
       </Modal>
 
-      <Group>
-        <Title sx={{ marginBottom: 12 }}>URLs</Title>
+      <Group mb='md'>
+        <Title>URLs</Title>
         <ActionIcon variant='filled' color='primary' onClick={() => setCreateOpen(true)}><PlusIcon/></ActionIcon>
       </Group>
 

@@ -1,4 +1,4 @@
-module.exports = {
+const mimes = {
   '.aac': 'audio/aac',
   '.abw': 'application/x-abiword',
   '.arc': 'application/x-freearc',
@@ -76,3 +76,5 @@ module.exports = {
   '.3g2': 'video/3gpp2',
   '.7z': 'application/x-7z-compressed',
 };
+
+export default mimes;

@@ -1,9 +1,9 @@
 import React from 'react';
-import { Box, Button, Stack, Text, Title } from '@mantine/core';
+import { Button, Stack, Title } from '@mantine/core';
 import Link from 'components/Link';
 import MutedText from 'components/MutedText';
 
-export default function FourOhFour() {
+export default function FiveHundred() {
   return (
     <>
       <Stack
@@ -16,8 +16,8 @@ export default function FourOhFour() {
         }}
         spacing='sm'
       >
-        <Title sx={{ fontSize: 220, fontWeight: 900, lineHeight: .8 }}>404</Title>
-        <MutedText sx={{ fontSize: 40, fontWeight: 500 }}>This page does not exist!</MutedText>
+        <Title sx={{ fontSize: 220, fontWeight: 900, lineHeight: .8 }}>500</Title>
+        <MutedText sx={{ fontSize: 40, fontWeight: 500 }}>Internal Server Error</MutedText>
         <Button component={Link} href='/dashboard'>Head to the Dashboard</Button>
       </Stack>
     </>

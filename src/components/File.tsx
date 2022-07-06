@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import useFetch from 'hooks/useFetch';
 import { Button, Card, Group, Image as MImage, Modal, Title } from '@mantine/core';
+import { useClipboard } from '@mantine/hooks';
 import { useNotifications } from '@mantine/notifications';
 import { CopyIcon, Cross1Icon, StarIcon, TrashIcon } from '@modulz/radix-icons';
-import { useClipboard } from '@mantine/hooks';
+import useFetch from 'hooks/useFetch';
+import { useState } from 'react';
 
-export default function Image({ image, updateImages }) {
+export default function File({ image, updateImages }) {
   const [open, setOpen] = useState(false);
   const [t] = useState(image.mimetype.split('/')[0]);
   const notif = useNotifications();
@@ -56,7 +56,7 @@ export default function Image({ image, updateImages }) {
   const Type = (props) => {
     return {
       'video': <video controls {...props} />,
-      'image': <MImage {...props} />,
+      'image': <MImage withPlaceholder {...props} />,
       'audio': <audio controls {...props} />,
     }[t];
   };

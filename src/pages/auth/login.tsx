@@ -1,14 +1,11 @@
-import React, { useEffect } from 'react';
-import { useRouter } from 'next/router';
-import useFetch from 'hooks/useFetch';
+import { Button, Center, TextInput, Title, PasswordInput } from '@mantine/core';
 import { useForm } from '@mantine/hooks';
-import { TextInput, Button, Center, Title, Box, Badge, Tooltip } from '@mantine/core';
-import { useNotifications } from '@mantine/notifications';
-import { Cross1Icon, DownloadIcon } from '@modulz/radix-icons';
+import useFetch from 'hooks/useFetch';
+import { useRouter } from 'next/router';
+import { useEffect } from 'react';
 
 export default function Login() {
   const router = useRouter();
-  const notif = useNotifications();
 
   const form = useForm({
     initialValues: {
@@ -28,12 +25,12 @@ export default function Login() {
     });
 
     if (res.error) {
-      notif.showNotification({
-        title: 'Login Failed',
-        message: res.error,
-        color: 'red',
-        icon: <Cross1Icon />,
-      });
+      if (res.error.startsWith('403')) {
+        form.setFieldError('password', 'Invalid password');
+      } else {
+        form.setFieldError('username', 'Invalid username');
+        form.setFieldError('password', 'Invalid password');
+      }
     } else {
       await router.push(router.query.url as string || '/dashboard');
     }
@@ -53,7 +50,7 @@ export default function Login() {
           <Title align='center'>Zipline</Title>
           <form onSubmit={form.onSubmit((v) => onSubmit(v))}>
             <TextInput size='lg' id='username' label='Username' {...form.getInputProps('username')} />
-            <TextInput size='lg' id='password' label='Password' type='password' {...form.getInputProps('password')} />
+            <PasswordInput size='lg' id='password' label='Password' {...form.getInputProps('password')} />
 
             <Button size='lg' type='submit' fullWidth mt={12}>Login</Button>
           </form>

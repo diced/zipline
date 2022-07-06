@@ -2,11 +2,12 @@ import React from 'react';
 import useLogin from 'hooks/useLogin';
 import Layout from 'components/Layout';
 import Files from 'components/pages/Files';
+import { LoadingOverlay } from '@mantine/core';
 
 export default function FilesPage() {
   const { user, loading } = useLogin();
 
-  if (loading) return null;
+  if (loading) return <LoadingOverlay visible={loading} />;
   
   return (
     <Layout
@@ -17,4 +18,4 @@ export default function FilesPage() {
   );
 }
 
-FilesPage.title = 'Zipline - Gallery';
+FilesPage.title = 'Zipline - Files';

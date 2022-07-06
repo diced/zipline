@@ -4,7 +4,7 @@ import parse from '@iarna/toml/parse-string';
 import Logger from '../logger';
 import { Config } from './Config';
 
-const e = (val, type, fn) => ({ val, type, fn });
+const e = (val, type, fn: (c: Config, v: any) => void) => ({ val, type, fn });
 
 const envValues = [
   e('SECURE', 'boolean', (c, v) => c.core.secure = v),

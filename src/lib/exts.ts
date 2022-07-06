@@ -1,6 +1,6 @@
 // https://github.com/toptal/haste-server/blob/master/static/application.js#L167-L174
 // Popular extension map
-module.exports = {
+const exts = {
   rb: 'ruby',
   py: 'python',
   pl: 'perl',
@@ -36,3 +36,5 @@ module.exports = {
   coffee: 'coffee',
   swift: 'swift',
 };
+
+export default exts;

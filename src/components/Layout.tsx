@@ -1,15 +1,14 @@
-import React, { useState } from 'react';
-import Link from 'next/link';
-
-import { useRouter } from 'next/router';
-import { useStoreDispatch } from 'lib/redux/store';
-import { updateUser } from 'lib/redux/reducers/user';
-import useFetch from 'hooks/useFetch';
-import { CheckIcon, CopyIcon, Cross1Icon, FileIcon, GearIcon, HomeIcon, Link1Icon, ResetIcon, UploadIcon, PinRightIcon, PersonIcon, Pencil1Icon, MixerHorizontalIcon } from '@modulz/radix-icons';
-import { AppShell, Burger, Divider, Group, Header, MediaQuery, Navbar, Paper, Popover, ScrollArea, Select, Text, ThemeIcon, Title, UnstyledButton, useMantineTheme, Box } from '@mantine/core';
+import { AppShell, Box, Burger, Divider, Group, Header, MediaQuery, Navbar, Paper, Popover, ScrollArea, Select, Text, ThemeIcon, Title, UnstyledButton, useMantineTheme } from '@mantine/core';
+import { useClipboard } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
 import { useNotifications } from '@mantine/notifications';
-import { useClipboard } from '@mantine/hooks';
+import { CheckIcon, CopyIcon, Cross1Icon, FileIcon, GearIcon, HomeIcon, Link1Icon, MixerHorizontalIcon, Pencil1Icon, PersonIcon, PinRightIcon, ResetIcon, UploadIcon } from '@modulz/radix-icons';
+import useFetch from 'hooks/useFetch';
+import { updateUser } from 'lib/redux/reducers/user';
+import { useStoreDispatch } from 'lib/redux/store';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
 import { friendlyThemeName, themes } from './Theming';
 
 function MenuItemLink(props) {
@@ -198,7 +197,7 @@ export default function Layout({ children, user }) {
             {items.map(({ icon, text, link }) => (
               <Link href={link} key={text} passHref>
                 <UnstyledButton
-                  sx={{ 
+                  sx={{
                     display: 'block',
                     width: '100%',
                     padding: theme.spacing.xs,
@@ -295,10 +294,13 @@ export default function Layout({ children, user }) {
                   <Text sx={{
                     color: theme.colorScheme === 'dark' ? theme.colors.dark[2] : theme.colors.gray[6],
                     fontWeight: 500,
-                    fontSize: theme.fontSizes.xs,
+                    fontSize: theme.fontSizes.sm,
                     padding: `${theme.spacing.xs / 2}px ${theme.spacing.sm}px`,
                     cursor: 'default',
-                  }}>User: {user.username}</Text>
+                  }}
+                  >
+                    {user.username}
+                  </Text>
                   <MenuItemLink icon={<GearIcon />} href='/dashboard/manage'>Manage Account</MenuItemLink>
                   <MenuItem icon={<CopyIcon />} onClick={() => {setOpen(false);openCopyToken();}}>Copy Token</MenuItem>
                   <MenuItem icon={<ResetIcon />} onClick={() => {setOpen(false);openResetToken();}} color='red'>Reset Token</MenuItem>

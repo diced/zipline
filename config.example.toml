@@ -1,9 +1,31 @@
 [core]
-secure = true
-secret = 'changethis'
+secure = true # whether to return https or http in links
+secret = 'changethis' # change this or zipline will not work
 host = '0.0.0.0'
 port = 3000
 database_url = 'postgres://postgres:postgres@postgres/postgres'
+
+[datasource]
+type = 'local' # s3, local, or swift
+
+[datasource.local]
+directory = './uploads' # directory to store uploads in
+
+[datasource.s3]
+access_key_id = 'AKIAEXAMPLEKEY'
+secret_access_key = 'somethingsomethingsomething'
+bucket = 'zipline-storage'
+endpoint = 's3.amazonaws.com'
+region = 'us-west-2' # not required, defaults to us-east-1 if not specified
+force_s3_path = false
+
+[datasource.swift]
+container = 'default'
+auth_endpoint = 'http://127.0.0.1:49155/v3' # only supports v3 swift endpoints at the moment.
+username = 'swift'
+password = 'fingertips'
+project_id = 'Default'
+domain_id = 'Default'
 
 [urls]
 route = '/go'
@@ -13,7 +35,10 @@ length = 6
 route = '/u'
 embed_route = '/a'
 length = 6
-directory = './uploads'
 user_limit = 104900000 # 100mb
 admin_limit = 104900000 # 100mb
 disabled_extensions = ['jpg']
+
+[ratelimit]
+user = 5 # 5 seconds
+admin = 0 # 0 seconds, disabled

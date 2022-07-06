@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import type { CookieSerializeOptions } from 'cookie';
 
 import { serialize } from 'cookie';
-import { sign64, unsign64 } from '../util';
+import { sign64, unsign64 } from 'lib/util';
 import config from 'lib/config';
 import prisma from 'lib/prisma';
 
@@ -36,7 +36,7 @@ export type NextApiRes = NextApiResponse & {
   error: (message: string) => void;
   forbid: (message: string, extra?: any) => void;
   bad: (message: string) => void;
-  json: (json: any) => void;
+  json: (json: Record<string, any>) => void;
   ratelimited: (remaining: number) => void;
   setCookie: (name: string, value: unknown, options: CookieSerializeOptions) => void;
 }

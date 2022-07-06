@@ -1,32 +1,18 @@
-import React, { useEffect, useState } from 'react';
-
+import { SimpleGrid, Skeleton, Text, Title } from '@mantine/core';
+import { randomId, useClipboard } from '@mantine/hooks';
+import { useNotifications } from '@mantine/notifications';
+import { CopyIcon, Cross1Icon, TrashIcon } from '@modulz/radix-icons';
 import Card from 'components/Card';
-import ZiplineImage from 'components/Image';
+import File from 'components/File';
 import ImagesTable from 'components/ImagesTable';
+import Link from 'components/Link';
+import MutedText from 'components/MutedText';
+import { bytesToRead } from 'lib/clientUtils';
 import useFetch from 'lib/hooks/useFetch';
 import { useStoreSelector } from 'lib/redux/store';
-import { Text, Skeleton, Title, SimpleGrid } from '@mantine/core';
-import { randomId, useClipboard } from '@mantine/hooks';
-import Link from 'components/Link';
-import { CopyIcon, Cross1Icon, TrashIcon } from '@modulz/radix-icons';
-import { useNotifications } from '@mantine/notifications';
-import StatText from 'components/StatText';
+import { useEffect, useState } from 'react';
 
 type Aligns = 'inherit' | 'right' | 'left' | 'center' | 'justify';
-
-export function bytesToRead(bytes: number) {
-  if (isNaN(bytes)) return '0.0 B';
-  if (bytes === Infinity) return '0.0 B';
-  const units = ['B', 'kB', 'MB', 'GB', 'TB', 'PB'];
-  let num = 0;
-
-  while (bytes > 1024) {
-    bytes /= 1024;
-    ++num;
-  }
-
-  return `${bytes.toFixed(1)} ${units[num]}`;
-}
 
 export default function Dashboard() {
   const user = useStoreSelector(state => state.user);
@@ -86,8 +72,8 @@ export default function Dashboard() {
   
   return (
     <>
-      <Title>Welcome back {user?.username}</Title>
-      <Text color='gray' sx={{ paddingBottom: 4 }}>You have <b>{images.length ? images.length : '...'}</b> files</Text>
+      <Title>Welcome back, {user?.username}</Title>
+      <Text color='gray' mb='sm'>You have <b>{images.length ? images.length : '...'}</b> files</Text>
 
       <Title>Recent Files</Title>
       <SimpleGrid
@@ -98,7 +84,7 @@ export default function Dashboard() {
         ]}
       >
         {recent.length ? recent.map(image => (
-          <ZiplineImage key={randomId()} image={image} updateImages={updateImages} />
+          <File key={randomId()} image={image} updateImages={updateImages} />
         )) : [1,2,3,4].map(x => (
           <div key={x}>
             <Skeleton width='100%' height={220} sx={{ borderRadius: 1 }}/>
@@ -116,20 +102,22 @@ export default function Dashboard() {
         ]}
       >
         <Card name='Size' sx={{ height: '100%' }}>
-          <StatText>{stats ? stats.size : <Skeleton height={8} />}</StatText>
+          <MutedText>{stats ? stats.size : <Skeleton height={8} />}</MutedText>
           <Title order={2}>Average Size</Title>
-          <StatText>{stats ? bytesToRead(stats.size_num / stats.count) : <Skeleton height={8} />}</StatText>
+          <MutedText>{stats ? bytesToRead(stats.size_num / stats.count) : <Skeleton height={8} />}</MutedText>
         </Card>
         <Card name='Images' sx={{ height: '100%' }}>
-          <StatText>{stats ? stats.count : <Skeleton height={8} />}</StatText>
+          <MutedText>{stats ? stats.count : <Skeleton height={8} />}</MutedText>
           <Title order={2}>Views</Title>
-          <StatText>{stats ? `${stats.views_count} (${isNaN(stats.views_count / stats.count) ? 0 : Math.round(stats.views_count / stats.count)})` : <Skeleton height={8} />}</StatText>
+          <MutedText>{stats ? `${stats.views_count} (${isNaN(stats.views_count / stats.count) ? 0 : Math.round(stats.views_count / stats.count)})` : <Skeleton height={8} />}</MutedText>
         </Card>
         <Card name='Users' sx={{ height: '100%' }}>
-          <StatText>{stats ? stats.count_users : <Skeleton height={8} />}</StatText>
+          <MutedText>{stats ? stats.count_users : <Skeleton height={8} />}</MutedText>
         </Card>
       </SimpleGrid>
 
+      <Title mt='md'>Files</Title>
+      <Text>View your gallery <Link href='/dashboard/files'>here</Link>.</Text>
       <ImagesTable
         columns={[
           { accessor: 'file', Header: 'Name', minWidth: 170, align: 'inherit' as Aligns },
@@ -141,34 +129,6 @@ export default function Dashboard() {
         copyImage={copyImage}
         viewImage={viewImage}
       />
-
-      {/* <Title mt='md'>Files</Title>
-      <Text>View previews of your files in the <Link href='/dashboard/files'>browser</Link>.</Text>
-      <ReactTable
-        columns={[
-          { accessor: 'file', Header: 'Name', minWidth: 170, align: 'inherit' as Aligns },
-          { accessor: 'mimetype', Header: 'Type', minWidth: 100, align: 'inherit' as Aligns },
-          { accessor: 'created_at', Header: 'Date' },
-        ]}
-        data={images}
-        pagination
-      />
-      <Card name='Files per User' mt={22}>
-        <StatTable
-          columns={[
-            { id: 'username', name: 'Name' },
-            { id: 'count', name: 'Files' },
-          ]}
-          rows={stats ? stats.count_by_user : []} />
-      </Card>
-      <Card name='Types' mt={22}>
-        <StatTable
-          columns={[
-            { id: 'mimetype', name: 'Type' },
-            { id: 'count', name: 'Count' },
-          ]}
-          rows={stats ? stats.types_count : []} />
-      </Card> */}
     </>
   );
 }

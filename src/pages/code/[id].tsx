@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/router';
-import exts from '../../../scripts/exts';
+import exts from 'lib/exts';
 import { Prism } from '@mantine/prism';
 
 export default function Code() {

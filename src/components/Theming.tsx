@@ -1,22 +1,22 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 
 // themes
-import dark_blue from 'lib/themes/dark_blue';
-import light_blue from 'lib/themes/light_blue';
-import dark from 'lib/themes/dark';
 import ayu_dark from 'lib/themes/ayu_dark';
-import ayu_mirage from 'lib/themes/ayu_mirage';
 import ayu_light from 'lib/themes/ayu_light';
-import nord from 'lib/themes/nord';
+import ayu_mirage from 'lib/themes/ayu_mirage';
+import dark from 'lib/themes/dark';
+import dark_blue from 'lib/themes/dark_blue';
 import dracula from 'lib/themes/dracula';
+import light_blue from 'lib/themes/light_blue';
 import matcha_dark_azul from 'lib/themes/matcha_dark_azul';
+import nord from 'lib/themes/nord';
 import qogir_dark from 'lib/themes/qogir_dark';
 
-import { useStoreSelector } from 'lib/redux/store';
 import { MantineProvider, MantineThemeOverride } from '@mantine/core';
+import { useColorScheme } from '@mantine/hooks';
 import { ModalsProvider } from '@mantine/modals';
 import { NotificationsProvider } from '@mantine/notifications';
-import { useColorScheme } from '@mantine/hooks';
+import { useStoreSelector } from 'lib/redux/store';
 
 export const themes = {
   system: (colorScheme: 'dark' | 'light') => colorScheme === 'dark' ? dark_blue : light_blue,

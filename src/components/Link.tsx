@@ -1,10 +1,10 @@
 /// https://github.com/mui-org/material-ui/blob/next/examples/nextjs/src/Link.js
 /* eslint-disable jsx-a11y/anchor-has-content */
-import React, { forwardRef } from 'react';
-import clsx from 'clsx';
-import { useRouter } from 'next/router';
-import NextLink from 'next/link';
 import { Text } from '@mantine/core';
+import clsx from 'clsx';
+import NextLink from 'next/link';
+import { useRouter } from 'next/router';
+import { forwardRef } from 'react';
 
 export const NextLinkComposed = forwardRef(function NextLinkComposed(props: any, ref) {
   const { to, linkAs, href, replace, scroll, passHref, shallow, prefetch, locale, ...other } =

@@ -7,11 +7,13 @@ import { extname } from 'path';
 import { mkdir } from 'fs/promises';
 import { getStats, log, migrations } from './util';
 import Logger from '../lib/logger';
-import mimes from '../../scripts/mimes';
-import exts from '../../scripts/exts';
+import mimes from '../lib/mimes';
+import exts from '../lib/exts';
 import { version } from '../../package.json';
-import config from '../lib/config';
-import datasource from '../lib/datasource';
+import type { Config } from 'lib/config/Config';
+import type { Datasource } from 'lib/datasources';
+
+let config: Config, datasource: Datasource;
 
 const logger = Logger.get('server');
 logger.info(`starting zipline@${version} server`);
@@ -19,6 +21,13 @@ logger.info(`starting zipline@${version} server`);
 start();
 
 async function start() {
+  const c = await import('../lib/config.js');
+  config = c.default.default;
+
+  const d = await import('../lib/datasource.js');
+  // @ts-ignore
+  datasource = d.default.default;
+
   // annoy user if they didnt change secret from default "changethis"
   if (config.core.secret === 'changethis') {
     logger.error('Secret is not set!');
@@ -64,7 +73,6 @@ async function start() {
         ],
       },
     });
-    console.log(image);
 
     if (!image) await rawFile(req, res, nextServer, params.id);
 
@@ -102,7 +110,7 @@ async function start() {
   });
 
   http.on('listening', () => {
-    logger.info(`Listening on ${config.core.host}:${config.core.port}`);
+    logger.info(`listening on ${config.core.host}:${config.core.port}`);
   });
 
   http.listen(config.core.port, config.core.host ?? '0.0.0.0');

@@ -3,7 +3,7 @@ import prisma from 'lib/prisma';
 import Logger from 'lib/logger';
 import { Zip, ZipPassThrough } from 'fflate';
 import datasource from 'lib/datasource';
-import { readdir } from 'fs/promises';
+import { readdir, stat } from 'fs/promises';
 import { createReadStream, createWriteStream } from 'fs';
 
 async function handler(req: NextApiReq, res: NextApiRes) {
@@ -21,6 +21,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     const export_name = `zipline_export_${user.id}_${Date.now()}.zip`;
     const write_stream = createWriteStream(`/tmp/${export_name}`);
 
+    // i found this on some stack overflow thing, forgot the url
     const onBackpressure = (stream, outputStream, cb) => {
       const runCb = () => {
         // Pause if either output or internal backpressure should be applied
@@ -85,7 +86,6 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       }
     };
 
-    // for (const file of files) {
     Logger.get('user').info(`Export for ${user.username} (${user.id}) has started`);
     for (let i = 0; i !== files.length; ++i) {
       const file = files[i];
@@ -123,7 +123,15 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       stream.pipe(res);
     } else {
       const files = await readdir('/tmp');
-      const exports = files.filter(f => f.startsWith('zipline_export_'));
+      const exp = files.filter(f => f.startsWith('zipline_export_'));
+      const exports = [];
+      for (let i = 0; i !== exp.length; ++i) {
+        const name = exp[i];
+        const stats = await stat(`/tmp/${name}`);
+
+        exports.push({ name, size: stats.size });
+      }
+
       res.json({
         exports,
       });

@@ -19,7 +19,7 @@ const validator = object({
     s3: object({
       access_key_id: string(),
       secret_access_key: string(),
-      endpoint: string().notRequired().nullable(),
+      endpoint: string(),
       bucket: string(),
       force_s3_path: boolean().default(false),
       region: string().default('us-east-1'),
@@ -64,6 +64,8 @@ export default function validate(config): Config {
           errors.push('datasource.s3.secret_access_key is a required field');
         if (!validated.datasource.s3.bucket)
           errors.push('datasource.s3.bucket is a required field');
+        if (!validated.datasource.s3.endpoint)
+          errors.push('datasource.s3.endpoint is a required field');
         if (errors.length) throw { errors };
         break;
       }

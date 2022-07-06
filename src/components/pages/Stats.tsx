@@ -1,52 +1,10 @@
-import React, { useEffect, useState } from 'react';
-
+import { SimpleGrid, Skeleton, Title } from '@mantine/core';
 import Card from 'components/Card';
-import StatText from 'components/StatText';
+import MutedText from 'components/MutedText';
+import { SmallTable } from 'components/SmallTable';
+import { bytesToRead } from 'lib/clientUtils';
 import useFetch from 'lib/hooks/useFetch';
-import { useStoreSelector } from 'lib/redux/store';
-import { Box, Text, Table, Skeleton, Title, SimpleGrid } from '@mantine/core';
-import { randomId } from '@mantine/hooks';
-
-export function bytesToRead(bytes: number) {
-  if (isNaN(bytes)) return '0.0 B';
-  if (bytes === Infinity) return '0.0 B';
-  const units = ['B', 'kB', 'MB', 'GB', 'TB', 'PB'];
-  let num = 0;
-
-  while (bytes > 1024) {
-    bytes /= 1024;
-    ++num;
-  }
-
-  return `${bytes.toFixed(1)} ${units[num]}`;
-}
-
-function StatTable({ rows, columns }) {
-  return (
-    <Box sx={{ pt: 1 }}>
-      <Table highlightOnHover>
-        <thead>
-          <tr>
-            {columns.map(col => (
-              <th key={randomId()}>{col.name}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map(row => (
-            <tr key={randomId()}>
-              {columns.map(col => (
-                <td key={randomId()}>
-                  {col.format ? col.format(row[col.id]) : row[col.id]}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </Table>
-    </Box>
-  );
-}
+import { useEffect, useState } from 'react';
 
 export default function Stats() {
   const [stats, setStats] = useState(null);
@@ -62,7 +20,7 @@ export default function Stats() {
   
   return (
     <>
-      <Title>Stats</Title>
+      <Title mb='md'>Stats</Title>
       <SimpleGrid
         cols={3}
         spacing='lg'
@@ -71,22 +29,22 @@ export default function Stats() {
         ]}
       >
         <Card name='Size' sx={{ height: '100%' }}>
-          <StatText>{stats ? stats.size : <Skeleton height={8} />}</StatText>
+          <MutedText>{stats ? stats.size : <Skeleton height={8} />}</MutedText>
           <Title order={2}>Average Size</Title>
-          <StatText>{stats ? bytesToRead(stats.size_num / stats.count) : <Skeleton height={8} />}</StatText>
+          <MutedText>{stats ? bytesToRead(stats.size_num / stats.count) : <Skeleton height={8} />}</MutedText>
         </Card>
         <Card name='Images' sx={{ height: '100%' }}>
-          <StatText>{stats ? stats.count : <Skeleton height={8} />}</StatText>
+          <MutedText>{stats ? stats.count : <Skeleton height={8} />}</MutedText>
           <Title order={2}>Views</Title>
-          <StatText>{stats ? `${stats.views_count} (${isNaN(stats.views_count / stats.count) ? 0 : Math.round(stats.views_count / stats.count)})` : <Skeleton height={8} />}</StatText>
+          <MutedText>{stats ? `${stats.views_count} (${isNaN(stats.views_count / stats.count) ? 0 : Math.round(stats.views_count / stats.count)})` : <Skeleton height={8} />}</MutedText>
         </Card>
         <Card name='Users' sx={{ height: '100%' }}>
-          <StatText>{stats ? stats.count_users : <Skeleton height={8} />}</StatText>
+          <MutedText>{stats ? stats.count_users : <Skeleton height={8} />}</MutedText>
         </Card>
       </SimpleGrid>
 
       <Card name='Files per User' mt={22}>
-        <StatTable
+        <SmallTable
           columns={[
             { id: 'username', name: 'Name' },
             { id: 'count', name: 'Files' },
@@ -94,7 +52,7 @@ export default function Stats() {
           rows={stats ? stats.count_by_user : []} />
       </Card>
       <Card name='Types' mt={22}>
-        <StatTable
+        <SmallTable
           columns={[
             { id: 'mimetype', name: 'Type' },
             { id: 'count', name: 'Count' },
