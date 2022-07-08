@@ -25,7 +25,6 @@ RUN apk add --no-cache nodejs yarn openssl openssl-dev
 
 COPY --from=deps /build/node_modules ./node_modules
 COPY src ./src
-COPY scripts ./scripts
 COPY prisma ./prisma
 COPY .yarn .yarn
 COPY package.json yarn.lock .yarnrc.yml esbuild.config.js next.config.js next-env.d.ts zip-env.d.ts tsconfig.json ./
@@ -57,7 +56,6 @@ COPY --from=builder /build/node_modules ./node_modules
 
 COPY --from=builder /build/next.config.js ./next.config.js
 COPY --from=builder /build/src ./src
-COPY --from=builder /build/scripts ./scripts
 COPY --from=builder /build/prisma ./prisma
 COPY --from=builder /build/tsconfig.json ./tsconfig.json
 COPY --from=builder /build/package.json ./package.json

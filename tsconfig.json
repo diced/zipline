@@ -47,6 +47,5 @@
     "dist",
     ".yarn",
     ".next",
-    "scripts"
   ]
 }
