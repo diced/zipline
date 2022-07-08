@@ -43,4 +43,3 @@ yarn-error.log*
 config.toml
 uploads/
 dist/
-docker-compose.local.yml

@@ -65,6 +65,8 @@ async function start() {
   });
 
   router.on('GET', config.uploader.route === '/' ? '/:id(^[^\\.]+\\.[^\\.]+)' : `${config.uploader.route}/:id`, async (req, res, params) => {
+    if (params.id === '') return nextServer.render404(req, res as ServerResponse);
+
     const image = await prisma.image.findFirst({
       where: {
         OR: [
@@ -75,13 +77,16 @@ async function start() {
     });
 
     if (!image) await rawFile(req, res, nextServer, params.id);
-
-    if (image.password) await handle(req, res);
-    else if (image.embed) await handle(req, res);
-    else await fileDb(req, res, nextServer, prisma, handle, image);
+    else {
+      if (image.password) await handle(req, res);
+      else if (image.embed) await handle(req, res);
+      else await fileDb(req, res, nextServer, prisma, handle, image);
+    }
   });
 
   router.on('GET', '/r/:id', async (req, res, params) => {
+    if (params.id === '') return nextServer.render404(req, res as ServerResponse);
+
     const image = await prisma.image.findFirst({
       where: {
         OR: [
@@ -92,9 +97,10 @@ async function start() {
     });
 
     if (!image) await rawFile(req, res, nextServer, params.id);
-
-    if (image.password) await handle(req, res);
-    else await rawFileDb(req, res, nextServer, prisma, image);
+    else {
+      if (image.password) await handle(req, res);
+      else await rawFileDb(req, res, nextServer, prisma, image);
+    }
   });
 
   await nextServer.prepare();
