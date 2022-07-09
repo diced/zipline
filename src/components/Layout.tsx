@@ -2,7 +2,7 @@ import { AppShell, Box, Burger, Divider, Group, Header, MediaQuery, Navbar, Pape
 import { useClipboard } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
 import { useNotifications } from '@mantine/notifications';
-import { CheckIcon, CopyIcon, Cross1Icon, FileIcon, GearIcon, HomeIcon, Link1Icon, MixerHorizontalIcon, Pencil1Icon, PersonIcon, PinRightIcon, ResetIcon, UploadIcon } from '@modulz/radix-icons';
+import { CheckIcon, CopyIcon, Cross1Icon, FileIcon, GearIcon, HomeIcon, Link1Icon, MixerHorizontalIcon, Pencil1Icon, PersonIcon, PinRightIcon, ResetIcon, TextIcon, UploadIcon } from '@modulz/radix-icons';
 import useFetch from 'hooks/useFetch';
 import { updateUser } from 'lib/redux/reducers/user';
 import { useStoreDispatch } from 'lib/redux/store';
@@ -87,6 +87,11 @@ const items = [
     icon: <UploadIcon />,
     text: 'Upload',
     link: '/dashboard/upload',
+  },
+  {
+    icon: <TextIcon />,
+    text: 'Upload Text',
+    link: '/dashboard/text',
   },
 ];
 
