@@ -23,7 +23,7 @@ const validator = object({
       bucket: string(),
       force_s3_path: boolean().default(false),
       region: string().default('us-east-1'),
-    }).notRequired(),
+    }).nullable().notRequired(),
     swift: object({
       username: string(),
       password: string(),
@@ -32,7 +32,7 @@ const validator = object({
       project_id: string(),
       domain_id: string().default('default'),
       region_id: string().nullable(),
-    }),
+    }).notRequired(),
   }).required(),
   uploader: object({
     route: string().default('/u'),
@@ -85,7 +85,7 @@ export default function validate(config): Config {
         break;
       }
     }
-
+    
     return validated as unknown as Config;
   } catch (e) {
     if (process.env.ZIPLINE_DOCKER_BUILD) return null;

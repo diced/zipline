@@ -24,6 +24,14 @@ const envValues = [
   e('DATASOURCE_S3_BUCKET', 'string', (c, v) => c.datasource.s3.bucket = v),
   e('DATASOURCE_S3_REGION', 'string', (c, v) => c.datasource.s3.region = v ?? 'us-east-1'),
 
+  e('DATASOURCE_SWIFT_CONTAINER', 'string', (c, v) => c.datasource.swift.container = v),
+  e('DATASOURCE_SWIFT_USERNAME', 'string', (c, v) => c.datasource.swift.username = v),
+  e('DATASOURCE_SWIFT_PASSWORD', 'string', (c, v) => c.datasource.swift.password = v),
+  e('DATASOURCE_SWIFT_AUTH_ENDPOINT', 'string', (c, v) => c.datasource.swift.auth_endpoint = v),
+  e('DATASOURCE_SWIFT_PROJECT_ID', 'string', (c, v) => c.datasource.swift.project_id = v),
+  e('DATASOURCE_SWIFT_DOMAIN_ID', 'string', (c, v) => c.datasource.swift.domain_id = v),
+  e('DATASOURCE_SWIFT_REGION_ID', 'string', (c, v) => c.datasource.swift.region_id = v),
+
   e('UPLOADER_ROUTE', 'string', (c, v) => c.uploader.route = v),
   e('UPLOADER_LENGTH', 'number', (c, v) => c.uploader.length = v),
   e('UPLOADER_ADMIN_LIMIT', 'number', (c, v) => c.uploader.admin_limit = v),
@@ -76,6 +84,15 @@ function tryReadEnv(): Config {
         force_s3_path: undefined,
         region: undefined,
       },
+      swift: {
+        username: undefined,
+        password: undefined,
+        auth_endpoint: undefined,
+        container: undefined,
+        project_id: undefined,
+        domain_id: undefined,
+        region_id: undefined,
+      },
     },
     uploader: {
       route: undefined,
@@ -108,6 +125,28 @@ function tryReadEnv(): Config {
       envValues[i].fn(config, value);
     }
   }
+
+
+  switch (config.datasource.type) {
+    case 's3':
+      config.datasource.swift = undefined;
+      break;
+    case 'swift':
+      config.datasource.s3 = undefined;
+      break;
+    case 'local':
+      config.datasource.s3 = undefined;
+      config.datasource.swift = undefined;
+      break;
+    default:
+      config.datasource.local = {
+        directory: null,
+      };
+      config.datasource.s3 = undefined;
+      config.datasource.swift = undefined;
+      break;
+  }
+
   return config;
 }
 
