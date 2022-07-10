@@ -1,4 +1,4 @@
-import { Button, Collapse, Group, Progress, Title, useMantineTheme } from '@mantine/core';
+import { Button, Collapse, Group, Progress, Title } from '@mantine/core';
 import { randomId, useClipboard } from '@mantine/hooks';
 import { useNotifications } from '@mantine/notifications';
 import Dropzone from 'components/dropzone/Dropzone';
@@ -20,8 +20,8 @@ export default function Upload() {
   useEffect(() => {
     window.addEventListener('paste', (e: ClipboardEvent) => {
       const item = Array.from(e.clipboardData.items).find(x => /^image/.test(x.type));
-      const blob = item.getAsFile();
-      setFiles([...files, new File([blob], blob.name, { type: blob.type })]);
+      const file = item.getAsFile();
+      setFiles([...files, file]);
       notif.showNotification({
         title: 'Image imported from clipboard',
         message: '',
@@ -94,7 +94,7 @@ export default function Upload() {
       </Collapse>
 
       <Group position='right'>
-        <Button leftIcon={<UploadIcon />} mt={12} onClick={handleUpload}>Upload</Button>
+        <Button leftIcon={<UploadIcon />} mt={12} onClick={handleUpload} disabled={files.length === 0 ? true : false}>Upload</Button>
       </Group>
     </>
   );

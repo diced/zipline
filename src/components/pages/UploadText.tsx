@@ -1,31 +1,20 @@
-import { Button, Collapse, Group, Progress, Select, Title, useMantineTheme } from '@mantine/core';
-import { randomId, useClipboard } from '@mantine/hooks';
+import { Button, Group, LoadingOverlay, Select, Title } from '@mantine/core';
 import { useNotifications } from '@mantine/notifications';
 import CodeInput from 'components/CodeInput';
-import Dropzone from 'components/dropzone/Dropzone';
-import FileDropzone from 'components/dropzone/DropzoneFile';
 import { TypeIcon, UploadIcon } from 'components/icons';
 import Link from 'components/Link';
 import exts from 'lib/exts';
 import { useStoreSelector } from 'lib/redux/store';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 export default function Upload() {
   const notif = useNotifications();
-  const clipboard = useClipboard();
   const user = useStoreSelector(state => state.user);
 
-
-  const [progress, setProgress] = useState(0);
-  const [loading, setLoading] = useState(false);
   const [value, setValue] = useState('');
   const [lang, setLang] = useState('txt');
-  console.log(lang);
   
   const handleUpload = async () => {
-    setProgress(0);
-    setLoading(true);
-
     const file = new File([value], 'text.' + lang);
 
     const id = notif.showNotification({
@@ -36,16 +25,9 @@ export default function Upload() {
     });
 
     const req = new XMLHttpRequest();
-    req.upload.addEventListener('progress', e => {
-      if (e.lengthComputable) {
-        setProgress(Math.round(e.loaded / e.total * 100));
-      }
-    });
-
     req.addEventListener('load', e => {
       // @ts-ignore not sure why it thinks response doesnt exist, but it does.
       const json = JSON.parse(e.target.response);
-      setLoading(false);
 
       if (!json.error) {
         notif.updateNotification(id, {
@@ -69,7 +51,7 @@ export default function Upload() {
 
       <CodeInput
         value={value}
-        onChange={e => setValue(e.target.value)}
+        onChange={e => setValue(e.target.value.trim())}
       />
 
       <Group position='right' mt='md'>
@@ -80,7 +62,7 @@ export default function Upload() {
           data={Object.keys(exts).map(x => ({ value: x, label: exts[x] }))}
           icon={<TypeIcon />}
         />
-        <Button leftIcon={<UploadIcon />} onClick={handleUpload}>Upload</Button>
+        <Button leftIcon={<UploadIcon />} onClick={handleUpload} disabled={value.trim().length === 0 ? true : false}>Upload</Button>
       </Group>
     </>
   );

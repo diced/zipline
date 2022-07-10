@@ -40,6 +40,8 @@
     "zip-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
+    "**/**/*.ts",
+    "**/**/*.tsx",
     "prisma/seed.ts"
   ],
   "exclude": [
