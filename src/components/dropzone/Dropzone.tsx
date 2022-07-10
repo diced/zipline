@@ -33,7 +33,7 @@ export default function Dropzone({ loading, onDrop, children }) {
     <MantineDropzone loading={loading} onDrop={onDrop}>
       {status => (
         <>
-          <Group position='center' spacing='xl' style={{ minHeight: 220, pointerEvents: 'none' }}>
+          <Group position='center' spacing='xl' style={{ minHeight: 440, pointerEvents: 'none' }}>
             <ImageUploadIcon
               status={status}
               style={{ width: 80, height: 80, color: getIconColor(status, theme) }}
