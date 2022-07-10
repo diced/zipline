@@ -1,9 +1,9 @@
 import { Button, Collapse, Group, Progress, Title, useMantineTheme } from '@mantine/core';
 import { randomId, useClipboard } from '@mantine/hooks';
 import { useNotifications } from '@mantine/notifications';
-import { CrossCircledIcon, UploadIcon } from '@modulz/radix-icons';
 import Dropzone from 'components/dropzone/Dropzone';
 import FileDropzone from 'components/dropzone/DropzoneFile';
+import { CrossIcon, UploadIcon } from 'components/icons';
 import Link from 'components/Link';
 import { useStoreSelector } from 'lib/redux/store';
 import { useEffect, useState } from 'react';
@@ -68,7 +68,7 @@ export default function Upload() {
           title: 'Upload Failed',
           message: json.error,
           color: 'red',
-          icon: <CrossCircledIcon />,
+          icon: <CrossIcon />,
         });
       }
       setProgress(0);

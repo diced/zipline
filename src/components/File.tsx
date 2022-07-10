@@ -1,9 +1,9 @@
 import { Button, Card, Group, Image as MImage, Modal, Title } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { useNotifications } from '@mantine/notifications';
-import { CopyIcon, Cross1Icon, StarIcon, TrashIcon } from '@modulz/radix-icons';
 import useFetch from 'hooks/useFetch';
 import { useState } from 'react';
+import { CopyIcon, CrossIcon, DeleteIcon, StarIcon } from './icons';
 
 export default function File({ image, updateImages }) {
   const [open, setOpen] = useState(false);
@@ -19,14 +19,14 @@ export default function File({ image, updateImages }) {
         title: 'Image Deleted',
         message: '',
         color: 'green',
-        icon: <TrashIcon />,
+        icon: <DeleteIcon />,
       });
     } else {
       notif.showNotification({
         title: 'Failed to delete image',
         message: res.error,
         color: 'red',
-        icon: <Cross1Icon />,
+        icon: <CrossIcon />,
       });
     }
     

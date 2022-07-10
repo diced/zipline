@@ -1,10 +1,10 @@
 import { Button, Collapse, Group, Progress, Select, Title, useMantineTheme } from '@mantine/core';
 import { randomId, useClipboard } from '@mantine/hooks';
 import { useNotifications } from '@mantine/notifications';
-import { CrossCircledIcon, LetterCaseCapitalizeIcon, LetterCaseLowercaseIcon, UploadIcon } from '@modulz/radix-icons';
 import CodeInput from 'components/CodeInput';
 import Dropzone from 'components/dropzone/Dropzone';
 import FileDropzone from 'components/dropzone/DropzoneFile';
+import { TypeIcon, UploadIcon } from 'components/icons';
 import Link from 'components/Link';
 import exts from 'lib/exts';
 import { useStoreSelector } from 'lib/redux/store';
@@ -62,7 +62,7 @@ export default function Upload() {
     req.setRequestHeader('Authorization', user.token);
     req.send(body);
   };
-  
+
   return (
     <>
       <Title mb='md'>Upload Text</Title>
@@ -78,7 +78,7 @@ export default function Upload() {
           onChange={setLang}
           dropdownPosition='top'
           data={Object.keys(exts).map(x => ({ value: x, label: exts[x] }))}
-          icon={<LetterCaseCapitalizeIcon />}
+          icon={<TypeIcon />}
         />
         <Button leftIcon={<UploadIcon />} onClick={handleUpload}>Upload</Button>
       </Group>

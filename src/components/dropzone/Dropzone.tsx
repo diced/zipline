@@ -1,7 +1,7 @@
 import React from 'react';
 import { Dropzone as MantineDropzone } from '@mantine/dropzone';
 import { Group, Text, useMantineTheme } from '@mantine/core';
-import { UploadIcon, CrossCircledIcon, ImageIcon } from '@modulz/radix-icons';
+import { CrossIcon, UploadIcon, ImageIcon } from 'components/icons';
 
 function ImageUploadIcon({ status, ...props }) {
   if (status.accepted) {
@@ -9,7 +9,7 @@ function ImageUploadIcon({ status, ...props }) {
   }
 
   if (status.rejected) {
-    return <CrossCircledIcon {...props} />;
+    return <CrossIcon {...props} />;
   }
 
   return <ImageIcon {...props} />;

@@ -13,14 +13,10 @@ import {
   useMantineTheme,
 } from '@mantine/core';
 import {
-  CopyIcon,
-  EnterIcon,
-  TrashIcon,
-} from '@modulz/radix-icons';
-import {
   usePagination,
   useTable,
 } from 'react-table';
+import { CopyIcon, DeleteIcon, EnterIcon } from './icons';
 
 const pageSizeOptions = ['10', '25', '50'];
 
@@ -128,7 +124,7 @@ export default function ImagesTable({
         ))}
         <td align='right'>
           <Group noWrap>
-            <ActionIcon color='red' variant='outline' onClick={() => deleteImage(row)}><TrashIcon /></ActionIcon>
+            <ActionIcon color='red' variant='outline' onClick={() => deleteImage(row)}><DeleteIcon /></ActionIcon>
             <ActionIcon color='primary' variant='outline' onClick={() => copyImage(row)}><CopyIcon /></ActionIcon>
             <ActionIcon color='green' variant='outline' onClick={() => viewImage(row)}><EnterIcon /></ActionIcon>
           </Group>

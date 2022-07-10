@@ -2,13 +2,13 @@ import { AppShell, Box, Burger, Divider, Group, Header, MediaQuery, Navbar, Pape
 import { useClipboard } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
 import { useNotifications } from '@mantine/notifications';
-import { CheckIcon, CopyIcon, Cross1Icon, FileIcon, GearIcon, HomeIcon, Link1Icon, MixerHorizontalIcon, Pencil1Icon, PersonIcon, PinRightIcon, ResetIcon, TextIcon, UploadIcon } from '@modulz/radix-icons';
 import useFetch from 'hooks/useFetch';
 import { updateUser } from 'lib/redux/reducers/user';
 import { useStoreDispatch } from 'lib/redux/store';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
+import { ActivityIcon, CheckIcon, CopyIcon, CrossIcon, DeleteIcon, FileIcon, HomeIcon, LinkIcon, LogoutIcon, PencilIcon, SettingsIcon, TypeIcon, UploadIcon, UserIcon } from './icons';
 import { friendlyThemeName, themes } from './Theming';
 
 function MenuItemLink(props) {
@@ -74,12 +74,12 @@ const items = [
     link: '/dashboard/files',
   },
   {
-    icon: <MixerHorizontalIcon />,
+    icon: <ActivityIcon />,
     text: 'Stats',
     link: '/dashboard/stats',
   },
   {
-    icon: <Link1Icon />,
+    icon: <LinkIcon />,
     text: 'URLs',
     link: '/dashboard/urls',
   },
@@ -89,7 +89,7 @@ const items = [
     link: '/dashboard/upload',
   },
   {
-    icon: <TextIcon />,
+    icon: <TypeIcon />,
     text: 'Upload Text',
     link: '/dashboard/text',
   },
@@ -120,7 +120,7 @@ export default function Layout({ children, user }) {
       title: `Theme changed to ${friendlyThemeName[value]}`,
       message: '',
       color: 'green',
-      icon: <Pencil1Icon />,
+      icon: <PencilIcon />,
     });
   };
 
@@ -142,7 +142,7 @@ export default function Layout({ children, user }) {
           title: 'Token Reset Failed',
           message: a.error,
           color: 'red',
-          icon: <Cross1Icon />,
+          icon: <CrossIcon />,
         });
       } else {
         notif.showNotification({
@@ -241,7 +241,7 @@ export default function Layout({ children, user }) {
                 >
                   <Group>
                     <ThemeIcon color='primary' variant='filled'>
-                      <PersonIcon />
+                      <UserIcon />
                     </ThemeIcon>
 
                     <Text size='lg'>Users</Text>
@@ -288,7 +288,7 @@ export default function Layout({ children, user }) {
                   >
                     <Group>
                       <ThemeIcon color='primary' variant='filled'>
-                        <GearIcon />
+                        <SettingsIcon />
                       </ThemeIcon>
                       <Text>{user.username}</Text>
                     </Group>
@@ -306,10 +306,10 @@ export default function Layout({ children, user }) {
                   >
                     {user.username}
                   </Text>
-                  <MenuItemLink icon={<GearIcon />} href='/dashboard/manage'>Manage Account</MenuItemLink>
+                  <MenuItemLink icon={<SettingsIcon />} href='/dashboard/manage'>Manage Account</MenuItemLink>
                   <MenuItem icon={<CopyIcon />} onClick={() => {setOpen(false);openCopyToken();}}>Copy Token</MenuItem>
-                  <MenuItem icon={<ResetIcon />} onClick={() => {setOpen(false);openResetToken();}} color='red'>Reset Token</MenuItem>
-                  <MenuItemLink icon={<PinRightIcon />} href='/auth/logout' color='red'>Logout</MenuItemLink>
+                  <MenuItem icon={<DeleteIcon />} onClick={() => {setOpen(false);openResetToken();}} color='red'>Reset Token</MenuItem>
+                  <MenuItemLink icon={<LogoutIcon />} href='/auth/logout' color='red'>Logout</MenuItemLink>
                   <Divider
                     variant='solid'
                     my={theme.spacing.xs / 2}
@@ -319,7 +319,7 @@ export default function Layout({ children, user }) {
                       margin: `${theme.spacing.xs / 2}px -4px`,
                     })}
                   />
-                  <MenuItem icon={<Pencil1Icon />}>
+                  <MenuItem icon={<PencilIcon />}>
                     <Select           
                       size='xs'    
                       data={Object.keys(themes).map(t => ({ value: t, label: friendlyThemeName[t] }))}

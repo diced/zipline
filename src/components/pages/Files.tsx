@@ -1,6 +1,6 @@
 import { Accordion, ActionIcon, Box, Group, Pagination, SimpleGrid, Skeleton, Title } from '@mantine/core';
-import { PlusIcon } from '@modulz/radix-icons';
 import File from 'components/File';
+import { PlusIcon } from 'components/icons';
 import useFetch from 'hooks/useFetch';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';

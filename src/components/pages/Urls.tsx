@@ -1,7 +1,7 @@
 import { ActionIcon, Button, Card, Group, Modal, SimpleGrid, Skeleton, TextInput, Title } from '@mantine/core';
 import { useClipboard, useForm } from '@mantine/hooks';
 import { useNotifications } from '@mantine/notifications';
-import { CopyIcon, Cross1Icon, Link1Icon, PlusIcon, TrashIcon } from '@modulz/radix-icons';
+import { CopyIcon, CrossIcon, DeleteIcon, LinkIcon, PlusIcon } from 'components/icons';
 import useFetch from 'hooks/useFetch';
 import { useStoreSelector } from 'lib/redux/store';
 import { useEffect, useState } from 'react';
@@ -26,14 +26,14 @@ export default function Urls() {
       notif.showNotification({
         title: 'Failed to delete URL',
         message: url.error,
-        icon: <TrashIcon />,
+        icon: <DeleteIcon />,
         color: 'red',
       });
     } else {
       notif.showNotification({
         title: 'Deleted URL',
         message: '',
-        icon: <Cross1Icon />,
+        icon: <CrossIcon />,
         color: 'green',
       });
     }
@@ -90,14 +90,14 @@ export default function Urls() {
         title: 'Failed to create URL',
         message: json.error,
         color: 'red',
-        icon: <Cross1Icon />,
+        icon: <CrossIcon />,
       });
     } else {
       notif.showNotification({
         title: 'URL shortened',
         message: json.url,
         color: 'green',
-        icon: <Link1Icon />,
+        icon: <LinkIcon />,
       });
     }
 
@@ -145,12 +145,12 @@ export default function Urls() {
                 <Title>{url.vanity ?? url.id}</Title>
               </Group>
               <Group position='right'>
-                <ActionIcon href={url.url} component='a' target='_blank'><Link1Icon/></ActionIcon>
+                <ActionIcon href={url.url} component='a' target='_blank'><LinkIcon/></ActionIcon>
                 <ActionIcon aria-label='copy' onClick={() => copyURL(url)}>
                   <CopyIcon />
                 </ActionIcon>
                 <ActionIcon aria-label='delete' onClick={() => deleteURL(url)}>
-                  <TrashIcon />
+                  <DeleteIcon />
                 </ActionIcon>
               </Group>
             </Group>

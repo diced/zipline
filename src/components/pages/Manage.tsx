@@ -2,7 +2,8 @@ import { Box, Button, Card, ColorInput, Group, MultiSelect, Space, Text, TextInp
 import { randomId, useForm, useInterval } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
 import { useNotifications } from '@mantine/notifications';
-import { Cross1Icon, DownloadIcon, TrashIcon } from '@modulz/radix-icons';
+import { CrossIcon, DeleteIcon } from 'components/icons';
+import DownloadIcon from 'components/icons/DownloadIcon';
 import Link from 'components/Link';
 import { SmallTable } from 'components/SmallTable';
 import useFetch from 'hooks/useFetch';
@@ -117,14 +118,14 @@ export default function Manage() {
             ))}
           </>,
           color: 'red',
-          icon: <Cross1Icon />,
+          icon: <CrossIcon />,
         });
       }
       notif.updateNotification(id, {
         title: 'Couldn\'t save user',
         message: newUser.error,
         color: 'red',
-        icon: <Cross1Icon />,
+        icon: <CrossIcon />,
       });
     } else {
       dispatch(updateUser(newUser));
@@ -166,14 +167,14 @@ export default function Manage() {
         title: 'Couldn\'t delete files',
         message: res.error,
         color: 'red',
-        icon: <Cross1Icon />,
+        icon: <CrossIcon />,
       });
     } else {
       notif.showNotification({
         title: 'Deleted files',
         message: `${res.count} files deleted`,
         color: 'green',
-        icon: <TrashIcon />,
+        icon: <DeleteIcon />,
       });
     }
   };
@@ -245,7 +246,7 @@ export default function Manage() {
       </Box>
 
       <Group>
-        <Button onClick={openDeleteModal} rightIcon={<TrashIcon />}>Delete All Data</Button>
+        <Button onClick={openDeleteModal} rightIcon={<DeleteIcon />}>Delete All Data</Button>
         <ExportDataTooltip><Button onClick={exportData} rightIcon={<DownloadIcon />}>Export Data</Button></ExportDataTooltip>
       </Group>
       <Card mt={22}>

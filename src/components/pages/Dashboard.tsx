@@ -1,9 +1,9 @@
 import { SimpleGrid, Skeleton, Text, Title } from '@mantine/core';
 import { randomId, useClipboard } from '@mantine/hooks';
 import { useNotifications } from '@mantine/notifications';
-import { CopyIcon, Cross1Icon, TrashIcon } from '@modulz/radix-icons';
 import Card from 'components/Card';
 import File from 'components/File';
+import { CopyIcon, CrossIcon, DeleteIcon } from 'components/icons';
 import ImagesTable from 'components/ImagesTable';
 import Link from 'components/Link';
 import MutedText from 'components/MutedText';
@@ -40,14 +40,14 @@ export default function Dashboard() {
         title: 'Image Deleted',
         message: '',
         color: 'green',
-        icon: <TrashIcon />,
+        icon: <DeleteIcon />,
       });
     } else {
       notif.showNotification({
         title: 'Failed to delete image',
         message: res.error,
         color: 'red',
-        icon: <Cross1Icon />,
+        icon: <CrossIcon />,
       });
     }
     

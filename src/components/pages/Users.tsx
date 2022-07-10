@@ -2,7 +2,7 @@ import { ActionIcon, Avatar, Button, Card, Group, Modal, SimpleGrid, Skeleton, S
 import { useForm } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
 import { useNotifications } from '@mantine/notifications';
-import { Cross1Icon, PlusIcon, TrashIcon } from '@modulz/radix-icons';
+import { CrossIcon, DeleteIcon, PlusIcon } from 'components/icons';
 import useFetch from 'hooks/useFetch';
 import { useStoreSelector } from 'lib/redux/store';
 import { useRouter } from 'next/router';
@@ -37,7 +37,7 @@ function CreateUserModal({ open, setOpen, updateUsers }) {
       notif.showNotification({
         title: 'Failed to create user',
         message: res.error,
-        icon: <TrashIcon />,
+        icon: <DeleteIcon />,
         color: 'red',
       });
     } else {
@@ -91,14 +91,14 @@ export default function Users() {
         title: 'Failed to delete user',
         message: res.error,
         color: 'red',
-        icon: <Cross1Icon />,
+        icon: <CrossIcon />,
       });
     } else {
       notif.showNotification({
         title: 'User deleted',
         message: '',
         color: 'green',
-        icon: <TrashIcon />,
+        icon: <DeleteIcon />,
       });
       updateUsers();
     }
@@ -165,7 +165,7 @@ export default function Users() {
               </Group>
               <Group position='right'>
                 <ActionIcon aria-label='delete' onClick={() => openDeleteModal(user)}>
-                  <TrashIcon />
+                  <DeleteIcon />
                 </ActionIcon>
               </Group>
             </Group>
