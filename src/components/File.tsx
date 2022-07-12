@@ -1,35 +1,49 @@
-import { Button, Card, Group, Image as MImage, Modal, Title } from '@mantine/core';
+import { Button, Card, Grid, Group, Image as MImage, Modal, Stack, Text, Title, useMantineTheme } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { useNotifications } from '@mantine/notifications';
 import useFetch from 'hooks/useFetch';
 import { useState } from 'react';
-import { CopyIcon, CrossIcon, DeleteIcon, StarIcon } from './icons';
+import Type from './Type';
+import { CalendarIcon, CopyIcon, CrossIcon, DeleteIcon, FileIcon, HashIcon, ImageIcon, StarIcon } from './icons';
+import MutedText from './MutedText';
+
+export function FileMeta({ Icon, title, subtitle }) {
+  return (
+    <Group>
+      <Icon size={24} />
+      <Stack spacing={1}>
+        <Text>{title}</Text>
+        <MutedText size='md'>{subtitle}</MutedText>
+      </Stack>
+    </Group>
+  );
+}
 
 export default function File({ image, updateImages }) {
   const [open, setOpen] = useState(false);
-  const [t] = useState(image.mimetype.split('/')[0]);
   const notif = useNotifications();
   const clipboard = useClipboard();
-  
+  const theme = useMantineTheme();
+
   const handleDelete = async () => {
     const res = await useFetch('/api/user/files', 'DELETE', { id: image.id });
     if (!res.error) {
       updateImages(true);
       notif.showNotification({
-        title: 'Image Deleted',
+        title: 'File Deleted',
         message: '',
         color: 'green',
         icon: <DeleteIcon />,
       });
     } else {
       notif.showNotification({
-        title: 'Failed to delete image',
+        title: 'Failed to delete file',
         message: res.error,
         color: 'red',
         icon: <CrossIcon />,
       });
     }
-    
+
     setOpen(false);
   };
 
@@ -53,13 +67,6 @@ export default function File({ image, updateImages }) {
     });
   };
 
-  const Type = (props) => {
-    return {
-      'video': <video controls {...props} />,
-      'image': <MImage withPlaceholder {...props} />,
-      'audio': <audio controls {...props} />,
-    }[t];
-  };
 
   return (
     <>
@@ -67,11 +74,27 @@ export default function File({ image, updateImages }) {
         opened={open}
         onClose={() => setOpen(false)}
         title={<Title>{image.file}</Title>}
+        size='xl'
+        overlayBlur={3}
+        overlayColor={theme.colorScheme === 'dark' ? theme.colors.dark[6] : 'white'}
       >
-        <Type
-          src={image.url}
-          alt={image.file}
-        />
+        <Stack>
+          <Type
+            file={image}
+            src={image.url}
+            alt={image.file}
+            popup
+            sx={{ minHeight: 200 }}
+            style={{ minHeight: 200 }}
+          />
+          <Stack>
+            <FileMeta Icon={FileIcon} title='Name' subtitle={image.file} />
+            <FileMeta Icon={ImageIcon} title='Type' subtitle={image.mimetype} />
+            <FileMeta Icon={CalendarIcon} title='Uploaded at' subtitle={new Date(image.created_at).toLocaleString()} />
+            <FileMeta Icon={HashIcon} title='ID' subtitle={image.id} />
+          </Stack>
+        </Stack>
+
         <Group position='right' mt={22}>
           <Button onClick={handleCopy}>Copy</Button>
           <Button onClick={handleDelete}>Delete</Button>
@@ -81,8 +104,9 @@ export default function File({ image, updateImages }) {
       <Card sx={{ maxWidth: '100%', height: '100%' }} shadow='md'>
         <Card.Section>
           <Type
-            sx={{ maxHeight: 320, fontSize: 70, width: '100%', cursor: 'pointer' }}
-            style={{ maxHeight: 320, fontSize: 70, width: '100%', cursor: 'pointer' }}
+            file={image}
+            sx={{ minHeight: 200, maxHeight: 320, fontSize: 70, width: '100%', cursor: 'pointer' }}
+            style={{ minHeight: 200, maxHeight: 320, fontSize: 70, width: '100%', cursor: 'pointer' }}
             src={image.url}
             alt={image.file}
             onClick={() => setOpen(true)}

@@ -42,6 +42,8 @@ export default function Upload() {
 
     req.open('POST', '/api/upload');
     req.setRequestHeader('Authorization', user.token);
+    req.setRequestHeader('UploadText', 'true');
+
     req.send(body);
   };
 
@@ -51,7 +53,7 @@ export default function Upload() {
 
       <CodeInput
         value={value}
-        onChange={e => setValue(e.target.value.trim())}
+        onChange={e => setValue(e.target.value)}
       />
 
       <Group position='right' mt='md'>

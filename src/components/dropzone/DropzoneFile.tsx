@@ -1,18 +1,12 @@
-/* eslint-disable jsx-a11y/alt-text */
 import React from 'react';
-import { Image, Table, Tooltip, Badge, useMantineTheme } from '@mantine/core';
+import { Table, Tooltip, Badge, useMantineTheme } from '@mantine/core';
+import Type from 'components/Type';
 
 export function FilePreview({ file }: { file: File }) {
-  const Type = props => {
-    return {
-      'video': <video autoPlay controls {...props} />,
-      'image': <Image withPlaceholder {...props} />,
-      'audio': <audio autoPlay controls {...props} />,
-    }[file.type.split('/')[0]];
-  };
-
   return (
     <Type
+      file={file}
+      autoPlay
       sx={{ maxWidth: '10vw', maxHeight: '100vh' }}
       style={{ maxWidth: '10vw', maxHeight: '100vh' }}
       src={URL.createObjectURL(file)}

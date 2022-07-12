@@ -1,6 +1,4 @@
-/* eslint-disable jsx-a11y/alt-text */
 /* eslint-disable react/jsx-key */
-/* eslint-disable react/display-name */
 // Code taken from https://codesandbox.io/s/eojw8 and is modified a bit (the entire src/components/table directory)
 import {
   ActionIcon,
@@ -86,17 +84,14 @@ export default function ImagesTable({
 
   const getPageRecordInfo = () => {
     const firstRowNum = pageIndex * pageSize + 1;
-    const totalRows = serverSideDataSource ? total : rows.length;
+    const totalRows = rows.length;
 
     const currLastRowNum = (pageIndex + 1) * pageSize;
     let lastRowNum = currLastRowNum < totalRows ? currLastRowNum : totalRows;
     return `${firstRowNum} - ${lastRowNum} of ${totalRows}`;
   };
 
-  const getPageCount = () => {
-    const totalRows = serverSideDataSource ? total : rows.length;
-    return Math.ceil(totalRows / pageSize);
-  };
+  const getPageCount = () => Math.ceil(rows.length / pageSize);
 
   const handlePageChange = (pageNum) => gotoPage(pageNum - 1);
 

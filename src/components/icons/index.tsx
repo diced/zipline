@@ -16,6 +16,11 @@ import EnterIcon from './EnterIcon';
 import PlusIcon from './PlusIcon';
 import ImageIcon from './ImageIcon';
 import StarIcon from './StarIcon';
+import AudioIcon from './AudioIcon';
+import VideoIcon from './VideoIcon';
+import PlayIcon from './PlayIcon';
+import CalendarIcon from './CalendarIcon';
+import HashIcon from './HashIcon';
 
 export {
   ActivityIcon,
@@ -36,4 +41,9 @@ export {
   PlusIcon,
   ImageIcon,
   StarIcon,
+  AudioIcon,
+  VideoIcon,
+  PlayIcon,
+  CalendarIcon,
+  HashIcon,
 };

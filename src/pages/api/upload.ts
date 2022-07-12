@@ -79,7 +79,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     const image = await prisma.image.create({
       data: {
         file: `${fileName}.${ext}`,
-        mimetype: file.mimetype,
+        mimetype: req.headers.uploadtext ? 'text/plain' : file.mimetype,
         userId: user.id,
         embed: !!req.headers.embed,
         format,

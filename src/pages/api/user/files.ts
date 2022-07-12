@@ -79,7 +79,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   
     // @ts-ignore
     images.map(image => image.url = `/r/${image.file}`);
-    if (req.query.filter && req.query.filter === 'media') images = images.filter(x => /^(video|audio|image)/.test(x.mimetype));
+    if (req.query.filter && req.query.filter === 'media') images = images.filter(x => /^(video|audio|image|text)/.test(x.mimetype));
   
     return res.json(req.query.paged ? chunk(images, 16) : images);
   }
