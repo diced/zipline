@@ -3,7 +3,7 @@ import { object, bool, string, number, boolean, array } from 'yup';
 
 const validator = object({
   core: object({
-    secure: bool().default(false),
+    https: bool().default(false),
     secret: string().min(8).required(),
     host: string().default('0.0.0.0'),
     port: number().default(3000),
@@ -32,7 +32,7 @@ const validator = object({
       project_id: string(),
       domain_id: string().default('default'),
       region_id: string().nullable(),
-    }).notRequired(),
+    }).nullable().notRequired(),
   }).required(),
   uploader: object({
     route: string().default('/u'),
@@ -50,6 +50,11 @@ const validator = object({
     user: number().default(0),
     admin: number().default(0),
   }),
+  meta: object({
+    description: string().nullable().notRequired(),
+    theme_color: string().nullable().notRequired(),
+    keywords: string().nullable().notRequired(),
+  }).notRequired(),
 });
 
 export default function validate(config): Config {

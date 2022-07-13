@@ -1,6 +1,6 @@
 export interface ConfigCore {
   // Whether to return http or https links
-  secure: boolean;
+  https: boolean;
 
   // Used for signing of cookies and other stuff
   secret: string;
@@ -105,10 +105,18 @@ export interface ConfigRatelimit {
   admin: number;
 }
 
+// Metadata for the site
+export interface ConfigMeta {
+  description: string;
+  theme_color: string;
+  keywords: string;
+}
+
 export interface Config {
   core: ConfigCore;
   uploader: ConfigUploader;
   urls: ConfigUrls;
   ratelimit: ConfigRatelimit;
   datasource: ConfigDatasource;
+  meta: ConfigMeta;
 }

@@ -2874,7 +2874,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dotenv@npm:16.0.1":
+"dot-prop@npm:^7.2.0":
+  version: 7.2.0
+  resolution: "dot-prop@npm:7.2.0"
+  dependencies:
+    type-fest: ^2.11.2
+  checksum: 08e4ff14f7305ffb5fda7e4c88f3cdbeb3cd97bd27efa4f47503869a2ee7f96938b4c21b0a2abf9c37d891a1bdb3994a09d219b0dcfd6130da4eaeb44c6f067e
+  languageName: node
+  linkType: hard
+
+"dotenv-expand@npm:^8.0.3":
+  version: 8.0.3
+  resolution: "dotenv-expand@npm:8.0.3"
+  checksum: 128ce90ac825b543de3ece0154a51b056ab0dc36bb26d97a68cd0b8707327ecd3c182fb6ac63b26a0fcdfa85064419906a1065cb634f1f9dc08ad311375f1fc0
+  languageName: node
+  linkType: hard
+
+"dotenv@npm:16.0.1, dotenv@npm:^16.0.1":
   version: 16.0.1
   resolution: "dotenv@npm:16.0.1"
   checksum: f459ffce07b977b7f15d8cc4ee69cdff77d4dd8c5dc8c85d2d485ee84655352c2415f9dd09d42b5b5985ced3be186130871b34e2f3e2569ebc72fbc2e8096792
@@ -7779,6 +7795,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"type-fest@npm:^2.11.2":
+  version: 2.16.0
+  resolution: "type-fest@npm:2.16.0"
+  checksum: 897fc5f6833de5ade5c4841d034bdfb6aaa168f24f725354ad13320b2a463b9df03a7a664b836b4c3bc7d9f92b22a25c26fe24668a35caf3b7a9ea5fcb847b8d
+  languageName: node
+  linkType: hard
+
 "type-is@npm:^1.6.4":
   version: 1.6.18
   resolution: "type-is@npm:1.6.18"
@@ -8236,6 +8259,9 @@ __metadata:
     babel-plugin-import: ^1.13.5
     colorette: ^2.0.19
     cookie: ^0.5.0
+    dot-prop: ^7.2.0
+    dotenv: ^16.0.1
+    dotenv-expand: ^8.0.3
     esbuild: ^0.14.44
     eslint: ^7.32.0
     eslint-config-next: 12.1.6

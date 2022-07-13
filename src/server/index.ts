@@ -4,7 +4,7 @@ import { NextServer, RequestHandler } from 'next/dist/server/next';
 import { Image, PrismaClient } from '@prisma/client';
 import { createServer, IncomingMessage, OutgoingMessage, ServerResponse } from 'http';
 import { extname } from 'path';
-import { mkdir } from 'fs/promises';
+import { mkdir, readFile } from 'fs/promises';
 import { getStats, log, migrations } from './util';
 import Logger from '../lib/logger';
 import mimes from '../lib/mimes';
@@ -34,7 +34,8 @@ async function start() {
     logger.error('Running Zipline as is, without a randomized secret is not recommended and leaves your instance at risk!');
     logger.error('Please change your secret in the config file or environment variables.');
     logger.error('The config file is located at `config.toml`, or if using docker-compose you can change the variables in the `docker-compose.yml` file.');
-    logger.error('It is recomended to use a secret that is alphanumeric and randomized. A way you can generate this is through a password manager you may have.');
+    logger.error('It is recomended to use a secret that is alphanumeric and randomized.');
+    logger.error('A way you can generate this is through a password manager you may have.');
     process.exit(1);
   };
 
