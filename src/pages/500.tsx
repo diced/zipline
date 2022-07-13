@@ -21,3 +21,5 @@ export default function FiveHundred() {
     </Stack>
   );
 }
+
+FiveHundred.title = 'Zipline - 500';

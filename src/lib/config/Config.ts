@@ -105,18 +105,10 @@ export interface ConfigRatelimit {
   admin: number;
 }
 
-// Metadata for the site
-export interface ConfigMeta {
-  description: string;
-  theme_color: string;
-  keywords: string;
-}
-
 export interface Config {
   core: ConfigCore;
   uploader: ConfigUploader;
   urls: ConfigUrls;
   ratelimit: ConfigRatelimit;
   datasource: ConfigDatasource;
-  meta: ConfigMeta;
 }

@@ -50,11 +50,6 @@ const validator = object({
     user: number().default(0),
     admin: number().default(0),
   }),
-  meta: object({
-    description: string().nullable().notRequired(),
-    theme_color: string().nullable().notRequired(),
-    keywords: string().nullable().notRequired(),
-  }).notRequired(),
 });
 
 export default function validate(config): Config {

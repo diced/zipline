@@ -21,3 +21,5 @@ export default function FourOhFour() {
     </Stack>
   );
 }
+
+FourOhFour.title = 'Zipline - 404';

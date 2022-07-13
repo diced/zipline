@@ -80,10 +80,6 @@ export default function readConfig() {
 
     map('RATELIMIT_USER', 'number', 'ratelimit.user'),
     map('RATELIMIT_ADMIN', 'number', 'ratelimit.admin'),
-
-    map('META_DESCRITPION', 'string', 'meta.description'),
-    map('META_KEYWORDS', 'string', 'meta.keywords'),
-    map('META_THEME_COLOR', 'string', 'meta.theme_color'),
   ];
 
   const config = {};
