@@ -23,21 +23,12 @@ services:
       - '3000:3000'
     restart: unless-stopped
     environment:
-      - SECURE=false
-      - SECRET=changethis
-      - HOST=0.0.0.0
-      - PORT=3000
-      - DATASOURCE_TYPE=local
-      - DATASOURCE_LOCAL_DIRECTORY=./uploads
-      - DATABASE_URL=postgresql://postgres:postgres@postgres/postgres/
-      - UPLOADER_ROUTE=/u
-      - UPLOADER_EMBED_ROUTE=/a
-      - UPLOADER_LENGTH=6
-      - UPLOADER_ADMIN_LIMIT=104900000
-      - UPLOADER_USER_LIMIT=104900000
-      - UPLOADER_DISABLED_EXTS=
-      - URLS_ROUTE=/go
-      - URLS_LENGTH=6
+      - CORE_HTTPS=false
+      - CORE_SECRET=changethis
+      - CORE_HOST=0.0.0.0
+      - CORE_PORT=3000
+      - CORE_DATABASE_URL=postgres://postgres:postgres@postgres/postgres
+      - CORE_LOGGER=true
     volumes:
       - '$PWD/uploads:/zipline/uploads'
       - '$PWD/public:/zipline/public'

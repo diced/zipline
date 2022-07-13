@@ -1,8 +1,9 @@
-name: 'Push Docker Images'
+name: 'Push Release Docker Images'
 
 on:
   push:
-    branches: [ trunk ]
+    tags: 
+      - 'v*.*.*'
     paths:
       - 'src/**'
       - 'server/**'
@@ -13,11 +14,17 @@ on:
 
 jobs:
   push_to_ghcr:
-    name: Push Image to GitHub Packages
+    name: Push Release Image to GitHub Packages
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
+
+      - name: Get version
+        uses: sergeysova/jq-action@v2
+        id: version
+        with:
+          cmd: 'jq .version package.json -r'
 
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v1
@@ -39,4 +46,5 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           tags: |
-            ghcr.io/diced/zipline:trunk
+            ghcr.io/diced/zipline:latest
+            ghcr.io/diced/zipline:${{ steps.version.outputs.value }}

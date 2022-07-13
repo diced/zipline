@@ -1,4 +1,4 @@
-name: 'CI: Build'
+name: 'Build'
 
 on:
   push:
@@ -22,12 +22,11 @@ jobs:
           path: node_modules
           key: ${{ runner.os }}-node${{ matrix.node }}-${{ hashFiles('**/yarn.lock') }}
 
-      - name: Create mock config
-        run: echo -e "[core]\nsecret = '12345678'\ndatabase_url = 'postgres://postgres:postgres@postgres/postgres'\n[uploader]\nroute = '/u'\ndirectory = './uploads'\n[urls]\nroute = '/go'" > config.toml
-
       - name: Install dependencies
         if: steps.cache-restore.outputs.cache-hit != 'true'
         run: yarn install
 
       - name: Build
         run: yarn build
+        env:
+          ZIPLINE_DOCKER_BUILD: true
