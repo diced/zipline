@@ -21,6 +21,7 @@ model User {
   domains       String[]
   images        Image[]
   urls          Url[]
+  Invite        Invite[]
 }
 
 enum ImageFormat {
@@ -74,4 +75,15 @@ model Stats {
   id         Int      @id @default(autoincrement())
   created_at DateTime @default(now())
   data       Json
+}
+
+model Invite {
+  id         Int      @id @default(autoincrement())
+  code       String   @unique
+  created_at DateTime @default(now())
+  expires_at DateTime?
+  used       Boolean  @default(false)
+
+  createdBy   User @relation(fields: [createdById], references: [id])
+  createdById Int
 }

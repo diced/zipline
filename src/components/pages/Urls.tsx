@@ -155,10 +155,8 @@ export default function Urls() {
               </Group>
             </Group>
           </Card>
-        )) : [1,2,3,4,5,6,7].map(x => (
-          <div key={x}>
-            <Skeleton width='100%' height={60} sx={{ borderRadius: 1 }}/>
-          </div>
+        )) : [1, 2, 3, 4].map(x => (
+          <Skeleton key={x} width='100%' height={80} radius='sm' />
         ))}
       </SimpleGrid>
     </>

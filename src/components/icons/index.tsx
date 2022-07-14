@@ -21,6 +21,7 @@ import VideoIcon from './VideoIcon';
 import PlayIcon from './PlayIcon';
 import CalendarIcon from './CalendarIcon';
 import HashIcon from './HashIcon';
+import TagIcon from './TagIcon';
 
 export {
   ActivityIcon,
@@ -46,4 +47,5 @@ export {
   PlayIcon,
   CalendarIcon,
   HashIcon,
+  TagIcon,
 };

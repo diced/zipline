@@ -8,7 +8,7 @@ import { useStoreDispatch } from 'lib/redux/store';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
-import { ActivityIcon, CheckIcon, CopyIcon, CrossIcon, DeleteIcon, FileIcon, HomeIcon, LinkIcon, LogoutIcon, PencilIcon, SettingsIcon, TypeIcon, UploadIcon, UserIcon } from './icons';
+import { ActivityIcon, CheckIcon, CopyIcon, CrossIcon, DeleteIcon, FileIcon, HomeIcon, LinkIcon, LogoutIcon, PencilIcon, SettingsIcon, TagIcon, TypeIcon, UploadIcon, UserIcon } from './icons';
 import { friendlyThemeName, themes } from './Theming';
 
 function MenuItemLink(props) {
@@ -225,29 +225,54 @@ export default function Layout({ children, user }) {
               </Link>
             ))}
             {user.administrator && (
-              <Link href='/dashboard/users' passHref>
-                <UnstyledButton
-                  sx={{ 
-                    display: 'block',
-                    width: '100%',
-                    padding: theme.spacing.xs,
-                    borderRadius: theme.radius.sm,
-                    color: theme.colorScheme === 'dark' ? theme.colors.dark[0] : theme.black,
-              
-                    '&:hover': {
-                      backgroundColor: theme.other.hover,
-                    },
-                  }}
-                >
-                  <Group>
-                    <ThemeIcon color='primary' variant='filled'>
-                      <UserIcon />
-                    </ThemeIcon>
+              <>
+                <Link href='/dashboard/users' passHref>
+                  <UnstyledButton
+                    sx={{ 
+                      display: 'block',
+                      width: '100%',
+                      padding: theme.spacing.xs,
+                      borderRadius: theme.radius.sm,
+                      color: theme.colorScheme === 'dark' ? theme.colors.dark[0] : theme.black,
+                
+                      '&:hover': {
+                        backgroundColor: theme.other.hover,
+                      },
+                    }}
+                  >
+                    <Group>
+                      <ThemeIcon color='primary' variant='filled'>
+                        <UserIcon />
+                      </ThemeIcon>
 
-                    <Text size='lg'>Users</Text>
-                  </Group>
-                </UnstyledButton>
-              </Link>
+                      <Text size='lg'>Users</Text>
+                    </Group>
+                  </UnstyledButton>
+                </Link>
+                <Link href='/dashboard/invites' passHref>
+                  <UnstyledButton
+                    sx={{ 
+                      display: 'block',
+                      width: '100%',
+                      padding: theme.spacing.xs,
+                      borderRadius: theme.radius.sm,
+                      color: theme.colorScheme === 'dark' ? theme.colors.dark[0] : theme.black,
+                
+                      '&:hover': {
+                        backgroundColor: theme.other.hover,
+                      },
+                    }}
+                  >
+                    <Group>
+                      <ThemeIcon color='primary' variant='filled'>
+                        <TagIcon />
+                      </ThemeIcon>
+
+                      <Text size='lg'>Invites</Text>
+                    </Group>
+                  </UnstyledButton>
+                </Link>
+              </>
             )}
           </Navbar.Section>
         </Navbar>

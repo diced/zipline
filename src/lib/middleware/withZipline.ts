@@ -36,7 +36,7 @@ export type NextApiRes = NextApiResponse & {
   error: (message: string) => void;
   forbid: (message: string, extra?: any) => void;
   bad: (message: string) => void;
-  json: (json: Record<string, any>) => void;
+  json: (json: Record<string, any>, status?: number) => void;
   ratelimited: (remaining: number) => void;
   setCookie: (name: string, value: unknown, options: CookieSerializeOptions) => void;
 }
@@ -50,23 +50,20 @@ export const withZipline = (handler: (req: NextApiRequest, res: NextApiResponse)
   res.error = (message: string) => {
     res.json({
       error: message,
-    });
+    }, 500);
   };
 
   res.forbid = (message: string, extra: any = {}) => {
-    res.setHeader('Content-Type', 'application/json');
-    res.status(403);
     res.json({
       error: '403: ' + message,
       ...extra,
-    });
+    }, 403);
   };
 
   res.bad = (message: string) => {
-    res.status(401);
     res.json({
-      error: '403: ' + message,
-    });
+      error: '401: ' + message,
+    }, 401);
   };
 
   res.ratelimited = (remaining: number) => {
@@ -77,7 +74,9 @@ export const withZipline = (handler: (req: NextApiRequest, res: NextApiResponse)
     });
   };
 
-  res.json = (json: any) => {
+  res.json = (json: any, status: number = 200) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.status(status);
     res.end(JSON.stringify(json));
   };
 

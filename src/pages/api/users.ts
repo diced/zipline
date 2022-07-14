@@ -4,6 +4,21 @@ import Logger from 'lib/logger';
 import datasource from 'lib/datasource';
 
 async function handler(req: NextApiReq, res: NextApiRes) {
+  if (req.method === 'POST' && req.body && req.body.code) {
+    const { code, username } = req.body as { code: string; username: string };
+    const invite = await prisma.invite.findUnique({
+      where: { code },
+    });
+    if (!invite) return res.bad('invalid invite code');
+    
+    const user = await prisma.user.findFirst({
+      where: { username },
+    });
+
+    if (user) return res.bad('username already exists');
+    return res.json({ success: true });
+  }
+
   const user = await req.user();
   if (!user) return res.forbid('not logged in');
   if (!user.administrator) return res.forbid('you aren\'t an administrator');

@@ -145,8 +145,8 @@ export default function Users() {
   return (
     <>
       <CreateUserModal open={open} setOpen={setOpen} updateUsers={updateUsers} />
-      <Group>
-        <Title sx={{ marginBottom: 12 }}>Users</Title>
+      <Group mb='md'>
+        <Title>Users</Title>
         <ActionIcon variant='filled' color='primary' onClick={() => setOpen(true)}><PlusIcon /></ActionIcon>
       </Group>
       <SimpleGrid
@@ -170,10 +170,8 @@ export default function Users() {
               </Group>
             </Group>
           </Card>
-        )) : [1, 2, 3, 4].map(x => (
-          <div key={x}>
-            <Skeleton width='100%' height={220} sx={{ borderRadius: 1 }} />
-          </div>
+        )) : [1, 2, 3].map(x => (
+          <Skeleton key={x} width='100%' height={100} radius='sm' />
         ))}
       </SimpleGrid>
     </>
