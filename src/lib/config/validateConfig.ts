@@ -50,6 +50,10 @@ const validator = object({
     user: number().default(0),
     admin: number().default(0),
   }),
+  website: object({
+    title: string().default('Zipliner'),
+    show_files_per_user: boolean().default(true),
+  }),
 });
 
 export default function validate(config): Config {

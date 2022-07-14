@@ -33,7 +33,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
   Logger.get('url').info(`User ${user.username} (${user.id}) shortenned a url ${url.destination} (${url.id})`); 
 
-  return res.json({ url: `${zconfig.core.secure ? 'https' : 'http'}://${req.headers.host}${zconfig.urls.route}/${req.body.vanity ? req.body.vanity : invis ? invis.invis : url.id}` });
+  return res.json({ url: `${zconfig.core.https ? 'https' : 'http'}://${req.headers.host}${zconfig.urls.route}/${req.body.vanity ? req.body.vanity : invis ? invis.invis : url.id}` });
 }
 
 export default withZipline(handler);

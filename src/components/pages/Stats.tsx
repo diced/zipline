@@ -43,14 +43,16 @@ export default function Stats() {
         </Card>
       </SimpleGrid>
 
-      <Card name='Files per User' mt={22}>
-        <SmallTable
-          columns={[
-            { id: 'username', name: 'Name' },
-            { id: 'count', name: 'Files' },
-          ]}
-          rows={stats ? stats.count_by_user : []} />
-      </Card>
+      {stats.count_by_user.length ? (
+        <Card name='Files per User' mt={22}>
+          <SmallTable
+            columns={[
+              { id: 'username', name: 'Name' },
+              { id: 'count', name: 'Files' },
+            ]}
+            rows={stats ? stats.count_by_user : []} />
+        </Card>
+      ) : null}
       <Card name='Types' mt={22}>
         <SmallTable
           columns={[

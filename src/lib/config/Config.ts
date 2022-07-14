@@ -105,10 +105,18 @@ export interface ConfigRatelimit {
   admin: number;
 }
 
+export interface ConfigWebsite {
+  // Change the title from Zipline to something else
+  title: string;
+  // If zipline should show files per user in the stats page
+  show_files_per_user: boolean;
+}
+
 export interface Config {
   core: ConfigCore;
   uploader: ConfigUploader;
   urls: ConfigUrls;
   ratelimit: ConfigRatelimit;
   datasource: ConfigDatasource;
+  website: ConfigWebsite;
 }

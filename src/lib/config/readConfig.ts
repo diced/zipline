@@ -80,6 +80,9 @@ export default function readConfig() {
 
     map('RATELIMIT_USER', 'number', 'ratelimit.user'),
     map('RATELIMIT_ADMIN', 'number', 'ratelimit.admin'),
+
+    map('WEBSITE_TITLE', 'string', 'website.title'),
+    map('WEBSITE_SHOW_FILES_PER_USER', 'boolean', 'website.show_files_per_user'),
   ];
 
   const config = {};
