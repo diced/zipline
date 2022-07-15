@@ -1,6 +1,5 @@
 import { Migrate } from '@prisma/migrate/dist/Migrate';
 import { ensureDatabaseExists } from '@prisma/migrate/dist/utils/ensureDatabaseExists';
-import {prisma} from '../../package.json';
 import {executeSeedCommand} from '@prisma/migrate/dist/utils/seed';
 import Logger from '../lib/logger';
 import { Datasource } from 'lib/datasources';
@@ -18,7 +17,7 @@ export async function migrations() {
     try {
       Logger.get('database').info('migrating database');
       await migrate.applyMigrations();
-      await executeSeedCommand(prisma.seed);
+      await executeSeedCommand('ts-node-esm --compiler-options {"module":"CommonJS"} --transpile-only prisma/seed.ts');
     } finally {
       migrate.stop();
       Logger.get('database').info('finished migrating database');
