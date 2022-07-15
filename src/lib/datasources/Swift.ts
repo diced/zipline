@@ -139,6 +139,7 @@ class SwiftContainer {
       body: data,
     });
   }
+
   public async deleteObject(name: string): Promise<any> {
     const auth = await this.authenticate();
 
@@ -147,14 +148,25 @@ class SwiftContainer {
       headers: this.generateHeaders(auth.token),
     });
   }
+
   public async getObject(name: string): Promise<Readable> {
     const auth = await this.authenticate();
+
     const arrayBuffer = await fetch(`${auth.swiftURL}/${this.options.credentials.container}/${name}`, {
       method: 'GET',
       headers: this.generateHeaders(auth.token, { Accept: '*/*' }),
     }).then((e) => e.arrayBuffer());
 
     return Readable.from(Buffer.from(arrayBuffer));
+  }
+
+  public async headObject(name: string): Promise<any> {
+    const auth = await this.authenticate();
+
+    return fetch(`${auth.swiftURL}/${this.options.credentials.container}/${name}`, {
+      method: 'HEAD',
+      headers: this.generateHeaders(auth.token),
+    });
   }
 }
 
@@ -164,6 +176,7 @@ export class Swift extends Datasource {
 
   public constructor(public config: ConfigSwiftDatasource) {
     super();
+    console.log(config);
     this.container = new SwiftContainer({
       auth_endpoint_url: config.auth_endpoint,
       credentials: {
@@ -201,7 +214,17 @@ export class Swift extends Datasource {
     }
   }
 
-  public async size(): Promise<number> {
+  public async size(file: string): Promise<number> {
+    try {
+      const head = await this.container.headObject(file);
+      
+      return head.headers.get('content-length') || 0;
+    } catch {
+      return 0;
+    }
+  }
+
+  public async fullSize(): Promise<number> {
     return this.container
       .listObjects()
       .then((objects) => objects.reduce((acc, object) => acc + object.bytes, 0))

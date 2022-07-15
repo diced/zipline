@@ -29,7 +29,13 @@ export class Local extends Datasource {
     }
   }
 
-  public async size(): Promise<number> {
+  public async size(file: string): Promise<number> {
+    const stats = await stat(join(process.cwd(), this.path, file));
+    
+    return stats.size;
+  }
+
+  public async fullSize(): Promise<number> {
     const files = await readdir(this.path);
   
     let size = 0;

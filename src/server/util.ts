@@ -44,7 +44,7 @@ export function bytesToRead(bytes: number) {
 
 
 export async function getStats(prisma: PrismaClient, datasource: Datasource) {
-  const size = await datasource.size();
+  const size = await datasource.fullSize();
   const byUser = await prisma.image.groupBy({
     by: ['userId'],
     _count: {

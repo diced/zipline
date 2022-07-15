@@ -22,6 +22,7 @@ start();
 
 async function start() {
   const c = await import('../lib/config.js');
+  // @ts-ignore
   config = c.default.default;
 
   const d = await import('../lib/datasource.js');
@@ -134,7 +135,10 @@ async function rawFile(
   const data = await datasource.get(id);
   if (!data) return nextServer.render404(req, res as ServerResponse);
   const mimetype = mimes[extname(id)] ?? 'application/octet-stream';
+  const size = await datasource.size(id);
+
   res.setHeader('Content-Type', mimetype);
+  res.setHeader('Content-Length', size);
 
   data.pipe(res);
   data.on('error', () => nextServer.render404(req, res as ServerResponse));
@@ -151,7 +155,11 @@ async function rawFileDb(
   const data = await datasource.get(image.file);
   if (!data) return nextServer.render404(req, res as ServerResponse);
 
+  const size = await datasource.size(image.file);
+
   res.setHeader('Content-Type', image.mimetype);
+  res.setHeader('Content-Length', size);
+
   data.pipe(res);
   data.on('error', () => nextServer.render404(req, res as ServerResponse));
   data.on('end', () => res.end());
@@ -176,7 +184,10 @@ async function fileDb(
   const data = await datasource.get(image.file);
   if (!data) return this.nextServer.render404(req, res as ServerResponse);
 
+  const size = await datasource.size(image.file);
+
   res.setHeader('Content-Type', image.mimetype);
+  res.setHeader('Content-Length', size);
   data.pipe(res);
   data.on('error', () => nextServer.render404(req, res as ServerResponse));
   data.on('end', () => res.end());
