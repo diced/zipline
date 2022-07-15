@@ -18,6 +18,7 @@ export default function StatsPage({ title }) {
       </Head>
       <Layout
         user={user}
+        title={title}
       >
         <Stats />
       </Layout>

@@ -9,8 +9,9 @@ import { CrossIcon, UserIcon } from 'components/icons';
 import { useStoreDispatch } from 'lib/redux/store';
 import { updateUser } from 'lib/redux/reducers/user';
 import { useRouter } from 'next/router';
+import Head from 'next/head';
 
-export default function Invite({ code }) {
+export default function Invite({ code, title }) {
   const [active, setActive] = useState(0);
   const [username, setUsername] = useState('');
   const [usernameError, setUsernameError] = useState('');
@@ -79,6 +80,9 @@ export default function Invite({ code }) {
 
   return (
     <>
+      <Head>
+        <title>{title} - Invite ({code})</title>
+      </Head>
       <Center sx={{ height: '100vh' }}>
         <Card>
           <Stepper active={active} onStepClick={setActive} breakpoint='sm'>
@@ -91,7 +95,6 @@ export default function Invite({ code }) {
                 onBlur={() => checkUsername()}
               />
               <Group position='center' mt='xl'>
-                {/* <Button variant='default' onClick={prevStep}>Back</Button> */}
                 <Button disabled={usernameError !== '' || username == ''} onClick={nextStep}>Continue</Button>
               </Group>
             </Stepper.Step>
@@ -150,5 +153,10 @@ export const getServerSideProps: GetServerSideProps = async context => {
     return { notFound: true };
   };
 
-  return { props: { code: invite.code } };
+  return {
+    props: {
+      code: invite.code,
+      title: global.config.website.title,
+    },
+  };
 };

@@ -51,7 +51,7 @@ const validator = object({
     admin: number().default(0),
   }),
   website: object({
-    title: string().default('Zipliner'),
+    title: string().default('Zipline'),
     show_files_per_user: boolean().default(true),
   }),
 });

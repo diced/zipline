@@ -18,6 +18,7 @@ export default function UploadPage({ title }) {
       </Head>
       <Layout
         user={user}
+        title={title}
       >
         <Upload/>
       </Layout>

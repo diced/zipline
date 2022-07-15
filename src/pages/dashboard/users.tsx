@@ -18,6 +18,7 @@ export default function UsersPage({ title }) {
       </Head>
       <Layout
         user={user}
+        title={title}
       >
         <Users />
       </Layout>

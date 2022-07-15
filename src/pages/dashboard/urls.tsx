@@ -18,6 +18,7 @@ export default function UrlsPage({ title }) {
       </Head>
       <Layout
         user={user}
+        title={title}
       >
         <Urls />
       </Layout>

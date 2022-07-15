@@ -95,7 +95,7 @@ const items = [
   },
 ];
 
-export default function Layout({ children, user }) {
+export default function Layout({ children, user, title }) {
   const [token, setToken] = useState(user?.token);
   const [systemTheme, setSystemTheme] = useState(user.systemTheme ?? 'system');
   const [opened, setOpened] = useState(false); // navigation open
@@ -288,7 +288,7 @@ export default function Layout({ children, user }) {
                 color={theme.colors.gray[6]}
               />
             </MediaQuery>
-            <Title sx={{ marginLeft: 12 }}>Zipline</Title>
+            <Title ml='md'>{title}</Title>
             <Box sx={{ marginLeft: 'auto', marginRight: 0 }}>
               <Popover
                 position='top'

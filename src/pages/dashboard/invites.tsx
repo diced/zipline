@@ -18,6 +18,7 @@ export default function InvitesPage({ title }) {
       </Head>
       <Layout
         user={user}
+        title={title}
       >
         <Invites />
       </Layout>

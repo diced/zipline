@@ -18,6 +18,7 @@ export default function DashboardPage({ title, meta }) {
       </Head>
       <Layout
         user={user}
+        title={title}
       >
         <Dashboard />
       </Layout>

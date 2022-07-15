@@ -19,6 +19,7 @@ export default function FilesPage({ title }) {
 
       <Layout
         user={user}
+        title={title}
       >
         <Files />
       </Layout>

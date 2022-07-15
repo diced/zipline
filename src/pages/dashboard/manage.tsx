@@ -18,6 +18,7 @@ export default function ManagePage({ title }) {
       </Head>
       <Layout
         user={user}
+        title={title}
       >
         <Manage />
       </Layout>
