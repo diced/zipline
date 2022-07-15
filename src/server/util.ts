@@ -17,7 +17,7 @@ export async function migrations() {
     try {
       Logger.get('database').info('migrating database');
       await migrate.applyMigrations();
-      await migrator.tryToRunGenerate();
+      await migrate.tryToRunGenerate();
       await executeSeedCommand('ts-node-esm --compiler-options {"module":"CommonJS"} --transpile-only prisma/seed.ts');
     } finally {
       migrate.stop();
