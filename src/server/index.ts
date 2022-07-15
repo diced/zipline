@@ -4,10 +4,10 @@ import { NextServer, RequestHandler } from 'next/dist/server/next';
 import { Image, PrismaClient } from '@prisma/client';
 import { createServer, IncomingMessage, OutgoingMessage, ServerResponse } from 'http';
 import { extname } from 'path';
-import { mkdir, readFile } from 'fs/promises';
+import { mkdir } from 'fs/promises';
 import { getStats, log, migrations } from './util';
 import Logger from '../lib/logger';
-import mimes from '../lib/mimes';
+import { guess } from '../lib/mimes';
 import exts from '../lib/exts';
 import { version } from '../../package.json';
 import type { Config } from 'lib/config/Config';
@@ -134,7 +134,7 @@ async function rawFile(
 ) {
   const data = await datasource.get(id);
   if (!data) return nextServer.render404(req, res as ServerResponse);
-  const mimetype = mimes[extname(id)] ?? 'application/octet-stream';
+  const mimetype = await guess(extname(id));
   const size = await datasource.size(id);
 
   res.setHeader('Content-Type', mimetype);
