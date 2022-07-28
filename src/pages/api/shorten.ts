@@ -20,6 +20,17 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   const rand = randomChars(zconfig.urls.length);
 
   let invis;
+
+  if (req.body.vanity) {
+    const existing = await prisma.url.findFirst({
+      where: {
+        vanity: req.body.vanity,
+      },
+    });
+
+    if (existing) return res.error('vanity already exists');
+  }
+
   const url = await prisma.url.create({
     data: {
       id: rand,
