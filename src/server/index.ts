@@ -6,30 +6,20 @@ import { createServer, IncomingMessage, OutgoingMessage, ServerResponse } from '
 import { extname } from 'path';
 import { mkdir } from 'fs/promises';
 import { getStats, log, migrations } from './util';
-import Logger from '../lib/logger';
-import { guess } from '../lib/mimes';
-import exts from '../lib/exts';
+import Logger from 'lib/logger';
+import { guess } from 'lib/mimes';
+import exts from 'lib/exts';
 import { version } from '../../package.json';
-import type { Config } from 'lib/config/Config';
-import type { Datasource } from 'lib/datasources';
+import config from 'lib/config';
+import datasource from 'lib/datasource';
 
 const dev = process.env.NODE_ENV === 'development';
-let config: Config, datasource: Datasource;
 
 const logger = Logger.get('server');
-logger.info(`starting ${process.env.NODE_ENV || 'production'} zipline@${version} server`);
 
 start();
 
 async function start() {
-  const c = await import('../lib/config.js');
-  // @ts-ignore
-  config = c.default.default;
-
-  const d = await import('../lib/datasource.js');
-  // @ts-ignore
-  datasource = d.default.default;
-
   // annoy user if they didnt change secret from default "changethis"
   if (config.core.secret === 'changethis') {
     logger.error('Secret is not set!');
@@ -121,6 +111,8 @@ async function start() {
   });
 
   http.listen(config.core.port, config.core.host ?? '0.0.0.0');
+  
+  logger.info(`started ${dev ? 'development' : 'production'} zipline@${version} server`);
 
   stats(prisma);
 }

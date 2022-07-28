@@ -3,13 +3,12 @@
   "version": "3.4.8",
   "license": "MIT",
   "scripts": {
-    "dev": "node esbuild.config.js && REACT_EDITOR=code NODE_ENV=development node --enable-source-maps dist/server",
-    "build": "npm-run-all build:server build:schema build:next",
-    "build:server": "node esbuild.config.js",
+    "dev": "REACT_EDITOR=code NODE_ENV=development tsx src/server",
+    "build": "npm-run-all build:schema build:next",
     "build:next": "next build",
     "build:schema": "prisma generate --schema=prisma/schema.prisma",
     "migrate:dev": "prisma migrate dev --create-only",
-    "start": "node dist/server",
+    "start": "tsx src/server",
     "lint": "next lint",
     "docker:run": "docker-compose up -d",
     "docker:down": "docker-compose down",
@@ -63,6 +62,7 @@
     "eslint-config-next": "12.1.6",
     "npm-run-all": "^4.1.5",
     "ts-node": "^10.8.1",
+    "tsx": "^3.8.0",
     "typescript": "^4.7.3"
   },
   "repository": {
