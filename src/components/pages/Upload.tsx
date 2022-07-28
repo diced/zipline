@@ -1,6 +1,6 @@
 import { Button, Collapse, Group, Progress, Title } from '@mantine/core';
 import { randomId, useClipboard } from '@mantine/hooks';
-import { useNotifications } from '@mantine/notifications';
+import { showNotification, updateNotification } from '@mantine/notifications';
 import Dropzone from 'components/dropzone/Dropzone';
 import FileDropzone from 'components/dropzone/DropzoneFile';
 import { CrossIcon, UploadIcon } from 'components/icons';
@@ -9,7 +9,6 @@ import { useStoreSelector } from 'lib/redux/store';
 import { useEffect, useState } from 'react';
 
 export default function Upload() {
-  const notif = useNotifications();
   const clipboard = useClipboard();
   const user = useStoreSelector(state => state.user);
 
@@ -22,7 +21,7 @@ export default function Upload() {
       const item = Array.from(e.clipboardData.items).find(x => /^image/.test(x.type));
       const file = item.getAsFile();
       setFiles([...files, file]);
-      notif.showNotification({
+      showNotification({
         title: 'Image imported from clipboard',
         message: '',
       });
@@ -35,7 +34,8 @@ export default function Upload() {
     const body = new FormData();
     for (let i = 0; i !== files.length; ++i) body.append('file', files[i]);
 
-    const id = notif.showNotification({
+    showNotification({
+      id: 'upload',
       title: 'Uploading Images...',
       message: '',
       loading: true,
@@ -55,7 +55,8 @@ export default function Upload() {
       setLoading(false);
 
       if (json.error === undefined) {
-        notif.updateNotification(id, {
+        updateNotification({
+          id: 'upload',
           title: 'Upload Successful',
           message: <>Copied first image to clipboard! <br />{json.files.map(x => (<Link key={x} href={x}>{x}<br /></Link>))}</>,
           color: 'green',
@@ -64,7 +65,8 @@ export default function Upload() {
         clipboard.copy(json.files[0]);
         setFiles([]);
       } else {
-        notif.updateNotification(id, {
+        updateNotification({
+          id: 'upload',
           title: 'Upload Failed',
           message: json.error,
           color: 'red',
@@ -82,10 +84,10 @@ export default function Upload() {
   return (
     <>
       <Title mb='md'>Upload Files</Title>
-      
+
       <Dropzone loading={loading} onDrop={(f) => setFiles([...files, ...f])}>
         <Group position='center' spacing='md'>
-          {files.map(file => (<FileDropzone key={randomId()} file={file} />))}
+          {files.map(file => (<FileDropzone  key={randomId()} file={file} />))}
         </Group>
       </Dropzone>
 

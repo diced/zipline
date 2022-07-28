@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Button, Card, Center, Group, PasswordInput, Stepper, TextInput } from '@mantine/core';
 import useFetch from 'hooks/useFetch';
 import PasswordStrength from 'components/PasswordStrength';
-import { useNotifications } from '@mantine/notifications';
+import { showNotification } from '@mantine/notifications';
 import { CrossIcon, UserIcon } from 'components/icons';
 import { useStoreDispatch } from 'lib/redux/store';
 import { updateUser } from 'lib/redux/reducers/user';
@@ -20,7 +20,6 @@ export default function Invite({ code, title }) {
   const [verifyPasswordError, setVerifyPasswordError] = useState('');
   const [strength, setStrength] = useState(0);
 
-  const notif = useNotifications();
   const dispatch = useStoreDispatch();
   const router = useRouter();
 
@@ -53,14 +52,14 @@ export default function Invite({ code, title }) {
   const createUser = async () => {
     const res = await useFetch('/api/auth/create', 'POST', { code, username, password });
     if (res.error) {
-      notif.showNotification({
+      showNotification({
         title: 'Error while creating user',
         message: res.error,
         color: 'red',
         icon: <CrossIcon />,
       });
     } else {
-      notif.showNotification({
+      showNotification({
         title: 'User created',
         message: 'You will be logged in shortly...',
         color: 'green',
@@ -74,7 +73,7 @@ export default function Invite({ code, title }) {
       });
 
       router.push('/dashboard');
-            
+
     }
   };
 

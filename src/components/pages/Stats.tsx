@@ -43,7 +43,7 @@ export default function Stats() {
         </Card>
       </SimpleGrid>
 
-      {stats.count_by_user.length ? (
+      {stats && stats.count_by_user.length ? (
         <Card name='Files per User' mt={22}>
           <SmallTable
             columns={[

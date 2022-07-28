@@ -1,6 +1,6 @@
-import { Button, Card, Grid, Group, Image as MImage, Modal, Stack, Text, Title, useMantineTheme } from '@mantine/core';
+import { Button, Card, Group, Modal, Stack, Text, Title, useMantineTheme } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
-import { useNotifications } from '@mantine/notifications';
+import { showNotification } from '@mantine/notifications';
 import useFetch from 'hooks/useFetch';
 import { useState } from 'react';
 import Type from './Type';
@@ -21,7 +21,6 @@ export function FileMeta({ Icon, title, subtitle }) {
 
 export default function File({ image, updateImages }) {
   const [open, setOpen] = useState(false);
-  const notif = useNotifications();
   const clipboard = useClipboard();
   const theme = useMantineTheme();
 
@@ -29,14 +28,14 @@ export default function File({ image, updateImages }) {
     const res = await useFetch('/api/user/files', 'DELETE', { id: image.id });
     if (!res.error) {
       updateImages(true);
-      notif.showNotification({
+      showNotification({
         title: 'File Deleted',
         message: '',
         color: 'green',
         icon: <DeleteIcon />,
       });
     } else {
-      notif.showNotification({
+      showNotification({
         title: 'Failed to delete file',
         message: res.error,
         color: 'red',
@@ -50,7 +49,7 @@ export default function File({ image, updateImages }) {
   const handleCopy = () => {
     clipboard.copy(`${window.location.protocol}//${window.location.host}${image.url}`);
     setOpen(false);
-    notif.showNotification({
+    showNotification({
       title: 'Copied to clipboard',
       message: '',
       icon: <CopyIcon />,
@@ -60,7 +59,7 @@ export default function File({ image, updateImages }) {
   const handleFavorite = async () => {
     const data = await useFetch('/api/user/files', 'PATCH', { id: image.id, favorite: !image.favorite });
     if (!data.error) updateImages(true);
-    notif.showNotification({
+    showNotification({
       title: 'Image is now ' + (!image.favorite ? 'favorited' : 'unfavorited'),
       message: '',
       icon: <StarIcon />,
@@ -75,8 +74,6 @@ export default function File({ image, updateImages }) {
         onClose={() => setOpen(false)}
         title={<Title>{image.file}</Title>}
         size='xl'
-        overlayBlur={3}
-        overlayColor={theme.colorScheme === 'dark' ? theme.colors.dark[6] : 'white'}
       >
         <Stack>
           <Type

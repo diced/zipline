@@ -13,10 +13,11 @@ import { version } from '../../package.json';
 import type { Config } from 'lib/config/Config';
 import type { Datasource } from 'lib/datasources';
 
+const dev = process.env.NODE_ENV === 'development';
 let config: Config, datasource: Datasource;
 
 const logger = Logger.get('server');
-logger.info(`starting zipline@${version} server`);
+logger.info(`starting ${process.env.NODE_ENV || 'production'} zipline@${version} server`);
 
 start();
 
@@ -39,8 +40,6 @@ async function start() {
     logger.error('A way you can generate this is through a password manager you may have.');
     process.exit(1);
   };
-
-  const dev = process.env.NODE_ENV === 'development';
 
   process.env.DATABASE_URL = config.core.database_url;
   await migrations();

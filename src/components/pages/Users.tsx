@@ -1,8 +1,9 @@
-import { ActionIcon, Avatar, Button, Card, Group, Modal, SimpleGrid, Skeleton, Switch, TextInput, Title } from '@mantine/core';
-import { useForm } from '@mantine/hooks';
+import { ActionIcon, Avatar, Button, Card, Group, Modal, SimpleGrid, Skeleton, Stack, Switch, Text, TextInput, Title } from '@mantine/core';
+import { useForm } from '@mantine/form';
 import { useModals } from '@mantine/modals';
-import { useNotifications } from '@mantine/notifications';
+import { showNotification } from '@mantine/notifications';
 import { CrossIcon, DeleteIcon, PlusIcon } from 'components/icons';
+import MutedText from 'components/MutedText';
 import useFetch from 'hooks/useFetch';
 import { useStoreSelector } from 'lib/redux/store';
 import { useRouter } from 'next/router';
@@ -17,7 +18,6 @@ function CreateUserModal({ open, setOpen, updateUsers }) {
       administrator: false,
     },
   });
-  const notif = useNotifications();
 
   const onSubmit = async values => {
     const cleanUsername = values.username.trim();
@@ -34,14 +34,14 @@ function CreateUserModal({ open, setOpen, updateUsers }) {
     setOpen(false);
     const res = await useFetch('/api/auth/create', 'POST', data);
     if (res.error) {
-      notif.showNotification({
+      showNotification({
         title: 'Failed to create user',
         message: res.error,
         icon: <DeleteIcon />,
         color: 'red',
       });
     } else {
-      notif.showNotification({
+      showNotification({
         title: 'Created user: ' + cleanUsername,
         message: '',
         icon: <PlusIcon />,
@@ -75,7 +75,6 @@ function CreateUserModal({ open, setOpen, updateUsers }) {
 export default function Users() {
   const user = useStoreSelector(state => state.user);
   const router = useRouter();
-  const notif = useNotifications();
   const modals = useModals();
 
   const [users, setUsers] = useState([]);
@@ -87,14 +86,14 @@ export default function Users() {
       delete_images,
     });
     if (res.error) {
-      notif.showNotification({
+      showNotification({
         title: 'Failed to delete user',
         message: res.error,
         color: 'red',
         icon: <CrossIcon />,
       });
     } else {
-      notif.showNotification({
+      showNotification({
         title: 'User deleted',
         message: '',
         color: 'green',
@@ -108,8 +107,6 @@ export default function Users() {
   const openDeleteModal = user => modals.openConfirmModal({
     title: `Delete ${user.username}?`,
     closeOnConfirm: false,
-    centered: true,
-    overlayBlur: 3,
     labels: { confirm: 'Yes', cancel: 'No' },
     onConfirm: () => {
       modals.openConfirmModal({
@@ -160,8 +157,12 @@ export default function Users() {
           <Card key={user.id} sx={{ maxWidth: '100%' }}>
             <Group position='apart'>
               <Group position='left'>
-                <Avatar color={user.administrator ? 'primary' : 'dark'}>{user.username[0]}</Avatar>
-                <Title>{user.username}</Title>
+                <Avatar size='lg' color={user.administrator ? 'primary' : 'dark'}>{user.username[0]}</Avatar>
+                <Stack spacing={0}>
+                  <Title>{user.username}</Title>
+                  <MutedText size='sm'>ID: {user.id}</MutedText>
+                  <MutedText size='sm'>Administrator: {user.administrator ? 'yes' : 'no'}</MutedText>
+                </Stack>
               </Group>
               <Group position='right'>
                 <ActionIcon aria-label='delete' onClick={() => openDeleteModal(user)}>

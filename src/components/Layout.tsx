@@ -1,7 +1,7 @@
-import { AppShell, Box, Burger, Divider, Group, Header, MediaQuery, Navbar, Paper, Popover, ScrollArea, Select, Text, ThemeIcon, Title, UnstyledButton, useMantineTheme } from '@mantine/core';
+import { AppShell, Box, Burger, Button, Divider, Header, MediaQuery, Navbar, NavLink, Paper, Popover, ScrollArea, Select, Stack, Text, Title, UnstyledButton, useMantineTheme, Group } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
-import { useNotifications } from '@mantine/notifications';
+import { showNotification } from '@mantine/notifications';
 import useFetch from 'hooks/useFetch';
 import { updateUser } from 'lib/redux/reducers/user';
 import { useStoreDispatch } from 'lib/redux/store';
@@ -64,34 +64,47 @@ function MenuItem(props) {
 
 const items = [
   {
-    icon: <HomeIcon />,
+    icon: <HomeIcon size={18} />,
     text: 'Home',
     link: '/dashboard',
   },
   {
-    icon: <FileIcon />,
+    icon: <FileIcon size={18} />,
     text: 'Files',
     link: '/dashboard/files',
   },
   {
-    icon: <ActivityIcon />,
+    icon: <ActivityIcon size={18} />,
     text: 'Stats',
     link: '/dashboard/stats',
   },
   {
-    icon: <LinkIcon />,
+    icon: <LinkIcon size={18} />,
     text: 'URLs',
     link: '/dashboard/urls',
   },
   {
-    icon: <UploadIcon />,
+    icon: <UploadIcon size={18} />,
     text: 'Upload',
     link: '/dashboard/upload',
   },
   {
-    icon: <TypeIcon />,
+    icon: <TypeIcon size={18} />,
     text: 'Upload Text',
     link: '/dashboard/text',
+  },
+];
+
+const admin_items = [
+  {
+    icon: <UserIcon size={18} />,
+    text: 'Users',
+    link: '/dashboard/users',
+  },
+  {
+    icon: <TagIcon size={18} />,
+    text: 'Invites',
+    link: '/dashboard/invites',
   },
 ];
 
@@ -104,7 +117,6 @@ export default function Layout({ children, user, title }) {
   const dispatch = useStoreDispatch();
   const theme = useMantineTheme();
   const modals = useModals();
-  const notif = useNotifications();
   const clipboard = useClipboard();
 
   const handleUpdateTheme = async value => {
@@ -116,7 +128,7 @@ export default function Layout({ children, user, title }) {
     dispatch(updateUser(newUser));
     router.replace(router.pathname);
 
-    notif.showNotification({
+    showNotification({
       title: `Theme changed to ${friendlyThemeName[value]}`,
       message: '',
       color: 'green',
@@ -126,8 +138,6 @@ export default function Layout({ children, user, title }) {
 
   const openResetToken = () => modals.openConfirmModal({
     title: 'Reset Token',
-    centered: true,
-    overlayBlur: 3,
     children: (
       <Text size='sm'>
         Once you reset your token, you will have to update any uploaders to use this new token.
@@ -138,14 +148,14 @@ export default function Layout({ children, user, title }) {
       const a = await useFetch('/api/user/token', 'PATCH');
       if (!a.success) {
         setToken(a.success);
-        notif.showNotification({
+        showNotification({
           title: 'Token Reset Failed',
           message: a.error,
           color: 'red',
           icon: <CrossIcon />,
         });
       } else {
-        notif.showNotification({
+        showNotification({
           title: 'Token Reset',
           message: 'Your token has been reset. You will need to update any uploaders to use this new token.',
           color: 'green',
@@ -159,8 +169,6 @@ export default function Layout({ children, user, title }) {
 
   const openCopyToken = () => modals.openConfirmModal({
     title: 'Copy Token',
-    centered: true,
-    overlayBlur: 3,
     children: (
       <Text size='sm'>
         Make sure you don&apos;t share this token with anyone as they will be able to upload files on your behalf.
@@ -170,7 +178,7 @@ export default function Layout({ children, user, title }) {
     onConfirm: async () => {
       clipboard.copy(token);
 
-      notif.showNotification({
+      showNotification({
         title: 'Token Copied',
         message: 'Your token has been copied to your clipboard.',
         color: 'green',
@@ -187,7 +195,7 @@ export default function Layout({ children, user, title }) {
       fixed
       navbar={
         <Navbar
-          p='md'
+          pt='sm'
           hiddenBreakpoint='sm'
           hidden={!opened}
           width={{ sm: 200, lg: 230 }}
@@ -195,84 +203,37 @@ export default function Layout({ children, user, title }) {
           <Navbar.Section
             grow
             component={ScrollArea}
-            ml={-10}
-            mr={-10}
-            sx={{ paddingLeft: 10, paddingRight: 10 }}
           >
             {items.map(({ icon, text, link }) => (
               <Link href={link} key={text} passHref>
-                <UnstyledButton
-                  sx={{
-                    display: 'block',
-                    width: '100%',
-                    padding: theme.spacing.xs,
-                    borderRadius: theme.radius.sm,
-                    color: theme.colorScheme === 'dark' ? theme.colors.dark[0] : theme.black,
-                
-                    '&:hover': {
-                      backgroundColor: theme.other.hover,
-                    },
-                  }}
-                >
-                  <Group>
-                    <ThemeIcon color='primary' variant='filled'>
-                      {icon}
-                    </ThemeIcon>
-
-                    <Text size='lg'>{text}</Text>
-                  </Group>
-                </UnstyledButton>
+                <NavLink
+                  component='a'
+                  label={text}
+                  icon={icon}
+                  active={router.pathname === link}
+                  variant='light'
+                />
               </Link>
             ))}
             {user.administrator && (
-              <>
-                <Link href='/dashboard/users' passHref>
-                  <UnstyledButton
-                    sx={{ 
-                      display: 'block',
-                      width: '100%',
-                      padding: theme.spacing.xs,
-                      borderRadius: theme.radius.sm,
-                      color: theme.colorScheme === 'dark' ? theme.colors.dark[0] : theme.black,
-                
-                      '&:hover': {
-                        backgroundColor: theme.other.hover,
-                      },
-                    }}
-                  >
-                    <Group>
-                      <ThemeIcon color='primary' variant='filled'>
-                        <UserIcon />
-                      </ThemeIcon>
-
-                      <Text size='lg'>Users</Text>
-                    </Group>
-                  </UnstyledButton>
-                </Link>
-                <Link href='/dashboard/invites' passHref>
-                  <UnstyledButton
-                    sx={{ 
-                      display: 'block',
-                      width: '100%',
-                      padding: theme.spacing.xs,
-                      borderRadius: theme.radius.sm,
-                      color: theme.colorScheme === 'dark' ? theme.colors.dark[0] : theme.black,
-                
-                      '&:hover': {
-                        backgroundColor: theme.other.hover,
-                      },
-                    }}
-                  >
-                    <Group>
-                      <ThemeIcon color='primary' variant='filled'>
-                        <TagIcon />
-                      </ThemeIcon>
-
-                      <Text size='lg'>Invites</Text>
-                    </Group>
-                  </UnstyledButton>
-                </Link>
-              </>
+              <NavLink
+                label='Administration'
+                icon={<SettingsIcon />}
+                childrenOffset={28}
+                defaultOpened={admin_items.map(x => x.link).includes(router.pathname)}
+              >
+                {admin_items.map(({ icon, text, link }) => (
+                  <Link href={link} key={text} passHref>
+                    <NavLink
+                      component='a'
+                      label={text}
+                      icon={icon}
+                      active={router.pathname === link}
+                      variant='light'
+                    />
+                  </Link>
+                ))}
+              </NavLink>
             )}
           </Navbar.Section>
         </Navbar>
@@ -291,75 +252,78 @@ export default function Layout({ children, user, title }) {
             <Title ml='md'>{title}</Title>
             <Box sx={{ marginLeft: 'auto', marginRight: 0 }}>
               <Popover
-                position='top'
-                placement='end'
-                spacing={4}
+                position='bottom-end'
                 opened={open}
                 onClose={() => setOpen(false)}
-                target={
-                  <UnstyledButton
-                    onClick={() => setOpen(!open)}
-                    sx={{ 
-                      display: 'block',
-                      width: '100%',
-                      padding: theme.spacing.xs,
-                      borderRadius: theme.radius.sm,
-                      color: theme.other.color,
-                
-                      '&:hover': {
-                        backgroundColor: theme.other.hover,
-                      },
-                    }}
-                  >
-                    <Group>
-                      <ThemeIcon color='primary' variant='filled'>
-                        <SettingsIcon />
-                      </ThemeIcon>
-                      <Text>{user.username}</Text>
-                    </Group>
-                  </UnstyledButton>
-                }
               >
-                <Group direction='column' spacing={2}>
-                  <Text sx={{
-                    color: theme.colorScheme === 'dark' ? theme.colors.dark[2] : theme.colors.gray[6],
-                    fontWeight: 500,
-                    fontSize: theme.fontSizes.sm,
-                    padding: `${theme.spacing.xs / 2}px ${theme.spacing.sm}px`,
-                    cursor: 'default',
-                  }}
+                <Popover.Target>
+                  <Button
+                    leftIcon={<SettingsIcon />}
+                    onClick={() => setOpen((o) => !o)}
+                    sx={t => ({
+                      backgroundColor: '#00000000',
+                      '&:hover': {
+                        backgroundColor: t.other.hover,
+                      },
+                    })}
+                    size='xl'
+                    p='sm'
                   >
                     {user.username}
-                  </Text>
-                  <MenuItemLink icon={<SettingsIcon />} href='/dashboard/manage'>Manage Account</MenuItemLink>
-                  <MenuItem icon={<CopyIcon />} onClick={() => {setOpen(false);openCopyToken();}}>Copy Token</MenuItem>
-                  <MenuItem icon={<DeleteIcon />} onClick={() => {setOpen(false);openResetToken();}} color='red'>Reset Token</MenuItem>
-                  <MenuItemLink icon={<LogoutIcon />} href='/auth/logout' color='red'>Logout</MenuItemLink>
-                  <Divider
-                    variant='solid'
-                    my={theme.spacing.xs / 2}
-                    sx={theme => ({
-                      width: '110%',
-                      borderTopColor: theme.colorScheme === 'dark' ? theme.colors.dark[7] : theme.colors.gray[2],
-                      margin: `${theme.spacing.xs / 2}px -4px`,
-                    })}
-                  />
-                  <MenuItem icon={<PencilIcon />}>
-                    <Select           
-                      size='xs'    
-                      data={Object.keys(themes).map(t => ({ value: t, label: friendlyThemeName[t] }))}
-                      value={systemTheme}
-                      onChange={handleUpdateTheme}
+                  </Button>
+                </Popover.Target>
+
+                <Popover.Dropdown p={4}>
+                  <Stack spacing={2}>
+                    <Text sx={{
+                      color: theme.colorScheme === 'dark' ? theme.colors.dark[2] : theme.colors.gray[6],
+                      fontWeight: 500,
+                      fontSize: theme.fontSizes.sm,
+                      padding: `${theme.spacing.xs / 2}px ${theme.spacing.sm}px`,
+                      cursor: 'default',
+                    }}
+                    >
+                      {user.username}
+                    </Text>
+                    <MenuItemLink icon={<SettingsIcon />} href='/dashboard/manage'>Manage Account</MenuItemLink>
+                    <MenuItem icon={<CopyIcon />} onClick={() => {setOpen(false);openCopyToken();}}>Copy Token</MenuItem>
+                    <MenuItem icon={<DeleteIcon />} onClick={() => {setOpen(false);openResetToken();}} color='red'>Reset Token</MenuItem>
+                    <MenuItemLink icon={<LogoutIcon />} href='/auth/logout' color='red'>Logout</MenuItemLink>
+                    <Divider
+                      variant='solid'
+                      my={theme.spacing.xs / 2}
+                      sx={theme => ({
+                        width: '110%',
+                        borderTopColor: theme.colorScheme === 'dark' ? theme.colors.dark[7] : theme.colors.gray[2],
+                        margin: `${theme.spacing.xs / 2}px -4px`,
+                      })}
                     />
-                  </MenuItem>
-                </Group>
+                    <MenuItem icon={<PencilIcon />}>
+                      <Select           
+                        size='xs'    
+                        data={Object.keys(themes).map(t => ({ value: t, label: friendlyThemeName[t] }))}
+                        value={systemTheme}
+                        onChange={handleUpdateTheme}
+                      />
+                    </MenuItem>
+                  </Stack>
+                </Popover.Dropdown>
               </Popover>
             </Box>
           </div>
         </Header>
       }
     >
-      <Paper withBorder p='md' shadow='xs'>{children}</Paper>
+      <Paper
+        withBorder
+        p='md'
+        shadow='xs'
+        sx={t => ({
+          borderColor: t.colorScheme === 'dark' ? t.colors.dark[5] : t.colors.dark[0],
+        })}
+      >
+        {children}
+      </Paper>
     </AppShell>
   );
 }

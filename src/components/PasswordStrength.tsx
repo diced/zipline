@@ -49,27 +49,30 @@ export default function PasswordStrength({ value, setValue, setStrength, ...prop
   return (
     <Popover
       opened={popoverOpened}
-      position='bottom'
-      placement='start'
+      position='top'
+      width='target'
       withArrow
       trapFocus={false}
-      transition='pop-top-left'
-      onFocusCapture={() => setPopoverOpened(true)}
-      onBlurCapture={() => setPopoverOpened(false)}
-      styles={{ root: { width: '100%' } }}
-      target={
-        <PasswordInput
-          label='Password'
-          description='Strong password should include letters in lower and uppercase, at least 1 number, at least 1 special symbol'
-          value={value}
-          onChange={(event) => setValue(event.currentTarget.value)}
-          {...props}
-        />
-      }
     >
-      <Progress color={color} value={strength} size={7} mb='md' />
-      <PasswordRequirement label='Includes at least 8 characters' meets={value.length > 7} />
-      {checks}
+      <Popover.Target>
+        <div
+          onFocusCapture={() => setPopoverOpened(true)}
+          onBlurCapture={() => setPopoverOpened(false)}
+        >
+          <PasswordInput
+            label='Password'
+            description='A strong password should include letters in lower and uppercase, at least 1 number, at least 1 special symbol'
+            value={value}
+            onChange={(event) => setValue(event.currentTarget.value)}
+            {...props}
+          />
+        </div>
+      </Popover.Target>
+      <Popover.Dropdown sx={{  }}>
+        <Progress color={color} value={strength} size={7} mb='md' />
+        <PasswordRequirement label='Includes at least 8 characters' meets={value.length > 7} />
+        {checks}
+      </Popover.Dropdown>
     </Popover>
   );
 }

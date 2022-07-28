@@ -8,9 +8,6 @@ module.exports = {
       },
     ];
   },
-  api: {
-    responseLimit: false,
-  },
   poweredByHeader: false,
   reactStrictMode: true,
 };

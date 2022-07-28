@@ -176,7 +176,6 @@ export class Swift extends Datasource {
 
   public constructor(public config: ConfigSwiftDatasource) {
     super();
-    console.log(config);
     this.container = new SwiftContainer({
       auth_endpoint_url: config.auth_endpoint,
       credentials: {

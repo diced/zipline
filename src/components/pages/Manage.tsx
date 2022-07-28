@@ -1,7 +1,8 @@
 import { Box, Button, Card, ColorInput, Group, MultiSelect, Space, Text, TextInput, PasswordInput, Title, Tooltip } from '@mantine/core';
-import { randomId, useForm, useInterval } from '@mantine/hooks';
+import { randomId, useInterval } from '@mantine/hooks';
+import { useForm } from '@mantine/form';
 import { useModals } from '@mantine/modals';
-import { useNotifications } from '@mantine/notifications';
+import { showNotification, updateNotification } from '@mantine/notifications';
 import { CrossIcon, DeleteIcon } from 'components/icons';
 import DownloadIcon from 'components/icons/DownloadIcon';
 import Link from 'components/Link';
@@ -11,31 +12,15 @@ import { bytesToRead } from 'lib/clientUtils';
 import { updateUser } from 'lib/redux/reducers/user';
 import { useStoreDispatch, useStoreSelector } from 'lib/redux/store';
 import { useEffect, useState } from 'react';
-
-function VarsTooltip({ children }) {
-  return (
-    <Tooltip position='top' placement='center' color='' label={
-      <>
-        <Text><b>{'{image.file}'}</b> - file name</Text>
-        <Text><b>{'{image.mimetype}'}</b> - mimetype</Text>
-        <Text><b>{'{image.id}'}</b> - id of the image</Text>
-        <Text><b>{'{user.name}'}</b> - your username</Text>
-        visit <Link href='https://zipl.vercel.app/docs/variables'>the docs</Link> for more variables
-      </>
-    }>
-      {children}
-    </Tooltip>
-  );
-}
+import MutedText from 'components/MutedText';
 
 function ExportDataTooltip({ children }) {
-  return <Tooltip position='top' placement='center' color='' label='After clicking, if you have a lot of files the export can take a while to complete. A list of previous exports will be below to download.'>{children}</Tooltip>;
+  return <Tooltip position='top' color='' label='After clicking, if you have a lot of files the export can take a while to complete. A list of previous exports will be below to download.'>{children}</Tooltip>;
 }
 
 export default function Manage() {
   const user = useStoreSelector(state => state.user);
   const dispatch = useStoreDispatch();
-  const notif = useNotifications();
   const modals = useModals();
 
   const [exports, setExports] = useState([]);
@@ -87,7 +72,8 @@ export default function Manage() {
 
     if (cleanUsername === '') return form.setFieldError('username', 'Username can\'t be nothing');
 
-    const id = notif.showNotification({
+    showNotification({
+      id: 'update-user',
       title: 'Updating user...',
       message: '',
       loading: true,
@@ -107,7 +93,8 @@ export default function Manage() {
 
     if (newUser.error) {
       if (newUser.invalidDomains) {
-        notif.updateNotification(id, {
+        updateNotification({
+          id: 'update-user',
           message: <>
             <Text mt='xs'>The following domains are invalid:</Text>
             {newUser.invalidDomains.map(err => (
@@ -121,7 +108,8 @@ export default function Manage() {
           icon: <CrossIcon />,
         });
       }
-      notif.updateNotification(id, {
+      updateNotification({
+        id: 'update-user',
         title: 'Couldn\'t save user',
         message: newUser.error,
         color: 'red',
@@ -129,7 +117,8 @@ export default function Manage() {
       });
     } else {
       dispatch(updateUser(newUser));
-      notif.updateNotification(id, {
+      updateNotification({
+        id: 'update-user',
         title: 'Saved User',
         message: '',
       });
@@ -139,7 +128,7 @@ export default function Manage() {
   const exportData = async () => {
     const res = await useFetch('/api/user/export', 'POST');
     if (res.url) {
-      notif.showNotification({
+      showNotification({
         title: 'Export started...',
         loading: true,
         message: 'If you have a lot of files, the export may take a while. The list of exports will be updated every 30s.',
@@ -163,14 +152,14 @@ export default function Manage() {
     });
 
     if (!res.count) {
-      notif.showNotification({
+      showNotification({
         title: 'Couldn\'t delete files',
         message: res.error,
         color: 'red',
         icon: <CrossIcon />,
       });
     } else {
-      notif.showNotification({
+      showNotification({
         title: 'Deleted files',
         message: `${res.count} files deleted`,
         color: 'green',
@@ -182,14 +171,10 @@ export default function Manage() {
   const openDeleteModal = () => modals.openConfirmModal({
     title: 'Are you sure you want to delete all of your images?',
     closeOnConfirm: false,
-    centered: true,
-    overlayBlur: 3,
     labels: { confirm: 'Yes', cancel: 'No' },
     onConfirm: () => {
       modals.openConfirmModal({
         title: 'Are you really sure?',
-        centered: true,
-        overlayBlur: 3,
         labels: { confirm: 'Yes', cancel: 'No' },
         onConfirm: () => {
           handleDelete();
@@ -211,9 +196,7 @@ export default function Manage() {
   return (
     <>
       <Title>Manage User</Title>
-      <VarsTooltip>
-        <Text color='gray'>Want to use variables in embed text? Hover on this or visit <Link href='https://zipline.diced.cf/docs/variables'>the docs</Link> for more variables</Text>
-      </VarsTooltip>
+      <MutedText size='md'>Want to use variables in embed text? Visit <Link href='https://zipline.diced.cf/docs/variables'>the docs</Link> for variables</MutedText>
       <form onSubmit={form.onSubmit((v) => onSubmit(v))}>
         <TextInput id='username' label='Username' {...form.getInputProps('username')} />
         <PasswordInput id='password' label='Password' description='Leave blank to keep your old password' {...form.getInputProps('password')} />
@@ -242,7 +225,7 @@ export default function Manage() {
 
       <Box mb='md'>
         <Title>Manage Data</Title>
-        <Text color='gray'>Delete, or export your data into a zip file.</Text>
+        <MutedText size='md'>Delete, or export your data into a zip file.</MutedText>
       </Box>
 
       <Group>
@@ -250,17 +233,21 @@ export default function Manage() {
         <ExportDataTooltip><Button onClick={exportData} rightIcon={<DownloadIcon />}>Export Data</Button></ExportDataTooltip>
       </Group>
       <Card mt={22}>
-        <SmallTable
-          columns={[
-            { id: 'name', name: 'Name' },
-            { id: 'date', name: 'Date' },
-            { id: 'size', name: 'Size' },
-          ]}
-          rows={exports ? exports.map((x, i) => ({
-            name: <Link href={'/api/user/export?name=' + x.full}>Export {i + 1}</Link>,
-            date: x.date.toLocaleString(),
-            size: bytesToRead(x.size),
-          })) : []} />
+        {exports && exports.length ? (
+          <SmallTable
+            columns={[
+              { id: 'name', name: 'Name' },
+              { id: 'date', name: 'Date' },
+              { id: 'size', name: 'Size' },
+            ]}
+            rows={exports ? exports.map((x, i) => ({
+              name: <Link href={'/api/user/export?name=' + x.full}>Export {i + 1}</Link>,
+              date: x.date.toLocaleString(),
+              size: bytesToRead(x.size),
+            })) : []} />
+        ) : (
+          <Text>No exports yet</Text>
+        )}
       </Card>
 
       <Title my='md'>ShareX Config</Title>

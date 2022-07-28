@@ -64,24 +64,34 @@ export default function ZiplineTheming({ Component, pageProps, ...props }) {
     <MantineProvider
       withGlobalStyles
       withNormalizeCSS
-      theme={theme}
-      styles={{
-        AppShell: t => ({
-          root: {
-            backgroundColor: t.other.AppShell_backgroundColor,
+      theme={{
+        ...theme,
+        components: {
+          AppShell: {
+            styles: t => ({
+              root: {
+                backgroundColor: t.other.AppShell_backgroundColor,
+              },
+            }),
           },
-        }),
-        Popover: {
-          inner: {
-            width: 200,
+          NavLink: {
+            styles: t => ({
+              icon: {
+                paddingLeft: t.spacing.sm,
+              },
+            }),
           },
-        },
-        Accordion: {
-          itemTitle: {
-            border: 0,
+          Modal: {
+            defaultProps: {
+              centered: true,
+              overlayBlur: 3,
+              overlayColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : 'white',
+            },
           },
-          itemOpened: {
-            border: 0,
+          Popover: {
+            defaultProps: {
+              transition: 'pop',
+            },
           },
         },
       }}

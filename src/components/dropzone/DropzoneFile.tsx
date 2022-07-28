@@ -11,6 +11,7 @@ export function FilePreview({ file }: { file: File }) {
       style={{ maxWidth: '10vw', maxHeight: '100vh' }}
       src={URL.createObjectURL(file)}
       alt={file.name}
+      popup
     />
   );
 }
@@ -21,13 +22,11 @@ export default function FileDropzone({ file }: { file: File }) {
   return (
     <Tooltip
       position='top'
-      placement='center'
-      allowPointerEvents
       label={
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <FilePreview file={file} />
 
-          <Table sx={{ color: theme.colorScheme === 'dark' ? 'black' : 'white' }} ml='md'>
+          <Table sx={{ color: theme.colorScheme === 'dark' ? 'white' : 'white' }} ml='md'>
             <tbody>
               <tr>
                 <td>Name</td>

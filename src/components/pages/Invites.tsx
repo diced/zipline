@@ -1,7 +1,8 @@
 import { ActionIcon, Avatar, Button, Card, Group, Modal, Select, SimpleGrid, Skeleton, Stack, Switch, TextInput, Title } from '@mantine/core';
-import { useClipboard, useForm } from '@mantine/hooks';
+import { useClipboard } from '@mantine/hooks';
+import { useForm } from '@mantine/form';
 import { useModals } from '@mantine/modals';
-import { useNotifications } from '@mantine/notifications';
+import { showNotification } from '@mantine/notifications';
 import { CopyIcon, CrossIcon, DeleteIcon, PlusIcon, TagIcon } from 'components/icons';
 import MutedText from 'components/MutedText';
 import useFetch from 'hooks/useFetch';
@@ -26,7 +27,6 @@ function CreateInviteModal({ open, setOpen, updateInvites }) {
       expires: '30m',
     },
   });
-  const notif = useNotifications();
 
   const onSubmit = async values => {
     if (!expires.includes(values.expires)) return form.setFieldError('expires', 'Invalid expiration');
@@ -47,14 +47,14 @@ function CreateInviteModal({ open, setOpen, updateInvites }) {
     });
 
     if (res.error) {
-      notif.showNotification({
+      showNotification({
         title: 'Failed to create invite',
         message: res.error,
         icon: <CrossIcon />,
         color: 'red',
       });
     } else {
-      notif.showNotification({
+      showNotification({
         title: 'Created invite',
         message: '',
         icon: <TagIcon />,
@@ -70,9 +70,6 @@ function CreateInviteModal({ open, setOpen, updateInvites }) {
       opened={open}
       onClose={() => setOpen(false)}
       title={<Title>Create Invite</Title>}
-      overlayBlur={3}
-      centered={true}
-
     >
       <form onSubmit={form.onSubmit(v => onSubmit(v))}>
         <Select
@@ -103,7 +100,6 @@ function CreateInviteModal({ open, setOpen, updateInvites }) {
 
 export default function Users() {
   const router = useRouter();
-  const notif = useNotifications();
   const modals = useModals();
   const clipboard = useClipboard();
 
@@ -118,14 +114,14 @@ export default function Users() {
     onConfirm: async () => {
       const res = await useFetch(`/api/auth/invite?code=${invite.code}`, 'DELETE');
       if (res.error) {
-        notif.showNotification({
+        showNotification({
           title: 'Failed to delete invite ${invite.code}',
           message: res.error,
           icon: <CrossIcon />,
           color: 'red',
         });
       } else {
-        notif.showNotification({
+        showNotification({
           title: `Deleted invite ${invite.code}`,
           message: '',
           icon: <DeleteIcon />,
@@ -139,7 +135,7 @@ export default function Users() {
 
   const handleCopy = async invite => {
     clipboard.copy(`${window.location.protocol}//${window.location.host}/invite/${invite.code}`);
-    notif.showNotification({
+    showNotification({
       title: 'Copied to clipboard',
       message: '',
       icon: <CopyIcon />,
@@ -156,7 +152,6 @@ export default function Users() {
   };
 
   useEffect(() => {
-    console.log(invites);
     updateInvites();
   }, []);
 

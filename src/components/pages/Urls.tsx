@@ -1,6 +1,7 @@
 import { ActionIcon, Button, Card, Group, Modal, SimpleGrid, Skeleton, TextInput, Title } from '@mantine/core';
-import { useClipboard, useForm } from '@mantine/hooks';
-import { useNotifications } from '@mantine/notifications';
+import { useClipboard } from '@mantine/hooks';
+import { useForm } from '@mantine/form';
+import { showNotification } from '@mantine/notifications';
 import { CopyIcon, CrossIcon, DeleteIcon, LinkIcon, PlusIcon } from 'components/icons';
 import useFetch from 'hooks/useFetch';
 import { useStoreSelector } from 'lib/redux/store';
@@ -8,7 +9,6 @@ import { useEffect, useState } from 'react';
 
 export default function Urls() {
   const user = useStoreSelector(state => state.user);
-  const notif = useNotifications();
   const clipboard = useClipboard();
 
   const [urls, setURLS] = useState([]);
@@ -23,14 +23,14 @@ export default function Urls() {
   const deleteURL = async u => {
     const url = await useFetch('/api/user/urls', 'DELETE', { id: u.id });
     if (url.error) {
-      notif.showNotification({
+      showNotification({
         title: 'Failed to delete URL',
         message: url.error,
         icon: <DeleteIcon />,
         color: 'red',
       });
     } else {
-      notif.showNotification({
+      showNotification({
         title: 'Deleted URL',
         message: '',
         icon: <CrossIcon />,
@@ -43,7 +43,7 @@ export default function Urls() {
 
   const copyURL = u => {
     clipboard.copy(`${window.location.protocol}//${window.location.host}${u.url}`);
-    notif.showNotification({
+    showNotification({
       title: 'Copied to clipboard',
       message: '',
       icon: <CopyIcon />,
@@ -86,14 +86,14 @@ export default function Urls() {
     const json = await res.json();
 
     if (json.error) {
-      notif.showNotification({
+      showNotification({
         title: 'Failed to create URL',
         message: json.error,
         color: 'red',
         icon: <CrossIcon />,
       });
     } else {
-      notif.showNotification({
+      showNotification({
         title: 'URL shortened',
         message: json.url,
         color: 'green',
@@ -128,7 +128,7 @@ export default function Urls() {
 
       <Group mb='md'>
         <Title>URLs</Title>
-        <ActionIcon variant='filled' color='primary' onClick={() => setCreateOpen(true)}><PlusIcon/></ActionIcon>
+        <ActionIcon variant='filled' color='primary' onClick={() => setCreateOpen(true)}><PlusIcon /></ActionIcon>
       </Group>
 
       <SimpleGrid
@@ -145,7 +145,7 @@ export default function Urls() {
                 <Title>{url.vanity ?? url.id}</Title>
               </Group>
               <Group position='right'>
-                <ActionIcon href={url.url} component='a' target='_blank'><LinkIcon/></ActionIcon>
+                <ActionIcon href={url.url} component='a' target='_blank'><LinkIcon /></ActionIcon>
                 <ActionIcon aria-label='copy' onClick={() => copyURL(url)}>
                   <CopyIcon />
                 </ActionIcon>

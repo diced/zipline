@@ -1,5 +1,5 @@
-import { Button, Group, LoadingOverlay, Select, Title } from '@mantine/core';
-import { useNotifications } from '@mantine/notifications';
+import { Button, Group, Select, Title } from '@mantine/core';
+import { showNotification, updateNotification } from '@mantine/notifications';
 import CodeInput from 'components/CodeInput';
 import { TypeIcon, UploadIcon } from 'components/icons';
 import Link from 'components/Link';
@@ -8,16 +8,16 @@ import { useStoreSelector } from 'lib/redux/store';
 import { useState } from 'react';
 
 export default function Upload() {
-  const notif = useNotifications();
   const user = useStoreSelector(state => state.user);
 
   const [value, setValue] = useState('');
   const [lang, setLang] = useState('txt');
-  
+
   const handleUpload = async () => {
     const file = new File([value], 'text.' + lang);
 
-    const id = notif.showNotification({
+    showNotification({
+      id: 'upload-text',
       title: 'Uploading...',
       message: '',
       loading: true,
@@ -30,7 +30,8 @@ export default function Upload() {
       const json = JSON.parse(e.target.response);
 
       if (!json.error) {
-        notif.updateNotification(id, {
+        updateNotification({
+          id: 'upload-text',
           title: 'Upload Successful',
           message: <>Copied first file to clipboard! <br />{json.files.map(x => (<Link key={x} href={x}>{x}<br /></Link>))}</>,
         });

@@ -34,39 +34,37 @@ export default function Files() {
       </Group>
       {favoritePages.length ? (
         <Accordion
-          offsetIcon={false}
-          sx={t => ({
-            marginTop: 2,
-            border: '1px solid',
-            marginBottom: 12,
-            borderColor: t.colorScheme === 'dark' ? t.colors.dark[6] : t.colors.gray[0] ,
-          })}
+          variant='contained'
+          mb='sm'
         >
-          <Accordion.Item label={<Title>Favorite Files</Title>}>
-            <SimpleGrid
-              cols={3}
-              spacing='lg'
-              breakpoints={[
-                { maxWidth: 'sm', cols: 1, spacing: 'sm' },
-              ]}
-            >
-              {favoritePages.length ? favoritePages[(favoritePage - 1) ?? 0].map(image => (
-                <div key={image.id}>
-                  <File image={image} updateImages={() => updatePages(true)} />
-                </div>
-              )) : null}
-            </SimpleGrid>
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                paddingTop: 12,
-                paddingBottom: 3,
-              }}
-            >
-              <Pagination total={favoritePages.length} page={favoritePage} onChange={setFavoritePage}/>
-            </Box>
+          <Accordion.Item value='favorite'>
+            <Accordion.Control>Favorite Files</Accordion.Control>
+            <Accordion.Panel>
+              <SimpleGrid
+                cols={3}
+                spacing='lg'
+                breakpoints={[
+                  { maxWidth: 'sm', cols: 1, spacing: 'sm' },
+                ]}
+              >
+                {favoritePages.length ? favoritePages[(favoritePage - 1) ?? 0].map(image => (
+                  <div key={image.id}>
+                    <File image={image} updateImages={() => updatePages(true)} />
+                  </div>
+                )) : null}
+              </SimpleGrid>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  paddingTop: 12,
+                  paddingBottom: 3,
+                }}
+              >
+                <Pagination total={favoritePages.length} page={favoritePage} onChange={setFavoritePage}/>
+              </Box>
+            </Accordion.Panel>
           </Accordion.Item>
         </Accordion>
       ) : null}

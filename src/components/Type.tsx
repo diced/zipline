@@ -1,15 +1,14 @@
-import { Group, Image, Stack, Text } from '@mantine/core';
+import { Group, Image, Text } from '@mantine/core';
 import { Prism } from '@mantine/prism';
 import { useEffect, useState } from 'react';
-import { AudioIcon, FileIcon, PlayIcon, TypeIcon, VideoIcon } from './icons';
-import MutedText from './MutedText';
+import { AudioIcon, FileIcon, PlayIcon } from './icons';
 
 function Placeholder({ text, Icon, ...props }) {
   return (
     <Image height={200} withPlaceholder placeholder={
       <Group>
         <Icon size={48} />
-        <Text>{text}</Text>
+        <Text size='md'>{text}</Text>
       </Group>
     } {...props} />
   );

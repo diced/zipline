@@ -1,5 +1,5 @@
 import { Button, Center, TextInput, Title, PasswordInput } from '@mantine/core';
-import { useForm } from '@mantine/hooks';
+import { useForm } from '@mantine/form';
 import useFetch from 'hooks/useFetch';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
