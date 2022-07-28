@@ -69,6 +69,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       },
       select: {
         created_at: true,
+        expires_at: true,
         file: true,
         mimetype: true,
         id: true,

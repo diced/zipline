@@ -4,8 +4,9 @@ import { showNotification } from '@mantine/notifications';
 import useFetch from 'hooks/useFetch';
 import { useState } from 'react';
 import Type from './Type';
-import { CalendarIcon, CopyIcon, CrossIcon, DeleteIcon, FileIcon, HashIcon, ImageIcon, StarIcon } from './icons';
+import { CalendarIcon, ClockIcon, CopyIcon, CrossIcon, DeleteIcon, FileIcon, HashIcon, ImageIcon, StarIcon } from './icons';
 import MutedText from './MutedText';
+import { relativeTime } from 'lib/clientUtils';
 
 export function FileMeta({ Icon, title, subtitle }) {
   return (
@@ -22,7 +23,6 @@ export function FileMeta({ Icon, title, subtitle }) {
 export default function File({ image, updateImages }) {
   const [open, setOpen] = useState(false);
   const clipboard = useClipboard();
-  const theme = useMantineTheme();
 
   const handleDelete = async () => {
     const res = await useFetch('/api/user/files', 'DELETE', { id: image.id });
@@ -88,6 +88,7 @@ export default function File({ image, updateImages }) {
             <FileMeta Icon={FileIcon} title='Name' subtitle={image.file} />
             <FileMeta Icon={ImageIcon} title='Type' subtitle={image.mimetype} />
             <FileMeta Icon={CalendarIcon} title='Uploaded at' subtitle={new Date(image.created_at).toLocaleString()} />
+            {image.expires_at && <FileMeta Icon={ClockIcon} title='Expires' subtitle={relativeTime(new Date(image.expires_at))} />}
             <FileMeta Icon={HashIcon} title='ID' subtitle={image.id} />
           </Stack>
         </Stack>

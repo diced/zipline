@@ -143,6 +143,14 @@ async function rawFileDb(
   prisma: PrismaClient,
   image: Image,
 ) {
+  if (image.expires_at && image.expires_at < new Date()) {
+    Logger.get('server').info(`${image.file} expired`);
+    await datasource.delete(image.file);
+    await prisma.image.delete({ where: { id: image.id } });
+
+    return nextServer.render404(req, res as ServerResponse);
+  }
+
   const data = await datasource.get(image.file);
   if (!data) return nextServer.render404(req, res as ServerResponse);
 
@@ -169,6 +177,13 @@ async function fileDb(
   handle: RequestHandler,
   image: Image,
 ) {
+  if (image.expires_at && image.expires_at < new Date()) {
+    await datasource.delete(image.file);
+    await prisma.image.delete({ where: { id: image.id } });
+    
+    return nextServer.render404(req, res as ServerResponse);
+  }
+
   const ext = image.file.split('.').pop();
   if (Object.keys(exts).includes(ext)) return handle(req, res as ServerResponse);
 

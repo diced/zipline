@@ -44,6 +44,13 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
   if (req.files && req.files.length === 0) return res.error('no files');
 
+  const expires_at = req.headers['expires-at'] as string;
+  const expiry = expires_at ? new Date(expires_at) : null;
+  if (expiry) {
+    if (!expiry.getTime()) return res.bad('invalid date');
+    if (expiry.getTime() < Date.now()) return res.bad('date is in the past');
+  }
+
   const rawFormat = ((req.headers.format || '') as string).toUpperCase() || 'RANDOM';
   const format: ImageFormat = Object.keys(ImageFormat).includes(rawFormat) && ImageFormat[rawFormat];
   const files = [];
@@ -84,6 +91,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         embed: !!req.headers.embed,
         format,
         password,
+        expires_at: expiry,
       },
     });
 

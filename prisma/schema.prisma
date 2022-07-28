@@ -36,6 +36,7 @@ model Image {
   file       String
   mimetype   String          @default("image/png")
   created_at DateTime        @default(now())
+  expires_at DateTime?
   views      Int             @default(0)
   favorite   Boolean         @default(false)
   embed      Boolean         @default(false)

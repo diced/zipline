@@ -28,3 +28,25 @@ export function bytesToRead(bytes: number) {
 
   return `${bytes.toFixed(1)} ${units[num]}`;
 }
+
+export const units = {
+  year: 365 * 24 * 60 * 60 * 1000,
+  month: 30 * 24 * 60 * 60 * 1000,
+  day: 24 * 60 * 60 * 1000,
+  hour: 60 * 60 * 1000,
+  minute: 60 * 1000,
+  second: 1000,
+};
+
+export function relativeTime(to: Date, from: Date = new Date()) {
+  const time = new Date(to.getTime() - from.getTime());
+  
+  const rtf = new Intl.RelativeTimeFormat('en', { style: 'long' });
+
+  for (const unit in units) {
+    if (time > units[unit]) {
+      return rtf.format(Math.floor(Math.round(time.getTime() / units[unit])), unit as Intl.RelativeTimeFormatUnit || 'second');
+    }
+  }
+}
+
