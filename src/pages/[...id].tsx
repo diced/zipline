@@ -65,15 +65,26 @@ export default function EmbeddedImage({ image, user, pass }) {
         )}
         {image.mimetype.startsWith('image') && (
           <>
-            <meta property='og:image' content={dataURL('/r')} />
+            <meta property='og:image' content={`/r/${image.file}`} />
             <meta property='twitter:card' content='summary_large_image' />
           </>
         )}
         {image.mimetype.startsWith('video') && (
           <>
-            <meta property='og:video' content={dataURL('/r')} />
-            <meta property='og:video:url' content={dataURL('/r')} />
+            <meta name='twitter:card' content='player' />
+            <meta name='twitter:player:stream' content={`/r/${image.file}`} />
+            <meta name='twitter:player:width' content='720' />
+            <meta name='twitter:player:height' content='480' />
+            <meta name='twitter:player:stream:content_type' content={image.mimetype} />
+            <meta name='twitter:title' content={image.file} />
+
+            <meta property='og:url' content={`/r/${image.file}`} />
+            <meta property='og:video' content={`/r/${image.file}`} />
+            <meta property='og:video:url' content={`/r/${image.file}`} />
+            <meta property='og:video:secure_url' content={`/r/${image.file}`} />
             <meta property='og:video:type' content={image.mimetype} />
+            <meta property='og:video:width' content='720' />
+            <meta property='og:video:height' content='480' />
           </>
         )}
         <title>{image.file}</title>

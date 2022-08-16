@@ -249,7 +249,7 @@ export default function Layout({ children, user, title }) {
                 color={theme.colors.gray[6]}
               />
             </MediaQuery>
-            <Title ml='md'>{title}</Title>
+            <Title ml='sm'>{title}</Title>
             <Box sx={{ marginLeft: 'auto', marginRight: 0 }}>
               <Popover
                 position='bottom-end'
