@@ -1,4 +1,4 @@
-FROM ghcr.io/diced/prisma-binaries:3.15.x as prisma
+FROM ghcr.io/diced/prisma-binaries:4.1.x as prisma
 
 FROM alpine:3.16 AS deps
 RUN mkdir -p /prisma-engines
@@ -51,7 +51,6 @@ ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
 
 COPY --from=builder /build/.next ./.next
-COPY --from=builder /build/dist ./dist
 COPY --from=builder /build/node_modules ./node_modules
 
 COPY --from=builder /build/next.config.js ./next.config.js
