@@ -17,6 +17,7 @@
 - Built with Next.js & React
 - Token protected uploading
 - Image uploading
+- Image compression
 - Password Protected Uploads
 - URL shortening
 - Text uploading
