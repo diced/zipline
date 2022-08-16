@@ -26,6 +26,7 @@ export type NextApiReq = NextApiRequest & {
     id: number;
     password: string;
     domains: string[];
+    avatar?: string;
   } | null | void>;
   getCookie: (name: string) => string | null;
   cleanCookie: (name: string) => void;
@@ -114,6 +115,7 @@ export const withZipline = (handler: (req: NextApiRequest, res: NextApiResponse)
           token: true,
           username: true,
           domains: true,
+          avatar: true,
         },
       });
 

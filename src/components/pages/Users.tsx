@@ -157,7 +157,7 @@ export default function Users() {
           <Card key={user.id} sx={{ maxWidth: '100%' }}>
             <Group position='apart'>
               <Group position='left'>
-                <Avatar size='lg' color={user.administrator ? 'primary' : 'dark'}>{user.username[0]}</Avatar>
+                <Avatar size='lg' color={user.administrator ? 'primary' : 'dark'} src={user.avatar ?? null}>{user.username[0]}</Avatar>
                 <Stack spacing={0}>
                   <Title>{user.username}</Title>
                   <MutedText size='sm'>ID: {user.id}</MutedText>

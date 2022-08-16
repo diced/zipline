@@ -10,7 +10,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       where: { code },
     });
     if (!invite) return res.bad('invalid invite code');
-    
+
     const user = await prisma.user.findFirst({
       where: { username },
     });
@@ -25,7 +25,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
   if (req.method === 'DELETE') {
     if (req.body.id === user.id) return res.forbid('you can\'t delete your own account');
-    
+
     const deleteUser = await prisma.user.findFirst({
       where: {
         id: req.body.id,
@@ -70,6 +70,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         embedColor: true,
         embedTitle: true,
         systemTheme: true,
+        avatar: true,
       },
     });
     return res.json(users);

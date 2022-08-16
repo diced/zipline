@@ -1,4 +1,4 @@
-import { AppShell, Box, Burger, Button, Divider, Header, MediaQuery, Navbar, NavLink, Paper, Popover, ScrollArea, Select, Stack, Text, Title, UnstyledButton, useMantineTheme, Group } from '@mantine/core';
+import { AppShell, Box, Burger, Button, Divider, Header, MediaQuery, Navbar, NavLink, Paper, Popover, ScrollArea, Select, Stack, Text, Title, UnstyledButton, useMantineTheme, Group, Image } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
 import { showNotification } from '@mantine/notifications';
@@ -111,8 +111,10 @@ const admin_items = [
 export default function Layout({ children, user, title }) {
   const [token, setToken] = useState(user?.token);
   const [systemTheme, setSystemTheme] = useState(user.systemTheme ?? 'system');
+  const [avatar, setAvatar] = useState(user.avatar ?? null);
   const [opened, setOpened] = useState(false); // navigation open
   const [open, setOpen] = useState(false); // manage acc dropdown
+  
   const router = useRouter();
   const dispatch = useStoreDispatch();
   const theme = useMantineTheme();
@@ -258,7 +260,7 @@ export default function Layout({ children, user, title }) {
               >
                 <Popover.Target>
                   <Button
-                    leftIcon={<SettingsIcon />}
+                    leftIcon={avatar ? <Image src={avatar} height={32} radius='md' /> : <SettingsIcon />}
                     onClick={() => setOpen((o) => !o)}
                     sx={t => ({
                       backgroundColor: '#00000000',

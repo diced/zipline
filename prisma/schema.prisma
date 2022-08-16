@@ -11,6 +11,7 @@ model User {
   id            Int       @id @default(autoincrement())
   username      String
   password      String
+  avatar        String?
   token         String
   administrator Boolean   @default(false)
   systemTheme   String    @default("system")
@@ -79,11 +80,11 @@ model Stats {
 }
 
 model Invite {
-  id         Int      @id @default(autoincrement())
-  code       String   @unique
-  created_at DateTime @default(now())
+  id         Int       @id @default(autoincrement())
+  code       String    @unique
+  created_at DateTime  @default(now())
   expires_at DateTime?
-  used       Boolean  @default(false)
+  used       Boolean   @default(false)
 
   createdBy   User @relation(fields: [createdById], references: [id])
   createdById Int

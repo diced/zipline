@@ -1,9 +1,9 @@
-import { Box, Button, Card, ColorInput, Group, MultiSelect, Space, Text, TextInput, PasswordInput, Title, Tooltip } from '@mantine/core';
+import { Box, Button, Card, ColorInput, Group, MultiSelect, Space, Text, TextInput, PasswordInput, Title, Tooltip, FileInput, Image } from '@mantine/core';
 import { randomId, useInterval } from '@mantine/hooks';
 import { useForm } from '@mantine/form';
 import { useModals } from '@mantine/modals';
 import { showNotification, updateNotification } from '@mantine/notifications';
-import { CrossIcon, DeleteIcon } from 'components/icons';
+import { CrossIcon, DeleteIcon, SettingsIcon } from 'components/icons';
 import DownloadIcon from 'components/icons/DownloadIcon';
 import Link from 'components/Link';
 import { SmallTable } from 'components/SmallTable';
@@ -25,6 +25,63 @@ export default function Manage() {
 
   const [exports, setExports] = useState([]);
   const [domains, setDomains] = useState(user.domains ?? []);
+  const [file, setFile] = useState<File>(null);
+  const [fileDataURL, setFileDataURL] = useState(user.avatar ?? null);
+
+  const getDataURL = (f: File): Promise<string> => {
+    return new Promise((res, rej) => {
+      const reader = new FileReader();
+
+      reader.addEventListener('load', () => {
+        res(reader.result as string);
+      });
+
+      reader.addEventListener('error', () => {
+        rej(reader.error);
+      });
+
+      reader.readAsDataURL(f);
+    });
+  };
+
+  const handleAvatarChange = async (file: File) => {
+    setFile(file);
+
+    setFileDataURL(await getDataURL(file));
+  };
+
+  const saveAvatar = async () => {
+    const dataURL = await getDataURL(file);
+
+    showNotification({
+      id: 'update-user',
+      title: 'Updating user...',
+      message: '',
+      loading: true,
+      autoClose: false,
+    });
+
+    const newUser = await useFetch('/api/user', 'PATCH', {
+      avatar: dataURL,
+    });
+
+    if (newUser.error) {
+      updateNotification({
+        id: 'update-user',
+        title: 'Couldn\'t save user',
+        message: newUser.error,
+        color: 'red',
+        icon: <CrossIcon />,
+      });
+    } else {
+      dispatch(updateUser(newUser));
+      updateNotification({
+        id: 'update-user',
+        title: 'Saved User',
+        message: '',
+      });
+    }
+  };
 
   const genShareX = (withEmbed: boolean = false, withZws: boolean = false) => {
     const config = {
@@ -222,6 +279,32 @@ export default function Manage() {
           >Save User</Button>
         </Group>
       </form>
+
+      <Box mb='md'>
+        <Title>Avatar</Title>
+        <FileInput id='file' description='Add a custom avatar or leave blank for none' accept='image/png,image/jpeg,image/gif' value={file} onChange={handleAvatarChange} />
+        <Card mt='md'>
+          <Text>Preview:</Text>
+          <Button
+            leftIcon={fileDataURL ? <Image src={fileDataURL} height={32} radius='md' /> : <SettingsIcon />}
+            sx={t => ({
+              backgroundColor: '#00000000',
+              '&:hover': {
+                backgroundColor: t.other.hover,
+              },
+            })}
+            size='xl'
+            p='sm'
+          >
+            {user.username}
+          </Button>
+        </Card>
+
+        <Group position='right' mt='md'>
+          <Button onClick={() => { setFile(null); setFileDataURL(null); }}>Reset</Button>
+          <Button onClick={saveAvatar} >Save Avatar</Button>
+        </Group>
+      </Box>
 
       <Box mb='md'>
         <Title>Manage Data</Title>

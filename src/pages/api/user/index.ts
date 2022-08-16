@@ -23,7 +23,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
           username: req.body.username,
         },
       });
-      if (existing && user.username !== req.body.username) { 
+      if (existing && user.username !== req.body.username) {
         return res.forbid('Username is already taken');
       }
       await prisma.user.update({
@@ -31,6 +31,11 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         data: { username: req.body.username },
       });
     }
+
+    if (req.body.avatar) await prisma.user.update({
+      where: { id: user.id },
+      data: { avatar: req.body.avatar },
+    });
 
     if (req.body.embedTitle) await prisma.user.update({
       where: { id: user.id },
@@ -57,7 +62,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         where: { id: user.id },
         data: { domains: [] },
       });
-      
+
       const invalidDomains = [];
 
       for (const domain of req.body.domains) {
@@ -98,6 +103,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         token: true,
         username: true,
         domains: true,
+        avatar: true,
       },
     });
 

@@ -8,6 +8,7 @@ export interface User {
   embedSiteName: string;
   systemTheme: string;
   domains: string[];
+  avatar?: string;
 }
 
 const initialState: User = null;
