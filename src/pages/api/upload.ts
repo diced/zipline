@@ -8,6 +8,7 @@ import { ImageFormat, InvisibleImage } from '@prisma/client';
 import { format as formatDate } from 'fecha';
 import datasource from 'lib/datasource';
 import { randomUUID } from 'crypto';
+import sharp from 'sharp';
 
 const uploader = multer();
 
@@ -53,6 +54,8 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
   const rawFormat = ((req.headers.format || '') as string).toUpperCase() || 'RANDOM';
   const format: ImageFormat = Object.keys(ImageFormat).includes(rawFormat) && ImageFormat[rawFormat];
+  const imageCompressionPercent = req.headers['image-compression-percent'] ? Number(req.headers['image-compression-percent']) : null;
+
   const files = [];
   for (let i = 0; i !== req.files.length; ++i) {
     const file = req.files[i];
@@ -82,10 +85,11 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       password = await hashPassword(req.headers.password as string);
     }
 
+    const compressionUsed = imageCompressionPercent && file.mimetype.startsWith('image/');
     let invis: InvisibleImage;
     const image = await prisma.image.create({
       data: {
-        file: `${fileName}.${ext}`,
+        file: `${fileName}.${compressionUsed ? 'jpg' : ext}`,
         mimetype: req.headers.uploadtext ? 'text/plain' : file.mimetype,
         userId: user.id,
         embed: !!req.headers.embed,
@@ -97,7 +101,14 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
     if (req.headers.zws) invis = await createInvisImage(zconfig.uploader.length, image.id);
 
-    await datasource.save(image.file, file.buffer);
+    if (compressionUsed) {
+      const buffer = await sharp(file.buffer).jpeg({ quality: imageCompressionPercent }).toBuffer();
+      await datasource.save(image.file, buffer);
+      Logger.get('image').info(`User ${user.username} (${user.id}) compressed image from ${file.buffer.length} -> ${buffer.length} bytes`);
+    } else {
+      await datasource.save(image.file, file.buffer);
+    }
+
     Logger.get('image').info(`User ${user.username} (${user.id}) uploaded an image ${image.file} (${image.id})`);
     if (user.domains.length) {
       const domain = user.domains[Math.floor(Math.random() * user.domains.length)];
