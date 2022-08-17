@@ -15,6 +15,7 @@
     "docker:build-dev": "docker-compose --file docker-compose.dev.yml up --build"
   },
   "dependencies": {
+    "@dicedtomato/mantine-data-grid": "0.0.20",
     "@emotion/react": "^11.9.3",
     "@emotion/server": "^11.4.0",
     "@iarna/toml": "2.2.5",
@@ -34,6 +35,7 @@
     "argon2": "^0.28.5",
     "colorette": "^2.0.19",
     "cookie": "^0.5.0",
+    "dayjs": "^1.11.5",
     "dotenv": "^16.0.1",
     "dotenv-expand": "^8.0.3",
     "fecha": "^4.2.3",

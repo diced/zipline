@@ -1,21 +1,20 @@
-import { SimpleGrid, Skeleton, Text, Title } from '@mantine/core';
+import { SimpleGrid, Skeleton, Title, Card as MantineCard, useMantineTheme, Box } from '@mantine/core';
 import { randomId, useClipboard } from '@mantine/hooks';
 import { showNotification } from '@mantine/notifications';
 import Card from 'components/Card';
 import File from 'components/File';
-import { CopyIcon, CrossIcon, DeleteIcon } from 'components/icons';
-import ImagesTable from 'components/ImagesTable';
+import { CopyIcon, CrossIcon, DeleteIcon, EnterIcon } from 'components/icons';
 import Link from 'components/Link';
 import MutedText from 'components/MutedText';
 import { bytesToRead } from 'lib/clientUtils';
 import useFetch from 'lib/hooks/useFetch';
 import { useStoreSelector } from 'lib/redux/store';
+import { DataGrid, dateFilterFn, stringFilterFn } from '@dicedtomato/mantine-data-grid';
 import { useEffect, useState } from 'react';
-
-type Aligns = 'inherit' | 'right' | 'left' | 'center' | 'justify';
 
 export default function Dashboard() {
   const user = useStoreSelector(state => state.user);
+  const theme = useMantineTheme();
 
   const [images, setImages] = useState([]);
   const [recent, setRecent] = useState([]);
@@ -117,17 +116,77 @@ export default function Dashboard() {
 
       <Title mt='md'>Files</Title>
       <MutedText size='md'>View your gallery <Link href='/dashboard/files'>here</Link>.</MutedText>
-      <ImagesTable
-        columns={[
-          { accessor: 'file', Header: 'Name', minWidth: 170, align: 'inherit' as Aligns },
-          { accessor: 'mimetype', Header: 'Type', minWidth: 100, align: 'inherit' as Aligns },
-          { accessor: 'created_at', Header: 'Date' },
-        ]}
-        data={images}
-        deleteImage={deleteImage}
-        copyImage={copyImage}
-        viewImage={viewImage}
-      />
+      <Box>
+        <DataGrid
+          data={images}
+          loading={images.length ? false : true}
+          withPagination={true}
+          withColumnResizing={false}
+          withColumnFilters={true}
+          noEllipsis={true}
+          withSorting={true}
+          highlightOnHover={true}
+          CopyIcon={CopyIcon}
+          DeleteIcon={DeleteIcon}
+          EnterIcon={EnterIcon}
+          deleteImage={deleteImage}
+          copyImage={copyImage}
+          viewImage={viewImage}
+          styles={{
+            dataCell: {
+              width: '100%',
+            },
+            td: {
+              ':nth-child(1)': {
+                minWidth: 170,
+              },
+              ':nth-child(2)': {
+                minWidth: 100,
+              },
+            },
+            th: {
+              ':nth-child(1)': {
+                minWidth: 170,
+                padding: theme.spacing.lg,
+                borderTopLeftRadius: theme.radius.sm,
+              },
+              ':nth-child(2)': {
+                minWidth: 100,
+                padding: theme.spacing.lg,
+              },
+              ':nth-child(3)': {
+                padding: theme.spacing.lg,
+              },
+              ':nth-child(4)': {
+                padding: theme.spacing.lg,
+                borderTopRightRadius: theme.radius.sm,
+              },
+            },
+            thead: {
+              backgroundColor: theme.colors.dark[6],
+            },
+          }}
+          empty={<></>}
+
+          columns={[
+            {
+              accessorKey: 'file',
+              header: 'Name',
+              filterFn: stringFilterFn,
+            },
+            {
+              accessorKey: 'mimetype',
+              header: 'Type',
+              filterFn: stringFilterFn,
+            },
+            {
+              accessorKey: 'created_at',
+              header: 'Date',
+              filterFn: dateFilterFn,
+            },
+          ]}
+        />
+      </Box>
     </>
   );
 }
