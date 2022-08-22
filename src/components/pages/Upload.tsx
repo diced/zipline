@@ -140,7 +140,7 @@ export default function Upload() {
 
     req.open('POST', '/api/upload');
     req.setRequestHeader('Authorization', user.token);
-    expires !== 'never' && req.setRequestHeader('Expires-At', expires_at.toISOString());
+    expires !== 'never' && req.setRequestHeader('Expires-At', 'date=' + expires_at.toISOString());
 
     req.send(body);
   };

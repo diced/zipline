@@ -6009,6 +6009,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ms@npm:canary":
+  version: 3.0.0-canary.1
+  resolution: "ms@npm:3.0.0-canary.1"
+  checksum: 5ec76c0932cf83ac3e7f70f1a4c0d4db4dbc91de6ea5f7d336c67b48f513c8cb4c0fce3a07e3d84ee931dbdc9a48f33ed1c485e834279fff8906d385e86684ae
+  languageName: node
+  linkType: hard
+
 "mssql@npm:8.1.2":
   version: 8.1.2
   resolution: "mssql@npm:8.1.2"
@@ -8896,6 +8903,7 @@ __metadata:
     fflate: ^0.7.3
     find-my-way: ^6.3.0
     minio: ^7.0.28
+    ms: canary
     multer: ^1.4.5-lts.1
     next: ^12.1.6
     npm-run-all: ^4.1.5

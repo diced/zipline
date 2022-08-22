@@ -9,6 +9,8 @@ import { format as formatDate } from 'fecha';
 import datasource from 'lib/datasource';
 import { randomUUID } from 'crypto';
 import sharp from 'sharp';
+import { humanTime, parseExpiry } from 'lib/clientUtils';
+import { StringValue } from 'ms';
 
 const uploader = multer();
 
@@ -42,21 +44,27 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   await run(uploader.array('file'))(req, res);
 
   if (!req.files) return res.error('no files');
-
   if (req.files && req.files.length === 0) return res.error('no files');
 
+  const response: { files: string[], expires_at?: Date } = { files: [] };
+
   const expires_at = req.headers['expires-at'] as string;
-  const expiry = expires_at ? new Date(expires_at) : null;
-  if (expiry) {
-    if (!expiry.getTime()) return res.bad('invalid date');
-    if (expiry.getTime() < Date.now()) return res.bad('date is in the past');
+  let expiry: Date;
+
+  if (expires_at) {
+    expiry = parseExpiry(expires_at);
+    if (!expiry) return res.error('invalid date');
+    else {
+      response.expires_at = expiry;
+    }
   }
 
   const rawFormat = ((req.headers.format || '') as string).toUpperCase() || 'RANDOM';
   const format: ImageFormat = Object.keys(ImageFormat).includes(rawFormat) && ImageFormat[rawFormat];
+
   const imageCompressionPercent = req.headers['image-compression-percent'] ? Number(req.headers['image-compression-percent']) : null;
 
-  const files = [];
+
   for (let i = 0; i !== req.files.length; ++i) {
     const file = req.files[i];
     if (file.size > zconfig.uploader[user.administrator ? 'admin_limit' : 'user_limit']) return res.error(`file[${i}] size too big`);
@@ -78,6 +86,9 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       case ImageFormat.NAME:
         fileName = file.originalname.split('.')[0];
         break;
+      default:
+        fileName = randomChars(zconfig.uploader.length);
+        break;
     }
 
     let password = null;
@@ -90,7 +101,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     const image = await prisma.image.create({
       data: {
         file: `${fileName}.${compressionUsed ? 'jpg' : ext}`,
-        mimetype: req.headers.uploadtext ? 'text/plain' : file.mimetype,
+        mimetype: req.headers.uploadtext ? 'text/plain' : (compressionUsed ? 'image/jpeg' : file.mimetype),
         userId: user.id,
         embed: !!req.headers.embed,
         format,
@@ -112,9 +123,9 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     Logger.get('image').info(`User ${user.username} (${user.id}) uploaded an image ${image.file} (${image.id})`);
     if (user.domains.length) {
       const domain = user.domains[Math.floor(Math.random() * user.domains.length)];
-      files.push(`${domain}${zconfig.uploader.route === '/' ? '' : zconfig.uploader.route}/${invis ? invis.invis : image.file}`);
+      response.files.push(`${domain}${zconfig.uploader.route === '/' ? '' : zconfig.uploader.route}/${invis ? invis.invis : image.file}`);
     } else {
-      files.push(`${zconfig.core.https ? 'https' : 'http'}://${req.headers.host}${zconfig.uploader.route === '/' ? '' : zconfig.uploader.route}/${invis ? invis.invis : image.file}`);
+      response.files.push(`${zconfig.core.https ? 'https' : 'http'}://${req.headers.host}${zconfig.uploader.route === '/' ? '' : zconfig.uploader.route}/${invis ? invis.invis : image.file}`);
     }
   }
 
@@ -140,7 +151,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     }
   }
 
-  return res.json({ files });
+  return res.json(response);
 }
 
 function run(middleware: any) {

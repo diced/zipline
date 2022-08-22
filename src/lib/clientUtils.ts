@@ -1,4 +1,5 @@
-import type { Image, User } from '@prisma/client';
+import type { Image, ImageFormat, User } from '@prisma/client';
+import ms, { StringValue } from 'ms';
 
 export function parse(str: string, image: Image, user: User) {
   if (!str) return null;
@@ -50,3 +51,35 @@ export function relativeTime(to: Date, from: Date = new Date()) {
   }
 }
 
+export function humanTime(string: StringValue | string): Date {
+  try {
+    const mil = ms(string as StringValue);
+    if (typeof mil !== 'number') return null; 
+    if (isNaN(mil)) return null;
+    if (!mil) return null;
+  
+    return new Date(Date.now() + mil);
+  } catch (_) {
+    return null;
+  }
+}
+
+export function parseExpiry(header: string): Date | null {
+  if (!header) return null;
+  header = header.toLowerCase();
+
+  if (header.startsWith('date=')) {
+    const date = new Date(header.substring(5));
+
+    if (!date.getTime()) return null;
+    if (date.getTime() < Date.now()) return null;
+    return date;
+  }
+
+  const human = humanTime(header);
+
+  if (!human) return null;
+  if (human.getTime() < Date.now()) return null;
+
+  return human;
+}

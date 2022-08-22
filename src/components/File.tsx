@@ -1,4 +1,4 @@
-import { Button, Card, Group, Modal, Stack, Text, Title, useMantineTheme } from '@mantine/core';
+import { Button, Card, Group, Modal, Stack, Text, Title, Tooltip, useMantineTheme } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { showNotification } from '@mantine/notifications';
 import useFetch from 'hooks/useFetch';
@@ -8,8 +8,18 @@ import { CalendarIcon, ClockIcon, CopyIcon, CrossIcon, DeleteIcon, FileIcon, Has
 import MutedText from './MutedText';
 import { relativeTime } from 'lib/clientUtils';
 
-export function FileMeta({ Icon, title, subtitle }) {
-  return (
+export function FileMeta({ Icon, title, subtitle, ...other }) {
+  return other.tooltip ? (
+    <Group>
+      <Icon size={24} />
+      <Tooltip label={other.tooltip}>
+        <Stack spacing={1}>
+          <Text>{title}</Text>
+          <MutedText size='md'>{subtitle}</MutedText>
+        </Stack>
+      </Tooltip>
+    </Group>
+  ) : (
     <Group>
       <Icon size={24} />
       <Stack spacing={1}>
@@ -88,7 +98,12 @@ export default function File({ image, updateImages }) {
             <FileMeta Icon={FileIcon} title='Name' subtitle={image.file} />
             <FileMeta Icon={ImageIcon} title='Type' subtitle={image.mimetype} />
             <FileMeta Icon={CalendarIcon} title='Uploaded at' subtitle={new Date(image.created_at).toLocaleString()} />
-            {image.expires_at && <FileMeta Icon={ClockIcon} title='Expires' subtitle={relativeTime(new Date(image.expires_at))} />}
+            {image.expires_at && <FileMeta
+              Icon={ClockIcon}
+              title='Expires'
+              subtitle={relativeTime(new Date(image.expires_at))}
+              tooltip={new Date(image.expires_at).toLocaleString()}
+            />}
             <FileMeta Icon={HashIcon} title='ID' subtitle={image.id} />
           </Stack>
         </Stack>
