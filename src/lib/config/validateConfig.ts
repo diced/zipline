@@ -1,6 +1,19 @@
 import { Config } from 'lib/config/Config';
 import { object, bool, string, number, boolean, array } from 'yup';
 
+const discord_content = object({
+  content: string().nullable(),
+  embed: object({
+    title: string().nullable().default(null),
+    description: string().nullable().default(null),
+    footer: string().nullable().default(null),
+    color: string().nullable().default(null),
+    thumbnail: boolean().default(false),
+    image: boolean().default(true),
+    timestamp: boolean().default(true),
+  }).nullable().default(null),
+}).nullable().default(null);
+
 const validator = object({
   core: object({
     https: bool().default(false),
@@ -54,6 +67,13 @@ const validator = object({
     title: string().default('Zipline'),
     show_files_per_user: boolean().default(true),
   }),
+  discord: object({
+    url: string(),
+    username: string().default('Zipline'),
+    avatar_url: string().default('https://raw.githubusercontent.com/diced/zipline/9b60147e112ec5b70170500b85c75ea621f41d03/public/zipline.png'),
+    upload: discord_content,
+    shorten: discord_content,
+  }).optional().nullable().default(null),
 });
 
 export default function validate(config): Config {
@@ -89,7 +109,9 @@ export default function validate(config): Config {
         break;
       }
     }
-    
+
+    console.log(validated);
+
     return validated as unknown as Config;
   } catch (e) {
     if (process.env.ZIPLINE_DOCKER_BUILD) return null;

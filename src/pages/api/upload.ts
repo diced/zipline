@@ -11,6 +11,7 @@ import { randomUUID } from 'crypto';
 import sharp from 'sharp';
 import { humanTime, parseExpiry } from 'lib/clientUtils';
 import { StringValue } from 'ms';
+import { sendUpload } from 'lib/discord';
 
 const uploader = multer();
 
@@ -126,6 +127,10 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       response.files.push(`${domain}${zconfig.uploader.route === '/' ? '' : zconfig.uploader.route}/${invis ? invis.invis : image.file}`);
     } else {
       response.files.push(`${zconfig.core.https ? 'https' : 'http'}://${req.headers.host}${zconfig.uploader.route === '/' ? '' : zconfig.uploader.route}/${invis ? invis.invis : image.file}`);
+    }
+
+    if (zconfig.discord.upload) {
+      await sendUpload(user, image, `${zconfig.core.https ? 'https' : 'http'}://${req.headers.host}${zconfig.uploader.route === '/' ? '' : zconfig.uploader.route}/${invis ? invis.invis : image.file}`);
     }
   }
 

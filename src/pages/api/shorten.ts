@@ -3,6 +3,8 @@ import zconfig from 'lib/config';
 import { NextApiReq, NextApiRes, withZipline } from 'lib/middleware/withZipline';
 import { createInvisURL, randomChars } from 'lib/util';
 import Logger from 'lib/logger';
+import config from 'lib/config';
+import { sendShorten } from 'lib/discord';
 
 async function handler(req: NextApiReq, res: NextApiRes) {
   if (req.method !== 'POST') return res.forbid('no allow');
@@ -42,7 +44,11 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     
   if (req.headers.zws) invis = await createInvisURL(zconfig.urls.length, url.id);
 
-  Logger.get('url').info(`User ${user.username} (${user.id}) shortenned a url ${url.destination} (${url.id})`); 
+  Logger.get('url').info(`User ${user.username} (${user.id}) shortenned a url ${url.destination} (${url.id})`);
+
+  if (config.discord.shorten) {
+    await sendShorten(user, url, `${zconfig.core.https ? 'https' : 'http'}://${req.headers.host}${zconfig.urls.route}/${req.body.vanity ? req.body.vanity : invis ? invis.invis : url.id}`);
+  }
 
   return res.json({ url: `${zconfig.core.https ? 'https' : 'http'}://${req.headers.host}${zconfig.urls.route}/${req.body.vanity ? req.body.vanity : invis ? invis.invis : url.id}` });
 }

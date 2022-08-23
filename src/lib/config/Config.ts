@@ -112,6 +112,30 @@ export interface ConfigWebsite {
   show_files_per_user: boolean;
 }
 
+export interface ConfigDiscord {
+  url: string;
+  username: string;
+  avatar_url: string;
+
+  upload: ConfigDiscordContent;
+  shorten: ConfigDiscordContent;
+}
+
+export interface ConfigDiscordContent {
+  content: string;
+  embed: ConfigDiscordEmbed;
+}
+
+export interface ConfigDiscordEmbed {
+  title?: string;
+  description?: string;
+  footer?: string;
+  color?: number;
+  thumbnail?: boolean;
+  timestamp: boolean;
+  image: boolean;
+}
+
 export interface Config {
   core: ConfigCore;
   uploader: ConfigUploader;
@@ -119,4 +143,5 @@ export interface Config {
   ratelimit: ConfigRatelimit;
   datasource: ConfigDatasource;
   website: ConfigWebsite;
+  discord: ConfigDiscord;
 }

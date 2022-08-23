@@ -83,6 +83,28 @@ export default function readConfig() {
 
     map('WEBSITE_TITLE', 'string', 'website.title'),
     map('WEBSITE_SHOW_FILES_PER_USER', 'boolean', 'website.show_files_per_user'),
+
+    map('DISCORD_URL', 'string', 'discord.url'),
+    map('DISCORD_USERNAME', 'string', 'discord.username'),
+    map('DISCORD_AVATAR_URL', 'string', 'discord.avatar_url'),
+
+    map('DISCORD_UPLOAD_CONTENT', 'string', 'discord.upload.content'),
+    map('DISCORD_UPLOAD_EMBED_TITLE', 'string', 'discord.upload.embed.title'),
+    map('DISCORD_UPLOAD_EMBED_DESCRIPTION', 'string', 'discord.upload.embed.description'),
+    map('DISCORD_UPLOAD_EMBED_FOOTER', 'string', 'discord.upload.embed.footer'),
+    map('DISCORD_UPLOAD_EMBED_COLOR', 'number', 'discord.upload.embed.color'),
+    map('DISCORD_UPLOAD_EMBED_IMAGE', 'boolean', 'discord.upload.embed.image'),
+    map('DISCORD_UPLOAD_EMBED_THUMBNAIL', 'boolean', 'discord.upload.embed.thumbnail'),
+    map('DISCORD_UPLOAD_EMBED_TIMESTAMP', 'boolean', 'discord.upload.embed.timestamp'),
+
+    map('DISCORD_SHORTEN_CONTENT', 'string', 'discord.shorten.content'),
+    map('DISCORD_SHORTEN_EMBED_TITLE', 'string', 'discord.shorten.embed.title'),
+    map('DISCORD_SHORTEN_EMBED_DESCRIPTION', 'string', 'discord.shorten.embed.description'),
+    map('DISCORD_SHORTEN_EMBED_FOOTER', 'string', 'discord.shorten.embed.footer'),
+    map('DISCORD_SHORTEN_EMBED_COLOR', 'number', 'discord.shorten.embed.color'),
+    map('DISCORD_SHORTEN_EMBED_IMAGE', 'boolean', 'discord.shorten.embed.image'),
+    map('DISCORD_SHORTEN_EMBED_THUMBNAIL', 'boolean', 'discord.shorten.embed.thumbnail'),
+    map('DISCORD_SHORTEN_EMBED_TIMESTAMP', 'boolean', 'discord.shorten.embed.timestamp'),
   ];
 
   const config = {};
@@ -111,6 +133,5 @@ export default function readConfig() {
       set(config, map.path, parsed);
     }
   }
-
   return config;
 }
