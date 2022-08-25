@@ -1,4 +1,4 @@
-import { AppShell, Box, Burger, Button, Divider, Header, MediaQuery, Navbar, NavLink, Paper, Popover, ScrollArea, Select, Stack, Text, Title, UnstyledButton, useMantineTheme, Group, Image } from '@mantine/core';
+import { AppShell, Box, Burger, Button, Divider, Header, MediaQuery, Navbar, NavLink, Paper, Popover, ScrollArea, Select, Stack, Text, Title, UnstyledButton, useMantineTheme, Group, Image, Tooltip, Badge } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
 import { showNotification } from '@mantine/notifications';
@@ -7,7 +7,7 @@ import { updateUser } from 'lib/redux/reducers/user';
 import { useStoreDispatch } from 'lib/redux/store';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ActivityIcon, CheckIcon, CopyIcon, CrossIcon, DeleteIcon, FileIcon, HomeIcon, LinkIcon, LogoutIcon, PencilIcon, SettingsIcon, TagIcon, TypeIcon, UploadIcon, UserIcon } from './icons';
 import { friendlyThemeName, themes } from './Theming';
 
@@ -111,10 +111,11 @@ const admin_items = [
 export default function Layout({ children, user, title }) {
   const [token, setToken] = useState(user?.token);
   const [systemTheme, setSystemTheme] = useState(user.systemTheme ?? 'system');
-  const [avatar, setAvatar] = useState(user.avatar ?? null);
+  const [version, setVersion] = useState<{ local: string, upstream: string }>(null);
   const [opened, setOpened] = useState(false); // navigation open
   const [open, setOpen] = useState(false); // manage acc dropdown
   
+  const avatar = user?.avatar ?? null;
   const router = useRouter();
   const dispatch = useStoreDispatch();
   const theme = useMantineTheme();
@@ -191,6 +192,15 @@ export default function Layout({ children, user, title }) {
     },
   });
 
+  useEffect(() => {
+    (async () => {
+      const data = await useFetch('/api/version');
+      if (!data.error) {
+        setVersion(data);
+      }
+    })();
+  }, []);
+
   return (
     <AppShell
       navbarOffsetBreakpoint='sm'
@@ -238,6 +248,27 @@ export default function Layout({ children, user, title }) {
               </NavLink>
             )}
           </Navbar.Section>
+          {version ? (
+            <Navbar.Section>
+              <Tooltip
+                label={
+                  version.local !== version.upstream
+                    ? `You are running an outdated version of Zipline, refer to the docs on how to update to ${version.upstream}`
+                    : 'You are running the latest version of Zipline'
+                }
+              >
+                <Badge
+                  m='md'
+                  radius='md'
+                  size='lg'
+                  variant='dot'
+                  color={version.local !== version.upstream ? 'red' : 'primary'}
+                >
+                  {version.local}
+                </Badge>
+              </Tooltip>
+            </Navbar.Section>
+          ) : null}
         </Navbar>
       }
       header={

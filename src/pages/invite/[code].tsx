@@ -142,15 +142,7 @@ export const getServerSideProps: GetServerSideProps = async context => {
   if (!invite) return { notFound: true };
   if (invite.used) return { notFound: true };
 
-  if (invite.expires_at && invite.expires_at < new Date()) {
-    await prisma.invite.delete({
-      where: {
-        code,
-      },
-    });
-
-    return { notFound: true };
-  };
+  if (invite.expires_at && invite.expires_at < new Date()) return { notFound: true };
 
   return {
     props: {

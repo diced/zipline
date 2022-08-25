@@ -301,9 +301,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@dicedtomato/mantine-data-grid@npm:0.0.20":
-  version: 0.0.20
-  resolution: "@dicedtomato/mantine-data-grid@npm:0.0.20"
+"@dicedtomato/mantine-data-grid@npm:0.0.21":
+  version: 0.0.21
+  resolution: "@dicedtomato/mantine-data-grid@npm:0.0.21"
   dependencies:
     "@emotion/react": ^11.9.3
     "@mantine/core": ^5.0.0
@@ -324,7 +324,7 @@ __metadata:
   peerDependenciesMeta:
     dayjs:
       optional: true
-  checksum: 6d23048cc4d0dba093c8bbbaa70f7f7b8539834bcf11f070669b54a643b8def70c21a3a3ed7e807220e2c9928239c658b0a8f717a466cbfd4e8933576a2762a2
+  checksum: bca215db4cc2fbf776a30c2fe9fbb2e95649d9adfd8b014c04ae6a8dff00a726c6042546d79144f11323e2895539cc5d83686d9e5c6bc7a2e9f1a48cb2831b87
   languageName: node
   linkType: hard
 
@@ -8867,7 +8867,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "zipline@workspace:."
   dependencies:
-    "@dicedtomato/mantine-data-grid": 0.0.20
+    "@dicedtomato/mantine-data-grid": 0.0.21
     "@emotion/react": ^11.9.3
     "@emotion/server": ^11.4.0
     "@iarna/toml": 2.2.5

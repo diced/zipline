@@ -25,6 +25,7 @@
 - Discord embeds (OG metadata)
 - Gallery viewer, and multiple file format support
 - Code highlighting
+- Fully customizable Discord webhook notifications
 - Easy setup instructions on [docs](https://zipl.vercel.app/) (One command install `docker-compose up -d`)
 
 # Usage

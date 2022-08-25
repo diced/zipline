@@ -49,6 +49,7 @@ export default function readConfig() {
     map('CORE_DATABASE_URL', 'string', 'core.database_url'),
     map('CORE_LOGGER', 'boolean', 'core.logger'),
     map('CORE_STATS_INTERVAL', 'number', 'core.stats_interval'),
+    map('CORE_INVITES_INTERVAL', 'number', 'core.invites_interval'),
 
     map('DATASOURCE_TYPE', 'string', 'datasource.type'),
 
@@ -83,6 +84,7 @@ export default function readConfig() {
 
     map('WEBSITE_TITLE', 'string', 'website.title'),
     map('WEBSITE_SHOW_FILES_PER_USER', 'boolean', 'website.show_files_per_user'),
+    map('WEBSITE_SHOW_VERSION', 'boolean', 'website.show_version'),
 
     map('DISCORD_URL', 'string', 'discord.url'),
     map('DISCORD_USERNAME', 'string', 'discord.username'),

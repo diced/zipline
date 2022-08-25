@@ -23,6 +23,7 @@ const validator = object({
     database_url: string().required(),
     logger: boolean().default(false),
     stats_interval: number().default(1800),
+    invites_interval: number().default(1800),
   }).required(),
   datasource: object({
     type: string().oneOf(['local', 's3', 'swift']).default('local'),
@@ -66,6 +67,7 @@ const validator = object({
   website: object({
     title: string().default('Zipline'),
     show_files_per_user: boolean().default(true),
+    show_version: boolean().default(true),
   }),
   discord: object({
     url: string(),
@@ -109,8 +111,6 @@ export default function validate(config): Config {
         break;
       }
     }
-
-    console.log(validated);
 
     return validated as unknown as Config;
   } catch (e) {

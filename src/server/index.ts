@@ -111,10 +111,20 @@ async function start() {
   });
 
   http.listen(config.core.port, config.core.host ?? '0.0.0.0');
-  
+
   logger.info(`started ${dev ? 'development' : 'production'} zipline@${version} server`);
 
   stats(prisma);
+
+  setInterval(async () => {
+    await prisma.invite.deleteMany({
+      where: {
+        used: true,
+      },
+    });
+
+    if (config.core.logger) logger.info('invites cleaned');
+  }, config.core.invites_interval * 1000);
 }
 
 async function rawFile(
@@ -180,7 +190,7 @@ async function fileDb(
   if (image.expires_at && image.expires_at < new Date()) {
     await datasource.delete(image.file);
     await prisma.image.delete({ where: { id: image.id } });
-    
+
     return nextServer.render404(req, res as ServerResponse);
   }
 

@@ -114,8 +114,6 @@ export async function sendShorten(user: User, url: Url, host: string) {
     }] : null,
   };
 
-  console.log(body);
-
   const res = await fetch(config.discord.url, {
     method: 'POST',
     body: JSON.stringify(body),

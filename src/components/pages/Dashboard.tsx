@@ -116,77 +116,75 @@ export default function Dashboard() {
 
       <Title mt='md'>Files</Title>
       <MutedText size='md'>View your gallery <Link href='/dashboard/files'>here</Link>.</MutedText>
-      <Box>
-        <DataGrid
-          data={images}
-          loading={images.length ? false : true}
-          withPagination={true}
-          withColumnResizing={false}
-          withColumnFilters={true}
-          noEllipsis={true}
-          withSorting={true}
-          highlightOnHover={true}
-          CopyIcon={CopyIcon}
-          DeleteIcon={DeleteIcon}
-          EnterIcon={EnterIcon}
-          deleteImage={deleteImage}
-          copyImage={copyImage}
-          viewImage={viewImage}
-          styles={{
-            dataCell: {
-              width: '100%',
+      <DataGrid
+        data={images}
+        loading={images.length ? false : true}
+        withPagination={true}
+        withColumnResizing={false}
+        withColumnFilters={true}
+        noEllipsis={true}
+        withSorting={true}
+        highlightOnHover={true}
+        CopyIcon={CopyIcon}
+        DeleteIcon={DeleteIcon}
+        EnterIcon={EnterIcon}
+        deleteImage={deleteImage}
+        copyImage={copyImage}
+        viewImage={viewImage}
+        styles={{
+          dataCell: {
+            width: '100%',
+          },
+          td: {
+            ':nth-child(1)': {
+              minWidth: 170,
             },
-            td: {
-              ':nth-child(1)': {
-                minWidth: 170,
-              },
-              ':nth-child(2)': {
-                minWidth: 100,
-              },
+            ':nth-child(2)': {
+              minWidth: 100,
             },
-            th: {
-              ':nth-child(1)': {
-                minWidth: 170,
-                padding: theme.spacing.lg,
-                borderTopLeftRadius: theme.radius.sm,
-              },
-              ':nth-child(2)': {
-                minWidth: 100,
-                padding: theme.spacing.lg,
-              },
-              ':nth-child(3)': {
-                padding: theme.spacing.lg,
-              },
-              ':nth-child(4)': {
-                padding: theme.spacing.lg,
-                borderTopRightRadius: theme.radius.sm,
-              },
+          },
+          th: {
+            ':nth-child(1)': {
+              minWidth: 170,
+              padding: theme.spacing.lg,
+              borderTopLeftRadius: theme.radius.sm,
             },
-            thead: {
-              backgroundColor: theme.colors.dark[6],
+            ':nth-child(2)': {
+              minWidth: 100,
+              padding: theme.spacing.lg,
             },
-          }}
-          empty={<></>}
+            ':nth-child(3)': {
+              padding: theme.spacing.lg,
+            },
+            ':nth-child(4)': {
+              padding: theme.spacing.lg,
+              borderTopRightRadius: theme.radius.sm,
+            },
+          },
+          thead: {
+            backgroundColor: theme.colors.dark[6],
+          },
+        }}
+        empty={<></>}
 
-          columns={[
-            {
-              accessorKey: 'file',
-              header: 'Name',
-              filterFn: stringFilterFn,
-            },
-            {
-              accessorKey: 'mimetype',
-              header: 'Type',
-              filterFn: stringFilterFn,
-            },
-            {
-              accessorKey: 'created_at',
-              header: 'Date',
-              filterFn: dateFilterFn,
-            },
-          ]}
-        />
-      </Box>
+        columns={[
+          {
+            accessorKey: 'file',
+            header: 'Name',
+            filterFn: stringFilterFn,
+          },
+          {
+            accessorKey: 'mimetype',
+            header: 'Type',
+            filterFn: stringFilterFn,
+          },
+          {
+            accessorKey: 'created_at',
+            header: 'Date',
+            filterFn: dateFilterFn,
+          },
+        ]}
+      />
     </>
   );
 }

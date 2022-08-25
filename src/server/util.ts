@@ -5,23 +5,29 @@ import { Datasource } from 'lib/datasources';
 import { PrismaClient } from '@prisma/client';
 
 export async function migrations() {
-  const migrate = new Migrate('./prisma/schema.prisma');
-  await ensureDatabaseExists('apply', true, './prisma/schema.prisma');
+  try {
+    const migrate = new Migrate('./prisma/schema.prisma');
+    await ensureDatabaseExists('apply', true, './prisma/schema.prisma');
 
-  const diagnose = await migrate.diagnoseMigrationHistory({
-    optInToShadowDatabase: false,
-  });
+    const diagnose = await migrate.diagnoseMigrationHistory({
+      optInToShadowDatabase: false,
+    });
 
-  if (diagnose.history?.diagnostic === 'databaseIsBehind') {
-    try {
-      Logger.get('database').info('migrating database');
-      await migrate.applyMigrations();
-    } finally {
+    if (diagnose.history?.diagnostic === 'databaseIsBehind') {
+      try {
+        Logger.get('database').info('migrating database');
+        await migrate.applyMigrations();
+      } finally {
+        migrate.stop();
+        Logger.get('database').info('finished migrating database');
+      }
+    } else {
       migrate.stop();
-      Logger.get('database').info('finished migrating database');
     }
-  } else {
-    migrate.stop();
+  } catch (error) {
+    Logger.get('database').error('Failed to migrate database... exiting...');
+    Logger.get('database').error(error);
+    process.exit(1);
   }
 }
 
