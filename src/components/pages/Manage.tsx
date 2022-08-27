@@ -24,7 +24,6 @@ export default function Manage() {
   const modals = useModals();
 
   const [exports, setExports] = useState([]);
-  const [domains, setDomains] = useState(user.domains ?? []);
   const [file, setFile] = useState<File>(null);
   const [fileDataURL, setFileDataURL] = useState(user.avatar ?? null);
 
@@ -116,7 +115,7 @@ export default function Manage() {
       embedTitle: user.embedTitle ?? '',
       embedColor: user.embedColor,
       embedSiteName: user.embedSiteName ?? '',
-      domains: user.domains ?? [],
+      domains: user.domains.join(','),
     },
   });
 
@@ -143,7 +142,7 @@ export default function Manage() {
       embedTitle: cleanEmbedTitle === '' ? null : cleanEmbedTitle,
       embedColor: cleanEmbedColor === '' ? null : cleanEmbedColor,
       embedSiteName: cleanEmbedSiteName === '' ? null : cleanEmbedSiteName,
-      domains,
+      domains: values.domains.split(/\s?,\s?/).map(x => x.trim()).filter(x => x !== ''),
     };
 
     const newUser = await useFetch('/api/user', 'PATCH', data);
@@ -260,18 +259,7 @@ export default function Manage() {
         <TextInput id='embedTitle' label='Embed Title' {...form.getInputProps('embedTitle')} />
         <ColorInput id='embedColor' label='Embed Color' {...form.getInputProps('embedColor')} />
         <TextInput id='embedSiteName' label='Embed Site Name' {...form.getInputProps('embedSiteName')} />
-        <MultiSelect
-          id='domains'
-          label='Domains'
-          data={domains}
-          placeholder='Leave blank if you dont want random domain selection.'
-          creatable
-          searchable
-          clearable
-          getCreateLabel={query => `Add ${query}`}
-          onCreate={query => setDomains((current) => [...current, query])}
-          {...form.getInputProps('domains')}
-        />
+        <TextInput id='domains' label='Domains' description='A list of domains separated by commas. These domains will be used to randomly output a domain when uploading. This is optional.' placeholder='https://example.com, https://example2.com' {...form.getInputProps('domains')} />
 
         <Group position='right' mt='md'>
           <Button

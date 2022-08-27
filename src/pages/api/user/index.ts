@@ -24,7 +24,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         },
       });
       if (existing && user.username !== req.body.username) {
-        return res.forbid('Username is already taken');
+        return res.forbid('username is already taken');
       }
       await prisma.user.update({
         where: { id: user.id },
@@ -64,27 +64,25 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       });
 
       const invalidDomains = [];
+      const domains = [];
 
       for (const domain of req.body.domains) {
         try {
           const url = new URL(domain);
-          url.pathname = '/api/version';
-          const res = await fetch(url.toString());
-          if (!res.ok) invalidDomains.push({ domain, reason: 'Got a non OK response' });
-          else {
-            const body = await res.json();
-            if (body?.local !== pkg.version) invalidDomains.push({ domain, reason: 'Version mismatch' });
-            else await prisma.user.update({
-              where: { id: user.id },
-              data: { domains: { push: url.origin } },
-            });
-          }
+          domains.push(url.origin);
         } catch (e) {
           invalidDomains.push({ domain, reason: e.message });
         }
       }
 
-      if (invalidDomains.length) return res.forbid('Invalid domains', { invalidDomains });
+      if (invalidDomains.length) return res.forbid('invalid domains', { invalidDomains });
+
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { domains },
+      });
+
+      return res.json({ domains });
     }
 
     const newUser = await prisma.user.findFirst({
