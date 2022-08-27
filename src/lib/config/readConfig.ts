@@ -24,7 +24,7 @@ function set(object: Record<string, any>, property: string, value: any) {
   return object;
 }
 
-function map(env: string, type: 'string' | 'number' | 'boolean' | 'array', path: string) {
+function map(env: string, type: 'string' | 'number' | 'boolean' | 'array' | 'json-array', path: string) {
   return {
     env,
     type,
@@ -85,6 +85,7 @@ export default function readConfig() {
     map('WEBSITE_TITLE', 'string', 'website.title'),
     map('WEBSITE_SHOW_FILES_PER_USER', 'boolean', 'website.show_files_per_user'),
     map('WEBSITE_SHOW_VERSION', 'boolean', 'website.show_version'),
+    map('WEBSITE_EXTERNAL_LINKS', 'json-array', 'website.external_links'),
 
     map('DISCORD_URL', 'string', 'discord.url'),
     map('DISCORD_USERNAME', 'string', 'discord.username'),
@@ -128,6 +129,12 @@ export default function readConfig() {
         case 'boolean':
           parsed = value === 'true';
           break;
+        case 'json-array':
+          try {
+            parsed = JSON.parse(value);
+          } catch (e) {
+            parsed = [];
+          }
         default:
           parsed = value;
       };

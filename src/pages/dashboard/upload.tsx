@@ -3,33 +3,25 @@ import useLogin from 'hooks/useLogin';
 import Layout from 'components/Layout';
 import Upload from 'components/pages/Upload';
 import { LoadingOverlay } from '@mantine/core';
-import { GetServerSideProps } from 'next';
 import Head from 'next/head';
+export { getServerSideProps } from 'middleware/getServerSideProps';
 
-export default function UploadPage({ title }) {
+export default function UploadPage(props) {
   const { user, loading } = useLogin();
 
   if (loading) return <LoadingOverlay visible={loading} />;
-  
+
   return (
     <>
       <Head>
-        <title>{title} - Upload</title>
+        <title>{props.title} - Upload</title>
       </Head>
       <Layout
         user={user}
-        title={title}
+        props={props}
       >
-        <Upload/>
+        <Upload />
       </Layout>
     </>
   );
 }
-
-export const getServerSideProps: GetServerSideProps = async () => {
-  return {
-    props: {
-      title: global.config.website.title,
-    },
-  };
-};

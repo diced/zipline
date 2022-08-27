@@ -62,6 +62,13 @@ export interface ConfigWebsite {
   title: string;
   show_files_per_user: boolean;
   show_version: boolean;
+
+  external_links: ConfigWebsiteExternalLinks[];
+}
+
+export interface ConfigWebsiteExternalLinks {
+  label: string;
+  url: string;
 }
 
 export interface ConfigDiscord {

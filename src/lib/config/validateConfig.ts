@@ -68,6 +68,13 @@ const validator = object({
     title: string().default('Zipline'),
     show_files_per_user: boolean().default(true),
     show_version: boolean().default(true),
+    external_links: array(object({
+      label: string(),
+      link: string(),
+    })).default([
+      { label: 'Zipline', link: 'https://github.com/diced/zipline' },
+      { label: 'Documentation', link: 'https://zipline.diced.tech/' },
+    ]),
   }),
   discord: object({
     url: string(),

@@ -4,9 +4,9 @@ import Layout from 'components/Layout';
 import Invites from 'components/pages/Invites';
 import { LoadingOverlay } from '@mantine/core';
 import Head from 'next/head';
-import { GetServerSideProps } from 'next';
+export { getServerSideProps } from 'middleware/getServerSideProps';
 
-export default function InvitesPage({ title }) {
+export default function InvitesPage(props) {
   const { user, loading } = useLogin();
 
   if (loading) return <LoadingOverlay visible={loading} />;
@@ -14,22 +14,14 @@ export default function InvitesPage({ title }) {
   return (
     <>
       <Head>
-        <title>{title} - Invites</title>
+        <title>{props.title} - Invites</title>
       </Head>
       <Layout
         user={user}
-        title={title}
+        props={props}
       >
         <Invites />
       </Layout>
     </>
   );
 }
-
-export const getServerSideProps: GetServerSideProps = async () => {
-  return {
-    props: {
-      title: global.config.website.title,
-    },
-  };
-};

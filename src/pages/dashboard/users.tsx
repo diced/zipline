@@ -3,10 +3,10 @@ import useLogin from 'hooks/useLogin';
 import Layout from 'components/Layout';
 import Users from 'components/pages/Users';
 import { LoadingOverlay } from '@mantine/core';
-import { GetServerSideProps } from 'next';
 import Head from 'next/head';
+export { getServerSideProps } from 'middleware/getServerSideProps';
 
-export default function UsersPage({ title }) {
+export default function UsersPage(props) {
   const { user, loading } = useLogin();
 
   if (loading) return <LoadingOverlay visible={loading} />;
@@ -14,22 +14,14 @@ export default function UsersPage({ title }) {
   return (
     <>
       <Head>
-        <title>{title} - Users</title>
+        <title>{props.title} - Users</title>
       </Head>
       <Layout
         user={user}
-        title={title}
+        props={props}
       >
         <Users />
       </Layout>
     </>
   );
 }
-
-export const getServerSideProps: GetServerSideProps = async () => {
-  return {
-    props: {
-      title: global.config.website.title,
-    },
-  };
-};

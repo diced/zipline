@@ -8,7 +8,7 @@ import { useStoreDispatch } from 'lib/redux/store';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { ActivityIcon, CheckIcon, CopyIcon, CrossIcon, DeleteIcon, FileIcon, HomeIcon, LinkIcon, LogoutIcon, PencilIcon, SettingsIcon, TagIcon, TypeIcon, UploadIcon, UserIcon } from './icons';
+import { ExternalLinkIcon, ActivityIcon, CheckIcon, CopyIcon, CrossIcon, DeleteIcon, FileIcon, HomeIcon, LinkIcon, LogoutIcon, PencilIcon, SettingsIcon, TagIcon, TypeIcon, UploadIcon, UserIcon } from './icons';
 import { friendlyThemeName, themes } from './Theming';
 
 function MenuItemLink(props) {
@@ -22,7 +22,7 @@ function MenuItemLink(props) {
 function MenuItem(props) {
   return (
     <UnstyledButton
-      sx={theme => ({ 
+      sx={theme => ({
         display: 'block',
         width: '100%',
         padding: 5,
@@ -31,7 +31,7 @@ function MenuItem(props) {
           ? theme.fn.themeColor(props.color, theme.colorScheme === 'dark' ? 5 : 7)
           : theme.colorScheme === 'dark'
             ? theme.colors.dark[0]
-            : theme.black,  
+            : theme.black,
         '&:hover': {
           backgroundColor: props.color
             ? theme.fn.rgba(
@@ -108,13 +108,16 @@ const admin_items = [
   },
 ];
 
-export default function Layout({ children, user, title }) {
+export default function Layout({ children, user, props }) {
+  const { title } = props;
+  const external_links = JSON.parse(props.external_links ?? '[]');
+
   const [token, setToken] = useState(user?.token);
   const [systemTheme, setSystemTheme] = useState(user.systemTheme ?? 'system');
   const [version, setVersion] = useState<{ local: string, upstream: string }>(null);
   const [opened, setOpened] = useState(false); // navigation open
   const [open, setOpen] = useState(false); // manage acc dropdown
-  
+
   const avatar = user?.avatar ?? null;
   const router = useRouter();
   const dispatch = useStoreDispatch();
@@ -248,6 +251,19 @@ export default function Layout({ children, user, title }) {
               </NavLink>
             )}
           </Navbar.Section>
+          <Navbar.Section>
+            {external_links.length ? external_links.map(({ label, link }, i) => (
+              <Link href={link} passHref key={i}>
+                <NavLink
+                  label={label}
+                  component='a'
+                  target='_blank'
+                  variant='light'
+                  icon={<ExternalLinkIcon />}
+                />
+              </Link>
+            )) : null}
+          </Navbar.Section>
           {version ? (
             <Navbar.Section>
               <Tooltip
@@ -319,8 +335,8 @@ export default function Layout({ children, user, title }) {
                       {user.username}
                     </Text>
                     <MenuItemLink icon={<SettingsIcon />} href='/dashboard/manage'>Manage Account</MenuItemLink>
-                    <MenuItem icon={<CopyIcon />} onClick={() => {setOpen(false);openCopyToken();}}>Copy Token</MenuItem>
-                    <MenuItem icon={<DeleteIcon />} onClick={() => {setOpen(false);openResetToken();}} color='red'>Reset Token</MenuItem>
+                    <MenuItem icon={<CopyIcon />} onClick={() => { setOpen(false); openCopyToken(); }}>Copy Token</MenuItem>
+                    <MenuItem icon={<DeleteIcon />} onClick={() => { setOpen(false); openResetToken(); }} color='red'>Reset Token</MenuItem>
                     <MenuItemLink icon={<LogoutIcon />} href='/auth/logout' color='red'>Logout</MenuItemLink>
                     <Divider
                       variant='solid'
@@ -332,8 +348,8 @@ export default function Layout({ children, user, title }) {
                       })}
                     />
                     <MenuItem icon={<PencilIcon />}>
-                      <Select           
-                        size='xs'    
+                      <Select
+                        size='xs'
                         data={Object.keys(themes).map(t => ({ value: t, label: friendlyThemeName[t] }))}
                         value={systemTheme}
                         onChange={handleUpdateTheme}

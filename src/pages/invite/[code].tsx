@@ -10,6 +10,7 @@ import { useStoreDispatch } from 'lib/redux/store';
 import { updateUser } from 'lib/redux/reducers/user';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
+import config from 'lib/config';
 
 export default function Invite({ code, title }) {
   const [active, setActive] = useState(0);
@@ -146,8 +147,8 @@ export const getServerSideProps: GetServerSideProps = async context => {
 
   return {
     props: {
+      title: config.website.title,
       code: invite.code,
-      title: global.config.website.title,
     },
   };
 };

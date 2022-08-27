@@ -9,7 +9,7 @@ import { sendShorten } from 'lib/discord';
 async function handler(req: NextApiReq, res: NextApiRes) {
   if (req.method !== 'POST') return res.forbid('no allow');
   if (!req.headers.authorization) return res.forbid('no authorization');
-  
+
   const user = await prisma.user.findFirst({
     where: {
       token: req.headers.authorization,
@@ -41,12 +41,12 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       userId: user.id,
     },
   });
-    
+
   if (req.headers.zws) invis = await createInvisURL(zconfig.urls.length, url.id);
 
   Logger.get('url').info(`User ${user.username} (${user.id}) shortenned a url ${url.destination} (${url.id})`);
 
-  if (config.discord.shorten) {
+  if (config.discord?.shorten) {
     await sendShorten(user, url, `${zconfig.core.https ? 'https' : 'http'}://${req.headers.host}${zconfig.urls.route}/${req.body.vanity ? req.body.vanity : invis ? invis.invis : url.id}`);
   }
 

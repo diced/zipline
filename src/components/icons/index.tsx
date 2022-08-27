@@ -23,6 +23,7 @@ import CalendarIcon from './CalendarIcon';
 import HashIcon from './HashIcon';
 import TagIcon from './TagIcon';
 import ClockIcon from './ClockIcon';
+import ExternalLinkIcon from './ExternalLinkIcon';
 
 export {
   ActivityIcon,
@@ -50,4 +51,5 @@ export {
   HashIcon,
   TagIcon,
   ClockIcon,
+  ExternalLinkIcon,
 };
