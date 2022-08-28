@@ -37,6 +37,16 @@ export const getServerSideProps: GetServerSideProps<CodeProps> = async (context)
     notFound: true
   }
 
+  // set cache header to prevent re-rendering when not needed
+  // this should only be done on 200 responses
+  context.res.setHeader(
+    'Cache-Control',
+    'public, max-age=2628000, stale-while-revalidate=86400'
+    // public -> browsers/whatever are allowed to use shared cache
+    // max-age: 1 month -> will cache for one month (uploads shouldn't change)
+    // stale-while-revalidate: 1 week -> this tells browsers to check the cache in the background after 1 week (instead of on-request)
+  )
+
   // resolve stream to a string and send it off to the component
   return {
     props: {
