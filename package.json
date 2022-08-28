@@ -4,19 +4,15 @@
   "license": "MIT",
   "scripts": {
     "dev": "REACT_EDITOR=code NODE_ENV=development tsx src/server",
-    
     "build": "npm-run-all build:schema build:next",
     "build:next": "next build",
     "build:schema": "prisma generate --schema=prisma/schema.prisma",
-
     "migrate:dev": "prisma migrate dev --create-only",
     "start": "tsx src/server",
     "lint": "next lint",
-
     "docker:run": "docker-compose up -d",
     "docker:down": "docker-compose down",
     "docker:build-dev": "docker-compose --file docker-compose.dev.yml up --build",
-
     "scripts:read-config": "tsx src/scripts/read-config"
   },
   "dependencies": {
