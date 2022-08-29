@@ -9,7 +9,7 @@ import { streamToString } from 'lib/utils/streams';
 // and will be inputted into Code component 
 type CodeProps = {
   code: string,
-  id: string
+  id: string,
 }
 
 // Code component
@@ -34,8 +34,8 @@ export const getServerSideProps: GetServerSideProps<CodeProps> = async (context)
   
   // return notFound if no data
   if(!data) return {
-    notFound: true
-  }
+    notFound: true,
+  };
 
   // set cache header to prevent re-rendering when not needed
   // this should only be done on 200 responses
@@ -45,13 +45,13 @@ export const getServerSideProps: GetServerSideProps<CodeProps> = async (context)
     // public -> browsers/whatever are allowed to use shared cache
     // max-age: 1 month -> will cache for one month (uploads shouldn't change)
     // stale-while-revalidate: 1 week -> this tells browsers to check the cache in the background after 1 week (instead of on-request)
-  )
+  );
 
   // resolve stream to a string and send it off to the component
   return {
     props: {
       code: await streamToString(data),
-      id: context.params.id as string
-    }
-  }
+      id: context.params.id as string,
+    },
+  };
 };
