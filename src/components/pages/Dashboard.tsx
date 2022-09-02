@@ -11,21 +11,21 @@ import useFetch from 'lib/hooks/useFetch';
 import { useStoreSelector } from 'lib/redux/store';
 import { DataGrid, dateFilterFn, stringFilterFn } from '@dicedtomato/mantine-data-grid';
 import { useEffect, useState } from 'react';
+import { useFiles } from 'lib/queries/files';
+import NoData from 'components/icons/undraw/NoData';
 
 export default function Dashboard() {
   const user = useStoreSelector(state => state.user);
   const theme = useMantineTheme();
 
-  const [images, setImages] = useState([]);
-  const [recent, setRecent] = useState([]);
+  const images = useFiles();
+  const [recent, setRecent] = useState<any[] | null>(null);
   const [stats, setStats] = useState(null);
   const clipboard = useClipboard();
 
   const updateImages = async () => {
-    const imgs = await useFetch('/api/user/files');
     const recent = await useFetch('/api/user/recent?filter=media');
     const stts = await useFetch('/api/stats');
-    setImages(imgs.map(x => ({ ...x, created_at: new Date(x.created_at).toLocaleString() })));
     setStats(stts);
     setRecent(recent);
   };
@@ -71,7 +71,7 @@ export default function Dashboard() {
   return (
     <>
       <Title>Welcome back, {user?.username}</Title>
-      <MutedText size='md'>You have <b>{images.length ? images.length : '...'}</b> files</MutedText>
+      <MutedText size='md'>You have <b>{images.isSuccess ? images.data.length : '...'}</b> files</MutedText>
 
       <Title>Recent Files</Title>
       <SimpleGrid
@@ -81,13 +81,24 @@ export default function Dashboard() {
           { maxWidth: 'sm', cols: 1, spacing: 'sm' },
         ]}
       >
-        {recent.length ? recent.map(image => (
-          <File key={randomId()} image={image} updateImages={updateImages} />
-        )) : [1, 2, 3, 4].map(x => (
-          <div key={x}>
-            <Skeleton width='100%' height={220} sx={{ borderRadius: 1 }} />
-          </div>
-        ))}
+        {
+          recent 
+            ? (
+              recent.length > 0 
+                ? (
+                  recent.map(image => (
+                    <File key={randomId()} image={image} updateImages={updateImages} />
+                  ))
+                ) : <NoData />
+
+            ) : (
+              [1, 2, 3, 4].map(x => (
+                <div key={x}>
+                  <Skeleton width='100%' height={220} sx={{ borderRadius: 1 }} />
+                </div>
+              ))
+            )
+        }
       </SimpleGrid>
 
       <Title mt='md'>Stats</Title>
@@ -117,8 +128,8 @@ export default function Dashboard() {
       <Title mt='md'>Files</Title>
       <MutedText size='md'>View your gallery <Link href='/dashboard/files'>here</Link>.</MutedText>
       <DataGrid
-        data={images}
-        loading={images.length ? false : true}
+        data={images.data ?? []}
+        loading={images.isLoading}
         withPagination={true}
         withColumnResizing={false}
         withColumnFilters={true}
