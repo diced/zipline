@@ -198,7 +198,7 @@ async function fileDb(
   if (Object.keys(exts).includes(ext)) return handle(req, res as ServerResponse);
 
   const data = await datasource.get(image.file);
-  if (!data) return this.nextServer.render404(req, res as ServerResponse);
+  if (!data) return nextServer.render404(req, res as ServerResponse);
 
   const size = await datasource.size(image.file);
 

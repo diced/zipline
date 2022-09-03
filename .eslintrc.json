@@ -4,6 +4,7 @@
     "next/core-web-vitals"
   ],
   "rules": {
+    "prettier/prettier": "error",
     "indent": [
       "error",
       2,
@@ -47,5 +48,7 @@
     "@next/next/no-img-element": "off",
     "jsx-a11y/alt-text": "off",
     "react/display-name": "off"
-  }
+  },
+
+  "plugins": ["prettier"]
 }

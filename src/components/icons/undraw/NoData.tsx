@@ -1,11 +1,12 @@
-import Image from 'next/image';
-import { lazy } from 'react';
-const undraw = lazy(() => import('./assets/undraw-no-data.svg'));
+import { Image } from '@mantine/core';
+// import Image from 'next/image';
+// import { SVGProps } from 'react';
+// import NoDataSVG from './assets/undraw-no-data.svg';
 
-type UnsplashProps = Omit<Parameters<typeof Image>[0], 'src'>;
+type UndrawProps = Omit<Parameters<typeof Image>[0], 'src'>;
 
-export default function NoData(props: UnsplashProps) {
+export default function NoData(props: UndrawProps) {
   return (
-    <Image layout='fill' {...props} src='/assets/undraw-no-data.svg' />
+    <Image fit='contain' height={80} src='/assets/img/undraw-no-data.svg' {...props} />
   );
 }

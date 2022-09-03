@@ -16,8 +16,12 @@ export class S3 extends Datasource {
       accessKey: config.access_key_id,
       secretKey: config.secret_access_key,
       pathStyle: config.force_s3_path,
+      port: 9000,
+      useSSL: false,
       region: config.region,
     });
+
+    // this.s3.
   }
 
   public async save(file: string, data: Buffer): Promise<void> {

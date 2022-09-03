@@ -10,24 +10,24 @@ import { bytesToRead } from 'lib/clientUtils';
 import useFetch from 'lib/hooks/useFetch';
 import { useStoreSelector } from 'lib/redux/store';
 import { DataGrid, dateFilterFn, stringFilterFn } from '@dicedtomato/mantine-data-grid';
-import { useEffect, useState } from 'react';
-import { useFiles } from 'lib/queries/files';
+import { useFiles, useRecent } from 'lib/queries/files';
 import NoData from 'components/icons/undraw/NoData';
+import { useStats } from 'lib/queries/stats';
+
 
 export default function Dashboard() {
   const user = useStoreSelector(state => state.user);
   const theme = useMantineTheme();
 
   const images = useFiles();
-  const [recent, setRecent] = useState<any[] | null>(null);
-  const [stats, setStats] = useState(null);
+  const recent = useRecent('media');
+  const stats = useStats();
   const clipboard = useClipboard();
 
-  const updateImages = async () => {
-    const recent = await useFetch('/api/user/recent?filter=media');
-    const stts = await useFetch('/api/stats');
-    setStats(stts);
-    setRecent(recent);
+  const updateImages = () => {
+    images.refetch();
+    recent.refetch();
+    stats.refetch();
   };
 
   const deleteImage = async ({ original }) => {
@@ -64,10 +64,6 @@ export default function Dashboard() {
     window.open(`${window.location.protocol}//${window.location.host}${original.url}`);
   };
 
-  useEffect(() => {
-    updateImages();
-  }, []);
-
   return (
     <>
       <Title>Welcome back, {user?.username}</Title>
@@ -75,22 +71,35 @@ export default function Dashboard() {
 
       <Title>Recent Files</Title>
       <SimpleGrid
-        cols={4}
+        cols={(recent.isSuccess && recent.data.length === 0) ? 1 : 4}
         spacing='lg'
         breakpoints={[
           { maxWidth: 'sm', cols: 1, spacing: 'sm' },
         ]}
       >
         {
-          recent 
+          recent.isSuccess
             ? (
-              recent.length > 0 
+              recent.data.length > 0 
                 ? (
-                  recent.map(image => (
+                  recent.data.map(image => (
                     <File key={randomId()} image={image} updateImages={updateImages} />
                   ))
-                ) : <NoData />
-
+                ) : (
+                  <MantineCard shadow='md' className='h-fit'>
+                    <MantineCard.Section>
+                      <div className='relative block w-fit mx-auto'>
+                        <div className='align-middle p-5 inline-block max-w-[50%]'>
+                          <NoData className='inline-block max-h-20 my-auto' />
+                        </div>
+                        <div className='align-middle my-auto w-fit inline-block'>
+                          <Title>Nothing here</Title>
+                          <MutedText size='md'>Upload some files to get started</MutedText>
+                        </div>
+                      </div>
+                    </MantineCard.Section>
+                  </MantineCard>
+                )
             ) : (
               [1, 2, 3, 4].map(x => (
                 <div key={x}>
@@ -111,17 +120,17 @@ export default function Dashboard() {
         ]}
       >
         <Card name='Size' sx={{ height: '100%' }}>
-          <MutedText>{stats ? stats.size : <Skeleton height={8} />}</MutedText>
+          <MutedText>{stats.isSuccess ? stats.data.size : <Skeleton height={8} />}</MutedText>
           <Title order={2}>Average Size</Title>
-          <MutedText>{stats ? bytesToRead(stats.size_num / stats.count) : <Skeleton height={8} />}</MutedText>
+          <MutedText>{stats.isSuccess ? bytesToRead(stats.data.size_num / stats.data.count) : <Skeleton height={8} />}</MutedText>
         </Card>
         <Card name='Images' sx={{ height: '100%' }}>
-          <MutedText>{stats ? stats.count : <Skeleton height={8} />}</MutedText>
+          <MutedText>{stats.isSuccess ? stats.data.count : <Skeleton height={8} />}</MutedText>
           <Title order={2}>Views</Title>
-          <MutedText>{stats ? `${stats.views_count} (${isNaN(stats.views_count / stats.count) ? 0 : Math.round(stats.views_count / stats.count)})` : <Skeleton height={8} />}</MutedText>
+          <MutedText>{stats.isSuccess ? `${stats.data.views_count} (${isNaN(stats.data.views_count / stats.data.count) ? 0 : Math.round(stats.data.views_count / stats.data.count)})` : <Skeleton height={8} />}</MutedText>
         </Card>
         <Card name='Users' sx={{ height: '100%' }}>
-          <MutedText>{stats ? stats.count_users : <Skeleton height={8} />}</MutedText>
+          <MutedText>{stats.isSuccess ? stats.data.count_users : <Skeleton height={8} />}</MutedText>
         </Card>
       </SimpleGrid>
 
@@ -140,8 +149,8 @@ export default function Dashboard() {
         DeleteIcon={DeleteIcon}
         EnterIcon={EnterIcon}
         deleteImage={deleteImage}
-        copyImage={copyImage}
-        viewImage={viewImage}
+        // copyImage={copyImage}
+        // viewImage={viewImage}
         styles={{
           dataCell: {
             width: '100%',
