@@ -130,7 +130,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     }
 
     if (zconfig.discord?.upload) {
-      await sendUpload(user, image, `${zconfig.core.https ? 'https' : 'http'}://${req.headers.host}${zconfig.uploader.route === '/' ? '' : zconfig.uploader.route}/${invis ? invis.invis : image.file}`);
+      await sendUpload(user, image, `${zconfig.core.https ? 'https' : 'http'}://${req.headers.host}/r/${invis ? invis.invis : image.file}`);
     }
   }
 
