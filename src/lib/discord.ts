@@ -3,7 +3,7 @@ import { ConfigDiscordContent } from 'lib/config/Config';
 import config from 'lib/config';
 import Logger from './logger';
 
-// [user, image, url, route (ex. https://example.com/u/something.png)]
+// [user, image, url, route (ex. https://example.com/r/something.png)]
 export type Args = [User, Image?, Url?, string?];
 
 function parse(str: string, args: Args) {
@@ -16,12 +16,12 @@ function parse(str: string, args: Args) {
     .replace(/{link}/gi, args[3]);
 
   if (args[1]) str = str
-    .replace(/{image.id}/gi, args[1].id.toString())
-    .replace(/{image.mime}/gi, args[1].mimetype)
-    .replace(/{image.file}/gi, args[1].file)
-    .replace(/{image.created_at.full_string}/gi, args[1].created_at.toLocaleString())
-    .replace(/{image.created_at.time_string}/gi, args[1].created_at.toLocaleTimeString())
-    .replace(/{image.created_at.date_string}/gi, args[1].created_at.toLocaleDateString());
+    .replace(/{file.id}/gi, args[1].id.toString())
+    .replace(/{file.mime}/gi, args[1].mimetype)
+    .replace(/{file.file}/gi, args[1].file)
+    .replace(/{file.created_at.full_string}/gi, args[1].created_at.toLocaleString())
+    .replace(/{file.created_at.time_string}/gi, args[1].created_at.toLocaleTimeString())
+    .replace(/{file.created_at.date_string}/gi, args[1].created_at.toLocaleDateString());
 
   if (args[2]) str = str
     .replace(/{url.id}/gi, args[2].id.toString())
@@ -87,7 +87,9 @@ export async function sendUpload(user: User, image: Image, host: string) {
   });
 
   if (!res.ok) {
+    const text = await res.text();
     Logger.get('discord').error(`Failed to send upload notification to discord: ${res.status} ${res.statusText}`);
+    Logger.get('discord').error(`Received response: ${text}`);
   }
 
   return;
