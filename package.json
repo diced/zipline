@@ -3,7 +3,7 @@
   "version": "3.5.1",
   "license": "MIT",
   "scripts": {
-    "dev": "REACT_EDITOR=code NODE_ENV=development tsx src/server",
+    "dev": "cross-env REACT_EDITOR=code NODE_ENV=development tsx src/server",
     "build": "npm-run-all build:schema build:next",
     "build:next": "next build",
     "build:schema": "prisma generate --schema=prisma/schema.prisma",
@@ -34,6 +34,7 @@
     "@prisma/migrate": "^4.1.0",
     "@reduxjs/toolkit": "^1.8.2",
     "@svgr/webpack": "^6.3.1",
+    "@tabler/icons": "^1.92.0",
     "@tanstack/react-query": "^4.2.3",
     "argon2": "^0.28.5",
     "colorette": "^2.0.19",

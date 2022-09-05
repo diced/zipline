@@ -2902,6 +2902,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tabler/icons@npm:^1.92.0":
+  version: 1.92.0
+  resolution: "@tabler/icons@npm:1.92.0"
+  peerDependencies:
+    react: ^16.x || 17.x || 18.x
+    react-dom: ^16.x || 17.x || 18.x
+  peerDependenciesMeta:
+    react:
+      optional: true
+    react-dom:
+      optional: true
+  checksum: 2e9c5df7b824b9591ada511f948afd9b133a079324a3fd8a1002255bdd260e1b7f12fd9c40a8c598a600d317f1eaf71fd7e97e87a3ada7280327204f27a8327c
+  languageName: node
+  linkType: hard
+
 "@tanstack/query-core@npm:4.2.3":
   version: 4.2.3
   resolution: "@tanstack/query-core@npm:4.2.3"
@@ -11148,6 +11163,7 @@ __metadata:
     "@prisma/migrate": ^4.1.0
     "@reduxjs/toolkit": ^1.8.2
     "@svgr/webpack": ^6.3.1
+    "@tabler/icons": ^1.92.0
     "@tanstack/react-query": ^4.2.3
     "@types/cookie": ^0.5.1
     "@types/minio": ^7.0.13

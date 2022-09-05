@@ -13,6 +13,8 @@ import { DataGrid, dateFilterFn, stringFilterFn } from '@dicedtomato/mantine-dat
 import { useFiles, useRecent } from 'lib/queries/files';
 import NoData from 'components/icons/undraw/NoData';
 import { useStats } from 'lib/queries/stats';
+import { StatCards } from './StatCards';
+import RecentFiles from './RecentFiles';
 
 
 export default function Dashboard() {
@@ -65,77 +67,20 @@ export default function Dashboard() {
   };
 
   return (
-    <>
+    <div className='gap-4'>
       <Title>Welcome back, {user?.username}</Title>
-      <MutedText size='md'>You have <b>{images.isSuccess ? images.data.length : '...'}</b> files</MutedText>
+      {/* <MutedText size='md'>You have <b>{images.isSuccess ? images.data.length : '...'}</b> files</MutedText> */}
 
-      <Title>Recent Files</Title>
-      <SimpleGrid
-        cols={(recent.isSuccess && recent.data.length === 0) ? 1 : 4}
-        spacing='lg'
-        breakpoints={[
-          { maxWidth: 'sm', cols: 1, spacing: 'sm' },
-        ]}
-      >
-        {
-          recent.isSuccess
-            ? (
-              recent.data.length > 0 
-                ? (
-                  recent.data.map(image => (
-                    <File key={randomId()} image={image} updateImages={updateImages} />
-                  ))
-                ) : (
-                  <MantineCard shadow='md' className='h-fit'>
-                    <MantineCard.Section>
-                      <div className='relative block w-fit mx-auto'>
-                        <div className='align-middle p-5 inline-block max-w-[50%]'>
-                          <NoData className='inline-block max-h-20 my-auto' />
-                        </div>
-                        <div className='align-middle my-auto w-fit inline-block'>
-                          <Title>Nothing here</Title>
-                          <MutedText size='md'>Upload some files to get started</MutedText>
-                        </div>
-                      </div>
-                    </MantineCard.Section>
-                  </MantineCard>
-                )
-            ) : (
-              [1, 2, 3, 4].map(x => (
-                <div key={x}>
-                  <Skeleton width='100%' height={220} sx={{ borderRadius: 1 }} />
-                </div>
-              ))
-            )
-        }
-      </SimpleGrid>
+      <section className='mb-4'>
+        <StatCards />
+      </section>
 
-      <Title mt='md'>Stats</Title>
-      <MutedText size='md'>View more stats here <Link href='/dashboard/stats'>here</Link>.</MutedText>
-      <SimpleGrid
-        cols={3}
-        spacing='lg'
-        breakpoints={[
-          { maxWidth: 'sm', cols: 1, spacing: 'sm' },
-        ]}
-      >
-        <Card name='Size' sx={{ height: '100%' }}>
-          <MutedText>{stats.isSuccess ? stats.data.size : <Skeleton height={8} />}</MutedText>
-          <Title order={2}>Average Size</Title>
-          <MutedText>{stats.isSuccess ? bytesToRead(stats.data.size_num / stats.data.count) : <Skeleton height={8} />}</MutedText>
-        </Card>
-        <Card name='Images' sx={{ height: '100%' }}>
-          <MutedText>{stats.isSuccess ? stats.data.count : <Skeleton height={8} />}</MutedText>
-          <Title order={2}>Views</Title>
-          <MutedText>{stats.isSuccess ? `${stats.data.views_count} (${isNaN(stats.data.views_count / stats.data.count) ? 0 : Math.round(stats.data.views_count / stats.data.count)})` : <Skeleton height={8} />}</MutedText>
-        </Card>
-        <Card name='Users' sx={{ height: '100%' }}>
-          <MutedText>{stats.isSuccess ? stats.data.count_users : <Skeleton height={8} />}</MutedText>
-        </Card>
-      </SimpleGrid>
+      <section>
+        <RecentFiles />
+      </section>
 
       <Title mt='md'>Files</Title>
-      <MutedText size='md'>View your gallery <Link href='/dashboard/files'>here</Link>.</MutedText>
+      <MutedText size='md'>View your gallery <Link href='/dashboard/files' className='underline'>here</Link>.</MutedText>
       <DataGrid
         data={images.data ?? []}
         loading={images.isLoading}
@@ -205,6 +150,6 @@ export default function Dashboard() {
           },
         ]}
       />
-    </>
+    </div>
   );
 }

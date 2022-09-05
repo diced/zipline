@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import queryClient from './client';
 
 export type UserFilesResponse = {
   created_at: string;
@@ -44,3 +45,10 @@ export const useRecent = (filter?: string) => {
       })));
   });
 };
+
+
+export function invalidateFiles() {
+  return queryClient.invalidateQueries(
+    ['files', 'recent', 'stats']
+  );
+}

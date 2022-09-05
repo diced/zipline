@@ -115,7 +115,7 @@ export default function File({ image, updateImages }) {
         </Group>
       </Modal>
       <Card sx={{ maxWidth: '100%', height: '100%' }} shadow='md'>
-        <Card.Section>
+        <Card.Section className='my-auto'>
           <Type
             file={image}
             sx={{ minHeight: 200, maxHeight: 320, fontSize: 70, width: '100%', cursor: 'pointer' }}
