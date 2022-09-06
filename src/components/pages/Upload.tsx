@@ -1,4 +1,4 @@
-import { Button, Collapse, Group, Progress, Select, Title } from '@mantine/core';
+import { Button, Collapse, Group, Progress, Select, Title, PasswordInput } from '@mantine/core';
 import { randomId, useClipboard } from '@mantine/hooks';
 import { showNotification, updateNotification } from '@mantine/notifications';
 import Dropzone from 'components/dropzone/Dropzone';
@@ -48,6 +48,7 @@ export default function Upload() {
   const [progress, setProgress] = useState(0);
   const [loading, setLoading] = useState(false);
   const [expires, setExpires] = useState('never');
+  const [password, setPassword] = useState('');
 
   useEffect(() => {
     window.addEventListener('paste', (e: ClipboardEvent) => {
@@ -143,6 +144,7 @@ export default function Upload() {
     req.open('POST', '/api/upload');
     req.setRequestHeader('Authorization', user.token);
     expires !== 'never' && req.setRequestHeader('Expires-At', 'date=' + expires_at.toISOString());
+    password !== '' && req.setRequestHeader('Password', password);
 
     req.send(body);
   };
@@ -162,6 +164,12 @@ export default function Upload() {
       </Collapse>
 
       <Group position='right' mt='md'>
+        <PasswordInput
+          style={{width: '252px'}}
+          placeholder='Password'
+          value={password}
+          onChange={(e) => setPassword(e.currentTarget.value)}
+        />
         <Select
           value={expires}
           onChange={(e) => setExpires(e)}
