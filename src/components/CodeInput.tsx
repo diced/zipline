@@ -4,7 +4,7 @@ const useStyles = createStyles((theme, { size }: { size: MantineSize }) => ({
   input: {
     fontFamily: 'monospace',
     fontSize: theme.fn.size({ size, sizes: theme.fontSizes }) - 2,
-    height: '100vh',
+    height: '80vh',
   },
 }));
 
