@@ -1,54 +1,22 @@
-import { ActionIcon, Button, Card, Group, Modal, SimpleGrid, Skeleton, TextInput, Title } from '@mantine/core';
+import { ActionIcon, Button, Card, Group, Modal, SimpleGrid, Skeleton, TextInput, Title, Text } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { useForm } from '@mantine/form';
 import { showNotification } from '@mantine/notifications';
-import { CopyIcon, CrossIcon, DeleteIcon, LinkIcon, PlusIcon } from 'components/icons';
-import useFetch from 'hooks/useFetch';
+import { CrossIcon, LinkIcon, PlusIcon } from 'components/icons';
 import { useStoreSelector } from 'lib/redux/store';
 import { useEffect, useState } from 'react';
+import { useURLs } from 'lib/queries/url';
+import URLCard from './URLCard';
+import WaitingForYou from 'components/icons/undraw/WaitingForYou';
+import MutedText from 'components/MutedText';
 
 export default function Urls() {
   const user = useStoreSelector(state => state.user);
-  const clipboard = useClipboard();
 
-  const [urls, setURLS] = useState([]);
+  const urls = useURLs();
   const [createOpen, setCreateOpen] = useState(false);
 
-  const updateURLs = async () => {
-    const urls = await useFetch('/api/user/urls');
-
-    setURLS(urls);
-  };
-
-  const deleteURL = async u => {
-    const url = await useFetch('/api/user/urls', 'DELETE', { id: u.id });
-    if (url.error) {
-      showNotification({
-        title: 'Failed to delete URL',
-        message: url.error,
-        icon: <DeleteIcon />,
-        color: 'red',
-      });
-    } else {
-      showNotification({
-        title: 'Deleted URL',
-        message: '',
-        icon: <CrossIcon />,
-        color: 'green',
-      });
-    }
-
-    updateURLs();
-  };
-
-  const copyURL = u => {
-    clipboard.copy(`${window.location.protocol}//${window.location.host}${u.url}`);
-    showNotification({
-      title: 'Copied to clipboard',
-      message: '',
-      icon: <CopyIcon />,
-    });
-  };
+  const updateURLs = async () => urls.refetch();
 
   const form = useForm({
     initialValues: {
@@ -131,6 +99,31 @@ export default function Urls() {
         <ActionIcon variant='filled' color='primary' onClick={() => setCreateOpen(true)}><PlusIcon /></ActionIcon>
       </Group>
 
+      {
+        (urls.data && urls.data.length === 0) && (
+          <div className='relative block w-fit mx-auto'>
+            <div className='align-middle p-5 inline-block max-w-[50%]'>
+              <WaitingForYou className='inline-block my-auto' />
+            </div>
+            <div className='align-middle my-auto w-fit inline-block'>
+              <Title>No Links</Title>
+              <MutedText size='md'>
+                <Text 
+                  component="span"
+                  color="blue"
+                  underline
+                  className='cursor-pointer'
+                  onClick={() => setCreateOpen(true)}
+                >
+                  Create a link
+                </Text> 
+                {" "}to get started!
+              </MutedText>
+            </div>
+          </div>
+        )
+      }
+
       <SimpleGrid
         cols={4}
         spacing='lg'
@@ -138,26 +131,15 @@ export default function Urls() {
           { maxWidth: 'sm', cols: 1, spacing: 'sm' },
         ]}
       >
-        {urls.length ? urls.map(url => (
-          <Card key={url.id} sx={{ maxWidth: '100%' }} shadow='sm'>
-            <Group position='apart'>
-              <Group position='left'>
-                <Title>{url.vanity ?? url.id}</Title>
-              </Group>
-              <Group position='right'>
-                <ActionIcon href={url.url} component='a' target='_blank'><LinkIcon /></ActionIcon>
-                <ActionIcon aria-label='copy' onClick={() => copyURL(url)}>
-                  <CopyIcon />
-                </ActionIcon>
-                <ActionIcon aria-label='delete' onClick={() => deleteURL(url)}>
-                  <DeleteIcon />
-                </ActionIcon>
-              </Group>
-            </Group>
-          </Card>
-        )) : [1, 2, 3, 4].map(x => (
-          <Skeleton key={x} width='100%' height={80} radius='sm' />
-        ))}
+        {
+          (urls.isLoading || !urls.data) ? 
+            [1, 2, 3, 4].map(x => (
+              <Skeleton key={x} width='100%' height={80} radius='sm' />
+            ))
+          : urls.data.map(url => (
+            <URLCard key={url.id} url={url} />
+          ))
+        }
       </SimpleGrid>
     </>
   );

@@ -8,7 +8,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   if (!user) return res.forbid('not logged in');
 
   if (req.method === 'DELETE') {
-    if (!req.body.id) return res.error('no url id');
+    if (!req.body.id) return res.bad('no url id');
 
     const url = await prisma.url.delete({
       where: {
