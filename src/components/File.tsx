@@ -1,4 +1,4 @@
-import { Button, Card, Group, Modal, Stack, Text, Title, Tooltip, useMantineTheme } from '@mantine/core';
+import { Button, Card, Group, LoadingOverlay, Modal, Stack, Text, Title, Tooltip, useMantineTheme } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { showNotification } from '@mantine/notifications';
 import useFetch from 'hooks/useFetch';
@@ -7,6 +7,7 @@ import Type from './Type';
 import { CalendarIcon, ClockIcon, CopyIcon, CrossIcon, DeleteIcon, FileIcon, HashIcon, ImageIcon, StarIcon } from './icons';
 import MutedText from './MutedText';
 import { relativeTime } from 'lib/clientUtils';
+import { useFileDelete, useFileFavorite } from 'lib/queries/files';
 
 export function FileMeta({ Icon, title, subtitle, ...other }) {
   return other.tooltip ? (
@@ -32,28 +33,36 @@ export function FileMeta({ Icon, title, subtitle, ...other }) {
 
 export default function File({ image, updateImages }) {
   const [open, setOpen] = useState(false);
+  const deleteFile = useFileDelete();
+  const favoriteFile = useFileFavorite();
   const clipboard = useClipboard();
 
-  const handleDelete = async () => {
-    const res = await useFetch('/api/user/files', 'DELETE', { id: image.id });
-    if (!res.error) {
-      updateImages(true);
-      showNotification({
-        title: 'File Deleted',
-        message: '',
-        color: 'green',
-        icon: <DeleteIcon />,
-      });
-    } else {
-      showNotification({
-        title: 'Failed to delete file',
-        message: res.error,
-        color: 'red',
-        icon: <CrossIcon />,
-      });
-    }
+  const loading = deleteFile.isLoading || favoriteFile.isLoading;
 
-    setOpen(false);
+  const handleDelete = async () => {
+    deleteFile.mutate(image.id, {
+      onSuccess: () => {
+        showNotification({
+          title: 'File Deleted',
+          message: '',
+          color: 'green',
+          icon: <DeleteIcon />,
+        });
+      },
+
+      onError: (res: any) => {
+        showNotification({
+          title: 'Failed to delete file',
+          message: res.error,
+          color: 'red',
+          icon: <CrossIcon />,
+        });
+      },
+
+      onSettled: () => {
+        setOpen(false);
+      }
+    });
   };
 
   const handleCopy = () => {
@@ -67,15 +76,25 @@ export default function File({ image, updateImages }) {
   };
 
   const handleFavorite = async () => {
-    const data = await useFetch('/api/user/files', 'PATCH', { id: image.id, favorite: !image.favorite });
-    if (!data.error) updateImages(true);
-    showNotification({
-      title: 'Image is now ' + (!image.favorite ? 'favorited' : 'unfavorited'),
-      message: '',
-      icon: <StarIcon />,
+    favoriteFile.mutate({ id: image.id, favorite: !image.favorite }, {
+      onSuccess: () => {
+        showNotification({
+          title: 'Image is now ' + (!image.favorite ? 'favorited' : 'unfavorited'),
+          message: '',
+          icon: <StarIcon />,
+        });
+      },
+
+      onError: (res: any) => {
+        showNotification({
+          title: 'Failed to favorite file',
+          message: res.error,
+          color: 'red',
+          icon: <CrossIcon />,
+        });
+      }
     });
   };
-
 
   return (
     <>
@@ -85,6 +104,7 @@ export default function File({ image, updateImages }) {
         title={<Title>{image.file}</Title>}
         size='xl'
       >
+        <LoadingOverlay visible={loading} />
         <Stack>
           <Type
             file={image}
@@ -116,6 +136,7 @@ export default function File({ image, updateImages }) {
       </Modal>
       <Card sx={{ maxWidth: '100%', height: '100%' }} shadow='md'>
         <Card.Section className='my-auto'>
+          <LoadingOverlay visible={loading} />
           <Type
             file={image}
             sx={{ minHeight: 200, maxHeight: 320, fontSize: 70, width: '100%', cursor: 'pointer' }}
