@@ -42,7 +42,7 @@ export default function readConfig() {
   }
 
   const maps = [
-    map('CORE_HTTPS', 'boolean', 'core.secure'),
+    map('CORE_HTTPS', 'boolean', 'core.https'),
     map('CORE_SECRET', 'string', 'core.secret'),
     map('CORE_HOST', 'string', 'core.host'),
     map('CORE_PORT', 'number', 'core.port'),
