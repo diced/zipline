@@ -1,6 +1,6 @@
 import { LoadingOverlay, Card } from '@mantine/core';
 import { SmallTable } from 'components/SmallTable';
-import { useStats } from 'lib/queries/stats'
+import { useStats } from 'lib/queries/stats';
 import { Fragment } from 'react';
 
 export default function Types() {
@@ -35,5 +35,5 @@ export default function Types() {
         />
       </Card>
     </Fragment>
-  )
+  );
 }

@@ -61,7 +61,7 @@ export default function File({ image, updateImages }) {
 
       onSettled: () => {
         setOpen(false);
-      }
+      },
     });
   };
 
@@ -92,7 +92,7 @@ export default function File({ image, updateImages }) {
           color: 'red',
           icon: <CrossIcon />,
         });
-      }
+      },
     });
   };
 

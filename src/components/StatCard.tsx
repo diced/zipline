@@ -41,7 +41,7 @@ interface StatsGridProps {
 export default function StatCard({ stat }: StatsGridProps) {
   const { classes } = useStyles();
   if(stat.diff)
-    stat.diff = Math.round(stat.diff)
+    stat.diff = Math.round(stat.diff);
 
   return (
     <Card p='md' radius='md' key={stat.title}>

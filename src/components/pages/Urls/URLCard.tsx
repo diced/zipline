@@ -38,7 +38,7 @@ export default function URLCard({ url }: {
           icon: <DeleteIcon />,
           color: 'red',
         });
-      }
+      },
     });
   };
 
@@ -63,5 +63,5 @@ export default function URLCard({ url }: {
         </Group>
       </Group>
     </Card>
-  )
+  );
 }

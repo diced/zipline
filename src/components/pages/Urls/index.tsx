@@ -108,15 +108,15 @@ export default function Urls() {
               <Title>No Links</Title>
               <MutedText size='md'>
                 <Text 
-                  component="span"
-                  color="blue"
+                  component='span'
+                  color='blue'
                   underline
                   className='cursor-pointer'
                   onClick={() => setCreateOpen(true)}
                 >
                   Create a link
                 </Text> 
-                {" "}to get started!
+                {' '}to get started!
               </MutedText>
             </div>
           </div>
@@ -135,9 +135,9 @@ export default function Urls() {
             [1, 2, 3, 4].map(x => (
               <Skeleton key={x} width='100%' height={80} radius='sm' />
             ))
-          : urls.data.map(url => (
-            <URLCard key={url.id} url={url} />
-          ))
+            : urls.data.map(url => (
+              <URLCard key={url.id} url={url} />
+            ))
         }
       </SimpleGrid>
     </>

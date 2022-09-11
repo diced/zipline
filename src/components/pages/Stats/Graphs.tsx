@@ -20,8 +20,8 @@ const CHART_OPTIONS = (theme: MantineTheme): ChartOptions => ({
     },
 
     datalabels: {
-      display: false
-    }
+      display: false,
+    },
   },
 
   scales: {
@@ -33,7 +33,7 @@ const CHART_OPTIONS = (theme: MantineTheme): ChartOptions => ({
 
       grid: {
         color: theme.colors.gray[8],
-      }
+      },
     },
 
     x: {
@@ -43,9 +43,9 @@ const CHART_OPTIONS = (theme: MantineTheme): ChartOptions => ({
 
       grid: {
         color: theme.colors.gray[8],
-      }
-    }
-  }
+      },
+    },
+  },
 });
 
 
@@ -81,7 +81,7 @@ export default function Graphs() {
           data: viewData,
           borderColor: theme.colors.blue[6],
           backgroundColor: theme.colors.blue[0],
-        }]
+        }],
       },
 
       uploads: {
@@ -91,7 +91,7 @@ export default function Graphs() {
           data: uploadData,
           borderColor: theme.colors.blue[6],
           backgroundColor: theme.colors.blue[0],
-        }]
+        }],
       },
 
       uploadTypes: {
@@ -100,7 +100,7 @@ export default function Graphs() {
           data: latest?.data.types_count.map((x) => x.count),
           label: 'Upload Types',
           backgroundColor: latest?.data.types_count.map((x) => hash.hex(x.mimetype)),
-        }]
+        }],
       },
 
       storage: {
@@ -110,9 +110,9 @@ export default function Graphs() {
           data: storageData,
           borderColor: theme.colors.blue[6],
           backgroundColor: theme.colors.blue[0],
-        }]
-      }
-    }
+        }],
+      },
+    };
   }, [historicalStats]);
 
   return (
@@ -142,8 +142,8 @@ export default function Graphs() {
                       color: 'white',
                       textShadowBlur: 7,
                       textShadowColor: 'black',
-                    }
-                  }
+                    },
+                  },
                 }}
               />
             )
@@ -201,7 +201,7 @@ export default function Graphs() {
                         callback: (value) => bytesToRead(value as number),
                         color: theme.colors.gray[6],
                       },
-                    }
+                    },
                   },
 
                   plugins: {
@@ -212,10 +212,10 @@ export default function Graphs() {
                         label: (context) => {
                           const value = context.raw as number;
                           return bytesToRead(value);
-                        }
-                      }
-                    }
-                  }
+                        },
+                      },
+                    },
+                  },
                 }}
               />
             )

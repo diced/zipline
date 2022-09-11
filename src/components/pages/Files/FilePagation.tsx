@@ -20,7 +20,7 @@ export default function FilePagation() {
           <MutedText size='md'>Upload some files to get started</MutedText>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -67,5 +67,5 @@ export default function FilePagation() {
         </Box>
       ) : null}
     </Fragment>
-  )
+  );
 }

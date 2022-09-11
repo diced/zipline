@@ -5,7 +5,7 @@ import Types from './Types';
 
 export default function Stats() {
   return (
-    <div className="gap-5 flex flex-col">
+    <div className='gap-5 flex flex-col'>
       <Title>Stats</Title>
 
       <StatCards />

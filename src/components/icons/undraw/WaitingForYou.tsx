@@ -1,5 +1,5 @@
 import { Image } from '@mantine/core';
-import { UndrawProps } from "./types";
+import { UndrawProps } from './types';
 
 export default function WaitingForYou(props: UndrawProps) {
   return (
