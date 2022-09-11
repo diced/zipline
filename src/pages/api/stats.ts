@@ -7,7 +7,8 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   const user = await req.user();
   if (!user) return res.forbid('not logged in');
 
-  const amount = typeof req.query.amount === 'string' ? parseInt(req.query.amount) : 2;
+  let amount = typeof req.query.amount === 'string' ? parseInt(req.query.amount) : 2;
+  if(isNaN(amount)) return res.bad('invalid amount');
 
   // get stats per day
 
