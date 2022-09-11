@@ -1,4 +1,4 @@
-import { Card, LoadingOverlay, MantineTheme, Title, useMantineTheme } from '@mantine/core';
+import { Box, Card, Grid, LoadingOverlay, MantineTheme, Title, useMantineTheme } from '@mantine/core';
 import { ArcElement, CategoryScale, Chart as ChartJS, ChartData, ChartOptions, LinearScale, LineController, LineElement, PointElement, Tooltip } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import ColorHash from 'color-hash';
@@ -116,112 +116,120 @@ export default function Graphs() {
   }, [historicalStats]);
 
   return (
-    <section className='flex flex-col gap-5'>
+    <Box mt='md'>
       <LoadingOverlay visible={historicalStats.isLoading} />
 
-      <div className='grid-cols-4 grid gap-5'>
+      <Grid>
         {/* 1/4 - upload types */}
-        <Card className='flex flex-col gap-2'>
-          <Title size='h4' className='text-center'>Upload Types</Title>
-          {
-            chartData && (
-              <Pie
-                data={chartData.uploadTypes}
-                className='max-h-[20vh]'
+        <Grid.Col md={12} lg={4}>
+          <Card>
+            <Title size='h4'>Upload Types</Title>
+            {
+              chartData && (
+                <Pie
+                  data={chartData.uploadTypes}
 
-                options={{
-                  plugins: {
-                    datalabels: {
-                      formatter: (_, ctx) => {
-                        // mime: count
-                        const mime = ctx.chart.data.labels[ctx.dataIndex];
-                        const count = ctx.chart.data.datasets[0].data[ctx.dataIndex];
-                        return `${mime}: ${count}`;
+                  options={{
+                    plugins: {
+                      datalabels: {
+                        formatter: (_, ctx) => {
+                          // mime: count
+                          const mime = ctx.chart.data.labels[ctx.dataIndex];
+                          const count = ctx.chart.data.datasets[0].data[ctx.dataIndex];
+                          return `${mime}: ${count}`;
+                        },
+
+                        color: 'white',
+                        textShadowBlur: 7,
+                        textShadowColor: 'black',
                       },
-
-                      color: 'white',
-                      textShadowBlur: 7,
-                      textShadowColor: 'black',
                     },
-                  },
-                }}
-              />
-            )
-          }
-        </Card>
+                  }}
+                  style={{ maxHeight: '20vh' }}
+                />
+              )
+            }
+          </Card>
+        </Grid.Col>
+        
         {/* 3/4 - views */}
-        <Card className='col-span-3'>
-          <Title size='h4' className='text-center'>Total Views</Title>
-          {
-            chartData && (
-              <Chart
-                className='max-h-[20vh]'
-                type='line'
-                data={chartData.views}
-                options={chartOptions}
-              />
-            )
-          }
-        </Card>
-      </div>
+        <Grid.Col md={12} lg={8}>
+          <Card>
+            <Title size='h4'>Total Views</Title>
+            {
+              chartData && (
+                <Chart
+                  type='line'
+                  data={chartData.views}
+                  options={chartOptions}
+                  style={{ maxHeight: '20vh' }}
+                />
+              )
+            }
+          </Card>
+        </Grid.Col>
 
-      <div className='grid grid-cols-2 gap-5'>
         {/* 1/2 - uploaded files */}
-        <Card className='flex flex-col gap-2'>
-          <Title size='h4' className='text-center'>Total Uploads</Title>
-          {
-            chartData && (
-              <Chart
-                className='max-h-[20vh]'
-                type='line'
-                data={chartData.uploads}
-                options={chartOptions}
-              />
-            )
-          }
-        </Card>
+        <Grid.Col md={12} lg={6}>
+          <Card>
+            <Title size='h4'>Total Uploads</Title>
+            {
+              chartData && (
+                <Chart
+                  type='line'
+                  data={chartData.uploads}
+                  options={chartOptions}
+                  style={{ maxHeight: '20vh' }}
+                />
+              )
+            }
+          </Card>
+        </Grid.Col>
+
         {/* 1/2 - storage used */}
-        <Card className='flex flex-col gap-2'>
-          <Title size='h4' className='text-center'>Storage Usage</Title>
-          {
-            chartData && (
-              <Chart
-                className='max-h-[20vh]'
-                type='line'
-                data={chartData.storage}
-                options={{
-                  ...chartOptions,
+        <Grid.Col md={12} lg={6}>
+          <Card>
+            <Title size='h4'>Storage Usage</Title>
+            {
+              chartData && (
+                <Chart
+                  type='line'
+                  data={chartData.storage}
+                  options={{
+                    ...chartOptions,
 
-                  scales: {
-                    ...chartOptions.scales,
-                    y: {
-                      ...chartOptions.scales.y,
+                    scales: {
+                      ...chartOptions.scales,
+                      y: {
+                        ...chartOptions.scales.y,
 
-                      ticks: {
-                        callback: (value) => bytesToRead(value as number),
-                        color: theme.colors.gray[6],
-                      },
-                    },
-                  },
-
-                  plugins: {
-                    ...chartOptions.plugins,
-                    tooltip: {
-                      ...chartOptions.plugins.tooltip,
-                      callbacks: {
-                        label: (context) => {
-                          const value = context.raw as number;
-                          return bytesToRead(value);
+                        ticks: {
+                          callback: (value) => bytesToRead(value as number),
+                          color: theme.colors.gray[6],
                         },
                       },
                     },
-                  },
-                }}
-              />
-            )
-          }
-        </Card>
-      </div>
-    </section>
+
+                    plugins: {
+                      ...chartOptions.plugins,
+                      tooltip: {
+                        ...chartOptions.plugins.tooltip,
+                        callbacks: {
+                          label: (context) => {
+                            const value = context.raw as number;
+                            return bytesToRead(value);
+                          },
+                        },
+                      },
+                    },
+                  }}
+                  style={{ maxHeight: '20vh' }}
+                />
+              )
+            }
+          </Card>
+        </Grid.Col>
+      </Grid>
+    </Box>
   );
 }

@@ -1,4 +1,4 @@
-import { ActionIcon, Button, Group, Modal, SimpleGrid, Skeleton, TextInput, Title, Text } from '@mantine/core';
+import { ActionIcon, Button, Group, Modal, SimpleGrid, Skeleton, TextInput, Title, Card, Center } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { showNotification } from '@mantine/notifications';
 import { CrossIcon, LinkIcon, PlusIcon } from 'components/icons';
@@ -6,7 +6,6 @@ import { useStoreSelector } from 'lib/redux/store';
 import { useEffect, useState } from 'react';
 import { useURLs } from 'lib/queries/url';
 import URLCard from './URLCard';
-import WaitingForYou from 'components/icons/undraw/WaitingForYou';
 import MutedText from 'components/MutedText';
 
 export default function Urls() {
@@ -100,26 +99,19 @@ export default function Urls() {
 
       {
         (urls.data && urls.data.length === 0) && (
-          <div className='relative block w-fit mx-auto'>
-            <div className='align-middle p-5 inline-block max-w-[50%]'>
-              <WaitingForYou className='inline-block my-auto' />
-            </div>
-            <div className='align-middle my-auto w-fit inline-block'>
-              <Title>No Links</Title>
-              <MutedText size='md'>
-                <Text 
-                  component='span'
-                  color='blue'
-                  underline
-                  className='cursor-pointer'
-                  onClick={() => setCreateOpen(true)}
-                >
-                  Create a link
-                </Text> 
-                {' '}to get started!
-              </MutedText>
-            </div>
-          </div>
+          <Card shadow='md'>
+            <Center>
+              <Group>
+                <div>
+                  <LinkIcon size={48} />
+                </div>
+                <div>
+                  <Title>Nothing here</Title>
+                  <MutedText size='md'>Create a link to get started!</MutedText>
+                </div>
+              </Group>
+            </Center>
+          </Card>
         )
       }
 

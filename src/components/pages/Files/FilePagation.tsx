@@ -1,6 +1,6 @@
-import { Box, Pagination, SimpleGrid, Skeleton, Title } from '@mantine/core';
+import { Box, Center, Group, Pagination, SimpleGrid, Skeleton, Title } from '@mantine/core';
 import File from 'components/File';
-import WaitingForYou from 'components/icons/undraw/WaitingForYou';
+import { FileIcon } from 'components/icons';
 import MutedText from 'components/MutedText';
 import { usePaginatedFiles } from 'lib/queries/files';
 import { Fragment, useState } from 'react';
@@ -9,17 +9,19 @@ export default function FilePagation() {
   const pages = usePaginatedFiles({ filter: 'media' });
   const [page, setPage] = useState(1);
 
-  if(pages.isSuccess && pages.data.length === 0) {
+  if (pages.isSuccess && pages.data.length === 0) {
     return (
-      <div className='relative block w-fit mx-auto'>
-        <div className='align-middle p-5 inline-block max-w-[50%]'>
-          <WaitingForYou className='inline-block my-auto' />
-        </div>
-        <div className='align-middle my-auto w-fit inline-block'>
-          <Title>No Files</Title>
-          <MutedText size='md'>Upload some files to get started</MutedText>
-        </div>
-      </div>
+      <Center>
+        <Group>
+          <div>
+            <FileIcon size={48} />
+          </div>
+          <div>
+            <Title>Nothing here</Title>
+            <MutedText size='md'>Upload some files and they will show up here.</MutedText>
+          </div>
+        </Group>
+      </Center>
     );
   }
 

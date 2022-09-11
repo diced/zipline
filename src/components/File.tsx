@@ -135,7 +135,7 @@ export default function File({ image, updateImages }) {
         </Group>
       </Modal>
       <Card sx={{ maxWidth: '100%', height: '100%' }} shadow='md'>
-        <Card.Section className='my-auto'>
+        <Card.Section>
           <LoadingOverlay visible={loading} />
           <Type
             file={image}

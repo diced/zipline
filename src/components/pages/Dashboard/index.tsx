@@ -12,7 +12,6 @@ import { useStoreSelector } from 'lib/redux/store';
 import RecentFiles from './RecentFiles';
 import { StatCards } from './StatCards';
 
-
 export default function Dashboard() {
   const user = useStoreSelector(state => state.user);
   const theme = useMantineTheme();
@@ -63,9 +62,9 @@ export default function Dashboard() {
   };
 
   return (
-    <div className='gap-4 flex flex-col'>
+    <div>
       <Title>Welcome back, {user?.username}</Title>
-      {/* <MutedText size='md'>You have <b>{images.isSuccess ? images.data.length : '...'}</b> files</MutedText> */}
+      <MutedText size='md'>You have <b>{images.isSuccess ? images.data.length : '...'}</b> files</MutedText>
 
       <StatCards />
 
@@ -73,7 +72,7 @@ export default function Dashboard() {
 
       <section>
         <Title>Files</Title>
-        <MutedText size='md'>View your gallery <Link href='/dashboard/files' className='underline'>here</Link>.</MutedText>
+        <MutedText size='md'>View your gallery <Link href='/dashboard/files'>here</Link>.</MutedText>
         <DataGrid
           data={images.data ?? []}
           loading={images.isLoading}
@@ -87,8 +86,8 @@ export default function Dashboard() {
           DeleteIcon={DeleteIcon}
           EnterIcon={EnterIcon}
           deleteImage={deleteImage}
-          // copyImage={copyImage}
-          // viewImage={viewImage}
+          copyImage={copyImage}
+          viewImage={viewImage}
           styles={{
             dataCell: {
               width: '100%',

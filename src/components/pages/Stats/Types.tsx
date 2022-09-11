@@ -1,7 +1,6 @@
-import { LoadingOverlay, Card } from '@mantine/core';
+import { LoadingOverlay, Card, Box } from '@mantine/core';
 import { SmallTable } from 'components/SmallTable';
 import { useStats } from 'lib/queries/stats';
-import { Fragment } from 'react';
 
 export default function Types() {
   const stats = useStats();
@@ -13,7 +12,7 @@ export default function Types() {
   const latest = stats.data[0];
 
   return (
-    <Fragment>
+    <Box mt='md'>
       {latest.data.count_by_user.length ? (
         <Card>
           <SmallTable
@@ -34,6 +33,6 @@ export default function Types() {
           rows={latest.data.types_count}
         />
       </Card>
-    </Fragment>
+    </Box>
   );
 }
