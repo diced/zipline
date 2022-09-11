@@ -49,34 +49,34 @@ export const useRecent = (filter?: string) => {
 export function useFileDelete() {
   // '/api/user/files', 'DELETE', { id: image.id }
   return useMutation(async (id: string) => {
-    return fetch(`/api/user/files`, {
+    return fetch('/api/user/files', {
       method: 'DELETE',
       body: JSON.stringify({ id }),
       headers: {
         'content-type': 'application/json',
-      }
+      },
     }).then(res => res.json());
   }, {
     onSuccess: () => {
       queryClient.refetchQueries(['files']);
-    }
-  })
+    },
+  });
 }
 
 export function useFileFavorite() {
   // /api/user/files', 'PATCH', { id: image.id, favorite: !image.favorite }
   return useMutation(async (data: { id: string, favorite: boolean }) => {
-    return fetch(`/api/user/files`, {
+    return fetch('/api/user/files', {
       method: 'PATCH',
       body: JSON.stringify(data),
       headers: {
         'content-type': 'application/json',
-      }
+      },
     }).then(res => res.json());
   }, {
     onSuccess: () => {
       queryClient.refetchQueries(['files']);
-    }
+    },
   });
 }
 

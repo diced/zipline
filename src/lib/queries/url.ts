@@ -19,17 +19,17 @@ export function useURLs() {
 export function useURLDelete() {
   return useMutation(async (id: string) => {
     // '/api/user/urls', 'DELETE', { id: u.id }
-    return fetch(`/api/user/urls`, {
+    return fetch('/api/user/urls', {
       method: 'DELETE',
       body: JSON.stringify({ id }),
       headers: {
         'content-type': 'application/json',
-      }
+      },
     }).then(res => res.json());
   }, {
     onSuccess: (data, variables) => {
       const dataWithoutDeleted = queryClient.getQueryData<URLResponse[]>(['urls'])?.filter(u => u.id !== variables);
       queryClient.setQueryData(['urls'], dataWithoutDeleted);
-    }
+    },
   });
 }
