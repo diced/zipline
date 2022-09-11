@@ -93,6 +93,20 @@ export default function ZiplineTheming({ Component, pageProps, ...props }) {
               transition: 'pop',
             },
           },
+          Card: {
+            styles: t => ({
+              root: {
+                backgroundColor: t.colorScheme === 'dark' ? t.colors.dark[6] : t.colors.gray[0],
+              },
+            }),
+          },
+          Image: {
+            styles: t => ({
+              placeholder: {
+                backgroundColor: t.colorScheme === 'dark' ? t.colors.dark[6] : t.colors.gray[0],
+              },
+            }),
+          },
         },
       }}
     >

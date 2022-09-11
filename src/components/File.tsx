@@ -1,13 +1,12 @@
 import { Button, Card, Group, LoadingOverlay, Modal, Stack, Text, Title, Tooltip, useMantineTheme } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { showNotification } from '@mantine/notifications';
-import useFetch from 'hooks/useFetch';
-import { useState } from 'react';
-import Type from './Type';
-import { CalendarIcon, ClockIcon, CopyIcon, CrossIcon, DeleteIcon, FileIcon, HashIcon, ImageIcon, StarIcon } from './icons';
-import MutedText from './MutedText';
 import { relativeTime } from 'lib/clientUtils';
 import { useFileDelete, useFileFavorite } from 'lib/queries/files';
+import { useState } from 'react';
+import { CalendarIcon, ClockIcon, CopyIcon, CrossIcon, DeleteIcon, FileIcon, HashIcon, ImageIcon, StarIcon } from './icons';
+import MutedText from './MutedText';
+import Type from './Type';
 
 export function FileMeta({ Icon, title, subtitle, ...other }) {
   return other.tooltip ? (
@@ -36,6 +35,7 @@ export default function File({ image, updateImages }) {
   const deleteFile = useFileDelete();
   const favoriteFile = useFileFavorite();
   const clipboard = useClipboard();
+  const theme = useMantineTheme();
 
   const loading = deleteFile.isLoading || favoriteFile.isLoading;
 

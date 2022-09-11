@@ -307,6 +307,7 @@ export default function Layout({ children, user, props }) {
                       '&:hover': {
                         backgroundColor: t.other.hover,
                       },
+                      color: t.colorScheme === 'dark' ? 'white' : 'black',
                     })}
                     size='xl'
                     p='sm'
