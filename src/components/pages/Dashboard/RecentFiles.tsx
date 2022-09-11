@@ -1,9 +1,9 @@
 import { Card as MantineCard, SimpleGrid, Skeleton, Title } from '@mantine/core';
 import { randomId } from '@mantine/hooks';
 import File from 'components/File';
-import NoData from 'components/icons/undraw/NoData';
 import MutedText from 'components/MutedText';
 import { invalidateFiles, useRecent } from 'lib/queries/files';
+import { UploadCloud } from 'react-feather';
 
 export default function RecentFiles() {
   const recent = useRecent('media');
@@ -31,7 +31,7 @@ export default function RecentFiles() {
                     <MantineCard.Section>
                       <div className='relative block w-fit mx-auto'>
                         <div className='align-middle px-6 py-12 inline-block max-w-[50%]'>
-                          <NoData className='inline-block max-h-20 my-auto' />
+                          <UploadCloud size={48} />
                         </div>
                         <div className='align-middle my-auto w-fit inline-block'>
                           <Title>Nothing here</Title>
