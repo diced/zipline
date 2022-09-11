@@ -83,3 +83,7 @@ export function parseExpiry(header: string): Date | null {
 
   return human;
 }
+
+export function percentChange(initial: number, final: number) {
+  return ((final - initial) / initial) * 100;
+}

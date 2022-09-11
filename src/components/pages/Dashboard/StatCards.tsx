@@ -1,6 +1,7 @@
 import { SimpleGrid } from "@mantine/core";
 import { FileIcon, UserIcon } from "components/icons";
 import StatCard from "components/StatCard";
+import { percentChange } from "lib/clientUtils";
 import { useStats } from "lib/queries/stats";
 import { Database, Eye, Users } from "react-feather";
 
@@ -24,7 +25,7 @@ export function StatCards() {
         icon: (
           <FileIcon />
         ),
-        diff: stats.isSuccess ? latest.data.count - before.data.count : undefined,
+        diff: stats.isSuccess ? percentChange(before.data.count, latest.data.count) : undefined,
       }}/>
 
       <StatCard stat={{
@@ -34,7 +35,7 @@ export function StatCards() {
         icon: (
           <Database size={15} />
         ),
-        diff: stats.isSuccess ? latest.data.size_num - before.data.size_num : undefined,
+        diff: stats.isSuccess ? percentChange(before.data.size_num, latest.data.size_num) : undefined,
       }}/>
 
       <StatCard stat={{
@@ -44,7 +45,7 @@ export function StatCards() {
         icon: (
           <Eye size={15} />
         ),
-        diff: stats.isSuccess ? latest.data.views_count - before.data.views_count : undefined,
+        diff: stats.isSuccess ? percentChange(before.data.views_count, latest.data.views_count) : undefined,
       }}/>
 
       <StatCard stat={{
@@ -54,7 +55,7 @@ export function StatCards() {
         icon: (
           <Users size={15} />
         ),
-        diff: stats.isSuccess ? latest.data.count_users - before.data.count_users : undefined,
+        diff: stats.isSuccess ? percentChange(before.data.count_users, latest.data.count_users) : undefined,
       }}/>
     </SimpleGrid>
   );
