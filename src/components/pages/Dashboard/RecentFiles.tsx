@@ -18,7 +18,6 @@ export default function RecentFiles() {
         breakpoints={[
           { maxWidth: 'sm', cols: 1, spacing: 'sm' },
         ]}
-        className='mt-3'
       >
         {
           recent.isSuccess

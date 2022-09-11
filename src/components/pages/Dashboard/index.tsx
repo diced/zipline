@@ -67,89 +67,87 @@ export default function Dashboard() {
   };
 
   return (
-    <div className='gap-4'>
+    <div className='gap-4 flex flex-col'>
       <Title>Welcome back, {user?.username}</Title>
       {/* <MutedText size='md'>You have <b>{images.isSuccess ? images.data.length : '...'}</b> files</MutedText> */}
 
-      <section className='mb-4'>
-        <StatCards />
-      </section>
+      <StatCards />
+
+      <RecentFiles />
 
       <section>
-        <RecentFiles />
+        <Title>Files</Title>
+        <MutedText size='md'>View your gallery <Link href='/dashboard/files' className='underline'>here</Link>.</MutedText>
+        <DataGrid
+          data={images.data ?? []}
+          loading={images.isLoading}
+          withPagination={true}
+          withColumnResizing={false}
+          withColumnFilters={true}
+          noEllipsis={true}
+          withSorting={true}
+          highlightOnHover={true}
+          CopyIcon={CopyIcon}
+          DeleteIcon={DeleteIcon}
+          EnterIcon={EnterIcon}
+          deleteImage={deleteImage}
+          // copyImage={copyImage}
+          // viewImage={viewImage}
+          styles={{
+            dataCell: {
+              width: '100%',
+            },
+            td: {
+              ':nth-child(1)': {
+                minWidth: 170,
+              },
+              ':nth-child(2)': {
+                minWidth: 100,
+              },
+            },
+            th: {
+              ':nth-child(1)': {
+                minWidth: 170,
+                padding: theme.spacing.lg,
+                borderTopLeftRadius: theme.radius.sm,
+              },
+              ':nth-child(2)': {
+                minWidth: 100,
+                padding: theme.spacing.lg,
+              },
+              ':nth-child(3)': {
+                padding: theme.spacing.lg,
+              },
+              ':nth-child(4)': {
+                padding: theme.spacing.lg,
+                borderTopRightRadius: theme.radius.sm,
+              },
+            },
+            thead: {
+              backgroundColor: theme.colors.dark[6],
+            },
+          }}
+          empty={<></>}
+
+          columns={[
+            {
+              accessorKey: 'file',
+              header: 'Name',
+              filterFn: stringFilterFn,
+            },
+            {
+              accessorKey: 'mimetype',
+              header: 'Type',
+              filterFn: stringFilterFn,
+            },
+            {
+              accessorKey: 'created_at',
+              header: 'Date',
+              filterFn: dateFilterFn,
+            },
+          ]}
+        />
       </section>
-
-      <Title mt='md'>Files</Title>
-      <MutedText size='md'>View your gallery <Link href='/dashboard/files' className='underline'>here</Link>.</MutedText>
-      <DataGrid
-        data={images.data ?? []}
-        loading={images.isLoading}
-        withPagination={true}
-        withColumnResizing={false}
-        withColumnFilters={true}
-        noEllipsis={true}
-        withSorting={true}
-        highlightOnHover={true}
-        CopyIcon={CopyIcon}
-        DeleteIcon={DeleteIcon}
-        EnterIcon={EnterIcon}
-        deleteImage={deleteImage}
-        // copyImage={copyImage}
-        // viewImage={viewImage}
-        styles={{
-          dataCell: {
-            width: '100%',
-          },
-          td: {
-            ':nth-child(1)': {
-              minWidth: 170,
-            },
-            ':nth-child(2)': {
-              minWidth: 100,
-            },
-          },
-          th: {
-            ':nth-child(1)': {
-              minWidth: 170,
-              padding: theme.spacing.lg,
-              borderTopLeftRadius: theme.radius.sm,
-            },
-            ':nth-child(2)': {
-              minWidth: 100,
-              padding: theme.spacing.lg,
-            },
-            ':nth-child(3)': {
-              padding: theme.spacing.lg,
-            },
-            ':nth-child(4)': {
-              padding: theme.spacing.lg,
-              borderTopRightRadius: theme.radius.sm,
-            },
-          },
-          thead: {
-            backgroundColor: theme.colors.dark[6],
-          },
-        }}
-        empty={<></>}
-
-        columns={[
-          {
-            accessorKey: 'file',
-            header: 'Name',
-            filterFn: stringFilterFn,
-          },
-          {
-            accessorKey: 'mimetype',
-            header: 'Type',
-            filterFn: stringFilterFn,
-          },
-          {
-            accessorKey: 'created_at',
-            header: 'Date',
-            filterFn: dateFilterFn,
-          },
-        ]}
-      />
     </div>
   );
 }

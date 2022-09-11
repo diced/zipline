@@ -1,29 +1,29 @@
 import { useQuery } from '@tanstack/react-query';
 
-
-/**
- * count: 0
-count_by_user: []
-count_users: 1
-size: "0.0 B"
-size_num: 0
-types_count: []
-views_count: 0
- */
-
-type Stats = {
+type StatsTypesCount = {
   count: number;
-  count_by_user: any[];
-  count_users: number;
-  size: string;
-  size_num: number;
-  types_count: any[];
-  views_count: number;
+  mimetype: string;
+};
+
+export type Stats = {
+  created_at: string;
+  id: number;
+  data: {
+    count: number;
+    count_by_user: any[];
+    count_users: number;
+    size: string;
+    size_num: number;
+    types_count: StatsTypesCount[];
+    views_count: number;
+  }
 }
 
-export const useStats = () => {
-  return useQuery<Stats>(['stats'], async () => {
-    return fetch('/api/stats')
+export const useStats = (amount = 2) => {
+  return useQuery<Stats[]>(['stats', amount], async () => {
+    return fetch('/api/stats?amount=' + amount)
       .then(res => res.json());
+  }, {
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 };

@@ -1,23 +1,36 @@
 import { NextApiReq, NextApiRes, withZipline } from 'middleware/withZipline';
 import prisma from 'lib/prisma';
 import config from 'lib/config';
+import { Stats } from '@prisma/client';
 
 async function handler(req: NextApiReq, res: NextApiRes) {
   const user = await req.user();
   if (!user) return res.forbid('not logged in');
 
-  const stats = await prisma.stats.findFirst({
-    orderBy: {
-      created_at: 'desc',
-    },
-    take: 1,
-  });
+  const amount = typeof req.query.amount === 'string' ? parseInt(req.query.amount) : 2;
+
+  // get stats per day
+
+  var stats = await prisma.$queryRaw<Stats[]>`
+    SELECT *
+    FROM "Stats" as t JOIN
+          (SELECT MIN(t2."created_at") as min_timestamp
+            FROM "Stats" t2
+            GROUP BY date(t2."created_at")
+          ) t2
+          ON t."created_at" = t2.min_timestamp
+    ORDER BY t."created_at" DESC
+    LIMIT ${amount}
+  `;
 
   if (config.website.show_files_per_user) {
-    (stats.data as any).count_by_user = [];
+    stats = stats.map((stat) => {
+      (stat.data as any).count_by_user = [];
+      return stat;
+    });
   }
 
-  return res.json(stats.data);
+  return res.json(stats);
 }
 
 export default withZipline(handler);
