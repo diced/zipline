@@ -1,7 +1,7 @@
-import { LoadingOverlay, Card } from "@mantine/core";
-import { SmallTable } from "components/SmallTable";
-import { useStats } from "lib/queries/stats"
-import { Fragment } from "react";
+import { LoadingOverlay, Card } from '@mantine/core';
+import { SmallTable } from 'components/SmallTable';
+import { useStats } from 'lib/queries/stats'
+import { Fragment } from 'react';
 
 export default function Types() {
   const stats = useStats();

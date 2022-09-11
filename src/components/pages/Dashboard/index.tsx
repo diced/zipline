@@ -1,20 +1,16 @@
-import { SimpleGrid, Skeleton, Title, Card as MantineCard, useMantineTheme, Box } from '@mantine/core';
-import { randomId, useClipboard } from '@mantine/hooks';
+import { DataGrid, dateFilterFn, stringFilterFn } from '@dicedtomato/mantine-data-grid';
+import { Title, useMantineTheme } from '@mantine/core';
+import { useClipboard } from '@mantine/hooks';
 import { showNotification } from '@mantine/notifications';
-import Card from 'components/Card';
-import File from 'components/File';
 import { CopyIcon, CrossIcon, DeleteIcon, EnterIcon } from 'components/icons';
 import Link from 'components/Link';
 import MutedText from 'components/MutedText';
-import { bytesToRead } from 'lib/clientUtils';
 import useFetch from 'lib/hooks/useFetch';
-import { useStoreSelector } from 'lib/redux/store';
-import { DataGrid, dateFilterFn, stringFilterFn } from '@dicedtomato/mantine-data-grid';
 import { useFiles, useRecent } from 'lib/queries/files';
-import NoData from 'components/icons/undraw/NoData';
 import { useStats } from 'lib/queries/stats';
-import { StatCards } from './StatCards';
+import { useStoreSelector } from 'lib/redux/store';
 import RecentFiles from './RecentFiles';
+import { StatCards } from './StatCards';
 
 
 export default function Dashboard() {

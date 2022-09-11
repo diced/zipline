@@ -1,16 +1,15 @@
-import { Title, SimpleGrid, Skeleton, Card as MantineCard } from "@mantine/core";
-import { randomId } from "@mantine/hooks";
-import NoData from "components/icons/undraw/NoData";
-import MutedText from "components/MutedText";
-import { invalidateFiles, useRecent } from "lib/queries/files";
-import { Fragment } from "react";
+import { Card as MantineCard, SimpleGrid, Skeleton, Title } from '@mantine/core';
+import { randomId } from '@mantine/hooks';
 import File from 'components/File';
+import NoData from 'components/icons/undraw/NoData';
+import MutedText from 'components/MutedText';
+import { invalidateFiles, useRecent } from 'lib/queries/files';
 
 export default function RecentFiles() {
   const recent = useRecent('media');
 
   return (
-    <Fragment>
+    <>
       <Title>Recent Files</Title>
       <SimpleGrid
         cols={(recent.isSuccess && recent.data.length === 0) ? 1 : 4}
@@ -51,6 +50,6 @@ export default function RecentFiles() {
             )
         }
       </SimpleGrid>
-    </Fragment>
+    </>
   )
 }

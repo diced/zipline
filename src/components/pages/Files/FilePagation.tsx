@@ -1,9 +1,9 @@
-import { SimpleGrid, Title, Skeleton, Pagination, Box } from '@mantine/core';
+import { Box, Pagination, SimpleGrid, Skeleton, Title } from '@mantine/core';
+import File from 'components/File';
 import WaitingForYou from 'components/icons/undraw/WaitingForYou';
 import MutedText from 'components/MutedText';
 import { usePaginatedFiles } from 'lib/queries/files';
 import { Fragment, useState } from 'react';
-import File from 'components/File';
 
 export default function FilePagation() {
   const pages = usePaginatedFiles({ filter: 'media' });

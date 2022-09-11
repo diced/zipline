@@ -1,9 +1,9 @@
-import { Card, Group, Title, ActionIcon, LoadingOverlay } from "@mantine/core";
-import { useClipboard } from "@mantine/hooks";
-import { showNotification } from "@mantine/notifications";
-import { ExternalLinkIcon, CopyIcon, CrossIcon, DeleteIcon } from "components/icons";
-import TrashIcon from "components/icons/TrashIcon";
-import { URLResponse, useURLDelete, useURLs } from "lib/queries/url";
+import { ActionIcon, Card, Group, LoadingOverlay, Title } from '@mantine/core';
+import { useClipboard } from '@mantine/hooks';
+import { showNotification } from '@mantine/notifications';
+import { CopyIcon, CrossIcon, DeleteIcon, ExternalLinkIcon } from 'components/icons';
+import TrashIcon from 'components/icons/TrashIcon';
+import { URLResponse, useURLDelete } from 'lib/queries/url';
 
 export default function URLCard({ url }: {
   url: URLResponse

@@ -1,18 +1,18 @@
-import { Box, Button, Card, ColorInput, Group, MultiSelect, Space, Text, TextInput, PasswordInput, Title, Tooltip, FileInput, Image } from '@mantine/core';
-import { randomId, useInterval } from '@mantine/hooks';
+import { Box, Button, Card, ColorInput, FileInput, Group, Image, PasswordInput, Space, Text, TextInput, Title, Tooltip } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { randomId, useInterval } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
 import { showNotification, updateNotification } from '@mantine/notifications';
 import { CrossIcon, DeleteIcon, SettingsIcon } from 'components/icons';
 import DownloadIcon from 'components/icons/DownloadIcon';
 import Link from 'components/Link';
+import MutedText from 'components/MutedText';
 import { SmallTable } from 'components/SmallTable';
 import useFetch from 'hooks/useFetch';
 import { bytesToRead } from 'lib/clientUtils';
 import { updateUser } from 'lib/redux/reducers/user';
 import { useStoreDispatch, useStoreSelector } from 'lib/redux/store';
 import { useEffect, useState } from 'react';
-import MutedText from 'components/MutedText';
 
 function ExportDataTooltip({ children }) {
   return <Tooltip position='top' color='' label='After clicking, if you have a lot of files the export can take a while to complete. A list of previous exports will be below to download.'>{children}</Tooltip>;

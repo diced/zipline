@@ -1,4 +1,4 @@
-import type { Image, ImageFormat, User } from '@prisma/client';
+import type { Image, User } from '@prisma/client';
 import ms, { StringValue } from 'ms';
 
 export function parse(str: string, image: Image, user: User) {

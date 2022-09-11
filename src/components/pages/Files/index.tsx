@@ -1,12 +1,9 @@
-import { Accordion, ActionIcon, Box, Group, Pagination, SimpleGrid, Skeleton, Title } from '@mantine/core';
+import { Accordion, ActionIcon, Box, Group, Pagination, SimpleGrid, Title } from '@mantine/core';
 import File from 'components/File';
 import { PlusIcon } from 'components/icons';
-import WaitingForYou from 'components/icons/undraw/WaitingForYou';
-import MutedText from 'components/MutedText';
-import useFetch from 'hooks/useFetch';
 import { usePaginatedFiles } from 'lib/queries/files';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import FilePagation from './FilePagation';
 
 export default function Files() {

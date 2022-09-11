@@ -1,5 +1,4 @@
-import { ActionIcon, Button, Card, Group, Modal, SimpleGrid, Skeleton, TextInput, Title, Text } from '@mantine/core';
-import { useClipboard } from '@mantine/hooks';
+import { ActionIcon, Button, Group, Modal, SimpleGrid, Skeleton, TextInput, Title, Text } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { showNotification } from '@mantine/notifications';
 import { CrossIcon, LinkIcon, PlusIcon } from 'components/icons';

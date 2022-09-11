@@ -1,11 +1,11 @@
-import { Stats, useStats } from "lib/queries/stats";
-import { Card, LoadingOverlay, MantineTheme, Title, useMantineTheme } from "@mantine/core";
-import { Pie, Line, Chart } from "react-chartjs-2";
-import { ArcElement, CategoryScale, Chart as ChartJS, LinearScale, PointElement, LineController, LineElement, ChartData, Tooltip, ChartOptions } from "chart.js";
-import ColorHash from 'color-hash';
+import { Card, LoadingOverlay, MantineTheme, Title, useMantineTheme } from '@mantine/core';
+import { ArcElement, CategoryScale, Chart as ChartJS, ChartData, ChartOptions, LinearScale, LineController, LineElement, PointElement, Tooltip } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import { useMemo } from "react";
-import { bytesToRead } from "lib/clientUtils";
+import ColorHash from 'color-hash';
+import { bytesToRead } from 'lib/clientUtils';
+import { useStats } from 'lib/queries/stats';
+import { useMemo } from 'react';
+import { Chart, Pie } from 'react-chartjs-2';
 
 const hash = new ColorHash();
 ChartJS.register(ArcElement);
@@ -49,11 +49,11 @@ const CHART_OPTIONS = (theme: MantineTheme): ChartOptions => ({
 });
 
 
-type LineChartData = ChartData<"line", number[], string>;
+type LineChartData = ChartData<'line', number[], string>;
 type ChartDataMemo = {
   views: LineChartData,
   uploads: LineChartData,
-  uploadTypes: ChartData<"pie", number[], string>,
+  uploadTypes: ChartData<'pie', number[], string>,
   storage: LineChartData,
 } | void;
 
@@ -65,21 +65,12 @@ export default function Graphs() {
   const chartOptions = useMemo(() => CHART_OPTIONS(theme), [theme]);
 
   const chartData = useMemo<ChartDataMemo>(() => {
-    if(historicalStats.isLoading || !historicalStats.data) return;
+    if (historicalStats.isLoading || !historicalStats.data) return;
 
-    // reverse the data so it's in older -> newer order
     const data = Array.from(historicalStats.data).reverse();
-
-    // get all the labels
     const labels = data.map((stat) => new Date(stat.created_at).toLocaleDateString());
-
-    // VIEW DATA
     const viewData = data.map((stat) => stat.data.views_count);
-    
-    // UPLOAD DATA
     const uploadData = data.map((stat) => stat.data.count);
-
-    // STORAGE DATA
     const storageData = data.map((stat) => stat.data.size_num);
 
     return {
@@ -88,18 +79,16 @@ export default function Graphs() {
         datasets: [{
           label: 'Views',
           data: viewData,
-          // themeing
           borderColor: theme.colors.blue[6],
           backgroundColor: theme.colors.blue[0],
         }]
-      }, 
+      },
 
       uploads: {
         labels,
         datasets: [{
           label: 'Uploads',
           data: uploadData,
-          // themeing
           borderColor: theme.colors.blue[6],
           backgroundColor: theme.colors.blue[0],
         }]
@@ -109,7 +98,7 @@ export default function Graphs() {
         labels: latest?.data.types_count.map((x) => x.mimetype),
         datasets: [{
           data: latest?.data.types_count.map((x) => x.count),
-          label: "Upload Types",
+          label: 'Upload Types',
           backgroundColor: latest?.data.types_count.map((x) => hash.hex(x.mimetype)),
         }]
       },
@@ -119,7 +108,6 @@ export default function Graphs() {
         datasets: [{
           label: 'Storage',
           data: storageData,
-          // themeing
           borderColor: theme.colors.blue[6],
           backgroundColor: theme.colors.blue[0],
         }]
@@ -128,18 +116,18 @@ export default function Graphs() {
   }, [historicalStats]);
 
   return (
-    <section className="flex flex-col gap-5">
+    <section className='flex flex-col gap-5'>
       <LoadingOverlay visible={historicalStats.isLoading} />
 
-      <div className="grid-cols-4 grid gap-5">
+      <div className='grid-cols-4 grid gap-5'>
         {/* 1/4 - upload types */}
-        <Card className="flex flex-col gap-2">
-          <Title size="h4" className="text-center">Upload Types</Title>
-          { 
+        <Card className='flex flex-col gap-2'>
+          <Title size='h4' className='text-center'>Upload Types</Title>
+          {
             chartData && (
               <Pie
                 data={chartData.uploadTypes}
-                className="max-h-[20vh]"
+                className='max-h-[20vh]'
 
                 options={{
                   plugins: {
@@ -159,16 +147,16 @@ export default function Graphs() {
                 }}
               />
             )
-          } 
+          }
         </Card>
         {/* 3/4 - views */}
-        <Card className="col-span-3">
-          <Title size="h4" className="text-center">Total Views</Title>
+        <Card className='col-span-3'>
+          <Title size='h4' className='text-center'>Total Views</Title>
           {
             chartData && (
               <Chart
-                className="max-h-[20vh]"
-                type="line"
+                className='max-h-[20vh]'
+                type='line'
                 data={chartData.views}
                 options={chartOptions}
               />
@@ -177,15 +165,15 @@ export default function Graphs() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-2 gap-5">
+      <div className='grid grid-cols-2 gap-5'>
         {/* 1/2 - uploaded files */}
-        <Card className="flex flex-col gap-2">
-          <Title size="h4" className="text-center">Total Uploads</Title>
+        <Card className='flex flex-col gap-2'>
+          <Title size='h4' className='text-center'>Total Uploads</Title>
           {
             chartData && (
               <Chart
-                className="max-h-[20vh]"
-                type="line"
+                className='max-h-[20vh]'
+                type='line'
                 data={chartData.uploads}
                 options={chartOptions}
               />
@@ -193,13 +181,13 @@ export default function Graphs() {
           }
         </Card>
         {/* 1/2 - storage used */}
-        <Card className="flex flex-col gap-2">
-          <Title size="h4" className="text-center">Storage Usage</Title>
+        <Card className='flex flex-col gap-2'>
+          <Title size='h4' className='text-center'>Storage Usage</Title>
           {
             chartData && (
               <Chart
-                className="max-h-[20vh]"
-                type="line"
+                className='max-h-[20vh]'
+                type='line'
                 data={chartData.storage}
                 options={{
                   ...chartOptions,

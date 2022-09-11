@@ -1,9 +1,9 @@
-import { SimpleGrid } from "@mantine/core";
-import { FileIcon, UserIcon } from "components/icons";
-import StatCard from "components/StatCard";
-import { percentChange } from "lib/clientUtils";
-import { useStats } from "lib/queries/stats";
-import { Database, Eye, Users } from "react-feather";
+import { SimpleGrid } from '@mantine/core';
+import { FileIcon } from 'components/icons';
+import StatCard from 'components/StatCard';
+import { percentChange } from 'lib/clientUtils';
+import { useStats } from 'lib/queries/stats';
+import { Database, Eye, Users } from 'react-feather';
 
 export function StatCards() {
   const stats  = useStats();
@@ -55,7 +55,6 @@ export function StatCards() {
         icon: (
           <Users size={15} />
         ),
-        diff: stats.isSuccess ? percentChange(before.data.count_users, latest.data.count_users) : undefined,
       }}/>
     </SimpleGrid>
   );
