@@ -1,12 +1,8 @@
-import React from 'react';
-import exts from 'lib/exts';
 import { Prism } from '@mantine/prism';
-import { GetServerSideProps } from 'next';
-import datasource from 'lib/datasource';
+import exts from 'lib/exts';
 import { streamToString } from 'lib/utils/streams';
+import { GetServerSideProps } from 'next';
 
-// the props that will be returned by getServerSideProps
-// and will be inputted into Code component 
 type CodeProps = {
   code: string,
   id: string,
@@ -29,25 +25,20 @@ export default function Code(
 
 // handle server-side rendering
 export const getServerSideProps: GetServerSideProps<CodeProps> = async (context) => {
-  // get the data from the datasource
+  if (process.env.ZIPLINE_DOCKER_BUILD) return { props: { code: '', id: '' } };
+
+  const { default: datasource } = await import('lib/datasource');
+
   const data = await datasource.get(context.params.id as string);
-  
-  // return notFound if no data
-  if(!data) return {
+  if (!data) return {
     notFound: true,
   };
 
-  // set cache header to prevent re-rendering when not needed
-  // this should only be done on 200 responses
   context.res.setHeader(
     'Cache-Control',
     'public, max-age=2628000, stale-while-revalidate=86400'
-    // public -> browsers/whatever are allowed to use shared cache
-    // max-age: 1 month -> will cache for one month (uploads shouldn't change)
-    // stale-while-revalidate: 1 week -> this tells browsers to check the cache in the background after 1 week (instead of on-request)
   );
 
-  // resolve stream to a string and send it off to the component
   return {
     props: {
       code: await streamToString(data),

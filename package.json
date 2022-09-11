@@ -48,7 +48,6 @@
     "fecha": "^4.2.3",
     "fflate": "^0.7.3",
     "find-my-way": "^6.3.0",
-    "i": "^0.3.7",
     "minio": "^7.0.28",
     "ms": "canary",
     "multer": "^1.4.5-lts.1",
