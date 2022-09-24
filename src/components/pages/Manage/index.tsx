@@ -3,7 +3,7 @@ import { useForm } from '@mantine/form';
 import { randomId, useInterval } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
 import { showNotification, updateNotification } from '@mantine/notifications';
-import { CrossIcon, DeleteIcon, SettingsIcon, ShareXIcon } from 'components/icons';
+import { CrossIcon, DeleteIcon, FlameshotIcon, SettingsIcon, ShareXIcon } from 'components/icons';
 import DownloadIcon from 'components/icons/DownloadIcon';
 import Link from 'components/Link';
 import MutedText from 'components/MutedText';
@@ -13,6 +13,7 @@ import { bytesToRead } from 'lib/clientUtils';
 import { updateUser } from 'lib/redux/reducers/user';
 import { useStoreDispatch, useStoreSelector } from 'lib/redux/store';
 import { useEffect, useState } from 'react';
+import Flameshot from './Flameshot';
 import ShareX from './ShareX';
 
 function ExportDataTooltip({ children }) {
@@ -24,7 +25,8 @@ export default function Manage() {
   const dispatch = useStoreDispatch();
   const modals = useModals();
 
-  const [open, setOpen] = useState(false);
+  const [shareXOpen, setShareXOpen] = useState(false);
+  const [flameshotOpen, setFlameshotOpen] = useState(false);
   const [exports, setExports] = useState([]);
   const [file, setFile] = useState<File>(null);
   const [fileDataURL, setFileDataURL] = useState(user.avatar ?? null);
@@ -297,12 +299,14 @@ export default function Manage() {
         )}
       </Card>
 
-      <Title my='md'>ShareX Config</Title>
+      <Title my='md'>Uploaders</Title>
       <Group>
-        <Button onClick={() => setOpen(true)} rightIcon={<ShareXIcon />}>Generate ShareX Config</Button>
+        <Button size='xl' onClick={() => setShareXOpen(true)} rightIcon={<ShareXIcon />}>Generate ShareX Config</Button>
+        <Button size='xl' onClick={() => setFlameshotOpen(true)} rightIcon={<FlameshotIcon />}>Generate Flameshot Script</Button>
       </Group>
 
-      <ShareX user={user} open={open} setOpen={setOpen} />
+      <ShareX user={user} open={shareXOpen} setOpen={setShareXOpen} />
+      <Flameshot user={user} open={flameshotOpen} setOpen={setFlameshotOpen} />
     </>
   );
 }

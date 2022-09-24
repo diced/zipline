@@ -82,11 +82,12 @@ The default port is `3000`, once you have accessed it you can see a login screen
 # ShareX (Windows)
 This section requires [ShareX](https://www.getsharex.com/).
 
-After navigating to Zipline, click on the top right corner where it says your username and click Manage Account. Scroll down to see "ShareX Config", select the one you would prefer using. After this you can import the .sxcu into sharex. [More information here](https://zipl.vercel.app/docs/uploaders/sharex)
+After navigating to Zipline, click on the top right corner where it says your username and click Manage Account. Scroll down to see "ShareX Config", select the one you would prefer using. After this you can import the .sxcu into sharex. [More information here](https://zipl.vercel.app/docs/guides/uploaders/sharex)
 
 # Flameshot (Linux)
 This section requires [Flameshot](https://www.flameshot.org/), [jq](https://stedolan.github.io/jq/), and [xsel](https://github.com/kfish/xsel).
 
+You can either use the script below, or generate one directly from Zipline (just like how you can generate a ShareX config).
 To upload files using flameshot we will use a script. Replace $TOKEN and $HOST with your own values, you probably know how to do this if you use linux.
 
 ```shell

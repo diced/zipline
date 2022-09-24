@@ -25,6 +25,8 @@ import TagIcon from './TagIcon';
 import ClockIcon from './ClockIcon';
 import ExternalLinkIcon from './ExternalLinkIcon';
 import ShareXIcon from './ShareXIcon';
+import DownloadIcon from './DownloadIcon';
+import FlameshotIcon from './FlameshotIcon';
 
 export {
   ActivityIcon,
@@ -54,4 +56,6 @@ export {
   ClockIcon,
   ExternalLinkIcon,
   ShareXIcon,
+  DownloadIcon,
+  FlameshotIcon,
 };
