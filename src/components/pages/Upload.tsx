@@ -5,6 +5,7 @@ import Dropzone from 'components/dropzone/Dropzone';
 import FileDropzone from 'components/dropzone/DropzoneFile';
 import { ClockIcon, CrossIcon, UploadIcon } from 'components/icons';
 import Link from 'components/Link';
+import { invalidateFiles } from 'lib/queries/files';
 import { useStoreSelector } from 'lib/redux/store';
 import { useEffect, useState } from 'react';
 
@@ -126,6 +127,7 @@ export default function Upload() {
         });
         clipboard.copy(json.files[0]);
         setFiles([]);
+        invalidateFiles();
       } else {
         updateNotification({
           id: 'upload',

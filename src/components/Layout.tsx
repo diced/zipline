@@ -3,6 +3,7 @@ import { useClipboard } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
 import { showNotification } from '@mantine/notifications';
 import useFetch from 'hooks/useFetch';
+import { useVersion } from 'lib/queries/version';
 import { updateUser } from 'lib/redux/reducers/user';
 import { useStoreDispatch } from 'lib/redux/store';
 import Link from 'next/link';
@@ -114,7 +115,8 @@ export default function Layout({ children, user, props }) {
 
   const [token, setToken] = useState(user?.token);
   const [systemTheme, setSystemTheme] = useState(user.systemTheme ?? 'system');
-  const [version, setVersion] = useState<{ local: string, upstream: string }>(null);
+  // const [version, setVersion] = useState<{ local: string, upstream: string }>(null);
+  const version = useVersion();
   const [opened, setOpened] = useState(false); // navigation open
   const [open, setOpen] = useState(false); // manage acc dropdown
 
@@ -195,15 +197,6 @@ export default function Layout({ children, user, props }) {
     },
   });
 
-  useEffect(() => {
-    (async () => {
-      const data = await useFetch('/api/version');
-      if (!data.error) {
-        setVersion(data);
-      }
-    })();
-  }, []);
-
   return (
     <AppShell
       navbarOffsetBreakpoint='sm'
@@ -264,12 +257,12 @@ export default function Layout({ children, user, props }) {
               </Link>
             )) : null}
           </Navbar.Section>
-          {version ? (
+          {version.isSuccess ? (
             <Navbar.Section>
               <Tooltip
                 label={
-                  version.local !== version.upstream
-                    ? `You are running an outdated version of Zipline, refer to the docs on how to update to ${version.upstream}`
+                  version.data.local !== version.data.upstream
+                    ? `You are running an outdated version of Zipline, refer to the docs on how to update to ${version.data.upstream}`
                     : 'You are running the latest version of Zipline'
                 }
               >
@@ -278,9 +271,9 @@ export default function Layout({ children, user, props }) {
                   radius='md'
                   size='lg'
                   variant='dot'
-                  color={version.local !== version.upstream ? 'red' : 'primary'}
+                  color={version.data.local !== version.data.upstream ? 'red' : 'primary'}
                 >
-                  {version.local}
+                  {version.data.local}
                 </Badge>
               </Tooltip>
             </Navbar.Section>
@@ -314,6 +307,7 @@ export default function Layout({ children, user, props }) {
                       '&:hover': {
                         backgroundColor: t.other.hover,
                       },
+                      color: t.colorScheme === 'dark' ? 'white' : 'black',
                     })}
                     size='xl'
                     p='sm'
