@@ -248,7 +248,7 @@ export default function Manage() {
 
       <Box mb='md'>
         <Title>Avatar</Title>
-        <FileInput id='file' description='Add a custom avatar or leave blank for none' accept='image/png,image/jpeg,image/gif' value={file} onChange={handleAvatarChange} />
+        <FileInput placeholder='Click to upload a file' id='file' description='Add a custom avatar or leave blank for none' accept='image/png,image/jpeg,image/gif' value={file} onChange={handleAvatarChange} />
         <Card mt='md'>
           <Text>Preview:</Text>
           <Button
@@ -267,7 +267,7 @@ export default function Manage() {
         </Card>
 
         <Group position='right' mt='md'>
-          <Button onClick={() => { setFile(null); setFileDataURL(null); }}>Reset</Button>
+          <Button onClick={() => { setFile(null); setFileDataURL(null); }} color='red'>Reset</Button>
           <Button onClick={saveAvatar} >Save Avatar</Button>
         </Group>
       </Box>
@@ -278,7 +278,7 @@ export default function Manage() {
       </Box>
 
       <Group>
-        <Button onClick={openDeleteModal} rightIcon={<DeleteIcon />}>Delete All Data</Button>
+        <Button onClick={openDeleteModal} rightIcon={<DeleteIcon />} color='red'>Delete All Data</Button>
         <ExportDataTooltip><Button onClick={exportData} rightIcon={<DownloadIcon />}>Export Data</Button></ExportDataTooltip>
       </Group>
       <Card mt={22}>
