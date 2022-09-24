@@ -19,6 +19,12 @@ module.exports = {
 
     return config;
   },
+  images: {
+    domains: [
+      // For sharex icon in manage user
+      'getsharex.com',
+    ],
+  },
   poweredByHeader: false,
   reactStrictMode: true,
 };

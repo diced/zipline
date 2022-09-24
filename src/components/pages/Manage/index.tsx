@@ -3,7 +3,7 @@ import { useForm } from '@mantine/form';
 import { randomId, useInterval } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
 import { showNotification, updateNotification } from '@mantine/notifications';
-import { CrossIcon, DeleteIcon, SettingsIcon } from 'components/icons';
+import { CrossIcon, DeleteIcon, SettingsIcon, ShareXIcon } from 'components/icons';
 import DownloadIcon from 'components/icons/DownloadIcon';
 import Link from 'components/Link';
 import MutedText from 'components/MutedText';
@@ -13,6 +13,7 @@ import { bytesToRead } from 'lib/clientUtils';
 import { updateUser } from 'lib/redux/reducers/user';
 import { useStoreDispatch, useStoreSelector } from 'lib/redux/store';
 import { useEffect, useState } from 'react';
+import ShareX from './ShareX';
 
 function ExportDataTooltip({ children }) {
   return <Tooltip position='top' color='' label='After clicking, if you have a lot of files the export can take a while to complete. A list of previous exports will be below to download.'>{children}</Tooltip>;
@@ -23,6 +24,7 @@ export default function Manage() {
   const dispatch = useStoreDispatch();
   const modals = useModals();
 
+  const [open, setOpen] = useState(false);
   const [exports, setExports] = useState([]);
   const [file, setFile] = useState<File>(null);
   const [fileDataURL, setFileDataURL] = useState(user.avatar ?? null);
@@ -80,32 +82,6 @@ export default function Manage() {
         message: '',
       });
     }
-  };
-
-  const genShareX = (withEmbed: boolean = false, withZws: boolean = false) => {
-    const config = {
-      Version: '13.2.1',
-      Name: 'Zipline',
-      DestinationType: 'ImageUploader, TextUploader',
-      RequestMethod: 'POST',
-      RequestURL: `${window.location.protocol + '//' + window.location.hostname + (window.location.port ? ':' + window.location.port : '')}/api/upload`,
-      Headers: {
-        Authorization: user?.token,
-        ...(withEmbed && { Embed: 'true' }),
-        ...(withZws && { ZWS: 'true' }),
-      },
-      URL: '$json:files[0]$',
-      Body: 'MultipartFormData',
-      FileFormName: 'file',
-    };
-
-    const pseudoElement = document.createElement('a');
-    pseudoElement.setAttribute('href', 'data:application/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(config, null, '\t')));
-    pseudoElement.setAttribute('download', `zipline${withEmbed ? '_embed' : ''}${withZws ? '_zws' : ''}.sxcu`);
-    pseudoElement.style.display = 'none';
-    document.body.appendChild(pseudoElement);
-    pseudoElement.click();
-    pseudoElement.parentNode.removeChild(pseudoElement);
   };
 
   const form = useForm({
@@ -323,10 +299,10 @@ export default function Manage() {
 
       <Title my='md'>ShareX Config</Title>
       <Group>
-        <Button onClick={() => genShareX(false)} rightIcon={<DownloadIcon />}>ShareX Config</Button>
-        <Button onClick={() => genShareX(true)} rightIcon={<DownloadIcon />}>ShareX Config with Embed</Button>
-        <Button onClick={() => genShareX(false, true)} rightIcon={<DownloadIcon />}>ShareX Config with ZWS</Button>
+        <Button onClick={() => setOpen(true)} rightIcon={<ShareXIcon />}>Generate ShareX Config</Button>
       </Group>
+
+      <ShareX user={user} open={open} setOpen={setOpen} />
     </>
   );
 }

@@ -6,7 +6,7 @@ import Types from './Types';
 export default function Stats() {
   return (
     <div>
-      <Title>Stats</Title>
+      <Title mb='md'>Stats</Title>
 
       <StatCards />
       

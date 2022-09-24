@@ -24,6 +24,7 @@ import HashIcon from './HashIcon';
 import TagIcon from './TagIcon';
 import ClockIcon from './ClockIcon';
 import ExternalLinkIcon from './ExternalLinkIcon';
+import ShareXIcon from './ShareXIcon';
 
 export {
   ActivityIcon,
@@ -52,4 +53,5 @@ export {
   TagIcon,
   ClockIcon,
   ExternalLinkIcon,
+  ShareXIcon,
 };
