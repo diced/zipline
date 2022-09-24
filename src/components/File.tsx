@@ -1,4 +1,4 @@
-import { Button, Card, Group, LoadingOverlay, Modal, Stack, Text, Title, Tooltip, useMantineTheme } from '@mantine/core';
+import { Button, Card, Group, LoadingOverlay, Modal, Stack, Text, Title, Tooltip } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { showNotification } from '@mantine/notifications';
 import { relativeTime } from 'lib/clientUtils';
@@ -35,7 +35,6 @@ export default function File({ image, updateImages }) {
   const deleteFile = useFileDelete();
   const favoriteFile = useFileFavorite();
   const clipboard = useClipboard();
-  const theme = useMantineTheme();
 
   const loading = deleteFile.isLoading || favoriteFile.isLoading;
 

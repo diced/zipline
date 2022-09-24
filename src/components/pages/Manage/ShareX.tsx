@@ -1,6 +1,3 @@
-import { Button, Checkbox, Group, Modal, NumberInput, Select, Title } from '@mantine/core';
-import { useForm } from '@mantine/form';
-import { DownloadIcon } from 'components/icons';
 import { useState } from 'react';
 import { GeneratorModal } from './GeneratorModal';
 

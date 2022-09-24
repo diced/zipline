@@ -1,12 +1,14 @@
-import { Box, Center, Group, Pagination, SimpleGrid, Skeleton, Title } from '@mantine/core';
+import { Box, Center, Checkbox, Group, Pagination, SimpleGrid, Skeleton, Text, Title } from '@mantine/core';
 import File from 'components/File';
 import { FileIcon } from 'components/icons';
 import MutedText from 'components/MutedText';
 import { usePaginatedFiles } from 'lib/queries/files';
-import { Fragment, useState } from 'react';
+import { useState } from 'react';
 
 export default function FilePagation() {
-  const pages = usePaginatedFiles({ filter: 'media' });
+  const [checked, setChecked] = useState(false);
+
+  const pages = usePaginatedFiles(!checked ? { filter: 'media' } : {});
   const [page, setPage] = useState(1);
 
   if (pages.isSuccess && pages.data.length === 0) {
@@ -26,7 +28,7 @@ export default function FilePagation() {
   }
 
   return (
-    <Fragment>
+    <>
       <SimpleGrid
         cols={3}
         spacing='lg'
@@ -59,15 +61,17 @@ export default function FilePagation() {
         <Box
           sx={{
             display: 'flex',
-            justifyContent: 'center',
+            justifyContent: 'space-between',
             alignItems: 'center',
             paddingTop: 12,
             paddingBottom: 3,
           }}
         >
+          <div></div>
           <Pagination total={pages.data?.length ?? 0} page={page} onChange={setPage}/>
+          <Checkbox label='Show non-media files' checked={checked} onChange={(event) => setChecked(event.currentTarget.checked)} />
         </Box>
       ) : null}
-    </Fragment>
+    </>
   );
 }
