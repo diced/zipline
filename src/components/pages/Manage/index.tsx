@@ -230,7 +230,7 @@ export default function Manage() {
   return (
     <>
       <Title>Manage User</Title>
-      <MutedText size='md'>Want to use variables in embed text? Visit <Link href='https://zipline.diced.tech/docs/variables'>the docs</Link> for variables</MutedText>
+      <MutedText size='md'>Want to use variables in embed text? Visit <Link href='https://zipline.diced.tech/docs/guides/variables'>the docs</Link> for variables</MutedText>
       <form onSubmit={form.onSubmit((v) => onSubmit(v))}>
         <TextInput id='username' label='Username' {...form.getInputProps('username')} />
         <PasswordInput id='password' label='Password' description='Leave blank to keep your old password' {...form.getInputProps('password')} />
