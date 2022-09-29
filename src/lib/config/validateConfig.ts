@@ -1,5 +1,5 @@
 import { Config } from 'lib/config/Config';
-import { object, bool, string, number, boolean, array } from 'yup';
+import { object, string, number, boolean, array } from 'yup';
 
 const discord_content = object({
   content: string().nullable(),
@@ -16,7 +16,7 @@ const discord_content = object({
 
 const validator = object({
   core: object({
-    https: bool().default(false),
+    https: boolean().default(false),
     secret: string().min(8).required(),
     host: string().default('0.0.0.0'),
     port: number().default(3000),
