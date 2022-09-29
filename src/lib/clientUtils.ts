@@ -5,15 +5,15 @@ export function parse(str: string, image: Image, user: User) {
   if (!str) return null;
 
   return str
-    .replace(/{user.admin}/gi, user.administrator ? 'yes' : 'no')
-    .replace(/{user.id}/gi, user.id.toString())
-    .replace(/{user.name}/gi, user.username)
-    .replace(/{image.id}/gi, image.id.toString())
-    .replace(/{image.mime}/gi, image.mimetype)
-    .replace(/{image.file}/gi, image.file)
-    .replace(/{image.created_at.full_string}/gi, image.created_at.toLocaleString())
-    .replace(/{image.created_at.time_string}/gi, image.created_at.toLocaleTimeString())
-    .replace(/{image.created_at.date_string}/gi, image.created_at.toLocaleDateString());
+    .replace(/{user\.admin}/gi, user.administrator ? 'yes' : 'no')
+    .replace(/{user\.id}/gi, user.id.toString())
+    .replace(/{user\.name}/gi, user.username)
+    .replace(/{image\.id}/gi, image.id.toString())
+    .replace(/{image\.mime}/gi, image.mimetype)
+    .replace(/{image\.file}/gi, image.file)
+    .replace(/{image\.created_at.full_string}/gi, image.created_at.toLocaleString())
+    .replace(/{image\.created_at.time_string}/gi, image.created_at.toLocaleTimeString())
+    .replace(/{image\.created_at.date_string}/gi, image.created_at.toLocaleDateString());
 }
 
 export function bytesToRead(bytes: number) {
@@ -41,7 +41,7 @@ export const units = {
 
 export function relativeTime(to: Date, from: Date = new Date()) {
   const time = new Date(to.getTime() - from.getTime());
-  
+
   const rtf = new Intl.RelativeTimeFormat('en', { style: 'long' });
 
   for (const unit in units) {
@@ -54,10 +54,10 @@ export function relativeTime(to: Date, from: Date = new Date()) {
 export function humanTime(string: StringValue | string): Date {
   try {
     const mil = ms(string as StringValue);
-    if (typeof mil !== 'number') return null; 
+    if (typeof mil !== 'number') return null;
     if (isNaN(mil)) return null;
     if (!mil) return null;
-  
+
     return new Date(Date.now() + mil);
   } catch (_) {
     return null;

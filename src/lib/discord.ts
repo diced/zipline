@@ -10,26 +10,26 @@ function parse(str: string, args: Args) {
   if (!str) return null;
 
   str = str
-    .replace(/{user.admin}/gi, args[0].administrator ? 'yes' : 'no')
-    .replace(/{user.id}/gi, args[0].id.toString())
-    .replace(/{user.name}/gi, args[0].username)
+    .replace(/{user\.admin}/gi, args[0].administrator ? 'yes' : 'no')
+    .replace(/{user\.id}/gi, args[0].id.toString())
+    .replace(/{user\.name}/gi, args[0].username)
     .replace(/{link}/gi, args[3]);
 
   if (args[1]) str = str
-    .replace(/{file.id}/gi, args[1].id.toString())
-    .replace(/{file.mime}/gi, args[1].mimetype)
-    .replace(/{file.file}/gi, args[1].file)
-    .replace(/{file.created_at.full_string}/gi, args[1].created_at.toLocaleString())
-    .replace(/{file.created_at.time_string}/gi, args[1].created_at.toLocaleTimeString())
-    .replace(/{file.created_at.date_string}/gi, args[1].created_at.toLocaleDateString());
+    .replace(/{file\.id}/gi, args[1].id.toString())
+    .replace(/{file\.mime}/gi, args[1].mimetype)
+    .replace(/{file\.file}/gi, args[1].file)
+    .replace(/{file\.created_at.full_string}/gi, args[1].created_at.toLocaleString())
+    .replace(/{file\.created_at.time_string}/gi, args[1].created_at.toLocaleTimeString())
+    .replace(/{file\.created_at.date_string}/gi, args[1].created_at.toLocaleDateString());
 
   if (args[2]) str = str
-    .replace(/{url.id}/gi, args[2].id.toString())
-    .replace(/{url.vanity}/gi, args[2].vanity ? args[2].vanity : 'none')
-    .replace(/{url.destination}/gi, args[2].destination)
-    .replace(/{url.created_at.full_string}/gi, args[2].created_at.toLocaleString())
-    .replace(/{url.created_at.time_string}/gi, args[2].created_at.toLocaleTimeString())
-    .replace(/{url.created_at.date_string}/gi, args[2].created_at.toLocaleDateString());
+    .replace(/{url\.id}/gi, args[2].id.toString())
+    .replace(/{url\.vanity}/gi, args[2].vanity ? args[2].vanity : 'none')
+    .replace(/{url\.destination}/gi, args[2].destination)
+    .replace(/{url\.created_at.full_string}/gi, args[2].created_at.toLocaleString())
+    .replace(/{url\.created_at.time_string}/gi, args[2].created_at.toLocaleTimeString())
+    .replace(/{url\.created_at.date_string}/gi, args[2].created_at.toLocaleDateString());
 
   return str;
 }
