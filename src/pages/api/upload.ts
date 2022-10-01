@@ -5,12 +5,11 @@ import { NextApiReq, NextApiRes, withZipline } from 'lib/middleware/withZipline'
 import { createInvisImage, randomChars, hashPassword } from 'lib/util';
 import Logger from 'lib/logger';
 import { ImageFormat, InvisibleImage } from '@prisma/client';
-import { format as formatDate } from 'fecha';
+import dayjs from 'dayjs';
 import datasource from 'lib/datasource';
 import { randomUUID } from 'crypto';
 import sharp from 'sharp';
-import { humanTime, parseExpiry } from 'lib/utils/clientUtils';
-import { StringValue } from 'ms';
+import { parseExpiry } from 'lib/utils/client';
 import { sendUpload } from 'lib/discord';
 
 const uploader = multer();
@@ -79,7 +78,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         fileName = randomChars(zconfig.uploader.length);
         break;
       case ImageFormat.DATE:
-        fileName = formatDate(new Date(), 'YYYY-MM-DD_HH:mm:ss');
+        fileName = dayjs().format(zconfig.uploader.format_date);
         break;
       case ImageFormat.UUID:
         fileName = randomUUID({ disableEntropyCache: true });

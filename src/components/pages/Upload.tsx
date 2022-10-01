@@ -1,4 +1,4 @@
-import { Button, Collapse, Group, Progress, Select, Title, PasswordInput } from '@mantine/core';
+import { Button, Collapse, Group, Progress, Select, Title, PasswordInput, Tooltip } from '@mantine/core';
 import { randomId, useClipboard } from '@mantine/hooks';
 import { showNotification, updateNotification } from '@mantine/notifications';
 import Dropzone from 'components/dropzone/Dropzone';
@@ -164,47 +164,51 @@ export default function Upload() {
       </Collapse>
 
       <Group position='right' mt='md'>
-        <PasswordInput
-          style={{width: '252px'}}
-          placeholder='Password'
-          value={password}
-          onChange={(e) => setPassword(e.currentTarget.value)}
-        />
-        <Select
-          value={expires}
-          onChange={(e) => setExpires(e)}
-          icon={<ClockIcon size={14} />}
-          data={[
-            { value: 'never', label: 'Never' },
-            { value: '5min', label: '5 minutes' },
-            { value: '10min', label: '10 minutes' },
-            { value: '15min', label: '15 minutes' },
-            { value: '30min', label: '30 minutes' },
-            { value: '1h', label: '1 hour' },
-            { value: '2h', label: '2 hours' },
-            { value: '3h', label: '3 hours' },
-            { value: '4h', label: '4 hours' },
-            { value: '5h', label: '5 hours' },
-            { value: '6h', label: '6 hours' },
-            { value: '8h', label: '8 hours' },
-            { value: '12h', label: '12 hours' },
-            { value: '1d', label: '1 day' },
-            { value: '3d', label: '3 days' },
-            { value: '5d', label: '5 days' },
-            { value: '7d', label: '7 days' },
-            { value: '1w', label: '1 week' },
-            { value: '1.5w', label: '1.5 weeks' },
-            { value: '2w', label: '2 weeks' },
-            { value: '3w', label: '3 weeks' },
-            { value: '1m', label: '1 month' },
-            { value: '1.5m', label: '1.5 months' },
-            { value: '2m', label: '2 months' },
-            { value: '3m', label: '3 months' },
-            { value: '6m', label: '6 months' },
-            { value: '8m', label: '8 months' },
-            { value: '1y', label: '1 year' },
-          ]}
-        />
+        <Tooltip label='Add a password to your files (optional, leave blank for none)'>
+          <PasswordInput
+            style={{width: '252px'}}
+            placeholder='Password'
+            value={password}
+            onChange={(e) => setPassword(e.currentTarget.value)}
+          />
+        </Tooltip>
+        <Tooltip label='Set an expiration date for your files (optional, defaults to never)'>
+          <Select
+            value={expires}
+            onChange={(e) => setExpires(e)}
+            icon={<ClockIcon size={14} />}
+            data={[
+              { value: 'never', label: 'Never' },
+              { value: '5min', label: '5 minutes' },
+              { value: '10min', label: '10 minutes' },
+              { value: '15min', label: '15 minutes' },
+              { value: '30min', label: '30 minutes' },
+              { value: '1h', label: '1 hour' },
+              { value: '2h', label: '2 hours' },
+              { value: '3h', label: '3 hours' },
+              { value: '4h', label: '4 hours' },
+              { value: '5h', label: '5 hours' },
+              { value: '6h', label: '6 hours' },
+              { value: '8h', label: '8 hours' },
+              { value: '12h', label: '12 hours' },
+              { value: '1d', label: '1 day' },
+              { value: '3d', label: '3 days' },
+              { value: '5d', label: '5 days' },
+              { value: '7d', label: '7 days' },
+              { value: '1w', label: '1 week' },
+              { value: '1.5w', label: '1.5 weeks' },
+              { value: '2w', label: '2 weeks' },
+              { value: '3w', label: '3 weeks' },
+              { value: '1m', label: '1 month' },
+              { value: '1.5m', label: '1.5 months' },
+              { value: '2m', label: '2 months' },
+              { value: '3m', label: '3 months' },
+              { value: '6m', label: '6 months' },
+              { value: '8m', label: '8 months' },
+              { value: '1y', label: '1 year' },
+            ]}
+          />
+        </Tooltip>
         <Button leftIcon={<UploadIcon />} onClick={handleUpload} disabled={files.length === 0 ? true : false}>Upload</Button>
       </Group>
     </>

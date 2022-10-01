@@ -1,4 +1,4 @@
-import { format } from 'fecha';
+import dayjs from 'dayjs';
 import { blueBright, red, cyan } from 'colorette';
 
 export enum LoggerLevel {
@@ -37,16 +37,16 @@ export default class Logger {
   }
 
   formatMessage(level: LoggerLevel, name: string, message: string) {
-    const time = format(new Date(), 'YYYY-MM-DD hh:mm:ss,SSS A');
+    const time = dayjs().format('YYYY-MM-DD hh:mm:ss,SSS A');
     return `${time} ${this.formatLevel(level)} [${blueBright(name)}] ${message}`;
   }
 
   formatLevel(level: LoggerLevel) {
     switch (level) {
       case LoggerLevel.INFO:
-        return cyan('INFO ');
+        return cyan('info ');
       case LoggerLevel.ERROR:
-        return red('ERROR');
+        return red('error');
     }
   }
 }

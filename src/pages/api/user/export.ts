@@ -24,11 +24,9 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     // i found this on some stack overflow thing, forgot the url
     const onBackpressure = (stream, outputStream, cb) => {
       const runCb = () => {
-        // Pause if either output or internal backpressure should be applied
         cb(applyOutputBackpressure || backpressureBytes > backpressureThreshold);
       };
 
-      // Internal backpressure (for when AsyncZipDeflate is slow)
       const backpressureThreshold = 65536;
       let backpressure = [];
       let backpressureBytes = 0;
@@ -48,15 +46,12 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       if (ondata) {
         stream.ondata = ondataPatched;
       } else {
-        // You can remove this condition if you make sure to
-        // call zip.add(file) before calling onBackpressure
         Object.defineProperty(stream, 'ondata', {
           get: () => ondataPatched,
           set: cb => ondata = cb,
         });
       }
 
-      // Output backpressure (for when outputStream is slow)
       let applyOutputBackpressure = false;
       const write = outputStream.write;
       outputStream.write = (data) => {

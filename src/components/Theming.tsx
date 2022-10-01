@@ -93,6 +93,12 @@ export default function ZiplineTheming({ Component, pageProps, ...props }) {
               transition: 'pop',
             },
           },
+          LoadingOverlay: {
+            defaultProps: {
+              overlayBlur: 3,
+              overlayColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : 'white',
+            },
+          },
           Card: {
             styles: t => ({
               root: {

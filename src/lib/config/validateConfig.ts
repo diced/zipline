@@ -55,6 +55,7 @@ const validator = object({
     admin_limit: number().default(104900000),
     user_limit: number().default(104900000),
     disabled_extensions: array().default([]),
+    format_date: string().default('YYYY-MM-DD_HH:mm:ss'),
   }).required(),
   urls: object({
     route: string().default('/go'),
