@@ -46,7 +46,6 @@ export interface ConfigUploader {
   admin_limit: number;
   user_limit: number;
   disabled_extensions: string[];
-
   format_date: string;
 }
 

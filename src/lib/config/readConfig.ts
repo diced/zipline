@@ -75,6 +75,7 @@ export default function readConfig() {
     map('UPLOADER_ADMIN_LIMIT', 'number', 'uploader.admin_limit'),
     map('UPLOADER_USER_LIMIT', 'number', 'uploader.user_limit'),
     map('UPLOADER_DISABLED_EXTENSIONS', 'array', 'uploader.disabled_extensions'),
+    map('UPLOADER_FORMAT_DATE', 'string', 'uploader.format_date'),
 
     map('URLS_ROUTE', 'string', 'urls.route'),
     map('URLS_LENGTH', 'number', 'urls.length'),

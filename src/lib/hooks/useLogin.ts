@@ -1,12 +1,12 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { User, userState } from 'lib/recoil/user';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { userSelector } from 'lib/recoil/user';
+import { useRecoilState } from 'recoil';
 import useFetch from './useFetch';
 
 export default function login() {
   const router = useRouter();
-  const [user, setUser] = useRecoilState(userState);
+  const [user, setUser] = useRecoilState(userSelector);
   const [loading, setLoading] = useState(!user);
 
   async function load() {
