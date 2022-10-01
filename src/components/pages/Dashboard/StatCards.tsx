@@ -1,7 +1,7 @@
 import { SimpleGrid } from '@mantine/core';
 import { FileIcon } from 'components/icons';
 import StatCard from 'components/StatCard';
-import { percentChange } from 'lib/clientUtils';
+import { percentChange } from 'lib/utils/client';
 import { useStats } from 'lib/queries/stats';
 import { Database, Eye, Users } from 'react-feather';
 

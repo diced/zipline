@@ -2,7 +2,7 @@ import { Box, Card, Grid, LoadingOverlay, MantineTheme, Title, useMantineTheme }
 import { ArcElement, CategoryScale, Chart as ChartJS, ChartData, ChartOptions, LinearScale, LineController, LineElement, PointElement, Tooltip } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import ColorHash from 'color-hash';
-import { bytesToRead } from 'lib/clientUtils';
+import { bytesToRead } from 'lib/utils/client';
 import { useStats } from 'lib/queries/stats';
 import { useMemo } from 'react';
 import { Chart, Pie } from 'react-chartjs-2';

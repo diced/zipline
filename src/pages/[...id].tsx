@@ -4,7 +4,7 @@ import { GetServerSideProps } from 'next';
 import { Box, Button, Modal, PasswordInput } from '@mantine/core';
 import config from 'lib/config';
 import prisma from 'lib/prisma';
-import { parse } from 'lib/clientUtils';
+import { parse } from 'lib/utils/clientUtils';
 import exts from 'lib/exts';
 
 export default function EmbeddedImage({ image, user, pass }) {

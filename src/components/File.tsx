@@ -1,7 +1,7 @@
 import { Button, Card, Group, LoadingOverlay, Modal, Stack, Text, Title, Tooltip } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { showNotification } from '@mantine/notifications';
-import { relativeTime } from 'lib/clientUtils';
+import { relativeTime } from 'lib/utils/client';
 import { useFileDelete, useFileFavorite } from 'lib/queries/files';
 import { useState } from 'react';
 import { CalendarIcon, ClockIcon, CopyIcon, CrossIcon, DeleteIcon, FileIcon, HashIcon, ImageIcon, StarIcon } from './icons';

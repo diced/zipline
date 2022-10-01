@@ -9,7 +9,7 @@ import { format as formatDate } from 'fecha';
 import datasource from 'lib/datasource';
 import { randomUUID } from 'crypto';
 import sharp from 'sharp';
-import { humanTime, parseExpiry } from 'lib/clientUtils';
+import { humanTime, parseExpiry } from 'lib/utils/clientUtils';
 import { StringValue } from 'ms';
 import { sendUpload } from 'lib/discord';
 

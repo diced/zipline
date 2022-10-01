@@ -9,7 +9,7 @@ import Link from 'components/Link';
 import MutedText from 'components/MutedText';
 import { SmallTable } from 'components/SmallTable';
 import useFetch from 'hooks/useFetch';
-import { bytesToRead } from 'lib/clientUtils';
+import { bytesToRead } from 'lib/utils/client';
 import { updateUser } from 'lib/redux/reducers/user';
 import { useStoreDispatch, useStoreSelector } from 'lib/redux/store';
 import { useEffect, useState } from 'react';
