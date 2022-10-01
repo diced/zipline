@@ -1,77 +1,15 @@
-import { ActionIcon, Avatar, Button, Card, Group, Modal, SimpleGrid, Skeleton, Stack, Switch, Text, TextInput, Title } from '@mantine/core';
-import { useForm } from '@mantine/form';
+import { ActionIcon, Avatar, Card, Group, SimpleGrid, Skeleton, Stack, Title } from '@mantine/core';
 import { useModals } from '@mantine/modals';
 import { showNotification } from '@mantine/notifications';
-import { CrossIcon, DeleteIcon, PlusIcon } from 'components/icons';
+import { CrossIcon, DeleteIcon, PencilIcon, PlusIcon } from 'components/icons';
 import MutedText from 'components/MutedText';
 import useFetch from 'hooks/useFetch';
 import { userSelector } from 'lib/recoil/user';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
-
-
-function CreateUserModal({ open, setOpen, updateUsers }) {
-  const form = useForm({
-    initialValues: {
-      username: '',
-      password: '',
-      administrator: false,
-    },
-  });
-
-  const onSubmit = async values => {
-    const cleanUsername = values.username.trim();
-    const cleanPassword = values.password.trim();
-    if (cleanUsername === '') return form.setFieldError('username', 'Username can\'t be nothing');
-    if (cleanPassword === '') return form.setFieldError('password', 'Password can\'t be nothing');
-
-    const data = {
-      username: cleanUsername,
-      password: cleanPassword,
-      administrator: values.administrator,
-    };
-
-    setOpen(false);
-    const res = await useFetch('/api/auth/create', 'POST', data);
-    if (res.error) {
-      showNotification({
-        title: 'Failed to create user',
-        message: res.error,
-        icon: <DeleteIcon />,
-        color: 'red',
-      });
-    } else {
-      showNotification({
-        title: 'Created user: ' + cleanUsername,
-        message: '',
-        icon: <PlusIcon />,
-        color: 'green',
-      });
-    }
-
-    updateUsers();
-  };
-
-  return (
-    <Modal
-      opened={open}
-      onClose={() => setOpen(false)}
-      title={<Title>Create User</Title>}
-    >
-      <form onSubmit={form.onSubmit(v => onSubmit(v))}>
-        <TextInput id='username' label='Username' {...form.getInputProps('username')} />
-        <TextInput id='password' label='Password' type='password' {...form.getInputProps('password')} />
-        <Switch mt={12} id='administrator' label='Administrator' {...form.getInputProps('administrator')} />
-
-        <Group position='right' mt={22}>
-          <Button onClick={() => setOpen(false)}>Cancel</Button>
-          <Button type='submit'>Create</Button>
-        </Group>
-      </form>
-    </Modal>
-  );
-}
+import { CreateUserModal } from './CreateUserModal';
+import { EditUserModal } from './EditUserModal';
 
 export default function Users() {
   const user = useRecoilValue(userSelector);
@@ -79,7 +17,9 @@ export default function Users() {
   const modals = useModals();
 
   const [users, setUsers] = useState([]);
-  const [open, setOpen] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   const handleDelete = async (user, delete_images) => {
     const res = await useFetch('/api/users', 'DELETE', {
@@ -142,10 +82,12 @@ export default function Users() {
 
   return (
     <>
-      <CreateUserModal open={open} setOpen={setOpen} updateUsers={updateUsers} />
+      <CreateUserModal open={createOpen} setOpen={setCreateOpen} updateUsers={updateUsers} />
+      <EditUserModal open={editOpen} setOpen={setEditOpen} updateUsers={updateUsers} user={selectedUser} />
+      
       <Group mb='md'>
         <Title>Users</Title>
-        <ActionIcon variant='filled' color='primary' onClick={() => setOpen(true)}><PlusIcon /></ActionIcon>
+        <ActionIcon variant='filled' color='primary' onClick={() => setCreateOpen(true)}><PlusIcon /></ActionIcon>
       </Group>
       <SimpleGrid
         cols={3}
@@ -166,6 +108,11 @@ export default function Users() {
                 </Stack>
               </Group>
               <Group position='right'>
+                {user.administrator ? null : (
+                  <ActionIcon aria-label='delete' onClick={() => {setEditOpen(true); setSelectedUser(user);}}>
+                    <PencilIcon />
+                  </ActionIcon>
+                )}
                 <ActionIcon aria-label='delete' onClick={() => openDeleteModal(user)}>
                   <DeleteIcon />
                 </ActionIcon>

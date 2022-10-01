@@ -7,12 +7,45 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   const user = await req.user();
   if (!user) return res.forbid('not logged in');
 
-  if (req.method === 'PATCH') {
+  if (!user.administrator) return res.forbid('not an administrator');
+
+  const { id } = req.query as { id: string };
+
+  const target = await prisma.user.findFirst({
+    where: {
+      id: Number(id),
+    },
+  });
+
+  if (!target) return res.error('user not found');
+
+  if (req.method === 'GET') {
+    delete target.password;
+
+    return res.json(target);
+  } else if (req.method === 'DELETE') {
+    const newTarget = await prisma.user.delete({
+      where: { id: target.id },
+    });
+
+    delete newTarget.password;
+
+    return res.json(newTarget);
+  } else if (req.method === 'PATCH') {
+    if (target.administrator) return res.forbid('cannot modify administrator');
+
     if (req.body.password) {
       const hashed = await hashPassword(req.body.password);
       await prisma.user.update({
-        where: { id: user.id },
+        where: { id: target.id },
         data: { password: hashed },
+      });
+    }
+
+    if (req.body.administrator) {
+      await prisma.user.update({
+        where: { id: target.id },
+        data: { administrator: req.body.administrator },
       });
     }
 
@@ -26,39 +59,39 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         return res.forbid('username is already taken');
       }
       await prisma.user.update({
-        where: { id: user.id },
+        where: { id: target.id },
         data: { username: req.body.username },
       });
     }
 
     if (req.body.avatar) await prisma.user.update({
-      where: { id: user.id },
+      where: { id: target.id },
       data: { avatar: req.body.avatar },
     });
 
     if (req.body.embedTitle) await prisma.user.update({
-      where: { id: user.id },
+      where: { id: target.id },
       data: { embedTitle: req.body.embedTitle },
     });
 
     if (req.body.embedColor) await prisma.user.update({
-      where: { id: user.id },
+      where: { id: target.id },
       data: { embedColor: req.body.embedColor },
     });
 
     if (req.body.embedSiteName) await prisma.user.update({
-      where: { id: user.id },
+      where: { id: target.id },
       data: { embedSiteName: req.body.embedSiteName },
     });
 
     if (req.body.systemTheme) await prisma.user.update({
-      where: { id: user.id },
+      where: { id: target.id },
       data: { systemTheme: req.body.systemTheme },
     });
 
     if (req.body.domains) {
       if (!req.body.domains) await prisma.user.update({
-        where: { id: user.id },
+        where: { id: target.id },
         data: { domains: [] },
       });
 
@@ -77,7 +110,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       if (invalidDomains.length) return res.forbid('invalid domains', { invalidDomains });
 
       await prisma.user.update({
-        where: { id: user.id },
+        where: { id: target.id },
         data: { domains },
       });
 
@@ -86,7 +119,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
     const newUser = await prisma.user.findFirst({
       where: {
-        id: Number(user.id),
+        id: target.id,
       },
       select: {
         administrator: true,
@@ -104,13 +137,9 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       },
     });
 
-    Logger.get('user').info(`User ${user.username} (${newUser.username}) (${newUser.id}) was updated`);
+    Logger.get('user').info(`User ${user.username} (${user.id}) updated ${target.username} (${newUser.username}) (${newUser.id})`);
 
     return res.json(newUser);
-  } else {
-    delete user.password;
-
-    return res.json(user);
   }
 }
 
