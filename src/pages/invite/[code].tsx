@@ -6,11 +6,11 @@ import useFetch from 'hooks/useFetch';
 import PasswordStrength from 'components/PasswordStrength';
 import { showNotification } from '@mantine/notifications';
 import { CrossIcon, UserIcon } from 'components/icons';
-import { useStoreDispatch } from 'lib/redux/store';
-import { updateUser } from 'lib/redux/reducers/user';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import config from 'lib/config';
+import { useSetRecoilState } from 'recoil';
+import { userSelector } from 'lib/recoil/user';
 
 export default function Invite({ code, title }) {
   const [active, setActive] = useState(0);
@@ -21,7 +21,7 @@ export default function Invite({ code, title }) {
   const [verifyPasswordError, setVerifyPasswordError] = useState('');
   const [strength, setStrength] = useState(0);
 
-  const dispatch = useStoreDispatch();
+  const setUser = useSetRecoilState(userSelector);
   const router = useRouter();
 
   const nextStep = () => setActive((current) => (current < 3 ? current + 1 : current));
@@ -67,7 +67,7 @@ export default function Invite({ code, title }) {
         icon: <UserIcon />,
       });
 
-      dispatch(updateUser(null));
+      setUser(null);
       await useFetch('/api/auth/logout');
       await useFetch('/api/auth/login', 'POST', {
         username, password,

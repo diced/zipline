@@ -1,16 +1,13 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { updateUser, User } from 'lib/redux/reducers/user';
-import { useStoreDispatch, useStoreSelector } from 'lib/redux/store';
+import { User, userState } from 'lib/recoil/user';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import useFetch from './useFetch';
 
 export default function login() {
   const router = useRouter();
-  const dispatch = useStoreDispatch();
-  const userState = useStoreSelector(s => s.user);
-
-  const [user, setUser] = useState<User>(userState);
-  const [loading, setLoading] = useState(!userState);
+  const [user, setUser] = useRecoilState(userState);
+  const [loading, setLoading] = useState(!user);
 
   async function load() {
     setLoading(true);
@@ -18,7 +15,6 @@ export default function login() {
     const res = await useFetch('/api/user');
     if (res.error) return router.push('/auth/login?url=' + router.route);
 
-    dispatch(updateUser(res));
     setUser(res);
     setLoading(false);
   }
@@ -28,5 +24,5 @@ export default function login() {
     load();
   }, []);
 
-  return { loading, user };
+  return { loading };
 }

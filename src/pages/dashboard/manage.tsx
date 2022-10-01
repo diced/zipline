@@ -7,7 +7,7 @@ import Head from 'next/head';
 export { getServerSideProps } from 'middleware/getServerSideProps';
 
 export default function ManagePage(props) {
-  const { user, loading } = useLogin();
+  const { loading } = useLogin();
 
   if (loading) return <LoadingOverlay visible={loading} />;
   
@@ -17,7 +17,6 @@ export default function ManagePage(props) {
         <title>{props.title} - Manage User</title>
       </Head>
       <Layout
-        user={user}
         props={props}
       >
         <Manage />

@@ -8,12 +8,13 @@ import MutedText from 'components/MutedText';
 import useFetch from 'lib/hooks/useFetch';
 import { useFiles, useRecent } from 'lib/queries/files';
 import { useStats } from 'lib/queries/stats';
-import { useStoreSelector } from 'lib/redux/store';
+import { userSelector } from 'lib/recoil/user';
+import { useRecoilValue } from 'recoil';
 import RecentFiles from './RecentFiles';
 import { StatCards } from './StatCards';
 
 export default function Dashboard() {
-  const user = useStoreSelector(state => state.user);
+  const user = useRecoilValue(userSelector);
   const theme = useMantineTheme();
 
   const images = useFiles();

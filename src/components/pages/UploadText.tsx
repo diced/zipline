@@ -4,11 +4,12 @@ import CodeInput from 'components/CodeInput';
 import { TypeIcon, UploadIcon } from 'components/icons';
 import Link from 'components/Link';
 import exts from 'lib/exts';
-import { useStoreSelector } from 'lib/redux/store';
+import { userSelector } from 'lib/recoil/user';
 import { useState } from 'react';
+import { useRecoilValue } from 'recoil';
 
 export default function Upload() {
-  const user = useStoreSelector(state => state.user);
+  const user = useRecoilValue(userSelector);
 
   const [value, setValue] = useState('');
   const [lang, setLang] = useState('txt');

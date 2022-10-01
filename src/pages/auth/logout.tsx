@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { LoadingOverlay } from '@mantine/core';
-import { useStoreDispatch } from 'lib/redux/store';
-import { updateUser } from 'lib/redux/reducers/user';
+import { useSetRecoilState } from 'recoil';
+import { userSelector } from 'lib/recoil/user';
 
 export default function Logout() {
-  const dispatch = useStoreDispatch();
+  const setUser = useSetRecoilState(userSelector);
   const router = useRouter();
 
   useEffect(() => {
@@ -14,7 +14,7 @@ export default function Logout() {
       if (userRes.ok) {
         const res = await fetch('/api/auth/logout');
         if (res.ok) {
-          dispatch(updateUser(null));
+          setUser(null);
           router.push('/auth/login');
         }
       } else {

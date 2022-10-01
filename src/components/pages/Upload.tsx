@@ -6,8 +6,9 @@ import FileDropzone from 'components/dropzone/DropzoneFile';
 import { ClockIcon, CrossIcon, UploadIcon } from 'components/icons';
 import Link from 'components/Link';
 import { invalidateFiles } from 'lib/queries/files';
-import { useStoreSelector } from 'lib/redux/store';
+import { userSelector } from 'lib/recoil/user';
 import { useEffect, useState } from 'react';
+import { useRecoilValue } from 'recoil';
 
 const expires = [
   '5min',
@@ -42,7 +43,7 @@ const expires = [
 
 export default function Upload() {
   const clipboard = useClipboard();
-  const user = useStoreSelector(state => state.user);
+  const user = useRecoilValue(userSelector);
 
   const [files, setFiles] = useState([]);
   const [progress, setProgress] = useState(0);

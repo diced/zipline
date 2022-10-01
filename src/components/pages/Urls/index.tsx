@@ -2,14 +2,15 @@ import { ActionIcon, Button, Group, Modal, SimpleGrid, Skeleton, TextInput, Titl
 import { useForm } from '@mantine/form';
 import { showNotification } from '@mantine/notifications';
 import { CrossIcon, LinkIcon, PlusIcon } from 'components/icons';
-import { useStoreSelector } from 'lib/redux/store';
 import { useEffect, useState } from 'react';
 import { useURLs } from 'lib/queries/url';
 import URLCard from './URLCard';
 import MutedText from 'components/MutedText';
+import { useRecoilValue } from 'recoil';
+import { userSelector } from 'lib/recoil/user';
 
 export default function Urls() {
-  const user = useStoreSelector(state => state.user);
+  const user = useRecoilValue(userSelector);
 
   const urls = useURLs();
   const [createOpen, setCreateOpen] = useState(false);

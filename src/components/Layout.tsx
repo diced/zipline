@@ -4,11 +4,11 @@ import { useModals } from '@mantine/modals';
 import { showNotification } from '@mantine/notifications';
 import useFetch from 'hooks/useFetch';
 import { useVersion } from 'lib/queries/version';
-import { updateUser } from 'lib/redux/reducers/user';
-import { useStoreDispatch } from 'lib/redux/store';
+import { userSelector } from 'lib/recoil/user';
+import { useRecoilState } from 'recoil';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { ExternalLinkIcon, ActivityIcon, CheckIcon, CopyIcon, CrossIcon, DeleteIcon, FileIcon, HomeIcon, LinkIcon, LogoutIcon, PencilIcon, SettingsIcon, TagIcon, TypeIcon, UploadIcon, UserIcon } from './icons';
 import { friendlyThemeName, themes } from './Theming';
 
@@ -109,20 +109,20 @@ const admin_items = [
   },
 ];
 
-export default function Layout({ children, user, props }) {
+export default function Layout({ children, props }) {
+  const [user, setUser] = useRecoilState(userSelector);
+
   const { title } = props;
   const external_links = JSON.parse(props.external_links ?? '[]');
 
   const [token, setToken] = useState(user?.token);
   const [systemTheme, setSystemTheme] = useState(user.systemTheme ?? 'system');
-  // const [version, setVersion] = useState<{ local: string, upstream: string }>(null);
   const version = useVersion();
   const [opened, setOpened] = useState(false); // navigation open
   const [open, setOpen] = useState(false); // manage acc dropdown
 
   const avatar = user?.avatar ?? null;
   const router = useRouter();
-  const dispatch = useStoreDispatch();
   const theme = useMantineTheme();
   const modals = useModals();
   const clipboard = useClipboard();
@@ -133,7 +133,7 @@ export default function Layout({ children, user, props }) {
     });
 
     setSystemTheme(newUser.systemTheme);
-    dispatch(updateUser(newUser));
+    setUser(newUser);
     router.replace(router.pathname);
 
     showNotification({

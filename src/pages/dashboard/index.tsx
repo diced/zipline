@@ -7,7 +7,7 @@ import Head from 'next/head';
 export { getServerSideProps } from 'middleware/getServerSideProps';
 
 export default function DashboardPage(props) {
-  const { user, loading } = useLogin();
+  const { loading } = useLogin();
 
   if (loading) return <LoadingOverlay visible={loading} />;
 
@@ -17,7 +17,6 @@ export default function DashboardPage(props) {
         <title>{props.title}</title>
       </Head>
       <Layout
-        user={user}
         props={props}
       >
         <Dashboard />

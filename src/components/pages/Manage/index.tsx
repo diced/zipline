@@ -9,10 +9,10 @@ import Link from 'components/Link';
 import MutedText from 'components/MutedText';
 import { SmallTable } from 'components/SmallTable';
 import useFetch from 'hooks/useFetch';
+import { userSelector } from 'lib/recoil/user';
 import { bytesToRead } from 'lib/utils/client';
-import { updateUser } from 'lib/redux/reducers/user';
-import { useStoreDispatch, useStoreSelector } from 'lib/redux/store';
 import { useEffect, useState } from 'react';
+import { useRecoilState } from 'recoil';
 import Flameshot from './Flameshot';
 import ShareX from './ShareX';
 
@@ -21,8 +21,7 @@ function ExportDataTooltip({ children }) {
 }
 
 export default function Manage() {
-  const user = useStoreSelector(state => state.user);
-  const dispatch = useStoreDispatch();
+  const [user, setUser] = useRecoilState(userSelector);
   const modals = useModals();
 
   const [shareXOpen, setShareXOpen] = useState(false);
@@ -77,7 +76,7 @@ export default function Manage() {
         icon: <CrossIcon />,
       });
     } else {
-      dispatch(updateUser(newUser));
+      setUser(newUser);
       updateNotification({
         id: 'update-user',
         title: 'Saved User',
@@ -150,7 +149,7 @@ export default function Manage() {
         icon: <CrossIcon />,
       });
     } else {
-      dispatch(updateUser(newUser));
+      setUser(newUser);
       updateNotification({
         id: 'update-user',
         title: 'Saved User',

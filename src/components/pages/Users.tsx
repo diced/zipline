@@ -5,9 +5,10 @@ import { showNotification } from '@mantine/notifications';
 import { CrossIcon, DeleteIcon, PlusIcon } from 'components/icons';
 import MutedText from 'components/MutedText';
 import useFetch from 'hooks/useFetch';
-import { useStoreSelector } from 'lib/redux/store';
+import { userSelector } from 'lib/recoil/user';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import { useRecoilValue } from 'recoil';
 
 
 function CreateUserModal({ open, setOpen, updateUsers }) {
@@ -73,7 +74,7 @@ function CreateUserModal({ open, setOpen, updateUsers }) {
 }
 
 export default function Users() {
-  const user = useStoreSelector(state => state.user);
+  const user = useRecoilValue(userSelector);
   const router = useRouter();
   const modals = useModals();
 

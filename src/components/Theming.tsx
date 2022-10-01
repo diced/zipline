@@ -16,7 +16,8 @@ import { MantineProvider, MantineThemeOverride } from '@mantine/core';
 import { useColorScheme } from '@mantine/hooks';
 import { ModalsProvider } from '@mantine/modals';
 import { NotificationsProvider } from '@mantine/notifications';
-import { useStoreSelector } from 'lib/redux/store';
+import { useRecoilValue } from 'recoil';
+import { userSelector } from 'lib/recoil/user';
 
 export const themes = {
   system: (colorScheme: 'dark' | 'light') => colorScheme === 'dark' ? dark_blue : light_blue,
@@ -47,7 +48,7 @@ export const friendlyThemeName = {
 };
 
 export default function ZiplineTheming({ Component, pageProps, ...props }) {
-  const user = useStoreSelector(state => state.user);
+  const user = useRecoilValue(userSelector);
   const colorScheme = useColorScheme();
 
   let theme: MantineThemeOverride;
