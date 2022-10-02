@@ -10,7 +10,7 @@
 
   ![Build](https://img.shields.io/github/workflow/status/diced/zipline/Build?logo=github&style=flat)
   [![Docker Image (trunk)](https://img.shields.io/github/workflow/status/diced/zipline/Push%20Docker%20Images?label=Docker%20%28trunk%29&logo=github&style=flat)](https://github.com/diced/zipline/pkgs/container/zipline/?tag=trunk)
-  [![Docker Image (release)](https://img.shields.io/github/workflow/status/diced/zipline/Push%20Release%20Docker%20Images?label=Docker%20%28release%29&logo=github&style=flat-square)](https://github.com/diced/zipline/pkgs/container/zipline/?tag=latest)
+  [![Docker Image (release)](https://img.shields.io/github/workflow/status/diced/zipline/Push%20Release%20Docker%20Images?label=Docker%20%28release%29&logo=github&style=flat)](https://github.com/diced/zipline/pkgs/container/zipline/?tag=latest)
 
 </div>
 
