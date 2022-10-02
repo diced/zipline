@@ -2,9 +2,12 @@ import prisma from 'lib/prisma';
 import { NextApiReq, NextApiRes, withZipline } from 'lib/middleware/withZipline';
 import { createToken, hashPassword } from 'lib/util';
 import Logger from 'lib/logger';
+import config from 'lib/config';
 
 async function handler(req: NextApiReq, res: NextApiRes) {
   if (req.method === 'POST' && req.body && req.body.code) {
+    if (!config.features.invites) return res.forbid('invites are disabled');
+
     const { code, username, password } = req.body as { code: string; username: string, password: string };
     const invite = await prisma.invite.findUnique({
       where: { code },

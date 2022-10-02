@@ -63,6 +63,7 @@ export interface ConfigWebsite {
   title: string;
   show_files_per_user: boolean;
   show_version: boolean;
+  disable_media_preview: boolean;
 
   external_links: ConfigWebsiteExternalLinks[];
 }
@@ -96,6 +97,10 @@ export interface ConfigDiscordEmbed {
   image: boolean;
 }
 
+export interface ConfigFeatures {
+  invites: boolean;
+}
+
 export interface Config {
   core: ConfigCore;
   uploader: ConfigUploader;
@@ -104,4 +109,5 @@ export interface Config {
   datasource: ConfigDatasource;
   website: ConfigWebsite;
   discord: ConfigDiscord;
+  features: ConfigFeatures;
 }

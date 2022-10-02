@@ -5,7 +5,7 @@ import MutedText from 'components/MutedText';
 import { usePaginatedFiles } from 'lib/queries/files';
 import { useState } from 'react';
 
-export default function FilePagation() {
+export default function FilePagation({ disableMediaPreview }) {
   const [checked, setChecked] = useState(false);
 
   const pages = usePaginatedFiles(!checked ? { filter: 'media' } : {});
@@ -42,7 +42,7 @@ export default function FilePagation() {
               ? (
                 pages.data[(page - 1) ?? 0].map(image => (
                   <div key={image.id}>
-                    <File image={image} updateImages={() => pages.refetch()} />
+                    <File image={image} updateImages={() => pages.refetch()} disableMediaPreview={disableMediaPreview} />
                   </div>
                 ))
               ) : (

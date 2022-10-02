@@ -101,15 +101,18 @@ const admin_items = [
     icon: <UserIcon size={18} />,
     text: 'Users',
     link: '/dashboard/users',
+    if: props => true,
   },
   {
     icon: <TagIcon size={18} />,
     text: 'Invites',
     link: '/dashboard/invites',
+    if: props => props.invites,
   },
 ];
 
 export default function Layout({ children, props }) {
+  console.log(props);
   const [user, setUser] = useRecoilState(userSelector);
 
   const { title } = props;
@@ -230,7 +233,7 @@ export default function Layout({ children, props }) {
                 childrenOffset={28}
                 defaultOpened={admin_items.map(x => x.link).includes(router.pathname)}
               >
-                {admin_items.map(({ icon, text, link }) => (
+                {admin_items.filter(x => x.if(props)).map(({ icon, text, link }) => (
                   <Link href={link} key={text} passHref>
                     <NavLink
                       component='a'

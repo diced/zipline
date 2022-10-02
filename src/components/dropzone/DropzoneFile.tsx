@@ -11,6 +11,7 @@ export function FilePreview({ file }: { file: File }) {
       style={{ maxWidth: '10vw', maxHeight: '100vh' }}
       src={URL.createObjectURL(file)}
       alt={file.name}
+      disableMediaPreview={false}
       popup
     />
   );

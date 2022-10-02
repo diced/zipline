@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { AudioIcon, FileIcon, PlayIcon } from './icons';
 
 function Placeholder({ text, Icon, ...props }) {
+  if (props.disableResolve) props.src = null;
+  
   return (
     <Image height={200} withPlaceholder placeholder={
       <Group>
@@ -14,7 +16,7 @@ function Placeholder({ text, Icon, ...props }) {
   );
 }
 
-export default function Type({ file, popup = false, ...props }){
+export default function Type({ file, popup = false, disableMediaPreview, ...props }){
   const type = (file.type || file.mimetype).split('/')[0];
   const name = (file.name || file.file);
 
@@ -32,6 +34,10 @@ export default function Type({ file, popup = false, ...props }){
       })();
     }, []);
   }
+
+  if (media && disableMediaPreview) {
+    return <Placeholder Icon={FileIcon} text={`Click to view file (${name})`} disableResolve={true} {...props} />;
+  };
 
   return popup ? (media ? {
     'video': <video width='100%' autoPlay controls {...props} />,

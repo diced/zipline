@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import FilePagation from './FilePagation';
 
-export default function Files() {
+export default function Files({ disableMediaPreview }) {
   const pages = usePaginatedFiles({ filter: 'media' });
   const favoritePages = usePaginatedFiles({ favorite: 'media' });
   const [favoritePage, setFavoritePage] = useState(1);
@@ -46,7 +46,7 @@ export default function Files() {
                   >
                     {(favoritePages.isSuccess && favoritePages.data.length) ? favoritePages.data[(favoritePage - 1) ?? 0].map(image => (
                       <div key={image.id}>
-                        <File image={image} updateImages={() => updatePages(true)} />
+                        <File image={image} updateImages={() => updatePages(true)} disableMediaPreview={disableMediaPreview} />
                       </div>
                     )) : null}
                   </SimpleGrid>
@@ -59,7 +59,7 @@ export default function Files() {
                       paddingBottom: 3,
                     }}
                   >
-                    <Pagination total={favoritePages.data.length} page={favoritePage} onChange={setFavoritePage}/>
+                    <Pagination total={favoritePages.data.length} page={favoritePage} onChange={setFavoritePage} />
                   </Box>
                 </Accordion.Panel>
               </Accordion.Item>
@@ -67,7 +67,7 @@ export default function Files() {
           ) : null
       }
       
-      <FilePagation />
+      <FilePagation disableMediaPreview={disableMediaPreview} />
     </>
   );
 }

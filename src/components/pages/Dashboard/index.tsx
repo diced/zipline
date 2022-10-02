@@ -13,7 +13,7 @@ import { useRecoilValue } from 'recoil';
 import RecentFiles from './RecentFiles';
 import { StatCards } from './StatCards';
 
-export default function Dashboard() {
+export default function Dashboard({ disableMediaPreview }) {
   const user = useRecoilValue(userSelector);
   const theme = useMantineTheme();
 
@@ -69,7 +69,7 @@ export default function Dashboard() {
 
       <StatCards />
 
-      <RecentFiles />
+      <RecentFiles disableMediaPreview={disableMediaPreview} />
 
       <section>
         <Title>Files</Title>
