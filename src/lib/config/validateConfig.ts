@@ -69,6 +69,8 @@ const validator = object({
     title: string().default('Zipline'),
     show_files_per_user: boolean().default(true),
     show_version: boolean().default(true),
+    disable_media_preview: boolean().default(false),
+
     external_links: array(object({
       label: string(),
       link: string(),
@@ -84,6 +86,9 @@ const validator = object({
     upload: discord_content,
     shorten: discord_content,
   }).optional().nullable().default(null),
+  features: object({
+    invites: boolean().default(true),
+  }).required(),
 });
 
 export default function validate(config): Config {

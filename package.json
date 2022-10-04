@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "cross-env REACT_EDITOR=code NODE_ENV=development tsx src/server",
     "build": "npm-run-all build:schema build:next",
+    "build-ci": "cross-env ZIPLINE_DOCKER_BUILD=1 npm-run-all build:schema build:next",
     "build:next": "next build",
     "build:schema": "prisma generate --schema=prisma/schema.prisma",
     "migrate:dev": "prisma migrate dev --create-only",

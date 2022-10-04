@@ -2,8 +2,11 @@ import prisma from 'lib/prisma';
 import { NextApiReq, NextApiRes, withZipline } from 'lib/middleware/withZipline';
 import { randomChars } from 'lib/util';
 import Logger from 'lib/logger';
+import config from 'lib/config';
 
 async function handler(req: NextApiReq, res: NextApiRes) {
+  if (!config.features.invites) return res.forbid('invites are disabled');
+  
   const user = await req.user();
   if (!user) return res.forbid('not logged in');
   if (!user.administrator) return res.forbid('you arent an administrator');

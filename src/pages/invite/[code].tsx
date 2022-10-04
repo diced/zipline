@@ -132,6 +132,10 @@ export default function Invite({ code, title }) {
 }
 
 export const getServerSideProps: GetServerSideProps = async context => {
+  if (!config.features.invites) return {
+    notFound: true,
+  };
+
   const { code } = context.query as { code: string };
 
   const invite = await prisma.invite.findUnique({

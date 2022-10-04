@@ -4,9 +4,10 @@ import { showNotification } from '@mantine/notifications';
 import { relativeTime } from 'lib/utils/client';
 import { useFileDelete, useFileFavorite } from 'lib/queries/files';
 import { useState } from 'react';
-import { CalendarIcon, ClockIcon, CopyIcon, CrossIcon, DeleteIcon, FileIcon, HashIcon, ImageIcon, StarIcon } from './icons';
+import { CalendarIcon, ClockIcon, CopyIcon, CrossIcon, DeleteIcon, ExternalLinkIcon, FileIcon, HashIcon, ImageIcon, StarIcon } from './icons';
 import MutedText from './MutedText';
 import Type from './Type';
+import Link from './Link';
 
 export function FileMeta({ Icon, title, subtitle, ...other }) {
   return other.tooltip ? (
@@ -30,7 +31,7 @@ export function FileMeta({ Icon, title, subtitle, ...other }) {
   );
 }
 
-export default function File({ image, updateImages }) {
+export default function File({ image, updateImages, disableMediaPreview }) {
   const [open, setOpen] = useState(false);
   const deleteFile = useFileDelete();
   const favoriteFile = useFileFavorite();
@@ -112,6 +113,7 @@ export default function File({ image, updateImages }) {
             popup
             sx={{ minHeight: 200 }}
             style={{ minHeight: 200 }}
+            disableMediaPreview={false}
           />
           <Stack>
             <FileMeta Icon={FileIcon} title='Name' subtitle={image.file} />
@@ -128,7 +130,10 @@ export default function File({ image, updateImages }) {
         </Stack>
 
         <Group position='right' mt={22}>
-          <Button onClick={handleCopy}>Copy</Button>
+          <Link href={image.url} target='_blank'>
+            <Button rightIcon={<ExternalLinkIcon />}>Open</Button>
+          </Link>
+          <Button onClick={handleCopy}>Copy URL</Button>
           <Button onClick={handleDelete}>Delete</Button>
           <Button onClick={handleFavorite}>{image.favorite ? 'Unfavorite' : 'Favorite'}</Button>
         </Group>
@@ -143,6 +148,7 @@ export default function File({ image, updateImages }) {
             src={image.url}
             alt={image.file}
             onClick={() => setOpen(true)}
+            disableMediaPreview={disableMediaPreview}
           />
         </Card.Section>
       </Card>

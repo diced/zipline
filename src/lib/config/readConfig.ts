@@ -86,6 +86,7 @@ export default function readConfig() {
     map('WEBSITE_TITLE', 'string', 'website.title'),
     map('WEBSITE_SHOW_FILES_PER_USER', 'boolean', 'website.show_files_per_user'),
     map('WEBSITE_SHOW_VERSION', 'boolean', 'website.show_version'),
+    map('WEBSITE_DISABLE_MEDIA_PREVIEW', 'boolean', 'website.disable_media_preview'),
     map('WEBSITE_EXTERNAL_LINKS', 'json-array', 'website.external_links'),
 
     map('DISCORD_URL', 'string', 'discord.url'),
@@ -109,6 +110,8 @@ export default function readConfig() {
     map('DISCORD_SHORTEN_EMBED_IMAGE', 'boolean', 'discord.shorten.embed.image'),
     map('DISCORD_SHORTEN_EMBED_THUMBNAIL', 'boolean', 'discord.shorten.embed.thumbnail'),
     map('DISCORD_SHORTEN_EMBED_TIMESTAMP', 'boolean', 'discord.shorten.embed.timestamp'),
+  
+    map('FEATURES_INVITES', 'boolean', 'features.invites'),
   ];
 
   const config = {};

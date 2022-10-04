@@ -19,7 +19,7 @@ export default function DashboardPage(props) {
       <Layout
         props={props}
       >
-        <Dashboard />
+        <Dashboard disableMediaPreview={props.disable_media_preview} />
       </Layout>
     </>
   );

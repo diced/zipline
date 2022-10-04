@@ -5,7 +5,7 @@ import MutedText from 'components/MutedText';
 import { invalidateFiles, useRecent } from 'lib/queries/files';
 import { UploadCloud } from 'react-feather';
 
-export default function RecentFiles() {
+export default function RecentFiles({ disableMediaPreview }) {
   const recent = useRecent('media');
 
   return (
@@ -24,7 +24,7 @@ export default function RecentFiles() {
               recent.data.length > 0 
                 ? (
                   recent.data.map(image => (
-                    <File key={randomId()} image={image} updateImages={invalidateFiles} />
+                    <File key={randomId()} image={image} updateImages={invalidateFiles} disableMediaPreview={disableMediaPreview} />
                   ))
                 ) : (
                   <MantineCard shadow='md'>

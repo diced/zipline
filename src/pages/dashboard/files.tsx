@@ -20,7 +20,7 @@ export default function FilesPage(props) {
       <Layout
         props={props}
       >
-        <Files />
+        <Files disableMediaPreview={props.disable_media_preview} />
       </Layout>
     </>
   );
