@@ -62,7 +62,7 @@ export default function StatCard({ stat }: StatsGridProps) {
                 weight={500}
                 className={classes.diff}
               >
-                <span>{stat.diff}%</span>
+                <span>{stat.diff === Infinity ? '∞' : stat.diff}%</span>
                 {
                   stat.diff >= 0 ? (
                     <ArrowUpRight size={16} />

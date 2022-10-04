@@ -85,5 +85,8 @@ export function parseExpiry(header: string): Date | null {
 }
 
 export function percentChange(initial: number, final: number) {
+  if(initial === 0 && final === 0) return 0;
+  if(initial === 0) return Infinity;
+
   return ((final - initial) / initial) * 100;
 }
