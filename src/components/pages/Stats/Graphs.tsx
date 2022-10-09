@@ -17,6 +17,7 @@ const CHART_OPTIONS = (theme: MantineTheme): ChartOptions => ({
   plugins: {
     tooltip: {
       enabled: true,
+      intersect: false,
     },
 
     datalabels: {
