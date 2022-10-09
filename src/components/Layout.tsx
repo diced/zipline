@@ -112,7 +112,6 @@ const admin_items = [
 ];
 
 export default function Layout({ children, props }) {
-  console.log(props);
   const [user, setUser] = useRecoilState(userSelector);
 
   const { title } = props;

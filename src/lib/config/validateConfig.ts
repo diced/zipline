@@ -134,7 +134,6 @@ export default function validate(config): Config {
       }
     }
 
-    console.log(validated);
     return validated as unknown as Config;
   } catch (e) {
     if (process.env.ZIPLINE_DOCKER_BUILD) return null;
