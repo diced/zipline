@@ -305,7 +305,7 @@ export default function Layout({ children, props }) {
                     leftIcon={avatar ? <Image src={avatar} height={32} radius='md' /> : <SettingsIcon />}
                     onClick={() => setOpen((o) => !o)}
                     sx={t => ({
-                      backgroundColor: '#00000000',
+                      backgroundColor: 'inherit',
                       '&:hover': {
                         backgroundColor: t.other.hover,
                       },
@@ -318,7 +318,7 @@ export default function Layout({ children, props }) {
                   </Button>
                 </Popover.Target>
 
-                <Popover.Dropdown p={4}>
+                <Popover.Dropdown p={4} mr='md' sx={{ minWidth: '200px' }}>
                   <Stack spacing={2}>
                     <Text sx={{
                       color: theme.colorScheme === 'dark' ? theme.colors.dark[2] : theme.colors.gray[6],
