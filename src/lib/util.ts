@@ -145,3 +145,17 @@ export function createInvisURL(length: number, urlId: string) {
 
   return retry();
 }
+
+export async function getBase64URLFromURL(url: string) {
+  const res = await fetch(url);
+  if (!res.ok) return null;
+
+  const buffer = await res.arrayBuffer();
+  const base64 = Buffer.from(buffer).toString('base64');
+
+  return `data:${res.headers.get('content-type')};base64,${base64}`;
+}
+
+export async function notNull(a: any, b: any) {
+  return a !== null && b !== null;
+}

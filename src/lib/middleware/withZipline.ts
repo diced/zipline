@@ -5,6 +5,7 @@ import { serialize } from 'cookie';
 import { sign64, unsign64 } from 'lib/util';
 import config from 'lib/config';
 import prisma from 'lib/prisma';
+import { User } from '@prisma/client';
 
 export interface NextApiFile {
   fieldname: string;
@@ -16,18 +17,7 @@ export interface NextApiFile {
 }
 
 export type NextApiReq = NextApiRequest & {
-  user: () => Promise<{
-    username: string;
-    token: string;
-    embedTitle: string;
-    embedColor: string;
-    systemTheme: string;
-    administrator: boolean;
-    id: number;
-    password: string;
-    domains: string[];
-    avatar?: string;
-  } | null | void>;
+  user: () => Promise<User | null | void>;
   getCookie: (name: string) => string | null;
   cleanCookie: (name: string) => void;
   files?: NextApiFile[];
@@ -100,22 +90,10 @@ export const withZipline = (handler: (req: NextApiRequest, res: NextApiResponse)
     try {
       const userId = req.getCookie('user');
       if (!userId) return null;
-      
+
       const user = await prisma.user.findFirst({
         where: {
           id: Number(userId),
-        },
-        select: {
-          administrator: true,
-          embedColor: true,
-          embedTitle: true,
-          id: true,
-          password: true,
-          systemTheme: true,
-          token: true,
-          username: true,
-          domains: true,
-          avatar: true,
         },
       });
 
@@ -140,7 +118,7 @@ export const setCookie = (
   value: unknown,
   options: CookieSerializeOptions = {}
 ) => {
-  
+
   if ('maxAge' in options) {
     options.expires = new Date(Date.now() + options.maxAge * 1000);
     options.maxAge /= 1000;

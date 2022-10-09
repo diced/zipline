@@ -86,9 +86,18 @@ const validator = object({
     upload: discord_content,
     shorten: discord_content,
   }).optional().nullable().default(null),
+  oauth: object({
+    github_client_id: string().nullable().default(null),
+    github_client_secret: string().nullable().default(null),
+
+    discord_client_id: string().nullable().default(null),
+    discord_client_secret: string().nullable().default(null),
+  }).optional().nullable().default(null),
   features: object({
     invites: boolean().default(true),
+    oauth_registration: boolean().default(false),
   }).required(),
+
 });
 
 export default function validate(config): Config {
@@ -125,6 +134,7 @@ export default function validate(config): Config {
       }
     }
 
+    console.log(validated);
     return validated as unknown as Config;
   } catch (e) {
     if (process.env.ZIPLINE_DOCKER_BUILD) return null;

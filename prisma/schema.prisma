@@ -8,21 +8,24 @@ generator client {
 }
 
 model User {
-  id            Int       @id @default(autoincrement())
-  username      String
-  password      String
-  avatar        String?
-  token         String
-  administrator Boolean   @default(false)
-  systemTheme   String    @default("system")
-  embedTitle    String?
-  embedColor    String    @default("#2f3136")
-  embedSiteName String?   @default("{image.file} • {user.name}")
-  ratelimit     DateTime?
-  domains       String[]
-  images        Image[]
-  urls          Url[]
-  Invite        Invite[]
+  id               Int       @id @default(autoincrement())
+  username         String
+  password         String?
+  oauth            Boolean   @default(false)
+  oauthProvider    String?
+  oauthAccessToken String?
+  avatar           String?
+  token            String
+  administrator    Boolean   @default(false)
+  systemTheme      String    @default("system")
+  embedTitle       String?
+  embedColor       String    @default("#2f3136")
+  embedSiteName    String?   @default("{image.file} • {user.name}")
+  ratelimit        DateTime?
+  domains          String[]
+  images           Image[]
+  urls             Url[]
+  Invite           Invite[]
 }
 
 enum ImageFormat {

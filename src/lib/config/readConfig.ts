@@ -110,8 +110,15 @@ export default function readConfig() {
     map('DISCORD_SHORTEN_EMBED_IMAGE', 'boolean', 'discord.shorten.embed.image'),
     map('DISCORD_SHORTEN_EMBED_THUMBNAIL', 'boolean', 'discord.shorten.embed.thumbnail'),
     map('DISCORD_SHORTEN_EMBED_TIMESTAMP', 'boolean', 'discord.shorten.embed.timestamp'),
-  
+
+    map('OAUTH_GITHUB_CLIENT_ID', 'string', 'oauth.github_client_id'),
+    map('OAUTH_GITHUB_CLIENT_SECRET', 'string', 'oauth.github_client_secret'),
+
+    map('OAUTH_DISCORD_CLIENT_ID', 'string', 'oauth.discord_client_id'),
+    map('OAUTH_DISCORD_CLIENT_SECRET', 'string', 'oauth.discord_client_secret'),
+
     map('FEATURES_INVITES', 'boolean', 'features.invites'),
+    map('FEATURES_OAUTH_REGISTRATION', 'boolean', 'features.oauth_registration'),
   ];
 
   const config = {};

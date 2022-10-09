@@ -1,10 +1,12 @@
 import { Button, Center, TextInput, Title, PasswordInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import Link from 'next/link';
 import useFetch from 'hooks/useFetch';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
+export { getServerSideProps } from 'middleware/getServerSideProps';
 
-export default function Login() {
+export default function Login({ oauth_registration }) {
   const router = useRouter();
 
   const form = useForm({
@@ -54,10 +56,13 @@ export default function Login() {
 
             <Button size='lg' type='submit' fullWidth mt={12}>Login</Button>
           </form>
+          {oauth_registration && (
+            <Link href='/auth/register' passHref>
+              <Button size='lg' fullWidth mt={12} component='a'>Register</Button>
+            </Link>
+          )}
         </div>
       </Center>
     </>
   );
 }
-
-Login.title = 'Zipline - Login';
