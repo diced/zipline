@@ -15,7 +15,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
   const { code } = req.query as { code: string };
 
-  if (!code) return res.bad('no code');
+  if (!code) return res.redirect(github_auth.oauth_url(config.oauth.github_client_id));
 
   const resp = await fetch('https://github.com/login/oauth/access_token', {
     method: 'POST',

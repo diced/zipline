@@ -14,7 +14,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   }
 
   const { code } = req.query as { code: string };
-  if (!code) return res.bad('no code');
+  if (!code) return res.redirect(discord_auth.oauth_url(config.oauth.discord_client_id, `${config.core.https ? 'https' : 'http'}://${req.headers.host}`));
 
   const resp = await fetch('https://discord.com/api/oauth2/token', {
     method: 'POST',

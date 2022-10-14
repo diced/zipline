@@ -27,6 +27,8 @@ import ExternalLinkIcon from './ExternalLinkIcon';
 import ShareXIcon from './ShareXIcon';
 import DownloadIcon from './DownloadIcon';
 import FlameshotIcon from './FlameshotIcon';
+import GitHubIcon from './GitHubIcon';
+import DiscordIcon from './DiscordIcon';
 
 export {
   ActivityIcon,
@@ -58,4 +60,6 @@ export {
   ShareXIcon,
   DownloadIcon,
   FlameshotIcon,
+  GitHubIcon,
+  DiscordIcon,
 };

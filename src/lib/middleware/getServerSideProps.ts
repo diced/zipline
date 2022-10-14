@@ -5,18 +5,18 @@ import { GetServerSideProps } from 'next';
 
 export const getServerSideProps: GetServerSideProps = async ctx => {
   // this entire thing will also probably change before the stable release
-  const ghEnabled = notNull(config.oauth.github_client_id, config.oauth.github_client_secret);
-  const discEnabled = notNull(config.oauth.discord_client_id, config.oauth.discord_client_secret);
+  const ghEnabled = notNull(config.oauth?.github_client_id, config.oauth?.github_client_secret);
+  const discEnabled = notNull(config.oauth?.discord_client_id, config.oauth?.discord_client_secret);
 
   const oauth_providers = [];
 
   if (ghEnabled) oauth_providers.push({
     name: 'GitHub',
-    url: github_auth.oauth_url(config.oauth.github_client_id),
+    url: '/api/auth/oauth/github',
   });
   if (discEnabled) oauth_providers.push({
     name: 'Discord',
-    url: discord_auth.oauth_url(config.oauth.discord_client_id, `${config.core.https ? 'https' : 'http'}://${ctx.req.headers.host}`),
+    url: '/api/auth/oauth/discord',
   });
 
   return {
