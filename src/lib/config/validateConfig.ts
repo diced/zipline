@@ -37,6 +37,7 @@ const validator = object({
       bucket: string(),
       force_s3_path: boolean().default(false),
       region: string().default('us-east-1'),
+      use_ssl: boolean().default(false),
     }).nullable().notRequired(),
     swift: object({
       username: string(),
