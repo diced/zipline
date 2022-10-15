@@ -27,6 +27,7 @@ export interface ConfigS3Datasource {
   endpoint?: string;
   bucket: string;
   force_s3_path: boolean;
+  use_ssl: boolean;
   region?: string;
 }
 
