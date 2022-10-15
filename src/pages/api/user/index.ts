@@ -2,10 +2,37 @@ import prisma from 'lib/prisma';
 import { hashPassword } from 'lib/util';
 import { NextApiReq, NextApiRes, withZipline } from 'middleware/withZipline';
 import Logger from 'lib/logger';
+import config from 'lib/config';
+import { discord_auth, github_auth } from 'lib/oauth';
 
 async function handler(req: NextApiReq, res: NextApiRes) {
   const user = await req.user();
   if (!user) return res.forbid('not logged in');
+
+  if (user.oauth) {
+    // this will probably change before the stable release
+    if (user.oauthProvider === 'github') {
+      const resp = await github_auth.oauth_user(user.oauthAccessToken);
+      if (!resp) {
+        req.cleanCookie('user');
+        Logger.get('user').info(`User ${user.username} (${user.id}) logged out (oauth token expired)`);
+
+        return res.json({ error: 'oauth token expired', redirect_uri: github_auth.oauth_url(config.oauth.github_client_id) });
+      }
+    } else if (user.oauthProvider === 'discord') {
+      const resp = await fetch('https://discord.com/api/users/@me', {
+        headers: {
+          'Authorization': `Bearer ${user.oauthAccessToken}`,
+        },
+      });
+      if (!resp.ok) {
+        req.cleanCookie('user');
+        Logger.get('user').info(`User ${user.username} (${user.id}) logged out (oauth token expired)`);
+
+        return res.json({ error: 'oauth token expired', redirect_uri: discord_auth.oauth_url(config.oauth.discord_client_id, `${config.core.https ? 'https' : 'http'}://${req.headers.host}`) });
+      }
+    }
+  }
 
   if (req.method === 'PATCH') {
     if (req.body.password) {

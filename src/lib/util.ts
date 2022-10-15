@@ -26,7 +26,7 @@ export function createToken() {
 }
 
 export function sign(value: string, secret: string): string {
-  const signed =  value + ':' + createHmac('sha256', secret)
+  const signed = value + ':' + createHmac('sha256', secret)
     .update(value)
     .digest('base64')
     .replace(/=+$/, '');
@@ -54,7 +54,7 @@ export function unsign64(value: string, secret: string): string {
 }
 
 export function chunk<T>(arr: T[], size: number): Array<T[]> {
-  const result = []; 
+  const result = [];
   const L = arr.length;
   let i = 0;
 
@@ -67,7 +67,7 @@ export function chunk<T>(arr: T[], size: number): Array<T[]> {
 
 export async function sizeOfDir(directory: string): Promise<number> {
   const files = await readdir(directory);
-  
+
   let size = 0;
   for (let i = 0, L = files.length; i !== L; ++i) {
     const sta = await stat(join(directory, files[i]));
@@ -92,7 +92,7 @@ export function bytesToRead(bytes: number) {
 export function randomInvis(length: number) {
   // some parts from https://github.com/tycrek/ass/blob/master/generators/lengthGen.js
   const invisibleCharset = ['\u200B', '\u2060', '\u200C', '\u200D'];
-  
+
   return [...randomBytes(length)].map((byte) => invisibleCharset[Number(byte) % invisibleCharset.length]).join('').slice(1).concat(invisibleCharset[0]);
 }
 
@@ -107,7 +107,7 @@ export function createInvisImage(length: number, imageId: number) {
     });
 
     if (existing) return retry();
-    
+
     const inv = await prisma.invisibleImage.create({
       data: {
         invis,
@@ -132,7 +132,7 @@ export function createInvisURL(length: number, urlId: string) {
     });
 
     if (existing) return retry();
-    
+
     const ur = await prisma.invisibleUrl.create({
       data: {
         invis,
@@ -144,4 +144,18 @@ export function createInvisURL(length: number, urlId: string) {
   };
 
   return retry();
+}
+
+export async function getBase64URLFromURL(url: string) {
+  const res = await fetch(url);
+  if (!res.ok) return null;
+
+  const buffer = await res.arrayBuffer();
+  const base64 = Buffer.from(buffer).toString('base64');
+
+  return `data:${res.headers.get('content-type')};base64,${base64}`;
+}
+
+export function notNull(a: any, b: any) {
+  return a !== null && b !== null;
 }

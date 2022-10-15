@@ -13,7 +13,11 @@ export default function login() {
     setLoading(true);
     
     const res = await useFetch('/api/user');
-    if (res.error) return router.push('/auth/login?url=' + router.route);
+    if (res.error) {
+      if (res.error === 'oauth token expired') return router.push(res.redirect_uri);
+      
+      return router.push('/auth/login?url=' + router.route);
+    }
 
     setUser(res);
     setLoading(false);

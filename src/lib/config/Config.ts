@@ -99,6 +99,15 @@ export interface ConfigDiscordEmbed {
 
 export interface ConfigFeatures {
   invites: boolean;
+  oauth_registration: boolean;
+}
+
+export interface ConfigOAuth {
+  github_client_id?: string;
+  github_client_secret?: string;
+
+  discord_client_id?: string;
+  discord_client_secret?: string;
 }
 
 export interface Config {
@@ -109,5 +118,6 @@ export interface Config {
   datasource: ConfigDatasource;
   website: ConfigWebsite;
   discord: ConfigDiscord;
+  oauth: ConfigOAuth;
   features: ConfigFeatures;
 }
