@@ -1,7 +1,7 @@
 import { GetServerSideProps } from 'next';
 import prisma from 'lib/prisma';
 import { useState } from 'react';
-import { Button, Card, Center, Group, PasswordInput, Stepper, TextInput } from '@mantine/core';
+import { Box, Button, Card, Center, Group, PasswordInput, Stepper, TextInput } from '@mantine/core';
 import useFetch from 'hooks/useFetch';
 import PasswordStrength from 'components/PasswordStrength';
 import { showNotification } from '@mantine/notifications';
@@ -84,7 +84,13 @@ export default function Invite({ code, title }) {
         <title>{title} - Invite ({code})</title>
       </Head>
       <Center sx={{ height: '100vh' }}>
-        <Card>
+        <Box
+          sx={t => ({
+            backgroundColor: t.colors.dark[6],
+            borderRadius: t.radius.sm,
+          })}
+          p='md'
+        >
           <Stepper active={active} onStepClick={setActive} breakpoint='sm'>
             <Stepper.Step label='Welcome' description='Choose a username' allowStepSelect={active > 0}>
               <TextInput
@@ -125,7 +131,7 @@ export default function Invite({ code, title }) {
               </Group>
             </Stepper.Completed>
           </Stepper>
-        </Card>
+        </Box>
       </Center>
     </>
   );

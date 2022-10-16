@@ -49,10 +49,15 @@ export default function PasswordStrength({ value, setValue, setStrength, ...prop
   return (
     <Popover
       opened={popoverOpened}
-      position='top'
+      position='bottom'
       width='target'
       withArrow
       trapFocus={false}
+      styles={{
+        dropdown: {
+          zIndex: 999999,
+        },
+      }}
     >
       <Popover.Target>
         <div
@@ -68,7 +73,7 @@ export default function PasswordStrength({ value, setValue, setStrength, ...prop
           />
         </div>
       </Popover.Target>
-      <Popover.Dropdown sx={{  }}>
+      <Popover.Dropdown>
         <Progress color={color} value={strength} size={7} mb='md' />
         <PasswordRequirement label='Includes at least 8 characters' meets={value.length > 7} />
         {checks}
