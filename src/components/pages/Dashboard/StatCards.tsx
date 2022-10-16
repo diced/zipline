@@ -25,7 +25,7 @@ export function StatCards() {
         icon: (
           <FileIcon />
         ),
-        diff: stats.isSuccess ? percentChange(before.data.count, latest.data.count) : undefined,
+        diff: stats.isSuccess && before?.data ? percentChange(before.data.count, latest.data.count) : undefined,
       }}/>
 
       <StatCard stat={{
@@ -35,7 +35,7 @@ export function StatCards() {
         icon: (
           <Database size={15} />
         ),
-        diff: stats.isSuccess ? percentChange(before.data.size_num, latest.data.size_num) : undefined,
+        diff: stats.isSuccess && before?.data ? percentChange(before.data.size_num, latest.data.size_num) : undefined,
       }}/>
 
       <StatCard stat={{
@@ -45,7 +45,7 @@ export function StatCards() {
         icon: (
           <Eye size={15} />
         ),
-        diff: stats.isSuccess ? percentChange(before.data.views_count, latest.data.views_count) : undefined,
+        diff: stats.isSuccess && before?.data ? percentChange(before.data.views_count, latest.data.views_count) : undefined,
       }}/>
 
       <StatCard stat={{
