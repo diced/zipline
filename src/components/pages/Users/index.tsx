@@ -109,13 +109,16 @@ export default function Users() {
               </Group>
               <Group position='right'>
                 {user.administrator ? null : (
-                  <ActionIcon aria-label='delete' onClick={() => {setEditOpen(true); setSelectedUser(user);}}>
-                    <PencilIcon />
-                  </ActionIcon>
+                  <>
+                    <ActionIcon aria-label='edit' onClick={() => {setEditOpen(true); setSelectedUser(user);}}>
+                      <PencilIcon />
+                    </ActionIcon>
+                    <ActionIcon aria-label='delete' onClick={() => openDeleteModal(user)}>
+                      <DeleteIcon />
+                    </ActionIcon>
+                  </>
                 )}
-                <ActionIcon aria-label='delete' onClick={() => openDeleteModal(user)}>
-                  <DeleteIcon />
-                </ActionIcon>
+                
               </Group>
             </Group>
           </Card>

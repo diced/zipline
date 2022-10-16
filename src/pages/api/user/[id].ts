@@ -27,6 +27,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     const newTarget = await prisma.user.delete({
       where: { id: target.id },
     });
+    if (newTarget.administrator) return res.error('cannot delete administrator');
 
     delete newTarget.password;
 
