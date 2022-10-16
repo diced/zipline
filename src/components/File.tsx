@@ -4,7 +4,7 @@ import { showNotification } from '@mantine/notifications';
 import { relativeTime } from 'lib/utils/client';
 import { useFileDelete, useFileFavorite } from 'lib/queries/files';
 import { useState } from 'react';
-import { CalendarIcon, ClockIcon, CopyIcon, CrossIcon, DeleteIcon, ExternalLinkIcon, FileIcon, HashIcon, ImageIcon, StarIcon } from './icons';
+import { CalendarIcon, ClockIcon, CopyIcon, CrossIcon, DeleteIcon, ExternalLinkIcon, FileIcon, HashIcon, ImageIcon, StarIcon, EyeIcon } from './icons';
 import MutedText from './MutedText';
 import Type from './Type';
 import Link from './Link';
@@ -96,6 +96,7 @@ export default function File({ image, updateImages, disableMediaPreview }) {
     });
   };
 
+  console.log(image);
   return (
     <>
       <Modal
@@ -118,6 +119,7 @@ export default function File({ image, updateImages, disableMediaPreview }) {
           <Stack>
             <FileMeta Icon={FileIcon} title='Name' subtitle={image.file} />
             <FileMeta Icon={ImageIcon} title='Type' subtitle={image.mimetype} />
+            <FileMeta Icon={EyeIcon} title='Views' subtitle={image.views} />
             <FileMeta Icon={CalendarIcon} title='Uploaded at' subtitle={new Date(image.created_at).toLocaleString()} />
             {image.expires_at && <FileMeta
               Icon={ClockIcon}

@@ -12,7 +12,7 @@ export default function Dropzone({ loading, onDrop, children }) {
         <ImageIcon size={80} />
 
         <Text size='xl' inline>
-          Drag images here or click to select files
+          Drag files here or click to select files
         </Text>
       </Group>
 

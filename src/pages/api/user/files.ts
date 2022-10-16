@@ -25,7 +25,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
           userId: user.id,
         },
       });
-      Logger.get('image').info(`User ${user.username} (${user.id}) deleted ${count} images.`);
+      Logger.get('image').info(`User ${user.username} (${user.id}) deleted ${count} files.`);
 
       return res.json({ count });
     } else {
@@ -74,14 +74,15 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         mimetype: true,
         id: true,
         favorite: true,
+        views: true,
       },
     });
 
-  
+
     // @ts-ignore
     images.map(image => image.url = `/r/${image.file}`);
     if (req.query.filter && req.query.filter === 'media') images = images.filter(x => /^(video|audio|image|text)/.test(x.mimetype));
-  
+
     return res.json(req.query.paged ? chunk(images, 16) : images);
   }
 }

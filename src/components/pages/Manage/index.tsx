@@ -202,7 +202,7 @@ export default function Manage() {
   };
 
   const openDeleteModal = () => modals.openConfirmModal({
-    title: 'Are you sure you want to delete all of your images?',
+    title: 'Are you sure you want to delete all of your files?',
     closeOnConfirm: false,
     labels: { confirm: 'Yes', cancel: 'No' },
     onConfirm: () => {

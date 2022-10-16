@@ -101,7 +101,7 @@ export default function Upload() {
 
     showNotification({
       id: 'upload',
-      title: 'Uploading Images...',
+      title: 'Uploading files...',
       message: '',
       loading: true,
       autoClose: false,
@@ -123,7 +123,7 @@ export default function Upload() {
         updateNotification({
           id: 'upload',
           title: 'Upload Successful',
-          message: <>Copied first image to clipboard! <br />{json.files.map(x => (<Link key={x} href={x}>{x}<br /></Link>))}</>,
+          message: <>Copied first file to clipboard! <br />{json.files.map(x => (<Link key={x} href={x}>{x}<br /></Link>))}</>,
           color: 'green',
           icon: <UploadIcon />,
         });
