@@ -1,109 +1,144 @@
 import { Config } from 'lib/config/Config';
-import { object, string, number, boolean, array } from 'yup';
+import { s } from '@sapphire/shapeshift';
 
-const discord_content = object({
-  content: string().nullable(),
-  embed: object({
-    title: string().nullable().default(null),
-    description: string().nullable().default(null),
-    footer: string().nullable().default(null),
-    color: string().nullable().default(null),
-    thumbnail: boolean().default(false),
-    image: boolean().default(true),
-    timestamp: boolean().default(true),
-  }).nullable().default(null),
-}).nullable().default(null);
+const discord_content = s.object({
+  content: s.string.nullable,
+  embed: s.object({
+    title: s.string.nullable.default(null),
+    description: s.string.nullable.default(null),
+    footer: s.string.nullable.default(null),
+    color: s.string.nullable.default(null),
+    thumbnail: s.boolean.default(false),
+    image: s.boolean.default(true),
+    timestamp: s.boolean.default(true),
+  }).nullable.default(null),
+}).nullable.default(null);
 
-const validator = object({
-  core: object({
-    https: boolean().default(false),
-    secret: string().min(8).required(),
-    host: string().default('0.0.0.0'),
-    port: number().default(3000),
-    database_url: string().required(),
-    logger: boolean().default(false),
-    stats_interval: number().default(1800),
-    invites_interval: number().default(1800),
-  }).required(),
-  datasource: object({
-    type: string().oneOf(['local', 's3', 'swift']).default('local'),
-    local: object({
-      directory: string().default('./uploads'),
-    }),
-    s3: object({
-      access_key_id: string(),
-      secret_access_key: string(),
-      endpoint: string(),
-      bucket: string(),
-      force_s3_path: boolean().default(false),
-      region: string().default('us-east-1'),
-      use_ssl: boolean().default(false),
-    }).nullable().notRequired(),
-    swift: object({
-      username: string(),
-      password: string(),
-      auth_endpoint: string(),
-      container: string(),
-      project_id: string(),
-      domain_id: string().default('default'),
-      region_id: string().nullable(),
-    }).nullable().notRequired(),
-  }).required(),
-  uploader: object({
-    route: string().default('/u'),
-    embed_route: string().default('/a'),
-    length: number().default(6),
-    admin_limit: number().default(104900000),
-    user_limit: number().default(104900000),
-    disabled_extensions: array().default([]),
-    format_date: string().default('YYYY-MM-DD_HH:mm:ss'),
-  }).required(),
-  urls: object({
-    route: string().default('/go'),
-    length: number().default(6),
-  }).required(),
-  ratelimit: object({
-    user: number().default(0),
-    admin: number().default(0),
+const validator = s.object({
+  core: s.object({
+    https: s.boolean.default(false),
+    secret: s.string.lengthGreaterThanOrEqual(8),
+    host: s.string.default('0.0.0.0'),
+    port: s.number.default(3000),
+    database_url: s.string,
+    logger: s.boolean.default(false),
+    stats_interval: s.number.default(1800),
+    invites_interval: s.number.default(1800),
   }),
-  website: object({
-    title: string().default('Zipline'),
-    show_files_per_user: boolean().default(true),
-    show_version: boolean().default(true),
-    disable_media_preview: boolean().default(false),
+  datasource: s.object({
+    type: s.enum('local', 's3', 'swift').default('local'),
+    local: s.object({
+      directory: s.string.default('./uploads'),
+    }),
+    s3: s.object({
+      access_key_id: s.string,
+      secret_access_key: s.string,
+      endpoint: s.string,
+      bucket: s.string,
+      force_s3_path: s.boolean.default(false),
+      region: s.string.default('us-east-1'),
+      use_ssl: s.boolean.default(false),
+    }).optional,
+    swift: s.object({
+      username: s.string,
+      password: s.string,
+      auth_endpoint: s.string,
+      container: s.string,
+      project_id: s.string,
+      domain_id: s.string.default('default'),
+      region_id: s.string.nullable,
+    }).optional,
+  }).default({
+    type: 'local',
+    local: {
+      directory: './uploads',
+    },
+    s3: {
+      region: 'us-east-1',
+      force_s3_path: false,
+    },
+    swift: {
+      domain_id: 'default',
+    },
+  }),
+  uploader: s.object({
+    route: s.string.default('/u'),
+    embed_route: s.string.default('/a'),
+    length: s.number.default(6),
+    admin_limit: s.number.default(104900000),
+    user_limit: s.number.default(104900000),
+    disabled_extensions: s.string.array.default([]),
+    format_date: s.string.default('YYYY-MM-DD_HH:mm:ss'),
+  }).default({
+    route: '/u',
+    embed_route: '/a',
+    length: 6,
+    admin_limit: 104900000,
+    user_limit: 104900000,
+    disabled_extensions: [],
+    format_date: 'YYYY-MM-DD_HH:mm:ss',
+  }),
+  urls: s.object({
+    route: s.string.default('/go'),
+    length: s.number.default(6),
+  }).default({
+    route: '/go',
+    length: 6,
+  }),
+  ratelimit: s.object({
+    user: s.number.default(0),
+    admin: s.number.default(0),
+  }).default({
+    user: 0,
+    admin: 0,
+  }),
+  website: s.object({
+    title: s.string.default('Zipline'),
+    show_files_per_user: s.boolean.default(true),
+    show_version: s.boolean.default(true),
+    disable_media_preview: s.boolean.default(false),
 
-    external_links: array(object({
-      label: string(),
-      link: string(),
+    external_links: s.array(s.object({
+      label: s.string,
+      link: s.string,
     })).default([
       { label: 'Zipline', link: 'https://github.com/diced/zipline' },
       { label: 'Documentation', link: 'https://zipline.diced.tech/' },
     ]),
+  }).default({
+    title: 'Zipline',
+    show_files_per_user: true,
+    show_version: true,
+    disable_media_preview: false,
+
+    external_links: [
+      { label: 'Zipline', link: 'https://github.com/diced/zipline' },
+      { label: 'Documentation', link: 'https://zipline.diced.tech/' },
+    ],
   }),
-  discord: object({
-    url: string(),
-    username: string().default('Zipline'),
-    avatar_url: string().default('https://raw.githubusercontent.com/diced/zipline/9b60147e112ec5b70170500b85c75ea621f41d03/public/zipline.png'),
+  discord: s.object({
+    url: s.string,
+    username: s.string.default('Zipline'),
+    avatar_url: s.string.default('https://raw.githubusercontent.com/diced/zipline/9b60147e112ec5b70170500b85c75ea621f41d03/public/zipline.png'),
     upload: discord_content,
     shorten: discord_content,
-  }).optional().nullable().default(null),
-  oauth: object({
-    github_client_id: string().nullable().default(null),
-    github_client_secret: string().nullable().default(null),
+  }).nullish.default(null),
+  oauth: s.object({
+    github_client_id: s.string.nullable.default(null),
+    github_client_secret: s.string.nullable.default(null),
 
-    discord_client_id: string().nullable().default(null),
-    discord_client_secret: string().nullable().default(null),
-  }).optional().nullable().default(null),
-  features: object({
-    invites: boolean().default(true),
-    oauth_registration: boolean().default(false),
-  }).required(),
-
+    discord_client_id: s.string.nullable.default(null),
+    discord_client_secret: s.string.nullable.default(null),
+  }).nullish.default(null),
+  features: s.object({
+    invites: s.boolean.default(true),
+    oauth_registration: s.boolean.default(false),
+  }).default({ invites: true, oauth_registration: false }),
 });
 
 export default function validate(config): Config {
   try {
-    const validated = validator.validateSync(config, { abortEarly: false });
+    const validated = validator.parse(config);
     switch (validated.datasource.type) {
       case 's3': {
         const errors = [];
