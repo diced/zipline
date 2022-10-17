@@ -124,6 +124,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         const name = exp[i];
         const stats = await stat(`/tmp/${name}`);
 
+        if (Number(exp[i].split('_')[2]) !== user.id) continue;
         exports.push({ name, size: stats.size });
       }
 
