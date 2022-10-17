@@ -31,7 +31,7 @@ function CreateInviteModal({ open, setOpen, updateInvites }) {
 
   const onSubmit = async values => {
     if (!expires.includes(values.expires)) return form.setFieldError('expires', 'Invalid expiration');
-    if (values.count < 1 || values.count > 200) return form.setFieldError('count', 'Must be between 1 and 200');
+    if (values.count < 1 || values.count > 100) return form.setFieldError('count', 'Must be between 1 and 200');
     const expires_at = values.expires === 'never' ? null : new Date({
       '30m': Date.now() + 30 * 60 * 1000,
       '1h': Date.now() + 60 * 60 * 1000,
