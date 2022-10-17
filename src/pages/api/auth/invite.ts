@@ -23,7 +23,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
     if (counts > 1) {
       const data = [];
-      for (let i = 0; i < counts; i++) {
+      for (let i = 0; i !== counts; ++i) {
         data.push({
           code: randomChars(8),
           createdById: user.id,
