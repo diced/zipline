@@ -1,4 +1,4 @@
-import { ActionIcon, Avatar, Button, Card, Group, Modal, Select, SimpleGrid, Skeleton, Stack, Title } from '@mantine/core';
+import { ActionIcon, Avatar, Button, Card, Group, Modal, NumberInput, Select, SimpleGrid, Skeleton, Stack, Title } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { useForm } from '@mantine/form';
 import { useModals } from '@mantine/modals';
@@ -25,11 +25,13 @@ function CreateInviteModal({ open, setOpen, updateInvites }) {
   const form = useForm({
     initialValues: {
       expires: '30m',
+      count: 1,
     },
   });
 
   const onSubmit = async values => {
     if (!expires.includes(values.expires)) return form.setFieldError('expires', 'Invalid expiration');
+    if (values.count < 1 || values.count > 200) return form.setFieldError('count', 'Must be between 1 and 200');
     const expires_at = values.expires === 'never' ? null : new Date({
       '30m': Date.now() + 30 * 60 * 1000,
       '1h': Date.now() + 60 * 60 * 1000,
@@ -44,6 +46,7 @@ function CreateInviteModal({ open, setOpen, updateInvites }) {
 
     const res = await useFetch('/api/auth/invite', 'POST', {
       expires_at,
+      count: values.count,
     });
 
     if (res.error) {
@@ -87,6 +90,17 @@ function CreateInviteModal({ open, setOpen, updateInvites }) {
             { value: '7d', label: '7 days' },
             { value: 'never', label: 'Never' },
           ]}
+        />
+
+        <NumberInput
+          label='Count'
+          id='count'
+          {...form.getInputProps('count')}
+          precision={0}
+          min={1}
+          stepHoldDelay={200}
+          stepHoldInterval={100}
+          parser={(v:string) => Number(v.replace(/[^\d]/g, ''))}
         />
 
         <Group position='right' mt={22}>
