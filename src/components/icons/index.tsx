@@ -30,6 +30,7 @@ import FlameshotIcon from './FlameshotIcon';
 import GitHubIcon from './GitHubIcon';
 import DiscordIcon from './DiscordIcon';
 import EyeIcon from './EyeIcon';
+import RefreshIcon from './RefreshIcon';
 
 export {
   ActivityIcon,
@@ -64,4 +65,5 @@ export {
   GitHubIcon,
   DiscordIcon,
   EyeIcon,
+  RefreshIcon,
 };

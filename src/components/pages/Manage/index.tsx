@@ -3,7 +3,7 @@ import { useForm } from '@mantine/form';
 import { randomId, useInterval } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
 import { showNotification, updateNotification } from '@mantine/notifications';
-import { CrossIcon, DeleteIcon, FlameshotIcon, SettingsIcon, ShareXIcon } from 'components/icons';
+import { CrossIcon, DeleteIcon, FlameshotIcon, RefreshIcon, SettingsIcon, ShareXIcon } from 'components/icons';
 import DownloadIcon from 'components/icons/DownloadIcon';
 import Link from 'components/Link';
 import MutedText from 'components/MutedText';
@@ -166,6 +166,13 @@ export default function Manage() {
         loading: true,
         message: 'If you have a lot of files, the export may take a while. The list of exports will be updated every 30s.',
       });
+    } else {
+      showNotification({
+        title: 'Error exporting data',
+        message: res.error,
+        color: 'red',
+        icon: <CrossIcon />,
+      });
     }
   };
 
@@ -279,6 +286,7 @@ export default function Manage() {
       <Group>
         <Button onClick={openDeleteModal} rightIcon={<DeleteIcon />} color='red'>Delete All Data</Button>
         <ExportDataTooltip><Button onClick={exportData} rightIcon={<DownloadIcon />}>Export Data</Button></ExportDataTooltip>
+        <Button onClick={getExports} rightIcon={<RefreshIcon />}>Refresh</Button>
       </Group>
       <Card mt={22}>
         {exports && exports.length ? (

@@ -18,6 +18,8 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       },
     });
 
+    if (!files.length) return res.error('no files found');
+
     const zip = new Zip();
     const export_name = `zipline_export_${user.id}_${Date.now()}.zip`;
     const write_stream = createWriteStream(tmpdir() + `/${export_name}`);
