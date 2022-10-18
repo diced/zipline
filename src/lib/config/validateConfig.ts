@@ -29,6 +29,8 @@ const validator = s.object({
     type: s.enum('local', 's3', 'swift').default('local'),
     local: s.object({
       directory: s.string.default('./uploads'),
+    }).default({
+      directory: './uploads',
     }),
     s3: s.object({
       access_key_id: s.string,
