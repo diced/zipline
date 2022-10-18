@@ -5,6 +5,7 @@ import { Zip, ZipPassThrough } from 'fflate';
 import datasource from 'lib/datasource';
 import { readdir, stat } from 'fs/promises';
 import { createReadStream, createWriteStream } from 'fs';
+import { tmpdir } from 'os';
 
 async function handler(req: NextApiReq, res: NextApiRes) {
   const user = await req.user();
@@ -19,7 +20,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
     const zip = new Zip();
     const export_name = `zipline_export_${user.id}_${Date.now()}.zip`;
-    const write_stream = createWriteStream(`/tmp/${export_name}`);
+    const write_stream = createWriteStream(tmpdir() + `/${export_name}`);
 
     // i found this on some stack overflow thing, forgot the url
     const onBackpressure = (stream, outputStream, cb) => {
@@ -111,18 +112,18 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       const parts = export_name.split('_');
       if (Number(parts[2]) !== user.id) return res.forbid('cannot access export');
 
-      const stream = createReadStream(`/tmp/${export_name}`);
+      const stream = createReadStream(tmpdir() + `/${export_name}`);
 
       res.setHeader('Content-Type', 'application/zip');
       res.setHeader('Content-Disposition', `attachment; filename="${export_name}"`);
       stream.pipe(res);
     } else {
-      const files = await readdir('/tmp');
+      const files = await readdir(tmpdir());
       const exp = files.filter(f => f.startsWith('zipline_export_'));
       const exports = [];
       for (let i = 0; i !== exp.length; ++i) {
         const name = exp[i];
-        const stats = await stat(`/tmp/${name}`);
+        const stats = await stat(tmpdir() + `/${name}`);
 
         if (Number(exp[i].split('_')[2]) !== user.id) continue;
         exports.push({ name, size: stats.size });
