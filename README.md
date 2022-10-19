@@ -30,6 +30,7 @@ A ShareX/file upload server that is easy to use, packed with features, and with 
 - Gallery viewer, and multiple file format support
 - Code highlighting
 - Fully customizable Discord webhook notifications
+- OAuth2 registration (Discord and GitHub)
 - User invites
 - Easy setup instructions on [docs](https://zipl.vercel.app/) (One command install `docker-compose up -d`)
 
