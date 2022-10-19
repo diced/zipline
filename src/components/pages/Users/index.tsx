@@ -20,6 +20,8 @@ export default function Users() {
   const [createOpen, setCreateOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [editLimit, setEditLimit] = useState(false);
+  const [createLimit, setCreateLimit] = useState(false);
 
   const handleDelete = async (user, delete_images) => {
     const res = await useFetch('/api/users', 'DELETE', {
@@ -82,12 +84,12 @@ export default function Users() {
 
   return (
     <>
-      <CreateUserModal open={createOpen} setOpen={setCreateOpen} updateUsers={updateUsers} />
-      <EditUserModal open={editOpen} setOpen={setEditOpen} updateUsers={updateUsers} user={selectedUser} />
+      <CreateUserModal open={createOpen} setOpen={setCreateOpen} updateUsers={updateUsers} limit={createLimit} setLimit={setCreateLimit} />
+      <EditUserModal open={editOpen} setOpen={setEditOpen} updateUsers={updateUsers} user={selectedUser} limit={editLimit} setLimit={setEditLimit} />
       
       <Group mb='md'>
         <Title>Users</Title>
-        <ActionIcon variant='filled' color='primary' onClick={() => setCreateOpen(true)}><PlusIcon /></ActionIcon>
+        <ActionIcon variant='filled' color='primary' onClick={() => {setCreateOpen(true); setCreateLimit(false);}}><PlusIcon /></ActionIcon>
       </Group>
       <SimpleGrid
         cols={3}
@@ -110,7 +112,7 @@ export default function Users() {
               <Group position='right'>
                 {user.administrator ? null : (
                   <>
-                    <ActionIcon aria-label='edit' onClick={() => {setEditOpen(true); setSelectedUser(user);}}>
+                    <ActionIcon aria-label='edit' onClick={() => {setEditOpen(true); setSelectedUser(user); setEditLimit(user.limit ? true : false);}}>
                       <PencilIcon />
                     </ActionIcon>
                     <ActionIcon aria-label='delete' onClick={() => openDeleteModal(user)}>

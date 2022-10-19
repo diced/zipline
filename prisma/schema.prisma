@@ -26,6 +26,7 @@ model User {
   images           Image[]
   urls             Url[]
   Invite           Invite[]
+  limit            Limit?
 }
 
 enum ImageFormat {
@@ -91,4 +92,14 @@ model Invite {
 
   createdBy   User @relation(fields: [createdById], references: [id])
   createdById Int
+}
+
+model Limit {
+  id         Int      @id @default(autoincrement())
+  type_time  String   @default("daily")
+  limit_by   String   @default("count")
+  limit      Int      @default(1)
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     Int      @unique
 }
