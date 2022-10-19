@@ -148,8 +148,10 @@ export default function readConfig() {
           } catch (e) {
             parsed = [];
           }
+          break;
         default:
           parsed = value;
+          break;
       };
 
       set(config, map.path, parsed);
