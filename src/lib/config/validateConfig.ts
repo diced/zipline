@@ -1,18 +1,20 @@
 import { Config } from 'lib/config/Config';
-import { s } from '@sapphire/shapeshift';
+import { CombinedError, s, ValidationError } from '@sapphire/shapeshift';
+import { inspect } from 'util';
+import Logger from 'lib/logger';
 
 const discord_content = s.object({
-  content: s.string.nullable,
+  content: s.string.nullish.default(null),
   embed: s.object({
-    title: s.string.nullable.default(null),
-    description: s.string.nullable.default(null),
-    footer: s.string.nullable.default(null),
-    color: s.string.nullable.default(null),
+    title: s.string.nullish.default(null),
+    description: s.string.nullish.default(null),
+    footer: s.string.nullish.default(null),
+    color: s.number.notEqual(NaN).nullish.default(null),
     thumbnail: s.boolean.default(false),
     image: s.boolean.default(true),
     timestamp: s.boolean.default(true),
-  }).nullable.default(null),
-}).nullable.default(null);
+  }).default(null),
+}).default(null);
 
 const validator = s.object({
   core: s.object({
@@ -124,7 +126,7 @@ const validator = s.object({
     avatar_url: s.string.default('https://raw.githubusercontent.com/diced/zipline/9b60147e112ec5b70170500b85c75ea621f41d03/public/zipline.png'),
     upload: discord_content,
     shorten: discord_content,
-  }).nullish.default(null),
+  }),
   oauth: s.object({
     github_client_id: s.string.nullable.default(null),
     github_client_secret: s.string.nullable.default(null),
@@ -175,6 +177,12 @@ export default function validate(config): Config {
     return validated as unknown as Config;
   } catch (e) {
     if (process.env.ZIPLINE_DOCKER_BUILD) return null;
-    throw `${e.errors.length} errors occured\n${e.errors.map((x) => '\t' + x).join('\n')}`;
+
+    e.stack = '';
+
+    Logger.get('config').error('Config is invalid, see below:');
+    Logger.get('config').error(inspect(e, { depth: Infinity, colors: true }));
+
+    process.exit(1);
   }
 }
