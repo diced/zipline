@@ -64,7 +64,7 @@ export function EditUserModal({ open, setOpen, updateUsers, user }) {
 
           <Group position='right' mt={22}>
             <Button onClick={() => setOpen(false)}>Cancel</Button>
-            <Button type='submit'>Create</Button>
+            <Button type='submit'>Save</Button>
           </Group>
         </form>
       )}
