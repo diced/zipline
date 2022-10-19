@@ -69,8 +69,8 @@ export function EditUserModal({ open, setOpen, updateUsers, user, limit, setLimi
         <form onSubmit={form.onSubmit(v => onSubmit(v))}>
           <TextInput id='username' label='Username' {...form.getInputProps('username')} />
           <TextInput id='password' label='Password' type='password' {...form.getInputProps('password')} />
-          <Switch mt={12} id='administrator' label='Administrator' {...form.getInputProps('administrator')} />
-          <Switch mt={12} id='limits' label='Limited' {...form.getInputProps('limits')} onChange={(v) => setLimit(v.currentTarget.checked)} checked={limit} />
+          <Switch mt={12} id='administrator' label='Administrator' {...form.getInputProps('administrator')} onChange={(v) => limit && v.currentTarget.checked ? setLimit(false) : null} />
+          <Switch mt={12} id='limits' label='Limited' {...form.getInputProps('limits')} onChange={(v) => {setLimit(v.currentTarget.checked); form.values.administrator ? form.setFieldValue('administrator', false) : null;}} checked={limit} />
           {
             limit ? (
               <>
