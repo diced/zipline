@@ -75,18 +75,18 @@ export function EditUserModal({ open, setOpen, updateUsers, user, limit, setLimi
             limit ? (
               <>
                 <Select
-                  label='Limit Type Per?'
+                  label='Limit Every'
                   id='type_time'
                   {...form.getInputProps('type_time')}
                   data={[
-                    { value: 'daily', label: 'Daily' },
-                    { value: 'weekly', label: 'Weekly' },
-                    { value: 'monthly', label: 'Monthly' },
-                    { value: 'yearly', label: 'Yearly' },
+                    { value: 'daily', label: 'Day' },
+                    { value: 'weekly', label: 'Week' },
+                    { value: 'monthly', label: 'Month' },
+                    { value: 'yearly', label: 'Year' },
                   ]} 
                 />
                 <Select
-                  label='Limit By Byte or count?'
+                  label='Limit By'
                   id='limit_by'
                   {...form.getInputProps('limit_by')}
                   data ={[
@@ -95,7 +95,7 @@ export function EditUserModal({ open, setOpen, updateUsers, user, limit, setLimi
                   ]}
                 />
                 <NumberInput
-                  label='Limit'
+                  label='Limit Amount'
                   id='limit'
                   {...form.getInputProps('limit')}
                   precision={0}
