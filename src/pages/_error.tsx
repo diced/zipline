@@ -15,9 +15,11 @@ export default function Error({ statusCode }) {
       }}
       spacing='sm'
     >
-      <Title sx={{ fontSize: 220, fontWeight: 900, lineHeight: .8 }}>{statusCode}</Title>
+      <Title sx={{ fontSize: 220, fontWeight: 900, lineHeight: 0.8 }}>{statusCode}</Title>
       <MutedText sx={{ fontSize: 40, fontWeight: 500 }}>Something went wrong...</MutedText>
-      <Button component={Link} href='/dashboard'>Head to the Dashboard</Button>
+      <Button component={Link} href='/dashboard'>
+        Head to the Dashboard
+      </Button>
     </Stack>
   );
 }

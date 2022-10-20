@@ -7,9 +7,7 @@ export class S3 extends Datasource {
   public name: string = 'S3';
   public s3: Client;
 
-  public constructor(
-    public config: ConfigS3Datasource,
-  ) {
+  public constructor(public config: ConfigS3Datasource) {
     super();
     this.s3 = new Client({
       endPoint: config.endpoint,
@@ -55,8 +53,8 @@ export class S3 extends Datasource {
       const objects = this.s3.listObjectsV2(this.config.bucket, '', true);
       let size = 0;
 
-      objects.on('data', item => size += item.size);
-      objects.on('end', err => {
+      objects.on('data', (item) => (size += item.size));
+      objects.on('end', (err) => {
         if (err) rej(err);
         else res(size);
       });

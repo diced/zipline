@@ -15,9 +15,11 @@ export default function FiveHundred() {
       }}
       spacing='sm'
     >
-      <Title sx={{ fontSize: 220, fontWeight: 900, lineHeight: .8 }}>500</Title>
+      <Title sx={{ fontSize: 220, fontWeight: 900, lineHeight: 0.8 }}>500</Title>
       <MutedText sx={{ fontSize: 40, fontWeight: 500 }}>Internal Server Error</MutedText>
-      <Button component={Link} href='/dashboard'>Head to the Dashboard</Button>
+      <Button component={Link} href='/dashboard'>
+        Head to the Dashboard
+      </Button>
     </Stack>
   );
 }

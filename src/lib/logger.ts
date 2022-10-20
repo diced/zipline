@@ -10,8 +10,7 @@ export default class Logger {
   public name: string;
 
   static get(clas: any) {
-    if (typeof clas !== 'function')
-      if (typeof clas !== 'string') throw new Error('not string/function');
+    if (typeof clas !== 'function') if (typeof clas !== 'string') throw new Error('not string/function');
 
     const name = clas.name ?? clas;
 
@@ -28,11 +27,7 @@ export default class Logger {
 
   error(...args: any[]) {
     console.log(
-      this.formatMessage(
-        LoggerLevel.ERROR,
-        this.name,
-        args.map((error) => error.stack ?? error).join(' ')
-      )
+      this.formatMessage(LoggerLevel.ERROR, this.name, args.map((error) => error.stack ?? error).join(' '))
     );
   }
 

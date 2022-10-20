@@ -51,7 +51,11 @@ export default function Invite({ code, title }) {
   };
 
   const createUser = async () => {
-    const res = await useFetch('/api/auth/create', 'POST', { code, username, password });
+    const res = await useFetch('/api/auth/create', 'POST', {
+      code,
+      username,
+      password,
+    });
     if (res.error) {
       showNotification({
         title: 'Error while creating user',
@@ -70,22 +74,24 @@ export default function Invite({ code, title }) {
       setUser(null);
       await useFetch('/api/auth/logout');
       await useFetch('/api/auth/login', 'POST', {
-        username, password,
+        username,
+        password,
       });
 
       router.push('/dashboard');
-
     }
   };
 
   return (
     <>
       <Head>
-        <title>{title} - Invite ({code})</title>
+        <title>
+          {title} - Invite ({code})
+        </title>
       </Head>
       <Center sx={{ height: '100vh' }}>
         <Box
-          sx={t => ({
+          sx={(t) => ({
             backgroundColor: t.colors.dark[6],
             borderRadius: t.radius.sm,
           })}
@@ -101,14 +107,20 @@ export default function Invite({ code, title }) {
                 onBlur={() => checkUsername()}
               />
               <Group position='center' mt='xl'>
-                <Button disabled={usernameError !== '' || username == ''} onClick={nextStep}>Continue</Button>
+                <Button disabled={usernameError !== '' || username == ''} onClick={nextStep}>
+                  Continue
+                </Button>
               </Group>
             </Stepper.Step>
             <Stepper.Step label='Choose a password' allowStepSelect={active > 1 && usernameError === ''}>
               <PasswordStrength value={password} setValue={setPassword} setStrength={setStrength} />
               <Group position='center' mt='xl'>
-                <Button variant='default' onClick={prevStep}>Back</Button>
-                <Button disabled={strength !== 100} onClick={nextStep}>Continue</Button>
+                <Button variant='default' onClick={prevStep}>
+                  Back
+                </Button>
+                <Button disabled={strength !== 100} onClick={nextStep}>
+                  Continue
+                </Button>
               </Group>
             </Stepper.Step>
             <Stepper.Step label='Verify your password' allowStepSelect={active > 2}>
@@ -120,13 +132,19 @@ export default function Invite({ code, title }) {
                 onBlur={() => checkPassword()}
               />
               <Group position='center' mt='xl'>
-                <Button variant='default' onClick={prevStep}>Back</Button>
-                <Button disabled={verifyPasswordError !== '' || verifyPassword == ''} onClick={nextStep}>Continue</Button>
+                <Button variant='default' onClick={prevStep}>
+                  Back
+                </Button>
+                <Button disabled={verifyPasswordError !== '' || verifyPassword == ''} onClick={nextStep}>
+                  Continue
+                </Button>
               </Group>
             </Stepper.Step>
             <Stepper.Completed>
               <Group position='center' mt='xl'>
-                <Button variant='default' onClick={() => setActive(0)}>Go back</Button>
+                <Button variant='default' onClick={() => setActive(0)}>
+                  Go back
+                </Button>
                 <Button onClick={() => createUser()}>Finish setup</Button>
               </Group>
             </Stepper.Completed>
@@ -137,10 +155,11 @@ export default function Invite({ code, title }) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async context => {
-  if (!config.features.invites) return {
-    notFound: true,
-  };
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  if (!config.features.invites)
+    return {
+      notFound: true,
+    };
 
   const { code } = context.query as { code: string };
 

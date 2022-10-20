@@ -23,7 +23,7 @@ export default function Login({ title, oauth_registration, oauth_providers: unpa
   if (!oauth_registration) {
     router.push('/auth/login');
     return null;
-  };
+  }
 
   useEffect(() => {
     (async () => {
@@ -46,7 +46,9 @@ export default function Login({ title, oauth_registration, oauth_providers: unpa
           </Link>
           {oauth_providers.map(({ url, name, Icon }, i) => (
             <Link key={i} href={url} passHref>
-              <Button size='lg' fullWidth mt={12} leftIcon={<Icon />} component='a'>Sign in with {name}</Button>
+              <Button size='lg' fullWidth mt={12} leftIcon={<Icon />} component='a'>
+                Sign in with {name}
+              </Button>
             </Link>
           ))}
         </div>

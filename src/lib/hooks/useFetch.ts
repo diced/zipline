@@ -1,4 +1,8 @@
-export default async function useFetch(url: string, method: 'GET' | 'POST' | 'PATCH' | 'DELETE' = 'GET', body: Record<string, any> = null) {
+export default async function useFetch(
+  url: string,
+  method: 'GET' | 'POST' | 'PATCH' | 'DELETE' = 'GET',
+  body: Record<string, any> = null
+) {
   const headers = {};
   if (body) headers['content-type'] = 'application/json';
 

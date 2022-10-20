@@ -29,9 +29,9 @@ const useStyles = createStyles((theme) => ({
 }));
 
 interface StatsGridProps {
-  stat: { 
-    title: string; 
-    icon: React.ReactNode, 
+  stat: {
+    title: string;
+    icon: React.ReactNode;
     value: string;
     desc: string;
     diff?: number;
@@ -53,27 +53,14 @@ export default function StatCard({ stat }: StatsGridProps) {
 
       <Group align='flex-end' spacing='xs' mt={25}>
         <Text className={classes.value}>{stat.value}</Text>
-        {
-          typeof stat.diff == 'number' && (
-            <>
-              <Text
-                color={stat.diff >= 0 ? 'teal' : 'red'}
-                size='sm'
-                weight={500}
-                className={classes.diff}
-              >
-                <span>{stat.diff === Infinity ? '∞' : stat.diff}%</span>
-                {
-                  stat.diff >= 0 ? (
-                    <ArrowUpRight size={16} />
-                  ) : (
-                    <ArrowDownRight size={16} />
-                  )
-                }
-              </Text>
-            </>
-          )
-        }
+        {typeof stat.diff == 'number' && (
+          <>
+            <Text color={stat.diff >= 0 ? 'teal' : 'red'} size='sm' weight={500} className={classes.diff}>
+              <span>{stat.diff === Infinity ? '∞' : stat.diff}%</span>
+              {stat.diff >= 0 ? <ArrowUpRight size={16} /> : <ArrowDownRight size={16} />}
+            </Text>
+          </>
+        )}
       </Group>
 
       <Text size='xs' color='dimmed' mt={7}>

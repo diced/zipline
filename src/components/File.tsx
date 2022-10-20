@@ -4,7 +4,19 @@ import { showNotification } from '@mantine/notifications';
 import { relativeTime } from 'lib/utils/client';
 import { useFileDelete, useFileFavorite } from 'lib/queries/files';
 import { useState } from 'react';
-import { CalendarIcon, ClockIcon, CopyIcon, CrossIcon, DeleteIcon, ExternalLinkIcon, FileIcon, HashIcon, ImageIcon, StarIcon, EyeIcon } from './icons';
+import {
+  CalendarIcon,
+  ClockIcon,
+  CopyIcon,
+  CrossIcon,
+  DeleteIcon,
+  ExternalLinkIcon,
+  FileIcon,
+  HashIcon,
+  ImageIcon,
+  StarIcon,
+  EyeIcon,
+} from './icons';
 import MutedText from './MutedText';
 import Type from './Type';
 import Link from './Link';
@@ -76,35 +88,33 @@ export default function File({ image, updateImages, disableMediaPreview }) {
   };
 
   const handleFavorite = async () => {
-    favoriteFile.mutate({ id: image.id, favorite: !image.favorite }, {
-      onSuccess: () => {
-        showNotification({
-          title: 'Image is now ' + (!image.favorite ? 'favorited' : 'unfavorited'),
-          message: '',
-          icon: <StarIcon />,
-        });
-      },
+    favoriteFile.mutate(
+      { id: image.id, favorite: !image.favorite },
+      {
+        onSuccess: () => {
+          showNotification({
+            title: 'Image is now ' + (!image.favorite ? 'favorited' : 'unfavorited'),
+            message: '',
+            icon: <StarIcon />,
+          });
+        },
 
-      onError: (res: any) => {
-        showNotification({
-          title: 'Failed to favorite file',
-          message: res.error,
-          color: 'red',
-          icon: <CrossIcon />,
-        });
-      },
-    });
+        onError: (res: any) => {
+          showNotification({
+            title: 'Failed to favorite file',
+            message: res.error,
+            color: 'red',
+            icon: <CrossIcon />,
+          });
+        },
+      }
+    );
   };
 
   console.log(image);
   return (
     <>
-      <Modal
-        opened={open}
-        onClose={() => setOpen(false)}
-        title={<Title>{image.file}</Title>}
-        size='xl'
-      >
+      <Modal opened={open} onClose={() => setOpen(false)} title={<Title>{image.file}</Title>} size='xl'>
         <LoadingOverlay visible={loading} />
         <Stack>
           <Type
@@ -120,13 +130,19 @@ export default function File({ image, updateImages, disableMediaPreview }) {
             <FileMeta Icon={FileIcon} title='Name' subtitle={image.file} />
             <FileMeta Icon={ImageIcon} title='Type' subtitle={image.mimetype} />
             <FileMeta Icon={EyeIcon} title='Views' subtitle={image.views} />
-            <FileMeta Icon={CalendarIcon} title='Uploaded at' subtitle={new Date(image.created_at).toLocaleString()} />
-            {image.expires_at && <FileMeta
-              Icon={ClockIcon}
-              title='Expires'
-              subtitle={relativeTime(new Date(image.expires_at))}
-              tooltip={new Date(image.expires_at).toLocaleString()}
-            />}
+            <FileMeta
+              Icon={CalendarIcon}
+              title='Uploaded at'
+              subtitle={new Date(image.created_at).toLocaleString()}
+            />
+            {image.expires_at && (
+              <FileMeta
+                Icon={ClockIcon}
+                title='Expires'
+                subtitle={relativeTime(new Date(image.expires_at))}
+                tooltip={new Date(image.expires_at).toLocaleString()}
+              />
+            )}
             <FileMeta Icon={HashIcon} title='ID' subtitle={image.id} />
           </Stack>
         </Stack>
@@ -145,8 +161,20 @@ export default function File({ image, updateImages, disableMediaPreview }) {
           <LoadingOverlay visible={loading} />
           <Type
             file={image}
-            sx={{ minHeight: 200, maxHeight: 320, fontSize: 70, width: '100%', cursor: 'pointer' }}
-            style={{ minHeight: 200, maxHeight: 320, fontSize: 70, width: '100%', cursor: 'pointer' }}
+            sx={{
+              minHeight: 200,
+              maxHeight: 320,
+              fontSize: 70,
+              width: '100%',
+              cursor: 'pointer',
+            }}
+            style={{
+              minHeight: 200,
+              maxHeight: 320,
+              fontSize: 70,
+              width: '100%',
+              cursor: 'pointer',
+            }}
             src={image.url}
             alt={image.file}
             onClick={() => setOpen(true)}

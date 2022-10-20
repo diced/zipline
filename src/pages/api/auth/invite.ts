@@ -6,13 +6,16 @@ import config from 'lib/config';
 
 async function handler(req: NextApiReq, res: NextApiRes) {
   if (!config.features.invites) return res.forbid('invites are disabled');
-  
+
   const user = await req.user();
   if (!user) return res.forbid('not logged in');
   if (!user.administrator) return res.forbid('you arent an administrator');
 
   if (req.method === 'POST') {
-    const { expires_at, count } = req.body as { expires_at: string, count: number };
+    const { expires_at, count } = req.body as {
+      expires_at: string;
+      count: number;
+    };
 
     const expiry = expires_at ? new Date(expires_at) : null;
     if (expiry) {
@@ -31,9 +34,13 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         });
       }
 
-      await prisma.invite.createMany({data});
+      await prisma.invite.createMany({ data });
 
-      Logger.get('invite').info(`${user.username} (${user.id}) created ${data.length} invites with codes ${data.map(invite => invite.code).join(', ')}`);
+      Logger.get('invite').info(
+        `${user.username} (${user.id}) created ${data.length} invites with codes ${data
+          .map((invite) => invite.code)
+          .join(', ')}`
+      );
 
       return res.json(data);
     } else {
@@ -46,9 +53,9 @@ async function handler(req: NextApiReq, res: NextApiRes) {
           expires_at: expiry,
         },
       });
-  
+
       Logger.get('invite').info(`${user.username} (${user.id}) created invite ${invite.code}`);
-  
+
       return res.json(invite);
     }
   } else if (req.method === 'GET') {

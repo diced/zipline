@@ -30,19 +30,21 @@ export default function EmbeddedImage({ image, user, pass }) {
   };
 
   const updateImage = async (url?: string) => {
-
     const imageEl = document.getElementById('image_content') as HTMLImageElement;
 
     const img = new Image();
     img.addEventListener('load', function () {
-      if (this.naturalWidth > innerWidth) imageEl.width = Math.floor(this.naturalWidth * Math.min((innerHeight / this.naturalHeight), (innerWidth / this.naturalWidth)));
+      if (this.naturalWidth > innerWidth)
+        imageEl.width = Math.floor(
+          this.naturalWidth * Math.min(innerHeight / this.naturalHeight, innerWidth / this.naturalWidth)
+        );
       else imageEl.width = this.naturalWidth;
     });
 
     img.src = url || dataURL('/r');
     if (url) {
       imageEl.src = url;
-    };
+    }
   };
 
   useEffect(() => {
@@ -58,7 +60,9 @@ export default function EmbeddedImage({ image, user, pass }) {
       <Head>
         {image.embed && (
           <>
-            {user.embedSiteName && <meta property='og:site_name' content={parse(user.embedSiteName, image, user)} />}
+            {user.embedSiteName && (
+              <meta property='og:site_name' content={parse(user.embedSiteName, image, user)} />
+            )}
             {user.embedTitle && <meta property='og:title' content={parse(user.embedTitle, image, user)} />}
             <meta property='theme-color' content={user.embedColor} />
           </>
@@ -99,7 +103,13 @@ export default function EmbeddedImage({ image, user, pass }) {
         closeOnClickOutside={false}
         overlayBlur={3}
       >
-        <PasswordInput label='Password' placeholder='Password' error={error} value={password} onChange={e => setPassword(e.target.value)} />
+        <PasswordInput
+          label='Password'
+          placeholder='Password'
+          error={error}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
         <Button fullWidth onClick={() => check()} mt='md'>
           Submit
         </Button>
@@ -117,12 +127,7 @@ export default function EmbeddedImage({ image, user, pass }) {
         )}
 
         {image.mimetype.startsWith('video') && (
-          <video
-            src={dataURL('/r')}
-            controls={true}
-            autoPlay={true}
-            id='image_content'
-          />
+          <video src={dataURL('/r')} controls={true} autoPlay={true} id='image_content' />
         )}
       </Box>
     </>
@@ -139,11 +144,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   if (route === config.urls.route.substring(1)) {
     const url = await prisma.url.findFirst({
       where: {
-        OR: [
-          { id },
-          { vanity: id },
-          { invisible: { invis: id } },
-        ],
+        OR: [{ id }, { vanity: id }, { invisible: { invis: id } }],
       },
       select: {
         destination: true,
@@ -157,14 +158,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         destination: url.destination,
       },
     };
-
   } else if (uploader_route === '' ? /(^[^\\.]+\.[^\\.]+)/.test(route) : route === uploader_route) {
     const image = await prisma.image.findFirst({
       where: {
-        OR: [
-          { file: id },
-          { invisible: { invis: id } },
-        ],
+        OR: [{ file: id }, { invisible: { invis: id } }],
       },
       select: {
         mimetype: true,
@@ -196,12 +193,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     image.created_at = image.created_at.toString();
 
     const prismRender = Object.keys(exts).includes(image.file.split('.').pop());
-    if (prismRender) return {
-      redirect: {
-        destination: `/code/${image.file}`,
-        permanent: true,
-      },
-    };
+    if (prismRender)
+      return {
+        redirect: {
+          destination: `/code/${image.file}`,
+          permanent: true,
+        },
+      };
 
     if (!image.mimetype.startsWith('image') && !image.mimetype.startsWith('video')) {
       const { default: datasource } = await import('lib/datasource');
@@ -225,4 +223,3 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return { notFound: true };
   }
 };
-

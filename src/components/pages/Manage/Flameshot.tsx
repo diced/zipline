@@ -1,7 +1,7 @@
 import { GeneratorModal } from './GeneratorModal';
 
 export default function Flameshot({ user, open, setOpen }) {
-  const onSubmit = values => {
+  const onSubmit = (values) => {
     const curl = [
       'curl',
       '-H',
@@ -10,7 +10,12 @@ export default function Flameshot({ user, open, setOpen }) {
       `"authorization: ${user?.token}"`,
       '-F',
       'file=@/tmp/ss.png',
-      `${window.location.protocol + '//' + window.location.hostname + (window.location.port ? ':' + window.location.port : '')}/api/upload`,
+      `${
+        window.location.protocol +
+        '//' +
+        window.location.hostname +
+        (window.location.port ? ':' + window.location.port : '')
+      }/api/upload`,
     ];
 
     const extraHeaders = {};
@@ -58,11 +63,13 @@ ${curl.join(' ')} | jq -r '.files[0]' | tr -d '\n' | xsel -ib;
     pseudoElement.parentNode.removeChild(pseudoElement);
   };
 
-  return <GeneratorModal
-    opened={open}
-    onClose={() => setOpen(false)}
-    title='Flameshot'
-    desc='To use this script, you need Flameshot, curl, jq, and xsel installed. This script is intended for use on Linux only.'
-    onSubmit={onSubmit}
-  />;
+  return (
+    <GeneratorModal
+      opened={open}
+      onClose={() => setOpen(false)}
+      title='Flameshot'
+      desc='To use this script, you need Flameshot, curl, jq, and xsel installed. This script is intended for use on Linux only.'
+      onSubmit={onSubmit}
+    />
+  );
 }

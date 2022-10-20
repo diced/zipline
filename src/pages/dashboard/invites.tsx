@@ -14,20 +14,18 @@ export default function InvitesPage(props) {
       router.push('/dashboard');
     }, []);
     return null;
-  };
+  }
 
   const { loading } = useLogin();
 
   if (loading) return <LoadingOverlay visible={loading} />;
-  
+
   return (
     <>
       <Head>
         <title>{props.title} - Invites</title>
       </Head>
-      <Layout
-        props={props}
-      >
+      <Layout props={props}>
         <Invites />
       </Layout>
     </>

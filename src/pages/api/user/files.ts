@@ -39,7 +39,9 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
       await datasource.delete(image.file);
 
-      Logger.get('image').info(`User ${user.username} (${user.id}) deleted an image ${image.file} (${image.id})`);
+      Logger.get('image').info(
+        `User ${user.username} (${user.id}) deleted an image ${image.file} (${image.id})`
+      );
 
       delete image.password;
       return res.json(image);
@@ -49,12 +51,13 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
     let image;
 
-    if (req.body.favorite !== null) image = await prisma.image.update({
-      where: { id: req.body.id },
-      data: {
-        favorite: req.body.favorite,
-      },
-    });
+    if (req.body.favorite !== null)
+      image = await prisma.image.update({
+        where: { id: req.body.id },
+        data: {
+          favorite: req.body.favorite,
+        },
+      });
 
     delete image.password;
     return res.json(image);
@@ -78,10 +81,10 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       },
     });
 
-
     // @ts-ignore
-    images.map(image => image.url = `/r/${image.file}`);
-    if (req.query.filter && req.query.filter === 'media') images = images.filter(x => /^(video|audio|image|text)/.test(x.mimetype));
+    images.map((image) => (image.url = `/r/${image.file}`));
+    if (req.query.filter && req.query.filter === 'media')
+      images = images.filter((x) => /^(video|audio|image|text)/.test(x.mimetype));
 
     return res.json(req.query.paged ? chunk(images, 16) : images);
   }

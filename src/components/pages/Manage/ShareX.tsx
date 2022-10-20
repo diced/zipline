@@ -7,7 +7,12 @@ export default function ShareX({ user, open, setOpen }) {
     Name: 'Zipline',
     DestinationType: 'ImageUploader, TextUploader',
     RequestMethod: 'POST',
-    RequestURL: `${window.location.protocol + '//' + window.location.hostname + (window.location.port ? ':' + window.location.port : '')}/api/upload`,
+    RequestURL: `${
+      window.location.protocol +
+      '//' +
+      window.location.hostname +
+      (window.location.port ? ':' + window.location.port : '')
+    }/api/upload`,
     Headers: {
       Authorization: user?.token,
     },
@@ -16,7 +21,7 @@ export default function ShareX({ user, open, setOpen }) {
     FileFormName: 'file',
   });
 
-  const onSubmit = values => {
+  const onSubmit = (values) => {
     if (values.format !== 'RANDOM') {
       config.Headers['Format'] = values.format;
       setConfig(config);
@@ -50,7 +55,10 @@ export default function ShareX({ user, open, setOpen }) {
     }
 
     const pseudoElement = document.createElement('a');
-    pseudoElement.setAttribute('href', 'data:application/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(config, null, '\t')));
+    pseudoElement.setAttribute(
+      'href',
+      'data:application/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(config, null, '\t'))
+    );
     pseudoElement.setAttribute('download', 'zipline.sxcu');
     pseudoElement.style.display = 'none';
     document.body.appendChild(pseudoElement);
@@ -58,10 +66,5 @@ export default function ShareX({ user, open, setOpen }) {
     pseudoElement.parentNode.removeChild(pseudoElement);
   };
 
-  return <GeneratorModal
-    opened={open}
-    onClose={() => setOpen(false)}
-    title='ShareX'
-    onSubmit={onSubmit}
-  />;
+  return <GeneratorModal opened={open} onClose={() => setOpen(false)} title='ShareX' onSubmit={onSubmit} />;
 }

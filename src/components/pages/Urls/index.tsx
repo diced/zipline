@@ -1,4 +1,15 @@
-import { ActionIcon, Button, Group, Modal, SimpleGrid, Skeleton, TextInput, Title, Card, Center } from '@mantine/core';
+import {
+  ActionIcon,
+  Button,
+  Group,
+  Modal,
+  SimpleGrid,
+  Skeleton,
+  TextInput,
+  Title,
+  Card,
+  Center,
+} from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { showNotification } from '@mantine/notifications';
 import { CrossIcon, LinkIcon, PlusIcon } from 'components/icons';
@@ -24,11 +35,11 @@ export default function Urls() {
     },
   });
 
-  const onSubmit = async values => {
+  const onSubmit = async (values) => {
     const cleanURL = values.url.trim();
     const cleanVanity = values.vanity.trim();
 
-    if (cleanURL === '') return form.setFieldError('url', 'URL can\'t be nothing');
+    if (cleanURL === '') return form.setFieldError('url', "URL can't be nothing");
 
     try {
       new URL(cleanURL);
@@ -45,7 +56,7 @@ export default function Urls() {
     const res = await fetch('/api/shorten', {
       method: 'POST',
       headers: {
-        'Authorization': user.token,
+        Authorization: user.token,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(data),
@@ -77,11 +88,7 @@ export default function Urls() {
 
   return (
     <>
-      <Modal
-        opened={createOpen}
-        onClose={() => setCreateOpen(false)}
-        title={<Title>Shorten URL</Title>}
-      >
+      <Modal opened={createOpen} onClose={() => setCreateOpen(false)} title={<Title>Shorten URL</Title>}>
         <form onSubmit={form.onSubmit((v) => onSubmit(v))}>
           <TextInput id='url' label='URL' {...form.getInputProps('url')} />
           <TextInput id='vanity' label='Vanity' {...form.getInputProps('vanity')} />
@@ -95,43 +102,31 @@ export default function Urls() {
 
       <Group mb='md'>
         <Title>URLs</Title>
-        <ActionIcon variant='filled' color='primary' onClick={() => setCreateOpen(true)}><PlusIcon /></ActionIcon>
+        <ActionIcon variant='filled' color='primary' onClick={() => setCreateOpen(true)}>
+          <PlusIcon />
+        </ActionIcon>
       </Group>
 
-      {
-        (urls.data && urls.data.length === 0) && (
-          <Card shadow='md'>
-            <Center>
-              <Group>
-                <div>
-                  <LinkIcon size={48} />
-                </div>
-                <div>
-                  <Title>Nothing here</Title>
-                  <MutedText size='md'>Create a link to get started!</MutedText>
-                </div>
-              </Group>
-            </Center>
-          </Card>
-        )
-      }
+      {urls.data && urls.data.length === 0 && (
+        <Card shadow='md'>
+          <Center>
+            <Group>
+              <div>
+                <LinkIcon size={48} />
+              </div>
+              <div>
+                <Title>Nothing here</Title>
+                <MutedText size='md'>Create a link to get started!</MutedText>
+              </div>
+            </Group>
+          </Center>
+        </Card>
+      )}
 
-      <SimpleGrid
-        cols={4}
-        spacing='lg'
-        breakpoints={[
-          { maxWidth: 'sm', cols: 1, spacing: 'sm' },
-        ]}
-      >
-        {
-          (urls.isLoading || !urls.data) ? 
-            [1, 2, 3, 4].map(x => (
-              <Skeleton key={x} width='100%' height={80} radius='sm' />
-            ))
-            : urls.data.map(url => (
-              <URLCard key={url.id} url={url} />
-            ))
-        }
+      <SimpleGrid cols={4} spacing='lg' breakpoints={[{ maxWidth: 'sm', cols: 1, spacing: 'sm' }]}>
+        {urls.isLoading || !urls.data
+          ? [1, 2, 3, 4].map((x) => <Skeleton key={x} width='100%' height={80} radius='sm' />)
+          : urls.data.map((url) => <URLCard key={url.id} url={url} />)}
       </SimpleGrid>
     </>
   );

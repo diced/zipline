@@ -16,9 +16,7 @@ export default function Dropzone({ loading, onDrop, children }) {
         </Text>
       </Group>
 
-      <div style={{ pointerEvents: 'all' }}>
-        {children}
-      </div>
+      <div style={{ pointerEvents: 'all' }}>{children}</div>
     </MantineDropzone>
   );
 }

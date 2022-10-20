@@ -5,7 +5,10 @@ import Logger from 'lib/logger';
 
 async function handler(req: NextApiReq, res: NextApiRes) {
   if (req.method !== 'POST') return res.status(405).end();
-  const { username, password } = req.body as { username: string, password: string };
+  const { username, password } = req.body as {
+    username: string;
+    password: string;
+  };
 
   const users = await prisma.user.findMany();
   if (users.length === 0) {
@@ -23,7 +26,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
   const user = await prisma.user.findFirst({
     where: {
-      username, 
+      username,
     },
   });
 
@@ -32,7 +35,11 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   const valid = await checkPassword(password, user.password);
   if (!valid) return res.forbid('Wrong password');
 
-  res.setCookie('user', user.id, { sameSite: true, expires: new Date(Date.now() + (6.048e+8 * 2)), path: '/' });
+  res.setCookie('user', user.id, {
+    sameSite: true,
+    expires: new Date(Date.now() + 6.048e8 * 2),
+    path: '/',
+  });
 
   Logger.get('user').info(`User ${user.username} (${user.id}) logged in`);
 

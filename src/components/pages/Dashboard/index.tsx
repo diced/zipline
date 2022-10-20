@@ -29,7 +29,9 @@ export default function Dashboard({ disableMediaPreview }) {
   };
 
   const deleteImage = async ({ original }) => {
-    const res = await useFetch('/api/user/files', 'DELETE', { id: original.id });
+    const res = await useFetch('/api/user/files', 'DELETE', {
+      id: original.id,
+    });
     if (!res.error) {
       updateImages();
       showNotification({
@@ -46,7 +48,6 @@ export default function Dashboard({ disableMediaPreview }) {
         icon: <CrossIcon />,
       });
     }
-
   };
 
   const copyImage = async ({ original }) => {
@@ -65,7 +66,9 @@ export default function Dashboard({ disableMediaPreview }) {
   return (
     <div>
       <Title>Welcome back, {user?.username}</Title>
-      <MutedText size='md'>You have <b>{images.isSuccess ? images.data.length : '...'}</b> files</MutedText>
+      <MutedText size='md'>
+        You have <b>{images.isSuccess ? images.data.length : '...'}</b> files
+      </MutedText>
 
       <StatCards />
 
@@ -73,7 +76,9 @@ export default function Dashboard({ disableMediaPreview }) {
 
       <section>
         <Title>Files</Title>
-        <MutedText size='md'>View your gallery <Link href='/dashboard/files'>here</Link>.</MutedText>
+        <MutedText size='md'>
+          View your gallery <Link href='/dashboard/files'>here</Link>.
+        </MutedText>
         <DataGrid
           data={images.data ?? []}
           loading={images.isLoading}
@@ -124,7 +129,6 @@ export default function Dashboard({ disableMediaPreview }) {
             },
           }}
           empty={<></>}
-
           columns={[
             {
               accessorKey: 'file',

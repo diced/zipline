@@ -53,7 +53,7 @@ export default function Upload() {
 
   useEffect(() => {
     window.addEventListener('paste', (e: ClipboardEvent) => {
-      const item = Array.from(e.clipboardData.items).find(x => /^image/.test(x.type));
+      const item = Array.from(e.clipboardData.items).find((x) => /^image/.test(x.type));
       const file = item.getAsFile();
       setFiles([...files, file]);
       showNotification({
@@ -64,35 +64,40 @@ export default function Upload() {
   });
 
   const handleUpload = async () => {
-    const expires_at = expires === 'never' ? null : new Date({
-      '5min': Date.now() + 5 * 60 * 1000,
-      '10min': Date.now() + 10 * 60 * 1000,
-      '15min': Date.now() + 15 * 60 * 1000,
-      '30min': Date.now() + 30 * 60 * 1000,
-      '1h': Date.now() + 60 * 60 * 1000,
-      '2h': Date.now() + 2 * 60 * 60 * 1000,
-      '3h': Date.now() + 3 * 60 * 60 * 1000,
-      '4h': Date.now() + 4 * 60 * 60 * 1000,
-      '5h': Date.now() + 5 * 60 * 60 * 1000,
-      '6h': Date.now() + 6 * 60 * 60 * 1000,
-      '8h': Date.now() + 8 * 60 * 60 * 1000,
-      '12h': Date.now() + 12 * 60 * 60 * 1000,
-      '1d': Date.now() + 24 * 60 * 60 * 1000,
-      '3d': Date.now() + 3 * 24 * 60 * 60 * 1000,
-      '5d': Date.now() + 5 * 24 * 60 * 60 * 1000,
-      '7d': Date.now() + 7 * 24 * 60 * 60 * 1000,
-      '1w': Date.now() + 7 * 24 * 60 * 60 * 1000,
-      '1.5w': Date.now() + 1.5 * 7 * 24 * 60 * 60 * 1000,
-      '2w': Date.now() + 2 * 7 * 24 * 60 * 60 * 1000,
-      '3w': Date.now() + 3 * 7 * 24 * 60 * 60 * 1000,
-      '1m': Date.now() + 30 * 24 * 60 * 60 * 1000,
-      '1.5m': Date.now() + 1.5 * 30 * 24 * 60 * 60 * 1000,
-      '2m': Date.now() + 2 * 30 * 24 * 60 * 60 * 1000,
-      '3m': Date.now() + 3 * 30 * 24 * 60 * 60 * 1000,
-      '6m': Date.now() + 6 * 30 * 24 * 60 * 60 * 1000,
-      '8m': Date.now() + 8 * 30 * 24 * 60 * 60 * 1000,
-      '1y': Date.now() + 365 * 24 * 60 * 60 * 1000,
-    }[expires]);
+    const expires_at =
+      expires === 'never'
+        ? null
+        : new Date(
+            {
+              '5min': Date.now() + 5 * 60 * 1000,
+              '10min': Date.now() + 10 * 60 * 1000,
+              '15min': Date.now() + 15 * 60 * 1000,
+              '30min': Date.now() + 30 * 60 * 1000,
+              '1h': Date.now() + 60 * 60 * 1000,
+              '2h': Date.now() + 2 * 60 * 60 * 1000,
+              '3h': Date.now() + 3 * 60 * 60 * 1000,
+              '4h': Date.now() + 4 * 60 * 60 * 1000,
+              '5h': Date.now() + 5 * 60 * 60 * 1000,
+              '6h': Date.now() + 6 * 60 * 60 * 1000,
+              '8h': Date.now() + 8 * 60 * 60 * 1000,
+              '12h': Date.now() + 12 * 60 * 60 * 1000,
+              '1d': Date.now() + 24 * 60 * 60 * 1000,
+              '3d': Date.now() + 3 * 24 * 60 * 60 * 1000,
+              '5d': Date.now() + 5 * 24 * 60 * 60 * 1000,
+              '7d': Date.now() + 7 * 24 * 60 * 60 * 1000,
+              '1w': Date.now() + 7 * 24 * 60 * 60 * 1000,
+              '1.5w': Date.now() + 1.5 * 7 * 24 * 60 * 60 * 1000,
+              '2w': Date.now() + 2 * 7 * 24 * 60 * 60 * 1000,
+              '3w': Date.now() + 3 * 7 * 24 * 60 * 60 * 1000,
+              '1m': Date.now() + 30 * 24 * 60 * 60 * 1000,
+              '1.5m': Date.now() + 1.5 * 30 * 24 * 60 * 60 * 1000,
+              '2m': Date.now() + 2 * 30 * 24 * 60 * 60 * 1000,
+              '3m': Date.now() + 3 * 30 * 24 * 60 * 60 * 1000,
+              '6m': Date.now() + 6 * 30 * 24 * 60 * 60 * 1000,
+              '8m': Date.now() + 8 * 30 * 24 * 60 * 60 * 1000,
+              '1y': Date.now() + 365 * 24 * 60 * 60 * 1000,
+            }[expires]
+          );
 
     setProgress(0);
     setLoading(true);
@@ -108,39 +113,53 @@ export default function Upload() {
     });
 
     const req = new XMLHttpRequest();
-    req.upload.addEventListener('progress', e => {
+    req.upload.addEventListener('progress', (e) => {
       if (e.lengthComputable) {
-        setProgress(Math.round(e.loaded / e.total * 100));
+        setProgress(Math.round((e.loaded / e.total) * 100));
       }
     });
 
-    req.addEventListener('load', e => {
-      // @ts-ignore not sure why it thinks response doesnt exist, but it does.
-      const json = JSON.parse(e.target.response);
-      setLoading(false);
+    req.addEventListener(
+      'load',
+      (e) => {
+        // @ts-ignore not sure why it thinks response doesnt exist, but it does.
+        const json = JSON.parse(e.target.response);
+        setLoading(false);
 
-      if (json.error === undefined) {
-        updateNotification({
-          id: 'upload',
-          title: 'Upload Successful',
-          message: <>Copied first file to clipboard! <br />{json.files.map(x => (<Link key={x} href={x}>{x}<br /></Link>))}</>,
-          color: 'green',
-          icon: <UploadIcon />,
-        });
-        clipboard.copy(json.files[0]);
-        setFiles([]);
-        invalidateFiles();
-      } else {
-        updateNotification({
-          id: 'upload',
-          title: 'Upload Failed',
-          message: json.error,
-          color: 'red',
-          icon: <CrossIcon />,
-        });
-      }
-      setProgress(0);
-    }, false);
+        if (json.error === undefined) {
+          updateNotification({
+            id: 'upload',
+            title: 'Upload Successful',
+            message: (
+              <>
+                Copied first file to clipboard! <br />
+                {json.files.map((x) => (
+                  <Link key={x} href={x}>
+                    {x}
+                    <br />
+                  </Link>
+                ))}
+              </>
+            ),
+            color: 'green',
+            icon: <UploadIcon />,
+          });
+          clipboard.copy(json.files[0]);
+          setFiles([]);
+          invalidateFiles();
+        } else {
+          updateNotification({
+            id: 'upload',
+            title: 'Upload Failed',
+            message: json.error,
+            color: 'red',
+            icon: <CrossIcon />,
+          });
+        }
+        setProgress(0);
+      },
+      false
+    );
 
     req.open('POST', '/api/upload');
     req.setRequestHeader('Authorization', user.token);
@@ -156,7 +175,9 @@ export default function Upload() {
 
       <Dropzone loading={loading} onDrop={(f) => setFiles([...files, ...f])}>
         <Group position='center' spacing='md'>
-          {files.map(file => (<FileDropzone  key={randomId()} file={file} />))}
+          {files.map((file) => (
+            <FileDropzone key={randomId()} file={file} />
+          ))}
         </Group>
       </Dropzone>
 
@@ -167,7 +188,7 @@ export default function Upload() {
       <Group position='right' mt='md'>
         <Tooltip label='Add a password to your files (optional, leave blank for none)'>
           <PasswordInput
-            style={{width: '252px'}}
+            style={{ width: '252px' }}
             placeholder='Password'
             value={password}
             onChange={(e) => setPassword(e.currentTarget.value)}
@@ -210,7 +231,9 @@ export default function Upload() {
             ]}
           />
         </Tooltip>
-        <Button leftIcon={<UploadIcon />} onClick={handleUpload} disabled={files.length === 0 ? true : false}>Upload</Button>
+        <Button leftIcon={<UploadIcon />} onClick={handleUpload} disabled={files.length === 0 ? true : false}>
+          Upload
+        </Button>
       </Group>
     </>
   );

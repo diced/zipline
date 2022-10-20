@@ -20,7 +20,7 @@ export default createTheme({
       '#2A2C34',
       '#262830',
     ],
-    
+
     blue: [
       '#FFFFFF',
       '#E6F3FB',

@@ -20,7 +20,7 @@ import { useRecoilValue } from 'recoil';
 import { userSelector } from 'lib/recoil/user';
 
 export const themes = {
-  system: (colorScheme: 'dark' | 'light') => colorScheme === 'dark' ? dark_blue : light_blue,
+  system: (colorScheme: 'dark' | 'light') => (colorScheme === 'dark' ? dark_blue : light_blue),
   dark_blue,
   light_blue,
   dark,
@@ -34,17 +34,17 @@ export const themes = {
 };
 
 export const friendlyThemeName = {
-  'system': 'System Theme',
-  'dark_blue': 'Dark Blue',
-  'light_blue': 'Light Blue',
-  'dark': 'Very Dark',
-  'ayu_dark': 'Ayu Dark',
-  'ayu_mirage': 'Ayu Mirage',
-  'ayu_light': 'Ayu Light',
-  'nord': 'Nord',
-  'dracula': 'Dracula',
-  'matcha_dark_azul': 'Matcha Dark Azul',
-  'qogir_dark': 'Qogir Dark',
+  system: 'System Theme',
+  dark_blue: 'Dark Blue',
+  light_blue: 'Light Blue',
+  dark: 'Very Dark',
+  ayu_dark: 'Ayu Dark',
+  ayu_mirage: 'Ayu Mirage',
+  ayu_light: 'Ayu Light',
+  nord: 'Nord',
+  dracula: 'Dracula',
+  matcha_dark_azul: 'Matcha Dark Azul',
+  qogir_dark: 'Qogir Dark',
 };
 
 export default function ZiplineTheming({ Component, pageProps, ...props }) {
@@ -69,14 +69,14 @@ export default function ZiplineTheming({ Component, pageProps, ...props }) {
         ...theme,
         components: {
           AppShell: {
-            styles: t => ({
+            styles: (t) => ({
               root: {
                 backgroundColor: t.other.AppShell_backgroundColor,
               },
             }),
           },
           NavLink: {
-            styles: t => ({
+            styles: (t) => ({
               icon: {
                 paddingLeft: t.spacing.sm,
               },
@@ -101,14 +101,14 @@ export default function ZiplineTheming({ Component, pageProps, ...props }) {
             },
           },
           Card: {
-            styles: t => ({
+            styles: (t) => ({
               root: {
                 backgroundColor: t.colorScheme === 'dark' ? t.colors.dark[6] : t.colors.gray[0],
               },
             }),
           },
           Image: {
-            styles: t => ({
+            styles: (t) => ({
               placeholder: {
                 backgroundColor: t.colorScheme === 'dark' ? t.colors.dark[6] : t.colors.gray[0],
               },

@@ -11,11 +11,5 @@ const useStyles = createStyles((theme, { size }: { size: MantineSize }) => ({
 export default function CodeInput({ ...props }) {
   const { classes } = useStyles({ size: 'md' }, { name: 'CodeInput' });
 
-  return (
-    <Textarea
-      classNames={{ input: classes.input }}
-      autoComplete='nope'
-      {...props}
-    />
-  );
+  return <Textarea classNames={{ input: classes.input }} autoComplete='nope' {...props} />;
 }

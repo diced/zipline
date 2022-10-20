@@ -16,9 +16,7 @@ export default function StatsPage(props) {
       <Head>
         <title>{props.title} - Stats</title>
       </Head>
-      <Layout
-        props={props}
-      >
+      <Layout props={props}>
         <Stats />
       </Layout>
     </>
