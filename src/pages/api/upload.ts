@@ -58,7 +58,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
               },
             },
           });
-          if (count >= userLimit.limit) {stopped=true; return res.forbid('daily limit reached');}
+          if (count >= userLimit.limit) {stopped=true; return res.forbid(`daily limit reached: ${userLimit.limit} File(s)`);}
           break;
         } else if (userLimit.limit_by==='byte') {
           const imgs = await prisma.image.findMany({
@@ -73,7 +73,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
             },
           });
           const totalSize = (await Promise.all(imgs.map(async ({file}) => await datasource.size(file)))).reduce((a, b) => a + b, 0);
-          if (totalSize >= userLimit.limit) {stopped=true; return res.forbid('daily limit reached');}
+          if (totalSize >= userLimit.limit) {stopped=true; return res.forbid(`daily limit reached: ${userLimit.limit} Byte(s)`);}
           break;
         } else {
           Logger.get('image').info(`User ${user.username} (${user.id}) has unique limit type: ${userLimit.limit_by}`);
@@ -88,7 +88,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
               },
             },
           });
-          if (count >= userLimit.limit) {stopped=true; return res.forbid('weekly limit reached');}
+          if (count >= userLimit.limit) {stopped=true; return res.forbid(`weekly limit reached: ${userLimit.limit} File(s)`);}
           break;
         } else if (userLimit.limit_by==='byte') {
           const imgs = await prisma.image.findMany({
@@ -103,7 +103,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
             },
           });
           const totalSize = (await Promise.all(imgs.map(async ({file}) => await datasource.size(file)))).reduce((a, b) => a + b, 0);
-          if (totalSize >= userLimit.limit) {stopped=true; return res.forbid('weekly limit reached');}
+          if (totalSize >= userLimit.limit) {stopped=true; return res.forbid(`weekly limit reached: ${userLimit.limit} Byte(s)`);}
           break;
         } else {
           Logger.get('image').info(`User ${user.username} (${user.id}) has unique limit type: ${userLimit.limit_by}`);
@@ -118,7 +118,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
               },
             },
           });
-          if (count >= userLimit.limit) {stopped=true; return res.forbid('monthly limit reached');}
+          if (count >= userLimit.limit) {stopped=true; return res.forbid(`monthly limit reached: ${userLimit.limit} File(s)`);}
           break;
         } else if (userLimit.limit_by==='byte') {
           const imgs = await prisma.image.findMany({
@@ -133,7 +133,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
             },
           });
           const totalSize = (await Promise.all(imgs.map(async ({file}) => await datasource.size(file)))).reduce((a, b) => a + b, 0);
-          if (totalSize >= userLimit.limit) {stopped=true; return res.forbid('monthly limit reached');}
+          if (totalSize >= userLimit.limit) {stopped=true; return res.forbid(`monthly limit reached: ${userLimit.limit} Byte(s)`);}
           break;
         } else {
           Logger.get('image').info(`User ${user.username} (${user.id}) has unique limit type: ${userLimit.limit_by}`);
@@ -148,7 +148,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
               },
             },
           });
-          if (count >= userLimit.limit) {stopped=true; return res.forbid('yearly limit reached');}
+          if (count >= userLimit.limit) {stopped=true; return res.forbid(`yearly limit reached: ${userLimit.limit} File(s)`);}
           break;
         } else if (userLimit.limit_by==='byte') {
           const imgs = await prisma.image.findMany({
@@ -163,7 +163,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
             },
           });
           const totalSize = (await Promise.all(imgs.map(async ({file}) => await datasource.size(file)))).reduce((a, b) => a + b, 0);
-          if (totalSize >= userLimit.limit) {stopped=true; return res.forbid('yearly limit reached');}
+          if (totalSize >= userLimit.limit) {stopped=true; return res.forbid(`yearly limit reached: ${userLimit.limit} Byte(s)`);}
           break;
         } else {
           Logger.get('image').info(`User ${user.username} (${user.id}) has unique limit type: ${userLimit.limit_by}`);
@@ -288,6 +288,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     }
   }
 
+  res.setHeader('X-Zipline-Quota', user.limit.limit);
   return res.json(response);
 }
 
