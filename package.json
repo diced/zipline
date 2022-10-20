@@ -8,7 +8,7 @@
     "build-ci": "cross-env ZIPLINE_DOCKER_BUILD=1 npm-run-all build:schema build:next",
     "build:next": "next build",
     "build:schema": "prisma generate --schema=prisma/schema.prisma",
-    "format": "prettier --write ./src/**/*.{ts,tsx}",
+    "format": "prettier --write ./src/**/*.{ts,tsx} ./*.{md,js,json,yml}",
     "migrate:dev": "prisma migrate dev --create-only",
     "start": "tsx src/server",
     "lint": "next lint",
