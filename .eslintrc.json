@@ -1,14 +1,7 @@
 {
-  "extends": [
-    "next",
-    "next/core-web-vitals",
-    "plugin:prettier/recommended"
-  ],
+  "extends": ["next", "next/core-web-vitals", "plugin:prettier/recommended"],
   "rules": {
-    "linebreak-style": [
-      "error",
-      "unix"
-    ],
+    "linebreak-style": ["error", "unix"],
     "quotes": [
       "error",
       "single",
@@ -16,18 +9,9 @@
         "avoidEscape": true
       }
     ],
-    "semi": [
-      "error",
-      "always"
-    ],
-    "comma-dangle": [
-      "error",
-      "always-multiline"
-    ],
-    "jsx-quotes": [
-      "error",
-      "prefer-single"
-    ],
+    "semi": ["error", "always"],
+    "comma-dangle": ["error", "always-multiline"],
+    "jsx-quotes": ["error", "prefer-single"],
     "indent": "off",
     "react/prop-types": "off",
     "react-hooks/rules-of-hooks": "off",
