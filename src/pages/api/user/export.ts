@@ -51,7 +51,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       } else {
         Object.defineProperty(stream, 'ondata', {
           get: () => ondataPatched,
-          set: cb => ondata = cb,
+          set: (cb) => (ondata = cb),
         });
       }
 
@@ -68,14 +68,14 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       });
     };
 
-
-
     zip.ondata = async (err, data, final) => {
       if (!err) {
         write_stream.write(data);
         if (final) {
           write_stream.close();
-          Logger.get('user').info(`Export for ${user.username} (${user.id}) has completed and is available at ${export_name}`);
+          Logger.get('user').info(
+            `Export for ${user.username} (${user.id}) has completed and is available at ${export_name}`
+          );
         }
       } else {
         write_stream.close();
@@ -91,14 +91,14 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       if (stream) {
         const def = new ZipPassThrough(file.file);
         zip.add(def);
-        onBackpressure(def, stream, shouldApplyBackpressure => {
+        onBackpressure(def, stream, (shouldApplyBackpressure) => {
           if (shouldApplyBackpressure) {
             stream.pause();
           } else if (stream.isPaused()) {
             stream.resume();
           }
         });
-        stream.on('data', c => def.push(c));
+        stream.on('data', (c) => def.push(c));
         stream.on('end', () => def.push(new Uint8Array(0), true));
       }
     }
@@ -121,7 +121,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       stream.pipe(res);
     } else {
       const files = await readdir(tmpdir());
-      const exp = files.filter(f => f.startsWith('zipline_export_'));
+      const exp = files.filter((f) => f.startsWith('zipline_export_'));
       const exports = [];
       for (let i = 0; i !== exp.length; ++i) {
         const name = exp[i];

@@ -9,11 +9,10 @@ export default function Stats() {
       <Title mb='md'>Stats</Title>
 
       <StatCards />
-      
+
       <Types />
 
       <Graphs />
-
     </div>
   );
 }

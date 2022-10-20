@@ -11,12 +11,12 @@ export default function Files({ disableMediaPreview }) {
   const favoritePages = usePaginatedFiles({ favorite: 'media' });
   const [favoritePage, setFavoritePage] = useState(1);
 
-  const updatePages = async favorite => {
+  const updatePages = async (favorite) => {
     pages.refetch();
-    
+
     if (favorite) {
       favoritePages.refetch();
-    } 
+    }
   };
 
   return (
@@ -24,49 +24,49 @@ export default function Files({ disableMediaPreview }) {
       <Group mb='md'>
         <Title>Files</Title>
         <Link href='/dashboard/upload' passHref>
-          <ActionIcon component='a' variant='filled' color='primary'><PlusIcon/></ActionIcon>
+          <ActionIcon component='a' variant='filled' color='primary'>
+            <PlusIcon />
+          </ActionIcon>
         </Link>
       </Group>
-      {
-        (favoritePages.isSuccess && favoritePages.data.length)
-          ? (
-            <Accordion
-              variant='contained'
-              mb='sm'
-            >
-              <Accordion.Item value='favorite'>
-                <Accordion.Control>Favorite Files</Accordion.Control>
-                <Accordion.Panel>
-                  <SimpleGrid
-                    cols={3}
-                    spacing='lg'
-                    breakpoints={[
-                      { maxWidth: 'sm', cols: 1, spacing: 'sm' },
-                    ]}
-                  >
-                    {(favoritePages.isSuccess && favoritePages.data.length) ? favoritePages.data[(favoritePage - 1) ?? 0].map(image => (
+      {favoritePages.isSuccess && favoritePages.data.length ? (
+        <Accordion variant='contained' mb='sm'>
+          <Accordion.Item value='favorite'>
+            <Accordion.Control>Favorite Files</Accordion.Control>
+            <Accordion.Panel>
+              <SimpleGrid cols={3} spacing='lg' breakpoints={[{ maxWidth: 'sm', cols: 1, spacing: 'sm' }]}>
+                {favoritePages.isSuccess && favoritePages.data.length
+                  ? favoritePages.data[favoritePage - 1 ?? 0].map((image) => (
                       <div key={image.id}>
-                        <File image={image} updateImages={() => updatePages(true)} disableMediaPreview={disableMediaPreview} />
+                        <File
+                          image={image}
+                          updateImages={() => updatePages(true)}
+                          disableMediaPreview={disableMediaPreview}
+                        />
                       </div>
-                    )) : null}
-                  </SimpleGrid>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      paddingTop: 12,
-                      paddingBottom: 3,
-                    }}
-                  >
-                    <Pagination total={favoritePages.data.length} page={favoritePage} onChange={setFavoritePage} />
-                  </Box>
-                </Accordion.Panel>
-              </Accordion.Item>
-            </Accordion>
-          ) : null
-      }
-      
+                    ))
+                  : null}
+              </SimpleGrid>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  paddingTop: 12,
+                  paddingBottom: 3,
+                }}
+              >
+                <Pagination
+                  total={favoritePages.data.length}
+                  page={favoritePage}
+                  onChange={setFavoritePage}
+                />
+              </Box>
+            </Accordion.Panel>
+          </Accordion.Item>
+        </Accordion>
+      ) : null}
+
       <FilePagation disableMediaPreview={disableMediaPreview} />
     </>
   );

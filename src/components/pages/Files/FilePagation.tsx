@@ -29,35 +29,26 @@ export default function FilePagation({ disableMediaPreview }) {
 
   return (
     <>
-      <SimpleGrid
-        cols={3}
-        spacing='lg'
-        breakpoints={[
-          { maxWidth: 'sm', cols: 1, spacing: 'sm' },
-        ]}
-      >
-        {
-          (pages.isSuccess)
-            ? pages.data.length 
-              ? (
-                pages.data[(page - 1) ?? 0].map(image => (
-                  <div key={image.id}>
-                    <File image={image} updateImages={() => pages.refetch()} disableMediaPreview={disableMediaPreview} />
-                  </div>
-                ))
-              ) : (
-                null
-              )
-            : (
-              [1,2,3,4].map(x => (
-                <div key={x}>
-                  <Skeleton width='100%' height={220} sx={{ borderRadius: 1 }}/>
+      <SimpleGrid cols={3} spacing='lg' breakpoints={[{ maxWidth: 'sm', cols: 1, spacing: 'sm' }]}>
+        {pages.isSuccess
+          ? pages.data.length
+            ? pages.data[page - 1 ?? 0].map((image) => (
+                <div key={image.id}>
+                  <File
+                    image={image}
+                    updateImages={() => pages.refetch()}
+                    disableMediaPreview={disableMediaPreview}
+                  />
                 </div>
               ))
-            )
-        }
+            : null
+          : [1, 2, 3, 4].map((x) => (
+              <div key={x}>
+                <Skeleton width='100%' height={220} sx={{ borderRadius: 1 }} />
+              </div>
+            ))}
       </SimpleGrid>
-      {(pages.isSuccess && pages.data.length) ? (
+      {pages.isSuccess && pages.data.length ? (
         <Box
           sx={{
             display: 'flex',
@@ -68,8 +59,12 @@ export default function FilePagation({ disableMediaPreview }) {
           }}
         >
           <div></div>
-          <Pagination total={pages.data?.length ?? 0} page={page} onChange={setPage}/>
-          <Checkbox label='Show non-media files' checked={checked} onChange={(event) => setChecked(event.currentTarget.checked)} />
+          <Pagination total={pages.data?.length ?? 0} page={page} onChange={setPage} />
+          <Checkbox
+            label='Show non-media files'
+            checked={checked}
+            onChange={(event) => setChecked(event.currentTarget.checked)}
+          />
         </Box>
       ) : null}
     </>

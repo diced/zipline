@@ -4,10 +4,8 @@ import { useStats } from 'lib/queries/stats';
 
 export default function Types() {
   const stats = useStats();
-  
-  if(stats.isLoading) return (
-    <LoadingOverlay visible />
-  );
+
+  if (stats.isLoading) return <LoadingOverlay visible />;
 
   const latest = stats.data[0];
 

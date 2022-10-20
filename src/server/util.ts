@@ -48,7 +48,6 @@ export function bytesToRead(bytes: number) {
   return `${bytes.toFixed(1)} ${units[num]}`;
 }
 
-
 export async function getStats(prisma: PrismaClient, datasource: Datasource) {
   const size = await datasource.fullSize();
   const byUser = await prisma.image.groupBy({
@@ -88,7 +87,11 @@ export async function getStats(prisma: PrismaClient, datasource: Datasource) {
     },
   });
   const types_count = [];
-  for (let i = 0, L = typesCount.length; i !== L; ++i) types_count.push({ mimetype: typesCount[i].mimetype, count: typesCount[i]._count.mimetype });
+  for (let i = 0, L = typesCount.length; i !== L; ++i)
+    types_count.push({
+      mimetype: typesCount[i].mimetype,
+      count: typesCount[i]._count.mimetype,
+    });
 
   return {
     size: bytesToRead(size),
@@ -96,7 +99,7 @@ export async function getStats(prisma: PrismaClient, datasource: Datasource) {
     count,
     count_by_user: count_by_user.sort((a, b) => b.count - a.count),
     count_users,
-    views_count: (viewsCount[0]?._sum?.views ?? 0),
+    views_count: viewsCount[0]?._sum?.views ?? 0,
     types_count: types_count.sort((a, b) => b.count - a.count),
   };
 }

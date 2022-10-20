@@ -16,9 +16,7 @@ export default function UploadPage(props) {
       <Head>
         <title>{props.title} - Upload</title>
       </Head>
-      <Layout
-        props={props}
-      >
+      <Layout props={props}>
         <Upload />
       </Layout>
     </>

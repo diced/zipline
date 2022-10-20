@@ -11,16 +11,11 @@ export function GeneratorModal({ opened, onClose, title, onSubmit, ...other }) {
       embed: false,
     },
   });
-  
+
   return (
-    <Modal
-      opened={opened}
-      onClose={onClose}
-      title={<Title order={3}>{title}</Title>}
-      size='lg'
-    >
+    <Modal opened={opened} onClose={onClose} title={<Title order={3}>{title}</Title>} size='lg'>
       {other.desc && <Text>{other.desc}</Text>}
-      <form onSubmit={form.onSubmit(values => onSubmit(values))}>
+      <form onSubmit={form.onSubmit((values) => onSubmit(values))}>
         <Select
           label='Select file name format'
           data={[
@@ -34,7 +29,7 @@ export function GeneratorModal({ opened, onClose, title, onSubmit, ...other }) {
         />
 
         <NumberInput
-          label={'Image Compression (leave at 0 if you don\'t want to compress)'}
+          label={"Image Compression (leave at 0 if you don't want to compress)"}
           max={100}
           min={0}
           mt='md'
@@ -48,26 +43,15 @@ export function GeneratorModal({ opened, onClose, title, onSubmit, ...other }) {
             id='zeroWidthSpace'
             {...form.getInputProps('zeroWidthSpace', { type: 'checkbox' })}
           />
-          <Checkbox
-            label='Embed'
-            id='embed'
-            {...form.getInputProps('embed', { type: 'checkbox' })}
-          />
+          <Checkbox label='Embed' id='embed' {...form.getInputProps('embed', { type: 'checkbox' })} />
         </Group>
 
         <Group grow>
-          <Button
-            mt='md'
-            onClick={form.reset}
-          >
+          <Button mt='md' onClick={form.reset}>
             Reset
           </Button>
 
-          <Button
-            mt='md'
-            rightIcon={<DownloadIcon />}
-            type='submit'
-          >
+          <Button mt='md' rightIcon={<DownloadIcon />} type='submit'>
             Download
           </Button>
         </Group>

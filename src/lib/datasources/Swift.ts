@@ -44,9 +44,7 @@ class SwiftContainer {
     const endpoint = catalogEntry.endpoints.find(
       (x: any) =>
         x.interface === (this.options.credentials.interface || 'public') &&
-        (this.options.credentials.region_id
-          ? x.region_id == this.options.credentials.region_id
-          : true)
+        (this.options.credentials.region_id ? x.region_id == this.options.credentials.region_id : true)
     );
 
     return endpoint ? endpoint.url : null;
@@ -94,7 +92,8 @@ class SwiftContainer {
       }
     });
 
-    if (error || !json || !headers || json.error) throw new Error('Could not retrieve credentials from OpenStack, check your config file');
+    if (error || !json || !headers || json.error)
+      throw new Error('Could not retrieve credentials from OpenStack, check your config file');
 
     const catalog = json.token.catalog;
     // many Swift clouds use ceph radosgw to provide swift
@@ -124,10 +123,15 @@ class SwiftContainer {
 
   public async listObjects(query?: string): Promise<SwiftObject[]> {
     const auth = await this.authenticate();
-    return await fetch(`${auth.swiftURL}/${this.options.credentials.container}${query ? `${query.startsWith('?') ? '' : '?'}${query}` : ''}`, {
-      method: 'GET',
-      headers: this.generateHeaders(auth.token),
-    }).then((e) => e.json());
+    return await fetch(
+      `${auth.swiftURL}/${this.options.credentials.container}${
+        query ? `${query.startsWith('?') ? '' : '?'}${query}` : ''
+      }`,
+      {
+        method: 'GET',
+        headers: this.generateHeaders(auth.token),
+      }
+    ).then((e) => e.json());
   }
 
   public async uploadObject(name: string, data: Buffer): Promise<any> {
@@ -216,7 +220,7 @@ export class Swift extends Datasource {
   public async size(file: string): Promise<number> {
     try {
       const head = await this.container.headObject(file);
-      
+
       return head.headers.get('content-length') || 0;
     } catch {
       return 0;

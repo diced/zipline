@@ -17,19 +17,28 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         req.cleanCookie('user');
         Logger.get('user').info(`User ${user.username} (${user.id}) logged out (oauth token expired)`);
 
-        return res.json({ error: 'oauth token expired', redirect_uri: github_auth.oauth_url(config.oauth.github_client_id) });
+        return res.json({
+          error: 'oauth token expired',
+          redirect_uri: github_auth.oauth_url(config.oauth.github_client_id),
+        });
       }
     } else if (user.oauthProvider === 'discord') {
       const resp = await fetch('https://discord.com/api/users/@me', {
         headers: {
-          'Authorization': `Bearer ${user.oauthAccessToken}`,
+          Authorization: `Bearer ${user.oauthAccessToken}`,
         },
       });
       if (!resp.ok) {
         req.cleanCookie('user');
         Logger.get('user').info(`User ${user.username} (${user.id}) logged out (oauth token expired)`);
 
-        return res.json({ error: 'oauth token expired', redirect_uri: discord_auth.oauth_url(config.oauth.discord_client_id, `${config.core.https ? 'https' : 'http'}://${req.headers.host}`) });
+        return res.json({
+          error: 'oauth token expired',
+          redirect_uri: discord_auth.oauth_url(
+            config.oauth.discord_client_id,
+            `${config.core.https ? 'https' : 'http'}://${req.headers.host}`
+          ),
+        });
       }
     }
   }
@@ -58,36 +67,42 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       });
     }
 
-    if (req.body.avatar) await prisma.user.update({
-      where: { id: user.id },
-      data: { avatar: req.body.avatar },
-    });
+    if (req.body.avatar)
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { avatar: req.body.avatar },
+      });
 
-    if (req.body.embedTitle) await prisma.user.update({
-      where: { id: user.id },
-      data: { embedTitle: req.body.embedTitle },
-    });
+    if (req.body.embedTitle)
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { embedTitle: req.body.embedTitle },
+      });
 
-    if (req.body.embedColor) await prisma.user.update({
-      where: { id: user.id },
-      data: { embedColor: req.body.embedColor },
-    });
+    if (req.body.embedColor)
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { embedColor: req.body.embedColor },
+      });
 
-    if (req.body.embedSiteName) await prisma.user.update({
-      where: { id: user.id },
-      data: { embedSiteName: req.body.embedSiteName },
-    });
+    if (req.body.embedSiteName)
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { embedSiteName: req.body.embedSiteName },
+      });
 
-    if (req.body.systemTheme) await prisma.user.update({
-      where: { id: user.id },
-      data: { systemTheme: req.body.systemTheme },
-    });
+    if (req.body.systemTheme)
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { systemTheme: req.body.systemTheme },
+      });
 
     if (req.body.domains) {
-      if (!req.body.domains) await prisma.user.update({
-        where: { id: user.id },
-        data: { domains: [] },
-      });
+      if (!req.body.domains)
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { domains: [] },
+        });
 
       const invalidDomains = [];
       const domains = [];

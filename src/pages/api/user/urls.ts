@@ -33,7 +33,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     });
 
     // @ts-ignore
-    urls.map(url => url.url = `${config.urls.route}/${url.vanity ?? url.id}`);
+    urls.map((url) => (url.url = `${config.urls.route}/${url.vanity ?? url.id}`));
     return res.json(urls);
   }
 }

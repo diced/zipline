@@ -46,7 +46,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   if (!req.files) return res.error('no files');
   if (req.files && req.files.length === 0) return res.error('no files');
 
-  const response: { files: string[], expires_at?: Date } = { files: [] };
+  const response: { files: string[]; expires_at?: Date } = { files: [] };
 
   const expires_at = req.headers['expires-at'] as string;
   let expiry: Date;
@@ -62,15 +62,18 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   const rawFormat = ((req.headers.format || '') as string).toUpperCase() || 'RANDOM';
   const format: ImageFormat = Object.keys(ImageFormat).includes(rawFormat) && ImageFormat[rawFormat];
 
-  const imageCompressionPercent = req.headers['image-compression-percent'] ? Number(req.headers['image-compression-percent']) : null;
-
+  const imageCompressionPercent = req.headers['image-compression-percent']
+    ? Number(req.headers['image-compression-percent'])
+    : null;
 
   for (let i = 0; i !== req.files.length; ++i) {
     const file = req.files[i];
-    if (file.size > zconfig.uploader[user.administrator ? 'admin_limit' : 'user_limit']) return res.error(`file[${i}] size too big`);
+    if (file.size > zconfig.uploader[user.administrator ? 'admin_limit' : 'user_limit'])
+      return res.error(`file[${i}] size too big`);
 
     const ext = file.originalname.split('.').pop();
-    if (zconfig.uploader.disabled_extensions.includes(ext)) return res.error('disabled extension recieved: ' + ext);
+    if (zconfig.uploader.disabled_extensions.includes(ext))
+      return res.error('disabled extension recieved: ' + ext);
     let fileName: string;
 
     switch (format) {
@@ -101,7 +104,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     const image = await prisma.image.create({
       data: {
         file: `${fileName}.${compressionUsed ? 'jpg' : ext}`,
-        mimetype: req.headers.uploadtext ? 'text/plain' : (compressionUsed ? 'image/jpeg' : file.mimetype),
+        mimetype: req.headers.uploadtext ? 'text/plain' : compressionUsed ? 'image/jpeg' : file.mimetype,
         userId: user.id,
         embed: !!req.headers.embed,
         format,
@@ -115,21 +118,37 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     if (compressionUsed) {
       const buffer = await sharp(file.buffer).jpeg({ quality: imageCompressionPercent }).toBuffer();
       await datasource.save(image.file, buffer);
-      Logger.get('image').info(`User ${user.username} (${user.id}) compressed image from ${file.buffer.length} -> ${buffer.length} bytes`);
+      Logger.get('image').info(
+        `User ${user.username} (${user.id}) compressed image from ${file.buffer.length} -> ${buffer.length} bytes`
+      );
     } else {
       await datasource.save(image.file, file.buffer);
     }
 
-    Logger.get('image').info(`User ${user.username} (${user.id}) uploaded an image ${image.file} (${image.id})`);
+    Logger.get('image').info(
+      `User ${user.username} (${user.id}) uploaded an image ${image.file} (${image.id})`
+    );
     if (user.domains.length) {
       const domain = user.domains[Math.floor(Math.random() * user.domains.length)];
-      response.files.push(`${domain}${zconfig.uploader.route === '/' ? '' : zconfig.uploader.route}/${invis ? invis.invis : image.file}`);
+      response.files.push(
+        `${domain}${zconfig.uploader.route === '/' ? '' : zconfig.uploader.route}/${
+          invis ? invis.invis : image.file
+        }`
+      );
     } else {
-      response.files.push(`${zconfig.core.https ? 'https' : 'http'}://${req.headers.host}${zconfig.uploader.route === '/' ? '' : zconfig.uploader.route}/${invis ? invis.invis : image.file}`);
+      response.files.push(
+        `${zconfig.core.https ? 'https' : 'http'}://${req.headers.host}${
+          zconfig.uploader.route === '/' ? '' : zconfig.uploader.route
+        }/${invis ? invis.invis : image.file}`
+      );
     }
 
     if (zconfig.discord?.upload) {
-      await sendUpload(user, image, `${zconfig.core.https ? 'https' : 'http'}://${req.headers.host}/r/${invis ? invis.invis : image.file}`);
+      await sendUpload(
+        user,
+        image,
+        `${zconfig.core.https ? 'https' : 'http'}://${req.headers.host}/r/${invis ? invis.invis : image.file}`
+      );
     }
   }
 
@@ -139,7 +158,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         id: user.id,
       },
       data: {
-        ratelimit: new Date(Date.now() + (zconfig.ratelimit.admin * 1000)),
+        ratelimit: new Date(Date.now() + zconfig.ratelimit.admin * 1000),
       },
     });
   } else if (!user.administrator && zconfig.ratelimit.user > 0) {
@@ -149,7 +168,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
           id: user.id,
         },
         data: {
-          ratelimit: new Date(Date.now() + (zconfig.ratelimit.user * 1000)),
+          ratelimit: new Date(Date.now() + zconfig.ratelimit.user * 1000),
         },
       });
     }
@@ -170,7 +189,7 @@ function run(middleware: any) {
 
 export default async function handlers(req, res) {
   return withZipline(handler)(req, res);
-};
+}
 
 export const config = {
   api: {

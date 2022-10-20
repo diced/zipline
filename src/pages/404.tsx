@@ -15,9 +15,11 @@ export default function FourOhFour() {
       }}
       spacing='sm'
     >
-      <Title sx={{ fontSize: 220, fontWeight: 900, lineHeight: .8 }}>404</Title>
+      <Title sx={{ fontSize: 220, fontWeight: 900, lineHeight: 0.8 }}>404</Title>
       <MutedText sx={{ fontSize: 40, fontWeight: 500 }}>This page does not exist!</MutedText>
-      <Button component={Link} href='/dashboard'>Head to the Dashboard</Button>
+      <Button component={Link} href='/dashboard'>
+        Head to the Dashboard
+      </Button>
     </Stack>
   );
 }

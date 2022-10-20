@@ -23,13 +23,17 @@ async function start() {
   // annoy user if they didnt change secret from default "changethis"
   if (config.core.secret === 'changethis') {
     logger.error('Secret is not set!');
-    logger.error('Running Zipline as is, without a randomized secret is not recommended and leaves your instance at risk!');
+    logger.error(
+      'Running Zipline as is, without a randomized secret is not recommended and leaves your instance at risk!'
+    );
     logger.error('Please change your secret in the config file or environment variables.');
-    logger.error('The config file is located at `config.toml`, or if using docker-compose you can change the variables in the `docker-compose.yml` file.');
+    logger.error(
+      'The config file is located at `config.toml`, or if using docker-compose you can change the variables in the `docker-compose.yml` file.'
+    );
     logger.error('It is recomended to use a secret that is alphanumeric and randomized.');
     logger.error('A way you can generate this is through a password manager you may have.');
     process.exit(1);
-  };
+  }
 
   process.env.DATABASE_URL = config.core.database_url;
   await migrations();
@@ -55,35 +59,33 @@ async function start() {
     },
   });
 
-  router.on('GET', config.uploader.route === '/' ? '/:id(^[^\\.]+\\.[^\\.]+)' : `${config.uploader.route}/:id`, async (req, res, params) => {
-    if (params.id === '') return nextServer.render404(req, res as ServerResponse);
+  router.on(
+    'GET',
+    config.uploader.route === '/' ? '/:id(^[^\\.]+\\.[^\\.]+)' : `${config.uploader.route}/:id`,
+    async (req, res, params) => {
+      if (params.id === '') return nextServer.render404(req, res as ServerResponse);
 
-    const image = await prisma.image.findFirst({
-      where: {
-        OR: [
-          { file: params.id },
-          { invisible: { invis: decodeURI(params.id) } },
-        ],
-      },
-    });
+      const image = await prisma.image.findFirst({
+        where: {
+          OR: [{ file: params.id }, { invisible: { invis: decodeURI(params.id) } }],
+        },
+      });
 
-    if (!image) await rawFile(req, res, nextServer, params.id);
-    else {
-      if (image.password) await handle(req, res);
-      else if (image.embed) await handle(req, res);
-      else await fileDb(req, res, nextServer, prisma, handle, image);
+      if (!image) await rawFile(req, res, nextServer, params.id);
+      else {
+        if (image.password) await handle(req, res);
+        else if (image.embed) await handle(req, res);
+        else await fileDb(req, res, nextServer, prisma, handle, image);
+      }
     }
-  });
+  );
 
   router.on('GET', '/r/:id', async (req, res, params) => {
     if (params.id === '') return nextServer.render404(req, res as ServerResponse);
 
     const image = await prisma.image.findFirst({
       where: {
-        OR: [
-          { file: params.id },
-          { invisible: { invis: decodeURI(params.id) } },
-        ],
+        OR: [{ file: params.id }, { invisible: { invis: decodeURI(params.id) } }],
       },
     });
 
@@ -127,12 +129,7 @@ async function start() {
   }, config.core.invites_interval * 1000);
 }
 
-async function rawFile(
-  req: IncomingMessage,
-  res: OutgoingMessage,
-  nextServer: NextServer,
-  id: string,
-) {
+async function rawFile(req: IncomingMessage, res: OutgoingMessage, nextServer: NextServer, id: string) {
   const data = await datasource.get(id);
   if (!data) return nextServer.render404(req, res as ServerResponse);
   const mimetype = await guess(extname(id));
@@ -151,7 +148,7 @@ async function rawFileDb(
   res: OutgoingMessage,
   nextServer: NextServer,
   prisma: PrismaClient,
-  image: Image,
+  image: Image
 ) {
   if (image.expires_at && image.expires_at < new Date()) {
     Logger.get('server').info(`${image.file} expired`);
@@ -185,7 +182,7 @@ async function fileDb(
   nextServer: NextServer,
   prisma: PrismaClient,
   handle: RequestHandler,
-  image: Image,
+  image: Image
 ) {
   if (image.expires_at && image.expires_at < new Date()) {
     await datasource.delete(image.file);

@@ -10,15 +10,13 @@ export default function ManagePage(props) {
   const { loading } = useLogin();
 
   if (loading) return <LoadingOverlay visible={loading} />;
-  
+
   return (
     <>
       <Head>
         <title>{props.title} - Manage User</title>
       </Head>
-      <Layout
-        props={props}
-      >
+      <Layout props={props}>
         <Manage />
       </Layout>
     </>

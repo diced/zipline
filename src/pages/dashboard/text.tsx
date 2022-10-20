@@ -10,16 +10,14 @@ export default function UploadTextPage(props) {
   const { loading } = useLogin();
 
   if (loading) return <LoadingOverlay visible={loading} />;
-  
+
   return (
     <>
       <Head>
         <title>{props.title} - Upload Text</title>
       </Head>
-      <Layout
-        props={props}
-      >
-        <UploadText/>
+      <Layout props={props}>
+        <UploadText />
       </Layout>
     </>
   );

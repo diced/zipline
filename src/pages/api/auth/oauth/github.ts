@@ -7,7 +7,7 @@ import { github_auth } from 'lib/oauth';
 
 async function handler(req: NextApiReq, res: NextApiRes) {
   if (!config.features.oauth_registration) return res.forbid('oauth registration disabled');
-  
+
   if (!notNull(config.oauth.github_client_id, config.oauth.github_client_secret)) {
     Logger.get('oauth').error('GitHub OAuth is not configured');
     return res.bad('GitHub OAuth is not configured');
@@ -21,7 +21,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Accept': 'application/json',
+      Accept: 'application/json',
     },
     body: JSON.stringify({
       client_id: config.oauth.github_client_id,
@@ -58,7 +58,11 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     });
 
     req.cleanCookie('user');
-    res.setCookie('user', existing.id, { sameSite: true, expires: new Date(Date.now() + (6.048e+8 * 2)), path: '/' });
+    res.setCookie('user', existing.id, {
+      sameSite: true,
+      expires: new Date(Date.now() + 6.048e8 * 2),
+      path: '/',
+    });
     Logger.get('user').info(`User ${existing.username} (${existing.id}) logged in via oauth(github)`);
 
     return res.redirect('/dashboard');
@@ -79,7 +83,11 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   Logger.get('user').info(`Created user ${user.username} via oauth(github)`);
 
   req.cleanCookie('user');
-  res.setCookie('user', user.id, { sameSite: true, expires: new Date(Date.now() + (6.048e+8 * 2)), path: '/' });
+  res.setCookie('user', user.id, {
+    sameSite: true,
+    expires: new Date(Date.now() + 6.048e8 * 2),
+    path: '/',
+  });
   Logger.get('user').info(`User ${user.username} (${user.id}) logged in via oauth(github)`);
 
   return res.redirect('/dashboard');

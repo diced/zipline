@@ -10,16 +10,14 @@ export default function FilesPage(props) {
   const { loading } = useLogin();
 
   if (loading) return <LoadingOverlay visible={loading} />;
-  
+
   return (
     <>
       <Head>
         <title>{props.title} - Files</title>
       </Head>
 
-      <Layout
-        props={props}
-      >
+      <Layout props={props}>
         <Files disableMediaPreview={props.disable_media_preview} />
       </Layout>
     </>

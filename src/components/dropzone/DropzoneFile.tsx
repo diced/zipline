@@ -46,9 +46,7 @@ export default function FileDropzone({ file }: { file: File }) {
         </div>
       }
     >
-      <Badge size='lg'>
-        {file.name}
-      </Badge>
+      <Badge size='lg'>{file.name}</Badge>
     </Tooltip>
   );
 }

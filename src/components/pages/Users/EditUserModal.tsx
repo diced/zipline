@@ -6,16 +6,17 @@ import useFetch from 'hooks/useFetch';
 
 export function EditUserModal({ open, setOpen, updateUsers, user }) {
   let form;
-  
-  if (user) form = useForm({
-    initialValues: {
-      username: user?.username,
-      password: '',
-      administrator: user?.administrator,
-    },
-  });
 
-  const onSubmit = async values => {
+  if (user)
+    form = useForm({
+      initialValues: {
+        username: user?.username,
+        password: '',
+        administrator: user?.administrator,
+      },
+    });
+
+  const onSubmit = async (values) => {
     const cleanUsername = values.username.trim();
     const cleanPassword = values.password.trim();
 
@@ -27,7 +28,6 @@ export function EditUserModal({ open, setOpen, updateUsers, user }) {
 
     if (cleanUsername !== '' && cleanUsername !== user.username) data.username = cleanUsername;
     if (cleanPassword !== '') data.password = cleanPassword;
-
 
     setOpen(false);
     const res = await useFetch('/api/user/' + user.id, 'PATCH', data);
@@ -51,13 +51,9 @@ export function EditUserModal({ open, setOpen, updateUsers, user }) {
   };
 
   return (
-    <Modal
-      opened={open}
-      onClose={() => setOpen(false)}
-      title={<Title>Edit User {user?.username}</Title>}
-    >
+    <Modal opened={open} onClose={() => setOpen(false)} title={<Title>Edit User {user?.username}</Title>}>
       {user && (
-        <form onSubmit={form.onSubmit(v => onSubmit(v))}>
+        <form onSubmit={form.onSubmit((v) => onSubmit(v))}>
           <TextInput id='username' label='Username' {...form.getInputProps('username')} />
           <TextInput id='password' label='Password' type='password' {...form.getInputProps('password')} />
           <Switch mt={12} id='administrator' label='Administrator' {...form.getInputProps('administrator')} />

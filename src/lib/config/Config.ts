@@ -5,7 +5,7 @@ export interface ConfigCore {
   port: number;
   database_url: string;
   logger: boolean;
-  
+
   stats_interval: number;
   invites_interval: number;
 }

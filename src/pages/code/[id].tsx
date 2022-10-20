@@ -4,18 +4,16 @@ import { streamToString } from 'lib/utils/streams';
 import { GetServerSideProps } from 'next';
 
 type CodeProps = {
-  code: string,
-  id: string,
-}
+  code: string;
+  id: string;
+};
 
 // Code component
-export default function Code(
-  { code, id }: CodeProps
-) {
+export default function Code({ code, id }: CodeProps) {
   return (
-    <Prism 
-      sx={t => ({ height: '100vh', backgroundColor: t.colors.dark[8] })}
-      withLineNumbers 
+    <Prism
+      sx={(t) => ({ height: '100vh', backgroundColor: t.colors.dark[8] })}
+      withLineNumbers
       language={exts[id.split('.').pop()]?.toLowerCase()}
     >
       {code}
@@ -30,14 +28,12 @@ export const getServerSideProps: GetServerSideProps<CodeProps> = async (context)
   const { default: datasource } = await import('lib/datasource');
 
   const data = await datasource.get(context.params.id as string);
-  if (!data) return {
-    notFound: true,
-  };
+  if (!data)
+    return {
+      notFound: true,
+    };
 
-  context.res.setHeader(
-    'Cache-Control',
-    'public, max-age=2628000, stale-while-revalidate=86400'
-  );
+  context.res.setHeader('Cache-Control', 'public, max-age=2628000, stale-while-revalidate=86400');
 
   return {
     props: {

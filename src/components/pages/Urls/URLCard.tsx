@@ -5,13 +5,11 @@ import { CopyIcon, CrossIcon, DeleteIcon, ExternalLinkIcon } from 'components/ic
 import TrashIcon from 'components/icons/TrashIcon';
 import { URLResponse, useURLDelete } from 'lib/queries/url';
 
-export default function URLCard({ url }: {
-  url: URLResponse
-}) {
+export default function URLCard({ url }: { url: URLResponse }) {
   const clipboard = useClipboard();
   const urlDelete = useURLDelete();
-  
-  const copyURL = u => {
+
+  const copyURL = (u) => {
     clipboard.copy(`${window.location.protocol}//${window.location.host}${u.url}`);
     showNotification({
       title: 'Copied to clipboard',
@@ -20,7 +18,7 @@ export default function URLCard({ url }: {
     });
   };
 
-  const deleteURL = async u => {
+  const deleteURL = async (u) => {
     urlDelete.mutate(u.id, {
       onSuccess: () => {
         showNotification({
@@ -44,7 +42,7 @@ export default function URLCard({ url }: {
 
   return (
     <Card key={url.id} sx={{ maxWidth: '100%' }} shadow='sm'>
-      <LoadingOverlay visible={urlDelete.isLoading}/>
+      <LoadingOverlay visible={urlDelete.isLoading} />
 
       <Group position='apart'>
         <Group position='left'>

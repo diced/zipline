@@ -45,27 +45,28 @@ export default function Users() {
   };
 
   // 2-step modal for deleting user if they want to delete their images too.
-  const openDeleteModal = user => modals.openConfirmModal({
-    title: `Delete ${user.username}?`,
-    closeOnConfirm: false,
-    labels: { confirm: 'Yes', cancel: 'No' },
-    onConfirm: () => {
-      modals.openConfirmModal({
-        title: `Delete ${user.username}'s images?`,
-        labels: { confirm: 'Yes', cancel: 'No' },
-        centered: true,
-        overlayBlur: 3,
-        onConfirm: () => {
-          handleDelete(user, true);
-          modals.closeAll();
-        },
-        onCancel: () => {
-          handleDelete(user, false);
-          modals.closeAll();
-        },
-      });
-    },
-  });
+  const openDeleteModal = (user) =>
+    modals.openConfirmModal({
+      title: `Delete ${user.username}?`,
+      closeOnConfirm: false,
+      labels: { confirm: 'Yes', cancel: 'No' },
+      onConfirm: () => {
+        modals.openConfirmModal({
+          title: `Delete ${user.username}'s images?`,
+          labels: { confirm: 'Yes', cancel: 'No' },
+          centered: true,
+          overlayBlur: 3,
+          onConfirm: () => {
+            handleDelete(user, true);
+            modals.closeAll();
+          },
+          onCancel: () => {
+            handleDelete(user, false);
+            modals.closeAll();
+          },
+        });
+      },
+    });
 
   const updateUsers = async () => {
     const us = await useFetch('/api/users');
@@ -73,7 +74,7 @@ export default function Users() {
       setUsers(us);
     } else {
       router.push('/dashboard');
-    };
+    }
   };
 
   useEffect(() => {
@@ -84,47 +85,56 @@ export default function Users() {
     <>
       <CreateUserModal open={createOpen} setOpen={setCreateOpen} updateUsers={updateUsers} />
       <EditUserModal open={editOpen} setOpen={setEditOpen} updateUsers={updateUsers} user={selectedUser} />
-      
+
       <Group mb='md'>
         <Title>Users</Title>
-        <ActionIcon variant='filled' color='primary' onClick={() => setCreateOpen(true)}><PlusIcon /></ActionIcon>
+        <ActionIcon variant='filled' color='primary' onClick={() => setCreateOpen(true)}>
+          <PlusIcon />
+        </ActionIcon>
       </Group>
-      <SimpleGrid
-        cols={3}
-        spacing='lg'
-        breakpoints={[
-          { maxWidth: 'sm', cols: 1, spacing: 'sm' },
-        ]}
-      >
-        {users.length ? users.filter(x => x.username !== user.username).map(user => (
-          <Card key={user.id} sx={{ maxWidth: '100%' }}>
-            <Group position='apart'>
-              <Group position='left'>
-                <Avatar size='lg' color={user.administrator ? 'primary' : 'dark'} src={user.avatar ?? null}>{user.username[0]}</Avatar>
-                <Stack spacing={0}>
-                  <Title>{user.username}</Title>
-                  <MutedText size='sm'>ID: {user.id}</MutedText>
-                  <MutedText size='sm'>Administrator: {user.administrator ? 'yes' : 'no'}</MutedText>
-                </Stack>
-              </Group>
-              <Group position='right'>
-                {user.administrator ? null : (
-                  <>
-                    <ActionIcon aria-label='edit' onClick={() => {setEditOpen(true); setSelectedUser(user);}}>
-                      <PencilIcon />
-                    </ActionIcon>
-                    <ActionIcon aria-label='delete' onClick={() => openDeleteModal(user)}>
-                      <DeleteIcon />
-                    </ActionIcon>
-                  </>
-                )}
-                
-              </Group>
-            </Group>
-          </Card>
-        )) : [1, 2, 3].map(x => (
-          <Skeleton key={x} width='100%' height={100} radius='sm' />
-        ))}
+      <SimpleGrid cols={3} spacing='lg' breakpoints={[{ maxWidth: 'sm', cols: 1, spacing: 'sm' }]}>
+        {users.length
+          ? users
+              .filter((x) => x.username !== user.username)
+              .map((user) => (
+                <Card key={user.id} sx={{ maxWidth: '100%' }}>
+                  <Group position='apart'>
+                    <Group position='left'>
+                      <Avatar
+                        size='lg'
+                        color={user.administrator ? 'primary' : 'dark'}
+                        src={user.avatar ?? null}
+                      >
+                        {user.username[0]}
+                      </Avatar>
+                      <Stack spacing={0}>
+                        <Title>{user.username}</Title>
+                        <MutedText size='sm'>ID: {user.id}</MutedText>
+                        <MutedText size='sm'>Administrator: {user.administrator ? 'yes' : 'no'}</MutedText>
+                      </Stack>
+                    </Group>
+                    <Group position='right'>
+                      {user.administrator ? null : (
+                        <>
+                          <ActionIcon
+                            aria-label='edit'
+                            onClick={() => {
+                              setEditOpen(true);
+                              setSelectedUser(user);
+                            }}
+                          >
+                            <PencilIcon />
+                          </ActionIcon>
+                          <ActionIcon aria-label='delete' onClick={() => openDeleteModal(user)}>
+                            <DeleteIcon />
+                          </ActionIcon>
+                        </>
+                      )}
+                    </Group>
+                  </Group>
+                </Card>
+              ))
+          : [1, 2, 3].map((x) => <Skeleton key={x} width='100%' height={100} radius='sm' />)}
       </SimpleGrid>
     </>
   );

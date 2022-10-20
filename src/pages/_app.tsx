@@ -11,9 +11,7 @@ export default function MyApp({ Component, pageProps }) {
       <Head>
         <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
       </Head>
-      <QueryClientProvider
-        client={queryClient}
-      >
+      <QueryClientProvider client={queryClient}>
         <ZiplineTheming Component={Component} pageProps={pageProps} />
       </QueryClientProvider>
     </RecoilRoot>

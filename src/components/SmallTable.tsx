@@ -7,18 +7,16 @@ export function SmallTable({ rows, columns }) {
       <Table highlightOnHover>
         <thead>
           <tr>
-            {columns.map(col => (
+            {columns.map((col) => (
               <th key={randomId()}>{col.name}</th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {rows.map(row => (
+          {rows.map((row) => (
             <tr key={randomId()}>
-              {columns.map(col => (
-                <td key={randomId()}>
-                  {col.format ? col.format(row[col.id]) : row[col.id]}
-                </td>
+              {columns.map((col) => (
+                <td key={randomId()}>{col.format ? col.format(row[col.id]) : row[col.id]}</td>
               ))}
             </tr>
           ))}

@@ -46,7 +46,10 @@ export function relativeTime(to: Date, from: Date = new Date()) {
 
   for (const unit in units) {
     if (time > units[unit]) {
-      return rtf.format(Math.floor(Math.round(time.getTime() / units[unit])), unit as Intl.RelativeTimeFormatUnit || 'second');
+      return rtf.format(
+        Math.floor(Math.round(time.getTime() / units[unit])),
+        (unit as Intl.RelativeTimeFormatUnit) || 'second'
+      );
     }
   }
 }

@@ -63,7 +63,6 @@ export default function readConfig() {
     map('DATASOURCE_S3_REGION', 'string', 'datasource.s3.region'),
     map('DATASOURCE_S3_USE_SSL', 'boolean', 'datasource.s3.use_ssl'),
 
-
     map('DATASOURCE_SWIFT_USERNAME', 'string', 'datasource.swift.username'),
     map('DATASOURCE_SWIFT_PASSWORD', 'string', 'datasource.swift.password'),
     map('DATASOURCE_SWIFT_AUTH_ENDPOINT', 'string', 'datasource.swift.auth_endpoint'),
@@ -152,7 +151,7 @@ export default function readConfig() {
         default:
           parsed = value;
           break;
-      };
+      }
 
       set(config, map.path, parsed);
     }

@@ -26,7 +26,7 @@ export default function Upload() {
     });
 
     const req = new XMLHttpRequest();
-    req.addEventListener('load', e => {
+    req.addEventListener('load', (e) => {
       // @ts-ignore not sure why it thinks response doesnt exist, but it does.
       const json = JSON.parse(e.target.response);
 
@@ -34,7 +34,17 @@ export default function Upload() {
         updateNotification({
           id: 'upload-text',
           title: 'Upload Successful',
-          message: <>Copied first file to clipboard! <br />{json.files.map(x => (<Link key={x} href={x}>{x}<br /></Link>))}</>,
+          message: (
+            <>
+              Copied first file to clipboard! <br />
+              {json.files.map((x) => (
+                <Link key={x} href={x}>
+                  {x}
+                  <br />
+                </Link>
+              ))}
+            </>
+          ),
         });
       }
     });
@@ -53,20 +63,23 @@ export default function Upload() {
     <>
       <Title mb='md'>Upload Text</Title>
 
-      <CodeInput
-        value={value}
-        onChange={e => setValue(e.target.value)}
-      />
+      <CodeInput value={value} onChange={(e) => setValue(e.target.value)} />
 
       <Group position='right' mt='md'>
         <Select
           value={lang}
           onChange={setLang}
           dropdownPosition='top'
-          data={Object.keys(exts).map(x => ({ value: x, label: exts[x] }))}
+          data={Object.keys(exts).map((x) => ({ value: x, label: exts[x] }))}
           icon={<TypeIcon />}
         />
-        <Button leftIcon={<UploadIcon />} onClick={handleUpload} disabled={value.trim().length === 0 ? true : false}>Upload</Button>
+        <Button
+          leftIcon={<UploadIcon />}
+          onClick={handleUpload}
+          disabled={value.trim().length === 0 ? true : false}
+        >
+          Upload
+        </Button>
       </Group>
     </>
   );

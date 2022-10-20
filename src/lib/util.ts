@@ -26,10 +26,7 @@ export function createToken() {
 }
 
 export function sign(value: string, secret: string): string {
-  const signed = value + ':' + createHmac('sha256', secret)
-    .update(value)
-    .digest('base64')
-    .replace(/=+$/, '');
+  const signed = value + ':' + createHmac('sha256', secret).update(value).digest('base64').replace(/=+$/, '');
 
   return signed;
 }
@@ -59,7 +56,7 @@ export function chunk<T>(arr: T[], size: number): Array<T[]> {
   let i = 0;
 
   while (i < L) {
-    result.push(arr.slice(i, i += size));
+    result.push(arr.slice(i, (i += size)));
   }
 
   return result;
@@ -93,7 +90,11 @@ export function randomInvis(length: number) {
   // some parts from https://github.com/tycrek/ass/blob/master/generators/lengthGen.js
   const invisibleCharset = ['\u200B', '\u2060', '\u200C', '\u200D'];
 
-  return [...randomBytes(length)].map((byte) => invisibleCharset[Number(byte) % invisibleCharset.length]).join('').slice(1).concat(invisibleCharset[0]);
+  return [...randomBytes(length)]
+    .map((byte) => invisibleCharset[Number(byte) % invisibleCharset.length])
+    .join('')
+    .slice(1)
+    .concat(invisibleCharset[0]);
 }
 
 export function createInvisImage(length: number, imageId: number) {

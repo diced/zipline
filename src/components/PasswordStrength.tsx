@@ -6,12 +6,7 @@ import { CheckIcon, CrossIcon } from './icons';
 
 function PasswordRequirement({ meets, label }: { meets: boolean; label: string }) {
   return (
-    <Text
-      color={meets ? 'teal' : 'red'}
-      sx={{ display: 'flex', alignItems: 'center' }}
-      mt='sm'
-      size='sm'
-    >
+    <Text color={meets ? 'teal' : 'red'} sx={{ display: 'flex', alignItems: 'center' }} mt='sm' size='sm'>
       {meets ? <CheckIcon /> : <CrossIcon />} <Box ml='md'>{label}</Box>
     </Text>
   );
@@ -60,10 +55,7 @@ export default function PasswordStrength({ value, setValue, setStrength, ...prop
       }}
     >
       <Popover.Target>
-        <div
-          onFocusCapture={() => setPopoverOpened(true)}
-          onBlurCapture={() => setPopoverOpened(false)}
-        >
+        <div onFocusCapture={() => setPopoverOpened(true)} onBlurCapture={() => setPopoverOpened(false)}>
           <PasswordInput
             label='Password'
             description='A strong password should include letters in lower and uppercase, at least 1 number, at least 1 special symbol'

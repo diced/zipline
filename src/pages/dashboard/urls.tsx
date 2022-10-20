@@ -16,9 +16,7 @@ export default function UrlsPage(props) {
       <Head>
         <title>{props.title} - URLs</title>
       </Head>
-      <Layout
-        props={props}
-      >
+      <Layout props={props}>
         <Urls />
       </Layout>
     </>

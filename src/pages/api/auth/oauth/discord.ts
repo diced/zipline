@@ -14,7 +14,13 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   }
 
   const { code } = req.query as { code: string };
-  if (!code) return res.redirect(discord_auth.oauth_url(config.oauth.discord_client_id, `${config.core.https ? 'https' : 'http'}://${req.headers.host}`));
+  if (!code)
+    return res.redirect(
+      discord_auth.oauth_url(
+        config.oauth.discord_client_id,
+        `${config.core.https ? 'https' : 'http'}://${req.headers.host}`
+      )
+    );
 
   const resp = await fetch('https://discord.com/api/oauth2/token', {
     method: 'POST',
@@ -38,7 +44,9 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   const userJson = await discord_auth.oauth_user(json.access_token);
   if (!userJson) return res.error('invalid user request');
 
-  const avatar = userJson.avatar ? `https://cdn.discordapp.com/avatars/${userJson.id}/${userJson.avatar}.png` : `https://cdn.discordapp.com/embed/avatars/${userJson.discriminator % 5}.png`;
+  const avatar = userJson.avatar
+    ? `https://cdn.discordapp.com/avatars/${userJson.id}/${userJson.avatar}.png`
+    : `https://cdn.discordapp.com/embed/avatars/${userJson.discriminator % 5}.png`;
   const avatarBase64 = await getBase64URLFromURL(avatar);
 
   const existing = await prisma.user.findFirst({
@@ -58,7 +66,11 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     });
 
     req.cleanCookie('user');
-    res.setCookie('user', existing.id, { sameSite: true, expires: new Date(Date.now() + (6.048e+8 * 2)), path: '/' });
+    res.setCookie('user', existing.id, {
+      sameSite: true,
+      expires: new Date(Date.now() + 6.048e8 * 2),
+      path: '/',
+    });
     Logger.get('user').info(`User ${existing.username} (${existing.id}) logged in via oauth(discord)`);
 
     return res.redirect('/dashboard');
@@ -79,7 +91,11 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   Logger.get('user').info(`Created user ${user.username} via oauth(discord)`);
 
   req.cleanCookie('user');
-  res.setCookie('user', user.id, { sameSite: true, expires: new Date(Date.now() + (6.048e+8 * 2)), path: '/' });
+  res.setCookie('user', user.id, {
+    sameSite: true,
+    expires: new Date(Date.now() + 6.048e8 * 2),
+    path: '/',
+  });
   Logger.get('user').info(`User ${user.username} (${user.id}) logged in via oauth(discord)`);
 
   return res.redirect('/dashboard');

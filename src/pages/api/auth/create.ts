@@ -8,12 +8,16 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   if (req.method === 'POST' && req.body && req.body.code) {
     if (!config.features.invites) return res.forbid('invites are disabled');
 
-    const { code, username, password } = req.body as { code: string; username: string, password: string };
+    const { code, username, password } = req.body as {
+      code: string;
+      username: string;
+      password: string;
+    };
     const invite = await prisma.invite.findUnique({
       where: { code },
     });
     if (!invite) return res.bad('invalid invite code');
-    
+
     const user = await prisma.user.findFirst({
       where: { username },
     });
@@ -49,7 +53,11 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
   if (req.method !== 'POST') return res.status(405).end();
 
-  const { username, password, administrator } = req.body as { username: string, password: string, administrator: boolean };
+  const { username, password, administrator } = req.body as {
+    username: string;
+    password: string;
+    administrator: boolean;
+  };
 
   if (!username) return res.bad('no username');
   if (!password) return res.bad('no auth');

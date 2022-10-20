@@ -29,14 +29,15 @@ export default function Login({ title, oauth_registration, oauth_providers: unpa
     },
   });
 
-  const onSubmit = async values => {
+  const onSubmit = async (values) => {
     const username = values.username.trim();
     const password = values.password.trim();
 
-    if (username === '') return form.setFieldError('username', 'Username can\'t be nothing');
+    if (username === '') return form.setFieldError('username', "Username can't be nothing");
 
     const res = await useFetch('/api/auth/login', 'POST', {
-      username, password,
+      username,
+      password,
     });
 
     if (res.error) {
@@ -47,7 +48,7 @@ export default function Login({ title, oauth_registration, oauth_providers: unpa
         form.setFieldError('password', 'Invalid password');
       }
     } else {
-      await router.push(router.query.url as string || '/dashboard');
+      await router.push((router.query.url as string) || '/dashboard');
     }
   };
 
@@ -70,14 +71,18 @@ export default function Login({ title, oauth_registration, oauth_providers: unpa
             <TextInput size='lg' id='username' label='Username' {...form.getInputProps('username')} />
             <PasswordInput size='lg' id='password' label='Password' {...form.getInputProps('password')} />
 
-            <Button size='lg' type='submit' fullWidth mt={12}>Login</Button>
+            <Button size='lg' type='submit' fullWidth mt={12}>
+              Login
+            </Button>
           </form>
           {oauth_registration && (
             <>
               <Divider label='or' labelPosition='center' my={8} />
               {oauth_providers.map(({ url, name, Icon }, i) => (
                 <Link key={i} href={url} passHref>
-                  <Button size='lg' fullWidth leftIcon={<Icon />} component='a' my={8}>Login in with {name}</Button>
+                  <Button size='lg' fullWidth leftIcon={<Icon />} component='a' my={8}>
+                    Login in with {name}
+                  </Button>
                 </Link>
               ))}
             </>

@@ -13,11 +13,11 @@ export function CreateUserModal({ open, setOpen, updateUsers }) {
     },
   });
 
-  const onSubmit = async values => {
+  const onSubmit = async (values) => {
     const cleanUsername = values.username.trim();
     const cleanPassword = values.password.trim();
-    if (cleanUsername === '') return form.setFieldError('username', 'Username can\'t be nothing');
-    if (cleanPassword === '') return form.setFieldError('password', 'Password can\'t be nothing');
+    if (cleanUsername === '') return form.setFieldError('username', "Username can't be nothing");
+    if (cleanPassword === '') return form.setFieldError('password', "Password can't be nothing");
 
     const data = {
       username: cleanUsername,
@@ -47,12 +47,8 @@ export function CreateUserModal({ open, setOpen, updateUsers }) {
   };
 
   return (
-    <Modal
-      opened={open}
-      onClose={() => setOpen(false)}
-      title={<Title>Create User</Title>}
-    >
-      <form onSubmit={form.onSubmit(v => onSubmit(v))}>
+    <Modal opened={open} onClose={() => setOpen(false)} title={<Title>Create User</Title>}>
+      <form onSubmit={form.onSubmit((v) => onSubmit(v))}>
         <TextInput id='username' label='Username' {...form.getInputProps('username')} />
         <TextInput id='password' label='Password' type='password' {...form.getInputProps('password')} />
         <Switch mt={12} id='administrator' label='Administrator' {...form.getInputProps('administrator')} />

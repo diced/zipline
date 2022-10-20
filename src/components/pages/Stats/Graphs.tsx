@@ -1,5 +1,16 @@
 import { Box, Card, Grid, LoadingOverlay, MantineTheme, Title, useMantineTheme } from '@mantine/core';
-import { ArcElement, CategoryScale, Chart as ChartJS, ChartData, ChartOptions, LinearScale, LineController, LineElement, PointElement, Tooltip } from 'chart.js';
+import {
+  ArcElement,
+  CategoryScale,
+  Chart as ChartJS,
+  ChartData,
+  ChartOptions,
+  LinearScale,
+  LineController,
+  LineElement,
+  PointElement,
+  Tooltip,
+} from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import ColorHash from 'color-hash';
 import { bytesToRead } from 'lib/utils/client';
@@ -49,13 +60,12 @@ const CHART_OPTIONS = (theme: MantineTheme): ChartOptions => ({
   },
 });
 
-
 type LineChartData = ChartData<'line', number[], string>;
 type ChartDataMemo = {
-  views: LineChartData,
-  uploads: LineChartData,
-  uploadTypes: ChartData<'pie', number[], string>,
-  storage: LineChartData,
+  views: LineChartData;
+  uploads: LineChartData;
+  uploadTypes: ChartData<'pie', number[], string>;
+  storage: LineChartData;
 } | void;
 
 export default function Graphs() {
@@ -77,41 +87,49 @@ export default function Graphs() {
     return {
       views: {
         labels,
-        datasets: [{
-          label: 'Views',
-          data: viewData,
-          borderColor: theme.colors.blue[6],
-          backgroundColor: theme.colors.blue[0],
-        }],
+        datasets: [
+          {
+            label: 'Views',
+            data: viewData,
+            borderColor: theme.colors.blue[6],
+            backgroundColor: theme.colors.blue[0],
+          },
+        ],
       },
 
       uploads: {
         labels,
-        datasets: [{
-          label: 'Uploads',
-          data: uploadData,
-          borderColor: theme.colors.blue[6],
-          backgroundColor: theme.colors.blue[0],
-        }],
+        datasets: [
+          {
+            label: 'Uploads',
+            data: uploadData,
+            borderColor: theme.colors.blue[6],
+            backgroundColor: theme.colors.blue[0],
+          },
+        ],
       },
 
       uploadTypes: {
         labels: latest?.data.types_count.map((x) => x.mimetype),
-        datasets: [{
-          data: latest?.data.types_count.map((x) => x.count),
-          label: 'Upload Types',
-          backgroundColor: latest?.data.types_count.map((x) => hash.hex(x.mimetype)),
-        }],
+        datasets: [
+          {
+            data: latest?.data.types_count.map((x) => x.count),
+            label: 'Upload Types',
+            backgroundColor: latest?.data.types_count.map((x) => hash.hex(x.mimetype)),
+          },
+        ],
       },
 
       storage: {
         labels,
-        datasets: [{
-          label: 'Storage',
-          data: storageData,
-          borderColor: theme.colors.blue[6],
-          backgroundColor: theme.colors.blue[0],
-        }],
+        datasets: [
+          {
+            label: 'Storage',
+            data: storageData,
+            borderColor: theme.colors.blue[6],
+            backgroundColor: theme.colors.blue[0],
+          },
+        ],
       },
     };
   }, [historicalStats]);
@@ -125,48 +143,43 @@ export default function Graphs() {
         <Grid.Col md={12} lg={4}>
           <Card>
             <Title size='h4'>Upload Types</Title>
-            {
-              chartData && (
-                <Pie
-                  data={chartData.uploadTypes}
-
-                  options={{
-                    plugins: {
-                      datalabels: {
-                        formatter: (_, ctx) => {
-                          // mime: count
-                          const mime = ctx.chart.data.labels[ctx.dataIndex];
-                          const count = ctx.chart.data.datasets[0].data[ctx.dataIndex];
-                          return `${mime}: ${count}`;
-                        },
-
-                        color: 'white',
-                        textShadowBlur: 7,
-                        textShadowColor: 'black',
+            {chartData && (
+              <Pie
+                data={chartData.uploadTypes}
+                options={{
+                  plugins: {
+                    datalabels: {
+                      formatter: (_, ctx) => {
+                        // mime: count
+                        const mime = ctx.chart.data.labels[ctx.dataIndex];
+                        const count = ctx.chart.data.datasets[0].data[ctx.dataIndex];
+                        return `${mime}: ${count}`;
                       },
+
+                      color: 'white',
+                      textShadowBlur: 7,
+                      textShadowColor: 'black',
                     },
-                  }}
-                  style={{ maxHeight: '20vh' }}
-                />
-              )
-            }
+                  },
+                }}
+                style={{ maxHeight: '20vh' }}
+              />
+            )}
           </Card>
         </Grid.Col>
-        
+
         {/* 3/4 - views */}
         <Grid.Col md={12} lg={8}>
           <Card>
             <Title size='h4'>Total Views</Title>
-            {
-              chartData && (
-                <Chart
-                  type='line'
-                  data={chartData.views}
-                  options={chartOptions}
-                  style={{ maxHeight: '20vh' }}
-                />
-              )
-            }
+            {chartData && (
+              <Chart
+                type='line'
+                data={chartData.views}
+                options={chartOptions}
+                style={{ maxHeight: '20vh' }}
+              />
+            )}
           </Card>
         </Grid.Col>
 
@@ -174,16 +187,14 @@ export default function Graphs() {
         <Grid.Col md={12} lg={6}>
           <Card>
             <Title size='h4'>Total Uploads</Title>
-            {
-              chartData && (
-                <Chart
-                  type='line'
-                  data={chartData.uploads}
-                  options={chartOptions}
-                  style={{ maxHeight: '20vh' }}
-                />
-              )
-            }
+            {chartData && (
+              <Chart
+                type='line'
+                data={chartData.uploads}
+                options={chartOptions}
+                style={{ maxHeight: '20vh' }}
+              />
+            )}
           </Card>
         </Grid.Col>
 
@@ -191,43 +202,41 @@ export default function Graphs() {
         <Grid.Col md={12} lg={6}>
           <Card>
             <Title size='h4'>Storage Usage</Title>
-            {
-              chartData && (
-                <Chart
-                  type='line'
-                  data={chartData.storage}
-                  options={{
-                    ...chartOptions,
+            {chartData && (
+              <Chart
+                type='line'
+                data={chartData.storage}
+                options={{
+                  ...chartOptions,
 
-                    scales: {
-                      ...chartOptions.scales,
-                      y: {
-                        ...chartOptions.scales.y,
+                  scales: {
+                    ...chartOptions.scales,
+                    y: {
+                      ...chartOptions.scales.y,
 
-                        ticks: {
-                          callback: (value) => bytesToRead(value as number),
-                          color: theme.colors.gray[6],
+                      ticks: {
+                        callback: (value) => bytesToRead(value as number),
+                        color: theme.colors.gray[6],
+                      },
+                    },
+                  },
+
+                  plugins: {
+                    ...chartOptions.plugins,
+                    tooltip: {
+                      ...chartOptions.plugins.tooltip,
+                      callbacks: {
+                        label: (context) => {
+                          const value = context.raw as number;
+                          return bytesToRead(value);
                         },
                       },
                     },
-
-                    plugins: {
-                      ...chartOptions.plugins,
-                      tooltip: {
-                        ...chartOptions.plugins.tooltip,
-                        callbacks: {
-                          label: (context) => {
-                            const value = context.raw as number;
-                            return bytesToRead(value);
-                          },
-                        },
-                      },
-                    },
-                  }}
-                  style={{ maxHeight: '20vh' }}
-                />
-              )
-            }
+                  },
+                }}
+                style={{ maxHeight: '20vh' }}
+              />
+            )}
           </Card>
         </Grid.Col>
       </Grid>
