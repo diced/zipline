@@ -22,6 +22,9 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     where: {
       token: req.headers.authorization,
     },
+    include: {
+      limit: true,
+    },
   });
 
   if (!user) return res.forbid('authorization incorect');
@@ -39,6 +42,178 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     } else {
       return res.ratelimited(remaining);
     }
+  }
+
+  if (user.limit && !user.administrator) {
+    const userLimit = user.limit;
+    let stopped: boolean = false;
+    switch (userLimit.type_time) {
+      case 'daily':
+        if (userLimit.limit_by === 'count') {
+          const count = await prisma.image.count({
+            where: {
+              userId: user.id,
+              created_at: {
+                gt: dayjs().startOf('day').toDate(),
+              },
+            },
+          });
+          if (count >= userLimit.limit) {
+            stopped = true;
+            return res.forbid(`daily limit reached: ${userLimit.limit} File(s)`);
+          }
+          break;
+        } else if (userLimit.limit_by === 'byte') {
+          const imgs = await prisma.image.findMany({
+            where: {
+              userId: user.id,
+              created_at: {
+                gt: dayjs().startOf('day').toDate(),
+              },
+            },
+            select: {
+              file: true,
+            },
+          });
+          const totalSize = (
+            await Promise.all(imgs.map(async ({ file }) => await datasource.size(file)))
+          ).reduce((a, b) => a + b, 0);
+          if (totalSize >= userLimit.limit) {
+            stopped = true;
+            return res.forbid(`daily limit reached: ${userLimit.limit} Byte(s)`);
+          }
+          break;
+        } else {
+          Logger.get('image').info(
+            `User ${user.username} (${user.id}) has unique limit type: ${userLimit.limit_by}`
+          );
+        }
+      case 'weekly':
+        if (userLimit.limit_by === 'count') {
+          const count = await prisma.image.count({
+            where: {
+              userId: user.id,
+              created_at: {
+                gt: dayjs().startOf('week').toDate(),
+              },
+            },
+          });
+          if (count >= userLimit.limit) {
+            stopped = true;
+            return res.forbid(`weekly limit reached: ${userLimit.limit} File(s)`);
+          }
+          break;
+        } else if (userLimit.limit_by === 'byte') {
+          const imgs = await prisma.image.findMany({
+            where: {
+              userId: user.id,
+              created_at: {
+                gt: dayjs().startOf('week').toDate(),
+              },
+            },
+            select: {
+              file: true,
+            },
+          });
+          const totalSize = (
+            await Promise.all(imgs.map(async ({ file }) => await datasource.size(file)))
+          ).reduce((a, b) => a + b, 0);
+          if (totalSize >= userLimit.limit) {
+            stopped = true;
+            return res.forbid(`weekly limit reached: ${userLimit.limit} Byte(s)`);
+          }
+          break;
+        } else {
+          Logger.get('image').info(
+            `User ${user.username} (${user.id}) has unique limit type: ${userLimit.limit_by}`
+          );
+        }
+      case 'monthly':
+        if (userLimit.limit_by === 'count') {
+          const count = await prisma.image.count({
+            where: {
+              userId: user.id,
+              created_at: {
+                gt: dayjs().startOf('month').toDate(),
+              },
+            },
+          });
+          if (count >= userLimit.limit) {
+            stopped = true;
+            return res.forbid(`monthly limit reached: ${userLimit.limit} File(s)`);
+          }
+          break;
+        } else if (userLimit.limit_by === 'byte') {
+          const imgs = await prisma.image.findMany({
+            where: {
+              userId: user.id,
+              created_at: {
+                gt: dayjs().startOf('month').toDate(),
+              },
+            },
+            select: {
+              file: true,
+            },
+          });
+          const totalSize = (
+            await Promise.all(imgs.map(async ({ file }) => await datasource.size(file)))
+          ).reduce((a, b) => a + b, 0);
+          if (totalSize >= userLimit.limit) {
+            stopped = true;
+            return res.forbid(`monthly limit reached: ${userLimit.limit} Byte(s)`);
+          }
+          break;
+        } else {
+          Logger.get('image').info(
+            `User ${user.username} (${user.id}) has unique limit type: ${userLimit.limit_by}`
+          );
+        }
+      case 'yearly':
+        if (userLimit.limit_by === 'count') {
+          const count = await prisma.image.count({
+            where: {
+              userId: user.id,
+              created_at: {
+                gt: dayjs().startOf('year').toDate(),
+              },
+            },
+          });
+          if (count >= userLimit.limit) {
+            stopped = true;
+            return res.forbid(`yearly limit reached: ${userLimit.limit} File(s)`);
+          }
+          break;
+        } else if (userLimit.limit_by === 'byte') {
+          const imgs = await prisma.image.findMany({
+            where: {
+              userId: user.id,
+              created_at: {
+                gt: dayjs().startOf('year').toDate(),
+              },
+            },
+            select: {
+              file: true,
+            },
+          });
+          const totalSize = (
+            await Promise.all(imgs.map(async ({ file }) => await datasource.size(file)))
+          ).reduce((a, b) => a + b, 0);
+          if (totalSize >= userLimit.limit) {
+            stopped = true;
+            return res.forbid(`yearly limit reached: ${userLimit.limit} Byte(s)`);
+          }
+          break;
+        } else {
+          Logger.get('image').info(
+            `User ${user.username} (${user.id}) has unique limit type: ${userLimit.limit_by}`
+          );
+        }
+      default:
+        Logger.get('image').info(
+          `User ${user.username} (${user.id}) has unique time limit: ${userLimit.type_time}`
+        );
+    }
+    if (stopped) return;
   }
 
   await run(uploader.array('file'))(req, res);
@@ -174,6 +349,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     }
   }
 
+  res.setHeader('X-Zipline-Quota', user.limit.limit);
   return res.json(response);
 }
 

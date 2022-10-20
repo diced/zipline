@@ -124,6 +124,41 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       return res.json({ domains });
     }
 
+    if (req.body.limits) {
+      if (Object.keys(req.body.limits).length === 0) {
+        await prisma.user.update({
+          where: { id: target.id },
+          data: {
+            limit: {
+              delete: true,
+            },
+          },
+        });
+      } else {
+        const data = {};
+        const ends = ['type_time', 'limit_by', 'limit'];
+        for (const [x, y] of Object.entries(req.body.limits)) {
+          if (ends.includes(x)) data[x] = [y][0];
+          else continue;
+        }
+        await prisma.user.update({
+          where: { id: target.id },
+          data: {
+            limit: {
+              upsert: {
+                create: {
+                  ...data,
+                },
+                update: {
+                  ...data,
+                },
+              },
+            },
+          },
+        });
+      }
+    }
+
     const newUser = await prisma.user.findFirst({
       where: {
         id: target.id,
@@ -141,6 +176,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         username: true,
         domains: true,
         avatar: true,
+        limit: true,
       },
     });
 

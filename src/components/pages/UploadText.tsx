@@ -1,7 +1,7 @@
 import { Button, Group, Select, Title } from '@mantine/core';
 import { showNotification, updateNotification } from '@mantine/notifications';
 import CodeInput from 'components/CodeInput';
-import { TypeIcon, UploadIcon } from 'components/icons';
+import { CrossIcon, TypeIcon, UploadIcon } from 'components/icons';
 import Link from 'components/Link';
 import exts from 'lib/exts';
 import { userSelector } from 'lib/recoil/user';
@@ -45,6 +45,14 @@ export default function Upload() {
               ))}
             </>
           ),
+        });
+      } else {
+        updateNotification({
+          id: 'upload-text',
+          title: 'Upload Failed',
+          message: json.error,
+          color: 'red',
+          icon: <CrossIcon />,
         });
       }
     });

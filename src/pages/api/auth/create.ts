@@ -3,6 +3,7 @@ import { NextApiReq, NextApiRes, withZipline } from 'lib/middleware/withZipline'
 import { createToken, hashPassword } from 'lib/util';
 import Logger from 'lib/logger';
 import config from 'lib/config';
+import { Limit } from '@prisma/client';
 
 async function handler(req: NextApiReq, res: NextApiRes) {
   if (req.method === 'POST' && req.body && req.body.code) {
@@ -53,10 +54,11 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
   if (req.method !== 'POST') return res.status(405).end();
 
-  const { username, password, administrator } = req.body as {
+  const { username, password, administrator, limits } = req.body as {
     username: string;
     password: string;
     administrator: boolean;
+    limits: Limit;
   };
 
   if (!username) return res.bad('no username');
@@ -81,6 +83,27 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   });
 
   delete newUser.password;
+
+  if (limits) {
+    const data = {};
+    const ends = ['type_time', 'limit_by', 'limit'];
+    for (const [x, y] of Object.entries(limits)) {
+      if (ends.includes(x)) data[x] = [y][0];
+      else continue;
+    }
+    await prisma.user.update({
+      where: {
+        id: newUser.id,
+      },
+      data: {
+        limit: {
+          create: {
+            ...data,
+          },
+        },
+      },
+    });
+  }
 
   Logger.get('user').info(`Created user ${newUser.username} (${newUser.id})`);
 

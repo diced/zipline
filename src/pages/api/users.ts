@@ -73,6 +73,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         embedTitle: true,
         systemTheme: true,
         avatar: true,
+        limit: true,
       },
     });
     return res.json(users);
