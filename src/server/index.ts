@@ -6,15 +6,14 @@ import { createServer, IncomingMessage, OutgoingMessage, ServerResponse } from '
 import { extname } from 'path';
 import { mkdir } from 'fs/promises';
 import { getStats, log, migrations } from './util';
-import Logger from 'lib/logger';
-import { guess } from 'lib/mimes';
-import exts from 'lib/exts';
+import Logger from '../lib/logger';
+import { guess } from '../lib/mimes';
+import exts from '../lib/exts';
 import { version } from '../../package.json';
-import config from 'lib/config';
-import datasource from 'lib/datasource';
+import config from '../lib/config';
+import datasource from '../lib/datasource';
 
 const dev = process.env.NODE_ENV === 'development';
-
 const logger = Logger.get('server');
 
 start();
@@ -96,7 +95,11 @@ async function start() {
     }
   });
 
-  await nextServer.prepare();
+  try {
+    await nextServer.prepare();
+  } catch (e) {
+    console.log(e);
+  }
 
   const http = createServer((req, res) => {
     router.lookup(req, res);

@@ -1,4 +1,4 @@
-FROM ghcr.io/diced/prisma-binaries:4.1.x as prisma
+FROM ghcr.io/diced/prisma-binaries:4.5.x as prisma
 
 FROM alpine:3.16 AS deps
 RUN mkdir -p /prisma-engines
@@ -55,9 +55,10 @@ COPY --from=builder /build/node_modules ./node_modules
 
 COPY --from=builder /build/next.config.js ./next.config.js
 COPY --from=builder /build/src ./src
+COPY --from=builder /build/dist ./dist
 COPY --from=builder /build/prisma ./prisma
 COPY --from=builder /build/tsconfig.json ./tsconfig.json
 COPY --from=builder /build/package.json ./package.json
 COPY --from=builder /build/mimes.json ./mimes.json
 
-CMD ["node_modules/.bin/tsx", "src/server"]
+CMD ["node", "--enable-source-maps", "dist/server"]

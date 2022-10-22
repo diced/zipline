@@ -22,13 +22,8 @@ services:
     ports:
       - '3000:3000'
     restart: unless-stopped
-    environment:
-      - CORE_HTTPS=false
-      - CORE_SECRET=changethislol
-      - CORE_HOST=0.0.0.0
-      - CORE_PORT=3000
-      - CORE_DATABASE_URL=postgres://postgres:postgres@postgres/postgres
-      - CORE_LOGGER=true
+    env_file:
+      - .env.local
     volumes:
       - '$PWD/uploads:/zipline/uploads'
       - '$PWD/public:/zipline/public'

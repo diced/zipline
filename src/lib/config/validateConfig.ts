@@ -1,7 +1,7 @@
 import { Config } from 'lib/config/Config';
 import { CombinedError, s, ValidationError } from '@sapphire/shapeshift';
 import { inspect } from 'util';
-import Logger from 'lib/logger';
+import Logger from '../logger';
 
 const discord_content = s
   .object({
