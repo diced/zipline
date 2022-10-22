@@ -1,5 +1,5 @@
 import { Config } from 'lib/config/Config';
-import { CombinedError, s, ValidationError } from '@sapphire/shapeshift';
+import { s } from '@sapphire/shapeshift';
 import { inspect } from 'util';
 import Logger from '../logger';
 
@@ -148,7 +148,7 @@ const validator = s.object({
     ),
     upload: discord_content,
     shorten: discord_content,
-  }),
+  }).nullish.default(null),
   oauth: s
     .object({
       github_client_id: s.string.nullable.default(null),
