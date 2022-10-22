@@ -140,15 +140,17 @@ const validator = s.object({
         { label: 'Documentation', link: 'https://zipline.diced.tech/' },
       ],
     }),
-  discord: s.object({
-    url: s.string,
-    username: s.string.default('Zipline'),
-    avatar_url: s.string.default(
-      'https://raw.githubusercontent.com/diced/zipline/9b60147e112ec5b70170500b85c75ea621f41d03/public/zipline.png'
-    ),
-    upload: discord_content,
-    shorten: discord_content,
-  }).nullish.default(null),
+  discord: s
+    .object({
+      url: s.string,
+      username: s.string.default('Zipline'),
+      avatar_url: s.string.default(
+        'https://raw.githubusercontent.com/diced/zipline/9b60147e112ec5b70170500b85c75ea621f41d03/public/zipline.png'
+      ),
+      upload: discord_content,
+      shorten: discord_content,
+    })
+    .nullish.default(null),
   oauth: s
     .object({
       github_client_id: s.string.nullable.default(null),
