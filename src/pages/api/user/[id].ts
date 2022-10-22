@@ -139,7 +139,6 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         const ends = ['type_time', 'limit_by', 'limit'];
         for (const [x, y] of Object.entries(req.body.limits)) {
           if (ends.includes(x)) data[x] = [y][0];
-          else continue;
         }
         await prisma.user.update({
           where: { id: target.id },
