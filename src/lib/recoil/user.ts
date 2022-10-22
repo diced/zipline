@@ -10,6 +10,7 @@ export interface User {
   domains: string[];
   avatar?: string;
   administrator: boolean;
+  superAdmin: boolean;
 }
 
 export const userState = atom({

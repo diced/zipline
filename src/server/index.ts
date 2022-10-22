@@ -39,6 +39,26 @@ async function start() {
 
   const prisma = new PrismaClient();
 
+  const admin = await prisma.user.findFirst({
+    where: {
+      id: 1,
+      OR: {
+        username: 'administrator',
+      },
+    },
+  });
+
+  if (admin) {
+    await prisma.user.update({
+      where: {
+        id: admin.id,
+      },
+      data: {
+        superAdmin: true,
+      },
+    });
+  }
+
   if (config.datasource.type === 'local') {
     await mkdir(config.datasource.local.directory, { recursive: true });
   }
@@ -99,6 +119,7 @@ async function start() {
     await nextServer.prepare();
   } catch (e) {
     console.log(e);
+    process.exit(1);
   }
 
   const http = createServer((req, res) => {
