@@ -90,7 +90,7 @@ export default function Users() {
         setOpen={setCreateOpen}
         updateUsers={updateUsers}
         limit={createLimit}
-        setLimit={setEditLimit}
+        setLimit={setCreateLimit}
       />
       <EditUserModal
         open={editOpen}
