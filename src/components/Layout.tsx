@@ -49,6 +49,8 @@ import {
   TypeIcon,
   UploadIcon,
   UserIcon,
+  DiscordIcon,
+  GitHubIcon,
 } from './icons';
 import { friendlyThemeName, themes } from './Theming';
 
@@ -73,16 +75,18 @@ function MenuItem(props) {
           : theme.colorScheme === 'dark'
           ? theme.colors.dark[0]
           : theme.black,
-        '&:hover': {
-          backgroundColor: props.color
-            ? theme.fn.rgba(
-                theme.fn.themeColor(props.color, theme.colorScheme === 'dark' ? 9 : 0),
-                theme.colorScheme === 'dark' ? 0.2 : 1
-              )
-            : theme.colorScheme === 'dark'
-            ? theme.fn.rgba(theme.colors.dark[3], 0.35)
-            : theme.colors.gray[0],
-        },
+        '&:hover': !props.noClick
+          ? {
+              backgroundColor: props.color
+                ? theme.fn.rgba(
+                    theme.fn.themeColor(props.color, theme.colorScheme === 'dark' ? 9 : 0),
+                    theme.colorScheme === 'dark' ? 0.2 : 1
+                  )
+                : theme.colorScheme === 'dark'
+                ? theme.fn.rgba(theme.colors.dark[3], 0.35)
+                : theme.colors.gray[0],
+            }
+          : null,
       })}
       {...props}
     >
@@ -404,6 +408,34 @@ export default function Layout({ children, props }) {
                         margin: `${theme.spacing.xs / 2}px -4px`,
                       })}
                     />
+                    {user.oauth ? (
+                      <>
+                        <MenuItem
+                          noClick
+                          icon={
+                            user.oauthProvider === 'discord' ? (
+                              <DiscordIcon size={18} />
+                            ) : (
+                              <GitHubIcon size={18} />
+                            )
+                          }
+                        >
+                          Logged in with{' '}
+                          <span style={{ textTransform: 'capitalize' }}>{user.oauthProvider}</span>
+                        </MenuItem>
+
+                        <Divider
+                          variant='solid'
+                          my={theme.spacing.xs / 2}
+                          sx={(theme) => ({
+                            width: '110%',
+                            borderTopColor:
+                              theme.colorScheme === 'dark' ? theme.colors.dark[7] : theme.colors.gray[2],
+                            margin: `${theme.spacing.xs / 2}px -4px`,
+                          })}
+                        />
+                      </>
+                    ) : null}
                     <MenuItem icon={<PencilIcon />}>
                       <Select
                         size='xs'
