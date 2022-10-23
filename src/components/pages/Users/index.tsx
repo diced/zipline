@@ -12,7 +12,7 @@ import { CreateUserModal } from './CreateUserModal';
 import { EditUserModal } from './EditUserModal';
 
 export default function Users() {
-  const user = useRecoilValue(userSelector);
+  const self = useRecoilValue(userSelector);
   const router = useRouter();
   const modals = useModals();
 
@@ -95,7 +95,7 @@ export default function Users() {
       <SimpleGrid cols={3} spacing='lg' breakpoints={[{ maxWidth: 'sm', cols: 1, spacing: 'sm' }]}>
         {users.length
           ? users
-              .filter((x) => x.username !== user.username)
+              .filter((x) => x.username !== self.username)
               .map((user) => (
                 <Card key={user.id} sx={{ maxWidth: '100%' }}>
                   <Group position='apart'>
@@ -114,7 +114,7 @@ export default function Users() {
                       </Stack>
                     </Group>
                     <Group position='right'>
-                      {user.administrator ? null : (
+                      {user.administrator && !self.superAdmin ? null : (
                         <>
                           <ActionIcon
                             aria-label='edit'

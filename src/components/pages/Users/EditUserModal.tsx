@@ -7,14 +7,15 @@ import useFetch from 'hooks/useFetch';
 export function EditUserModal({ open, setOpen, updateUsers, user }) {
   let form;
 
-  if (user)
+  if (user) {
     form = useForm({
       initialValues: {
-        username: user?.username,
+        username: user.username,
         password: '',
-        administrator: user?.administrator,
+        administrator: user.administrator,
       },
     });
+  }
 
   const onSubmit = async (values) => {
     const cleanUsername = values.username.trim();

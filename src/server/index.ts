@@ -6,15 +6,14 @@ import { createServer, IncomingMessage, OutgoingMessage, ServerResponse } from '
 import { extname } from 'path';
 import { mkdir } from 'fs/promises';
 import { getStats, log, migrations } from './util';
-import Logger from 'lib/logger';
-import { guess } from 'lib/mimes';
-import exts from 'lib/exts';
+import Logger from '../lib/logger';
+import { guess } from '../lib/mimes';
+import exts from '../lib/exts';
 import { version } from '../../package.json';
-import config from 'lib/config';
-import datasource from 'lib/datasource';
+import config from '../lib/config';
+import datasource from '../lib/datasource';
 
 const dev = process.env.NODE_ENV === 'development';
-
 const logger = Logger.get('server');
 
 start();
@@ -39,6 +38,26 @@ async function start() {
   await migrations();
 
   const prisma = new PrismaClient();
+
+  const admin = await prisma.user.findFirst({
+    where: {
+      id: 1,
+      OR: {
+        username: 'administrator',
+      },
+    },
+  });
+
+  if (admin) {
+    await prisma.user.update({
+      where: {
+        id: admin.id,
+      },
+      data: {
+        superAdmin: true,
+      },
+    });
+  }
 
   if (config.datasource.type === 'local') {
     await mkdir(config.datasource.local.directory, { recursive: true });
@@ -96,7 +115,12 @@ async function start() {
     }
   });
 
-  await nextServer.prepare();
+  try {
+    await nextServer.prepare();
+  } catch (e) {
+    console.log(e);
+    process.exit(1);
+  }
 
   const http = createServer((req, res) => {
     router.lookup(req, res);

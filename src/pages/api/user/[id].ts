@@ -27,13 +27,13 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     const newTarget = await prisma.user.delete({
       where: { id: target.id },
     });
-    if (newTarget.administrator) return res.error('cannot delete administrator');
+    if (newTarget.administrator && !user.superAdmin) return res.error('cannot delete administrator');
 
     delete newTarget.password;
 
     return res.json(newTarget);
   } else if (req.method === 'PATCH') {
-    if (target.administrator) return res.forbid('cannot modify administrator');
+    if (target.administrator && !user.superAdmin) return res.forbid('cannot modify administrator');
 
     if (req.body.password) {
       const hashed = await hashPassword(req.body.password);

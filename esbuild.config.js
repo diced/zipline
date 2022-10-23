@@ -3,8 +3,6 @@ const { existsSync } = require('fs');
 const { rm } = require('fs/promises');
 
 (async () => {
-  const watch = process.argv[2] === '--watch';
-
   if (existsSync('./dist')) {
     await rm('./dist', { recursive: true });
   }
@@ -14,7 +12,6 @@ const { rm } = require('fs/promises');
     outdir: 'dist',
     bundle: false,
     platform: 'node',
-    treeShaking: true,
     entryPoints: [
       'src/server/index.ts',
       'src/server/util.ts',
@@ -31,12 +28,11 @@ const { rm } = require('fs/promises');
       'src/lib/datasources/S3.ts',
       'src/lib/datasources/Swift.ts',
       'src/lib/datasource.ts',
+      'src/scripts/read-config.ts',
     ],
     format: 'cjs',
     resolveExtensions: ['.ts', '.js'],
     write: true,
-    watch,
-    incremental: watch,
     sourcemap: true,
     minify: false,
   });
