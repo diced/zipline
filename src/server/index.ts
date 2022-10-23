@@ -23,7 +23,7 @@ async function start() {
   if (config.core.secret === 'changethis') {
     logger.error('Secret is not set!');
     logger.error(
-      'Running Zipline as is, without a randomized secret is not recommended and leaves your instance at risk!'
+      'Running LunarX as is, without a randomized secret is not recommended and leaves your instance at risk!'
     );
     logger.error('Please change your secret in the config file or environment variables.');
     logger.error(
@@ -138,7 +138,7 @@ async function start() {
 
   http.listen(config.core.port, config.core.host ?? '0.0.0.0');
 
-  logger.info(`started ${dev ? 'development' : 'production'} zipline@${version} server`);
+  logger.info(`started ${dev ? 'development' : 'production'} lunarx@${version} server`);
 
   stats(prisma);
 

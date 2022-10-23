@@ -1,6 +1,6 @@
 {
   "name": "zipline",
-  "version": "3.6.0-rc1",
+  "version": "3.6.1",
   "license": "MIT",
   "scripts": {
     "dev": "npm-run-all build:server dev:run",
@@ -17,6 +17,7 @@
     "docker:run": "docker-compose up -d",
     "docker:down": "docker-compose down",
     "docker:build-dev": "docker-compose --file docker-compose.dev.yml up --build",
+    "docker:restart": "npm run docker:down && npm run docker:run",
     "scripts:read-config": "npm-run-all build:server && node dist/scripts/read-config"
   },
   "dependencies": {
