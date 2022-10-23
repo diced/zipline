@@ -29,6 +29,7 @@ const { rm } = require('fs/promises');
       'src/lib/datasources/Swift.ts',
       'src/lib/datasource.ts',
       'src/scripts/read-config.ts',
+      'src/scripts/import-dir.ts',
     ],
     format: 'cjs',
     resolveExtensions: ['.ts', '.js'],

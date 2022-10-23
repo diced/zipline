@@ -364,7 +364,7 @@ export default function Layout({ children, props }) {
                 <Popover.Dropdown p={4} mr='md' sx={{ minWidth: '200px' }}>
                   <Stack spacing={2}>
                     <Menu.Label>
-                      {user.username}{' '}
+                      {user.username} ({user.id}){' '}
                       {user.administrator && user.username !== 'administrator' ? '(Administrator)' : ''}
                     </Menu.Label>
                     <MenuItemLink icon={<SettingsIcon />} href='/dashboard/manage'>
