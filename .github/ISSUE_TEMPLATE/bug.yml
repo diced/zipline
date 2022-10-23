@@ -32,13 +32,13 @@ body:
         - Safari
         - Microsoft Edge
   - type: textarea
-    id: zlogs
+    id: zipline-logs
     attributes:
       label: Zipline Logs
       description: Please copy and paste any relevant log output.
       render: shell
   - type: textarea
-    id: zlogs
+    id: browser-logs
     attributes:
       label: Browser Logs
       description: Please copy and paste any relevant log output.
