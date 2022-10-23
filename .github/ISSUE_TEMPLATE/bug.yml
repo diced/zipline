@@ -1,0 +1,45 @@
+name: Bug
+description: File a bug report
+title: '[Bug]: '
+labels: ['bug']
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Provide some context in the problem.
+      value: 'A bug happened!'
+    validations:
+      required: true
+  - type: dropdown
+    id: version
+    attributes:
+      label: Version
+      description: What version of Zipline are you using?
+      options:
+        - upstream
+        - latest
+      validations:
+        required: true
+  - type: dropdown
+    id: browsers
+    attributes:
+      label: What browser(s) are you seeing hte problem on?
+      multiple: true
+      options:
+        - Firefox
+        - Chrome
+        - Safari
+        - Microsoft Edge
+  - type: textarea
+    id: zlogs
+    attributes:
+      label: Zipline Logs
+      description: Please copy and paste any relevant log output.
+      render: shell
+  - type: textarea
+    id: zlogs
+    attributes:
+      label: Browser Logs
+      description: Please copy and paste any relevant log output.
+      render: shell
