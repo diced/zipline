@@ -58,6 +58,7 @@ export default function readConfig() {
     map('DATASOURCE_S3_ACCESS_KEY_ID', 'string', 'datasource.s3.access_key_id'),
     map('DATASOURCE_S3_SECRET_ACCESS_KEY', 'string', 'datasource.s3.secret_access_key'),
     map('DATASOURCE_S3_ENDPOINT', 'string', 'datasource.s3.endpoint'),
+    map('DATASOURCE_S3_PORT', 'number', 'datasource.s3.port'),
     map('DATASOURCE_S3_BUCKET', 'string', 'datasource.s3.bucket'),
     map('DATASOURCE_S3_FORCE_S3_PATH', 'boolean', 'datasource.s3.force_s3_path'),
     map('DATASOURCE_S3_REGION', 'string', 'datasource.s3.region'),
