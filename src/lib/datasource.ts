@@ -1,5 +1,5 @@
 import config from './config';
-import { Swift, Local, S3 } from './datasources';
+import { Swift, Local, S3, Datasource } from './datasources';
 import Logger from './logger';
 
 if (!global.datasource) {
@@ -21,4 +21,4 @@ if (!global.datasource) {
   }
 }
 
-export default global.datasource;
+export default global.datasource as Datasource;

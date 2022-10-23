@@ -1,4 +1,5 @@
 import {
+  Anchor,
   Box,
   Button,
   Card,
@@ -283,21 +284,28 @@ export default function Manage() {
         <Link href='https://zipline.diced.tech/docs/guides/variables'>the docs</Link> for variables
       </MutedText>
       <form onSubmit={form.onSubmit((v) => onSubmit(v))}>
-        <TextInput id='username' label='Username' {...form.getInputProps('username')} />
+        <TextInput id='username' label='Username' my='sm' {...form.getInputProps('username')} />
         <PasswordInput
           id='password'
           label='Password'
           description='Leave blank to keep your old password'
+          my='sm'
           {...form.getInputProps('password')}
         />
-        <TextInput id='embedTitle' label='Embed Title' {...form.getInputProps('embedTitle')} />
-        <ColorInput id='embedColor' label='Embed Color' {...form.getInputProps('embedColor')} />
-        <TextInput id='embedSiteName' label='Embed Site Name' {...form.getInputProps('embedSiteName')} />
+        <TextInput id='embedTitle' label='Embed Title' my='sm' {...form.getInputProps('embedTitle')} />
+        <ColorInput id='embedColor' label='Embed Color' my='sm' {...form.getInputProps('embedColor')} />
+        <TextInput
+          id='embedSiteName'
+          label='Embed Site Name'
+          my='sm'
+          {...form.getInputProps('embedSiteName')}
+        />
         <TextInput
           id='domains'
           label='Domains'
           description='A list of domains separated by commas. These domains will be used to randomly output a domain when uploading. This is optional.'
           placeholder='https://example.com, https://example2.com'
+          my='sm'
           {...form.getInputProps('domains')}
         />
 
@@ -376,7 +384,11 @@ export default function Manage() {
             rows={
               exports
                 ? exports.map((x, i) => ({
-                    name: <Link href={'/api/user/export?name=' + x.full}>Export {i + 1}</Link>,
+                    name: (
+                      <Anchor target='_blank' href={'/api/user/export?name=' + x.full}>
+                        Export {i + 1}
+                      </Anchor>
+                    ),
                     date: x.date.toLocaleString(),
                     size: bytesToRead(x.size),
                   }))

@@ -100,6 +100,11 @@ export default function ZiplineTheming({ Component, pageProps, ...props }) {
               overlayColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : 'white',
             },
           },
+          Loader: {
+            defaultProps: {
+              variant: 'dots',
+            },
+          },
           Card: {
             styles: (t) => ({
               root: {

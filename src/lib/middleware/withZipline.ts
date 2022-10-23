@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import type { CookieSerializeOptions } from 'cookie';
 
 import { serialize } from 'cookie';
-import { sign64, unsign64 } from 'lib/util';
+import { sign64, unsign64 } from 'lib/utils/crypto';
 import config from 'lib/config';
 import prisma from 'lib/prisma';
 import { User } from '@prisma/client';

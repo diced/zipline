@@ -72,6 +72,7 @@ export default function Upload() {
           dropdownPosition='top'
           data={Object.keys(exts).map((x) => ({ value: x, label: exts[x] }))}
           icon={<TypeIcon />}
+          searchable
         />
         <Button
           leftIcon={<UploadIcon />}

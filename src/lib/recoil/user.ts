@@ -11,6 +11,9 @@ export interface User {
   avatar?: string;
   administrator: boolean;
   superAdmin: boolean;
+  oauth: boolean;
+  oauthProvider: 'github' | 'discord';
+  id: number;
 }
 
 export const userState = atom({

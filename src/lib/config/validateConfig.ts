@@ -45,6 +45,7 @@ const validator = s.object({
         access_key_id: s.string,
         secret_access_key: s.string,
         endpoint: s.string,
+        port: s.number.optional.default(undefined),
         bucket: s.string,
         force_s3_path: s.boolean.default(false),
         region: s.string.default('us-east-1'),
