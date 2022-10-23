@@ -21,7 +21,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     if (!files.length) return res.error('no files found');
 
     const zip = new Zip();
-    const export_name = `zipline_export_${user.id}_${Date.now()}.zip`;
+    const export_name = `lunarx_export_${user.id}_${Date.now()}.zip`;
     const write_stream = createWriteStream(tmpdir() + `/${export_name}`);
 
     // i found this on some stack overflow thing, forgot the url
@@ -125,7 +125,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       stream.pipe(res);
     } else {
       const files = await readdir(tmpdir());
-      const exp = files.filter((f) => f.startsWith('zipline_export_'));
+      const exp = files.filter((f) => f.startsWith('lunarx_export_'));
       const exports = [];
       for (let i = 0; i !== exp.length; ++i) {
         const name = exp[i];

@@ -1,6 +1,6 @@
 {
   "name": "zipline",
-  "version": "3.6.0-rc1",
+  "version": "3.6.1",
   "license": "MIT",
   "scripts": {
     "dev": "npm-run-all build:server dev:run",
@@ -19,6 +19,8 @@
     "docker:build-dev": "docker-compose --file docker-compose.dev.yml up --build",
     "scripts:read-config": "npm-run-all build:server && node dist/scripts/read-config",
     "scripts:import-dir": "npm-run-all build:server && node dist/scripts/import-dir"
+    "docker:restart": "npm run docker:down && npm run docker:run",
+    "scripts:read-config": "npm-run-all build:server && node dist/scripts/read-config"
   },
   "dependencies": {
     "@dicedtomato/mantine-data-grid": "0.0.23",

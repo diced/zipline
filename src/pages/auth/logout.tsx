@@ -26,4 +26,4 @@ export default function Logout() {
   return <LoadingOverlay visible={true} />;
 }
 
-Logout.title = 'Zipline - Logout';
+Logout.title = 'LunarX - Logout';
