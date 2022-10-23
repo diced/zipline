@@ -17,6 +17,7 @@ export function StatCards() {
         { maxWidth: 'md', cols: 2 },
         { maxWidth: 'xs', cols: 1 },
       ]}
+      my='sm'
     >
       <StatCard
         stat={{
