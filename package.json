@@ -19,7 +19,7 @@
     "docker:build-dev": "docker-compose --file docker-compose.dev.yml up --build",
     "scripts:read-config": "npm-run-all build:server && node dist/scripts/read-config",
     "scripts:import-dir": "npm-run-all build:server && node dist/scripts/import-dir",
-    "docker:restart": "npm run docker:down && npm run docker:run",
+    "docker:restart": "npm run docker:down && npm run docker:run"
   },
   "dependencies": {
     "@dicedtomato/mantine-data-grid": "0.0.23",
