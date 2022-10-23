@@ -21,7 +21,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     if (!files.length) return res.notFound('no files found');
 
     const zip = new Zip();
-    const export_name = `zipline_export_${user.id}_${Date.now()}.zip`;
+    const export_name = `lunarx_export_${user.id}_${Date.now()}.zip`;
     const path = join(tmpdir(), export_name);
 
     logger.debug(`creating write stream at ${path}`);
@@ -128,7 +128,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       stream.pipe(res);
     } else {
       const files = await readdir(tmpdir());
-      const exp = files.filter((f) => f.startsWith('zipline_export_'));
+      const exp = files.filter((f) => f.startsWith('lunarx_export_'));
       const exports = [];
       for (let i = 0; i !== exp.length; ++i) {
         const name = exp[i];

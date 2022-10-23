@@ -7,7 +7,7 @@ async function handler(_: NextApiReq, res: NextApiRes) {
 
   const pkg = JSON.parse(await readFile('package.json', 'utf8'));
 
-  const re = await fetch('https://raw.githubusercontent.com/diced/zipline/trunk/package.json');
+  const re = await fetch('https://raw.githubusercontent.com/WinterFe/zipline/lunar/package.json');
   const upstreamPkg = await re.json();
 
   return res.json({

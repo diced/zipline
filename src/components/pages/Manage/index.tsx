@@ -1,4 +1,5 @@
 import {
+  Accordion,
   Anchor,
   Box,
   Button,
@@ -8,7 +9,9 @@ import {
   Group,
   Image,
   PasswordInput,
+  SimpleGrid,
   Space,
+  Table,
   Text,
   TextInput,
   Title,
@@ -337,13 +340,61 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
     interval.start();
   }, []);
 
+  const embedvars = [
+    { var: '{user.admin}', description: 'outputs yes or no if the user is an administrator' },
+    { var: '{user.id}', description: 'outputs the id of the user' },
+    { var: '{user.name}', description: 'outputs the name of the user' },
+    { var: '{image.id}', description: 'outputs the numeric id of the file' },
+    { var: '{image.file}', description: 'outputs the file name' },
+    { var: '{image.mime}', description: 'outputs the mimetype of the file' },
+    { var: '{image.created_at.full_string}', description: 'outputs the full date' },
+    { var: '{image.created_at.date_string}', description: 'outputs only the date' },
+    { var: '{image.created_at.time_string}', description: 'outputs only the time' },
+  ];
+
+  const varRows = embedvars.map((element) => (
+    <tr key={element.var}>
+      <td>{element.var}</td>
+      <td>{element.description}</td>
+    </tr>
+  ));
+
   return (
     <>
       <Title>Manage User</Title>
       <MutedText size='md'>
-        Want to use variables in embed text? Visit{' '}
-        <Link href='https://zipline.diced.tech/docs/guides/variables'>the docs</Link> for variables
+        Want to use variables in embed text? Open the drown-down below to see a list of currently-available
+        variables.
       </MutedText>
+      <Accordion variant='contained' mb='sm'>
+        <Accordion.Item value='favorite'>
+          <Accordion.Control>Embed Variables</Accordion.Control>
+          <Accordion.Panel>
+            <SimpleGrid cols={3} spacing='lg' breakpoints={[{ maxWidth: 'sm', cols: 1, spacing: 'sm' }]}>
+              <div key='EmbedVars'>
+                <Table horizontalSpacing='xl' verticalSpacing='md'>
+                  <thead>
+                    <tr>
+                      <th>Variable</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>{varRows}</tbody>
+                </Table>
+              </div>
+            </SimpleGrid>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                paddingTop: 12,
+                paddingBottom: 3,
+              }}
+            ></Box>
+          </Accordion.Panel>
+        </Accordion.Item>
+      </Accordion>
       <form onSubmit={form.onSubmit((v) => onSubmit(v))}>
         <TextInput id='username' label='Username' my='sm' {...form.getInputProps('username')} />
         <PasswordInput
@@ -364,7 +415,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
         <TextInput
           id='domains'
           label='Domains'
-          description='A list of domains separated by commas. These domains will be used to randomly output a domain when uploading. This is optional.'
+          description='A list of domains separated by commas. These domains will be used to randomly output a domain when uploading. This is optional. (Your domain must be set up by a site admin to work properly.)'
           placeholder='https://example.com, https://example2.com'
           my='sm'
           {...form.getInputProps('domains')}

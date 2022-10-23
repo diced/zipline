@@ -111,7 +111,7 @@ const validator = s.object({
     }),
   website: s
     .object({
-      title: s.string.default('Zipline'),
+      title: s.string.default('LunarX'),
       show_files_per_user: s.boolean.default(true),
       show_version: s.boolean.default(true),
       disable_media_preview: s.boolean.default(false),
@@ -124,25 +124,27 @@ const validator = s.object({
           })
         )
         .default([
-          { label: 'Zipline', link: 'https://github.com/diced/zipline' },
-          { label: 'Documentation', link: 'https://zipline.diced.tech/' },
+          { label: 'Lunar', link: 'https://lunardev.group' },
+          { label: 'Discord', link: 'https://lunardev.group/discord' },
+          { label: 'Melon (P)', link: 'https://melonbot.io' },
         ]),
     })
     .default({
-      title: 'Zipline',
+      title: 'LunarX',
       show_files_per_user: true,
-      show_version: true,
+      show_version: false,
       disable_media_preview: false,
 
       external_links: [
-        { label: 'Zipline', link: 'https://github.com/diced/zipline' },
-        { label: 'Documentation', link: 'https://zipline.diced.tech/' },
+        { label: 'Lunar', link: 'https://lunardev.group' },
+        { label: 'Discord', link: 'https://lunardev.group/discord' },
+        { label: 'Melon (P)', link: 'https://melonbot.io' },
       ],
     }),
   discord: s
     .object({
       url: s.string,
-      username: s.string.default('Zipline'),
+      username: s.string.default('LunarX'),
       avatar_url: s.string.default(
         'https://raw.githubusercontent.com/diced/zipline/9b60147e112ec5b70170500b85c75ea621f41d03/public/zipline.png'
       ),

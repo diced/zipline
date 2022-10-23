@@ -27,7 +27,7 @@ async function start() {
     logger
       .error('Secret is not set!')
       .error(
-        'Running Zipline as is, without a randomized secret is not recommended and leaves your instance at risk!'
+        'Running lunarx as is, without a randomized secret is not recommended and leaves your instance at risk!'
       )
       .error('Please change your secret in the config file or environment variables.')
       .error(

@@ -56,7 +56,7 @@ ${curl.join(' ')} | jq -r '.files[0]' | tr -d '\n' | xsel -ib;
 
     const pseudoElement = document.createElement('a');
     pseudoElement.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(shell));
-    pseudoElement.setAttribute('download', 'zipline.sh');
+    pseudoElement.setAttribute('download', 'lunarx.sh');
     pseudoElement.style.display = 'none';
     document.body.appendChild(pseudoElement);
     pseudoElement.click();
