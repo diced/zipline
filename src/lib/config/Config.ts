@@ -25,6 +25,7 @@ export interface ConfigS3Datasource {
   access_key_id: string;
   secret_access_key: string;
   endpoint?: string;
+  port?: number;
   bucket: string;
   force_s3_path: boolean;
   use_ssl: boolean;
