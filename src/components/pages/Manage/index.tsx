@@ -1,4 +1,5 @@
 import {
+  Anchor,
   Box,
   Button,
   Card,
@@ -383,7 +384,11 @@ export default function Manage() {
             rows={
               exports
                 ? exports.map((x, i) => ({
-                    name: <Link href={'/api/user/export?name=' + x.full}>Export {i + 1}</Link>,
+                    name: (
+                      <Anchor target='_blank' href={'/api/user/export?name=' + x.full}>
+                        Export {i + 1}
+                      </Anchor>
+                    ),
                     date: x.date.toLocaleString(),
                     size: bytesToRead(x.size),
                   }))
