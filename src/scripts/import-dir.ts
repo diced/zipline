@@ -39,7 +39,7 @@ async function main() {
   const prisma = new PrismaClient();
 
   console.log('Starting transaction to database..');
-  prisma.image.createMany({
+  await prisma.image.createMany({
     data,
   });
   console.log('Finished transaction to database.');
