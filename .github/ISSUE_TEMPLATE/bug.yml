@@ -19,8 +19,8 @@ body:
       options:
         - upstream
         - latest
-      validations:
-        required: true
+    validations:
+      required: true
   - type: dropdown
     id: browsers
     attributes:
