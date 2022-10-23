@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, Tooltip, Badge, useMantineTheme } from '@mantine/core';
+import { Table, Tooltip, Badge, HoverCard, Text, useMantineTheme, Group } from '@mantine/core';
 import Type from 'components/Type';
 
 export function FilePreview({ file }: { file: File }) {
@@ -21,10 +21,12 @@ export default function FileDropzone({ file }: { file: File }) {
   const theme = useMantineTheme();
 
   return (
-    <Tooltip
-      position='top'
-      label={
-        <div style={{ display: 'flex', alignItems: 'center' }}>
+    <HoverCard shadow='md'>
+      <HoverCard.Target>
+        <Badge size='lg'>{file.name}</Badge>
+      </HoverCard.Target>
+      <HoverCard.Dropdown>
+        <Group grow>
           <FilePreview file={file} />
 
           <Table sx={{ color: theme.colorScheme === 'dark' ? 'white' : 'white' }} ml='md'>
@@ -43,10 +45,8 @@ export default function FileDropzone({ file }: { file: File }) {
               </tr>
             </tbody>
           </Table>
-        </div>
-      }
-    >
-      <Badge size='lg'>{file.name}</Badge>
-    </Tooltip>
+        </Group>
+      </HoverCard.Dropdown>
+    </HoverCard>
   );
 }

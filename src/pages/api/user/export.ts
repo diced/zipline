@@ -87,7 +87,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     Logger.get('user').info(`Export for ${user.username} (${user.id}) has started`);
     for (let i = 0; i !== files.length; ++i) {
       const file = files[i];
-      const stream = await datasource.get(file.file);
+      const stream = datasource.get(file.file);
       if (stream) {
         const def = new ZipPassThrough(file.file);
         zip.add(def);

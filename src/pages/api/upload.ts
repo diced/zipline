@@ -24,7 +24,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     },
   });
 
-  if (!user) return res.forbid('authorization incorect');
+  if (!user) return res.forbid('authorization incorrect');
   if (user.ratelimit) {
     const remaining = user.ratelimit.getTime() - Date.now();
     if (remaining <= 0) {

@@ -21,6 +21,7 @@ import {
   Image,
   Tooltip,
   Badge,
+  Menu,
 } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
@@ -194,7 +195,7 @@ export default function Layout({ children, props }) {
 
   const openResetToken = () =>
     modals.openConfirmModal({
-      title: 'Reset Token',
+      title: <Title>Reset Token?</Title>,
       children: (
         <Text size='sm'>
           Once you reset your token, you will have to update any uploaders to use this new token.
@@ -227,7 +228,7 @@ export default function Layout({ children, props }) {
 
   const openCopyToken = () =>
     modals.openConfirmModal({
-      title: 'Copy Token',
+      title: <Title>Copy Token</Title>,
       children: (
         <Text size='sm'>
           Make sure you don&apos;t share this token with anyone as they will be able to upload files on your
@@ -362,17 +363,10 @@ export default function Layout({ children, props }) {
 
                 <Popover.Dropdown p={4} mr='md' sx={{ minWidth: '200px' }}>
                   <Stack spacing={2}>
-                    <Text
-                      sx={{
-                        color: theme.colorScheme === 'dark' ? theme.colors.dark[2] : theme.colors.gray[6],
-                        fontWeight: 500,
-                        fontSize: theme.fontSizes.sm,
-                        padding: `${theme.spacing.xs / 2}px ${theme.spacing.sm}px`,
-                        cursor: 'default',
-                      }}
-                    >
-                      {user.username}
-                    </Text>
+                    <Menu.Label>
+                      {user.username}{' '}
+                      {user.administrator && user.username !== 'administrator' ? '(Administrator)' : ''}
+                    </Menu.Label>
                     <MenuItemLink icon={<SettingsIcon />} href='/dashboard/manage'>
                       Manage Account
                     </MenuItemLink>
@@ -398,20 +392,10 @@ export default function Layout({ children, props }) {
                     <MenuItemLink icon={<LogoutIcon />} href='/auth/logout' color='red'>
                       Logout
                     </MenuItemLink>
-                    <Divider
-                      variant='solid'
-                      my={theme.spacing.xs / 2}
-                      sx={(theme) => ({
-                        width: '110%',
-                        borderTopColor:
-                          theme.colorScheme === 'dark' ? theme.colors.dark[7] : theme.colors.gray[2],
-                        margin: `${theme.spacing.xs / 2}px -4px`,
-                      })}
-                    />
+                    <Menu.Divider />
                     {user.oauth ? (
                       <>
                         <MenuItem
-                          noClick
                           icon={
                             user.oauthProvider === 'discord' ? (
                               <DiscordIcon size={18} />
@@ -424,16 +408,7 @@ export default function Layout({ children, props }) {
                           <span style={{ textTransform: 'capitalize' }}>{user.oauthProvider}</span>
                         </MenuItem>
 
-                        <Divider
-                          variant='solid'
-                          my={theme.spacing.xs / 2}
-                          sx={(theme) => ({
-                            width: '110%',
-                            borderTopColor:
-                              theme.colorScheme === 'dark' ? theme.colors.dark[7] : theme.colors.gray[2],
-                            margin: `${theme.spacing.xs / 2}px -4px`,
-                          })}
-                        />
+                        <Menu.Divider />
                       </>
                     ) : null}
                     <MenuItem icon={<PencilIcon />}>

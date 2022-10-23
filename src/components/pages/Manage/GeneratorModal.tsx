@@ -14,7 +14,7 @@ export function GeneratorModal({ opened, onClose, title, onSubmit, ...other }) {
 
   return (
     <Modal opened={opened} onClose={onClose} title={<Title order={3}>{title}</Title>} size='lg'>
-      {other.desc && <Text>{other.desc}</Text>}
+      {other.desc && <Text mb='md'>{other.desc}</Text>}
       <form onSubmit={form.onSubmit((values) => onSubmit(values))}>
         <Select
           label='Select file name format'
