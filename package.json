@@ -18,7 +18,6 @@
     "docker:down": "docker-compose down",
     "docker:build-dev": "docker-compose --file docker-compose.dev.yml up --build",
     "docker:restart": "npm run docker:down && npm run docker:run",
-    "scripts:read-config": "npm-run-all build:server && node dist/scripts/read-config",
     "scripts:read-config": "node dist/scripts/read-config",
     "scripts:import-dir": "node dist/scripts/import-dir",
     "scripts:list-users": "node dist/scripts/list-users",
