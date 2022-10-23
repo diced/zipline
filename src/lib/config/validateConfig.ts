@@ -132,7 +132,7 @@ const validator = s.object({
     .default({
       title: 'LunarX',
       show_files_per_user: true,
-      show_version: false,
+      show_version: true,
       disable_media_preview: false,
 
       external_links: [
