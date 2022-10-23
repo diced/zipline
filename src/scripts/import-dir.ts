@@ -1,9 +1,10 @@
 import datasource from '../lib/datasource';
-import { readdir, stat } from 'fs/promises';
+import { readdir, readFile } from 'fs/promises';
 import config from '../lib/config';
 import { migrations } from '../server/util';
 import { PrismaClient } from '@prisma/client';
 import { guess } from '../lib/mimes';
+import { join } from 'path';
 
 async function main() {
   const directory = process.argv[2];
@@ -43,6 +44,14 @@ async function main() {
     data,
   });
   console.log('Finished transaction to database.');
+
+  // copy files to local storage
+  console.log(`Copying files to ${config.datasource.type} storage..`);
+  for (let i = 0; i !== files.length; ++i) {
+    const file = files[i];
+    await datasource.save(file, await readFile(join(directory, file)));
+  }
+  console.log(`Finished copying files to ${config.datasource.type} storage.`);
 }
 
 main();
