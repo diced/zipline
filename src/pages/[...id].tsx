@@ -6,10 +6,13 @@ import config from 'lib/config';
 import prisma from 'lib/prisma';
 import { parse } from 'lib/utils/client';
 import exts from 'lib/exts';
+import { Image } from '@prisma/client';
+import { useRouter } from 'next/router';
 
-export default function EmbeddedImage({ image, user, pass }) {
+export default function EmbeddedImage({ image, user, pass, prismRender }) {
   const dataURL = (route: string) => `${route}/${image.file}`;
 
+  const router = useRouter();
   const [opened, setOpened] = useState(pass);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -22,6 +25,7 @@ export default function EmbeddedImage({ image, user, pass }) {
 
     if (res.ok) {
       setError('');
+      if (prismRender) return router.push(`/code/${image.file}?password=${password}`);
       updateImage(`/api/auth/image?id=${image.id}&password=${password}`);
       setOpened(false);
     } else {
@@ -193,13 +197,25 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     image.created_at = image.created_at.toString();
 
     const prismRender = Object.keys(exts).includes(image.file.split('.').pop());
-    if (prismRender)
+    if (prismRender && !image.password)
       return {
         redirect: {
           destination: `/code/${image.file}`,
           permanent: true,
         },
       };
+    else if (prismRender && image.password) {
+      const pass = image.password ? true : false;
+      delete image.password;
+      return {
+        props: {
+          image,
+          user,
+          pass,
+          prismRender: true,
+        },
+      };
+    }
 
     if (!image.mimetype.startsWith('image') && !image.mimetype.startsWith('video')) {
       const { default: datasource } = await import('lib/datasource');
