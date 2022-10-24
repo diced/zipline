@@ -1,7 +1,9 @@
-import { Button, Group, Select, Title } from '@mantine/core';
+import { Button, Group, Select, Tabs, Title } from '@mantine/core';
+import { Prism } from '@mantine/prism';
+import { Language } from 'prism-react-renderer';
 import { showNotification, updateNotification } from '@mantine/notifications';
 import CodeInput from 'components/CodeInput';
-import { TypeIcon, UploadIcon } from 'components/icons';
+import { ImageIcon, TypeIcon, UploadIcon } from 'components/icons';
 import Link from 'components/Link';
 import exts from 'lib/exts';
 import { userSelector } from 'lib/recoil/user';
@@ -63,7 +65,30 @@ export default function Upload() {
     <>
       <Title mb='md'>Upload Text</Title>
 
-      <CodeInput value={value} onChange={(e) => setValue(e.target.value)} />
+      <Tabs defaultValue='text' variant='pills'>
+        <Tabs.List>
+          <Tabs.Tab value='text' icon={<TypeIcon />}>
+            Text
+          </Tabs.Tab>
+          <Tabs.Tab value='preview' icon={<ImageIcon />}>
+            Preview
+          </Tabs.Tab>
+        </Tabs.List>
+
+        <Tabs.Panel mt='sm' value='text'>
+          <CodeInput value={value} onChange={(e) => setValue(e.target.value)} />
+        </Tabs.Panel>
+
+        <Tabs.Panel mt='sm' value='preview'>
+          <Prism
+            sx={(t) => ({ height: '80vh', backgroundColor: t.colors.dark[8] })}
+            withLineNumbers
+            language={lang as Language}
+          >
+            {value}
+          </Prism>
+        </Tabs.Panel>
+      </Tabs>
 
       <Group position='right' mt='md'>
         <Select
