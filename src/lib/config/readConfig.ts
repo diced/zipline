@@ -121,6 +121,7 @@ export default function readConfig() {
 
     map('FEATURES_INVITES', 'boolean', 'features.invites'),
     map('FEATURES_OAUTH_REGISTRATION', 'boolean', 'features.oauth_registration'),
+    map('FEATURES_USER_REGISTRATION', 'boolean', 'features.user_registration'),
   ];
 
   const config = {};

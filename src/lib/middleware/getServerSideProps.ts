@@ -27,6 +27,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       external_links: JSON.stringify(config.website.external_links),
       disable_media_preview: config.website.disable_media_preview,
       invites: config.features.invites,
+      user_registration: config.features.user_registration,
       oauth_registration: config.features.oauth_registration,
       oauth_providers: JSON.stringify(oauth_providers),
     },

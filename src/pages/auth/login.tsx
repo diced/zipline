@@ -8,7 +8,7 @@ import Head from 'next/head';
 import { GitHubIcon, DiscordIcon } from 'components/icons';
 export { getServerSideProps } from 'middleware/getServerSideProps';
 
-export default function Login({ title, oauth_registration, oauth_providers: unparsed }) {
+export default function Login({ title, user_registration, oauth_registration, oauth_providers: unparsed }) {
   const router = useRouter();
 
   const oauth_providers = JSON.parse(unparsed);
@@ -75,6 +75,16 @@ export default function Login({ title, oauth_registration, oauth_providers: unpa
               Login
             </Button>
           </form>
+          {user_registration && (
+            <>
+              <Divider label='or' labelPosition='center' my={8} />
+              <Link href='/auth/register' passHref>
+                <Button size='lg' fullWidth component='a'>
+                  Register
+                </Button>
+              </Link>
+            </>
+          )}
           {oauth_registration && (
             <>
               <Divider label='or' labelPosition='center' my={8} />

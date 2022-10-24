@@ -5,18 +5,19 @@ import Logger from 'lib/logger';
 import config from 'lib/config';
 
 async function handler(req: NextApiReq, res: NextApiRes) {
-  if (req.method === 'POST' && req.body && req.body.code) {
-    if (!config.features.invites) return res.forbid('invites are disabled');
+  if (req.method === 'POST' && req.body) {
+    if (!config.features.invites && req.body.code) return res.forbid('invites are disabled');
+    if (!config.features.user_registration) return res.forbid('user registration is disabled');
 
     const { code, username, password } = req.body as {
-      code: string;
+      code?: string;
       username: string;
       password: string;
     };
     const invite = await prisma.invite.findUnique({
-      where: { code },
+      where: { code: code ?? '' },
     });
-    if (!invite) return res.bad('invalid invite code');
+    if (!invite && code) return res.bad('invalid invite code');
 
     const user = await prisma.user.findFirst({
       where: { username },
@@ -33,16 +34,22 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       },
     });
 
-    await prisma.invite.update({
-      where: {
-        code,
-      },
-      data: {
-        used: true,
-      },
-    });
+    if (code) {
+      await prisma.invite.update({
+        where: {
+          code,
+        },
+        data: {
+          used: true,
+        },
+      });
+    }
 
-    Logger.get('user').info(`Created user ${newUser.username} (${newUser.id}) from invite code ${code}`);
+    Logger.get('user').info(
+      `Created user ${newUser.username} (${newUser.id}) ${
+        code ? `from invite code ${code}` : 'via registration'
+      }`
+    );
 
     return res.json({ success: true });
   }

@@ -163,10 +163,11 @@ const validator = s.object({
     .nullish.default(null),
   features: s
     .object({
-      invites: s.boolean.default(true),
+      invites: s.boolean.default(false),
       oauth_registration: s.boolean.default(false),
+      user_registration: s.boolean.default(false),
     })
-    .default({ invites: true, oauth_registration: false }),
+    .default({ invites: false, oauth_registration: false, user_registration: false }),
 });
 
 export default function validate(config): Config {
