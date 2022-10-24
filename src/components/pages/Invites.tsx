@@ -108,7 +108,7 @@ function CreateInviteModal({ open, setOpen, updateInvites }) {
           parser={(v: string) => Number(v.replace(/[^\d]/g, ''))}
         />
 
-        <Group position='right' mt={22}>
+        <Group position='right' mt='md'>
           <Button onClick={() => setOpen(false)}>Cancel</Button>
           <Button type='submit'>Create</Button>
         </Group>
@@ -154,7 +154,7 @@ export default function Users() {
     });
 
   const handleCopy = async (invite) => {
-    clipboard.copy(`${window.location.protocol}//${window.location.host}/invite/${invite.code}`);
+    clipboard.copy(`${window.location.protocol}//${window.location.host}/auth/register?code=${invite.code}`);
     showNotification({
       title: 'Copied to clipboard',
       message: '',

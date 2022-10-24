@@ -373,7 +373,7 @@ export default function Manage() {
           Refresh
         </Button>
       </Group>
-      <Card mt={22}>
+      <Card mt='md'>
         {exports && exports.length ? (
           <SmallTable
             columns={[

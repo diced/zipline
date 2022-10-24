@@ -147,7 +147,7 @@ export default function File({ image, updateImages, disableMediaPreview }) {
           </Stack>
         </Stack>
 
-        <Group position='right' mt={22}>
+        <Group position='right' mt='md'>
           <Link href={image.url} target='_blank'>
             <Button rightIcon={<ExternalLinkIcon />}>Open</Button>
           </Link>

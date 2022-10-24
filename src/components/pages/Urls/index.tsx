@@ -93,7 +93,7 @@ export default function Urls() {
           <TextInput id='url' label='URL' {...form.getInputProps('url')} />
           <TextInput id='vanity' label='Vanity' {...form.getInputProps('vanity')} />
 
-          <Group position='right' mt={22}>
+          <Group position='right' mt='md'>
             <Button onClick={() => setCreateOpen(false)}>Cancel</Button>
             <Button type='submit'>Submit</Button>
           </Group>

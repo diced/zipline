@@ -71,13 +71,13 @@ export default function Login({ title, user_registration, oauth_registration, oa
             <TextInput size='lg' id='username' label='Username' {...form.getInputProps('username')} />
             <PasswordInput size='lg' id='password' label='Password' {...form.getInputProps('password')} />
 
-            <Button size='lg' type='submit' fullWidth mt={12}>
+            <Button size='lg' type='submit' fullWidth mt='sm'>
               Login
             </Button>
           </form>
           {user_registration && (
             <>
-              <Divider label='or' labelPosition='center' my={8} />
+              <Divider label='or' labelPosition='center' my='sm' />
               <Link href='/auth/register' passHref>
                 <Button size='lg' fullWidth component='a'>
                   Register
@@ -87,7 +87,7 @@ export default function Login({ title, user_registration, oauth_registration, oa
           )}
           {oauth_registration && (
             <>
-              <Divider label='or' labelPosition='center' my={8} />
+              <Divider label='or' labelPosition='center' my='sm' />
               {oauth_providers.map(({ url, name, Icon }, i) => (
                 <Link key={i} href={url} passHref>
                   <Button size='lg' fullWidth leftIcon={<Icon />} component='a' my={8}>
