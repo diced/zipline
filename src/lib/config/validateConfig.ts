@@ -2,6 +2,7 @@ import { Config } from 'lib/config/Config';
 import { s } from '@sapphire/shapeshift';
 import { inspect } from 'util';
 import Logger from '../logger';
+import { humanToBytes } from '../utils/bytes';
 
 const discord_content = s
   .object({
@@ -79,8 +80,8 @@ const validator = s.object({
       route: s.string.default('/u'),
       embed_route: s.string.default('/a'),
       length: s.number.default(6),
-      admin_limit: s.number.default(104900000),
-      user_limit: s.number.default(104900000),
+      admin_limit: s.number.default(humanToBytes('100MB')),
+      user_limit: s.number.default(humanToBytes('100MB')),
       disabled_extensions: s.string.array.default([]),
       format_date: s.string.default('YYYY-MM-DD_HH:mm:ss'),
     })
@@ -88,8 +89,8 @@ const validator = s.object({
       route: '/u',
       embed_route: '/a',
       length: 6,
-      admin_limit: 104900000,
-      user_limit: 104900000,
+      admin_limit: humanToBytes('100MB'),
+      user_limit: humanToBytes('100MB'),
       disabled_extensions: [],
       format_date: 'YYYY-MM-DD_HH:mm:ss',
     }),
@@ -168,6 +169,15 @@ const validator = s.object({
       user_registration: s.boolean.default(false),
     })
     .default({ invites: false, oauth_registration: false, user_registration: false }),
+  chunks: s
+    .object({
+      max_size: s.number.default(humanToBytes('90MB')),
+      chunks_size: s.number.default(humanToBytes('20MB')),
+    })
+    .default({
+      max_size: humanToBytes('90MB'),
+      chunks_size: humanToBytes('20MB'),
+    }),
 });
 
 export default function validate(config): Config {

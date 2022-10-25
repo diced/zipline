@@ -113,6 +113,11 @@ export interface ConfigOAuth {
   discord_client_secret?: string;
 }
 
+export interface ConfigChunks {
+  max_size: number;
+  chunks_size: number;
+}
+
 export interface Config {
   core: ConfigCore;
   uploader: ConfigUploader;
@@ -123,4 +128,5 @@ export interface Config {
   discord: ConfigDiscord;
   oauth: ConfigOAuth;
   features: ConfigFeatures;
+  chunks: ConfigChunks;
 }

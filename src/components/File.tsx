@@ -111,7 +111,6 @@ export default function File({ image, updateImages, disableMediaPreview }) {
     );
   };
 
-  console.log(image);
   return (
     <>
       <Modal opened={open} onClose={() => setOpen(false)} title={<Title>{image.file}</Title>} size='xl'>
