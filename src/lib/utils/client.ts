@@ -16,18 +16,12 @@ export function parse(str: string, image: Image, user: User) {
     .replace(/{image\.created_at.date_string}/gi, image.created_at.toLocaleDateString());
 }
 
-export function bytesToRead(bytes: number) {
-  if (isNaN(bytes)) return '0.0 B';
-  if (bytes === Infinity) return '0.0 B';
-  const units = ['B', 'kB', 'MB', 'GB', 'TB', 'PB'];
-  let num = 0;
+export function randomChars(length: number) {
+  const charset = 'QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890';
 
-  while (bytes > 1024) {
-    bytes /= 1024;
-    ++num;
-  }
-
-  return `${bytes.toFixed(1)} ${units[num]}`;
+  let res = '';
+  for (let i = 0; i !== length; ++i) res += charset[Math.floor(Math.random() * charset.length)];
+  return res;
 }
 
 export const units = {

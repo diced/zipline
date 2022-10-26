@@ -13,7 +13,7 @@ import {
 } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import ColorHash from 'color-hash';
-import { bytesToRead } from 'lib/utils/client';
+import { bytesToHuman } from 'lib/utils/bytes';
 import { useStats } from 'lib/queries/stats';
 import { useMemo } from 'react';
 import { Chart, Pie } from 'react-chartjs-2';
@@ -215,7 +215,7 @@ export default function Graphs() {
                       ...chartOptions.scales.y,
 
                       ticks: {
-                        callback: (value) => bytesToRead(value as number),
+                        callback: (value) => bytesToHuman(value as number),
                         color: theme.colors.gray[6],
                       },
                     },
@@ -228,7 +228,7 @@ export default function Graphs() {
                       callbacks: {
                         label: (context) => {
                           const value = context.raw as number;
-                          return bytesToRead(value);
+                          return bytesToHuman(value);
                         },
                       },
                     },

@@ -49,18 +49,6 @@ export async function sizeOfDir(directory: string): Promise<number> {
   return size;
 }
 
-export function bytesToRead(bytes: number) {
-  const units = ['B', 'kB', 'MB', 'GB', 'TB', 'PB'];
-  let num = 0;
-
-  while (bytes > 1024) {
-    bytes /= 1024;
-    ++num;
-  }
-
-  return `${bytes.toFixed(1)} ${units[num]}`;
-}
-
 export function randomInvis(length: number) {
   // some parts from https://github.com/tycrek/ass/blob/master/generators/lengthGen.js
   const invisibleCharset = ['\u200B', '\u2060', '\u200C', '\u200D'];

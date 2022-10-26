@@ -68,11 +68,12 @@ export const withZipline =
     };
 
     res.ratelimited = (remaining: number) => {
-      res.status(429);
-      res.setHeader('X-Ratelimit-Remaining', Math.floor(remaining / 1000));
-      res.json({
-        error: '429: ratelimited',
-      });
+      res.setHeader('X-Ratelimit-Remaining', Math.floor(remaining / 1000)).json(
+        {
+          error: '429: ratelimited',
+        },
+        429
+      );
     };
 
     res.json = (json: any, status: number = 200) => {

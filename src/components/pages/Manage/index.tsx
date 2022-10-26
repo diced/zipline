@@ -32,7 +32,7 @@ import MutedText from 'components/MutedText';
 import { SmallTable } from 'components/SmallTable';
 import useFetch from 'hooks/useFetch';
 import { userSelector } from 'lib/recoil/user';
-import { bytesToRead } from 'lib/utils/client';
+import { bytesToHuman } from 'lib/utils/bytes';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import Flameshot from './Flameshot';
@@ -373,7 +373,7 @@ export default function Manage() {
           Refresh
         </Button>
       </Group>
-      <Card mt={22}>
+      <Card mt='md'>
         {exports && exports.length ? (
           <SmallTable
             columns={[
@@ -390,7 +390,7 @@ export default function Manage() {
                       </Anchor>
                     ),
                     date: x.date.toLocaleString(),
-                    size: bytesToRead(x.size),
+                    size: bytesToHuman(x.size),
                   }))
                 : []
             }

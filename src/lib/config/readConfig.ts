@@ -1,6 +1,9 @@
 import { parse } from 'dotenv';
 import { expand } from 'dotenv-expand';
 import { existsSync, readFileSync } from 'fs';
+import { humanToBytes } from '../utils/bytes';
+
+export type ValueType = 'string' | 'number' | 'boolean' | 'array' | 'json-array' | 'human-to-byte';
 
 function isObject(value: any): value is Record<string, any> {
   return typeof value === 'object' && value !== null;
@@ -24,7 +27,7 @@ function set(object: Record<string, any>, property: string, value: any) {
   return object;
 }
 
-function map(env: string, type: 'string' | 'number' | 'boolean' | 'array' | 'json-array', path: string) {
+function map(env: string, type: ValueType, path: string) {
   return {
     env,
     type,
@@ -74,8 +77,8 @@ export default function readConfig() {
 
     map('UPLOADER_ROUTE', 'string', 'uploader.route'),
     map('UPLOADER_LENGTH', 'number', 'uploader.length'),
-    map('UPLOADER_ADMIN_LIMIT', 'number', 'uploader.admin_limit'),
-    map('UPLOADER_USER_LIMIT', 'number', 'uploader.user_limit'),
+    map('UPLOADER_ADMIN_LIMIT', 'human-to-byte', 'uploader.admin_limit'),
+    map('UPLOADER_USER_LIMIT', 'human-to-byte', 'uploader.user_limit'),
     map('UPLOADER_DISABLED_EXTENSIONS', 'array', 'uploader.disabled_extensions'),
     map('UPLOADER_FORMAT_DATE', 'string', 'uploader.format_date'),
 
@@ -121,6 +124,10 @@ export default function readConfig() {
 
     map('FEATURES_INVITES', 'boolean', 'features.invites'),
     map('FEATURES_OAUTH_REGISTRATION', 'boolean', 'features.oauth_registration'),
+    map('FEATURES_USER_REGISTRATION', 'boolean', 'features.user_registration'),
+
+    map('CHUNKS_MAX_SIZE', 'human-to-byte', 'chunks.max_size'),
+    map('CHUNKS_CHUNKS_SIZE', 'human-to-byte', 'chunks.chunks_size'),
   ];
 
   const config = {};
@@ -148,6 +155,9 @@ export default function readConfig() {
           } catch (e) {
             parsed = [];
           }
+          break;
+        case 'human-to-byte':
+          parsed = humanToBytes(value) ?? undefined;
           break;
         default:
           parsed = value;

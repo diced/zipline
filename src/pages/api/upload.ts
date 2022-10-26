@@ -11,6 +11,10 @@ import { randomUUID } from 'crypto';
 import sharp from 'sharp';
 import { parseExpiry } from 'lib/utils/client';
 import { sendUpload } from 'lib/discord';
+import { join } from 'path';
+import { tmpdir } from 'os';
+import { readdir, readFile, unlink, writeFile } from 'fs/promises';
+import { guess } from 'lib/mimes';
 
 const uploader = multer();
 
@@ -25,29 +29,10 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   });
 
   if (!user) return res.forbid('authorization incorrect');
-  if (user.ratelimit) {
-    const remaining = user.ratelimit.getTime() - Date.now();
-    if (remaining <= 0) {
-      await prisma.user.update({
-        where: {
-          id: user.id,
-        },
-        data: {
-          ratelimit: null,
-        },
-      });
-    } else {
-      return res.ratelimited(remaining);
-    }
-  }
 
   await run(uploader.array('file'))(req, res);
 
-  if (!req.files) return res.error('no files');
-  if (req.files && req.files.length === 0) return res.error('no files');
-
   const response: { files: string[]; expires_at?: Date } = { files: [] };
-
   const expires_at = req.headers['expires-at'] as string;
   let expiry: Date;
 
@@ -65,6 +50,125 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   const imageCompressionPercent = req.headers['image-compression-percent']
     ? Number(req.headers['image-compression-percent'])
     : null;
+
+  // handle partial uploads before ratelimits
+  if (req.headers['content-range']) {
+    // parses content-range header (bytes start-end/total)
+    const [start, end, total] = req.headers['content-range']
+      .replace('bytes ', '')
+      .replace('-', '/')
+      .split('/')
+      .map((x) => Number(x));
+
+    const filename = req.headers['x-zipline-partial-filename'] as string;
+    const mimetype = req.headers['x-zipline-partial-mimetype'] as string;
+    const identifier = req.headers['x-zipline-partial-identifier'];
+    const lastchunk = req.headers['x-zipline-partial-lastchunk'] === 'true';
+
+    const tempFile = join(tmpdir(), `zipline_partial_${identifier}_${start}_${end}`);
+    await writeFile(tempFile, req.files[0].buffer);
+
+    if (lastchunk) {
+      const partials = await readdir(tmpdir()).then((files) =>
+        files.filter((x) => x.startsWith(`zipline_partial_${identifier}`))
+      );
+
+      const readChunks = partials.map((x) => {
+        const [, , , start, end] = x.split('_');
+        return { start: Number(start), end: Number(end), filename: x };
+      });
+
+      // combine chunks
+      const chunks = new Uint8Array(total);
+
+      for (let i = 0; i !== readChunks.length; ++i) {
+        const chunkData = readChunks[i];
+
+        const buffer = await readFile(join(tmpdir(), chunkData.filename));
+        await unlink(join(tmpdir(), readChunks[i].filename));
+
+        chunks.set(buffer, chunkData.start);
+      }
+
+      const ext = filename.split('.').pop();
+      if (zconfig.uploader.disabled_extensions.includes(ext))
+        return res.error('disabled extension recieved: ' + ext);
+      let fileName: string;
+
+      switch (format) {
+        case ImageFormat.RANDOM:
+          fileName = randomChars(zconfig.uploader.length);
+          break;
+        case ImageFormat.DATE:
+          fileName = dayjs().format(zconfig.uploader.format_date);
+          break;
+        case ImageFormat.UUID:
+          fileName = randomUUID({ disableEntropyCache: true });
+          break;
+        case ImageFormat.NAME:
+          fileName = filename.split('.')[0];
+          break;
+        default:
+          fileName = randomChars(zconfig.uploader.length);
+          break;
+      }
+
+      let password = null;
+      if (req.headers.password) {
+        password = await hashPassword(req.headers.password as string);
+      }
+
+      const compressionUsed = imageCompressionPercent && mimetype.startsWith('image/');
+      let invis: InvisibleImage;
+
+      const file = await prisma.image.create({
+        data: {
+          file: `${fileName}.${compressionUsed ? 'jpg' : ext}`,
+          mimetype,
+          userId: user.id,
+          embed: !!req.headers.embed,
+          format,
+          password,
+          expires_at: expiry,
+        },
+      });
+
+      if (req.headers.zws) invis = await createInvisImage(zconfig.uploader.length, file.id);
+
+      await datasource.save(file.file, Buffer.from(chunks));
+
+      return res.json({
+        files: [
+          `${zconfig.core.https ? 'https' : 'http'}://${req.headers.host}${
+            zconfig.uploader.route === '/' ? '' : zconfig.uploader.route
+          }/${file.file}`,
+        ],
+      });
+    }
+
+    return res.json({
+      success: true,
+    });
+  }
+
+  if (user.ratelimit) {
+    const remaining = user.ratelimit.getTime() - Date.now();
+    if (remaining <= 0) {
+      await prisma.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          ratelimit: null,
+        },
+      });
+    } else {
+      return res.ratelimited(remaining);
+    }
+  }
+
+  if (!req.files) return res.error('no files');
+  if (req.files && req.files.length === 0) return res.error('no files');
 
   for (let i = 0; i !== req.files.length; ++i) {
     const file = req.files[i];

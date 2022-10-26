@@ -1,7 +1,9 @@
 import { Prism } from '@mantine/prism';
+import prisma from 'lib/prisma';
 import exts from 'lib/exts';
 import { streamToString } from 'lib/utils/streams';
 import { GetServerSideProps } from 'next';
+import { checkPassword } from 'lib/util';
 
 type CodeProps = {
   code: string;
@@ -32,6 +34,23 @@ export const getServerSideProps: GetServerSideProps<CodeProps> = async (context)
     return {
       notFound: true,
     };
+
+  const file = await prisma.image.findFirst({
+    where: {
+      file: context.params.id as string,
+    },
+  });
+  if (!file) return { notFound: true };
+
+  if (file.password && !context.query.password)
+    return {
+      notFound: true,
+    };
+
+  if (file.password && context.query.password) {
+    const valid = await checkPassword(context.query.password as string, file.password);
+    if (!valid) return { notFound: true };
+  }
 
   context.res.setHeader('Cache-Control', 'public, max-age=2628000, stale-while-revalidate=86400');
 

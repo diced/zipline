@@ -57,9 +57,9 @@ export function EditUserModal({ open, setOpen, updateUsers, user }) {
         <form onSubmit={form.onSubmit((v) => onSubmit(v))}>
           <TextInput id='username' label='Username' {...form.getInputProps('username')} />
           <TextInput id='password' label='Password' type='password' {...form.getInputProps('password')} />
-          <Switch mt={12} id='administrator' label='Administrator' {...form.getInputProps('administrator')} />
+          <Switch mt='sm' id='administrator' label='Administrator' {...form.getInputProps('administrator')} />
 
-          <Group position='right' mt={22}>
+          <Group position='right' mt='md'>
             <Button onClick={() => setOpen(false)}>Cancel</Button>
             <Button type='submit'>Save</Button>
           </Group>

@@ -1,7 +1,8 @@
 import { Migrate } from '@prisma/migrate/dist/Migrate';
 import { ensureDatabaseExists } from '@prisma/migrate/dist/utils/ensureDatabaseExists';
 import Logger from '../lib/logger';
-import { Datasource } from 'lib/datasources';
+import { bytesToHuman } from '../lib/utils/bytes';
+import { Datasource } from '../lib/datasources';
 import { PrismaClient } from '@prisma/client';
 
 export async function migrations() {
@@ -34,18 +35,6 @@ export async function migrations() {
 export function log(url: string) {
   if (url.startsWith('/_next') || url.startsWith('/__nextjs')) return;
   return Logger.get('url').info(url);
-}
-
-export function bytesToRead(bytes: number) {
-  const units = ['B', 'kB', 'MB', 'GB', 'TB', 'PB'];
-  let num = 0;
-
-  while (bytes > 1024) {
-    bytes /= 1024;
-    ++num;
-  }
-
-  return `${bytes.toFixed(1)} ${units[num]}`;
 }
 
 export async function getStats(prisma: PrismaClient, datasource: Datasource) {
@@ -94,7 +83,7 @@ export async function getStats(prisma: PrismaClient, datasource: Datasource) {
     });
 
   return {
-    size: bytesToRead(size),
+    size: bytesToHuman(size),
     size_num: size,
     count,
     count_by_user: count_by_user.sort((a, b) => b.count - a.count),

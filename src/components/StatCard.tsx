@@ -51,7 +51,7 @@ export default function StatCard({ stat }: StatsGridProps) {
         {stat.icon}
       </Group>
 
-      <Group align='flex-end' spacing='xs' mt={25}>
+      <Group align='flex-end' spacing='xs' mt='md'>
         <Text className={classes.value}>{stat.value}</Text>
         {typeof stat.diff == 'number' && (
           <>
@@ -63,7 +63,7 @@ export default function StatCard({ stat }: StatsGridProps) {
         )}
       </Group>
 
-      <Text size='xs' color='dimmed' mt={7}>
+      <Text size='xs' color='dimmed' mt='sm'>
         {stat.desc}
       </Text>
     </Card>

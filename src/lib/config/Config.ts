@@ -102,6 +102,7 @@ export interface ConfigDiscordEmbed {
 export interface ConfigFeatures {
   invites: boolean;
   oauth_registration: boolean;
+  user_registration: boolean;
 }
 
 export interface ConfigOAuth {
@@ -110,6 +111,11 @@ export interface ConfigOAuth {
 
   discord_client_id?: string;
   discord_client_secret?: string;
+}
+
+export interface ConfigChunks {
+  max_size: number;
+  chunks_size: number;
 }
 
 export interface Config {
@@ -122,4 +128,5 @@ export interface Config {
   discord: ConfigDiscord;
   oauth: ConfigOAuth;
   features: ConfigFeatures;
+  chunks: ConfigChunks;
 }
