@@ -24,4 +24,4 @@ export default function FourOhFour() {
   );
 }
 
-FourOhFour.title = 'Zipline - 404';
+FourOhFour.title = 'LunarX - 404';

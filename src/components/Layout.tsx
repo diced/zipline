@@ -311,8 +311,8 @@ export default function Layout({ children, props }) {
               <Tooltip
                 label={
                   version.data.local !== version.data.upstream
-                    ? `You are running an outdated version of Zipline, refer to the docs on how to update to ${version.data.upstream}`
-                    : 'You are running the latest version of Zipline'
+                    ? `You are running an outdated version of LunarX, refer to the docs on how to update to ${version.data.upstream}`
+                    : 'You are running the latest version of LunarX'
                 }
               >
                 <Badge

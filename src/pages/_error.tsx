@@ -29,4 +29,4 @@ export function getInitialProps({ res, err }) {
   return { pageProps: { statusCode } };
 }
 
-Error.title = 'Zipline - Something went wrong...';
+Error.title = 'LunarX - Something went wrong...';
