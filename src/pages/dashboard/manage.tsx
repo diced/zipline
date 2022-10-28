@@ -11,10 +11,11 @@ export default function ManagePage(props) {
 
   if (loading) return <LoadingOverlay visible={loading} />;
 
+  const title = `${props.title} - Manage User`;
   return (
     <>
       <Head>
-        <title>{props.title} - Manage User</title>
+        <title>{title}</title>
       </Head>
       <Layout props={props}>
         <Manage />

@@ -1,20 +1,19 @@
-import multer from 'multer';
-import prisma from 'lib/prisma';
-import zconfig from 'lib/config';
-import { NextApiReq, NextApiRes, withZipline } from 'lib/middleware/withZipline';
-import { createInvisImage, randomChars, hashPassword } from 'lib/util';
-import Logger from 'lib/logger';
 import { ImageFormat, InvisibleImage } from '@prisma/client';
-import dayjs from 'dayjs';
-import datasource from 'lib/datasource';
 import { randomUUID } from 'crypto';
-import sharp from 'sharp';
-import { parseExpiry } from 'lib/utils/client';
-import { sendUpload } from 'lib/discord';
-import { join } from 'path';
-import { tmpdir } from 'os';
+import dayjs from 'dayjs';
 import { readdir, readFile, unlink, writeFile } from 'fs/promises';
-import { guess } from 'lib/mimes';
+import zconfig from 'lib/config';
+import datasource from 'lib/datasource';
+import { sendUpload } from 'lib/discord';
+import Logger from 'lib/logger';
+import { NextApiReq, NextApiRes, withZipline } from 'lib/middleware/withZipline';
+import prisma from 'lib/prisma';
+import { createInvisImage, hashPassword, randomChars } from 'lib/util';
+import { parseExpiry } from 'lib/utils/client';
+import multer from 'multer';
+import { tmpdir } from 'os';
+import { join } from 'path';
+import sharp from 'sharp';
 
 const uploader = multer();
 
@@ -50,6 +49,13 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   const imageCompressionPercent = req.headers['image-compression-percent']
     ? Number(req.headers['image-compression-percent'])
     : null;
+  if (isNaN(imageCompressionPercent)) return res.error('invalid image compression percent (invalid number)');
+  if (imageCompressionPercent < 0 || imageCompressionPercent > 100)
+    return res.error('invalid image compression percent (% < 0 || % > 100)');
+
+  const fileMaxViews = req.headers['max-views'] ? Number(req.headers['max-views']) : null;
+  if (isNaN(fileMaxViews)) return res.error('invalid max views (invalid number)');
+  if (fileMaxViews < 0) return res.error('invalid max views (max views < 0)');
 
   // handle partial uploads before ratelimits
   if (req.headers['content-range']) {
@@ -130,6 +136,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
           format,
           password,
           expires_at: expiry,
+          maxViews: fileMaxViews,
         },
       });
 
@@ -141,7 +148,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         files: [
           `${zconfig.core.https ? 'https' : 'http'}://${req.headers.host}${
             zconfig.uploader.route === '/' ? '' : zconfig.uploader.route
-          }/${file.file}`,
+          }/${invis ? invis.invis : file.file}`,
         ],
       });
     }
@@ -173,11 +180,11 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   for (let i = 0; i !== req.files.length; ++i) {
     const file = req.files[i];
     if (file.size > zconfig.uploader[user.administrator ? 'admin_limit' : 'user_limit'])
-      return res.error(`file[${i}] size too big`);
+      return res.error(`file[${i}]: size too big`);
 
     const ext = file.originalname.split('.').pop();
     if (zconfig.uploader.disabled_extensions.includes(ext))
-      return res.error('disabled extension recieved: ' + ext);
+      return res.error(`file[${i}]: disabled extension recieved: ${ext}`);
     let fileName: string;
 
     switch (format) {
@@ -214,6 +221,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         format,
         password,
         expires_at: expiry,
+        maxViews: fileMaxViews,
       },
     });
 

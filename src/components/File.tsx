@@ -128,7 +128,15 @@ export default function File({ image, updateImages, disableMediaPreview }) {
           <Stack>
             <FileMeta Icon={FileIcon} title='Name' subtitle={image.file} />
             <FileMeta Icon={ImageIcon} title='Type' subtitle={image.mimetype} />
-            <FileMeta Icon={EyeIcon} title='Views' subtitle={image.views} />
+            <FileMeta Icon={EyeIcon} title='Views' subtitle={image.views.toLocaleString()} />
+            {image.maxViews && (
+              <FileMeta
+                Icon={EyeIcon}
+                title='Max views'
+                subtitle={image.maxViews.toLocaleString()}
+                tooltip={`This file will be deleted after being viewed ${image.maxViews.toLocaleString()} times.`}
+              />
+            )}
             <FileMeta
               Icon={CalendarIcon}
               title='Uploaded at'
@@ -147,12 +155,12 @@ export default function File({ image, updateImages, disableMediaPreview }) {
         </Stack>
 
         <Group position='right' mt='md'>
-          <Link href={image.url} target='_blank'>
-            <Button rightIcon={<ExternalLinkIcon />}>Open</Button>
-          </Link>
           <Button onClick={handleCopy}>Copy URL</Button>
           <Button onClick={handleDelete}>Delete</Button>
           <Button onClick={handleFavorite}>{image.favorite ? 'Unfavorite' : 'Favorite'}</Button>
+          <Link href={image.url} target='_blank'>
+            <Button rightIcon={<ExternalLinkIcon />}>Open</Button>
+          </Link>
         </Group>
       </Modal>
       <Card sx={{ maxWidth: '100%', height: '100%' }} shadow='md'>

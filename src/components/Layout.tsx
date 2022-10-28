@@ -57,7 +57,7 @@ import { friendlyThemeName, themes } from './Theming';
 
 function MenuItemLink(props) {
   return (
-    <Link href={props.href} passHref>
+    <Link href={props.href} passHref legacyBehavior>
       <MenuItem {...props} />
     </Link>
   );
@@ -258,7 +258,7 @@ export default function Layout({ children, props }) {
         <Navbar pt='sm' hiddenBreakpoint='sm' hidden={!opened} width={{ sm: 200, lg: 230 }}>
           <Navbar.Section grow component={ScrollArea}>
             {items.map(({ icon, text, link }) => (
-              <Link href={link} key={text} passHref>
+              <Link href={link} key={text} passHref legacyBehavior>
                 <NavLink
                   component='a'
                   label={text}
@@ -278,7 +278,7 @@ export default function Layout({ children, props }) {
                 {admin_items
                   .filter((x) => x.if(props))
                   .map(({ icon, text, link }) => (
-                    <Link href={link} key={text} passHref>
+                    <Link href={link} key={text} passHref legacyBehavior>
                       <NavLink
                         component='a'
                         label={text}
@@ -294,7 +294,7 @@ export default function Layout({ children, props }) {
           <Navbar.Section>
             {external_links.length
               ? external_links.map(({ label, link }, i) => (
-                  <Link href={link} passHref key={i}>
+                  <Link href={link} passHref key={i} legacyBehavior>
                     <NavLink
                       label={label}
                       component='a'

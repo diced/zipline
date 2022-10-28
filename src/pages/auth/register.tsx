@@ -83,12 +83,11 @@ export default function Register({ code, title, user_registration }) {
     }
   };
 
+  const full_title = `${title} - Invite (${code || 'None'})`;
   return (
     <>
       <Head>
-        <title>
-          {title} - Invite ({code})
-        </title>
+        <title>{title}</title>
       </Head>
       <Center sx={{ height: '100vh' }}>
         <Box

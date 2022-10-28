@@ -11,10 +11,11 @@ export default function UploadTextPage(props) {
 
   if (loading) return <LoadingOverlay visible={loading} />;
 
+  const title = `${props.title} - Upload Text`;
   return (
     <>
       <Head>
-        <title>{props.title} - Upload Text</title>
+        <title>{title}</title>
       </Head>
       <Layout props={props}>
         <UploadText />

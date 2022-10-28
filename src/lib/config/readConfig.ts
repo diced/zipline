@@ -42,6 +42,12 @@ export default function readConfig() {
     expand({
       parsed: parse(contents),
     });
+  } else if (existsSync('.env')) {
+    const contents = readFileSync('.env');
+
+    expand({
+      parsed: parse(contents),
+    });
   }
 
   const maps = [

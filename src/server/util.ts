@@ -4,6 +4,7 @@ import Logger from '../lib/logger';
 import { bytesToHuman } from '../lib/utils/bytes';
 import { Datasource } from '../lib/datasources';
 import { PrismaClient } from '@prisma/client';
+import { ServerResponse } from 'http';
 
 export async function migrations() {
   try {
@@ -35,6 +36,11 @@ export async function migrations() {
 export function log(url: string) {
   if (url.startsWith('/_next') || url.startsWith('/__nextjs')) return;
   return Logger.get('url').info(url);
+}
+
+export function redirect(res: ServerResponse, url: string) {
+  res.writeHead(307, { Location: url });
+  res.end();
 }
 
 export async function getStats(prisma: PrismaClient, datasource: Datasource) {

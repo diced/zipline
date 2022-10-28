@@ -23,7 +23,7 @@ export default function Files({ disableMediaPreview }) {
     <>
       <Group mb='md'>
         <Title>Files</Title>
-        <Link href='/dashboard/upload' passHref>
+        <Link href='/dashboard/upload' passHref legacyBehavior>
           <ActionIcon component='a' variant='filled' color='primary'>
             <PlusIcon />
           </ActionIcon>
