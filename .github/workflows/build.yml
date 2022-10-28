@@ -19,10 +19,15 @@ jobs:
         id: cache-restore
         uses: actions/cache@v2
         with:
-          path: node_modules
-          key: ${{ runner.os }}-node${{ matrix.node }}-${{ hashFiles('**/yarn.lock') }}
+          path: |
+            node_modules
+            ${{ github.workspace }}/.next/cache
+          key: ${{ runner.os }}-node${{ matrix.node }}-${{ hashFiles('**/yarn.lock') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+          restore-keys: |
+            ${{ runner.os }}-node${{ matrix.node }}-${{ hashFiles('**/yarn.lock') }}-
       - name: Install dependencies
         if: steps.cache-restore.outputs.cache-hit != 'true'
+        run: yarn install
 
       - name: Build
         run: yarn build
