@@ -59,10 +59,11 @@ export default function Login({ title, user_registration, oauth_registration, oa
     })();
   }, []);
 
+  const full_title = `${title} - Login`;
   return (
     <>
       <Head>
-        <title>{title} - Login</title>
+        <title>{full_title}</title>
       </Head>
       <Center sx={{ height: '100vh' }}>
         <div>

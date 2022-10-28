@@ -11,10 +11,11 @@ export default function FilesPage(props) {
 
   if (loading) return <LoadingOverlay visible={loading} />;
 
+  const title = `${props.title} - Files`;
   return (
     <>
       <Head>
-        <title>{props.title} - Files</title>
+        <title>{title}</title>
       </Head>
 
       <Layout props={props}>
