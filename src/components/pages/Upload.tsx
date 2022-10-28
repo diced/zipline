@@ -1,4 +1,14 @@
-import { Button, Collapse, Group, Progress, Select, Title, PasswordInput, Tooltip } from '@mantine/core';
+import {
+  Button,
+  Collapse,
+  Group,
+  Progress,
+  Select,
+  Title,
+  PasswordInput,
+  Tooltip,
+  NumberInput,
+} from '@mantine/core';
 import { randomId, useClipboard } from '@mantine/hooks';
 import { showNotification, updateNotification } from '@mantine/notifications';
 import Dropzone from 'components/dropzone/Dropzone';
@@ -20,6 +30,8 @@ export default function Upload({ chunks: chunks_config }) {
   const [loading, setLoading] = useState(false);
   const [expires, setExpires] = useState('never');
   const [password, setPassword] = useState('');
+  const [maxViews, setMaxViews] = useState<number>(undefined);
+  console.log(maxViews);
 
   useEffect(() => {
     window.addEventListener('paste', (e: ClipboardEvent) => {
@@ -139,6 +151,7 @@ export default function Upload({ chunks: chunks_config }) {
         req.setRequestHeader('X-Zipline-Partial-LastChunk', j === chunks.length - 1 ? 'true' : 'false');
         expires !== 'never' && req.setRequestHeader('Expires-At', 'date=' + expires_at.toISOString());
         password !== '' && req.setRequestHeader('Password', password);
+        maxViews && maxViews !== 0 && req.setRequestHeader('Max-Views', String(maxViews));
 
         req.send(body);
 
@@ -285,6 +298,7 @@ export default function Upload({ chunks: chunks_config }) {
       req.setRequestHeader('Authorization', user.token);
       expires !== 'never' && req.setRequestHeader('Expires-At', 'date=' + expires_at.toISOString());
       password !== '' && req.setRequestHeader('Password', password);
+      maxViews && maxViews !== 0 && req.setRequestHeader('Max-Views', String(maxViews));
 
       req.send(body);
     }
@@ -307,6 +321,9 @@ export default function Upload({ chunks: chunks_config }) {
       </Collapse>
 
       <Group position='right' mt='md'>
+        <Tooltip label='After the file reaches this amount of views, it will be deleted automatically. Leave blank for no limit.'>
+          <NumberInput placeholder='Max Views' min={0} value={maxViews} onChange={(x) => setMaxViews(x)} />
+        </Tooltip>
         <Tooltip label='Add a password to your files (optional, leave blank for none)'>
           <PasswordInput
             style={{ width: '252px' }}
