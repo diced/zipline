@@ -23,6 +23,8 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       file: true,
       mimetype: true,
       id: true,
+      views: true,
+      maxViews: true,
     },
   });
 

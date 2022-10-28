@@ -128,13 +128,13 @@ export default function File({ image, updateImages, disableMediaPreview }) {
           <Stack>
             <FileMeta Icon={FileIcon} title='Name' subtitle={image.file} />
             <FileMeta Icon={ImageIcon} title='Type' subtitle={image.mimetype} />
-            <FileMeta Icon={EyeIcon} title='Views' subtitle={image.views.toLocaleString()} />
+            <FileMeta Icon={EyeIcon} title='Views' subtitle={image?.views?.toLocaleString()} />
             {image.maxViews && (
               <FileMeta
                 Icon={EyeIcon}
                 title='Max views'
                 subtitle={image.maxViews.toLocaleString()}
-                tooltip={`This file will be deleted after being viewed ${image.maxViews.toLocaleString()} times.`}
+                tooltip={`This file will be deleted after being viewed ${image?.maxViews?.toLocaleString()} times.`}
               />
             )}
             <FileMeta
