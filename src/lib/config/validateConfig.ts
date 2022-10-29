@@ -127,9 +127,8 @@ const validator = s.object({
           })
         )
         .default([
-          { label: 'Lunar', link: 'https://lunardev.group' },
-          { label: 'Discord', link: 'https://lunardev.group/discord' },
-          { label: 'Melon (P)', link: 'https://melonbot.io' },
+          { label: 'Lunar (Website Down)', link: '' },
+          { label: 'Discord', link: 'https://discord.gg/cNRNeaX' },
         ]),
     })
     .default({
@@ -139,9 +138,8 @@ const validator = s.object({
       disable_media_preview: false,
 
       external_links: [
-        { label: 'Lunar', link: 'https://lunardev.group' },
-        { label: 'Discord', link: 'https://lunardev.group/discord' },
-        { label: 'Melon (P)', link: 'https://melonbot.io' },
+        { label: 'Lunar (Website Down)', link: '' },
+        { label: 'Discord', link: 'https://discord.gg/cNRNeaX' },
       ],
     }),
   discord: s
@@ -149,7 +147,7 @@ const validator = s.object({
       url: s.string,
       username: s.string.default('LunarX'),
       avatar_url: s.string.default(
-        'https://raw.githubusercontent.com/diced/zipline/9b60147e112ec5b70170500b85c75ea621f41d03/public/zipline.png'
+        'https://raw.githubusercontent.com/WinterFe/zipline/trunk/public/zipline.png'
       ),
       upload: discord_content,
       shorten: discord_content,
