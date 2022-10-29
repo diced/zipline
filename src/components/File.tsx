@@ -118,7 +118,7 @@ export default function File({ image, updateImages, disableMediaPreview }) {
         <Stack>
           <Type
             file={image}
-            src={image.url}
+            src={`/r/${image.file}`}
             alt={image.file}
             popup
             sx={{ minHeight: 200 }}
@@ -183,7 +183,7 @@ export default function File({ image, updateImages, disableMediaPreview }) {
               width: '100%',
               cursor: 'pointer',
             }}
-            src={image.url}
+            src={`/r/${image.file}`}
             alt={image.file}
             onClick={() => setOpen(true)}
             disableMediaPreview={disableMediaPreview}

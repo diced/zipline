@@ -65,7 +65,7 @@
     "@types/cookie": "^0.5.1",
     "@types/minio": "^7.0.14",
     "@types/multer": "^1.4.7",
-    "@types/node": "16.11.68",
+    "@types/node": "^18.11.7",
     "@types/react": "^18.0.24",
     "@types/sharp": "^0.31.0",
     "cross-env": "^7.0.3",

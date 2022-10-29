@@ -19,6 +19,7 @@ import { randomId, useInterval } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
 import { showNotification, updateNotification } from '@mantine/notifications';
 import {
+  CheckIcon,
   CrossIcon,
   DeleteIcon,
   FlameshotIcon,
@@ -270,6 +271,25 @@ export default function Manage() {
       },
     });
 
+  const forceUpdateStats = async () => {
+    const res = await useFetch('/api/stats', 'POST');
+    if (res.error) {
+      showNotification({
+        title: 'Error updating stats',
+        message: res.error,
+        color: 'red',
+        icon: <CrossIcon />,
+      });
+    } else {
+      showNotification({
+        title: 'Updated stats',
+        message: '',
+        color: 'green',
+        icon: <CheckIcon />,
+      });
+    }
+  };
+
   const interval = useInterval(() => getExports(), 30000);
   useEffect(() => {
     getExports();
@@ -399,6 +419,17 @@ export default function Manage() {
           <Text>No exports yet</Text>
         )}
       </Card>
+
+      {user.administrator && (
+        <Box mt='md'>
+          <Title>Server</Title>
+          <Group>
+            <Button size='md' onClick={forceUpdateStats} color='red' rightIcon={<RefreshIcon />}>
+              Force Update Stats
+            </Button>
+          </Group>
+        </Box>
+      )}
 
       <Title my='md'>Uploaders</Title>
       <Group>
