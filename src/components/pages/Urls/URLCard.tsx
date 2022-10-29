@@ -1,9 +1,12 @@
-import { ActionIcon, Card, Group, LoadingOverlay, Title } from '@mantine/core';
+import { ActionIcon, Card, Group, LoadingOverlay, Stack, Title, Tooltip } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { showNotification } from '@mantine/notifications';
 import { CopyIcon, CrossIcon, DeleteIcon, ExternalLinkIcon } from 'components/icons';
 import TrashIcon from 'components/icons/TrashIcon';
+import Link from 'components/Link';
+import MutedText from 'components/MutedText';
 import { URLResponse, useURLDelete } from 'lib/queries/url';
+import { relativeTime } from 'lib/utils/client';
 
 export default function URLCard({ url }: { url: URLResponse }) {
   const clipboard = useClipboard();
@@ -46,7 +49,18 @@ export default function URLCard({ url }: { url: URLResponse }) {
 
       <Group position='apart'>
         <Group position='left'>
-          <Title>{url.vanity ?? url.id}</Title>
+          <Stack spacing={0}>
+            <Title>{url.vanity ?? url.id}</Title>
+            <Tooltip label={new Date(url.created_at).toLocaleString()}>
+              <div>
+                <MutedText size='sm'>Created: {relativeTime(new Date(url.created_at))}</MutedText>
+              </div>
+            </Tooltip>
+            {url.vanity && <MutedText size='sm'>ID: {url.id}</MutedText>}
+            <MutedText size='sm'>
+              URL: <Link href={url.destination}>{url.destination}</Link>
+            </MutedText>
+          </Stack>
         </Group>
         <Group position='right'>
           <ActionIcon href={url.url} component='a' target='_blank'>
