@@ -48,3 +48,5 @@ jobs:
           tags: |
             ghcr.io/diced/zipline:latest
             ghcr.io/diced/zipline:${{ steps.version.outputs.value }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
