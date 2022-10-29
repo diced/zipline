@@ -19,6 +19,12 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v2
 
+      - name: Get version
+        uses: sergeysova/jq-action@v2
+        id: version
+        with:
+          cmd: 'jq .version package.json -r'
+
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v1
 
@@ -40,5 +46,6 @@ jobs:
           platforms: linux/amd64,linux/arm64
           tags: |
             ghcr.io/diced/zipline:trunk
+            ghcr.io/diced/zipline:trunk-${{ steps.version.outputs.value }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
