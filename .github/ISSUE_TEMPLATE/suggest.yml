@@ -1,7 +1,7 @@
 name: Suggestion
 description: Suggest a feature to be added
-title: '[Suggestion]: '
-labels: ['suggest']
+title: 'Suggestion: '
+labels: ['suggestion']
 body:
   - type: textarea
     id: suggest
@@ -9,4 +9,4 @@ body:
       label: Suggestion
       description: Be as descriptive as possible!
       placeholder: What do you want in Zipline?
-      value: Minecraft!
+      value: A suggestion
