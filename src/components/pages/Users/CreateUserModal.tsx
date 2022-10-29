@@ -87,10 +87,10 @@ export function CreateUserModal({ open, setOpen, updateUsers, limit, setLimit })
               id='type_time'
               {...form.getInputProps('type_time')}
               data={[
-                { value: 'daily', label: 'Day' },
-                { value: 'weekly', label: 'Week' },
-                { value: 'monthly', label: 'Month' },
-                { value: 'yearly', label: 'Year' },
+                { value: 'DAILY', label: 'Day' },
+                { value: 'WEEKLY', label: 'Week' },
+                { value: 'MONTHLY', label: 'Month' },
+                { value: 'YEARLY', label: 'Year' },
               ]}
             />
             <Select
@@ -98,8 +98,8 @@ export function CreateUserModal({ open, setOpen, updateUsers, limit, setLimit })
               id='limit_by'
               {...form.getInputProps('limit_by')}
               data={[
-                { value: 'byte', label: 'Byte' },
-                { value: 'count', label: 'Count' },
+                { value: 'SIZE', label: 'Byte' },
+                { value: 'COUNT', label: 'Count' },
               ]}
             />
             <NumberInput

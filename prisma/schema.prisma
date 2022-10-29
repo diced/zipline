@@ -96,10 +96,22 @@ model Invite {
 
 model Limit {
   id         Int      @id @default(autoincrement())
-  type_time  String   @default("daily")
-  limit_by   String   @default("count")
+  type_time  LimitType @default(DAILY)
+  limit_by   LimitBy  @default(COUNT)
   limit      Int      @default(1)
 
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     Int      @unique
+}
+
+enum LimitType {
+  DAILY
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
+
+enum LimitBy {
+  COUNT
+  SIZE
 }

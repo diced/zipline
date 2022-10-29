@@ -48,8 +48,8 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     const userLimit = user.limit;
     let stopped: boolean = false;
     switch (userLimit.type_time) {
-      case 'daily':
-        if (userLimit.limit_by === 'count') {
+      case 'DAILY':
+        if (userLimit.limit_by === 'COUNT') {
           const count = await prisma.image.count({
             where: {
               userId: user.id,
@@ -63,7 +63,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
             return res.forbid(`daily limit reached: ${userLimit.limit} File(s)`);
           }
           break;
-        } else if (userLimit.limit_by === 'byte') {
+        } else if (userLimit.limit_by === 'SIZE') {
           const imgs = await prisma.image.findMany({
             where: {
               userId: user.id,
@@ -88,8 +88,8 @@ async function handler(req: NextApiReq, res: NextApiRes) {
             `User ${user.username} (${user.id}) has unique limit type: ${userLimit.limit_by}`
           );
         }
-      case 'weekly':
-        if (userLimit.limit_by === 'count') {
+      case 'WEEKLY':
+        if (userLimit.limit_by === 'COUNT') {
           const count = await prisma.image.count({
             where: {
               userId: user.id,
@@ -103,7 +103,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
             return res.forbid(`weekly limit reached: ${userLimit.limit} File(s)`);
           }
           break;
-        } else if (userLimit.limit_by === 'byte') {
+        } else if (userLimit.limit_by === 'SIZE') {
           const imgs = await prisma.image.findMany({
             where: {
               userId: user.id,
@@ -128,8 +128,8 @@ async function handler(req: NextApiReq, res: NextApiRes) {
             `User ${user.username} (${user.id}) has unique limit type: ${userLimit.limit_by}`
           );
         }
-      case 'monthly':
-        if (userLimit.limit_by === 'count') {
+      case 'MONTHLY':
+        if (userLimit.limit_by === 'COUNT') {
           const count = await prisma.image.count({
             where: {
               userId: user.id,
@@ -143,7 +143,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
             return res.forbid(`monthly limit reached: ${userLimit.limit} File(s)`);
           }
           break;
-        } else if (userLimit.limit_by === 'byte') {
+        } else if (userLimit.limit_by === 'SIZE') {
           const imgs = await prisma.image.findMany({
             where: {
               userId: user.id,
@@ -168,8 +168,8 @@ async function handler(req: NextApiReq, res: NextApiRes) {
             `User ${user.username} (${user.id}) has unique limit type: ${userLimit.limit_by}`
           );
         }
-      case 'yearly':
-        if (userLimit.limit_by === 'count') {
+      case 'YEARLY':
+        if (userLimit.limit_by === 'COUNT') {
           const count = await prisma.image.count({
             where: {
               userId: user.id,
@@ -183,7 +183,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
             return res.forbid(`yearly limit reached: ${userLimit.limit} File(s)`);
           }
           break;
-        } else if (userLimit.limit_by === 'byte') {
+        } else if (userLimit.limit_by === 'SIZE') {
           const imgs = await prisma.image.findMany({
             where: {
               userId: user.id,
