@@ -22,7 +22,7 @@ jobs:
 
       - name: Get version
         run: |
-          echo "zipline_version=$(jq .version package.json -r) >> $GITHUB_ENV"
+          echo "zipline_version=$(jq .version package.json -r)" >> $GITHUB_OUTPUT
 
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v2
@@ -45,6 +45,6 @@ jobs:
           platforms: linux/amd64,linux/arm64
           tags: |
             ghcr.io/diced/zipline:latest
-            ghcr.io/diced/zipline:${{ env.zipline_version }}
+            ghcr.io/diced/zipline:${{ steps.version.outputs.zipline_version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
