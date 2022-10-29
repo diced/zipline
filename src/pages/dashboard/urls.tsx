@@ -11,10 +11,11 @@ export default function UrlsPage(props) {
 
   if (loading) return <LoadingOverlay visible={loading} />;
 
+  const title = `${props.title} - URLs`;
   return (
     <>
       <Head>
-        <title>{props.title} - URLs</title>
+        <title>{title}</title>
       </Head>
       <Layout props={props}>
         <Urls />

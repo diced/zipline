@@ -4,27 +4,29 @@ import exts from 'lib/exts';
 import { streamToString } from 'lib/utils/streams';
 import { GetServerSideProps } from 'next';
 import { checkPassword } from 'lib/util';
+import config from 'lib/config';
+import Head from 'next/head';
 
-type CodeProps = {
-  code: string;
-  id: string;
-};
-
-// Code component
-export default function Code({ code, id }: CodeProps) {
+export default function Code({ code, id, title }) {
+  const full_title = `${title} - Code (${id})`;
   return (
-    <Prism
-      sx={(t) => ({ height: '100vh', backgroundColor: t.colors.dark[8] })}
-      withLineNumbers
-      language={exts[id.split('.').pop()]?.toLowerCase()}
-    >
-      {code}
-    </Prism>
+    <>
+      <Head>
+        <title>{full_title}</title>
+      </Head>
+
+      <Prism
+        sx={(t) => ({ height: '100vh', backgroundColor: t.colors.dark[8] })}
+        withLineNumbers
+        language={exts[id.split('.').pop()]?.toLowerCase()}
+      >
+        {code}
+      </Prism>
+    </>
   );
 }
 
-// handle server-side rendering
-export const getServerSideProps: GetServerSideProps<CodeProps> = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
   if (process.env.ZIPLINE_DOCKER_BUILD) return { props: { code: '', id: '' } };
 
   const { default: datasource } = await import('lib/datasource');
@@ -58,6 +60,7 @@ export const getServerSideProps: GetServerSideProps<CodeProps> = async (context)
     props: {
       code: await streamToString(data),
       id: context.params.id as string,
+      title: config.website.title,
     },
   };
 };

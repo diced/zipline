@@ -59,10 +59,11 @@ export default function Login({ title, user_registration, oauth_registration, oa
     })();
   }, []);
 
+  const full_title = `${title} - Login`;
   return (
     <>
       <Head>
-        <title>{title} - Login</title>
+        <title>{full_title}</title>
       </Head>
       <Center sx={{ height: '100vh' }}>
         <div>
@@ -78,7 +79,7 @@ export default function Login({ title, user_registration, oauth_registration, oa
           {user_registration && (
             <>
               <Divider label='or' labelPosition='center' my='sm' />
-              <Link href='/auth/register' passHref>
+              <Link href='/auth/register' passHref legacyBehavior>
                 <Button size='lg' fullWidth component='a'>
                   Register
                 </Button>
@@ -89,7 +90,7 @@ export default function Login({ title, user_registration, oauth_registration, oa
             <>
               <Divider label='or' labelPosition='center' my='sm' />
               {oauth_providers.map(({ url, name, Icon }, i) => (
-                <Link key={i} href={url} passHref>
+                <Link key={i} href={url} passHref legacyBehavior>
                   <Button size='lg' fullWidth leftIcon={<Icon />} component='a' my={8}>
                     Login in with {name}
                   </Button>

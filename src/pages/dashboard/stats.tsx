@@ -11,10 +11,11 @@ export default function StatsPage(props) {
 
   if (loading) return <LoadingOverlay visible={loading} />;
 
+  const title = `${props.title} - Statistics`;
   return (
     <>
       <Head>
-        <title>{props.title} - Stats</title>
+        <title>{title}</title>
       </Head>
       <Layout props={props}>
         <Stats />

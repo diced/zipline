@@ -1,4 +1,4 @@
-import { Button, Group, PasswordInput, Select, Tabs, Title, Tooltip } from '@mantine/core';
+import { Button, Group, NumberInput, PasswordInput, Select, Tabs, Title, Tooltip } from '@mantine/core';
 import { Prism } from '@mantine/prism';
 import { Language } from 'prism-react-renderer';
 import { showNotification, updateNotification } from '@mantine/notifications';
@@ -17,6 +17,7 @@ export default function Upload() {
   const [lang, setLang] = useState('txt');
   const [password, setPassword] = useState('');
   const [expires, setExpires] = useState('never');
+  const [maxViews, setMaxViews] = useState<number>(undefined);
 
   const handleUpload = async () => {
     const file = new File([value], 'text.' + lang);
@@ -97,6 +98,7 @@ export default function Upload() {
 
     expires !== 'never' && req.setRequestHeader('Expires-At', 'date=' + expires_at.toISOString());
     password !== '' && req.setRequestHeader('Password', password);
+    maxViews && maxViews !== 0 && req.setRequestHeader('Max-Views', String(maxViews));
 
     req.send(body);
   };
@@ -139,6 +141,9 @@ export default function Upload() {
           icon={<TypeIcon />}
           searchable
         />
+        <Tooltip label='After the file reaches this amount of views, it will be deleted automatically. Leave blank for no limit.'>
+          <NumberInput placeholder='Max Views' min={0} value={maxViews} onChange={(x) => setMaxViews(x)} />
+        </Tooltip>
         <Tooltip label='Add a password to your files (optional, leave blank for none)'>
           <PasswordInput
             style={{ width: '252px' }}

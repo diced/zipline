@@ -32,7 +32,19 @@ A ShareX/file upload server that is easy to use, packed with features, and with 
 - Fully customizable Discord webhook notifications
 - OAuth2 registration (Discord and GitHub)
 - User invites
+- File Chunking (for large files)
+- File deletion once it reaches a certain amount of views
 - Easy setup instructions on [docs](https://zipl.vercel.app/) (One command install `docker-compose up -d`)
+
+<details>
+  <summary><h2>Screenshots (click)</h2></summary>
+  
+  View full album at [imgur](https://imgur.com/a/GzyowZ7)
+  
+  ![Login Page](https://i.imgur.com/14Er7qt.png)
+  ![Dashboard](https://i.imgur.com/3JK5bp6.png)
+  ![Files Page](https://i.imgur.com/grIaDs8.png)
+</details>
 
 # Usage
 

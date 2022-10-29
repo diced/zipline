@@ -20,10 +20,11 @@ export default function InvitesPage(props) {
 
   if (loading) return <LoadingOverlay visible={loading} />;
 
+  const title = `${props.title} - Invites`;
   return (
     <>
       <Head>
-        <title>{props.title} - Invites</title>
+        <title>{title}</title>
       </Head>
       <Layout props={props}>
         <Invites />

@@ -29,6 +29,8 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         id: true,
         destination: true,
         vanity: true,
+        views: true,
+        maxViews: true,
       },
     });
 

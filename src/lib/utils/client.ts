@@ -1,5 +1,10 @@
 import type { Image, User } from '@prisma/client';
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+import dayjsRelativeTime from 'dayjs/plugin/relativeTime';
 import ms, { StringValue } from 'ms';
+dayjs.extend(duration);
+dayjs.extend(dayjsRelativeTime);
 
 export function parse(str: string, image: Image, user: User) {
   if (!str) return null;
@@ -34,17 +39,12 @@ export const units = {
 };
 
 export function relativeTime(to: Date, from: Date = new Date()) {
-  const time = new Date(to.getTime() - from.getTime());
+  if (!to) return null;
 
-  const rtf = new Intl.RelativeTimeFormat('en', { style: 'long' });
-
-  for (const unit in units) {
-    if (time > units[unit]) {
-      return rtf.format(
-        Math.floor(Math.round(time.getTime() / units[unit])),
-        (unit as Intl.RelativeTimeFormatUnit) || 'second'
-      );
-    }
+  if (to.getTime() < from.getTime()) {
+    return dayjs(to).from(from);
+  } else {
+    return dayjs(from).to(to);
   }
 }
 

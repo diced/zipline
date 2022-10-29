@@ -5,13 +5,14 @@ import { Image, PrismaClient } from '@prisma/client';
 import { createServer, IncomingMessage, OutgoingMessage, ServerResponse } from 'http';
 import { extname } from 'path';
 import { mkdir } from 'fs/promises';
-import { getStats, log, migrations } from './util';
+import { getStats, log, migrations, redirect } from './util';
 import Logger from '../lib/logger';
 import { guess } from '../lib/mimes';
 import exts from '../lib/exts';
 import { version } from '../../package.json';
 import config from '../lib/config';
 import datasource from '../lib/datasource';
+import { NextUrlWithParsedQuery } from 'next/dist/server/request-meta';
 
 const dev = process.env.NODE_ENV === 'development';
 const logger = Logger.get('server');
@@ -78,26 +79,54 @@ async function start() {
     },
   });
 
-  router.on(
-    'GET',
-    config.uploader.route === '/' ? '/:id(^[^\\.]+\\.[^\\.]+)' : `${config.uploader.route}/:id`,
-    async (req, res, params) => {
-      if (params.id === '') return nextServer.render404(req, res as ServerResponse);
+  router.on('GET', `${config.urls.route}/:id`, async (req, res, params) => {
+    if (params.id === '') return nextServer.render404(req, res as ServerResponse);
 
-      const image = await prisma.image.findFirst({
+    const url = await prisma.url.findFirst({
+      where: {
+        OR: [{ id: params.id }, { vanity: params.id }, { invisible: { invis: decodeURI(params.id) } }],
+      },
+    });
+    if (!url) return nextServer.render404(req, res as ServerResponse);
+
+    const nUrl = await prisma.url.update({
+      where: {
+        id: url.id,
+      },
+      data: {
+        views: { increment: 1 },
+      },
+    });
+
+    if (nUrl.maxViews && nUrl.views >= nUrl.maxViews) {
+      await prisma.url.delete({
         where: {
-          OR: [{ file: params.id }, { invisible: { invis: decodeURI(params.id) } }],
+          id: nUrl.id,
         },
       });
 
-      if (!image) await rawFile(req, res, nextServer, params.id);
-      else {
-        if (image.password) await handle(req, res);
-        else if (image.embed) await handle(req, res);
-        else await fileDb(req, res, nextServer, prisma, handle, image);
-      }
+      return nextServer.render404(req, res as ServerResponse);
     }
-  );
+
+    return redirect(res, url.destination);
+  });
+
+  router.on('GET', `${config.uploader.route}/:id`, async (req, res, params) => {
+    if (params.id === '') return nextServer.render404(req, res as ServerResponse);
+
+    const image = await prisma.image.findFirst({
+      where: {
+        OR: [{ file: params.id }, { invisible: { invis: decodeURI(params.id) } }],
+      },
+    });
+
+    if (!image) await rawFile(req, res, nextServer, params.id);
+    else {
+      if (image.password) return redirect(res, `/view/${image.file}`);
+      else if (image.embed) await handle(req, res);
+      else await fileDb(req, res, nextServer, prisma, handle, image);
+    }
+  });
 
   router.on('GET', '/r/:id', async (req, res, params) => {
     if (params.id === '') return nextServer.render404(req, res as ServerResponse);
@@ -110,8 +139,13 @@ async function start() {
 
     if (!image) await rawFile(req, res, nextServer, params.id);
     else {
-      if (image.password) await handle(req, res);
-      else await rawFileDb(req, res, nextServer, prisma, image);
+      if (image.password) {
+        res.setHeader('Content-Type', 'application/json');
+        res.statusCode = 403;
+        return res.end(
+          JSON.stringify({ error: "can't view a raw file that has a password", url: `/view/${image.file}` })
+        );
+      } else await rawFile(req, res, nextServer, params.id);
     }
   });
 
@@ -167,39 +201,6 @@ async function rawFile(req: IncomingMessage, res: OutgoingMessage, nextServer: N
   data.on('end', () => res.end());
 }
 
-async function rawFileDb(
-  req: IncomingMessage,
-  res: OutgoingMessage,
-  nextServer: NextServer,
-  prisma: PrismaClient,
-  image: Image
-) {
-  if (image.expires_at && image.expires_at < new Date()) {
-    Logger.get('server').info(`${image.file} expired`);
-    await datasource.delete(image.file);
-    await prisma.image.delete({ where: { id: image.id } });
-
-    return nextServer.render404(req, res as ServerResponse);
-  }
-
-  const data = await datasource.get(image.file);
-  if (!data) return nextServer.render404(req, res as ServerResponse);
-
-  const size = await datasource.size(image.file);
-
-  res.setHeader('Content-Type', image.mimetype);
-  res.setHeader('Content-Length', size);
-
-  data.pipe(res);
-  data.on('error', () => nextServer.render404(req, res as ServerResponse));
-  data.on('end', () => res.end());
-
-  await prisma.image.update({
-    where: { id: image.id },
-    data: { views: { increment: 1 } },
-  });
-}
-
 async function fileDb(
   req: IncomingMessage,
   res: OutgoingMessage,
@@ -221,6 +222,20 @@ async function fileDb(
   const data = await datasource.get(image.file);
   if (!data) return nextServer.render404(req, res as ServerResponse);
 
+  const nImage = await prisma.image.update({
+    where: { id: image.id },
+    data: { views: { increment: 1 } },
+  });
+
+  if (nImage.maxViews && nImage.views >= nImage.maxViews) {
+    await datasource.delete(image.file);
+    await prisma.image.delete({ where: { id: image.id } });
+
+    Logger.get('image').info(`Image ${image.file} has been deleted due to max views (${nImage.maxViews})`);
+
+    return nextServer.render404(req, res as ServerResponse);
+  }
+
   const size = await datasource.size(image.file);
 
   res.setHeader('Content-Type', image.mimetype);
@@ -228,11 +243,6 @@ async function fileDb(
   data.pipe(res);
   data.on('error', () => nextServer.render404(req, res as ServerResponse));
   data.on('end', () => res.end());
-
-  await prisma.image.update({
-    where: { id: image.id },
-    data: { views: { increment: 1 } },
-  });
 }
 
 async function stats(prisma: PrismaClient) {

@@ -78,6 +78,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         id: true,
         favorite: true,
         views: true,
+        maxViews: true,
       },
     });
 

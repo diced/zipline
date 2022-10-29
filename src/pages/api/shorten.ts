@@ -19,6 +19,11 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   if (!user) return res.forbid('authorization incorect');
   if (!req.body) return res.error('no body');
   if (!req.body.url) return res.error('no url');
+
+  const maxUrlViews = req.headers['max-views'] ? Number(req.headers['max-views']) : null;
+  if (isNaN(maxUrlViews)) return res.error('invalid max views (invalid number)');
+  if (maxUrlViews < 0) return res.error('invalid max views (max views < 0)');
+
   const rand = randomChars(zconfig.urls.length);
 
   let invis;
@@ -39,6 +44,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       vanity: req.body.vanity ?? null,
       destination: req.body.url,
       userId: user.id,
+      maxViews: maxUrlViews,
     },
   });
 

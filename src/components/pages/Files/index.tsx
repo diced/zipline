@@ -23,14 +23,21 @@ export default function Files({ disableMediaPreview }) {
     <>
       <Group mb='md'>
         <Title>Files</Title>
-        <Link href='/dashboard/upload' passHref>
+        <Link href='/dashboard/upload' passHref legacyBehavior>
           <ActionIcon component='a' variant='filled' color='primary'>
             <PlusIcon />
           </ActionIcon>
         </Link>
       </Group>
       {favoritePages.isSuccess && favoritePages.data.length ? (
-        <Accordion variant='contained' mb='sm'>
+        <Accordion
+          variant='contained'
+          mb='sm'
+          styles={(t) => ({
+            content: { backgroundColor: t.colorScheme === 'dark' ? t.colors.dark[7] : t.colors.gray[0] },
+            control: { backgroundColor: t.colorScheme === 'dark' ? t.colors.dark[7] : t.colors.gray[0] },
+          })}
+        >
           <Accordion.Item value='favorite'>
             <Accordion.Control>Favorite Files</Accordion.Control>
             <Accordion.Panel>

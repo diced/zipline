@@ -9,6 +9,7 @@ import {
   Title,
   Card,
   Center,
+  NumberInput,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { showNotification } from '@mantine/notifications';
@@ -32,6 +33,7 @@ export default function Urls() {
     initialValues: {
       url: '',
       vanity: '',
+      maxViews: undefined,
     },
   });
 
@@ -47,10 +49,17 @@ export default function Urls() {
       return form.setFieldError('url', 'Invalid URL');
     }
 
-    const data = {
+    const data: {
+      url: string;
+      vanity?: string;
+    } = {
       url: cleanURL,
       vanity: cleanVanity === '' ? null : cleanVanity,
     };
+
+    const headers = {};
+
+    if (values.maxViews && values.maxViews !== 0) headers['Max-Views'] = values.maxViews;
 
     setCreateOpen(false);
     const res = await fetch('/api/shorten', {
@@ -58,6 +67,7 @@ export default function Urls() {
       headers: {
         Authorization: user.token,
         'Content-Type': 'application/json',
+        ...headers,
       },
       body: JSON.stringify(data),
     });
@@ -92,6 +102,7 @@ export default function Urls() {
         <form onSubmit={form.onSubmit((v) => onSubmit(v))}>
           <TextInput id='url' label='URL' {...form.getInputProps('url')} />
           <TextInput id='vanity' label='Vanity' {...form.getInputProps('vanity')} />
+          <NumberInput id='maxViews' label='Max Views' {...form.getInputProps('maxViews')} />
 
           <Group position='right' mt='md'>
             <Button onClick={() => setCreateOpen(false)}>Cancel</Button>
