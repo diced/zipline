@@ -7,6 +7,8 @@ export type URLResponse = {
   id: string;
   url: string;
   vanity: string;
+  maxViews?: number;
+  views: number;
 };
 
 export function useURLs() {

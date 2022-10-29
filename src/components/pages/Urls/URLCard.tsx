@@ -57,6 +57,14 @@ export default function URLCard({ url }: { url: URLResponse }) {
               </div>
             </Tooltip>
             {url.vanity && <MutedText size='sm'>ID: {url.id}</MutedText>}
+            {url.maxViews && (
+              <Tooltip label='This URL will delete itself after reaching this treshold.'>
+                <div>
+                  <MutedText size='sm'>Max Views: {url.maxViews}</MutedText>
+                </div>
+              </Tooltip>
+            )}
+            <MutedText size='sm'>Views: {url.views}</MutedText>
             <MutedText size='sm'>
               URL: <Link href={url.destination}>{url.destination}</Link>
             </MutedText>
