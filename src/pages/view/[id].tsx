@@ -6,22 +6,25 @@ import config from 'lib/config';
 import prisma from 'lib/prisma';
 import { parse } from 'lib/utils/client';
 import exts from 'lib/exts';
+import { useRouter } from 'next/router';
 
-export default function EmbeddedImage({ image, user, pass }) {
+export default function EmbeddedImage({ image, user, pass, prismRender }) {
   const dataURL = (route: string) => `${route}/${image.file}`;
 
+  const router = useRouter();
   const [opened, setOpened] = useState(pass);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
   // reapply date from workaround
-  image.created_at = new Date(image.created_at);
+  image.created_at = new Date(image?.created_at);
 
   const check = async () => {
     const res = await fetch(`/api/auth/image?id=${image.id}&password=${password}`);
 
     if (res.ok) {
       setError('');
+      if (prismRender) return router.push(`/code/${image.file}?password=${password}`);
       updateImage(`/api/auth/image?id=${image.id}&password=${password}`);
       setOpened(false);
     } else {
@@ -135,81 +138,50 @@ export default function EmbeddedImage({ image, user, pass }) {
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const route = context.params.id[0];
-  const serve_on_root = /(^[^\\.]+\.[^\\.]+)/.test(route);
+  const { id } = context.params as { id: string };
 
-  const id = serve_on_root ? route : context.params.id[1];
-  const uploader_route = config.uploader.route.substring(1);
+  const image = await prisma.image.findFirst({
+    where: {
+      OR: [{ file: id }, { invisible: { invis: id } }],
+    },
+    select: {
+      mimetype: true,
+      id: true,
+      file: true,
+      invisible: true,
+      userId: true,
+      embed: true,
+      created_at: true,
+      password: true,
+    },
+  });
+  if (!image) return { notFound: true };
 
-  if (route === config.urls.route.substring(1)) {
-    const url = await prisma.url.findFirst({
-      where: {
-        OR: [{ id }, { vanity: id }, { invisible: { invis: id } }],
-      },
-      select: {
-        destination: true,
-      },
-    });
-    if (!url) return { notFound: true };
+  const user = await prisma.user.findFirst({
+    select: {
+      embedTitle: true,
+      embedColor: true,
+      embedSiteName: true,
+      username: true,
+      id: true,
+    },
+    where: {
+      id: image.userId,
+    },
+  });
 
+  //@ts-ignore workaround because next wont allow date
+  image.created_at = image.created_at.toString();
+
+  const prismRender = Object.keys(exts).includes(image.file.split('.').pop());
+  if (prismRender && !image.password)
     return {
-      props: {},
       redirect: {
-        destination: url.destination,
+        destination: `/code/${image.file}`,
+        permanent: true,
       },
     };
-  } else if (uploader_route === '' ? /(^[^\\.]+\.[^\\.]+)/.test(route) : route === uploader_route) {
-    const image = await prisma.image.findFirst({
-      where: {
-        OR: [{ file: id }, { invisible: { invis: id } }],
-      },
-      select: {
-        mimetype: true,
-        id: true,
-        file: true,
-        invisible: true,
-        userId: true,
-        embed: true,
-        created_at: true,
-        password: true,
-      },
-    });
-    if (!image) return { notFound: true };
-
-    const user = await prisma.user.findFirst({
-      select: {
-        embedTitle: true,
-        embedColor: true,
-        embedSiteName: true,
-        username: true,
-        id: true,
-      },
-      where: {
-        id: image.userId,
-      },
-    });
-
-    //@ts-ignore workaround because next wont allow date
-    image.created_at = image.created_at.toString();
-
-    const prismRender = Object.keys(exts).includes(image.file.split('.').pop());
-    if (prismRender)
-      return {
-        redirect: {
-          destination: `/code/${image.file}`,
-          permanent: true,
-        },
-      };
-
-    if (!image.mimetype.startsWith('image') && !image.mimetype.startsWith('video')) {
-      const { default: datasource } = await import('lib/datasource');
-
-      const data = await datasource.get(image.file);
-      if (!data) return { notFound: true };
-
-      data.pipe(context.res);
-      return { props: {} };
-    }
+  else if (prismRender && image.password) {
     const pass = image.password ? true : false;
     delete image.password;
     return {
@@ -217,9 +189,27 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         image,
         user,
         pass,
+        prismRender: true,
       },
     };
-  } else {
-    return { notFound: true };
   }
+
+  if (!image.mimetype.startsWith('image') && !image.mimetype.startsWith('video')) {
+    const { default: datasource } = await import('lib/datasource');
+
+    const data = await datasource.get(image.file);
+    if (!data) return { notFound: true };
+
+    data.pipe(context.res);
+    return { props: {} };
+  }
+  const pass = image.password ? true : false;
+  delete image.password;
+  return {
+    props: {
+      image,
+      user,
+      pass,
+    },
+  };
 };

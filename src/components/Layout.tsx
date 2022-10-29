@@ -21,6 +21,7 @@ import {
   Image,
   Tooltip,
   Badge,
+  Menu,
 } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
@@ -49,12 +50,14 @@ import {
   TypeIcon,
   UploadIcon,
   UserIcon,
+  DiscordIcon,
+  GitHubIcon,
 } from './icons';
 import { friendlyThemeName, themes } from './Theming';
 
 function MenuItemLink(props) {
   return (
-    <Link href={props.href} passHref>
+    <Link href={props.href} passHref legacyBehavior>
       <MenuItem {...props} />
     </Link>
   );
@@ -73,16 +76,18 @@ function MenuItem(props) {
           : theme.colorScheme === 'dark'
           ? theme.colors.dark[0]
           : theme.black,
-        '&:hover': {
-          backgroundColor: props.color
-            ? theme.fn.rgba(
-                theme.fn.themeColor(props.color, theme.colorScheme === 'dark' ? 9 : 0),
-                theme.colorScheme === 'dark' ? 0.2 : 1
-              )
-            : theme.colorScheme === 'dark'
-            ? theme.fn.rgba(theme.colors.dark[3], 0.35)
-            : theme.colors.gray[0],
-        },
+        '&:hover': !props.noClick
+          ? {
+              backgroundColor: props.color
+                ? theme.fn.rgba(
+                    theme.fn.themeColor(props.color, theme.colorScheme === 'dark' ? 9 : 0),
+                    theme.colorScheme === 'dark' ? 0.2 : 1
+                  )
+                : theme.colorScheme === 'dark'
+                ? theme.fn.rgba(theme.colors.dark[3], 0.35)
+                : theme.colors.gray[0],
+            }
+          : null,
       })}
       {...props}
     >
@@ -190,7 +195,7 @@ export default function Layout({ children, props }) {
 
   const openResetToken = () =>
     modals.openConfirmModal({
-      title: 'Reset Token',
+      title: <Title>Reset Token?</Title>,
       children: (
         <Text size='sm'>
           Once you reset your token, you will have to update any uploaders to use this new token.
@@ -223,7 +228,7 @@ export default function Layout({ children, props }) {
 
   const openCopyToken = () =>
     modals.openConfirmModal({
-      title: 'Copy Token',
+      title: <Title>Copy Token</Title>,
       children: (
         <Text size='sm'>
           Make sure you don&apos;t share this token with anyone as they will be able to upload files on your
@@ -253,7 +258,7 @@ export default function Layout({ children, props }) {
         <Navbar pt='sm' hiddenBreakpoint='sm' hidden={!opened} width={{ sm: 200, lg: 230 }}>
           <Navbar.Section grow component={ScrollArea}>
             {items.map(({ icon, text, link }) => (
-              <Link href={link} key={text} passHref>
+              <Link href={link} key={text} passHref legacyBehavior>
                 <NavLink
                   component='a'
                   label={text}
@@ -273,7 +278,7 @@ export default function Layout({ children, props }) {
                 {admin_items
                   .filter((x) => x.if(props))
                   .map(({ icon, text, link }) => (
-                    <Link href={link} key={text} passHref>
+                    <Link href={link} key={text} passHref legacyBehavior>
                       <NavLink
                         component='a'
                         label={text}
@@ -289,7 +294,7 @@ export default function Layout({ children, props }) {
           <Navbar.Section>
             {external_links.length
               ? external_links.map(({ label, link }, i) => (
-                  <Link href={link} passHref key={i}>
+                  <Link href={link} passHref key={i} legacyBehavior>
                     <NavLink
                       label={label}
                       component='a'
@@ -358,17 +363,10 @@ export default function Layout({ children, props }) {
 
                 <Popover.Dropdown p={4} mr='md' sx={{ minWidth: '200px' }}>
                   <Stack spacing={2}>
-                    <Text
-                      sx={{
-                        color: theme.colorScheme === 'dark' ? theme.colors.dark[2] : theme.colors.gray[6],
-                        fontWeight: 500,
-                        fontSize: theme.fontSizes.sm,
-                        padding: `${theme.spacing.xs / 2}px ${theme.spacing.sm}px`,
-                        cursor: 'default',
-                      }}
-                    >
-                      {user.username}
-                    </Text>
+                    <Menu.Label>
+                      {user.username} ({user.id}){' '}
+                      {user.administrator && user.username !== 'administrator' ? '(Administrator)' : ''}
+                    </Menu.Label>
                     <MenuItemLink icon={<SettingsIcon />} href='/dashboard/manage'>
                       Manage Account
                     </MenuItemLink>
@@ -394,16 +392,25 @@ export default function Layout({ children, props }) {
                     <MenuItemLink icon={<LogoutIcon />} href='/auth/logout' color='red'>
                       Logout
                     </MenuItemLink>
-                    <Divider
-                      variant='solid'
-                      my={theme.spacing.xs / 2}
-                      sx={(theme) => ({
-                        width: '110%',
-                        borderTopColor:
-                          theme.colorScheme === 'dark' ? theme.colors.dark[7] : theme.colors.gray[2],
-                        margin: `${theme.spacing.xs / 2}px -4px`,
-                      })}
-                    />
+                    <Menu.Divider />
+                    {user.oauth ? (
+                      <>
+                        <MenuItem
+                          icon={
+                            user.oauthProvider === 'discord' ? (
+                              <DiscordIcon size={18} />
+                            ) : (
+                              <GitHubIcon size={18} />
+                            )
+                          }
+                        >
+                          Logged in with{' '}
+                          <span style={{ textTransform: 'capitalize' }}>{user.oauthProvider}</span>
+                        </MenuItem>
+
+                        <Menu.Divider />
+                      </>
+                    ) : null}
                     <MenuItem icon={<PencilIcon />}>
                       <Select
                         size='xs'

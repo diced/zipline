@@ -25,6 +25,7 @@ export interface ConfigS3Datasource {
   access_key_id: string;
   secret_access_key: string;
   endpoint?: string;
+  port?: number;
   bucket: string;
   force_s3_path: boolean;
   use_ssl: boolean;
@@ -101,6 +102,7 @@ export interface ConfigDiscordEmbed {
 export interface ConfigFeatures {
   invites: boolean;
   oauth_registration: boolean;
+  user_registration: boolean;
 }
 
 export interface ConfigOAuth {
@@ -109,6 +111,11 @@ export interface ConfigOAuth {
 
   discord_client_id?: string;
   discord_client_secret?: string;
+}
+
+export interface ConfigChunks {
+  max_size: number;
+  chunks_size: number;
 }
 
 export interface Config {
@@ -121,4 +128,5 @@ export interface Config {
   discord: ConfigDiscord;
   oauth: ConfigOAuth;
   features: ConfigFeatures;
+  chunks: ConfigChunks;
 }

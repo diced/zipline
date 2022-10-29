@@ -11,16 +11,22 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: '16.x'
+      
       - name: 'Restore dependency cache'
         id: cache-restore
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
-          path: node_modules
-          key: ${{ runner.os }}-node${{ matrix.node }}-${{ hashFiles('**/yarn.lock') }}
+          path: |
+            node_modules
+            ${{ github.workspace }}/.next/cache
+          key: ${{ runner.os }}-node${{ matrix.node }}-${{ hashFiles('**/yarn.lock') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+          restore-keys: |
+            ${{ runner.os }}-node${{ matrix.node }}-${{ hashFiles('**/yarn.lock') }}-
+
 
       - name: Install dependencies
         if: steps.cache-restore.outputs.cache-hit != 'true'

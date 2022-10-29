@@ -1,5 +1,5 @@
 import { DataGrid, dateFilterFn, stringFilterFn } from '@dicedtomato/mantine-data-grid';
-import { Title, useMantineTheme } from '@mantine/core';
+import { Title, useMantineTheme, Box } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { showNotification } from '@mantine/notifications';
 import { CopyIcon, CrossIcon, DeleteIcon, EnterIcon } from 'components/icons';
@@ -74,7 +74,7 @@ export default function Dashboard({ disableMediaPreview }) {
 
       <RecentFiles disableMediaPreview={disableMediaPreview} />
 
-      <section>
+      <Box my='sm'>
         <Title>Files</Title>
         <MutedText size='md'>
           View your gallery <Link href='/dashboard/files'>here</Link>.
@@ -147,7 +147,7 @@ export default function Dashboard({ disableMediaPreview }) {
             },
           ]}
         />
-      </section>
+      </Box>
     </div>
   );
 }

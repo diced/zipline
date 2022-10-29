@@ -11,13 +11,14 @@ export default function UploadPage(props) {
 
   if (loading) return <LoadingOverlay visible={loading} />;
 
+  const title = `${props.title} - Upload`;
   return (
     <>
       <Head>
-        <title>{props.title} - Upload</title>
+        <title>{title}</title>
       </Head>
       <Layout props={props}>
-        <Upload />
+        <Upload chunks={{ chunks_size: props.chunks_size, max_size: props.max_size }} />
       </Layout>
     </>
   );

@@ -10,6 +10,10 @@ export interface User {
   domains: string[];
   avatar?: string;
   administrator: boolean;
+  superAdmin: boolean;
+  oauth: boolean;
+  oauthProvider: 'github' | 'discord';
+  id: number;
 }
 
 export const userState = atom({

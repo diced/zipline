@@ -1,4 +1,14 @@
-import { Button, Collapse, Group, Progress, Select, Title, PasswordInput, Tooltip } from '@mantine/core';
+import {
+  Button,
+  Collapse,
+  Group,
+  Progress,
+  Select,
+  Title,
+  PasswordInput,
+  Tooltip,
+  NumberInput,
+} from '@mantine/core';
 import { randomId, useClipboard } from '@mantine/hooks';
 import { showNotification, updateNotification } from '@mantine/notifications';
 import Dropzone from 'components/dropzone/Dropzone';
@@ -7,41 +17,11 @@ import { ClockIcon, CrossIcon, UploadIcon } from 'components/icons';
 import Link from 'components/Link';
 import { invalidateFiles } from 'lib/queries/files';
 import { userSelector } from 'lib/recoil/user';
+import { randomChars } from 'lib/utils/client';
 import { useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 
-const expires = [
-  '5min',
-  '10min',
-  '15min',
-  '30min',
-  '1h',
-  '2h',
-  '3h',
-  '4h',
-  '5h',
-  '6h',
-  '8h',
-  '12h',
-  '1d',
-  '3d',
-  '5d',
-  '7d',
-  '1w',
-  '1.5w',
-  '2w',
-  '3w',
-  '1m',
-  '1.5m',
-  '2m',
-  '3m',
-  '6m',
-  '8m',
-  '1y',
-  'never',
-];
-
-export default function Upload() {
+export default function Upload({ chunks: chunks_config }) {
   const clipboard = useClipboard();
   const user = useRecoilValue(userSelector);
 
@@ -50,6 +30,8 @@ export default function Upload() {
   const [loading, setLoading] = useState(false);
   const [expires, setExpires] = useState('never');
   const [password, setPassword] = useState('');
+  const [maxViews, setMaxViews] = useState<number>(undefined);
+  console.log(maxViews);
 
   useEffect(() => {
     window.addEventListener('paste', (e: ClipboardEvent) => {
@@ -62,6 +44,121 @@ export default function Upload() {
       });
     });
   });
+
+  const handleChunkedFiles = async (expires_at: Date, toChunkFiles: File[]) => {
+    for (let i = 0; i !== toChunkFiles.length; ++i) {
+      const file = toChunkFiles[i];
+      const identifier = randomChars(4);
+
+      const nChunks = Math.ceil(file.size / chunks_config.chunks_size);
+      const chunks: {
+        blob: Blob;
+        start: number;
+        end: number;
+      }[] = [];
+
+      for (let j = 0; j !== nChunks; ++j) {
+        const chunk = file.slice(j * chunks_config.chunks_size, (j + 1) * chunks_config.chunks_size);
+        chunks.push({
+          blob: chunk,
+          start: j * chunks_config.chunks_size,
+          end: (j + 1) * chunks_config.chunks_size,
+        });
+      }
+
+      let ready = true;
+      for (let j = 0; j !== chunks.length; ++j) {
+        while (!ready) {
+          await new Promise((resolve) => setTimeout(resolve, 100));
+        }
+
+        const body = new FormData();
+
+        body.append('file', chunks[j].blob);
+
+        setProgress(0);
+        setLoading(true);
+
+        const req = new XMLHttpRequest();
+        req.upload.addEventListener('progress', (e) => {
+          if (e.lengthComputable) {
+            setProgress(Math.round((e.loaded / e.total) * 100));
+          }
+        });
+
+        req.addEventListener(
+          'load',
+          (e) => {
+            // @ts-ignore not sure why it thinks response doesnt exist, but it does.
+            const json = JSON.parse(e.target.response);
+
+            if (json.error === undefined) {
+              updateNotification({
+                id: 'upload-chunked',
+                title: `Uploading chunk ${j + 1}/${chunks.length} Successful`,
+                message: '',
+                color: 'green',
+                icon: <UploadIcon />,
+              });
+
+              if (j === chunks.length - 1) {
+                updateNotification({
+                  id: 'upload-chunked',
+                  title: 'Upload Successful',
+                  message: (
+                    <>
+                      Copied first file to clipboard! <br />
+                      {json.files.map((x) => (
+                        <Link key={x} href={x}>
+                          {x}
+                          <br />
+                        </Link>
+                      ))}
+                    </>
+                  ),
+                  color: 'green',
+                  icon: <UploadIcon />,
+                });
+
+                invalidateFiles();
+                setFiles([]);
+
+                clipboard.copy(json.files[0]);
+              }
+
+              ready = true;
+            } else {
+              updateNotification({
+                id: 'upload-chunked',
+                title: `Uploading chunk ${j + 1}/${chunks.length} Failed`,
+                message: json.error,
+                color: 'red',
+                icon: <CrossIcon />,
+              });
+              ready = false;
+            }
+            setProgress(0);
+          },
+          false
+        );
+
+        req.open('POST', '/api/upload');
+        req.setRequestHeader('Authorization', user.token);
+        req.setRequestHeader('Content-Range', `bytes ${chunks[j].start}-${chunks[j].end}/${file.size}`);
+        req.setRequestHeader('X-Zipline-Partial-FileName', file.name);
+        req.setRequestHeader('X-Zipline-Partial-MimeType', file.type);
+        req.setRequestHeader('X-Zipline-Partial-Identifier', identifier);
+        req.setRequestHeader('X-Zipline-Partial-LastChunk', j === chunks.length - 1 ? 'true' : 'false');
+        expires !== 'never' && req.setRequestHeader('Expires-At', 'date=' + expires_at.toISOString());
+        password !== '' && req.setRequestHeader('Password', password);
+        maxViews && maxViews !== 0 && req.setRequestHeader('Max-Views', String(maxViews));
+
+        req.send(body);
+
+        ready = false;
+      }
+    }
+  };
 
   const handleUpload = async () => {
     const expires_at =
@@ -102,7 +199,30 @@ export default function Upload() {
     setProgress(0);
     setLoading(true);
     const body = new FormData();
-    for (let i = 0; i !== files.length; ++i) body.append('file', files[i]);
+    const toChunkFiles = [];
+
+    for (let i = 0; i !== files.length; ++i) {
+      const file = files[i];
+      if (file.size >= chunks_config.max_size) {
+        toChunkFiles.push(file);
+      } else {
+        body.append('file', files[i]);
+      }
+    }
+
+    const bodyLength = body.getAll('file').length;
+
+    if (bodyLength === 0 && toChunkFiles.length) {
+      showNotification({
+        id: 'upload-chunked',
+        title: 'Uploading chunked files',
+        message: '',
+        loading: true,
+        autoClose: false,
+      });
+
+      return handleChunkedFiles(expires_at, toChunkFiles);
+    }
 
     showNotification({
       id: 'upload',
@@ -147,6 +267,18 @@ export default function Upload() {
           clipboard.copy(json.files[0]);
           setFiles([]);
           invalidateFiles();
+
+          if (toChunkFiles.length) {
+            showNotification({
+              id: 'upload-chunked',
+              title: 'Uploading chunked files',
+              message: '',
+              loading: true,
+              autoClose: false,
+            });
+
+            return handleChunkedFiles(expires_at, toChunkFiles);
+          }
         } else {
           updateNotification({
             id: 'upload',
@@ -161,12 +293,15 @@ export default function Upload() {
       false
     );
 
-    req.open('POST', '/api/upload');
-    req.setRequestHeader('Authorization', user.token);
-    expires !== 'never' && req.setRequestHeader('Expires-At', 'date=' + expires_at.toISOString());
-    password !== '' && req.setRequestHeader('Password', password);
+    if (bodyLength !== 0) {
+      req.open('POST', '/api/upload');
+      req.setRequestHeader('Authorization', user.token);
+      expires !== 'never' && req.setRequestHeader('Expires-At', 'date=' + expires_at.toISOString());
+      password !== '' && req.setRequestHeader('Password', password);
+      maxViews && maxViews !== 0 && req.setRequestHeader('Max-Views', String(maxViews));
 
-    req.send(body);
+      req.send(body);
+    }
   };
 
   return (
@@ -186,6 +321,9 @@ export default function Upload() {
       </Collapse>
 
       <Group position='right' mt='md'>
+        <Tooltip label='After the file reaches this amount of views, it will be deleted automatically. Leave blank for no limit.'>
+          <NumberInput placeholder='Max Views' min={0} value={maxViews} onChange={(x) => setMaxViews(x)} />
+        </Tooltip>
         <Tooltip label='Add a password to your files (optional, leave blank for none)'>
           <PasswordInput
             style={{ width: '252px' }}

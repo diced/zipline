@@ -1,6 +1,9 @@
 import { parse } from 'dotenv';
 import { expand } from 'dotenv-expand';
 import { existsSync, readFileSync } from 'fs';
+import { humanToBytes } from '../utils/bytes';
+
+export type ValueType = 'string' | 'number' | 'boolean' | 'array' | 'json-array' | 'human-to-byte';
 
 function isObject(value: any): value is Record<string, any> {
   return typeof value === 'object' && value !== null;
@@ -24,7 +27,7 @@ function set(object: Record<string, any>, property: string, value: any) {
   return object;
 }
 
-function map(env: string, type: 'string' | 'number' | 'boolean' | 'array' | 'json-array', path: string) {
+function map(env: string, type: ValueType, path: string) {
   return {
     env,
     type,
@@ -35,6 +38,12 @@ function map(env: string, type: 'string' | 'number' | 'boolean' | 'array' | 'jso
 export default function readConfig() {
   if (existsSync('.env.local')) {
     const contents = readFileSync('.env.local');
+
+    expand({
+      parsed: parse(contents),
+    });
+  } else if (existsSync('.env')) {
+    const contents = readFileSync('.env');
 
     expand({
       parsed: parse(contents),
@@ -58,6 +67,7 @@ export default function readConfig() {
     map('DATASOURCE_S3_ACCESS_KEY_ID', 'string', 'datasource.s3.access_key_id'),
     map('DATASOURCE_S3_SECRET_ACCESS_KEY', 'string', 'datasource.s3.secret_access_key'),
     map('DATASOURCE_S3_ENDPOINT', 'string', 'datasource.s3.endpoint'),
+    map('DATASOURCE_S3_PORT', 'number', 'datasource.s3.port'),
     map('DATASOURCE_S3_BUCKET', 'string', 'datasource.s3.bucket'),
     map('DATASOURCE_S3_FORCE_S3_PATH', 'boolean', 'datasource.s3.force_s3_path'),
     map('DATASOURCE_S3_REGION', 'string', 'datasource.s3.region'),
@@ -73,8 +83,8 @@ export default function readConfig() {
 
     map('UPLOADER_ROUTE', 'string', 'uploader.route'),
     map('UPLOADER_LENGTH', 'number', 'uploader.length'),
-    map('UPLOADER_ADMIN_LIMIT', 'number', 'uploader.admin_limit'),
-    map('UPLOADER_USER_LIMIT', 'number', 'uploader.user_limit'),
+    map('UPLOADER_ADMIN_LIMIT', 'human-to-byte', 'uploader.admin_limit'),
+    map('UPLOADER_USER_LIMIT', 'human-to-byte', 'uploader.user_limit'),
     map('UPLOADER_DISABLED_EXTENSIONS', 'array', 'uploader.disabled_extensions'),
     map('UPLOADER_FORMAT_DATE', 'string', 'uploader.format_date'),
 
@@ -120,6 +130,10 @@ export default function readConfig() {
 
     map('FEATURES_INVITES', 'boolean', 'features.invites'),
     map('FEATURES_OAUTH_REGISTRATION', 'boolean', 'features.oauth_registration'),
+    map('FEATURES_USER_REGISTRATION', 'boolean', 'features.user_registration'),
+
+    map('CHUNKS_MAX_SIZE', 'human-to-byte', 'chunks.max_size'),
+    map('CHUNKS_CHUNKS_SIZE', 'human-to-byte', 'chunks.chunks_size'),
   ];
 
   const config = {};
@@ -147,6 +161,9 @@ export default function readConfig() {
           } catch (e) {
             parsed = [];
           }
+          break;
+        case 'human-to-byte':
+          parsed = humanToBytes(value) ?? undefined;
           break;
         default:
           parsed = value;

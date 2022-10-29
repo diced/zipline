@@ -17,6 +17,7 @@ model User {
   avatar           String?
   token            String
   administrator    Boolean   @default(false)
+  superAdmin       Boolean   @default(false)
   systemTheme      String    @default("system")
   embedTitle       String?
   embedColor       String    @default("#2f3136")
@@ -42,6 +43,7 @@ model Image {
   mimetype   String          @default("image/png")
   created_at DateTime        @default(now())
   expires_at DateTime?
+  maxViews   Int?
   views      Int             @default(0)
   favorite   Boolean         @default(false)
   embed      Boolean         @default(false)
@@ -64,6 +66,7 @@ model Url {
   destination String
   vanity      String?
   created_at  DateTime      @default(now())
+  maxViews    Int?
   views       Int           @default(0)
   invisible   InvisibleUrl?
   user        User          @relation(fields: [userId], references: [id])

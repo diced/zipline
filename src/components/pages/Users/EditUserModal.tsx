@@ -7,18 +7,19 @@ import useFetch from 'hooks/useFetch';
 export function EditUserModal({ open, setOpen, updateUsers, user, limit, setLimit }) {
   let form;
 
-  if (user)
+  if (user) {
     form = useForm({
       initialValues: {
-        username: user?.username,
+        username: user.username,
         password: '',
-        administrator: user?.administrator,
+        administrator: user.administrator,
         limits: limit,
-        type_time: user?.limit?.type_time || 'daily',
-        limit_by: user?.limit?.limit_by || 'count',
-        limit: user?.limit?.limit || 1,
+        type_time: user.limit?.type_time || 'daily',
+        limit_by: user.limit?.limit_by || 'count',
+        limit: user.limit?.limit || 1,
       },
     });
+  }
 
   const resetForm = () =>
     form.setValues({
@@ -85,14 +86,14 @@ export function EditUserModal({ open, setOpen, updateUsers, user, limit, setLimi
           <TextInput id='username' label='Username' {...form.getInputProps('username')} />
           <TextInput id='password' label='Password' type='password' {...form.getInputProps('password')} />
           <Switch
-            mt={12}
+            mt='sm'
             id='administrator'
             label='Administrator'
             {...form.getInputProps('administrator')}
             onChange={(v) => (limit && v.currentTarget.checked ? setLimit(false) : null)}
           />
           <Switch
-            mt={12}
+            mt='sm'
             id='limits'
             label='Limited'
             {...form.getInputProps('limits')}
@@ -105,8 +106,8 @@ export function EditUserModal({ open, setOpen, updateUsers, user, limit, setLimi
           {limit ? (
             <>
               <Select
-                label='Limit Every'
                 id='type_time'
+                label='Limit Every'
                 {...form.getInputProps('type_time')}
                 data={[
                   { value: 'DAILY', label: 'Day' },
@@ -116,8 +117,8 @@ export function EditUserModal({ open, setOpen, updateUsers, user, limit, setLimi
                 ]}
               />
               <Select
-                label='Limit By'
                 id='limit_by'
+                label='Limit By'
                 {...form.getInputProps('limit_by')}
                 data={[
                   { value: 'SIZE', label: 'Byte' },
@@ -125,8 +126,8 @@ export function EditUserModal({ open, setOpen, updateUsers, user, limit, setLimi
                 ]}
               />
               <NumberInput
-                label='Limit Amount'
                 id='limit'
+                label='Limit Amount'
                 {...form.getInputProps('limit')}
                 precision={0}
                 min={1}

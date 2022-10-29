@@ -68,6 +68,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         username: true,
         id: true,
         administrator: true,
+        superAdmin: true,
         token: true,
         embedColor: true,
         embedTitle: true,

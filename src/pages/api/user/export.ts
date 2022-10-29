@@ -87,6 +87,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     Logger.get('user').info(`Export for ${user.username} (${user.id}) has started`);
     for (let i = 0; i !== files.length; ++i) {
       const file = files[i];
+      // try {
       const stream = await datasource.get(file.file);
       if (stream) {
         const def = new ZipPassThrough(file.file);
@@ -101,6 +102,9 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         stream.on('data', (c) => def.push(c));
         stream.on('end', () => def.push(new Uint8Array(0), true));
       }
+      // } catch (e) {
+
+      // }
     }
 
     zip.end();

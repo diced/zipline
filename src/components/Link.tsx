@@ -1,3 +1,5 @@
-import { NextLink as Link } from '@mantine/next';
+import { NextLink } from '@mantine/next';
 
-export default Link;
+export default function Link(props) {
+  return <NextLink legacyBehavior {...props} />;
+}

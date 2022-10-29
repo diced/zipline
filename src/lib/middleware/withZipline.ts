@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import type { CookieSerializeOptions } from 'cookie';
 
 import { serialize } from 'cookie';
-import { sign64, unsign64 } from 'lib/util';
+import { sign64, unsign64 } from 'lib/utils/crypto';
 import config from 'lib/config';
 import prisma from 'lib/prisma';
 import { User } from '@prisma/client';
@@ -68,11 +68,12 @@ export const withZipline =
     };
 
     res.ratelimited = (remaining: number) => {
-      res.status(429);
-      res.setHeader('X-Ratelimit-Remaining', Math.floor(remaining / 1000));
-      res.json({
-        error: '429: ratelimited',
-      });
+      res.setHeader('X-Ratelimit-Remaining', Math.floor(remaining / 1000)).json(
+        {
+          error: '429: ratelimited',
+        },
+        429
+      );
     };
 
     res.json = (json: any, status: number = 200) => {

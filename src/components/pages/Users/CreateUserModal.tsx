@@ -63,14 +63,14 @@ export function CreateUserModal({ open, setOpen, updateUsers, limit, setLimit })
         <TextInput id='username' label='Username' {...form.getInputProps('username')} />
         <TextInput id='password' label='Password' type='password' {...form.getInputProps('password')} />
         <Switch
-          mt={12}
+          mt='sm'
           id='administrator'
           label='Administrator'
           {...form.getInputProps('administrator')}
           onChange={(v) => (limit && v.currentTarget.checked ? setLimit(false) : null)}
         />
         <Switch
-          mt={12}
+          mt='sm'
           id='limits'
           label='Limited'
           {...form.getInputProps('limits')}
@@ -83,8 +83,8 @@ export function CreateUserModal({ open, setOpen, updateUsers, limit, setLimit })
         {limit ? (
           <>
             <Select
-              label='Limit Every'
               id='type_time'
+              label='Limit Every'
               {...form.getInputProps('type_time')}
               data={[
                 { value: 'DAILY', label: 'Day' },
@@ -94,8 +94,8 @@ export function CreateUserModal({ open, setOpen, updateUsers, limit, setLimit })
               ]}
             />
             <Select
-              label='Limit By'
               id='limit_by'
+              label='Limit By'
               {...form.getInputProps('limit_by')}
               data={[
                 { value: 'SIZE', label: 'Byte' },
@@ -103,8 +103,8 @@ export function CreateUserModal({ open, setOpen, updateUsers, limit, setLimit })
               ]}
             />
             <NumberInput
-              label='Limit Amount'
               id='limit'
+              label='Limit Amount'
               {...form.getInputProps('limit')}
               precision={0}
               min={1}

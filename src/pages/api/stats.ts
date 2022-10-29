@@ -7,12 +7,12 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   const user = await req.user();
   if (!user) return res.forbid('not logged in');
 
-  let amount = typeof req.query.amount === 'string' ? parseInt(req.query.amount) : 2;
+  let amount = typeof req.query.amount === 'string' ? Number(req.query.amount) : 2;
   if (isNaN(amount)) return res.bad('invalid amount');
 
   // get stats per day
 
-  var stats = await prisma.$queryRaw<Stats[]>`
+  let stats: Stats[] = await prisma.$queryRaw`
     SELECT *
     FROM "Stats" as t JOIN
           (SELECT MAX(t2."created_at") as max_timestamp

@@ -11,10 +11,11 @@ export default function UsersPage(props) {
 
   if (loading) return <LoadingOverlay visible={loading} />;
 
+  const title = `${props.title} - User`;
   return (
     <>
       <Head>
-        <title>{props.title} - Users</title>
+        <title>{title}</title>
       </Head>
       <Layout props={props}>
         <Users />

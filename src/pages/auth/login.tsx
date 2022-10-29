@@ -8,7 +8,7 @@ import Head from 'next/head';
 import { GitHubIcon, DiscordIcon } from 'components/icons';
 export { getServerSideProps } from 'middleware/getServerSideProps';
 
-export default function Login({ title, oauth_registration, oauth_providers: unparsed }) {
+export default function Login({ title, user_registration, oauth_registration, oauth_providers: unparsed }) {
   const router = useRouter();
 
   const oauth_providers = JSON.parse(unparsed);
@@ -59,10 +59,11 @@ export default function Login({ title, oauth_registration, oauth_providers: unpa
     })();
   }, []);
 
+  const full_title = `${title} - Login`;
   return (
     <>
       <Head>
-        <title>{title} - Login</title>
+        <title>{full_title}</title>
       </Head>
       <Center sx={{ height: '100vh' }}>
         <div>
@@ -71,15 +72,25 @@ export default function Login({ title, oauth_registration, oauth_providers: unpa
             <TextInput size='lg' id='username' label='Username' {...form.getInputProps('username')} />
             <PasswordInput size='lg' id='password' label='Password' {...form.getInputProps('password')} />
 
-            <Button size='lg' type='submit' fullWidth mt={12}>
+            <Button size='lg' type='submit' fullWidth mt='sm'>
               Login
             </Button>
           </form>
+          {user_registration && (
+            <>
+              <Divider label='or' labelPosition='center' my='sm' />
+              <Link href='/auth/register' passHref legacyBehavior>
+                <Button size='lg' fullWidth component='a'>
+                  Register
+                </Button>
+              </Link>
+            </>
+          )}
           {oauth_registration && (
             <>
-              <Divider label='or' labelPosition='center' my={8} />
+              <Divider label='or' labelPosition='center' my='sm' />
               {oauth_providers.map(({ url, name, Icon }, i) => (
-                <Link key={i} href={url} passHref>
+                <Link key={i} href={url} passHref legacyBehavior>
                   <Button size='lg' fullWidth leftIcon={<Icon />} component='a' my={8}>
                     Login in with {name}
                   </Button>

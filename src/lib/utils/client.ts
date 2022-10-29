@@ -1,5 +1,10 @@
 import type { Image, User } from '@prisma/client';
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+import dayjsRelativeTime from 'dayjs/plugin/relativeTime';
 import ms, { StringValue } from 'ms';
+dayjs.extend(duration);
+dayjs.extend(dayjsRelativeTime);
 
 export function parse(str: string, image: Image, user: User) {
   if (!str) return null;
@@ -16,18 +21,12 @@ export function parse(str: string, image: Image, user: User) {
     .replace(/{image\.created_at.date_string}/gi, image.created_at.toLocaleDateString());
 }
 
-export function bytesToRead(bytes: number) {
-  if (isNaN(bytes)) return '0.0 B';
-  if (bytes === Infinity) return '0.0 B';
-  const units = ['B', 'kB', 'MB', 'GB', 'TB', 'PB'];
-  let num = 0;
+export function randomChars(length: number) {
+  const charset = 'QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890';
 
-  while (bytes > 1024) {
-    bytes /= 1024;
-    ++num;
-  }
-
-  return `${bytes.toFixed(1)} ${units[num]}`;
+  let res = '';
+  for (let i = 0; i !== length; ++i) res += charset[Math.floor(Math.random() * charset.length)];
+  return res;
 }
 
 export const units = {
@@ -40,17 +39,12 @@ export const units = {
 };
 
 export function relativeTime(to: Date, from: Date = new Date()) {
-  const time = new Date(to.getTime() - from.getTime());
+  if (!to) return null;
 
-  const rtf = new Intl.RelativeTimeFormat('en', { style: 'long' });
-
-  for (const unit in units) {
-    if (time > units[unit]) {
-      return rtf.format(
-        Math.floor(Math.round(time.getTime() / units[unit])),
-        (unit as Intl.RelativeTimeFormatUnit) || 'second'
-      );
-    }
+  if (to.getTime() < from.getTime()) {
+    return dayjs(to).from(from);
+  } else {
+    return dayjs(from).to(to);
   }
 }
 

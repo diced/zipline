@@ -1,7 +1,8 @@
 import { Config } from 'lib/config/Config';
-import { CombinedError, s, ValidationError } from '@sapphire/shapeshift';
+import { s } from '@sapphire/shapeshift';
 import { inspect } from 'util';
-import Logger from 'lib/logger';
+import Logger from '../logger';
+import { humanToBytes } from '../utils/bytes';
 
 const discord_content = s
   .object({
@@ -45,6 +46,7 @@ const validator = s.object({
         access_key_id: s.string,
         secret_access_key: s.string,
         endpoint: s.string,
+        port: s.number.optional.default(undefined),
         bucket: s.string,
         force_s3_path: s.boolean.default(false),
         region: s.string.default('us-east-1'),
@@ -78,8 +80,8 @@ const validator = s.object({
       route: s.string.default('/u'),
       embed_route: s.string.default('/a'),
       length: s.number.default(6),
-      admin_limit: s.number.default(104900000),
-      user_limit: s.number.default(104900000),
+      admin_limit: s.number.default(humanToBytes('100MB')),
+      user_limit: s.number.default(humanToBytes('100MB')),
       disabled_extensions: s.string.array.default([]),
       format_date: s.string.default('YYYY-MM-DD_HH:mm:ss'),
     })
@@ -87,8 +89,8 @@ const validator = s.object({
       route: '/u',
       embed_route: '/a',
       length: 6,
-      admin_limit: 104900000,
-      user_limit: 104900000,
+      admin_limit: humanToBytes('100MB'),
+      user_limit: humanToBytes('100MB'),
       disabled_extensions: [],
       format_date: 'YYYY-MM-DD_HH:mm:ss',
     }),
@@ -140,15 +142,17 @@ const validator = s.object({
         { label: 'Documentation', link: 'https://zipline.diced.tech/' },
       ],
     }),
-  discord: s.object({
-    url: s.string,
-    username: s.string.default('Zipline'),
-    avatar_url: s.string.default(
-      'https://raw.githubusercontent.com/diced/zipline/9b60147e112ec5b70170500b85c75ea621f41d03/public/zipline.png'
-    ),
-    upload: discord_content,
-    shorten: discord_content,
-  }),
+  discord: s
+    .object({
+      url: s.string,
+      username: s.string.default('Zipline'),
+      avatar_url: s.string.default(
+        'https://raw.githubusercontent.com/diced/zipline/9b60147e112ec5b70170500b85c75ea621f41d03/public/zipline.png'
+      ),
+      upload: discord_content,
+      shorten: discord_content,
+    })
+    .nullish.default(null),
   oauth: s
     .object({
       github_client_id: s.string.nullable.default(null),
@@ -160,10 +164,20 @@ const validator = s.object({
     .nullish.default(null),
   features: s
     .object({
-      invites: s.boolean.default(true),
+      invites: s.boolean.default(false),
       oauth_registration: s.boolean.default(false),
+      user_registration: s.boolean.default(false),
     })
-    .default({ invites: true, oauth_registration: false }),
+    .default({ invites: false, oauth_registration: false, user_registration: false }),
+  chunks: s
+    .object({
+      max_size: s.number.default(humanToBytes('90MB')),
+      chunks_size: s.number.default(humanToBytes('20MB')),
+    })
+    .default({
+      max_size: humanToBytes('90MB'),
+      chunks_size: humanToBytes('20MB'),
+    }),
 });
 
 export default function validate(config): Config {

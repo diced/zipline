@@ -10,7 +10,7 @@ export default function RecentFiles({ disableMediaPreview }) {
 
   return (
     <>
-      <Title>Recent Files</Title>
+      <Title mt='sm'>Recent Files</Title>
       <SimpleGrid
         cols={recent.isSuccess && recent.data.length === 0 ? 1 : 4}
         spacing='lg'
