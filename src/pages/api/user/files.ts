@@ -3,6 +3,7 @@ import prisma from 'lib/prisma';
 import { chunk } from 'lib/util';
 import Logger from 'lib/logger';
 import datasource from 'lib/datasource';
+import config from 'lib/config';
 
 async function handler(req: NextApiReq, res: NextApiRes) {
   const user = await req.user();
@@ -62,7 +63,16 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     delete image.password;
     return res.json(image);
   } else {
-    let images = await prisma.image.findMany({
+    let images: {
+      favorite: boolean;
+      created_at: Date;
+      id: number;
+      file: string;
+      mimetype: string;
+      expires_at: Date;
+      maxViews: number;
+      views: number;
+    }[] = await prisma.image.findMany({
       where: {
         userId: user.id,
         favorite: !!req.query.favorite,
@@ -82,8 +92,10 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       },
     });
 
-    // @ts-ignore
-    images.map((image) => (image.url = `/r/${image.file}`));
+    for (let i = 0; i !== images.length; ++i) {
+      (images[i] as unknown as { url: string }).url = `${config.uploader.route}/${images[i].file}`;
+    }
+
     if (req.query.filter && req.query.filter === 'media')
       images = images.filter((x) => /^(video|audio|image|text)/.test(x.mimetype));
 

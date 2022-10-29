@@ -1,16 +1,15 @@
 FROM ghcr.io/diced/prisma-binaries:4.5.x as prisma
 
-FROM alpine:3.16 AS deps
+FROM node:alpine3.16 AS deps
 RUN mkdir -p /prisma-engines
 WORKDIR /build
 
 COPY .yarn .yarn
 COPY package.json yarn.lock .yarnrc.yml ./
 
-RUN apk add --no-cache nodejs yarn
 RUN yarn install --immutable
 
-FROM alpine:3.16 AS builder
+FROM node:alpine3.16 AS builder
 WORKDIR /build
 
 COPY --from=prisma /prisma-engines /prisma-engines
@@ -21,7 +20,7 @@ ENV PRISMA_QUERY_ENGINE_BINARY=/prisma-engines/query-engine \
   PRISMA_CLI_QUERY_ENGINE_TYPE=binary \
   PRISMA_CLIENT_ENGINE_TYPE=binary
 
-RUN apk add --no-cache nodejs yarn openssl openssl-dev
+RUN apk add --no-cache openssl openssl-dev
 
 COPY --from=deps /build/node_modules ./node_modules
 COPY src ./src
@@ -34,7 +33,7 @@ ENV NEXT_TELEMETRY_DISABLED 1
 
 RUN yarn build
 
-FROM alpine:3.16 AS runner
+FROM node:alpine3.16 AS runner
 WORKDIR /zipline
 
 COPY --from=prisma /prisma-engines /prisma-engines
@@ -45,7 +44,7 @@ ENV PRISMA_QUERY_ENGINE_BINARY=/prisma-engines/query-engine \
   PRISMA_CLI_QUERY_ENGINE_TYPE=binary \
   PRISMA_CLIENT_ENGINE_TYPE=binary
 
-RUN apk add --no-cache nodejs yarn openssl openssl-dev
+RUN apk add --no-cache openssl openssl-dev
 
 ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
