@@ -31,7 +31,6 @@ export default function Upload({ chunks: chunks_config }) {
   const [expires, setExpires] = useState('never');
   const [password, setPassword] = useState('');
   const [maxViews, setMaxViews] = useState<number>(undefined);
-  console.log(maxViews);
 
   useEffect(() => {
     window.addEventListener('paste', (e: ClipboardEvent) => {
