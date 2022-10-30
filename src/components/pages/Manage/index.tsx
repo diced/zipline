@@ -22,12 +22,15 @@ import {
   CheckIcon,
   CrossIcon,
   DeleteIcon,
+  DiscordIcon,
   FlameshotIcon,
+  GitHubIcon,
   RefreshIcon,
   SettingsIcon,
   ShareXIcon,
 } from 'components/icons';
 import DownloadIcon from 'components/icons/DownloadIcon';
+import TrashIcon from 'components/icons/TrashIcon';
 import Link from 'components/Link';
 import MutedText from 'components/MutedText';
 import { SmallTable } from 'components/SmallTable';
@@ -51,7 +54,17 @@ function ExportDataTooltip({ children }) {
   );
 }
 
-export default function Manage() {
+export default function Manage({ oauth_registration, oauth_providers: raw_oauth_providers }) {
+  const oauth_providers = JSON.parse(raw_oauth_providers);
+  const icons = {
+    GitHub: GitHubIcon,
+    Discord: DiscordIcon,
+  };
+
+  for (const provider of oauth_providers) {
+    provider.Icon = icons[provider.name];
+  }
+
   const [user, setUser] = useRecoilState(userSelector);
   const modals = useModals();
 
@@ -290,6 +303,26 @@ export default function Manage() {
     }
   };
 
+  const handleOauthUnlink = async () => {
+    const res = await useFetch('/api/auth/oauth', 'DELETE');
+    if (res.error) {
+      showNotification({
+        title: 'Error while unlinking from OAuth',
+        message: res.error,
+        color: 'red',
+        icon: <CrossIcon />,
+      });
+    } else {
+      setUser(res);
+      showNotification({
+        title: 'Unlinked from OAuth',
+        message: '',
+        color: 'green',
+        icon: <CheckIcon />,
+      });
+    }
+  };
+
   const interval = useInterval(() => getExports(), 30000);
   useEffect(() => {
     getExports();
@@ -334,7 +367,31 @@ export default function Manage() {
         </Group>
       </form>
 
-      <Box mb='md'>
+      {oauth_registration && (
+        <Box my='md'>
+          <Title>OAuth</Title>
+          <MutedText size='md'>Link your account with an OAuth provider.</MutedText>
+
+          <Group>
+            {oauth_providers
+              .filter((x) => x.name.toLowerCase() !== user.oauthProvider)
+              .map(({ link_url, name, Icon }, i) => (
+                <Link key={i} href={link_url} passHref legacyBehavior>
+                  <Button size='lg' leftIcon={<Icon />} component='a' my='sm'>
+                    Link account with {name}
+                  </Button>
+                </Link>
+              ))}
+            {user.oauth && user.oauthProvider && (
+              <Button onClick={handleOauthUnlink} size='lg' leftIcon={<TrashIcon />} my='sm' color='red'>
+                Unlink account with {user.oauthProvider[0].toUpperCase() + user.oauthProvider.slice(1)}
+              </Button>
+            )}
+          </Group>
+        </Box>
+      )}
+
+      <Box my='md'>
         <Title>Avatar</Title>
         <FileInput
           placeholder='Click to upload a file'

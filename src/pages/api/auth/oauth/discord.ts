@@ -13,12 +13,13 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     return res.bad('Discord OAuth is not configured');
   }
 
-  const { code } = req.query as { code: string };
+  const { code, state } = req.query as { code: string; state?: string };
   if (!code)
     return res.redirect(
       discord_auth.oauth_url(
         config.oauth.discord_client_id,
-        `${config.core.https ? 'https' : 'http'}://${req.headers.host}`
+        `${config.core.https ? 'https' : 'http'}://${req.headers.host}`,
+        state
       )
     );
 
@@ -55,7 +56,34 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     },
   });
 
-  if (existing && existing.oauth && existing.oauthProvider === 'discord') {
+  if (state && state === 'link') {
+    const user = await req.user();
+    if (!user) return res.error('not logged in, unable to link account');
+
+    if (user.oauth && user.oauthProvider === 'discord')
+      return res.error('account already linked with discord');
+
+    await prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        oauth: true,
+        oauthProvider: 'discord',
+        oauthAccessToken: json.access_token,
+        avatar: avatarBase64,
+      },
+    });
+    req.cleanCookie('user');
+    res.setCookie('user', user.id, {
+      sameSite: 'lax',
+      expires: new Date(Date.now() + 6.048e8 * 2),
+      path: '/',
+    });
+    Logger.get('user').info(`User ${user.username} (${user.id}) linked account via oauth(discord)`);
+
+    return res.redirect('/');
+  } else if (existing && existing.oauth && existing.oauthProvider === 'discord') {
     await prisma.user.update({
       where: {
         id: existing.id,
@@ -67,7 +95,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
     req.cleanCookie('user');
     res.setCookie('user', existing.id, {
-      sameSite: true,
+      sameSite: 'lax',
       expires: new Date(Date.now() + 6.048e8 * 2),
       path: '/',
     });
@@ -92,7 +120,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
   req.cleanCookie('user');
   res.setCookie('user', user.id, {
-    sameSite: true,
+    sameSite: 'lax',
     expires: new Date(Date.now() + 6.048e8 * 2),
     path: '/',
   });
