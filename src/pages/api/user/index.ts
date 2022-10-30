@@ -9,10 +9,16 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   const user = await req.user();
   if (!user) return res.forbid('not logged in');
 
-  if (user.oauth) {
+  const userOauths = await prisma.oauth.findMany({
+    where: {
+      userId: user?.id,
+    },
+  });
+
+  if (userOauths) {
     // this will probably change before the stable release
-    if (user.oauthProvider === 'github') {
-      const resp = await github_auth.oauth_user(user.oauthAccessToken);
+    if (userOauths.find((o) => o.provider === 'GITHUB')) {
+      const resp = await github_auth.oauth_user(userOauths.find((o) => o.provider === 'GITHUB').token);
       if (!resp) {
         req.cleanCookie('user');
         Logger.get('user').info(`User ${user.username} (${user.id}) logged out (oauth token expired)`);
@@ -22,10 +28,10 @@ async function handler(req: NextApiReq, res: NextApiRes) {
           redirect_uri: github_auth.oauth_url(config.oauth.github_client_id),
         });
       }
-    } else if (user.oauthProvider === 'discord') {
+    } else if (userOauths.find((o) => o.provider === 'DISCORD')) {
       const resp = await fetch('https://discord.com/api/users/@me', {
         headers: {
-          Authorization: `Bearer ${user.oauthAccessToken}`,
+          Authorization: `Bearer ${userOauths.find((o) => o.provider === 'DISCORD').token}`,
         },
       });
       if (!resp.ok) {
@@ -143,12 +149,13 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         username: true,
         domains: true,
         avatar: true,
+        oauth: true,
       },
     });
 
     Logger.get('user').info(`User ${user.username} (${newUser.username}) (${newUser.id}) was updated`);
 
-    return res.json(newUser);
+    return res.json(newUser.oauth);
   } else {
     delete user.password;
 

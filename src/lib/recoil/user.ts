@@ -1,3 +1,4 @@
+import { oauth } from '@prisma/client';
 import { atom, selector } from 'recoil';
 
 export interface User {
@@ -11,8 +12,7 @@ export interface User {
   avatar?: string;
   administrator: boolean;
   superAdmin: boolean;
-  oauth: boolean;
-  oauthProvider: 'github' | 'discord';
+  oauth: oauth[];
   id: number;
 }
 

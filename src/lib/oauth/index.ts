@@ -1,6 +1,6 @@
 export const github_auth = {
   oauth_url: (clientId: string) =>
-    `https://github.com/login/oauth/authorize?client_id=${clientId}&scope=user`,
+    `https://github.com/login/oauth/authorize?client_id=${clientId}&scope=read:user`,
   oauth_user: async (access_token: string) => {
     const res = await fetch('https://api.github.com/user', {
       headers: {

@@ -393,11 +393,11 @@ export default function Layout({ children, props }) {
                       Logout
                     </MenuItemLink>
                     <Menu.Divider />
-                    {user.oauth ? (
+                    {user.oauth?.length === 1 ? (
                       <>
                         <MenuItem
                           icon={
-                            user.oauthProvider === 'discord' ? (
+                            user.oauth.find((o) => o.provider === 'DISCORD') ? (
                               <DiscordIcon size={18} />
                             ) : (
                               <GitHubIcon size={18} />
@@ -405,7 +405,9 @@ export default function Layout({ children, props }) {
                           }
                         >
                           Logged in with{' '}
-                          <span style={{ textTransform: 'capitalize' }}>{user.oauthProvider}</span>
+                          <span style={{ textTransform: 'capitalize' }}>
+                            {user.oauth[0].provider.toLowerCase()}
+                          </span>
                         </MenuItem>
 
                         <Menu.Divider />

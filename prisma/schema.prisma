@@ -11,9 +11,6 @@ model User {
   id               Int       @id @default(autoincrement())
   username         String
   password         String?
-  oauth            Boolean   @default(false)
-  oauthProvider    String?
-  oauthAccessToken String?
   avatar           String?
   token            String
   administrator    Boolean   @default(false)
@@ -24,6 +21,7 @@ model User {
   embedSiteName    String?   @default("{image.file} • {user.name}")
   ratelimit        DateTime?
   domains          String[]
+  oauth            oauth[]
   images           Image[]
   urls             Url[]
   Invite           Invite[]
@@ -94,4 +92,17 @@ model Invite {
 
   createdBy   User @relation(fields: [createdById], references: [id])
   createdById Int
+}
+
+model oauth {
+  id        Int      @id @default(autoincrement())
+  provider  oauthProviders  @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+  token     String
+}
+
+enum oauthProviders {
+  DISCORD
+  GITHUB
 }

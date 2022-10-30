@@ -53,15 +53,29 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     where: {
       username: userJson.username,
     },
+    include: {
+      oauth: true,
+    },
   });
 
-  if (existing && existing.oauth && existing.oauthProvider === 'discord') {
+  const existingOauth = existing?.oauth?.find((o) => o.provider === 'DISCORD');
+
+  if (existing && existingOauth) {
     await prisma.user.update({
       where: {
         id: existing.id,
       },
       data: {
-        oauthAccessToken: json.access_token,
+        oauth: {
+          update: {
+            where: {
+              provider: 'DISCORD',
+            },
+            data: {
+              token: json.access_token,
+            },
+          },
+        },
       },
     });
 
@@ -82,9 +96,12 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     data: {
       username: userJson.username,
       token: createToken(),
-      oauth: true,
-      oauthProvider: 'discord',
-      oauthAccessToken: json.access_token,
+      oauth: {
+        create: {
+          provider: 'DISCORD',
+          token: json.access_token,
+        },
+      },
       avatar: avatarBase64,
     },
   });

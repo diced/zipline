@@ -45,15 +45,29 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     where: {
       username: userJson.login,
     },
+    include: {
+      oauth: true,
+    },
   });
 
-  if (existing && existing.oauth && existing.oauthProvider === 'github') {
+  const existingOauth = existing?.oauth?.find((o) => o.provider === 'GITHUB');
+
+  if (existing && existingOauth) {
     await prisma.user.update({
       where: {
         id: existing.id,
       },
       data: {
-        oauthAccessToken: json.access_token,
+        oauth: {
+          update: {
+            where: {
+              provider: 'GITHUB',
+            },
+            data: {
+              token: json.access_token,
+            },
+          },
+        },
       },
     });
 
@@ -74,9 +88,12 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     data: {
       username: userJson.login,
       token: createToken(),
-      oauth: true,
-      oauthProvider: 'github',
-      oauthAccessToken: json.access_token,
+      oauth: {
+        create: {
+          provider: 'GITHUB',
+          token: json.access_token,
+        },
+      },
       avatar: avatarBase64,
     },
   });
