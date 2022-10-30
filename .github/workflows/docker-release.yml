@@ -24,6 +24,7 @@ jobs:
         id: version
         run: |
           echo "zipline_version=$(jq .version package.json -r)" >> $GITHUB_OUTPUT
+
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v2
 

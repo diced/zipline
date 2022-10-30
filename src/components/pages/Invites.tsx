@@ -11,6 +11,7 @@ import {
   Skeleton,
   Stack,
   Title,
+  Tooltip,
 } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { useForm } from '@mantine/form';
@@ -21,6 +22,7 @@ import MutedText from 'components/MutedText';
 import useFetch from 'hooks/useFetch';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import { relativeTime } from 'lib/utils/client';
 
 const expires = ['30m', '1h', '6h', '12h', '1d', '3d', '5d', '7d', 'never'];
 
@@ -117,7 +119,7 @@ function CreateInviteModal({ open, setOpen, updateInvites }) {
   );
 }
 
-export default function Users() {
+export default function Uz2sers() {
   const router = useRouter();
   const modals = useModals();
   const clipboard = useClipboard();
@@ -198,10 +200,20 @@ export default function Users() {
                         {invite.code}
                         {invite.used && <> (Used)</>}
                       </Title>
-                      <MutedText size='sm'>Created: {new Date(invite.created_at).toLocaleString()}</MutedText>
-                      <MutedText size='sm'>
-                        Expires: {invite.expires_at ? new Date(invite.expires_at).toLocaleString() : 'Never'}
-                      </MutedText>
+                      <Tooltip label={new Date(invite.created_at).toLocaleString()}>
+                        <div>
+                          <MutedText size='sm'>
+                            Created: {relativeTime(new Date(invite.created_at))}
+                          </MutedText>
+                        </div>
+                      </Tooltip>
+                      <Tooltip label={new Date(invite.expires_at).toLocaleString()}>
+                        <div>
+                          <MutedText size='sm'>
+                            Expires: {relativeTime(new Date(invite.expires_at))}
+                          </MutedText>
+                        </div>
+                      </Tooltip>
                     </Stack>
                   </Group>
                   <Group position='right'>

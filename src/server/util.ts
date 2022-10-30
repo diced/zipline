@@ -68,8 +68,8 @@ export async function getStats(prisma: PrismaClient, datasource: Datasource) {
   }
 
   const count = await prisma.image.count();
-  const viewsCount = await prisma.image.groupBy({
-    by: ['views'],
+
+  const views = await prisma.image.aggregate({
     _sum: {
       views: true,
     },
@@ -94,7 +94,7 @@ export async function getStats(prisma: PrismaClient, datasource: Datasource) {
     count,
     count_by_user: count_by_user.sort((a, b) => b.count - a.count),
     count_users,
-    views_count: viewsCount[0]?._sum?.views ?? 0,
+    views_count: views?._sum?.views ?? 0,
     types_count: types_count.sort((a, b) => b.count - a.count),
   };
 }

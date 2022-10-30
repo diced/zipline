@@ -28,8 +28,6 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     },
   });
 
-  // @ts-ignore
-  images.map((image) => (image.url = `/r/${image.file}`));
   if (req.query.filter && req.query.filter === 'media')
     images = images.filter((x) => /^(video|audio|image)/.test(x.mimetype));
 

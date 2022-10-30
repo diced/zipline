@@ -118,7 +118,7 @@ export default function File({ image, updateImages, disableMediaPreview }) {
         <Stack>
           <Type
             file={image}
-            src={image.url}
+            src={`/r/${image.file}`}
             alt={image.file}
             popup
             sx={{ minHeight: 200 }}
@@ -133,14 +133,15 @@ export default function File({ image, updateImages, disableMediaPreview }) {
               <FileMeta
                 Icon={EyeIcon}
                 title='Max views'
-                subtitle={image.maxViews.toLocaleString()}
+                subtitle={image?.maxViews?.toLocaleString()}
                 tooltip={`This file will be deleted after being viewed ${image?.maxViews?.toLocaleString()} times.`}
               />
             )}
             <FileMeta
               Icon={CalendarIcon}
-              title='Uploaded at'
-              subtitle={new Date(image.created_at).toLocaleString()}
+              title='Uploaded'
+              subtitle={relativeTime(new Date(image.created_at))}
+              tooltip={new Date(image?.created_at).toLocaleString()}
             />
             {image.expires_at && (
               <FileMeta
@@ -182,7 +183,7 @@ export default function File({ image, updateImages, disableMediaPreview }) {
               width: '100%',
               cursor: 'pointer',
             }}
-            src={image.url}
+            src={`/r/${image.file}`}
             alt={image.file}
             onClick={() => setOpen(true)}
             disableMediaPreview={disableMediaPreview}

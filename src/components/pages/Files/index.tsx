@@ -30,7 +30,14 @@ export default function Files({ disableMediaPreview }) {
         </Link>
       </Group>
       {favoritePages.isSuccess && favoritePages.data.length ? (
-        <Accordion variant='contained' mb='sm'>
+        <Accordion
+          variant='contained'
+          mb='sm'
+          styles={(t) => ({
+            content: { backgroundColor: t.colorScheme === 'dark' ? t.colors.dark[7] : t.colors.gray[0] },
+            control: { backgroundColor: t.colorScheme === 'dark' ? t.colors.dark[7] : t.colors.gray[0] },
+          })}
+        >
           <Accordion.Item value='favorite'>
             <Accordion.Control>Favorite Files</Accordion.Control>
             <Accordion.Panel>
