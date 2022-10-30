@@ -51,7 +51,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
           userId: deleteUser.id,
         },
       });
-      Logger.get('image').info(
+      Logger.get('users').info(
         `User ${user.username} (${user.id}) deleted ${count} files of user ${deleteUser.username} (${deleteUser.id})`
       );
     }

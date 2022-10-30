@@ -120,11 +120,14 @@ async function start() {
       },
     });
 
-    if (!image) await rawFile(req, res, nextServer, params.id);
+    if (!image) return rawFile(req, res, nextServer, params.id);
     else {
-      if (image.password) return redirect(res, `/view/${image.file}`);
-      else if (image.embed) await handle(req, res);
-      else await fileDb(req, res, nextServer, prisma, handle, image);
+      const failed = await preImage(image, prisma);
+      if (failed) return nextServer.render404(req, res as ServerResponse);
+
+      if (image.password || image.embed || image.mimetype.startsWith('text/'))
+        return redirect(res, `/view/${image.file}`);
+      else return fileDb(req, res, nextServer, handle, image);
     }
   });
 
@@ -139,6 +142,9 @@ async function start() {
 
     if (!image) await rawFile(req, res, nextServer, params.id);
     else {
+      const failed = await preImage(image, prisma);
+      if (failed) return nextServer.render404(req, res as ServerResponse);
+
       if (image.password) {
         res.setHeader('Content-Type', 'application/json');
         res.statusCode = 403;
@@ -187,9 +193,37 @@ async function start() {
   }, config.core.invites_interval * 1000);
 }
 
+async function preImage(image: Image, prisma: PrismaClient) {
+  if (image.expires_at && image.expires_at < new Date()) {
+    await datasource.delete(image.file);
+    await prisma.image.delete({ where: { id: image.id } });
+
+    Logger.get('file').info(`File ${image.file} expired and was deleted.`);
+
+    return true;
+  }
+
+  const nImage = await prisma.image.update({
+    where: { id: image.id },
+    data: { views: { increment: 1 } },
+  });
+
+  if (nImage.maxViews && nImage.views >= nImage.maxViews) {
+    await datasource.delete(image.file);
+    await prisma.image.delete({ where: { id: image.id } });
+
+    Logger.get('file').info(`File ${image.file} has been deleted due to max views (${nImage.maxViews})`);
+
+    return true;
+  }
+
+  return false;
+}
+
 async function rawFile(req: IncomingMessage, res: OutgoingMessage, nextServer: NextServer, id: string) {
   const data = await datasource.get(id);
   if (!data) return nextServer.render404(req, res as ServerResponse);
+
   const mimetype = await guess(extname(id));
   const size = await datasource.size(id);
 
@@ -205,36 +239,14 @@ async function fileDb(
   req: IncomingMessage,
   res: OutgoingMessage,
   nextServer: NextServer,
-  prisma: PrismaClient,
   handle: RequestHandler,
   image: Image
 ) {
-  if (image.expires_at && image.expires_at < new Date()) {
-    await datasource.delete(image.file);
-    await prisma.image.delete({ where: { id: image.id } });
-
-    return nextServer.render404(req, res as ServerResponse);
-  }
-
   const ext = image.file.split('.').pop();
   if (Object.keys(exts).includes(ext)) return handle(req, res as ServerResponse);
 
   const data = await datasource.get(image.file);
   if (!data) return nextServer.render404(req, res as ServerResponse);
-
-  const nImage = await prisma.image.update({
-    where: { id: image.id },
-    data: { views: { increment: 1 } },
-  });
-
-  if (nImage.maxViews && nImage.views >= nImage.maxViews) {
-    await datasource.delete(image.file);
-    await prisma.image.delete({ where: { id: image.id } });
-
-    Logger.get('image').info(`Image ${image.file} has been deleted due to max views (${nImage.maxViews})`);
-
-    return nextServer.render404(req, res as ServerResponse);
-  }
 
   const size = await datasource.size(image.file);
 
