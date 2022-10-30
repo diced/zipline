@@ -18,33 +18,33 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Get version
-        uses: sergeysova/jq-action@v2
         id: version
-        with:
-          cmd: 'jq .version package.json -r'
-
+        run: |
+          echo "zipline_version=$(jq .version package.json -r)" >> $GITHUB_OUTPUT
       - name: Setup QEMU
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v2
 
       - name: Set up Docker Buildx
         id: buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v2
 
       - name: Login to Github Packages
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Docker Image
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           push: true
           platforms: linux/amd64,linux/arm64
           tags: |
             ghcr.io/winterfe/zipline:latest
-            ghcr.io/winterfe/zipline:${{ steps.version.outputs.value }}
+            ghcr.io/winterfe/zipline:${{ steps.version.outputs.zipline_version }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
