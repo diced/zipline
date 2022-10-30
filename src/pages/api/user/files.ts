@@ -26,7 +26,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
           userId: user.id,
         },
       });
-      Logger.get('image').info(`User ${user.username} (${user.id}) deleted ${count} files.`);
+      Logger.get('users').info(`User ${user.username} (${user.id}) deleted ${count} files.`);
 
       return res.json({ count });
     } else {
@@ -40,7 +40,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
       await datasource.delete(image.file);
 
-      Logger.get('image').info(
+      Logger.get('users').info(
         `User ${user.username} (${user.id}) deleted an image ${image.file} (${image.id})`
       );
 

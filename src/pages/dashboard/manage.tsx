@@ -18,7 +18,7 @@ export default function ManagePage(props) {
         <title>{title}</title>
       </Head>
       <Layout props={props}>
-        <Manage />
+        <Manage oauth_providers={props.oauth_providers} oauth_registration={props.oauth_registration} />
       </Layout>
     </>
   );

@@ -230,15 +230,15 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     if (compressionUsed) {
       const buffer = await sharp(file.buffer).jpeg({ quality: imageCompressionPercent }).toBuffer();
       await datasource.save(image.file, buffer);
-      Logger.get('image').info(
+      Logger.get('file').info(
         `User ${user.username} (${user.id}) compressed image from ${file.buffer.length} -> ${buffer.length} bytes`
       );
     } else {
       await datasource.save(image.file, file.buffer);
     }
 
-    Logger.get('image').info(
-      `User ${user.username} (${user.id}) uploaded an image ${image.file} (${image.id})`
+    Logger.get('file').info(
+      `User ${user.username} (${user.id}) uploaded an file ${image.file} (${image.id})`
     );
     if (user.domains.length) {
       const domain = user.domains[Math.floor(Math.random() * user.domains.length)];

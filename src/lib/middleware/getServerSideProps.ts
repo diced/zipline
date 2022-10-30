@@ -13,11 +13,13 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     oauth_providers.push({
       name: 'GitHub',
       url: '/api/auth/oauth/github',
+      link_url: '/api/auth/oauth/github?state=link',
     });
   if (discEnabled)
     oauth_providers.push({
       name: 'Discord',
       url: '/api/auth/oauth/discord',
+      link_url: '/api/auth/oauth/discord?state=link',
     });
 
   return {
