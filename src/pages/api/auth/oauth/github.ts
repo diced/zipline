@@ -13,9 +13,9 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     return res.bad('GitHub OAuth is not configured');
   }
 
-  const { code } = req.query as { code: string };
+  const { code, state } = req.query as { code: string; state: string };
 
-  if (!code) return res.redirect(github_auth.oauth_url(config.oauth.github_client_id));
+  if (!code) return res.redirect(github_auth.oauth_url(config.oauth.github_client_id, state));
 
   const resp = await fetch('https://github.com/login/oauth/access_token', {
     method: 'POST',
@@ -52,7 +52,36 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
   const existingOauth = existing?.oauth?.find((o) => o.provider === 'GITHUB');
 
-  if (existing && existingOauth) {
+  if (state && state === 'link') {
+    const user = await req.user();
+    if (!user) return res.error('not logged in, unable to link account');
+
+    if (existingOauth) return res.error('account already linked with github');
+
+    await prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        oauth: {
+          create: {
+            provider: 'GITHUB',
+            token: json.access_token,
+          },
+        },
+        avatar: avatarBase64,
+      },
+    });
+    req.cleanCookie('user');
+    res.setCookie('user', user.id, {
+      sameSite: 'lax',
+      expires: new Date(Date.now() + 6.048e8 * 2),
+      path: '/',
+    });
+    Logger.get('user').info(`User ${user.username} (${user.id}) linked account via oauth(github)`);
+
+    return res.redirect('/');
+  } else if (existing && existingOauth) {
     await prisma.user.update({
       where: {
         id: existing.id,
@@ -74,7 +103,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
     req.cleanCookie('user');
     res.setCookie('user', existing.id, {
-      sameSite: true,
+      sameSite: 'lax',
       expires: new Date(Date.now() + 6.048e8 * 2),
       path: '/',
     });
@@ -102,7 +131,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
   req.cleanCookie('user');
   res.setCookie('user', user.id, {
-    sameSite: true,
+    sameSite: 'lax',
     expires: new Date(Date.now() + 6.048e8 * 2),
     path: '/',
   });

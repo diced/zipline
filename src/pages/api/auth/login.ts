@@ -36,7 +36,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   if (!valid) return res.forbid('Wrong password');
 
   res.setCookie('user', user.id, {
-    sameSite: true,
+    sameSite: 'lax',
     expires: new Date(Date.now() + 6.048e8 * 2),
     path: '/',
   });
