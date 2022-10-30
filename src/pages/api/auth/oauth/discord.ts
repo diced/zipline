@@ -76,6 +76,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
             },
           },
         },
+        avatar: avatarBase64,
       },
     });
 
