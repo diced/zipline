@@ -44,6 +44,7 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           tags: |
-            ghcr.io/winterfe/zipline:lunar
+            ghcr.io/winterfe/zipline:trunk
+            ghcr.io/winterfe/zipline:trunk-${{ steps.version.outputs.zipline_version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
