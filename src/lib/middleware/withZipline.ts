@@ -109,9 +109,6 @@ export const withZipline =
           where: {
             id: Number(userId),
           },
-          include: {
-            oauth: true,
-          },
         });
 
         if (!user) return null;
