@@ -56,7 +56,6 @@ export const withOAuth =
 
     const existingOauth = existing?.oauth?.find((o) => o.provider === provider.toUpperCase());
     const existingUserOauth = user?.oauth?.find((o) => o.provider === provider.toUpperCase());
-    console.log(provider.toUpperCase());
     if (state === 'link') {
       if (!user) return res.error('not logged in, unable to link account');
 
