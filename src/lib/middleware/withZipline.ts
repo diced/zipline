@@ -5,7 +5,7 @@ import { serialize } from 'cookie';
 import { sign64, unsign64 } from 'lib/utils/crypto';
 import config from 'lib/config';
 import prisma from 'lib/prisma';
-import { User } from '@prisma/client';
+import { OAuth, User } from '@prisma/client';
 
 export interface NextApiFile {
   fieldname: string;
@@ -16,8 +16,12 @@ export interface NextApiFile {
   size: number;
 }
 
+interface UserExtended extends User {
+  oauth: OAuth[];
+}
+
 export type NextApiReq = NextApiRequest & {
-  user: () => Promise<User | null | void>;
+  user: () => Promise<UserExtended | null>;
   getCookie: (name: string) => string | null;
   cleanCookie: (name: string) => void;
   files?: NextApiFile[];
@@ -30,6 +34,7 @@ export type NextApiRes = NextApiResponse & {
   json: (json: Record<string, any>, status?: number) => void;
   ratelimited: (remaining: number) => void;
   setCookie: (name: string, value: unknown, options: CookieSerializeOptions) => void;
+  setUserCookie: (id: number) => void;
 };
 
 export const withZipline =
@@ -109,6 +114,9 @@ export const withZipline =
           where: {
             id: Number(userId),
           },
+          include: {
+            oauth: true,
+          },
         });
 
         if (!user) return null;
@@ -123,6 +131,15 @@ export const withZipline =
 
     res.setCookie = (name: string, value: unknown, options?: CookieSerializeOptions) =>
       setCookie(res, name, value, options || {});
+
+    res.setUserCookie = (id: number) => {
+      req.cleanCookie('user');
+      res.setCookie('user', String(id), {
+        sameSite: 'lax',
+        expires: new Date(Date.now() + 6.048e8 * 2),
+        path: '/',
+      });
+    };
 
     return handler(req, res);
   };

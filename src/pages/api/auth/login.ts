@@ -35,12 +35,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   const valid = await checkPassword(password, user.password);
   if (!valid) return res.forbid('Wrong password');
 
-  res.setCookie('user', user.id, {
-    sameSite: 'lax',
-    expires: new Date(Date.now() + 6.048e8 * 2),
-    path: '/',
-  });
-
+  res.setUserCookie(user.id);
   Logger.get('user').info(`User ${user.username} (${user.id}) logged in`);
 
   return res.json({ success: true });

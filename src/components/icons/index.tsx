@@ -29,6 +29,7 @@ import DownloadIcon from './DownloadIcon';
 import FlameshotIcon from './FlameshotIcon';
 import GitHubIcon from './GitHubIcon';
 import DiscordIcon from './DiscordIcon';
+import GoogleIcon from './GoogleIcon';
 import EyeIcon from './EyeIcon';
 import RefreshIcon from './RefreshIcon';
 
@@ -64,6 +65,7 @@ export {
   FlameshotIcon,
   GitHubIcon,
   DiscordIcon,
+  GoogleIcon,
   EyeIcon,
   RefreshIcon,
 };

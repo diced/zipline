@@ -43,7 +43,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       for (let i = 0; i !== files.length; ++i) {
         try {
           await datasource.delete(files[i].file);
-        } catch (e) {}
+        } catch {}
       }
 
       const { count } = await prisma.image.deleteMany({
