@@ -1,4 +1,4 @@
-import { oauth } from '@prisma/client';
+import { OAuth } from '@prisma/client';
 import { atom, selector } from 'recoil';
 
 export interface User {
@@ -12,7 +12,7 @@ export interface User {
   avatar?: string;
   administrator: boolean;
   superAdmin: boolean;
-  oauth: oauth[];
+  oauth: OAuth[];
   id: number;
 }
 

@@ -111,6 +111,9 @@ export interface ConfigOAuth {
 
   discord_client_id?: string;
   discord_client_secret?: string;
+
+  google_client_id?: string;
+  google_client_secret?: string;
 }
 
 export interface ConfigChunks {

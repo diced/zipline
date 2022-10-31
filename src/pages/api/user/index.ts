@@ -3,47 +3,120 @@ import { hashPassword } from 'lib/util';
 import { NextApiReq, NextApiRes, withZipline } from 'middleware/withZipline';
 import Logger from 'lib/logger';
 import config from 'lib/config';
-import { discord_auth, github_auth } from 'lib/oauth';
+import { discord_auth, github_auth, google_auth } from 'lib/oauth';
 
 async function handler(req: NextApiReq, res: NextApiRes) {
   const user = await req.user();
   if (!user) return res.forbid('not logged in');
 
-  const userOauths = await prisma.oauth.findMany({
-    where: {
-      userId: user?.id,
-    },
-  });
-
-  if (userOauths) {
+  if (user.oauth) {
     // this will probably change before the stable release
-    if (userOauths.find((o) => o.provider === 'GITHUB')) {
-      const resp = await github_auth.oauth_user(userOauths.find((o) => o.provider === 'GITHUB').token);
+    if (user.oauth.find((o) => o.provider === 'GITHUB')) {
+      const resp = await github_auth.oauth_user(user.oauth.find((o) => o.provider === 'GITHUB').token);
       if (!resp) {
-        req.cleanCookie('user');
-        Logger.get('user').info(`User ${user.username} (${user.id}) logged out (oauth token expired)`);
-
         return res.json({
           error: 'oauth token expired',
           redirect_uri: github_auth.oauth_url(config.oauth.github_client_id),
         });
       }
-    } else if (userOauths.find((o) => o.provider === 'DISCORD')) {
+    } else if (user.oauth.find((o) => o.provider === 'DISCORD')) {
       const resp = await fetch('https://discord.com/api/users/@me', {
         headers: {
-          Authorization: `Bearer ${userOauths.find((o) => o.provider === 'DISCORD').token}`,
+          Authorization: `Bearer ${user.oauth.find((o) => o.provider === 'DISCORD').token}`,
         },
       });
       if (!resp.ok) {
-        req.cleanCookie('user');
-        Logger.get('user').info(`User ${user.username} (${user.id}) logged out (oauth token expired)`);
+        const provider = user.oauth.find((o) => o.provider === 'DISCORD');
+        if (!provider.refresh)
+          return res.json({
+            error: 'oauth token expired',
+            redirect_uri: discord_auth.oauth_url(
+              config.oauth.discord_client_id,
+              `${config.core.https ? 'https' : 'http'}://${req.headers.host}`
+            ),
+          });
 
-        return res.json({
-          error: 'oauth token expired',
-          redirect_uri: discord_auth.oauth_url(
-            config.oauth.discord_client_id,
-            `${config.core.https ? 'https' : 'http'}://${req.headers.host}`
-          ),
+        const resp2 = await fetch('https://discord.com/api/oauth2/token', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            client_id: config.oauth.discord_client_id,
+            client_secret: config.oauth.discord_client_secret,
+            grant_type: 'refresh_token',
+            refresh_token: provider.refresh,
+          }),
+        });
+        if (!resp2.ok)
+          return res.json({
+            error: 'oauth token expired',
+            redirect_uri: discord_auth.oauth_url(
+              config.oauth.discord_client_id,
+              `${config.core.https ? 'https' : 'http'}://${req.headers.host}`
+            ),
+          });
+
+        const json = await resp2.json();
+
+        await prisma.oAuth.update({
+          where: {
+            id: provider.id,
+          },
+          data: {
+            token: json.access_token,
+            refresh: json.refresh_token,
+          },
+        });
+      }
+    } else if (user.oauth.find((o) => o.provider === 'GOOGLE')) {
+      const resp = await fetch(
+        `https://people.googleapis.com/v1/people/me?access_token=${
+          user.oauth.find((o) => o.provider === 'GOOGLE').token
+        }&personFields=names,photos`
+      );
+      if (!resp.ok) {
+        const provider = user.oauth.find((o) => o.provider === 'GOOGLE');
+        if (!provider.refresh)
+          return res.json({
+            error: 'oauth token expired',
+            redirect_uri: google_auth.oauth_url(
+              config.oauth.google_client_id,
+              `${config.core.https ? 'https' : 'http'}://${req.headers.host}`
+            ),
+          });
+
+        const resp2 = await fetch('https://oauth2.googleapis.com/token', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            client_id: config.oauth.google_client_id,
+            client_secret: config.oauth.google_client_secret,
+            grant_type: 'refresh_token',
+            refresh_token: provider.refresh,
+          }),
+        });
+        if (!resp2.ok)
+          return res.json({
+            error: 'oauth token expired',
+            redirect_uri: google_auth.oauth_url(
+              config.oauth.google_client_id,
+              `${config.core.https ? 'https' : 'http'}://${req.headers.host}`
+            ),
+          });
+
+        const json = await resp2.json();
+
+        await prisma.oAuth.update({
+          where: {
+            id: provider.id,
+          },
+          data: {
+            token: json.access_token,
+            refresh: json.refresh_token,
+          },
         });
       }
     }
@@ -128,8 +201,6 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         where: { id: user.id },
         data: { domains },
       });
-
-      return res.json({ domains });
     }
 
     const newUser = await prisma.user.findFirst({
@@ -155,7 +226,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
     Logger.get('user').info(`User ${user.username} (${newUser.username}) (${newUser.id}) was updated`);
 
-    return res.json(newUser.oauth);
+    return res.json(newUser);
   } else {
     delete user.password;
 

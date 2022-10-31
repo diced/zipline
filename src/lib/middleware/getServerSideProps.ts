@@ -6,6 +6,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   // this entire thing will also probably change before the stable release
   const ghEnabled = notNull(config.oauth?.github_client_id, config.oauth?.github_client_secret);
   const discEnabled = notNull(config.oauth?.discord_client_id, config.oauth?.discord_client_secret);
+  const googleEnabled = notNull(config.oauth?.google_client_id, config.oauth?.google_client_secret);
 
   const oauth_providers = [];
 
@@ -20,6 +21,13 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       name: 'Discord',
       url: '/api/auth/oauth/discord',
       link_url: '/api/auth/oauth/discord?state=link',
+    });
+
+  if (googleEnabled)
+    oauth_providers.push({
+      name: 'Google',
+      url: '/api/auth/oauth/google',
+      link_url: '/api/auth/oauth/google?state=link',
     });
 
   return {

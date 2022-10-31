@@ -87,3 +87,7 @@ export function percentChange(initial: number, final: number) {
 
   return ((final - initial) / initial) * 100;
 }
+
+export function capitalize(str: string) {
+  return str[0].toUpperCase() + str.slice(1).toLowerCase();
+}

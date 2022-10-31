@@ -8,23 +8,23 @@ generator client {
 }
 
 model User {
-  id               Int       @id @default(autoincrement())
-  username         String
-  password         String?
-  avatar           String?
-  token            String
-  administrator    Boolean   @default(false)
-  superAdmin       Boolean   @default(false)
-  systemTheme      String    @default("system")
-  embedTitle       String?
-  embedColor       String    @default("#2f3136")
-  embedSiteName    String?   @default("{image.file} • {user.name}")
-  ratelimit        DateTime?
-  domains          String[]
-  oauth            oauth[]
-  images           Image[]
-  urls             Url[]
-  Invite           Invite[]
+  id            Int       @id @default(autoincrement())
+  username      String
+  password      String?
+  avatar        String?
+  token         String
+  administrator Boolean   @default(false)
+  superAdmin    Boolean   @default(false)
+  systemTheme   String    @default("system")
+  embedTitle    String?
+  embedColor    String    @default("#2f3136")
+  embedSiteName String?   @default("{image.file} • {user.name}")
+  ratelimit     DateTime?
+  domains       String[]
+  oauth         OAuth[]
+  images        Image[]
+  urls          Url[]
+  Invite        Invite[]
 }
 
 enum ImageFormat {
@@ -47,8 +47,8 @@ model Image {
   password   String?
   invisible  InvisibleImage?
   format     ImageFormat     @default(RANDOM)
-  user       User            @relation(fields: [userId], references: [id])
-  userId     Int
+  user       User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId     Int?
 }
 
 model InvisibleImage {
@@ -84,25 +84,27 @@ model Stats {
 }
 
 model Invite {
-  id         Int       @id @default(autoincrement())
-  code       String    @unique
-  created_at DateTime  @default(now())
-  expires_at DateTime?
-  used       Boolean   @default(false)
-
-  createdBy   User @relation(fields: [createdById], references: [id])
+  id          Int       @id @default(autoincrement())
+  code        String    @unique
+  created_at  DateTime  @default(now())
+  expires_at  DateTime?
+  used        Boolean   @default(false)
+  createdBy   User      @relation(fields: [createdById], references: [id])
   createdById Int
 }
 
-model oauth {
-  id        Int      @id @default(autoincrement())
-  provider  oauthProviders  @unique
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    Int
-  token     String
+model OAuth {
+  id       Int            @id @default(autoincrement())
+  provider OauthProviders
+  user     User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId   Int
+  username String
+  token    String
+  refresh  String?
 }
 
-enum oauthProviders {
+enum OauthProviders {
   DISCORD
   GITHUB
+  GOOGLE
 }

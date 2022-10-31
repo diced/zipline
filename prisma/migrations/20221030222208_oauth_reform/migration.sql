@@ -7,7 +7,7 @@
 
 */
 -- CreateEnum
-CREATE TYPE "oauthProviders" AS ENUM ('DISCORD', 'GITHUB');
+CREATE TYPE "OauthProviders" AS ENUM ('DISCORD', 'GITHUB');
 
 -- AlterTable
 ALTER TABLE "User" DROP COLUMN "oauth",
@@ -15,17 +15,17 @@ DROP COLUMN "oauthAccessToken",
 DROP COLUMN "oauthProvider";
 
 -- CreateTable
-CREATE TABLE "oauth" (
+CREATE TABLE "OAuth" (
     "id" SERIAL NOT NULL,
-    "provider" "oauthProviders" NOT NULL,
+    "provider" "OauthProviders" NOT NULL,
     "userId" INTEGER NOT NULL,
     "token" TEXT NOT NULL,
 
-    CONSTRAINT "oauth_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "OAuth_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "oauth_provider_key" ON "oauth"("provider");
+CREATE UNIQUE INDEX "OAuth_provider_key" ON "OAuth"("provider");
 
 -- AddForeignKey
-ALTER TABLE "oauth" ADD CONSTRAINT "oauth_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "OAuth" ADD CONSTRAINT "OAuth_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;

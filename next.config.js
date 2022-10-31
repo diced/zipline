@@ -17,8 +17,8 @@ module.exports = {
       'getsharex.com',
       // For flameshot icon, and maybe in the future other stuff from github
       'raw.githubusercontent.com',
-      // Discord Icon
-      'assets-global.website-files.com',
+      // Google Icon
+      'madeby.google.com',
     ],
   },
   poweredByHeader: false,
