@@ -237,9 +237,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       await datasource.save(image.file, file.buffer);
     }
 
-    Logger.get('file').info(
-      `User ${user.username} (${user.id}) uploaded a file ${image.file} (${image.id})`
-    );
+    Logger.get('file').info(`User ${user.username} (${user.id}) uploaded file ${image.file} (${image.id})`);
     if (user.domains.length) {
       const domain = user.domains[Math.floor(Math.random() * user.domains.length)];
       response.files.push(
