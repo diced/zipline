@@ -238,7 +238,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     }
 
     Logger.get('file').info(
-      `User ${user.username} (${user.id}) uploaded an file ${image.file} (${image.id})`
+      `User ${user.username} (${user.id}) uploaded a file ${image.file} (${image.id})`
     );
     if (user.domains.length) {
       const domain = user.domains[Math.floor(Math.random() * user.domains.length)];
