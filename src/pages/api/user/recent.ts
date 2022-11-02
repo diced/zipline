@@ -1,5 +1,6 @@
 import { NextApiReq, NextApiRes, withZipline } from 'middleware/withZipline';
 import prisma from 'lib/prisma';
+import config from 'lib/config';
 
 async function handler(req: NextApiReq, res: NextApiRes) {
   const user = await req.user();
@@ -27,6 +28,10 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       maxViews: true,
     },
   });
+
+  for (let i = 0; i !== images.length; ++i) {
+    (images[i] as unknown as { url: string }).url = `${config.uploader.route}/${images[i].file}`;
+  }
 
   if (req.query.filter && req.query.filter === 'media')
     images = images.filter((x) => /^(video|audio|image)/.test(x.mimetype));
