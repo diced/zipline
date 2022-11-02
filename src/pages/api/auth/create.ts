@@ -7,7 +7,8 @@ import config from 'lib/config';
 async function handler(req: NextApiReq, res: NextApiRes) {
   if (req.method === 'POST' && req.body) {
     if (!config.features.invites && req.body.code) return res.forbid('invites are disabled');
-    if (!config.features.user_registration) return res.forbid('user registration is disabled');
+    if (!config.features.user_registration && !req.body.code)
+      return res.forbid('user registration is disabled');
 
     const { code, username, password } = req.body as {
       code?: string;
