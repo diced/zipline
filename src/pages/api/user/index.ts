@@ -1,14 +1,11 @@
 import prisma from 'lib/prisma';
 import { hashPassword } from 'lib/util';
-import { NextApiReq, NextApiRes, withZipline } from 'middleware/withZipline';
+import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'middleware/withZipline';
 import Logger from 'lib/logger';
 import config from 'lib/config';
 import { discord_auth, github_auth, google_auth } from 'lib/oauth';
 
-async function handler(req: NextApiReq, res: NextApiRes) {
-  const user = await req.user();
-  if (!user) return res.forbid('not logged in');
-
+async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   if (user.oauth) {
     // this will probably change before the stable release
     if (user.oauth.find((o) => o.provider === 'GITHUB')) {
@@ -137,9 +134,8 @@ async function handler(req: NextApiReq, res: NextApiRes) {
           username: req.body.username,
         },
       });
-      if (existing && user.username !== req.body.username) {
-        return res.forbid('username is already taken');
-      }
+      if (existing && user.username !== req.body.username) return res.badRequest('username is already taken');
+
       await prisma.user.update({
         where: { id: user.id },
         data: { username: req.body.username },
@@ -195,7 +191,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         }
       }
 
-      if (invalidDomains.length) return res.forbid('invalid domains', { invalidDomains });
+      if (invalidDomains.length) return res.badRequest('invalid domains', { invalidDomains });
 
       await prisma.user.update({
         where: { id: user.id },
@@ -234,4 +230,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   }
 }
 
-export default withZipline(handler);
+export default withZipline(handler, {
+  methods: ['GET', 'PATCH'],
+  user: true,
+});

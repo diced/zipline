@@ -1,10 +1,7 @@
-import { NextApiReq, NextApiRes, withZipline } from 'middleware/withZipline';
+import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'middleware/withZipline';
 import Logger from 'lib/logger';
 
-async function handler(req: NextApiReq, res: NextApiRes) {
-  const user = await req.user();
-  if (!user) return res.forbid('not logged in');
-
+async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   req.cleanCookie('user');
 
   Logger.get('user').info(`User ${user.username} (${user.id}) logged out`);
@@ -12,4 +9,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   return res.json({ success: true });
 }
 
-export default withZipline(handler);
+export default withZipline(handler, {
+  methods: ['GET'],
+  user: true,
+});
