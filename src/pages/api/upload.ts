@@ -18,8 +18,7 @@ import sharp from 'sharp';
 const uploader = multer();
 
 async function handler(req: NextApiReq, res: NextApiRes) {
-  if (req.method !== 'POST') return res.forbid('invalid method');
-  if (!req.headers.authorization) return res.forbid('no authorization');
+  if (!req.headers.authorization) return res.forbidden('no authorization');
 
   const user = await prisma.user.findFirst({
     where: {
@@ -27,9 +26,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     },
   });
 
-  if (!user) return res.forbid('authorization incorrect');
-
-  await run(uploader.array('file'))(req, res);
+  if (!user) return res.forbidden('authorization incorrect');
 
   const response: { files: string[]; expires_at?: Date } = { files: [] };
   const expires_at = req.headers['expires-at'] as string;
@@ -37,7 +34,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
   if (expires_at) {
     expiry = parseExpiry(expires_at);
-    if (!expiry) return res.error('invalid date');
+    if (!expiry) return res.badRequest('invalid date');
     else {
       response.expires_at = expiry;
     }
@@ -49,13 +46,14 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   const imageCompressionPercent = req.headers['image-compression-percent']
     ? Number(req.headers['image-compression-percent'])
     : null;
-  if (isNaN(imageCompressionPercent)) return res.error('invalid image compression percent (invalid number)');
+  if (isNaN(imageCompressionPercent))
+    return res.badRequest('invalid image compression percent (invalid number)');
   if (imageCompressionPercent < 0 || imageCompressionPercent > 100)
-    return res.error('invalid image compression percent (% < 0 || % > 100)');
+    return res.badRequest('invalid image compression percent (% < 0 || % > 100)');
 
   const fileMaxViews = req.headers['max-views'] ? Number(req.headers['max-views']) : null;
-  if (isNaN(fileMaxViews)) return res.error('invalid max views (invalid number)');
-  if (fileMaxViews < 0) return res.error('invalid max views (max views < 0)');
+  if (isNaN(fileMaxViews)) return res.badRequest('invalid max views (invalid number)');
+  if (fileMaxViews < 0) return res.badRequest('invalid max views (max views < 0)');
 
   // handle partial uploads before ratelimits
   if (req.headers['content-range']) {
@@ -174,17 +172,17 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     }
   }
 
-  if (!req.files) return res.error('no files');
-  if (req.files && req.files.length === 0) return res.error('no files');
+  if (!req.files) return res.badRequest('no files');
+  if (req.files && req.files.length === 0) return res.badRequest('no files');
 
   for (let i = 0; i !== req.files.length; ++i) {
     const file = req.files[i];
     if (file.size > zconfig.uploader[user.administrator ? 'admin_limit' : 'user_limit'])
-      return res.error(`file[${i}]: size too big`);
+      return res.badRequest(`file[${i}]: size too big`);
 
     const ext = file.originalname.split('.').pop();
     if (zconfig.uploader.disabled_extensions.includes(ext))
-      return res.error(`file[${i}]: disabled extension recieved: ${ext}`);
+      return res.badRequest(`file[${i}]: disabled extension recieved: ${ext}`);
     let fileName: string;
 
     switch (format) {
@@ -287,19 +285,10 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   return res.json(response);
 }
 
-function run(middleware: any) {
-  return (req, res) =>
-    new Promise((resolve, reject) => {
-      middleware(req, res, (result) => {
-        if (result instanceof Error) reject(result);
-        resolve(result);
-      });
-    });
-}
-
-export default async function handlers(req, res) {
-  return withZipline(handler)(req, res);
-}
+export default withZipline(handler, {
+  methods: ['POST'],
+  middleware: [uploader.array('file')],
+});
 
 export const config = {
   api: {

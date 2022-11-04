@@ -1,4 +1,4 @@
-import { NextApiReq, NextApiRes, withZipline } from 'middleware/withZipline';
+import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'middleware/withZipline';
 import prisma from 'lib/prisma';
 import Logger from 'lib/logger';
 import { Zip, ZipPassThrough } from 'fflate';
@@ -7,10 +7,7 @@ import { readdir, stat } from 'fs/promises';
 import { createReadStream, createWriteStream } from 'fs';
 import { tmpdir } from 'os';
 
-async function handler(req: NextApiReq, res: NextApiRes) {
-  const user = await req.user();
-  if (!user) return res.forbid('not logged in');
-
+async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   if (req.method === 'POST') {
     const files = await prisma.image.findMany({
       where: {
@@ -18,7 +15,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       },
     });
 
-    if (!files.length) return res.error('no files found');
+    if (!files.length) return res.notFound('no files found');
 
     const zip = new Zip();
     const export_name = `zipline_export_${user.id}_${Date.now()}.zip`;
@@ -116,7 +113,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     const export_name = req.query.name as string;
     if (export_name) {
       const parts = export_name.split('_');
-      if (Number(parts[2]) !== user.id) return res.forbid('cannot access export');
+      if (Number(parts[2]) !== user.id) return res.unauthorized('cannot access export owned by another user');
 
       const stream = createReadStream(tmpdir() + `/${export_name}`);
 
@@ -142,4 +139,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   }
 }
 
-export default withZipline(handler);
+export default withZipline(handler, {
+  methods: ['GET', 'POST'],
+  user: true,
+});

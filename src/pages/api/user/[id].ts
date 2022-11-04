@@ -1,14 +1,9 @@
 import prisma from 'lib/prisma';
 import { hashPassword } from 'lib/util';
-import { NextApiReq, NextApiRes, withZipline } from 'middleware/withZipline';
+import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'middleware/withZipline';
 import Logger from 'lib/logger';
 
-async function handler(req: NextApiReq, res: NextApiRes) {
-  const user = await req.user();
-  if (!user) return res.forbid('not logged in');
-
-  if (!user.administrator) return res.forbid('not an administrator');
-
+async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   const { id } = req.query as { id: string };
 
   const target = await prisma.user.findFirst({
@@ -17,23 +12,19 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     },
   });
 
-  if (!target) return res.error('user not found');
+  if (!target) return res.notFound('user not found');
 
-  if (req.method === 'GET') {
-    delete target.password;
-
-    return res.json(target);
-  } else if (req.method === 'DELETE') {
+  if (req.method === 'DELETE') {
     const newTarget = await prisma.user.delete({
       where: { id: target.id },
     });
-    if (newTarget.administrator && !user.superAdmin) return res.error('cannot delete administrator');
+    if (newTarget.administrator && !user.superAdmin) return res.forbidden('cannot delete administrator');
 
     delete newTarget.password;
 
     return res.json(newTarget);
   } else if (req.method === 'PATCH') {
-    if (target.administrator && !user.superAdmin) return res.forbid('cannot modify administrator');
+    if (target.administrator && !user.superAdmin) return res.forbidden('cannot modify administrator');
 
     if (req.body.password) {
       const hashed = await hashPassword(req.body.password);
@@ -57,7 +48,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         },
       });
       if (existing && user.username !== req.body.username) {
-        return res.forbid('username is already taken');
+        return res.badRequest('username is already taken');
       }
       await prisma.user.update({
         where: { id: target.id },
@@ -114,7 +105,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         }
       }
 
-      if (invalidDomains.length) return res.forbid('invalid domains', { invalidDomains });
+      if (invalidDomains.length) return res.badRequest('invalid domains', { invalidDomains });
 
       await prisma.user.update({
         where: { id: target.id },
@@ -150,7 +141,15 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     );
 
     return res.json(newUser);
+  } else {
+    delete target.password;
+
+    return res.json(target);
   }
 }
 
-export default withZipline(handler);
+export default withZipline(handler, {
+  methods: ['GET', 'DELETE', 'PATCH'],
+  user: true,
+  administrator: true,
+});

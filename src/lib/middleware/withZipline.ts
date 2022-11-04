@@ -6,6 +6,7 @@ import { sign64, unsign64 } from 'lib/utils/crypto';
 import config from 'lib/config';
 import prisma from 'lib/prisma';
 import { OAuth, User } from '@prisma/client';
+import { HTTPMethod } from 'find-my-way';
 
 export interface NextApiFile {
   fieldname: string;
@@ -16,7 +17,7 @@ export interface NextApiFile {
   size: number;
 }
 
-interface UserExtended extends User {
+export interface UserExtended extends User {
   oauth: OAuth[];
 }
 
@@ -27,55 +28,98 @@ export type NextApiReq = NextApiRequest & {
   files?: NextApiFile[];
 };
 
-export type NextApiRes = NextApiResponse & {
-  error: (message: string) => void;
-  forbid: (message: string, extra?: any) => void;
-  bad: (message: string) => void;
-  json: (json: Record<string, any>, status?: number) => void;
-  ratelimited: (remaining: number) => void;
-  setCookie: (name: string, value: unknown, options: CookieSerializeOptions) => void;
-  setUserCookie: (id: number) => void;
+export type NextApiResExtra =
+  | 'badRequest'
+  | 'unauthorized'
+  | 'forbidden'
+  | 'ratelimited'
+  | 'notFound'
+  | 'error';
+export type NextApiResExtraObj = {
+  [key in NextApiResExtra]: (message: any, extra?: Record<string, any>) => void;
+};
+
+export type NextApiRes = NextApiResponse &
+  NextApiResExtraObj & {
+    json: (json: Record<string, any>, status?: number) => void;
+    setCookie: (name: string, value: unknown, options: CookieSerializeOptions) => void;
+    setUserCookie: (id: number) => void;
+  };
+
+export type ZiplineApiConfig = {
+  methods: HTTPMethod[];
+  user?: boolean;
+  administrator?: boolean;
+  middleware?: any[];
 };
 
 export const withZipline =
-  (handler: (req: NextApiRequest, res: NextApiResponse) => unknown) => (req: NextApiReq, res: NextApiRes) => {
+  (
+    handler: (req: NextApiRequest, res: NextApiResponse, user?: UserExtended) => unknown,
+    api_config: ZiplineApiConfig = { methods: ['GET'] }
+  ) =>
+  (req: NextApiReq, res: NextApiRes) => {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Content-Allow-Methods', 'GET,HEAD,POST,OPTIONS');
     res.setHeader('Access-Control-Max-Age', '86400');
 
-    res.error = (message: string) => {
+    // Used when the client sends wrong information, etc.
+    res.badRequest = (message: string, extra: Record<string, any> = {}) => {
       res.json(
         {
           error: message,
+          code: 400,
+          ...extra,
         },
-        500
+        400
       );
     };
 
-    res.forbid = (message: string, extra: any = {}) => {
+    // If the user is not logged in
+    res.unauthorized = (message: string, extra: Record<string, any> = {}) => {
       res.json(
         {
-          error: '403: ' + message,
+          error: message,
+          code: 401,
+          ...extra,
+        },
+        401
+      );
+    };
+
+    // If the user is logged in but doesn't have permission to do something
+    res.forbidden = (message: string, extra: Record<string, any> = {}) => {
+      res.json(
+        {
+          error: message,
+          code: 403,
           ...extra,
         },
         403
       );
     };
 
-    res.bad = (message: string) => {
+    res.notFound = (message: string, extra: Record<string, any> = {}) => {
       res.json(
         {
-          error: '401: ' + message,
+          error: message,
+          code: 404,
+          ...extra,
         },
-        401
+        404
       );
     };
 
-    res.ratelimited = (remaining: number) => {
-      res.setHeader('X-Ratelimit-Remaining', Math.floor(remaining / 1000)).json(
+    res.ratelimited = (message: number, extra: Record<string, any> = {}) => {
+      const retry = Math.floor(message / 1000);
+
+      res.setHeader('X-Ratelimit-Remaining', retry);
+      res.json(
         {
-          error: '429: ratelimited',
+          error: `ratelimited - try again in ${retry} seconds`,
+          code: 429,
+          ...extra,
         },
         429
       );
@@ -129,8 +173,16 @@ export const withZipline =
       }
     };
 
-    res.setCookie = (name: string, value: unknown, options?: CookieSerializeOptions) =>
-      setCookie(res, name, value, options || {});
+    res.setCookie = (name: string, value: unknown, options: CookieSerializeOptions = {}) => {
+      if ('maxAge' in options) {
+        options.expires = new Date(Date.now() + options.maxAge * 1000);
+        options.maxAge /= 1000;
+      }
+
+      const signed = sign64(String(value), config.core.secret);
+
+      res.setHeader('Set-Cookie', serialize(name, signed, options));
+    };
 
     res.setUserCookie = (id: number) => {
       req.cleanCookie('user');
@@ -141,21 +193,32 @@ export const withZipline =
       });
     };
 
+    if (!api_config.methods.includes(req.method as HTTPMethod)) {
+      return res.json(
+        {
+          error: 'method not allowed',
+          code: 405,
+        },
+        405
+      );
+    }
+
+    if (api_config.middleware) {
+      for (let i = 0; i !== api_config.middleware.length; ++i) {
+        api_config.middleware[i](req, res, (result) => {
+          if (result instanceof Error) return res.error(result.message);
+        });
+      }
+    }
+
+    if (api_config.user) {
+      return req.user().then((user) => {
+        if (!user) return res.unauthorized('not logged in');
+        if (api_config.administrator && !user.administrator) return res.forbidden('not an administrator');
+
+        return handler(req, res, user);
+      });
+    }
+
     return handler(req, res);
   };
-
-export const setCookie = (
-  res: NextApiResponse,
-  name: string,
-  value: unknown,
-  options: CookieSerializeOptions = {}
-) => {
-  if ('maxAge' in options) {
-    options.expires = new Date(Date.now() + options.maxAge * 1000);
-    options.maxAge /= 1000;
-  }
-
-  const signed = sign64(String(value), config.core.secret);
-
-  res.setHeader('Set-Cookie', serialize(name, signed, options));
-};

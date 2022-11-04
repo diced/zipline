@@ -4,7 +4,6 @@ import { checkPassword, createToken, hashPassword } from 'lib/util';
 import Logger from 'lib/logger';
 
 async function handler(req: NextApiReq, res: NextApiRes) {
-  if (req.method !== 'POST') return res.status(405).end();
   const { username, password } = req.body as {
     username: string;
     password: string;
@@ -30,10 +29,10 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     },
   });
 
-  if (!user) return res.status(404).end(JSON.stringify({ error: 'User not found' }));
+  if (!user) return res.notFound('user not found');
 
   const valid = await checkPassword(password, user.password);
-  if (!valid) return res.forbid('Wrong password');
+  if (!valid) return res.unauthorized('Wrong password');
 
   res.setUserCookie(user.id);
   Logger.get('user').info(`User ${user.username} (${user.id}) logged in`);
@@ -41,4 +40,6 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   return res.json({ success: true });
 }
 
-export default withZipline(handler);
+export default withZipline(handler, {
+  methods: ['POST'],
+});

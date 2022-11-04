@@ -1,17 +1,25 @@
-import { NextApiReq, NextApiRes, withZipline } from 'middleware/withZipline';
+import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'middleware/withZipline';
 import prisma from 'lib/prisma';
 import config from 'lib/config';
 import { Stats } from '@prisma/client';
 import { getStats } from 'server/util';
 import datasource from 'lib/datasource';
 
-async function handler(req: NextApiReq, res: NextApiRes) {
-  const user = await req.user();
-  if (!user) return res.forbid('not logged in');
+async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
+  if (req.method === 'POST') {
+    if (!user.administrator) return res.forbidden('not an administrator');
 
-  if (req.method === 'GET') {
+    const stats = await getStats(prisma, datasource);
+    const stats_data = await prisma.stats.create({
+      data: {
+        data: stats,
+      },
+    });
+
+    return res.json(stats_data);
+  } else {
     let amount = typeof req.query.amount === 'string' ? Number(req.query.amount) : 2;
-    if (isNaN(amount)) return res.bad('invalid amount');
+    if (isNaN(amount)) return res.badRequest('invalid amount');
 
     // get stats per day
 
@@ -35,18 +43,10 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     }
 
     return res.json(stats);
-  } else if (req.method === 'POST') {
-    if (!user.administrator) return res.forbid('unable to force update stats as a non-admin');
-
-    const stats = await getStats(prisma, datasource);
-    const stats_data = await prisma.stats.create({
-      data: {
-        data: stats,
-      },
-    });
-
-    return res.json(stats_data);
   }
 }
 
-export default withZipline(handler);
+export default withZipline(handler, {
+  methods: ['GET', 'POST'],
+  user: true,
+});
