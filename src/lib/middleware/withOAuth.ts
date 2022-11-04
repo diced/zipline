@@ -116,7 +116,7 @@ export const withOAuth =
 
       return res.redirect('/dashboard');
     } else if (existing) {
-      return res.forbid('username is already taken');
+      return res.badRequest('username is already taken');
     }
 
     const nuser = await prisma.user.create({
