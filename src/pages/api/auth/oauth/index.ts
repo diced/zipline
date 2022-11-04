@@ -1,14 +1,11 @@
 import prisma from 'lib/prisma';
-import { NextApiReq, NextApiRes, withZipline } from 'lib/middleware/withZipline';
+import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'lib/middleware/withZipline';
 import { OauthProviders } from '@prisma/client';
 
-async function handler(req: NextApiReq, res: NextApiRes) {
-  const user = await req.user();
-  if (!user) return res.error('not logged in');
-
+async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   if (req.method === 'DELETE') {
-    if (!user.password && user.oauth.length === 1)
-      return res.forbid("can't unlink account without a password, please set one then unlink.");
+    if (!user.password && user.oauth?.length === 1)
+      return res.badRequest("can't unlink account without a password, please set one then unlink.");
 
     const { provider } = req.body as { provider: OauthProviders };
 
@@ -44,8 +41,11 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
     return res.json(nuser);
   } else {
-    return res.json(user.oauth);
+    return res.json(user.oauth ?? []);
   }
 }
 
-export default withZipline(handler);
+export default withZipline(handler, {
+  methods: ['DELETE', 'GET'],
+  user: true,
+});

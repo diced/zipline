@@ -1,14 +1,11 @@
-import { NextApiReq, NextApiRes, withZipline } from 'middleware/withZipline';
+import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'middleware/withZipline';
 import prisma from 'lib/prisma';
 import { chunk } from 'lib/util';
 import Logger from 'lib/logger';
 import datasource from 'lib/datasource';
 import config from 'lib/config';
 
-async function handler(req: NextApiReq, res: NextApiRes) {
-  const user = await req.user();
-  if (!user) return res.forbid('not logged in');
-
+async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   if (req.method === 'DELETE') {
     if (req.body.all) {
       const files = await prisma.image.findMany({
@@ -30,7 +27,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
       return res.json({ count });
     } else {
-      if (!req.body.id) return res.error('no file id');
+      if (!req.body.id) return res.badRequest('no file id');
 
       const image = await prisma.image.delete({
         where: {
@@ -48,7 +45,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       return res.json(image);
     }
   } else if (req.method === 'PATCH') {
-    if (!req.body.id) return res.error('no file id');
+    if (!req.body.id) return res.badRequest('no file id');
 
     let image;
 
@@ -103,4 +100,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   }
 }
 
-export default withZipline(handler);
+export default withZipline(handler, {
+  methods: ['GET', 'DELETE', 'PATCH'],
+  user: true,
+});

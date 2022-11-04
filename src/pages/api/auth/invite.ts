@@ -1,15 +1,11 @@
 import prisma from 'lib/prisma';
-import { NextApiReq, NextApiRes, withZipline } from 'lib/middleware/withZipline';
+import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'lib/middleware/withZipline';
 import { randomChars } from 'lib/util';
 import Logger from 'lib/logger';
 import config from 'lib/config';
 
-async function handler(req: NextApiReq, res: NextApiRes) {
-  if (!config.features.invites) return res.forbid('invites are disabled');
-
-  const user = await req.user();
-  if (!user) return res.forbid('not logged in');
-  if (!user.administrator) return res.forbid('you arent an administrator');
+async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
+  if (!config.features.invites) return res.badRequest('invites are disabled');
 
   if (req.method === 'POST') {
     const { expires_at, count } = req.body as {
@@ -19,8 +15,8 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
     const expiry = expires_at ? new Date(expires_at) : null;
     if (expiry) {
-      if (!expiry.getTime()) return res.bad('invalid date');
-      if (expiry.getTime() < Date.now()) return res.bad('date is in the past');
+      if (!expiry.getTime()) return res.badRequest('invalid date');
+      if (expiry.getTime() < Date.now()) return res.badRequest('date is in the past');
     }
     const counts = count ? count : 1;
 
@@ -58,14 +54,6 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
       return res.json(invite);
     }
-  } else if (req.method === 'GET') {
-    const invites = await prisma.invite.findMany({
-      orderBy: {
-        created_at: 'desc',
-      },
-    });
-
-    return res.json(invites);
   } else if (req.method === 'DELETE') {
     const { code } = req.query as { code: string };
 
@@ -78,7 +66,19 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     Logger.get('invite').info(`${user.username} (${user.id}) deleted invite ${invite.code}`);
 
     return res.json(invite);
+  } else {
+    const invites = await prisma.invite.findMany({
+      orderBy: {
+        created_at: 'desc',
+      },
+    });
+
+    return res.json(invites);
   }
 }
 
-export default withZipline(handler);
+export default withZipline(handler, {
+  methods: ['GET', 'POST', 'DELETE'],
+  user: true,
+  administrator: true,
+});

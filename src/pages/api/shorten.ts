@@ -7,8 +7,7 @@ import config from 'lib/config';
 import { sendShorten } from 'lib/discord';
 
 async function handler(req: NextApiReq, res: NextApiRes) {
-  if (req.method !== 'POST') return res.forbid('no allow');
-  if (!req.headers.authorization) return res.forbid('no authorization');
+  if (!req.headers.authorization) return res.badRequest('no authorization');
 
   const user = await prisma.user.findFirst({
     where: {
@@ -16,13 +15,13 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     },
   });
 
-  if (!user) return res.forbid('authorization incorect');
-  if (!req.body) return res.error('no body');
-  if (!req.body.url) return res.error('no url');
+  if (!user) return res.unauthorized('authorization incorect');
+  if (!req.body) return res.badRequest('no body');
+  if (!req.body.url) return res.badRequest('no url');
 
   const maxUrlViews = req.headers['max-views'] ? Number(req.headers['max-views']) : null;
-  if (isNaN(maxUrlViews)) return res.error('invalid max views (invalid number)');
-  if (maxUrlViews < 0) return res.error('invalid max views (max views < 0)');
+  if (isNaN(maxUrlViews)) return res.badRequest('invalid max views (invalid number)');
+  if (maxUrlViews < 0) return res.badRequest('invalid max views (max views < 0)');
 
   const rand = randomChars(zconfig.urls.length);
 
@@ -35,7 +34,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       },
     });
 
-    if (existing) return res.error('vanity already exists');
+    if (existing) return res.badRequest('vanity already exists');
   }
 
   const url = await prisma.url.create({
@@ -71,4 +70,6 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   });
 }
 
-export default withZipline(handler);
+export default withZipline(handler, {
+  methods: ['POST'],
+});

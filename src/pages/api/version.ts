@@ -3,10 +3,7 @@ import config from 'lib/config';
 import { NextApiReq, NextApiRes, withZipline } from 'middleware/withZipline';
 
 async function handler(req: NextApiReq, res: NextApiRes) {
-  const user = await req.user();
-  if (!user) return res.forbid('not logged in');
-
-  if (!config.website.show_version) return res.bad('version hidden');
+  if (!config.website.show_version) return res.forbidden('version hidden');
 
   const pkg = JSON.parse(await readFile('package.json', 'utf8'));
 
@@ -19,4 +16,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   });
 }
 
-export default withZipline(handler);
+export default withZipline(handler, {
+  methods: ['GET'],
+  user: true,
+});

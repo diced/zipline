@@ -1,14 +1,11 @@
-import { NextApiReq, NextApiRes, withZipline } from 'middleware/withZipline';
+import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'middleware/withZipline';
 import prisma from 'lib/prisma';
 import config from 'lib/config';
 import Logger from 'lib/logger';
 
-async function handler(req: NextApiReq, res: NextApiRes) {
-  const user = await req.user();
-  if (!user) return res.forbid('not logged in');
-
+async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   if (req.method === 'DELETE') {
-    if (!req.body.id) return res.bad('no url id');
+    if (!req.body.id) return res.badRequest('no url id');
 
     const url = await prisma.url.delete({
       where: {
@@ -40,4 +37,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   }
 }
 
-export default withZipline(handler);
+export default withZipline(handler, {
+  methods: ['GET', 'DELETE'],
+  user: true,
+});

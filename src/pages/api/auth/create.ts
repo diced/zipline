@@ -5,10 +5,11 @@ import Logger from 'lib/logger';
 import config from 'lib/config';
 
 async function handler(req: NextApiReq, res: NextApiRes) {
+  // handle invites
   if (req.method === 'POST' && req.body) {
-    if (!config.features.invites && req.body.code) return res.forbid('invites are disabled');
+    if (!config.features.invites && req.body.code) return res.badRequest('invites are disabled');
     if (!config.features.user_registration && !req.body.code)
-      return res.forbid('user registration is disabled');
+      return res.badRequest('user registration is disabled');
 
     const { code, username, password } = req.body as {
       code?: string;
@@ -18,13 +19,13 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     const invite = await prisma.invite.findUnique({
       where: { code: code ?? '' },
     });
-    if (!invite && code) return res.bad('invalid invite code');
+    if (!invite && code) return res.badRequest('invalid invite code');
 
     const user = await prisma.user.findFirst({
       where: { username },
     });
 
-    if (user) return res.bad('username already exists');
+    if (user) return res.badRequest('username already exists');
     const hashed = await hashPassword(password);
     const newUser = await prisma.user.create({
       data: {
@@ -56,8 +57,8 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   }
 
   const user = await req.user();
-  if (!user) return res.forbid('not logged in');
-  if (!user.administrator) return res.forbid('you arent an administrator');
+  if (!user) return res.unauthorized('not logged in');
+  if (!user.administrator) return res.forbidden('you arent an administrator');
 
   if (req.method !== 'POST') return res.status(405).end();
 
@@ -67,15 +68,15 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     administrator: boolean;
   };
 
-  if (!username) return res.bad('no username');
-  if (!password) return res.bad('no auth');
+  if (!username) return res.badRequest('no username');
+  if (!password) return res.badRequest('no password');
 
   const existing = await prisma.user.findFirst({
     where: {
       username,
     },
   });
-  if (existing) return res.forbid('user exists');
+  if (existing) return res.badRequest('user exists');
 
   const hashed = await hashPassword(password);
 
@@ -95,4 +96,6 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   return res.json(newUser);
 }
 
-export default withZipline(handler);
+export default withZipline(handler, {
+  methods: ['POST'],
+});
