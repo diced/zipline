@@ -29,6 +29,7 @@ import { showNotification } from '@mantine/notifications';
 import useFetch from 'hooks/useFetch';
 import { useVersion } from 'lib/queries/version';
 import { userSelector } from 'lib/recoil/user';
+import { capitalize } from 'lib/utils/client';
 import { useRecoilState } from 'recoil';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -52,6 +53,7 @@ import {
   UserIcon,
   DiscordIcon,
   GitHubIcon,
+  GoogleIcon,
 } from './icons';
 import { friendlyThemeName, themes } from './Theming';
 
@@ -161,7 +163,18 @@ const admin_items = [
 export default function Layout({ children, props }) {
   const [user, setUser] = useRecoilState(userSelector);
 
-  const { title } = props;
+  const { title, oauth_providers: unparsed } = props;
+  const oauth_providers = JSON.parse(unparsed);
+  const icons = {
+    GitHub: GitHubIcon,
+    Discord: DiscordIcon,
+    Google: GoogleIcon,
+  };
+
+  for (const provider of oauth_providers) {
+    provider.Icon = icons[provider.name];
+  }
+
   const external_links = JSON.parse(props.external_links ?? '[]');
 
   const [token, setToken] = useState(user?.token);
@@ -393,24 +406,34 @@ export default function Layout({ children, props }) {
                       Logout
                     </MenuItemLink>
                     <Menu.Divider />
-                    {user.oauth ? (
-                      <>
-                        <MenuItem
-                          icon={
-                            user.oauthProvider === 'discord' ? (
-                              <DiscordIcon size={18} />
-                            ) : (
-                              <GitHubIcon size={18} />
-                            )
-                          }
-                        >
-                          Logged in with{' '}
-                          <span style={{ textTransform: 'capitalize' }}>{user.oauthProvider}</span>
-                        </MenuItem>
-
+                    <>
+                      {oauth_providers
+                        .filter((x) =>
+                          user.oauth
+                            ?.map(({ provider }) => provider.toLowerCase())
+                            .includes(x.name.toLowerCase())
+                        )
+                        .map(({ name, Icon }, i) => (
+                          <>
+                            <MenuItem
+                              sx={{ '&:hover': { backgroundColor: 'inherit' } }}
+                              key={i}
+                              py={5}
+                              px={4}
+                              icon={<Icon size={18} colorScheme={theme.colorScheme} />}
+                            >
+                              Logged in with {capitalize(name)}
+                            </MenuItem>
+                          </>
+                        ))}
+                      {oauth_providers.filter((x) =>
+                        user.oauth
+                          ?.map(({ provider }) => provider.toLowerCase())
+                          .includes(x.name.toLowerCase())
+                      ).length ? (
                         <Menu.Divider />
-                      </>
-                    ) : null}
+                      ) : null}
+                    </>
                     <MenuItem icon={<PencilIcon />}>
                       <Select
                         size='xs'

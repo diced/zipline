@@ -141,6 +141,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         username: true,
         domains: true,
         avatar: true,
+        oauth: true,
       },
     });
 

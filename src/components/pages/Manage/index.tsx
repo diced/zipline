@@ -28,6 +28,7 @@ import {
   DiscordIcon,
   FlameshotIcon,
   GitHubIcon,
+  GoogleIcon,
   RefreshIcon,
   SettingsIcon,
   ShareXIcon,
@@ -40,6 +41,7 @@ import { SmallTable } from 'components/SmallTable';
 import useFetch from 'hooks/useFetch';
 import { userSelector } from 'lib/recoil/user';
 import { bytesToHuman } from 'lib/utils/bytes';
+import { capitalize } from 'lib/utils/client';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import Flameshot from './Flameshot';
@@ -60,8 +62,9 @@ function ExportDataTooltip({ children }) {
 export default function Manage({ oauth_registration, oauth_providers: raw_oauth_providers }) {
   const oauth_providers = JSON.parse(raw_oauth_providers);
   const icons = {
-    GitHub: GitHubIcon,
     Discord: DiscordIcon,
+    GitHub: GitHubIcon,
+    Google: GoogleIcon,
   };
 
   for (const provider of oauth_providers) {
@@ -236,7 +239,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
 
     setExports(
       res.exports
-        .map((s) => ({
+        ?.map((s) => ({
           date: new Date(Number(s.name.split('_')[3].slice(0, -4))),
           size: s.size,
           full: s.name,
@@ -306,8 +309,10 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
     }
   };
 
-  const handleOauthUnlink = async () => {
-    const res = await useFetch('/api/auth/oauth', 'DELETE');
+  const handleOauthUnlink = async (provider) => {
+    const res = await useFetch('/api/auth/oauth', 'DELETE', {
+      provider,
+    });
     if (res.error) {
       showNotification({
         title: 'Error while unlinking from OAuth',
@@ -318,7 +323,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
     } else {
       setUser(res);
       showNotification({
-        title: 'Unlinked from OAuth',
+        title: `Unlinked from ${provider[0] + provider.slice(1).toLowerCase()}`,
         message: '',
         color: 'green',
         icon: <CheckIcon />,
@@ -425,19 +430,30 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
 
           <Group>
             {oauth_providers
-              .filter((x) => x.name.toLowerCase() !== user.oauthProvider)
+              .filter(
+                (x) =>
+                  !user.oauth?.map(({ provider }) => provider.toLowerCase()).includes(x.name.toLowerCase())
+              )
               .map(({ link_url, name, Icon }, i) => (
                 <Link key={i} href={link_url} passHref legacyBehavior>
-                  <Button size='lg' leftIcon={<Icon />} component='a' my='sm'>
+                  <Button size='lg' leftIcon={<Icon colorScheme='manage' />} component='a' my='sm'>
                     Link account with {name}
                   </Button>
                 </Link>
               ))}
-            {user.oauth && user.oauthProvider && (
-              <Button onClick={handleOauthUnlink} size='lg' leftIcon={<TrashIcon />} my='sm' color='red'>
-                Unlink account with {user.oauthProvider[0].toUpperCase() + user.oauthProvider.slice(1)}
+
+            {user?.oauth?.map(({ provider }, i) => (
+              <Button
+                key={i}
+                onClick={() => handleOauthUnlink(provider)}
+                size='lg'
+                leftIcon={<TrashIcon />}
+                my='sm'
+                color='red'
+              >
+                Unlink account with {capitalize(provider)}
               </Button>
-            )}
+            ))}
           </Group>
         </Box>
       )}

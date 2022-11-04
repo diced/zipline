@@ -22,7 +22,7 @@ import MutedText from 'components/MutedText';
 import useFetch from 'hooks/useFetch';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { relativeTime } from 'lib/utils/client';
+import { expireText, relativeTime } from 'lib/utils/client';
 
 const expires = ['30m', '1h', '6h', '12h', '1d', '3d', '5d', '7d', 'never'];
 
@@ -202,16 +202,12 @@ export default function Uz2sers() {
                       </Title>
                       <Tooltip label={new Date(invite.created_at).toLocaleString()}>
                         <div>
-                          <MutedText size='sm'>
-                            Created: {relativeTime(new Date(invite.created_at))}
-                          </MutedText>
+                          <MutedText size='sm'>Created {relativeTime(new Date(invite.created_at))}</MutedText>
                         </div>
                       </Tooltip>
                       <Tooltip label={new Date(invite.expires_at).toLocaleString()}>
                         <div>
-                          <MutedText size='sm'>
-                            Expires: {relativeTime(new Date(invite.expires_at))}
-                          </MutedText>
+                          <MutedText size='sm'>{expireText(invite.expires_at)}</MutedText>
                         </div>
                       </Tooltip>
                     </Stack>

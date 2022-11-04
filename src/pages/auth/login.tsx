@@ -1,11 +1,11 @@
-import { Button, Center, TextInput, Title, PasswordInput, Divider } from '@mantine/core';
+import { Button, Center, TextInput, Title, PasswordInput, Divider, Group } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import Link from 'next/link';
 import useFetch from 'hooks/useFetch';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import Head from 'next/head';
-import { GitHubIcon, DiscordIcon } from 'components/icons';
+import { GitHubIcon, DiscordIcon, GoogleIcon } from 'components/icons';
 export { getServerSideProps } from 'middleware/getServerSideProps';
 
 export default function Login({ title, user_registration, oauth_registration, oauth_providers: unparsed }) {
@@ -16,6 +16,7 @@ export default function Login({ title, user_registration, oauth_registration, oa
   const icons = {
     GitHub: GitHubIcon,
     Discord: DiscordIcon,
+    Google: GoogleIcon,
   };
 
   for (const provider of oauth_providers) {
@@ -67,18 +68,30 @@ export default function Login({ title, user_registration, oauth_registration, oa
       </Head>
       <Center sx={{ height: '100vh' }}>
         <div>
-          <Title align='center'>{title}</Title>
-          <form onSubmit={form.onSubmit((v) => onSubmit(v))}>
-            <TextInput size='lg' id='username' label='Username' {...form.getInputProps('username')} />
-            <PasswordInput size='lg' id='password' label='Password' {...form.getInputProps('password')} />
+          <Title size={70} align='center'>
+            {title}
+          </Title>
 
-            <Button size='lg' type='submit' fullWidth mt='sm'>
+          <form onSubmit={form.onSubmit((v) => onSubmit(v))}>
+            <TextInput my='sm' size='lg' id='username' label='Username' {...form.getInputProps('username')} />
+            <PasswordInput
+              my='sm'
+              size='lg'
+              id='password'
+              label='Password'
+              {...form.getInputProps('password')}
+            />
+
+            <Button size='lg' my='sm' fullWidth type='submit'>
               Login
             </Button>
           </form>
+
           {user_registration && (
             <>
-              <Divider label='or' labelPosition='center' my='sm' />
+              <Divider my='sm' label='or' labelPosition='center'>
+                or
+              </Divider>
               <Link href='/auth/register' passHref legacyBehavior>
                 <Button size='lg' fullWidth component='a'>
                   Register
@@ -88,10 +101,12 @@ export default function Login({ title, user_registration, oauth_registration, oa
           )}
           {oauth_registration && (
             <>
-              <Divider label='or' labelPosition='center' my='sm' />
+              <Divider my='sm' label='or' labelPosition='center'>
+                or
+              </Divider>
               {oauth_providers.map(({ url, name, Icon }, i) => (
                 <Link key={i} href={url} passHref legacyBehavior>
-                  <Button size='lg' fullWidth leftIcon={<Icon />} component='a' my={8}>
+                  <Button size='lg' fullWidth leftIcon={<Icon colorScheme='manage' />} component='a' my='sm'>
                     Login in with {name}
                   </Button>
                 </Link>

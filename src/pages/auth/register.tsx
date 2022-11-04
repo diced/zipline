@@ -163,7 +163,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       notFound: true,
     };
 
-  if (!config.features.user_registration) return { notFound: true };
+  if (!config.features.user_registration && !code) return { notFound: true };
 
   if (code) {
     const invite = await prisma.invite.findUnique({

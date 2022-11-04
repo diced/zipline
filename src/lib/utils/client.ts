@@ -87,3 +87,18 @@ export function percentChange(initial: number, final: number) {
 
   return ((final - initial) / initial) * 100;
 }
+
+export function capitalize(str: string) {
+  return str[0].toUpperCase() + str.slice(1).toLowerCase();
+}
+
+export function expireText(to_: string, from_: string = new Date().toLocaleString()) {
+  const from = new Date(from_);
+  const to = new Date(to_);
+
+  if (from.getTime() < to.getTime()) {
+    return `Expires ${dayjs(to).from(from)}`;
+  } else {
+    return `Expired ${dayjs(from).to(to)}`;
+  }
+}
