@@ -64,7 +64,6 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
   // handle partial uploads before ratelimits
   if (req.headers['content-range']) {
-    console.log(req.files);
     // parses content-range header (bytes start-end/total)
     const [start, end, total] = req.headers['content-range']
       .replace('bytes ', '')
