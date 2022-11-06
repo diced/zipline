@@ -125,6 +125,7 @@ const validator = s.object({
         )
         .default([
           { label: 'Lunar (Website Down)', link: '' },
+          { label: 'Bot Hosting', link: 'https://user.lunardev.group' },
           { label: 'Discord', link: 'https://discord.gg/cNRNeaX' },
         ]),
     })
@@ -136,6 +137,7 @@ const validator = s.object({
 
       external_links: [
         { label: 'Lunar (Website Down)', link: '' },
+        { label: 'Bot Hosting', link: 'https://user.lunardev.group' },
         { label: 'Discord', link: 'https://discord.gg/cNRNeaX' },
       ],
     }),
