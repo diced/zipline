@@ -28,7 +28,7 @@ async function start() {
     );
     logger.error('Please change your secret in the config file or environment variables.');
     logger.error(
-      'The config file is located at `config.toml`, or if using docker-compose you can change the variables in the `docker-compose.yml` file.'
+      'The config file is located at `.env.local`, or if using docker-compose you can change the variables in the `docker-compose.yml` file.'
     );
     logger.error('It is recomended to use a secret that is alphanumeric and randomized.');
     logger.error('A way you can generate this is through a password manager you may have.');

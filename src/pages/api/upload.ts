@@ -28,6 +28,13 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
   if (!user) return res.forbidden('authorization incorrect');
 
+  await new Promise((resolve, reject) => {
+    uploader.array('file')(req as any, res as any, (result: unknown) => {
+      if (result instanceof Error) reject(result.message);
+      resolve(result);
+    });
+  });
+
   const response: { files: string[]; expires_at?: Date } = { files: [] };
   const expires_at = req.headers['expires-at'] as string;
   let expiry: Date;
@@ -179,6 +186,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     const file = req.files[i];
     if (file.size > zconfig.uploader[user.administrator ? 'admin_limit' : 'user_limit'])
       return res.badRequest(`file[${i}]: size too big`);
+    if (!file.originalname) return res.badRequest(`file[${i}]: no filename`);
 
     const ext = file.originalname.split('.').pop();
     if (zconfig.uploader.disabled_extensions.includes(ext))
@@ -287,7 +295,6 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
 export default withZipline(handler, {
   methods: ['POST'],
-  middleware: [uploader.array('file')],
 });
 
 export const config = {
