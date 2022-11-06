@@ -50,7 +50,6 @@ export type ZiplineApiConfig = {
   methods: HTTPMethod[];
   user?: boolean;
   administrator?: boolean;
-  middleware?: any[];
 };
 
 export const withZipline =
@@ -201,14 +200,6 @@ export const withZipline =
         },
         405
       );
-    }
-
-    if (api_config.middleware) {
-      for (let i = 0; i !== api_config.middleware.length; ++i) {
-        api_config.middleware[i](req, res, (result) => {
-          if (result instanceof Error) return res.error(result.message);
-        });
-      }
     }
 
     if (api_config.user) {
