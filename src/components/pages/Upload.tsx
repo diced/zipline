@@ -71,19 +71,23 @@ export default function Upload({ chunks: chunks_config }) {
           await new Promise((resolve) => setTimeout(resolve, 100));
         }
 
-        const body = new FormData();
+        // if last chunk send notif that it will take a while
+        if (j === chunks.length - 1) {
+          updateNotification({
+            id: 'upload-chunked',
+            title: 'Finalizing partial upload',
+            message: 'This may take a while...',
+            icon: <ClockIcon />,
+            color: 'yellow',
+            autoClose: false,
+          });
+        }
 
+        const body = new FormData();
         body.append('file', chunks[j].blob);
 
-        setProgress(0);
         setLoading(true);
-
         const req = new XMLHttpRequest();
-        req.upload.addEventListener('progress', (e) => {
-          if (e.lengthComputable) {
-            setProgress(Math.round((e.loaded / e.total) * 100));
-          }
-        });
 
         req.addEventListener(
           'load',
@@ -92,12 +96,14 @@ export default function Upload({ chunks: chunks_config }) {
             const json = JSON.parse(e.target.response);
 
             if (json.error === undefined) {
+              setProgress(Math.round((j / chunks.length) * 100));
               updateNotification({
                 id: 'upload-chunked',
                 title: `Uploading chunk ${j + 1}/${chunks.length} Successful`,
                 message: '',
                 color: 'green',
                 icon: <UploadIcon />,
+                autoClose: false,
               });
 
               if (j === chunks.length - 1) {
@@ -121,6 +127,9 @@ export default function Upload({ chunks: chunks_config }) {
 
                 invalidateFiles();
                 setFiles([]);
+                setProgress(100);
+
+                setTimeout(() => setProgress(0), 1000);
 
                 clipboard.copy(json.files[0]);
               }
@@ -133,10 +142,10 @@ export default function Upload({ chunks: chunks_config }) {
                 message: json.error,
                 color: 'red',
                 icon: <CrossIcon />,
+                autoClose: false,
               });
               ready = false;
             }
-            setProgress(0);
           },
           false
         );

@@ -149,13 +149,35 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
       await datasource.save(file.file, Buffer.from(chunks));
 
-      return res.json({
-        files: [
+      Logger.get('file').info(
+        `User ${user.username} (${user.id}) uploaded ${file.file} (${file.id}) (chunked)`
+      );
+      if (user.domains.length) {
+        const domain = user.domains[Math.floor(Math.random() * user.domains.length)];
+        response.files.push(
+          `${domain}${zconfig.uploader.route === '/' ? '' : zconfig.uploader.route}/${
+            invis ? invis.invis : file.file
+          }`
+        );
+      } else {
+        response.files.push(
           `${zconfig.core.https ? 'https' : 'http'}://${req.headers.host}${
             zconfig.uploader.route === '/' ? '' : zconfig.uploader.route
-          }/${invis ? invis.invis : file.file}`,
-        ],
-      });
+          }/${invis ? invis.invis : file.file}`
+        );
+      }
+
+      if (zconfig.discord?.upload) {
+        await sendUpload(
+          user,
+          file,
+          `${zconfig.core.https ? 'https' : 'http'}://${req.headers.host}/r/${
+            invis ? invis.invis : file.file
+          }`
+        );
+      }
+
+      return res.json(response);
     }
 
     return res.json({
