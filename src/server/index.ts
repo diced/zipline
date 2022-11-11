@@ -122,12 +122,14 @@ async function start() {
 
     if (!image) return rawFile(req, res, nextServer, params.id);
     else {
-      const failed = await preImage(image, prisma);
+      const failed = await preFile(image, prisma);
       if (failed) return nextServer.render404(req, res as ServerResponse);
 
       if (image.password || image.embed || image.mimetype.startsWith('text/'))
-        return redirect(res, `/view/${image.file}`);
-      else return fileDb(req, res, nextServer, handle, image);
+        redirect(res, `/view/${image.file}`);
+      else fileDb(req, res, nextServer, handle, image);
+
+      postFile(image, prisma);
     }
   });
 
@@ -142,7 +144,7 @@ async function start() {
 
     if (!image) await rawFile(req, res, nextServer, params.id);
     else {
-      const failed = await preImage(image, prisma, true);
+      const failed = await preFile(image, prisma);
       if (failed) return nextServer.render404(req, res as ServerResponse);
 
       if (image.password) {
@@ -193,33 +195,33 @@ async function start() {
   }, config.core.invites_interval * 1000);
 }
 
-async function preImage(image: Image, prisma: PrismaClient, ignoreViews = false) {
-  if (image.expires_at && image.expires_at < new Date()) {
-    await datasource.delete(image.file);
-    await prisma.image.delete({ where: { id: image.id } });
+async function preFile(file: Image, prisma: PrismaClient) {
+  if (file.expires_at && file.expires_at < new Date()) {
+    await datasource.delete(file.file);
+    await prisma.image.delete({ where: { id: file.id } });
 
-    Logger.get('file').info(`File ${image.file} expired and was deleted.`);
+    Logger.get('file').info(`File ${file.file} expired and was deleted.`);
 
     return true;
   }
 
-  if (!ignoreViews) {
-    const nImage = await prisma.image.update({
-      where: { id: image.id },
-      data: { views: { increment: 1 } },
-    });
-
-    if (nImage.maxViews && nImage.views >= nImage.maxViews) {
-      await datasource.delete(image.file);
-      await prisma.image.delete({ where: { id: image.id } });
-
-      Logger.get('file').info(`File ${image.file} has been deleted due to max views (${nImage.maxViews})`);
-
-      return true;
-    }
-  }
-
   return false;
+}
+
+async function postFile(file: Image, prisma: PrismaClient) {
+  const nFile = await prisma.image.update({
+    where: { id: file.id },
+    data: { views: { increment: 1 } },
+  });
+
+  if (nFile.maxViews && nFile.views >= nFile.maxViews) {
+    await datasource.delete(file.file);
+    await prisma.image.delete({ where: { id: nFile.id } });
+
+    Logger.get('file').info(`File ${file.file} has been deleted due to max views (${nFile.maxViews})`);
+
+    return true;
+  }
 }
 
 async function rawFile(req: IncomingMessage, res: OutgoingMessage, nextServer: NextServer, id: string) {
