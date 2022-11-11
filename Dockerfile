@@ -53,6 +53,7 @@ COPY --from=builder /build/.next ./.next
 COPY --from=builder /build/node_modules ./node_modules
 
 COPY --from=builder /build/next.config.js ./next.config.js
+COPY --from=builder /build/esbuild.config.js ./esbuild.config.js
 COPY --from=builder /build/src ./src
 COPY --from=builder /build/dist ./dist
 COPY --from=builder /build/prisma ./prisma
