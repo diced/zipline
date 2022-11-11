@@ -9,7 +9,6 @@ const SUPPORTED_FIELDS = [
   'administrator',
   'avatar',
   'token',
-  'administrator',
   'superAdmin',
   'systemTheme',
   'embedTitle',
