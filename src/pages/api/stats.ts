@@ -1,9 +1,9 @@
-import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'middleware/withZipline';
-import prisma from 'lib/prisma';
-import config from 'lib/config';
 import { Stats } from '@prisma/client';
-import { getStats } from 'server/util';
+import config from 'lib/config';
 import datasource from 'lib/datasource';
+import prisma from 'lib/prisma';
+import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'middleware/withZipline';
+import { getStats } from 'server/util';
 
 async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   if (req.method === 'POST') {

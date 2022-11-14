@@ -1,7 +1,7 @@
-import config from '../lib/config';
 import { PrismaClient } from '@prisma/client';
-import { migrations } from '../server/util';
 import { hash } from 'argon2';
+import config from '../lib/config';
+import { migrations } from '../server/util';
 
 const SUPPORTED_FIELDS = [
   'username',

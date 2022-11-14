@@ -1,11 +1,11 @@
-import { withZipline } from 'lib/middleware/withZipline';
-import { getBase64URLFromURL, notNull } from 'lib/util';
-import Logger from 'lib/logger';
 import config from 'lib/config';
+import Logger from 'lib/logger';
+import { OAuthQuery, OAuthResponse, withOAuth } from 'lib/middleware/withOAuth';
+import { withZipline } from 'lib/middleware/withZipline';
 import { google_auth } from 'lib/oauth';
-import { withOAuth, OAuthResponse, OAuthQuery } from 'lib/middleware/withOAuth';
+import { getBase64URLFromURL, notNull } from 'lib/util';
 
-async function handler({ code, state, host }: OAuthQuery): Promise<OAuthResponse> {
+async function handler({ code, state, host }: OAuthQuery, logger: Logger): Promise<OAuthResponse> {
   if (!config.features.oauth_registration)
     return {
       error_code: 403,
@@ -13,7 +13,7 @@ async function handler({ code, state, host }: OAuthQuery): Promise<OAuthResponse
     };
 
   if (!notNull(config.oauth.google_client_id, config.oauth.google_client_secret)) {
-    Logger.get('oauth').error('Google OAuth is not configured');
+    logger.error('Google OAuth is not configured');
     return {
       error_code: 401,
       error: 'Google OAuth is not configured',
@@ -29,23 +29,28 @@ async function handler({ code, state, host }: OAuthQuery): Promise<OAuthResponse
       ),
     };
 
+  const body = new URLSearchParams({
+    code,
+    client_id: config.oauth.google_client_id,
+    client_secret: config.oauth.google_client_secret,
+    redirect_uri: `${config.core.https ? 'https' : 'http'}://${host}/api/auth/oauth/google`,
+    grant_type: 'authorization_code',
+  });
+
   const resp = await fetch('https://oauth2.googleapis.com/token', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
     },
-    body: new URLSearchParams({
-      code,
-      client_id: config.oauth.google_client_id,
-      client_secret: config.oauth.google_client_secret,
-      redirect_uri: `${config.core.https ? 'https' : 'http'}://${host}/api/auth/oauth/google`,
-      grant_type: 'authorization_code',
-    }),
+    body,
   });
+
+  const text = await resp.text();
+  logger.debug(`oauth https://oauth2.googleapis.com/token -> body(${body}) resp(${text})`);
 
   if (!resp.ok) return { error: 'invalid request' };
 
-  const json = await resp.json();
+  const json = JSON.parse(text);
 
   if (!json.access_token) return { error: 'no access_token in response' };
 

@@ -1,5 +1,5 @@
-import { Config } from 'lib/config/Config';
 import { s } from '@sapphire/shapeshift';
+import { Config } from 'lib/config/Config';
 import { inspect } from 'util';
 import Logger from '../logger';
 import { humanToBytes } from '../utils/bytes';
@@ -168,10 +168,11 @@ const validator = s.object({
   features: s
     .object({
       invites: s.boolean.default(false),
+      invites_length: s.number.default(6),
       oauth_registration: s.boolean.default(false),
       user_registration: s.boolean.default(false),
     })
-    .default({ invites: false, oauth_registration: false, user_registration: false }),
+    .default({ invites: false, invites_length: 6, oauth_registration: false, user_registration: false }),
   chunks: s
     .object({
       max_size: s.number.default(humanToBytes('90MB')),
@@ -184,8 +185,12 @@ const validator = s.object({
 });
 
 export default function validate(config): Config {
+  const logger = Logger.get('config');
+
   try {
+    logger.debug(`Attemping to validate ${JSON.stringify(config)}`);
     const validated = validator.parse(config);
+    logger.debug(`Recieved config: ${JSON.stringify(validated)}`);
     switch (validated.datasource.type) {
       case 's3': {
         const errors = [];
@@ -221,8 +226,9 @@ export default function validate(config): Config {
 
     e.stack = '';
 
-    Logger.get('config').error('Config is invalid, see below:');
-    Logger.get('config').error(inspect(e, { depth: Infinity, colors: true }));
+    Logger.get('config')
+      .error('Config is invalid, see below:')
+      .error(inspect(e, { depth: Infinity, colors: true }));
 
     process.exit(1);
   }

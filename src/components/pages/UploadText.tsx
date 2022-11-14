@@ -1,12 +1,12 @@
 import { Button, Group, NumberInput, PasswordInput, Select, Tabs, Title, Tooltip } from '@mantine/core';
-import { Prism } from '@mantine/prism';
-import { Language } from 'prism-react-renderer';
 import { showNotification, updateNotification } from '@mantine/notifications';
+import { Prism } from '@mantine/prism';
 import CodeInput from 'components/CodeInput';
 import { ClockIcon, ImageIcon, TypeIcon, UploadIcon } from 'components/icons';
 import Link from 'components/Link';
 import exts from 'lib/exts';
 import { userSelector } from 'lib/recoil/user';
+import { Language } from 'prism-react-renderer';
 import { useState } from 'react';
 import { useRecoilValue } from 'recoil';
 

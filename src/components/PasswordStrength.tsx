@@ -1,7 +1,7 @@
 // https://mantine.dev/core/password-input/
 
+import { Box, PasswordInput, Popover, Progress, Text } from '@mantine/core';
 import { useState } from 'react';
-import { PasswordInput, Progress, Text, Popover, Box } from '@mantine/core';
 import { CheckIcon, CrossIcon } from './icons';
 
 function PasswordRequirement({ meets, label }: { meets: boolean; label: string }) {

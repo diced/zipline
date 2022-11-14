@@ -1,8 +1,8 @@
 import { SimpleGrid } from '@mantine/core';
 import { FileIcon } from 'components/icons';
 import StatCard from 'components/StatCard';
-import { percentChange } from 'lib/utils/client';
 import { useStats } from 'lib/queries/stats';
+import { percentChange } from 'lib/utils/client';
 import { Database, Eye, Users } from 'react-feather';
 
 export function StatCards() {

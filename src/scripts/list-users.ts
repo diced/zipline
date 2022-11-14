@@ -1,5 +1,5 @@
-import config from '../lib/config';
 import { PrismaClient } from '@prisma/client';
+import config from '../lib/config';
 import { migrations } from '../server/util';
 
 async function main() {

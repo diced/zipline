@@ -2,12 +2,12 @@ import {
   Button,
   Collapse,
   Group,
+  NumberInput,
+  PasswordInput,
   Progress,
   Select,
   Title,
-  PasswordInput,
   Tooltip,
-  NumberInput,
 } from '@mantine/core';
 import { randomId, useClipboard } from '@mantine/hooks';
 import { showNotification, updateNotification } from '@mantine/notifications';

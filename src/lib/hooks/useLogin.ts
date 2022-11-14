@@ -1,6 +1,6 @@
+import { userSelector } from 'lib/recoil/user';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { userSelector } from 'lib/recoil/user';
 import { useRecoilState } from 'recoil';
 import useFetch from './useFetch';
 

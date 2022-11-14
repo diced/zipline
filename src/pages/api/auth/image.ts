@@ -1,8 +1,8 @@
-import prisma from 'lib/prisma';
-import { NextApiReq, NextApiRes, withZipline } from 'middleware/withZipline';
-import { checkPassword } from 'lib/util';
 import datasource from 'lib/datasource';
 import { guess } from 'lib/mimes';
+import prisma from 'lib/prisma';
+import { checkPassword } from 'lib/util';
+import { NextApiReq, NextApiRes, withZipline } from 'middleware/withZipline';
 import { extname } from 'path';
 
 async function handler(req: NextApiReq, res: NextApiRes) {

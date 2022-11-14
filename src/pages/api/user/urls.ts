@@ -1,7 +1,7 @@
-import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'middleware/withZipline';
-import prisma from 'lib/prisma';
 import config from 'lib/config';
 import Logger from 'lib/logger';
+import prisma from 'lib/prisma';
+import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'middleware/withZipline';
 
 async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   if (req.method === 'DELETE') {

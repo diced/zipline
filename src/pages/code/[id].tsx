@@ -1,10 +1,10 @@
 import { Prism } from '@mantine/prism';
-import prisma from 'lib/prisma';
+import config from 'lib/config';
 import exts from 'lib/exts';
+import prisma from 'lib/prisma';
+import { checkPassword } from 'lib/util';
 import { streamToString } from 'lib/utils/streams';
 import { GetServerSideProps } from 'next';
-import { checkPassword } from 'lib/util';
-import config from 'lib/config';
 import Head from 'next/head';
 
 export default function Code({ code, id, title }) {

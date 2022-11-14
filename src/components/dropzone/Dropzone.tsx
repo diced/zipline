@@ -1,6 +1,5 @@
-import React from 'react';
-import { Dropzone as MantineDropzone } from '@mantine/dropzone';
 import { Group, Text, useMantineTheme } from '@mantine/core';
+import { Dropzone as MantineDropzone } from '@mantine/dropzone';
 import { ImageIcon } from 'components/icons';
 
 export default function Dropzone({ loading, onDrop, children }) {

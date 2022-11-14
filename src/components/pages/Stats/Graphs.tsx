@@ -13,8 +13,8 @@ import {
 } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import ColorHash from 'color-hash';
-import { bytesToHuman } from 'lib/utils/bytes';
 import { useStats } from 'lib/queries/stats';
+import { bytesToHuman } from 'lib/utils/bytes';
 import { useMemo } from 'react';
 import { Chart, Pie } from 'react-chartjs-2';
 

@@ -1,8 +1,8 @@
-import { createToken } from 'lib/util';
-import Logger from 'lib/logger';
-import { NextApiReq, NextApiRes } from './withZipline';
-import prisma from 'lib/prisma';
 import { OauthProviders } from '@prisma/client';
+import Logger from 'lib/logger';
+import prisma from 'lib/prisma';
+import { createToken } from 'lib/util';
+import { NextApiReq, NextApiRes } from './withZipline';
 
 export interface OAuthQuery {
   state?: string;
@@ -22,21 +22,32 @@ export interface OAuthResponse {
 }
 
 export const withOAuth =
-  (provider: 'discord' | 'github' | 'google', oauth: (query: OAuthQuery) => Promise<OAuthResponse>) =>
+  (
+    provider: 'discord' | 'github' | 'google',
+    oauth: (query: OAuthQuery, logger: Logger) => Promise<OAuthResponse>
+  ) =>
   async (req: NextApiReq, res: NextApiRes) => {
+    const logger = Logger.get(`oauth::${provider}`);
+
+    function oauthError(error: string) {
+      return res.redirect(`/oauth_error?error=${error}&provider=${provider}`);
+    }
+
     req.query.host = req.headers.host;
 
-    const oauth_resp = await oauth(req.query as unknown as OAuthQuery);
+    const oauth_resp = await oauth(req.query as unknown as OAuthQuery, logger);
 
     if (oauth_resp.error) {
-      return res.json({ error: oauth_resp.error }, oauth_resp.error_code || 500);
+      logger.debug(`Failed to authenticate with ${provider}: ${JSON.stringify(oauth_resp)})`);
+
+      return oauthError(oauth_resp.error);
     }
 
     if (oauth_resp.redirect) {
       return res.redirect(oauth_resp.redirect);
     }
 
-    const { code, state } = req.query as { code: string; state?: string };
+    const { state } = req.query as { state?: string };
 
     const existing = await prisma.user.findFirst({
       where: {
@@ -55,13 +66,15 @@ export const withOAuth =
     const user = await req.user();
 
     const existingOauth = existing?.oauth?.find((o) => o.provider === provider.toUpperCase());
-    const existingUserOauth = user?.oauth?.find((o) => o.provider === provider.toUpperCase());
+    const userOauth = user?.oauth?.find((o) => o.provider === provider.toUpperCase());
+
     if (state === 'link') {
-      if (!user) return res.error('not logged in, unable to link account');
+      if (!user) return oauthError('You are not logged in, unable to link account.');
 
       if (user.oauth && user.oauth.find((o) => o.provider === provider.toUpperCase()))
-        return res.error(`account already linked with ${provider}`);
+        return oauthError(`This account was already linked with ${provider}!`);
 
+      logger.debug(`attempting to link ${provider} account to ${user.username}`);
       await prisma.user.update({
         where: {
           id: user.id,
@@ -80,13 +93,14 @@ export const withOAuth =
       });
 
       res.setUserCookie(user.id);
-      Logger.get('user').info(`User ${user.username} (${user.id}) linked account via oauth(${provider})`);
+      logger.info(`User ${user.username} (${user.id}) linked account via oauth(${provider})`);
 
       return res.redirect('/');
-    } else if (user && existingUserOauth) {
+    } else if (user && userOauth) {
+      logger.debug(`attempting to refresh ${provider} account for ${user.username}`);
       await prisma.oAuth.update({
         where: {
-          id: existingUserOauth!.id,
+          id: userOauth!.id,
         },
         data: {
           token: oauth_resp.access_token,
@@ -96,7 +110,7 @@ export const withOAuth =
       });
 
       res.setUserCookie(user.id);
-      Logger.get('user').info(`User ${user.username} (${user.id}) logged in via oauth(${provider})`);
+      logger.info(`User ${user.username} (${user.id}) logged in via oauth(${provider})`);
 
       return res.redirect('/dashboard');
     } else if (existing && existingOauth) {
@@ -116,9 +130,10 @@ export const withOAuth =
 
       return res.redirect('/dashboard');
     } else if (existing) {
-      return res.badRequest('username is already taken');
+      return oauthError(`Username "${oauth_resp.username}" is already taken, unable to create account.`);
     }
 
+    logger.debug('creating new user via oauth');
     const nuser = await prisma.user.create({
       data: {
         username: oauth_resp.username,
@@ -134,10 +149,12 @@ export const withOAuth =
         avatar: oauth_resp.avatar,
       },
     });
-    Logger.get('user').info(`Created user ${nuser.username} via oauth(${provider})`);
+
+    logger.debug(`created user ${JSON.stringify(nuser)} via oauth(${provider})`);
+    logger.info(`Created user ${nuser.username} via oauth(${provider})`);
 
     res.setUserCookie(nuser.id);
-    Logger.get('user').info(`User ${nuser.username} (${nuser.id}) logged in via oauth(${provider})`);
+    logger.info(`User ${nuser.username} (${nuser.id}) logged in via oauth(${provider})`);
 
     return res.redirect('/dashboard');
   };

@@ -2,7 +2,7 @@ import { readFile } from 'fs/promises';
 import config from 'lib/config';
 import { NextApiReq, NextApiRes, withZipline } from 'middleware/withZipline';
 
-async function handler(req: NextApiReq, res: NextApiRes) {
+async function handler(_: NextApiReq, res: NextApiRes) {
   if (!config.website.show_version) return res.forbidden('version hidden');
 
   const pkg = JSON.parse(await readFile('package.json', 'utf8'));

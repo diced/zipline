@@ -1,8 +1,10 @@
-import prisma from 'lib/prisma';
-import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'lib/middleware/withZipline';
-import { randomChars } from 'lib/util';
-import Logger from 'lib/logger';
 import config from 'lib/config';
+import Logger from 'lib/logger';
+import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'lib/middleware/withZipline';
+import prisma from 'lib/prisma';
+import { randomChars } from 'lib/util';
+
+const logger = Logger.get('invite');
 
 async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   if (!config.features.invites) return res.badRequest('invites are disabled');
@@ -24,7 +26,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       const data = [];
       for (let i = 0; i !== counts; ++i) {
         data.push({
-          code: randomChars(8),
+          code: randomChars(config.features.invites_length),
           createdById: user.id,
           expires_at: expiry,
         });
@@ -32,7 +34,9 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
 
       await prisma.invite.createMany({ data });
 
-      Logger.get('invite').info(
+      logger.debug(`created invites ${JSON.stringify(data)}`);
+
+      logger.info(
         `${user.username} (${user.id}) created ${data.length} invites with codes ${data
           .map((invite) => invite.code)
           .join(', ')}`
@@ -40,17 +44,17 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
 
       return res.json(data);
     } else {
-      const code = randomChars(6);
-
       const invite = await prisma.invite.create({
         data: {
-          code,
+          code: randomChars(config.features.invites_length),
           createdById: user.id,
           expires_at: expiry,
         },
       });
 
-      Logger.get('invite').info(`${user.username} (${user.id}) created invite ${invite.code}`);
+      logger.debug(`created invite ${JSON.stringify(invite)}`);
+
+      logger.info(`${user.username} (${user.id}) created invite ${invite.code}`);
 
       return res.json(invite);
     }
@@ -63,7 +67,9 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       },
     });
 
-    Logger.get('invite').info(`${user.username} (${user.id}) deleted invite ${invite.code}`);
+    logger.debug(`deleted invite ${JSON.stringify(invite)}`);
+
+    logger.info(`${user.username} (${user.id}) deleted invite ${invite.code}`);
 
     return res.json(invite);
   } else {

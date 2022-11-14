@@ -1,11 +1,14 @@
-import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'middleware/withZipline';
-import prisma from 'lib/prisma';
-import Logger from 'lib/logger';
 import { Zip, ZipPassThrough } from 'fflate';
-import datasource from 'lib/datasource';
-import { readdir, stat } from 'fs/promises';
 import { createReadStream, createWriteStream } from 'fs';
+import { readdir, stat } from 'fs/promises';
+import datasource from 'lib/datasource';
+import Logger from 'lib/logger';
+import prisma from 'lib/prisma';
+import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'middleware/withZipline';
 import { tmpdir } from 'os';
+import { join } from 'path';
+
+const logger = Logger.get('user::export');
 
 async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   if (req.method === 'POST') {
@@ -19,7 +22,10 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
 
     const zip = new Zip();
     const export_name = `zipline_export_${user.id}_${Date.now()}.zip`;
-    const write_stream = createWriteStream(tmpdir() + `/${export_name}`);
+    const path = join(tmpdir(), export_name);
+
+    logger.debug(`creating write stream at ${path}`);
+    const write_stream = createWriteStream(path);
 
     // i found this on some stack overflow thing, forgot the url
     const onBackpressure = (stream, outputStream, cb) => {
@@ -70,21 +76,22 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
         write_stream.write(data);
         if (final) {
           write_stream.close();
-          Logger.get('user').info(
+          logger.debug(`finished writing zip to ${path} at ${data.length} bytes written`);
+          logger.info(
             `Export for ${user.username} (${user.id}) has completed and is available at ${export_name}`
           );
         }
       } else {
         write_stream.close();
-
-        Logger.get('user').error(`Export for ${user.username} (${user.id}) has failed\n${err}`);
+        logger.debug(`error while writing to zip: ${err}`);
+        logger.error(`Export for ${user.username} (${user.id}) has failed\n${err}`);
       }
     };
 
-    Logger.get('user').info(`Export for ${user.username} (${user.id}) has started`);
+    logger.info(`Export for ${user.username} (${user.id}) has started`);
     for (let i = 0; i !== files.length; ++i) {
       const file = files[i];
-      // try {
+
       const stream = await datasource.get(file.file);
       if (stream) {
         const def = new ZipPassThrough(file.file);
@@ -98,10 +105,9 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
         });
         stream.on('data', (c) => def.push(c));
         stream.on('end', () => def.push(new Uint8Array(0), true));
+      } else {
+        logger.debug(`couldn't find stream for ${file.file}`);
       }
-      // } catch (e) {
-
-      // }
     }
 
     zip.end();
@@ -115,7 +121,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       const parts = export_name.split('_');
       if (Number(parts[2]) !== user.id) return res.unauthorized('cannot access export owned by another user');
 
-      const stream = createReadStream(tmpdir() + `/${export_name}`);
+      const stream = createReadStream(join(tmpdir(), export_name));
 
       res.setHeader('Content-Type', 'application/zip');
       res.setHeader('Content-Disposition', `attachment; filename="${export_name}"`);
@@ -126,7 +132,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       const exports = [];
       for (let i = 0; i !== exp.length; ++i) {
         const name = exp[i];
-        const stats = await stat(tmpdir() + `/${name}`);
+        const stats = await stat(join(tmpdir(), name));
 
         if (Number(exp[i].split('_')[2]) !== user.id) continue;
         exports.push({ name, size: stats.size });

@@ -1,4 +1,4 @@
-import { Box, Center, Checkbox, Group, Pagination, SimpleGrid, Skeleton, Text, Title } from '@mantine/core';
+import { Box, Center, Checkbox, Group, Pagination, SimpleGrid, Skeleton, Title } from '@mantine/core';
 import File from 'components/File';
 import { FileIcon } from 'components/icons';
 import MutedText from 'components/MutedText';

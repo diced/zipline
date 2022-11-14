@@ -101,6 +101,8 @@ export interface ConfigDiscordEmbed {
 
 export interface ConfigFeatures {
   invites: boolean;
+  invites_length: number;
+
   oauth_registration: boolean;
   user_registration: boolean;
 }

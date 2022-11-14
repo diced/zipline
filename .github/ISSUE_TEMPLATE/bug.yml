@@ -17,8 +17,9 @@ body:
       label: Version
       description: What version of Zipline are you using?
       options:
-        - upstream
-        - latest
+        - upstream (ghcr.io/diced/zipline:trunk)
+        - latest (ghcr.io/diced/zipline:latest)
+        - other (provide version in additional info)
     validations:
       required: true
   - type: dropdown
@@ -28,14 +29,15 @@ body:
       multiple: true
       options:
         - Firefox
-        - Chrome
+        - Chromium-based (Chrome, Edge, Brave, Opera, mobile chrome/chromium based, etc)
         - Safari
-        - Microsoft Edge
+        - Firefox Mobile
+        - Safari Mobile
   - type: textarea
     id: zipline-logs
     attributes:
       label: Zipline Logs
-      description: Please copy and paste any relevant log output.
+      description: Please copy and paste any relevant log output. Not seeing anything interesting? Try adding the `DEBUG=true` environment variable to see more logs, make sure to review the output and remove any sensitive information as it can be VERY verbose at times.
       render: shell
   - type: textarea
     id: browser-logs
@@ -43,3 +45,8 @@ body:
       label: Browser Logs
       description: Please copy and paste any relevant log output.
       render: shell
+  - type: textarea
+    id: additional-info
+    attributes:
+      label: Additional Info
+      description: Anything else that could be used to narrow down the issue, like your config.

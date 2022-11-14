@@ -1,6 +1,7 @@
 import { parse } from 'dotenv';
 import { expand } from 'dotenv-expand';
 import { existsSync, readFileSync } from 'fs';
+import Logger from '../logger';
 import { humanToBytes } from '../utils/bytes';
 
 export type ValueType = 'string' | 'number' | 'boolean' | 'array' | 'json-array' | 'human-to-byte';
@@ -36,6 +37,9 @@ function map(env: string, type: ValueType, path: string) {
 }
 
 export default function readConfig() {
+  const logger = Logger.get('config');
+
+  logger.debug('attemping to read .env.local/.env or environment variables');
   if (existsSync('.env.local')) {
     const contents = readFileSync('.env.local');
 
@@ -132,6 +136,8 @@ export default function readConfig() {
     map('OAUTH_GOOGLE_CLIENT_SECRET', 'string', 'oauth.google_client_secret'),
 
     map('FEATURES_INVITES', 'boolean', 'features.invites'),
+    map('FEATURES_INVITES_LENGTH', 'number', 'features.invites_length'),
+
     map('FEATURES_OAUTH_REGISTRATION', 'boolean', 'features.oauth_registration'),
     map('FEATURES_USER_REGISTRATION', 'boolean', 'features.user_registration'),
 
@@ -154,6 +160,10 @@ export default function readConfig() {
           break;
         case 'number':
           parsed = Number(value);
+          if (isNaN(parsed)) {
+            parsed = undefined;
+            logger.debug(`Failed to parse number ${map.env}=${value}`);
+          }
           break;
         case 'boolean':
           parsed = value === 'true';
@@ -162,11 +172,13 @@ export default function readConfig() {
           try {
             parsed = JSON.parse(value);
           } catch (e) {
-            parsed = [];
+            logger.debug(`Failed to parse JSON array ${map.env}=${value}`);
           }
           break;
         case 'human-to-byte':
           parsed = humanToBytes(value) ?? undefined;
+          if (!parsed) logger.debug(`Unable to parse ${map.env}=${value}`);
+
           break;
         default:
           parsed = value;

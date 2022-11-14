@@ -1,12 +1,12 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
 import type { CookieSerializeOptions } from 'cookie';
+import type { NextApiRequest, NextApiResponse } from 'next';
 
+import { OAuth, User } from '@prisma/client';
 import { serialize } from 'cookie';
-import { sign64, unsign64 } from 'lib/utils/crypto';
+import { HTTPMethod } from 'find-my-way';
 import config from 'lib/config';
 import prisma from 'lib/prisma';
-import { OAuth, User } from '@prisma/client';
-import { HTTPMethod } from 'find-my-way';
+import { sign64, unsign64 } from 'lib/utils/crypto';
 
 export interface NextApiFile {
   fieldname: string;
@@ -54,7 +54,7 @@ export type ZiplineApiConfig = {
 
 export const withZipline =
   (
-    handler: (req: NextApiRequest, res: NextApiResponse, user?: UserExtended) => unknown,
+    handler: (req: NextApiRequest, res: NextApiResponse, user?: UserExtended) => Promise<unknown>,
     api_config: ZiplineApiConfig = { methods: ['GET'] }
   ) =>
   (req: NextApiReq, res: NextApiRes) => {

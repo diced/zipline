@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "npm-run-all build:server dev:run",
-    "dev:run": "cross-env REACT_EDITOR=code NODE_ENV=development RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED=false node --enable-source-maps dist/server",
+    "dev:run": "cross-env DEBUG=true REACT_EDITOR=code NODE_ENV=development RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED=false node --enable-source-maps dist/server",
     "build": "npm-run-all build:server build:schema build:next",
     "build-ci": "cross-env ZIPLINE_DOCKER_BUILD=1 npm-run-all build:server build:schema build:next",
     "build:server": "node esbuild.config.js",

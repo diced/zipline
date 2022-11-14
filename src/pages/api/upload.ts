@@ -16,6 +16,7 @@ import { join } from 'path';
 import sharp from 'sharp';
 
 const uploader = multer();
+const logger = Logger.get('upload');
 
 async function handler(req: NextApiReq, res: NextApiRes) {
   if (!req.headers.authorization) return res.forbidden('no authorization');
@@ -76,7 +77,20 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     const identifier = req.headers['x-zipline-partial-identifier'];
     const lastchunk = req.headers['x-zipline-partial-lastchunk'] === 'true';
 
+    logger.debug(
+      `recieved partial upload ${JSON.stringify({
+        filename,
+        mimetype,
+        identifier,
+        lastchunk,
+        start,
+        end,
+        total,
+      })}`
+    );
+
     const tempFile = join(tmpdir(), `zipline_partial_${identifier}_${start}_${end}`);
+    logger.debug(`writing partial to disk ${tempFile}`);
     await writeFile(tempFile, req.files[0].buffer);
 
     if (lastchunk) {
@@ -149,9 +163,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
       await datasource.save(file.file, Buffer.from(chunks));
 
-      Logger.get('file').info(
-        `User ${user.username} (${user.id}) uploaded ${file.file} (${file.id}) (chunked)`
-      );
+      logger.info(`User ${user.username} (${user.id}) uploaded ${file.file} (${file.id}) (chunked)`);
       if (user.domains.length) {
         const domain = user.domains[Math.floor(Math.random() * user.domains.length)];
         response.files.push(
@@ -187,6 +199,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
   if (user.ratelimit) {
     const remaining = user.ratelimit.getTime() - Date.now();
+    logger.debug(`${user.id} encountered ratelimit, ${remaining}ms remaining`);
     if (remaining <= 0) {
       await prisma.user.update({
         where: {
@@ -203,6 +216,18 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
   if (!req.files) return res.badRequest('no files');
   if (req.files && req.files.length === 0) return res.badRequest('no files');
+
+  logger.debug(
+    `recieved upload (len=${req.files.length}) ${JSON.stringify(
+      req.files.map((x) => ({
+        fieldname: x.fieldname,
+        originalname: x.originalname,
+        mimetype: x.mimetype,
+        size: x.size,
+        encoding: x.encoding,
+      }))
+    )}`
+  );
 
   for (let i = 0; i !== req.files.length; ++i) {
     const file = req.files[i];
@@ -258,14 +283,14 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     if (compressionUsed) {
       const buffer = await sharp(file.buffer).jpeg({ quality: imageCompressionPercent }).toBuffer();
       await datasource.save(image.file, buffer);
-      Logger.get('file').info(
+      logger.info(
         `User ${user.username} (${user.id}) compressed image from ${file.buffer.length} -> ${buffer.length} bytes`
       );
     } else {
       await datasource.save(image.file, file.buffer);
     }
 
-    Logger.get('file').info(`User ${user.username} (${user.id}) uploaded ${image.file} (${image.id})`);
+    logger.info(`User ${user.username} (${user.id}) uploaded ${image.file} (${image.id})`);
     if (user.domains.length) {
       const domain = user.domains[Math.floor(Math.random() * user.domains.length)];
       response.files.push(
@@ -280,6 +305,8 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         }/${invis ? invis.invis : image.file}`
       );
     }
+
+    logger.debug(`sent response: ${JSON.stringify(response)}`);
 
     if (zconfig.discord?.upload) {
       await sendUpload(
