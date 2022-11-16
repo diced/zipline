@@ -1,6 +1,6 @@
-import prisma from 'lib/prisma';
-import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'lib/middleware/withZipline';
 import { OauthProviders } from '@prisma/client';
+import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'lib/middleware/withZipline';
+import prisma from 'lib/prisma';
 
 async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   if (req.method === 'DELETE') {

@@ -1,14 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import Head from 'next/head';
-import { GetServerSideProps } from 'next';
 import { Box, Button, Modal, PasswordInput } from '@mantine/core';
-import config from 'lib/config';
+import exts from 'lib/exts';
 import prisma from 'lib/prisma';
 import { parse } from 'lib/utils/client';
-import exts from 'lib/exts';
+import { GetServerSideProps } from 'next';
+import Head from 'next/head';
 import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 
-export default function EmbeddedImage({ image, user, pass, prismRender }) {
+export default function EmbeddedFile({ image, user, pass, prismRender }) {
   const dataURL = (route: string) => `${route}/${image.file}`;
 
   const router = useRouter();

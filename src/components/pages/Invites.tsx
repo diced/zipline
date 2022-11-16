@@ -13,16 +13,16 @@ import {
   Title,
   Tooltip,
 } from '@mantine/core';
-import { useClipboard } from '@mantine/hooks';
 import { useForm } from '@mantine/form';
+import { useClipboard } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
 import { showNotification } from '@mantine/notifications';
 import { CopyIcon, CrossIcon, DeleteIcon, PlusIcon, TagIcon } from 'components/icons';
 import MutedText from 'components/MutedText';
 import useFetch from 'hooks/useFetch';
+import { expireText, relativeTime } from 'lib/utils/client';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { expireText, relativeTime } from 'lib/utils/client';
 
 const expires = ['30m', '1h', '6h', '12h', '1d', '3d', '5d', '7d', 'never'];
 
@@ -48,6 +48,7 @@ function CreateInviteModal({ open, setOpen, updateInvites }) {
               '6h': Date.now() + 6 * 60 * 60 * 1000,
               '12h': Date.now() + 12 * 60 * 60 * 1000,
               '1d': Date.now() + 24 * 60 * 60 * 1000,
+              '3d': Date.now() + 3 * 24 * 60 * 60 * 1000,
               '5d': Date.now() + 5 * 24 * 60 * 60 * 1000,
               '7d': Date.now() + 7 * 24 * 60 * 60 * 1000,
             }[values.expires]
@@ -119,7 +120,7 @@ function CreateInviteModal({ open, setOpen, updateInvites }) {
   );
 }
 
-export default function Uz2sers() {
+export default function Invites() {
   const router = useRouter();
   const modals = useModals();
   const clipboard = useClipboard();

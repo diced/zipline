@@ -1,9 +1,11 @@
+import config from 'lib/config';
+import Logger from 'lib/logger';
+import { discord_auth, github_auth, google_auth } from 'lib/oauth';
 import prisma from 'lib/prisma';
 import { hashPassword } from 'lib/util';
 import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'middleware/withZipline';
-import Logger from 'lib/logger';
-import config from 'lib/config';
-import { discord_auth, github_auth, google_auth } from 'lib/oauth';
+
+const logger = Logger.get('user');
 
 async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   if (user.oauth) {
@@ -11,6 +13,8 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     if (user.oauth.find((o) => o.provider === 'GITHUB')) {
       const resp = await github_auth.oauth_user(user.oauth.find((o) => o.provider === 'GITHUB').token);
       if (!resp) {
+        logger.debug(`oauth expired for ${JSON.stringify(user)}`);
+
         return res.json({
           error: 'oauth token expired',
           redirect_uri: github_auth.oauth_url(config.oauth.github_client_id),
@@ -24,7 +28,9 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       });
       if (!resp.ok) {
         const provider = user.oauth.find((o) => o.provider === 'DISCORD');
-        if (!provider.refresh)
+        if (!provider.refresh) {
+          logger.debug(`couldn't find a refresh token for ${JSON.stringify(user)}`);
+
           return res.json({
             error: 'oauth token expired',
             redirect_uri: discord_auth.oauth_url(
@@ -32,6 +38,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
               `${config.core.https ? 'https' : 'http'}://${req.headers.host}`
             ),
           });
+        }
 
         const resp2 = await fetch('https://discord.com/api/oauth2/token', {
           method: 'POST',
@@ -45,7 +52,9 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
             refresh_token: provider.refresh,
           }),
         });
-        if (!resp2.ok)
+        if (!resp2.ok) {
+          logger.debug(`oauth expired for ${JSON.stringify(user)}`);
+
           return res.json({
             error: 'oauth token expired',
             redirect_uri: discord_auth.oauth_url(
@@ -53,7 +62,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
               `${config.core.https ? 'https' : 'http'}://${req.headers.host}`
             ),
           });
-
+        }
         const json = await resp2.json();
 
         await prisma.oAuth.update({
@@ -74,7 +83,9 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       );
       if (!resp.ok) {
         const provider = user.oauth.find((o) => o.provider === 'GOOGLE');
-        if (!provider.refresh)
+        if (!provider.refresh) {
+          logger.debug(`couldn't find a refresh token for ${JSON.stringify(user)}`);
+
           return res.json({
             error: 'oauth token expired',
             redirect_uri: google_auth.oauth_url(
@@ -82,7 +93,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
               `${config.core.https ? 'https' : 'http'}://${req.headers.host}`
             ),
           });
-
+        }
         const resp2 = await fetch('https://oauth2.googleapis.com/token', {
           method: 'POST',
           headers: {
@@ -95,7 +106,9 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
             refresh_token: provider.refresh,
           }),
         });
-        if (!resp2.ok)
+        if (!resp2.ok) {
+          logger.debug(`oauth expired for ${JSON.stringify(user)}`);
+
           return res.json({
             error: 'oauth token expired',
             redirect_uri: google_auth.oauth_url(
@@ -103,6 +116,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
               `${config.core.https ? 'https' : 'http'}://${req.headers.host}`
             ),
           });
+        }
 
         const json = await resp2.json();
 
@@ -120,6 +134,8 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   }
 
   if (req.method === 'PATCH') {
+    logger.debug(`attempting to update user ${JSON.stringify(user)}`);
+
     if (req.body.password) {
       const hashed = await hashPassword(req.body.password);
       await prisma.user.update({
@@ -220,7 +236,9 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       },
     });
 
-    Logger.get('user').info(`User ${user.username} (${newUser.username}) (${newUser.id}) was updated`);
+    logger.debug(`updated user ${JSON.stringify(newUser)}`);
+
+    logger.info(`User ${user.username} (${newUser.username}) (${newUser.id}) was updated`);
 
     return res.json(newUser);
   } else {

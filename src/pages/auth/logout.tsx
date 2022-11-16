@@ -1,10 +1,12 @@
-import React, { useEffect } from 'react';
-import { useRouter } from 'next/router';
 import { LoadingOverlay } from '@mantine/core';
-import { useSetRecoilState } from 'recoil';
 import { userSelector } from 'lib/recoil/user';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { useEffect } from 'react';
+import { useSetRecoilState } from 'recoil';
+export { getServerSideProps } from 'middleware/getServerSideProps';
 
-export default function Logout() {
+export default function Logout({ title }) {
   const setUser = useSetRecoilState(userSelector);
   const router = useRouter();
 
@@ -23,7 +25,15 @@ export default function Logout() {
     })();
   }, []);
 
-  return <LoadingOverlay visible={true} />;
-}
+  const full_title = `${title} - Logout`;
 
-Logout.title = 'LunarX - Logout';
+  return (
+    <>
+      <Head>
+        <title>{full_title}</title>
+      </Head>
+
+      <LoadingOverlay visible={true} />
+    </>
+  );
+}

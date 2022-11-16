@@ -1,18 +1,17 @@
+import { Image, PrismaClient } from '@prisma/client';
 import Router from 'find-my-way';
+import { mkdir } from 'fs/promises';
+import { createServer, IncomingMessage, OutgoingMessage, ServerResponse } from 'http';
 import next from 'next';
 import { NextServer, RequestHandler } from 'next/dist/server/next';
-import { Image, PrismaClient } from '@prisma/client';
-import { createServer, IncomingMessage, OutgoingMessage, ServerResponse } from 'http';
 import { extname } from 'path';
-import { mkdir } from 'fs/promises';
-import { getStats, log, migrations, redirect } from './util';
-import Logger from '../lib/logger';
-import { guess } from '../lib/mimes';
-import exts from '../lib/exts';
 import { version } from '../../package.json';
 import config from '../lib/config';
 import datasource from '../lib/datasource';
-import { NextUrlWithParsedQuery } from 'next/dist/server/request-meta';
+import exts from '../lib/exts';
+import Logger from '../lib/logger';
+import { guess } from '../lib/mimes';
+import { getStats, log, migrations, redirect } from './util';
 
 const dev = process.env.NODE_ENV === 'development';
 const logger = Logger.get('server');
@@ -20,18 +19,22 @@ const logger = Logger.get('server');
 start();
 
 async function start() {
+  logger.debug('Starting server');
+
   // annoy user if they didnt change secret from default "changethis"
   if (config.core.secret === 'changethis') {
-    logger.error('Secret is not set!');
-    logger.error(
       'Running LunarX as is, without a randomized secret is not recommended and leaves your instance at risk!'
-    );
-    logger.error('Please change your secret in the config file or environment variables.');
-    logger.error(
-      'The config file is located at `.env.local`, or if using docker-compose you can change the variables in the `docker-compose.yml` file.'
-    );
-    logger.error('It is recomended to use a secret that is alphanumeric and randomized.');
-    logger.error('A way you can generate this is through a password manager you may have.');
+    logger
+      .error('Secret is not set!')
+      .error(
+      )
+      .error('Please change your secret in the config file or environment variables.')
+      .error(
+        'The config file is located at `.env.local`, or if using docker-compose you can change the variables in the `docker-compose.yml` file.'
+      )
+      .error('It is recomended to use a secret that is alphanumeric and randomized.')
+      .error('A way you can generate this is through a password manager you may have.');
+
     process.exit(1);
   }
 
@@ -50,6 +53,8 @@ async function start() {
   });
 
   if (admin) {
+    logger.debug('setting main administrator user to a superAdmin');
+
     await prisma.user.update({
       where: {
         id: admin.id,
@@ -105,6 +110,8 @@ async function start() {
         },
       });
 
+      Logger.get('url').debug(`url deleted due to max views ${JSON.stringify(nUrl)}`);
+
       return nextServer.render404(req, res as ServerResponse);
     }
 
@@ -122,12 +129,14 @@ async function start() {
 
     if (!image) return rawFile(req, res, nextServer, params.id);
     else {
-      const failed = await preImage(image, prisma);
+      const failed = await preFile(image, prisma);
       if (failed) return nextServer.render404(req, res as ServerResponse);
 
       if (image.password || image.embed || image.mimetype.startsWith('text/'))
-        return redirect(res, `/view/${image.file}`);
-      else return fileDb(req, res, nextServer, handle, image);
+        redirect(res, `/view/${image.file}`);
+      else fileDb(req, res, nextServer, handle, image);
+
+      postFile(image, prisma);
     }
   });
 
@@ -142,7 +151,7 @@ async function start() {
 
     if (!image) await rawFile(req, res, nextServer, params.id);
     else {
-      const failed = await preImage(image, prisma, true);
+      const failed = await preFile(image, prisma);
       if (failed) return nextServer.render404(req, res as ServerResponse);
 
       if (image.password) {
@@ -183,43 +192,43 @@ async function start() {
   stats(prisma);
 
   setInterval(async () => {
-    await prisma.invite.deleteMany({
+    const { count } = await prisma.invite.deleteMany({
       where: {
         used: true,
       },
     });
 
-    if (config.core.logger) logger.info('invites cleaned');
+    logger.debug(`deleted ${count} used invites`);
   }, config.core.invites_interval * 1000);
 }
 
-async function preImage(image: Image, prisma: PrismaClient, ignoreViews = false) {
-  if (image.expires_at && image.expires_at < new Date()) {
-    await datasource.delete(image.file);
-    await prisma.image.delete({ where: { id: image.id } });
+async function preFile(file: Image, prisma: PrismaClient) {
+  if (file.expires_at && file.expires_at < new Date()) {
+    await datasource.delete(file.file);
+    await prisma.image.delete({ where: { id: file.id } });
 
-    Logger.get('file').info(`File ${image.file} expired and was deleted.`);
+    Logger.get('file').info(`File ${file.file} expired and was deleted.`);
 
     return true;
   }
 
-  if (!ignoreViews) {
-    const nImage = await prisma.image.update({
-      where: { id: image.id },
-      data: { views: { increment: 1 } },
-    });
-
-    if (nImage.maxViews && nImage.views >= nImage.maxViews) {
-      await datasource.delete(image.file);
-      await prisma.image.delete({ where: { id: image.id } });
-
-      Logger.get('file').info(`File ${image.file} has been deleted due to max views (${nImage.maxViews})`);
-
-      return true;
-    }
-  }
-
   return false;
+}
+
+async function postFile(file: Image, prisma: PrismaClient) {
+  const nFile = await prisma.image.update({
+    where: { id: file.id },
+    data: { views: { increment: 1 } },
+  });
+
+  if (nFile.maxViews && nFile.views >= nFile.maxViews) {
+    await datasource.delete(file.file);
+    await prisma.image.delete({ where: { id: nFile.id } });
+
+    Logger.get('file').info(`File ${file.file} has been deleted due to max views (${nFile.maxViews})`);
+
+    return true;
+  }
 }
 
 async function rawFile(req: IncomingMessage, res: OutgoingMessage, nextServer: NextServer, id: string) {
@@ -267,6 +276,8 @@ async function stats(prisma: PrismaClient) {
     },
   });
 
+  logger.debug(`stats updated ${JSON.stringify(stats)}`);
+
   setInterval(async () => {
     const stats = await getStats(prisma, datasource);
     await prisma.stats.create({
@@ -274,6 +285,7 @@ async function stats(prisma: PrismaClient) {
         data: stats,
       },
     });
-    if (config.core.logger) logger.info('stats updated');
+
+    logger.debug(`stats updated ${JSON.stringify(stats)}`);
   }, config.core.stats_interval * 1000);
 }

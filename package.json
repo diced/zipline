@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "npm-run-all build:server dev:run",
-    "dev:run": "cross-env REACT_EDITOR=code NODE_ENV=development RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED=false node --enable-source-maps dist/server",
+    "dev:run": "cross-env DEBUG=true REACT_EDITOR=code NODE_ENV=development RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED=false node --enable-source-maps dist/server",
     "build": "npm-run-all build:server build:schema build:next",
     "build-ci": "cross-env ZIPLINE_DOCKER_BUILD=1 npm-run-all build:server build:schema build:next",
     "build:server": "node esbuild.config.js",
@@ -17,9 +17,11 @@
     "docker:run": "docker-compose up -d",
     "docker:down": "docker-compose down",
     "docker:build-dev": "docker-compose --file docker-compose.dev.yml up --build",
-    "scripts:read-config": "npm-run-all build:server && node dist/scripts/read-config",
-    "scripts:import-dir": "npm-run-all build:server && node dist/scripts/import-dir",
     "docker:restart": "npm run docker:down && npm run docker:run"
+    "scripts:read-config": "node dist/scripts/read-config",
+    "scripts:import-dir": "node dist/scripts/import-dir",
+    "scripts:list-users": "node dist/scripts/list-users",
+    "scripts:set-user": "node dist/scripts/set-user"
   },
   "dependencies": {
     "@dicedtomato/mantine-data-grid": "0.0.23",

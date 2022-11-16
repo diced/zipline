@@ -21,11 +21,11 @@ export default function Users() {
   const [editOpen, setEditOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
-  const handleDelete = async (user, delete_images) => {
-    const res = await useFetch('/api/users', 'DELETE', {
-      id: user.id,
-      delete_images,
+  const handleDelete = async (user, delete_files) => {
+    const res = await useFetch(`/api/user/${user.id}`, 'DELETE', {
+      delete_files,
     });
+
     if (res.error) {
       showNotification({
         title: 'Failed to delete user',
@@ -52,7 +52,7 @@ export default function Users() {
       labels: { confirm: 'Yes', cancel: 'No' },
       onConfirm: () => {
         modals.openConfirmModal({
-          title: `Delete ${user.username}'s images?`,
+          title: `Delete ${user.username}'s files?`,
           labels: { confirm: 'Yes', cancel: 'No' },
           centered: true,
           overlayBlur: 3,

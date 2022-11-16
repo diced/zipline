@@ -1,5 +1,4 @@
-import React from 'react';
-import { Table, Tooltip, Badge, HoverCard, Text, useMantineTheme, Group } from '@mantine/core';
+import { Badge, Group, HoverCard, Table, useMantineTheme } from '@mantine/core';
 import Type from 'components/Type';
 
 export function FilePreview({ file }: { file: File }) {

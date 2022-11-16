@@ -1,9 +1,9 @@
-import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'middleware/withZipline';
+import Logger from 'lib/logger';
 import prisma from 'lib/prisma';
 import { createToken } from 'lib/util';
-import Logger from 'lib/logger';
+import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'middleware/withZipline';
 
-async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
+async function handler(_: NextApiReq, res: NextApiRes, user: UserExtended) {
   const updated = await prisma.user.update({
     where: {
       id: user.id,

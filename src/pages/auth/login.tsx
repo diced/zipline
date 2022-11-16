@@ -1,11 +1,11 @@
-import { Button, Center, TextInput, Title, PasswordInput, Divider, Group } from '@mantine/core';
+import { Button, Center, Divider, PasswordInput, TextInput, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import Link from 'next/link';
+import { DiscordIcon, GitHubIcon, GoogleIcon } from 'components/icons';
 import useFetch from 'hooks/useFetch';
+import Head from 'next/head';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
-import Head from 'next/head';
-import { GitHubIcon, DiscordIcon, GoogleIcon } from 'components/icons';
 export { getServerSideProps } from 'middleware/getServerSideProps';
 
 export default function Login({ title, user_registration, oauth_registration, oauth_providers: unparsed }) {
@@ -42,7 +42,7 @@ export default function Login({ title, user_registration, oauth_registration, oa
     });
 
     if (res.error) {
-      if (res.error.startsWith('403')) {
+      if (res.code === 403) {
         form.setFieldError('password', 'Invalid password');
       } else {
         form.setFieldError('username', 'Invalid username');

@@ -1,14 +1,13 @@
-import React from 'react';
 import { Button, Stack, Title } from '@mantine/core';
 import Link from 'components/Link';
 import MutedText from 'components/MutedText';
 import Head from 'next/head';
 
-export default function Error({ statusCode }) {
+export default function Error({ statusCode, oauthError }) {
   return (
     <>
       <Head>
-        <title>{statusCode} Error</title>
+        <title>Error ({statusCode})</title>
       </Head>
 
       <Stack
@@ -35,5 +34,3 @@ export function getInitialProps({ res, err }) {
   const statusCode = res ? res.statusCode : err ? err.statusCode : 404;
   return { pageProps: { statusCode } };
 }
-
-Error.title = 'LunarX - Something went wrong...';

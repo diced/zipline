@@ -1,5 +1,5 @@
-import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'middleware/withZipline';
 import Logger from 'lib/logger';
+import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'middleware/withZipline';
 
 async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   req.cleanCookie('user');

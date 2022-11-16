@@ -1,10 +1,12 @@
 import { Image, Url, User } from '@prisma/client';
-import { ConfigDiscordContent } from 'lib/config/Config';
 import config from 'lib/config';
+import { ConfigDiscordContent } from 'lib/config/Config';
 import Logger from './logger';
 
 // [user, image, url, route (ex. https://example.com/r/something.png)]
 export type Args = [User, Image?, Url?, string?];
+
+const logger = Logger.get('discord');
 
 function parse(str: string, args: Args) {
   if (!str) return null;
@@ -63,7 +65,7 @@ export async function sendUpload(user: User, image: Image, host: string) {
   const parsed = parseContent(config.discord.upload, [user, image, null, host]);
   const isImage = image.mimetype.startsWith('image/');
 
-  const body = {
+  const body = JSON.stringify({
     username: config.discord.username,
     avatar_url: config.discord.avatar_url,
     content: parsed.content ?? null,
@@ -95,11 +97,12 @@ export async function sendUpload(user: User, image: Image, host: string) {
           },
         ]
       : null,
-  };
+  });
 
+  logger.debug('attempting to send shorten notification to discord', body);
   const res = await fetch(config.discord.url, {
     method: 'POST',
-    body: JSON.stringify(body),
+    body,
     headers: {
       'Content-Type': 'application/json',
     },
@@ -107,10 +110,9 @@ export async function sendUpload(user: User, image: Image, host: string) {
 
   if (!res.ok) {
     const text = await res.text();
-    Logger.get('discord').error(
-      `Failed to send upload notification to discord: ${res.status} ${res.statusText}`
-    );
-    Logger.get('discord').error(`Received response: ${text}`);
+    logger
+      .error(`Failed to send shorten notification to discord: ${res.status}`)
+      .error(`Received response:\n${text}`);
   }
 
   return;
@@ -121,7 +123,7 @@ export async function sendShorten(user: User, url: Url, host: string) {
 
   const parsed = parseContent(config.discord.shorten, [user, null, url, host]);
 
-  const body = {
+  const body = JSON.stringify({
     username: config.discord.username,
     avatar_url: config.discord.avatar_url,
     content: parsed.content ?? null,
@@ -141,20 +143,22 @@ export async function sendShorten(user: User, url: Url, host: string) {
           },
         ]
       : null,
-  };
+  });
 
+  logger.debug('attempting to send shorten notification to discord', body);
   const res = await fetch(config.discord.url, {
     method: 'POST',
-    body: JSON.stringify(body),
+    body,
     headers: {
       'Content-Type': 'application/json',
     },
   });
 
   if (!res.ok) {
-    Logger.get('discord').error(
-      `Failed to send url shorten notification to discord: ${res.status} ${res.statusText}`
-    );
+    const text = await res.text();
+    logger
+      .error(`Failed to send shorten notification to discord: ${res.status}`)
+      .error(`Received response:\n${text}`);
   }
 
   return;

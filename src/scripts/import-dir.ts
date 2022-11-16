@@ -1,10 +1,10 @@
-import datasource from '../lib/datasource';
-import { readdir, readFile } from 'fs/promises';
-import config from '../lib/config';
-import { migrations } from '../server/util';
 import { PrismaClient } from '@prisma/client';
-import { guess } from '../lib/mimes';
+import { readdir, readFile } from 'fs/promises';
 import { join } from 'path';
+import config from '../lib/config';
+import datasource from '../lib/datasource';
+import { guess } from '../lib/mimes';
+import { migrations } from '../server/util';
 
 async function main() {
   const directory = process.argv[2];

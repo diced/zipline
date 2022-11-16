@@ -1,8 +1,7 @@
-import React from 'react';
-import useLogin from 'hooks/useLogin';
+import { LoadingOverlay } from '@mantine/core';
 import Layout from 'components/Layout';
 import Upload from 'components/pages/Upload';
-import { LoadingOverlay } from '@mantine/core';
+import useLogin from 'hooks/useLogin';
 import Head from 'next/head';
 export { getServerSideProps } from 'middleware/getServerSideProps';
 

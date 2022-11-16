@@ -12,12 +12,12 @@ import matcha_dark_azul from 'lib/themes/matcha_dark_azul';
 import nord from 'lib/themes/nord';
 import qogir_dark from 'lib/themes/qogir_dark';
 
-import { MantineProvider, MantineThemeOverride } from '@mantine/core';
+import { createEmotionCache, MantineProvider, MantineThemeOverride } from '@mantine/core';
 import { useColorScheme } from '@mantine/hooks';
 import { ModalsProvider } from '@mantine/modals';
 import { NotificationsProvider } from '@mantine/notifications';
-import { useRecoilValue } from 'recoil';
 import { userSelector } from 'lib/recoil/user';
+import { useRecoilValue } from 'recoil';
 
 export const themes = {
   system: (colorScheme: 'dark' | 'light') => (colorScheme === 'dark' ? dark_blue : light_blue),
@@ -47,6 +47,8 @@ export const friendlyThemeName = {
   qogir_dark: 'Qogir Dark',
 };
 
+const cache = createEmotionCache({ key: 'zipline' });
+
 export default function ZiplineTheming({ Component, pageProps, ...props }) {
   const user = useRecoilValue(userSelector);
   const colorScheme = useColorScheme();
@@ -65,8 +67,14 @@ export default function ZiplineTheming({ Component, pageProps, ...props }) {
     <MantineProvider
       withGlobalStyles
       withNormalizeCSS
+      emotionCache={cache}
       theme={{
         ...theme,
+        fontFamily: 'Ubuntu, sans-serif',
+        fontFamilyMonospace: 'Ubuntu Mono, monospace',
+        headings: {
+          fontFamily: 'Ubuntu, sans-serif',
+        },
         components: {
           AppShell: {
             styles: (t) => ({
@@ -92,6 +100,7 @@ export default function ZiplineTheming({ Component, pageProps, ...props }) {
           Popover: {
             defaultProps: {
               transition: 'pop',
+              shadow: 'lg',
             },
           },
           LoadingOverlay: {

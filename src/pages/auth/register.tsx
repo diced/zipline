@@ -1,17 +1,17 @@
-import { GetServerSideProps } from 'next';
-import prisma from 'lib/prisma';
-import { useState } from 'react';
-import { Box, Button, Card, Center, Group, PasswordInput, Stepper, TextInput } from '@mantine/core';
-import useFetch from 'hooks/useFetch';
-import PasswordStrength from 'components/PasswordStrength';
+import { Box, Button, Center, Group, PasswordInput, Stepper, TextInput } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { CrossIcon, UserIcon } from 'components/icons';
-import { useRouter } from 'next/router';
-import Head from 'next/head';
+import PasswordStrength from 'components/PasswordStrength';
+import useFetch from 'hooks/useFetch';
 import config from 'lib/config';
-import { useSetRecoilState } from 'recoil';
+import prisma from 'lib/prisma';
 import { userSelector } from 'lib/recoil/user';
 import { randomChars } from 'lib/util';
+import { GetServerSideProps } from 'next';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
+import { useSetRecoilState } from 'recoil';
 
 export default function Register({ code, title, user_registration }) {
   const [active, setActive] = useState(0);
@@ -33,7 +33,7 @@ export default function Register({ code, title, user_registration }) {
 
     setUsernameError('');
 
-    const res = await useFetch('/api/users', 'POST', { code, username });
+    const res = await useFetch('/api/user/check', 'POST', { code, username });
     if (res.error) {
       setUsernameError('A user with that username already exists');
     } else {
@@ -46,9 +46,8 @@ export default function Register({ code, title, user_registration }) {
     setPassword(password.trim());
     setVerifyPassword(verifyPassword.trim());
 
-    if (password.trim() !== verifyPassword.trim()) {
-      setVerifyPasswordError('Passwords do not match');
-    }
+    if (password !== verifyPassword) setVerifyPasswordError('Passwords do not match');
+    else setVerifyPasswordError('');
   };
 
   const createUser = async () => {
@@ -57,6 +56,7 @@ export default function Register({ code, title, user_registration }) {
       username,
       password,
     });
+
     if (res.error) {
       showNotification({
         title: 'Error while creating user',
@@ -87,7 +87,7 @@ export default function Register({ code, title, user_registration }) {
   return (
     <>
       <Head>
-        <title>{title}</title>
+        <title>{full_title}</title>
       </Head>
       <Center sx={{ height: '100vh' }}>
         <Box
@@ -158,24 +158,31 @@ export default function Register({ code, title, user_registration }) {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { code } = context.query as { code: string };
 
-  if (!config.features.invites && code)
-    return {
-      notFound: true,
-    };
-
-  if (!config.features.user_registration && !code) return { notFound: true };
+  const { default: Logger } = await import('lib/logger');
+  const logger = Logger.get('pages::register');
 
   if (code) {
+    if (!config.features.invites)
+      return {
+        notFound: true,
+      };
+
     const invite = await prisma.invite.findUnique({
       where: {
         code,
       },
     });
 
+    logger.debug(`request to access ${JSON.stringify(invite)}`);
+
     if (!invite) return { notFound: true };
     if (invite.used) return { notFound: true };
 
-    if (invite.expires_at && invite.expires_at < new Date()) return { notFound: true };
+    if (invite.expires_at && invite.expires_at < new Date()) {
+      logger.debug(`restricting access to ${JSON.stringify(invite)} as it has expired`);
+
+      return { notFound: true };
+    }
 
     return {
       props: {
@@ -184,13 +191,21 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       },
     };
   } else {
+    if (!config.features.user_registration)
+      return {
+        notFound: true,
+      };
+
     const code = randomChars(4);
-    await prisma.invite.create({
+    const temp = await prisma.invite.create({
       data: {
         code,
         createdById: 1,
       },
     });
+
+    logger.debug(`request to access user registration, creating temporary invite ${JSON.stringify(temp)}`);
+
     return {
       props: {
         title: config.website.title,

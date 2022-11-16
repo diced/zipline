@@ -1,11 +1,11 @@
-import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'middleware/withZipline';
-import prisma from 'lib/prisma';
 import config from 'lib/config';
+import prisma from 'lib/prisma';
+import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'middleware/withZipline';
 
 async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   const take = Number(req.query.take ?? 4);
 
-  if (take > 50) return res.badRequest("take can't be more than 50");
+  if (take >= 50) return res.badRequest("take can't be more than 50");
 
   let images = await prisma.image.findMany({
     take,

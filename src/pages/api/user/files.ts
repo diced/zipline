@@ -1,9 +1,11 @@
-import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'middleware/withZipline';
+import config from 'lib/config';
+import datasource from 'lib/datasource';
+import Logger from 'lib/logger';
 import prisma from 'lib/prisma';
 import { chunk } from 'lib/util';
-import Logger from 'lib/logger';
-import datasource from 'lib/datasource';
-import config from 'lib/config';
+import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'middleware/withZipline';
+
+const logger = Logger.get('files');
 
 async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   if (req.method === 'DELETE') {
@@ -23,7 +25,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
           userId: user.id,
         },
       });
-      Logger.get('users').info(`User ${user.username} (${user.id}) deleted ${count} files.`);
+      logger.info(`User ${user.username} (${user.id}) deleted ${count} files.`);
 
       return res.json({ count });
     } else {
@@ -37,9 +39,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
 
       await datasource.delete(image.file);
 
-      Logger.get('users').info(
-        `User ${user.username} (${user.id}) deleted an image ${image.file} (${image.id})`
-      );
+      logger.info(`User ${user.username} (${user.id}) deleted an image ${image.file} (${image.id})`);
 
       delete image.password;
       return res.json(image);

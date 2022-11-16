@@ -1,10 +1,10 @@
-import React, { useEffect } from 'react';
-import useLogin from 'hooks/useLogin';
+import { LoadingOverlay } from '@mantine/core';
 import Layout from 'components/Layout';
 import Invites from 'components/pages/Invites';
-import { LoadingOverlay } from '@mantine/core';
+import useLogin from 'hooks/useLogin';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
+import { useEffect } from 'react';
 export { getServerSideProps } from 'middleware/getServerSideProps';
 
 export default function InvitesPage(props) {

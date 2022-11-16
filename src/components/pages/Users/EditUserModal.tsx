@@ -1,4 +1,4 @@
-import { Modal, TextInput, Switch, Group, Button, Title } from '@mantine/core';
+import { Button, Group, Modal, Switch, TextInput, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { showNotification } from '@mantine/notifications';
 import { DeleteIcon, PlusIcon } from 'components/icons';

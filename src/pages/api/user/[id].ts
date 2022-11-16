@@ -1,7 +1,10 @@
+import datasource from 'lib/datasource';
+import Logger from 'lib/logger';
 import prisma from 'lib/prisma';
 import { hashPassword } from 'lib/util';
 import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'middleware/withZipline';
-import Logger from 'lib/logger';
+
+const logger = Logger.get('user');
 
 async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   const { id } = req.query as { id: string };
@@ -15,16 +18,51 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   if (!target) return res.notFound('user not found');
 
   if (req.method === 'DELETE') {
+    if (target.id === user.id) return res.badRequest("you can't delete your own account");
+    if (target.administrator && !user.superAdmin) return res.forbidden('cannot delete administrator');
+
     const newTarget = await prisma.user.delete({
       where: { id: target.id },
     });
-    if (newTarget.administrator && !user.superAdmin) return res.forbidden('cannot delete administrator');
+
+    logger.debug(`deleted user ${JSON.stringify(newTarget)}`);
+
+    if (req.body.delete_files) {
+      logger.debug(`attempting to delete ${newTarget.id}'s files`);
+
+      const files = await prisma.image.findMany({
+        where: {
+          userId: newTarget.id,
+        },
+      });
+
+      for (let i = 0; i !== files.length; ++i) {
+        try {
+          await datasource.delete(files[i].file);
+        } catch {
+          logger.debug(`failed to find file ${files[i].file} to delete`);
+        }
+      }
+
+      const { count } = await prisma.image.deleteMany({
+        where: {
+          userId: newTarget.id,
+        },
+      });
+      Logger.get('users').info(
+        `User ${user.username} (${user.id}) deleted ${count} files of user ${newTarget.username} (${newTarget.id})`
+      );
+    }
+
+    logger.info(`User ${user.username} (${user.id}) deleted user ${newTarget.username} (${newTarget.id})`);
 
     delete newTarget.password;
 
     return res.json(newTarget);
   } else if (req.method === 'PATCH') {
     if (target.administrator && !user.superAdmin) return res.forbidden('cannot modify administrator');
+
+    logger.debug(`attempting to update user ${id} with ${JSON.stringify(req.body)}`);
 
     if (req.body.password) {
       const hashed = await hashPassword(req.body.password);
@@ -119,27 +157,15 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       where: {
         id: target.id,
       },
-      select: {
-        administrator: true,
-        embedColor: true,
-        embedTitle: true,
-        embedSiteName: true,
-        id: true,
-        images: false,
-        password: false,
-        systemTheme: true,
-        token: true,
-        username: true,
-        domains: true,
-        avatar: true,
-        oauth: true,
-      },
     });
 
-    Logger.get('user').info(
+    logger.debug(`updated user ${id} with ${JSON.stringify(newUser)}`);
+
+    logger.info(
       `User ${user.username} (${user.id}) updated ${target.username} (${newUser.username}) (${newUser.id})`
     );
 
+    delete newUser.password;
     return res.json(newUser);
   } else {
     delete target.password;

@@ -1,4 +1,4 @@
-import { Modal, Select, NumberInput, Group, Checkbox, Button, Title, Text } from '@mantine/core';
+import { Button, Checkbox, Group, Modal, NumberInput, Select, Text, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { DownloadIcon } from 'components/icons';
 

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Button, Stack, Title } from '@mantine/core';
 import Link from 'components/Link';
 import MutedText from 'components/MutedText';

@@ -1,10 +1,11 @@
-import prisma from 'lib/prisma';
-import zconfig from 'lib/config';
-import { NextApiReq, NextApiRes, withZipline } from 'lib/middleware/withZipline';
-import { createInvisURL, randomChars } from 'lib/util';
-import Logger from 'lib/logger';
-import config from 'lib/config';
+import { default as config, default as zconfig } from 'lib/config';
 import { sendShorten } from 'lib/discord';
+import Logger from 'lib/logger';
+import { NextApiReq, NextApiRes, withZipline } from 'lib/middleware/withZipline';
+import prisma from 'lib/prisma';
+import { createInvisURL, randomChars } from 'lib/util';
+
+const logger = Logger.get('shorten');
 
 async function handler(req: NextApiReq, res: NextApiRes) {
   if (!req.headers.authorization) return res.badRequest('no authorization');
@@ -49,9 +50,9 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
   if (req.headers.zws) invis = await createInvisURL(zconfig.urls.length, url.id);
 
-  Logger.get('url').info(
-    `User ${user.username} (${user.id}) shortenned a url ${url.destination} (${url.id})`
-  );
+  logger.debug(`shortened ${JSON.stringify(url)}`);
+
+  logger.info(`User ${user.username} (${user.id}) shortenned a url ${url.destination} (${url.id})`);
 
   if (config.discord?.shorten) {
     await sendShorten(

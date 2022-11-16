@@ -1,8 +1,8 @@
 import { Button, Card, Group, LoadingOverlay, Modal, Stack, Text, Title, Tooltip } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { showNotification } from '@mantine/notifications';
-import { relativeTime } from 'lib/utils/client';
 import { useFileDelete, useFileFavorite } from 'lib/queries/files';
+import { relativeTime } from 'lib/utils/client';
 import { useState } from 'react';
 import {
   CalendarIcon,
@@ -11,15 +11,15 @@ import {
   CrossIcon,
   DeleteIcon,
   ExternalLinkIcon,
+  EyeIcon,
   FileIcon,
   HashIcon,
   ImageIcon,
   StarIcon,
-  EyeIcon,
 } from './icons';
+import Link from './Link';
 import MutedText from './MutedText';
 import Type from './Type';
-import Link from './Link';
 
 export function FileMeta({ Icon, title, subtitle, ...other }) {
   return other.tooltip ? (

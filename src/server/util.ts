@@ -1,14 +1,19 @@
+import { PrismaClient } from '@prisma/client';
 import { Migrate } from '@prisma/migrate/dist/Migrate';
 import { ensureDatabaseExists } from '@prisma/migrate/dist/utils/ensureDatabaseExists';
+import { ServerResponse } from 'http';
+import { Datasource } from '../lib/datasources';
 import Logger from '../lib/logger';
 import { bytesToHuman } from '../lib/utils/bytes';
-import { Datasource } from '../lib/datasources';
-import { PrismaClient } from '@prisma/client';
-import { ServerResponse } from 'http';
 
 export async function migrations() {
+  const logger = Logger.get('database::migrations');
+
   try {
+    logger.debug('establishing database connection');
     const migrate = new Migrate('./prisma/schema.prisma');
+
+    logger.debug('ensuring database exists, if not creating database - may error if no permissions');
     await ensureDatabaseExists('apply', true, './prisma/schema.prisma');
 
     const diagnose = await migrate.diagnoseMigrationHistory({
@@ -16,19 +21,28 @@ export async function migrations() {
     });
 
     if (diagnose.history?.diagnostic === 'databaseIsBehind') {
+      logger.debug('database is behind, attempting to migrate');
       try {
-        Logger.get('database').info('migrating database');
+        logger.debug('migrating database');
         await migrate.applyMigrations();
       } finally {
         migrate.stop();
-        Logger.get('database').info('finished migrating database');
+        logger.info('finished migrating database');
       }
     } else {
+      logger.debug('exiting migrations engine - database is up to date');
       migrate.stop();
     }
   } catch (error) {
-    Logger.get('database').error('Failed to migrate database... exiting...');
-    Logger.get('database').error(error);
+    if (error.message.startsWith('P1001')) {
+      logger.error(
+        `Unable to connect to database \`${process.env.DATABASE_URL}\`, check your database connection`
+      );
+    } else {
+      logger.error('Failed to migrate database... exiting...');
+      logger.error(error);
+    }
+
     process.exit(1);
   }
 }

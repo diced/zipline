@@ -1,11 +1,14 @@
 import {
   AppShell,
+  Badge,
   Box,
   Burger,
   Button,
-  Divider,
+  Group,
   Header,
+  Image,
   MediaQuery,
+  Menu,
   Navbar,
   NavLink,
   Paper,
@@ -15,13 +18,9 @@ import {
   Stack,
   Text,
   Title,
+  Tooltip,
   UnstyledButton,
   useMantineTheme,
-  Group,
-  Image,
-  Tooltip,
-  Badge,
-  Menu,
 } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
@@ -30,18 +29,21 @@ import useFetch from 'hooks/useFetch';
 import { useVersion } from 'lib/queries/version';
 import { userSelector } from 'lib/recoil/user';
 import { capitalize } from 'lib/utils/client';
-import { useRecoilState } from 'recoil';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
+import { useRecoilState } from 'recoil';
 import {
-  ExternalLinkIcon,
   ActivityIcon,
   CheckIcon,
   CopyIcon,
   CrossIcon,
   DeleteIcon,
+  DiscordIcon,
+  ExternalLinkIcon,
   FileIcon,
+  GitHubIcon,
+  GoogleIcon,
   HomeIcon,
   LinkIcon,
   LogoutIcon,
@@ -51,9 +53,6 @@ import {
   TypeIcon,
   UploadIcon,
   UserIcon,
-  DiscordIcon,
-  GitHubIcon,
-  GoogleIcon,
 } from './icons';
 import { friendlyThemeName, themes } from './Theming';
 
@@ -136,12 +135,12 @@ const items = [
   {
     icon: <UploadIcon size={18} />,
     text: 'Upload',
-    link: '/dashboard/upload',
+    link: '/dashboard/upload/file',
   },
   {
     icon: <TypeIcon size={18} />,
     text: 'Upload Text',
-    link: '/dashboard/text',
+    link: '/dashboard/upload/text',
   },
 ];
 
@@ -150,7 +149,7 @@ const admin_items = [
     icon: <UserIcon size={18} />,
     text: 'Users',
     link: '/dashboard/users',
-    if: (props) => true,
+    if: () => true,
   },
   {
     icon: <TagIcon size={18} />,

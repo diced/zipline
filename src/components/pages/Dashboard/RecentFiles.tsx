@@ -1,4 +1,4 @@
-import { Box, Card as MantineCard, Center, Group, SimpleGrid, Skeleton, Title } from '@mantine/core';
+import { Card as MantineCard, Center, Group, SimpleGrid, Skeleton, Title } from '@mantine/core';
 import { randomId } from '@mantine/hooks';
 import File from 'components/File';
 import MutedText from 'components/MutedText';

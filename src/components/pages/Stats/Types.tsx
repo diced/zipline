@@ -1,4 +1,4 @@
-import { LoadingOverlay, Card, Box } from '@mantine/core';
+import { Box, Card, LoadingOverlay } from '@mantine/core';
 import { SmallTable } from 'components/SmallTable';
 import { useStats } from 'lib/queries/stats';
 
