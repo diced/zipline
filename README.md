@@ -139,7 +139,7 @@ Create an issue on GitHub, please include the following (if one of them is not a
 
 Create an issue on GitHub, please include the following:
 
-- Breif explanation of the feature in the title (very breif please)
+- Brief explanation of the feature in the title (very brief please)
 - How it would work (detailed, but optional)
 
 ## Pull Requests (contributions to the codebase)
