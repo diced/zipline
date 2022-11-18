@@ -20,6 +20,7 @@ model User {
   embedColor    String    @default("#2f3136")
   embedSiteName String?   @default("{image.file} • {user.name}")
   ratelimit     DateTime?
+  totpSecret    String?
   domains       String[]
   oauth         OAuth[]
   images        Image[]

@@ -143,6 +143,9 @@ export default function readConfig() {
 
     map('CHUNKS_MAX_SIZE', 'human-to-byte', 'chunks.max_size'),
     map('CHUNKS_CHUNKS_SIZE', 'human-to-byte', 'chunks.chunks_size'),
+
+    map('MFA_TOTP_ISSUER', 'string', 'mfa.totp_issuer'),
+    map('MFA_TOTP_ENABLED', 'boolean', 'mfa.totp_enabled'),
   ];
 
   const config = {};
