@@ -46,6 +46,7 @@ import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import Flameshot from './Flameshot';
 import ShareX from './ShareX';
+import { TotpModal } from './TotpModal';
 
 function ExportDataTooltip({ children }) {
   return (
@@ -59,7 +60,7 @@ function ExportDataTooltip({ children }) {
   );
 }
 
-export default function Manage({ oauth_registration, oauth_providers: raw_oauth_providers }) {
+export default function Manage({ oauth_registration, oauth_providers: raw_oauth_providers, totp_enabled }) {
   const oauth_providers = JSON.parse(raw_oauth_providers);
   const icons = {
     Discord: DiscordIcon,
@@ -74,11 +75,13 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
   const [user, setUser] = useRecoilState(userSelector);
   const modals = useModals();
 
+  const [totpOpen, setTotpOpen] = useState(false);
   const [shareXOpen, setShareXOpen] = useState(false);
   const [flameshotOpen, setFlameshotOpen] = useState(false);
   const [exports, setExports] = useState([]);
   const [file, setFile] = useState<File>(null);
   const [fileDataURL, setFileDataURL] = useState(user.avatar ?? null);
+  const [totpEnabled, setTotpEnabled] = useState(!!user.totpSecret);
 
   const getDataURL = (f: File): Promise<string> => {
     return new Promise((res, rej) => {
@@ -422,6 +425,28 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
           <Button type='submit'>Save User</Button>
         </Group>
       </form>
+
+      {totp_enabled && (
+        <Box my='md'>
+          <Title>Two Factor Authentication</Title>
+          <MutedText size='md'>
+            {user.totpSecret
+              ? 'You have two factor authentication enabled.'
+              : 'You do not have two factor authentication enabled.'}
+          </MutedText>
+
+          <Button size='lg' my='sm' onClick={() => setTotpOpen(true)}>
+            {totpEnabled ? 'Disable' : 'Enable'} Two Factor Authentication
+          </Button>
+
+          <TotpModal
+            opened={totpOpen}
+            onClose={() => setTotpOpen(false)}
+            deleteTotp={totpEnabled}
+            setTotpEnabled={setTotpEnabled}
+          />
+        </Box>
+      )}
 
       {oauth_registration && (
         <Box my='md'>

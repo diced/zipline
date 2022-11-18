@@ -7,6 +7,7 @@ import { HTTPMethod } from 'find-my-way';
 import config from 'lib/config';
 import prisma from 'lib/prisma';
 import { sign64, unsign64 } from 'lib/utils/crypto';
+import Logger from 'lib/logger';
 
 export interface NextApiFile {
   fieldname: string;
@@ -179,6 +180,8 @@ export const withZipline =
       }
 
       const signed = sign64(String(value), config.core.secret);
+
+      Logger.get('api').debug(`headers(${JSON.stringify(req.headers)}): cookie(${name}, ${value})`);
 
       res.setHeader('Set-Cookie', serialize(name, signed, options));
     };

@@ -2,13 +2,31 @@ import config from 'lib/config';
 import { notNull } from 'lib/util';
 import { GetServerSideProps } from 'next';
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  // this entire thing will also probably change before the stable release
+export type OauthProvider = {
+  name: string;
+  url: string;
+  link_url: string;
+};
+
+export type ServerSideProps = {
+  title: string;
+  external_links: string;
+  disable_media_preview: boolean;
+  invites: boolean;
+  user_registration: boolean;
+  oauth_registration: boolean;
+  oauth_providers: string;
+  chunks_size: number;
+  max_size: number;
+  totp_enabled: boolean;
+};
+
+export const getServerSideProps: GetServerSideProps<ServerSideProps> = async () => {
   const ghEnabled = notNull(config.oauth?.github_client_id, config.oauth?.github_client_secret);
   const discEnabled = notNull(config.oauth?.discord_client_id, config.oauth?.discord_client_secret);
   const googleEnabled = notNull(config.oauth?.google_client_id, config.oauth?.google_client_secret);
 
-  const oauth_providers = [];
+  const oauth_providers: OauthProvider[] = [];
 
   if (ghEnabled)
     oauth_providers.push({
@@ -41,6 +59,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       oauth_providers: JSON.stringify(oauth_providers),
       chunks_size: config.chunks.chunks_size,
       max_size: config.chunks.max_size,
+      totp_enabled: config.mfa.totp_enabled,
     },
   };
 };

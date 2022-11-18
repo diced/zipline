@@ -123,6 +123,11 @@ export interface ConfigChunks {
   chunks_size: number;
 }
 
+export interface ConfigMfa {
+  totp_enabled: boolean;
+  totp_issuer: string;
+}
+
 export interface Config {
   core: ConfigCore;
   uploader: ConfigUploader;
@@ -134,4 +139,5 @@ export interface Config {
   oauth: ConfigOAuth;
   features: ConfigFeatures;
   chunks: ConfigChunks;
+  mfa: ConfigMfa;
 }

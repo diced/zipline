@@ -1,15 +1,31 @@
-import { Button, Center, Divider, PasswordInput, TextInput, Title } from '@mantine/core';
+import {
+  Button,
+  Center,
+  CheckIcon,
+  Divider,
+  Modal,
+  NumberInput,
+  PasswordInput,
+  TextInput,
+  Title,
+} from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { DiscordIcon, GitHubIcon, GoogleIcon } from 'components/icons';
 import useFetch from 'hooks/useFetch';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 export { getServerSideProps } from 'middleware/getServerSideProps';
 
 export default function Login({ title, user_registration, oauth_registration, oauth_providers: unparsed }) {
   const router = useRouter();
+
+  // totp modal
+  const [totpOpen, setTotpOpen] = useState(false);
+  const [code, setCode] = useState(undefined);
+  const [error, setError] = useState('');
+  const [disabled, setDisabled] = useState(false);
 
   const oauth_providers = JSON.parse(unparsed);
 
@@ -31,6 +47,7 @@ export default function Login({ title, user_registration, oauth_registration, oa
   });
 
   const onSubmit = async (values) => {
+    setError('');
     const username = values.username.trim();
     const password = values.password.trim();
 
@@ -39,11 +56,20 @@ export default function Login({ title, user_registration, oauth_registration, oa
     const res = await useFetch('/api/auth/login', 'POST', {
       username,
       password,
+      code: code?.toString() || null,
     });
 
     if (res.error) {
       if (res.code === 403) {
         form.setFieldError('password', 'Invalid password');
+      } else if (res.totp) {
+        if (res.code === 400) {
+          setError('Invalid code');
+        } else {
+          setError('');
+        }
+
+        setTotpOpen(true);
       } else {
         form.setFieldError('username', 'Invalid username');
         form.setFieldError('password', 'Invalid password');
@@ -66,6 +92,35 @@ export default function Login({ title, user_registration, oauth_registration, oa
       <Head>
         <title>{full_title}</title>
       </Head>
+      <Modal
+        opened={totpOpen}
+        onClose={() => setTotpOpen(false)}
+        title={<Title order={3}>Two-Factor Authentication Required</Title>}
+        size='lg'
+      >
+        <NumberInput
+          placeholder='2FA Code'
+          label='Verify'
+          size='xl'
+          hideControls
+          maxLength={6}
+          minLength={6}
+          value={code}
+          onChange={(e) => setCode(e)}
+          error={error}
+        />
+
+        <Button
+          disabled={disabled}
+          size='lg'
+          fullWidth
+          mt='md'
+          rightIcon={<CheckIcon />}
+          onClick={() => onSubmit(form.values)}
+        >
+          Verify &amp; Login
+        </Button>
+      </Modal>
       <Center sx={{ height: '100vh' }}>
         <div>
           <Title size={70} align='center'>

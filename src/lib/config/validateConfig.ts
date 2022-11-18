@@ -174,7 +174,12 @@ const validator = s.object({
       oauth_registration: s.boolean.default(false),
       user_registration: s.boolean.default(false),
     })
-    .default({ invites: false, invites_length: 6, oauth_registration: false, user_registration: false }),
+    .default({
+      invites: false,
+      invites_length: 6,
+      oauth_registration: false,
+      user_registration: false,
+    }),
   chunks: s
     .object({
       max_size: s.number.default(humanToBytes('90MB')),
@@ -183,6 +188,15 @@ const validator = s.object({
     .default({
       max_size: humanToBytes('90MB'),
       chunks_size: humanToBytes('20MB'),
+    }),
+  mfa: s
+    .object({
+      totp_issuer: s.string.default('Zipline'),
+      totp_enabled: s.boolean.default(false),
+    })
+    .default({
+      totp_issuer: 'Zipline',
+      totp_enabled: false,
     }),
 });
 
@@ -225,6 +239,8 @@ export default function validate(config): Config {
     return validated as unknown as Config;
   } catch (e) {
     if (process.env.ZIPLINE_DOCKER_BUILD) return null;
+
+    logger.debug(`config error: ${inspect(e, { depth: Infinity })}`);
 
     e.stack = '';
 
