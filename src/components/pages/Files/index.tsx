@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import FilePagation from './FilePagation';
 
-export default function Files({ disableMediaPreview }) {
+export default function Files({ disableMediaPreview, exifEnabled }) {
   const pages = usePaginatedFiles({ filter: 'media' });
   const favoritePages = usePaginatedFiles({ favorite: 'media' });
   const [favoritePage, setFavoritePage] = useState(1);
@@ -49,6 +49,7 @@ export default function Files({ disableMediaPreview }) {
                           image={image}
                           updateImages={() => updatePages(true)}
                           disableMediaPreview={disableMediaPreview}
+                          exifEnabled={exifEnabled}
                         />
                       </div>
                     ))
@@ -74,7 +75,7 @@ export default function Files({ disableMediaPreview }) {
         </Accordion>
       ) : null}
 
-      <FilePagation disableMediaPreview={disableMediaPreview} />
+      <FilePagation disableMediaPreview={disableMediaPreview} exifEnabled={exifEnabled} />
     </>
   );
 }

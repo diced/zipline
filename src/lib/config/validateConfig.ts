@@ -196,6 +196,15 @@ const validator = s.object({
       totp_issuer: 'Zipline',
       totp_enabled: false,
     }),
+  exif: s
+    .object({
+      enabled: s.boolean.default(false),
+      remove_gps: s.boolean.default(false),
+    })
+    .default({
+      enabled: false,
+      remove_gps: false,
+    }),
 });
 
 export default function validate(config): Config {

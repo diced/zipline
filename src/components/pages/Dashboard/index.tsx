@@ -13,7 +13,7 @@ import { useRecoilValue } from 'recoil';
 import RecentFiles from './RecentFiles';
 import { StatCards } from './StatCards';
 
-export default function Dashboard({ disableMediaPreview }) {
+export default function Dashboard({ disableMediaPreview, exifEnabled }) {
   const user = useRecoilValue(userSelector);
   const theme = useMantineTheme();
 
@@ -72,7 +72,7 @@ export default function Dashboard({ disableMediaPreview }) {
 
       <StatCards />
 
-      <RecentFiles disableMediaPreview={disableMediaPreview} />
+      <RecentFiles disableMediaPreview={disableMediaPreview} exifEnabled={exifEnabled} />
 
       <Box my='sm'>
         <Title>Files</Title>

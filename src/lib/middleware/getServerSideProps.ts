@@ -19,9 +19,11 @@ export type ServerSideProps = {
   chunks_size: number;
   max_size: number;
   totp_enabled: boolean;
+  exif_enabled: boolean;
+  fileId?: string;
 };
 
-export const getServerSideProps: GetServerSideProps<ServerSideProps> = async () => {
+export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (ctx) => {
   const ghEnabled = notNull(config.oauth?.github_client_id, config.oauth?.github_client_secret);
   const discEnabled = notNull(config.oauth?.discord_client_id, config.oauth?.discord_client_secret);
   const googleEnabled = notNull(config.oauth?.google_client_id, config.oauth?.google_client_secret);
@@ -48,7 +50,7 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async () 
       link_url: '/api/auth/oauth/google?state=link',
     });
 
-  return {
+  const obj = {
     props: {
       title: config.website.title,
       external_links: JSON.stringify(config.website.external_links),
@@ -60,6 +62,14 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async () 
       chunks_size: config.chunks.chunks_size,
       max_size: config.chunks.max_size,
       totp_enabled: config.mfa.totp_enabled,
-    },
+      exif_enabled: config.exif.enabled,
+    } as ServerSideProps,
   };
+
+  if (ctx.resolvedUrl.startsWith('/dashboard/metadata')) {
+    if (!config.exif.enabled) return { notFound: true };
+    obj.props.fileId = ctx.query.id as string;
+  }
+
+  return obj;
 };

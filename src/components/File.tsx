@@ -43,11 +43,13 @@ export function FileMeta({ Icon, title, subtitle, ...other }) {
   );
 }
 
-export default function File({ image, updateImages, disableMediaPreview }) {
+export default function File({ image, updateImages, disableMediaPreview, exifEnabled }) {
   const [open, setOpen] = useState(false);
   const deleteFile = useFileDelete();
   const favoriteFile = useFileFavorite();
   const clipboard = useClipboard();
+
+  console.log(exifEnabled);
 
   const loading = deleteFile.isLoading || favoriteFile.isLoading;
 
@@ -156,6 +158,11 @@ export default function File({ image, updateImages, disableMediaPreview }) {
         </Stack>
 
         <Group position='right' mt='md'>
+          {exifEnabled && (
+            <Link href={`/dashboard/metadata/${image.id}`} target='_blank' rel='noopener noreferrer'>
+              <Button leftIcon={<ExternalLinkIcon />}>View Metadata</Button>
+            </Link>
+          )}
           <Button onClick={handleCopy}>Copy URL</Button>
           <Button onClick={handleDelete}>Delete</Button>
           <Button onClick={handleFavorite}>{image.favorite ? 'Unfavorite' : 'Favorite'}</Button>

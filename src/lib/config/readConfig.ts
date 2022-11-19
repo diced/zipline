@@ -146,6 +146,9 @@ export default function readConfig() {
 
     map('MFA_TOTP_ISSUER', 'string', 'mfa.totp_issuer'),
     map('MFA_TOTP_ENABLED', 'boolean', 'mfa.totp_enabled'),
+
+    map('EXIF_ENABLED', 'boolean', 'exif.enabled'),
+    map('EXIF_REMOVE_GPS', 'boolean', 'exif.remove_gps'),
   ];
 
   const config = {};
