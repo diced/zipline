@@ -128,6 +128,11 @@ export interface ConfigMfa {
   totp_issuer: string;
 }
 
+export interface ConfigExif {
+  enabled: boolean;
+  remove_gps: boolean;
+}
+
 export interface Config {
   core: ConfigCore;
   uploader: ConfigUploader;
@@ -140,4 +145,5 @@ export interface Config {
   features: ConfigFeatures;
   chunks: ConfigChunks;
   mfa: ConfigMfa;
+  exif: ConfigExif;
 }

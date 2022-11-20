@@ -5,7 +5,7 @@ import MutedText from 'components/MutedText';
 import { invalidateFiles, useRecent } from 'lib/queries/files';
 import { UploadCloud } from 'react-feather';
 
-export default function RecentFiles({ disableMediaPreview }) {
+export default function RecentFiles({ disableMediaPreview, exifEnabled }) {
   const recent = useRecent('media');
 
   return (
@@ -24,6 +24,7 @@ export default function RecentFiles({ disableMediaPreview }) {
                 image={image}
                 updateImages={invalidateFiles}
                 disableMediaPreview={disableMediaPreview}
+                exifEnabled={exifEnabled}
               />
             ))
           ) : (

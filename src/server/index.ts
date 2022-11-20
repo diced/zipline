@@ -190,16 +190,10 @@ async function start() {
   logger.info(`started ${dev ? 'development' : 'production'} lunarx@${version} server`);
 
   stats(prisma);
+  clearInvites(prisma);
 
-  setInterval(async () => {
-    const { count } = await prisma.invite.deleteMany({
-      where: {
-        used: true,
-      },
-    });
-
-    logger.debug(`deleted ${count} used invites`);
-  }, config.core.invites_interval * 1000);
+  setInterval(() => clearInvites(prisma), config.core.invites_interval * 1000);
+  setInterval(() => stats(prisma), config.core.stats_interval * 1000);
 }
 
 async function preFile(file: Image, prisma: PrismaClient) {
@@ -277,15 +271,21 @@ async function stats(prisma: PrismaClient) {
   });
 
   logger.debug(`stats updated ${JSON.stringify(stats)}`);
+}
 
-  setInterval(async () => {
-    const stats = await getStats(prisma, datasource);
-    await prisma.stats.create({
-      data: {
-        data: stats,
-      },
-    });
+async function clearInvites(prisma: PrismaClient) {
+  const { count } = await prisma.invite.deleteMany({
+    where: {
+      OR: [
+        {
+          expires_at: { lt: new Date() },
+        },
+        {
+          used: true,
+        },
+      ],
+    },
+  });
 
-    logger.debug(`stats updated ${JSON.stringify(stats)}`);
-  }, config.core.stats_interval * 1000);
+  logger.debug(`deleted ${count} used invites`);
 }

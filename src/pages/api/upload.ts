@@ -10,6 +10,7 @@ import { NextApiReq, NextApiRes, withZipline } from 'lib/middleware/withZipline'
 import prisma from 'lib/prisma';
 import { createInvisImage, hashPassword, randomChars } from 'lib/util';
 import { parseExpiry } from 'lib/utils/client';
+import { removeGPSData } from 'lib/utils/exif';
 import multer from 'multer';
 import { tmpdir } from 'os';
 import { join } from 'path';
@@ -36,7 +37,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     });
   });
 
-  const response: { files: string[]; expires_at?: Date } = { files: [] };
+  const response: { files: string[]; expires_at?: Date; removed_gps?: boolean } = { files: [] };
   const expires_at = req.headers['expires-at'] as string;
   let expiry: Date;
 
@@ -189,6 +190,11 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         );
       }
 
+      if (zconfig.exif.enabled && zconfig.exif.remove_gps && mimetype.startsWith('image/')) {
+        await removeGPSData(file);
+        response.removed_gps = true;
+      }
+
       return res.json(response);
     }
 
@@ -314,6 +320,11 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         image,
         `${zconfig.core.https ? 'https' : 'http'}://${req.headers.host}/r/${invis ? invis.invis : image.file}`
       );
+    }
+
+    if (zconfig.exif.enabled && zconfig.exif.remove_gps && image.mimetype.startsWith('image/')) {
+      await removeGPSData(image);
+      response.removed_gps = true;
     }
   }
 
