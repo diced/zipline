@@ -162,7 +162,7 @@ export default function Login({ title, user_registration, oauth_registration, oa
               {oauth_providers.map(({ url, name, Icon }, i) => (
                 <Link key={i} href={url} passHref legacyBehavior>
                   <Button size='lg' fullWidth leftIcon={<Icon colorScheme='manage' />} component='a' my='sm'>
-                    Login in with {name}
+                    Login with {name}
                   </Button>
                 </Link>
               ))}
