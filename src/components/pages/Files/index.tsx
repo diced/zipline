@@ -23,7 +23,7 @@ export default function Files({ disableMediaPreview, exifEnabled }) {
     <>
       <Group mb='md'>
         <Title>Files</Title>
-        <Link href='/dashboard/upload' passHref legacyBehavior>
+        <Link href='/dashboard/upload/file' passHref legacyBehavior>
           <ActionIcon component='a' variant='filled' color='primary'>
             <PlusIcon />
           </ActionIcon>
