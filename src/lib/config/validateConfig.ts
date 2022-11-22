@@ -77,6 +77,7 @@ const validator = s.object({
     }),
   uploader: s
     .object({
+      default_format: s.string.default('NAME'),
       route: s.string.default('/u'),
       embed_route: s.string.default('/a'),
       length: s.number.default(6),
@@ -86,6 +87,7 @@ const validator = s.object({
       format_date: s.string.default('YYYY-MM-DD_HH:mm:ss'),
     })
     .default({
+      default_format: 'NAME',
       route: '/u',
       embed_route: '/a',
       length: 6,
