@@ -85,6 +85,7 @@ export default function readConfig() {
     map('DATASOURCE_SWIFT_DOMAIN_ID', 'string', 'datasource.swift.domain_id'),
     map('DATASOURCE_SWIFT_REGION_ID', 'string', 'datasource.swift.region_id'),
 
+    map('UPLOADER_DEFAULT_FORMAT', 'string', 'uploader.default_format'),
     map('UPLOADER_ROUTE', 'string', 'uploader.route'),
     map('UPLOADER_LENGTH', 'number', 'uploader.length'),
     map('UPLOADER_ADMIN_LIMIT', 'human-to-byte', 'uploader.admin_limit'),

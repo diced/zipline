@@ -49,7 +49,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     }
   }
 
-  const rawFormat = ((req.headers.format || '') as string).toUpperCase() || 'RANDOM';
+  const rawFormat = ((req.headers.format || '') as string).toUpperCase() || zconfig.uploader.default_format;
   const format: ImageFormat = Object.keys(ImageFormat).includes(rawFormat) && ImageFormat[rawFormat];
 
   const imageCompressionPercent = req.headers['image-compression-percent']

@@ -43,6 +43,7 @@ export interface ConfigSwiftDatasource {
 }
 
 export interface ConfigUploader {
+  default_format: string;
   route: string;
   length: number;
   admin_limit: number;
