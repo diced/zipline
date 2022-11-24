@@ -66,6 +66,8 @@ export const withZipline =
     res.setHeader('Access-Content-Allow-Methods', api_config.methods.join(','));
     res.setHeader('Access-Control-Max-Age', '86400');
 
+    if (req.method === 'OPTIONS') return res.status(204).end();
+
     // Used when the client sends wrong information, etc.
     res.badRequest = (message: string, extra: Record<string, any> = {}) => {
       res.json(
@@ -140,6 +142,7 @@ export const withZipline =
       const unsigned = unsign64(cookie, config.core.secret);
       return unsigned ? unsigned : null;
     };
+
     req.cleanCookie = (name: string) => {
       res.setHeader(
         'Set-Cookie',
