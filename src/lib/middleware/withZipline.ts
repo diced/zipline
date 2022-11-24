@@ -59,9 +59,11 @@ export const withZipline =
     api_config: ZiplineApiConfig = { methods: ['GET'] }
   ) =>
   (req: NextApiReq, res: NextApiRes) => {
+    api_config.methods.push('OPTIONS');
+
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Content-Allow-Methods', 'GET,HEAD,POST,OPTIONS');
+    res.setHeader('Access-Content-Allow-Methods', api_config.methods.join(','));
     res.setHeader('Access-Control-Max-Age', '86400');
 
     // Used when the client sends wrong information, etc.
