@@ -77,13 +77,9 @@ export default function readConfig() {
     map('DATASOURCE_S3_REGION', 'string', 'datasource.s3.region'),
     map('DATASOURCE_S3_USE_SSL', 'boolean', 'datasource.s3.use_ssl'),
 
-    map('DATASOURCE_SWIFT_USERNAME', 'string', 'datasource.swift.username'),
-    map('DATASOURCE_SWIFT_PASSWORD', 'string', 'datasource.swift.password'),
-    map('DATASOURCE_SWIFT_AUTH_ENDPOINT', 'string', 'datasource.swift.auth_endpoint'),
-    map('DATASOURCE_SWIFT_CONTAINER', 'string', 'datasource.swift.container'),
-    map('DATASOURCE_SWIFT_PROJECT_ID', 'string', 'datasource.swift.project_id'),
-    map('DATASOURCE_SWIFT_DOMAIN_ID', 'string', 'datasource.swift.domain_id'),
-    map('DATASOURCE_SWIFT_REGION_ID', 'string', 'datasource.swift.region_id'),
+    map('DATASOURCE_SUPABASE_URL', 'string', 'datasource.supabase.url'),
+    map('DATASOURCE_SUPABASE_KEY', 'string', 'datasource.supabase.key'),
+    map('DATASOURCE_SUPABASE_BUCKET', 'string', 'datasource.supabase.bucket'),
 
     map('UPLOADER_DEFAULT_FORMAT', 'string', 'uploader.default_format'),
     map('UPLOADER_ROUTE', 'string', 'uploader.route'),
