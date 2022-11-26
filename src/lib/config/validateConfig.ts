@@ -34,7 +34,7 @@ const validator = s.object({
   }),
   datasource: s
     .object({
-      type: s.enum('local', 's3', 'swift').default('local'),
+      type: s.enum('local', 's3', 'swift', 'supabase').default('local'),
       local: s
         .object({
           directory: s.string.default('./uploads'),
@@ -60,6 +60,11 @@ const validator = s.object({
         project_id: s.string,
         domain_id: s.string.default('default'),
         region_id: s.string.nullable,
+      }).optional,
+      supabase: s.object({
+        url: s.string,
+        key: s.string,
+        bucket: s.string,
       }).optional,
     })
     .default({

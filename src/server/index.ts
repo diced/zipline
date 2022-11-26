@@ -236,7 +236,10 @@ async function rawFile(req: IncomingMessage, res: OutgoingMessage, nextServer: N
   res.setHeader('Content-Length', size);
 
   data.pipe(res);
-  data.on('error', () => nextServer.render404(req, res as ServerResponse));
+  data.on('error', (e) => {
+    logger.debug(`error while serving raw file ${id}: ${e}`);
+    nextServer.render404(req, res as ServerResponse);
+  });
   data.on('end', () => res.end());
 }
 
@@ -257,8 +260,12 @@ async function fileDb(
 
   res.setHeader('Content-Type', image.mimetype);
   res.setHeader('Content-Length', size);
+
   data.pipe(res);
-  data.on('error', () => nextServer.render404(req, res as ServerResponse));
+  data.on('error', (e) => {
+    logger.debug(`error while serving raw file ${image.file}: ${e}`);
+    nextServer.render404(req, res as ServerResponse);
+  });
   data.on('end', () => res.end());
 }
 
