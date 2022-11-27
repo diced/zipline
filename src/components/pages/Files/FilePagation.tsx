@@ -13,7 +13,7 @@ export default function FilePagation({ disableMediaPreview, exifEnabled }) {
 
   if (pages.isSuccess && pages.data.length === 0) {
     return (
-      <Center>
+      <Center sx={{ flexDirection: 'column' }}>
         <Group>
           <div>
             <FileIcon size={48} />
@@ -21,16 +21,16 @@ export default function FilePagation({ disableMediaPreview, exifEnabled }) {
           <div>
             <Title>Nothing here</Title>
             <MutedText size='md'>Upload some files and they will show up here.</MutedText>
-            <div hidden={checked}>
-              <MutedText size='md'>
-                There might be some non-media files. Would you like to show them?{' '}
-                <Button compact type='button' onClick={() => setChecked(true)}>
-                  Sure!
-                </Button>
-              </MutedText>
-            </div>
           </div>
         </Group>
+        <Box my='sm' hidden={checked}>
+          <MutedText size='md'>
+            There might be some non-media files, would you like to show them?
+            <Button mx='sm' compact type='button' onClick={() => setChecked(true)}>
+              Show
+            </Button>
+          </MutedText>
+        </Box>
       </Center>
     );
   }
