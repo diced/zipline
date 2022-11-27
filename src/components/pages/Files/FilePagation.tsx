@@ -21,14 +21,14 @@ export default function FilePagation({ disableMediaPreview, exifEnabled }) {
           <div>
             <Title>Nothing here</Title>
             <MutedText size='md'>Upload some files and they will show up here.</MutedText>
-          </div>
-          <div hidden={checked}>
-            <MutedText size='md'>
-              There might be some non-media files. Would you like to show them?{' '}
-              <Button compact type='button' onClick={() => setChecked(true)}>
-                Sure!
-              </Button>
-            </MutedText>
+            <div hidden={checked}>
+              <MutedText size='md'>
+                There might be some non-media files. Would you like to show them?{' '}
+                <Button compact type='button' onClick={() => setChecked(true)}>
+                  Sure!
+                </Button>
+              </MutedText>
+            </div>
           </div>
         </Group>
       </Center>
