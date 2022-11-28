@@ -1,5 +1,6 @@
 import { Image, PrismaClient } from '@prisma/client';
 import Router from 'find-my-way';
+import { createReadStream, existsSync } from 'fs';
 import { mkdir } from 'fs/promises';
 import { createServer, IncomingMessage, OutgoingMessage, ServerResponse } from 'http';
 import next from 'next';
@@ -82,6 +83,15 @@ async function start() {
     defaultRoute: (req, res) => {
       handle(req, res);
     },
+  });
+
+  router.on('GET', '/favicon.ico', async (req, res) => {
+    if (!existsSync('./public/favicon.ico')) return nextServer.render404(req, res);
+
+    const favicon = createReadStream('./public/favicon.ico');
+    res.setHeader('Content-Type', 'image/x-icon');
+
+    favicon.pipe(res);
   });
 
   router.on('GET', `${config.urls.route}/:id`, async (req, res, params) => {
