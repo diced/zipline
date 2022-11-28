@@ -123,7 +123,7 @@ async function start() {
     config.uploader.route === '/' ? '/:id' : `${config.uploader.route}/:id`,
     async (req, res, params) => {
       if (params.id === '') return nextServer.render404(req, res as ServerResponse);
-      else if (params.id === 'dashboard') return nextServer.render(req, res as ServerResponse, '/dasboard');
+      else if (params.id === 'dashboard') return nextServer.render(req, res as ServerResponse, '/dashboard');
 
       const image = await prisma.image.findFirst({
         where: {
