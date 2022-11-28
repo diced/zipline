@@ -149,7 +149,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
       const file = await prisma.image.create({
         data: {
-          file: `${fileName}${compressionUsed ? '.jpg' : ext ?? ''}`,
+          file: `${fileName}${compressionUsed ? '.jpg' : `${ext ? '.' : ''}${ext}`}`,
           mimetype,
           userId: user.id,
           embed: !!req.headers.embed,
@@ -273,7 +273,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     let invis: InvisibleImage;
     const image = await prisma.image.create({
       data: {
-        file: `${fileName}${compressionUsed ? '.jpg' : ext ?? ''}`,
+        file: `${fileName}${compressionUsed ? '.jpg' : `${ext ? '.' : ''}${ext}`}`,
         mimetype: req.headers.uploadtext ? 'text/plain' : compressionUsed ? 'image/jpeg' : file.mimetype,
         userId: user.id,
         embed: !!req.headers.embed,

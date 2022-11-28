@@ -32,16 +32,6 @@ export interface ConfigS3Datasource {
   region?: string;
 }
 
-export interface ConfigSwiftDatasource {
-  container: string;
-  auth_endpoint: string;
-  username: string;
-  password: string;
-  project_id: string;
-  domain_id?: string;
-  region_id?: string;
-}
-
 export interface ConfigSupabaseDatasource {
   url: string;
   key: string;
