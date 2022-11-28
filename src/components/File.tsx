@@ -43,13 +43,11 @@ export function FileMeta({ Icon, title, subtitle, ...other }) {
   );
 }
 
-export default function File({ image, updateImages, disableMediaPreview, exifEnabled }) {
+export default function File({ image, disableMediaPreview, exifEnabled }) {
   const [open, setOpen] = useState(false);
   const deleteFile = useFileDelete();
   const favoriteFile = useFileFavorite();
   const clipboard = useClipboard();
-
-  console.log(exifEnabled);
 
   const loading = deleteFile.isLoading || favoriteFile.isLoading;
 

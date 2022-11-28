@@ -2,7 +2,7 @@ import { Card as MantineCard, Center, Group, SimpleGrid, Skeleton, Title } from 
 import { randomId } from '@mantine/hooks';
 import File from 'components/File';
 import MutedText from 'components/MutedText';
-import { invalidateFiles, useRecent } from 'lib/queries/files';
+import { useRecent } from 'lib/queries/files';
 import { UploadCloud } from 'react-feather';
 
 export default function RecentFiles({ disableMediaPreview, exifEnabled }) {
@@ -22,7 +22,6 @@ export default function RecentFiles({ disableMediaPreview, exifEnabled }) {
               <File
                 key={randomId()}
                 image={image}
-                updateImages={invalidateFiles}
                 disableMediaPreview={disableMediaPreview}
                 exifEnabled={exifEnabled}
               />
