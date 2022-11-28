@@ -221,6 +221,16 @@ export default function validate(config): Config {
         if (errors.length) throw { errors };
         break;
       }
+      case 'supabase': {
+        const errors = [];
+        
+        if (!validated.datasource.supabase.key) errors.push('datasource.supabase.key is a required field');
+        if (!validated.datasource.supabase.url) errors.push('datasource.supabase.url is a required field');
+        if (!validated.datasource.supabase.bucket) errors.push('datasource.supabase.bucket is a required field');
+        if (errors.length) throw { errors };
+        
+        break;
+      }
     }
 
     return validated as unknown as Config;
