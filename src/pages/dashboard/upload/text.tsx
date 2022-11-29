@@ -1,6 +1,6 @@
 import { LoadingOverlay } from '@mantine/core';
 import Layout from 'components/Layout';
-import UploadText from 'components/pages/UploadText';
+import Text from 'components/pages/Upload/Text';
 import useLogin from 'hooks/useLogin';
 import Head from 'next/head';
 export { getServerSideProps } from 'middleware/getServerSideProps';
@@ -17,7 +17,7 @@ export default function UploadTextPage(props) {
         <title>{title}</title>
       </Head>
       <Layout props={props}>
-        <UploadText />
+        <Text />
       </Layout>
     </>
   );
