@@ -1,5 +1,6 @@
 import { Image, PrismaClient } from '@prisma/client';
 import Router from 'find-my-way';
+import { createReadStream, existsSync } from 'fs';
 import { mkdir } from 'fs/promises';
 import { createServer, IncomingMessage, OutgoingMessage, ServerResponse } from 'http';
 import next from 'next';
@@ -84,6 +85,15 @@ async function start() {
     },
   });
 
+  router.on('GET', '/favicon.ico', async (req, res) => {
+    if (!existsSync('./public/favicon.ico')) return nextServer.render404(req, res);
+
+    const favicon = createReadStream('./public/favicon.ico');
+    res.setHeader('Content-Type', 'image/x-icon');
+
+    favicon.pipe(res);
+  });
+
   router.on('GET', `${config.urls.route}/:id`, async (req, res, params) => {
     if (params.id === '') return nextServer.render404(req, res as ServerResponse);
 
@@ -118,27 +128,32 @@ async function start() {
     return redirect(res, url.destination);
   });
 
-  router.on('GET', `${config.uploader.route}/:id`, async (req, res, params) => {
-    if (params.id === '') return nextServer.render404(req, res as ServerResponse);
+  router.on(
+    'GET',
+    config.uploader.route === '/' ? '/:id' : `${config.uploader.route}/:id`,
+    async (req, res, params) => {
+      if (params.id === '') return nextServer.render404(req, res as ServerResponse);
+      else if (params.id === 'dashboard') return nextServer.render(req, res as ServerResponse, '/dashboard');
 
-    const image = await prisma.image.findFirst({
-      where: {
-        OR: [{ file: params.id }, { invisible: { invis: decodeURI(params.id) } }],
-      },
-    });
+      const image = await prisma.image.findFirst({
+        where: {
+          OR: [{ file: params.id }, { invisible: { invis: decodeURI(params.id) } }],
+        },
+      });
 
-    if (!image) return rawFile(req, res, nextServer, params.id);
-    else {
-      const failed = await preFile(image, prisma);
-      if (failed) return nextServer.render404(req, res as ServerResponse);
+      if (!image) return rawFile(req, res, nextServer, params.id);
+      else {
+        const failed = await preFile(image, prisma);
+        if (failed) return nextServer.render404(req, res as ServerResponse);
 
-      if (image.password || image.embed || image.mimetype.startsWith('text/'))
-        redirect(res, `/view/${image.file}`);
-      else fileDb(req, res, nextServer, handle, image);
+        if (image.password || image.embed || image.mimetype.startsWith('text/'))
+          redirect(res, `/view/${image.file}`);
+        else fileDb(req, res, nextServer, handle, image);
 
-      postFile(image, prisma);
+        postFile(image, prisma);
+      }
     }
-  });
+  );
 
   router.on('GET', '/r/:id', async (req, res, params) => {
     if (params.id === '') return nextServer.render404(req, res as ServerResponse);
@@ -236,7 +251,10 @@ async function rawFile(req: IncomingMessage, res: OutgoingMessage, nextServer: N
   res.setHeader('Content-Length', size);
 
   data.pipe(res);
-  data.on('error', () => nextServer.render404(req, res as ServerResponse));
+  data.on('error', (e) => {
+    logger.debug(`error while serving raw file ${id}: ${e}`);
+    nextServer.render404(req, res as ServerResponse);
+  });
   data.on('end', () => res.end());
 }
 
@@ -257,8 +275,12 @@ async function fileDb(
 
   res.setHeader('Content-Type', image.mimetype);
   res.setHeader('Content-Length', size);
+
   data.pipe(res);
-  data.on('error', () => nextServer.render404(req, res as ServerResponse));
+  data.on('error', (e) => {
+    logger.debug(`error while serving raw file ${image.file}: ${e}`);
+    nextServer.render404(req, res as ServerResponse);
+  });
   data.on('end', () => res.end());
 }
 

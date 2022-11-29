@@ -34,7 +34,7 @@ const validator = s.object({
   }),
   datasource: s
     .object({
-      type: s.enum('local', 's3', 'swift').default('local'),
+      type: s.enum('local', 's3', 'supabase').default('local'),
       local: s
         .object({
           directory: s.string.default('./uploads'),
@@ -52,14 +52,10 @@ const validator = s.object({
         region: s.string.default('us-east-1'),
         use_ssl: s.boolean.default(false),
       }).optional,
-      swift: s.object({
-        username: s.string,
-        password: s.string,
-        auth_endpoint: s.string,
-        container: s.string,
-        project_id: s.string,
-        domain_id: s.string.default('default'),
-        region_id: s.string.nullable,
+      supabase: s.object({
+        url: s.string,
+        key: s.string,
+        bucket: s.string,
       }).optional,
     })
     .default({
@@ -71,12 +67,10 @@ const validator = s.object({
         region: 'us-east-1',
         force_s3_path: false,
       },
-      swift: {
-        domain_id: 'default',
-      },
     }),
   uploader: s
     .object({
+      default_format: s.string.default('RANDOM'),
       route: s.string.default('/u'),
       embed_route: s.string.default('/a'),
       length: s.number.default(6),
@@ -86,6 +80,7 @@ const validator = s.object({
       format_date: s.string.default('YYYY-MM-DD_HH:mm:ss'),
     })
     .default({
+      default_format: 'RANDOM',
       route: '/u',
       embed_route: '/a',
       length: 6,
@@ -228,19 +223,15 @@ export default function validate(config): Config {
         if (errors.length) throw { errors };
         break;
       }
-      case 'swift': {
+      case 'supabase': {
         const errors = [];
-        if (!validated.datasource.swift.container)
-          errors.push('datasource.swift.container is a required field');
-        if (!validated.datasource.swift.project_id)
-          errors.push('datasource.swift.project_id is a required field');
-        if (!validated.datasource.swift.auth_endpoint)
-          errors.push('datasource.swift.auth_endpoint is a required field');
-        if (!validated.datasource.swift.password)
-          errors.push('datasource.swift.password is a required field');
-        if (!validated.datasource.swift.username)
-          errors.push('datasource.swift.username is a required field');
+
+        if (!validated.datasource.supabase.key) errors.push('datasource.supabase.key is a required field');
+        if (!validated.datasource.supabase.url) errors.push('datasource.supabase.url is a required field');
+        if (!validated.datasource.supabase.bucket)
+          errors.push('datasource.supabase.bucket is a required field');
         if (errors.length) throw { errors };
+
         break;
       }
     }

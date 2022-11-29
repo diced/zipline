@@ -59,10 +59,15 @@ export const withZipline =
     api_config: ZiplineApiConfig = { methods: ['GET'] }
   ) =>
   (req: NextApiReq, res: NextApiRes) => {
+    api_config.methods.push('OPTIONS');
+
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Content-Allow-Methods', 'GET,HEAD,POST,OPTIONS');
+    res.setHeader('Access-Content-Allow-Methods', api_config.methods.join(','));
     res.setHeader('Access-Control-Max-Age', '86400');
+    res.setHeader('Access-Control-Allow-Headers', '*');
+
+    if (req.method === 'OPTIONS') return res.status(204).end();
 
     // Used when the client sends wrong information, etc.
     res.badRequest = (message: string, extra: Record<string, any> = {}) => {
@@ -138,6 +143,7 @@ export const withZipline =
       const unsigned = unsign64(cookie, config.core.secret);
       return unsigned ? unsigned : null;
     };
+
     req.cleanCookie = (name: string) => {
       res.setHeader(
         'Set-Cookie',

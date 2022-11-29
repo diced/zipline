@@ -32,6 +32,7 @@ import DiscordIcon from './DiscordIcon';
 import GoogleIcon from './GoogleIcon';
 import EyeIcon from './EyeIcon';
 import RefreshIcon from './RefreshIcon';
+import KeyIcon from './KeyIcon';
 
 export {
   ActivityIcon,
@@ -68,4 +69,5 @@ export {
   GoogleIcon,
   EyeIcon,
   RefreshIcon,
+  KeyIcon,
 };

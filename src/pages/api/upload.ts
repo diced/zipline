@@ -49,7 +49,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     }
   }
 
-  const rawFormat = ((req.headers.format || '') as string).toUpperCase() || 'RANDOM';
+  const rawFormat = ((req.headers.format || '') as string).toUpperCase() || zconfig.uploader.default_format;
   const format: ImageFormat = Object.keys(ImageFormat).includes(rawFormat) && ImageFormat[rawFormat];
 
   const imageCompressionPercent = req.headers['image-compression-percent']
@@ -116,7 +116,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         chunks.set(buffer, chunkData.start);
       }
 
-      const ext = filename.split('.').pop();
+      const ext = filename.split('.').length === 1 ? '' : filename.split('.').pop();
       if (zconfig.uploader.disabled_extensions.includes(ext))
         return res.error('disabled extension recieved: ' + ext);
       let fileName: string;
@@ -149,7 +149,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
       const file = await prisma.image.create({
         data: {
-          file: `${fileName}.${compressionUsed ? 'jpg' : ext}`,
+          file: `${fileName}${compressionUsed ? '.jpg' : `${ext ? '.' : ''}${ext}`}`,
           mimetype,
           userId: user.id,
           embed: !!req.headers.embed,
@@ -241,7 +241,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       return res.badRequest(`file[${i}]: size too big`);
     if (!file.originalname) return res.badRequest(`file[${i}]: no filename`);
 
-    const ext = file.originalname.split('.').pop();
+    const ext = file.originalname.split('.').length === 1 ? '' : file.originalname.split('.').pop();
     if (zconfig.uploader.disabled_extensions.includes(ext))
       return res.badRequest(`file[${i}]: disabled extension recieved: ${ext}`);
     let fileName: string;
@@ -273,7 +273,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     let invis: InvisibleImage;
     const image = await prisma.image.create({
       data: {
-        file: `${fileName}.${compressionUsed ? 'jpg' : ext}`,
+        file: `${fileName}${compressionUsed ? '.jpg' : `${ext ? '.' : ''}${ext}`}`,
         mimetype: req.headers.uploadtext ? 'text/plain' : compressionUsed ? 'image/jpeg' : file.mimetype,
         userId: user.id,
         embed: !!req.headers.embed,

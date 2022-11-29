@@ -47,7 +47,6 @@ export default function Files({ disableMediaPreview, exifEnabled }) {
                       <div key={image.id}>
                         <File
                           image={image}
-                          updateImages={() => updatePages(true)}
                           disableMediaPreview={disableMediaPreview}
                           exifEnabled={exifEnabled}
                         />

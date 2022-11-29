@@ -11,10 +11,10 @@ export interface ConfigCore {
 }
 
 export interface ConfigDatasource {
-  type: 'local' | 's3' | 'swift';
+  type: 'local' | 's3' | 'supabase';
   local: ConfigLocalDatasource;
   s3?: ConfigS3Datasource;
-  swift?: ConfigSwiftDatasource;
+  supabase?: ConfigSupabaseDatasource;
 }
 
 export interface ConfigLocalDatasource {
@@ -32,17 +32,14 @@ export interface ConfigS3Datasource {
   region?: string;
 }
 
-export interface ConfigSwiftDatasource {
-  container: string;
-  auth_endpoint: string;
-  username: string;
-  password: string;
-  project_id: string;
-  domain_id?: string;
-  region_id?: string;
+export interface ConfigSupabaseDatasource {
+  url: string;
+  key: string;
+  bucket: string;
 }
 
 export interface ConfigUploader {
+  default_format: string;
   route: string;
   length: number;
   admin_limit: number;

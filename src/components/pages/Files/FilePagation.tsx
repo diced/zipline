@@ -1,4 +1,4 @@
-import { Box, Center, Checkbox, Group, Pagination, SimpleGrid, Skeleton, Title } from '@mantine/core';
+import { Box, Button, Center, Checkbox, Group, Pagination, SimpleGrid, Skeleton, Title } from '@mantine/core';
 import File from 'components/File';
 import { FileIcon } from 'components/icons';
 import MutedText from 'components/MutedText';
@@ -13,7 +13,7 @@ export default function FilePagation({ disableMediaPreview, exifEnabled }) {
 
   if (pages.isSuccess && pages.data.length === 0) {
     return (
-      <Center>
+      <Center sx={{ flexDirection: 'column' }}>
         <Group>
           <div>
             <FileIcon size={48} />
@@ -23,6 +23,14 @@ export default function FilePagation({ disableMediaPreview, exifEnabled }) {
             <MutedText size='md'>Upload some files and they will show up here.</MutedText>
           </div>
         </Group>
+        <Box my='sm' hidden={checked}>
+          <MutedText size='md'>
+            There might be some non-media files, would you like to show them?
+            <Button mx='sm' compact type='button' onClick={() => setChecked(true)}>
+              Show
+            </Button>
+          </MutedText>
+        </Box>
       </Center>
     );
   }
@@ -36,7 +44,6 @@ export default function FilePagation({ disableMediaPreview, exifEnabled }) {
                 <div key={image.id}>
                   <File
                     image={image}
-                    updateImages={() => pages.refetch()}
                     disableMediaPreview={disableMediaPreview}
                     exifEnabled={exifEnabled}
                   />
