@@ -1,6 +1,6 @@
 import { LoadingOverlay } from '@mantine/core';
 import Layout from 'components/Layout';
-import Upload from 'components/pages/Upload';
+import File from 'components/pages/Upload/File';
 import useLogin from 'hooks/useLogin';
 import Head from 'next/head';
 export { getServerSideProps } from 'middleware/getServerSideProps';
@@ -17,7 +17,7 @@ export default function UploadPage(props) {
         <title>{title}</title>
       </Head>
       <Layout props={props}>
-        <Upload chunks={{ chunks_size: props.chunks_size, max_size: props.max_size }} />
+        <File chunks={{ chunks_size: props.chunks_size, max_size: props.max_size }} />
       </Layout>
     </>
   );

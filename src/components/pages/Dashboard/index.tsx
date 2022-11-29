@@ -35,14 +35,14 @@ export default function Dashboard({ disableMediaPreview, exifEnabled }) {
     if (!res.error) {
       updateImages();
       showNotification({
-        title: 'Image Deleted',
-        message: '',
+        title: 'File Deleted',
+        message: `${original.name}`,
         color: 'green',
         icon: <DeleteIcon />,
       });
     } else {
       showNotification({
-        title: 'Failed to delete image',
+        title: 'Failed to Delete File',
         message: res.error,
         color: 'red',
         icon: <CrossIcon />,
@@ -54,7 +54,11 @@ export default function Dashboard({ disableMediaPreview, exifEnabled }) {
     clipboard.copy(`${window.location.protocol}//${window.location.host}${original.url}`);
     showNotification({
       title: 'Copied to clipboard',
-      message: '',
+      message: (
+        <a
+          href={`${window.location.protocol}//${window.location.host}${original.url}`}
+        >{`${window.location.protocol}//${window.location.host}${original.url}`}</a>
+      ),
       icon: <CopyIcon />,
     });
   };

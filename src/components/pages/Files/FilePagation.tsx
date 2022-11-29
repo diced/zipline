@@ -44,7 +44,6 @@ export default function FilePagation({ disableMediaPreview, exifEnabled }) {
                 <div key={image.id}>
                   <File
                     image={image}
-                    updateImages={() => pages.refetch()}
                     disableMediaPreview={disableMediaPreview}
                     exifEnabled={exifEnabled}
                   />

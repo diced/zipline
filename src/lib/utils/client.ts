@@ -102,3 +102,39 @@ export function expireText(to_: string, from_: string = new Date().toLocaleStrin
     return `Expired ${dayjs(from).to(to)}`;
   }
 }
+
+export function expireReadToDate(expires: string): Date {
+  if (expires === 'never') return null;
+
+  return new Date(
+    {
+      '5min': Date.now() + 5 * 60 * 1000,
+      '10min': Date.now() + 10 * 60 * 1000,
+      '15min': Date.now() + 15 * 60 * 1000,
+      '30min': Date.now() + 30 * 60 * 1000,
+      '1h': Date.now() + 60 * 60 * 1000,
+      '2h': Date.now() + 2 * 60 * 60 * 1000,
+      '3h': Date.now() + 3 * 60 * 60 * 1000,
+      '4h': Date.now() + 4 * 60 * 60 * 1000,
+      '5h': Date.now() + 5 * 60 * 60 * 1000,
+      '6h': Date.now() + 6 * 60 * 60 * 1000,
+      '8h': Date.now() + 8 * 60 * 60 * 1000,
+      '12h': Date.now() + 12 * 60 * 60 * 1000,
+      '1d': Date.now() + 24 * 60 * 60 * 1000,
+      '3d': Date.now() + 3 * 24 * 60 * 60 * 1000,
+      '5d': Date.now() + 5 * 24 * 60 * 60 * 1000,
+      '7d': Date.now() + 7 * 24 * 60 * 60 * 1000,
+      '1w': Date.now() + 7 * 24 * 60 * 60 * 1000,
+      '1.5w': Date.now() + 1.5 * 7 * 24 * 60 * 60 * 1000,
+      '2w': Date.now() + 2 * 7 * 24 * 60 * 60 * 1000,
+      '3w': Date.now() + 3 * 7 * 24 * 60 * 60 * 1000,
+      '1m': Date.now() + 30 * 24 * 60 * 60 * 1000,
+      '1.5m': Date.now() + 1.5 * 30 * 24 * 60 * 60 * 1000,
+      '2m': Date.now() + 2 * 30 * 24 * 60 * 60 * 1000,
+      '3m': Date.now() + 3 * 30 * 24 * 60 * 60 * 1000,
+      '6m': Date.now() + 6 * 30 * 24 * 60 * 60 * 1000,
+      '8m': Date.now() + 8 * 30 * 24 * 60 * 60 * 1000,
+      '1y': Date.now() + 365 * 24 * 60 * 60 * 1000,
+    }[expires]
+  );
+}
