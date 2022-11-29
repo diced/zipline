@@ -139,7 +139,7 @@ curl -H "Content-Type: multipart/form-data" -H "authorization: $TOKEN" -F file=@
 
 ## Bug reports
 
-Create an issue on GitHub, please include the following (if one of them is not applicable to the issue then it's not needed):
+Create an issue on GitHub and use the template, please include the following (if one of them is not applicable to the issue then it's not needed):
 
 - The steps to reproduce the bug
 - Logs of Zipline
