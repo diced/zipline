@@ -56,7 +56,7 @@ model InvisibleImage {
   id      Int    @id @default(autoincrement())
   invis   String @unique
   imageId Int    @unique
-  image   Image  @relation(fields: [imageId], references: [id])
+  image   Image  @relation(fields: [imageId], references: [id], onDelete: Cascade)
 }
 
 model Url {
@@ -67,15 +67,15 @@ model Url {
   maxViews    Int?
   views       Int           @default(0)
   invisible   InvisibleUrl?
-  user        User          @relation(fields: [userId], references: [id])
-  userId      Int
+  user        User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId      Int?
 }
 
 model InvisibleUrl {
   id    Int    @id @default(autoincrement())
   invis String @unique
   urlId String @unique
-  url   Url    @relation(fields: [urlId], references: [id])
+  url   Url    @relation(fields: [urlId], references: [id], onDelete: Cascade)
 }
 
 model Stats {
@@ -90,7 +90,7 @@ model Invite {
   created_at  DateTime  @default(now())
   expires_at  DateTime?
   used        Boolean   @default(false)
-  createdBy   User      @relation(fields: [createdById], references: [id])
+  createdBy   User      @relation(fields: [createdById], references: [id], onDelete: Cascade)
   createdById Int
 }
 
