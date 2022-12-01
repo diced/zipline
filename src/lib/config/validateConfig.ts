@@ -166,12 +166,14 @@ const validator = s.object({
       invites_length: s.number.default(6),
       oauth_registration: s.boolean.default(false),
       user_registration: s.boolean.default(false),
+      headless: s.boolean.default(false),
     })
     .default({
       invites: false,
       invites_length: 6,
       oauth_registration: false,
       user_registration: false,
+      headless: false,
     }),
   chunks: s
     .object({

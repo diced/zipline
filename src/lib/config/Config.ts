@@ -102,6 +102,8 @@ export interface ConfigFeatures {
 
   oauth_registration: boolean;
   user_registration: boolean;
+
+  headless: boolean;
 }
 
 export interface ConfigOAuth {

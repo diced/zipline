@@ -81,12 +81,17 @@ async function start() {
   const handle = nextServer.getRequestHandler();
   const router = Router({
     defaultRoute: (req, res) => {
+      if (config.features.headless) {
+        const url = req.url.toLowerCase();
+        if (!url.startsWith('/api') || url === '/api') return notFound(req, res, nextServer);
+      }
+
       handle(req, res);
     },
   });
 
   router.on('GET', '/favicon.ico', async (req, res) => {
-    if (!existsSync('./public/favicon.ico')) return nextServer.render404(req, res);
+    if (!existsSync('./public/favicon.ico')) return notFound(req, res, nextServer);
 
     const favicon = createReadStream('./public/favicon.ico');
     res.setHeader('Content-Type', 'image/x-icon');
@@ -95,14 +100,14 @@ async function start() {
   });
 
   router.on('GET', `${config.urls.route}/:id`, async (req, res, params) => {
-    if (params.id === '') return nextServer.render404(req, res as ServerResponse);
+    if (params.id === '') return notFound(req, res, nextServer);
 
     const url = await prisma.url.findFirst({
       where: {
         OR: [{ id: params.id }, { vanity: params.id }, { invisible: { invis: decodeURI(params.id) } }],
       },
     });
-    if (!url) return nextServer.render404(req, res as ServerResponse);
+    if (!url) return notFound(req, res, nextServer);
 
     const nUrl = await prisma.url.update({
       where: {
@@ -122,7 +127,7 @@ async function start() {
 
       Logger.get('url').debug(`url deleted due to max views ${JSON.stringify(nUrl)}`);
 
-      return nextServer.render404(req, res as ServerResponse);
+      return notFound(req, res, nextServer);
     }
 
     return redirect(res, url.destination);
@@ -132,8 +137,9 @@ async function start() {
     'GET',
     config.uploader.route === '/' ? '/:id' : `${config.uploader.route}/:id`,
     async (req, res, params) => {
-      if (params.id === '') return nextServer.render404(req, res as ServerResponse);
-      else if (params.id === 'dashboard') return nextServer.render(req, res as ServerResponse, '/dashboard');
+      if (params.id === '') return notFound(req, res, nextServer);
+      else if (params.id === 'dashboard' && !config.features.headless)
+        return nextServer.render(req, res as ServerResponse, '/dashboard');
 
       const image = await prisma.image.findFirst({
         where: {
@@ -144,7 +150,7 @@ async function start() {
       if (!image) return rawFile(req, res, nextServer, params.id);
       else {
         const failed = await preFile(image, prisma);
-        if (failed) return nextServer.render404(req, res as ServerResponse);
+        if (failed) return notFound(req, res, nextServer);
 
         if (image.password || image.embed || image.mimetype.startsWith('text/'))
           redirect(res, `/view/${image.file}`);
@@ -156,7 +162,7 @@ async function start() {
   );
 
   router.on('GET', '/r/:id', async (req, res, params) => {
-    if (params.id === '') return nextServer.render404(req, res as ServerResponse);
+    if (params.id === '') return notFound(req, res, nextServer);
 
     const image = await prisma.image.findFirst({
       where: {
@@ -167,13 +173,17 @@ async function start() {
     if (!image) await rawFile(req, res, nextServer, params.id);
     else {
       const failed = await preFile(image, prisma);
-      if (failed) return nextServer.render404(req, res as ServerResponse);
+      if (failed) return notFound(req, res, nextServer);
 
       if (image.password) {
         res.setHeader('Content-Type', 'application/json');
         res.statusCode = 403;
         return res.end(
-          JSON.stringify({ error: "can't view a raw file that has a password", url: `/view/${image.file}` })
+          JSON.stringify({
+            error: "can't view a raw file that has a password",
+            url: `/view/${image.file}`,
+            code: 403,
+          })
         );
       } else await rawFile(req, res, nextServer, params.id);
     }
@@ -202,13 +212,27 @@ async function start() {
 
   http.listen(config.core.port, config.core.host ?? '0.0.0.0');
 
-  logger.info(`started ${dev ? 'development' : 'production'} zipline@${version} server`);
+  logger.info(
+    `started ${dev ? 'development' : 'production'} zipline@${version} server${
+      config.features.headless ? ' (headless)' : ''
+    }`
+  );
 
   stats(prisma);
   clearInvites(prisma);
 
   setInterval(() => clearInvites(prisma), config.core.invites_interval * 1000);
   setInterval(() => stats(prisma), config.core.stats_interval * 1000);
+}
+
+async function notFound(req: IncomingMessage, res: ServerResponse, nextServer: NextServer) {
+  if (config.features.headless) {
+    res.statusCode = 404;
+    res.setHeader('Content-Type', 'application/json');
+    return res.end(JSON.stringify({ error: 'not found', url: req.url, code: 404 }));
+  } else {
+    return notFound(req, res, nextServer);
+  }
 }
 
 async function preFile(file: Image, prisma: PrismaClient) {
@@ -242,7 +266,7 @@ async function postFile(file: Image, prisma: PrismaClient) {
 
 async function rawFile(req: IncomingMessage, res: OutgoingMessage, nextServer: NextServer, id: string) {
   const data = await datasource.get(id);
-  if (!data) return nextServer.render404(req, res as ServerResponse);
+  if (!data) return notFound(req, res as ServerResponse, nextServer);
 
   const mimetype = await guess(extname(id));
   const size = await datasource.size(id);
@@ -253,7 +277,7 @@ async function rawFile(req: IncomingMessage, res: OutgoingMessage, nextServer: N
   data.pipe(res);
   data.on('error', (e) => {
     logger.debug(`error while serving raw file ${id}: ${e}`);
-    nextServer.render404(req, res as ServerResponse);
+    notFound(req, res as ServerResponse, nextServer);
   });
   data.on('end', () => res.end());
 }
@@ -269,7 +293,7 @@ async function fileDb(
   if (Object.keys(exts).includes(ext)) return handle(req, res as ServerResponse);
 
   const data = await datasource.get(image.file);
-  if (!data) return nextServer.render404(req, res as ServerResponse);
+  if (!data) return notFound(req, res as ServerResponse, nextServer);
 
   const size = await datasource.size(image.file);
 
@@ -279,7 +303,7 @@ async function fileDb(
   data.pipe(res);
   data.on('error', (e) => {
     logger.debug(`error while serving raw file ${image.file}: ${e}`);
-    nextServer.render404(req, res as ServerResponse);
+    notFound(req, res as ServerResponse, nextServer);
   });
   data.on('end', () => res.end());
 }

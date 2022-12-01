@@ -138,6 +138,8 @@ export default function readConfig() {
     map('FEATURES_OAUTH_REGISTRATION', 'boolean', 'features.oauth_registration'),
     map('FEATURES_USER_REGISTRATION', 'boolean', 'features.user_registration'),
 
+    map('FEATURES_HEADLESS', 'boolean', 'features.headless'),
+
     map('CHUNKS_MAX_SIZE', 'human-to-byte', 'chunks.max_size'),
     map('CHUNKS_CHUNKS_SIZE', 'human-to-byte', 'chunks.chunks_size'),
 

@@ -157,6 +157,18 @@ export const withZipline =
 
     req.user = async () => {
       try {
+        const authHeader = req.headers.authorization;
+        if (authHeader) {
+          const user = await prisma.user.findFirst({
+            where: {
+              token: authHeader,
+            },
+            include: { oauth: true },
+          });
+
+          if (user) return user;
+        }
+
         const userId = req.getCookie('user');
         if (!userId) return null;
 

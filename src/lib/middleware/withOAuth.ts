@@ -1,4 +1,5 @@
 import { OauthProviders } from '@prisma/client';
+import config from 'lib/config';
 import Logger from 'lib/logger';
 import prisma from 'lib/prisma';
 import { createToken } from 'lib/util';
@@ -30,6 +31,12 @@ export const withOAuth =
     const logger = Logger.get(`oauth::${provider}`);
 
     function oauthError(error: string) {
+      if (config.features.headless)
+        return res.json({
+          error,
+          provider,
+        });
+
       return res.redirect(`/oauth_error?error=${error}&provider=${provider}`);
     }
 
