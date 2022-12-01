@@ -46,6 +46,7 @@ export interface ConfigUploader {
   user_limit: number;
   disabled_extensions: string[];
   format_date: string;
+  default_expiration: string;
 }
 
 export interface ConfigUrls {

@@ -3,6 +3,7 @@ import { expand } from 'dotenv-expand';
 import { existsSync, readFileSync } from 'fs';
 import Logger from '../logger';
 import { humanToBytes } from '../utils/bytes';
+import { parseExpiry } from '../utils/client';
 
 export type ValueType = 'string' | 'number' | 'boolean' | 'array' | 'json-array' | 'human-to-byte';
 
@@ -88,6 +89,7 @@ export default function readConfig() {
     map('UPLOADER_USER_LIMIT', 'human-to-byte', 'uploader.user_limit'),
     map('UPLOADER_DISABLED_EXTENSIONS', 'array', 'uploader.disabled_extensions'),
     map('UPLOADER_FORMAT_DATE', 'string', 'uploader.format_date'),
+    map('UPLOADER_DEFAULT_EXPIRATION', 'string', 'uploader.default_expiration'),
 
     map('URLS_ROUTE', 'string', 'urls.route'),
     map('URLS_LENGTH', 'number', 'urls.length'),

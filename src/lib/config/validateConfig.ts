@@ -78,6 +78,7 @@ const validator = s.object({
       user_limit: s.number.default(humanToBytes('100MB')),
       disabled_extensions: s.string.array.default([]),
       format_date: s.string.default('YYYY-MM-DD_HH:mm:ss'),
+      default_expiration: s.string.optional.default(null),
     })
     .default({
       default_format: 'RANDOM',
@@ -88,6 +89,7 @@ const validator = s.object({
       user_limit: humanToBytes('100MB'),
       disabled_extensions: [],
       format_date: 'YYYY-MM-DD_HH:mm:ss',
+      default_expiration: null,
     }),
   urls: s
     .object({

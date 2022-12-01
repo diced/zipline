@@ -49,6 +49,11 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     }
   }
 
+  if (zconfig.uploader.default_expiration) {
+    expiry = parseExpiry(zconfig.uploader.default_expiration);
+    if (!expiry) return res.badRequest('invalid date (UPLOADER_DEFAULT_EXPIRATION)');
+  }
+
   const rawFormat = ((req.headers.format || '') as string).toUpperCase() || zconfig.uploader.default_format;
   const format: ImageFormat = Object.keys(ImageFormat).includes(rawFormat) && ImageFormat[rawFormat];
 
