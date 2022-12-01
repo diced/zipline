@@ -1,7 +1,6 @@
 import {
   Accordion,
   Anchor,
-  Accordion,
   Box,
   Button,
   Card,
