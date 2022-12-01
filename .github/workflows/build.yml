@@ -2,9 +2,9 @@ name: 'Build'
 
 on:
   push:
-    branches: [ trunk ]
+    branches: [trunk]
   pull_request:
-    branches: [ trunk ]
+    branches: [trunk]
   workflow_dispatch:
 
 jobs:
@@ -15,7 +15,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '18.x'
-      
+
       - name: 'Restore dependency cache'
         id: cache-restore
         uses: actions/cache@v3

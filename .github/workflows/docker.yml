@@ -2,7 +2,7 @@ name: 'Push Docker Images'
 
 on:
   push:
-    branches: [ trunk ]
+    branches: [trunk]
     paths:
       - 'src/**'
       - 'server/**'

@@ -7,7 +7,7 @@ declare global {
     interface Global {
       prisma: PrismaClient;
       config: Config;
-      datasource: Datasource
+      datasource: Datasource;
     }
 
     interface ProcessEnv {
