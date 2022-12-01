@@ -2,7 +2,7 @@ name: 'Push Release Docker Images'
 
 on:
   push:
-    tags:
+    tags: 
       - 'v*.*.*'
     paths:
       - 'src/**'
@@ -46,6 +46,6 @@ jobs:
           platforms: linux/amd64,linux/arm64
           tags: |
             ghcr.io/winterfe/zipline:latest
-            ghcr.io/winterfe/zipline:${{ steps.version.outputs.value }}
+            ghcr.io/winterfe/zipline:${{ steps.version.outputs.zipline_version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
