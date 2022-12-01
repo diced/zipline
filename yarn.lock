@@ -881,8 +881,10 @@ __metadata:
   version: 1.1.0
   resolution: "@azure/abort-controller@npm:1.1.0"
   dependencies:
-    "@jridgewell/gen-mapping" "^0.1.0"
-    "@jridgewell/trace-mapping" "^0.3.9"
+    tslib: ^2.2.0
+  checksum: 0f45e504d4aea799486867179afe7589255f6c111951279958e9d0aa5faebb2c96b8f88e3e3c958ce07b02bcba0b0cddb1bbec94705f573a48ecdb93eec1a92a
+  languageName: node
+  linkType: hard
 
 "@azure/core-auth@npm:^1.3.0, @azure/core-auth@npm:^1.4.0":
   version: 1.4.0
@@ -2103,8 +2105,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@radix-ui/number@1.0.0":
-  "version" "1.0.0"
+"@radix-ui/number@npm:1.0.0":
+  version: 1.0.0
+  resolution: "@radix-ui/number@npm:1.0.0"
   dependencies:
     "@babel/runtime": ^7.13.10
   checksum: 517ac0790e05cceb41401154d1bc55d4738accd51095e2a918ef9bcedac6a455cd7179201e88e76121bedec19cd93a37b2c20288b084fb224b69c74e67935457
@@ -2388,9 +2391,12 @@ __metadata:
   version: 4.17.31
   resolution: "@types/express-serve-static-core@npm:4.17.31"
   dependencies:
-    "@types/node" "*"
-    "@types/qs" "*"
-    "@types/range-parser" "*"
+    "@types/node": "*"
+    "@types/qs": "*"
+    "@types/range-parser": "*"
+  checksum: 009bfbe1070837454a1056aa710d0390ee5fb8c05dfe5a1691cc3e2ca88dc256f80e1ca27cb51a978681631d2f6431bfc9ec352ea46dd0c6eb183d0170bde5df
+  languageName: node
+  linkType: hard
 
 "@types/express@npm:*":
   version: 4.17.14
@@ -2471,8 +2477,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/normalize-package-data@^2.4.0":
-  "version" "2.4.1"
+"@types/normalize-package-data@npm:^2.4.0":
+  version: 2.4.1
+  resolution: "@types/normalize-package-data@npm:2.4.1"
+  checksum: e87bccbf11f95035c89a132b52b79ce69a1e3652fe55962363063c9c0dae0fe2477ebc585e03a9652adc6f381d24ba5589cc5e51849df4ced3d3e004a7d40ed5
+  languageName: node
+  linkType: hard
 
 "@types/parse-json@npm:^4.0.0":
   version: 4.0.0
@@ -2504,8 +2514,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/range-parser@*":
-  "version" "1.2.4"
+"@types/range-parser@npm:*":
+  version: 1.2.4
+  resolution: "@types/range-parser@npm:1.2.4"
+  checksum: b7c0dfd5080a989d6c8bb0b6750fc0933d9acabeb476da6fe71d8bdf1ab65e37c136169d84148034802f48378ab94e3c37bb4ef7656b2bec2cb9c0f8d4146a95
+  languageName: node
+  linkType: hard
 
 "@types/react@npm:^18.0.24":
   version: 18.0.25
@@ -2916,10 +2930,13 @@ __metadata:
   version: 5.4.1
   resolution: "asn1.js@npm:5.4.1"
   dependencies:
-    "bn.js" "^4.0.0"
-    "inherits" "^2.0.1"
-    "minimalistic-assert" "^1.0.0"
-    "safer-buffer" "^2.1.0"
+    bn.js: ^4.0.0
+    inherits: ^2.0.1
+    minimalistic-assert: ^1.0.0
+    safer-buffer: ^2.1.0
+  checksum: 3786a101ac6f304bd4e9a7df79549a7561950a13d4bcaec0c7790d44c80d147c1a94ba3d4e663673406064642a40b23fcd6c82a9952468e386c1a1376d747f9a
+  languageName: node
+  linkType: hard
 
 "ast-types-flow@npm:^0.0.7":
   version: 0.0.7
@@ -3304,8 +3321,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chalk@^2.0.0":
-  "version" "2.4.2"
+"chalk@npm:4.1.2, chalk@npm:^4.0.0, chalk@npm:^4.1.0":
+  version: 4.1.2
+  resolution: "chalk@npm:4.1.2"
   dependencies:
     ansi-styles: ^4.1.0
     supports-color: ^7.1.0
@@ -3444,8 +3462,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"clsx@1.1.1":
-  "version" "1.1.1"
+"clsx@npm:1.1.1":
+  version: 1.1.1
+  resolution: "clsx@npm:1.1.1"
+  checksum: ff052650329773b9b245177305fc4c4dc3129f7b2be84af4f58dc5defa99538c61d4207be7419405a5f8f3d92007c954f4daba5a7b74e563d5de71c28c830063
+  languageName: node
+  linkType: hard
 
 "color-convert@npm:^1.9.0":
   version: 1.9.3
@@ -3808,9 +3830,9 @@ __metadata:
   linkType: hard
 
 "decode-uri-component@npm:^0.2.1":
-  version: 0.2.1
-  resolution: "decode-uri-component@npm:0.2.1"
-  checksum: 6417d3aee8822f3e01010723936e0b2142c0ee5b1261d6d49643ae38d90ef490f0d7d12972da2790251cf6b85b1cbdec7ed304e6d31814c8b0a341d005b5f0e4
+  version: 0.2.2
+  resolution: "decode-uri-component@npm:0.2.2"
+  checksum: 95476a7d28f267292ce745eac3524a9079058bbb35767b76e3ee87d42e34cd0275d2eb19d9d08c3e167f97556e8a2872747f5e65cbebcac8b0c98d83e285f139
   languageName: node
   linkType: hard
 
@@ -4031,8 +4053,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"duplexer2@^0.1.2":
-  "version" "0.1.4"
+"duplexer2@npm:^0.1.2":
+  version: 0.1.4
+  resolution: "duplexer2@npm:0.1.4"
   dependencies:
     readable-stream: ^2.0.2
   checksum: 744961f03c7f54313f90555ac20284a3fb7bf22fdff6538f041a86c22499560eb6eac9d30ab5768054137cb40e6b18b40f621094e0261d7d8c35a37b7a5ad241
@@ -4119,8 +4142,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"entities@^3.0.1":
-  "version" "3.0.1"
+"entities@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "entities@npm:3.0.1"
+  checksum: aaf7f12033f0939be91f5161593f853f2da55866db55ccbf72f45430b8977e2b79dbd58c53d0fdd2d00bd7d313b75b0968d09f038df88e308aa97e39f9456572
+  languageName: node
+  linkType: hard
 
 "env-paths@npm:2.2.1, env-paths@npm:^2.2.0":
   version: 2.2.1
@@ -4829,8 +4856,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fast-decode-uri-component@^1.0.1":
-  "version" "1.0.1"
+"fast-decode-uri-component@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "fast-decode-uri-component@npm:1.0.1"
+  checksum: 427a48fe0907e76f0e9a2c228e253b4d8a8ab21d130ee9e4bb8339c5ba4086235cf9576831f7b20955a752eae4b525a177ff9d5825dd8d416e7726939194fbee
+  languageName: node
+  linkType: hard
 
 "fast-deep-equal@npm:^3.1.1, fast-deep-equal@npm:^3.1.3":
   version: 3.1.3
@@ -4904,7 +4935,12 @@ __metadata:
   version: 3.21.1
   resolution: "fast-xml-parser@npm:3.21.1"
   dependencies:
-    "strnum" "^1.0.4"
+    strnum: ^1.0.4
+  bin:
+    xml2js: cli.js
+  checksum: 73b9c907a424cc2f9b11a8a2f1b7448d936f1db6fa574b85cbe4be9739c2f77d99a827bb27d738a0db0047b20c71a5d663f64937fbdb9c38977fc6cd145221d2
+  languageName: node
+  linkType: hard
 
 "fastq@npm:^1.6.0":
   version: 1.13.0
@@ -5216,8 +5252,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"glob-parent@^5.1.2":
-  "version" "5.1.2"
+"glob-parent@npm:^5.1.2":
+  version: 5.1.2
+  resolution: "glob-parent@npm:5.1.2"
   dependencies:
     is-glob: ^4.0.1
   checksum: f4f2bfe2425296e8a47e36864e4f42be38a996db40420fe434565e4480e3322f18eb37589617a98640c5dc8fdec1a387007ee18dbb1f3f5553409c34d17f425e
@@ -5358,8 +5395,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"grapheme-splitter@^1.0.4":
-  "version" "1.0.4"
+"grapheme-splitter@npm:^1.0.4":
+  version: 1.0.4
+  resolution: "grapheme-splitter@npm:1.0.4"
+  checksum: 0c22ec54dee1b05cd480f78cf14f732cb5b108edc073572c4ec205df4cd63f30f8db8025afc5debc8835a8ddeacf648a1c7992fe3dcd6ad38f9a476d84906620
+  languageName: node
+  linkType: hard
 
 "hamt_plus@npm:1.0.2":
   version: 1.0.2
@@ -7318,7 +7359,10 @@ __metadata:
   version: 2.1.0
   resolution: "p-filter@npm:2.1.0"
   dependencies:
-    "p-map" "^2.0.0"
+    p-map: ^2.0.0
+  checksum: 76e552ca624ce2233448d68b19eec9de42b695208121998f7e011edce71d1079a83096ee6a2078fb2a59cfa8a5c999f046edf00ebf16a8e780022010b4693234
+  languageName: node
+  linkType: hard
 
 "p-limit@npm:^2.0.0, p-limit@npm:^2.2.0":
   version: 2.3.0
@@ -7874,8 +7918,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"queue-microtask@^1.2.2":
-  "version" "1.2.3"
+"queue-microtask@npm:^1.2.2":
+  version: 1.2.3
+  resolution: "queue-microtask@npm:1.2.3"
+  checksum: b676f8c040cdc5b12723ad2f91414d267605b26419d5c821ff03befa817ddd10e238d22b25d604920340fd73efd8ba795465a0377c4adf45a4a41e4234e42dc4
+  languageName: node
+  linkType: hard
 
 "randombytes@npm:^2.0.0, randombytes@npm:^2.0.1, randombytes@npm:^2.0.5":
   version: 2.1.0
@@ -9103,7 +9151,10 @@ __metadata:
   version: 0.2.1
   resolution: "tmp@npm:0.2.1"
   dependencies:
-    "rimraf" "^3.0.0"
+    rimraf: ^3.0.0
+  checksum: 8b1214654182575124498c87ca986ac53dc76ff36e8f0e0b67139a8d221eaecfdec108c0e6ec54d76f49f1f72ab9325500b246f562b926f85bcdfca8bf35df9e
+  languageName: node
+  linkType: hard
 
 "to-fast-properties@npm:^2.0.0":
   version: 2.0.0
@@ -9627,8 +9678,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"yaml@^1.10.0":
-  "version" "1.10.2"
+"yaml@npm:^1.10.0":
+  version: 1.10.2
+  resolution: "yaml@npm:1.10.2"
+  checksum: ce4ada136e8a78a0b08dc10b4b900936912d15de59905b2bf415b4d33c63df1d555d23acb2a41b23cf9fb5da41c256441afca3d6509de7247daa062fd2c5ea5f
+  languageName: node
+  linkType: hard
 
 "yargs-parser@npm:^18.1.2":
   version: 18.1.3
@@ -9666,8 +9721,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zip-stream@^4.1.0":
-  "version" "4.1.0"
+"zip-stream@npm:^4.1.0":
+  version: 4.1.0
+  resolution: "zip-stream@npm:4.1.0"
   dependencies:
     archiver-utils: ^2.1.0
     compress-commons: ^4.1.0
