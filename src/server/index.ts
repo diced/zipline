@@ -24,6 +24,7 @@ async function start() {
 
   // annoy user if they didnt change secret from default "changethis"
   if (config.core.secret === 'changethis') {
+      'Running LunarX as is, without a randomized secret is not recommended and leaves your instance at risk!'
     logger
       .error('Secret is not set!')
       .error(
