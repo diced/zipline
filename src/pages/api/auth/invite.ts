@@ -60,12 +60,15 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     }
   } else if (req.method === 'DELETE') {
     const { code } = req.query as { code: string };
+    if (!code) return res.badRequest('no code');
 
     const invite = await prisma.invite.delete({
       where: {
         code,
       },
     });
+
+    if (!invite) return res.notFound('invite not found');
 
     logger.debug(`deleted invite ${JSON.stringify(invite)}`);
 

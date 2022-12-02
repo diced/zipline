@@ -14,14 +14,14 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     },
   });
 
-  if (!image) return res.status(404).end(JSON.stringify({ error: 'Image not found' }));
-  if (!password) return res.badRequest('No password provided');
+  if (!image) return res.notFound('image not found');
+  if (!password) return res.badRequest('no password provided');
 
   const valid = await checkPassword(password as string, image.password);
-  if (!valid) return res.badRequest('Wrong password');
+  if (!valid) return res.badRequest('wrong password');
 
   const data = await datasource.get(image.file);
-  if (!data) return res.notFound('Image not found');
+  if (!data) return res.notFound('image not found');
 
   const size = await datasource.size(image.file);
 
@@ -30,7 +30,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   res.setHeader('Content-Length', size);
 
   data.pipe(res);
-  data.on('error', () => res.error('Image not found'));
+  data.on('error', () => res.notFound('image not found'));
   data.on('end', () => res.end());
 }
 

@@ -3,7 +3,6 @@ import { expand } from 'dotenv-expand';
 import { existsSync, readFileSync } from 'fs';
 import Logger from '../logger';
 import { humanToBytes } from '../utils/bytes';
-import { parseExpiry } from '../utils/client';
 
 export type ValueType = 'string' | 'number' | 'boolean' | 'array' | 'json-array' | 'human-to-byte';
 
