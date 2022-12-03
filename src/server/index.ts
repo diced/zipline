@@ -231,7 +231,7 @@ async function notFound(req: IncomingMessage, res: ServerResponse, nextServer: N
     res.setHeader('Content-Type', 'application/json');
     return res.end(JSON.stringify({ error: 'not found', url: req.url, code: 404 }));
   } else {
-    return notFound(req, res, nextServer);
+    return nextServer.render404(req, res);
   }
 }
 
