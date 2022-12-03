@@ -45,6 +45,7 @@ ENV PRISMA_QUERY_ENGINE_BINARY=/prisma-engines/query-engine \
   PRISMA_CLIENT_ENGINE_TYPE=binary
 
 RUN apk add --no-cache openssl openssl-dev
+RUN apk add --no-cache perl procps
 
 ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1

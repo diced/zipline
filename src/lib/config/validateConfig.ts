@@ -1,5 +1,5 @@
 import { s } from '@sapphire/shapeshift';
-import { Config } from 'lib/config/Config';
+import type { Config } from './Config';
 import { inspect } from 'util';
 import Logger from '../logger';
 import { humanToBytes } from '../utils/bytes';
