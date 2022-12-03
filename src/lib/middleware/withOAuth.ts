@@ -32,8 +32,7 @@ export const withOAuth =
 
     function oauthError(error: string) {
       if (config.features.headless)
-        return res.json({
-          error,
+        return res.badRequest(error, {
           provider,
         });
 
