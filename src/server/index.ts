@@ -99,8 +99,10 @@ async function start() {
     favicon.pipe(res);
   });
 
-  router.on('GET', `${config.urls.route}/:id`, async (req, res, params) => {
+  const urlsRoute = async (req, res, params) => {
     if (params.id === '') return notFound(req, res, nextServer);
+    else if (params.id === 'dashboard' && !config.features.headless)
+      return nextServer.render(req, res as ServerResponse, '/dashboard');
 
     const url = await prisma.url.findFirst({
       where: {
@@ -131,35 +133,53 @@ async function start() {
     }
 
     return redirect(res, url.destination);
-  });
+  };
 
-  router.on(
-    'GET',
-    config.uploader.route === '/' ? '/:id' : `${config.uploader.route}/:id`,
-    async (req, res, params) => {
+  const uploadsRoute = async (req, res, params) => {
+    if (params.id === '') return notFound(req, res, nextServer);
+    else if (params.id === 'dashboard' && !config.features.headless)
+      return nextServer.render(req, res as ServerResponse, '/dashboard');
+
+    const image = await prisma.image.findFirst({
+      where: {
+        OR: [{ file: params.id }, { invisible: { invis: decodeURI(params.id) } }],
+      },
+    });
+
+    if (!image) return rawFile(req, res, nextServer, params.id);
+    else {
+      const failed = await preFile(image, prisma);
+      if (failed) return notFound(req, res, nextServer);
+
+      if (image.password || image.embed || image.mimetype.startsWith('text/'))
+        redirect(res, `/view/${image.file}`);
+      else fileDb(req, res, nextServer, handle, image);
+
+      postFile(image, prisma);
+    }
+  };
+
+  // makes sure to handle both in one route as you cant have two handlers with the same route
+  if (config.urls.route === '/' && config.uploader.route === '/') {
+    router.on('GET', '/:id', async (req, res, params) => {
       if (params.id === '') return notFound(req, res, nextServer);
       else if (params.id === 'dashboard' && !config.features.headless)
         return nextServer.render(req, res as ServerResponse, '/dashboard');
 
-      const image = await prisma.image.findFirst({
+      const url = await prisma.url.findFirst({
         where: {
-          OR: [{ file: params.id }, { invisible: { invis: decodeURI(params.id) } }],
+          OR: [{ id: params.id }, { vanity: params.id }, { invisible: { invis: decodeURI(params.id) } }],
         },
       });
 
-      if (!image) return rawFile(req, res, nextServer, params.id);
-      else {
-        const failed = await preFile(image, prisma);
-        if (failed) return notFound(req, res, nextServer);
+      if (url) return urlsRoute(req, res, params);
+      else return uploadsRoute(req, res, params);
+    });
+  } else {
+    router.on('GET', config.urls.route === '/' ? '/:id' : `${config.urls.route}/:id`, urlsRoute);
 
-        if (image.password || image.embed || image.mimetype.startsWith('text/'))
-          redirect(res, `/view/${image.file}`);
-        else fileDb(req, res, nextServer, handle, image);
-
-        postFile(image, prisma);
-      }
-    }
-  );
+    router.on('GET', config.uploader.route === '/' ? '/:id' : `${config.uploader.route}/:id`, uploadsRoute);
+  }
 
   router.on('GET', '/r/:id', async (req, res, params) => {
     if (params.id === '') return notFound(req, res, nextServer);
