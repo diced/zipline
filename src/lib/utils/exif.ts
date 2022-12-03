@@ -1,6 +1,6 @@
 import { Image } from '@prisma/client';
 import { createWriteStream } from 'fs';
-import { exiftool, Tags } from 'exiftool-vendored';
+import { ExifTool, Tags } from 'exiftool-vendored';
 import datasource from 'lib/datasource';
 import Logger from 'lib/logger';
 import { tmpdir } from 'os';
@@ -10,6 +10,8 @@ import { readFile, unlink } from 'fs/promises';
 const logger = Logger.get('exif');
 
 export async function readMetadata(filePath: string): Promise<Tags> {
+  const exiftool = new ExifTool({ cleanupChildProcs: false });
+
   const exif = await exiftool.read(filePath);
   logger.debug(`exif(${filePath}) -> ${JSON.stringify(exif)}`);
 
@@ -25,10 +27,13 @@ export async function readMetadata(filePath: string): Promise<Tags> {
   delete exif.errors;
   delete exif.Warning;
 
+  await exiftool.end(true);
+
   return exif;
 }
 
 export async function removeGPSData(image: Image): Promise<void> {
+  const exiftool = new ExifTool({ cleanupChildProcs: false });
   const file = join(tmpdir(), `zipline-exif-remove-${Date.now()}-${image.file}`);
   logger.debug(`writing temp file to remove GPS data: ${file}`);
 
@@ -81,6 +86,8 @@ export async function removeGPSData(image: Image): Promise<void> {
 
   logger.debug(`removing temp file: ${file}`);
   await unlink(file);
+
+  await exiftool.end(true);
 
   return;
 }
