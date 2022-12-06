@@ -1,14 +1,15 @@
-import { Button, Group, NumberInput, PasswordInput, Select, Tabs, Title, Tooltip } from '@mantine/core';
+import { Alert, Button, Card, Container, Group, Select, Tabs, Title } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
 import { showNotification, updateNotification } from '@mantine/notifications';
-import { Prism } from '@mantine/prism';
 import CodeInput from 'components/CodeInput';
-import { ClockIcon, ImageIcon, TypeIcon, UploadIcon } from 'components/icons';
+import { ImageIcon, TypeIcon, UploadIcon } from 'components/icons';
+import KaTeX from 'components/render/KaTeX';
+import Markdown from 'components/render/Markdown';
+import PrismCode from 'components/render/PrismCode';
 import exts from 'lib/exts';
 import { userSelector } from 'lib/recoil/user';
 import { expireReadToDate } from 'lib/utils/client';
-import { Language } from 'prism-react-renderer';
 import { useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import showFilesModal from './showFilesModal';
@@ -23,6 +24,9 @@ export default function Text() {
   const [lang, setLang] = useState('txt');
 
   const [options, setOpened, OptionsModal] = useUploadOptions();
+
+  const shouldRenderMarkdown = lang === 'md';
+  const shouldRenderTex = lang === 'tex';
 
   const handleUpload = async () => {
     const file = new File([value], 'text.' + lang);
@@ -90,13 +94,26 @@ export default function Text() {
         </Tabs.Panel>
 
         <Tabs.Panel mt='sm' value='preview'>
-          <Prism
-            sx={(t) => ({ height: '80vh', backgroundColor: t.colors.dark[8] })}
-            withLineNumbers
-            language={lang as Language}
-          >
-            {value}
-          </Prism>
+          {shouldRenderMarkdown || shouldRenderTex ? (
+            <>
+              <Alert color='blue' variant='outline' sx={{ width: '100%' }}>
+                You are viewing a rendered version of your code
+              </Alert>
+
+              <Container>
+                <Card p='md' my='sm'>
+                  {shouldRenderMarkdown && <Markdown code={value} />}
+                  {shouldRenderTex && <KaTeX code={value} />}
+                </Card>
+              </Container>
+            </>
+          ) : (
+            <PrismCode
+              sx={(t) => ({ height: '100vh', backgroundColor: t.colors.dark[8] })}
+              code={value}
+              ext={lang}
+            />
+          )}
         </Tabs.Panel>
       </Tabs>
 
