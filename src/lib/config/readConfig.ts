@@ -137,7 +137,7 @@ export default function readConfig() {
     map('FEATURES_INVITES_LENGTH', 'number', 'features.invites_length'),
 
     map('FEATURES_OAUTH_REGISTRATION', 'boolean', 'features.oauth_registration'),
-    map('FEATURES_OAUTH_LOGINONLY', 'boolean', 'features.oauth_loginonly'),
+    map('FEATURES_OAUTH_LOGIN_ONLY', 'boolean', 'features.oauth_login_only'),
     map('FEATURES_USER_REGISTRATION', 'boolean', 'features.user_registration'),
 
     map('FEATURES_HEADLESS', 'boolean', 'features.headless'),

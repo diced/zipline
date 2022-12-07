@@ -145,7 +145,7 @@ export const withOAuth =
       );
 
       return res.redirect('/dashboard');
-    } else if (config.features.oauth_loginonly) {
+    } else if (config.features.oauth_login_only) {
       return oauthError('Login only mode is enabled, unable to create account.');
     } else if (existingUser)
       return oauthError(`Username ${oauth_resp.username} is already taken, unable to create account.`);
