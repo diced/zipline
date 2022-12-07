@@ -86,23 +86,30 @@ export const withOAuth =
         return oauthError(`This account was already linked with ${provider}!`);
 
       logger.debug(`attempting to link ${provider} account to ${user.username}`);
-      await prisma.user.update({
-        where: {
-          id: user.id,
-        },
-        data: {
-          oauth: {
-            create: {
-              provider: OauthProviders[provider.toUpperCase()],
-              token: oauth_resp.access_token,
-              refresh: oauth_resp.refresh_token || null,
-              username: oauth_resp.username,
-              oauthId: oauth_resp.user_id,
-            },
+      try {
+        await prisma.user.update({
+          where: {
+            id: user.id,
           },
-          avatar: oauth_resp.avatar,
-        },
-      });
+          data: {
+            oauth: {
+              create: {
+                provider: OauthProviders[provider.toUpperCase()],
+                token: oauth_resp.access_token,
+                refresh: oauth_resp.refresh_token || null,
+                username: oauth_resp.username,
+                oauthId: oauth_resp.user_id,
+              },
+            },
+            avatar: oauth_resp.avatar,
+          },
+        });
+      } catch (e) {
+        if (e.code === 'P2002') {
+          logger.debug(`account already linked with ${provider}`);
+          return oauthError('This account is already linked with another user.');
+        } else throw e;
+      }
 
       res.setUserCookie(user.id);
       logger.info(`User ${user.username} (${user.id}) linked account via oauth(${provider})`);
