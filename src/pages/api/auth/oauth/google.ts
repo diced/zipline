@@ -61,6 +61,7 @@ async function handler({ code, state, host }: OAuthQuery, logger: Logger): Promi
 
   return {
     username: userJson.names[0].displayName,
+    user_id: userJson.resourceName.split('/')[1],
     avatar: avatarBase64,
     access_token: json.access_token,
     refresh_token: json.refresh_token,
