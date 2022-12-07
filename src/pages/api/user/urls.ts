@@ -21,6 +21,9 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       where: {
         userId: user.id,
       },
+      orderBy: {
+        created_at: 'desc',
+      },
       select: {
         created_at: true,
         id: true,
