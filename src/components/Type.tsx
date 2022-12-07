@@ -1,7 +1,10 @@
-import { Box, Center, Group, Image, Text } from '@mantine/core';
+import { Alert, Box, Button, Card, Center, Container, Group, Image, Text } from '@mantine/core';
 import { Prism } from '@mantine/prism';
 import { useEffect, useState } from 'react';
 import { AudioIcon, FileIcon, ImageIcon, PlayIcon } from './icons';
+import KaTeX from './render/KaTeX';
+import Markdown from './render/Markdown';
+import PrismCode from './render/PrismCode';
 
 function PlaceholderContent({ text, Icon }) {
   return (
@@ -13,8 +16,6 @@ function PlaceholderContent({ text, Icon }) {
 }
 
 function Placeholder({ text, Icon, ...props }) {
-  if (props.disableResolve) props.src = null;
-
   return (
     <Box sx={{ height: 200 }} {...props}>
       <Center sx={{ height: 200 }}>
@@ -31,8 +32,10 @@ export default function Type({ file, popup = false, disableMediaPreview, ...prop
   const media = /^(video|audio|image|text)/.test(type);
 
   const [text, setText] = useState('');
+  const shouldRenderMarkdown = name.endsWith('.md');
+  const shouldRenderTex = name.endsWith('.tex');
 
-  if (type === 'text') {
+  if (type === 'text' && popup) {
     useEffect(() => {
       (async () => {
         const res = await fetch('/r/' + name);
@@ -43,10 +46,35 @@ export default function Type({ file, popup = false, disableMediaPreview, ...prop
     }, []);
   }
 
-  if (media && disableMediaPreview) {
+  const renderRenderAlert = () => {
     return (
-      <Placeholder Icon={FileIcon} text={`Click to view file (${name})`} disableResolve={true} {...props} />
+      <Alert color='blue' variant='outline' sx={{ width: '100%' }}>
+        You are{props.overrideRender ? ' not ' : ' '}viewing a rendered version of the file
+        <Button
+          mx='md'
+          onClick={() => props.setOverrideRender(!props.overrideRender)}
+          compact
+          variant='light'
+        >
+          View {props.overrideRender ? 'rendered' : 'raw'}
+        </Button>
+      </Alert>
     );
+  };
+
+  if ((shouldRenderMarkdown || shouldRenderTex) && !props.overrideRender && popup)
+    return (
+      <>
+        {renderRenderAlert()}
+        <Card p='md' my='sm'>
+          {shouldRenderMarkdown && <Markdown code={text} />}
+          {shouldRenderTex && <KaTeX code={text} />}
+        </Card>
+      </>
+    );
+
+  if (media && disableMediaPreview) {
+    return <Placeholder Icon={FileIcon} text={`Click to view file (${name})`} {...props} />;
   }
 
   return popup ? (
@@ -61,9 +89,10 @@ export default function Type({ file, popup = false, disableMediaPreview, ...prop
         ),
         audio: <audio autoPlay controls {...props} style={{ width: '100%' }} />,
         text: (
-          <Prism withLineNumbers language={name.split('.').pop()} {...props} style={{}} sx={{}}>
-            {text}
-          </Prism>
+          <>
+            {(shouldRenderMarkdown || shouldRenderTex) && renderRenderAlert()}
+            <PrismCode code={text} ext={name.split('.').pop()} {...props} />
+          </>
         ),
       }[type]
     ) : (

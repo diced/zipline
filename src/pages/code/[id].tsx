@@ -34,9 +34,7 @@ export default function Code({ code, id, title, render, renderType }) {
             </span>
           )}
           {renderType === 'tex' && (
-            <span>
-              You are {overrideRender ? 'not' : 'now'} viewing a KaTeX rendering version of the tex file.
-            </span>
+            <span>You are {overrideRender ? 'not' : 'now'} viewing a KaTeX rendering of the tex file.</span>
           )}
           <Button mx='md' onClick={() => setOverrideRender(!overrideRender)} compact variant='light'>
             View {overrideRender ? 'rendered' : 'raw'}

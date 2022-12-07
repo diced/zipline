@@ -19,6 +19,7 @@ import {
 } from './icons';
 import Link from './Link';
 import MutedText from './MutedText';
+import Markdown from './render/Markdown';
 import Type from './Type';
 
 export function FileMeta({ Icon, title, subtitle, ...other }) {
@@ -45,6 +46,7 @@ export function FileMeta({ Icon, title, subtitle, ...other }) {
 
 export default function File({ image, disableMediaPreview, exifEnabled }) {
   const [open, setOpen] = useState(false);
+  const [overrideRender, setOverrideRender] = useState(false);
   const deleteFile = useFileDelete();
   const favoriteFile = useFileFavorite();
   const clipboard = useClipboard();
@@ -124,6 +126,8 @@ export default function File({ image, disableMediaPreview, exifEnabled }) {
             sx={{ minHeight: 200 }}
             style={{ minHeight: 200 }}
             disableMediaPreview={false}
+            overrideRender={overrideRender}
+            setOverrideRender={setOverrideRender}
           />
           <Stack>
             <FileMeta Icon={FileIcon} title='Name' subtitle={image.file} />
