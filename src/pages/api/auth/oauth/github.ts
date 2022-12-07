@@ -56,6 +56,7 @@ async function handler({ code, state }: OAuthQuery, logger: Logger): Promise<OAu
 
   return {
     username: userJson.login,
+    user_id: userJson.id.toString(),
     avatar: avatarBase64,
     access_token: json.access_token,
   };

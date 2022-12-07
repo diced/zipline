@@ -167,6 +167,7 @@ const validator = s.object({
       invites: s.boolean.default(false),
       invites_length: s.number.default(6),
       oauth_registration: s.boolean.default(false),
+      oauth_login_only: s.boolean.default(false),
       user_registration: s.boolean.default(false),
       headless: s.boolean.default(false),
     })
@@ -174,6 +175,7 @@ const validator = s.object({
       invites: false,
       invites_length: 6,
       oauth_registration: false,
+      oauth_login_only: false,
       user_registration: false,
       headless: false,
     }),

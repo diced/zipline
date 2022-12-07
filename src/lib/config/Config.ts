@@ -102,6 +102,7 @@ export interface ConfigFeatures {
   invites_length: number;
 
   oauth_registration: boolean;
+  oauth_login_only: boolean;
   user_registration: boolean;
 
   headless: boolean;

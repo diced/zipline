@@ -13,6 +13,7 @@ export interface OAuthQuery {
 
 export interface OAuthResponse {
   username?: string;
+  user_id?: string;
   access_token?: string;
   refresh_token?: string;
   avatar?: string;
@@ -55,23 +56,27 @@ export const withOAuth =
 
     const { state } = req.query as { state?: string };
 
-    const existing = await prisma.user.findFirst({
+    const existingOauth = await prisma.oAuth.findUnique({
       where: {
-        oauth: {
-          some: {
-            provider: provider.toUpperCase() as OauthProviders,
-            username: oauth_resp.username,
-          },
+        provider_oauthId: {
+          provider: provider.toUpperCase() as OauthProviders,
+          oauthId: oauth_resp.user_id,
         },
       },
-      include: {
-        oauth: true,
+    });
+
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        username: oauth_resp.username,
+      },
+      select: {
+        username: true,
+        id: true,
       },
     });
 
     const user = await req.user();
 
-    const existingOauth = existing?.oauth?.find((o) => o.provider === provider.toUpperCase());
     const userOauth = user?.oauth?.find((o) => o.provider === provider.toUpperCase());
 
     if (state === 'link') {
@@ -81,22 +86,30 @@ export const withOAuth =
         return oauthError(`This account was already linked with ${provider}!`);
 
       logger.debug(`attempting to link ${provider} account to ${user.username}`);
-      await prisma.user.update({
-        where: {
-          id: user.id,
-        },
-        data: {
-          oauth: {
-            create: {
-              provider: OauthProviders[provider.toUpperCase()],
-              token: oauth_resp.access_token,
-              refresh: oauth_resp.refresh_token || null,
-              username: oauth_resp.username,
-            },
+      try {
+        await prisma.user.update({
+          where: {
+            id: user.id,
           },
-          avatar: oauth_resp.avatar,
-        },
-      });
+          data: {
+            oauth: {
+              create: {
+                provider: OauthProviders[provider.toUpperCase()],
+                token: oauth_resp.access_token,
+                refresh: oauth_resp.refresh_token || null,
+                username: oauth_resp.username,
+                oauthId: oauth_resp.user_id,
+              },
+            },
+            avatar: oauth_resp.avatar,
+          },
+        });
+      } catch (e) {
+        if (e.code === 'P2002') {
+          logger.debug(`account already linked with ${provider}`);
+          return oauthError('This account is already linked with another user.');
+        } else throw e;
+      }
 
       res.setUserCookie(user.id);
       logger.info(`User ${user.username} (${user.id}) linked account via oauth(${provider})`);
@@ -112,6 +125,7 @@ export const withOAuth =
           token: oauth_resp.access_token,
           refresh: oauth_resp.refresh_token || null,
           username: oauth_resp.username,
+          oauthId: oauth_resp.user_id,
         },
       });
 
@@ -119,7 +133,7 @@ export const withOAuth =
       logger.info(`User ${user.username} (${user.id}) logged in via oauth(${provider})`);
 
       return res.redirect('/dashboard');
-    } else if (existing && existingOauth) {
+    } else if (existingOauth) {
       await prisma.oAuth.update({
         where: {
           id: existingOauth!.id,
@@ -128,16 +142,20 @@ export const withOAuth =
           token: oauth_resp.access_token,
           refresh: oauth_resp.refresh_token || null,
           username: oauth_resp.username,
+          oauthId: oauth_resp.user_id,
         },
       });
 
-      res.setUserCookie(existing.id);
-      Logger.get('user').info(`User ${existing.username} (${existing.id}) logged in via oauth(${provider})`);
+      res.setUserCookie(existingOauth.userId);
+      Logger.get('user').info(
+        `User ${existingOauth.username} (${existingOauth.id}) logged in via oauth(${provider})`
+      );
 
       return res.redirect('/dashboard');
-    } else if (existing) {
-      return oauthError(`Username "${oauth_resp.username}" is already taken, unable to create account.`);
-    }
+    } else if (config.features.oauth_login_only) {
+      return oauthError('Login only mode is enabled, unable to create account.');
+    } else if (existingUser)
+      return oauthError(`Username ${oauth_resp.username} is already taken, unable to create account.`);
 
     logger.debug('creating new user via oauth');
     const nuser = await prisma.user.create({
@@ -150,6 +168,7 @@ export const withOAuth =
             token: oauth_resp.access_token,
             refresh: oauth_resp.refresh_token || null,
             username: oauth_resp.username,
+            oauthId: oauth_resp.user_id,
           },
         },
         avatar: oauth_resp.avatar,
