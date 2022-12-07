@@ -1,4 +1,4 @@
-import { Image, PrismaClient } from '@prisma/client';
+import { Image, PrismaClient, Url } from '@prisma/client';
 import Router from 'find-my-way';
 import { createReadStream, existsSync } from 'fs';
 import { mkdir } from 'fs/promises';
@@ -111,28 +111,9 @@ async function start() {
     });
     if (!url) return notFound(req, res, nextServer);
 
-    const nUrl = await prisma.url.update({
-      where: {
-        id: url.id,
-      },
-      data: {
-        views: { increment: 1 },
-      },
-    });
+    redirect(res, url.destination);
 
-    if (nUrl.maxViews && nUrl.views >= nUrl.maxViews) {
-      await prisma.url.delete({
-        where: {
-          id: nUrl.id,
-        },
-      });
-
-      Logger.get('url').debug(`url deleted due to max views ${JSON.stringify(nUrl)}`);
-
-      return notFound(req, res, nextServer);
-    }
-
-    return redirect(res, url.destination);
+    postUrl(url, prisma);
   };
 
   const uploadsRoute = async (req, res, params) => {
@@ -281,6 +262,27 @@ async function postFile(file: Image, prisma: PrismaClient) {
     Logger.get('file').info(`File ${file.file} has been deleted due to max views (${nFile.maxViews})`);
 
     return true;
+  }
+}
+
+async function postUrl(url: Url, prisma: PrismaClient) {
+  const nUrl = await prisma.url.update({
+    where: {
+      id: url.id,
+    },
+    data: {
+      views: { increment: 1 },
+    },
+  });
+
+  if (nUrl.maxViews && nUrl.views >= nUrl.maxViews) {
+    await prisma.url.delete({
+      where: {
+        id: nUrl.id,
+      },
+    });
+
+    Logger.get('url').debug(`url deleted due to max views ${JSON.stringify(nUrl)}`);
   }
 }
 
