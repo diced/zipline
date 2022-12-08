@@ -70,23 +70,23 @@ async function start() {
     done();
   });
 
-  // server.addHook('onResponse', (req, reply, done) => {
-  //   if (config.core.logger || dev || process.env.DEBUG) {
-  //     if (req.url.startsWith('/_next')) return done();
+  server.addHook('onResponse', (req, reply, done) => {
+    if (config.core.logger || dev || process.env.DEBUG) {
+      if (req.url.startsWith('/_next')) return done();
 
-  //     server.logger.child('response').info(`${req.method} ${req.url} -> ${reply.statusCode}`);
-  //     server.logger.child('response').debug(
-  //       JSON.stringify({
-  //         method: req.method,
-  //         url: req.url,
-  //         headers: req.headers,
-  //         body: req.headers['content-type']?.startsWith('application/json') ? req.body : undefined,
-  //       })
-  //     );
-  //   }
+      server.logger.child('response').info(`${req.method} ${req.url} -> ${reply.statusCode}`);
+      server.logger.child('response').debug(
+        JSON.stringify({
+          method: req.method,
+          url: req.url,
+          headers: req.headers,
+          body: req.headers['content-type']?.startsWith('application/json') ? req.body : undefined,
+        })
+      );
+    }
 
-  //   done();
-  // });
+    done();
+  });
 
   server.get('/favicon.ico', async (_, reply) => {
     if (!existsSync('./public/favicon.ico')) return reply.notFound();
@@ -166,9 +166,9 @@ async function start() {
     server.next('/api/*', { method: 'ALL' });
   });
 
-  // server.setDefaultRoute((req, res) => {
-  //   server.nextHandle(req, res);
-  // });
+  server.setDefaultRoute((req, res) => {
+    server.nextHandle(req, res);
+  });
 
   await server.listen({
     port: config.core.port,
