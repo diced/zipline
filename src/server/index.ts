@@ -4,7 +4,7 @@ import datasource from '../lib/datasource';
 import Logger from '../lib/logger';
 import { getStats } from './util';
 
-import fastify, { FastifyInstance, FastifyServerOptions } from 'fastify';
+import fastify, { FastifyInstance, FastifyRequest, FastifyServerOptions } from 'fastify';
 import { createReadStream, existsSync, readFileSync } from 'fs';
 import dbFileDecorator from './decorators/dbFile';
 import notFound from './decorators/notFound';
@@ -20,6 +20,7 @@ import prismaPlugin from './plugins/prisma';
 import rawRoute from './routes/raw';
 import uploadsRoute, { uploadsRouteOnResponse } from './routes/uploads';
 import urlsRoute, { urlsRouteOnResponse } from './routes/urls';
+import { IncomingMessage } from 'http';
 
 const dev = process.env.NODE_ENV === 'development';
 const logger = Logger.get('server');
@@ -69,23 +70,23 @@ async function start() {
     done();
   });
 
-  server.addHook('onResponse', (req, reply, done) => {
-    if (config.core.logger || dev || process.env.DEBUG) {
-      if (req.url.startsWith('/_next')) return done();
+  // server.addHook('onResponse', (req, reply, done) => {
+  //   if (config.core.logger || dev || process.env.DEBUG) {
+  //     if (req.url.startsWith('/_next')) return done();
 
-      server.logger.child('response').info(`${req.method} ${req.url} -> ${reply.statusCode}`);
-      server.logger.child('response').debug(
-        JSON.stringify({
-          method: req.method,
-          url: req.url,
-          headers: req.headers,
-          body: req.headers['content-type']?.startsWith('application/json') ? req.body : undefined,
-        })
-      );
-    }
+  //     server.logger.child('response').info(`${req.method} ${req.url} -> ${reply.statusCode}`);
+  //     server.logger.child('response').debug(
+  //       JSON.stringify({
+  //         method: req.method,
+  //         url: req.url,
+  //         headers: req.headers,
+  //         body: req.headers['content-type']?.startsWith('application/json') ? req.body : undefined,
+  //       })
+  //     );
+  //   }
 
-    done();
-  });
+  //   done();
+  // });
 
   server.get('/favicon.ico', async (_, reply) => {
     if (!existsSync('./public/favicon.ico')) return reply.notFound();
@@ -149,6 +150,25 @@ async function start() {
 
   server.get('/r/:id', rawRoute.bind(server));
   server.get('/', (_, reply) => reply.redirect('/dashboard'));
+
+  server.after(() => {
+    // overrides fastify's default parser so that next.js can handle the request
+    // in the future Zipline's api will probably be entirely handled by fastify
+    async function parser(_: FastifyRequest, payload: IncomingMessage) {
+      return payload;
+    }
+
+    server.addContentTypeParser('text/plain', parser);
+    server.addContentTypeParser('application/json', parser);
+    server.addContentTypeParser('multipart/form-data', parser);
+
+    server.next('/*', { method: 'ALL' });
+    server.next('/api/*', { method: 'ALL' });
+  });
+
+  // server.setDefaultRoute((req, res) => {
+  //   server.nextHandle(req, res);
+  // });
 
   await server.listen({
     port: config.core.port,

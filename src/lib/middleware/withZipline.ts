@@ -184,6 +184,7 @@ export const withZipline =
         if (!user) return null;
         return user;
       } catch (e) {
+        Logger.get('withZipline').debug(e.message);
         if (e.code && e.code === 'ERR_CRYPTO_TIMING_SAFE_EQUAL_LENGTH') {
           req.cleanCookie('user');
           return null;

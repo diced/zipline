@@ -15,10 +15,11 @@ async function nextPlugin(fastify: FastifyInstance, options: NextServerOptions) 
     .decorate('nextHandle', handle)
     .decorate('next', route.bind(fastify));
 
-  fastify.next('/*');
-
-  function route(path, opts: any = { method: 'get' }) {
-    this[opts.method.toLowerCase()](path, opts, handler);
+  function route(path, opts: any = { method: 'GET' }) {
+    if (typeof opts.method === 'string') this[opts.method.toLowerCase()](path, opts, handler);
+    else if (Array.isArray(opts.method)) {
+      for (const method of opts.method) this[method.toLowerCase()](path, opts, handler);
+    }
 
     async function handler(req: FastifyRequest, reply: FastifyReply) {
       for (const [key, value] of Object.entries(reply.getHeaders())) {
@@ -42,7 +43,7 @@ export default fastifyPlugin(nextPlugin, {
 declare module 'fastify' {
   interface FastifyInstance {
     nextServer: ReturnType<typeof next>;
-    next: (path: string, opts?: { method: string }) => void;
+    next: (path: string, opts?: { method: string | string[] }) => void;
     nextHandle: (req: IncomingMessage, res: OutgoingMessage | ServerResponse) => Promise<void>;
   }
 }
