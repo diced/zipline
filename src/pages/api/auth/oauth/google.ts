@@ -24,7 +24,7 @@ async function handler({ code, state, host }: OAuthQuery, logger: Logger): Promi
     return {
       redirect: google_auth.oauth_url(
         config.oauth.google_client_id,
-        `${config.core.https ? 'https' : 'http'}://${host}`,
+        `${config.core.return_https ? 'https' : 'http'}://${host}`,
         state
       ),
     };
@@ -33,7 +33,7 @@ async function handler({ code, state, host }: OAuthQuery, logger: Logger): Promi
     code,
     client_id: config.oauth.google_client_id,
     client_secret: config.oauth.google_client_secret,
-    redirect_uri: `${config.core.https ? 'https' : 'http'}://${host}/api/auth/oauth/google`,
+    redirect_uri: `${config.core.return_https ? 'https' : 'http'}://${host}/api/auth/oauth/google`,
     grant_type: 'authorization_code',
   });
 

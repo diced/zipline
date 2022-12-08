@@ -58,14 +58,14 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     await sendShorten(
       user,
       url,
-      `${zconfig.core.https ? 'https' : 'http'}://${req.headers.host}${zconfig.urls.route}/${
+      `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}${zconfig.urls.route}/${
         req.body.vanity ? req.body.vanity : invis ? invis.invis : url.id
       }`
     );
   }
 
   return res.json({
-    url: `${zconfig.core.https ? 'https' : 'http'}://${req.headers.host}${zconfig.urls.route}/${
+    url: `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}${zconfig.urls.route}/${
       req.body.vanity ? req.body.vanity : invis ? invis.invis : url.id
     }`,
   });

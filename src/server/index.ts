@@ -4,8 +4,8 @@ import datasource from '../lib/datasource';
 import Logger from '../lib/logger';
 import { getStats } from './util';
 
-import fastify, { FastifyInstance } from 'fastify';
-import { createReadStream, existsSync } from 'fs';
+import fastify, { FastifyInstance, FastifyServerOptions } from 'fastify';
+import { createReadStream, existsSync, readFileSync } from 'fs';
 import dbFileDecorator from './decorators/dbFile';
 import notFound from './decorators/notFound';
 import postFileDecorator from './decorators/postFile';
@@ -24,7 +24,7 @@ import urlsRoute, { urlsRouteOnResponse } from './routes/urls';
 const dev = process.env.NODE_ENV === 'development';
 const logger = Logger.get('server');
 
-const server = fastify();
+const server = fastify(genFastifyOpts());
 
 if (dev) {
   server.addHook('onRoute', (opts) => {
@@ -196,4 +196,19 @@ async function clearInvites(this: FastifyInstance) {
   });
 
   logger.child('invites').debug(`deleted ${count} used invites`);
+}
+
+function genFastifyOpts(): FastifyServerOptions {
+  const opts = {};
+
+  if (config.ssl?.cert && config.ssl?.key) {
+    opts['https'] = {
+      key: readFileSync(config.ssl.key),
+      cert: readFileSync(config.ssl.cert),
+    };
+
+    if (config.ssl?.allow_http1) opts['https']['allowHTTP1'] = true;
+  }
+
+  return opts;
 }
