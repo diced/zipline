@@ -22,6 +22,10 @@ export default class Logger {
     this.name = name;
   }
 
+  child(name: string) {
+    return new Logger(`${this.name}::${name}`);
+  }
+
   info(...args: any[]): this {
     process.stdout.write(this.formatMessage(LoggerLevel.INFO, this.name, args.join(' ')));
 
