@@ -35,7 +35,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
             error: 'oauth token expired',
             redirect_uri: discord_auth.oauth_url(
               config.oauth.discord_client_id,
-              `${config.core.https ? 'https' : 'http'}://${req.headers.host}`
+              `${config.core.return_https ? 'https' : 'http'}://${req.headers.host}`
             ),
           });
         }
@@ -59,7 +59,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
             error: 'oauth token expired',
             redirect_uri: discord_auth.oauth_url(
               config.oauth.discord_client_id,
-              `${config.core.https ? 'https' : 'http'}://${req.headers.host}`
+              `${config.core.return_https ? 'https' : 'http'}://${req.headers.host}`
             ),
           });
         }
@@ -90,7 +90,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
             error: 'oauth token expired',
             redirect_uri: google_auth.oauth_url(
               config.oauth.google_client_id,
-              `${config.core.https ? 'https' : 'http'}://${req.headers.host}`
+              `${config.core.return_https ? 'https' : 'http'}://${req.headers.host}`
             ),
           });
         }
@@ -113,7 +113,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
             error: 'oauth token expired',
             redirect_uri: google_auth.oauth_url(
               config.oauth.google_client_id,
-              `${config.core.https ? 'https' : 'http'}://${req.headers.host}`
+              `${config.core.return_https ? 'https' : 'http'}://${req.headers.host}`
             ),
           });
         }

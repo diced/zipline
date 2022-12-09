@@ -1,10 +1,11 @@
 import { parse } from 'dotenv';
 import { expand } from 'dotenv-expand';
 import { existsSync, readFileSync } from 'fs';
+import { resolve } from 'path';
 import Logger from '../logger';
 import { humanToBytes } from '../utils/bytes';
 
-export type ValueType = 'string' | 'number' | 'boolean' | 'array' | 'json-array' | 'human-to-byte';
+export type ValueType = 'string' | 'number' | 'boolean' | 'array' | 'json-array' | 'human-to-byte' | 'path';
 
 function isObject(value: any): value is Record<string, any> {
   return typeof value === 'object' && value !== null;
@@ -55,7 +56,7 @@ export default function readConfig() {
   }
 
   const maps = [
-    map('CORE_HTTPS', 'boolean', 'core.https'),
+    map('CORE_RETURN_HTTPS', 'boolean', 'core.return_https'),
     map('CORE_SECRET', 'string', 'core.secret'),
     map('CORE_HOST', 'string', 'core.host'),
     map('CORE_PORT', 'number', 'core.port'),
@@ -150,6 +151,10 @@ export default function readConfig() {
 
     map('EXIF_ENABLED', 'boolean', 'exif.enabled'),
     map('EXIF_REMOVE_GPS', 'boolean', 'exif.remove_gps'),
+
+    map('SSL_KEY', 'path', 'ssl.key'),
+    map('SSL_CERT', 'path', 'ssl.cert'),
+    map('SSL_ALLOW_HTTP1', 'boolean', 'ssl.allow_http1'),
   ];
 
   const config = {};
@@ -186,6 +191,10 @@ export default function readConfig() {
           parsed = humanToBytes(value) ?? undefined;
           if (!parsed) logger.debug(`Unable to parse ${map.env}=${value}`);
 
+          break;
+        case 'path':
+          parsed = resolve(value);
+          if (!existsSync(parsed)) logger.debug(`Unable to find ${map.env}=${value} (path does not exist)`);
           break;
         default:
           parsed = value;

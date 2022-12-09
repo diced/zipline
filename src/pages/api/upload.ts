@@ -179,7 +179,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         );
       } else {
         response.files.push(
-          `${zconfig.core.https ? 'https' : 'http'}://${req.headers.host}${
+          `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}${
             zconfig.uploader.route === '/' ? '' : zconfig.uploader.route
           }/${invis ? invis.invis : file.file}`
         );
@@ -189,7 +189,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         await sendUpload(
           user,
           file,
-          `${zconfig.core.https ? 'https' : 'http'}://${req.headers.host}/r/${
+          `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}/r/${
             invis ? invis.invis : file.file
           }`
         );
@@ -311,7 +311,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       );
     } else {
       response.files.push(
-        `${zconfig.core.https ? 'https' : 'http'}://${req.headers.host}${
+        `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}${
           zconfig.uploader.route === '/' ? '' : zconfig.uploader.route
         }/${invis ? invis.invis : image.file}`
       );
@@ -323,7 +323,9 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       await sendUpload(
         user,
         image,
-        `${zconfig.core.https ? 'https' : 'http'}://${req.headers.host}/r/${invis ? invis.invis : image.file}`
+        `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}/r/${
+          invis ? invis.invis : image.file
+        }`
       );
     }
 

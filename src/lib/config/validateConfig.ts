@@ -23,7 +23,7 @@ const discord_content = s
 
 const validator = s.object({
   core: s.object({
-    https: s.boolean.default(false),
+    return_https: s.boolean.default(false),
     secret: s.string.lengthGreaterThanOrEqual(8),
     host: s.string.default('0.0.0.0'),
     port: s.number.default(3000),
@@ -206,6 +206,13 @@ const validator = s.object({
       enabled: false,
       remove_gps: false,
     }),
+  ssl: s
+    .object({
+      key: s.string,
+      cert: s.string,
+      allow_http1: s.boolean.default(false),
+    })
+    .optional.nullish.default(null),
 });
 
 export default function validate(config): Config {

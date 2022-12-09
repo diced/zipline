@@ -1,348 +1,208 @@
-import { Image, PrismaClient, Url } from '@prisma/client';
-import Router from 'find-my-way';
-import { createReadStream, existsSync } from 'fs';
-import { mkdir } from 'fs/promises';
-import { createServer, IncomingMessage, OutgoingMessage, ServerResponse } from 'http';
-import next from 'next';
-import { NextServer, RequestHandler } from 'next/dist/server/next';
-import { extname } from 'path';
 import { version } from '../../package.json';
 import config from '../lib/config';
 import datasource from '../lib/datasource';
-import exts from '../lib/exts';
 import Logger from '../lib/logger';
-import { guess } from '../lib/mimes';
-import { getStats, log, migrations, redirect } from './util';
+import { getStats } from './util';
+
+import fastify, { FastifyInstance, FastifyRequest, FastifyServerOptions } from 'fastify';
+import { createReadStream, existsSync, readFileSync } from 'fs';
+import dbFileDecorator from './decorators/dbFile';
+import notFound from './decorators/notFound';
+import postFileDecorator from './decorators/postFile';
+import postUrlDecorator from './decorators/postUrl';
+import preFileDecorator from './decorators/preFile';
+import rawFileDecorator from './decorators/rawFile';
+import configPlugin from './plugins/config';
+import datasourcePlugin from './plugins/datasource';
+import loggerPlugin from './plugins/logger';
+import nextPlugin from './plugins/next';
+import prismaPlugin from './plugins/prisma';
+import rawRoute from './routes/raw';
+import uploadsRoute, { uploadsRouteOnResponse } from './routes/uploads';
+import urlsRoute, { urlsRouteOnResponse } from './routes/urls';
+import { IncomingMessage } from 'http';
 
 const dev = process.env.NODE_ENV === 'development';
 const logger = Logger.get('server');
+
+const server = fastify(genFastifyOpts());
+
+if (dev) {
+  server.addHook('onRoute', (opts) => {
+    logger.child('route').debug(JSON.stringify(opts));
+  });
+}
 
 start();
 
 async function start() {
   logger.debug('Starting server');
 
-  // annoy user if they didnt change secret from default "changethis"
-  if (config.core.secret === 'changethis') {
-    logger
-      .error('Secret is not set!')
-      .error(
-        'Running Zipline as is, without a randomized secret is not recommended and leaves your instance at risk!'
-      )
-      .error('Please change your secret in the config file or environment variables.')
-      .error(
-        'The config file is located at `.env.local`, or if using docker-compose you can change the variables in the `docker-compose.yml` file.'
-      )
-      .error('It is recomended to use a secret that is alphanumeric and randomized.')
-      .error('A way you can generate this is through a password manager you may have.');
-
-    process.exit(1);
-  }
-
-  process.env.DATABASE_URL = config.core.database_url;
-  await migrations();
-
-  const prisma = new PrismaClient();
-
-  const admin = await prisma.user.findFirst({
-    where: {
-      id: 1,
-      OR: {
-        username: 'administrator',
-      },
-    },
-  });
-
-  if (admin) {
-    logger.debug('setting main administrator user to a superAdmin');
-
-    await prisma.user.update({
-      where: {
-        id: admin.id,
-      },
-      data: {
-        superAdmin: true,
-      },
+  // plugins
+  server
+    .register(loggerPlugin)
+    .register(configPlugin, config)
+    .register(datasourcePlugin, datasource)
+    .register(prismaPlugin)
+    .register(nextPlugin, {
+      dir: '.',
+      dev,
+      quiet: !dev,
+      hostname: config.core.host,
+      port: config.core.port,
     });
-  }
 
-  if (config.datasource.type === 'local') {
-    await mkdir(config.datasource.local.directory, { recursive: true });
-  }
+  // decorators
+  server
+    .register(notFound)
+    .register(postUrlDecorator)
+    .register(postFileDecorator)
+    .register(preFileDecorator)
+    .register(rawFileDecorator)
+    .register(dbFileDecorator);
 
-  const nextServer = next({
-    dir: '.',
-    dev,
-    quiet: !dev,
-    hostname: config.core.host,
-    port: config.core.port,
+  server.addHook('onRequest', (req, reply, done) => {
+    if (config.features.headless) {
+      const url = req.url.toLowerCase();
+      if (!url.startsWith('/api') || url === '/api') return reply.notFound();
+    }
+
+    done();
   });
 
-  const handle = nextServer.getRequestHandler();
-  const router = Router({
-    defaultRoute: (req, res) => {
-      if (config.features.headless) {
-        const url = req.url.toLowerCase();
-        if (!url.startsWith('/api') || url === '/api') return notFound(req, res, nextServer);
-      }
+  server.addHook('onResponse', (req, reply, done) => {
+    if (config.core.logger || dev || process.env.DEBUG) {
+      if (req.url.startsWith('/_next')) return done();
 
-      handle(req, res);
-    },
+      server.logger.child('response').info(`${req.method} ${req.url} -> ${reply.statusCode}`);
+      server.logger.child('response').debug(
+        JSON.stringify({
+          method: req.method,
+          url: req.url,
+          headers: req.headers,
+          body: req.headers['content-type']?.startsWith('application/json') ? req.body : undefined,
+        })
+      );
+    }
+
+    done();
   });
 
-  router.on('GET', '/favicon.ico', async (req, res) => {
-    if (!existsSync('./public/favicon.ico')) return notFound(req, res, nextServer);
+  server.get('/favicon.ico', async (_, reply) => {
+    if (!existsSync('./public/favicon.ico')) return reply.notFound();
 
     const favicon = createReadStream('./public/favicon.ico');
-    res.setHeader('Content-Type', 'image/x-icon');
-
-    favicon.pipe(res);
+    return reply.type('image/x-icon').send(favicon);
   });
-
-  const urlsRoute = async (req, res, params) => {
-    if (params.id === '') return notFound(req, res, nextServer);
-    else if (params.id === 'dashboard' && !config.features.headless)
-      return nextServer.render(req, res as ServerResponse, '/dashboard');
-
-    const url = await prisma.url.findFirst({
-      where: {
-        OR: [{ id: params.id }, { vanity: params.id }, { invisible: { invis: decodeURI(params.id) } }],
-      },
-    });
-    if (!url) return notFound(req, res, nextServer);
-
-    redirect(res, url.destination);
-
-    postUrl(url, prisma);
-  };
-
-  const uploadsRoute = async (req, res, params) => {
-    if (params.id === '') return notFound(req, res, nextServer);
-    else if (params.id === 'dashboard' && !config.features.headless)
-      return nextServer.render(req, res as ServerResponse, '/dashboard');
-
-    const image = await prisma.image.findFirst({
-      where: {
-        OR: [{ file: params.id }, { invisible: { invis: decodeURI(params.id) } }],
-      },
-    });
-
-    if (!image) return rawFile(req, res, nextServer, params.id);
-    else {
-      const failed = await preFile(image, prisma);
-      if (failed) return notFound(req, res, nextServer);
-
-      if (image.password || image.embed || image.mimetype.startsWith('text/'))
-        redirect(res, `/view/${image.file}`);
-      else fileDb(req, res, nextServer, handle, image);
-
-      postFile(image, prisma);
-    }
-  };
 
   // makes sure to handle both in one route as you cant have two handlers with the same route
   if (config.urls.route === '/' && config.uploader.route === '/') {
-    router.on('GET', '/:id', async (req, res, params) => {
-      if (params.id === '') return notFound(req, res, nextServer);
-      else if (params.id === 'dashboard' && !config.features.headless)
-        return nextServer.render(req, res as ServerResponse, '/dashboard');
+    server.route({
+      method: 'GET',
+      url: '/:id',
+      handler: async (req, reply) => {
+        const { id } = req.params as { id: string };
+        if (id === '') return reply.notFound();
+        else if (id === 'dashboard' && !config.features.headless)
+          return server.nextServer.render(req.raw, reply.raw, '/dashboard');
 
-      const url = await prisma.url.findFirst({
-        where: {
-          OR: [{ id: params.id }, { vanity: params.id }, { invisible: { invis: decodeURI(params.id) } }],
-        },
+        const url = await server.prisma.url.findFirst({
+          where: {
+            OR: [{ id: id }, { vanity: id }, { invisible: { invis: decodeURI(id) } }],
+          },
+        });
+
+        if (url) return urlsRoute.bind(server)(req, reply);
+        else return uploadsRoute.bind(server)(req, reply);
+      },
+      onResponse: async (req, reply, done) => {
+        if (reply.statusCode === 200) {
+          const { id } = req.params as { id: string };
+
+          const url = await server.prisma.url.findFirst({
+            where: {
+              OR: [{ id: id }, { vanity: id }, { invisible: { invis: decodeURI(id) } }],
+            },
+          });
+
+          if (url) urlsRouteOnResponse.bind(server)(req, reply, done);
+          else uploadsRouteOnResponse.bind(server)(req, reply, done);
+        }
+
+        done();
+      },
+    });
+  } else {
+    server
+      .route({
+        method: 'GET',
+        url: config.urls.route === '/' ? '/:id' : `${config.urls.route}/:id`,
+        handler: urlsRoute.bind(server),
+        onResponse: urlsRouteOnResponse.bind(server),
+      })
+      .route({
+        method: 'GET',
+        url: config.uploader.route === '/' ? '/:id' : `${config.uploader.route}/:id`,
+        handler: uploadsRoute.bind(server),
+        onResponse: uploadsRouteOnResponse.bind(server),
       });
-
-      if (url) return urlsRoute(req, res, params);
-      else return uploadsRoute(req, res, params);
-    });
-  } else {
-    router.on('GET', config.urls.route === '/' ? '/:id' : `${config.urls.route}/:id`, urlsRoute);
-
-    router.on('GET', config.uploader.route === '/' ? '/:id' : `${config.uploader.route}/:id`, uploadsRoute);
   }
 
-  router.on('GET', '/r/:id', async (req, res, params) => {
-    if (params.id === '') return notFound(req, res, nextServer);
+  server.get('/r/:id', rawRoute.bind(server));
+  server.get('/', (_, reply) => reply.redirect('/dashboard'));
 
-    const image = await prisma.image.findFirst({
-      where: {
-        OR: [{ file: params.id }, { invisible: { invis: decodeURI(params.id) } }],
-      },
-    });
-
-    if (!image) await rawFile(req, res, nextServer, params.id);
-    else {
-      const failed = await preFile(image, prisma);
-      if (failed) return notFound(req, res, nextServer);
-
-      if (image.password) {
-        res.setHeader('Content-Type', 'application/json');
-        res.statusCode = 403;
-        return res.end(
-          JSON.stringify({
-            error: "can't view a raw file that has a password",
-            url: `/view/${image.file}`,
-            code: 403,
-          })
-        );
-      } else await rawFile(req, res, nextServer, params.id);
+  server.after(() => {
+    // overrides fastify's default parser so that next.js can handle the request
+    // in the future Zipline's api will probably be entirely handled by fastify
+    async function parser(_: FastifyRequest, payload: IncomingMessage) {
+      return payload;
     }
+
+    server.addContentTypeParser('text/plain', parser);
+    server.addContentTypeParser('application/json', parser);
+    server.addContentTypeParser('multipart/form-data', parser);
+
+    server.next('/*', { method: 'ALL' });
+    server.next('/api/*', { method: 'ALL' });
   });
 
-  try {
-    await nextServer.prepare();
-  } catch (e) {
-    console.log(e);
-    process.exit(1);
-  }
-
-  const http = createServer((req, res) => {
-    router.lookup(req, res);
-    if (config.core.logger) log(req.url);
+  server.setDefaultRoute((req, res) => {
+    server.nextHandle(req, res);
   });
 
-  http.on('error', (e) => {
-    logger.error(e);
-    process.exit(1);
+  await server.listen({
+    port: config.core.port,
+    host: config.core.host ?? '0.0.0.0',
   });
 
-  http.on('listening', () => {
-    logger.info(`listening on ${config.core.host}:${config.core.port}`);
-  });
+  server.logger
+    .info(`listening on ${config.core.host}:${config.core.port}`)
+    .info(
+      `started ${dev ? 'development' : 'production'} zipline@${version} server${
+        config.features.headless ? ' (headless)' : ''
+      }`
+    );
 
-  http.listen(config.core.port, config.core.host ?? '0.0.0.0');
+  clearInvites.bind(server)();
+  stats.bind(server)();
 
-  logger.info(
-    `started ${dev ? 'development' : 'production'} zipline@${version} server${
-      config.features.headless ? ' (headless)' : ''
-    }`
-  );
-
-  stats(prisma);
-  clearInvites(prisma);
-
-  setInterval(() => clearInvites(prisma), config.core.invites_interval * 1000);
-  setInterval(() => stats(prisma), config.core.stats_interval * 1000);
+  setInterval(() => clearInvites.bind(server)(), config.core.invites_interval * 1000);
+  setInterval(() => stats.bind(server)(), config.core.stats_interval * 1000);
 }
 
-async function notFound(req: IncomingMessage, res: ServerResponse, nextServer: NextServer) {
-  if (config.features.headless) {
-    res.statusCode = 404;
-    res.setHeader('Content-Type', 'application/json');
-    return res.end(JSON.stringify({ error: 'not found', url: req.url, code: 404 }));
-  } else {
-    return nextServer.render404(req, res);
-  }
-}
-
-async function preFile(file: Image, prisma: PrismaClient) {
-  if (file.expires_at && file.expires_at < new Date()) {
-    await datasource.delete(file.file);
-    await prisma.image.delete({ where: { id: file.id } });
-
-    Logger.get('file').info(`File ${file.file} expired and was deleted.`);
-
-    return true;
-  }
-
-  return false;
-}
-
-async function postFile(file: Image, prisma: PrismaClient) {
-  const nFile = await prisma.image.update({
-    where: { id: file.id },
-    data: { views: { increment: 1 } },
-  });
-
-  if (nFile.maxViews && nFile.views >= nFile.maxViews) {
-    await datasource.delete(file.file);
-    await prisma.image.delete({ where: { id: nFile.id } });
-
-    Logger.get('file').info(`File ${file.file} has been deleted due to max views (${nFile.maxViews})`);
-
-    return true;
-  }
-}
-
-async function postUrl(url: Url, prisma: PrismaClient) {
-  const nUrl = await prisma.url.update({
-    where: {
-      id: url.id,
-    },
-    data: {
-      views: { increment: 1 },
-    },
-  });
-
-  if (nUrl.maxViews && nUrl.views >= nUrl.maxViews) {
-    await prisma.url.delete({
-      where: {
-        id: nUrl.id,
-      },
-    });
-
-    Logger.get('url').debug(`url deleted due to max views ${JSON.stringify(nUrl)}`);
-  }
-}
-
-async function rawFile(req: IncomingMessage, res: OutgoingMessage, nextServer: NextServer, id: string) {
-  const data = await datasource.get(id);
-  if (!data) return notFound(req, res as ServerResponse, nextServer);
-
-  const mimetype = await guess(extname(id));
-  const size = await datasource.size(id);
-
-  res.setHeader('Content-Type', mimetype);
-  res.setHeader('Content-Length', size);
-
-  data.pipe(res);
-  data.on('error', (e) => {
-    logger.debug(`error while serving raw file ${id}: ${e}`);
-    notFound(req, res as ServerResponse, nextServer);
-  });
-  data.on('end', () => res.end());
-}
-
-async function fileDb(
-  req: IncomingMessage,
-  res: OutgoingMessage,
-  nextServer: NextServer,
-  handle: RequestHandler,
-  image: Image
-) {
-  const ext = image.file.split('.').pop();
-  if (Object.keys(exts).includes(ext)) return handle(req, res as ServerResponse);
-
-  const data = await datasource.get(image.file);
-  if (!data) return notFound(req, res as ServerResponse, nextServer);
-
-  const size = await datasource.size(image.file);
-
-  res.setHeader('Content-Type', image.mimetype);
-  res.setHeader('Content-Length', size);
-
-  data.pipe(res);
-  data.on('error', (e) => {
-    logger.debug(`error while serving raw file ${image.file}: ${e}`);
-    notFound(req, res as ServerResponse, nextServer);
-  });
-  data.on('end', () => res.end());
-}
-
-async function stats(prisma: PrismaClient) {
-  const stats = await getStats(prisma, datasource);
-  await prisma.stats.create({
+async function stats(this: FastifyInstance) {
+  const stats = await getStats(this.prisma, this.datasource);
+  await this.prisma.stats.create({
     data: {
       data: stats,
     },
   });
 
-  logger.debug(`stats updated ${JSON.stringify(stats)}`);
+  this.logger.child('stats').debug(`stats updated ${JSON.stringify(stats)}`);
 }
 
-async function clearInvites(prisma: PrismaClient) {
-  const { count } = await prisma.invite.deleteMany({
+async function clearInvites(this: FastifyInstance) {
+  const { count } = await this.prisma.invite.deleteMany({
     where: {
       OR: [
         {
@@ -355,5 +215,20 @@ async function clearInvites(prisma: PrismaClient) {
     },
   });
 
-  logger.debug(`deleted ${count} used invites`);
+  logger.child('invites').debug(`deleted ${count} used invites`);
+}
+
+function genFastifyOpts(): FastifyServerOptions {
+  const opts = {};
+
+  if (config.ssl?.cert && config.ssl?.key) {
+    opts['https'] = {
+      key: readFileSync(config.ssl.key),
+      cert: readFileSync(config.ssl.cert),
+    };
+
+    if (config.ssl?.allow_http1) opts['https']['allowHTTP1'] = true;
+  }
+
+  return opts;
 }

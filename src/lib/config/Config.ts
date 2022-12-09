@@ -1,5 +1,5 @@
 export interface ConfigCore {
-  https: boolean;
+  return_https: boolean;
   secret: string;
   host: string;
   port: number;
@@ -134,6 +134,12 @@ export interface ConfigExif {
   remove_gps: boolean;
 }
 
+export interface ConfigSsl {
+  allow_http1: boolean;
+  key: string;
+  cert: string;
+}
+
 export interface Config {
   core: ConfigCore;
   uploader: ConfigUploader;
@@ -147,4 +153,5 @@ export interface Config {
   chunks: ConfigChunks;
   mfa: ConfigMfa;
   exif: ConfigExif;
+  ssl: ConfigSsl;
 }
