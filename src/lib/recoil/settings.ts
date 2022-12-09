@@ -26,7 +26,7 @@ export const settingsState = atom<Settings>({
 });
 
 export const showNonMediaSelector = selector<boolean>({
-  key: 'settingsState',
+  key: 'settingsShowNonMediaSelector',
   get: ({ get }) => get(settingsState).showNonMedia,
   set: ({ set }, newValue) => set(settingsState, { showNonMedia: newValue }),
 });

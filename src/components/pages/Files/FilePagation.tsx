@@ -3,10 +3,12 @@ import File from 'components/File';
 import { FileIcon } from 'components/icons';
 import MutedText from 'components/MutedText';
 import { usePaginatedFiles } from 'lib/queries/files';
+import { showNonMediaSelector } from 'lib/recoil/settings';
 import { useState } from 'react';
+import { useRecoilState } from 'recoil';
 
 export default function FilePagation({ disableMediaPreview, exifEnabled }) {
-  const [checked, setChecked] = useState(false);
+  const [checked, setChecked] = useRecoilState(showNonMediaSelector);
 
   const pages = usePaginatedFiles(!checked ? { filter: 'media' } : {});
   const [page, setPage] = useState(1);
