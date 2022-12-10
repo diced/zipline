@@ -11,28 +11,18 @@ import {
   PointElement,
   Tooltip,
 } from 'chart.js';
-import ChartDataLabels from 'chartjs-plugin-datalabels';
-import ColorHash from 'color-hash';
 import { useStats } from 'lib/queries/stats';
 import { bytesToHuman } from 'lib/utils/bytes';
 import { useMemo } from 'react';
-import { Chart, Pie } from 'react-chartjs-2';
+import { Chart } from 'react-chartjs-2';
 
-const hash = new ColorHash();
-ChartJS.register(ArcElement);
-ChartJS.register(ChartDataLabels);
-ChartJS.register(LinearScale);
-ChartJS.register(CategoryScale, PointElement, LineController, LineElement, Tooltip);
+ChartJS.register(ArcElement, LinearScale, CategoryScale, PointElement, LineController, LineElement, Tooltip);
 
 const CHART_OPTIONS = (theme: MantineTheme): ChartOptions => ({
   plugins: {
     tooltip: {
       enabled: true,
       intersect: false,
-    },
-
-    datalabels: {
-      display: false,
     },
   },
 
@@ -60,17 +50,15 @@ const CHART_OPTIONS = (theme: MantineTheme): ChartOptions => ({
   },
 });
 
-type LineChartData = ChartData<'line', number[], string>;
-type ChartDataMemo = {
+export type LineChartData = ChartData<'line', number[], string>;
+export type ChartDataMemo = {
   views: LineChartData;
   uploads: LineChartData;
-  uploadTypes: ChartData<'pie', number[], string>;
   storage: LineChartData;
 } | void;
 
 export default function Graphs() {
   const historicalStats = useStats(10);
-  const latest = historicalStats.data?.[0];
   const theme = useMantineTheme();
 
   const chartOptions = useMemo(() => CHART_OPTIONS(theme), [theme]);
@@ -89,7 +77,7 @@ export default function Graphs() {
         labels,
         datasets: [
           {
-            label: 'Views',
+            label: ' Views',
             data: viewData,
             borderColor: theme.colors.blue[6],
             backgroundColor: theme.colors.blue[0],
@@ -101,21 +89,10 @@ export default function Graphs() {
         labels,
         datasets: [
           {
-            label: 'Uploads',
+            label: ' Uploads',
             data: uploadData,
             borderColor: theme.colors.blue[6],
             backgroundColor: theme.colors.blue[0],
-          },
-        ],
-      },
-
-      uploadTypes: {
-        labels: latest?.data.types_count.map((x) => x.mimetype),
-        datasets: [
-          {
-            data: latest?.data.types_count.map((x) => x.count),
-            label: 'Upload Types',
-            backgroundColor: latest?.data.types_count.map((x) => hash.hex(x.mimetype)),
           },
         ],
       },
@@ -124,7 +101,7 @@ export default function Graphs() {
         labels,
         datasets: [
           {
-            label: 'Storage',
+            label: ' Storage',
             data: storageData,
             borderColor: theme.colors.blue[6],
             backgroundColor: theme.colors.blue[0],
@@ -139,37 +116,8 @@ export default function Graphs() {
       <LoadingOverlay visible={historicalStats.isLoading} />
 
       <Grid>
-        {/* 1/4 - upload types */}
-        <Grid.Col md={12} lg={4}>
-          <Card>
-            <Title size='h4'>Upload Types</Title>
-            {chartData && (
-              <Pie
-                data={chartData.uploadTypes}
-                options={{
-                  plugins: {
-                    datalabels: {
-                      formatter: (_, ctx) => {
-                        // mime: count
-                        const mime = ctx.chart.data.labels[ctx.dataIndex];
-                        const count = ctx.chart.data.datasets[0].data[ctx.dataIndex];
-                        return `${mime}: ${count}`;
-                      },
-
-                      color: 'white',
-                      textShadowBlur: 7,
-                      textShadowColor: 'black',
-                    },
-                  },
-                }}
-                style={{ maxHeight: '20vh' }}
-              />
-            )}
-          </Card>
-        </Grid.Col>
-
         {/* 3/4 - views */}
-        <Grid.Col md={12} lg={8}>
+        <Grid.Col md={12}>
           <Card>
             <Title size='h4'>Total Views</Title>
             {chartData && (

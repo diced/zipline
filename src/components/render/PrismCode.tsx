@@ -8,7 +8,8 @@ import { useEffect } from 'react';
 export default function PrismCode({ code, ext, ...props }) {
   useEffect(() => {
     (async () => {
-      if (ext !== 'txt') await import(`prismjs/components/prism-${extToPrismComponent(ext)}`);
+      const component = extToPrismComponent[ext];
+      if (component && ext !== 'txt') await import(`prismjs/components/prism-${component}`);
     })();
   }, [ext]);
 
