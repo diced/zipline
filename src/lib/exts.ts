@@ -35,6 +35,7 @@ export default {
   json: 'JSON',
   vim: 'Vim Script',
   txt: 'Plain Text',
+  html: 'HTML',
 };
 
 export const extToPrismComponent = (ext: string) => {
@@ -75,5 +76,6 @@ export const extToPrismComponent = (ext: string) => {
     vb: 'visual-basic',
     json: 'json',
     vim: 'vim',
+    html: 'html',
   }[ext];
 };

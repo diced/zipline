@@ -33,6 +33,7 @@ import GoogleIcon from './GoogleIcon';
 import EyeIcon from './EyeIcon';
 import RefreshIcon from './RefreshIcon';
 import KeyIcon from './KeyIcon';
+import DatabaseIcon from './DatabaseIcon';
 
 export {
   ActivityIcon,
@@ -70,4 +71,5 @@ export {
   EyeIcon,
   RefreshIcon,
   KeyIcon,
+  DatabaseIcon,
 };

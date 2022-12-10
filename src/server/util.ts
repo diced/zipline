@@ -1,7 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { Migrate } from '@prisma/migrate/dist/Migrate';
 import { ensureDatabaseExists } from '@prisma/migrate/dist/utils/ensureDatabaseExists';
-import { FastifyInstance } from 'fastify';
 import { ServerResponse } from 'http';
 import { Datasource } from '../lib/datasources';
 import Logger from '../lib/logger';
