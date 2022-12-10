@@ -21,7 +21,7 @@ services:
       - '3000:3000'
     restart: always
     environment:
-      - CORE_HTTPS=false
+      - CORE_RETURN_HTTPS=false
       - CORE_SECRET=changethis
       - CORE_HOST=0.0.0.0
       - CORE_PORT=3000
