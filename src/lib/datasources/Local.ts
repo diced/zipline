@@ -18,6 +18,13 @@ export class Local extends Datasource {
     await rm(join(process.cwd(), this.path, file));
   }
 
+  public async clear(): Promise<void> {
+    const files = await readdir(join(process.cwd(), this.path));
+
+    for (let i = 0; i !== files.length; ++i) {
+      await rm(join(process.cwd(), this.path, files[i]));
+    }
+  }
   public get(file: string): ReadStream {
     const full = join(process.cwd(), this.path, file);
     if (!existsSync(full)) return null;

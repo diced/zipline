@@ -41,5 +41,5 @@ yarn-error.log*
 
 # zipline
 config.toml
-uploads/
+uploads*/
 dist/
