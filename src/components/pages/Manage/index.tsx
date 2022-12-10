@@ -309,6 +309,58 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
     }
   };
 
+  const openClearData = () => {
+    modals.openConfirmModal({
+      title: 'Are you sure you want to clear ALL uploads in DB?',
+      closeOnConfirm: false,
+      labels: { confirm: 'Yes', cancel: 'No' },
+      onConfirm: () => {
+        modals.openConfirmModal({
+          title: 'Do you want to clear storage too?',
+          labels: { confirm: 'Yes', cancel: 'No' },
+          onConfirm: () => {
+            handleClearData(true);
+            modals.closeAll();
+          },
+          onCancel: () => {
+            handleClearData(false);
+            modals.closeAll();
+          },
+        });
+      },
+    });
+  };
+
+  const handleClearData = async (datasource?: boolean) => {
+    showNotification({
+      id: 'clear-uploads',
+      title: 'Clearing...',
+      message: '',
+      loading: true,
+      autoClose: false,
+    });
+
+    const res = await useFetch('/api/admin/clear', 'POST', { datasource });
+
+    if (res.error) {
+      updateNotification({
+        id: 'clear-uploads',
+        title: 'Error while clearing uploads',
+        message: res.error,
+        color: 'red',
+        icon: <CrossIcon />,
+      });
+    } else {
+      updateNotification({
+        id: 'clear-uploads',
+        title: 'Successfully cleared uploads',
+        message: '',
+        color: 'green',
+        icon: <CheckIcon />,
+      });
+    }
+  };
+
   const handleOauthUnlink = async (provider) => {
     const res = await useFetch('/api/auth/oauth', 'DELETE', {
       provider,
@@ -524,6 +576,9 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
           <Group>
             <Button size='md' onClick={forceUpdateStats} color='red' rightIcon={<RefreshIcon />}>
               Force Update Stats
+            </Button>
+            <Button size='md' onClick={openClearData} color='red' rightIcon={<TrashIcon />}>
+              Delete ALL uploads
             </Button>
           </Group>
         </Box>

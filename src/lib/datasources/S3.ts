@@ -28,6 +28,18 @@ export class S3 extends Datasource {
     await this.s3.removeObject(this.config.bucket, file);
   }
 
+  public async clear(): Promise<void> {
+    const objects = this.s3.listObjectsV2(this.config.bucket, '', true);
+    const files = [];
+
+    objects.on('data', (item) => files.push(item.name));
+    objects.on('end', async () => {
+      this.s3.removeObjects(this.config.bucket, files, (err) => {
+        if (err) throw err;
+      });
+    });
+  }
+
   public get(file: string): Promise<Readable> {
     return new Promise((res, rej) => {
       this.s3.getObject(this.config.bucket, file, (err, stream) => {

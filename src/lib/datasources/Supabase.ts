@@ -37,6 +37,41 @@ export class Supabase extends Datasource {
     });
   }
 
+  public async clear(): Promise<void> {
+    try {
+      const resp = await fetch(`${this.config.url}/storage/v1/object/list/${this.config.bucket}`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${this.config.key}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prefix: '',
+        }),
+      });
+      const objs = await resp.json();
+      if (objs.error) throw new Error(`${objs.error}: ${objs.message}`);
+
+      const res = await fetch(`${this.config.url}/storage/v1/object/${this.config.bucket}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${this.config.key}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prefixes: objs.map((x: { name: string }) => x.name),
+        }),
+      });
+
+      const j = await res.json();
+      if (j.error) throw new Error(`${j.error}: ${j.message}`);
+
+      return;
+    } catch (e) {
+      this.logger.error(e);
+    }
+  }
+
   public async get(file: string): Promise<Readable> {
     // get a readable stream from the request
     const r = await fetch(`${this.config.url}/storage/v1/object/${this.config.bucket}/${file}`, {
