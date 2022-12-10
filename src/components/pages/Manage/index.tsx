@@ -311,7 +311,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
 
   const openClearData = () => {
     modals.openConfirmModal({
-      title: 'Are you sure you want to clear ALL uploads in DB?',
+      title: 'Are you sure you want to clear all uploads in the database?',
       closeOnConfirm: false,
       labels: { confirm: 'Yes', cancel: 'No' },
       onConfirm: () => {
