@@ -578,7 +578,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
               Force Update Stats
             </Button>
             <Button size='md' onClick={openClearData} color='red' rightIcon={<TrashIcon />}>
-              Delete ALL uploads
+              Delete all uploads
             </Button>
           </Group>
         </Box>
