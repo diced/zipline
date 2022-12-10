@@ -184,15 +184,16 @@ async function start() {
       }`
     );
 
-  clearInvites.bind(server)();
-  stats.bind(server)();
+  await clearInvites.bind(server)();
+  await stats.bind(server)();
 
   setInterval(() => clearInvites.bind(server)(), config.core.invites_interval * 1000);
   setInterval(() => stats.bind(server)(), config.core.stats_interval * 1000);
 }
 
 async function stats(this: FastifyInstance) {
-  const stats = await getStats(this.prisma, this.datasource);
+  const stats = await getStats.bind(this)();
+
   await this.prisma.stats.create({
     data: {
       data: stats,

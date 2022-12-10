@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { Migrate } from '@prisma/migrate/dist/Migrate';
 import { ensureDatabaseExists } from '@prisma/migrate/dist/utils/ensureDatabaseExists';
+import { FastifyInstance } from 'fastify';
 import { ServerResponse } from 'http';
 import { Datasource } from '../lib/datasources';
 import Logger from '../lib/logger';
@@ -57,19 +58,31 @@ export function redirect(res: ServerResponse, url: string) {
   res.end();
 }
 
-export async function getStats(prisma: PrismaClient, datasource: Datasource) {
-  const size = await datasource.fullSize();
-  const byUser = await prisma.image.groupBy({
+export async function getStats(this: FastifyInstance) {
+  const logger = this.logger.child('stats');
+
+  const size = await this.datasource.fullSize();
+  logger.debug(`full size: ${size}`);
+
+  const byUser = await this.prisma.image.groupBy({
     by: ['userId'],
     _count: {
       _all: true,
     },
   });
-  const count_users = await prisma.user.count();
+  logger.debug(`by user: ${JSON.stringify(byUser)}`);
+
+  const count_users = await this.prisma.user.count();
+  logger.debug(`count users: ${count_users}`);
 
   const count_by_user = [];
   for (let i = 0, L = byUser.length; i !== L; ++i) {
-    const user = await prisma.user.findFirst({
+    if (!byUser[i].userId) {
+      logger.debug(`skipping user ${byUser[i]}`);
+      continue;
+    }
+
+    const user = await this.prisma.user.findFirst({
       where: {
         id: byUser[i].userId,
       },
@@ -80,27 +93,33 @@ export async function getStats(prisma: PrismaClient, datasource: Datasource) {
       count: byUser[i]._count._all,
     });
   }
+  logger.debug(`count by user: ${JSON.stringify(count_by_user)}`);
 
-  const count = await prisma.image.count();
+  const count = await this.prisma.image.count();
+  logger.debug(`count files: ${JSON.stringify(count)}`);
 
-  const views = await prisma.image.aggregate({
+  const views = await this.prisma.image.aggregate({
     _sum: {
       views: true,
     },
   });
+  logger.debug(`sum views: ${JSON.stringify(views)}`);
 
-  const typesCount = await prisma.image.groupBy({
+  const typesCount = await this.prisma.image.groupBy({
     by: ['mimetype'],
     _count: {
       mimetype: true,
     },
   });
+  logger.debug(`types count: ${JSON.stringify(typesCount)}`);
   const types_count = [];
   for (let i = 0, L = typesCount.length; i !== L; ++i)
     types_count.push({
       mimetype: typesCount[i].mimetype,
       count: typesCount[i]._count.mimetype,
     });
+
+  logger.debug(`types count: ${JSON.stringify(types_count)}`);
 
   return {
     size: bytesToHuman(size),
