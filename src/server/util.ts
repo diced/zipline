@@ -58,13 +58,11 @@ export function redirect(res: ServerResponse, url: string) {
   res.end();
 }
 
-export async function getStats(this: FastifyInstance) {
-  const logger = this.logger.child('stats');
-
-  const size = await this.datasource.fullSize();
+export async function getStats(prisma: PrismaClient, datasource: Datasource, logger: Logger) {
+  const size = await datasource.fullSize();
   logger.debug(`full size: ${size}`);
 
-  const byUser = await this.prisma.image.groupBy({
+  const byUser = await prisma.image.groupBy({
     by: ['userId'],
     _count: {
       _all: true,
@@ -72,7 +70,7 @@ export async function getStats(this: FastifyInstance) {
   });
   logger.debug(`by user: ${JSON.stringify(byUser)}`);
 
-  const count_users = await this.prisma.user.count();
+  const count_users = await prisma.user.count();
   logger.debug(`count users: ${count_users}`);
 
   const count_by_user = [];
@@ -82,7 +80,7 @@ export async function getStats(this: FastifyInstance) {
       continue;
     }
 
-    const user = await this.prisma.user.findFirst({
+    const user = await prisma.user.findFirst({
       where: {
         id: byUser[i].userId,
       },
@@ -95,17 +93,17 @@ export async function getStats(this: FastifyInstance) {
   }
   logger.debug(`count by user: ${JSON.stringify(count_by_user)}`);
 
-  const count = await this.prisma.image.count();
+  const count = await prisma.image.count();
   logger.debug(`count files: ${JSON.stringify(count)}`);
 
-  const views = await this.prisma.image.aggregate({
+  const views = await prisma.image.aggregate({
     _sum: {
       views: true,
     },
   });
   logger.debug(`sum views: ${JSON.stringify(views)}`);
 
-  const typesCount = await this.prisma.image.groupBy({
+  const typesCount = await prisma.image.groupBy({
     by: ['mimetype'],
     _count: {
       mimetype: true,

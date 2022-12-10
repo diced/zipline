@@ -1,6 +1,7 @@
 import { Stats } from '@prisma/client';
 import config from 'lib/config';
 import datasource from 'lib/datasource';
+import Logger from 'lib/logger';
 import prisma from 'lib/prisma';
 import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'middleware/withZipline';
 import { getStats } from 'server/util';
@@ -9,7 +10,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   if (req.method === 'POST') {
     if (!user.administrator) return res.forbidden('not an administrator');
 
-    const stats = await getStats(prisma, datasource);
+    const stats = await getStats(prisma, datasource, Logger.get('server'));
     const stats_data = await prisma.stats.create({
       data: {
         data: stats,

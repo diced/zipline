@@ -192,7 +192,7 @@ async function start() {
 }
 
 async function stats(this: FastifyInstance) {
-  const stats = await getStats.bind(this)();
+  const stats = await getStats(server.prisma, server.datasource, server.logger);
 
   await this.prisma.stats.create({
     data: {
