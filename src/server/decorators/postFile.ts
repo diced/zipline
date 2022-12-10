@@ -7,6 +7,8 @@ function postFileDecorator(fastify: FastifyInstance, _: unknown, done: () => voi
   done();
 
   async function postFile(this: FastifyReply, file: Image) {
+    if (!file) return true;
+
     const nFile = await this.server.prisma.image.update({
       where: { id: file.id },
       data: { views: { increment: 1 } },

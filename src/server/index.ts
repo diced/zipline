@@ -71,7 +71,7 @@ async function start() {
   });
 
   server.addHook('onResponse', (req, reply, done) => {
-    if (config.core.logger || dev || process.env.DEBUG) {
+    if (config.core.logger) {
       if (req.url.startsWith('/_next')) return done();
 
       server.logger.child('response').info(`${req.method} ${req.url} -> ${reply.statusCode}`);
@@ -151,6 +151,7 @@ async function start() {
   server.get('/r/:id', rawRoute.bind(server));
   server.get('/', (_, reply) => reply.redirect('/dashboard'));
 
+  // initialize next routes after all other routes have been registered so theres no overlap
   server.after(() => {
     // overrides fastify's default parser so that next.js can handle the request
     // in the future Zipline's api will probably be entirely handled by fastify
@@ -166,9 +167,9 @@ async function start() {
     server.next('/api/*', { method: 'ALL' });
   });
 
-  server.setDefaultRoute((req, res) => {
-    server.nextHandle(req, res);
-  });
+  // server.setDefaultRoute((req, res) => {
+  //   server.nextHandle(req, res);
+  // });
 
   await server.listen({
     port: config.core.port,
@@ -183,15 +184,16 @@ async function start() {
       }`
     );
 
-  clearInvites.bind(server)();
-  stats.bind(server)();
+  await clearInvites.bind(server)();
+  await stats.bind(server)();
 
   setInterval(() => clearInvites.bind(server)(), config.core.invites_interval * 1000);
   setInterval(() => stats.bind(server)(), config.core.stats_interval * 1000);
 }
 
 async function stats(this: FastifyInstance) {
-  const stats = await getStats(this.prisma, this.datasource);
+  const stats = await getStats(server.prisma, server.datasource, server.logger);
+
   await this.prisma.stats.create({
     data: {
       data: stats,

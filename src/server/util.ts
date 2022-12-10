@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { Migrate } from '@prisma/migrate/dist/Migrate';
 import { ensureDatabaseExists } from '@prisma/migrate/dist/utils/ensureDatabaseExists';
+import { FastifyInstance } from 'fastify';
 import { ServerResponse } from 'http';
 import { Datasource } from '../lib/datasources';
 import Logger from '../lib/logger';
@@ -57,18 +58,28 @@ export function redirect(res: ServerResponse, url: string) {
   res.end();
 }
 
-export async function getStats(prisma: PrismaClient, datasource: Datasource) {
+export async function getStats(prisma: PrismaClient, datasource: Datasource, logger: Logger) {
   const size = await datasource.fullSize();
+  logger.debug(`full size: ${size}`);
+
   const byUser = await prisma.image.groupBy({
     by: ['userId'],
     _count: {
       _all: true,
     },
   });
+  logger.debug(`by user: ${JSON.stringify(byUser)}`);
+
   const count_users = await prisma.user.count();
+  logger.debug(`count users: ${count_users}`);
 
   const count_by_user = [];
   for (let i = 0, L = byUser.length; i !== L; ++i) {
+    if (!byUser[i].userId) {
+      logger.debug(`skipping user ${byUser[i]}`);
+      continue;
+    }
+
     const user = await prisma.user.findFirst({
       where: {
         id: byUser[i].userId,
@@ -80,14 +91,17 @@ export async function getStats(prisma: PrismaClient, datasource: Datasource) {
       count: byUser[i]._count._all,
     });
   }
+  logger.debug(`count by user: ${JSON.stringify(count_by_user)}`);
 
   const count = await prisma.image.count();
+  logger.debug(`count files: ${JSON.stringify(count)}`);
 
   const views = await prisma.image.aggregate({
     _sum: {
       views: true,
     },
   });
+  logger.debug(`sum views: ${JSON.stringify(views)}`);
 
   const typesCount = await prisma.image.groupBy({
     by: ['mimetype'],
@@ -95,12 +109,15 @@ export async function getStats(prisma: PrismaClient, datasource: Datasource) {
       mimetype: true,
     },
   });
+  logger.debug(`types count: ${JSON.stringify(typesCount)}`);
   const types_count = [];
   for (let i = 0, L = typesCount.length; i !== L; ++i)
     types_count.push({
       mimetype: typesCount[i].mimetype,
       count: typesCount[i]._count.mimetype,
     });
+
+  logger.debug(`types count: ${JSON.stringify(types_count)}`);
 
   return {
     size: bytesToHuman(size),
