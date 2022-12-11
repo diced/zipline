@@ -21,7 +21,6 @@ import rawRoute from './routes/raw';
 import uploadsRoute, { uploadsRouteOnResponse } from './routes/uploads';
 import urlsRoute, { urlsRouteOnResponse } from './routes/urls';
 import { IncomingMessage } from 'http';
-import { parseString } from '../lib/utils/parser';
 
 const dev = process.env.NODE_ENV === 'development';
 const logger = Logger.get('server');
@@ -38,19 +37,6 @@ start();
 
 async function start() {
   logger.debug('Starting server');
-
-  // const a = parseString(
-  //   '{file.name::upper} {file.mimetype} {file.test} {file.created_at::unix} {file.v::yesno} {file.int::hex}',
-  //   // @ts-ignore
-  //   {
-  //     name: 'test',
-  //     mimetype: 'image/png',
-  //     created_at: new Date(),
-  //     int: 123123123123123,
-  //     v: false,
-  //   }
-  // );
-  // console.log(a);
 
   // plugins
   server
