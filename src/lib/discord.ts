@@ -2,53 +2,21 @@ import { Image, Url, User } from '@prisma/client';
 import config from 'lib/config';
 import { ConfigDiscordContent } from 'lib/config/Config';
 import Logger from './logger';
-
-// [user, image, url, route (ex. https://example.com/r/something.png)]
-export type Args = [User, Image?, Url?, string?];
+import { parseString, ParseValue } from './utils/parser';
 
 const logger = Logger.get('discord');
 
-function parse(str: string, args: Args) {
-  if (!str) return null;
-
-  str = str
-    .replace(/{user\.admin}/gi, args[0].administrator ? 'yes' : 'no')
-    .replace(/{user\.id}/gi, args[0].id.toString())
-    .replace(/{user\.name}/gi, args[0].username)
-    .replace(/{link}/gi, args[3]);
-
-  if (args[1])
-    str = str
-      .replace(/{file\.id}/gi, args[1].id.toString())
-      .replace(/{file\.mime}/gi, args[1].mimetype)
-      .replace(/{file\.file}/gi, args[1].file)
-      .replace(/{file\.created_at.full_string}/gi, args[1].created_at.toLocaleString())
-      .replace(/{file\.created_at.time_string}/gi, args[1].created_at.toLocaleTimeString())
-      .replace(/{file\.created_at.date_string}/gi, args[1].created_at.toLocaleDateString());
-
-  if (args[2])
-    str = str
-      .replace(/{url\.id}/gi, args[2].id.toString())
-      .replace(/{url\.vanity}/gi, args[2].vanity ? args[2].vanity : 'none')
-      .replace(/{url\.destination}/gi, args[2].destination)
-      .replace(/{url\.created_at.full_string}/gi, args[2].created_at.toLocaleString())
-      .replace(/{url\.created_at.time_string}/gi, args[2].created_at.toLocaleTimeString())
-      .replace(/{url\.created_at.date_string}/gi, args[2].created_at.toLocaleDateString());
-
-  return str;
-}
-
 export function parseContent(
   content: ConfigDiscordContent,
-  args: Args
+  args: ParseValue
 ): ConfigDiscordContent & { url: string } {
   return {
-    content: parse(content.content, args),
+    content: parseString(content.content, args),
     embed: content.embed
       ? {
-          title: parse(content.embed.title, args),
-          description: parse(content.embed.description, args),
-          footer: parse(content.embed.footer, args),
+          title: parseString(content.embed.title, args),
+          description: parseString(content.embed.description, args),
+          footer: parseString(content.embed.footer, args),
           color: content.embed.color,
           thumbnail: content.embed.thumbnail,
           timestamp: content.embed.timestamp,
@@ -59,10 +27,16 @@ export function parseContent(
   };
 }
 
-export async function sendUpload(user: User, image: Image, host: string) {
+export async function sendUpload(user: User, image: Image, raw_link: string, link: string) {
   if (!config.discord.upload) return;
 
-  const parsed = parseContent(config.discord.upload, [user, image, null, host]);
+  const parsed = parseContent(config.discord.upload, {
+    file: image,
+    user,
+    link,
+    raw_link,
+  });
+
   const isImage = image.mimetype.startsWith('image/');
 
   const body = JSON.stringify({
@@ -118,10 +92,14 @@ export async function sendUpload(user: User, image: Image, host: string) {
   return;
 }
 
-export async function sendShorten(user: User, url: Url, host: string) {
+export async function sendShorten(user: User, url: Url, link: string) {
   if (!config.discord.shorten) return;
 
-  const parsed = parseContent(config.discord.shorten, [user, null, url, host]);
+  const parsed = parseContent(config.discord.shorten, {
+    url,
+    user,
+    link,
+  });
 
   const body = JSON.stringify({
     username: config.discord.username,

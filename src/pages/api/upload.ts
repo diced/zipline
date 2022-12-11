@@ -191,7 +191,10 @@ async function handler(req: NextApiReq, res: NextApiRes) {
           file,
           `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}/r/${
             invis ? invis.invis : file.file
-          }`
+          }`,
+          `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}${
+            zconfig.uploader.route === '/' ? '' : zconfig.uploader.route
+          }/${invis ? invis.invis : file.file}`
         );
       }
 
@@ -325,7 +328,10 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         image,
         `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}/r/${
           invis ? invis.invis : image.file
-        }`
+        }`,
+        `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}${
+          zconfig.uploader.route === '/' ? '' : zconfig.uploader.route
+        }/${invis ? invis.invis : image.file}`
       );
     }
 

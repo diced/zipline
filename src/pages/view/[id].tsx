@@ -1,7 +1,7 @@
 import { Box, Button, Modal, PasswordInput } from '@mantine/core';
 import exts from 'lib/exts';
 import prisma from 'lib/prisma';
-import { parse } from 'lib/utils/client';
+import { parseString } from 'lib/utils/parser';
 import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -63,9 +63,14 @@ export default function EmbeddedFile({ image, user, pass, prismRender }) {
         {image.embed && (
           <>
             {user.embedSiteName && (
-              <meta property='og:site_name' content={parse(user.embedSiteName, image, user)} />
+              <meta
+                property='og:site_name'
+                content={parseString(user.embedSiteName, { file: image, user })}
+              />
             )}
-            {user.embedTitle && <meta property='og:title' content={parse(user.embedTitle, image, user)} />}
+            {user.embedTitle && (
+              <meta property='og:title' content={parseString(user.embedTitle, { file: image, user })} />
+            )}
             <meta property='theme-color' content={user.embedColor} />
           </>
         )}
