@@ -1,7 +1,7 @@
 version: '3'
 services:
   postgres:
-    image: postgres
+    image: postgres:15
     restart: always
     environment:
       - POSTGRES_USER=postgres

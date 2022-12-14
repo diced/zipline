@@ -17,6 +17,8 @@
     "docker:run": "docker-compose up -d",
     "docker:down": "docker-compose down",
     "docker:build-dev": "docker-compose --file docker-compose.dev.yml up --build",
+    "docker:run-dev": "docker-compose --file docker-compose.dev.yml up",
+    "docker:down-dev": "docker-compose --file docker-compose.dev.yml down",
     "scripts:read-config": "node dist/scripts/read-config",
     "scripts:import-dir": "node dist/scripts/import-dir",
     "scripts:list-users": "node dist/scripts/list-users",
