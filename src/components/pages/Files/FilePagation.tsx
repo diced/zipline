@@ -2,16 +2,39 @@ import { Box, Button, Center, Checkbox, Group, Pagination, SimpleGrid, Skeleton,
 import File from 'components/File';
 import { FileIcon } from 'components/icons';
 import MutedText from 'components/MutedText';
+import useFetch from 'hooks/useFetch';
 import { usePaginatedFiles } from 'lib/queries/files';
 import { showNonMediaSelector } from 'lib/recoil/settings';
-import { useState } from 'react';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 
-export default function FilePagation({ disableMediaPreview, exifEnabled }) {
+export default function FilePagation({ disableMediaPreview, exifEnabled, queryPage }) {
   const [checked, setChecked] = useRecoilState(showNonMediaSelector);
+  const [numPages, setNumPages] = useState(Number(queryPage)); // just set it to the queryPage, since the req may have not loaded yet
+  const [page, setPage] = useState(Number(queryPage));
 
-  const pages = usePaginatedFiles(!checked ? { filter: 'media' } : {});
-  const [page, setPage] = useState(1);
+  const router = useRouter();
+
+  useEffect(() => {
+    (async () => {
+      router.replace(
+        {
+          query: {
+            ...router.query,
+            page: page,
+          },
+        },
+        undefined,
+        { shallow: true }
+      );
+
+      const { count } = await useFetch(`/api/user/paged?type=count${!checked ? '&filter=media' : ''}`);
+      setNumPages(count);
+    })();
+  }, [page]);
+
+  const pages = usePaginatedFiles(page, !checked ? 'media' : null);
 
   if (pages.isSuccess && pages.data.length === 0) {
     return (
@@ -42,7 +65,7 @@ export default function FilePagation({ disableMediaPreview, exifEnabled }) {
       <SimpleGrid cols={3} spacing='lg' breakpoints={[{ maxWidth: 'sm', cols: 1, spacing: 'sm' }]}>
         {pages.isSuccess
           ? pages.data.length
-            ? pages.data[page - 1 ?? 0].map((image) => (
+            ? pages.data.map((image) => (
                 <div key={image.id}>
                   <File image={image} disableMediaPreview={disableMediaPreview} exifEnabled={exifEnabled} />
                 </div>
@@ -65,7 +88,7 @@ export default function FilePagation({ disableMediaPreview, exifEnabled }) {
           }}
         >
           <div></div>
-          <Pagination total={pages.data?.length ?? 0} page={page} onChange={setPage} />
+          <Pagination total={numPages} page={page} onChange={setPage} />
           <Checkbox
             label='Show non-media files'
             checked={checked}

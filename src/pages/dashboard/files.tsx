@@ -18,7 +18,11 @@ export default function FilesPage(props) {
       </Head>
 
       <Layout props={props}>
-        <Files disableMediaPreview={props.disable_media_preview} exifEnabled={props.exif_enabled} />
+        <Files
+          disableMediaPreview={props.disable_media_preview}
+          exifEnabled={props.exif_enabled}
+          queryPage={props.queryPage}
+        />
       </Layout>
     </>
   );

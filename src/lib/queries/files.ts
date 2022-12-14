@@ -28,13 +28,19 @@ export const useFiles = (query: { [key: string]: string } = {}) => {
       );
   });
 };
+export const usePaginatedFiles = (page?: number, filter: string = 'media', favorite = null) => {
+  const queryBuilder = new URLSearchParams({
+    page: Number(page || '1').toString(),
+    filter,
+    ...(favorite !== null && { favorite: favorite.toString() }),
+  });
+  const queryString = queryBuilder.toString();
 
-export const usePaginatedFiles = (query: { [key: string]: string } = {}) => {
-  query['paged'] = 'true';
-  const data = useFiles(query) as ReturnType<typeof useQuery> & {
-    data: UserFilesResponse[][];
-  };
-  return data;
+  return useQuery<UserFilesResponse[]>(['files', queryString], async () => {
+    return fetch('/api/user/paged?' + queryString)
+      .then((res) => res.json() as Promise<UserFilesResponse[]>)
+      .then((data) => data.map((x) => ({ ...x, created_at: new Date(x.created_at).toLocaleString() })));
+  });
 };
 
 export const useRecent = (filter?: string) => {

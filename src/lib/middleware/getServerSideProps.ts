@@ -21,6 +21,7 @@ export type ServerSideProps = {
   totp_enabled: boolean;
   exif_enabled: boolean;
   fileId?: string;
+  queryPage?: string;
 };
 
 export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (ctx) => {
@@ -69,6 +70,10 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (ct
   if (ctx.resolvedUrl.startsWith('/dashboard/metadata')) {
     if (!config.exif.enabled) return { notFound: true };
     obj.props.fileId = ctx.query.id as string;
+  }
+
+  if (ctx.resolvedUrl.startsWith('/dashboard/files')) {
+    obj.props.queryPage = (ctx.query.page as string) || '1';
   }
 
   return obj;

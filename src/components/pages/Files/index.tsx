@@ -1,19 +1,25 @@
 import { Accordion, ActionIcon, Box, Group, Pagination, SimpleGrid, Title } from '@mantine/core';
 import File from 'components/File';
 import { PlusIcon } from 'components/icons';
+import useFetch from 'hooks/useFetch';
 import { usePaginatedFiles } from 'lib/queries/files';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import FilePagation from './FilePagation';
 
-export default function Files({ disableMediaPreview, exifEnabled }) {
-  const pages = usePaginatedFiles({ filter: 'media' });
-  const favoritePages = usePaginatedFiles({ favorite: 'media' });
+export default function Files({ disableMediaPreview, exifEnabled, queryPage }) {
   const [favoritePage, setFavoritePage] = useState(1);
+  const [favoriteNumPages, setFavoriteNumPages] = useState(0);
+  const favoritePages = usePaginatedFiles(favoritePage, 'media', true);
+
+  useEffect(() => {
+    (async () => {
+      const { count } = await useFetch('/api/user/paged?type=count&filter=media&favorite=true');
+      setFavoriteNumPages(count);
+    })();
+  });
 
   const updatePages = async (favorite) => {
-    pages.refetch();
-
     if (favorite) {
       favoritePages.refetch();
     }
@@ -43,7 +49,7 @@ export default function Files({ disableMediaPreview, exifEnabled }) {
             <Accordion.Panel>
               <SimpleGrid cols={3} spacing='lg' breakpoints={[{ maxWidth: 'sm', cols: 1, spacing: 'sm' }]}>
                 {favoritePages.isSuccess && favoritePages.data.length
-                  ? favoritePages.data[favoritePage - 1 ?? 0].map((image) => (
+                  ? favoritePages.data.map((image) => (
                       <div key={image.id}>
                         <File
                           image={image}
@@ -63,18 +69,18 @@ export default function Files({ disableMediaPreview, exifEnabled }) {
                   paddingBottom: 3,
                 }}
               >
-                <Pagination
-                  total={favoritePages.data.length}
-                  page={favoritePage}
-                  onChange={setFavoritePage}
-                />
+                <Pagination total={favoriteNumPages} page={favoritePage} onChange={setFavoritePage} />
               </Box>
             </Accordion.Panel>
           </Accordion.Item>
         </Accordion>
       ) : null}
 
-      <FilePagation disableMediaPreview={disableMediaPreview} exifEnabled={exifEnabled} />
+      <FilePagation
+        disableMediaPreview={disableMediaPreview}
+        exifEnabled={exifEnabled}
+        queryPage={queryPage}
+      />
     </>
   );
 }
