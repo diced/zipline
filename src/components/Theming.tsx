@@ -95,6 +95,7 @@ export default function ZiplineTheming({ Component, pageProps, ...props }) {
               centered: true,
               overlayBlur: 3,
               overlayColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : 'white',
+              exitTransitionDuration: 100,
             },
           },
           Popover: {
