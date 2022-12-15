@@ -1,3 +1,5 @@
+import { Code } from '@mantine/core';
+import Link from 'components/Link';
 import { GeneratorModal } from './GeneratorModal';
 
 export default function Flameshot({ user, open, setOpen }) {
@@ -49,9 +51,9 @@ export default function Flameshot({ user, open, setOpen }) {
       curl.push(`"${key}: ${value}"`);
     }
 
-    const shell = `#!/bin/bash
-flameshot gui -r > /tmp/ss.png;
-${curl.join(' ')} | jq -r '.files[0]' | tr -d '\n' | xsel -ib;
+    const shell = `#!/bin/bash${values.wlCompositorNotSupported ? '\nexport XDG_CURRENT_DESKTOP=sway\n' : ''}
+flameshot gui -p /tmp/ss.png;
+${curl.join(' ')} | jq -r '.files[0]' | tr -d '\\n' | ${values.wlCompatibility ? 'wl-copy' : 'xsel -ib'};
 `;
 
     const pseudoElement = document.createElement('a');
@@ -68,7 +70,23 @@ ${curl.join(' ')} | jq -r '.files[0]' | tr -d '\n' | xsel -ib;
       opened={open}
       onClose={() => setOpen(false)}
       title='Flameshot'
-      desc='To use this script, you need Flameshot, curl, jq, and xsel installed. This script is intended for use on Linux only.'
+      desc={
+        <>
+          To use this script, you need <Link href='https://flameshot.org'>Flameshot</Link>,{' '}
+          <Link href='https://curl.se/'>
+            <Code>curl</Code>
+          </Link>
+          ,{' '}
+          <Link href='https://github.com/stedolan/jq'>
+            <Code>jq</Code>
+          </Link>
+          , and{' '}
+          <Link href='https://github.com/kfish/xsel'>
+            <Code>xsel</Code>
+          </Link>{' '}
+          installed. This script is intended for use on Linux only.
+        </>
+      }
       onSubmit={onSubmit}
     />
   );
