@@ -5,10 +5,10 @@ import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'middleware/wi
 const pageCount = 16;
 
 async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
-  const { page, filter, type, favorite } = req.query as {
+  const { page, filter, count, favorite } = req.query as {
     page: string;
     filter: string;
-    type: string;
+    count: string;
     favorite: string;
   };
 
@@ -34,7 +34,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     }),
   };
 
-  if (type === 'count') {
+  if (count) {
     const count = await prisma.image.count({
       where,
     });

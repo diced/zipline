@@ -2,7 +2,6 @@ import config from 'lib/config';
 import datasource from 'lib/datasource';
 import Logger from 'lib/logger';
 import prisma from 'lib/prisma';
-import { chunk } from 'lib/util';
 import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'middleware/withZipline';
 
 const logger = Logger.get('files');
@@ -96,7 +95,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     if (req.query.filter && req.query.filter === 'media')
       images = images.filter((x) => /^(video|audio|image|text)/.test(x.mimetype));
 
-    return res.json(req.query.paged ? chunk(images, 16) : images);
+    return res.json(images);
   }
 }
 
