@@ -149,10 +149,10 @@ Create an issue on GitHub and use the template, please include the following (if
 
 ## Feature requests
 
-Create an issue on GitHub, please include the following:
+Create a discussion on GitHub, please include the following:
 
 - Brief explanation of the feature in the title (very brief please)
-- How it would work (detailed, but optional)
+- How it would work (Be detailed!)
 
 ## Pull Requests (contributions to the codebase)
 
