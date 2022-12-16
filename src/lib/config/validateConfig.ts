@@ -170,6 +170,7 @@ const validator = s.object({
       oauth_login_only: s.boolean.default(false),
       user_registration: s.boolean.default(false),
       headless: s.boolean.default(false),
+      default_avatar: s.string.nullable.default(null),
     })
     .default({
       invites: false,
@@ -178,6 +179,7 @@ const validator = s.object({
       oauth_login_only: false,
       user_registration: false,
       headless: false,
+      default_avatar: null,
     }),
   chunks: s
     .object({

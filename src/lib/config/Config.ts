@@ -106,6 +106,8 @@ export interface ConfigFeatures {
   user_registration: boolean;
 
   headless: boolean;
+
+  default_avatar: string;
 }
 
 export interface ConfigOAuth {
