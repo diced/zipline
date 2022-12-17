@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE "OAuth" ALTER COLUMN "oauthId" DROP NOT NULL;
