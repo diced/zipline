@@ -3,6 +3,7 @@ import Logger from 'lib/logger';
 import { discord_auth, github_auth, google_auth } from 'lib/oauth';
 import prisma from 'lib/prisma';
 import { hashPassword } from 'lib/util';
+import { jsonUserReplacer } from 'lib/utils/client';
 import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'middleware/withZipline';
 
 const logger = Logger.get('user');
@@ -13,7 +14,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     if (user.oauth.find((o) => o.provider === 'GITHUB')) {
       const resp = await github_auth.oauth_user(user.oauth.find((o) => o.provider === 'GITHUB').token);
       if (!resp) {
-        logger.debug(`oauth expired for ${JSON.stringify(user)}`);
+        logger.debug(`oauth expired for ${JSON.stringify(user, jsonUserReplacer)}`);
 
         return res.json({
           error: 'oauth token expired',
@@ -29,7 +30,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       if (!resp.ok) {
         const provider = user.oauth.find((o) => o.provider === 'DISCORD');
         if (!provider.refresh) {
-          logger.debug(`couldn't find a refresh token for ${JSON.stringify(user)}`);
+          logger.debug(`couldn't find a refresh token for ${JSON.stringify(user, jsonUserReplacer)}`);
 
           return res.json({
             error: 'oauth token expired',
@@ -53,7 +54,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
           }),
         });
         if (!resp2.ok) {
-          logger.debug(`oauth expired for ${JSON.stringify(user)}`);
+          logger.debug(`oauth expired for ${JSON.stringify(user, jsonUserReplacer)}`);
 
           return res.json({
             error: 'oauth token expired',
@@ -84,7 +85,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       if (!resp.ok) {
         const provider = user.oauth.find((o) => o.provider === 'GOOGLE');
         if (!provider.refresh) {
-          logger.debug(`couldn't find a refresh token for ${JSON.stringify(user)}`);
+          logger.debug(`couldn't find a refresh token for ${JSON.stringify(user, jsonUserReplacer)}`);
 
           return res.json({
             error: 'oauth token expired',
@@ -107,7 +108,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
           }),
         });
         if (!resp2.ok) {
-          logger.debug(`oauth expired for ${JSON.stringify(user)}`);
+          logger.debug(`oauth expired for ${JSON.stringify(user, jsonUserReplacer)}`);
 
           return res.json({
             error: 'oauth token expired',
@@ -134,7 +135,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   }
 
   if (req.method === 'PATCH') {
-    logger.debug(`attempting to update user ${JSON.stringify(user)}`);
+    logger.debug(`attempting to update user ${JSON.stringify(user, jsonUserReplacer)}`);
 
     if (req.body.password) {
       const hashed = await hashPassword(req.body.password);
@@ -236,7 +237,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       },
     });
 
-    logger.debug(`updated user ${JSON.stringify(newUser)}`);
+    logger.debug(`updated user ${JSON.stringify(newUser, jsonUserReplacer)}`);
 
     logger.info(`User ${user.username} (${newUser.username}) (${newUser.id}) was updated`);
 
