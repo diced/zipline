@@ -5,6 +5,12 @@ import ms, { StringValue } from 'ms';
 dayjs.extend(duration);
 dayjs.extend(dayjsRelativeTime);
 
+export function jsonUserReplacer(key: string, value: any) {
+  if (key === 'avatar') return 'data:image/*;base64,***';
+
+  return value;
+}
+
 export function randomChars(length: number) {
   const charset = 'QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890';
 

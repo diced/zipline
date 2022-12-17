@@ -14,7 +14,7 @@ export default function Files({ disableMediaPreview, exifEnabled, queryPage }) {
 
   useEffect(() => {
     (async () => {
-      const { count } = await useFetch('/api/user/paged?type=count&filter=media&favorite=true');
+      const { count } = await useFetch('/api/user/paged?count=true&filter=media&favorite=true');
       setFavoriteNumPages(count);
     })();
   });

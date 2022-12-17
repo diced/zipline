@@ -1,8 +1,12 @@
+import { readFile } from 'fs/promises';
 import config from 'lib/config';
 import Logger from 'lib/logger';
 import { NextApiReq, NextApiRes, withZipline } from 'lib/middleware/withZipline';
+import { guess } from 'lib/mimes';
 import prisma from 'lib/prisma';
 import { createToken, hashPassword } from 'lib/util';
+import { jsonUserReplacer } from 'lib/utils/client';
+import { extname } from 'path';
 
 const logger = Logger.get('user');
 
@@ -29,12 +33,25 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
     if (user) return res.badRequest('username already exists');
     const hashed = await hashPassword(password);
+
+    let avatar;
+    if (config.features.default_avatar) {
+      logger.debug(`using default avatar ${config.features.default_avatar}`);
+
+      const buf = await readFile(config.features.default_avatar);
+      const mimetype = await guess(extname(config.features.default_avatar));
+      logger.debug(`guessed mimetype ${mimetype} for ${config.features.default_avatar}`);
+
+      avatar = `data:${mimetype};base64,${buf.toString('base64')}`;
+    }
+
     const newUser = await prisma.user.create({
       data: {
         password: hashed,
         username,
         token: createToken(),
         administrator: false,
+        avatar,
       },
     });
 
@@ -49,7 +66,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       });
     }
 
-    logger.debug(`created user via invite ${code} ${JSON.stringify(newUser)}`);
+    logger.debug(`created user via invite ${code} ${JSON.stringify(newUser, jsonUserReplacer)}`);
 
     logger.info(
       `Created user ${newUser.username} (${newUser.id}) ${
@@ -82,16 +99,28 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
   const hashed = await hashPassword(password);
 
+  let avatar;
+  if (config.features.default_avatar) {
+    logger.debug(`using default avatar ${config.features.default_avatar}`);
+
+    const buf = await readFile(config.features.default_avatar);
+    const mimetype = await guess(extname(config.features.default_avatar));
+    logger.debug(`guessed mimetype ${mimetype} for ${config.features.default_avatar}`);
+
+    avatar = `data:${mimetype};base64,${buf.toString('base64')}`;
+  }
+
   const newUser = await prisma.user.create({
     data: {
       password: hashed,
       username,
       token: createToken(),
       administrator,
+      avatar,
     },
   });
 
-  logger.debug(`created user ${JSON.stringify(newUser)}`);
+  logger.debug(`created user ${JSON.stringify(newUser, jsonUserReplacer)}`);
 
   delete newUser.password;
 

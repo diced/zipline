@@ -111,7 +111,15 @@ function MenuItem(props) {
   );
 }
 
-const items = [
+export type NavbarItems = {
+  icon: React.ReactNode;
+  text: string;
+  link?: string;
+  children?: NavbarItems[];
+  if?: (user: any, props: any) => boolean;
+};
+
+const items: NavbarItems[] = [
   {
     icon: <HomeIcon size={18} />,
     text: 'Home',
@@ -135,27 +143,37 @@ const items = [
   {
     icon: <UploadIcon size={18} />,
     text: 'Upload',
-    link: '/dashboard/upload/file',
+    children: [
+      {
+        icon: <UploadIcon size={18} />,
+        text: 'File',
+        link: '/dashboard/upload/file',
+      },
+      {
+        icon: <TypeIcon size={18} />,
+        text: 'Text',
+        link: '/dashboard/upload/text',
+      },
+    ],
   },
-  {
-    icon: <TypeIcon size={18} />,
-    text: 'Upload Text',
-    link: '/dashboard/upload/text',
-  },
-];
-
-const admin_items = [
   {
     icon: <UserIcon size={18} />,
-    text: 'Users',
-    link: '/dashboard/users',
-    if: () => true,
-  },
-  {
-    icon: <TagIcon size={18} />,
-    text: 'Invites',
-    link: '/dashboard/invites',
-    if: (props) => props.invites,
+    text: 'Administration',
+    if: (user, _) => user.administrator as boolean,
+    children: [
+      {
+        icon: <UserIcon size={18} />,
+        text: 'Users',
+        link: '/dashboard/users',
+        if: () => true,
+      },
+      {
+        icon: <TagIcon size={18} />,
+        text: 'Invites',
+        link: '/dashboard/invites',
+        if: (_, props) => props.invites,
+      },
+    ],
   },
 ];
 
@@ -269,39 +287,42 @@ export default function Layout({ children, props }) {
       navbar={
         <Navbar pt='sm' hiddenBreakpoint='sm' hidden={!opened} width={{ sm: 200, lg: 230 }}>
           <Navbar.Section grow component={ScrollArea}>
-            {items.map(({ icon, text, link }) => (
-              <Link href={link} key={text} passHref legacyBehavior>
-                <NavLink
-                  component='a'
-                  label={text}
-                  icon={icon}
-                  active={router.pathname === link}
-                  variant='light'
-                />
-              </Link>
-            ))}
-            {user.administrator && (
-              <NavLink
-                label='Administration'
-                icon={<SettingsIcon />}
-                childrenOffset={28}
-                defaultOpened={admin_items.map((x) => x.link).includes(router.pathname)}
-              >
-                {admin_items
-                  .filter((x) => x.if(props))
-                  .map(({ icon, text, link }) => (
-                    <Link href={link} key={text} passHref legacyBehavior>
-                      <NavLink
-                        component='a'
-                        label={text}
-                        icon={icon}
-                        active={router.pathname === link}
-                        variant='light'
-                      />
-                    </Link>
-                  ))}
-              </NavLink>
-            )}
+            {items
+              .filter((x) => (x.if ? x.if(user, props) : true))
+              .map(({ icon, text, link, children }) =>
+                children ? (
+                  <NavLink
+                    key={text}
+                    label={text}
+                    icon={icon}
+                    defaultOpened={children.map((x) => x.link).includes(router.pathname)}
+                  >
+                    {children
+                      .filter((x) => (x.if ? x.if(user, props) : true))
+                      .map(({ icon, text, link }) => (
+                        <Link href={link} key={text} passHref legacyBehavior>
+                          <NavLink
+                            component='a'
+                            label={text}
+                            icon={icon}
+                            active={router.pathname === link}
+                            variant='light'
+                          />
+                        </Link>
+                      ))}
+                  </NavLink>
+                ) : (
+                  <Link href={link} key={text} passHref legacyBehavior>
+                    <NavLink
+                      component='a'
+                      label={text}
+                      icon={icon}
+                      active={router.pathname === link}
+                      variant='light'
+                    />
+                  </Link>
+                )
+              )}
           </Navbar.Section>
           <Navbar.Section>
             {external_links.length
