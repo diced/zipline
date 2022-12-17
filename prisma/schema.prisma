@@ -100,7 +100,7 @@ model OAuth {
   user     User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId   Int
   username String
-  oauthId  String?
+  oauthId  String
   token    String
   refresh  String?
 
