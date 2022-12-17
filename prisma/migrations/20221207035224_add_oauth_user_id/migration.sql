@@ -6,7 +6,7 @@
 
 */
 -- AlterTable
-ALTER TABLE "OAuth" ADD COLUMN     "oauthId" TEXT NOT NULL;
+ALTER TABLE "OAuth" ADD COLUMN     "oauthId" TEXT;
 
 -- CreateIndex
 CREATE UNIQUE INDEX "OAuth_provider_oauthId_key" ON "OAuth"("provider", "oauthId");

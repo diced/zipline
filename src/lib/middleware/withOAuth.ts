@@ -56,14 +56,34 @@ export const withOAuth =
 
     const { state } = req.query as { state?: string };
 
-    const existingOauth = await prisma.oAuth.findUnique({
-      where: {
-        provider_oauthId: {
-          provider: provider.toUpperCase() as OauthProviders,
-          oauthId: oauth_resp.user_id,
+    let existingOauth;
+    try {
+      existingOauth = await prisma.oAuth.findUnique({
+        where: {
+          provider_oauthId: {
+            provider: provider.toUpperCase() as OauthProviders,
+            oauthId: oauth_resp.user_id as string,
+          },
         },
-      },
-    });
+      });
+    } catch (e) {
+      if (e.code === 'P2002') {
+        const existing = await prisma.user.findFirst({
+          where: {
+            oauth: {
+              some: {
+                provider: provider.toUpperCase() as OauthProviders,
+                username: oauth_resp.username,
+              },
+            },
+          },
+          include: {
+            oauth: true,
+          },
+        });
+        existingOauth = existing?.oauth?.find((o) => o.provider === provider.toUpperCase());
+      }
+    }
 
     const existingUser = await prisma.user.findFirst({
       where: {
@@ -98,7 +118,7 @@ export const withOAuth =
                 token: oauth_resp.access_token,
                 refresh: oauth_resp.refresh_token || null,
                 username: oauth_resp.username,
-                oauthId: oauth_resp.user_id,
+                oauthId: oauth_resp.user_id as string,
               },
             },
             avatar: oauth_resp.avatar,
@@ -125,7 +145,7 @@ export const withOAuth =
           token: oauth_resp.access_token,
           refresh: oauth_resp.refresh_token || null,
           username: oauth_resp.username,
-          oauthId: oauth_resp.user_id,
+          oauthId: oauth_resp.user_id as string,
         },
       });
 
@@ -142,7 +162,7 @@ export const withOAuth =
           token: oauth_resp.access_token,
           refresh: oauth_resp.refresh_token || null,
           username: oauth_resp.username,
-          oauthId: oauth_resp.user_id,
+          oauthId: oauth_resp.user_id as string,
         },
       });
 
@@ -168,7 +188,7 @@ export const withOAuth =
             token: oauth_resp.access_token,
             refresh: oauth_resp.refresh_token || null,
             username: oauth_resp.username,
-            oauthId: oauth_resp.user_id,
+            oauthId: oauth_resp.user_id as string,
           },
         },
         avatar: oauth_resp.avatar,
