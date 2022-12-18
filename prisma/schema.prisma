@@ -38,6 +38,7 @@ enum ImageFormat {
 model Image {
   id         Int             @id @default(autoincrement())
   file       String
+  ogFile     String?
   mimetype   String          @default("image/png")
   created_at DateTime        @default(now())
   expires_at DateTime?

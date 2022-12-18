@@ -18,6 +18,10 @@ function dbFileDecorator(fastify: FastifyInstance, _, done) {
 
     this.header('Content-Length', size);
     this.header('Content-Type', image.mimetype);
+    this.header(
+      'Content-Disposition',
+      `inline; name="${image.ogFile ?? image.file}" filename="${image.file}"`
+    );
     return this.send(data);
   }
 }
