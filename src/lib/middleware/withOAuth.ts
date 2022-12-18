@@ -58,7 +58,7 @@ export const withOAuth =
 
     let existingOauth;
     try {
-      existingOauth = await prisma.oAuth.findUnique({
+      existingOauth = await prisma.oAuth.findUniqueOrThrow({
         where: {
           provider_oauthId: {
             provider: provider.toUpperCase() as OauthProviders,
@@ -67,7 +67,8 @@ export const withOAuth =
         },
       });
     } catch (e) {
-      if (e.code === 'P2002') {
+      logger.debug(`Failed to find existing oauth. Using fallback. ${e}`);
+      if (e.code === 'P2022' || e.code === 'P2025') {
         const existing = await prisma.user.findFirst({
           where: {
             oauth: {
@@ -82,6 +83,7 @@ export const withOAuth =
           },
         });
         existingOauth = existing?.oauth?.find((o) => o.provider === provider.toUpperCase());
+        existingOauth.lastCase = true;
       }
     }
 
@@ -153,7 +155,7 @@ export const withOAuth =
       logger.info(`User ${user.username} (${user.id}) logged in via oauth(${provider})`);
 
       return res.redirect('/dashboard');
-    } else if (existingOauth) {
+    } else if ((existingOauth && existingOauth.lastCase) || existingOauth) {
       await prisma.oAuth.update({
         where: {
           id: existingOauth!.id,
