@@ -14,9 +14,9 @@ export function parseContent(
     content: parseString(content.content, args),
     embed: content.embed
       ? {
-          title: parseString(content.embed.title, args),
-          description: parseString(content.embed.description, args),
-          footer: parseString(content.embed.footer, args),
+          title: content.embed.title ? parseString(content.embed.title, args) : null,
+          description: content.embed.description ? parseString(content.embed.description, args) : null,
+          footer: content.embed.footer ? parseString(content.embed.footer, args) : null,
           color: content.embed.color,
           thumbnail: content.embed.thumbnail,
           timestamp: content.embed.timestamp,
@@ -73,7 +73,7 @@ export async function sendUpload(user: User, image: Image, raw_link: string, lin
       : null,
   });
 
-  logger.debug('attempting to send shorten notification to discord', body);
+  logger.debug('attempting to send upload notification to discord', body);
   const res = await fetch(config.discord.url, {
     method: 'POST',
     body,
@@ -85,7 +85,7 @@ export async function sendUpload(user: User, image: Image, raw_link: string, lin
   if (!res.ok) {
     const text = await res.text();
     logger
-      .error(`Failed to send shorten notification to discord: ${res.status}`)
+      .error(`Failed to send upload notification to discord: ${res.status}`)
       .error(`Received response:\n${text}`);
   }
 
