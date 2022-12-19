@@ -11,7 +11,7 @@ export function parseContent(
   args: ParseValue
 ): ConfigDiscordContent & { url: string } {
   return {
-    content: parseString(content.content, args),
+    content: content.content ? parseString(content.content, args) : null,
     embed: content.embed
       ? {
           title: content.embed.title ? parseString(content.embed.title, args) : null,
