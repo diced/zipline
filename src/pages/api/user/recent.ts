@@ -27,7 +27,9 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   });
 
   for (let i = 0; i !== images.length; ++i) {
-    (images[i] as unknown as { url: string }).url = `${config.uploader.route}/${images[i].file}`;
+    (images[i] as unknown as { url: string }).url = `${
+      config.uploader.route === '/' ? '/' : `${config.uploader.route}/`
+    }${images[i].file}`;
   }
 
   if (req.query.filter && req.query.filter === 'media')
