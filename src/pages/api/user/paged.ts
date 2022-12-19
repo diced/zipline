@@ -77,7 +77,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
 
   for (let i = 0; i !== files.length; ++i) {
     (files[i] as unknown as { url: string }).url = `${
-      config.uploader.route === '/' ? '' : `${config.uploader.route}/`
+      config.uploader.route === '/' ? '/' : `${config.uploader.route}/`
     }${files[i].file}`;
   }
 
