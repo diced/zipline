@@ -16,9 +16,7 @@ model User {
   administrator Boolean   @default(false)
   superAdmin    Boolean   @default(false)
   systemTheme   String    @default("system")
-  embedTitle    String?
-  embedColor    String    @default("#2f3136")
-  embedSiteName String?   @default("{image.file} • {user.name}")
+  embed         UserEmbed?
   ratelimit     DateTime?
   totpSecret    String?
   domains       String[]
@@ -92,6 +90,16 @@ model Invite {
   used        Boolean   @default(false)
   createdBy   User      @relation(fields: [createdById], references: [id], onDelete: Cascade)
   createdById Int
+}
+
+model UserEmbed {
+  id          Int       @id @default(autoincrement())
+  title       String?
+  color       String    @default("#2f3136")
+  siteName    String?   @default("{image.file} • {user.username}")
+  description String?
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      Int       @unique
 }
 
 model OAuth {

@@ -139,9 +139,10 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
     initialValues: {
       username: user.username,
       password: '',
-      embedTitle: user.embedTitle ?? '',
-      embedColor: user.embedColor,
-      embedSiteName: user.embedSiteName ?? '',
+      embedTitle: user.embed?.title ?? '',
+      embedColor: user.embed?.color ?? '#2f3136',
+      embedSiteName: user.embed?.siteName ?? '',
+      embedDescription: user.embed?.description ?? '',
       domains: user.domains.join(','),
     },
   });
@@ -152,6 +153,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
     const cleanEmbedTitle = values.embedTitle.trim();
     const cleanEmbedColor = values.embedColor.trim();
     const cleanEmbedSiteName = values.embedSiteName.trim();
+    const cleanEmbedDescription = values.embedDescription.trim();
 
     if (cleanUsername === '') return form.setFieldError('username', "Username can't be nothing");
 
@@ -169,6 +171,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
       embedTitle: cleanEmbedTitle === '' ? null : cleanEmbedTitle,
       embedColor: cleanEmbedColor === '' ? null : cleanEmbedColor,
       embedSiteName: cleanEmbedSiteName === '' ? null : cleanEmbedSiteName,
+      embedDescription: cleanEmbedDescription === '' ? null : cleanEmbedDescription,
       domains: values.domains
         .split(/\s?,\s?/)
         .map((x) => x.trim())
@@ -412,6 +415,13 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
           label='Embed Site Name'
           my='sm'
           {...form.getInputProps('embedSiteName')}
+        />
+        <TextInput
+          id='embedDescription'
+          label='Embed Description'
+          description='This will be shown if the file is neither an image nor a video.'
+          my='sm'
+          {...form.getInputProps('embedDescription')}
         />
         <TextInput
           id='domains'

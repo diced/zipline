@@ -1,4 +1,4 @@
-import { Image, Url, User } from '@prisma/client';
+import { Image, Url, User, UserEmbed } from '@prisma/client';
 import config from 'lib/config';
 import { ConfigDiscordContent } from 'lib/config/Config';
 import Logger from './logger';
@@ -27,7 +27,12 @@ export function parseContent(
   };
 }
 
-export async function sendUpload(user: User, image: Image, raw_link: string, link: string) {
+export async function sendUpload(
+  user: User & { embed: UserEmbed },
+  image: Image,
+  raw_link: string,
+  link: string
+) {
   if (!config.discord.upload) return;
 
   const parsed = parseContent(config.discord.upload, {
@@ -92,7 +97,7 @@ export async function sendUpload(user: User, image: Image, raw_link: string, lin
   return;
 }
 
-export async function sendShorten(user: User, url: Url, link: string) {
+export async function sendShorten(user: User & { embed: UserEmbed }, url: Url, link: string) {
   if (!config.discord.shorten) return;
 
   const parsed = parseContent(config.discord.shorten, {

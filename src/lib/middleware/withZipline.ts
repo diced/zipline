@@ -1,7 +1,7 @@
 import type { CookieSerializeOptions } from 'cookie';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { OAuth, User } from '@prisma/client';
+import { OAuth, User, UserEmbed } from '@prisma/client';
 import { serialize } from 'cookie';
 import { HTTPMethod } from 'find-my-way';
 import config from 'lib/config';
@@ -20,6 +20,7 @@ export interface NextApiFile {
 
 export interface UserExtended extends User {
   oauth: OAuth[];
+  embed: UserEmbed;
 }
 
 export type NextApiReq = NextApiRequest & {
@@ -163,7 +164,10 @@ export const withZipline =
             where: {
               token: authHeader,
             },
-            include: { oauth: true },
+            include: {
+              oauth: true,
+              embed: true,
+            },
           });
 
           if (user) return user;
@@ -178,6 +182,7 @@ export const withZipline =
           },
           include: {
             oauth: true,
+            embed: true,
           },
         });
 

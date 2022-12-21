@@ -62,16 +62,16 @@ export default function EmbeddedFile({ image, user, pass, prismRender }) {
       <Head>
         {image.embed && (
           <>
-            {user.embedSiteName && (
+            {user.embed?.siteName && (
               <meta
                 property='og:site_name'
-                content={parseString(user.embedSiteName, { file: image, user })}
+                content={parseString(user.embed.siteName, { file: image, user })}
               />
             )}
-            {user.embedTitle && (
-              <meta property='og:title' content={parseString(user.embedTitle, { file: image, user })} />
+            {user.embed?.title && (
+              <meta property='og:title' content={parseString(user.embed.title, { file: image, user })} />
             )}
-            <meta property='theme-color' content={user.embedColor} />
+            <meta property='theme-color' content={user.embed?.color ?? '#2f3136'} />
           </>
         )}
         {image.mimetype.startsWith('image') && (
@@ -96,6 +96,17 @@ export default function EmbeddedFile({ image, user, pass, prismRender }) {
             <meta property='og:video:type' content={image.mimetype} />
             <meta property='og:video:width' content='720' />
             <meta property='og:video:height' content='480' />
+          </>
+        )}
+        {!image.mimetype.startsWith('video') && !image.mimetype.startsWith('image') && (
+          <>
+            {user.embed?.description && (
+              <meta
+                property='og:description'
+                content={parseString(user.embed.description, { file: image, user })}
+              />
+            )}
+            <meta property='og:url' content={`/r/${image.file}`} />
           </>
         )}
         <title>{image.file}</title>
@@ -136,6 +147,10 @@ export default function EmbeddedFile({ image, user, pass, prismRender }) {
         {image.mimetype.startsWith('video') && (
           <video src={dataURL('/r')} controls={true} autoPlay={true} id='image_content' />
         )}
+
+        {!image.mimetype.startsWith('video') && !image.mimetype.startsWith('image') && (
+          <a href={dataURL('/r')}>Can&#39;t preview this file. Click here to download it.</a>
+        )}
       </Box>
     </>
   );
@@ -163,9 +178,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const user = await prisma.user.findFirst({
     select: {
-      embedTitle: true,
-      embedColor: true,
-      embedSiteName: true,
+      embed: true,
       username: true,
       id: true,
     },
@@ -204,8 +217,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     const data = await datasource.get(image.file);
     if (!data) return { notFound: true };
 
-    data.pipe(context.res);
-    return { props: {} };
+    return {
+      props: {
+        image,
+        user,
+      },
+    };
   }
   const pass = image.password ? true : false;
   delete image.password;

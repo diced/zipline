@@ -1,9 +1,9 @@
-import type { Image, User, Url } from '@prisma/client';
+import type { Image, User, Url, UserEmbed } from '@prisma/client';
 
 export type ParseValue = {
   file?: Image;
   url?: Url;
-  user?: User;
+  user?: User & { embed?: UserEmbed };
 
   link?: string;
   raw_link?: string;
@@ -12,7 +12,7 @@ export type ParseValue = {
 export function parseString(str: string, value: ParseValue) {
   str = str.replace(/\{link\}/gi, value.link).replace(/\{raw_link\}/gi, value.raw_link);
 
-  const re = /\{(?<type>file|url|user)\.(?<prop>\w+)(::(?<mod>\w+))?\}/gi;
+  const re = /\{(?<type>file|url|user)\.(?<prop>\w+)(\.?(?<subprop>\w+))?(::(?<mod>\w+))?\}/gi;
   let matches: RegExpMatchArray;
 
   while ((matches = re.exec(str))) {
@@ -33,6 +33,29 @@ export function parseString(str: string, value: ParseValue) {
 
     if (v === undefined) {
       str = replaceCharsFromString(str, '{unknown_property}', matches.index, re.lastIndex);
+      re.lastIndex = matches.index;
+      continue;
+    } else if (typeof v === 'object' && !matches.groups.subprop) {
+      str = replaceCharsFromString(str, '{unknown_property}', matches.index, re.lastIndex);
+      re.lastIndex = matches.index;
+      continue;
+    }
+
+    if (matches.groups.subprop !== undefined) {
+      const subv = v[matches.groups.subprop];
+      if (subv === undefined) {
+        str = replaceCharsFromString(str, '{unknown_property}', matches.index, re.lastIndex);
+        re.lastIndex = matches.index;
+        continue;
+      }
+
+      if (matches.groups.mod) {
+        str = replaceCharsFromString(str, modifier(matches.groups.mod, subv), matches.index, re.lastIndex);
+        re.lastIndex = matches.index;
+        continue;
+      }
+
+      str = replaceCharsFromString(str, subv, matches.index, re.lastIndex);
       re.lastIndex = matches.index;
       continue;
     }

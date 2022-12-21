@@ -104,19 +104,53 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     if (req.body.embedTitle)
       await prisma.user.update({
         where: { id: target.id },
-        data: { embedTitle: req.body.embedTitle },
+        data: {
+          embed: {
+            upsert: {
+              create: { title: req.body.embedTitle },
+              update: { title: req.body.embedTitle },
+            },
+          },
+        },
       });
 
     if (req.body.embedColor)
       await prisma.user.update({
         where: { id: target.id },
-        data: { embedColor: req.body.embedColor },
+        data: {
+          embed: {
+            upsert: {
+              create: { color: req.body.embedColor },
+              update: { color: req.body.embedColor },
+            },
+          },
+        },
       });
 
     if (req.body.embedSiteName)
       await prisma.user.update({
         where: { id: target.id },
-        data: { embedSiteName: req.body.embedSiteName },
+        data: {
+          embed: {
+            upsert: {
+              create: { siteName: req.body.embedSiteName },
+              update: { siteName: req.body.embedSiteName },
+            },
+          },
+        },
+      });
+
+    if (req.body.embedDescription)
+      await prisma.user.update({
+        where: { id: target.id },
+        data: {
+          embed: {
+            upsert: {
+              create: { description: req.body.embedDescription },
+              update: { description: req.body.embedDescription },
+            },
+          },
+        },
       });
 
     if (req.body.systemTheme)
