@@ -14,6 +14,9 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     where: {
       token: req.headers.authorization,
     },
+    include: {
+      embed: true,
+    },
   });
 
   if (!user) return res.unauthorized('authorization incorect');
