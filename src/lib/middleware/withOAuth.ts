@@ -83,7 +83,9 @@ export const withOAuth =
           },
         });
         existingOauth = existing?.oauth?.find((o) => o.provider === provider.toUpperCase());
-        existingOauth.lastCase = true;
+        if (existingOauth) existingOauth.fallback = true;
+      } else {
+        logger.error(`Failed to find existing oauth. ${e}`);
       }
     }
 
@@ -155,7 +157,7 @@ export const withOAuth =
       logger.info(`User ${user.username} (${user.id}) logged in via oauth(${provider})`);
 
       return res.redirect('/dashboard');
-    } else if ((existingOauth && existingOauth.lastCase) || existingOauth) {
+    } else if ((existingOauth && existingOauth.fallback) || existingOauth) {
       await prisma.oAuth.update({
         where: {
           id: existingOauth!.id,
@@ -180,28 +182,35 @@ export const withOAuth =
       return oauthError(`Username ${oauth_resp.username} is already taken, unable to create account.`);
 
     logger.debug('creating new user via oauth');
-    const nuser = await prisma.user.create({
-      data: {
-        username: oauth_resp.username,
-        token: createToken(),
-        oauth: {
-          create: {
-            provider: OauthProviders[provider.toUpperCase()],
-            token: oauth_resp.access_token,
-            refresh: oauth_resp.refresh_token || null,
-            username: oauth_resp.username,
-            oauthId: oauth_resp.user_id as string,
+    try {
+      const nuser = await prisma.user.create({
+        data: {
+          username: oauth_resp.username,
+          token: createToken(),
+          oauth: {
+            create: {
+              provider: OauthProviders[provider.toUpperCase()],
+              token: oauth_resp.access_token,
+              refresh: oauth_resp.refresh_token || null,
+              username: oauth_resp.username,
+              oauthId: oauth_resp.user_id as string,
+            },
           },
+          avatar: oauth_resp.avatar,
         },
-        avatar: oauth_resp.avatar,
-      },
-    });
+      });
 
-    logger.debug(`created user ${JSON.stringify(nuser)} via oauth(${provider})`);
-    logger.info(`Created user ${nuser.username} via oauth(${provider})`);
+      logger.debug(`created user ${JSON.stringify(nuser)} via oauth(${provider})`);
+      logger.info(`Created user ${nuser.username} via oauth(${provider})`);
 
-    res.setUserCookie(nuser.id);
-    logger.info(`User ${nuser.username} (${nuser.id}) logged in via oauth(${provider})`);
+      res.setUserCookie(nuser.id);
+      logger.info(`User ${nuser.username} (${nuser.id}) logged in via oauth(${provider})`);
 
-    return res.redirect('/dashboard');
+      return res.redirect('/dashboard');
+    } catch (e) {
+      if (e.code === 'P2002') {
+        logger.debug(`account already linked with ${provider}`);
+        return oauthError('This account is already linked with another user.');
+      } else throw e;
+    }
   };
