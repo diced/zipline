@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import fastifyPlugin from 'fastify-plugin';
-import Logger from '../../lib/logger';
+import Logger from 'lib/logger';
 
 function loggerPlugin(fastify: FastifyInstance, _: unknown, done: () => void) {
   fastify.decorate('logger', Logger.get('server'));

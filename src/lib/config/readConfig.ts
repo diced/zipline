@@ -2,8 +2,8 @@ import { parse } from 'dotenv';
 import { expand } from 'dotenv-expand';
 import { existsSync, readFileSync } from 'fs';
 import { resolve } from 'path';
-import Logger from '../logger';
-import { humanToBytes } from '../utils/bytes';
+import Logger from 'lib/logger';
+import { humanToBytes } from 'utils/bytes';
 
 export type ValueType = 'string' | 'number' | 'boolean' | 'array' | 'json-array' | 'human-to-byte' | 'path';
 

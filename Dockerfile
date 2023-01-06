@@ -62,4 +62,4 @@ COPY --from=builder /build/tsconfig.json ./tsconfig.json
 COPY --from=builder /build/package.json ./package.json
 COPY --from=builder /build/mimes.json ./mimes.json
 
-CMD ["node", "--enable-source-maps", "dist/server"]
+CMD ["node", "--enable-source-maps", "dist"]

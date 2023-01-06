@@ -2,9 +2,9 @@ import { PrismaClient } from '@prisma/client';
 import { Migrate } from '@prisma/migrate/dist/Migrate';
 import { ensureDatabaseExists } from '@prisma/migrate/dist/utils/ensureDatabaseExists';
 import { ServerResponse } from 'http';
-import { Datasource } from '../lib/datasources';
-import Logger from '../lib/logger';
-import { bytesToHuman } from '../lib/utils/bytes';
+import { Datasource } from 'lib/datasources';
+import Logger from 'lib/logger';
+import { bytesToHuman } from 'lib/utils/bytes';
 
 export async function migrations() {
   const logger = Logger.get('database::migrations');

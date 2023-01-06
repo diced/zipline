@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { FastifyInstance } from 'fastify';
 import fastifyPlugin from 'fastify-plugin';
-import { migrations } from '../util';
+import { migrations } from 'server/util';
 
 async function prismaPlugin(fastify: FastifyInstance, _, done) {
   process.env.DATABASE_URL = fastify.config.core?.database_url;
