@@ -133,7 +133,7 @@ export default function ZiplineTheming({ Component, pageProps, ...props }) {
       }}
     >
       <ModalsProvider>
-        <NotificationsProvider>
+        <NotificationsProvider position='top-center' style={{ marginTop: -10 }}>
           {props.children ? props.children : <Component {...pageProps} />}
         </NotificationsProvider>
       </ModalsProvider>
