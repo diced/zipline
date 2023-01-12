@@ -52,7 +52,7 @@ export default function Flameshot({ user, open, setOpen }) {
     }
 
     const shell = `#!/bin/bash${values.wlCompositorNotSupported ? '\nexport XDG_CURRENT_DESKTOP=sway\n' : ''}
-flameshot gui -p /tmp/ss.png;
+flameshot gui -r > /tmp/ss.png;
 ${curl.join(' ')} | jq -r '.files[0]' | tr -d '\\n' | ${values.wlCompatibility ? 'wl-copy' : 'xsel -ib'};
 `;
 
