@@ -75,16 +75,16 @@ export default function EmbeddedFile({
       <Head>
         {image.embed && (
           <>
-            {user.embedSiteName && (
+            {user.embed.siteName && (
               <meta
                 property='og:site_name'
-                content={parseString(user.embedSiteName, { file: image, user })}
+                content={parseString(user.embed.siteName, { file: image, user })}
               />
             )}
-            {user.embedTitle && (
-              <meta property='og:title' content={parseString(user.embedTitle, { file: image, user })} />
+            {user.embed.title && (
+              <meta property='og:title' content={parseString(user.embed.title, { file: image, user })} />
             )}
-            <meta property='theme-color' content={user.embedColor ?? '#2f3136'} />
+            <meta property='theme-color' content={user.embed.color ?? '#2f3136'} />
           </>
         )}
         {image.mimetype.startsWith('image') && (

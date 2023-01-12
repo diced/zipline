@@ -18,8 +18,18 @@ export interface NextApiFile {
   size: number;
 }
 
-export interface UserExtended extends User {
+export interface UserOauth extends User {
   oauth: OAuth[];
+}
+export type UserExtended = UserOauth & {
+  embed: UserEmbed;
+};
+
+export interface UserEmbed {
+  title?: string;
+  siteName?: string;
+  description?: string;
+  color?: string;
 }
 
 export type NextApiReq = NextApiRequest & {
@@ -166,7 +176,7 @@ export const withZipline =
             include: { oauth: true },
           });
 
-          if (user) return user;
+          if (user) return user as UserExtended;
         }
 
         const userId = req.getCookie('user');
@@ -182,7 +192,7 @@ export const withZipline =
         });
 
         if (!user) return null;
-        return user;
+        return user as UserExtended;
       } catch (e) {
         Logger.get('withZipline').debug(e.message);
         if (e.code && e.code === 'ERR_CRYPTO_TIMING_SAFE_EQUAL_LENGTH') {

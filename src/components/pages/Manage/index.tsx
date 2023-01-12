@@ -8,6 +8,7 @@ import {
   Group,
   Image,
   PasswordInput,
+  SimpleGrid,
   Space,
   Text,
   TextInput,
@@ -139,9 +140,10 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
     initialValues: {
       username: user.username,
       password: '',
-      embedTitle: user.embedTitle ?? '',
-      embedColor: user.embedColor,
-      embedSiteName: user.embedSiteName ?? '',
+      embedTitle: user.embed?.title ?? null,
+      embedColor: user.embed?.color ?? '',
+      embedSiteName: user.embed?.siteName ?? null,
+      embedDescription: user.embed?.description ?? null,
       domains: user.domains.join(','),
     },
   });
@@ -149,9 +151,12 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
   const onSubmit = async (values) => {
     const cleanUsername = values.username.trim();
     const cleanPassword = values.password.trim();
-    const cleanEmbedTitle = values.embedTitle.trim();
-    const cleanEmbedColor = values.embedColor.trim();
-    const cleanEmbedSiteName = values.embedSiteName.trim();
+    const cleanEmbed = {
+      title: values.embedTitle ? values.embedTitle.trim() : null,
+      color: values.embedColor !== '' ? values.embedColor.trim() : null,
+      siteName: values.embedSiteName ? values.embedSiteName.trim() : null,
+      description: values.embedDescription ? values.embedDescription.trim() : null,
+    };
 
     if (cleanUsername === '') return form.setFieldError('username', "Username can't be nothing");
 
@@ -166,13 +171,11 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
     const data = {
       username: cleanUsername,
       password: cleanPassword === '' ? null : cleanPassword,
-      embedTitle: cleanEmbedTitle === '' ? null : cleanEmbedTitle,
-      embedColor: cleanEmbedColor === '' ? null : cleanEmbedColor,
-      embedSiteName: cleanEmbedSiteName === '' ? null : cleanEmbedSiteName,
       domains: values.domains
         .split(/\s?,\s?/)
         .map((x) => x.trim())
         .filter((x) => x !== ''),
+      embed: cleanEmbed,
     };
 
     const newUser = await useFetch('/api/user', 'PATCH', data);
@@ -405,14 +408,31 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
           my='sm'
           {...form.getInputProps('password')}
         />
-        <TextInput id='embedTitle' label='Embed Title' my='sm' {...form.getInputProps('embedTitle')} />
-        <ColorInput id='embedColor' label='Embed Color' my='sm' {...form.getInputProps('embedColor')} />
-        <TextInput
-          id='embedSiteName'
-          label='Embed Site Name'
-          my='sm'
-          {...form.getInputProps('embedSiteName')}
-        />
+
+        <SimpleGrid
+          cols={4}
+          breakpoints={[
+            { maxWidth: 768, cols: 1 },
+            { minWidth: 769, maxWidth: 1024, cols: 2 },
+            { minWidth: 1281, cols: 4 },
+          ]}
+        >
+          <TextInput id='embedTitle' label='Embed Title' my='sm' {...form.getInputProps('embedTitle')} />
+          <ColorInput id='embedColor' label='Embed Color' my='sm' {...form.getInputProps('embedColor')} />
+          <TextInput
+            id='embedSiteName'
+            label='Embed Site Name'
+            my='sm'
+            {...form.getInputProps('embedSiteName')}
+          />
+          <TextInput
+            id='embedDescription'
+            label='Embed Description'
+            my='sm'
+            {...form.getInputProps('embedDescription')}
+          />
+        </SimpleGrid>
+
         <TextInput
           id='domains'
           label='Domains'

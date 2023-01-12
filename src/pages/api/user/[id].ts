@@ -101,22 +101,10 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
         data: { avatar: req.body.avatar },
       });
 
-    if (req.body.embedTitle)
+    if (req.body.embed)
       await prisma.user.update({
         where: { id: target.id },
-        data: { embedTitle: req.body.embedTitle },
-      });
-
-    if (req.body.embedColor)
-      await prisma.user.update({
-        where: { id: target.id },
-        data: { embedColor: req.body.embedColor },
-      });
-
-    if (req.body.embedSiteName)
-      await prisma.user.update({
-        where: { id: target.id },
-        data: { embedSiteName: req.body.embedSiteName },
+        data: { embed: req.body.embed },
       });
 
     if (req.body.systemTheme)
