@@ -268,6 +268,17 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         fileName = file.originalname.split('.')[0];
         break;
       default:
+        if (req.headers['x-zipline-filename']) {
+          fileName = req.headers['x-zipline-filename'] as string;
+          const existing = await prisma.image.findFirst({
+            where: {
+              file: fileName,
+            },
+          });
+          if (existing) return res.badRequest(`file[${i}]: filename already exists: '${fileName}'`);
+
+          break;
+        }
         fileName = randomChars(zconfig.uploader.length);
         break;
     }
@@ -361,6 +372,11 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         },
       });
     }
+  }
+
+  if (req.headers['x-zipline-nojson']) {
+    res.setHeader('Content-Type', 'text/plain');
+    return res.end(response.files.join(','));
   }
 
   return res.json(response);

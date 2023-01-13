@@ -46,6 +46,12 @@ export default function Flameshot({ user, open, setOpen }) {
       delete extraHeaders['Embed'];
     }
 
+    if (values.noJSON) {
+      extraHeaders['X-Zipline-NoJSON'] = 'true';
+    } else {
+      delete extraHeaders['X-Zipline-NoJSON'];
+    }
+
     for (const [key, value] of Object.entries(extraHeaders)) {
       curl.push('-H');
       curl.push(`"${key}: ${value}"`);
@@ -53,7 +59,9 @@ export default function Flameshot({ user, open, setOpen }) {
 
     const shell = `#!/bin/bash${values.wlCompositorNotSupported ? '\nexport XDG_CURRENT_DESKTOP=sway\n' : ''}
 flameshot gui -r > /tmp/ss.png;
-${curl.join(' ')} | jq -r '.files[0]' | tr -d '\\n' | ${values.wlCompatibility ? 'wl-copy' : 'xsel -ib'};
+${curl.join(' ')}${values.noJSON ? '' : " | jq -r '.files[0]'"} | tr -d '\\n' | ${
+      values.wlCompatibility ? 'wl-copy' : 'xsel -ib'
+    };
 `;
 
     const pseudoElement = document.createElement('a');

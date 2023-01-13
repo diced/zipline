@@ -54,6 +54,15 @@ export default function ShareX({ user, open, setOpen }) {
       setConfig(config);
     }
 
+    if (values.noJSON) {
+      config.URL = '{response}';
+      config.Headers['X-Zipline-NoJSON'] = 'true';
+      setConfig(config);
+    } else {
+      delete config.Headers['X-Zipline-NoJSON'];
+      setConfig(config);
+    }
+
     const pseudoElement = document.createElement('a');
     pseudoElement.setAttribute(
       'href',

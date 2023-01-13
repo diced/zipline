@@ -13,6 +13,7 @@ export function GeneratorModal({ opened, onClose, title, onSubmit, ...other }) {
       embed: false,
       wlCompatibility: false,
       wlCompositorNotSupported: false,
+      noJSON: false,
     },
   });
 
@@ -37,7 +38,8 @@ export function GeneratorModal({ opened, onClose, title, onSubmit, ...other }) {
         />
 
         <NumberInput
-          label={"Image Compression (leave at 0 if you don't want to compress)"}
+          label='Image Compression'
+          description='Set the image compression level (0-100). 0 is no compression, 100 is maximum compression.'
           max={100}
           min={0}
           mt='md'
@@ -45,18 +47,30 @@ export function GeneratorModal({ opened, onClose, title, onSubmit, ...other }) {
           {...form.getInputProps('imageCompression')}
         />
 
-        <Group grow mt='md'>
+        <Group grow my='md'>
           <Checkbox
             label='Zero Width Space'
+            description='Use zero width spaces as the file name'
             id='zeroWidthSpace'
             {...form.getInputProps('zeroWidthSpace', { type: 'checkbox' })}
           />
-          <Checkbox label='Embed' id='embed' {...form.getInputProps('embed', { type: 'checkbox' })} />
+          <Checkbox
+            description='Image will display with embedded metadata'
+            label='Embed'
+            id='embed'
+            {...form.getInputProps('embed', { type: 'checkbox' })}
+          />
+          <Checkbox
+            description='Return response as plain text instead of JSON'
+            label='No JSON'
+            id='noJSON'
+            {...form.getInputProps('noJSON', { type: 'checkbox' })}
+          />
         </Group>
 
         {title === 'Flameshot' && (
           <>
-            <Box mt='md'>
+            <Box my='md'>
               <Text>Wayland</Text>
               <MutedText size='sm'>
                 If using wayland, you can check the boxes below to your liking. This will require{' '}
@@ -67,7 +81,7 @@ export function GeneratorModal({ opened, onClose, title, onSubmit, ...other }) {
               </MutedText>
             </Box>
 
-            <Group mt='md'>
+            <Group my='md'>
               <Checkbox
                 label='Enable Wayland Compatibility'
                 description={
@@ -99,12 +113,10 @@ export function GeneratorModal({ opened, onClose, title, onSubmit, ...other }) {
           </>
         )}
 
-        <Group grow>
-          <Button mt='md' onClick={form.reset}>
-            Reset
-          </Button>
+        <Group grow my='md'>
+          <Button onClick={form.reset}>Reset</Button>
 
-          <Button mt='md' rightIcon={<DownloadIcon />} type='submit'>
+          <Button rightIcon={<DownloadIcon />} type='submit'>
             Download
           </Button>
         </Group>
