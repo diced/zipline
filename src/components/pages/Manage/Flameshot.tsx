@@ -7,28 +7,31 @@ export default function Flameshot({ user, open, setOpen }) {
     const curl = [
       'curl',
       '-H',
-      '"Content-Type: multipart/form-data"',
-      '-H',
       `"authorization: ${user?.token}"`,
-      '-F',
-      'file=@/tmp/ss.png',
       `${
         window.location.protocol +
         '//' +
         window.location.hostname +
         (window.location.port ? ':' + window.location.port : '')
-      }/api/upload`,
+      }/api/${values.type === 'upload-file' ? 'upload' : 'shorten'}`,
     ];
+
+    if (values.type === 'upload-file') {
+      curl.push('-F', 'file=@/tmp/ss.png');
+      curl.push('-H', '"Content-Type: multipart/form-data"');
+    } else {
+      curl.push('-H', '"Content-Type: application/json"');
+    }
 
     const extraHeaders = {};
 
-    if (values.format !== 'RANDOM') {
+    if (values.format !== 'RANDOM' && values.type === 'upload-file') {
       extraHeaders['Format'] = values.format;
     } else {
       delete extraHeaders['Format'];
     }
 
-    if (values.imageCompression !== 0) {
+    if (values.imageCompression !== 0 && values.type === 'upload-file') {
       extraHeaders['Image-Compression-Percent'] = values.imageCompression;
     } else {
       delete extraHeaders['Image-Compression-Percent'];
@@ -40,16 +43,16 @@ export default function Flameshot({ user, open, setOpen }) {
       delete extraHeaders['Zws'];
     }
 
-    if (values.embed) {
+    if (values.embed && values.type === 'upload-file') {
       extraHeaders['Embed'] = 'true';
     } else {
       delete extraHeaders['Embed'];
     }
 
     if (values.noJSON) {
-      extraHeaders['X-Zipline-NoJSON'] = 'true';
+      extraHeaders['No-JSON'] = 'true';
     } else {
-      delete extraHeaders['X-Zipline-NoJSON'];
+      delete extraHeaders['No-JSON'];
     }
 
     for (const [key, value] of Object.entries(extraHeaders)) {
@@ -57,16 +60,28 @@ export default function Flameshot({ user, open, setOpen }) {
       curl.push(`"${key}: ${value}"`);
     }
 
-    const shell = `#!/bin/bash${values.wlCompositorNotSupported ? '\nexport XDG_CURRENT_DESKTOP=sway\n' : ''}
+    console.log(curl);
+
+    let shell;
+    if (values.type === 'upload-file') {
+      shell = `#!/bin/bash${values.wlCompositorNotSupported ? '\nexport XDG_CURRENT_DESKTOP=sway\n' : ''}
 flameshot gui -r > /tmp/ss.png;
 ${curl.join(' ')}${values.noJSON ? '' : " | jq -r '.files[0]'"} | tr -d '\\n' | ${
-      values.wlCompatibility ? 'wl-copy' : 'xsel -ib'
-    };
+        values.wlCompatibility ? 'wl-copy' : 'xsel -ib'
+      };
 `;
+    } else if (values.type === 'shorten-url') {
+      shell = `#!/bin/bash
+arg=$1;
+${curl.join(' ')} -d "{\\"url\\": \\"$arg\\"}"${values.noJSON ? '' : " | jq -r '.url'"} | tr -d '\\n' | ${
+        values.wlCompatibility ? 'wl-copy' : 'xsel -ib'
+      };
+`;
+    }
 
     const pseudoElement = document.createElement('a');
     pseudoElement.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(shell));
-    pseudoElement.setAttribute('download', 'zipline.sh');
+    pseudoElement.setAttribute('download', `zipline${values.type === 'upload-file' ? '' : '-url'}.sh`);
     pseudoElement.style.display = 'none';
     document.body.appendChild(pseudoElement);
     pseudoElement.click();

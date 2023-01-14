@@ -3,10 +3,12 @@ import { useForm } from '@mantine/form';
 import { DownloadIcon } from 'components/icons';
 import Link from 'components/Link';
 import MutedText from 'components/MutedText';
+import { useState } from 'react';
 
 export function GeneratorModal({ opened, onClose, title, onSubmit, ...other }) {
   const form = useForm({
     initialValues: {
+      type: 'upload-file',
       format: 'RANDOM',
       imageCompression: 0,
       zeroWidthSpace: false,
@@ -17,6 +19,13 @@ export function GeneratorModal({ opened, onClose, title, onSubmit, ...other }) {
     },
   });
 
+  const [isUploadFile, setIsUploadFile] = useState(true);
+
+  const onChangeType = (value) => {
+    setIsUploadFile(value === 'upload-file');
+    form.setFieldValue('type', value);
+  };
+
   return (
     <Modal opened={opened} onClose={onClose} title={<Title order={3}>{title}</Title>} size='lg'>
       {other.desc && (
@@ -26,6 +35,18 @@ export function GeneratorModal({ opened, onClose, title, onSubmit, ...other }) {
       )}
       <form onSubmit={form.onSubmit((values) => onSubmit(values))}>
         <Select
+          label='Type'
+          data={[
+            { value: 'upload-file', label: 'Upload file' },
+            { value: 'shorten-url', label: 'Shorten URLs' },
+          ]}
+          id='type'
+          my='sm'
+          {...form.getInputProps('type')}
+          onChange={onChangeType}
+        />
+
+        <Select
           label='Select file name format'
           data={[
             { value: 'RANDOM', label: 'Random (alphanumeric)' },
@@ -34,6 +55,8 @@ export function GeneratorModal({ opened, onClose, title, onSubmit, ...other }) {
             { value: 'NAME', label: 'Name (keeps original file name)' },
           ]}
           id='format'
+          my='sm'
+          disabled={!isUploadFile}
           {...form.getInputProps('format')}
         />
 
@@ -42,8 +65,9 @@ export function GeneratorModal({ opened, onClose, title, onSubmit, ...other }) {
           description='Set the image compression level (0-100). 0 is no compression, 100 is maximum compression.'
           max={100}
           min={0}
-          mt='md'
+          my='sm'
           id='imageCompression'
+          disabled={!isUploadFile}
           {...form.getInputProps('imageCompression')}
         />
 
@@ -58,6 +82,7 @@ export function GeneratorModal({ opened, onClose, title, onSubmit, ...other }) {
             description='Image will display with embedded metadata'
             label='Embed'
             id='embed'
+            disabled={!isUploadFile}
             {...form.getInputProps('embed', { type: 'checkbox' })}
           />
           <Checkbox
@@ -106,6 +131,7 @@ export function GeneratorModal({ opened, onClose, title, onSubmit, ...other }) {
                     <Code>XDG_CURRENT_DESKTOP=sway</Code> to workaround Flameshot&apos;s errors
                   </>
                 }
+                disabled={!isUploadFile}
                 id='wlCompositorNotSupported'
                 {...form.getInputProps('wlCompositorNotSupported', { type: 'checkbox' })}
               />

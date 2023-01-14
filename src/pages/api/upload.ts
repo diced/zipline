@@ -374,7 +374,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     }
   }
 
-  if (req.headers['x-zipline-nojson']) {
+  if (req.headers['no-json']) {
     res.setHeader('Content-Type', 'text/plain');
     return res.end(response.files.join(','));
   }
