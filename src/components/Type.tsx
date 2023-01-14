@@ -1,4 +1,15 @@
-import { Alert, Box, Button, Card, Center, Container, Group, Image, Text } from '@mantine/core';
+import {
+  Alert,
+  Box,
+  Button,
+  Card,
+  Center,
+  Container,
+  Group,
+  Image,
+  LoadingOverlay,
+  Text,
+} from '@mantine/core';
 import { Prism } from '@mantine/prism';
 import { useEffect, useState } from 'react';
 import { AudioIcon, FileIcon, ImageIcon, PlayIcon } from './icons';
@@ -35,6 +46,8 @@ export default function Type({ file, popup = false, disableMediaPreview, ...prop
   const shouldRenderMarkdown = name.endsWith('.md');
   const shouldRenderTex = name.endsWith('.tex');
 
+  const [loading, setLoading] = useState(type === 'text' && popup);
+
   if (type === 'text' && popup) {
     useEffect(() => {
       (async () => {
@@ -42,6 +55,7 @@ export default function Type({ file, popup = false, disableMediaPreview, ...prop
         const text = await res.text();
 
         setText(text);
+        setLoading(false);
       })();
     }, []);
   }
@@ -90,8 +104,14 @@ export default function Type({ file, popup = false, disableMediaPreview, ...prop
         audio: <audio autoPlay controls {...props} style={{ width: '100%' }} />,
         text: (
           <>
-            {(shouldRenderMarkdown || shouldRenderTex) && renderRenderAlert()}
-            <PrismCode code={text} ext={name.split('.').pop()} {...props} />
+            {loading ? (
+              <LoadingOverlay visible={loading} />
+            ) : (
+              <>
+                {(shouldRenderMarkdown || shouldRenderTex) && renderRenderAlert()}
+                <PrismCode code={text} ext={name.split('.').pop()} {...props} />
+              </>
+            )}
           </>
         ),
       }[type]
