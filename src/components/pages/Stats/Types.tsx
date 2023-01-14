@@ -1,10 +1,11 @@
 import { Box, Card, Center, Grid, LoadingOverlay, Title } from '@mantine/core';
-import { ChartData } from 'chart.js';
+
 import { SmallTable } from 'components/SmallTable';
 import { useStats } from 'lib/queries/stats';
 import { colorHash } from 'lib/utils/client';
 import { useMemo } from 'react';
-import { Pie } from 'react-chartjs-2';
+
+import { Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 
 export default function Types() {
   const stats = useStats();
@@ -13,20 +14,13 @@ export default function Types() {
 
   const latest = stats.data[0];
 
-  const chartData = useMemo<{
-    uploadTypes: ChartData<'pie', number[], string>;
-  }>(() => {
+  const chartData = useMemo(() => {
     return {
-      uploadTypes: {
-        labels: latest?.data.types_count.map((x) => x.mimetype),
-        datasets: [
-          {
-            data: latest?.data.types_count.map((x) => x.count),
-            label: ' Count',
-            backgroundColor: latest?.data.types_count.map((x) => colorHash(x.mimetype)),
-          },
-        ],
-      },
+      data: latest.data.types_count.map((type) => ({
+        name: type.mimetype,
+        value: type.count,
+        fill: colorHash(type.mimetype),
+      })),
     };
   }, [latest]);
 
@@ -57,7 +51,24 @@ export default function Types() {
           </Grid.Col>
 
           <Grid.Col md={12} lg={4}>
-            <Center>{chartData && <Pie data={chartData.uploadTypes} style={{ maxHeight: '20vh' }} />}</Center>
+            <Center>
+              {chartData && (
+                <ResponsiveContainer width='100%' height={250}>
+                  <PieChart>
+                    <Pie
+                      data={chartData.data}
+                      dataKey='value'
+                      nameKey='name'
+                      cx='50%'
+                      cy='50%'
+                      outerRadius={80}
+                      label={({ name, value }) => `${name} (${value})`}
+                    />
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              )}
+            </Center>
           </Grid.Col>
         </Grid>
       </Card>
