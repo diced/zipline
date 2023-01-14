@@ -37,8 +37,11 @@ function Placeholder({ text, Icon, ...props }) {
 }
 
 export default function Type({ file, popup = false, disableMediaPreview, ...props }) {
-  const type = (file.type || file.mimetype).split('/')[0];
-  const name = file.name || file.file;
+  const type =
+    (file.type ?? file.mimetype) === ''
+      ? file.name.split('.').pop()
+      : (file.type ?? file.mimetype).split('/')[0];
+  const name = file.name ?? file.file;
 
   const media = /^(video|audio|image|text)/.test(type);
 

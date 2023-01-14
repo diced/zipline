@@ -60,8 +60,6 @@ export default function Flameshot({ user, open, setOpen }) {
       curl.push(`"${key}: ${value}"`);
     }
 
-    console.log(curl);
-
     let shell;
     if (values.type === 'upload-file') {
       shell = `#!/bin/bash${values.wlCompositorNotSupported ? '\nexport XDG_CURRENT_DESKTOP=sway\n' : ''}
