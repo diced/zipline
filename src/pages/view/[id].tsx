@@ -73,20 +73,25 @@ export default function EmbeddedFile({
   return (
     <>
       <Head>
-        {image.embed && (
-          <>
-            {user.embed.siteName && (
-              <meta
-                property='og:site_name'
-                content={parseString(user.embed.siteName, { file: image, user })}
-              />
-            )}
-            {user.embed.title && (
-              <meta property='og:title' content={parseString(user.embed.title, { file: image, user })} />
-            )}
-            <meta property='theme-color' content={user.embed.color ?? '#2f3136'} />
-          </>
+        {user.embed.title && image.embed && (
+          <meta property='og:title' content={parseString(user.embed.title, { file: image, user })} />
         )}
+
+        {user.embed.description && image.embed && (
+          <meta
+            property='og:description'
+            content={parseString(user.embed.description, { file: image, user })}
+          />
+        )}
+
+        {user.embed.siteName && image.embed && (
+          <meta property='og:site_name' content={parseString(user.embed.siteName, { file: image, user })} />
+        )}
+
+        {user.embed.color && image.embed && (
+          <meta property='theme-color' content={parseString(user.embed.color, { file: image, user })} />
+        )}
+
         {image.mimetype.startsWith('image') && (
           <>
             <meta property='og:image' content={`/r/${image.file}`} />
@@ -176,6 +181,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       userId: true,
       created_at: true,
       password: true,
+      embed: true,
     },
   });
   if (!image) return { notFound: true };
@@ -184,6 +190,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     select: {
       username: true,
       id: true,
+      embed: true,
     },
     where: {
       id: image.userId,
