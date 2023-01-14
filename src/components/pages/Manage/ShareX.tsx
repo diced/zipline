@@ -87,7 +87,7 @@ export default function ShareX({ user, open, setOpen }) {
       'href',
       'data:application/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(config, null, '\t'))
     );
-    pseudoElement.setAttribute('download', 'zipline.sxcu');
+    pseudoElement.setAttribute('download', `zipline${values.type === 'upload-file' ? '' : '-url'}.sxcu`);
     pseudoElement.style.display = 'none';
     document.body.appendChild(pseudoElement);
     pseudoElement.click();
