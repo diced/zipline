@@ -5,6 +5,7 @@ import {
   NumberInput,
   PasswordInput,
   Select,
+  SimpleGrid,
   Stack,
   Switch,
   Title,
@@ -25,16 +26,6 @@ export default function useUploadOptions(): [
   Dispatch<SetStateAction<boolean>>,
   React.FC
 ] {
-  // const [expires, setExpires] = useState('never');
-  // const [password, setPassword] = useState('');
-  // const [maxViews, setMaxViews] = useState(0);
-  // const [compression, setCompression] = useState<string>('none');
-  // const [zeroWidth, setZeroWidth] = useState(false);
-  // const [embedded, setEmbedded] = useState(false);
-  // const [format, setFormat] = useState('default');
-
-  // migrate this to useReducer
-
   const [state, setState] = useReducer((state, newState) => ({ ...state, ...newState }), {
     expires: 'never',
     password: '',
@@ -60,7 +51,7 @@ export default function useUploadOptions(): [
   };
 
   const OptionsModal: React.FC = () => (
-    <Modal title={<Title>Upload Options</Title>} size='auto' opened={opened} onClose={() => setOpened(false)}>
+    <Modal title={<Title>Upload Options</Title>} size='lg' opened={opened} onClose={() => setOpened(false)}>
       <Stack>
         <NumberInput
           label='Max Views'
@@ -70,7 +61,6 @@ export default function useUploadOptions(): [
           min={0}
           icon={<UserIcon />}
         />
-
         <Select
           label='Expires'
           description='The date and time this file will expire. Leave blank for never.'
@@ -108,7 +98,6 @@ export default function useUploadOptions(): [
             { value: '1y', label: '1 year' },
           ]}
         />
-
         <Select
           label='Compression'
           description='The compression level to use when uploading this file. Leave blank for default.'
@@ -122,7 +111,6 @@ export default function useUploadOptions(): [
             { value: '75', label: 'High (75%)' },
           ]}
         />
-
         <Select
           label='Format'
           description="The file name format to use when uploading this file. Leave blank for the server's default."
@@ -137,7 +125,6 @@ export default function useUploadOptions(): [
             { value: 'UUID', label: 'UUID' },
           ]}
         />
-
         <PasswordInput
           label='Password'
           description='The password required to view this file. Leave blank for no password.'
@@ -145,7 +132,6 @@ export default function useUploadOptions(): [
           onChange={(e) => setState({ password: e })}
           icon={<KeyIcon />}
         />
-
         <Group>
           <Switch
             label='Zero Width'
@@ -161,7 +147,6 @@ export default function useUploadOptions(): [
             onChange={(e) => setState({ embedded: e.currentTarget.checked })}
           />
         </Group>
-
         <Group grow>
           <Button onClick={() => reset()} color='red'>
             Reset Options
