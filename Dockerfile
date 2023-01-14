@@ -1,4 +1,4 @@
-FROM ghcr.io/diced/prisma-binaries:4.7.x as prisma
+FROM ghcr.io/diced/prisma-binaries:4.8.x as prisma
 
 FROM node:alpine3.16 AS deps
 RUN mkdir -p /prisma-engines
