@@ -1,8 +1,8 @@
 import { Image, Url, User } from '@prisma/client';
 import config from 'lib/config';
-import { ConfigDiscordContent } from 'lib/config/Config';
-import Logger from './logger';
-import { parseString, ParseValue } from './utils/parser';
+import { ConfigDiscordContent } from 'config/Config';
+import Logger from 'lib/logger';
+import { parseString, ParseValue } from 'utils/parser';
 
 const logger = Logger.get('discord');
 

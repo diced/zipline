@@ -20,6 +20,8 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   if (!req.body) return res.badRequest('no body');
   if (!req.body.url) return res.badRequest('no url');
 
+  if (req.body.vanity && req.body.vanity.trim().length === 0) return res.badRequest('vanity is empty');
+
   const maxUrlViews = req.headers['max-views'] ? Number(req.headers['max-views']) : null;
   if (isNaN(maxUrlViews)) return res.badRequest('invalid max views (invalid number)');
   if (maxUrlViews < 0) return res.badRequest('invalid max views (max views < 0)');

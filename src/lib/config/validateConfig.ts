@@ -1,8 +1,8 @@
 import { s } from '@sapphire/shapeshift';
 import type { Config } from './Config';
 import { inspect } from 'util';
-import Logger from '../logger';
-import { humanToBytes } from '../utils/bytes';
+import Logger from 'lib/logger';
+import { humanToBytes } from 'utils/bytes';
 
 const discord_content = s
   .object({

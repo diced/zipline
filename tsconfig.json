@@ -19,7 +19,9 @@
       "components/*": ["components/*"],
       "hooks/*": ["lib/hooks/*"],
       "middleware/*": ["lib/middleware/*"],
-      "lib/*": ["lib/*"]
+      "lib/*": ["lib/*"],
+      "config/*": ["lib/config/*"],
+      "utils/*": ["lib/utils/*"]
     },
     "incremental": true
   },

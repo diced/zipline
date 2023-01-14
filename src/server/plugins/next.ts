@@ -8,12 +8,12 @@ async function nextPlugin(fastify: FastifyInstance, options: NextServerOptions) 
   const nextServer = next(options);
   const handle = nextServer.getRequestHandler();
 
-  await nextServer.prepare();
-
   fastify
     .decorate('nextServer', nextServer)
     .decorate('nextHandle', handle)
     .decorate('next', route.bind(fastify));
+
+  return nextServer.prepare();
 
   function route(path, opts: any = { method: 'GET' }) {
     if (typeof opts.method === 'string') this[opts.method.toLowerCase()](path, opts, handler);
@@ -31,8 +31,6 @@ async function nextPlugin(fastify: FastifyInstance, options: NextServerOptions) 
       reply.hijack();
     }
   }
-
-  return;
 }
 
 export default fastifyPlugin(nextPlugin, {

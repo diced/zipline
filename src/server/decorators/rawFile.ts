@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyReply } from 'fastify';
-import { guess } from '../../lib/mimes';
+import { guess } from 'lib/mimes';
 import { extname } from 'path';
 import fastifyPlugin from 'fastify-plugin';
 

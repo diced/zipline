@@ -1,7 +1,7 @@
 import { Image } from '@prisma/client';
 import { FastifyInstance, FastifyReply } from 'fastify';
 import fastifyPlugin from 'fastify-plugin';
-import exts from '../../lib/exts';
+import exts from 'lib/exts';
 
 function dbFileDecorator(fastify: FastifyInstance, _, done) {
   fastify.decorateReply('dbFile', dbFile);
