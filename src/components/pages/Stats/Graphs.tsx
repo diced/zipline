@@ -1,16 +1,17 @@
-import { Box, Card, Grid, LoadingOverlay, Title } from '@mantine/core';
+import { Box, Card, Grid, LoadingOverlay, Title, useMantineTheme } from '@mantine/core';
 
 import { useStats } from 'lib/queries/stats';
 import { bytesToHuman } from 'lib/utils/bytes';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 export default function Graphs() {
   const historicalStats = useStats(10);
+  const theme = useMantineTheme();
 
   const chartData = useMemo(() => {
-    if (historicalStats.isLoading || !historicalStats.data) return;
+    if (historicalStats.isLoading || !historicalStats.data) return null;
 
     const data = Array.from(historicalStats.data).reverse();
 
@@ -18,6 +19,7 @@ export default function Graphs() {
       date: new Date(stat.created_at).toLocaleDateString(),
       views: stat.data.views_count,
     }));
+
     const uploads = data.map((stat) => ({
       date: new Date(stat.created_at).toLocaleDateString(),
       uploads: stat.data.count,
@@ -35,10 +37,10 @@ export default function Graphs() {
     };
   }, [historicalStats]);
 
-  return (
+  return historicalStats.isLoading ? (
+    <LoadingOverlay visible={historicalStats.isLoading} />
+  ) : (
     <Box mt='md'>
-      <LoadingOverlay visible={historicalStats.isLoading} />
-
       <Grid>
         {/* 3/4 - views */}
         <Grid.Col md={12}>
@@ -50,7 +52,12 @@ export default function Graphs() {
                   <CartesianGrid strokeDasharray='3 3' />
                   <XAxis dataKey='date' />
                   <YAxis />
-                  <Tooltip />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[7] : 'white',
+                      borderColor: theme.colorScheme === 'dark' ? theme.colors.dark[7] : 'white',
+                    }}
+                  />
                   <Line type='monotone' dataKey='views' name='Views' stroke='#8884d8' activeDot={{ r: 8 }} />
                 </LineChart>
               </ResponsiveContainer>
@@ -68,7 +75,12 @@ export default function Graphs() {
                   <CartesianGrid strokeDasharray='3 3' />
                   <XAxis dataKey='date' />
                   <YAxis />
-                  <Tooltip />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[7] : 'white',
+                      borderColor: theme.colorScheme === 'dark' ? theme.colors.dark[7] : 'white',
+                    }}
+                  />
                   <Line
                     type='monotone'
                     dataKey='uploads'
@@ -92,7 +104,13 @@ export default function Graphs() {
                   <CartesianGrid strokeDasharray='3 3' />
                   <XAxis dataKey='date' />
                   <YAxis width={80} tickFormatter={(value) => bytesToHuman(value as number)} />
-                  <Tooltip formatter={(value) => bytesToHuman(value as number)} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[7] : 'white',
+                      borderColor: theme.colorScheme === 'dark' ? theme.colors.dark[7] : theme.colors.gray[3],
+                    }}
+                    formatter={(value) => bytesToHuman(value as number)}
+                  />
                   <Line
                     type='monotone'
                     stroke='#8884d8'

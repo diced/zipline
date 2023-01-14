@@ -1,30 +1,39 @@
-import { Box, Card, Center, Grid, LoadingOverlay, Title } from '@mantine/core';
+import { Box, Card, Center, Grid, LoadingOverlay, Title, useMantineTheme } from '@mantine/core';
 
 import { SmallTable } from 'components/SmallTable';
 import { useStats } from 'lib/queries/stats';
 import { colorHash } from 'lib/utils/client';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 
 export default function Types() {
   const stats = useStats();
+  const theme = useMantineTheme();
 
-  if (stats.isLoading) return <LoadingOverlay visible />;
+  const latest = useMemo(() => {
+    if (stats.isLoading || !stats.data) return null;
 
-  const latest = stats.data[0];
+    return stats.data[0];
+  }, [stats]);
 
   const chartData = useMemo(() => {
+    if (!latest) return null;
+
+    const data = latest.data.types_count.map((type) => ({
+      name: type.mimetype,
+      value: type.count,
+      fill: colorHash(type.mimetype),
+    }));
+
     return {
-      data: latest.data.types_count.map((type) => ({
-        name: type.mimetype,
-        value: type.count,
-        fill: colorHash(type.mimetype),
-      })),
+      data,
     };
   }, [latest]);
 
-  return (
+  return !latest ? (
+    <LoadingOverlay visible={stats.isLoading} />
+  ) : (
     <Box mt='md'>
       {latest.data.count_by_user.length ? (
         <Card>
@@ -64,7 +73,16 @@ export default function Types() {
                       outerRadius={80}
                       label={({ name, value }) => `${name} (${value})`}
                     />
-                    <Tooltip />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[7] : 'white',
+                        borderColor:
+                          theme.colorScheme === 'dark' ? theme.colors.dark[7] : theme.colors.gray[3],
+                      }}
+                      itemStyle={{
+                        color: theme.colorScheme === 'dark' ? 'white' : 'black',
+                      }}
+                    />
                   </PieChart>
                 </ResponsiveContainer>
               )}

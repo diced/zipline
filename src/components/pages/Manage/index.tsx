@@ -40,7 +40,7 @@ import useFetch from 'hooks/useFetch';
 import { userSelector } from 'lib/recoil/user';
 import { bytesToHuman } from 'lib/utils/bytes';
 import { capitalize } from 'lib/utils/client';
-import { useEffect, useState } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import Flameshot from './Flameshot';
 import ShareX from './ShareX';
