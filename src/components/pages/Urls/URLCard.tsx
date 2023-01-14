@@ -70,7 +70,7 @@ export default function URLCard({ url }: { url: URLResponse }) {
             </MutedText>
           </Stack>
         </Group>
-        <Group position='right'>
+        <Stack>
           <ActionIcon href={url.url} component='a' target='_blank'>
             <ExternalLinkIcon />
           </ActionIcon>
@@ -80,7 +80,7 @@ export default function URLCard({ url }: { url: URLResponse }) {
           <ActionIcon aria-label='delete' onClick={() => deleteURL(url)}>
             <TrashIcon />
           </ActionIcon>
-        </Group>
+        </Stack>
       </Group>
     </Card>
   );

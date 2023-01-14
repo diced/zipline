@@ -213,14 +213,14 @@ export default function Invites() {
                       </Tooltip>
                     </Stack>
                   </Group>
-                  <Group position='right'>
+                  <Stack>
                     <ActionIcon aria-label='copy' onClick={() => handleCopy(invite)}>
                       <CopyIcon />
                     </ActionIcon>
                     <ActionIcon aria-label='delete' onClick={() => openDeleteModal(invite)}>
                       <DeleteIcon />
                     </ActionIcon>
-                  </Group>
+                  </Stack>
                 </Group>
               </Card>
             ))

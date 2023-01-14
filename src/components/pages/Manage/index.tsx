@@ -523,6 +523,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
               '&:hover': {
                 backgroundColor: t.other.hover,
               },
+              color: t.colorScheme === 'dark' ? 'white' : 'black',
             })}
             size='xl'
             p='sm'
