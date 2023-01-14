@@ -9,6 +9,9 @@ const discord_content = s
     content: s.string.nullish.default(null),
     embed: s
       .object({
+        url: s.string.nullish.default(null),
+        username: s.string.nullish.default(null),
+        avatar_url: s.string.nullish.default(null),
         title: s.string.nullish.default(null),
         description: s.string.nullish.default(null),
         footer: s.string.nullish.default(null),

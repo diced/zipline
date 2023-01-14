@@ -83,6 +83,9 @@ export interface ConfigDiscord {
 }
 
 export interface ConfigDiscordContent {
+  url?: string;
+  username?: string;
+  avatar_url?: string;
   content: string;
   embed: ConfigDiscordEmbed;
 }

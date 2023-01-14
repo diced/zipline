@@ -29,6 +29,9 @@ export function parseContent(
 
 export async function sendUpload(user: User, image: Image, raw_link: string, link: string) {
   if (!config.discord.upload) return;
+  if (!config.discord.url && !config.discord.upload.url) return;
+  if (!config.discord.avatar_url && !config.discord.upload.avatar_url) return;
+  if (!config.discord.username && !config.discord.upload.username) return;
 
   const parsed = parseContent(config.discord.upload, {
     file: image,
@@ -40,8 +43,8 @@ export async function sendUpload(user: User, image: Image, raw_link: string, lin
   const isImage = image.mimetype.startsWith('image/');
 
   const body = JSON.stringify({
-    username: config.discord.username,
-    avatar_url: config.discord.avatar_url,
+    username: config.discord.username || config.discord.upload.username,
+    avatar_url: config.discord.avatar_url || config.discord.upload.avatar_url,
     content: parsed.content ?? null,
     embeds: parsed.embed
       ? [
@@ -74,7 +77,7 @@ export async function sendUpload(user: User, image: Image, raw_link: string, lin
   });
 
   logger.debug('attempting to send upload notification to discord', body);
-  const res = await fetch(config.discord.url, {
+  const res = await fetch(config.discord.url || config.discord.upload.url, {
     method: 'POST',
     body,
     headers: {
@@ -94,6 +97,9 @@ export async function sendUpload(user: User, image: Image, raw_link: string, lin
 
 export async function sendShorten(user: User, url: Url, link: string) {
   if (!config.discord.shorten) return;
+  if (!config.discord.url && !config.discord.shorten.url) return;
+  if (!config.discord.avatar_url && !config.discord.shorten.avatar_url) return;
+  if (!config.discord.username && !config.discord.shorten.username) return;
 
   const parsed = parseContent(config.discord.shorten, {
     url,
@@ -102,8 +108,8 @@ export async function sendShorten(user: User, url: Url, link: string) {
   });
 
   const body = JSON.stringify({
-    username: config.discord.username,
-    avatar_url: config.discord.avatar_url,
+    username: config.discord.username || config.discord.shorten.username,
+    avatar_url: config.discord.avatar_url || config.discord.shorten.avatar_url,
     content: parsed.content ?? null,
     embeds: parsed.embed
       ? [
@@ -124,7 +130,7 @@ export async function sendShorten(user: User, url: Url, link: string) {
   });
 
   logger.debug('attempting to send shorten notification to discord', body);
-  const res = await fetch(config.discord.url, {
+  const res = await fetch(config.discord.url || config.discord.shorten.url, {
     method: 'POST',
     body,
     headers: {
