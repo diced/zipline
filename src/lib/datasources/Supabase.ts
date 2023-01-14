@@ -1,7 +1,7 @@
 import { Datasource } from '.';
 import { ConfigSupabaseDatasource } from 'lib/config/Config';
-import { guess } from '../mimes';
-import Logger from '../logger';
+import { guess } from 'lib/mimes';
+import Logger from 'lib/logger';
 import { Readable } from 'stream';
 
 export class Supabase extends Datasource {

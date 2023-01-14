@@ -12,10 +12,8 @@ const logger = Logger.get('user');
 
 async function handler(req: NextApiReq, res: NextApiRes) {
   // handle invites
-  if (!config.features.user_registration && !req.body.code)
-    return res.badRequest('user registration is disabled');
-  else if (req.body.code) {
-    if (!config.features.invites && req.body.code) return res.badRequest('invites are disabled');
+  if (req.body.code) {
+    if (!config.features.invites) return res.badRequest('invites are disabled');
 
     const { code, username, password } = req.body as {
       code?: string;
