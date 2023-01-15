@@ -16,17 +16,17 @@ export default function Graphs() {
     const data = Array.from(historicalStats.data).reverse();
 
     const views = data.map((stat) => ({
-      date: new Date(stat.created_at).toLocaleDateString(),
+      date: new Date(stat.createdAt).toLocaleDateString(),
       views: stat.data.views_count,
     }));
 
     const uploads = data.map((stat) => ({
-      date: new Date(stat.created_at).toLocaleDateString(),
+      date: new Date(stat.createdAt).toLocaleDateString(),
       uploads: stat.data.count,
     }));
 
     const storage = data.map((stat) => ({
-      date: new Date(stat.created_at).toLocaleDateString(),
+      date: new Date(stat.createdAt).toLocaleDateString(),
       bytes: stat.data.size_num,
     }));
 

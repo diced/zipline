@@ -212,7 +212,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
         administrator: true,
         embed: true,
         id: true,
-        images: false,
+        files: false,
         password: false,
         systemTheme: true,
         token: true,

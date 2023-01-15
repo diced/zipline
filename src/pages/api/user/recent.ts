@@ -7,18 +7,18 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
 
   if (take >= 50) return res.badRequest("take can't be more than 50");
 
-  let images = await prisma.image.findMany({
+  let files = await prisma.file.findMany({
     take,
     where: {
       userId: user.id,
     },
     orderBy: {
-      created_at: 'desc',
+      createdAt: 'desc',
     },
     select: {
-      created_at: true,
-      expires_at: true,
-      file: true,
+      createdAt: true,
+      expiresAt: true,
+      name: true,
       mimetype: true,
       id: true,
       views: true,
@@ -26,16 +26,16 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     },
   });
 
-  for (let i = 0; i !== images.length; ++i) {
-    (images[i] as unknown as { url: string }).url = `${
+  for (let i = 0; i !== files.length; ++i) {
+    (files[i] as unknown as { url: string }).url = `${
       config.uploader.route === '/' ? '/' : `${config.uploader.route}/`
-    }${images[i].file}`;
+    }${files[i].name}`;
   }
 
   if (req.query.filter && req.query.filter === 'media')
-    images = images.filter((x) => /^(video|audio|image)/.test(x.mimetype));
+    files = files.filter((x) => /^(video|audio|image)/.test(x.mimetype));
 
-  return res.json(images);
+  return res.json(files);
 }
 
 export default withZipline(handler, {

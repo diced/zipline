@@ -127,13 +127,13 @@ export default function File({ image, disableMediaPreview, exifEnabled }) {
 
   return (
     <>
-      <Modal opened={open} onClose={() => setOpen(false)} title={<Title>{image.file}</Title>} size='xl'>
+      <Modal opened={open} onClose={() => setOpen(false)} title={<Title>{image.name}</Title>} size='xl'>
         <LoadingOverlay visible={loading} />
         <Stack>
           <Type
             file={image}
-            src={`/r/${image.file}`}
-            alt={image.file}
+            src={`/r/${image.name}`}
+            alt={image.name}
             popup
             sx={{ minHeight: 200 }}
             style={{ minHeight: 200 }}
@@ -150,7 +150,7 @@ export default function File({ image, disableMediaPreview, exifEnabled }) {
               { maxWidth: 1200, cols: 3 },
             ]}
           >
-            <FileMeta Icon={FileIcon} title='Name' subtitle={image.file} />
+            <FileMeta Icon={FileIcon} title='Name' subtitle={image.name} />
             <FileMeta Icon={ImageIcon} title='Type' subtitle={image.mimetype} />
             <FileMeta Icon={EyeIcon} title='Views' subtitle={image?.views?.toLocaleString()} />
             {image.maxViews && (
@@ -164,15 +164,15 @@ export default function File({ image, disableMediaPreview, exifEnabled }) {
             <FileMeta
               Icon={CalendarIcon}
               title='Uploaded'
-              subtitle={relativeTime(new Date(image.created_at))}
-              tooltip={new Date(image?.created_at).toLocaleString()}
+              subtitle={relativeTime(new Date(image.createdAt))}
+              tooltip={new Date(image?.createdAt).toLocaleString()}
             />
-            {image.expires_at && (
+            {image.expiresAt && (
               <FileMeta
                 Icon={ClockIcon}
                 title='Expires'
-                subtitle={relativeTime(new Date(image.expires_at))}
-                tooltip={new Date(image.expires_at).toLocaleString()}
+                subtitle={relativeTime(new Date(image.expiresAt))}
+                tooltip={new Date(image.expiresAt).toLocaleString()}
               />
             )}
             <FileMeta Icon={HashIcon} title='ID' subtitle={image.id} />
@@ -229,7 +229,7 @@ export default function File({ image, disableMediaPreview, exifEnabled }) {
               <ActionIcon
                 color='blue'
                 variant='filled'
-                onClick={() => window.open(`/r/${image.file}?download=true`, '_blank')}
+                onClick={() => window.open(`/r/${image.name}?download=true`, '_blank')}
               >
                 <DownloadIcon />
               </ActionIcon>
@@ -267,8 +267,8 @@ export default function File({ image, disableMediaPreview, exifEnabled }) {
               width: '100%',
               cursor: 'pointer',
             }}
-            src={`/r/${image.file}`}
-            alt={image.file}
+            src={`/r/${image.name}`}
+            alt={image.name}
             onClick={() => setOpen(true)}
             disableMediaPreview={disableMediaPreview}
           />

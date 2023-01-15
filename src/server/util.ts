@@ -61,7 +61,7 @@ export async function getStats(prisma: PrismaClient, datasource: Datasource, log
   const size = await datasource.fullSize();
   logger.debug(`full size: ${size}`);
 
-  const byUser = await prisma.image.groupBy({
+  const byUser = await prisma.file.groupBy({
     by: ['userId'],
     _count: {
       _all: true,
@@ -92,17 +92,17 @@ export async function getStats(prisma: PrismaClient, datasource: Datasource, log
   }
   logger.debug(`count by user: ${JSON.stringify(count_by_user)}`);
 
-  const count = await prisma.image.count();
+  const count = await prisma.file.count();
   logger.debug(`count files: ${JSON.stringify(count)}`);
 
-  const views = await prisma.image.aggregate({
+  const views = await prisma.file.aggregate({
     _sum: {
       views: true,
     },
   });
   logger.debug(`sum views: ${JSON.stringify(views)}`);
 
-  const typesCount = await prisma.image.groupBy({
+  const typesCount = await prisma.file.groupBy({
     by: ['mimetype'],
     _count: {
       mimetype: true,

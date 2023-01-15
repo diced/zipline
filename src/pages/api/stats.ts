@@ -27,12 +27,12 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     let stats: Stats[] = await prisma.$queryRaw`
       SELECT *
       FROM "Stats" as t JOIN
-            (SELECT MAX(t2."created_at") as max_timestamp
+            (SELECT MAX(t2."createdAt") as max_timestamp
               FROM "Stats" t2
-              GROUP BY date(t2."created_at")
+              GROUP BY date(t2."createdAt")
             ) t2
-            ON t."created_at" = t2.max_timestamp
-      ORDER BY t."created_at" DESC
+            ON t."createdAt" = t2.max_timestamp
+      ORDER BY t."createdAt" DESC
       LIMIT ${amount}
     `;
 

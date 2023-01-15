@@ -31,7 +31,7 @@ export default function Text() {
   const handleUpload = async () => {
     const file = new File([value], 'text.' + lang);
 
-    const expires_at = options.expires === 'never' ? null : expireReadToDate(options.expires);
+    const expiresAt = options.expires === 'never' ? null : expireReadToDate(options.expires);
 
     showNotification({
       id: 'upload-text',
@@ -63,7 +63,7 @@ export default function Text() {
     req.setRequestHeader('Authorization', user.token);
     req.setRequestHeader('UploadText', 'true');
 
-    options.expires !== 'never' && req.setRequestHeader('Expires-At', 'date=' + expires_at.toISOString());
+    options.expires !== 'never' && req.setRequestHeader('Expires-At', 'date=' + expiresAt.toISOString());
     options.password.trim() !== '' && req.setRequestHeader('Password', options.password);
     options.maxViews && options.maxViews !== 0 && req.setRequestHeader('Max-Views', String(options.maxViews));
     options.compression !== 'none' && req.setRequestHeader('Image-Compression-Percent', options.compression);

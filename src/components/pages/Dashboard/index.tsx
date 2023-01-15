@@ -146,7 +146,7 @@ export default function Dashboard({ disableMediaPreview, exifEnabled }) {
               filterFn: stringFilterFn,
             },
             {
-              accessorKey: 'created_at',
+              accessorKey: 'createdAt',
               header: 'Date',
               filterFn: dateFilterFn,
             },

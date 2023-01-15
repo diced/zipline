@@ -51,9 +51,9 @@ export default function URLCard({ url }: { url: URLResponse }) {
         <Group position='left'>
           <Stack spacing={0}>
             <Title>{url.vanity ?? url.id}</Title>
-            <Tooltip label={new Date(url.created_at).toLocaleString()}>
+            <Tooltip label={new Date(url.createdAt).toLocaleString()}>
               <div>
-                <MutedText size='sm'>Created: {relativeTime(new Date(url.created_at))}</MutedText>
+                <MutedText size='sm'>Created: {relativeTime(new Date(url.createdAt))}</MutedText>
               </div>
             </Tooltip>
             {url.vanity && <MutedText size='sm'>ID: {url.id}</MutedText>}

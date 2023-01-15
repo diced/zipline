@@ -50,7 +50,7 @@ export default function File({ chunks: chunks_config }) {
     });
   });
 
-  const handleChunkedFiles = async (expires_at: Date, toChunkFiles: File[]) => {
+  const handleChunkedFiles = async (expiresAt: Date, toChunkFiles: File[]) => {
     for (let i = 0; i !== toChunkFiles.length; ++i) {
       const file = toChunkFiles[i];
       const identifier = randomChars(4);
@@ -153,7 +153,7 @@ export default function File({ chunks: chunks_config }) {
         req.setRequestHeader('X-Zipline-Partial-MimeType', file.type);
         req.setRequestHeader('X-Zipline-Partial-Identifier', identifier);
         req.setRequestHeader('X-Zipline-Partial-LastChunk', j === chunks.length - 1 ? 'true' : 'false');
-        options.expires !== 'never' && req.setRequestHeader('Expires-At', 'date=' + expires_at.toISOString());
+        options.expires !== 'never' && req.setRequestHeader('Expires-At', 'date=' + expiresAt.toISOString());
         options.password.trim() !== '' && req.setRequestHeader('Password', options.password);
         options.maxViews &&
           options.maxViews !== 0 &&
@@ -172,7 +172,7 @@ export default function File({ chunks: chunks_config }) {
   };
 
   const handleUpload = async () => {
-    const expires_at = options.expires === 'never' ? null : expireReadToDate(options.expires);
+    const expiresAt = options.expires === 'never' ? null : expireReadToDate(options.expires);
 
     setProgress(0);
     setLoading(true);
@@ -199,7 +199,7 @@ export default function File({ chunks: chunks_config }) {
         autoClose: false,
       });
 
-      return handleChunkedFiles(expires_at, toChunkFiles);
+      return handleChunkedFiles(expiresAt, toChunkFiles);
     }
 
     showNotification({
@@ -245,7 +245,7 @@ export default function File({ chunks: chunks_config }) {
               autoClose: false,
             });
 
-            return handleChunkedFiles(expires_at, toChunkFiles);
+            return handleChunkedFiles(expiresAt, toChunkFiles);
           }
         } else {
           updateNotification({
@@ -264,7 +264,7 @@ export default function File({ chunks: chunks_config }) {
     if (bodyLength !== 0) {
       req.open('POST', '/api/upload');
       req.setRequestHeader('Authorization', user.token);
-      options.expires !== 'never' && req.setRequestHeader('Expires-At', 'date=' + expires_at.toISOString());
+      options.expires !== 'never' && req.setRequestHeader('Expires-At', 'date=' + expiresAt.toISOString());
       options.password.trim() !== '' && req.setRequestHeader('Password', options.password);
       options.maxViews &&
         options.maxViews !== 0 &&

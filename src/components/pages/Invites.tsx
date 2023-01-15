@@ -38,7 +38,7 @@ function CreateInviteModal({ open, setOpen, updateInvites }) {
     if (!expires.includes(values.expires)) return form.setFieldError('expires', 'Invalid expiration');
     if (values.count < 1 || values.count > 100)
       return form.setFieldError('count', 'Must be between 1 and 100');
-    const expires_at =
+    const expiresAt =
       values.expires === 'never'
         ? null
         : new Date(
@@ -57,7 +57,7 @@ function CreateInviteModal({ open, setOpen, updateInvites }) {
     setOpen(false);
 
     const res = await useFetch('/api/auth/invite', 'POST', {
-      expires_at,
+      expiresAt,
       count: values.count,
     });
 
@@ -201,14 +201,14 @@ export default function Invites() {
                         {invite.code}
                         {invite.used && <> (Used)</>}
                       </Title>
-                      <Tooltip label={new Date(invite.created_at).toLocaleString()}>
+                      <Tooltip label={new Date(invite.createdAt).toLocaleString()}>
                         <div>
-                          <MutedText size='sm'>Created {relativeTime(new Date(invite.created_at))}</MutedText>
+                          <MutedText size='sm'>Created {relativeTime(new Date(invite.createdAt))}</MutedText>
                         </div>
                       </Tooltip>
-                      <Tooltip label={new Date(invite.expires_at).toLocaleString()}>
+                      <Tooltip label={new Date(invite.expiresAt).toLocaleString()}>
                         <div>
-                          <MutedText size='sm'>{expireText(invite.expires_at)}</MutedText>
+                          <MutedText size='sm'>{expireText(invite.expiresAt)}</MutedText>
                         </div>
                       </Tooltip>
                     </Stack>

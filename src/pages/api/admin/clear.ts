@@ -7,8 +7,8 @@ const logger = Logger.get('admin');
 
 async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   try {
-    const { count } = await prisma.image.deleteMany({});
-    logger.info(`User ${user.username} (${user.id}) cleared the database of ${count} images`);
+    const { count } = await prisma.file.deleteMany({});
+    logger.info(`User ${user.username} (${user.id}) cleared the database of ${count} files`);
 
     if (req.body.datasource) {
       await datasource.clear();

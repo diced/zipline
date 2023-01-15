@@ -193,7 +193,7 @@ async function clearInvites(this: FastifyInstance) {
     where: {
       OR: [
         {
-          expires_at: { lt: new Date() },
+          expiresAt: { lt: new Date() },
         },
         {
           used: true,

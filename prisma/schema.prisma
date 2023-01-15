@@ -21,47 +21,49 @@ model User {
   totpSecret    String?
   domains       String[]
   oauth         OAuth[]
-  images        Image[]
+  files        File[]
   urls          Url[]
   Invite        Invite[]
 }
 
-enum ImageFormat {
+enum FileNameFormat {
   UUID
   DATE
   RANDOM
   NAME
 }
 
-model Image {
-  id         Int             @id @default(autoincrement())
-  file       String
-  mimetype   String          @default("image/png")
-  created_at DateTime        @default(now())
-  expires_at DateTime?
-  maxViews   Int?
-  views      Int             @default(0)
-  favorite   Boolean         @default(false)
-  embed      Boolean         @default(false)
-  password   String?
-  invisible  InvisibleImage?
-  format     ImageFormat     @default(RANDOM)
-  user       User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
-  userId     Int?
+model File {
+  id        Int             @id @default(autoincrement())
+  name      String
+  mimetype  String          @default("image/png")
+  createdAt DateTime        @default(now())
+  expiresAt DateTime?
+  maxViews  Int?
+  views     Int             @default(0)
+  favorite  Boolean         @default(false)
+  embed     Boolean         @default(false)
+  password  String?
+  invisible InvisibleFile?
+  format    FileNameFormat     @default(RANDOM)
+  user      User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId    Int?
 }
 
-model InvisibleImage {
+model InvisibleFile {
   id      Int    @id @default(autoincrement())
   invis   String @unique
-  imageId Int    @unique
-  image   Image  @relation(fields: [imageId], references: [id], onDelete: Cascade)
+  // imageId Int    @unique
+  fileId  Int    @unique
+  // image   File  @relation(fields: [imageId], references: [id], onDelete: Cascade)
+  file    File   @relation(fields: [fileId], references: [id], onDelete: Cascade)
 }
 
 model Url {
   id          String        @id @unique
   destination String
   vanity      String?
-  created_at  DateTime      @default(now())
+  createdAt   DateTime      @default(now())
   maxViews    Int?
   views       Int           @default(0)
   invisible   InvisibleUrl?
@@ -78,15 +80,15 @@ model InvisibleUrl {
 
 model Stats {
   id         Int      @id @default(autoincrement())
-  created_at DateTime @default(now())
+  createdAt DateTime @default(now())
   data       Json
 }
 
 model Invite {
   id          Int       @id @default(autoincrement())
   code        String    @unique
-  created_at  DateTime  @default(now())
-  expires_at  DateTime?
+  createdAt  DateTime  @default(now())
+  expiresAt  DateTime?
   used        Boolean   @default(false)
   createdBy   User      @relation(fields: [createdById], references: [id], onDelete: Cascade)
   createdById Int
