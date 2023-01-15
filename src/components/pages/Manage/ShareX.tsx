@@ -3,7 +3,7 @@ import { GeneratorModal } from './GeneratorModal';
 
 export default function ShareX({ user, open, setOpen }) {
   const [config, setConfig] = useState({
-    Version: '13.2.1',
+    Version: '14.1.0',
     Name: 'Zipline',
     DestinationType: 'ImageUploader, TextUploader',
     RequestMethod: 'POST',
@@ -19,10 +19,28 @@ export default function ShareX({ user, open, setOpen }) {
     URL: '$json:files[0]$',
     Body: 'MultipartFormData',
     FileFormName: 'file',
+    Data: undefined,
   });
 
   const onSubmit = (values) => {
-    if (values.format !== 'RANDOM') {
+    if (values.type === 'shorten-url') {
+      config.RequestURL = `${
+        window.location.protocol +
+        '//' +
+        window.location.hostname +
+        (window.location.port ? ':' + window.location.port : '')
+      }/api/shorten`;
+      config.URL = '$json:url$';
+      config.Body = 'JSON';
+      delete config.FileFormName;
+      config.Data = JSON.stringify({ url: '{input}' });
+      setConfig(config);
+    } else {
+      delete config.Data;
+      setConfig(config);
+    }
+
+    if (values.format !== 'RANDOM' && values.type === 'upload-file') {
       config.Headers['Format'] = values.format;
       setConfig(config);
     } else {
@@ -30,7 +48,7 @@ export default function ShareX({ user, open, setOpen }) {
       setConfig(config);
     }
 
-    if (values.imageCompression !== 0) {
+    if (values.imageCompression !== 0 && values.type === 'upload-file') {
       config.Headers['Image-Compression-Percent'] = values.imageCompression;
       setConfig(config);
     } else {
@@ -46,11 +64,21 @@ export default function ShareX({ user, open, setOpen }) {
       setConfig(config);
     }
 
-    if (values.embed) {
+    if (values.embed && values.type === 'upload-file') {
       config.Headers['Embed'] = 'true';
       setConfig(config);
     } else {
       delete config.Headers['Embed'];
+      setConfig(config);
+    }
+
+    if (values.noJSON) {
+      config.URL = '{response}';
+      config.Headers['No-JSON'] = 'true';
+      setConfig(config);
+    } else {
+      delete config.Headers['No-JSON'];
+      config.URL = values.type === 'upload-file' ? '$json:files[0]$' : '$json:url$';
       setConfig(config);
     }
 
@@ -59,7 +87,7 @@ export default function ShareX({ user, open, setOpen }) {
       'href',
       'data:application/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(config, null, '\t'))
     );
-    pseudoElement.setAttribute('download', 'zipline.sxcu');
+    pseudoElement.setAttribute('download', `zipline${values.type === 'upload-file' ? '' : '-url'}.sxcu`);
     pseudoElement.style.display = 'none';
     document.body.appendChild(pseudoElement);
     pseudoElement.click();

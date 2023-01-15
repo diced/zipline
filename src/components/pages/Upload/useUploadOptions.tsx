@@ -5,12 +5,13 @@ import {
   NumberInput,
   PasswordInput,
   Select,
+  SimpleGrid,
   Stack,
   Switch,
   Title,
 } from '@mantine/core';
 import { ClockIcon, ImageIcon, KeyIcon, TypeIcon, UserIcon } from 'components/icons';
-import React, { Dispatch, SetStateAction, useState } from 'react';
+import React, { Dispatch, SetStateAction, useReducer, useState } from 'react';
 
 export default function useUploadOptions(): [
   {
@@ -25,43 +26,46 @@ export default function useUploadOptions(): [
   Dispatch<SetStateAction<boolean>>,
   React.FC
 ] {
-  const [expires, setExpires] = useState('never');
-  const [password, setPassword] = useState('');
-  const [maxViews, setMaxViews] = useState(0);
-  const [compression, setCompression] = useState<string>('none');
-  const [zeroWidth, setZeroWidth] = useState(false);
-  const [embedded, setEmbedded] = useState(false);
-  const [format, setFormat] = useState('default');
+  const [state, setState] = useReducer((state, newState) => ({ ...state, ...newState }), {
+    expires: 'never',
+    password: '',
+    maxViews: 0,
+    compression: 'none',
+    zeroWidth: false,
+    embedded: false,
+    format: 'default',
+  });
 
   const [opened, setOpened] = useState(false);
 
   const reset = () => {
-    setExpires('never');
-    setPassword('');
-    setMaxViews(0);
-    setCompression('none');
-    setZeroWidth(false);
-    setEmbedded(false);
-    setFormat('default');
+    setState({
+      expires: 'never',
+      password: '',
+      maxViews: 0,
+      compression: 'none',
+      zeroWidth: false,
+      embedded: false,
+      format: 'default',
+    });
   };
 
   const OptionsModal: React.FC = () => (
-    <Modal title={<Title>Upload Options</Title>} size='auto' opened={opened} onClose={() => setOpened(false)}>
+    <Modal title={<Title>Upload Options</Title>} size='lg' opened={opened} onClose={() => setOpened(false)}>
       <Stack>
         <NumberInput
           label='Max Views'
           description='The maximum number of times this file can be viewed. Leave blank for unlimited views.'
-          value={maxViews}
-          onChange={setMaxViews}
+          value={state.maxViews}
+          onChange={(e) => setState({ maxViews: e })}
           min={0}
           icon={<UserIcon />}
         />
-
         <Select
           label='Expires'
           description='The date and time this file will expire. Leave blank for never.'
-          value={expires}
-          onChange={(e) => setExpires(e)}
+          value={state.expires}
+          onChange={(e) => setState({ expires: e })}
           icon={<ClockIcon size={14} />}
           data={[
             { value: 'never', label: 'Never' },
@@ -94,12 +98,11 @@ export default function useUploadOptions(): [
             { value: '1y', label: '1 year' },
           ]}
         />
-
         <Select
           label='Compression'
           description='The compression level to use when uploading this file. Leave blank for default.'
-          value={compression}
-          onChange={(e) => setCompression(e)}
+          value={state.compression}
+          onChange={(e) => setState({ compression: e })}
           icon={<ImageIcon />}
           data={[
             { value: 'none', label: 'None' },
@@ -108,12 +111,11 @@ export default function useUploadOptions(): [
             { value: '75', label: 'High (75%)' },
           ]}
         />
-
         <Select
           label='Format'
           description="The file name format to use when uploading this file. Leave blank for the server's default."
-          value={format}
-          onChange={(e) => setFormat(e)}
+          value={state.format}
+          onChange={(e) => setState({ format: e })}
           icon={<TypeIcon />}
           data={[
             { value: 'default', label: 'Default' },
@@ -123,31 +125,28 @@ export default function useUploadOptions(): [
             { value: 'UUID', label: 'UUID' },
           ]}
         />
-
         <PasswordInput
           label='Password'
           description='The password required to view this file. Leave blank for no password.'
-          value={password}
-          onChange={(e) => setPassword(e.currentTarget.value)}
+          value={state.password}
+          onChange={(e) => setState({ password: e })}
           icon={<KeyIcon />}
         />
-
         <Group>
           <Switch
             label='Zero Width'
             description='Whether or not to use zero width characters for the file name.'
-            checked={zeroWidth}
-            onChange={(e) => setZeroWidth(e.currentTarget.checked)}
+            checked={state.zeroWidth}
+            onChange={(e) => setState({ zeroWidth: e.currentTarget.checked })}
           />
 
           <Switch
             label='Embedded'
             description='Whether or not to embed with OG tags for this file.'
-            checked={embedded}
-            onChange={(e) => setEmbedded(e.currentTarget.checked)}
+            checked={state.embedded}
+            onChange={(e) => setState({ embedded: e.currentTarget.checked })}
           />
         </Group>
-
         <Group grow>
           <Button onClick={() => reset()} color='red'>
             Reset Options
@@ -158,17 +157,5 @@ export default function useUploadOptions(): [
     </Modal>
   );
 
-  return [
-    {
-      expires,
-      password,
-      maxViews,
-      compression,
-      zeroWidth,
-      embedded,
-      format,
-    },
-    setOpened,
-    OptionsModal,
-  ];
+  return [state, setOpened, OptionsModal];
 }

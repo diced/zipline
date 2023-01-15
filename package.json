@@ -1,6 +1,6 @@
 {
   "name": "zipline",
-  "version": "3.6.4",
+  "version": "3.7.0-rc1",
   "license": "MIT",
   "scripts": {
     "dev": "npm-run-all build:server dev:run",
@@ -43,7 +43,6 @@
     "@sapphire/shapeshift": "^3.7.1",
     "@tanstack/react-query": "^4.19.1",
     "argon2": "^0.30.2",
-    "chart.js": "^4.0.1",
     "colorette": "^2.0.19",
     "cookie": "^0.5.0",
     "dayjs": "^1.11.7",
@@ -64,10 +63,10 @@
     "prismjs": "^1.29.0",
     "qrcode": "^1.5.1",
     "react": "^18.2.0",
-    "react-chartjs-2": "^5.0.1",
     "react-dom": "^18.2.0",
     "react-feather": "^2.0.10",
     "react-markdown": "^8.0.4",
+    "recharts": "^2.3.2",
     "recoil": "^0.7.6",
     "remark-gfm": "^3.0.1",
     "sharp": "^0.31.2"

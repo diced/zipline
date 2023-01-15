@@ -20,7 +20,7 @@ export function StatCards() {
     >
       <StatCard
         stat={{
-          title: 'UPLOADED FILES',
+          title: 'FILES',
           value: stats.isSuccess ? latest.data.count.toLocaleString() : '...',
           desc: 'files have been uploaded',
           icon: <FileIcon />,
@@ -33,7 +33,7 @@ export function StatCards() {
         stat={{
           title: 'STORAGE',
           value: stats.isSuccess ? latest.data.size : '...',
-          desc: 'of storage used',
+          desc: 'used',
           icon: <DatabaseIcon />,
           diff:
             stats.isSuccess && before?.data
@@ -46,7 +46,7 @@ export function StatCards() {
         stat={{
           title: 'VIEWS',
           value: stats.isSuccess ? latest.data.views_count.toLocaleString() : '...',
-          desc: 'total page views',
+          desc: 'total file views',
           icon: <EyeIcon />,
           diff:
             stats.isSuccess && before?.data
@@ -59,7 +59,7 @@ export function StatCards() {
         stat={{
           title: 'USERS',
           value: stats.isSuccess ? latest.data.count_users.toLocaleString() : '...',
-          desc: 'total registered users',
+          desc: 'users',
           icon: <UserIcon />,
         }}
       />

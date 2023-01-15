@@ -1,13 +1,26 @@
 import { Box, Button, Modal, PasswordInput } from '@mantine/core';
+import type { Image } from '@prisma/client';
+import Link from 'components/Link';
 import exts from 'lib/exts';
 import prisma from 'lib/prisma';
 import { parseString } from 'lib/utils/parser';
+import type { UserExtended } from 'middleware/withZipline';
 import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
-export default function EmbeddedFile({ image, user, pass, prismRender }) {
+export default function EmbeddedFile({
+  image,
+  user,
+  pass,
+  prismRender,
+}: {
+  image: Image;
+  user: UserExtended;
+  pass: boolean;
+  prismRender: boolean;
+}) {
   const dataURL = (route: string) => `${route}/${image.file}`;
 
   const router = useRouter();
@@ -16,7 +29,7 @@ export default function EmbeddedFile({ image, user, pass, prismRender }) {
   const [error, setError] = useState('');
 
   // reapply date from workaround
-  image.created_at = new Date(image?.created_at);
+  image.created_at = new Date(image ? image.created_at : 0);
 
   const check = async () => {
     const res = await fetch(`/api/auth/image?id=${image.id}&password=${password}`);
@@ -60,20 +73,25 @@ export default function EmbeddedFile({ image, user, pass, prismRender }) {
   return (
     <>
       <Head>
-        {image.embed && (
-          <>
-            {user.embedSiteName && (
-              <meta
-                property='og:site_name'
-                content={parseString(user.embedSiteName, { file: image, user })}
-              />
-            )}
-            {user.embedTitle && (
-              <meta property='og:title' content={parseString(user.embedTitle, { file: image, user })} />
-            )}
-            <meta property='theme-color' content={user.embedColor} />
-          </>
+        {user.embed.title && image.embed && (
+          <meta property='og:title' content={parseString(user.embed.title, { file: image, user })} />
         )}
+
+        {user.embed.description && image.embed && (
+          <meta
+            property='og:description'
+            content={parseString(user.embed.description, { file: image, user })}
+          />
+        )}
+
+        {user.embed.siteName && image.embed && (
+          <meta property='og:site_name' content={parseString(user.embed.siteName, { file: image, user })} />
+        )}
+
+        {user.embed.color && image.embed && (
+          <meta property='theme-color' content={parseString(user.embed.color, { file: image, user })} />
+        )}
+
         {image.mimetype.startsWith('image') && (
           <>
             <meta property='og:image' content={`/r/${image.file}`} />
@@ -97,6 +115,9 @@ export default function EmbeddedFile({ image, user, pass, prismRender }) {
             <meta property='og:video:width' content='720' />
             <meta property='og:video:height' content='480' />
           </>
+        )}
+        {!image.mimetype.startsWith('video') && !image.mimetype.startsWith('image') && (
+          <meta property='og:url' content={`/r/${image.file}`} />
         )}
         <title>{image.file}</title>
       </Head>
@@ -136,6 +157,10 @@ export default function EmbeddedFile({ image, user, pass, prismRender }) {
         {image.mimetype.startsWith('video') && (
           <video src={dataURL('/r')} controls={true} autoPlay={true} id='image_content' />
         )}
+
+        {!image.mimetype.startsWith('video') && !image.mimetype.startsWith('image') && (
+          <Link href={dataURL('/r')}>Can&#39;t preview this file. Click here to download it.</Link>
+        )}
       </Box>
     </>
   );
@@ -154,27 +179,25 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       file: true,
       invisible: true,
       userId: true,
-      embed: true,
       created_at: true,
       password: true,
+      embed: true,
     },
   });
   if (!image) return { notFound: true };
 
   const user = await prisma.user.findFirst({
     select: {
-      embedTitle: true,
-      embedColor: true,
-      embedSiteName: true,
       username: true,
       id: true,
+      embed: true,
     },
     where: {
       id: image.userId,
     },
   });
 
-  //@ts-ignore workaround because next wont allow date
+  // @ts-ignore workaround because next wont allow date
   image.created_at = image.created_at.toString();
 
   const prismRender = Object.keys(exts).includes(image.file.split('.').pop());
@@ -204,8 +227,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     const data = await datasource.get(image.file);
     if (!data) return { notFound: true };
 
-    data.pipe(context.res);
-    return { props: {} };
+    return {
+      props: {
+        image,
+        user,
+      },
+    };
   }
   const pass = image.password ? true : false;
   delete image.password;

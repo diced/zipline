@@ -113,7 +113,7 @@ export default function Users() {
                         <MutedText size='sm'>Administrator: {user.administrator ? 'yes' : 'no'}</MutedText>
                       </Stack>
                     </Group>
-                    <Group position='right'>
+                    <Stack>
                       {user.administrator && !self.superAdmin ? null : (
                         <>
                           <ActionIcon
@@ -130,7 +130,7 @@ export default function Users() {
                           </ActionIcon>
                         </>
                       )}
-                    </Group>
+                    </Stack>
                   </Group>
                 </Card>
               ))

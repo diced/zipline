@@ -3,18 +3,28 @@ import { useForm } from '@mantine/form';
 import { DownloadIcon } from 'components/icons';
 import Link from 'components/Link';
 import MutedText from 'components/MutedText';
+import { useState } from 'react';
 
 export function GeneratorModal({ opened, onClose, title, onSubmit, ...other }) {
   const form = useForm({
     initialValues: {
+      type: 'upload-file',
       format: 'RANDOM',
       imageCompression: 0,
       zeroWidthSpace: false,
       embed: false,
       wlCompatibility: false,
       wlCompositorNotSupported: false,
+      noJSON: false,
     },
   });
+
+  const [isUploadFile, setIsUploadFile] = useState(true);
+
+  const onChangeType = (value) => {
+    setIsUploadFile(value === 'upload-file');
+    form.setFieldValue('type', value);
+  };
 
   return (
     <Modal opened={opened} onClose={onClose} title={<Title order={3}>{title}</Title>} size='lg'>
@@ -25,6 +35,18 @@ export function GeneratorModal({ opened, onClose, title, onSubmit, ...other }) {
       )}
       <form onSubmit={form.onSubmit((values) => onSubmit(values))}>
         <Select
+          label='Type'
+          data={[
+            { value: 'upload-file', label: 'Upload file' },
+            { value: 'shorten-url', label: 'Shorten URLs' },
+          ]}
+          id='type'
+          my='sm'
+          {...form.getInputProps('type')}
+          onChange={onChangeType}
+        />
+
+        <Select
           label='Select file name format'
           data={[
             { value: 'RANDOM', label: 'Random (alphanumeric)' },
@@ -33,30 +55,47 @@ export function GeneratorModal({ opened, onClose, title, onSubmit, ...other }) {
             { value: 'NAME', label: 'Name (keeps original file name)' },
           ]}
           id='format'
+          my='sm'
+          disabled={!isUploadFile}
           {...form.getInputProps('format')}
         />
 
         <NumberInput
-          label={"Image Compression (leave at 0 if you don't want to compress)"}
+          label='Image Compression'
+          description='Set the image compression level (0-100). 0 is no compression, 100 is maximum compression.'
           max={100}
           min={0}
-          mt='md'
+          my='sm'
           id='imageCompression'
+          disabled={!isUploadFile}
           {...form.getInputProps('imageCompression')}
         />
 
-        <Group grow mt='md'>
+        <Group grow my='md'>
           <Checkbox
             label='Zero Width Space'
+            description='Use zero width spaces as the file name'
             id='zeroWidthSpace'
             {...form.getInputProps('zeroWidthSpace', { type: 'checkbox' })}
           />
-          <Checkbox label='Embed' id='embed' {...form.getInputProps('embed', { type: 'checkbox' })} />
+          <Checkbox
+            description='Image will display with embedded metadata'
+            label='Embed'
+            id='embed'
+            disabled={!isUploadFile}
+            {...form.getInputProps('embed', { type: 'checkbox' })}
+          />
+          <Checkbox
+            description='Return response as plain text instead of JSON'
+            label='No JSON'
+            id='noJSON'
+            {...form.getInputProps('noJSON', { type: 'checkbox' })}
+          />
         </Group>
 
         {title === 'Flameshot' && (
           <>
-            <Box mt='md'>
+            <Box my='md'>
               <Text>Wayland</Text>
               <MutedText size='sm'>
                 If using wayland, you can check the boxes below to your liking. This will require{' '}
@@ -67,7 +106,7 @@ export function GeneratorModal({ opened, onClose, title, onSubmit, ...other }) {
               </MutedText>
             </Box>
 
-            <Group mt='md'>
+            <Group my='md'>
               <Checkbox
                 label='Enable Wayland Compatibility'
                 description={
@@ -92,6 +131,7 @@ export function GeneratorModal({ opened, onClose, title, onSubmit, ...other }) {
                     <Code>XDG_CURRENT_DESKTOP=sway</Code> to workaround Flameshot&apos;s errors
                   </>
                 }
+                disabled={!isUploadFile}
                 id='wlCompositorNotSupported'
                 {...form.getInputProps('wlCompositorNotSupported', { type: 'checkbox' })}
               />
@@ -99,12 +139,10 @@ export function GeneratorModal({ opened, onClose, title, onSubmit, ...other }) {
           </>
         )}
 
-        <Group grow>
-          <Button mt='md' onClick={form.reset}>
-            Reset
-          </Button>
+        <Group grow my='md'>
+          <Button onClick={form.reset}>Reset</Button>
 
-          <Button mt='md' rightIcon={<DownloadIcon />} type='submit'>
+          <Button rightIcon={<DownloadIcon />} type='submit'>
             Download
           </Button>
         </Group>
