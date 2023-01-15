@@ -82,6 +82,14 @@ export default function ShareX({ user, open, setOpen }) {
       setConfig(config);
     }
 
+    if (values.originalName && values.type === 'upload-file') {
+      config.Headers['Original-Name'] = 'true';
+      setConfig(config);
+    } else {
+      delete config.Headers['Original-Name'];
+      setConfig(config);
+    }
+
     const pseudoElement = document.createElement('a');
     pseudoElement.setAttribute(
       'href',

@@ -5,7 +5,6 @@ import {
   NumberInput,
   PasswordInput,
   Select,
-  SimpleGrid,
   Stack,
   Switch,
   Title,

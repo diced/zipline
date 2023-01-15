@@ -1,4 +1,17 @@
-import { Box, Button, Checkbox, Code, Group, Modal, NumberInput, Select, Text, Title } from '@mantine/core';
+import {
+  Box,
+  Button,
+  Checkbox,
+  Code,
+  Group,
+  Modal,
+  NumberInput,
+  Select,
+  Stack,
+  Switch,
+  Text,
+  Title,
+} from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { DownloadIcon } from 'components/icons';
 import Link from 'components/Link';
@@ -16,6 +29,7 @@ export function GeneratorModal({ opened, onClose, title, onSubmit, ...other }) {
       wlCompatibility: false,
       wlCompositorNotSupported: false,
       noJSON: false,
+      originalName: false,
     },
   });
 
@@ -71,27 +85,34 @@ export function GeneratorModal({ opened, onClose, title, onSubmit, ...other }) {
           {...form.getInputProps('imageCompression')}
         />
 
-        <Group grow my='md'>
-          <Checkbox
+        <Stack my='md'>
+          <Switch
             label='Zero Width Space'
             description='Use zero width spaces as the file name'
             id='zeroWidthSpace'
             {...form.getInputProps('zeroWidthSpace', { type: 'checkbox' })}
           />
-          <Checkbox
+          <Switch
+            description='Return response as plain text instead of JSON'
+            label='No JSON'
+            id='noJSON'
+            {...form.getInputProps('noJSON', { type: 'checkbox' })}
+          />
+          <Switch
             description='Image will display with embedded metadata'
             label='Embed'
             id='embed'
             disabled={!isUploadFile}
             {...form.getInputProps('embed', { type: 'checkbox' })}
           />
-          <Checkbox
-            description='Return response as plain text instead of JSON'
-            label='No JSON'
-            id='noJSON'
-            {...form.getInputProps('noJSON', { type: 'checkbox' })}
+          <Switch
+            description='Whether or not to show the original name when downloading this specific file. This will not change the name format in the URL.'
+            label='Original Name'
+            id='originalName'
+            disabled={!isUploadFile}
+            {...form.getInputProps('originalName', { type: 'checkbox' })}
           />
-        </Group>
+        </Stack>
 
         {title === 'Flameshot' && (
           <>

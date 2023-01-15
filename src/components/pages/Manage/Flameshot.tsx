@@ -55,6 +55,12 @@ export default function Flameshot({ user, open, setOpen }) {
       delete extraHeaders['No-JSON'];
     }
 
+    if (values.originalName && values.type === 'upload-file') {
+      extraHeaders['Original-Name'] = 'true';
+    } else {
+      delete extraHeaders['Original-Name'];
+    }
+
     for (const [key, value] of Object.entries(extraHeaders)) {
       curl.push('-H');
       curl.push(`"${key}: ${value}"`);
