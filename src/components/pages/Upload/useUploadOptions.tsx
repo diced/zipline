@@ -22,6 +22,7 @@ export default function useUploadOptions(): [
     zeroWidth: boolean;
     embedded: boolean;
     format: string;
+    originalName: boolean;
   },
   Dispatch<SetStateAction<boolean>>,
   React.FC
@@ -34,6 +35,7 @@ export default function useUploadOptions(): [
     zeroWidth: false,
     embedded: false,
     format: 'default',
+    originalName: false,
   });
 
   const [opened, setOpened] = useState(false);
@@ -47,6 +49,7 @@ export default function useUploadOptions(): [
       zeroWidth: false,
       embedded: false,
       format: 'default',
+      originalName: false,
     });
   };
 
@@ -145,6 +148,13 @@ export default function useUploadOptions(): [
             description='Whether or not to embed with OG tags for this file.'
             checked={state.embedded}
             onChange={(e) => setState({ embedded: e.currentTarget.checked })}
+          />
+
+          <Switch
+            label='Keep Original Name'
+            description='Whether or not to show the original name when downloading this specific file. This will not change the name format in the URL.'
+            checked={state.originalName}
+            onChange={(e) => setState({ originalName: e.currentTarget.checked })}
           />
         </Group>
         <Group grow>

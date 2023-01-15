@@ -36,6 +36,7 @@ enum FileNameFormat {
 model File {
   id        Int             @id @default(autoincrement())
   name      String
+  originalName String?
   mimetype  String          @default("image/png")
   createdAt DateTime        @default(now())
   expiresAt DateTime?

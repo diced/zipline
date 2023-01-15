@@ -162,6 +162,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
           password,
           expiresAt: expiry,
           maxViews: fileMaxViews,
+          originalName: req.headers['original-name'] ? filename ?? null : null,
         },
       });
 
@@ -290,7 +291,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
     const compressionUsed = imageCompressionPercent && file.mimetype.startsWith('image/');
     let invis: InvisibleFile;
-    const image = await prisma.file.create({
+    const fileUpload = await prisma.file.create({
       data: {
         name: `${fileName}${compressionUsed ? '.jpg' : `${ext ? '.' : ''}${ext}`}`,
         mimetype: req.headers.uploadtext ? 'text/plain' : compressionUsed ? 'image/jpeg' : file.mimetype,
@@ -300,34 +301,35 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         password,
         expiresAt: expiry,
         maxViews: fileMaxViews,
+        originalName: req.headers['original-name'] ? file.originalname ?? null : null,
       },
     });
 
-    if (req.headers.zws) invis = await createInvisImage(zconfig.uploader.length, image.id);
+    if (req.headers.zws) invis = await createInvisImage(zconfig.uploader.length, fileUpload.id);
 
     if (compressionUsed) {
       const buffer = await sharp(file.buffer).jpeg({ quality: imageCompressionPercent }).toBuffer();
-      await datasource.save(image.name, buffer);
+      await datasource.save(fileUpload.name, buffer);
       logger.info(
         `User ${user.username} (${user.id}) compressed image from ${file.buffer.length} -> ${buffer.length} bytes`
       );
     } else {
-      await datasource.save(image.name, file.buffer);
+      await datasource.save(fileUpload.name, file.buffer);
     }
 
-    logger.info(`User ${user.username} (${user.id}) uploaded ${image.name} (${image.id})`);
+    logger.info(`User ${user.username} (${user.id}) uploaded ${fileUpload.name} (${fileUpload.id})`);
     if (user.domains.length) {
       const domain = user.domains[Math.floor(Math.random() * user.domains.length)];
       response.files.push(
         `${domain}${zconfig.uploader.route === '/' ? '' : zconfig.uploader.route}/${
-          invis ? invis.invis : image.name
+          invis ? invis.invis : fileUpload.name
         }`
       );
     } else {
       response.files.push(
         `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}${
           zconfig.uploader.route === '/' ? '' : zconfig.uploader.route
-        }/${invis ? invis.invis : image.name}`
+        }/${invis ? invis.invis : fileUpload.name}`
       );
     }
 
@@ -336,18 +338,18 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     if (zconfig.discord?.upload) {
       await sendUpload(
         user,
-        image,
+        fileUpload,
         `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}/r/${
-          invis ? invis.invis : image.name
+          invis ? invis.invis : fileUpload.name
         }`,
         `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}${
           zconfig.uploader.route === '/' ? '' : zconfig.uploader.route
-        }/${invis ? invis.invis : image.name}`
+        }/${invis ? invis.invis : fileUpload.name}`
       );
     }
 
-    if (zconfig.exif.enabled && zconfig.exif.remove_gps && image.mimetype.startsWith('image/')) {
-      await removeGPSData(image);
+    if (zconfig.exif.enabled && zconfig.exif.remove_gps && fileUpload.mimetype.startsWith('image/')) {
+      await removeGPSData(fileUpload);
       response.removed_gps = true;
     }
   }
