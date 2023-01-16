@@ -136,7 +136,7 @@ export default function Dashboard({ disableMediaPreview, exifEnabled }) {
           empty={<></>}
           columns={[
             {
-              accessorKey: 'file',
+              accessorKey: 'name',
               header: 'Name',
               filterFn: stringFilterFn,
             },
