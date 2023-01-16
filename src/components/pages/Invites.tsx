@@ -108,7 +108,7 @@ function CreateInviteModal({ open, setOpen, updateInvites }) {
           min={1}
           stepHoldDelay={200}
           stepHoldInterval={100}
-          parser={(v: string) => Number(v.replace(/[^\d]/g, ''))}
+          parser={(v: string) => v.replace(/[^\d]/g, '')}
         />
 
         <Group position='right' mt='md'>
