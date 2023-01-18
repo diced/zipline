@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Collapse,
   Group,
@@ -6,6 +7,8 @@ import {
   PasswordInput,
   Progress,
   Select,
+  Stack,
+  Text,
   Title,
   Tooltip,
 } from '@mantine/core';
@@ -15,6 +18,7 @@ import { showNotification, updateNotification } from '@mantine/notifications';
 import Dropzone from 'components/dropzone/Dropzone';
 import FileDropzone from 'components/dropzone/DropzoneFile';
 import { ClockIcon, CrossIcon, UploadIcon } from 'components/icons';
+import MutedText from 'components/MutedText';
 import { invalidateFiles } from 'lib/queries/files';
 import { userSelector } from 'lib/recoil/user';
 import { expireReadToDate, randomChars } from 'lib/utils/client';
@@ -46,7 +50,7 @@ export default function File({ chunks: chunks_config }) {
     });
   });
 
-  const handleChunkedFiles = async (expires_at: Date, toChunkFiles: File[]) => {
+  const handleChunkedFiles = async (expiresAt: Date, toChunkFiles: File[]) => {
     for (let i = 0; i !== toChunkFiles.length; ++i) {
       const file = toChunkFiles[i];
       const identifier = randomChars(4);
@@ -149,7 +153,7 @@ export default function File({ chunks: chunks_config }) {
         req.setRequestHeader('X-Zipline-Partial-MimeType', file.type);
         req.setRequestHeader('X-Zipline-Partial-Identifier', identifier);
         req.setRequestHeader('X-Zipline-Partial-LastChunk', j === chunks.length - 1 ? 'true' : 'false');
-        options.expires !== 'never' && req.setRequestHeader('Expires-At', 'date=' + expires_at.toISOString());
+        options.expires !== 'never' && req.setRequestHeader('Expires-At', 'date=' + expiresAt.toISOString());
         options.password.trim() !== '' && req.setRequestHeader('Password', options.password);
         options.maxViews &&
           options.maxViews !== 0 &&
@@ -159,6 +163,7 @@ export default function File({ chunks: chunks_config }) {
         options.embedded && req.setRequestHeader('Embed', 'true');
         options.zeroWidth && req.setRequestHeader('Zws', 'true');
         options.format !== 'default' && req.setRequestHeader('Format', options.format);
+        options.originalName && req.setRequestHeader('Original-Name', 'true');
 
         req.send(body);
 
@@ -168,7 +173,7 @@ export default function File({ chunks: chunks_config }) {
   };
 
   const handleUpload = async () => {
-    const expires_at = options.expires === 'never' ? null : expireReadToDate(options.expires);
+    const expiresAt = options.expires === 'never' ? null : expireReadToDate(options.expires);
 
     setProgress(0);
     setLoading(true);
@@ -195,7 +200,7 @@ export default function File({ chunks: chunks_config }) {
         autoClose: false,
       });
 
-      return handleChunkedFiles(expires_at, toChunkFiles);
+      return handleChunkedFiles(expiresAt, toChunkFiles);
     }
 
     showNotification({
@@ -241,7 +246,7 @@ export default function File({ chunks: chunks_config }) {
               autoClose: false,
             });
 
-            return handleChunkedFiles(expires_at, toChunkFiles);
+            return handleChunkedFiles(expiresAt, toChunkFiles);
           }
         } else {
           updateNotification({
@@ -260,7 +265,7 @@ export default function File({ chunks: chunks_config }) {
     if (bodyLength !== 0) {
       req.open('POST', '/api/upload');
       req.setRequestHeader('Authorization', user.token);
-      options.expires !== 'never' && req.setRequestHeader('Expires-At', 'date=' + expires_at.toISOString());
+      options.expires !== 'never' && req.setRequestHeader('Expires-At', 'date=' + expiresAt.toISOString());
       options.password.trim() !== '' && req.setRequestHeader('Password', options.password);
       options.maxViews &&
         options.maxViews !== 0 &&
@@ -270,6 +275,7 @@ export default function File({ chunks: chunks_config }) {
       options.embedded && req.setRequestHeader('Embed', 'true');
       options.zeroWidth && req.setRequestHeader('Zws', 'true');
       options.format !== 'default' && req.setRequestHeader('Format', options.format);
+      options.originalName && req.setRequestHeader('Original-Name', 'true');
 
       req.send(body);
     }
@@ -281,28 +287,46 @@ export default function File({ chunks: chunks_config }) {
       <Title mb='md'>Upload Files</Title>
 
       <Dropzone loading={loading} onDrop={(f) => setFiles([...files, ...f])}>
-        <Group position='center' spacing='md'>
-          {files.map((file) => (
-            <FileDropzone key={randomId()} file={file} />
-          ))}
-        </Group>
+        <Stack justify='space-between' h='100%'>
+          {files.length ? (
+            <Group spacing='md'>
+              {files.map((file) => (
+                <FileDropzone
+                  key={randomId()}
+                  file={file}
+                  onRemove={() => setFiles(files.filter((f) => f !== file))}
+                />
+              ))}
+            </Group>
+          ) : (
+            <Group position='center'>
+              <MutedText>Files will appear here once you drop/select them</MutedText>
+            </Group>
+          )}
+
+          <Stack>
+            <Group position='right' mt='md'>
+              <Button onClick={() => setOpened(true)} variant='outline'>
+                Options
+              </Button>
+              <Button onClick={() => setFiles([])} color='red' variant='outline'>
+                Clear Files
+              </Button>
+              <Button
+                leftIcon={<UploadIcon />}
+                onClick={handleUpload}
+                disabled={files.length === 0 ? true : false}
+              >
+                Upload
+              </Button>
+            </Group>
+
+            <Collapse in={progress !== 0}>
+              {progress !== 0 && <Progress mt='md' value={progress} animate />}
+            </Collapse>
+          </Stack>
+        </Stack>
       </Dropzone>
-
-      <Collapse in={progress !== 0}>
-        {progress !== 0 && <Progress mt='md' value={progress} animate />}
-      </Collapse>
-
-      <Group position='right' mt='md'>
-        <Button onClick={() => setOpened(true)} variant='outline'>
-          Options
-        </Button>
-        <Button onClick={() => setFiles([])} color='red' variant='outline'>
-          Clear Files
-        </Button>
-        <Button leftIcon={<UploadIcon />} onClick={handleUpload} disabled={files.length === 0 ? true : false}>
-          Upload
-        </Button>
-      </Group>
     </>
   );
 }

@@ -9,17 +9,17 @@ const logger = Logger.get('files');
 async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   if (req.method === 'DELETE') {
     if (req.body.all) {
-      const files = await prisma.image.findMany({
+      const files = await prisma.file.findMany({
         where: {
           userId: user.id,
         },
       });
 
       for (let i = 0; i !== files.length; ++i) {
-        await datasource.delete(files[i].file);
+        await datasource.delete(files[i].name);
       }
 
-      const { count } = await prisma.image.deleteMany({
+      const { count } = await prisma.file.deleteMany({
         where: {
           userId: user.id,
         },
@@ -30,18 +30,18 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     } else {
       if (!req.body.id) return res.badRequest('no file id');
 
-      const image = await prisma.image.delete({
+      const file = await prisma.file.delete({
         where: {
           id: req.body.id,
         },
       });
 
-      await datasource.delete(image.file);
+      await datasource.delete(file.name);
 
-      logger.info(`User ${user.username} (${user.id}) deleted an image ${image.file} (${image.id})`);
+      logger.info(`User ${user.username} (${user.id}) deleted an image ${file.name} (${file.id})`);
 
-      delete image.password;
-      return res.json(image);
+      delete file.password;
+      return res.json(file);
     }
   } else if (req.method === 'PATCH') {
     if (!req.body.id) return res.badRequest('no file id');
@@ -49,7 +49,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     let image;
 
     if (req.body.favorite !== null)
-      image = await prisma.image.update({
+      image = await prisma.file.update({
         where: { id: req.body.id },
         data: {
           favorite: req.body.favorite,
@@ -59,27 +59,27 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     delete image.password;
     return res.json(image);
   } else {
-    let images: {
+    let files: {
       favorite: boolean;
-      created_at: Date;
+      createdAt: Date;
       id: number;
-      file: string;
+      name: string;
       mimetype: string;
-      expires_at: Date;
+      expiresAt: Date;
       maxViews: number;
       views: number;
-    }[] = await prisma.image.findMany({
+    }[] = await prisma.file.findMany({
       where: {
         userId: user.id,
         favorite: !!req.query.favorite,
       },
       orderBy: {
-        created_at: 'desc',
+        createdAt: 'desc',
       },
       select: {
-        created_at: true,
-        expires_at: true,
-        file: true,
+        createdAt: true,
+        expiresAt: true,
+        name: true,
         mimetype: true,
         id: true,
         favorite: true,
@@ -88,14 +88,14 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       },
     });
 
-    for (let i = 0; i !== images.length; ++i) {
-      (images[i] as unknown as { url: string }).url = `${config.uploader.route}/${images[i].file}`;
+    for (let i = 0; i !== files.length; ++i) {
+      (files[i] as unknown as { url: string }).url = `${config.uploader.route}/${files[i].name}`;
     }
 
     if (req.query.filter && req.query.filter === 'media')
-      images = images.filter((x) => /^(video|audio|image|text)/.test(x.mimetype));
+      files = files.filter((x) => /^(video|audio|image|text)/.test(x.mimetype));
 
-    return res.json(images);
+    return res.json(files);
   }
 }
 

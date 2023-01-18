@@ -1,4 +1,16 @@
-import { Button, Card, Group, LoadingOverlay, Modal, Stack, Text, Title, Tooltip } from '@mantine/core';
+import {
+  ActionIcon,
+  Card,
+  Group,
+  LoadingOverlay,
+  Modal,
+  Paper,
+  SimpleGrid,
+  Stack,
+  Text,
+  Title,
+  Tooltip,
+} from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { showNotification } from '@mantine/notifications';
 import { useFileDelete, useFileFavorite } from 'lib/queries/files';
@@ -10,16 +22,16 @@ import {
   CopyIcon,
   CrossIcon,
   DeleteIcon,
+  DownloadIcon,
   ExternalLinkIcon,
   EyeIcon,
   FileIcon,
   HashIcon,
   ImageIcon,
   StarIcon,
+  InfoIcon,
 } from './icons';
-import Link from './Link';
 import MutedText from './MutedText';
-import Markdown from './render/Markdown';
 import Type from './Type';
 
 export function FileMeta({ Icon, title, subtitle, ...other }) {
@@ -115,13 +127,13 @@ export default function File({ image, disableMediaPreview, exifEnabled }) {
 
   return (
     <>
-      <Modal opened={open} onClose={() => setOpen(false)} title={<Title>{image.file}</Title>} size='xl'>
+      <Modal opened={open} onClose={() => setOpen(false)} title={<Title>{image.name}</Title>} size='xl'>
         <LoadingOverlay visible={loading} />
         <Stack>
           <Type
             file={image}
-            src={`/r/${image.file}`}
-            alt={image.file}
+            src={`/r/${image.name}`}
+            alt={image.name}
             popup
             sx={{ minHeight: 200 }}
             style={{ minHeight: 200 }}
@@ -129,8 +141,16 @@ export default function File({ image, disableMediaPreview, exifEnabled }) {
             overrideRender={overrideRender}
             setOverrideRender={setOverrideRender}
           />
-          <Stack>
-            <FileMeta Icon={FileIcon} title='Name' subtitle={image.file} />
+          <SimpleGrid
+            my='md'
+            cols={3}
+            breakpoints={[
+              { maxWidth: 600, cols: 1 },
+              { maxWidth: 900, cols: 2 },
+              { maxWidth: 1200, cols: 3 },
+            ]}
+          >
+            <FileMeta Icon={FileIcon} title='Name' subtitle={image.name} />
             <FileMeta Icon={ImageIcon} title='Type' subtitle={image.mimetype} />
             <FileMeta Icon={EyeIcon} title='Views' subtitle={image?.views?.toLocaleString()} />
             {image.maxViews && (
@@ -144,23 +164,78 @@ export default function File({ image, disableMediaPreview, exifEnabled }) {
             <FileMeta
               Icon={CalendarIcon}
               title='Uploaded'
-              subtitle={relativeTime(new Date(image.created_at))}
-              tooltip={new Date(image?.created_at).toLocaleString()}
+              subtitle={relativeTime(new Date(image.createdAt))}
+              tooltip={new Date(image?.createdAt).toLocaleString()}
             />
-            {image.expires_at && (
+            {image.expiresAt && (
               <FileMeta
                 Icon={ClockIcon}
                 title='Expires'
-                subtitle={relativeTime(new Date(image.expires_at))}
-                tooltip={new Date(image.expires_at).toLocaleString()}
+                subtitle={relativeTime(new Date(image.expiresAt))}
+                tooltip={new Date(image.expiresAt).toLocaleString()}
               />
             )}
             <FileMeta Icon={HashIcon} title='ID' subtitle={image.id} />
-          </Stack>
+          </SimpleGrid>
         </Stack>
 
-        <Group position='right' mt='md'>
-          {exifEnabled && (
+        <Group position='apart' my='md'>
+          <Group position='left'>
+            {exifEnabled && (
+              // <Link href={`/dashboard/metadata/${image.id}`} target='_blank' rel='noopener noreferrer'>
+              //   <Button leftIcon={<ExternalLinkIcon />}>View Metadata</Button>
+              // </Link>
+              <Tooltip label='View Metadata'>
+                <ActionIcon
+                  color='blue'
+                  variant='filled'
+                  onClick={() => window.open(`/dashboard/metadata/${image.id}`, '_blank')}
+                >
+                  <InfoIcon />
+                </ActionIcon>
+              </Tooltip>
+            )}
+          </Group>
+          <Group position='right'>
+            <Tooltip label='Delete file'>
+              <ActionIcon color='red' variant='filled' onClick={handleDelete}>
+                <DeleteIcon />
+              </ActionIcon>
+            </Tooltip>
+
+            <Tooltip label={image.favorite ? 'Unfavorite' : 'Favorite'}>
+              <ActionIcon
+                color={image.favorite ? 'yellow' : 'gray'}
+                variant='filled'
+                onClick={handleFavorite}
+              >
+                <StarIcon />
+              </ActionIcon>
+            </Tooltip>
+
+            <Tooltip label='Open in new tab'>
+              <ActionIcon color='blue' variant='filled' onClick={() => window.open(image.url, '_blank')}>
+                <ExternalLinkIcon />
+              </ActionIcon>
+            </Tooltip>
+
+            <Tooltip label='Copy URL'>
+              <ActionIcon color='blue' variant='filled' onClick={handleCopy}>
+                <CopyIcon />
+              </ActionIcon>
+            </Tooltip>
+
+            <Tooltip label='Download'>
+              <ActionIcon
+                color='blue'
+                variant='filled'
+                onClick={() => window.open(`/r/${image.name}?download=true`, '_blank')}
+              >
+                <DownloadIcon />
+              </ActionIcon>
+            </Tooltip>
+          </Group>
+          {/* {exifEnabled && (
             <Link href={`/dashboard/metadata/${image.id}`} target='_blank' rel='noopener noreferrer'>
               <Button leftIcon={<ExternalLinkIcon />}>View Metadata</Button>
             </Link>
@@ -170,7 +245,7 @@ export default function File({ image, disableMediaPreview, exifEnabled }) {
           <Button onClick={handleFavorite}>{image.favorite ? 'Unfavorite' : 'Favorite'}</Button>
           <Link href={image.url} target='_blank'>
             <Button rightIcon={<ExternalLinkIcon />}>Open</Button>
-          </Link>
+          </Link> */}
         </Group>
       </Modal>
       <Card sx={{ maxWidth: '100%', height: '100%' }} shadow='md'>
@@ -192,8 +267,8 @@ export default function File({ image, disableMediaPreview, exifEnabled }) {
               width: '100%',
               cursor: 'pointer',
             }}
-            src={`/r/${image.file}`}
-            alt={image.file}
+            src={`/r/${image.name}`}
+            alt={image.name}
             onClick={() => setOpen(true)}
             disableMediaPreview={disableMediaPreview}
           />

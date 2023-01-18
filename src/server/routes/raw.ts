@@ -4,26 +4,26 @@ export default async function rawRoute(this: FastifyInstance, req: FastifyReques
   const { id } = req.params as { id: string };
   if (id === '') return reply.notFound();
 
-  const image = await this.prisma.image.findFirst({
+  const file = await this.prisma.file.findFirst({
     where: {
-      OR: [{ file: id }, { invisible: { invis: decodeURI(id) } }],
+      OR: [{ name: id }, { invisible: { invis: decodeURI(id) } }],
     },
   });
 
-  if (!image) return reply.rawFile(id);
+  if (!file) return reply.rawFile(id);
   else {
-    const failed = await reply.preFile(image);
+    const failed = await reply.preFile(file);
     if (failed) return reply.notFound();
 
-    if (image.password) {
+    if (file.password) {
       return reply
         .type('application/json')
         .code(403)
         .send({
           error: "can't view a raw file that has a password",
-          url: `/view/${image.file}`,
+          url: `/view/${file.name}`,
           code: 403,
         });
-    } else return reply.rawFile(image.file);
+    } else return reply.rawFile(file.name);
   }
 }

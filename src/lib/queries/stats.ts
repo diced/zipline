@@ -6,7 +6,7 @@ type StatsTypesCount = {
 };
 
 export type Stats = {
-  created_at: string;
+  createdAt: string;
   id: number;
   data: {
     count: number;

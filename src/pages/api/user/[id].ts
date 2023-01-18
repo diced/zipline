@@ -31,7 +31,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     if (req.body.delete_files) {
       logger.debug(`attempting to delete ${newTarget.id}'s files`);
 
-      const files = await prisma.image.findMany({
+      const files = await prisma.file.findMany({
         where: {
           userId: newTarget.id,
         },
@@ -39,13 +39,13 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
 
       for (let i = 0; i !== files.length; ++i) {
         try {
-          await datasource.delete(files[i].file);
+          await datasource.delete(files[i].name);
         } catch {
-          logger.debug(`failed to find file ${files[i].file} to delete`);
+          logger.debug(`failed to find file ${files[i].name} to delete`);
         }
       }
 
-      const { count } = await prisma.image.deleteMany({
+      const { count } = await prisma.file.deleteMany({
         where: {
           userId: newTarget.id,
         },
@@ -101,22 +101,10 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
         data: { avatar: req.body.avatar },
       });
 
-    if (req.body.embedTitle)
+    if (req.body.embed)
       await prisma.user.update({
         where: { id: target.id },
-        data: { embedTitle: req.body.embedTitle },
-      });
-
-    if (req.body.embedColor)
-      await prisma.user.update({
-        where: { id: target.id },
-        data: { embedColor: req.body.embedColor },
-      });
-
-    if (req.body.embedSiteName)
-      await prisma.user.update({
-        where: { id: target.id },
-        data: { embedSiteName: req.body.embedSiteName },
+        data: { embed: req.body.embed },
       });
 
     if (req.body.systemTheme)

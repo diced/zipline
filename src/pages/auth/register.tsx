@@ -178,7 +178,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     if (!invite) return { notFound: true };
     if (invite.used) return { notFound: true };
 
-    if (invite.expires_at && invite.expires_at < new Date()) {
+    if (invite.expiresAt && invite.expiresAt < new Date()) {
       logger.debug(`restricting access to ${JSON.stringify(invite)} as it has expired`);
 
       return { notFound: true };

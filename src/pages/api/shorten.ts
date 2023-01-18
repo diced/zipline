@@ -66,10 +66,17 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     );
   }
 
+  const fullUrl = `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}${
+    zconfig.urls.route === '/' ? '/' : zconfig.urls.route
+  }/${req.body.vanity ? req.body.vanity : invis ? invis.invis : url.id}`;
+
+  if (req.headers['no-json']) {
+    res.setHeader('Content-Type', 'text/plain');
+    return res.end(fullUrl);
+  }
+
   return res.json({
-    url: `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}${
-      zconfig.urls.route === '/' ? '/' : `${zconfig.urls.route}/`
-    }${req.body.vanity ? req.body.vanity : invis ? invis.invis : url.id}`,
+    url: fullUrl,
   });
 }
 

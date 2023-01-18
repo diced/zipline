@@ -1,14 +1,27 @@
 import { Box, Button, Modal, PasswordInput } from '@mantine/core';
+import type { File } from '@prisma/client';
+import Link from 'components/Link';
 import exts from 'lib/exts';
 import prisma from 'lib/prisma';
 import { parseString } from 'lib/utils/parser';
+import type { UserExtended } from 'middleware/withZipline';
 import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
-export default function EmbeddedFile({ image, user, pass, prismRender }) {
-  const dataURL = (route: string) => `${route}/${image.file}`;
+export default function EmbeddedFile({
+  file,
+  user,
+  pass,
+  prismRender,
+}: {
+  file: File;
+  user: UserExtended;
+  pass: boolean;
+  prismRender: boolean;
+}) {
+  const dataURL = (route: string) => `${route}/${file.name}`;
 
   const router = useRouter();
   const [opened, setOpened] = useState(pass);
@@ -16,15 +29,15 @@ export default function EmbeddedFile({ image, user, pass, prismRender }) {
   const [error, setError] = useState('');
 
   // reapply date from workaround
-  image.created_at = new Date(image?.created_at);
+  file.createdAt = new Date(file ? file.createdAt : 0);
 
   const check = async () => {
-    const res = await fetch(`/api/auth/image?id=${image.id}&password=${password}`);
+    const res = await fetch(`/api/auth/image?id=${file.id}&password=${password}`);
 
     if (res.ok) {
       setError('');
-      if (prismRender) return router.push(`/code/${image.file}?password=${password}`);
-      updateImage(`/api/auth/image?id=${image.id}&password=${password}`);
+      if (prismRender) return router.push(`/code/${file.name}?password=${password}`);
+      updateImage(`/api/auth/image?id=${file.id}&password=${password}`);
       setOpened(false);
     } else {
       setError('Invalid password');
@@ -60,45 +73,53 @@ export default function EmbeddedFile({ image, user, pass, prismRender }) {
   return (
     <>
       <Head>
-        {image.embed && (
-          <>
-            {user.embedSiteName && (
-              <meta
-                property='og:site_name'
-                content={parseString(user.embedSiteName, { file: image, user })}
-              />
-            )}
-            {user.embedTitle && (
-              <meta property='og:title' content={parseString(user.embedTitle, { file: image, user })} />
-            )}
-            <meta property='theme-color' content={user.embedColor} />
-          </>
+        {user.embed.title && file.embed && (
+          <meta property='og:title' content={parseString(user.embed.title, { file: file, user })} />
         )}
-        {image.mimetype.startsWith('image') && (
+
+        {user.embed.description && file.embed && (
+          <meta
+            property='og:description'
+            content={parseString(user.embed.description, { file: file, user })}
+          />
+        )}
+
+        {user.embed.siteName && file.embed && (
+          <meta property='og:site_name' content={parseString(user.embed.siteName, { file: file, user })} />
+        )}
+
+        {user.embed.color && file.embed && (
+          <meta property='theme-color' content={parseString(user.embed.color, { file: file, user })} />
+        )}
+
+        {file.mimetype.startsWith('image') && (
           <>
-            <meta property='og:image' content={`/r/${image.file}`} />
+            <meta property='og:image' content={`/r/${file.name}`} />
             <meta property='twitter:card' content='summary_large_image' />
           </>
         )}
-        {image.mimetype.startsWith('video') && (
+        {file.mimetype.startsWith('video') && (
           <>
             <meta name='twitter:card' content='player' />
-            <meta name='twitter:player:stream' content={`/r/${image.file}`} />
+            <meta name='twitter:player:stream' content={`/r/${file.name}`} />
             <meta name='twitter:player:width' content='720' />
             <meta name='twitter:player:height' content='480' />
-            <meta name='twitter:player:stream:content_type' content={image.mimetype} />
-            <meta name='twitter:title' content={image.file} />
+            <meta name='twitter:player:stream:content_type' content={file.mimetype} />
+            <meta name='twitter:title' content={file.name} />
 
-            <meta property='og:url' content={`/r/${image.file}`} />
-            <meta property='og:video' content={`/r/${image.file}`} />
-            <meta property='og:video:url' content={`/r/${image.file}`} />
-            <meta property='og:video:secure_url' content={`/r/${image.file}`} />
-            <meta property='og:video:type' content={image.mimetype} />
+            <meta property='og:url' content={`/r/${file.name}`} />
+            <meta property='og:video' content={`/r/${file.name}`} />
+            <meta property='og:video:url' content={`/r/${file.name}`} />
+            <meta property='og:video:secure_url' content={`/r/${file.name}`} />
+            <meta property='og:video:type' content={file.mimetype} />
             <meta property='og:video:width' content='720' />
             <meta property='og:video:height' content='480' />
           </>
         )}
-        <title>{image.file}</title>
+        {!file.mimetype.startsWith('video') && !file.mimetype.startsWith('image') && (
+          <meta property='og:url' content={`/r/${file.name}`} />
+        )}
+        <title>{file.name}</title>
       </Head>
       <Modal
         opened={opened}
@@ -129,12 +150,16 @@ export default function EmbeddedFile({ image, user, pass, prismRender }) {
           justifyContent: 'center',
         }}
       >
-        {image.mimetype.startsWith('image') && (
+        {file.mimetype.startsWith('image') && (
           <img src={dataURL('/r')} alt={dataURL('/r')} id='image_content' />
         )}
 
-        {image.mimetype.startsWith('video') && (
+        {file.mimetype.startsWith('video') && (
           <video src={dataURL('/r')} controls={true} autoPlay={true} id='image_content' />
+        )}
+
+        {!file.mimetype.startsWith('video') && !file.mimetype.startsWith('image') && (
+          <Link href={dataURL('/r')}>Can&#39;t preview this file. Click here to download it.</Link>
         )}
       </Box>
     </>
@@ -144,53 +169,51 @@ export default function EmbeddedFile({ image, user, pass, prismRender }) {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { id } = context.params as { id: string };
 
-  const image = await prisma.image.findFirst({
+  const file = await prisma.file.findFirst({
     where: {
-      OR: [{ file: id }, { invisible: { invis: id } }],
+      OR: [{ name: id }, { invisible: { invis: id } }],
     },
     select: {
       mimetype: true,
       id: true,
-      file: true,
+      name: true,
       invisible: true,
       userId: true,
-      embed: true,
-      created_at: true,
+      createdAt: true,
       password: true,
+      embed: true,
     },
   });
-  if (!image) return { notFound: true };
+  if (!file) return { notFound: true };
 
   const user = await prisma.user.findFirst({
     select: {
-      embedTitle: true,
-      embedColor: true,
-      embedSiteName: true,
       username: true,
       id: true,
+      embed: true,
     },
     where: {
-      id: image.userId,
+      id: file.userId,
     },
   });
 
-  //@ts-ignore workaround because next wont allow date
-  image.created_at = image.created_at.toString();
+  // @ts-ignore workaround because next wont allow date
+  file.createdAt = file.createdAt.toString();
 
-  const prismRender = Object.keys(exts).includes(image.file.split('.').pop());
-  if (prismRender && !image.password)
+  const prismRender = Object.keys(exts).includes(file.name.split('.').pop());
+  if (prismRender && !file.password)
     return {
       redirect: {
-        destination: `/code/${image.file}`,
+        destination: `/code/${file.name}`,
         permanent: true,
       },
     };
-  else if (prismRender && image.password) {
-    const pass = image.password ? true : false;
-    delete image.password;
+  else if (prismRender && file.password) {
+    const pass = file.password ? true : false;
+    delete file.password;
     return {
       props: {
-        image,
+        image: file,
         user,
         pass,
         prismRender: true,
@@ -198,20 +221,24 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
   }
 
-  if (!image.mimetype.startsWith('image') && !image.mimetype.startsWith('video')) {
+  if (!file.mimetype.startsWith('image') && !file.mimetype.startsWith('video')) {
     const { default: datasource } = await import('lib/datasource');
 
-    const data = await datasource.get(image.file);
+    const data = await datasource.get(file.name);
     if (!data) return { notFound: true };
 
-    data.pipe(context.res);
-    return { props: {} };
+    return {
+      props: {
+        file,
+        user,
+      },
+    };
   }
-  const pass = image.password ? true : false;
-  delete image.password;
+  const pass = file.password ? true : false;
+  delete file.password;
   return {
     props: {
-      image,
+      file,
       user,
       pass,
     },

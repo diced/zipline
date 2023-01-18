@@ -51,9 +51,9 @@ export default function URLCard({ url }: { url: URLResponse }) {
         <Group position='left'>
           <Stack spacing={0}>
             <Title>{url.vanity ?? url.id}</Title>
-            <Tooltip label={new Date(url.created_at).toLocaleString()}>
+            <Tooltip label={new Date(url.createdAt).toLocaleString()}>
               <div>
-                <MutedText size='sm'>Created: {relativeTime(new Date(url.created_at))}</MutedText>
+                <MutedText size='sm'>Created: {relativeTime(new Date(url.createdAt))}</MutedText>
               </div>
             </Tooltip>
             {url.vanity && <MutedText size='sm'>ID: {url.id}</MutedText>}
@@ -70,7 +70,7 @@ export default function URLCard({ url }: { url: URLResponse }) {
             </MutedText>
           </Stack>
         </Group>
-        <Group position='right'>
+        <Stack>
           <ActionIcon href={url.url} component='a' target='_blank'>
             <ExternalLinkIcon />
           </ActionIcon>
@@ -80,7 +80,7 @@ export default function URLCard({ url }: { url: URLResponse }) {
           <ActionIcon aria-label='delete' onClick={() => deleteURL(url)}>
             <TrashIcon />
           </ActionIcon>
-        </Group>
+        </Stack>
       </Group>
     </Card>
   );
