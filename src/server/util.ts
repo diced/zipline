@@ -14,7 +14,7 @@ export async function migrations() {
     const migrate = new Migrate('./prisma/schema.prisma');
 
     logger.debug('ensuring database exists, if not creating database - may error if no permissions');
-    await ensureDatabaseExists('apply', true, './prisma/schema.prisma');
+    await ensureDatabaseExists('apply', './prisma/schema.prisma');
 
     const diagnose = await migrate.diagnoseMigrationHistory({
       optInToShadowDatabase: false,
