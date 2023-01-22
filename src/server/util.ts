@@ -21,7 +21,7 @@ export async function migrations() {
     });
 
     if (diagnose.history?.diagnostic === 'databaseIsBehind') {
-      if (diagnose.hasMigrationsTable === false) {
+      if (!diagnose.hasMigrationsTable) {
         logger.debug('no migrations table found, attempting schema push');
         try {
           logger.debug('pushing schema');
@@ -29,25 +29,17 @@ export async function migrations() {
           if (migration.unexecutable && migration.unexecutable.length > 0)
             throw new Error('This database is not empty, schema push is not possible.');
         } catch (e) {
-          logger.error('failed to push schema');
           migrate.stop();
+          logger.error('failed to push schema');
           throw e;
-        } finally {
-          logger.debug('finished pushing schema, marking migrations as applied');
-          try {
-            for (const migration of diagnose.history.unappliedMigrationNames) {
-              await migrate.markMigrationApplied({ migrationId: migration });
-            }
-          } catch (e) {
-            logger.error('failed to mark migrations as applied');
-            migrate.stop();
-            throw e;
-          } finally {
-            migrate.stop();
-            logger.debug('finished marking migrations as applied');
-          }
         }
-      } else if (diagnose.hasMigrationsTable === true) {
+        logger.debug('finished pushing schema, marking migrations as applied');
+        for (const migration of diagnose.history.unappliedMigrationNames) {
+          await migrate.markMigrationApplied({ migrationId: migration });
+        }
+        migrate.stop();
+        logger.info('finished migrating database');
+      } else if (diagnose.hasMigrationsTable) {
         logger.debug('database is behind, attempting to migrate');
         try {
           logger.debug('migrating database');
@@ -56,10 +48,9 @@ export async function migrations() {
           logger.error('failed to migrate database');
           migrate.stop();
           throw e;
-        } finally {
-          migrate.stop();
-          logger.info('finished migrating database');
         }
+        migrate.stop();
+        logger.info('finished migrating database');
       }
     } else {
       logger.debug('exiting migrations engine - database is up to date');
