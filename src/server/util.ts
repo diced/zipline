@@ -10,10 +10,10 @@ export async function migrations() {
   const logger = Logger.get('database::migrations');
 
   try {
-    logger.debug('establishing database connection');
+    logger.info('establishing database connection');
     const migrate = new Migrate('./prisma/schema.prisma');
 
-    logger.debug('ensuring database exists, if not creating database - may error if no permissions');
+    logger.info('ensuring database exists, if not creating database - may error if no permissions');
     await ensureDatabaseExists('apply', './prisma/schema.prisma');
 
     const diagnose = await migrate.diagnoseMigrationHistory({
@@ -53,7 +53,7 @@ export async function migrations() {
         logger.info('finished migrating database');
       }
     } else {
-      logger.debug('exiting migrations engine - database is up to date');
+      logger.info('exiting migrations engine - database is up to date');
       migrate.stop();
     }
   } catch (error) {
