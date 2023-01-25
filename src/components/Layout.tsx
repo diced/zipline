@@ -396,75 +396,77 @@ export default function Layout({ children, props }) {
 
                 <Popover.Dropdown p={4} mr='md' sx={{ minWidth: '200px' }}>
                   <Stack spacing={2}>
-                    <Menu.Label>
-                      {user.username} ({user.id}){' '}
-                      {user.administrator && user.username !== 'administrator' ? '(Administrator)' : ''}
-                    </Menu.Label>
-                    <MenuItemLink icon={<SettingsIcon />} href='/dashboard/manage'>
-                      Manage Account
-                    </MenuItemLink>
-                    <MenuItem
-                      icon={<CopyIcon />}
-                      onClick={() => {
-                        setOpen(false);
-                        openCopyToken();
-                      }}
-                    >
-                      Copy Token
-                    </MenuItem>
-                    <MenuItem
-                      icon={<DeleteIcon />}
-                      onClick={() => {
-                        setOpen(false);
-                        openResetToken();
-                      }}
-                      color='red'
-                    >
-                      Reset Token
-                    </MenuItem>
-                    <MenuItemLink icon={<LogoutIcon />} href='/auth/logout' color='red'>
-                      Logout
-                    </MenuItemLink>
-                    <Menu.Divider />
-                    <>
-                      {oauth_providers
-                        .filter((x) =>
+                    <Menu>
+                      <Menu.Label>
+                        {user.username} ({user.id}){' '}
+                        {user.administrator && user.username !== 'administrator' ? '(Administrator)' : ''}
+                      </Menu.Label>
+                      <MenuItemLink icon={<SettingsIcon />} href='/dashboard/manage'>
+                        Manage Account
+                      </MenuItemLink>
+                      <MenuItem
+                        icon={<CopyIcon />}
+                        onClick={() => {
+                          setOpen(false);
+                          openCopyToken();
+                        }}
+                      >
+                        Copy Token
+                      </MenuItem>
+                      <MenuItem
+                        icon={<DeleteIcon />}
+                        onClick={() => {
+                          setOpen(false);
+                          openResetToken();
+                        }}
+                        color='red'
+                      >
+                        Reset Token
+                      </MenuItem>
+                      <MenuItemLink icon={<LogoutIcon />} href='/auth/logout' color='red'>
+                        Logout
+                      </MenuItemLink>
+                      <Menu.Divider />
+                      <>
+                        {oauth_providers
+                          .filter((x) =>
+                            user.oauth
+                              ?.map(({ provider }) => provider.toLowerCase())
+                              .includes(x.name.toLowerCase())
+                          )
+                          .map(({ name, Icon }, i) => (
+                            <>
+                              <MenuItem
+                                sx={{ '&:hover': { backgroundColor: 'inherit' } }}
+                                key={i}
+                                py={5}
+                                px={4}
+                                icon={<Icon size={18} colorScheme={theme.colorScheme} />}
+                              >
+                                Logged in with {capitalize(name)}
+                              </MenuItem>
+                            </>
+                          ))}
+                        {oauth_providers.filter((x) =>
                           user.oauth
                             ?.map(({ provider }) => provider.toLowerCase())
                             .includes(x.name.toLowerCase())
-                        )
-                        .map(({ name, Icon }, i) => (
-                          <>
-                            <MenuItem
-                              sx={{ '&:hover': { backgroundColor: 'inherit' } }}
-                              key={i}
-                              py={5}
-                              px={4}
-                              icon={<Icon size={18} colorScheme={theme.colorScheme} />}
-                            >
-                              Logged in with {capitalize(name)}
-                            </MenuItem>
-                          </>
-                        ))}
-                      {oauth_providers.filter((x) =>
-                        user.oauth
-                          ?.map(({ provider }) => provider.toLowerCase())
-                          .includes(x.name.toLowerCase())
-                      ).length ? (
-                        <Menu.Divider />
-                      ) : null}
-                    </>
-                    <MenuItem icon={<PencilIcon />}>
-                      <Select
-                        size='xs'
-                        data={Object.keys(themes).map((t) => ({
-                          value: t,
-                          label: friendlyThemeName[t],
-                        }))}
-                        value={systemTheme}
-                        onChange={handleUpdateTheme}
-                      />
-                    </MenuItem>
+                        ).length ? (
+                          <Menu.Divider />
+                        ) : null}
+                      </>
+                      <MenuItem icon={<PencilIcon />}>
+                        <Select
+                          size='xs'
+                          data={Object.keys(themes).map((t) => ({
+                            value: t,
+                            label: friendlyThemeName[t],
+                          }))}
+                          value={systemTheme}
+                          onChange={handleUpdateTheme}
+                        />
+                      </MenuItem>
+                    </Menu>
                   </Stack>
                 </Popover.Dropdown>
               </Popover>
