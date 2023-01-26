@@ -4,7 +4,6 @@ import {
   Box,
   Burger,
   Button,
-  Group,
   Header,
   Image,
   MediaQuery,
@@ -12,14 +11,11 @@ import {
   Navbar,
   NavLink,
   Paper,
-  Popover,
   ScrollArea,
   Select,
-  Stack,
   Text,
   Title,
   Tooltip,
-  UnstyledButton,
   useMantineTheme,
 } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
@@ -55,61 +51,6 @@ import {
   UserIcon,
 } from './icons';
 import { friendlyThemeName, themes } from './Theming';
-
-function MenuItemLink(props) {
-  return (
-    <Link href={props.href} passHref legacyBehavior>
-      <MenuItem {...props} />
-    </Link>
-  );
-}
-
-function MenuItem(props) {
-  return (
-    <UnstyledButton
-      sx={(theme) => ({
-        display: 'block',
-        width: '100%',
-        padding: 5,
-        borderRadius: theme.radius.sm,
-        color: props.color
-          ? theme.fn.themeColor(props.color, theme.colorScheme === 'dark' ? 5 : 7)
-          : theme.colorScheme === 'dark'
-          ? theme.colors.dark[0]
-          : theme.black,
-        '&:hover': !props.noClick
-          ? {
-              backgroundColor: props.color
-                ? theme.fn.rgba(
-                    theme.fn.themeColor(props.color, theme.colorScheme === 'dark' ? 9 : 0),
-                    theme.colorScheme === 'dark' ? 0.2 : 1
-                  )
-                : theme.colorScheme === 'dark'
-                ? theme.fn.rgba(theme.colors.dark[3], 0.35)
-                : theme.colors.gray[0],
-            }
-          : null,
-      })}
-      {...props}
-    >
-      <Group noWrap>
-        <Box
-          sx={(theme) => ({
-            marginRight: theme.spacing.xs / 4,
-            paddingLeft: theme.spacing.xs / 2,
-
-            '& *': {
-              display: 'block',
-            },
-          })}
-        >
-          {props.icon}
-        </Box>
-        <Text size='sm'>{props.children}</Text>
-      </Group>
-    </UnstyledButton>
-  );
-}
 
 export type NavbarItems = {
   icon: React.ReactNode;
@@ -198,7 +139,6 @@ export default function Layout({ children, props }) {
   const [systemTheme, setSystemTheme] = useState(user.systemTheme ?? 'system');
   const version = useVersion();
   const [opened, setOpened] = useState(false); // navigation open
-  const [open, setOpen] = useState(false); // manage acc dropdown
 
   const avatar = user?.avatar ?? null;
   const router = useRouter();
@@ -375,11 +315,10 @@ export default function Layout({ children, props }) {
             </MediaQuery>
             <Title ml='sm'>{title}</Title>
             <Box sx={{ marginLeft: 'auto', marginRight: 0 }}>
-              <Popover position='bottom-end' opened={open} onClose={() => setOpen(false)}>
-                <Popover.Target>
+              <Menu>
+                <Menu.Target>
                   <Button
                     leftIcon={avatar ? <Image src={avatar} height={32} radius='md' /> : <SettingsIcon />}
-                    onClick={() => setOpen((o) => !o)}
                     sx={(t) => ({
                       backgroundColor: 'inherit',
                       '&:hover': {
@@ -392,84 +331,73 @@ export default function Layout({ children, props }) {
                   >
                     {user.username}
                   </Button>
-                </Popover.Target>
-
-                <Popover.Dropdown p={4} mr='md' sx={{ minWidth: '200px' }}>
-                  <Stack spacing={2}>
-                    <Menu>
-                      <Menu.Label>
-                        {user.username} ({user.id}){' '}
-                        {user.administrator && user.username !== 'administrator' ? '(Administrator)' : ''}
-                      </Menu.Label>
-                      <MenuItemLink icon={<SettingsIcon />} href='/dashboard/manage'>
-                        Manage Account
-                      </MenuItemLink>
-                      <MenuItem
-                        icon={<CopyIcon />}
-                        onClick={() => {
-                          setOpen(false);
-                          openCopyToken();
-                        }}
-                      >
-                        Copy Token
-                      </MenuItem>
-                      <MenuItem
-                        icon={<DeleteIcon />}
-                        onClick={() => {
-                          setOpen(false);
-                          openResetToken();
-                        }}
-                        color='red'
-                      >
-                        Reset Token
-                      </MenuItem>
-                      <MenuItemLink icon={<LogoutIcon />} href='/auth/logout' color='red'>
-                        Logout
-                      </MenuItemLink>
+                </Menu.Target>
+                <Menu.Dropdown>
+                  <Menu.Label>
+                    {user.username} ({user.id}){' '}
+                    {user.administrator && user.username !== 'administrator' ? '(Administrator)' : ''}
+                  </Menu.Label>
+                  <Menu.Item component={Link} icon={<SettingsIcon />} href='/dashboard/manage'>
+                    Manage Account
+                  </Menu.Item>
+                  <Menu.Item
+                    icon={<CopyIcon />}
+                    onClick={() => {
+                      openCopyToken();
+                    }}
+                  >
+                    Copy Token
+                  </Menu.Item>
+                  <Menu.Item
+                    icon={<DeleteIcon />}
+                    onClick={() => {
+                      openResetToken();
+                    }}
+                    color='red'
+                  >
+                    Reset Token
+                  </Menu.Item>
+                  <Menu.Item component={Link} icon={<LogoutIcon />} href='/auth/logout' color='red'>
+                    Logout
+                  </Menu.Item>
+                  <Menu.Divider />
+                  <>
+                    {oauth_providers
+                      .filter((x) =>
+                        user.oauth
+                          ?.map(({ provider }) => provider.toLowerCase())
+                          .includes(x.name.toLowerCase())
+                      )
+                      .map(({ name, Icon }, i) => (
+                        <>
+                          <Menu.Item
+                            closeMenuOnClick={false}
+                            key={i}
+                            icon={<Icon size={18} colorScheme={theme.colorScheme} />}
+                          >
+                            Logged in with {capitalize(name)}
+                          </Menu.Item>
+                        </>
+                      ))}
+                    {oauth_providers.filter((x) =>
+                      user.oauth?.map(({ provider }) => provider.toLowerCase()).includes(x.name.toLowerCase())
+                    ).length ? (
                       <Menu.Divider />
-                      <>
-                        {oauth_providers
-                          .filter((x) =>
-                            user.oauth
-                              ?.map(({ provider }) => provider.toLowerCase())
-                              .includes(x.name.toLowerCase())
-                          )
-                          .map(({ name, Icon }, i) => (
-                            <>
-                              <MenuItem
-                                sx={{ '&:hover': { backgroundColor: 'inherit' } }}
-                                key={i}
-                                py={5}
-                                px={4}
-                                icon={<Icon size={18} colorScheme={theme.colorScheme} />}
-                              >
-                                Logged in with {capitalize(name)}
-                              </MenuItem>
-                            </>
-                          ))}
-                        {oauth_providers.filter((x) =>
-                          user.oauth
-                            ?.map(({ provider }) => provider.toLowerCase())
-                            .includes(x.name.toLowerCase())
-                        ).length ? (
-                          <Menu.Divider />
-                        ) : null}
-                      </>
-                      <MenuItem icon={<PencilIcon />}>
-                        <Select
-                          size='xs'
-                          data={Object.keys(themes).map((t) => ({
-                            value: t,
-                            label: friendlyThemeName[t],
-                          }))}
-                          value={systemTheme}
-                          onChange={handleUpdateTheme}
-                        />
-                      </MenuItem>
-                    </Menu>
-                  </Stack>
-                </Popover.Dropdown>
-              </Popover>
+                    ) : null}
+                  </>
+                  <Menu.Item closeMenuOnClick={false} icon={<PencilIcon />}>
+                    <Select
+                      size='xs'
+                      data={Object.keys(themes).map((t) => ({
+                        value: t,
+                        label: friendlyThemeName[t],
+                      }))}
+                      value={systemTheme}
+                      onChange={handleUpdateTheme}
+                    />
+                  </Menu.Item>
+                </Menu.Dropdown>
+              </Menu>
             </Box>
           </div>
         </Header>
