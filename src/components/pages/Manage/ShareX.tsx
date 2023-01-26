@@ -3,9 +3,11 @@ import { GeneratorModal } from './GeneratorModal';
 
 export default function ShareX({ user, open, setOpen }) {
   const onSubmit = (values) => {
+    const hostname = window.location.hostname;
+
     const config = {
       Version: '14.1.0',
-      Name: 'Zipline',
+      Name: `Zipline - ${hostname} - ${values.type === 'upload-file' ? 'File' : 'URL'}`,
       DestinationType: 'ImageUploader, TextUploader, FileUploader',
       RequestMethod: 'POST',
       RequestURL: `${
@@ -17,7 +19,7 @@ export default function ShareX({ user, open, setOpen }) {
       Headers: {
         Authorization: user?.token,
       },
-      URL: '$json:files[0]$',
+      URL: '{json:files[0]}',
       Body: 'MultipartFormData',
       FileFormName: 'file',
       Data: undefined,
@@ -30,9 +32,9 @@ export default function ShareX({ user, open, setOpen }) {
         window.location.hostname +
         (window.location.port ? ':' + window.location.port : '')
       }/api/shorten`;
-      config.URL = '$json:url$';
+      config.URL = '{json:url}';
       config.Body = 'JSON';
-      config.DestinationType = 'URLShortener';
+      config.DestinationType = 'URLShortener,URLSharingService';
       delete config.FileFormName;
       config.Data = JSON.stringify({ url: '{input}' });
     } else {
@@ -68,7 +70,7 @@ export default function ShareX({ user, open, setOpen }) {
       config.Headers['No-JSON'] = 'true';
     } else {
       delete config.Headers['No-JSON'];
-      config.URL = values.type === 'upload-file' ? '$json:files[0]$' : '$json:url$';
+      config.URL = values.type === 'upload-file' ? '{json:files[0]}' : '{json:url}';
     }
 
     if (values.originalName && values.type === 'upload-file') {
