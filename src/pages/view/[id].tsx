@@ -173,29 +173,16 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     where: {
       OR: [{ name: id }, { invisible: { invis: id } }],
     },
-    select: {
-      mimetype: true,
-      id: true,
-      name: true,
-      invisible: true,
-      userId: true,
-      createdAt: true,
-      password: true,
-      embed: true,
-    },
   });
   if (!file) return { notFound: true };
 
   const user = await prisma.user.findFirst({
-    select: {
-      username: true,
-      id: true,
-      embed: true,
-    },
     where: {
       id: file.userId,
     },
   });
+  delete user.password;
+  delete user.totpSecret;
 
   // @ts-ignore workaround because next wont allow date
   file.createdAt = file.createdAt.toString();
@@ -227,6 +214,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     const data = await datasource.get(file.name);
     if (!data) return { notFound: true };
 
+    delete file.password;
+
     return {
       props: {
         file,
@@ -234,6 +223,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       },
     };
   }
+
   const pass = file.password ? true : false;
   delete file.password;
   return {
