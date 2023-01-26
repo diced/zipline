@@ -34,6 +34,7 @@ import EyeIcon from './EyeIcon';
 import RefreshIcon from './RefreshIcon';
 import KeyIcon from './KeyIcon';
 import DatabaseIcon from './DatabaseIcon';
+import InfoIcon from './InfoIcon';
 
 export {
   ActivityIcon,
@@ -72,4 +73,5 @@ export {
   RefreshIcon,
   KeyIcon,
   DatabaseIcon,
+  InfoIcon,
 };

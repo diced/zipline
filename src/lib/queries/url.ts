@@ -2,7 +2,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import queryClient from './client';
 
 export type URLResponse = {
-  created_at: string;
+  createdAt: string;
   destination: string;
   id: string;
   url: string;

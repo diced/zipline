@@ -35,7 +35,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   };
 
   if (count) {
-    const count = await prisma.image.count({
+    const count = await prisma.file.count({
       where,
     });
 
@@ -49,22 +49,22 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
 
   let files: {
     favorite: boolean;
-    created_at: Date;
+    createdAt: Date;
     id: number;
-    file: string;
+    name: string;
     mimetype: string;
-    expires_at: Date;
+    expiresAt: Date;
     maxViews: number;
     views: number;
-  }[] = await prisma.image.findMany({
+  }[] = await prisma.file.findMany({
     where,
     orderBy: {
-      created_at: 'desc',
+      createdAt: 'desc',
     },
     select: {
-      created_at: true,
-      expires_at: true,
-      file: true,
+      createdAt: true,
+      expiresAt: true,
+      name: true,
       mimetype: true,
       id: true,
       favorite: true,
@@ -78,7 +78,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   for (let i = 0; i !== files.length; ++i) {
     (files[i] as unknown as { url: string }).url = `${
       config.uploader.route === '/' ? '/' : `${config.uploader.route}/`
-    }${files[i].file}`;
+    }${files[i].name}`;
   }
 
   return res.json(files);

@@ -1,4 +1,4 @@
-import { ImageFormat, InvisibleImage } from '@prisma/client';
+import { FileNameFormat, InvisibleFile } from '@prisma/client';
 import { randomUUID } from 'crypto';
 import dayjs from 'dayjs';
 import { readdir, readFile, unlink, writeFile } from 'fs/promises';
@@ -37,15 +37,15 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     });
   });
 
-  const response: { files: string[]; expires_at?: Date; removed_gps?: boolean } = { files: [] };
-  const expires_at = req.headers['expires-at'] as string;
+  const response: { files: string[]; expiresAt?: Date; removed_gps?: boolean } = { files: [] };
+  const expiresAt = req.headers['expires-at'] as string;
   let expiry: Date;
 
-  if (expires_at) {
-    expiry = parseExpiry(expires_at);
+  if (expiresAt) {
+    expiry = parseExpiry(expiresAt);
     if (!expiry) return res.badRequest('invalid date');
     else {
-      response.expires_at = expiry;
+      response.expiresAt = expiry;
     }
   }
 
@@ -55,7 +55,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   }
 
   const rawFormat = ((req.headers.format || '') as string).toUpperCase() || zconfig.uploader.default_format;
-  const format: ImageFormat = Object.keys(ImageFormat).includes(rawFormat) && ImageFormat[rawFormat];
+  const format: FileNameFormat = Object.keys(FileNameFormat).includes(rawFormat) && FileNameFormat[rawFormat];
 
   const imageCompressionPercent = req.headers['image-compression-percent']
     ? Number(req.headers['image-compression-percent'])
@@ -127,16 +127,16 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       let fileName: string;
 
       switch (format) {
-        case ImageFormat.RANDOM:
+        case FileNameFormat.RANDOM:
           fileName = randomChars(zconfig.uploader.length);
           break;
-        case ImageFormat.DATE:
+        case FileNameFormat.DATE:
           fileName = dayjs().format(zconfig.uploader.format_date);
           break;
-        case ImageFormat.UUID:
+        case FileNameFormat.UUID:
           fileName = randomUUID({ disableEntropyCache: true });
           break;
-        case ImageFormat.NAME:
+        case FileNameFormat.NAME:
           fileName = filename.split('.')[0];
           break;
         default:
@@ -150,38 +150,39 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       }
 
       const compressionUsed = imageCompressionPercent && mimetype.startsWith('image/');
-      let invis: InvisibleImage;
+      let invis: InvisibleFile;
 
-      const file = await prisma.image.create({
+      const file = await prisma.file.create({
         data: {
-          file: `${fileName}${compressionUsed ? '.jpg' : `${ext ? '.' : ''}${ext}`}`,
+          name: `${fileName}${compressionUsed ? '.jpg' : `${ext ? '.' : ''}${ext}`}`,
           mimetype,
           userId: user.id,
           embed: !!req.headers.embed,
           format,
           password,
-          expires_at: expiry,
+          expiresAt: expiry,
           maxViews: fileMaxViews,
+          originalName: req.headers['original-name'] ? filename ?? null : null,
         },
       });
 
       if (req.headers.zws) invis = await createInvisImage(zconfig.uploader.length, file.id);
 
-      await datasource.save(file.file, Buffer.from(chunks));
+      await datasource.save(file.name, Buffer.from(chunks));
 
-      logger.info(`User ${user.username} (${user.id}) uploaded ${file.file} (${file.id}) (chunked)`);
+      logger.info(`User ${user.username} (${user.id}) uploaded ${file.name} (${file.id}) (chunked)`);
       if (user.domains.length) {
         const domain = user.domains[Math.floor(Math.random() * user.domains.length)];
         response.files.push(
           `${domain}${zconfig.uploader.route === '/' ? '' : zconfig.uploader.route}/${
-            invis ? invis.invis : file.file
+            invis ? invis.invis : file.name
           }`
         );
       } else {
         response.files.push(
           `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}${
             zconfig.uploader.route === '/' ? '' : zconfig.uploader.route
-          }/${invis ? invis.invis : file.file}`
+          }/${invis ? invis.invis : file.name}`
         );
       }
 
@@ -190,11 +191,11 @@ async function handler(req: NextApiReq, res: NextApiRes) {
           user,
           file,
           `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}/r/${
-            invis ? invis.invis : file.file
+            invis ? invis.invis : file.name
           }`,
           `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}${
             zconfig.uploader.route === '/' ? '' : zconfig.uploader.route
-          }/${invis ? invis.invis : file.file}`
+          }/${invis ? invis.invis : file.name}`
         );
       }
 
@@ -255,19 +256,30 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     let fileName: string;
 
     switch (format) {
-      case ImageFormat.RANDOM:
+      case FileNameFormat.RANDOM:
         fileName = randomChars(zconfig.uploader.length);
         break;
-      case ImageFormat.DATE:
+      case FileNameFormat.DATE:
         fileName = dayjs().format(zconfig.uploader.format_date);
         break;
-      case ImageFormat.UUID:
+      case FileNameFormat.UUID:
         fileName = randomUUID({ disableEntropyCache: true });
         break;
-      case ImageFormat.NAME:
+      case FileNameFormat.NAME:
         fileName = file.originalname.split('.')[0];
         break;
       default:
+        if (req.headers['x-zipline-filename']) {
+          fileName = req.headers['x-zipline-filename'] as string;
+          const existing = await prisma.file.findFirst({
+            where: {
+              name: fileName,
+            },
+          });
+          if (existing) return res.badRequest(`file[${i}]: filename already exists: '${fileName}'`);
+
+          break;
+        }
         fileName = randomChars(zconfig.uploader.length);
         break;
     }
@@ -278,45 +290,46 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     }
 
     const compressionUsed = imageCompressionPercent && file.mimetype.startsWith('image/');
-    let invis: InvisibleImage;
-    const image = await prisma.image.create({
+    let invis: InvisibleFile;
+    const fileUpload = await prisma.file.create({
       data: {
-        file: `${fileName}${compressionUsed ? '.jpg' : `${ext ? '.' : ''}${ext}`}`,
+        name: `${fileName}${compressionUsed ? '.jpg' : `${ext ? '.' : ''}${ext}`}`,
         mimetype: req.headers.uploadtext ? 'text/plain' : compressionUsed ? 'image/jpeg' : file.mimetype,
         userId: user.id,
         embed: !!req.headers.embed,
         format,
         password,
-        expires_at: expiry,
+        expiresAt: expiry,
         maxViews: fileMaxViews,
+        originalName: req.headers['original-name'] ? file.originalname ?? null : null,
       },
     });
 
-    if (req.headers.zws) invis = await createInvisImage(zconfig.uploader.length, image.id);
+    if (req.headers.zws) invis = await createInvisImage(zconfig.uploader.length, fileUpload.id);
 
     if (compressionUsed) {
       const buffer = await sharp(file.buffer).jpeg({ quality: imageCompressionPercent }).toBuffer();
-      await datasource.save(image.file, buffer);
+      await datasource.save(fileUpload.name, buffer);
       logger.info(
         `User ${user.username} (${user.id}) compressed image from ${file.buffer.length} -> ${buffer.length} bytes`
       );
     } else {
-      await datasource.save(image.file, file.buffer);
+      await datasource.save(fileUpload.name, file.buffer);
     }
 
-    logger.info(`User ${user.username} (${user.id}) uploaded ${image.file} (${image.id})`);
+    logger.info(`User ${user.username} (${user.id}) uploaded ${fileUpload.name} (${fileUpload.id})`);
     if (user.domains.length) {
       const domain = user.domains[Math.floor(Math.random() * user.domains.length)];
       response.files.push(
         `${domain}${zconfig.uploader.route === '/' ? '' : zconfig.uploader.route}/${
-          invis ? invis.invis : image.file
+          invis ? invis.invis : fileUpload.name
         }`
       );
     } else {
       response.files.push(
         `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}${
           zconfig.uploader.route === '/' ? '' : zconfig.uploader.route
-        }/${invis ? invis.invis : image.file}`
+        }/${invis ? invis.invis : fileUpload.name}`
       );
     }
 
@@ -325,18 +338,18 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     if (zconfig.discord?.upload) {
       await sendUpload(
         user,
-        image,
+        fileUpload,
         `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}/r/${
-          invis ? invis.invis : image.file
+          invis ? invis.invis : fileUpload.name
         }`,
         `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}${
           zconfig.uploader.route === '/' ? '' : zconfig.uploader.route
-        }/${invis ? invis.invis : image.file}`
+        }/${invis ? invis.invis : fileUpload.name}`
       );
     }
 
-    if (zconfig.exif.enabled && zconfig.exif.remove_gps && image.mimetype.startsWith('image/')) {
-      await removeGPSData(image);
+    if (zconfig.exif.enabled && zconfig.exif.remove_gps && fileUpload.mimetype.startsWith('image/')) {
+      await removeGPSData(fileUpload);
       response.removed_gps = true;
     }
   }
@@ -361,6 +374,11 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         },
       });
     }
+  }
+
+  if (req.headers['no-json']) {
+    res.setHeader('Content-Type', 'text/plain');
+    return res.end(response.files.join(','));
   }
 
   return res.json(response);

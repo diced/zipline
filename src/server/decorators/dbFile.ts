@@ -1,4 +1,4 @@
-import { Image } from '@prisma/client';
+import { File } from '@prisma/client';
 import { FastifyInstance, FastifyReply } from 'fastify';
 import fastifyPlugin from 'fastify-plugin';
 import exts from 'lib/exts';
@@ -7,17 +7,19 @@ function dbFileDecorator(fastify: FastifyInstance, _, done) {
   fastify.decorateReply('dbFile', dbFile);
   done();
 
-  async function dbFile(this: FastifyReply, image: Image) {
-    const ext = image.file.split('.').pop();
+  async function dbFile(this: FastifyReply, file: File) {
+    const ext = file.name.split('.').pop();
     if (Object.keys(exts).includes(ext)) return this.server.nextHandle(this.request.raw, this.raw);
 
-    const data = await this.server.datasource.get(image.file);
+    const data = await this.server.datasource.get(file.name);
     if (!data) return this.notFound();
 
-    const size = await this.server.datasource.size(image.file);
+    const size = await this.server.datasource.size(file.name);
 
     this.header('Content-Length', size);
-    this.header('Content-Type', image.mimetype);
+    this.header('Content-Type', file.mimetype);
+    this.header('Content-Disposition', `inline; filename="${file.originalName}"`);
+
     return this.send(data);
   }
 }
@@ -31,6 +33,6 @@ export default fastifyPlugin(dbFileDecorator, {
 
 declare module 'fastify' {
   interface FastifyReply {
-    dbFile: (image: Image) => Promise<void>;
+    dbFile: (file: File) => Promise<void>;
   }
 }

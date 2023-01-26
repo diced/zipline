@@ -2,7 +2,7 @@ version: '3'
 services:
   postgres:
     image: postgres:15
-    restart: always
+    restart: unless-stopped
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -19,7 +19,7 @@ services:
     image: ghcr.io/diced/zipline
     ports:
       - '3000:3000'
-    restart: always
+    restart: unless-stopped
     environment:
       - CORE_RETURN_HTTPS=false
       - CORE_SECRET=changethis

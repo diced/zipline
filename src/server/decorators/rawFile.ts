@@ -8,6 +8,8 @@ function rawFileDecorator(fastify: FastifyInstance, _, done) {
   done();
 
   async function rawFile(this: FastifyReply, id: string) {
+    const { download } = this.request.query as { download?: string };
+
     const data = await this.server.datasource.get(id);
     if (!data) return this.notFound();
 
@@ -15,7 +17,7 @@ function rawFileDecorator(fastify: FastifyInstance, _, done) {
     const size = await this.server.datasource.size(id);
 
     this.header('Content-Length', size);
-    this.header('Content-Type', mimetype);
+    this.header('Content-Type', download ? 'application/octet-stream' : mimetype);
     return this.send(data);
   }
 }

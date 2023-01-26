@@ -1,4 +1,4 @@
-import { Image } from '@prisma/client';
+import { File } from '@prisma/client';
 import { FastifyInstance, FastifyReply } from 'fastify';
 import fastifyPlugin from 'fastify-plugin';
 
@@ -6,12 +6,12 @@ function preFileDecorator(fastify: FastifyInstance, _, done) {
   fastify.decorateReply('preFile', preFile);
   done();
 
-  async function preFile(this: FastifyReply, file: Image) {
-    if (file.expires_at && file.expires_at < new Date()) {
-      await this.server.datasource.delete(file.file);
-      await this.server.prisma.image.delete({ where: { id: file.id } });
+  async function preFile(this: FastifyReply, file: File) {
+    if (file.expiresAt && file.expiresAt < new Date()) {
+      await this.server.datasource.delete(file.name);
+      await this.server.prisma.file.delete({ where: { id: file.id } });
 
-      this.server.logger.child('file').info(`File ${file.file} expired and was deleted.`);
+      this.server.logger.child('file').info(`File ${file.name} expired and was deleted.`);
 
       return true;
     }
@@ -29,6 +29,6 @@ export default fastifyPlugin(preFileDecorator, {
 
 declare module 'fastify' {
   interface FastifyReply {
-    preFile: (file: Image) => Promise<boolean>;
+    preFile: (file: File) => Promise<boolean>;
   }
 }

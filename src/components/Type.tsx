@@ -1,4 +1,15 @@
-import { Alert, Box, Button, Card, Center, Container, Group, Image, Text } from '@mantine/core';
+import {
+  Alert,
+  Box,
+  Button,
+  Card,
+  Center,
+  Container,
+  Group,
+  Image,
+  LoadingOverlay,
+  Text,
+} from '@mantine/core';
 import { Prism } from '@mantine/prism';
 import { useEffect, useState } from 'react';
 import { AudioIcon, FileIcon, ImageIcon, PlayIcon } from './icons';
@@ -26,22 +37,27 @@ function Placeholder({ text, Icon, ...props }) {
 }
 
 export default function Type({ file, popup = false, disableMediaPreview, ...props }) {
-  const type = (file.type || file.mimetype).split('/')[0];
-  const name = file.name || file.file;
+  const type =
+    (file.type ?? file.mimetype) === ''
+      ? file.name.split('.').pop()
+      : (file.type ?? file.mimetype).split('/')[0];
 
   const media = /^(video|audio|image|text)/.test(type);
 
   const [text, setText] = useState('');
-  const shouldRenderMarkdown = name.endsWith('.md');
-  const shouldRenderTex = name.endsWith('.tex');
+  const shouldRenderMarkdown = file.name.endsWith('.md');
+  const shouldRenderTex = file.name.endsWith('.tex');
+
+  const [loading, setLoading] = useState(type === 'text' && popup);
 
   if (type === 'text' && popup) {
     useEffect(() => {
       (async () => {
-        const res = await fetch('/r/' + name);
+        const res = await fetch('/r/' + file.name);
         const text = await res.text();
 
         setText(text);
+        setLoading(false);
       })();
     }, []);
   }
@@ -90,8 +106,14 @@ export default function Type({ file, popup = false, disableMediaPreview, ...prop
         audio: <audio autoPlay controls {...props} style={{ width: '100%' }} />,
         text: (
           <>
-            {(shouldRenderMarkdown || shouldRenderTex) && renderRenderAlert()}
-            <PrismCode code={text} ext={name.split('.').pop()} {...props} />
+            {loading ? (
+              <LoadingOverlay visible={loading} />
+            ) : (
+              <>
+                {(shouldRenderMarkdown || shouldRenderTex) && renderRenderAlert()}
+                <PrismCode code={text} ext={file.name.split('.').pop()} {...props} />
+              </>
+            )}
           </>
         ),
       }[type]
@@ -100,17 +122,17 @@ export default function Type({ file, popup = false, disableMediaPreview, ...prop
     )
   ) : media ? (
     {
-      video: <Placeholder Icon={PlayIcon} text={`Click to view video (${name})`} {...props} />,
+      video: <Placeholder Icon={PlayIcon} text={`Click to view video (${file.name})`} {...props} />,
       image: (
         <Image
           placeholder={<PlaceholderContent Icon={ImageIcon} text={'Image failed to load...'} />}
           {...props}
         />
       ),
-      audio: <Placeholder Icon={AudioIcon} text={`Click to view audio (${name})`} {...props} />,
-      text: <Placeholder Icon={FileIcon} text={`Click to view text file (${name})`} {...props} />,
+      audio: <Placeholder Icon={AudioIcon} text={`Click to view audio (${file.name})`} {...props} />,
+      text: <Placeholder Icon={FileIcon} text={`Click to view text file (${file.name})`} {...props} />,
     }[type]
   ) : (
-    <Placeholder Icon={FileIcon} text={`Click to view file (${name})`} {...props} />
+    <Placeholder Icon={FileIcon} text={`Click to view file (${file.name})`} {...props} />
   );
 }

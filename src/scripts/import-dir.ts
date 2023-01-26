@@ -40,7 +40,7 @@ async function main() {
   const prisma = new PrismaClient();
 
   console.log('Starting transaction to database..');
-  await prisma.image.createMany({
+  await prisma.file.createMany({
     data,
   });
   console.log('Finished transaction to database.');

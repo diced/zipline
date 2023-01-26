@@ -103,27 +103,28 @@ export default function Dashboard({ disableMediaPreview, exifEnabled }) {
               width: '100%',
             },
             td: {
-              ':nth-child(1)': {
+              ':nth-of-child(1)': {
                 minWidth: 170,
               },
-              ':nth-child(2)': {
+              ':nth-of-child(2)': {
                 minWidth: 100,
               },
             },
             th: {
-              ':nth-child(1)': {
+              backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0],
+              ':nth-of-child(1)': {
                 minWidth: 170,
                 padding: theme.spacing.lg,
                 borderTopLeftRadius: theme.radius.sm,
               },
-              ':nth-child(2)': {
+              ':nth-of-child(2)': {
                 minWidth: 100,
                 padding: theme.spacing.lg,
               },
-              ':nth-child(3)': {
+              ':nth-of-child(3)': {
                 padding: theme.spacing.lg,
               },
-              ':nth-child(4)': {
+              ':nth-of-child(4)': {
                 padding: theme.spacing.lg,
                 borderTopRightRadius: theme.radius.sm,
               },
@@ -135,7 +136,7 @@ export default function Dashboard({ disableMediaPreview, exifEnabled }) {
           empty={<></>}
           columns={[
             {
-              accessorKey: 'file',
+              accessorKey: 'name',
               header: 'Name',
               filterFn: stringFilterFn,
             },
@@ -145,7 +146,7 @@ export default function Dashboard({ disableMediaPreview, exifEnabled }) {
               filterFn: stringFilterFn,
             },
             {
-              accessorKey: 'created_at',
+              accessorKey: 'createdAt',
               header: 'Date',
               filterFn: dateFilterFn,
             },

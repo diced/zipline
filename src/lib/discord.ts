@@ -1,4 +1,4 @@
-import { Image, Url, User } from '@prisma/client';
+import { File, Url, User } from '@prisma/client';
 import config from 'lib/config';
 import { ConfigDiscordContent } from 'config/Config';
 import Logger from 'lib/logger';
@@ -27,20 +27,20 @@ export function parseContent(
   };
 }
 
-export async function sendUpload(user: User, image: Image, raw_link: string, link: string) {
+export async function sendUpload(user: User, file: File, raw_link: string, link: string) {
   if (!config.discord.upload) return;
   if (!config.discord.url && !config.discord.upload.url) return;
   if (!config.discord.avatar_url && !config.discord.upload.avatar_url) return;
   if (!config.discord.username && !config.discord.upload.username) return;
 
   const parsed = parseContent(config.discord.upload, {
-    file: image,
+    file,
     user,
     link,
     raw_link,
   });
 
-  const isImage = image.mimetype.startsWith('image/');
+  const isImage = file.mimetype.startsWith('image/');
 
   const body = JSON.stringify({
     username: config.discord.username || config.discord.upload.username,
@@ -52,7 +52,7 @@ export async function sendUpload(user: User, image: Image, raw_link: string, lin
             title: parsed.embed.title ?? null,
             description: parsed.embed.description ?? null,
             url: parsed.url ?? null,
-            timestamp: parsed.embed.timestamp ? image.created_at.toISOString() : null,
+            timestamp: parsed.embed.timestamp ? file.createdAt.toISOString() : null,
             color: parsed.embed.color ?? null,
             footer: parsed.embed.footer
               ? {
@@ -117,7 +117,7 @@ export async function sendShorten(user: User, url: Url, link: string) {
             title: parsed.embed.title ?? null,
             description: parsed.embed.description ?? null,
             url: parsed.url ?? null,
-            timestamp: parsed.embed.timestamp ? url.created_at.toISOString() : null,
+            timestamp: parsed.embed.timestamp ? url.createdAt.toISOString() : null,
             color: parsed.embed.color ?? null,
             footer: parsed.embed.footer
               ? {

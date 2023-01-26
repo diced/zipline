@@ -1,7 +1,7 @@
-import type { Image, User, Url } from '@prisma/client';
+import type { File, User, Url } from '@prisma/client';
 
 export type ParseValue = {
-  file?: Image;
+  file?: File;
   url?: Url;
   user?: User;
 

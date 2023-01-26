@@ -1,13 +1,11 @@
-import { Button, Center, Group, Skeleton, Stack, Table, TextInput, Title } from '@mantine/core';
+import { Button, Center, Group, Skeleton, Table, TextInput, Title } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { showNotification } from '@mantine/notifications';
 import { CopyIcon } from 'components/icons';
 import useFetch from 'hooks/useFetch';
-import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 export default function MetadataView({ fileId }) {
-  const router = useRouter();
   const clipboard = useClipboard();
 
   const [metadata, setMetadata] = useState([]);

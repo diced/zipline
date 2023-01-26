@@ -2,9 +2,9 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import queryClient from './client';
 
 export type UserFilesResponse = {
-  created_at: string;
-  expires_at?: string;
-  file: string;
+  createdAt: string;
+  expiresAt?: string;
+  name: string;
   mimetype: string;
   id: string;
   favorite: boolean;
@@ -23,7 +23,7 @@ export const useFiles = (query: { [key: string]: string } = {}) => {
           ? data
           : data.map((x) => ({
               ...x,
-              created_at: new Date(x.created_at).toLocaleString(),
+              createdAt: new Date(x.createdAt).toLocaleString(),
             }))
       );
   });
@@ -39,7 +39,7 @@ export const usePaginatedFiles = (page?: number, filter: string = 'media', favor
   return useQuery<UserFilesResponse[]>(['files', queryString], async () => {
     return fetch('/api/user/paged?' + queryString)
       .then((res) => res.json() as Promise<UserFilesResponse[]>)
-      .then((data) => data.map((x) => ({ ...x, created_at: new Date(x.created_at).toLocaleString() })));
+      .then((data) => data.map((x) => ({ ...x, createdAt: new Date(x.createdAt).toLocaleString() })));
   });
 };
 
@@ -50,7 +50,7 @@ export const useRecent = (filter?: string) => {
       .then((data) =>
         data.map((x) => ({
           ...x,
-          created_at: new Date(x.created_at).toLocaleString(),
+          createdAt: new Date(x.createdAt).toLocaleString(),
         }))
       );
   });

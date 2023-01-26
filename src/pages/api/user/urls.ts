@@ -22,10 +22,10 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
         userId: user.id,
       },
       orderBy: {
-        created_at: 'desc',
+        createdAt: 'desc',
       },
       select: {
-        created_at: true,
+        createdAt: true,
         id: true,
         destination: true,
         vanity: true,

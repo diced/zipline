@@ -67,6 +67,10 @@ async function start() {
       const url = req.url.toLowerCase();
       if (!url.startsWith('/api') || url === '/api') return reply.notFound();
     }
+    reply
+      .header('Access-Control-Allow-Origin', '*')
+      .header('Access-Control-Max-Age', '86400')
+      .header('Access-Control-Allow-Headers', '*');
 
     done();
   });
@@ -189,7 +193,7 @@ async function clearInvites(this: FastifyInstance) {
     where: {
       OR: [
         {
-          expires_at: { lt: new Date() },
+          expiresAt: { lt: new Date() },
         },
         {
           used: true,

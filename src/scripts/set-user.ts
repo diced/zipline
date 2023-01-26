@@ -11,9 +11,7 @@ const SUPPORTED_FIELDS = [
   'token',
   'superAdmin',
   'systemTheme',
-  'embedTitle',
-  'embedColor',
-  'embedSiteName',
+  'embed',
   'ratelimit',
   'domains',
 ];

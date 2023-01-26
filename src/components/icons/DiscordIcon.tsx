@@ -1,7 +1,5 @@
 // https://discord.com/branding
 
-import Image from 'next/image';
-
 export default function DiscordIcon({ ...props }) {
   return (
     <svg width='24' height='24' viewBox='0 0 71 55' xmlns='http://www.w3.org/2000/svg'>
