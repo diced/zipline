@@ -10,10 +10,10 @@ export async function migrations() {
   const logger = Logger.get('database::migrations');
 
   try {
-    logger.debug('establishing database connection');
+    logger.info('establishing database connection');
     const migrate = new Migrate('./prisma/schema.prisma');
 
-    logger.debug('ensuring database exists, if not creating database - may error if no permissions');
+    logger.info('ensuring database exists, if not creating database - may error if no permissions');
     await ensureDatabaseExists('apply', './prisma/schema.prisma');
 
     const diagnose = await migrate.diagnoseMigrationHistory({
@@ -21,16 +21,39 @@ export async function migrations() {
     });
 
     if (diagnose.history?.diagnostic === 'databaseIsBehind') {
-      logger.debug('database is behind, attempting to migrate');
-      try {
-        logger.debug('migrating database');
-        await migrate.applyMigrations();
-      } finally {
+      if (!diagnose.hasMigrationsTable) {
+        logger.debug('no migrations table found, attempting schema push');
+        try {
+          logger.debug('pushing schema');
+          const migration = await migrate.push({ force: false });
+          if (migration.unexecutable && migration.unexecutable.length > 0)
+            throw new Error('This database is not empty, schema push is not possible.');
+        } catch (e) {
+          migrate.stop();
+          logger.error('failed to push schema');
+          throw e;
+        }
+        logger.debug('finished pushing schema, marking migrations as applied');
+        for (const migration of diagnose.history.unappliedMigrationNames) {
+          await migrate.markMigrationApplied({ migrationId: migration });
+        }
+        migrate.stop();
+        logger.info('finished migrating database');
+      } else if (diagnose.hasMigrationsTable) {
+        logger.debug('database is behind, attempting to migrate');
+        try {
+          logger.debug('migrating database');
+          await migrate.applyMigrations();
+        } catch (e) {
+          logger.error('failed to migrate database');
+          migrate.stop();
+          throw e;
+        }
         migrate.stop();
         logger.info('finished migrating database');
       }
     } else {
-      logger.debug('exiting migrations engine - database is up to date');
+      logger.info('exiting migrations engine - database is up to date');
       migrate.stop();
     }
   } catch (error) {
