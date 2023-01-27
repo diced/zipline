@@ -174,14 +174,14 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       if (user.domains.length) {
         const domain = user.domains[Math.floor(Math.random() * user.domains.length)];
         response.files.push(
-          `${domain}${zconfig.uploader.route === '/' ? '' : zconfig.uploader.route}/${
+          `${domain}${zconfig.uploader.route === '/' ? '/' : zconfig.uploader.route}/${
             invis ? invis.invis : file.name
           }`
         );
       } else {
         response.files.push(
           `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}${
-            zconfig.uploader.route === '/' ? '' : zconfig.uploader.route
+            zconfig.uploader.route === '/' ? '/' : zconfig.uploader.route
           }/${invis ? invis.invis : file.name}`
         );
       }
@@ -194,7 +194,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
             invis ? invis.invis : file.name
           }`,
           `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}${
-            zconfig.uploader.route === '/' ? '' : zconfig.uploader.route
+            zconfig.uploader.route === '/' ? '/' : zconfig.uploader.route
           }/${invis ? invis.invis : file.name}`
         );
       }

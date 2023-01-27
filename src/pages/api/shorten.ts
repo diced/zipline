@@ -60,14 +60,14 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     await sendShorten(
       user,
       url,
-      `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}${zconfig.urls.route}/${
-        req.body.vanity ? req.body.vanity : invis ? invis.invis : url.id
-      }`
+      `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}${
+        zconfig.urls.route === '/' ? '/' : `${zconfig.urls.route}/`
+      }${req.body.vanity ? req.body.vanity : invis ? invis.invis : url.id}`
     );
   }
 
   const fullUrl = `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}${
-    zconfig.uploader.route === '/' ? '' : zconfig.uploader.route
+    zconfig.urls.route === '/' ? '/' : zconfig.urls.route
   }/${req.body.vanity ? req.body.vanity : invis ? invis.invis : url.id}`;
 
   if (req.headers['no-json']) {
