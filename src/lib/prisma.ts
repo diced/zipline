@@ -5,3 +5,7 @@ if (!global.prisma) {
 }
 
 export default global.prisma as PrismaClient;
+
+declare global {
+  var prisma: PrismaClient;
+}

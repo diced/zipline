@@ -5,7 +5,7 @@ FROM ghcr.io/diced/prisma-binaries:4.8.x as prisma
 FROM node:18-alpine3.16 as base
 
 # Set the working directory
-WORKDIR /app
+WORKDIR /zipline
 
 # Copy the necessary files from the project
 COPY prisma ./prisma
@@ -48,9 +48,6 @@ FROM base
 
 RUN apk add --no-cache perl procps
 
-# Set the working directory
-WORKDIR /app
-
 COPY --from=builder /prisma-engines /prisma-engines
 ENV PRISMA_QUERY_ENGINE_BINARY=/prisma-engines/query-engine \
   PRISMA_MIGRATION_ENGINE_BINARY=/prisma-engines/migration-engine \
@@ -61,13 +58,13 @@ ENV PRISMA_QUERY_ENGINE_BINARY=/prisma-engines/query-engine \
   NEXT_TELEMETRY_DISABLED=1
 
 # Copy only the necessary files from the previous stage
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /zipline/dist ./dist
+COPY --from=builder /zipline/.next ./.next
+COPY --from=builder /zipline/package.json ./package.json
 
-COPY --from=builder /tmp/node_modules ./node_modules
-COPY --from=builder /app/node_modules/.prisma/client ./node_modules/.prisma/client
-COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/client
+COPY --from=builder /zipline/node_modules ./node_modules
+COPY --from=builder /zipline/node_modules/.prisma/client ./node_modules/.prisma/client
+COPY --from=builder /zipline/node_modules/@prisma/client ./node_modules/@prisma/client
 
 # Run the application
 CMD ["node", "--enable-source-maps", "dist/index.js"]
