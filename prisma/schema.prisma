@@ -21,9 +21,22 @@ model User {
   totpSecret    String?
   domains       String[]
   oauth         OAuth[]
-  files        File[]
+  files         File[]
   urls          Url[]
   Invite        Invite[]
+  Folder        Folder[]
+}
+
+model Folder {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int
+
+  files File[]
 }
 
 enum FileNameFormat {
@@ -34,30 +47,33 @@ enum FileNameFormat {
 }
 
 model File {
-  id        Int             @id @default(autoincrement())
-  name      String
+  id           Int            @id @default(autoincrement())
+  name         String
   originalName String?
-  mimetype  String          @default("image/png")
-  createdAt DateTime        @default(now())
-  expiresAt DateTime?
-  maxViews  Int?
-  views     Int             @default(0)
-  favorite  Boolean         @default(false)
-  embed     Boolean         @default(false)
-  password  String?
-  invisible InvisibleFile?
-  format    FileNameFormat     @default(RANDOM)
-  user      User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
-  userId    Int?
+  mimetype     String         @default("image/png")
+  createdAt    DateTime       @default(now())
+  expiresAt    DateTime?
+  maxViews     Int?
+  views        Int            @default(0)
+  favorite     Boolean        @default(false)
+  embed        Boolean        @default(false)
+  password     String?
+  invisible    InvisibleFile?
+  format       FileNameFormat @default(RANDOM)
+
+  user   User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId Int?
+
+  folder   Folder? @relation(fields: [folderId], references: [id], onDelete: SetNull)
+  folderId Int?
 }
 
 model InvisibleFile {
-  id      Int    @id @default(autoincrement())
-  invis   String @unique
-  // imageId Int    @unique
-  fileId  Int    @unique
-  // image   File  @relation(fields: [imageId], references: [id], onDelete: Cascade)
-  file    File   @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  id    Int    @id @default(autoincrement())
+  invis String @unique
+
+  fileId Int  @unique
+  file   File @relation(fields: [fileId], references: [id], onDelete: Cascade)
 }
 
 model Url {
@@ -68,30 +84,33 @@ model Url {
   maxViews    Int?
   views       Int           @default(0)
   invisible   InvisibleUrl?
-  user        User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
-  userId      Int?
+
+  user   User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId Int?
 }
 
 model InvisibleUrl {
   id    Int    @id @default(autoincrement())
   invis String @unique
+
   urlId String @unique
   url   Url    @relation(fields: [urlId], references: [id], onDelete: Cascade)
 }
 
 model Stats {
-  id         Int      @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
-  data       Json
+  data      Json
 }
 
 model Invite {
-  id          Int       @id @default(autoincrement())
-  code        String    @unique
-  createdAt  DateTime  @default(now())
-  expiresAt  DateTime?
-  used        Boolean   @default(false)
-  createdBy   User      @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  id        Int       @id @default(autoincrement())
+  code      String    @unique
+  createdAt DateTime  @default(now())
+  expiresAt DateTime?
+  used      Boolean   @default(false)
+
+  createdBy   User @relation(fields: [createdById], references: [id], onDelete: Cascade)
   createdById Int
 }
 

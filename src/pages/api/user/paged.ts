@@ -1,5 +1,6 @@
 import config from 'lib/config';
 import prisma from 'lib/prisma';
+import { formatRootUrl } from 'lib/utils/urls';
 import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'middleware/withZipline';
 
 const pageCount = 16;
@@ -56,6 +57,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     expiresAt: Date;
     maxViews: number;
     views: number;
+    folderId: number;
   }[] = await prisma.file.findMany({
     where,
     orderBy: {
@@ -70,15 +72,14 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       favorite: true,
       views: true,
       maxViews: true,
+      folderId: true,
     },
     skip: page ? (Number(page) - 1) * pageCount : undefined,
     take: page ? pageCount : undefined,
   });
 
   for (let i = 0; i !== files.length; ++i) {
-    (files[i] as unknown as { url: string }).url = `${
-      config.uploader.route === '/' ? '/' : `${config.uploader.route}/`
-    }${files[i].name}`;
+    (files[i] as unknown as { url: string }).url = formatRootUrl(config.uploader.route, files[i].name);
   }
 
   return res.json(files);

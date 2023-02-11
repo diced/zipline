@@ -1,5 +1,6 @@
 import config from 'lib/config';
 import prisma from 'lib/prisma';
+import { formatRootUrl } from 'lib/utils/urls';
 import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'middleware/withZipline';
 
 async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
@@ -23,13 +24,12 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       id: true,
       views: true,
       maxViews: true,
+      folderId: true,
     },
   });
 
   for (let i = 0; i !== files.length; ++i) {
-    (files[i] as unknown as { url: string }).url = `${
-      config.uploader.route === '/' ? '/' : `${config.uploader.route}/`
-    }${files[i].name}`;
+    (files[i] as unknown as { url: string }).url = formatRootUrl(config.uploader.route, files[i].name);
   }
 
   if (req.query.filter && req.query.filter === 'media')
