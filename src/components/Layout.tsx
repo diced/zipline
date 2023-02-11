@@ -38,6 +38,7 @@ import {
   DiscordIcon,
   ExternalLinkIcon,
   FileIcon,
+  FolderIcon,
   GitHubIcon,
   GoogleIcon,
   HomeIcon,
@@ -70,6 +71,11 @@ const items: NavbarItems[] = [
     icon: <FileIcon size={18} />,
     text: 'Files',
     link: '/dashboard/files',
+  },
+  {
+    icon: <FolderIcon size={18} />,
+    text: 'Folders',
+    link: '/dashboard/folders',
   },
   {
     icon: <ActivityIcon size={18} />,

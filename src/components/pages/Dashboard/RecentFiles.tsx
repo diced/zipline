@@ -24,6 +24,7 @@ export default function RecentFiles({ disableMediaPreview, exifEnabled }) {
                 image={image}
                 disableMediaPreview={disableMediaPreview}
                 exifEnabled={exifEnabled}
+                refreshImages={recent.refetch}
               />
             ))
           ) : (

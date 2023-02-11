@@ -19,12 +19,6 @@ export default function Files({ disableMediaPreview, exifEnabled, queryPage }) {
     })();
   });
 
-  const updatePages = async (favorite) => {
-    if (favorite) {
-      favoritePages.refetch();
-    }
-  };
-
   return (
     <>
       <Group mb='md'>
@@ -55,6 +49,7 @@ export default function Files({ disableMediaPreview, exifEnabled, queryPage }) {
                           image={image}
                           disableMediaPreview={disableMediaPreview}
                           exifEnabled={exifEnabled}
+                          refreshImages={favoritePages.refetch}
                         />
                       </div>
                     ))

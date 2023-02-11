@@ -2,6 +2,7 @@ import config from 'lib/config';
 import datasource from 'lib/datasource';
 import Logger from 'lib/logger';
 import prisma from 'lib/prisma';
+import { formatRootUrl } from 'lib/utils/urls';
 import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'middleware/withZipline';
 
 const logger = Logger.get('files');
@@ -89,7 +90,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     });
 
     for (let i = 0; i !== files.length; ++i) {
-      (files[i] as unknown as { url: string }).url = `${config.uploader.route}/${files[i].name}`;
+      (files[i] as unknown as { url: string }).url = formatRootUrl(config.uploader.route, files[i].name);
     }
 
     if (req.query.filter && req.query.filter === 'media')
