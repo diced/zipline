@@ -27,7 +27,7 @@ async function main() {
     const mime = await guess(files[i].split('.').pop());
 
     data.push({
-      file: files[i],
+      name: files[i],
       mimetype: mime,
       userId,
     });
