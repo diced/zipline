@@ -4,7 +4,6 @@ import {
   Group,
   LoadingOverlay,
   Modal,
-  MultiSelect,
   Paper,
   Select,
   SimpleGrid,
