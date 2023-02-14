@@ -4,6 +4,7 @@ import {
   Group,
   LoadingOverlay,
   Modal,
+  MultiSelect,
   Paper,
   Select,
   SimpleGrid,
@@ -39,11 +40,6 @@ import {
 } from './icons';
 import MutedText from './MutedText';
 import Type from './Type';
-
-const CREATE_FOLDER_OPTION = {
-  label: 'Create new folder',
-  value: 'create',
-};
 
 export function FileMeta({ Icon, title, subtitle, ...other }) {
   return other.tooltip ? (
@@ -171,31 +167,53 @@ export default function File({ image, disableMediaPreview, exifEnabled, refreshI
   };
 
   const addToFolder = async (t) => {
-    if (t === CREATE_FOLDER_OPTION.value) {
-      router.push('/dashboard/folders?create=' + image.id);
-    } else {
-      const res = await useFetch('/api/user/folders/' + t, 'POST', {
-        file: Number(image.id),
-      });
+    const res = await useFetch('/api/user/folders/' + t, 'POST', {
+      file: Number(image.id),
+    });
 
+    refresh();
+
+    if (!res.error) {
+      showNotification({
+        title: 'Added to folder',
+        message: res.name,
+        color: 'green',
+        icon: <FolderPlusIcon />,
+      });
+    } else {
+      showNotification({
+        title: 'Failed to add to folder',
+        message: res.error,
+        color: 'red',
+        icon: <CrossIcon />,
+      });
+    }
+  };
+
+  const createFolder = (t) => {
+    useFetch('/api/user/folders', 'POST', {
+      name: t,
+      add: [Number(image.id)],
+    }).then((res) => {
       refresh();
 
       if (!res.error) {
         showNotification({
-          title: 'Added to folder',
+          title: 'Created & added to folder',
           message: res.name,
           color: 'green',
           icon: <FolderPlusIcon />,
         });
       } else {
         showNotification({
-          title: 'Failed to add to folder',
+          title: 'Failed to create folder',
           message: res.error,
           color: 'red',
           icon: <CrossIcon />,
         });
       }
-    }
+    });
+    return { value: t, label: t };
   };
 
   return (
@@ -290,8 +308,11 @@ export default function File({ image, disableMediaPreview, exifEnabled, refreshI
                       value: String(folder.id),
                       label: `${folder.id}: ${folder.name}`,
                     })),
-                    CREATE_FOLDER_OPTION,
                   ]}
+                  searchable
+                  creatable
+                  getCreateLabel={(query) => `Create folder "${query}"`}
+                  onCreate={createFolder}
                 />
               </Tooltip>
             )}
