@@ -66,5 +66,9 @@ COPY --from=builder /zipline/node_modules ./node_modules
 COPY --from=builder /zipline/node_modules/.prisma/client ./node_modules/.prisma/client
 COPY --from=builder /zipline/node_modules/@prisma/client ./node_modules/@prisma/client
 
-# Run the application
-CMD ["node", "--enable-source-maps", "dist/index.js"]
+# Copy Startup Script
+COPY entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+# backwards compat (from https://success.docker.com/article/use-a-script-to-initialize-stateful-container-data)
+RUN ln -s /usr/local/bin/docker-entrypoint.sh / 
+
+ENTRYPOINT ["tini", "--", "docker-entrypoint.sh"]
