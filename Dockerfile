@@ -71,4 +71,4 @@ COPY entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 # backwards compat (from https://success.docker.com/article/use-a-script-to-initialize-stateful-container-data)
 RUN ln -s /usr/local/bin/docker-entrypoint.sh / 
 
-ENTRYPOINT ["tini", "--", "docker-entrypoint.sh"]
+ENTRYPOINT ["tini", "--", "/zipline/docker-entrypoint.sh"]
