@@ -46,7 +46,7 @@ RUN yarn build
 # Use Alpine Linux as the final image
 FROM base
 
-RUN apk add --no-cache perl procps
+RUN apk add --no-cache perl procps tini
 
 COPY --from=builder /prisma-engines /prisma-engines
 ENV PRISMA_QUERY_ENGINE_BINARY=/prisma-engines/query-engine \
