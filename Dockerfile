@@ -67,6 +67,6 @@ COPY --from=builder /zipline/node_modules/.prisma/client ./node_modules/.prisma/
 COPY --from=builder /zipline/node_modules/@prisma/client ./node_modules/@prisma/client
 
 # Copy Startup Script
-COPY entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+COPY docker-entrypoint.sh /zipline
 
 ENTRYPOINT ["tini", "--", "/zipline/docker-entrypoint.sh"]
