@@ -45,7 +45,7 @@ RUN yarn build
 
 # Use Alpine Linux as the final image
 FROM base
-
+# Install the necessary packages
 RUN apk add --no-cache perl procps tini
 
 COPY --from=builder /prisma-engines /prisma-engines
@@ -68,5 +68,7 @@ COPY --from=builder /zipline/node_modules/@prisma/client ./node_modules/@prisma/
 
 # Copy Startup Script
 COPY docker-entrypoint.sh /zipline
-
+# Make Startup Script Executable
+RUN chmod a+x /zipline/docker-entrypoint.sh
+# Set the entrypoint to the startup script
 ENTRYPOINT ["tini", "--", "/zipline/docker-entrypoint.sh"]
