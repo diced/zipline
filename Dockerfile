@@ -46,7 +46,7 @@ RUN yarn build
 # Use Alpine Linux as the final image
 FROM base
 
-RUN apk add --no-cache perl procps
+RUN apk add --no-cache perl procps tini
 
 COPY --from=builder /prisma-engines /prisma-engines
 ENV PRISMA_QUERY_ENGINE_BINARY=/prisma-engines/query-engine \
@@ -66,5 +66,7 @@ COPY --from=builder /zipline/node_modules ./node_modules
 COPY --from=builder /zipline/node_modules/.prisma/client ./node_modules/.prisma/client
 COPY --from=builder /zipline/node_modules/@prisma/client ./node_modules/@prisma/client
 
-# Run the application
-CMD ["node", "--enable-source-maps", "dist/index.js"]
+# Copy Startup Script
+COPY docker-entrypoint.sh /zipline
+
+ENTRYPOINT ["tini", "--", "/zipline/docker-entrypoint.sh"]
