@@ -35,6 +35,9 @@ import RefreshIcon from './RefreshIcon';
 import KeyIcon from './KeyIcon';
 import DatabaseIcon from './DatabaseIcon';
 import InfoIcon from './InfoIcon';
+import FolderIcon from './FolderIcon';
+import FolderMinusIcon from './FolderMinusIcon';
+import FolderPlusIcon from './FolderPlusIcon';
 
 export {
   ActivityIcon,
@@ -74,4 +77,7 @@ export {
   KeyIcon,
   DatabaseIcon,
   InfoIcon,
+  FolderIcon,
+  FolderMinusIcon,
+  FolderPlusIcon,
 };

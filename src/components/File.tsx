@@ -5,6 +5,7 @@ import {
   LoadingOverlay,
   Modal,
   Paper,
+  Select,
   SimpleGrid,
   Stack,
   Text,
@@ -13,8 +14,11 @@ import {
 } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { showNotification } from '@mantine/notifications';
-import { useFileDelete, useFileFavorite } from 'lib/queries/files';
+import useFetch from 'hooks/useFetch';
+import { invalidateFiles, useFileDelete, useFileFavorite } from 'lib/queries/files';
+import { invalidateFolders, useFolders } from 'lib/queries/folders';
 import { relativeTime } from 'lib/utils/client';
+import { useRouter } from 'next/router';
 import { useState } from 'react';
 import {
   CalendarIcon,
@@ -30,6 +34,8 @@ import {
   ImageIcon,
   StarIcon,
   InfoIcon,
+  FolderMinusIcon,
+  FolderPlusIcon,
 } from './icons';
 import MutedText from './MutedText';
 import Type from './Type';
@@ -56,12 +62,15 @@ export function FileMeta({ Icon, title, subtitle, ...other }) {
   );
 }
 
-export default function File({ image, disableMediaPreview, exifEnabled }) {
+export default function File({ image, disableMediaPreview, exifEnabled, refreshImages }) {
   const [open, setOpen] = useState(false);
   const [overrideRender, setOverrideRender] = useState(false);
   const deleteFile = useFileDelete();
   const favoriteFile = useFileFavorite();
   const clipboard = useClipboard();
+  const router = useRouter();
+
+  const folders = useFolders();
 
   const loading = deleteFile.isLoading || favoriteFile.isLoading;
 
@@ -125,6 +134,87 @@ export default function File({ image, disableMediaPreview, exifEnabled }) {
     );
   };
 
+  const inFolder = image.folderId;
+
+  const refresh = () => {
+    refreshImages();
+    folders.refetch();
+  };
+
+  const removeFromFolder = async () => {
+    const res = await useFetch('/api/user/folders/' + image.folderId, 'DELETE', {
+      file: Number(image.id),
+    });
+
+    refresh();
+
+    if (!res.error) {
+      showNotification({
+        title: 'Removed from folder',
+        message: res.name,
+        color: 'green',
+        icon: <FolderMinusIcon />,
+      });
+    } else {
+      showNotification({
+        title: 'Failed to remove from folder',
+        message: res.error,
+        color: 'red',
+        icon: <CrossIcon />,
+      });
+    }
+  };
+
+  const addToFolder = async (t) => {
+    const res = await useFetch('/api/user/folders/' + t, 'POST', {
+      file: Number(image.id),
+    });
+
+    refresh();
+
+    if (!res.error) {
+      showNotification({
+        title: 'Added to folder',
+        message: res.name,
+        color: 'green',
+        icon: <FolderPlusIcon />,
+      });
+    } else {
+      showNotification({
+        title: 'Failed to add to folder',
+        message: res.error,
+        color: 'red',
+        icon: <CrossIcon />,
+      });
+    }
+  };
+
+  const createFolder = (t) => {
+    useFetch('/api/user/folders', 'POST', {
+      name: t,
+      add: [Number(image.id)],
+    }).then((res) => {
+      refresh();
+
+      if (!res.error) {
+        showNotification({
+          title: 'Created & added to folder',
+          message: res.name,
+          color: 'green',
+          icon: <FolderPlusIcon />,
+        });
+      } else {
+        showNotification({
+          title: 'Failed to create folder',
+          message: res.error,
+          color: 'red',
+          icon: <CrossIcon />,
+        });
+      }
+    });
+    return { value: t, label: t };
+  };
+
   return (
     <>
       <Modal opened={open} onClose={() => setOpen(false)} title={<Title>{image.name}</Title>} size='xl'>
@@ -182,9 +272,6 @@ export default function File({ image, disableMediaPreview, exifEnabled }) {
         <Group position='apart' my='md'>
           <Group position='left'>
             {exifEnabled && (
-              // <Link href={`/dashboard/metadata/${image.id}`} target='_blank' rel='noopener noreferrer'>
-              //   <Button leftIcon={<ExternalLinkIcon />}>View Metadata</Button>
-              // </Link>
               <Tooltip label='View Metadata'>
                 <ActionIcon
                   color='blue'
@@ -193,6 +280,39 @@ export default function File({ image, disableMediaPreview, exifEnabled }) {
                 >
                   <InfoIcon />
                 </ActionIcon>
+              </Tooltip>
+            )}
+            {inFolder && !folders.isLoading ? (
+              <Tooltip
+                label={`Remove from folder "${
+                  folders.data.find((f) => f.id === image.folderId)?.name ?? ''
+                }"`}
+              >
+                <ActionIcon
+                  color='red'
+                  variant='filled'
+                  onClick={removeFromFolder}
+                  loading={folders.isLoading}
+                >
+                  <FolderMinusIcon />
+                </ActionIcon>
+              </Tooltip>
+            ) : (
+              <Tooltip label='Add to folder'>
+                <Select
+                  onChange={addToFolder}
+                  placeholder='Add to folder'
+                  data={[
+                    ...(folders.data ? folders.data : []).map((folder) => ({
+                      value: String(folder.id),
+                      label: `${folder.id}: ${folder.name}`,
+                    })),
+                  ]}
+                  searchable
+                  creatable
+                  getCreateLabel={(query) => `Create folder "${query}"`}
+                  onCreate={createFolder}
+                />
               </Tooltip>
             )}
           </Group>
@@ -235,17 +355,6 @@ export default function File({ image, disableMediaPreview, exifEnabled }) {
               </ActionIcon>
             </Tooltip>
           </Group>
-          {/* {exifEnabled && (
-            <Link href={`/dashboard/metadata/${image.id}`} target='_blank' rel='noopener noreferrer'>
-              <Button leftIcon={<ExternalLinkIcon />}>View Metadata</Button>
-            </Link>
-          )}
-          <Button onClick={handleCopy}>Copy URL</Button>
-          <Button onClick={handleDelete}>Delete</Button>
-          <Button onClick={handleFavorite}>{image.favorite ? 'Unfavorite' : 'Favorite'}</Button>
-          <Link href={image.url} target='_blank'>
-            <Button rightIcon={<ExternalLinkIcon />}>Open</Button>
-          </Link> */}
         </Group>
       </Modal>
       <Card sx={{ maxWidth: '100%', height: '100%' }} shadow='md'>

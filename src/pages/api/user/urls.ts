@@ -1,6 +1,7 @@
 import config from 'lib/config';
 import Logger from 'lib/logger';
 import prisma from 'lib/prisma';
+import { formatRootUrl } from 'lib/utils/urls';
 import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'middleware/withZipline';
 
 async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
@@ -34,11 +35,12 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       },
     });
 
-    urls.map(
-      (url) =>
-        // @ts-ignore
-        (url.url = `${config.urls.route === '/' ? '/' : `${config.urls.route}/`}${url.vanity ?? url.id}`)
-    );
+    for (let i = 0; i !== urls.length; ++i) {
+      (urls[i] as unknown as { url: string }).url = formatRootUrl(
+        config.urls.route,
+        urls[i].vanity ?? urls[i].id
+      );
+    }
     return res.json(urls);
   }
 }

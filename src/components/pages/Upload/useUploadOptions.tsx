@@ -131,7 +131,7 @@ export default function useUploadOptions(): [
           label='Password'
           description='The password required to view this file. Leave blank for no password.'
           value={state.password}
-          onChange={(e) => setState({ password: e })}
+          onChange={(e) => setState({ password: e.currentTarget.value })}
           icon={<KeyIcon />}
         />
         <Group>

@@ -67,7 +67,12 @@ export default function FilePagation({ disableMediaPreview, exifEnabled, queryPa
           ? pages.data.length
             ? pages.data.map((image) => (
                 <div key={image.id}>
-                  <File image={image} disableMediaPreview={disableMediaPreview} exifEnabled={exifEnabled} />
+                  <File
+                    image={image}
+                    disableMediaPreview={disableMediaPreview}
+                    exifEnabled={exifEnabled}
+                    refreshImages={pages.refetch}
+                  />
                 </div>
               ))
             : null

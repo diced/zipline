@@ -24,3 +24,7 @@ if (!global.datasource) {
 }
 
 export default global.datasource as Datasource;
+
+declare global {
+  var datasource: Datasource;
+}

@@ -32,7 +32,7 @@ export default function EmbeddedFile({
   file.createdAt = new Date(file ? file.createdAt : 0);
 
   const check = async () => {
-    const res = await fetch(`/api/auth/image?id=${file.id}&password=${password}`);
+    const res = await fetch(`/api/auth/image?id=${file.id}&password=${encodeURIComponent(password)}`);
 
     if (res.ok) {
       setError('');
