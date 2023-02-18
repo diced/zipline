@@ -56,27 +56,31 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
   logger.info(`User ${user.username} (${user.id}) shortenned a url ${url.destination} (${url.id})`);
 
-  if (config.discord?.shorten) {
-    await sendShorten(
-      user,
-      url,
-      `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}${
-        zconfig.urls.route === '/' ? '/' : `${zconfig.urls.route}/`
-      }${req.body.vanity ? req.body.vanity : invis ? invis.invis : url.id}`
-    );
+  let domain;
+  if (req.headers['override-domain']) {
+    domain = `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers['override-domain']}`;
+  } else if (user.domains.length) {
+    const randomDomain = user.domains[Math.floor(Math.random() * user.domains.length)];
+    domain = `${zconfig.core.return_https ? 'https' : 'http'}://${randomDomain}`;
+  } else {
+    domain = `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}`;
   }
 
-  const fullUrl = `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}${
-    zconfig.urls.route === '/' ? '/' : zconfig.urls.route
-  }/${req.body.vanity ? req.body.vanity : invis ? invis.invis : url.id}`;
+  const responseUrl = `${domain}${zconfig.uploader.route === '/' ? '/' : zconfig.uploader.route}${
+    req.body.vanity ? req.body.vanity : invis ? invis.invis : url.id
+  }`;
+
+  if (config.discord?.shorten) {
+    await sendShorten(user, url, responseUrl);
+  }
 
   if (req.headers['no-json']) {
     res.setHeader('Content-Type', 'text/plain');
-    return res.end(fullUrl);
+    return res.end(responseUrl);
   }
 
   return res.json({
-    url: fullUrl,
+    url: responseUrl,
   });
 }
 

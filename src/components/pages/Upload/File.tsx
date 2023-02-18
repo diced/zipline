@@ -276,6 +276,7 @@ export default function File({ chunks: chunks_config }) {
       options.zeroWidth && req.setRequestHeader('Zws', 'true');
       options.format !== 'default' && req.setRequestHeader('Format', options.format);
       options.originalName && req.setRequestHeader('Original-Name', 'true');
+      options.overrideDomain && req.setRequestHeader('Override-Domain', options.overrideDomain);
 
       req.send(body);
     }
@@ -283,7 +284,7 @@ export default function File({ chunks: chunks_config }) {
 
   return (
     <>
-      <OptionsModal />
+      {OptionsModal}
       <Title mb='md'>Upload Files</Title>
 
       <Dropzone loading={loading} onDrop={(f) => setFiles([...files, ...f])}>

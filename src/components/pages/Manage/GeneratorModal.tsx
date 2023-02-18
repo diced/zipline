@@ -10,13 +10,16 @@ import {
   Stack,
   Switch,
   Text,
+  TextInput,
   Title,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { DownloadIcon } from 'components/icons';
+import { DownloadIcon, GlobeIcon } from 'components/icons';
 import Link from 'components/Link';
 import MutedText from 'components/MutedText';
-import { useState } from 'react';
+import { useReducer, useState } from 'react';
+
+const DEFAULT_OD_DESC = 'Override the default domain(s). Type in a URL, e.g https://example.com';
 
 export function GeneratorModal({ opened, onClose, title, onSubmit, ...other }) {
   const form = useForm({
@@ -30,6 +33,7 @@ export function GeneratorModal({ opened, onClose, title, onSubmit, ...other }) {
       wlCompositorNotSupported: false,
       noJSON: false,
       originalName: false,
+      overrideDomain: null,
     },
   });
 
@@ -38,6 +42,42 @@ export function GeneratorModal({ opened, onClose, title, onSubmit, ...other }) {
   const onChangeType = (value) => {
     setIsUploadFile(value === 'upload-file');
     form.setFieldValue('type', value);
+  };
+
+  const [odState, setODState] = useReducer((state, newState) => ({ ...state, ...newState }), {
+    description: DEFAULT_OD_DESC,
+    error: '',
+    domain: '',
+  });
+
+  const handleOD = (e) => {
+    setODState({ error: '' });
+
+    if (e.currentTarget.value === '') {
+      setODState({ description: DEFAULT_OD_DESC, error: '', domain: null });
+      form.setFieldValue('overrideDomain', null);
+      return;
+    }
+
+    try {
+      const url = new URL(e.currentTarget.value);
+      setODState({
+        description: (
+          <>
+            {DEFAULT_OD_DESC}
+            <br />
+            <br />
+            Using domain &quot;<b>{url.hostname}</b>&quot;
+          </>
+        ),
+        error: '',
+        domain: url.hostname,
+      });
+      form.setFieldValue('overrideDomain', url.hostname);
+    } catch (e) {
+      setODState({ error: 'Invalid URL', domain: '' });
+      form.setFieldValue('overrideDomain', null);
+    }
   };
 
   return (
@@ -83,6 +123,14 @@ export function GeneratorModal({ opened, onClose, title, onSubmit, ...other }) {
           id='imageCompression'
           disabled={!isUploadFile}
           {...form.getInputProps('imageCompression')}
+        />
+
+        <TextInput
+          label='Override Domain'
+          onChange={handleOD}
+          icon={<GlobeIcon />}
+          description={odState.description}
+          error={odState.error}
         />
 
         <Stack my='md'>

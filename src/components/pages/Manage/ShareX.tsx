@@ -79,6 +79,12 @@ export default function ShareX({ user, open, setOpen }) {
       delete config.Headers['Original-Name'];
     }
 
+    if (values.overrideDomain && values.overrideDomain.trim() !== '') {
+      config.Headers['Override-Domain'] = values.overrideDomain;
+    } else {
+      delete config.Headers['Override-Domain'];
+    }
+
     const pseudoElement = document.createElement('a');
     pseudoElement.setAttribute(
       'href',
