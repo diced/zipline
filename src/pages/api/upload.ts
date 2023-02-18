@@ -175,8 +175,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       if (req.headers['override-domain']) {
         domain = `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers['override-domain']}`;
       } else if (user.domains.length) {
-        const randomDomain = user.domains[Math.floor(Math.random() * user.domains.length)];
-        domain = `${zconfig.core.return_https ? 'https' : 'http'}://${randomDomain}`;
+        domain = user.domains[Math.floor(Math.random() * user.domains.length)];
       } else {
         domain = `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}`;
       }
