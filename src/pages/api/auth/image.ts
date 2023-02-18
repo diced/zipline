@@ -17,7 +17,9 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   if (!file) return res.notFound('image not found');
   if (!password) return res.badRequest('no password provided');
 
-  const valid = await checkPassword(password as string, file.password);
+  const decoded = decodeURIComponent(password as string);
+
+  const valid = await checkPassword(decoded, file.password);
   if (!valid) return res.badRequest('wrong password');
 
   const data = await datasource.get(file.name);
