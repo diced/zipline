@@ -289,9 +289,11 @@ export default function Layout({ children, props }) {
             <Navbar.Section>
               <Tooltip
                 label={
-                  version.data.local !== version.data.upstream
-                    ? `You are running an outdated version of Zipline, refer to the docs on how to update to ${version.data.upstream}`
-                    : 'You are running the latest version of Zipline'
+                  version.data.update
+                    ? `There is a new ${version.data.updateToType} version: ${
+                        version.data.versions[version.data.updateToType]
+                      }`
+                    : `You are running the latest ${version.data.isUpstream ? 'upstream' : 'stable'} version`
                 }
               >
                 <Badge
@@ -299,9 +301,9 @@ export default function Layout({ children, props }) {
                   radius='md'
                   size='lg'
                   variant='dot'
-                  color={version.data.local !== version.data.upstream ? 'red' : 'primary'}
+                  color={version.data.update ? 'red' : 'primary'}
                 >
-                  {version.data.local}
+                  {version.data.versions.current}
                 </Badge>
               </Tooltip>
             </Navbar.Section>
