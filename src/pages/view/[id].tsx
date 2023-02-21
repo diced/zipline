@@ -171,7 +171,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const file = await prisma.file.findFirst({
     where: {
-      OR: [{ name: id }, { invisible: { invis: id } }],
+      OR: [{ name: decodeURIComponent(id) }, { invisible: { invis: decodeURI(id) } }],
     },
   });
   if (!file) return { notFound: true };

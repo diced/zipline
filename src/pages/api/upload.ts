@@ -180,8 +180,8 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         domain = `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}`;
       }
 
-      const responseUrl = `${domain}${zconfig.uploader.route === '/' ? '/' : zconfig.uploader.route}${
-        invis ? invis.invis : file.name
+      const responseUrl = `${domain}${zconfig.uploader.route === '/' ? '/' : zconfig.uploader.route + '/'}${
+        invis ? invis.invis : encodeURIComponent(file.name)
       }`;
 
       response.files.push(responseUrl);
@@ -319,8 +319,8 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       domain = `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}`;
     }
 
-    const responseUrl = `${domain}${zconfig.uploader.route === '/' ? '/' : zconfig.uploader.route}${
-      invis ? invis.invis : fileUpload.name
+    const responseUrl = `${domain}${zconfig.uploader.route === '/' ? '/' : zconfig.uploader.route + '/'}${
+      invis ? invis.invis : encodeURIComponent(fileUpload.name)
     }`;
 
     response.files.push(responseUrl);

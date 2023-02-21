@@ -66,7 +66,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     domain = `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}`;
   }
 
-  const responseUrl = `${domain}${zconfig.uploader.route === '/' ? '/' : zconfig.uploader.route}${
+  const responseUrl = `${domain}${zconfig.urls.route === '/' ? '/' : zconfig.urls.route + '/'}${
     req.body.vanity ? req.body.vanity : invis ? invis.invis : url.id
   }`;
 
