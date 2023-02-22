@@ -181,7 +181,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       }
 
       const responseUrl = `${domain}${zconfig.uploader.route === '/' ? '/' : zconfig.uploader.route + '/'}${
-        invis ? invis.invis : encodeURIComponent(file.name)
+        invis ? invis.invis : encodeURI(file.name)
       }`;
 
       response.files.push(responseUrl);
@@ -320,7 +320,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     }
 
     const responseUrl = `${domain}${zconfig.uploader.route === '/' ? '/' : zconfig.uploader.route + '/'}${
-      invis ? invis.invis : encodeURIComponent(fileUpload.name)
+      invis ? invis.invis : encodeURI(fileUpload.name)
     }`;
 
     response.files.push(responseUrl);

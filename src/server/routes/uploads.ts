@@ -8,7 +8,7 @@ export default async function uploadsRoute(this: FastifyInstance, req: FastifyRe
 
   const image = await this.prisma.file.findFirst({
     where: {
-      OR: [{ name: id }, { invisible: { invis: decodeURI(id) } }],
+      OR: [{ name: id }, { invisible: { invis: decodeURI(encodeURI(id)) } }],
     },
   });
   if (!image) return reply.rawFile(id);
@@ -32,7 +32,7 @@ export async function uploadsRouteOnResponse(
 
     const file = await this.prisma.file.findFirst({
       where: {
-        OR: [{ name: id }, { invisible: { invis: decodeURI(id) } }],
+        OR: [{ name: id }, { invisible: { invis: decodeURI(encodeURI(id)) } }],
       },
     });
 
