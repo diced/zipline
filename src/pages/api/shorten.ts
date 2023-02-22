@@ -67,7 +67,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   }
 
   const responseUrl = `${domain}${zconfig.urls.route === '/' ? '/' : zconfig.urls.route + '/'}${
-    req.body.vanity ? encodeURIComponent(req.body.vanity) : invis ? invis.invis : url.id
+    req.body.vanity ? encodeURI(req.body.vanity) : invis ? invis.invis : url.id
   }`;
 
   if (config.discord?.shorten) {
