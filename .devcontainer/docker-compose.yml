@@ -1,7 +1,12 @@
-version: 3
+version: '3.8'
 services:
   app:
-    image: debian:11-slim
+    image: mcr.microsoft.com/vscode/devcontainers/javascript-node:0-18
+    volumes:
+      - ..:/workspace:cached
+    network_mode: service:db
+    command: sleep infinity
+    user: node
   db:
     image: postgres:latest
     restart: unless-stopped
@@ -11,9 +16,7 @@ services:
       - POSTGRES_DATABASE=postgres
     volumes:
       - pg_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres']
-      interval: 10s
-      timeout: 5s
-      retries: 5
+
+volumes:
+  pg_data:
     

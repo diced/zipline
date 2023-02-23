@@ -1,8 +1,31 @@
 {
   "name": "Zipline CodeSpace",
-  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
+  "forwardPorts": [3000, 5432],
   "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "version": "latest"
+    },
     "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
-    "ghcr.io/devcontainers/features/node:1": {}    
-  }
+    "ghcr.io/devcontainers/features/node:1": {}
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "[typescript]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[typescriptreact]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true,
+        "files.autoSave": "afterDelay"
+      },
+      "extensions": ["prisma.prisma", "esbenp.prettier-vscode", "dbaeumer.vscode-eslint"]
+    }
+  },
+  "remoteUser": "node"
 }
