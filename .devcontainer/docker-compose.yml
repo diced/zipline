@@ -6,7 +6,7 @@ services:
       - ..:/workspace:cached
     network_mode: service:db
     command: sleep infinity
-    user: node
+    user: zipline
   db:
     image: postgres:latest
     restart: unless-stopped
