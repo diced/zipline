@@ -2,7 +2,8 @@ import { ActionIcon, Avatar, Card, Group, SimpleGrid, Skeleton, Stack, Title, To
 import { useClipboard } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
 import { showNotification } from '@mantine/notifications';
-import { CopyIcon, DeleteIcon, FileIcon, PlusIcon } from 'components/icons';
+import { DeleteIcon, FileIcon, PlusIcon, LockIcon, UnlockIcon, LinkIcon, CopyIcon } from 'components/icons';
+import Link from 'components/Link';
 import MutedText from 'components/MutedText';
 import useFetch from 'hooks/useFetch';
 import { useFolders } from 'lib/queries/folders';
@@ -65,6 +66,30 @@ export default function Folders({ disableMediaPreview, exifEnabled }) {
     });
   };
 
+  const makePublic = async (folder) => {
+    const res = await useFetch(`/api/user/folders/${folder.id}`, 'PATCH', {
+      public: folder.public ? false : true,
+    });
+
+    if (!res.error) {
+      showNotification({
+        title: 'Made folder public',
+        message: `Made folder ${folder.name} ${folder.public ? 'private' : 'public'}`,
+        color: 'green',
+        icon: <UnlockIcon />,
+      });
+      folders.refetch();
+    } else {
+      showNotification({
+        title: 'Failed to make folder public/private',
+        message: res.error,
+        color: 'red',
+        icon: <UnlockIcon />,
+      });
+      folders.refetch();
+    }
+  };
+
   return (
     <>
       <CreateFolderModal
@@ -101,6 +126,7 @@ export default function Folders({ disableMediaPreview, exifEnabled }) {
                       <Stack spacing={0}>
                         <Title>{folder.name}</Title>
                         <MutedText size='sm'>ID: {folder.id}</MutedText>
+                        <MutedText size='sm'>Public: {folder.public ? 'Yes' : 'No'}</MutedText>
                         <Tooltip label={new Date(folder.createdAt).toLocaleString()}>
                           <div>
                             <MutedText size='sm'>
@@ -117,7 +143,15 @@ export default function Folders({ disableMediaPreview, exifEnabled }) {
                         </Tooltip>
                       </Stack>
                     </Group>
-                    <Stack>
+                    <Group>
+                      <Tooltip label={folder.public ? 'Make folder private' : 'Make folder public'}>
+                        <ActionIcon
+                          aria-label={folder.public ? 'make private' : 'make public'}
+                          onClick={() => makePublic(folder)}
+                        >
+                          {folder.public ? <LockIcon /> : <UnlockIcon />}
+                        </ActionIcon>
+                      </Tooltip>
                       <ActionIcon
                         aria-label='view files'
                         onClick={() => {
@@ -127,10 +161,28 @@ export default function Folders({ disableMediaPreview, exifEnabled }) {
                       >
                         <FileIcon />
                       </ActionIcon>
+                      <ActionIcon
+                        aria-label='copy link'
+                        onClick={() => {
+                          clipboard.copy(`${window.location.origin}/folder/${folder.id}`);
+                          showNotification({
+                            title: 'Copied folder link',
+                            message: (
+                              <>
+                                Copied <Link href={`/folder/${folder.id}`}>folder link</Link> to clipboard
+                              </>
+                            ),
+                            color: 'green',
+                            icon: <CopyIcon />,
+                          });
+                        }}
+                      >
+                        <LinkIcon />
+                      </ActionIcon>
                       <ActionIcon aria-label='delete' onClick={() => deleteFolder(folder)}>
                         <DeleteIcon />
                       </ActionIcon>
-                    </Stack>
+                    </Group>
                   </Group>
                 </Card>
               ))
