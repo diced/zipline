@@ -1,5 +1,5 @@
 {
-  "name": "Zipline CodeSpace",
+  "name": "Zipline Codespace",
   "dockerComposeFile": "docker-compose.yml",
   "service": "app",
   "workspaceFolder": "/workspace",
