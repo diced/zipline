@@ -1,0 +1,8 @@
+{
+  "name": "Zipline CodeSpace",
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
+    "ghcr.io/devcontainers/features/node:1": {}    
+  }
+}
