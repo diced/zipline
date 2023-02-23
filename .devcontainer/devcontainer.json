@@ -5,9 +5,7 @@
   "workspaceFolder": "/workspace",
   "forwardPorts": [3000, 5432],
   "features": {
-    "ghcr.io/devcontainers/features/common-utils:2": {
-      "version": "latest"
-    },
+    "ghcr.io/devcontainers/features/common-utils:2": {},
     "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
     "ghcr.io/devcontainers/features/node:1": {}
   },
