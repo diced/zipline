@@ -31,7 +31,8 @@
 },
 "portsAttributes": {
 	"3000": {
-		"label": "Zipline"
+		"label": "Zipline",
+    "onAutoForward": "openBrowser"
 	},
 	"5432": {
 		"label": "Postgres"
