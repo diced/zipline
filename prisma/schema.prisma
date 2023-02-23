@@ -30,6 +30,7 @@ model User {
 model Folder {
   id        Int      @id @default(autoincrement())
   name      String
+  public    Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
