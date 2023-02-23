@@ -4,7 +4,6 @@ import {
   Group,
   LoadingOverlay,
   Modal,
-  Paper,
   Select,
   SimpleGrid,
   Stack,
@@ -15,10 +14,9 @@ import {
 import { useClipboard } from '@mantine/hooks';
 import { showNotification } from '@mantine/notifications';
 import useFetch from 'hooks/useFetch';
-import { invalidateFiles, useFileDelete, useFileFavorite } from 'lib/queries/files';
-import { invalidateFolders, useFolders } from 'lib/queries/folders';
+import { useFileDelete, useFileFavorite } from 'lib/queries/files';
+import { useFolders } from 'lib/queries/folders';
 import { relativeTime } from 'lib/utils/client';
-import { useRouter } from 'next/router';
 import { useState } from 'react';
 import {
   CalendarIcon,
@@ -30,12 +28,12 @@ import {
   ExternalLinkIcon,
   EyeIcon,
   FileIcon,
-  HashIcon,
-  ImageIcon,
-  StarIcon,
-  InfoIcon,
   FolderMinusIcon,
   FolderPlusIcon,
+  HashIcon,
+  ImageIcon,
+  InfoIcon,
+  StarIcon,
 } from './icons';
 import MutedText from './MutedText';
 import Type from './Type';
@@ -62,13 +60,18 @@ export function FileMeta({ Icon, title, subtitle, ...other }) {
   );
 }
 
-export default function File({ image, disableMediaPreview, exifEnabled, refreshImages }) {
+export default function File({
+  image,
+  disableMediaPreview,
+  exifEnabled,
+  refreshImages,
+  reducedActions = false,
+}) {
   const [open, setOpen] = useState(false);
   const [overrideRender, setOverrideRender] = useState(false);
   const deleteFile = useFileDelete();
   const favoriteFile = useFileFavorite();
   const clipboard = useClipboard();
-  const router = useRouter();
 
   const folders = useFolders();
 
@@ -257,7 +260,7 @@ export default function File({ image, disableMediaPreview, exifEnabled, refreshI
               subtitle={relativeTime(new Date(image.createdAt))}
               tooltip={new Date(image?.createdAt).toLocaleString()}
             />
-            {image.expiresAt && (
+            {image.expiresAt && !reducedActions && (
               <FileMeta
                 Icon={ClockIcon}
                 title='Expires'
@@ -271,7 +274,7 @@ export default function File({ image, disableMediaPreview, exifEnabled, refreshI
 
         <Group position='apart' my='md'>
           <Group position='left'>
-            {exifEnabled && (
+            {exifEnabled && !reducedActions && (
               <Tooltip label='View Metadata'>
                 <ActionIcon
                   color='blue'
@@ -282,7 +285,7 @@ export default function File({ image, disableMediaPreview, exifEnabled, refreshI
                 </ActionIcon>
               </Tooltip>
             )}
-            {inFolder && !folders.isLoading ? (
+            {reducedActions ? null : inFolder && !folders.isLoading ? (
               <Tooltip
                 label={`Remove from folder "${
                   folders.data.find((f) => f.id === image.folderId)?.name ?? ''
@@ -317,21 +320,25 @@ export default function File({ image, disableMediaPreview, exifEnabled, refreshI
             )}
           </Group>
           <Group position='right'>
-            <Tooltip label='Delete file'>
-              <ActionIcon color='red' variant='filled' onClick={handleDelete}>
-                <DeleteIcon />
-              </ActionIcon>
-            </Tooltip>
+            {reducedActions ? null : (
+              <>
+                <Tooltip label='Delete file'>
+                  <ActionIcon color='red' variant='filled' onClick={handleDelete}>
+                    <DeleteIcon />
+                  </ActionIcon>
+                </Tooltip>
 
-            <Tooltip label={image.favorite ? 'Unfavorite' : 'Favorite'}>
-              <ActionIcon
-                color={image.favorite ? 'yellow' : 'gray'}
-                variant='filled'
-                onClick={handleFavorite}
-              >
-                <StarIcon />
-              </ActionIcon>
-            </Tooltip>
+                <Tooltip label={image.favorite ? 'Unfavorite' : 'Favorite'}>
+                  <ActionIcon
+                    color={image.favorite ? 'yellow' : 'gray'}
+                    variant='filled'
+                    onClick={handleFavorite}
+                  >
+                    <StarIcon />
+                  </ActionIcon>
+                </Tooltip>
+              </>
+            )}
 
             <Tooltip label='Open in new tab'>
               <ActionIcon color='blue' variant='filled' onClick={() => window.open(image.url, '_blank')}>
