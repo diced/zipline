@@ -2,8 +2,8 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import queryClient from './client';
 
 export type UserFilesResponse = {
-  createdAt: string;
-  expiresAt?: string;
+  createdAt: Date;
+  expiresAt?: Date;
   name: string;
   mimetype: string;
   id: string;
@@ -23,7 +23,8 @@ export const useFiles = (query: { [key: string]: string } = {}) => {
           ? data
           : data.map((x) => ({
               ...x,
-              createdAt: new Date(x.createdAt).toLocaleString(),
+              createdAt: new Date(x.createdAt),
+              expiresAt: x.expiresAt ? new Date(x.expiresAt) : null,
             }))
       );
   });
@@ -39,7 +40,13 @@ export const usePaginatedFiles = (page?: number, filter: string = 'media', favor
   return useQuery<UserFilesResponse[]>(['files', queryString], async () => {
     return fetch('/api/user/paged?' + queryString)
       .then((res) => res.json() as Promise<UserFilesResponse[]>)
-      .then((data) => data.map((x) => ({ ...x, createdAt: new Date(x.createdAt).toLocaleString() })));
+      .then((data) =>
+        data.map((x) => ({
+          ...x,
+          createdAt: new Date(x.createdAt),
+          expiresAt: x.expiresAt ? new Date(x.expiresAt) : null,
+        }))
+      );
   });
 };
 
@@ -50,7 +57,8 @@ export const useRecent = (filter?: string) => {
       .then((data) =>
         data.map((x) => ({
           ...x,
-          createdAt: new Date(x.createdAt).toLocaleString(),
+          createdAt: new Date(x.createdAt),
+          expiresAt: x.expiresAt ? new Date(x.expiresAt) : null,
         }))
       );
   });
