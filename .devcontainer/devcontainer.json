@@ -25,5 +25,16 @@
       "extensions": ["prisma.prisma", "esbenp.prettier-vscode", "dbaeumer.vscode-eslint"]
     }
   },
-  "remoteUser": "node"
+"remoteUser": "node",
+"remoteEnv": {
+  "CORE_DATABASE_URL": "postgres://postgres:postgres@localhost/zip10"
+},
+"portsAttributes": {
+	"3000": {
+		"label": "Zipline"
+	},
+	"5432": {
+		"label": "Postgres"
+	}
+}
 }
