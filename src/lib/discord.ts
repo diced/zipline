@@ -30,9 +30,8 @@ export function parseContent(
 export async function sendUpload(user: User, file: File, raw_link: string, link: string) {
   if (!config.discord.upload) return;
   if (!config.discord.url && !config.discord.upload.url) return;
-  if (!config.discord.avatar_url && !config.discord.upload.avatar_url) return;
-  if (!config.discord.username && !config.discord.upload.username) return;
 
+  logger.debug(`discord config:\n${JSON.stringify(config.discord)}`);
   const parsed = parseContent(config.discord.upload, {
     file,
     user,
@@ -43,8 +42,10 @@ export async function sendUpload(user: User, file: File, raw_link: string, link:
   const isImage = file.mimetype.startsWith('image/');
 
   const body = JSON.stringify({
-    username: config.discord.username || config.discord.upload.username,
-    avatar_url: config.discord.avatar_url || config.discord.upload.avatar_url,
+    username: (config.discord.username ?? config.discord.upload.username) || 'Zipline',
+    avatar_url:
+      (config.discord.avatar_url ?? config.discord.upload.avatar_url) ||
+      'https://raw.githubusercontent.com/diced/zipline/9b60147e112ec5b70170500b85c75ea621f41d03/public/zipline.png',
     content: parsed.content ?? null,
     embeds: parsed.embed
       ? [
@@ -98,8 +99,6 @@ export async function sendUpload(user: User, file: File, raw_link: string, link:
 export async function sendShorten(user: User, url: Url, link: string) {
   if (!config.discord.shorten) return;
   if (!config.discord.url && !config.discord.shorten.url) return;
-  if (!config.discord.avatar_url && !config.discord.shorten.avatar_url) return;
-  if (!config.discord.username && !config.discord.shorten.username) return;
 
   const parsed = parseContent(config.discord.shorten, {
     url,
@@ -108,8 +107,10 @@ export async function sendShorten(user: User, url: Url, link: string) {
   });
 
   const body = JSON.stringify({
-    username: config.discord.username || config.discord.shorten.username,
-    avatar_url: config.discord.avatar_url || config.discord.shorten.avatar_url,
+    username: (config.discord.username ?? config.discord.shorten.username) || 'Zipline',
+    avatar_url:
+      (config.discord.avatar_url ?? config.discord.shorten.avatar_url) ||
+      'https://raw.githubusercontent.com/diced/zipline/9b60147e112ec5b70170500b85c75ea621f41d03/public/zipline.png',
     content: parsed.content ?? null,
     embeds: parsed.embed
       ? [

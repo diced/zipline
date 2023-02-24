@@ -74,9 +74,9 @@ export interface ConfigWebsiteExternalLinks {
 }
 
 export interface ConfigDiscord {
-  url: string;
-  username: string;
-  avatar_url: string;
+  url?: string;
+  username?: string;
+  avatar_url?: string;
 
   upload: ConfigDiscordContent;
   shorten: ConfigDiscordContent;
