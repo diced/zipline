@@ -113,7 +113,7 @@ async function start() {
 
         const url = await server.prisma.url.findFirst({
           where: {
-            OR: [{ id: id }, { vanity: id }, { invisible: { invis: decodeURI(id) } }],
+            OR: [{ id: id }, { vanity: id }, { invisible: { invis: decodeURI(encodeURI(id)) } }],
           },
         });
 
@@ -126,7 +126,7 @@ async function start() {
 
           const url = await server.prisma.url.findFirst({
             where: {
-              OR: [{ id: id }, { vanity: id }, { invisible: { invis: decodeURI(id) } }],
+              OR: [{ id: id }, { vanity: id }, { invisible: { invis: decodeURI(encodeURI(id)) } }],
             },
           });
 

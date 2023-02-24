@@ -7,52 +7,72 @@ import {
   Select,
   Stack,
   Switch,
+  TextInput,
   Title,
 } from '@mantine/core';
-import { ClockIcon, ImageIcon, KeyIcon, TypeIcon, UserIcon } from 'components/icons';
+import { ClockIcon, ImageIcon, KeyIcon, TypeIcon, UserIcon, GlobeIcon } from 'components/icons';
 import React, { Dispatch, SetStateAction, useReducer, useState } from 'react';
 
-export default function useUploadOptions(): [
-  {
-    expires: string;
-    password: string;
-    maxViews: number;
-    compression: string;
-    zeroWidth: boolean;
-    embedded: boolean;
-    format: string;
-    originalName: boolean;
-  },
-  Dispatch<SetStateAction<boolean>>,
-  React.FC
-] {
-  const [state, setState] = useReducer((state, newState) => ({ ...state, ...newState }), {
-    expires: 'never',
-    password: '',
-    maxViews: 0,
-    compression: 'none',
-    zeroWidth: false,
-    embedded: false,
-    format: 'default',
-    originalName: false,
+export type UploadOptionsState = {
+  expires: string;
+  password: string;
+  maxViews: number;
+  compression: string;
+  zeroWidth: boolean;
+  embedded: boolean;
+  format: string;
+  originalName: boolean;
+  overrideDomain: string;
+};
+
+const DEFAULT_OD_DESC = 'Override the default domain(s). Type in a URL, e.g https://example.com';
+
+export function OptionsModal({
+  opened,
+  setOpened,
+  state,
+  setState,
+  reset,
+}: {
+  opened: boolean;
+  setOpened: Dispatch<SetStateAction<boolean>>;
+  state: UploadOptionsState;
+  setState: Dispatch<SetStateAction<any>>;
+  reset: () => void;
+}) {
+  const [odState, setODState] = useReducer((state, newState) => ({ ...state, ...newState }), {
+    description: DEFAULT_OD_DESC,
+    error: '',
   });
 
-  const [opened, setOpened] = useState(false);
+  const handleOD = (e) => {
+    setODState({ error: '' });
 
-  const reset = () => {
-    setState({
-      expires: 'never',
-      password: '',
-      maxViews: 0,
-      compression: 'none',
-      zeroWidth: false,
-      embedded: false,
-      format: 'default',
-      originalName: false,
-    });
+    if (e.currentTarget.value === '') {
+      setODState({ description: DEFAULT_OD_DESC, error: '' });
+      setState({ overrideDomain: '' });
+      return;
+    }
+
+    try {
+      const url = new URL(e.currentTarget.value);
+      setODState({
+        description: (
+          <>
+            {DEFAULT_OD_DESC}
+            <br />
+            <br />
+            Using domain &quot;<b>{url.hostname}</b>&quot;
+          </>
+        ),
+      });
+      setState({ overrideDomain: url.hostname });
+    } catch (e) {
+      setODState({ error: 'Invalid URL' });
+    }
   };
 
-  const OptionsModal: React.FC = () => (
+  return (
     <Modal title={<Title>Upload Options</Title>} size='lg' opened={opened} onClose={() => setOpened(false)}>
       <Stack>
         <NumberInput
@@ -134,6 +154,13 @@ export default function useUploadOptions(): [
           onChange={(e) => setState({ password: e.currentTarget.value })}
           icon={<KeyIcon />}
         />
+        <TextInput
+          label='Override Domain'
+          onChange={handleOD}
+          icon={<GlobeIcon />}
+          description={odState.description}
+          error={odState.error}
+        />
         <Group>
           <Switch
             label='Zero Width'
@@ -165,6 +192,47 @@ export default function useUploadOptions(): [
       </Stack>
     </Modal>
   );
+}
 
-  return [state, setOpened, OptionsModal];
+export default function useUploadOptions(): [UploadOptionsState, Dispatch<SetStateAction<boolean>>, any] {
+  const [state, setState] = useReducer((state, newState) => ({ ...state, ...newState }), {
+    expires: 'never',
+    password: '',
+    maxViews: 0,
+    compression: 'none',
+    zeroWidth: false,
+    embedded: false,
+    format: 'default',
+    originalName: false,
+    overrideDomain: '',
+  } as UploadOptionsState);
+
+  const [opened, setOpened] = useState(false);
+
+  const reset = () => {
+    setState({
+      expires: 'never',
+      password: '',
+      maxViews: 0,
+      compression: 'none',
+      zeroWidth: false,
+      embedded: false,
+      format: 'default',
+      originalName: false,
+      overrideDomain: '',
+    });
+  };
+
+  return [
+    state,
+    setOpened,
+    <OptionsModal
+      state={state}
+      setState={setState}
+      reset={reset}
+      opened={opened}
+      setOpened={setOpened}
+      key={1}
+    />,
+  ];
 }

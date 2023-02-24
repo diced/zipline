@@ -171,32 +171,23 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       await datasource.save(file.name, Buffer.from(chunks));
 
       logger.info(`User ${user.username} (${user.id}) uploaded ${file.name} (${file.id}) (chunked)`);
-      if (user.domains.length) {
-        const domain = user.domains[Math.floor(Math.random() * user.domains.length)];
-        response.files.push(
-          `${domain}${zconfig.uploader.route === '/' ? '/' : zconfig.uploader.route}/${
-            invis ? invis.invis : file.name
-          }`
-        );
+      let domain;
+      if (req.headers['override-domain']) {
+        domain = `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers['override-domain']}`;
+      } else if (user.domains.length) {
+        domain = user.domains[Math.floor(Math.random() * user.domains.length)];
       } else {
-        response.files.push(
-          `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}${
-            zconfig.uploader.route === '/' ? '/' : zconfig.uploader.route
-          }/${invis ? invis.invis : file.name}`
-        );
+        domain = `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}`;
       }
 
+      const responseUrl = `${domain}${zconfig.uploader.route === '/' ? '/' : zconfig.uploader.route + '/'}${
+        invis ? invis.invis : encodeURI(file.name)
+      }`;
+
+      response.files.push(responseUrl);
+
       if (zconfig.discord?.upload) {
-        await sendUpload(
-          user,
-          file,
-          `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}/r/${
-            invis ? invis.invis : file.name
-          }`,
-          `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}${
-            zconfig.uploader.route === '/' ? '/' : zconfig.uploader.route
-          }/${invis ? invis.invis : file.name}`
-        );
+        await sendUpload(user, file, `${domain}/r/${invis ? invis.invis : file.name}`, responseUrl);
       }
 
       if (zconfig.exif.enabled && zconfig.exif.remove_gps && mimetype.startsWith('image/')) {
@@ -318,34 +309,23 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     }
 
     logger.info(`User ${user.username} (${user.id}) uploaded ${fileUpload.name} (${fileUpload.id})`);
-    if (user.domains.length) {
-      const domain = user.domains[Math.floor(Math.random() * user.domains.length)];
-      response.files.push(
-        `${domain}${zconfig.uploader.route === '/' ? '' : zconfig.uploader.route}/${
-          invis ? invis.invis : fileUpload.name
-        }`
-      );
+    let domain;
+    if (req.headers['override-domain']) {
+      domain = `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers['override-domain']}`;
+    } else if (user.domains.length) {
+      domain = user.domains[Math.floor(Math.random() * user.domains.length)];
     } else {
-      response.files.push(
-        `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}${
-          zconfig.uploader.route === '/' ? '' : zconfig.uploader.route
-        }/${invis ? invis.invis : fileUpload.name}`
-      );
+      domain = `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}`;
     }
 
-    logger.debug(`sent response: ${JSON.stringify(response)}`);
+    const responseUrl = `${domain}${zconfig.uploader.route === '/' ? '/' : zconfig.uploader.route + '/'}${
+      invis ? invis.invis : encodeURI(fileUpload.name)
+    }`;
+
+    response.files.push(responseUrl);
 
     if (zconfig.discord?.upload) {
-      await sendUpload(
-        user,
-        fileUpload,
-        `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}/r/${
-          invis ? invis.invis : fileUpload.name
-        }`,
-        `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}${
-          zconfig.uploader.route === '/' ? '' : zconfig.uploader.route
-        }/${invis ? invis.invis : fileUpload.name}`
-      );
+      await sendUpload(user, fileUpload, `${domain}/r/${invis ? invis.invis : fileUpload.name}`, responseUrl);
     }
 
     if (zconfig.exif.enabled && zconfig.exif.remove_gps && fileUpload.mimetype.startsWith('image/')) {

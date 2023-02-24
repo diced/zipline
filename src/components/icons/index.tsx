@@ -38,6 +38,9 @@ import InfoIcon from './InfoIcon';
 import FolderIcon from './FolderIcon';
 import FolderMinusIcon from './FolderMinusIcon';
 import FolderPlusIcon from './FolderPlusIcon';
+import GlobeIcon from './GlobeIcon';
+import LockIcon from './LockIcon';
+import UnlockIcon from './UnlockIcon';
 
 export {
   ActivityIcon,
@@ -80,4 +83,7 @@ export {
   FolderIcon,
   FolderMinusIcon,
   FolderPlusIcon,
+  GlobeIcon,
+  LockIcon,
+  UnlockIcon,
 };

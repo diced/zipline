@@ -69,6 +69,10 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
         userId: true,
         createdAt: true,
         updatedAt: true,
+        public: true,
+      },
+      orderBy: {
+        updatedAt: 'desc',
       },
     });
 

@@ -61,6 +61,12 @@ export default function Flameshot({ user, open, setOpen }) {
       delete extraHeaders['Original-Name'];
     }
 
+    if (values.overrideDomain && values.overrideDomain.trim() !== '') {
+      extraHeaders['Override-Domain'] = values.overrideDomain;
+    } else {
+      delete extraHeaders['Override-Domain'];
+    }
+
     for (const [key, value] of Object.entries(extraHeaders)) {
       curl.push('-H');
       curl.push(`"${key}: ${value}"`);

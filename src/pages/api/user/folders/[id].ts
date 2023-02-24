@@ -22,6 +22,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       userId: true,
       createdAt: true,
       updatedAt: true,
+      public: true,
     },
   });
 
@@ -75,6 +76,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
         userId: true,
         createdAt: true,
         updatedAt: true,
+        public: true,
       },
     });
 
@@ -83,6 +85,40 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     logger.info(
       `Added file "${file.name}" to folder "${folder.name}" for user ${user.username} (${user.id})`
     );
+
+    if (req.query.files) {
+      for (let i = 0; i !== folder.files.length; ++i) {
+        const file = folder.files[i];
+        delete file.password;
+
+        (folder.files[i] as unknown as { url: string }).url = formatRootUrl(
+          config.uploader.route,
+          folder.files[i].name
+        );
+      }
+    }
+
+    return res.json(folder);
+  } else if (req.method === 'PATCH') {
+    const { public: publicFolder } = req.body as { public?: string };
+
+    const folder = await prisma.folder.update({
+      where: {
+        id: idParsed,
+      },
+      data: {
+        public: !!publicFolder,
+      },
+      select: {
+        files: !!req.query.files,
+        id: true,
+        name: true,
+        userId: true,
+        createdAt: true,
+        updatedAt: true,
+        public: true,
+      },
+    });
 
     if (req.query.files) {
       for (let i = 0; i !== folder.files.length; ++i) {
@@ -111,6 +147,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
           userId: true,
           createdAt: true,
           updatedAt: true,
+          public: true,
         },
       });
 
@@ -167,6 +204,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
           userId: true,
           createdAt: true,
           updatedAt: true,
+          public: true,
         },
       });
 
@@ -208,6 +246,6 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
 }
 
 export default withZipline(handler, {
-  methods: ['GET', 'POST', 'DELETE'],
+  methods: ['GET', 'POST', 'DELETE', 'PATCH'],
   user: true,
 });
