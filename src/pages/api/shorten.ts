@@ -8,7 +8,7 @@ import { createInvisURL, randomChars } from 'lib/util';
 const logger = Logger.get('shorten');
 
 async function handler(req: NextApiReq, res: NextApiRes) {
-  if (!req.headers.authorization) return res.badRequest('no authorization');
+  if (!req.headers.authorization) return res.forbidden('no authorization');
 
   const user = await prisma.user.findFirst({
     where: {
