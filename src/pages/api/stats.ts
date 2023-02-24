@@ -36,7 +36,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       LIMIT ${amount}
     `;
 
-    if (config.website.show_files_per_user) {
+    if (!config.website.show_files_per_user) {
       stats = stats.map((stat) => {
         (stat.data as any).count_by_user = [];
         return stat;
