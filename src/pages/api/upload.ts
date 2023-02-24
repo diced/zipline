@@ -180,8 +180,8 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         domain = `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}`;
       }
 
-      const responseUrl = `${domain}${zconfig.uploader.route === '/' ? '/' : zconfig.uploader.route}${
-        invis ? invis.invis : file.name
+      const responseUrl = `${domain}${zconfig.uploader.route === '/' ? '/' : zconfig.uploader.route + '/'}${
+        invis ? invis.invis : encodeURI(file.name)
       }`;
 
       response.files.push(responseUrl);
@@ -313,14 +313,13 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     if (req.headers['override-domain']) {
       domain = `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers['override-domain']}`;
     } else if (user.domains.length) {
-      const randomDomain = user.domains[Math.floor(Math.random() * user.domains.length)];
-      domain = `${zconfig.core.return_https ? 'https' : 'http'}://${randomDomain}`;
+      domain = user.domains[Math.floor(Math.random() * user.domains.length)];
     } else {
       domain = `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}`;
     }
 
-    const responseUrl = `${domain}${zconfig.uploader.route === '/' ? '/' : zconfig.uploader.route}${
-      invis ? invis.invis : fileUpload.name
+    const responseUrl = `${domain}${zconfig.uploader.route === '/' ? '/' : zconfig.uploader.route + '/'}${
+      invis ? invis.invis : encodeURI(fileUpload.name)
     }`;
 
     response.files.push(responseUrl);

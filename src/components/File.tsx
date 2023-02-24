@@ -225,7 +225,7 @@ export default function File({
         <Stack>
           <Type
             file={image}
-            src={`/r/${image.name}`}
+            src={`/r/${encodeURI(image.name)}`}
             alt={image.name}
             popup
             sx={{ minHeight: 200 }}
@@ -356,7 +356,7 @@ export default function File({
               <ActionIcon
                 color='blue'
                 variant='filled'
-                onClick={() => window.open(`/r/${image.name}?download=true`, '_blank')}
+                onClick={() => window.open(`/r/${encodeURI(image.name)}?download=true`, '_blank')}
               >
                 <DownloadIcon />
               </ActionIcon>
@@ -383,7 +383,7 @@ export default function File({
               width: '100%',
               cursor: 'pointer',
             }}
-            src={`/r/${image.name}`}
+            src={`/r/${encodeURI(image.name)}`}
             alt={image.name}
             onClick={() => setOpen(true)}
             disableMediaPreview={disableMediaPreview}

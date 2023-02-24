@@ -21,7 +21,7 @@ export default function EmbeddedFile({
   pass: boolean;
   prismRender: boolean;
 }) {
-  const dataURL = (route: string) => `${route}/${file.name}`;
+  const dataURL = (route: string) => `${route}/${encodeURI(file.name)}`;
 
   const router = useRouter();
   const [opened, setOpened] = useState(pass);
@@ -171,7 +171,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const file = await prisma.file.findFirst({
     where: {
-      OR: [{ name: id }, { invisible: { invis: id } }],
+      OR: [{ name: id }, { invisible: { invis: decodeURI(encodeURI(id)) } }],
     },
   });
   if (!file) return { notFound: true };
