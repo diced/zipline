@@ -1,0 +1,41 @@
+{
+  "name": "Zipline Codespace",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
+  "forwardPorts": [3000, 5432],
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {},
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
+    "ghcr.io/devcontainers/features/node:1": {}
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "[typescript]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[typescriptreact]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true,
+        "files.autoSave": "afterDelay"
+      },
+      "extensions": ["prisma.prisma", "esbenp.prettier-vscode", "dbaeumer.vscode-eslint"]
+    }
+  },
+  "remoteUser": "zipline",
+  "remoteEnv": {
+    "CORE_DATABASE_URL": "postgres://postgres:postgres@localhost/zip10"
+  },
+  "portsAttributes": {
+	  "3000": {
+		  "label": "Zipline",
+      "onAutoForward": "openBrowser"
+	  },
+	  "5432": {
+		  "label": "Postgres"
+	  }
+  }
+}
