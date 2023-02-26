@@ -14,6 +14,7 @@ COPY next.config.js ./next.config.js
 COPY tsup.config.ts ./tsup.config.ts
 COPY tsconfig.json ./tsconfig.json
 COPY mimes.json ./mimes.json
+COPY public ./public
 
 FROM base as builder
 
