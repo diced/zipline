@@ -165,16 +165,23 @@ export default function Folders({ disableMediaPreview, exifEnabled }) {
                         aria-label='copy link'
                         onClick={() => {
                           clipboard.copy(`${window.location.origin}/folder/${folder.id}`);
-                          showNotification({
-                            title: 'Copied folder link',
-                            message: (
-                              <>
-                                Copied <Link href={`/folder/${folder.id}`}>folder link</Link> to clipboard
-                              </>
-                            ),
-                            color: 'green',
-                            icon: <CopyIcon />,
-                          });
+                          if (!navigator.clipboard)
+                            showNotification({
+                              title: 'Unable to copy to clipboard',
+                              message: 'Zipline is unable to copy to clipboard due to security reasons.',
+                              color: 'red',
+                            });
+                          else
+                            showNotification({
+                              title: 'Copied folder link',
+                              message: (
+                                <>
+                                  Copied <Link href={`/folder/${folder.id}`}>folder link</Link> to clipboard
+                                </>
+                              ),
+                              color: 'green',
+                              icon: <CopyIcon />,
+                            });
                         }}
                       >
                         <LinkIcon />
