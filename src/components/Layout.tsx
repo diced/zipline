@@ -230,7 +230,6 @@ export default function Layout({ children, props }) {
                 </Group>
               </Text>
             ),
-            // message: `Zipline is unable to copy to clipboard due to security reasons. However, you can still copy the token manually.\n\nYour token is: ${token}`,
             color: 'red',
           });
         else
