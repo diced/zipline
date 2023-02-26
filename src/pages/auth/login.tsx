@@ -98,28 +98,24 @@ export default function Login({ title, user_registration, oauth_registration, oa
         title={<Title order={3}>Two-Factor Authentication Required</Title>}
         size='lg'
       >
-        <NumberInput
-          placeholder='2FA Code'
-          label='Verify'
-          size='xl'
-          hideControls
-          maxLength={6}
-          minLength={6}
-          value={code}
-          onChange={(e) => setCode(e)}
-          error={error}
-        />
+        <form onSubmit={form.onSubmit(() => onSubmit(form.values))}>
+          <NumberInput
+            placeholder='2FA Code'
+            label='Verify'
+            size='xl'
+            hideControls
+            maxLength={6}
+            minLength={6}
+            value={code}
+            onChange={(e) => setCode(e)}
+            data-autofocus
+            error={error}
+          />
 
-        <Button
-          disabled={disabled}
-          size='lg'
-          fullWidth
-          mt='md'
-          rightIcon={<CheckIcon />}
-          onClick={() => onSubmit(form.values)}
-        >
-          Verify &amp; Login
-        </Button>
+          <Button disabled={disabled} size='lg' fullWidth mt='md' rightIcon={<CheckIcon />} type='submit'>
+            Verify &amp; Login
+          </Button>
+        </form>
       </Modal>
       <Center sx={{ height: '100vh' }}>
         <div>

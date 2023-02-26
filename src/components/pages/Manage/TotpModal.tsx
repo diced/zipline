@@ -1,5 +1,6 @@
 import { Button, Center, Image, Modal, NumberInput, Text, Title } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
+import { useForm } from '@mantine/form';
 import { CheckIcon, CrossIcon } from 'components/icons';
 import useFetch from 'hooks/useFetch';
 import { useEffect, useState } from 'react';
@@ -10,6 +11,7 @@ export function TotpModal({ opened, onClose, deleteTotp, setTotpEnabled }) {
   const [disabled, setDisabled] = useState(false);
   const [code, setCode] = useState(undefined);
   const [error, setError] = useState('');
+  const form = useForm();
 
   useEffect(() => {
     (async () => {
@@ -114,28 +116,35 @@ export function TotpModal({ opened, onClose, deleteTotp, setTotpEnabled }) {
         </>
       )}
 
-      <NumberInput
-        placeholder='2FA Code'
-        label='Verify'
-        size='xl'
-        hideControls
-        maxLength={6}
-        minLength={6}
-        value={code}
-        onChange={(e) => setCode(e)}
-        error={error}
-      />
-
-      <Button
-        disabled={disabled}
-        size='lg'
-        fullWidth
-        mt='md'
-        rightIcon={<CheckIcon />}
-        onClick={deleteTotp ? disableTotp : verifyCode}
+      <form
+        onSubmit={form.onSubmit(() => {
+          deleteTotp ? disableTotp() : verifyCode();
+        })}
       >
-        Verify{deleteTotp ? ' and Disable' : ''}
-      </Button>
+        <NumberInput
+          placeholder='2FA Code'
+          label='Verify'
+          size='xl'
+          hideControls
+          maxLength={6}
+          minLength={6}
+          value={code}
+          onChange={(e) => setCode(e)}
+          data-autofocus
+          error={error}
+        />
+
+        <Button
+          disabled={disabled}
+          size='lg'
+          fullWidth
+          mt='md'
+          rightIcon={<CheckIcon />}
+          onClick={deleteTotp ? disableTotp : verifyCode}
+        >
+          Verify{deleteTotp ? ' and Disable' : ''}
+        </Button>
+      </form>
     </Modal>
   );
 }
