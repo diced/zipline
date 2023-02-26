@@ -128,6 +128,12 @@ export default function File({ chunks: chunks_config }) {
                 setTimeout(() => setProgress(0), 1000);
 
                 clipboard.copy(json.files[0]);
+                if (!navigator.clipboard)
+                  showNotification({
+                    title: 'Unable to copy to clipboard',
+                    message: 'Zipline is unable to copy to clipboard due to security reasons.',
+                    color: 'red',
+                  });
               }
 
               ready = true;
