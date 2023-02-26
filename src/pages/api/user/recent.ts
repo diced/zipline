@@ -25,6 +25,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       views: true,
       maxViews: true,
       folderId: true,
+      size: true,
     },
   });
 

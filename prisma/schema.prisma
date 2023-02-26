@@ -53,6 +53,7 @@ model File {
   originalName String?
   mimetype     String         @default("image/png")
   createdAt    DateTime       @default(now())
+  size         Int            @default(0)
   expiresAt    DateTime?
   maxViews     Int?
   views        Int            @default(0)

@@ -16,6 +16,7 @@ import { showNotification } from '@mantine/notifications';
 import useFetch from 'hooks/useFetch';
 import { useFileDelete, useFileFavorite } from 'lib/queries/files';
 import { useFolders } from 'lib/queries/folders';
+import { bytesToHuman } from 'lib/utils/bytes';
 import { relativeTime } from 'lib/utils/client';
 import { useState } from 'react';
 import {
@@ -27,6 +28,7 @@ import {
   DownloadIcon,
   ExternalLinkIcon,
   EyeIcon,
+  HardDriveIcon,
   FileIcon,
   FolderMinusIcon,
   FolderPlusIcon,
@@ -245,6 +247,7 @@ export default function File({
           >
             <FileMeta Icon={FileIcon} title='Name' subtitle={image.name} />
             <FileMeta Icon={ImageIcon} title='Type' subtitle={image.mimetype} />
+            <FileMeta Icon={HardDriveIcon} title='Size' subtitle={bytesToHuman(image.size || 0)} />
             <FileMeta Icon={EyeIcon} title='Views' subtitle={image?.views?.toLocaleString()} />
             {image.maxViews && (
               <FileMeta
