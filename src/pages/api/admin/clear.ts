@@ -7,6 +7,16 @@ const logger = Logger.get('admin');
 
 async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   try {
+    const { datasource, orphaned } = req.body;
+    if (orphaned) {
+      const { count } = await prisma.file.deleteMany({
+        where: {
+          userId: null,
+        },
+      });
+      logger.info(`User ${user.username} (${user.id}) cleared the database of ${count} orphaned files`);
+      return res.json({ message: 'cleared storage (orphaned only)' });
+    }
     const { count } = await prisma.file.deleteMany({});
     logger.info(`User ${user.username} (${user.id}) cleared the database of ${count} files`);
 
