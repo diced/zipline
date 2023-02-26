@@ -52,15 +52,22 @@ export default function Dashboard({ disableMediaPreview, exifEnabled }) {
 
   const copyImage = async ({ original }) => {
     clipboard.copy(`${window.location.protocol}//${window.location.host}${original.url}`);
-    showNotification({
-      title: 'Copied to clipboard',
-      message: (
-        <a
-          href={`${window.location.protocol}//${window.location.host}${original.url}`}
-        >{`${window.location.protocol}//${window.location.host}${original.url}`}</a>
-      ),
-      icon: <CopyIcon />,
-    });
+    if (!navigator.clipboard)
+      showNotification({
+        title: 'Unable to copy to clipboard',
+        message: 'Zipline is unable to copy to clipboard due to security reasons.',
+        color: 'red',
+      });
+    else
+      showNotification({
+        title: 'Copied to clipboard',
+        message: (
+          <a
+            href={`${window.location.protocol}//${window.location.host}${original.url}`}
+          >{`${window.location.protocol}//${window.location.host}${original.url}`}</a>
+        ),
+        icon: <CopyIcon />,
+      });
   };
 
   const viewImage = async ({ original }) => {
