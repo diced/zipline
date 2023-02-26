@@ -20,7 +20,7 @@ import {
   Tooltip,
   useMantineTheme,
 } from '@mantine/core';
-import { useClipboard } from '@mantine/hooks';
+import { useClipboard, useMediaQuery } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
 import { showNotification } from '@mantine/notifications';
 import useFetch from 'hooks/useFetch';
@@ -341,7 +341,16 @@ export default function Layout({ children, props }) {
             </MediaQuery>
             <Title ml='sm'>{title}</Title>
             <Box sx={{ marginLeft: 'auto', marginRight: 0 }}>
-              <Menu>
+              <Menu
+                styles={{
+                  item: {
+                    '@media (max-width: 768px)': {
+                      padding: '1rem',
+                      width: '80vw',
+                    },
+                  },
+                }}
+              >
                 <Menu.Target>
                   <Button
                     leftIcon={avatar ? <Image src={avatar} height={32} radius='md' /> : <SettingsIcon />}
@@ -413,7 +422,7 @@ export default function Layout({ children, props }) {
                   </>
                   <Menu.Item closeMenuOnClick={false} icon={<PencilIcon />}>
                     <Select
-                      size='xs'
+                      size={useMediaQuery('(max-width: 768px)') ? 'md' : 'xs'}
                       data={Object.keys(themes).map((t) => ({
                         value: t,
                         label: friendlyThemeName[t],

@@ -16,7 +16,7 @@ import {
   Tooltip,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { randomId, useInterval } from '@mantine/hooks';
+import { randomId, useInterval, useMediaQuery } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
 import { showNotification, updateNotification } from '@mantine/notifications';
 import {
@@ -40,7 +40,7 @@ import useFetch from 'hooks/useFetch';
 import { userSelector } from 'lib/recoil/user';
 import { bytesToHuman } from 'lib/utils/bytes';
 import { capitalize } from 'lib/utils/client';
-import { useEffect, useReducer, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import ClearStorage from './ClearStorage';
 import Flameshot from './Flameshot';
@@ -394,7 +394,18 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
         />
 
         <Group position='right' mt='md'>
-          <Button type='submit'>Save User</Button>
+          <Button
+            type='submit'
+            size='lg'
+            my='sm'
+            sx={{
+              '@media screen and (max-width: 768px)': {
+                width: '100%',
+              },
+            }}
+          >
+            Save
+          </Button>
         </Group>
       </form>
 
@@ -407,7 +418,16 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
               : 'You do not have two factor authentication enabled.'}
           </MutedText>
 
-          <Button size='lg' my='sm' onClick={() => setTotpOpen(true)}>
+          <Button
+            size='lg'
+            my='sm'
+            onClick={() => setTotpOpen(true)}
+            sx={{
+              '@media screen and (max-width: 768px)': {
+                width: '100%',
+              },
+            }}
+          >
             {totpEnabled ? 'Disable' : 'Enable'} Two Factor Authentication
           </Button>
 
@@ -483,7 +503,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
           </Button>
         </Card>
 
-        <Group position='right' mt='md'>
+        <Group position='right' my='md' grow={useMediaQuery('(max-width: 768px)')}>
           <Button
             onClick={() => {
               setFile(null);
@@ -497,12 +517,12 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
         </Group>
       </Box>
 
-      <Box mb='md'>
+      <Box my='md'>
         <Title>Manage Data</Title>
         <MutedText size='md'>Delete, or export your data into a zip file.</MutedText>
       </Box>
 
-      <Group>
+      <Group my='md' grow={useMediaQuery('(max-width: 768px)')}>
         <Button onClick={openDeleteModal} rightIcon={<DeleteIcon />} color='red'>
           Delete All Data
         </Button>
@@ -545,7 +565,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
       {user.administrator && (
         <Box mt='md'>
           <Title>Server</Title>
-          <Group>
+          <Group my='md' grow={useMediaQuery('(max-width: 768px)')}>
             <Button size='md' onClick={forceUpdateStats} color='red' rightIcon={<RefreshIcon />}>
               Force Update Stats
             </Button>
@@ -558,10 +578,28 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
 
       <Title my='md'>Uploaders</Title>
       <Group>
-        <Button size='xl' onClick={() => setShareXOpen(true)} rightIcon={<ShareXIcon />}>
+        <Button
+          size='xl'
+          onClick={() => setShareXOpen(true)}
+          rightIcon={<ShareXIcon />}
+          sx={{
+            '@media screen and (max-width: 768px)': {
+              width: '100%',
+            },
+          }}
+        >
           Generate ShareX Config
         </Button>
-        <Button size='xl' onClick={() => setFlameshotOpen(true)} rightIcon={<FlameshotIcon />}>
+        <Button
+          size='xl'
+          onClick={() => setFlameshotOpen(true)}
+          rightIcon={<FlameshotIcon />}
+          sx={{
+            '@media screen and (max-width: 768px)': {
+              width: '100%',
+            },
+          }}
+        >
           Generate Flameshot Script
         </Button>
       </Group>
