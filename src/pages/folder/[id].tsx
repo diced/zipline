@@ -3,6 +3,7 @@ import File from 'components/File';
 import prisma from 'lib/prisma';
 import { formatRootUrl } from 'lib/utils/urls';
 import { GetServerSideProps } from 'next';
+import Head from 'next/head';
 
 type LimitedFolder = {
   files: {
@@ -23,35 +24,42 @@ type LimitedFolder = {
 type Props = {
   folder: LimitedFolder;
   uploadRoute: string;
+  title: string;
 };
 
-export default function EmbeddedFile({ folder }: Props) {
+export default function Folder({ title, folder }: Props) {
+  const full_title = `${title} - ${folder.name}`;
   return (
-    <Container size='lg'>
-      <Title align='center' my='lg'>
-        Viewing folder: {folder.name}
-      </Title>
-      <SimpleGrid
-        my='md'
-        cols={3}
-        breakpoints={[
-          { maxWidth: 600, cols: 1 },
-          { maxWidth: 900, cols: 2 },
-          { maxWidth: 1200, cols: 3 },
-        ]}
-      >
-        {folder.files.map((file, i) => (
-          <File
-            key={i}
-            image={file}
-            disableMediaPreview={false}
-            exifEnabled={false}
-            refreshImages={null}
-            reducedActions={true}
-          />
-        ))}
-      </SimpleGrid>
-    </Container>
+    <>
+      <Head>
+        <title>{full_title}</title>
+      </Head>
+      <Container size='lg'>
+        <Title align='center' my='lg'>
+          Viewing folder: {folder.name}
+        </Title>
+        <SimpleGrid
+          my='md'
+          cols={3}
+          breakpoints={[
+            { maxWidth: 600, cols: 1 },
+            { maxWidth: 900, cols: 2 },
+            { maxWidth: 1200, cols: 3 },
+          ]}
+        >
+          {folder.files.map((file, i) => (
+            <File
+              key={i}
+              image={file}
+              disableMediaPreview={false}
+              exifEnabled={false}
+              refreshImages={null}
+              reducedActions={true}
+            />
+          ))}
+        </SimpleGrid>
+      </Container>
+    </>
   );
 }
 
@@ -100,6 +108,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (context) => 
     props: {
       folder,
       uploadRoute: config.uploader.route,
+      title: config.website.title,
     },
   };
 };
