@@ -74,15 +74,18 @@ export interface ConfigWebsiteExternalLinks {
 }
 
 export interface ConfigDiscord {
-  url: string;
-  username: string;
-  avatar_url: string;
+  url?: string;
+  username?: string;
+  avatar_url?: string;
 
   upload: ConfigDiscordContent;
   shorten: ConfigDiscordContent;
 }
 
 export interface ConfigDiscordContent {
+  url?: string;
+  username?: string;
+  avatar_url?: string;
   content: string;
   embed: ConfigDiscordEmbed;
 }

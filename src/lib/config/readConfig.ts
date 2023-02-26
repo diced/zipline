@@ -107,6 +107,9 @@ export default function readConfig() {
     map('DISCORD_USERNAME', 'string', 'discord.username'),
     map('DISCORD_AVATAR_URL', 'string', 'discord.avatar_url'),
 
+    map('DISCORD_UPLOAD_URL', 'string', 'discord.upload.url'),
+    map('DISCORD_UPLOAD_USERNAME', 'string', 'discord.upload.username'),
+    map('DISCORD_UPLOAD_AVATAR_URL', 'string', 'discord.upload.avatar_url'),
     map('DISCORD_UPLOAD_CONTENT', 'string', 'discord.upload.content'),
     map('DISCORD_UPLOAD_EMBED_TITLE', 'string', 'discord.upload.embed.title'),
     map('DISCORD_UPLOAD_EMBED_DESCRIPTION', 'string', 'discord.upload.embed.description'),
@@ -116,6 +119,9 @@ export default function readConfig() {
     map('DISCORD_UPLOAD_EMBED_THUMBNAIL', 'boolean', 'discord.upload.embed.thumbnail'),
     map('DISCORD_UPLOAD_EMBED_TIMESTAMP', 'boolean', 'discord.upload.embed.timestamp'),
 
+    map('DISCORD_SHORTEN_URL', 'string', 'discord.shorten.url'),
+    map('DISCORD_SHORTEN_USERNAME', 'string', 'discord.shorten.username'),
+    map('DISCORD_SHORTEN_AVATAR_URL', 'string', 'discord.shorten.avatar_url'),
     map('DISCORD_SHORTEN_CONTENT', 'string', 'discord.shorten.content'),
     map('DISCORD_SHORTEN_EMBED_TITLE', 'string', 'discord.shorten.embed.title'),
     map('DISCORD_SHORTEN_EMBED_DESCRIPTION', 'string', 'discord.shorten.embed.description'),

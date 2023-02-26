@@ -6,6 +6,9 @@ import { humanToBytes } from 'utils/bytes';
 
 const discord_content = s
   .object({
+    url: s.string.nullish.default(null),
+    username: s.string.nullish.default(null),
+    avatar_url: s.string.nullish.default(null),
     content: s.string.nullish.default(null),
     embed: s
       .object({
@@ -141,11 +144,9 @@ const validator = s.object({
     }),
   discord: s
     .object({
-      url: s.string,
-      username: s.string.default('Zipline'),
-      avatar_url: s.string.default(
-        'https://raw.githubusercontent.com/diced/zipline/9b60147e112ec5b70170500b85c75ea621f41d03/public/zipline.png'
-      ),
+      url: s.string.nullish.default(null),
+      username: s.string.nullish.default(null),
+      avatar_url: s.string.nullish.default(null),
       upload: discord_content,
       shorten: discord_content,
     })
