@@ -42,6 +42,7 @@ import { bytesToHuman } from 'lib/utils/bytes';
 import { capitalize } from 'lib/utils/client';
 import { useEffect, useReducer, useState } from 'react';
 import { useRecoilState } from 'recoil';
+import ClearStorage from './ClearStorage';
 import Flameshot from './Flameshot';
 import ShareX from './ShareX';
 import { TotpModal } from './TotpModal';
@@ -76,10 +77,12 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
   const [totpOpen, setTotpOpen] = useState(false);
   const [shareXOpen, setShareXOpen] = useState(false);
   const [flameshotOpen, setFlameshotOpen] = useState(false);
+  const [clrStorOpen, setClrStorOpen] = useState(false);
   const [exports, setExports] = useState([]);
   const [file, setFile] = useState<File>(null);
   const [fileDataURL, setFileDataURL] = useState(user.avatar ?? null);
   const [totpEnabled, setTotpEnabled] = useState(!!user.totpSecret);
+  const [checked, setCheck] = useState(false);
 
   const getDataURL = (f: File): Promise<string> => {
     return new Promise((res, rej) => {
@@ -305,58 +308,6 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
     } else {
       showNotification({
         title: 'Updated stats',
-        message: '',
-        color: 'green',
-        icon: <CheckIcon />,
-      });
-    }
-  };
-
-  const openClearData = () => {
-    modals.openConfirmModal({
-      title: 'Are you sure you want to clear all uploads in the database?',
-      closeOnConfirm: false,
-      labels: { confirm: 'Yes', cancel: 'No' },
-      onConfirm: () => {
-        modals.openConfirmModal({
-          title: 'Do you want to clear storage too?',
-          labels: { confirm: 'Yes', cancel: 'No' },
-          onConfirm: () => {
-            handleClearData(true);
-            modals.closeAll();
-          },
-          onCancel: () => {
-            handleClearData(false);
-            modals.closeAll();
-          },
-        });
-      },
-    });
-  };
-
-  const handleClearData = async (datasource?: boolean) => {
-    showNotification({
-      id: 'clear-uploads',
-      title: 'Clearing...',
-      message: '',
-      loading: true,
-      autoClose: false,
-    });
-
-    const res = await useFetch('/api/admin/clear', 'POST', { datasource });
-
-    if (res.error) {
-      updateNotification({
-        id: 'clear-uploads',
-        title: 'Error while clearing uploads',
-        message: res.error,
-        color: 'red',
-        icon: <CrossIcon />,
-      });
-    } else {
-      updateNotification({
-        id: 'clear-uploads',
-        title: 'Successfully cleared uploads',
         message: '',
         color: 'green',
         icon: <CheckIcon />,
@@ -598,7 +549,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
             <Button size='md' onClick={forceUpdateStats} color='red' rightIcon={<RefreshIcon />}>
               Force Update Stats
             </Button>
-            <Button size='md' onClick={openClearData} color='red' rightIcon={<TrashIcon />}>
+            <Button size='md' onClick={() => setClrStorOpen(true)} color='red' rightIcon={<TrashIcon />}>
               Delete all uploads
             </Button>
           </Group>
@@ -617,6 +568,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
 
       <ShareX user={user} open={shareXOpen} setOpen={setShareXOpen} />
       <Flameshot user={user} open={flameshotOpen} setOpen={setFlameshotOpen} />
+      <ClearStorage open={clrStorOpen} setOpen={setClrStorOpen} check={checked} setCheck={setCheck} />
     </>
   );
 }
