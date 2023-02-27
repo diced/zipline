@@ -18,7 +18,7 @@ export default class Logger {
   public name: string;
 
   static filters(): string[] {
-    return (process.env.LOGGER_FILTERS ?? '').split(',');
+    return (process.env.LOGGER_FILTERS ?? '').split(',').filter((x) => x !== '');
   }
 
   static get(klass: any) {
@@ -38,9 +38,10 @@ export default class Logger {
   }
 
   show(): boolean {
-    if (!Logger.filters().length) return true;
+    const filters = Logger.filters();
+    if (!filters.length) return true;
 
-    return Logger.filters().includes(this.name);
+    return filters.includes(this.name);
   }
 
   info(...args: any[]): this {

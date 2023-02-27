@@ -1,5 +1,5 @@
 # Use the Prisma binaries image as the first stage
-FROM ghcr.io/diced/prisma-binaries:4.8.x as prisma
+FROM ghcr.io/diced/prisma-binaries:4.10.x as prisma
 
 # Use Alpine Linux as the second stage
 FROM node:18-alpine3.16 as base

@@ -68,7 +68,6 @@ export async function removeGPSData(image: File): Promise<void> {
     GPSLongitude: null,
     GPSLongitudeRef: null,
     GPSMapDatum: null,
-    GPSMeasureMode: null,
     GPSPosition: null,
     GPSProcessingMethod: null,
     GPSSatellites: null,
