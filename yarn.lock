@@ -1548,20 +1548,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mantine/nprogress@npm:^5.9.2":
-  version: 5.9.3
-  resolution: "@mantine/nprogress@npm:5.9.3"
-  dependencies:
-    "@mantine/utils": 5.9.3
-  peerDependencies:
-    "@mantine/core": 5.9.3
-    "@mantine/hooks": 5.9.3
-    react: ">=16.8.0"
-    react-dom: ">=16.8.0"
-  checksum: 2dfb96e32fcd92a0d9aaee6868025307a0982cea777cc129d2036bffe255953fa35483f6ca0c8f5accbc13606ac7294e9b8102c88eb3071776931b5aab75ce2c
-  languageName: node
-  linkType: hard
-
 "@mantine/prism@npm:^5.9.2":
   version: 5.9.3
   resolution: "@mantine/prism@npm:5.9.3"
@@ -3754,13 +3740,6 @@ __metadata:
     color-convert: ^2.0.1
     color-string: ^1.9.0
   checksum: 0579629c02c631b426780038da929cca8e8d80a40158b09811a0112a107c62e10e4aad719843b791b1e658ab4e800558f2e87ca4522c8b32349d497ecb6adeb4
-  languageName: node
-  linkType: hard
-
-"colorette@npm:^2.0.19":
-  version: 2.0.19
-  resolution: "colorette@npm:2.0.19"
-  checksum: 888cf5493f781e5fcf54ce4d49e9d7d698f96ea2b2ef67906834bb319a392c667f9ec69f4a10e268d2946d13a9503d2d19b3abaaaf174e3451bfe91fb9d82427
   languageName: node
   linkType: hard
 
@@ -11556,7 +11535,6 @@ __metadata:
     "@mantine/modals": ^5.9.2
     "@mantine/next": ^5.9.2
     "@mantine/notifications": ^5.9.2
-    "@mantine/nprogress": ^5.9.2
     "@mantine/prism": ^5.9.2
     "@prisma/client": ^4.8.1
     "@prisma/internals": ^4.8.1
@@ -11572,7 +11550,6 @@ __metadata:
     "@types/react": ^18.0.26
     "@types/sharp": ^0.31.0
     argon2: ^0.30.2
-    colorette: ^2.0.19
     cookie: ^0.5.0
     cross-env: ^7.0.3
     dayjs: ^1.11.7
