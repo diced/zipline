@@ -1,42 +1,88 @@
-import { DataGrid, dateFilterFn, stringFilterFn } from '@dicedtomato/mantine-data-grid';
-import { Title, useMantineTheme, Box } from '@mantine/core';
+import { ActionIcon, Box, Group, Title, Tooltip } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { showNotification } from '@mantine/notifications';
-import { CopyIcon, CrossIcon, DeleteIcon, EnterIcon } from 'components/icons';
+import FileModal from 'components/File/FileModal';
+import { CopyIcon, CrossIcon, DeleteIcon, EnterIcon, FileIcon } from 'components/icons';
 import Link from 'components/Link';
 import MutedText from 'components/MutedText';
 import useFetch from 'lib/hooks/useFetch';
-import { useFiles, useRecent } from 'lib/queries/files';
+import { usePaginatedFiles, useRecent } from 'lib/queries/files';
 import { useStats } from 'lib/queries/stats';
 import { userSelector } from 'lib/recoil/user';
+import { DataTable, DataTableSortStatus } from 'mantine-datatable';
+import { useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import RecentFiles from './RecentFiles';
 import { StatCards } from './StatCards';
 
 export default function Dashboard({ disableMediaPreview, exifEnabled }) {
   const user = useRecoilValue(userSelector);
-  const theme = useMantineTheme();
 
-  const images = useFiles();
   const recent = useRecent('media');
   const stats = useStats();
   const clipboard = useClipboard();
 
-  const updateImages = () => {
-    images.refetch();
+  // pagination
+  const [, setNumPages] = useState(0);
+  const [page, setPage] = useState(1);
+  const [numFiles, setNumFiles] = useState(0);
+
+  useEffect(() => {
+    (async () => {
+      const { count } = await useFetch('/api/user/paged?count=true');
+      setNumPages(count);
+
+      const { count: filesCount } = await useFetch('/api/user/files?count=true');
+      setNumFiles(filesCount);
+    })();
+  }, [page]);
+
+  const files = usePaginatedFiles(page);
+
+  // sorting
+  const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
+    columnAccessor: 'date',
+    direction: 'asc',
+  });
+  const [records, setRecords] = useState(files.data);
+
+  useEffect(() => {
+    setRecords(files.data);
+  }, [files.data]);
+
+  useEffect(() => {
+    if (!records || records.length === 0) return;
+
+    const sortedRecords = [...records].sort((a, b) => {
+      if (sortStatus.direction === 'asc') {
+        return a[sortStatus.columnAccessor] > b[sortStatus.columnAccessor] ? 1 : -1;
+      }
+
+      return a[sortStatus.columnAccessor] < b[sortStatus.columnAccessor] ? 1 : -1;
+    });
+
+    setRecords(sortedRecords);
+  }, [sortStatus]);
+
+  // file modal on click
+  const [open, setOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+
+  const updateFiles = () => {
+    files.refetch();
     recent.refetch();
     stats.refetch();
   };
 
-  const deleteImage = async ({ original }) => {
+  const deleteFile = async (file) => {
     const res = await useFetch('/api/user/files', 'DELETE', {
-      id: original.id,
+      id: file.id,
     });
     if (!res.error) {
-      updateImages();
+      updateFiles();
       showNotification({
         title: 'File Deleted',
-        message: `${original.name}`,
+        message: `${file.name}`,
         color: 'green',
         icon: <DeleteIcon />,
       });
@@ -50,8 +96,8 @@ export default function Dashboard({ disableMediaPreview, exifEnabled }) {
     }
   };
 
-  const copyImage = async ({ original }) => {
-    clipboard.copy(`${window.location.protocol}//${window.location.host}${original.url}`);
+  const copyFile = async (file) => {
+    clipboard.copy(`${window.location.protocol}//${window.location.host}${file.url}`);
     if (!navigator.clipboard)
       showNotification({
         title: 'Unable to copy to clipboard',
@@ -63,22 +109,34 @@ export default function Dashboard({ disableMediaPreview, exifEnabled }) {
         title: 'Copied to clipboard',
         message: (
           <a
-            href={`${window.location.protocol}//${window.location.host}${original.url}`}
-          >{`${window.location.protocol}//${window.location.host}${original.url}`}</a>
+            href={`${window.location.protocol}//${window.location.host}${file.url}`}
+          >{`${window.location.protocol}//${window.location.host}${file.url}`}</a>
         ),
         icon: <CopyIcon />,
       });
   };
 
-  const viewImage = async ({ original }) => {
-    window.open(`${window.location.protocol}//${window.location.host}${original.url}`);
+  const viewFile = async (file) => {
+    window.open(`${window.location.protocol}//${window.location.host}${file.url}`);
   };
 
   return (
     <div>
+      {selectedFile && (
+        <FileModal
+          open={open}
+          setOpen={setOpen}
+          file={selectedFile}
+          loading={files.isLoading}
+          refresh={() => files.refetch()}
+          reducedActions={false}
+          exifEnabled={exifEnabled}
+        />
+      )}
+
       <Title>Welcome back, {user?.username}</Title>
       <MutedText size='md'>
-        You have <b>{images.isSuccess ? images.data.length : '...'}</b> files
+        You have <b>{numFiles === 0 ? '...' : numFiles}</b> files
       </MutedText>
 
       <StatCards />
@@ -90,74 +148,92 @@ export default function Dashboard({ disableMediaPreview, exifEnabled }) {
         <MutedText size='md'>
           View your gallery <Link href='/dashboard/files'>here</Link>.
         </MutedText>
-        <DataGrid
-          data={images.data ?? []}
-          loading={images.isLoading}
-          withPagination={true}
-          withColumnResizing={false}
-          withColumnFilters={true}
-          noEllipsis={true}
-          withSorting={true}
-          highlightOnHover={true}
-          CopyIcon={CopyIcon}
-          DeleteIcon={DeleteIcon}
-          EnterIcon={EnterIcon}
-          deleteImage={deleteImage}
-          copyImage={copyImage}
-          viewImage={viewImage}
-          styles={{
-            dataCell: {
-              width: '100%',
-            },
-            td: {
-              ':nth-of-child(1)': {
-                minWidth: 170,
-              },
-              ':nth-of-child(2)': {
-                minWidth: 100,
-              },
-            },
-            th: {
-              backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0],
-              ':nth-of-child(1)': {
-                minWidth: 170,
-                padding: theme.spacing.lg,
-                borderTopLeftRadius: theme.radius.sm,
-              },
-              ':nth-of-child(2)': {
-                minWidth: 100,
-                padding: theme.spacing.lg,
-              },
-              ':nth-of-child(3)': {
-                padding: theme.spacing.lg,
-              },
-              ':nth-of-child(4)': {
-                padding: theme.spacing.lg,
-                borderTopRightRadius: theme.radius.sm,
-              },
-            },
-            thead: {
-              backgroundColor: theme.colors.dark[6],
-            },
-          }}
-          empty={<></>}
+
+        <DataTable
+          withBorder
+          borderRadius='md'
+          highlightOnHover
+          verticalSpacing='sm'
           columns={[
+            { accessor: 'name', sortable: true },
+            { accessor: 'mimetype', sortable: true },
             {
-              accessorKey: 'name',
-              header: 'Name',
-              filterFn: stringFilterFn,
+              accessor: 'createdAt',
+              sortable: true,
+              render: (file) => new Date(file.createdAt).toLocaleString(),
             },
             {
-              accessorKey: 'mimetype',
-              header: 'Type',
-              filterFn: stringFilterFn,
-            },
-            {
-              accessorKey: 'createdAt',
-              header: 'Date',
-              filterFn: dateFilterFn,
+              accessor: 'actions',
+              textAlignment: 'right',
+              render: (file) => (
+                <Group spacing={4} position='right' noWrap>
+                  <Tooltip label='More details'>
+                    <ActionIcon
+                      onClick={() => {
+                        setSelectedFile(file);
+                        setOpen(true);
+                      }}
+                      color='blue'
+                    >
+                      <FileIcon />
+                    </ActionIcon>
+                  </Tooltip>
+
+                  <Tooltip label='Open file in new tab'>
+                    <ActionIcon onClick={() => viewFile(file)} color='blue'>
+                      <EnterIcon />
+                    </ActionIcon>
+                  </Tooltip>
+
+                  <ActionIcon onClick={() => copyFile(file)} color='green'>
+                    <CopyIcon />
+                  </ActionIcon>
+                  <ActionIcon onClick={() => deleteFile(file)} color='red'>
+                    <DeleteIcon />
+                  </ActionIcon>
+                </Group>
+              ),
             },
           ]}
+          records={records ?? []}
+          fetching={files.isLoading}
+          loaderBackgroundBlur={5}
+          loaderVariant='dots'
+          minHeight={620}
+          page={page}
+          onPageChange={setPage}
+          recordsPerPage={16}
+          totalRecords={numFiles}
+          sortStatus={sortStatus}
+          onSortStatusChange={setSortStatus}
+          rowContextMenu={{
+            shadow: 'xl',
+            borderRadius: 'md',
+            items: (file) => [
+              {
+                key: 'view',
+                icon: <EnterIcon />,
+                title: `View ${file.name}`,
+                onClick: () => viewFile(file),
+              },
+              {
+                key: 'copy',
+                icon: <CopyIcon />,
+                title: `Copy ${file.name}`,
+                onClick: () => copyFile(file),
+              },
+              {
+                key: 'delete',
+                icon: <DeleteIcon />,
+                title: `Delete ${file.name}`,
+                onClick: () => deleteFile(file),
+              },
+            ],
+          }}
+          onCellClick={({ record: file }) => {
+            setSelectedFile(file);
+            setOpen(true);
+          }}
         />
       </Box>
     </div>

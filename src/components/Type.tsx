@@ -1,16 +1,4 @@
-import {
-  Alert,
-  Box,
-  Button,
-  Card,
-  Center,
-  Container,
-  Group,
-  Image,
-  LoadingOverlay,
-  Text,
-} from '@mantine/core';
-import { Prism } from '@mantine/prism';
+import { Alert, Box, Button, Card, Center, Group, Image, LoadingOverlay, Text } from '@mantine/core';
 import { useEffect, useState } from 'react';
 import { AudioIcon, FileIcon, ImageIcon, PlayIcon } from './icons';
 import KaTeX from './render/KaTeX';
@@ -62,7 +50,7 @@ export default function Type({ file, popup = false, disableMediaPreview, ...prop
     }, []);
   }
 
-  const renderRenderAlert = () => {
+  const renderAlert = () => {
     return (
       <Alert color='blue' variant='outline' sx={{ width: '100%' }}>
         You are{props.overrideRender ? ' not ' : ' '}viewing a rendered version of the file
@@ -81,7 +69,7 @@ export default function Type({ file, popup = false, disableMediaPreview, ...prop
   if ((shouldRenderMarkdown || shouldRenderTex) && !props.overrideRender && popup)
     return (
       <>
-        {renderRenderAlert()}
+        {renderAlert()}
         <Card p='md' my='sm'>
           {shouldRenderMarkdown && <Markdown code={text} />}
           {shouldRenderTex && <KaTeX code={text} />}
@@ -90,7 +78,7 @@ export default function Type({ file, popup = false, disableMediaPreview, ...prop
     );
 
   if (media && disableMediaPreview) {
-    return <Placeholder Icon={FileIcon} text={`Click to view file (${name})`} {...props} />;
+    return <Placeholder Icon={FileIcon} text={`Click to view file (${file.name})`} {...props} />;
   }
 
   return popup ? (
@@ -110,7 +98,7 @@ export default function Type({ file, popup = false, disableMediaPreview, ...prop
               <LoadingOverlay visible={loading} />
             ) : (
               <>
-                {(shouldRenderMarkdown || shouldRenderTex) && renderRenderAlert()}
+                {(shouldRenderMarkdown || shouldRenderTex) && renderAlert()}
                 <PrismCode code={text} ext={file.name.split('.').pop()} {...props} />
               </>
             )}

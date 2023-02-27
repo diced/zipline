@@ -60,6 +60,16 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     delete image.password;
     return res.json(image);
   } else {
+    if (req.query.count) {
+      const count = await prisma.file.count({
+        where: {
+          userId: user.id,
+          favorite: !!req.query.favorite,
+        },
+      });
+
+      return res.json({ count });
+    }
     let files: {
       favorite: boolean;
       createdAt: Date;

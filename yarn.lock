@@ -1167,33 +1167,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@dicedtomato/mantine-data-grid@npm:0.0.23":
-  version: 0.0.23
-  resolution: "@dicedtomato/mantine-data-grid@npm:0.0.23"
-  dependencies:
-    "@emotion/react": ^11.10.4
-    "@mantine/core": ^5.5.6
-    "@mantine/dates": ^5.5.6
-    "@mantine/hooks": ^5.5.6
-    "@tanstack/react-table": ^8.5.15
-    dayjs: ^1.11.4
-    react: ^18.0.0
-    react-dom: ^18.0.0
-    tabler-icons-react: ^1.54.0
-  peerDependencies:
-    "@mantine/core": ^5.0.0
-    "@mantine/dates": ^5.0.0
-    "@mantine/hooks": ^5.0.0
-    dayjs: ^1.11.4
-    react: ^18.0.0
-    react-dom: ^18.0.0
-  peerDependenciesMeta:
-    dayjs:
-      optional: true
-  checksum: e08bfff49f4ef58e88169fe31c1589d9e94ec5b94a8e04d39e0ddbd833ae79fe3a67350e7442d8d15ec0e3f887dd872af88eacabfce71fe2f3bd6b280811bdf3
-  languageName: node
-  linkType: hard
-
 "@emotion/babel-plugin@npm:^11.10.5":
   version: 11.10.5
   resolution: "@emotion/babel-plugin@npm:11.10.5"
@@ -1243,7 +1216,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@emotion/react@npm:^11.10.4, @emotion/react@npm:^11.10.5":
+"@emotion/react@npm:^11.10.5":
   version: 11.10.5
   resolution: "@emotion/react@npm:11.10.5"
   dependencies:
@@ -1479,7 +1452,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mantine/core@npm:^5.5.6, @mantine/core@npm:^5.9.2":
+"@mantine/core@npm:^5.9.2":
   version: 5.9.3
   resolution: "@mantine/core@npm:5.9.3"
   dependencies:
@@ -1493,20 +1466,6 @@ __metadata:
     react: ">=16.8.0"
     react-dom: ">=16.8.0"
   checksum: 8a84074c5af3607034fc8b31a73b04281e7b62e421395d884e392e74b966b616d9f01211ec35d7d491effaa04e0a02f7c69cd2b70813ebc2cb21e34d31afd0f2
-  languageName: node
-  linkType: hard
-
-"@mantine/dates@npm:^5.5.6":
-  version: 5.9.3
-  resolution: "@mantine/dates@npm:5.9.3"
-  dependencies:
-    "@mantine/utils": 5.9.3
-  peerDependencies:
-    "@mantine/core": 5.9.3
-    "@mantine/hooks": 5.9.3
-    dayjs: ">=1.0.0"
-    react: ">=16.8.0"
-  checksum: fc7c8d19ab10c1d997a882debae74f21fa3a2a59ee834b901713e5ddd9feba7197f61fb68a9a27794071d83d7690564fc45793a6966eebf5f55dff368f837aee
   languageName: node
   linkType: hard
 
@@ -1537,7 +1496,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mantine/hooks@npm:^5.5.6, @mantine/hooks@npm:^5.9.2":
+"@mantine/hooks@npm:^5.9.2":
   version: 5.9.3
   resolution: "@mantine/hooks@npm:5.9.3"
   peerDependencies:
@@ -2353,25 +2312,6 @@ __metadata:
     react-native:
       optional: true
   checksum: cce8b51c5cbaff007efb2fc54c5e03a2191e363626226903c345ae9baf0d48a36fc322383e24aff4f12250e672da67d3ceaa9819bbb16ace98a5c7bdff098a61
-  languageName: node
-  linkType: hard
-
-"@tanstack/react-table@npm:^8.5.15":
-  version: 8.7.0
-  resolution: "@tanstack/react-table@npm:8.7.0"
-  dependencies:
-    "@tanstack/table-core": 8.7.0
-  peerDependencies:
-    react: ">=16"
-    react-dom: ">=16"
-  checksum: 5f739f619dacfd134449bc8cff819d7e1b9549b8c8b20c293f2c786098a53d20fe5755727d8abb6fa56a64583792bbc89d8b1c7cd24ac3497495d2c20bac9e77
-  languageName: node
-  linkType: hard
-
-"@tanstack/table-core@npm:8.7.0":
-  version: 8.7.0
-  resolution: "@tanstack/table-core@npm:8.7.0"
-  checksum: 835511727ab5651066a4cbc98916fbc2463ec6d6ddc5c74c1fec5713eeba8e26641653c1a35b69b303f0c58f574416a09e26da44cf7e9a884cb954fc26b12afd
   languageName: node
   linkType: hard
 
@@ -4193,7 +4133,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dayjs@npm:^1.11.4, dayjs@npm:^1.11.7":
+"dayjs@npm:^1.11.7":
   version: 1.11.7
   resolution: "dayjs@npm:1.11.7"
   checksum: 5003a7c1dd9ed51385beb658231c3548700b82d3548c0cfbe549d85f2d08e90e972510282b7506941452c58d32136d6362f009c77ca55381a09c704e9f177ebb
@@ -7188,6 +7128,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"mantine-datatable@npm:^1.8.6":
+  version: 1.8.6
+  resolution: "mantine-datatable@npm:1.8.6"
+  peerDependencies:
+    "@mantine/core": ^5.10.4
+    "@mantine/hooks": ^5.10.4
+    react: ^18.2.0
+  checksum: a4558418067ada3e269e3d9dc0153b613b031ecd5fccd484b45a2b13e403084971870515d51c888d933eb2f4d85f6df2ad221b0c84a2bf2cd602d27938bb9029
+  languageName: node
+  linkType: hard
+
 "mariadb@npm:3.0.1":
   version: 3.0.1
   resolution: "mariadb@npm:3.0.1"
@@ -9291,7 +9242,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-dom@npm:^18.0.0, react-dom@npm:^18.2.0":
+"react-dom@npm:^18.2.0":
   version: 18.2.0
   resolution: "react-dom@npm:18.2.0"
   dependencies:
@@ -9450,7 +9401,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react@npm:^18.0.0, react@npm:^18.2.0":
+"react@npm:^18.2.0":
   version: 18.2.0
   resolution: "react@npm:18.2.0"
   dependencies:
@@ -10571,15 +10522,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tabler-icons-react@npm:^1.54.0":
-  version: 1.56.0
-  resolution: "tabler-icons-react@npm:1.56.0"
-  peerDependencies:
-    react: ">= 16.8.0"
-  checksum: 0b058055826fe478afa5c72641bb5207b6332b177d6ed7f505ebaad632cf33a63f0a3bf87af103af2b65bb0fc7b76f056ef03328fea7fa0c7378e30a82c3212b
-  languageName: node
-  linkType: hard
-
 "tapable@npm:^2.2.0":
   version: 2.2.1
   resolution: "tapable@npm:2.2.1"
@@ -11605,7 +11547,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "zipline@workspace:."
   dependencies:
-    "@dicedtomato/mantine-data-grid": 0.0.23
     "@emotion/react": ^11.10.5
     "@emotion/server": ^11.10.0
     "@mantine/core": ^5.9.2
@@ -11647,6 +11588,7 @@ __metadata:
     fflate: ^0.7.4
     find-my-way: ^7.3.1
     katex: ^0.16.4
+    mantine-datatable: ^1.8.6
     minio: ^7.0.32
     ms: canary
     multer: ^1.4.5-lts.1
