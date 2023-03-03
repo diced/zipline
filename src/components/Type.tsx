@@ -84,14 +84,14 @@ export default function Type({ file, popup = false, disableMediaPreview, ...prop
   return popup ? (
     media ? (
       {
-        video: <video width='100%' autoPlay controls {...props} />,
+        video: <video width='100%' autoPlay muted controls {...props} />,
         image: (
           <Image
             placeholder={<PlaceholderContent Icon={FileIcon} text={'Image failed to load...'} />}
             {...props}
           />
         ),
-        audio: <audio autoPlay controls {...props} style={{ width: '100%' }} />,
+        audio: <audio autoPlay muted controls {...props} style={{ width: '100%' }} />,
         text: (
           <>
             {loading ? (
