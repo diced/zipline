@@ -1,4 +1,5 @@
 import { Alert, Box, Button, Card, Center, Group, Image, LoadingOverlay, Text } from '@mantine/core';
+import exts from 'lib/exts';
 import { useEffect, useState } from 'react';
 import { AudioIcon, FileIcon, ImageIcon, PlayIcon } from './icons';
 import KaTeX from './render/KaTeX';
@@ -35,10 +36,11 @@ export default function Type({ file, popup = false, disableMediaPreview, ...prop
   const [text, setText] = useState('');
   const shouldRenderMarkdown = file.name.endsWith('.md');
   const shouldRenderTex = file.name.endsWith('.tex');
+  const shouldRenderCode: boolean = Object.keys(exts).includes(file.name.split('.').pop());
 
   const [loading, setLoading] = useState(type === 'text' && popup);
 
-  if (type === 'text' && popup) {
+  if ((type === 'text' || shouldRenderMarkdown || shouldRenderTex || shouldRenderCode) && popup) {
     useEffect(() => {
       (async () => {
         const res = await fetch('/r/' + file.name);
@@ -66,13 +68,16 @@ export default function Type({ file, popup = false, disableMediaPreview, ...prop
     );
   };
 
-  if ((shouldRenderMarkdown || shouldRenderTex) && !props.overrideRender && popup)
+  if ((shouldRenderMarkdown || shouldRenderTex || shouldRenderCode) && !props.overrideRender && popup)
     return (
       <>
         {renderAlert()}
         <Card p='md' my='sm'>
           {shouldRenderMarkdown && <Markdown code={text} />}
           {shouldRenderTex && <KaTeX code={text} />}
+          {shouldRenderCode && !(shouldRenderTex || shouldRenderMarkdown) && (
+            <PrismCode code={text} ext={type} />
+          )}
         </Card>
       </>
     );
