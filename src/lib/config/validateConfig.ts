@@ -250,6 +250,17 @@ export default function validate(config): Config {
       }
     }
 
+    const arr = ['/view', '/dashboard', '/code', '/folder', '/api', '/auth'];
+    if (arr.includes(validated.uploader.route)) {
+      throw {
+        errors: [`The uploader route cannot be ${validated.uploader.route}, this is a reserved route.`],
+      };
+    } else if (arr.includes(validated.urls.route)) {
+      throw {
+        errors: [`The urls route cannot be ${validated.urls.route}, this is a reserved route.`],
+      };
+    }
+
     return validated as unknown as Config;
   } catch (e) {
     if (process.env.ZIPLINE_DOCKER_BUILD) return null;
