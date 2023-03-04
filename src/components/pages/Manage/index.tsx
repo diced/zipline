@@ -413,7 +413,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
         <Box my='md'>
           <Title>Two Factor Authentication</Title>
           <MutedText size='md'>
-            {user.totpSecret
+            {totpEnabled
               ? 'You have two factor authentication enabled.'
               : 'You do not have two factor authentication enabled.'}
           </MutedText>
