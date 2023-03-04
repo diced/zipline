@@ -1,5 +1,16 @@
-import { Alert, Box, Button, Card, Center, Group, Image, LoadingOverlay, Text } from '@mantine/core';
 import exts from 'lib/exts';
+import {
+  Alert,
+  Box,
+  Button,
+  Card,
+  Center,
+  Group,
+  Image,
+  LoadingOverlay,
+  Text,
+  UnstyledButton,
+} from '@mantine/core';
 import { useEffect, useState } from 'react';
 import { AudioIcon, FileIcon, ImageIcon, PlayIcon } from './icons';
 import KaTeX from './render/KaTeX';
@@ -16,6 +27,15 @@ function PlaceholderContent({ text, Icon }) {
 }
 
 function Placeholder({ text, Icon, ...props }) {
+  if (props.onClick)
+    return (
+      <UnstyledButton sx={{ height: 200 }} {...props}>
+        <Center sx={{ height: 200 }}>
+          <PlaceholderContent text={text} Icon={Icon} />
+        </Center>
+      </UnstyledButton>
+    );
+
   return (
     <Box sx={{ height: 200 }} {...props}>
       <Center sx={{ height: 200 }}>
@@ -84,6 +104,17 @@ export default function Type({ file, popup = false, disableMediaPreview, ...prop
 
   if (media && disableMediaPreview) {
     return <Placeholder Icon={FileIcon} text={`Click to view file (${file.name})`} {...props} />;
+  }
+
+  if (file.password) {
+    return (
+      <Placeholder
+        Icon={FileIcon}
+        text={`This file is password protected. Click to view file (${file.name})`}
+        onClick={() => window.open(file.url)}
+        {...props}
+      />
+    );
   }
 
   return popup ? (

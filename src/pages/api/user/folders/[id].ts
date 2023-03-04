@@ -89,7 +89,8 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     if (req.query.files) {
       for (let i = 0; i !== folder.files.length; ++i) {
         const file = folder.files[i];
-        delete file.password;
+        // @ts-ignore
+        if (file.password) file.password = true;
 
         (folder.files[i] as unknown as { url: string }).url = formatRootUrl(
           config.uploader.route,
@@ -123,7 +124,8 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     if (req.query.files) {
       for (let i = 0; i !== folder.files.length; ++i) {
         const file = folder.files[i];
-        delete file.password;
+        // @ts-ignore
+        if (file.password) file.password = true;
 
         (folder.files[i] as unknown as { url: string }).url = formatRootUrl(
           config.uploader.route,
@@ -217,7 +219,8 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       if (req.query.files) {
         for (let i = 0; i !== folder.files.length; ++i) {
           const file = folder.files[i];
-          delete file.password;
+          // @ts-ignore
+          if (file.password) file.password = true;
 
           (folder.files[i] as unknown as { url: string }).url = formatRootUrl(
             config.uploader.route,
@@ -232,7 +235,8 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     if (req.query.files) {
       for (let i = 0; i !== folder.files.length; ++i) {
         const file = folder.files[i];
-        delete file.password;
+        // @ts-ignore
+        if (file.password) file.password = true;
 
         (folder.files[i] as unknown as { url: string }).url = formatRootUrl(
           config.uploader.route,
