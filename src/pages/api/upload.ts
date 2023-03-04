@@ -191,8 +191,14 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       }
 
       if (zconfig.exif.enabled && zconfig.exif.remove_gps && mimetype.startsWith('image/')) {
-        await removeGPSData(file);
-        response.removed_gps = true;
+        try {
+          await removeGPSData(file);
+          response.removed_gps = true;
+        } catch (e) {
+          logger.error(`Failed to remove GPS data from ${file.name} (${file.id}) - ${e.message}`);
+
+          response.removed_gps = false;
+        }
       }
 
       return res.json(response);
@@ -330,8 +336,14 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     }
 
     if (zconfig.exif.enabled && zconfig.exif.remove_gps && fileUpload.mimetype.startsWith('image/')) {
-      await removeGPSData(fileUpload);
-      response.removed_gps = true;
+      try {
+        await removeGPSData(fileUpload);
+        response.removed_gps = true;
+      } catch (e) {
+        logger.error(`Failed to remove GPS data from ${fileUpload.name} (${fileUpload.id}) - ${e.message}`);
+
+        response.removed_gps = false;
+      }
     }
   }
 

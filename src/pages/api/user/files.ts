@@ -41,7 +41,9 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
 
       logger.info(`User ${user.username} (${user.id}) deleted an image ${file.name} (${file.id})`);
 
-      delete file.password;
+      // @ts-ignore
+      if (file.password) file.password = true;
+
       return res.json(file);
     }
   } else if (req.method === 'PATCH') {
@@ -57,9 +59,20 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
         },
       });
 
-    delete image.password;
+    // @ts-ignore
+    if (file.password) file.password = true;
     return res.json(image);
   } else {
+    if (req.query.count) {
+      const count = await prisma.file.count({
+        where: {
+          userId: user.id,
+          favorite: !!req.query.favorite,
+        },
+      });
+
+      return res.json({ count });
+    }
     let files: {
       favorite: boolean;
       createdAt: Date;

@@ -27,11 +27,18 @@ export default function MetadataView({ fileId }) {
 
   const copy = (value) => {
     clipboard.copy(value);
-    showNotification({
-      title: 'Copied to clipboard',
-      message: value,
-      icon: <CopyIcon />,
-    });
+    if (!navigator.clipboard)
+      showNotification({
+        title: 'Unable to copy to clipboard',
+        message: 'Zipline is unable to copy to clipboard due to security reasons.',
+        color: 'red',
+      });
+    else
+      showNotification({
+        title: 'Copied to clipboard',
+        message: value,
+        icon: <CopyIcon />,
+      });
   };
 
   const searchValue = (value) => {

@@ -1,4 +1,5 @@
 import { Box, Button, Center, Checkbox, Group, Pagination, SimpleGrid, Skeleton, Title } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import File from 'components/File';
 import { FileIcon } from 'components/icons';
 import MutedText from 'components/MutedText';
@@ -13,6 +14,8 @@ export default function FilePagation({ disableMediaPreview, exifEnabled, queryPa
   const [checked, setChecked] = useRecoilState(showNonMediaSelector);
   const [numPages, setNumPages] = useState(Number(queryPage)); // just set it to the queryPage, since the req may have not loaded yet
   const [page, setPage] = useState(Number(queryPage));
+
+  const isMobile = useMediaQuery('(max-width: 768px)');
 
   const router = useRouter();
 
@@ -92,13 +95,15 @@ export default function FilePagation({ disableMediaPreview, exifEnabled, queryPa
             paddingBottom: 3,
           }}
         >
-          <div></div>
-          <Pagination total={numPages} page={page} onChange={setPage} />
-          <Checkbox
-            label='Show non-media files'
-            checked={checked}
-            onChange={(event) => setChecked(event.currentTarget.checked)}
-          />
+          {!isMobile && <div></div>}
+          <Pagination total={numPages} page={page} onChange={setPage} withEdges />
+          {!isMobile && (
+            <Checkbox
+              label='Show non-media files'
+              checked={checked}
+              onChange={(event) => setChecked(event.currentTarget.checked)}
+            />
+          )}
         </Box>
       ) : null}
     </>

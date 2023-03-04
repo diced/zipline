@@ -34,4 +34,9 @@ export default defineConfig([
     outDir: 'dist/scripts',
     ...opts,
   },
+  {
+    entryPoints: ['src/scripts/clear-zero-byte.ts'],
+    outDir: 'dist/scripts',
+    ...opts,
+  },
 ]);

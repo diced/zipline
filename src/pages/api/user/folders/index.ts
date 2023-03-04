@@ -81,7 +81,8 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
         const folder = folders[i];
         for (let j = 0; j !== folders[i].files.length; ++j) {
           const file = folder.files[j];
-          delete file.password;
+          // @ts-ignore
+          if (file.password) file.password = true;
 
           (folder.files[j] as unknown as { url: string }).url = formatRootUrl(
             config.uploader.route,

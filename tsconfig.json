@@ -27,12 +27,8 @@
   },
   "include": [
     "next-env.d.ts",
-    "zip-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "**/**/*.ts",
-    "**/**/*.tsx",
-    "prisma/seed.ts"
   ],
   "exclude": ["node_modules", "dist", ".yarn", ".next"]
 }

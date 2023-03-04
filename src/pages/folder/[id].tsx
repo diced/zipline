@@ -35,8 +35,8 @@ export default function Folder({ title, folder }: Props) {
         <title>{full_title}</title>
       </Head>
       <Container size='lg'>
-        <Title align='center' my='lg'>
-          Viewing folder: {folder.name}
+        <Title size={50} align='center' my='lg'>
+          {folder.name}
         </Title>
         <SimpleGrid
           my='md'
@@ -80,6 +80,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (context) => 
           id: true,
           views: true,
           createdAt: true,
+          password: true,
         },
       },
       user: {
@@ -100,6 +101,9 @@ export const getServerSideProps: GetServerSideProps<Props> = async (context) => 
       config.uploader.route,
       folder.files[j].name
     );
+
+    // @ts-ignore
+    if (folder.files[j].password) folder.files[j].password = true;
 
     (folder.files[j].createdAt as unknown) = folder.files[j].createdAt.toString();
   }
