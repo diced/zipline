@@ -1,16 +1,15 @@
-import { createStyles, MantineSize, Textarea } from '@mantine/core';
+import { createStyles, Textarea } from '@mantine/core';
 import { useEffect } from 'react';
 
-const useStyles = createStyles((theme, { size }: { size: MantineSize }) => ({
+const useStyles = createStyles(() => ({
   input: {
     fontFamily: 'monospace',
-    fontSize: theme.fn.size({ size, sizes: theme.fontSizes }) - 2,
     height: '80vh',
   },
 }));
 
 export default function CodeInput({ ...props }) {
-  const { classes } = useStyles({ size: 'md' }, { name: 'CodeInput' });
+  const { classes } = useStyles(null, { name: 'CodeInput' });
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
