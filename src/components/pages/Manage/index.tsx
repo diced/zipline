@@ -489,15 +489,11 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
           <Text>Preview:</Text>
           <Button
             leftIcon={fileDataURL ? <Image src={fileDataURL} height={32} radius='md' /> : <SettingsIcon />}
-            sx={(t) => ({
-              backgroundColor: '#00000000',
-              '&:hover': {
-                backgroundColor: t.other.hover,
-              },
-              color: t.colorScheme === 'dark' ? 'white' : 'black',
-            })}
             size='xl'
             p='sm'
+            variant='subtle'
+            color='gray'
+            compact
           >
             {user.username}
           </Button>

@@ -355,13 +355,9 @@ export default function Layout({ children, props }) {
                 <Menu.Target>
                   <Button
                     leftIcon={avatar ? <Image src={avatar} height={32} radius='md' /> : <SettingsIcon />}
-                    sx={(t) => ({
-                      backgroundColor: 'inherit',
-                      '&:hover': {
-                        backgroundColor: t.other.hover,
-                      },
-                      color: t.colorScheme === 'dark' ? 'white' : 'black',
-                    })}
+                    variant='subtle'
+                    color='gray'
+                    compact
                     size='xl'
                     p='sm'
                   >
