@@ -250,20 +250,27 @@ export default function validate(config): Config {
       }
     }
 
-    const arr = ['/view', '/dashboard', '/code', '/folder', '/api', '/auth'];
-    if (arr.includes(validated.uploader.route)) {
+    const reserved = ['/view', '/dashboard', '/code', '/folder', '/api', '/auth'];
+    if (reserved.some((r) => validated.uploader.route.startsWith(r))) {
       throw {
         errors: [`The uploader route cannot be ${validated.uploader.route}, this is a reserved route.`],
+        show: true,
       };
-    } else if (arr.includes(validated.urls.route)) {
+    } else if (reserved.some((r) => validated.urls.route.startsWith(r))) {
       throw {
         errors: [`The urls route cannot be ${validated.urls.route}, this is a reserved route.`],
+        show: true,
       };
     }
 
     return validated as unknown as Config;
   } catch (e) {
     if (process.env.ZIPLINE_DOCKER_BUILD) return null;
+
+    if (e.show) {
+      Logger.get('config').error('Config is invalid, see below:').error(e.errors.join('\n'));
+      process.exit(1);
+    }
 
     logger.debug(`config error: ${inspect(e, { depth: Infinity })}`);
 
