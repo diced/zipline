@@ -23,7 +23,8 @@
     "scripts:import-dir": "node --enable-source-maps dist/scripts/import-dir",
     "scripts:list-users": "node --enable-source-maps dist/scripts/list-users",
     "scripts:set-user": "node --enable-source-maps dist/scripts/set-user",
-    "scripts:clear-zero-byte": "node --enable-source-maps dist/scripts/clear-zero-byte"
+    "scripts:clear-zero-byte": "node --enable-source-maps dist/scripts/clear-zero-byte",
+    "scripts:query-size": "node --enable-source-maps dist/scripts/query-size"
   },
   "dependencies": {
     "@emotion/react": "^11.10.6",
