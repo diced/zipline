@@ -39,4 +39,9 @@ export default defineConfig([
     outDir: 'dist/scripts',
     ...opts,
   },
+  {
+    entryPoints: ['src/scripts/query-size.ts'],
+    outDir: 'dist/scripts',
+    ...opts,
+  },
 ]);

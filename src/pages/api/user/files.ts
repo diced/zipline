@@ -82,6 +82,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       expiresAt: Date;
       maxViews: number;
       views: number;
+      size: number;
     }[] = await prisma.file.findMany({
       where: {
         userId: user.id,
@@ -99,6 +100,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
         favorite: true,
         views: true,
         maxViews: true,
+        size: true,
       },
     });
 

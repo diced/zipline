@@ -58,6 +58,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     maxViews: number;
     views: number;
     folderId: number;
+    size: number;
     password: string | boolean;
   }[] = await prisma.file.findMany({
     where,
@@ -74,6 +75,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       views: true,
       maxViews: true,
       folderId: true,
+      size: true,
       password: true,
     },
     skip: page ? (Number(page) - 1) * pageCount : undefined,

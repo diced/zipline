@@ -299,6 +299,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         expiresAt: expiry,
         maxViews: fileMaxViews,
         originalName: req.headers['original-name'] ? file.originalname ?? null : null,
+        size: file.size,
       },
     });
 
