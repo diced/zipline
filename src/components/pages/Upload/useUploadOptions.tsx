@@ -118,6 +118,11 @@ export function OptionsModal({
             { value: '6m', label: '6 months' },
             { value: '8m', label: '8 months' },
             { value: '1y', label: '1 year' },
+            {
+              value: null,
+              label: 'Need more freedom? Set an exact date and time through the API.',
+              disabled: true,
+            },
           ]}
         />
         <Select
@@ -131,6 +136,12 @@ export function OptionsModal({
             { value: '25', label: 'Low (25%)' },
             { value: '50', label: 'Medium (50%)' },
             { value: '75', label: 'High (75%)' },
+            { value: '100', label: 'Maximum (100%)' },
+            {
+              value: null,
+              label: 'Need more freedom? Set a custom compression level through the API.',
+              disabled: true,
+            },
           ]}
         />
         <Select
