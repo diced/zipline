@@ -13,6 +13,7 @@ import {
   Navbar,
   NavLink,
   Paper,
+  rem,
   ScrollArea,
   Select,
   Text,
@@ -442,8 +443,12 @@ export default function Layout({ children, props }) {
         withBorder
         p='md'
         shadow='xs'
-        sx={(t) => ({
-          borderColor: t.colorScheme === 'dark' ? t.colors.dark[5] : t.colors.dark[0],
+        sx={(theme) => ({
+          '&[data-with-border]': {
+            border: `${rem(1)} solid ${
+              theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[0]
+            }`,
+          },
         })}
       >
         {children}

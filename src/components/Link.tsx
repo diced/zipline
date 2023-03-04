@@ -1,5 +1,6 @@
-import { NextLink } from '@mantine/next';
+import { Anchor } from '@mantine/core';
+import * as NextLink from 'next/link';
 
 export default function Link(props) {
-  return <NextLink legacyBehavior {...props} />;
+  return <Anchor component={NextLink} legacyBehavior {...props} />;
 }
