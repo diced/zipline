@@ -102,7 +102,7 @@ export default function Urls() {
         <form onSubmit={form.onSubmit((v) => onSubmit(v))}>
           <TextInput id='url' label='URL' {...form.getInputProps('url')} />
           <TextInput id='vanity' label='Vanity' {...form.getInputProps('vanity')} />
-          <NumberInput id='maxViews' label='Max Views' {...form.getInputProps('maxViews')} />
+          <NumberInput id='maxViews' label='Max Views' {...form.getInputProps('maxViews')} min={0} />
 
           <Group position='right' mt='md'>
             <Button onClick={() => setCreateOpen(false)}>Cancel</Button>
