@@ -1,4 +1,5 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import exts from 'lib/exts';
 
 export default async function uploadsRoute(this: FastifyInstance, req: FastifyRequest, reply: FastifyReply) {
   const { id } = req.params as { id: string };
@@ -16,7 +17,9 @@ export default async function uploadsRoute(this: FastifyInstance, req: FastifyRe
   const failed = await reply.preFile(image);
   if (failed) return reply.notFound();
 
-  if (image.password || image.embed || image.mimetype.startsWith('text/'))
+  const ext = image.name.split('.').pop();
+
+  if (image.password || image.embed || image.mimetype.startsWith('text/') || Object.keys(exts).includes(ext))
     return reply.redirect(`/view/${image.name}`);
   else return reply.dbFile(image);
 }
