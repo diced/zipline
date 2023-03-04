@@ -197,7 +197,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
   else if (prismRender && file.password) {
     const pass = file.password ? true : false;
-    delete file.password;
+    // @ts-ignore
+    if (file.password) file.password = true;
     return {
       props: {
         image: file,
@@ -214,7 +215,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     const data = await datasource.get(file.name);
     if (!data) return { notFound: true };
 
-    delete file.password;
+    // @ts-ignore
+    if (file.password) file.password = true;
 
     return {
       props: {
@@ -223,14 +225,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       },
     };
   }
+  // @ts-ignore
+  if (file.password) file.password = true;
 
-  const pass = file.password ? true : false;
-  delete file.password;
   return {
     props: {
       file,
       user,
-      pass,
+      pass: file.password ? true : false,
     },
   };
 };
