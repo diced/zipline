@@ -341,7 +341,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
   useEffect(() => {
     getExports();
     interval.start();
-  }, []);
+  }, [totpEnabled]);
 
   return (
     <>
