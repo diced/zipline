@@ -9,6 +9,7 @@ import useFetch from 'lib/hooks/useFetch';
 import { usePaginatedFiles, useRecent } from 'lib/queries/files';
 import { useStats } from 'lib/queries/stats';
 import { userSelector } from 'lib/recoil/user';
+import { bytesToHuman } from 'lib/utils/bytes';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
@@ -157,6 +158,7 @@ export default function Dashboard({ disableMediaPreview, exifEnabled }) {
           columns={[
             { accessor: 'name', sortable: true },
             { accessor: 'mimetype', sortable: true },
+            { accessor: 'size', sortable: true, render: (file) => bytesToHuman(file.size) },
             {
               accessor: 'createdAt',
               sortable: true,

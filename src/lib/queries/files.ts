@@ -9,6 +9,7 @@ export type UserFilesResponse = {
   id: string;
   favorite: boolean;
   url: string;
+  size: number;
 };
 
 export const useFiles = (query: { [key: string]: string } = {}) => {
