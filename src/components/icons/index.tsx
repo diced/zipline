@@ -42,6 +42,7 @@ import GlobeIcon from './GlobeIcon';
 import LockIcon from './LockIcon';
 import UnlockIcon from './UnlockIcon';
 import HardDriveIcon from './HardDriveIcon';
+import SearchIcon from './SearchIcon';
 
 export {
   ActivityIcon,
@@ -88,4 +89,5 @@ export {
   LockIcon,
   UnlockIcon,
   HardDriveIcon,
+  SearchIcon,
 };

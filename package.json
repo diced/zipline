@@ -37,6 +37,7 @@
     "@mantine/next": "^6.0.0",
     "@mantine/notifications": "^6.0.0",
     "@mantine/prism": "^6.0.0",
+    "@mantine/spotlight": "^6.0.0",
     "@prisma/client": "^4.10.1",
     "@prisma/internals": "^4.10.1",
     "@prisma/migrate": "^4.10.1",
