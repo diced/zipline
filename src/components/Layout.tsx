@@ -369,6 +369,17 @@ export default function Layout({ children, props }) {
                     {user.username} ({user.id}){' '}
                     {user.administrator && user.username !== 'administrator' ? '(Administrator)' : ''}
                   </Menu.Label>
+                  <Menu.Item component={Link} icon={<FileIcon />} href='/dashboard/files'>
+                    Files
+                  </Menu.Item>
+                  <Menu.Item component={Link} icon={<UploadIcon />} href='/dashboard/upload/file'>
+                    Upload File
+                  </Menu.Item>
+                  <Menu.Item component={Link} icon={<LinkIcon />} href='/dashboard/urls'>
+                    Shorten URL
+                  </Menu.Item>
+
+                  <Menu.Label>Settings</Menu.Label>
                   <Menu.Item component={Link} icon={<SettingsIcon />} href='/dashboard/manage'>
                     Manage Account
                   </Menu.Item>
@@ -380,6 +391,11 @@ export default function Layout({ children, props }) {
                   >
                     Copy Token
                   </Menu.Item>
+                  <Menu.Item icon={<LogoutIcon />} component={Link} href='/auth/logout'>
+                    Logout
+                  </Menu.Item>
+
+                  <Menu.Label>Danger</Menu.Label>
                   <Menu.Item
                     icon={<DeleteIcon />}
                     onClick={() => {
@@ -389,11 +405,13 @@ export default function Layout({ children, props }) {
                   >
                     Reset Token
                   </Menu.Item>
-                  <Menu.Item component={Link} icon={<LogoutIcon />} href='/auth/logout' color='red'>
-                    Logout
-                  </Menu.Item>
                   <Menu.Divider />
                   <>
+                    {oauth_providers.filter((x) =>
+                      user.oauth?.map(({ provider }) => provider.toLowerCase()).includes(x.name.toLowerCase())
+                    ).length ? (
+                      <Menu.Label>Connected Accounts</Menu.Label>
+                    ) : null}
                     {oauth_providers
                       .filter((x) =>
                         user.oauth
