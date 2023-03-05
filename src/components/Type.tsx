@@ -1,4 +1,3 @@
-import exts from 'lib/exts';
 import {
   Alert,
   Box,
@@ -11,8 +10,17 @@ import {
   Text,
   UnstyledButton,
 } from '@mantine/core';
+import {
+  IconFile,
+  IconFileAlert,
+  IconFileText,
+  IconFileUnknown,
+  IconHeadphones,
+  IconPhotoCancel,
+  IconPlayerPlay,
+} from '@tabler/icons-react';
+import exts from 'lib/exts';
 import { useEffect, useState } from 'react';
-import { AudioIcon, FileIcon, ImageIcon, PlayIcon } from './icons';
 import KaTeX from './render/KaTeX';
 import Markdown from './render/Markdown';
 import PrismCode from './render/PrismCode';
@@ -103,13 +111,13 @@ export default function Type({ file, popup = false, disableMediaPreview, ...prop
     );
 
   if (media && disableMediaPreview) {
-    return <Placeholder Icon={FileIcon} text={`Click to view file (${file.name})`} {...props} />;
+    return <Placeholder Icon={IconFile} text={`Click to view file (${file.name})`} {...props} />;
   }
 
   if (file.password) {
     return (
       <Placeholder
-        Icon={FileIcon}
+        Icon={IconFileAlert}
         text={`This file is password protected. Click to view file (${file.name})`}
         onClick={() => window.open(file.url)}
         {...props}
@@ -123,7 +131,7 @@ export default function Type({ file, popup = false, disableMediaPreview, ...prop
         video: <video width='100%' autoPlay muted controls {...props} />,
         image: (
           <Image
-            placeholder={<PlaceholderContent Icon={FileIcon} text={'Image failed to load...'} />}
+            placeholder={<PlaceholderContent Icon={IconPhotoCancel} text={'Image failed to load...'} />}
             {...props}
           />
         ),
@@ -146,17 +154,17 @@ export default function Type({ file, popup = false, disableMediaPreview, ...prop
     )
   ) : media ? (
     {
-      video: <Placeholder Icon={PlayIcon} text={`Click to view video (${file.name})`} {...props} />,
+      video: <Placeholder Icon={IconPlayerPlay} text={`Click to view video (${file.name})`} {...props} />,
       image: (
         <Image
-          placeholder={<PlaceholderContent Icon={ImageIcon} text={'Image failed to load...'} />}
+          placeholder={<PlaceholderContent Icon={IconPhotoCancel} text={'Image failed to load...'} />}
           {...props}
         />
       ),
-      audio: <Placeholder Icon={AudioIcon} text={`Click to view audio (${file.name})`} {...props} />,
-      text: <Placeholder Icon={FileIcon} text={`Click to view text file (${file.name})`} {...props} />,
+      audio: <Placeholder Icon={IconHeadphones} text={`Click to view audio (${file.name})`} {...props} />,
+      text: <Placeholder Icon={IconFileText} text={`Click to view text file (${file.name})`} {...props} />,
     }[type]
   ) : (
-    <Placeholder Icon={FileIcon} text={`Click to view file (${file.name})`} {...props} />
+    <Placeholder Icon={IconFileUnknown} text={`Click to view file (${file.name})`} {...props} />
   );
 }

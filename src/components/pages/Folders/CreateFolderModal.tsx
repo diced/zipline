@@ -1,7 +1,7 @@
 import { Button, Group, Modal, TextInput, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { showNotification } from '@mantine/notifications';
-import { CrossIcon, FolderIcon } from 'components/icons';
+import { IconFolderPlus, IconFolderX } from '@tabler/icons-react';
 import MutedText from 'components/MutedText';
 import useFetch from 'hooks/useFetch';
 import { useRouter } from 'next/router';
@@ -25,14 +25,14 @@ export default function CreateFolderModal({ open, setOpen, updateFolders, create
       showNotification({
         title: 'Failed to create folder',
         message: res.error,
-        icon: <CrossIcon />,
+        icon: <IconFolderX size='1rem' />,
         color: 'red',
       });
     } else {
       showNotification({
         title: 'Created folder ' + res.name,
         message: createWithFile ? 'Added file to folder' : undefined,
-        icon: <FolderIcon />,
+        icon: <IconFolderPlus size='1rem' />,
         color: 'green',
       });
 

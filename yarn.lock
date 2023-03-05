@@ -2414,6 +2414,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tabler/icons-react@npm:^2.7.0":
+  version: 2.7.0
+  resolution: "@tabler/icons-react@npm:2.7.0"
+  dependencies:
+    "@tabler/icons": 2.7.0
+    prop-types: ^15.7.2
+  peerDependencies:
+    react: ^16.5.1 || ^17.0.0 || ^18.0.0
+  checksum: 365e130dd3904e1b7e224a3f9c839744e48ae5f1bd59968c9e439fc1d635b95028a117aa08c1759f0fc943d82dfbd1e78f9ac31c7fdcaf20baed036c372e9e52
+  languageName: node
+  linkType: hard
+
+"@tabler/icons@npm:2.7.0":
+  version: 2.7.0
+  resolution: "@tabler/icons@npm:2.7.0"
+  checksum: db6b61b1a02ed74d1f9fd6943175dbfd1c8f24dae30cd56f4bc86d214d8e4ecf9e28022d16cbb3a3064780ee3543610f53e65f3592ea9f9ca22ddeebf4ec44ee
+  languageName: node
+  linkType: hard
+
 "@tanstack/query-core@npm:4.24.10":
   version: 4.24.10
   resolution: "@tanstack/query-core@npm:4.24.10"
@@ -9294,17 +9313,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-feather@npm:^2.0.10":
-  version: 2.0.10
-  resolution: "react-feather@npm:2.0.10"
-  dependencies:
-    prop-types: ^15.7.2
-  peerDependencies:
-    react: ">=16.8.6"
-  checksum: 75acb29ee4352cd4e2a509ca81e15f3b553439c069dac19035503d53c0fe2b6133d65f5e32ccdb61ed1514cfda1b615e34de6a9640973a7bda283b7eb98850a1
-  languageName: node
-  linkType: hard
-
 "react-is@npm:^16.10.2, react-is@npm:^16.13.1, react-is@npm:^16.7.0":
   version: 16.13.1
   resolution: "react-is@npm:16.13.1"
@@ -11695,6 +11703,7 @@ __metadata:
     "@prisma/internals": ^4.10.1
     "@prisma/migrate": ^4.10.1
     "@sapphire/shapeshift": ^3.8.1
+    "@tabler/icons-react": ^2.7.0
     "@tanstack/react-query": ^4.24.10
     "@types/cookie": ^0.5.1
     "@types/katex": ^0.16.0
@@ -11733,7 +11742,6 @@ __metadata:
     qrcode: ^1.5.1
     react: ^18.2.0
     react-dom: ^18.2.0
-    react-feather: ^2.0.10
     react-markdown: ^8.0.5
     recharts: ^2.4.3
     recoil: ^0.7.6

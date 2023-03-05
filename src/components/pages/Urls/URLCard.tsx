@@ -1,8 +1,7 @@
 import { ActionIcon, Card, Group, LoadingOverlay, Stack, Title, Tooltip } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { showNotification } from '@mantine/notifications';
-import { CopyIcon, CrossIcon, DeleteIcon, ExternalLinkIcon } from 'components/icons';
-import TrashIcon from 'components/icons/TrashIcon';
+import { IconClipboardCopy, IconExternalLink, IconLink, IconLinkOff, IconTrash } from '@tabler/icons-react';
 import Link from 'components/Link';
 import MutedText from 'components/MutedText';
 import { URLResponse, useURLDelete } from 'lib/queries/url';
@@ -24,7 +23,7 @@ export default function URLCard({ url }: { url: URLResponse }) {
       showNotification({
         title: 'Copied to clipboard',
         message: '',
-        icon: <CopyIcon />,
+        icon: <IconClipboardCopy size='1rem' />,
       });
   };
 
@@ -34,7 +33,7 @@ export default function URLCard({ url }: { url: URLResponse }) {
         showNotification({
           title: 'Deleted URL',
           message: '',
-          icon: <CrossIcon />,
+          icon: <IconLink size='1rem' />,
           color: 'green',
         });
       },
@@ -43,7 +42,7 @@ export default function URLCard({ url }: { url: URLResponse }) {
         showNotification({
           title: 'Failed to delete URL',
           message: url.error,
-          icon: <DeleteIcon />,
+          icon: <IconLinkOff size='1rem' />,
           color: 'red',
         });
       },
@@ -79,13 +78,13 @@ export default function URLCard({ url }: { url: URLResponse }) {
         </Group>
         <Stack>
           <ActionIcon href={url.url} component='a' target='_blank'>
-            <ExternalLinkIcon />
+            <IconExternalLink size='1rem' />
           </ActionIcon>
           <ActionIcon aria-label='copy' onClick={() => copyURL(url)}>
-            <CopyIcon />
+            <IconClipboardCopy size='1rem' />
           </ActionIcon>
           <ActionIcon aria-label='delete' onClick={() => deleteURL(url)}>
-            <TrashIcon />
+            <IconTrash size='1rem' />
           </ActionIcon>
         </Stack>
       </Group>

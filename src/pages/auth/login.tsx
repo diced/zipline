@@ -7,7 +7,6 @@ import {
   Divider,
   Group,
   Modal,
-  NumberInput,
   PasswordInput,
   PinInput,
   Text,

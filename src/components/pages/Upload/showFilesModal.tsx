@@ -1,6 +1,6 @@
-import { ActionIcon, Box, Button, Group, Stack, Table, Title, Tooltip } from '@mantine/core';
+import { ActionIcon, Group, Stack, Table, Title, Tooltip } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
-import { CopyIcon, LinkIcon } from 'components/icons';
+import { IconClipboardCopy, IconExternalLink } from '@tabler/icons-react';
 import Link from 'components/Link';
 
 export default function showFilesModal(clipboard, modals, files: string[]) {
@@ -17,7 +17,7 @@ export default function showFilesModal(clipboard, modals, files: string[]) {
       showNotification({
         title: 'Copied to clipboard',
         message: <Link href={files[idx]}>{files[idx]}</Link>,
-        icon: <CopyIcon />,
+        icon: <IconClipboardCopy size='1rem' />,
       });
   };
 
@@ -35,12 +35,12 @@ export default function showFilesModal(clipboard, modals, files: string[]) {
               <Group position='right'>
                 <Tooltip label='Open link in a new tab'>
                   <ActionIcon onClick={() => open(idx)} variant='filled' color='primary'>
-                    <LinkIcon />
+                    <IconExternalLink size='1rem' />
                   </ActionIcon>
                 </Tooltip>
                 <Tooltip label='Copy link to clipboard'>
                   <ActionIcon onClick={() => copy(idx)} variant='filled' color='primary'>
-                    <CopyIcon />
+                    <IconClipboardCopy size='1rem' />
                   </ActionIcon>
                 </Tooltip>
               </Group>

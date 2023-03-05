@@ -1,6 +1,6 @@
 import { Accordion, ActionIcon, Box, Group, Pagination, SimpleGrid, Title } from '@mantine/core';
+import { IconFileUpload } from '@tabler/icons-react';
 import File from 'components/File';
-import { PlusIcon } from 'components/icons';
 import useFetch from 'hooks/useFetch';
 import { usePaginatedFiles } from 'lib/queries/files';
 import Link from 'next/link';
@@ -25,7 +25,7 @@ export default function Files({ disableMediaPreview, exifEnabled, queryPage }) {
         <Title>Files</Title>
         <Link href='/dashboard/upload/file' passHref legacyBehavior>
           <ActionIcon component='a' variant='filled' color='primary'>
-            <PlusIcon />
+            <IconFileUpload size='1rem' />
           </ActionIcon>
         </Link>
       </Group>

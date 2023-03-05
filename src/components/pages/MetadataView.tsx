@@ -1,7 +1,7 @@
 import { Button, Center, Group, Skeleton, Table, TextInput, Title } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { showNotification } from '@mantine/notifications';
-import { CopyIcon } from 'components/icons';
+import { IconClipboardCopy } from '@tabler/icons-react';
 import useFetch from 'hooks/useFetch';
 import { useEffect, useState } from 'react';
 
@@ -37,7 +37,7 @@ export default function MetadataView({ fileId }) {
       showNotification({
         title: 'Copied to clipboard',
         message: value,
-        icon: <CopyIcon />,
+        icon: <IconClipboardCopy size='1rem' />,
       });
   };
 

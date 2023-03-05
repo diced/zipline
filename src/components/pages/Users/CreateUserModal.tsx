@@ -1,7 +1,7 @@
 import { Button, Group, Modal, Switch, TextInput, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { showNotification } from '@mantine/notifications';
-import { DeleteIcon, PlusIcon } from 'components/icons';
+import { IconUserPlus, IconUserX } from '@tabler/icons-react';
 import useFetch from 'hooks/useFetch';
 
 export function CreateUserModal({ open, setOpen, updateUsers }) {
@@ -31,14 +31,14 @@ export function CreateUserModal({ open, setOpen, updateUsers }) {
       showNotification({
         title: 'Failed to create user',
         message: res.error,
-        icon: <DeleteIcon />,
+        icon: <IconUserX size='1rem' />,
         color: 'red',
       });
     } else {
       showNotification({
         title: 'Created user: ' + cleanUsername,
         message: '',
-        icon: <PlusIcon />,
+        icon: <IconUserPlus size='1rem' />,
         color: 'green',
       });
     }
@@ -55,7 +55,9 @@ export function CreateUserModal({ open, setOpen, updateUsers }) {
 
         <Group position='right' mt='md'>
           <Button onClick={() => setOpen(false)}>Cancel</Button>
-          <Button type='submit'>Create</Button>
+          <Button type='submit' rightIcon={<IconUserPlus size='1rem' />}>
+            Create
+          </Button>
         </Group>
       </form>
     </Modal>

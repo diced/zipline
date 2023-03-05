@@ -2,16 +2,18 @@ import { useClipboard } from '@mantine/hooks';
 import { showNotification } from '@mantine/notifications';
 import type { SpotlightAction } from '@mantine/spotlight';
 import {
-  FileIcon,
-  FolderIcon,
-  HomeIcon,
-  ActivityIcon,
-  LinkIcon,
-  UserIcon,
-  LogoutIcon,
-  CopyIcon,
-  SearchIcon,
-} from 'components/icons';
+  IconClipboardCopy,
+  IconFiles,
+  IconFileText,
+  IconFileUpload,
+  IconFolders,
+  IconGraph,
+  IconHelp,
+  IconHome,
+  IconLink,
+  IconLogout,
+  IconUser,
+} from '@tabler/icons-react';
 import { NextRouter } from 'next/router';
 import { useRecoilValue } from 'recoil';
 import { userSelector } from './recoil/user';
@@ -57,46 +59,46 @@ export const createSpotlightActions = (router: NextRouter): SpotlightAction[] =>
 
   return [
     // Navigation
-    actionLink('Navigation', 'Home', 'Go to the home page', '/dashboard', <HomeIcon />),
-    actionLink('Navigation', 'Files', 'View your files', '/dashboard/files', <FileIcon />),
-    actionLink('Navigation', 'URLs', 'View your URLs', '/dashboard/urls', <LinkIcon />),
-    actionLink('Navigation', 'Folders', 'View your folders', '/dashboard/folders', <FolderIcon />),
-    actionLink('Navigation', 'Statistics', 'View your statistics', '/dashboard/stats', <ActivityIcon />),
+    actionLink('Navigation', 'Home', 'Go to the home page', '/dashboard', <IconHome />),
+    actionLink('Navigation', 'Files', 'View your files', '/dashboard/files', <IconFiles />),
+    actionLink('Navigation', 'URLs', 'View your URLs', '/dashboard/urls', <IconLink />),
+    actionLink('Navigation', 'Folders', 'View your folders', '/dashboard/folders', <IconFolders />),
+    actionLink('Navigation', 'Statistics', 'View your statistics', '/dashboard/stats', <IconGraph />),
     actionLink(
       'Navigation',
       'Manage Account',
       'Manage your account settings',
       '/dashboard/manage',
-      <UserIcon />
+      <IconUser />
     ),
 
     // Actions
-    actionLink('Actions', 'Logout', 'Logout of your account', '/auth/logout', <LogoutIcon />),
-    actionLink('Actions', 'Upload Files', 'Upload files of any kind', '/dashboard/upload/file', <FileIcon />),
+    actionLink('Actions', 'Logout', 'Logout of your account', '/auth/logout', <IconLogout />),
+    actionLink(
+      'Actions',
+      'Upload Files',
+      'Upload files of any kind',
+      '/dashboard/upload/file',
+      <IconFileUpload />
+    ),
     actionLink(
       'Actions',
       'Upload Text',
       'Upload code, or any other kind of text file',
       '/dashboard/upload/text',
-      <FileIcon />
+      <IconFileText />
     ),
-    actionDo('Actions', 'Copy Token', 'Copy your API token to your clipboard', <CopyIcon />, () => {
+    actionDo('Actions', 'Copy Token', 'Copy your API token to your clipboard', <IconClipboardCopy />, () => {
       clipboard.copy(user.token);
       showNotification({
         title: 'Copied to clipboard',
         message: '',
         color: 'green',
-        icon: <CopyIcon />,
+        icon: <IconClipboardCopy />,
       });
     }),
 
-    actionLink(
-      'Help',
-      'Documentation',
-      'View the documentation',
-      'https://zipline.diced.tech',
-      <SearchIcon />
-    ),
+    actionLink('Help', 'Documentation', 'View the documentation', 'https://zipline.diced.tech', <IconHelp />),
 
     // the list of actions here is very incomplete, and will be expanded in the future
   ];

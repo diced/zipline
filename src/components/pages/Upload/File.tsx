@@ -1,23 +1,10 @@
-import {
-  Box,
-  Button,
-  Collapse,
-  Group,
-  NumberInput,
-  PasswordInput,
-  Progress,
-  Select,
-  Stack,
-  Text,
-  Title,
-  Tooltip,
-} from '@mantine/core';
+import { Button, Collapse, Group, Progress, Stack, Title } from '@mantine/core';
 import { randomId, useClipboard } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
 import { showNotification, updateNotification } from '@mantine/notifications';
+import { IconFileTime, IconFileUpload, IconFileX } from '@tabler/icons-react';
 import Dropzone from 'components/dropzone/Dropzone';
 import FileDropzone from 'components/dropzone/DropzoneFile';
-import { ClockIcon, CrossIcon, UploadIcon } from 'components/icons';
 import MutedText from 'components/MutedText';
 import { invalidateFiles } from 'lib/queries/files';
 import { userSelector } from 'lib/recoil/user';
@@ -83,7 +70,7 @@ export default function File({ chunks: chunks_config }) {
             id: 'upload-chunked',
             title: 'Finalizing partial upload',
             message: 'This may take a while...',
-            icon: <ClockIcon />,
+            icon: <IconFileTime size='1rem' />,
             color: 'yellow',
             autoClose: false,
           });
@@ -108,7 +95,7 @@ export default function File({ chunks: chunks_config }) {
                 title: `Uploading chunk ${j + 1}/${chunks.length} Successful`,
                 message: '',
                 color: 'green',
-                icon: <UploadIcon />,
+                icon: <IconFileUpload size='1rem' />,
                 autoClose: false,
               });
 
@@ -118,7 +105,7 @@ export default function File({ chunks: chunks_config }) {
                   title: 'Upload Successful',
                   message: '',
                   color: 'green',
-                  icon: <UploadIcon />,
+                  icon: <IconFileUpload size='1rem' />,
                 });
                 showFilesModal(clipboard, modals, json.files);
                 invalidateFiles();
@@ -143,7 +130,7 @@ export default function File({ chunks: chunks_config }) {
                 title: `Uploading chunk ${j + 1}/${chunks.length} Failed`,
                 message: json.error,
                 color: 'red',
-                icon: <CrossIcon />,
+                icon: <IconFileX size='1rem' />,
                 autoClose: false,
               });
               ready = false;
@@ -237,7 +224,7 @@ export default function File({ chunks: chunks_config }) {
             title: 'Upload Successful',
             message: '',
             color: 'green',
-            icon: <UploadIcon />,
+            icon: <IconFileUpload size='1rem' />,
           });
           showFilesModal(clipboard, modals, json.files);
           setFiles([]);
@@ -260,7 +247,7 @@ export default function File({ chunks: chunks_config }) {
             title: 'Upload Failed',
             message: json.error,
             color: 'red',
-            icon: <CrossIcon />,
+            icon: <IconFileX size='1rem' />,
           });
         }
         setProgress(0);
@@ -320,7 +307,7 @@ export default function File({ chunks: chunks_config }) {
                 Clear Files
               </Button>
               <Button
-                leftIcon={<UploadIcon />}
+                leftIcon={<IconFileUpload size='1rem' />}
                 onClick={handleUpload}
                 disabled={files.length === 0 ? true : false}
               >

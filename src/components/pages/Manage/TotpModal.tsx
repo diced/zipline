@@ -1,7 +1,6 @@
-import { Button, Center, Image, Modal, NumberInput, PinInput, Text, Title } from '@mantine/core';
+import { Button, Center, Image, Modal, PinInput, Text, Title } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
-import { useForm } from '@mantine/form';
-import { CheckIcon, CrossIcon } from 'components/icons';
+import { Icon2fa, IconBarcodeOff, IconCheck } from '@tabler/icons-react';
 import useFetch from 'hooks/useFetch';
 import { useEffect, useState } from 'react';
 
@@ -21,7 +20,7 @@ export function TotpModal({ opened, onClose, deleteTotp, setTotpEnabled }) {
             title: 'Error',
             message: "Can't generate code as you are already using MFA",
             color: 'red',
-            icon: <CrossIcon />,
+            icon: <IconBarcodeOff />,
           });
         } else {
           setSecret(data.secret);
@@ -48,9 +47,9 @@ export function TotpModal({ opened, onClose, deleteTotp, setTotpEnabled }) {
     } else {
       showNotification({
         title: 'Success',
-        message: 'Successfully disabled MFA',
+        message: 'Successfully disabled 2FA',
         color: 'green',
-        icon: <CheckIcon />,
+        icon: <Icon2fa />,
       });
 
       setTotpEnabled(false);
@@ -79,9 +78,9 @@ export function TotpModal({ opened, onClose, deleteTotp, setTotpEnabled }) {
     } else {
       showNotification({
         title: 'Success',
-        message: 'Successfully enabled MFA',
+        message: 'Successfully enabled 2FA',
         color: 'green',
-        icon: <CheckIcon />,
+        icon: <Icon2fa />,
       });
 
       setTotpEnabled(true);
@@ -147,7 +146,14 @@ export function TotpModal({ opened, onClose, deleteTotp, setTotpEnabled }) {
         </Text>
       )}
 
-      <Button disabled={disabled} size='lg' fullWidth mt='md' rightIcon={<CheckIcon />} type='submit'>
+      <Button
+        disabled={disabled}
+        size='lg'
+        fullWidth
+        mt='md'
+        rightIcon={<IconCheck size='1rem' />}
+        type='submit'
+      >
         Verify{deleteTotp ? ' and Disable' : ''}
       </Button>
     </Modal>

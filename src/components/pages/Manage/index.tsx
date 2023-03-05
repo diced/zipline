@@ -20,19 +20,22 @@ import { randomId, useInterval, useMediaQuery } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
 import { showNotification, updateNotification } from '@mantine/notifications';
 import {
-  CheckIcon,
-  CrossIcon,
-  DeleteIcon,
-  DiscordIcon,
-  FlameshotIcon,
-  GitHubIcon,
-  GoogleIcon,
-  RefreshIcon,
-  SettingsIcon,
-  ShareXIcon,
-} from 'components/icons';
-import DownloadIcon from 'components/icons/DownloadIcon';
-import TrashIcon from 'components/icons/TrashIcon';
+  IconFileExport,
+  IconFiles,
+  IconFilesOff,
+  IconFileZip,
+  IconGraph,
+  IconGraphOff,
+  IconPhotoMinus,
+  IconReload,
+  IconSettings,
+  IconTrash,
+  IconUserCheck,
+  IconUserExclamation,
+  IconUserMinus,
+  IconUserX,
+} from '@tabler/icons-react';
+import { DiscordIcon, FlameshotIcon, GitHubIcon, GoogleIcon, ShareXIcon } from 'components/icons';
 import Link from 'components/Link';
 import MutedText from 'components/MutedText';
 import { SmallTable } from 'components/SmallTable';
@@ -127,7 +130,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
         title: "Couldn't save user",
         message: newUser.error,
         color: 'red',
-        icon: <CrossIcon />,
+        icon: <IconUserX size='1rem' />,
       });
     } else {
       setUser(newUser);
@@ -135,6 +138,8 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
         id: 'update-user',
         title: 'Saved User',
         message: '',
+        color: 'green',
+        icon: <IconUserCheck size='1rem' />,
       });
     }
   };
@@ -201,7 +206,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
             </>
           ),
           color: 'red',
-          icon: <CrossIcon />,
+          icon: <IconUserX size='1rem' />,
         });
       }
       updateNotification({
@@ -209,7 +214,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
         title: "Couldn't save user",
         message: newUser.error,
         color: 'red',
-        icon: <CrossIcon />,
+        icon: <IconUserX size='1rem' />,
       });
     } else {
       setUser(newUser);
@@ -217,6 +222,8 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
         id: 'update-user',
         title: 'Saved User',
         message: '',
+        color: 'green',
+        icon: <IconUserCheck size='1rem' />,
       });
     }
   };
@@ -235,7 +242,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
         title: 'Error exporting data',
         message: res.error,
         color: 'red',
-        icon: <CrossIcon />,
+        icon: <IconFileExport size='1rem' />,
       });
     }
   };
@@ -264,14 +271,14 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
         title: "Couldn't delete files",
         message: res.error,
         color: 'red',
-        icon: <CrossIcon />,
+        icon: <IconFilesOff size='1rem' />,
       });
     } else {
       showNotification({
         title: 'Deleted files',
         message: `${res.count} files deleted`,
         color: 'green',
-        icon: <DeleteIcon />,
+        icon: <IconFiles size='1rem' />,
       });
     }
   };
@@ -303,14 +310,14 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
         title: 'Error updating stats',
         message: res.error,
         color: 'red',
-        icon: <CrossIcon />,
+        icon: <IconGraphOff size='1rem' />,
       });
     } else {
       showNotification({
         title: 'Updated stats',
         message: '',
         color: 'green',
-        icon: <CheckIcon />,
+        icon: <IconGraph size='1rem' />,
       });
     }
   };
@@ -324,7 +331,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
         title: 'Error while unlinking from OAuth',
         message: res.error,
         color: 'red',
-        icon: <CrossIcon />,
+        icon: <IconUserExclamation size='1rem' />,
       });
     } else {
       setUser(res);
@@ -332,7 +339,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
         title: `Unlinked from ${provider[0] + provider.slice(1).toLowerCase()}`,
         message: '',
         color: 'green',
-        icon: <CheckIcon />,
+        icon: <IconUserMinus size='1rem' />,
       });
     }
   };
@@ -464,7 +471,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
                 key={i}
                 onClick={() => handleOauthUnlink(provider)}
                 size='lg'
-                leftIcon={<TrashIcon />}
+                leftIcon={<IconTrash size='1rem' />}
                 my='sm'
                 color='red'
               >
@@ -488,7 +495,9 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
         <Card mt='md'>
           <Text>Preview:</Text>
           <Button
-            leftIcon={fileDataURL ? <Image src={fileDataURL} height={32} radius='md' /> : <SettingsIcon />}
+            leftIcon={
+              fileDataURL ? <Image src={fileDataURL} height={32} radius='md' /> : <IconSettings size='1rem' />
+            }
             size='xl'
             p='sm'
             variant='subtle'
@@ -519,15 +528,15 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
       </Box>
 
       <Group my='md' grow={useMediaQuery('(max-width: 768px)')}>
-        <Button onClick={openDeleteModal} rightIcon={<DeleteIcon />} color='red'>
+        <Button onClick={openDeleteModal} rightIcon={<IconPhotoMinus size='1rem' />} color='red'>
           Delete All Data
         </Button>
         <ExportDataTooltip>
-          <Button onClick={exportData} rightIcon={<DownloadIcon />}>
+          <Button onClick={exportData} rightIcon={<IconFileZip size='1rem' />}>
             Export Data
           </Button>
         </ExportDataTooltip>
-        <Button onClick={getExports} rightIcon={<RefreshIcon />}>
+        <Button onClick={getExports} rightIcon={<IconReload size='1rem' />}>
           Refresh
         </Button>
       </Group>
@@ -562,10 +571,15 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
         <Box mt='md'>
           <Title>Server</Title>
           <Group my='md' grow={useMediaQuery('(max-width: 768px)')}>
-            <Button size='md' onClick={forceUpdateStats} color='red' rightIcon={<RefreshIcon />}>
+            <Button size='md' onClick={forceUpdateStats} color='red' rightIcon={<IconReload size='1rem' />}>
               Force Update Stats
             </Button>
-            <Button size='md' onClick={() => setClrStorOpen(true)} color='red' rightIcon={<TrashIcon />}>
+            <Button
+              size='md'
+              onClick={() => setClrStorOpen(true)}
+              color='red'
+              rightIcon={<IconTrash size='1rem' />}
+            >
               Delete all uploads
             </Button>
           </Group>
@@ -577,7 +591,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
         <Button
           size='xl'
           onClick={() => setShareXOpen(true)}
-          rightIcon={<ShareXIcon />}
+          rightIcon={<ShareXIcon size='1rem' />}
           sx={{
             '@media screen and (max-width: 768px)': {
               width: '100%',
@@ -589,7 +603,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
         <Button
           size='xl'
           onClick={() => setFlameshotOpen(true)}
-          rightIcon={<FlameshotIcon />}
+          rightIcon={<FlameshotIcon size='1rem' />}
           sx={{
             '@media screen and (max-width: 768px)': {
               width: '100%',

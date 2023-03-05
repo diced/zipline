@@ -1,7 +1,7 @@
 import { Button, Group, Modal, Switch, TextInput, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { showNotification } from '@mantine/notifications';
-import { DeleteIcon, PlusIcon } from 'components/icons';
+import { IconUserCheck, IconUserExclamation } from '@tabler/icons-react';
 import useFetch from 'hooks/useFetch';
 
 export function EditUserModal({ open, setOpen, updateUsers, user }) {
@@ -36,14 +36,14 @@ export function EditUserModal({ open, setOpen, updateUsers, user }) {
       showNotification({
         title: 'Failed to edit user',
         message: res.error,
-        icon: <DeleteIcon />,
+        icon: <IconUserExclamation size='1rem' />,
         color: 'red',
       });
     } else {
       showNotification({
         title: 'Edited user: ' + cleanUsername,
         message: '',
-        icon: <PlusIcon />,
+        icon: <IconUserCheck size='1rem' />,
         color: 'green',
       });
     }

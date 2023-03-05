@@ -12,17 +12,17 @@ import matcha_dark_azul from 'lib/themes/matcha_dark_azul';
 import nord from 'lib/themes/nord';
 import qogir_dark from 'lib/themes/qogir_dark';
 
-import { createEmotionCache, MantineProvider, MantineThemeOverride, Modal, ScrollArea } from '@mantine/core';
+import { createEmotionCache, MantineProvider, MantineThemeOverride } from '@mantine/core';
 import { useColorScheme } from '@mantine/hooks';
 import { ModalsProvider } from '@mantine/modals';
-import { SpotlightProvider } from '@mantine/spotlight';
 import { Notifications } from '@mantine/notifications';
+import { SpotlightProvider } from '@mantine/spotlight';
 import { userSelector } from 'lib/recoil/user';
 import { useRecoilValue } from 'recoil';
-import { SearchIcon } from './icons';
 
-import { useRouter } from 'next/router';
 import { createSpotlightActions } from 'lib/spotlight';
+import { useRouter } from 'next/router';
+import { IconSearch } from '@tabler/icons-react';
 
 export const themes = {
   system: (colorScheme: 'dark' | 'light') => (colorScheme === 'dark' ? dark_blue : light_blue),
@@ -148,7 +148,7 @@ export default function ZiplineTheming({ Component, pageProps, ...props }) {
     >
       <ModalsProvider>
         <SpotlightProvider
-          searchIcon={<SearchIcon />}
+          searchIcon={<IconSearch />}
           shortcut={['mod + k', '/']}
           actions={createSpotlightActions(router)}
         >

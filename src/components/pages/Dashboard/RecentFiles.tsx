@@ -1,9 +1,9 @@
 import { Card as MantineCard, Center, Group, SimpleGrid, Skeleton, Title } from '@mantine/core';
 import { randomId } from '@mantine/hooks';
+import { IconCloudUpload } from '@tabler/icons-react';
 import File from 'components/File';
 import MutedText from 'components/MutedText';
 import { useRecent } from 'lib/queries/files';
-import { UploadCloud } from 'react-feather';
 
 export default function RecentFiles({ disableMediaPreview, exifEnabled }) {
   const recent = useRecent('media');
@@ -32,7 +32,7 @@ export default function RecentFiles({ disableMediaPreview, exifEnabled }) {
               <Center>
                 <Group>
                   <div>
-                    <UploadCloud size={48} />
+                    <IconCloudUpload size={48} />
                   </div>
                   <div>
                     <Title>Nothing here</Title>
