@@ -96,7 +96,7 @@ export default function FilePagation({ disableMediaPreview, exifEnabled, queryPa
           }}
         >
           {!isMobile && <div></div>}
-          <Pagination total={numPages} page={page} onChange={setPage} withEdges />
+          <Pagination total={numPages} value={page} onChange={setPage} withEdges />
           {!isMobile && (
             <Checkbox
               label='Show non-media files'

@@ -14,6 +14,7 @@ import { showNotification } from '@mantine/notifications';
 import useFetch from 'hooks/useFetch';
 import { useFileDelete, useFileFavorite } from 'lib/queries/files';
 import { useFolders } from 'lib/queries/folders';
+import { bytesToHuman } from 'lib/utils/bytes';
 import { relativeTime } from 'lib/utils/client';
 import { useState } from 'react';
 import { FileMeta } from '.';
@@ -29,6 +30,7 @@ import {
   FileIcon,
   FolderMinusIcon,
   FolderPlusIcon,
+  HardDriveIcon,
   HashIcon,
   ImageIcon,
   InfoIcon,
@@ -229,6 +231,7 @@ export default function FileModal({
         >
           <FileMeta Icon={FileIcon} title='Name' subtitle={file.name} />
           <FileMeta Icon={ImageIcon} title='Type' subtitle={file.mimetype} />
+          <FileMeta Icon={HardDriveIcon} title='Size' subtitle={bytesToHuman(file.size || 0)} />
           <FileMeta Icon={EyeIcon} title='Views' subtitle={file?.views?.toLocaleString()} />
           {file.maxViews && (
             <FileMeta

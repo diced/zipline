@@ -132,7 +132,7 @@ export default function Invites() {
     modals.openConfirmModal({
       title: `Delete ${invite.code}?`,
       centered: true,
-      overlayBlur: 3,
+      overlayProps: { blur: 3 },
       labels: { confirm: 'Yes', cancel: 'No' },
       onConfirm: async () => {
         const res = await useFetch(`/api/auth/invite?code=${invite.code}`, 'DELETE');

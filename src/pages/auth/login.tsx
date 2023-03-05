@@ -6,6 +6,8 @@ import {
   Modal,
   NumberInput,
   PasswordInput,
+  PinInput,
+  Text,
   TextInput,
   Title,
 } from '@mantine/core';
@@ -23,9 +25,10 @@ export default function Login({ title, user_registration, oauth_registration, oa
 
   // totp modal
   const [totpOpen, setTotpOpen] = useState(false);
-  const [code, setCode] = useState(undefined);
   const [error, setError] = useState('');
   const [disabled, setDisabled] = useState(false);
+
+  const [loading, setLoading] = useState(false);
 
   const oauth_providers = JSON.parse(unparsed);
 
@@ -46,8 +49,10 @@ export default function Login({ title, user_registration, oauth_registration, oa
     },
   });
 
-  const onSubmit = async (values) => {
+  const onSubmit = async (values, code = null) => {
+    setLoading(true);
     setError('');
+    setDisabled(true);
     const username = values.username.trim();
     const password = values.password.trim();
 
@@ -65,17 +70,28 @@ export default function Login({ title, user_registration, oauth_registration, oa
       } else if (res.totp) {
         if (res.code === 400) {
           setError('Invalid code');
+          setDisabled(false);
+          setLoading(false);
         } else {
           setError('');
+          setDisabled(false);
+          setLoading(false);
         }
 
         setTotpOpen(true);
       } else {
         form.setFieldError('username', 'Invalid username');
         form.setFieldError('password', 'Invalid password');
+        setLoading(false);
       }
     } else {
       await router.push((router.query.url as string) || '/dashboard');
+    }
+  };
+
+  const handlePinChange = (value) => {
+    if (value.length === 6) {
+      onSubmit(form.values, value);
     }
   };
 
@@ -98,24 +114,38 @@ export default function Login({ title, user_registration, oauth_registration, oa
         title={<Title order={3}>Two-Factor Authentication Required</Title>}
         size='lg'
       >
-        <form onSubmit={form.onSubmit(() => onSubmit(form.values))}>
-          <NumberInput
-            placeholder='2FA Code'
-            label='Verify'
-            size='xl'
-            hideControls
-            maxLength={6}
-            minLength={6}
-            value={code}
-            onChange={(e) => setCode(e)}
+        <Center my='md'>
+          <PinInput
             data-autofocus
-            error={error}
+            length={6}
+            oneTimeCode
+            type='number'
+            placeholder=''
+            onChange={handlePinChange}
+            autoFocus={true}
+            error={!!error}
+            disabled={disabled}
+            size='xl'
           />
+        </Center>
 
-          <Button disabled={disabled} size='lg' fullWidth mt='md' rightIcon={<CheckIcon />} type='submit'>
-            Verify &amp; Login
-          </Button>
-        </form>
+        {error && (
+          <Text my='sm' size='sm' color='red' align='center'>
+            {error}
+          </Text>
+        )}
+
+        <Button
+          loading={loading}
+          disabled={disabled}
+          size='lg'
+          fullWidth
+          mt='md'
+          rightIcon={<CheckIcon />}
+          type='submit'
+        >
+          Verify &amp; Login
+        </Button>
       </Modal>
       <Center sx={{ height: '100vh' }}>
         <div>
@@ -133,7 +163,7 @@ export default function Login({ title, user_registration, oauth_registration, oa
               {...form.getInputProps('password')}
             />
 
-            <Button size='lg' my='sm' fullWidth type='submit'>
+            <Button size='lg' my='sm' fullWidth type='submit' loading={loading}>
               Login
             </Button>
           </form>
