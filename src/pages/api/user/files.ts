@@ -49,10 +49,10 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   } else if (req.method === 'PATCH') {
     if (!req.body.id) return res.badRequest('no file id');
 
-    let image;
+    let file;
 
     if (req.body.favorite !== null)
-      image = await prisma.file.update({
+      file = await prisma.file.update({
         where: { id: req.body.id },
         data: {
           favorite: req.body.favorite,
@@ -61,7 +61,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
 
     // @ts-ignore
     if (file.password) file.password = true;
-    return res.json(image);
+    return res.json(file);
   } else {
     if (req.query.count) {
       const count = await prisma.file.count({
