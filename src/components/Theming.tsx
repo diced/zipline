@@ -12,12 +12,17 @@ import matcha_dark_azul from 'lib/themes/matcha_dark_azul';
 import nord from 'lib/themes/nord';
 import qogir_dark from 'lib/themes/qogir_dark';
 
-import { createEmotionCache, MantineProvider, MantineThemeOverride, Modal, ScrollArea } from '@mantine/core';
+import { createEmotionCache, MantineProvider, MantineThemeOverride } from '@mantine/core';
 import { useColorScheme } from '@mantine/hooks';
 import { ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';
+import { SpotlightProvider } from '@mantine/spotlight';
 import { userSelector } from 'lib/recoil/user';
 import { useRecoilValue } from 'recoil';
+
+import { createSpotlightActions } from 'lib/spotlight';
+import { useRouter } from 'next/router';
+import { IconSearch } from '@tabler/icons-react';
 
 export const themes = {
   system: (colorScheme: 'dark' | 'light') => (colorScheme === 'dark' ? dark_blue : light_blue),
@@ -52,6 +57,7 @@ const cache = createEmotionCache({ key: 'zipline' });
 export default function ZiplineTheming({ Component, pageProps, ...props }) {
   const user = useRecoilValue(userSelector);
   const colorScheme = useColorScheme();
+  const router = useRouter();
 
   let theme: MantineThemeOverride;
 
@@ -141,8 +147,14 @@ export default function ZiplineTheming({ Component, pageProps, ...props }) {
       }}
     >
       <ModalsProvider>
-        <Notifications position='top-center' style={{ marginTop: -10 }} />
-        {props.children ? props.children : <Component {...pageProps} />}
+        <SpotlightProvider
+          searchIcon={<IconSearch />}
+          shortcut={['mod + k', '/']}
+          actions={createSpotlightActions(router)}
+        >
+          <Notifications position='top-center' style={{ marginTop: -10 }} />
+          {props.children ? props.children : <Component {...pageProps} />}
+        </SpotlightProvider>
       </ModalsProvider>
     </MantineProvider>
   );

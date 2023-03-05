@@ -10,7 +10,7 @@ import {
   TextInput,
   Title,
 } from '@mantine/core';
-import { ClockIcon, ImageIcon, KeyIcon, TypeIcon, UserIcon, GlobeIcon } from 'components/icons';
+import { IconAlarm, IconEye, IconFileInfo, IconKey, IconPhotoDown, IconWorld } from '@tabler/icons-react';
 import React, { Dispatch, SetStateAction, useReducer, useState } from 'react';
 
 export type UploadOptionsState = {
@@ -81,14 +81,14 @@ export function OptionsModal({
           value={state.maxViews}
           onChange={(e) => setState({ maxViews: e })}
           min={0}
-          icon={<UserIcon />}
+          icon={<IconEye size='1rem' />}
         />
         <Select
           label='Expires'
           description='The date and time this file will expire. Leave blank for never.'
           value={state.expires}
           onChange={(e) => setState({ expires: e })}
-          icon={<ClockIcon size={14} />}
+          icon={<IconAlarm size='1rem' />}
           data={[
             { value: 'never', label: 'Never' },
             { value: '5min', label: '5 minutes' },
@@ -130,7 +130,7 @@ export function OptionsModal({
           description='The compression level to use when uploading this file. Leave blank for default.'
           value={state.compression}
           onChange={(e) => setState({ compression: e })}
-          icon={<ImageIcon />}
+          icon={<IconPhotoDown size='1rem' />}
           data={[
             { value: 'none', label: 'None' },
             { value: '25', label: 'Low (25%)' },
@@ -149,7 +149,7 @@ export function OptionsModal({
           description="The file name format to use when uploading this file. Leave blank for the server's default."
           value={state.format}
           onChange={(e) => setState({ format: e })}
-          icon={<TypeIcon />}
+          icon={<IconFileInfo size='1rem' />}
           data={[
             { value: 'default', label: 'Default' },
             { value: 'RANDOM', label: 'Random' },
@@ -163,12 +163,12 @@ export function OptionsModal({
           description='The password required to view this file. Leave blank for no password.'
           value={state.password}
           onChange={(e) => setState({ password: e.currentTarget.value })}
-          icon={<KeyIcon />}
+          icon={<IconKey size='1rem' />}
         />
         <TextInput
           label='Override Domain'
           onChange={handleOD}
-          icon={<GlobeIcon />}
+          icon={<IconWorld size='1rem' />}
           description={odState.description}
           error={odState.error}
         />

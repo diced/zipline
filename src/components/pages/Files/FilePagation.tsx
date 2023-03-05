@@ -1,7 +1,7 @@
 import { Box, Button, Center, Checkbox, Group, Pagination, SimpleGrid, Skeleton, Title } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
+import { IconFile } from '@tabler/icons-react';
 import File from 'components/File';
-import { FileIcon } from 'components/icons';
 import MutedText from 'components/MutedText';
 import useFetch from 'hooks/useFetch';
 import { usePaginatedFiles } from 'lib/queries/files';
@@ -44,7 +44,7 @@ export default function FilePagation({ disableMediaPreview, exifEnabled, queryPa
       <Center sx={{ flexDirection: 'column' }}>
         <Group>
           <div>
-            <FileIcon size={48} />
+            <IconFile size={48} />
           </div>
           <div>
             <Title>Nothing here</Title>

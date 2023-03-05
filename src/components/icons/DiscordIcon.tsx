@@ -2,7 +2,12 @@
 
 export default function DiscordIcon({ ...props }) {
   return (
-    <svg width='24' height='24' viewBox='0 0 71 55' xmlns='http://www.w3.org/2000/svg'>
+    <svg
+      width={props.width ?? '24'}
+      height={props.height ?? '24'}
+      viewBox='0 0 71 55'
+      xmlns='http://www.w3.org/2000/svg'
+    >
       <g clipPath='url(#clip0)'>
         <path
           fill={props.colorScheme === 'manage' ? '#ffffff' : '#5865F2'}

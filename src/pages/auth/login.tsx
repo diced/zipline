@@ -1,10 +1,12 @@
 import {
+  Anchor,
   Button,
+  Card,
   Center,
   CheckIcon,
   Divider,
+  Group,
   Modal,
-  NumberInput,
   PasswordInput,
   PinInput,
   Text,
@@ -148,53 +150,66 @@ export default function Login({ title, user_registration, oauth_registration, oa
         </Button>
       </Modal>
       <Center sx={{ height: '100vh' }}>
-        <div>
-          <Title size={70} align='center'>
+        <Card radius='md'>
+          <Title size={30} align='left'>
             {title}
           </Title>
 
+          {oauth_registration && (
+            <>
+              <Group grow>
+                {oauth_providers.map(({ url, name, Icon }, i) => (
+                  <Link key={i} href={url} passHref legacyBehavior>
+                    <Button
+                      size='sm'
+                      variant='outline'
+                      radius='md'
+                      fullWidth
+                      leftIcon={<Icon height={'15'} width={'15'} colorScheme='dark' />}
+                      component='a'
+                      my='xs'
+                    >
+                      {name}
+                    </Button>
+                  </Link>
+                ))}
+              </Group>
+
+              <Divider my='xs' label='or' labelPosition='center' />
+            </>
+          )}
+
           <form onSubmit={form.onSubmit((v) => onSubmit(v))}>
-            <TextInput my='sm' size='lg' id='username' label='Username' {...form.getInputProps('username')} />
+            <TextInput
+              my='xs'
+              radius='md'
+              size='md'
+              id='username'
+              label='Username'
+              {...form.getInputProps('username')}
+            />
             <PasswordInput
-              my='sm'
-              size='lg'
+              my='xs'
+              radius='md'
+              size='md'
               id='password'
               label='Password'
               {...form.getInputProps('password')}
             />
 
-            <Button size='lg' my='sm' fullWidth type='submit' loading={loading}>
-              Login
-            </Button>
-          </form>
+            <Group position='apart'>
+              {user_registration && (
+                <Anchor size='xs' href='/auth/register' component={Link}>
+                  Don&apos;t have an account? Register
+                </Anchor>
+              )}
 
-          {user_registration && (
-            <>
-              <Divider my='sm' label='or' labelPosition='center'>
-                or
-              </Divider>
-              <Link href='/auth/register' passHref legacyBehavior>
-                <Button size='lg' fullWidth component='a'>
-                  Register
-                </Button>
-              </Link>
-            </>
-          )}
-          {oauth_registration && (
-            <>
-              <Divider my='sm' label='or' labelPosition='center'>
-                or
-              </Divider>
-              {oauth_providers.map(({ url, name, Icon }, i) => (
-                <Link key={i} href={url} passHref legacyBehavior>
-                  <Button size='lg' fullWidth leftIcon={<Icon colorScheme='manage' />} component='a' my='sm'>
-                    Login with {name}
-                  </Button>
-                </Link>
-              ))}
-            </>
-          )}
-        </div>
+              <Button size='sm' p='xs' radius='md' my='xs' type='submit' loading={loading}>
+                Login
+              </Button>
+            </Group>
+          </form>
+        </Card>
       </Center>
     </>
   );

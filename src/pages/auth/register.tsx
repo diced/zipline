@@ -1,6 +1,6 @@
 import { Box, Button, Center, Group, PasswordInput, Stepper, TextInput } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
-import { CrossIcon, UserIcon } from 'components/icons';
+import { IconUserPlus, IconUserX } from '@tabler/icons-react';
 import PasswordStrength from 'components/PasswordStrength';
 import useFetch from 'hooks/useFetch';
 import config from 'lib/config';
@@ -62,14 +62,14 @@ export default function Register({ code, title, user_registration }) {
         title: 'Error while creating user',
         message: res.error,
         color: 'red',
-        icon: <CrossIcon />,
+        icon: <IconUserX />,
       });
     } else {
       showNotification({
         title: 'User created',
         message: 'You will be logged in shortly...',
         color: 'green',
-        icon: <UserIcon />,
+        icon: <IconUserPlus />,
       });
 
       setUser(null);

@@ -11,6 +11,28 @@ import {
 } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { showNotification } from '@mantine/notifications';
+import {
+  IconAlarm,
+  IconCalendarPlus,
+  IconClipboardCopy,
+  IconDeviceSdCard,
+  IconExternalLink,
+  IconEye,
+  IconEyeglass,
+  IconFile,
+  IconFileDownload,
+  IconFolderMinus,
+  IconFolderOff,
+  IconFolderPlus,
+  IconFolderX,
+  IconHash,
+  IconInfoCircle,
+  IconPhoto,
+  IconPhotoCancel,
+  IconPhotoMinus,
+  IconPhotoStar,
+  IconStarFilled,
+} from '@tabler/icons-react';
 import useFetch from 'hooks/useFetch';
 import { useFileDelete, useFileFavorite } from 'lib/queries/files';
 import { useFolders } from 'lib/queries/folders';
@@ -18,24 +40,6 @@ import { bytesToHuman } from 'lib/utils/bytes';
 import { relativeTime } from 'lib/utils/client';
 import { useState } from 'react';
 import { FileMeta } from '.';
-import {
-  CalendarIcon,
-  ClockIcon,
-  CopyIcon,
-  CrossIcon,
-  DeleteIcon,
-  DownloadIcon,
-  ExternalLinkIcon,
-  EyeIcon,
-  FileIcon,
-  FolderMinusIcon,
-  FolderPlusIcon,
-  HardDriveIcon,
-  HashIcon,
-  ImageIcon,
-  InfoIcon,
-  StarIcon,
-} from '../icons';
 import Type from '../Type';
 
 export default function FileModal({
@@ -69,7 +73,7 @@ export default function FileModal({
           title: 'File Deleted',
           message: '',
           color: 'green',
-          icon: <DeleteIcon />,
+          icon: <IconPhotoMinus />,
         });
       },
 
@@ -78,7 +82,7 @@ export default function FileModal({
           title: 'Failed to delete file',
           message: res.error,
           color: 'red',
-          icon: <CrossIcon />,
+          icon: <IconPhotoCancel />,
         });
       },
 
@@ -101,7 +105,7 @@ export default function FileModal({
       showNotification({
         title: 'Copied to clipboard',
         message: '',
-        icon: <CopyIcon />,
+        icon: <IconClipboardCopy />,
       });
   };
 
@@ -113,7 +117,7 @@ export default function FileModal({
           showNotification({
             title: 'The file is now ' + (!file.favorite ? 'favorited' : 'unfavorited'),
             message: '',
-            icon: <StarIcon />,
+            icon: <IconPhotoStar />,
           });
         },
 
@@ -122,7 +126,7 @@ export default function FileModal({
             title: 'Failed to favorite file',
             message: res.error,
             color: 'red',
-            icon: <CrossIcon />,
+            icon: <IconPhotoCancel />,
           });
         },
       }
@@ -143,14 +147,14 @@ export default function FileModal({
         title: 'Removed from folder',
         message: res.name,
         color: 'green',
-        icon: <FolderMinusIcon />,
+        icon: <IconFolderMinus />,
       });
     } else {
       showNotification({
         title: 'Failed to remove from folder',
         message: res.error,
         color: 'red',
-        icon: <CrossIcon />,
+        icon: <IconFolderX />,
       });
     }
   };
@@ -167,14 +171,14 @@ export default function FileModal({
         title: 'Added to folder',
         message: res.name,
         color: 'green',
-        icon: <FolderPlusIcon />,
+        icon: <IconFolderPlus />,
       });
     } else {
       showNotification({
         title: 'Failed to add to folder',
         message: res.error,
         color: 'red',
-        icon: <CrossIcon />,
+        icon: <IconFolderX />,
       });
     }
   };
@@ -191,14 +195,14 @@ export default function FileModal({
           title: 'Created & added to folder',
           message: res.name,
           color: 'green',
-          icon: <FolderPlusIcon />,
+          icon: <IconFolderPlus />,
         });
       } else {
         showNotification({
           title: 'Failed to create folder',
           message: res.error,
           color: 'red',
-          icon: <CrossIcon />,
+          icon: <IconFolderX />,
         });
       }
     });
@@ -229,33 +233,33 @@ export default function FileModal({
             { maxWidth: 1200, cols: 3 },
           ]}
         >
-          <FileMeta Icon={FileIcon} title='Name' subtitle={file.name} />
-          <FileMeta Icon={ImageIcon} title='Type' subtitle={file.mimetype} />
-          <FileMeta Icon={HardDriveIcon} title='Size' subtitle={bytesToHuman(file.size || 0)} />
-          <FileMeta Icon={EyeIcon} title='Views' subtitle={file?.views?.toLocaleString()} />
+          <FileMeta Icon={IconFile} title='Name' subtitle={file.name} />
+          <FileMeta Icon={IconPhoto} title='Type' subtitle={file.mimetype} />
+          <FileMeta Icon={IconDeviceSdCard} title='Size' subtitle={bytesToHuman(file.size || 0)} />
+          <FileMeta Icon={IconEye} title='Views' subtitle={file?.views?.toLocaleString()} />
           {file.maxViews && (
             <FileMeta
-              Icon={EyeIcon}
+              Icon={IconEyeglass}
               title='Max views'
               subtitle={file?.maxViews?.toLocaleString()}
               tooltip={`This file will be deleted after being viewed ${file?.maxViews?.toLocaleString()} times.`}
             />
           )}
           <FileMeta
-            Icon={CalendarIcon}
+            Icon={IconCalendarPlus}
             title='Uploaded'
             subtitle={relativeTime(new Date(file.createdAt))}
             tooltip={new Date(file?.createdAt).toLocaleString()}
           />
           {file.expiresAt && !reducedActions && (
             <FileMeta
-              Icon={ClockIcon}
+              Icon={IconAlarm}
               title='Expires'
               subtitle={relativeTime(new Date(file.expiresAt))}
               tooltip={new Date(file.expiresAt).toLocaleString()}
             />
           )}
-          <FileMeta Icon={HashIcon} title='ID' subtitle={file.id} />
+          <FileMeta Icon={IconHash} title='ID' subtitle={file.id} />
         </SimpleGrid>
       </Stack>
 
@@ -268,7 +272,7 @@ export default function FileModal({
                 variant='filled'
                 onClick={() => window.open(`/dashboard/metadata/${file.id}`, '_blank')}
               >
-                <InfoIcon />
+                <IconInfoCircle size='1rem' />
               </ActionIcon>
             </Tooltip>
           )}
@@ -277,7 +281,7 @@ export default function FileModal({
               label={`Remove from folder "${folders.data.find((f) => f.id === file.folderId)?.name ?? ''}"`}
             >
               <ActionIcon color='red' variant='filled' onClick={removeFromFolder} loading={folders.isLoading}>
-                <FolderMinusIcon />
+                <IconFolderMinus size='1rem' />
               </ActionIcon>
             </Tooltip>
           ) : (
@@ -304,7 +308,7 @@ export default function FileModal({
             <>
               <Tooltip label='Delete file'>
                 <ActionIcon color='red' variant='filled' onClick={handleDelete}>
-                  <DeleteIcon />
+                  <IconPhotoMinus size='1rem' />
                 </ActionIcon>
               </Tooltip>
 
@@ -314,7 +318,7 @@ export default function FileModal({
                   variant='filled'
                   onClick={handleFavorite}
                 >
-                  <StarIcon />
+                  <IconPhotoStar size='1rem' />
                 </ActionIcon>
               </Tooltip>
             </>
@@ -322,13 +326,13 @@ export default function FileModal({
 
           <Tooltip label='Open in new tab'>
             <ActionIcon color='blue' variant='filled' onClick={() => window.open(file.url, '_blank')}>
-              <ExternalLinkIcon />
+              <IconExternalLink size='1rem' />
             </ActionIcon>
           </Tooltip>
 
           <Tooltip label='Copy URL'>
             <ActionIcon color='blue' variant='filled' onClick={handleCopy}>
-              <CopyIcon />
+              <IconClipboardCopy size='1rem' />
             </ActionIcon>
           </Tooltip>
 
@@ -338,7 +342,7 @@ export default function FileModal({
               variant='filled'
               onClick={() => window.open(`/r/${encodeURI(file.name)}?download=true`, '_blank')}
             >
-              <DownloadIcon />
+              <IconFileDownload size='1rem' />
             </ActionIcon>
           </Tooltip>
         </Group>

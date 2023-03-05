@@ -17,7 +17,7 @@ import { useForm } from '@mantine/form';
 import { useClipboard } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
 import { showNotification } from '@mantine/notifications';
-import { CopyIcon, CrossIcon, DeleteIcon, PlusIcon, TagIcon } from 'components/icons';
+import { IconClipboardCopy, IconPlus, IconTag, IconTagOff, IconTrash } from '@tabler/icons-react';
 import MutedText from 'components/MutedText';
 import useFetch from 'hooks/useFetch';
 import { expireText, relativeTime } from 'lib/utils/client';
@@ -65,14 +65,14 @@ function CreateInviteModal({ open, setOpen, updateInvites }) {
       showNotification({
         title: 'Failed to create invite',
         message: res.error,
-        icon: <CrossIcon />,
+        icon: <IconTagOff />,
         color: 'red',
       });
     } else {
       showNotification({
         title: 'Created invite',
         message: '',
-        icon: <TagIcon />,
+        icon: <IconTag />,
         color: 'green',
       });
     }
@@ -138,16 +138,16 @@ export default function Invites() {
         const res = await useFetch(`/api/auth/invite?code=${invite.code}`, 'DELETE');
         if (res.error) {
           showNotification({
-            title: 'Failed to delete invite ${invite.code}',
+            title: `Failed to delete invite ${invite.code}`,
             message: res.error,
-            icon: <CrossIcon />,
+            icon: <IconTagOff size='1rem' />,
             color: 'red',
           });
         } else {
           showNotification({
             title: `Deleted invite ${invite.code}`,
             message: '',
-            icon: <DeleteIcon />,
+            icon: <IconTag size='1rem' />,
             color: 'green',
           });
         }
@@ -168,7 +168,7 @@ export default function Invites() {
       showNotification({
         title: 'Copied to clipboard',
         message: '',
-        icon: <CopyIcon />,
+        icon: <IconClipboardCopy size='1rem' />,
       });
   };
 
@@ -191,7 +191,7 @@ export default function Invites() {
       <Group mb='md'>
         <Title>Invites</Title>
         <ActionIcon variant='filled' color='primary' onClick={() => setOpen(true)}>
-          <PlusIcon />
+          <IconPlus size='1rem' />
         </ActionIcon>
       </Group>
       <SimpleGrid cols={3} spacing='lg' breakpoints={[{ maxWidth: 'sm', cols: 1, spacing: 'sm' }]}>
@@ -222,10 +222,10 @@ export default function Invites() {
                   </Group>
                   <Stack>
                     <ActionIcon aria-label='copy' onClick={() => handleCopy(invite)}>
-                      <CopyIcon />
+                      <IconClipboardCopy size='1rem' />
                     </ActionIcon>
                     <ActionIcon aria-label='delete' onClick={() => openDeleteModal(invite)}>
-                      <DeleteIcon />
+                      <IconTrash size='1rem' />
                     </ActionIcon>
                   </Stack>
                 </Group>

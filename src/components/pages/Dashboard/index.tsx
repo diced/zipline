@@ -1,14 +1,21 @@
 import { ActionIcon, Box, Group, Title, Tooltip } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { showNotification } from '@mantine/notifications';
+import {
+  IconClipboardCopy,
+  IconExternalLink,
+  IconPhotoCancel,
+  IconPhotoMinus,
+  IconPhotoUp,
+} from '@tabler/icons-react';
 import FileModal from 'components/File/FileModal';
-import { CopyIcon, CrossIcon, DeleteIcon, EnterIcon, FileIcon } from 'components/icons';
 import Link from 'components/Link';
 import MutedText from 'components/MutedText';
 import useFetch from 'lib/hooks/useFetch';
 import { usePaginatedFiles, useRecent } from 'lib/queries/files';
 import { useStats } from 'lib/queries/stats';
 import { userSelector } from 'lib/recoil/user';
+import { bytesToHuman } from 'lib/utils/bytes';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
@@ -84,14 +91,14 @@ export default function Dashboard({ disableMediaPreview, exifEnabled }) {
         title: 'File Deleted',
         message: `${file.name}`,
         color: 'green',
-        icon: <DeleteIcon />,
+        icon: <IconPhotoMinus size='1rem' />,
       });
     } else {
       showNotification({
         title: 'Failed to Delete File',
         message: res.error,
         color: 'red',
-        icon: <CrossIcon />,
+        icon: <IconPhotoCancel size='1rem' />,
       });
     }
   };
@@ -112,7 +119,7 @@ export default function Dashboard({ disableMediaPreview, exifEnabled }) {
             href={`${window.location.protocol}//${window.location.host}${file.url}`}
           >{`${window.location.protocol}//${window.location.host}${file.url}`}</a>
         ),
-        icon: <CopyIcon />,
+        icon: <IconClipboardCopy size='1rem' />,
       });
   };
 
@@ -145,9 +152,6 @@ export default function Dashboard({ disableMediaPreview, exifEnabled }) {
 
       <Box my='sm'>
         <Title>Files</Title>
-        <MutedText size='md'>
-          View your gallery <Link href='/dashboard/files'>here</Link>.
-        </MutedText>
 
         <DataTable
           withBorder
@@ -157,6 +161,7 @@ export default function Dashboard({ disableMediaPreview, exifEnabled }) {
           columns={[
             { accessor: 'name', sortable: true },
             { accessor: 'mimetype', sortable: true },
+            { accessor: 'size', sortable: true, render: (file) => bytesToHuman(file.size) },
             {
               accessor: 'createdAt',
               sortable: true,
@@ -175,21 +180,21 @@ export default function Dashboard({ disableMediaPreview, exifEnabled }) {
                       }}
                       color='blue'
                     >
-                      <FileIcon />
+                      <IconPhotoUp size='1rem' />
                     </ActionIcon>
                   </Tooltip>
 
                   <Tooltip label='Open file in new tab'>
                     <ActionIcon onClick={() => viewFile(file)} color='blue'>
-                      <EnterIcon />
+                      <IconExternalLink size='1rem' />
                     </ActionIcon>
                   </Tooltip>
 
                   <ActionIcon onClick={() => copyFile(file)} color='green'>
-                    <CopyIcon />
+                    <IconClipboardCopy size='1rem' />
                   </ActionIcon>
                   <ActionIcon onClick={() => deleteFile(file)} color='red'>
-                    <DeleteIcon />
+                    <IconPhotoMinus size='1rem' />
                   </ActionIcon>
                 </Group>
               ),
@@ -212,19 +217,19 @@ export default function Dashboard({ disableMediaPreview, exifEnabled }) {
             items: (file) => [
               {
                 key: 'view',
-                icon: <EnterIcon />,
+                icon: <IconExternalLink size='1rem' />,
                 title: `View ${file.name}`,
                 onClick: () => viewFile(file),
               },
               {
                 key: 'copy',
-                icon: <CopyIcon />,
+                icon: <IconClipboardCopy size='1rem' />,
                 title: `Copy ${file.name}`,
                 onClick: () => copyFile(file),
               },
               {
                 key: 'delete',
-                icon: <DeleteIcon />,
+                icon: <IconPhotoMinus size='1rem' />,
                 title: `Delete ${file.name}`,
                 onClick: () => deleteFile(file),
               },

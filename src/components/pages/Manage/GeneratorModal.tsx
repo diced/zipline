@@ -14,7 +14,7 @@ import {
   Title,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { DownloadIcon, GlobeIcon } from 'components/icons';
+import { IconFileDownload, IconWorld } from '@tabler/icons-react';
 import Link from 'components/Link';
 import MutedText from 'components/MutedText';
 import { useReducer, useState } from 'react';
@@ -128,7 +128,7 @@ export function GeneratorModal({ opened, onClose, title, onSubmit, ...other }) {
         <TextInput
           label='Override Domain'
           onChange={handleOD}
-          icon={<GlobeIcon />}
+          icon={<IconWorld size='1rem' />}
           description={odState.description}
           error={odState.error}
         />
@@ -211,7 +211,7 @@ export function GeneratorModal({ opened, onClose, title, onSubmit, ...other }) {
         <Group grow my='md'>
           <Button onClick={form.reset}>Reset</Button>
 
-          <Button rightIcon={<DownloadIcon />} type='submit'>
+          <Button rightIcon={<IconFileDownload size='1rem' />} type='submit'>
             Download
           </Button>
         </Group>

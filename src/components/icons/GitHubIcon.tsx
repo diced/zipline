@@ -1,6 +1,3 @@
-import { GitHub } from 'react-feather';
-import Image from 'next/image';
-
 // https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg
 export default function GitHubIcon({ colorScheme, ...props }) {
   return (

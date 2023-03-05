@@ -1,8 +1,8 @@
 import { SimpleGrid } from '@mantine/core';
+import { IconDatabase, IconEye, IconFile, IconUsers } from '@tabler/icons-react';
 import StatCard from 'components/StatCard';
 import { useStats } from 'lib/queries/stats';
 import { percentChange } from 'lib/utils/client';
-import { EyeIcon, DatabaseIcon, UserIcon, FileIcon } from 'components/icons';
 
 export function StatCards() {
   const stats = useStats();
@@ -23,7 +23,7 @@ export function StatCards() {
           title: 'FILES',
           value: stats.isSuccess ? latest.data.count.toLocaleString() : '...',
           desc: 'files have been uploaded',
-          icon: <FileIcon />,
+          icon: <IconFile />,
           diff:
             stats.isSuccess && before?.data ? percentChange(before.data.count, latest.data.count) : undefined,
         }}
@@ -34,7 +34,7 @@ export function StatCards() {
           title: 'STORAGE',
           value: stats.isSuccess ? latest.data.size : '...',
           desc: 'used',
-          icon: <DatabaseIcon />,
+          icon: <IconDatabase />,
           diff:
             stats.isSuccess && before?.data
               ? percentChange(before.data.size_num, latest.data.size_num)
@@ -47,7 +47,7 @@ export function StatCards() {
           title: 'VIEWS',
           value: stats.isSuccess ? latest.data.views_count.toLocaleString() : '...',
           desc: 'total file views',
-          icon: <EyeIcon />,
+          icon: <IconEye />,
           diff:
             stats.isSuccess && before?.data
               ? percentChange(before.data.views_count, latest.data.views_count)
@@ -60,7 +60,7 @@ export function StatCards() {
           title: 'USERS',
           value: stats.isSuccess ? latest.data.count_users.toLocaleString() : '...',
           desc: 'users',
-          icon: <UserIcon />,
+          icon: <IconUsers />,
         }}
       />
     </SimpleGrid>

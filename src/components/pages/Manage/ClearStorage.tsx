@@ -1,7 +1,7 @@
 import { Button, Checkbox, Group, Modal, Text, Title } from '@mantine/core';
 import { closeAllModals, openConfirmModal } from '@mantine/modals';
 import { showNotification, updateNotification } from '@mantine/notifications';
-import { CheckIcon, CrossIcon } from 'components/icons';
+import { IconFiles, IconFilesOff } from '@tabler/icons-react';
 import useFetch from 'hooks/useFetch';
 
 export default function ClearStorage({ open, setOpen, check, setCheck }) {
@@ -22,7 +22,7 @@ export default function ClearStorage({ open, setOpen, check, setCheck }) {
         title: 'Error while clearing uploads',
         message: res.error,
         color: 'red',
-        icon: <CrossIcon />,
+        icon: <IconFilesOff size='1rem' />,
       });
     } else {
       updateNotification({
@@ -30,7 +30,7 @@ export default function ClearStorage({ open, setOpen, check, setCheck }) {
         title: 'Successfully cleared uploads',
         message: '',
         color: 'green',
-        icon: <CheckIcon />,
+        icon: <IconFiles size='1rem' />,
       });
     }
   };

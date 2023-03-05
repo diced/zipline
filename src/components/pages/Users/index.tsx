@@ -1,7 +1,7 @@
 import { ActionIcon, Avatar, Card, Group, SimpleGrid, Skeleton, Stack, Title } from '@mantine/core';
 import { useModals } from '@mantine/modals';
 import { showNotification } from '@mantine/notifications';
-import { CrossIcon, DeleteIcon, PencilIcon, PlusIcon } from 'components/icons';
+import { IconEdit, IconUserExclamation, IconUserMinus, IconUserPlus } from '@tabler/icons-react';
 import MutedText from 'components/MutedText';
 import useFetch from 'hooks/useFetch';
 import { userSelector } from 'lib/recoil/user';
@@ -31,14 +31,14 @@ export default function Users() {
         title: 'Failed to delete user',
         message: res.error,
         color: 'red',
-        icon: <CrossIcon />,
+        icon: <IconUserExclamation size='1rem' />,
       });
     } else {
       showNotification({
         title: 'User deleted',
         message: '',
         color: 'green',
-        icon: <DeleteIcon />,
+        icon: <IconUserMinus size='1rem' />,
       });
       updateUsers();
     }
@@ -89,7 +89,7 @@ export default function Users() {
       <Group mb='md'>
         <Title>Users</Title>
         <ActionIcon variant='filled' color='primary' onClick={() => setCreateOpen(true)}>
-          <PlusIcon />
+          <IconUserPlus size='1rem' />
         </ActionIcon>
       </Group>
       <SimpleGrid cols={3} spacing='lg' breakpoints={[{ maxWidth: 'sm', cols: 1, spacing: 'sm' }]}>
@@ -123,10 +123,10 @@ export default function Users() {
                               setSelectedUser(user);
                             }}
                           >
-                            <PencilIcon />
+                            <IconEdit size='1rem' />
                           </ActionIcon>
                           <ActionIcon aria-label='delete' onClick={() => openDeleteModal(user)}>
-                            <DeleteIcon />
+                            <IconUserMinus size='1rem' />
                           </ActionIcon>
                         </>
                       )}

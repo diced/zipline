@@ -24,6 +24,26 @@ import {
 import { useClipboard, useMediaQuery } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
 import { showNotification } from '@mantine/notifications';
+import {
+  IconBackspace,
+  IconBrush,
+  IconClipboardCopy,
+  IconExternalLink,
+  IconFiles,
+  IconFileText,
+  IconFileUpload,
+  IconFolders,
+  IconGraph,
+  IconHome,
+  IconLink,
+  IconLogout,
+  IconReload,
+  IconSettings,
+  IconTag,
+  IconUpload,
+  IconUser,
+  IconUsers,
+} from '@tabler/icons-react';
 import useFetch from 'hooks/useFetch';
 import { useVersion } from 'lib/queries/version';
 import { userSelector } from 'lib/recoil/user';
@@ -32,28 +52,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { useRecoilState } from 'recoil';
-import {
-  ActivityIcon,
-  CheckIcon,
-  CopyIcon,
-  CrossIcon,
-  DeleteIcon,
-  DiscordIcon,
-  ExternalLinkIcon,
-  FileIcon,
-  FolderIcon,
-  GitHubIcon,
-  GoogleIcon,
-  HomeIcon,
-  LinkIcon,
-  LogoutIcon,
-  PencilIcon,
-  SettingsIcon,
-  TagIcon,
-  TypeIcon,
-  UploadIcon,
-  UserIcon,
-} from './icons';
+import { DiscordIcon, GitHubIcon, GoogleIcon } from './icons';
 import { friendlyThemeName, themes } from './Theming';
 
 export type NavbarItems = {
@@ -66,59 +65,59 @@ export type NavbarItems = {
 
 const items: NavbarItems[] = [
   {
-    icon: <HomeIcon size={18} />,
+    icon: <IconHome size={18} />,
     text: 'Home',
     link: '/dashboard',
   },
   {
-    icon: <FileIcon size={18} />,
+    icon: <IconFiles size={18} />,
     text: 'Files',
     link: '/dashboard/files',
   },
   {
-    icon: <FolderIcon size={18} />,
+    icon: <IconFolders size={18} />,
     text: 'Folders',
     link: '/dashboard/folders',
   },
   {
-    icon: <ActivityIcon size={18} />,
+    icon: <IconGraph size={18} />,
     text: 'Stats',
     link: '/dashboard/stats',
   },
   {
-    icon: <LinkIcon size={18} />,
+    icon: <IconLink size={18} />,
     text: 'URLs',
     link: '/dashboard/urls',
   },
   {
-    icon: <UploadIcon size={18} />,
+    icon: <IconUpload size={18} />,
     text: 'Upload',
     children: [
       {
-        icon: <UploadIcon size={18} />,
+        icon: <IconFileUpload size={18} />,
         text: 'File',
         link: '/dashboard/upload/file',
       },
       {
-        icon: <TypeIcon size={18} />,
+        icon: <IconFileText size={18} />,
         text: 'Text',
         link: '/dashboard/upload/text',
       },
     ],
   },
   {
-    icon: <UserIcon size={18} />,
+    icon: <IconUser size={18} />,
     text: 'Administration',
     if: (user, _) => user.administrator as boolean,
     children: [
       {
-        icon: <UserIcon size={18} />,
+        icon: <IconUsers size={18} />,
         text: 'Users',
         link: '/dashboard/users',
         if: () => true,
       },
       {
-        icon: <TagIcon size={18} />,
+        icon: <IconTag size={18} />,
         text: 'Invites',
         link: '/dashboard/invites',
         if: (_, props) => props.invites,
@@ -168,7 +167,7 @@ export default function Layout({ children, props }) {
       title: `Theme changed to ${friendlyThemeName[value]}`,
       message: '',
       color: 'green',
-      icon: <PencilIcon />,
+      icon: <IconBrush size='1rem' />,
     });
   };
 
@@ -189,7 +188,7 @@ export default function Layout({ children, props }) {
             title: 'Token Reset Failed',
             message: a.error,
             color: 'red',
-            icon: <CrossIcon />,
+            icon: <IconReload size='1rem' />,
           });
         } else {
           showNotification({
@@ -197,7 +196,7 @@ export default function Layout({ children, props }) {
             message:
               'Your token has been reset. You will need to update any uploaders to use this new token.',
             color: 'green',
-            icon: <CheckIcon />,
+            icon: <IconReload size='1rem' />,
           });
         }
 
@@ -238,7 +237,7 @@ export default function Layout({ children, props }) {
             title: 'Token Copied',
             message: 'Your token has been copied to your clipboard.',
             color: 'green',
-            icon: <CheckIcon />,
+            icon: <IconClipboardCopy size='1rem' />,
           });
 
         modals.closeAll();
@@ -298,7 +297,7 @@ export default function Layout({ children, props }) {
                       component='a'
                       target='_blank'
                       variant='light'
-                      icon={<ExternalLinkIcon />}
+                      icon={<IconExternalLink size={18} />}
                     />
                   </Link>
                 ))
@@ -354,7 +353,9 @@ export default function Layout({ children, props }) {
               >
                 <Menu.Target>
                   <Button
-                    leftIcon={avatar ? <Image src={avatar} height={32} radius='md' /> : <SettingsIcon />}
+                    leftIcon={
+                      avatar ? <Image src={avatar} height={32} radius='md' /> : <IconSettings size='1rem' />
+                    }
                     variant='subtle'
                     color='gray'
                     compact
@@ -369,19 +370,39 @@ export default function Layout({ children, props }) {
                     {user.username} ({user.id}){' '}
                     {user.administrator && user.username !== 'administrator' ? '(Administrator)' : ''}
                   </Menu.Label>
-                  <Menu.Item component={Link} icon={<SettingsIcon />} href='/dashboard/manage'>
+                  <Menu.Item component={Link} icon={<IconFiles size='1rem' />} href='/dashboard/files'>
+                    Files
+                  </Menu.Item>
+                  <Menu.Item
+                    component={Link}
+                    icon={<IconFileUpload size='1rem' />}
+                    href='/dashboard/upload/file'
+                  >
+                    Upload File
+                  </Menu.Item>
+                  <Menu.Item component={Link} icon={<IconLink size='1rem' />} href='/dashboard/urls'>
+                    Shorten URL
+                  </Menu.Item>
+
+                  <Menu.Label>Settings</Menu.Label>
+                  <Menu.Item component={Link} icon={<IconSettings size='1rem' />} href='/dashboard/manage'>
                     Manage Account
                   </Menu.Item>
                   <Menu.Item
-                    icon={<CopyIcon />}
+                    icon={<IconClipboardCopy size='1rem' />}
                     onClick={() => {
                       openCopyToken();
                     }}
                   >
                     Copy Token
                   </Menu.Item>
+                  <Menu.Item icon={<IconLogout size='1rem' />} component={Link} href='/auth/logout'>
+                    Logout
+                  </Menu.Item>
+
+                  <Menu.Label>Danger</Menu.Label>
                   <Menu.Item
-                    icon={<DeleteIcon />}
+                    icon={<IconBackspace size='1rem' />}
                     onClick={() => {
                       openResetToken();
                     }}
@@ -389,11 +410,13 @@ export default function Layout({ children, props }) {
                   >
                     Reset Token
                   </Menu.Item>
-                  <Menu.Item component={Link} icon={<LogoutIcon />} href='/auth/logout' color='red'>
-                    Logout
-                  </Menu.Item>
                   <Menu.Divider />
                   <>
+                    {oauth_providers.filter((x) =>
+                      user.oauth?.map(({ provider }) => provider.toLowerCase()).includes(x.name.toLowerCase())
+                    ).length ? (
+                      <Menu.Label>Connected Accounts</Menu.Label>
+                    ) : null}
                     {oauth_providers
                       .filter((x) =>
                         user.oauth
@@ -417,7 +440,7 @@ export default function Layout({ children, props }) {
                       <Menu.Divider />
                     ) : null}
                   </>
-                  <Menu.Item closeMenuOnClick={false} icon={<PencilIcon />}>
+                  <Menu.Item closeMenuOnClick={false} icon={<IconBrush size='1rem' />}>
                     <Select
                       size={useMediaQuery('(max-width: 768px)') ? 'md' : 'xs'}
                       data={Object.keys(themes).map((t) => ({
@@ -438,6 +461,8 @@ export default function Layout({ children, props }) {
       <Paper
         withBorder
         p='md'
+        mr='md'
+        mb='md'
         shadow='xs'
         sx={(theme) => ({
           '&[data-with-border]': {

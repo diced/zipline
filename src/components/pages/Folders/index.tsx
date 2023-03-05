@@ -2,7 +2,16 @@ import { ActionIcon, Avatar, Card, Group, SimpleGrid, Skeleton, Stack, Title, To
 import { useClipboard } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
 import { showNotification } from '@mantine/notifications';
-import { DeleteIcon, FileIcon, PlusIcon, LockIcon, UnlockIcon, LinkIcon, CopyIcon } from 'components/icons';
+import {
+  IconClipboardCopy,
+  IconFiles,
+  IconFolderMinus,
+  IconFolderPlus,
+  IconFolderX,
+  IconLock,
+  IconLockAccessOff,
+  IconLockOpen,
+} from '@tabler/icons-react';
 import Link from 'components/Link';
 import MutedText from 'components/MutedText';
 import useFetch from 'hooks/useFetch';
@@ -50,7 +59,7 @@ export default function Folders({ disableMediaPreview, exifEnabled }) {
             title: 'Deleted folder',
             message: `Deleted folder ${folder.name}`,
             color: 'green',
-            icon: <DeleteIcon />,
+            icon: <IconFolderMinus size='1rem' />,
           });
           folders.refetch();
         } else {
@@ -58,7 +67,7 @@ export default function Folders({ disableMediaPreview, exifEnabled }) {
             title: 'Failed to delete folder',
             message: res.error,
             color: 'red',
-            icon: <DeleteIcon />,
+            icon: <IconFolderX size='1rem' />,
           });
           folders.refetch();
         }
@@ -76,7 +85,7 @@ export default function Folders({ disableMediaPreview, exifEnabled }) {
         title: 'Made folder public',
         message: `Made folder ${folder.name} ${folder.public ? 'private' : 'public'}`,
         color: 'green',
-        icon: <UnlockIcon />,
+        icon: <IconLockOpen size='1rem' />,
       });
       folders.refetch();
     } else {
@@ -84,7 +93,7 @@ export default function Folders({ disableMediaPreview, exifEnabled }) {
         title: 'Failed to make folder public/private',
         message: res.error,
         color: 'red',
-        icon: <UnlockIcon />,
+        icon: <IconLockAccessOff size='1rem' />,
       });
       folders.refetch();
     }
@@ -109,7 +118,7 @@ export default function Folders({ disableMediaPreview, exifEnabled }) {
       <Group mb='md'>
         <Title>Folders</Title>
         <ActionIcon onClick={() => setCreateOpen(!createOpen)} component='a' variant='filled' color='primary'>
-          <PlusIcon />
+          <IconFolderPlus size='1rem' />
         </ActionIcon>
       </Group>
 
@@ -149,7 +158,7 @@ export default function Folders({ disableMediaPreview, exifEnabled }) {
                           aria-label={folder.public ? 'make private' : 'make public'}
                           onClick={() => makePublic(folder)}
                         >
-                          {folder.public ? <LockIcon /> : <UnlockIcon />}
+                          {folder.public ? <IconLock size='1rem' /> : <IconLockOpen size='1rem' />}
                         </ActionIcon>
                       </Tooltip>
                       <ActionIcon
@@ -159,7 +168,7 @@ export default function Folders({ disableMediaPreview, exifEnabled }) {
                           setActiveFolderId(folder.id);
                         }}
                       >
-                        <FileIcon />
+                        <IconFiles size='1rem' />
                       </ActionIcon>
                       <ActionIcon
                         aria-label='copy link'
@@ -180,14 +189,14 @@ export default function Folders({ disableMediaPreview, exifEnabled }) {
                                 </>
                               ),
                               color: 'green',
-                              icon: <CopyIcon />,
+                              icon: <IconClipboardCopy size='1rem' />,
                             });
                         }}
                       >
-                        <LinkIcon />
+                        <IconClipboardCopy size='1rem' />
                       </ActionIcon>
                       <ActionIcon aria-label='delete' onClick={() => deleteFolder(folder)}>
-                        <DeleteIcon />
+                        <IconFolderMinus size='1rem' />
                       </ActionIcon>
                     </Group>
                   </Group>
