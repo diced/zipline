@@ -10,10 +10,14 @@ import {
   Skeleton,
   TextInput,
   Title,
+  Tooltip,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { useClipboard } from '@mantine/hooks';
+import { useModals } from '@mantine/modals';
 import { showNotification } from '@mantine/notifications';
-import { CrossIcon, LinkIcon, PlusIcon } from 'components/icons';
+import { CopyIcon, CrossIcon, LinkIcon, PlusIcon } from 'components/icons';
+import Link from 'components/Link';
 import MutedText from 'components/MutedText';
 import { useURLs } from 'lib/queries/url';
 import { userSelector } from 'lib/recoil/user';
@@ -23,6 +27,9 @@ import URLCard from './URLCard';
 
 export default function Urls() {
   const user = useRecoilValue(userSelector);
+
+  const modals = useModals();
+  const clipboard = useClipboard();
 
   const urls = useURLs();
   const [createOpen, setCreateOpen] = useState(false);
@@ -36,6 +43,16 @@ export default function Urls() {
       maxViews: undefined,
     },
   });
+
+  const copy = (url) => {
+    clipboard.copy(url);
+    showNotification({
+      title: 'Copied to clipboard',
+      message: <Link href={url}>{url}</Link>,
+      color: 'green',
+      icon: <CopyIcon />,
+    });
+  };
 
   const onSubmit = async (values) => {
     const cleanURL = values.url.trim();
@@ -81,11 +98,28 @@ export default function Urls() {
         icon: <CrossIcon />,
       });
     } else {
-      showNotification({
-        title: 'URL shortened',
-        message: json.url,
-        color: 'green',
-        icon: <LinkIcon />,
+      modals.openModal({
+        title: <Title>Shortened URL!</Title>,
+        size: 'auto',
+        children: (
+          <Group position='apart'>
+            <Group position='left'>
+              <Link href={json.url}>{data.vanity ?? json.url}</Link>
+            </Group>
+            <Group position='right'>
+              <Tooltip label='Open link in a new tab'>
+                <ActionIcon onClick={() => window.open(json.url, '_blank')} variant='filled' color='primary'>
+                  <LinkIcon />
+                </ActionIcon>
+              </Tooltip>
+              <Tooltip label='Copy link to clipboard'>
+                <ActionIcon onClick={() => copy(json.url)} variant='filled' color='primary'>
+                  <CopyIcon />
+                </ActionIcon>
+              </Tooltip>
+            </Group>
+          </Group>
+        ),
       });
     }
 
