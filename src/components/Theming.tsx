@@ -12,10 +12,10 @@ import matcha_dark_azul from 'lib/themes/matcha_dark_azul';
 import nord from 'lib/themes/nord';
 import qogir_dark from 'lib/themes/qogir_dark';
 
-import { createEmotionCache, MantineProvider, MantineThemeOverride } from '@mantine/core';
+import { createEmotionCache, MantineProvider, MantineThemeOverride, Modal, ScrollArea } from '@mantine/core';
 import { useColorScheme } from '@mantine/hooks';
 import { ModalsProvider } from '@mantine/modals';
-import { NotificationsProvider } from '@mantine/notifications';
+import { Notifications } from '@mantine/notifications';
 import { userSelector } from 'lib/recoil/user';
 import { useRecoilValue } from 'recoil';
 
@@ -78,8 +78,9 @@ export default function ZiplineTheming({ Component, pageProps, ...props }) {
         components: {
           AppShell: {
             styles: (t) => ({
-              root: {
+              main: {
                 backgroundColor: t.other.AppShell_backgroundColor,
+                // backgroundColor: '#fff',
               },
             }),
           },
@@ -93,9 +94,14 @@ export default function ZiplineTheming({ Component, pageProps, ...props }) {
           Modal: {
             defaultProps: {
               centered: true,
-              overlayBlur: 3,
-              overlayColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : 'white',
-              exitTransitionDuration: 100,
+              transitionProps: {
+                exitDuration: 100,
+              },
+              overlayProps: {
+                blur: 6,
+                color: theme.colorScheme === 'dark' ? theme.colors.dark[6] : 'white',
+              },
+              // scrollAreaComponent: Modal.NativeScrollArea,
             },
           },
           Popover: {
@@ -106,8 +112,10 @@ export default function ZiplineTheming({ Component, pageProps, ...props }) {
           },
           LoadingOverlay: {
             defaultProps: {
-              overlayBlur: 3,
-              overlayColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : 'white',
+              overlayProps: {
+                blur: 3,
+                color: theme.colorScheme === 'dark' ? theme.colors.dark[6] : 'white',
+              },
             },
           },
           Loader: {
@@ -133,9 +141,8 @@ export default function ZiplineTheming({ Component, pageProps, ...props }) {
       }}
     >
       <ModalsProvider>
-        <NotificationsProvider position='top-center' style={{ marginTop: -10 }}>
-          {props.children ? props.children : <Component {...pageProps} />}
-        </NotificationsProvider>
+        <Notifications position='top-center' style={{ marginTop: -10 }} />
+        {props.children ? props.children : <Component {...pageProps} />}
       </ModalsProvider>
     </MantineProvider>
   );

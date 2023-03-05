@@ -13,6 +13,7 @@ import {
   Navbar,
   NavLink,
   Paper,
+  rem,
   ScrollArea,
   Select,
   Text,
@@ -354,13 +355,9 @@ export default function Layout({ children, props }) {
                 <Menu.Target>
                   <Button
                     leftIcon={avatar ? <Image src={avatar} height={32} radius='md' /> : <SettingsIcon />}
-                    sx={(t) => ({
-                      backgroundColor: 'inherit',
-                      '&:hover': {
-                        backgroundColor: t.other.hover,
-                      },
-                      color: t.colorScheme === 'dark' ? 'white' : 'black',
-                    })}
+                    variant='subtle'
+                    color='gray'
+                    compact
                     size='xl'
                     p='sm'
                   >
@@ -442,8 +439,12 @@ export default function Layout({ children, props }) {
         withBorder
         p='md'
         shadow='xs'
-        sx={(t) => ({
-          borderColor: t.colorScheme === 'dark' ? t.colors.dark[5] : t.colors.dark[0],
+        sx={(theme) => ({
+          '&[data-with-border]': {
+            border: `${rem(1)} solid ${
+              theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[0]
+            }`,
+          },
         })}
       >
         {children}

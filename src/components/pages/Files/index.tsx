@@ -64,7 +64,7 @@ export default function Files({ disableMediaPreview, exifEnabled, queryPage }) {
                   paddingBottom: 3,
                 }}
               >
-                <Pagination total={favoriteNumPages} page={favoritePage} onChange={setFavoritePage} />
+                <Pagination total={favoriteNumPages} value={favoritePage} onChange={setFavoritePage} />
               </Box>
             </Accordion.Panel>
           </Accordion.Item>

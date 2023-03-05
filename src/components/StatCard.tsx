@@ -3,7 +3,7 @@ import { ArrowDownRight, ArrowUpRight } from 'react-feather';
 
 const useStyles = createStyles((theme) => ({
   root: {
-    padding: theme.spacing.xl * 1.5,
+    padding: `calc(${theme.spacing.xl} * 1.5)`,
   },
 
   value: {

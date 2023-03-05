@@ -55,7 +55,7 @@ export default function Users() {
           title: `Delete ${user.username}'s files?`,
           labels: { confirm: 'Yes', cancel: 'No' },
           centered: true,
-          overlayBlur: 3,
+          overlayProps: { blur: 3 },
           onConfirm: () => {
             handleDelete(user, true);
             modals.closeAll();
