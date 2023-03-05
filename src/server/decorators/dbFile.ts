@@ -8,6 +8,8 @@ function dbFileDecorator(fastify: FastifyInstance, _, done) {
   done();
 
   async function dbFile(this: FastifyReply, file: File) {
+    const { download } = this.request.query as { download?: string };
+
     const ext = file.name.split('.').pop();
     if (Object.keys(exts).includes(ext)) return this.server.nextHandle(this.request.raw, this.raw);
 
@@ -17,7 +19,7 @@ function dbFileDecorator(fastify: FastifyInstance, _, done) {
     const size = await this.server.datasource.size(file.name);
 
     this.header('Content-Length', size);
-    this.header('Content-Type', file.mimetype);
+    this.header('Content-Type', download ? 'application/octet-stream' : file.mimetype);
     this.header('Content-Disposition', `inline; filename="${file.originalName || file.name}"`);
 
     return this.send(data);
