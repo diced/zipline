@@ -438,6 +438,8 @@ export default function Layout({ children, props }) {
       <Paper
         withBorder
         p='md'
+        mr='md'
+        mb='md'
         shadow='xs'
         sx={(theme) => ({
           '&[data-with-border]': {
