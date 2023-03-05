@@ -34,9 +34,11 @@ export default function Types() {
   return !latest ? (
     <LoadingOverlay visible={stats.isLoading} />
   ) : (
-    <Box mt='md'>
+    <Box my='md'>
       {latest.data.count_by_user.length ? (
-        <Card>
+        <Card my='md'>
+          <Title size='h4'>Top Uploaders</Title>
+
           <SmallTable
             columns={[
               { id: 'username', name: 'Name' },
@@ -46,7 +48,7 @@ export default function Types() {
           />
         </Card>
       ) : null}
-      <Card>
+      <Card my='md'>
         <Title size='h4'>Upload Types</Title>
         <Grid>
           <Grid.Col md={12} lg={8}>
