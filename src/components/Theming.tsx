@@ -112,8 +112,10 @@ export default function ZiplineTheming({ Component, pageProps, ...props }) {
           },
           LoadingOverlay: {
             defaultProps: {
-              overlayBlur: 3,
-              overlayColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : 'white',
+              overlayProps: {
+                blur: 3,
+                color: theme.colorScheme === 'dark' ? theme.colors.dark[6] : 'white',
+              },
             },
           },
           Loader: {
