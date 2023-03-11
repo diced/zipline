@@ -79,6 +79,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       return res.forbidden('cannot modify administrator');
 
     logger.debug(`attempting to update user ${id} with ${JSON.stringify(req.body)}`);
+    logger.debug(`user ${id} has ${!req.body.administrator} in administrator`);
 
     if (req.body.password) {
       const hashed = await hashPassword(req.body.password);
@@ -88,7 +89,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       });
     }
 
-    if (req.body.administrator) {
+    if (typeof req.body.administrator != 'undefined') {
       await prisma.user.update({
         where: { id: target.id },
         data: { administrator: req.body.administrator },
