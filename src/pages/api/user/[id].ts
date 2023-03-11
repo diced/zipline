@@ -72,7 +72,11 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       return res.json(newTarget);
     });
   } else if (req.method === 'PATCH') {
-    if (target.administrator && !user.superAdmin) return res.forbidden('cannot modify administrator');
+    if (
+      (target.administrator && !user.superAdmin) ||
+      (target.administrator && user.administrator && !user.superAdmin)
+    )
+      return res.forbidden('cannot modify administrator');
 
     logger.debug(`attempting to update user ${id} with ${JSON.stringify(req.body)}`);
 
