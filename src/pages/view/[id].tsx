@@ -116,6 +116,20 @@ export default function EmbeddedFile({
             <meta property='og:video:height' content='480' />
           </>
         )}
+        {file.mimetype.startsWith('audio') && (
+          <>
+            <meta name='twitter:card' content='player' />
+            <meta name='twitter:player:stream' content={`/r/${file.name}`} />
+            <meta name='twitter:player:stream:content_type' content={file.mimetype} />
+            <meta name='twitter:title' content={file.name} />
+
+            <meta property='og:type' content='music.song' />
+            <meta property='og:url' content={`/r/${file.name}`} />
+            <meta property='og:audio' content={`/r/${file.name}`} />
+            <meta property='og:audio:secure_url' content={`/r/${file.name}`} />
+            <meta property='og:audio:type' content={file.mimetype} />
+          </>
+        )}
         {!file.mimetype.startsWith('video') && !file.mimetype.startsWith('image') && (
           <meta property='og:url' content={`/r/${file.name}`} />
         )}
