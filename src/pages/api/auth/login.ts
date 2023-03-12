@@ -23,6 +23,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         password: await hashPassword('password'),
         token: createToken(),
         superAdmin: true,
+        administrator: true,
       },
     });
     logger.info('created default user:\nUsername: "administrator"\nPassword: "password"');
