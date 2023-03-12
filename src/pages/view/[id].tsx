@@ -16,7 +16,7 @@ export default function EmbeddedFile({
   pass,
   prismRender,
 }: {
-  file: File;
+  file: File & { imageProps?: HTMLImageElement };
   user: UserExtended;
   pass: boolean;
   prismRender: boolean;
@@ -60,6 +60,7 @@ export default function EmbeddedFile({
     if (url) {
       imageEl.src = url;
     }
+    file.imageProps = img;
   };
 
   useEffect(() => {
@@ -94,7 +95,11 @@ export default function EmbeddedFile({
 
         {file.mimetype.startsWith('image') && (
           <>
-            <meta property='og:image' content={`/r/${file.name}`} />
+            <meta property='og:type' content='image' />
+            <meta property='og:image' itemProp='image' content={`/r/${file.name}`} />
+            <meta property='og:url' content={`/r/${file.name}`} />
+            <meta property='og:image:width' content={file.imageProps?.naturalWidth.toString()} />
+            <meta property='og:image:height' content={file.imageProps?.naturalHeight.toString()} />
             <meta property='twitter:card' content='summary_large_image' />
           </>
         )}
