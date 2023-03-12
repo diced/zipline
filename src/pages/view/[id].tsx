@@ -155,12 +155,18 @@ export default function EmbeddedFile({
         )}
 
         {file.mimetype.startsWith('video') && (
-          <video src={dataURL('/r')} controls={true} autoPlay={true} id='image_content' />
+          <video src={dataURL('/r')} controls autoPlay muted id='video_content' />
         )}
 
-        {!file.mimetype.startsWith('video') && !file.mimetype.startsWith('image') && (
-          <Link href={dataURL('/r')}>Can&#39;t preview this file. Click here to download it.</Link>
+        {file.mimetype.startsWith('audio') && (
+          <audio src={dataURL('/r')} controls autoPlay muted id='audio_content' />
         )}
+
+        {!file.mimetype.startsWith('video') &&
+          !file.mimetype.startsWith('image') &&
+          !file.mimetype.startsWith('audio') && (
+            <Link href={dataURL('/r')}>Can&#39;t preview this file. Click here to download it.</Link>
+          )}
       </Box>
     </>
   );
