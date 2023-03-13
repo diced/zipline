@@ -61,7 +61,7 @@ export default function File({
         compress={onDash}
       />
 
-      <Card sx={{ maxWidth: '100%', height: '100%' }} shadow='md'>
+      <Card sx={{ maxWidth: '100%', height: '100%' }} shadow='md' onClick={() => setOpen(true)}>
         <Card.Section>
           <LoadingOverlay visible={loading} />
           <Type
@@ -82,7 +82,6 @@ export default function File({
             }}
             src={`/r/${encodeURI(image.name)}?nocompress=${!onDash}`}
             alt={image.name}
-            onClick={() => setOpen(true)}
             disableMediaPreview={disableMediaPreview}
           />
         </Card.Section>
