@@ -34,6 +34,7 @@ export default function File({
   exifEnabled,
   refreshImages,
   reducedActions = false,
+  onDash,
 }) {
   const [open, setOpen] = useState(false);
   const deleteFile = useFileDelete();
@@ -57,6 +58,7 @@ export default function File({
         refresh={refresh}
         reducedActions={reducedActions}
         exifEnabled={exifEnabled}
+        compress={onDash}
       />
 
       <Card sx={{ maxWidth: '100%', height: '100%' }} shadow='md'>
@@ -78,7 +80,7 @@ export default function File({
               width: '100%',
               cursor: 'pointer',
             }}
-            src={`/r/${encodeURI(image.name)}`}
+            src={`/r/${encodeURI(image.name)}?nocompress=${!onDash}`}
             alt={image.name}
             onClick={() => setOpen(true)}
             disableMediaPreview={disableMediaPreview}

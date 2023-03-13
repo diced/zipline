@@ -5,7 +5,7 @@ import File from 'components/File';
 import MutedText from 'components/MutedText';
 import { useRecent } from 'lib/queries/files';
 
-export default function RecentFiles({ disableMediaPreview, exifEnabled }) {
+export default function RecentFiles({ disableMediaPreview, exifEnabled, compress }) {
   const recent = useRecent('media');
 
   return (
@@ -25,6 +25,7 @@ export default function RecentFiles({ disableMediaPreview, exifEnabled }) {
                 disableMediaPreview={disableMediaPreview}
                 exifEnabled={exifEnabled}
                 refreshImages={recent.refetch}
+                onDash={compress}
               />
             ))
           ) : (

@@ -22,7 +22,7 @@ import { useRecoilValue } from 'recoil';
 import RecentFiles from './RecentFiles';
 import { StatCards } from './StatCards';
 
-export default function Dashboard({ disableMediaPreview, exifEnabled }) {
+export default function Dashboard({ disableMediaPreview, exifEnabled, compress }) {
   const user = useRecoilValue(userSelector);
 
   const recent = useRecent('media');
@@ -138,6 +138,7 @@ export default function Dashboard({ disableMediaPreview, exifEnabled }) {
           refresh={() => files.refetch()}
           reducedActions={false}
           exifEnabled={exifEnabled}
+          compress={compress}
         />
       )}
 
@@ -148,7 +149,7 @@ export default function Dashboard({ disableMediaPreview, exifEnabled }) {
 
       <StatCards />
 
-      <RecentFiles disableMediaPreview={disableMediaPreview} exifEnabled={exifEnabled} />
+      <RecentFiles disableMediaPreview={disableMediaPreview} exifEnabled={exifEnabled} compress={compress} />
 
       <Box my='sm'>
         <Title>Files</Title>

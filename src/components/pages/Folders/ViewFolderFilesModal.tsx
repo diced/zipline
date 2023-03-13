@@ -3,7 +3,14 @@ import File from 'components/File';
 import MutedText from 'components/MutedText';
 import { useFolder } from 'lib/queries/folders';
 
-export default function ViewFolderFilesModal({ open, setOpen, folderId, disableMediaPreview, exifEnabled }) {
+export default function ViewFolderFilesModal({
+  open,
+  setOpen,
+  folderId,
+  disableMediaPreview,
+  exifEnabled,
+  compress,
+}) {
   if (!folderId) return null;
 
   const folder = useFolder(folderId, true);
@@ -26,6 +33,7 @@ export default function ViewFolderFilesModal({ open, setOpen, folderId, disableM
                   image={file}
                   exifEnabled={exifEnabled}
                   refreshImages={folder.refetch}
+                  onDash={compress}
                 />
               ))}
             </SimpleGrid>

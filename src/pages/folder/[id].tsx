@@ -25,9 +25,10 @@ type Props = {
   folder: LimitedFolder;
   uploadRoute: string;
   title: string;
+  compress: boolean;
 };
 
-export default function Folder({ title, folder }: Props) {
+export default function Folder({ title, folder, compress }: Props) {
   const full_title = `${title} - ${folder.name}`;
   return (
     <>
@@ -55,6 +56,7 @@ export default function Folder({ title, folder }: Props) {
               exifEnabled={false}
               refreshImages={null}
               reducedActions={true}
+              onDash={compress}
             />
           ))}
         </SimpleGrid>
@@ -113,6 +115,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (context) => 
       folder,
       uploadRoute: config.uploader.route,
       title: config.website.title,
+      compress: config.core.compression.on_dashboard,
     },
   };
 };

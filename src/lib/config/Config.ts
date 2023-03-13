@@ -5,9 +5,16 @@ export interface ConfigCore {
   port: number;
   database_url: string;
   logger: boolean;
+  compression: ConfigCompression;
 
   stats_interval: number;
   invites_interval: number;
+}
+
+export interface ConfigCompression {
+  enabled: boolean;
+  threshold: number;
+  on_dashboard: boolean;
 }
 
 export interface ConfigDatasource {

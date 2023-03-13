@@ -1,5 +1,6 @@
 import { Box, Button, Modal, PasswordInput } from '@mantine/core';
 import type { File } from '@prisma/client';
+import config from 'lib/config';
 import Link from 'components/Link';
 import exts from 'lib/exts';
 import prisma from 'lib/prisma';
@@ -15,13 +16,18 @@ export default function EmbeddedFile({
   user,
   pass,
   prismRender,
+  onDash,
+  noCompress,
 }: {
   file: File & { imageProps?: HTMLImageElement };
   user: UserExtended;
   pass: boolean;
   prismRender: boolean;
+  onDash: boolean;
+  noCompress?: boolean;
 }) {
-  const dataURL = (route: string) => `${route}/${encodeURI(file.name)}`;
+  const dataURL = (route: string) =>
+    `${route}/${encodeURI(file.name)}?nocompress=${noCompress == null ? !onDash : noCompress}`;
 
   const router = useRouter();
   const [opened, setOpened] = useState(pass);
@@ -192,8 +198,7 @@ export default function EmbeddedFile({
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { id } = context.params as { id: string };
-
+  const { id, noCompress = null } = context.query as unknown as { id: string; noCompress?: boolean };
   const file = await prisma.file.findFirst({
     where: {
       OR: [{ name: id }, { invisible: { invis: decodeURI(encodeURI(id)) } }],
@@ -258,6 +263,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       file,
       user,
       pass: file.password ? true : false,
+      onDash: config.core.compression.on_dashboard,
+      noCompress,
     },
   };
 };

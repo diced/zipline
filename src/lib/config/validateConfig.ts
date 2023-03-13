@@ -34,6 +34,16 @@ const validator = s.object({
     logger: s.boolean.default(false),
     stats_interval: s.number.default(1800),
     invites_interval: s.number.default(1800),
+    compression: s
+      .object({
+        enabled: s.boolean.default(false),
+        threshold: s.number.default(2048),
+        on_dashboard: s.boolean.default(true),
+      })
+      .default({
+        enabled: false,
+        on_dashboard: false,
+      }),
   }),
   datasource: s
     .object({

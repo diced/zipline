@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import FilePagation from './FilePagation';
 
-export default function Files({ disableMediaPreview, exifEnabled, queryPage }) {
+export default function Files({ disableMediaPreview, exifEnabled, queryPage, compress }) {
   const [favoritePage, setFavoritePage] = useState(1);
   const [favoriteNumPages, setFavoriteNumPages] = useState(0);
   const favoritePages = usePaginatedFiles(favoritePage, 'media', true);
@@ -50,6 +50,7 @@ export default function Files({ disableMediaPreview, exifEnabled, queryPage }) {
                           disableMediaPreview={disableMediaPreview}
                           exifEnabled={exifEnabled}
                           refreshImages={favoritePages.refetch}
+                          onDash={compress}
                         />
                       </div>
                     ))
@@ -75,6 +76,7 @@ export default function Files({ disableMediaPreview, exifEnabled, queryPage }) {
         disableMediaPreview={disableMediaPreview}
         exifEnabled={exifEnabled}
         queryPage={queryPage}
+        compress={compress}
       />
     </>
   );
