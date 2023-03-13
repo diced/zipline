@@ -55,7 +55,7 @@
     "fflate": "^0.7.4",
     "find-my-way": "^7.5.0",
     "katex": "^0.16.4",
-    "mantine-datatable": "^1.8.6",
+    "mantine-datatable": "2.0.1",
     "minio": "^7.0.32",
     "ms": "canary",
     "multer": "^1.4.5-lts.1",
