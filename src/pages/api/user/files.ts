@@ -99,6 +99,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
         id: true,
         favorite: true,
         views: true,
+        folderId: true,
         maxViews: true,
         size: true,
       },
