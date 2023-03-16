@@ -57,7 +57,7 @@ function useCompress(this: FastifyReply, data: NodeJS.ReadableStream) {
       break;
   }
   if (!compress) return data;
-  setTimeout(() => compress.destroy(), 1000);
+  setTimeout(() => compress.destroy(), 2000);
   return pump(data, compress, (err) => (err ? this.server.logger.error(err) : null));
 }
 
