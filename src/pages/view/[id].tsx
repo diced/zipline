@@ -17,17 +17,17 @@ export default function EmbeddedFile({
   pass,
   prismRender,
   onDash,
-  noCompress,
+  compress,
 }: {
   file: File & { imageProps?: HTMLImageElement };
   user: UserExtended;
   pass: boolean;
   prismRender: boolean;
   onDash: boolean;
-  noCompress?: boolean;
+  compress?: boolean;
 }) {
   const dataURL = (route: string) =>
-    `${route}/${encodeURI(file.name)}?nocompress=${noCompress == null ? !onDash : noCompress}`;
+    `${route}/${encodeURI(file.name)}?compress=${compress == null ? onDash : compress}`;
 
   const router = useRouter();
   const [opened, setOpened] = useState(pass);
@@ -198,7 +198,8 @@ export default function EmbeddedFile({
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { id, noCompress = null } = context.query as unknown as { id: string; noCompress?: boolean };
+  const { id } = context.params as { id: string };
+  const { compress = null } = context.query as unknown as { compress?: boolean };
   const file = await prisma.file.findFirst({
     where: {
       OR: [{ name: id }, { invisible: { invis: decodeURI(encodeURI(id)) } }],
@@ -264,7 +265,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       user,
       pass: file.password ? true : false,
       onDash: config.core.compression.on_dashboard,
-      noCompress,
+      compress,
     },
   };
 };

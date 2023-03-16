@@ -217,7 +217,7 @@ export default function FileModal({
       <Stack>
         <Type
           file={file}
-          src={`/r/${encodeURI(file.name)}?nocompress=${!compress}`}
+          src={`/r/${encodeURI(file.name)}?compress=${compress}`}
           alt={file.name}
           popup
           sx={{ minHeight: 200 }}

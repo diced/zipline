@@ -80,7 +80,7 @@ export default function File({
               width: '100%',
               cursor: 'pointer',
             }}
-            src={`/r/${encodeURI(image.name)}?nocompress=${!onDash}`}
+            src={`/r/${encodeURI(image.name)}?compress=${onDash}`}
             alt={image.name}
             disableMediaPreview={disableMediaPreview}
           />
