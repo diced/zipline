@@ -99,6 +99,7 @@ export default function ZiplineTheming({ Component, pageProps, ...props }) {
           },
           Modal: {
             defaultProps: {
+              closeButtonProps: { size: 'lg' },
               centered: true,
               transitionProps: {
                 exitDuration: 100,
