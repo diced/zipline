@@ -220,8 +220,8 @@ export default function FileModal({
           src={`/r/${encodeURI(file.name)}?compress=${compress}`}
           alt={file.name}
           popup
-          sx={{ minHeight: 200 }}
-          style={{ minHeight: 200 }}
+          sx={{ minHeight: 200, overflowY: 'scroll', maxHeight: 500 }}
+          style={{ minHeight: 200, overflowY: 'scroll', maxHeight: 500 }}
           disableMediaPreview={false}
           overrideRender={overrideRender}
           setOverrideRender={setOverrideRender}
