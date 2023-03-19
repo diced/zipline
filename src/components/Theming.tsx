@@ -99,6 +99,7 @@ export default function ZiplineTheming({ Component, pageProps, ...props }) {
           },
           Modal: {
             defaultProps: {
+              closeButtonProps: { size: 'lg' },
               centered: true,
               transitionProps: {
                 exitDuration: 100,
@@ -118,7 +119,7 @@ export default function ZiplineTheming({ Component, pageProps, ...props }) {
           },
           LoadingOverlay: {
             defaultProps: {
-              overlayProps: {
+              overlayprops: {
                 blur: 3,
                 color: theme.colorScheme === 'dark' ? theme.colors.dark[6] : 'white',
               },

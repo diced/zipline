@@ -23,7 +23,7 @@ export function parseContent(
           image: content.embed.image,
         }
       : null,
-    url: args[3],
+    url: args.link,
   };
 }
 

@@ -50,6 +50,7 @@ export default function FileModal({
   refresh,
   reducedActions = false,
   exifEnabled,
+  compress,
 }: {
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -58,6 +59,7 @@ export default function FileModal({
   refresh: () => void;
   reducedActions?: boolean;
   exifEnabled?: boolean;
+  compress: boolean;
 }) {
   const deleteFile = useFileDelete();
   const favoriteFile = useFileFavorite();
@@ -215,11 +217,11 @@ export default function FileModal({
       <Stack>
         <Type
           file={file}
-          src={`/r/${encodeURI(file.name)}`}
+          src={`/r/${encodeURI(file.name)}?compress=${compress}`}
           alt={file.name}
           popup
-          sx={{ minHeight: 200 }}
-          style={{ minHeight: 200 }}
+          sx={{ minHeight: 200, overflowY: 'scroll', maxHeight: 500 }}
+          style={{ minHeight: 200, overflowY: 'scroll', maxHeight: 500 }}
           disableMediaPreview={false}
           overrideRender={overrideRender}
           setOverrideRender={setOverrideRender}

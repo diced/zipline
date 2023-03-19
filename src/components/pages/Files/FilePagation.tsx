@@ -10,7 +10,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 
-export default function FilePagation({ disableMediaPreview, exifEnabled, queryPage }) {
+export default function FilePagation({ disableMediaPreview, exifEnabled, queryPage, compress }) {
   const [checked, setChecked] = useRecoilState(showNonMediaSelector);
   const [numPages, setNumPages] = useState(Number(queryPage)); // just set it to the queryPage, since the req may have not loaded yet
   const [page, setPage] = useState(Number(queryPage));
@@ -75,6 +75,7 @@ export default function FilePagation({ disableMediaPreview, exifEnabled, queryPa
                     disableMediaPreview={disableMediaPreview}
                     exifEnabled={exifEnabled}
                     refreshImages={pages.refetch}
+                    onDash={compress}
                   />
                 </div>
               ))

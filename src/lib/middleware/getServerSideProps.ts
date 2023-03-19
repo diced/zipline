@@ -64,6 +64,7 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (ct
       max_size: config.chunks.max_size,
       totp_enabled: config.mfa.totp_enabled,
       exif_enabled: config.exif.enabled,
+      compress: config.core.compression.on_dashboard,
     } as ServerSideProps,
   };
 

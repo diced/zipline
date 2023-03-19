@@ -1,5 +1,6 @@
 import { Box, Button, Modal, PasswordInput } from '@mantine/core';
 import type { File } from '@prisma/client';
+import config from 'lib/config';
 import Link from 'components/Link';
 import exts from 'lib/exts';
 import prisma from 'lib/prisma';
@@ -15,13 +16,18 @@ export default function EmbeddedFile({
   user,
   pass,
   prismRender,
+  onDash,
+  compress,
 }: {
-  file: File;
+  file: File & { imageProps?: HTMLImageElement };
   user: UserExtended;
   pass: boolean;
   prismRender: boolean;
+  onDash: boolean;
+  compress?: boolean;
 }) {
-  const dataURL = (route: string) => `${route}/${encodeURI(file.name)}`;
+  const dataURL = (route: string) =>
+    `${route}/${encodeURI(file.name)}?compress=${compress == null ? onDash : compress}`;
 
   const router = useRouter();
   const [opened, setOpened] = useState(pass);
@@ -60,6 +66,7 @@ export default function EmbeddedFile({
     if (url) {
       imageEl.src = url;
     }
+    file.imageProps = img;
   };
 
   useEffect(() => {
@@ -94,7 +101,11 @@ export default function EmbeddedFile({
 
         {file.mimetype.startsWith('image') && (
           <>
-            <meta property='og:image' content={`/r/${file.name}`} />
+            <meta property='og:type' content='image' />
+            <meta property='og:image' itemProp='image' content={`/r/${file.name}`} />
+            <meta property='og:url' content={`/r/${file.name}`} />
+            <meta property='og:image:width' content={file.imageProps?.naturalWidth.toString()} />
+            <meta property='og:image:height' content={file.imageProps?.naturalHeight.toString()} />
             <meta property='twitter:card' content='summary_large_image' />
           </>
         )}
@@ -114,6 +125,20 @@ export default function EmbeddedFile({
             <meta property='og:video:type' content={file.mimetype} />
             <meta property='og:video:width' content='720' />
             <meta property='og:video:height' content='480' />
+          </>
+        )}
+        {file.mimetype.startsWith('audio') && (
+          <>
+            <meta name='twitter:card' content='player' />
+            <meta name='twitter:player:stream' content={`/r/${file.name}`} />
+            <meta name='twitter:player:stream:content_type' content={file.mimetype} />
+            <meta name='twitter:title' content={file.name} />
+
+            <meta property='og:type' content='music.song' />
+            <meta property='og:url' content={`/r/${file.name}`} />
+            <meta property='og:audio' content={`/r/${file.name}`} />
+            <meta property='og:audio:secure_url' content={`/r/${file.name}`} />
+            <meta property='og:audio:type' content={file.mimetype} />
           </>
         )}
         {!file.mimetype.startsWith('video') && !file.mimetype.startsWith('image') && (
@@ -155,12 +180,18 @@ export default function EmbeddedFile({
         )}
 
         {file.mimetype.startsWith('video') && (
-          <video src={dataURL('/r')} controls={true} autoPlay={true} id='image_content' />
+          <video src={dataURL('/r')} controls autoPlay muted id='video_content' />
         )}
 
-        {!file.mimetype.startsWith('video') && !file.mimetype.startsWith('image') && (
-          <Link href={dataURL('/r')}>Can&#39;t preview this file. Click here to download it.</Link>
+        {file.mimetype.startsWith('audio') && (
+          <audio src={dataURL('/r')} controls autoPlay muted id='audio_content' />
         )}
+
+        {!file.mimetype.startsWith('video') &&
+          !file.mimetype.startsWith('image') &&
+          !file.mimetype.startsWith('audio') && (
+            <Link href={dataURL('/r')}>Can&#39;t preview this file. Click here to download it.</Link>
+          )}
       </Box>
     </>
   );
@@ -168,7 +199,7 @@ export default function EmbeddedFile({
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { id } = context.params as { id: string };
-
+  const { compress = null } = context.query as unknown as { compress?: boolean };
   const file = await prisma.file.findFirst({
     where: {
       OR: [{ name: id }, { invisible: { invis: decodeURI(encodeURI(id)) } }],
@@ -233,6 +264,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       file,
       user,
       pass: file.password ? true : false,
+      onDash: config.core.compression.on_dashboard,
+      compress,
     },
   };
 };

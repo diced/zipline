@@ -22,7 +22,7 @@ import { useEffect, useState } from 'react';
 import CreateFolderModal from './CreateFolderModal';
 import ViewFolderFilesModal from './ViewFolderFilesModal';
 
-export default function Folders({ disableMediaPreview, exifEnabled }) {
+export default function Folders({ disableMediaPreview, exifEnabled, compress }) {
   const folders = useFolders();
   const [createOpen, setCreateOpen] = useState(false);
   const [createWithFile, setCreateWithFile] = useState(null);
@@ -113,6 +113,7 @@ export default function Folders({ disableMediaPreview, exifEnabled }) {
         folderId={activeFolderId}
         disableMediaPreview={disableMediaPreview}
         exifEnabled={exifEnabled}
+        compress={compress}
       />
 
       <Group mb='md'>

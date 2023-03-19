@@ -24,8 +24,18 @@ export function parseString(str: string, value: ParseValue) {
       continue;
     }
 
-    if (matches.groups.prop in ['password', 'avatar']) {
+    if (['password', 'avatar'].includes(matches.groups.prop)) {
       str = replaceCharsFromString(str, '{unknown_property}', matches.index, re.lastIndex);
+      re.lastIndex = matches.index;
+      continue;
+    }
+    if (['originalName', 'name'].includes(matches.groups.prop)) {
+      str = replaceCharsFromString(
+        str,
+        decodeURIComponent(escape(getV[matches.groups.prop])),
+        matches.index,
+        re.lastIndex
+      );
       re.lastIndex = matches.index;
       continue;
     }

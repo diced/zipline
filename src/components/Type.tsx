@@ -45,8 +45,8 @@ function Placeholder({ text, Icon, ...props }) {
     );
 
   return (
-    <Box sx={{ height: 200 }} {...props}>
-      <Center sx={{ height: 200 }}>
+    <Box sx={{ height: 320 }} {...props}>
+      <Center sx={{ height: 320 }}>
         <PlaceholderContent text={text} Icon={Icon} />
       </Center>
     </Box>
@@ -158,6 +158,8 @@ export default function Type({ file, popup = false, disableMediaPreview, ...prop
       image: (
         <Image
           placeholder={<PlaceholderContent Icon={IconPhotoCancel} text={'Image failed to load...'} />}
+          height={320}
+          fit='contain'
           {...props}
         />
       ),

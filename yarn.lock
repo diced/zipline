@@ -7167,14 +7167,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mantine-datatable@npm:^1.8.6":
-  version: 1.8.6
-  resolution: "mantine-datatable@npm:1.8.6"
+"mantine-datatable@npm:2.0.1":
+  version: 2.0.1
+  resolution: "mantine-datatable@npm:2.0.1"
   peerDependencies:
-    "@mantine/core": ^5.10.4
-    "@mantine/hooks": ^5.10.4
+    "@mantine/core": ^6.0.0
+    "@mantine/hooks": ^6.0.0
     react: ^18.2.0
-  checksum: a4558418067ada3e269e3d9dc0153b613b031ecd5fccd484b45a2b13e403084971870515d51c888d933eb2f4d85f6df2ad221b0c84a2bf2cd602d27938bb9029
+  checksum: aa39a662619373a82ed0408ffbe4ade71449abf281495af6820bfe9113d6de22005128d8ac1ff7d6a89f4919d58c1c2ceb0fdfa4e9be37050350d2635f595f6b
   languageName: node
   linkType: hard
 
@@ -11729,7 +11729,7 @@ __metadata:
     fflate: ^0.7.4
     find-my-way: ^7.5.0
     katex: ^0.16.4
-    mantine-datatable: ^1.8.6
+    mantine-datatable: 2.0.1
     minio: ^7.0.32
     ms: canary
     multer: ^1.4.5-lts.1
