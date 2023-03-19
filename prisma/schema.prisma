@@ -40,13 +40,6 @@ model Folder {
   files File[]
 }
 
-enum FileNameFormat {
-  UUID
-  DATE
-  RANDOM
-  NAME
-}
-
 model File {
   id           Int            @id @default(autoincrement())
   name         String
@@ -61,7 +54,6 @@ model File {
   embed        Boolean        @default(false)
   password     String?
   invisible    InvisibleFile?
-  format       FileNameFormat @default(RANDOM)
 
   user   User? @relation(fields: [userId], references: [id], onDelete: SetNull)
   userId Int?

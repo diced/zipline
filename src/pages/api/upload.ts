@@ -1,10 +1,11 @@
-import { FileNameFormat, InvisibleFile } from '@prisma/client';
+import { InvisibleFile } from '@prisma/client';
 import { randomUUID } from 'crypto';
 import dayjs from 'dayjs';
 import { readdir, readFile, unlink, writeFile } from 'fs/promises';
 import zconfig from 'lib/config';
 import datasource from 'lib/datasource';
 import { sendUpload } from 'lib/discord';
+import formatFileName, { NameFormat, NameFormats } from 'lib/format';
 import Logger from 'lib/logger';
 import { NextApiReq, NextApiRes, withZipline } from 'lib/middleware/withZipline';
 import prisma from 'lib/prisma';
@@ -54,8 +55,8 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     if (!expiry) return res.badRequest('invalid date (UPLOADER_DEFAULT_EXPIRATION)');
   }
 
-  const rawFormat = ((req.headers.format || '') as string).toUpperCase() || zconfig.uploader.default_format;
-  const format: FileNameFormat = Object.keys(FileNameFormat).includes(rawFormat) && FileNameFormat[rawFormat];
+  const rawFormat = ((req.headers['format'] as string) || zconfig.uploader.default_format).toLowerCase();
+  const format = NameFormats.includes(rawFormat as NameFormat) ? rawFormat : 'random';
 
   const imageCompressionPercent = req.headers['image-compression-percent']
     ? Number(req.headers['image-compression-percent'])
@@ -124,25 +125,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       const ext = filename.split('.').length === 1 ? '' : filename.split('.').pop();
       if (zconfig.uploader.disabled_extensions.includes(ext))
         return res.error('disabled extension recieved: ' + ext);
-      let fileName: string;
-
-      switch (format) {
-        case FileNameFormat.RANDOM:
-          fileName = randomChars(zconfig.uploader.length);
-          break;
-        case FileNameFormat.DATE:
-          fileName = dayjs().format(zconfig.uploader.format_date);
-          break;
-        case FileNameFormat.UUID:
-          fileName = randomUUID({ disableEntropyCache: true });
-          break;
-        case FileNameFormat.NAME:
-          fileName = filename.split('.')[0];
-          break;
-        default:
-          fileName = randomChars(zconfig.uploader.length);
-          break;
-      }
+      let fileName = await formatFileName(format, filename);
 
       let password = null;
       if (req.headers.password) {
@@ -158,7 +141,6 @@ async function handler(req: NextApiReq, res: NextApiRes) {
           mimetype,
           userId: user.id,
           embed: !!req.headers.embed,
-          format,
           password,
           expiresAt: expiry,
           maxViews: fileMaxViews,
@@ -250,35 +232,16 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     const ext = file.originalname.split('.').length === 1 ? '' : file.originalname.split('.').pop();
     if (zconfig.uploader.disabled_extensions.includes(ext))
       return res.badRequest(`file[${i}]: disabled extension recieved: ${ext}`);
-    let fileName: string;
-
-    switch (format) {
-      case FileNameFormat.RANDOM:
-        fileName = randomChars(zconfig.uploader.length);
-        break;
-      case FileNameFormat.DATE:
-        fileName = dayjs().format(zconfig.uploader.format_date);
-        break;
-      case FileNameFormat.UUID:
-        fileName = randomUUID({ disableEntropyCache: true });
-        break;
-      case FileNameFormat.NAME:
-        fileName = file.originalname.split('.')[0];
-        break;
-      default:
-        if (req.headers['x-zipline-filename']) {
-          fileName = req.headers['x-zipline-filename'] as string;
-          const existing = await prisma.file.findFirst({
-            where: {
-              name: fileName,
-            },
-          });
-          if (existing) return res.badRequest(`file[${i}]: filename already exists: '${fileName}'`);
-
-          break;
-        }
-        fileName = randomChars(zconfig.uploader.length);
-        break;
+    let fileName = await formatFileName(format, file.originalname);
+    console.log(fileName);
+    if (req.headers['x-zipline-filename']) {
+      fileName = req.headers['x-zipline-filename'] as string;
+      const existing = await prisma.file.findFirst({
+        where: {
+          name: fileName,
+        },
+      });
+      if (existing) return res.badRequest(`file[${i}]: filename already exists: '${fileName}'`);
     }
 
     let password = null;
@@ -294,7 +257,6 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         mimetype: req.headers.uploadtext ? 'text/plain' : compressionUsed ? 'image/jpeg' : file.mimetype,
         userId: user.id,
         embed: !!req.headers.embed,
-        format,
         password,
         expiresAt: expiry,
         maxViews: fileMaxViews,

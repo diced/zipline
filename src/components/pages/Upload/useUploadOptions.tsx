@@ -152,10 +152,11 @@ export function OptionsModal({
           icon={<IconFileInfo size='1rem' />}
           data={[
             { value: 'default', label: 'Default' },
-            { value: 'RANDOM', label: 'Random' },
-            { value: 'NAME', label: 'Original Name' },
-            { value: 'DATE', label: 'Date (format configured by server)' },
-            { value: 'UUID', label: 'UUID' },
+            { value: 'random', label: 'Random' },
+            { value: 'name', label: 'Original Name' },
+            { value: 'date', label: 'Date (format configured by server)' },
+            { value: 'uuid', label: 'UUID' },
+            { value: 'gfycat', label: 'Gfycat' },
           ]}
         />
         <PasswordInput

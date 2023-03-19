@@ -103,10 +103,11 @@ export function GeneratorModal({ opened, onClose, title, onSubmit, ...other }) {
         <Select
           label='Select file name format'
           data={[
-            { value: 'RANDOM', label: 'Random (alphanumeric)' },
-            { value: 'DATE', label: 'Date' },
-            { value: 'UUID', label: 'UUID' },
-            { value: 'NAME', label: 'Name (keeps original file name)' },
+            { value: 'random', label: 'Random (alphanumeric)' },
+            { value: 'date', label: 'Date' },
+            { value: 'uuid', label: 'UUID' },
+            { value: 'name', label: 'Name (keeps original file name)' },
+            { value: 'gfycat', label: 'Gfycat' },
           ]}
           id='format'
           my='sm'
