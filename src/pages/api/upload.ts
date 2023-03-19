@@ -56,7 +56,9 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   }
 
   const rawFormat = ((req.headers['format'] as string) || zconfig.uploader.default_format).toLowerCase();
-  const format = NameFormats.includes(rawFormat as NameFormat) ? rawFormat : 'random';
+  const format = NameFormats.includes(rawFormat as NameFormat)
+    ? (rawFormat as NameFormat)
+    : ('random' as NameFormat);
 
   const imageCompressionPercent = req.headers['image-compression-percent']
     ? Number(req.headers['image-compression-percent'])
