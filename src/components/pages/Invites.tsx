@@ -17,10 +17,20 @@ import { useForm } from '@mantine/form';
 import { useClipboard } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
 import { showNotification } from '@mantine/notifications';
-import { IconClipboardCopy, IconPlus, IconTag, IconTagOff, IconTrash } from '@tabler/icons-react';
+import type { Invite } from '@prisma/client';
+import {
+  IconClipboardCopy,
+  IconGridDots,
+  IconList,
+  IconPlus,
+  IconTag,
+  IconTagOff,
+  IconTrash,
+} from '@tabler/icons-react';
 import MutedText from 'components/MutedText';
 import useFetch from 'hooks/useFetch';
 import { expireText, relativeTime } from 'lib/utils/client';
+import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
@@ -125,8 +135,34 @@ export default function Invites() {
   const modals = useModals();
   const clipboard = useClipboard();
 
-  const [invites, setInvites] = useState([]);
+  const [invites, setInvites] = useState<Invite[]>([]);
   const [open, setOpen] = useState(false);
+
+  const [listView, setListView] = useState(true);
+
+  const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
+    columnAccessor: 'createdAt',
+    direction: 'asc',
+  });
+  const [records, setRecords] = useState(invites);
+
+  useEffect(() => {
+    setRecords(invites);
+  }, [invites]);
+
+  useEffect(() => {
+    if (!records || records.length === 0) return;
+
+    const sortedRecords = [...records].sort((a, b) => {
+      if (sortStatus.direction === 'asc') {
+        return a[sortStatus.columnAccessor] > b[sortStatus.columnAccessor] ? 1 : -1;
+      }
+
+      return a[sortStatus.columnAccessor] < b[sortStatus.columnAccessor] ? 1 : -1;
+    });
+
+    setRecords(sortedRecords);
+  }, [sortStatus]);
 
   const openDeleteModal = (invite) =>
     modals.openConfirmModal({
@@ -193,46 +229,132 @@ export default function Invites() {
         <ActionIcon variant='filled' color='primary' onClick={() => setOpen(true)}>
           <IconPlus size='1rem' />
         </ActionIcon>
+        <Tooltip label={listView ? 'Switch to grid view' : 'Switch to list view'}>
+          <ActionIcon variant='filled' color='primary' onClick={() => setListView(!listView)}>
+            {listView ? <IconList size='1rem' /> : <IconGridDots size='1rem' />}
+          </ActionIcon>
+        </Tooltip>
       </Group>
-      <SimpleGrid cols={3} spacing='lg' breakpoints={[{ maxWidth: 'sm', cols: 1, spacing: 'sm' }]}>
-        {invites.length
-          ? invites.map((invite) => (
-              <Card key={invite.id} sx={{ maxWidth: '100%' }}>
-                <Group position='apart'>
-                  <Group position='left'>
-                    <Avatar size='lg' color={invite.used ? 'dark' : 'primary'}>
-                      {invite.id}
-                    </Avatar>
-                    <Stack spacing={0}>
-                      <Title>
-                        {invite.code}
-                        {invite.used && <> (Used)</>}
-                      </Title>
-                      <Tooltip label={new Date(invite.createdAt).toLocaleString()}>
-                        <div>
-                          <MutedText size='sm'>Created {relativeTime(new Date(invite.createdAt))}</MutedText>
-                        </div>
-                      </Tooltip>
-                      <Tooltip label={new Date(invite.expiresAt).toLocaleString()}>
-                        <div>
-                          <MutedText size='sm'>{expireText(invite.expiresAt)}</MutedText>
-                        </div>
-                      </Tooltip>
-                    </Stack>
-                  </Group>
-                  <Stack>
-                    <ActionIcon aria-label='copy' onClick={() => handleCopy(invite)}>
+      {listView ? (
+        <DataTable
+          withBorder
+          borderRadius='md'
+          highlightOnHover
+          verticalSpacing='sm'
+          columns={[
+            { accessor: 'id', sortable: true },
+            { accessor: 'code', sortable: true },
+            {
+              accessor: 'createdAt',
+              title: 'Created At',
+              sortable: true,
+              render: (invite) => new Date(invite.createdAt).toLocaleString(),
+            },
+            {
+              accessor: 'expiresAt',
+              title: 'Expires At',
+              sortable: true,
+              render: (invite) => new Date(invite.expiresAt).toLocaleString(),
+            },
+            {
+              accessor: 'used',
+              sortable: true,
+              render: (invite) => (invite.used ? 'Yes' : 'No'),
+            },
+            {
+              accessor: 'actions',
+              textAlignment: 'right',
+              render: (invite) => (
+                <Group spacing={4} position='right' noWrap>
+                  <Tooltip label='Copy invite link'>
+                    <ActionIcon variant='subtle' color='primary' onClick={() => handleCopy(invite)}>
                       <IconClipboardCopy size='1rem' />
                     </ActionIcon>
-                    <ActionIcon aria-label='delete' onClick={() => openDeleteModal(invite)}>
+                  </Tooltip>
+                  <Tooltip label='Delete invite'>
+                    <ActionIcon variant='subtle' color='red' onClick={() => openDeleteModal(invite)}>
                       <IconTrash size='1rem' />
                     </ActionIcon>
-                  </Stack>
+                  </Tooltip>
                 </Group>
-              </Card>
-            ))
-          : [1, 2, 3].map((x) => <Skeleton key={x} width='100%' height={100} radius='sm' />)}
-      </SimpleGrid>
+              ),
+            },
+          ]}
+          sortStatus={sortStatus}
+          onSortStatusChange={setSortStatus}
+          records={records ?? []}
+          fetching={records.length === 0}
+          loaderBackgroundBlur={5}
+          loaderVariant='dots'
+          rowContextMenu={{
+            shadow: 'xl',
+            borderRadius: 'md',
+            items: (invite) => [
+              {
+                key: 'copy',
+                icon: <IconClipboardCopy size='1rem' />,
+                title: `Copy invite code: "${invite.code}"`,
+                onClick: () => clipboard.copy(invite.code),
+              },
+              {
+                key: 'copyLink',
+                icon: <IconClipboardCopy size='1rem' />,
+                title: 'Copy invite link',
+                onClick: () => handleCopy(invite),
+              },
+              {
+                key: 'delete',
+                icon: <IconTrash size='1rem' />,
+                title: `Delete invite ${invite.code}`,
+                onClick: () => openDeleteModal(invite),
+              },
+            ],
+          }}
+        />
+      ) : (
+        <SimpleGrid cols={3} spacing='lg' breakpoints={[{ maxWidth: 'sm', cols: 1, spacing: 'sm' }]}>
+          {invites.length
+            ? invites.map((invite) => (
+                <Card key={invite.id} sx={{ maxWidth: '100%' }}>
+                  <Group position='apart'>
+                    <Group position='left'>
+                      <Avatar size='lg' color={invite.used ? 'dark' : 'primary'}>
+                        {invite.id}
+                      </Avatar>
+                      <Stack spacing={0}>
+                        <Title>
+                          {invite.code}
+                          {invite.used && <> (Used)</>}
+                        </Title>
+                        <Tooltip label={new Date(invite.createdAt).toLocaleString()}>
+                          <div>
+                            <MutedText size='sm'>
+                              Created {relativeTime(new Date(invite.createdAt))}
+                            </MutedText>
+                          </div>
+                        </Tooltip>
+                        <Tooltip label={new Date(invite.expiresAt).toLocaleString()}>
+                          <div>
+                            {/* @ts-ignore */}
+                            <MutedText size='sm'>{expireText(new Date(invite.expiresAt))}</MutedText>
+                          </div>
+                        </Tooltip>
+                      </Stack>
+                    </Group>
+                    <Stack>
+                      <ActionIcon aria-label='copy' onClick={() => handleCopy(invite)}>
+                        <IconClipboardCopy size='1rem' />
+                      </ActionIcon>
+                      <ActionIcon aria-label='delete' onClick={() => openDeleteModal(invite)}>
+                        <IconTrash size='1rem' />
+                      </ActionIcon>
+                    </Stack>
+                  </Group>
+                </Card>
+              ))
+            : [1, 2, 3].map((x) => <Skeleton key={x} width='100%' height={100} radius='sm' />)}
+        </SimpleGrid>
+      )}
     </>
   );
 }

@@ -1,5 +1,6 @@
 import {
   ActionIcon,
+  Anchor,
   Button,
   Card,
   Center,
@@ -11,16 +12,25 @@ import {
   TextInput,
   Title,
   Tooltip,
+  Text,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useClipboard } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
 import { showNotification } from '@mantine/notifications';
-import { IconClipboardCopy, IconExternalLink, IconLink, IconLinkOff } from '@tabler/icons-react';
+import {
+  IconClipboardCopy,
+  IconExternalLink,
+  IconGridDots,
+  IconLink,
+  IconLinkOff,
+  IconList,
+} from '@tabler/icons-react';
 import Link from 'components/Link';
 import MutedText from 'components/MutedText';
-import { useURLs } from 'lib/queries/url';
+import { useURLDelete, useURLs } from 'lib/queries/url';
 import { userSelector } from 'lib/recoil/user';
+import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import URLCard from './URLCard';
@@ -35,6 +45,32 @@ export default function Urls() {
   const [createOpen, setCreateOpen] = useState(false);
 
   const updateURLs = async () => urls.refetch();
+
+  const [listView, setListView] = useState(true);
+
+  const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
+    columnAccessor: 'id',
+    direction: 'asc',
+  });
+  const [records, setRecords] = useState(urls.data);
+
+  useEffect(() => {
+    setRecords(urls.data);
+  }, [urls.data]);
+
+  useEffect(() => {
+    if (!records || records.length === 0) return;
+
+    const sortedRecords = [...records].sort((a, b) => {
+      if (sortStatus.direction === 'asc') {
+        return a[sortStatus.columnAccessor] > b[sortStatus.columnAccessor] ? 1 : -1;
+      }
+
+      return a[sortStatus.columnAccessor] < b[sortStatus.columnAccessor] ? 1 : -1;
+    });
+
+    setRecords(sortedRecords);
+  }, [sortStatus]);
 
   const form = useForm({
     initialValues: {
@@ -130,6 +166,45 @@ export default function Urls() {
     updateURLs();
   }, []);
 
+  const copyURL = (u) => {
+    clipboard.copy(`${window.location.protocol}//${window.location.host}${u.url}`);
+    if (!navigator.clipboard)
+      showNotification({
+        title: 'Unable to copy to clipboard',
+        message: 'Zipline is unable to copy to clipboard due to security reasons.',
+        color: 'red',
+      });
+    else
+      showNotification({
+        title: 'Copied to clipboard',
+        message: '',
+        icon: <IconClipboardCopy size='1rem' />,
+      });
+  };
+
+  const urlDelete = useURLDelete();
+  const deleteURL = async (u) => {
+    urlDelete.mutate(u.id, {
+      onSuccess: () => {
+        showNotification({
+          title: 'Deleted URL',
+          message: '',
+          icon: <IconLink size='1rem' />,
+          color: 'green',
+        });
+      },
+
+      onError: (url: any) => {
+        showNotification({
+          title: 'Failed to delete URL',
+          message: url.error,
+          icon: <IconLinkOff size='1rem' />,
+          color: 'red',
+        });
+      },
+    });
+  };
+
   return (
     <>
       <Modal opened={createOpen} onClose={() => setCreateOpen(false)} title={<Title>Shorten URL</Title>}>
@@ -150,6 +225,11 @@ export default function Urls() {
         <ActionIcon variant='filled' color='primary' onClick={() => setCreateOpen(true)}>
           <IconLink size='1rem' />
         </ActionIcon>
+        <Tooltip label={listView ? 'Switch to grid view' : 'Switch to list view'}>
+          <ActionIcon variant='filled' color='primary' onClick={() => setListView(!listView)}>
+            {listView ? <IconList size='1rem' /> : <IconGridDots size='1rem' />}
+          </ActionIcon>
+        </Tooltip>
       </Group>
 
       {urls.data && urls.data.length === 0 && (
@@ -168,11 +248,106 @@ export default function Urls() {
         </Card>
       )}
 
-      <SimpleGrid cols={4} spacing='lg' breakpoints={[{ maxWidth: 'sm', cols: 1, spacing: 'sm' }]}>
-        {urls.isLoading || !urls.data
-          ? [1, 2, 3, 4].map((x) => <Skeleton key={x} width='100%' height={80} radius='sm' />)
-          : urls.data.map((url) => <URLCard key={url.id} url={url} />)}
-      </SimpleGrid>
+      {listView ? (
+        <DataTable
+          withBorder
+          borderRadius='md'
+          highlightOnHover
+          verticalSpacing='sm'
+          columns={[
+            { accessor: 'id', title: 'ID', sortable: true },
+            {
+              accessor: 'vanity',
+              title: 'Vanity',
+              sortable: true,
+              render: (url) => <Text>{url.vanity ?? ''}</Text>,
+            },
+            {
+              accessor: 'destination',
+              title: 'URL',
+              sortable: true,
+              render: (url) => (
+                <Anchor component={Link} href={url.url} target='_blank'>
+                  {url.destination}
+                </Anchor>
+              ),
+            },
+            {
+              accessor: 'views',
+              sortable: true,
+            },
+            {
+              accessor: 'maxViews',
+              sortable: true,
+            },
+            {
+              accessor: 'actions',
+              textAlignment: 'right',
+              render: (url) => (
+                <Group spacing={4} position='right' noWrap>
+                  <Tooltip label='Open link in a new tab'>
+                    <ActionIcon
+                      onClick={() => window.open(url.url, '_blank')}
+                      variant='subtle'
+                      color='primary'
+                    >
+                      <IconExternalLink size='1rem' />
+                    </ActionIcon>
+                  </Tooltip>
+                  <Tooltip label='Copy link to clipboard'>
+                    <ActionIcon onClick={() => copyURL(url)} variant='subtle' color='primary'>
+                      <IconClipboardCopy size='1rem' />
+                    </ActionIcon>
+                  </Tooltip>
+                  <Tooltip label='Delete URL'>
+                    <ActionIcon onClick={() => deleteURL(url)} variant='subtle' color='red'>
+                      <IconLinkOff size='1rem' />
+                    </ActionIcon>
+                  </Tooltip>
+                </Group>
+              ),
+            },
+          ]}
+          sortStatus={sortStatus}
+          onSortStatusChange={setSortStatus}
+          records={records ?? []}
+          fetching={urls.isLoading}
+          loaderBackgroundBlur={5}
+          loaderVariant='dots'
+          rowContextMenu={{
+            shadow: 'xl',
+            borderRadius: 'md',
+            items: (url) => [
+              {
+                key: 'openLink',
+                title: 'Open link in a new tab',
+                icon: <IconExternalLink size='1rem' />,
+                onClick: () => window.open(url.url, '_blank'),
+              },
+              {
+                key: 'copyLink',
+                title: 'Copy link to clipboard',
+                icon: <IconClipboardCopy size='1rem' />,
+                onClick: () => copyURL(url),
+              },
+              {
+                key: 'deleteURL',
+                title: 'Delete URL',
+                icon: <IconLinkOff size='1rem' />,
+                onClick: () => deleteURL(url),
+              },
+            ],
+          }}
+        />
+      ) : (
+        <SimpleGrid cols={4} spacing='lg' breakpoints={[{ maxWidth: 'sm', cols: 1, spacing: 'sm' }]}>
+          {urls.isLoading || !urls.data
+            ? [1, 2, 3, 4].map((x) => <Skeleton key={x} width='100%' height={80} radius='sm' />)
+            : urls.data.map((url) => (
+                <URLCard key={url.id} url={url} deleteURL={deleteURL} copyURL={copyURL} />
+              ))}
+        </SimpleGrid>
+      )}
     </>
   );
 }

@@ -52,7 +52,11 @@ export function EditUserModal({ open, setOpen, updateUsers, user }) {
   };
 
   return (
-    <Modal opened={open} onClose={() => setOpen(false)} title={<Title>Edit User {user?.username}</Title>}>
+    <Modal
+      opened={open}
+      onClose={() => setOpen(false)}
+      title={<Title>Edit &quot;{user?.username}&quot;</Title>}
+    >
       {user && (
         <form onSubmit={form.onSubmit((v) => onSubmit(v))}>
           <TextInput id='username' label='Username' {...form.getInputProps('username')} />

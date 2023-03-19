@@ -9,7 +9,6 @@ import {
   IconPhotoUp,
 } from '@tabler/icons-react';
 import FileModal from 'components/File/FileModal';
-import Link from 'components/Link';
 import MutedText from 'components/MutedText';
 import useFetch from 'lib/hooks/useFetch';
 import { usePaginatedFiles, useRecent } from 'lib/queries/files';
