@@ -35,7 +35,7 @@ A ShareX/file upload server that is easy to use, packed with features, and with 
 - User invites
 - File Chunking (for large files)
 - File deletion once it reaches a certain amount of views
-- Easy setup instructions on [docs](https://zipl.vercel.app/) (One command install `docker-compose up -d`)
+- Easy setup instructions on [docs](https://zipl.vercel.app/) (One command install `docker compose up -d`)
 
 <details>
   <summary>View upstream documentation</summary>
@@ -60,13 +60,13 @@ The website below provides documentation for more up-to-date features with the u
 
 ## Install & run with Docker
 
-This section requires [Docker](https://docs.docker.com/get-docker/) and [docker-compose](https://docs.docker.com/compose/install/).
+This section requires [Docker](https://docs.docker.com/get-docker/) and [docker compose](https://docs.docker.com/compose/install/).
 
 ```shell
 git clone https://github.com/diced/zipline
 cd zipline
 
-docker-compose up -d
+docker compose up -d
 ```
 
 ### After installing
