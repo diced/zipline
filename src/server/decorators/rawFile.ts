@@ -18,7 +18,7 @@ function rawFileDecorator(fastify: FastifyInstance, _, done) {
 
     const mimetype = await guess(extname(id).slice(1));
     const size = await this.server.datasource.size(id);
-    this.header('Content-Type', download ? 'application/octt-stream' : mimetype);
+    this.header('Content-Type', download ? 'application/octet-stream' : mimetype);
 
     if (
       this.server.config.core.compression.enabled &&
