@@ -25,7 +25,7 @@ A ShareX/file upload server that is easy to use, packed with features, and with 
 - Password Protected Uploads
 - URL shortening
 - Text uploading
-- URL Formats (uuid, dates, random alphanumeric, original name, zws)
+- URL Formats (uuid, dates, random alphanumeric, original name, zws, gfycat -> [animals](https://assets.gfycat.com/animals) [adjectives](https://assets.gfycat.com/adjectives))
 - Discord embeds (OG metadata)
 - Gallery viewer, and multiple file format support
 - Code highlighting
@@ -36,6 +36,15 @@ A ShareX/file upload server that is easy to use, packed with features, and with 
 - File Chunking (for large files)
 - File deletion once it reaches a certain amount of views
 - Easy setup instructions on [docs](https://zipl.vercel.app/) (One command install `docker-compose up -d`)
+
+<details>
+  <summary>View upstream documentation</summary>
+
+The website below provides documentation for more up-to-date features with the upstream branch. The normal documentation is for the latest release and is not updated unless a new release is made.
+
+[https://trunk.zipline.diced.tech/](https://trunk.zipline.diced.tech/)
+
+</details>
 
 <details>
   <summary><h2>Screenshots (click)</h2></summary>
