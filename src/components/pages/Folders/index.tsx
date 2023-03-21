@@ -4,6 +4,7 @@ import { useModals } from '@mantine/modals';
 import { showNotification } from '@mantine/notifications';
 import {
   IconClipboardCopy,
+  IconExternalLink,
   IconFiles,
   IconFolderMinus,
   IconFolderPlus,
@@ -154,51 +155,63 @@ export default function Folders({ disableMediaPreview, exifEnabled, compress }) 
                       </Stack>
                     </Group>
                     <Group>
-                      <Tooltip label={folder.public ? 'Make folder private' : 'Make folder public'}>
+                      <Stack>
+                        <Tooltip label={folder.public ? 'Make folder private' : 'Make folder public'}>
+                          <ActionIcon
+                            aria-label={folder.public ? 'make private' : 'make public'}
+                            onClick={() => makePublic(folder)}
+                          >
+                            {folder.public ? <IconLock size='1rem' /> : <IconLockOpen size='1rem' />}
+                          </ActionIcon>
+                        </Tooltip>
+                        <Tooltip label='Delete folder'>
+                          <ActionIcon aria-label='delete' onClick={() => deleteFolder(folder)}>
+                            <IconFolderMinus size='1rem' />
+                          </ActionIcon>
+                        </Tooltip>
+                      </Stack>
+                      <Stack>
                         <ActionIcon
-                          aria-label={folder.public ? 'make private' : 'make public'}
-                          onClick={() => makePublic(folder)}
+                          aria-label='view files'
+                          onClick={() => {
+                            setViewOpen(!viewOpen);
+                            setActiveFolderId(folder.id);
+                          }}
                         >
-                          {folder.public ? <IconLock size='1rem' /> : <IconLockOpen size='1rem' />}
+                          <IconFiles size='1rem' />
                         </ActionIcon>
-                      </Tooltip>
-                      <ActionIcon
-                        aria-label='view files'
-                        onClick={() => {
-                          setViewOpen(!viewOpen);
-                          setActiveFolderId(folder.id);
-                        }}
-                      >
-                        <IconFiles size='1rem' />
-                      </ActionIcon>
-                      <ActionIcon
-                        aria-label='copy link'
-                        onClick={() => {
-                          clipboard.copy(`${window.location.origin}/folder/${folder.id}`);
-                          if (!navigator.clipboard)
-                            showNotification({
-                              title: 'Unable to copy to clipboard',
-                              message: 'Zipline is unable to copy to clipboard due to security reasons.',
-                              color: 'red',
-                            });
-                          else
-                            showNotification({
-                              title: 'Copied folder link',
-                              message: (
-                                <>
-                                  Copied <Link href={`/folder/${folder.id}`}>folder link</Link> to clipboard
-                                </>
-                              ),
-                              color: 'green',
-                              icon: <IconClipboardCopy size='1rem' />,
-                            });
-                        }}
-                      >
-                        <IconClipboardCopy size='1rem' />
-                      </ActionIcon>
-                      <ActionIcon aria-label='delete' onClick={() => deleteFolder(folder)}>
-                        <IconFolderMinus size='1rem' />
-                      </ActionIcon>
+                        <ActionIcon
+                          aria-label='copy link'
+                          onClick={() => {
+                            clipboard.copy(`${window.location.origin}/folder/${folder.id}`);
+                            if (!navigator.clipboard)
+                              showNotification({
+                                title: 'Unable to copy to clipboard',
+                                message: 'Zipline is unable to copy to clipboard due to security reasons.',
+                                color: 'red',
+                              });
+                            else
+                              showNotification({
+                                title: 'Copied folder link',
+                                message: (
+                                  <>
+                                    Copied <Link href={`/folder/${folder.id}`}>folder link</Link> to clipboard
+                                  </>
+                                ),
+                                color: 'green',
+                                icon: <IconClipboardCopy size='1rem' />,
+                              });
+                          }}
+                        >
+                          <IconClipboardCopy size='1rem' />
+                        </ActionIcon>
+                        <ActionIcon
+                          aria-label='open in new tab'
+                          onClick={() => window.open(`/folder/${folder.id}`)}
+                        >
+                          <IconExternalLink size='1rem' />
+                        </ActionIcon>
+                      </Stack>
                     </Group>
                   </Group>
                 </Card>
