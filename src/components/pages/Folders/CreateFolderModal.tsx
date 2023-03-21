@@ -43,6 +43,7 @@ export default function CreateFolderModal({ open, setOpen, updateFolders, create
 
     setOpen(false);
     updateFolders();
+    form.setValues({ name: '' });
   };
 
   return (
