@@ -233,7 +233,7 @@ export default function Urls() {
         </Tooltip>
       </Group>
 
-      {urls.data && urls.data.length === 0 && (
+      {!listView && urls.data && urls.data.length === 0 && (
         <Card shadow='md'>
           <Center>
             <Group>
@@ -313,6 +313,7 @@ export default function Urls() {
           onSortStatusChange={setSortStatus}
           records={records ?? []}
           fetching={urls.isLoading}
+          minHeight={160}
           loaderBackgroundBlur={5}
           loaderVariant='dots'
           rowContextMenu={{
