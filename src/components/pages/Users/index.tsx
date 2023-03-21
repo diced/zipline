@@ -14,11 +14,12 @@ import {
 } from '@tabler/icons-react';
 import MutedText from 'components/MutedText';
 import useFetch from 'hooks/useFetch';
+import { listViewUsersSelector } from 'lib/recoil/settings';
 import { userSelector } from 'lib/recoil/user';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { CreateUserModal } from './CreateUserModal';
 import { EditUserModal } from './EditUserModal';
 
@@ -33,7 +34,7 @@ export default function Users() {
   const [editOpen, setEditOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
-  const [listView, setListView] = useState(true);
+  const [listView, setListView] = useRecoilState(listViewUsersSelector);
 
   const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
     columnAccessor: 'id',
