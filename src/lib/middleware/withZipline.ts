@@ -66,10 +66,10 @@ export type ZiplineApiConfig = {
 export const withZipline =
   (
     handler: (req: NextApiRequest, res: NextApiResponse, user?: UserExtended) => Promise<unknown>,
-    api_config: ZiplineApiConfig = { methods: ['GET'] }
+    api_config: ZiplineApiConfig = { methods: ['GET', 'OPTIONS'] }
   ) =>
   (req: NextApiReq, res: NextApiRes) => {
-    api_config.methods.push('OPTIONS');
+    if (!api_config.methods.includes('OPTIONS')) api_config.methods.push('OPTIONS');
 
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
