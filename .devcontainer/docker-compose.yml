@@ -1,12 +1,14 @@
 version: '3.8'
 services:
   app:
-    image: mcr.microsoft.com/vscode/devcontainers/javascript-node:0-18
+    build:
+      context: ./
+      dockerfile: Dockerfile
     volumes:
-      - ..:/workspace:cached
-    network_mode: service:db
+      - ../:/zipline:cached
+      - uploads:/zipline/uploads
+      - node_modules:/zipline/node_modules
     command: sleep infinity
-    user: zipline
   db:
     image: postgres:latest
     restart: unless-stopped
@@ -19,4 +21,5 @@ services:
 
 volumes:
   pg_data:
-    
+  uploads:
+  node_modules:
