@@ -4,6 +4,7 @@ import { showNotification } from '@mantine/notifications';
 import {
   IconClipboardCopy,
   IconExternalLink,
+  IconGridDots,
   IconPhotoCancel,
   IconPhotoMinus,
   IconPhotoUp,
@@ -16,6 +17,7 @@ import { useStats } from 'lib/queries/stats';
 import { userSelector } from 'lib/recoil/user';
 import { bytesToHuman } from 'lib/utils/bytes';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import RecentFiles from './RecentFiles';
@@ -151,7 +153,14 @@ export default function Dashboard({ disableMediaPreview, exifEnabled, compress }
       <RecentFiles disableMediaPreview={disableMediaPreview} exifEnabled={exifEnabled} compress={compress} />
 
       <Box my='sm'>
-        <Title>Files</Title>
+        <Group mb='md'>
+          <Title>Files</Title>
+          <Tooltip label='View Gallery'>
+            <ActionIcon variant='filled' color='primary' component={Link} href='/dashboard/files'>
+              <IconGridDots size='1rem' />
+            </ActionIcon>
+          </Tooltip>
+        </Group>
 
         <DataTable
           withBorder
