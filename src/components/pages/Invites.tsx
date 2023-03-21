@@ -29,10 +29,12 @@ import {
 } from '@tabler/icons-react';
 import MutedText from 'components/MutedText';
 import useFetch from 'hooks/useFetch';
+import { listViewInvitesSelector } from 'lib/recoil/settings';
 import { expireText, relativeTime } from 'lib/utils/client';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import { useRecoilState } from 'recoil';
 
 const expires = ['30m', '1h', '6h', '12h', '1d', '3d', '5d', '7d', 'never'];
 
@@ -137,8 +139,9 @@ export default function Invites() {
 
   const [invites, setInvites] = useState<Invite[]>([]);
   const [open, setOpen] = useState(false);
+  const [ok, setOk] = useState(false);
 
-  const [listView, setListView] = useState(true);
+  const [listView, setListView] = useRecoilState(listViewInvitesSelector);
 
   const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
     columnAccessor: 'createdAt',
@@ -212,6 +215,7 @@ export default function Invites() {
     const us = await useFetch('/api/auth/invite');
     if (!us.error) {
       setInvites(us);
+      setOk(true);
     } else {
       router.push('/dashboard');
     }
@@ -283,7 +287,8 @@ export default function Invites() {
           sortStatus={sortStatus}
           onSortStatusChange={setSortStatus}
           records={records ?? []}
-          fetching={records.length === 0}
+          fetching={!ok}
+          minHeight={160}
           loaderBackgroundBlur={5}
           loaderVariant='dots'
           rowContextMenu={{

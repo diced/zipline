@@ -29,10 +29,11 @@ import {
 import Link from 'components/Link';
 import MutedText from 'components/MutedText';
 import { useURLDelete, useURLs } from 'lib/queries/url';
+import { listViewUrlsSelector } from 'lib/recoil/settings';
 import { userSelector } from 'lib/recoil/user';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { useEffect, useState } from 'react';
-import { useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import URLCard from './URLCard';
 
 export default function Urls() {
@@ -46,7 +47,7 @@ export default function Urls() {
 
   const updateURLs = async () => urls.refetch();
 
-  const [listView, setListView] = useState(true);
+  const [listView, setListView] = useRecoilState(listViewUrlsSelector);
 
   const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
     columnAccessor: 'id',
