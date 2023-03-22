@@ -19,7 +19,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
 
     return res.json(stats_data);
   } else {
-    let amount = typeof req.query.amount === 'string' ? Number(req.query.amount) : 2;
+    const amount = typeof req.query.amount === 'string' ? Number(req.query.amount) : 2;
     if (isNaN(amount)) return res.badRequest('invalid amount');
 
     // get stats per day
@@ -38,7 +38,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
 
     if (!config.website.show_files_per_user) {
       stats = stats.map((stat) => {
-        (stat.data as any).count_by_user = [];
+        (stat.data as Record<string, unknown>).count_by_user = [];
         return stat;
       });
     }

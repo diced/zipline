@@ -1,6 +1,4 @@
 import { InvisibleFile } from '@prisma/client';
-import { randomUUID } from 'crypto';
-import dayjs from 'dayjs';
 import { readdir, readFile, unlink, writeFile } from 'fs/promises';
 import zconfig from 'lib/config';
 import datasource from 'lib/datasource';
@@ -9,7 +7,7 @@ import formatFileName, { NameFormat, NameFormats } from 'lib/format';
 import Logger from 'lib/logger';
 import { NextApiReq, NextApiRes, withZipline } from 'lib/middleware/withZipline';
 import prisma from 'lib/prisma';
-import { createInvisImage, hashPassword, randomChars } from 'lib/util';
+import { createInvisImage, hashPassword } from 'lib/util';
 import { parseExpiry } from 'lib/utils/client';
 import { removeGPSData } from 'lib/utils/exif';
 import multer from 'multer';
@@ -32,7 +30,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   if (!user) return res.forbidden('authorization incorrect');
 
   await new Promise((resolve, reject) => {
-    uploader.array('file')(req as any, res as any, (result: unknown) => {
+    uploader.array('file')(req as never, res as never, (result: unknown) => {
       if (result instanceof Error) reject(result.message);
       resolve(result);
     });
@@ -127,7 +125,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       const ext = filename.split('.').length === 1 ? '' : filename.split('.').pop();
       if (zconfig.uploader.disabled_extensions.includes(ext))
         return res.error('disabled extension recieved: ' + ext);
-      let fileName = await formatFileName(format, filename);
+      const fileName = await formatFileName(format, filename);
 
       let password = null;
       if (req.headers.password) {

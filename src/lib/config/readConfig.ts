@@ -7,11 +7,11 @@ import { humanToBytes } from 'utils/bytes';
 
 export type ValueType = 'string' | 'number' | 'boolean' | 'array' | 'json-array' | 'human-to-byte' | 'path';
 
-function isObject(value: any): value is Record<string, any> {
+function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
 }
 
-function set(object: Record<string, any>, property: string, value: any) {
+function set(object: Record<string, unknown> | unknown, property: string, value: unknown) {
   const parts = property.split('.');
 
   for (let i = 0; i < parts.length; ++i) {
@@ -176,14 +176,14 @@ export default function readConfig() {
     const value = process.env[map.env];
 
     if (value) {
-      let parsed: any;
+      let parsed: unknown;
       switch (map.type) {
         case 'array':
           parsed = value.split(',');
           break;
         case 'number':
           parsed = Number(value);
-          if (isNaN(parsed)) {
+          if (isNaN(parsed as number)) {
             parsed = undefined;
             logger.debug(`Failed to parse number ${map.env}=${value}`);
           }
@@ -205,7 +205,8 @@ export default function readConfig() {
           break;
         case 'path':
           parsed = resolve(value);
-          if (!existsSync(parsed)) logger.debug(`Unable to find ${map.env}=${value} (path does not exist)`);
+          if (!existsSync(parsed as string))
+            logger.debug(`Unable to find ${map.env}=${value} (path does not exist)`);
           break;
         default:
           parsed = value;

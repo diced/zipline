@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 
-export default function GoogleIcon({ colorScheme, ...props }) {
+export default function GoogleIcon({ ...props }) {
   return (
     <Image
       alt='google'

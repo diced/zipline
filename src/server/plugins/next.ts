@@ -15,7 +15,7 @@ async function nextPlugin(fastify: FastifyInstance, options: NextServerOptions) 
 
   return nextServer.prepare();
 
-  function route(path, opts: any = { method: 'GET' }) {
+  function route(path, opts: { method: string | string[] } = { method: 'GET' }) {
     if (typeof opts.method === 'string') this[opts.method.toLowerCase()](path, opts, handler);
     else if (Array.isArray(opts.method)) {
       for (const method of opts.method) this[method.toLowerCase()](path, opts, handler);

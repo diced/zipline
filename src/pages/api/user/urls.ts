@@ -18,7 +18,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
 
     return res.json(url);
   } else {
-    let urls = await prisma.url.findMany({
+    const urls = await prisma.url.findMany({
       where: {
         userId: user.id,
       },

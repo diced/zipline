@@ -259,6 +259,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       },
     };
   }
+
   // @ts-ignore
   if (file.password) file.password = true;
 

@@ -1,15 +1,4 @@
-import {
-  ActionIcon,
-  Anchor,
-  Avatar,
-  Card,
-  Group,
-  SimpleGrid,
-  Skeleton,
-  Stack,
-  Title,
-  Tooltip,
-} from '@mantine/core';
+import { ActionIcon, Avatar, Card, Group, SimpleGrid, Skeleton, Stack, Title, Tooltip } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
 import { showNotification } from '@mantine/notifications';
@@ -34,7 +23,6 @@ import { useFolders } from 'lib/queries/folders';
 import { listViewFoldersSelector } from 'lib/recoil/settings';
 import { relativeTime } from 'lib/utils/client';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';

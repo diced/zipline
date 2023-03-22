@@ -47,12 +47,12 @@ export type NextApiResExtra =
   | 'notFound'
   | 'error';
 export type NextApiResExtraObj = {
-  [key in NextApiResExtra]: (message: any, extra?: Record<string, any>) => void;
+  [key in NextApiResExtra]: (message: string | number, extra?: Record<string, unknown>) => void;
 };
 
 export type NextApiRes = NextApiResponse &
   NextApiResExtraObj & {
-    json: (json: Record<string, any>, status?: number) => void;
+    json: (json: Record<string, unknown>, status?: number) => void;
     setCookie: (name: string, value: unknown, options: CookieSerializeOptions) => void;
     setUserCookie: (id: number) => void;
   };
@@ -80,7 +80,7 @@ export const withZipline =
     if (req.method === 'OPTIONS') return res.status(204).end();
 
     // Used when the client sends wrong information, etc.
-    res.badRequest = (message: string, extra: Record<string, any> = {}) => {
+    res.badRequest = (message: string, extra: Record<string, unknown> = {}) => {
       res.json(
         {
           error: message,
@@ -92,7 +92,7 @@ export const withZipline =
     };
 
     // If the user is not logged in
-    res.unauthorized = (message: string, extra: Record<string, any> = {}) => {
+    res.unauthorized = (message: string, extra: Record<string, unknown> = {}) => {
       res.json(
         {
           error: message,
@@ -104,7 +104,7 @@ export const withZipline =
     };
 
     // If the user is logged in but doesn't have permission to do something
-    res.forbidden = (message: string, extra: Record<string, any> = {}) => {
+    res.forbidden = (message: string, extra: Record<string, unknown> = {}) => {
       res.json(
         {
           error: message,
@@ -115,7 +115,7 @@ export const withZipline =
       );
     };
 
-    res.notFound = (message: string, extra: Record<string, any> = {}) => {
+    res.notFound = (message: string, extra: Record<string, unknown> = {}) => {
       res.json(
         {
           error: message,
@@ -126,7 +126,7 @@ export const withZipline =
       );
     };
 
-    res.ratelimited = (message: number, extra: Record<string, any> = {}) => {
+    res.ratelimited = (message: number, extra: Record<string, unknown> = {}) => {
       const retry = Math.floor(message / 1000);
 
       res.setHeader('X-Ratelimit-Remaining', retry);
@@ -140,7 +140,7 @@ export const withZipline =
       );
     };
 
-    res.json = (json: any, status: number = 200) => {
+    res.json = (json: unknown, status = 200) => {
       res.setHeader('Content-Type', 'application/json');
       res.status(status);
       res.end(JSON.stringify(json));

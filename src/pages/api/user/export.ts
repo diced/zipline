@@ -34,7 +34,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       };
 
       const backpressureThreshold = 65536;
-      let backpressure = [];
+      const backpressure = [];
       let backpressureBytes = 0;
       const push = stream.push;
       stream.push = (dat, final) => {

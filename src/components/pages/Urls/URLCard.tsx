@@ -1,9 +1,9 @@
-import { ActionIcon, Anchor, Card, Group, Stack, Title, Tooltip } from '@mantine/core';
+import { ActionIcon, Card, Group, Stack, Title, Tooltip } from '@mantine/core';
 import { IconClipboardCopy, IconExternalLink, IconTrash } from '@tabler/icons-react';
+import AnchorNext from 'components/AnchorNext';
 import MutedText from 'components/MutedText';
 import { URLResponse } from 'lib/queries/url';
 import { relativeTime } from 'lib/utils/client';
-import Link from 'next/link';
 
 export default function URLCard({
   url,

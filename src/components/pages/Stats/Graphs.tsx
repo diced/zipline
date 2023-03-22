@@ -2,7 +2,7 @@ import { Box, Card, Grid, LoadingOverlay, Title, useMantineTheme } from '@mantin
 
 import { useStats } from 'lib/queries/stats';
 import { bytesToHuman } from 'lib/utils/bytes';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 

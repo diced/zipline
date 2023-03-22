@@ -1,6 +1,5 @@
 import {
   ActionIcon,
-  Anchor,
   Button,
   Card,
   Center,
@@ -28,11 +27,11 @@ import {
 } from '@tabler/icons-react';
 import AnchorNext from 'components/AnchorNext';
 import MutedText from 'components/MutedText';
+import { ApiError } from 'hooks/useFetch';
 import { useURLDelete, useURLs } from 'lib/queries/url';
 import { listViewUrlsSelector } from 'lib/recoil/settings';
 import { userSelector } from 'lib/recoil/user';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import URLCard from './URLCard';
@@ -196,7 +195,7 @@ export default function Urls() {
         });
       },
 
-      onError: (url: any) => {
+      onError: (url: ApiError) => {
         showNotification({
           title: 'Failed to delete URL',
           message: url.error,

@@ -1,5 +1,4 @@
 import {
-  Anchor,
   Box,
   Button,
   Checkbox,
@@ -18,7 +17,6 @@ import { useForm } from '@mantine/form';
 import { IconFileDownload, IconWorld } from '@tabler/icons-react';
 import AnchorNext from 'components/AnchorNext';
 import MutedText from 'components/MutedText';
-import Link from 'next/link';
 import { useReducer, useState } from 'react';
 
 const DEFAULT_OD_DESC = 'Override the default domain(s). Type in a URL, e.g https://example.com';

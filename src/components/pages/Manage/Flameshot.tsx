@@ -1,6 +1,5 @@
-import { Anchor, Code } from '@mantine/core';
+import { Code } from '@mantine/core';
 import AnchorNext from 'components/AnchorNext';
-import Link from 'next/link';
 import { GeneratorModal } from './GeneratorModal';
 
 export default function Flameshot({ user, open, setOpen }) {

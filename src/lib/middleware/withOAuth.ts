@@ -143,7 +143,7 @@ export const withOAuth =
       logger.debug(`attempting to refresh ${provider} account for ${user.username}`);
       await prisma.oAuth.update({
         where: {
-          id: userOauth!.id,
+          id: userOauth?.id,
         },
         data: {
           token: oauth_resp.access_token,
@@ -160,7 +160,7 @@ export const withOAuth =
     } else if ((existingOauth && existingOauth.fallback) || existingOauth) {
       await prisma.oAuth.update({
         where: {
-          id: existingOauth!.id,
+          id: existingOauth?.id,
         },
         data: {
           token: oauth_resp.access_token,

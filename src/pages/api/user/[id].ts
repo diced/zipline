@@ -21,7 +21,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   if (req.method === 'DELETE') {
     if (target.id === user.id) return res.badRequest("you can't delete your own account");
     if (target.administrator && !user.superAdmin) return res.forbidden('cannot delete administrator');
-    let promises = [];
+    const promises = [];
 
     promises.push(
       prisma.user.delete({

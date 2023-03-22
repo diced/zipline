@@ -10,6 +10,9 @@ export type UserFilesResponse = {
   favorite: boolean;
   url: string;
   size: number;
+  maxViews: number;
+  views: number;
+  folderId?: number;
 };
 
 export const useFiles = (query: { [key: string]: string } = {}) => {
@@ -30,7 +33,7 @@ export const useFiles = (query: { [key: string]: string } = {}) => {
       );
   });
 };
-export const usePaginatedFiles = (page?: number, filter: string = 'media', favorite = null) => {
+export const usePaginatedFiles = (page?: number, filter = 'media', favorite = null) => {
   const queryBuilder = new URLSearchParams({
     page: Number(page || '1').toString(),
     filter,

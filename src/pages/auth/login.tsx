@@ -21,7 +21,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 export { getServerSideProps } from 'middleware/getServerSideProps';
-import AnchorNext from 'components/AnchorNext';
 
 export default function Login({ title, user_registration, oauth_registration, oauth_providers: unparsed }) {
   const router = useRouter();

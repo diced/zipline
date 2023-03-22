@@ -48,6 +48,7 @@ import useFetch from 'hooks/useFetch';
 import { useVersion } from 'lib/queries/version';
 import { userSelector } from 'lib/recoil/user';
 import { capitalize } from 'lib/utils/client';
+import { UserExtended } from 'middleware/withZipline';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
@@ -60,7 +61,7 @@ export type NavbarItems = {
   text: string;
   link?: string;
   children?: NavbarItems[];
-  if?: (user: any, props: any) => boolean;
+  if?: (user: UserExtended, props: unknown) => boolean;
 };
 
 const items: NavbarItems[] = [
@@ -120,7 +121,7 @@ const items: NavbarItems[] = [
         icon: <IconTag size={18} />,
         text: 'Invites',
         link: '/dashboard/invites',
-        if: (_, props) => props.invites,
+        if: (_, props: { invites: boolean }) => props.invites,
       },
     ],
   },
@@ -290,9 +291,9 @@ export default function Layout({ children, props }) {
           </Navbar.Section>
           <Navbar.Section>
             {external_links.length
-              ? external_links.map(({ label, link }, i) => (
+              ? external_links.map(({ label, link }, i: number) => (
                   <NavLink
-                    key={label}
+                    key={i}
                     label={label}
                     target='_blank'
                     variant='light'
