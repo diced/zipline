@@ -233,7 +233,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     if (zconfig.uploader.disabled_extensions.includes(ext))
       return res.badRequest(`file[${i}]: disabled extension recieved: ${ext}`);
     let fileName = await formatFileName(format, file.originalname);
-    console.log(fileName);
+
     if (req.headers['x-zipline-filename']) {
       fileName = req.headers['x-zipline-filename'] as string;
       const existing = await prisma.file.findFirst({

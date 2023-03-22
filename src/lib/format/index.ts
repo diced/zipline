@@ -6,7 +6,6 @@ import uuid from './uuid';
 export type NameFormat = 'random' | 'date' | 'uuid' | 'name' | 'gfycat';
 export const NameFormats: NameFormat[] = ['random', 'date', 'uuid', 'name', 'gfycat'];
 export default async function formatFileName(nameFormat: NameFormat, originalName?: string) {
-  console.log(nameFormat, originalName);
   switch (nameFormat) {
     case 'random':
       return random();

@@ -19,7 +19,6 @@ export default function KaTeX({ code, ...props }) {
       </Alert>
     );
   };
-  // dynamic
 
   useEffect(() => {
     (async () => {
