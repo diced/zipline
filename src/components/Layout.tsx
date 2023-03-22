@@ -264,42 +264,42 @@ export default function Layout({ children, props }) {
                     {children
                       .filter((x) => (x.if ? x.if(user, props) : true))
                       .map(({ icon, text, link }) => (
-                        <Link href={link} key={text} passHref legacyBehavior>
-                          <NavLink
-                            component='a'
-                            label={text}
-                            icon={icon}
-                            active={router.pathname === link}
-                            variant='light'
-                          />
-                        </Link>
+                        <NavLink
+                          key={text}
+                          label={text}
+                          icon={icon}
+                          active={router.pathname === link}
+                          variant='light'
+                          component={Link}
+                          href={link}
+                        />
                       ))}
                   </NavLink>
                 ) : (
-                  <Link href={link} key={text} passHref legacyBehavior>
-                    <NavLink
-                      component='a'
-                      label={text}
-                      icon={icon}
-                      active={router.pathname === link}
-                      variant='light'
-                    />
-                  </Link>
+                  <NavLink
+                    key={text}
+                    label={text}
+                    icon={icon}
+                    active={router.pathname === link}
+                    variant='light'
+                    component={Link}
+                    href={link}
+                  />
                 )
               )}
           </Navbar.Section>
           <Navbar.Section>
             {external_links.length
               ? external_links.map(({ label, link }, i) => (
-                  <Link href={link} passHref key={i} legacyBehavior>
-                    <NavLink
-                      label={label}
-                      component='a'
-                      target='_blank'
-                      variant='light'
-                      icon={<IconExternalLink size={18} />}
-                    />
-                  </Link>
+                  <NavLink
+                    key={label}
+                    label={label}
+                    target='_blank'
+                    variant='light'
+                    icon={<IconExternalLink size={18} />}
+                    component={Link}
+                    href={link}
+                  />
                 ))
               : null}
           </Navbar.Section>

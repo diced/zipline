@@ -1,4 +1,15 @@
-import { ActionIcon, Avatar, Card, Group, SimpleGrid, Skeleton, Stack, Title, Tooltip } from '@mantine/core';
+import {
+  ActionIcon,
+  Anchor,
+  Avatar,
+  Card,
+  Group,
+  SimpleGrid,
+  Skeleton,
+  Stack,
+  Title,
+  Tooltip,
+} from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
 import { showNotification } from '@mantine/notifications';
@@ -16,13 +27,14 @@ import {
   IconLockAccessOff,
   IconLockOpen,
 } from '@tabler/icons-react';
-import Link from 'components/Link';
+import AnchorNext from 'components/AnchorNext';
 import MutedText from 'components/MutedText';
 import useFetch from 'hooks/useFetch';
 import { useFolders } from 'lib/queries/folders';
 import { listViewFoldersSelector } from 'lib/recoil/settings';
 import { relativeTime } from 'lib/utils/client';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
@@ -366,7 +378,8 @@ export default function Folders({ disableMediaPreview, exifEnabled, compress }) 
                                   title: 'Copied folder link',
                                   message: (
                                     <>
-                                      Copied <Link href={`/folder/${folder.id}`}>folder link</Link> to
+                                      Copied{' '}
+                                      <AnchorNext href={`/folder/${folder.id}`}>folder link</AnchorNext> to
                                       clipboard
                                     </>
                                   ),

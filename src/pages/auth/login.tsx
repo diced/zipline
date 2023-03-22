@@ -21,6 +21,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 export { getServerSideProps } from 'middleware/getServerSideProps';
+import AnchorNext from 'components/AnchorNext';
 
 export default function Login({ title, user_registration, oauth_registration, oauth_providers: unparsed }) {
   const router = useRouter();
@@ -159,19 +160,19 @@ export default function Login({ title, user_registration, oauth_registration, oa
             <>
               <Group grow>
                 {oauth_providers.map(({ url, name, Icon }, i) => (
-                  <Link key={i} href={url} passHref legacyBehavior>
-                    <Button
-                      size='sm'
-                      variant='outline'
-                      radius='md'
-                      fullWidth
-                      leftIcon={<Icon height={'15'} width={'15'} colorScheme='dark' />}
-                      component='a'
-                      my='xs'
-                    >
-                      {name}
-                    </Button>
-                  </Link>
+                  <Button
+                    key={i}
+                    size='sm'
+                    variant='outline'
+                    radius='md'
+                    fullWidth
+                    leftIcon={<Icon height={'15'} width={'15'} colorScheme='dark' />}
+                    my='xs'
+                    component={Link}
+                    href={url}
+                  >
+                    {name}
+                  </Button>
                 ))}
               </Group>
 

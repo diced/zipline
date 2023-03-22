@@ -1,11 +1,9 @@
-import { ActionIcon, Card, Group, LoadingOverlay, Stack, Title, Tooltip } from '@mantine/core';
-import { useClipboard } from '@mantine/hooks';
-import { showNotification } from '@mantine/notifications';
-import { IconClipboardCopy, IconExternalLink, IconLink, IconLinkOff, IconTrash } from '@tabler/icons-react';
-import Link from 'components/Link';
+import { ActionIcon, Anchor, Card, Group, Stack, Title, Tooltip } from '@mantine/core';
+import { IconClipboardCopy, IconExternalLink, IconTrash } from '@tabler/icons-react';
 import MutedText from 'components/MutedText';
-import { URLResponse, useURLDelete } from 'lib/queries/url';
+import { URLResponse } from 'lib/queries/url';
 import { relativeTime } from 'lib/utils/client';
+import Link from 'next/link';
 
 export default function URLCard({
   url,
@@ -37,7 +35,7 @@ export default function URLCard({
             )}
             <MutedText size='sm'>Views: {url.views}</MutedText>
             <MutedText size='sm'>
-              URL: <Link href={url.destination}>{url.destination}</Link>
+              URL: <AnchorNext href={url.destination}>{url.destination}</AnchorNext>
             </MutedText>
           </Stack>
         </Group>

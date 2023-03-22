@@ -9,10 +9,10 @@ import {
   NumberInput,
   SimpleGrid,
   Skeleton,
+  Text,
   TextInput,
   Title,
   Tooltip,
-  Text,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useClipboard } from '@mantine/hooks';
@@ -26,12 +26,13 @@ import {
   IconLinkOff,
   IconList,
 } from '@tabler/icons-react';
-import Link from 'components/Link';
+import AnchorNext from 'components/AnchorNext';
 import MutedText from 'components/MutedText';
 import { useURLDelete, useURLs } from 'lib/queries/url';
 import { listViewUrlsSelector } from 'lib/recoil/settings';
 import { userSelector } from 'lib/recoil/user';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import URLCard from './URLCard';
@@ -85,7 +86,7 @@ export default function Urls() {
     clipboard.copy(url);
     showNotification({
       title: 'Copied to clipboard',
-      message: <Link href={url}>{url}</Link>,
+      message: <AnchorNext href={url}>{url}</AnchorNext>,
       color: 'green',
       icon: <IconClipboardCopy size='1rem' />,
     });
@@ -141,7 +142,7 @@ export default function Urls() {
         children: (
           <Group position='apart'>
             <Group position='left'>
-              <Link href={json.url}>{data.vanity ?? json.url}</Link>
+              <AnchorNext href={json.url}>{data.vanity ?? json.url}</AnchorNext>
             </Group>
             <Group position='right'>
               <Tooltip label='Open link in a new tab'>
@@ -268,9 +269,9 @@ export default function Urls() {
               title: 'URL',
               sortable: true,
               render: (url) => (
-                <Anchor component={Link} href={url.url} target='_blank'>
+                <AnchorNext href={url.url} target='_blank'>
                   {url.destination}
-                </Anchor>
+                </AnchorNext>
               ),
             },
             {

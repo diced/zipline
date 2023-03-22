@@ -23,11 +23,9 @@ export default function Files({ disableMediaPreview, exifEnabled, queryPage, com
     <>
       <Group mb='md'>
         <Title>Files</Title>
-        <Link href='/dashboard/upload/file' passHref legacyBehavior>
-          <ActionIcon component='a' variant='filled' color='primary'>
-            <IconFileUpload size='1rem' />
-          </ActionIcon>
-        </Link>
+        <ActionIcon component={Link} href='/dashboard/upload/file' variant='filled' color='primary'>
+          <IconFileUpload size='1rem' />
+        </ActionIcon>
       </Group>
       {favoritePages.isSuccess && favoritePages.data.length ? (
         <Accordion
