@@ -45,7 +45,7 @@ export default function Dashboard({ disableMediaPreview, exifEnabled, compress }
     })();
   }, [page]);
 
-  const files = usePaginatedFiles(page);
+  const files = usePaginatedFiles(page, 'none');
 
   // sorting
   const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
