@@ -293,6 +293,10 @@ export default function Folders({ disableMediaPreview, exifEnabled, compress }) 
               },
             ],
           }}
+          onRowClick={(folder) => {
+            setViewOpen(true);
+            setActiveFolderId(folder.id);
+          }}
         />
       ) : (
         <SimpleGrid cols={3} spacing='lg' breakpoints={[{ maxWidth: 'sm', cols: 1, spacing: 'sm' }]}>
