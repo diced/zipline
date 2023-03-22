@@ -131,6 +131,11 @@ export default function Type({ file, popup = false, disableMediaPreview, ...prop
         video: <video width='100%' autoPlay muted controls {...props} />,
         image: (
           <Image
+            styles={{
+              imageWrapper: {
+                position: 'inherit',
+              },
+            }}
             placeholder={<PlaceholderContent Icon={IconPhotoCancel} text={'Image failed to load...'} />}
             {...props}
           />

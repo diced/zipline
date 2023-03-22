@@ -9,7 +9,7 @@ import {
   Title,
   Tooltip,
 } from '@mantine/core';
-import { useClipboard } from '@mantine/hooks';
+import { useClipboard, useMediaQuery } from '@mantine/hooks';
 import { showNotification } from '@mantine/notifications';
 import {
   IconAlarm,
@@ -210,7 +210,13 @@ export default function FileModal({
   };
 
   return (
-    <Modal opened={open} onClose={() => setOpen(false)} title={<Title>{file.name}</Title>} size='xl'>
+    <Modal
+      opened={open}
+      onClose={() => setOpen(false)}
+      title={<Title>{file.name}</Title>}
+      size='auto'
+      fullScreen={useMediaQuery('(max-width: 600px)')}
+    >
       <LoadingOverlay visible={loading} />
       <Stack>
         <Type
@@ -218,8 +224,8 @@ export default function FileModal({
           src={`/r/${encodeURI(file.name)}?compress=${compress}`}
           alt={file.name}
           popup
-          sx={{ minHeight: 200, overflowY: 'scroll', maxHeight: 500 }}
-          style={{ minHeight: 200, overflowY: 'scroll', maxHeight: 500 }}
+          sx={{ minHeight: 200 }}
+          style={{ minHeight: 200 }}
           disableMediaPreview={false}
           overrideRender={overrideRender}
           setOverrideRender={setOverrideRender}
