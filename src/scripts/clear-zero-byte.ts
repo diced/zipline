@@ -1,9 +1,6 @@
 import { PrismaClient } from '@prisma/client';
-import { readdir, readFile } from 'fs/promises';
-import { join } from 'path';
 import config from 'lib/config';
 import datasource from 'lib/datasource';
-import { guess } from 'lib/mimes';
 import { migrations } from 'server/util';
 
 async function main() {

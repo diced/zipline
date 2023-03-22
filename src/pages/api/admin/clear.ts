@@ -1,4 +1,3 @@
-import datasource from 'lib/datasource';
 import Logger from 'lib/logger';
 import prisma from 'lib/prisma';
 import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'middleware/withZipline';

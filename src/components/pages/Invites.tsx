@@ -340,8 +340,7 @@ export default function Invites() {
                         </Tooltip>
                         <Tooltip label={new Date(invite.expiresAt).toLocaleString()}>
                           <div>
-                            {/* @ts-ignore */}
-                            <MutedText size='sm'>{expireText(new Date(invite.expiresAt))}</MutedText>
+                            <MutedText size='sm'>{expireText(invite.expiresAt.toString())}</MutedText>
                           </div>
                         </Tooltip>
                       </Stack>

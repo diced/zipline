@@ -1,4 +1,3 @@
-import { useReducer, useState } from 'react';
 import { GeneratorModal } from './GeneratorModal';
 
 export default function ShareX({ user, open, setOpen }) {

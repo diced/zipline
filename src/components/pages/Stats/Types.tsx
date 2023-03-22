@@ -3,7 +3,7 @@ import { Box, Card, Center, Grid, LoadingOverlay, Title, useMantineTheme } from 
 import { SmallTable } from 'components/SmallTable';
 import { useStats } from 'lib/queries/stats';
 import { colorHash } from 'lib/utils/client';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
 import { Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 

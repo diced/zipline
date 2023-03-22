@@ -61,7 +61,7 @@ export function parseString(str: string, value: ParseValue) {
   return str;
 }
 
-function modifier(mod: string, value: any): string {
+function modifier(mod: string, value: unknown): string {
   mod = mod.toLowerCase();
 
   if (value instanceof Date) {

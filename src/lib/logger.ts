@@ -21,10 +21,11 @@ export default class Logger {
     return (process.env.LOGGER_FILTERS ?? '').split(',').filter((x) => x !== '');
   }
 
-  static get(klass: any) {
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  static get(klass: Function | string) {
     if (typeof klass !== 'function') if (typeof klass !== 'string') throw new Error('not string/function');
 
-    const name = klass.name ?? klass;
+    const name = typeof klass === 'string' ? klass : klass.name;
 
     return new Logger(name);
   }
@@ -44,7 +45,7 @@ export default class Logger {
     return filters.includes(this.name);
   }
 
-  info(...args: any[]): this {
+  info(...args: unknown[]): this {
     if (!this.show()) return this;
 
     process.stdout.write(this.formatMessage(LoggerLevel.INFO, this.name, args.join(' ')));
@@ -52,17 +53,21 @@ export default class Logger {
     return this;
   }
 
-  error(...args: any[]): this {
+  error(...args: unknown[]): this {
     if (!this.show()) return this;
 
     process.stdout.write(
-      this.formatMessage(LoggerLevel.ERROR, this.name, args.map((error) => error.stack ?? error).join(' '))
+      this.formatMessage(
+        LoggerLevel.ERROR,
+        this.name,
+        args.map((error) => (typeof error === 'string' ? error : (error as Error).stack)).join(' ')
+      )
     );
 
     return this;
   }
 
-  debug(...args: any[]): this {
+  debug(...args: unknown[]): this {
     if (!process.env.DEBUG) return this;
     if (!this.show()) return this;
 

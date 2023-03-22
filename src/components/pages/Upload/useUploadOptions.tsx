@@ -11,7 +11,7 @@ import {
   Title,
 } from '@mantine/core';
 import { IconAlarm, IconEye, IconFileInfo, IconKey, IconPhotoDown, IconWorld } from '@tabler/icons-react';
-import React, { Dispatch, SetStateAction, useReducer, useState } from 'react';
+import React, { Dispatch, ReactNode, SetStateAction, useReducer, useState } from 'react';
 
 export type UploadOptionsState = {
   expires: string;
@@ -37,7 +37,11 @@ export function OptionsModal({
   opened: boolean;
   setOpened: Dispatch<SetStateAction<boolean>>;
   state: UploadOptionsState;
-  setState: Dispatch<SetStateAction<any>>;
+  setState: Dispatch<
+    SetStateAction<{
+      [key in keyof UploadOptionsState]?: UploadOptionsState[key];
+    }>
+  >;
   reset: () => void;
 }) {
   const [odState, setODState] = useReducer((state, newState) => ({ ...state, ...newState }), {
@@ -79,7 +83,7 @@ export function OptionsModal({
           label='Max Views'
           description='The maximum number of times this file can be viewed. Leave blank for unlimited views.'
           value={state.maxViews}
-          onChange={(e) => setState({ maxViews: e })}
+          onChange={(e) => setState({ maxViews: e === '' ? undefined : e })}
           min={0}
           icon={<IconEye size='1rem' />}
         />
@@ -206,7 +210,11 @@ export function OptionsModal({
   );
 }
 
-export default function useUploadOptions(): [UploadOptionsState, Dispatch<SetStateAction<boolean>>, any] {
+export default function useUploadOptions(): [
+  UploadOptionsState,
+  Dispatch<SetStateAction<boolean>>,
+  ReactNode
+] {
   const [state, setState] = useReducer((state, newState) => ({ ...state, ...newState }), {
     expires: 'never',
     password: '',

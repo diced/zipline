@@ -5,7 +5,7 @@ import ms, { StringValue } from 'ms';
 dayjs.extend(duration);
 dayjs.extend(dayjsRelativeTime);
 
-export function jsonUserReplacer(key: string, value: any) {
+export function jsonUserReplacer(key: string, value: unknown) {
   if (key === 'avatar') return 'data:image/*;base64,***';
 
   return value;
@@ -137,7 +137,7 @@ export function colorHash(str: string) {
 
   let color = '#';
   for (let i = 0; i < 3; i++) {
-    let value = (hash >> (i * 8)) & 0xff;
+    const value = (hash >> (i * 8)) & 0xff;
     color += ('00' + value.toString(16)).substr(-2);
   }
 

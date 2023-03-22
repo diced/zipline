@@ -1,5 +1,5 @@
 import { Code } from '@mantine/core';
-import Link from 'components/Link';
+import AnchorNext from 'components/AnchorNext';
 import { GeneratorModal } from './GeneratorModal';
 
 export default function Flameshot({ user, open, setOpen }) {
@@ -105,18 +105,18 @@ ${curl.join(' ')} -d "{\\"url\\": \\"$arg\\"}"${values.noJSON ? '' : " | jq -r '
       title='Flameshot'
       desc={
         <>
-          To use this script, you need <Link href='https://flameshot.org'>Flameshot</Link>,{' '}
-          <Link href='https://curl.se/'>
+          To use this script, you need <AnchorNext href='https://flameshot.org'>Flameshot</AnchorNext>,{' '}
+          <AnchorNext href='https://curl.se/'>
             <Code>curl</Code>
-          </Link>
+          </AnchorNext>
           ,{' '}
-          <Link href='https://github.com/stedolan/jq'>
+          <AnchorNext href='https://github.com/stedolan/jq'>
             <Code>jq</Code>
-          </Link>
+          </AnchorNext>
           , and{' '}
-          <Link href='https://github.com/kfish/xsel'>
+          <AnchorNext href='https://github.com/kfish/xsel'>
             <Code>xsel</Code>
-          </Link>{' '}
+          </AnchorNext>{' '}
           installed. This script is intended for use on Linux only.
         </>
       }

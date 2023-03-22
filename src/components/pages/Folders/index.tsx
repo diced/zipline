@@ -16,7 +16,7 @@ import {
   IconLockAccessOff,
   IconLockOpen,
 } from '@tabler/icons-react';
-import Link from 'components/Link';
+import AnchorNext from 'components/AnchorNext';
 import MutedText from 'components/MutedText';
 import useFetch from 'hooks/useFetch';
 import { useFolders } from 'lib/queries/folders';
@@ -366,7 +366,8 @@ export default function Folders({ disableMediaPreview, exifEnabled, compress }) 
                                   title: 'Copied folder link',
                                   message: (
                                     <>
-                                      Copied <Link href={`/folder/${folder.id}`}>folder link</Link> to
+                                      Copied{' '}
+                                      <AnchorNext href={`/folder/${folder.id}`}>folder link</AnchorNext> to
                                       clipboard
                                     </>
                                   ),

@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import queryClient from './client';
 import { UserFilesResponse } from './files';
 
@@ -29,7 +29,7 @@ export const useFolders = (query: { [key: string]: string } = {}) => {
   });
 };
 
-export const useFolder = (id: string, withFiles: boolean = false) => {
+export const useFolder = (id: string, withFiles = false) => {
   return useQuery<UserFoldersResponse>(['folder', id], async () => {
     return fetch('/api/user/folders/' + id + (withFiles ? '?files=true' : ''))
       .then((res) => res.json() as Promise<UserFoldersResponse>)

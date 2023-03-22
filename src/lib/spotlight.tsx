@@ -15,6 +15,7 @@ import {
   IconUser,
 } from '@tabler/icons-react';
 import { NextRouter } from 'next/router';
+import { ReactNode } from 'react';
 import { useRecoilValue } from 'recoil';
 import { userSelector } from './recoil/user';
 
@@ -35,7 +36,7 @@ export const createSpotlightActions = (router: NextRouter): SpotlightAction[] =>
     title: string,
     description: string,
     link: string,
-    icon: any
+    icon: ReactNode
   ): SpotlightAction => {
     return actionDo(group, title, description, icon, () => linkTo(link));
   };
@@ -44,7 +45,7 @@ export const createSpotlightActions = (router: NextRouter): SpotlightAction[] =>
     group: string,
     title: string,
     description: string,
-    icon: any,
+    icon: ReactNode,
     action: () => void
   ): SpotlightAction => {
     return {

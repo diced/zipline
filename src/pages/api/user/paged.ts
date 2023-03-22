@@ -48,7 +48,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   if (!page) return res.badRequest('no page');
   if (isNaN(Number(page))) return res.badRequest('page is not a number');
 
-  let files: {
+  const files: {
     favorite: boolean;
     createdAt: Date;
     id: number;

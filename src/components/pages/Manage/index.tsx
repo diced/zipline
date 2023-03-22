@@ -35,14 +35,15 @@ import {
   IconUserMinus,
   IconUserX,
 } from '@tabler/icons-react';
+import AnchorNext from 'components/AnchorNext';
 import { DiscordIcon, FlameshotIcon, GitHubIcon, GoogleIcon, ShareXIcon } from 'components/icons';
-import Link from 'components/Link';
 import MutedText from 'components/MutedText';
 import { SmallTable } from 'components/SmallTable';
 import useFetch from 'hooks/useFetch';
 import { userSelector } from 'lib/recoil/user';
 import { bytesToHuman } from 'lib/utils/bytes';
 import { capitalize } from 'lib/utils/client';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import ClearStorage from './ClearStorage';
@@ -355,7 +356,8 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
       <Title>Manage User</Title>
       <MutedText size='md'>
         Want to use variables in embed text? Visit{' '}
-        <Link href='https://zipline.diced.tech/docs/guides/variables'>the docs</Link> for variables
+        <AnchorNext href='https://zipline.diced.tech/docs/guides/variables'>the docs</AnchorNext> for
+        variables
       </MutedText>
       <form onSubmit={form.onSubmit((v) => onSubmit(v))}>
         <TextInput id='username' label='Username' my='sm' {...form.getInputProps('username')} />
@@ -459,11 +461,16 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
                   !user.oauth?.map(({ provider }) => provider.toLowerCase()).includes(x.name.toLowerCase())
               )
               .map(({ link_url, name, Icon }, i) => (
-                <Link key={i} href={link_url} passHref legacyBehavior>
-                  <Button size='lg' leftIcon={<Icon colorScheme='manage' />} component='a' my='sm'>
-                    Link account with {name}
-                  </Button>
-                </Link>
+                <Button
+                  key={i}
+                  size='lg'
+                  leftIcon={<Icon colorScheme='manage' />}
+                  component={Link}
+                  href={link_url}
+                  my='sm'
+                >
+                  Link account with {name}
+                </Button>
               ))}
 
             {user?.oauth?.map(({ provider }, i) => (

@@ -15,7 +15,7 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconFileDownload, IconWorld } from '@tabler/icons-react';
-import Link from 'components/Link';
+import AnchorNext from 'components/AnchorNext';
 import MutedText from 'components/MutedText';
 import { useReducer, useState } from 'react';
 
@@ -169,9 +169,9 @@ export function GeneratorModal({ opened, onClose, title, onSubmit, ...other }) {
               <Text>Wayland</Text>
               <MutedText size='sm'>
                 If using wayland, you can check the boxes below to your liking. This will require{' '}
-                <Link href='https://github.com/bugaevc/wl-clipboard'>
+                <AnchorNext href='https://github.com/bugaevc/wl-clipboard'>
                   <Code>wl-clipboard</Code>
-                </Link>{' '}
+                </AnchorNext>{' '}
                 for the <Code>wl-copy</Code> command.
               </MutedText>
             </Box>
@@ -197,8 +197,8 @@ export function GeneratorModal({ opened, onClose, title, onSubmit, ...other }) {
                 description={
                   <>
                     If using a compositor such as{' '}
-                    <Link href='https://github.com/hyprwm/hyprland'>Hyprland</Link>, this option will set the{' '}
-                    <Code>XDG_CURRENT_DESKTOP=sway</Code> to workaround Flameshot&apos;s errors
+                    <AnchorNext href='https://github.com/hyprwm/hyprland'>Hyprland</AnchorNext>, this option
+                    will set the <Code>XDG_CURRENT_DESKTOP=sway</Code> to workaround Flameshot&apos;s errors
                   </>
                 }
                 disabled={!isUploadFile}

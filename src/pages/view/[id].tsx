@@ -1,13 +1,14 @@
 import { Box, Button, Modal, PasswordInput } from '@mantine/core';
 import type { File } from '@prisma/client';
+import AnchorNext from 'components/AnchorNext';
 import config from 'lib/config';
-import Link from 'components/Link';
 import exts from 'lib/exts';
 import prisma from 'lib/prisma';
 import { parseString } from 'lib/utils/parser';
 import type { UserExtended } from 'middleware/withZipline';
 import { GetServerSideProps } from 'next';
 import Head from 'next/head';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
@@ -190,7 +191,9 @@ export default function EmbeddedFile({
         {!file.mimetype.startsWith('video') &&
           !file.mimetype.startsWith('image') &&
           !file.mimetype.startsWith('audio') && (
-            <Link href={dataURL('/r')}>Can&#39;t preview this file. Click here to download it.</Link>
+            <AnchorNext component={Link} href={dataURL('/r')}>
+              Can&#39;t preview this file. Click here to download it.
+            </AnchorNext>
           )}
       </Box>
     </>
@@ -256,6 +259,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       },
     };
   }
+
   // @ts-ignore
   if (file.password) file.password = true;
 

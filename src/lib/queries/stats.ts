@@ -10,7 +10,7 @@ export type Stats = {
   id: number;
   data: {
     count: number;
-    count_by_user: any[];
+    count_by_user: unknown[];
     count_users: number;
     size: string;
     size_num: number;

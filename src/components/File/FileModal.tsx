@@ -22,7 +22,6 @@ import {
   IconFile,
   IconFileDownload,
   IconFolderMinus,
-  IconFolderOff,
   IconFolderPlus,
   IconFolderX,
   IconHash,
@@ -31,10 +30,9 @@ import {
   IconPhotoCancel,
   IconPhotoMinus,
   IconPhotoStar,
-  IconStarFilled,
 } from '@tabler/icons-react';
-import useFetch from 'hooks/useFetch';
-import { useFileDelete, useFileFavorite } from 'lib/queries/files';
+import useFetch, { ApiError } from 'hooks/useFetch';
+import { useFileDelete, useFileFavorite, UserFilesResponse } from 'lib/queries/files';
 import { useFolders } from 'lib/queries/folders';
 import { bytesToHuman } from 'lib/utils/bytes';
 import { relativeTime } from 'lib/utils/client';
@@ -54,7 +52,7 @@ export default function FileModal({
 }: {
   open: boolean;
   setOpen: (open: boolean) => void;
-  file: any;
+  file: UserFilesResponse;
   loading: boolean;
   refresh: () => void;
   reducedActions?: boolean;
@@ -79,7 +77,7 @@ export default function FileModal({
         });
       },
 
-      onError: (res: any) => {
+      onError: (res: ApiError) => {
         showNotification({
           title: 'Failed to delete file',
           message: res.error,
@@ -123,7 +121,7 @@ export default function FileModal({
           });
         },
 
-        onError: (res: any) => {
+        onError: (res: { error: string }) => {
           showNotification({
             title: 'Failed to favorite file',
             message: res.error,
