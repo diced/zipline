@@ -2,12 +2,15 @@
   "name": "Zipline Codespace",
   "dockerComposeFile": "docker-compose.yml",
   "service": "app",
-  "workspaceFolder": "/workspace",
-  "forwardPorts": [3000, 5432],
+  "workspaceFolder": "/zipline",
   "features": {
-    "ghcr.io/devcontainers/features/common-utils:2": {},
-    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
-    "ghcr.io/devcontainers/features/node:1": {}
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "username": "zipline"
+    },
+    "ghcr.io/devcontainers/features/docker-in-docker:1": {
+      "dockerDashComposeVersion": "v2",
+      "installDockerBuildx": true
+    }
   },
   "customizations": {
     "vscode": {
@@ -20,22 +23,34 @@
         },
         "editor.defaultFormatter": "esbenp.prettier-vscode",
         "editor.formatOnSave": true,
-        "files.autoSave": "afterDelay"
+        "files.autoSave": "afterDelay",
+        "terminal.integrated.persistentSessionReviveProcess": "never",
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "terminal.integrated.profiles.linux": {
+          "zsh": {
+            "path": "/bin/zsh",
+            "env": {
+              "ZSH_THEME": "devcontainers"
+            }
+          }
+        }
       },
       "extensions": ["prisma.prisma", "esbenp.prettier-vscode", "dbaeumer.vscode-eslint"]
     }
   },
   "remoteUser": "zipline",
+  "updateRemoteUserUID": true,
   "remoteEnv": {
     "CORE_DATABASE_URL": "postgres://postgres:postgres@localhost/zip10"
   },
   "portsAttributes": {
-	  "3000": {
-		  "label": "Zipline",
+    "3000": {
+      "label": "Zipline",
       "onAutoForward": "openBrowser"
-	  },
-	  "5432": {
-		  "label": "Postgres"
-	  }
-  }
+    },
+    "5432": {
+      "label": "Postgres"
+    }
+  },
+  "postCreateCommand": "sudo chown -R zipline:zipline /zipline && yarn install"
 }
