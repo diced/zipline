@@ -95,7 +95,7 @@ export const createSpotlightActions = (router: NextRouter): SpotlightAction[] =>
         title: 'Copied to clipboard',
         message: '',
         color: 'green',
-        icon: <IconClipboardCopy />,
+        icon: <IconClipboardCopy size='1rem' />,
       });
     }),
 

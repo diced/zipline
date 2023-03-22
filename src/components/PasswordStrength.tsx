@@ -7,7 +7,7 @@ import { useState } from 'react';
 function PasswordRequirement({ meets, label }: { meets: boolean; label: string }) {
   return (
     <Text color={meets ? 'teal' : 'red'} sx={{ display: 'flex', alignItems: 'center' }} mt='sm' size='sm'>
-      {meets ? <IconCheck /> : <IconCross />} <Box ml='md'>{label}</Box>
+      {meets ? <IconCheck size='1rem' /> : <IconCross size='1rem' />} <Box ml='md'>{label}</Box>
     </Text>
   );
 }

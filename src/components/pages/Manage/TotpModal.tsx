@@ -20,7 +20,7 @@ export function TotpModal({ opened, onClose, deleteTotp, setTotpEnabled }) {
             title: 'Error',
             message: "Can't generate code as you are already using MFA",
             color: 'red',
-            icon: <IconBarcodeOff />,
+            icon: <IconBarcodeOff size='1rem' />,
           });
         } else {
           setSecret(data.secret);
@@ -49,7 +49,7 @@ export function TotpModal({ opened, onClose, deleteTotp, setTotpEnabled }) {
         title: 'Success',
         message: 'Successfully disabled 2FA',
         color: 'green',
-        icon: <Icon2fa />,
+        icon: <Icon2fa size='1rem' />,
       });
 
       setTotpEnabled(false);
@@ -80,7 +80,7 @@ export function TotpModal({ opened, onClose, deleteTotp, setTotpEnabled }) {
         title: 'Success',
         message: 'Successfully enabled 2FA',
         color: 'green',
-        icon: <Icon2fa />,
+        icon: <Icon2fa size='1rem' />,
       });
 
       setTotpEnabled(true);

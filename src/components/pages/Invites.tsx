@@ -77,14 +77,14 @@ function CreateInviteModal({ open, setOpen, updateInvites }) {
       showNotification({
         title: 'Failed to create invite',
         message: res.error,
-        icon: <IconTagOff />,
+        icon: <IconTagOff size='1rem' />,
         color: 'red',
       });
     } else {
       showNotification({
         title: 'Created invite',
         message: '',
-        icon: <IconTag />,
+        icon: <IconTag size='1rem' />,
         color: 'green',
       });
     }

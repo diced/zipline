@@ -149,7 +149,7 @@ export default function ZiplineTheming({ Component, pageProps, ...props }) {
     >
       <ModalsProvider>
         <SpotlightProvider
-          searchIcon={<IconSearch />}
+          searchIcon={<IconSearch size='1rem' />}
           shortcut={['mod + k', '/']}
           actions={createSpotlightActions(router)}
         >

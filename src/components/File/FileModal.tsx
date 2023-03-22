@@ -73,7 +73,7 @@ export default function FileModal({
           title: 'File Deleted',
           message: '',
           color: 'green',
-          icon: <IconPhotoMinus />,
+          icon: <IconPhotoMinus size='1rem' />,
         });
       },
 
@@ -82,7 +82,7 @@ export default function FileModal({
           title: 'Failed to delete file',
           message: res.error,
           color: 'red',
-          icon: <IconPhotoCancel />,
+          icon: <IconPhotoCancel size='1rem' />,
         });
       },
 
@@ -105,7 +105,7 @@ export default function FileModal({
       showNotification({
         title: 'Copied to clipboard',
         message: '',
-        icon: <IconClipboardCopy />,
+        icon: <IconClipboardCopy size='1rem' />,
       });
   };
 
@@ -117,7 +117,7 @@ export default function FileModal({
           showNotification({
             title: 'The file is now ' + (!file.favorite ? 'favorited' : 'unfavorited'),
             message: '',
-            icon: <IconPhotoStar />,
+            icon: <IconPhotoStar size='1rem' />,
           });
         },
 
@@ -126,7 +126,7 @@ export default function FileModal({
             title: 'Failed to favorite file',
             message: res.error,
             color: 'red',
-            icon: <IconPhotoCancel />,
+            icon: <IconPhotoCancel size='1rem' />,
           });
         },
       }
@@ -147,14 +147,14 @@ export default function FileModal({
         title: 'Removed from folder',
         message: res.name,
         color: 'green',
-        icon: <IconFolderMinus />,
+        icon: <IconFolderMinus size='1rem' />,
       });
     } else {
       showNotification({
         title: 'Failed to remove from folder',
         message: res.error,
         color: 'red',
-        icon: <IconFolderX />,
+        icon: <IconFolderX size='1rem' />,
       });
     }
   };
@@ -171,14 +171,14 @@ export default function FileModal({
         title: 'Added to folder',
         message: res.name,
         color: 'green',
-        icon: <IconFolderPlus />,
+        icon: <IconFolderPlus size='1rem' />,
       });
     } else {
       showNotification({
         title: 'Failed to add to folder',
         message: res.error,
         color: 'red',
-        icon: <IconFolderX />,
+        icon: <IconFolderX size='1rem' />,
       });
     }
   };
@@ -195,14 +195,14 @@ export default function FileModal({
           title: 'Created & added to folder',
           message: res.name,
           color: 'green',
-          icon: <IconFolderPlus />,
+          icon: <IconFolderPlus size='1rem' />,
         });
       } else {
         showNotification({
           title: 'Failed to create folder',
           message: res.error,
           color: 'red',
-          icon: <IconFolderX />,
+          icon: <IconFolderX size='1rem' />,
         });
       }
     });
