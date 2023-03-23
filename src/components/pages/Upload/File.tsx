@@ -26,16 +26,22 @@ export default function File({ chunks: chunks_config }) {
   const [options, setOpened, OptionsModal] = useUploadOptions();
 
   useEffect(() => {
-    window.addEventListener('paste', (e: ClipboardEvent) => {
+    const listener = (e: ClipboardEvent) => {
       const item = Array.from(e.clipboardData.items).find((x) => /^image/.test(x.type));
+      if (!item) return;
+
       const file = item.getAsFile();
+
       setFiles([...files, file]);
       showNotification({
         title: 'Image imported from clipboard',
         message: '',
       });
-    });
-  });
+    };
+
+    document.addEventListener('paste', listener);
+    return () => document.removeEventListener('paste', listener);
+  }, []);
 
   const handleChunkedFiles = async (expiresAt: Date, toChunkFiles: File[]) => {
     for (let i = 0; i !== toChunkFiles.length; ++i) {
