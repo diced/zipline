@@ -165,6 +165,12 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
         data: { avatar: req.body.avatar },
       });
 
+    if (req.body.resetAvatar)
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { avatar: null },
+      });
+
     if (req.body.embed)
       await prisma.user.update({
         where: { id: user.id },

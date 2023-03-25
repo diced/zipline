@@ -83,7 +83,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
   const [flameshotOpen, setFlameshotOpen] = useState(false);
   const [clrStorOpen, setClrStorOpen] = useState(false);
   const [exports, setExports] = useState([]);
-  const [file, setFile] = useState<File>(null);
+  const [file, setFile] = useState<File | null>(null);
   const [fileDataURL, setFileDataURL] = useState(user.avatar ?? null);
   const [totpEnabled, setTotpEnabled] = useState(!!user.totpSecret);
   const [checked, setCheck] = useState(false);
@@ -107,11 +107,13 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
   const handleAvatarChange = async (file: File) => {
     setFile(file);
 
-    setFileDataURL(await getDataURL(file));
+    if (file) setFileDataURL(await getDataURL(file));
   };
 
   const saveAvatar = async () => {
-    const dataURL = await getDataURL(file);
+    let dataURL = null;
+
+    if (file) dataURL = await getDataURL(file);
 
     showNotification({
       id: 'update-user',
@@ -123,6 +125,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
 
     const newUser = await useFetch('/api/user', 'PATCH', {
       avatar: dataURL,
+      ...(!dataURL && { resetAvatar: true }),
     });
 
     if (newUser.error) {
