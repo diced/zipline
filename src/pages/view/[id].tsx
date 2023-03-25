@@ -155,7 +155,6 @@ export default function EmbeddedFile({
         withCloseButton={true}
         closeOnEscape={false}
         closeOnClickOutside={false}
-        overlayProps={{ blur: 3 }}
       >
         <PasswordInput
           label='Password'

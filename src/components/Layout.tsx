@@ -26,6 +26,9 @@ import { useModals } from '@mantine/modals';
 import { showNotification } from '@mantine/notifications';
 import {
   IconBackspace,
+  IconBrandDiscordFilled,
+  IconBrandGithubFilled,
+  IconBrandGoogle,
   IconBrush,
   IconClipboardCopy,
   IconExternalLink,
@@ -54,7 +57,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { useRecoilState } from 'recoil';
-import { DiscordIcon, GitHubIcon, GoogleIcon } from './icons';
 import { friendlyThemeName, themes } from './Theming';
 
 export type NavbarItems = {
@@ -134,9 +136,9 @@ export default function Layout({ children, props }) {
   const { title, oauth_providers: unparsed } = props;
   const oauth_providers = JSON.parse(unparsed);
   const icons = {
-    GitHub: GitHubIcon,
-    Discord: DiscordIcon,
-    Google: GoogleIcon,
+    GitHub: IconBrandGithubFilled,
+    Discord: IconBrandDiscordFilled,
+    Google: IconBrandGoogle,
   };
 
   for (const provider of oauth_providers) {

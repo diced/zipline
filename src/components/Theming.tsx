@@ -86,7 +86,6 @@ export default function ZiplineTheming({ Component, pageProps, ...props }) {
             styles: (t) => ({
               main: {
                 backgroundColor: t.other.AppShell_backgroundColor,
-                // backgroundColor: '#fff',
               },
             }),
           },
@@ -108,7 +107,6 @@ export default function ZiplineTheming({ Component, pageProps, ...props }) {
                 blur: 6,
                 color: theme.colorScheme === 'dark' ? theme.colors.dark[6] : 'white',
               },
-              // scrollAreaComponent: Modal.NativeScrollArea,
             },
           },
           Popover: {
@@ -119,10 +117,8 @@ export default function ZiplineTheming({ Component, pageProps, ...props }) {
           },
           LoadingOverlay: {
             defaultProps: {
-              overlayprops: {
-                blur: 3,
-                color: theme.colorScheme === 'dark' ? theme.colors.dark[6] : 'white',
-              },
+              overlayColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : 'white',
+              overlayOpacity: 0.3,
             },
           },
           Loader: {

@@ -20,6 +20,9 @@ import { randomId, useInterval, useMediaQuery } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
 import { showNotification, updateNotification } from '@mantine/notifications';
 import {
+  IconBrandDiscordFilled,
+  IconBrandGithubFilled,
+  IconBrandGoogle,
   IconFileExport,
   IconFiles,
   IconFilesOff,
@@ -36,7 +39,7 @@ import {
   IconUserX,
 } from '@tabler/icons-react';
 import AnchorNext from 'components/AnchorNext';
-import { DiscordIcon, FlameshotIcon, GitHubIcon, GoogleIcon, ShareXIcon } from 'components/icons';
+import { FlameshotIcon, ShareXIcon } from 'components/icons';
 import MutedText from 'components/MutedText';
 import { SmallTable } from 'components/SmallTable';
 import useFetch from 'hooks/useFetch';
@@ -66,9 +69,9 @@ function ExportDataTooltip({ children }) {
 export default function Manage({ oauth_registration, oauth_providers: raw_oauth_providers, totp_enabled }) {
   const oauth_providers = JSON.parse(raw_oauth_providers);
   const icons = {
-    Discord: DiscordIcon,
-    GitHub: GitHubIcon,
-    Google: GoogleIcon,
+    Discord: IconBrandDiscordFilled,
+    GitHub: IconBrandGithubFilled,
+    Google: IconBrandGoogle,
   };
 
   for (const provider of oauth_providers) {
@@ -464,14 +467,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
                   !user.oauth?.map(({ provider }) => provider.toLowerCase()).includes(x.name.toLowerCase())
               )
               .map(({ link_url, name, Icon }, i) => (
-                <Button
-                  key={i}
-                  size='lg'
-                  leftIcon={<Icon colorScheme='manage' />}
-                  component={Link}
-                  href={link_url}
-                  my='sm'
-                >
+                <Button key={i} size='lg' leftIcon={<Icon />} component={Link} href={link_url} my='sm'>
                   Link account with {name}
                 </Button>
               ))}

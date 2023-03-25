@@ -2,7 +2,7 @@ import { Button, Collapse, Group, Progress, Stack, Title } from '@mantine/core';
 import { randomId, useClipboard } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
 import { showNotification, updateNotification } from '@mantine/notifications';
-import { IconFileTime, IconFileUpload, IconFileX } from '@tabler/icons-react';
+import { IconFileImport, IconFileTime, IconFileUpload, IconFileX } from '@tabler/icons-react';
 import Dropzone from 'components/dropzone/Dropzone';
 import FileDropzone from 'components/dropzone/DropzoneFile';
 import MutedText from 'components/MutedText';
@@ -36,6 +36,7 @@ export default function File({ chunks: chunks_config }) {
       showNotification({
         title: 'Image imported from clipboard',
         message: '',
+        icon: <IconFileImport size='1rem' />,
       });
     };
 

@@ -21,9 +21,9 @@ import {
   IconEyeglass,
   IconFile,
   IconFileDownload,
+  IconFolderCancel,
   IconFolderMinus,
   IconFolderPlus,
-  IconFolderX,
   IconHash,
   IconInfoCircle,
   IconPhoto,
@@ -154,7 +154,7 @@ export default function FileModal({
         title: 'Failed to remove from folder',
         message: res.error,
         color: 'red',
-        icon: <IconFolderX size='1rem' />,
+        icon: <IconFolderCancel size='1rem' />,
       });
     }
   };
@@ -178,7 +178,7 @@ export default function FileModal({
         title: 'Failed to add to folder',
         message: res.error,
         color: 'red',
-        icon: <IconFolderX size='1rem' />,
+        icon: <IconFolderCancel size='1rem' />,
       });
     }
   };
@@ -202,7 +202,7 @@ export default function FileModal({
           title: 'Failed to create folder',
           message: res.error,
           color: 'red',
-          icon: <IconFolderX size='1rem' />,
+          icon: <IconFolderCancel size='1rem' />,
         });
       }
     });

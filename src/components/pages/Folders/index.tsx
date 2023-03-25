@@ -7,13 +7,15 @@ import {
   IconClipboardCopy,
   IconExternalLink,
   IconFiles,
+  IconFolderCancel,
   IconFolderMinus,
   IconFolderPlus,
+  IconFolderShare,
   IconFolderX,
   IconGridDots,
   IconList,
   IconLock,
-  IconLockAccessOff,
+  IconLockCancel,
   IconLockOpen,
 } from '@tabler/icons-react';
 import AnchorNext from 'components/AnchorNext';
@@ -100,7 +102,7 @@ export default function Folders({ disableMediaPreview, exifEnabled, compress }) 
             title: 'Failed to delete folder',
             message: res.error,
             color: 'red',
-            icon: <IconFolderX size='1rem' />,
+            icon: <IconFolderCancel size='1rem' />,
           });
           folders.refetch();
         }
@@ -126,7 +128,7 @@ export default function Folders({ disableMediaPreview, exifEnabled, compress }) 
         title: 'Failed to make folder public/private',
         message: res.error,
         color: 'red',
-        icon: <IconLockAccessOff size='1rem' />,
+        icon: <IconLockCancel size='1rem' />,
       });
       folders.refetch();
     }
@@ -216,7 +218,7 @@ export default function Folders({ disableMediaPreview, exifEnabled, compress }) 
                       variant='subtle'
                       color='primary'
                     >
-                      <IconExternalLink size='1rem' />
+                      <IconFolderShare size='1rem' />
                     </ActionIcon>
                   </Tooltip>
                   <Tooltip label='Copy folder link'>
@@ -386,7 +388,7 @@ export default function Folders({ disableMediaPreview, exifEnabled, compress }) 
                             aria-label='open in new tab'
                             onClick={() => window.open(`/folder/${folder.id}`)}
                           >
-                            <IconExternalLink size='1rem' />
+                            <IconFolderShare size='1rem' />
                           </ActionIcon>
                         </Stack>
                       </Group>
