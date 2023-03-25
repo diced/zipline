@@ -6,6 +6,7 @@ import { sendUpload } from 'lib/discord';
 import formatFileName, { NameFormat, NameFormats } from 'lib/format';
 import Logger from 'lib/logger';
 import { NextApiReq, NextApiRes, withZipline } from 'lib/middleware/withZipline';
+import { guess } from 'lib/mimes';
 import prisma from 'lib/prisma';
 import { createInvisImage, hashPassword } from 'lib/util';
 import { parseExpiry } from 'lib/utils/client';
@@ -36,7 +37,14 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     });
   });
 
-  const response: { files: string[]; expiresAt?: Date; removed_gps?: boolean } = { files: [] };
+  const response: {
+    files: string[];
+    expiresAt?: Date;
+    removed_gps?: boolean;
+    assumed_mimetype?: string | boolean;
+  } = {
+    files: [],
+  };
   const expiresAt = req.headers['expires-at'] as string;
   let expiry: Date;
 
@@ -249,12 +257,25 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       password = await hashPassword(req.headers.password as string);
     }
 
+    let mimetype = file.mimetype;
+
+    if (file.mimetype === 'application/octet-stream' && zconfig.uploader.assume_mimetypes) {
+      const ext = file.originalname.split('.').pop();
+      const mime = await guess(ext);
+
+      if (!mime) response.assumed_mimetype = false;
+      else {
+        response.assumed_mimetype = mime;
+        mimetype = mime;
+      }
+    }
+
     const compressionUsed = imageCompressionPercent && file.mimetype.startsWith('image/');
     let invis: InvisibleFile;
     const fileUpload = await prisma.file.create({
       data: {
         name: `${fileName}${compressionUsed ? '.jpg' : `${ext ? '.' : ''}${ext}`}`,
-        mimetype: req.headers.uploadtext ? 'text/plain' : compressionUsed ? 'image/jpeg' : file.mimetype,
+        mimetype: req.headers.uploadtext ? 'text/plain' : compressionUsed ? 'image/jpeg' : mimetype,
         userId: user.id,
         embed: !!req.headers.embed,
         password,

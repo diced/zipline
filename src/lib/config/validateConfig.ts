@@ -92,6 +92,7 @@ const validator = s.object({
       disabled_extensions: s.string.array.default([]),
       format_date: s.string.default('YYYY-MM-DD_HH:mm:ss'),
       default_expiration: s.string.optional.default(null),
+      assume_mimetypes: s.boolean.default(false),
     })
     .default({
       default_format: 'RANDOM',
@@ -103,6 +104,7 @@ const validator = s.object({
       disabled_extensions: [],
       format_date: 'YYYY-MM-DD_HH:mm:ss',
       default_expiration: null,
+      assume_mimetypes: false,
     }),
   urls: s
     .object({
