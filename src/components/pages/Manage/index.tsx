@@ -28,9 +28,9 @@ import {
   IconGraphOff,
   IconPhotoMinus,
   IconReload,
-  IconSettings,
   IconTrash,
   IconUserCheck,
+  IconUserCog,
   IconUserExclamation,
   IconUserMinus,
   IconUserX,
@@ -503,7 +503,11 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
           <Text>Preview:</Text>
           <Button
             leftIcon={
-              fileDataURL ? <Image src={fileDataURL} height={32} radius='md' /> : <IconSettings size='1rem' />
+              fileDataURL ? (
+                <Image src={fileDataURL} height={32} width={32} radius='md' />
+              ) : (
+                <IconUserCog size='1rem' />
+              )
             }
             size='xl'
             p='sm'

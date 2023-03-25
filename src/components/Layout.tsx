@@ -42,6 +42,7 @@ import {
   IconTag,
   IconUpload,
   IconUser,
+  IconUserCog,
   IconUsers,
 } from '@tabler/icons-react';
 import useFetch from 'hooks/useFetch';
@@ -355,7 +356,7 @@ export default function Layout({ children, props }) {
                 <Menu.Target>
                   <Button
                     leftIcon={
-                      avatar ? <Image src={avatar} height={32} radius='md' /> : <IconSettings size='1rem' />
+                      avatar ? <Image src={avatar} height={32} radius='md' /> : <IconUserCog size='1rem' />
                     }
                     variant='subtle'
                     color='gray'

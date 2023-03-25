@@ -2432,22 +2432,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tabler/icons-react@npm:^2.7.0":
-  version: 2.7.0
-  resolution: "@tabler/icons-react@npm:2.7.0"
+"@tabler/icons-react@npm:^2.11.0":
+  version: 2.11.0
+  resolution: "@tabler/icons-react@npm:2.11.0"
   dependencies:
-    "@tabler/icons": 2.7.0
+    "@tabler/icons": 2.11.0
     prop-types: ^15.7.2
   peerDependencies:
     react: ^16.5.1 || ^17.0.0 || ^18.0.0
-  checksum: 365e130dd3904e1b7e224a3f9c839744e48ae5f1bd59968c9e439fc1d635b95028a117aa08c1759f0fc943d82dfbd1e78f9ac31c7fdcaf20baed036c372e9e52
+  checksum: 12aa82bfeee168e2a12adc7848a8bdd36e595f3ce02129bf662b47b59dfb188c74e4f0f8c64443d939815ba4f944121fd19f31700dbc383ac7bf999a4a5f16f2
   languageName: node
   linkType: hard
 
-"@tabler/icons@npm:2.7.0":
-  version: 2.7.0
-  resolution: "@tabler/icons@npm:2.7.0"
-  checksum: db6b61b1a02ed74d1f9fd6943175dbfd1c8f24dae30cd56f4bc86d214d8e4ecf9e28022d16cbb3a3064780ee3543610f53e65f3592ea9f9ca22ddeebf4ec44ee
+"@tabler/icons@npm:2.11.0":
+  version: 2.11.0
+  resolution: "@tabler/icons@npm:2.11.0"
+  checksum: 23d7f9f15f46d9e9edd26d6220ff5c3cf125a51beb23d0fd2a1f8a7b871f2632eec93056a044bc6042c3eba54136e51c037987c83c8d8bc4d7b20bf78519d776
   languageName: node
   linkType: hard
 
@@ -11877,7 +11877,7 @@ __metadata:
     "@prisma/internals": ^4.10.1
     "@prisma/migrate": ^4.10.1
     "@sapphire/shapeshift": ^3.8.1
-    "@tabler/icons-react": ^2.7.0
+    "@tabler/icons-react": ^2.11.0
     "@tanstack/react-query": ^4.24.10
     "@types/cookie": ^0.5.1
     "@types/katex": ^0.16.0
