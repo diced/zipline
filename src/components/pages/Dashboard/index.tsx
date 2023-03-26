@@ -244,7 +244,9 @@ export default function Dashboard({ disableMediaPreview, exifEnabled, compress }
               },
             ],
           }}
-          onCellClick={({ record: file }) => {
+          onCellClick={({ column, record: file }) => {
+            if (column.accessor === 'actions') return;
+
             setSelectedFile(file);
             setOpen(true);
           }}

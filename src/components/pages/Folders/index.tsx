@@ -295,7 +295,9 @@ export default function Folders({ disableMediaPreview, exifEnabled, compress }) 
               },
             ],
           }}
-          onRowClick={(folder) => {
+          onCellClick={({ column, record: folder }) => {
+            if (column.accessor === 'actions') return;
+
             setViewOpen(true);
             setActiveFolderId(folder.id);
           }}

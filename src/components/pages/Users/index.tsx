@@ -218,7 +218,9 @@ export default function Users() {
               },
             ],
           }}
-          onRowClick={(user) => {
+          onCellClick={({ column, record: user }) => {
+            if (column.accessor === 'actions') return;
+
             setSelectedUser(user);
             setEditOpen(true);
           }}
