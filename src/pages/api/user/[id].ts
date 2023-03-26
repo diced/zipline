@@ -184,3 +184,11 @@ export default withZipline(handler, {
   user: true,
   administrator: true,
 });
+
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '50mb',
+    },
+  },
+};
