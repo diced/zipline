@@ -190,6 +190,7 @@ export default function Users() {
           records={records ? records.filter((x) => x.username !== self.username) : []}
           fetching={users.length === 0}
           loaderBackgroundBlur={5}
+          minHeight='calc(100vh - 200px)'
           loaderVariant='dots'
           rowContextMenu={{
             shadow: 'xl',

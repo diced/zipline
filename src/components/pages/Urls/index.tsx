@@ -314,6 +314,7 @@ export default function Urls() {
           records={records ?? []}
           fetching={urls.isLoading}
           loaderBackgroundBlur={5}
+          minHeight='calc(100vh - 200px)'
           loaderVariant='dots'
           rowContextMenu={{
             shadow: 'xl',

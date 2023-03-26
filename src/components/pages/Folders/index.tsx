@@ -252,6 +252,7 @@ export default function Folders({ disableMediaPreview, exifEnabled, compress }) 
           records={records ?? []}
           fetching={folders.isLoading}
           loaderBackgroundBlur={5}
+          minHeight='calc(100vh - 200px)'
           loaderVariant='dots'
           rowContextMenu={{
             shadow: 'xl',
