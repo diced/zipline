@@ -216,6 +216,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   });
   delete user.password;
   delete user.totpSecret;
+  delete user.token;
 
   // @ts-ignore workaround because next wont allow date
   file.createdAt = file.createdAt.toString();
