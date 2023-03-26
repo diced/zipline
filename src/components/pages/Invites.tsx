@@ -288,7 +288,6 @@ export default function Invites() {
           onSortStatusChange={setSortStatus}
           records={records ?? []}
           fetching={!ok}
-          minHeight={160}
           loaderBackgroundBlur={5}
           loaderVariant='dots'
           rowContextMenu={{

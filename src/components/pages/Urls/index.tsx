@@ -313,7 +313,6 @@ export default function Urls() {
           onSortStatusChange={setSortStatus}
           records={records ?? []}
           fetching={urls.isLoading}
-          minHeight={160}
           loaderBackgroundBlur={5}
           loaderVariant='dots'
           rowContextMenu={{

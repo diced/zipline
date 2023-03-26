@@ -251,7 +251,6 @@ export default function Folders({ disableMediaPreview, exifEnabled, compress }) 
           onSortStatusChange={setSortStatus}
           records={records ?? []}
           fetching={folders.isLoading}
-          minHeight={160}
           loaderBackgroundBlur={5}
           loaderVariant='dots'
           rowContextMenu={{
