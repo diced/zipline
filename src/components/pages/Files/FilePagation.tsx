@@ -1,7 +1,6 @@
 import { Box, Button, Center, Checkbox, Group, Pagination, SimpleGrid, Skeleton, Title } from '@mantine/core';
-import { useMediaQuery } from '@mantine/hooks';
-import { IconFile } from '@tabler/icons-react';
 import File from 'components/File';
+import { FileIcon } from 'components/icons';
 import MutedText from 'components/MutedText';
 import useFetch from 'hooks/useFetch';
 import { usePaginatedFiles } from 'lib/queries/files';
@@ -10,12 +9,10 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 
-export default function FilePagation({ disableMediaPreview, exifEnabled, queryPage, compress }) {
+export default function FilePagation({ disableMediaPreview, exifEnabled, queryPage }) {
   const [checked, setChecked] = useRecoilState(showNonMediaSelector);
   const [numPages, setNumPages] = useState(Number(queryPage)); // just set it to the queryPage, since the req may have not loaded yet
   const [page, setPage] = useState(Number(queryPage));
-
-  const isMobile = useMediaQuery('(max-width: 768px)');
 
   const router = useRouter();
 
@@ -44,7 +41,7 @@ export default function FilePagation({ disableMediaPreview, exifEnabled, queryPa
       <Center sx={{ flexDirection: 'column' }}>
         <Group>
           <div>
-            <IconFile size={48} />
+            <FileIcon size={48} />
           </div>
           <div>
             <Title>Nothing here</Title>
@@ -70,13 +67,7 @@ export default function FilePagation({ disableMediaPreview, exifEnabled, queryPa
           ? pages.data.length
             ? pages.data.map((image) => (
                 <div key={image.id}>
-                  <File
-                    image={image}
-                    disableMediaPreview={disableMediaPreview}
-                    exifEnabled={exifEnabled}
-                    refreshImages={pages.refetch}
-                    onDash={compress}
-                  />
+                  <File image={image} disableMediaPreview={disableMediaPreview} exifEnabled={exifEnabled} />
                 </div>
               ))
             : null
@@ -96,15 +87,13 @@ export default function FilePagation({ disableMediaPreview, exifEnabled, queryPa
             paddingBottom: 3,
           }}
         >
-          {!isMobile && <div></div>}
-          <Pagination total={numPages} value={page} onChange={setPage} withEdges />
-          {!isMobile && (
-            <Checkbox
-              label='Show non-media files'
-              checked={checked}
-              onChange={(event) => setChecked(event.currentTarget.checked)}
-            />
-          )}
+          <div></div>
+          <Pagination total={numPages} page={page} onChange={setPage} />
+          <Checkbox
+            label='Show non-media files'
+            checked={checked}
+            onChange={(event) => setChecked(event.currentTarget.checked)}
+          />
         </Box>
       ) : null}
     </>

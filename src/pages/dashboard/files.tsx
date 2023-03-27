@@ -22,7 +22,6 @@ export default function FilesPage(props) {
           disableMediaPreview={props.disable_media_preview}
           exifEnabled={props.exif_enabled}
           queryPage={props.queryPage}
-          compress={props.compress}
         />
       </Layout>
     </>

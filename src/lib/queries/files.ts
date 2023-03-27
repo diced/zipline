@@ -2,17 +2,13 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import queryClient from './client';
 
 export type UserFilesResponse = {
-  createdAt: Date;
-  expiresAt?: Date;
-  name: string;
+  created_at: string;
+  expires_at?: string;
+  file: string;
   mimetype: string;
   id: string;
   favorite: boolean;
   url: string;
-  size: number;
-  maxViews: number;
-  views: number;
-  folderId?: number;
 };
 
 export const useFiles = (query: { [key: string]: string } = {}) => {
@@ -27,13 +23,12 @@ export const useFiles = (query: { [key: string]: string } = {}) => {
           ? data
           : data.map((x) => ({
               ...x,
-              createdAt: new Date(x.createdAt),
-              expiresAt: x.expiresAt ? new Date(x.expiresAt) : null,
+              created_at: new Date(x.created_at).toLocaleString(),
             }))
       );
   });
 };
-export const usePaginatedFiles = (page?: number, filter = 'media', favorite = null) => {
+export const usePaginatedFiles = (page?: number, filter: string = 'media', favorite = null) => {
   const queryBuilder = new URLSearchParams({
     page: Number(page || '1').toString(),
     filter,
@@ -44,13 +39,7 @@ export const usePaginatedFiles = (page?: number, filter = 'media', favorite = nu
   return useQuery<UserFilesResponse[]>(['files', queryString], async () => {
     return fetch('/api/user/paged?' + queryString)
       .then((res) => res.json() as Promise<UserFilesResponse[]>)
-      .then((data) =>
-        data.map((x) => ({
-          ...x,
-          createdAt: new Date(x.createdAt),
-          expiresAt: x.expiresAt ? new Date(x.expiresAt) : null,
-        }))
-      );
+      .then((data) => data.map((x) => ({ ...x, created_at: new Date(x.created_at).toLocaleString() })));
   });
 };
 
@@ -61,8 +50,7 @@ export const useRecent = (filter?: string) => {
       .then((data) =>
         data.map((x) => ({
           ...x,
-          createdAt: new Date(x.createdAt),
-          expiresAt: x.expiresAt ? new Date(x.expiresAt) : null,
+          created_at: new Date(x.created_at).toLocaleString(),
         }))
       );
   });

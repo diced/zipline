@@ -1,10 +1,10 @@
-import config from 'lib/config';
-import datasource from 'lib/datasource';
-import Logger from 'lib/logger';
 import { version } from '../../package.json';
-import { getStats } from 'server/util';
+import config from '../lib/config';
+import datasource from '../lib/datasource';
+import Logger from '../lib/logger';
+import { getStats } from './util';
 
-import fastify, { FastifyInstance, FastifyServerOptions } from 'fastify';
+import fastify, { FastifyInstance, FastifyRequest, FastifyServerOptions } from 'fastify';
 import { createReadStream, existsSync, readFileSync } from 'fs';
 import dbFileDecorator from './decorators/dbFile';
 import notFound from './decorators/notFound';
@@ -12,7 +12,6 @@ import postFileDecorator from './decorators/postFile';
 import postUrlDecorator from './decorators/postUrl';
 import preFileDecorator from './decorators/preFile';
 import rawFileDecorator from './decorators/rawFile';
-import allPlugin from './plugins/all';
 import configPlugin from './plugins/config';
 import datasourcePlugin from './plugins/datasource';
 import loggerPlugin from './plugins/logger';
@@ -21,6 +20,7 @@ import prismaPlugin from './plugins/prisma';
 import rawRoute from './routes/raw';
 import uploadsRoute, { uploadsRouteOnResponse } from './routes/uploads';
 import urlsRoute, { urlsRouteOnResponse } from './routes/urls';
+import { IncomingMessage } from 'http';
 
 const dev = process.env.NODE_ENV === 'development';
 const logger = Logger.get('server');
@@ -50,8 +50,7 @@ async function start() {
       quiet: !dev,
       hostname: config.core.host,
       port: config.core.port,
-    })
-    .register(allPlugin);
+    });
 
   // decorators
   server
@@ -67,10 +66,6 @@ async function start() {
       const url = req.url.toLowerCase();
       if (!url.startsWith('/api') || url === '/api') return reply.notFound();
     }
-    reply
-      .header('Access-Control-Allow-Origin', '*')
-      .header('Access-Control-Max-Age', '86400')
-      .header('Access-Control-Allow-Headers', '*');
 
     done();
   });
@@ -113,7 +108,7 @@ async function start() {
 
         const url = await server.prisma.url.findFirst({
           where: {
-            OR: [{ id: id }, { vanity: id }, { invisible: { invis: decodeURI(encodeURI(id)) } }],
+            OR: [{ id: id }, { vanity: id }, { invisible: { invis: decodeURI(id) } }],
           },
         });
 
@@ -126,7 +121,7 @@ async function start() {
 
           const url = await server.prisma.url.findFirst({
             where: {
-              OR: [{ id: id }, { vanity: id }, { invisible: { invis: decodeURI(encodeURI(id)) } }],
+              OR: [{ id: id }, { vanity: id }, { invisible: { invis: decodeURI(id) } }],
             },
           });
 
@@ -155,6 +150,26 @@ async function start() {
 
   server.get('/r/:id', rawRoute.bind(server));
   server.get('/', (_, reply) => reply.redirect('/dashboard'));
+
+  // initialize next routes after all other routes have been registered so theres no overlap
+  server.after(() => {
+    // overrides fastify's default parser so that next.js can handle the request
+    // in the future Zipline's api will probably be entirely handled by fastify
+    async function parser(_: FastifyRequest, payload: IncomingMessage) {
+      return payload;
+    }
+
+    server.addContentTypeParser('text/plain', parser);
+    server.addContentTypeParser('application/json', parser);
+    server.addContentTypeParser('multipart/form-data', parser);
+
+    server.next('/*', { method: 'ALL' });
+    server.next('/api/*', { method: 'ALL' });
+  });
+
+  // server.setDefaultRoute((req, res) => {
+  //   server.nextHandle(req, res);
+  // });
 
   await server.listen({
     port: config.core.port,
@@ -193,7 +208,7 @@ async function clearInvites(this: FastifyInstance) {
     where: {
       OR: [
         {
-          expiresAt: { lt: new Date() },
+          expires_at: { lt: new Date() },
         },
         {
           used: true,

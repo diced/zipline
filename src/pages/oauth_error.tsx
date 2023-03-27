@@ -1,8 +1,8 @@
 import { Button, Stack, Title } from '@mantine/core';
+import Link from 'components/Link';
 import MutedText from 'components/MutedText';
 import { GetServerSideProps } from 'next';
 import Head from 'next/head';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 

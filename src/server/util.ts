@@ -2,58 +2,35 @@ import { PrismaClient } from '@prisma/client';
 import { Migrate } from '@prisma/migrate/dist/Migrate';
 import { ensureDatabaseExists } from '@prisma/migrate/dist/utils/ensureDatabaseExists';
 import { ServerResponse } from 'http';
-import { Datasource } from 'lib/datasources';
-import Logger from 'lib/logger';
-import { bytesToHuman } from 'lib/utils/bytes';
+import { Datasource } from '../lib/datasources';
+import Logger from '../lib/logger';
+import { bytesToHuman } from '../lib/utils/bytes';
 
 export async function migrations() {
   const logger = Logger.get('database::migrations');
 
   try {
-    logger.info('establishing database connection');
+    logger.debug('establishing database connection');
     const migrate = new Migrate('./prisma/schema.prisma');
 
-    logger.info('ensuring database exists, if not creating database - may error if no permissions');
-    await ensureDatabaseExists('apply', './prisma/schema.prisma');
+    logger.debug('ensuring database exists, if not creating database - may error if no permissions');
+    await ensureDatabaseExists('apply', true, './prisma/schema.prisma');
 
     const diagnose = await migrate.diagnoseMigrationHistory({
       optInToShadowDatabase: false,
     });
 
     if (diagnose.history?.diagnostic === 'databaseIsBehind') {
-      if (!diagnose.hasMigrationsTable) {
-        logger.debug('no migrations table found, attempting schema push');
-        try {
-          logger.debug('pushing schema');
-          const migration = await migrate.push({ force: false });
-          if (migration.unexecutable && migration.unexecutable.length > 0)
-            throw new Error('This database is not empty, schema push is not possible.');
-        } catch (e) {
-          migrate.stop();
-          logger.error('failed to push schema');
-          throw e;
-        }
-        logger.debug('finished pushing schema, marking migrations as applied');
-        for (const migration of diagnose.history.unappliedMigrationNames) {
-          await migrate.markMigrationApplied({ migrationId: migration });
-        }
-        migrate.stop();
-        logger.info('finished migrating database');
-      } else if (diagnose.hasMigrationsTable) {
-        logger.debug('database is behind, attempting to migrate');
-        try {
-          logger.debug('migrating database');
-          await migrate.applyMigrations();
-        } catch (e) {
-          logger.error('failed to migrate database');
-          migrate.stop();
-          throw e;
-        }
+      logger.debug('database is behind, attempting to migrate');
+      try {
+        logger.debug('migrating database');
+        await migrate.applyMigrations();
+      } finally {
         migrate.stop();
         logger.info('finished migrating database');
       }
     } else {
-      logger.info('exiting migrations engine - database is up to date');
+      logger.debug('exiting migrations engine - database is up to date');
       migrate.stop();
     }
   } catch (error) {
@@ -84,7 +61,7 @@ export async function getStats(prisma: PrismaClient, datasource: Datasource, log
   const size = await datasource.fullSize();
   logger.debug(`full size: ${size}`);
 
-  const byUser = await prisma.file.groupBy({
+  const byUser = await prisma.image.groupBy({
     by: ['userId'],
     _count: {
       _all: true,
@@ -115,17 +92,17 @@ export async function getStats(prisma: PrismaClient, datasource: Datasource, log
   }
   logger.debug(`count by user: ${JSON.stringify(count_by_user)}`);
 
-  const count = await prisma.file.count();
+  const count = await prisma.image.count();
   logger.debug(`count files: ${JSON.stringify(count)}`);
 
-  const views = await prisma.file.aggregate({
+  const views = await prisma.image.aggregate({
     _sum: {
       views: true,
     },
   });
   logger.debug(`sum views: ${JSON.stringify(views)}`);
 
-  const typesCount = await prisma.file.groupBy({
+  const typesCount = await prisma.image.groupBy({
     by: ['mimetype'],
     _count: {
       mimetype: true,

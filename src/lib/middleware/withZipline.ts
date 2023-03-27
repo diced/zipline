@@ -18,18 +18,8 @@ export interface NextApiFile {
   size: number;
 }
 
-export interface UserOauth extends User {
+export interface UserExtended extends User {
   oauth: OAuth[];
-}
-export type UserExtended = UserOauth & {
-  embed: UserEmbed;
-};
-
-export interface UserEmbed {
-  title?: string;
-  siteName?: string;
-  description?: string;
-  color?: string;
 }
 
 export type NextApiReq = NextApiRequest & {
@@ -47,12 +37,12 @@ export type NextApiResExtra =
   | 'notFound'
   | 'error';
 export type NextApiResExtraObj = {
-  [key in NextApiResExtra]: (message: string | number, extra?: Record<string, unknown>) => void;
+  [key in NextApiResExtra]: (message: any, extra?: Record<string, any>) => void;
 };
 
 export type NextApiRes = NextApiResponse &
   NextApiResExtraObj & {
-    json: (json: Record<string, unknown>, status?: number) => void;
+    json: (json: Record<string, any>, status?: number) => void;
     setCookie: (name: string, value: unknown, options: CookieSerializeOptions) => void;
     setUserCookie: (id: number) => void;
   };
@@ -66,10 +56,10 @@ export type ZiplineApiConfig = {
 export const withZipline =
   (
     handler: (req: NextApiRequest, res: NextApiResponse, user?: UserExtended) => Promise<unknown>,
-    api_config: ZiplineApiConfig = { methods: ['GET', 'OPTIONS'] }
+    api_config: ZiplineApiConfig = { methods: ['GET'] }
   ) =>
   (req: NextApiReq, res: NextApiRes) => {
-    if (!api_config.methods.includes('OPTIONS')) api_config.methods.push('OPTIONS');
+    api_config.methods.push('OPTIONS');
 
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -80,7 +70,7 @@ export const withZipline =
     if (req.method === 'OPTIONS') return res.status(204).end();
 
     // Used when the client sends wrong information, etc.
-    res.badRequest = (message: string, extra: Record<string, unknown> = {}) => {
+    res.badRequest = (message: string, extra: Record<string, any> = {}) => {
       res.json(
         {
           error: message,
@@ -92,7 +82,7 @@ export const withZipline =
     };
 
     // If the user is not logged in
-    res.unauthorized = (message: string, extra: Record<string, unknown> = {}) => {
+    res.unauthorized = (message: string, extra: Record<string, any> = {}) => {
       res.json(
         {
           error: message,
@@ -104,7 +94,7 @@ export const withZipline =
     };
 
     // If the user is logged in but doesn't have permission to do something
-    res.forbidden = (message: string, extra: Record<string, unknown> = {}) => {
+    res.forbidden = (message: string, extra: Record<string, any> = {}) => {
       res.json(
         {
           error: message,
@@ -115,7 +105,7 @@ export const withZipline =
       );
     };
 
-    res.notFound = (message: string, extra: Record<string, unknown> = {}) => {
+    res.notFound = (message: string, extra: Record<string, any> = {}) => {
       res.json(
         {
           error: message,
@@ -126,7 +116,7 @@ export const withZipline =
       );
     };
 
-    res.ratelimited = (message: number, extra: Record<string, unknown> = {}) => {
+    res.ratelimited = (message: number, extra: Record<string, any> = {}) => {
       const retry = Math.floor(message / 1000);
 
       res.setHeader('X-Ratelimit-Remaining', retry);
@@ -140,7 +130,7 @@ export const withZipline =
       );
     };
 
-    res.json = (json: unknown, status = 200) => {
+    res.json = (json: any, status: number = 200) => {
       res.setHeader('Content-Type', 'application/json');
       res.status(status);
       res.end(JSON.stringify(json));
@@ -176,7 +166,7 @@ export const withZipline =
             include: { oauth: true },
           });
 
-          if (user) return user as UserExtended;
+          if (user) return user;
         }
 
         const userId = req.getCookie('user');
@@ -192,7 +182,7 @@ export const withZipline =
         });
 
         if (!user) return null;
-        return user as UserExtended;
+        return user;
       } catch (e) {
         Logger.get('withZipline').debug(e.message);
         if (e.code && e.code === 'ERR_CRYPTO_TIMING_SAFE_EQUAL_LENGTH') {

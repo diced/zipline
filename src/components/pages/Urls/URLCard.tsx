@@ -1,28 +1,59 @@
-import { ActionIcon, Card, Group, Stack, Title, Tooltip } from '@mantine/core';
-import { IconClipboardCopy, IconExternalLink, IconTrash } from '@tabler/icons-react';
-import AnchorNext from 'components/AnchorNext';
+import { ActionIcon, Card, Group, LoadingOverlay, Stack, Title, Tooltip } from '@mantine/core';
+import { useClipboard } from '@mantine/hooks';
+import { showNotification } from '@mantine/notifications';
+import { CopyIcon, CrossIcon, DeleteIcon, ExternalLinkIcon } from 'components/icons';
+import TrashIcon from 'components/icons/TrashIcon';
+import Link from 'components/Link';
 import MutedText from 'components/MutedText';
-import { URLResponse } from 'lib/queries/url';
+import { URLResponse, useURLDelete } from 'lib/queries/url';
 import { relativeTime } from 'lib/utils/client';
 
-export default function URLCard({
-  url,
-  copyURL,
-  deleteURL,
-}: {
-  url: URLResponse;
-  copyURL: (u: URLResponse) => void;
-  deleteURL: (u: URLResponse) => void;
-}) {
+export default function URLCard({ url }: { url: URLResponse }) {
+  const clipboard = useClipboard();
+  const urlDelete = useURLDelete();
+
+  const copyURL = (u) => {
+    clipboard.copy(`${window.location.protocol}//${window.location.host}${u.url}`);
+    showNotification({
+      title: 'Copied to clipboard',
+      message: '',
+      icon: <CopyIcon />,
+    });
+  };
+
+  const deleteURL = async (u) => {
+    urlDelete.mutate(u.id, {
+      onSuccess: () => {
+        showNotification({
+          title: 'Deleted URL',
+          message: '',
+          icon: <CrossIcon />,
+          color: 'green',
+        });
+      },
+
+      onError: (url: any) => {
+        showNotification({
+          title: 'Failed to delete URL',
+          message: url.error,
+          icon: <DeleteIcon />,
+          color: 'red',
+        });
+      },
+    });
+  };
+
   return (
     <Card key={url.id} sx={{ maxWidth: '100%' }} shadow='sm'>
+      <LoadingOverlay visible={urlDelete.isLoading} />
+
       <Group position='apart'>
         <Group position='left'>
           <Stack spacing={0}>
             <Title>{url.vanity ?? url.id}</Title>
-            <Tooltip label={new Date(url.createdAt).toLocaleString()}>
+            <Tooltip label={new Date(url.created_at).toLocaleString()}>
               <div>
-                <MutedText size='sm'>Created: {relativeTime(new Date(url.createdAt))}</MutedText>
+                <MutedText size='sm'>Created: {relativeTime(new Date(url.created_at))}</MutedText>
               </div>
             </Tooltip>
             {url.vanity && <MutedText size='sm'>ID: {url.id}</MutedText>}
@@ -35,21 +66,21 @@ export default function URLCard({
             )}
             <MutedText size='sm'>Views: {url.views}</MutedText>
             <MutedText size='sm'>
-              URL: <AnchorNext href={url.destination}>{url.destination}</AnchorNext>
+              URL: <Link href={url.destination}>{url.destination}</Link>
             </MutedText>
           </Stack>
         </Group>
-        <Stack>
+        <Group position='right'>
           <ActionIcon href={url.url} component='a' target='_blank'>
-            <IconExternalLink size='1rem' />
+            <ExternalLinkIcon />
           </ActionIcon>
           <ActionIcon aria-label='copy' onClick={() => copyURL(url)}>
-            <IconClipboardCopy size='1rem' />
+            <CopyIcon />
           </ActionIcon>
           <ActionIcon aria-label='delete' onClick={() => deleteURL(url)}>
-            <IconTrash size='1rem' />
+            <TrashIcon />
           </ActionIcon>
-        </Stack>
+        </Group>
       </Group>
     </Card>
   );

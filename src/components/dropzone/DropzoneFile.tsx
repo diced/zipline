@@ -1,5 +1,4 @@
-import { ActionIcon, Box, Card, Group, HoverCard, Table, useMantineTheme } from '@mantine/core';
-import { IconX } from '@tabler/icons-react';
+import { Badge, Group, HoverCard, Table, useMantineTheme } from '@mantine/core';
 import Type from 'components/Type';
 
 export function FilePreview({ file }: { file: File }) {
@@ -17,34 +16,15 @@ export function FilePreview({ file }: { file: File }) {
   );
 }
 
-export default function FileDropzone({ file, onRemove }: { file: File; onRemove: () => void }) {
+export default function FileDropzone({ file }: { file: File }) {
   const theme = useMantineTheme();
 
   return (
     <HoverCard shadow='md'>
       <HoverCard.Target>
-        <Card shadow='sm' radius='sm' p='sm'>
-          <Group position='center' spacing='xl'>
-            {file.name}
-          </Group>
-        </Card>
+        <Badge size='lg'>{file.name}</Badge>
       </HoverCard.Target>
       <HoverCard.Dropdown>
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 0,
-            right: 0,
-            zIndex: 1,
-            color: theme.colorScheme === 'dark' ? 'white' : 'white',
-          }}
-          m='xs'
-        >
-          <ActionIcon onClick={onRemove} size='sm' color='red' variant='filled'>
-            <IconX />
-          </ActionIcon>
-        </Box>
-
         <Group grow>
           <FilePreview file={file} />
 

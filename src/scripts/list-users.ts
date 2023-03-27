@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
-import config from 'lib/config';
-import { migrations } from 'server/util';
+import config from '../lib/config';
+import { migrations } from '../server/util';
 
 async function main() {
   const extras = (process.argv[2] ?? '').split(',');

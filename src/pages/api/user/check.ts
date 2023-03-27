@@ -3,9 +3,8 @@ import prisma from 'lib/prisma';
 import { NextApiReq, NextApiRes, withZipline } from 'middleware/withZipline';
 
 async function handler(req: NextApiReq, res: NextApiRes) {
-  if (!config.features.user_registration && !req.body.code)
-    return res.badRequest('user registration is disabled');
-  else if (!config.features.invites && req.body.code) return res.forbidden('user/invites are disabled');
+  if (!config.features.invites || !config.features.user_registration)
+    return res.forbidden('user/invites are disabled');
 
   if (!req.body?.code) return res.badRequest('no code');
   if (!req.body?.username) return res.badRequest('no username');
@@ -18,7 +17,6 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
   const user = await prisma.user.findFirst({
     where: { username },
-    select: { id: true },
   });
 
   if (user) return res.badRequest('username already exists');

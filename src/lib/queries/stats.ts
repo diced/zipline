@@ -6,11 +6,11 @@ type StatsTypesCount = {
 };
 
 export type Stats = {
-  createdAt: string;
+  created_at: string;
   id: number;
   data: {
     count: number;
-    count_by_user: unknown[];
+    count_by_user: any[];
     count_users: number;
     size: string;
     size_num: number;

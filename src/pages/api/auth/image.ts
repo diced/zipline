@@ -8,26 +8,24 @@ import { extname } from 'path';
 async function handler(req: NextApiReq, res: NextApiRes) {
   const { id, password } = req.query;
 
-  const file = await prisma.file.findFirst({
+  const image = await prisma.image.findFirst({
     where: {
       id: Number(id),
     },
   });
 
-  if (!file) return res.notFound('image not found');
+  if (!image) return res.notFound('image not found');
   if (!password) return res.badRequest('no password provided');
 
-  const decoded = decodeURIComponent(password as string);
-
-  const valid = await checkPassword(decoded, file.password);
+  const valid = await checkPassword(password as string, image.password);
   if (!valid) return res.badRequest('wrong password');
 
-  const data = await datasource.get(file.name);
+  const data = await datasource.get(image.file);
   if (!data) return res.notFound('image not found');
 
-  const size = await datasource.size(file.name);
+  const size = await datasource.size(image.file);
 
-  const mimetype = await guess(extname(file.name));
+  const mimetype = await guess(extname(image.file));
   res.setHeader('Content-Type', mimetype);
   res.setHeader('Content-Length', size);
 

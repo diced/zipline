@@ -1,7 +1,6 @@
 import config from 'lib/config';
 import Logger from 'lib/logger';
 import prisma from 'lib/prisma';
-import { formatRootUrl } from 'lib/utils/urls';
 import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'middleware/withZipline';
 
 async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
@@ -18,15 +17,15 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
 
     return res.json(url);
   } else {
-    const urls = await prisma.url.findMany({
+    let urls = await prisma.url.findMany({
       where: {
         userId: user.id,
       },
       orderBy: {
-        createdAt: 'desc',
+        created_at: 'desc',
       },
       select: {
-        createdAt: true,
+        created_at: true,
         id: true,
         destination: true,
         vanity: true,
@@ -35,12 +34,8 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       },
     });
 
-    for (let i = 0; i !== urls.length; ++i) {
-      (urls[i] as unknown as { url: string }).url = formatRootUrl(
-        config.urls.route,
-        urls[i].vanity ?? urls[i].id
-      );
-    }
+    // @ts-ignore
+    urls.map((url) => (url.url = `${config.urls.route}/${url.vanity ?? url.id}`));
     return res.json(urls);
   }
 }

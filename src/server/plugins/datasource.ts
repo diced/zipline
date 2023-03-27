@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import fastifyPlugin from 'fastify-plugin';
-import type { Datasource } from 'lib/datasources';
+import type { Datasource } from '../../lib/datasources';
 
 function datasourcePlugin(fastify: FastifyInstance, datasource: Datasource, done: () => void) {
   fastify.decorate('datasource', datasource);

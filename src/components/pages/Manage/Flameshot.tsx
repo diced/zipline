@@ -1,5 +1,5 @@
 import { Code } from '@mantine/core';
-import AnchorNext from 'components/AnchorNext';
+import Link from 'components/Link';
 import { GeneratorModal } from './GeneratorModal';
 
 export default function Flameshot({ user, open, setOpen }) {
@@ -7,31 +7,28 @@ export default function Flameshot({ user, open, setOpen }) {
     const curl = [
       'curl',
       '-H',
+      '"Content-Type: multipart/form-data"',
+      '-H',
       `"authorization: ${user?.token}"`,
+      '-F',
+      'file=@/tmp/ss.png',
       `${
         window.location.protocol +
         '//' +
         window.location.hostname +
         (window.location.port ? ':' + window.location.port : '')
-      }/api/${values.type === 'upload-file' ? 'upload' : 'shorten'}`,
+      }/api/upload`,
     ];
-
-    if (values.type === 'upload-file') {
-      curl.push('-F', 'file=@/tmp/ss.png');
-      curl.push('-H', '"Content-Type: multipart/form-data"');
-    } else {
-      curl.push('-H', '"Content-Type: application/json"');
-    }
 
     const extraHeaders = {};
 
-    if (values.format !== 'RANDOM' && values.type === 'upload-file') {
+    if (values.format !== 'RANDOM') {
       extraHeaders['Format'] = values.format;
     } else {
       delete extraHeaders['Format'];
     }
 
-    if (values.imageCompression !== 0 && values.type === 'upload-file') {
+    if (values.imageCompression !== 0) {
       extraHeaders['Image-Compression-Percent'] = values.imageCompression;
     } else {
       delete extraHeaders['Image-Compression-Percent'];
@@ -43,28 +40,10 @@ export default function Flameshot({ user, open, setOpen }) {
       delete extraHeaders['Zws'];
     }
 
-    if (values.embed && values.type === 'upload-file') {
+    if (values.embed) {
       extraHeaders['Embed'] = 'true';
     } else {
       delete extraHeaders['Embed'];
-    }
-
-    if (values.noJSON) {
-      extraHeaders['No-JSON'] = 'true';
-    } else {
-      delete extraHeaders['No-JSON'];
-    }
-
-    if (values.originalName && values.type === 'upload-file') {
-      extraHeaders['Original-Name'] = 'true';
-    } else {
-      delete extraHeaders['Original-Name'];
-    }
-
-    if (values.overrideDomain && values.overrideDomain.trim() !== '') {
-      extraHeaders['Override-Domain'] = values.overrideDomain;
-    } else {
-      delete extraHeaders['Override-Domain'];
     }
 
     for (const [key, value] of Object.entries(extraHeaders)) {
@@ -72,26 +51,14 @@ export default function Flameshot({ user, open, setOpen }) {
       curl.push(`"${key}: ${value}"`);
     }
 
-    let shell;
-    if (values.type === 'upload-file') {
-      shell = `#!/bin/bash${values.wlCompositorNotSupported ? '\nexport XDG_CURRENT_DESKTOP=sway\n' : ''}
-flameshot gui -r > /tmp/ss.png;
-${curl.join(' ')}${values.noJSON ? '' : " | jq -r '.files[0]'"} | tr -d '\\n' | ${
-        values.wlCompatibility ? 'wl-copy' : 'xsel -ib'
-      };
+    const shell = `#!/bin/bash${values.wlCompositorNotSupported ? '\nexport XDG_CURRENT_DESKTOP=sway\n' : ''}
+flameshot gui -p /tmp/ss.png;
+${curl.join(' ')} | jq -r '.files[0]' | tr -d '\\n' | ${values.wlCompatibility ? 'wl-copy' : 'xsel -ib'};
 `;
-    } else if (values.type === 'shorten-url') {
-      shell = `#!/bin/bash
-arg=$1;
-${curl.join(' ')} -d "{\\"url\\": \\"$arg\\"}"${values.noJSON ? '' : " | jq -r '.url'"} | tr -d '\\n' | ${
-        values.wlCompatibility ? 'wl-copy' : 'xsel -ib'
-      };
-`;
-    }
 
     const pseudoElement = document.createElement('a');
     pseudoElement.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(shell));
-    pseudoElement.setAttribute('download', `zipline${values.type === 'upload-file' ? '' : '-url'}.sh`);
+    pseudoElement.setAttribute('download', 'zipline.sh');
     pseudoElement.style.display = 'none';
     document.body.appendChild(pseudoElement);
     pseudoElement.click();
@@ -105,18 +72,18 @@ ${curl.join(' ')} -d "{\\"url\\": \\"$arg\\"}"${values.noJSON ? '' : " | jq -r '
       title='Flameshot'
       desc={
         <>
-          To use this script, you need <AnchorNext href='https://flameshot.org'>Flameshot</AnchorNext>,{' '}
-          <AnchorNext href='https://curl.se/'>
+          To use this script, you need <Link href='https://flameshot.org'>Flameshot</Link>,{' '}
+          <Link href='https://curl.se/'>
             <Code>curl</Code>
-          </AnchorNext>
+          </Link>
           ,{' '}
-          <AnchorNext href='https://github.com/stedolan/jq'>
+          <Link href='https://github.com/stedolan/jq'>
             <Code>jq</Code>
-          </AnchorNext>
+          </Link>
           , and{' '}
-          <AnchorNext href='https://github.com/kfish/xsel'>
+          <Link href='https://github.com/kfish/xsel'>
             <Code>xsel</Code>
-          </AnchorNext>{' '}
+          </Link>{' '}
           installed. This script is intended for use on Linux only.
         </>
       }

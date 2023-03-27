@@ -1,66 +1,132 @@
-import { Box, Card, Grid, LoadingOverlay, Title, useMantineTheme } from '@mantine/core';
-
+import { Box, Card, Grid, LoadingOverlay, MantineTheme, Title, useMantineTheme } from '@mantine/core';
+import {
+  ArcElement,
+  CategoryScale,
+  Chart as ChartJS,
+  ChartData,
+  ChartOptions,
+  LinearScale,
+  LineController,
+  LineElement,
+  PointElement,
+  Tooltip,
+} from 'chart.js';
 import { useStats } from 'lib/queries/stats';
 import { bytesToHuman } from 'lib/utils/bytes';
 import { useMemo } from 'react';
+import { Chart } from 'react-chartjs-2';
 
-import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+ChartJS.register(ArcElement, LinearScale, CategoryScale, PointElement, LineController, LineElement, Tooltip);
+
+const CHART_OPTIONS = (theme: MantineTheme): ChartOptions => ({
+  plugins: {
+    tooltip: {
+      enabled: true,
+      intersect: false,
+    },
+  },
+
+  scales: {
+    y: {
+      ticks: {
+        callback: (value) => value.toLocaleString(),
+        color: theme.colors.gray[6],
+      },
+
+      grid: {
+        color: theme.colors.gray[8],
+      },
+    },
+
+    x: {
+      ticks: {
+        color: theme.colors.gray[6],
+      },
+
+      grid: {
+        color: theme.colors.gray[8],
+      },
+    },
+  },
+});
+
+export type LineChartData = ChartData<'line', number[], string>;
+export type ChartDataMemo = {
+  views: LineChartData;
+  uploads: LineChartData;
+  storage: LineChartData;
+} | void;
 
 export default function Graphs() {
   const historicalStats = useStats(10);
   const theme = useMantineTheme();
 
-  const chartData = useMemo(() => {
-    if (historicalStats.isLoading || !historicalStats.data) return null;
+  const chartOptions = useMemo(() => CHART_OPTIONS(theme), [theme]);
+
+  const chartData = useMemo<ChartDataMemo>(() => {
+    if (historicalStats.isLoading || !historicalStats.data) return;
 
     const data = Array.from(historicalStats.data).reverse();
-
-    const views = data.map((stat) => ({
-      date: new Date(stat.createdAt).toLocaleDateString(),
-      views: stat.data.views_count,
-    }));
-
-    const uploads = data.map((stat) => ({
-      date: new Date(stat.createdAt).toLocaleDateString(),
-      uploads: stat.data.count,
-    }));
-
-    const storage = data.map((stat) => ({
-      date: new Date(stat.createdAt).toLocaleDateString(),
-      bytes: stat.data.size_num,
-    }));
+    const labels = data.map((stat) => new Date(stat.created_at).toLocaleDateString());
+    const viewData = data.map((stat) => stat.data.views_count);
+    const uploadData = data.map((stat) => stat.data.count);
+    const storageData = data.map((stat) => stat.data.size_num);
 
     return {
-      views,
-      uploads,
-      storage,
+      views: {
+        labels,
+        datasets: [
+          {
+            label: ' Views',
+            data: viewData,
+            borderColor: theme.colors.blue[6],
+            backgroundColor: theme.colors.blue[0],
+          },
+        ],
+      },
+
+      uploads: {
+        labels,
+        datasets: [
+          {
+            label: ' Uploads',
+            data: uploadData,
+            borderColor: theme.colors.blue[6],
+            backgroundColor: theme.colors.blue[0],
+          },
+        ],
+      },
+
+      storage: {
+        labels,
+        datasets: [
+          {
+            label: ' Storage',
+            data: storageData,
+            borderColor: theme.colors.blue[6],
+            backgroundColor: theme.colors.blue[0],
+          },
+        ],
+      },
     };
   }, [historicalStats]);
 
-  return historicalStats.isLoading ? (
-    <LoadingOverlay visible={historicalStats.isLoading} />
-  ) : (
+  return (
     <Box mt='md'>
+      <LoadingOverlay visible={historicalStats.isLoading} />
+
       <Grid>
         {/* 3/4 - views */}
         <Grid.Col md={12}>
           <Card>
             <Title size='h4'>Total Views</Title>
             {chartData && (
-              <ResponsiveContainer width='100%' height={250}>
-                <LineChart data={chartData.views}>
-                  <CartesianGrid strokeDasharray='3 3' />
-                  <XAxis dataKey='date' />
-                  <YAxis />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[7] : 'white',
-                      borderColor: theme.colorScheme === 'dark' ? theme.colors.dark[7] : 'white',
-                    }}
-                  />
-                  <Line type='monotone' dataKey='views' name='Views' stroke='#8884d8' activeDot={{ r: 8 }} />
-                </LineChart>
-              </ResponsiveContainer>
+              <Chart
+                type='line'
+                data={chartData.views}
+                options={chartOptions}
+                style={{ maxHeight: '20vh' }}
+              />
             )}
           </Card>
         </Grid.Col>
@@ -70,26 +136,12 @@ export default function Graphs() {
           <Card>
             <Title size='h4'>Total Uploads</Title>
             {chartData && (
-              <ResponsiveContainer width='100%' height={250}>
-                <LineChart data={chartData.uploads}>
-                  <CartesianGrid strokeDasharray='3 3' />
-                  <XAxis dataKey='date' />
-                  <YAxis />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[7] : 'white',
-                      borderColor: theme.colorScheme === 'dark' ? theme.colors.dark[7] : 'white',
-                    }}
-                  />
-                  <Line
-                    type='monotone'
-                    dataKey='uploads'
-                    name='Uploads'
-                    stroke='#8884d8'
-                    activeDot={{ r: 8 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+              <Chart
+                type='line'
+                data={chartData.uploads}
+                options={chartOptions}
+                style={{ maxHeight: '20vh' }}
+              />
             )}
           </Card>
         </Grid.Col>
@@ -99,27 +151,39 @@ export default function Graphs() {
           <Card>
             <Title size='h4'>Storage Usage</Title>
             {chartData && (
-              <ResponsiveContainer width='100%' height={250}>
-                <LineChart data={chartData.storage}>
-                  <CartesianGrid strokeDasharray='3 3' />
-                  <XAxis dataKey='date' />
-                  <YAxis width={80} tickFormatter={(value) => bytesToHuman(value as number)} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[7] : 'white',
-                      borderColor: theme.colorScheme === 'dark' ? theme.colors.dark[7] : theme.colors.gray[3],
-                    }}
-                    formatter={(value) => bytesToHuman(value as number)}
-                  />
-                  <Line
-                    type='monotone'
-                    stroke='#8884d8'
-                    activeDot={{ r: 8 }}
-                    dataKey='bytes'
-                    name='Storage'
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+              <Chart
+                type='line'
+                data={chartData.storage}
+                options={{
+                  ...chartOptions,
+
+                  scales: {
+                    ...chartOptions.scales,
+                    y: {
+                      ...chartOptions.scales.y,
+
+                      ticks: {
+                        callback: (value) => bytesToHuman(value as number),
+                        color: theme.colors.gray[6],
+                      },
+                    },
+                  },
+
+                  plugins: {
+                    ...chartOptions.plugins,
+                    tooltip: {
+                      ...chartOptions.plugins.tooltip,
+                      callbacks: {
+                        label: (context) => {
+                          const value = context.raw as number;
+                          return bytesToHuman(value);
+                        },
+                      },
+                    },
+                  },
+                }}
+                style={{ maxHeight: '20vh' }}
+              />
             )}
           </Card>
         </Grid.Col>

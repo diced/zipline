@@ -8,7 +8,7 @@ import { createInvisURL, randomChars } from 'lib/util';
 const logger = Logger.get('shorten');
 
 async function handler(req: NextApiReq, res: NextApiRes) {
-  if (!req.headers.authorization) return res.forbidden('no authorization');
+  if (!req.headers.authorization) return res.badRequest('no authorization');
 
   const user = await prisma.user.findFirst({
     where: {
@@ -19,8 +19,6 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   if (!user) return res.unauthorized('authorization incorect');
   if (!req.body) return res.badRequest('no body');
   if (!req.body.url) return res.badRequest('no url');
-
-  if (req.body.vanity && req.body.vanity.trim().length === 0) return res.badRequest('vanity is empty');
 
   const maxUrlViews = req.headers['max-views'] ? Number(req.headers['max-views']) : null;
   if (isNaN(maxUrlViews)) return res.badRequest('invalid max views (invalid number)');
@@ -56,30 +54,20 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
   logger.info(`User ${user.username} (${user.id}) shortenned a url ${url.destination} (${url.id})`);
 
-  let domain;
-  if (req.headers['override-domain']) {
-    domain = `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers['override-domain']}`;
-  } else if (user.domains.length) {
-    domain = user.domains[Math.floor(Math.random() * user.domains.length)];
-  } else {
-    domain = `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}`;
-  }
-
-  const responseUrl = `${domain}${zconfig.urls.route === '/' ? '/' : zconfig.urls.route + '/'}${
-    req.body.vanity ? encodeURI(req.body.vanity) : invis ? invis.invis : url.id
-  }`;
-
   if (config.discord?.shorten) {
-    await sendShorten(user, url, responseUrl);
-  }
-
-  if (req.headers['no-json']) {
-    res.setHeader('Content-Type', 'text/plain');
-    return res.end(responseUrl);
+    await sendShorten(
+      user,
+      url,
+      `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}${zconfig.urls.route}/${
+        req.body.vanity ? req.body.vanity : invis ? invis.invis : url.id
+      }`
+    );
   }
 
   return res.json({
-    url: responseUrl,
+    url: `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}${zconfig.urls.route}/${
+      req.body.vanity ? req.body.vanity : invis ? invis.invis : url.id
+    }`,
   });
 }
 

@@ -1,26 +1,7 @@
-import {
-  Alert,
-  Box,
-  Button,
-  Card,
-  Center,
-  Group,
-  Image,
-  LoadingOverlay,
-  Text,
-  UnstyledButton,
-} from '@mantine/core';
-import {
-  IconFile,
-  IconFileAlert,
-  IconFileText,
-  IconFileUnknown,
-  IconHeadphones,
-  IconPhotoCancel,
-  IconPlayerPlay,
-} from '@tabler/icons-react';
-import exts from 'lib/exts';
+import { Alert, Box, Button, Card, Center, Container, Group, Image, Text } from '@mantine/core';
+import { Prism } from '@mantine/prism';
 import { useEffect, useState } from 'react';
+import { AudioIcon, FileIcon, ImageIcon, PlayIcon } from './icons';
 import KaTeX from './render/KaTeX';
 import Markdown from './render/Markdown';
 import PrismCode from './render/PrismCode';
@@ -35,18 +16,9 @@ function PlaceholderContent({ text, Icon }) {
 }
 
 function Placeholder({ text, Icon, ...props }) {
-  if (props.onClick)
-    return (
-      <UnstyledButton sx={{ height: 200 }} {...props}>
-        <Center sx={{ height: 200 }}>
-          <PlaceholderContent text={text} Icon={Icon} />
-        </Center>
-      </UnstyledButton>
-    );
-
   return (
-    <Box sx={{ height: 320 }} {...props}>
-      <Center sx={{ height: 320 }}>
+    <Box sx={{ height: 200 }} {...props}>
+      <Center sx={{ height: 200 }}>
         <PlaceholderContent text={text} Icon={Icon} />
       </Center>
     </Box>
@@ -54,33 +26,27 @@ function Placeholder({ text, Icon, ...props }) {
 }
 
 export default function Type({ file, popup = false, disableMediaPreview, ...props }) {
-  const type =
-    (file.type ?? file.mimetype) === ''
-      ? file.name.split('.').pop()
-      : (file.type ?? file.mimetype).split('/')[0];
+  const type = (file.type || file.mimetype).split('/')[0];
+  const name = file.name || file.file;
 
   const media = /^(video|audio|image|text)/.test(type);
 
   const [text, setText] = useState('');
-  const shouldRenderMarkdown = file.name.endsWith('.md');
-  const shouldRenderTex = file.name.endsWith('.tex');
-  const shouldRenderCode: boolean = Object.keys(exts).includes(file.name.split('.').pop());
+  const shouldRenderMarkdown = name.endsWith('.md');
+  const shouldRenderTex = name.endsWith('.tex');
 
-  const [loading, setLoading] = useState(type === 'text' && popup);
-
-  if ((type === 'text' || shouldRenderMarkdown || shouldRenderTex || shouldRenderCode) && popup) {
+  if (type === 'text' && popup) {
     useEffect(() => {
       (async () => {
-        const res = await fetch('/r/' + file.name);
+        const res = await fetch('/r/' + name);
         const text = await res.text();
 
         setText(text);
-        setLoading(false);
       })();
     }, []);
   }
 
-  const renderAlert = () => {
+  const renderRenderAlert = () => {
     return (
       <Alert color='blue' variant='outline' sx={{ width: '100%' }}>
         You are{props.overrideRender ? ' not ' : ' '}viewing a rendered version of the file
@@ -96,61 +62,36 @@ export default function Type({ file, popup = false, disableMediaPreview, ...prop
     );
   };
 
-  if ((shouldRenderMarkdown || shouldRenderTex || shouldRenderCode) && !props.overrideRender && popup)
+  if ((shouldRenderMarkdown || shouldRenderTex) && !props.overrideRender && popup)
     return (
       <>
-        {renderAlert()}
+        {renderRenderAlert()}
         <Card p='md' my='sm'>
           {shouldRenderMarkdown && <Markdown code={text} />}
           {shouldRenderTex && <KaTeX code={text} />}
-          {shouldRenderCode && !(shouldRenderTex || shouldRenderMarkdown) && (
-            <PrismCode code={text} ext={type} />
-          )}
         </Card>
       </>
     );
 
   if (media && disableMediaPreview) {
-    return <Placeholder Icon={IconFile} text={`Click to view file (${file.name})`} {...props} />;
-  }
-
-  if (file.password) {
-    return (
-      <Placeholder
-        Icon={IconFileAlert}
-        text={`This file is password protected. Click to view file (${file.name})`}
-        onClick={() => window.open(file.url)}
-        {...props}
-      />
-    );
+    return <Placeholder Icon={FileIcon} text={`Click to view file (${name})`} {...props} />;
   }
 
   return popup ? (
     media ? (
       {
-        video: <video width='100%' autoPlay muted controls {...props} />,
+        video: <video width='100%' autoPlay controls {...props} />,
         image: (
           <Image
-            styles={{
-              imageWrapper: {
-                position: 'inherit',
-              },
-            }}
-            placeholder={<PlaceholderContent Icon={IconPhotoCancel} text={'Image failed to load...'} />}
+            placeholder={<PlaceholderContent Icon={FileIcon} text={'Image failed to load...'} />}
             {...props}
           />
         ),
-        audio: <audio autoPlay muted controls {...props} style={{ width: '100%' }} />,
+        audio: <audio autoPlay controls {...props} style={{ width: '100%' }} />,
         text: (
           <>
-            {loading ? (
-              <LoadingOverlay visible={loading} />
-            ) : (
-              <>
-                {(shouldRenderMarkdown || shouldRenderTex) && renderAlert()}
-                <PrismCode code={text} ext={file.name.split('.').pop()} {...props} />
-              </>
-            )}
+            {(shouldRenderMarkdown || shouldRenderTex) && renderRenderAlert()}
+            <PrismCode code={text} ext={name.split('.').pop()} {...props} />
           </>
         ),
       }[type]
@@ -159,19 +100,17 @@ export default function Type({ file, popup = false, disableMediaPreview, ...prop
     )
   ) : media ? (
     {
-      video: <Placeholder Icon={IconPlayerPlay} text={`Click to view video (${file.name})`} {...props} />,
+      video: <Placeholder Icon={PlayIcon} text={`Click to view video (${name})`} {...props} />,
       image: (
         <Image
-          placeholder={<PlaceholderContent Icon={IconPhotoCancel} text={'Image failed to load...'} />}
-          height={320}
-          fit='contain'
+          placeholder={<PlaceholderContent Icon={ImageIcon} text={'Image failed to load...'} />}
           {...props}
         />
       ),
-      audio: <Placeholder Icon={IconHeadphones} text={`Click to view audio (${file.name})`} {...props} />,
-      text: <Placeholder Icon={IconFileText} text={`Click to view text file (${file.name})`} {...props} />,
+      audio: <Placeholder Icon={AudioIcon} text={`Click to view audio (${name})`} {...props} />,
+      text: <Placeholder Icon={FileIcon} text={`Click to view text file (${name})`} {...props} />,
     }[type]
   ) : (
-    <Placeholder Icon={IconFileUnknown} text={`Click to view file (${file.name})`} {...props} />
+    <Placeholder Icon={FileIcon} text={`Click to view file (${name})`} {...props} />
   );
 }

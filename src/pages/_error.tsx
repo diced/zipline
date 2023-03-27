@@ -1,9 +1,9 @@
 import { Button, Stack, Title } from '@mantine/core';
+import Link from 'components/Link';
 import MutedText from 'components/MutedText';
 import Head from 'next/head';
-import Link from 'next/link';
 
-export default function Error({ statusCode }) {
+export default function Error({ statusCode, oauthError }) {
   return (
     <>
       <Head>

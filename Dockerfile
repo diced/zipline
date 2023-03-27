@@ -1,75 +1,65 @@
-# Use the Prisma binaries image as the first stage
-FROM ghcr.io/diced/prisma-binaries:4.10.x as prisma
+FROM ghcr.io/diced/prisma-binaries:4.7.x as prisma
 
-# Use Alpine Linux as the second stage
-FROM node:18-alpine3.16 as base
+FROM node:alpine3.16 AS deps
+RUN mkdir -p /prisma-engines
+WORKDIR /build
 
-# Set the working directory
-WORKDIR /zipline
+COPY .yarn .yarn
+COPY package.json yarn.lock .yarnrc.yml ./
 
-# Copy the necessary files from the project
-COPY prisma ./prisma
-COPY src ./src
-COPY next.config.js ./next.config.js
-COPY tsup.config.ts ./tsup.config.ts
-COPY tsconfig.json ./tsconfig.json
-COPY mimes.json ./mimes.json
-COPY public ./public
+RUN yarn install --immutable
 
-FROM base as builder
+FROM node:alpine3.16 AS builder
+WORKDIR /build
 
-COPY .yarn ./.yarn
-COPY package*.json ./
-COPY yarn*.lock ./
-COPY .yarnrc.yml ./
-
-# Copy the prisma binaries from prisma stage
 COPY --from=prisma /prisma-engines /prisma-engines
 ENV PRISMA_QUERY_ENGINE_BINARY=/prisma-engines/query-engine \
   PRISMA_MIGRATION_ENGINE_BINARY=/prisma-engines/migration-engine \
   PRISMA_INTROSPECTION_ENGINE_BINARY=/prisma-engines/introspection-engine \
   PRISMA_FMT_BINARY=/prisma-engines/prisma-fmt \
   PRISMA_CLI_QUERY_ENGINE_TYPE=binary \
-  PRISMA_CLIENT_ENGINE_TYPE=binary \
-  ZIPLINE_DOCKER_BUILD=true \
-  NEXT_TELEMETRY_DISABLED=1
+  PRISMA_CLIENT_ENGINE_TYPE=binary
 
-# Install production dependencies then temporarily save
-RUN yarn workspaces focus --production --all
-RUN cp -RL node_modules /tmp/node_modules
+RUN apk add --no-cache openssl openssl-dev
 
-# Install the dependencies
-RUN yarn install --immutable
+COPY --from=deps /build/node_modules ./node_modules
+COPY src ./src
+COPY prisma ./prisma
+COPY .yarn .yarn
+COPY package.json yarn.lock .yarnrc.yml esbuild.config.js next.config.js next-env.d.ts zip-env.d.ts tsconfig.json mimes.json ./
 
-# Run the build
+ENV ZIPLINE_DOCKER_BUILD 1
+ENV NEXT_TELEMETRY_DISABLED 1
+
 RUN yarn build
 
-# Use Alpine Linux as the final image
-FROM base
-# Install the necessary packages
-RUN apk add --no-cache perl procps tini
+FROM node:alpine3.16 AS runner
+WORKDIR /zipline
 
-COPY --from=builder /prisma-engines /prisma-engines
+COPY --from=prisma /prisma-engines /prisma-engines
 ENV PRISMA_QUERY_ENGINE_BINARY=/prisma-engines/query-engine \
   PRISMA_MIGRATION_ENGINE_BINARY=/prisma-engines/migration-engine \
   PRISMA_INTROSPECTION_ENGINE_BINARY=/prisma-engines/introspection-engine \
   PRISMA_FMT_BINARY=/prisma-engines/prisma-fmt \
   PRISMA_CLI_QUERY_ENGINE_TYPE=binary \
-  PRISMA_CLIENT_ENGINE_TYPE=binary \
-  NEXT_TELEMETRY_DISABLED=1
+  PRISMA_CLIENT_ENGINE_TYPE=binary
 
-# Copy only the necessary files from the previous stage
-COPY --from=builder /zipline/dist ./dist
-COPY --from=builder /zipline/.next ./.next
-COPY --from=builder /zipline/package.json ./package.json
+RUN apk add --no-cache openssl openssl-dev
+RUN apk add --no-cache perl procps
 
-COPY --from=builder /zipline/node_modules ./node_modules
-COPY --from=builder /zipline/node_modules/.prisma/client ./node_modules/.prisma/client
-COPY --from=builder /zipline/node_modules/@prisma/client ./node_modules/@prisma/client
+ENV NODE_ENV production
+ENV NEXT_TELEMETRY_DISABLED 1
 
-# Copy Startup Script
-COPY docker-entrypoint.sh /zipline
-# Make Startup Script Executable
-RUN chmod a+x /zipline/docker-entrypoint.sh
-# Set the entrypoint to the startup script
-ENTRYPOINT ["tini", "--", "/zipline/docker-entrypoint.sh"]
+COPY --from=builder /build/.next ./.next
+COPY --from=builder /build/node_modules ./node_modules
+
+COPY --from=builder /build/next.config.js ./next.config.js
+COPY --from=builder /build/esbuild.config.js ./esbuild.config.js
+COPY --from=builder /build/src ./src
+COPY --from=builder /build/dist ./dist
+COPY --from=builder /build/prisma ./prisma
+COPY --from=builder /build/tsconfig.json ./tsconfig.json
+COPY --from=builder /build/package.json ./package.json
+COPY --from=builder /build/mimes.json ./mimes.json
+
+CMD ["node", "--enable-source-maps", "dist/server"]
