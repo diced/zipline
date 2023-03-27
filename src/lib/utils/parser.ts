@@ -11,7 +11,10 @@ export type ParseValue = {
 
 export function parseString(str: string, value: ParseValue) {
   if (!str) return null;
-  str = str.replace(/\{link\}/gi, value.link).replace(/\{raw_link\}/gi, value.raw_link);
+  str = str
+    .replace(/\{link\}/gi, value.link)
+    .replace(/\{raw_link\}/gi, value.raw_link)
+    .replace(/\\n/g, '\n');
 
   const re = /\{(?<type>file|url|user)\.(?<prop>\w+)(::(?<mod>\w+))?\}/gi;
   let matches: RegExpMatchArray;
