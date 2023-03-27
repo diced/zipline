@@ -15,7 +15,7 @@ export default {
   yaml: 'YAML',
   c: 'C',
   cpp: 'C++',
-  csharp: 'C#',
+  cs: 'C#',
   go: 'Go',
   docker: 'Docker',
   toml: 'TOML',
@@ -40,7 +40,6 @@ export default {
 
 export const extToPrismComponent = (ext: string) => {
   // await import(prismjs/components/prism-${extToPrismComponent(ext)}.js)
-
   return {
     md: 'markdown',
     css: 'css',
@@ -57,7 +56,7 @@ export const extToPrismComponent = (ext: string) => {
     yaml: 'yaml',
     c: 'c',
     cpp: 'cpp',
-    csharp: 'csharp',
+    cs: 'csharp',
     go: 'go',
     docker: 'docker',
     toml: 'toml',

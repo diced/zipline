@@ -1,4 +1,4 @@
-import { Image } from '@prisma/client';
+import { File } from '@prisma/client';
 import { createWriteStream } from 'fs';
 import { ExifTool, Tags } from 'exiftool-vendored';
 import datasource from 'lib/datasource';
@@ -32,12 +32,12 @@ export async function readMetadata(filePath: string): Promise<Tags> {
   return exif;
 }
 
-export async function removeGPSData(image: Image): Promise<void> {
+export async function removeGPSData(image: File): Promise<void> {
   const exiftool = new ExifTool({ cleanupChildProcs: false });
-  const file = join(tmpdir(), `zipline-exif-remove-${Date.now()}-${image.file}`);
+  const file = join(tmpdir(), `zipline-exif-remove-${Date.now()}-${image.name}`);
   logger.debug(`writing temp file to remove GPS data: ${file}`);
 
-  const stream = await datasource.get(image.file);
+  const stream = await datasource.get(image.name);
   const writeStream = createWriteStream(file);
   stream.pipe(writeStream);
 
@@ -68,7 +68,6 @@ export async function removeGPSData(image: Image): Promise<void> {
     GPSLongitude: null,
     GPSLongitudeRef: null,
     GPSMapDatum: null,
-    GPSMeasureMode: null,
     GPSPosition: null,
     GPSProcessingMethod: null,
     GPSSatellites: null,
@@ -80,9 +79,9 @@ export async function removeGPSData(image: Image): Promise<void> {
     GPSTrackRef: null,
   });
 
-  logger.debug(`reading file to upload to datasource: ${file} -> ${image.file}`);
+  logger.debug(`reading file to upload to datasource: ${file} -> ${image.name}`);
   const buffer = await readFile(file);
-  await datasource.save(image.file, buffer);
+  await datasource.save(image.name, buffer);
 
   logger.debug(`removing temp file: ${file}`);
   await unlink(file);

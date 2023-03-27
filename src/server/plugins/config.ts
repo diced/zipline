@@ -1,7 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import fastifyPlugin from 'fastify-plugin';
 import { mkdir } from 'fs/promises';
-import type { Config } from '../../lib/config/Config';
+import type { Config } from 'lib/config/Config';
 
 async function configPlugin(fastify: FastifyInstance, config: Config) {
   fastify.decorate('config', config);

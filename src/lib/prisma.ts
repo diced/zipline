@@ -5,3 +5,8 @@ if (!global.prisma) {
 }
 
 export default global.prisma as PrismaClient;
+
+declare global {
+  // eslint-disable-next-line no-var
+  var prisma: PrismaClient;
+}

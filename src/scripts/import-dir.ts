@@ -1,10 +1,10 @@
 import { PrismaClient } from '@prisma/client';
 import { readdir, readFile } from 'fs/promises';
 import { join } from 'path';
-import config from '../lib/config';
-import datasource from '../lib/datasource';
-import { guess } from '../lib/mimes';
-import { migrations } from '../server/util';
+import config from 'lib/config';
+import datasource from 'lib/datasource';
+import { guess } from 'lib/mimes';
+import { migrations } from 'server/util';
 
 async function main() {
   const directory = process.argv[2];
@@ -27,7 +27,7 @@ async function main() {
     const mime = await guess(files[i].split('.').pop());
 
     data.push({
-      file: files[i],
+      name: files[i],
       mimetype: mime,
       userId,
     });
@@ -40,7 +40,7 @@ async function main() {
   const prisma = new PrismaClient();
 
   console.log('Starting transaction to database..');
-  await prisma.image.createMany({
+  await prisma.file.createMany({
     data,
   });
   console.log('Finished transaction to database.');

@@ -86,9 +86,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       notFound: true,
     };
 
-  const file = await prisma.image.findFirst({
+  const file = await prisma.file.findFirst({
     where: {
-      file: context.params.id as string,
+      name: context.params.id as string,
     },
   });
   if (!file) return { notFound: true };
@@ -107,9 +107,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   let renderType;
 
-  if (file.file.endsWith('.md')) {
+  if (file.name.endsWith('.md')) {
     renderType = 'markdown';
-  } else if (file.file.endsWith('.tex')) {
+  } else if (file.name.endsWith('.tex')) {
     renderType = 'tex';
   } else {
     renderType = null;
@@ -120,7 +120,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       code: await streamToString(data),
       id: context.params.id as string,
       title: config.website.title,
-      render: file.file.endsWith('.md') || file.file.endsWith('.tex'),
+      render: file.name.endsWith('.md') || file.name.endsWith('.tex'),
       renderType,
     },
   };

@@ -1,13 +1,13 @@
 // https://mantine.dev/core/password-input/
 
 import { Box, PasswordInput, Popover, Progress, Text } from '@mantine/core';
+import { IconCheck, IconCross } from '@tabler/icons-react';
 import { useState } from 'react';
-import { CheckIcon, CrossIcon } from './icons';
 
 function PasswordRequirement({ meets, label }: { meets: boolean; label: string }) {
   return (
     <Text color={meets ? 'teal' : 'red'} sx={{ display: 'flex', alignItems: 'center' }} mt='sm' size='sm'>
-      {meets ? <CheckIcon /> : <CrossIcon />} <Box ml='md'>{label}</Box>
+      {meets ? <IconCheck size='1rem' /> : <IconCross size='1rem' />} <Box ml='md'>{label}</Box>
     </Text>
   );
 }

@@ -1,11 +1,14 @@
 import { s } from '@sapphire/shapeshift';
 import type { Config } from './Config';
 import { inspect } from 'util';
-import Logger from '../logger';
-import { humanToBytes } from '../utils/bytes';
+import Logger from 'lib/logger';
+import { humanToBytes } from 'utils/bytes';
 
 const discord_content = s
   .object({
+    url: s.string.nullish.default(null),
+    username: s.string.nullish.default(null),
+    avatar_url: s.string.nullish.default(null),
     content: s.string.nullish.default(null),
     embed: s
       .object({
@@ -31,6 +34,16 @@ const validator = s.object({
     logger: s.boolean.default(false),
     stats_interval: s.number.default(1800),
     invites_interval: s.number.default(1800),
+    compression: s
+      .object({
+        enabled: s.boolean.default(false),
+        threshold: s.number.default(2048),
+        on_dashboard: s.boolean.default(true),
+      })
+      .default({
+        enabled: false,
+        on_dashboard: false,
+      }),
   }),
   datasource: s
     .object({
@@ -79,6 +92,7 @@ const validator = s.object({
       disabled_extensions: s.string.array.default([]),
       format_date: s.string.default('YYYY-MM-DD_HH:mm:ss'),
       default_expiration: s.string.optional.default(null),
+      assume_mimetypes: s.boolean.default(false),
     })
     .default({
       default_format: 'RANDOM',
@@ -90,6 +104,7 @@ const validator = s.object({
       disabled_extensions: [],
       format_date: 'YYYY-MM-DD_HH:mm:ss',
       default_expiration: null,
+      assume_mimetypes: false,
     }),
   urls: s
     .object({
@@ -141,11 +156,9 @@ const validator = s.object({
     }),
   discord: s
     .object({
-      url: s.string,
-      username: s.string.default('Zipline'),
-      avatar_url: s.string.default(
-        'https://raw.githubusercontent.com/diced/zipline/9b60147e112ec5b70170500b85c75ea621f41d03/public/zipline.png'
-      ),
+      url: s.string.nullish.default(null),
+      username: s.string.nullish.default(null),
+      avatar_url: s.string.nullish.default(null),
       upload: discord_content,
       shorten: discord_content,
     })
@@ -249,9 +262,27 @@ export default function validate(config): Config {
       }
     }
 
+    const reserved = ['/view', '/dashboard', '/code', '/folder', '/api', '/auth'];
+    if (reserved.some((r) => validated.uploader.route.startsWith(r))) {
+      throw {
+        errors: [`The uploader route cannot be ${validated.uploader.route}, this is a reserved route.`],
+        show: true,
+      };
+    } else if (reserved.some((r) => validated.urls.route.startsWith(r))) {
+      throw {
+        errors: [`The urls route cannot be ${validated.urls.route}, this is a reserved route.`],
+        show: true,
+      };
+    }
+
     return validated as unknown as Config;
   } catch (e) {
     if (process.env.ZIPLINE_DOCKER_BUILD) return null;
+
+    if (e.show) {
+      Logger.get('config').error('Config is invalid, see below:').error(e.errors.join('\n'));
+      process.exit(1);
+    }
 
     logger.debug(`config error: ${inspect(e, { depth: Infinity })}`);
 

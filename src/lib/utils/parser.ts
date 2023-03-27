@@ -1,7 +1,7 @@
-import type { Image, User, Url } from '@prisma/client';
+import type { File, User, Url } from '@prisma/client';
 
 export type ParseValue = {
-  file?: Image;
+  file?: File;
   url?: Url;
   user?: User;
 
@@ -10,6 +10,7 @@ export type ParseValue = {
 };
 
 export function parseString(str: string, value: ParseValue) {
+  if (!str) return null;
   str = str.replace(/\{link\}/gi, value.link).replace(/\{raw_link\}/gi, value.raw_link);
 
   const re = /\{(?<type>file|url|user)\.(?<prop>\w+)(::(?<mod>\w+))?\}/gi;
@@ -23,8 +24,18 @@ export function parseString(str: string, value: ParseValue) {
       continue;
     }
 
-    if (matches.groups.prop in ['password', 'avatar']) {
+    if (['password', 'avatar'].includes(matches.groups.prop)) {
       str = replaceCharsFromString(str, '{unknown_property}', matches.index, re.lastIndex);
+      re.lastIndex = matches.index;
+      continue;
+    }
+    if (['originalName', 'name'].includes(matches.groups.prop)) {
+      str = replaceCharsFromString(
+        str,
+        decodeURIComponent(escape(getV[matches.groups.prop])),
+        matches.index,
+        re.lastIndex
+      );
       re.lastIndex = matches.index;
       continue;
     }
@@ -50,7 +61,7 @@ export function parseString(str: string, value: ParseValue) {
   return str;
 }
 
-function modifier(mod: string, value: any): string {
+function modifier(mod: string, value: unknown): string {
   mod = mod.toLowerCase();
 
   if (value instanceof Date) {

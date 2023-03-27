@@ -1,14 +1,14 @@
-import { ImageFormat, InvisibleImage } from '@prisma/client';
-import { randomUUID } from 'crypto';
-import dayjs from 'dayjs';
+import { InvisibleFile } from '@prisma/client';
 import { readdir, readFile, unlink, writeFile } from 'fs/promises';
 import zconfig from 'lib/config';
 import datasource from 'lib/datasource';
 import { sendUpload } from 'lib/discord';
+import formatFileName, { NameFormat, NameFormats } from 'lib/format';
 import Logger from 'lib/logger';
 import { NextApiReq, NextApiRes, withZipline } from 'lib/middleware/withZipline';
+import { guess } from 'lib/mimes';
 import prisma from 'lib/prisma';
-import { createInvisImage, hashPassword, randomChars } from 'lib/util';
+import { createInvisImage, hashPassword } from 'lib/util';
 import { parseExpiry } from 'lib/utils/client';
 import { removeGPSData } from 'lib/utils/exif';
 import multer from 'multer';
@@ -31,21 +31,28 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   if (!user) return res.forbidden('authorization incorrect');
 
   await new Promise((resolve, reject) => {
-    uploader.array('file')(req as any, res as any, (result: unknown) => {
+    uploader.array('file')(req as never, res as never, (result: unknown) => {
       if (result instanceof Error) reject(result.message);
       resolve(result);
     });
   });
 
-  const response: { files: string[]; expires_at?: Date; removed_gps?: boolean } = { files: [] };
-  const expires_at = req.headers['expires-at'] as string;
+  const response: {
+    files: string[];
+    expiresAt?: Date;
+    removed_gps?: boolean;
+    assumed_mimetype?: string | boolean;
+  } = {
+    files: [],
+  };
+  const expiresAt = req.headers['expires-at'] as string;
   let expiry: Date;
 
-  if (expires_at) {
-    expiry = parseExpiry(expires_at);
+  if (expiresAt) {
+    expiry = parseExpiry(expiresAt);
     if (!expiry) return res.badRequest('invalid date');
     else {
-      response.expires_at = expiry;
+      response.expiresAt = expiry;
     }
   }
 
@@ -54,8 +61,10 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     if (!expiry) return res.badRequest('invalid date (UPLOADER_DEFAULT_EXPIRATION)');
   }
 
-  const rawFormat = ((req.headers.format || '') as string).toUpperCase() || zconfig.uploader.default_format;
-  const format: ImageFormat = Object.keys(ImageFormat).includes(rawFormat) && ImageFormat[rawFormat];
+  const rawFormat = ((req.headers['format'] as string) || zconfig.uploader.default_format).toLowerCase();
+  const format = NameFormats.includes(rawFormat as NameFormat)
+    ? (rawFormat as NameFormat)
+    : ('random' as NameFormat);
 
   const imageCompressionPercent = req.headers['image-compression-percent']
     ? Number(req.headers['image-compression-percent'])
@@ -124,25 +133,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       const ext = filename.split('.').length === 1 ? '' : filename.split('.').pop();
       if (zconfig.uploader.disabled_extensions.includes(ext))
         return res.error('disabled extension recieved: ' + ext);
-      let fileName: string;
-
-      switch (format) {
-        case ImageFormat.RANDOM:
-          fileName = randomChars(zconfig.uploader.length);
-          break;
-        case ImageFormat.DATE:
-          fileName = dayjs().format(zconfig.uploader.format_date);
-          break;
-        case ImageFormat.UUID:
-          fileName = randomUUID({ disableEntropyCache: true });
-          break;
-        case ImageFormat.NAME:
-          fileName = filename.split('.')[0];
-          break;
-        default:
-          fileName = randomChars(zconfig.uploader.length);
-          break;
-      }
+      const fileName = await formatFileName(format, filename);
 
       let password = null;
       if (req.headers.password) {
@@ -150,57 +141,54 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       }
 
       const compressionUsed = imageCompressionPercent && mimetype.startsWith('image/');
-      let invis: InvisibleImage;
+      let invis: InvisibleFile;
 
-      const file = await prisma.image.create({
+      const file = await prisma.file.create({
         data: {
-          file: `${fileName}${compressionUsed ? '.jpg' : `${ext ? '.' : ''}${ext}`}`,
+          name: `${fileName}${compressionUsed ? '.jpg' : `${ext ? '.' : ''}${ext}`}`,
           mimetype,
           userId: user.id,
           embed: !!req.headers.embed,
-          format,
           password,
-          expires_at: expiry,
+          expiresAt: expiry,
           maxViews: fileMaxViews,
+          originalName: req.headers['original-name'] ? filename ?? null : null,
         },
       });
 
       if (req.headers.zws) invis = await createInvisImage(zconfig.uploader.length, file.id);
 
-      await datasource.save(file.file, Buffer.from(chunks));
+      await datasource.save(file.name, Buffer.from(chunks));
 
-      logger.info(`User ${user.username} (${user.id}) uploaded ${file.file} (${file.id}) (chunked)`);
-      if (user.domains.length) {
-        const domain = user.domains[Math.floor(Math.random() * user.domains.length)];
-        response.files.push(
-          `${domain}${zconfig.uploader.route === '/' ? '' : zconfig.uploader.route}/${
-            invis ? invis.invis : file.file
-          }`
-        );
+      logger.info(`User ${user.username} (${user.id}) uploaded ${file.name} (${file.id}) (chunked)`);
+      let domain;
+      if (req.headers['override-domain']) {
+        domain = `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers['override-domain']}`;
+      } else if (user.domains.length) {
+        domain = user.domains[Math.floor(Math.random() * user.domains.length)];
       } else {
-        response.files.push(
-          `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}${
-            zconfig.uploader.route === '/' ? '' : zconfig.uploader.route
-          }/${invis ? invis.invis : file.file}`
-        );
+        domain = `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}`;
       }
 
+      const responseUrl = `${domain}${zconfig.uploader.route === '/' ? '/' : zconfig.uploader.route + '/'}${
+        invis ? invis.invis : encodeURI(file.name)
+      }`;
+
+      response.files.push(responseUrl);
+
       if (zconfig.discord?.upload) {
-        await sendUpload(
-          user,
-          file,
-          `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}/r/${
-            invis ? invis.invis : file.file
-          }`,
-          `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}${
-            zconfig.uploader.route === '/' ? '' : zconfig.uploader.route
-          }/${invis ? invis.invis : file.file}`
-        );
+        await sendUpload(user, file, `${domain}/r/${invis ? invis.invis : file.name}`, responseUrl);
       }
 
       if (zconfig.exif.enabled && zconfig.exif.remove_gps && mimetype.startsWith('image/')) {
-        await removeGPSData(file);
-        response.removed_gps = true;
+        try {
+          await removeGPSData(file);
+          response.removed_gps = true;
+        } catch (e) {
+          logger.error(`Failed to remove GPS data from ${file.name} (${file.id}) - ${e.message}`);
+
+          response.removed_gps = false;
+        }
       }
 
       return res.json(response);
@@ -252,24 +240,16 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     const ext = file.originalname.split('.').length === 1 ? '' : file.originalname.split('.').pop();
     if (zconfig.uploader.disabled_extensions.includes(ext))
       return res.badRequest(`file[${i}]: disabled extension recieved: ${ext}`);
-    let fileName: string;
+    let fileName = await formatFileName(format, file.originalname);
 
-    switch (format) {
-      case ImageFormat.RANDOM:
-        fileName = randomChars(zconfig.uploader.length);
-        break;
-      case ImageFormat.DATE:
-        fileName = dayjs().format(zconfig.uploader.format_date);
-        break;
-      case ImageFormat.UUID:
-        fileName = randomUUID({ disableEntropyCache: true });
-        break;
-      case ImageFormat.NAME:
-        fileName = file.originalname.split('.')[0];
-        break;
-      default:
-        fileName = randomChars(zconfig.uploader.length);
-        break;
+    if (req.headers['x-zipline-filename']) {
+      fileName = req.headers['x-zipline-filename'] as string;
+      const existing = await prisma.file.findFirst({
+        where: {
+          name: fileName,
+        },
+      });
+      if (existing) return res.badRequest(`file[${i}]: filename already exists: '${fileName}'`);
     }
 
     let password = null;
@@ -277,67 +257,76 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       password = await hashPassword(req.headers.password as string);
     }
 
+    let mimetype = file.mimetype;
+
+    if (file.mimetype === 'application/octet-stream' && zconfig.uploader.assume_mimetypes) {
+      const ext = file.originalname.split('.').pop();
+      const mime = await guess(ext);
+
+      if (!mime) response.assumed_mimetype = false;
+      else {
+        response.assumed_mimetype = mime;
+        mimetype = mime;
+      }
+    }
+
     const compressionUsed = imageCompressionPercent && file.mimetype.startsWith('image/');
-    let invis: InvisibleImage;
-    const image = await prisma.image.create({
+    let invis: InvisibleFile;
+    const fileUpload = await prisma.file.create({
       data: {
-        file: `${fileName}${compressionUsed ? '.jpg' : `${ext ? '.' : ''}${ext}`}`,
-        mimetype: req.headers.uploadtext ? 'text/plain' : compressionUsed ? 'image/jpeg' : file.mimetype,
+        name: `${fileName}${compressionUsed ? '.jpg' : `${ext ? '.' : ''}${ext}`}`,
+        mimetype: req.headers.uploadtext ? 'text/plain' : compressionUsed ? 'image/jpeg' : mimetype,
         userId: user.id,
         embed: !!req.headers.embed,
-        format,
         password,
-        expires_at: expiry,
+        expiresAt: expiry,
         maxViews: fileMaxViews,
+        originalName: req.headers['original-name'] ? file.originalname ?? null : null,
+        size: file.size,
       },
     });
 
-    if (req.headers.zws) invis = await createInvisImage(zconfig.uploader.length, image.id);
+    if (req.headers.zws) invis = await createInvisImage(zconfig.uploader.length, fileUpload.id);
 
     if (compressionUsed) {
       const buffer = await sharp(file.buffer).jpeg({ quality: imageCompressionPercent }).toBuffer();
-      await datasource.save(image.file, buffer);
+      await datasource.save(fileUpload.name, buffer);
       logger.info(
         `User ${user.username} (${user.id}) compressed image from ${file.buffer.length} -> ${buffer.length} bytes`
       );
     } else {
-      await datasource.save(image.file, file.buffer);
+      await datasource.save(fileUpload.name, file.buffer);
     }
 
-    logger.info(`User ${user.username} (${user.id}) uploaded ${image.file} (${image.id})`);
-    if (user.domains.length) {
-      const domain = user.domains[Math.floor(Math.random() * user.domains.length)];
-      response.files.push(
-        `${domain}${zconfig.uploader.route === '/' ? '' : zconfig.uploader.route}/${
-          invis ? invis.invis : image.file
-        }`
-      );
+    logger.info(`User ${user.username} (${user.id}) uploaded ${fileUpload.name} (${fileUpload.id})`);
+    let domain;
+    if (req.headers['override-domain']) {
+      domain = `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers['override-domain']}`;
+    } else if (user.domains.length) {
+      domain = user.domains[Math.floor(Math.random() * user.domains.length)];
     } else {
-      response.files.push(
-        `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}${
-          zconfig.uploader.route === '/' ? '' : zconfig.uploader.route
-        }/${invis ? invis.invis : image.file}`
-      );
+      domain = `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}`;
     }
 
-    logger.debug(`sent response: ${JSON.stringify(response)}`);
+    const responseUrl = `${domain}${zconfig.uploader.route === '/' ? '/' : zconfig.uploader.route + '/'}${
+      invis ? invis.invis : encodeURI(fileUpload.name)
+    }`;
+
+    response.files.push(responseUrl);
 
     if (zconfig.discord?.upload) {
-      await sendUpload(
-        user,
-        image,
-        `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}/r/${
-          invis ? invis.invis : image.file
-        }`,
-        `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}${
-          zconfig.uploader.route === '/' ? '' : zconfig.uploader.route
-        }/${invis ? invis.invis : image.file}`
-      );
+      await sendUpload(user, fileUpload, `${domain}/r/${invis ? invis.invis : fileUpload.name}`, responseUrl);
     }
 
-    if (zconfig.exif.enabled && zconfig.exif.remove_gps && image.mimetype.startsWith('image/')) {
-      await removeGPSData(image);
-      response.removed_gps = true;
+    if (zconfig.exif.enabled && zconfig.exif.remove_gps && fileUpload.mimetype.startsWith('image/')) {
+      try {
+        await removeGPSData(fileUpload);
+        response.removed_gps = true;
+      } catch (e) {
+        logger.error(`Failed to remove GPS data from ${fileUpload.name} (${fileUpload.id}) - ${e.message}`);
+
+        response.removed_gps = false;
+      }
     }
   }
 
@@ -361,6 +350,11 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         },
       });
     }
+  }
+
+  if (req.headers['no-json']) {
+    res.setHeader('Content-Type', 'text/plain');
+    return res.end(response.files.join(','));
   }
 
   return res.json(response);

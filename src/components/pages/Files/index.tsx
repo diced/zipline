@@ -1,13 +1,13 @@
 import { Accordion, ActionIcon, Box, Group, Pagination, SimpleGrid, Title } from '@mantine/core';
+import { IconFileUpload } from '@tabler/icons-react';
 import File from 'components/File';
-import { PlusIcon } from 'components/icons';
 import useFetch from 'hooks/useFetch';
 import { usePaginatedFiles } from 'lib/queries/files';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import FilePagation from './FilePagation';
 
-export default function Files({ disableMediaPreview, exifEnabled, queryPage }) {
+export default function Files({ disableMediaPreview, exifEnabled, queryPage, compress }) {
   const [favoritePage, setFavoritePage] = useState(1);
   const [favoriteNumPages, setFavoriteNumPages] = useState(0);
   const favoritePages = usePaginatedFiles(favoritePage, 'media', true);
@@ -19,21 +19,13 @@ export default function Files({ disableMediaPreview, exifEnabled, queryPage }) {
     })();
   });
 
-  const updatePages = async (favorite) => {
-    if (favorite) {
-      favoritePages.refetch();
-    }
-  };
-
   return (
     <>
       <Group mb='md'>
         <Title>Files</Title>
-        <Link href='/dashboard/upload/file' passHref legacyBehavior>
-          <ActionIcon component='a' variant='filled' color='primary'>
-            <PlusIcon />
-          </ActionIcon>
-        </Link>
+        <ActionIcon component={Link} href='/dashboard/upload/file' variant='filled' color='primary'>
+          <IconFileUpload size='1rem' />
+        </ActionIcon>
       </Group>
       {favoritePages.isSuccess && favoritePages.data.length ? (
         <Accordion
@@ -55,6 +47,8 @@ export default function Files({ disableMediaPreview, exifEnabled, queryPage }) {
                           image={image}
                           disableMediaPreview={disableMediaPreview}
                           exifEnabled={exifEnabled}
+                          refreshImages={favoritePages.refetch}
+                          onDash={compress}
                         />
                       </div>
                     ))
@@ -69,7 +63,7 @@ export default function Files({ disableMediaPreview, exifEnabled, queryPage }) {
                   paddingBottom: 3,
                 }}
               >
-                <Pagination total={favoriteNumPages} page={favoritePage} onChange={setFavoritePage} />
+                <Pagination total={favoriteNumPages} value={favoritePage} onChange={setFavoritePage} />
               </Box>
             </Accordion.Panel>
           </Accordion.Item>
@@ -80,6 +74,7 @@ export default function Files({ disableMediaPreview, exifEnabled, queryPage }) {
         disableMediaPreview={disableMediaPreview}
         exifEnabled={exifEnabled}
         queryPage={queryPage}
+        compress={compress}
       />
     </>
   );

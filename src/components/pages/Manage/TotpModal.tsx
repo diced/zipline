@@ -1,6 +1,6 @@
-import { Button, Center, Image, Modal, NumberInput, Text, Title } from '@mantine/core';
+import { Button, Center, Image, Modal, PinInput, Text, Title } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
-import { CheckIcon, CrossIcon } from 'components/icons';
+import { Icon2fa, IconBarcodeOff, IconCheck } from '@tabler/icons-react';
 import useFetch from 'hooks/useFetch';
 import { useEffect, useState } from 'react';
 
@@ -8,7 +8,6 @@ export function TotpModal({ opened, onClose, deleteTotp, setTotpEnabled }) {
   const [secret, setSecret] = useState('');
   const [qrCode, setQrCode] = useState('');
   const [disabled, setDisabled] = useState(false);
-  const [code, setCode] = useState(undefined);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -21,7 +20,7 @@ export function TotpModal({ opened, onClose, deleteTotp, setTotpEnabled }) {
             title: 'Error',
             message: "Can't generate code as you are already using MFA",
             color: 'red',
-            icon: <CrossIcon />,
+            icon: <IconBarcodeOff size='1rem' />,
           });
         } else {
           setSecret(data.secret);
@@ -32,15 +31,15 @@ export function TotpModal({ opened, onClose, deleteTotp, setTotpEnabled }) {
     })();
   }, [opened]);
 
-  const disableTotp = async () => {
+  const disableTotp = async (code) => {
     setDisabled(true);
-    const str = code.toString();
-    if (str.length !== 6) {
+    if (code.length !== 6) {
+      setDisabled(false);
       return setError('Code must be 6 digits');
     }
 
     const resp = await useFetch('/api/user/mfa/totp', 'DELETE', {
-      code: str,
+      code,
     });
 
     if (resp.error) {
@@ -48,9 +47,9 @@ export function TotpModal({ opened, onClose, deleteTotp, setTotpEnabled }) {
     } else {
       showNotification({
         title: 'Success',
-        message: 'Successfully disabled MFA',
+        message: 'Successfully disabled 2FA',
         color: 'green',
-        icon: <CheckIcon />,
+        icon: <Icon2fa size='1rem' />,
       });
 
       setTotpEnabled(false);
@@ -61,16 +60,16 @@ export function TotpModal({ opened, onClose, deleteTotp, setTotpEnabled }) {
     setDisabled(false);
   };
 
-  const verifyCode = async () => {
+  const verifyCode = async (code) => {
     setDisabled(true);
-    const str = code.toString();
-    if (str.length !== 6) {
+    if (code.length !== 6) {
+      setDisabled(false);
       return setError('Code must be 6 digits');
     }
 
     const resp = await useFetch('/api/user/mfa/totp', 'POST', {
       secret,
-      code: str,
+      code,
       register: true,
     });
 
@@ -79,9 +78,9 @@ export function TotpModal({ opened, onClose, deleteTotp, setTotpEnabled }) {
     } else {
       showNotification({
         title: 'Success',
-        message: 'Successfully enabled MFA',
+        message: 'Successfully enabled 2FA',
         color: 'green',
-        icon: <CheckIcon />,
+        icon: <Icon2fa size='1rem' />,
       });
 
       setTotpEnabled(true);
@@ -90,6 +89,13 @@ export function TotpModal({ opened, onClose, deleteTotp, setTotpEnabled }) {
     }
 
     setDisabled(false);
+  };
+
+  const handlePinChange = (value) => {
+    if (value.length === 6) {
+      setDisabled(true);
+      deleteTotp ? disableTotp(value) : verifyCode(value);
+    }
   };
 
   return (
@@ -110,29 +116,43 @@ export function TotpModal({ opened, onClose, deleteTotp, setTotpEnabled }) {
           <Center>
             <Image height={180} width={180} src={qrCode} alt='QR Code' withPlaceholder />
           </Center>
-          <Text my='sm'>QR Code not working? Try manually entering the code into your app: {secret}</Text>
         </>
       )}
 
-      <NumberInput
-        placeholder='2FA Code'
-        label='Verify'
-        size='xl'
-        hideControls
-        maxLength={6}
-        minLength={6}
-        value={code}
-        onChange={(e) => setCode(e)}
-        error={error}
-      />
+      <Center my='md'>
+        <PinInput
+          data-autofocus
+          length={6}
+          oneTimeCode
+          type='number'
+          placeholder=''
+          onChange={handlePinChange}
+          autoFocus={true}
+          error={!!error}
+          disabled={disabled}
+          size='xl'
+        />
+      </Center>
+
+      {error && (
+        <Text my='sm' size='sm' color='red' align='center'>
+          {error}
+        </Text>
+      )}
+
+      {!deleteTotp && (
+        <Text my='sm' size='sm' color='gray' align='center'>
+          QR Code not working? Try manually entering the code into your app: {secret}
+        </Text>
+      )}
 
       <Button
         disabled={disabled}
         size='lg'
         fullWidth
         mt='md'
-        rightIcon={<CheckIcon />}
-        onClick={deleteTotp ? disableTotp : verifyCode}
+        rightIcon={<IconCheck size='1rem' />}
+        type='submit'
       >
         Verify{deleteTotp ? ' and Disable' : ''}
       </Button>
