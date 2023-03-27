@@ -89,7 +89,6 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
   const [file, setFile] = useState<File | null>(null);
   const [fileDataURL, setFileDataURL] = useState(user.avatar ?? null);
   const [totpEnabled, setTotpEnabled] = useState(!!user.totpSecret);
-  const [checked, setCheck] = useState(false);
 
   const getDataURL = (f: File): Promise<string> => {
     return new Promise((res, rej) => {
@@ -355,7 +354,8 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
   useEffect(() => {
     getExports();
     interval.start();
-  }, [totpEnabled]);
+    setTotpEnabled(() => !!user.totpSecret);
+  }, [user]);
 
   return (
     <>
@@ -450,7 +450,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
             opened={totpOpen}
             onClose={() => setTotpOpen(false)}
             deleteTotp={totpEnabled}
-            setTotpEnabled={setTotpEnabled}
+            setUser={setUser}
           />
         </Box>
       )}
@@ -626,7 +626,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
 
       <ShareX user={user} open={shareXOpen} setOpen={setShareXOpen} />
       <Flameshot user={user} open={flameshotOpen} setOpen={setFlameshotOpen} />
-      <ClearStorage open={clrStorOpen} setOpen={setClrStorOpen} check={checked} setCheck={setCheck} />
+      <ClearStorage open={clrStorOpen} setOpen={setClrStorOpen} />
     </>
   );
 }
