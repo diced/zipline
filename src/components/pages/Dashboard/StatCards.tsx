@@ -1,8 +1,8 @@
 import { SimpleGrid } from '@mantine/core';
-import { IconDatabase, IconEye, IconFile, IconUsers } from '@tabler/icons-react';
 import StatCard from 'components/StatCard';
 import { useStats } from 'lib/queries/stats';
 import { percentChange } from 'lib/utils/client';
+import { EyeIcon, DatabaseIcon, UserIcon, FileIcon } from 'components/icons';
 
 export function StatCards() {
   const stats = useStats();
@@ -20,10 +20,10 @@ export function StatCards() {
     >
       <StatCard
         stat={{
-          title: 'FILES',
+          title: 'UPLOADED FILES',
           value: stats.isSuccess ? latest.data.count.toLocaleString() : '...',
           desc: 'files have been uploaded',
-          icon: <IconFile />,
+          icon: <FileIcon />,
           diff:
             stats.isSuccess && before?.data ? percentChange(before.data.count, latest.data.count) : undefined,
         }}
@@ -33,8 +33,8 @@ export function StatCards() {
         stat={{
           title: 'STORAGE',
           value: stats.isSuccess ? latest.data.size : '...',
-          desc: 'used',
-          icon: <IconDatabase />,
+          desc: 'of storage used',
+          icon: <DatabaseIcon />,
           diff:
             stats.isSuccess && before?.data
               ? percentChange(before.data.size_num, latest.data.size_num)
@@ -46,8 +46,8 @@ export function StatCards() {
         stat={{
           title: 'VIEWS',
           value: stats.isSuccess ? latest.data.views_count.toLocaleString() : '...',
-          desc: 'total file views',
-          icon: <IconEye />,
+          desc: 'total page views',
+          icon: <EyeIcon />,
           diff:
             stats.isSuccess && before?.data
               ? percentChange(before.data.views_count, latest.data.views_count)
@@ -59,8 +59,8 @@ export function StatCards() {
         stat={{
           title: 'USERS',
           value: stats.isSuccess ? latest.data.count_users.toLocaleString() : '...',
-          desc: 'users',
-          icon: <IconUsers />,
+          desc: 'total registered users',
+          icon: <UserIcon />,
         }}
       />
     </SimpleGrid>

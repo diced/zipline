@@ -12,7 +12,7 @@ const logger = Logger.get('user::export');
 
 async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   if (req.method === 'POST') {
-    const files = await prisma.file.findMany({
+    const files = await prisma.image.findMany({
       where: {
         userId: user.id,
       },
@@ -34,7 +34,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       };
 
       const backpressureThreshold = 65536;
-      const backpressure = [];
+      let backpressure = [];
       let backpressureBytes = 0;
       const push = stream.push;
       stream.push = (dat, final) => {
@@ -92,9 +92,9 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     for (let i = 0; i !== files.length; ++i) {
       const file = files[i];
 
-      const stream = await datasource.get(file.name);
+      const stream = await datasource.get(file.file);
       if (stream) {
-        const def = new ZipPassThrough(file.name);
+        const def = new ZipPassThrough(file.file);
         zip.add(def);
         onBackpressure(def, stream, (shouldApplyBackpressure) => {
           if (shouldApplyBackpressure) {
@@ -106,7 +106,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
         stream.on('data', (c) => def.push(c));
         stream.on('end', () => def.push(new Uint8Array(0), true));
       } else {
-        logger.debug(`couldn't find stream for ${file.name}`);
+        logger.debug(`couldn't find stream for ${file.file}`);
       }
     }
 

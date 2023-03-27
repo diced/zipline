@@ -2,16 +2,16 @@ import { parse } from 'dotenv';
 import { expand } from 'dotenv-expand';
 import { existsSync, readFileSync } from 'fs';
 import { resolve } from 'path';
-import Logger from 'lib/logger';
-import { humanToBytes } from 'utils/bytes';
+import Logger from '../logger';
+import { humanToBytes } from '../utils/bytes';
 
 export type ValueType = 'string' | 'number' | 'boolean' | 'array' | 'json-array' | 'human-to-byte' | 'path';
 
-function isObject(value: unknown): value is Record<string, unknown> {
+function isObject(value: any): value is Record<string, any> {
   return typeof value === 'object' && value !== null;
 }
 
-function set(object: Record<string, unknown> | unknown, property: string, value: unknown) {
+function set(object: Record<string, any>, property: string, value: any) {
   const parts = property.split('.');
 
   for (let i = 0; i < parts.length; ++i) {
@@ -64,9 +64,6 @@ export default function readConfig() {
     map('CORE_LOGGER', 'boolean', 'core.logger'),
     map('CORE_STATS_INTERVAL', 'number', 'core.stats_interval'),
     map('CORE_INVITES_INTERVAL', 'number', 'core.invites_interval'),
-    map('CORE_COMPRESSION_ENABLED', 'boolean', 'core.compression.enabled'),
-    map('CORE_COMPRESSION_THRESHOLD', 'human-to-byte', 'core.compression.threshold'),
-    map('CORE_COMPRESSION_ON_DASHBOARD', 'boolean', 'core.compression.on_dashboard'),
 
     map('DATASOURCE_TYPE', 'string', 'datasource.type'),
 
@@ -93,7 +90,6 @@ export default function readConfig() {
     map('UPLOADER_DISABLED_EXTENSIONS', 'array', 'uploader.disabled_extensions'),
     map('UPLOADER_FORMAT_DATE', 'string', 'uploader.format_date'),
     map('UPLOADER_DEFAULT_EXPIRATION', 'string', 'uploader.default_expiration'),
-    map('UPLOADER_ASSUME_MIMETYPES', 'boolean', 'uploader.assume_mimetypes'),
 
     map('URLS_ROUTE', 'string', 'urls.route'),
     map('URLS_LENGTH', 'number', 'urls.length'),
@@ -111,9 +107,6 @@ export default function readConfig() {
     map('DISCORD_USERNAME', 'string', 'discord.username'),
     map('DISCORD_AVATAR_URL', 'string', 'discord.avatar_url'),
 
-    map('DISCORD_UPLOAD_URL', 'string', 'discord.upload.url'),
-    map('DISCORD_UPLOAD_USERNAME', 'string', 'discord.upload.username'),
-    map('DISCORD_UPLOAD_AVATAR_URL', 'string', 'discord.upload.avatar_url'),
     map('DISCORD_UPLOAD_CONTENT', 'string', 'discord.upload.content'),
     map('DISCORD_UPLOAD_EMBED_TITLE', 'string', 'discord.upload.embed.title'),
     map('DISCORD_UPLOAD_EMBED_DESCRIPTION', 'string', 'discord.upload.embed.description'),
@@ -123,9 +116,6 @@ export default function readConfig() {
     map('DISCORD_UPLOAD_EMBED_THUMBNAIL', 'boolean', 'discord.upload.embed.thumbnail'),
     map('DISCORD_UPLOAD_EMBED_TIMESTAMP', 'boolean', 'discord.upload.embed.timestamp'),
 
-    map('DISCORD_SHORTEN_URL', 'string', 'discord.shorten.url'),
-    map('DISCORD_SHORTEN_USERNAME', 'string', 'discord.shorten.username'),
-    map('DISCORD_SHORTEN_AVATAR_URL', 'string', 'discord.shorten.avatar_url'),
     map('DISCORD_SHORTEN_CONTENT', 'string', 'discord.shorten.content'),
     map('DISCORD_SHORTEN_EMBED_TITLE', 'string', 'discord.shorten.embed.title'),
     map('DISCORD_SHORTEN_EMBED_DESCRIPTION', 'string', 'discord.shorten.embed.description'),
@@ -177,14 +167,14 @@ export default function readConfig() {
     const value = process.env[map.env];
 
     if (value) {
-      let parsed: unknown;
+      let parsed: any;
       switch (map.type) {
         case 'array':
           parsed = value.split(',');
           break;
         case 'number':
           parsed = Number(value);
-          if (isNaN(parsed as number)) {
+          if (isNaN(parsed)) {
             parsed = undefined;
             logger.debug(`Failed to parse number ${map.env}=${value}`);
           }
@@ -206,8 +196,7 @@ export default function readConfig() {
           break;
         case 'path':
           parsed = resolve(value);
-          if (!existsSync(parsed as string))
-            logger.debug(`Unable to find ${map.env}=${value} (path does not exist)`);
+          if (!existsSync(parsed)) logger.debug(`Unable to find ${map.env}=${value} (path does not exist)`);
           break;
         default:
           parsed = value;

@@ -12,7 +12,7 @@ Create an issue on GitHub, please include the following (if one of them is not a
 
 ## Feature requests
 
-Create an discussion on GitHub, please include the following:
+Create an issue on GitHub, please include the following:
 
 - Breif explanation of the feature in the title (very breif please)
 - How it would work (detailed, but optional)

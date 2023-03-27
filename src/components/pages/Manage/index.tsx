@@ -8,7 +8,6 @@ import {
   Group,
   Image,
   PasswordInput,
-  SimpleGrid,
   Space,
   Text,
   TextInput,
@@ -16,40 +15,32 @@ import {
   Tooltip,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { randomId, useInterval, useMediaQuery } from '@mantine/hooks';
+import { randomId, useInterval } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
 import { showNotification, updateNotification } from '@mantine/notifications';
 import {
-  IconBrandDiscordFilled,
-  IconBrandGithubFilled,
-  IconBrandGoogle,
-  IconFileExport,
-  IconFiles,
-  IconFilesOff,
-  IconFileZip,
-  IconGraph,
-  IconGraphOff,
-  IconPhotoMinus,
-  IconReload,
-  IconTrash,
-  IconUserCheck,
-  IconUserCog,
-  IconUserExclamation,
-  IconUserMinus,
-  IconUserX,
-} from '@tabler/icons-react';
-import AnchorNext from 'components/AnchorNext';
-import { FlameshotIcon, ShareXIcon } from 'components/icons';
+  CheckIcon,
+  CrossIcon,
+  DeleteIcon,
+  DiscordIcon,
+  FlameshotIcon,
+  GitHubIcon,
+  GoogleIcon,
+  RefreshIcon,
+  SettingsIcon,
+  ShareXIcon,
+} from 'components/icons';
+import DownloadIcon from 'components/icons/DownloadIcon';
+import TrashIcon from 'components/icons/TrashIcon';
+import Link from 'components/Link';
 import MutedText from 'components/MutedText';
 import { SmallTable } from 'components/SmallTable';
 import useFetch from 'hooks/useFetch';
 import { userSelector } from 'lib/recoil/user';
 import { bytesToHuman } from 'lib/utils/bytes';
 import { capitalize } from 'lib/utils/client';
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
-import ClearStorage from './ClearStorage';
 import Flameshot from './Flameshot';
 import ShareX from './ShareX';
 import { TotpModal } from './TotpModal';
@@ -69,9 +60,9 @@ function ExportDataTooltip({ children }) {
 export default function Manage({ oauth_registration, oauth_providers: raw_oauth_providers, totp_enabled }) {
   const oauth_providers = JSON.parse(raw_oauth_providers);
   const icons = {
-    Discord: IconBrandDiscordFilled,
-    GitHub: IconBrandGithubFilled,
-    Google: IconBrandGoogle,
+    Discord: DiscordIcon,
+    GitHub: GitHubIcon,
+    Google: GoogleIcon,
   };
 
   for (const provider of oauth_providers) {
@@ -84,12 +75,10 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
   const [totpOpen, setTotpOpen] = useState(false);
   const [shareXOpen, setShareXOpen] = useState(false);
   const [flameshotOpen, setFlameshotOpen] = useState(false);
-  const [clrStorOpen, setClrStorOpen] = useState(false);
   const [exports, setExports] = useState([]);
-  const [file, setFile] = useState<File | null>(null);
+  const [file, setFile] = useState<File>(null);
   const [fileDataURL, setFileDataURL] = useState(user.avatar ?? null);
   const [totpEnabled, setTotpEnabled] = useState(!!user.totpSecret);
-  const [checked, setCheck] = useState(false);
 
   const getDataURL = (f: File): Promise<string> => {
     return new Promise((res, rej) => {
@@ -110,13 +99,11 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
   const handleAvatarChange = async (file: File) => {
     setFile(file);
 
-    if (file) setFileDataURL(await getDataURL(file));
+    setFileDataURL(await getDataURL(file));
   };
 
   const saveAvatar = async () => {
-    let dataURL = null;
-
-    if (file) dataURL = await getDataURL(file);
+    const dataURL = await getDataURL(file);
 
     showNotification({
       id: 'update-user',
@@ -128,7 +115,6 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
 
     const newUser = await useFetch('/api/user', 'PATCH', {
       avatar: dataURL,
-      ...(!dataURL && { resetAvatar: true }),
     });
 
     if (newUser.error) {
@@ -137,7 +123,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
         title: "Couldn't save user",
         message: newUser.error,
         color: 'red',
-        icon: <IconUserX size='1rem' />,
+        icon: <CrossIcon />,
       });
     } else {
       setUser(newUser);
@@ -145,8 +131,6 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
         id: 'update-user',
         title: 'Saved User',
         message: '',
-        color: 'green',
-        icon: <IconUserCheck size='1rem' />,
       });
     }
   };
@@ -155,10 +139,9 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
     initialValues: {
       username: user.username,
       password: '',
-      embedTitle: user.embed?.title ?? null,
-      embedColor: user.embed?.color ?? '',
-      embedSiteName: user.embed?.siteName ?? null,
-      embedDescription: user.embed?.description ?? null,
+      embedTitle: user.embedTitle ?? '',
+      embedColor: user.embedColor,
+      embedSiteName: user.embedSiteName ?? '',
       domains: user.domains.join(','),
     },
   });
@@ -166,12 +149,9 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
   const onSubmit = async (values) => {
     const cleanUsername = values.username.trim();
     const cleanPassword = values.password.trim();
-    const cleanEmbed = {
-      title: values.embedTitle ? values.embedTitle.trim() : null,
-      color: values.embedColor !== '' ? values.embedColor.trim() : null,
-      siteName: values.embedSiteName ? values.embedSiteName.trim() : null,
-      description: values.embedDescription ? values.embedDescription.trim() : null,
-    };
+    const cleanEmbedTitle = values.embedTitle.trim();
+    const cleanEmbedColor = values.embedColor.trim();
+    const cleanEmbedSiteName = values.embedSiteName.trim();
 
     if (cleanUsername === '') return form.setFieldError('username', "Username can't be nothing");
 
@@ -186,11 +166,13 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
     const data = {
       username: cleanUsername,
       password: cleanPassword === '' ? null : cleanPassword,
+      embedTitle: cleanEmbedTitle === '' ? null : cleanEmbedTitle,
+      embedColor: cleanEmbedColor === '' ? null : cleanEmbedColor,
+      embedSiteName: cleanEmbedSiteName === '' ? null : cleanEmbedSiteName,
       domains: values.domains
         .split(/\s?,\s?/)
         .map((x) => x.trim())
         .filter((x) => x !== ''),
-      embed: cleanEmbed,
     };
 
     const newUser = await useFetch('/api/user', 'PATCH', data);
@@ -213,7 +195,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
             </>
           ),
           color: 'red',
-          icon: <IconUserX size='1rem' />,
+          icon: <CrossIcon />,
         });
       }
       updateNotification({
@@ -221,7 +203,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
         title: "Couldn't save user",
         message: newUser.error,
         color: 'red',
-        icon: <IconUserX size='1rem' />,
+        icon: <CrossIcon />,
       });
     } else {
       setUser(newUser);
@@ -229,8 +211,6 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
         id: 'update-user',
         title: 'Saved User',
         message: '',
-        color: 'green',
-        icon: <IconUserCheck size='1rem' />,
       });
     }
   };
@@ -249,7 +229,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
         title: 'Error exporting data',
         message: res.error,
         color: 'red',
-        icon: <IconFileExport size='1rem' />,
+        icon: <CrossIcon />,
       });
     }
   };
@@ -278,14 +258,14 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
         title: "Couldn't delete files",
         message: res.error,
         color: 'red',
-        icon: <IconFilesOff size='1rem' />,
+        icon: <CrossIcon />,
       });
     } else {
       showNotification({
         title: 'Deleted files',
         message: `${res.count} files deleted`,
         color: 'green',
-        icon: <IconFiles size='1rem' />,
+        icon: <DeleteIcon />,
       });
     }
   };
@@ -317,14 +297,66 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
         title: 'Error updating stats',
         message: res.error,
         color: 'red',
-        icon: <IconGraphOff size='1rem' />,
+        icon: <CrossIcon />,
       });
     } else {
       showNotification({
         title: 'Updated stats',
         message: '',
         color: 'green',
-        icon: <IconGraph size='1rem' />,
+        icon: <CheckIcon />,
+      });
+    }
+  };
+
+  const openClearData = () => {
+    modals.openConfirmModal({
+      title: 'Are you sure you want to clear all uploads in the database?',
+      closeOnConfirm: false,
+      labels: { confirm: 'Yes', cancel: 'No' },
+      onConfirm: () => {
+        modals.openConfirmModal({
+          title: 'Do you want to clear storage too?',
+          labels: { confirm: 'Yes', cancel: 'No' },
+          onConfirm: () => {
+            handleClearData(true);
+            modals.closeAll();
+          },
+          onCancel: () => {
+            handleClearData(false);
+            modals.closeAll();
+          },
+        });
+      },
+    });
+  };
+
+  const handleClearData = async (datasource?: boolean) => {
+    showNotification({
+      id: 'clear-uploads',
+      title: 'Clearing...',
+      message: '',
+      loading: true,
+      autoClose: false,
+    });
+
+    const res = await useFetch('/api/admin/clear', 'POST', { datasource });
+
+    if (res.error) {
+      updateNotification({
+        id: 'clear-uploads',
+        title: 'Error while clearing uploads',
+        message: res.error,
+        color: 'red',
+        icon: <CrossIcon />,
+      });
+    } else {
+      updateNotification({
+        id: 'clear-uploads',
+        title: 'Successfully cleared uploads',
+        message: '',
+        color: 'green',
+        icon: <CheckIcon />,
       });
     }
   };
@@ -338,7 +370,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
         title: 'Error while unlinking from OAuth',
         message: res.error,
         color: 'red',
-        icon: <IconUserExclamation size='1rem' />,
+        icon: <CrossIcon />,
       });
     } else {
       setUser(res);
@@ -346,7 +378,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
         title: `Unlinked from ${provider[0] + provider.slice(1).toLowerCase()}`,
         message: '',
         color: 'green',
-        icon: <IconUserMinus size='1rem' />,
+        icon: <CheckIcon />,
       });
     }
   };
@@ -355,15 +387,14 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
   useEffect(() => {
     getExports();
     interval.start();
-  }, [totpEnabled]);
+  }, []);
 
   return (
     <>
       <Title>Manage User</Title>
       <MutedText size='md'>
         Want to use variables in embed text? Visit{' '}
-        <AnchorNext href='https://zipline.diced.tech/docs/guides/variables'>the docs</AnchorNext> for
-        variables
+        <Link href='https://zipline.diced.tech/docs/guides/variables'>the docs</Link> for variables
       </MutedText>
       <form onSubmit={form.onSubmit((v) => onSubmit(v))}>
         <TextInput id='username' label='Username' my='sm' {...form.getInputProps('username')} />
@@ -374,31 +405,14 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
           my='sm'
           {...form.getInputProps('password')}
         />
-
-        <SimpleGrid
-          cols={4}
-          breakpoints={[
-            { maxWidth: 768, cols: 1 },
-            { minWidth: 769, maxWidth: 1024, cols: 2 },
-            { minWidth: 1281, cols: 4 },
-          ]}
-        >
-          <TextInput id='embedTitle' label='Embed Title' my='sm' {...form.getInputProps('embedTitle')} />
-          <ColorInput id='embedColor' label='Embed Color' my='sm' {...form.getInputProps('embedColor')} />
-          <TextInput
-            id='embedSiteName'
-            label='Embed Site Name'
-            my='sm'
-            {...form.getInputProps('embedSiteName')}
-          />
-          <TextInput
-            id='embedDescription'
-            label='Embed Description'
-            my='sm'
-            {...form.getInputProps('embedDescription')}
-          />
-        </SimpleGrid>
-
+        <TextInput id='embedTitle' label='Embed Title' my='sm' {...form.getInputProps('embedTitle')} />
+        <ColorInput id='embedColor' label='Embed Color' my='sm' {...form.getInputProps('embedColor')} />
+        <TextInput
+          id='embedSiteName'
+          label='Embed Site Name'
+          my='sm'
+          {...form.getInputProps('embedSiteName')}
+        />
         <TextInput
           id='domains'
           label='Domains'
@@ -409,18 +423,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
         />
 
         <Group position='right' mt='md'>
-          <Button
-            type='submit'
-            size='lg'
-            my='sm'
-            sx={{
-              '@media screen and (max-width: 768px)': {
-                width: '100%',
-              },
-            }}
-          >
-            Save
-          </Button>
+          <Button type='submit'>Save User</Button>
         </Group>
       </form>
 
@@ -428,21 +431,12 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
         <Box my='md'>
           <Title>Two Factor Authentication</Title>
           <MutedText size='md'>
-            {totpEnabled
+            {user.totpSecret
               ? 'You have two factor authentication enabled.'
               : 'You do not have two factor authentication enabled.'}
           </MutedText>
 
-          <Button
-            size='lg'
-            my='sm'
-            onClick={() => setTotpOpen(true)}
-            sx={{
-              '@media screen and (max-width: 768px)': {
-                width: '100%',
-              },
-            }}
-          >
+          <Button size='lg' my='sm' onClick={() => setTotpOpen(true)}>
             {totpEnabled ? 'Disable' : 'Enable'} Two Factor Authentication
           </Button>
 
@@ -467,9 +461,11 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
                   !user.oauth?.map(({ provider }) => provider.toLowerCase()).includes(x.name.toLowerCase())
               )
               .map(({ link_url, name, Icon }, i) => (
-                <Button key={i} size='lg' leftIcon={<Icon />} component={Link} href={link_url} my='sm'>
-                  Link account with {name}
-                </Button>
+                <Link key={i} href={link_url} passHref legacyBehavior>
+                  <Button size='lg' leftIcon={<Icon colorScheme='manage' />} component='a' my='sm'>
+                    Link account with {name}
+                  </Button>
+                </Link>
               ))}
 
             {user?.oauth?.map(({ provider }, i) => (
@@ -477,7 +473,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
                 key={i}
                 onClick={() => handleOauthUnlink(provider)}
                 size='lg'
-                leftIcon={<IconTrash size='1rem' />}
+                leftIcon={<TrashIcon />}
                 my='sm'
                 color='red'
               >
@@ -501,24 +497,21 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
         <Card mt='md'>
           <Text>Preview:</Text>
           <Button
-            leftIcon={
-              fileDataURL ? (
-                <Image src={fileDataURL} height={32} width={32} radius='md' />
-              ) : (
-                <IconUserCog size='1rem' />
-              )
-            }
+            leftIcon={fileDataURL ? <Image src={fileDataURL} height={32} radius='md' /> : <SettingsIcon />}
+            sx={(t) => ({
+              backgroundColor: '#00000000',
+              '&:hover': {
+                backgroundColor: t.other.hover,
+              },
+            })}
             size='xl'
             p='sm'
-            variant='subtle'
-            color='gray'
-            compact
           >
             {user.username}
           </Button>
         </Card>
 
-        <Group position='right' my='md' grow={useMediaQuery('(max-width: 768px)')}>
+        <Group position='right' mt='md'>
           <Button
             onClick={() => {
               setFile(null);
@@ -532,21 +525,21 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
         </Group>
       </Box>
 
-      <Box my='md'>
+      <Box mb='md'>
         <Title>Manage Data</Title>
         <MutedText size='md'>Delete, or export your data into a zip file.</MutedText>
       </Box>
 
-      <Group my='md' grow={useMediaQuery('(max-width: 768px)')}>
-        <Button onClick={openDeleteModal} rightIcon={<IconPhotoMinus size='1rem' />} color='red'>
+      <Group>
+        <Button onClick={openDeleteModal} rightIcon={<DeleteIcon />} color='red'>
           Delete All Data
         </Button>
         <ExportDataTooltip>
-          <Button onClick={exportData} rightIcon={<IconFileZip size='1rem' />}>
+          <Button onClick={exportData} rightIcon={<DownloadIcon />}>
             Export Data
           </Button>
         </ExportDataTooltip>
-        <Button onClick={getExports} rightIcon={<IconReload size='1rem' />}>
+        <Button onClick={getExports} rightIcon={<RefreshIcon />}>
           Refresh
         </Button>
       </Group>
@@ -580,16 +573,11 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
       {user.administrator && (
         <Box mt='md'>
           <Title>Server</Title>
-          <Group my='md' grow={useMediaQuery('(max-width: 768px)')}>
-            <Button size='md' onClick={forceUpdateStats} color='red' rightIcon={<IconReload size='1rem' />}>
+          <Group>
+            <Button size='md' onClick={forceUpdateStats} color='red' rightIcon={<RefreshIcon />}>
               Force Update Stats
             </Button>
-            <Button
-              size='md'
-              onClick={() => setClrStorOpen(true)}
-              color='red'
-              rightIcon={<IconTrash size='1rem' />}
-            >
+            <Button size='md' onClick={openClearData} color='red' rightIcon={<TrashIcon />}>
               Delete all uploads
             </Button>
           </Group>
@@ -598,35 +586,16 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
 
       <Title my='md'>Uploaders</Title>
       <Group>
-        <Button
-          size='xl'
-          onClick={() => setShareXOpen(true)}
-          rightIcon={<ShareXIcon size='1rem' />}
-          sx={{
-            '@media screen and (max-width: 768px)': {
-              width: '100%',
-            },
-          }}
-        >
+        <Button size='xl' onClick={() => setShareXOpen(true)} rightIcon={<ShareXIcon />}>
           Generate ShareX Config
         </Button>
-        <Button
-          size='xl'
-          onClick={() => setFlameshotOpen(true)}
-          rightIcon={<FlameshotIcon size='1rem' />}
-          sx={{
-            '@media screen and (max-width: 768px)': {
-              width: '100%',
-            },
-          }}
-        >
+        <Button size='xl' onClick={() => setFlameshotOpen(true)} rightIcon={<FlameshotIcon />}>
           Generate Flameshot Script
         </Button>
       </Group>
 
       <ShareX user={user} open={shareXOpen} setOpen={setShareXOpen} />
       <Flameshot user={user} open={flameshotOpen} setOpen={setFlameshotOpen} />
-      <ClearStorage open={clrStorOpen} setOpen={setClrStorOpen} check={checked} setCheck={setCheck} />
     </>
   );
 }

@@ -5,16 +5,9 @@ export interface ConfigCore {
   port: number;
   database_url: string;
   logger: boolean;
-  compression: ConfigCompression;
 
   stats_interval: number;
   invites_interval: number;
-}
-
-export interface ConfigCompression {
-  enabled: boolean;
-  threshold: number;
-  on_dashboard: boolean;
 }
 
 export interface ConfigDatasource {
@@ -54,7 +47,6 @@ export interface ConfigUploader {
   disabled_extensions: string[];
   format_date: string;
   default_expiration: string;
-  assume_mimetypes: boolean;
 }
 
 export interface ConfigUrls {
@@ -82,18 +74,15 @@ export interface ConfigWebsiteExternalLinks {
 }
 
 export interface ConfigDiscord {
-  url?: string;
-  username?: string;
-  avatar_url?: string;
+  url: string;
+  username: string;
+  avatar_url: string;
 
   upload: ConfigDiscordContent;
   shorten: ConfigDiscordContent;
 }
 
 export interface ConfigDiscordContent {
-  url?: string;
-  username?: string;
-  avatar_url?: string;
   content: string;
   embed: ConfigDiscordEmbed;
 }

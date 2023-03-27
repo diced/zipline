@@ -1,20 +1,16 @@
 import {
-  Anchor,
   Button,
-  Card,
   Center,
   CheckIcon,
   Divider,
-  Group,
   Modal,
+  NumberInput,
   PasswordInput,
-  PinInput,
-  Text,
   TextInput,
   Title,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { IconBrandDiscordFilled, IconBrandGithub, IconBrandGoogle } from '@tabler/icons-react';
+import { DiscordIcon, GitHubIcon, GoogleIcon } from 'components/icons';
 import useFetch from 'hooks/useFetch';
 import Head from 'next/head';
 import Link from 'next/link';
@@ -27,17 +23,16 @@ export default function Login({ title, user_registration, oauth_registration, oa
 
   // totp modal
   const [totpOpen, setTotpOpen] = useState(false);
+  const [code, setCode] = useState(undefined);
   const [error, setError] = useState('');
   const [disabled, setDisabled] = useState(false);
-
-  const [loading, setLoading] = useState(false);
 
   const oauth_providers = JSON.parse(unparsed);
 
   const icons = {
-    GitHub: IconBrandGithub,
-    Discord: IconBrandDiscordFilled,
-    Google: IconBrandGoogle,
+    GitHub: GitHubIcon,
+    Discord: DiscordIcon,
+    Google: GoogleIcon,
   };
 
   for (const provider of oauth_providers) {
@@ -51,10 +46,8 @@ export default function Login({ title, user_registration, oauth_registration, oa
     },
   });
 
-  const onSubmit = async (values, code = null) => {
-    setLoading(true);
+  const onSubmit = async (values) => {
     setError('');
-    setDisabled(true);
     const username = values.username.trim();
     const password = values.password.trim();
 
@@ -72,28 +65,17 @@ export default function Login({ title, user_registration, oauth_registration, oa
       } else if (res.totp) {
         if (res.code === 400) {
           setError('Invalid code');
-          setDisabled(false);
-          setLoading(false);
         } else {
           setError('');
-          setDisabled(false);
-          setLoading(false);
         }
 
         setTotpOpen(true);
       } else {
         form.setFieldError('username', 'Invalid username');
         form.setFieldError('password', 'Invalid password');
-        setLoading(false);
       }
     } else {
       await router.push((router.query.url as string) || '/dashboard');
-    }
-  };
-
-  const handlePinChange = (value) => {
-    if (value.length === 6) {
-      onSubmit(form.values, value);
     }
   };
 
@@ -116,100 +98,77 @@ export default function Login({ title, user_registration, oauth_registration, oa
         title={<Title order={3}>Two-Factor Authentication Required</Title>}
         size='lg'
       >
-        <Center my='md'>
-          <PinInput
-            data-autofocus
-            length={6}
-            oneTimeCode
-            type='number'
-            placeholder=''
-            onChange={handlePinChange}
-            autoFocus={true}
-            error={!!error}
-            disabled={disabled}
-            size='xl'
-          />
-        </Center>
-
-        {error && (
-          <Text my='sm' size='sm' color='red' align='center'>
-            {error}
-          </Text>
-        )}
+        <NumberInput
+          placeholder='2FA Code'
+          label='Verify'
+          size='xl'
+          hideControls
+          maxLength={6}
+          minLength={6}
+          value={code}
+          onChange={(e) => setCode(e)}
+          error={error}
+        />
 
         <Button
-          loading={loading}
           disabled={disabled}
           size='lg'
           fullWidth
           mt='md'
           rightIcon={<CheckIcon />}
-          type='submit'
+          onClick={() => onSubmit(form.values)}
         >
           Verify &amp; Login
         </Button>
       </Modal>
       <Center sx={{ height: '100vh' }}>
-        <Card radius='md'>
-          <Title size={30} align='left'>
+        <div>
+          <Title size={70} align='center'>
             {title}
           </Title>
 
-          {oauth_registration && (
-            <>
-              <Group grow>
-                {oauth_providers.map(({ url, name, Icon }, i) => (
-                  <Button
-                    key={i}
-                    size='sm'
-                    variant='outline'
-                    radius='md'
-                    fullWidth
-                    leftIcon={<Icon height={'15'} width={'15'} />}
-                    my='xs'
-                    component={Link}
-                    href={url}
-                  >
-                    {name}
-                  </Button>
-                ))}
-              </Group>
-
-              <Divider my='xs' label='or' labelPosition='center' />
-            </>
-          )}
-
           <form onSubmit={form.onSubmit((v) => onSubmit(v))}>
-            <TextInput
-              my='xs'
-              radius='md'
-              size='md'
-              id='username'
-              label='Username'
-              {...form.getInputProps('username')}
-            />
+            <TextInput my='sm' size='lg' id='username' label='Username' {...form.getInputProps('username')} />
             <PasswordInput
-              my='xs'
-              radius='md'
-              size='md'
+              my='sm'
+              size='lg'
               id='password'
               label='Password'
               {...form.getInputProps('password')}
             />
 
-            <Group position='apart'>
-              {user_registration && (
-                <Anchor size='xs' href='/auth/register' component={Link}>
-                  Don&apos;t have an account? Register
-                </Anchor>
-              )}
-
-              <Button size='sm' p='xs' radius='md' my='xs' type='submit' loading={loading}>
-                Login
-              </Button>
-            </Group>
+            <Button size='lg' my='sm' fullWidth type='submit'>
+              Login
+            </Button>
           </form>
-        </Card>
+
+          {user_registration && (
+            <>
+              <Divider my='sm' label='or' labelPosition='center'>
+                or
+              </Divider>
+              <Link href='/auth/register' passHref legacyBehavior>
+                <Button size='lg' fullWidth component='a'>
+                  Register
+                </Button>
+              </Link>
+            </>
+          )}
+          {oauth_registration && (
+            <>
+              <Divider my='sm' label='or' labelPosition='center'>
+                or
+              </Divider>
+              {oauth_providers.map(({ url, name, Icon }, i) => (
+                <Link key={i} href={url} passHref legacyBehavior>
+                  <Button size='lg' fullWidth leftIcon={<Icon colorScheme='manage' />} component='a' my='sm'>
+                    Login with {name}
+                  </Button>
+                </Link>
+              ))}
+            </>
+          )}
+        </div>
       </Center>
     </>
   );

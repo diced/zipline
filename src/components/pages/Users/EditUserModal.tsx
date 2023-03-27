@@ -1,7 +1,7 @@
 import { Button, Group, Modal, Switch, TextInput, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { showNotification } from '@mantine/notifications';
-import { IconUserCheck, IconUserExclamation } from '@tabler/icons-react';
+import { DeleteIcon, PlusIcon } from 'components/icons';
 import useFetch from 'hooks/useFetch';
 
 export function EditUserModal({ open, setOpen, updateUsers, user }) {
@@ -36,14 +36,14 @@ export function EditUserModal({ open, setOpen, updateUsers, user }) {
       showNotification({
         title: 'Failed to edit user',
         message: res.error,
-        icon: <IconUserExclamation size='1rem' />,
+        icon: <DeleteIcon />,
         color: 'red',
       });
     } else {
       showNotification({
         title: 'Edited user: ' + cleanUsername,
         message: '',
-        icon: <IconUserCheck size='1rem' />,
+        icon: <PlusIcon />,
         color: 'green',
       });
     }
@@ -52,11 +52,7 @@ export function EditUserModal({ open, setOpen, updateUsers, user }) {
   };
 
   return (
-    <Modal
-      opened={open}
-      onClose={() => setOpen(false)}
-      title={<Title>Edit &quot;{user?.username}&quot;</Title>}
-    >
+    <Modal opened={open} onClose={() => setOpen(false)} title={<Title>Edit User {user?.username}</Title>}>
       {user && (
         <form onSubmit={form.onSubmit((v) => onSubmit(v))}>
           <TextInput id='username' label='Username' {...form.getInputProps('username')} />

@@ -16,11 +16,7 @@ export default function DashboardPage(props) {
         <title>{props.title}</title>
       </Head>
       <Layout props={props}>
-        <Dashboard
-          disableMediaPreview={props.disable_media_preview}
-          exifEnabled={props.exif_enabled}
-          compress={props.compress}
-        />
+        <Dashboard disableMediaPreview={props.disable_media_preview} exifEnabled={props.exif_enabled} />
       </Layout>
     </>
   );

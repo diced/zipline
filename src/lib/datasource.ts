@@ -24,8 +24,3 @@ if (!global.datasource) {
 }
 
 export default global.datasource as Datasource;
-
-declare global {
-  // eslint-disable-next-line no-var
-  var datasource: Datasource;
-}

@@ -4,7 +4,7 @@ import { join } from 'path';
 import { Datasource } from '.';
 
 export class Local extends Datasource {
-  public name = 'local';
+  public name: string = 'local';
 
   public constructor(public path: string) {
     super();

@@ -1,4 +1,4 @@
-import { InvisibleFile, InvisibleUrl } from '@prisma/client';
+import { InvisibleImage, InvisibleUrl } from '@prisma/client';
 import { hash, verify } from 'argon2';
 import { randomBytes } from 'crypto';
 import { readdir, stat } from 'fs/promises';
@@ -60,11 +60,11 @@ export function randomInvis(length: number) {
     .concat(invisibleCharset[0]);
 }
 
-export function createInvisImage(length: number, fileId: number) {
-  const retry = async (): Promise<InvisibleFile> => {
+export function createInvisImage(length: number, imageId: number) {
+  const retry = async (): Promise<InvisibleImage> => {
     const invis = randomInvis(length);
 
-    const existing = await prisma.invisibleFile.findUnique({
+    const existing = await prisma.invisibleImage.findUnique({
       where: {
         invis,
       },
@@ -72,10 +72,10 @@ export function createInvisImage(length: number, fileId: number) {
 
     if (existing) return retry();
 
-    const inv = await prisma.invisibleFile.create({
+    const inv = await prisma.invisibleImage.create({
       data: {
         invis,
-        fileId,
+        imageId,
       },
     });
 
@@ -120,6 +120,6 @@ export async function getBase64URLFromURL(url: string) {
   return `data:${res.headers.get('content-type')};base64,${base64}`;
 }
 
-export function notNull(a: unknown, b: unknown) {
+export function notNull(a: any, b: any) {
   return a !== null && b !== null;
 }

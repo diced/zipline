@@ -17,7 +17,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   const { id } = req.query as { id: string };
   if (!id) return res.badRequest('no id');
 
-  const image = await prisma.file.findFirst({
+  const image = await prisma.image.findFirst({
     where: {
       id: Number(id),
       userId: user.id,
@@ -27,11 +27,11 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   if (!image) return res.notFound('image not found');
 
   logger.info(
-    `${user.username} (${user.id}) requested to read exif metadata for image ${image.name} (${image.id})`
+    `${user.username} (${user.id}) requested to read exif metadata for image ${image.file} (${image.id})`
   );
 
   if (config.datasource.type === 'local') {
-    const filePath = join(config.datasource.local.directory, image.name);
+    const filePath = join(config.datasource.local.directory, image.file);
     logger.debug(`attemping to read exif metadata from ${filePath}`);
 
     if (!existsSync(filePath)) return res.notFound('image not found on fs');
@@ -41,10 +41,10 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
 
     return res.json(data);
   } else {
-    const file = join(tmpdir(), `zipline-exif-read-${Date.now()}-${image.name}`);
+    const file = join(tmpdir(), `zipline-exif-read-${Date.now()}-${image.file}`);
     logger.debug(`writing temp file to view metadata: ${file}`);
 
-    const stream = await datasource.get(image.name);
+    const stream = await datasource.get(image.file);
     const writeStream = createWriteStream(file);
     stream.pipe(writeStream);
 

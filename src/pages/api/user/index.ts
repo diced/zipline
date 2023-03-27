@@ -165,16 +165,22 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
         data: { avatar: req.body.avatar },
       });
 
-    if (req.body.resetAvatar)
+    if (req.body.embedTitle)
       await prisma.user.update({
         where: { id: user.id },
-        data: { avatar: null },
+        data: { embedTitle: req.body.embedTitle },
       });
 
-    if (req.body.embed)
+    if (req.body.embedColor)
       await prisma.user.update({
         where: { id: user.id },
-        data: { embed: req.body.embed },
+        data: { embedColor: req.body.embedColor },
+      });
+
+    if (req.body.embedSiteName)
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { embedSiteName: req.body.embedSiteName },
       });
 
     if (req.body.systemTheme)
@@ -216,9 +222,11 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       },
       select: {
         administrator: true,
-        embed: true,
+        embedColor: true,
+        embedTitle: true,
+        embedSiteName: true,
         id: true,
-        files: false,
+        images: false,
         password: false,
         systemTheme: true,
         token: true,

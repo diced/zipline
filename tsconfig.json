@@ -19,12 +19,18 @@
       "components/*": ["components/*"],
       "hooks/*": ["lib/hooks/*"],
       "middleware/*": ["lib/middleware/*"],
-      "lib/*": ["lib/*"],
-      "config/*": ["lib/config/*"],
-      "utils/*": ["lib/utils/*"]
+      "lib/*": ["lib/*"]
     },
     "incremental": true
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": [
+    "next-env.d.ts",
+    "zip-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/**/*.ts",
+    "**/**/*.tsx",
+    "prisma/seed.ts"
+  ],
   "exclude": ["node_modules", "dist", ".yarn", ".next"]
 }

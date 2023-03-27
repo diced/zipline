@@ -8,7 +8,7 @@ export default async function urlsRoute(this: FastifyInstance, req: FastifyReque
 
   const url = await this.prisma.url.findFirst({
     where: {
-      OR: [{ id }, { vanity: decodeURI(encodeURI(id)) }, { invisible: { invis: decodeURI(encodeURI(id)) } }],
+      OR: [{ id }, { vanity: id }, { invisible: { invis: decodeURI(id) } }],
     },
   });
   if (!url) return reply.notFound();

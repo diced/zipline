@@ -22,7 +22,6 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         username: 'administrator',
         password: await hashPassword('password'),
         token: createToken(),
-        superAdmin: true,
         administrator: true,
       },
     });

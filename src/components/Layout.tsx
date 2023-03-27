@@ -7,124 +7,171 @@ import {
   Group,
   Header,
   Image,
-  Input,
   MediaQuery,
   Menu,
   Navbar,
   NavLink,
   Paper,
-  rem,
+  Popover,
   ScrollArea,
   Select,
+  Stack,
   Text,
   Title,
   Tooltip,
+  UnstyledButton,
   useMantineTheme,
 } from '@mantine/core';
-import { useClipboard, useMediaQuery } from '@mantine/hooks';
+import { useClipboard } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
 import { showNotification } from '@mantine/notifications';
-import {
-  IconBackspace,
-  IconBrandDiscordFilled,
-  IconBrandGithubFilled,
-  IconBrandGoogle,
-  IconBrush,
-  IconClipboardCopy,
-  IconExternalLink,
-  IconFiles,
-  IconFileText,
-  IconFileUpload,
-  IconFolders,
-  IconGraph,
-  IconHome,
-  IconLink,
-  IconLogout,
-  IconReload,
-  IconSettings,
-  IconTag,
-  IconUpload,
-  IconUser,
-  IconUserCog,
-  IconUsers,
-} from '@tabler/icons-react';
 import useFetch from 'hooks/useFetch';
 import { useVersion } from 'lib/queries/version';
 import { userSelector } from 'lib/recoil/user';
 import { capitalize } from 'lib/utils/client';
-import { UserExtended } from 'middleware/withZipline';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { useRecoilState } from 'recoil';
+import {
+  ActivityIcon,
+  CheckIcon,
+  CopyIcon,
+  CrossIcon,
+  DeleteIcon,
+  DiscordIcon,
+  ExternalLinkIcon,
+  FileIcon,
+  GitHubIcon,
+  GoogleIcon,
+  HomeIcon,
+  LinkIcon,
+  LogoutIcon,
+  PencilIcon,
+  SettingsIcon,
+  TagIcon,
+  TypeIcon,
+  UploadIcon,
+  UserIcon,
+} from './icons';
 import { friendlyThemeName, themes } from './Theming';
+
+function MenuItemLink(props) {
+  return (
+    <Link href={props.href} passHref legacyBehavior>
+      <MenuItem {...props} />
+    </Link>
+  );
+}
+
+function MenuItem(props) {
+  return (
+    <UnstyledButton
+      sx={(theme) => ({
+        display: 'block',
+        width: '100%',
+        padding: 5,
+        borderRadius: theme.radius.sm,
+        color: props.color
+          ? theme.fn.themeColor(props.color, theme.colorScheme === 'dark' ? 5 : 7)
+          : theme.colorScheme === 'dark'
+          ? theme.colors.dark[0]
+          : theme.black,
+        '&:hover': !props.noClick
+          ? {
+              backgroundColor: props.color
+                ? theme.fn.rgba(
+                    theme.fn.themeColor(props.color, theme.colorScheme === 'dark' ? 9 : 0),
+                    theme.colorScheme === 'dark' ? 0.2 : 1
+                  )
+                : theme.colorScheme === 'dark'
+                ? theme.fn.rgba(theme.colors.dark[3], 0.35)
+                : theme.colors.gray[0],
+            }
+          : null,
+      })}
+      {...props}
+    >
+      <Group noWrap>
+        <Box
+          sx={(theme) => ({
+            marginRight: theme.spacing.xs / 4,
+            paddingLeft: theme.spacing.xs / 2,
+
+            '& *': {
+              display: 'block',
+            },
+          })}
+        >
+          {props.icon}
+        </Box>
+        <Text size='sm'>{props.children}</Text>
+      </Group>
+    </UnstyledButton>
+  );
+}
 
 export type NavbarItems = {
   icon: React.ReactNode;
   text: string;
   link?: string;
   children?: NavbarItems[];
-  if?: (user: UserExtended, props: unknown) => boolean;
+  if?: (user: any, props: any) => boolean;
 };
 
 const items: NavbarItems[] = [
   {
-    icon: <IconHome size={18} />,
+    icon: <HomeIcon size={18} />,
     text: 'Home',
     link: '/dashboard',
   },
   {
-    icon: <IconFiles size={18} />,
+    icon: <FileIcon size={18} />,
     text: 'Files',
     link: '/dashboard/files',
   },
   {
-    icon: <IconFolders size={18} />,
-    text: 'Folders',
-    link: '/dashboard/folders',
-  },
-  {
-    icon: <IconGraph size={18} />,
+    icon: <ActivityIcon size={18} />,
     text: 'Stats',
     link: '/dashboard/stats',
   },
   {
-    icon: <IconLink size={18} />,
+    icon: <LinkIcon size={18} />,
     text: 'URLs',
     link: '/dashboard/urls',
   },
   {
-    icon: <IconUpload size={18} />,
+    icon: <UploadIcon size={18} />,
     text: 'Upload',
     children: [
       {
-        icon: <IconFileUpload size={18} />,
+        icon: <UploadIcon size={18} />,
         text: 'File',
         link: '/dashboard/upload/file',
       },
       {
-        icon: <IconFileText size={18} />,
+        icon: <TypeIcon size={18} />,
         text: 'Text',
         link: '/dashboard/upload/text',
       },
     ],
   },
   {
-    icon: <IconUser size={18} />,
+    icon: <UserIcon size={18} />,
     text: 'Administration',
     if: (user, _) => user.administrator as boolean,
     children: [
       {
-        icon: <IconUsers size={18} />,
+        icon: <UserIcon size={18} />,
         text: 'Users',
         link: '/dashboard/users',
         if: () => true,
       },
       {
-        icon: <IconTag size={18} />,
+        icon: <TagIcon size={18} />,
         text: 'Invites',
         link: '/dashboard/invites',
-        if: (_, props: { invites: boolean }) => props.invites,
+        if: (_, props) => props.invites,
       },
     ],
   },
@@ -136,9 +183,9 @@ export default function Layout({ children, props }) {
   const { title, oauth_providers: unparsed } = props;
   const oauth_providers = JSON.parse(unparsed);
   const icons = {
-    GitHub: IconBrandGithubFilled,
-    Discord: IconBrandDiscordFilled,
-    Google: IconBrandGoogle,
+    GitHub: GitHubIcon,
+    Discord: DiscordIcon,
+    Google: GoogleIcon,
   };
 
   for (const provider of oauth_providers) {
@@ -151,6 +198,7 @@ export default function Layout({ children, props }) {
   const [systemTheme, setSystemTheme] = useState(user.systemTheme ?? 'system');
   const version = useVersion();
   const [opened, setOpened] = useState(false); // navigation open
+  const [open, setOpen] = useState(false); // manage acc dropdown
 
   const avatar = user?.avatar ?? null;
   const router = useRouter();
@@ -171,7 +219,7 @@ export default function Layout({ children, props }) {
       title: `Theme changed to ${friendlyThemeName[value]}`,
       message: '',
       color: 'green',
-      icon: <IconBrush size='1rem' />,
+      icon: <PencilIcon />,
     });
   };
 
@@ -192,7 +240,7 @@ export default function Layout({ children, props }) {
             title: 'Token Reset Failed',
             message: a.error,
             color: 'red',
-            icon: <IconReload size='1rem' />,
+            icon: <CrossIcon />,
           });
         } else {
           showNotification({
@@ -200,7 +248,7 @@ export default function Layout({ children, props }) {
             message:
               'Your token has been reset. You will need to update any uploaders to use this new token.',
             color: 'green',
-            icon: <IconReload size='1rem' />,
+            icon: <CheckIcon />,
           });
         }
 
@@ -220,29 +268,13 @@ export default function Layout({ children, props }) {
       labels: { confirm: 'Copy', cancel: 'Cancel' },
       onConfirm: async () => {
         clipboard.copy(token);
-        if (!navigator.clipboard)
-          showNotification({
-            title: 'Unable to copy to clipboard',
-            message: (
-              <Text size='sm'>
-                Zipline is unable to copy to clipboard due to security reasons. However, you can still copy
-                the token manually.
-                <br />
-                <Group position='left' spacing='sm'>
-                  <Text>Your token is:</Text>
-                  <Input size='sm' onFocus={(e) => e.target.select()} type='text' value={token} />
-                </Group>
-              </Text>
-            ),
-            color: 'red',
-          });
-        else
-          showNotification({
-            title: 'Token Copied',
-            message: 'Your token has been copied to your clipboard.',
-            color: 'green',
-            icon: <IconClipboardCopy size='1rem' />,
-          });
+
+        showNotification({
+          title: 'Token Copied',
+          message: 'Your token has been copied to your clipboard.',
+          color: 'green',
+          icon: <CheckIcon />,
+        });
 
         modals.closeAll();
       },
@@ -268,42 +300,42 @@ export default function Layout({ children, props }) {
                     {children
                       .filter((x) => (x.if ? x.if(user, props) : true))
                       .map(({ icon, text, link }) => (
-                        <NavLink
-                          key={text}
-                          label={text}
-                          icon={icon}
-                          active={router.pathname === link}
-                          variant='light'
-                          component={Link}
-                          href={link}
-                        />
+                        <Link href={link} key={text} passHref legacyBehavior>
+                          <NavLink
+                            component='a'
+                            label={text}
+                            icon={icon}
+                            active={router.pathname === link}
+                            variant='light'
+                          />
+                        </Link>
                       ))}
                   </NavLink>
                 ) : (
-                  <NavLink
-                    key={text}
-                    label={text}
-                    icon={icon}
-                    active={router.pathname === link}
-                    variant='light'
-                    component={Link}
-                    href={link}
-                  />
+                  <Link href={link} key={text} passHref legacyBehavior>
+                    <NavLink
+                      component='a'
+                      label={text}
+                      icon={icon}
+                      active={router.pathname === link}
+                      variant='light'
+                    />
+                  </Link>
                 )
               )}
           </Navbar.Section>
           <Navbar.Section>
             {external_links.length
-              ? external_links.map(({ label, link }, i: number) => (
-                  <NavLink
-                    key={i}
-                    label={label}
-                    target='_blank'
-                    variant='light'
-                    icon={<IconExternalLink size={18} />}
-                    component={Link}
-                    href={link}
-                  />
+              ? external_links.map(({ label, link }, i) => (
+                  <Link href={link} passHref key={i} legacyBehavior>
+                    <NavLink
+                      label={label}
+                      component='a'
+                      target='_blank'
+                      variant='light'
+                      icon={<ExternalLinkIcon />}
+                    />
+                  </Link>
                 ))
               : null}
           </Navbar.Section>
@@ -311,11 +343,9 @@ export default function Layout({ children, props }) {
             <Navbar.Section>
               <Tooltip
                 label={
-                  version.data.update
-                    ? `There is a new ${version.data.updateToType} version: ${
-                        version.data.versions[version.data.updateToType]
-                      }`
-                    : `You are running the latest ${version.data.isUpstream ? 'upstream' : 'stable'} version`
+                  version.data.local !== version.data.upstream
+                    ? `You are running an outdated version of Zipline, refer to the docs on how to update to ${version.data.upstream}`
+                    : 'You are running the latest version of Zipline'
                 }
               >
                 <Badge
@@ -323,9 +353,9 @@ export default function Layout({ children, props }) {
                   radius='md'
                   size='lg'
                   variant='dot'
-                  color={version.data.update ? 'red' : 'primary'}
+                  color={version.data.local !== version.data.upstream ? 'red' : 'primary'}
                 >
-                  {version.data.versions.current}
+                  {version.data.local}
                 </Badge>
               </Tooltip>
             </Navbar.Section>
@@ -345,118 +375,99 @@ export default function Layout({ children, props }) {
             </MediaQuery>
             <Title ml='sm'>{title}</Title>
             <Box sx={{ marginLeft: 'auto', marginRight: 0 }}>
-              <Menu
-                styles={{
-                  item: {
-                    '@media (max-width: 768px)': {
-                      padding: '1rem',
-                      width: '80vw',
-                    },
-                  },
-                }}
-              >
-                <Menu.Target>
+              <Popover position='bottom-end' opened={open} onClose={() => setOpen(false)}>
+                <Popover.Target>
                   <Button
-                    leftIcon={
-                      avatar ? <Image src={avatar} height={32} radius='md' /> : <IconUserCog size='1rem' />
-                    }
-                    variant='subtle'
-                    color='gray'
-                    compact
+                    leftIcon={avatar ? <Image src={avatar} height={32} radius='md' /> : <SettingsIcon />}
+                    onClick={() => setOpen((o) => !o)}
+                    sx={(t) => ({
+                      backgroundColor: 'inherit',
+                      '&:hover': {
+                        backgroundColor: t.other.hover,
+                      },
+                      color: t.colorScheme === 'dark' ? 'white' : 'black',
+                    })}
                     size='xl'
                     p='sm'
                   >
                     {user.username}
                   </Button>
-                </Menu.Target>
-                <Menu.Dropdown>
-                  <Menu.Label>
-                    {user.username} ({user.id}){' '}
-                    {user.administrator && user.username !== 'administrator' ? '(Administrator)' : ''}
-                  </Menu.Label>
-                  <Menu.Item component={Link} icon={<IconFiles size='1rem' />} href='/dashboard/files'>
-                    Files
-                  </Menu.Item>
-                  <Menu.Item
-                    component={Link}
-                    icon={<IconFileUpload size='1rem' />}
-                    href='/dashboard/upload/file'
-                  >
-                    Upload File
-                  </Menu.Item>
-                  <Menu.Item component={Link} icon={<IconLink size='1rem' />} href='/dashboard/urls'>
-                    Shorten URL
-                  </Menu.Item>
+                </Popover.Target>
 
-                  <Menu.Label>Settings</Menu.Label>
-                  <Menu.Item component={Link} icon={<IconSettings size='1rem' />} href='/dashboard/manage'>
-                    Manage Account
-                  </Menu.Item>
-                  <Menu.Item
-                    icon={<IconClipboardCopy size='1rem' />}
-                    onClick={() => {
-                      openCopyToken();
-                    }}
-                  >
-                    Copy Token
-                  </Menu.Item>
-                  <Menu.Item icon={<IconLogout size='1rem' />} component={Link} href='/auth/logout'>
-                    Logout
-                  </Menu.Item>
-
-                  <Menu.Label>Danger</Menu.Label>
-                  <Menu.Item
-                    icon={<IconBackspace size='1rem' />}
-                    onClick={() => {
-                      openResetToken();
-                    }}
-                    color='red'
-                  >
-                    Reset Token
-                  </Menu.Item>
-                  <Menu.Divider />
-                  <>
-                    {oauth_providers.filter((x) =>
-                      user.oauth?.map(({ provider }) => provider.toLowerCase()).includes(x.name.toLowerCase())
-                    ).length ? (
-                      <Menu.Label>Connected Accounts</Menu.Label>
-                    ) : null}
-                    {oauth_providers
-                      .filter((x) =>
+                <Popover.Dropdown p={4} mr='md' sx={{ minWidth: '200px' }}>
+                  <Stack spacing={2}>
+                    <Menu.Label>
+                      {user.username} ({user.id}){' '}
+                      {user.administrator && user.username !== 'administrator' ? '(Administrator)' : ''}
+                    </Menu.Label>
+                    <MenuItemLink icon={<SettingsIcon />} href='/dashboard/manage'>
+                      Manage Account
+                    </MenuItemLink>
+                    <MenuItem
+                      icon={<CopyIcon />}
+                      onClick={() => {
+                        setOpen(false);
+                        openCopyToken();
+                      }}
+                    >
+                      Copy Token
+                    </MenuItem>
+                    <MenuItem
+                      icon={<DeleteIcon />}
+                      onClick={() => {
+                        setOpen(false);
+                        openResetToken();
+                      }}
+                      color='red'
+                    >
+                      Reset Token
+                    </MenuItem>
+                    <MenuItemLink icon={<LogoutIcon />} href='/auth/logout' color='red'>
+                      Logout
+                    </MenuItemLink>
+                    <Menu.Divider />
+                    <>
+                      {oauth_providers
+                        .filter((x) =>
+                          user.oauth
+                            ?.map(({ provider }) => provider.toLowerCase())
+                            .includes(x.name.toLowerCase())
+                        )
+                        .map(({ name, Icon }, i) => (
+                          <>
+                            <MenuItem
+                              sx={{ '&:hover': { backgroundColor: 'inherit' } }}
+                              key={i}
+                              py={5}
+                              px={4}
+                              icon={<Icon size={18} colorScheme={theme.colorScheme} />}
+                            >
+                              Logged in with {capitalize(name)}
+                            </MenuItem>
+                          </>
+                        ))}
+                      {oauth_providers.filter((x) =>
                         user.oauth
                           ?.map(({ provider }) => provider.toLowerCase())
                           .includes(x.name.toLowerCase())
-                      )
-                      .map(({ name, Icon }, i) => (
-                        <>
-                          <Menu.Item
-                            closeMenuOnClick={false}
-                            key={i}
-                            icon={<Icon size={18} colorScheme={theme.colorScheme} />}
-                          >
-                            Logged in with {capitalize(name)}
-                          </Menu.Item>
-                        </>
-                      ))}
-                    {oauth_providers.filter((x) =>
-                      user.oauth?.map(({ provider }) => provider.toLowerCase()).includes(x.name.toLowerCase())
-                    ).length ? (
-                      <Menu.Divider />
-                    ) : null}
-                  </>
-                  <Menu.Item closeMenuOnClick={false} icon={<IconBrush size='1rem' />}>
-                    <Select
-                      size={useMediaQuery('(max-width: 768px)') ? 'md' : 'xs'}
-                      data={Object.keys(themes).map((t) => ({
-                        value: t,
-                        label: friendlyThemeName[t],
-                      }))}
-                      value={systemTheme}
-                      onChange={handleUpdateTheme}
-                    />
-                  </Menu.Item>
-                </Menu.Dropdown>
-              </Menu>
+                      ).length ? (
+                        <Menu.Divider />
+                      ) : null}
+                    </>
+                    <MenuItem icon={<PencilIcon />}>
+                      <Select
+                        size='xs'
+                        data={Object.keys(themes).map((t) => ({
+                          value: t,
+                          label: friendlyThemeName[t],
+                        }))}
+                        value={systemTheme}
+                        onChange={handleUpdateTheme}
+                      />
+                    </MenuItem>
+                  </Stack>
+                </Popover.Dropdown>
+              </Popover>
             </Box>
           </div>
         </Header>
@@ -465,15 +476,9 @@ export default function Layout({ children, props }) {
       <Paper
         withBorder
         p='md'
-        mr='md'
-        mb='md'
         shadow='xs'
-        sx={(theme) => ({
-          '&[data-with-border]': {
-            border: `${rem(1)} solid ${
-              theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[0]
-            }`,
-          },
+        sx={(t) => ({
+          borderColor: t.colorScheme === 'dark' ? t.colors.dark[5] : t.colors.dark[0],
         })}
       >
         {children}

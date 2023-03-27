@@ -1,8 +1,8 @@
-import { File, Url, User } from '@prisma/client';
+import { Image, Url, User } from '@prisma/client';
 import config from 'lib/config';
-import { ConfigDiscordContent } from 'config/Config';
-import Logger from 'lib/logger';
-import { parseString, ParseValue } from 'utils/parser';
+import { ConfigDiscordContent } from 'lib/config/Config';
+import Logger from './logger';
+import { parseString, ParseValue } from './utils/parser';
 
 const logger = Logger.get('discord');
 
@@ -11,41 +11,37 @@ export function parseContent(
   args: ParseValue
 ): ConfigDiscordContent & { url: string } {
   return {
-    content: content.content ? parseString(content.content, args) : null,
+    content: parseString(content.content, args),
     embed: content.embed
       ? {
-          title: content.embed.title ? parseString(content.embed.title, args) : null,
-          description: content.embed.description ? parseString(content.embed.description, args) : null,
-          footer: content.embed.footer ? parseString(content.embed.footer, args) : null,
+          title: parseString(content.embed.title, args),
+          description: parseString(content.embed.description, args),
+          footer: parseString(content.embed.footer, args),
           color: content.embed.color,
           thumbnail: content.embed.thumbnail,
           timestamp: content.embed.timestamp,
           image: content.embed.image,
         }
       : null,
-    url: args.link,
+    url: args[3],
   };
 }
 
-export async function sendUpload(user: User, file: File, raw_link: string, link: string) {
+export async function sendUpload(user: User, image: Image, raw_link: string, link: string) {
   if (!config.discord.upload) return;
-  if (!config.discord.url && !config.discord.upload.url) return;
 
-  logger.debug(`discord config:\n${JSON.stringify(config.discord)}`);
   const parsed = parseContent(config.discord.upload, {
-    file,
+    file: image,
     user,
     link,
     raw_link,
   });
 
-  const isImage = file.mimetype.startsWith('image/');
+  const isImage = image.mimetype.startsWith('image/');
 
   const body = JSON.stringify({
-    username: (config.discord.username ?? config.discord.upload.username) || 'Zipline',
-    avatar_url:
-      (config.discord.avatar_url ?? config.discord.upload.avatar_url) ||
-      'https://raw.githubusercontent.com/diced/zipline/9b60147e112ec5b70170500b85c75ea621f41d03/public/zipline.png',
+    username: config.discord.username,
+    avatar_url: config.discord.avatar_url,
     content: parsed.content ?? null,
     embeds: parsed.embed
       ? [
@@ -53,7 +49,7 @@ export async function sendUpload(user: User, file: File, raw_link: string, link:
             title: parsed.embed.title ?? null,
             description: parsed.embed.description ?? null,
             url: parsed.url ?? null,
-            timestamp: parsed.embed.timestamp ? file.createdAt.toISOString() : null,
+            timestamp: parsed.embed.timestamp ? image.created_at.toISOString() : null,
             color: parsed.embed.color ?? null,
             footer: parsed.embed.footer
               ? {
@@ -77,8 +73,8 @@ export async function sendUpload(user: User, file: File, raw_link: string, link:
       : null,
   });
 
-  logger.debug('attempting to send upload notification to discord', body);
-  const res = await fetch(config.discord.url || config.discord.upload.url, {
+  logger.debug('attempting to send shorten notification to discord', body);
+  const res = await fetch(config.discord.url, {
     method: 'POST',
     body,
     headers: {
@@ -89,7 +85,7 @@ export async function sendUpload(user: User, file: File, raw_link: string, link:
   if (!res.ok) {
     const text = await res.text();
     logger
-      .error(`Failed to send upload notification to discord: ${res.status}`)
+      .error(`Failed to send shorten notification to discord: ${res.status}`)
       .error(`Received response:\n${text}`);
   }
 
@@ -98,7 +94,6 @@ export async function sendUpload(user: User, file: File, raw_link: string, link:
 
 export async function sendShorten(user: User, url: Url, link: string) {
   if (!config.discord.shorten) return;
-  if (!config.discord.url && !config.discord.shorten.url) return;
 
   const parsed = parseContent(config.discord.shorten, {
     url,
@@ -107,10 +102,8 @@ export async function sendShorten(user: User, url: Url, link: string) {
   });
 
   const body = JSON.stringify({
-    username: (config.discord.username ?? config.discord.shorten.username) || 'Zipline',
-    avatar_url:
-      (config.discord.avatar_url ?? config.discord.shorten.avatar_url) ||
-      'https://raw.githubusercontent.com/diced/zipline/9b60147e112ec5b70170500b85c75ea621f41d03/public/zipline.png',
+    username: config.discord.username,
+    avatar_url: config.discord.avatar_url,
     content: parsed.content ?? null,
     embeds: parsed.embed
       ? [
@@ -118,7 +111,7 @@ export async function sendShorten(user: User, url: Url, link: string) {
             title: parsed.embed.title ?? null,
             description: parsed.embed.description ?? null,
             url: parsed.url ?? null,
-            timestamp: parsed.embed.timestamp ? url.createdAt.toISOString() : null,
+            timestamp: parsed.embed.timestamp ? url.created_at.toISOString() : null,
             color: parsed.embed.color ?? null,
             footer: parsed.embed.footer
               ? {
@@ -131,7 +124,7 @@ export async function sendShorten(user: User, url: Url, link: string) {
   });
 
   logger.debug('attempting to send shorten notification to discord', body);
-  const res = await fetch(config.discord.url || config.discord.shorten.url, {
+  const res = await fetch(config.discord.url, {
     method: 'POST',
     body,
     headers: {

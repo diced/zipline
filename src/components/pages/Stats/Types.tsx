@@ -1,44 +1,39 @@
-import { Box, Card, Center, Grid, LoadingOverlay, Title, useMantineTheme } from '@mantine/core';
-
+import { Box, Card, Center, Grid, LoadingOverlay, Title } from '@mantine/core';
+import { ChartData } from 'chart.js';
 import { SmallTable } from 'components/SmallTable';
 import { useStats } from 'lib/queries/stats';
 import { colorHash } from 'lib/utils/client';
 import { useMemo } from 'react';
-
-import { Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
+import { Pie } from 'react-chartjs-2';
 
 export default function Types() {
   const stats = useStats();
-  const theme = useMantineTheme();
 
-  const latest = useMemo(() => {
-    if (stats.isLoading || !stats.data) return null;
+  if (stats.isLoading) return <LoadingOverlay visible />;
 
-    return stats.data[0];
-  }, [stats]);
+  const latest = stats.data[0];
 
-  const chartData = useMemo(() => {
-    if (!latest) return null;
-
-    const data = latest.data.types_count.map((type) => ({
-      name: type.mimetype,
-      value: type.count,
-      fill: colorHash(type.mimetype),
-    }));
-
+  const chartData = useMemo<{
+    uploadTypes: ChartData<'pie', number[], string>;
+  }>(() => {
     return {
-      data,
+      uploadTypes: {
+        labels: latest?.data.types_count.map((x) => x.mimetype),
+        datasets: [
+          {
+            data: latest?.data.types_count.map((x) => x.count),
+            label: ' Count',
+            backgroundColor: latest?.data.types_count.map((x) => colorHash(x.mimetype)),
+          },
+        ],
+      },
     };
   }, [latest]);
 
-  return !latest ? (
-    <LoadingOverlay visible={stats.isLoading} />
-  ) : (
-    <Box my='md'>
+  return (
+    <Box mt='md'>
       {latest.data.count_by_user.length ? (
-        <Card my='md'>
-          <Title size='h4'>Top Uploaders</Title>
-
+        <Card>
           <SmallTable
             columns={[
               { id: 'username', name: 'Name' },
@@ -48,7 +43,7 @@ export default function Types() {
           />
         </Card>
       ) : null}
-      <Card my='md'>
+      <Card>
         <Title size='h4'>Upload Types</Title>
         <Grid>
           <Grid.Col md={12} lg={8}>
@@ -62,33 +57,7 @@ export default function Types() {
           </Grid.Col>
 
           <Grid.Col md={12} lg={4}>
-            <Center>
-              {chartData && (
-                <ResponsiveContainer width='100%' height={250}>
-                  <PieChart>
-                    <Pie
-                      data={chartData.data}
-                      dataKey='value'
-                      nameKey='name'
-                      cx='50%'
-                      cy='50%'
-                      outerRadius={80}
-                      label={({ name, value }) => `${name} (${value})`}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[7] : 'white',
-                        borderColor:
-                          theme.colorScheme === 'dark' ? theme.colors.dark[7] : theme.colors.gray[3],
-                      }}
-                      itemStyle={{
-                        color: theme.colorScheme === 'dark' ? 'white' : 'black',
-                      }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              )}
-            </Center>
+            <Center>{chartData && <Pie data={chartData.uploadTypes} style={{ maxHeight: '20vh' }} />}</Center>
           </Grid.Col>
         </Grid>
       </Card>

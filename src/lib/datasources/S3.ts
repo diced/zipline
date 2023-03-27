@@ -4,7 +4,7 @@ import { ConfigS3Datasource } from 'lib/config/Config';
 import { Client } from 'minio';
 
 export class S3 extends Datasource {
-  public name = 'S3';
+  public name: string = 'S3';
   public s3: Client;
 
   public constructor(public config: ConfigS3Datasource) {
@@ -41,7 +41,7 @@ export class S3 extends Datasource {
   }
 
   public get(file: string): Promise<Readable> {
-    return new Promise((res) => {
+    return new Promise((res, rej) => {
       this.s3.getObject(this.config.bucket, file, (err, stream) => {
         if (err) res(null);
         else res(stream);
