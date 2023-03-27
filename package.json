@@ -1,6 +1,6 @@
 {
   "name": "zipline",
-  "version": "3.7.0-rc7",
+  "version": "3.7.0",
   "license": "MIT",
   "scripts": {
     "dev": "npm-run-all build:server dev:run",

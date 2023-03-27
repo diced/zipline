@@ -7,8 +7,7 @@ async function handler(_: NextApiReq, res: NextApiRes) {
 
   const pkg = JSON.parse(await readFile('package.json', 'utf8'));
 
-  // TODO: this needs to change to zipline.diced.tech once 3.7.0 is released
-  const re = await fetch('https://trunk.zipline.diced.tech/api/version?c=' + pkg.version);
+  const re = await fetch('https://zipline.diced.tech/api/version?c=' + pkg.version);
   const json = await re.json();
 
   let updateToType = 'stable';
