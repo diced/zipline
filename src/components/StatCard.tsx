@@ -1,9 +1,9 @@
 import { Card, createStyles, Group, Text } from '@mantine/core';
-import { ArrowDownRight, ArrowUpRight } from 'react-feather';
+import { IconArrowDownRight, IconArrowUpRight } from '@tabler/icons-react';
 
 const useStyles = createStyles((theme) => ({
   root: {
-    padding: theme.spacing.xl * 1.5,
+    padding: `calc(${theme.spacing.xl} * 1.5)`,
   },
 
   value: {
@@ -57,7 +57,7 @@ export default function StatCard({ stat }: StatsGridProps) {
           <>
             <Text color={stat.diff >= 0 ? 'teal' : 'red'} size='sm' weight={500} className={classes.diff}>
               <span>{stat.diff === Infinity ? '∞' : stat.diff}%</span>
-              {stat.diff >= 0 ? <ArrowUpRight size={16} /> : <ArrowDownRight size={16} />}
+              {stat.diff >= 0 ? <IconArrowUpRight size={16} /> : <IconArrowDownRight size={16} />}
             </Text>
           </>
         )}

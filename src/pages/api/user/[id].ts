@@ -21,49 +21,65 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   if (req.method === 'DELETE') {
     if (target.id === user.id) return res.badRequest("you can't delete your own account");
     if (target.administrator && !user.superAdmin) return res.forbidden('cannot delete administrator');
+    const promises = [];
 
-    const newTarget = await prisma.user.delete({
-      where: { id: target.id },
-    });
-
-    logger.debug(`deleted user ${JSON.stringify(newTarget)}`);
+    promises.push(
+      prisma.user.delete({
+        where: { id: target.id },
+      })
+    );
 
     if (req.body.delete_files) {
-      logger.debug(`attempting to delete ${newTarget.id}'s files`);
-
-      const files = await prisma.image.findMany({
+      const files = await prisma.file.findMany({
         where: {
-          userId: newTarget.id,
+          userId: target.id,
         },
       });
+
+      logger.debug(`attempting to delete ${target.id}'s files`);
 
       for (let i = 0; i !== files.length; ++i) {
         try {
-          await datasource.delete(files[i].file);
+          await datasource.delete(files[i].name);
         } catch {
-          logger.debug(`failed to find file ${files[i].file} to delete`);
+          logger.debug(`failed to find file ${files[i].name} to delete`);
         }
       }
 
-      const { count } = await prisma.image.deleteMany({
-        where: {
-          userId: newTarget.id,
-        },
-      });
-      Logger.get('users').info(
-        `User ${user.username} (${user.id}) deleted ${count} files of user ${newTarget.username} (${newTarget.id})`
+      promises.unshift(
+        prisma.file.deleteMany({
+          where: {
+            userId: target.id,
+          },
+        })
       );
     }
+    Promise.all(promises).then((promised) => {
+      const newTarget = promised[1];
+      const { count } = promised[0];
+      logger.debug(`deleted user ${JSON.stringify(newTarget)}`);
 
-    logger.info(`User ${user.username} (${user.id}) deleted user ${newTarget.username} (${newTarget.id})`);
+      req.body.delete_files
+        ? logger.info(
+            `User ${user.username} (${user.id}) deleted ${count} files of user ${newTarget.username} (${newTarget.id})`
+          )
+        : logger.info(
+            `User ${user.username} (${user.id}) deleted user ${newTarget.username} (${newTarget.id})`
+          );
 
-    delete newTarget.password;
+      delete newTarget.password;
 
-    return res.json(newTarget);
+      return res.json(newTarget);
+    });
   } else if (req.method === 'PATCH') {
-    if (target.administrator && !user.superAdmin) return res.forbidden('cannot modify administrator');
+    if (
+      (target.administrator && !user.superAdmin) ||
+      (target.administrator && user.administrator && !user.superAdmin)
+    )
+      return res.forbidden('cannot modify administrator');
 
     logger.debug(`attempting to update user ${id} with ${JSON.stringify(req.body)}`);
+    logger.debug(`user ${id} has ${!req.body.administrator} in administrator`);
 
     if (req.body.password) {
       const hashed = await hashPassword(req.body.password);
@@ -73,7 +89,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       });
     }
 
-    if (req.body.administrator) {
+    if (typeof req.body.administrator != 'undefined') {
       await prisma.user.update({
         where: { id: target.id },
         data: { administrator: req.body.administrator },
@@ -101,22 +117,10 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
         data: { avatar: req.body.avatar },
       });
 
-    if (req.body.embedTitle)
+    if (req.body.embed)
       await prisma.user.update({
         where: { id: target.id },
-        data: { embedTitle: req.body.embedTitle },
-      });
-
-    if (req.body.embedColor)
-      await prisma.user.update({
-        where: { id: target.id },
-        data: { embedColor: req.body.embedColor },
-      });
-
-    if (req.body.embedSiteName)
-      await prisma.user.update({
-        where: { id: target.id },
-        data: { embedSiteName: req.body.embedSiteName },
+        data: { embed: req.body.embed },
       });
 
     if (req.body.systemTheme)
@@ -180,3 +184,11 @@ export default withZipline(handler, {
   user: true,
   administrator: true,
 });
+
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '50mb',
+    },
+  },
+};

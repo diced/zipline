@@ -56,14 +56,38 @@ export const withOAuth =
 
     const { state } = req.query as { state?: string };
 
-    const existingOauth = await prisma.oAuth.findUnique({
-      where: {
-        provider_oauthId: {
-          provider: provider.toUpperCase() as OauthProviders,
-          oauthId: oauth_resp.user_id,
+    let existingOauth;
+    try {
+      existingOauth = await prisma.oAuth.findUniqueOrThrow({
+        where: {
+          provider_oauthId: {
+            provider: provider.toUpperCase() as OauthProviders,
+            oauthId: oauth_resp.user_id as string,
+          },
         },
-      },
-    });
+      });
+    } catch (e) {
+      logger.debug(`Failed to find existing oauth. Using fallback. ${e}`);
+      if (e.code === 'P2022' || e.code === 'P2025') {
+        const existing = await prisma.user.findFirst({
+          where: {
+            oauth: {
+              some: {
+                provider: provider.toUpperCase() as OauthProviders,
+                username: oauth_resp.username,
+              },
+            },
+          },
+          include: {
+            oauth: true,
+          },
+        });
+        existingOauth = existing?.oauth?.find((o) => o.provider === provider.toUpperCase());
+        if (existingOauth) existingOauth.fallback = true;
+      } else {
+        logger.error(`Failed to find existing oauth. ${e}`);
+      }
+    }
 
     const existingUser = await prisma.user.findFirst({
       where: {
@@ -98,7 +122,7 @@ export const withOAuth =
                 token: oauth_resp.access_token,
                 refresh: oauth_resp.refresh_token || null,
                 username: oauth_resp.username,
-                oauthId: oauth_resp.user_id,
+                oauthId: oauth_resp.user_id as string,
               },
             },
             avatar: oauth_resp.avatar,
@@ -119,13 +143,13 @@ export const withOAuth =
       logger.debug(`attempting to refresh ${provider} account for ${user.username}`);
       await prisma.oAuth.update({
         where: {
-          id: userOauth!.id,
+          id: userOauth?.id,
         },
         data: {
           token: oauth_resp.access_token,
           refresh: oauth_resp.refresh_token || null,
           username: oauth_resp.username,
-          oauthId: oauth_resp.user_id,
+          oauthId: oauth_resp.user_id as string,
         },
       });
 
@@ -133,16 +157,16 @@ export const withOAuth =
       logger.info(`User ${user.username} (${user.id}) logged in via oauth(${provider})`);
 
       return res.redirect('/dashboard');
-    } else if (existingOauth) {
+    } else if ((existingOauth && existingOauth.fallback) || existingOauth) {
       await prisma.oAuth.update({
         where: {
-          id: existingOauth!.id,
+          id: existingOauth?.id,
         },
         data: {
           token: oauth_resp.access_token,
           refresh: oauth_resp.refresh_token || null,
           username: oauth_resp.username,
-          oauthId: oauth_resp.user_id,
+          oauthId: oauth_resp.user_id as string,
         },
       });
 
@@ -158,28 +182,35 @@ export const withOAuth =
       return oauthError(`Username ${oauth_resp.username} is already taken, unable to create account.`);
 
     logger.debug('creating new user via oauth');
-    const nuser = await prisma.user.create({
-      data: {
-        username: oauth_resp.username,
-        token: createToken(),
-        oauth: {
-          create: {
-            provider: OauthProviders[provider.toUpperCase()],
-            token: oauth_resp.access_token,
-            refresh: oauth_resp.refresh_token || null,
-            username: oauth_resp.username,
-            oauthId: oauth_resp.user_id,
+    try {
+      const nuser = await prisma.user.create({
+        data: {
+          username: oauth_resp.username,
+          token: createToken(),
+          oauth: {
+            create: {
+              provider: OauthProviders[provider.toUpperCase()],
+              token: oauth_resp.access_token,
+              refresh: oauth_resp.refresh_token || null,
+              username: oauth_resp.username,
+              oauthId: oauth_resp.user_id as string,
+            },
           },
+          avatar: oauth_resp.avatar,
         },
-        avatar: oauth_resp.avatar,
-      },
-    });
+      });
 
-    logger.debug(`created user ${JSON.stringify(nuser)} via oauth(${provider})`);
-    logger.info(`Created user ${nuser.username} via oauth(${provider})`);
+      logger.debug(`created user ${JSON.stringify(nuser)} via oauth(${provider})`);
+      logger.info(`Created user ${nuser.username} via oauth(${provider})`);
 
-    res.setUserCookie(nuser.id);
-    logger.info(`User ${nuser.username} (${nuser.id}) logged in via oauth(${provider})`);
+      res.setUserCookie(nuser.id);
+      logger.info(`User ${nuser.username} (${nuser.id}) logged in via oauth(${provider})`);
 
-    return res.redirect('/dashboard');
+      return res.redirect('/dashboard');
+    } catch (e) {
+      if (e.code === 'P2002') {
+        logger.debug(`account already linked with ${provider}`);
+        return oauthError('This account is already linked with another user.');
+      } else throw e;
+    }
   };

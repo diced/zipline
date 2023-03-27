@@ -2,8 +2,8 @@ import { Alert, Button, Card, Container, Group, Select, Tabs, Title } from '@man
 import { useClipboard } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
 import { showNotification, updateNotification } from '@mantine/notifications';
+import { IconCursorText, IconFileInfinity, IconFileUpload, IconPhoto } from '@tabler/icons-react';
 import CodeInput from 'components/CodeInput';
-import { ImageIcon, TypeIcon, UploadIcon } from 'components/icons';
 import KaTeX from 'components/render/KaTeX';
 import Markdown from 'components/render/Markdown';
 import PrismCode from 'components/render/PrismCode';
@@ -31,7 +31,7 @@ export default function Text() {
   const handleUpload = async () => {
     const file = new File([value], 'text.' + lang);
 
-    const expires_at = options.expires === 'never' ? null : expireReadToDate(options.expires);
+    const expiresAt = options.expires === 'never' ? null : expireReadToDate(options.expires);
 
     showNotification({
       id: 'upload-text',
@@ -63,28 +63,30 @@ export default function Text() {
     req.setRequestHeader('Authorization', user.token);
     req.setRequestHeader('UploadText', 'true');
 
-    options.expires !== 'never' && req.setRequestHeader('Expires-At', 'date=' + expires_at.toISOString());
+    options.expires !== 'never' && req.setRequestHeader('Expires-At', 'date=' + expiresAt.toISOString());
     options.password.trim() !== '' && req.setRequestHeader('Password', options.password);
     options.maxViews && options.maxViews !== 0 && req.setRequestHeader('Max-Views', String(options.maxViews));
     options.compression !== 'none' && req.setRequestHeader('Image-Compression-Percent', options.compression);
     options.embedded && req.setRequestHeader('Embed', 'true');
     options.zeroWidth && req.setRequestHeader('Zws', 'true');
     options.format !== 'default' && req.setRequestHeader('Format', options.format);
+    options.originalName && req.setRequestHeader('Original-Name', 'true');
+    options.overrideDomain && req.setRequestHeader('Override-Domain', options.overrideDomain);
 
     req.send(body);
   };
 
   return (
     <>
-      <OptionsModal />
+      {OptionsModal}
       <Title mb='md'>Upload Text</Title>
 
       <Tabs defaultValue='text' variant='pills'>
         <Tabs.List>
-          <Tabs.Tab value='text' icon={<TypeIcon />}>
+          <Tabs.Tab value='text' icon={<IconCursorText size='1rem' />}>
             Text
           </Tabs.Tab>
-          <Tabs.Tab value='preview' icon={<ImageIcon />}>
+          <Tabs.Tab value='preview' icon={<IconPhoto size='1rem' />}>
             Preview
           </Tabs.Tab>
         </Tabs.List>
@@ -123,7 +125,7 @@ export default function Text() {
           onChange={setLang}
           dropdownPosition='top'
           data={Object.keys(exts).map((x) => ({ value: x, label: exts[x] }))}
-          icon={<TypeIcon />}
+          icon={<IconFileInfinity size='1rem' />}
           searchable
         />
 
@@ -132,7 +134,7 @@ export default function Text() {
         </Button>
 
         <Button
-          leftIcon={<UploadIcon />}
+          leftIcon={<IconFileUpload size='1rem' />}
           onClick={handleUpload}
           disabled={value.trim().length === 0 ? true : false}
         >

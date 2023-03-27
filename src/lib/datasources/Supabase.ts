@@ -1,11 +1,11 @@
 import { Datasource } from '.';
 import { ConfigSupabaseDatasource } from 'lib/config/Config';
-import { guess } from '../mimes';
-import Logger from '../logger';
+import { guess } from 'lib/mimes';
+import Logger from 'lib/logger';
 import { Readable } from 'stream';
 
 export class Supabase extends Datasource {
-  public name: string = 'Supabase';
+  public name = 'Supabase';
   public logger: Logger = Logger.get('datasource::supabase');
 
   public constructor(public config: ConfigSupabaseDatasource) {
@@ -81,11 +81,12 @@ export class Supabase extends Datasource {
       },
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return Readable.fromWeb(r.body as any);
   }
 
   public size(file: string): Promise<number> {
-    return new Promise(async (res, rej) => {
+    return new Promise(async (res) => {
       fetch(`${this.config.url}/storage/v1/object/list/${this.config.bucket}`, {
         method: 'POST',
         headers: {
@@ -114,7 +115,7 @@ export class Supabase extends Datasource {
   }
 
   public async fullSize(): Promise<number> {
-    return new Promise((res, rej) => {
+    return new Promise((res) => {
       fetch(`${this.config.url}/storage/v1/object/list/${this.config.bucket}`, {
         method: 'POST',
         headers: {

@@ -1,6 +1,6 @@
 import { Box, Button, Center, Group, PasswordInput, Stepper, TextInput } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
-import { CrossIcon, UserIcon } from 'components/icons';
+import { IconUserPlus, IconUserX } from '@tabler/icons-react';
 import PasswordStrength from 'components/PasswordStrength';
 import useFetch from 'hooks/useFetch';
 import config from 'lib/config';
@@ -51,7 +51,7 @@ export default function Register({ code, title, user_registration }) {
   };
 
   const createUser = async () => {
-    const res = await useFetch('/api/auth/create', 'POST', {
+    const res = await useFetch(`/api/auth/${user_registration ? 'register' : 'create'}`, 'POST', {
       code: user_registration ? null : code,
       username,
       password,
@@ -62,14 +62,14 @@ export default function Register({ code, title, user_registration }) {
         title: 'Error while creating user',
         message: res.error,
         color: 'red',
-        icon: <CrossIcon />,
+        icon: <IconUserX />,
       });
     } else {
       showNotification({
         title: 'User created',
         message: 'You will be logged in shortly...',
         color: 'green',
-        icon: <UserIcon />,
+        icon: <IconUserPlus />,
       });
 
       setUser(null);
@@ -178,7 +178,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     if (!invite) return { notFound: true };
     if (invite.used) return { notFound: true };
 
-    if (invite.expires_at && invite.expires_at < new Date()) {
+    if (invite.expiresAt && invite.expiresAt < new Date()) {
       logger.debug(`restricting access to ${JSON.stringify(invite)} as it has expired`);
 
       return { notFound: true };

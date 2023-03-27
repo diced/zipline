@@ -10,12 +10,12 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   if (!config.features.invites) return res.badRequest('invites are disabled');
 
   if (req.method === 'POST') {
-    const { expires_at, count } = req.body as {
-      expires_at: string;
+    const { expiresAt, count } = req.body as {
+      expiresAt: string;
       count: number;
     };
 
-    const expiry = expires_at ? new Date(expires_at) : null;
+    const expiry = expiresAt ? new Date(expiresAt) : null;
     if (expiry) {
       if (!expiry.getTime()) return res.badRequest('invalid date');
       if (expiry.getTime() < Date.now()) return res.badRequest('date is in the past');
@@ -28,7 +28,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
         data.push({
           code: randomChars(config.features.invites_length),
           createdById: user.id,
-          expires_at: expiry,
+          expiresAt: expiry,
         });
       }
 
@@ -48,7 +48,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
         data: {
           code: randomChars(config.features.invites_length),
           createdById: user.id,
-          expires_at: expiry,
+          expiresAt: expiry,
         },
       });
 
@@ -78,7 +78,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   } else {
     const invites = await prisma.invite.findMany({
       orderBy: {
-        created_at: 'desc',
+        createdAt: 'desc',
       },
     });
 

@@ -2,7 +2,6 @@ version: '3'
 services:
   postgres:
     image: postgres:15
-    restart: always
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -21,7 +20,6 @@ services:
       dockerfile: Dockerfile
     ports:
       - '3000:3000'
-    restart: unless-stopped
     env_file:
       - .env.local
     volumes:

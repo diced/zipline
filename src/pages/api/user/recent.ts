@@ -1,5 +1,6 @@
 import config from 'lib/config';
 import prisma from 'lib/prisma';
+import { formatRootUrl } from 'lib/utils/urls';
 import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'middleware/withZipline';
 
 async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
@@ -7,33 +8,36 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
 
   if (take >= 50) return res.badRequest("take can't be more than 50");
 
-  let images = await prisma.image.findMany({
+  let files = await prisma.file.findMany({
     take,
     where: {
       userId: user.id,
     },
     orderBy: {
-      created_at: 'desc',
+      createdAt: 'desc',
     },
     select: {
-      created_at: true,
-      expires_at: true,
-      file: true,
+      createdAt: true,
+      expiresAt: true,
+      name: true,
       mimetype: true,
       id: true,
       views: true,
       maxViews: true,
+      folderId: true,
+      size: true,
+      favorite: true,
     },
   });
 
-  for (let i = 0; i !== images.length; ++i) {
-    (images[i] as unknown as { url: string }).url = `${config.uploader.route}/${images[i].file}`;
+  for (let i = 0; i !== files.length; ++i) {
+    (files[i] as unknown as { url: string }).url = formatRootUrl(config.uploader.route, files[i].name);
   }
 
   if (req.query.filter && req.query.filter === 'media')
-    images = images.filter((x) => /^(video|audio|image)/.test(x.mimetype));
+    files = files.filter((x) => /^(video|audio|image)/.test(x.mimetype));
 
-  return res.json(images);
+  return res.json(files);
 }
 
 export default withZipline(handler, {

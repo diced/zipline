@@ -1,5 +1,5 @@
 import { Alert } from '@mantine/core';
-import katex, { ParseError } from 'katex';
+import type { ParseError } from 'katex';
 import { useEffect, useState } from 'react';
 
 import 'katex/dist/katex.min.css';
@@ -21,21 +21,24 @@ export default function KaTeX({ code, ...props }) {
   };
 
   useEffect(() => {
-    try {
-      const html = katex.renderToString(code, {
-        displayMode: true,
-        throwOnError: true,
-        errorColor: '#f44336',
-      });
+    (async () => {
+      const katex = await import('katex');
+      try {
+        const html = katex.default.renderToString(code, {
+          displayMode: true,
+          throwOnError: true,
+          errorColor: '#f44336',
+        });
 
-      setRendered(html);
-    } catch (e) {
-      if (e instanceof Error) {
-        setError(renderError(e));
-      } else {
-        throw e;
+        setRendered(html);
+      } catch (e) {
+        if (e instanceof Error) {
+          setError(renderError(e));
+        } else {
+          throw e;
+        }
       }
-    }
+    })();
   }, [rendered, error, code]);
 
   if (error) return error;

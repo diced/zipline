@@ -7,62 +7,92 @@ import {
   Select,
   Stack,
   Switch,
+  TextInput,
   Title,
 } from '@mantine/core';
-import { ClockIcon, ImageIcon, KeyIcon, TypeIcon, UserIcon } from 'components/icons';
-import React, { Dispatch, SetStateAction, useState } from 'react';
+import { IconAlarm, IconEye, IconFileInfo, IconKey, IconPhotoDown, IconWorld } from '@tabler/icons-react';
+import React, { Dispatch, ReactNode, SetStateAction, useReducer, useState } from 'react';
 
-export default function useUploadOptions(): [
-  {
-    expires: string;
-    password: string;
-    maxViews: number;
-    compression: string;
-    zeroWidth: boolean;
-    embedded: boolean;
-    format: string;
-  },
-  Dispatch<SetStateAction<boolean>>,
-  React.FC
-] {
-  const [expires, setExpires] = useState('never');
-  const [password, setPassword] = useState('');
-  const [maxViews, setMaxViews] = useState(0);
-  const [compression, setCompression] = useState<string>('none');
-  const [zeroWidth, setZeroWidth] = useState(false);
-  const [embedded, setEmbedded] = useState(false);
-  const [format, setFormat] = useState('default');
+export type UploadOptionsState = {
+  expires: string;
+  password: string;
+  maxViews: number;
+  compression: string;
+  zeroWidth: boolean;
+  embedded: boolean;
+  format: string;
+  originalName: boolean;
+  overrideDomain: string;
+};
 
-  const [opened, setOpened] = useState(false);
+const DEFAULT_OD_DESC = 'Override the default domain(s). Type in a URL, e.g https://example.com';
 
-  const reset = () => {
-    setExpires('never');
-    setPassword('');
-    setMaxViews(0);
-    setCompression('none');
-    setZeroWidth(false);
-    setEmbedded(false);
-    setFormat('default');
+export function OptionsModal({
+  opened,
+  setOpened,
+  state,
+  setState,
+  reset,
+}: {
+  opened: boolean;
+  setOpened: Dispatch<SetStateAction<boolean>>;
+  state: UploadOptionsState;
+  setState: Dispatch<
+    SetStateAction<{
+      [key in keyof UploadOptionsState]?: UploadOptionsState[key];
+    }>
+  >;
+  reset: () => void;
+}) {
+  const [odState, setODState] = useReducer((state, newState) => ({ ...state, ...newState }), {
+    description: DEFAULT_OD_DESC,
+    error: '',
+  });
+
+  const handleOD = (e) => {
+    setODState({ error: '' });
+
+    if (e.currentTarget.value === '') {
+      setODState({ description: DEFAULT_OD_DESC, error: '' });
+      setState({ overrideDomain: '' });
+      return;
+    }
+
+    try {
+      const url = new URL(e.currentTarget.value);
+      setODState({
+        description: (
+          <>
+            {DEFAULT_OD_DESC}
+            <br />
+            <br />
+            Using domain &quot;<b>{url.hostname}</b>&quot;
+          </>
+        ),
+      });
+      setState({ overrideDomain: url.hostname });
+    } catch (e) {
+      setODState({ error: 'Invalid URL' });
+    }
   };
 
-  const OptionsModal: React.FC = () => (
-    <Modal title={<Title>Upload Options</Title>} size='auto' opened={opened} onClose={() => setOpened(false)}>
+  return (
+    <Modal title={<Title>Upload Options</Title>} size='lg' opened={opened} onClose={() => setOpened(false)}>
       <Stack>
         <NumberInput
           label='Max Views'
           description='The maximum number of times this file can be viewed. Leave blank for unlimited views.'
-          value={maxViews}
-          onChange={setMaxViews}
+          value={state.maxViews}
+          onChange={(e) => setState({ maxViews: e === '' ? undefined : e })}
           min={0}
-          icon={<UserIcon />}
+          icon={<IconEye size='1rem' />}
         />
-
         <Select
           label='Expires'
           description='The date and time this file will expire. Leave blank for never.'
-          value={expires}
-          onChange={(e) => setExpires(e)}
-          icon={<ClockIcon size={14} />}
+          value={state.expires}
+          onChange={(e) => setState({ expires: e })}
+          icon={<IconAlarm size='1rem' />}
           data={[
             { value: 'never', label: 'Never' },
             { value: '5min', label: '5 minutes' },
@@ -92,62 +122,83 @@ export default function useUploadOptions(): [
             { value: '6m', label: '6 months' },
             { value: '8m', label: '8 months' },
             { value: '1y', label: '1 year' },
+            {
+              value: null,
+              label: 'Need more freedom? Set an exact date and time through the API.',
+              disabled: true,
+            },
           ]}
         />
-
         <Select
           label='Compression'
           description='The compression level to use when uploading this file. Leave blank for default.'
-          value={compression}
-          onChange={(e) => setCompression(e)}
-          icon={<ImageIcon />}
+          value={state.compression}
+          onChange={(e) => setState({ compression: e })}
+          icon={<IconPhotoDown size='1rem' />}
           data={[
             { value: 'none', label: 'None' },
             { value: '25', label: 'Low (25%)' },
             { value: '50', label: 'Medium (50%)' },
             { value: '75', label: 'High (75%)' },
+            { value: '100', label: 'Maximum (100%)' },
+            {
+              value: null,
+              label: 'Need more freedom? Set a custom compression level through the API.',
+              disabled: true,
+            },
           ]}
         />
-
         <Select
           label='Format'
           description="The file name format to use when uploading this file. Leave blank for the server's default."
-          value={format}
-          onChange={(e) => setFormat(e)}
-          icon={<TypeIcon />}
+          value={state.format}
+          onChange={(e) => setState({ format: e })}
+          icon={<IconFileInfo size='1rem' />}
           data={[
             { value: 'default', label: 'Default' },
-            { value: 'RANDOM', label: 'Random' },
-            { value: 'NAME', label: 'Original Name' },
-            { value: 'DATE', label: 'Date (format configured by server)' },
-            { value: 'UUID', label: 'UUID' },
+            { value: 'random', label: 'Random' },
+            { value: 'name', label: 'Original Name' },
+            { value: 'date', label: 'Date (format configured by server)' },
+            { value: 'uuid', label: 'UUID' },
+            { value: 'gfycat', label: 'Gfycat' },
           ]}
         />
-
         <PasswordInput
           label='Password'
           description='The password required to view this file. Leave blank for no password.'
-          value={password}
-          onChange={(e) => setPassword(e.currentTarget.value)}
-          icon={<KeyIcon />}
+          value={state.password}
+          onChange={(e) => setState({ password: e.currentTarget.value })}
+          icon={<IconKey size='1rem' />}
         />
-
+        <TextInput
+          label='Override Domain'
+          onChange={handleOD}
+          icon={<IconWorld size='1rem' />}
+          description={odState.description}
+          error={odState.error}
+        />
         <Group>
           <Switch
             label='Zero Width'
             description='Whether or not to use zero width characters for the file name.'
-            checked={zeroWidth}
-            onChange={(e) => setZeroWidth(e.currentTarget.checked)}
+            checked={state.zeroWidth}
+            onChange={(e) => setState({ zeroWidth: e.currentTarget.checked })}
           />
 
           <Switch
             label='Embedded'
             description='Whether or not to embed with OG tags for this file.'
-            checked={embedded}
-            onChange={(e) => setEmbedded(e.currentTarget.checked)}
+            checked={state.embedded}
+            onChange={(e) => setState({ embedded: e.currentTarget.checked })}
+          />
+
+          <Switch
+            label='Keep Original Name'
+            description='Whether or not to show the original name when downloading this specific file. This will not change the name format in the URL.'
+            checked={state.originalName}
+            onChange={(e) => setState({ originalName: e.currentTarget.checked })}
           />
         </Group>
-
         <Group grow>
           <Button onClick={() => reset()} color='red'>
             Reset Options
@@ -157,18 +208,51 @@ export default function useUploadOptions(): [
       </Stack>
     </Modal>
   );
+}
+
+export default function useUploadOptions(): [
+  UploadOptionsState,
+  Dispatch<SetStateAction<boolean>>,
+  ReactNode
+] {
+  const [state, setState] = useReducer((state, newState) => ({ ...state, ...newState }), {
+    expires: 'never',
+    password: '',
+    maxViews: 0,
+    compression: 'none',
+    zeroWidth: false,
+    embedded: false,
+    format: 'default',
+    originalName: false,
+    overrideDomain: '',
+  } as UploadOptionsState);
+
+  const [opened, setOpened] = useState(false);
+
+  const reset = () => {
+    setState({
+      expires: 'never',
+      password: '',
+      maxViews: 0,
+      compression: 'none',
+      zeroWidth: false,
+      embedded: false,
+      format: 'default',
+      originalName: false,
+      overrideDomain: '',
+    });
+  };
 
   return [
-    {
-      expires,
-      password,
-      maxViews,
-      compression,
-      zeroWidth,
-      embedded,
-      format,
-    },
+    state,
     setOpened,
-    OptionsModal,
+    <OptionsModal
+      state={state}
+      setState={setState}
+      reset={reset}
+      opened={opened}
+      setOpened={setOpened}
+      key={1}
+    />,
   ];
 }

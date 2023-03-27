@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { hash } from 'argon2';
-import config from '../lib/config';
-import { migrations } from '../server/util';
+import config from 'lib/config';
+import { migrations } from 'server/util';
 
 const SUPPORTED_FIELDS = [
   'username',
@@ -11,9 +11,7 @@ const SUPPORTED_FIELDS = [
   'token',
   'superAdmin',
   'systemTheme',
-  'embedTitle',
-  'embedColor',
-  'embedSiteName',
+  'embed',
   'ratelimit',
   'domains',
 ];

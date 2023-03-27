@@ -1,4 +1,3 @@
-import datasource from 'lib/datasource';
 import Logger from 'lib/logger';
 import prisma from 'lib/prisma';
 import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'middleware/withZipline';
@@ -7,8 +6,18 @@ const logger = Logger.get('admin');
 
 async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   try {
-    const { count } = await prisma.image.deleteMany({});
-    logger.info(`User ${user.username} (${user.id}) cleared the database of ${count} images`);
+    const { datasource, orphaned } = req.body;
+    if (orphaned) {
+      const { count } = await prisma.file.deleteMany({
+        where: {
+          userId: null,
+        },
+      });
+      logger.info(`User ${user.username} (${user.id}) cleared the database of ${count} orphaned files`);
+      return res.json({ message: 'cleared storage (orphaned only)' });
+    }
+    const { count } = await prisma.file.deleteMany({});
+    logger.info(`User ${user.username} (${user.id}) cleared the database of ${count} files`);
 
     if (req.body.datasource) {
       await datasource.clear();
