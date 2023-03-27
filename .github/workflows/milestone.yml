@@ -15,7 +15,7 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            const milestone = 2
+            const milestone = 3
             github.issues.update({
               issue_number: context.issue.number,
               owner: context.repo.owner,
