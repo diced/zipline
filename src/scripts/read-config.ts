@@ -1,3 +1,4 @@
 import config from 'lib/config';
+import { inspect } from 'util';
 
-console.log(JSON.stringify(config, null, 2));
+console.log(inspect(config, { depth: Infinity, colors: true }));
