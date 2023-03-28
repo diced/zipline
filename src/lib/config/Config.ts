@@ -1,5 +1,6 @@
 export interface ConfigCore {
   return_https: boolean;
+  temp_directory: string;
   secret: string;
   host: string;
   port: number;

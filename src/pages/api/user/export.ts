@@ -5,7 +5,6 @@ import datasource from 'lib/datasource';
 import Logger from 'lib/logger';
 import prisma from 'lib/prisma';
 import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'middleware/withZipline';
-import { tmpdir } from 'os';
 import { join } from 'path';
 
 const logger = Logger.get('user::export');
@@ -22,7 +21,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
 
     const zip = new Zip();
     const export_name = `zipline_export_${user.id}_${Date.now()}.zip`;
-    const path = join(tmpdir(), export_name);
+    const path = join(config.core.temp_directory, export_name);
 
     logger.debug(`creating write stream at ${path}`);
     const write_stream = createWriteStream(path);
@@ -121,18 +120,18 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       const parts = export_name.split('_');
       if (Number(parts[2]) !== user.id) return res.unauthorized('cannot access export owned by another user');
 
-      const stream = createReadStream(join(tmpdir(), export_name));
+      const stream = createReadStream(join(config.core.temp_directory, export_name));
 
       res.setHeader('Content-Type', 'application/zip');
       res.setHeader('Content-Disposition', `attachment; filename="${export_name}"`);
       stream.pipe(res);
     } else {
-      const files = await readdir(tmpdir());
+      const files = await readdir(config.core.temp_directory);
       const exp = files.filter((f) => f.startsWith('zipline_export_'));
       const exports = [];
       for (let i = 0; i !== exp.length; ++i) {
         const name = exp[i];
-        const stats = await stat(join(tmpdir(), name));
+        const stats = await stat(join(config.core.temp_directory, name));
 
         if (Number(exp[i].split('_')[2]) !== user.id) continue;
         exports.push({ name, size: stats.size });
