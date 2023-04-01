@@ -71,18 +71,6 @@ export default function File({ chunks: chunks_config }) {
           await new Promise((resolve) => setTimeout(resolve, 100));
         }
 
-        // if last chunk send notif that it will take a while
-        if (j === chunks.length - 1) {
-          updateNotification({
-            id: 'upload-chunked',
-            title: 'Finalizing partial upload',
-            message: 'This may take a while...',
-            icon: <IconFileTime size='1rem' />,
-            color: 'yellow',
-            autoClose: false,
-          });
-        }
-
         const body = new FormData();
         body.append('file', chunks[j].blob);
 
@@ -109,25 +97,18 @@ export default function File({ chunks: chunks_config }) {
               if (j === chunks.length - 1) {
                 updateNotification({
                   id: 'upload-chunked',
-                  title: 'Upload Successful',
-                  message: '',
+                  title: 'Finalizing partial upload',
+                  message:
+                    'The upload has been offloaded, and will complete in the background. You can see processing files in the files tab.',
+                  icon: <IconFileTime size='1rem' />,
                   color: 'green',
-                  icon: <IconFileUpload size='1rem' />,
+                  autoClose: true,
                 });
-                showFilesModal(clipboard, modals, json.files);
                 invalidateFiles();
                 setFiles([]);
                 setProgress(100);
 
                 setTimeout(() => setProgress(0), 1000);
-
-                clipboard.copy(json.files[0]);
-                if (!navigator.clipboard)
-                  showNotification({
-                    title: 'Unable to copy to clipboard',
-                    message: 'Zipline is unable to copy to clipboard due to security reasons.',
-                    color: 'red',
-                  });
               }
 
               ready = true;
