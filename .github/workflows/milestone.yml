@@ -6,14 +6,15 @@ on:
   issues:
     types: [opened, reopened]
 
+permissions:
+  issues: write
+  checks: write
+  contents: read
+  pull-requests: write
+
 jobs:
   set:
     runs-on: ubuntu-latest
-    permissions:
-      issues: write
-      checks: write
-      contents: read
-      pull-requests: write
 
     steps:
       - uses: actions/checkout@v2
