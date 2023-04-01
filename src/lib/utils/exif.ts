@@ -3,7 +3,6 @@ import { createWriteStream } from 'fs';
 import { ExifTool, Tags } from 'exiftool-vendored';
 import datasource from 'lib/datasource';
 import Logger from 'lib/logger';
-import { tmpdir } from 'os';
 import { join } from 'path';
 import { readFile, unlink } from 'fs/promises';
 
@@ -34,7 +33,7 @@ export async function readMetadata(filePath: string): Promise<Tags> {
 
 export async function removeGPSData(image: File): Promise<void> {
   const exiftool = new ExifTool({ cleanupChildProcs: false });
-  const file = join(tmpdir(), `zipline-exif-remove-${Date.now()}-${image.name}`);
+  const file = join(config.core.temp_directory, `zipline-exif-remove-${Date.now()}-${image.name}`);
   logger.debug(`writing temp file to remove GPS data: ${file}`);
 
   const stream = await datasource.get(image.name);

@@ -12,7 +12,6 @@ import { createInvisImage, hashPassword } from 'lib/util';
 import { parseExpiry } from 'lib/utils/client';
 import { removeGPSData } from 'lib/utils/exif';
 import multer from 'multer';
-import { tmpdir } from 'os';
 import { join } from 'path';
 import sharp from 'sharp';
 
@@ -104,12 +103,12 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       })}`
     );
 
-    const tempFile = join(tmpdir(), `zipline_partial_${identifier}_${start}_${end}`);
+    const tempFile = join(zconfig.core.temp_directory, `zipline_partial_${identifier}_${start}_${end}`);
     logger.debug(`writing partial to disk ${tempFile}`);
     await writeFile(tempFile, req.files[0].buffer);
 
     if (lastchunk) {
-      const partials = await readdir(tmpdir()).then((files) =>
+      const partials = await readdir(zconfig.core.temp_directory).then((files) =>
         files.filter((x) => x.startsWith(`zipline_partial_${identifier}`))
       );
 
@@ -124,8 +123,8 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       for (let i = 0; i !== readChunks.length; ++i) {
         const chunkData = readChunks[i];
 
-        const buffer = await readFile(join(tmpdir(), chunkData.filename));
-        await unlink(join(tmpdir(), readChunks[i].filename));
+        const buffer = await readFile(join(zconfig.core.temp_directory, chunkData.filename));
+        await unlink(join(zconfig.core.temp_directory, readChunks[i].filename));
 
         chunks.set(buffer, chunkData.start);
       }
