@@ -12,10 +12,10 @@ ALTER TABLE "OAuth" DROP CONSTRAINT "OAuth_userId_fkey";
 ALTER TABLE "OAuth" ALTER COLUMN "userId" SET DATA TYPE TEXT;
 
 -- AlterTable
-ALTER TABLE "User" ADD COLUMN     "uuid" TEXT NOT NULL;
+ALTER TABLE "User" ADD COLUMN     "cuid" TEXT NOT NULL;
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User_uuid_key" ON "User"("uuid");
+CREATE UNIQUE INDEX "User_uuid_key" ON "User"("cuid");
 
 -- AddForeignKey
-ALTER TABLE "OAuth" ADD CONSTRAINT "OAuth_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("uuid") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "OAuth" ADD CONSTRAINT "OAuth_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("cuid") ON DELETE CASCADE ON UPDATE CASCADE;
