@@ -13,8 +13,11 @@ import { useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import showFilesModal from './showFilesModal';
 import useUploadOptions from './useUploadOptions';
+import { useRouter } from 'next/router';
 
 export default function File({ chunks: chunks_config }) {
+  const router = useRouter();
+
   const clipboard = useClipboard();
   const modals = useModals();
   const user = useRecoilValue(userSelector);
@@ -24,6 +27,24 @@ export default function File({ chunks: chunks_config }) {
   const [loading, setLoading] = useState(false);
 
   const [options, setOpened, OptionsModal] = useUploadOptions();
+
+  const beforeUnload = (e: BeforeUnloadEvent) => {
+    if (loading) {
+      e.preventDefault();
+      e.returnValue = "Are you sure you want to leave? Your upload(s) won't be saved.";
+      return e.returnValue;
+    }
+  };
+
+  const beforeRouteChange = (url: string) => {
+    if (loading) {
+      const confirmed = confirm("Are you sure you want to leave? Your upload(s) won't be saved.");
+      if (!confirmed) {
+        router.events.emit('routeChangeComplete', url);
+        throw 'Route change aborted';
+      }
+    }
+  };
 
   useEffect(() => {
     const listener = (e: ClipboardEvent) => {
@@ -41,8 +62,14 @@ export default function File({ chunks: chunks_config }) {
     };
 
     document.addEventListener('paste', listener);
-    return () => document.removeEventListener('paste', listener);
-  }, []);
+    window.addEventListener('beforeunload', beforeUnload);
+    router.events.on('routeChangeStart', beforeRouteChange);
+    return () => {
+      window.removeEventListener('beforeunload', beforeUnload);
+      router.events.off('routeChangeStart', beforeRouteChange);
+      document.removeEventListener('paste', listener);
+    };
+  }, [loading, beforeUnload, beforeRouteChange]);
 
   const handleChunkedFiles = async (expiresAt: Date, toChunkFiles: File[]) => {
     for (let i = 0; i !== toChunkFiles.length; ++i) {

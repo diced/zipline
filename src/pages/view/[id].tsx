@@ -1,7 +1,6 @@
 import { Box, Button, Modal, PasswordInput } from '@mantine/core';
 import type { File } from '@prisma/client';
 import AnchorNext from 'components/AnchorNext';
-import config from 'lib/config';
 import exts from 'lib/exts';
 import prisma from 'lib/prisma';
 import { parseString } from 'lib/utils/parser';
@@ -17,18 +16,15 @@ export default function EmbeddedFile({
   user,
   pass,
   prismRender,
-  onDash,
   compress,
 }: {
   file: File & { imageProps?: HTMLImageElement };
   user: UserExtended;
   pass: boolean;
   prismRender: boolean;
-  onDash: boolean;
   compress?: boolean;
 }) {
-  const dataURL = (route: string) =>
-    `${route}/${encodeURI(file.name)}?compress=${compress == null ? onDash : compress}`;
+  const dataURL = (route: string) => `${route}/${encodeURI(file.name)}?compress=${compress ?? false}`;
 
   const router = useRouter();
   const [opened, setOpened] = useState(pass);
@@ -268,7 +264,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       file,
       user,
       pass: file.password ? true : false,
-      onDash: config.core.compression.on_dashboard,
       compress,
     },
   };

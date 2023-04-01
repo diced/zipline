@@ -6,7 +6,6 @@ import Logger from 'lib/logger';
 import prisma from 'lib/prisma';
 import { readMetadata } from 'lib/utils/exif';
 import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'middleware/withZipline';
-import { tmpdir } from 'os';
 import { join } from 'path';
 
 const logger = Logger.get('exif');
@@ -41,7 +40,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
 
     return res.json(data);
   } else {
-    const file = join(tmpdir(), `zipline-exif-read-${Date.now()}-${image.name}`);
+    const file = join(config.core.temp_directory, `zipline-exif-read-${Date.now()}-${image.name}`);
     logger.debug(`writing temp file to view metadata: ${file}`);
 
     const stream = await datasource.get(image.name);

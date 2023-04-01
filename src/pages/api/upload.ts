@@ -12,7 +12,6 @@ import { createInvisImage, hashPassword } from 'lib/util';
 import { parseExpiry } from 'lib/utils/client';
 import { removeGPSData } from 'lib/utils/exif';
 import multer from 'multer';
-import { tmpdir } from 'os';
 import { join } from 'path';
 import sharp from 'sharp';
 import { Worker } from 'worker_threads';
@@ -105,7 +104,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       })}`
     );
 
-    const tempFile = join(tmpdir(), `zipline_partial_${identifier}_${start}_${end}`);
+    const tempFile = join(zconfig.core.temp_directory, `zipline_partial_${identifier}_${start}_${end}`);
     logger.debug(`writing partial to disk ${tempFile}`);
     await writeFile(tempFile, req.files[0].buffer);
 

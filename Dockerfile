@@ -69,7 +69,8 @@ COPY --from=builder /zipline/node_modules/@prisma/client ./node_modules/@prisma/
 
 # Copy Startup Script
 COPY docker-entrypoint.sh /zipline
+
 # Make Startup Script Executable
-RUN chmod a+x /zipline/docker-entrypoint.sh
+RUN chmod a+x /zipline/docker-entrypoint.sh && rm -rf /zipline/src
 # Set the entrypoint to the startup script
 ENTRYPOINT ["tini", "--", "/zipline/docker-entrypoint.sh"]
