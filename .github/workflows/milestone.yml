@@ -9,9 +9,7 @@ on:
 jobs:
   set:
     runs-on: ubuntu-latest
-    permissions:
-      issues: write
-      pull-requests: write
+    permissions: write-all
     steps:
       - uses: actions/checkout@v2
       - uses: actions/github-script@v6
