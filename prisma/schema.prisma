@@ -9,6 +9,7 @@ generator client {
 
 model User {
   id            Int       @id @default(autoincrement())
+  uuid          String    @unique @default(cuid())
   username      String
   password      String?
   avatar        String?
@@ -111,8 +112,8 @@ model Invite {
 model OAuth {
   id       Int            @id @default(autoincrement())
   provider OauthProviders
-  user     User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId   Int
+  user     User           @relation(fields: [userId], references: [uuid], onDelete: Cascade)
+  userId   String
   username String
   oauthId  String?
   token    String

@@ -12,7 +12,8 @@ export default function OauthError({ error, provider }) {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setRemaining((remaining) => remaining - 1);
+      if (remaining > 0) setRemaining((remaining) => remaining - 1);
+      else clearInterval(interval);
     }, 1000);
 
     return () => clearInterval(interval);
@@ -43,7 +44,7 @@ export default function OauthError({ error, provider }) {
         </Title>
         <MutedText sx={{ fontSize: 40, fontWeight: 500 }}>{error}</MutedText>
         <MutedText>
-          Redirecting to login in {remaining} second{remaining === 1 ? 's' : ''}
+          Redirecting to login in {remaining} second{remaining !== 1 ? 's' : ''}
         </MutedText>
         <Button component={Link} href='/dashboard'>
           Head to the Dashboard

@@ -54,7 +54,7 @@ export type NextApiRes = NextApiResponse &
   NextApiResExtraObj & {
     json: (json: Record<string, unknown>, status?: number) => void;
     setCookie: (name: string, value: unknown, options: CookieSerializeOptions) => void;
-    setUserCookie: (id: number) => void;
+    setUserCookie: (id: string) => void;
   };
 
 export type ZiplineApiConfig = {
@@ -184,7 +184,7 @@ export const withZipline =
 
         const user = await prisma.user.findFirst({
           where: {
-            id: Number(userId),
+            uuid: userId,
           },
           include: {
             oauth: true,
@@ -202,22 +202,22 @@ export const withZipline =
       }
     };
 
-    res.setCookie = (name: string, value: unknown, options: CookieSerializeOptions = {}) => {
+    res.setCookie = (name: string, value: string, options: CookieSerializeOptions = {}) => {
       if ('maxAge' in options) {
         options.expires = new Date(Date.now() + options.maxAge * 1000);
         options.maxAge /= 1000;
       }
 
-      const signed = sign64(String(value), config.core.secret);
+      const signed = sign64(value, config.core.secret);
 
       Logger.get('api').debug(`headers(${JSON.stringify(req.headers)}): cookie(${name}, ${value})`);
 
       res.setHeader('Set-Cookie', serialize(name, signed, options));
     };
 
-    res.setUserCookie = (id: number) => {
+    res.setUserCookie = (id: string) => {
       req.cleanCookie('user');
-      res.setCookie('user', String(id), {
+      res.setCookie('user', id, {
         sameSite: 'lax',
         expires: new Date(Date.now() + 6.048e8 * 2),
         path: '/',
