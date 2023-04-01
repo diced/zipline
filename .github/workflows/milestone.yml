@@ -1,15 +1,21 @@
 name: 'Issue/PR Milestones'
 
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, reopened]
   issues:
     types: [opened, reopened]
 
+permissions:
+  issues: write
+  checks: write
+  contents: read
+  pull-requests: write
+
 jobs:
   set:
     runs-on: ubuntu-latest
-    permissions: write-all
+
     steps:
       - uses: actions/checkout@v2
       - uses: actions/github-script@v6
