@@ -11,23 +11,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/github-script@v3
+      - uses: actions/github-script@v6
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
             const milestone = 3
-            if (context.eventName === 'issues') {
-              github.issues.update({
-                issue_number: context.issue.number,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                milestone
-              })
-            } else {
-              github.pulls.update({
-                pull_number: context.issue.number,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                milestone
-              })
-            }
+            github.rest.issues.update({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              milestone
+            })
