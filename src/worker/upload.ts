@@ -2,7 +2,6 @@ import { readdir, readFile, open, rm } from 'fs/promises';
 import type { NameFormat } from 'lib/format';
 import Logger from 'lib/logger';
 import type { UserExtended } from 'middleware/withZipline';
-import { tmpdir } from 'os';
 import { isMainThread, workerData } from 'worker_threads';
 
 import prisma from 'lib/prisma';
@@ -50,7 +49,7 @@ start();
 async function start() {
   logger.debug('starting worker');
 
-  const partials = await readdir(tmpdir()).then((files) =>
+  const partials = await readdir(config.core.temp_directory).then((files) =>
     files.filter((x) => x.startsWith(`zipline_partial_${file.identifier}`))
   );
 
@@ -93,7 +92,7 @@ async function start() {
   for (let i = 0; i !== readChunks.length; ++i) {
     const chunk = readChunks[i];
 
-    const buffer = await readFile(join(tmpdir(), chunk.filename));
+    const buffer = await readFile(join(config.core.temp_directory, chunk.filename));
 
     if (config.datasource.type === 'local') {
       const { bytesWritten } = await fd.write(buffer, 0, buffer.length, chunk.start);
@@ -103,7 +102,7 @@ async function start() {
       logger.child('bytes').debug(`wrote ${buffer.length} bytes to array`);
     }
 
-    await rm(join(tmpdir(), chunk.filename));
+    await rm(join(config.core.temp_directory, chunk.filename));
 
     await prisma.incompleteFile.update({
       where: {
