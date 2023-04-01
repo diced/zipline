@@ -11,20 +11,23 @@ ALTER TABLE "OAuth" RENAME CONSTRAINT "OAuth_userId_fkey" TO "OAuth_userId_old_f
 -- Rename old column
 ALTER TABLE "OAuth" RENAME COLUMN "userId" TO "userId_old";
 
--- Add new foreign key
-ALTER TABLE "OAuth" ADD CONSTRAINT "OAuth_userId_fkey";
-
 -- Add new column
-ALTER TABLE "OAuth" ADD COLUMN "userId" TEXT NOT NULL;
+ALTER TABLE "OAuth" ADD COLUMN "userId" TEXT;
+
+-- Add user cuid
+ALTER TABLE "User" ADD COLUMN "cuid" TEXT NOT NULL;
 
 -- Create index
 CREATE UNIQUE INDEX "User_cuid_key" ON "User"("cuid");
 
--- Add foreign key
+-- Add new foreign key
 ALTER TABLE "OAuth" ADD CONSTRAINT "OAuth_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("cuid") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- Update userId with cuid
 UPDATE "OAuth" SET "userId" = "User"."cuid" FROM "User" WHERE "OAuth"."userId_old" = "User"."id";
+
+-- Make column required for new records
+ALTER TABLE "OAuth" ALTER COLUMN "userId" SET NOT NULL;
 
 -- Drop old foreign key
 ALTER TABLE "OAuth" DROP CONSTRAINT "OAuth_userId_old_fkey";
