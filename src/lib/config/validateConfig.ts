@@ -3,6 +3,8 @@ import type { Config } from './Config';
 import { inspect } from 'util';
 import Logger from 'lib/logger';
 import { humanToBytes } from 'utils/bytes';
+import { tmpdir } from 'os';
+import { join } from 'path';
 
 const discord_content = s
   .object({
@@ -27,6 +29,7 @@ const discord_content = s
 const validator = s.object({
   core: s.object({
     return_https: s.boolean.default(false),
+    temp_directory: s.string.default(join(tmpdir(), 'zipline')),
     secret: s.string.lengthGreaterThanOrEqual(8),
     host: s.string.default('0.0.0.0'),
     port: s.number.default(3000),

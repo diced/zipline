@@ -4,7 +4,7 @@ import { Icon2fa, IconBarcodeOff, IconCheck } from '@tabler/icons-react';
 import useFetch from 'hooks/useFetch';
 import { useEffect, useState } from 'react';
 
-export function TotpModal({ opened, onClose, deleteTotp, setTotpEnabled }) {
+export function TotpModal({ opened, onClose, deleteTotp, setUser }) {
   const [secret, setSecret] = useState('');
   const [qrCode, setQrCode] = useState('');
   const [disabled, setDisabled] = useState(false);
@@ -52,8 +52,7 @@ export function TotpModal({ opened, onClose, deleteTotp, setTotpEnabled }) {
         icon: <Icon2fa size='1rem' />,
       });
 
-      setTotpEnabled(false);
-
+      setUser((user) => ({ ...user, totpSecret: null }));
       onClose();
     }
 
@@ -83,8 +82,7 @@ export function TotpModal({ opened, onClose, deleteTotp, setTotpEnabled }) {
         icon: <Icon2fa size='1rem' />,
       });
 
-      setTotpEnabled(true);
-
+      setUser((user) => ({ ...user, totpSecret: secret }));
       onClose();
     }
 

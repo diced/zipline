@@ -3,8 +3,10 @@ import { closeAllModals, openConfirmModal } from '@mantine/modals';
 import { showNotification, updateNotification } from '@mantine/notifications';
 import { IconFiles, IconFilesOff } from '@tabler/icons-react';
 import useFetch from 'hooks/useFetch';
+import { useState } from 'react';
 
-export default function ClearStorage({ open, setOpen, check, setCheck }) {
+export default function ClearStorage({ open, setOpen }) {
+  const [check, setCheck] = useState(false);
   const handleDelete = async (datasource: boolean, orphaned?: boolean) => {
     showNotification({
       id: 'clear-uploads',
@@ -38,7 +40,10 @@ export default function ClearStorage({ open, setOpen, check, setCheck }) {
   return (
     <Modal
       opened={open}
-      onClose={() => setOpen(false)}
+      onClose={() => {
+        setOpen(false);
+        setCheck(() => false);
+      }}
       title={<Title size='sm'>Are you sure you want to clear all uploads in the database?</Title>}
     >
       <Checkbox
