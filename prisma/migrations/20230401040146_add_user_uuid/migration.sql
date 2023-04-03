@@ -26,6 +26,9 @@ ALTER TABLE "User" ALTER COLUMN "cuid" SET NOT NULL;
 -- Update table "OAuth" with cuid
 UPDATE "OAuth" SET "userId" = "User"."cuid" FROM "User" WHERE "OAuth"."userId_old" = "User"."id";
 
+-- Alter table "OAuth" to make "userId" required
+ALTER TABLE "OAuth" ALTER COLUMN "userId" SET NOT NULL;
+
 -- Create index
 CREATE UNIQUE INDEX "User_cuid_key" ON "User"("cuid");
 
