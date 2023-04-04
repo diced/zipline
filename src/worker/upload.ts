@@ -44,6 +44,11 @@ if (!file.lastchunk) {
   process.exit(1);
 }
 
+if (!config.chunks.enabled) {
+  logger.error('chunks are not enabled, worker should not have been started');
+  process.exit(1);
+}
+
 start();
 
 async function start() {

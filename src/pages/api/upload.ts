@@ -79,7 +79,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   if (fileMaxViews < 0) return res.badRequest('invalid max views (max views < 0)');
 
   // handle partial uploads before ratelimits
-  if (req.headers['content-range']) {
+  if (req.headers['content-range'] && zconfig.chunks.enabled) {
     // parses content-range header (bytes start-end/total)
     const [start, end, total] = req.headers['content-range']
       .replace('bytes ', '')
