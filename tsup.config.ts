@@ -13,6 +13,12 @@ export default defineConfig([
     entryPoints: ['src/server/index.ts'],
     ...opts,
   },
+  // workers
+  {
+    entryPoints: ['src/worker/upload.ts'],
+    outDir: 'dist/worker',
+    ...opts,
+  },
   // scripts
   {
     entryPoints: ['src/scripts/import-dir.ts'],

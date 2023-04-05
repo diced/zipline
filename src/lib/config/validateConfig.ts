@@ -201,10 +201,12 @@ const validator = s.object({
     .object({
       max_size: s.number.default(humanToBytes('90MB')),
       chunks_size: s.number.default(humanToBytes('20MB')),
+      enabled: s.boolean.default(true),
     })
     .default({
       max_size: humanToBytes('90MB'),
       chunks_size: humanToBytes('20MB'),
+      enabled: true,
     }),
   mfa: s
     .object({

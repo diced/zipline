@@ -136,6 +136,7 @@ export interface ConfigOAuth {
 export interface ConfigChunks {
   max_size: number;
   chunks_size: number;
+  enabled: boolean;
 }
 
 export interface ConfigMfa {

@@ -26,6 +26,7 @@ model User {
   urls          Url[]
   Invite        Invite[]
   Folder        Folder[]
+  IncompleteFile IncompleteFile[]
 }
 
 model Folder {
@@ -126,4 +127,24 @@ enum OauthProviders {
   DISCORD
   GITHUB
   GOOGLE
+}
+
+model IncompleteFile {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  status         ProcessingStatus
+  chunks         Int
+  chunksComplete Int
+
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int
+
+  data Json
+}
+
+enum ProcessingStatus {
+  PENDING
+  PROCESSING
+  COMPLETE
 }
