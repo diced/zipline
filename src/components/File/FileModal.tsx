@@ -3,11 +3,14 @@ import {
   Group,
   LoadingOverlay,
   Modal,
+  MultiSelect,
   Select,
   SimpleGrid,
   Stack,
   Title,
   Tooltip,
+  Text,
+  Accordion,
 } from '@mantine/core';
 import { useClipboard, useMediaQuery } from '@mantine/hooks';
 import { showNotification } from '@mantine/notifications';
@@ -24,21 +27,26 @@ import {
   IconFolderCancel,
   IconFolderMinus,
   IconFolderPlus,
+  IconFolders,
   IconHash,
   IconInfoCircle,
   IconPhoto,
   IconPhotoCancel,
   IconPhotoMinus,
   IconPhotoStar,
+  IconPlus,
+  IconTags,
 } from '@tabler/icons-react';
 import useFetch, { ApiError } from 'hooks/useFetch';
 import { useFileDelete, useFileFavorite, UserFilesResponse } from 'lib/queries/files';
 import { useFolders } from 'lib/queries/folders';
 import { bytesToHuman } from 'lib/utils/bytes';
-import { relativeTime } from 'lib/utils/client';
+import { colorHash, relativeTime } from 'lib/utils/client';
 import { useState } from 'react';
 import { FileMeta } from '.';
 import Type from '../Type';
+import Tag from 'components/File/tag/Tag';
+import Item from 'components/File/tag/Item';
 
 export default function FileModal({
   open,
@@ -65,6 +73,12 @@ export default function FileModal({
 
   const [overrideRender, setOverrideRender] = useState(false);
   const clipboard = useClipboard();
+
+  const [tags, setTags] = useState<{ label: string; value: string; color: string }[]>([
+    { label: 'Tag 1', value: 'tag-1', color: '#ff0000' },
+    { label: 'Tag 2', value: 'tag-2', color: '#00ff00' },
+    { label: 'Tag 3', value: 'tag-3', color: '#0000ff' },
+  ]);
 
   const handleDelete = async () => {
     deleteFile.mutate(file.id, {
@@ -209,12 +223,16 @@ export default function FileModal({
     return { value: t, label: t };
   };
 
+  const handleTagsSave = () => {
+    console.log('should save');
+  };
+
   return (
     <Modal
       opened={open}
       onClose={() => setOpen(false)}
       title={<Title>{file.name}</Title>}
-      size='auto'
+      size='lg'
       fullScreen={useMediaQuery('(max-width: 600px)')}
     >
       <LoadingOverlay visible={loading} />
@@ -224,8 +242,6 @@ export default function FileModal({
           src={`/r/${encodeURI(file.name)}?compress=${compress}`}
           alt={file.name}
           popup
-          sx={{ minHeight: 200 }}
-          style={{ minHeight: 200 }}
           disableMediaPreview={false}
           overrideRender={overrideRender}
           setOverrideRender={setOverrideRender}
@@ -269,6 +285,95 @@ export default function FileModal({
         </SimpleGrid>
       </Stack>
 
+      {!reducedActions ? (
+        <Accordion
+          variant='contained'
+          mb='sm'
+          styles={(t) => ({
+            content: { backgroundColor: t.colorScheme === 'dark' ? t.colors.dark[7] : t.colors.gray[0] },
+            control: { backgroundColor: t.colorScheme === 'dark' ? t.colors.dark[7] : t.colors.gray[0] },
+          })}
+        >
+          <Accordion.Item value='tags'>
+            <Accordion.Control icon={<IconTags size='1rem' />}>Tags</Accordion.Control>
+            <Accordion.Panel>
+              <MultiSelect
+                data={tags}
+                placeholder={tags.length ? 'Add tags' : 'Add tags (optional)'}
+                icon={<IconTags size='1rem' />}
+                valueComponent={Tag}
+                itemComponent={Item}
+                searchable
+                creatable
+                getCreateLabel={(t) => (
+                  <Group>
+                    <IconPlus size='1rem' />
+                    <Text ml='sm' display='flex'>
+                      Create tag{' '}
+                      <Text ml={4} color={colorHash(t)}>
+                        &quot;{t}&quot;
+                      </Text>
+                    </Text>
+                  </Group>
+                )}
+                onCreate={(t) => {
+                  const item = { value: t, label: t, color: colorHash(t) };
+                  setTags([...tags, item]);
+                  return item;
+                }}
+                onBlur={handleTagsSave}
+              />
+            </Accordion.Panel>
+          </Accordion.Item>
+          <Accordion.Item value='folders'>
+            <Accordion.Control icon={<IconFolders size='1rem' />}>Folders</Accordion.Control>
+            <Accordion.Panel>
+              {inFolder && !folders.isLoading ? (
+                <Group>
+                  <Tooltip
+                    label={`Remove from folder "${
+                      folders.data.find((f) => f.id === file.folderId)?.name ?? ''
+                    }"`}
+                  >
+                    <ActionIcon
+                      color='red'
+                      variant='filled'
+                      onClick={removeFromFolder}
+                      loading={folders.isLoading}
+                    >
+                      <IconFolderMinus size='1rem' />
+                    </ActionIcon>
+                  </Tooltip>
+
+                  <Text display='flex' align='center'>
+                    Currently in folder &quot;{folders.data.find((f) => f.id === file.folderId)?.name ?? ''}
+                    &quot;
+                  </Text>
+                </Group>
+              ) : (
+                <Tooltip label='Add to folder'>
+                  <Select
+                    icon={<IconFolderPlus size='1rem' />}
+                    onChange={addToFolder}
+                    placeholder='Add to folder'
+                    data={[
+                      ...(folders.data ? folders.data : []).map((folder) => ({
+                        value: String(folder.id),
+                        label: `${folder.id}: ${folder.name}`,
+                      })),
+                    ]}
+                    searchable
+                    creatable
+                    getCreateLabel={(query) => `Create folder "${query}"`}
+                    onCreate={createFolder}
+                  />
+                </Tooltip>
+              )}
+            </Accordion.Panel>
+          </Accordion.Item>
+        </Accordion>
+      ) : null}
+
       <Group position='apart' my='md'>
         <Group position='left'>
           {exifEnabled && !reducedActions && (
@@ -280,32 +385,6 @@ export default function FileModal({
               >
                 <IconInfoCircle size='1rem' />
               </ActionIcon>
-            </Tooltip>
-          )}
-          {reducedActions ? null : inFolder && !folders.isLoading ? (
-            <Tooltip
-              label={`Remove from folder "${folders.data.find((f) => f.id === file.folderId)?.name ?? ''}"`}
-            >
-              <ActionIcon color='red' variant='filled' onClick={removeFromFolder} loading={folders.isLoading}>
-                <IconFolderMinus size='1rem' />
-              </ActionIcon>
-            </Tooltip>
-          ) : (
-            <Tooltip label='Add to folder'>
-              <Select
-                onChange={addToFolder}
-                placeholder='Add to folder'
-                data={[
-                  ...(folders.data ? folders.data : []).map((folder) => ({
-                    value: String(folder.id),
-                    label: `${folder.id}: ${folder.name}`,
-                  })),
-                ]}
-                searchable
-                creatable
-                getCreateLabel={(query) => `Create folder "${query}"`}
-                onCreate={createFolder}
-              />
             </Tooltip>
           )}
         </Group>

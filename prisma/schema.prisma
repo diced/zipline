@@ -58,8 +58,18 @@ model File {
   user   User? @relation(fields: [userId], references: [id], onDelete: SetNull)
   userId Int?
 
-  folder   Folder? @relation(fields: [folderId], references: [id], onDelete: SetNull)
-  folderId Int?
+  folder    Folder?  @relation(fields: [folderId], references: [id], onDelete: SetNull)
+  folderId  Int?
+
+  tags Tag[]
+}
+
+model Tag {
+  id    String @id @default(cuid())
+  name  String
+  color String
+
+  files File[]
 }
 
 model InvisibleFile {
