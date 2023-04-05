@@ -1,5 +1,5 @@
 import { InvisibleFile } from '@prisma/client';
-import { readdir, readFile, unlink, writeFile } from 'fs/promises';
+import { writeFile } from 'fs/promises';
 import zconfig from 'lib/config';
 import datasource from 'lib/datasource';
 import { sendUpload } from 'lib/discord';
@@ -14,6 +14,7 @@ import { removeGPSData } from 'lib/utils/exif';
 import multer from 'multer';
 import { join } from 'path';
 import sharp from 'sharp';
+import { Worker } from 'worker_threads';
 
 const uploader = multer();
 const logger = Logger.get('upload');
@@ -78,7 +79,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   if (fileMaxViews < 0) return res.badRequest('invalid max views (max views < 0)');
 
   // handle partial uploads before ratelimits
-  if (req.headers['content-range']) {
+  if (req.headers['content-range'] && zconfig.chunks.enabled) {
     // parses content-range header (bytes start-end/total)
     const [start, end, total] = req.headers['content-range']
       .replace('bytes ', '')
@@ -108,89 +109,29 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     await writeFile(tempFile, req.files[0].buffer);
 
     if (lastchunk) {
-      const partials = await readdir(zconfig.core.temp_directory).then((files) =>
-        files.filter((x) => x.startsWith(`zipline_partial_${identifier}`))
-      );
-
-      const readChunks = partials.map((x) => {
-        const [, , , start, end] = x.split('_');
-        return { start: Number(start), end: Number(end), filename: x };
-      });
-
-      // combine chunks
-      const chunks = new Uint8Array(total);
-
-      for (let i = 0; i !== readChunks.length; ++i) {
-        const chunkData = readChunks[i];
-
-        const buffer = await readFile(join(zconfig.core.temp_directory, chunkData.filename));
-        await unlink(join(zconfig.core.temp_directory, readChunks[i].filename));
-
-        chunks.set(buffer, chunkData.start);
-      }
-
-      const ext = filename.split('.').length === 1 ? '' : filename.split('.').pop();
-      if (zconfig.uploader.disabled_extensions.includes(ext))
-        return res.error('disabled extension recieved: ' + ext);
-      const fileName = await formatFileName(format, filename);
-
-      let password = null;
-      if (req.headers.password) {
-        password = await hashPassword(req.headers.password as string);
-      }
-
-      const compressionUsed = imageCompressionPercent && mimetype.startsWith('image/');
-      let invis: InvisibleFile;
-
-      const file = await prisma.file.create({
-        data: {
-          name: `${fileName}${compressionUsed ? '.jpg' : `${ext ? '.' : ''}${ext}`}`,
-          mimetype,
-          userId: user.id,
-          embed: !!req.headers.embed,
-          password,
-          expiresAt: expiry,
-          maxViews: fileMaxViews,
-          originalName: req.headers['original-name'] ? filename ?? null : null,
+      new Worker('./dist/worker/upload.js', {
+        workerData: {
+          user,
+          file: {
+            filename,
+            mimetype,
+            identifier,
+            lastchunk,
+            totalBytes: total,
+          },
+          response: {
+            expiresAt: expiry,
+            format,
+            imageCompressionPercent,
+            fileMaxViews,
+          },
+          headers: req.headers,
         },
       });
 
-      if (req.headers.zws) invis = await createInvisImage(zconfig.uploader.length, file.id);
-
-      await datasource.save(file.name, Buffer.from(chunks));
-
-      logger.info(`User ${user.username} (${user.id}) uploaded ${file.name} (${file.id}) (chunked)`);
-      let domain;
-      if (req.headers['override-domain']) {
-        domain = `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers['override-domain']}`;
-      } else if (user.domains.length) {
-        domain = user.domains[Math.floor(Math.random() * user.domains.length)];
-      } else {
-        domain = `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}`;
-      }
-
-      const responseUrl = `${domain}${zconfig.uploader.route === '/' ? '/' : zconfig.uploader.route + '/'}${
-        invis ? invis.invis : encodeURI(file.name)
-      }`;
-
-      response.files.push(responseUrl);
-
-      if (zconfig.discord?.upload) {
-        await sendUpload(user, file, `${domain}/r/${invis ? invis.invis : file.name}`, responseUrl);
-      }
-
-      if (zconfig.exif.enabled && zconfig.exif.remove_gps && mimetype.startsWith('image/')) {
-        try {
-          await removeGPSData(file);
-          response.removed_gps = true;
-        } catch (e) {
-          logger.error(`Failed to remove GPS data from ${file.name} (${file.id}) - ${e.message}`);
-
-          response.removed_gps = false;
-        }
-      }
-
-      return res.json(response);
+      return res.json({
+        pending: true,
+      });
     }
 
     return res.json({

@@ -1,16 +1,19 @@
-import { Accordion, ActionIcon, Box, Group, Pagination, SimpleGrid, Title } from '@mantine/core';
-import { IconFileUpload } from '@tabler/icons-react';
+import { Accordion, ActionIcon, Box, Group, Pagination, SimpleGrid, Title, Tooltip } from '@mantine/core';
+import { IconFileUpload, IconPhotoUp } from '@tabler/icons-react';
 import File from 'components/File';
 import useFetch from 'hooks/useFetch';
 import { usePaginatedFiles } from 'lib/queries/files';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import FilePagation from './FilePagation';
+import PendingFilesModal from './PendingFilesModal';
 
 export default function Files({ disableMediaPreview, exifEnabled, queryPage, compress }) {
   const [favoritePage, setFavoritePage] = useState(1);
   const [favoriteNumPages, setFavoriteNumPages] = useState(0);
   const favoritePages = usePaginatedFiles(favoritePage, 'media', true);
+
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -21,11 +24,19 @@ export default function Files({ disableMediaPreview, exifEnabled, queryPage, com
 
   return (
     <>
+      <PendingFilesModal open={open} onClose={() => setOpen(false)} />
+
       <Group mb='md'>
         <Title>Files</Title>
         <ActionIcon component={Link} href='/dashboard/upload/file' variant='filled' color='primary'>
           <IconFileUpload size='1rem' />
         </ActionIcon>
+
+        <Tooltip label='View pending uploads'>
+          <ActionIcon onClick={() => setOpen(true)} variant='filled' color='primary'>
+            <IconPhotoUp size='1rem' />
+          </ActionIcon>
+        </Tooltip>
       </Group>
       {favoritePages.isSuccess && favoritePages.data.length ? (
         <Accordion
