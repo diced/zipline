@@ -27,7 +27,7 @@ export function parseString(str: string, value: ParseValue) {
       continue;
     }
 
-    if (['password', 'avatar'].includes(matches.groups.prop)) {
+    if (['password', 'avatar', 'uuid'].includes(matches.groups.prop)) {
       str = replaceCharsFromString(str, '{unknown_property}', matches.index, re.lastIndex);
       re.lastIndex = matches.index;
       continue;

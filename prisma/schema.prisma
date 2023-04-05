@@ -8,23 +8,24 @@ generator client {
 }
 
 model User {
-  id             Int              @id @default(autoincrement())
-  username       String
-  password       String?
-  avatar         String?
-  token          String
-  administrator  Boolean          @default(false)
-  superAdmin     Boolean          @default(false)
-  systemTheme    String           @default("system")
-  embed          Json             @default("{}")
-  ratelimit      DateTime?
-  totpSecret     String?
-  domains        String[]
-  oauth          OAuth[]
-  files          File[]
-  urls           Url[]
-  Invite         Invite[]
-  Folder         Folder[]
+  id            Int       @id @default(autoincrement())
+  uuid          String    @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  username      String
+  password      String?
+  avatar        String?
+  token         String
+  administrator Boolean   @default(false)
+  superAdmin    Boolean   @default(false)
+  systemTheme   String    @default("system")
+  embed         Json      @default("{}")
+  ratelimit     DateTime?
+  totpSecret    String?
+  domains       String[]
+  oauth         OAuth[]
+  files         File[]
+  urls          Url[]
+  Invite        Invite[]
+  Folder        Folder[]
   IncompleteFile IncompleteFile[]
 }
 
@@ -122,8 +123,8 @@ model Invite {
 model OAuth {
   id       Int            @id @default(autoincrement())
   provider OauthProviders
-  user     User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId   Int
+  user     User           @relation(fields: [userId], references: [uuid], onDelete: Cascade)
+  userId   String
   username String
   oauthId  String?
   token    String
