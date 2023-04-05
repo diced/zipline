@@ -184,7 +184,7 @@ export const withZipline =
 
         const user = await prisma.user.findFirst({
           where: {
-            cuid: userId,
+            uuid: userId,
           },
           include: {
             oauth: true,

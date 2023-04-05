@@ -135,7 +135,7 @@ export const withOAuth =
         } else throw e;
       }
 
-      res.setUserCookie(user.cuid);
+      res.setUserCookie(user.uuid);
       logger.info(`User ${user.username} (${user.id}) linked account via oauth(${provider})`);
 
       return res.redirect('/');
@@ -153,7 +153,7 @@ export const withOAuth =
         },
       });
 
-      res.setUserCookie(user.cuid);
+      res.setUserCookie(user.uuid);
       logger.info(`User ${user.username} (${user.id}) logged in via oauth(${provider})`);
 
       return res.redirect('/dashboard');
@@ -203,7 +203,7 @@ export const withOAuth =
       logger.debug(`created user ${JSON.stringify(nuser)} via oauth(${provider})`);
       logger.info(`Created user ${nuser.username} via oauth(${provider})`);
 
-      res.setUserCookie(nuser.cuid);
+      res.setUserCookie(nuser.uuid);
       logger.info(`User ${nuser.username} (${nuser.id}) logged in via oauth(${provider})`);
 
       return res.redirect('/dashboard');
