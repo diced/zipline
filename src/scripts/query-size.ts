@@ -8,13 +8,42 @@ async function main() {
   await migrations();
 
   const prisma = new PrismaClient();
+  let notFound = false;
 
-  const files = await prisma.file.findMany();
+  const files = await prisma.file.findMany({
+    ...(process.argv.includes('--force-update')
+      ? undefined
+      : {
+          where: {
+            size: 0,
+          },
+        }),
+    select: {
+      id: true,
+      name: true,
+      size: true,
+    },
+  });
 
   console.log(`The script will attempt to query the size of ${files.length} files.`);
 
   for (let i = 0; i !== files.length; ++i) {
     const file = files[i];
+    if (!datasource.get(file.name)) {
+      if (process.argv.includes('--force-delete')) {
+        console.log(`File ${file.name} does not exist. Deleting...`);
+        await prisma.file.delete({
+          where: {
+            id: file.id,
+          },
+        });
+        continue;
+      } else {
+        notFound ? null : (notFound = true);
+        continue;
+      }
+    }
+
     const size = await datasource.size(file.name);
     if (size === 0) {
       console.log(`File ${file.name} has a size of 0 bytes. Ignoring...`);
@@ -31,7 +60,11 @@ async function main() {
     }
   }
 
-  console.log('Done.');
+  notFound
+    ? console.log(
+        'At least one file has been found to not exist in the datasource but was on the database. To remove these files, run the script with the --force-delete flag.'
+      )
+    : console.log('Done.');
   process.exit(0);
 }
 

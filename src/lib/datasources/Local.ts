@@ -25,6 +25,7 @@ export class Local extends Datasource {
       await rm(join(process.cwd(), this.path, files[i]));
     }
   }
+
   public get(file: string): ReadStream {
     const full = join(process.cwd(), this.path, file);
     if (!existsSync(full)) return null;
@@ -37,7 +38,9 @@ export class Local extends Datasource {
   }
 
   public async size(file: string): Promise<number> {
-    const stats = await stat(join(process.cwd(), this.path, file));
+    const full = join(process.cwd(), this.path, file);
+    if (!existsSync(full)) return 0;
+    const stats = await stat(full);
 
     return stats.size;
   }
