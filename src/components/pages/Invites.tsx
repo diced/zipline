@@ -30,7 +30,7 @@ import {
 import MutedText from 'components/MutedText';
 import useFetch from 'hooks/useFetch';
 import { listViewInvitesSelector } from 'lib/recoil/settings';
-import { expireText, relativeTime } from 'lib/utils/client';
+import { expireReadToDate, expireText, relativeTime } from 'lib/utils/client';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -50,21 +50,7 @@ function CreateInviteModal({ open, setOpen, updateInvites }) {
     if (!expires.includes(values.expires)) return form.setFieldError('expires', 'Invalid expiration');
     if (values.count < 1 || values.count > 100)
       return form.setFieldError('count', 'Must be between 1 and 100');
-    const expiresAt =
-      values.expires === 'never'
-        ? null
-        : new Date(
-            {
-              '30m': Date.now() + 30 * 60 * 1000,
-              '1h': Date.now() + 60 * 60 * 1000,
-              '6h': Date.now() + 6 * 60 * 60 * 1000,
-              '12h': Date.now() + 12 * 60 * 60 * 1000,
-              '1d': Date.now() + 24 * 60 * 60 * 1000,
-              '3d': Date.now() + 3 * 24 * 60 * 60 * 1000,
-              '5d': Date.now() + 5 * 24 * 60 * 60 * 1000,
-              '7d': Date.now() + 7 * 24 * 60 * 60 * 1000,
-            }[values.expires]
-          );
+    const expiresAt = values.expires === 'never' ? null : expireReadToDate(values.expires);
 
     setOpen(false);
 

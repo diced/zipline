@@ -3,6 +3,7 @@ import Logger from 'lib/logger';
 import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'lib/middleware/withZipline';
 import prisma from 'lib/prisma';
 import { randomChars } from 'lib/util';
+import { parseExpiry } from 'lib/utils/client';
 
 const logger = Logger.get('invite');
 
@@ -15,11 +16,8 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       count: number;
     };
 
-    const expiry = expiresAt ? new Date(expiresAt) : null;
-    if (expiry) {
-      if (!expiry.getTime()) return res.badRequest('invalid date');
-      if (expiry.getTime() < Date.now()) return res.badRequest('date is in the past');
-    }
+    const expiry = parseExpiry(expiresAt);
+    if (!expiry) return res.badRequest('invalid date');
     const counts = count ? count : 1;
 
     if (counts > 1) {

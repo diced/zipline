@@ -58,12 +58,13 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
 
     return res.json(folder);
   } else {
+    if (req.query.files instanceof Array) req.query.files = req.query.files[0];
     const folders = await prisma.folder.findMany({
       where: {
         userId: user.id,
       },
       select: {
-        files: !!req.query.files,
+        files: ((req.query.files as string) ?? 'false').toLowerCase() === 'true',
         id: true,
         name: true,
         userId: true,
@@ -76,7 +77,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       },
     });
 
-    if (req.query.files) {
+    if (((req.query.files as string) ?? 'false').toLowerCase() === 'true') {
       for (let i = 0; i !== folders.length; ++i) {
         const folder = folders[i];
         for (let j = 0; j !== folders[i].files.length; ++j) {
