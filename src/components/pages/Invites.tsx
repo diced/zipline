@@ -36,12 +36,12 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 
-const expires = ['30m', '1h', '6h', '12h', '1d', '3d', '5d', '7d', 'never'];
+const expires = ['30min', '1h', '6h', '12h', '1d', '3d', '5d', '7d', 'never'];
 
 function CreateInviteModal({ open, setOpen, updateInvites }) {
   const form = useForm({
     initialValues: {
-      expires: '30m',
+      expires: '30min',
       count: 1,
     },
   });
@@ -55,7 +55,7 @@ function CreateInviteModal({ open, setOpen, updateInvites }) {
     setOpen(false);
 
     const res = await useFetch('/api/auth/invite', 'POST', {
-      expiresAt,
+      expiresAt: expiresAt === null ? null : `date=${expiresAt.toISOString()}`,
       count: values.count,
     });
 
@@ -86,7 +86,7 @@ function CreateInviteModal({ open, setOpen, updateInvites }) {
           id='expires'
           {...form.getInputProps('expires')}
           data={[
-            { value: '30m', label: '30 minutes' },
+            { value: '30min', label: '30 minutes' },
             { value: '1h', label: '1 hour' },
             { value: '6h', label: '6 hours' },
             { value: '12h', label: '12 hours' },
