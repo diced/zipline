@@ -85,6 +85,7 @@ function CreateInviteModal({ open, setOpen, updateInvites }) {
           label='Expires'
           id='expires'
           {...form.getInputProps('expires')}
+          maxDropdownHeight={100}
           data={[
             { value: '30min', label: '30 minutes' },
             { value: '1h', label: '1 hour' },
