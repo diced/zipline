@@ -21,6 +21,7 @@ async function main() {
     select: {
       id: true,
       name: true,
+      size: true,
     },
   });
 
