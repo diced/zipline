@@ -83,6 +83,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       maxViews: number;
       views: number;
       size: number;
+      originalName: string;
     }[] = await prisma.file.findMany({
       where: {
         userId: user.id,
@@ -102,6 +103,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
         folderId: true,
         maxViews: true,
         size: true,
+        originalName: true,
       },
     });
 
