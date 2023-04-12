@@ -50,4 +50,9 @@ export default defineConfig([
     outDir: 'dist/scripts',
     ...opts,
   },
+  {
+    entryPoints: ['src/scripts/clear-temp.ts'],
+    outDir: 'dist/scripts',
+    ...opts,
+  },
 ]);
