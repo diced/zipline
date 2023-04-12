@@ -8,6 +8,7 @@ export type UserFilesResponse = {
   mimetype: string;
   id: string;
   favorite: boolean;
+  lock: boolean;
   url: string;
   size: number;
   maxViews: number;
@@ -33,11 +34,12 @@ export const useFiles = (query: { [key: string]: string } = {}) => {
       );
   });
 };
-export const usePaginatedFiles = (page?: number, filter = 'media', favorite = null) => {
+export const usePaginatedFiles = (page?: number, filter = 'media', favorite = null, lock = null) => {
   const queryBuilder = new URLSearchParams({
     page: Number(page || '1').toString(),
     filter,
     ...(favorite !== null && { favorite: favorite.toString() }),
+    ...(lock !== null && { lock: lock.toString() }),
   });
   const queryString = queryBuilder.toString();
 
@@ -94,6 +96,26 @@ export function useFileFavorite() {
     async (data: { id: string; favorite: boolean }) => {
       return fetch('/api/user/files', {
         method: 'PATCH',
+        body: JSON.stringify(data),
+        headers: {
+          'content-type': 'application/json',
+        },
+      }).then((res) => res.json());
+    },
+    {
+      onSuccess: () => {
+        queryClient.refetchQueries(['files']);
+      },
+    }
+  );
+}
+
+export function useFileLock() {
+  // /api/user/files', 'HEAD', { id: image.id, lock: !image.lock }
+  return useMutation(
+    async (data: { id: string; lock: boolean }) => {
+      return fetch('/api/user/files', {
+        method: 'HEAD',
         body: JSON.stringify(data),
         headers: {
           'content-type': 'application/json',

@@ -1,5 +1,5 @@
 import { Card, Group, LoadingOverlay, Stack, Text, Tooltip } from '@mantine/core';
-import { useFileDelete, useFileFavorite } from 'lib/queries/files';
+import { useFileDelete, useFileFavorite, useFileLock } from 'lib/queries/files';
 import { useFolders } from 'lib/queries/folders';
 import { useState } from 'react';
 import MutedText from '../MutedText';
@@ -39,7 +39,8 @@ export default function File({
   const [open, setOpen] = useState(false);
   const deleteFile = useFileDelete();
   const favoriteFile = useFileFavorite();
-  const loading = deleteFile.isLoading || favoriteFile.isLoading;
+  const lockFile = useFileLock();
+  const loading = deleteFile.isLoading || favoriteFile.isLoading || lockFile.isLoading;
 
   const folders = useFolders();
 

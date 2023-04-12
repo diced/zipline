@@ -62,6 +62,22 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     // @ts-ignore
     if (file.password) file.password = true;
     return res.json(file);
+  } else if (req.method === 'HEAD') {
+    if (!req.body.id) return res.badRequest('no file id');
+
+    let file;
+
+    if (req.body.lock !== null)
+      file = await prisma.file.update({
+        where: { id: req.body.id },
+        data: {
+          lock: req.body.lock,
+        },
+      });
+
+    // @ts-ignore
+    if (file.password) file.password = true;
+    return res.json(file);
   } else {
     if (req.query.count) {
       const count = await prisma.file.count({
@@ -119,6 +135,6 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
 }
 
 export default withZipline(handler, {
-  methods: ['GET', 'DELETE', 'PATCH'],
+  methods: ['GET', 'DELETE', 'PATCH', 'HEAD'],
   user: true,
 });
