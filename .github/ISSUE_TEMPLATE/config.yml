@@ -1,7 +1,7 @@
 blank_issues_enabled: false
 contact_links:
   - name: Feature Request
-    url: https://github.com/diced/zipline/discussions/new?category=ideas&title=Your%20breif%20description%20here&labels=feature
+    url: https://github.com/diced/zipline/discussions/new?category=ideas&title=Your%20brief%20description%20here&labels=feature
     about: Ask for a new feature
   - name: Zipline Discord
     url: https://discord.gg/EAhCRfGxCF
