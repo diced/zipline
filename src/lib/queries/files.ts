@@ -34,12 +34,11 @@ export const useFiles = (query: { [key: string]: string } = {}) => {
       );
   });
 };
-export const usePaginatedFiles = (page?: number, filter = 'media', favorite = null, lock = null) => {
+export const usePaginatedFiles = (page?: number, filter = 'media', favorite = null) => {
   const queryBuilder = new URLSearchParams({
     page: Number(page || '1').toString(),
     filter,
     ...(favorite !== null && { favorite: favorite.toString() }),
-    ...(lock !== null && { lock: lock.toString() }),
   });
   const queryString = queryBuilder.toString();
 
