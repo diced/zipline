@@ -53,7 +53,6 @@ model File {
   maxViews     Int?
   views        Int            @default(0)
   favorite     Boolean        @default(false)
-  lock         Boolean        @default(false)
   embed        Boolean        @default(false)
   password     String?
   invisible    InvisibleFile?

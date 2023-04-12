@@ -30,11 +30,9 @@ import {
   IconPhotoCancel,
   IconPhotoMinus,
   IconPhotoStar,
-  IconLock,
-  IconLockOff,
 } from '@tabler/icons-react';
 import useFetch, { ApiError } from 'hooks/useFetch';
-import { useFileDelete, useFileFavorite, useFileLock, UserFilesResponse } from 'lib/queries/files';
+import { useFileDelete, useFileFavorite, UserFilesResponse } from 'lib/queries/files';
 import { useFolders } from 'lib/queries/folders';
 import { bytesToHuman } from 'lib/utils/bytes';
 import { relativeTime } from 'lib/utils/client';
@@ -63,7 +61,6 @@ export default function FileModal({
 }) {
   const deleteFile = useFileDelete();
   const favoriteFile = useFileFavorite();
-  const lockFile = useFileLock();
   const folders = useFolders();
 
   const [overrideRender, setOverrideRender] = useState(false);
@@ -130,30 +127,6 @@ export default function FileModal({
             message: res.error,
             color: 'red',
             icon: <IconPhotoCancel size='1rem' />,
-          });
-        },
-      }
-    );
-  };
-
-  const handleLock = async () => {
-    lockFile.mutate(
-      { id: file.id, lock: !file.lock },
-      {
-        onSuccess: () => {
-          showNotification({
-            title: 'The file is now ' + (!file.lock ? 'locked' : 'unlocked'),
-            message: '',
-            icon: <IconLock size='1rem' />,
-          });
-        },
-
-        onError: (res: { error: string }) => {
-          showNotification({
-            title: 'Failed to lock file',
-            message: res.error,
-            color: 'red',
-            icon: <IconLockOff size='1rem' />,
           });
         },
       }
@@ -352,12 +325,6 @@ export default function FileModal({
                   onClick={handleFavorite}
                 >
                   <IconPhotoStar size='1rem' />
-                </ActionIcon>
-              </Tooltip>
-
-              <Tooltip label={file.lock ? 'Unlock' : 'lock'}>
-                <ActionIcon color={file.lock ? 'green' : 'red'} variant='filled' onClick={handleLock}>
-                  <IconLock size='1rem' />
                 </ActionIcon>
               </Tooltip>
             </>
