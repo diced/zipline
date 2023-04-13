@@ -48,3 +48,20 @@ export const google_auth = {
     return res.json();
   },
 };
+
+export const authentik_auth = {
+  oauth_url: (clientId: string, origin: string, authorize_url: string, state?: string) =>
+    `${authorize_url}?client_id=${clientId}&redirect_uri=${encodeURIComponent(
+      `${origin}/api/auth/oauth/authentik`
+    )}&response_type=code&scope=openid+email+profile${state ? `&state=${state}` : ''}`,
+  oauth_user: async (access_token: string, user_info_url: string) => {
+    const res = await fetch(user_info_url, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    });
+    if (!res.ok) return null;
+
+    return res.json();
+  },
+};

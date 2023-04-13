@@ -1,5 +1,5 @@
 import config from 'lib/config';
-import { notNull } from 'lib/util';
+import { notNull, notNullArray } from 'lib/util';
 import { GetServerSideProps } from 'next';
 
 export type OauthProvider = {
@@ -28,6 +28,13 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (ct
   const ghEnabled = notNull(config.oauth?.github_client_id, config.oauth?.github_client_secret);
   const discEnabled = notNull(config.oauth?.discord_client_id, config.oauth?.discord_client_secret);
   const googleEnabled = notNull(config.oauth?.google_client_id, config.oauth?.google_client_secret);
+  const authentikEnabled = notNullArray([
+    config.oauth?.authentik_client_id,
+    config.oauth?.authentik_client_secret,
+    config.oauth?.authentik_authorize_url,
+    config.oauth?.authentik_userinfo_url,
+    config.oauth?.authentik_token_url,
+  ]);
 
   const oauth_providers: OauthProvider[] = [];
 
@@ -49,6 +56,13 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (ct
       name: 'Google',
       url: '/api/auth/oauth/google',
       link_url: '/api/auth/oauth/google?state=link',
+    });
+
+  if (authentikEnabled)
+    oauth_providers.push({
+      name: 'Authentik',
+      url: '/api/auth/oauth/authentik',
+      link_url: '/api/auth/oauth/authentik?state=link',
     });
 
   const obj = {

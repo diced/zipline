@@ -38,6 +38,7 @@ import {
   IconFolders,
   IconGraph,
   IconHome,
+  IconKey,
   IconLink,
   IconLogout,
   IconReload,
@@ -139,6 +140,7 @@ export default function Layout({ children, props }) {
     GitHub: IconBrandGithubFilled,
     Discord: IconBrandDiscordFilled,
     Google: IconBrandGoogle,
+    Authentik: IconKey,
   };
 
   for (const provider of oauth_providers) {

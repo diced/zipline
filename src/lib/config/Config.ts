@@ -131,6 +131,12 @@ export interface ConfigOAuth {
 
   google_client_id?: string;
   google_client_secret?: string;
+
+  authentik_client_id?: string;
+  authentik_client_secret?: string;
+  authentik_authorize_url?: string;
+  authentik_userinfo_url?: string;
+  authentik_token_url?: string;
 }
 
 export interface ConfigChunks {

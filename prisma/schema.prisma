@@ -127,6 +127,7 @@ enum OauthProviders {
   DISCORD
   GITHUB
   GOOGLE
+  AUTHENTIK
 }
 
 model IncompleteFile {

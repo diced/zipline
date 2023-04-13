@@ -123,3 +123,7 @@ export async function getBase64URLFromURL(url: string) {
 export function notNull(a: unknown, b: unknown) {
   return a !== null && b !== null;
 }
+
+export function notNullArray(arr: unknown[]) {
+  return !arr.some((x) => x === null);
+}
