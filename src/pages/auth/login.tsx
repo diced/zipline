@@ -111,7 +111,7 @@ export default function Login({
       // if the user includes `local=true` as a query param, show the login form
       // otherwise, redirect to the oauth login if there is only one registered provider
       if (bypass_local_login && oauth_providers?.length === 1 && router.query.local !== 'true') {
-        // await router.push(oauth_providers[0].url);
+        await router.push(oauth_providers[0].url);
       }
 
       const a = await fetch('/api/user');
