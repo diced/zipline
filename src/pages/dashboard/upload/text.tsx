@@ -10,7 +10,7 @@ export default function UploadTextPage(props) {
 
   if (loading) return <LoadingOverlay visible={loading} />;
 
-  const title = `${props.title} - Upload Text`;
+  const title = `${props.title} - Upload to Pastebin`;
   return (
     <>
       <Head>
