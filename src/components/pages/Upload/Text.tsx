@@ -69,7 +69,7 @@ export default function Text() {
     options.compression !== 'none' && req.setRequestHeader('Image-Compression-Percent', options.compression);
     options.embedded && req.setRequestHeader('Embed', 'true');
     options.zeroWidth && req.setRequestHeader('Zws', 'true');
-    options.format !== 'default' && req.setRequestHeader('Format', options.format);
+    options.format !== 'random' && req.setRequestHeader('Random', options.format);
     options.originalName && req.setRequestHeader('Original-Name', 'true');
     options.overrideDomain && req.setRequestHeader('Override-Domain', options.overrideDomain);
 
