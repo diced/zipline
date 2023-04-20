@@ -20,6 +20,7 @@ export type Settings = {
     users: boolean;
     invites: boolean;
     folders: boolean;
+    files: boolean;
   };
 };
 
@@ -30,6 +31,7 @@ export const DEFAULT_SETTINGS: Settings = {
     users: true,
     invites: true,
     folders: true,
+    files: true,
   },
 };
 
@@ -86,5 +88,15 @@ export const listViewFoldersSelector = selector<boolean>({
     set(settingsState, {
       showNonMedia: get(settingsState).showNonMedia,
       listView: { ...(get(settingsState).listView ?? DEFAULT_SETTINGS.listView), folders: newValue },
+    }),
+});
+
+export const listViewFilesSelector = selector<boolean>({
+  key: 'listViewFilesSelector',
+  get: ({ get }) => get(settingsState).listView?.files ?? DEFAULT_SETTINGS.listView.files,
+  set: ({ set, get }, newValue) =>
+    set(settingsState, {
+      showNonMedia: get(settingsState).showNonMedia,
+      listView: { ...(get(settingsState).listView ?? DEFAULT_SETTINGS.listView), files: newValue },
     }),
 });
