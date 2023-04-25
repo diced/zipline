@@ -7,6 +7,7 @@ function preFileDecorator(fastify: FastifyInstance, _, done) {
   done();
 
   async function preFile(this: FastifyReply, file: File) {
+    if (file.favorite) return false;
     if (file.expiresAt && file.expiresAt < new Date()) {
       await this.server.datasource.delete(file.name);
       await this.server.prisma.file.delete({ where: { id: file.id } });

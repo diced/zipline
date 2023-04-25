@@ -6,7 +6,7 @@ const logger = Logger.get('admin');
 
 async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   try {
-    const { datasource, orphaned } = req.body;
+    const { orphaned } = req.body;
     if (orphaned) {
       const { count } = await prisma.file.deleteMany({
         where: {
