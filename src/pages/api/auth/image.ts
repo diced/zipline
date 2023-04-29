@@ -7,6 +7,7 @@ import { extname } from 'path';
 
 async function handler(req: NextApiReq, res: NextApiRes) {
   const { id, password } = req.query;
+  if (isNaN(Number(id))) return res.badRequest('invalid id');
 
   const file = await prisma.file.findFirst({
     where: {

@@ -50,22 +50,22 @@ export class S3 extends Datasource {
   }
 
   public size(file: string): Promise<number> {
-    return new Promise((res, rej) => {
+    return new Promise((res) => {
       this.s3.statObject(this.config.bucket, file, (err, stat) => {
-        if (err) rej(err);
+        if (err) res(0);
         else res(stat.size);
       });
     });
   }
 
   public async fullSize(): Promise<number> {
-    return new Promise((res, rej) => {
+    return new Promise((res) => {
       const objects = this.s3.listObjectsV2(this.config.bucket, '', true);
       let size = 0;
 
       objects.on('data', (item) => (size += item.size));
       objects.on('end', (err) => {
-        if (err) rej(err);
+        if (err) res(0);
         else res(size);
       });
     });
