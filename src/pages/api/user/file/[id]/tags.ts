@@ -72,7 +72,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     if (!tags) return res.badRequest('no tags');
     if (!tags.length) return res.badRequest('no tags');
 
-    // if the tag has an id, it means it already exists so we just connect it
+    // if the tag has an id, it means it already exists, so we just connect it
     // if it doesn't have an id, we create it and then connect it
     const nFile = await prisma.file.update({
       where: { id },

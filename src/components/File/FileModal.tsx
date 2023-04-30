@@ -47,6 +47,7 @@ import { FileMeta } from '.';
 import Type from '../Type';
 import Tag from 'components/File/tag/Tag';
 import Item from 'components/File/tag/Item';
+import { useDeleteFileTags, useFileTags, useTags, useUpdateFileTags } from 'lib/queries/tags';
 
 export default function FileModal({
   open,
@@ -70,15 +71,14 @@ export default function FileModal({
   const deleteFile = useFileDelete();
   const favoriteFile = useFileFavorite();
   const folders = useFolders();
-
-  const [overrideRender, setOverrideRender] = useState(false);
+  const tags = useFileTags(file.id);
+  const updateTags = useUpdateFileTags(file.id);
+  const removeTags = useDeleteFileTags(file.id);
   const clipboard = useClipboard();
 
-  const [tags, setTags] = useState<{ label: string; value: string; color: string }[]>([
-    { label: 'Tag 1', value: 'tag-1', color: '#ff0000' },
-    { label: 'Tag 2', value: 'tag-2', color: '#00ff00' },
-    { label: 'Tag 3', value: 'tag-3', color: '#0000ff' },
-  ]);
+  const allTags = useTags();
+
+  const [overrideRender, setOverrideRender] = useState(false);
 
   const handleDelete = async () => {
     deleteFile.mutate(file.id, {
@@ -227,6 +227,40 @@ export default function FileModal({
     console.log('should save');
   };
 
+  const handleAddTags = (t: string[]) => {
+    // filter out existing tags from t
+    t = t.filter((tag) => !tags.data.find((t) => t.id === tag));
+
+    const fullTag = allTags.data.find((tag) => tag.id === t[0]);
+
+    if (!fullTag) return;
+
+    updateTags.mutate([...tags.data, fullTag], {
+      onSuccess: () => {
+        showNotification({
+          title: 'Added tag',
+          message: fullTag.name,
+          color: 'green',
+          icon: <IconTags size='1rem' />,
+        });
+      },
+    });
+  };
+
+  const handleRemoveTags = (t: string[]) => {
+    const fullTag = allTags.data.find((tag) => tag.id === t[0]);
+
+    removeTags.mutate(t, {
+      onSuccess: () =>
+        showNotification({
+          title: 'Removed tag',
+          message: fullTag.name,
+          color: 'green',
+          icon: <IconTags size='1rem' />,
+        }),
+    });
+  };
+
   return (
     <Modal
       opened={open}
@@ -298,8 +332,9 @@ export default function FileModal({
             <Accordion.Control icon={<IconTags size='1rem' />}>Tags</Accordion.Control>
             <Accordion.Panel>
               <MultiSelect
-                data={tags}
-                placeholder={tags.length ? 'Add tags' : 'Add tags (optional)'}
+                value={tags.data?.map((t) => t.id) ?? []}
+                data={allTags.data?.map((t) => ({ value: t.id, label: t.name, color: t.color })) ?? []}
+                placeholder={allTags.data?.length ? 'Add tags' : 'Add tags (optional)'}
                 icon={<IconTags size='1rem' />}
                 valueComponent={Tag}
                 itemComponent={Item}
@@ -316,9 +351,11 @@ export default function FileModal({
                     </Text>
                   </Group>
                 )}
+                // onChange={(t) => (t.length === 1 ? handleRemoveTags(t) : handleAddTags(t))}
+                onChange={(t) => console.log(t)}
                 onCreate={(t) => {
                   const item = { value: t, label: t, color: colorHash(t) };
-                  setTags([...tags, item]);
+                  // setLabelTags([...labelTags, item]);
                   return item;
                 }}
                 onBlur={handleTagsSave}
