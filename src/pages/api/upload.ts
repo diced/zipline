@@ -12,7 +12,7 @@ import { createInvisImage, hashPassword } from 'lib/util';
 import { parseExpiry } from 'lib/utils/client';
 import { removeGPSData } from 'lib/utils/exif';
 import multer from 'multer';
-import { join } from 'path';
+import { join, parse } from 'path';
 import sharp from 'sharp';
 import { Worker } from 'worker_threads';
 
@@ -200,7 +200,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     let mimetype = file.mimetype;
 
     if (file.mimetype === 'application/octet-stream' && zconfig.uploader.assume_mimetypes) {
-      const ext = file.originalname.split('.').pop();
+      const ext = parse(file.originalname).ext.replace('.', '');
       const mime = await guess(ext);
 
       if (!mime) response.assumed_mimetype = false;
