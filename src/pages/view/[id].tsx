@@ -231,7 +231,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     if (file.password) file.password = true;
     return {
       props: {
-        image: file,
+        file,
         user,
         pass,
         prismRender: true,
