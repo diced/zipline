@@ -167,7 +167,7 @@ export default function Login({
       <Center sx={{ height: '100vh' }}>
         <Card radius='md'>
           <Title size={30} align='left'>
-            {title}
+            {bypass_local_login ? ' Login to Zipline with' : 'Zipline'}
           </Title>
 
           {oauth_registration && (
@@ -180,7 +180,7 @@ export default function Login({
                     variant='outline'
                     radius='md'
                     fullWidth
-                    leftIcon={<Icon height={'15'} width={'15'} />}
+                    leftIcon={<Icon size='1rem' />}
                     my='xs'
                     component={Link}
                     href={url}
