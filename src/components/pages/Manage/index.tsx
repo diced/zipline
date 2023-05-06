@@ -1,9 +1,11 @@
 import {
+  ActionIcon,
   Anchor,
   Box,
   Button,
   Card,
   ColorInput,
+  CopyButton,
   FileInput,
   Group,
   Image,
@@ -23,6 +25,8 @@ import {
   IconBrandDiscordFilled,
   IconBrandGithubFilled,
   IconBrandGoogle,
+  IconCheck,
+  IconClipboardCopy,
   IconFileExport,
   IconFiles,
   IconFilesOff,
@@ -89,6 +93,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
   const [file, setFile] = useState<File | null>(null);
   const [fileDataURL, setFileDataURL] = useState(user.avatar ?? null);
   const [totpEnabled, setTotpEnabled] = useState(!!user.totpSecret);
+  const [tokenShown, setTokenShown] = useState(false);
 
   const getDataURL = (f: File): Promise<string> => {
     return new Promise((res, rej) => {
@@ -365,6 +370,25 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
         <AnchorNext href='https://zipline.diced.tech/docs/guides/variables'>the docs</AnchorNext> for
         variables
       </MutedText>
+
+      <TextInput
+        rightSection={
+          <CopyButton value={user.token} timeout={1000}>
+            {({ copied, copy }) => (
+              <ActionIcon onClick={copy}>
+                {copied ? <IconCheck color='green' size='1rem' /> : <IconClipboardCopy size='1rem' />}
+              </ActionIcon>
+            )}
+          </CopyButton>
+        }
+        // @ts-ignore (this works even though ts doesn't allow for it)
+        component='span'
+        label='Token'
+        onClick={() => setTokenShown(true)}
+      >
+        {tokenShown ? user.token : '[click to reveal]'}
+      </TextInput>
+
       <form onSubmit={form.onSubmit((v) => onSubmit(v))}>
         <TextInput id='username' label='Username' my='sm' {...form.getInputProps('username')} />
         <PasswordInput

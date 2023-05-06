@@ -114,7 +114,7 @@ model OAuth {
   id       Int            @id @default(autoincrement())
   provider OauthProviders
   user     User           @relation(fields: [userId], references: [uuid], onDelete: Cascade)
-  userId   String
+  userId   String         @db.Uuid
   username String
   oauthId  String?
   token    String

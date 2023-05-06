@@ -29,7 +29,7 @@ async function main() {
 
   for (let i = 0; i !== files.length; ++i) {
     const file = files[i];
-    if (!datasource.get(file.name)) {
+    if (!(await datasource.get(file.name))) {
       if (process.argv.includes('--force-delete')) {
         console.log(`File ${file.name} does not exist. Deleting...`);
         await prisma.file.delete({
