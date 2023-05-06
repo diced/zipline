@@ -169,18 +169,12 @@ export default function Urls() {
 
   const copyURL = (u) => {
     clipboard.copy(`${window.location.protocol}//${window.location.host}${u.url}`);
-    if (!navigator.clipboard)
-      showNotification({
-        title: 'Unable to copy to clipboard',
-        message: 'Zipline is unable to copy to clipboard due to security reasons.',
-        color: 'red',
-      });
-    else
-      showNotification({
-        title: 'Copied to clipboard',
-        message: '',
-        icon: <IconClipboardCopy size='1rem' />,
-      });
+
+    showNotification({
+      title: 'Copied to clipboard',
+      message: '',
+      icon: <IconClipboardCopy size='1rem' />,
+    });
   };
 
   const urlDelete = useURLDelete();

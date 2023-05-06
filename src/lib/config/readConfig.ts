@@ -136,6 +136,8 @@ export default function readConfig() {
     map('DISCORD_SHORTEN_EMBED_THUMBNAIL', 'boolean', 'discord.shorten.embed.thumbnail'),
     map('DISCORD_SHORTEN_EMBED_TIMESTAMP', 'boolean', 'discord.shorten.embed.timestamp'),
 
+    map('OAUTH_BYPASS_LOCAL_LOGIN', 'boolean', 'oauth.bypass_local_login'),
+
     map('OAUTH_GITHUB_CLIENT_ID', 'string', 'oauth.github_client_id'),
     map('OAUTH_GITHUB_CLIENT_SECRET', 'string', 'oauth.github_client_secret'),
 

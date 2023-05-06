@@ -4,10 +4,8 @@ import {
   Box,
   Burger,
   Button,
-  Group,
   Header,
   Image,
-  Input,
   MediaQuery,
   Menu,
   Navbar,
@@ -222,21 +220,14 @@ export default function Layout({ children, props }) {
       labels: { confirm: 'Copy', cancel: 'Cancel' },
       onConfirm: async () => {
         clipboard.copy(token);
+
         if (!navigator.clipboard)
           showNotification({
-            title: 'Unable to copy to clipboard',
-            message: (
-              <Text size='sm'>
-                Zipline is unable to copy to clipboard due to security reasons. However, you can still copy
-                the token manually.
-                <br />
-                <Group position='left' spacing='sm'>
-                  <Text>Your token is:</Text>
-                  <Input size='sm' onFocus={(e) => e.target.select()} type='text' value={token} />
-                </Group>
-              </Text>
-            ),
+            title: 'Unable to copy token',
+            message:
+              "Zipline couldn't copy to your clipboard. Please copy the token manually from the settings page.",
             color: 'red',
+            icon: <IconClipboardCopy size='1rem' />,
           });
         else
           showNotification({

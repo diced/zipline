@@ -7,18 +7,12 @@ export default function showFilesModal(clipboard, modals, files: string[]) {
   const open = (idx: number) => window.open(files[idx], '_blank');
   const copy = (idx: number) => {
     clipboard.copy(files[idx]);
-    if (!navigator.clipboard)
-      showNotification({
-        title: 'Unable to copy to clipboard',
-        message: 'Zipline is unable to copy to clipboard due to security reasons.',
-        color: 'red',
-      });
-    else
-      showNotification({
-        title: 'Copied to clipboard',
-        message: <AnchorNext href={files[idx]}>{files[idx]}</AnchorNext>,
-        icon: <IconClipboardCopy size='1rem' />,
-      });
+
+    showNotification({
+      title: 'Copied to clipboard',
+      message: <AnchorNext href={files[idx]}>{files[idx]}</AnchorNext>,
+      icon: <IconClipboardCopy size='1rem' />,
+    });
   };
 
   modals.openModal({

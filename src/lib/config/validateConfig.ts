@@ -168,6 +168,8 @@ const validator = s.object({
     .nullish.default(null),
   oauth: s
     .object({
+      bypass_local_login: s.boolean.default(false),
+
       github_client_id: s.string.nullable.default(null),
       github_client_secret: s.string.nullable.default(null),
 

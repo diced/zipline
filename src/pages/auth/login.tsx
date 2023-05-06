@@ -22,7 +22,13 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 export { getServerSideProps } from 'middleware/getServerSideProps';
 
-export default function Login({ title, user_registration, oauth_registration, oauth_providers: unparsed }) {
+export default function Login({
+  title,
+  user_registration,
+  oauth_registration,
+  bypass_local_login,
+  oauth_providers: unparsed,
+}) {
   const router = useRouter();
 
   // totp modal
@@ -33,6 +39,9 @@ export default function Login({ title, user_registration, oauth_registration, oa
   const [loading, setLoading] = useState(false);
 
   const oauth_providers = JSON.parse(unparsed);
+
+  const show_local_login =
+    router.query.local === 'true' || !(bypass_local_login && oauth_providers?.length > 0);
 
   const icons = {
     GitHub: IconBrandGithub,
@@ -100,6 +109,12 @@ export default function Login({ title, user_registration, oauth_registration, oa
 
   useEffect(() => {
     (async () => {
+      // if the user includes `local=true` as a query param, show the login form
+      // otherwise, redirect to the oauth login if there is only one registered provider
+      if (bypass_local_login && oauth_providers?.length === 1 && router.query.local !== 'true') {
+        await router.push(oauth_providers[0].url);
+      }
+
       const a = await fetch('/api/user');
       if (a.ok) await router.push('/dashboard');
     })();
@@ -153,7 +168,7 @@ export default function Login({ title, user_registration, oauth_registration, oa
       <Center sx={{ height: '100vh' }}>
         <Card radius='md'>
           <Title size={30} align='left'>
-            {title}
+            {bypass_local_login ? ' Login to Zipline with' : 'Zipline'}
           </Title>
 
           {oauth_registration && (
@@ -166,7 +181,7 @@ export default function Login({ title, user_registration, oauth_registration, oa
                     variant='outline'
                     radius='md'
                     fullWidth
-                    leftIcon={<Icon height={'15'} width={'15'} />}
+                    leftIcon={<Icon size='1rem' />}
                     my='xs'
                     component={Link}
                     href={url}
@@ -175,41 +190,42 @@ export default function Login({ title, user_registration, oauth_registration, oa
                   </Button>
                 ))}
               </Group>
-
-              <Divider my='xs' label='or' labelPosition='center' />
+              {show_local_login && <Divider my='xs' label='or' labelPosition='center' />}
             </>
           )}
 
-          <form onSubmit={form.onSubmit((v) => onSubmit(v))}>
-            <TextInput
-              my='xs'
-              radius='md'
-              size='md'
-              id='username'
-              label='Username'
-              {...form.getInputProps('username')}
-            />
-            <PasswordInput
-              my='xs'
-              radius='md'
-              size='md'
-              id='password'
-              label='Password'
-              {...form.getInputProps('password')}
-            />
+          {show_local_login && (
+            <form onSubmit={form.onSubmit((v) => onSubmit(v))}>
+              <TextInput
+                my='xs'
+                radius='md'
+                size='md'
+                id='username'
+                label='Username'
+                {...form.getInputProps('username')}
+              />
+              <PasswordInput
+                my='xs'
+                radius='md'
+                size='md'
+                id='password'
+                label='Password'
+                {...form.getInputProps('password')}
+              />
 
-            <Group position='apart'>
-              {user_registration && (
-                <Anchor size='xs' href='/auth/register' component={Link}>
-                  Don&apos;t have an account? Register
-                </Anchor>
-              )}
+              <Group position='apart'>
+                {user_registration && (
+                  <Anchor size='xs' href='/auth/register' component={Link}>
+                    Don&apos;t have an account? Register
+                  </Anchor>
+                )}
 
-              <Button size='sm' p='xs' radius='md' my='xs' type='submit' loading={loading}>
-                Login
-              </Button>
-            </Group>
-          </form>
+                <Button size='sm' p='xs' radius='md' my='xs' type='submit' loading={loading}>
+                  Login
+                </Button>
+              </Group>
+            </form>
+          )}
         </Card>
       </Center>
     </>

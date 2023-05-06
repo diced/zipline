@@ -40,6 +40,12 @@ export default function FilePagation({ disableMediaPreview, exifEnabled, queryPa
   const pages = usePaginatedFiles(page, !checked ? 'media' : null);
 
   if (pages.isSuccess && pages.data.length === 0) {
+    if (page > 1 && numPages > 0) {
+      setPage(page - 1);
+
+      return null;
+    }
+
     return (
       <Center sx={{ flexDirection: 'column' }}>
         <Group>

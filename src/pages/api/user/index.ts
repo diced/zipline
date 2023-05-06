@@ -1,4 +1,4 @@
-import config from 'lib/config';
+import zconfig from 'lib/config';
 import Logger from 'lib/logger';
 import { authentik_auth, discord_auth, github_auth, google_auth } from 'lib/oauth';
 import prisma from 'lib/prisma';
@@ -18,7 +18,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
 
         return res.json({
           error: 'oauth token expired',
-          redirect_uri: github_auth.oauth_url(config.oauth.github_client_id),
+          redirect_uri: github_auth.oauth_url(zconfig.oauth.github_client_id),
         });
       }
     } else if (user.oauth.find((o) => o.provider === 'DISCORD')) {
@@ -35,8 +35,8 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
           return res.json({
             error: 'oauth token expired',
             redirect_uri: discord_auth.oauth_url(
-              config.oauth.discord_client_id,
-              `${config.core.return_https ? 'https' : 'http'}://${req.headers.host}`
+              zconfig.oauth.discord_client_id,
+              `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}`
             ),
           });
         }
@@ -47,8 +47,8 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
             'Content-Type': 'application/x-www-form-urlencoded',
           },
           body: new URLSearchParams({
-            client_id: config.oauth.discord_client_id,
-            client_secret: config.oauth.discord_client_secret,
+            client_id: zconfig.oauth.discord_client_id,
+            client_secret: zconfig.oauth.discord_client_secret,
             grant_type: 'refresh_token',
             refresh_token: provider.refresh,
           }),
@@ -59,8 +59,8 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
           return res.json({
             error: 'oauth token expired',
             redirect_uri: discord_auth.oauth_url(
-              config.oauth.discord_client_id,
-              `${config.core.return_https ? 'https' : 'http'}://${req.headers.host}`
+              zconfig.oauth.discord_client_id,
+              `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}`
             ),
           });
         }
@@ -90,8 +90,8 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
           return res.json({
             error: 'oauth token expired',
             redirect_uri: google_auth.oauth_url(
-              config.oauth.google_client_id,
-              `${config.core.return_https ? 'https' : 'http'}://${req.headers.host}`
+              zconfig.oauth.google_client_id,
+              `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}`
             ),
           });
         }
@@ -101,8 +101,8 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
             'Content-Type': 'application/x-www-form-urlencoded',
           },
           body: new URLSearchParams({
-            client_id: config.oauth.google_client_id,
-            client_secret: config.oauth.google_client_secret,
+            client_id: zconfig.oauth.google_client_id,
+            client_secret: zconfig.oauth.google_client_secret,
             grant_type: 'refresh_token',
             refresh_token: provider.refresh,
           }),
@@ -113,8 +113,8 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
           return res.json({
             error: 'oauth token expired',
             redirect_uri: google_auth.oauth_url(
-              config.oauth.google_client_id,
-              `${config.core.return_https ? 'https' : 'http'}://${req.headers.host}`
+              zconfig.oauth.google_client_id,
+              `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}`
             ),
           });
         }
@@ -257,6 +257,14 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     return res.json(user);
   }
 }
+
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '50mb',
+    },
+  },
+};
 
 export default withZipline(handler, {
   methods: ['GET', 'PATCH'],
