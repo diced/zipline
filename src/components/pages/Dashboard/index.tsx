@@ -106,22 +106,16 @@ export default function Dashboard({ disableMediaPreview, exifEnabled, compress }
 
   const copyFile = async (file) => {
     clipboard.copy(`${window.location.protocol}//${window.location.host}${file.url}`);
-    if (!navigator.clipboard)
-      showNotification({
-        title: 'Unable to copy to clipboard',
-        message: 'Zipline is unable to copy to clipboard due to security reasons.',
-        color: 'red',
-      });
-    else
-      showNotification({
-        title: 'Copied to clipboard',
-        message: (
-          <a
-            href={`${window.location.protocol}//${window.location.host}${file.url}`}
-          >{`${window.location.protocol}//${window.location.host}${file.url}`}</a>
-        ),
-        icon: <IconClipboardCopy size='1rem' />,
-      });
+
+    showNotification({
+      title: 'Copied to clipboard',
+      message: (
+        <a
+          href={`${window.location.protocol}//${window.location.host}${file.url}`}
+        >{`${window.location.protocol}//${window.location.host}${file.url}`}</a>
+      ),
+      icon: <IconClipboardCopy size='1rem' />,
+    });
   };
 
   const viewFile = async (file) => {

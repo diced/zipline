@@ -112,7 +112,7 @@ export default function Folders({ disableMediaPreview, exifEnabled, compress }) 
 
   const makePublic = async (folder) => {
     const res = await useFetch(`/api/user/folders/${folder.id}`, 'PATCH', {
-      public: folder.public ? false : true,
+      public: !folder.public,
     });
 
     if (!res.error) {
@@ -363,25 +363,18 @@ export default function Folders({ disableMediaPreview, exifEnabled, compress }) 
                             aria-label='copy link'
                             onClick={() => {
                               clipboard.copy(`${window.location.origin}/folder/${folder.id}`);
-                              if (!navigator.clipboard)
-                                showNotification({
-                                  title: 'Unable to copy to clipboard',
-                                  message: 'Zipline is unable to copy to clipboard due to security reasons.',
-                                  color: 'red',
-                                });
-                              else
-                                showNotification({
-                                  title: 'Copied folder link',
-                                  message: (
-                                    <>
-                                      Copied{' '}
-                                      <AnchorNext href={`/folder/${folder.id}`}>folder link</AnchorNext> to
-                                      clipboard
-                                    </>
-                                  ),
-                                  color: 'green',
-                                  icon: <IconClipboardCopy size='1rem' />,
-                                });
+
+                              showNotification({
+                                title: 'Copied folder link',
+                                message: (
+                                  <>
+                                    Copied <AnchorNext href={`/folder/${folder.id}`}>folder link</AnchorNext>{' '}
+                                    to clipboard
+                                  </>
+                                ),
+                                color: 'green',
+                                icon: <IconClipboardCopy size='1rem' />,
+                              });
                             }}
                           >
                             <IconClipboardCopy size='1rem' />
