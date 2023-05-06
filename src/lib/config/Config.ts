@@ -123,6 +123,8 @@ export interface ConfigFeatures {
 }
 
 export interface ConfigOAuth {
+  bypass_local_login: boolean;
+
   github_client_id?: string;
   github_client_secret?: string;
 
