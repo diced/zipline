@@ -29,7 +29,7 @@ services:
       - CORE_LOGGER=true
     volumes:
       - './uploads:/zipline/uploads'
-      - '$PWD/public:/zipline/public'
+      - './public:/zipline/public'
     depends_on:
       - 'postgres'
 
