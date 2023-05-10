@@ -61,7 +61,7 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (ct
       user_registration: config.features.user_registration,
       oauth_registration: config.features.oauth_registration,
       oauth_providers: JSON.stringify(oauth_providers),
-      bypass_local_login: config.oauth.bypass_local_login,
+      bypass_local_login: config.oauth?.bypass_local_login ?? false,
       chunks_size: config.chunks.chunks_size,
       max_size: config.chunks.max_size,
       totp_enabled: config.mfa.totp_enabled,
