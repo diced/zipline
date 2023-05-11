@@ -37,7 +37,9 @@ export default function FilePagation({ disableMediaPreview, exifEnabled, queryPa
     })();
   }, [page]);
 
-  const pages = usePaginatedFiles(page, !checked ? 'media' : null);
+  const pages = usePaginatedFiles(page, {
+    filter: !checked ? 'media' : 'none',
+  });
 
   if (pages.isSuccess && pages.data.length === 0) {
     if (page > 1 && numPages > 0) {
