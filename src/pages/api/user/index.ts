@@ -144,7 +144,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
           redirect_uri: authentik_auth.oauth_url(
             zconfig.oauth.authentik_client_id,
             `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}`,
-            config.oauth.authentik_authorize_url
+           zconfig.oauth.authentik_authorize_url
           ),
         });
       }
