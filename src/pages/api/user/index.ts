@@ -143,7 +143,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
           error: 'oauth token expired',
           redirect_uri: authentik_auth.oauth_url(
             zconfig.oauth.authentik_client_id,
-            `${config.core.return_https ? 'https' : 'http'}://${req.headers.host}`,
+            `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}`,
             config.oauth.authentik_authorize_url
           ),
         });
