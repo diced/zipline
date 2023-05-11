@@ -134,7 +134,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     } else if (user.oauth.find((o) => o.provider === 'AUTHENTIK')) {
       const resp = await authentik_auth.oauth_user(
         user.oauth.find((o) => o.provider === 'AUTHENTIK').token,
-        config.oauth.authentik_userinfo_url
+        zconfig.oauth.authentik_userinfo_url
       );
       if (!resp) {
         logger.debug(`oauth expired for ${JSON.stringify(user, jsonUserReplacer)}`);
