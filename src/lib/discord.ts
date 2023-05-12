@@ -63,13 +63,13 @@ export async function sendUpload(user: User, file: File, raw_link: string, link:
             thumbnail:
               isImage && parsed.embed.thumbnail
                 ? {
-                    url: parsed.url,
+                    url: raw_link,
                   }
                 : null,
             image:
               isImage && parsed.embed.image
                 ? {
-                    url: parsed.url,
+                    url: raw_link,
                   }
                 : null,
           },

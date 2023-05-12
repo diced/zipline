@@ -252,12 +252,15 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       invis ? invis.invis : encodeURI(fileUpload.name)
     }`;
 
-    const embedUrl = `${domain}/r/${invis ? invis.invis : encodeURI(fileUpload.name)}`;
-
     response.files.push(responseUrl);
 
     if (zconfig.discord?.upload) {
-      await sendUpload(user, fileUpload, `${domain}/r/${invis ? invis.invis : fileUpload.name}`, embedUrl);
+      await sendUpload(
+        user,
+        fileUpload,
+        `${domain}/r/${invis ? invis.invis : encodeURI(fileUpload.name)}`,
+        responseUrl
+      );
     }
 
     if (zconfig.exif.enabled && zconfig.exif.remove_gps && fileUpload.mimetype.startsWith('image/')) {
