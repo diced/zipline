@@ -84,7 +84,6 @@ async function start() {
   if (config.datasource.type === 'local') {
     fd = await open(
       join(
-        process.cwd(),
         config.datasource.local.directory,
         `${fileName}${compressionUsed ? '.jpg' : `${ext ? '.' : ''}${ext}`}`
       ),
