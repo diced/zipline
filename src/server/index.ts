@@ -100,6 +100,18 @@ async function start() {
     return reply.type('image/x-icon').send(favicon);
   });
 
+  if (config.features.robots_txt) {
+    server.get('/robots.txt', async (_, reply) => {
+      return reply.type('text/plain').send(`User-Agent: *
+Disallow: /r/
+Disallow: /api/
+Disallow: /view/
+Disallow: ${config.uploader.route}
+Disallow: ${config.urls.route}
+`);
+    });
+  }
+
   // makes sure to handle both in one route as you cant have two handlers with the same route
   if (config.urls.route === '/' && config.uploader.route === '/') {
     server.route({
