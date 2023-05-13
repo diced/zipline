@@ -12,7 +12,7 @@ import {
 import FileModal from 'components/File/FileModal';
 import MutedText from 'components/MutedText';
 import useFetch from 'lib/hooks/useFetch';
-import { usePaginatedFiles, useRecent } from 'lib/queries/files';
+import { PaginatedFilesOptions, usePaginatedFiles, useRecent } from 'lib/queries/files';
 import { useStats } from 'lib/queries/stats';
 import { userSelector } from 'lib/recoil/user';
 import { bytesToHuman } from 'lib/utils/bytes';
@@ -45,32 +45,24 @@ export default function Dashboard({ disableMediaPreview, exifEnabled, compress }
     })();
   }, [page]);
 
-  const files = usePaginatedFiles(page, 'none');
-
   // sorting
   const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
-    columnAccessor: 'date',
+    columnAccessor: 'createdAt',
     direction: 'asc',
   });
-  const [records, setRecords] = useState(files.data);
 
-  useEffect(() => {
-    setRecords(files.data);
-  }, [files.data]);
+  const files = usePaginatedFiles(page, {
+    filter: 'none',
 
-  useEffect(() => {
-    if (!records || records.length === 0) return;
-
-    const sortedRecords = [...records].sort((a, b) => {
-      if (sortStatus.direction === 'asc') {
-        return a[sortStatus.columnAccessor] > b[sortStatus.columnAccessor] ? 1 : -1;
-      }
-
-      return a[sortStatus.columnAccessor] < b[sortStatus.columnAccessor] ? 1 : -1;
-    });
-
-    setRecords(sortedRecords);
-  }, [sortStatus]);
+    // only query for correct results if there is more than one page
+    // otherwise, querying has no effect
+    ...(numFiles > 1
+      ? {
+          sortBy: sortStatus.columnAccessor as PaginatedFilesOptions['sortBy'],
+          order: sortStatus.direction,
+        }
+      : {}),
+  });
 
   // file modal on click
   const [open, setOpen] = useState(false);
@@ -203,7 +195,7 @@ export default function Dashboard({ disableMediaPreview, exifEnabled, compress }
               ),
             },
           ]}
-          records={records ?? []}
+          records={files.data ?? []}
           fetching={files.isLoading}
           loaderBackgroundBlur={5}
           loaderVariant='dots'

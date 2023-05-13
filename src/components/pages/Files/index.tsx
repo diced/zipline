@@ -11,7 +11,10 @@ import PendingFilesModal from './PendingFilesModal';
 export default function Files({ disableMediaPreview, exifEnabled, queryPage, compress }) {
   const [favoritePage, setFavoritePage] = useState(1);
   const [favoriteNumPages, setFavoriteNumPages] = useState(0);
-  const favoritePages = usePaginatedFiles(favoritePage, 'media', true);
+  const favoritePages = usePaginatedFiles(favoritePage, {
+    filter: 'media',
+    favorite: true,
+  });
 
   const [open, setOpen] = useState(false);
 

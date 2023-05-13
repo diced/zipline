@@ -23,8 +23,8 @@ services:
     env_file:
       - .env.local
     volumes:
-      - '$PWD/uploads:/zipline/uploads'
-      - '$PWD/public:/zipline/public'
+      - './uploads:/zipline/uploads'
+      - './public:/zipline/public'
     depends_on:
       - 'postgres'
 

@@ -1,3 +1,5 @@
+import { Prisma } from '@prisma/client';
+import { s } from '@sapphire/shapeshift';
 import config from 'lib/config';
 import prisma from 'lib/prisma';
 import { formatRootUrl } from 'lib/utils/urls';
@@ -5,12 +7,27 @@ import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'middleware/wi
 
 const pageCount = 16;
 
+const sortByValidator = s.enum(
+  ...([
+    'createdAt',
+    'views',
+    'expiresAt',
+    'size',
+    'name',
+    'mimetype',
+  ] satisfies (keyof Prisma.FileOrderByWithRelationInput)[])
+);
+
+const orderValidator = s.enum('asc', 'desc');
+
 async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
-  const { page, filter, count, favorite } = req.query as {
+  const { page, filter, count, favorite, ...rest } = req.query as {
     page: string;
     filter: string;
     count: string;
     favorite: string;
+    sortBy: string;
+    order: string;
   };
 
   const where = {
@@ -33,7 +50,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
         },
       ],
     }),
-  };
+  } satisfies Prisma.FileWhereInput;
 
   if (count) {
     const count = await prisma.file.count({
@@ -47,6 +64,14 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
 
   if (!page) return res.badRequest('no page');
   if (isNaN(Number(page))) return res.badRequest('page is not a number');
+
+  // validate sortBy
+  const sortBy = sortByValidator.run(rest.sortBy || 'createdAt');
+  if (!sortBy.isOk()) return res.badRequest('invalid sortBy option');
+
+  // validate order
+  const order = orderValidator.run(rest.order || 'desc');
+  if (!sortBy.isOk()) return res.badRequest('invalid order option');
 
   const files: {
     favorite: boolean;
@@ -63,7 +88,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   }[] = await prisma.file.findMany({
     where,
     orderBy: {
-      createdAt: 'desc',
+      [sortBy.value]: order.value,
     },
     select: {
       createdAt: true,

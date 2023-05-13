@@ -2,8 +2,10 @@ import { Button, Stack, Title, Tooltip } from '@mantine/core';
 import MutedText from 'components/MutedText';
 import Head from 'next/head';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 export default function FiveHundred() {
+  const { asPath } = useRouter();
   return (
     <>
       <Head>
@@ -24,9 +26,13 @@ export default function FiveHundred() {
         <Tooltip label={"Take a look at Zipline's logs and the browser console for more info"}>
           <MutedText>Internal server error</MutedText>
         </Tooltip>
-        <Button component={Link} href='/dashboard'>
-          Head to the Dashboard
-        </Button>
+        {asPath === '/dashboard' ? (
+          <Button onClick={() => window.location.reload()}>Attempt Refresh</Button>
+        ) : (
+          <Button component={Link} href='/dashboard'>
+            Head to the Dashboard
+          </Button>
+        )}
       </Stack>
     </>
   );
