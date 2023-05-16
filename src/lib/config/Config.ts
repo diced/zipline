@@ -120,6 +120,8 @@ export interface ConfigFeatures {
   headless: boolean;
 
   default_avatar: string;
+
+  robots_txt: string;
 }
 
 export interface ConfigOAuth {
