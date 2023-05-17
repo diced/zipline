@@ -11,6 +11,7 @@ type UserFiles = {
   id: number;
   username: string;
   files?: File[];
+  error?: unknown;
 };
 
 export default function UserFiles({ userId, disableMediaPreview, exifEnabled, compress }) {
@@ -20,8 +21,12 @@ export default function UserFiles({ userId, disableMediaPreview, exifEnabled, co
 
   useEffect(() => {
     (async () => {
-      const { id, username, files }: UserFiles = await useFetch(`/api/user/${userId}`);
-      setUser({ id, username, files });
+      const user: UserFiles = await useFetch(`/api/user/${userId}`);
+      if (!user.error) {
+        setUser(user);
+      } else {
+        push('/dashboard');
+      }
     })();
   }, [userId]);
 
