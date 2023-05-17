@@ -6,6 +6,7 @@ import type { User } from '@prisma/client';
 import {
   IconClipboardCopy,
   IconEdit,
+  IconExternalLink,
   IconGridDots,
   IconList,
   IconUserExclamation,
@@ -116,6 +117,10 @@ export default function Users() {
     }
   };
 
+  const openUser = async (user) => {
+    await router.push(`/dashboard/users/${user.id}`);
+  };
+
   useEffect(() => {
     updateUsers();
   }, []);
@@ -179,6 +184,11 @@ export default function Users() {
                       color='blue'
                     >
                       <IconEdit size='1rem' />
+                    </ActionIcon>
+                  </Tooltip>
+                  <Tooltip label='Open user'>
+                    <ActionIcon color='cyan' onClick={() => openUser(user)}>
+                      <IconExternalLink size='1rem' />
                     </ActionIcon>
                   </Tooltip>
                 </Group>

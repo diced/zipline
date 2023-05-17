@@ -14,6 +14,10 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     where: {
       id: Number(id),
     },
+    include: {
+      files: true,
+      Folder: true,
+    },
   });
 
   if (!target) return res.notFound('user not found');
