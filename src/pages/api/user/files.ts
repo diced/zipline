@@ -31,15 +31,46 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     } else {
       if (!req.body.id) return res.badRequest('no file id');
 
-      const file = await prisma.file.delete({
+      let file = await prisma.file.findFirst({
         where: {
           id: req.body.id,
+          userId: user.id,
+        },
+        include: {
+          user: {
+            select: {
+              administrator: true,
+              superAdmin: true,
+              username: true,
+              id: true,
+            },
+          },
+        },
+      });
+
+      if (!file && (!user.administrator || !user.superAdmin)) return res.notFound('file not found');
+
+      file = await prisma.file.delete({
+        where: {
+          id: req.body.id,
+        },
+        include: {
+          user: {
+            select: {
+              administrator: true,
+              superAdmin: true,
+              username: true,
+              id: true,
+            },
+          },
         },
       });
 
       await datasource.delete(file.name);
 
-      logger.info(`User ${user.username} (${user.id}) deleted an image ${file.name} (${file.id})`);
+      logger.info(
+        `User ${user.username} (${user.id}) deleted an image ${file.name} (${file.id}) owned by ${file.user.username} (${file.user.id})`
+      );
 
       // @ts-ignore
       if (file.password) file.password = true;
