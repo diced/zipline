@@ -82,14 +82,33 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
 
     let file;
 
-    if (req.body.favorite !== null)
+    if (req.body.favorite !== null) {
+      file = await prisma.file.findFirst({
+        where: {
+          id: req.body.id,
+          userId: user.id,
+        },
+        include: {
+          user: {
+            select: {
+              administrator: true,
+              superAdmin: true,
+              username: true,
+              id: true,
+            },
+          },
+        },
+      });
+
+      if (!file && (!user.administrator || !user.superAdmin)) return res.notFound('file not found');
+
       file = await prisma.file.update({
         where: { id: req.body.id },
         data: {
           favorite: req.body.favorite,
         },
       });
-
+    }
     // @ts-ignore
     if (file.password) file.password = true;
     return res.json(file);
