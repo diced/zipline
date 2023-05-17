@@ -55,7 +55,7 @@ export default function UserFiles({ userId, disableMediaPreview, exifEnabled, co
         <Title>{currentUser.username}&apos;s Files</Title>
       </Group>
 
-      <SimpleGrid>
+      <SimpleGrid cols={3} spacing='lg' breakpoints={[{ maxWidth: 'sm', cols: 1, spacing: 'sm' }]}>
         {currentUser.files.map((file) => (
           <div key={file.id}>
             <FileComponent
