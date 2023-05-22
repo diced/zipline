@@ -11,23 +11,23 @@ export class Local extends Datasource {
   }
 
   public async save(file: string, data: Buffer): Promise<void> {
-    await writeFile(join(process.cwd(), this.path, file), data);
+    await writeFile(join(this.path, file), data);
   }
 
   public async delete(file: string): Promise<void> {
-    await rm(join(process.cwd(), this.path, file));
+    await rm(join(this.path, file));
   }
 
   public async clear(): Promise<void> {
-    const files = await readdir(join(process.cwd(), this.path));
+    const files = await readdir(this.path);
 
     for (let i = 0; i !== files.length; ++i) {
-      await rm(join(process.cwd(), this.path, files[i]));
+      await rm(join(this.path, files[i]));
     }
   }
 
   public get(file: string): ReadStream {
-    const full = join(process.cwd(), this.path, file);
+    const full = join(this.path, file);
     if (!existsSync(full)) return null;
 
     try {
@@ -38,7 +38,7 @@ export class Local extends Datasource {
   }
 
   public async size(file: string): Promise<number> {
-    const full = join(process.cwd(), this.path, file);
+    const full = join(this.path, file);
     if (!existsSync(full)) return 0;
     const stats = await stat(full);
 

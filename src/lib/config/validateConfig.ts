@@ -4,7 +4,7 @@ import { inspect } from 'util';
 import Logger from 'lib/logger';
 import { humanToBytes } from 'utils/bytes';
 import { tmpdir } from 'os';
-import { join } from 'path';
+import { join, resolve } from 'path';
 
 const discord_content = s
   .object({
@@ -53,7 +53,7 @@ const validator = s.object({
       type: s.enum('local', 's3', 'supabase').default('local'),
       local: s
         .object({
-          directory: s.string.default('./uploads'),
+          directory: s.string.default(resolve('./uploads')).transform((v) => resolve(v)),
         })
         .default({
           directory: './uploads',
@@ -195,6 +195,7 @@ const validator = s.object({
       user_registration: s.boolean.default(false),
       headless: s.boolean.default(false),
       default_avatar: s.string.nullable.default(null),
+      robots_txt: s.boolean.default(false),
     })
     .default({
       invites: false,
@@ -204,6 +205,7 @@ const validator = s.object({
       user_registration: false,
       headless: false,
       default_avatar: null,
+      robots_txt: false,
     }),
   chunks: s
     .object({

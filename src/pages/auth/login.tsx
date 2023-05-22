@@ -168,7 +168,7 @@ export default function Login({
       <Center sx={{ height: '100vh' }}>
         <Card radius='md'>
           <Title size={30} align='left'>
-            {bypass_local_login ? ' Login to Zipline with' : 'Zipline'}
+            {bypass_local_login ? ` Login to ${title} with` : title}
           </Title>
 
           {oauth_registration && (

@@ -164,6 +164,8 @@ export default function readConfig() {
 
     map('FEATURES_DEFAULT_AVATAR', 'path', 'features.default_avatar'),
 
+    map('FEATURES_ROBOTS_TXT', 'boolean', 'features.robots_txt'),
+
     map('CHUNKS_MAX_SIZE', 'human-to-byte', 'chunks.max_size'),
     map('CHUNKS_CHUNKS_SIZE', 'human-to-byte', 'chunks.chunks_size'),
     map('CHUNKS_ENABLED', 'boolean', 'chunks.enabled'),
