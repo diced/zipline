@@ -61,6 +61,7 @@ export async function migrations() {
       logger.error(
         `Unable to connect to database \`${process.env.DATABASE_URL}\`, check your database connection`
       );
+      logger.debug(error);
     } else {
       logger.error('Failed to migrate database... exiting...');
       logger.error(error);
