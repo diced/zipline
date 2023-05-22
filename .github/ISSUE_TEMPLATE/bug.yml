@@ -15,10 +15,10 @@ body:
     id: version
     attributes:
       label: Version
-      description: What version of Zipline are you using?
+      description: What version (or docker image) of Zipline are you using?
       options:
+        - latest (ghcr.io/diced/zipline or ghcr.io/diced/zipline:latest)
         - upstream (ghcr.io/diced/zipline:trunk)
-        - latest (ghcr.io/diced/zipline:latest)
         - other (provide version in additional info)
     validations:
       required: true
