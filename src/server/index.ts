@@ -183,6 +183,7 @@ Disallow: ${config.urls.route}
 
   await clearInvites.bind(server)();
   await stats.bind(server)();
+  await thumbs.bind(server)(); // TODO: TEMPORARY - this will be done somewhere else i think
 
   setInterval(() => clearInvites.bind(server)(), config.core.invites_interval * 1000);
   setInterval(() => stats.bind(server)(), config.core.stats_interval * 1000);
@@ -215,6 +216,19 @@ async function clearInvites(this: FastifyInstance) {
   });
 
   logger.child('invites').debug(`deleted ${count} used invites`);
+}
+
+async function thumbs(this: FastifyInstance) {
+  const videoFiles = await this.prisma.file.findMany({
+    where: {
+      mimetype: {
+        startsWith: 'video/',
+      },
+      thumbnail: null,
+    },
+  });
+
+  logger.child('thumb').debug(`found ${videoFiles.length} videos without thumbnails`);
 }
 
 function genFastifyOpts(): FastifyServerOptions {

@@ -54,6 +54,7 @@
     "fastify": "^4.15.0",
     "fastify-plugin": "^4.5.0",
     "fflate": "^0.7.4",
+    "ffmpeg-static": "^5.1.0",
     "find-my-way": "^7.6.0",
     "katex": "^0.16.4",
     "mantine-datatable": "^2.2.6",

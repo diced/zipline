@@ -8,24 +8,24 @@ generator client {
 }
 
 model User {
-  id            Int       @id @default(autoincrement())
-  uuid          String    @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  username      String
-  password      String?
-  avatar        String?
-  token         String
-  administrator Boolean   @default(false)
-  superAdmin    Boolean   @default(false)
-  systemTheme   String    @default("system")
-  embed         Json      @default("{}")
-  ratelimit     DateTime?
-  totpSecret    String?
-  domains       String[]
-  oauth         OAuth[]
-  files         File[]
-  urls          Url[]
-  Invite        Invite[]
-  Folder        Folder[]
+  id             Int              @id @default(autoincrement())
+  uuid           String           @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  username       String
+  password       String?
+  avatar         String?
+  token          String
+  administrator  Boolean          @default(false)
+  superAdmin     Boolean          @default(false)
+  systemTheme    String           @default("system")
+  embed          Json             @default("{}")
+  ratelimit      DateTime?
+  totpSecret     String?
+  domains        String[]
+  oauth          OAuth[]
+  files          File[]
+  urls           Url[]
+  Invite         Invite[]
+  Folder         Folder[]
   IncompleteFile IncompleteFile[]
 }
 
@@ -62,6 +62,18 @@ model File {
 
   folder   Folder? @relation(fields: [folderId], references: [id], onDelete: SetNull)
   folderId Int?
+
+  thumbnail   Thumbnail?
+  thumbnailId Int?
+}
+
+model Thumbnail {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  name      String
+
+  fileId Int  @unique
+  file   File @relation(fields: [fileId], references: [id], onDelete: Cascade)
 }
 
 model InvisibleFile {
