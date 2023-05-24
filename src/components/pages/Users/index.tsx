@@ -186,7 +186,7 @@ export default function Users() {
                       <IconEdit size='1rem' />
                     </ActionIcon>
                   </Tooltip>
-                  {user.administrator || user.superAdmin ? null : (
+                  {(!self.superAdmin && user.superAdmin) || (self.superAdmin && user.superAdmin) ? null : (
                     <Tooltip label='Open user'>
                       <ActionIcon color='cyan' onClick={() => openUser(user)}>
                         <IconExternalLink size='1rem' />
