@@ -179,6 +179,9 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   } else {
     delete target.password;
 
+    if ((user.superAdmin || user.administrator) && (target.administrator || target.superAdmin))
+      delete target.files;
+
     return res.json(target);
   }
 }
