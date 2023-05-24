@@ -49,6 +49,7 @@ export default function FileModal({
   reducedActions = false,
   exifEnabled,
   compress,
+  otherUser = false,
 }: {
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -58,6 +59,7 @@ export default function FileModal({
   reducedActions?: boolean;
   exifEnabled?: boolean;
   compress: boolean;
+  otherUser: boolean;
 }) {
   const deleteFile = useFileDelete();
   const favoriteFile = useFileFavorite();
@@ -276,7 +278,7 @@ export default function FileModal({
               </ActionIcon>
             </Tooltip>
           )}
-          {reducedActions ? null : inFolder && !folders.isLoading ? (
+          {reducedActions || otherUser ? null : inFolder && !folders.isLoading ? (
             <Tooltip
               label={`Remove from folder "${folders.data.find((f) => f.id === file.folderId)?.name ?? ''}"`}
             >

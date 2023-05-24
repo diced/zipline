@@ -14,6 +14,10 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     where: {
       id: Number(id),
     },
+    include: {
+      files: true,
+      Folder: true,
+    },
   });
 
   if (!target) return res.notFound('user not found');
@@ -174,6 +178,10 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     return res.json(newUser);
   } else {
     delete target.password;
+
+    if (user.superAdmin && target.superAdmin) delete target.files;
+    if (user.administrator && !user.superAdmin && (target.administrator || target.superAdmin))
+      delete target.files;
 
     return res.json(target);
   }
