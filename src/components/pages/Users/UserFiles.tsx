@@ -4,8 +4,10 @@ import { IconArrowLeft, IconFile } from '@tabler/icons-react';
 import FileComponent from 'components/File';
 import MutedText from 'components/MutedText';
 import useFetch from 'hooks/useFetch';
+import { userSelector } from 'lib/recoil/user';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import { useRecoilState } from 'recoil';
 
 type UserFiles = {
   id: number;
@@ -15,15 +17,17 @@ type UserFiles = {
 };
 
 export default function UserFiles({ userId, disableMediaPreview, exifEnabled, compress }) {
-  const [currentUser, setUser] = useState<UserFiles>({ id: 0, username: 'user' });
+  const [currentUser, viewUser] = useState<UserFiles>({ id: 0, username: 'user' });
+  const [self] = useRecoilState(userSelector);
 
   const { push } = useRouter();
 
   useEffect(() => {
+    if (self.id == userId) push('/dashboard/files');
     (async () => {
       const user: UserFiles = await useFetch(`/api/user/${userId}`);
       if (!user.error) {
-        setUser(user);
+        viewUser(user);
       } else {
         push('/dashboard');
       }
