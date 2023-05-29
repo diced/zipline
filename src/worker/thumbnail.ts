@@ -55,6 +55,9 @@ async function start() {
     where: {
       id,
     },
+    include: {
+      thumbnail: true,
+    },
   });
 
   if (!file) {
@@ -67,7 +70,7 @@ async function start() {
     process.exit(0);
   }
 
-  if (file.thumbnailId) {
+  if (file.thumbnail) {
     logger.info('thumbnail already exists');
     process.exit(0);
   }
