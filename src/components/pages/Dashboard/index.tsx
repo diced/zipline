@@ -126,6 +126,7 @@ export default function Dashboard({ disableMediaPreview, exifEnabled, compress }
           reducedActions={false}
           exifEnabled={exifEnabled}
           compress={compress}
+          otherUser={false}
         />
       )}
 

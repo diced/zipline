@@ -32,9 +32,10 @@ export default function File({
   image,
   disableMediaPreview,
   exifEnabled,
-  refreshImages,
+  refreshImages = undefined,
   reducedActions = false,
   onDash,
+  otherUser = false,
 }) {
   const [open, setOpen] = useState(false);
   const deleteFile = useFileDelete();
@@ -44,7 +45,7 @@ export default function File({
   const folders = useFolders();
 
   const refresh = () => {
-    refreshImages();
+    if (!otherUser) refreshImages();
     folders.refetch();
   };
 
@@ -59,6 +60,7 @@ export default function File({
         reducedActions={reducedActions}
         exifEnabled={exifEnabled}
         compress={onDash}
+        otherUser={otherUser}
       />
 
       <Card
