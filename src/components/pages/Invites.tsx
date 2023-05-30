@@ -55,7 +55,7 @@ function CreateInviteModal({ open, setOpen, updateInvites }) {
     setOpen(false);
 
     const res = await useFetch('/api/auth/invite', 'POST', {
-      expiresAt: expiresAt === null ? null : `date=${expiresAt.toISOString()}`,
+      expiresAt: `date=${expiresAt.toISOString()}`,
       count: values.count,
     });
 
@@ -95,7 +95,6 @@ function CreateInviteModal({ open, setOpen, updateInvites }) {
             { value: '3d', label: '3 days' },
             { value: '5d', label: '5 days' },
             { value: '7d', label: '7 days' },
-            { value: 'never', label: 'Never' },
           ]}
         />
 
