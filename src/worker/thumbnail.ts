@@ -1,16 +1,14 @@
-import Logger from 'lib/logger';
-import { isMainThread, workerData } from 'worker_threads';
-// import ffmpeg from 'ffmpeg-static';
-
-import prisma from 'lib/prisma';
-import datasource from 'lib/datasource';
-import config from 'lib/config';
-import { spawn } from 'child_process';
-import { join } from 'path';
-import { createWriteStream } from 'fs';
 import { File } from '@prisma/client';
+import { spawn } from 'child_process';
 import ffmpeg from 'ffmpeg-static';
+import { createWriteStream } from 'fs';
 import { rm } from 'fs/promises';
+import config from 'lib/config';
+import datasource from 'lib/datasource';
+import Logger from 'lib/logger';
+import prisma from 'lib/prisma';
+import { join } from 'path';
+import { isMainThread, workerData } from 'worker_threads';
 
 const { id } = workerData as { id: number };
 
@@ -26,12 +24,12 @@ async function loadThumbnail(path) {
 
   const child = spawn(ffmpeg, args, { stdio: ['ignore', 'pipe', 'ignore'] });
 
-  const data = await new Promise((resolve, reject) => {
+  const data: Promise<Buffer> = new Promise((resolve, reject) => {
     child.stdout.once('data', resolve);
     child.once('error', reject);
   });
 
-  return data as unknown as Buffer;
+  return data;
 }
 
 async function loadFileTmp(file: File) {

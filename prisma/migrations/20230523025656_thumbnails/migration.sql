@@ -1,5 +1,3 @@
--- AlterTable
-ALTER TABLE "File" ADD COLUMN     "thumbnailId" INTEGER;
 
 -- CreateTable
 CREATE TABLE "Thumbnail" (
