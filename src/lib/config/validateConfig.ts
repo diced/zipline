@@ -35,8 +35,9 @@ const validator = s.object({
     port: s.number.default(3000),
     database_url: s.string,
     logger: s.boolean.default(false),
-    stats_interval: s.number.default(1800),
-    invites_interval: s.number.default(1800),
+    stats_interval: s.number.default(1800), // 30m
+    invites_interval: s.number.default(1800), // 30m
+    thumbnails_interval: s.number.default(600), // 10m
     compression: s
       .object({
         enabled: s.boolean.default(false),

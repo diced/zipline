@@ -10,6 +10,7 @@ export interface ConfigCore {
 
   stats_interval: number;
   invites_interval: number;
+  thumbnails_interval: number;
 }
 
 export interface ConfigCompression {

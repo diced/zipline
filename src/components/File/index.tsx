@@ -63,7 +63,19 @@ export default function File({
         otherUser={otherUser}
       />
 
-      <Card sx={{ maxWidth: '100%', height: '100%' }} shadow='md' onClick={() => setOpen(true)}>
+      <Card
+        sx={{
+          maxWidth: '100%',
+          height: '100%',
+          '&:hover': {
+            filter: 'brightness(0.75)',
+          },
+          transition: 'filter 0.2s ease-in-out',
+          cursor: 'pointer',
+        }}
+        shadow='md'
+        onClick={() => setOpen(true)}
+      >
         <Card.Section>
           <LoadingOverlay visible={loading} />
           <Type

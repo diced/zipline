@@ -21,6 +21,7 @@ import prismaPlugin from './plugins/prisma';
 import rawRoute from './routes/raw';
 import uploadsRoute, { uploadsRouteOnResponse } from './routes/uploads';
 import urlsRoute, { urlsRouteOnResponse } from './routes/urls';
+import { Worker } from 'worker_threads';
 
 const dev = process.env.NODE_ENV === 'development';
 const logger = Logger.get('server');
@@ -183,9 +184,11 @@ Disallow: ${config.urls.route}
 
   await clearInvites.bind(server)();
   await stats.bind(server)();
+  await thumbs.bind(server)();
 
   setInterval(() => clearInvites.bind(server)(), config.core.invites_interval * 1000);
   setInterval(() => stats.bind(server)(), config.core.stats_interval * 1000);
+  setInterval(() => thumbs.bind(server)(), config.core.thumbnails_interval * 1000);
 }
 
 async function stats(this: FastifyInstance) {
@@ -215,6 +218,27 @@ async function clearInvites(this: FastifyInstance) {
   });
 
   logger.child('invites').debug(`deleted ${count} used invites`);
+}
+
+async function thumbs(this: FastifyInstance) {
+  const videoFiles = await this.prisma.file.findMany({
+    where: {
+      mimetype: {
+        startsWith: 'video/',
+      },
+      thumbnail: null,
+    },
+  });
+
+  logger.child('thumb').debug(`found ${videoFiles.length} videos without thumbnails`);
+
+  for (const file of videoFiles) {
+    new Worker('./dist/worker/thumbnail.js', {
+      workerData: {
+        id: file.id,
+      },
+    });
+  }
 }
 
 function genFastifyOpts(): FastifyServerOptions {

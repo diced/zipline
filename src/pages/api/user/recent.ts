@@ -27,11 +27,15 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       folderId: true,
       size: true,
       favorite: true,
+      thumbnail: true,
     },
   });
 
   for (let i = 0; i !== files.length; ++i) {
     (files[i] as unknown as { url: string }).url = formatRootUrl(config.uploader.route, files[i].name);
+    if (files[i].thumbnail) {
+      (files[i].thumbnail as unknown as string) = formatRootUrl('/r', files[i].thumbnail.name);
+    }
   }
 
   if (req.query.filter && req.query.filter === 'media')

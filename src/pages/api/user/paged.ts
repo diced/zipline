@@ -85,6 +85,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     folderId: number;
     size: number;
     password: string | boolean;
+    thumbnail?: { name: string };
   }[] = await prisma.file.findMany({
     where,
     orderBy: {
@@ -102,6 +103,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       folderId: true,
       size: true,
       password: true,
+      thumbnail: true,
     },
     skip: page ? (Number(page) - 1) * pageCount : undefined,
     take: page ? pageCount : undefined,
@@ -112,6 +114,9 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     if (file.password) file.password = true;
 
     (file as unknown as { url: string }).url = formatRootUrl(config.uploader.route, file.name);
+    if (files[i].thumbnail) {
+      (files[i].thumbnail as unknown as string) = formatRootUrl('/r', files[i].thumbnail.name);
+    }
   }
 
   return res.json(files);
