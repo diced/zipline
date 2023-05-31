@@ -58,23 +58,27 @@ function VideoThumbnailPlaceholder({ file, mediaPreview, ...props }) {
     return <Placeholder Icon={IconPlayerPlay} text={`Click to view video (${file.name})`} {...props} />;
 
   return (
-    <Box>
+    <Box sx={{ position: 'relative' }}>
       <Image
         src={file.thumbnail}
         sx={{
-          position: 'absolute',
           width: '100%',
-          height: '100%',
-          objectFit: 'cover',
+          height: 'auto',
         }}
       />
 
-      <Center sx={{ position: 'absolute', width: '100%', height: '100%' }}>
+      <Center
+        sx={{
+          position: 'absolute',
+          height: '100%',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+        }}
+      >
         <IconPlayerPlay size={48} />
       </Center>
     </Box>
-
-    // </Placeholder>
   );
 }
 
