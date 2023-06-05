@@ -3,6 +3,8 @@ import Logger from 'lib/logger';
 import prisma from 'lib/prisma';
 import { hashPassword } from 'lib/util';
 import { jsonUserReplacer } from 'lib/utils/client';
+import { formatRootUrl } from 'lib/utils/urls';
+import zconfig from 'lib/config';
 import { NextApiReq, NextApiRes, UserExtended, withZipline } from 'middleware/withZipline';
 
 const logger = Logger.get('user');
@@ -15,7 +17,11 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       id: Number(id),
     },
     include: {
-      files: true,
+      files: {
+        include: {
+          thumbnail: true,
+        },
+      },
       Folder: true,
     },
   });
@@ -182,6 +188,13 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     if (user.superAdmin && target.superAdmin) delete target.files;
     if (user.administrator && !user.superAdmin && (target.administrator || target.superAdmin))
       delete target.files;
+
+    for (const file of target.files) {
+      (file as unknown as { url: string }).url = formatRootUrl(zconfig.uploader.route, file.name);
+      if (file.thumbnail) {
+        (file.thumbnail as unknown as string) = formatRootUrl('/r', file.thumbnail.name);
+      }
+    }
 
     return res.json(target);
   }
