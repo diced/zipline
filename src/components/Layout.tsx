@@ -349,7 +349,11 @@ export default function Layout({ children, props }) {
                 <Menu.Target>
                   <Button
                     leftIcon={
-                      avatar ? <Image src={avatar} height={32} radius='md' /> : <IconUserCog size='1rem' />
+                      avatar ? (
+                        <Image src={avatar} height={32} width={32} fit='cover' radius='md' />
+                      ) : (
+                        <IconUserCog size='1rem' />
+                      )
                     }
                     variant='subtle'
                     color='gray'
