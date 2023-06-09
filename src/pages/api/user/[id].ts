@@ -185,9 +185,14 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   } else {
     delete target.password;
 
-    if (user.superAdmin && target.superAdmin) delete target.files;
-    if (user.administrator && !user.superAdmin && (target.administrator || target.superAdmin))
+    if (user.superAdmin && target.superAdmin) {
       delete target.files;
+      return res.json(target);
+    }
+    if (user.administrator && !user.superAdmin && (target.administrator || target.superAdmin)) {
+      delete target.files;
+      return res.json(target);
+    }
 
     for (const file of target.files) {
       (file as unknown as { url: string }).url = formatRootUrl(zconfig.uploader.route, file.name);
