@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import config from 'lib/config';
 import { migrations } from 'server/util';
+import { inspect } from 'util';
 
 async function main() {
   const extras = (process.argv[2] ?? '').split(',');
@@ -13,6 +14,7 @@ async function main() {
   const select = {
     username: true,
     administrator: true,
+    superAdmin: true,
     id: true,
   };
   for (let i = 0; i !== extras.length; ++i) {
@@ -30,7 +32,11 @@ async function main() {
     select,
   });
 
-  console.log(JSON.stringify(users, null, 2));
+  await prisma.$disconnect();
+
+  console.log(inspect(users, false, 4, true));
+
+  process.exit(0);
 }
 
 main();
