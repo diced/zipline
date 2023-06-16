@@ -232,13 +232,48 @@ async function thumbs(this: FastifyInstance) {
 
   logger.child('thumb').debug(`found ${videoFiles.length} videos without thumbnails`);
 
+  const $: Worker[] = [];
+
+  // for the sake of readability, here are some comments.
   for (const file of videoFiles) {
-    new Worker('./dist/worker/thumbnail.js', {
-      workerData: {
-        id: file.id,
-      },
-    });
+    if ($.length !== config.core.thumbnails_maxthreads) {
+      // This section spawns a new worker if the config for max threads is not reached.
+      const worker = new Worker('./dist/worker/thumbnail.js', {
+        workerData: {
+          id: file.id,
+        },
+      });
+      $.push(worker);
+      logger.child('thumb').debug(`Thread ID: ${worker.threadId}`);
+      await new Promise((resolve) => worker.once('message', resolve)); // This line waits for the worker to be "ready" before continuing.
+    } else {
+      // If the max threads is reached, it will send the file to a pseudo-random thread.
+      const which = Math.floor(Math.random() * $.length);
+      const worker: Worker = $[which];
+      // Some debug logging left in for the sake of debugging. I hate it.
+      logger
+        .child('thumb')
+        .debug(`sending ${file.id} to thread ${which} total of ${$.length} threads running`);
+      worker.postMessage({ id: file.id }); // This line sends the file ID to the worker.
+      logger.child('thumb').debug(`queued ${file.id} for thumbnail generation with thread ${which}`);
+      logger.child('thumb').debug(`total of ${$.length} threads running`);
+    }
   }
+  /*
+    after the for statement, it will wait for all threads to exit after sending a message to.
+    however at the moment, the worker will wait 30 seconds before exiting cuz I have no idea how to
+    add some sort of "idle" check to the worker.
+   */
+  await Promise.all(
+    $.map(
+      (_) =>
+        new Promise((resolve) => {
+          _.postMessage({ exit: true });
+          _.once('exit', resolve);
+        })
+    )
+  );
+  logger.child('thumb').debug('all threads exited');
 }
 
 function genFastifyOpts(): FastifyServerOptions {

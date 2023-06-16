@@ -11,6 +11,8 @@ export interface ConfigCore {
   stats_interval: number;
   invites_interval: number;
   thumbnails_interval: number;
+
+  thumbnails_maxthreads: number;
 }
 
 export interface ConfigCompression {

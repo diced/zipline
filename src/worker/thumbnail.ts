@@ -8,11 +8,23 @@ import datasource from 'lib/datasource';
 import Logger from 'lib/logger';
 import prisma from 'lib/prisma';
 import { join } from 'path';
-import { isMainThread, workerData } from 'worker_threads';
+import { isMainThread, workerData, parentPort, threadId } from 'worker_threads';
 
 const { id } = workerData as { id: number };
 
-const logger = Logger.get('worker::thumbnail').child(id.toString() ?? 'unknown-ident');
+const logger = Logger.get('worker::thumbnail').child(threadId.toString() ?? 'unknown-ident');
+
+parentPort.on('message', async (data: { id?: number; exit?: boolean }) => {
+  if (data.id) {
+    logger.debug(`recieved new id: ${data.id}`);
+    await start(data.id);
+  } else if (data.exit) {
+    // help
+    logger.debug('exiting in 30 seconds');
+    await new Promise((resolve) => setTimeout(resolve, 1000 * 30));
+    process.exit(0);
+  }
+});
 
 if (isMainThread) {
   logger.error('worker is not a thread');
@@ -48,7 +60,9 @@ async function loadFileTmp(file: File) {
   return tmpFile;
 }
 
-async function start() {
+async function start(id: number) {
+  logger.debug(`starting thumbnail generation for ${id}`);
+
   const file = await prisma.file.findUnique({
     where: {
       id,
@@ -100,9 +114,11 @@ async function start() {
   logger.debug(`thumbnail ${JSON.stringify(thumb)}`);
 
   logger.debug(`removing tmp file: ${tmpFile}`);
-  await rm(tmpFile);
-
-  process.exit(0);
+  await rm(tmpFile, {
+    maxRetries: 1,
+  });
 }
 
-start();
+// "ready" message
+parentPort.postMessage(true);
+start(id);

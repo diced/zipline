@@ -67,6 +67,7 @@ export default function readConfig() {
     map('CORE_STATS_INTERVAL', 'number', 'core.stats_interval'),
     map('CORE_INVITES_INTERVAL', 'number', 'core.invites_interval'),
     map('CORE_THUMBNAILS_INTERVAL', 'number', 'core.thumbnails_interval'),
+    map('CORE_THUMBNAILS_MAXTHREADS', 'number', 'core.thumbnails_maxthreads'),
 
     map('CORE_COMPRESSION_ENABLED', 'boolean', 'core.compression.enabled'),
     map('CORE_COMPRESSION_THRESHOLD', 'human-to-byte', 'core.compression.threshold'),

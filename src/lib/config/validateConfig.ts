@@ -38,6 +38,7 @@ const validator = s.object({
     stats_interval: s.number.default(1800), // 30m
     invites_interval: s.number.default(1800), // 30m
     thumbnails_interval: s.number.default(600), // 10m
+    thumbnails_maxthreads: s.number.default(4),
     compression: s
       .object({
         enabled: s.boolean.default(false),
