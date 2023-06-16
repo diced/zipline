@@ -230,7 +230,9 @@ async function thumbs(this: FastifyInstance) {
     },
   });
 
-  logger.child('thumb').debug(`found ${videoFiles.length} videos without thumbnails`);
+  const tLogger = logger.child('thumb');
+
+  tLogger.debug(`found ${videoFiles.length} videos without thumbnails`);
 
   const $: Worker[] = [];
 
@@ -244,23 +246,21 @@ async function thumbs(this: FastifyInstance) {
         },
       });
       $.push(worker);
-      logger.child('thumb').debug(`Thread ID: ${worker.threadId}`);
+      worker.on('error', tLogger.error);
       await new Promise((resolve) => worker.once('message', resolve)); // This line waits for the worker to be "ready" before continuing.
+      tLogger.debug(`thread ${worker.threadId} ready`);
     } else {
       // If the max threads is reached, it will send the file to a pseudo-random thread.
+
       const which = Math.floor(Math.random() * $.length);
       const worker: Worker = $[which];
       // Some debug logging left in for the sake of debugging. I hate it.
-      logger
-        .child('thumb')
-        .debug(`sending ${file.id} to thread ${which} total of ${$.length} threads running`);
+      tLogger.debug(`sending ${file.id} to thread ${which} total of ${$.length} threads running`);
       worker.postMessage({ id: file.id }); // This line sends the file ID to the worker.
-      logger.child('thumb').debug(`queued ${file.id} for thumbnail generation with thread ${which}`);
-      logger.child('thumb').debug(`total of ${$.length} threads running`);
     }
   }
   /*
-    after the for statement, it will wait for all threads to exit after sending a message to.
+    after the for statement, it will wait for all threads to exit after sending a message to each.
     however at the moment, the worker will wait 30 seconds before exiting cuz I have no idea how to
     add some sort of "idle" check to the worker.
    */
