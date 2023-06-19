@@ -298,45 +298,65 @@ export default function Invites() {
         />
       ) : (
         <SimpleGrid cols={3} spacing='lg' breakpoints={[{ maxWidth: 'sm', cols: 1, spacing: 'sm' }]}>
-          {invites.length
-            ? invites.map((invite) => (
-                <Card key={invite.id} sx={{ maxWidth: '100%' }}>
-                  <Group position='apart'>
-                    <Group position='left'>
-                      <Avatar size='lg' color={invite.used ? 'dark' : 'primary'}>
-                        {invite.id}
-                      </Avatar>
-                      <Stack spacing={0}>
-                        <Title>
-                          {invite.code}
-                          {invite.used && <> (Used)</>}
-                        </Title>
-                        <Tooltip label={new Date(invite.createdAt).toLocaleString()}>
-                          <div>
-                            <MutedText size='sm'>
-                              Created {relativeTime(new Date(invite.createdAt))}
-                            </MutedText>
-                          </div>
-                        </Tooltip>
-                        <Tooltip label={new Date(invite.expiresAt).toLocaleString()}>
-                          <div>
-                            <MutedText size='sm'>{expireText(invite.expiresAt.toString())}</MutedText>
-                          </div>
-                        </Tooltip>
-                      </Stack>
-                    </Group>
-                    <Stack>
-                      <ActionIcon aria-label='copy' onClick={() => handleCopy(invite)}>
-                        <IconClipboardCopy size='1rem' />
-                      </ActionIcon>
-                      <ActionIcon aria-label='delete' onClick={() => openDeleteModal(invite)}>
-                        <IconTrash size='1rem' />
-                      </ActionIcon>
+          {!ok && !invites.length && (
+            <>
+              {[1, 2, 3].map((x) => (
+                <Skeleton key={x} width='100%' height={100} radius='sm' />
+              ))}
+            </>
+          )}
+
+          {invites.length && ok ? (
+            invites.map((invite) => (
+              <Card key={invite.id} sx={{ maxWidth: '100%' }}>
+                <Group position='apart'>
+                  <Group position='left'>
+                    <Avatar size='lg' color={invite.used ? 'dark' : 'primary'}>
+                      {invite.id}
+                    </Avatar>
+                    <Stack spacing={0}>
+                      <Title>
+                        {invite.code}
+                        {invite.used && <> (Used)</>}
+                      </Title>
+                      <Tooltip label={new Date(invite.createdAt).toLocaleString()}>
+                        <div>
+                          <MutedText size='sm'>Created {relativeTime(new Date(invite.createdAt))}</MutedText>
+                        </div>
+                      </Tooltip>
+                      <Tooltip label={new Date(invite.expiresAt).toLocaleString()}>
+                        <div>
+                          <MutedText size='sm'>{expireText(invite.expiresAt.toString())}</MutedText>
+                        </div>
+                      </Tooltip>
                     </Stack>
                   </Group>
-                </Card>
-              ))
-            : [1, 2, 3].map((x) => <Skeleton key={x} width='100%' height={100} radius='sm' />)}
+                  <Stack>
+                    <ActionIcon aria-label='copy' onClick={() => handleCopy(invite)}>
+                      <IconClipboardCopy size='1rem' />
+                    </ActionIcon>
+                    <ActionIcon aria-label='delete' onClick={() => openDeleteModal(invite)}>
+                      <IconTrash size='1rem' />
+                    </ActionIcon>
+                  </Stack>
+                </Group>
+              </Card>
+            ))
+          ) : (
+            <>
+              <div></div>
+              <Group>
+                <div>
+                  <IconTag size={48} />
+                </div>
+                <div>
+                  <Title>Nothing here</Title>
+                  <MutedText size='md'>Create some invites and they will show up here</MutedText>
+                </div>
+              </Group>
+              <div></div>
+            </>
+          )}
         </SimpleGrid>
       )}
     </>
