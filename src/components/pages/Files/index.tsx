@@ -7,12 +7,16 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import FilePagation from './FilePagation';
 import PendingFilesModal from './PendingFilesModal';
+import { showNonMediaSelector } from 'lib/recoil/settings';
+import { useRecoilState } from 'recoil';
 
 export default function Files({ disableMediaPreview, exifEnabled, queryPage, compress }) {
+  const [checked] = useRecoilState(showNonMediaSelector);
+
   const [favoritePage, setFavoritePage] = useState(1);
   const [favoriteNumPages, setFavoriteNumPages] = useState(0);
   const favoritePages = usePaginatedFiles(favoritePage, {
-    filter: 'media',
+    filter: checked ? 'none' : 'media',
     favorite: true,
   });
 
