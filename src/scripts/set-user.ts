@@ -66,11 +66,15 @@ async function main() {
     data,
   });
 
+  await prisma.$disconnect();
+
   if (args[1] === 'password') {
     parsed = '***';
   }
 
   console.log(`Updated user ${user.id} with ${args[1]} = ${parsed}`);
+
+  process.exit(0);
 }
 
 main();

@@ -47,6 +47,9 @@ async function main() {
       },
     },
   });
+
+  await prisma.$disconnect();
+
   console.log(`Deleted ${count} files from the database.`);
 
   for (let i = 0; i !== toDelete.length; ++i) {

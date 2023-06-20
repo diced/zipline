@@ -11,7 +11,9 @@ async function main() {
     process.exit(0);
   }
 
-  const files = (await readdir(temp)).filter((x) => x.startsWith('zipline_partial_'));
+  const files = (await readdir(temp)).filter(
+    (x) => x.startsWith('zipline_partial_') || x.startsWith('zipline_thumb_')
+  );
   if (files.length === 0) {
     console.log('No partial files found, exiting..');
     process.exit(0);

@@ -63,8 +63,11 @@ export default function readConfig() {
     map('CORE_PORT', 'number', 'core.port'),
     map('CORE_DATABASE_URL', 'string', 'core.database_url'),
     map('CORE_LOGGER', 'boolean', 'core.logger'),
+
     map('CORE_STATS_INTERVAL', 'number', 'core.stats_interval'),
     map('CORE_INVITES_INTERVAL', 'number', 'core.invites_interval'),
+    map('CORE_THUMBNAILS_INTERVAL', 'number', 'core.thumbnails_interval'),
+
     map('CORE_COMPRESSION_ENABLED', 'boolean', 'core.compression.enabled'),
     map('CORE_COMPRESSION_THRESHOLD', 'human-to-byte', 'core.compression.threshold'),
     map('CORE_COMPRESSION_ON_DASHBOARD', 'boolean', 'core.compression.on_dashboard'),

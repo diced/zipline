@@ -1,10 +1,10 @@
 import { File } from '@prisma/client';
-import { createWriteStream } from 'fs';
 import { ExifTool, Tags } from 'exiftool-vendored';
+import { createWriteStream } from 'fs';
+import { readFile, rm } from 'fs/promises';
 import datasource from 'lib/datasource';
 import Logger from 'lib/logger';
 import { join } from 'path';
-import { readFile, unlink } from 'fs/promises';
 
 const logger = Logger.get('exif');
 
@@ -43,47 +43,54 @@ export async function removeGPSData(image: File): Promise<void> {
   await new Promise((resolve) => writeStream.on('finish', resolve));
 
   logger.debug(`removing GPS data from ${file}`);
-  await exiftool.write(file, {
-    GPSVersionID: null,
-    GPSAltitude: null,
-    GPSAltitudeRef: null,
-    GPSAreaInformation: null,
-    GPSDateStamp: null,
-    GPSDateTime: null,
-    GPSDestBearing: null,
-    GPSDestBearingRef: null,
-    GPSDestDistance: null,
-    GPSDestLatitude: null,
-    GPSDestLatitudeRef: null,
-    GPSDestLongitude: null,
-    GPSDestLongitudeRef: null,
-    GPSDifferential: null,
-    GPSDOP: null,
-    GPSHPositioningError: null,
-    GPSImgDirection: null,
-    GPSImgDirectionRef: null,
-    GPSLatitude: null,
-    GPSLatitudeRef: null,
-    GPSLongitude: null,
-    GPSLongitudeRef: null,
-    GPSMapDatum: null,
-    GPSPosition: null,
-    GPSProcessingMethod: null,
-    GPSSatellites: null,
-    GPSSpeed: null,
-    GPSSpeedRef: null,
-    GPSStatus: null,
-    GPSTimeStamp: null,
-    GPSTrack: null,
-    GPSTrackRef: null,
-  });
+  try {
+    await exiftool.write(file, {
+      GPSVersionID: null,
+      GPSAltitude: null,
+      GPSAltitudeRef: null,
+      GPSAreaInformation: null,
+      GPSDateStamp: null,
+      GPSDateTime: null,
+      GPSDestBearing: null,
+      GPSDestBearingRef: null,
+      GPSDestDistance: null,
+      GPSDestLatitude: null,
+      GPSDestLatitudeRef: null,
+      GPSDestLongitude: null,
+      GPSDestLongitudeRef: null,
+      GPSDifferential: null,
+      GPSDOP: null,
+      GPSHPositioningError: null,
+      GPSImgDirection: null,
+      GPSImgDirectionRef: null,
+      GPSLatitude: null,
+      GPSLatitudeRef: null,
+      GPSLongitude: null,
+      GPSLongitudeRef: null,
+      GPSMapDatum: null,
+      GPSPosition: null,
+      GPSProcessingMethod: null,
+      GPSSatellites: null,
+      GPSSpeed: null,
+      GPSSpeedRef: null,
+      GPSStatus: null,
+      GPSTimeStamp: null,
+      GPSTrack: null,
+      GPSTrackRef: null,
+    });
+  } catch (e) {
+    logger.debug(`removing temp file: ${file}`);
+    await rm(file);
+
+    return;
+  }
 
   logger.debug(`reading file to upload to datasource: ${file} -> ${image.name}`);
   const buffer = await readFile(file);
   await datasource.save(image.name, buffer);
 
   logger.debug(`removing temp file: ${file}`);
-  await unlink(file);
+  await rm(file);
 
   await exiftool.end(true);
 

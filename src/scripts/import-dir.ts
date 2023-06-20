@@ -52,6 +52,8 @@ async function main() {
     await datasource.save(file, await readFile(join(directory, file)));
   }
   console.log(`Finished copying files to ${config.datasource.type} storage.`);
+
+  process.exit(0);
 }
 
 main();

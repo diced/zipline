@@ -14,10 +14,14 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
         where: {
           userId: user.id,
         },
+        include: {
+          thumbnail: true,
+        },
       });
 
       for (let i = 0; i !== files.length; ++i) {
         await datasource.delete(files[i].name);
+        if (files[i].thumbnail?.name) await datasource.delete(files[i].thumbnail.name);
       }
 
       const { count } = await prisma.file.deleteMany({
@@ -45,6 +49,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
               id: true,
             },
           },
+          thumbnail: true,
         },
       });
 
@@ -63,10 +68,12 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
               id: true,
             },
           },
+          thumbnail: true,
         },
       });
 
       await datasource.delete(file.name);
+      if (file.thumbnail?.name) await datasource.delete(file.thumbnail.name);
 
       logger.info(
         `User ${user.username} (${user.id}) deleted an image ${file.name} (${file.id}) owned by ${file.user.username} (${file.user.id})`
@@ -134,6 +141,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       views: number;
       size: number;
       originalName: string;
+      thumbnail?: { name: string };
     }[] = await prisma.file.findMany({
       where: {
         userId: user.id,
@@ -154,11 +162,16 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
         maxViews: true,
         size: true,
         originalName: true,
+        thumbnail: true,
       },
     });
 
     for (let i = 0; i !== files.length; ++i) {
       (files[i] as unknown as { url: string }).url = formatRootUrl(config.uploader.route, files[i].name);
+
+      if (files[i].thumbnail) {
+        (files[i].thumbnail as unknown as string) = formatRootUrl('/r', files[i].thumbnail.name);
+      }
     }
 
     if (req.query.filter && req.query.filter === 'media')

@@ -53,6 +53,35 @@ function Placeholder({ text, Icon, ...props }) {
   );
 }
 
+function VideoThumbnailPlaceholder({ file, mediaPreview, ...props }) {
+  if (!file.thumbnail || !mediaPreview)
+    return <Placeholder Icon={IconPlayerPlay} text={`Click to view video (${file.name})`} {...props} />;
+
+  return (
+    <Box sx={{ position: 'relative' }}>
+      <Image
+        src={file.thumbnail}
+        sx={{
+          width: '100%',
+          height: 'auto',
+        }}
+      />
+
+      <Center
+        sx={{
+          position: 'absolute',
+          height: '100%',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+        }}
+      >
+        <IconPlayerPlay size={48} />
+      </Center>
+    </Box>
+  );
+}
+
 export default function Type({ file, popup = false, disableMediaPreview, ...props }) {
   const type =
     (file.type ?? file.mimetype) === ''
@@ -159,7 +188,8 @@ export default function Type({ file, popup = false, disableMediaPreview, ...prop
     )
   ) : media ? (
     {
-      video: <Placeholder Icon={IconPlayerPlay} text={`Click to view video (${file.name})`} {...props} />,
+      // video: <Placeholder Icon={IconPlayerPlay} text={`Click to view video (${file.name})`} {...props} />,
+      video: <VideoThumbnailPlaceholder file={file} mediaPreview={!disableMediaPreview} />,
       image: (
         <Image
           placeholder={<PlaceholderContent Icon={IconPhotoCancel} text={'Image failed to load...'} />}

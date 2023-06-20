@@ -19,6 +19,11 @@ export default defineConfig([
     outDir: 'dist/worker',
     ...opts,
   },
+  {
+    entryPoints: ['src/worker/thumbnail.ts'],
+    outDir: 'dist/worker',
+    ...opts,
+  },
   // scripts
   {
     entryPoints: ['src/scripts/import-dir.ts'],

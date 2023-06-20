@@ -1,11 +1,12 @@
 import config from 'lib/config';
 import datasource from 'lib/datasource';
 import Logger from 'lib/logger';
-import { version } from '../../package.json';
 import { getStats } from 'server/util';
+import { version } from '../../package.json';
 
 import fastify, { FastifyInstance, FastifyServerOptions } from 'fastify';
 import { createReadStream, existsSync, readFileSync } from 'fs';
+import { Worker } from 'worker_threads';
 import dbFileDecorator from './decorators/dbFile';
 import notFound from './decorators/notFound';
 import postFileDecorator from './decorators/postFile';
@@ -183,9 +184,11 @@ Disallow: ${config.urls.route}
 
   await clearInvites.bind(server)();
   await stats.bind(server)();
+  await thumbs.bind(server)();
 
   setInterval(() => clearInvites.bind(server)(), config.core.invites_interval * 1000);
   setInterval(() => stats.bind(server)(), config.core.stats_interval * 1000);
+  setInterval(() => thumbs.bind(server)(), config.core.thumbnails_interval * 1000);
 }
 
 async function stats(this: FastifyInstance) {
@@ -215,6 +218,51 @@ async function clearInvites(this: FastifyInstance) {
   });
 
   logger.child('invites').debug(`deleted ${count} used invites`);
+}
+
+async function thumbs(this: FastifyInstance) {
+  const videoFiles = await this.prisma.file.findMany({
+    where: {
+      mimetype: {
+        startsWith: 'video/',
+      },
+      thumbnail: null,
+    },
+    include: {
+      thumbnail: true,
+    },
+  });
+
+  // avoids reaching prisma connection limit
+  const MAX_THUMB_THREADS = 4;
+
+  // make all the files fit into 4 arrays
+  const chunks = [];
+
+  for (let i = 0; i !== MAX_THUMB_THREADS; ++i) {
+    chunks.push([]);
+
+    for (let j = i; j < videoFiles.length; j += MAX_THUMB_THREADS) {
+      chunks[i].push(videoFiles[j]);
+    }
+  }
+
+  logger.child('thumbnail').debug(`starting ${chunks.length} thumbnail threads`);
+
+  for (let i = 0; i !== chunks.length; ++i) {
+    const chunk = chunks[i];
+    if (chunk.length === 0) continue;
+
+    logger.child('thumbnail').debug(`starting thumbnail generation for ${chunk.length} videos`);
+
+    new Worker('./dist/worker/thumbnail.js', {
+      workerData: {
+        videos: chunk,
+        config,
+        datasource,
+      },
+    });
+  }
 }
 
 function genFastifyOpts(): FastifyServerOptions {
