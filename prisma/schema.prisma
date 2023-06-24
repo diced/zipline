@@ -1,0 +1,213 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Zipline {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  firstSetup Boolean @default(true)
+
+  metrics Metric[]
+  users   User[]
+  invite  Invite[]
+
+  @@map("zipline_meta")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  username      String  @unique
+  password      String?
+  avatar        String?
+  token         String  @unique
+  administrator Boolean @default(false)
+
+  files          File[]
+  urls           Url[]
+  folders        Folder[]
+  limits         UserLimit[]
+  invites        Invite[]
+  oauthProviders OAuthProvider[]
+  IncompleteFile IncompleteFile[]
+
+  Zipline        Zipline          @relation(fields: [ziplineId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  ziplineId      String
+}
+
+model OAuthProvider {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId       String
+  provider     OAuthProviderType
+  accessToken  String
+  refreshToken String
+  expiresIn    Int
+  scope        String
+  tokenType    String
+  profile      Json
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, provider])
+}
+
+enum OAuthProviderType {
+  DISCORD
+  GOOGLE
+  GITHUB
+}
+
+model UserLimit {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  type      LimitType      @unique
+  value     Int
+  timeframe LimitTimeframe
+
+  User   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId String
+}
+
+enum LimitType {
+  UPLOAD_COUNT
+  UPLOAD_SIZE
+  SHORTEN_COUNT
+}
+
+enum LimitTimeframe {
+  SECONDLY
+  MINUTELY
+  HOURLY
+  DAILY
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
+
+model File {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletesAt DateTime?
+
+  name         String // name shown on dashboard
+  originalName String // original name of file when uploaded
+  path         String // path it's stored on the server
+  size         Int
+  type         String
+  views        Int     @default(0)
+  favorite     Boolean @default(false)
+  password     String?
+
+  zeroWidthSpace String?
+
+  tags Tag[]
+
+  User   User?   @relation(fields: [userId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  userId String?
+
+  Folder   Folder? @relation(fields: [folderId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  folderId String?
+}
+
+model Folder {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name String
+
+  files File[]
+
+  User   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId String
+}
+
+model IncompleteFile {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  status         IncompleteFileStatus
+  chunksTotal    Int
+  chunksComplete Int
+
+  metadata Json
+
+  User   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId String
+}
+
+enum IncompleteFileStatus {
+  PENDING
+  PROCESSING
+  COMPLETE
+  FAILED
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name  String @unique
+  color String
+
+  files File[]
+}
+
+model Url {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  vanity      String?
+  destination String
+  name        String  @unique
+
+  zeroWidthSpace String?
+
+  User   User?   @relation(fields: [userId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  userId String?
+}
+
+model Metric {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  data Json
+
+  Zipline   Zipline @relation(fields: [ziplineId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  ziplineId String
+}
+
+model Invite {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  expiresAt DateTime?
+
+  code String  @unique
+  used Boolean @default(false)
+
+  inviter   User   @relation(fields: [inviterId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  inviterId String
+
+  Zipline   Zipline @relation(fields: [ziplineId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  ziplineId String
+}
