@@ -10,7 +10,8 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "~/*": ["src/app/*"]
+      "~/*": ["src/app/*"],
+      "lib/*": ["src/lib/*"]
     },
     "forceConsistentCasingInFileNames": true,
     "allowJs": true,

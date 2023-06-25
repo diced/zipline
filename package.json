@@ -11,7 +11,7 @@
     "dev": "run-p dev:remix & (run-s dev:build && run-s dev:server)",
     "dev:build": "cross-env NODE_ENV=development run-s build:server",
     "dev:remix": "cross-env NODE_ENV=development remix watch",
-    "dev:server": "cross-env NODE_ENV=development node --require ./node_modules/dotenv/config ./build/server.js",
+    "dev:server": "cross-env NODE_ENV=development DEBUG=zipline node --require ./node_modules/dotenv/config ./build/server.js",
     "start": "node ./server.mjs",
     "lint": "eslint --cache --ignore-path .gitignore --fix .",
     "format": "prettier --write --ignore-path .gitignore .",

@@ -1,6 +1,6 @@
 import { Migrate } from '@prisma/migrate/dist/Migrate';
 import { ensureDatabaseExists } from '@prisma/migrate/dist/utils/ensureDatabaseExists';
-import { log } from './logger';
+import { log } from 'lib/logger';
 
 export async function runMigrations() {
   const migrate = new Migrate('./prisma/schema.prisma');

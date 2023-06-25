@@ -7,5 +7,8 @@ export function convertEnv(env: ValidatedEnv) {
       sessionSecret: env.SESSION_SECRET,
       databaseUrl: env.DATABASE_URL,
     },
+    files: {
+      route: env.FILES_ROUTE,
+    },
   };
 }

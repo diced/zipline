@@ -58,7 +58,7 @@ export default class Logger {
   }
 
   public debug(...args: unknown[]) {
-    if (process.env.DEBUG === 'zipline') return this;
+    if (process.env.DEBUG !== 'zipline') return this;
 
     this.write(args.join(' '), 'debug');
 

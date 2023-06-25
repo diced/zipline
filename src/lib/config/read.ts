@@ -11,7 +11,11 @@ export function readEnv() {
     PORT: z.number().default(3000),
     SESSION_SECRET: z.string(),
     DATABASE_URL: z.string(),
+
+    FILES_ROUTE: z.string().default('u'),
   });
+
+  logger.debug('env read', JSON.stringify(validation));
 
   return validation;
 }
