@@ -226,7 +226,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       },
     });
 
-    if (typeof req.headers.zws !== undefined)
+    if (typeof req.headers.zws !== 'undefined')
       if ((req.headers.zws as string).toLowerCase().match('true'))
         invis = await createInvisImage(zconfig.uploader.length, fileUpload.id);
 
