@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { blue, green, red, yellow, gray, white, bold } from 'colorette';
+import { green, red, yellow, gray, white, bold } from 'colorette';
 
 export type LoggerLevel = 'info' | 'warn' | 'error' | 'debug' | 'trace';
 

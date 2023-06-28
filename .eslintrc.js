@@ -1,11 +1,6 @@
 /** @type {import('eslint').Linter.Config} */
 module.exports = {
-  extends: [
-    '@remix-run/eslint-config',
-    '@remix-run/eslint-config/node',
-    'plugin:prettier/recommended',
-    'plugin:@typescript-eslint/recommended',
-  ],
+  extends: ['next/core-web-vitals', 'plugin:prettier/recommended', 'plugin:@typescript-eslint/recommended'],
   root: true,
   plugins: ['unused-imports', '@typescript-eslint'],
   parser: '@typescript-eslint/parser',

@@ -13,12 +13,6 @@ model Zipline {
   updatedAt DateTime @updatedAt
 
   firstSetup Boolean @default(true)
-
-  metrics Metric[]
-  users   User[]
-  invite  Invite[]
-
-  @@map("zipline_meta")
 }
 
 model User {
@@ -39,9 +33,6 @@ model User {
   invites        Invite[]
   oauthProviders OAuthProvider[]
   IncompleteFile IncompleteFile[]
-
-  Zipline        Zipline          @relation(fields: [ziplineId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  ziplineId      String
 }
 
 model OAuthProvider {
@@ -191,9 +182,6 @@ model Metric {
   updatedAt DateTime @updatedAt
 
   data Json
-
-  Zipline   Zipline @relation(fields: [ziplineId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  ziplineId String
 }
 
 model Invite {
@@ -207,7 +195,4 @@ model Invite {
 
   inviter   User   @relation(fields: [inviterId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   inviterId String
-
-  Zipline   Zipline @relation(fields: [ziplineId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  ziplineId String
 }

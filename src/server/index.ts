@@ -1,58 +1,50 @@
+import { validateEnv } from '@/lib/config/validate';
+import { readEnv } from '@/lib/config/read';
+import { createToken, decryptToken, encryptToken } from '@/lib/crypto';
+import { runMigrations } from '@/lib/db/migration';
+import { log } from '@/lib/logger';
 import express from 'express';
-import { join } from 'path';
-import { createRequestHandler } from '@remix-run/express';
-import { convertEnv } from 'src/lib/config/convert';
-import { log } from 'src/lib/logger';
-import { readEnv } from 'src/lib/config/read';
-import { runMigrations } from 'src/lib/migration';
+import next from 'next';
+import { parse } from 'url';
 
 const MODE = process.env.NODE_ENV || 'production';
-const BUILD_DIR = join(process.cwd(), 'build');
 
 const logger = log('server');
 
-logger.info(`starting zipline in ${MODE} mode`);
+async function main() {
+  logger.info(`starting zipline in ${MODE} mode`);
 
-runMigrations().then(() => {});
+  const server = express();
 
-const server = express();
-const config = convertEnv(readEnv());
+  logger.info('reading environment for configuration');
+  const config = validateEnv(readEnv());
 
-server.disable('x-powered-by');
+  process.env.DATABASE_URL = config.core.databaseUrl;
 
-server.use('/modules', express.static('public/build', { maxAge: '1y', immutable: true }));
-server.use(express.static('public', { maxAge: '1h' }));
+  await runMigrations();
 
-server.all(
-  '*',
-  MODE === 'production'
-    ? createRequestHandler({ build: require(BUILD_DIR) })
-    : (...args) => {
-        purgeRequireCache();
-        const requestHandler = createRequestHandler({
-          build: require(BUILD_DIR),
-          mode: MODE,
-          getLoadContext() {
-            return {
-              config,
-            };
-          },
-        });
-        return requestHandler(...args);
-      }
-);
+  server.disable('x-powered-by');
+  server.use(express.static('public', { maxAge: '1h' }));
 
-server.listen(3000, () => {
-  require(BUILD_DIR);
+  const app = next({
+    dev: MODE === 'development',
+    quiet: MODE === 'production',
+    hostname: config.core.hostname,
+    port: config.core.port,
+    dir: '.',
+  });
+  const handle = app.getRequestHandler();
 
-  logger.info(`server listening on port ${config.core.port}`);
-});
+  await app.prepare();
 
-function purgeRequireCache() {
-  for (const key in require.cache) {
-    if (key.startsWith(BUILD_DIR)) {
-      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-      delete require.cache[key];
-    }
-  }
+  server.all('*', (req, res) => {
+    const parsedUrl = parse(req.url!, true);
+    return handle(req, res, parsedUrl);
+  });
+
+  server.listen(config.core.port, config.core.hostname, () => {
+    logger.info(`server listening on port ${config.core.port}`);
+  });
 }
+
+main();
