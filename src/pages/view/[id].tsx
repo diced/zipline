@@ -1,5 +1,5 @@
 import { Box, Button, Modal, PasswordInput } from '@mantine/core';
-import type { File } from '@prisma/client';
+import type { File, Thumbnail } from '@prisma/client';
 import AnchorNext from 'components/AnchorNext';
 import exts from 'lib/exts';
 import prisma from 'lib/prisma';
@@ -16,12 +16,14 @@ export default function EmbeddedFile({
   user,
   pass,
   prismRender,
+  host,
   compress,
 }: {
-  file: File & { imageProps?: HTMLImageElement };
+  file: File & { imageProps?: HTMLImageElement; thumbnail: Thumbnail };
   user: UserExtended;
   pass: boolean;
   prismRender: boolean;
+  host: string;
   compress?: boolean;
 }) {
   const dataURL = (route: string) => `${route}/${encodeURI(file.name)}?compress=${compress ?? false}`;
@@ -152,7 +154,7 @@ export default function EmbeddedFile({
           </>
         )}
         {!file.mimetype.startsWith('video') && !file.mimetype.startsWith('image') && (
-          <meta property='og:url' content={`/r/${file.name}`} />
+          <meta property='og:url' content={`${host}/r/${file.name}`} />
         )}
         <title>{file.name}</title>
       </Head>
@@ -215,8 +217,22 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     where: {
       OR: [{ name: id }, { invisible: { invis: decodeURI(encodeURI(id)) } }],
     },
+    include: {
+      thumbnail: true,
+    },
   });
+  let host = context.req.headers.host;
   if (!file) return { notFound: true };
+
+  const proto = context.req.headers['x-forwarded-proto'];
+  try {
+    if (JSON.parse(context.req.headers['cf-visitor'] as string).scheme === 'https' || proto === 'https')
+      host = `https://${host}`;
+    else host = `http://${host}`;
+  } catch (e) {
+    if (proto === 'https') host = `https://${host}`;
+    else host = `http://${host}`;
+  }
 
   const user = await prisma.user.findFirst({
     where: {
@@ -248,6 +264,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         user,
         pass,
         prismRender: true,
+        host,
       },
     };
   }
@@ -265,6 +282,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       props: {
         file,
         user,
+        host,
       },
     };
   }
@@ -277,6 +295,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       file,
       user,
       pass: file.password ? true : false,
+      host,
       compress,
     },
   };
