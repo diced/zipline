@@ -137,14 +137,17 @@ export default function EmbeddedFile({
         {file.mimetype.startsWith('audio') && (
           <>
             <meta name='twitter:card' content='player' />
-            <meta name='twitter:player:stream' content={`/r/${file.name}`} />
+            <meta name='twitter:player' content={`${host}/r/${file.name}`} />
+            <meta name='twitter:player:stream' content={`${host}/r/${file.name}`} />
             <meta name='twitter:player:stream:content_type' content={file.mimetype} />
             <meta name='twitter:title' content={file.name} />
+            <meta name='twitter:player:width' content='720' />
+            <meta name='twitter:player:height' content='480' />
 
             <meta property='og:type' content='music.song' />
-            <meta property='og:url' content={`/r/${file.name}`} />
-            <meta property='og:audio' content={`/r/${file.name}`} />
-            <meta property='og:audio:secure_url' content={`/r/${file.name}`} />
+            <meta property='og:url' content={`${host}/r/${file.name}`} />
+            <meta property='og:audio' content={`${host}/r/${file.name}`} />
+            <meta property='og:audio:secure_url' content={`${host}/r/${file.name}`} />
             <meta property='og:audio:type' content={file.mimetype} />
           </>
         )}
