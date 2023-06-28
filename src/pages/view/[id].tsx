@@ -99,11 +99,13 @@ export default function EmbeddedFile({
         {file.mimetype.startsWith('image') && (
           <>
             <meta property='og:type' content='image' />
-            <meta property='og:image' itemProp='image' content={`/r/${file.name}`} />
-            <meta property='og:url' content={`/r/${file.name}`} />
+            <meta property='og:image' itemProp='image' content={`${host}/r/${file.name}`} />
+            <meta property='og:url' content={`${host}/r/${file.name}`} />
             <meta property='og:image:width' content={file.imageProps?.naturalWidth.toString()} />
             <meta property='og:image:height' content={file.imageProps?.naturalHeight.toString()} />
             <meta property='twitter:card' content='summary_large_image' />
+            <meta property='twitter:image' content={`${host}/r/${file.name}`} />
+            <meta property='twitter:title' content={file.name} />
           </>
         )}
         {file.mimetype.startsWith('video') && (
