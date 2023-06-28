@@ -111,16 +111,24 @@ export default function EmbeddedFile({
         {file.mimetype.startsWith('video') && (
           <>
             <meta name='twitter:card' content='player' />
-            <meta name='twitter:player:stream' content={`/r/${file.name}`} />
+            <meta name='twitter:player' content={`${host}/r/${file.name}`} />
+            <meta name='twitter:player:stream' content={`${host}/r/${file.name}`} />
             <meta name='twitter:player:width' content='720' />
             <meta name='twitter:player:height' content='480' />
             <meta name='twitter:player:stream:content_type' content={file.mimetype} />
             <meta name='twitter:title' content={file.name} />
 
-            <meta property='og:url' content={`/r/${file.name}`} />
-            <meta property='og:video' content={`/r/${file.name}`} />
-            <meta property='og:video:url' content={`/r/${file.name}`} />
-            <meta property='og:video:secure_url' content={`/r/${file.name}`} />
+            {file.thumbnail && (
+              <>
+                <meta name='twitter:image' content={`${host}/r/${file.thumbnail.name}`} />
+                <meta property='og:image' content={`${host}/r/${file.thumbnail.name}`} />
+              </>
+            )}
+
+            <meta property='og:url' content={`${host}/r/${file.name}`} />
+            <meta property='og:video' content={`${host}/r/${file.name}`} />
+            <meta property='og:video:url' content={`${host}/r/${file.name}`} />
+            <meta property='og:video:secure_url' content={`${host}/r/${file.name}`} />
             <meta property='og:video:type' content={file.mimetype} />
             <meta property='og:video:width' content='720' />
             <meta property='og:video:height' content='480' />
