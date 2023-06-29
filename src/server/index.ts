@@ -188,7 +188,8 @@ Disallow: ${config.urls.route}
 
   setInterval(() => clearInvites.bind(server)(), config.core.invites_interval * 1000);
   setInterval(() => stats.bind(server)(), config.core.stats_interval * 1000);
-  setInterval(() => thumbs.bind(server)(), config.core.thumbnails_interval * 1000);
+  if (config.features.thumbnails)
+    setInterval(() => thumbs.bind(server)(), config.core.thumbnails_interval * 1000);
 }
 
 async function stats(this: FastifyInstance) {
