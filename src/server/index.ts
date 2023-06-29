@@ -184,7 +184,7 @@ Disallow: ${config.urls.route}
 
   await clearInvites.bind(server)();
   await stats.bind(server)();
-  await thumbs.bind(server)();
+  if (config.features.thumbnails) await thumbs.bind(server)();
 
   setInterval(() => clearInvites.bind(server)(), config.core.invites_interval * 1000);
   setInterval(() => stats.bind(server)(), config.core.stats_interval * 1000);
