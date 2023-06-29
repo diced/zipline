@@ -1,6 +1,8 @@
 import { ZodError, z } from 'zod';
 import { PROP_TO_ENV, ParsedEnv } from './read';
 import { log } from '../logger';
+import { resolve } from 'path';
+import bytes from 'bytes';
 
 const schema = z.object({
   core: z.object({
@@ -27,10 +29,54 @@ const schema = z.object({
       }
     }),
     databaseUrl: z.string().url(),
+    returnHttpsUrls: z.boolean().default(false),
   }),
   files: z.object({
     route: z.string().default('u'),
+    length: z.number().default(6),
+    defaultFormat: z.enum(['random', 'date', 'uuid', 'name', 'gfycat']).default('random'),
+    disabledExtensions: z.array(z.string()).default([]),
+    maxFileSize: z.number().default(bytes('100mb')),
+    defaultExpiration: z.number().nullish(),
+    assumeMimetypes: z.boolean().default(false),
+    defaultDateFormat: z.string().default('YYYY-MM-DD_HH:mm:ss')
   }),
+  datasource: z
+    .object({
+      type: z.enum(['local', 's3']).default('local'),
+      s3: z
+        .object({
+          accessKeyId: z.string(),
+          secretAccessKey: z.string(),
+          region: z.string(),
+          bucket: z.string(),
+        })
+        .optional(),
+      local: z
+        .object({
+          directory: z.string().transform((s) => resolve(s)),
+        })
+        .optional(),
+    })
+    .superRefine((s, c) => {
+      if (s.type === 's3' && !s.s3) {
+        for (const key of ['accessKeyId', 'secretAccessKey', 'region', 'bucket']) {
+          c.addIssue({
+            code: z.ZodIssueCode.invalid_type,
+            expected: 'string',
+            received: 'unknown',
+            path: ['s3', key],
+          });
+        }
+      } else if (s.type === 'local' && !s.local) {
+        c.addIssue({
+          code: z.ZodIssueCode.invalid_type,
+          expected: 'string',
+          received: 'unknown',
+          path: ['local', 'directory'],
+        });
+      }
+    }),
 });
 
 export type Config = z.infer<typeof schema>;
@@ -45,6 +91,8 @@ export function validateEnv(env: ParsedEnv): Config {
       logger.error('There was an error while validating the environment.');
       process.exit(1);
     }
+
+    logger.debug(`environment validated: ${JSON.stringify(validated)}`);
 
     return validated;
   } catch (e) {

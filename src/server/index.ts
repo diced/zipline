@@ -6,6 +6,7 @@ import { log } from '@/lib/logger';
 import express from 'express';
 import next from 'next';
 import { parse } from 'url';
+import { mkdir } from 'fs/promises';
 
 const MODE = process.env.NODE_ENV || 'production';
 
@@ -18,6 +19,10 @@ async function main() {
 
   logger.info('reading environment for configuration');
   const config = validateEnv(readEnv());
+
+  if (config.datasource.type === 'local') {
+    await mkdir(config.datasource.local!.directory, { recursive: true });
+  }
 
   process.env.DATABASE_URL = config.core.databaseUrl;
 

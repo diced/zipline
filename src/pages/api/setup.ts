@@ -1,18 +1,16 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-
+import { createToken, hashPassword } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
-import { log } from '@/lib/logger';
+import { User } from '@/lib/db/queries/user';
 import { getZipline } from '@/lib/db/queries/zipline';
-import { NextApiReq, NextApiRes, badRequest, forbidden, methodNotAllowed, ok } from '@/lib/response';
+import { log } from '@/lib/logger';
 import { combine } from '@/lib/middleware/combine';
 import { cors } from '@/lib/middleware/cors';
 import { method } from '@/lib/middleware/method';
-import { createToken, hashPassword } from '@/lib/crypto';
-import { User } from '@/lib/db/queries/user';
+import { NextApiReq, NextApiRes } from '@/lib/response';
 
 type Response = {
-  firstSetup: boolean;
-  user: User;
+  firstSetup?: boolean;
+  user?: User;
 };
 
 type Body = {
@@ -24,19 +22,19 @@ export async function handler(req: NextApiReq<Body>, res: NextApiRes<Response>) 
   const logger = log('api').c('setup');
   const { firstSetup, id } = await getZipline();
 
-  if (!firstSetup) return forbidden(res);
+  if (!firstSetup) return res.forbidden();
 
   logger.info('first setup running');
 
   if (req.method === 'GET') {
-    return ok(res, { firstSetup });
+    return res.ok({ firstSetup });
   }
 
   const { username, password } = req.body;
-  if (!username) return badRequest(res, 'Username is required');
-  if (!password) return badRequest(res, 'Password is required');
+  if (!username) return res.badRequest('Username is required');
+  if (!password) return res.badRequest('Password is required');
 
-  if (password.length < 8) return badRequest(res, 'Password must be at least 8 characters long');
+  if (password.length < 8) return res.badRequest('Password must be at least 8 characters long');
 
   const user = await prisma.user.create({
     data: {
@@ -65,10 +63,10 @@ export async function handler(req: NextApiReq<Body>, res: NextApiRes<Response>) 
     },
   });
 
-  return ok(res, {
+  return res.ok({
     firstSetup,
     user,
   });
 }
 
-export default combine([cors(), method(['GET', 'POST'])], handler);
+export default combine([method(['GET', 'POST'])], handler);

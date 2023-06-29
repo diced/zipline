@@ -1,11 +1,11 @@
 import { config } from '@/lib/config';
 import { serializeCookie } from '@/lib/cookie';
 import { encryptToken, verifyPassword } from '@/lib/crypto';
-import { User, getUser, getUserTokenRaw } from '@/lib/db/queries/user';
+import { User, getUser } from '@/lib/db/queries/user';
 import { combine } from '@/lib/middleware/combine';
 import { cors } from '@/lib/middleware/cors';
 import { method } from '@/lib/middleware/method';
-import { NextApiReq, NextApiRes, badRequest, ok } from '@/lib/response';
+import { NextApiReq, NextApiRes } from '@/lib/response';
 
 type Data = {
   user: User;
@@ -15,25 +15,22 @@ type Data = {
 type Body = {
   username: string;
   password: string;
-}
+};
 
 async function handler(req: NextApiReq<Body>, res: NextApiRes<Data>) {
   const { username, password } = req.body;
 
-  if (!username) return badRequest(res, 'Username is required');
-  if (!password) return badRequest(res, 'Password is required');
+  if (!username) return res.badRequest('Username is required');
+  if (!password) return res.badRequest('Password is required');
 
-  const user = await getUser({ username }, { password: true });
-  if (!user) return badRequest(res, 'Invalid username');
+  const user = await getUser({ username }, { password: true, token: true });
+  if (!user) return res.badRequest('Invalid username');
 
-  if (!user.password) return badRequest(res, 'User does not have a password, login through a provider');
+  if (!user.password) return res.badRequest('User does not have a password, login through a provider');
   const valid = await verifyPassword(password, user.password);
-  if (!valid) return badRequest(res, 'Invalid password');
+  if (!valid) return res.badRequest('Invalid password');
 
-  const rawToken = await getUserTokenRaw({ id: user.id });
-  if (!rawToken) return badRequest(res, 'User does not have a token');
-
-  const token = encryptToken(rawToken, config.core.secret);
+  const token = encryptToken(user.token!, config.core.secret);
 
   const cookie = serializeCookie('zipline_token', token, {
     // week
@@ -45,11 +42,12 @@ async function handler(req: NextApiReq<Body>, res: NextApiRes<Data>) {
 
   res.setHeader('Set-Cookie', cookie);
 
+  delete user.token;
   delete user.password;
 
-  return ok(res, {
-    user,
+  return res.ok({
     token,
+    user,
   });
 }
 

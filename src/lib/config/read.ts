@@ -12,6 +12,19 @@ export const PROP_TO_ENV: Record<string, string> = {
   'core.databaseUrl': 'CORE_DATABASE_URL',
 
   'files.route': 'FILES_ROUTE',
+
+  'datasource.type': 'DATASOURCE_TYPE',
+
+  // only for errors, not used in readenv
+  'datasource.s3': 'DATASOURCE_S3_*',
+  'datasource.local': 'DATASOURCE_LOCAL_*',
+
+  'datasource.s3.accessKeyId': 'DATASOURCE_S3_ACCESS_KEY_ID',
+  'datasource.s3.secretAccessKey': 'DATASOURCE_S3_SECRET_ACCESS_KEY',
+  'datasource.s3.region': 'DATASOURCE_S3_REGION',
+  'datasource.s3.bucket': 'DATASOURCE_S3_BUCKET',
+
+  'datasource.local.directory': 'DATASOURCE_LOCAL_DIRECTORY',
 };
 
 export function readEnv() {
@@ -22,9 +35,18 @@ export function readEnv() {
     env(PROP_TO_ENV['core.databaseUrl'], 'core.databaseUrl', 'string'),
 
     env(PROP_TO_ENV['files.route'], 'files.route', 'string'),
+
+    env(PROP_TO_ENV['datasource.type'], 'datasource.type', 'string'),
+
+    env(PROP_TO_ENV['datasource.s3.accessKeyId'], 'datasource.s3.accessKeyId', 'string'),
+    env(PROP_TO_ENV['datasource.s3.secretAccessKey'], 'datasource.s3.secretAccessKey', 'string'),
+    env(PROP_TO_ENV['datasource.s3.region'], 'datasource.s3.region', 'string'),
+    env(PROP_TO_ENV['datasource.s3.bucket'], 'datasource.s3.bucket', 'string'),
+
+    env(PROP_TO_ENV['datasource.local.directory'], 'datasource.local.directory', 'string'),
   ];
 
-  const raw = {
+  const raw: any = {
     core: {
       port: undefined,
       hostname: undefined,
@@ -34,12 +56,30 @@ export function readEnv() {
     files: {
       route: undefined,
     },
+    datasource: {
+      type: undefined,
+    },
   };
 
   for (let i = 0; i !== envs.length; ++i) {
     const env = envs[i];
     const value = process.env[env.variable];
     if (value === undefined) continue;
+
+    if (env.variable === 'DATASOURCE_TYPE') {
+      if (value === 's3') {
+        raw.datasource.s3 = {
+          accessKeyId: undefined,
+          secretAccessKey: undefined,
+          region: undefined,
+          bucket: undefined,
+        };
+      } else if (value === 'local') {
+        raw.datasource.local = {
+          directory: undefined,
+        };
+      }
+    }
 
     const parsed = parse(value, env.type);
     if (parsed === undefined) continue;

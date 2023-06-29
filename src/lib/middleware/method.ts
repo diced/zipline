@@ -1,4 +1,4 @@
-import { NextApiReq, NextApiRes, methodNotAllowed } from '../response';
+import { NextApiReq, NextApiRes } from '../response';
 import { Handler } from './combine';
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS';
@@ -10,7 +10,7 @@ export function method(allowedMethods: HttpMethod[] = []) {
 
       if (!allowedMethods.includes(req.method as HttpMethod)) {
         res.setHeader('Allow', allowedMethods.join(', '));
-        return methodNotAllowed(res);
+        return res.methodNotAllowed();
       }
 
       return handler(req, res);

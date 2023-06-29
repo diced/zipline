@@ -77,15 +77,21 @@ export function encryptToken(token: string, secret: string): string {
   return `${date64}.${encrypted64}`;
 }
 
-export function decryptToken(encryptedToken: string, secret: string): [number, string] {
+export function decryptToken(encryptedToken: string, secret: string): [number, string] | null {
   const key = createKey(secret);
   const [date64, encrypted64] = encryptedToken.split('.');
 
-  const date = parseInt(Buffer.from(date64, 'base64').toString('ascii'), 10);
+  if (!date64 || !encrypted64) return null;
 
-  const encrypted = Buffer.from(encrypted64, 'base64').toString('ascii');
+  try {
+    const date = parseInt(Buffer.from(date64, 'base64').toString('ascii'), 10);
 
-  return [date, decrypt(encrypted, key)];
+    const encrypted = Buffer.from(encrypted64, 'base64').toString('ascii');
+
+    return [date, decrypt(encrypted, key)];
+  } catch (e) {
+    return null;
+  }
 }
 
 export async function hashPassword(password: string) {

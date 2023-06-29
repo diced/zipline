@@ -9,11 +9,14 @@ export type User = {
   administrator: boolean;
   avatar?: string | null;
   password?: string | null;
+  token?: string | null;
 };
+
+export type UserSelectOptions = { password?: boolean; avatar?: boolean; token?: boolean };
 
 export async function getUser(
   where: Prisma.UserWhereInput | Prisma.UserWhereUniqueInput,
-  options?: { password?: boolean; avatar?: boolean }
+  options?: UserSelectOptions
 ): Promise<User | null> {
   return prisma.user.findFirst({
     where,
@@ -25,21 +28,28 @@ export async function getUser(
       updatedAt: true,
       password: options?.password || false,
       username: true,
+      token: options?.token || false,
     },
   });
 }
 
-export async function getUserTokenRaw(
-  where: Prisma.UserWhereInput | Prisma.UserWhereUniqueInput
-): Promise<string | null> {
-  const user = await prisma.user.findFirst({
+export async function updateUser(
+  where: Prisma.UserWhereUniqueInput,
+  data: Prisma.UserUpdateInput,
+  options?: UserSelectOptions
+): Promise<User> {
+  return prisma.user.update({
     where,
+    data,
     select: {
-      token: true,
+      administrator: true,
+      avatar: options?.avatar || false,
+      id: true,
+      createdAt: true,
+      updatedAt: true,
+      password: options?.password || false,
+      username: true,
+      token: options?.token || false,
     },
   });
-
-  if (!user) return null;
-
-  return user.token;
 }
