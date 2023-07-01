@@ -110,10 +110,11 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
     if (lastchunk) {
       const fileName = await formatFileName(format, filename);
+      const ext = filename.split('.').length === 1 ? '' : fileName.split('.').pop();
 
       const file = await prisma.file.create({
         data: {
-          name: fileName,
+          name: `${fileName}${ext ? '.' : ''}${ext}`,
           mimetype: req.headers.uploadtext ? 'text/plain' : mimetype,
           userId: user.id,
           originalName: req.headers['original-name'] ? filename ?? null : null,
