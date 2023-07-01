@@ -9,7 +9,7 @@ import MutedText from 'components/MutedText';
 import { invalidateFiles } from 'lib/queries/files';
 import { userSelector } from 'lib/recoil/user';
 import { expireReadToDate, randomChars } from 'lib/utils/client';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import showFilesModal from './showFilesModal';
 import useUploadOptions from './useUploadOptions';
@@ -28,23 +28,29 @@ export default function File({ chunks: chunks_config }) {
 
   const [options, setOpened, OptionsModal] = useUploadOptions();
 
-  const beforeUnload = (e: BeforeUnloadEvent) => {
-    if (loading) {
-      e.preventDefault();
-      e.returnValue = "Are you sure you want to leave? Your upload(s) won't be saved.";
-      return e.returnValue;
-    }
-  };
-
-  const beforeRouteChange = (url: string) => {
-    if (loading) {
-      const confirmed = confirm("Are you sure you want to leave? Your upload(s) won't be saved.");
-      if (!confirmed) {
-        router.events.emit('routeChangeComplete', url);
-        throw 'Route change aborted';
+  const beforeUnload = useCallback(
+    (e: BeforeUnloadEvent) => {
+      if (loading) {
+        e.preventDefault();
+        e.returnValue = "Are you sure you want to leave? Your upload(s) won't be saved.";
+        return e.returnValue;
       }
-    }
-  };
+    },
+    [loading]
+  );
+
+  const beforeRouteChange = useCallback(
+    (url: string) => {
+      if (loading) {
+        const confirmed = confirm("Are you sure you want to leave? Your upload(s) won't be saved.");
+        if (!confirmed) {
+          router.events.emit('routeChangeComplete', url);
+          throw 'Route change aborted';
+        }
+      }
+    },
+    [loading]
+  );
 
   useEffect(() => {
     const listener = (e: ClipboardEvent) => {
@@ -62,10 +68,10 @@ export default function File({ chunks: chunks_config }) {
     };
 
     document.addEventListener('paste', listener);
-    window.addEventListener('beforeunload', beforeUnload);
+    window.addEventListener('beforeunload', beforeUnload, true);
     router.events.on('routeChangeStart', beforeRouteChange);
     return () => {
-      window.removeEventListener('beforeunload', beforeUnload);
+      window.removeEventListener('beforeunload', beforeUnload, true);
       router.events.off('routeChangeStart', beforeRouteChange);
       document.removeEventListener('paste', listener);
     };
@@ -122,7 +128,7 @@ export default function File({ chunks: chunks_config }) {
               });
 
               if (j === chunks.length - 1) {
-                window.removeEventListener('beforeunload', beforeUnload);
+                window.removeEventListener('beforeunload', beforeUnload, true);
                 router.events.off('routeChangeStart', beforeRouteChange);
                 updateNotification({
                   id: 'upload-chunked',
@@ -248,6 +254,9 @@ export default function File({ chunks: chunks_config }) {
           showFilesModal(clipboard, modals, json.files);
           setFiles([]);
           invalidateFiles();
+
+          window.removeEventListener('beforeunload', beforeUnload, true);
+          router.events.off('routeChangeStart', beforeRouteChange);
 
           if (toChunkFiles.length) {
             showNotification({
