@@ -1,32 +1,50 @@
 import { config } from '@/lib/config';
 import { serializeCookie } from '@/lib/cookie';
 import { createToken, encryptToken } from '@/lib/crypto';
-import { User, updateUser } from '@/lib/db/queries/user';
+import { prisma } from '@/lib/db';
+import { User, userSelect } from '@/lib/db/models/user';
 import { combine } from '@/lib/middleware/combine';
-import { cors } from '@/lib/middleware/cors';
 import { method } from '@/lib/middleware/method';
 import { ziplineAuth } from '@/lib/middleware/ziplineAuth';
 import { NextApiReq, NextApiRes } from '@/lib/response';
 
-type Response = {
+export type ApiUserTokenResponse = {
   user?: User;
   token?: string;
 };
 
-export async function handler(req: NextApiReq, res: NextApiRes<Response>) {
-  const user = await updateUser(
-    {
+export async function handler(req: NextApiReq, res: NextApiRes<ApiUserTokenResponse>) {
+  if (req.method === 'GET') {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: req.user.id,
+      },
+      select: {
+        token: true,
+      },
+    });
+
+    const token = encryptToken(user!.token, config.core.secret);
+
+    return res.ok({
+      token,
+    });
+  }
+
+  const user = await prisma.user.update({
+    where: {
       id: req.user.id,
     },
-    {
+    data: {
       token: createToken(),
     },
-    {
+    select: {
+      ...userSelect,
       token: true,
-    }
-  );
+    },
+  });
 
-  const token = encryptToken(user.token!, config.core.secret);
+  const token = encryptToken(user.token, config.core.secret);
 
   const cookie = serializeCookie('zipline_token', token, {
     // week
@@ -37,7 +55,7 @@ export async function handler(req: NextApiReq, res: NextApiRes<Response>) {
   });
   res.setHeader('Set-Cookie', cookie);
 
-  delete user.token;
+  delete (user as any).token;
 
   return res.ok({
     user,
@@ -45,4 +63,4 @@ export async function handler(req: NextApiReq, res: NextApiRes<Response>) {
   });
 }
 
-export default combine([cors(), method(['PATCH']), ziplineAuth()], handler);
+export default combine([method(['GET', 'PATCH']), ziplineAuth()], handler);

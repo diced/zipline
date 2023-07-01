@@ -31,7 +31,7 @@
     "@prisma/client": "4.16.1",
     "@prisma/internals": "^4.16.1",
     "@prisma/migrate": "^4.16.1",
-    "@tabler/icons-react": "^2.22.0",
+    "@tabler/icons-react": "^2.23.0",
     "argon2": "^0.30.3",
     "bytes": "^3.1.2",
     "colorette": "^2.0.20",
@@ -42,8 +42,10 @@
     "next": "^13.4.7",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "swr": "^2.2.0",
     "znv": "^0.3.2",
-    "zod": "^3.21.4"
+    "zod": "^3.21.4",
+    "zustand": "^4.3.8"
   },
   "devDependencies": {
     "@remix-run/dev": "^1.16.1",

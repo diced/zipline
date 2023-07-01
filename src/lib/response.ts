@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { User } from './db/queries/user';
+import { User } from './db/models/user';
 import { Readable } from 'stream';
 
 export interface File {

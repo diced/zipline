@@ -1,14 +1,13 @@
 import { createToken, hashPassword } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
-import { User } from '@/lib/db/queries/user';
-import { getZipline } from '@/lib/db/queries/zipline';
+import { User } from '@/lib/db/models/user';
+import { getZipline } from '@/lib/db/models/zipline';
 import { log } from '@/lib/logger';
 import { combine } from '@/lib/middleware/combine';
-import { cors } from '@/lib/middleware/cors';
 import { method } from '@/lib/middleware/method';
 import { NextApiReq, NextApiRes } from '@/lib/response';
 
-type Response = {
+export type ApiSetupResponse = {
   firstSetup?: boolean;
   user?: User;
 };
@@ -18,7 +17,7 @@ type Body = {
   password: string;
 };
 
-export async function handler(req: NextApiReq<Body>, res: NextApiRes<Response>) {
+export async function handler(req: NextApiReq<Body>, res: NextApiRes<ApiSetupResponse>) {
   const logger = log('api').c('setup');
   const { firstSetup, id } = await getZipline();
 

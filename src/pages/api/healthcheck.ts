@@ -1,15 +1,14 @@
 import { prisma } from '@/lib/db';
 import { log } from '@/lib/logger';
 import { combine } from '@/lib/middleware/combine';
-import { cors } from '@/lib/middleware/cors';
 import { method } from '@/lib/middleware/method';
 import { NextApiReq, NextApiRes } from '@/lib/response';
 
-type Data = {
+export type ApiHealthcheckResponse = {
   pass: boolean;
 };
 
-export async function handler(req: NextApiReq, res: NextApiRes<Data>) {
+export async function handler(req: NextApiReq, res: NextApiRes<ApiHealthcheckResponse>) {
   const logger = log('api').c('healthcheck');
 
   try {
@@ -25,4 +24,4 @@ export async function handler(req: NextApiReq, res: NextApiRes<Data>) {
   }
 }
 
-export default combine([cors(), method(['GET'])], handler);
+export default combine([method(['GET'])], handler);

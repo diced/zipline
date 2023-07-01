@@ -1,12 +1,14 @@
+import { Prisma } from '@prisma/client';
 import { config } from '../config';
 import { decryptToken } from '../crypto';
-import { User, UserSelectOptions, getUser } from '../db/queries/user';
+import { prisma } from '../db';
+import { User, userSelect } from '../db/models/user';
 import { NextApiReq, NextApiRes } from '../response';
 import { Handler } from './combine';
 
 export type ZiplineAuthOptions = {
   administratorOnly?: boolean;
-  getOptions?: UserSelectOptions;
+  select?: Prisma.UserSelect;
 };
 
 declare module 'next' {
@@ -31,7 +33,15 @@ export function ziplineAuth(options?: ZiplineAuthOptions) {
       const [date, token] = decryptedToken;
       if (isNaN(new Date(date).getTime())) return res.unauthorized('could not decrypt token date');
 
-      const user = await getUser({ token }, options?.getOptions || {});
+      const user = await prisma.user.findFirst({
+        where: {
+          token,
+        },
+        select: {
+          ...userSelect,
+          ...(options?.select && options.select),
+        },
+      });
       if (!user) return res.unauthorized();
 
       req.user = user;

@@ -1,10 +1,9 @@
 import { config as zconfig } from '@/lib/config';
 import { hashPassword } from '@/lib/crypto';
 import { datasource } from '@/lib/datasource';
-import { createFile, getFile } from '@/lib/db/queries/file';
+import { prisma } from '@/lib/db';
 import { log } from '@/lib/logger';
 import { combine } from '@/lib/middleware/combine';
-import { cors } from '@/lib/middleware/cors';
 import { file } from '@/lib/middleware/file';
 import { method } from '@/lib/middleware/method';
 import { ziplineAuth } from '@/lib/middleware/ziplineAuth';
@@ -15,7 +14,7 @@ import { UploadHeaders, parseHeaders } from '@/lib/uploader/parseHeaders';
 import bytes from 'bytes';
 import { extname, parse } from 'path';
 
-type Data = {
+export type ApiUploadResponse = {
   files: {
     id: string;
     type: string;
@@ -28,14 +27,14 @@ type Data = {
 
 const logger = log('api').c('upload');
 
-export async function handler(req: NextApiReq<any, any, UploadHeaders>, res: NextApiRes<Data>) {
+export async function handler(req: NextApiReq<any, any, UploadHeaders>, res: NextApiRes<ApiUploadResponse>) {
   if (!req.files || !req.files.length) return res.badRequest('No files received');
 
   const options = parseHeaders(req.headers, zconfig.files);
 
   if (options.header) return res.badRequest('', options);
 
-  const response: Data = {
+  const response: ApiUploadResponse = {
     files: [],
     ...(options.deletesAt && { deletesAt: options.deletesAt.toISOString() }),
     ...(zconfig.files.assumeMimetypes && { assumedMimetypes: Array(req.files.length) }),
@@ -64,9 +63,11 @@ export async function handler(req: NextApiReq<any, any, UploadHeaders>, res: Nex
 
     if (options.overrides?.filename) {
       fileName = options.overrides!.filename!;
-      const existing = await getFile({
-        name: {
-          startsWith: fileName,
+      const existing = await prisma.file.findFirst({
+        where: {
+          name: {
+            startsWith: fileName,
+          },
         },
       });
       if (existing) return res.badRequest(`A file with the name "${fileName}*" already exists`);
@@ -84,16 +85,29 @@ export async function handler(req: NextApiReq<any, any, UploadHeaders>, res: Nex
       }
     }
 
-    const fileUpload = await createFile({
-      name: `${fileName}${extension}`,
-      path: `${fileName}${extension}`,
-      originalName: file.originalname,
-      size: file.size,
-      type: mimetype,
-      ...(options.maxViews && { maxViews: options.maxViews }),
-      ...(options.password && { password: await hashPassword(options.password) }),
-      ...(options.deletesAt && { deletesAt: options.deletesAt }),
-      ...(options.folder && { Folder: { connect: { id: options.folder } } }),
+    const fileUpload = await prisma.file.create({
+      data: {
+        name: `${fileName}${extension}`,
+        path: `${fileName}${extension}`,
+        originalName: file.originalname,
+        size: file.size,
+        type: mimetype,
+        User: {
+          connect: {
+            id: req.user.id,
+          },
+        },
+        ...(options.maxViews && { maxViews: options.maxViews }),
+        ...(options.password && { password: await hashPassword(options.password) }),
+        ...(options.deletesAt && { deletesAt: options.deletesAt }),
+        ...(options.folder && { Folder: { connect: { id: options.folder } } }),
+      },
+      select: {
+        name: true,
+        id: true,
+        type: true,
+        size: true,
+      },
     });
 
     // TODO: remove gps
@@ -115,12 +129,16 @@ export async function handler(req: NextApiReq<any, any, UploadHeaders>, res: Nex
     });
   }
 
-  if (options.noJson) return res.status(200).end(response.files.map((x) => x.url).join(','));
+  if (options.noJson)
+    return res
+      .status(200)
+      .setHeader('content-type', 'text/plain')
+      .end(response.files.map((x) => x.url).join(','));
 
   return res.ok(response);
 }
 
-export default combine([cors(), method(['POST']), ziplineAuth(), file()], handler);
+export default combine([method(['POST']), ziplineAuth(), file()], handler);
 
 export const config = {
   api: {
