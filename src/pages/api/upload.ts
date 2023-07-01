@@ -110,7 +110,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
     if (lastchunk) {
       const fileName = await formatFileName(format, filename);
-      const ext = filename.split('.').length === 1 ? '' : fileName.split('.').pop();
+      const ext = filename.split('.').length === 1 ? '' : filename.split('.').pop();
 
       const file = await prisma.file.create({
         data: {
