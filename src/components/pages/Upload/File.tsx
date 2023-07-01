@@ -136,6 +136,8 @@ export default function File({ chunks: chunks_config }) {
                 invalidateFiles();
                 setFiles([]);
                 setProgress(100);
+                showFilesModal(clipboard, modals, json.files);
+                setLoading(false);
 
                 setTimeout(() => setProgress(0), 1000);
               }

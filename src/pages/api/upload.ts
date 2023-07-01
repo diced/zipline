@@ -109,12 +109,37 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     await writeFile(tempFile, req.files[0].buffer);
 
     if (lastchunk) {
+      const fileName = await formatFileName(format, filename);
+
+      const file = await prisma.file.create({
+        data: {
+          name: fileName,
+          mimetype: req.headers.uploadtext ? 'text/plain' : mimetype,
+          userId: user.id,
+          originalName: req.headers['original-name'] ? filename ?? null : null,
+        },
+      });
+
+      let domain;
+      if (req.headers['override-domain']) {
+        domain = `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers['override-domain']}`;
+      } else if (user.domains.length) {
+        domain = user.domains[Math.floor(Math.random() * user.domains.length)];
+      } else {
+        domain = `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}`;
+      }
+
+      const responseUrl = `${domain}${
+        zconfig.uploader.route === '/' ? '/' : zconfig.uploader.route + '/'
+      }${encodeURI(file.name)}`;
+
       new Worker('./dist/worker/upload.js', {
         workerData: {
           user,
           file: {
-            filename,
-            mimetype,
+            id: file.id,
+            filename: file.name,
+            mimetype: file.mimetype,
             identifier,
             lastchunk,
             totalBytes: total,
@@ -122,7 +147,6 @@ async function handler(req: NextApiReq, res: NextApiRes) {
           response: {
             expiresAt: expiry,
             format,
-            imageCompressionPercent,
             fileMaxViews,
           },
           headers: req.headers,
@@ -131,6 +155,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
       return res.json({
         pending: true,
+        files: [responseUrl],
       });
     }
 
