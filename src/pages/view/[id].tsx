@@ -1,5 +1,5 @@
 import { Box, Button, Modal, PasswordInput } from '@mantine/core';
-import type { File } from '@prisma/client';
+import type { File, Thumbnail } from '@prisma/client';
 import AnchorNext from 'components/AnchorNext';
 import exts from 'lib/exts';
 import prisma from 'lib/prisma';
@@ -10,18 +10,21 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import zconfig from 'lib/config';
 
 export default function EmbeddedFile({
   file,
   user,
   pass,
   prismRender,
+  host,
   compress,
 }: {
-  file: File & { imageProps?: HTMLImageElement };
+  file: File & { imageProps?: HTMLImageElement; thumbnail: Thumbnail };
   user: UserExtended;
   pass: boolean;
   prismRender: boolean;
+  host: string;
   compress?: boolean;
 }) {
   const dataURL = (route: string) => `${route}/${encodeURI(file.name)}?compress=${compress ?? false}`;
@@ -99,26 +102,36 @@ export default function EmbeddedFile({
         {file.mimetype.startsWith('image') && (
           <>
             <meta property='og:type' content='image' />
-            <meta property='og:image' itemProp='image' content={`/r/${file.name}`} />
-            <meta property='og:url' content={`/r/${file.name}`} />
+            <meta property='og:image' itemProp='image' content={`${host}/r/${file.name}`} />
+            <meta property='og:url' content={`${host}/r/${file.name}`} />
             <meta property='og:image:width' content={file.imageProps?.naturalWidth.toString()} />
             <meta property='og:image:height' content={file.imageProps?.naturalHeight.toString()} />
             <meta property='twitter:card' content='summary_large_image' />
+            <meta property='twitter:image' content={`${host}/r/${file.name}`} />
+            <meta property='twitter:title' content={file.name} />
           </>
         )}
         {file.mimetype.startsWith('video') && (
           <>
             <meta name='twitter:card' content='player' />
-            <meta name='twitter:player:stream' content={`/r/${file.name}`} />
+            <meta name='twitter:player' content={`${host}/r/${file.name}`} />
+            <meta name='twitter:player:stream' content={`${host}/r/${file.name}`} />
             <meta name='twitter:player:width' content='720' />
             <meta name='twitter:player:height' content='480' />
             <meta name='twitter:player:stream:content_type' content={file.mimetype} />
             <meta name='twitter:title' content={file.name} />
 
-            <meta property='og:url' content={`/r/${file.name}`} />
-            <meta property='og:video' content={`/r/${file.name}`} />
-            <meta property='og:video:url' content={`/r/${file.name}`} />
-            <meta property='og:video:secure_url' content={`/r/${file.name}`} />
+            {file.thumbnail && (
+              <>
+                <meta name='twitter:image' content={`${host}/r/${file.thumbnail.name}`} />
+                <meta property='og:image' content={`${host}/r/${file.thumbnail.name}`} />
+              </>
+            )}
+
+            <meta property='og:url' content={`${host}/r/${file.name}`} />
+            <meta property='og:video' content={`${host}/r/${file.name}`} />
+            <meta property='og:video:url' content={`${host}/r/${file.name}`} />
+            <meta property='og:video:secure_url' content={`${host}/r/${file.name}`} />
             <meta property='og:video:type' content={file.mimetype} />
             <meta property='og:video:width' content='720' />
             <meta property='og:video:height' content='480' />
@@ -127,19 +140,22 @@ export default function EmbeddedFile({
         {file.mimetype.startsWith('audio') && (
           <>
             <meta name='twitter:card' content='player' />
-            <meta name='twitter:player:stream' content={`/r/${file.name}`} />
+            <meta name='twitter:player' content={`${host}/r/${file.name}`} />
+            <meta name='twitter:player:stream' content={`${host}/r/${file.name}`} />
             <meta name='twitter:player:stream:content_type' content={file.mimetype} />
             <meta name='twitter:title' content={file.name} />
+            <meta name='twitter:player:width' content='720' />
+            <meta name='twitter:player:height' content='480' />
 
             <meta property='og:type' content='music.song' />
-            <meta property='og:url' content={`/r/${file.name}`} />
-            <meta property='og:audio' content={`/r/${file.name}`} />
-            <meta property='og:audio:secure_url' content={`/r/${file.name}`} />
+            <meta property='og:url' content={`${host}/r/${file.name}`} />
+            <meta property='og:audio' content={`${host}/r/${file.name}`} />
+            <meta property='og:audio:secure_url' content={`${host}/r/${file.name}`} />
             <meta property='og:audio:type' content={file.mimetype} />
           </>
         )}
         {!file.mimetype.startsWith('video') && !file.mimetype.startsWith('image') && (
-          <meta property='og:url' content={`/r/${file.name}`} />
+          <meta property='og:url' content={`${host}/r/${file.name}`} />
         )}
         <title>{file.name}</title>
       </Head>
@@ -202,8 +218,26 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     where: {
       OR: [{ name: id }, { invisible: { invis: decodeURI(encodeURI(id)) } }],
     },
+    include: {
+      thumbnail: true,
+    },
   });
+  let host = context.req.headers.host;
   if (!file) return { notFound: true };
+
+  const proto = context.req.headers['x-forwarded-proto'];
+  try {
+    if (
+      JSON.parse(context.req.headers['cf-visitor'] as string).scheme === 'https' ||
+      proto === 'https' ||
+      zconfig.core.return_https
+    )
+      host = `https://${host}`;
+    else host = `http://${host}`;
+  } catch (e) {
+    if (proto === 'https' || zconfig.core.return_https) host = `https://${host}`;
+    else host = `http://${host}`;
+  }
 
   const user = await prisma.user.findFirst({
     where: {
@@ -235,6 +269,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         user,
         pass,
         prismRender: true,
+        host,
       },
     };
   }
@@ -252,6 +287,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       props: {
         file,
         user,
+        host,
       },
     };
   }
@@ -264,6 +300,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       file,
       user,
       pass: file.password ? true : false,
+      host,
       compress,
     },
   };

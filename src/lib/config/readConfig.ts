@@ -163,6 +163,8 @@ export default function readConfig() {
 
     map('FEATURES_ROBOTS_TXT', 'boolean', 'features.robots_txt'),
 
+    map('FEATURES_THUMBNAILS', 'boolean', 'features.thumbnails'),
+
     map('CHUNKS_MAX_SIZE', 'human-to-byte', 'chunks.max_size'),
     map('CHUNKS_CHUNKS_SIZE', 'human-to-byte', 'chunks.chunks_size'),
     map('CHUNKS_ENABLED', 'boolean', 'chunks.enabled'),
