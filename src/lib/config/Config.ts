@@ -123,6 +123,8 @@ export interface ConfigFeatures {
   default_avatar: string;
 
   robots_txt: string;
+
+  thumbnails: boolean;
 }
 
 export interface ConfigOAuth {
