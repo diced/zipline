@@ -128,8 +128,6 @@ export default function File({ chunks: chunks_config }) {
               });
 
               if (j === chunks.length - 1) {
-                window.removeEventListener('beforeunload', beforeUnload, true);
-                router.events.off('routeChangeStart', beforeRouteChange);
                 updateNotification({
                   id: 'upload-chunked',
                   title: 'Finalizing partial upload',
@@ -254,9 +252,6 @@ export default function File({ chunks: chunks_config }) {
           showFilesModal(clipboard, modals, json.files);
           setFiles([]);
           invalidateFiles();
-
-          window.removeEventListener('beforeunload', beforeUnload, true);
-          router.events.off('routeChangeStart', beforeRouteChange);
 
           if (toChunkFiles.length) {
             showNotification({
