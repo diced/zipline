@@ -1,19 +1,26 @@
-import { Button, Collapse, Group, Progress, Stack, Title } from '@mantine/core';
+import { Anchor, Button, Collapse, Group, Progress, Stack, Text, Title } from '@mantine/core';
 import { randomId, useClipboard } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
-import { showNotification, updateNotification } from '@mantine/notifications';
-import { IconFileImport, IconFileTime, IconFileUpload, IconFileX } from '@tabler/icons-react';
+import { hideNotification, showNotification, updateNotification } from '@mantine/notifications';
+import {
+  IconClipboardCopy,
+  IconFileImport,
+  IconFileTime,
+  IconFileUpload,
+  IconFileX,
+} from '@tabler/icons-react';
 import Dropzone from 'components/dropzone/Dropzone';
 import FileDropzone from 'components/dropzone/DropzoneFile';
 import MutedText from 'components/MutedText';
 import { invalidateFiles } from 'lib/queries/files';
 import { userSelector } from 'lib/recoil/user';
 import { expireReadToDate, randomChars } from 'lib/utils/client';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import showFilesModal from './showFilesModal';
 import useUploadOptions from './useUploadOptions';
 import { useRouter } from 'next/router';
+import AnchorNext from 'components/AnchorNext';
 
 export default function File({ chunks: chunks_config }) {
   const router = useRouter();
@@ -28,23 +35,29 @@ export default function File({ chunks: chunks_config }) {
 
   const [options, setOpened, OptionsModal] = useUploadOptions();
 
-  const beforeUnload = (e: BeforeUnloadEvent) => {
-    if (loading) {
-      e.preventDefault();
-      e.returnValue = "Are you sure you want to leave? Your upload(s) won't be saved.";
-      return e.returnValue;
-    }
-  };
-
-  const beforeRouteChange = (url: string) => {
-    if (loading) {
-      const confirmed = confirm("Are you sure you want to leave? Your upload(s) won't be saved.");
-      if (!confirmed) {
-        router.events.emit('routeChangeComplete', url);
-        throw 'Route change aborted';
+  const beforeUnload = useCallback(
+    (e: BeforeUnloadEvent) => {
+      if (loading) {
+        e.preventDefault();
+        e.returnValue = "Are you sure you want to leave? Your upload(s) won't be saved.";
+        return e.returnValue;
       }
-    }
-  };
+    },
+    [loading]
+  );
+
+  const beforeRouteChange = useCallback(
+    (url: string) => {
+      if (loading) {
+        const confirmed = confirm("Are you sure you want to leave? Your upload(s) won't be saved.");
+        if (!confirmed) {
+          router.events.emit('routeChangeComplete', url);
+          throw 'Route change aborted';
+        }
+      }
+    },
+    [loading]
+  );
 
   useEffect(() => {
     const listener = (e: ClipboardEvent) => {
@@ -62,10 +75,10 @@ export default function File({ chunks: chunks_config }) {
     };
 
     document.addEventListener('paste', listener);
-    window.addEventListener('beforeunload', beforeUnload);
+    window.addEventListener('beforeunload', beforeUnload, true);
     router.events.on('routeChangeStart', beforeRouteChange);
     return () => {
-      window.removeEventListener('beforeunload', beforeUnload);
+      window.removeEventListener('beforeunload', beforeUnload, true);
       router.events.off('routeChangeStart', beforeRouteChange);
       document.removeEventListener('paste', listener);
     };
@@ -122,20 +135,37 @@ export default function File({ chunks: chunks_config }) {
               });
 
               if (j === chunks.length - 1) {
-                window.removeEventListener('beforeunload', beforeUnload);
-                router.events.off('routeChangeStart', beforeRouteChange);
                 updateNotification({
                   id: 'upload-chunked',
                   title: 'Finalizing partial upload',
-                  message:
-                    'The upload has been offloaded, and will complete in the background. You can see processing files in the files tab.',
+                  message: (
+                    <Text>
+                      The upload has been offloaded, and will complete in the background.
+                      <br />
+                      <Anchor
+                        component='span'
+                        onClick={() => {
+                          hideNotification('upload-chunked');
+                          clipboard.copy(json.files[0]);
+                          showNotification({
+                            title: 'Copied to clipboard',
+                            message: <AnchorNext href={json.files[0]}>{json.files[0]}</AnchorNext>,
+                            icon: <IconClipboardCopy size='1rem' />,
+                          });
+                        }}
+                      >
+                        Click here to copy the URL while it&lsquo;s being processed.
+                      </Anchor>
+                    </Text>
+                  ),
                   icon: <IconFileTime size='1rem' />,
                   color: 'green',
-                  autoClose: true,
+                  autoClose: false,
                 });
                 invalidateFiles();
                 setFiles([]);
                 setProgress(100);
+                setLoading(false);
 
                 setTimeout(() => setProgress(0), 1000);
               }

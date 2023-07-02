@@ -10,11 +10,11 @@ import { IncompleteFile, InvisibleFile } from '@prisma/client';
 import { removeGPSData } from 'lib/utils/exif';
 import { sendUpload } from 'lib/discord';
 import { createInvisImage, hashPassword } from 'lib/util';
-import formatFileName from 'lib/format';
 
 export type UploadWorkerData = {
   user: UserExtended;
   file: {
+    id: number;
     filename: string;
     mimetype: string;
     identifier: string;
@@ -24,7 +24,6 @@ export type UploadWorkerData = {
   response: {
     expiresAt?: Date;
     format: NameFormat;
-    imageCompressionPercent?: number;
     fileMaxViews?: number;
   };
   headers: Record<string, string>;
@@ -46,7 +45,12 @@ if (!file.lastchunk) {
 
 if (!config.chunks.enabled) {
   logger.error('chunks are not enabled, worker should not have been started');
-  process.exit(1);
+  if (file.id) {
+    prisma.file.delete({ where: { id: file.id } }).then(() => {
+      logger.debug('deleted a file entry due to anomalous worker start');
+      process.exit(1);
+    });
+  } else process.exit(1);
 }
 
 start();
@@ -75,20 +79,12 @@ async function start() {
     },
   });
 
-  const compressionUsed = response.imageCompressionPercent && file.mimetype.startsWith('image/');
   const ext = file.filename.split('.').length === 1 ? '' : file.filename.split('.').pop();
-  const fileName = await formatFileName(response.format, file.filename);
 
   let fd;
 
   if (config.datasource.type === 'local') {
-    fd = await open(
-      join(
-        config.datasource.local.directory,
-        `${fileName}${compressionUsed ? '.jpg' : `${ext ? '.' : ''}${ext}`}`
-      ),
-      'w'
-    );
+    fd = await open(join(config.datasource.local.directory, file.filename), 'w');
   } else {
     fd = new Uint8Array(file.totalBytes);
   }
@@ -125,10 +121,7 @@ async function start() {
     await fd.close();
   } else {
     logger.debug('writing file to datasource');
-    await datasource.save(
-      `${fileName}${compressionUsed ? '.jpg' : `${ext ? '.' : ''}${ext}`}`,
-      Buffer.from(fd as Uint8Array)
-    );
+    await datasource.save(file.filename, Buffer.from(fd as Uint8Array));
   }
 
   const final = await prisma.incompleteFile.update({
@@ -142,7 +135,7 @@ async function start() {
 
   logger.debug('done writing file');
 
-  await runFileComplete(fileName, ext, compressionUsed, final);
+  await runFileComplete(file.id, ext, final);
 
   logger.debug('done running worker');
   process.exit(0);
@@ -151,6 +144,11 @@ async function start() {
 async function setResponse(incompleteFile: IncompleteFile, code: number, message: string) {
   incompleteFile.data['code'] = code;
   incompleteFile.data['message'] = message;
+
+  if (code !== 200) {
+    await datasource.delete(file.filename);
+    await prisma.file.delete({ where: { id: file.id } });
+  }
 
   return prisma.incompleteFile.update({
     where: {
@@ -162,12 +160,7 @@ async function setResponse(incompleteFile: IncompleteFile, code: number, message
   });
 }
 
-async function runFileComplete(
-  fileName: string,
-  ext: string,
-  compressionUsed: boolean,
-  incompleteFile: IncompleteFile
-) {
+async function runFileComplete(id: number, ext: string, incompleteFile: IncompleteFile) {
   if (config.uploader.disabled_extensions.includes(ext))
     return setResponse(incompleteFile, 403, 'disabled extension');
 
@@ -178,11 +171,11 @@ async function runFileComplete(
 
   let invis: InvisibleFile;
 
-  const fFile = await prisma.file.create({
+  const fFile = await prisma.file.update({
+    where: {
+      id,
+    },
     data: {
-      name: `${fileName}${compressionUsed ? '.jpg' : `${ext ? '.' : ''}${ext}`}`,
-      mimetype: file.mimetype,
-      userId: user.id,
       embed: !!headers.embed,
       password,
       expiresAt: response.expiresAt,
@@ -192,7 +185,8 @@ async function runFileComplete(
     },
   });
 
-  if (headers.zws) invis = await createInvisImage(config.uploader.length, fFile.id);
+  if (typeof headers.zws !== 'undefined' && (headers.zws as string).toLowerCase().match('true'))
+    invis = await createInvisImage(config.uploader.length, fFile.id);
 
   logger.info(`User ${user.username} (${user.id}) uploaded ${fFile.name} (${fFile.id}) (chunked)`);
   let domain;
