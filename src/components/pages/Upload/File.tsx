@@ -1,4 +1,4 @@
-import { Button, Collapse, Group, Progress, Stack, Title } from '@mantine/core';
+import { Anchor, Button, Collapse, Group, Progress, Stack, Text, Title } from '@mantine/core';
 import { randomId, useClipboard } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
 import { hideNotification, showNotification, updateNotification } from '@mantine/notifications';
@@ -138,20 +138,29 @@ export default function File({ chunks: chunks_config }) {
                 updateNotification({
                   id: 'upload-chunked',
                   title: 'Finalizing partial upload',
-                  message:
-                    "The upload has been offloaded, and will complete in the background. Click here to copy the normal URL while it's being processed.",
+                  message: (
+                    <Text>
+                      The upload has been offloaded, and will complete in the background.
+                      <br />
+                      <Anchor
+                        component='span'
+                        onClick={() => {
+                          hideNotification('upload-chunked');
+                          clipboard.copy(json.files[0]);
+                          showNotification({
+                            title: 'Copied to clipboard',
+                            message: <AnchorNext href={json.files[0]}>{json.files[0]}</AnchorNext>,
+                            icon: <IconClipboardCopy size='1rem' />,
+                          });
+                        }}
+                      >
+                        Click here to copy the URL while it&lsquo;s being processed.
+                      </Anchor>
+                    </Text>
+                  ),
                   icon: <IconFileTime size='1rem' />,
                   color: 'green',
                   autoClose: false,
-                  onClick: () => {
-                    hideNotification('upload-chunked');
-                    clipboard.copy(json.files[0]);
-                    showNotification({
-                      title: 'Copied to clipboard',
-                      message: <AnchorNext href={json.files[0]}>{json.files[0]}</AnchorNext>,
-                      icon: <IconClipboardCopy size='1rem' />,
-                    });
-                  },
                 });
                 invalidateFiles();
                 setFiles([]);
