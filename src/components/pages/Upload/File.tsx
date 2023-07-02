@@ -1,8 +1,14 @@
 import { Button, Collapse, Group, Progress, Stack, Title } from '@mantine/core';
 import { randomId, useClipboard } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
-import { showNotification, updateNotification } from '@mantine/notifications';
-import { IconFileImport, IconFileTime, IconFileUpload, IconFileX } from '@tabler/icons-react';
+import { hideNotification, showNotification, updateNotification } from '@mantine/notifications';
+import {
+  IconClipboardCopy,
+  IconFileImport,
+  IconFileTime,
+  IconFileUpload,
+  IconFileX,
+} from '@tabler/icons-react';
 import Dropzone from 'components/dropzone/Dropzone';
 import FileDropzone from 'components/dropzone/DropzoneFile';
 import MutedText from 'components/MutedText';
@@ -14,6 +20,7 @@ import { useRecoilValue } from 'recoil';
 import showFilesModal from './showFilesModal';
 import useUploadOptions from './useUploadOptions';
 import { useRouter } from 'next/router';
+import AnchorNext from 'components/AnchorNext';
 
 export default function File({ chunks: chunks_config }) {
   const router = useRouter();
@@ -132,15 +139,23 @@ export default function File({ chunks: chunks_config }) {
                   id: 'upload-chunked',
                   title: 'Finalizing partial upload',
                   message:
-                    'The upload has been offloaded, and will complete in the background. You can see processing files in the files tab.',
+                    "The upload has been offloaded, and will complete in the background. Click here to copy the normal URL while it's being processed.",
                   icon: <IconFileTime size='1rem' />,
                   color: 'green',
-                  autoClose: true,
+                  autoClose: false,
+                  onClick: () => {
+                    hideNotification('upload-chunked');
+                    clipboard.copy(json.files[0]);
+                    showNotification({
+                      title: 'Copied to clipboard',
+                      message: <AnchorNext href={json.files[0]}>{json.files[0]}</AnchorNext>,
+                      icon: <IconClipboardCopy size='1rem' />,
+                    });
+                  },
                 });
                 invalidateFiles();
                 setFiles([]);
                 setProgress(100);
-                showFilesModal(clipboard, modals, json.files);
                 setLoading(false);
 
                 setTimeout(() => setProgress(0), 1000);
