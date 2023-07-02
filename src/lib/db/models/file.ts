@@ -1,5 +1,3 @@
-import { Prisma } from '@prisma/client';
-import { prisma } from '..';
 import { formatRootUrl } from '@/lib/url';
 import { config } from '@/lib/config';
 

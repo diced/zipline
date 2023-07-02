@@ -5,15 +5,10 @@ import { method } from '@/lib/middleware/method';
 import { ziplineAuth } from '@/lib/middleware/ziplineAuth';
 import { NextApiReq, NextApiRes } from '@/lib/response';
 
-export type ApiUserRecentResponse =
-  | File[]
-  | {
-      count: number;
-    };
+export type ApiUserRecentResponse = File[];
 
 type Query = {
   page?: string;
-  pagecount?: string;
 };
 
 export async function handler(req: NextApiReq<any, Query>, res: NextApiRes<ApiUserRecentResponse>) {
@@ -29,7 +24,7 @@ export async function handler(req: NextApiReq<any, Query>, res: NextApiRes<ApiUs
       orderBy: {
         createdAt: 'desc',
       },
-      take: 4,
+      take: 3,
     })
   );
 

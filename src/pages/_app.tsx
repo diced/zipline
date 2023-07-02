@@ -2,6 +2,8 @@ import { AppProps } from 'next/app';
 import Head from 'next/head';
 import { MantineProvider } from '@mantine/core';
 import { SWRConfig } from 'swr';
+import { ModalsProvider } from '@mantine/modals';
+import { Notifications } from '@mantine/notifications';
 
 const fetcher = async (url: RequestInfo | URL) => {
   const res = await fetch(url);
@@ -13,7 +15,7 @@ const fetcher = async (url: RequestInfo | URL) => {
   }
 
   return res.json();
-}
+};
 
 export default function App(props: AppProps) {
   const { Component, pageProps } = props;
@@ -27,7 +29,7 @@ export default function App(props: AppProps) {
 
       <SWRConfig
         value={{
-          fetcher
+          fetcher,
         }}
       >
         <MantineProvider
@@ -37,7 +39,18 @@ export default function App(props: AppProps) {
             colorScheme: 'dark',
           }}
         >
-          <Component {...pageProps} />
+          <ModalsProvider
+            modalProps={{
+              overlayProps: {
+                blur: 3,
+                opacity: 0.5,
+              },
+              centered: true,
+            }}
+          >
+            <Notifications />
+            <Component {...pageProps} />
+          </ModalsProvider>
         </MantineProvider>
       </SWRConfig>
     </>

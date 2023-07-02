@@ -6,6 +6,7 @@ import type { ApiUserRecentResponse } from '@/pages/api/user/recent';
 import type { ApiUserTokenResponse } from '@/pages/api/user/token';
 import type { ApiUserFilesIdResponse } from '@/pages/api/user/files/[id]';
 import type { ApiUserFilesResponse } from '@/pages/api/user/files';
+import type { ApiUserStatsResponse } from '@/pages/api/user/stats';
 
 import type { ApiHealthcheckResponse } from '@/pages/api/healthcheck';
 import type { ApiSetupResponse } from '@/pages/api/setup';
@@ -17,6 +18,7 @@ export type Response = {
   '/api/user/files/[id]': ApiUserFilesIdResponse;
   '/api/user/files': ApiUserFilesResponse;
   '/api/user': ApiUserResponse;
+  '/api/user/stats': ApiUserStatsResponse;
   '/api/user/recent': ApiUserRecentResponse;
   '/api/user/token': ApiUserTokenResponse;
   '/api/healthcheck': ApiHealthcheckResponse;

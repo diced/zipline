@@ -1,23 +1,36 @@
 import type { Response } from '@/lib/api/response';
+import { fetchApi } from '@/lib/fetchApi';
 import useLogin from '@/lib/hooks/useLogin';
+import { useUserStore } from '@/lib/store/user';
 import {
   AppShell,
   Burger,
+  Button,
   Header,
   MediaQuery,
+  Menu,
   NavLink,
   Navbar,
   Paper,
   Text,
+  Title,
   useMantineTheme,
 } from '@mantine/core';
+import { useClipboard } from '@mantine/hooks';
+import { useModals } from '@mantine/modals';
+import { showNotification } from '@mantine/notifications';
 import {
+  IconChevronDown,
   IconChevronRight,
+  IconClipboardCopy,
   IconFileText,
   IconFileUpload,
   IconFiles,
   IconHome,
   IconLink,
+  IconLogout,
+  IconRefreshDot,
+  IconSettingsFilled,
   IconShieldLockFilled,
   IconUpload,
   IconUsersGroup,
@@ -31,7 +44,6 @@ type NavLinks = {
   icon: React.ReactNode;
   active: (path: string) => boolean;
   href?: string;
-  description?: string;
   links?: NavLinks[];
   if?: (user: Response['/api/user']['user']) => boolean;
 };
@@ -42,14 +54,12 @@ const navLinks: NavLinks[] = [
     icon: <IconHome size='1rem' />,
     active: (path: string) => path === '/dashbaord',
     href: '/dashboard',
-    description: 'View recent files and your statistics',
   },
   {
     label: 'Files',
     icon: <IconFiles size='1rem' />,
     active: (path: string) => path === '/dashboard/files',
     href: '/dashboard/files',
-    description: 'View your files',
   },
   {
     label: 'Upload',
@@ -61,14 +71,12 @@ const navLinks: NavLinks[] = [
         icon: <IconFileUpload size='1rem' />,
         active: (path: string) => path === '/dashboard/upload/file',
         href: '/dashboard/upload/file',
-        description: 'Upload a file',
       },
       {
         label: 'Text',
         icon: <IconFileText size='1rem' />,
         active: (path: string) => path === '/dashboard/upload/text',
         href: '/dashboard/upload/text',
-        description: 'Upload text, code, etc.',
       },
     ],
   },
@@ -77,7 +85,6 @@ const navLinks: NavLinks[] = [
     icon: <IconLink size='1rem' />,
     active: (path: string) => path === '/dashboard/urls',
     href: '/dashboard/urls',
-    description: 'View your URLs',
   },
   {
     label: 'Administrator',
@@ -90,7 +97,6 @@ const navLinks: NavLinks[] = [
         icon: <IconUsersGroup size='1rem' />,
         active: (path: string) => path === '/dashboard/admin/users',
         href: '/dashboard/admin/users',
-        description: 'View all users',
       },
     ],
   },
@@ -100,8 +106,79 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const theme = useMantineTheme();
   const [opened, setOpened] = useState(false);
   const router = useRouter();
+  const modals = useModals();
+  const clipboard = useClipboard();
+  const [setUser, setToken] = useUserStore((s) => [s.setUser, s.setToken]);
 
-  const { user, token } = useLogin();
+  const { user, mutate } = useLogin();
+
+  const copyToken = () => {
+    modals.openConfirmModal({
+      title: (
+        <Title order={4} weight={700}>
+          Copy token?
+        </Title>
+      ),
+      children:
+        'Are you sure you want to copy your token? Your token can interact with all parts of Zipline. Do not share this token with anyone.',
+      labels: { confirm: 'Copy', cancel: 'No, close this popup' },
+      onConfirm: async () => {
+        const { data, error } = await fetchApi<Response['/api/user/token']>('/api/user/token');
+        if (error) {
+          showNotification({
+            title: 'Error',
+            message: error.message,
+            color: 'red',
+            icon: <IconClipboardCopy size='1rem' />,
+          });
+        } else {
+          clipboard.copy(data?.token);
+          showNotification({
+            title: 'Copied',
+            message: 'Your token has been copied to your clipboard.',
+            color: 'green',
+            icon: <IconClipboardCopy size='1rem' />,
+          });
+        }
+      },
+    });
+  };
+
+  const refreshToken = () => {
+    modals.openConfirmModal({
+      title: (
+        <Title order={4} weight={700}>
+          Refresh token?
+        </Title>
+      ),
+
+      children:
+        'Are you sure you want to refresh your token? Once you refresh/reset your token, you will need to update any scripts or applications that use your token.',
+      labels: { confirm: 'Refresh', cancel: 'No, close this popup' },
+      onConfirm: async () => {
+        const { data, error } = await fetchApi<Response['/api/user/token']>('/api/user/token', 'PATCH');
+        if (error) {
+          showNotification({
+            title: 'Error',
+            message: error.message,
+            color: 'red',
+            icon: <IconRefreshDot size='1rem' />,
+          });
+        } else {
+          setToken(data?.token);
+          setUser(data?.user);
+          mutate(data as Response['/api/user']);
+
+          showNotification({
+            title: 'Refreshed',
+            message: 'Your token has been refreshed.',
+            color: 'green',
+            icon: <IconRefreshDot size='1rem' />,
+          });
+        }
+      },
+    });
+  };
 
   return (
     <AppShell
@@ -113,7 +190,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       navbarOffsetBreakpoint='sm'
       asideOffsetBreakpoint='sm'
       navbar={
-        <Navbar hiddenBreakpoint='sm' hidden={!opened} width={{ sm: 200, lg: 300 }}>
+        <Navbar hiddenBreakpoint='sm' hidden={!opened} width={{ sm: 200, lg: 200 }}>
           {navLinks
             .filter((link) => !link.if || link.if(user as Response['/api/user']['user']))
             .map((link) => {
@@ -128,7 +205,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     active={router.pathname === link.href}
                     component={Link}
                     href={link.href || ''}
-                    description={link.description}
                   />
                 );
               } else {
@@ -140,7 +216,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     variant='light'
                     rightSection={<IconChevronRight size='0.7rem' />}
                     active={router.pathname === link.href}
-                    description={link.description}
                     defaultOpened={link.active(router.pathname)}
                   >
                     {link.links.map((sublink) => (
@@ -153,7 +228,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                         active={router.pathname === link.href}
                         component={Link}
                         href={sublink.href || ''}
-                        description={sublink.description}
                       />
                     ))}
                   </NavLink>
@@ -178,6 +252,49 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <Text size={30} weight={700}>
               Zipline
             </Text>
+
+            {/* right aligned Menu */}
+            <div style={{ marginLeft: 'auto' }}>
+              <Menu shadow='md' width={200}>
+                <Menu.Target>
+                  <Button
+                    variant='subtle'
+                    color='gray'
+                    leftIcon={<IconSettingsFilled size='1.4rem' />}
+                    rightIcon={<IconChevronDown size='0.7rem' />}
+                    size='sm'
+                  >
+                    {user?.username}
+                  </Button>
+                </Menu.Target>
+
+                <Menu.Dropdown>
+                  <Menu.Label>
+                    {user?.username}
+                    {user?.administrator ? ' (Administrator)' : ''}
+                  </Menu.Label>
+
+                  <Menu.Item icon={<IconClipboardCopy size='1rem' />} onClick={copyToken}>
+                    Copy token
+                  </Menu.Item>
+                  <Menu.Item icon={<IconRefreshDot size='1rem' />} onClick={refreshToken}>
+                    Refresh token
+                  </Menu.Item>
+                  <Menu.Divider />
+
+                  <Menu.Item
+                    icon={<IconSettingsFilled size='1rem' />}
+                    component={Link}
+                    href='/dashboard/settings'
+                  >
+                    Settings
+                  </Menu.Item>
+
+                  <Menu.Divider />
+                  <Menu.Item icon={<IconLogout size='1rem' />}>Logout</Menu.Item>
+                </Menu.Dropdown>
+              </Menu>
+            </div>
           </div>
         </Header>
       }

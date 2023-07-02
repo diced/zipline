@@ -1,12 +1,15 @@
 import { validateEnv } from '@/lib/config/validate';
 import { readEnv } from '@/lib/config/read';
-import { createToken, decryptToken, encryptToken } from '@/lib/crypto';
 import { runMigrations } from '@/lib/db/migration';
 import { log } from '@/lib/logger';
 import express from 'express';
 import next from 'next';
 import { parse } from 'url';
 import { mkdir } from 'fs/promises';
+import { prisma } from '@/lib/db';
+import { datasource } from '@/lib/datasource';
+import { guess } from '@/lib/mimes';
+import { extname } from 'path';
 
 const MODE = process.env.NODE_ENV || 'production';
 
@@ -41,6 +44,66 @@ async function main() {
   const handle = app.getRequestHandler();
 
   await app.prepare();
+
+  server.get(config.files.route === '/' ? `/:id` : `${config.files.route}/:id`, async (req, res) => {
+    const { id } = req.params;
+    const parsedUrl = parse(req.url!, true);
+
+    if (!id) return app.render404(req, res, parsedUrl);
+    if (id === '') return app.render404(req, res, parsedUrl);
+    if (id === 'dashboard') return app.render(req, res, '/dashboard');
+
+    const file = await prisma.file.findFirst({
+      where: {
+        name: id,
+      },
+    });
+
+    if (!file) return app.render404(req, res, parsedUrl);
+
+    const stream = await datasource.get(file.name);
+    if (!stream) return app.render404(req, res, parsedUrl);
+
+    if (!file.type && config.files.assumeMimetypes) {
+      const ext = extname(file.name);
+      const mime = await guess(ext);
+
+      res.setHeader('Content-Type', mime);
+    } else {
+      res.setHeader('Content-Type', file.type);
+    }
+
+    res.setHeader('Content-Length', file.size);
+    file.originalName && res.setHeader('Content-Disposition', `filename="${file.originalName}"`);
+
+    stream.pipe(res);
+  });
+
+  server.get('/raw/:id', async (req, res) => {
+    const { id } = req.params;
+    const parsedUrl = parse(req.url!, true);
+
+    const file = await prisma.file.findFirst({
+      where: {
+        name: id,
+      },
+    });
+
+    if (!file) return app.render404(req, res, parsedUrl);
+
+    const stream = await datasource.get(file.name);
+    if (!stream) return app.render404(req, res, parsedUrl);
+
+    res.setHeader('Content-Type', 'text/plain');
+    res.setHeader('Content-Length', file.size);
+    file.originalName &&
+      res.setHeader(
+        'Content-Disposition',
+        `${req.query.download ? 'attachment; ' : ''}filename="${file.originalName}"`
+      );
+
+    stream.pipe(res);
+  });
 
   server.all('*', (req, res) => {
     const parsedUrl = parse(req.url!, true);

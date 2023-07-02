@@ -32,14 +32,14 @@ const schema = z.object({
     returnHttpsUrls: z.boolean().default(false),
   }),
   files: z.object({
-    route: z.string().default('u'),
+    route: z.string().startsWith('/').nonempty().trim().toLowerCase().default('/u'),
     length: z.number().default(6),
     defaultFormat: z.enum(['random', 'date', 'uuid', 'name', 'gfycat']).default('random'),
     disabledExtensions: z.array(z.string()).default([]),
     maxFileSize: z.number().default(bytes('100mb')),
     defaultExpiration: z.number().nullish(),
     assumeMimetypes: z.boolean().default(false),
-    defaultDateFormat: z.string().default('YYYY-MM-DD_HH:mm:ss')
+    defaultDateFormat: z.string().default('YYYY-MM-DD_HH:mm:ss'),
   }),
   datasource: z
     .object({
