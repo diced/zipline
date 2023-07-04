@@ -291,7 +291,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   </Menu.Item>
 
                   <Menu.Divider />
-                  <Menu.Item icon={<IconLogout size='1rem' />}>Logout</Menu.Item>
+                  <Menu.Item icon={<IconLogout size='1rem' />} component={Link} href='/auth/logout'>
+                    Logout
+                  </Menu.Item>
                 </Menu.Dropdown>
               </Menu>
             </div>

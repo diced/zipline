@@ -1,0 +1,212 @@
+[
+  {
+    "ext": "html",
+    "mime": "text/html",
+    "name": "HTML"
+  },
+  {
+    "ext": "css",
+    "mime": "text/css",
+    "name": "CSS"
+  },
+  {
+    "ext": "cpp",
+    "mime": "text/x-c++src",
+    "name": "C++"
+  },
+  {
+    "ext": "js",
+    "mime": "application/javascript",
+    "name": "JavaScript"
+  },
+  {
+    "ext": "py",
+    "mime": "text/x-python",
+    "name": "Python"
+  },
+  {
+    "ext": "rb",
+    "mime": "text/x-ruby",
+    "name": "Ruby"
+  },
+  {
+    "ext": "java",
+    "mime": "text/x-java",
+    "name": "Java"
+  },
+  {
+    "ext": "md",
+    "mime": "text/markdown",
+    "name": "Markdown"
+  },
+  {
+    "ext": "c",
+    "mime": "text/x-csrc",
+    "name": "C"
+  },
+  {
+    "ext": "php",
+    "mime": "application/x-httpd-php",
+    "name": "PHP"
+  },
+  {
+    "ext": "sass",
+    "mime": "text/x-sass",
+    "name": "Sass"
+  },
+  {
+    "ext": "scss",
+    "mime": "text/x-scss",
+    "name": "SCSS"
+  },
+  {
+    "ext": "swift",
+    "mime": "text/x-swift",
+    "name": "Swift"
+  },
+  {
+    "ext": "ts",
+    "mime": "application/typescript",
+    "name": "TypeScript"
+  },
+  {
+    "ext": "go",
+    "mime": "text/x-go",
+    "name": "Go"
+  },
+  {
+    "ext": "rs",
+    "mime": "text/x-rustsrc",
+    "name": "Rust"
+  },
+  {
+    "ext": "sh",
+    "mime": "application/x-sh",
+    "name": "Bash"
+  },
+  {
+    "ext": "json",
+    "mime": "application/json",
+    "name": "JSON"
+  },
+  {
+    "ext": "ps1",
+    "mime": "application/x-powershell",
+    "name": "PowerShell"
+  },
+  {
+    "ext": "sql",
+    "mime": "application/sql",
+    "name": "SQL"
+  },
+  {
+    "ext": "yaml",
+    "mime": "text/yaml",
+    "name": "YAML"
+  },
+  {
+    "ext": "dockerfile",
+    "mime": "text/x-dockerfile",
+    "name": "Dockerfile"
+  },
+  {
+    "ext": "lua",
+    "mime": "text/x-lua",
+    "name": "Lua"
+  },
+  {
+    "ext": "conf",
+    "mime": "text/x-nginx-conf",
+    "name": "NGINX Config File"
+  },
+  {
+    "ext": "pl",
+    "mime": "text/x-perl",
+    "name": "Perl"
+  },
+  {
+    "ext": "r",
+    "mime": "text/x-rsrc",
+    "name": "R"
+  },
+  {
+    "ext": "scala",
+    "mime": "text/x-scala",
+    "name": "Scala"
+  },
+  {
+    "ext": "groovy",
+    "mime": "text/x-groovy",
+    "name": "Groovy"
+  },
+  {
+    "ext": "kt",
+    "mime": "text/x-kotlin",
+    "name": "Kotlin"
+  },
+  {
+    "ext": "hs",
+    "mime": "text/x-haskell",
+    "name": "Haskell"
+  },
+  {
+    "ext": "ex",
+    "mime": "text/x-elixir",
+    "name": "Elixir"
+  },
+  {
+    "ext": "vim",
+    "mime": "text/x-vim",
+    "name": "Vim"
+  },
+  {
+    "ext": "m",
+    "mime": "text/x-matlab",
+    "name": "MATLAB"
+  },
+  {
+    "ext": "dart",
+    "mime": "application/dart",
+    "name": "Dart"
+  },
+  {
+    "ext": "hbs",
+    "mime": "text/x-handlebars-template",
+    "name": "Handlebars"
+  },
+  {
+    "ext": "hcl",
+    "mime": "text/x-hcl",
+    "name": "HCL"
+  },
+  {
+    "ext": "http",
+    "mime": "text/http",
+    "name": "HTTP"
+  },
+  {
+    "ext": "ini",
+    "mime": "text/x-ini",
+    "name": "INI"
+  },
+  {
+    "ext": "jsx",
+    "mime": "text/jsx",
+    "name": "JSX"
+  },
+  {
+    "ext": "coffee",
+    "mime": "text/x-coffeescript",
+    "name": "CoffeeScript"
+  },
+  {
+    "ext": "tex",
+    "mime": "text/x-latex",
+    "name": "LaTeX (KaTeX)"
+  },
+  {
+    "name": "Plain Text",
+    "mime": "text/plain",
+    "ext": "txt"
+  }
+]

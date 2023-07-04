@@ -4,6 +4,7 @@ import { MantineProvider } from '@mantine/core';
 import { SWRConfig } from 'swr';
 import { ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';
+import '@/components/render/code/HighlightCode.css';
 
 const fetcher = async (url: RequestInfo | URL) => {
   const res = await fetch(url);
@@ -35,6 +36,7 @@ export default function App(props: AppProps) {
         <MantineProvider
           withGlobalStyles
           withNormalizeCSS
+          withCSSVariables
           theme={{
             colorScheme: 'dark',
           }}

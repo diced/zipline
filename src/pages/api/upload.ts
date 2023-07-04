@@ -88,8 +88,6 @@ export async function handler(req: NextApiReq<any, any, UploadHeaders>, res: Nex
     const fileUpload = await prisma.file.create({
       data: {
         name: `${fileName}${extension}`,
-        path: `${fileName}${extension}`,
-        originalName: file.originalname,
         size: file.size,
         type: mimetype,
         User: {
@@ -101,6 +99,7 @@ export async function handler(req: NextApiReq<any, any, UploadHeaders>, res: Nex
         ...(options.password && { password: await hashPassword(options.password) }),
         ...(options.deletesAt && { deletesAt: options.deletesAt }),
         ...(options.folder && { Folder: { connect: { id: options.folder } } }),
+        ...(options.addOriginalName && { originalName: file.originalname }),
       },
       select: {
         name: true,
@@ -119,7 +118,7 @@ export async function handler(req: NextApiReq<any, any, UploadHeaders>, res: Nex
     logger.info(`${req.user.username} uploaded ${fileUpload.name} (size=${bytes(fileUpload.size)})`);
 
     const responseUrl = `${domain}${
-      zconfig.files.route === '/' || zconfig.files.route === '' ? '' : `/${zconfig.files.route}`
+      zconfig.files.route === '/' || zconfig.files.route === '' ? '' : `${zconfig.files.route}`
     }/${fileUpload.name}`;
 
     response.files.push({

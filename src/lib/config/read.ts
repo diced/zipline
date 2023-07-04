@@ -1,7 +1,7 @@
 import bytes from 'bytes';
 import msFn from 'ms';
 
-type EnvType = 'string' | 'number' | 'boolean' | 'byte' | 'ms';
+type EnvType = 'string' | 'string[]' | 'number' | 'boolean' | 'byte' | 'ms';
 
 export type ParsedEnv = ReturnType<typeof readEnv>;
 
@@ -10,8 +10,16 @@ export const PROP_TO_ENV: Record<string, string> = {
   'core.hostname': 'CORE_HOSTNAME',
   'core.secret': 'CORE_SECRET',
   'core.databaseUrl': 'CORE_DATABASE_URL',
+  'core.returnHttpsUrls': 'CORE_RETURN_HTTPS_URLS',
 
   'files.route': 'FILES_ROUTE',
+  'files.length': 'FILES_LENGTH',
+  'files.defaultFormat': 'FILES_DEFAULT_FORMAT',
+  'files.disabledExtensions': 'FILES_DISABLED_EXTENSIONS',
+  'files.maxFileSize': 'FILES_MAX_FILE_SIZE',
+  'files.defaultExpiration': 'FILES_DEFAULT_EXPIRATION',
+  'files.assumeMimetypes': 'FILES_ASSUME_MIMETYPES',
+  'files.defaultDateFormat': 'FILES_DEFAULT_DATE_FORMAT',
 
   'datasource.type': 'DATASOURCE_TYPE',
 
@@ -25,6 +33,14 @@ export const PROP_TO_ENV: Record<string, string> = {
   'datasource.s3.bucket': 'DATASOURCE_S3_BUCKET',
 
   'datasource.local.directory': 'DATASOURCE_LOCAL_DIRECTORY',
+
+  'features.thumbnail': 'FEATURES_THUMBNAIL',
+  'features.imageCompression': 'FEATURES_IMAGE_COMPRESSION',
+  'features.robotsTxt': 'FEATURES_ROBOTS_TXT',
+  'features.healthcheck': 'FEATURES_HEALTHCHECK',
+  'features.invites': 'FEATURES_INVITES',
+  'features.userRegistration': 'FEATURES_USER_REGISTRATION',
+  'features.oauthRegistration': 'FEATURES_OAUTH_REGISTRATION',
 };
 
 export function readEnv() {
@@ -35,6 +51,11 @@ export function readEnv() {
     env(PROP_TO_ENV['core.databaseUrl'], 'core.databaseUrl', 'string'),
 
     env(PROP_TO_ENV['files.route'], 'files.route', 'string'),
+    env(PROP_TO_ENV['files.length'], 'files.length', 'number'),
+    env(PROP_TO_ENV['files.defaultFormat'], 'files.defaultFormat', 'string'),
+    env(PROP_TO_ENV['files.disabledExtensions'], 'files.disabledExtensions', 'string[]'),
+    env(PROP_TO_ENV['files.maxFileSize'], 'files.maxFileSize', 'byte'),
+    env(PROP_TO_ENV['files.defaultExpiration'], 'files.defaultExpiration', 'ms'),
 
     env(PROP_TO_ENV['datasource.type'], 'datasource.type', 'string'),
 
@@ -44,6 +65,14 @@ export function readEnv() {
     env(PROP_TO_ENV['datasource.s3.bucket'], 'datasource.s3.bucket', 'string'),
 
     env(PROP_TO_ENV['datasource.local.directory'], 'datasource.local.directory', 'string'),
+
+    env(PROP_TO_ENV['features.thumbnail'], 'features.thumbnail', 'boolean'),
+    env(PROP_TO_ENV['features.imageCompression'], 'features.imageCompression', 'boolean'),
+    env(PROP_TO_ENV['features.robotsTxt'], 'features.robotsTxt', 'boolean'),
+    env(PROP_TO_ENV['features.healthcheck'], 'features.healthcheck', 'boolean'),
+    env(PROP_TO_ENV['features.invites'], 'features.invites', 'boolean'),
+    env(PROP_TO_ENV['features.userRegistration'], 'features.userRegistration', 'boolean'),
+    env(PROP_TO_ENV['features.oauthRegistration'], 'features.oauthRegistration', 'boolean'),
   ];
 
   const raw: any = {
@@ -52,12 +81,29 @@ export function readEnv() {
       hostname: undefined,
       secret: undefined,
       databaseUrl: undefined,
+      returnHttpsUrls: undefined,
     },
     files: {
       route: undefined,
+      length: undefined,
+      defaultFormat: undefined,
+      disabledExtensions: undefined,
+      maxFileSize: undefined,
+      defaultExpiration: undefined,
+      assumeMimetypes: undefined,
+      defaultDateFormat: undefined,
     },
     datasource: {
       type: undefined,
+    },
+    features: {
+      thumbnail: undefined,
+      imageCompression: undefined,
+      robotsTxt: undefined,
+      healthcheck: undefined,
+      invites: undefined,
+      userRegistration: undefined,
+      oauthRegistration: undefined,
     },
   };
 
@@ -120,6 +166,11 @@ function parse(value: string, type: EnvType) {
   switch (type) {
     case 'string':
       return string(value);
+    case 'string[]':
+      return value
+        .split(',')
+        .filter((s) => s.length !== 0)
+        .map((s) => s.trim());
     case 'number':
       return number(value);
     case 'boolean':

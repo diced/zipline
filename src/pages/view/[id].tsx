@@ -1,7 +1,7 @@
-import DashboardFileType from '@/components/DashboardFileType';
+import DashboardFileType from '@/components/file/DashboardFileType';
 import { prisma } from '@/lib/db';
 import { fileSelect, type File } from '@/lib/db/models/file';
-import { ActionIcon, Button, Center, Group, Paper, Space, Text } from '@mantine/core';
+import { Button, Center, Group, Paper, Space, Text } from '@mantine/core';
 import { IconFileDownload } from '@tabler/icons-react';
 import bytes from 'bytes';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
@@ -15,21 +15,6 @@ export default function ViewFile({ file }: InferGetServerSidePropsType<typeof ge
   return (
     <Center h='100vh'>
       <Paper p='md' shadow='md' radius='md' withBorder>
-        {/* <Text size='lg' weight={700} mb='sm' sx={{ display: 'flex' }}>
-          {file.name}{' '}
-          <Text size='sm' color='dimmed' ml='sm' sx={{ alignSelf: 'center' }}>
-            {file.type}
-          </Text>
-          <ActionIcon
-            ml='sm'
-            variant='outline'
-            component={Link}
-            href={`/raw/${file.name}?download=true`}
-            target='_blank'
-          >
-            <IconFileDownload size='1rem' />
-          </ActionIcon>
-        </Text> */}
         <Group position='apart' mb='sm'>
           <Text size='lg' weight={700} sx={{ display: 'flex' }}>
             {file.name}

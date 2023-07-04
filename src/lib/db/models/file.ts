@@ -7,9 +7,8 @@ export type File = {
   deletesAt: Date | null;
   favorite: boolean;
   id: string;
-  originalName: string;
+  originalName: string | null;
   name: string;
-  path: string;
   size: number;
   type: string;
   views: number;
@@ -27,7 +26,6 @@ export const fileSelect = {
   id: true,
   originalName: true,
   name: true,
-  path: true,
   size: true,
   type: true,
   views: true,

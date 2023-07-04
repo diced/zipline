@@ -77,6 +77,15 @@ const schema = z.object({
         });
       }
     }),
+  features: z.object({
+    thumbnails: z.boolean().default(true),
+    imageCompression: z.boolean().default(true),
+    robotsTxt: z.boolean().default(false),
+    healthcheck: z.boolean().default(true),
+    invites: z.boolean().default(true),
+    userRegistration: z.boolean().default(false),
+    oauthRegistration: z.boolean().default(false),
+  }),
 });
 
 export type Config = z.infer<typeof schema>;

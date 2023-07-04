@@ -58,6 +58,7 @@ enum OAuthProviderType {
   DISCORD
   GOOGLE
   GITHUB
+  AUTHENTIK
 }
 
 model UserLimit {
@@ -95,9 +96,8 @@ model File {
   updatedAt DateTime  @updatedAt
   deletesAt DateTime?
 
-  name         String // name shown on dashboard
-  originalName String // original name of file when uploaded
-  path         String // path it's stored on the server
+  name         String // name & file saved on datasource
+  originalName String? // original name of file when uploaded
   size         Int
   type         String
   views        Int     @default(0)
@@ -169,6 +169,7 @@ model Url {
   vanity      String?
   destination String
   name        String  @unique
+  views       Int     @default(0)
 
   zeroWidthSpace String?
 

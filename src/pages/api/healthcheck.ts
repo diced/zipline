@@ -1,3 +1,4 @@
+import { config } from '@/lib/config';
 import { prisma } from '@/lib/db';
 import { log } from '@/lib/logger';
 import { combine } from '@/lib/middleware/combine';
@@ -8,7 +9,9 @@ export type ApiHealthcheckResponse = {
   pass: boolean;
 };
 
-export async function handler(req: NextApiReq, res: NextApiRes<ApiHealthcheckResponse>) {
+export async function handler(_: NextApiReq, res: NextApiRes<ApiHealthcheckResponse>) {
+  if (!config.features.healthcheck) return res.notFound();
+
   const logger = log('api').c('healthcheck');
 
   try {

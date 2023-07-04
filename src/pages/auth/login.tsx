@@ -95,7 +95,7 @@ export default function Login() {
                 {...form.getInputProps('password')}
               />
 
-              <Button size='lg' fullWidth type='submit'>
+              <Button size='lg' fullWidth type='submit' color='gray'>
                 Login
               </Button>
             </Stack>
@@ -106,19 +106,19 @@ export default function Login() {
           </Text>
 
           <Stack my='xs'>
-            <Button size='lg' fullWidth variant='outline'>
+            <Button size='lg' fullWidth variant='outline' color='gray'>
               Sign up
             </Button>
-            <Button size='lg' fullWidth variant='outline'>
+            <Button size='lg' fullWidth variant='outline' color='gray'>
               <IconText Icon={IconBrandGithubFilled} text='Sign in with GitHub' />
             </Button>
-            <Button size='lg' fullWidth variant='outline'>
+            <Button size='lg' fullWidth variant='outline' color='gray'>
               <IconText Icon={IconBrandGoogle} text='Sign in with Google' />
             </Button>
-            <Button size='lg' fullWidth variant='outline'>
+            <Button size='lg' fullWidth variant='outline' color='gray'>
               <IconText Icon={IconBrandDiscordFilled} text='Sign in with Discord' />
             </Button>
-            <Button size='lg' fullWidth variant='outline'>
+            <Button size='lg' fullWidth variant='outline' color='gray'>
               <IconText Icon={IconCircleKeyFilled} text='Sign in with Authentik' />
             </Button>
           </Stack>
