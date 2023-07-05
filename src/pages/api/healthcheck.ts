@@ -19,7 +19,7 @@ export async function handler(_: NextApiReq, res: NextApiRes<ApiHealthcheckRespo
 
     return res.ok({ pass: true });
   } catch (e) {
-    logger.error('there was an error during a healthcheck').error(e);
+    logger.error('there was an error during a healthcheck').error(e as Error);
 
     return res.serverError('there was an error during a healthcheck', {
       pass: false,

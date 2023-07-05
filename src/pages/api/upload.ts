@@ -115,7 +115,7 @@ export async function handler(req: NextApiReq<any, any, UploadHeaders>, res: Nex
 
     await datasource.put(fileUpload.name, file.buffer);
 
-    logger.info(`${req.user.username} uploaded ${fileUpload.name} (size=${bytes(fileUpload.size)})`);
+    logger.info(`${req.user.username} uploaded ${fileUpload.name}`, { size: bytes(fileUpload.size) });
 
     const responseUrl = `${domain}${
       zconfig.files.route === '/' || zconfig.files.route === '' ? '' : `${zconfig.files.route}`

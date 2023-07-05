@@ -40,7 +40,7 @@ export async function handler(req: NextApiReq<Body, Query>, res: NextApiRes<ApiU
       select: fileSelect,
     });
 
-    logger.info(`${req.user.username} updated file ${newFile.name} (favorite=${newFile.favorite})`);
+    logger.info(`${req.user.username} updated file ${newFile.name}`, { favorite: newFile.favorite });
 
     return res.ok(newFile);
   } else if (req.method === 'DELETE') {
@@ -53,7 +53,7 @@ export async function handler(req: NextApiReq<Body, Query>, res: NextApiRes<ApiU
 
     await datasource.delete(deletedFile.name);
 
-    logger.info(`${req.user.username} deleted file ${deletedFile.name} (size=${bytes(deletedFile.size)})`);
+    logger.info(`${req.user.username} deleted file ${deletedFile.name}`, { size: bytes(deletedFile.size) });
 
     return res.ok(deletedFile);
   }

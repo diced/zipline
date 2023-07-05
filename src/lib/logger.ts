@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { green, red, yellow, gray, white, bold } from 'colorette';
+import { green, red, yellow, gray, white, bold, blue } from 'colorette';
 
 export type LoggerLevel = 'info' | 'warn' | 'error' | 'debug' | 'trace';
 
@@ -38,35 +38,44 @@ export default class Logger {
     }
   }
 
-  private write(message: string, level: LoggerLevel) {
-    process.stdout.write(`${this.format(message, level)}\n`);
+  private formatExtra(extra: Record<string, unknown>) {
+    return (
+      ' ' +
+      Object.entries(extra)
+        .map(([key, value]) => `${blue(key)}${gray('=')}${JSON.stringify(value)}`)
+        .join(' ')
+    );
   }
 
-  public info(...args: unknown[]) {
-    this.write(args.join(' '), 'info');
+  private write(message: string, level: LoggerLevel, extra?: Record<string, unknown>) {
+    process.stdout.write(`${this.format(message, level)}${extra ? this.formatExtra(extra) : ''}\n`);
+  }
+
+  public info(args: string, extra?: Record<string, unknown>) {
+    this.write(args, 'info', extra);
     return this;
   }
 
-  public warn(...args: unknown[]) {
-    this.write(args.join(' '), 'warn');
+  public warn(args: string, extra?: Record<string, unknown>) {
+    this.write(args, 'warn', extra);
     return this;
   }
 
-  public error(...args: unknown[]) {
-    this.write(args.join(' '), 'error');
+  public error(args: string | Error, extra?: Record<string, unknown>) {
+    this.write(args.toString(), 'error', extra);
     return this;
   }
 
-  public debug(...args: unknown[]) {
+  public debug(args: string, extra?: Record<string, unknown>) {
     if (process.env.DEBUG !== 'zipline') return this;
 
-    this.write(args.join(' '), 'debug');
+    this.write(args, 'debug', extra);
 
     return this;
   }
 
-  public trace(...args: unknown[]) {
-    this.write(args.join(' '), 'trace');
+  public trace(args: string, extra?: Record<string, unknown>) {
+    this.write(args, 'trace', extra);
     return this;
   }
 }

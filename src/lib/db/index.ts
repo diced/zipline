@@ -19,7 +19,7 @@ if (process.env.NODE_ENV === 'production') {
 function getClient() {
   const logger = log('db');
 
-  logger.info('connecting to database', process.env.DATABASE_URL);
+  logger.info('connecting to database ' + process.env.DATABASE_URL);
 
   const client = new PrismaClient();
   client.$connect();

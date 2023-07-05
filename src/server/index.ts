@@ -12,12 +12,14 @@ import { guess } from '@/lib/mimes';
 import { extname } from 'path';
 import { verifyPassword } from '@/lib/crypto';
 
+import { version } from '../../package.json';
+
 const MODE = process.env.NODE_ENV || 'production';
 
 const logger = log('server');
 
 async function main() {
-  logger.info(`starting zipline in ${MODE} mode`);
+  logger.info('starting zipline', { mode: MODE, version: version });
 
   const server = express();
 
@@ -120,7 +122,10 @@ async function main() {
   });
 
   server.listen(config.core.port, config.core.hostname, () => {
-    logger.info(`server listening on port ${config.core.port}`);
+    logger.info(`server listening`, {
+      hostname: config.core.hostname,
+      port: config.core.port,
+    });
   });
 }
 

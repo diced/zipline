@@ -14,7 +14,7 @@ export async function runMigrations() {
       logger.info('database created');
     }
   } catch (e) {
-    logger.error('failed to create database', e);
+    logger.error('failed to create database' + e);
     logger.error('try creating the database manually and running the server again');
 
     migrate.stop();
@@ -27,7 +27,7 @@ export async function runMigrations() {
     const { appliedMigrationNames } = await migrate.applyMigrations();
     migrationIds = appliedMigrationNames;
   } catch (e) {
-    logger.error('failed to apply migrations', e);
+    logger.error('failed to apply migrations' + e);
 
     migrate.stop();
     process.exit(1);
