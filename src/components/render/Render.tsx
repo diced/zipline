@@ -16,7 +16,7 @@ export function RenderAlert({
   change: (s: boolean) => void;
 }) {
   return (
-    <Alert color='gray' icon={<IconEyeFilled size='1rem' />} variant='outline' my='sm'>
+    <Alert color='gray' icon={<IconEyeFilled size='1rem' />} variant='outline' mb='sm'>
       {!state ? `This file is rendered through ${renderer}` : `This file can be rendered through ${renderer}`}
       <Button
         mx='sm'

@@ -10,6 +10,7 @@ import { prisma } from '@/lib/db';
 import { datasource } from '@/lib/datasource';
 import { guess } from '@/lib/mimes';
 import { extname } from 'path';
+import { verifyPassword } from '@/lib/crypto';
 
 const MODE = process.env.NODE_ENV || 'production';
 
@@ -81,6 +82,8 @@ async function main() {
 
   server.get('/raw/:id', async (req, res) => {
     const { id } = req.params;
+    const { pw } = req.query;
+
     const parsedUrl = parse(req.url!, true);
 
     const file = await prisma.file.findFirst({
@@ -93,6 +96,12 @@ async function main() {
 
     const stream = await datasource.get(file.name);
     if (!stream) return app.render404(req, res, parsedUrl);
+    if (file.password) {
+      if (!pw) return res.status(403).json({ code: 403, message: 'Password protected.' });
+      const verified = await verifyPassword(pw as string, file.password!);
+
+      if (!verified) return res.status(403).json({ code: 403, message: 'Incorrect password.' });
+    }
 
     res.setHeader('Content-Type', 'text/plain');
     res.setHeader('Content-Length', file.size);

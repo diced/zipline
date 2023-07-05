@@ -34,7 +34,7 @@ function Placeholder({ text, Icon, ...props }: { text: string; Icon: Icon; onCli
   );
 }
 
-export default function DashboardFileType({ file, show }: { file: DbFile | File; show?: boolean }) {
+export default function DashboardFileType({ file, show, password }: { file: DbFile | File; show?: boolean; password?: string; }) {
   const type = file.type.split('/')[0];
   const dbFile = 'id' in file;
   const renderIn = renderMode(file.name.split('.').pop() || '');
@@ -43,7 +43,7 @@ export default function DashboardFileType({ file, show }: { file: DbFile | File;
 
   useEffect(() => {
     (async () => {
-      const res = await fetch(`/raw/${file.name}`);
+      const res = await fetch(`/raw/${file.name}${password ? `?pw=${password}` : ''}`);
       const text = await res.text();
 
       setFileContent(text);
@@ -58,7 +58,7 @@ export default function DashboardFileType({ file, show }: { file: DbFile | File;
           autoPlay
           muted
           controls
-          src={dbFile ? `/raw/${file.name}` : URL.createObjectURL(file)}
+          src={dbFile ? `/raw/${file.name}${password ? `?pw=${password}` : ''}` : URL.createObjectURL(file)}
         />
       ) : (
         <Placeholder text={`Click to play video ${file.name}`} Icon={IconPlayerPlay} />
@@ -75,7 +75,7 @@ export default function DashboardFileType({ file, show }: { file: DbFile | File;
             },
           }}
           placeholder={<PlaceholderContent Icon={IconPhotoCancel} text={'Image failed to load...'} />}
-          src={dbFile ? `/raw/${file.name}` : URL.createObjectURL(file)}
+          src={dbFile ? `/raw/${file.name}${password ? `?pw=${password}` : ''}` : URL.createObjectURL(file)}
           alt={file.name}
           width={show ? 'auto' : undefined}
         />
@@ -87,7 +87,7 @@ export default function DashboardFileType({ file, show }: { file: DbFile | File;
           muted
           controls
           style={{ width: '100%' }}
-          src={dbFile ? `/raw/${file.name}` : URL.createObjectURL(file)}
+          src={dbFile ? `/raw/${file.name}${password ? `?pw=${password}` : ''}` : URL.createObjectURL(file)}
         />
       ) : (
         <Placeholder text={`Click to play audio ${file.name}`} Icon={IconPlayerPlay} />

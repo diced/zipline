@@ -2,7 +2,7 @@ import type { ParseError } from 'katex';
 import { useEffect, useState } from 'react';
 
 import 'katex/dist/katex.min.css';
-import { Alert } from '@mantine/core';
+import { Alert, Paper } from '@mantine/core';
 
 const sanitize = (str: string) => {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -31,5 +31,9 @@ export default function KaTeX({ tex }: { tex: string }) {
     );
   }
 
-  return <div dangerouslySetInnerHTML={{ __html: html }} />;
+  return (
+    <Paper withBorder p='md'>
+      <div dangerouslySetInnerHTML={{ __html: html }} />
+    </Paper>
+  );
 }

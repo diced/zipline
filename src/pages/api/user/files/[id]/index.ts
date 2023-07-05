@@ -18,7 +18,7 @@ type Query = {
   id: string;
 };
 
-const logger = log('api').c('user').c('files').c('id');
+const logger = log('api').c('user').c('files').c('$id');
 
 export async function handler(req: NextApiReq<Body, Query>, res: NextApiRes<ApiUserFilesIdResponse>) {
   const file = await prisma.file.findFirst({
@@ -35,7 +35,7 @@ export async function handler(req: NextApiReq<Body, Query>, res: NextApiRes<ApiU
         id: req.query.id,
       },
       data: {
-        ...(req.body.favorite && { favorite: req.body.favorite }),
+        ...(req.body.favorite !== undefined && { favorite: req.body.favorite }),
       },
       select: fileSelect,
     });
