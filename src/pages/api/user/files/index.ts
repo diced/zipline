@@ -17,7 +17,6 @@ export type ApiUserFilesResponse =
 type Query = {
   page?: string;
   pagecount?: string;
-  totalcount?: string;
   filter?: 'dashboard' | 'none';
 };
 
@@ -32,16 +31,6 @@ export async function handler(req: NextApiReq<any, Query>, res: NextApiRes<ApiUs
     });
 
     return res.ok({ count: Math.ceil(count / PAGE_COUNT) });
-  }
-
-  if (req.query.totalcount) {
-    const totalCount = await prisma.file.count({
-      where: {
-        userId: req.user.id,
-      },
-    });
-
-    return res.ok({ totalCount });
   }
 
   const { page, filter } = req.query;
