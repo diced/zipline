@@ -1,7 +1,8 @@
 import bytes from 'bytes';
 import msFn from 'ms';
+import { log } from '../logger';
 
-type EnvType = 'string' | 'string[]' | 'number' | 'boolean' | 'byte' | 'ms';
+type EnvType = 'string' | 'string[]' | 'number' | 'boolean' | 'byte' | 'ms' | 'json[]';
 
 export type ParsedEnv = ReturnType<typeof readEnv>;
 
@@ -41,7 +42,14 @@ export const PROP_TO_ENV: Record<string, string> = {
   'features.invites': 'FEATURES_INVITES',
   'features.userRegistration': 'FEATURES_USER_REGISTRATION',
   'features.oauthRegistration': 'FEATURES_OAUTH_REGISTRATION',
+
+  'website.title': 'WEBSITE_TITLE',
+  'website.externalLinks': 'WEBSITE_EXTERNAL_LINKS',
+  'website.defaultAvatar': 'WEBSITE_DEFAULT_AVATAR',
+  'website.disableMediaPreview': 'WEBSITE_DISABLE_MEDIA_PREVIEW',
 };
+
+const logger = log('config').c('read');
 
 export function readEnv() {
   const envs = [
@@ -73,6 +81,11 @@ export function readEnv() {
     env(PROP_TO_ENV['features.invites'], 'features.invites', 'boolean'),
     env(PROP_TO_ENV['features.userRegistration'], 'features.userRegistration', 'boolean'),
     env(PROP_TO_ENV['features.oauthRegistration'], 'features.oauthRegistration', 'boolean'),
+
+    env(PROP_TO_ENV['website.title'], 'website.title', 'string'),
+    env(PROP_TO_ENV['website.externalLinks'], 'website.externalLinks', 'json[]'),
+    env(PROP_TO_ENV['website.defaultAvatar'], 'website.defaultAvatar', 'string'),
+    env(PROP_TO_ENV['website.disableMediaPreview'], 'website.disableMediaPreview', 'boolean'),
   ];
 
   const raw: any = {
@@ -104,6 +117,12 @@ export function readEnv() {
       invites: undefined,
       userRegistration: undefined,
       oauthRegistration: undefined,
+    },
+    website: {
+      title: undefined,
+      externalLinks: undefined,
+      defaultAvatar: undefined,
+      disableMediaPreview: undefined,
     },
   };
 
@@ -179,6 +198,13 @@ function parse(value: string, type: EnvType) {
       return byte(value);
     case 'ms':
       return ms(value);
+    case 'json[]':
+      try {
+        return JSON.parse(value);
+      } catch {
+        logger.error(`Failed to parse JSON array`, { value });
+        return undefined;
+      }
     default:
       return undefined;
   }

@@ -13,7 +13,6 @@ const schema = z.object({
         return c.addIssue({
           code: 'custom',
           message: 'Secret must be changed from the default value',
-          path: ['core', 'secret'],
         });
 
       if (s.length <= 16) {
@@ -23,7 +22,6 @@ const schema = z.object({
           type: 'string',
           inclusive: true,
           message: 'Secret must contain at least 16 characters',
-          path: ['core', 'secret'],
           exact: false,
         });
       }
@@ -86,6 +84,31 @@ const schema = z.object({
     userRegistration: z.boolean().default(false),
     oauthRegistration: z.boolean().default(false),
   }),
+  website: z.object({
+    title: z.string().default('Zipline'),
+    externalLinks: z
+      .array(
+        z.object({
+          name: z.string(),
+          url: z.string().url(),
+        })
+      )
+      .default([
+        {
+          name: 'GitHub',
+          url: 'https://github.com/diced/zipline',
+        },
+        {
+          name: 'Documentation',
+          url: 'https://zipline.diced.tech',
+        },
+      ]),
+    defaultAvatar: z
+      .string()
+      .transform((s) => resolve(s))
+      .nullish(),
+    disableMediaPreview: z.boolean().default(false),
+  }),
 });
 
 export type Config = z.infer<typeof schema>;
@@ -112,7 +135,10 @@ export function validateEnv(env: ParsedEnv): Config {
         const error = e.errors[i];
         logger.debug(JSON.stringify(error));
 
-        const path = PROP_TO_ENV[error.path.join('.')];
+        const path =
+          error.path[1] === 'externalLinks'
+            ? `WEBSITE_EXTERNAL_LINKS[${error.path[2]}]`
+            : PROP_TO_ENV[error.path.join('.')] ?? error.path.join('.');
 
         logger.error(`${path}: ${error.message}`);
       }
