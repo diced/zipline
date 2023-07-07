@@ -4,7 +4,13 @@ import { useState } from 'react';
 import DashboardFileType from '../DashboardFileType';
 import FileModal from './FileModal';
 
-export default function DashboardFile({ file }: { file: File }) {
+export default function DashboardFile({
+  file,
+  disableMediaPreview,
+}: {
+  file: File;
+  disableMediaPreview: boolean;
+}) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -26,7 +32,7 @@ export default function DashboardFile({ file }: { file: File }) {
         }}
         onClick={() => setOpen(true)}
       >
-        <DashboardFileType key={file.id} file={file} />
+        <DashboardFileType disableMediaPreview={disableMediaPreview} key={file.id} file={file} />
       </Card>
     </>
   );

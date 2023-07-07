@@ -1,13 +1,15 @@
-import { SafeConfig, safeConfig, stringifyDates } from '@/lib/config/safe';
+import { SafeConfig, safeConfig } from '@/lib/config/safe';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 
-export function withSafeConfig<T>(fn: (ctx: GetServerSidePropsContext) => T | Promise<T>): GetServerSideProps<
+export function withSafeConfig<T = {}>(
+  fn: (ctx: GetServerSidePropsContext) => T | Promise<T> = (): any => {}
+): GetServerSideProps<
   T & {
     config: SafeConfig;
   }
 > {
   return async (ctx) => {
-    const config = stringifyDates(safeConfig());
+    const config = safeConfig();
     const data = await fn(ctx);
 
     return { props: { ...data, config } };

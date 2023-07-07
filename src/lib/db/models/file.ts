@@ -43,7 +43,7 @@ export function cleanFile(file: File) {
 export function cleanFiles(files: File[]) {
   for (let i = 0; i !== files.length; ++i) {
     const file = files[i];
-    file.password = !!file.password;
+    if (file.password) file.password = true;
 
     file.url = formatRootUrl(config.files.route, file.name);
   }

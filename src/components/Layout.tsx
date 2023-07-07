@@ -1,9 +1,11 @@
 import type { Response } from '@/lib/api/response';
+import type { SafeConfig } from '@/lib/config/safe';
 import { fetchApi } from '@/lib/fetchApi';
 import useLogin from '@/lib/hooks/useLogin';
 import { useUserStore } from '@/lib/store/user';
 import {
   AppShell,
+  Box,
   Burger,
   Button,
   Header,
@@ -23,6 +25,7 @@ import {
   IconChevronDown,
   IconChevronRight,
   IconClipboardCopy,
+  IconExternalLink,
   IconFileText,
   IconFileUpload,
   IconFiles,
@@ -102,7 +105,7 @@ const navLinks: NavLinks[] = [
   },
 ];
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default function Layout({ children, config }: { children: React.ReactNode; config: SafeConfig }) {
   const theme = useMantineTheme();
   const [opened, setOpened] = useState(false);
   const router = useRouter();
@@ -234,6 +237,20 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 );
               }
             })}
+
+          <Box mt='auto'>
+            {config.website.externalLinks.map(({ name, url }) => (
+              <NavLink
+                key={name}
+                label={name}
+                icon={<IconExternalLink size='1rem' />}
+                variant='light'
+                component={Link}
+                href={url}
+                target='_blank'
+              />
+            ))}
+          </Box>
         </Navbar>
       }
       header={

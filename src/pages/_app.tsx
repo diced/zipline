@@ -39,6 +39,12 @@ export default function App(props: AppProps) {
           withCSSVariables
           theme={{
             colorScheme: 'dark',
+            colors: {
+              discord: ['#5865F2'],
+              google: ['#4285F4'],
+              authentik: ['#FD4B2D'],
+              github: ['#24292E'],
+            },
           }}
         >
           <ModalsProvider

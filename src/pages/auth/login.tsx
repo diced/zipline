@@ -9,6 +9,7 @@ import {
   Text,
   TextInput,
   Title,
+  useMantineTheme,
 } from '@mantine/core';
 import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
@@ -24,17 +25,19 @@ import {
 } from '@tabler/icons-react';
 import { hasLength, useForm } from '@mantine/form';
 import { fetchApi } from '@/lib/fetchApi';
+import { withSafeConfig } from '@/lib/middleware/next/withSafeConfig';
+import { config } from '@/lib/config';
+import { eitherTrue, isTruthy } from '@/lib/primitive';
+import { InferGetServerSidePropsType } from 'next';
+import Link from 'next/link';
 
-function IconText({ Icon, text }: { Icon: TIcon; text: string }) {
-  return (
-    <Group spacing='xs' align='center'>
-      <Icon />
-      <Text>{text}</Text>
-    </Group>
-  );
-}
-
-export default function Login() {
+export default function Login({
+  config,
+  authentikEnabled,
+  discordEnabled,
+  githubEnabled,
+  googleEnabled,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter();
   const { data, isLoading, mutate } = useSWR<Response['/api/user']>('/api/user');
 
@@ -73,8 +76,6 @@ export default function Login() {
 
   return (
     <>
-      <LoadingOverlay visible={isLoading} />
-
       <Center h='100vh'>
         <div>
           <Title order={1} size={50} align='center'>
@@ -95,35 +96,136 @@ export default function Login() {
                 {...form.getInputProps('password')}
               />
 
-              <Button size='lg' fullWidth type='submit' color='gray'>
+              <Button size='lg' fullWidth type='submit' color='gray' loading={isLoading}>
                 Login
               </Button>
             </Stack>
           </form>
 
-          <Text size='sm' align='center' color='dimmed'>
-            OR
-          </Text>
+          {eitherTrue(config.features.oauthRegistration, config.features.userRegistration) && (
+            <Text size='sm' align='center' color='dimmed'>
+              OR
+            </Text>
+          )}
 
           <Stack my='xs'>
-            <Button size='lg' fullWidth variant='outline' color='gray'>
-              Sign up
-            </Button>
-            <Button size='lg' fullWidth variant='outline' color='gray'>
-              <IconText Icon={IconBrandGithubFilled} text='Sign in with GitHub' />
-            </Button>
-            <Button size='lg' fullWidth variant='outline' color='gray'>
-              <IconText Icon={IconBrandGoogle} text='Sign in with Google' />
-            </Button>
-            <Button size='lg' fullWidth variant='outline' color='gray'>
-              <IconText Icon={IconBrandDiscordFilled} text='Sign in with Discord' />
-            </Button>
-            <Button size='lg' fullWidth variant='outline' color='gray'>
-              <IconText Icon={IconCircleKeyFilled} text='Sign in with Authentik' />
-            </Button>
+            {config.features.userRegistration && (
+              <Button size='lg' fullWidth variant='outline' color='gray'>
+                Sign up
+              </Button>
+            )}
+
+            {discordEnabled && (
+              <Button
+                size='lg'
+                fullWidth
+                variant='filled'
+                component={Link}
+                href='/api/auth/oauth/discord'
+                leftIcon={<IconBrandDiscordFilled />}
+                color='discord.0'
+                sx={(t) => ({
+                  '&:hover': {
+                    backgroundColor: t.fn.darken(t.colors.discord[0], 0.1),
+                  },
+                })}
+              >
+                Sign in with Discord
+              </Button>
+            )}
+
+            {githubEnabled && (
+              <Button
+                size='lg'
+                fullWidth
+                color='github.0'
+                component={Link}
+                href='/api/auth/oauth/github'
+                leftIcon={<IconBrandGithubFilled />}
+                sx={(t) => ({
+                  '&:hover': {
+                    backgroundColor: t.fn.darken(t.colors.github[0], 0.1),
+                  },
+                })}
+              >
+                Sign in with GitHub
+              </Button>
+            )}
+
+            {googleEnabled && (
+              <Button
+                size='lg'
+                fullWidth
+                component={Link}
+                href='/api/auth/oauth/google'
+                leftIcon={<IconBrandGoogle stroke={4} />}
+                color='google.0'
+                sx={(t) => ({
+                  '&:hover': {
+                    backgroundColor: t.fn.darken(t.colors.google[0], 0.1),
+                  },
+                })}
+              >
+                Sign in with Google
+              </Button>
+            )}
+
+            {authentikEnabled && (
+              <Button
+                size='lg'
+                fullWidth
+                color='authentik.0'
+                component={Link}
+                href='/api/auth/oauth/authentik'
+                leftIcon={<IconCircleKeyFilled />}
+                sx={(t) => ({
+                  '&:hover': {
+                    backgroundColor: t.fn.darken(t.colors.authentik[0], 0.2),
+                  },
+                })}
+              >
+                Sign in with Authentik
+              </Button>
+            )}
           </Stack>
         </div>
       </Center>
     </>
   );
 }
+
+export const getServerSideProps = withSafeConfig(async () => {
+  const discordEnabled = isTruthy(
+    config.oauth?.discord?.clientId,
+    config.oauth?.discord?.clientSecret,
+    config.features.oauthRegistration
+  );
+
+  const githubEnabled = isTruthy(
+    config.oauth?.github?.clientId,
+    config.oauth?.github?.clientSecret,
+    config.features.oauthRegistration
+  );
+
+  const googleEnabled = isTruthy(
+    config.oauth?.google?.clientId,
+    config.oauth?.google?.clientSecret,
+    config.features.oauthRegistration
+  );
+
+  const authentikEnabled = isTruthy(
+    config.oauth?.authentik?.clientId,
+    config.oauth?.authentik?.clientSecret,
+    config.oauth?.authentik?.authorizeUrl,
+    config.oauth?.authentik?.tokenUrl,
+    config.oauth?.authentik?.userinfoUrl,
+    config.features.oauthRegistration
+  );
+
+  return {
+    discordEnabled,
+    githubEnabled,
+    googleEnabled,
+    authentikEnabled,
+  };
+});

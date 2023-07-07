@@ -130,6 +130,7 @@ export default function FileModal({
     }
 
     mutate('/api/user/recent');
+    mutate('/api/user/files');
   };
 
   return (

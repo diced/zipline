@@ -1,10 +1,10 @@
-import { ZodError, z } from 'zod';
+import { ZodError, ZodIssue, z } from 'zod';
 import { PROP_TO_ENV, ParsedEnv } from './read';
 import { log } from '../logger';
 import { resolve } from 'path';
 import bytes from 'bytes';
 
-const schema = z.object({
+export const schema = z.object({
   core: z.object({
     port: z.number().default(3000),
     hostname: z.string().default('localhost'),
@@ -35,7 +35,7 @@ const schema = z.object({
     defaultFormat: z.enum(['random', 'date', 'uuid', 'name', 'gfycat']).default('random'),
     disabledExtensions: z.array(z.string()).default([]),
     maxFileSize: z.number().default(bytes('100mb')),
-    defaultExpiration: z.number().nullish(),
+    defaultExpiration: z.number().nullable().default(null),
     assumeMimetypes: z.boolean().default(false),
     defaultDateFormat: z.string().default('YYYY-MM-DD_HH:mm:ss'),
   }),
@@ -106,16 +106,69 @@ const schema = z.object({
     defaultAvatar: z
       .string()
       .transform((s) => resolve(s))
-      .nullish(),
+      .nullable()
+      .default(null),
     disableMediaPreview: z.boolean().default(false),
+  }),
+  oauth: z.object({
+    discord: z
+      .object({
+        clientId: z.string(),
+        clientSecret: z.string(),
+      })
+      .or(
+        z.object({
+          clientId: z.undefined(),
+          clientSecret: z.undefined(),
+        })
+      ),
+    github: z
+      .object({
+        clientId: z.string(),
+        clientSecret: z.string(),
+      })
+      .or(
+        z.object({
+          clientId: z.undefined(),
+          clientSecret: z.undefined(),
+        })
+      ),
+    google: z
+      .object({
+        clientId: z.string(),
+        clientSecret: z.string(),
+      })
+      .or(
+        z.object({
+          clientId: z.undefined(),
+          clientSecret: z.undefined(),
+        })
+      ),
+    authentik: z
+      .object({
+        clientId: z.string(),
+        clientSecret: z.string(),
+        authorizeUrl: z.string().url(),
+        userinfoUrl: z.string().url(),
+        tokenUrl: z.string().url(),
+      })
+      .or(
+        z.object({
+          clientId: z.undefined(),
+          clientSecret: z.undefined(),
+          authorizeUrl: z.undefined(),
+          userinfoUrl: z.undefined(),
+          tokenUrl: z.undefined(),
+        })
+      ),
   }),
 });
 
 export type Config = z.infer<typeof schema>;
 
-export function validateEnv(env: ParsedEnv): Config {
-  const logger = log('config').c('validate');
+const logger = log('config').c('validate');
 
+export function validateEnv(env: ParsedEnv): Config {
   try {
     const validated = schema.parse(env);
 
@@ -131,16 +184,8 @@ export function validateEnv(env: ParsedEnv): Config {
     if (e instanceof ZodError) {
       logger.error(`There were ${e.errors.length} error(s) while validating the environment.`);
 
-      for (let i = 0; i !== e.errors.length; ++i) {
-        const error = e.errors[i];
-        logger.debug(JSON.stringify(error));
-
-        const path =
-          error.path[1] === 'externalLinks'
-            ? `WEBSITE_EXTERNAL_LINKS[${error.path[2]}]`
-            : PROP_TO_ENV[error.path.join('.')] ?? error.path.join('.');
-
-        logger.error(`${path}: ${error.message}`);
+      for (const error of e.errors) {
+        handleError(error);
       }
 
       process.exit(1);
@@ -148,4 +193,25 @@ export function validateEnv(env: ParsedEnv): Config {
 
     throw e;
   }
+}
+
+function handleError(error: ZodIssue) {
+  logger.debug(JSON.stringify(error));
+
+  if (error.code === 'invalid_union') {
+    for (const unionError of error.unionErrors) {
+      for (const subError of unionError.issues) {
+        handleError(subError);
+      }
+    }
+
+    return;
+  }
+
+  const path =
+    error.path[1] === 'externalLinks'
+      ? `WEBSITE_EXTERNAL_LINKS[${error.path[2]}]`
+      : PROP_TO_ENV[error.path.join('.')] ?? error.path.join('.');
+
+  logger.error(`${path}: ${error.message}`);
 }

@@ -18,6 +18,7 @@ type Query = {
   page?: string;
   pagecount?: string;
   filter?: 'dashboard' | 'none';
+  favorite?: 'true' | 'false';
 };
 
 const PAGE_COUNT = 9;
@@ -33,7 +34,7 @@ export async function handler(req: NextApiReq<any, Query>, res: NextApiRes<ApiUs
     return res.ok({ count: Math.ceil(count / PAGE_COUNT) });
   }
 
-  const { page, filter } = req.query;
+  const { page, filter, favorite } = req.query;
   if (!page) return res.badRequest('Page is required');
   if (isNaN(Number(page))) return res.badRequest('Page must be a number');
 
@@ -57,9 +58,13 @@ export async function handler(req: NextApiReq<any, Query>, res: NextApiRes<ApiUs
             },
           ],
         }),
+        ...(favorite === 'true' && {
+          favorite: true,
+        }),
       },
       select: {
         ...fileSelect,
+        password: true,
       },
       orderBy: {
         createdAt: 'desc',

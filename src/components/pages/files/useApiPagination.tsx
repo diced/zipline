@@ -3,9 +3,9 @@ import { File } from '@/lib/db/models/file';
 import useSWR from 'swr';
 
 const fetcher = async (
-  [_, page, filter]: [unknown, number, string] = ['/api/user/files?page=1', 0, 'dashboard']
+  [_, page, filter, favorite]: [unknown, number, string, string?] = ['/api/user/files?page=1', 0, 'dashboard']
 ) => {
-  const res = await fetch(`/api/user/files?page=${page}&filter=${filter}`);
+  const res = await fetch(`/api/user/files?page=${page}&filter=${filter}${favorite ? `&favorite=true` : ''}`);
 
   if (!res.ok) {
     const json = await res.json();
@@ -16,9 +16,9 @@ const fetcher = async (
   return res.json();
 };
 
-export function useApiPagination(page: number = 1, filter: string = 'dashboard') {
+export function useApiPagination(page: number = 1, filter: string = 'dashboard', favorite?: string) {
   const { data, error, isLoading, mutate } = useSWR<Extract<Response['/api/user/files'], File[]>>(
-    [`/api/user/files`, page, filter],
+    [`/api/user/files`, page, filter, favorite],
     fetcher
   );
   const {

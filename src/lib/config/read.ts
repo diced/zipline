@@ -47,6 +47,18 @@ export const PROP_TO_ENV: Record<string, string> = {
   'website.externalLinks': 'WEBSITE_EXTERNAL_LINKS',
   'website.defaultAvatar': 'WEBSITE_DEFAULT_AVATAR',
   'website.disableMediaPreview': 'WEBSITE_DISABLE_MEDIA_PREVIEW',
+
+  'oauth.discord.clientId': 'OAUTH_DISCORD_CLIENT_ID',
+  'oauth.discord.clientSecret': 'OAUTH_DISCORD_CLIENT_SECRET',
+  'oauth.github.clientId': 'OAUTH_GITHUB_CLIENT_ID',
+  'oauth.github.clientSecret': 'OAUTH_GITHUB_CLIENT_SECRET',
+  'oauth.google.clientId': 'OAUTH_GOOGLE_CLIENT_ID',
+  'oauth.google.clientSecret': 'OAUTH_GOOGLE_CLIENT_SECRET',
+  'oauth.authentik.clientId': 'OAUTH_AUTHENTIK_CLIENT_ID',
+  'oauth.authentik.clientSecret': 'OAUTH_AUTHENTIK_CLIENT_SECRET',
+  'oauth.authentik.authorizeUrl': 'OAUTH_AUTHENTIK_AUTHORIZE_URL',
+  'oauth.authentik.userinfoUrl': 'OAUTH_AUTHENTIK_USERINFO_URL',
+  'oauth.authentik.tokenUrl': 'OAUTH_AUTHENTIK_TOKEN_URL',
 };
 
 const logger = log('config').c('read');
@@ -86,6 +98,18 @@ export function readEnv() {
     env(PROP_TO_ENV['website.externalLinks'], 'website.externalLinks', 'json[]'),
     env(PROP_TO_ENV['website.defaultAvatar'], 'website.defaultAvatar', 'string'),
     env(PROP_TO_ENV['website.disableMediaPreview'], 'website.disableMediaPreview', 'boolean'),
+
+    env(PROP_TO_ENV['oauth.discord.clientId'], 'oauth.discord.clientId', 'string'),
+    env(PROP_TO_ENV['oauth.discord.clientSecret'], 'oauth.discord.clientSecret', 'string'),
+    env(PROP_TO_ENV['oauth.github.clientId'], 'oauth.github.clientId', 'string'),
+    env(PROP_TO_ENV['oauth.github.clientSecret'], 'oauth.github.clientSecret', 'string'),
+    env(PROP_TO_ENV['oauth.google.clientId'], 'oauth.google.clientId', 'string'),
+    env(PROP_TO_ENV['oauth.google.clientSecret'], 'oauth.google.clientSecret', 'string'),
+    env(PROP_TO_ENV['oauth.authentik.clientId'], 'oauth.authentik.clientId', 'string'),
+    env(PROP_TO_ENV['oauth.authentik.clientSecret'], 'oauth.authentik.clientSecret', 'string'),
+    env(PROP_TO_ENV['oauth.authentik.authorizeUrl'], 'oauth.authentik.authorizeUrl', 'string'),
+    env(PROP_TO_ENV['oauth.authentik.userinfoUrl'], 'oauth.authentik.userinfoUrl', 'string'),
+    env(PROP_TO_ENV['oauth.authentik.tokenUrl'], 'oauth.authentik.tokenUrl', 'string'),
   ];
 
   const raw: any = {
@@ -123,6 +147,27 @@ export function readEnv() {
       externalLinks: undefined,
       defaultAvatar: undefined,
       disableMediaPreview: undefined,
+    },
+    oauth: {
+      discord: {
+        clientId: undefined,
+        clientSecret: undefined,
+      },
+      github: {
+        clientId: undefined,
+        clientSecret: undefined,
+      },
+      google: {
+        clientId: undefined,
+        clientSecret: undefined,
+      },
+      authentik: {
+        clientId: undefined,
+        clientSecret: undefined,
+        authorizeUrl: undefined,
+        userinfoUrl: undefined,
+        tokenUrl: undefined,
+      },
     },
   };
 

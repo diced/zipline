@@ -1,13 +1,14 @@
 import DashboardFile from '@/components/file/DashboardFile';
 import Stat from '@/components/Stat';
 import type { Response } from '@/lib/api/response';
+import type { SafeConfig } from '@/lib/config/safe';
 import useLogin from '@/lib/hooks/useLogin';
 import { LoadingOverlay, Paper, SimpleGrid, Table, Text, Title } from '@mantine/core';
 import { IconDeviceSdCard, IconEyeFilled, IconFiles, IconLink, IconStarFilled } from '@tabler/icons-react';
 import bytes from 'bytes';
 import useSWR from 'swr';
 
-export default function DashboardHome() {
+export default function DashboardHome({ config }: { config: SafeConfig }) {
   const { user } = useLogin();
 
   const { data: recent, isLoading: recentLoading } = useSWR<Response['/api/user/recent']>('/api/user/recent');
@@ -33,7 +34,7 @@ export default function DashboardHome() {
       ) : (
         <SimpleGrid cols={3} spacing='md' breakpoints={[{ maxWidth: 'sm', cols: 1, spacing: 'sm' }]}>
           {recent!.map((file) => (
-            <DashboardFile key={file.id} file={file} />
+            <DashboardFile disableMediaPreview={config.website.disableMediaPreview} key={file.id} file={file} />
           ))}
         </SimpleGrid>
       )}
