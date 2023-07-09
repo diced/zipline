@@ -27,19 +27,15 @@ function PlaceholderContent({ text, Icon }: { text: string; Icon: Icon }) {
 function Placeholder({ text, Icon, ...props }: { text: string; Icon: Icon; onClick?: () => void }) {
   if (props.onClick)
     return (
-      <Box sx={{ height: 200, cursor: 'pointer' }} {...props}>
-        <Center sx={{ height: 200 }}>
-          <PlaceholderContent text={text} Icon={Icon} />
-        </Center>
-      </Box>
+      <Center sx={{ height: '100%', cursor: 'pointer' }} {...props}>
+        <PlaceholderContent text={text} Icon={Icon} />
+      </Center>
     );
 
   return (
-    <Box sx={{ height: 320 }} {...props}>
-      <Center sx={{ height: 320 }}>
-        <PlaceholderContent text={text} Icon={Icon} />
-      </Center>
-    </Box>
+    <Center sx={{ height: '100%' }} {...props}>
+      <PlaceholderContent text={text} Icon={Icon} />
+    </Center>
   );
 }
 
