@@ -69,8 +69,6 @@ export async function handler(req: NextApiReq, res: NextApiRes<ApiUserStatsRespo
     return acc;
   }, {} as { [type: string]: number });
 
-  console.log(aggFile);
-
   return res.ok({
     filesUploaded: aggFile._count._all ?? 0,
     favoriteFiles: favCount ?? 0,

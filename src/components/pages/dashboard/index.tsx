@@ -79,22 +79,25 @@ export default function DashboardHome() {
           <Title order={3} mt='lg' mb='xs'>
             File types
           </Title>
-          <Table>
-            <thead>
-              <tr>
-                <th>Type</th>
-                <th>Count</th>
-              </tr>
-            </thead>
-            <tbody>
-              {Object.entries(stats!.sortTypeCount).map(([type, count]) => (
-                <tr key={type}>
-                  <td>{type}</td>
-                  <td>{count}</td>
+
+          <Paper radius='sm' withBorder>
+            <Table>
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>Count</th>
                 </tr>
-              ))}
-            </tbody>
-          </Table>
+              </thead>
+              <tbody>
+                {Object.entries(stats!.sortTypeCount).map(([type, count]) => (
+                  <tr key={type}>
+                    <td>{type}</td>
+                    <td>{count}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </Paper>
         </>
       )}
     </>
