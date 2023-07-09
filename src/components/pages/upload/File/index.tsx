@@ -14,22 +14,44 @@ import {
 import { Dropzone } from '@mantine/dropzone';
 import { useClipboard } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
-import { IconFiles, IconPhoto, IconUpload, IconX } from '@tabler/icons-react';
+import { IconDeviceSdCard, IconFiles, IconPhoto, IconUpload, IconX } from '@tabler/icons-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { uploadFiles } from '../uploadFiles';
 import ToUploadFile from './ToUploadFile';
+import { useConfig } from '@/components/ConfigProvider';
+import bytes from 'bytes';
+import { notifications } from '@mantine/notifications';
 
 export default function UploadFile() {
   const theme = useMantineTheme();
   const modals = useModals();
   const clipboard = useClipboard();
+  const config = useConfig();
 
   const [files, setFiles] = useState<File[]>([]);
   const [progress, setProgress] = useState(0);
   const [dropLoading, setLoading] = useState(false);
 
+  const aggregateSize = () => files.reduce((acc, file) => acc + file.size, 0);
+
   const upload = () => {
+    const size = aggregateSize();
+    if (size > config.files.maxFileSize) {
+      notifications.show({
+        title: 'Upload may fail',
+        color: 'red',
+        icon: <IconDeviceSdCard size='1rem' />,
+        message: (
+          <>
+            The upload may fail because the total size of the files you are trying to upload is{' '}
+            <b>{bytes(size, { unitSeparator: ' ' })}</b>, which is larger than the limit of{' '}
+            <b>{bytes(config.files.maxFileSize, { unitSeparator: ' ' })}</b>
+          </>
+        ),
+      });
+    }
+
     uploadFiles(files, {
       setFiles,
       setLoading,
@@ -78,6 +100,9 @@ export default function UploadFile() {
             <Text size='sm' color='dimmed' inline mt={7}>
               Attach as many files as you like, they will show up below to review before uploading.
             </Text>
+            <Text size='sm' color='dimmed' mt={7}>
+              <b>{bytes(config.files.maxFileSize, { unitSeparator: ' ' })}</b> limit per file
+            </Text>
           </div>
         </Group>
       </Dropzone>
@@ -103,7 +128,7 @@ export default function UploadFile() {
         size='xl'
         onClick={upload}
       >
-        Upload {files.length} files
+        Upload {files.length} files ({bytes(aggregateSize(), { unitSeparator: ' ' })})
       </Button>
     </>
   );
