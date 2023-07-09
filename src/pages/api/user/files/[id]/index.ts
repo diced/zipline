@@ -18,7 +18,7 @@ type Query = {
   id: string;
 };
 
-const logger = log('api').c('user').c('files').c('$id');
+const logger = log('api').c('user').c('files').c('[id]');
 
 export async function handler(req: NextApiReq<Body, Query>, res: NextApiRes<ApiUserFilesIdResponse>) {
   const file = await prisma.file.findFirst({
