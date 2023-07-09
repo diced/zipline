@@ -11,7 +11,7 @@ export default function DashboardIndex({ config }: InferGetServerSidePropsType<t
 
   return (
     <Layout config={config}>
-      <DashboardHome config={config} />
+      <DashboardHome />
     </Layout>
   );
 }

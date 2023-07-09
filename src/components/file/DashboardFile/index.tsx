@@ -3,6 +3,7 @@ import { Card } from '@mantine/core';
 import { useState } from 'react';
 import DashboardFileType from '../DashboardFileType';
 import FileModal from './FileModal';
+import { KeyedMutator } from 'swr';
 
 export default function DashboardFile({
   file,

@@ -14,17 +14,23 @@ import {
 } from '@mantine/core';
 import { IconFileUpload, IconFilesOff } from '@tabler/icons-react';
 import Link from 'next/link';
-import { useApiPagination } from './useApiPagination';
+import { useApiPagination } from '../useApiPagination';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import { useConfig } from '@/components/ConfigProvider';
 
-export default function FavoriteFiles({ config }: { config: SafeConfig }) {
+export default function FavoriteFiles() {
   const router = useRouter();
+  const config = useConfig();
 
   const [page, setPage] = useState<number>(
     router.query.favoritePage ? parseInt(router.query.favoritePage as string) : 1
   );
-  const { pages, pagesCount } = useApiPagination(page, 'dashboard', 'favorite');
+  const { pages, pagesCount } = useApiPagination({
+    page,
+    favorite: true,
+    filter: 'dashboard',
+  });
 
   useEffect(() => {
     router.replace(
@@ -65,7 +71,7 @@ export default function FavoriteFiles({ config }: { config: SafeConfig }) {
                 ) : pages.data?.length ?? 0 > 0 ? (
                   pages.data?.map((file) => (
                     <DashboardFile
-                      disableMediaPreview={config.website.disableMediaPreview}
+                      disableMediaPreview={config?.website.disableMediaPreview ?? false}
                       key={file.id}
                       file={file}
                     />

@@ -1,16 +1,31 @@
 import type { SafeConfig } from '@/lib/config/safe';
-import { Title } from '@mantine/core';
-import Files from './Files';
-import FavoriteFiles from './FavoriteFiles';
+import { useSettingsStore } from '@/lib/store/settings';
+import { Group, Title } from '@mantine/core';
+import FavoriteFiles from './views/FavoriteFiles';
+import Files from './views/Files';
+import FileTable from './views/FileTable';
+import GridTableSwitcher from '@/components/GridTableSwitcher';
 
-export default function DashbaordFiles({ config }: { config: SafeConfig }) {
+export default function DashbaordFiles() {
+  const view = useSettingsStore((state) => state.view.files);
+
   return (
     <>
-      <Title>Files</Title>
+      <Group>
+        <Title>Files</Title>
 
-      <FavoriteFiles config={config} />
+        <GridTableSwitcher type='files' />
+      </Group>
 
-      <Files config={config} />
+      {view === 'grid' ? (
+        <>
+          <FavoriteFiles />
+
+          <Files />
+        </>
+      ) : (
+        <FileTable />
+      )}
     </>
   );
 }

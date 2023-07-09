@@ -23,8 +23,9 @@ import DashboardFileType from '../DashboardFileType';
 import FileStat from './FileStat';
 import { useClipboard } from '@mantine/hooks';
 import Link from 'next/link';
-import { mutate } from 'swr';
+import { KeyedMutator, mutate } from 'swr';
 import { Response } from '@/lib/api/response';
+import { copyFile, deleteFile, downloadFile, favoriteFile, viewFile } from '../actions';
 
 function ActionButton({
   Icon,
@@ -56,82 +57,6 @@ export default function FileModal({
   file: File;
 }) {
   const clipboard = useClipboard();
-
-  const viewFile = () => {
-    window.open(`/view/${file.name}`, '_blank');
-  };
-
-  const downloadFile = () => {
-    window.open(`/raw/${file.name}?download=true`, '_blank');
-  };
-
-  const copyFile = () => {
-    const domain = `${window.location.protocol}//${window.location.host}`;
-
-    clipboard.copy(`${domain}/view/${file.name}`);
-
-    notifications.show({
-      title: 'Copied link',
-      message: (
-        <Anchor component={Link} href={`/view/${file.name}`}>
-          {`${domain}/view/${file.name}`}
-        </Anchor>
-      ),
-      color: 'green',
-      icon: <IconCopy size='1rem' />,
-    });
-  };
-
-  const deleteFile = async () => {
-    const { error } = await fetchApi(`/api/user/files/${file.id}`, 'DELETE');
-
-    if (error) {
-      notifications.show({
-        title: 'Error',
-        message: error.message,
-        color: 'red',
-        icon: <IconTrashXFilled size='1rem' />,
-      });
-    } else {
-      notifications.show({
-        title: 'File deleted',
-        message: `${file.name} has been deleted`,
-        color: 'green',
-        icon: <IconTrashFilled size='1rem' />,
-      });
-
-      setOpen(false);
-    }
-  };
-
-  const favoriteFile = async () => {
-    const { data, error } = await fetchApi<Response['/api/user/files/[id]']>(
-      `/api/user/files/${file.id}`,
-      'PATCH',
-      {
-        favorite: !file.favorite,
-      }
-    );
-
-    if (error) {
-      notifications.show({
-        title: 'Error',
-        message: error.message,
-        color: 'red',
-        icon: <IconStar size='1rem' />,
-      });
-    } else {
-      notifications.show({
-        title: `File ${data!.favorite ? 'favorited' : 'unfavorited'}`,
-        message: `${file.name} has been ${data!.favorite ? 'favorited' : 'unfavorited'}`,
-        color: 'yellow',
-        icon: <IconStarFilled size='1rem' />,
-      });
-    }
-
-    mutate('/api/user/recent');
-    mutate('/api/user/files');
-  };
 
   return (
     <Modal
@@ -181,16 +106,25 @@ export default function FileModal({
         </Group>
 
         <Group position='right'>
-          <ActionButton Icon={IconTrashFilled} onClick={deleteFile} tooltip='Delete file' color='red' />
-          <ActionButton Icon={IconExternalLink} onClick={viewFile} tooltip='View file in a new tab' />
-          <ActionButton Icon={IconCopy} onClick={copyFile} tooltip='Copy file link' />
+          <ActionButton
+            Icon={IconTrashFilled}
+            onClick={() => deleteFile(file, notifications, setOpen)}
+            tooltip='Delete file'
+            color='red'
+          />
+          <ActionButton
+            Icon={IconExternalLink}
+            onClick={() => viewFile(file)}
+            tooltip='View file in a new tab'
+          />
+          <ActionButton Icon={IconCopy} onClick={() => copyFile(file, clipboard, notifications)} tooltip='Copy file link' />
           <ActionButton
             Icon={file.favorite ? IconStarFilled : IconStar}
-            onClick={favoriteFile}
+            onClick={() => favoriteFile(file, notifications)}
             tooltip={file.favorite ? 'Unfavorite file' : 'Favorite file'}
             color={file.favorite ? 'yellow' : 'gray'}
           />
-          <ActionButton Icon={IconDownload} onClick={downloadFile} tooltip='Download file' />
+          <ActionButton Icon={IconDownload} onClick={() => downloadFile(file)} tooltip='Download file' />
         </Group>
       </Group>
     </Modal>

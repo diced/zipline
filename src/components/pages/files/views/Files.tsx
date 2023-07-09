@@ -13,15 +13,19 @@ import {
 } from '@mantine/core';
 import { IconFileUpload, IconFilesOff } from '@tabler/icons-react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import { useApiPagination } from './useApiPagination';
 import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+import { useApiPagination } from '../useApiPagination';
+import { useConfig } from '@/components/ConfigProvider';
 
-export default function Files({ config }: { config: SafeConfig }) {
+export default function Files() {
   const router = useRouter();
+  const config = useConfig();
 
   const [page, setPage] = useState<number>(router.query.page ? parseInt(router.query.page as string) : 1);
-  const { pages, pagesCount } = useApiPagination(page);
+  const { pages, pagesCount } = useApiPagination({
+    page,
+  });
 
   useEffect(() => {
     router.replace(

@@ -41,6 +41,7 @@ import {
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
+import ConfigProvider from './ConfigProvider';
 
 type NavLinks = {
   label: string;
@@ -318,9 +319,11 @@ export default function Layout({ children, config }: { children: React.ReactNode
         </Header>
       }
     >
-      <Paper m={2} withBorder p={'xs'}>
-        {children}
-      </Paper>
+      <ConfigProvider config={config}>
+        <Paper m={2} withBorder p={'xs'}>
+          {children}
+        </Paper>
+      </ConfigProvider>
     </AppShell>
   );
 }
