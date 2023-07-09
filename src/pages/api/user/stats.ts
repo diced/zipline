@@ -24,7 +24,6 @@ export async function handler(req: NextApiReq, res: NextApiRes<ApiUserStatsRespo
     },
     _count: {
       _all: true,
-      favorite: true,
     },
     _sum: {
       views: true,
@@ -33,6 +32,12 @@ export async function handler(req: NextApiReq, res: NextApiRes<ApiUserStatsRespo
     _avg: {
       views: true,
       size: true,
+    },
+  });
+
+  const favCount = await prisma.file.count({
+    where: {
+      favorite: true,
     },
   });
 
@@ -64,9 +69,11 @@ export async function handler(req: NextApiReq, res: NextApiRes<ApiUserStatsRespo
     return acc;
   }, {} as { [type: string]: number });
 
+  console.log(aggFile);
+
   return res.ok({
     filesUploaded: aggFile._count._all ?? 0,
-    favoriteFiles: aggFile._count.favorite ?? 0,
+    favoriteFiles: favCount ?? 0,
     views: aggFile._sum.views ?? 0,
     avgViews: aggFile._avg.views ?? 0,
     storageUsed: aggFile._sum.size ?? 0,
