@@ -140,7 +140,14 @@ export default function DashboardFileType({
         <Placeholder text={`Click to view text ${file.name}`} Icon={IconFileText} />
       );
     default:
-      if (dbFile) return <Placeholder text={`Click to view file ${file.name}`} Icon={IconFileUnknown} />;
+      if (dbFile)
+        return (
+          <Placeholder
+            onClick={() => window.open(`/raw/${file.name}${password ? `?pw=${password}` : ''}`)}
+            text={`Click to view file ${file.name}`}
+            Icon={IconFileUnknown}
+          />
+        );
       else return <IconFileUnknown size={48} />;
   }
 }
