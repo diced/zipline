@@ -20,7 +20,6 @@ const PER_PAGE_OPTIONS = [10, 20, 50];
 
 export default function FileTable() {
   const router = useRouter();
-  const config = useConfig();
   const clipboard = useClipboard();
 
   const { data: stats, isLoading: statsLoading } = useSWR<Response['/api/user/stats']>('/api/user/stats');
@@ -66,6 +65,7 @@ export default function FileTable() {
 
       <Box my='sm'>
         <DataTable
+          borderRadius='sm'
           withBorder
           minHeight={200}
           records={pages.data}
