@@ -18,13 +18,14 @@ import { useEffect, useState } from 'react';
 import { useApiPagination } from '../useApiPagination';
 import { useConfig } from '@/components/ConfigProvider';
 
-export default function Files() {
+export default function Files({ id }: { id?: string }) {
   const router = useRouter();
   const config = useConfig();
 
   const [page, setPage] = useState<number>(router.query.page ? parseInt(router.query.page as string) : 1);
-  const { pages, pagesCount } = useApiPagination({
+  const { data, isLoading } = useApiPagination({
     page,
+    id,
   });
 
   useEffect(() => {
@@ -44,7 +45,7 @@ export default function Files() {
     <>
       <SimpleGrid
         my='sm'
-        cols={pages.data?.length ?? 0 > 0 ? 3 : 1}
+        cols={data?.page?.length ?? 0 > 0 ? 3 : 1}
         spacing='md'
         breakpoints={[
           { maxWidth: 'sm', cols: 1 },
@@ -52,12 +53,12 @@ export default function Files() {
         ]}
         pos='relative'
       >
-        {pages.isLoading ? (
+        {isLoading ? (
           <Paper withBorder h={200}>
             <LoadingOverlay visible />
           </Paper>
-        ) : pages.data?.length ?? 0 > 0 ? (
-          pages.data?.map((file) => (
+        ) : data?.page?.length ?? 0 > 0 ? (
+          data?.page.map((file) => (
             <DashboardFile
               disableMediaPreview={config.website.disableMediaPreview}
               key={file.id}
@@ -89,7 +90,7 @@ export default function Files() {
       </SimpleGrid>
 
       <Center>
-        <Pagination my='sm' value={page} onChange={setPage} total={pagesCount.data?.count ?? 1} />
+        <Pagination my='sm' value={page} onChange={setPage} total={data?.pages ?? 1} />
       </Center>
     </>
   );

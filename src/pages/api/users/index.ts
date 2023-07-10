@@ -9,7 +9,11 @@ import { ziplineAuth } from '@/lib/middleware/ziplineAuth';
 import { NextApiReq, NextApiRes } from '@/lib/response';
 import { readFile } from 'fs/promises';
 
-export type ApiUsersIdResponse = User[] | User;
+export type ApiUsersResponse = User[] | User;
+
+type Query = {
+  noincl?: 'true' | 'false';
+};
 
 type Body = {
   username?: string;
@@ -18,7 +22,9 @@ type Body = {
   administrator?: boolean;
 };
 
-export async function handler(req: NextApiReq<Body>, res: NextApiRes<ApiUsersIdResponse>) {
+const logger = log('api').c('users');
+
+export async function handler(req: NextApiReq<Body, Query>, res: NextApiRes<ApiUsersResponse>) {
   if (req.method === 'POST') {
     const { username, password, avatar, administrator } = req.body;
 
@@ -27,10 +33,14 @@ export async function handler(req: NextApiReq<Body>, res: NextApiRes<ApiUsersIdR
 
     let avatar64 = null;
 
-    if (config.website.defaultAvatar) {
-      avatar64 = (await readFile(config.website.defaultAvatar)).toString('base64');
-    } else if (avatar) {
-      avatar64 = avatar;
+    try {
+      if (config.website.defaultAvatar) {
+        avatar64 = (await readFile(config.website.defaultAvatar)).toString('base64');
+      } else if (avatar) {
+        avatar64 = avatar;
+      }
+    } catch {
+      logger.debug('failed to read default avatar', { path: config.website.defaultAvatar });
     }
 
     const user = await prisma.user.create({
@@ -44,11 +54,22 @@ export async function handler(req: NextApiReq<Body>, res: NextApiRes<ApiUsersIdR
       select: userSelect,
     });
 
+    logger.info(`${req.user.username} created a new user`, {
+      username: user.username,
+      administrator: user.administrator,
+    });
+
     return res.ok(user);
   }
 
   const users = await prisma.user.findMany({
-    select: userSelect,
+    select: {
+      ...userSelect,
+      avatar: true,
+    },
+    where: {
+      ...(req.query.noincl === 'true' && { id: { not: req.user.id } }),
+    },
   });
 
   return res.ok(users);

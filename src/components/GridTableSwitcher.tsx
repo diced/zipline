@@ -7,6 +7,7 @@ export default function GridTableSwitcher({ type }: { type: keyof SettingsStore[
 
   return (
     <SegmentedControl
+      sx={{ marginLeft: 'auto' }}
       size='xs'
       data={[
         {

@@ -1,28 +1,25 @@
+import FileModal from '@/components/file/DashboardFile/FileModal';
+import { copyFile, deleteFile, viewFile } from '@/components/file/actions';
 import { Response } from '@/lib/api/response';
-import { SafeConfig } from '@/lib/config/safe';
-import type { File } from '@/lib/db/models/file';
+import { fileSelect, type File } from '@/lib/db/models/file';
 import { ActionIcon, Box, Group, Tooltip } from '@mantine/core';
+import { useClipboard } from '@mantine/hooks';
+import { notifications } from '@mantine/notifications';
 import type { Prisma } from '@prisma/client';
+import { IconCopy, IconExternalLink, IconFile, IconTrashFilled } from '@tabler/icons-react';
 import bytes from 'bytes';
 import { DataTable } from 'mantine-datatable';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import { useApiPagination } from '../useApiPagination';
-import FileModal from '@/components/file/DashboardFile/FileModal';
-import { useClipboard } from '@mantine/hooks';
-import { IconCopy, IconExternalLink, IconFile, IconTrashFilled } from '@tabler/icons-react';
-import { copyFile, deleteFile, viewFile } from '@/components/file/actions';
-import { notifications } from '@mantine/notifications';
-import { useConfig } from '@/components/ConfigProvider';
+import RelativeDate from '@/components/RelativeDate';
 
 const PER_PAGE_OPTIONS = [10, 20, 50];
 
-export default function FileTable() {
+export default function FileTable({ id }: { id?: string }) {
   const router = useRouter();
   const clipboard = useClipboard();
-
-  const { data: stats, isLoading: statsLoading } = useSWR<Response['/api/user/stats']>('/api/user/stats');
 
   const [page, setPage] = useState<number>(router.query.page ? parseInt(router.query.page as string) : 1);
   const [perpage, setPerpage] = useState<number>(20);
@@ -30,12 +27,13 @@ export default function FileTable() {
   const [order, setOrder] = useState<'asc' | 'desc'>('desc');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const { pages } = useApiPagination({
+  const { data, isLoading } = useApiPagination({
     page,
     perpage,
     filter: 'all',
     sort,
     order,
+    id,
   });
 
   useEffect(() => {
@@ -68,7 +66,7 @@ export default function FileTable() {
           borderRadius='sm'
           withBorder
           minHeight={200}
-          records={pages.data}
+          records={data?.page ?? []}
           columns={[
             { accessor: 'name', sortable: true },
             { accessor: 'type', sortable: true },
@@ -76,7 +74,12 @@ export default function FileTable() {
             {
               accessor: 'createdAt',
               sortable: true,
-              render: (file) => new Date(file.createdAt).toLocaleString(),
+              render: (file) => <RelativeDate date={file.createdAt} />,
+            },
+            {
+              accessor: 'favorite',
+              sortable: true,
+              render: (file) => (file.favorite ? 'Yes' : 'No')
             },
             {
               accessor: 'actions',
@@ -132,8 +135,8 @@ export default function FileTable() {
               ),
             },
           ]}
-          fetching={pages.isLoading || statsLoading}
-          totalRecords={stats?.filesUploaded ?? 0}
+          fetching={isLoading}
+          totalRecords={data?.total ?? 0}
           recordsPerPage={perpage}
           onRecordsPerPageChange={setPerpage}
           recordsPerPageOptions={PER_PAGE_OPTIONS}

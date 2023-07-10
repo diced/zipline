@@ -10,6 +10,7 @@ type ApiPaginationOptions = {
   favorite?: boolean;
   sort?: keyof Prisma.FileOrderByWithRelationInput;
   order?: 'asc' | 'desc';
+  id?: string;
 };
 
 const fetcher = async (
@@ -26,6 +27,7 @@ const fetcher = async (
   if (options.perpage) searchParams.append('perpage', options.perpage.toString());
   if (options.sort) searchParams.append('sortBy', options.sort);
   if (options.order) searchParams.append('order', options.order);
+  if (options.id) searchParams.append('id', options.id);
 
   const res = await fetch(`/api/user/files${searchParams.toString() ? `?${searchParams.toString()}` : ''}`);
 
@@ -43,29 +45,15 @@ export function useApiPagination(
     page: 1,
   }
 ) {
-  const { data, error, isLoading, mutate } = useSWR<Extract<Response['/api/user/files'], File[]>>(
+    const { data, error, isLoading, mutate } = useSWR<Response['/api/user/files']>(
     { key: `/api/user/files`, options },
     fetcher
   );
-  const {
-    data: pagesCount,
-    error: pagesCountError,
-    isLoading: pagesCountLoading,
-    mutate: pagesCountMutate,
-  } = useSWR<Extract<Response['/api/user/files'], { count: number }>>(`/api/user/files?pagecount=true`);
 
   return {
-    pages: {
-      data,
-      error,
-      isLoading,
-      mutate,
-    },
-    pagesCount: {
-      data: pagesCount,
-      error: pagesCountError,
-      isLoading: pagesCountLoading,
-      mutate: pagesCountMutate,
-    },
+    data,
+    error,
+    isLoading,
+    mutate,
   };
 }

@@ -6,12 +6,23 @@ export function withSafeConfig<T = {}>(
 ): GetServerSideProps<
   T & {
     config: SafeConfig;
+    notFound?: boolean;
   }
 > {
   return async (ctx) => {
     const config = safeConfig();
     const data = await fn(ctx);
 
-    return { props: { ...data, config } };
+    if ((data as any) && (data as any).notFound)
+      return {
+        notFound: true,
+      };
+
+    return {
+      props: {
+        config,
+        ...data,
+      },
+    };
   };
 }

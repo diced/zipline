@@ -7,23 +7,20 @@ import { NextApiReq, NextApiRes } from '@/lib/response';
 import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 
-export type ApiUserFilesResponse =
-  | File[]
-  | {
-      count: number;
-    }
-  | {
-      totalCount: number;
-    };
+export type ApiUserFilesResponse = {
+  page: File[];
+  total: number;
+  pages: number;
+};
 
 type Query = {
   page?: string;
   perpage?: string;
-  pagecount?: string;
   filter?: 'dashboard' | 'none' | 'all';
   favorite?: 'true' | 'false';
   sortBy: keyof Prisma.FileOrderByWithRelationInput;
   order: 'asc' | 'desc';
+  id?: string;
 };
 
 const validateSortBy = z
@@ -44,18 +41,23 @@ const validateSortBy = z
 const validateOrder = z.enum(['asc', 'desc']).default('desc');
 
 export async function handler(req: NextApiReq<any, Query>, res: NextApiRes<ApiUserFilesResponse>) {
+  if (req.query.id && !req.user.administrator) return res.forbidden("You cannot view another user's files");
+
+  const user = await prisma.user.findUnique({
+    where: {
+      id: req.query.id ?? req.user.id,
+    },
+  });
+  if (!user) return res.notFound('User not found');
+
   const perpage = Number(req.query.perpage || '9');
   if (isNaN(Number(perpage))) return res.badRequest('Perpage must be a number');
 
-  if (req.query.pagecount) {
-    const count = await prisma.file.count({
-      where: {
-        userId: req.user.id,
-      },
-    });
-
-    return res.ok({ count: Math.ceil(count / perpage) });
-  }
+  const count = await prisma.file.count({
+    where: {
+      userId: user.id,
+    },
+  });
 
   const { page, filter, favorite } = req.query;
   if (!page) return res.badRequest('Page is required');
@@ -70,7 +72,7 @@ export async function handler(req: NextApiReq<any, Query>, res: NextApiRes<ApiUs
   const files = cleanFiles(
     await prisma.file.findMany({
       where: {
-        userId: req.user.id,
+        userId: user.id,
         ...(filter === 'dashboard' && {
           OR: [
             {
@@ -104,7 +106,11 @@ export async function handler(req: NextApiReq<any, Query>, res: NextApiRes<ApiUs
     })
   );
 
-  return res.ok(files);
+  return res.ok({
+    page: files,
+    total: count,
+    pages: Math.ceil(count / perpage),
+  });
 }
 
 export default combine([method(['GET']), ziplineAuth()], handler);

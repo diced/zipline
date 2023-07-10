@@ -1,5 +1,5 @@
+import { useConfig } from '@/components/ConfigProvider';
 import DashboardFile from '@/components/file/DashboardFile';
-import { SafeConfig } from '@/lib/config/safe';
 import {
   Accordion,
   Button,
@@ -14,10 +14,9 @@ import {
 } from '@mantine/core';
 import { IconFileUpload, IconFilesOff } from '@tabler/icons-react';
 import Link from 'next/link';
-import { useApiPagination } from '../useApiPagination';
-import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { useConfig } from '@/components/ConfigProvider';
+import { useEffect, useState } from 'react';
+import { useApiPagination } from '../useApiPagination';
 
 export default function FavoriteFiles() {
   const router = useRouter();
@@ -26,7 +25,7 @@ export default function FavoriteFiles() {
   const [page, setPage] = useState<number>(
     router.query.favoritePage ? parseInt(router.query.favoritePage as string) : 1
   );
-  const { pages, pagesCount } = useApiPagination({
+  const { data, isLoading } = useApiPagination({
     page,
     favorite: true,
     filter: 'dashboard',
@@ -45,7 +44,7 @@ export default function FavoriteFiles() {
     );
   }, [page]);
 
-  if (!pages.isLoading && pages.data?.length === 0) return null;
+  if (!isLoading && data?.page.length === 0) return null;
 
   return (
     <>
@@ -56,7 +55,7 @@ export default function FavoriteFiles() {
             <Accordion.Panel>
               <SimpleGrid
                 my='sm'
-                cols={pages.data?.length ?? 0 > 0 ? 3 : 1}
+                cols={data?.page.length ?? 0 > 0 ? 3 : 1}
                 spacing='md'
                 breakpoints={[
                   { maxWidth: 'sm', cols: 1 },
@@ -64,12 +63,12 @@ export default function FavoriteFiles() {
                 ]}
                 pos='relative'
               >
-                {pages.isLoading ? (
+                {isLoading ? (
                   <Paper withBorder h={200}>
                     <LoadingOverlay visible />
                   </Paper>
-                ) : pages.data?.length ?? 0 > 0 ? (
-                  pages.data?.map((file) => (
+                ) : data?.page.length ?? 0 > 0 ? (
+                  data?.page.map((file) => (
                     <DashboardFile
                       disableMediaPreview={config?.website.disableMediaPreview ?? false}
                       key={file.id}
@@ -101,7 +100,7 @@ export default function FavoriteFiles() {
               </SimpleGrid>
 
               <Center>
-                <Pagination my='sm' value={page} onChange={setPage} total={pagesCount.data?.count ?? 1} />
+                <Pagination my='sm' value={page} onChange={setPage} total={data?.pages ?? 1} />
               </Center>
             </Accordion.Panel>
           </Accordion.Control>

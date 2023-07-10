@@ -1,13 +1,9 @@
 import { verifyPassword } from '@/lib/crypto';
-import { datasource } from '@/lib/datasource';
 import { prisma } from '@/lib/db';
-import { File, fileSelect } from '@/lib/db/models/file';
 import { log } from '@/lib/logger';
 import { combine } from '@/lib/middleware/combine';
 import { method } from '@/lib/middleware/method';
-import { ziplineAuth } from '@/lib/middleware/ziplineAuth';
 import { NextApiReq, NextApiRes } from '@/lib/response';
-import bytes from 'bytes';
 
 export type ApiUserFilesIdPasswordResponse = {
   success: boolean;
@@ -25,6 +21,7 @@ export async function handler(req: NextApiReq<Body>, res: NextApiRes<ApiUserFile
       OR: [{ id: req.query.id }, { name: req.query.id }],
     },
     select: {
+      name: true,
       password: true,
     },
   });
@@ -33,6 +30,8 @@ export async function handler(req: NextApiReq<Body>, res: NextApiRes<ApiUserFile
 
   const verified = await verifyPassword(req.body.password, file.password);
   if (!verified) return res.forbidden('Incorrect password');
+
+  logger.info(`${file.name} was accessed with the correct password`, { ua: req.headers['user-agent'] });
 
   return res.ok({ success: true });
 }
