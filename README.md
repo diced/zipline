@@ -35,16 +35,8 @@ A ShareX/file upload server that is easy to use, packed with features, and with 
 - User invites
 - File Chunking (for large files)
 - File deletion once it reaches a certain amount of views
+- Automatic video thumbnail generation
 - Easy setup instructions on [docs](https://zipl.vercel.app/) (One command install `docker compose up -d`)
-
-<details>
-  <summary>View upstream documentation</summary>
-
-The website below provides documentation for more up-to-date features with the upstream branch. The normal documentation is for the latest release and is not updated unless a new release is made.
-
-[https://trunk.zipline.diced.tech/](https://trunk.zipline.diced.tech/)
-
-</details>
 
 <details>
   <summary><h2>Screenshots (click)</h2></summary>
@@ -76,17 +68,18 @@ Ways you could generate the string could be from a password managers generator, 
 
 ## Building & running from source
 
-This section requires [nodejs](https://nodejs.org), [yarn](https://yarnpkg.com/) or [npm](https://npmjs.com).
+This section requires [nodejs](https://nodejs.org), [yarn](https://yarnpkg.com/).
+
+It is recommended to not use npm, as it can cause issues with the build process.
+
+Before you run `yarn build`, you might want to configure Zipline, as when building from source Zipline will need to read some sort of configuration. The only two variables needed are `CORE_SECRET` and `CORE_DATABASE_URL`.
 
 ```shell
 git clone https://github.com/diced/zipline
 cd zipline
 
-# npm install
 yarn install
-# npm run build
 yarn build
-# npm start
 yarn start
 ```
 
@@ -119,7 +112,7 @@ This section requires [ShareX](https://www.getsharex.com/).
 
 After navigating to Zipline, click on the top right corner where it says your username and click Manage Account. Scroll down to see "ShareX Config", select the one you would prefer using. After this you can import the .sxcu into sharex. [More information here](https://zipl.vercel.app/docs/guides/uploaders/sharex)
 
-# Flameshot (Linux)
+# Flameshot (Linux(Xorg/Wayland) and macOS)
 
 This section requires [Flameshot](https://www.flameshot.org/), [jq](https://stedolan.github.io/jq/), and [xsel](https://github.com/kfish/xsel).
 
@@ -131,6 +124,13 @@ If using wayland you will need to have [wl-clipboard](https://github.com/bugaevc
 If you are not using GNOME/KDE/Qtile/Sway, and are using something like a wlroots-based compositor (ex. [Hyprland](https://github.com/hyprwm/Hyprland/), [River](https://github.com/riverwm/river), etc), you will need to set the `XDG_CURRENT_DESKTOP` environment variable to `sway`, which will just override it for this script. Adding `export XDG_CURRENT_DESKTOP=sway` to the start of the script will work.
 
 After this, replace the `xsel -ib` with `wl-copy` in the script.
+
+</details>
+
+<details>
+  <summary>Mac instructions</summary>
+
+If using macOS, you can replace the `xsel -ib` with `pbcopy` in the script.
 
 </details>
 
@@ -166,3 +166,7 @@ Create a discussion on GitHub, please include the following:
 ## Pull Requests (contributions to the codebase)
 
 Create a pull request on GitHub. If your PR does not pass the action checks, then please fix the errors. If your PR was submitted before a release, and I have pushed a new release, please make sure to update your PR to reflect any changes, usually this is handled by GitHub.
+
+# Documentation
+
+Documentation source code is located in [diced/zipline-docs](https://github.com/diced/zipline-docs), and can be accessed [here](https://zipl.vercel.app).
