@@ -1,4 +1,5 @@
 import type { File, User, Url } from '@prisma/client';
+import { bytesToHuman } from './bytes';
 
 export type ParseValue = {
   file?: File;
@@ -32,6 +33,7 @@ export function parseString(str: string, value: ParseValue) {
       re.lastIndex = matches.index;
       continue;
     }
+
     if (['originalName', 'name'].includes(matches.groups.prop)) {
       str = replaceCharsFromString(
         str,
@@ -125,6 +127,8 @@ function modifier(mod: string, value: unknown): string {
         return value.toString(8);
       case 'binary':
         return value.toString(2);
+      case 'bytes':
+        return bytesToHuman(value);
       default:
         return '{unknown_int_modifier}';
     }
