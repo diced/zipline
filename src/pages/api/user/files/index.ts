@@ -48,7 +48,7 @@ export async function handler(req: NextApiReq<any, Query>, res: NextApiRes<ApiUs
     },
   });
 
-  if (user && !canInteract(req.user.role, user.role))
+  if (user && user.id !== req.user.id && !canInteract(req.user.role, user.role))
     return res.forbidden("You can't view this user's files.");
 
   if (!user) return res.notFound('User not found');

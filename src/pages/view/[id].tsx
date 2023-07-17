@@ -112,8 +112,8 @@ export default function ViewFile({
       </Paper>
     </>
   ) : (
-    <Center h='100vh'>
-      <Paper p='md' shadow='md' radius='md' withBorder>
+    <Center h='100%'>
+      <Paper m='md' p='md' shadow='md' radius='md' withBorder>
         <Group position='apart' mb='sm'>
           <Text size='lg' weight={700} sx={{ display: 'flex' }}>
             {file.name}
