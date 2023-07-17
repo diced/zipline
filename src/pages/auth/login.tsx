@@ -1,35 +1,30 @@
+import { Response } from '@/lib/api/response';
+import { config } from '@/lib/config';
+import { getZipline } from '@/lib/db/models/zipline';
+import { fetchApi } from '@/lib/fetchApi';
+import { withSafeConfig } from '@/lib/middleware/next/withSafeConfig';
+import { eitherTrue, isTruthy } from '@/lib/primitive';
 import {
-  Box,
   Button,
   Center,
-  Group,
-  LoadingOverlay,
   PasswordInput,
   Stack,
   Text,
   TextInput,
-  Title,
-  useMantineTheme,
+  Title
 } from '@mantine/core';
-import useSWR from 'swr';
-import useSWRImmutable from 'swr/immutable';
-import { Response } from '@/lib/api/response';
-import { useRouter } from 'next/router';
-import { useEffect } from 'react';
+import { hasLength, useForm } from '@mantine/form';
 import {
+  IconBrandDiscordFilled,
   IconBrandGithubFilled,
   IconBrandGoogle,
-  IconBrandDiscordFilled,
-  IconCircleKeyFilled,
-  Icon as TIcon,
+  IconCircleKeyFilled
 } from '@tabler/icons-react';
-import { hasLength, useForm } from '@mantine/form';
-import { fetchApi } from '@/lib/fetchApi';
-import { withSafeConfig } from '@/lib/middleware/next/withSafeConfig';
-import { config } from '@/lib/config';
-import { eitherTrue, isTruthy } from '@/lib/primitive';
 import { InferGetServerSidePropsType } from 'next';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useEffect } from 'react';
+import useSWR from 'swr';
 
 export default function Login({
   config,
@@ -195,6 +190,16 @@ export default function Login({
 }
 
 export const getServerSideProps = withSafeConfig(async () => {
+  const { firstSetup } = await getZipline();
+
+  if (firstSetup)
+    return {
+      redirect: {
+        destination: '/setup',
+        permanent: false,
+      },
+    };
+
   const discordEnabled = isTruthy(
     config.oauth?.discord?.clientId,
     config.oauth?.discord?.clientSecret,

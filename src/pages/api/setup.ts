@@ -33,8 +33,6 @@ export async function handler(req: NextApiReq<Body>, res: NextApiRes<ApiSetupRes
   if (!username) return res.badRequest('Username is required');
   if (!password) return res.badRequest('Password is required');
 
-  if (password.length < 8) return res.badRequest('Password must be at least 8 characters long');
-
   const user = await prisma.user.create({
     data: {
       username,

@@ -18,6 +18,11 @@ export function withSafeConfig<T = {}>(
         notFound: true,
       };
 
+    if ((data as any) && (data as any).redirect)
+      return {
+        redirect: (data as any).redirect,
+      };
+
     return {
       props: {
         config,
