@@ -24,7 +24,7 @@ model User {
   password      String?
   avatar        String?
   token         String  @unique
-  administrator Boolean @default(false)
+  role  Role @default(USER)
 
   files          File[]
   urls           Url[]
@@ -33,6 +33,12 @@ model User {
   invites        Invite[]
   oauthProviders OAuthProvider[]
   IncompleteFile IncompleteFile[]
+}
+
+enum Role {
+  USER
+  ADMIN
+  SUPERADMIN
 }
 
 model OAuthProvider {

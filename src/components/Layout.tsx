@@ -42,6 +42,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import ConfigProvider from './ConfigProvider';
+import { isAdministrator } from '@/lib/role';
 
 type NavLinks = {
   label: string;
@@ -93,7 +94,7 @@ const navLinks: NavLinks[] = [
   {
     label: 'Administrator',
     icon: <IconShieldLockFilled size='1rem' />,
-    if: (user) => user?.administrator || false,
+    if: (user) => isAdministrator(user?.role),
     active: (path: string) => path.startsWith('/dashboard/admin'),
     links: [
       {
@@ -219,7 +220,6 @@ export default function Layout({ children, config }: { children: React.ReactNode
                     icon={link.icon}
                     variant='light'
                     rightSection={<IconChevronRight size='0.7rem' />}
-                    active={router.pathname === link.href}
                     defaultOpened={link.active(router.pathname)}
                   >
                     {link.links.map((sublink) => (
@@ -229,7 +229,7 @@ export default function Layout({ children, config }: { children: React.ReactNode
                         icon={sublink.icon}
                         rightSection={<IconChevronRight size='0.7rem' />}
                         variant='light'
-                        active={router.pathname === link.href}
+                        active={router.pathname === sublink.href}
                         component={Link}
                         href={sublink.href || ''}
                       />
@@ -289,13 +289,13 @@ export default function Layout({ children, config }: { children: React.ReactNode
                 <Menu.Dropdown>
                   <Menu.Label>
                     {user?.username}
-                    {user?.administrator ? ' (Administrator)' : ''}
+                    {isAdministrator(user?.role) ? ' (Administrator)' : ''}
                   </Menu.Label>
 
                   <Menu.Item icon={<IconClipboardCopy size='1rem' />} onClick={copyToken}>
                     Copy token
                   </Menu.Item>
-                  <Menu.Item icon={<IconRefreshDot size='1rem' />} onClick={refreshToken}>
+                  <Menu.Item color='red' icon={<IconRefreshDot size='1rem' />} onClick={refreshToken}>
                     Refresh token
                   </Menu.Item>
                   <Menu.Divider />
@@ -309,7 +309,12 @@ export default function Layout({ children, config }: { children: React.ReactNode
                   </Menu.Item>
 
                   <Menu.Divider />
-                  <Menu.Item icon={<IconLogout size='1rem' />} component={Link} href='/auth/logout'>
+                  <Menu.Item
+                    color='red'
+                    icon={<IconLogout size='1rem' />}
+                    component={Link}
+                    href='/auth/logout'
+                  >
                     Logout
                   </Menu.Item>
                 </Menu.Dropdown>

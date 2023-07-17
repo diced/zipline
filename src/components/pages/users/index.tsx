@@ -10,6 +10,7 @@ import {
   Group,
   Modal,
   PasswordInput,
+  Select,
   Stack,
   Switch,
   TextInput,
@@ -24,21 +25,24 @@ import { mutate } from 'swr';
 import UserGridView from './views/UserGridView';
 import UserTableView from './views/UserTableView';
 import { readToDataURL } from '@/lib/readToDataURL';
+import { canInteract } from '@/lib/role';
+import { useUserStore } from '@/lib/store/user';
 
 export default function DashboardUsers() {
+  const currentUser = useUserStore((state) => state.user);
   const view = useSettingsStore((state) => state.view.users);
   const [open, setOpen] = useState(false);
 
   const form = useForm<{
     username: string;
     password: string;
-    administrator: boolean;
+    role: 'USER' | 'ADMIN' | 'SUPERADMIN';
     avatar: File | null;
   }>({
     initialValues: {
       username: '',
       password: '',
-      administrator: false,
+      role: 'USER',
       avatar: null,
     },
     validate: {
@@ -65,7 +69,7 @@ export default function DashboardUsers() {
     const { data, error } = await fetchApi<Extract<Response['/api/users'], User>>('/api/users', 'POST', {
       username: values.username,
       password: values.password,
-      administrator: values.administrator ?? false,
+      role: values.role ?? 'USER',
       ...(avatar64 ? { avatar: avatar64 } : {}),
     });
 
@@ -122,10 +126,19 @@ export default function DashboardUsers() {
               }
               {...form.getInputProps('avatar')}
             />
-            <Switch
-              label='Administrator'
-              color='red'
-              {...form.getInputProps('administrator', { type: 'checkbox' })}
+
+            <Select
+              label='Role'
+              defaultValue={'USER'}
+              data={[
+                { value: 'USER', label: 'User' },
+                {
+                  value: 'ADMIN',
+                  label: 'Administrator',
+                  disabled: !canInteract(currentUser?.role, 'ADMIN'),
+                },
+              ]}
+              {...form.getInputProps('role')}
             />
 
             <Button

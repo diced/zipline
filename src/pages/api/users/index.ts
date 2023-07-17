@@ -7,7 +7,10 @@ import { combine } from '@/lib/middleware/combine';
 import { method } from '@/lib/middleware/method';
 import { ziplineAuth } from '@/lib/middleware/ziplineAuth';
 import { NextApiReq, NextApiRes } from '@/lib/response';
+import { canInteract } from '@/lib/role';
+import { Role } from '@prisma/client';
 import { readFile } from 'fs/promises';
+import z from 'zod';
 
 export type ApiUsersResponse = User[] | User;
 
@@ -19,14 +22,14 @@ type Body = {
   username?: string;
   password?: string;
   avatar?: string;
-  administrator?: boolean;
+  role?: Role;
 };
 
 const logger = log('api').c('users');
 
 export async function handler(req: NextApiReq<Body, Query>, res: NextApiRes<ApiUsersResponse>) {
   if (req.method === 'POST') {
-    const { username, password, avatar, administrator } = req.body;
+    const { username, password, avatar, role } = req.body;
 
     if (!username) return res.badRequest('Username is required');
     if (!password) return res.badRequest('Password is required');
@@ -43,11 +46,16 @@ export async function handler(req: NextApiReq<Body, Query>, res: NextApiRes<ApiU
       logger.debug('failed to read default avatar', { path: config.website.defaultAvatar });
     }
 
+    if (role && !z.enum(['USER', 'ADMIN']).safeParse(role).success)
+      return res.badRequest('Invalid role (USER, ADMIN)');
+
+    if (role && !canInteract(req.user.role, role)) return res.forbidden('You cannot create this role');
+
     const user = await prisma.user.create({
       data: {
         username,
         password: await hashPassword(password),
-        administrator: administrator ?? false,
+        role: role ?? 'USER',
         avatar: avatar64 ?? null,
         token: createToken(),
       },
@@ -56,7 +64,7 @@ export async function handler(req: NextApiReq<Body, Query>, res: NextApiRes<ApiU
 
     logger.info(`${req.user.username} created a new user`, {
       username: user.username,
-      administrator: user.administrator,
+      role: user.role,
     });
 
     return res.ok(user);

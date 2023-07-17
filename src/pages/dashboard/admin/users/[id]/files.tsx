@@ -4,6 +4,8 @@ import { prisma } from '@/lib/db';
 import { User, userSelect } from '@/lib/db/models/user';
 import useLogin from '@/lib/hooks/useLogin';
 import { withSafeConfig } from '@/lib/middleware/next/withSafeConfig';
+import { parseUserToken } from '@/lib/middleware/ziplineAuth';
+import { canInteract } from '@/lib/role';
 import { LoadingOverlay } from '@mantine/core';
 import { InferGetServerSidePropsType } from 'next';
 
@@ -30,10 +32,38 @@ export const getServerSideProps = withSafeConfig(async (ctx) => {
     select: {
       id: true,
       username: true,
+      role: true,
     },
   });
-  // if (!user) return { notFound: true };
-  // if (!user.administrator) return { notFound: true };
+
+  try {
+    var currentUserToken = parseUserToken(ctx.req.cookies['zipline_token']);
+  } catch (e) {
+    return {
+      notFound: true,
+    };
+  }
+
+  const currentUser = await prisma.user.findUnique({
+    where: {
+      token: currentUserToken,
+    },
+    select: {
+      id: true,
+      username: true,
+      role: true,
+    },
+  });
+
+  if (!currentUser)
+    return {
+      notFound: true,
+    };
+
+  if (!canInteract(currentUser.role, user?.role))
+    return {
+      notFound: true,
+    };
 
   return {
     user: user as User,

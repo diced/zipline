@@ -2,12 +2,15 @@ import { Response } from '@/lib/api/response';
 import { User } from '@/lib/db/models/user';
 import { fetchApi } from '@/lib/fetchApi';
 import { readToDataURL } from '@/lib/readToDataURL';
+import { canInteract } from '@/lib/role';
+import { useUserStore } from '@/lib/store/user';
 import {
   ActionIcon,
   Button,
   FileInput,
   Modal,
   PasswordInput,
+  Select,
   Stack,
   Switch,
   Text,
@@ -29,16 +32,18 @@ export default function EditUserModal({
   opened: boolean;
   onClose: () => void;
 }) {
+  const currentUser = useUserStore((state) => state.user);
+
   const form = useForm<{
     username: string;
     password: string;
-    administrator: boolean;
+    role: 'USER' | 'ADMIN' | 'SUPERADMIN';
     avatar: File | null;
   }>({
     initialValues: {
       username: user.username,
       password: '',
-      administrator: user.administrator,
+      role: user.role,
       avatar: null,
     },
   });
@@ -61,7 +66,7 @@ export default function EditUserModal({
     const { data, error } = await fetchApi<Response['/api/users/[id]']>(`/api/users/${user.id}`, 'PATCH', {
       ...(values.username !== user.username && { username: values.username }),
       ...(values.password && { password: values.password }),
-      ...(values.administrator !== user.administrator && { administrator: values.administrator }),
+      ...(values.role !== user.role && { role: values.role }),
       ...(avatar64 && { avatar: avatar64 }),
     });
 
@@ -117,10 +122,15 @@ export default function EditUserModal({
             }
             {...form.getInputProps('avatar')}
           />
-          <Switch
-            label='Administrator'
-            color='red'
-            {...form.getInputProps('administrator', { type: 'checkbox' })}
+
+          <Select
+            label='Role'
+            defaultValue={user.role}
+            data={[
+              { value: 'USER', label: 'User' },
+              { value: 'ADMIN', label: 'Administrator', disabled: !canInteract(currentUser?.role, 'ADMIN') },
+            ]}
+            {...form.getInputProps('role')}
           />
 
           <Button

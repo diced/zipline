@@ -1,18 +1,18 @@
 import { User } from '@/lib/db/models/user';
 import { ActionIcon, Avatar, Card, Group, Menu, Stack, Text } from '@mantine/core';
 import { useUserStore } from '@/lib/store/user';
-import { IconDots, IconTrashFilled, IconUserEdit } from '@tabler/icons-react';
+import { IconDots, IconFiles, IconTrashFilled, IconUserEdit } from '@tabler/icons-react';
 import EditUserModal from './EditUserModal';
-import { useState } from 'react';
+import { forwardRef, useState } from 'react';
 import { deleteUser } from './actions';
 import RelativeDate from '@/components/RelativeDate';
+import { canInteract, isAdministrator, roleName } from '@/lib/role';
+import Link from 'next/link';
 
 export default function UserCard({ user }: { user: User }) {
   const currentUser = useUserStore((state) => state.user);
 
   const [opened, setOpen] = useState(false);
-
-  if (currentUser?.id === user.id) return null;
 
   return (
     <>
@@ -23,7 +23,7 @@ export default function UserCard({ user }: { user: User }) {
           <Group position='apart'>
             <Group>
               <Avatar
-                color={user.administrator ? 'red' : 'gray'}
+                color={isAdministrator(user.role) ? 'red' : 'gray'}
                 size='md'
                 radius='md'
                 src={user.avatar ?? null}
@@ -40,22 +40,33 @@ export default function UserCard({ user }: { user: User }) {
             </Group>
 
             <Menu withinPortal position='bottom-end' shadow='sm'>
-              <Menu.Target>
-                <ActionIcon>
-                  <IconDots size='1rem' />
+              <Group spacing={2}>
+                <ActionIcon
+                  variant={canInteract(currentUser?.role, user?.role) ? 'subtle' : 'transparent'}
+                  component={Link}
+                  href={`/dashboard/admin/users/${user.id}/files`}
+                  disabled={!canInteract(currentUser?.role, user?.role)}
+                >
+                  <IconFiles size='1rem' />
                 </ActionIcon>
-              </Menu.Target>
+
+                <Menu.Target>
+                  <ActionIcon>
+                    <IconDots size='1rem' />
+                  </ActionIcon>
+                </Menu.Target>
+              </Group>
 
               <Menu.Dropdown>
                 <Menu.Item
-                  disabled={user.administrator}
+                  disabled={!canInteract(currentUser?.role, user?.role)}
                   icon={<IconUserEdit size='1rem' />}
                   onClick={() => setOpen(true)}
                 >
                   Edit
                 </Menu.Item>
                 <Menu.Item
-                  disabled={user.administrator}
+                  disabled={!canInteract(currentUser?.role, user?.role)}
                   icon={<IconTrashFilled size='1rem' />}
                   color='red'
                   onClick={() => deleteUser(user)}
@@ -70,7 +81,7 @@ export default function UserCard({ user }: { user: User }) {
         <Card.Section inheritPadding py='xs'>
           <Stack spacing={1}>
             <Text size='xs' color='dimmed'>
-              <b>Administrator:</b> {user.administrator ? 'Yes' : 'No'}
+              <b>Role:</b> {roleName(user.role)}
             </Text>
             <Text size='xs' color='dimmed'>
               <b>Created:</b> <RelativeDate date={user.createdAt} />

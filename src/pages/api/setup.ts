@@ -39,11 +39,11 @@ export async function handler(req: NextApiReq<Body>, res: NextApiRes<ApiSetupRes
     data: {
       username,
       password: await hashPassword(password),
-      administrator: true,
+      role: 'SUPERADMIN',
       token: createToken(),
     },
     select: {
-      administrator: true,
+      role: true,
       id: true,
       createdAt: true,
       updatedAt: true,

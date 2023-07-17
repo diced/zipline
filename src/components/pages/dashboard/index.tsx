@@ -32,7 +32,7 @@ export default function DashboardHome() {
         <Paper withBorder p='md' radius='md' pos='relative' h={300}>
           <LoadingOverlay visible />
         </Paper>
-      ) : (
+      ) : recent?.length !== 0 ? (
         <SimpleGrid cols={3} spacing='md' breakpoints={[{ maxWidth: 'sm', cols: 1, spacing: 'sm' }]}>
           {recent!.map((file) => (
             <DashboardFile
@@ -42,6 +42,10 @@ export default function DashboardHome() {
             />
           ))}
         </SimpleGrid>
+      ) : (
+        <Text size='sm' color='dimmed'>
+          You have no recent files. The last three files you uploaded will appear here.
+        </Text>
       )}
 
       <Title order={2} mt='md'>
@@ -76,28 +80,32 @@ export default function DashboardHome() {
             <Stat Icon={IconLink} title='Links created' value={stats!.urlsCreated} />
           </SimpleGrid>
 
-          <Title order={3} mt='lg' mb='xs'>
-            File types
-          </Title>
+          {Object.keys(stats!.sortTypeCount).length !== 0 && (
+            <>
+              <Title order={3} mt='lg' mb='xs'>
+                File types
+              </Title>
 
-          <Paper radius='sm' withBorder>
-            <Table>
-              <thead>
-                <tr>
-                  <th>Type</th>
-                  <th>Count</th>
-                </tr>
-              </thead>
-              <tbody>
-                {Object.entries(stats!.sortTypeCount).map(([type, count]) => (
-                  <tr key={type}>
-                    <td>{type}</td>
-                    <td>{count}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-          </Paper>
+              <Paper radius='sm' withBorder>
+                <Table highlightOnHover>
+                  <thead>
+                    <tr>
+                      <th>File Type</th>
+                      <th>Count</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {Object.entries(stats!.sortTypeCount).map(([type, count]) => (
+                      <tr key={type}>
+                        <td>{type}</td>
+                        <td>{count}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              </Paper>
+            </>
+          )}
         </>
       )}
     </>

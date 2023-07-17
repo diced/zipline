@@ -7,6 +7,8 @@ import { combine } from '@/lib/middleware/combine';
 import { method } from '@/lib/middleware/method';
 import { ziplineAuth } from '@/lib/middleware/ziplineAuth';
 import { NextApiReq, NextApiRes } from '@/lib/response';
+import { canInteract } from '@/lib/role';
+import { z } from 'zod';
 
 export type ApiUsersIdResponse = User;
 
@@ -14,7 +16,7 @@ type Body = {
   username?: string;
   password?: string;
   avatar?: string;
-  administrator?: boolean;
+  role?: 'USER' | 'ADMIN' | 'SUPERADMIN';
 
   delete?: boolean;
 };
@@ -35,7 +37,12 @@ export async function handler(req: NextApiReq<Body, Query>, res: NextApiRes<ApiU
   if (!user) return res.notFound('User not found');
 
   if (req.method === 'PATCH') {
-    const { username, password, avatar, administrator } = req.body;
+    const { username, password, avatar, role } = req.body;
+
+    if (role && !z.enum(['USER', 'ADMIN']).safeParse(role).success)
+      return res.badRequest('Invalid role (USER, ADMIN)');
+
+    if (role && !canInteract(req.user.role, role)) return res.forbidden('You cannot create this role');
 
     const updatedUser = await prisma.user.update({
       where: {
@@ -44,7 +51,7 @@ export async function handler(req: NextApiReq<Body, Query>, res: NextApiRes<ApiU
       data: {
         ...(username && { username }),
         ...(password && { password: await hashPassword(password) }),
-        ...(administrator !== undefined && { administrator }),
+        ...(role !== undefined && { role: 'USER' }),
         ...(avatar && { avatar }),
       },
       select: userSelect,
@@ -52,12 +59,13 @@ export async function handler(req: NextApiReq<Body, Query>, res: NextApiRes<ApiU
 
     logger.info(`${req.user.username} updated another user`, {
       username: updatedUser.username,
-      administrator: updatedUser.administrator,
+      role: updatedUser.role,
     });
 
     return res.ok(updatedUser);
   } else if (req.method === 'DELETE') {
     if (user.id === req.user.id) return res.forbidden('You cannot delete yourself');
+    if (!canInteract(req.user.role, user.role)) return res.forbidden('You cannot delete this user');
 
     if (req.body.delete) {
       const files = await prisma.file.findMany({
@@ -106,7 +114,7 @@ export async function handler(req: NextApiReq<Body, Query>, res: NextApiRes<ApiU
 
     logger.info(`${req.user.username} deleted another user`, {
       username: deletedUser.username,
-      administrator: deletedUser.administrator,
+      role: deletedUser.role,
     });
 
     return res.ok(deletedUser);

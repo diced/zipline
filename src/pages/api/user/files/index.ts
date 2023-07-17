@@ -4,6 +4,7 @@ import { combine } from '@/lib/middleware/combine';
 import { method } from '@/lib/middleware/method';
 import { ziplineAuth } from '@/lib/middleware/ziplineAuth';
 import { NextApiReq, NextApiRes } from '@/lib/response';
+import { canInteract } from '@/lib/role';
 import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 
@@ -41,13 +42,15 @@ const validateSortBy = z
 const validateOrder = z.enum(['asc', 'desc']).default('desc');
 
 export async function handler(req: NextApiReq<any, Query>, res: NextApiRes<ApiUserFilesResponse>) {
-  if (req.query.id && !req.user.administrator) return res.forbidden("You cannot view another user's files");
-
   const user = await prisma.user.findUnique({
     where: {
       id: req.query.id ?? req.user.id,
     },
   });
+
+  if (user && !canInteract(req.user.role, user.role))
+    return res.forbidden("You can't view this user's files.");
+
   if (!user) return res.notFound('User not found');
 
   const perpage = Number(req.query.perpage || '9');

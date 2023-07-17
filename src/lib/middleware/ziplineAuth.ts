@@ -5,6 +5,7 @@ import { prisma } from '../db';
 import { User, userSelect } from '../db/models/user';
 import { NextApiReq, NextApiRes } from '../response';
 import { Handler } from './combine';
+import { isAdministrator } from '../role';
 
 export type ZiplineAuthOptions = {
   administratorOnly?: boolean;
@@ -17,6 +18,18 @@ declare module 'next' {
   }
 }
 
+export function parseUserToken(encryptedToken?: string): string {
+  if (!encryptedToken) throw { error: 'Unauthorized' };
+
+  const decryptedToken = decryptToken(encryptedToken, config.core.secret);
+  if (!decryptedToken) throw { error: 'could not decrypt token' };
+
+  const [date, token] = decryptedToken;
+  if (isNaN(new Date(date).getTime())) throw { error: 'could not decrypt token date' };
+
+  return token;
+}
+
 export function ziplineAuth(options?: ZiplineAuthOptions) {
   return (handler: Handler) => {
     return async (req: NextApiReq, res: NextApiRes) => {
@@ -25,13 +38,11 @@ export function ziplineAuth(options?: ZiplineAuthOptions) {
       if (req.cookies.zipline_token) rawToken = req.cookies.zipline_token;
       else if (req.headers.authorization) rawToken = req.headers.authorization;
 
-      if (!rawToken) return res.unauthorized();
-
-      const decryptedToken = decryptToken(rawToken, config.core.secret);
-      if (!decryptedToken) return res.unauthorized('could not decrypt token');
-
-      const [date, token] = decryptedToken;
-      if (isNaN(new Date(date).getTime())) return res.unauthorized('could not decrypt token date');
+      try {
+        var token = parseUserToken(rawToken);
+      } catch (e) {
+        return res.unauthorized((e as { error: string }).error);
+      }
 
       const user = await prisma.user.findFirst({
         where: {
@@ -46,7 +57,7 @@ export function ziplineAuth(options?: ZiplineAuthOptions) {
 
       req.user = user;
 
-      if (options?.administratorOnly && !user.administrator) return res.forbidden();
+      if (options?.administratorOnly && !isAdministrator(user.role)) return res.forbidden();
 
       return handler(req, res);
     };
