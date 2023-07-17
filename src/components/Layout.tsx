@@ -5,6 +5,7 @@ import useLogin from '@/lib/hooks/useLogin';
 import { useUserStore } from '@/lib/store/user';
 import {
   AppShell,
+  Avatar,
   Box,
   Burger,
   Button,
@@ -271,14 +272,17 @@ export default function Layout({ children, config }: { children: React.ReactNode
               Zipline
             </Text>
 
-            {/* right aligned Menu */}
             <div style={{ marginLeft: 'auto' }}>
               <Menu shadow='md' width={200}>
                 <Menu.Target>
                   <Button
                     variant='subtle'
                     color='gray'
-                    leftIcon={<IconSettingsFilled size='1.4rem' />}
+                    leftIcon={
+                      <Avatar size='sm' src='/api/user/avatar' radius='sm'>
+                        <IconSettingsFilled size='1.4rem' />
+                      </Avatar>
+                    }
                     rightIcon={<IconChevronDown size='0.7rem' />}
                     size='sm'
                   >
