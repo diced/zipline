@@ -73,13 +73,24 @@ export default function DashboardFileType({
     // @ts-ignore
     return <Placeholder text={`Click to view file ${file.name}`} Icon={icon[type] ?? IconFileUnknown} />;
 
-  if (dbFile && file.password === true)
+  if (dbFile && file.password === true && !show)
     return (
       <Placeholder
         text={`Click to view protected ${file.name}`}
         Icon={IconShieldLockFilled}
         onClick={() => window.open(`/view/${file.name}${password ? `?pw=${password}` : ''}`)}
       />
+    );
+
+  if (dbFile && file.password === true && show)
+    return (
+      <Paper withBorder p='xs' sx={{ cursor: 'pointer' }}>
+        <Placeholder
+          text={`Click to view protected ${file.name}`}
+          Icon={IconShieldLockFilled}
+          onClick={() => window.open(`/view/${file.name}${password ? `?pw=${password}` : ''}`)}
+        />
+      </Paper>
     );
 
   switch (type) {
@@ -131,9 +142,9 @@ export default function DashboardFileType({
         <Placeholder text={`Click to view text ${file.name}`} Icon={IconFileText} />
       );
     default:
-      console.log(show);
       if (dbFile && !show)
         return <Placeholder text={`Click to view file ${file.name}`} Icon={IconFileUnknown} />;
+
       if (dbFile && show)
         return (
           <Paper withBorder p='xs' sx={{ cursor: 'pointer' }}>
