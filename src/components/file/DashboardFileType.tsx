@@ -1,5 +1,5 @@
 import type { File as DbFile } from '@/lib/db/models/file';
-import { Box, Center, Group, Image, Text, UnstyledButton } from '@mantine/core';
+import { Box, Center, Group, Image, Paper, Stack, Text, UnstyledButton } from '@mantine/core';
 import {
   Icon,
   IconFileText,
@@ -17,23 +17,18 @@ import Render from '../render/Render';
 
 function PlaceholderContent({ text, Icon }: { text: string; Icon: Icon }) {
   return (
-    <Group sx={(t) => ({ color: t.colors.dark[2] })}>
+    <Stack align='center'>
       <Icon size={48} />
-      <Text size='md'>{text}</Text>
-    </Group>
+      <Text size='md' align='center'>
+        {text}
+      </Text>
+    </Stack>
   );
 }
 
 function Placeholder({ text, Icon, ...props }: { text: string; Icon: Icon; onClick?: () => void }) {
-  if (props.onClick)
-    return (
-      <Center sx={{ height: '100%', cursor: 'pointer' }} {...props}>
-        <PlaceholderContent text={text} Icon={Icon} />
-      </Center>
-    );
-
   return (
-    <Center sx={{ height: '100%' }} {...props}>
+    <Center sx={{ height: '100%', width: '100%', cursor: 'pointed' }} {...props}>
       <PlaceholderContent text={text} Icon={Icon} />
     </Center>
   );
@@ -136,13 +131,18 @@ export default function DashboardFileType({
         <Placeholder text={`Click to view text ${file.name}`} Icon={IconFileText} />
       );
     default:
-      if (dbFile)
+      console.log(show);
+      if (dbFile && !show)
+        return <Placeholder text={`Click to view file ${file.name}`} Icon={IconFileUnknown} />;
+      if (dbFile && show)
         return (
-          <Placeholder
-            onClick={() => window.open(`/raw/${file.name}${password ? `?pw=${password}` : ''}`)}
-            text={`Click to view file ${file.name}`}
-            Icon={IconFileUnknown}
-          />
+          <Paper withBorder p='xs' sx={{ cursor: 'pointer' }}>
+            <Placeholder
+              onClick={() => window.open(`/raw/${file.name}${password ? `?pw=${password}` : ''}`)}
+              text={`Click to view file ${file.name} in a new tab`}
+              Icon={IconFileUnknown}
+            />
+          </Paper>
         );
       else return <IconFileUnknown size={48} />;
   }
