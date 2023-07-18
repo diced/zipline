@@ -1,8 +1,9 @@
 import { Response } from '@/lib/api/response';
 import { ErrorBody } from '@/lib/response';
+import { UploadOptionsStore, useUploadOptionsStore } from '@/lib/store/uploadOptions';
 import { ActionIcon, Anchor, Group, Stack, Table, Title, Tooltip } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
-import { useModals } from '@mantine/modals';
+import { modals, useModals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import { IconClipboardCopy, IconExternalLink, IconFileUpload, IconFileXFilled } from '@tabler/icons-react';
 import Link from 'next/link';
@@ -10,11 +11,11 @@ import Link from 'next/link';
 export function filesModal(
   files: Response['/api/upload']['files'],
   {
-    modals,
     clipboard,
+    clearEphemeral,
   }: {
-    modals: ReturnType<typeof useModals>;
     clipboard: ReturnType<typeof useClipboard>;
+    clearEphemeral: () => void;
   }
 ) {
   const open = (idx: number) => window.open(files[idx].url, '_blank');
@@ -32,7 +33,7 @@ export function filesModal(
     });
   };
 
-  modals.openModal({
+  modals.open({
     title: <Title>Uploaded Files</Title>,
     size: 'auto',
     children: (
@@ -63,6 +64,8 @@ export function filesModal(
       </Table>
     ),
   });
+
+  clearEphemeral();
 }
 
 export function uploadFiles(
@@ -71,14 +74,18 @@ export function uploadFiles(
     setProgress,
     setLoading,
     setFiles,
-    modals,
     clipboard,
+    clearEphemeral,
+    options,
+    ephemeral,
   }: {
     setProgress: (progress: number) => void;
     setLoading: (loading: boolean) => void;
     setFiles: (files: File[]) => void;
-    modals: ReturnType<typeof useModals>;
     clipboard: ReturnType<typeof useClipboard>;
+    clearEphemeral: () => void;
+    options: UploadOptionsStore['options'];
+    ephemeral: UploadOptionsStore['ephemeral'];
   }
 ) {
   setLoading(true);
@@ -134,11 +141,23 @@ export function uploadFiles(
         autoClose: true,
       });
       setFiles([]);
-      filesModal(res.files, { modals, clipboard });
+      filesModal(res.files, { clipboard, clearEphemeral });
     },
     false
   );
 
   req.open('POST', '/api/upload');
+
+  options.deletesAt && req.setRequestHeader('x-zipline-deletes-at', options.deletesAt);
+  options.format && req.setRequestHeader('x-zipline-format', options.format);
+  options.imageCompressionPercent &&
+    req.setRequestHeader('x-zipline-image-compression-percent', options.imageCompressionPercent.toString());
+  options.maxViews && req.setRequestHeader('x-zipline-max-views', options.maxViews.toString());
+  options.addOriginalName && req.setRequestHeader('x-zipline-original-name', 'true');
+  options.overrides_returnDomain && req.setRequestHeader('x-zipline-domain', options.overrides_returnDomain);
+
+  ephemeral.password && req.setRequestHeader('x-zipline-password', ephemeral.password);
+  ephemeral.filename && req.setRequestHeader('x-zipline-filename', ephemeral.filename);
+
   req.send(body);
 }

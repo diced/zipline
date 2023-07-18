@@ -2,7 +2,7 @@ import GridTableSwitcher from '@/components/GridTableSwitcher';
 import { Response } from '@/lib/api/response';
 import { User } from '@/lib/db/models/user';
 import { fetchApi } from '@/lib/fetchApi';
-import { useSettingsStore } from '@/lib/store/settings';
+import { useViewStore } from '@/lib/store/view';
 import {
   ActionIcon,
   Button,
@@ -30,7 +30,7 @@ import { useUserStore } from '@/lib/store/user';
 
 export default function DashboardUsers() {
   const currentUser = useUserStore((state) => state.user);
-  const view = useSettingsStore((state) => state.view.users);
+  const view = useViewStore((state) => state.users);
   const [open, setOpen] = useState(false);
 
   const form = useForm<{

@@ -44,7 +44,7 @@ export type UploadHeaders = {
   'x-zipline-password': string;
   'x-zipline-max-views': string;
   'x-zipline-no-json': 'true' | 'false';
-  'x-zipline-original-name': string;
+  'x-zipline-original-name': 'true' | 'false';
 
   'x-zipline-folder': string;
 
@@ -144,7 +144,6 @@ export function parseHeaders(headers: UploadHeaders, fileConfig: Config['files']
     if (isNaN(num))
       return headerError('x-zipline-image-compression-percent', 'Invalid compression percent (NaN)');
 
-    // check bounds, 0-100
     if (num < 0 || num > 100)
       return headerError(
         'x-zipline-image-compression-percent',

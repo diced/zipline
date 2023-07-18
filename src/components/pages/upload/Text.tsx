@@ -1,4 +1,5 @@
 import Render from '@/components/render/Render';
+import { useUploadOptionsStore } from '@/lib/store/uploadOptions';
 import DashboardUploadText from '@/pages/dashboard/upload/text';
 import {
   ActionIcon,
@@ -12,21 +13,26 @@ import {
   Title,
   Tooltip,
 } from '@mantine/core';
+import { useClipboard } from '@mantine/hooks';
 import { IconCursorText, IconEyeFilled, IconFiles, IconUpload } from '@tabler/icons-react';
 import Link from 'next/link';
 import { useState } from 'react';
+import UploadOptionsButton from './UploadOptionsButton';
 import { renderMode } from './renderMode';
 import { uploadFiles } from './uploadFiles';
-import { useModals } from '@mantine/modals';
-import { useClipboard } from '@mantine/hooks';
 
 export default function UploadText({
   codeMeta,
 }: {
   codeMeta: Parameters<typeof DashboardUploadText>[0]['codeMeta'];
 }) {
-  const modals = useModals();
   const clipboard = useClipboard();
+
+  const [options, ephemeral, clearEphemeral] = useUploadOptionsStore((state) => [
+    state.options,
+    state.ephemeral,
+    state.clearEphemeral,
+  ]);
 
   const [selectedLanguage, setSelectedLanguage] = useState('txt');
   const [text, setText] = useState('');
@@ -34,7 +40,6 @@ export default function UploadText({
 
   const renderIn = renderMode(selectedLanguage);
 
-  // when pressing tab in textarea, it should insert 2 spaces instead of switching focus
   const handleTab = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Tab') {
       e.preventDefault();
@@ -54,10 +59,12 @@ export default function UploadText({
 
     uploadFiles([file], {
       clipboard,
-      modals,
       setFiles: () => {},
       setLoading,
       setProgress: () => {},
+      clearEphemeral,
+      options,
+      ephemeral,
     });
   };
 
@@ -119,6 +126,7 @@ export default function UploadText({
           data={codeMeta.map((meta) => ({ value: meta.ext, label: meta.name }))}
           onChange={(value) => setSelectedLanguage(value as string)}
         />
+        <UploadOptionsButton numFiles={1} />
         <Button
           variant='outline'
           color='gray'

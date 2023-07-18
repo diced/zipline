@@ -1,3 +1,5 @@
+import { useConfig } from '@/components/ConfigProvider';
+import { useUploadOptionsStore } from '@/lib/store/uploadOptions';
 import {
   ActionIcon,
   Button,
@@ -13,21 +15,25 @@ import {
 } from '@mantine/core';
 import { Dropzone } from '@mantine/dropzone';
 import { useClipboard } from '@mantine/hooks';
-import { useModals } from '@mantine/modals';
+import { notifications } from '@mantine/notifications';
 import { IconDeviceSdCard, IconFiles, IconPhoto, IconUpload, IconX } from '@tabler/icons-react';
+import bytes from 'bytes';
 import Link from 'next/link';
 import { useState } from 'react';
+import UploadOptionsButton from '../UploadOptionsButton';
 import { uploadFiles } from '../uploadFiles';
 import ToUploadFile from './ToUploadFile';
-import { useConfig } from '@/components/ConfigProvider';
-import bytes from 'bytes';
-import { notifications } from '@mantine/notifications';
 
 export default function UploadFile() {
   const theme = useMantineTheme();
-  const modals = useModals();
   const clipboard = useClipboard();
   const config = useConfig();
+
+  const [options, ephemeral, clearEphemeral] = useUploadOptionsStore((state) => [
+    state.options,
+    state.ephemeral,
+    state.clearEphemeral,
+  ]);
 
   const [files, setFiles] = useState<File[]>([]);
   const [progress, setProgress] = useState(0);
@@ -40,7 +46,7 @@ export default function UploadFile() {
     if (size > config.files.maxFileSize) {
       notifications.show({
         title: 'Upload may fail',
-        color: 'red',
+        color: 'yellow',
         icon: <IconDeviceSdCard size='1rem' />,
         message: (
           <>
@@ -56,8 +62,10 @@ export default function UploadFile() {
       setFiles,
       setLoading,
       setProgress,
-      modals,
       clipboard,
+      clearEphemeral,
+      options,
+      ephemeral
     });
   };
 
@@ -119,17 +127,19 @@ export default function UploadFile() {
         ))}
       </Grid>
 
-      <Button
-        variant='outline'
-        color='gray'
-        leftIcon={<IconUpload size={18} />}
-        disabled={files.length === 0 || dropLoading}
-        fullWidth
-        size='xl'
-        onClick={upload}
-      >
-        Upload {files.length} files ({bytes(aggregateSize(), { unitSeparator: ' ' })})
-      </Button>
+      <Group position='right' spacing='sm' my='md'>
+        <UploadOptionsButton numFiles={files.length} />
+
+        <Button
+          variant='outline'
+          color='gray'
+          leftIcon={<IconUpload size={18} />}
+          disabled={files.length === 0 || dropLoading}
+          onClick={upload}
+        >
+          Upload {files.length} files ({bytes(aggregateSize(), { unitSeparator: ' ' })})
+        </Button>
+      </Group>
     </>
   );
 }

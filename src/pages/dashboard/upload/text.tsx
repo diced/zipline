@@ -2,16 +2,27 @@ import Layout from '@/components/Layout';
 import UploadText from '@/components/pages/upload/Text';
 import useLogin from '@/lib/hooks/useLogin';
 import { withSafeConfig } from '@/lib/middleware/next/withSafeConfig';
+import { useUploadOptionsStore } from '@/lib/store/uploadOptions';
 import { LoadingOverlay } from '@mantine/core';
 import { readFile } from 'fs/promises';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import { InferGetServerSidePropsType } from 'next';
 import { join } from 'path';
+import { useEffect } from 'react';
 
 export default function DashboardUploadText({
   codeMeta,
   config,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { loading } = useLogin();
+  const clearEphemeral = useUploadOptionsStore((state) => state.clearEphemeral);
+
+  useEffect(() => {
+    window.addEventListener('beforeunload', clearEphemeral);
+
+    return () => {
+      window.removeEventListener('beforeunload', clearEphemeral);
+    };
+  }, []);
 
   if (loading) return <LoadingOverlay visible />;
 
