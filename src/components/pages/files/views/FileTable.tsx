@@ -51,15 +51,13 @@ export default function FileTable({ id }: { id?: string }) {
 
   return (
     <>
-      {selectedFile && (
-        <FileModal
-          open={!!selectedFile}
-          setOpen={(open) => {
-            if (!open) setSelectedFile(null);
-          }}
-          file={selectedFile}
-        />
-      )}
+      <FileModal
+        open={!!selectedFile}
+        setOpen={(open) => {
+          if (!open) setSelectedFile(null);
+        }}
+        file={selectedFile}
+      />
 
       <Box my='sm'>
         <DataTable
@@ -79,7 +77,7 @@ export default function FileTable({ id }: { id?: string }) {
             {
               accessor: 'favorite',
               sortable: true,
-              render: (file) => (file.favorite ? 'Yes' : 'No')
+              render: (file) => (file.favorite ? 'Yes' : 'No'),
             },
             {
               accessor: 'actions',

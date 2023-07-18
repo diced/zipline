@@ -12,7 +12,6 @@ import {
   PasswordInput,
   Select,
   Stack,
-  Switch,
   Text,
   TextInput,
   Title,
@@ -20,7 +19,7 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
-import { IconPhotoMinus, IconUserCancel, IconUserEdit, IconUserPlus } from '@tabler/icons-react';
+import { IconPhotoMinus, IconUserCancel, IconUserEdit } from '@tabler/icons-react';
 import { mutate } from 'swr';
 
 export default function EditUserModal({
@@ -28,7 +27,7 @@ export default function EditUserModal({
   opened,
   onClose,
 }: {
-  user: User;
+  user?: User | null;
   opened: boolean;
   onClose: () => void;
 }) {
@@ -41,14 +40,16 @@ export default function EditUserModal({
     avatar: File | null;
   }>({
     initialValues: {
-      username: user.username,
+      username: user?.username || '',
       password: '',
-      role: user.role,
+      role: user?.role || 'USER',
       avatar: null,
     },
   });
 
   const onSubmit = async (values: typeof form.values) => {
+    if (!user) return;
+
     let avatar64: string | null = null;
     if (values.avatar) {
       if (!values.avatar.type.startsWith('image/')) return form.setFieldError('avatar', 'Invalid file type');
@@ -92,58 +93,68 @@ export default function EditUserModal({
   };
 
   return (
-    <Modal centered title={<Title>Edit {user.username}</Title>} onClose={onClose} opened={opened}>
+    <Modal centered title={<Title>Edit {user?.username ?? ''}</Title>} onClose={onClose} opened={opened}>
       <Text size='sm' color='dimmed'>
         Any fields that are blank will be omitted, and will not be updated.
       </Text>
 
-      <form onSubmit={form.onSubmit(onSubmit)}>
-        <Stack spacing='sm'>
-          <TextInput label='Username' placeholder='Enter a username...' {...form.getInputProps('username')} />
-          <PasswordInput
-            label='Password'
-            placeholder='Enter a password...'
-            {...form.getInputProps('password')}
-          />
-          <FileInput
-            label='Avatar'
-            placeholder='Select an avatar...'
-            rightSection={
-              <Tooltip label='Clear avatar'>
-                <ActionIcon
-                  variant='transparent'
-                  color='gray'
-                  disabled={!form.values.avatar}
-                  onClick={() => form.setFieldValue('avatar', null)}
-                >
-                  <IconPhotoMinus size='1rem' />
-                </ActionIcon>
-              </Tooltip>
-            }
-            {...form.getInputProps('avatar')}
-          />
+      {user ? (
+        <form onSubmit={form.onSubmit(onSubmit)}>
+          <Stack spacing='sm'>
+            <TextInput
+              label='Username'
+              placeholder='Enter a username...'
+              {...form.getInputProps('username')}
+            />
+            <PasswordInput
+              label='Password'
+              placeholder='Enter a password...'
+              {...form.getInputProps('password')}
+            />
+            <FileInput
+              label='Avatar'
+              placeholder='Select an avatar...'
+              rightSection={
+                <Tooltip label='Clear avatar'>
+                  <ActionIcon
+                    variant='transparent'
+                    color='gray'
+                    disabled={!form.values.avatar}
+                    onClick={() => form.setFieldValue('avatar', null)}
+                  >
+                    <IconPhotoMinus size='1rem' />
+                  </ActionIcon>
+                </Tooltip>
+              }
+              {...form.getInputProps('avatar')}
+            />
 
-          <Select
-            label='Role'
-            defaultValue={user.role}
-            data={[
-              { value: 'USER', label: 'User' },
-              { value: 'ADMIN', label: 'Administrator', disabled: !canInteract(currentUser?.role, 'ADMIN') },
-            ]}
-            {...form.getInputProps('role')}
-          />
+            <Select
+              label='Role'
+              defaultValue={user.role}
+              data={[
+                { value: 'USER', label: 'User' },
+                {
+                  value: 'ADMIN',
+                  label: 'Administrator',
+                  disabled: !canInteract(currentUser?.role, 'ADMIN'),
+                },
+              ]}
+              {...form.getInputProps('role')}
+            />
 
-          <Button
-            type='submit'
-            variant='outline'
-            color='blue'
-            radius='sm'
-            leftIcon={<IconUserEdit size='1rem' />}
-          >
-            Update user
-          </Button>
-        </Stack>
-      </form>
+            <Button
+              type='submit'
+              variant='outline'
+              color='blue'
+              radius='sm'
+              leftIcon={<IconUserEdit size='1rem' />}
+            >
+              Update user
+            </Button>
+          </Stack>
+        </form>
+      ) : null}
     </Modal>
   );
 }

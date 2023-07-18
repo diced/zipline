@@ -44,9 +44,11 @@ export default function UserTableView() {
 
   return (
     <>
-      {selectedUser && (
-        <EditUserModal opened={!!selectedUser} onClose={() => setSelectedUser(null)} user={selectedUser} />
-      )}
+      <EditUserModal
+        opened={!!selectedUser}
+        onClose={() => setSelectedUser(null)}
+        user={selectedUser}
+      />
 
       <Box my='sm'>
         <DataTable
