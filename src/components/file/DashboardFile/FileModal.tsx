@@ -1,6 +1,6 @@
 import { File } from '@/lib/db/models/file';
-import { fetchApi } from '@/lib/fetchApi';
-import { ActionIcon, Anchor, Group, Modal, SimpleGrid, Text, Title, Tooltip } from '@mantine/core';
+import { ActionIcon, Group, Modal, SimpleGrid, Text, Title, Tooltip } from '@mantine/core';
+import { useClipboard } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import {
   Icon,
@@ -15,17 +15,12 @@ import {
   IconStar,
   IconStarFilled,
   IconTrashFilled,
-  IconTrashXFilled,
-  IconUpload,
+  IconUpload
 } from '@tabler/icons-react';
 import bytes from 'bytes';
 import DashboardFileType from '../DashboardFileType';
-import FileStat from './FileStat';
-import { useClipboard } from '@mantine/hooks';
-import Link from 'next/link';
-import { KeyedMutator, mutate } from 'swr';
-import { Response } from '@/lib/api/response';
 import { copyFile, deleteFile, downloadFile, favoriteFile, viewFile } from '../actions';
+import FileStat from './FileStat';
 
 function ActionButton({
   Icon,
@@ -64,7 +59,7 @@ export default function FileModal({
       onClose={() => setOpen(false)}
       title={
         <Title order={3} weight={700}>
-          {file?.name}
+          {file?.name ?? ''}
         </Title>
       }
       size='auto'

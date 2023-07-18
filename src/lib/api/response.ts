@@ -7,6 +7,7 @@ import { ApiUserResponse } from '@/pages/api/user';
 import { ApiUserFilesResponse } from '@/pages/api/user/files';
 import { ApiUserFilesIdResponse } from '@/pages/api/user/files/[id]';
 import { ApiUserFilesIdPasswordResponse } from '@/pages/api/user/files/[id]/password';
+import { ApiUserFilesTransactionResponse } from '@/pages/api/user/files/transaction';
 import { ApiUserRecentResponse } from '@/pages/api/user/recent';
 import { ApiUserStatsResponse } from '@/pages/api/user/stats';
 import { ApiUserTokenResponse } from '@/pages/api/user/token';
@@ -18,6 +19,7 @@ export type Response = {
   '/api/auth/logout': ApiLogoutResponse;
   '/api/user/files/[id]/password': ApiUserFilesIdPasswordResponse;
   '/api/user/files/[id]': ApiUserFilesIdResponse;
+  '/api/user/files/transaction': ApiUserFilesTransactionResponse;
   '/api/user/files': ApiUserFilesResponse;
   '/api/user': ApiUserResponse;
   '/api/user/stats': ApiUserStatsResponse;

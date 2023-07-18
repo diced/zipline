@@ -1,19 +1,18 @@
+import RelativeDate from '@/components/RelativeDate';
 import FileModal from '@/components/file/DashboardFile/FileModal';
 import { copyFile, deleteFile, viewFile } from '@/components/file/actions';
-import { Response } from '@/lib/api/response';
-import { fileSelect, type File } from '@/lib/db/models/file';
-import { ActionIcon, Box, Group, Tooltip } from '@mantine/core';
+import { type File } from '@/lib/db/models/file';
+import { ActionIcon, Box, Button, Group, Paper, Title, Tooltip } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import type { Prisma } from '@prisma/client';
-import { IconCopy, IconExternalLink, IconFile, IconTrashFilled } from '@tabler/icons-react';
+import { IconCopy, IconExternalLink, IconFile, IconStar, IconTrashFilled } from '@tabler/icons-react';
 import bytes from 'bytes';
 import { DataTable } from 'mantine-datatable';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import useSWR from 'swr';
+import { bulkDelete, bulkFavorite } from '../bulk';
 import { useApiPagination } from '../useApiPagination';
-import RelativeDate from '@/components/RelativeDate';
 
 const PER_PAGE_OPTIONS = [10, 20, 50];
 
@@ -26,6 +25,8 @@ export default function FileTable({ id }: { id?: string }) {
   const [sort, setSort] = useState<keyof Prisma.FileOrderByWithRelationInput>('createdAt');
   const [order, setOrder] = useState<'asc' | 'desc'>('desc');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   const { data, isLoading } = useApiPagination({
     page,
@@ -60,6 +61,44 @@ export default function FileTable({ id }: { id?: string }) {
       />
 
       <Box my='sm'>
+        {selectedFiles.length > 0 && (
+          <Paper withBorder p='sm' my='sm'>
+            <Title order={3} mb='md'>
+              Operations
+            </Title>
+
+            <Group>
+              <Button
+                variant='outline'
+                color='red'
+                leftIcon={<IconTrashFilled size='1rem' />}
+                onClick={() => bulkDelete(selectedFiles.map((x) => x.id), setSelectedFiles)}
+              >
+                Delete {selectedFiles.length} file{selectedFiles.length > 1 ? 's' : ''}
+              </Button>
+
+              <Button
+                variant='outline'
+                color='yellow'
+                leftIcon={<IconStar size='1rem' />}
+                onClick={() => bulkFavorite(selectedFiles.map((x) => x.id))}
+              >
+                Favorite {selectedFiles.length} file{selectedFiles.length > 1 ? 's' : ''}
+              </Button>
+
+              <Button
+                variant='outline'
+                color='gray'
+                onClick={() => {
+                  setSelectedFiles([]);
+                }}
+              >
+                Clear selection
+              </Button>
+            </Group>
+          </Paper>
+        )}
+
         <DataTable
           borderRadius='sm'
           withBorder
@@ -149,6 +188,8 @@ export default function FileTable({ id }: { id?: string }) {
             setOrder(data.direction);
           }}
           onCellClick={({ record }) => setSelectedFile(record)}
+          selectedRecords={selectedFiles}
+          onSelectedRecordsChange={setSelectedFiles}
         />
       </Box>
     </>
