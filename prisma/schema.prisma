@@ -24,7 +24,7 @@ model User {
   password      String?
   avatar        String?
   token         String  @unique
-  role  Role @default(USER)
+  role          Role @default(USER)
 
   files          File[]
   urls           Url[]

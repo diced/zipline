@@ -1,7 +1,8 @@
-import { useUploadOptionsStore } from '@/lib/store/uploadOptions';
+import { defaultUploadOptions, useUploadOptionsStore } from '@/lib/store/uploadOptions';
 import {
   Badge,
   Button,
+  Center,
   Group,
   Modal,
   NumberInput,
@@ -16,6 +17,7 @@ import {
 import {
   IconAlarmFilled,
   IconArrowsMinimize,
+  IconDeviceFloppy,
   IconEyeFilled,
   IconFileInfo,
   IconGlobe,
@@ -90,7 +92,16 @@ export default function UploadOptionsButton({ numFiles }: { numFiles: number }) 
                 disabled: true,
               },
             ]}
-            label='Deletes at'
+            label={
+              <>
+                Deletes at{' '}
+                {options.deletesAt ? (
+                  <Badge variant='outline' size='xs'>
+                    saved
+                  </Badge>
+                ) : null}
+              </>
+            }
             description='The file will automatically delete itself after this time.'
             icon={<IconAlarmFilled size='1rem' />}
             value={options.deletesAt}
@@ -112,7 +123,16 @@ export default function UploadOptionsButton({ numFiles }: { numFiles: number }) 
               { value: 'name', label: 'Use file name' },
               { value: 'gfycat', label: 'Gfycat-style name' },
             ]}
-            label='Name Format'
+            label={
+              <>
+                Name Format{' '}
+                {options.format ? (
+                  <Badge variant='outline' size='xs'>
+                    saved
+                  </Badge>
+                ) : null}
+              </>
+            }
             description='The file name format to use when upload this file, the "File name" field will override this value.'
             icon={<IconWriting size='1rem' />}
             value={options.format}
@@ -126,7 +146,16 @@ export default function UploadOptionsButton({ numFiles }: { numFiles: number }) 
           />
 
           <NumberInput
-            label='Compression'
+            label={
+              <>
+                Compression{' '}
+                {options.imageCompressionPercent ? (
+                  <Badge variant='outline' size='xs'>
+                    saved
+                  </Badge>
+                ) : null}
+              </>
+            }
             description='The compression level to use on image (only). Leave blank to disable compression.'
             icon={<IconPercentage size='1rem' />}
             max={100}
@@ -136,7 +165,16 @@ export default function UploadOptionsButton({ numFiles }: { numFiles: number }) 
           />
 
           <NumberInput
-            label='Max Views'
+            label={
+              <>
+                Max Views{' '}
+                {options.maxViews ? (
+                  <Badge variant='outline' size='xs'>
+                    saved
+                  </Badge>
+                ) : null}
+              </>
+            }
             description='The maximum number of views the files can have before they are deleted. Leave blank to allow as many views as you want.'
             icon={<IconEyeFilled size='1rem' />}
             min={0}
@@ -145,8 +183,17 @@ export default function UploadOptionsButton({ numFiles }: { numFiles: number }) 
           />
 
           <TextInput
-            label='Override Domain'
-            description='Override the domain with this value. Leave blank to use the default domain.'
+            label={
+              <>
+                Override Domain{' '}
+                {options.overrides_returnDomain ? (
+                  <Badge variant='outline' size='xs'>
+                    saved
+                  </Badge>
+                ) : null}
+              </>
+            }
+            description='Override the domain with this value. This will change the domain returned in your uploads. Leave blank to use the default domain.'
             icon={<IconGlobe size='1rem' />}
             value={options.overrides_returnDomain ?? ''}
             onChange={(event) =>
@@ -189,7 +236,16 @@ export default function UploadOptionsButton({ numFiles }: { numFiles: number }) 
           </Text>
 
           <Switch
-            label='Add Original Name'
+            label={
+              <>
+                Add Original Name{' '}
+                {options.addOriginalName ? (
+                  <Badge variant='outline' size='xs'>
+                    saved
+                  </Badge>
+                ) : null}
+              </>
+            }
             description={`Add the original file name, so that the file can be downloaded with the original name. This will still use the "Name Format" option for it's file name.`}
             checked={options.addOriginalName ?? false}
             onChange={(event) => setOption('addOriginalName', event.currentTarget.checked ?? false)}
