@@ -4,21 +4,13 @@ import { getZipline } from '@/lib/db/models/zipline';
 import { fetchApi } from '@/lib/fetchApi';
 import { withSafeConfig } from '@/lib/middleware/next/withSafeConfig';
 import { eitherTrue, isTruthy } from '@/lib/primitive';
-import {
-  Button,
-  Center,
-  PasswordInput,
-  Stack,
-  Text,
-  TextInput,
-  Title
-} from '@mantine/core';
+import { Button, Center, PasswordInput, Stack, Text, TextInput, Title } from '@mantine/core';
 import { hasLength, useForm } from '@mantine/form';
 import {
   IconBrandDiscordFilled,
   IconBrandGithubFilled,
   IconBrandGoogle,
-  IconCircleKeyFilled
+  IconCircleKeyFilled,
 } from '@tabler/icons-react';
 import { InferGetServerSidePropsType } from 'next';
 import Link from 'next/link';
@@ -26,13 +18,7 @@ import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import useSWR from 'swr';
 
-export default function Login({
-  config,
-  authentikEnabled,
-  discordEnabled,
-  githubEnabled,
-  googleEnabled,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function Login({ config }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter();
   const { data, isLoading, mutate } = useSWR<Response['/api/user']>('/api/user');
 
@@ -110,7 +96,7 @@ export default function Login({
               </Button>
             )}
 
-            {discordEnabled && (
+            {config.oauthEnabled.discord && (
               <Button
                 size='lg'
                 fullWidth
@@ -129,7 +115,7 @@ export default function Login({
               </Button>
             )}
 
-            {githubEnabled && (
+            {config.oauthEnabled.github && (
               <Button
                 size='lg'
                 fullWidth
@@ -147,7 +133,7 @@ export default function Login({
               </Button>
             )}
 
-            {googleEnabled && (
+            {config.oauthEnabled.google && (
               <Button
                 size='lg'
                 fullWidth
@@ -165,7 +151,7 @@ export default function Login({
               </Button>
             )}
 
-            {authentikEnabled && (
+            {config.oauthEnabled.authentik && (
               <Button
                 size='lg'
                 fullWidth
@@ -200,37 +186,5 @@ export const getServerSideProps = withSafeConfig(async () => {
       },
     };
 
-  const discordEnabled = isTruthy(
-    config.oauth?.discord?.clientId,
-    config.oauth?.discord?.clientSecret,
-    config.features.oauthRegistration
-  );
-
-  const githubEnabled = isTruthy(
-    config.oauth?.github?.clientId,
-    config.oauth?.github?.clientSecret,
-    config.features.oauthRegistration
-  );
-
-  const googleEnabled = isTruthy(
-    config.oauth?.google?.clientId,
-    config.oauth?.google?.clientSecret,
-    config.features.oauthRegistration
-  );
-
-  const authentikEnabled = isTruthy(
-    config.oauth?.authentik?.clientId,
-    config.oauth?.authentik?.clientSecret,
-    config.oauth?.authentik?.authorizeUrl,
-    config.oauth?.authentik?.tokenUrl,
-    config.oauth?.authentik?.userinfoUrl,
-    config.features.oauthRegistration
-  );
-
-  return {
-    discordEnabled,
-    githubEnabled,
-    googleEnabled,
-    authentikEnabled,
-  };
+  return {};
 });

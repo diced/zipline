@@ -25,12 +25,7 @@ export async function handler(req: NextApiReq, res: NextApiRes<ApiUserTokenRespo
 
   if (!u.avatar) return res.notFound();
 
-  u.avatar = u.avatar.replace(/^data:image\/\w+;base64,/, '');
-  const buf = Buffer.from(u.avatar, 'base64');
-
-  res.setHeader('Content-Length', buf.length);
-
-  return res.send(buf);
+  return res.status(200).send(u.avatar);
 }
 
 export default combine([method(['GET']), ziplineAuth()], handler);

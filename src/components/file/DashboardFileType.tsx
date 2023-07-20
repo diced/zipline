@@ -46,27 +46,36 @@ export default function DashboardFileType({
   show,
   password,
   disableMediaPreview,
+  code,
 }: {
   file: DbFile | File;
   show?: boolean;
   password?: string;
   disableMediaPreview?: boolean;
+  code?: boolean;
 }) {
-  const type = file.type.split('/')[0];
   const dbFile = 'id' in file;
   const renderIn = renderMode(file.name.split('.').pop() || '');
 
   const [fileContent, setFileContent] = useState('');
+  const [type, setType] = useState(file.type.split('/')[0]);
+
+  const gettext = async () => {
+    const res = await fetch(`/raw/${file.name}${password ? `?pw=${password}` : ''}`);
+    const text = await res.text();
+
+    setFileContent(text);
+  };
 
   useEffect(() => {
-    if (type !== 'text') return;
-
-    (async () => {
-      const res = await fetch(`/raw/${file.name}${password ? `?pw=${password}` : ''}`);
-      const text = await res.text();
-
-      setFileContent(text);
-    })();
+    if (code) {
+      setType('text');
+      gettext();
+    } else if (type === 'text') {
+      gettext();
+    } else {
+      return;
+    }
   }, []);
 
   if (disableMediaPreview)

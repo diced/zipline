@@ -20,11 +20,12 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  username      String  @unique
-  password      String?
-  avatar        String?
-  token         String  @unique
-  role          Role @default(USER)
+  username String  @unique
+  password String?
+  avatar   String?
+  token    String  @unique
+  role     Role    @default(USER)
+  view     Json    @default("{}")
 
   files          File[]
   urls           Url[]

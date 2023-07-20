@@ -44,6 +44,7 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 import ConfigProvider from './ConfigProvider';
 import { isAdministrator } from '@/lib/role';
+import useAvatar from '@/lib/hooks/useAvatar';
 
 type NavLinks = {
   label: string;
@@ -117,6 +118,7 @@ export default function Layout({ children, config }: { children: React.ReactNode
   const [setUser, setToken] = useUserStore((s) => [s.setUser, s.setToken]);
 
   const { user, mutate } = useLogin();
+  const { avatar } = useAvatar();
 
   const copyToken = () => {
     modals.openConfirmModal({
@@ -279,9 +281,11 @@ export default function Layout({ children, config }: { children: React.ReactNode
                     variant='subtle'
                     color='gray'
                     leftIcon={
-                      <Avatar size='sm' src='/api/user/avatar' radius='sm'>
-                        <IconSettingsFilled size='1.4rem' />
-                      </Avatar>
+                      avatar ? (
+                        <Avatar src={avatar} radius='sm' size='sm' alt={user?.username ?? 'User avatar'} />
+                      ) : (
+                        <IconSettingsFilled size='1rem' />
+                      )
                     }
                     rightIcon={<IconChevronDown size='0.7rem' />}
                     size='sm'
