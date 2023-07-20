@@ -1,15 +1,15 @@
 import DashboardFileType from '@/components/file/DashboardFileType';
 import { isCode } from '@/lib/code';
+import { config as zConfig } from '@/lib/config';
 import { SafeConfig, safeConfig } from '@/lib/config/safe';
 import { verifyPassword } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
 import { fileSelect, type File } from '@/lib/db/models/file';
-import { User, UserViewSettings, userSelect } from '@/lib/db/models/user';
+import { User, userSelect } from '@/lib/db/models/user';
 import { fetchApi } from '@/lib/fetchApi';
 import { parseString } from '@/lib/parser';
 import { formatRootUrl } from '@/lib/url';
 import {
-  Box,
   Button,
   Center,
   Collapse,
@@ -17,19 +17,17 @@ import {
   Modal,
   Paper,
   PasswordInput,
-  Space,
   Text,
   Title,
-  TypographyStylesProvider,
+  TypographyStylesProvider
 } from '@mantine/core';
 import { IconFileDownload } from '@tabler/icons-react';
-import bytes from 'bytes';
+import { sanitize } from 'isomorphic-dompurify';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
-import { sanitize } from 'isomorphic-dompurify';
-import Head from 'next/head';
+import { useState } from 'react';
 
 export default function ViewFile({
   file,
@@ -326,12 +324,12 @@ export const getServerSideProps: GetServerSideProps<{
     if (
       JSON.parse(context.req.headers['cf-visitor'] as string).scheme === 'https' ||
       proto === 'https' ||
-      false // return+Htt[s]
+      zConfig.core.returnHttpsUrls
     )
       host = `https://${host}`;
     else host = `http://${host}`;
   } catch (e) {
-    if (proto === 'https' || false /* return https */) host = `https://${host}`;
+    if (proto === 'https' || zConfig.core.returnHttpsUrls) host = `https://${host}`;
     else host = `http://${host}`;
   }
 
