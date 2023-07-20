@@ -1,212 +1,212 @@
 [
   {
     "ext": "html",
-    "mime": "text/html",
+    "mime": "text/x-zipline-html",
     "name": "HTML"
   },
   {
     "ext": "css",
-    "mime": "text/css",
+    "mime": "text/x-zipline-css",
     "name": "CSS"
   },
   {
     "ext": "cpp",
-    "mime": "text/x-c++src",
+    "mime": "text/x-zipline-c++src",
     "name": "C++"
   },
   {
     "ext": "js",
-    "mime": "application/javascript",
+    "mime": "text/x-zipline-javascript",
     "name": "JavaScript"
   },
   {
     "ext": "py",
-    "mime": "text/x-python",
+    "mime": "text/x-zipline-python",
     "name": "Python"
   },
   {
     "ext": "rb",
-    "mime": "text/x-ruby",
+    "mime": "text/x-zipline-ruby",
     "name": "Ruby"
   },
   {
     "ext": "java",
-    "mime": "text/x-java",
+    "mime": "text/x-zipline-java",
     "name": "Java"
   },
   {
     "ext": "md",
-    "mime": "text/markdown",
+    "mime": "text/x-zipline-markdown",
     "name": "Markdown"
   },
   {
     "ext": "c",
-    "mime": "text/x-csrc",
+    "mime": "text/x-zipline-csrc",
     "name": "C"
   },
   {
     "ext": "php",
-    "mime": "application/x-httpd-php",
+    "mime": "text/x-zipline-httpd-php",
     "name": "PHP"
   },
   {
     "ext": "sass",
-    "mime": "text/x-sass",
+    "mime": "text/x-zipline-sass",
     "name": "Sass"
   },
   {
     "ext": "scss",
-    "mime": "text/x-scss",
+    "mime": "text/x-zipline-scss",
     "name": "SCSS"
   },
   {
     "ext": "swift",
-    "mime": "text/x-swift",
+    "mime": "text/x-zipline-swift",
     "name": "Swift"
   },
   {
     "ext": "ts",
-    "mime": "application/typescript",
+    "mime": "text/x-zipline-typescript",
     "name": "TypeScript"
   },
   {
     "ext": "go",
-    "mime": "text/x-go",
+    "mime": "text/x-zipline-go",
     "name": "Go"
   },
   {
     "ext": "rs",
-    "mime": "text/x-rustsrc",
+    "mime": "text/x-zipline-rustsrc",
     "name": "Rust"
   },
   {
     "ext": "sh",
-    "mime": "application/x-sh",
+    "mime": "text/x-zipline-sh",
     "name": "Bash"
   },
   {
     "ext": "json",
-    "mime": "application/json",
+    "mime": "text/x-zipline-json",
     "name": "JSON"
   },
   {
     "ext": "ps1",
-    "mime": "application/x-powershell",
+    "mime": "text/x-zipline-powershell",
     "name": "PowerShell"
   },
   {
     "ext": "sql",
-    "mime": "application/sql",
+    "mime": "text/x-zipline-sql",
     "name": "SQL"
   },
   {
     "ext": "yaml",
-    "mime": "text/yaml",
+    "mime": "text/x-zipline-yaml",
     "name": "YAML"
   },
   {
     "ext": "dockerfile",
-    "mime": "text/x-dockerfile",
+    "mime": "text/x-zipline-dockerfile",
     "name": "Dockerfile"
   },
   {
     "ext": "lua",
-    "mime": "text/x-lua",
+    "mime": "text/x-zipline-lua",
     "name": "Lua"
   },
   {
     "ext": "conf",
-    "mime": "text/x-nginx-conf",
+    "mime": "text/x-zipline-nginx-conf",
     "name": "NGINX Config File"
   },
   {
     "ext": "pl",
-    "mime": "text/x-perl",
+    "mime": "text/x-zipline-perl",
     "name": "Perl"
   },
   {
     "ext": "r",
-    "mime": "text/x-rsrc",
+    "mime": "text/x-zipline-rsrc",
     "name": "R"
   },
   {
     "ext": "scala",
-    "mime": "text/x-scala",
+    "mime": "text/x-zipline-scala",
     "name": "Scala"
   },
   {
     "ext": "groovy",
-    "mime": "text/x-groovy",
+    "mime": "text/x-zipline-groovy",
     "name": "Groovy"
   },
   {
     "ext": "kt",
-    "mime": "text/x-kotlin",
+    "mime": "text/x-zipline-kotlin",
     "name": "Kotlin"
   },
   {
     "ext": "hs",
-    "mime": "text/x-haskell",
+    "mime": "text/x-zipline-haskell",
     "name": "Haskell"
   },
   {
     "ext": "ex",
-    "mime": "text/x-elixir",
+    "mime": "text/x-zipline-elixir",
     "name": "Elixir"
   },
   {
     "ext": "vim",
-    "mime": "text/x-vim",
+    "mime": "text/x-zipline-vim",
     "name": "Vim"
   },
   {
     "ext": "m",
-    "mime": "text/x-matlab",
+    "mime": "text/x-zipline-matlab",
     "name": "MATLAB"
   },
   {
     "ext": "dart",
-    "mime": "application/dart",
+    "mime": "text/x-zipline-dart",
     "name": "Dart"
   },
   {
     "ext": "hbs",
-    "mime": "text/x-handlebars-template",
+    "mime": "text/x-zipline-handlebars-template",
     "name": "Handlebars"
   },
   {
     "ext": "hcl",
-    "mime": "text/x-hcl",
+    "mime": "text/x-zipline-hcl",
     "name": "HCL"
   },
   {
     "ext": "http",
-    "mime": "text/http",
+    "mime": "text/x-zipline-http",
     "name": "HTTP"
   },
   {
     "ext": "ini",
-    "mime": "text/x-ini",
+    "mime": "text/x-zipline-ini",
     "name": "INI"
   },
   {
     "ext": "jsx",
-    "mime": "text/jsx",
+    "mime": "text/x-zipline-jsx",
     "name": "JSX"
   },
   {
     "ext": "coffee",
-    "mime": "text/x-coffeescript",
+    "mime": "text/x-zipline-coffeescript",
     "name": "CoffeeScript"
   },
   {
     "ext": "tex",
-    "mime": "text/x-latex",
+    "mime": "text/x-zipline-latex",
     "name": "LaTeX (KaTeX)"
   },
   {
     "name": "Plain Text",
-    "mime": "text/plain",
+    "mime": "text/x-zipline-plain",
     "ext": "txt"
   }
 ]
