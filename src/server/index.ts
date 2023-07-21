@@ -49,6 +49,8 @@ async function main() {
   await app.prepare();
 
   if (config.files.route === '/' && config.urls.route === '/') {
+    logger.debug('files & urls route are both /, using catch-all route');
+
     server.get('/:id', async (req, res) => {
       const { id } = req.params;
       const parsedUrl = parse(req.url!, true);

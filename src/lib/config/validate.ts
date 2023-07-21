@@ -87,6 +87,7 @@ export const schema = z.object({
     invites: z.boolean().default(true),
     userRegistration: z.boolean().default(false),
     oauthRegistration: z.boolean().default(false),
+    deleteOnMaxViews: z.boolean().default(true),
   }),
   website: z.object({
     title: z.string().default('Zipline'),

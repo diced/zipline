@@ -1,9 +1,13 @@
+import { config } from '@/lib/config';
 import { verifyPassword } from '@/lib/crypto';
 import { datasource } from '@/lib/datasource';
 import { prisma } from '@/lib/db';
+import { log } from '@/lib/logger';
 import express, { Request, Response } from 'express';
 import { NextServer } from 'next/dist/server/next';
 import { parse } from 'url';
+
+const logger = log('server').c('files');
 
 export async function filesRoute(
   this: ReturnType<typeof express>,
@@ -27,7 +31,22 @@ export async function filesRoute(
 
   if (!file) return app.render404(req, res, parsedUrl);
 
-  if (file.maxViews && file.views >= file.maxViews) return app.render404(req, res, parsedUrl);
+  if (file.maxViews && file.views >= file.maxViews) {
+    if (config.features.deleteOnMaxViews) {
+      await prisma.file.delete({
+        where: {
+          id: file.id,
+        },
+      });
+
+      logger.info(`${file.name} deleted due to reaching max views`, {
+        id: file.id,
+        views: file.views,
+      });
+    }
+
+    return app.render404(req, res, parsedUrl);
+  }
 
   if (file.User?.view.enabled) return res.redirect(`/view/${file.name}`);
 

@@ -45,6 +45,7 @@ export const PROP_TO_ENV: Record<string, string> = {
   'features.invites': 'FEATURES_INVITES',
   'features.userRegistration': 'FEATURES_USER_REGISTRATION',
   'features.oauthRegistration': 'FEATURES_OAUTH_REGISTRATION',
+  'features.deleteOnMaxViews': 'FEATURES_DELETE_ON_MAX_VIEWS',
 
   'website.title': 'WEBSITE_TITLE',
   'website.externalLinks': 'WEBSITE_EXTERNAL_LINKS',
@@ -99,6 +100,7 @@ export function readEnv() {
     env(PROP_TO_ENV['features.invites'], 'features.invites', 'boolean'),
     env(PROP_TO_ENV['features.userRegistration'], 'features.userRegistration', 'boolean'),
     env(PROP_TO_ENV['features.oauthRegistration'], 'features.oauthRegistration', 'boolean'),
+    env(PROP_TO_ENV['features.deleteOnMaxViews'], 'features.deleteOnMaxViews', 'boolean'),
 
     env(PROP_TO_ENV['website.title'], 'website.title', 'string'),
     env(PROP_TO_ENV['website.externalLinks'], 'website.externalLinks', 'json[]'),
@@ -151,6 +153,7 @@ export function readEnv() {
       invites: undefined,
       userRegistration: undefined,
       oauthRegistration: undefined,
+      deleteOnMaxViews: undefined,
     },
     website: {
       title: undefined,

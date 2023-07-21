@@ -2,6 +2,10 @@ import { NextServer } from 'next/dist/server/next';
 import express, { Request, Response } from 'express';
 import { parse } from 'url';
 import { prisma } from '@/lib/db';
+import { config } from '@/lib/config';
+import { log } from '@/lib/logger';
+
+const logger = log('server').c('urls');
 
 export async function urlsRoute(
   this: ReturnType<typeof express>,
@@ -20,7 +24,23 @@ export async function urlsRoute(
   });
   if (!url) return app.render404(req, res, parsedUrl);
 
-  if (url.maxViews && url.views >= url.maxViews) return app.render404(req, res, parsedUrl);
+  if (url.maxViews && url.views >= url.maxViews) {
+    if (config.features.deleteOnMaxViews) {
+      await prisma.url.delete({
+        where: {
+          id: url.id,
+        },
+      });
+
+      logger.info(`${url.code} deleted due to reaching max views`, {
+        id: url.id,
+        views: url.views,
+        vanity: url.vanity ?? 'none',
+      });
+    }
+
+    return app.render404(req, res, parsedUrl);
+  }
 
   await prisma.url.update({
     where: {
