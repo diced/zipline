@@ -144,7 +144,7 @@ export default function DashboardUsers() {
             <Button
               type='submit'
               variant='outline'
-              color='blue'
+              color='gray'
               radius='sm'
               leftIcon={<IconUserPlus size='1rem' />}
             >

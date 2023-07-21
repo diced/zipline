@@ -39,6 +39,10 @@ export const schema = z.object({
     assumeMimetypes: z.boolean().default(false),
     defaultDateFormat: z.string().default('YYYY-MM-DD_HH:mm:ss'),
   }),
+  urls: z.object({
+    route: z.string().startsWith('/').nonempty().trim().toLowerCase().default('/go'),
+    length: z.number().default(6),
+  }),
   datasource: z
     .object({
       type: z.enum(['local', 's3']).default('local'),

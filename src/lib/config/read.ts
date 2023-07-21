@@ -22,6 +22,9 @@ export const PROP_TO_ENV: Record<string, string> = {
   'files.assumeMimetypes': 'FILES_ASSUME_MIMETYPES',
   'files.defaultDateFormat': 'FILES_DEFAULT_DATE_FORMAT',
 
+  'urls.route': 'URLS_ROUTE',
+  'urls.length': 'URLS_LENGTH',
+
   'datasource.type': 'DATASOURCE_TYPE',
 
   // only for errors, not used in readenv
@@ -77,6 +80,9 @@ export function readEnv() {
     env(PROP_TO_ENV['files.maxFileSize'], 'files.maxFileSize', 'byte'),
     env(PROP_TO_ENV['files.defaultExpiration'], 'files.defaultExpiration', 'ms'),
 
+    env(PROP_TO_ENV['urls.route'], 'urls.route', 'string'),
+    env(PROP_TO_ENV['urls.length'], 'urls.length', 'number'),
+
     env(PROP_TO_ENV['datasource.type'], 'datasource.type', 'string'),
 
     env(PROP_TO_ENV['datasource.s3.accessKeyId'], 'datasource.s3.accessKeyId', 'string'),
@@ -129,6 +135,10 @@ export function readEnv() {
       defaultExpiration: undefined,
       assumeMimetypes: undefined,
       defaultDateFormat: undefined,
+    },
+    urls: {
+      route: undefined,
+      length: undefined,
     },
     datasource: {
       type: undefined,

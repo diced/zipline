@@ -23,13 +23,15 @@ export function copyFile(
 ) {
   const domain = `${window.location.protocol}//${window.location.host}`;
 
-  clipboard.copy(`${domain}/view/${file.name}`);
+  const url = file.url ? `${domain}${file.url}` : `${domain}/view/${file.name}`;
+
+  clipboard.copy(url);
 
   notifications.show({
     title: 'Copied link',
     message: (
-      <Anchor component={Link} href={`/view/${file.name}`}>
-        {`${domain}/view/${file.name}`}
+      <Anchor component={Link} href={url}>
+        {url}
       </Anchor>
     ),
     color: 'green',

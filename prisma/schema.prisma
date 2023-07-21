@@ -108,10 +108,9 @@ model File {
   size         Int
   type         String
   views        Int     @default(0)
+  maxViews     Int?
   favorite     Boolean @default(false)
   password     String?
-
-  zeroWidthSpace String?
 
   tags Tag[]
 
@@ -173,15 +172,16 @@ model Url {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  code        String
   vanity      String?
   destination String
-  name        String  @unique
   views       Int     @default(0)
-
-  zeroWidthSpace String?
+  maxViews    Int?
 
   User   User?   @relation(fields: [userId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   userId String?
+
+  @@unique([code, vanity])
 }
 
 model Metric {

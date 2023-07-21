@@ -4,7 +4,8 @@ import { ErrorBody } from './response';
 export async function fetchApi<Response = any, Error = string>(
   route: string,
   method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' = 'GET',
-  body: any = null
+  body: any = null,
+  headers: Record<string, string> = {}
 ): Promise<{
   data: Response | null;
   error: ErrorBody | null;
@@ -16,6 +17,7 @@ export async function fetchApi<Response = any, Error = string>(
     method,
     headers: {
       'Content-Type': 'application/json',
+      ...headers,
     },
     body: body ? JSON.stringify(body) : null,
   });

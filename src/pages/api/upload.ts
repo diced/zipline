@@ -95,7 +95,7 @@ export async function handler(req: NextApiReq<any, any, UploadHeaders>, res: Nex
             id: req.user.id,
           },
         },
-        // ...(options.maxViews && { maxViews: options.maxViews }),
+        ...(options.maxViews && { maxViews: options.maxViews }),
         ...(options.password && { password: await hashPassword(options.password) }),
         ...(options.deletesAt && { deletesAt: options.deletesAt }),
         ...(options.folder && { Folder: { connect: { id: options.folder } } }),

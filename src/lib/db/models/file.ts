@@ -12,7 +12,6 @@ export type File = {
   size: number;
   type: string;
   views: number;
-  zeroWidthSpace: string | null;
   password?: string | boolean | null;
 
   url?: string;
@@ -29,7 +28,6 @@ export const fileSelect = {
   size: true,
   type: true,
   views: true,
-  zeroWidthSpace: true,
 };
 
 export function cleanFile(file: File) {

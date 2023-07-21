@@ -14,7 +14,8 @@
     "start": "node ./build/server.mjs",
     "lint": "eslint --cache --ignore-path .gitignore --fix .",
     "format": "prettier --write --ignore-path .gitignore .",
-    "validate": "run-p lint format"
+    "validate": "run-p lint format",
+    "db:prototype": "prisma db push && prisma generate"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",

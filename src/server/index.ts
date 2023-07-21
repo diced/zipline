@@ -1,18 +1,18 @@
-import { validateEnv } from '@/lib/config/validate';
 import { readEnv } from '@/lib/config/read';
+import { validateEnv } from '@/lib/config/validate';
+import { verifyPassword } from '@/lib/crypto';
+import { datasource } from '@/lib/datasource';
+import { prisma } from '@/lib/db';
 import { runMigrations } from '@/lib/db/migration';
 import { log } from '@/lib/logger';
 import express from 'express';
+import { mkdir } from 'fs/promises';
 import next from 'next';
 import { parse } from 'url';
-import { mkdir } from 'fs/promises';
-import { prisma } from '@/lib/db';
-import { datasource } from '@/lib/datasource';
-import { guess } from '@/lib/mimes';
-import { extname } from 'path';
-import { verifyPassword } from '@/lib/crypto';
 
 import { version } from '../../package.json';
+import { filesRoute } from './routes/files';
+import { urlsRoute } from './routes/urls';
 
 const MODE = process.env.NODE_ENV || 'production';
 
@@ -48,39 +48,32 @@ async function main() {
 
   await app.prepare();
 
-  server.get(config.files.route === '/' ? `/:id` : `${config.files.route}/:id`, async (req, res) => {
-    const { id } = req.params;
-    const parsedUrl = parse(req.url!, true);
+  if (config.files.route === '/' && config.urls.route === '/') {
+    server.get('/:id', async (req, res) => {
+      const { id } = req.params;
+      const parsedUrl = parse(req.url!, true);
 
-    if (!id) return app.render404(req, res, parsedUrl);
-    if (id === '') return app.render404(req, res, parsedUrl);
-    if (id === 'dashboard') return app.render(req, res, '/dashboard');
+      if (id === '') return app.render404(req, res, parsedUrl);
+      else if (id === 'dashboard') return app.render(req, res, '/dashboard');
 
-    const file = await prisma.file.findFirst({
-      where: {
-        name: id,
-      },
+      const url = await prisma.url.findFirst({
+        where: {
+          OR: [{ code: id }, { vanity: id }],
+        },
+      });
+
+      if (url) return urlsRoute.bind(server)(app, req, res);
+      else return filesRoute.bind(server)(app, req, res);
+    });
+  } else {
+    server.get(config.files.route === '/' ? `/:id` : `${config.files.route}/:id`, async (req, res) => {
+      filesRoute.bind(server)(app, req, res);
     });
 
-    if (!file) return app.render404(req, res, parsedUrl);
-
-    const stream = await datasource.get(file.name);
-    if (!stream) return app.render404(req, res, parsedUrl);
-
-    if (!file.type && config.files.assumeMimetypes) {
-      const ext = extname(file.name);
-      const mime = await guess(ext);
-
-      res.setHeader('Content-Type', mime);
-    } else {
-      res.setHeader('Content-Type', file.type);
-    }
-
-    res.setHeader('Content-Length', file.size);
-    file.originalName && res.setHeader('Content-Disposition', `filename="${file.originalName}"`);
-
-    stream.pipe(res);
-  });
+    server.get(config.urls.route === '/' ? `/:id` : `${config.urls.route}/:id`, async (req, res) => {
+      urlsRoute.bind(server)(app, req, res);
+    });
+  }
 
   server.get('/raw/:id', async (req, res) => {
     const { id } = req.params;
