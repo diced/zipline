@@ -42,9 +42,15 @@ export default class Logger {
     return (
       ' ' +
       Object.entries(extra)
-        .map(([key, value]) => `${blue(key)}${gray('=')}${JSON.stringify(value)}`)
+        .map(([key, value]) => `${blue(key)}${gray('=')}${JSON.stringify(value, this.replacer)}`)
         .join(' ')
     );
+  }
+
+  private replacer(key: string, value: unknown) {
+    if (key === 'password') return '********';
+    if (key === 'avatar') return '[base64]';
+    return value;
   }
 
   private write(message: string, level: LoggerLevel, extra?: Record<string, unknown>) {

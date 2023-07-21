@@ -105,6 +105,12 @@ export async function handler(req: NextApiReq<Body, Query>, res: NextApiRes<ApiU
       });
     }
 
+    await prisma.oAuthProvider.deleteMany({
+      where: {
+        userId: user.id,
+      },
+    });
+
     const deletedUser = await prisma.user.delete({
       where: {
         id: user.id,

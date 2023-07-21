@@ -1,16 +1,22 @@
 import { useConfig } from '@/components/ConfigProvider';
+import { Response } from '@/lib/api/response';
+import { fetchApi } from '@/lib/fetchApi';
 import { findProvider } from '@/lib/oauth/providerUtil';
 import { useSettingsStore } from '@/lib/store/settings';
 import { useUserStore } from '@/lib/store/user';
 import { Button, Group, Paper, Stack, Switch, Text, Title } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
 import type { OAuthProviderType } from '@prisma/client';
 import {
   IconBrandDiscordFilled,
   IconBrandGithubFilled,
   IconBrandGoogle,
+  IconCheck,
   IconCircleKeyFilled,
+  IconUserExclamation,
 } from '@tabler/icons-react';
 import Link from 'next/link';
+import { mutate } from 'swr';
 
 const icons = {
   DISCORD: <IconBrandDiscordFilled />,
@@ -27,8 +33,30 @@ const names = {
 };
 
 function OAuthButton({ provider, linked }: { provider: OAuthProviderType; linked: boolean }) {
-  const unlink = async () => {};
-  
+  const unlink = async () => {
+    const { error } = await fetchApi<Response['/api/auth/oauth']>('/api/auth/oauth', 'DELETE', {
+      provider,
+    });
+
+    if (error) {
+      notifications.show({
+        title: 'Failed to unlink account',
+        message: error.message,
+        color: 'red',
+        icon: <IconUserExclamation size='1rem' />,
+      });
+    } else {
+      notifications.show({
+        title: 'Account unlinked',
+        message: `Your ${names[provider]} account has been unlinked.`,
+        color: 'green',
+        icon: <IconCheck size='1rem' />,
+      });
+
+      mutate('/api/user');
+    }
+  };
+
   const baseProps = {
     size: 'sm',
     leftIcon: icons[provider],
@@ -45,7 +73,7 @@ function OAuthButton({ provider, linked }: { provider: OAuthProviderType; linked
       Unlink {names[provider]} account
     </Button>
   ) : (
-    <Button {...baseProps} component={Link} href={`/api/auth/oauth/${provider.toLowerCase()}?link=true`}>
+    <Button {...baseProps} component={Link} href={`/api/auth/oauth/${provider.toLowerCase()}?state=link`}>
       Link {names[provider]} account
     </Button>
   );
@@ -54,7 +82,7 @@ function OAuthButton({ provider, linked }: { provider: OAuthProviderType; linked
 export default function SettingsOAuth() {
   const config = useConfig();
 
-  const [user, setUser] = useUserStore((state) => [state.user, state.setUser]);
+  const user = useUserStore((state) => state.user);
 
   const discordLinked = findProvider('DISCORD', user?.oauthProviders ?? []);
   const githubLinked = findProvider('GITHUB', user?.oauthProviders ?? []);

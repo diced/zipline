@@ -24,7 +24,7 @@ import { useState } from 'react';
 import { mutate } from 'swr';
 import UserGridView from './views/UserGridView';
 import UserTableView from './views/UserTableView';
-import { readToDataURL } from '@/lib/readToDataURL';
+import { readToDataURL } from '@/lib/base64';
 import { canInteract } from '@/lib/role';
 import { useUserStore } from '@/lib/store/user';
 

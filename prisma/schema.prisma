@@ -49,16 +49,15 @@ model OAuthProvider {
 
   userId       String
   provider     OAuthProviderType
+
+  username     String
   accessToken  String
-  refreshToken String
-  expiresIn    Int
-  scope        String
-  tokenType    String
-  profile      Json
+  refreshToken String?
+  oauthId      String?
 
   user User @relation(fields: [userId], references: [id])
 
-  @@unique([userId, provider])
+  @@unique([provider, oauthId])
 }
 
 enum OAuthProviderType {

@@ -3,6 +3,7 @@ import { serializeCookie } from '@/lib/cookie';
 import { createToken, encryptToken } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
 import { User, userSelect } from '@/lib/db/models/user';
+import { loginToken } from '@/lib/login';
 import { combine } from '@/lib/middleware/combine';
 import { method } from '@/lib/middleware/method';
 import { ziplineAuth } from '@/lib/middleware/ziplineAuth';
@@ -44,16 +45,7 @@ export async function handler(req: NextApiReq, res: NextApiRes<ApiUserTokenRespo
     },
   });
 
-  const token = encryptToken(user.token, config.core.secret);
-
-  const cookie = serializeCookie('zipline_token', token, {
-    // week
-    maxAge: 60 * 60 * 24 * 7,
-    expires: new Date(Date.now() + 60 * 60 * 24 * 7 * 1000),
-    path: '/',
-    sameSite: 'lax',
-  });
-  res.setHeader('Set-Cookie', cookie);
+  const token = loginToken(res, user);
 
   delete (user as any).token;
 

@@ -1,7 +1,7 @@
 import { Response } from '@/lib/api/response';
 import { fetchApi } from '@/lib/fetchApi';
 import useAvatar from '@/lib/hooks/useAvatar';
-import { readToDataURL } from '@/lib/readToDataURL';
+import { readToDataURL } from '@/lib/base64';
 import { useUserStore } from '@/lib/store/user';
 import { Avatar, Button, Card, FileInput, Group, Paper, Stack, Text, Title } from '@mantine/core';
 import { notifications } from '@mantine/notifications';

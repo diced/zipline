@@ -1,5 +1,6 @@
 import { ApiLoginResponse } from '@/pages/api/auth/login';
 import { ApiLogoutResponse } from '@/pages/api/auth/logout';
+import { ApiAuthOauthResponse } from '@/pages/api/auth/oauth';
 import { ApiHealthcheckResponse } from '@/pages/api/healthcheck';
 import { ApiSetupResponse } from '@/pages/api/setup';
 import { ApiUploadResponse } from '@/pages/api/upload';
@@ -17,6 +18,7 @@ import { ApiUsersResponse } from '@/pages/api/users';
 import { ApiUsersIdResponse } from '@/pages/api/users/[id]';
 
 export type Response = {
+  '/api/auth/oauth': ApiAuthOauthResponse;
   '/api/auth/login': ApiLoginResponse;
   '/api/auth/logout': ApiLogoutResponse;
   '/api/user/files/[id]/password': ApiUserFilesIdPasswordResponse;

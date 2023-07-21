@@ -18,14 +18,28 @@ declare module 'next' {
   }
 }
 
-export function parseUserToken(encryptedToken?: string): string {
-  if (!encryptedToken) throw { error: 'Unauthorized' };
+export function parseUserToken(encryptedToken: string | undefined | null): string;
+export function parseUserToken(encryptedToken: string | undefined | null, noThrow: true): string | null;
+export function parseUserToken(
+  encryptedToken: string | undefined | null,
+  noThrow: boolean = false
+): string | null {
+  if (!encryptedToken) {
+    if (noThrow) return null;
+    throw { error: 'no token' };
+  }
 
   const decryptedToken = decryptToken(encryptedToken, config.core.secret);
-  if (!decryptedToken) throw { error: 'could not decrypt token' };
+  if (!decryptedToken) {
+    if (noThrow) return null;
+    throw { error: 'could not decrypt token' };
+  }
 
   const [date, token] = decryptedToken;
-  if (isNaN(new Date(date).getTime())) throw { error: 'could not decrypt token date' };
+  if (isNaN(new Date(date).getTime())) {
+    if (noThrow) return null;
+    throw { error: 'invalid token' };
+  }
 
   return token;
 }

@@ -1,7 +1,7 @@
 import { Response } from '@/lib/api/response';
 import { User } from '@/lib/db/models/user';
 import { fetchApi } from '@/lib/fetchApi';
-import { readToDataURL } from '@/lib/readToDataURL';
+import { readToDataURL } from '@/lib/base64';
 import { canInteract } from '@/lib/role';
 import { useUserStore } from '@/lib/store/user';
 import {

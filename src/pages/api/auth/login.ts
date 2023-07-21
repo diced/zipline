@@ -3,6 +3,7 @@ import { serializeCookie } from '@/lib/cookie';
 import { encryptToken, verifyPassword } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
 import { User, userSelect } from '@/lib/db/models/user';
+import { loginToken } from '@/lib/login';
 import { combine } from '@/lib/middleware/combine';
 import { cors } from '@/lib/middleware/cors';
 import { method } from '@/lib/middleware/method';
@@ -40,17 +41,7 @@ async function handler(req: NextApiReq<Body>, res: NextApiRes<ApiLoginResponse>)
   const valid = await verifyPassword(password, user.password);
   if (!valid) return res.badRequest('Invalid password', { password: true });
 
-  const token = encryptToken(user.token!, config.core.secret);
-
-  const cookie = serializeCookie('zipline_token', token, {
-    // week
-    maxAge: 60 * 60 * 24 * 7,
-    expires: new Date(Date.now() + 60 * 60 * 24 * 7 * 1000),
-    path: '/',
-    sameSite: 'lax',
-  });
-
-  res.setHeader('Set-Cookie', cookie);
+  const token = loginToken(res, user);
 
   delete (user as any).token;
   delete (user as any).password;
