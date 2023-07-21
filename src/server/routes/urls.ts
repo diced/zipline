@@ -20,7 +20,18 @@ export async function urlsRoute(
   });
   if (!url) return app.render404(req, res, parsedUrl);
 
-  // todo: add view
+  if (url.maxViews && url.views >= url.maxViews) return app.render404(req, res, parsedUrl);
+
+  await prisma.url.update({
+    where: {
+      id: url.id,
+    },
+    data: {
+      views: {
+        increment: 1,
+      },
+    },
+  });
 
   return res.redirect(url.destination);
 }

@@ -68,6 +68,10 @@ export default function UrlTableView() {
               ),
             },
             {
+              accessor: 'views',
+              sortable: true,
+            },
+            {
               accessor: 'maxViews',
               sortable: true,
               render: (url) => (url.maxViews ? url.maxViews : <b>None</b>),

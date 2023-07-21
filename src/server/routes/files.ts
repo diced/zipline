@@ -27,6 +27,8 @@ export async function filesRoute(
 
   if (!file) return app.render404(req, res, parsedUrl);
 
+  if (file.maxViews && file.views >= file.maxViews) return app.render404(req, res, parsedUrl);
+
   if (file.User?.view.enabled) return res.redirect(`/view/${file.name}`);
 
   const stream = await datasource.get(file.name);
@@ -46,7 +48,16 @@ export async function filesRoute(
       `${req.query.download ? 'attachment; ' : ''}filename="${file.originalName}"`
     );
 
-  // todo: add view
+  await prisma.file.update({
+    where: {
+      id: file.id,
+    },
+    data: {
+      views: {
+        increment: 1,
+      },
+    },
+  });
 
   stream.pipe(res);
 }
