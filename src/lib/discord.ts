@@ -31,7 +31,6 @@ export async function sendUpload(user: User, file: File, raw_link: string, link:
   if (!config.discord.upload) return;
   if (!config.discord.url && !config.discord.upload.url) return;
 
-  logger.debug(`discord config:\n${JSON.stringify(config.discord)}`);
   const parsed = parseContent(config.discord.upload, {
     file,
     user,
