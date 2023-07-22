@@ -1,10 +1,11 @@
 import { Response } from '@/lib/api/response';
 import { config } from '@/lib/config';
+import { SafeConfig } from '@/lib/config/safe';
 import { getZipline } from '@/lib/db/models/zipline';
 import { fetchApi } from '@/lib/fetchApi';
 import { withSafeConfig } from '@/lib/middleware/next/withSafeConfig';
 import { eitherTrue, isTruthy } from '@/lib/primitive';
-import { Button, Center, PasswordInput, Stack, Text, TextInput, Title } from '@mantine/core';
+import { Button, Center, LoadingOverlay, PasswordInput, Stack, Text, TextInput, Title } from '@mantine/core';
 import { hasLength, useForm } from '@mantine/form';
 import {
   IconBrandDiscordFilled,
@@ -21,6 +22,17 @@ import useSWR from 'swr';
 export default function Login({ config }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter();
   const { data, isLoading, mutate } = useSWR<Response['/api/user']>('/api/user');
+
+  const showLocalLogin =
+    router.query.local === 'true' ||
+    !(
+      config.oauth.bypassLocalLogin && Object.values(config.oauthEnabled).filter((x) => x === true).length > 0
+    );
+
+  const willRedirect =
+    config.oauth.bypassLocalLogin &&
+    Object.values(config.oauthEnabled).filter((x) => x === true).length === 1 &&
+    router.query.local !== 'true';
 
   useEffect(() => {
     if (data?.user) {
@@ -55,47 +67,65 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
     }
   };
 
+  useEffect(() => {
+    if (willRedirect) {
+      const provider = Object.keys(config.oauthEnabled).find(
+        (x) => config.oauthEnabled[x as keyof SafeConfig['oauthEnabled']] === true
+      );
+
+      if (provider) {
+        router.push(`/api/auth/oauth/${provider}`);
+      }
+    }
+  }, []);
+
   return (
     <>
+      {willRedirect && !showLocalLogin && <LoadingOverlay visible />}
+
       <Center h='100vh'>
         <div>
           <Title order={1} size={50} align='center'>
             <b>Zipline</b>
           </Title>
 
-          <form onSubmit={form.onSubmit(onSubmit)}>
-            <Stack my='sm'>
-              <TextInput
-                size='lg'
-                placeholder='Enter your username...'
-                {...form.getInputProps('username', { withError: true })}
-              />
+          {showLocalLogin && (
+            <>
+              <form onSubmit={form.onSubmit(onSubmit)}>
+                <Stack my='sm'>
+                  <TextInput
+                    size='lg'
+                    placeholder='Enter your username...'
+                    {...form.getInputProps('username', { withError: true })}
+                  />
 
-              <PasswordInput
-                size='lg'
-                placeholder='Enter your password...'
-                {...form.getInputProps('password')}
-              />
+                  <PasswordInput
+                    size='lg'
+                    placeholder='Enter your password...'
+                    {...form.getInputProps('password')}
+                  />
 
-              <Button size='lg' fullWidth type='submit' color='gray' loading={isLoading}>
-                Login
-              </Button>
-            </Stack>
-          </form>
+                  <Button size='lg' fullWidth type='submit' color='gray' loading={isLoading}>
+                    Login
+                  </Button>
+                </Stack>
+              </form>
 
-          {eitherTrue(config.features.oauthRegistration, config.features.userRegistration) && (
-            <Text size='sm' align='center' color='dimmed'>
-              OR
-            </Text>
+              {eitherTrue(config.features.oauthRegistration, config.features.userRegistration) && (
+                <Text size='sm' my='xs' align='center' color='dimmed'>
+                  OR
+                </Text>
+              )}
+
+              {config.features.userRegistration && (
+                <Button size='lg' fullWidth variant='outline' color='gray'>
+                  Sign up
+                </Button>
+              )}
+            </>
           )}
 
           <Stack my='xs'>
-            {config.features.userRegistration && (
-              <Button size='lg' fullWidth variant='outline' color='gray'>
-                Sign up
-              </Button>
-            )}
-
             {config.oauthEnabled.discord && (
               <Button
                 size='lg'

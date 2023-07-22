@@ -116,6 +116,8 @@ export const schema = z.object({
     disableMediaPreview: z.boolean().default(false),
   }),
   oauth: z.object({
+    bypassLocalLogin: z.boolean().default(false),
+    loginOnly: z.boolean().default(false),
     discord: z
       .object({
         clientId: z.string(),

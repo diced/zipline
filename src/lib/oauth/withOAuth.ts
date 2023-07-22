@@ -175,6 +175,8 @@ export const withOAuth =
       });
 
       return res.redirect('/dashboard');
+    } else if (config.oauth.loginOnly) {
+      return res.badRequest('Can\'t create users through oauth.');
     } else if (existingUser) {
       return res.badRequest('This username is already taken');
     }

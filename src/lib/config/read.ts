@@ -52,6 +52,8 @@ export const PROP_TO_ENV: Record<string, string> = {
   'website.defaultAvatar': 'WEBSITE_DEFAULT_AVATAR',
   'website.disableMediaPreview': 'WEBSITE_DISABLE_MEDIA_PREVIEW',
 
+  'oauth.bypassLocalLogin': 'OAUTH_BYPASS_LOCAL_LOGIN',
+  'oauth.loginOnly': 'OAUTH_LOGIN_ONLY',
   'oauth.discord.clientId': 'OAUTH_DISCORD_CLIENT_ID',
   'oauth.discord.clientSecret': 'OAUTH_DISCORD_CLIENT_SECRET',
   'oauth.github.clientId': 'OAUTH_GITHUB_CLIENT_ID',
@@ -107,6 +109,8 @@ export function readEnv() {
     env(PROP_TO_ENV['website.defaultAvatar'], 'website.defaultAvatar', 'string'),
     env(PROP_TO_ENV['website.disableMediaPreview'], 'website.disableMediaPreview', 'boolean'),
 
+    env(PROP_TO_ENV['oauth.bypassLocalLogin'], 'oauth.bypassLocalLogin', 'boolean'),
+    env(PROP_TO_ENV['oauth.loginOnly'], 'oauth.loginOnly', 'boolean'),
     env(PROP_TO_ENV['oauth.discord.clientId'], 'oauth.discord.clientId', 'string'),
     env(PROP_TO_ENV['oauth.discord.clientSecret'], 'oauth.discord.clientSecret', 'string'),
     env(PROP_TO_ENV['oauth.github.clientId'], 'oauth.github.clientId', 'string'),
@@ -162,6 +166,8 @@ export function readEnv() {
       disableMediaPreview: undefined,
     },
     oauth: {
+      bypassLocalLogin: undefined,
+      loginOnly: undefined,
       discord: {
         clientId: undefined,
         clientSecret: undefined,
