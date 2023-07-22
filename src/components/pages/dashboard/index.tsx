@@ -10,8 +10,6 @@ import useSWR from 'swr';
 
 export default function DashboardHome() {
   const { user } = useLogin();
-  const config = useConfig();
-
   const { data: recent, isLoading: recentLoading } = useSWR<Response['/api/user/recent']>('/api/user/recent');
   const { data: stats, isLoading: statsLoading } = useSWR<Response['/api/user/stats']>('/api/user/stats');
 
@@ -35,11 +33,7 @@ export default function DashboardHome() {
       ) : recent?.length !== 0 ? (
         <SimpleGrid cols={3} spacing='md' breakpoints={[{ maxWidth: 'sm', cols: 1, spacing: 'sm' }]}>
           {recent!.map((file) => (
-            <DashboardFile
-              disableMediaPreview={config.website.disableMediaPreview}
-              key={file.id}
-              file={file}
-            />
+            <DashboardFile key={file.id} file={file} />
           ))}
         </SimpleGrid>
       ) : (

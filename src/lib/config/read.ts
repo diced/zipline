@@ -50,7 +50,6 @@ export const PROP_TO_ENV: Record<string, string> = {
   'website.title': 'WEBSITE_TITLE',
   'website.externalLinks': 'WEBSITE_EXTERNAL_LINKS',
   'website.defaultAvatar': 'WEBSITE_DEFAULT_AVATAR',
-  'website.disableMediaPreview': 'WEBSITE_DISABLE_MEDIA_PREVIEW',
 
   'oauth.bypassLocalLogin': 'OAUTH_BYPASS_LOCAL_LOGIN',
   'oauth.loginOnly': 'OAUTH_LOGIN_ONLY',
@@ -107,7 +106,6 @@ export function readEnv() {
     env(PROP_TO_ENV['website.title'], 'website.title', 'string'),
     env(PROP_TO_ENV['website.externalLinks'], 'website.externalLinks', 'json[]'),
     env(PROP_TO_ENV['website.defaultAvatar'], 'website.defaultAvatar', 'string'),
-    env(PROP_TO_ENV['website.disableMediaPreview'], 'website.disableMediaPreview', 'boolean'),
 
     env(PROP_TO_ENV['oauth.bypassLocalLogin'], 'oauth.bypassLocalLogin', 'boolean'),
     env(PROP_TO_ENV['oauth.loginOnly'], 'oauth.loginOnly', 'boolean'),
@@ -163,7 +161,6 @@ export function readEnv() {
       title: undefined,
       externalLinks: undefined,
       defaultAvatar: undefined,
-      disableMediaPreview: undefined,
     },
     oauth: {
       bypassLocalLogin: undefined,

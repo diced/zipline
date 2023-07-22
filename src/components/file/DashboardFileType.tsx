@@ -14,6 +14,7 @@ import {
 import { useEffect, useState } from 'react';
 import { renderMode } from '../pages/upload/renderMode';
 import Render from '../render/Render';
+import { useSettingsStore } from '@/lib/store/settings';
 
 function PlaceholderContent({ text, Icon }: { text: string; Icon: Icon }) {
   return (
@@ -45,15 +46,15 @@ export default function DashboardFileType({
   file,
   show,
   password,
-  disableMediaPreview,
   code,
 }: {
   file: DbFile | File;
   show?: boolean;
   password?: string;
-  disableMediaPreview?: boolean;
   code?: boolean;
 }) {
+  const disableMediaPreview = useSettingsStore((state) => state.settings.disableMediaPreview);
+
   const dbFile = 'id' in file;
   const renderIn = renderMode(file.name.split('.').pop() || '');
 
@@ -78,7 +79,7 @@ export default function DashboardFileType({
     }
   }, []);
 
-  if (disableMediaPreview)
+  if (disableMediaPreview && !show)
     // @ts-ignore
     return <Placeholder text={`Click to view file ${file.name}`} Icon={icon[type] ?? IconFileUnknown} />;
 

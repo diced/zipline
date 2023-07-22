@@ -20,7 +20,6 @@ import { useApiPagination } from '../useApiPagination';
 
 export default function FavoriteFiles() {
   const router = useRouter();
-  const config = useConfig();
 
   const [page, setPage] = useState<number>(
     router.query.favoritePage ? parseInt(router.query.favoritePage as string) : 1
@@ -68,13 +67,7 @@ export default function FavoriteFiles() {
                     <LoadingOverlay visible />
                   </Paper>
                 ) : data?.page.length ?? 0 > 0 ? (
-                  data?.page.map((file) => (
-                    <DashboardFile
-                      disableMediaPreview={config?.website.disableMediaPreview ?? false}
-                      key={file.id}
-                      file={file}
-                    />
-                  ))
+                  data?.page.map((file) => <DashboardFile key={file.id} file={file} />)
                 ) : (
                   <Paper withBorder p='sm'>
                     <Center>

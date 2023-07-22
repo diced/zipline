@@ -20,7 +20,6 @@ import { useConfig } from '@/components/ConfigProvider';
 
 export default function Files({ id }: { id?: string }) {
   const router = useRouter();
-  const config = useConfig();
 
   const [page, setPage] = useState<number>(router.query.page ? parseInt(router.query.page as string) : 1);
   const { data, isLoading } = useApiPagination({
@@ -58,13 +57,7 @@ export default function Files({ id }: { id?: string }) {
             <LoadingOverlay visible />
           </Paper>
         ) : data?.page?.length ?? 0 > 0 ? (
-          data?.page.map((file) => (
-            <DashboardFile
-              disableMediaPreview={config.website.disableMediaPreview}
-              key={file.id}
-              file={file}
-            />
-          ))
+          data?.page.map((file) => <DashboardFile key={file.id} file={file} />)
         ) : (
           <Paper withBorder p='sm'>
             <Center>

@@ -3,15 +3,8 @@ import { Card } from '@mantine/core';
 import { useState } from 'react';
 import DashboardFileType from '../DashboardFileType';
 import FileModal from './FileModal';
-import { KeyedMutator } from 'swr';
 
-export default function DashboardFile({
-  file,
-  disableMediaPreview,
-}: {
-  file: File;
-  disableMediaPreview: boolean;
-}) {
+export default function DashboardFile({ file }: { file: File }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -33,7 +26,7 @@ export default function DashboardFile({
         }}
         onClick={() => setOpen(true)}
       >
-        <DashboardFileType disableMediaPreview={disableMediaPreview} key={file.id} file={file} />
+        <DashboardFileType key={file.id} file={file} />
       </Card>
     </>
   );
