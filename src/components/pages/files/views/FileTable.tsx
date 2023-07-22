@@ -2,7 +2,7 @@ import RelativeDate from '@/components/RelativeDate';
 import FileModal from '@/components/file/DashboardFile/FileModal';
 import { copyFile, deleteFile, viewFile } from '@/components/file/actions';
 import { type File } from '@/lib/db/models/file';
-import { ActionIcon, Box, Button, Group, Paper, Title, Tooltip } from '@mantine/core';
+import { ActionIcon, Box, Button, Group, Paper, Text, Title, Tooltip } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import type { Prisma } from '@prisma/client';
@@ -63,16 +63,25 @@ export default function FileTable({ id }: { id?: string }) {
       <Box my='sm'>
         {selectedFiles.length > 0 && (
           <Paper withBorder p='sm' my='sm'>
-            <Title order={3} mb='md'>
+            <Title order={3}>
               Operations
             </Title>
+
+            <Text size='sm' color='dimmed' mb='xs'>
+              Selections are saved across page changes
+            </Text>
 
             <Group>
               <Button
                 variant='outline'
                 color='red'
                 leftIcon={<IconTrashFilled size='1rem' />}
-                onClick={() => bulkDelete(selectedFiles.map((x) => x.id), setSelectedFiles)}
+                onClick={() =>
+                  bulkDelete(
+                    selectedFiles.map((x) => x.id),
+                    setSelectedFiles
+                  )
+                }
               >
                 Delete {selectedFiles.length} file{selectedFiles.length > 1 ? 's' : ''}
               </Button>
