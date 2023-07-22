@@ -28,8 +28,9 @@ export function parseContent(
 }
 
 export async function sendUpload(user: User, file: File, raw_link: string, link: string) {
-  if (!config.discord.upload) return;
-  if (!config.discord.url && !config.discord.upload.url) return;
+  if (!config.discord.upload) return logger.debug('no discord upload config, no webhook sent');
+  if (!config.discord.url && !config.discord.upload.url)
+    return logger.debug('no discord url, no webhook sent');
 
   const parsed = parseContent(config.discord.upload, {
     file,
@@ -96,8 +97,9 @@ export async function sendUpload(user: User, file: File, raw_link: string, link:
 }
 
 export async function sendShorten(user: User, url: Url, link: string) {
-  if (!config.discord.shorten) return;
-  if (!config.discord.url && !config.discord.shorten.url) return;
+  if (!config.discord.shorten) return logger.debug('no discord shorten config, no webhook sent');
+  if (!config.discord.url && !config.discord.shorten.url)
+    return logger.debug('no discord url, no webhook sent');
 
   const parsed = parseContent(config.discord.shorten, {
     url,
