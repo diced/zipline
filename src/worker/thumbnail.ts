@@ -3,18 +3,17 @@ import { spawn } from 'child_process';
 import ffmpeg from 'ffmpeg-static';
 import { createWriteStream } from 'fs';
 import { rm } from 'fs/promises';
-import type { Config } from 'lib/config/Config';
 import Logger from 'lib/logger';
 import { randomChars } from 'lib/util';
 import { join } from 'path';
 import { isMainThread, workerData } from 'worker_threads';
 import datasource from 'lib/datasource';
+import config from 'lib/config';
 
-const { videos, config } = workerData as {
+const { videos } = workerData as {
   videos: (File & {
     thumbnail: Thumbnail;
   })[];
-  config: Config;
 };
 
 const logger = Logger.get('worker::thumbnail').child(randomChars(4));

@@ -259,8 +259,6 @@ async function thumbs(this: FastifyInstance) {
     new Worker('./dist/worker/thumbnail.js', {
       workerData: {
         videos: chunk,
-        config,
-        datasource,
       },
     });
   }
