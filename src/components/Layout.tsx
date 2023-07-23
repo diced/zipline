@@ -30,6 +30,7 @@ import {
   IconFileText,
   IconFileUpload,
   IconFiles,
+  IconFolder,
   IconHome,
   IconLink,
   IconLogout,
@@ -67,6 +68,12 @@ const navLinks: NavLinks[] = [
     icon: <IconFiles size='1rem' />,
     active: (path: string) => path === '/dashboard/files',
     href: '/dashboard/files',
+  },
+  {
+    label: 'Folders',
+    icon: <IconFolder size='1rem' />,
+    active: (path: string) => path === '/dashboard/folders',
+    href: '/dashboard/folders',
   },
   {
     label: 'Upload',
@@ -198,7 +205,7 @@ export default function Layout({ children, config }: { children: React.ReactNode
       navbarOffsetBreakpoint='sm'
       asideOffsetBreakpoint='sm'
       navbar={
-        <Navbar hiddenBreakpoint='sm' hidden={!opened} width={{ sm: 200, lg: 200 }}>
+        <Navbar hiddenBreakpoint='sm' hidden={!opened} width={{ sm: 200, lg: 230 }}>
           {navLinks
             .filter((link) => !link.if || link.if(user as Response['/api/user']['user']))
             .map((link) => {

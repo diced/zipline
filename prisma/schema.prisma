@@ -47,8 +47,8 @@ model OAuthProvider {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  userId       String
-  provider     OAuthProviderType
+  userId   String
+  provider OAuthProviderType
 
   username     String
   accessToken  String
@@ -125,7 +125,8 @@ model Folder {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  name String
+  name   String
+  public Boolean @default(false)
 
   files File[]
 

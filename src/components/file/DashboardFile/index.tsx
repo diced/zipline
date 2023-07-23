@@ -4,12 +4,12 @@ import { useState } from 'react';
 import DashboardFileType from '../DashboardFileType';
 import FileModal from './FileModal';
 
-export default function DashboardFile({ file }: { file: File }) {
+export default function DashboardFile({ file, reduce }: { file: File; reduce?: boolean }) {
   const [open, setOpen] = useState(false);
 
   return (
     <>
-      <FileModal open={open} setOpen={setOpen} file={file} />
+      <FileModal open={open} setOpen={setOpen} file={file} reduce={reduce} />
 
       <Card
         shadow='md'

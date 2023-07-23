@@ -9,6 +9,8 @@ import { ApiUserFilesResponse } from '@/pages/api/user/files';
 import { ApiUserFilesIdResponse } from '@/pages/api/user/files/[id]';
 import { ApiUserFilesIdPasswordResponse } from '@/pages/api/user/files/[id]/password';
 import { ApiUserFilesTransactionResponse } from '@/pages/api/user/files/transaction';
+import { ApiUserFoldersResponse } from '@/pages/api/user/folders';
+import { ApiUserFoldersIdResponse } from '@/pages/api/user/folders/[id]';
 import { ApiUserRecentResponse } from '@/pages/api/user/recent';
 import { ApiUserStatsResponse } from '@/pages/api/user/stats';
 import { ApiUserTokenResponse } from '@/pages/api/user/token';
@@ -21,6 +23,8 @@ export type Response = {
   '/api/auth/oauth': ApiAuthOauthResponse;
   '/api/auth/login': ApiLoginResponse;
   '/api/auth/logout': ApiLogoutResponse;
+  '/api/user/folders/[id]': ApiUserFoldersIdResponse;
+  '/api/user/folders': ApiUserFoldersResponse;
   '/api/user/files/[id]/password': ApiUserFilesIdPasswordResponse;
   '/api/user/files/[id]': ApiUserFilesIdResponse;
   '/api/user/files/transaction': ApiUserFilesTransactionResponse;

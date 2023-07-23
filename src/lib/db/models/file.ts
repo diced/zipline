@@ -13,6 +13,7 @@ export type File = {
   type: string;
   views: number;
   password?: string | boolean | null;
+  folderId: string | null;
 
   url?: string;
 };
@@ -28,6 +29,7 @@ export const fileSelect = {
   size: true,
   type: true,
   views: true,
+  folderId: true,
 };
 
 export function cleanFile(file: File) {
@@ -38,10 +40,14 @@ export function cleanFile(file: File) {
   return file;
 }
 
-export function cleanFiles(files: File[]) {
+export function cleanFiles(files: File[], stringifyDates = false) {
   for (let i = 0; i !== files.length; ++i) {
     const file = files[i];
     if (file.password) file.password = true;
+
+    (file as any).createdAt = stringifyDates ? file.createdAt.toISOString() : file.createdAt;
+    (file as any).updatedAt = stringifyDates ? file.updatedAt.toISOString() : file.updatedAt;
+    (file as any).deletesAt = stringifyDates ? file.deletesAt?.toISOString() || null : file.deletesAt;
 
     file.url = formatRootUrl(config.files.route, file.name);
   }

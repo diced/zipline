@@ -8,6 +8,7 @@ export type ViewStore = {
   urls: ViewType;
   users: ViewType;
   invites: ViewType;
+  folders: ViewType;
 
   setView: (type: Exclude<keyof ViewStore, 'setView'>, value: ViewType) => void;
 };
@@ -19,6 +20,7 @@ export const useViewStore = create<ViewStore>()(
       urls: 'table',
       users: 'table',
       invites: 'table',
+      folders: 'table',
 
       setView: (type, value) =>
         set((state) => ({

@@ -1,5 +1,5 @@
 import { File } from '@/lib/db/models/file';
-import { ActionIcon, Group, Modal, SimpleGrid, Text, Title, Tooltip } from '@mantine/core';
+import { ActionIcon, Group, Modal, Select, SimpleGrid, Text, Title, Tooltip } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import {
@@ -11,16 +11,29 @@ import {
   IconExternalLink,
   IconEyeFilled,
   IconFileInfo,
+  IconFolderMinus,
   IconRefresh,
   IconStar,
   IconStarFilled,
   IconTrashFilled,
-  IconUpload
+  IconUpload,
 } from '@tabler/icons-react';
 import bytes from 'bytes';
 import DashboardFileType from '../DashboardFileType';
-import { copyFile, deleteFile, downloadFile, favoriteFile, viewFile } from '../actions';
+import {
+  addToFolder,
+  copyFile,
+  createFolderAndAdd,
+  deleteFile,
+  downloadFile,
+  favoriteFile,
+  removeFromFolder,
+  viewFile,
+} from '../actions';
 import FileStat from './FileStat';
+import useSWR from 'swr';
+import { Response } from '@/lib/api/response';
+import { Folder } from '@/lib/db/models/folder';
 
 function ActionButton({
   Icon,
@@ -46,12 +59,18 @@ export default function FileModal({
   open,
   setOpen,
   file,
+  reduce,
 }: {
   open: boolean;
   setOpen: (open: boolean) => void;
   file?: File | null;
+  reduce?: boolean;
 }) {
   const clipboard = useClipboard();
+
+  const { data: folders } = useSWR<Extract<Response['/api/user/folders'], Folder[]>>(
+    '/api/user/folders?noincl=true'
+  );
 
   return (
     <Modal
@@ -89,7 +108,7 @@ export default function FileModal({
             <FileStat Icon={IconDeviceSdCard} title='Size' value={bytes(file.size, { unitSeparator: ' ' })} />
             <FileStat Icon={IconUpload} title='Created at' value={file.createdAt.toLocaleString()} />
             <FileStat Icon={IconRefresh} title='Updated at' value={file.updatedAt.toLocaleString()} />
-            {file.deletesAt && (
+            {file.deletesAt && !reduce && (
               <FileStat Icon={IconBombFilled} title='Deletes at' value={file.deletesAt.toLocaleString()} />
             )}
             <FileStat Icon={IconEyeFilled} title='Views' value={file.views} />
@@ -97,18 +116,47 @@ export default function FileModal({
 
           <Group position='apart'>
             <Group position='left'>
-              <Text size='sm' color='dimmed'>
-                {file.id}
-              </Text>
+              {!reduce &&
+                (file.folderId ? (
+                  <ActionButton
+                    Icon={IconFolderMinus}
+                    onClick={() => removeFromFolder(file)}
+                    tooltip={`Remove from folder "${
+                      folders?.find((f) => f.id === file.folderId)?.name ?? ''
+                    }"`}
+                    color='red'
+                  />
+                ) : (
+                  <Select
+                    data={folders?.map((f) => ({ value: f.id, label: f.name })) ?? []}
+                    placeholder='Add to a folder...'
+                    searchable
+                    creatable
+                    getCreateLabel={(value) => `Create folder "${value}"`}
+                    onCreate={(query) => createFolderAndAdd(file, query)}
+                    onChange={(value) => addToFolder(file, value)}
+                    size='xs'
+                  />
+                ))}
             </Group>
 
             <Group position='right'>
-              <ActionButton
-                Icon={IconTrashFilled}
-                onClick={() => deleteFile(file, notifications, setOpen)}
-                tooltip='Delete file'
-                color='red'
-              />
+              {!reduce && (
+                <>
+                  <ActionButton
+                    Icon={IconTrashFilled}
+                    onClick={() => deleteFile(file, setOpen)}
+                    tooltip='Delete file'
+                    color='red'
+                  />
+                  <ActionButton
+                    Icon={file.favorite ? IconStarFilled : IconStar}
+                    onClick={() => favoriteFile(file)}
+                    tooltip={file.favorite ? 'Unfavorite file' : 'Favorite file'}
+                    color={file.favorite ? 'yellow' : 'gray'}
+                  />
+                </>
+              )}
               <ActionButton
                 Icon={IconExternalLink}
                 onClick={() => viewFile(file)}
@@ -116,14 +164,8 @@ export default function FileModal({
               />
               <ActionButton
                 Icon={IconCopy}
-                onClick={() => copyFile(file, clipboard, notifications)}
+                onClick={() => copyFile(file, clipboard)}
                 tooltip='Copy file link'
-              />
-              <ActionButton
-                Icon={file.favorite ? IconStarFilled : IconStar}
-                onClick={() => favoriteFile(file, notifications)}
-                tooltip={file.favorite ? 'Unfavorite file' : 'Favorite file'}
-                color={file.favorite ? 'yellow' : 'gray'}
               />
               <ActionButton Icon={IconDownload} onClick={() => downloadFile(file)} tooltip='Download file' />
             </Group>

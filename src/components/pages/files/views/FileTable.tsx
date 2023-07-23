@@ -50,6 +50,16 @@ export default function FileTable({ id }: { id?: string }) {
     );
   }, [page]);
 
+  useEffect(() => {
+    if (data && selectedFile) {
+      const file = data.page.find((x) => x.id === selectedFile.id);
+
+      if (file) {
+        setSelectedFile(file);
+      }
+    }
+  }, [data]);
+
   return (
     <>
       <FileModal
@@ -63,9 +73,7 @@ export default function FileTable({ id }: { id?: string }) {
       <Box my='sm'>
         {selectedFiles.length > 0 && (
           <Paper withBorder p='sm' my='sm'>
-            <Title order={3}>
-              Operations
-            </Title>
+            <Title order={3}>Operations</Title>
 
             <Text size='sm' color='dimmed' mb='xs'>
               Selections are saved across page changes
@@ -158,7 +166,7 @@ export default function FileTable({ id }: { id?: string }) {
                       color='gray'
                       onClick={(e) => {
                         e.stopPropagation();
-                        copyFile(file, clipboard, notifications);
+                        copyFile(file, clipboard);
                       }}
                     >
                       <IconCopy size='1rem' />
@@ -171,7 +179,7 @@ export default function FileTable({ id }: { id?: string }) {
                       color='red'
                       onClick={(e) => {
                         e.stopPropagation();
-                        deleteFile(file, notifications, () => {});
+                        deleteFile(file, () => {});
                       }}
                     >
                       <IconTrashFilled size='1rem' />
