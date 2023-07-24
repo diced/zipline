@@ -40,6 +40,10 @@ async function loadThumbnail(path) {
     child.once('error', reject);
     child.once('close', (code) => {
       if (code !== 0) {
+        const msg = buffers.join('').trim();
+        logger.debug(`cmd: ${ffmpeg} ${args.join(' ')}`);
+        logger.error(`while ${path} child exited with code ${code}: ${msg}`);
+
         reject(new Error(`child exited with code ${code}`));
       } else {
         const buffer = Buffer.allocUnsafe(buffers.reduce((acc, val) => acc + val.length, 0));
