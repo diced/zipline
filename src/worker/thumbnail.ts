@@ -95,7 +95,7 @@ async function start() {
     }
 
     const tmpFile = await loadFileTmp(file);
-    logger.debug(`loadede file to tmp: ${tmpFile}`);
+    logger.debug(`loaded file to tmp: ${tmpFile}`);
     const thumbnail = await loadThumbnail(tmpFile);
     logger.debug(`loaded thumbnail: ${thumbnail.length} bytes mjpeg`);
 
