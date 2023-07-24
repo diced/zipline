@@ -9,14 +9,6 @@ WORKDIR /zipline
 
 # Copy the necessary files from the project
 COPY prisma ./prisma
-COPY src ./src
-COPY next.config.js ./next.config.js
-COPY tsup.config.ts ./tsup.config.ts
-COPY tsconfig.json ./tsconfig.json
-COPY mimes.json ./mimes.json
-COPY public ./public
-
-FROM base as builder
 
 COPY .yarn ./.yarn
 COPY package*.json ./
@@ -41,11 +33,21 @@ RUN cp -RL node_modules /tmp/node_modules
 # Install the dependencies
 RUN yarn install --immutable
 
+FROM base as builder
+
+COPY src ./src
+COPY next.config.js ./next.config.js
+COPY tsup.config.ts ./tsup.config.ts
+COPY tsconfig.json ./tsconfig.json
+COPY mimes.json ./mimes.json
+COPY public ./public
+
 # Run the build
 RUN yarn build
 
 # Use Alpine Linux as the final image
 FROM base
+
 # Install the necessary packages
 RUN apk add --no-cache perl procps tini
 
