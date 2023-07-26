@@ -6,14 +6,13 @@ import useFetch from 'hooks/useFetch';
 import config from 'lib/config';
 import prisma from 'lib/prisma';
 import { userSelector } from 'lib/recoil/user';
-import { randomChars } from 'lib/util';
 import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { useSetRecoilState } from 'recoil';
 
-export default function Register({ code, title, user_registration }) {
+export default function Register({ code = undefined, title, user_registration }) {
   const [active, setActive] = useState(0);
   const [username, setUsername] = useState('');
   const [usernameError, setUsernameError] = useState('');
@@ -196,20 +195,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         notFound: true,
       };
 
-    const code = randomChars(4);
-    const temp = await prisma.invite.create({
-      data: {
-        code,
-        createdById: 1,
-      },
-    });
-
-    logger.debug(`request to access user registration, creating temporary invite ${JSON.stringify(temp)}`);
-
     return {
       props: {
         title: config.website.title,
-        code,
         user_registration: true,
       },
     };
