@@ -260,7 +260,7 @@ async function thumbs(this: FastifyInstance) {
       workerData: {
         videos: chunk,
       },
-    });
+    }).on('error', (err) => logger.child('thumbnail').error(err));
   }
 }
 
