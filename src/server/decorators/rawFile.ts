@@ -11,7 +11,7 @@ function rawFileDecorator(fastify: FastifyInstance, _, done) {
   done();
 
   async function rawFile(this: FastifyReply, id: string) {
-    const { download, compress } = this.request.query as { download?: string; compress?: boolean };
+    const { download, compress = 'false' } = this.request.query as { download?: string; compress?: string };
 
     const data = await this.server.datasource.get(id);
     if (!data) return this.notFound();
@@ -22,11 +22,11 @@ function rawFileDecorator(fastify: FastifyInstance, _, done) {
 
     if (
       this.server.config.core.compression.enabled &&
-      compress &&
+      compress?.match(/^true$/i) &&
       !this.request.headers['X-Zipline-NoCompress'] &&
       !!this.request.headers['accept-encoding']
     )
-      if (size > this.server.config.core.compression.threshold)
+      if (size > this.server.config.core.compression.threshold && mimetype.match(/^(image|video|text)/))
         return this.send(useCompress.call(this, data));
     this.header('Content-Length', size);
     return this.send(data);

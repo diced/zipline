@@ -17,27 +17,17 @@ export const useFolders = (query: { [key: string]: string } = {}) => {
   const queryString = queryBuilder.toString();
 
   return useQuery<UserFoldersResponse[]>(['folders', queryString], async () => {
-    return fetch('/api/user/folders?' + queryString)
-      .then((res) => res.json() as Promise<UserFoldersResponse[]>)
-      .then((data) =>
-        data.map((x) => ({
-          ...x,
-          createdAt: new Date(x.createdAt).toLocaleString(),
-          updatedAt: new Date(x.updatedAt).toLocaleString(),
-        }))
-      );
+    return fetch('/api/user/folders?' + queryString).then(
+      (res) => res.json() as Promise<UserFoldersResponse[]>
+    );
   });
 };
 
 export const useFolder = (id: string, withFiles = false) => {
   return useQuery<UserFoldersResponse>(['folder', id], async () => {
-    return fetch('/api/user/folders/' + id + (withFiles ? '?files=true' : ''))
-      .then((res) => res.json() as Promise<UserFoldersResponse>)
-      .then((data) => ({
-        ...data,
-        createdAt: new Date(data.createdAt).toLocaleString(),
-        updatedAt: new Date(data.updatedAt).toLocaleString(),
-      }));
+    return fetch('/api/user/folders/' + id + (withFiles ? '?files=true' : '')).then(
+      (res) => res.json() as Promise<UserFoldersResponse>
+    );
   });
 };
 

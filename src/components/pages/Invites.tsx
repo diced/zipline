@@ -50,7 +50,7 @@ function CreateInviteModal({ open, setOpen, updateInvites }) {
     if (!expires.includes(values.expires)) return form.setFieldError('expires', 'Invalid expiration');
     if (values.count < 1 || values.count > 100)
       return form.setFieldError('count', 'Must be between 1 and 100');
-    const expiresAt = values.expires === 'never' ? null : expireReadToDate(values.expires);
+    const expiresAt = expireReadToDate(values.expires);
 
     setOpen(false);
 
