@@ -65,7 +65,12 @@ COPY --from=builder /zipline/dist ./dist
 COPY --from=builder /zipline/.next ./.next
 COPY --from=builder /zipline/package.json ./package.json
 
+COPY --from=builder /zipline/mimes.json ./mimes.json
+COPY --from=builder /zipline/next.config.js ./next.config.js
+COPY --from=builder /zipline/public ./public
+
 COPY --from=builder /zipline/node_modules ./node_modules
+
 
 # Copy Startup Script
 COPY docker-entrypoint.sh /zipline
