@@ -19,6 +19,7 @@ export type ServerSideProps = {
   bypass_local_login: boolean;
   chunks_size: number;
   max_size: number;
+  chunks_enabled: boolean;
   totp_enabled: boolean;
   exif_enabled: boolean;
   fileId?: string;
@@ -65,6 +66,7 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (ct
       chunks_size: config.chunks.chunks_size,
       max_size: config.chunks.max_size,
       totp_enabled: config.mfa.totp_enabled,
+      chunks_enabled: config.chunks.enabled,
       exif_enabled: config.exif.enabled,
       compress: config.core.compression.on_dashboard,
     } as ServerSideProps,

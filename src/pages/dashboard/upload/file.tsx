@@ -17,7 +17,9 @@ export default function UploadPage(props) {
         <title>{title}</title>
       </Head>
       <Layout props={props}>
-        <File chunks={{ chunks_size: props.chunks_size, max_size: props.max_size }} />
+        <File
+          chunks={{ chunks_size: props.chunks_size, max_size: props.max_size, enabled: props.chunks_enabled }}
+        />
       </Layout>
     </>
   );

@@ -85,6 +85,14 @@ export default function File({ chunks: chunks_config }) {
   }, [loading, beforeUnload, beforeRouteChange]);
 
   const handleChunkedFiles = async (expiresAt: Date, toChunkFiles: File[]) => {
+    if (!chunks_config.enabled)
+      return showNotification({
+        id: 'upload-chunked',
+        title: 'Chunked files are disabled',
+        message: 'This should not be called, but some how got called...',
+        color: 'red',
+      });
+
     for (let i = 0; i !== toChunkFiles.length; ++i) {
       const file = toChunkFiles[i];
       const identifier = randomChars(4);
@@ -222,7 +230,7 @@ export default function File({ chunks: chunks_config }) {
 
     for (let i = 0; i !== files.length; ++i) {
       const file = files[i];
-      if (file.size >= chunks_config.max_size) {
+      if (chunks_config.enabled && file.size >= chunks_config.max_size) {
         toChunkFiles.push(file);
       } else {
         body.append('file', files[i]);
