@@ -15,6 +15,7 @@ import { filesRoute } from './routes/files';
 import { urlsRoute } from './routes/urls';
 import { Scheduler } from '@/lib/scheduler';
 import deleteJob from '@/lib/scheduler/jobs/delete';
+import maxViewsJob from '@/lib/scheduler/jobs/maxViews';
 
 const MODE = process.env.NODE_ENV || 'production';
 
@@ -125,7 +126,8 @@ async function main() {
       port: config.core.port,
     });
 
-    scheduler.addInterval('delete', 0, deleteJob(prisma));
+    scheduler.addInterval('delete', config.scheduler.deleteInterval, deleteJob(prisma));
+    scheduler.addInterval('maxviews', config.scheduler.maxViewsInterval, maxViewsJob(prisma));
 
     scheduler.start();
   });

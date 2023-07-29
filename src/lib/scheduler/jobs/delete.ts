@@ -36,6 +36,7 @@ export default function deleteJob(prisma: typeof globalThis.__db__) {
     if (count)
       this.logger.info(`deleted ${count} expired files`, {
         size: bytes(expiredFiles.reduce((acc, f) => acc + f.size, 0)),
+        files: expiredFiles.map((f) => f.name),
       });
   };
 }

@@ -19,7 +19,7 @@ import {
   PasswordInput,
   Text,
   Title,
-  TypographyStylesProvider
+  TypographyStylesProvider,
 } from '@mantine/core';
 import { IconFileDownload } from '@tabler/icons-react';
 import { sanitize } from 'isomorphic-dompurify';
@@ -354,6 +354,17 @@ export const getServerSideProps: GetServerSideProps<{
   delete (file as any).password;
 
   const config = safeConfig();
+
+  await prisma.file.update({
+    where: {
+      id: file.id,
+    },
+    data: {
+      views: {
+        increment: 1,
+      },
+    },
+  });
 
   return {
     props: {

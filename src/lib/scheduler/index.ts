@@ -38,6 +38,11 @@ export class Scheduler {
       job.logger = this.logger.c('jobs').c(job.id);
 
       if ('interval' in job) {
+        this.logger.debug('running first run', {
+          id: job.id,
+        });
+        (job as IntervalJob).func.bind(job)();
+
         this.startInterval(job as IntervalJob);
       } else if ('path' in job) {
         this.startWorker(job as WorkerJob);

@@ -2,6 +2,8 @@ import { ZodError, ZodIssue, z } from 'zod';
 import { PROP_TO_ENV, ParsedEnv } from './read';
 import { log } from '../logger';
 import { resolve } from 'path';
+import { bytes } from '../bytes';
+import ms from 'ms';
 
 export const schema = z.object({
   core: z.object({
@@ -27,6 +29,11 @@ export const schema = z.object({
     }),
     databaseUrl: z.string().url(),
     returnHttpsUrls: z.boolean().default(false),
+  }),
+  scheduler: z.object({
+    deleteInterval: z.number().default(ms('30min')),
+    clearInvitesInterval: z.number().default(ms('30min')),
+    maxViewsInterval: z.number().default(ms('30min')),
   }),
   files: z.object({
     route: z.string().startsWith('/').nonempty().trim().toLowerCase().default('/u'),

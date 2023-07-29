@@ -13,6 +13,10 @@ export const PROP_TO_ENV: Record<string, string> = {
   'core.databaseUrl': 'CORE_DATABASE_URL',
   'core.returnHttpsUrls': 'CORE_RETURN_HTTPS_URLS',
 
+  'scheduler.deleteInterval': 'SCHEDULER_DELETE_INTERVAL',
+  'scheduler.clearInvitesInterval': 'SCHEDULER_CLEAR_INVITES_INTERVAL',
+  'scheduler.maxViewsInterval': 'SCHEDULER_MAX_VIEWS_INTERVAL',
+
   'files.route': 'FILES_ROUTE',
   'files.length': 'FILES_LENGTH',
   'files.defaultFormat': 'FILES_DEFAULT_FORMAT',
@@ -75,6 +79,10 @@ export function readEnv() {
     env(PROP_TO_ENV['core.secret'], 'core.secret', 'string'),
     env(PROP_TO_ENV['core.databaseUrl'], 'core.databaseUrl', 'string'),
 
+    env(PROP_TO_ENV['scheduler.deleteInterval'], 'scheduler.deleteInterval', 'ms'),
+    env(PROP_TO_ENV['scheduler.clearInvitesInterval'], 'scheduler.clearInvitesInterval', 'ms'),
+    env(PROP_TO_ENV['scheduler.maxViewsInterval'], 'scheduler.maxViewsInterval', 'ms'),
+
     env(PROP_TO_ENV['files.route'], 'files.route', 'string'),
     env(PROP_TO_ENV['files.length'], 'files.length', 'number'),
     env(PROP_TO_ENV['files.defaultFormat'], 'files.defaultFormat', 'string'),
@@ -129,6 +137,11 @@ export function readEnv() {
       secret: undefined,
       databaseUrl: undefined,
       returnHttpsUrls: undefined,
+    },
+    scheduler: {
+      deleteInterval: undefined,
+      clearInvitesInterval: undefined,
+      maxViewsInterval: undefined,
     },
     files: {
       route: undefined,
