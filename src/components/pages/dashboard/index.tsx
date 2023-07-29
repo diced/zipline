@@ -2,10 +2,10 @@ import { useConfig } from '@/components/ConfigProvider';
 import DashboardFile from '@/components/file/DashboardFile';
 import Stat from '@/components/Stat';
 import type { Response } from '@/lib/api/response';
+import { bytes } from '@/lib/bytes';
 import useLogin from '@/lib/hooks/useLogin';
 import { LoadingOverlay, Paper, SimpleGrid, Table, Text, Title } from '@mantine/core';
 import { IconDeviceSdCard, IconEyeFilled, IconFiles, IconLink, IconStarFilled } from '@tabler/icons-react';
-import bytes from 'bytes';
 import useSWR from 'swr';
 
 export default function DashboardHome() {
@@ -58,16 +58,8 @@ export default function DashboardHome() {
           <SimpleGrid cols={4} spacing='md' breakpoints={[{ maxWidth: 'sm', cols: 1, spacing: 'sm' }]}>
             <Stat Icon={IconFiles} title='Files uploaded' value={stats!.filesUploaded} />
             <Stat Icon={IconStarFilled} title='Favorite files' value={stats!.favoriteFiles} />
-            <Stat
-              Icon={IconDeviceSdCard}
-              title='Storage used'
-              value={bytes(stats!.storageUsed, { unitSeparator: ' ' })}
-            />
-            <Stat
-              Icon={IconDeviceSdCard}
-              title='Average storage used'
-              value={bytes(stats!.avgStorageUsed, { unitSeparator: ' ' })}
-            />
+            <Stat Icon={IconDeviceSdCard} title='Storage used' value={bytes(stats!.storageUsed)} />
+            <Stat Icon={IconDeviceSdCard} title='Average storage used' value={bytes(stats!.avgStorageUsed)} />
             <Stat Icon={IconEyeFilled} title='File views' value={stats!.views} />
             <Stat Icon={IconEyeFilled} title='File average views' value={stats!.avgViews} />
 

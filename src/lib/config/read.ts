@@ -1,6 +1,6 @@
-import bytes from 'bytes';
 import msFn from 'ms';
 import { log } from '../logger';
+import { bytes } from '../bytes';
 
 type EnvType = 'string' | 'string[]' | 'number' | 'boolean' | 'byte' | 'ms' | 'json[]';
 
@@ -256,9 +256,9 @@ function parse(value: string, type: EnvType) {
     case 'boolean':
       return boolean(value);
     case 'byte':
-      return byte(value);
+      return bytes(Number(value));
     case 'ms':
-      return ms(value);
+      return msFn(value);
     case 'json[]':
       try {
         return JSON.parse(value);
@@ -287,12 +287,4 @@ function boolean(value: string) {
   if (value === 'false') return false;
 
   return undefined;
-}
-
-function byte(value: string) {
-  return bytes(value);
-}
-
-function ms(value: string) {
-  return msFn(value);
 }

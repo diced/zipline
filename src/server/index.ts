@@ -13,10 +13,13 @@ import { parse } from 'url';
 import { version } from '../../package.json';
 import { filesRoute } from './routes/files';
 import { urlsRoute } from './routes/urls';
+import { Scheduler } from '@/lib/scheduler';
+import deleteJob from '@/lib/scheduler/jobs/delete';
 
 const MODE = process.env.NODE_ENV || 'production';
 
 const logger = log('server');
+const scheduler = new Scheduler();
 
 async function main() {
   logger.info('starting zipline', { mode: MODE, version: version });
@@ -121,6 +124,10 @@ async function main() {
       hostname: config.core.hostname,
       port: config.core.port,
     });
+
+    scheduler.addInterval('delete', 0, deleteJob(prisma));
+
+    scheduler.start();
   });
 }
 

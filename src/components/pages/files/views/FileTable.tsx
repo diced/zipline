@@ -7,12 +7,12 @@ import { useClipboard } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import type { Prisma } from '@prisma/client';
 import { IconCopy, IconExternalLink, IconFile, IconStar, IconTrashFilled } from '@tabler/icons-react';
-import bytes from 'bytes';
 import { DataTable } from 'mantine-datatable';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { bulkDelete, bulkFavorite } from '../bulk';
 import { useApiPagination } from '../useApiPagination';
+import { bytes } from '@/lib/bytes';
 
 const PER_PAGE_OPTIONS = [10, 20, 50];
 
@@ -124,7 +124,7 @@ export default function FileTable({ id }: { id?: string }) {
           columns={[
             { accessor: 'name', sortable: true },
             { accessor: 'type', sortable: true },
-            { accessor: 'size', sortable: true, render: (file) => bytes(file.size, { unitSeparator: ' ' }) },
+            { accessor: 'size', sortable: true, render: (file) => bytes(file.size) },
             {
               accessor: 'createdAt',
               sortable: true,

@@ -18,7 +18,6 @@ import {
   IconTrashFilled,
   IconUpload,
 } from '@tabler/icons-react';
-import bytes from 'bytes';
 import DashboardFileType from '../DashboardFileType';
 import {
   addToFolder,
@@ -34,6 +33,7 @@ import FileStat from './FileStat';
 import useSWR from 'swr';
 import { Response } from '@/lib/api/response';
 import { Folder } from '@/lib/db/models/folder';
+import { bytes } from '@/lib/bytes';
 
 function ActionButton({
   Icon,
@@ -105,7 +105,7 @@ export default function FileModal({
             ]}
           >
             <FileStat Icon={IconFileInfo} title='Type' value={file.type} />
-            <FileStat Icon={IconDeviceSdCard} title='Size' value={bytes(file.size, { unitSeparator: ' ' })} />
+            <FileStat Icon={IconDeviceSdCard} title='Size' value={bytes(file.size)} />
             <FileStat Icon={IconUpload} title='Created at' value={file.createdAt.toLocaleString()} />
             <FileStat Icon={IconRefresh} title='Updated at' value={file.updatedAt.toLocaleString()} />
             {file.deletesAt && !reduce && (

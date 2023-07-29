@@ -1,7 +1,7 @@
 import DashboardFileType from '@/components/file/DashboardFileType';
+import { bytes } from '@/lib/bytes';
 import { Button, Center, Group, HoverCard, Paper, Stack, Text } from '@mantine/core';
 import { IconFileUpload, IconTrashFilled } from '@tabler/icons-react';
-import bytes from 'bytes';
 
 export default function ToUploadFile({ file, onDelete }: { file: File; onDelete: () => void }) {
   return (
@@ -24,7 +24,7 @@ export default function ToUploadFile({ file, onDelete }: { file: File; onDelete:
               <b>{file.name}</b> {file.type || file.type === '' ? `(${file.type})` : ''}
             </Text>
             <Text size='sm' color='dimmed'>
-              {bytes(file.size, { unitSeparator: ' ' })}
+              {bytes(file.size)}
             </Text>
             <Button
               compact

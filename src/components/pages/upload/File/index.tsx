@@ -17,12 +17,12 @@ import { Dropzone } from '@mantine/dropzone';
 import { useClipboard } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { IconDeviceSdCard, IconFiles, IconPhoto, IconUpload, IconX } from '@tabler/icons-react';
-import bytes from 'bytes';
 import Link from 'next/link';
 import { useState } from 'react';
 import UploadOptionsButton from '../UploadOptionsButton';
 import { uploadFiles } from '../uploadFiles';
 import ToUploadFile from './ToUploadFile';
+import { bytes } from '@/lib/bytes';
 
 export default function UploadFile() {
   const theme = useMantineTheme();
@@ -51,8 +51,8 @@ export default function UploadFile() {
         message: (
           <>
             The upload may fail because the total size of the files you are trying to upload is{' '}
-            <b>{bytes(size, { unitSeparator: ' ' })}</b>, which is larger than the limit of{' '}
-            <b>{bytes(config.files.maxFileSize, { unitSeparator: ' ' })}</b>
+            <b>{bytes(size)}</b>, which is larger than the limit of{' '}
+            <b>{bytes(config.files.maxFileSize)}</b>
           </>
         ),
       });
@@ -65,7 +65,7 @@ export default function UploadFile() {
       clipboard,
       clearEphemeral,
       options,
-      ephemeral
+      ephemeral,
     });
   };
 
@@ -109,7 +109,7 @@ export default function UploadFile() {
               Attach as many files as you like, they will show up below to review before uploading.
             </Text>
             <Text size='sm' color='dimmed' mt={7}>
-              <b>{bytes(config.files.maxFileSize, { unitSeparator: ' ' })}</b> limit per file
+              <b>{bytes(config.files.maxFileSize)}</b> limit per file
             </Text>
           </div>
         </Group>
@@ -137,7 +137,7 @@ export default function UploadFile() {
           disabled={files.length === 0 || dropLoading}
           onClick={upload}
         >
-          Upload {files.length} files ({bytes(aggregateSize(), { unitSeparator: ' ' })})
+          Upload {files.length} files ({bytes(aggregateSize())})
         </Button>
       </Group>
     </>

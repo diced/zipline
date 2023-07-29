@@ -1,3 +1,4 @@
+import { bytes } from '@/lib/bytes';
 import { config as zconfig } from '@/lib/config';
 import { hashPassword } from '@/lib/crypto';
 import { datasource } from '@/lib/datasource';
@@ -11,7 +12,6 @@ import { guess } from '@/lib/mimes';
 import { NextApiReq, NextApiRes } from '@/lib/response';
 import { formatFileName } from '@/lib/uploader/formatFileName';
 import { UploadHeaders, parseHeaders } from '@/lib/uploader/parseHeaders';
-import bytes from 'bytes';
 import { extname, parse } from 'path';
 
 export type ApiUploadResponse = {

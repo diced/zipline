@@ -2,7 +2,6 @@ import { ZodError, ZodIssue, z } from 'zod';
 import { PROP_TO_ENV, ParsedEnv } from './read';
 import { log } from '../logger';
 import { resolve } from 'path';
-import bytes from 'bytes';
 
 export const schema = z.object({
   core: z.object({

@@ -1,3 +1,4 @@
+import { bytes } from '@/lib/bytes';
 import { datasource } from '@/lib/datasource';
 import { prisma } from '@/lib/db';
 import { File, fileSelect } from '@/lib/db/models/file';
@@ -6,7 +7,6 @@ import { combine } from '@/lib/middleware/combine';
 import { method } from '@/lib/middleware/method';
 import { ziplineAuth } from '@/lib/middleware/ziplineAuth';
 import { NextApiReq, NextApiRes } from '@/lib/response';
-import bytes from 'bytes';
 
 export type ApiUserFilesIdResponse = File;
 

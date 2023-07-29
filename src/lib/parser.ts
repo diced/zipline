@@ -1,4 +1,4 @@
-import bytes from 'bytes';
+import { bytes } from './bytes';
 import { File } from './db/models/file';
 import { User } from './db/models/user';
 
@@ -132,7 +132,7 @@ function modifier(mod: string, value: unknown): string {
       case 'binary':
         return value.toString(2);
       case 'bytes':
-        return bytes(value, { unitSeparator: ' ' });
+        return bytes(value);
       default:
         return `{unknown_int_modifier(${mod})}`;
     }
