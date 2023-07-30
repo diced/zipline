@@ -5,7 +5,17 @@ import { getZipline } from '@/lib/db/models/zipline';
 import { fetchApi } from '@/lib/fetchApi';
 import { withSafeConfig } from '@/lib/middleware/next/withSafeConfig';
 import { eitherTrue, isTruthy } from '@/lib/primitive';
-import { Button, Center, LoadingOverlay, PasswordInput, Stack, Text, TextInput, Title } from '@mantine/core';
+import {
+  Button,
+  Card,
+  Center,
+  LoadingOverlay,
+  PasswordInput,
+  Stack,
+  Text,
+  TextInput,
+  Title,
+} from '@mantine/core';
 import { hasLength, useForm } from '@mantine/form';
 import {
   IconBrandDiscordFilled,
@@ -83,10 +93,29 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
     <>
       {willRedirect && !showLocalLogin && <LoadingOverlay visible />}
 
-      <Center h='100vh'>
-        <div>
+      <Center
+        h='100vh'
+        sx={
+          config.website.loginBackground
+            ? {
+                backgroundImage: `url(${config.website.loginBackground})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+              }
+            : undefined
+        }
+      >
+        <Card
+          p='xl'
+          sx={(t) => ({
+            backgroundColor: config.website.loginBackground ? t.fn.rgba('white', 0.1) : undefined,
+            backdropFilter: config.website.loginBackground ? 'blur(25px)' : undefined,
+          })}
+          withBorder
+        >
           <Title order={1} size={50} align='center'>
-            <b>Zipline</b>
+            <b>{config.website.title ?? 'Zipline'}</b>
           </Title>
 
           {showLocalLogin && (
@@ -96,36 +125,52 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
                   <TextInput
                     size='lg'
                     placeholder='Enter your username...'
+                    styles={{
+                      input: {
+                        backgroundColor: config.website.loginBackground ? 'transparent' : undefined,
+                      },
+                    }}
                     {...form.getInputProps('username', { withError: true })}
                   />
 
                   <PasswordInput
                     size='lg'
                     placeholder='Enter your password...'
+                    styles={{
+                      input: {
+                        backgroundColor: config.website.loginBackground ? 'transparent' : undefined,
+                      },
+                    }}
                     {...form.getInputProps('password')}
                   />
 
-                  <Button size='lg' fullWidth type='submit' color='gray' loading={isLoading}>
+                  <Button
+                    size='lg'
+                    fullWidth
+                    type='submit'
+                    loading={isLoading}
+                    variant={config.website.loginBackground ? 'outline' : 'filled'}
+                    color='gray'
+                  >
                     Login
                   </Button>
                 </Stack>
               </form>
-
-              {eitherTrue(config.features.oauthRegistration, config.features.userRegistration) && (
-                <Text size='sm' my='xs' align='center' color='dimmed'>
-                  OR
-                </Text>
-              )}
-
-              {config.features.userRegistration && (
-                <Button size='lg' fullWidth variant='outline' color='gray'>
-                  Sign up
-                </Button>
-              )}
             </>
           )}
 
           <Stack my='xs'>
+            {eitherTrue(config.features.oauthRegistration, config.features.userRegistration) && (
+              <Text size='sm' align='center' color='dimmed'>
+                or
+              </Text>
+            )}
+
+            {config.features.userRegistration && (
+              <Button size='lg' fullWidth variant='outline' color='gray'>
+                Sign up
+              </Button>
+            )}
             {config.oauthEnabled.discord && (
               <Button
                 size='lg'
@@ -144,7 +189,6 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
                 Sign in with Discord
               </Button>
             )}
-
             {config.oauthEnabled.github && (
               <Button
                 size='lg'
@@ -162,7 +206,6 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
                 Sign in with GitHub
               </Button>
             )}
-
             {config.oauthEnabled.google && (
               <Button
                 size='lg'
@@ -180,7 +223,6 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
                 Sign in with Google
               </Button>
             )}
-
             {config.oauthEnabled.authentik && (
               <Button
                 size='lg'
@@ -199,7 +241,7 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
               </Button>
             )}
           </Stack>
-        </div>
+        </Card>
       </Center>
     </>
   );

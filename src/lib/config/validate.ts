@@ -114,6 +114,7 @@ export const schema = z.object({
           url: 'https://zipline.diced.tech',
         },
       ]),
+    loginBackground: z.string().url().nullable().default(null),
     defaultAvatar: z
       .string()
       .transform((s) => resolve(s))
