@@ -144,7 +144,7 @@ const validator = s.object({
         )
         .default([
           { label: 'Zipline', link: 'https://github.com/diced/zipline' },
-          { label: 'Documentation', link: 'https://zipline.diced.tech/' },
+          { label: 'Documentation', link: 'https://zipline.diced.vercel.app/' },
         ]),
     })
     .default({
@@ -155,7 +155,7 @@ const validator = s.object({
 
       external_links: [
         { label: 'Zipline', link: 'https://github.com/diced/zipline' },
-        { label: 'Documentation', link: 'https://zipline.diced.tech/' },
+        { label: 'Documentation', link: 'https://zipline.diced.vercel.app/' },
       ],
     }),
   discord: s

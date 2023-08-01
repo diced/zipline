@@ -7,5 +7,5 @@ contact_links:
     url: https://discord.gg/EAhCRfGxCF
     about: Ask for help with anything related to Zipline!
   - name: Zipline Docs
-    url: https://zipline.diced.tech
+    url: https://zipline.diced.vercel.app
     about: Maybe take a look a the docs?

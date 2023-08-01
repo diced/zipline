@@ -99,7 +99,13 @@ export const createSpotlightActions = (router: NextRouter): SpotlightAction[] =>
       });
     }),
 
-    actionLink('Help', 'Documentation', 'View the documentation', 'https://zipline.diced.tech', <IconHelp />),
+    actionLink(
+      'Help',
+      'Documentation',
+      'View the documentation',
+      'https://zipline.diced.vercel.app',
+      <IconHelp />
+    ),
 
     // the list of actions here is very incomplete, and will be expanded in the future
   ];

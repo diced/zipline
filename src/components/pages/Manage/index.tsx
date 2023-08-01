@@ -367,7 +367,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
       <Title>Manage User</Title>
       <MutedText size='md'>
         Want to use variables in embed text? Visit{' '}
-        <AnchorNext href='https://zipline.diced.tech/docs/guides/variables'>the docs</AnchorNext> for
+        <AnchorNext href='https://zipline.diced.vercel.app/docs/guides/variables'>the docs</AnchorNext> for
         variables
       </MutedText>
 
