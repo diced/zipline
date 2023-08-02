@@ -18,6 +18,7 @@ import { ApiUserUrlsResponse } from '@/pages/api/user/urls';
 import { ApiUserUrlsIdResponse } from '@/pages/api/user/urls/[id]';
 import { ApiUsersResponse } from '@/pages/api/users';
 import { ApiUsersIdResponse } from '@/pages/api/users/[id]';
+import { ApiVersionResponse } from '@/pages/api/version';
 
 export type Response = {
   '/api/auth/oauth': ApiAuthOauthResponse;
@@ -40,4 +41,5 @@ export type Response = {
   '/api/healthcheck': ApiHealthcheckResponse;
   '/api/setup': ApiSetupResponse;
   '/api/upload': ApiUploadResponse;
+  '/api/version': ApiVersionResponse;
 };

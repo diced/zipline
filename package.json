@@ -3,7 +3,7 @@
   "private": true,
   "license": "MIT",
   "sideEffects": false,
-  "version": "4.0.0-dev.1",
+  "version": "4.0.0-dev+1",
   "scripts": {
     "build": "run-p \"build:*\"",
     "build:next": "next build",

@@ -1,6 +1,6 @@
 import { createToken, hashPassword } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
-import { User } from '@/lib/db/models/user';
+import { User, userSelect } from '@/lib/db/models/user';
 import { getZipline } from '@/lib/db/models/zipline';
 import { log } from '@/lib/logger';
 import { combine } from '@/lib/middleware/combine';
@@ -40,13 +40,7 @@ export async function handler(req: NextApiReq<Body>, res: NextApiRes<ApiSetupRes
       role: 'SUPERADMIN',
       token: createToken(),
     },
-    select: {
-      role: true,
-      id: true,
-      createdAt: true,
-      updatedAt: true,
-      username: true,
-    },
+    select: userSelect,
   });
 
   logger.info('first setup complete');
