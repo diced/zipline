@@ -1,5 +1,7 @@
+import { Config } from '@/lib/config/validate';
 import { useSettingsStore } from '@/lib/store/settings';
-import { ZiplineTheme, themeComponents } from '@/lib/theme';
+import { useUserStore } from '@/lib/store/user';
+import { ZiplineTheme, findTheme, themeComponents } from '@/lib/theme';
 import { MantineProvider } from '@mantine/core';
 import { useColorScheme } from '@mantine/hooks';
 import { createContext, useContext, useEffect } from 'react';
@@ -17,25 +19,38 @@ export function useThemes() {
   return ctx.themes;
 }
 
-export default function Theming({ themes, children }: { themes: ZiplineTheme[]; children: React.ReactNode }) {
-  const [currentTheme, preferredDark, preferredLight] = useSettingsStore((state) => [
+export default function Theming({
+  themes,
+  defaultTheme,
+  children,
+}: {
+  themes: ZiplineTheme[];
+  children: React.ReactNode;
+  defaultTheme?: Config['website']['theme'];
+}) {
+  const user = useUserStore((state) => state.user);
+  const [userTheme, preferredDark, preferredLight] = useSettingsStore((state) => [
     state.settings.theme,
     state.settings.themeDark,
     state.settings.themeLight,
   ]);
   const systemTheme = useColorScheme();
+  const currentTheme = user ? userTheme : defaultTheme?.default ?? 'system';
 
-  let theme = themes.find((theme) => theme.id === currentTheme);
+  let theme = findTheme(currentTheme, themes);
+
   if (currentTheme === 'system') {
     theme =
       systemTheme === 'dark'
-        ? themes.find((theme) => theme.id === preferredDark)
-        : themes.find((theme) => theme.id === preferredLight);
+        ? findTheme(user ? preferredDark : defaultTheme?.dark ?? '', themes) ??
+          findTheme('builtin:dark_gray', themes)
+        : findTheme(user ? preferredLight : defaultTheme?.light ?? '', themes) ??
+          findTheme('builtin:light_gray', themes);
   }
 
   if (!theme) {
     theme =
-      themes.find((theme) => theme.id === 'builtin:dark_gray') ??
+      findTheme('builtin:dark_gray') ??
       ({
         id: 'builtin:dark_gray',
         name: 'Dark Gray',

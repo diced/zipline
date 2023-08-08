@@ -35,7 +35,7 @@ export default function App({ Component, pageProps }: AppProps) {
           fetcher,
         }}
       >
-        <Theming themes={themes}>
+        <Theming themes={themes} defaultTheme={pageProps?.config?.website?.theme}>
           <ModalsProvider
             modalProps={{
               overlayProps: {

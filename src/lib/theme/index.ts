@@ -2,6 +2,10 @@ import { MantineTheme, MantineThemeOverride, rem } from '@mantine/core';
 
 export type ZiplineTheme = MantineTheme & { id: string; name: string };
 
+export function findTheme(id: string, themes: ZiplineTheme[] = []): ZiplineTheme | undefined {
+  return themes.find((theme) => theme.id === id);
+}
+
 export function themeComponents(theme: ZiplineTheme): MantineThemeOverride {
   return {
     ...theme,

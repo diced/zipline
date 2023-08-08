@@ -55,6 +55,9 @@ export const PROP_TO_ENV: Record<string, string> = {
   'website.externalLinks': 'WEBSITE_EXTERNAL_LINKS',
   'website.loginBackground': 'WEBSITE_LOGIN_BACKGROUND',
   'website.defaultAvatar': 'WEBSITE_DEFAULT_AVATAR',
+  'website.theme.default': 'WEBSITE_THEME_DEFAULT',
+  'website.theme.dark': 'WEBSITE_THEME_DARK',
+  'website.theme.light': 'WEBSITE_THEME_LIGHT',
 
   'oauth.bypassLocalLogin': 'OAUTH_BYPASS_LOCAL_LOGIN',
   'oauth.loginOnly': 'OAUTH_LOGIN_ONLY',
@@ -116,6 +119,9 @@ export function readEnv() {
     env(PROP_TO_ENV['website.externalLinks'], 'website.externalLinks', 'json[]'),
     env(PROP_TO_ENV['website.loginBackground'], 'website.loginBackground', 'string'),
     env(PROP_TO_ENV['website.defaultAvatar'], 'website.defaultAvatar', 'string'),
+    env(PROP_TO_ENV['website.theme.default'], 'website.theme.default', 'string'),
+    env(PROP_TO_ENV['website.theme.dark'], 'website.theme.dark', 'string'),
+    env(PROP_TO_ENV['website.theme.light'], 'website.theme.light', 'string'),
 
     env(PROP_TO_ENV['oauth.bypassLocalLogin'], 'oauth.bypassLocalLogin', 'boolean'),
     env(PROP_TO_ENV['oauth.loginOnly'], 'oauth.loginOnly', 'boolean'),
@@ -177,6 +183,11 @@ export function readEnv() {
       externalLinks: undefined,
       loginBackground: undefined,
       defaultAvatar: undefined,
+      theme: {
+        default: undefined,
+        dark: undefined,
+        light: undefined,
+      },
     },
     oauth: {
       bypassLocalLogin: undefined,

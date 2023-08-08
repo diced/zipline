@@ -121,6 +121,11 @@ export const schema = z.object({
       .nullable()
       .default(null),
     disableMediaPreview: z.boolean().default(false),
+    theme: z.object({
+      default: z.string().default('system'),
+      dark: z.string().default('builtin:dark_gray'),
+      light: z.string().default('builtin:light_gray'),
+    })
   }),
   oauth: z.object({
     bypassLocalLogin: z.boolean().default(false),
