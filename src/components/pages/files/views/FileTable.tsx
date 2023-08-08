@@ -83,7 +83,7 @@ function SearchFilter({
 export default function FileTable({ id }: { id?: string }) {
   const router = useRouter();
   const clipboard = useClipboard();
-  const searchTreshold = useSettingsStore((state) => state.settings.searchTreshold);
+  const searchThreshold = useSettingsStore((state) => state.settings.searchThreshold);
 
   const [page, setPage] = useState<number>(router.query.page ? parseInt(router.query.page as string) : 1);
   const [perpage, setPerpage] = useState<number>(20);
@@ -125,7 +125,7 @@ export default function FileTable({ id }: { id?: string }) {
     id,
     ...(searchQuery[searchField].trim() !== '' && {
       search: {
-        treshold: searchTreshold,
+        threshold: searchThreshold,
         field: searchField,
         query: searchQuery[searchField],
       },

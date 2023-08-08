@@ -14,7 +14,7 @@ export type ApiUserFilesResponse = {
   search?: {
     field: 'name' | 'originalName' | 'type';
     query: string;
-    treshold: number;
+    threshold: number;
   };
   total?: number;
   pages?: number;
@@ -29,7 +29,7 @@ type Query = {
   order: 'asc' | 'desc';
   searchField?: 'name' | 'originalName' | 'type';
   searchQuery?: string;
-  searchTreshold?: string;
+  searchThreshold?: string;
   id?: string;
 };
 
@@ -52,7 +52,7 @@ const validateSortBy = z
   .default('createdAt');
 
 const validateOrder = z.enum(['asc', 'desc']).default('desc');
-const validateTreshold = z.number().default(0.1);
+const validateThreshold = z.number().default(0.1);
 
 const logger = log('api').c('user').c('files');
 
@@ -94,8 +94,8 @@ export async function handler(req: NextApiReq<any, Query>, res: NextApiRes<ApiUs
   const searchField = validateSearchField.safeParse(req.query.searchField || 'name');
   if (!searchField.success) return res.badRequest('Invalid searchField value');
 
-  const searchTreshold = validateTreshold.safeParse(Number(req.query.searchTreshold) || 0.1);
-  if (!searchTreshold.success) return res.badRequest('Invalid searchTreshold value');
+  const searchThreshold = validateThreshold.safeParse(Number(req.query.searchThreshold) || 0.1);
+  if (!searchThreshold.success) return res.badRequest('Invalid searchThreshold value');
 
   if (searchQuery) {
     const extension: { extname: string }[] =
@@ -116,7 +116,7 @@ export async function handler(req: NextApiReq<any, Query>, res: NextApiRes<ApiUs
           searchField.data,
         ])}", ${searchQuery}) as similarity, "createdAt", "updatedAt", "deletesAt", favorite, id, "originalName", name, size, type, views, "folderId" FROM "File" WHERE
         word_similarity("${Prisma.sql([searchField.data])}", ${searchQuery}) > ${Prisma.sql([
-        String(searchTreshold.data),
+        String(searchThreshold.data),
       ])} OR
         "${Prisma.sql([searchField.data])}" ILIKE '${Prisma.sql`%${searchQuery}%`}'
         AND
@@ -142,7 +142,7 @@ export async function handler(req: NextApiReq<any, Query>, res: NextApiRes<ApiUs
       search: {
         field: searchField.data,
         query: searchQuery,
-        treshold: searchTreshold.data,
+        threshold: searchThreshold.data,
       },
     });
   }

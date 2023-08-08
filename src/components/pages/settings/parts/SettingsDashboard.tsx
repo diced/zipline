@@ -72,12 +72,12 @@ export default function SettingsDashboard() {
         </Group>
 
         <NumberInput
-          label='Search Treshold'
+          label='Search Threshold'
           description='When performing a similarity check on file searches, this is the minimum percentage of similarity required to show the file. The lower the number, the more results will be shown though they will be less relevant to the actual search query. A recomended value is between 0.1 and 0.4 as this will yield moderate-relevancy results that should match your queries.'
           min={0}
           max={100}
-          value={settings.searchTreshold}
-          onChange={(value) => update('searchTreshold', value === '' ? 0 : value)}
+          value={settings.searchThreshold}
+          onChange={(value) => update('searchThreshold', value === '' ? 0 : value)}
           step={0.01}
           precision={2}
           icon={<IconPercentage size='1rem' />}
