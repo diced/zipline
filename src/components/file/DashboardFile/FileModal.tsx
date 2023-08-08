@@ -48,7 +48,7 @@ function ActionButton({
 }) {
   return (
     <Tooltip label={tooltip}>
-      <ActionIcon variant='outline' color={color ?? 'gray'} onClick={onClick}>
+      <ActionIcon variant='filled' color={color ?? 'gray'} onClick={onClick}>
         <Icon size='1rem' />
       </ActionIcon>
     </Tooltip>

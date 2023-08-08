@@ -84,12 +84,11 @@ export default function UrlTableView() {
             },
             {
               accessor: 'actions',
-              width: 150,
+              width: 90,
               render: (url) => (
                 <Group spacing='sm'>
                   <Tooltip label='Copy URL'>
                     <ActionIcon
-                      variant='outline'
                       onClick={(e) => {
                         e.stopPropagation();
                         copyUrl(url, config, clipboard);
@@ -100,7 +99,6 @@ export default function UrlTableView() {
                   </Tooltip>
                   <Tooltip label='Delete URL'>
                     <ActionIcon
-                      variant='outline'
                       color='red'
                       onClick={(e) => {
                         e.stopPropagation();

@@ -85,7 +85,6 @@ export default function FolderTableView() {
                 <Group spacing='sm'>
                   <Tooltip label='View files'>
                     <ActionIcon
-                      variant='outline'
                       onClick={(e) => {
                         e.stopPropagation();
                         setSelectedFolder(folder);
@@ -96,7 +95,6 @@ export default function FolderTableView() {
                   </Tooltip>
                   <Tooltip label='Copy folder link'>
                     <ActionIcon
-                      variant='outline'
                       onClick={(e) => {
                         e.stopPropagation();
                         copyFolderUrl(folder, clipboard);
@@ -107,7 +105,6 @@ export default function FolderTableView() {
                   </Tooltip>
                   <Tooltip label={folder.public ? 'Make private' : 'Make public'}>
                     <ActionIcon
-                      variant='outline'
                       color={folder.public ? 'blue' : 'gray'}
                       onClick={(e) => {
                         e.stopPropagation();
@@ -119,7 +116,6 @@ export default function FolderTableView() {
                   </Tooltip>
                   <Tooltip label='Delete Folder'>
                     <ActionIcon
-                      variant='outline'
                       color='red'
                       onClick={(e) => {
                         e.stopPropagation();

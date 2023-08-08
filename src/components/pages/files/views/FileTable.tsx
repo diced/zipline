@@ -290,18 +290,17 @@ export default function FileTable({ id }: { id?: string }) {
             {
               accessor: 'actions',
               textAlignment: 'right',
-              width: 200,
+              width: 170,
               render: (file) => (
                 <Group spacing='sm'>
                   <Tooltip label='More details'>
-                    <ActionIcon variant='outline'>
+                    <ActionIcon>
                       <IconFile size='1rem' />
                     </ActionIcon>
                   </Tooltip>
 
                   <Tooltip label='View file in new tab'>
                     <ActionIcon
-                      variant='outline'
                       onClick={(e) => {
                         e.stopPropagation();
                         viewFile(file);
@@ -313,7 +312,6 @@ export default function FileTable({ id }: { id?: string }) {
 
                   <Tooltip label='Copy file link to clipboard'>
                     <ActionIcon
-                      variant='outline'
                       onClick={(e) => {
                         e.stopPropagation();
                         copyFile(file, clipboard);
@@ -325,7 +323,6 @@ export default function FileTable({ id }: { id?: string }) {
 
                   <Tooltip label='Delete file'>
                     <ActionIcon
-                      variant='outline'
                       color='red'
                       onClick={(e) => {
                         e.stopPropagation();
