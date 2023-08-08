@@ -65,5 +65,10 @@ async function handleDeleteUrl(url: Url) {
     });
   }
 
+  mutateURls();
+}
+
+function mutateURls() {
   mutate('/api/user/urls');
+  mutate((key) => (key as Record<any, any>)?.key === '/api/user/urls');
 }

@@ -110,7 +110,7 @@ export async function handler(req: NextApiReq<any, Query>, res: NextApiRes<ApiUs
     // there might be a better way, but all the values that use Prisma.sql([...]) are validated and should not
     // be able to be used for SQL injection
 
-    const similarityResult: (File & { similarty: number })[] = await prisma.$queryRaw(
+    const similarityResult: File[] = await prisma.$queryRaw(
       Prisma.sql`
         SELECT word_similarity("${Prisma.sql([
           searchField.data,

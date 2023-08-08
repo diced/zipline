@@ -7,6 +7,8 @@ import { combine } from '@/lib/middleware/combine';
 import { method } from '@/lib/middleware/method';
 import { ziplineAuth } from '@/lib/middleware/ziplineAuth';
 import { NextApiReq, NextApiRes } from '@/lib/response';
+import { z } from 'zod';
+import { Prisma } from '@prisma/client';
 
 export type ApiUserUrlsResponse =
   | Url[]
@@ -19,15 +21,24 @@ type Body = {
   destination: string;
 };
 
-type Query = {
+type Headers = {
   'x-zipline-max-views': string;
   'x-zipline-no-json': string;
   'x-zipline-domain': string;
 };
 
+type Query = {
+  searchField?: 'destination' | 'vanity' | 'code';
+  searchQuery?: string;
+  searchThreshold?: string;
+};
+
+const validateSearchField = z.enum(['destination', 'vanity', 'code']).default('destination');
+const validateThreshold = z.number().default(0.1);
+
 const logger = log('api').c('user').c('urls');
 
-export async function handler(req: NextApiReq<Body, unknown, Query>, res: NextApiRes<ApiUserUrlsResponse>) {
+export async function handler(req: NextApiReq<Body, Query, Headers>, res: NextApiRes<ApiUserUrlsResponse>) {
   if (req.method === 'POST') {
     const { vanity, destination } = req.body;
     const noJson = !!req.headers['x-zipline-no-json'];
@@ -85,6 +96,30 @@ export async function handler(req: NextApiReq<Body, unknown, Query>, res: NextAp
     return res.ok({
       url: responseUrl,
     });
+  }
+
+  const searchQuery = req.query.searchQuery ? decodeURIComponent(req.query.searchQuery.trim()) ?? null : null;
+  const searchField = validateSearchField.safeParse(req.query.searchField || 'destination');
+  if (!searchField.success) return res.badRequest('Invalid searchField value');
+
+  const searchThreshold = validateThreshold.safeParse(Number(req.query.searchThreshold) || 0.1);
+  if (!searchThreshold.success) return res.badRequest('Invalid searchThreshold value');
+
+  if (searchQuery) {
+    const similarityResult: Url[] = await prisma.$queryRaw`
+      SELECT
+        word_similarity("${Prisma.raw(searchField.data)}", ${searchQuery}) AS similarity,
+        *
+      FROM "Url"
+      WHERE
+        word_similarity("${Prisma.raw(searchField.data)}", ${searchQuery}) > ${Prisma.raw(
+      String(searchThreshold.data)
+    )} OR
+        "${Prisma.raw(searchField.data)}" ILIKE '${Prisma.sql`%${searchQuery}%`}' AND
+        "userId" = ${req.user.id};
+    `;
+
+    return res.ok(similarityResult);
   }
 
   const urls = await prisma.url.findMany({

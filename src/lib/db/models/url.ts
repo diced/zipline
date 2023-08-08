@@ -1,3 +1,5 @@
-import type { Url as PrismaUrl } from "@prisma/client"
+import type { Url as PrismaUrl } from '@prisma/client';
 
-export type Url = PrismaUrl;
+export type Url = PrismaUrl & {
+  similarity?: number;
+};

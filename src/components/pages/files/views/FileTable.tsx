@@ -43,13 +43,11 @@ const NAMES = {
 };
 
 function SearchFilter({
-  searchField,
   setSearchField,
   searchQuery,
   setSearchQuery,
   field,
 }: {
-  searchField: 'name' | 'originalName' | 'type';
   searchQuery: {
     name: string;
     originalName: string;
@@ -232,7 +230,6 @@ export default function FileTable({ id }: { id?: string }) {
               sortable: true,
               filter: (
                 <SearchFilter
-                  searchField={searchField}
                   setSearchField={setSearchField}
                   searchQuery={searchQuery}
                   setSearchQuery={setSearchQuery}
@@ -246,7 +243,6 @@ export default function FileTable({ id }: { id?: string }) {
               sortable: true,
               filter: (
                 <SearchFilter
-                  searchField={searchField}
                   setSearchField={setSearchField}
                   searchQuery={searchQuery}
                   setSearchQuery={setSearchQuery}
@@ -260,7 +256,6 @@ export default function FileTable({ id }: { id?: string }) {
               sortable: true,
               filter: (
                 <SearchFilter
-                  searchField={searchField}
                   setSearchField={setSearchField}
                   searchQuery={searchQuery}
                   setSearchQuery={setSearchQuery}
