@@ -1,5 +1,4 @@
 import { Response } from '@/lib/api/response';
-import { File } from '@/lib/db/models/file';
 import type { Prisma } from '@prisma/client';
 import useSWR from 'swr';
 
@@ -8,9 +7,14 @@ type ApiPaginationOptions = {
   filter?: string;
   perpage?: number;
   favorite?: boolean;
-  sort?: keyof Prisma.FileOrderByWithRelationInput;
+  sort?: keyof Prisma.FileOrderByWithAggregationInput;
   order?: 'asc' | 'desc';
   id?: string;
+  search?: {
+    treshold?: number;
+    field?: string;
+    query: string;
+  };
 };
 
 const fetcher = async (
@@ -28,6 +32,11 @@ const fetcher = async (
   if (options.sort) searchParams.append('sortBy', options.sort);
   if (options.order) searchParams.append('order', options.order);
   if (options.id) searchParams.append('id', options.id);
+  if (options.search) {
+    if (options.search.treshold !== undefined) searchParams.append('searchTreshold', options.search.treshold.toString());
+    if (options.search.field) searchParams.append('searchField', options.search.field);
+    searchParams.append('searchQuery', options.search.query);
+  }
 
   const res = await fetch(`/api/user/files${searchParams.toString() ? `?${searchParams.toString()}` : ''}`);
 

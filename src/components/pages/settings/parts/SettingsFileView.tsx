@@ -106,7 +106,7 @@ export default function SettingsFileView() {
 
           <Textarea
             label='View Content'
-            description='Change the content within view-routes'
+            description='Change the content within view-routes. Most HTML is valid, while the use of JavaScript is unavailable.'
             disabled={!form.values.enabled}
             mb='xs'
             {...form.getInputProps('content')}

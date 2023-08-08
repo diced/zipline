@@ -24,7 +24,9 @@ function getClient() {
 
   logger.info('connecting to database ' + process.env.DATABASE_URL);
 
-  const client = new PrismaClient().$extends({
+  const client = new PrismaClient({
+    // log: ['query'],
+  }).$extends({
     result: {
       user: {
         view: {

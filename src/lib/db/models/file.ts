@@ -16,6 +16,7 @@ export type File = {
   folderId: string | null;
 
   url?: string;
+  similarity?: number;
 };
 
 export const fileSelect = {
