@@ -211,7 +211,6 @@ export default function FileTable({ id }: { id?: string }) {
 
               <Button
                 variant='outline'
-                color='gray'
                 onClick={() => {
                   setSelectedFiles([]);
                 }}
@@ -295,7 +294,7 @@ export default function FileTable({ id }: { id?: string }) {
               render: (file) => (
                 <Group spacing='sm'>
                   <Tooltip label='More details'>
-                    <ActionIcon variant='outline' color='gray'>
+                    <ActionIcon variant='outline'>
                       <IconFile size='1rem' />
                     </ActionIcon>
                   </Tooltip>
@@ -303,7 +302,6 @@ export default function FileTable({ id }: { id?: string }) {
                   <Tooltip label='View file in new tab'>
                     <ActionIcon
                       variant='outline'
-                      color='gray'
                       onClick={(e) => {
                         e.stopPropagation();
                         viewFile(file);
@@ -316,7 +314,6 @@ export default function FileTable({ id }: { id?: string }) {
                   <Tooltip label='Copy file link to clipboard'>
                     <ActionIcon
                       variant='outline'
-                      color='gray'
                       onClick={(e) => {
                         e.stopPropagation();
                         copyFile(file, clipboard);

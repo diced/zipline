@@ -51,8 +51,7 @@ export default function UploadFile() {
         message: (
           <>
             The upload may fail because the total size of the files you are trying to upload is{' '}
-            <b>{bytes(size)}</b>, which is larger than the limit of{' '}
-            <b>{bytes(config.files.maxFileSize)}</b>
+            <b>{bytes(size)}</b>, which is larger than the limit of <b>{bytes(config.files.maxFileSize)}</b>
           </>
         ),
       });
@@ -75,7 +74,7 @@ export default function UploadFile() {
         <Title order={1}>Upload files</Title>
 
         <Tooltip label='View your files'>
-          <ActionIcon component={Link} href='/dashboard/files' variant='outline' color='gray' radius='sm'>
+          <ActionIcon component={Link} href='/dashboard/files' variant='outline' radius='sm'>
             <IconFiles size={18} />
           </ActionIcon>
         </Tooltip>
@@ -132,7 +131,6 @@ export default function UploadFile() {
 
         <Button
           variant='outline'
-          color='gray'
           leftIcon={<IconUpload size={18} />}
           disabled={files.length === 0 || dropLoading}
           onClick={upload}

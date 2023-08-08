@@ -7,7 +7,7 @@ export type SafeConfig = Omit<Config, 'oauth' | 'datasource' | 'core'> & {
   oauth: {
     bypassLocalLogin: boolean;
     loginOnly: boolean;
-  }
+  };
 };
 
 export function safeConfig(): SafeConfig {

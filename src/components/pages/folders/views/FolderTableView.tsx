@@ -86,7 +86,6 @@ export default function FolderTableView() {
                   <Tooltip label='View files'>
                     <ActionIcon
                       variant='outline'
-                      color='gray'
                       onClick={(e) => {
                         e.stopPropagation();
                         setSelectedFolder(folder);
@@ -98,7 +97,6 @@ export default function FolderTableView() {
                   <Tooltip label='Copy folder link'>
                     <ActionIcon
                       variant='outline'
-                      color='gray'
                       onClick={(e) => {
                         e.stopPropagation();
                         copyFolderUrl(folder, clipboard);

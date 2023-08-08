@@ -68,7 +68,6 @@ export default function Files({ id }: { id?: string }) {
                 </Group>
                 <Button
                   variant='outline'
-                  color='gray'
                   compact
                   leftIcon={<IconFileUpload size='1rem' />}
                   component={Link}

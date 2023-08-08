@@ -116,7 +116,6 @@ export default function DashboardUsers() {
                 <Tooltip label='Clear avatar'>
                   <ActionIcon
                     variant='transparent'
-                    color='gray'
                     disabled={!form.values.avatar}
                     onClick={() => form.setFieldValue('avatar', null)}
                   >
@@ -141,13 +140,7 @@ export default function DashboardUsers() {
               {...form.getInputProps('role')}
             />
 
-            <Button
-              type='submit'
-              variant='outline'
-              color='gray'
-              radius='sm'
-              leftIcon={<IconUserPlus size='1rem' />}
-            >
+            <Button type='submit' variant='outline' radius='sm' leftIcon={<IconUserPlus size='1rem' />}>
               Create
             </Button>
           </Stack>
@@ -158,7 +151,7 @@ export default function DashboardUsers() {
         <Title>Users</Title>
 
         <Tooltip label='Create a new user'>
-          <ActionIcon variant='outline' color='gray' onClick={() => setOpen(true)}>
+          <ActionIcon variant='outline' onClick={() => setOpen(true)}>
             <IconUserPlus size='1rem' />
           </ActionIcon>
         </Tooltip>

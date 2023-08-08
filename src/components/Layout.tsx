@@ -286,7 +286,6 @@ export default function Layout({ children, config }: { children: React.ReactNode
                 <Menu.Target>
                   <Button
                     variant='subtle'
-                    color='gray'
                     leftIcon={
                       avatar ? (
                         <Avatar src={avatar} radius='sm' size='sm' alt={user?.username ?? 'User avatar'} />
@@ -340,7 +339,11 @@ export default function Layout({ children, config }: { children: React.ReactNode
       }
     >
       <ConfigProvider config={config}>
-        <Paper m={2} withBorder p={'xs'}>
+        <Paper
+          m={2}
+          withBorder
+          p='xs'
+        >
           {children}
         </Paper>
       </ConfigProvider>

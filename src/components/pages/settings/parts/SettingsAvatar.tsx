@@ -5,7 +5,7 @@ import { readToDataURL } from '@/lib/base64';
 import { useUserStore } from '@/lib/store/user';
 import { Avatar, Button, Card, FileInput, Group, Paper, Stack, Text, Title } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconChevronDown, IconPhoto, IconPhotoCancel, IconSettingsFilled } from '@tabler/icons-react';
+import { IconChevronDown, IconPhoto, IconPhotoCancel, IconPhotoUp, IconSettingsFilled } from '@tabler/icons-react';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import useSWR from 'swr';
@@ -94,6 +94,7 @@ export default function SettingsAvatar() {
           placeholder='Upload new avatar...'
           value={avatar}
           onChange={(file) => setAvatar(file)}
+          icon={<IconPhotoUp size='1rem' />}
         />
 
         <Card withBorder shadow='sm'>
@@ -103,7 +104,6 @@ export default function SettingsAvatar() {
 
           <Button
             variant='subtle'
-            color='gray'
             leftIcon={
               avatarSrc ? (
                 <Avatar src={avatarSrc} radius='sm' size='sm' alt={user?.username ?? 'Proposed avatar'} />
@@ -138,7 +138,7 @@ export default function SettingsAvatar() {
               Remove Avatar
             </Button>
           )}
-          <Button variant='outline' color='gray' disabled={!avatar} onClick={saveAvatar}>
+          <Button variant='outline' disabled={!avatar} onClick={saveAvatar}>
             Save
           </Button>
         </Group>

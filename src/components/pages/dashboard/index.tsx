@@ -61,7 +61,7 @@ export default function DashboardHome() {
             <Stat Icon={IconDeviceSdCard} title='Storage used' value={bytes(stats!.storageUsed)} />
             <Stat Icon={IconDeviceSdCard} title='Average storage used' value={bytes(stats!.avgStorageUsed)} />
             <Stat Icon={IconEyeFilled} title='File views' value={stats!.views} />
-            <Stat Icon={IconEyeFilled} title='File average views' value={stats!.avgViews} />
+            <Stat Icon={IconEyeFilled} title='File average views' value={Math.round(stats!.avgViews)} />
 
             <Stat Icon={IconLink} title='Links created' value={stats!.urlsCreated} />
           </SimpleGrid>

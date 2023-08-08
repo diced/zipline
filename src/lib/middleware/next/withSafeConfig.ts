@@ -1,4 +1,6 @@
 import { SafeConfig, safeConfig } from '@/lib/config/safe';
+import { ZiplineTheme } from '@/lib/theme';
+import { readThemes } from '@/lib/theme/file';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 
 export function withSafeConfig<T = {}>(
@@ -6,11 +8,13 @@ export function withSafeConfig<T = {}>(
 ): GetServerSideProps<
   T & {
     config: SafeConfig;
+    themes: ZiplineTheme[];
     notFound?: boolean;
   }
 > {
   return async (ctx) => {
     const config = safeConfig();
+
     const data = await fn(ctx);
 
     if ((data as any) && (data as any).notFound)
@@ -26,6 +30,7 @@ export function withSafeConfig<T = {}>(
     return {
       props: {
         config,
+        themes: await readThemes(),
         ...data,
       },
     };

@@ -265,7 +265,6 @@ export default function UploadOptionsButton({ numFiles }: { numFiles: number }) 
 
           <Button
             variant='outline'
-            color='gray'
             leftIcon={<IconArrowsMinimize size='1rem' />}
             onClick={() => setOpen(false)}
           >
@@ -276,15 +275,8 @@ export default function UploadOptionsButton({ numFiles }: { numFiles: number }) 
 
       <Button
         variant={changes() !== 0 ? 'filled' : 'outline'}
-        rightIcon={
-          changes() !== 0 ? (
-            <Badge variant='outline' color='gray'>
-              {changes()}
-            </Badge>
-          ) : null
-        }
+        rightIcon={changes() !== 0 ? <Badge variant='outline'>{changes()}</Badge> : null}
         onClick={() => setOpen(true)}
-        color='gray'
       >
         Options
       </Button>

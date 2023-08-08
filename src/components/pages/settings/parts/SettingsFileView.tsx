@@ -162,7 +162,7 @@ export default function SettingsFileView() {
           </SimpleGrid>
 
           <Group position='left' mt='sm'>
-            <Button variant='outline' color='gray' type='submit'>
+            <Button variant='outline' type='submit'>
               Save
             </Button>
           </Group>

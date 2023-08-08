@@ -16,7 +16,7 @@ import {
 } from '@mantine/core';
 import { hasLength, useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
-import { IconCheck, IconCopy, IconUserCancel } from '@tabler/icons-react';
+import { IconAsteriskSimple, IconCheck, IconCopy, IconUser, IconUserCancel } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { mutate } from 'swr';
 
@@ -103,19 +103,21 @@ export default function SettingsUser() {
           component='span'
           label='Token'
           onClick={() => setTokenShown(true)}
+          icon={<IconAsteriskSimple size='1rem' />}
         >
           <ScrollArea scrollbarSize={5}>{tokenShown ? token : '[click to reveal]'}</ScrollArea>
         </TextInput>
 
-        <TextInput label='Username' {...form.getInputProps('username')} />
+        <TextInput label='Username' {...form.getInputProps('username')} icon={<IconUser size='1rem' />} />
         <PasswordInput
           label='Password'
           description='Leave blank to keep the same password'
           {...form.getInputProps('password')}
+          icon={<IconAsteriskSimple size='1rem' />}
         />
 
         <Group position='left' mt='sm'>
-          <Button variant='outline' color='gray' type='submit'>
+          <Button variant='outline' type='submit'>
             Save
           </Button>
         </Group>

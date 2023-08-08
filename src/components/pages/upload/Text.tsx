@@ -74,7 +74,7 @@ export default function UploadText({
         <Title order={1}>Upload text</Title>
 
         <Tooltip label='View your files'>
-          <ActionIcon component={Link} href='/dashboard/files' variant='outline' color='gray' radius='sm'>
+          <ActionIcon component={Link} href='/dashboard/files' variant='outline' radius='sm'>
             <IconFiles size={18} />
           </ActionIcon>
         </Tooltip>
@@ -129,7 +129,6 @@ export default function UploadText({
         <UploadOptionsButton numFiles={1} />
         <Button
           variant='outline'
-          color='gray'
           leftIcon={<IconUpload size='1rem' />}
           disabled={text.length === 0 || loading}
           onClick={upload}

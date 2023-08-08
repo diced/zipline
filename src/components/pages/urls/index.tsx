@@ -139,13 +139,7 @@ export default function DashboardURLs() {
               {...form.getInputProps('maxViews')}
             />
 
-            <Button
-              type='submit'
-              variant='outline'
-              color='gray'
-              radius='sm'
-              leftIcon={<IconLink size='1rem' />}
-            >
+            <Button type='submit' variant='outline' radius='sm' leftIcon={<IconLink size='1rem' />}>
               Create
             </Button>
           </Stack>
@@ -156,7 +150,7 @@ export default function DashboardURLs() {
         <Title>URLs</Title>
 
         <Tooltip label='Shorten a URL'>
-          <ActionIcon variant='outline' color='gray' onClick={() => setOpen(true)}>
+          <ActionIcon variant='outline' onClick={() => setOpen(true)}>
             <IconLink size='1rem' />
           </ActionIcon>
         </Tooltip>

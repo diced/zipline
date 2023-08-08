@@ -74,13 +74,7 @@ export default function DashboardFolders() {
               {...form.getInputProps('isPublic', { type: 'checkbox' })}
             />
 
-            <Button
-              type='submit'
-              variant='outline'
-              color='gray'
-              radius='sm'
-              leftIcon={<IconFolderPlus size='1rem' />}
-            >
+            <Button type='submit' variant='outline' radius='sm' leftIcon={<IconFolderPlus size='1rem' />}>
               Create
             </Button>
           </Stack>
@@ -91,7 +85,7 @@ export default function DashboardFolders() {
         <Title>Folders</Title>
 
         <Tooltip label='Create a new folder'>
-          <ActionIcon variant='outline' color='gray' onClick={() => setOpen(true)}>
+          <ActionIcon variant='outline' onClick={() => setOpen(true)}>
             <IconPlus size='1rem' />
           </ActionIcon>
         </Tooltip>

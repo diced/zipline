@@ -44,11 +44,7 @@ export default function UserTableView() {
 
   return (
     <>
-      <EditUserModal
-        opened={!!selectedUser}
-        onClose={() => setSelectedUser(null)}
-        user={selectedUser}
-      />
+      <EditUserModal opened={!!selectedUser} onClose={() => setSelectedUser(null)} user={selectedUser} />
 
       <Box my='sm'>
         <DataTable
@@ -87,7 +83,6 @@ export default function UserTableView() {
                   <Tooltip label="View user's files">
                     <ActionIcon
                       variant='outline'
-                      color='gray'
                       component={Link}
                       href={`/dashboard/admin/users/${user.id}/files`}
                       disabled={!canInteract(currentUser?.role, user?.role)}
@@ -99,7 +94,6 @@ export default function UserTableView() {
                   <Tooltip label='Edit user'>
                     <ActionIcon
                       variant='outline'
-                      color='gray'
                       onClick={(e) => {
                         e.stopPropagation();
                         setSelectedUser(user);

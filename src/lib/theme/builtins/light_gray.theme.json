@@ -1,0 +1,6 @@
+{
+  "name": "Light Gray",
+  "id": "builtin:light_gray",
+  "colorScheme": "light",
+  "primaryColor": "gray"
+}

@@ -8,6 +8,8 @@ import { fileSelect, type File } from '@/lib/db/models/file';
 import { User, userSelect } from '@/lib/db/models/user';
 import { fetchApi } from '@/lib/fetchApi';
 import { parseString } from '@/lib/parser';
+import { ZiplineTheme } from '@/lib/theme';
+import { readThemes } from '@/lib/theme/file';
 import { formatRootUrl } from '@/lib/url';
 import {
   Button,
@@ -174,7 +176,6 @@ export default function ViewFile({
       <Button
         fullWidth
         variant='outline'
-        color='gray'
         my='sm'
         onClick={() => verifyPassword()}
         disabled={passwordValue.trim().length === 0}
@@ -189,7 +190,7 @@ export default function ViewFile({
         <Group position='apart' py={5} px='xs'>
           <Text color='dimmed'>{file.name}</Text>
 
-          <Button compact size='sm' variant='outline' color='gray' onClick={() => setDetailsOpen((o) => !o)}>
+          <Button compact size='sm' variant='outline' onClick={() => setDetailsOpen((o) => !o)}>
             Toggle Details
           </Button>
         </Group>
@@ -247,7 +248,6 @@ export default function ViewFile({
               href={`/raw/${file.name}?download=true${pw ? `&pw=${pw}` : ''}`}
               target='_blank'
               compact
-              color='gray'
               leftIcon={<IconFileDownload size='1rem' />}
             >
               Download
@@ -290,6 +290,7 @@ export const getServerSideProps: GetServerSideProps<{
   user?: Omit<User, 'oauthProviders'>;
   config?: SafeConfig;
   host: string;
+  themes: ZiplineTheme[];
 }> = async (context) => {
   const { id, pw } = context.query;
   if (!id) return { notFound: true };
@@ -343,11 +344,13 @@ export const getServerSideProps: GetServerSideProps<{
 
   const code = await isCode(file.name);
 
+  const themes = await readThemes();
+
   if (pw) {
     const verified = await verifyPassword(pw as string, file.password!);
 
     delete (file as any).password;
-    if (verified) return { props: { file, pw: pw as string, code, host } };
+    if (verified) return { props: { file, pw: pw as string, code, host, themes } };
   }
 
   const password = !!file.password;
@@ -374,6 +377,7 @@ export const getServerSideProps: GetServerSideProps<{
       user,
       config,
       host,
+      themes,
     },
   };
 };

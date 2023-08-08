@@ -118,7 +118,6 @@ export default function EditUserModal({
                 <Tooltip label='Clear avatar'>
                   <ActionIcon
                     variant='transparent'
-                    color='gray'
                     disabled={!form.values.avatar}
                     onClick={() => form.setFieldValue('avatar', null)}
                   >

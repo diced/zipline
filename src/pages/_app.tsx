@@ -5,6 +5,8 @@ import { SWRConfig } from 'swr';
 import { ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';
 import '@/components/render/code/HighlightCode.css';
+import { ZiplineTheme, themeComponents } from '@/lib/theme';
+import Theming from '@/components/ThemeProvider';
 
 const fetcher = async (url: RequestInfo | URL) => {
   const res = await fetch(url);
@@ -18,8 +20,8 @@ const fetcher = async (url: RequestInfo | URL) => {
   return res.json();
 };
 
-export default function App(props: AppProps) {
-  const { Component, pageProps } = props;
+export default function App({ Component, pageProps }: AppProps) {
+  const themes: ZiplineTheme[] = pageProps.themes;
 
   return (
     <>
@@ -33,20 +35,7 @@ export default function App(props: AppProps) {
           fetcher,
         }}
       >
-        <MantineProvider
-          withGlobalStyles
-          withNormalizeCSS
-          withCSSVariables
-          theme={{
-            colorScheme: 'dark',
-            colors: {
-              discord: ['#5865F2'],
-              google: ['#4285F4'],
-              authentik: ['#FD4B2D'],
-              github: ['#24292E'],
-            },
-          }}
-        >
+        <Theming themes={themes}>
           <ModalsProvider
             modalProps={{
               overlayProps: {
@@ -59,7 +48,7 @@ export default function App(props: AppProps) {
             <Notifications />
             <Component {...pageProps} />
           </ModalsProvider>
-        </MantineProvider>
+        </Theming>
       </SWRConfig>
     </>
   );

@@ -90,7 +90,6 @@ export default function UrlTableView() {
                   <Tooltip label='Copy URL'>
                     <ActionIcon
                       variant='outline'
-                      color='gray'
                       onClick={(e) => {
                         e.stopPropagation();
                         copyUrl(url, config, clipboard);

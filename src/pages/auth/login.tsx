@@ -150,7 +150,6 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
                     type='submit'
                     loading={isLoading}
                     variant={config.website.loginBackground ? 'outline' : 'filled'}
-                    color='gray'
                   >
                     Login
                   </Button>
@@ -167,7 +166,7 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
             )}
 
             {config.features.userRegistration && (
-              <Button size='lg' fullWidth variant='outline' color='gray'>
+              <Button size='lg' fullWidth variant='outline'>
                 Sign up
               </Button>
             )}

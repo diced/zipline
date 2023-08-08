@@ -6,6 +6,9 @@ export type SettingsStore = {
     disableMediaPreview: boolean;
     warnDeletion: boolean;
     searchTreshold: number;
+    theme: string;
+    themeDark: string;
+    themeLight: string;
   };
 
   update: <K extends keyof SettingsStore['settings']>(key: K, value: SettingsStore['settings'][K]) => void;
@@ -18,6 +21,9 @@ export const useSettingsStore = create<SettingsStore>()(
         disableMediaPreview: false,
         warnDeletion: true,
         searchTreshold: 0.1,
+        theme: 'builtin:dark_gray',
+        themeDark: 'builtin:dark_gray',
+        themeLight: 'builtin:light_gray',
       },
 
       update: (key, value) =>

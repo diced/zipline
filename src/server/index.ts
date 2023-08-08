@@ -16,6 +16,7 @@ import { urlsRoute } from './routes/urls';
 import { Scheduler } from '@/lib/scheduler';
 import deleteJob from '@/lib/scheduler/jobs/delete';
 import maxViewsJob from '@/lib/scheduler/jobs/maxViews';
+import { handleOverrideColors, parseThemes, readThemesDir } from '@/lib/theme/file';
 
 const MODE = process.env.NODE_ENV || 'production';
 
@@ -26,6 +27,13 @@ async function main() {
   logger.info('starting zipline', { mode: MODE, version: version });
 
   const server = express();
+
+  const themes = await readThemesDir();
+  console.log('themes', themes)
+  const parsedThemes = await parseThemes(themes);
+  console.log('parsedThemes', parsedThemes)
+  const overriden = await handleOverrideColors(parsedThemes[0]);
+  console.log('overriden', overriden)
 
   logger.info('reading environment for configuration');
   const config = validateEnv(readEnv());

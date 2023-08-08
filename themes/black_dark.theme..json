@@ -1,0 +1,19 @@
+{
+  "name": "Black Dark",
+  "colorScheme": "dark",
+  "colors": {
+    "dark": [
+      "#ffffff",
+      "#A7A9AD",
+      "#7B7E84",
+      "#61646A",
+      "#54575D",
+      "#303236",
+      "#282a2e",
+      "#060606",
+      "#141517",
+      "#000000"
+    ]
+  },
+  "primaryColor": "gray"
+}

@@ -16,17 +16,9 @@ export function RenderAlert({
   change: (s: boolean) => void;
 }) {
   return (
-    <Alert color='gray' icon={<IconEyeFilled size='1rem' />} variant='outline' mb='sm'>
+    <Alert icon={<IconEyeFilled size='1rem' />} variant='outline' mb='sm'>
       {!state ? `This file is rendered through ${renderer}` : `This file can be rendered through ${renderer}`}
-      <Button
-        mx='sm'
-        variant='outline'
-        compact
-        onClick={() => change(!state)}
-        color='gray'
-        pos='absolute'
-        right={0}
-      >
+      <Button mx='sm' variant='outline' compact onClick={() => change(!state)} pos='absolute' right={0}>
         {state ? 'Show' : 'Hide'} rendered version
       </Button>
     </Alert>
