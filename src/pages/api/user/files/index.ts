@@ -106,36 +106,34 @@ export async function handler(req: NextApiReq<any, Query>, res: NextApiRes<ApiUs
       logger.debug('pg_trgm extension installed');
     }
 
-    // Doing Prisma.sql([...]) is unsafe as it will not escape any values leading to SQL injection
+    // Doing Prisma.raw/sql(...) could be unsafe as it will not escape any values leading to SQL injection
     // there might be a better way, but all the values that use Prisma.sql([...]) are validated and should not
     // be able to be used for SQL injection
 
-    const similarityResult: File[] = await prisma.$queryRaw(
-      Prisma.sql`
-        SELECT word_similarity("${Prisma.sql([
-          searchField.data,
-        ])}", ${searchQuery}) as similarity, "createdAt", "updatedAt", "deletesAt", favorite, id, "originalName", name, size, type, views, "folderId" FROM "File" WHERE
-        word_similarity("${Prisma.sql([searchField.data])}", ${searchQuery}) > ${Prisma.sql([
-        String(searchThreshold.data),
-      ])} OR
-        "${Prisma.sql([searchField.data])}" ILIKE '${Prisma.sql`%${searchQuery}%`}'
-        AND
-          "userId" = ${user.id}
-          ${
-            filter === 'dashboard'
-              ? Prisma.sql`AND
+    const similarityResult: File[] = await prisma.$queryRaw`
+      SELECT
+        word_similarity("${Prisma.raw(searchField.data)}", ${searchQuery}) as similarity,
+        "createdAt", "updatedAt", "deletesAt", favorite, id, "originalName", name, size,
+        type, views, "folderId"
+      FROM "File"
+      WHERE
+        word_similarity("${Prisma.raw(searchField.data)}", ${searchQuery}) > ${Prisma.raw(
+      String(searchThreshold.data)
+    )} OR
+        "${Prisma.raw(searchField.data)}" ILIKE ${Prisma.sql`%${searchQuery}%`} AND
+        "userId" = ${user.id} ${
+      filter === 'dashboard'
+        ? Prisma.sql`
+          AND
             type LIKE 'image/%' OR
             type LIKE 'video/%' OR
             type LIKE 'audio/%' OR
             type LIKE 'text/%'
             `
-              : Prisma.empty
-          }
-          ${favorite === 'true' && filter !== 'all' ? Prisma.sql`AND favorite = true` : Prisma.empty}
-
-          ORDER BY "${Prisma.sql([sortBy.data])}" ${Prisma.sql([order.data])}
-          `
-    );
+        : Prisma.empty
+    } ${favorite === 'true' && filter !== 'all' ? Prisma.sql`AND favorite = true` : Prisma.empty}
+      ORDER BY "${Prisma.raw(sortBy.data)}" ${Prisma.raw(order.data)}
+    `;
 
     return res.ok({
       page: cleanFiles(similarityResult),
