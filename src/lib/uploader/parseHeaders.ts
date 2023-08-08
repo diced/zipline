@@ -170,12 +170,8 @@ export function parseHeaders(headers: UploadHeaders, fileConfig: Config['files']
   const addOriginalName = headers['x-zipline-original-name'];
   if (addOriginalName) response.addOriginalName = addOriginalName === 'true';
 
-
   const folder = headers['x-zipline-folder'];
-  if (folder) {
-    // TODO: add check for folder
-    response.folder = folder;
-  }
+  if (folder) response.folder = folder;
 
   response.overrides = {};
 

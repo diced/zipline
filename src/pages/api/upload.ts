@@ -85,6 +85,17 @@ export async function handler(req: NextApiReq<any, any, UploadHeaders>, res: Nex
       }
     }
 
+    if (options.folder) {
+      const exists = await prisma.folder.findFirst({
+        where: {
+          id: options.folder,
+          userId: req.user.id,
+        },
+      });
+
+      if (!exists) return res.badRequest('Folder does not exist');
+    }
+
     const fileUpload = await prisma.file.create({
       data: {
         name: `${fileName}${extension}`,
