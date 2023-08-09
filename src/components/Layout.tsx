@@ -360,6 +360,11 @@ export default function Layout({ children, props }) {
                     compact
                     size='xl'
                     p='sm'
+                    styles={{
+                      label: {
+                        overflow: 'unset',
+                      },
+                    }}
                   >
                     {user.username}
                   </Button>
