@@ -44,6 +44,7 @@ export const schema = z.object({
     defaultExpiration: z.number().nullable().default(null),
     assumeMimetypes: z.boolean().default(false),
     defaultDateFormat: z.string().default('YYYY-MM-DD_HH:mm:ss'),
+    removeGpsMetadata: z.boolean().default(false),
   }),
   urls: z.object({
     route: z.string().startsWith('/').nonempty().trim().toLowerCase().default('/go'),
@@ -125,7 +126,7 @@ export const schema = z.object({
       default: z.string().default('system'),
       dark: z.string().default('builtin:dark_gray'),
       light: z.string().default('builtin:light_gray'),
-    })
+    }),
   }),
   oauth: z.object({
     bypassLocalLogin: z.boolean().default(false),

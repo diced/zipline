@@ -1,8 +1,10 @@
 import { bytes } from '@/lib/bytes';
+import { compress } from '@/lib/compress';
 import { config as zconfig } from '@/lib/config';
 import { hashPassword } from '@/lib/crypto';
 import { datasource } from '@/lib/datasource';
 import { prisma } from '@/lib/db';
+import { removeGps } from '@/lib/gps';
 import { log } from '@/lib/logger';
 import { combine } from '@/lib/middleware/combine';
 import { file } from '@/lib/middleware/file';
@@ -96,11 +98,31 @@ export async function handler(req: NextApiReq<any, any, UploadHeaders>, res: Nex
       if (!exists) return res.badRequest('Folder does not exist');
     }
 
+    let compressed = false;
+    if (mimetype.startsWith('image/') && options.imageCompressionPercent) {
+      const buffer = await compress(file.buffer, options.imageCompressionPercent);
+      logger.c('jpg').debug(`compressed file ${file.originalname}`, {
+        osize: bytes(file.buffer.length),
+        nsize: bytes(buffer.length),
+      });
+
+      file.buffer = buffer;
+      compressed = true;
+    }
+
+    let removedGps = false;
+    if (mimetype.startsWith('image/') && zconfig.files.removeGpsMetadata) {
+      removedGps = await removeGps(file.buffer);
+      if (removedGps) {
+        logger.c('gps').debug(`removed gps metadata from ${file.originalname}`);
+      }
+    }
+
     const fileUpload = await prisma.file.create({
       data: {
-        name: `${fileName}${extension}`,
-        size: file.size,
-        type: mimetype,
+        name: `${fileName}${compressed ? '.jpg' : extension}`,
+        size: file.buffer.length,
+        type: compressed ? 'image/jpeg' : mimetype,
         User: {
           connect: {
             id: req.user.id,
@@ -120,10 +142,6 @@ export async function handler(req: NextApiReq<any, any, UploadHeaders>, res: Nex
       },
     });
 
-    // TODO: remove gps
-    // TODO: zws
-    // TODO: image compression
-
     await datasource.put(fileUpload.name, file.buffer);
 
     logger.info(`${req.user.username} uploaded ${fileUpload.name}`, { size: bytes(fileUpload.size) });
@@ -136,6 +154,9 @@ export async function handler(req: NextApiReq<any, any, UploadHeaders>, res: Nex
       id: fileUpload.id,
       type: fileUpload.type,
       url: responseUrl,
+
+      ...(removedGps && { removedGps: true }),
+      ...(compressed && { compressed: true }),
     });
   }
 

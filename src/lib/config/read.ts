@@ -25,6 +25,7 @@ export const PROP_TO_ENV: Record<string, string> = {
   'files.defaultExpiration': 'FILES_DEFAULT_EXPIRATION',
   'files.assumeMimetypes': 'FILES_ASSUME_MIMETYPES',
   'files.defaultDateFormat': 'FILES_DEFAULT_DATE_FORMAT',
+  'files.removeGpsMetadata': 'FILES_REMOVE_GPS_METADATA',
 
   'urls.route': 'URLS_ROUTE',
   'urls.length': 'URLS_LENGTH',
@@ -93,6 +94,8 @@ export function readEnv() {
     env(PROP_TO_ENV['files.disabledExtensions'], 'files.disabledExtensions', 'string[]'),
     env(PROP_TO_ENV['files.maxFileSize'], 'files.maxFileSize', 'byte'),
     env(PROP_TO_ENV['files.defaultExpiration'], 'files.defaultExpiration', 'ms'),
+    env(PROP_TO_ENV['files.assumeMimetypes'], 'files.assumeMimetypes', 'boolean'),
+    env(PROP_TO_ENV['files.removeGpsMetadata'], 'files.removeGpsMetadata', 'boolean'),
 
     env(PROP_TO_ENV['urls.route'], 'urls.route', 'string'),
     env(PROP_TO_ENV['urls.length'], 'urls.length', 'number'),
@@ -160,6 +163,7 @@ export function readEnv() {
       defaultExpiration: undefined,
       assumeMimetypes: undefined,
       defaultDateFormat: undefined,
+      removeGpsMetadata: undefined,
     },
     urls: {
       route: undefined,

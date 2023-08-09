@@ -37,14 +37,16 @@ type Unit =
 type UnitAnyCase = Unit | Uppercase<Unit> | Lowercase<Unit>;
 type StringValue = `${number}` | `${number}${UnitAnyCase}` | `${number} ${UnitAnyCase}`;
 
+type StringBoolean = 'true' | 'false';
+
 export type UploadHeaders = {
   'x-zipline-deletes-at': string;
   'x-zipline-format': Config['files']['defaultFormat'];
   'x-zipline-image-compression-percent': string;
   'x-zipline-password': string;
   'x-zipline-max-views': string;
-  'x-zipline-no-json': 'true' | 'false';
-  'x-zipline-original-name': 'true' | 'false';
+  'x-zipline-no-json': StringBoolean;
+  'x-zipline-original-name': StringBoolean;
 
   'x-zipline-folder': string;
 
