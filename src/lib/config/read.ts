@@ -12,6 +12,7 @@ export const PROP_TO_ENV: Record<string, string> = {
   'core.secret': 'CORE_SECRET',
   'core.databaseUrl': 'CORE_DATABASE_URL',
   'core.returnHttpsUrls': 'CORE_RETURN_HTTPS_URLS',
+  'core.defaultDomain': 'CORE_DEFAULT_DOMAIN',
 
   'scheduler.deleteInterval': 'SCHEDULER_DELETE_INTERVAL',
   'scheduler.clearInvitesInterval': 'SCHEDULER_CLEAR_INVITES_INTERVAL',
@@ -83,6 +84,8 @@ export function readEnv() {
     env(PROP_TO_ENV['core.hostname'], 'core.hostname', 'string'),
     env(PROP_TO_ENV['core.secret'], 'core.secret', 'string'),
     env(PROP_TO_ENV['core.databaseUrl'], 'core.databaseUrl', 'string'),
+    env(PROP_TO_ENV['core.returnHttpsUrls'], 'core.returnHttpsUrls', 'boolean'),
+    env(PROP_TO_ENV['core.defaultDomain'], 'core.defaultDomain', 'string'),
 
     env(PROP_TO_ENV['scheduler.deleteInterval'], 'scheduler.deleteInterval', 'ms'),
     env(PROP_TO_ENV['scheduler.clearInvitesInterval'], 'scheduler.clearInvitesInterval', 'ms'),

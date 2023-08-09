@@ -29,6 +29,7 @@ export const schema = z.object({
     }),
     databaseUrl: z.string().url(),
     returnHttpsUrls: z.boolean().default(false),
+    defaultDomain: z.string().nullable().default(null),
   }),
   scheduler: z.object({
     deleteInterval: z.number().default(ms('30min')),

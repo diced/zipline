@@ -45,6 +45,8 @@ export async function handler(req: NextApiReq<any, any, UploadHeaders>, res: Nex
   let domain;
   if (options.overrides?.returnDomain) {
     domain = `${zconfig.core.returnHttpsUrls ? 'https' : 'http'}://${options.overrides.returnDomain}`;
+  } else if (zconfig.core.defaultDomain) {
+    domain = `${zconfig.core.returnHttpsUrls ? 'https' : 'http'}://${zconfig.core.defaultDomain}`;
   } else {
     domain = `${zconfig.core.returnHttpsUrls ? 'https' : 'http'}://${req.headers.host}`;
   }

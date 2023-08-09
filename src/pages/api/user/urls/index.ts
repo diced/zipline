@@ -77,6 +77,8 @@ export async function handler(req: NextApiReq<Body, Query, Headers>, res: NextAp
     let domain;
     if (returnDomain) {
       domain = `${config.core.returnHttpsUrls ? 'https' : 'http'}://${returnDomain}`;
+    } else if (config.core.defaultDomain) {
+      domain = `${config.core.returnHttpsUrls ? 'https' : 'http'}://${config.core.defaultDomain}`;
     } else {
       domain = `${config.core.returnHttpsUrls ? 'https' : 'http'}://${req.headers.host}`;
     }
