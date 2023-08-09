@@ -7,7 +7,7 @@ async function handler(_: NextApiReq, res: NextApiRes) {
 
   const pkg = JSON.parse(await readFile('package.json', 'utf8'));
 
-  const re = await fetch('https://zipline.diced.vercel.app/api/version?c=' + pkg.version);
+  const re = await fetch('https://zipline.diced.sh/api/version?c=' + pkg.version);
   const json = await re.json();
 
   let updateToType = 'stable';
