@@ -82,7 +82,6 @@ export default function UserTableView() {
                 <Group spacing='sm'>
                   <Tooltip label="View user's files">
                     <ActionIcon
-                      variant='outline'
                       component={Link}
                       href={`/dashboard/admin/users/${user.id}/files`}
                       disabled={!canInteract(currentUser?.role, user?.role)}
@@ -93,7 +92,6 @@ export default function UserTableView() {
 
                   <Tooltip label='Edit user'>
                     <ActionIcon
-                      variant='outline'
                       onClick={(e) => {
                         e.stopPropagation();
                         setSelectedUser(user);
@@ -106,7 +104,6 @@ export default function UserTableView() {
 
                   <Tooltip label='Delete user'>
                     <ActionIcon
-                      variant='outline'
                       color='red'
                       onClick={(e) => {
                         e.stopPropagation();
