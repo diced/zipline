@@ -48,10 +48,12 @@ export const PROP_TO_ENV: Record<string, string> = {
   'features.imageCompression': 'FEATURES_IMAGE_COMPRESSION',
   'features.robotsTxt': 'FEATURES_ROBOTS_TXT',
   'features.healthcheck': 'FEATURES_HEALTHCHECK',
-  'features.invites': 'FEATURES_INVITES',
   'features.userRegistration': 'FEATURES_USER_REGISTRATION',
   'features.oauthRegistration': 'FEATURES_OAUTH_REGISTRATION',
   'features.deleteOnMaxViews': 'FEATURES_DELETE_ON_MAX_VIEWS',
+
+  'invites.enabled': 'INVITES_ENABLED',
+  'invites.length': 'INVITES_LENGTH',
 
   'website.title': 'WEBSITE_TITLE',
   'website.externalLinks': 'WEBSITE_EXTERNAL_LINKS',
@@ -121,6 +123,9 @@ export function readEnv() {
     env(PROP_TO_ENV['features.oauthRegistration'], 'features.oauthRegistration', 'boolean'),
     env(PROP_TO_ENV['features.deleteOnMaxViews'], 'features.deleteOnMaxViews', 'boolean'),
 
+    env(PROP_TO_ENV['invites.enabled'], 'invites.enabled', 'boolean'),
+    env(PROP_TO_ENV['invites.length'], 'invites.length', 'number'),
+
     env(PROP_TO_ENV['website.title'], 'website.title', 'string'),
     env(PROP_TO_ENV['website.externalLinks'], 'website.externalLinks', 'json[]'),
     env(PROP_TO_ENV['website.loginBackground'], 'website.loginBackground', 'string'),
@@ -184,6 +189,10 @@ export function readEnv() {
       userRegistration: undefined,
       oauthRegistration: undefined,
       deleteOnMaxViews: undefined,
+    },
+    invites: {
+      enabled: undefined,
+      length: undefined,
     },
     website: {
       title: undefined,

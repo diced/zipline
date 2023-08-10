@@ -1,31 +1,28 @@
 import GridTableSwitcher from '@/components/GridTableSwitcher';
+import { Response } from '@/lib/api/response';
+import { Folder } from '@/lib/db/models/folder';
+import { fetchApi } from '@/lib/fetchApi';
 import { useViewStore } from '@/lib/store/view';
 import {
   ActionIcon,
   Button,
   Group,
   Modal,
-  NumberInput,
   Stack,
   Switch,
   TextInput,
   Title,
-  Tooltip,
+  Tooltip
 } from '@mantine/core';
-import { useClipboard } from '@mantine/hooks';
-import { IconFolderPlus, IconLink, IconPlus } from '@tabler/icons-react';
+import { hasLength, useForm } from '@mantine/form';
+import { notifications } from '@mantine/notifications';
+import { IconFolderPlus, IconPlus } from '@tabler/icons-react';
 import { useState } from 'react';
+import { mutate } from 'swr';
 import FolderGridView from './views/FolderGridView';
 import FolderTableView from './views/FolderTableView';
-import { hasLength, useForm } from '@mantine/form';
-import { Folder } from '@/lib/db/models/folder';
-import { fetchApi } from '@/lib/fetchApi';
-import { Response } from '@/lib/api/response';
-import { mutate } from 'swr';
-import { notifications } from '@mantine/notifications';
 
 export default function DashboardFolders() {
-  const clipboard = useClipboard();
   const view = useViewStore((state) => state.folders);
 
   const [open, setOpen] = useState(false);

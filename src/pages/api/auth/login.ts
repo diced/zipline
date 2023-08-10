@@ -1,11 +1,8 @@
-import { config } from '@/lib/config';
-import { serializeCookie } from '@/lib/cookie';
-import { encryptToken, verifyPassword } from '@/lib/crypto';
+import { verifyPassword } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
 import { User, userSelect } from '@/lib/db/models/user';
 import { loginToken } from '@/lib/login';
 import { combine } from '@/lib/middleware/combine';
-import { cors } from '@/lib/middleware/cors';
 import { method } from '@/lib/middleware/method';
 import { NextApiReq, NextApiRes } from '@/lib/response';
 
@@ -52,4 +49,4 @@ async function handler(req: NextApiReq<Body>, res: NextApiRes<ApiLoginResponse>)
   });
 }
 
-export default combine([cors(), method(['POST'])], handler);
+export default combine([method(['POST'])], handler);

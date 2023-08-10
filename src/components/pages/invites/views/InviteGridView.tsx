@@ -1,13 +1,13 @@
 import { Response } from '@/lib/api/response';
-import { Folder } from '@/lib/db/models/folder';
+import { Invite } from '@/lib/db/models/invite';
 import { Center, Group, LoadingOverlay, Paper, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 import { IconLink } from '@tabler/icons-react';
 import useSWR from 'swr';
-import FolderCard from '../FolderCard';
+import InviteCard from '../InviteCard';
 
-export default function FolderGridView() {
+export default function InviteGridView() {
   const { data: folders, isLoading } =
-    useSWR<Extract<Response['/api/user/folders'], Folder[]>>('/api/user/folders');
+    useSWR<Extract<Response['/api/auth/invites'], Invite[]>>('/api/auth/invites');
 
   return (
     <>
@@ -26,8 +26,8 @@ export default function FolderGridView() {
           ]}
           pos='relative'
         >
-          {folders?.map((folder) => (
-            <FolderCard key={folder.id} folder={folder} />
+          {folders?.map((invite) => (
+            <InviteCard key={invite.id} invite={invite} />
           ))}
         </SimpleGrid>
       ) : (
@@ -36,10 +36,10 @@ export default function FolderGridView() {
             <Stack>
               <Group>
                 <IconLink size='2rem' />
-                <Title order={2}>No Folders found</Title>
+                <Title order={2}>No invites found</Title>
               </Group>
               <Text size='sm' color='dimmed'>
-                Create a folder to see it here
+                Create an invite to see them here.
               </Text>
             </Stack>
           </Center>

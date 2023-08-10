@@ -1,7 +1,9 @@
 import type { Response } from '@/lib/api/response';
 import type { SafeConfig } from '@/lib/config/safe';
 import { fetchApi } from '@/lib/fetchApi';
+import useAvatar from '@/lib/hooks/useAvatar';
 import useLogin from '@/lib/hooks/useLogin';
+import { isAdministrator } from '@/lib/role';
 import { useUserStore } from '@/lib/store/user';
 import {
   AppShell,
@@ -37,6 +39,7 @@ import {
   IconRefreshDot,
   IconSettingsFilled,
   IconShieldLockFilled,
+  IconTags,
   IconUpload,
   IconUsersGroup,
 } from '@tabler/icons-react';
@@ -44,8 +47,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import ConfigProvider from './ConfigProvider';
-import { isAdministrator } from '@/lib/role';
-import useAvatar from '@/lib/hooks/useAvatar';
 
 type NavLinks = {
   label: string;
@@ -53,7 +54,7 @@ type NavLinks = {
   active: (path: string) => boolean;
   href?: string;
   links?: NavLinks[];
-  if?: (user: Response['/api/user']['user']) => boolean;
+  if?: (user: Response['/api/user']['user'], config: SafeConfig) => boolean;
 };
 
 const navLinks: NavLinks[] = [
@@ -111,6 +112,13 @@ const navLinks: NavLinks[] = [
         icon: <IconUsersGroup size='1rem' />,
         active: (path: string) => path === '/dashboard/admin/users',
         href: '/dashboard/admin/users',
+      },
+      {
+        label: 'Invites',
+        icon: <IconTags size='1rem' />,
+        active: (path: string) => path === '/dashboard/admin/invites',
+        href: '/dashboard/admin/invites',
+        if: (_, config) => config.invites.enabled,
       },
     ],
   },
@@ -207,7 +215,7 @@ export default function Layout({ children, config }: { children: React.ReactNode
       navbar={
         <Navbar hiddenBreakpoint='sm' hidden={!opened} width={{ sm: 200, lg: 230 }}>
           {navLinks
-            .filter((link) => !link.if || link.if(user as Response['/api/user']['user']))
+            .filter((link) => !link.if || link.if(user as Response['/api/user']['user'], config))
             .map((link) => {
               if (!link.links) {
                 return (
@@ -232,18 +240,22 @@ export default function Layout({ children, config }: { children: React.ReactNode
                     rightSection={<IconChevronRight size='0.7rem' />}
                     defaultOpened={link.active(router.pathname)}
                   >
-                    {link.links.map((sublink) => (
-                      <NavLink
-                        key={sublink.label}
-                        label={sublink.label}
-                        icon={sublink.icon}
-                        rightSection={<IconChevronRight size='0.7rem' />}
-                        variant='light'
-                        active={router.pathname === sublink.href}
-                        component={Link}
-                        href={sublink.href || ''}
-                      />
-                    ))}
+                    {link.links
+                      .filter(
+                        (sublink) => !sublink.if || sublink.if(user as Response['/api/user']['user'], config)
+                      )
+                      .map((sublink) => (
+                        <NavLink
+                          key={sublink.label}
+                          label={sublink.label}
+                          icon={sublink.icon}
+                          rightSection={<IconChevronRight size='0.7rem' />}
+                          variant='light'
+                          active={router.pathname === sublink.href}
+                          component={Link}
+                          href={sublink.href || ''}
+                        />
+                      ))}
                   </NavLink>
                 );
               }
@@ -339,11 +351,7 @@ export default function Layout({ children, config }: { children: React.ReactNode
       }
     >
       <ConfigProvider config={config}>
-        <Paper
-          m={2}
-          withBorder
-          p='xs'
-        >
+        <Paper m={2} withBorder p='xs'>
           {children}
         </Paper>
       </ConfigProvider>

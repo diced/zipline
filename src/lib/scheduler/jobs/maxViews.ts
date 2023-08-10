@@ -2,7 +2,7 @@ import { datasource } from '@/lib/datasource';
 import { IntervalJob } from '..';
 import { bytes } from '@/lib/bytes';
 
-export default function maxViewsJob(prisma: typeof globalThis.__db__) {
+export default function maxViews(prisma: typeof globalThis.__db__) {
   return async function (this: IntervalJob) {
     const files = await prisma.file.findMany({
       where: {

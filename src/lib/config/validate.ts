@@ -92,10 +92,13 @@ export const schema = z.object({
     imageCompression: z.boolean().default(true),
     robotsTxt: z.boolean().default(false),
     healthcheck: z.boolean().default(true),
-    invites: z.boolean().default(true),
     userRegistration: z.boolean().default(false),
     oauthRegistration: z.boolean().default(false),
     deleteOnMaxViews: z.boolean().default(true),
+  }),
+  invites: z.object({
+    enabled: z.boolean().default(true),
+    length: z.number().default(8),
   }),
   website: z.object({
     title: z.string().default('Zipline'),

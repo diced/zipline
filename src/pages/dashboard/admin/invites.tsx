@@ -1,5 +1,5 @@
 import Layout from '@/components/Layout';
-import DashboardUsers from '@/components/pages/users';
+import DashboardInvites from '@/components/pages/invites';
 import useLogin from '@/lib/hooks/useLogin';
 import { withSafeConfig } from '@/lib/middleware/next/withSafeConfig';
 import { LoadingOverlay } from '@mantine/core';
@@ -11,7 +11,7 @@ export default function DashboardIndex({ config }: InferGetServerSidePropsType<t
 
   return (
     <Layout config={config}>
-      <DashboardUsers />
+      <DashboardInvites />
     </Layout>
   );
 }

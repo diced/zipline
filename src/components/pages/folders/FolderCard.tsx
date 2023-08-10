@@ -1,17 +1,13 @@
-import { useConfig } from '@/components/ConfigProvider';
 import RelativeDate from '@/components/RelativeDate';
-import { Url } from '@/lib/db/models/url';
-import { formatRootUrl } from '@/lib/url';
-import { ActionIcon, Anchor, Card, Group, Menu, Stack, Text } from '@mantine/core';
+import { Folder } from '@/lib/db/models/folder';
+import { ActionIcon, Card, Group, Menu, Stack, Text } from '@mantine/core';
+import { useClipboard } from '@mantine/hooks';
 import { IconCopy, IconDots, IconFiles, IconLock, IconLockOpen, IconTrashFilled } from '@tabler/icons-react';
 import { useState } from 'react';
-import { useClipboard } from '@mantine/hooks';
-import { Folder } from '@/lib/db/models/folder';
 import ViewFilesModal from './ViewFilesModal';
 import { copyFolderUrl, deleteFolder, editFolderVisibility } from './actions';
 
 export default function FolderCard({ folder }: { folder: Folder }) {
-  const config = useConfig();
   const clipboard = useClipboard();
 
   const [open, setOpen] = useState(false);
@@ -75,7 +71,7 @@ export default function FolderCard({ folder }: { folder: Folder }) {
               <b>Public:</b> {folder.public ? 'Yes' : 'No'}
             </Text>
             <Text size='xs' color='dimmed'>
-              <b>Files:</b> {folder.files.length}
+              <b>Files:</b> {folder.files!.length}
             </Text>
           </Stack>
         </Card.Section>

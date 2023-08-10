@@ -198,8 +198,9 @@ model Invite {
   updatedAt DateTime  @updatedAt
   expiresAt DateTime?
 
-  code String  @unique
-  used Boolean @default(false)
+  code    String @unique
+  uses    Int    @default(0)
+  maxUses Int?
 
   inviter   User   @relation(fields: [inviterId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   inviterId String

@@ -1,6 +1,9 @@
+import { ApiAuthInvitesResponse } from '@/pages/api/auth/invites';
+import { ApiAuthInvitesIdResponse } from '@/pages/api/auth/invites/[id]';
 import { ApiLoginResponse } from '@/pages/api/auth/login';
 import { ApiLogoutResponse } from '@/pages/api/auth/logout';
 import { ApiAuthOauthResponse } from '@/pages/api/auth/oauth';
+import { ApiAuthRegisterResponse } from '@/pages/api/auth/register';
 import { ApiHealthcheckResponse } from '@/pages/api/healthcheck';
 import { ApiSetupResponse } from '@/pages/api/setup';
 import { ApiUploadResponse } from '@/pages/api/upload';
@@ -21,6 +24,9 @@ import { ApiUsersIdResponse } from '@/pages/api/users/[id]';
 import { ApiVersionResponse } from '@/pages/api/version';
 
 export type Response = {
+  '/api/auth/invites/[id]': ApiAuthInvitesIdResponse;
+  '/api/auth/invites': ApiAuthInvitesResponse;
+  '/api/auth/register': ApiAuthRegisterResponse;
   '/api/auth/oauth': ApiAuthOauthResponse;
   '/api/auth/login': ApiLoginResponse;
   '/api/auth/logout': ApiLogoutResponse;

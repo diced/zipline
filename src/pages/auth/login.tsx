@@ -166,7 +166,7 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
             )}
 
             {config.features.userRegistration && (
-              <Button size='lg' fullWidth variant='outline'>
+              <Button component={Link} href='/auth/register' size='lg' fullWidth variant='outline'>
                 Sign up
               </Button>
             )}

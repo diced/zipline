@@ -14,8 +14,9 @@ import { version } from '../../package.json';
 import { filesRoute } from './routes/files';
 import { urlsRoute } from './routes/urls';
 import { Scheduler } from '@/lib/scheduler';
-import deleteJob from '@/lib/scheduler/jobs/delete';
-import maxViewsJob from '@/lib/scheduler/jobs/maxViews';
+import deleteFiles from '@/lib/scheduler/jobs/deleteFiles';
+import clearInvites from '@/lib/scheduler/jobs/clearInvites';
+import maxViews from '@/lib/scheduler/jobs/maxViews';
 import { handleOverrideColors, parseThemes, readThemesDir } from '@/lib/theme/file';
 
 const MODE = process.env.NODE_ENV || 'production';
@@ -27,13 +28,6 @@ async function main() {
   logger.info('starting zipline', { mode: MODE, version: version });
 
   const server = express();
-
-  const themes = await readThemesDir();
-  console.log('themes', themes)
-  const parsedThemes = await parseThemes(themes);
-  console.log('parsedThemes', parsedThemes)
-  const overriden = await handleOverrideColors(parsedThemes[0]);
-  console.log('overriden', overriden)
 
   logger.info('reading environment for configuration');
   const config = validateEnv(readEnv());
@@ -134,8 +128,9 @@ async function main() {
       port: config.core.port,
     });
 
-    scheduler.addInterval('delete', config.scheduler.deleteInterval, deleteJob(prisma));
-    scheduler.addInterval('maxviews', config.scheduler.maxViewsInterval, maxViewsJob(prisma));
+    scheduler.addInterval('deletefiles', config.scheduler.deleteInterval, deleteFiles(prisma));
+    scheduler.addInterval('maxviews', config.scheduler.maxViewsInterval, maxViews(prisma));
+    scheduler.addInterval('clearinvites', config.scheduler.clearInvitesInterval, clearInvites(prisma));
 
     scheduler.start();
   });

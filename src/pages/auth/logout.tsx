@@ -23,7 +23,7 @@ export default function Login() {
         await router.push('/auth/login');
       }
     })();
-  });
+  }, []);
 
   return (
     <>
