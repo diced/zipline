@@ -12,7 +12,7 @@ export type ApiUserStatsResponse = {
   storageUsed: number;
   avgStorageUsed: number;
   urlsCreated: number;
-  avgUrlViews: number;
+  urlViews: number;
 
   sortTypeCount: { [type: string]: number };
 };
@@ -51,6 +51,9 @@ export async function handler(req: NextApiReq, res: NextApiRes<ApiUserStatsRespo
     _avg: {
       views: true,
     },
+    _sum: {
+      views: true,
+    }
   });
 
   const sortType = await prisma.file.findMany({
@@ -77,7 +80,7 @@ export async function handler(req: NextApiReq, res: NextApiRes<ApiUserStatsRespo
     storageUsed: aggFile._sum.size ?? 0,
     avgStorageUsed: aggFile._avg.size ?? 0,
     urlsCreated: aggUrl._count._all ?? 0,
-    avgUrlViews: aggUrl._avg.views ?? 0,
+    urlViews: aggUrl._sum.views ?? 0,
 
     sortTypeCount,
   });

@@ -64,6 +64,7 @@ export default function DashboardHome() {
             <Stat Icon={IconEyeFilled} title='File average views' value={Math.round(stats!.avgViews)} />
 
             <Stat Icon={IconLink} title='Links created' value={stats!.urlsCreated} />
+            <Stat Icon={IconLink} title='Total link views' value={Math.round(stats!.urlViews)} />
           </SimpleGrid>
 
           {Object.keys(stats!.sortTypeCount).length !== 0 && (
