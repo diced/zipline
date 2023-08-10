@@ -114,7 +114,7 @@ export default function FileModal({
             <FileStat Icon={IconEyeFilled} title='Views' value={file.views} />
           </SimpleGrid>
 
-          <Group position='apart'>
+          <Group position='apart' mt='lg'>
             <Group position='left'>
               {!reduce &&
                 (file.folderId ? (
