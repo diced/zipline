@@ -26,10 +26,6 @@ ENV PRISMA_QUERY_ENGINE_BINARY=/prisma-engines/query-engine \
   ZIPLINE_DOCKER_BUILD=true \
   NEXT_TELEMETRY_DISABLED=1
 
-# Install production dependencies then temporarily save
-RUN yarn workspaces focus --production --all
-RUN cp -RL node_modules /tmp/node_modules
-
 # Install the dependencies
 RUN yarn install --immutable
 
@@ -63,20 +59,20 @@ ENV PRISMA_QUERY_ENGINE_BINARY=/prisma-engines/query-engine \
 # Copy only the necessary files from the previous stage
 COPY --from=builder /zipline/dist ./dist
 COPY --from=builder /zipline/.next ./.next
-COPY --from=builder /zipline/package.json ./package.json
 
 COPY --from=builder /zipline/mimes.json ./mimes.json
 COPY --from=builder /zipline/next.config.js ./next.config.js
 COPY --from=builder /zipline/public ./public
-
-COPY --from=builder /zipline/node_modules ./node_modules
-
 
 # Copy Startup Script
 COPY docker-entrypoint.sh /zipline
 
 # Make Startup Script Executable
 RUN chmod a+x /zipline/docker-entrypoint.sh && rm -rf /zipline/src
+
+# Clean up
+RUN rm -rf /tmp/* /root/* 
+RUN yarn cache clean --all
 
 # Set the entrypoint to the startup script
 ENTRYPOINT ["tini", "--", "/zipline/docker-entrypoint.sh"]
