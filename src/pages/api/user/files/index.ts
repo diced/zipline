@@ -54,21 +54,6 @@ const validateSortBy = z
 const validateOrder = z.enum(['asc', 'desc']).default('desc');
 const validateThreshold = z.number().default(0.1);
 
-const dashboardFilter = [
-  {
-    type: { startsWith: 'image/' },
-  },
-  {
-    type: { startsWith: 'video/' },
-  },
-  {
-    type: { startsWith: 'audio/' },
-  },
-  {
-    type: { startsWith: 'text/' },
-  },
-];
-
 const logger = log('api').c('user').c('files');
 
 export async function handler(req: NextApiReq<any, Query>, res: NextApiRes<ApiUserFilesResponse>) {
@@ -154,31 +139,37 @@ export async function handler(req: NextApiReq<any, Query>, res: NextApiRes<ApiUs
     });
   }
 
-  const count = await prisma.file.count({
-    where: {
-      userId: user.id,
-      ...(filter === 'dashboard' && {
-        OR: dashboardFilter,
+  const where = {
+    userId: user.id,
+    ...(filter === 'dashboard' && {
+      OR: [
+        {
+          type: { startsWith: 'image/' },
+        },
+        {
+          type: { startsWith: 'video/' },
+        },
+        {
+          type: { startsWith: 'audio/' },
+        },
+        {
+          type: { startsWith: 'text/' },
+        },
+      ],
+    }),
+    ...(favorite === 'true' &&
+      filter !== 'all' && {
+        favorite: true,
       }),
-      ...(favorite === 'true' &&
-        filter !== 'all' && {
-          favorite: true,
-        }),
-    },
+  };
+
+  const count = await prisma.file.count({
+    where,
   });
 
   const files = cleanFiles(
     await prisma.file.findMany({
-      where: {
-        userId: user.id,
-        ...(filter === 'dashboard' && {
-          OR: dashboardFilter,
-        }),
-        ...(favorite === 'true' &&
-          filter !== 'all' && {
-            favorite: true,
-          }),
-      },
+      where,
       select: {
         ...fileSelect,
         password: true,
