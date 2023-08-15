@@ -156,7 +156,7 @@ export default function UploadOptionsButton({ numFiles }: { numFiles: number }) 
                 ) : null}
               </>
             }
-            description='The compression level to use on image (only). Leave blank to disable compression.'
+            description='The compression level to use on images (only). Leave blank to disable compression.'
             icon={<IconPercentage size='1rem' />}
             max={100}
             min={0}

@@ -3,8 +3,9 @@ import SettingsAvatar from './parts/SettingsAvatar';
 import SettingsDashboard from './parts/SettingsDashboard';
 import SettingsUser from './parts/SettingsUser';
 import SettingsFileView from './parts/SettingsFileView';
-import { useConfig } from '@/components/ConfigProvider';
 import SettingsOAuth from './parts/SettingsOAuth';
+import SettingsGenerators from './parts/SettingsGenerators';
+import { useConfig } from '@/components/ConfigProvider';
 
 export default function DashboardSettings() {
   const config = useConfig();
@@ -25,6 +26,8 @@ export default function DashboardSettings() {
         <SettingsFileView />
 
         {config.features.oauthRegistration && <SettingsOAuth />}
+
+        <SettingsGenerators />
       </SimpleGrid>
     </>
   );

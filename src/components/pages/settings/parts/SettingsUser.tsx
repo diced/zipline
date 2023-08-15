@@ -9,10 +9,9 @@ import {
   Paper,
   PasswordInput,
   ScrollArea,
-  Stack,
   TextInput,
   Title,
-  Tooltip,
+  Tooltip
 } from '@mantine/core';
 import { hasLength, useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
