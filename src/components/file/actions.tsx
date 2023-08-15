@@ -2,8 +2,11 @@ import { Response } from '@/lib/api/response';
 import type { File } from '@/lib/db/models/file';
 import { Folder } from '@/lib/db/models/folder';
 import { fetchApi } from '@/lib/fetchApi';
+import { useSettingsStore } from '@/lib/store/settings';
+import { conditionalWarning } from '@/lib/warningModal';
 import { Anchor } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
+import { modals } from '@mantine/modals';
 import { notifications, notifications as notifs } from '@mantine/notifications';
 import {
   IconCopy,
@@ -45,7 +48,15 @@ export function copyFile(file: File, clipboard: ReturnType<typeof useClipboard>)
   });
 }
 
-export async function deleteFile(file: File, setOpen: (open: boolean) => void) {
+export async function deleteFile(warnDeletion: boolean, file: File, setOpen: (open: boolean) => void) {
+  conditionalWarning(warnDeletion, {
+    confirmLabel: `Delete ${file.name}`,
+    message: `Are you sure you want to delete ${file.name}? This action cannot be undone.`,
+    onConfirm: () => handleDeleteFile(file, setOpen),
+  });
+}
+
+export async function handleDeleteFile(file: File, setOpen: (open: boolean) => void) {
   const { error } = await fetchApi(`/api/user/files/${file.id}`, 'DELETE');
 
   if (error) {

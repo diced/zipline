@@ -3,14 +3,16 @@ import RelativeDate from '@/components/RelativeDate';
 import { Url } from '@/lib/db/models/url';
 import { formatRootUrl } from '@/lib/url';
 import { ActionIcon, Anchor, Card, Group, Menu, Stack, Text } from '@mantine/core';
-import { IconCopy, IconDots, IconTrashFilled } from '@tabler/icons-react';
-import { useState } from 'react';
-import { copyUrl, deleteUrl } from './actions';
 import { useClipboard } from '@mantine/hooks';
+import { IconCopy, IconDots, IconTrashFilled } from '@tabler/icons-react';
+import { copyUrl, deleteUrl } from './actions';
+import { useSettingsStore } from '@/lib/store/settings';
 
 export default function UserCard({ url }: { url: Url }) {
   const config = useConfig();
   const clipboard = useClipboard();
+
+  const warnDeletion = useSettingsStore((state) => state.settings.warnDeletion);
 
   return (
     <>
@@ -40,7 +42,11 @@ export default function UserCard({ url }: { url: Url }) {
                 <Menu.Item icon={<IconCopy size='1rem' />} onClick={() => copyUrl(url, config, clipboard)}>
                   Copy
                 </Menu.Item>
-                <Menu.Item icon={<IconTrashFilled size='1rem' />} color='red' onClick={() => deleteUrl(url)}>
+                <Menu.Item
+                  icon={<IconTrashFilled size='1rem' />}
+                  color='red'
+                  onClick={() => deleteUrl(warnDeletion, url)}
+                >
                   Delete
                 </Menu.Item>
               </Menu.Dropdown>

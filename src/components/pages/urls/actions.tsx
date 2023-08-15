@@ -3,6 +3,7 @@ import type { SafeConfig } from '@/lib/config/safe';
 import { Url } from '@/lib/db/models/url';
 import { fetchApi } from '@/lib/fetchApi';
 import { formatRootUrl } from '@/lib/url';
+import { conditionalWarning } from '@/lib/warningModal';
 import { Anchor, Title } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
@@ -11,18 +12,11 @@ import { IconCheck, IconCopy, IconLinkOff } from '@tabler/icons-react';
 import Link from 'next/link';
 import { mutate } from 'swr';
 
-export async function deleteUrl(url: Url) {
-  modals.openConfirmModal({
-    centered: true,
-    title: <Title>Delete {url.code ?? url.vanity}?</Title>,
-    children: `Are you sure you want to delete ${url.code ?? url.vanity}? This action cannot be undone.`,
-    labels: {
-      cancel: 'Cancel',
-      confirm: 'Delete',
-    },
-    confirmProps: { color: 'red' },
+export async function deleteUrl(warnDeletion: boolean, url: Url) {
+  conditionalWarning(warnDeletion, {
+    message: `Are you sure you want to delete ${url.code ?? url.vanity}? This action cannot be undone.`,
     onConfirm: () => handleDeleteUrl(url),
-    onCancel: modals.closeAll,
+    confirmLabel: `Delete '${url.code ?? url.vanity}'`,
   });
 }
 

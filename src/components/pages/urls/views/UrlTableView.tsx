@@ -109,7 +109,10 @@ export default function UrlTableView() {
       destination: '',
     }
   );
-  const searchThreshold = useSettingsStore((s) => s.settings.searchThreshold);
+  const [warnDeletion, searchThreshold] = useSettingsStore((s) => [
+    s.settings.warnDeletion,
+    s.settings.searchThreshold,
+  ]);
 
   const { data, isLoading } = useSWR<Extract<Response['/api/user/urls'], Url[]>>(
     {
@@ -259,7 +262,7 @@ export default function UrlTableView() {
                       color='red'
                       onClick={(e) => {
                         e.stopPropagation();
-                        deleteUrl(url);
+                        deleteUrl(warnDeletion, url);
                       }}
                     >
                       <IconTrashFilled size='1rem' />

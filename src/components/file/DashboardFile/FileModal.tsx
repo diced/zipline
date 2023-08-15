@@ -34,6 +34,7 @@ import useSWR from 'swr';
 import { Response } from '@/lib/api/response';
 import { Folder } from '@/lib/db/models/folder';
 import { bytes } from '@/lib/bytes';
+import { useSettingsStore } from '@/lib/store/settings';
 
 function ActionButton({
   Icon,
@@ -67,6 +68,7 @@ export default function FileModal({
   reduce?: boolean;
 }) {
   const clipboard = useClipboard();
+  const warnDeletion = useSettingsStore((state) => state.settings.warnDeletion);
 
   const { data: folders } = useSWR<Extract<Response['/api/user/folders'], Folder[]>>(
     '/api/user/folders?noincl=true'
@@ -145,7 +147,7 @@ export default function FileModal({
                 <>
                   <ActionButton
                     Icon={IconTrashFilled}
-                    onClick={() => deleteFile(file, setOpen)}
+                    onClick={() => deleteFile(warnDeletion, file, setOpen)}
                     tooltip='Delete file'
                     color='red'
                   />

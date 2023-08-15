@@ -65,7 +65,7 @@ export default function SettingsDashboard() {
           />
           <Switch
             label='Warn on deletion'
-            description='Show a warning when deleting files. This is useful to prevent accidental deletion of files.'
+            description='Show a warning when deleting stuff. When this is disabled, files, urls, etc will be deleted with no prior warning! Folders, users, and bulk-transactions are exempt from this rule and will always warn you before deleting anything.'
             checked={settings.warnDeletion}
             onChange={(event) => update('warnDeletion', event.currentTarget.checked)}
           />
@@ -73,7 +73,7 @@ export default function SettingsDashboard() {
 
         <NumberInput
           label='Search Threshold'
-          description='When performing a similarity check on file searches, this is the minimum percentage of similarity required to show the file. The lower the number, the more results will be shown though they will be less relevant to the actual search query. A recomended value is between 0.1 and 0.4 as this will yield moderate-relevancy results that should match your queries.'
+          description='When performing a similarity check on file/url searches, this is the minimum percentage of similarity required to show the file/url. The lower the number, the more results will be shown though they will be less relevant to the actual search query. A recomended value is between 0.1 and 0.4 as this will yield moderate-relevancy results that should match your queries.'
           min={0}
           max={100}
           value={settings.searchThreshold}

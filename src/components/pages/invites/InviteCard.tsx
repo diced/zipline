@@ -4,9 +4,12 @@ import { ActionIcon, Card, Group, Menu, Stack, Text } from '@mantine/core';
 import { IconCopy, IconDots, IconTrashFilled } from '@tabler/icons-react';
 import { copyInviteUrl, deleteInvite } from './actions';
 import { useClipboard } from '@mantine/hooks';
+import { useSettingsStore } from '@/lib/store/settings';
 
 export default function InviteCard({ invite }: { invite: Invite }) {
   const clipboard = useClipboard();
+
+  const warnDeletion = useSettingsStore((state) => state.settings.warnDeletion);
 
   return (
     <>
@@ -31,7 +34,7 @@ export default function InviteCard({ invite }: { invite: Invite }) {
                 <Menu.Item
                   icon={<IconTrashFilled size='1rem' />}
                   color='red'
-                  onClick={() => deleteInvite(invite)}
+                  onClick={() => deleteInvite(warnDeletion, invite)}
                 >
                   Delete
                 </Menu.Item>

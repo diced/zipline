@@ -81,7 +81,10 @@ function SearchFilter({
 export default function FileTable({ id }: { id?: string }) {
   const router = useRouter();
   const clipboard = useClipboard();
-  const searchThreshold = useSettingsStore((state) => state.settings.searchThreshold);
+  const [searchThreshold, warnDeletion] = useSettingsStore((state) => [
+    state.settings.searchThreshold,
+    state.settings.warnDeletion,
+  ]);
 
   const [page, setPage] = useState<number>(router.query.page ? parseInt(router.query.page as string) : 1);
   const [perpage, setPerpage] = useState<number>(20);
@@ -321,7 +324,7 @@ export default function FileTable({ id }: { id?: string }) {
                       color='red'
                       onClick={(e) => {
                         e.stopPropagation();
-                        deleteFile(file, () => {});
+                        deleteFile(warnDeletion, file, () => {});
                       }}
                     >
                       <IconTrashFilled size='1rem' />

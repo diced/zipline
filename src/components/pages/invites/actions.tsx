@@ -1,6 +1,7 @@
 import { Response } from '@/lib/api/response';
 import { Invite } from '@/lib/db/models/invite';
 import { fetchApi } from '@/lib/fetchApi';
+import { conditionalWarning } from '@/lib/warningModal';
 import { Anchor, Title } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
@@ -9,17 +10,11 @@ import { IconCheck, IconCopy, IconTagOff } from '@tabler/icons-react';
 import Link from 'next/link';
 import { mutate } from 'swr';
 
-export async function deleteInvite(invite: Invite) {
-  modals.openConfirmModal({
-    title: <Title>Delete invite "{invite.code}"</Title>,
-    children: `Are you sure you want to delete invite ${invite.code}? This action cannot be undone.`,
-    labels: {
-      cancel: 'Cancel',
-      confirm: 'Delete',
-    },
-    confirmProps: { color: 'red' },
+export async function deleteInvite(warnDeletion: boolean, invite: Invite) {
+  conditionalWarning(warnDeletion, {
+    message: `Are you sure you want to delete invite ${invite.code}? This action cannot be undone.`,
     onConfirm: () => handleDeleteInvite(invite),
-    onCancel: modals.closeAll,
+    confirmLabel: `Delete ${invite.code}`,
   });
 }
 

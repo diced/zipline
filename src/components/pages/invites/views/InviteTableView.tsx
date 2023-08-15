@@ -1,4 +1,3 @@
-import { useConfig } from '@/components/ConfigProvider';
 import RelativeDate from '@/components/RelativeDate';
 import { Response } from '@/lib/api/response';
 import { Invite } from '@/lib/db/models/invite';
@@ -9,10 +8,11 @@ import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import { copyInviteUrl, deleteInvite } from '../actions';
+import { useSettingsStore } from '@/lib/store/settings';
 
 export default function InviteTableView() {
-  const config = useConfig();
   const clipboard = useClipboard();
+  const warnDeletion = useSettingsStore((state) => state.settings.warnDeletion);
 
   const { data, isLoading } = useSWR<Extract<Response['/api/auth/invites'], Invite[]>>('/api/auth/invites');
 
@@ -105,7 +105,7 @@ export default function InviteTableView() {
                       color='red'
                       onClick={(e) => {
                         e.stopPropagation();
-                        deleteInvite(invite);
+                        deleteInvite(warnDeletion, invite);
                       }}
                     >
                       <IconTrashFilled size='1rem' />
