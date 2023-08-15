@@ -43,7 +43,11 @@ export default function FavoriteFiles() {
     );
   }, [page]);
 
-  if (!isLoading && data?.page.length === 0) return null;
+  if (!isLoading && !data?.page.length && router.query.favoritePage) {
+    delete router.query.favoritePage;
+    router.replace({ query: router.query }, undefined, { shallow: true });
+    setPage(1);
+  }
 
   return (
     <>
