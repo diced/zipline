@@ -13,14 +13,9 @@ import {
   Stack,
   Switch,
   Text,
-  Title
+  Title,
 } from '@mantine/core';
-import {
-  IconMoonFilled,
-  IconPaintFilled,
-  IconPercentage,
-  IconSunFilled
-} from '@tabler/icons-react';
+import { IconMoonFilled, IconPaintFilled, IconPercentage, IconSunFilled } from '@tabler/icons-react';
 
 function ThemeSelectItem({ value, label, ...others }: { value: string; label: string }) {
   const themes = useThemes();
@@ -33,9 +28,11 @@ function ThemeSelectItem({ value, label, ...others }: { value: string; label: st
       <div>{label}</div>
       {value !== 'system' && (
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          {mergedTheme.colors[mergedTheme?.primaryColor!]?.map((color) => (
-            <ColorSwatch key={color} color={color} size={18} style={{ marginRight: '0.5rem' }} />
-          ))}
+          {mergedTheme.colors[mergedTheme.colorScheme === 'dark' ? 'dark' : mergedTheme?.primaryColor!]?.map(
+            (color) => (
+              <ColorSwatch key={color} color={color} size={18} style={{ marginRight: '0.5rem' }} />
+            )
+          )}
         </div>
       )}
     </Group>
@@ -56,7 +53,6 @@ export default function SettingsDashboard() {
       <Stack spacing='sm' my='xs'>
         <Group grow>
           <Switch
-            
             label='Disable Media Preview'
             description='Disable previews of files in the dashboard. This is useful to save data as Zipline, by default, will load previews of files.'
             checked={settings.disableMediaPreview}
