@@ -18,6 +18,7 @@ export default function Login() {
           setUser(null);
           setToken(null);
           mutate('/api/user', null);
+          await router.push('/auth/login');
         }
       } else {
         await router.push('/auth/login');
