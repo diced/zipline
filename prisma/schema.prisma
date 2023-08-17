@@ -28,6 +28,7 @@ model User {
   view     Json    @default("{}")
 
   totpSecret String?
+  passkeys   UserPasskey[]
 
   files          File[]
   urls           Url[]
@@ -36,6 +37,20 @@ model User {
   invites        Invite[]
   oauthProviders OAuthProvider[]
   IncompleteFile IncompleteFile[]
+}
+
+model UserPasskey {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  lastUsed DateTime?
+
+  name     String
+  reg      Json
+
+  User   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId String
 }
 
 enum Role {

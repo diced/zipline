@@ -4,6 +4,7 @@ import { ApiLoginResponse } from '@/pages/api/auth/login';
 import { ApiLogoutResponse } from '@/pages/api/auth/logout';
 import { ApiAuthOauthResponse } from '@/pages/api/auth/oauth';
 import { ApiAuthRegisterResponse } from '@/pages/api/auth/register';
+import { ApiAuthWebauthnResponse } from '@/pages/api/auth/webauthn';
 import { ApiHealthcheckResponse } from '@/pages/api/healthcheck';
 import { ApiSetupResponse } from '@/pages/api/setup';
 import { ApiUploadResponse } from '@/pages/api/upload';
@@ -14,6 +15,7 @@ import { ApiUserFilesIdPasswordResponse } from '@/pages/api/user/files/[id]/pass
 import { ApiUserFilesTransactionResponse } from '@/pages/api/user/files/transaction';
 import { ApiUserFoldersResponse } from '@/pages/api/user/folders';
 import { ApiUserFoldersIdResponse } from '@/pages/api/user/folders/[id]';
+import { ApiUserMfaPasskeyResponse } from '@/pages/api/user/mfa/passkey';
 import { ApiUserMfaTotpResponse } from '@/pages/api/user/mfa/totp';
 import { ApiUserRecentResponse } from '@/pages/api/user/recent';
 import { ApiUserStatsResponse } from '@/pages/api/user/stats';
@@ -28,9 +30,11 @@ export type Response = {
   '/api/auth/invites/[id]': ApiAuthInvitesIdResponse;
   '/api/auth/invites': ApiAuthInvitesResponse;
   '/api/auth/register': ApiAuthRegisterResponse;
+  '/api/auth/webauthn': ApiAuthWebauthnResponse;
   '/api/auth/oauth': ApiAuthOauthResponse;
   '/api/auth/login': ApiLoginResponse;
   '/api/auth/logout': ApiLogoutResponse;
+  '/api/user/mfa/passkey': ApiUserMfaPasskeyResponse;
   '/api/user/mfa/totp': ApiUserMfaTotpResponse;
   '/api/user/folders/[id]': ApiUserFoldersIdResponse;
   '/api/user/folders': ApiUserFoldersResponse;

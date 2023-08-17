@@ -1,4 +1,5 @@
-import { OAuthProvider } from '@prisma/client';
+import { RegistrationResponseJSON } from '@github/webauthn-json/dist/types/browser-ponyfill';
+import { OAuthProvider, UserPasskey } from '@prisma/client';
 import { z } from 'zod';
 
 export type User = {
@@ -12,6 +13,7 @@ export type User = {
   oauthProviders: OAuthProvider[];
 
   totpSecret?: string | null;
+  passkeys: UserPasskey[];
 
   avatar?: string | null;
   password?: string | null;
@@ -27,6 +29,7 @@ export const userSelect = {
   view: true,
   oauthProviders: true,
   totpSecret: true,
+  passkeys: true,
 };
 
 export type UserViewSettings = z.infer<typeof userViewSchema>;

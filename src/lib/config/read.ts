@@ -65,6 +65,7 @@ export const PROP_TO_ENV: Record<string, string> = {
 
   'mfa.totp.enabled': 'MFA_TOTP_ENABLED',
   'mfa.totp.issuer': 'MFA_TOTP_ISSUER',
+  'mfa.passkeys': 'MFA_PASSKEYS',
 
   'oauth.bypassLocalLogin': 'OAUTH_BYPASS_LOCAL_LOGIN',
   'oauth.loginOnly': 'OAUTH_LOGIN_ONLY',
@@ -139,6 +140,7 @@ export function readEnv() {
 
     env(PROP_TO_ENV['mfa.totp.enabled'], 'mfa.totp.enabled', 'boolean'),
     env(PROP_TO_ENV['mfa.totp.issuer'], 'mfa.totp.issuer', 'string'),
+    env(PROP_TO_ENV['mfa.passkeys'], 'mfa.passkeys', 'boolean'),
 
     env(PROP_TO_ENV['oauth.bypassLocalLogin'], 'oauth.bypassLocalLogin', 'boolean'),
     env(PROP_TO_ENV['oauth.loginOnly'], 'oauth.loginOnly', 'boolean'),
@@ -216,6 +218,7 @@ export function readEnv() {
         enabled: undefined,
         issuer: undefined,
       },
+      passkeys: undefined,
     },
     oauth: {
       bypassLocalLogin: undefined,

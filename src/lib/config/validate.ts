@@ -137,7 +137,7 @@ export const schema = z.object({
       enabled: z.boolean().default(false),
       issuer: z.string().default('Zipline'),
     }),
-    // TODO: passkeys
+    passkeys: z.boolean().default(true),
   }),
   oauth: z.object({
     bypassLocalLogin: z.boolean().default(false),

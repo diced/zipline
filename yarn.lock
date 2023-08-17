@@ -3309,6 +3309,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@github/webauthn-json@npm:^2.1.1":
+  version: 2.1.1
+  resolution: "@github/webauthn-json@npm:2.1.1"
+  bin:
+    webauthn-json: dist/bin/main.js
+  checksum: 2ae5c416d547ed5cd383bee7e1f9c5899bbe0e3928364364028d24ed0380704fe9e746b436b09af644d6737206444c16e934acc182ab04babd2ac68179becb27
+  languageName: node
+  linkType: hard
+
 "@humanwhocodes/config-array@npm:^0.11.10":
   version: 0.11.10
   resolution: "@humanwhocodes/config-array@npm:0.11.10"
@@ -16147,6 +16156,7 @@ __metadata:
   dependencies:
     "@emotion/react": ^11.11.1
     "@emotion/server": ^11.11.0
+    "@github/webauthn-json": ^2.1.1
     "@mantine/core": ^6.0.14
     "@mantine/dates": ^6.0.14
     "@mantine/dropzone": ^6.0.14

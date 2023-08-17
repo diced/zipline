@@ -3,6 +3,7 @@ import { SafeConfig } from '@/lib/config/safe';
 import { getZipline } from '@/lib/db/models/zipline';
 import { fetchApi } from '@/lib/fetchApi';
 import { withSafeConfig } from '@/lib/middleware/next/withSafeConfig';
+import { authenticateWeb, registerWeb } from '@/lib/passkey';
 import { eitherTrue } from '@/lib/primitive';
 import {
   Button,
@@ -19,11 +20,14 @@ import {
   Title,
 } from '@mantine/core';
 import { hasLength, useForm } from '@mantine/form';
+import { notifications } from '@mantine/notifications';
 import {
   IconBrandDiscordFilled,
   IconBrandGithubFilled,
   IconBrandGoogle,
   IconCircleKeyFilled,
+  IconKering,
+  IconKey,
   IconShieldQuestion,
   IconX,
 } from '@tabler/icons-react';
@@ -52,6 +56,9 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
   const [pinDisabled, setPinDisabled] = useState(false);
   const [pinError, setPinError] = useState('');
   const [pin, setPin] = useState('');
+
+  const [passkeyErrored, setPasskeyErrored] = useState(false);
+  const [passkeyLoading, setPasskeyLoading] = useState(false);
 
   useEffect(() => {
     if (data?.user) {
@@ -106,6 +113,31 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
     }
   };
 
+  const handlePasskeyLogin = async () => {
+    try {
+      setPasskeyLoading(true);
+      const res = await authenticateWeb();
+
+      const { data, error } = await fetchApi<Response['/api/auth/webauthn']>('/api/auth/webauthn', 'POST', {
+        auth: res.toJSON(),
+      });
+      if (error) {
+        setPasskeyErrored(true);
+        setPasskeyLoading(false);
+        notifications.show({
+          title: 'Error while authenticating with passkey',
+          message: error.message,
+          color: 'red',
+        });
+      } else {
+        mutate(data as Response['/api/user']);
+      }
+    } catch (e) {
+      setPasskeyErrored(true);
+      setPasskeyLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (willRedirect) {
       const provider = Object.keys(config.oauthEnabled).find(
@@ -118,11 +150,25 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
     }
   }, []);
 
+  // remove setpasskeyerrored after 3 seconds
+  useEffect(() => {
+    if (passkeyErrored) {
+      setTimeout(() => {
+        setPasskeyErrored(false);
+      }, 3000);
+    }
+  }, [passkeyErrored]);
+
   return (
     <>
       {willRedirect && !showLocalLogin && <LoadingOverlay visible />}
 
-      <Modal onClose={() => {}} title={<Title order={3}>Enter code</Title>} opened={totpOpen} withCloseButton={false}>
+      <Modal
+        onClose={() => {}}
+        title={<Title order={3}>Enter code</Title>}
+        opened={totpOpen}
+        withCloseButton={false}
+      >
         <Center>
           <PinInput
             data-autofocus
@@ -237,6 +283,18 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
                 or
               </Text>
             )}
+
+            <Button
+              onClick={handlePasskeyLogin}
+              size='lg'
+              fullWidth
+              variant='outline'
+              leftIcon={<IconKey size='1rem' />}
+              color={passkeyErrored ? 'red' : 'primary'}
+              loading={passkeyLoading}
+            >
+              Login with passkey
+            </Button>
 
             {config.features.userRegistration && (
               <Button component={Link} href='/auth/register' size='lg' fullWidth variant='outline'>

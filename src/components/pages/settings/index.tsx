@@ -7,6 +7,7 @@ import SettingsGenerators from './parts/SettingsGenerators';
 import SettingsMfa from './parts/SettingsMfa';
 import SettingsOAuth from './parts/SettingsOAuth';
 import SettingsUser from './parts/SettingsUser';
+import { eitherTrue } from '@/lib/primitive';
 
 export default function DashboardSettings() {
   const config = useConfig();
@@ -27,7 +28,7 @@ export default function DashboardSettings() {
         <SettingsFileView />
 
         {config.features.oauthRegistration && <SettingsOAuth />}
-        {config.mfa.totp.enabled && <SettingsMfa />}
+        {eitherTrue(config.mfa.totp.enabled, config.mfa.passkeys) && <SettingsMfa />}
 
         <SettingsGenerators />
       </SimpleGrid>
