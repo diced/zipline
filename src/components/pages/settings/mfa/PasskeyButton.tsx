@@ -91,8 +91,11 @@ export default function PasskeyButton() {
         confirm: `Remove "${passkey.name}"`,
         cancel: 'Cancel',
       },
+      confirmProps: {
+        color: 'red',
+      },
       onConfirm: async () => {
-        const { data, error } = await fetchApi('/api/user/mfa/passkey', 'DELETE', {
+        const { error } = await fetchApi('/api/user/mfa/passkey', 'DELETE', {
           id: passkey.id,
         });
 
@@ -121,7 +124,7 @@ export default function PasskeyButton() {
     if (passkeyErrored) {
       setTimeout(() => {
         setPasskeyErrored(false);
-      }, 5000);
+      }, 2500);
     }
   }, [passkeyErrored]);
 
@@ -138,7 +141,7 @@ export default function PasskeyButton() {
               <Paper withBorder p='xs'>
                 <Group position='apart'>
                   <Text weight='bolder'>{passkey.name}</Text>
-                  <ActionIcon color='red' variant='filled' onClick={() => removePasskey(passkey)}>
+                  <ActionIcon color='red' onClick={() => removePasskey(passkey)}>
                     <IconTrashFilled size='1rem' />
                   </ActionIcon>
                 </Group>
@@ -158,11 +161,16 @@ export default function PasskeyButton() {
           <Button
             size='sm'
             leftIcon={<IconKey size='1rem' />}
-            color={passkeyErrored ? 'red' : 'blue'}
+            color={passkeyErrored ? 'red' : 'primary'}
             onClick={handleRegisterPasskey}
             loading={passkeyLoading}
           >
-            {passkeyLoading ? 'Loading...' : 'Create a passkey...'}
+            {/* {passkeyLoading ? 'Loading...' : 'Create a passkey...'} */}
+            {passkeyErrored
+              ? 'Error while creating a passkey'
+              : passkeyLoading
+              ? 'Loading...'
+              : 'Create a passkey'}
           </Button>
 
           {namerShown && (
@@ -183,12 +191,7 @@ export default function PasskeyButton() {
         </Stack>
       </Modal>
 
-      <Button
-        size='sm'
-        leftIcon={<IconKey size={24} />}
-        color={user?.totpSecret ? 'red' : 'blue'}
-        onClick={() => setPasskeyOpen(true)}
-      >
+      <Button size='sm' leftIcon={<IconKey size={24} />} onClick={() => setPasskeyOpen(true)}>
         Manage passkeys
       </Button>
     </>

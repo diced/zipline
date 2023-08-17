@@ -21,9 +21,9 @@ export default function DashboardSettings() {
       <SimpleGrid mt='md' cols={2} spacing='lg' breakpoints={[{ maxWidth: 'sm', cols: 1 }]}>
         <SettingsUser />
 
-        <SettingsDashboard />
-
         <SettingsAvatar />
+
+        <SettingsDashboard />
 
         <SettingsFileView />
 

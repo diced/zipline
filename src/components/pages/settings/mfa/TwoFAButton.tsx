@@ -202,7 +202,7 @@ export default function TwoFAButton() {
       <Button
         size='sm'
         leftIcon={<IconShieldLockFilled size={24} />}
-        color={user?.totpSecret ? 'red' : 'blue'}
+        color={user?.totpSecret ? 'red' : 'primary'}
         onClick={() => setTotpOpen(true)}
       >
         {user?.totpSecret ? 'Disable 2FA' : 'Enable 2FA'}
