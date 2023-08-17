@@ -115,7 +115,10 @@ export async function handler(req: NextApiReq<Body, Query>, res: NextApiRes<ApiU
       where: {
         id: user.id,
       },
-      select: userSelect,
+      select: {
+        ...userSelect,
+        totpSecret: false,
+      },
     });
 
     logger.info(`${req.user.username} deleted another user`, {

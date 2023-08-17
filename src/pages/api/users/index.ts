@@ -59,7 +59,10 @@ export async function handler(req: NextApiReq<Body, Query>, res: NextApiRes<ApiU
         avatar: avatar64 ?? null,
         token: createToken(),
       },
-      select: userSelect,
+      select: {
+        ...userSelect,
+        totpSecret: false,
+      },
     });
 
     logger.info(`${req.user.username} created a new user`, {

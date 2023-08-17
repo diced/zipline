@@ -6,7 +6,6 @@ import {
   ColorSwatch,
   DEFAULT_THEME,
   Group,
-  MantineProvider,
   MantineThemeOverride,
   NumberInput,
   Paper,
@@ -14,14 +13,13 @@ import {
   Stack,
   Switch,
   Text,
-  Title,
+  Title
 } from '@mantine/core';
 import {
-  IconFile,
   IconMoonFilled,
   IconPaintFilled,
   IconPercentage,
-  IconSunFilled,
+  IconSunFilled
 } from '@tabler/icons-react';
 
 function ThemeSelectItem({ value, label, ...others }: { value: string; label: string }) {

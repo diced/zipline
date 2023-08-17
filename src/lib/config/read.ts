@@ -63,6 +63,9 @@ export const PROP_TO_ENV: Record<string, string> = {
   'website.theme.dark': 'WEBSITE_THEME_DARK',
   'website.theme.light': 'WEBSITE_THEME_LIGHT',
 
+  'mfa.totp.enabled': 'MFA_TOTP_ENABLED',
+  'mfa.totp.issuer': 'MFA_TOTP_ISSUER',
+
   'oauth.bypassLocalLogin': 'OAUTH_BYPASS_LOCAL_LOGIN',
   'oauth.loginOnly': 'OAUTH_LOGIN_ONLY',
   'oauth.discord.clientId': 'OAUTH_DISCORD_CLIENT_ID',
@@ -134,6 +137,9 @@ export function readEnv() {
     env(PROP_TO_ENV['website.theme.dark'], 'website.theme.dark', 'string'),
     env(PROP_TO_ENV['website.theme.light'], 'website.theme.light', 'string'),
 
+    env(PROP_TO_ENV['mfa.totp.enabled'], 'mfa.totp.enabled', 'boolean'),
+    env(PROP_TO_ENV['mfa.totp.issuer'], 'mfa.totp.issuer', 'string'),
+
     env(PROP_TO_ENV['oauth.bypassLocalLogin'], 'oauth.bypassLocalLogin', 'boolean'),
     env(PROP_TO_ENV['oauth.loginOnly'], 'oauth.loginOnly', 'boolean'),
     env(PROP_TO_ENV['oauth.discord.clientId'], 'oauth.discord.clientId', 'string'),
@@ -203,6 +209,12 @@ export function readEnv() {
         default: undefined,
         dark: undefined,
         light: undefined,
+      },
+    },
+    mfa: {
+      totp: {
+        enabled: undefined,
+        issuer: undefined,
       },
     },
     oauth: {

@@ -2,15 +2,11 @@ import { Response } from '@/lib/api/response';
 import { fetchApi } from '@/lib/fetchApi';
 import { useUserStore } from '@/lib/store/user';
 import {
-  ActionIcon,
   Button,
   ColorInput,
-  CopyButton,
   Divider,
   Group,
   Paper,
-  PasswordInput,
-  ScrollArea,
   Select,
   SimpleGrid,
   Stack,
@@ -18,13 +14,11 @@ import {
   Text,
   TextInput,
   Textarea,
-  Title,
-  Tooltip,
+  Title
 } from '@mantine/core';
-import { hasLength, useForm } from '@mantine/form';
+import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
-import { IconCheck, IconCopy, IconFileX, IconUserCancel } from '@tabler/icons-react';
-import { forwardRef, useEffect, useState } from 'react';
+import { IconCheck, IconFileX } from '@tabler/icons-react';
 import { mutate } from 'swr';
 
 export default function SettingsFileView() {

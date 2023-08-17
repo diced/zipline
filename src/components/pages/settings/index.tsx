@@ -1,11 +1,12 @@
+import { useConfig } from '@/components/ConfigProvider';
 import { Group, SimpleGrid, Title } from '@mantine/core';
 import SettingsAvatar from './parts/SettingsAvatar';
 import SettingsDashboard from './parts/SettingsDashboard';
-import SettingsUser from './parts/SettingsUser';
 import SettingsFileView from './parts/SettingsFileView';
-import SettingsOAuth from './parts/SettingsOAuth';
 import SettingsGenerators from './parts/SettingsGenerators';
-import { useConfig } from '@/components/ConfigProvider';
+import SettingsMfa from './parts/SettingsMfa';
+import SettingsOAuth from './parts/SettingsOAuth';
+import SettingsUser from './parts/SettingsUser';
 
 export default function DashboardSettings() {
   const config = useConfig();
@@ -26,6 +27,7 @@ export default function DashboardSettings() {
         <SettingsFileView />
 
         {config.features.oauthRegistration && <SettingsOAuth />}
+        {config.mfa.totp.enabled && <SettingsMfa />}
 
         <SettingsGenerators />
       </SimpleGrid>

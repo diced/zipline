@@ -11,6 +11,8 @@ export type User = {
 
   oauthProviders: OAuthProvider[];
 
+  totpSecret?: string | null;
+
   avatar?: string | null;
   password?: string | null;
   token?: string | null;
@@ -24,6 +26,7 @@ export const userSelect = {
   role: true,
   view: true,
   oauthProviders: true,
+  totpSecret: true,
 };
 
 export type UserViewSettings = z.infer<typeof userViewSchema>;

@@ -27,6 +27,8 @@ model User {
   role     Role    @default(USER)
   view     Json    @default("{}")
 
+  totpSecret String?
+
   files          File[]
   urls           Url[]
   folders        Folder[]

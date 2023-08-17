@@ -1,17 +1,15 @@
 import { Response } from '@/lib/api/response';
+import { readToDataURL } from '@/lib/base64';
 import { fetchApi } from '@/lib/fetchApi';
 import useAvatar from '@/lib/hooks/useAvatar';
-import { readToDataURL } from '@/lib/base64';
 import { useUserStore } from '@/lib/store/user';
 import { Avatar, Button, Card, FileInput, Group, Paper, Stack, Text, Title } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconChevronDown, IconPhoto, IconPhotoCancel, IconPhotoUp, IconSettingsFilled } from '@tabler/icons-react';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import useSWR from 'swr';
 
 export default function SettingsAvatar() {
-  const router = useRouter();
   const user = useUserStore((state) => state.user);
 
   const { avatar: currentAvatar, mutate } = useAvatar();

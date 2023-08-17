@@ -132,6 +132,13 @@ export const schema = z.object({
       light: z.string().default('builtin:light_gray'),
     }),
   }),
+  mfa: z.object({
+    totp: z.object({
+      enabled: z.boolean().default(false),
+      issuer: z.string().default('Zipline'),
+    }),
+    // TODO: passkeys
+  }),
   oauth: z.object({
     bypassLocalLogin: z.boolean().default(false),
     loginOnly: z.boolean().default(false),

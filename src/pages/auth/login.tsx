@@ -1,16 +1,18 @@
 import { Response } from '@/lib/api/response';
-import { config } from '@/lib/config';
 import { SafeConfig } from '@/lib/config/safe';
 import { getZipline } from '@/lib/db/models/zipline';
 import { fetchApi } from '@/lib/fetchApi';
 import { withSafeConfig } from '@/lib/middleware/next/withSafeConfig';
-import { eitherTrue, isTruthy } from '@/lib/primitive';
+import { eitherTrue } from '@/lib/primitive';
 import {
   Button,
   Card,
   Center,
+  Group,
   LoadingOverlay,
+  Modal,
   PasswordInput,
+  PinInput,
   Stack,
   Text,
   TextInput,
@@ -22,11 +24,13 @@ import {
   IconBrandGithubFilled,
   IconBrandGoogle,
   IconCircleKeyFilled,
+  IconShieldQuestion,
+  IconX,
 } from '@tabler/icons-react';
 import { InferGetServerSidePropsType } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 
 export default function Login({ config }: InferGetServerSidePropsType<typeof getServerSideProps>) {
@@ -43,6 +47,11 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
     config.oauth.bypassLocalLogin &&
     Object.values(config.oauthEnabled).filter((x) => x === true).length === 1 &&
     router.query.local !== 'true';
+
+  const [totpOpen, setTotpOpen] = useState(false);
+  const [pinDisabled, setPinDisabled] = useState(false);
+  const [pinError, setPinError] = useState('');
+  const [pin, setPin] = useState('');
 
   useEffect(() => {
     if (data?.user) {
@@ -61,19 +70,39 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
     },
   });
 
-  const onSubmit = async (values: typeof form.values) => {
+  const onSubmit = async (values: typeof form.values, code: string | undefined = undefined) => {
+    setPinDisabled(true);
+    setPinError('');
+
     const { username, password } = values;
 
     const { data, error } = await fetchApi<Response['/api/auth/login']>('/api/auth/login', 'POST', {
       username,
       password,
+      code,
     });
 
     if (error) {
       if (error.username) form.setFieldError('username', 'Invalid username');
       else if (error.password) form.setFieldError('password', 'Invalid password');
+      else if (error.code) setPinError(error.message!);
+      setPinDisabled(false);
     } else {
+      if (data!.totp) {
+        setTotpOpen(true);
+        setPinDisabled(false);
+        return;
+      }
+
       mutate(data as Response['/api/user']);
+    }
+  };
+
+  const handlePinChange = (value: string) => {
+    setPin(value);
+
+    if (value.length === 6) {
+      onSubmit(form.values, value);
     }
   };
 
@@ -92,6 +121,50 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
   return (
     <>
       {willRedirect && !showLocalLogin && <LoadingOverlay visible />}
+
+      <Modal onClose={() => {}} title={<Title order={3}>Enter code</Title>} opened={totpOpen} withCloseButton={false}>
+        <Center>
+          <PinInput
+            data-autofocus
+            length={6}
+            oneTimeCode
+            type='number'
+            placeholder=''
+            onChange={handlePinChange}
+            autoFocus={true}
+            error={!!pinError}
+            disabled={pinDisabled}
+            size='xl'
+          />
+        </Center>
+        {pinError && (
+          <Text align='center' size='sm' color='red' mt={0}>
+            {pinError}
+          </Text>
+        )}
+
+        <Group mt='sm' grow>
+          <Button
+            leftIcon={<IconX size='1rem' />}
+            color='red'
+            variant='outline'
+            onClick={() => {
+              setTotpOpen(false);
+              form.reset();
+            }}
+          >
+            Cancel login attempt
+          </Button>
+          <Button
+            leftIcon={<IconShieldQuestion size='1rem' />}
+            loading={pinDisabled}
+            type='submit'
+            onClick={() => onSubmit(form.values, pin)}
+          >
+            Verify
+          </Button>
+        </Group>
+      </Modal>
 
       <Center
         h='100vh'
@@ -120,7 +193,7 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
 
           {showLocalLogin && (
             <>
-              <form onSubmit={form.onSubmit(onSubmit)}>
+              <form onSubmit={form.onSubmit((v) => onSubmit(v))}>
                 <Stack my='sm'>
                   <TextInput
                     size='lg'

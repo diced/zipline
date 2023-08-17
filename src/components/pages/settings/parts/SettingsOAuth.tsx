@@ -2,9 +2,8 @@ import { useConfig } from '@/components/ConfigProvider';
 import { Response } from '@/lib/api/response';
 import { fetchApi } from '@/lib/fetchApi';
 import { findProvider } from '@/lib/oauth/providerUtil';
-import { useSettingsStore } from '@/lib/store/settings';
 import { useUserStore } from '@/lib/store/user';
-import { Button, Group, Paper, Stack, Switch, Text, Title } from '@mantine/core';
+import { Button, Group, Paper, Text, Title } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import type { OAuthProviderType } from '@prisma/client';
 import {

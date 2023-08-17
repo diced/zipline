@@ -276,6 +276,7 @@ export default function GeneratorButton({
             onClick={() => generators[name as keyof typeof generators](token!, generatorType as any, options)}
             fullWidth
             leftIcon={<IconDownload size='1rem' />}
+            size='sm'
           >
             Download
           </Button>

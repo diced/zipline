@@ -5,19 +5,22 @@ import { loginToken } from '@/lib/login';
 import { combine } from '@/lib/middleware/combine';
 import { method } from '@/lib/middleware/method';
 import { NextApiReq, NextApiRes } from '@/lib/response';
+import { verifyTotpCode } from '@/lib/totp';
 
 export type ApiLoginResponse = {
-  user: User;
-  token: string;
+  user?: User;
+  token?: string;
+  totp?: true;
 };
 
 type Body = {
   username: string;
   password: string;
+  code?: string;
 };
 
 async function handler(req: NextApiReq<Body>, res: NextApiRes<ApiLoginResponse>) {
-  const { username, password } = req.body;
+  const { username, password, code } = req.body;
 
   if (!username) return res.badRequest('Username is required');
   if (!password) return res.badRequest('Password is required');
@@ -37,6 +40,16 @@ async function handler(req: NextApiReq<Body>, res: NextApiRes<ApiLoginResponse>)
   if (!user.password) return res.badRequest('User does not have a password, login through a provider');
   const valid = await verifyPassword(password, user.password);
   if (!valid) return res.badRequest('Invalid password', { password: true });
+
+  if (user.totpSecret && code) {
+    const valid = verifyTotpCode(code, user.totpSecret);
+    if (!valid) return res.badRequest('Invalid code', { code: true });
+  }
+
+  if (user.totpSecret && !code)
+    return res.ok({
+      totp: true,
+    });
 
   const token = loginToken(res, user);
 
