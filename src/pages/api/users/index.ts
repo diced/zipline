@@ -62,6 +62,7 @@ export async function handler(req: NextApiReq<Body, Query>, res: NextApiRes<ApiU
       select: {
         ...userSelect,
         totpSecret: false,
+        passkeys: false,
       },
     });
 

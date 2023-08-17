@@ -54,7 +54,11 @@ export async function handler(req: NextApiReq<Body, Query>, res: NextApiRes<ApiU
         ...(role !== undefined && { role: 'USER' }),
         ...(avatar && { avatar }),
       },
-      select: userSelect,
+      select: {
+        ...userSelect,
+        totpSecret: false,
+        passkeys: false,
+      },
     });
 
     logger.info(`${req.user.username} updated another user`, {

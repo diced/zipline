@@ -4,7 +4,7 @@ import { User } from './db/models/user';
 
 export type ParseValue = {
   file?: File;
-  user?: User | Omit<User, 'oauthProviders'>;
+  user?: User | Omit<User, 'oauthProviders' | 'passkeys'>;
 
   link?: string;
   raw_link?: string;

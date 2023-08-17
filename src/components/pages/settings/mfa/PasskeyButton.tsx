@@ -19,12 +19,13 @@ import {
 } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
+import { UserPasskey } from '@prisma/client';
 import { IconKey, IconKeyOff, IconTrashFilled } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { mutate } from 'swr';
 
 export default function PasskeyButton() {
-  const [user, setUser] = useUserStore((state) => [state.user, state.setUser]);
+  const user = useUserStore((state) => state.user);
 
   const [passkeyOpen, setPasskeyOpen] = useState(false);
   const [passkeyErrored, setPasskeyErrored] = useState(false);
@@ -49,7 +50,7 @@ export default function PasskeyButton() {
   const handleSavePasskey = async () => {
     if (!savedKey) return;
 
-    const { data, error } = await fetchApi('/api/user/mfa/passkey', 'POST', {
+    const { error } = await fetchApi('/api/user/mfa/passkey', 'POST', {
       reg: savedKey,
       name: name.trim(),
     });
@@ -83,7 +84,7 @@ export default function PasskeyButton() {
     }
   };
 
-  const removePasskey = async (passkey: User['passkeys'][0]) => {
+  const removePasskey = async (passkey: UserPasskey) => {
     modals.openConfirmModal({
       title: <Title>Are you sure?</Title>,
       children: `Your browser and device may still show "${passkey.name}" as an option to log in. If you want to remove it, you'll have to do so manually through your device's settings.`,
@@ -137,7 +138,7 @@ export default function PasskeyButton() {
       >
         <Stack spacing='sm'>
           <>
-            {user?.passkeys.map((passkey) => (
+            {user?.passkeys!.map((passkey) => (
               <Paper withBorder p='xs'>
                 <Group position='apart'>
                   <Text weight='bolder'>{passkey.name}</Text>
@@ -156,7 +157,7 @@ export default function PasskeyButton() {
               </Paper>
             ))}
 
-            {user?.passkeys.length !== undefined && <Divider />}
+            {user?.passkeys!.length !== undefined && <Divider />}
           </>
           <Button
             size='sm'
@@ -165,7 +166,6 @@ export default function PasskeyButton() {
             onClick={handleRegisterPasskey}
             loading={passkeyLoading}
           >
-            {/* {passkeyLoading ? 'Loading...' : 'Create a passkey...'} */}
             {passkeyErrored
               ? 'Error while creating a passkey'
               : passkeyLoading

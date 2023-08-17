@@ -287,7 +287,7 @@ export const getServerSideProps: GetServerSideProps<{
   password?: boolean;
   pw?: string;
   code: boolean;
-  user?: Omit<User, 'oauthProviders'>;
+  user?: Omit<User, 'oauthProviders' | 'passkeys'>;
   config?: SafeConfig;
   host: string;
   themes: ZiplineTheme[];
@@ -314,6 +314,7 @@ export const getServerSideProps: GetServerSideProps<{
     select: {
       ...userSelect,
       oauthProviders: false,
+      passkeys: false,
     },
   });
   if (!user) return { notFound: true };

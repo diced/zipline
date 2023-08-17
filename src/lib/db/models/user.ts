@@ -13,7 +13,7 @@ export type User = {
   oauthProviders: OAuthProvider[];
 
   totpSecret?: string | null;
-  passkeys: UserPasskey[];
+  passkeys?: UserPasskey[];
 
   avatar?: string | null;
   password?: string | null;
