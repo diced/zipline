@@ -21,7 +21,7 @@ export default function Login() {
           await router.push('/auth/login');
         }
       } else {
-        await router.push('/auth/login');
+        await router.push('/dashboard');
       }
     })();
   }, []);
