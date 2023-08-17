@@ -13,8 +13,6 @@ export default function maxViews(prisma: typeof globalThis.__db__) {
       select: {
         name: true,
         id: true,
-        maxViews: true,
-        views: true,
         size: true,
       },
     });
@@ -23,11 +21,33 @@ export default function maxViews(prisma: typeof globalThis.__db__) {
       files: files.map((f) => f.name),
     });
 
+    const urls = await prisma.url.findMany({
+      where: {
+        views: {
+          gte: prisma.url.fields.maxViews,
+        },
+      },
+      select: {
+        id: true,
+        destination: true,
+      },
+    });
+
+    this.logger.debug(`found ${urls.length} expired urls`, {
+      dests: urls.map((u) => u.destination),
+    });
+
     for (const file of files) {
-      await datasource.delete(file.name);
+      try {
+        await datasource.delete(file.name);
+      } catch {
+        this.logger.error(`failed to delete file from datasource`, {
+          file: file.name,
+        });
+      }
     }
 
-    const { count } = await prisma.file.deleteMany({
+    const fileDelete = prisma.file.deleteMany({
       where: {
         id: {
           in: files.map((f) => f.id),
@@ -35,10 +55,25 @@ export default function maxViews(prisma: typeof globalThis.__db__) {
       },
     });
 
-    if (count)
-      this.logger.info(`deleted ${count} files due to max views`, {
+    const urlDelete = prisma.url.deleteMany({
+      where: {
+        id: {
+          in: urls.map((u) => u.id),
+        },
+      },
+    });
+
+    const [{ count: fileCount }, { count: urlCount }] = await prisma.$transaction([fileDelete, urlDelete]);
+
+    if (fileCount)
+      this.logger.info(`deleted ${fileCount} files due to max views`, {
         size: bytes(files.reduce((acc, f) => acc + f.size, 0)),
         files: files.map((f) => f.name),
+      });
+
+    if (urlCount)
+      this.logger.info(`deleted ${urlCount} urls due to max views`, {
+        dests: urls.map((u) => u.destination),
       });
   };
 }

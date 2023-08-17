@@ -35,7 +35,7 @@ export default function clearInvites(prisma: typeof globalThis.__db__) {
 
     const toDelete = [...expiredInvites, ...maxUsedInvites];
 
-    const { count } = await prisma.file.deleteMany({
+    const { count } = await prisma.invite.deleteMany({
       where: {
         id: {
           in: toDelete.map((i) => i.id),

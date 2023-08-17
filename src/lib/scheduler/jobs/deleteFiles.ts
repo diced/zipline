@@ -22,7 +22,13 @@ export default function deleteFiles(prisma: typeof globalThis.__db__) {
     });
 
     for (const file of expiredFiles) {
-      await datasource.delete(file.name);
+      try {
+        await datasource.delete(file.name);
+      } catch {
+        this.logger.error(`failed to delete file from datasource`, {
+          file: file.name,
+        });
+      }
     }
 
     const { count } = await prisma.file.deleteMany({
