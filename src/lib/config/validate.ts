@@ -5,6 +5,15 @@ import { resolve } from 'path';
 import { bytes } from '../bytes';
 import ms from 'ms';
 
+declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace NodeJS {
+    interface ProcessEnv {
+      ZIPLINE_BUILD?: string;
+    }
+  }
+}
+
 export const schema = z.object({
   core: z.object({
     port: z.number().default(3000),
@@ -64,7 +73,10 @@ export const schema = z.object({
         .optional(),
       local: z
         .object({
-          directory: z.string().transform((s) => resolve(s)),
+          directory: z
+            .string()
+            .transform((s) => resolve(s))
+            .default('./uploads'),
         })
         .optional(),
     })
@@ -107,7 +119,7 @@ export const schema = z.object({
         z.object({
           name: z.string(),
           url: z.string().url(),
-        })
+        }),
       )
       .default([
         {
@@ -151,7 +163,7 @@ export const schema = z.object({
         z.object({
           clientId: z.undefined(),
           clientSecret: z.undefined(),
-        })
+        }),
       ),
     github: z
       .object({
@@ -162,7 +174,7 @@ export const schema = z.object({
         z.object({
           clientId: z.undefined(),
           clientSecret: z.undefined(),
-        })
+        }),
       ),
     google: z
       .object({
@@ -173,7 +185,7 @@ export const schema = z.object({
         z.object({
           clientId: z.undefined(),
           clientSecret: z.undefined(),
-        })
+        }),
       ),
     authentik: z
       .object({
@@ -190,7 +202,7 @@ export const schema = z.object({
           authorizeUrl: z.undefined(),
           userinfoUrl: z.undefined(),
           tokenUrl: z.undefined(),
-        })
+        }),
       ),
   }),
 });
@@ -200,6 +212,14 @@ export type Config = z.infer<typeof schema>;
 const logger = log('config').c('validate');
 
 export function validateEnv(env: ParsedEnv): Config {
+  const building = !!process.env.ZIPLINE_BUILD;
+
+  if (building) {
+    logger.debug('building, skipping validation');
+    // @ts-ignore
+    return {};
+  }
+
   try {
     const validated = schema.parse(env);
 

@@ -30,6 +30,6 @@ export const useViewStore = create<ViewStore>()(
     }),
     {
       name: 'zipline-view-settings',
-    }
-  )
+    },
+  ),
 );

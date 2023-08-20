@@ -1,4 +1,4 @@
-import { Anchor, Button, Code, Group, Paper, Text, Title } from '@mantine/core';
+import { Anchor, Code, Group, Paper, Text, Title } from '@mantine/core';
 import { IconPrompt } from '@tabler/icons-react';
 import Image from 'next/image';
 import GeneratorButton from '../generators/GeneratorButton';

@@ -242,7 +242,7 @@ export default function Layout({ children, config }: { children: React.ReactNode
                   >
                     {link.links
                       .filter(
-                        (sublink) => !sublink.if || sublink.if(user as Response['/api/user']['user'], config)
+                        (sublink) => !sublink.if || sublink.if(user as Response['/api/user']['user'], config),
                       )
                       .map((sublink) => (
                         <NavLink

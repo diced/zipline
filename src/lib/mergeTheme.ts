@@ -6,7 +6,7 @@ import { MantineThemeBase, MantineThemeOverride, getBreakpointValue } from '@man
 
 export function mergeTheme(
   currentTheme: MantineThemeBase,
-  themeOverride?: MantineThemeOverride
+  themeOverride?: MantineThemeOverride,
 ): MantineThemeBase {
   if (!themeOverride) {
     return currentTheme;
@@ -15,14 +15,17 @@ export function mergeTheme(
   const result: MantineThemeBase = Object.keys(currentTheme).reduce((acc, key) => {
     if (key === 'headings' && themeOverride.headings) {
       const sizes = themeOverride.headings.sizes
-        ? Object.keys(currentTheme.headings.sizes).reduce((headingsAcc, h) => {
-            // eslint-disable-next-line no-param-reassign
-            headingsAcc[h] = {
-              ...currentTheme.headings.sizes[h],
-              ...themeOverride.headings.sizes[h],
-            };
-            return headingsAcc;
-          }, {} as MantineThemeBase['headings']['sizes'])
+        ? Object.keys(currentTheme.headings.sizes).reduce(
+            (headingsAcc, h) => {
+              // eslint-disable-next-line no-param-reassign
+              headingsAcc[h] = {
+                ...currentTheme.headings.sizes[h],
+                ...themeOverride.headings.sizes[h],
+              };
+              return headingsAcc;
+            },
+            {} as MantineThemeBase['headings']['sizes'],
+          )
         : currentTheme.headings.sizes;
       return {
         ...acc,
@@ -41,8 +44,8 @@ export function mergeTheme(
         ...acc,
         breakpoints: Object.fromEntries(
           Object.entries(mergedBreakpoints).sort(
-            (a, b) => getBreakpointValue(a[1]) - getBreakpointValue(b[1])
-          )
+            (a, b) => getBreakpointValue(a[1]) - getBreakpointValue(b[1]),
+          ),
         ),
       };
     }
@@ -64,7 +67,7 @@ export function mergeTheme(
 
   if (!(result.primaryColor in result.colors)) {
     throw new Error(
-      'MantineProvider: Invalid theme.primaryColor, it accepts only key of theme.colors, learn more – https://mantine.dev/theming/colors/#primary-color'
+      'MantineProvider: Invalid theme.primaryColor, it accepts only key of theme.colors, learn more – https://mantine.dev/theming/colors/#primary-color',
     );
   }
 

@@ -96,7 +96,7 @@ export default function GeneratorButton({
   const [generatorType, setGeneratorType] = useState('file');
   const [options, setOption] = useReducer(
     (state: GeneratorOptions, action: Partial<GeneratorOptions>) => ({ ...state, ...action }),
-    defaultGeneratorOptions
+    defaultGeneratorOptions,
   );
 
   const isUnixLike = name === 'Flameshot' || name === 'Shell Script';
@@ -191,7 +191,9 @@ export default function GeneratorButton({
 
           <Switch
             label='Add Original Name'
-            description={`Add the original file name, so that the file can be downloaded with the original name. This will still use the "Name Format" option for it's file name.`}
+            description={
+              'Add the original file name, so that the file can be downloaded with the original name. This will still use the "Name Format" option for it\'s file name.'
+            }
             checked={options.addOriginalName ?? false}
             onChange={(event) => setOption({ addOriginalName: event.currentTarget.checked ?? false })}
             disabled={!onlyFile}

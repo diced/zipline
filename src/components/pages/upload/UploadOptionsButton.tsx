@@ -1,8 +1,7 @@
-import { defaultUploadOptions, useUploadOptionsStore } from '@/lib/store/uploadOptions';
+import { useUploadOptionsStore } from '@/lib/store/uploadOptions';
 import {
   Badge,
   Button,
-  Center,
   Group,
   Modal,
   NumberInput,
@@ -17,7 +16,6 @@ import {
 import {
   IconAlarmFilled,
   IconArrowsMinimize,
-  IconDeviceFloppy,
   IconEyeFilled,
   IconFileInfo,
   IconGlobe,
@@ -199,7 +197,7 @@ export default function UploadOptionsButton({ numFiles }: { numFiles: number }) 
             onChange={(event) =>
               setOption(
                 'overrides_returnDomain',
-                event.currentTarget.value.trim() === '' ? null : event.currentTarget.value.trim()
+                event.currentTarget.value.trim() === '' ? null : event.currentTarget.value.trim(),
               )
             }
           />
@@ -212,7 +210,7 @@ export default function UploadOptionsButton({ numFiles }: { numFiles: number }) 
             onChange={(event) =>
               setEphemeral(
                 'filename',
-                event.currentTarget.value.trim() === '' ? null : event.currentTarget.value.trim()
+                event.currentTarget.value.trim() === '' ? null : event.currentTarget.value.trim(),
               )
             }
             disabled={numFiles > 1}
@@ -226,7 +224,7 @@ export default function UploadOptionsButton({ numFiles }: { numFiles: number }) 
             onChange={(event) =>
               setEphemeral(
                 'password',
-                event.currentTarget.value.trim() === '' ? null : event.currentTarget.value.trim()
+                event.currentTarget.value.trim() === '' ? null : event.currentTarget.value.trim(),
               )
             }
           />
@@ -246,7 +244,9 @@ export default function UploadOptionsButton({ numFiles }: { numFiles: number }) 
                 ) : null}
               </>
             }
-            description={`Add the original file name, so that the file can be downloaded with the original name. This will still use the "Name Format" option for it's file name.`}
+            description={
+              'Add the original file name, so that the file can be downloaded with the original name. This will still use the "Name Format" option for it\'s file name.'
+            }
             checked={options.addOriginalName ?? false}
             onChange={(event) => setOption('addOriginalName', event.currentTarget.checked ?? false)}
           />

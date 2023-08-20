@@ -3,8 +3,8 @@ import { ZiplineTheme } from '@/lib/theme';
 import { readThemes } from '@/lib/theme/file';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 
-export function withSafeConfig<T = {}>(
-  fn: (ctx: GetServerSidePropsContext) => T | Promise<T> = (): any => {}
+export function withSafeConfig<T = unknown>(
+  fn: (ctx: GetServerSidePropsContext) => T | Promise<T> = (): any => {},
 ): GetServerSideProps<
   T & {
     config: SafeConfig;

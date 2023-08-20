@@ -1,10 +1,9 @@
 import { NextApiReq, NextApiRes } from '@/lib/response';
-import { OAuthProviderType, Prisma } from '@prisma/client';
+import { OAuthProviderType } from '@prisma/client';
 import { prisma } from '../db';
 import { parseUserToken } from '../middleware/ziplineAuth';
 import { findProvider } from './providerUtil';
-import { createToken, encryptToken } from '../crypto';
-import { serializeCookie } from '../cookie';
+import { createToken } from '../crypto';
 import { config } from '../config';
 import { loginToken } from '../login';
 import { User } from '../db/models/user';
@@ -29,7 +28,10 @@ export interface OAuthResponse {
 }
 
 export const withOAuth =
-  (provider: OAuthProviderType, oauthProfile: (query: OAuthQuery, logger: Logger) => Promise<OAuthResponse>) =>
+  (
+    provider: OAuthProviderType,
+    oauthProfile: (query: OAuthQuery, logger: Logger) => Promise<OAuthResponse>,
+  ) =>
   async (req: NextApiReq, res: NextApiRes) => {
     const logger = log('api').c('auth').c('oauth').c(provider.toLowerCase());
 
@@ -95,7 +97,7 @@ export const withOAuth =
       if (findProvider(provider, user.oauthProviders))
         return res.badRequest('This account is already linked to this provider');
 
-      logger.debug(`attempting to link oauth account`, {
+      logger.debug('attempting to link oauth account', {
         provider,
         user: user.id,
       });
@@ -120,14 +122,14 @@ export const withOAuth =
 
         loginToken(res, user);
 
-        logger.info(`linked oauth account`, {
+        logger.info('linked oauth account', {
           provider,
           user: user.id,
         });
 
         return res.redirect('/dashboard/settings');
       } catch (e) {
-        logger.error(`failed to link oauth account`, {
+        logger.error('failed to link oauth account', {
           provider,
           user: user.id,
           error: e,
@@ -169,14 +171,14 @@ export const withOAuth =
 
       loginToken(res, login.user! as User);
 
-      logger.info(`logged in with oauth`, {
+      logger.info('logged in with oauth', {
         provider,
         user: login.user!.id,
       });
 
       return res.redirect('/dashboard');
     } else if (config.oauth.loginOnly) {
-      return res.badRequest('Can\'t create users through oauth.');
+      return res.badRequest("Can't create users through oauth.");
     } else if (existingUser) {
       return res.badRequest('This username is already taken');
     }
@@ -201,7 +203,7 @@ export const withOAuth =
 
       loginToken(res, nuser as User);
 
-      logger.info(`created user with oauth`, {
+      logger.info('created user with oauth', {
         provider,
         user: nuser.id,
       });

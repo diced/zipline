@@ -1,5 +1,5 @@
 import { ViewStore, ViewType, useViewStore } from '@/lib/store/view';
-import { Center, SegmentedControl, Tooltip } from '@mantine/core';
+import { Center, SegmentedControl } from '@mantine/core';
 import { IconLayoutGrid, IconLayoutList } from '@tabler/icons-react';
 
 export default function GridTableSwitcher({ type }: { type: Exclude<keyof ViewStore, 'setView'> }) {

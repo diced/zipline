@@ -27,7 +27,7 @@ async function handler({ code, state, host }: OAuthQuery, logger: Logger): Promi
       redirect: discordAuth.url(
         config.oauth.discord.clientId!,
         `${config.core.returnHttpsUrls ? 'https' : 'http'}://${host}`,
-        state
+        state,
       ),
     };
 
@@ -40,7 +40,7 @@ async function handler({ code, state, host }: OAuthQuery, logger: Logger): Promi
     scope: 'identify',
   });
 
-  logger.debug(`discord oauth request`, {
+  logger.debug('discord oauth request', {
     body: body.toString(),
   });
 

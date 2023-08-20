@@ -53,7 +53,7 @@ export async function handler(req: NextApiReq, res: NextApiRes<ApiUserStatsRespo
     },
     _sum: {
       views: true,
-    }
+    },
   });
 
   const sortType = await prisma.file.findMany({
@@ -65,12 +65,15 @@ export async function handler(req: NextApiReq, res: NextApiRes<ApiUserStatsRespo
     },
   });
 
-  const sortTypeCount = sortType.reduce((acc, cur) => {
-    if (acc[cur.type]) acc[cur.type] += 1;
-    else acc[cur.type] = 1;
+  const sortTypeCount = sortType.reduce(
+    (acc, cur) => {
+      if (acc[cur.type]) acc[cur.type] += 1;
+      else acc[cur.type] = 1;
 
-    return acc;
-  }, {} as { [type: string]: number });
+      return acc;
+    },
+    {} as { [type: string]: number },
+  );
 
   return res.ok({
     filesUploaded: aggFile._count._all ?? 0,

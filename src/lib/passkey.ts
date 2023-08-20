@@ -3,9 +3,6 @@ import {
   parseRequestOptionsFromJSON,
   create,
   get,
-  supported,
-  RegistrationResponseJSON,
-  RegistrationPublicKeyCredential,
 } from '@github/webauthn-json/browser-ponyfill';
 import { User } from './db/models/user';
 
@@ -41,7 +38,7 @@ export async function registerWeb(user: User) {
     },
   });
 
-  return create(cro)
+  return create(cro);
 }
 
 export async function authenticateWeb() {

@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 import type { User } from '../db/models/user';
 
 type UserStore = {

@@ -96,7 +96,7 @@ export default function UrlTableView() {
       action: {
         field: 'code' | 'vanity' | 'destination';
         query: string;
-      }
+      },
     ) => {
       return {
         ...state,
@@ -107,7 +107,7 @@ export default function UrlTableView() {
       code: '',
       vanity: '',
       destination: '',
-    }
+    },
   );
   const [warnDeletion, searchThreshold] = useSettingsStore((s) => [
     s.settings.warnDeletion,
@@ -123,7 +123,7 @@ export default function UrlTableView() {
         searchThreshold,
       }),
     },
-    fetcher
+    fetcher,
   );
 
   const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({

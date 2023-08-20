@@ -2,9 +2,8 @@ import { Response } from '@/lib/api/response';
 import { Invite } from '@/lib/db/models/invite';
 import { fetchApi } from '@/lib/fetchApi';
 import { conditionalWarning } from '@/lib/warningModal';
-import { Anchor, Title } from '@mantine/core';
+import { Anchor } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
-import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import { IconCheck, IconCopy, IconTagOff } from '@tabler/icons-react';
 import Link from 'next/link';
@@ -36,7 +35,7 @@ export function copyInviteUrl(invite: Invite, clipboard: ReturnType<typeof useCl
 async function handleDeleteInvite(invite: Invite) {
   const { data, error } = await fetchApi<Response['/api/auth/invites/[id]']>(
     `/api/auth/invites/${invite.id}`,
-    'DELETE'
+    'DELETE',
   );
 
   if (error) {

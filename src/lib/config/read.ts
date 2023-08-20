@@ -6,6 +6,94 @@ type EnvType = 'string' | 'string[]' | 'number' | 'boolean' | 'byte' | 'ms' | 'j
 
 export type ParsedEnv = ReturnType<typeof readEnv>;
 
+export const rawConfig: any = {
+  core: {
+    port: undefined,
+    hostname: undefined,
+    secret: undefined,
+    databaseUrl: undefined,
+    returnHttpsUrls: undefined,
+  },
+  scheduler: {
+    deleteInterval: undefined,
+    clearInvitesInterval: undefined,
+    maxViewsInterval: undefined,
+  },
+  files: {
+    route: undefined,
+    length: undefined,
+    defaultFormat: undefined,
+    disabledExtensions: undefined,
+    maxFileSize: undefined,
+    defaultExpiration: undefined,
+    assumeMimetypes: undefined,
+    defaultDateFormat: undefined,
+    removeGpsMetadata: undefined,
+  },
+  urls: {
+    route: undefined,
+    length: undefined,
+  },
+  datasource: {
+    type: undefined,
+  },
+  features: {
+    thumbnail: undefined,
+    imageCompression: undefined,
+    robotsTxt: undefined,
+    healthcheck: undefined,
+    invites: undefined,
+    userRegistration: undefined,
+    oauthRegistration: undefined,
+    deleteOnMaxViews: undefined,
+  },
+  invites: {
+    enabled: undefined,
+    length: undefined,
+  },
+  website: {
+    title: undefined,
+    externalLinks: undefined,
+    loginBackground: undefined,
+    defaultAvatar: undefined,
+    theme: {
+      default: undefined,
+      dark: undefined,
+      light: undefined,
+    },
+  },
+  mfa: {
+    totp: {
+      enabled: undefined,
+      issuer: undefined,
+    },
+    passkeys: undefined,
+  },
+  oauth: {
+    bypassLocalLogin: undefined,
+    loginOnly: undefined,
+    discord: {
+      clientId: undefined,
+      clientSecret: undefined,
+    },
+    github: {
+      clientId: undefined,
+      clientSecret: undefined,
+    },
+    google: {
+      clientId: undefined,
+      clientSecret: undefined,
+    },
+    authentik: {
+      clientId: undefined,
+      clientSecret: undefined,
+      authorizeUrl: undefined,
+      userinfoUrl: undefined,
+      tokenUrl: undefined,
+    },
+  },
+};
+
 export const PROP_TO_ENV: Record<string, string> = {
   'core.port': 'CORE_PORT',
   'core.hostname': 'CORE_HOSTNAME',
@@ -157,93 +245,8 @@ export function readEnv() {
     env(PROP_TO_ENV['oauth.authentik.tokenUrl'], 'oauth.authentik.tokenUrl', 'string'),
   ];
 
-  const raw: any = {
-    core: {
-      port: undefined,
-      hostname: undefined,
-      secret: undefined,
-      databaseUrl: undefined,
-      returnHttpsUrls: undefined,
-    },
-    scheduler: {
-      deleteInterval: undefined,
-      clearInvitesInterval: undefined,
-      maxViewsInterval: undefined,
-    },
-    files: {
-      route: undefined,
-      length: undefined,
-      defaultFormat: undefined,
-      disabledExtensions: undefined,
-      maxFileSize: undefined,
-      defaultExpiration: undefined,
-      assumeMimetypes: undefined,
-      defaultDateFormat: undefined,
-      removeGpsMetadata: undefined,
-    },
-    urls: {
-      route: undefined,
-      length: undefined,
-    },
-    datasource: {
-      type: undefined,
-    },
-    features: {
-      thumbnail: undefined,
-      imageCompression: undefined,
-      robotsTxt: undefined,
-      healthcheck: undefined,
-      invites: undefined,
-      userRegistration: undefined,
-      oauthRegistration: undefined,
-      deleteOnMaxViews: undefined,
-    },
-    invites: {
-      enabled: undefined,
-      length: undefined,
-    },
-    website: {
-      title: undefined,
-      externalLinks: undefined,
-      loginBackground: undefined,
-      defaultAvatar: undefined,
-      theme: {
-        default: undefined,
-        dark: undefined,
-        light: undefined,
-      },
-    },
-    mfa: {
-      totp: {
-        enabled: undefined,
-        issuer: undefined,
-      },
-      passkeys: undefined,
-    },
-    oauth: {
-      bypassLocalLogin: undefined,
-      loginOnly: undefined,
-      discord: {
-        clientId: undefined,
-        clientSecret: undefined,
-      },
-      github: {
-        clientId: undefined,
-        clientSecret: undefined,
-      },
-      google: {
-        clientId: undefined,
-        clientSecret: undefined,
-      },
-      authentik: {
-        clientId: undefined,
-        clientSecret: undefined,
-        authorizeUrl: undefined,
-        userinfoUrl: undefined,
-        tokenUrl: undefined,
-      },
-    },
-  };
+  // clone raw
+  const raw = structuredClone(rawConfig);
 
   for (let i = 0; i !== envs.length; ++i) {
     const env = envs[i];
@@ -321,7 +324,7 @@ function parse(value: string, type: EnvType) {
       try {
         return JSON.parse(value);
       } catch {
-        logger.error(`Failed to parse JSON array`, { value });
+        logger.error('Failed to parse JSON array', { value });
         return undefined;
       }
     default:

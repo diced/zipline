@@ -4,7 +4,7 @@ import { useUserStore } from '@/lib/store/user';
 import { ZiplineTheme, findTheme, themeComponents } from '@/lib/theme';
 import { MantineProvider } from '@mantine/core';
 import { useColorScheme } from '@mantine/hooks';
-import { createContext, useContext, useEffect } from 'react';
+import { createContext, useContext } from 'react';
 
 const ThemeContext = createContext<{
   themes: ZiplineTheme[];

@@ -74,7 +74,7 @@ export default function Register({ config, invite }: InferGetServerSidePropsType
       notifications.show({
         title: 'Complete!',
         message: `Your "${
-          data!.user.username
+          data!.user!.username
         }" account has been created, you will be redirected to the dashboard shortly.`,
         color: 'green',
         icon: <IconPlus size='1rem' />,

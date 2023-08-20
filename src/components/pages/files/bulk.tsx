@@ -42,7 +42,7 @@ export async function bulkDelete(ids: string[], setSelectedFiles: (files: File[]
           files: ids,
 
           delete_datasourceFiles: true,
-        }
+        },
       );
 
       if (error) {
@@ -104,7 +104,7 @@ export async function bulkFavorite(ids: string[]) {
           files: ids,
 
           favorite: true,
-        }
+        },
       );
 
       if (error) {

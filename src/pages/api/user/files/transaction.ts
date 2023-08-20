@@ -1,14 +1,10 @@
 import { datasource } from '@/lib/datasource';
 import { prisma } from '@/lib/db';
-import { File, cleanFiles, fileSelect } from '@/lib/db/models/file';
 import { log } from '@/lib/logger';
 import { combine } from '@/lib/middleware/combine';
 import { method } from '@/lib/middleware/method';
 import { ziplineAuth } from '@/lib/middleware/ziplineAuth';
 import { NextApiReq, NextApiRes } from '@/lib/response';
-import { canInteract } from '@/lib/role';
-import { Prisma } from '@prisma/client';
-import { z } from 'zod';
 
 export type ApiUserFilesTransactionResponse = {
   count: number;
@@ -32,7 +28,7 @@ export async function handler(req: NextApiReq<Body>, res: NextApiRes<ApiUserFile
   if (req.method === 'DELETE') {
     const { delete_datasourceFiles } = req.body;
 
-    logger.debug(`preparing transaction`, {
+    logger.debug('preparing transaction', {
       action: 'delete',
       files: files.length,
     });

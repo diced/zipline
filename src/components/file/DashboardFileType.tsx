@@ -1,5 +1,5 @@
 import type { File as DbFile } from '@/lib/db/models/file';
-import { Box, Center, Group, Image, Paper, Stack, Text, UnstyledButton } from '@mantine/core';
+import { Center, Image, Paper, Stack, Text } from '@mantine/core';
 import {
   Icon,
   IconFileText,

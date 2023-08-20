@@ -17,7 +17,7 @@ type Body = {
   code?: string;
 };
 
-const logger = log('api').c('auth').c('register');
+const _logger = log('api').c('auth').c('register');
 async function handler(req: NextApiReq<Body>, res: NextApiRes<ApiAuthRegisterResponse>) {
   const { username, password, code } = req.body;
 
@@ -68,7 +68,7 @@ async function handler(req: NextApiReq<Body>, res: NextApiRes<ApiAuthRegisterRes
       ...userSelect,
       password: true,
       token: true,
-    }
+    },
   });
 
   const token = loginToken(res, user);

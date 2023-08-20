@@ -43,7 +43,7 @@ export function parseString(str: string, value: ParseValue) {
         str,
         decodeURIComponent(escape(getV[matches.groups.prop as keyof ParseValue['file']])),
         index,
-        re.lastIndex
+        re.lastIndex,
       );
       re.lastIndex = index;
       continue;

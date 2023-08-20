@@ -6,6 +6,7 @@ import { LocalDatasource } from './Local';
 let datasource: Datasource;
 
 declare global {
+  // eslint-disable-next-line no-var
   var __datasource__: Datasource;
 }
 
@@ -23,6 +24,7 @@ if (!global.__datasource__) {
   }
 }
 
+// eslint-disable-next-line prefer-const
 datasource = global.__datasource__;
 
 export { datasource };

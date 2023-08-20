@@ -33,12 +33,12 @@ export type UploadOptionsStore = {
 
   setOption: <K extends keyof UploadOptionsStore['options']>(
     key: K,
-    value: UploadOptionsStore['options'][K]
+    value: UploadOptionsStore['options'][K],
   ) => void;
 
   setEphemeral: <K extends keyof UploadOptionsStore['ephemeral']>(
     key: K,
-    value: UploadOptionsStore['ephemeral'][K]
+    value: UploadOptionsStore['ephemeral'][K],
   ) => void;
 
   clearEphemeral: () => void;
@@ -94,6 +94,6 @@ export const useUploadOptionsStore = create<UploadOptionsStore>()(
     }),
     {
       name: 'zipline-upload-options',
-    }
-  )
+    },
+  ),
 );

@@ -17,7 +17,6 @@ import { Scheduler } from '@/lib/scheduler';
 import deleteFiles from '@/lib/scheduler/jobs/deleteFiles';
 import clearInvites from '@/lib/scheduler/jobs/clearInvites';
 import maxViews from '@/lib/scheduler/jobs/maxViews';
-import { handleOverrideColors, parseThemes, readThemesDir } from '@/lib/theme/file';
 
 const MODE = process.env.NODE_ENV || 'production';
 
@@ -74,11 +73,11 @@ async function main() {
       else return filesRoute.bind(server)(app, req, res);
     });
   } else {
-    server.get(config.files.route === '/' ? `/:id` : `${config.files.route}/:id`, async (req, res) => {
+    server.get(config.files.route === '/' ? '/:id' : `${config.files.route}/:id`, async (req, res) => {
       filesRoute.bind(server)(app, req, res);
     });
 
-    server.get(config.urls.route === '/' ? `/:id` : `${config.urls.route}/:id`, async (req, res) => {
+    server.get(config.urls.route === '/' ? '/:id' : `${config.urls.route}/:id`, async (req, res) => {
       urlsRoute.bind(server)(app, req, res);
     });
   }
@@ -111,7 +110,7 @@ async function main() {
     file.originalName &&
       res.setHeader(
         'Content-Disposition',
-        `${req.query.download ? 'attachment; ' : ''}filename="${file.originalName}"`
+        `${req.query.download ? 'attachment; ' : ''}filename="${file.originalName}"`,
       );
 
     stream.pipe(res);
@@ -123,7 +122,7 @@ async function main() {
   });
 
   server.listen(config.core.port, config.core.hostname, () => {
-    logger.info(`server listening`, {
+    logger.info('server listening', {
       hostname: config.core.hostname,
       port: config.core.port,
     });

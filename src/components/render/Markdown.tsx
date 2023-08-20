@@ -8,7 +8,7 @@ export default function Markdown({ md }: { md: string }) {
     <Paper withBorder p='md'>
       <ReactMarkdown
         components={{
-          code({ node, inline, className, children, ...props }) {
+          code({ node: _, inline, className, children, ...props }) {
             const match = /language-(\w+)/.exec(className || '');
             return !inline && match ? (
               <HighlightCode language={match[1]} code={String(children).replace(/\n$/, '')} />
@@ -18,13 +18,14 @@ export default function Markdown({ md }: { md: string }) {
               </Code>
             );
           },
-          img({ node, ...props }) {
+          img({ node: _, ...props }) {
             return <Image {...props} />;
           },
         }}
         remarkPlugins={[remarkGfm]}
-        children={md}
-      />
+      >
+        {md}
+      </ReactMarkdown>
     </Paper>
   );
 }

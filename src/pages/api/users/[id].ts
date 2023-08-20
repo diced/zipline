@@ -138,5 +138,5 @@ export async function handler(req: NextApiReq<Body, Query>, res: NextApiRes<ApiU
 
 export default combine(
   [method(['GET', 'PATCH', 'DELETE']), ziplineAuth({ administratorOnly: true })],
-  handler
+  handler,
 );

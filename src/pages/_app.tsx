@@ -1,11 +1,10 @@
 import { AppProps } from 'next/app';
 import Head from 'next/head';
-import { MantineProvider } from '@mantine/core';
 import { SWRConfig } from 'swr';
 import { ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';
 import '@/components/render/code/HighlightCode.css';
-import { ZiplineTheme, themeComponents } from '@/lib/theme';
+import { ZiplineTheme } from '@/lib/theme';
 import Theming from '@/components/ThemeProvider';
 
 const fetcher = async (url: RequestInfo | URL) => {

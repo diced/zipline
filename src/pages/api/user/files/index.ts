@@ -112,20 +112,20 @@ export async function handler(req: NextApiReq<any, Query>, res: NextApiRes<ApiUs
       FROM "File"
       WHERE
         word_similarity("${Prisma.raw(searchField.data)}", ${searchQuery}) > ${Prisma.raw(
-      String(searchThreshold.data)
-    )} OR
+          String(searchThreshold.data),
+        )} OR
         "${Prisma.raw(searchField.data)}" ILIKE ${Prisma.sql`%${searchQuery}%`} AND
         "userId" = ${user.id} ${
-      filter === 'dashboard'
-        ? Prisma.sql`
+          filter === 'dashboard'
+            ? Prisma.sql`
           AND
             type LIKE 'image/%' OR
             type LIKE 'video/%' OR
             type LIKE 'audio/%' OR
             type LIKE 'text/%'
             `
-        : Prisma.empty
-    } ${favorite === 'true' && filter !== 'all' ? Prisma.sql`AND favorite = true` : Prisma.empty}
+            : Prisma.empty
+        } ${favorite === 'true' && filter !== 'all' ? Prisma.sql`AND favorite = true` : Prisma.empty}
       ORDER BY "${Prisma.raw(sortBy.data)}" ${Prisma.raw(order.data)}
     `;
 
@@ -179,7 +179,7 @@ export async function handler(req: NextApiReq<any, Query>, res: NextApiRes<ApiUs
       },
       skip: (Number(page) - 1) * perpage,
       take: perpage,
-    })
+    }),
   );
 
   return res.ok({

@@ -33,7 +33,7 @@ async function handler({ code, state }: OAuthQuery, logger: Logger): Promise<OAu
     code,
   });
 
-  logger.debug(`github oauth request`, {
+  logger.debug('github oauth request', {
     body,
   });
 

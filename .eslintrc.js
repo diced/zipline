@@ -14,7 +14,7 @@ module.exports = {
       },
     ],
     semi: ['error', 'always'],
-    'comma-dangle': ['error', 'always-multiline'],
+    // 'comma-dangle': ['error', 'always-multiline'],
     'jsx-quotes': ['error', 'prefer-single'],
     indent: 'off',
     'react/prop-types': 'off',
@@ -40,5 +40,6 @@ module.exports = {
       { vars: 'all', varsIgnorePattern: '^_', args: 'after-used', argsIgnorePattern: '^_' },
     ],
     '@typescript-eslint/ban-ts-comment': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
   },
 };

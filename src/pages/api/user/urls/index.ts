@@ -115,8 +115,8 @@ export async function handler(req: NextApiReq<Body, Query, Headers>, res: NextAp
       FROM "Url"
       WHERE
         word_similarity("${Prisma.raw(searchField.data)}", ${searchQuery}) > ${Prisma.raw(
-      String(searchThreshold.data)
-    )} OR
+          String(searchThreshold.data),
+        )} OR
         "${Prisma.raw(searchField.data)}" ILIKE '${Prisma.sql`%${searchQuery}%`}' AND
         "userId" = ${req.user.id};
     `;

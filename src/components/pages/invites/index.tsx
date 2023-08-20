@@ -33,9 +33,9 @@ export default function DashboardInvites() {
     };
 
     const { data, error } = await fetchApi<Extract<Response['/api/auth/invites'], Invite>>(
-      `/api/auth/invites`,
+      '/api/auth/invites',
       'POST',
-      send
+      send,
     );
 
     if (error) {

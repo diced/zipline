@@ -2,20 +2,21 @@ import { log } from '@/lib/logger';
 import { Prisma, PrismaClient } from '@prisma/client';
 import { userViewSchema } from './models/user';
 
+const building = !!process.env.ZIPLINE_BUILD;
+
 let prisma: ExtendedPrismaClient;
 
 declare global {
+  // eslint-disable-next-line no-var
   var __db__: ExtendedPrismaClient;
 }
 
-if (process.env.NODE_ENV === 'production') {
-  prisma = getClient();
-} else {
-  if (!global.__db__) {
-    global.__db__ = getClient();
-  }
-  prisma = global.__db__;
+if (!global.__db__) {
+  if (!building) global.__db__ = getClient();
 }
+
+// eslint-disable-next-line prefer-const
+prisma = global.__db__;
 
 type ExtendedPrismaClient = ReturnType<typeof getClient>;
 

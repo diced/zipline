@@ -6,7 +6,7 @@ export function serializeCookie(
     maxAge?: number;
     path?: string;
     sameSite?: 'strict' | 'lax' | 'none';
-  } = {}
+  } = {},
 ) {
   const cookie = [`${name}=${value}`];
 

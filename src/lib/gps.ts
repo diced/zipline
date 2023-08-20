@@ -4,7 +4,7 @@ import * as gmr from '@xoi/gps-metadata-remover';
 const removeLocation = gmr.removeLocation as (
   photoUri: string,
   read: ReadFunction,
-  write: WriteFunction
+  write: WriteFunction,
 ) => Promise<boolean>;
 
 export type ReadFunction = (size: number, offset: number) => Promise<Buffer>;

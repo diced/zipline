@@ -1,4 +1,3 @@
-import { useConfig } from '@/components/ConfigProvider';
 import RelativeDate from '@/components/RelativeDate';
 import { Response } from '@/lib/api/response';
 import { Folder } from '@/lib/db/models/folder';
@@ -12,7 +11,6 @@ import { IconCopy, IconFiles, IconLock, IconLockOpen, IconTrashFilled } from '@t
 import ViewFilesModal from '../ViewFilesModal';
 
 export default function FolderTableView() {
-  const config = useConfig();
   const clipboard = useClipboard();
 
   const { data, isLoading } = useSWR<Extract<Response['/api/user/folders'], Folder[]>>('/api/user/folders');

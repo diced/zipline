@@ -1,4 +1,3 @@
-import { RegistrationResponseJSON } from '@github/webauthn-json/dist/types/browser-ponyfill';
 import { OAuthProvider, UserPasskey } from '@prisma/client';
 import { z } from 'zod';
 

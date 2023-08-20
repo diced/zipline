@@ -1,7 +1,6 @@
 import { File } from '@/lib/db/models/file';
-import { ActionIcon, Group, Modal, Select, SimpleGrid, Text, Title, Tooltip } from '@mantine/core';
+import { ActionIcon, Group, Modal, Select, SimpleGrid, Title, Tooltip } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
-import { notifications } from '@mantine/notifications';
 import {
   Icon,
   IconBombFilled,
@@ -71,7 +70,7 @@ export default function FileModal({
   const warnDeletion = useSettingsStore((state) => state.settings.warnDeletion);
 
   const { data: folders } = useSWR<Extract<Response['/api/user/folders'], Folder[]>>(
-    '/api/user/folders?noincl=true'
+    '/api/user/folders?noincl=true',
   );
 
   return (

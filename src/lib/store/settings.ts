@@ -36,6 +36,6 @@ export const useSettingsStore = create<SettingsStore>()(
     }),
     {
       name: 'zipline-settings',
-    }
-  )
+    },
+  ),
 );

@@ -1,21 +1,11 @@
 import RelativeDate from '@/components/RelativeDate';
 import FileModal from '@/components/file/DashboardFile/FileModal';
 import { copyFile, deleteFile, viewFile } from '@/components/file/actions';
+import { bytes } from '@/lib/bytes';
 import { type File } from '@/lib/db/models/file';
-import {
-  ActionIcon,
-  Box,
-  Button,
-  Group,
-  Paper,
-  Select,
-  Text,
-  TextInput,
-  Title,
-  Tooltip,
-} from '@mantine/core';
+import { useSettingsStore } from '@/lib/store/settings';
+import { ActionIcon, Box, Button, Group, Paper, Text, TextInput, Title, Tooltip } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
-import { notifications } from '@mantine/notifications';
 import type { Prisma } from '@prisma/client';
 import { IconCopy, IconExternalLink, IconFile, IconStar, IconTrashFilled } from '@tabler/icons-react';
 import { DataTable } from 'mantine-datatable';
@@ -23,9 +13,11 @@ import { useRouter } from 'next/router';
 import { useEffect, useReducer, useState } from 'react';
 import { bulkDelete, bulkFavorite } from '../bulk';
 import { useApiPagination } from '../useApiPagination';
-import { bytes } from '@/lib/bytes';
-import { Response } from '@/lib/api/response';
-import { useSettingsStore } from '@/lib/store/settings';
+
+type ReducerQuery = {
+  state: { name: string; originalName: string; type: string };
+  action: { field: string; query: string };
+};
 
 const PER_PAGE_OPTIONS = [10, 20, 50];
 
@@ -94,20 +86,13 @@ export default function FileTable({ id }: { id?: string }) {
 
   const [searchField, setSearchField] = useState<'name' | 'originalName' | 'type'>('name');
   const [searchQuery, setSearchQuery] = useReducer(
-    (
-      state: { name: string; originalName: string; type: string },
-      action: { field: string; query: string }
-    ) => {
+    (state: ReducerQuery['state'], action: ReducerQuery['action']) => {
       return {
         ...state,
         [action.field]: action.query,
       };
     },
-    {
-      name: '',
-      originalName: '',
-      type: '',
-    }
+    { name: '', originalName: '', type: '' },
   );
 
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -142,7 +127,7 @@ export default function FileTable({ id }: { id?: string }) {
         },
       },
       undefined,
-      { shallow: true }
+      { shallow: true },
     );
   }, [page]);
 
@@ -194,7 +179,7 @@ export default function FileTable({ id }: { id?: string }) {
                 onClick={() =>
                   bulkDelete(
                     selectedFiles.map((x) => x.id),
-                    setSelectedFiles
+                    setSelectedFiles,
                   )
                 }
               >
@@ -222,6 +207,7 @@ export default function FileTable({ id }: { id?: string }) {
           </Paper>
         )}
 
+        {/* @ts-ignore */}
         <DataTable
           borderRadius='sm'
           withBorder
@@ -341,6 +327,13 @@ export default function FileTable({ id }: { id?: string }) {
           recordsPerPageOptions={searching ? undefined : PER_PAGE_OPTIONS}
           page={searching ? undefined : page}
           onPageChange={searching ? undefined : setPage}
+          // {...(!searching && {
+          //   recordsPerPage: perpage,
+          //   onRecordsPerPageChange: setPerpage,
+          //   recordsPerPageOptions: PER_PAGE_OPTIONS,
+          //   page: page as number,
+          //   onPageChange: setPage,
+          // })}
           sortStatus={{
             columnAccessor: sort,
             direction: order,

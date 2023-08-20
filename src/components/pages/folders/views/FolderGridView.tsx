@@ -26,9 +26,7 @@ export default function FolderGridView() {
           ]}
           pos='relative'
         >
-          {folders?.map((folder) => (
-            <FolderCard key={folder.id} folder={folder} />
-          ))}
+          {folders?.map((folder) => <FolderCard key={folder.id} folder={folder} />)}
         </SimpleGrid>
       ) : (
         <Paper withBorder p='sm' my='sm'>

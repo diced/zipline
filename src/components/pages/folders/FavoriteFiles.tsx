@@ -1,4 +1,3 @@
-import { useConfig } from '@/components/ConfigProvider';
 import DashboardFile from '@/components/file/DashboardFile';
 import {
   Accordion,
@@ -16,13 +15,13 @@ import { IconFileUpload, IconFilesOff } from '@tabler/icons-react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { useApiPagination } from '../useApiPagination';
+import { useApiPagination } from '../files/useApiPagination';
 
 export default function FavoriteFiles() {
   const router = useRouter();
 
   const [page, setPage] = useState<number>(
-    router.query.favoritePage ? parseInt(router.query.favoritePage as string) : 1
+    router.query.favoritePage ? parseInt(router.query.favoritePage as string) : 1,
   );
   const { data, isLoading } = useApiPagination({
     page,
@@ -39,7 +38,7 @@ export default function FavoriteFiles() {
         },
       },
       undefined,
-      { shallow: true }
+      { shallow: true },
     );
   }, [page]);
 

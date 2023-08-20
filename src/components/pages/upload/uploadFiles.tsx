@@ -1,9 +1,9 @@
 import { Response } from '@/lib/api/response';
 import { ErrorBody } from '@/lib/response';
-import { UploadOptionsStore, useUploadOptionsStore } from '@/lib/store/uploadOptions';
+import { UploadOptionsStore } from '@/lib/store/uploadOptions';
 import { ActionIcon, Anchor, Group, Stack, Table, Title, Tooltip } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
-import { modals, useModals } from '@mantine/modals';
+import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import { IconClipboardCopy, IconExternalLink, IconFileUpload, IconFileXFilled } from '@tabler/icons-react';
 import Link from 'next/link';
@@ -16,7 +16,7 @@ export function filesModal(
   }: {
     clipboard: ReturnType<typeof useClipboard>;
     clearEphemeral: () => void;
-  }
+  },
 ) {
   const open = (idx: number) => window.open(files[idx].url, '_blank');
   const copy = (idx: number) => {
@@ -86,7 +86,7 @@ export function uploadFiles(
     clearEphemeral: () => void;
     options: UploadOptionsStore['options'];
     ephemeral: UploadOptionsStore['ephemeral'];
-  }
+  },
 ) {
   setLoading(true);
   setProgress(0);
@@ -114,7 +114,7 @@ export function uploadFiles(
 
   req.addEventListener(
     'load',
-    (e) => {
+    () => {
       const res: Response['/api/upload'] = JSON.parse(req.responseText);
       setLoading(false);
       setProgress(0);
@@ -143,7 +143,7 @@ export function uploadFiles(
       setFiles([]);
       filesModal(res.files, { clipboard, clearEphemeral });
     },
-    false
+    false,
   );
 
   req.open('POST', '/api/upload');

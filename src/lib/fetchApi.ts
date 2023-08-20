@@ -1,11 +1,10 @@
-import { useEffect, useState } from 'react';
 import { ErrorBody } from './response';
 
-export async function fetchApi<Response = any, Error = string>(
+export async function fetchApi<Response = any, _Error = string>(
   route: string,
   method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' = 'GET',
   body: any = null,
-  headers: Record<string, string> = {}
+  headers: Record<string, string> = {},
 ): Promise<{
   data: Response | null;
   error: ErrorBody | null;

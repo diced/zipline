@@ -13,7 +13,7 @@ export async function filesRoute(
   this: ReturnType<typeof express>,
   app: NextServer,
   req: Request,
-  res: Response
+  res: Response,
 ) {
   const { id } = req.params;
   const { pw } = req.query;
@@ -64,7 +64,7 @@ export async function filesRoute(
   file.originalName &&
     res.setHeader(
       'Content-Disposition',
-      `${req.query.download ? 'attachment; ' : ''}filename="${file.originalName}"`
+      `${req.query.download ? 'attachment; ' : ''}filename="${file.originalName}"`,
     );
 
   await prisma.file.update({

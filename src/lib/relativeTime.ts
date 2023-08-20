@@ -1,5 +1,5 @@
-import dayjs from "dayjs";
-import dayJsrelativeTime from "dayjs/plugin/relativeTime";
+import dayjs from 'dayjs';
+import dayJsrelativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(dayJsrelativeTime);
 
 export function relativeTime(to: Date, from: Date = new Date()) {

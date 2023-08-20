@@ -15,7 +15,7 @@ import { deleteUser } from '../actions';
 export default function UserTableView() {
   const currentUser = useUserStore((state) => state.user);
 
-  const { data, isLoading } = useSWR<Extract<Response['/api/users'], User[]>>(`/api/users?noincl=true`);
+  const { data, isLoading } = useSWR<Extract<Response['/api/users'], User[]>>('/api/users?noincl=true');
 
   const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
     columnAccessor: 'createdAt',

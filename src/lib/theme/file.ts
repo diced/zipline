@@ -19,7 +19,7 @@ export async function readThemes(includeBuiltins: boolean = true): Promise<Zipli
   if (includeBuiltins) {
     parsedThemes.push(
       await handleOverrideColors(dark_gray as ZiplineTheme),
-      await handleOverrideColors(light_gray as ZiplineTheme)
+      await handleOverrideColors(light_gray as ZiplineTheme),
     );
   }
 

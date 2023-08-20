@@ -7,11 +7,9 @@ import {
   Box,
   Button,
   Center,
-  Group,
   Image,
   LoadingOverlay,
   Modal,
-  Paper,
   PinInput,
   Stack,
   Text,
@@ -38,7 +36,7 @@ export default function TwoFAButton() {
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
       revalidateIfStale: false,
-    }
+    },
   );
 
   const [pinDisabled, setPinDisabled] = useState(false);
@@ -53,7 +51,7 @@ export default function TwoFAButton() {
       {
         code: pin,
         secret: twoData!.secret,
-      }
+      },
     );
 
     if (error) {
@@ -82,7 +80,7 @@ export default function TwoFAButton() {
       'DELETE',
       {
         code: pin,
-      }
+      },
     );
 
     if (error) {
@@ -167,7 +165,7 @@ export default function TwoFAButton() {
               </Box>
 
               <Text size='sm' color='dimmed'>
-                If you can't scan the QR code, you can manually enter the following code into your
+                If you can&apos;t scan the QR code, you can manually enter the following code into your
                 authenticator app: <br /> {twoData?.secret ?? ''}
               </Text>
 

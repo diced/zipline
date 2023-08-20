@@ -4,9 +4,8 @@ import { Url } from '@/lib/db/models/url';
 import { fetchApi } from '@/lib/fetchApi';
 import { formatRootUrl } from '@/lib/url';
 import { conditionalWarning } from '@/lib/warningModal';
-import { Anchor, Title } from '@mantine/core';
+import { Anchor } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
-import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import { IconCheck, IconCopy, IconLinkOff } from '@tabler/icons-react';
 import Link from 'next/link';
@@ -40,7 +39,7 @@ export function copyUrl(url: Url, config: SafeConfig, clipboard: ReturnType<type
 async function handleDeleteUrl(url: Url) {
   const { data, error } = await fetchApi<Response['/api/user/urls/[id]']>(
     `/api/user/urls/${url.id}`,
-    'DELETE'
+    'DELETE',
   );
 
   if (error) {

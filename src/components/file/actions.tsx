@@ -2,12 +2,10 @@ import { Response } from '@/lib/api/response';
 import type { File } from '@/lib/db/models/file';
 import { Folder } from '@/lib/db/models/folder';
 import { fetchApi } from '@/lib/fetchApi';
-import { useSettingsStore } from '@/lib/store/settings';
 import { conditionalWarning } from '@/lib/warningModal';
 import { Anchor } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
-import { modals } from '@mantine/modals';
-import { notifications, notifications as notifs } from '@mantine/notifications';
+import { notifications } from '@mantine/notifications';
 import {
   IconCopy,
   IconFolderMinus,
@@ -86,7 +84,7 @@ export async function favoriteFile(file: File) {
     'PATCH',
     {
       favorite: !file.favorite,
-    }
+    },
   );
 
   if (error) {
@@ -109,7 +107,7 @@ export async function favoriteFile(file: File) {
 }
 
 export function createFolderAndAdd(file: File, folderName: string | null) {
-  fetchApi<Extract<Response['/api/user/folders'], Folder>>(`/api/user/folders`, 'POST', {
+  fetchApi<Extract<Response['/api/user/folders'], Folder>>('/api/user/folders', 'POST', {
     name: folderName,
     files: [file.id],
   }).then(({ data, error }) => {
@@ -143,7 +141,7 @@ export async function removeFromFolder(file: File) {
     {
       delete: 'file',
       id: file.id,
-    }
+    },
   );
 
   if (error) {
@@ -174,7 +172,7 @@ export async function addToFolder(file: File, folderId: string | null) {
     'POST',
     {
       id: file.id,
-    }
+    },
   );
 
   if (error) {

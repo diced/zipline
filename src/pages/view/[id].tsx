@@ -212,7 +212,7 @@ export default function ViewFile({
                     {
                       USE_PROFILES: { html: true },
                       FORBID_TAGS: ['style', 'script'],
-                    }
+                    },
                   ),
                 }}
               />
@@ -270,7 +270,7 @@ export default function ViewFile({
                     {
                       USE_PROFILES: { html: true },
                       FORBID_TAGS: ['style', 'script'],
-                    }
+                    },
                   ),
                 }}
               />

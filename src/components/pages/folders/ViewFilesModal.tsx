@@ -35,9 +35,7 @@ export default function ViewFilesModal({
           ]}
           pos='relative'
         >
-          {folder?.files.map((file) => (
-            <DashboardFile file={file} key={file.id} />
-          ))}
+          {folder?.files!.map((file) => <DashboardFile file={file} key={file.id} />)}
         </SimpleGrid>
       )}
     </Modal>

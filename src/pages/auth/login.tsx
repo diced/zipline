@@ -3,7 +3,7 @@ import { SafeConfig } from '@/lib/config/safe';
 import { getZipline } from '@/lib/db/models/zipline';
 import { fetchApi } from '@/lib/fetchApi';
 import { withSafeConfig } from '@/lib/middleware/next/withSafeConfig';
-import { authenticateWeb, registerWeb } from '@/lib/passkey';
+import { authenticateWeb } from '@/lib/passkey';
 import { eitherTrue } from '@/lib/primitive';
 import {
   Button,
@@ -26,7 +26,6 @@ import {
   IconBrandGithubFilled,
   IconBrandGoogle,
   IconCircleKeyFilled,
-  IconKering,
   IconKey,
   IconShieldQuestion,
   IconX,
@@ -141,7 +140,7 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
   useEffect(() => {
     if (willRedirect) {
       const provider = Object.keys(config.oauthEnabled).find(
-        (x) => config.oauthEnabled[x as keyof SafeConfig['oauthEnabled']] === true
+        (x) => config.oauthEnabled[x as keyof SafeConfig['oauthEnabled']] === true,
       );
 
       if (provider) {

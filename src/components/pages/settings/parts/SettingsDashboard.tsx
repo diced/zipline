@@ -28,10 +28,8 @@ function ThemeSelectItem({ value, label, ...others }: { value: string; label: st
       <div>{label}</div>
       {value !== 'system' && (
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          {mergedTheme.colors[mergedTheme.colorScheme === 'dark' ? 'dark' : mergedTheme?.primaryColor!]?.map(
-            (color) => (
-              <ColorSwatch key={color} color={color} size={18} style={{ marginRight: '0.5rem' }} />
-            )
+          {mergedTheme.colors[mergedTheme.colorScheme === 'dark' ? 'dark' : mergedTheme?.primaryColor]?.map(
+            (color) => <ColorSwatch key={color} color={color} size={18} style={{ marginRight: '0.5rem' }} />,
           )}
         </div>
       )}

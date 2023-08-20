@@ -7,7 +7,7 @@ import enabled from '@/lib/oauth/enabled';
 import { googleAuth } from '@/lib/oauth/providerUtil';
 import { OAuthQuery, OAuthResponse, withOAuth } from '@/lib/oauth/withOAuth';
 
-async function handler({ code, state, host }: OAuthQuery, logger: Logger): Promise<OAuthResponse> {
+async function handler({ code, state, host }: OAuthQuery, _logger: Logger): Promise<OAuthResponse> {
   if (!config.features.oauthRegistration)
     return {
       error: 'OAuth registration is disabled.',
@@ -27,7 +27,7 @@ async function handler({ code, state, host }: OAuthQuery, logger: Logger): Promi
       redirect: googleAuth.url(
         config.oauth.google.clientId!,
         `${config.core.returnHttpsUrls ? 'https' : 'http'}://${host}`,
-        state
+        state,
       ),
     };
 

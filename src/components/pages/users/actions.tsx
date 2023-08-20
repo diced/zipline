@@ -19,7 +19,7 @@ export async function deleteUser(user: User) {
     onConfirm: () =>
       modals.openConfirmModal({
         centered: true,
-        title: <Title>Delete {user.username}'s data?</Title>,
+        title: <Title>Delete {user.username}&qpos;s data?</Title>,
         children: `Would you like to delete ${user.username}'s files and urls? This action cannot be undone.`,
         labels: {
           cancel: 'No, keep everything & only delete user',

@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/db';
-import { cleanFiles, fileSelect } from '@/lib/db/models/file';
+import { fileSelect } from '@/lib/db/models/file';
 import { Folder, cleanFolder, cleanFolders } from '@/lib/db/models/folder';
 import { combine } from '@/lib/middleware/combine';
 import { method } from '@/lib/middleware/method';
@@ -23,7 +23,8 @@ export async function handler(req: NextApiReq<Body, Query>, res: NextApiRes<ApiU
   const { noincl } = req.query;
 
   if (req.method === 'POST') {
-    let { name, isPublic, files } = req.body;
+    const { name, isPublic } = req.body;
+    let files = req.body.files;
     if (!name) return res.badRequest('Name is required');
 
     if (files) {

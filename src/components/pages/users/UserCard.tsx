@@ -3,7 +3,7 @@ import { ActionIcon, Avatar, Card, Group, Menu, Stack, Text } from '@mantine/cor
 import { useUserStore } from '@/lib/store/user';
 import { IconDots, IconFiles, IconTrashFilled, IconUserEdit } from '@tabler/icons-react';
 import EditUserModal from './EditUserModal';
-import { forwardRef, useState } from 'react';
+import { useState } from 'react';
 import { deleteUser } from './actions';
 import RelativeDate from '@/components/RelativeDate';
 import { canInteract, isAdministrator, roleName } from '@/lib/role';

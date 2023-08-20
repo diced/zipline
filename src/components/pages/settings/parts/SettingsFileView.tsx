@@ -14,7 +14,7 @@ import {
   Text,
   TextInput,
   Textarea,
-  Title
+  Title,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
@@ -51,7 +51,7 @@ export default function SettingsFileView() {
       showMimetype: values.showMimetype,
     };
 
-    const { data, error } = await fetchApi<Response['/api/user']>(`/api/user`, 'PATCH', {
+    const { data, error } = await fetchApi<Response['/api/user']>('/api/user', 'PATCH', {
       view: valuesTrimmed,
     });
 

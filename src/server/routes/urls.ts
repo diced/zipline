@@ -11,7 +11,7 @@ export async function urlsRoute(
   this: ReturnType<typeof express>,
   app: NextServer,
   req: Request,
-  res: Response
+  res: Response,
 ) {
   const { id } = req.params;
 

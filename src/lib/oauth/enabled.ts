@@ -5,19 +5,19 @@ export default function enabled(config: Config) {
   const discordEnabled = isTruthy(
     config.oauth?.discord?.clientId,
     config.oauth?.discord?.clientSecret,
-    config.features.oauthRegistration
+    config.features.oauthRegistration,
   );
 
   const githubEnabled = isTruthy(
     config.oauth?.github?.clientId,
     config.oauth?.github?.clientSecret,
-    config.features.oauthRegistration
+    config.features.oauthRegistration,
   );
 
   const googleEnabled = isTruthy(
     config.oauth?.google?.clientId,
     config.oauth?.google?.clientSecret,
-    config.features.oauthRegistration
+    config.features.oauthRegistration,
   );
 
   const authentikEnabled = isTruthy(
@@ -26,7 +26,7 @@ export default function enabled(config: Config) {
     config.oauth?.authentik?.authorizeUrl,
     config.oauth?.authentik?.tokenUrl,
     config.oauth?.authentik?.userinfoUrl,
-    config.features.oauthRegistration
+    config.features.oauthRegistration,
   );
 
   return {

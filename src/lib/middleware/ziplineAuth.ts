@@ -22,7 +22,7 @@ export function parseUserToken(encryptedToken: string | undefined | null): strin
 export function parseUserToken(encryptedToken: string | undefined | null, noThrow: true): string | null;
 export function parseUserToken(
   encryptedToken: string | undefined | null,
-  noThrow: boolean = false
+  noThrow: boolean = false,
 ): string | null {
   if (!encryptedToken) {
     if (noThrow) return null;
@@ -53,6 +53,7 @@ export function ziplineAuth(options?: ZiplineAuthOptions) {
       else if (req.headers.authorization) rawToken = req.headers.authorization;
 
       try {
+        // eslint-disable-next-line no-var
         var token = parseUserToken(rawToken);
       } catch (e) {
         return res.unauthorized((e as { error: string }).error);

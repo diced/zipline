@@ -45,7 +45,7 @@ export async function editFolderVisibility(folder: Folder, isPublic: boolean) {
     'PATCH',
     {
       isPublic,
-    }
+    },
   );
 
   if (error) {
@@ -73,7 +73,7 @@ async function handleDeleteFolder(folder: Folder) {
     'DELETE',
     {
       delete: 'folder',
-    }
+    },
   );
 
   if (error) {

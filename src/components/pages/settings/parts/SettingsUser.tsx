@@ -11,7 +11,7 @@ import {
   ScrollArea,
   TextInput,
   Title,
-  Tooltip
+  Tooltip,
 } from '@mantine/core';
 import { hasLength, useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
@@ -27,7 +27,7 @@ export default function SettingsUser() {
 
   useEffect(() => {
     (async () => {
-      const { data, error } = await fetchApi<Response['/api/user/token']>('/api/user/token');
+      const { data } = await fetchApi<Response['/api/user/token']>('/api/user/token');
 
       if (data) {
         setToken(data.token || '');
@@ -54,7 +54,7 @@ export default function SettingsUser() {
     if (values.username !== user?.username) send['username'] = values.username.trim();
     if (values.password) send['password'] = values.password.trim();
 
-    const { data, error } = await fetchApi<Response['/api/user']>(`/api/user`, 'PATCH', send);
+    const { data, error } = await fetchApi<Response['/api/user']>('/api/user', 'PATCH', send);
 
     if (!data && error) {
       if (error.field === 'username') {

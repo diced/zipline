@@ -1,4 +1,3 @@
-import { useConfig } from '@/components/ConfigProvider';
 import DashboardFile from '@/components/file/DashboardFile';
 import Stat from '@/components/Stat';
 import type { Response } from '@/lib/api/response';

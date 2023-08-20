@@ -22,7 +22,7 @@ const fetcher = async (
     options: {
       page: 1,
     },
-  }
+  },
 ) => {
   const searchParams = new URLSearchParams();
   if (options.page) searchParams.append('page', options.page.toString());
@@ -53,11 +53,11 @@ const fetcher = async (
 export function useApiPagination(
   options: ApiPaginationOptions = {
     page: 1,
-  }
+  },
 ) {
   const { data, error, isLoading, mutate } = useSWR<Response['/api/user/files']>(
-    { key: `/api/user/files`, options },
-    fetcher
+    { key: '/api/user/files', options },
+    fetcher,
   );
 
   return {

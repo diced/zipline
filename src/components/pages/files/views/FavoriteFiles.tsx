@@ -1,4 +1,3 @@
-import { useConfig } from '@/components/ConfigProvider';
 import DashboardFile from '@/components/file/DashboardFile';
 import {
   Accordion,
@@ -22,7 +21,7 @@ export default function FavoriteFiles() {
   const router = useRouter();
 
   const [page, setPage] = useState<number>(
-    router.query.favoritePage ? parseInt(router.query.favoritePage as string) : 1
+    router.query.favoritePage ? parseInt(router.query.favoritePage as string) : 1,
   );
   const { data, isLoading } = useApiPagination({
     page,
@@ -39,7 +38,7 @@ export default function FavoriteFiles() {
         },
       },
       undefined,
-      { shallow: true }
+      { shallow: true },
     );
   }, [page]);
 

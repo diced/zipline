@@ -11,7 +11,7 @@ export type SafeConfig = Omit<Config, 'oauth' | 'datasource' | 'core'> & {
 };
 
 export function safeConfig(): SafeConfig {
-  const { datasource, core, oauth, ...rest } = config;
+  const { datasource: _d, core: _c, oauth, ...rest } = config;
 
   (rest as SafeConfig).oauthEnabled = enabled(config);
   (rest as SafeConfig).oauth = {

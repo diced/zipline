@@ -1,5 +1,4 @@
 import DashboardFile from '@/components/file/DashboardFile';
-import type { SafeConfig } from '@/lib/config/safe';
 import {
   Button,
   Center,
@@ -16,7 +15,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useApiPagination } from '../useApiPagination';
-import { useConfig } from '@/components/ConfigProvider';
 
 export default function Files({ id }: { id?: string }) {
   const router = useRouter();
@@ -36,7 +34,7 @@ export default function Files({ id }: { id?: string }) {
         },
       },
       undefined,
-      { shallow: true }
+      { shallow: true },
     );
   }, [page]);
 

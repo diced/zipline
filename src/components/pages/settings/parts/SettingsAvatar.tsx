@@ -5,8 +5,13 @@ import useAvatar from '@/lib/hooks/useAvatar';
 import { useUserStore } from '@/lib/store/user';
 import { Avatar, Button, Card, FileInput, Group, Paper, Stack, Text, Title } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconChevronDown, IconPhoto, IconPhotoCancel, IconPhotoUp, IconSettingsFilled } from '@tabler/icons-react';
-import { useRouter } from 'next/router';
+import {
+  IconChevronDown,
+  IconPhoto,
+  IconPhotoCancel,
+  IconPhotoUp,
+  IconSettingsFilled,
+} from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 
 export default function SettingsAvatar() {
@@ -29,7 +34,7 @@ export default function SettingsAvatar() {
     if (!avatar) return;
 
     const base64url = await readToDataURL(avatar);
-    const { data, error } = await fetchApi<Response['/api/user']>(`/api/user`, 'PATCH', {
+    const { data, error } = await fetchApi<Response['/api/user']>('/api/user', 'PATCH', {
       avatar: base64url,
     });
 
@@ -56,7 +61,7 @@ export default function SettingsAvatar() {
   };
 
   const clearAvatar = async () => {
-    const { data, error } = await fetchApi<Response['/api/user']>(`/api/user`, 'PATCH', {
+    const { data, error } = await fetchApi<Response['/api/user']>('/api/user', 'PATCH', {
       avatar: null,
     });
 

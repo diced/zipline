@@ -149,7 +149,7 @@ export function parseHeaders(headers: UploadHeaders, fileConfig: Config['files']
     if (num < 0 || num > 100)
       return headerError(
         'x-zipline-image-compression-percent',
-        'Invalid compression percent (must be between 0 and 100)'
+        'Invalid compression percent (must be between 0 and 100)',
       );
 
     response.imageCompressionPercent = num;

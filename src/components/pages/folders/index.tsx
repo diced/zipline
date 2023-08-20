@@ -3,17 +3,7 @@ import { Response } from '@/lib/api/response';
 import { Folder } from '@/lib/db/models/folder';
 import { fetchApi } from '@/lib/fetchApi';
 import { useViewStore } from '@/lib/store/view';
-import {
-  ActionIcon,
-  Button,
-  Group,
-  Modal,
-  Stack,
-  Switch,
-  TextInput,
-  Title,
-  Tooltip
-} from '@mantine/core';
+import { ActionIcon, Button, Group, Modal, Stack, Switch, TextInput, Title, Tooltip } from '@mantine/core';
 import { hasLength, useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { IconFolderPlus, IconPlus } from '@tabler/icons-react';
@@ -39,12 +29,12 @@ export default function DashboardFolders() {
 
   const onSubmit = async (values: typeof form.values) => {
     const { error } = await fetchApi<Extract<Response['/api/user/folders'], Folder>>(
-      `/api/user/folders`,
+      '/api/user/folders',
       'POST',
       {
         name: values.name,
         isPublic: values.isPublic,
-      }
+      },
     );
 
     if (error) {

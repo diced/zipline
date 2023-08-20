@@ -60,7 +60,7 @@ export async function handler(req: NextApiReq<any, any, UploadHeaders>, res: Nex
 
     if (file.size > zconfig.files.maxFileSize)
       return res.badRequest(
-        `File size is too large. Maximum file size is ${zconfig.files.maxFileSize} bytes`
+        `File size is too large. Maximum file size is ${zconfig.files.maxFileSize} bytes`,
       );
 
     let fileName = formatFileName(options.format || zconfig.files.defaultFormat, file.originalname);

@@ -54,13 +54,13 @@ export default function DashboardURLs() {
     }
 
     const { data, error } = await fetchApi<Extract<Response['/api/user/urls'], { url: string }>>(
-      `/api/user/urls`,
+      '/api/user/urls',
       'POST',
       {
         destination: values.url,
         vanity: values.vanity.trim() || null,
       },
-      values.maxViews !== '' ? { 'x-zipline-max-views': String(values.maxViews) } : {}
+      values.maxViews !== '' ? { 'x-zipline-max-views': String(values.maxViews) } : {},
     );
 
     if (error) {

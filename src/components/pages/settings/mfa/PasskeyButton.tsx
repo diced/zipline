@@ -1,5 +1,4 @@
 import RelativeDate from '@/components/RelativeDate';
-import { User } from '@/lib/db/models/user';
 import { fetchApi } from '@/lib/fetchApi';
 import { registerWeb } from '@/lib/passkey';
 import { useUserStore } from '@/lib/store/user';
@@ -7,7 +6,6 @@ import { RegistrationResponseJSON } from '@github/webauthn-json/dist/types/brows
 import {
   ActionIcon,
   Button,
-  Card,
   Divider,
   Group,
   Modal,
@@ -138,8 +136,8 @@ export default function PasskeyButton() {
       >
         <Stack spacing='sm'>
           <>
-            {user?.passkeys!.map((passkey) => (
-              <Paper withBorder p='xs'>
+            {user?.passkeys!.map((passkey, i) => (
+              <Paper withBorder p='xs' key={i}>
                 <Group position='apart'>
                   <Text weight='bolder'>{passkey.name}</Text>
                   <ActionIcon color='red' onClick={() => removePasskey(passkey)}>

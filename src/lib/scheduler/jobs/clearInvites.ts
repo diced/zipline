@@ -1,6 +1,4 @@
-import { datasource } from '@/lib/datasource';
 import { IntervalJob } from '..';
-import { bytes } from '@/lib/bytes';
 
 export default function clearInvites(prisma: typeof globalThis.__db__) {
   return async function (this: IntervalJob) {

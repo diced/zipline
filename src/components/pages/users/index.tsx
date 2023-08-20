@@ -12,7 +12,6 @@ import {
   PasswordInput,
   Select,
   Stack,
-  Switch,
   TextInput,
   Title,
   Tooltip,

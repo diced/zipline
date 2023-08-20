@@ -22,7 +22,7 @@ import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { mutate } from 'swr';
 
 export default function Setup() {
@@ -131,7 +131,7 @@ export default function Setup() {
                 <Title order={2}>Configuration</Title>
 
                 <Text>
-                  Zipline's configuration is managed by environment variables. Zipline makes this easy by
+                  Zipline&apos;s configuration is managed by environment variables. Zipline makes this easy by
                   providing support for using a <Code>.env</Code> file. When using <b>Docker Compose</b> all
                   the environment variables are found in the <Code>docker-compose.yml</Code> file.
                 </Text>
@@ -198,8 +198,8 @@ export default function Setup() {
             <Title order={2}>Setup complete!</Title>
 
             <Text>
-              Clicking "continue" below will create your super-admin account and log you in. You will be
-              redirected to the dashboard shortly after that.
+              Clicking &quot;continue&quot; below will create your super-admin account and log you in. You
+              will be redirected to the dashboard shortly after that.
             </Text>
             <Group position='apart' my='lg'>
               <Button

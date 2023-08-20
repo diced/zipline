@@ -25,7 +25,7 @@ export async function handler(req: NextApiReq<any, Query>, res: NextApiRes<ApiUs
         createdAt: 'desc',
       },
       take: 3,
-    })
+    }),
   );
 
   return res.ok(files);

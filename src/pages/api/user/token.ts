@@ -1,5 +1,4 @@
 import { config } from '@/lib/config';
-import { serializeCookie } from '@/lib/cookie';
 import { createToken, encryptToken } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
 import { User, userSelect } from '@/lib/db/models/user';

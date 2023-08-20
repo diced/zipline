@@ -25,7 +25,7 @@ export default function deleteFiles(prisma: typeof globalThis.__db__) {
       try {
         await datasource.delete(file.name);
       } catch {
-        this.logger.error(`failed to delete file from datasource`, {
+        this.logger.error('failed to delete file from datasource', {
           file: file.name,
         });
       }

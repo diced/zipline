@@ -1,7 +1,7 @@
 import Layout from '@/components/Layout';
 import ViewFiles from '@/components/pages/users/ViewUserFiles';
 import { prisma } from '@/lib/db';
-import { User, userSelect } from '@/lib/db/models/user';
+import { User } from '@/lib/db/models/user';
 import useLogin from '@/lib/hooks/useLogin';
 import { withSafeConfig } from '@/lib/middleware/next/withSafeConfig';
 import { parseUserToken } from '@/lib/middleware/ziplineAuth';
@@ -37,6 +37,7 @@ export const getServerSideProps = withSafeConfig(async (ctx) => {
   });
 
   try {
+    // eslint-disable-next-line no-var
     var currentUserToken = parseUserToken(ctx.req.cookies['zipline_token']);
   } catch (e) {
     return {
