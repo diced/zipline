@@ -12,17 +12,29 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [18.x, latest]
+        node: [18.x, 20.x]
     steps:
       - uses: actions/checkout@v3
 
-      - name: Use node@${{ matrix.node-version }}
+      - name: Use node@${{ matrix.node }}
         uses: actions/setup-node@v2
         with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'yarn'
+          node-version: ${{ matrix.node }}
       
+      - name: 'Restore dependency cache'
+        id: cache-restore
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            ${{ github.workspace }}/.next/cache
+          key: ${{ runner.os }}-node${{ matrix.node }}-${{ hashFiles('**/yarn.lock') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+          restore-keys: |
+            ${{ runner.os }}-node${{ matrix.node }}-${{ hashFiles('**/yarn.lock') }}-
+  
+  
       - name: Install dependencies
+        if: steps.cache-restore.outputs.cache-hit != 'true'
         run: yarn install
       
       - name: Build
