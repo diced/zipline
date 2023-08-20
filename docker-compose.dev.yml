@@ -1,0 +1,36 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DATABASE=postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-U', 'postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  zipline:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000'
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@postgres/postgres
+    depends_on:
+      - postgres
+    volumes:
+      - './uploads:/zipline/uploads'
+      - './public:/zipline/public'
+      - './themes:/zipline/themes'
+
+volumes:
+  pgdata:

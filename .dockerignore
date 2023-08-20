@@ -1,0 +1,10 @@
+.github
+.next
+.yarn/cache
+.yarn/install-state.gz
+build
+node_modules
+public
+uploads
+.env
+.eslintcache
