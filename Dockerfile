@@ -1,35 +1,21 @@
-# FROM ghcr.io/diced/prisma-binaries:4.10.x as prisma-binaries
-
 FROM node:18-alpine3.16 as base
+
+ENV PNPM_HOME="/pnpm"
+RUN corepack enable pnpm
+RUN corepack prepare pnpm@latest --activate
 
 WORKDIR /zipline
 
-# Prisma binaries
-# COPY --from=prisma /prisma-engines /prisma-engines
-# ENV PRISMA_QUERY_ENGINE_BINARY=/prisma-engines/query-engine \
-#   PRISMA_MIGRATION_ENGINE_BINARY=/prisma-engines/migration-engine \
-#   PRISMA_INTROSPECTION_ENGINE_BINARY=/prisma-engines/introspection-engine \
-#   PRISMA_FMT_BINARY=/prisma-engines/prisma-fmt \
-#   PRISMA_CLI_QUERY_ENGINE_TYPE=binary \
-#   PRISMA_CLIENT_ENGINE_TYPE=binary \
-#   ZIPLINE_BUILD=true \
-#   NEXT_TELEMETRY_DISABLED=1 \
-#   NODE_ENV=production
 
-ENV NEXT_TELEMETRY_DISABLED=1 \
-  NODE_ENV=production
-
-# Copy the necessary files from the project
 COPY prisma ./prisma
-COPY .yarn ./.yarn
-COPY package.json ./
-COPY yarn.lock ./
-COPY .yarnrc.yml ./
+COPY package.json .
+COPY pnpm-lock.yaml .
 
-# Install the dependencies
-RUN yarn install --immutable
+FROM base as deps
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
 
 FROM base as builder
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
 COPY src ./src
 COPY next.config.js ./next.config.js
@@ -39,20 +25,20 @@ COPY mimes.json ./mimes.json
 COPY code.json ./code.json
 COPY themes ./themes
 
-# Run the build
-RUN ZIPLINE_BUILD=true yarn build
+ENV NEXT_TELEMETRY_DISABLED=1 \
+  NODE_ENV=production
 
-# Use Alpine Linux as the final image
+RUN ZIPLINE_BUILD=true pnpm run build
+
 FROM base
+
+COPY --from=deps /zipline/node_modules ./node_modules
 
 COPY --from=builder /zipline/build ./build
 COPY --from=builder /zipline/.next ./.next
 
 COPY --from=builder /zipline/mimes.json ./mimes.json
 COPY --from=builder /zipline/code.json ./code.json
-
-# remove the ZIPLINE_BUILD env var
-RUN unset ZIPLINE_BUILD
 
 # clean
 RUN yarn cache clean --all

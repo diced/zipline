@@ -123,13 +123,13 @@ export default function FileModal({
                     Icon={IconFolderMinus}
                     onClick={() => removeFromFolder(file)}
                     tooltip={`Remove from folder "${
-                      folders?.find((f) => f.id === file.folderId)?.name ?? ''
+                      folders?.find((f: any) => f.id === file.folderId)?.name ?? ''
                     }"`}
                     color='red'
                   />
                 ) : (
                   <Select
-                    data={folders?.map((f) => ({ value: f.id, label: f.name })) ?? []}
+                    data={folders?.map((f: any) => ({ value: f.id, label: f.name })) ?? []}
                     placeholder='Add to a folder...'
                     searchable
                     creatable
