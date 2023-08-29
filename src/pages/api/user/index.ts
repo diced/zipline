@@ -1,6 +1,6 @@
 import zconfig from 'lib/config';
 import Logger from 'lib/logger';
-import { discord_auth, github_auth, google_auth } from 'lib/oauth';
+import { authentik_auth, discord_auth, github_auth, google_auth } from 'lib/oauth';
 import prisma from 'lib/prisma';
 import { hashPassword } from 'lib/util';
 import { jsonUserReplacer } from 'lib/utils/client';
@@ -129,6 +129,23 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
             token: json.access_token,
             refresh: json.refresh_token,
           },
+        });
+      }
+    } else if (user.oauth.find((o) => o.provider === 'AUTHENTIK')) {
+      const resp = await authentik_auth.oauth_user(
+        user.oauth.find((o) => o.provider === 'AUTHENTIK').token,
+        zconfig.oauth.authentik_userinfo_url
+      );
+      if (!resp) {
+        logger.debug(`oauth expired for ${JSON.stringify(user, jsonUserReplacer)}`);
+
+        return res.json({
+          error: 'oauth token expired',
+          redirect_uri: authentik_auth.oauth_url(
+            zconfig.oauth.authentik_client_id,
+            `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}`,
+            zconfig.oauth.authentik_authorize_url
+          ),
         });
       }
     }

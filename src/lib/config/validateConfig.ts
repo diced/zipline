@@ -179,6 +179,12 @@ const validator = s.object({
 
       google_client_id: s.string.nullable.default(null),
       google_client_secret: s.string.nullable.default(null),
+
+      authentik_client_id: s.string.nullable.default(null),
+      authentik_client_secret: s.string.nullable.default(null),
+      authentik_authorize_url: s.string.nullable.default(null),
+      authentik_userinfo_url: s.string.nullable.default(null),
+      authentik_token_url: s.string.nullable.default(null),
     })
     .nullish.default(null),
   features: s

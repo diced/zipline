@@ -33,6 +33,7 @@ import {
   IconFileZip,
   IconGraph,
   IconGraphOff,
+  IconKey,
   IconPhotoMinus,
   IconReload,
   IconTrash,
@@ -76,6 +77,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
     Discord: IconBrandDiscordFilled,
     GitHub: IconBrandGithubFilled,
     Google: IconBrandGoogle,
+    Authentik: IconKey,
   };
 
   for (const provider of oauth_providers) {
