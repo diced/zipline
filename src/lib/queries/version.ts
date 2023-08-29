@@ -15,10 +15,12 @@ export const useVersion = () => {
   return useQuery<VersionResponse>(
     ['version'],
     async () => {
-      return fetch('/api/version').then((res) => res.json());
+      return fetch('/api/version').then((res) => (res.ok ? res.json() : Promise.reject('')));
     },
     {
-      staleTime: Infinity,
+      refetchInterval: false,
+      refetchOnMount: false,
+      retry: false,
     }
   );
 };
