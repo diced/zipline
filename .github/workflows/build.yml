@@ -39,6 +39,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
+      - name: Install
+        run: pnpm install
+
       - name: Build
         env:
           ZIPLINE_BUILD: 'true'
