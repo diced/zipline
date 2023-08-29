@@ -21,20 +21,23 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
-      - name: 'Restore dependency cache'
-        id: cache-restore
-        uses: actions/cache@v3
+      - uses: pnpm/action-setup@v2
         with:
-          path: |
-            node_modules
-            ${{ github.workspace }}/.next/cache
-          key: ${{ runner.os }}-node${{ matrix.node }}-${{ hashFiles('**/yarn.lock') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
-          restore-keys: |
-            ${{ runner.os }}-node${{ matrix.node }}-${{ hashFiles('**/yarn.lock') }}-
+          version: 8
+          run_install: false
 
-      - name: Install dependencies
-        if: steps.cache-restore.outputs.cache-hit != 'true'
-        run: yarn install
+      - name: Get pnpm store directory
+        shell: bash
+        id: pnpm-cache
+        run: |
+          echo "store_path=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v3
+        with:
+          path: ${{ steps.pnpm-cache.outputs.store_path }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Build
         env:
