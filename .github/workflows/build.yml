@@ -43,4 +43,4 @@ jobs:
         env:
           ZIPLINE_BUILD: 'true'
           NEXT_TELEMETRY_DISABLED: '1'
-        run: yarn build
+        run: pnpm build
