@@ -17,6 +17,7 @@ import { Scheduler } from '@/lib/scheduler';
 import deleteFiles from '@/lib/scheduler/jobs/deleteFiles';
 import clearInvites from '@/lib/scheduler/jobs/clearInvites';
 import maxViews from '@/lib/scheduler/jobs/maxViews';
+import thumbnails from '@/lib/scheduler/jobs/thumbnails';
 
 const MODE = process.env.NODE_ENV || 'production';
 
@@ -94,20 +95,20 @@ async function main() {
       },
     });
 
-    if (!file) return app.render404(req, res, parsedUrl);
-
-    const stream = await datasource.get(file.name);
+    const stream = await datasource.get(file?.name ?? id);
     if (!stream) return app.render404(req, res, parsedUrl);
-    if (file.password) {
+    if (file?.password) {
       if (!pw) return res.status(403).json({ code: 403, message: 'Password protected.' });
       const verified = await verifyPassword(pw as string, file.password!);
 
       if (!verified) return res.status(403).json({ code: 403, message: 'Incorrect password.' });
     }
 
+    const size = await datasource.size(file?.name ?? id);
+
     res.setHeader('Content-Type', 'text/plain');
-    res.setHeader('Content-Length', file.size);
-    file.originalName &&
+    res.setHeader('Content-Length', size);
+    file?.originalName &&
       res.setHeader(
         'Content-Disposition',
         `${req.query.download ? 'attachment; ' : ''}filename="${file.originalName}"`,
@@ -129,7 +130,18 @@ async function main() {
 
     scheduler.addInterval('deletefiles', config.scheduler.deleteInterval, deleteFiles(prisma));
     scheduler.addInterval('maxviews', config.scheduler.maxViewsInterval, maxViews(prisma));
-    scheduler.addInterval('clearinvites', config.scheduler.clearInvitesInterval, clearInvites(prisma));
+    scheduler.addInterval('thumbnails', config.scheduler.thumbnailsInterval, thumbnails(prisma));
+
+    if (config.features.thumbnails.enabled) {
+      for (let i = 0; i !== config.features.thumbnails.num_threads; ++i) {
+        scheduler.addWorker(`thumbnail-${i}`, './build/offload/thumbnails.js', {
+          id: `thumbnail-${i}`,
+          enabled: config.features.thumbnails.enabled,
+        });
+      }
+
+      scheduler.addInterval('clearinvites', config.scheduler.clearInvitesInterval, clearInvites(prisma));
+    }
 
     scheduler.start();
   });

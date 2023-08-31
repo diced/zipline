@@ -1,5 +1,5 @@
-import { formatRootUrl } from '@/lib/url';
 import { config } from '@/lib/config';
+import { formatRootUrl } from '@/lib/url';
 
 export type File = {
   createdAt: Date;
@@ -14,6 +14,10 @@ export type File = {
   views: number;
   password?: string | boolean | null;
   folderId: string | null;
+
+  thumbnail: {
+    path: string;
+  };
 
   url?: string;
   similarity?: number;
@@ -31,6 +35,11 @@ export const fileSelect = {
   type: true,
   views: true,
   folderId: true,
+  thumbnail: {
+    select: {
+      path: true,
+    },
+  },
 };
 
 export function cleanFile(file: File) {

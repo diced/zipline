@@ -12,4 +12,15 @@ export default defineConfig([
     },
     outDir: 'build',
   },
+  {
+    platform: 'node',
+    format: 'cjs',
+    treeshake: true,
+    clean: false,
+    sourcemap: true,
+    entryPoints: {
+      thumbnails: 'src/offload/thumbnails.ts',
+    },
+    outDir: 'build/offload',
+  },
 ]);

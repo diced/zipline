@@ -18,6 +18,7 @@ export const rawConfig: any = {
     deleteInterval: undefined,
     clearInvitesInterval: undefined,
     maxViewsInterval: undefined,
+    thumbnailsInterval: undefined,
   },
   files: {
     route: undefined,
@@ -38,7 +39,6 @@ export const rawConfig: any = {
     type: undefined,
   },
   features: {
-    thumbnail: undefined,
     imageCompression: undefined,
     robotsTxt: undefined,
     healthcheck: undefined,
@@ -46,6 +46,10 @@ export const rawConfig: any = {
     userRegistration: undefined,
     oauthRegistration: undefined,
     deleteOnMaxViews: undefined,
+    thumbnails: {
+      enabled: undefined,
+      num_threads: undefined,
+    },
   },
   invites: {
     enabled: undefined,
@@ -105,6 +109,7 @@ export const PROP_TO_ENV: Record<string, string> = {
   'scheduler.deleteInterval': 'SCHEDULER_DELETE_INTERVAL',
   'scheduler.clearInvitesInterval': 'SCHEDULER_CLEAR_INVITES_INTERVAL',
   'scheduler.maxViewsInterval': 'SCHEDULER_MAX_VIEWS_INTERVAL',
+  'scheduler.thumbnailsInterval': 'SCHEDULER_THUMBNAILS_INTERVAL',
 
   'files.route': 'FILES_ROUTE',
   'files.length': 'FILES_LENGTH',
@@ -132,13 +137,14 @@ export const PROP_TO_ENV: Record<string, string> = {
 
   'datasource.local.directory': 'DATASOURCE_LOCAL_DIRECTORY',
 
-  'features.thumbnail': 'FEATURES_THUMBNAIL',
   'features.imageCompression': 'FEATURES_IMAGE_COMPRESSION',
   'features.robotsTxt': 'FEATURES_ROBOTS_TXT',
   'features.healthcheck': 'FEATURES_HEALTHCHECK',
   'features.userRegistration': 'FEATURES_USER_REGISTRATION',
   'features.oauthRegistration': 'FEATURES_OAUTH_REGISTRATION',
   'features.deleteOnMaxViews': 'FEATURES_DELETE_ON_MAX_VIEWS',
+  'features.thumbails.enabled': 'FEATURES_THUMBNAILS_ENABLED',
+  'features.thumbnails.num_threads': 'FEATURES_THUMBNAILS_NUM_THREADS',
 
   'invites.enabled': 'INVITES_ENABLED',
   'invites.length': 'INVITES_LENGTH',
@@ -184,6 +190,7 @@ export function readEnv() {
     env(PROP_TO_ENV['scheduler.deleteInterval'], 'scheduler.deleteInterval', 'ms'),
     env(PROP_TO_ENV['scheduler.clearInvitesInterval'], 'scheduler.clearInvitesInterval', 'ms'),
     env(PROP_TO_ENV['scheduler.maxViewsInterval'], 'scheduler.maxViewsInterval', 'ms'),
+    env(PROP_TO_ENV['scheduler.thumbnailsInterval'], 'scheduler.thumbnailsInterval', 'ms'),
 
     env(PROP_TO_ENV['files.route'], 'files.route', 'string'),
     env(PROP_TO_ENV['files.length'], 'files.length', 'number'),
@@ -206,7 +213,6 @@ export function readEnv() {
 
     env(PROP_TO_ENV['datasource.local.directory'], 'datasource.local.directory', 'string'),
 
-    env(PROP_TO_ENV['features.thumbnail'], 'features.thumbnail', 'boolean'),
     env(PROP_TO_ENV['features.imageCompression'], 'features.imageCompression', 'boolean'),
     env(PROP_TO_ENV['features.robotsTxt'], 'features.robotsTxt', 'boolean'),
     env(PROP_TO_ENV['features.healthcheck'], 'features.healthcheck', 'boolean'),
@@ -214,6 +220,8 @@ export function readEnv() {
     env(PROP_TO_ENV['features.userRegistration'], 'features.userRegistration', 'boolean'),
     env(PROP_TO_ENV['features.oauthRegistration'], 'features.oauthRegistration', 'boolean'),
     env(PROP_TO_ENV['features.deleteOnMaxViews'], 'features.deleteOnMaxViews', 'boolean'),
+    env(PROP_TO_ENV['features.thumbnails.enabled'], 'features.thumbnails.enabled', 'boolean'),
+    env(PROP_TO_ENV['features.thumbnails.num_threads'], 'features.thumbnails.num_threads', 'number'),
 
     env(PROP_TO_ENV['invites.enabled'], 'invites.enabled', 'boolean'),
     env(PROP_TO_ENV['invites.length'], 'invites.length', 'number'),

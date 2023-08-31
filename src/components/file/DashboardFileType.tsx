@@ -1,5 +1,5 @@
 import type { File as DbFile } from '@/lib/db/models/file';
-import { Center, Image, Paper, Stack, Text } from '@mantine/core';
+import { Box, Center, Image, Paper, Stack, Text } from '@mantine/core';
 import {
   Icon,
   IconFileText,
@@ -113,6 +113,34 @@ export default function DashboardFileType({
           controls
           src={dbFile ? `/raw/${file.name}${password ? `?pw=${password}` : ''}` : URL.createObjectURL(file)}
         />
+      ) : (file as DbFile).thumbnail && dbFile ? (
+        <Box>
+          <Image
+            styles={{
+              imageWrapper: {
+                position: 'inherit',
+              },
+              image: {
+                maxHeight: dbFile ? '100vh' : 100,
+              },
+            }}
+            src={`/raw/${(file as DbFile).thumbnail.path}`}
+            alt={file.name}
+          />
+
+          <Center
+            sx={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              height: '100%',
+              width: '100%',
+              cursor: 'pointer',
+            }}
+          >
+            <IconPlayerPlay size='4rem' stroke={3} />
+          </Center>
+        </Box>
       ) : (
         <Placeholder text={`Click to play video ${file.name}`} Icon={IconPlayerPlay} />
       );

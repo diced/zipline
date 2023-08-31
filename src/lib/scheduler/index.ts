@@ -6,6 +6,7 @@ export interface Job {
 
   started: boolean;
   logger: Logger;
+  scheduler: Scheduler;
 }
 
 export interface WorkerJob<Data = any> extends Job {
@@ -36,6 +37,7 @@ export class Scheduler {
       if (job.started) continue;
 
       job.logger = this.logger.c('jobs').c(job.id);
+      job.scheduler = this;
 
       if ('interval' in job) {
         this.logger.debug('running first run', {
@@ -76,6 +78,18 @@ export class Scheduler {
 
     const worker = new Worker(job.path, {
       workerData: job.data,
+    });
+
+    worker.once('exit', (code) => {
+      this.logger.debug('worker exited', {
+        id: job.id,
+        code,
+      });
+
+      const index = this.jobs.findIndex((x) => x.id === job.id);
+      if (index === -1) return;
+
+      this.jobs.splice(index, 1);
     });
 
     job.worker = worker;

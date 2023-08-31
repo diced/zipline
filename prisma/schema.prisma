@@ -135,6 +135,22 @@ model File {
 
   Folder   Folder? @relation(fields: [folderId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   folderId String?
+
+  thumbnail Thumbnail?
+
+}
+
+model Thumbnail { 
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  path String
+
+  file File @relation(fields: [fileId], references: [id], onDelete: Cascade, onUpdate: Cascade) 
+  fileId String
+
+  @@unique([fileId])
 }
 
 model Folder {
