@@ -3,7 +3,7 @@ import Logger from 'lib/logger';
 import { OAuthQuery, OAuthResponse, withOAuth } from 'lib/middleware/withOAuth';
 import { withZipline } from 'lib/middleware/withZipline';
 import { github_auth } from 'lib/oauth';
-import { getBase64URLFromURL, notNull } from 'lib/util';
+import { getBase64URLFromURL, isNotNullOrUndefined } from 'lib/util';
 
 async function handler({ code, state }: OAuthQuery, logger: Logger): Promise<OAuthResponse> {
   if (!config.features.oauth_registration)
@@ -12,7 +12,7 @@ async function handler({ code, state }: OAuthQuery, logger: Logger): Promise<OAu
       error: 'oauth registration is disabled',
     };
 
-  if (!notNull(config.oauth.github_client_id, config.oauth.github_client_secret)) {
+  if (!isNotNullOrUndefined(config.oauth.github_client_id) && !isNotNullOrUndefined(config.oauth.github_client_secret)) {
     logger.error('GitHub OAuth is not configured');
     return {
       error_code: 401,

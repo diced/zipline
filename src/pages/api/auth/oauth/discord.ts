@@ -3,7 +3,7 @@ import Logger from 'lib/logger';
 import { OAuthQuery, OAuthResponse, withOAuth } from 'lib/middleware/withOAuth';
 import { withZipline } from 'lib/middleware/withZipline';
 import { discord_auth } from 'lib/oauth';
-import { getBase64URLFromURL, notNull } from 'lib/util';
+import { getBase64URLFromURL, isNotNullOrUndefined } from 'lib/util';
 
 async function handler({ code, state, host }: OAuthQuery, logger: Logger): Promise<OAuthResponse> {
   if (!config.features.oauth_registration)
@@ -12,7 +12,7 @@ async function handler({ code, state, host }: OAuthQuery, logger: Logger): Promi
       error: 'oauth registration is disabled',
     };
 
-  if (!notNull(config.oauth.discord_client_id, config.oauth.discord_client_secret)) {
+  if (!isNotNullOrUndefined(config.oauth.discord_client_id) && !isNotNullOrUndefined(config.oauth.discord_client_secret)) {
     logger.error('Discord OAuth is not configured');
 
     return {
