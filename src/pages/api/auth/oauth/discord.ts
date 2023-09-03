@@ -12,7 +12,10 @@ async function handler({ code, state, host }: OAuthQuery, logger: Logger): Promi
       error: 'oauth registration is disabled',
     };
 
-  if (!isNotNullOrUndefined(config.oauth.discord_client_id) && !isNotNullOrUndefined(config.oauth.discord_client_secret)) {
+  if (
+    !isNotNullOrUndefined(config.oauth.discord_client_id) &&
+    !isNotNullOrUndefined(config.oauth.discord_client_secret)
+  ) {
     logger.error('Discord OAuth is not configured');
 
     return {

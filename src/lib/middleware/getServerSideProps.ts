@@ -27,9 +27,15 @@ export type ServerSideProps = {
 };
 
 export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (ctx) => {
-  const ghEnabled = isNotNullOrUndefined(config.oauth?.github_client_id) && isNotNullOrUndefined(config.oauth?.github_client_secret);
-  const discEnabled = isNotNullOrUndefined(config.oauth?.discord_client_id) && isNotNullOrUndefined(config.oauth?.discord_client_secret);
-  const googleEnabled = isNotNullOrUndefined(config.oauth?.google_client_id) && isNotNullOrUndefined(config.oauth?.google_client_secret);
+  const ghEnabled =
+    isNotNullOrUndefined(config.oauth?.github_client_id) &&
+    isNotNullOrUndefined(config.oauth?.github_client_secret);
+  const discEnabled =
+    isNotNullOrUndefined(config.oauth?.discord_client_id) &&
+    isNotNullOrUndefined(config.oauth?.discord_client_secret);
+  const googleEnabled =
+    isNotNullOrUndefined(config.oauth?.google_client_id) &&
+    isNotNullOrUndefined(config.oauth?.google_client_secret);
 
   const oauth_providers: OauthProvider[] = [];
 

@@ -12,7 +12,10 @@ async function handler({ code, state }: OAuthQuery, logger: Logger): Promise<OAu
       error: 'oauth registration is disabled',
     };
 
-  if (!isNotNullOrUndefined(config.oauth.github_client_id) && !isNotNullOrUndefined(config.oauth.github_client_secret)) {
+  if (
+    !isNotNullOrUndefined(config.oauth.github_client_id) &&
+    !isNotNullOrUndefined(config.oauth.github_client_secret)
+  ) {
     logger.error('GitHub OAuth is not configured');
     return {
       error_code: 401,

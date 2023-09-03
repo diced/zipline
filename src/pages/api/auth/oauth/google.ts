@@ -12,7 +12,10 @@ async function handler({ code, state, host }: OAuthQuery, logger: Logger): Promi
       error: 'oauth registration is disabled',
     };
 
-  if (!isNotNullOrUndefined(config.oauth.google_client_id) && !isNotNullOrUndefined(config.oauth.google_client_secret)) {
+  if (
+    !isNotNullOrUndefined(config.oauth.google_client_id) &&
+    !isNotNullOrUndefined(config.oauth.google_client_secret)
+  ) {
     logger.error('Google OAuth is not configured');
     return {
       error_code: 401,
