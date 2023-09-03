@@ -123,7 +123,3 @@ export async function getBase64URLFromURL(url: string) {
 export function isNotNullOrUndefined (value: unknown) {
   return value !== null && value !== undefined;
 }
-
-export function notNull(a: unknown, b: unknown) {
-  return a !== null && b !== null;
-}
