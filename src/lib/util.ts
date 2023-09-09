@@ -120,6 +120,6 @@ export async function getBase64URLFromURL(url: string) {
   return `data:${res.headers.get('content-type')};base64,${base64}`;
 }
 
-export function notNull(a: unknown, b: unknown) {
-  return a !== null && b !== null;
+export function isNotNullOrUndefined(value: unknown) {
+  return value !== null && value !== undefined;
 }
