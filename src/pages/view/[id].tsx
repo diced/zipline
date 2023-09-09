@@ -128,6 +128,7 @@ export default function EmbeddedFile({
               </>
             )}
 
+            <meta property='og:type' content={'video.other'} />
             <meta property='og:url' content={`${host}/r/${file.name}`} />
             <meta property='og:video' content={`${host}/r/${file.name}`} />
             <meta property='og:video:url' content={`${host}/r/${file.name}`} />
