@@ -44,7 +44,8 @@ export const schema = z.object({
     deleteInterval: z.number().default(ms('30min')),
     clearInvitesInterval: z.number().default(ms('30min')),
     maxViewsInterval: z.number().default(ms('30min')),
-    thumbnailsInterval: z.number().default(ms('15s')),
+    thumbnailsInterval: z.number().default(ms('30min')),
+    metricsInterval: z.number().default(ms('30min')),
   }),
   files: z.object({
     route: z.string().startsWith('/').nonempty().trim().toLowerCase().default('/u'),
@@ -111,6 +112,7 @@ export const schema = z.object({
       enabled: z.boolean().default(true),
       num_threads: z.number().default(4),
     }),
+    metrics: z.boolean().default(true),
   }),
   invites: z.object({
     enabled: z.boolean().default(true),

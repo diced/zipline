@@ -7,6 +7,7 @@ import { ApiAuthRegisterResponse } from '@/pages/api/auth/register';
 import { ApiAuthWebauthnResponse } from '@/pages/api/auth/webauthn';
 import { ApiHealthcheckResponse } from '@/pages/api/healthcheck';
 import { ApiSetupResponse } from '@/pages/api/setup';
+import { ApiStatsResponse } from '@/pages/api/stats';
 import { ApiUploadResponse } from '@/pages/api/upload';
 import { ApiUserResponse } from '@/pages/api/user';
 import { ApiUserFilesResponse } from '@/pages/api/user/files';
@@ -54,4 +55,5 @@ export type Response = {
   '/api/setup': ApiSetupResponse;
   '/api/upload': ApiUploadResponse;
   '/api/version': ApiVersionResponse;
+  '/api/stats': ApiStatsResponse;
 };

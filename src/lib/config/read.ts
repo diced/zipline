@@ -19,6 +19,7 @@ export const rawConfig: any = {
     clearInvitesInterval: undefined,
     maxViewsInterval: undefined,
     thumbnailsInterval: undefined,
+    metricsInterval: undefined,
   },
   files: {
     route: undefined,
@@ -50,6 +51,7 @@ export const rawConfig: any = {
       enabled: undefined,
       num_threads: undefined,
     },
+    metrics: undefined,
   },
   invites: {
     enabled: undefined,
@@ -110,6 +112,7 @@ export const PROP_TO_ENV: Record<string, string> = {
   'scheduler.clearInvitesInterval': 'SCHEDULER_CLEAR_INVITES_INTERVAL',
   'scheduler.maxViewsInterval': 'SCHEDULER_MAX_VIEWS_INTERVAL',
   'scheduler.thumbnailsInterval': 'SCHEDULER_THUMBNAILS_INTERVAL',
+  'scheduler.metricsInterval': 'SCHEDULER_METRICS_INTERVAL',
 
   'files.route': 'FILES_ROUTE',
   'files.length': 'FILES_LENGTH',
@@ -145,6 +148,7 @@ export const PROP_TO_ENV: Record<string, string> = {
   'features.deleteOnMaxViews': 'FEATURES_DELETE_ON_MAX_VIEWS',
   'features.thumbails.enabled': 'FEATURES_THUMBNAILS_ENABLED',
   'features.thumbnails.num_threads': 'FEATURES_THUMBNAILS_NUM_THREADS',
+  'features.metrics': 'FEATURES_METRICS',
 
   'invites.enabled': 'INVITES_ENABLED',
   'invites.length': 'INVITES_LENGTH',
@@ -191,6 +195,7 @@ export function readEnv() {
     env(PROP_TO_ENV['scheduler.clearInvitesInterval'], 'scheduler.clearInvitesInterval', 'ms'),
     env(PROP_TO_ENV['scheduler.maxViewsInterval'], 'scheduler.maxViewsInterval', 'ms'),
     env(PROP_TO_ENV['scheduler.thumbnailsInterval'], 'scheduler.thumbnailsInterval', 'ms'),
+    env(PROP_TO_ENV['scheduler.metricsInterval'], 'scheduler.metricsInterval', 'ms'),
 
     env(PROP_TO_ENV['files.route'], 'files.route', 'string'),
     env(PROP_TO_ENV['files.length'], 'files.length', 'number'),
@@ -222,6 +227,7 @@ export function readEnv() {
     env(PROP_TO_ENV['features.deleteOnMaxViews'], 'features.deleteOnMaxViews', 'boolean'),
     env(PROP_TO_ENV['features.thumbnails.enabled'], 'features.thumbnails.enabled', 'boolean'),
     env(PROP_TO_ENV['features.thumbnails.num_threads'], 'features.thumbnails.num_threads', 'number'),
+    env(PROP_TO_ENV['features.metrics'], 'features.metrics', 'boolean'),
 
     env(PROP_TO_ENV['invites.enabled'], 'invites.enabled', 'boolean'),
     env(PROP_TO_ENV['invites.length'], 'invites.length', 'number'),

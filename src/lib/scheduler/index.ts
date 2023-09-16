@@ -99,7 +99,7 @@ export class Scheduler {
     });
   }
 
-  public addInterval(id: string, interval: number, func: () => void, start: boolean = false): void {
+  public interval(id: string, interval: number, func: () => void, start: boolean = false): void {
     const len = this.jobs.push({
       id,
       interval,
@@ -110,7 +110,7 @@ export class Scheduler {
     if (start) this.startInterval(this.jobs[len - 1] as IntervalJob);
   }
 
-  public addWorker<Data = any>(id: string, path: string, data: Data, start: boolean = false): void {
+  public worker<Data = any>(id: string, path: string, data: Data, start: boolean = false): void {
     const len = this.jobs.push({
       id,
       path,

@@ -47,6 +47,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import ConfigProvider from './ConfigProvider';
+import { IconGraph } from '@tabler/icons-react';
 
 type NavLinks = {
   label: string;
@@ -63,6 +64,13 @@ const navLinks: NavLinks[] = [
     icon: <IconHome size='1rem' />,
     active: (path: string) => path === '/dashbaord',
     href: '/dashboard',
+  },
+  {
+    label: 'Metrics',
+    icon: <IconGraph size='1rem' />,
+    active: (path: string) => path === '/dashboard/metrics',
+    href: '/dashboard/metrics',
+    if: (_, config) => config.features.metrics,
   },
   {
     label: 'Files',

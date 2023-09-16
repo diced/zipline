@@ -18,6 +18,7 @@ import deleteFiles from '@/lib/scheduler/jobs/deleteFiles';
 import clearInvites from '@/lib/scheduler/jobs/clearInvites';
 import maxViews from '@/lib/scheduler/jobs/maxViews';
 import thumbnails from '@/lib/scheduler/jobs/thumbnails';
+import metrics from '@/lib/scheduler/jobs/metrics';
 
 const MODE = process.env.NODE_ENV || 'production';
 
@@ -128,19 +129,23 @@ async function main() {
       port: config.core.port,
     });
 
-    scheduler.addInterval('deletefiles', config.scheduler.deleteInterval, deleteFiles(prisma));
-    scheduler.addInterval('maxviews', config.scheduler.maxViewsInterval, maxViews(prisma));
-    scheduler.addInterval('thumbnails', config.scheduler.thumbnailsInterval, thumbnails(prisma));
+    scheduler.interval('deletefiles', config.scheduler.deleteInterval, deleteFiles(prisma));
+    scheduler.interval('maxviews', config.scheduler.maxViewsInterval, maxViews(prisma));
+
+    if (config.features.metrics)
+      scheduler.interval('metrics', config.scheduler.metricsInterval, metrics(prisma));
 
     if (config.features.thumbnails.enabled) {
+      scheduler.interval('thumbnails', config.scheduler.thumbnailsInterval, thumbnails(prisma));
+
       for (let i = 0; i !== config.features.thumbnails.num_threads; ++i) {
-        scheduler.addWorker(`thumbnail-${i}`, './build/offload/thumbnails.js', {
+        scheduler.worker(`thumbnail-${i}`, './build/offload/thumbnails.js', {
           id: `thumbnail-${i}`,
           enabled: config.features.thumbnails.enabled,
         });
       }
 
-      scheduler.addInterval('clearinvites', config.scheduler.clearInvitesInterval, clearInvites(prisma));
+      scheduler.interval('clearinvites', config.scheduler.clearInvitesInterval, clearInvites(prisma));
     }
 
     scheduler.start();

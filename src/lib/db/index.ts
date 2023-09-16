@@ -1,6 +1,7 @@
 import { log } from '@/lib/logger';
 import { Prisma, PrismaClient } from '@prisma/client';
 import { userViewSchema } from './models/user';
+import { metricDataSchema } from './models/metric';
 
 const building = !!process.env.ZIPLINE_BUILD;
 
@@ -32,6 +33,14 @@ function getClient() {
           needs: { view: true },
           compute({ view }: { view: Prisma.JsonValue }) {
             return userViewSchema.parse(view);
+          },
+        },
+      },
+      metric: {
+        data: {
+          needs: { data: true },
+          compute({ data }: { data: Prisma.JsonValue }) {
+            return metricDataSchema.parse(data);
           },
         },
       },
