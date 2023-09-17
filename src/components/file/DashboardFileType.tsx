@@ -124,7 +124,7 @@ export default function DashboardFileType({
                 maxHeight: dbFile ? '100vh' : 100,
               },
             }}
-            src={`/raw/${(file as DbFile).thumbnail.path}`}
+            src={`/raw/${(file as DbFile).thumbnail!.path}`}
             alt={file.name}
           />
 

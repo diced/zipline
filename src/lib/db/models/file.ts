@@ -17,7 +17,7 @@ export type File = {
 
   thumbnail: {
     path: string;
-  };
+  } | null;
 
   url?: string;
   similarity?: number;
