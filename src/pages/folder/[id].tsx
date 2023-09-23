@@ -12,6 +12,7 @@ type LimitedFolder = {
     createdAt: Date | string;
     mimetype: string;
     views: number;
+    size: number;
   }[];
   user: {
     username: string;
@@ -83,6 +84,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (context) => 
           views: true,
           createdAt: true,
           password: true,
+          size: true,
         },
       },
       user: {
