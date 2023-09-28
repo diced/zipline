@@ -138,6 +138,16 @@ export interface ConfigOAuth {
 
   google_client_id?: string;
   google_client_secret?: string;
+
+  oidc_client_id?: string;
+  oidc_client_secret?: string;
+  oidc_authorize_url?: string;
+  oidc_token_url?: string;
+  oidc_userinfo_url?: string;
+  oidc_scopes?: string;
+  oidc_name_field?: string;
+  oidc_user_id_field?: string;
+  oidc_provider_display_name?: string;
 }
 
 export interface ConfigChunks {

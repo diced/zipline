@@ -138,6 +138,7 @@ enum OauthProviders {
   DISCORD
   GITHUB
   GOOGLE
+  OIDC
 }
 
 model IncompleteFile {

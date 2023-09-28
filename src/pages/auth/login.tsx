@@ -14,7 +14,7 @@ import {
   Title,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { IconBrandDiscordFilled, IconBrandGithub, IconBrandGoogle } from '@tabler/icons-react';
+import { IconBrandDiscordFilled, IconBrandGithub, IconBrandGoogle, IconLogin } from '@tabler/icons-react';
 import useFetch from 'hooks/useFetch';
 import Head from 'next/head';
 import Link from 'next/link';
@@ -47,6 +47,7 @@ export default function Login({
     GitHub: IconBrandGithub,
     Discord: IconBrandDiscordFilled,
     Google: IconBrandGoogle,
+    OIDC: IconLogin,
   };
 
   for (const provider of oauth_providers) {

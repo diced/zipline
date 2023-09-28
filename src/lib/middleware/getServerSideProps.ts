@@ -37,6 +37,17 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (ct
     isNotNullOrUndefined(config.oauth?.google_client_id) &&
     isNotNullOrUndefined(config.oauth?.google_client_secret);
 
+  const oidcEnabled =
+    isNotNullOrUndefined(config.oauth.oidc_client_id) &&
+    isNotNullOrUndefined(config.oauth.oidc_client_secret) &&
+    isNotNullOrUndefined(config.oauth.oidc_authorize_url) &&
+    isNotNullOrUndefined(config.oauth.oidc_token_url) &&
+    isNotNullOrUndefined(config.oauth.oidc_userinfo_url) &&
+    isNotNullOrUndefined(config.oauth.oidc_scopes) &&
+    isNotNullOrUndefined(config.oauth.oidc_name_field) &&
+    isNotNullOrUndefined(config.oauth.oidc_user_id_field) &&
+    isNotNullOrUndefined(config.oauth.oidc_provider_display_name);
+
   const oauth_providers: OauthProvider[] = [];
 
   if (ghEnabled)
@@ -58,6 +69,15 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (ct
       url: '/api/auth/oauth/google',
       link_url: '/api/auth/oauth/google?state=link',
     });
+
+  if (oidcEnabled)
+    oauth_providers.push({
+      name: config.oauth.oidc_provider_display_name,
+      url: '/api/auth/oauth/oidc',
+      link_url: '/api/auth/oauth/oidc?state=link',
+    });
+
+  console.log(oauth_providers);
 
   const obj = {
     props: {

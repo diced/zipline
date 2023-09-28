@@ -1,6 +1,6 @@
 import zconfig from 'lib/config';
 import Logger from 'lib/logger';
-import { discord_auth, github_auth, google_auth } from 'lib/oauth';
+import { discord_auth, github_auth, google_auth, oidc_auth } from 'lib/oauth';
 import prisma from 'lib/prisma';
 import { hashPassword } from 'lib/util';
 import { jsonUserReplacer } from 'lib/utils/client';
@@ -115,6 +115,65 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
             redirect_uri: google_auth.oauth_url(
               zconfig.oauth.google_client_id,
               `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}`
+            ),
+          });
+        }
+
+        const json = await resp2.json();
+
+        await prisma.oAuth.update({
+          where: {
+            id: provider.id,
+          },
+          data: {
+            token: json.access_token,
+            refresh: json.refresh_token,
+          },
+        });
+      }
+    } else if (user.oauth.find((o) => o.provider === 'OIDC')) {
+      const resp = await fetch(
+        `${zconfig.oauth.oidc_userinfo_url}?access_token=${
+          user.oauth.find((o) => o.provider === 'OIDC').token
+        }`
+      );
+      if (!resp.ok) {
+        const provider = user.oauth.find((o) => o.provider === 'OIDC');
+        if (!provider.refresh) {
+          logger.debug(`couldn't find a refresh token for ${JSON.stringify(user, jsonUserReplacer)}`);
+
+          return res.json({
+            error: 'oauth token expired',
+            redirect_uri: oidc_auth.oauth_url(
+              zconfig.oauth.oidc_authorize_url,
+              zconfig.oauth.oidc_client_id,
+              `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}`,
+              zconfig.oauth.oidc_scopes
+            ),
+          });
+        }
+        const resp2 = await fetch(zconfig.oauth.oidc_token_url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            client_id: zconfig.oauth.oidc_client_id,
+            client_secret: zconfig.oauth.oidc_client_secret,
+            grant_type: 'refresh_token',
+            refresh_token: provider.refresh,
+          }),
+        });
+        if (!resp2.ok) {
+          logger.debug(`oauth expired for ${JSON.stringify(user, jsonUserReplacer)}`);
+
+          return res.json({
+            error: 'oauth token expired',
+            redirect_uri: oidc_auth.oauth_url(
+              zconfig.oauth.oidc_authorize_url,
+              zconfig.oauth.oidc_client_id,
+              `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}`,
+              zconfig.oauth.oidc_scopes
             ),
           });
         }

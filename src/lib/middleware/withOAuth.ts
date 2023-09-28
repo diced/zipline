@@ -25,7 +25,7 @@ export interface OAuthResponse {
 
 export const withOAuth =
   (
-    provider: 'discord' | 'github' | 'google',
+    provider: 'discord' | 'github' | 'google' | 'oidc',
     oauth: (query: OAuthQuery, logger: Logger) => Promise<OAuthResponse>
   ) =>
   async (req: NextApiReq, res: NextApiRes) => {

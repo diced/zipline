@@ -48,3 +48,21 @@ export const google_auth = {
     return res.json();
   },
 };
+
+export const oidc_auth = {
+  oauth_url: (authorizeUrl: string, clientId: string, origin: string, scope: string, state?: string) =>
+    `${authorizeUrl}?client_id=${clientId}&redirect_uri=${encodeURIComponent(
+      `${origin}/api/auth/oauth/oidc`
+    )}&response_type=code&access_type=offline&scope=${scope}${state ? `&state=${state}` : ''}`,
+  oauth_user: async (userinfoUrl: string, access_token: string) => {
+    const res = await fetch(`${userinfoUrl}`, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    });
+    console.log('userinfo', res);
+    if (!res.ok) return null;
+
+    return res.json();
+  },
+};

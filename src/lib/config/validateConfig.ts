@@ -179,6 +179,16 @@ const validator = s.object({
 
       google_client_id: s.string.nullable.default(null),
       google_client_secret: s.string.nullable.default(null),
+
+      oidc_client_id: s.string.nullable.default(null),
+      oidc_client_secret: s.string.nullable.default(null),
+      oidc_authorize_url: s.string.nullable.default(null),
+      oidc_token_url: s.string.nullable.default(null),
+      oidc_userinfo_url: s.string.nullable.default(null),
+      oidc_scopes: s.string.nullable.default(null),
+      oidc_name_field: s.string.nullable.default(null),
+      oidc_user_id_field: s.string.nullable.default(null),
+      oidc_provider_display_name: s.string.nullable.default(null),
     })
     .nullish.default(null),
   features: s
