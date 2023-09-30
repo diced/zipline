@@ -97,6 +97,7 @@ const validator = s.object({
       format_date: s.string.default('YYYY-MM-DD_HH:mm:ss'),
       default_expiration: s.string.optional.default(null),
       assume_mimetypes: s.boolean.default(false),
+      random_words_separator: s.string.default('-'),
     })
     .default({
       default_format: 'RANDOM',

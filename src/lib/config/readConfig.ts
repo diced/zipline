@@ -98,6 +98,7 @@ export default function readConfig() {
     map('UPLOADER_FORMAT_DATE', 'string', 'uploader.format_date'),
     map('UPLOADER_DEFAULT_EXPIRATION', 'string', 'uploader.default_expiration'),
     map('UPLOADER_ASSUME_MIMETYPES', 'boolean', 'uploader.assume_mimetypes'),
+    map('UPLOADER_RANDOM_WORDS_SEPARATOR', 'string', 'uploader.random_words_separator'),
 
     map('URLS_ROUTE', 'string', 'urls.route'),
     map('URLS_LENGTH', 'number', 'urls.length'),

@@ -1,4 +1,5 @@
 import { readFile } from 'fs/promises';
+import config from 'lib/config';
 
 export type GfyCatWords = {
   adjectives: string[];
@@ -22,5 +23,7 @@ function randomWord(words: string[]) {
 export default async function gfycat() {
   const words = await importWords();
 
-  return `${randomWord(words.adjectives)} ${randomWord(words.adjectives)} ${randomWord(words.animals)}`;
+  return `${randomWord(words.adjectives)}${config.uploader.random_words_separator}${randomWord(
+    words.adjectives
+  )}${config.uploader.random_words_separator}${randomWord(words.animals)}`;
 }

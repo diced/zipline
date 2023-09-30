@@ -57,6 +57,7 @@ export interface ConfigUploader {
   format_date: string;
   default_expiration: string;
   assume_mimetypes: boolean;
+  random_words_separator: string;
 }
 
 export interface ConfigUrls {
