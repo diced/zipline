@@ -29,7 +29,7 @@ async function handler({ code, state, host }: OAuthQuery, logger: Logger): Promi
       redirect: discord_auth.oauth_url(
         config.oauth.discord_client_id,
         `${config.core.return_https ? 'https' : 'http'}://${host}`,
-        state
+        state, config.oauth.discord_redirect_uri
       ),
     };
 
@@ -38,7 +38,7 @@ async function handler({ code, state, host }: OAuthQuery, logger: Logger): Promi
     client_secret: config.oauth.discord_client_secret,
     code,
     grant_type: 'authorization_code',
-    redirect_uri: `${config.core.return_https ? 'https' : 'http'}://${host}/api/auth/oauth/discord`,
+    redirect_uri: config.oauth.discord_redirect_uri || `${config.core.return_https ? 'https' : 'http'}://${host}/api/auth/oauth/discord`,
     scope: 'identify',
   });
 
