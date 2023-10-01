@@ -148,6 +148,7 @@ export default function readConfig() {
     map('OAUTH_DISCORD_CLIENT_ID', 'string', 'oauth.discord_client_id'),
     map('OAUTH_DISCORD_CLIENT_SECRET', 'string', 'oauth.discord_client_secret'),
     map('OAUTH_DISCORD_REDIRECT_URI', 'string', 'oauth.discord_redirect_uri'),
+    map('OAUTH_DISCORD_WHITELISTED_USERS', 'array', 'oauth.discord_whitelisted_users'),
 
     map('OAUTH_GOOGLE_CLIENT_ID', 'string', 'oauth.google_client_id'),
     map('OAUTH_GOOGLE_CLIENT_SECRET', 'string', 'oauth.google_client_secret'),
