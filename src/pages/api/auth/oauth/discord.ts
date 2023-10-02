@@ -73,7 +73,10 @@ async function handler({ code, state, host }: OAuthQuery, logger: Logger): Promi
     : `https://cdn.discordapp.com/embed/avatars/${userJson.discriminator % 5}.png`;
   const avatarBase64 = await getBase64URLFromURL(avatar);
 
-  if (!config.oauth.discord_whitelisted_users.includes(userJson.id))
+  if (
+    config.oauth.discord_whitelisted_users?.length && 
+    !config.oauth.discord_whitelisted_users.includes(userJson.id)
+  )
     return { error: 'user is not whitelisted' };
 
   return {
