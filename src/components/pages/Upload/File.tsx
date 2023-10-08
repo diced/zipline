@@ -233,7 +233,7 @@ export default function File({ chunks: chunks_config }) {
       if (chunks_config.enabled && file.size >= chunks_config.max_size) {
         toChunkFiles.push(file);
       } else {
-        body.append('file', files[i]);
+        body.append('file', files[i], encodeURIComponent(files[i].name));
       }
     }
 
