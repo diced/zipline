@@ -199,14 +199,17 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
   for (let i = 0; i !== req.files.length; ++i) {
     const file = req.files[i];
+
     if (file.size > zconfig.uploader[user.administrator ? 'admin_limit' : 'user_limit'])
       return res.badRequest(`file[${i}]: size too big`);
     if (!file.originalname) return res.badRequest(`file[${i}]: no filename`);
 
-    const ext = file.originalname.split('.').length === 1 ? '' : file.originalname.split('.').pop();
+    const decodedName = decodeURI(file.originalname);
+
+    const ext = decodedName.split('.').length === 1 ? '' : decodedName.split('.').pop();
     if (zconfig.uploader.disabled_extensions.includes(ext))
       return res.badRequest(`file[${i}]: disabled extension recieved: ${ext}`);
-    let fileName = await formatFileName(format, file.originalname);
+    let fileName = await formatFileName(format, decodedName);
 
     if (req.headers['x-zipline-filename']) {
       fileName = req.headers['x-zipline-filename'] as string;
@@ -226,7 +229,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     let mimetype = file.mimetype;
 
     if (file.mimetype === 'application/octet-stream' && zconfig.uploader.assume_mimetypes) {
-      const ext = parse(file.originalname).ext.replace('.', '');
+      const ext = parse(decodedName).ext.replace('.', '');
       const mime = await guess(ext);
 
       if (!mime) response.assumed_mimetype = false;
@@ -247,7 +250,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         password,
         expiresAt: expiry,
         maxViews: fileMaxViews,
-        originalName: req.headers['original-name'] ? file.originalname ?? null : null,
+        originalName: req.headers['original-name'] ? decodedName ?? null : null,
         size: file.size,
       },
     });
