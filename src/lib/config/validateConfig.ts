@@ -177,9 +177,12 @@ const validator = s.object({
 
       discord_client_id: s.string.nullable.default(null),
       discord_client_secret: s.string.nullable.default(null),
+      discord_redirect_uri: s.string.nullable.default(null),
+      discord_whitelisted_users: s.string.array.default([]),
 
       google_client_id: s.string.nullable.default(null),
       google_client_secret: s.string.nullable.default(null),
+      google_redirect_uri: s.string.nullable.default(null),
     })
     .nullish.default(null),
   features: s
