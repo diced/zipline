@@ -80,6 +80,16 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
   // handle partial uploads before ratelimits
   if (req.headers['content-range'] && zconfig.chunks.enabled) {
+    if (format === 'name') {
+      const existing = await prisma.file.findFirst({
+        where: {
+          name: req.headers['x-zipline-partial-filename'] as string,
+        },
+      });
+
+      if (existing) return res.badRequest('filename already exists (conflict: NAME format)');
+    }
+
     // parses content-range header (bytes start-end/total)
     const [start, end, total] = req.headers['content-range']
       .replace('bytes ', '')
@@ -211,8 +221,8 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       return res.badRequest(`file[${i}]: disabled extension recieved: ${ext}`);
     let fileName = await formatFileName(format, decodedName);
 
-    if (req.headers['x-zipline-filename']) {
-      fileName = req.headers['x-zipline-filename'] as string;
+    if (format === 'name' || req.headers['x-zipline-filename']) {
+      fileName = (req.headers['x-zipline-filename'] as string) || fileName;
       const existing = await prisma.file.findFirst({
         where: {
           name: fileName,

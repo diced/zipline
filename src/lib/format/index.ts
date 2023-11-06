@@ -19,7 +19,7 @@ export default async function formatFileName(nameFormat: NameFormat, originalNam
 
       return name;
     case 'gfycat':
-      return gfycat();
+      return gfycat() ?? random();
     default:
       return random();
   }
