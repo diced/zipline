@@ -12,7 +12,7 @@ type LimitedFolder = {
     createdAt: Date | string;
     mimetype: string;
     views: number;
-    size: number;
+    size: bigint;
   }[];
   user: {
     username: string;
