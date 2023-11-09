@@ -31,7 +31,7 @@ const server = fastify(genFastifyOpts());
 // Normally I would never condone this, but I lack the patience to deal with this correctly.
 // This is just to get JSON.stringify to globally serialize BigInt's
 BigInt.prototype['toJSON'] = function () {
-  return this.toString();
+  return Number(this);
 };
 
 if (dev) {
