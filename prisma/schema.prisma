@@ -48,7 +48,7 @@ model File {
   originalName String?
   mimetype     String         @default("image/png")
   createdAt    DateTime       @default(now())
-  size         Int            @default(0)
+  size         BigInt         @default(0)
   expiresAt    DateTime?
   maxViews     Int?
   views        Int            @default(0)
@@ -63,7 +63,7 @@ model File {
   folder   Folder? @relation(fields: [folderId], references: [id], onDelete: SetNull)
   folderId Int?
 
-  thumbnail   Thumbnail?
+  thumbnail Thumbnail?
 }
 
 model Thumbnail {
