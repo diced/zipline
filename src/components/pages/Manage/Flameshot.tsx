@@ -75,7 +75,7 @@ export default function Flameshot({ user, open, setOpen }) {
     let shell;
     if (values.type === 'upload-file') {
       shell = `#!/bin/bash${values.wlCompositorNotSupported ? '\nexport XDG_CURRENT_DESKTOP=sway\n' : ''}
-flameshot gui -r > /tmp/ss.png;
+flameshot gui -r > /tmp/ss.png;if [ ! -s /tmp/ss.png ]; then\n  exit 1\nfi
 ${curl.join(' ')}${values.noJSON ? '' : " | jq -r '.files[0]'"} | tr -d '\\n' | ${
         values.wlCompatibility ? 'wl-copy' : 'xsel -ib'
       };
