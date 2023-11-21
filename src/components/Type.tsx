@@ -27,7 +27,7 @@ import PrismCode from './render/PrismCode';
 
 function PlaceholderContent({ text, Icon }) {
   return (
-    <Group sx={(t) => ({ color: t.colors.dark[2] })}>
+    <Group sx={(t) => ({ color: t.colors.dark[2], padding: 3, justifyContent: 'center' })}>
       <Icon size={48} />
       <Text size='md'>{text}</Text>
     </Group>
