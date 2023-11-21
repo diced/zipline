@@ -83,7 +83,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     logger.debug(`added file ${fileIdParsed} to folder ${idParsed}`);
 
     logger.info(
-      `Added file "${file.name}" to folder "${folder.name}" for user ${user.username} (${user.id})`
+      `Added file "${file.name}" to folder "${folder.name}" for user ${user.username} (${user.id})`,
     );
 
     if (req.query.files) {
@@ -94,7 +94,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
 
         (folder.files[i] as unknown as { url: string }).url = formatRootUrl(
           config.uploader.route,
-          folder.files[i].name
+          folder.files[i].name,
         );
       }
     }
@@ -129,7 +129,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
 
         (folder.files[i] as unknown as { url: string }).url = formatRootUrl(
           config.uploader.route,
-          folder.files[i].name
+          folder.files[i].name,
         );
       }
     }
@@ -213,7 +213,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       logger.debug(`removed file ${fileIdParsed} from folder ${idParsed}`);
 
       logger.info(
-        `Removed file "${file.name}" from folder "${folder.name}" for user ${user.username} (${user.id})`
+        `Removed file "${file.name}" from folder "${folder.name}" for user ${user.username} (${user.id})`,
       );
 
       if (req.query.files) {
@@ -224,7 +224,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
 
           (folder.files[i] as unknown as { url: string }).url = formatRootUrl(
             config.uploader.route,
-            folder.files[i].name
+            folder.files[i].name,
           );
         }
       }
@@ -240,7 +240,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
 
         (folder.files[i] as unknown as { url: string }).url = formatRootUrl(
           config.uploader.route,
-          folder.files[i].name
+          folder.files[i].name,
         );
       }
     }

@@ -69,7 +69,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     logger.info(
       `Created user ${newUser.username} (${newUser.id}) ${
         code ? `from invite code ${code}` : 'via registration'
-      }`
+      }`,
     );
 
     return res.json({ success: true });

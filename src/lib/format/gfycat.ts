@@ -36,6 +36,6 @@ export default async function gfycat(): Promise<string | null> {
   if (!words) return null;
 
   return `${randomWord(words.adjectives)}${config.uploader.random_words_separator}${randomWord(
-    words.adjectives
+    words.adjectives,
   )}${config.uploader.random_words_separator}${randomWord(words.animals)}`;
 }

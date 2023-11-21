@@ -36,7 +36,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     promises.push(
       prisma.user.delete({
         where: { id: target.id },
-      })
+      }),
     );
 
     if (req.body.delete_files) {
@@ -61,7 +61,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
           where: {
             userId: target.id,
           },
-        })
+        }),
       );
     }
     Promise.all(promises).then((promised) => {
@@ -71,10 +71,10 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
 
       req.body.delete_files
         ? logger.info(
-            `User ${user.username} (${user.id}) deleted ${count} files of user ${newTarget.username} (${newTarget.id})`
+            `User ${user.username} (${user.id}) deleted ${count} files of user ${newTarget.username} (${newTarget.id})`,
           )
         : logger.info(
-            `User ${user.username} (${user.id}) deleted user ${newTarget.username} (${newTarget.id})`
+            `User ${user.username} (${user.id}) deleted user ${newTarget.username} (${newTarget.id})`,
           );
 
       delete newTarget.password;
@@ -177,7 +177,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     logger.debug(`updated user ${id} with ${JSON.stringify(newUser, jsonUserReplacer)}`);
 
     logger.info(
-      `User ${user.username} (${user.id}) updated ${target.username} (${newUser.username}) (${newUser.id})`
+      `User ${user.username} (${user.id}) updated ${target.username} (${newUser.username}) (${newUser.id})`,
     );
 
     delete newUser.password;

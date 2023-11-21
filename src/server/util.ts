@@ -59,7 +59,7 @@ export async function migrations() {
   } catch (error) {
     if (error.message.startsWith('P1001')) {
       logger.error(
-        `Unable to connect to database \`${process.env.DATABASE_URL}\`, check your database connection`
+        `Unable to connect to database \`${process.env.DATABASE_URL}\`, check your database connection`,
       );
       logger.debug(error);
     } else {

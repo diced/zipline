@@ -37,7 +37,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       logger.info(
         `${user.username} (${user.id}) created ${data.length} invites with codes ${data
           .map((invite) => invite.code)
-          .join(', ')}`
+          .join(', ')}`,
       );
 
       return res.json(data);

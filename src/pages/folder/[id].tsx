@@ -103,7 +103,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (context) => 
   for (let j = 0; j !== folder.files.length; ++j) {
     (folder.files[j] as unknown as { url: string }).url = formatRootUrl(
       config.uploader.route,
-      folder.files[j].name
+      folder.files[j].name,
     );
 
     // @ts-ignore

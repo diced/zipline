@@ -64,7 +64,7 @@ async function main() {
 
   notFound
     ? console.log(
-        'At least one file has been found to not exist in the datasource but was on the database. To remove these files, run the script with the --force-delete flag.'
+        'At least one file has been found to not exist in the datasource but was on the database. To remove these files, run the script with the --force-delete flag.',
       )
     : console.log('Done.');
 

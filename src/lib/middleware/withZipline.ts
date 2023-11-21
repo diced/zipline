@@ -66,7 +66,7 @@ export type ZiplineApiConfig = {
 export const withZipline =
   (
     handler: (req: NextApiRequest, res: NextApiResponse, user?: UserExtended) => Promise<unknown>,
-    api_config: ZiplineApiConfig = { methods: ['GET', 'OPTIONS'] }
+    api_config: ZiplineApiConfig = { methods: ['GET', 'OPTIONS'] },
   ) =>
   (req: NextApiReq, res: NextApiRes) => {
     if (!api_config.methods.includes('OPTIONS')) api_config.methods.push('OPTIONS');
@@ -87,7 +87,7 @@ export const withZipline =
           code: 400,
           ...extra,
         },
-        400
+        400,
       );
     };
 
@@ -99,7 +99,7 @@ export const withZipline =
           code: 401,
           ...extra,
         },
-        401
+        401,
       );
     };
 
@@ -111,7 +111,7 @@ export const withZipline =
           code: 403,
           ...extra,
         },
-        403
+        403,
       );
     };
 
@@ -122,7 +122,7 @@ export const withZipline =
           code: 404,
           ...extra,
         },
-        404
+        404,
       );
     };
 
@@ -136,7 +136,7 @@ export const withZipline =
           code: 429,
           ...extra,
         },
-        429
+        429,
       );
     };
 
@@ -161,7 +161,7 @@ export const withZipline =
           path: '/',
           expires: new Date(1),
           maxAge: undefined,
-        })
+        }),
       );
     };
 
@@ -230,7 +230,7 @@ export const withZipline =
           error: 'method not allowed',
           code: 405,
         },
-        405
+        405,
       );
     }
 

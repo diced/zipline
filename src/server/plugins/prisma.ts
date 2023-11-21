@@ -3,15 +3,13 @@ import { FastifyInstance } from 'fastify';
 import fastifyPlugin from 'fastify-plugin';
 import { migrations } from 'server/util';
 
-async function prismaPlugin(fastify: FastifyInstance, _, done) {
+async function prismaPlugin(fastify: FastifyInstance) {
   process.env.DATABASE_URL = fastify.config.core?.database_url;
   await migrations();
 
   const prisma = new PrismaClient();
 
   fastify.decorate('prisma', prisma);
-
-  done();
 }
 
 export default fastifyPlugin(prismaPlugin, {

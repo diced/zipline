@@ -12,7 +12,7 @@ async function main() {
   }
 
   const files = (await readdir(temp)).filter(
-    (x) => x.startsWith('zipline_partial_') || x.startsWith('zipline_thumb_')
+    (x) => x.startsWith('zipline_partial_') || x.startsWith('zipline_thumb_'),
   );
   if (files.length === 0) {
     console.log('No partial files found, exiting..');

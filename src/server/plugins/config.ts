@@ -11,14 +11,14 @@ async function configPlugin(fastify: FastifyInstance, config: Config) {
     fastify.logger
       .error('Secret is not set!')
       .error(
-        'Running Zipline as is, without a randomized secret is not recommended and leaves your instance at risk!'
+        'Running Zipline as is, without a randomized secret is not recommended and leaves your instance at risk!',
       )
       .error('Please change your secret in the config file or environment variables.')
       .error(
-        'The config file is located at `.env.local`, or if using docker-compose you can change the variables in the `docker-compose.yml` file.'
+        'The config file is located at `.env.local`, or if using docker-compose you can change the variables in the `docker-compose.yml` file.',
       )
       .error(
-        'It is recomended to use a secret that is alphanumeric and randomized. If you include special characters, surround the secret with quotes.'
+        'It is recomended to use a secret that is alphanumeric and randomized. If you include special characters, surround the secret with quotes.',
       )
       .error('A way you can generate this is through a password manager you may have.');
 
@@ -41,7 +41,7 @@ async function configPlugin(fastify: FastifyInstance, config: Config) {
         .error("Found temporary files in Zipline's temp directory.")
         .error('This can happen if Zipline crashes or is stopped while chunking a file.')
         .error(
-          'If you are sure that no files are currently being processed, you can delete the files in the temp directory.'
+          'If you are sure that no files are currently being processed, you can delete the files in the temp directory.',
         )
         .error('The temp directory is located at: ' + config.core.temp_directory)
         .error('If you are unsure, you can safely ignore this message.');

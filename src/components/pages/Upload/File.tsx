@@ -43,7 +43,7 @@ export default function File({ chunks: chunks_config }) {
         return e.returnValue;
       }
     },
-    [loading]
+    [loading],
   );
 
   const beforeRouteChange = useCallback(
@@ -56,7 +56,7 @@ export default function File({ chunks: chunks_config }) {
         }
       }
     },
-    [loading]
+    [loading],
   );
 
   useEffect(() => {
@@ -191,7 +191,7 @@ export default function File({ chunks: chunks_config }) {
               ready = false;
             }
           },
-          false
+          false,
         );
 
         req.open('POST', '/api/upload');
@@ -307,7 +307,7 @@ export default function File({ chunks: chunks_config }) {
         }
         setProgress(0);
       },
-      false
+      false,
     );
 
     if (bodyLength !== 0) {

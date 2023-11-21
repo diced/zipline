@@ -18,7 +18,7 @@ export const useFolders = (query: { [key: string]: string } = {}) => {
 
   return useQuery<UserFoldersResponse[]>(['folders', queryString], async () => {
     return fetch('/api/user/folders?' + queryString).then(
-      (res) => res.json() as Promise<UserFoldersResponse[]>
+      (res) => res.json() as Promise<UserFoldersResponse[]>,
     );
   });
 };
@@ -26,7 +26,7 @@ export const useFolders = (query: { [key: string]: string } = {}) => {
 export const useFolder = (id: string, withFiles = false) => {
   return useQuery<UserFoldersResponse>(['folder', id], async () => {
     return fetch('/api/user/folders/' + id + (withFiles ? '?files=true' : '')).then(
-      (res) => res.json() as Promise<UserFoldersResponse>
+      (res) => res.json() as Promise<UserFoldersResponse>,
     );
   });
 };

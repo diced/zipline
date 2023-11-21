@@ -28,7 +28,7 @@ export async function uploadsRouteOnResponse(
   this: FastifyInstance,
   req: FastifyRequest,
   reply: FastifyReply,
-  done: () => void
+  done: () => void,
 ) {
   if (reply.statusCode === 200) {
     const { id } = req.params as { id: string };

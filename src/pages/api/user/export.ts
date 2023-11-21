@@ -77,7 +77,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
           write_stream.close();
           logger.debug(`finished writing zip to ${path} at ${data.length} bytes written`);
           logger.info(
-            `Export for ${user.username} (${user.id}) has completed and is available at ${export_name}`
+            `Export for ${user.username} (${user.id}) has completed and is available at ${export_name}`,
           );
         }
       } else {

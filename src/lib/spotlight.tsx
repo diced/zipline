@@ -36,7 +36,7 @@ export const createSpotlightActions = (router: NextRouter): SpotlightAction[] =>
     title: string,
     description: string,
     link: string,
-    icon: ReactNode
+    icon: ReactNode,
   ): SpotlightAction => {
     return actionDo(group, title, description, icon, () => linkTo(link));
   };
@@ -46,7 +46,7 @@ export const createSpotlightActions = (router: NextRouter): SpotlightAction[] =>
     title: string,
     description: string,
     icon: ReactNode,
-    action: () => void
+    action: () => void,
   ): SpotlightAction => {
     return {
       group,
@@ -70,7 +70,7 @@ export const createSpotlightActions = (router: NextRouter): SpotlightAction[] =>
       'Manage Account',
       'Manage your account settings',
       '/dashboard/manage',
-      <IconUser />
+      <IconUser />,
     ),
 
     // Actions
@@ -80,14 +80,14 @@ export const createSpotlightActions = (router: NextRouter): SpotlightAction[] =>
       'Upload Files',
       'Upload files of any kind',
       '/dashboard/upload/file',
-      <IconFileUpload />
+      <IconFileUpload />,
     ),
     actionLink(
       'Actions',
       'Upload Text',
       'Upload code, or any other kind of text file',
       '/dashboard/upload/text',
-      <IconFileText />
+      <IconFileText />,
     ),
     actionDo('Actions', 'Copy Token', 'Copy your API token to your clipboard', <IconClipboardCopy />, () => {
       clipboard.copy(user.token);
