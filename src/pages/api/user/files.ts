@@ -139,7 +139,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       expiresAt: Date;
       maxViews: number;
       views: number;
-      size: number;
+      size: bigint;
       originalName: string;
       thumbnail?: { name: string };
     }[] = await prisma.file.findMany({

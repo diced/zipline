@@ -28,6 +28,12 @@ const logger = Logger.get('server');
 
 const server = fastify(genFastifyOpts());
 
+// Normally I would never condone this, but I lack the patience to deal with this correctly.
+// This is just to get JSON.stringify to globally serialize BigInt's
+BigInt.prototype['toJSON'] = function () {
+  return Number(this);
+};
+
 if (dev) {
   server.addHook('onRoute', (opts) => {
     logger.child('route').debug(JSON.stringify(opts));
