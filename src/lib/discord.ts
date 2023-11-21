@@ -8,7 +8,7 @@ const logger = Logger.get('discord');
 
 export function parseContent(
   content: ConfigDiscordContent,
-  args: ParseValue
+  args: ParseValue,
 ): ConfigDiscordContent & { url: string } {
   return {
     content: content.content ? parseString(content.content, args) : null,

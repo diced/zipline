@@ -93,7 +93,7 @@ async function start() {
           url: req.url,
           headers: req.headers,
           body: req.headers['content-type']?.startsWith('application/json') ? req.body : undefined,
-        })
+        }),
       );
     }
 
@@ -185,7 +185,7 @@ Disallow: ${config.urls.route}
     .info(
       `started ${dev ? 'development' : 'production'} zipline@${version} server${
         config.features.headless ? ' (headless)' : ''
-      }`
+      }`,
     );
 
   await clearInvites.bind(server)();

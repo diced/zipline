@@ -3,7 +3,7 @@ import { FastifyInstance, FastifyReply } from 'fastify';
 import fastifyPlugin from 'fastify-plugin';
 
 function postUrlDecorator(fastify: FastifyInstance, _, done) {
-  fastify.decorateReply('postUrl', postUrl);
+  fastify.decorateReply('postUrl', postUrl.bind(fastify));
   done();
 
   async function postUrl(this: FastifyReply, url: Url) {

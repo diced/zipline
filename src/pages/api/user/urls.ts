@@ -38,7 +38,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     for (let i = 0; i !== urls.length; ++i) {
       (urls[i] as unknown as { url: string }).url = formatRootUrl(
         config.urls.route,
-        urls[i].vanity ?? urls[i].id
+        urls[i].vanity ?? urls[i].id,
       );
     }
     return res.json(urls);

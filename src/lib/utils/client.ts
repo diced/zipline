@@ -125,7 +125,7 @@ export function expireReadToDate(expires: string): Date {
       '6m': Date.now() + 6 * 30 * 24 * 60 * 60 * 1000,
       '8m': Date.now() + 8 * 30 * 24 * 60 * 60 * 1000,
       '1y': Date.now() + 365 * 24 * 60 * 60 * 1000,
-    }[expires]
+    }[expires],
   );
 }
 

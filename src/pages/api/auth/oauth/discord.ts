@@ -30,7 +30,7 @@ async function handler({ code, state, host }: OAuthQuery, logger: Logger): Promi
         config.oauth.discord_client_id,
         `${config.core.return_https ? 'https' : 'http'}://${host}`,
         state,
-        config.oauth.discord_redirect_uri
+        config.oauth.discord_redirect_uri,
       ),
     };
 

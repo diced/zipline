@@ -49,13 +49,10 @@ export class S3 extends Datasource {
     });
   }
 
-  public size(file: string): Promise<number> {
-    return new Promise((res) => {
-      this.s3.statObject(this.config.bucket, file, (err, stat) => {
-        if (err) res(0);
-        else res(stat.size);
-      });
-    });
+  public async size(file: string): Promise<number> {
+    const stat = await this.s3.statObject(this.config.bucket, file);
+
+    return stat.size;
   }
 
   public async fullSize(): Promise<number> {

@@ -268,7 +268,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
           size: s.size,
           full: s.name,
         }))
-        .sort((a, b) => a.date.getTime() - b.date.getTime())
+        .sort((a, b) => a.date.getTime() - b.date.getTime()),
     );
   };
 
@@ -487,7 +487,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
             {oauth_providers
               .filter(
                 (x) =>
-                  !user.oauth?.map(({ provider }) => provider.toLowerCase()).includes(x.name.toLowerCase())
+                  !user.oauth?.map(({ provider }) => provider.toLowerCase()).includes(x.name.toLowerCase()),
               )
               .map(({ link_url, name, Icon }, i) => (
                 <Button key={i} size='lg' leftIcon={<Icon />} component={Link} href={link_url} my='sm'>
