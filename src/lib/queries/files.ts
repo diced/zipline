@@ -29,7 +29,7 @@ export const useFiles = (query: { [key: string]: string } = {}) => {
               ...x,
               createdAt: new Date(x.createdAt),
               expiresAt: x.expiresAt ? new Date(x.expiresAt) : null,
-            }))
+            })),
       );
   });
 };
@@ -59,7 +59,7 @@ export const usePaginatedFiles = (page?: number, options?: Partial<PaginatedFile
           ...x,
           createdAt: new Date(x.createdAt),
           expiresAt: x.expiresAt ? new Date(x.expiresAt) : null,
-        }))
+        })),
       );
   });
 };
@@ -73,7 +73,7 @@ export const useRecent = (filter?: string) => {
           ...x,
           createdAt: new Date(x.createdAt),
           expiresAt: x.expiresAt ? new Date(x.expiresAt) : null,
-        }))
+        })),
       );
   });
 };
@@ -94,7 +94,7 @@ export function useFileDelete() {
       onSuccess: () => {
         queryClient.refetchQueries(['files']);
       },
-    }
+    },
   );
 }
 
@@ -114,7 +114,7 @@ export function useFileFavorite() {
       onSuccess: () => {
         queryClient.refetchQueries(['files']);
       },
-    }
+    },
   );
 }
 

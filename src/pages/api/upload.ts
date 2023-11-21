@@ -111,7 +111,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         start,
         end,
         total,
-      })}`
+      })}`,
     );
 
     const tempFile = join(zconfig.core.temp_directory, `zipline_partial_${identifier}_${start}_${end}`);
@@ -203,8 +203,8 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         mimetype: x.mimetype,
         size: x.size,
         encoding: x.encoding,
-      }))
-    )}`
+      })),
+    )}`,
   );
 
   for (let i = 0; i !== req.files.length; ++i) {
@@ -272,7 +272,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       const buffer = await sharp(file.buffer).jpeg({ quality: imageCompressionPercent }).toBuffer();
       await datasource.save(fileUpload.name, buffer);
       logger.info(
-        `User ${user.username} (${user.id}) compressed image from ${file.buffer.length} -> ${buffer.length} bytes`
+        `User ${user.username} (${user.id}) compressed image from ${file.buffer.length} -> ${buffer.length} bytes`,
       );
     } else {
       await datasource.save(fileUpload.name, file.buffer);
@@ -299,7 +299,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         user,
         fileUpload,
         `${domain}/r/${invis ? invis.invis : encodeURI(fileUpload.name)}`,
-        responseUrl
+        responseUrl,
       );
     }
 

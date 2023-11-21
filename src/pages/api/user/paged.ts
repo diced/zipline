@@ -15,7 +15,7 @@ const sortByValidator = s.enum(
     'size',
     'name',
     'mimetype',
-  ] satisfies (keyof Prisma.FileOrderByWithRelationInput)[])
+  ] satisfies (keyof Prisma.FileOrderByWithRelationInput)[]),
 );
 
 const orderValidator = s.enum('asc', 'desc');

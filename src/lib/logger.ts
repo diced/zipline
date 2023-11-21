@@ -60,8 +60,8 @@ export default class Logger {
       this.formatMessage(
         LoggerLevel.ERROR,
         this.name,
-        args.map((error) => (typeof error === 'string' ? error : (error as Error).stack)).join(' ')
-      )
+        args.map((error) => (typeof error === 'string' ? error : (error as Error).stack)).join(' '),
+      ),
     );
 
     return this;

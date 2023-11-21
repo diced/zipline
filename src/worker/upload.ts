@@ -59,7 +59,7 @@ async function start() {
   logger.debug('starting worker');
 
   const partials = await readdir(config.core.temp_directory).then((files) =>
-    files.filter((x) => x.startsWith(`zipline_partial_${file.identifier}`))
+    files.filter((x) => x.startsWith(`zipline_partial_${file.identifier}`)),
   );
 
   const readChunks = partials.map((x) => {

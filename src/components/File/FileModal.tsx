@@ -125,7 +125,7 @@ export default function FileModal({
             icon: <IconPhotoCancel size='1rem' />,
           });
         },
-      }
+      },
     );
   };
 

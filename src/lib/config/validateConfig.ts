@@ -141,7 +141,7 @@ const validator = s.object({
           s.object({
             label: s.string,
             link: s.string,
-          })
+          }),
         )
         .default([
           { label: 'Zipline', link: 'https://github.com/diced/zipline' },

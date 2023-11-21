@@ -57,7 +57,7 @@ export default function EmbeddedFile({
     img.addEventListener('load', function () {
       if (this.naturalWidth > innerWidth)
         imageEl.width = Math.floor(
-          this.naturalWidth * Math.min(innerHeight / this.naturalHeight, innerWidth / this.naturalWidth)
+          this.naturalWidth * Math.min(innerHeight / this.naturalHeight, innerWidth / this.naturalWidth),
         );
       else imageEl.width = this.naturalWidth;
     });

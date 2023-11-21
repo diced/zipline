@@ -51,7 +51,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
     const success = verify_totp_code(user.totpSecret, code);
     logger.debug(
-      `body(${JSON.stringify(req.body)}): verify_totp_code(${user.totpSecret}, ${code}) => ${success}`
+      `body(${JSON.stringify(req.body)}): verify_totp_code(${user.totpSecret}, ${code}) => ${success}`,
     );
     if (!success) return res.badRequest('Invalid code', { totp: true });
   }

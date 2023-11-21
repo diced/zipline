@@ -25,7 +25,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
 
       if (files.length !== add.length)
         return res.badRequest(
-          `files ${add.filter((id) => !files.find((file) => file.id === Number(id))).join(', ')} not found`
+          `files ${add.filter((id) => !files.find((file) => file.id === Number(id))).join(', ')} not found`,
         );
 
       const folder = await prisma.folder.create({
@@ -87,7 +87,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
 
           (folder.files[j] as unknown as { url: string }).url = formatRootUrl(
             config.uploader.route,
-            folder.files[j].name
+            folder.files[j].name,
           );
         }
       }
