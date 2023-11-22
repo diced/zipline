@@ -36,7 +36,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
             error: 'oauth token expired',
             redirect_uri: discord_auth.oauth_url(
               zconfig.oauth.discord_client_id,
-              `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}`
+              `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}`,
             ),
           });
         }
@@ -60,7 +60,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
             error: 'oauth token expired',
             redirect_uri: discord_auth.oauth_url(
               zconfig.oauth.discord_client_id,
-              `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}`
+              `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}`,
             ),
           });
         }
@@ -80,7 +80,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       const resp = await fetch(
         `https://people.googleapis.com/v1/people/me?access_token=${
           user.oauth.find((o) => o.provider === 'GOOGLE').token
-        }&personFields=names,photos`
+        }&personFields=names,photos`,
       );
       if (!resp.ok) {
         const provider = user.oauth.find((o) => o.provider === 'GOOGLE');
@@ -91,7 +91,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
             error: 'oauth token expired',
             redirect_uri: google_auth.oauth_url(
               zconfig.oauth.google_client_id,
-              `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}`
+              `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}`,
             ),
           });
         }
@@ -114,7 +114,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
             error: 'oauth token expired',
             redirect_uri: google_auth.oauth_url(
               zconfig.oauth.google_client_id,
-              `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}`
+              `${zconfig.core.return_https ? 'https' : 'http'}://${req.headers.host}`,
             ),
           });
         }

@@ -213,7 +213,7 @@ export function OptionsModal({
 export default function useUploadOptions(): [
   UploadOptionsState,
   Dispatch<SetStateAction<boolean>>,
-  ReactNode
+  ReactNode,
 ] {
   const [state, setState] = useReducer((state, newState) => ({ ...state, ...newState }), {
     expires: 'never',

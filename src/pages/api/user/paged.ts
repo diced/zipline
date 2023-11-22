@@ -15,7 +15,7 @@ const sortByValidator = s.enum(
     'size',
     'name',
     'mimetype',
-  ] satisfies (keyof Prisma.FileOrderByWithRelationInput)[])
+  ] satisfies (keyof Prisma.FileOrderByWithRelationInput)[]),
 );
 
 const orderValidator = s.enum('asc', 'desc');
@@ -83,7 +83,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     maxViews: number;
     views: number;
     folderId: number;
-    size: number;
+    size: bigint;
     password: string | boolean;
     thumbnail?: { name: string };
   }[] = await prisma.file.findMany({

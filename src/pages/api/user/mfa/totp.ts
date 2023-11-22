@@ -44,7 +44,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     logger.debug(
       `body(${JSON.stringify(req.body)}): verify_totp_code(${user.totpSecret}, ${
         req.body.code
-      }) => ${success}`
+      }) => ${success}`,
     );
 
     if (!success) return res.badRequest('Invalid code');

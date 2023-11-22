@@ -26,7 +26,7 @@ export interface OAuthResponse {
 export const withOAuth =
   (
     provider: 'discord' | 'github' | 'google',
-    oauth: (query: OAuthQuery, logger: Logger) => Promise<OAuthResponse>
+    oauth: (query: OAuthQuery, logger: Logger) => Promise<OAuthResponse>,
   ) =>
   async (req: NextApiReq, res: NextApiRes) => {
     const logger = Logger.get(`oauth::${provider}`);
@@ -172,7 +172,7 @@ export const withOAuth =
 
       res.setUserCookie(existingOauth.userId);
       Logger.get('user').info(
-        `User ${existingOauth.username} (${existingOauth.id}) logged in via oauth(${provider})`
+        `User ${existingOauth.username} (${existingOauth.id}) logged in via oauth(${provider})`,
       );
 
       return res.redirect('/dashboard');

@@ -36,6 +36,6 @@ export function useURLDelete() {
           ?.filter((u) => u.id !== variables);
         queryClient.setQueryData(['urls'], dataWithoutDeleted);
       },
-    }
+    },
   );
 }

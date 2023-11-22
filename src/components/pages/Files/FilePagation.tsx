@@ -29,7 +29,7 @@ export default function FilePagation({ disableMediaPreview, exifEnabled, queryPa
           },
         },
         undefined,
-        { shallow: true }
+        { shallow: true },
       );
 
       const { count } = await useFetch(`/api/user/paged?count=true${!checked ? '&filter=media' : ''}`);

@@ -7,7 +7,7 @@ export type ApiError = {
 export default async function useFetch(
   url: string,
   method: 'GET' | 'POST' | 'PATCH' | 'DELETE' = 'GET',
-  body: ApiError | Record<string, unknown> = null
+  body: ApiError | Record<string, unknown> = null,
 ) {
   const headers = {};
   if (body) headers['content-type'] = 'application/json';

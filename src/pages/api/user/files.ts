@@ -76,7 +76,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       if (file.thumbnail?.name) await datasource.delete(file.thumbnail.name);
 
       logger.info(
-        `User ${user.username} (${user.id}) deleted an image ${file.name} (${file.id}) owned by ${file.user.username} (${file.user.id})`
+        `User ${user.username} (${user.id}) deleted an image ${file.name} (${file.id}) owned by ${file.user.username} (${file.user.id})`,
       );
 
       // @ts-ignore
@@ -139,7 +139,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       expiresAt: Date;
       maxViews: number;
       views: number;
-      size: number;
+      size: bigint;
       originalName: string;
       thumbnail?: { name: string };
     }[] = await prisma.file.findMany({

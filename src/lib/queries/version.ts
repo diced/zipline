@@ -21,6 +21,6 @@ export const useVersion = () => {
       refetchInterval: false,
       refetchOnMount: false,
       retry: false,
-    }
+    },
   );
 };

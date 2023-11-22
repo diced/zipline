@@ -20,7 +20,7 @@ function dbFileDecorator(fastify: FastifyInstance, _, done) {
 
     this.header('Content-Length', size);
     this.header('Content-Type', download ? 'application/octet-stream' : file.mimetype);
-    this.header('Content-Disposition', `inline; filename="${file.originalName || file.name}"`);
+    this.header('Content-Disposition', `inline; filename="${encodeURI(file.originalName || file.name)}"`);
 
     return this.send(data);
   }

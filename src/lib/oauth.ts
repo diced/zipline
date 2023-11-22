@@ -16,9 +16,9 @@ export const github_auth = {
 };
 
 export const discord_auth = {
-  oauth_url: (clientId: string, origin: string, state?: string) =>
+  oauth_url: (clientId: string, origin: string, state?: string, redirect_uri?: string) =>
     `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(
-      `${origin}/api/auth/oauth/discord`
+      redirect_uri || `${origin}/api/auth/oauth/discord`,
     )}&response_type=code&scope=identify${state ? `&state=${state}` : ''}`,
   oauth_user: async (access_token: string) => {
     const res = await fetch('https://discord.com/api/users/@me', {
@@ -33,15 +33,15 @@ export const discord_auth = {
 };
 
 export const google_auth = {
-  oauth_url: (clientId: string, origin: string, state?: string) =>
+  oauth_url: (clientId: string, origin: string, state?: string, redirect_uri?: string) =>
     `https://accounts.google.com/o/oauth2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(
-      `${origin}/api/auth/oauth/google`
+      redirect_uri || `${origin}/api/auth/oauth/google`,
     )}&response_type=code&access_type=offline&scope=https://www.googleapis.com/auth/userinfo.profile${
       state ? `&state=${state}` : ''
     }`,
   oauth_user: async (access_token: string) => {
     const res = await fetch(
-      `https://people.googleapis.com/v1/people/me?access_token=${access_token}&personFields=names,photos`
+      `https://people.googleapis.com/v1/people/me?access_token=${access_token}&personFields=names,photos`,
     );
     if (!res.ok) return null;
 

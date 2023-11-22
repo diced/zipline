@@ -280,7 +280,7 @@ export default function Layout({ children, props }) {
                     component={Link}
                     href={link}
                   />
-                )
+                ),
               )}
           </Navbar.Section>
           <Navbar.Section>
@@ -416,16 +416,20 @@ export default function Layout({ children, props }) {
                   </Menu.Item>
                   <Menu.Divider />
                   <>
-                    {oauth_providers.filter((x) =>
-                      user.oauth?.map(({ provider }) => provider.toLowerCase()).includes(x.name.toLowerCase())
+                    {oauth_providers.filter(
+                      (x) =>
+                        user.oauth
+                          ?.map(({ provider }) => provider.toLowerCase())
+                          .includes(x.name.toLowerCase()),
                     ).length ? (
                       <Menu.Label>Connected Accounts</Menu.Label>
                     ) : null}
                     {oauth_providers
-                      .filter((x) =>
-                        user.oauth
-                          ?.map(({ provider }) => provider.toLowerCase())
-                          .includes(x.name.toLowerCase())
+                      .filter(
+                        (x) =>
+                          user.oauth
+                            ?.map(({ provider }) => provider.toLowerCase())
+                            .includes(x.name.toLowerCase()),
                       )
                       .map(({ name, Icon }, i) => (
                         <>
@@ -438,8 +442,11 @@ export default function Layout({ children, props }) {
                           </Menu.Item>
                         </>
                       ))}
-                    {oauth_providers.filter((x) =>
-                      user.oauth?.map(({ provider }) => provider.toLowerCase()).includes(x.name.toLowerCase())
+                    {oauth_providers.filter(
+                      (x) =>
+                        user.oauth
+                          ?.map(({ provider }) => provider.toLowerCase())
+                          .includes(x.name.toLowerCase()),
                     ).length ? (
                       <Menu.Divider />
                     ) : null}

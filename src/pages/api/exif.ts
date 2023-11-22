@@ -26,7 +26,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   if (!image) return res.notFound('image not found');
 
   logger.info(
-    `${user.username} (${user.id}) requested to read exif metadata for image ${image.name} (${image.id})`
+    `${user.username} (${user.id}) requested to read exif metadata for image ${image.name} (${image.id})`,
   );
 
   if (config.datasource.type === 'local') {
