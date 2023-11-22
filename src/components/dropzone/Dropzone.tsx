@@ -12,7 +12,7 @@ export default function Dropzone({ loading, onDrop, children }) {
       ]}
     >
       <MantineDropzone loading={loading} onDrop={onDrop} styles={{ inner: { pointerEvents: 'none' } }}>
-        <Group position='center' spacing='xl' style={{ minHeight: 440 }}>
+        <Group position='center' spacing='xl' style={{ minHeight: 440, flexDirection: 'column' }}>
           <IconPhoto size={80} />
 
           <Text size='xl' inline>
