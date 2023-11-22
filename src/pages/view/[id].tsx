@@ -1,4 +1,4 @@
-import { Box, Button, Modal, PasswordInput } from '@mantine/core';
+import { Box, Button, Modal, PasswordInput, Title } from '@mantine/core';
 import type { File, Thumbnail } from '@prisma/client';
 import AnchorNext from 'components/AnchorNext';
 import exts from 'lib/exts';
@@ -27,12 +27,17 @@ export default function EmbeddedFile({
   host: string;
   compress?: boolean;
 }) {
-  const dataURL = (route: string) => `${route}/${encodeURI(file.name)}?compress=${compress ?? false}`;
+  const dataURL = (route: string, pass?: string) =>
+    `${route}/${encodeURIComponent(file.name)}?compress=${compress ?? false}${
+      pass ? `&password=${encodeURIComponent(pass)}` : ''
+    }`;
 
   const router = useRouter();
-  const [opened, setOpened] = useState(pass);
+  const [opened, setOpened] = useState(pass || !!file.password);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+
+  const [downloadWPass, setDownloadWPass] = useState(false);
 
   // reapply date from workaround
   file.createdAt = new Date(file ? file.createdAt : 0);
@@ -45,12 +50,15 @@ export default function EmbeddedFile({
       if (prismRender) return router.push(`/code/${file.name}?password=${password}`);
       updateImage(`/api/auth/image?id=${file.id}&password=${password}`);
       setOpened(false);
+      setDownloadWPass(true);
     } else {
       setError('Invalid password');
     }
   };
 
   const updateImage = async (url?: string) => {
+    if (!file.mimetype.startsWith('image')) return;
+
     const imageEl = document.getElementById('image_content') as HTMLImageElement;
 
     const img = new Image();
@@ -163,14 +171,13 @@ export default function EmbeddedFile({
       <Modal
         opened={opened}
         onClose={() => setOpened(false)}
-        title='Password Protected'
+        title={<Title order={3}>Password Protected</Title>}
         centered={true}
-        withCloseButton={true}
+        withCloseButton={false}
         closeOnEscape={false}
         closeOnClickOutside={false}
       >
         <PasswordInput
-          label='Password'
           placeholder='Password'
           error={error}
           value={password}
@@ -203,7 +210,7 @@ export default function EmbeddedFile({
         {!file.mimetype.startsWith('video') &&
           !file.mimetype.startsWith('image') &&
           !file.mimetype.startsWith('audio') && (
-            <AnchorNext component={Link} href={dataURL('/r')}>
+            <AnchorNext component={Link} href={dataURL('/r', downloadWPass ? password : undefined)}>
               Can&#39;t preview this file. Click here to download it.
             </AnchorNext>
           )}
@@ -225,6 +232,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   });
   let host = context.req.headers.host;
   if (!file) return { notFound: true };
+
+  // @ts-ignore
+  file.size = Number(file.size);
 
   const proto = context.req.headers['x-forwarded-proto'];
   try {
