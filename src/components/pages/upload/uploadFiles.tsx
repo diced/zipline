@@ -106,8 +106,9 @@ export function uploadFiles(
 
   const req = new XMLHttpRequest();
 
-  req.addEventListener('progress', (e) => {
+  req.upload.addEventListener('progress', (e) => {
     if (e.lengthComputable) {
+      console.log(e.loaded, e.total);
       setProgress(Math.round((e.loaded / e.total) * 100));
     }
   });
@@ -119,11 +120,11 @@ export function uploadFiles(
       setLoading(false);
       setProgress(0);
 
-      if ((res as ErrorBody).error) {
+      if ((res as ErrorBody).code) {
         notifications.update({
           id: 'upload',
           title: 'Error uploading files',
-          message: (res as ErrorBody).error,
+          message: (res as ErrorBody).message,
           color: 'red',
           icon: <IconFileXFilled size='1rem' />,
           autoClose: true,

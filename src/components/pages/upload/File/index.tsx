@@ -6,6 +6,7 @@ import {
   Collapse,
   Grid,
   Group,
+  Paper,
   Progress,
   Text,
   Title,
@@ -80,7 +81,12 @@ export default function UploadFile() {
         </Tooltip>
       </Group>
 
-      <Dropzone onDrop={(f) => setFiles([...f, ...files])} my='sm' loading={dropLoading}>
+      <Dropzone
+        onDrop={(f) => setFiles([...f, ...files])}
+        my='sm'
+        loading={dropLoading}
+        disabled={dropLoading}
+      >
         <Group position='center' spacing='xl' style={{ minHeight: rem(220), pointerEvents: 'none' }}>
           <Dropzone.Accept>
             <IconUpload
@@ -114,8 +120,18 @@ export default function UploadFile() {
         </Group>
       </Dropzone>
 
-      <Collapse in={progress !== 0}>
-        {progress !== 0 && <Progress my='sm' label={`${Math.floor(progress)}%`} value={progress} animate />}
+      <Collapse in={progress > 0 && progress < 100}>
+        {progress > 0 && progress < 100 && (
+          <Progress my='sm' size='xl' label={`${Math.floor(progress)}%`} value={progress} animate />
+        )}
+      </Collapse>
+
+      <Collapse in={progress === 100}>
+        <Paper withBorder p='xs' radius='sm'>
+          <Text align='center' size='sm' color='yellow'>
+            Finalizing upload(s)...
+          </Text>
+        </Paper>
       </Collapse>
 
       <Grid grow my='sm'>

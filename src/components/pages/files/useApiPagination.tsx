@@ -18,12 +18,13 @@ type ApiPaginationOptions = {
 };
 
 const fetcher = async (
-  { options }: { options: ApiPaginationOptions } = {
+  { options }: { options: ApiPaginationOptions; key: string } = {
     options: {
       page: 1,
     },
+    key: '/api/user/files',
   },
-) => {
+): Promise<Response['/api/user/files']> => {
   const searchParams = new URLSearchParams();
   if (options.page) searchParams.append('page', options.page.toString());
   if (options.filter) searchParams.append('filter', options.filter);

@@ -25,6 +25,16 @@ const MODE = process.env.NODE_ENV || 'production';
 const logger = log('server');
 const scheduler = new Scheduler();
 
+declare global {
+  interface BigInt {
+    toJSON(): number;
+  }
+}
+
+BigInt.prototype.toJSON = function () {
+  return Number(this.toString());
+};
+
 async function main() {
   logger.info('starting zipline', { mode: MODE, version: version });
 

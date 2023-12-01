@@ -80,8 +80,8 @@ export async function handler(req: NextApiReq, res: NextApiRes<ApiUserStatsRespo
     favoriteFiles: favCount ?? 0,
     views: aggFile._sum.views ?? 0,
     avgViews: aggFile._avg.views ?? 0,
-    storageUsed: aggFile._sum.size ?? 0,
-    avgStorageUsed: aggFile._avg.size ?? 0,
+    storageUsed: Number(aggFile._sum.size ?? 0),
+    avgStorageUsed: Number(aggFile._avg.size ?? 0),
     urlsCreated: aggUrl._count._all ?? 0,
     urlViews: aggUrl._sum.views ?? 0,
 

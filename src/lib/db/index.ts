@@ -28,6 +28,14 @@ function getClient() {
 
   const client = new PrismaClient().$extends({
     result: {
+      file: {
+        size: {
+          needs: { size: true },
+          compute({ size }: { size: bigint }) {
+            return Number(size);
+          },
+        },
+      },
       user: {
         view: {
           needs: { view: true },

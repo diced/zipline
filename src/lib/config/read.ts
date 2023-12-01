@@ -331,7 +331,7 @@ function parse(value: string, type: EnvType) {
     case 'boolean':
       return boolean(value);
     case 'byte':
-      return bytes(Number(value));
+      return bytes(value);
     case 'ms':
       return msFn(value);
     case 'json[]':

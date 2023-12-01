@@ -121,7 +121,7 @@ model File {
 
   name         String // name & file saved on datasource
   originalName String? // original name of file when uploaded
-  size         Int
+  size         BigInt
   type         String
   views        Int     @default(0)
   maxViews     Int?
