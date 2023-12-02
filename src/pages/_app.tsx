@@ -3,9 +3,16 @@ import Head from 'next/head';
 import { SWRConfig } from 'swr';
 import { ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';
-import '@/components/render/code/HighlightCode.css';
 import { ZiplineTheme } from '@/lib/theme';
 import Theming from '@/components/ThemeProvider';
+
+import '@mantine/core/styles.css';
+import '@mantine/dates/styles.css';
+import '@mantine/dropzone/styles.css';
+import '@mantine/notifications/styles.css';
+import 'mantine-datatable/styles.css';
+
+import '@/lib/theme/override.css';
 
 const fetcher = async (url: RequestInfo | URL) => {
   const res = await fetch(url);

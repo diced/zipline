@@ -1,5 +1,5 @@
 import Layout from '@/components/Layout';
-import UploadText from '@/components/pages/upload/Text';
+import UploadText from '@/components/pages/upload/Text/index';
 import useLogin from '@/lib/hooks/useLogin';
 import { withSafeConfig } from '@/lib/middleware/next/withSafeConfig';
 import { useUploadOptionsStore } from '@/lib/store/uploadOptions';

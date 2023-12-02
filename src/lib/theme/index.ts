@@ -1,6 +1,6 @@
-import { MantineTheme, MantineThemeOverride, rem } from '@mantine/core';
+import { AppShell, LoadingOverlay, MantineTheme, MantineThemeOverride, Modal } from '@mantine/core';
 
-export type ZiplineTheme = MantineTheme & { id: string; name: string };
+export type ZiplineTheme = MantineTheme & { id: string; name: string; colorScheme: string };
 
 export function findTheme(id: string, themes: ZiplineTheme[] = []): ZiplineTheme | undefined {
   return themes.find((theme) => theme.id === id);
@@ -10,33 +10,21 @@ export function themeComponents(theme: ZiplineTheme): MantineThemeOverride {
   return {
     ...theme,
     components: {
-      Paper: {
-        styles: (theme) => ({
-          root: {
-            '&[data-with-border]': {
-              border: `${rem(1)} solid ${
-                theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[3]
-              }`,
-            },
-          },
-        }),
-      },
-      AppShell: {
-        styles: (theme) => ({
+      AppShell: AppShell.extend({
+        styles: (t) => ({
           main: {
-            background: `${
-              theme.colorScheme === 'dark' ? theme.colors.dark[7] : theme.colors.gray[0]
-            } !important`,
+            background: `${theme.colorScheme === 'dark' ? t.colors.dark[8] : t.colors.gray[0]} !important`,
           },
         }),
-      },
-      LoadingOverlay: {
+      }),
+      LoadingOverlay: LoadingOverlay.extend({
         defaultProps: {
-          // overlayColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : 'white',
-          overlayOpacity: 0.3,
+          overlayProps: {
+            opacity: 0.3,
+          },
         },
-      },
-      Modal: {
+      }),
+      Modal: Modal.extend({
         defaultProps: {
           closeButtonProps: { size: 'lg' },
           centered: true,
@@ -44,7 +32,7 @@ export function themeComponents(theme: ZiplineTheme): MantineThemeOverride {
             blur: 6,
           },
         },
-      },
+      }),
     },
   };
 }

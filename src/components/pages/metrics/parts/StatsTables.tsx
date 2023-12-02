@@ -10,67 +10,67 @@ export default function StatsTables({ data }: { data: Metric[] }) {
 
   return (
     <>
-      <SimpleGrid cols={2} breakpoints={[{ maxWidth: 'sm', cols: 1 }]}>
+      <SimpleGrid cols={{ base: 1, md: 2 }}>
         <Paper radius='sm' withBorder>
           <Table highlightOnHover>
-            <thead>
-              <tr>
-                <th>User</th>
-                <th>Files</th>
-                <th>Storage Used</th>
-                <th>Views</th>
-              </tr>
-            </thead>
-            <tbody>
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>User</Table.Th>
+                <Table.Th>Files</Table.Th>
+                <Table.Th>Storage Used</Table.Th>
+                <Table.Th>Views</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
               {recent.data.filesUsers.map((count, i) => (
-                <tr key={i}>
-                  <td>{count.username}</td>
-                  <td>{count.sum}</td>
-                  <td>{bytes(count.storage)}</td>
-                  <td>{count.views}</td>
-                </tr>
+                <Table.Tr key={i}>
+                  <Table.Td>{count.username}</Table.Td>
+                  <Table.Td>{count.sum}</Table.Td>
+                  <Table.Td>{bytes(count.storage)}</Table.Td>
+                  <Table.Td>{count.views}</Table.Td>
+                </Table.Tr>
               ))}
-            </tbody>
+            </Table.Tbody>
           </Table>
         </Paper>
 
         <Paper radius='sm' withBorder>
           <Table highlightOnHover>
-            <thead>
-              <tr>
-                <th>User</th>
-                <th>URLs</th>
-                <th>Views</th>
-              </tr>
-            </thead>
-            <tbody>
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>User</Table.Th>
+                <Table.Th>URLs</Table.Th>
+                <Table.Th>Views</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
               {recent.data.urlsUsers.map((count, i) => (
-                <tr key={i}>
-                  <td>{count.username}</td>
-                  <td>{count.sum}</td>
-                  <td>{count.views}</td>
-                </tr>
+                <Table.Tr key={i}>
+                  <Table.Td>{count.username}</Table.Td>
+                  <Table.Td>{count.sum}</Table.Td>
+                  <Table.Td>{count.views}</Table.Td>
+                </Table.Tr>
               ))}
-            </tbody>
+            </Table.Tbody>
           </Table>
         </Paper>
 
         <Paper radius='sm' withBorder>
           <Table highlightOnHover>
-            <thead>
-              <tr>
-                <th>Type</th>
-                <th>Files</th>
-              </tr>
-            </thead>
-            <tbody>
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>Type</Table.Th>
+                <Table.Th>Files</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
               {recent.data.types.map((count, i) => (
-                <tr key={i}>
-                  <td>{count.type}</td>
-                  <td>{count.sum}</td>
-                </tr>
+                <Table.Tr key={i}>
+                  <Table.Td>{count.type}</Table.Td>
+                  <Table.Td>{count.sum}</Table.Td>
+                </Table.Tr>
               ))}
-            </tbody>
+            </Table.Tbody>
           </Table>
         </Paper>
 

@@ -13,12 +13,12 @@ import {
 function StatCard({ title, value, Icon }: { title: string; value: number | string; Icon: TablerIcon }) {
   return (
     <Paper radius='sm' withBorder p='sm'>
-      <Group position='apart'>
-        <Text size='xl' weight='bolder' color='dimmed'>
+      <Group justify='space-between'>
+        <Text size='xl' fw='bolder'>
           {title}
         </Text>
 
-        <Icon size='1rem' />
+        <Icon size='1.2rem' />
       </Group>
 
       <Title order={1}>{value}</Title>
@@ -32,11 +32,11 @@ export default function StatsCards({ data }: { data: Metric[] }) {
 
   return (
     <SimpleGrid
-      cols={3}
-      breakpoints={[
-        { maxWidth: 'sm', cols: 1 },
-        { maxWidth: 'md', cols: 2 },
-      ]}
+      cols={{
+        base: 1,
+        md: 2,
+        lg: 3,
+      }}
       mb='sm'
     >
       <StatCard title='Files' value={recent.data.files} Icon={IconFiles} />

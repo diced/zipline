@@ -57,12 +57,12 @@ export default function FavoriteFiles() {
             <Accordion.Panel>
               <SimpleGrid
                 my='sm'
-                cols={data?.page.length ?? 0 > 0 ? 3 : 1}
+                cols={{
+                  base: 1,
+                  md: 2,
+                  lg: data?.page.length ?? 0 > 0 ? 3 : 1,
+                }}
                 spacing='md'
-                breakpoints={[
-                  { maxWidth: 'sm', cols: 1 },
-                  { maxWidth: 'md', cols: 2 },
-                ]}
                 pos='relative'
               >
                 {isLoading ? (
@@ -81,8 +81,8 @@ export default function FavoriteFiles() {
                         </Group>
                         <Button
                           variant='outline'
-                          compact
-                          leftIcon={<IconFileUpload size='1rem' />}
+                          size='compact-sm'
+                          leftSection={<IconFileUpload size='1rem' />}
                           component={Link}
                           href='/dashboard/upload/file'
                         >

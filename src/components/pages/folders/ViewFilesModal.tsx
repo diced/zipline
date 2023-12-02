@@ -28,14 +28,14 @@ export default function ViewFilesModal({
         <SimpleGrid
           my='sm'
           spacing='md'
-          cols={3}
-          breakpoints={[
-            { maxWidth: 'sm', cols: 1 },
-            { maxWidth: 'md', cols: 2 },
-          ]}
+          cols={{
+            base: 1,
+            md: 2,
+            lg: 3,
+          }}
           pos='relative'
         >
-          {folder?.files!.map((file) => <DashboardFile file={file} key={file.id} />)}
+          {folder?.files?.map((file) => <DashboardFile file={file} key={file.id} />)}
         </SimpleGrid>
       )}
     </Modal>

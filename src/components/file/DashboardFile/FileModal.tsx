@@ -1,5 +1,15 @@
 import { File } from '@/lib/db/models/file';
-import { ActionIcon, Group, Modal, Select, SimpleGrid, Title, Tooltip } from '@mantine/core';
+import {
+  ActionIcon,
+  Combobox,
+  Group,
+  InputBase,
+  Modal,
+  SimpleGrid,
+  Title,
+  Tooltip,
+  useCombobox,
+} from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import {
   Icon,
@@ -34,6 +44,7 @@ import { Response } from '@/lib/api/response';
 import { Folder } from '@/lib/db/models/folder';
 import { bytes } from '@/lib/bytes';
 import { useSettingsStore } from '@/lib/store/settings';
+import { useState } from 'react';
 
 function ActionButton({
   Icon,
@@ -73,12 +84,23 @@ export default function FileModal({
     '/api/user/folders?noincl=true',
   );
 
+  const combobox = useCombobox();
+  const [search, setSearch] = useState('');
+
+  const handleAdd = async (value: string) => {
+    if (value === '$create') {
+      createFolderAndAdd(file!, search.trim());
+    } else {
+      addToFolder(file!, value);
+    }
+  };
+
   return (
     <Modal
       opened={open}
       onClose={() => setOpen(false)}
       title={
-        <Title order={3} weight={700}>
+        <Title order={3} fw={700}>
           {file?.name ?? ''}
         </Title>
       }
@@ -88,35 +110,33 @@ export default function FileModal({
         blur: 3,
         opacity: 0.5,
       }}
+      zIndex={200}
     >
       {file ? (
         <>
           <DashboardFileType file={file} show />
 
-          <SimpleGrid
-            cols={3}
-            spacing='md'
-            my='xs'
-            breakpoints={[
-              { maxWidth: 'sm', cols: 1, spacing: 'sm' },
-              {
-                maxWidth: 'md',
-                cols: 2,
-              },
-            ]}
-          >
+          <SimpleGrid cols={{ base: 1, md: 2, lg: 3 }} spacing='md' my='xs'>
             <FileStat Icon={IconFileInfo} title='Type' value={file.type} />
             <FileStat Icon={IconDeviceSdCard} title='Size' value={bytes(file.size)} />
-            <FileStat Icon={IconUpload} title='Created at' value={file.createdAt.toLocaleString()} />
-            <FileStat Icon={IconRefresh} title='Updated at' value={file.updatedAt.toLocaleString()} />
+            <FileStat
+              Icon={IconUpload}
+              title='Created at'
+              value={new Date(file.createdAt).toLocaleString()}
+            />
+            <FileStat
+              Icon={IconRefresh}
+              title='Updated at'
+              value={new Date(file.updatedAt).toLocaleString()}
+            />
             {file.deletesAt && !reduce && (
               <FileStat Icon={IconBombFilled} title='Deletes at' value={file.deletesAt.toLocaleString()} />
             )}
             <FileStat Icon={IconEyeFilled} title='Views' value={file.views} />
           </SimpleGrid>
 
-          <Group position='apart' mt='lg'>
-            <Group position='left'>
+          <Group justify='space-between' mt='lg'>
+            <Group>
               {!reduce &&
                 (file.folderId ? (
                   <ActionButton
@@ -128,20 +148,53 @@ export default function FileModal({
                     color='red'
                   />
                 ) : (
-                  <Select
-                    data={folders?.map((f: any) => ({ value: f.id, label: f.name })) ?? []}
-                    placeholder='Add to a folder...'
-                    searchable
-                    creatable
-                    getCreateLabel={(value) => `Create folder "${value}"`}
-                    onCreate={(query) => createFolderAndAdd(file, query)}
-                    onChange={(value) => addToFolder(file, value)}
-                    size='xs'
-                  />
+                  <Combobox
+                    store={combobox}
+                    withinPortal={false}
+                    onOptionSubmit={(value) => handleAdd(value)}
+                  >
+                    <Combobox.Target>
+                      <InputBase
+                        rightSection={<Combobox.Chevron />}
+                        value={search}
+                        onChange={(event) => {
+                          combobox.openDropdown();
+                          combobox.updateSelectedOptionIndex();
+                          setSearch(event.currentTarget.value);
+                        }}
+                        onClick={() => combobox.openDropdown()}
+                        onFocus={() => combobox.openDropdown()}
+                        onBlur={() => {
+                          combobox.closeDropdown();
+                          setSearch(search || '');
+                        }}
+                        placeholder='Add to folder...'
+                        rightSectionPointerEvents='none'
+                      />
+                    </Combobox.Target>
+
+                    <Combobox.Dropdown>
+                      <Combobox.Options>
+                        {folders
+                          ?.filter((f) => f.name.toLowerCase().includes(search.toLowerCase().trim()))
+                          .map((f) => (
+                            <Combobox.Option value={f.id} key={f.id}>
+                              {f.name}
+                            </Combobox.Option>
+                          ))}
+
+                        {!folders?.some((f) => f.name === search) && search.trim().length > 0 && (
+                          <Combobox.Option value='$create'>
+                            + Create folder &quot;{search}&quot;
+                          </Combobox.Option>
+                        )}
+                      </Combobox.Options>
+                    </Combobox.Dropdown>
+                  </Combobox>
                 ))}
             </Group>
 
-            <Group position='right'>
+            <Group>
               {!reduce && (
                 <>
                   <ActionButton
@@ -154,7 +207,7 @@ export default function FileModal({
                     Icon={file.favorite ? IconStarFilled : IconStar}
                     onClick={() => favoriteFile(file)}
                     tooltip={file.favorite ? 'Unfavorite file' : 'Favorite file'}
-                    color={file.favorite ? 'yellow' : 'gray'}
+                    color={file.favorite ? 'gray' : 'yellow'}
                   />
                 </>
               )}

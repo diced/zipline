@@ -1,6 +1,6 @@
 import { ErrorBody } from './response';
 
-export async function fetchApi<Response = any, _Error = string>(
+export async function fetchApi<Response = any>(
   route: string,
   method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' = 'GET',
   body: any = null,
@@ -26,6 +26,11 @@ export async function fetchApi<Response = any, _Error = string>(
   } else {
     if (res.headers.get('Content-Type')?.startsWith('application/json')) {
       error = await res.json();
+    } else {
+      error = {
+        message: await res.text(),
+        code: res.status,
+      } as ErrorBody;
     }
   }
 

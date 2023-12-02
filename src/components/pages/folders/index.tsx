@@ -53,7 +53,7 @@ export default function DashboardFolders() {
     <>
       <Modal centered opened={open} onClose={() => setOpen(false)} title={<Title>Create a folder</Title>}>
         <form onSubmit={form.onSubmit(onSubmit)}>
-          <Stack spacing='sm'>
+          <Stack gap='sm'>
             <TextInput label='Name' placeholder='Enter a name...' {...form.getInputProps('name')} />
             <Switch
               label='Public'
@@ -61,7 +61,7 @@ export default function DashboardFolders() {
               {...form.getInputProps('isPublic', { type: 'checkbox' })}
             />
 
-            <Button type='submit' variant='outline' radius='sm' leftIcon={<IconFolderPlus size='1rem' />}>
+            <Button type='submit' variant='outline' radius='sm' leftSection={<IconFolderPlus size='1rem' />}>
               Create
             </Button>
           </Stack>

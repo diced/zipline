@@ -7,7 +7,7 @@ export default function GridTableSwitcher({ type }: { type: Exclude<keyof ViewSt
 
   return (
     <SegmentedControl
-      sx={{ marginLeft: 'auto' }}
+      ml='auto'
       size='xs'
       data={[
         {

@@ -49,13 +49,17 @@ export default function UserTableView() {
       <Box my='sm'>
         <DataTable
           borderRadius='sm'
-          withBorder
+          withTableBorder
           minHeight={200}
           records={sorted ?? []}
           columns={[
             {
               accessor: 'avatar',
-              render: (user) => <Avatar src={user.avatar}>{user.username[0].toUpperCase()}</Avatar>,
+              render: (user) => (
+                <Avatar radius='sm' src={user.avatar}>
+                  {user.username[0].toUpperCase()}
+                </Avatar>
+              ),
             },
             { accessor: 'username', sortable: true },
             {
@@ -79,7 +83,7 @@ export default function UserTableView() {
               accessor: 'actions',
               width: 150,
               render: (user) => (
-                <Group spacing='sm'>
+                <Group gap='sm'>
                   <Tooltip label="View user's files">
                     <ActionIcon
                       component={Link}
@@ -120,7 +124,7 @@ export default function UserTableView() {
           ]}
           fetching={isLoading}
           sortStatus={sortStatus}
-          onSortStatusChange={(s) => setSortStatus(s)}
+          onSortStatusChange={(s) => setSortStatus(s as unknown as any)}
         />
       </Box>
     </>

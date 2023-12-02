@@ -1,3 +1,4 @@
+import ExternalAuthButton from '@/components/pages/login/ExternalAuthButton';
 import { Response } from '@/lib/api/response';
 import { SafeConfig } from '@/lib/config/safe';
 import { getZipline } from '@/lib/db/models/zipline';
@@ -20,14 +21,15 @@ import {
   Title,
 } from '@mantine/core';
 import { hasLength, useForm } from '@mantine/form';
-import { notifications } from '@mantine/notifications';
+import { notifications, showNotification } from '@mantine/notifications';
 import {
   IconBrandDiscordFilled,
   IconBrandGithubFilled,
-  IconBrandGoogle,
+  IconBrandGoogleFilled,
   IconCircleKeyFilled,
   IconKey,
   IconShieldQuestion,
+  IconUserPlus,
   IconX,
 } from '@tabler/icons-react';
 import { InferGetServerSidePropsType } from 'next';
@@ -149,12 +151,18 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
     }
   }, []);
 
-  // remove setpasskeyerrored after 3 seconds
   useEffect(() => {
     if (passkeyErrored) {
       setTimeout(() => {
         setPasskeyErrored(false);
       }, 3000);
+
+      showNotification({
+        title: 'Error while authenticating with passkey',
+        message: 'Please try again',
+        color: 'red',
+        icon: <IconX size='1rem' />,
+      });
     }
   }, [passkeyErrored]);
 
@@ -183,14 +191,14 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
           />
         </Center>
         {pinError && (
-          <Text align='center' size='sm' color='red' mt={0}>
+          <Text ta='center' size='sm' c='red' mt={0}>
             {pinError}
           </Text>
         )}
 
         <Group mt='sm' grow>
           <Button
-            leftIcon={<IconX size='1rem' />}
+            leftSection={<IconX size='1rem' />}
             color='red'
             variant='outline'
             onClick={() => {
@@ -201,7 +209,7 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
             Cancel login attempt
           </Button>
           <Button
-            leftIcon={<IconShieldQuestion size='1rem' />}
+            leftSection={<IconShieldQuestion size='1rem' />}
             loading={pinDisabled}
             type='submit'
             onClick={() => onSubmit(form.values, pin)}
@@ -213,7 +221,7 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
 
       <Center
         h='100vh'
-        sx={
+        style={
           config.website.loginBackground
             ? {
                 backgroundImage: `url(${config.website.loginBackground})`,
@@ -226,13 +234,13 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
       >
         <Card
           p='xl'
-          sx={(t) => ({
-            backgroundColor: config.website.loginBackground ? t.fn.rgba('white', 0.1) : undefined,
+          style={{
+            backgroundColor: config.website.loginBackground ? 'rgba(255, 255, 255, 0.1)' : undefined,
             backdropFilter: config.website.loginBackground ? 'blur(25px)' : undefined,
-          })}
+          }}
           withBorder
         >
-          <Title order={1} size={50} align='center'>
+          <Title order={1} size={50} ta='center'>
             <b>{config.website.title ?? 'Zipline'}</b>
           </Title>
 
@@ -241,7 +249,7 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
               <form onSubmit={form.onSubmit((v) => onSubmit(v))}>
                 <Stack my='sm'>
                   <TextInput
-                    size='lg'
+                    size='md'
                     placeholder='Enter your username...'
                     styles={{
                       input: {
@@ -252,7 +260,7 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
                   />
 
                   <PasswordInput
-                    size='lg'
+                    size='md'
                     placeholder='Enter your password...'
                     styles={{
                       input: {
@@ -263,7 +271,7 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
                   />
 
                   <Button
-                    size='lg'
+                    size='md'
                     fullWidth
                     type='submit'
                     loading={isLoading}
@@ -278,96 +286,54 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
 
           <Stack my='xs'>
             {eitherTrue(config.features.oauthRegistration, config.features.userRegistration) && (
-              <Text size='sm' align='center' color='dimmed'>
+              <Text size='sm' ta='center' c='dimmed'>
                 or
               </Text>
             )}
 
             <Button
               onClick={handlePasskeyLogin}
-              size='lg'
+              size='md'
               fullWidth
               variant='outline'
-              leftIcon={<IconKey size='1rem' />}
-              color={passkeyErrored ? 'red' : 'primary'}
+              leftSection={<IconKey size='1rem' />}
+              color={passkeyErrored ? 'red' : undefined}
               loading={passkeyLoading}
             >
               Login with passkey
             </Button>
 
             {config.features.userRegistration && (
-              <Button component={Link} href='/auth/register' size='lg' fullWidth variant='outline'>
+              <Button
+                component={Link}
+                href='/auth/register'
+                size='md'
+                fullWidth
+                variant='outline'
+                leftSection={<IconUserPlus size='1rem' />}
+              >
                 Sign up
               </Button>
             )}
             {config.oauthEnabled.discord && (
-              <Button
-                size='lg'
-                fullWidth
-                variant='filled'
-                component={Link}
-                href='/api/auth/oauth/discord'
-                leftIcon={<IconBrandDiscordFilled />}
-                color='discord.0'
-                sx={(t) => ({
-                  '&:hover': {
-                    backgroundColor: t.fn.darken(t.colors.discord[0], 0.1),
-                  },
-                })}
-              >
-                Sign in with Discord
-              </Button>
+              <ExternalAuthButton
+                provider='Discord'
+                alpha={0.1}
+                leftSection={<IconBrandDiscordFilled stroke={4} />}
+              />
             )}
             {config.oauthEnabled.github && (
-              <Button
-                size='lg'
-                fullWidth
-                color='github.0'
-                component={Link}
-                href='/api/auth/oauth/github'
-                leftIcon={<IconBrandGithubFilled />}
-                sx={(t) => ({
-                  '&:hover': {
-                    backgroundColor: t.fn.darken(t.colors.github[0], 0.1),
-                  },
-                })}
-              >
-                Sign in with GitHub
-              </Button>
+              <ExternalAuthButton provider='GitHub' alpha={0.1} leftSection={<IconBrandGithubFilled />} />
             )}
             {config.oauthEnabled.google && (
-              <Button
-                size='lg'
-                fullWidth
-                component={Link}
-                href='/api/auth/oauth/google'
-                leftIcon={<IconBrandGoogle stroke={4} />}
-                color='google.0'
-                sx={(t) => ({
-                  '&:hover': {
-                    backgroundColor: t.fn.darken(t.colors.google[0], 0.1),
-                  },
-                })}
-              >
-                Sign in with Google
-              </Button>
+              <ExternalAuthButton
+                provider='Google'
+                alpha={0.1}
+                leftSection={<IconBrandGoogleFilled stroke={4} />}
+              />
             )}
             {config.oauthEnabled.authentik && (
-              <Button
-                size='lg'
-                fullWidth
-                color='authentik.0'
-                component={Link}
-                href='/api/auth/oauth/authentik'
-                leftIcon={<IconCircleKeyFilled />}
-                sx={(t) => ({
-                  '&:hover': {
-                    backgroundColor: t.fn.darken(t.colors.authentik[0], 0.2),
-                  },
-                })}
-              >
-                Sign in with Authentik
-              </Button>
+              <ExternalAuthButton provider='Authentik' alpha={0.2} leftSection={<IconCircleKeyFilled />} />
             )}
           </Stack>
         </Card>

@@ -8,7 +8,7 @@ export default function SettingsGenerators() {
   return (
     <Paper withBorder p='sm'>
       <Title order={2}>Generate Uploaders</Title>
-      <Text size='sm' color='dimmed' mt={3}>
+      <Text size='sm' c='dimmed' mt={3}>
         Generate scripts for upload tools. The Flameshot and Shell Script generators are supported on only
         Linux and macOS.
       </Text>

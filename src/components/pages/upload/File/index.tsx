@@ -15,7 +15,7 @@ import {
   useMantineTheme,
 } from '@mantine/core';
 import { Dropzone } from '@mantine/dropzone';
-import { useClipboard } from '@mantine/hooks';
+import { useClipboard, useColorScheme } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { IconDeviceSdCard, IconFiles, IconPhoto, IconUpload, IconX } from '@tabler/icons-react';
 import Link from 'next/link';
@@ -27,6 +27,7 @@ import { bytes } from '@/lib/bytes';
 
 export default function UploadFile() {
   const theme = useMantineTheme();
+  const colorScheme = useColorScheme();
   const clipboard = useClipboard();
   const config = useConfig();
 
@@ -71,7 +72,7 @@ export default function UploadFile() {
 
   return (
     <>
-      <Group spacing='sm'>
+      <Group gap='sm'>
         <Title order={1}>Upload files</Title>
 
         <Tooltip label='View your files'>
@@ -87,20 +88,16 @@ export default function UploadFile() {
         loading={dropLoading}
         disabled={dropLoading}
       >
-        <Group position='center' spacing='xl' style={{ minHeight: rem(220), pointerEvents: 'none' }}>
+        <Group justify='center' gap='xl' style={{ minHeight: rem(220), pointerEvents: 'none' }}>
           <Dropzone.Accept>
             <IconUpload
               size='3.2rem'
               stroke={1.5}
-              color={theme.colors[theme.primaryColor][theme.colorScheme === 'dark' ? 4 : 6]}
+              color={theme.colors[theme.primaryColor][colorScheme === 'dark' ? 4 : 6]}
             />
           </Dropzone.Accept>
           <Dropzone.Reject>
-            <IconX
-              size='3.2rem'
-              stroke={1.5}
-              color={theme.colors.red[theme.colorScheme === 'dark' ? 4 : 6]}
-            />
+            <IconX size='3.2rem' stroke={1.5} color={theme.colors.red[colorScheme === 'dark' ? 4 : 6]} />
           </Dropzone.Reject>
           <Dropzone.Idle>
             <IconPhoto size='3.2rem' stroke={1.5} />
@@ -110,10 +107,10 @@ export default function UploadFile() {
             <Text size='xl' inline>
               Drag images here or click to select files
             </Text>
-            <Text size='sm' color='dimmed' inline mt={7}>
+            <Text size='sm' c='dimmed' inline mt={7}>
               Attach as many files as you like, they will show up below to review before uploading.
             </Text>
-            <Text size='sm' color='dimmed' mt={7}>
+            <Text size='sm' c='dimmed' mt={7}>
               <b>{bytes(config.files.maxFileSize)}</b> limit per file
             </Text>
           </div>
@@ -122,13 +119,15 @@ export default function UploadFile() {
 
       <Collapse in={progress > 0 && progress < 100}>
         {progress > 0 && progress < 100 && (
-          <Progress my='sm' size='xl' label={`${Math.floor(progress)}%`} value={progress} animate />
+          <Progress my='sm' size='xl' value={progress} animated>
+            <Progress.Label>{Math.floor(progress)}%</Progress.Label>
+          </Progress>
         )}
       </Collapse>
 
       <Collapse in={progress === 100}>
         <Paper withBorder p='xs' radius='sm'>
-          <Text align='center' size='sm' color='yellow'>
+          <Text ta='center' size='sm' color='yellow'>
             Finalizing upload(s)...
           </Text>
         </Paper>
@@ -142,12 +141,12 @@ export default function UploadFile() {
         ))}
       </Grid>
 
-      <Group position='right' spacing='sm' my='md'>
+      <Group justify='right' gap='sm' my='md'>
         <UploadOptionsButton numFiles={files.length} />
 
         <Button
           variant='outline'
-          leftIcon={<IconUpload size={18} />}
+          leftSection={<IconUpload size={18} />}
           disabled={files.length === 0 || dropLoading}
           onClick={upload}
         >

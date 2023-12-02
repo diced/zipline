@@ -55,10 +55,10 @@ export async function handleOverrideColors(theme: ZiplineTheme) {
     ...theme,
     colors: {
       ...theme.colors,
-      google: theme.colors?.google || ['#4285F4'],
-      github: theme.colors?.github || ['#24292E'],
-      authentik: theme.colors?.authentik || ['#FD4B2D'],
-      discord: theme.colors?.discord || ['#5865F2'],
+      google: theme.colors?.google || Array(10).fill('#4285F4'),
+      github: theme.colors?.github || Array(10).fill('#24292E'),
+      authentik: theme.colors?.authentik || Array(10).fill('#FD4B2D'),
+      discord: theme.colors?.discord || Array(10).fill('#5865F2'),
     },
   } as ZiplineTheme;
 }

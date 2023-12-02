@@ -23,7 +23,7 @@ import { useUserStore } from '@/lib/store/user';
 
 export type GeneratorOptions = {
   deletesAt: string | null;
-  format: Config['files']['defaultFormat'] | null;
+  format: Config['files']['defaultFormat'] | 'default';
   imageCompressionPercent: number | null;
   maxViews: number | null;
   addOriginalName: boolean | null;
@@ -60,9 +60,9 @@ export const download = (name: string, text: string) => {
   document.body.removeChild(element);
 };
 
-export const defaultGeneratorOptions = {
+export const defaultGeneratorOptions: GeneratorOptions = {
   deletesAt: null,
-  format: null,
+  format: 'default',
   imageCompressionPercent: null,
   maxViews: null,
   addOriginalName: null,
@@ -106,12 +106,12 @@ export default function GeneratorButton({
     <>
       <Modal opened={opened} onClose={() => setOpen(false)} title={<Title>Generate {name}</Title>}>
         {desc && (
-          <Text size='sm' color='dimmed'>
+          <Text size='sm' c='dimmed'>
             {desc}
           </Text>
         )}
 
-        <Stack spacing='xs' my='sm'>
+        <Stack gap='xs' my='sm'>
           <Select
             data={[
               { label: 'Upload File', value: 'file' },
@@ -122,9 +122,12 @@ export default function GeneratorButton({
             value={generatorType}
             onChange={(value) => setGeneratorType(value ?? 'file')}
             defaultValue='file'
-            portalProps={{
-              style: {
-                zIndex: 100000000,
+            comboboxProps={{
+              withinPortal: true,
+              portalProps: {
+                style: {
+                  zIndex: 100000000,
+                },
               },
             }}
           />
@@ -133,7 +136,7 @@ export default function GeneratorButton({
 
           <Select
             data={[
-              { value: null as unknown as string, label: 'Default' },
+              { value: 'default', label: 'Default' },
               { value: 'random', label: 'Random' },
               { value: 'date', label: 'Date' },
               { value: 'uuid', label: 'UUID' },
@@ -142,14 +145,16 @@ export default function GeneratorButton({
             ]}
             label='Name format'
             description='The file name format to use when uploading files, the "File name" field will override this value.'
-            icon={<IconWriting size='1rem' />}
+            leftSection={<IconWriting size='1rem' />}
             value={options.format}
-            onChange={(value) => setOption({ format: value as any })}
+            onChange={(value) => setOption({ format: (value || 'default') as GeneratorOptions['format'] })}
             defaultValue={null}
-            withinPortal
-            portalProps={{
-              style: {
-                zIndex: 100000000,
+            comboboxProps={{
+              withinPortal: true,
+              portalProps: {
+                style: {
+                  zIndex: 100000000,
+                },
               },
             }}
             disabled={!onlyFile}
@@ -158,34 +163,34 @@ export default function GeneratorButton({
           <NumberInput
             label='Compression'
             description='The compression level to use on images (only). Leave blank to disable compression.'
-            icon={<IconPercentage size='1rem' />}
+            leftSection={<IconPercentage size='1rem' />}
             max={100}
             min={0}
             value={options.imageCompressionPercent || ''}
-            onChange={(value) => setOption({ imageCompressionPercent: value === '' ? null : value })}
+            onChange={(value) => setOption({ imageCompressionPercent: value === '' ? null : Number(value) })}
             disabled={!onlyFile}
           />
 
           <NumberInput
             label='Max Views'
             description='The maximum number of views files/urls can have before they are deleted. Leave blank to allow as many views as you want.'
-            icon={<IconEyeFilled size='1rem' />}
+            leftSection={<IconEyeFilled size='1rem' />}
             min={0}
             value={options.maxViews || ''}
-            onChange={(value) => setOption({ maxViews: value === '' ? null : value })}
+            onChange={(value) => setOption({ maxViews: value === '' ? null : Number(value) })}
           />
 
           <TextInput
             label='Override Domain'
             description='Override the domain with this value. This will change the domain returned in your uploads. Leave blank to use the default domain.'
-            icon={<IconGlobe size='1rem' />}
+            leftSection={<IconGlobe size='1rem' />}
             value={options.overrides_returnDomain ?? ''}
             onChange={(event) =>
               setOption({ overrides_returnDomain: event.currentTarget.value.trim() || null })
             }
           />
 
-          <Text color='dimmed' size='sm'>
+          <Text c='dimmed' size='sm'>
             <b>Other Options</b>
           </Text>
 
@@ -277,7 +282,7 @@ export default function GeneratorButton({
           <Button
             onClick={() => generators[name as keyof typeof generators](token!, generatorType as any, options)}
             fullWidth
-            leftIcon={<IconDownload size='1rem' />}
+            leftSection={<IconDownload size='1rem' />}
             size='sm'
           >
             Download
@@ -285,7 +290,7 @@ export default function GeneratorButton({
         </Stack>
       </Modal>
 
-      <Button size='sm' leftIcon={icon} onClick={() => setOpen(true)}>
+      <Button size='sm' leftSection={icon} onClick={() => setOpen(true)}>
         {name}
       </Button>
     </>

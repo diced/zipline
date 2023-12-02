@@ -14,11 +14,11 @@ export default function DashboardSettings() {
 
   return (
     <>
-      <Group spacing='sm'>
+      <Group gap='sm'>
         <Title order={1}>Settings</Title>
       </Group>
 
-      <SimpleGrid mt='md' cols={2} spacing='lg' breakpoints={[{ maxWidth: 'sm', cols: 1 }]}>
+      <SimpleGrid mt='md' cols={{ base: 1, md: 2 }} spacing='lg'>
         <SettingsUser />
 
         <SettingsAvatar />

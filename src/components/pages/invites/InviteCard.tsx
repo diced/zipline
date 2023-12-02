@@ -15,24 +15,27 @@ export default function InviteCard({ invite }: { invite: Invite }) {
     <>
       <Card withBorder shadow='sm' radius='sm'>
         <Card.Section withBorder inheritPadding py='xs'>
-          <Group position='apart'>
-            <Text weight={400}>{invite.code}</Text>
+          <Group justify='space-between'>
+            <Text fw={400}>{invite.code}</Text>
 
             <Menu withinPortal position='bottom-end' shadow='sm'>
-              <Group spacing={2}>
+              <Group gap={2}>
                 <Menu.Target>
-                  <ActionIcon>
+                  <ActionIcon variant='transparent'>
                     <IconDots size='1rem' />
                   </ActionIcon>
                 </Menu.Target>
               </Group>
 
               <Menu.Dropdown>
-                <Menu.Item icon={<IconCopy size='1rem' />} onClick={() => copyInviteUrl(invite, clipboard)}>
+                <Menu.Item
+                  leftSection={<IconCopy size='1rem' />}
+                  onClick={() => copyInviteUrl(invite, clipboard)}
+                >
                   Copy URL
                 </Menu.Item>
                 <Menu.Item
-                  icon={<IconTrashFilled size='1rem' />}
+                  leftSection={<IconTrashFilled size='1rem' />}
                   color='red'
                   onClick={() => deleteInvite(warnDeletion, invite)}
                 >
@@ -44,22 +47,22 @@ export default function InviteCard({ invite }: { invite: Invite }) {
         </Card.Section>
 
         <Card.Section inheritPadding py='xs'>
-          <Stack spacing={1}>
-            <Text size='xs' color='dimmed'>
+          <Stack gap={1}>
+            <Text size='xs' c='dimmed'>
               <b>Created By:</b> {invite.inviter!.username}
             </Text>
-            <Text size='xs' color='dimmed'>
+            <Text size='xs' c='dimmed'>
               <b>Created:</b> <RelativeDate date={invite.createdAt} />
             </Text>
             {invite.expiresAt && (
-              <Text size='xs' color='dimmed'>
+              <Text size='xs' c='dimmed'>
                 <b>Expires:</b> <RelativeDate date={invite.expiresAt} />
               </Text>
             )}
-            <Text size='xs' color='dimmed'>
+            <Text size='xs' c='dimmed'>
               <b>Max Uses:</b> {invite.maxUses ?? 'Unlimited'}
             </Text>
-            <Text size='xs' color='dimmed'>
+            <Text size='xs' c='dimmed'>
               <b>Uses:</b> {invite.uses.toLocaleString()}
             </Text>
           </Stack>

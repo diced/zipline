@@ -93,7 +93,7 @@ export default function Register({ config, invite }: InferGetServerSidePropsType
         <Paper withBorder p='sm'>
           {invite && (
             <div>
-              <Title order={4} weight={500}>
+              <Title order={4} fw={500}>
                 You have been invited to join <b>{config.website.title}</b> by{' '}
                 <b>{invite.inviter!.username}</b>
               </Title>
@@ -105,11 +105,11 @@ export default function Register({ config, invite }: InferGetServerSidePropsType
           </Text>
 
           <form onSubmit={form.onSubmit(onSubmit)}>
-            <Stack spacing='sm'>
+            <Stack gap='sm'>
               <TextInput label='Username' placeholder='Username' {...form.getInputProps('username')} />
               <PasswordInput label='Password' placeholder='Password' {...form.getInputProps('password')} />
 
-              <Button type='submit' fullWidth leftIcon={<IconPlus size='1rem' />}>
+              <Button type='submit' fullWidth leftSection={<IconPlus size='1rem' />}>
                 Register
               </Button>
             </Stack>

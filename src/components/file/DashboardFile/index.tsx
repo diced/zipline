@@ -4,6 +4,8 @@ import { useState } from 'react';
 import DashboardFileType from '../DashboardFileType';
 import FileModal from './FileModal';
 
+import styles from './index.module.css';
+
 export default function DashboardFile({ file, reduce }: { file: File; reduce?: boolean }) {
   const [open, setOpen] = useState(false);
 
@@ -11,21 +13,7 @@ export default function DashboardFile({ file, reduce }: { file: File; reduce?: b
     <>
       <FileModal open={open} setOpen={setOpen} file={file} reduce={reduce} />
 
-      <Card
-        shadow='md'
-        radius='md'
-        p={0}
-        h={300}
-        sx={{
-          '&:hover': {
-            cursor: 'pointer',
-            boxShadow: '0 0 0 1px rgba(0, 0, 0, 0.1), 0 4px 12px -1px rgba(0, 0, 0, 0.1)',
-            filter: 'brightness(0.86)',
-          },
-          transition: 'all 0.2s ease-in-out',
-        }}
-        onClick={() => setOpen(true)}
-      >
+      <Card shadow='md' radius='md' p={0} h={300} onClick={() => setOpen(true)} className={styles.file}>
         <DashboardFileType key={file.id} file={file} />
       </Card>
     </>

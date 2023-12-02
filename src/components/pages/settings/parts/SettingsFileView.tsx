@@ -78,12 +78,12 @@ export default function SettingsFileView() {
   return (
     <Paper withBorder p='sm'>
       <Title order={2}>Viewing Files</Title>
-      <Text color='dimmed' mt='xs'>
+      <Text c='dimmed' mt='xs'>
         All text fields support using variables.
       </Text>
-      <Stack spacing='sm' mt='xs'>
+      <Stack gap='sm' mt='xs'>
         <form onSubmit={form.onSubmit(onSubmit)}>
-          <SimpleGrid cols={2} spacing='sm' breakpoints={[{ maxWidth: 'sm', cols: 1 }]} mb='xs'>
+          <SimpleGrid cols={{ base: 1, md: 2 }} spacing='sm' mb='xs'>
             <Switch
               label='Enable View Routes'
               description='Enable viewing files through customizable view-routes'
@@ -114,11 +114,11 @@ export default function SettingsFileView() {
               { value: 'center', label: 'Center' },
               { value: 'right', label: 'Right' },
             ]}
-            itemComponent={({ label, value, ...props }) => (
-              <Group position={value} {...props}>
-                {label}
-              </Group>
-            )}
+            // itemComponent={({ label, value, ...props }) => (
+            //   <Group position={value} {...props}>
+            //     {label}
+            //   </Group>
+            // )}
             disabled={!form.values.enabled}
             {...form.getInputProps('align')}
           />
@@ -132,7 +132,7 @@ export default function SettingsFileView() {
             {...form.getInputProps('embed', { type: 'checkbox' })}
           />
 
-          <SimpleGrid cols={2} spacing='sm' breakpoints={[{ maxWidth: 'sm', cols: 1 }]}>
+          <SimpleGrid cols={{ base: 1, md: 2 }} spacing='sm'>
             <TextInput
               label='Embed Title'
               disabled={!form.values.embed}
@@ -155,7 +155,7 @@ export default function SettingsFileView() {
             />
           </SimpleGrid>
 
-          <Group position='left' mt='sm'>
+          <Group justify='left' mt='sm'>
             <Button variant='outline' type='submit'>
               Save
             </Button>

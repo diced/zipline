@@ -9,7 +9,7 @@ export default function SettingsMfa() {
   return (
     <Paper withBorder p='sm'>
       <Title order={2}>Multi-Factor Authentication</Title>
-      <Text size='sm' color='dimmed' mt={3}>
+      <Text size='sm' c='dimmed' mt={3}>
         Setup 2FA or passkeys to add an extra layer of security to your account.
       </Text>
 

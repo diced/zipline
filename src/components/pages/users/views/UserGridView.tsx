@@ -19,11 +19,11 @@ export default function UserGridView() {
         <SimpleGrid
           my='sm'
           spacing='md'
-          cols={4}
-          breakpoints={[
-            { maxWidth: 'sm', cols: 1 },
-            { maxWidth: 'md', cols: 2 },
-          ]}
+          cols={{
+            base: 1,
+            md: 2,
+            lg: 4,
+          }}
           pos='relative'
         >
           {users?.map((user) => <UserCard key={user.id} user={user} />)}
@@ -36,7 +36,7 @@ export default function UserGridView() {
                 <IconFilesOff size='2rem' />
                 <Title order={2}>No users found</Title>
               </Group>
-              <Text size='sm' color='dimmed'>
+              <Text size='sm' c='dimmed'>
                 Create a user to see them here
               </Text>
             </Stack>

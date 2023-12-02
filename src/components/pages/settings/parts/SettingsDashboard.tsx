@@ -1,41 +1,7 @@
 import { useThemes } from '@/components/ThemeProvider';
-import { mergeTheme } from '@/lib/mergeTheme';
 import { useSettingsStore } from '@/lib/store/settings';
-import { ZiplineTheme } from '@/lib/theme';
-import {
-  ColorSwatch,
-  DEFAULT_THEME,
-  Group,
-  MantineThemeOverride,
-  NumberInput,
-  Paper,
-  Select,
-  Stack,
-  Switch,
-  Text,
-  Title,
-} from '@mantine/core';
+import { Group, NumberInput, Paper, Select, Stack, Switch, Text, Title } from '@mantine/core';
 import { IconMoonFilled, IconPaintFilled, IconPercentage, IconSunFilled } from '@tabler/icons-react';
-
-function ThemeSelectItem({ value, label, ...others }: { value: string; label: string }) {
-  const themes = useThemes();
-  const theme: ZiplineTheme | undefined = themes.find((theme) => theme.id === value);
-
-  const mergedTheme = mergeTheme(DEFAULT_THEME, theme as MantineThemeOverride);
-
-  return (
-    <Group {...others}>
-      <div>{label}</div>
-      {value !== 'system' && (
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          {mergedTheme.colors[mergedTheme.colorScheme === 'dark' ? 'dark' : mergedTheme?.primaryColor]?.map(
-            (color) => <ColorSwatch key={color} color={color} size={18} style={{ marginRight: '0.5rem' }} />,
-          )}
-        </div>
-      )}
-    </Group>
-  );
-}
 
 export default function SettingsDashboard() {
   const [settings, update] = useSettingsStore((state) => [state.settings, state.update]);
@@ -44,11 +10,11 @@ export default function SettingsDashboard() {
   return (
     <Paper withBorder p='sm'>
       <Title order={2}>Dashboard Settings</Title>
-      <Text size='sm' color='dimmed' mt={3}>
+      <Text size='sm' c='dimmed' mt={3}>
         These settings are saved in your browser.
       </Text>
 
-      <Stack spacing='sm' my='xs'>
+      <Stack gap='sm' my='xs'>
         <Group grow>
           <Switch
             label='Disable Media Preview'
@@ -70,10 +36,10 @@ export default function SettingsDashboard() {
           min={0}
           max={100}
           value={settings.searchThreshold}
-          onChange={(value) => update('searchThreshold', value === '' ? 0 : value)}
+          onChange={(value) => update('searchThreshold', value === '' ? 0 : Number(value))}
           step={0.01}
-          precision={2}
-          icon={<IconPercentage size='1rem' />}
+          decimalScale={2}
+          leftSection={<IconPercentage size='1rem' />}
         />
 
         <Select
@@ -85,8 +51,7 @@ export default function SettingsDashboard() {
           ]}
           value={settings.theme}
           onChange={(value) => update('theme', value ?? 'builtin:dark_gray')}
-          itemComponent={ThemeSelectItem}
-          icon={<IconPaintFilled size='1rem' />}
+          leftSection={<IconPaintFilled size='1rem' />}
         />
 
         {settings.theme === 'system' && (
@@ -100,8 +65,7 @@ export default function SettingsDashboard() {
               value={settings.themeDark}
               onChange={(value) => update('themeDark', value ?? 'builtin:dark_gray')}
               disabled={settings.theme !== 'system'}
-              itemComponent={ThemeSelectItem}
-              icon={<IconMoonFilled size='1rem' />}
+              leftSection={<IconMoonFilled size='1rem' />}
             />
 
             <Select
@@ -113,8 +77,7 @@ export default function SettingsDashboard() {
               value={settings.themeLight}
               onChange={(value) => update('themeLight', value ?? 'builtin:light_gray')}
               disabled={settings.theme !== 'system'}
-              itemComponent={ThemeSelectItem}
-              icon={<IconSunFilled size='1rem' />}
+              leftSection={<IconSunFilled size='1rem' />}
             />
           </Group>
         )}

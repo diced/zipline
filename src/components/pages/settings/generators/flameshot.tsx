@@ -24,7 +24,7 @@ export function flameshot(token: string, type: 'file' | 'url', options: Generato
     delete toAddHeaders['x-zipline-deletes-at'];
   }
 
-  if (options.format !== null && type === 'file') {
+  if (options.format !== 'default' && type === 'file') {
     toAddHeaders['x-zipline-format'] = options.format;
   } else {
     delete toAddHeaders['x-zipline-format'];

@@ -16,12 +16,12 @@ export default function ViewFolder({ folder }: InferGetServerSidePropsType<typeo
 
         <SimpleGrid
           my='sm'
-          cols={3}
+          cols={{
+            base: 1,
+            lg: 3,
+            md: 2,
+          }}
           spacing='md'
-          breakpoints={[
-            { maxWidth: 'sm', cols: 1 },
-            { maxWidth: 'md', cols: 2 },
-          ]}
         >
           {folder.files?.map((file) => <DashboardFile key={file.id} file={file} reduce />)}
         </SimpleGrid>

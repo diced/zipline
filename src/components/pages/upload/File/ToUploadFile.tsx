@@ -9,7 +9,7 @@ export default function ToUploadFile({ file, onDelete }: { file: File; onDelete:
       <HoverCard.Target>
         <Paper withBorder p='md' radius='md' pos='relative'>
           <Center h='100%'>
-            <Group position='center' spacing='xl'>
+            <Group justify='center' gap='xl'>
               <IconFileUpload size={48} />
               <Text size='md'>{file.name}</Text>
             </Group>
@@ -19,20 +19,20 @@ export default function ToUploadFile({ file, onDelete }: { file: File; onDelete:
       <HoverCard.Dropdown>
         <Group>
           <DashboardFileType file={file} show />
-          <Stack spacing='xs'>
-            <Text size='sm' color='dimmed'>
+          <Stack justify='xs'>
+            <Text size='sm' c='dimmed'>
               <b>{file.name}</b> {file.type || file.type === '' ? `(${file.type})` : ''}
             </Text>
-            <Text size='sm' color='dimmed'>
+            <Text size='sm' c='dimmed'>
               {bytes(file.size)}
             </Text>
             <Button
-              compact
+              size='compact-sm'
               variant='outline'
               color='red'
               fullWidth
               onClick={onDelete}
-              leftIcon={<IconTrashFilled size='1rem' />}
+              leftSection={<IconTrashFilled size='1rem' />}
             >
               Remove
             </Button>

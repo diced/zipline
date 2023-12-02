@@ -175,7 +175,7 @@ export default function FileTable({ id }: { id?: string }) {
               <Button
                 variant='outline'
                 color='red'
-                leftIcon={<IconTrashFilled size='1rem' />}
+                leftSection={<IconTrashFilled size='1rem' />}
                 onClick={() =>
                   bulkDelete(
                     selectedFiles.map((x) => x.id),
@@ -189,7 +189,7 @@ export default function FileTable({ id }: { id?: string }) {
               <Button
                 variant='outline'
                 color='yellow'
-                leftIcon={<IconStar size='1rem' />}
+                leftSection={<IconStar size='1rem' />}
                 onClick={() => bulkFavorite(selectedFiles.map((x) => x.id))}
               >
                 Favorite {selectedFiles.length} file{selectedFiles.length > 1 ? 's' : ''}
@@ -210,7 +210,7 @@ export default function FileTable({ id }: { id?: string }) {
         {/* @ts-ignore */}
         <DataTable
           borderRadius='sm'
-          withBorder
+          withTableBorder
           minHeight={200}
           records={data?.page ?? []}
           columns={[
@@ -273,10 +273,10 @@ export default function FileTable({ id }: { id?: string }) {
             },
             {
               accessor: 'actions',
-              textAlignment: 'right',
-              width: 170,
+              textAlign: 'right',
+              width: 180,
               render: (file) => (
-                <Group spacing='sm'>
+                <Group gap='sm'>
                   <Tooltip label='More details'>
                     <ActionIcon>
                       <IconFile size='1rem' />

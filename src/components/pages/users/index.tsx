@@ -97,7 +97,7 @@ export default function DashboardUsers() {
     <>
       <Modal centered opened={open} onClose={() => setOpen(false)} title={<Title>Create a new user</Title>}>
         <form onSubmit={form.onSubmit(onSubmit)}>
-          <Stack spacing='sm'>
+          <Stack gap='sm'>
             <TextInput
               label='Username'
               placeholder='Enter a username...'
@@ -139,7 +139,7 @@ export default function DashboardUsers() {
               {...form.getInputProps('role')}
             />
 
-            <Button type='submit' variant='outline' radius='sm' leftIcon={<IconUserPlus size='1rem' />}>
+            <Button type='submit' variant='outline' radius='sm' leftSection={<IconUserPlus size='1rem' />}>
               Create
             </Button>
           </Stack>

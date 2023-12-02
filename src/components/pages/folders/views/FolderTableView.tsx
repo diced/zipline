@@ -51,7 +51,7 @@ export default function FolderTableView() {
       <Box my='sm'>
         <DataTable
           borderRadius='sm'
-          withBorder
+          withTableBorder
           minHeight={200}
           records={sorted ?? []}
           columns={[
@@ -80,7 +80,7 @@ export default function FolderTableView() {
               accessor: 'actions',
               width: 170,
               render: (folder) => (
-                <Group spacing='sm'>
+                <Group gap='sm'>
                   <Tooltip label='View files'>
                     <ActionIcon
                       onClick={(e) => {
@@ -129,7 +129,7 @@ export default function FolderTableView() {
           ]}
           fetching={isLoading}
           sortStatus={sortStatus}
-          onSortStatusChange={(s) => setSortStatus(s)}
+          onSortStatusChange={(s) => setSortStatus(s as unknown as any)}
         />
       </Box>
     </>

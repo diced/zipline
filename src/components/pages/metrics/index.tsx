@@ -45,15 +45,15 @@ export default function DashboardMetrics() {
         <Title>Metrics</Title>
 
         <Button
-          compact
+          size='compact-sm'
           variant='outline'
-          leftIcon={<IconCalendarTime size='1rem' />}
+          leftSection={<IconCalendarTime size='1rem' />}
           onClick={() => setOpen(true)}
         >
           Change Date Range
         </Button>
 
-        <Text size='sm' color='dimmed'>
+        <Text size='sm' c='dimmed'>
           {dateRange[0]?.toLocaleDateString()}{' '}
           {dateRange[1] ? `to ${dateRange[1]?.toLocaleDateString()}` : ''}
         </Text>
@@ -68,7 +68,7 @@ export default function DashboardMetrics() {
 
             <StatsTables data={data!} />
 
-            <SimpleGrid mt='md' cols={2} breakpoints={[{ maxWidth: 'sm', cols: 1 }]}>
+            <SimpleGrid mt='md' cols={{ base: 1, md: 2 }}>
               <FilesUrlsCountGraph metrics={data!} />
               <ViewsGraph metrics={data!} />
             </SimpleGrid>
@@ -79,8 +79,8 @@ export default function DashboardMetrics() {
             </SimpleGrid>
           </div>
         ) : (
-          <Text size='sm' color='dimmed'>
-            none
+          <Text size='sm' c='red'>
+            Failed to load statistics for this time range.
           </Text>
         )}
       </Box>

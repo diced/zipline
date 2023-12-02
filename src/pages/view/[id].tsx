@@ -187,10 +187,10 @@ export default function ViewFile({
     <>
       {meta}
       <Paper withBorder>
-        <Group position='apart' py={5} px='xs'>
-          <Text color='dimmed'>{file.name}</Text>
+        <Group justify='space-between' py={5} px='xs'>
+          <Text c='dimmed'>{file.name}</Text>
 
-          <Button compact size='sm' variant='outline' onClick={() => setDetailsOpen((o) => !o)}>
+          <Button size='compact-sm' variant='outline' onClick={() => setDetailsOpen((o) => !o)}>
             Toggle Details
           </Button>
         </Group>
@@ -201,7 +201,7 @@ export default function ViewFile({
           {user?.view.content && (
             <TypographyStylesProvider>
               <Text
-                align={user?.view.align ?? 'left'}
+                ta={user?.view.align ?? 'left'}
                 dangerouslySetInnerHTML={{
                   __html: sanitize(
                     parseString(user.view.content, {
@@ -230,12 +230,12 @@ export default function ViewFile({
       {meta}
       <Center h='100%'>
         <Paper m='md' p='md' shadow='md' radius='md' withBorder>
-          <Group position='apart' mb='sm'>
-            <Text size='lg' weight={700} sx={{ display: 'flex' }}>
+          <Group justify='space-between' mb='sm'>
+            <Text size='lg' fw={700} display='flex'>
               {file.name}
 
               {user?.view.showMimetype && (
-                <Text size='sm' color='dimmed' ml='sm' sx={{ alignSelf: 'center' }}>
+                <Text size='sm' c='dimmed' ml='sm' style={{ alignSelf: 'center' }}>
                   {file.type}
                 </Text>
               )}
@@ -247,8 +247,8 @@ export default function ViewFile({
               component={Link}
               href={`/raw/${file.name}?download=true${pw ? `&pw=${pw}` : ''}`}
               target='_blank'
-              compact
-              leftIcon={<IconFileDownload size='1rem' />}
+              size='compact-sm'
+              leftSection={<IconFileDownload size='1rem' />}
             >
               Download
             </Button>
@@ -259,7 +259,8 @@ export default function ViewFile({
           {user?.view.content && (
             <TypographyStylesProvider>
               <Text
-                align={user?.view.align ?? 'left'}
+                mt='sm'
+                ta={user?.view.align ?? 'left'}
                 dangerouslySetInnerHTML={{
                   __html: sanitize(
                     parseString(user?.view.content, {
@@ -269,7 +270,7 @@ export default function ViewFile({
                     }) ?? '',
                     {
                       USE_PROFILES: { html: true },
-                      FORBID_TAGS: ['style', 'script'],
+                      FORBID_TAGS: ['script'],
                     },
                   ),
                 }}

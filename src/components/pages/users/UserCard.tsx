@@ -20,73 +20,72 @@ export default function UserCard({ user }: { user: User }) {
 
       <Card withBorder shadow='sm' radius='sm'>
         <Card.Section withBorder inheritPadding py='xs'>
-          <Group position='apart'>
+          <Group justify='space-between'>
             <Group>
               <Avatar
                 color={isAdministrator(user.role) ? 'red' : 'gray'}
                 size='md'
-                radius='md'
+                radius='sm'
                 src={user.avatar ?? null}
               >
                 {user.username[0].toUpperCase()}
               </Avatar>
 
-              <Stack spacing={1}>
-                <Text weight={400}>{user.username}</Text>
-                <Text size='xs' color='dimmed'>
+              <Stack gap={1}>
+                <Text fw={400}>{user.username}</Text>
+                <Text size='xs' c='dimmed'>
                   {user.id}
                 </Text>
               </Stack>
             </Group>
 
-            <Menu withinPortal position='bottom-end' shadow='sm'>
-              <Group spacing={2}>
-                <ActionIcon
-                  variant={canInteract(currentUser?.role, user?.role) ? 'subtle' : 'transparent'}
-                  component={Link}
-                  href={`/dashboard/admin/users/${user.id}/files`}
-                  disabled={!canInteract(currentUser?.role, user?.role)}
-                >
-                  <IconFiles size='1rem' />
-                </ActionIcon>
-
+            <Group gap='xs'>
+              <ActionIcon
+                variant={canInteract(currentUser?.role, user?.role) ? 'subtle' : 'transparent'}
+                component={Link}
+                href={`/dashboard/admin/users/${user.id}/files`}
+                disabled={!canInteract(currentUser?.role, user?.role)}
+              >
+                <IconFiles size='1rem' />
+              </ActionIcon>
+              <Menu withinPortal position='bottom-end' shadow='sm'>
                 <Menu.Target>
-                  <ActionIcon>
+                  <ActionIcon variant='transparent'>
                     <IconDots size='1rem' />
                   </ActionIcon>
                 </Menu.Target>
-              </Group>
 
-              <Menu.Dropdown>
-                <Menu.Item
-                  disabled={!canInteract(currentUser?.role, user?.role)}
-                  icon={<IconUserEdit size='1rem' />}
-                  onClick={() => setOpen(true)}
-                >
-                  Edit
-                </Menu.Item>
-                <Menu.Item
-                  disabled={!canInteract(currentUser?.role, user?.role)}
-                  icon={<IconTrashFilled size='1rem' />}
-                  color='red'
-                  onClick={() => deleteUser(user)}
-                >
-                  Delete
-                </Menu.Item>
-              </Menu.Dropdown>
-            </Menu>
+                <Menu.Dropdown>
+                  <Menu.Item
+                    disabled={!canInteract(currentUser?.role, user?.role)}
+                    leftSection={<IconUserEdit size='1rem' />}
+                    onClick={() => setOpen(true)}
+                  >
+                    Edit
+                  </Menu.Item>
+                  <Menu.Item
+                    disabled={!canInteract(currentUser?.role, user?.role)}
+                    leftSection={<IconTrashFilled size='1rem' />}
+                    color='red'
+                    onClick={() => deleteUser(user)}
+                  >
+                    Delete
+                  </Menu.Item>
+                </Menu.Dropdown>
+              </Menu>
+            </Group>
           </Group>
         </Card.Section>
 
         <Card.Section inheritPadding py='xs'>
-          <Stack spacing={1}>
-            <Text size='xs' color='dimmed'>
+          <Stack gap={1}>
+            <Text size='xs' c='dimmed'>
               <b>Role:</b> {roleName(user.role)}
             </Text>
-            <Text size='xs' color='dimmed'>
+            <Text size='xs' c='dimmed'>
               <b>Created:</b> <RelativeDate date={user.createdAt} />
             </Text>
-            <Text size='xs' color='dimmed'>
+            <Text size='xs' c='dimmed'>
               <b>Updated:</b> <RelativeDate date={user.updatedAt} />
             </Text>
           </Stack>

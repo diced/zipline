@@ -101,28 +101,28 @@ export default function Setup() {
       </Head>
 
       <Paper withBorder p='xs' m='sm'>
-        <Stepper active={active} onStepClick={setActive} breakpoint='sm' m='md'>
+        <Stepper active={active} onStepClick={setActive} m='md'>
           <Stepper.Step label='Welcome!' description='Setup Zipline'>
             <Title>Welcome to Zipline!</Title>
-            <SimpleGrid cols={2} spacing='md' breakpoints={[{ maxWidth: 'sm', cols: 1 }]}>
+            <SimpleGrid spacing='md' cols={{ base: 1, sm: 1 }}>
               <Paper withBorder p='sm' my='sm' h='100%'>
                 <Title order={2}>Documentation</Title>
                 <Text>Here are a couple of useful documentation links to get you started with Zipline.</Text>
 
-                <Text color='dimmed'>
+                <Text c='dimmed'>
                   <Anchor>[name]</Anchor>: desc
                 </Text>
 
-                <Text color='dimmed'>
+                <Text c='dimmed'>
                   <Anchor>[name]</Anchor>: desc
                 </Text>
-                <Text color='dimmed'>
+                <Text c='dimmed'>
                   <Anchor>[name]</Anchor>: desc
                 </Text>
-                <Text color='dimmed'>
+                <Text c='dimmed'>
                   <Anchor>[name]</Anchor>: desc
                 </Text>
-                <Text color='dimmed'>
+                <Text c='dimmed'>
                   <Anchor>[name]</Anchor>: desc
                 </Text>
               </Paper>
@@ -148,7 +148,7 @@ export default function Setup() {
             <Button
               mt='xl'
               fullWidth
-              rightIcon={<IconArrowForwardUp size='1.25rem' />}
+              rightSection={<IconArrowForwardUp size='1.25rem' />}
               size='lg'
               variant='default'
               onClick={nextStep}
@@ -157,7 +157,7 @@ export default function Setup() {
             </Button>
           </Stepper.Step>
           <Stepper.Step label='Create user' description='Create a super-admin account'>
-            <Stack spacing='lg'>
+            <Stack gap='lg'>
               <Title order={2}>Create your super-admin account</Title>
 
               <TextInput
@@ -173,9 +173,9 @@ export default function Setup() {
               />
             </Stack>
 
-            <Group position='apart' my='lg'>
+            <Group justify='space-between' my='lg'>
               <Button
-                leftIcon={<IconArrowBackUp size='1.25rem' />}
+                leftSection={<IconArrowBackUp size='1.25rem' />}
                 size='lg'
                 variant='default'
                 onClick={prevStep}
@@ -184,7 +184,7 @@ export default function Setup() {
               </Button>
 
               <Button
-                rightIcon={<IconArrowForwardUp size='1.25rem' />}
+                rightSection={<IconArrowForwardUp size='1.25rem' />}
                 size='lg'
                 variant='default'
                 onClick={nextStep}
@@ -201,9 +201,9 @@ export default function Setup() {
               Clicking &quot;continue&quot; below will create your super-admin account and log you in. You
               will be redirected to the dashboard shortly after that.
             </Text>
-            <Group position='apart' my='lg'>
+            <Group justify='space-between' my='lg'>
               <Button
-                leftIcon={<IconArrowBackUp size='1.25rem' />}
+                leftSection={<IconArrowBackUp size='1.25rem' />}
                 size='lg'
                 variant='default'
                 onClick={prevStep}
@@ -213,7 +213,7 @@ export default function Setup() {
               </Button>
 
               <Button
-                rightIcon={<IconCheck size='1.25rem' />}
+                rightSection={<IconCheck size='1.25rem' />}
                 size='lg'
                 variant='default'
                 loading={loading}

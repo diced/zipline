@@ -1,0 +1,11 @@
+.file {
+  transition: all 0.2s ease-in-out;
+}
+
+.file:hover {
+  cursor: pointer;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.1),
+    0 4px 12px -1px rgba(0, 0, 0, 0.1);
+  filter: brightness(0.86);
+}

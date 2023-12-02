@@ -3,7 +3,18 @@ import { readToDataURL } from '@/lib/base64';
 import { fetchApi } from '@/lib/fetchApi';
 import useAvatar from '@/lib/hooks/useAvatar';
 import { useUserStore } from '@/lib/store/user';
-import { Avatar, Button, Card, FileInput, Group, Paper, Stack, Text, Title } from '@mantine/core';
+import {
+  Avatar,
+  Button,
+  Card,
+  FileInput,
+  Group,
+  Paper,
+  Stack,
+  Text,
+  Title,
+  useMantineColorScheme,
+} from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import {
   IconChevronDown,
@@ -16,6 +27,8 @@ import { useEffect, useState } from 'react';
 
 export default function SettingsAvatar() {
   const user = useUserStore((state) => state.user);
+
+  const { colorScheme } = useMantineColorScheme();
 
   const { avatar: currentAvatar, mutate } = useAvatar();
   const [avatar, setAvatar] = useState<File | null>(null);
@@ -91,23 +104,25 @@ export default function SettingsAvatar() {
     <Paper withBorder p='sm'>
       <Title order={2}>Avatar</Title>
 
-      <Stack spacing='sm'>
+      <Stack gap='sm'>
         <FileInput
           accept='image/*'
           placeholder='Upload new avatar...'
           value={avatar}
           onChange={(file) => setAvatar(file)}
-          icon={<IconPhotoUp size='1rem' />}
+          leftSection={<IconPhotoUp size='1rem' />}
         />
 
         <Card withBorder shadow='sm'>
-          <Text size='sm' color='dimmed'>
+          <Text size='sm' c='dimmed'>
             Preview of {avatar ? 'new' : 'current'} avatar
           </Text>
 
           <Button
-            variant='subtle'
-            leftIcon={
+            justify='left'
+            variant='transparent'
+            color={colorScheme === 'dark' ? 'white' : 'black'}
+            leftSection={
               avatarSrc ? (
                 <Avatar src={avatarSrc} radius='sm' size='sm' alt={user?.username ?? 'Proposed avatar'} />
               ) : currentAvatar ? (
@@ -116,14 +131,14 @@ export default function SettingsAvatar() {
                 <IconSettingsFilled size='1rem' />
               )
             }
-            rightIcon={<IconChevronDown size='0.7rem' />}
+            rightSection={<IconChevronDown size='0.7rem' />}
             size='sm'
           >
             {user?.username}
           </Button>
         </Card>
 
-        <Group position='left'>
+        <Group justify='left'>
           {avatarSrc && (
             <Button
               variant='outline'

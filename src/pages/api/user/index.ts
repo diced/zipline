@@ -80,4 +80,13 @@ export async function handler(req: NextApiReq<EditBody>, res: NextApiRes<ApiUser
   }
 }
 
+export const config = {
+  api: {
+    responseLimit: false,
+    bodyParser: {
+      sizeLimit: '100gb',
+    },
+  },
+};
+
 export default combine([method(['GET', 'PATCH']), ziplineAuth()], handler);

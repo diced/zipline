@@ -3,8 +3,8 @@ import { persist } from 'zustand/middleware';
 import type { Config } from '../config/validate';
 
 export const defaultUploadOptions: UploadOptionsStore['options'] = {
-  deletesAt: null,
-  format: null,
+  deletesAt: 'never',
+  format: 'default',
   imageCompressionPercent: null,
   maxViews: null,
   addOriginalName: false,
@@ -18,8 +18,8 @@ export const defaultEphemeralOptions: UploadOptionsStore['ephemeral'] = {
 
 export type UploadOptionsStore = {
   options: {
-    deletesAt: string | null;
-    format: Config['files']['defaultFormat'] | null;
+    deletesAt: string | 'never';
+    format: Config['files']['defaultFormat'] | 'default';
     imageCompressionPercent: number | null;
     maxViews: number | null;
     addOriginalName: boolean | null;

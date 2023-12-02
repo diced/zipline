@@ -19,11 +19,11 @@ export default function InviteGridView() {
         <SimpleGrid
           my='sm'
           spacing='md'
-          cols={4}
-          breakpoints={[
-            { maxWidth: 'sm', cols: 1 },
-            { maxWidth: 'md', cols: 2 },
-          ]}
+          cols={{
+            base: 1,
+            md: 2,
+            lg: 4,
+          }}
           pos='relative'
         >
           {folders?.map((invite) => <InviteCard key={invite.id} invite={invite} />)}
@@ -36,7 +36,7 @@ export default function InviteGridView() {
                 <IconLink size='2rem' />
                 <Title order={2}>No invites found</Title>
               </Group>
-              <Text size='sm' color='dimmed'>
+              <Text size='sm' c='dimmed'>
                 Create an invite to see them here.
               </Text>
             </Stack>

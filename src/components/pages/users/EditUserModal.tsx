@@ -94,13 +94,13 @@ export default function EditUserModal({
 
   return (
     <Modal centered title={<Title>Edit {user?.username ?? ''}</Title>} onClose={onClose} opened={opened}>
-      <Text size='sm' color='dimmed'>
+      <Text size='sm' c='dimmed'>
         Any fields that are blank will be omitted, and will not be updated.
       </Text>
 
       {user ? (
         <form onSubmit={form.onSubmit(onSubmit)}>
-          <Stack spacing='sm'>
+          <Stack gap='sm'>
             <TextInput
               label='Username'
               placeholder='Enter a username...'
@@ -147,7 +147,7 @@ export default function EditUserModal({
               variant='outline'
               color='blue'
               radius='sm'
-              leftIcon={<IconUserEdit size='1rem' />}
+              leftSection={<IconUserEdit size='1rem' />}
             >
               Update user
             </Button>

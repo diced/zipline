@@ -92,13 +92,13 @@ export default function DashboardURLs() {
         title: <Title>Shortened URL</Title>,
         size: 'auto',
         children: (
-          <Group position='apart'>
-            <Group position='left'>
+          <Group justify='space-between'>
+            <Group justify='left'>
               <Anchor component={Link} href={data?.url ?? ''}>
                 {data?.url}
               </Anchor>
             </Group>
-            <Group position='right'>
+            <Group justify='right'>
               <Tooltip label='Open link in a new tab'>
                 <ActionIcon onClick={() => open()} variant='filled' color='primary'>
                   <IconExternalLink size='1rem' />
@@ -123,7 +123,7 @@ export default function DashboardURLs() {
     <>
       <Modal centered opened={open} onClose={() => setOpen(false)} title={<Title>Shorten a URL</Title>}>
         <form onSubmit={form.onSubmit(onSubmit)}>
-          <Stack spacing='sm'>
+          <Stack gap='sm'>
             <TextInput label='URL' placeholder='https://example.com' {...form.getInputProps('url')} />
             <TextInput
               label='Vanity'
@@ -139,7 +139,7 @@ export default function DashboardURLs() {
               {...form.getInputProps('maxViews')}
             />
 
-            <Button type='submit' variant='outline' radius='sm' leftIcon={<IconLink size='1rem' />}>
+            <Button type='submit' variant='outline' radius='sm' leftSection={<IconLink size='1rem' />}>
               Create
             </Button>
           </Stack>

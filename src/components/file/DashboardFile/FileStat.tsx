@@ -14,12 +14,12 @@ export default function FileStat({
     <Group>
       <Icon size='2rem' />
 
-      <Stack spacing={1}>
-        <Title order={5} weight={700}>
+      <Stack gap={1}>
+        <Title order={5} fw={700}>
           {title}
         </Title>
 
-        <Text size='sm' color='dimmed'>
+        <Text size='sm' c='dimmed'>
           {value}
         </Text>
       </Stack>

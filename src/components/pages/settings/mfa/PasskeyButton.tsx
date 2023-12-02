@@ -3,18 +3,7 @@ import { fetchApi } from '@/lib/fetchApi';
 import { registerWeb } from '@/lib/passkey';
 import { useUserStore } from '@/lib/store/user';
 import { RegistrationResponseJSON } from '@github/webauthn-json/dist/types/browser-ponyfill';
-import {
-  ActionIcon,
-  Button,
-  Divider,
-  Group,
-  Modal,
-  Paper,
-  Stack,
-  Text,
-  TextInput,
-  Title,
-} from '@mantine/core';
+import { ActionIcon, Button, Group, Modal, Paper, Stack, Text, TextInput, Title } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import { UserPasskey } from '@prisma/client';
@@ -134,12 +123,12 @@ export default function PasskeyButton() {
         opened={passkeyOpen}
         onClose={() => setPasskeyOpen(false)}
       >
-        <Stack spacing='sm'>
+        <Stack gap='sm'>
           <>
-            {user?.passkeys!.map((passkey, i) => (
+            {user?.passkeys?.map((passkey, i) => (
               <Paper withBorder p='xs' key={i}>
-                <Group position='apart'>
-                  <Text weight='bolder'>{passkey.name}</Text>
+                <Group justify='space-between'>
+                  <Text fw='bolder'>{passkey.name}</Text>
                   <ActionIcon color='red' onClick={() => removePasskey(passkey)}>
                     <IconTrashFilled size='1rem' />
                   </ActionIcon>
@@ -154,21 +143,19 @@ export default function PasskeyButton() {
                 </Text>
               </Paper>
             ))}
-
-            {user?.passkeys!.length !== undefined && <Divider />}
           </>
           <Button
             size='sm'
-            leftIcon={<IconKey size='1rem' />}
-            color={passkeyErrored ? 'red' : 'primary'}
+            leftSection={<IconKey size='1rem' />}
+            color={passkeyErrored ? 'red' : undefined}
             onClick={handleRegisterPasskey}
             loading={passkeyLoading}
           >
             {passkeyErrored
               ? 'Error while creating a passkey'
               : passkeyLoading
-              ? 'Loading...'
-              : 'Create a passkey'}
+                ? 'Loading...'
+                : 'Create a passkey'}
           </Button>
 
           {namerShown && (
@@ -181,7 +168,12 @@ export default function PasskeyButton() {
                 onChange={(e) => setName(e.currentTarget.value)}
               />
 
-              <Button size='sm' leftIcon={<IconKey size='1rem' />} color='blue' onClick={handleSavePasskey}>
+              <Button
+                size='sm'
+                leftSection={<IconKey size='1rem' />}
+                color='blue'
+                onClick={handleSavePasskey}
+              >
                 Save
               </Button>
             </>
@@ -189,7 +181,7 @@ export default function PasskeyButton() {
         </Stack>
       </Modal>
 
-      <Button size='sm' leftIcon={<IconKey size={24} />} onClick={() => setPasskeyOpen(true)}>
+      <Button size='sm' leftSection={<IconKey size={24} />} onClick={() => setPasskeyOpen(true)}>
         Manage passkeys
       </Button>
     </>

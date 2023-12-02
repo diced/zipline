@@ -11,14 +11,11 @@ import {
   Box,
   Burger,
   Button,
-  Header,
-  MediaQuery,
   Menu,
   NavLink,
-  Navbar,
   Paper,
-  Text,
   Title,
+  useMantineColorScheme,
   useMantineTheme,
 } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
@@ -134,6 +131,7 @@ const navLinks: NavLinks[] = [
 
 export default function Layout({ children, config }: { children: React.ReactNode; config: SafeConfig }) {
   const theme = useMantineTheme();
+  const { colorScheme } = useMantineColorScheme();
   const [opened, setOpened] = useState(false);
   const router = useRouter();
   const modals = useModals();
@@ -146,7 +144,7 @@ export default function Layout({ children, config }: { children: React.ReactNode
   const copyToken = () => {
     modals.openConfirmModal({
       title: (
-        <Title order={4} weight={700}>
+        <Title order={4} fw={700}>
           Copy token?
         </Title>
       ),
@@ -178,7 +176,7 @@ export default function Layout({ children, config }: { children: React.ReactNode
   const refreshToken = () => {
     modals.openConfirmModal({
       title: (
-        <Title order={4} weight={700}>
+        <Title order={4} fw={700}>
           Refresh token?
         </Title>
       ),
@@ -213,156 +211,149 @@ export default function Layout({ children, config }: { children: React.ReactNode
 
   return (
     <AppShell
-      styles={{
-        main: {
-          background: theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[0],
-        },
-      }}
-      navbarOffsetBreakpoint='sm'
-      asideOffsetBreakpoint='sm'
-      navbar={
-        <Navbar hiddenBreakpoint='sm' hidden={!opened} width={{ sm: 200, lg: 230 }}>
-          {navLinks
-            .filter((link) => !link.if || link.if(user as Response['/api/user']['user'], config))
-            .map((link) => {
-              if (!link.links) {
-                return (
-                  <NavLink
-                    key={link.label}
-                    label={link.label}
-                    icon={link.icon}
-                    variant='light'
-                    rightSection={<IconChevronRight size='0.7rem' />}
-                    active={router.pathname === link.href}
-                    component={Link}
-                    href={link.href || ''}
-                  />
-                );
-              } else {
-                return (
-                  <NavLink
-                    key={link.label}
-                    label={link.label}
-                    icon={link.icon}
-                    variant='light'
-                    rightSection={<IconChevronRight size='0.7rem' />}
-                    defaultOpened={link.active(router.pathname)}
-                  >
-                    {link.links
-                      .filter(
-                        (sublink) => !sublink.if || sublink.if(user as Response['/api/user']['user'], config),
-                      )
-                      .map((sublink) => (
-                        <NavLink
-                          key={sublink.label}
-                          label={sublink.label}
-                          icon={sublink.icon}
-                          rightSection={<IconChevronRight size='0.7rem' />}
-                          variant='light'
-                          active={router.pathname === sublink.href}
-                          component={Link}
-                          href={sublink.href || ''}
-                        />
-                      ))}
-                  </NavLink>
-                );
-              }
-            })}
-
-          <Box mt='auto'>
-            {config.website.externalLinks.map(({ name, url }) => (
-              <NavLink
-                key={name}
-                label={name}
-                icon={<IconExternalLink size='1rem' />}
-                variant='light'
-                component={Link}
-                href={url}
-                target='_blank'
-              />
-            ))}
-          </Box>
-        </Navbar>
-      }
-      header={
-        <Header height={{ base: 50, md: 70 }} p='md'>
-          <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
-            <MediaQuery largerThan='sm' styles={{ display: 'none' }}>
-              <Burger
-                opened={opened}
-                onClick={() => setOpened((o) => !o)}
-                size='sm'
-                color={theme.colors.gray[6]}
-                mr='xl'
-              />
-            </MediaQuery>
-
-            <Text size={30} weight={700}>
-              Zipline
-            </Text>
-
-            <div style={{ marginLeft: 'auto' }}>
-              <Menu shadow='md' width={200}>
-                <Menu.Target>
-                  <Button
-                    variant='subtle'
-                    leftIcon={
-                      avatar ? (
-                        <Avatar src={avatar} radius='sm' size='sm' alt={user?.username ?? 'User avatar'} />
-                      ) : (
-                        <IconSettingsFilled size='1rem' />
-                      )
-                    }
-                    rightIcon={<IconChevronDown size='0.7rem' />}
-                    size='sm'
-                  >
-                    {user?.username}
-                  </Button>
-                </Menu.Target>
-
-                <Menu.Dropdown>
-                  <Menu.Label>
-                    {user?.username}
-                    {isAdministrator(user?.role) ? ' (Administrator)' : ''}
-                  </Menu.Label>
-
-                  <Menu.Item icon={<IconClipboardCopy size='1rem' />} onClick={copyToken}>
-                    Copy token
-                  </Menu.Item>
-                  <Menu.Item color='red' icon={<IconRefreshDot size='1rem' />} onClick={refreshToken}>
-                    Refresh token
-                  </Menu.Item>
-                  <Menu.Divider />
-
-                  <Menu.Item
-                    icon={<IconSettingsFilled size='1rem' />}
-                    component={Link}
-                    href='/dashboard/settings'
-                  >
-                    Settings
-                  </Menu.Item>
-
-                  <Menu.Divider />
-                  <Menu.Item
-                    color='red'
-                    icon={<IconLogout size='1rem' />}
-                    component={Link}
-                    href='/auth/logout'
-                  >
-                    Logout
-                  </Menu.Item>
-                </Menu.Dropdown>
-              </Menu>
-            </div>
-          </div>
-        </Header>
-      }
+      navbar={{ breakpoint: 'sm', width: { sm: 200, lg: 230 }, collapsed: { mobile: !opened } }}
+      header={{ height: { base: 50, md: 70 } }}
     >
-      <ConfigProvider config={config}>
-        <Paper m={2} withBorder p='xs'>
-          {children}
-        </Paper>
-      </ConfigProvider>
+      <AppShell.Header px='md'>
+        <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
+          <Burger
+            opened={opened}
+            onClick={() => setOpened((o) => !o)}
+            size='sm'
+            color={theme.colors.gray[6]}
+            mr='xl'
+            hiddenFrom='sm'
+          />
+
+          <Title fw={700}>Zipline</Title>
+
+          <div style={{ marginLeft: 'auto' }}>
+            <Menu shadow='md' width={200}>
+              <Menu.Target>
+                <Button
+                  variant='transparent'
+                  color={colorScheme === 'dark' ? 'white' : 'black'}
+                  leftSection={
+                    avatar ? (
+                      <Avatar src={avatar} radius='sm' size='sm' alt={user?.username ?? 'User avatar'} />
+                    ) : (
+                      <IconSettingsFilled size='1rem' />
+                    )
+                  }
+                  rightSection={<IconChevronDown size='0.7rem' />}
+                  size='sm'
+                >
+                  {user?.username}
+                </Button>
+              </Menu.Target>
+
+              <Menu.Dropdown>
+                <Menu.Label>
+                  {user?.username}
+                  {isAdministrator(user?.role) ? ' (Administrator)' : ''}
+                </Menu.Label>
+
+                <Menu.Item leftSection={<IconClipboardCopy size='1rem' />} onClick={copyToken}>
+                  Copy token
+                </Menu.Item>
+                <Menu.Item color='red' leftSection={<IconRefreshDot size='1rem' />} onClick={refreshToken}>
+                  Refresh token
+                </Menu.Item>
+                <Menu.Divider />
+
+                <Menu.Item
+                  leftSection={<IconSettingsFilled size='1rem' />}
+                  component={Link}
+                  href='/dashboard/settings'
+                >
+                  Settings
+                </Menu.Item>
+
+                <Menu.Divider />
+                <Menu.Item
+                  color='red'
+                  leftSection={<IconLogout size='1rem' />}
+                  component={Link}
+                  href='/auth/logout'
+                >
+                  Logout
+                </Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
+          </div>
+        </div>
+      </AppShell.Header>
+
+      <AppShell.Navbar hidden={!opened} zIndex={90}>
+        {navLinks
+          .filter((link) => !link.if || link.if(user as Response['/api/user']['user'], config))
+          .map((link) => {
+            if (!link.links) {
+              return (
+                <NavLink
+                  key={link.label}
+                  label={link.label}
+                  leftSection={link.icon}
+                  variant='light'
+                  rightSection={<IconChevronRight size='0.7rem' />}
+                  active={router.pathname === link.href}
+                  component={Link}
+                  href={link.href || ''}
+                />
+              );
+            } else {
+              return (
+                <NavLink
+                  key={link.label}
+                  label={link.label}
+                  leftSection={link.icon}
+                  variant='light'
+                  rightSection={<IconChevronRight size='0.7rem' />}
+                  defaultOpened={link.active(router.pathname)}
+                >
+                  {link.links
+                    .filter(
+                      (sublink) => !sublink.if || sublink.if(user as Response['/api/user']['user'], config),
+                    )
+                    .map((sublink) => (
+                      <NavLink
+                        key={sublink.label}
+                        label={sublink.label}
+                        leftSection={sublink.icon}
+                        rightSection={<IconChevronRight size='0.7rem' />}
+                        variant='light'
+                        active={router.pathname === sublink.href}
+                        component={Link}
+                        href={sublink.href || ''}
+                      />
+                    ))}
+                </NavLink>
+              );
+            }
+          })}
+
+        <Box mt='auto'>
+          {config.website.externalLinks.map(({ name, url }) => (
+            <NavLink
+              key={name}
+              label={name}
+              leftSection={<IconExternalLink size='1rem' />}
+              variant='light'
+              component={Link}
+              href={url}
+              target='_blank'
+            />
+          ))}
+        </Box>
+      </AppShell.Navbar>
+
+      <AppShell.Main>
+        <ConfigProvider config={config}>
+          <Paper m='lg' withBorder p='xs'>
+            {children}
+          </Paper>
+        </ConfigProvider>
+      </AppShell.Main>
     </AppShell>
   );
 }

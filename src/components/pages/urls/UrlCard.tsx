@@ -2,7 +2,7 @@ import { useConfig } from '@/components/ConfigProvider';
 import RelativeDate from '@/components/RelativeDate';
 import { Url } from '@/lib/db/models/url';
 import { formatRootUrl } from '@/lib/url';
-import { ActionIcon, Anchor, Card, Group, Menu, Stack, Text } from '@mantine/core';
+import { ActionIcon, Anchor, Card, Group, Menu, Stack, Text, Tooltip } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { IconCopy, IconDots, IconTrashFilled } from '@tabler/icons-react';
 import { copyUrl, deleteUrl } from './actions';
@@ -18,8 +18,8 @@ export default function UserCard({ url }: { url: Url }) {
     <>
       <Card withBorder shadow='sm' radius='sm'>
         <Card.Section withBorder inheritPadding py='xs'>
-          <Group position='apart'>
-            <Text weight={400}>
+          <Group justify='space-between'>
+            <Text fw={400}>
               <Anchor
                 href={formatRootUrl(config.urls.route, url.vanity ?? url.code)}
                 target='_blank'
@@ -30,20 +30,29 @@ export default function UserCard({ url }: { url: Url }) {
             </Text>
 
             <Menu withinPortal position='bottom-end' shadow='sm'>
-              <Group spacing={2}>
+              <Group gap={2}>
                 <Menu.Target>
-                  <ActionIcon>
+                  <ActionIcon variant='transparent'>
                     <IconDots size='1rem' />
                   </ActionIcon>
                 </Menu.Target>
               </Group>
 
               <Menu.Dropdown>
-                <Menu.Item icon={<IconCopy size='1rem' />} onClick={() => copyUrl(url, config, clipboard)}>
-                  Copy
+                <Menu.Item
+                  leftSection={<IconCopy size='1rem' />}
+                  onClick={() => copyUrl(url, config, clipboard)}
+                >
+                  Copy short link
                 </Menu.Item>
                 <Menu.Item
-                  icon={<IconTrashFilled size='1rem' />}
+                  leftSection={<IconCopy size='1rem' />}
+                  onClick={() => clipboard.copy(url.destination.trim())}
+                >
+                  Copy destination
+                </Menu.Item>
+                <Menu.Item
+                  leftSection={<IconTrashFilled size='1rem' />}
                   color='red'
                   onClick={() => deleteUrl(warnDeletion, url)}
                 >
@@ -55,21 +64,23 @@ export default function UserCard({ url }: { url: Url }) {
         </Card.Section>
 
         <Card.Section inheritPadding py='xs'>
-          <Stack spacing={1}>
-            <Text size='xs' color='dimmed'>
+          <Stack gap={1}>
+            <Text size='xs' c='dimmed'>
               <b>Created:</b> <RelativeDate date={url.createdAt} />
             </Text>
-            <Text size='xs' color='dimmed'>
+            <Text size='xs' c='dimmed'>
               <b>Updated:</b> <RelativeDate date={url.updatedAt} />
             </Text>
-            <Text size='xs' color='dimmed'>
+            <Text size='xs' c='dimmed'>
               <b>Destination:</b>{' '}
-              <Anchor href={url.destination} target='_blank' rel='noopener noreferrer'>
-                {url.destination}
-              </Anchor>
+              <Tooltip label={`Open "${url.destination.trim()}" in a new tab`}>
+                <Anchor href={url.destination} target='_blank' rel='noopener noreferrer'>
+                  {url.destination}
+                </Anchor>
+              </Tooltip>
             </Text>
             {url.vanity && (
-              <Text size='xs' color='dimmed'>
+              <Text size='xs' c='dimmed'>
                 <b>Code:</b> {url.code}
               </Text>
             )}

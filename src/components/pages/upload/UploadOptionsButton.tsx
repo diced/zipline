@@ -49,14 +49,14 @@ export default function UploadOptionsButton({ numFiles }: { numFiles: number }) 
   return (
     <>
       <Modal centered opened={opened} onClose={() => setOpen(false)} title={<Title>Upload Options</Title>}>
-        <Text size='sm' color='dimmed'>
+        <Text size='sm' c='dimmed'>
           These options will be applied to all files you upload and are saved in your browser.
         </Text>
 
-        <Stack spacing='xs' my='sm'>
+        <Stack gap='xs' my='sm'>
           <Select
             data={[
-              { value: null as unknown as string, label: 'Never' },
+              { value: 'never', label: 'Never' },
               { value: '5min', label: '5 minutes' },
               { value: '10min', label: '10 minutes' },
               { value: '15min', label: '15 minutes' },
@@ -85,7 +85,7 @@ export default function UploadOptionsButton({ numFiles }: { numFiles: number }) 
               { value: '0.5 year', label: '6 months (0.5 year)' },
               { value: '1y', label: '1 year' },
               {
-                value: null as unknown as string,
+                value: '_',
                 label: 'Need more freedom? Set an exact date and time through the API.',
                 disabled: true,
               },
@@ -93,7 +93,7 @@ export default function UploadOptionsButton({ numFiles }: { numFiles: number }) 
             label={
               <>
                 Deletes at{' '}
-                {options.deletesAt ? (
+                {options.deletesAt !== 'never' ? (
                   <Badge variant='outline' size='xs'>
                     saved
                   </Badge>
@@ -101,20 +101,22 @@ export default function UploadOptionsButton({ numFiles }: { numFiles: number }) 
               </>
             }
             description='The file will automatically delete itself after this time.'
-            icon={<IconAlarmFilled size='1rem' />}
+            leftSection={<IconAlarmFilled size='1rem' />}
             value={options.deletesAt}
-            onChange={(value) => setOption('deletesAt', value)}
-            withinPortal
-            portalProps={{
-              style: {
-                zIndex: 100000000,
+            onChange={(value) => setOption('deletesAt', value || 'never')}
+            comboboxProps={{
+              withinPortal: true,
+              portalProps: {
+                style: {
+                  zIndex: 100000000,
+                },
               },
             }}
           />
 
           <Select
             data={[
-              { value: null as unknown as string, label: 'Default' },
+              { value: 'default', label: 'Default' },
               { value: 'random', label: 'Random' },
               { value: 'date', label: 'Date' },
               { value: 'uuid', label: 'UUID' },
@@ -124,7 +126,7 @@ export default function UploadOptionsButton({ numFiles }: { numFiles: number }) 
             label={
               <>
                 Name Format{' '}
-                {options.format ? (
+                {options.format !== 'default' ? (
                   <Badge variant='outline' size='xs'>
                     saved
                   </Badge>
@@ -132,13 +134,15 @@ export default function UploadOptionsButton({ numFiles }: { numFiles: number }) 
               </>
             }
             description='The file name format to use when upload this file, the "File name" field will override this value.'
-            icon={<IconWriting size='1rem' />}
+            leftSection={<IconWriting size='1rem' />}
             value={options.format}
-            onChange={(value) => setOption('format', value as any)}
-            withinPortal
-            portalProps={{
-              style: {
-                zIndex: 100000000,
+            onChange={(value) => setOption('format', value || ('default' as any))}
+            comboboxProps={{
+              withinPortal: true,
+              portalProps: {
+                style: {
+                  zIndex: 100000000,
+                },
               },
             }}
           />
@@ -155,11 +159,11 @@ export default function UploadOptionsButton({ numFiles }: { numFiles: number }) 
               </>
             }
             description='The compression level to use on images (only). Leave blank to disable compression.'
-            icon={<IconPercentage size='1rem' />}
+            leftSection={<IconPercentage size='1rem' />}
             max={100}
             min={0}
             value={options.imageCompressionPercent || ''}
-            onChange={(value) => setOption('imageCompressionPercent', value === '' ? null : value)}
+            onChange={(value) => setOption('imageCompressionPercent', value === '' ? null : Number(value))}
           />
 
           <NumberInput
@@ -174,10 +178,10 @@ export default function UploadOptionsButton({ numFiles }: { numFiles: number }) 
               </>
             }
             description='The maximum number of views the files can have before they are deleted. Leave blank to allow as many views as you want.'
-            icon={<IconEyeFilled size='1rem' />}
+            leftSection={<IconEyeFilled size='1rem' />}
             min={0}
             value={options.maxViews || ''}
-            onChange={(value) => setOption('maxViews', value === '' ? null : value)}
+            onChange={(value) => setOption('maxViews', value === '' ? null : Number(value))}
           />
 
           <TextInput
@@ -192,7 +196,7 @@ export default function UploadOptionsButton({ numFiles }: { numFiles: number }) 
               </>
             }
             description='Override the domain with this value. This will change the domain returned in your uploads. Leave blank to use the default domain.'
-            icon={<IconGlobe size='1rem' />}
+            leftSection={<IconGlobe size='1rem' />}
             value={options.overrides_returnDomain ?? ''}
             onChange={(event) =>
               setOption(
@@ -205,7 +209,7 @@ export default function UploadOptionsButton({ numFiles }: { numFiles: number }) 
           <TextInput
             label='Override File Name'
             description='Override the file name with this value. Leave blank to use the "Name Format" option. This value is ignored if you are uploading more than one file. This value is not saved to your browser, and is cleared after uploading.'
-            icon={<IconFileInfo size='1rem' />}
+            leftSection={<IconFileInfo size='1rem' />}
             value={ephemeral.filename ?? ''}
             onChange={(event) =>
               setEphemeral(
@@ -219,7 +223,7 @@ export default function UploadOptionsButton({ numFiles }: { numFiles: number }) 
           <PasswordInput
             label='Password'
             description='Set a password for these files. Leave blank to disable password protection. This value is not saved to your browser, and is cleared after uploading.'
-            icon={<IconKey size='1rem' />}
+            leftSection={<IconKey size='1rem' />}
             value={ephemeral.password ?? ''}
             onChange={(event) =>
               setEphemeral(
@@ -252,11 +256,11 @@ export default function UploadOptionsButton({ numFiles }: { numFiles: number }) 
           />
         </Stack>
 
-        <Group position='right' my='sm' spacing='sm'>
+        <Group justify='right' my='sm' gap='sm'>
           <Button
             variant='outline'
             color='red'
-            leftIcon={<IconTrashFilled size='1rem' />}
+            leftSection={<IconTrashFilled size='1rem' />}
             onClick={clearSettings}
             disabled={changes() === 0}
           >
@@ -265,7 +269,7 @@ export default function UploadOptionsButton({ numFiles }: { numFiles: number }) 
 
           <Button
             variant='outline'
-            leftIcon={<IconArrowsMinimize size='1rem' />}
+            leftSection={<IconArrowsMinimize size='1rem' />}
             onClick={() => setOpen(false)}
           >
             Close
@@ -274,8 +278,8 @@ export default function UploadOptionsButton({ numFiles }: { numFiles: number }) 
       </Modal>
 
       <Button
-        variant={changes() !== 0 ? 'filled' : 'outline'}
-        rightIcon={changes() !== 0 ? <Badge variant='outline'>{changes()}</Badge> : null}
+        variant={changes() !== 0 ? 'light' : 'outline'}
+        rightSection={changes() !== 0 ? <Badge variant='outline'>{changes()}</Badge> : null}
         onClick={() => setOpen(true)}
       >
         Options

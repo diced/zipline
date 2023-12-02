@@ -45,7 +45,7 @@ export default function InviteTableView() {
       <Box my='sm'>
         <DataTable
           borderRadius='sm'
-          withBorder
+          withTableBorder
           minHeight={200}
           records={sorted ?? []}
           columns={[
@@ -87,9 +87,9 @@ export default function InviteTableView() {
             },
             {
               accessor: 'actions',
-              width: 90,
+              width: 100,
               render: (invite) => (
-                <Group spacing='sm'>
+                <Group gap='sm'>
                   <Tooltip label='Copy invite link'>
                     <ActionIcon
                       onClick={(e) => {
@@ -117,7 +117,7 @@ export default function InviteTableView() {
           ]}
           fetching={isLoading}
           sortStatus={sortStatus}
-          onSortStatusChange={(s) => setSortStatus(s)}
+          onSortStatusChange={(s) => setSortStatus(s as unknown as any)}
         />
       </Box>
     </>

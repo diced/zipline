@@ -35,7 +35,7 @@ export function sharex(token: string, type: 'file' | 'url', options: GeneratorOp
     delete toAddHeaders['x-zipline-deletes-at'];
   }
 
-  if (options.format !== null && type === 'file') {
+  if (options.format !== 'default' && type === 'file') {
     toAddHeaders['x-zipline-format'] = options.format;
   } else {
     delete toAddHeaders['x-zipline-format'];

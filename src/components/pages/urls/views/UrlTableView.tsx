@@ -171,7 +171,7 @@ export default function UrlTableView() {
       <Box my='sm'>
         <DataTable
           borderRadius='sm'
-          withBorder
+          withTableBorder
           minHeight={200}
           records={sorted ?? []}
           columns={[
@@ -244,9 +244,9 @@ export default function UrlTableView() {
             },
             {
               accessor: 'actions',
-              width: 90,
+              width: 100,
               render: (url) => (
-                <Group spacing='sm'>
+                <Group gap='sm'>
                   <Tooltip label='Copy URL'>
                     <ActionIcon
                       onClick={(e) => {
@@ -274,7 +274,7 @@ export default function UrlTableView() {
           ]}
           fetching={isLoading}
           sortStatus={sortStatus}
-          onSortStatusChange={(s) => setSortStatus(s)}
+          onSortStatusChange={(s) => setSortStatus(s as unknown as any)}
         />
       </Box>
     </>

@@ -113,14 +113,14 @@ export default function TwoFAButton() {
   return (
     <>
       <Modal title={<Title>Enable 2FA</Title>} opened={totpOpen} onClose={() => setTotpOpen(false)}>
-        <Stack spacing='sm'>
+        <Stack gap='sm'>
           {user?.totpSecret ? (
-            <Text size='sm' color='dimmed'>
+            <Text size='sm' c='dimmed'>
               Enter the 6-digit code from your authenticator app below to confirm disabling 2FA.
             </Text>
           ) : (
             <>
-              <Text size='sm' color='dimmed'>
+              <Text size='sm' c='dimmed'>
                 <b>Step 1</b> Open/download an authenticator that supports qrcode scanning or manual code
                 entry. Popular options include{' '}
                 <Anchor component={Link} href='https://authy.com/' target='_blank'>
@@ -145,13 +145,15 @@ export default function TwoFAButton() {
                 .
               </Text>
 
-              <Text size='sm' color='dimmed'>
+              <Text size='sm' c='dimmed'>
                 <b>Step 2</b> Scan the QR code below with your authenticator app to enable 2FA.
               </Text>
 
               <Box pos='relative'>
                 {twoLoading && !twoError ? (
-                  <LoadingOverlay visible />
+                  <Box w={180} h={180}>
+                    <LoadingOverlay visible pos='relative' />
+                  </Box>
                 ) : (
                   <Center>
                     <Image
@@ -164,12 +166,12 @@ export default function TwoFAButton() {
                 )}
               </Box>
 
-              <Text size='sm' color='dimmed'>
+              <Text size='sm' c='dimmed'>
                 If you can&apos;t scan the QR code, you can manually enter the following code into your
                 authenticator app: <br /> {twoData?.secret ?? ''}
               </Text>
 
-              <Text size='sm' color='dimmed'>
+              <Text size='sm' c='dimmed'>
                 <b>Step 3</b> Enter the 6-digit code from your authenticator app below to confirm 2FA setup.
               </Text>
             </>
@@ -190,7 +192,7 @@ export default function TwoFAButton() {
             />
           </Center>
           {pinError && (
-            <Text align='center' size='sm' color='red' mt={0}>
+            <Text ta='center' size='sm' c='red' mt={0}>
               {pinError}
             </Text>
           )}
@@ -199,8 +201,8 @@ export default function TwoFAButton() {
 
       <Button
         size='sm'
-        leftIcon={<IconShieldLockFilled size={24} />}
-        color={user?.totpSecret ? 'red' : 'primary'}
+        leftSection={<IconShieldLockFilled size={24} />}
+        color={user?.totpSecret ? 'red' : undefined}
         onClick={() => setTotpOpen(true)}
       >
         {user?.totpSecret ? 'Disable 2FA' : 'Enable 2FA'}

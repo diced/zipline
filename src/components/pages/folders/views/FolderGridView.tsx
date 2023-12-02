@@ -19,11 +19,11 @@ export default function FolderGridView() {
         <SimpleGrid
           my='sm'
           spacing='md'
-          cols={4}
-          breakpoints={[
-            { maxWidth: 'sm', cols: 1 },
-            { maxWidth: 'md', cols: 2 },
-          ]}
+          cols={{
+            base: 1,
+            md: 2,
+            lg: 4,
+          }}
           pos='relative'
         >
           {folders?.map((folder) => <FolderCard key={folder.id} folder={folder} />)}
@@ -36,7 +36,7 @@ export default function FolderGridView() {
                 <IconLink size='2rem' />
                 <Title order={2}>No Folders found</Title>
               </Group>
-              <Text size='sm' color='dimmed'>
+              <Text size='sm' c='dimmed'>
                 Create a folder to see it here
               </Text>
             </Stack>

@@ -17,9 +17,11 @@ import { useClipboard } from '@mantine/hooks';
 import { IconCursorText, IconEyeFilled, IconFiles, IconUpload } from '@tabler/icons-react';
 import Link from 'next/link';
 import { useState } from 'react';
-import UploadOptionsButton from './UploadOptionsButton';
-import { renderMode } from './renderMode';
-import { uploadFiles } from './uploadFiles';
+import UploadOptionsButton from '../UploadOptionsButton';
+import { renderMode } from '../renderMode';
+import { uploadFiles } from '../uploadFiles';
+
+import styles from './index.module.css';
 
 export default function UploadText({
   codeMeta,
@@ -70,7 +72,7 @@ export default function UploadText({
 
   return (
     <>
-      <Group spacing='sm'>
+      <Group gap='sm'>
         <Title order={1}>Upload text</Title>
 
         <Tooltip label='View your files'>
@@ -81,35 +83,30 @@ export default function UploadText({
       </Group>
 
       <Tabs defaultValue='textarea' variant='pills' my='sm'>
-        <Tabs.List>
-          <Tabs.Tab value='textarea' icon={<IconCursorText size='1rem' />}>
+        <Tabs.List my='sm'>
+          <Tabs.Tab value='textarea' leftSection={<IconCursorText size='1rem' />}>
             Text
           </Tabs.Tab>
-          <Tabs.Tab value='preview' icon={<IconEyeFilled size='1rem' />}>
+          <Tabs.Tab value='preview' leftSection={<IconEyeFilled size='1rem' />}>
             Preview
           </Tabs.Tab>
         </Tabs.List>
 
         <Tabs.Panel value='textarea'>
           <Textarea
-            sx={{
-              '& textarea': {
-                fontFamily: 'monospace',
-                height: '50vh',
-              },
-            }}
             my='md'
             value={text}
             onChange={(e) => setText(e.currentTarget.value)}
             onKeyDown={handleTab}
             disabled={loading}
+            className={styles.textarea}
           />
         </Tabs.Panel>
 
         <Tabs.Panel value='preview'>
           {text.length === 0 ? (
             <Center h='100%'>
-              <Text size='md' color='red'>
+              <Text size='md' c='red'>
                 No text to preview!
               </Text>
             </Center>
@@ -119,7 +116,7 @@ export default function UploadText({
         </Tabs.Panel>
       </Tabs>
 
-      <Group position='right' spacing='sm' my='md'>
+      <Group justify='right' gap='sm' my='md'>
         <Select
           searchable
           defaultValue='txt'
@@ -129,7 +126,7 @@ export default function UploadText({
         <UploadOptionsButton numFiles={1} />
         <Button
           variant='outline'
-          leftIcon={<IconUpload size='1rem' />}
+          leftSection={<IconUpload size='1rem' />}
           disabled={text.length === 0 || loading}
           onClick={upload}
         >

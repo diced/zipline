@@ -6,7 +6,6 @@ import {
   IconFileUnknown,
   IconMusic,
   IconPhoto,
-  IconPhotoCancel,
   IconPlayerPlay,
   IconShieldLockFilled,
   IconVideo,
@@ -20,7 +19,7 @@ function PlaceholderContent({ text, Icon }: { text: string; Icon: Icon }) {
   return (
     <Stack align='center'>
       <Icon size={48} />
-      <Text size='md' align='center'>
+      <Text size='md' ta='center'>
         {text}
       </Text>
     </Stack>
@@ -29,7 +28,7 @@ function PlaceholderContent({ text, Icon }: { text: string; Icon: Icon }) {
 
 function Placeholder({ text, Icon, ...props }: { text: string; Icon: Icon; onClick?: () => void }) {
   return (
-    <Center sx={{ height: '100%', width: '100%', cursor: 'pointed' }} {...props}>
+    <Center style={{ height: '100%', width: '100%', cursor: 'pointed' }} {...props}>
       <PlaceholderContent text={text} Icon={Icon} />
     </Center>
   );
@@ -94,7 +93,7 @@ export default function DashboardFileType({
 
   if (dbFile && file.password === true && show)
     return (
-      <Paper withBorder p='xs' sx={{ cursor: 'pointer' }}>
+      <Paper withBorder p='xs' style={{ cursor: 'pointer' }}>
         <Placeholder
           text={`Click to view protected ${file.name}`}
           Icon={IconShieldLockFilled}
@@ -117,10 +116,7 @@ export default function DashboardFileType({
         <Box>
           <Image
             styles={{
-              imageWrapper: {
-                position: 'inherit',
-              },
-              image: {
+              root: {
                 maxHeight: dbFile ? '100vh' : 100,
               },
             }}
@@ -129,7 +125,7 @@ export default function DashboardFileType({
           />
 
           <Center
-            sx={{
+            style={{
               position: 'absolute',
               top: 0,
               left: 0,
@@ -148,14 +144,10 @@ export default function DashboardFileType({
       return (
         <Image
           styles={{
-            imageWrapper: {
-              position: 'inherit',
-            },
-            image: {
+            root: {
               maxHeight: dbFile ? '100vh' : 100,
             },
           }}
-          placeholder={<PlaceholderContent Icon={IconPhotoCancel} text={'Image failed to load...'} />}
           src={dbFile ? `/raw/${file.name}${password ? `?pw=${password}` : ''}` : URL.createObjectURL(file)}
           alt={file.name}
           width={show ? 'auto' : undefined}
@@ -185,7 +177,7 @@ export default function DashboardFileType({
 
       if (dbFile && show)
         return (
-          <Paper withBorder p='xs' sx={{ cursor: 'pointer' }}>
+          <Paper withBorder p='xs' style={{ cursor: 'pointer' }}>
             <Placeholder
               onClick={() => window.open(`/raw/${file.name}${password ? `?pw=${password}` : ''}`)}
               text={`Click to view file ${file.name} in a new tab`}

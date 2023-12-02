@@ -62,7 +62,7 @@ export default function DashboardInvites() {
     <>
       <Modal centered opened={open} onClose={() => setOpen(false)} title={<Title>Create an invite</Title>}>
         <form onSubmit={form.onSubmit(onSubmit)}>
-          <Stack spacing='sm'>
+          <Stack gap='sm'>
             <Select
               label='Expires at'
               description='Select an expiration for this invite, or choose "never" if you want the invite to never expire.'
@@ -78,13 +78,14 @@ export default function DashboardInvites() {
                 { value: '5d', label: '5 days' },
                 { value: '7d', label: '7 days' },
               ]}
-              withinPortal
-              portalProps={{
-                style: {
-                  zIndex: 100000000,
+              comboboxProps={{
+                withinPortal: true,
+                portalProps: {
+                  style: {
+                    zIndex: 100000000,
+                  },
                 },
               }}
-              dropdownPosition='bottom'
               {...form.getInputProps('expiresAt')}
             />
             <NumberInput
@@ -95,7 +96,13 @@ export default function DashboardInvites() {
               {...form.getInputProps('maxUses')}
             />
 
-            <Button type='submit' variant='outline' fullWidth radius='sm' leftIcon={<IconPlus size='1rem' />}>
+            <Button
+              type='submit'
+              variant='outline'
+              fullWidth
+              radius='sm'
+              leftSection={<IconPlus size='1rem' />}
+            >
               Create
             </Button>
           </Stack>

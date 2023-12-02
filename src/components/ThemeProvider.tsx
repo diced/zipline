@@ -2,7 +2,7 @@ import { Config } from '@/lib/config/validate';
 import { useSettingsStore } from '@/lib/store/settings';
 import { useUserStore } from '@/lib/store/user';
 import { ZiplineTheme, findTheme, themeComponents } from '@/lib/theme';
-import { MantineProvider } from '@mantine/core';
+import { MantineProvider, createTheme } from '@mantine/core';
 import { useColorScheme } from '@mantine/hooks';
 import { createContext, useContext } from 'react';
 
@@ -56,12 +56,16 @@ export default function Theming({
         name: 'Dark Gray',
         colorScheme: 'dark',
         primaryColor: 'gray',
-      } as ZiplineTheme); // back up theme if all else fails lol
+      } as unknown as ZiplineTheme); // back up theme if all else fails lol
   }
 
   return (
     <ThemeContext.Provider value={{ themes }}>
-      <MantineProvider withGlobalStyles withNormalizeCSS withCSSVariables theme={themeComponents(theme)}>
+      <MantineProvider
+        defaultColorScheme={theme.colorScheme as unknown as any}
+        forceColorScheme={theme.colorScheme as unknown as any}
+        theme={createTheme(themeComponents(theme))}
+      >
         {children}
       </MantineProvider>
     </ThemeContext.Provider>

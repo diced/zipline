@@ -17,7 +17,7 @@ export default function DashboardHome() {
       <Title order={1}>
         Welcome back, <b>{user?.username}</b>
       </Title>
-      <Text size='sm' color='dimmed'>
+      <Text size='sm' c='dimmed'>
         You have <b>{statsLoading ? '...' : stats?.filesUploaded}</b> files uploaded.
       </Text>
 
@@ -30,13 +30,13 @@ export default function DashboardHome() {
           <LoadingOverlay visible />
         </Paper>
       ) : recent?.length !== 0 ? (
-        <SimpleGrid cols={3} spacing='md' breakpoints={[{ maxWidth: 'sm', cols: 1, spacing: 'sm' }]}>
+        <SimpleGrid cols={{ base: 1, md: 2, lg: 3 }} spacing={{ base: 'sm', md: 'md' }}>
           {recent!.map((file) => (
             <DashboardFile key={file.id} file={file} />
           ))}
         </SimpleGrid>
       ) : (
-        <Text size='sm' color='dimmed'>
+        <Text size='sm' c='dimmed'>
           You have no recent files. The last three files you uploaded will appear here.
         </Text>
       )}
@@ -44,7 +44,7 @@ export default function DashboardHome() {
       <Title order={2} mt='md'>
         Stats
       </Title>
-      <Text size='sm' color='dimmed' mb='xs'>
+      <Text size='sm' c='dimmed' mb='xs'>
         These statistics are based on your uploads only.
       </Text>
 
@@ -54,7 +54,7 @@ export default function DashboardHome() {
         </Paper>
       ) : (
         <>
-          <SimpleGrid cols={4} spacing='md' breakpoints={[{ maxWidth: 'sm', cols: 1, spacing: 'sm' }]}>
+          <SimpleGrid cols={{ base: 1, md: 2, lg: 4 }} spacing={{ base: 'sm', md: 'md' }}>
             <Stat Icon={IconFiles} title='Files uploaded' value={stats!.filesUploaded} />
             <Stat Icon={IconStarFilled} title='Favorite files' value={stats!.favoriteFiles} />
             <Stat Icon={IconDeviceSdCard} title='Storage used' value={bytes(stats!.storageUsed)} />
@@ -74,20 +74,22 @@ export default function DashboardHome() {
 
               <Paper radius='sm' withBorder>
                 <Table highlightOnHover>
-                  <thead>
-                    <tr>
-                      <th>File Type</th>
-                      <th>Count</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {Object.entries(stats!.sortTypeCount).map(([type, count]) => (
-                      <tr key={type}>
-                        <td>{type}</td>
-                        <td>{count}</td>
-                      </tr>
-                    ))}
-                  </tbody>
+                  <Table.Thead>
+                    <Table.Tr>
+                      <Table.Th>File Type</Table.Th>
+                      <Table.Th>Count</Table.Th>
+                    </Table.Tr>
+                  </Table.Thead>
+                  <Table.Tbody>
+                    {Object.entries(stats!.sortTypeCount)
+                      .sort(([, a], [, b]) => b - a)
+                      .map(([type, count]) => (
+                        <Table.Tr key={type}>
+                          <Table.Td>{type}</Table.Td>
+                          <Table.Td>{count}</Table.Td>
+                        </Table.Tr>
+                      ))}
+                  </Table.Tbody>
                 </Table>
               </Paper>
             </>

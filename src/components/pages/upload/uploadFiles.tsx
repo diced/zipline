@@ -37,16 +37,16 @@ export function filesModal(
     title: <Title>Uploaded Files</Title>,
     size: 'auto',
     children: (
-      <Table withBorder={false} withColumnBorders={false} highlightOnHover horizontalSpacing={'sm'}>
+      <Table withTableBorder={false} withColumnBorders={false} highlightOnHover horizontalSpacing={'sm'}>
         <Stack>
           {files.map((file, idx) => (
-            <Group key={idx} position='apart'>
-              <Group position='left'>
+            <Group key={idx} justify='space-between'>
+              <Group justify='left'>
                 <Anchor component={Link} href={file.url}>
                   {file.url}
                 </Anchor>
               </Group>
-              <Group position='right'>
+              <Group justify='right'>
                 <Tooltip label='Open link in a new tab'>
                   <ActionIcon onClick={() => open(idx)} variant='filled' color='primary'>
                     <IconExternalLink size='1rem' />
@@ -108,7 +108,6 @@ export function uploadFiles(
 
   req.upload.addEventListener('progress', (e) => {
     if (e.lengthComputable) {
-      console.log(e.loaded, e.total);
       setProgress(Math.round((e.loaded / e.total) * 100));
     }
   });
@@ -149,8 +148,8 @@ export function uploadFiles(
 
   req.open('POST', '/api/upload');
 
-  options.deletesAt && req.setRequestHeader('x-zipline-deletes-at', options.deletesAt);
-  options.format && req.setRequestHeader('x-zipline-format', options.format);
+  options.deletesAt !== 'never' && req.setRequestHeader('x-zipline-deletes-at', options.deletesAt);
+  options.format !== 'default' && req.setRequestHeader('x-zipline-format', options.format);
   options.imageCompressionPercent &&
     req.setRequestHeader('x-zipline-image-compression-percent', options.imageCompressionPercent.toString());
   options.maxViews && req.setRequestHeader('x-zipline-max-views', options.maxViews.toString());
