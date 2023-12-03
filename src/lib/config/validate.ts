@@ -10,6 +10,7 @@ declare global {
   namespace NodeJS {
     interface ProcessEnv {
       ZIPLINE_BUILD?: string;
+      ZIPLINE_DB_LOG?: string;
     }
   }
 }

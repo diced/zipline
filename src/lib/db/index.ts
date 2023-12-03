@@ -21,13 +21,22 @@ prisma = global.__db__;
 
 type ExtendedPrismaClient = ReturnType<typeof getClient>;
 
+function parseDbLog(env: string): Prisma.LogLevel[] {
+  if (env === 'true') return ['query'];
+
+  return env
+    .split(',')
+    .map((v) => v.trim())
+    .filter((v) => v) as unknown as Prisma.LogLevel[];
+}
+
 function getClient() {
   const logger = log('db');
 
   logger.info('connecting to database ' + process.env.DATABASE_URL);
 
   const client = new PrismaClient({
-    log: ['query'],
+    log: process.env.ZIPLINE_DB_LOG ? parseDbLog(process.env.ZIPLINE_DB_LOG) : undefined,
   }).$extends({
     result: {
       file: {
