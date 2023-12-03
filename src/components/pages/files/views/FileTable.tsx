@@ -1,10 +1,23 @@
 import RelativeDate from '@/components/RelativeDate';
 import FileModal from '@/components/file/DashboardFile/FileModal';
-import { copyFile, deleteFile, viewFile } from '@/components/file/actions';
+import { addMultipleToFolder, copyFile, deleteFile, viewFile } from '@/components/file/actions';
 import { bytes } from '@/lib/bytes';
 import { type File } from '@/lib/db/models/file';
 import { useSettingsStore } from '@/lib/store/settings';
-import { ActionIcon, Box, Button, Group, Paper, Text, TextInput, Title, Tooltip } from '@mantine/core';
+import {
+  ActionIcon,
+  Box,
+  Button,
+  Collapse,
+  Combobox,
+  Group,
+  InputBase,
+  Paper,
+  Text,
+  TextInput,
+  Tooltip,
+  useCombobox,
+} from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import type { Prisma } from '@prisma/client';
 import { IconCopy, IconExternalLink, IconFile, IconStar, IconTrashFilled } from '@tabler/icons-react';
@@ -13,6 +26,9 @@ import { useRouter } from 'next/router';
 import { useEffect, useReducer, useState } from 'react';
 import { bulkDelete, bulkFavorite } from '../bulk';
 import { useApiPagination } from '../useApiPagination';
+import useSWR from 'swr';
+import { Response } from '@/lib/api/response';
+import { Folder } from '@/lib/db/models/folder';
 
 type ReducerQuery = {
   state: { name: string; originalName: string; type: string };
@@ -78,6 +94,10 @@ export default function FileTable({ id }: { id?: string }) {
     state.settings.warnDeletion,
   ]);
 
+  const { data: folders } = useSWR<Extract<Response['/api/user/folders'], Folder[]>>(
+    '/api/user/folders?noincl=true',
+  );
+
   const [page, setPage] = useState<number>(router.query.page ? parseInt(router.query.page as string) : 1);
   const [perpage, setPerpage] = useState<number>(20);
   const [sort, setSort] = useState<keyof Prisma.FileOrderByWithAggregationInput>('createdAt');
@@ -96,6 +116,16 @@ export default function FileTable({ id }: { id?: string }) {
   );
 
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+
+  const combobox = useCombobox();
+  const [folderSearch, setFolderSearch] = useState('');
+
+  const handleAddFolder = async (value: string) => {
+    try {
+      addMultipleToFolder(selectedFiles, value);
+      setSelectedFiles([]);
+    } catch {}
+  };
 
   const searching =
     searchQuery.name.trim() !== '' ||
@@ -163,49 +193,89 @@ export default function FileTable({ id }: { id?: string }) {
       />
 
       <Box my='sm'>
-        {selectedFiles.length > 0 && (
+        <Collapse in={selectedFiles.length > 0}>
           <Paper withBorder p='sm' my='sm'>
-            <Title order={3}>Operations</Title>
-
-            <Text size='sm' color='dimmed' mb='xs'>
+            <Text size='sm' c='dimmed' mb='xs'>
               Selections are saved across page changes
             </Text>
 
             <Group>
-              <Button
-                variant='outline'
-                color='red'
-                leftSection={<IconTrashFilled size='1rem' />}
-                onClick={() =>
-                  bulkDelete(
-                    selectedFiles.map((x) => x.id),
-                    setSelectedFiles,
-                  )
-                }
-              >
-                Delete {selectedFiles.length} file{selectedFiles.length > 1 ? 's' : ''}
-              </Button>
+              <Group mr='auto'>
+                <Button
+                  variant='outline'
+                  color='red'
+                  leftSection={<IconTrashFilled size='1rem' />}
+                  onClick={() =>
+                    bulkDelete(
+                      selectedFiles.map((x) => x.id),
+                      setSelectedFiles,
+                    )
+                  }
+                >
+                  Delete {selectedFiles.length} file{selectedFiles.length > 1 ? 's' : ''}
+                </Button>
 
-              <Button
-                variant='outline'
-                color='yellow'
-                leftSection={<IconStar size='1rem' />}
-                onClick={() => bulkFavorite(selectedFiles.map((x) => x.id))}
-              >
-                Favorite {selectedFiles.length} file{selectedFiles.length > 1 ? 's' : ''}
-              </Button>
+                <Button
+                  variant='outline'
+                  color='yellow'
+                  leftSection={<IconStar size='1rem' />}
+                  onClick={() => bulkFavorite(selectedFiles.map((x) => x.id))}
+                >
+                  Favorite {selectedFiles.length} file{selectedFiles.length > 1 ? 's' : ''}
+                </Button>
+
+                <Combobox
+                  store={combobox}
+                  withinPortal={false}
+                  onOptionSubmit={(value) => handleAddFolder(value)}
+                >
+                  <Combobox.Target>
+                    <InputBase
+                      rightSection={<Combobox.Chevron />}
+                      value={folderSearch}
+                      onChange={(event) => {
+                        combobox.openDropdown();
+                        combobox.updateSelectedOptionIndex();
+                        setFolderSearch(event.currentTarget.value);
+                      }}
+                      onClick={() => combobox.openDropdown()}
+                      onFocus={() => combobox.openDropdown()}
+                      onBlur={() => {
+                        combobox.closeDropdown();
+                        setFolderSearch(folderSearch || '');
+                      }}
+                      placeholder='Add to folder...'
+                      rightSectionPointerEvents='none'
+                    />
+                  </Combobox.Target>
+
+                  <Combobox.Dropdown>
+                    <Combobox.Options>
+                      {folders
+                        ?.filter((f) => f.name.toLowerCase().includes(folderSearch.toLowerCase().trim()))
+                        .map((f) => (
+                          <Combobox.Option value={f.id} key={f.id}>
+                            {f.name}
+                          </Combobox.Option>
+                        ))}
+                    </Combobox.Options>
+                  </Combobox.Dropdown>
+                </Combobox>
+              </Group>
 
               <Button
                 variant='outline'
                 onClick={() => {
                   setSelectedFiles([]);
                 }}
+                justify='right'
+                ml='auto'
               >
                 Clear selection
               </Button>
             </Group>
           </Paper>
-        )}
+        </Collapse>
 
         {/* @ts-ignore */}
         <DataTable

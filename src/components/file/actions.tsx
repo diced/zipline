@@ -195,6 +195,38 @@ export async function addToFolder(file: File, folderId: string | null) {
   mutateFiles();
 }
 
+export async function addMultipleToFolder(files: File[], folderId: string | null) {
+  if (!folderId) return;
+
+  const { data, error } = await fetchApi<Response['/api/user/files/transaction']>(
+    '/api/user/files/transaction',
+    'PATCH',
+    {
+      folder: folderId,
+      files: files.map((file) => file.id),
+    },
+  );
+
+  if (error) {
+    notifications.show({
+      title: 'Error while adding files to folder',
+      message: error.message,
+      color: 'red',
+      icon: <IconFolderOff size='1rem' />,
+    });
+  } else {
+    notifications.show({
+      title: 'Files added to folder',
+      message: `${data!.count} file(s) have been added to ${data!.name}`,
+      color: 'green',
+      icon: <IconFolderPlus size='1rem' />,
+    });
+  }
+
+  mutateFolders();
+  mutateFiles();
+}
+
 export function mutateFiles() {
   mutate('/api/user/recent');
   mutate((key) => (key as Record<any, any>)?.key === '/api/user/files'); // paged files

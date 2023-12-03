@@ -8,6 +8,7 @@ import { NextApiReq, NextApiRes } from '@/lib/response';
 
 export type ApiUserFilesTransactionResponse = {
   count: number;
+  name?: string;
 };
 
 type Body = {
@@ -15,13 +16,15 @@ type Body = {
 
   favorite?: boolean;
 
+  folder?: string;
+
   delete_datasourceFiles?: boolean;
 };
 
 const logger = log('api').c('user').c('files').c('transaction');
 
 export async function handler(req: NextApiReq<Body>, res: NextApiRes<ApiUserFilesTransactionResponse>) {
-  const { files, favorite } = req.body;
+  const { files, favorite, folder } = req.body;
 
   if (!files || !files.length) return res.badRequest('Cannot process transaction without files');
 
@@ -66,6 +69,36 @@ export async function handler(req: NextApiReq<Body>, res: NextApiRes<ApiUserFile
     return res.ok(resp);
   }
 
+  if (favorite) {
+    const resp = await prisma.file.updateMany({
+      where: {
+        id: {
+          in: files,
+        },
+      },
+
+      data: {
+        favorite: favorite ?? false,
+      },
+    });
+
+    logger.info(`${req.user.username} ${favorite ? 'favorited' : 'unfavorited'} ${resp.count} files`, {
+      user: req.user.id,
+    });
+
+    return res.ok(resp);
+  }
+
+  if (!folder) return res.badRequest("can't PATCH without an action");
+
+  const f = await prisma.folder.findUnique({
+    where: {
+      id: folder,
+      userId: req.user.id,
+    },
+  });
+  if (!f) return res.notFound('folder not found');
+
   const resp = await prisma.file.updateMany({
     where: {
       id: {
@@ -74,15 +107,19 @@ export async function handler(req: NextApiReq<Body>, res: NextApiRes<ApiUserFile
     },
 
     data: {
-      favorite: favorite ?? false,
+      folderId: folder,
     },
   });
 
-  logger.info(`${req.user.username} ${favorite ? 'favorited' : 'unfavorited'} ${resp.count} files`, {
+  logger.info(`${req.user.username} moved ${resp.count} files to ${f.name}`, {
     user: req.user.id,
+    folderId: f.id,
   });
 
-  return res.ok(resp);
+  return res.ok({
+    ...resp,
+    name: f.name,
+  });
 }
 
 export default combine([method(['DELETE', 'PATCH']), ziplineAuth()], handler);
