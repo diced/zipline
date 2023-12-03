@@ -47,7 +47,6 @@ const validateSortBy = z
     'type',
     'views',
     'favorite',
-    'similarity',
   ])
   .default('createdAt');
 
@@ -79,8 +78,6 @@ export async function handler(req: NextApiReq<any, Query>, res: NextApiRes<ApiUs
 
   const sortBy = validateSortBy.safeParse(req.query.sortBy || 'createdAt');
   if (!sortBy.success) return res.badRequest('Invalid sortBy value');
-  if (sortBy.data === 'similarity' && !searchQuery)
-    return res.badRequest("Can't use sortBy=similarity when searchQuery is empty");
 
   const order = validateOrder.safeParse(req.query.order || 'desc');
   if (!order.success) return res.badRequest('Invalid order value');
@@ -100,34 +97,36 @@ export async function handler(req: NextApiReq<any, Query>, res: NextApiRes<ApiUs
       logger.debug('pg_trgm extension installed');
     }
 
-    // Doing Prisma.raw/sql(...) could be unsafe as it will not escape any values leading to SQL injection
-    // there might be a better way, but all the values that use Prisma.sql([...]) are validated and should not
-    // be able to be used for SQL injection
-
-    const similarityResult: File[] = await prisma.$queryRaw`
-      SELECT
-        word_similarity("${Prisma.raw(searchField.data)}", ${searchQuery}) as similarity,
-        "createdAt", "updatedAt", "deletesAt", favorite, id, "originalName", name, size,
-        type, views, "folderId"
-      FROM "File"
-      WHERE
-        word_similarity("${Prisma.raw(searchField.data)}", ${searchQuery}) > ${Prisma.raw(
-          String(searchThreshold.data),
-        )} OR
-        "${Prisma.raw(searchField.data)}" ILIKE ${Prisma.sql`%${searchQuery}%`} AND
-        "userId" = ${user.id} ${
-          filter === 'dashboard'
-            ? Prisma.sql`
-          AND
-            type LIKE 'image/%' OR
-            type LIKE 'video/%' OR
-            type LIKE 'audio/%' OR
-            type LIKE 'text/%'
-            `
-            : Prisma.empty
-        } ${favorite === 'true' && filter !== 'all' ? Prisma.sql`AND favorite = true` : Prisma.empty}
-      ORDER BY "${Prisma.raw(sortBy.data)}" ${Prisma.raw(order.data)}
-    `;
+    const similarityResult = await prisma.file.findMany({
+      where: {
+        userId: user.id,
+        ...(filter === 'dashboard' && {
+          OR: [
+            {
+              type: { startsWith: 'image/' },
+            },
+            {
+              type: { startsWith: 'video/' },
+            },
+            {
+              type: { startsWith: 'audio/' },
+            },
+            {
+              type: { startsWith: 'text/' },
+            },
+          ],
+        }),
+        ...(favorite === 'true' &&
+          filter !== 'all' && {
+            favorite: true,
+          }),
+        [searchField.data]: {
+          contains: searchQuery,
+          mode: 'insensitive',
+        },
+      },
+      select: fileSelect,
+    });
 
     return res.ok({
       page: cleanFiles(similarityResult),

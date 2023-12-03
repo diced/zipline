@@ -265,13 +265,6 @@ export default function FileTable({ id }: { id?: string }) {
               render: (file) => (file.favorite ? 'Yes' : 'No'),
             },
             {
-              accessor: 'similarity',
-              title: 'Relevance',
-              sortable: true,
-              render: (file) => (file.similarity ? file.similarity.toFixed(4) : 'N/A'),
-              hidden: !searching,
-            },
-            {
               accessor: 'actions',
               textAlign: 'right',
               width: 180,
@@ -327,13 +320,6 @@ export default function FileTable({ id }: { id?: string }) {
           recordsPerPageOptions={searching ? undefined : PER_PAGE_OPTIONS}
           page={searching ? undefined : page}
           onPageChange={searching ? undefined : setPage}
-          // {...(!searching && {
-          //   recordsPerPage: perpage,
-          //   onRecordsPerPageChange: setPerpage,
-          //   recordsPerPageOptions: PER_PAGE_OPTIONS,
-          //   page: page as number,
-          //   onPageChange: setPage,
-          // })}
           sortStatus={{
             columnAccessor: sort,
             direction: order,
