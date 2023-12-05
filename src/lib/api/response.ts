@@ -20,6 +20,8 @@ import { ApiUserMfaPasskeyResponse } from '@/pages/api/user/mfa/passkey';
 import { ApiUserMfaTotpResponse } from '@/pages/api/user/mfa/totp';
 import { ApiUserRecentResponse } from '@/pages/api/user/recent';
 import { ApiUserStatsResponse } from '@/pages/api/user/stats';
+import { ApiUserTagsResponse } from '@/pages/api/user/tags';
+import { ApiUserTagsIdResponse } from '@/pages/api/user/tags/[id]';
 import { ApiUserTokenResponse } from '@/pages/api/user/token';
 import { ApiUserUrlsResponse } from '@/pages/api/user/urls';
 import { ApiUserUrlsIdResponse } from '@/pages/api/user/urls/[id]';
@@ -45,6 +47,8 @@ export type Response = {
   '/api/user/files': ApiUserFilesResponse;
   '/api/user/urls/[id]': ApiUserUrlsIdResponse;
   '/api/user/urls': ApiUserUrlsResponse;
+  '/api/user/tags/[id]': ApiUserTagsIdResponse;
+  '/api/user/tags': ApiUserTagsResponse;
   '/api/user': ApiUserResponse;
   '/api/user/stats': ApiUserStatsResponse;
   '/api/user/recent': ApiUserRecentResponse;

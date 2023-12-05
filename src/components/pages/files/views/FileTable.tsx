@@ -8,11 +8,17 @@ import {
   ActionIcon,
   Box,
   Button,
+  Checkbox,
   Collapse,
   Combobox,
+  Flex,
   Group,
+  Input,
   InputBase,
   Paper,
+  Pill,
+  PillsInput,
+  ScrollArea,
   Text,
   TextInput,
   Tooltip,
@@ -29,9 +35,11 @@ import { useApiPagination } from '../useApiPagination';
 import useSWR from 'swr';
 import { Response } from '@/lib/api/response';
 import { Folder } from '@/lib/db/models/folder';
+import TagPill from '../tags/TagPill';
+import { Tag } from '@/lib/db/models/tag';
 
 type ReducerQuery = {
-  state: { name: string; originalName: string; type: string };
+  state: { name: string; originalName: string; type: string; tags: string };
   action: { field: string; query: string };
 };
 
@@ -86,6 +94,88 @@ function SearchFilter({
   );
 }
 
+function TagsFilter({
+  setSearchField,
+  setSearchQuery,
+  searchQuery,
+}: {
+  searchQuery: {
+    name: string;
+    originalName: string;
+    type: string;
+    tags: string;
+  };
+  setSearchField: (...args: any) => void;
+  setSearchQuery: (...args: any) => void;
+}) {
+  const combobox = useCombobox();
+  const { data: tags } = useSWR<Extract<Response['/api/user/tags'], Tag[]>>('/api/user/tags');
+
+  const [value, setValue] = useState(searchQuery.tags.split(','));
+  const handleValueSelect = (val: string) => {
+    setValue((current) => (current.includes(val) ? current.filter((v) => v !== val) : [...current, val]));
+  };
+
+  const handleValueRemove = (val: string) => {
+    setValue((current) => current.filter((v) => v !== val));
+  };
+
+  const values = value.map((tag) => <TagPill key={tag} tag={tags?.find((t) => t.id === tag) || null} />);
+
+  const triggerSave = () => {
+    setSearchField('tags');
+
+    setSearchQuery({
+      field: 'tags',
+      query: value.join(','),
+    });
+  };
+
+  return (
+    <Combobox store={combobox} onOptionSubmit={handleValueSelect} withinPortal={false}>
+      <Combobox.DropdownTarget>
+        <PillsInput onBlur={() => triggerSave()} pointer onClick={() => combobox.toggleDropdown()} w={200}>
+          <Pill.Group>
+            {values.length > 0 ? values : <Input.Placeholder>Pick one or more tags</Input.Placeholder>}
+
+            <Combobox.EventsTarget>
+              <PillsInput.Field
+                type='hidden'
+                onBlur={() => combobox.closeDropdown()}
+                onKeyDown={(event) => {
+                  if (event.key === 'Backspace') {
+                    event.preventDefault();
+                    handleValueRemove(value[value.length - 1]);
+                  }
+                }}
+              />
+            </Combobox.EventsTarget>
+          </Pill.Group>
+        </PillsInput>
+      </Combobox.DropdownTarget>
+
+      <Combobox.Dropdown>
+        <Combobox.Options>
+          {tags?.map((tag) => (
+            <Combobox.Option value={tag.id} key={tag.id} active={value.includes(tag.id)}>
+              <Group gap='sm'>
+                <Checkbox
+                  checked={value.includes(tag.id)}
+                  onChange={() => {}}
+                  aria-hidden
+                  tabIndex={-1}
+                  style={{ pointerEvents: 'none' }}
+                />
+                <TagPill tag={tag} />
+              </Group>
+            </Combobox.Option>
+          ))}
+        </Combobox.Options>
+      </Combobox.Dropdown>
+    </Combobox>
+  );
+}
+
 export default function FileTable({ id }: { id?: string }) {
   const router = useRouter();
   const clipboard = useClipboard();
@@ -104,7 +194,7 @@ export default function FileTable({ id }: { id?: string }) {
   const [order, setOrder] = useState<'asc' | 'desc'>('desc');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const [searchField, setSearchField] = useState<'name' | 'originalName' | 'type'>('name');
+  const [searchField, setSearchField] = useState<'name' | 'originalName' | 'type' | 'tags'>('name');
   const [searchQuery, setSearchQuery] = useReducer(
     (state: ReducerQuery['state'], action: ReducerQuery['action']) => {
       return {
@@ -112,7 +202,7 @@ export default function FileTable({ id }: { id?: string }) {
         [action.field]: action.query,
       };
     },
-    { name: '', originalName: '', type: '' },
+    { name: '', originalName: '', type: '', tags: '' },
   );
 
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -172,7 +262,7 @@ export default function FileTable({ id }: { id?: string }) {
   }, [data]);
 
   useEffect(() => {
-    for (const field of ['name', 'originalName', 'type'] as const) {
+    for (const field of ['name', 'originalName', 'type', 'tags'] as const) {
       if (field !== searchField) {
         setSearchQuery({
           field,
@@ -298,17 +388,26 @@ export default function FileTable({ id }: { id?: string }) {
               filtering: searchField === 'name' && searchQuery.name.trim() !== '',
             },
             {
-              accessor: 'originalName',
-              sortable: true,
+              accessor: 'tags',
+              sortable: false,
+              width: 200,
+              render: (file) => (
+                <ScrollArea w={180} onClick={(e) => e.stopPropagation()}>
+                  <Flex gap='sm'>
+                    {file.tags!.map((tag) => (
+                      <TagPill tag={tag} key={tag.id} />
+                    ))}
+                  </Flex>
+                </ScrollArea>
+              ),
               filter: (
-                <SearchFilter
+                <TagsFilter
                   setSearchField={setSearchField}
                   searchQuery={searchQuery}
                   setSearchQuery={setSearchQuery}
-                  field='originalName'
                 />
               ),
-              filtering: searchField === 'originalName' && searchQuery.originalName.trim() !== '',
+              filtering: searchField === 'tags' && searchQuery.tags.trim() !== '',
             },
             {
               accessor: 'type',

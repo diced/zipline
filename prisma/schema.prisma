@@ -35,6 +35,7 @@ model User {
   folders        Folder[]
   limits         UserLimit[]
   invites        Invite[]
+  tags           Tag[]
   oauthProviders OAuthProvider[]
   IncompleteFile IncompleteFile[]
 }
@@ -46,8 +47,8 @@ model UserPasskey {
 
   lastUsed DateTime?
 
-  name     String
-  reg      Json
+  name String
+  reg  Json
 
   User   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId String
@@ -137,17 +138,16 @@ model File {
   folderId String?
 
   thumbnail Thumbnail?
-
 }
 
-model Thumbnail { 
+model Thumbnail {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   path String
 
-  file File @relation(fields: [fileId], references: [id], onDelete: Cascade, onUpdate: Cascade) 
+  file   File   @relation(fields: [fileId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   fileId String
 
   @@unique([fileId])
@@ -197,7 +197,9 @@ model Tag {
   name  String @unique
   color String
 
-  files File[]
+  files  File[]
+  User   User?   @relation(fields: [userId], references: [id])
+  userId String?
 }
 
 model Url {

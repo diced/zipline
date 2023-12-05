@@ -1,6 +1,5 @@
 import { prisma } from '@/lib/db';
 import { File, cleanFiles, fileSelect } from '@/lib/db/models/file';
-import { log } from '@/lib/logger';
 import { combine } from '@/lib/middleware/combine';
 import { method } from '@/lib/middleware/method';
 import { ziplineAuth } from '@/lib/middleware/ziplineAuth';
@@ -12,9 +11,8 @@ import { z } from 'zod';
 export type ApiUserFilesResponse = {
   page: File[];
   search?: {
-    field: 'name' | 'originalName' | 'type';
-    query: string;
-    threshold: number;
+    field: 'name' | 'originalName' | 'type' | 'tags';
+    query: string | string[];
   };
   total?: number;
   pages?: number;
@@ -27,13 +25,12 @@ type Query = {
   favorite?: 'true' | 'false';
   sortBy: keyof Prisma.FileOrderByWithAggregationInput;
   order: 'asc' | 'desc';
-  searchField?: 'name' | 'originalName' | 'type';
+  searchField?: 'name' | 'originalName' | 'type' | 'tags';
   searchQuery?: string;
-  searchThreshold?: string;
   id?: string;
 };
 
-const validateSearchField = z.enum(['name', 'originalName', 'type']).default('name');
+const validateSearchField = z.enum(['name', 'originalName', 'type', 'tags']).default('name');
 
 const validateSortBy = z
   .enum([
@@ -51,9 +48,6 @@ const validateSortBy = z
   .default('createdAt');
 
 const validateOrder = z.enum(['asc', 'desc']).default('desc');
-const validateThreshold = z.number().default(0.1);
-
-const logger = log('api').c('user').c('files');
 
 export async function handler(req: NextApiReq<any, Query>, res: NextApiRes<ApiUserFilesResponse>) {
   const user = await prisma.user.findUnique({
@@ -85,16 +79,39 @@ export async function handler(req: NextApiReq<any, Query>, res: NextApiRes<ApiUs
   const searchField = validateSearchField.safeParse(req.query.searchField || 'name');
   if (!searchField.success) return res.badRequest('Invalid searchField value');
 
-  const searchThreshold = validateThreshold.safeParse(Number(req.query.searchThreshold) || 0.1);
-  if (!searchThreshold.success) return res.badRequest('Invalid searchThreshold value');
-
   if (searchQuery) {
-    const extension: { extname: string }[] =
-      await prisma.$queryRaw`SELECT extname FROM pg_extension WHERE extname = 'pg_trgm';`;
-    if (extension.length === 0) {
-      logger.debug('pg_trgm extension not found, installing...');
-      await prisma.$executeRaw`CREATE EXTENSION IF NOT EXISTS pg_trgm;`;
-      logger.debug('pg_trgm extension installed');
+    let tagFiles: string[] = [];
+
+    if (searchField.data === 'tags') {
+      const parsedTags = searchQuery
+        .split(',')
+        .map((tag) => tag.trim())
+        .filter((tag) => tag);
+
+      const foundTags = await prisma.tag.findMany({
+        where: {
+          userId: user.id,
+          id: {
+            in: searchQuery
+              .split(',')
+              .map((tag) => tag.trim())
+              .filter((tag) => tag),
+          },
+        },
+        include: {
+          files: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      });
+
+      if (foundTags.length !== parsedTags.length) return res.badRequest('invalid tag somewhere');
+
+      tagFiles = foundTags
+        .map((tag) => tag.files.map((file) => file.id))
+        .reduce((a, b) => a.filter((c) => b.includes(c)));
     }
 
     const similarityResult = await prisma.file.findMany({
@@ -120,20 +137,38 @@ export async function handler(req: NextApiReq<any, Query>, res: NextApiRes<ApiUs
           filter !== 'all' && {
             favorite: true,
           }),
-        [searchField.data]: {
-          contains: searchQuery,
-          mode: 'insensitive',
-        },
+        ...(searchField.data === 'tags'
+          ? {
+              id: {
+                in: tagFiles,
+              },
+            }
+          : {
+              [searchField.data]: {
+                contains: searchQuery,
+                mode: 'insensitive',
+              },
+            }),
       },
       select: fileSelect,
+      orderBy: {
+        [sortBy.data]: order.data,
+      },
+      skip: (Number(page) - 1) * perpage,
+      take: perpage,
     });
 
     return res.ok({
       page: cleanFiles(similarityResult),
       search: {
         field: searchField.data,
-        query: searchQuery,
-        threshold: searchThreshold.data,
+        query:
+          searchField.data === 'tags'
+            ? searchQuery
+                .split(',')
+                .map((tag) => tag.trim())
+                .filter((tag) => tag)
+            : searchQuery,
       },
     });
   }

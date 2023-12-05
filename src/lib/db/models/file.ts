@@ -1,5 +1,6 @@
 import { config } from '@/lib/config';
 import { formatRootUrl } from '@/lib/url';
+import { Tag, tagSelectNoFiles } from './tag';
 
 export type File = {
   createdAt: Date;
@@ -18,6 +19,8 @@ export type File = {
   thumbnail: {
     path: string;
   } | null;
+
+  tags?: Tag[];
 
   url?: string;
   similarity?: number;
@@ -39,6 +42,9 @@ export const fileSelect = {
     select: {
       path: true,
     },
+  },
+  tags: {
+    select: tagSelectNoFiles,
   },
 };
 

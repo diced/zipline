@@ -4,6 +4,7 @@ import { Group, Title } from '@mantine/core';
 import FavoriteFiles from './views/FavoriteFiles';
 import FileTable from './views/FileTable';
 import Files from './views/Files';
+import TagsButton from './tags/TagsButton';
 
 export default function DashbaordFiles() {
   const view = useViewStore((state) => state.files);
@@ -12,6 +13,8 @@ export default function DashbaordFiles() {
     <>
       <Group>
         <Title>Files</Title>
+
+        <TagsButton />
 
         <GridTableSwitcher type='files' />
       </Group>

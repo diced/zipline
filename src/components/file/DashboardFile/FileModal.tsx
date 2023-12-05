@@ -1,16 +1,28 @@
+import TagPill from '@/components/pages/files/tags/TagPill';
+import { Response } from '@/lib/api/response';
+import { bytes } from '@/lib/bytes';
 import { File } from '@/lib/db/models/file';
+import { Folder } from '@/lib/db/models/folder';
+import { Tag } from '@/lib/db/models/tag';
+import { fetchApi } from '@/lib/fetchApi';
+import { useSettingsStore } from '@/lib/store/settings';
 import {
   ActionIcon,
+  Checkbox,
   Combobox,
   Group,
+  Input,
   InputBase,
   Modal,
+  Pill,
+  PillsInput,
   SimpleGrid,
   Title,
   Tooltip,
   useCombobox,
 } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
+import { showNotification } from '@mantine/notifications';
 import {
   Icon,
   IconBombFilled,
@@ -24,9 +36,14 @@ import {
   IconRefresh,
   IconStar,
   IconStarFilled,
+  IconTags,
+  IconTagsOff,
+  IconTextRecognition,
   IconTrashFilled,
   IconUpload,
 } from '@tabler/icons-react';
+import { useEffect, useState } from 'react';
+import useSWR from 'swr';
 import DashboardFileType from '../DashboardFileType';
 import {
   addToFolder,
@@ -35,16 +52,11 @@ import {
   deleteFile,
   downloadFile,
   favoriteFile,
+  mutateFiles,
   removeFromFolder,
   viewFile,
 } from '../actions';
 import FileStat from './FileStat';
-import useSWR from 'swr';
-import { Response } from '@/lib/api/response';
-import { Folder } from '@/lib/db/models/folder';
-import { bytes } from '@/lib/bytes';
-import { useSettingsStore } from '@/lib/store/settings';
-import { useState } from 'react';
 
 function ActionButton({
   Icon,
@@ -84,7 +96,7 @@ export default function FileModal({
     '/api/user/folders?noincl=true',
   );
 
-  const combobox = useCombobox();
+  const folderCombobox = useCombobox();
   const [search, setSearch] = useState('');
 
   const handleAdd = async (value: string) => {
@@ -94,6 +106,66 @@ export default function FileModal({
       addToFolder(file!, value);
     }
   };
+
+  const { data: tags } = useSWR<Extract<Response['/api/user/tags'], Tag[]>>('/api/user/tags');
+
+  const tagsCombobox = useCombobox();
+  const [value, setValue] = useState(file?.tags?.map((x) => x.id) ?? []);
+  const handleValueSelect = (val: string) => {
+    setValue((current) => (current.includes(val) ? current.filter((v) => v !== val) : [...current, val]));
+  };
+
+  const handleValueRemove = (val: string) => {
+    setValue((current) => current.filter((v) => v !== val));
+  };
+
+  const handleTagsUpdate = async () => {
+    if (value.length === file?.tags?.length && value.every((v) => file?.tags?.map((x) => x.id).includes(v))) {
+      return;
+    }
+
+    const { data, error } = await fetchApi<Response['/api/user/files/[id]']>(
+      `/api/user/files/${file!.id}`,
+      'PATCH',
+      {
+        tags: value,
+      },
+    );
+
+    if (error) {
+      showNotification({
+        title: 'Failed to save tags',
+        message: error.message,
+        color: 'red',
+        icon: <IconTagsOff size='1rem' />,
+      });
+    } else {
+      showNotification({
+        title: 'Saved tags',
+        message: `Saved ${data!.tags!.length} tags for file ${data!.name}`,
+        color: 'green',
+        icon: <IconTags size='1rem' />,
+      });
+    }
+
+    mutateFiles();
+  };
+
+  const triggerSave = async () => {
+    tagsCombobox.closeDropdown();
+
+    handleTagsUpdate();
+  };
+
+  const values = value.map((tag) => <TagPill key={tag} tag={tags?.find((t) => t.id === tag) || null} />);
+
+  useEffect(() => {
+    if (file) {
+      setValue(file.tags?.map((x) => x.id) ?? []);
+    } else {
+      setValue([]);
+    }
+  }, [file]);
 
   return (
     <Modal
@@ -133,7 +205,65 @@ export default function FileModal({
               <FileStat Icon={IconBombFilled} title='Deletes at' value={file.deletesAt.toLocaleString()} />
             )}
             <FileStat Icon={IconEyeFilled} title='Views' value={file.views} />
+            {file.originalName && (
+              <FileStat Icon={IconTextRecognition} title='Original Name' value={file.originalName} />
+            )}
           </SimpleGrid>
+
+          <>
+            <Title order={4} mt='lg' mb='xs'>
+              Tags
+            </Title>
+            <Combobox store={tagsCombobox} onOptionSubmit={handleValueSelect} withinPortal={false}>
+              <Combobox.DropdownTarget>
+                <PillsInput
+                  onBlur={() => triggerSave()}
+                  pointer
+                  onClick={() => tagsCombobox.toggleDropdown()}
+                >
+                  <Pill.Group>
+                    {values.length > 0 ? (
+                      values
+                    ) : (
+                      <Input.Placeholder>Pick one or more tags</Input.Placeholder>
+                    )}
+
+                    <Combobox.EventsTarget>
+                      <PillsInput.Field
+                        type='hidden'
+                        onBlur={() => tagsCombobox.closeDropdown()}
+                        onKeyDown={(event) => {
+                          if (event.key === 'Backspace') {
+                            event.preventDefault();
+                            handleValueRemove(value[value.length - 1]);
+                          }
+                        }}
+                      />
+                    </Combobox.EventsTarget>
+                  </Pill.Group>
+                </PillsInput>
+              </Combobox.DropdownTarget>
+
+              <Combobox.Dropdown>
+                <Combobox.Options>
+                  {tags?.map((tag) => (
+                    <Combobox.Option value={tag.id} key={tag.id} active={value.includes(tag.id)}>
+                      <Group gap='sm'>
+                        <Checkbox
+                          checked={value.includes(tag.id)}
+                          onChange={() => {}}
+                          aria-hidden
+                          tabIndex={-1}
+                          style={{ pointerEvents: 'none' }}
+                        />
+                        <TagPill tag={tag} />
+                      </Group>
+                    </Combobox.Option>
+                  ))}
+                </Combobox.Options>
+              </Combobox.Dropdown>
+            </Combobox>
+          </>
 
           <Group justify='space-between' mt='lg'>
             <Group>
@@ -149,7 +279,7 @@ export default function FileModal({
                   />
                 ) : (
                   <Combobox
-                    store={combobox}
+                    store={folderCombobox}
                     withinPortal={false}
                     onOptionSubmit={(value) => handleAdd(value)}
                   >
@@ -158,14 +288,14 @@ export default function FileModal({
                         rightSection={<Combobox.Chevron />}
                         value={search}
                         onChange={(event) => {
-                          combobox.openDropdown();
-                          combobox.updateSelectedOptionIndex();
+                          folderCombobox.openDropdown();
+                          folderCombobox.updateSelectedOptionIndex();
                           setSearch(event.currentTarget.value);
                         }}
-                        onClick={() => combobox.openDropdown()}
-                        onFocus={() => combobox.openDropdown()}
+                        onClick={() => folderCombobox.openDropdown()}
+                        onFocus={() => folderCombobox.openDropdown()}
                         onBlur={() => {
-                          combobox.closeDropdown();
+                          folderCombobox.closeDropdown();
                           setSearch(search || '');
                         }}
                         placeholder='Add to folder...'
