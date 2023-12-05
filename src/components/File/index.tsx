@@ -72,6 +72,9 @@ export default function File({
           },
           transition: 'filter 0.2s ease-in-out',
           cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
         shadow='md'
         onClick={() => setOpen(true)}
