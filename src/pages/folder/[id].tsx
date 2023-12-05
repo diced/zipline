@@ -107,6 +107,9 @@ export const getServerSideProps: GetServerSideProps<Props> = async (context) => 
     );
 
     // @ts-ignore
+    folder.files[j].size = Number(folder.files[j].size);
+
+    // @ts-ignore
     if (folder.files[j].password) folder.files[j].password = true;
 
     (folder.files[j].createdAt as unknown) = folder.files[j].createdAt.toString();
