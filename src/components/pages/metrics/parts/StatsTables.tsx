@@ -8,6 +8,9 @@ export default function StatsTables({ data }: { data: Metric[] }) {
 
   const recent = data[0]; // it is sorted by desc so 0 is the first one.
 
+  if (recent.data.filesUsers.length === 0) return null;
+  if (recent.data.urlsUsers.length === 0) return null;
+
   return (
     <>
       <SimpleGrid cols={{ base: 1, md: 2 }}>

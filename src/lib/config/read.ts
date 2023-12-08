@@ -160,6 +160,7 @@ export const PROP_TO_ENV: Record<string, string> = {
   'website.theme.default': 'WEBSITE_THEME_DEFAULT',
   'website.theme.dark': 'WEBSITE_THEME_DARK',
   'website.theme.light': 'WEBSITE_THEME_LIGHT',
+  'website.metricsShowUserSpecific': 'WEBSITE_METRICS_SHOW_USER_SPECIFIC',
 
   'mfa.totp.enabled': 'MFA_TOTP_ENABLED',
   'mfa.totp.issuer': 'MFA_TOTP_ISSUER',
@@ -239,6 +240,7 @@ export function readEnv() {
     env(PROP_TO_ENV['website.theme.default'], 'website.theme.default', 'string'),
     env(PROP_TO_ENV['website.theme.dark'], 'website.theme.dark', 'string'),
     env(PROP_TO_ENV['website.theme.light'], 'website.theme.light', 'string'),
+    env(PROP_TO_ENV['website.metricsShowUserSpecific'], 'website.metricsShowUserSpecific', 'boolean'),
 
     env(PROP_TO_ENV['mfa.totp.enabled'], 'mfa.totp.enabled', 'boolean'),
     env(PROP_TO_ENV['mfa.totp.issuer'], 'mfa.totp.issuer', 'string'),
