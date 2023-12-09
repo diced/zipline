@@ -124,8 +124,6 @@ export default function EmbeddedFile({
             <meta name='twitter:card' content='player' />
             <meta name='twitter:player' content={`${host}/r/${file.name}`} />
             <meta name='twitter:player:stream' content={`${host}/r/${file.name}`} />
-            <meta name='twitter:player:width' content='720' />
-            <meta name='twitter:player:height' content='480' />
             <meta name='twitter:player:stream:content_type' content={file.mimetype} />
             <meta name='twitter:title' content={file.name} />
 
