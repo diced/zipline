@@ -142,8 +142,6 @@ export default function EmbeddedFile({
             <meta property='og:video:url' content={`${host}/r/${file.name}`} />
             <meta property='og:video:secure_url' content={`${host}/r/${file.name}`} />
             <meta property='og:video:type' content={file.mimetype} />
-            <meta property='og:video:width' content='720' />
-            <meta property='og:video:height' content='480' />
           </>
         )}
         {file.mimetype.startsWith('audio') && (
