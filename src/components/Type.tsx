@@ -60,7 +60,7 @@ function VideoThumbnailPlaceholder({ file, mediaPreview, ...props }) {
   return (
     <Box sx={{ position: 'relative' }}>
       <Image
-        src={file.thumbnail}
+        src={typeof file.thumbnail === 'string' ? file.thumbnail : `/r/${file.thumbnail.name}`}
         sx={{
           width: '100%',
           height: 'auto',
