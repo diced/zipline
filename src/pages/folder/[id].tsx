@@ -85,6 +85,12 @@ export const getServerSideProps: GetServerSideProps<Props> = async (context) => 
           createdAt: true,
           password: true,
           size: true,
+          thumbnail: {
+            select: {
+              name: true,
+              id: true,
+            },
+          },
         },
       },
       user: {
