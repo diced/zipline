@@ -43,6 +43,8 @@
   ["afp", ["application/vnd.ibm.modcap"]],
   ["ahead", ["application/vnd.ahead.space"]],
   ["ahk", ["text/autohotkey"]],
+  ["ahk1", ["text/autohotkey"]],
+  ["ahk2", ["text/autohotkey"]],
   ["ai", ["application/postscript"]],
   ["aif", ["audio/aiff"]],
   ["aifc", ["audio/aiff"]],
