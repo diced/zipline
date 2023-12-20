@@ -20,8 +20,13 @@ export class S3 extends Datasource {
     });
   }
 
-  public async save(file: string, data: Buffer): Promise<void> {
-    await this.s3.putObject(this.config.bucket, file, data);
+  public async save(file: string, data: Buffer, options?: { type: string }): Promise<void> {
+    await this.s3.putObject(
+      this.config.bucket,
+      file,
+      data,
+      options ? { 'Content-Type': options.type } : undefined,
+    );
   }
 
   public async delete(file: string): Promise<void> {

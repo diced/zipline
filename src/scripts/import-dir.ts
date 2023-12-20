@@ -29,12 +29,12 @@ async function main() {
     const mime = await guess(files[i].split('.').pop());
     const { size } = statSync(join(directory, files[i]));
 
-    data.push({
+    data[i] = {
       name: files[i],
       mimetype: mime,
       userId,
       size,
-    });
+    };
 
     console.log(`Imported ${files[i]} (${bytesToHuman(size)}) (${mime} mimetype) to user ${userId}`);
   }
@@ -54,7 +54,9 @@ async function main() {
   console.log(`Copying files to ${config.datasource.type} storage..`);
   for (let i = 0; i !== files.length; ++i) {
     const file = files[i];
-    await datasource.save(file, await readFile(join(directory, file)));
+    await datasource.save(file, await readFile(join(directory, file)), {
+      type: data[i]?.mimetype ?? 'application/octet-stream',
+    });
   }
   console.log(`Finished copying files to ${config.datasource.type} storage.`);
 

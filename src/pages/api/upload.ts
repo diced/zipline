@@ -270,12 +270,12 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
     if (compressionUsed) {
       const buffer = await sharp(file.buffer).jpeg({ quality: imageCompressionPercent }).toBuffer();
-      await datasource.save(fileUpload.name, buffer);
+      await datasource.save(fileUpload.name, buffer, { type: 'image/jpeg' });
       logger.info(
         `User ${user.username} (${user.id}) compressed image from ${file.buffer.length} -> ${buffer.length} bytes`,
       );
     } else {
-      await datasource.save(fileUpload.name, file.buffer);
+      await datasource.save(fileUpload.name, file.buffer, { type: file.mimetype });
     }
 
     logger.info(`User ${user.username} (${user.id}) uploaded ${fileUpload.name} (${fileUpload.id})`);
