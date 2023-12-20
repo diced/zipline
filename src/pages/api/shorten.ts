@@ -54,7 +54,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
   logger.debug(`shortened ${JSON.stringify(url)}`);
 
-  logger.info(`User ${user.username} (${user.id}) shortenned a url ${url.destination} (${url.id})`);
+  logger.info(`User ${user.username} (${user.id}) shortened a url ${url.destination} (${url.id})`);
 
   let domain;
   if (req.headers['override-domain']) {
