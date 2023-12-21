@@ -85,7 +85,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     });
 
   logger.debug(
-    `registered user${usedInvite ? ' via invite ' + code : ''} ${JSON.stringify(newUser, jsonUserReplacer)}`
+    `registered user${usedInvite ? ' via invite ' + code : ''} ${JSON.stringify(newUser, jsonUserReplacer)}`,
   );
 
   delete newUser.password;
