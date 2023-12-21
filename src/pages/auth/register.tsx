@@ -50,7 +50,7 @@ export default function Register({ code = undefined, title, user_registration })
   };
 
   const createUser = async () => {
-    const res = await useFetch(`/api/auth/${user_registration ? 'register' : 'create'}`, 'POST', {
+    const res = await useFetch('/api/auth/register', 'POST', {
       code: user_registration ? null : code,
       username,
       password,

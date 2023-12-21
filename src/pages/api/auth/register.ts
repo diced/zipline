@@ -11,23 +11,49 @@ import { extname } from 'path';
 const logger = Logger.get('user');
 
 async function handler(req: NextApiReq, res: NextApiRes) {
-  if (!config.features.user_registration) return res.badRequest('user registration is disabled');
+  const user = await req.user();
+  let badRequest,
+    usedInvite = false;
 
-  const { username, password, administrator } = req.body as {
+  if (!config.features.user_registration && !config.features.invites && !user?.administrator)
+    return res.badRequest('This endpoint is unavailable due to current configurations');
+
+  const { username, password, administrator, code } = req.body as {
     username: string;
     password: string;
     administrator: boolean;
+    code?: string;
   };
 
-  if (!username) return res.badRequest('no username');
-  if (!password) return res.badRequest('no password');
+  if (!username) badRequest = true;
+  if (!password) badRequest = true;
 
   const existing = await prisma.user.findFirst({
     where: {
       username,
     },
+    select: {
+      username: true,
+    },
   });
-  if (existing) return res.badRequest('user exists');
+
+  if (existing) badRequest = true;
+
+  if (badRequest) return res.badRequest('Bad Username/Password');
+
+  if (code) {
+    if (config.features.invites) {
+      const invite = await prisma.invite.findUnique({
+        where: {
+          code,
+        },
+      });
+
+      if (!invite || invite?.used) return res.badRequest('Bad invite');
+      usedInvite = true;
+    } else return res.badRequest('Bad Username/Password');
+  } else if (config.features.invites && !config.features.user_registration && !user?.administrator)
+    return res.badRequest('Bad invite');
 
   const hashed = await hashPassword(password);
 
@@ -47,12 +73,20 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       password: hashed,
       username,
       token: createToken(),
-      administrator,
+      administrator: user?.superAdmin ? administrator : false,
       avatar,
     },
   });
 
-  logger.debug(`registered user ${JSON.stringify(newUser, jsonUserReplacer)}`);
+  if (usedInvite)
+    await prisma.invite.update({
+      where: { code },
+      data: { used: true },
+    });
+
+  logger.debug(
+    `registered user${usedInvite ? ' via invite ' + code : ''} ${JSON.stringify(newUser, jsonUserReplacer)}`
+  );
 
   delete newUser.password;
 
