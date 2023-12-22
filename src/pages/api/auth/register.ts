@@ -17,6 +17,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
   if (!config.features.user_registration && !config.features.invites && !user?.administrator)
     return res.badRequest('This endpoint is unavailable due to current configurations');
+  else if (!!user && !user?.administrator) return res.badRequest('Already logged in');
 
   const { username, password, administrator, code } = req.body as {
     username: string;
