@@ -59,9 +59,9 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
   if (zconfig.uploader.default_expiration) {
     try {
-      expiry = parseExpiry(zconfig.uploader.default_expiration)
+      expiry = parseExpiry(zconfig.uploader.default_expiration);
     } catch (error) {
-      return res.badRequest(`${error.message} (UPLOADER_DEFAULT_EXPIRATION)`)
+      return res.badRequest(`${error.message} (UPLOADER_DEFAULT_EXPIRATION)`);
     }
   }
 
