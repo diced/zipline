@@ -1,3 +1,4 @@
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import config from 'lib/config';
 import Logger from 'lib/logger';
 import prisma from 'lib/prisma';
@@ -8,15 +9,22 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   if (req.method === 'DELETE') {
     if (!req.body.id) return res.badRequest('no url id');
 
-    const url = await prisma.url.delete({
-      where: {
-        id: req.body.id,
-      },
-    });
+    try {
+      const url = await prisma.url.delete({
+        where: {
+          id: req.body.id,
+        },
+      });
 
-    Logger.get('url').info(`User ${user.username} (${user.id}) deleted a url ${url.destination} (${url.id})`);
+      Logger.get('url').info(
+        `User ${user.username} (${user.id}) deleted a url ${url.destination} (${url.id})`,
+      );
 
-    return res.json(url);
+      return res.json(url);
+    } catch (err) {
+      if (err instanceof PrismaClientKnownRequestError) return res.notFound('url not found');
+      else throw err;
+    }
   } else {
     const urls = await prisma.url.findMany({
       where: {
