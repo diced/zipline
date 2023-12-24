@@ -26,7 +26,7 @@ export function CreateUserModal({ open, setOpen, updateUsers }) {
     };
 
     setOpen(false);
-    const res = await useFetch('/api/auth/create', 'POST', data);
+    const res = await useFetch('/api/auth/register', 'POST', data);
     if (res.error) {
       showNotification({
         title: 'Failed to create user',
