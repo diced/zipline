@@ -49,16 +49,20 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   let expiry: Date;
 
   if (expiresAt) {
-    expiry = parseExpiry(expiresAt);
-    if (!expiry) return res.badRequest('invalid date');
-    else {
+    try {
+      expiry = parseExpiry(expiresAt);
       response.expiresAt = expiry;
+    } catch (error) {
+      return res.badRequest(error.message);
     }
   }
 
   if (zconfig.uploader.default_expiration) {
-    expiry = parseExpiry(zconfig.uploader.default_expiration);
-    if (!expiry) return res.badRequest('invalid date (UPLOADER_DEFAULT_EXPIRATION)');
+    try {
+      expiry = parseExpiry(zconfig.uploader.default_expiration);
+    } catch (error) {
+      return res.badRequest(`${error.message} (UPLOADER_DEFAULT_EXPIRATION)`);
+    }
   }
 
   const rawFormat = ((req.headers['format'] as string) || zconfig.uploader.default_format).toLowerCase();

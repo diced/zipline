@@ -16,8 +16,12 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       count: number;
     };
 
-    const expiry = parseExpiry(expiresAt);
-    if (!expiry) return res.badRequest('invalid date');
+    let expiry: Date;
+    try {
+      expiry = parseExpiry(expiresAt);
+    } catch (error) {
+      return res.badRequest(error.message);
+    }
     const counts = count ? count : 1;
 
     if (counts > 1) {
