@@ -14,8 +14,8 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     code?: string;
   };
 
-  const users = await prisma.user.findMany();
-  if (users.length === 0) {
+  const users = await prisma.user.count();
+  if (users === 0) {
     logger.debug('no users found... creating default user...');
     await prisma.user.create({
       data: {
