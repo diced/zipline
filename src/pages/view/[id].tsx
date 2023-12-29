@@ -206,8 +206,10 @@ export default function ViewFile({
                   __html: sanitize(
                     parseString(user.view.content, {
                       file,
-                      link: `${host}${formatRootUrl(config?.files?.route ?? '/u', file.name)}`,
-                      raw_link: `${host}/raw/${file.name}`,
+                      link: {
+                        returned: `${host}${formatRootUrl(config?.files?.route ?? '/u', file.name)}`,
+                        raw: `${host}/raw/${file.name}`,
+                      },
                     }) ?? '',
                     {
                       USE_PROFILES: { html: true },
@@ -265,8 +267,10 @@ export default function ViewFile({
                   __html: sanitize(
                     parseString(user?.view.content, {
                       file,
-                      link: `${host}${formatRootUrl(config?.files?.route ?? '/u', file.name)}`,
-                      raw_link: `${host}/raw/${file.name}`,
+                      link: {
+                        returned: `${host}${formatRootUrl(config?.files?.route ?? '/u', file.name)}`,
+                        raw: `${host}/raw/${file.name}`,
+                      },
                     }) ?? '',
                     {
                       USE_PROFILES: { html: true },

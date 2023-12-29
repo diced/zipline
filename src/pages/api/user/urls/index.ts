@@ -9,6 +9,7 @@ import { ziplineAuth } from '@/lib/middleware/ziplineAuth';
 import { NextApiReq, NextApiRes } from '@/lib/response';
 import { z } from 'zod';
 import { Prisma } from '@prisma/client';
+import { onShorten } from '@/lib/discord';
 
 export type ApiUserUrlsResponse =
   | Url[]
@@ -91,6 +92,14 @@ export async function handler(req: NextApiReq<Body, Query, Headers>, res: NextAp
       from: destination,
       to: responseUrl,
       user: req.user.id,
+    });
+
+    onShorten({
+      user: req.user,
+      url,
+      link: {
+        returned: responseUrl,
+      },
     });
 
     if (noJson) return res.status(200).end(responseUrl);

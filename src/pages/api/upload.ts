@@ -4,6 +4,8 @@ import { config as zconfig } from '@/lib/config';
 import { hashPassword } from '@/lib/crypto';
 import { datasource } from '@/lib/datasource';
 import { prisma } from '@/lib/db';
+import { fileSelect } from '@/lib/db/models/file';
+import { onUpload } from '@/lib/discord';
 import { removeGps } from '@/lib/gps';
 import { log } from '@/lib/logger';
 import { combine } from '@/lib/middleware/combine';
@@ -136,12 +138,7 @@ export async function handler(req: NextApiReq<any, any, UploadHeaders>, res: Nex
         ...(options.folder && { Folder: { connect: { id: options.folder } } }),
         ...(options.addOriginalName && { originalName: file.originalname }),
       },
-      select: {
-        name: true,
-        id: true,
-        type: true,
-        size: true,
-      },
+      select: fileSelect,
     });
 
     await datasource.put(fileUpload.name, file.buffer);
@@ -159,6 +156,15 @@ export async function handler(req: NextApiReq<any, any, UploadHeaders>, res: Nex
 
       ...(removedGps && { removedGps: true }),
       ...(compressed && { compressed: true }),
+    });
+
+    onUpload({
+      user: req.user,
+      file: fileUpload,
+      link: {
+        raw: `${domain}/raw/${fileUpload.name}`,
+        returned: responseUrl,
+      },
     });
   }
 

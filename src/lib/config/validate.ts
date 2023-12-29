@@ -15,6 +15,33 @@ declare global {
   }
 }
 
+export const discordContent = z
+  .object({
+    webhookUrl: z.string().url().nullable().default(null),
+    username: z.string().nullable().default(null),
+    avatarUrl: z.string().nullable().default(null),
+    content: z.string().nullable().default(null),
+    embed: z
+      .object({
+        title: z.string().nullable().default(null),
+        description: z.string().nullable().default(null),
+        footer: z.string().nullable().default(null),
+        color: z
+          .string()
+          .regex(/^#?([a-f0-9]{6}|[a-f0-9]{3})$/)
+          .nullable()
+          .default(null),
+        thumbnail: z.boolean().default(false),
+        imageOrVideo: z.boolean().default(false),
+        timestamp: z.boolean().default(false),
+        url: z.boolean().default(false),
+      })
+      .nullable()
+      .default(null),
+  })
+  .nullable()
+  .default(null);
+
 export const schema = z.object({
   core: z.object({
     port: z.number().default(3000),
@@ -49,7 +76,7 @@ export const schema = z.object({
     metricsInterval: z.number().default(ms('30min')),
   }),
   files: z.object({
-    route: z.string().startsWith('/').nonempty().trim().toLowerCase().default('/u'),
+    route: z.string().startsWith('/').min(1).trim().toLowerCase().default('/u'),
     length: z.number().default(6),
     defaultFormat: z.enum(['random', 'date', 'uuid', 'name', 'gfycat']).default('random'),
     disabledExtensions: z.array(z.string()).default([]),
@@ -60,7 +87,7 @@ export const schema = z.object({
     removeGpsMetadata: z.boolean().default(false),
   }),
   urls: z.object({
-    route: z.string().startsWith('/').nonempty().trim().toLowerCase().default('/go'),
+    route: z.string().startsWith('/').min(1).trim().toLowerCase().default('/go'),
     length: z.number().default(6),
   }),
   datasource: z
@@ -212,6 +239,16 @@ export const schema = z.object({
         }),
       ),
   }),
+  discord: z
+    .object({
+      webhookUrl: z.string().url().nullable().default(null),
+      username: z.string().nullable().default(null),
+      avatarUrl: z.string().url().nullable().default(null),
+      onUpload: discordContent,
+      onShorten: discordContent,
+    })
+    .nullable()
+    .default(null),
 });
 
 export type Config = z.infer<typeof schema>;
