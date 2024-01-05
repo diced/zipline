@@ -192,11 +192,29 @@ export default function EmbeddedFile({
         }}
       >
         {file.mimetype.startsWith('image') && (
-          <img src={dataURL('/r')} alt={dataURL('/r')} id='image_content' />
+          <img
+            style={{
+              maxHeight: '100vh',
+              maxWidth: '100vw',
+            }}
+            src={dataURL('/r')}
+            alt={dataURL('/r')}
+            id='image_content'
+          />
         )}
 
         {file.mimetype.startsWith('video') && (
-          <video src={dataURL('/r')} controls autoPlay muted id='video_content' />
+          <video
+            style={{
+              maxHeight: '100vh',
+              maxWidth: '100vw',
+            }}
+            src={dataURL('/r')}
+            controls
+            autoPlay
+            muted
+            id='video_content'
+          />
         )}
 
         {file.mimetype.startsWith('audio') && (
