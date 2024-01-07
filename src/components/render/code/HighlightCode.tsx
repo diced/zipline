@@ -2,8 +2,6 @@ import { ActionIcon, CopyButton, Paper, ScrollArea, Text, useMantineTheme } from
 import { IconCheck, IconClipboardCopy } from '@tabler/icons-react';
 import hljs from 'highlight.js';
 
-import styles from './HighlightCode.theme.module.css';
-
 export default function HighlightCode({ language, code }: { language: string; code: string }) {
   const theme = useMantineTheme();
 
@@ -31,8 +29,8 @@ export default function HighlightCode({ language, code }: { language: string; co
       </CopyButton>
 
       <ScrollArea type='auto' dir='ltr' offsetScrollbars={false}>
-        <pre style={{ margin: 0 }} className={styles.theme}>
-          <code className={styles.theme}>
+        <pre style={{ margin: 0 }} className='theme'>
+          <code className='theme'>
             {lines.map((line, i) => (
               <div key={i}>
                 <Text

@@ -1,4 +1,4 @@
-/* adapted from https://github.com/mantinedev/mantine/blob/master/src/mantine-code-highlight/src/CodeHighlight.tsx */
+/* adapted from https://github.com/mantinedev/mantine/blob/master/packages/%40mantine/code-highlight/src/CodeHighlight.theme.module.css */
 
 .theme {
   color: var(--_color);
@@ -28,70 +28,70 @@
     --code-class-color: var(--mantine-color-orange-5);
   }
 
-  :global(.hljs-comment),
-  :global(.hljs-quote) {
+  .hljs-comment,
+  .hljs-quote {
     font-style: italic;
     color: var(--code-comment-color);
   }
 
-  :global(.hljs-doctag),
-  :global(.hljs-formula),
-  :global(.hljs-keyword) {
+  .hljs-doctag,
+  .hljs-formula,
+  .hljs-keyword {
     color: var(--code-keyword-color);
   }
 
-  :global(.hljs-deletion),
-  :global(.hljs-name),
-  :global(.hljs-section),
-  :global(.hljs-selector-tag),
-  :global(.hljs-subst) {
+  .hljs-deletion,
+  .hljs-name,
+  .hljs-section,
+  .hljs-selector-tag,
+  .hljs-subst {
     color: var(--code-tag-color);
   }
 
-  :global(.hljs-literal) {
+  .hljs-literal {
     color: var(--code-literal-color);
   }
 
-  :global(.hljs-addition),
-  :global(.hljs-attribute),
-  :global(.hljs-meta .hljs-string),
-  :global(.hljs-regexp),
-  :global(.hljs-string) {
+  .hljs-addition,
+  .hljs-attribute,
+  .hljs-meta .hljs-string,
+  .hljs-regexp,
+  .hljs-string {
     color: var(--code-string-color);
   }
 
-  :global(.hljs-attr),
-  :global(.hljs-number),
-  :global(.hljs-selector-attr),
-  :global(.hljs-selector-class),
-  :global(.hljs-selector-pseudo),
-  :global(.hljs-template-variable),
-  :global(.hljs-type),
-  :global(.hljs-variable) {
+  .hljs-attr,
+  .hljs-number,
+  .hljs-selector-attr,
+  .hljs-selector-class,
+  .hljs-selector-pseudo,
+  .hljs-template-variable,
+  .hljs-type,
+  .hljs-variable {
     color: var(--code-variable-color);
   }
 
-  :global(.hljs-bullet),
-  :global(.hljs-link),
-  :global(.hljs-meta),
-  :global(.hljs-selector-id),
-  :global(.hljs-symbol),
-  :global(.hljs-title),
-  :global(.hljs-built_in),
-  :global(.hljs-class .hljs-title),
-  :global(.hljs-title.class_) {
+  .hljs-bullet,
+  .hljs-link,
+  .hljs-meta,
+  .hljs-selector-id,
+  .hljs-symbol,
+  .hljs-title,
+  .hljs-built_in,
+  .hljs-class .hljs-title,
+  .hljs-title.class_ {
     color: var(--code-class-color);
   }
 
-  :global(.hljs-emphasis) {
+  .hljs-emphasis {
     font-style: italic;
   }
 
-  :global(.hljs-strong) {
+  .hljs-strong {
     font-weight: 700;
   }
 
-  :global(.hljs-link) {
+  .hljs-link {
     text-decoration: underline;
   }
 }

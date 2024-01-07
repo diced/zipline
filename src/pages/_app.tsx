@@ -13,6 +13,7 @@ import '@mantine/notifications/styles.css';
 import 'mantine-datatable/styles.css';
 
 import '@/lib/theme/override.css';
+import '@/components/render/code/HighlightCode.theme.css';
 
 const fetcher = async (url: RequestInfo | URL) => {
   const res = await fetch(url);
