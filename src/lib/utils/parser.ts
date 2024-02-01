@@ -150,7 +150,7 @@ function modifier(mod: string, value: unknown, tzlocale?: string): string {
       default:
         return '{unknown_str_modifier}';
     }
-  } else if (typeof value === 'number') {
+  } else if (typeof value === 'number' || typeof value === 'bigint') {
     switch (mod) {
       case 'comma':
         return value.toLocaleString();

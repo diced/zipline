@@ -24,16 +24,16 @@ export function humanToBytes(value: string): number {
   return bytes;
 }
 
-export function bytesToHuman(value: number): string {
-  if (isNaN(value)) return '0.0 B';
+export function bytesToHuman(value: number | bigint): string {
+  if (typeof value !== 'bigint' && isNaN(value)) return '0.0 B';
   if (value === Infinity) return '0.0 B';
-  const units = ['B', 'kB', 'MB', 'GB', 'TB', 'PB'];
+  const units = ['B', 'kB', 'MB', 'GB', 'TB', 'PB']; // if people upload stuff bigger than a petabyte then idk
   let num = 0;
 
   while (value > 1024) {
-    value /= 1024;
+    value = Number(value) / 1024;
     ++num;
   }
 
-  return `${value.toFixed(1)} ${units[num]}`;
+  return `${Number(value).toFixed(1)} ${units[num] || ''}`;
 }
