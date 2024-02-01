@@ -80,9 +80,17 @@ export default function EmbeddedFile({
   useEffect(() => {
     if (pass) {
       setOpened(true);
-    } else {
-      updateImage();
     }
+  }, []);
+
+  useEffect(() => {
+    if (!file?.mimetype?.startsWith('image')) return;
+
+    updateImage();
+    window.addEventListener('resize', () => updateImage());
+    return () => {
+      window.removeEventListener('resize', () => updateImage());
+    };
   }, []);
 
   return (
@@ -192,15 +200,7 @@ export default function EmbeddedFile({
         }}
       >
         {file.mimetype.startsWith('image') && (
-          <img
-            style={{
-              maxHeight: '100vh',
-              maxWidth: '100vw',
-            }}
-            src={dataURL('/r')}
-            alt={dataURL('/r')}
-            id='image_content'
-          />
+          <img src={dataURL('/r')} alt={dataURL('/r')} id='image_content' />
         )}
 
         {file.mimetype.startsWith('video') && (
