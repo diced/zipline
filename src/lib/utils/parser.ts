@@ -128,6 +128,10 @@ function modifier(mod: string, value: unknown, tzlocale?: string): string {
         return value.getMinutes().toString();
       case 'second':
         return value.getSeconds().toString();
+      case 'ampm':
+        return value.getHours() < 12 ? 'am' : 'pm';
+      case 'AMPM':
+        return value.getHours() < 12 ? 'AM' : 'PM';
       default:
         return '{unknown_date_modifier}';
     }
