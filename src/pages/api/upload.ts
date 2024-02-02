@@ -42,6 +42,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     expiresAt?: Date;
     removed_gps?: boolean;
     assumed_mimetype?: string | boolean;
+    folder?: number;
   } = {
     files: [],
   };
@@ -81,6 +82,20 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   const fileMaxViews = req.headers['max-views'] ? Number(req.headers['max-views']) : null;
   if (isNaN(fileMaxViews)) return res.badRequest('invalid max views (invalid number)');
   if (fileMaxViews < 0) return res.badRequest('invalid max views (max views < 0)');
+
+  const folderToAdd = req.headers['x-zipline-folder'] ? Number(req.headers['x-zipline-folder']) : null;
+  if (folderToAdd) {
+    if (isNaN(folderToAdd)) return res.badRequest('invalid folder id (invalid number)');
+    const folder = await prisma.folder.findFirst({
+      where: {
+        id: folderToAdd,
+        userId: user.id,
+      },
+    });
+    if (!folder) return res.badRequest('invalid folder id (no folder found)');
+
+    response.folder = folder.id;
+  }
 
   // handle partial uploads before ratelimits
   if (req.headers['content-range'] && zconfig.chunks.enabled) {
@@ -132,6 +147,9 @@ async function handler(req: NextApiReq, res: NextApiRes) {
           mimetype: req.headers.uploadtext ? 'text/plain' : mimetype,
           userId: user.id,
           originalName: req.headers['original-name'] ? filename ?? null : null,
+          ...(folderToAdd && {
+            folderId: folderToAdd,
+          }),
         },
       });
 
@@ -266,6 +284,9 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         maxViews: fileMaxViews,
         originalName: req.headers['original-name'] ? decodedName ?? null : null,
         size: file.size,
+        ...(folderToAdd && {
+          folderId: folderToAdd,
+        }),
       },
     });
 
