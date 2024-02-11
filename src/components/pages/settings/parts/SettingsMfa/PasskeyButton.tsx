@@ -181,7 +181,7 @@ export default function PasskeyButton() {
         </Stack>
       </Modal>
 
-      <Button size='sm' leftSection={<IconKey size={24} />} onClick={() => setPasskeyOpen(true)}>
+      <Button size='sm' leftSection={<IconKey size='1rem' />} onClick={() => setPasskeyOpen(true)}>
         Manage passkeys
       </Button>
     </>

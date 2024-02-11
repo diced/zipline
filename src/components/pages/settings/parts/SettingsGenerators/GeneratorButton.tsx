@@ -16,9 +16,9 @@ import {
 import { IconDownload, IconEyeFilled, IconGlobe, IconPercentage, IconWriting } from '@tabler/icons-react';
 import Link from 'next/link';
 import React, { useReducer, useState } from 'react';
-import { flameshot } from './flameshot';
-import { sharex } from './sharex';
-import { shell } from './shell';
+import { flameshot } from './generators/flameshot';
+import { sharex } from './generators/sharex';
+import { shell } from './generators/shell';
 import { useUserStore } from '@/lib/store/user';
 
 export type GeneratorOptions = {

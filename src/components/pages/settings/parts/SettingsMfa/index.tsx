@@ -1,6 +1,6 @@
 import { Group, Paper, Text, Title } from '@mantine/core';
-import PasskeyButton from '../mfa/PasskeyButton';
-import TwoFAButton from '../mfa/TwoFAButton';
+import PasskeyButton from './PasskeyButton';
+import TwoFAButton from './TwoFAButton';
 import { useConfig } from '@/components/ConfigProvider';
 
 export default function SettingsMfa() {

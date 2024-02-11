@@ -1,9 +1,10 @@
 import { ZodError, ZodIssue, z } from 'zod';
 import { PROP_TO_ENV, ParsedEnv } from './read';
 import { log } from '../logger';
-import { resolve } from 'path';
+import { join, resolve } from 'path';
 import { bytes } from '../bytes';
 import ms from 'ms';
+import { tmpdir } from 'os';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -67,6 +68,10 @@ export const schema = z.object({
     databaseUrl: z.string().url(),
     returnHttpsUrls: z.boolean().default(false),
     defaultDomain: z.string().nullable().default(null),
+    tempDirectory: z
+      .string()
+      .transform((s) => resolve(s))
+      .default(join(tmpdir(), 'zipline')),
   }),
   scheduler: z.object({
     deleteInterval: z.number().default(ms('30min')),

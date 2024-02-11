@@ -201,7 +201,7 @@ export default function TwoFAButton() {
 
       <Button
         size='sm'
-        leftSection={<IconShieldLockFilled size={24} />}
+        leftSection={<IconShieldLockFilled size='1rem' />}
         color={user?.totpSecret ? 'red' : undefined}
         onClick={() => setTotpOpen(true)}
       >

@@ -21,10 +21,10 @@ import { darken } from '@/lib/theme/color';
 import styles from './index.module.css';
 
 const icons = {
-  DISCORD: <IconBrandDiscordFilled />,
-  GITHUB: <IconBrandGithubFilled />,
-  GOOGLE: <IconBrandGoogleFilled stroke={4} />,
-  AUTHENTIK: <IconCircleKeyFilled />,
+  DISCORD: <IconBrandDiscordFilled size='1rem' />,
+  GITHUB: <IconBrandGithubFilled size='1rem' />,
+  GOOGLE: <IconBrandGoogleFilled size='1rem' stroke={4} />,
+  AUTHENTIK: <IconCircleKeyFilled size='1rem' />,
 };
 
 const names = {

@@ -1,5 +1,5 @@
 import { UploadHeaders } from '@/lib/uploader/parseHeaders';
-import { GeneratorOptions, copier, download } from './GeneratorButton';
+import { GeneratorOptions, copier, download } from '../GeneratorButton';
 
 export function flameshot(token: string, type: 'file' | 'url', options: GeneratorOptions) {
   const curl = [

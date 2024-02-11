@@ -1,19 +1,30 @@
 import { UploadHeaders } from '@/lib/uploader/parseHeaders';
-import { GeneratorOptions, copier, download } from './GeneratorButton';
+import { GeneratorOptions, download } from '../GeneratorButton';
 
-export function shell(token: string, type: 'file' | 'url', options: GeneratorOptions) {
-  const curl = [
-    'curl',
-    '-H',
-    `"authorization: ${token}"`,
-    `${window.origin}/api/${type === 'file' ? 'upload' : 'user/urls'}`,
-  ];
+export function sharex(token: string, type: 'file' | 'url', options: GeneratorOptions) {
+  const config = {
+    Version: '14.1.0',
+    Name: `Zipline - ${window.location.origin} - ${type === 'file' ? 'File' : 'URL'}`,
+    DestinationType: 'ImageUploader, TextUploader, FileUploader',
+    RequestMethod: 'POST',
+    RequestURL: `${window.location.origin}/api/upload`,
+    Headers: {
+      authentication: token,
+    },
+    URL: '{json:files[0]}',
+    Body: 'MultipartFormData',
+    FileFormName: 'file',
+    Data: undefined,
+  };
 
-  if (type === 'file') {
-    curl.push('-F', 'file=@/tmp/screenshot.png');
-    curl.push('-H', 'content-type: multipart/form-data');
-  } else {
-    curl.push('-H', 'content-type: application/json');
+  if (type === 'url') {
+    config.URL = '{json:url}';
+    config.Body = 'JSON';
+    config.DestinationType = 'URLShortener,URLSharingService';
+    config.RequestURL = `${window.location.origin}/api/user/urls`;
+
+    delete (config as any).FileFormName;
+    (config as any).Data = JSON.stringify({ url: '{input}' });
   }
 
   const toAddHeaders: UploadHeaders = {};
@@ -44,6 +55,7 @@ export function shell(token: string, type: 'file' | 'url', options: GeneratorOpt
 
   if (options.noJson === true) {
     toAddHeaders['x-zipline-no-json'] = 'true';
+    config.URL = '{response}';
   } else {
     delete toAddHeaders['x-zipline-no-json'];
   }
@@ -61,22 +73,8 @@ export function shell(token: string, type: 'file' | 'url', options: GeneratorOpt
   }
 
   for (const [key, value] of Object.entries(toAddHeaders)) {
-    curl.push('-H', `${key}: ${value}`);
+    (config as any).Headers[key] = value;
   }
 
-  let script;
-
-  if (type === 'file') {
-    script = `#!/bin/bash
-${curl.join(' ')}${options.noJson ? '' : ' | jq -r .files[0].url'} | tr -d '\\n' | ${copier(options)}
-`;
-  } else {
-    script = `#!/bin/bash
-${curl.join(' ')} -d "{\\"url\\": \\"$1\\"}"${
-      options.noJson ? '' : ' | jq -r .files[0].url'
-    } | tr -d '\\n' | ${copier(options)}
-`;
-  }
-
-  return download(`zipline-script-${type}.sh`, script);
+  return download(`zipline-${type}.sxcu`, JSON.stringify(config, null, 2));
 }

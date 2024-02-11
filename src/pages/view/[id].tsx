@@ -132,6 +132,7 @@ export default function ViewFile({
           <meta property='og:video:type' content={file.type} />
           <meta property='og:video:width' content='720' />
           <meta property='og:video:height' content='480' />
+          <meta property='og:type' content='video.other' />
         </>
       )}
 
