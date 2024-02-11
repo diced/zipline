@@ -6,6 +6,7 @@ import { File } from './db/models/file';
 import { User } from './db/models/user';
 import { log } from './logger';
 import { Url } from './db/models/url';
+import { parserMetrics } from './parser/metrics';
 
 const logger = log('discord');
 
@@ -112,7 +113,9 @@ export async function onUpload({ user, file, link }: { user: User; file: File; l
   if (!config.discord?.webhookUrl && !config.discord?.onUpload?.webhookUrl)
     return logger.debug('no webhookUrl config, no webhook executed');
 
-  const content = parseContent(config.discord?.onUpload, { user, file, link });
+  const metrics = await parserMetrics(user.id);
+
+  const content = parseContent(config.discord?.onUpload, { user, file, link, ...metrics });
   if (!content) return logger.debug('no content somehow, no webhook executed');
 
   const response = buildResponse(content, file);
@@ -140,7 +143,9 @@ export async function onShorten({ user, url, link }: { user: User; url: Url; lin
   if (!config.discord?.webhookUrl && !config.discord?.onShorten?.webhookUrl)
     return logger.debug('no webhookUrl config, no webhook executed');
 
-  const content = parseContent(config.discord?.onShorten, { user, url, link });
+  const metrics = await parserMetrics(user.id);
+
+  const content = parseContent(config.discord?.onShorten, { user, url, link, ...metrics });
   if (!content) return logger.debug('no content somehow, no webhook executed');
 
   const response = buildResponse(content, undefined, url);

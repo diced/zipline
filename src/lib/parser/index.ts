@@ -1,8 +1,9 @@
-import { bytes } from './bytes';
-import { File } from './db/models/file';
-import { Url } from './db/models/url';
-import { User } from './db/models/user';
-import { log } from './logger';
+import { bytes } from '../bytes';
+import { File } from '../db/models/file';
+import { Url } from '../db/models/url';
+import { User } from '../db/models/user';
+import { log } from '../logger';
+import { ParseValueMetrics } from './metrics';
 
 export type ParseValue = {
   file?: File;
@@ -14,8 +15,12 @@ export type ParseValue = {
     raw?: string;
   };
 
+  metricsZipline?: ParseValueMetrics;
+  metricsUser?: ParseValueMetrics;
+
   debug?: {
     json?: string;
+    jsonf?: string;
   };
 };
 
@@ -25,27 +30,30 @@ export function parseString(str: string, value: ParseValue) {
   if (!str) return null;
   str = str.replace(/\\n/g, '\n');
 
-  if (process.env.DEBUG === 'zipline') {
-    value.debug = {
-      json: JSON.stringify(
-        {
-          file: value.file || null,
-          url: value.url || null,
-          user: value.user || null,
-          link: value.link || null,
-        },
-        (key, value) => {
-          if (key === 'password' || key === 'avatar') return '***';
-          if (key === 'reg' || key === 'passkeys') return 'passkey registration redacted';
-          if (key === 'oauthProviders') return 'oauth providers redacted';
+  const replacer = (key: string, value: unknown) => {
+    if (key === 'password' || key === 'avatar') return '***';
+    if (key === 'reg' || key === 'passkeys') return 'passkey registration redacted';
+    if (key === 'oauthProviders') return 'oauth providers redacted';
 
-          return value;
-        },
-      ),
-    };
-  }
+    return value;
+  };
 
-  const re = /\{(?<type>file|url|user|debug|link)\.(?<prop>\w+)(::(?<mod>\w+))?(::(?<mod_tzlocale>\S+))?\}/gi;
+  const data = {
+    file: value.file || null,
+    url: value.url || null,
+    user: value.user || null,
+    link: value.link || null,
+    metricsUser: value.metricsUser,
+    metricsZipline: value.metricsZipline,
+  };
+
+  value.debug = {
+    json: JSON.stringify(data, replacer),
+    jsonf: JSON.stringify(data, replacer, 2),
+  };
+
+  const re =
+    /\{(?<type>file|url|user|debug|link|metricsUser|metricsZipline)\.(?<prop>\w+)(::(?<mod>\w+))?(::(?<mod_tzlocale>\S+))?\}/gi;
   let matches: RegExpMatchArray | null;
 
   while ((matches = re.exec(str))) {
@@ -60,7 +68,7 @@ export function parseString(str: string, value: ParseValue) {
       continue;
     }
 
-    if (['password', 'avatar', 'passkeys', 'oauthProviders'].includes(matches.groups.prop)) {
+    if (['password', 'avatar', 'passkeys', 'oauthProviders', 'tags'].includes(matches.groups.prop)) {
       str = replaceCharsFromString(str, '{unknown_property}', index, re.lastIndex);
       re.lastIndex = index;
       continue;
@@ -160,6 +168,10 @@ function modifier(mod: string, value: unknown, tzlocale?: string): string {
         return value.getSeconds().toString();
       case 'string':
         return value.toString();
+      case 'ampm':
+        return value.getHours() < 12 ? 'am' : 'pm';
+      case 'AMPM':
+        return value.getHours() < 12 ? 'AM' : 'PM';
       default:
         return `{unknown_date_modifier(${mod})}`;
     }

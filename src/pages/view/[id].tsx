@@ -8,6 +8,7 @@ import { fileSelect, type File } from '@/lib/db/models/file';
 import { User, userSelect } from '@/lib/db/models/user';
 import { fetchApi } from '@/lib/fetchApi';
 import { parseString } from '@/lib/parser';
+import { parserMetrics } from '@/lib/parser/metrics';
 import { ZiplineTheme } from '@/lib/theme';
 import { readThemes } from '@/lib/theme/file';
 import { formatRootUrl } from '@/lib/url';
@@ -39,6 +40,7 @@ export default function ViewFile({
   user,
   config,
   host,
+  metrics,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   file.createdAt = new Date(file.createdAt);
   file.updatedAt = new Date(file.updatedAt);
@@ -71,24 +73,27 @@ export default function ViewFile({
   const meta = (
     <Head>
       {user?.view.embedTitle && user?.view.embed && (
-        <meta property='og:title' content={parseString(user.view.embedTitle, { file: file, user }) ?? ''} />
+        <meta
+          property='og:title'
+          content={parseString(user.view.embedTitle, { file: file, user, ...metrics }) ?? ''}
+        />
       )}
       {user?.view.embedDescription && user?.view.embed && (
         <meta
           property='og:description'
-          content={parseString(user.view.embedDescription, { file: file, user }) ?? ''}
+          content={parseString(user.view.embedDescription, { file, user, ...metrics }) ?? ''}
         />
       )}
       {user?.view.embedSiteName && user?.view.embed && (
         <meta
           property='og:site_name'
-          content={parseString(user.view.embedSiteName, { file: file, user }) ?? ''}
+          content={parseString(user.view.embedSiteName, { file, user, ...metrics }) ?? ''}
         />
       )}
       {user?.view.embedColor && user?.view.embed && (
         <meta
           property='theme-color'
-          content={parseString(user.view.embedColor, { file: file, user }) ?? ''}
+          content={parseString(user.view.embedColor, { file, user, ...metrics }) ?? ''}
         />
       )}
 
@@ -210,6 +215,7 @@ export default function ViewFile({
                         returned: `${host}${formatRootUrl(config?.files?.route ?? '/u', file.name)}`,
                         raw: `${host}/raw/${file.name}`,
                       },
+                      ...metrics,
                     }) ?? '',
                     {
                       USE_PROFILES: { html: true },
@@ -271,6 +277,7 @@ export default function ViewFile({
                         returned: `${host}${formatRootUrl(config?.files?.route ?? '/u', file.name)}`,
                         raw: `${host}/raw/${file.name}`,
                       },
+                      ...metrics,
                     }) ?? '',
                     {
                       USE_PROFILES: { html: true },
@@ -296,6 +303,7 @@ export const getServerSideProps: GetServerSideProps<{
   config?: SafeConfig;
   host: string;
   themes: ZiplineTheme[];
+  metrics?: Awaited<ReturnType<typeof parserMetrics>>;
 }> = async (context) => {
   const { id, pw } = context.query;
   if (!id) return { notFound: true };
@@ -308,6 +316,7 @@ export const getServerSideProps: GetServerSideProps<{
       ...fileSelect,
       password: true,
       userId: true,
+      tags: false,
     },
   });
   if (!file || !file.userId) return { notFound: true };
@@ -349,14 +358,14 @@ export const getServerSideProps: GetServerSideProps<{
   (user as any).updatedAt = user.updatedAt.toISOString();
 
   const code = await isCode(file.name);
-
   const themes = await readThemes();
+  const metrics = await parserMetrics(user.id);
 
   if (pw) {
     const verified = await verifyPassword(pw as string, file.password!);
 
     delete (file as any).password;
-    if (verified) return { props: { file, pw: pw as string, code, host, themes } };
+    if (verified) return { props: { file, pw: pw as string, code, host, themes, metrics } };
   }
 
   const password = !!file.password;
@@ -384,6 +393,7 @@ export const getServerSideProps: GetServerSideProps<{
       config,
       host,
       themes,
+      metrics,
     },
   };
 };
