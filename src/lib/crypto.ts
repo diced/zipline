@@ -1,7 +1,10 @@
 import crypto from 'crypto';
 import { hash, verify } from 'argon2';
+import { randomCharacters } from './random';
 
 const ALGORITHM = 'aes-256-cbc';
+
+export { randomCharacters } from './random';
 
 export function createKey(secret: string) {
   const hash = crypto.createHash('sha256');
@@ -40,19 +43,6 @@ export function decrypt(value: string, secret: string): string {
   buffer.set(final, decrypted.length);
 
   return buffer.toString();
-}
-
-export function randomCharacters(length: number): string {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  const charactersLength = characters.length;
-
-  let result = '';
-
-  for (let i = 0; i !== length; ++i) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-
-  return result;
 }
 
 export function createToken(): string {

@@ -24,6 +24,7 @@ import UploadOptionsButton from '../UploadOptionsButton';
 import { uploadFiles } from '../uploadFiles';
 import ToUploadFile from './ToUploadFile';
 import { bytes } from '@/lib/bytes';
+import { uploadPartialFiles } from '../uploadPartialFiles';
 
 export default function UploadFile() {
   const theme = useMantineTheme();
@@ -38,36 +39,60 @@ export default function UploadFile() {
   ]);
 
   const [files, setFiles] = useState<File[]>([]);
+  const [toPartialFiles, setToPartialFiles] = useState<File[]>([]);
   const [progress, setProgress] = useState(0);
   const [dropLoading, setLoading] = useState(false);
 
-  const aggregateSize = () => files.reduce((acc, file) => acc + file.size, 0);
+  const aggSize = () => files.reduce((acc, file) => acc + file.size, 0);
 
   const upload = () => {
-    const size = aggregateSize();
-    if (size > config.files.maxFileSize) {
+    for (let i = 0; i !== files.length; ++i) {
+      const file = files[i];
+      if (config.chunks.enabled && file.size >= config.chunks.max) {
+        setToPartialFiles((prev) => [...prev, file]);
+        setFiles((prev) => prev.filter((_, j) => i !== j));
+        continue;
+      }
+    }
+
+    const size = aggSize();
+    if (size > config.files.maxFileSize && !toPartialFiles.length) {
       notifications.show({
         title: 'Upload may fail',
         color: 'yellow',
         icon: <IconDeviceSdCard size='1rem' />,
         message: (
           <>
-            The upload may fail because the total size of the files you are trying to upload is{' '}
-            <b>{bytes(size)}</b>, which is larger than the limit of <b>{bytes(config.files.maxFileSize)}</b>
+            The upload may fail because the total size of the files (that are not being partially uploaded)
+            you are trying to upload is <b>{bytes(size)}</b>, which is larger than the limit of{' '}
+            <b>{bytes(config.files.maxFileSize)}</b>
           </>
         ),
       });
     }
 
-    uploadFiles(files, {
-      setFiles,
-      setLoading,
-      setProgress,
-      clipboard,
-      clearEphemeral,
-      options,
-      ephemeral,
-    });
+    if (toPartialFiles.length) {
+      uploadPartialFiles(toPartialFiles, {
+        setToPartialFiles,
+        setLoading,
+        setProgress,
+        clipboard,
+        clearEphemeral,
+        options,
+        ephemeral,
+        config,
+      });
+    } else {
+      uploadFiles(files, {
+        setFiles,
+        setLoading,
+        setProgress,
+        clipboard,
+        clearEphemeral,
+        options,
+        ephemeral,
+      });
+    }
   };
 
   return (
@@ -150,7 +175,7 @@ export default function UploadFile() {
           disabled={files.length === 0 || dropLoading}
           onClick={upload}
         >
-          Upload {files.length} files ({bytes(aggregateSize())})
+          Upload {files.length} files ({bytes(aggSize())})
         </Button>
       </Group>
     </>

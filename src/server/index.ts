@@ -47,6 +47,8 @@ async function main() {
     await mkdir(config.datasource.local!.directory, { recursive: true });
   }
 
+  await mkdir(config.core.tempDirectory, { recursive: true });
+
   process.env.DATABASE_URL = config.core.databaseUrl;
 
   await runMigrations();

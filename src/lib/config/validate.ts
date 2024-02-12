@@ -73,6 +73,11 @@ export const schema = z.object({
       .transform((s) => resolve(s))
       .default(join(tmpdir(), 'zipline')),
   }),
+  chunks: z.object({
+    max: z.number().default(bytes('95mb')),
+    size: z.number().default(bytes('25mb')),
+    enabled: z.boolean().default(true),
+  }),
   scheduler: z.object({
     deleteInterval: z.number().default(ms('30min')),
     clearInvitesInterval: z.number().default(ms('30min')),

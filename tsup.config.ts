@@ -23,4 +23,15 @@ export default defineConfig([
     },
     outDir: 'build/offload',
   },
+  {
+    platform: 'node',
+    format: 'cjs',
+    treeshake: true,
+    clean: false,
+    sourcemap: true,
+    entryPoints: {
+      partial: 'src/offload/partial.ts',
+    },
+    outDir: 'build/offload',
+  },
 ]);

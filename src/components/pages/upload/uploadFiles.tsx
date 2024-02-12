@@ -127,6 +127,7 @@ export function uploadFiles(
           color: 'red',
           icon: <IconFileXFilled size='1rem' />,
           autoClose: true,
+          loading: false,
         });
 
         return;
@@ -139,6 +140,7 @@ export function uploadFiles(
         color: 'green',
         icon: <IconFileUpload size='1rem' />,
         autoClose: true,
+        loading: false,
       });
       setFiles([]);
       filesModal(res.files, { clipboard, clearEphemeral });

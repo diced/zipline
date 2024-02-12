@@ -1,32 +1,26 @@
-import { bytes } from '@/lib/bytes';
-import { compress } from '@/lib/compress';
+import { handlePartialUpload } from '@/lib/api/partialUpload';
+import { handleFile } from '@/lib/api/upload';
 import { config as zconfig } from '@/lib/config';
-import { hashPassword } from '@/lib/crypto';
-import { datasource } from '@/lib/datasource';
-import { prisma } from '@/lib/db';
-import { fileSelect } from '@/lib/db/models/file';
-import { onUpload } from '@/lib/discord';
-import { removeGps } from '@/lib/gps';
 import { log } from '@/lib/logger';
 import { combine } from '@/lib/middleware/combine';
 import { file } from '@/lib/middleware/file';
 import { method } from '@/lib/middleware/method';
 import { ziplineAuth } from '@/lib/middleware/ziplineAuth';
-import { guess } from '@/lib/mimes';
 import { NextApiReq, NextApiRes } from '@/lib/response';
-import { formatFileName } from '@/lib/uploader/formatFileName';
 import { UploadHeaders, parseHeaders } from '@/lib/uploader/parseHeaders';
-import { extname, parse } from 'path';
 
 export type ApiUploadResponse = {
   files: {
     id: string;
     type: string;
     url: string;
+    pending?: boolean;
   }[];
 
   deletesAt?: string;
   assumedMimetypes?: boolean[];
+
+  partialSuccess?: boolean;
 };
 
 const logger = log('api').c('upload');
@@ -53,119 +47,51 @@ export async function handler(req: NextApiReq<any, any, UploadHeaders>, res: Nex
     domain = `${zconfig.core.returnHttpsUrls ? 'https' : 'http'}://${req.headers.host}`;
   }
 
+  logger.debug('uploading files', { files: req.files.map((x) => x.originalname) });
+
+  if (options.partial && zconfig.chunks.enabled) {
+    try {
+      await handlePartialUpload({
+        req,
+        file: req.files[0],
+        options,
+        domain,
+        response,
+      });
+    } catch (e) {
+      if (e instanceof String) {
+        return res.badRequest(e as string);
+      } else {
+        console.error(e);
+
+        return res.serverError('An error occurred while processing the file');
+      }
+    }
+
+    return res.ok(response);
+  }
+
   for (let i = 0; i !== req.files.length; ++i) {
     const file = req.files[i];
-    const extension = extname(file.originalname);
 
-    if (zconfig.files.disabledExtensions.includes(extension))
-      return res.badRequest(`File extension ${extension} is not allowed`);
-
-    if (file.size > zconfig.files.maxFileSize)
-      return res.badRequest(
-        `File size is too large. Maximum file size is ${zconfig.files.maxFileSize} bytes`,
-      );
-
-    let fileName = formatFileName(options.format || zconfig.files.defaultFormat, file.originalname);
-
-    if (options.overrides?.filename) {
-      fileName = options.overrides!.filename!;
-      const existing = await prisma.file.findFirst({
-        where: {
-          name: {
-            startsWith: fileName,
-          },
-        },
+    try {
+      await handleFile({
+        file,
+        i,
+        options,
+        domain,
+        response,
+        req,
       });
-      if (existing) return res.badRequest(`A file with the name "${fileName}*" already exists`);
-    }
+    } catch (e) {
+      if (e instanceof String) {
+        return res.badRequest(e as string);
+      } else {
+        console.error(e);
 
-    let mimetype = file.mimetype;
-    if (mimetype === 'application/octet-stream' && zconfig.files.assumeMimetypes) {
-      const ext = parse(file.originalname).ext.replace('.', '');
-      const mime = await guess(ext);
-
-      if (!mime) response.assumedMimetypes![i] = false;
-      else {
-        response.assumedMimetypes![i] = true;
-        mimetype = mime;
+        return res.serverError('An error occurred while processing the file');
       }
     }
-
-    if (options.folder) {
-      const exists = await prisma.folder.findFirst({
-        where: {
-          id: options.folder,
-          userId: req.user.id,
-        },
-      });
-
-      if (!exists) return res.badRequest('Folder does not exist');
-    }
-
-    let compressed = false;
-    if (mimetype.startsWith('image/') && options.imageCompressionPercent) {
-      const buffer = await compress(file.buffer, options.imageCompressionPercent);
-      logger.c('jpg').debug(`compressed file ${file.originalname}`, {
-        osize: bytes(file.buffer.length),
-        nsize: bytes(buffer.length),
-      });
-
-      file.buffer = buffer;
-      compressed = true;
-    }
-
-    let removedGps = false;
-    if (mimetype.startsWith('image/') && zconfig.files.removeGpsMetadata) {
-      removedGps = await removeGps(file.buffer);
-      if (removedGps) {
-        logger.c('gps').debug(`removed gps metadata from ${file.originalname}`);
-      }
-    }
-
-    const fileUpload = await prisma.file.create({
-      data: {
-        name: `${fileName}${compressed ? '.jpg' : extension}`,
-        size: file.buffer.length,
-        type: compressed ? 'image/jpeg' : mimetype,
-        User: {
-          connect: {
-            id: req.user.id,
-          },
-        },
-        ...(options.maxViews && { maxViews: options.maxViews }),
-        ...(options.password && { password: await hashPassword(options.password) }),
-        ...(options.deletesAt && { deletesAt: options.deletesAt }),
-        ...(options.folder && { Folder: { connect: { id: options.folder } } }),
-        ...(options.addOriginalName && { originalName: file.originalname }),
-      },
-      select: fileSelect,
-    });
-
-    await datasource.put(fileUpload.name, file.buffer);
-
-    logger.info(`${req.user.username} uploaded ${fileUpload.name}`, { size: bytes(fileUpload.size) });
-
-    const responseUrl = `${domain}${
-      zconfig.files.route === '/' || zconfig.files.route === '' ? '' : `${zconfig.files.route}`
-    }/${fileUpload.name}`;
-
-    response.files.push({
-      id: fileUpload.id,
-      type: fileUpload.type,
-      url: responseUrl,
-
-      ...(removedGps && { removedGps: true }),
-      ...(compressed && { compressed: true }),
-    });
-
-    onUpload({
-      user: req.user,
-      file: fileUpload,
-      link: {
-        raw: `${domain}/raw/${fileUpload.name}`,
-        returned: responseUrl,
-      },
-    });
   }
 
   if (options.noJson)

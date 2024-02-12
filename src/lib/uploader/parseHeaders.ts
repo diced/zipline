@@ -52,6 +52,12 @@ export type UploadHeaders = {
 
   'x-zipline-filename'?: string;
   'x-zipline-domain'?: string;
+
+  'content-range'?: string;
+  'x-zipline-p-filename'?: string;
+  'x-zipline-p-content-type'?: string;
+  'x-zipline-p-identifier'?: string;
+  'x-zipline-p-lastchunk'?: StringBoolean;
 };
 
 export type UploadOptions = {
@@ -72,6 +78,15 @@ export type UploadOptions = {
   // error
   header?: string;
   message?: string;
+
+  // partials
+  partial?: {
+    filename: string;
+    contentType: string;
+    identifier: string;
+    lastchunk: boolean;
+    range: [number, number, number]; // start, end, total
+  };
 };
 
 export function humanTime(string: StringValue | string): Date | null {
@@ -182,6 +197,22 @@ export function parseHeaders(headers: UploadHeaders, fileConfig: Config['files']
 
   const returnDomain = headers['x-zipline-domain'];
   if (returnDomain) response.overrides.returnDomain = returnDomain;
+
+  if (headers['content-range']) {
+    const [start, end, total] = headers['content-range']
+      .replace('bytes ', '')
+      .replace('-', '/')
+      .split('/')
+      .map((x) => Number(x));
+
+    response.partial = {
+      filename: headers['x-zipline-p-filename']!,
+      contentType: headers['x-zipline-p-content-type']!,
+      identifier: headers['x-zipline-p-identifier']!,
+      lastchunk: headers['x-zipline-p-lastchunk'] === 'true',
+      range: [start, end, total],
+    };
+  }
 
   return response;
 }

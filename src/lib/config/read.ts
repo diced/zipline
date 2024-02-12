@@ -13,6 +13,12 @@ export const rawConfig: any = {
     secret: undefined,
     databaseUrl: undefined,
     returnHttpsUrls: undefined,
+    tempDirectory: undefined,
+  },
+  chunks: {
+    max: undefined,
+    size: undefined,
+    enabled: undefined,
   },
   scheduler: {
     deleteInterval: undefined,
@@ -108,6 +114,11 @@ export const PROP_TO_ENV: Record<string, string> = {
   'core.databaseUrl': 'CORE_DATABASE_URL',
   'core.returnHttpsUrls': 'CORE_RETURN_HTTPS_URLS',
   'core.defaultDomain': 'CORE_DEFAULT_DOMAIN',
+  'core.tempDirectory': 'CORE_TEMP_DIRECTORY',
+
+  'chunks.max': 'CHUNKS_MAX',
+  'chunks.size': 'CHUNKS_SIZE',
+  'chunks.enabled': 'CHUNKS_ENABLED',
 
   'scheduler.deleteInterval': 'SCHEDULER_DELETE_INTERVAL',
   'scheduler.clearInvitesInterval': 'SCHEDULER_CLEAR_INVITES_INTERVAL',
@@ -220,6 +231,11 @@ export function readEnv() {
     env('core.databaseUrl', 'string'),
     env('core.returnHttpsUrls', 'boolean'),
     env('core.defaultDomain', 'string'),
+    env('core.tempDirectory', 'string'),
+
+    env('chunks.max', 'byte'),
+    env('chunks.size', 'byte'),
+    env('chunks.enabled', 'boolean'),
 
     env('scheduler.deleteInterval', 'ms'),
     env('scheduler.clearInvitesInterval', 'ms'),
