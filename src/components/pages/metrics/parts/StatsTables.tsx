@@ -1,6 +1,6 @@
 import { bytes } from '@/lib/bytes';
 import { Metric } from '@/lib/db/models/metric';
-import { Paper, SimpleGrid, Table } from '@mantine/core';
+import { Paper, ScrollArea, SimpleGrid, Table } from '@mantine/core';
 import TypesPieChart from './TypesPieChart';
 
 export default function StatsTables({ data }: { data: Metric[] }) {
@@ -25,14 +25,16 @@ export default function StatsTables({ data }: { data: Metric[] }) {
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
-              {recent.data.filesUsers.map((count, i) => (
-                <Table.Tr key={i}>
-                  <Table.Td>{count.username}</Table.Td>
-                  <Table.Td>{count.sum}</Table.Td>
-                  <Table.Td>{bytes(count.storage)}</Table.Td>
-                  <Table.Td>{count.views}</Table.Td>
-                </Table.Tr>
-              ))}
+              {recent.data.filesUsers
+                .sort((a, b) => b.sum - a.sum)
+                .map((count, i) => (
+                  <Table.Tr key={i}>
+                    <Table.Td>{count.username}</Table.Td>
+                    <Table.Td>{count.sum}</Table.Td>
+                    <Table.Td>{bytes(count.storage)}</Table.Td>
+                    <Table.Td>{count.views}</Table.Td>
+                  </Table.Tr>
+                ))}
             </Table.Tbody>
           </Table>
         </Paper>
@@ -47,35 +49,41 @@ export default function StatsTables({ data }: { data: Metric[] }) {
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
-              {recent.data.urlsUsers.map((count, i) => (
-                <Table.Tr key={i}>
-                  <Table.Td>{count.username}</Table.Td>
-                  <Table.Td>{count.sum}</Table.Td>
-                  <Table.Td>{count.views}</Table.Td>
-                </Table.Tr>
-              ))}
+              {recent.data.urlsUsers
+                .sort((a, b) => b.sum - a.sum)
+                .map((count, i) => (
+                  <Table.Tr key={i}>
+                    <Table.Td>{count.username}</Table.Td>
+                    <Table.Td>{count.sum}</Table.Td>
+                    <Table.Td>{count.views}</Table.Td>
+                  </Table.Tr>
+                ))}
             </Table.Tbody>
           </Table>
         </Paper>
 
-        <Paper radius='sm' withBorder>
-          <Table highlightOnHover>
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>Type</Table.Th>
-                <Table.Th>Files</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>
-              {recent.data.types.map((count, i) => (
-                <Table.Tr key={i}>
-                  <Table.Td>{count.type}</Table.Td>
-                  <Table.Td>{count.sum}</Table.Td>
+        <ScrollArea mah={500}>
+          <Paper radius='sm' withBorder>
+            <Table highlightOnHover>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>Type</Table.Th>
+                  <Table.Th>Files</Table.Th>
                 </Table.Tr>
-              ))}
-            </Table.Tbody>
-          </Table>
-        </Paper>
+              </Table.Thead>
+              <Table.Tbody>
+                {recent.data.types
+                  .sort((a, b) => b.sum - a.sum)
+                  .map((count, i) => (
+                    <Table.Tr key={i}>
+                      <Table.Td>{count.type}</Table.Td>
+                      <Table.Td>{count.sum}</Table.Td>
+                    </Table.Tr>
+                  ))}
+              </Table.Tbody>
+            </Table>
+          </Paper>
+        </ScrollArea>
 
         <Paper radius='sm' withBorder p='sm'>
           <TypesPieChart metric={recent} />
