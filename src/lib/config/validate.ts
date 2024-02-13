@@ -150,7 +150,11 @@ export const schema = z.object({
       enabled: z.boolean().default(true),
       num_threads: z.number().default(4),
     }),
-    metrics: z.boolean().default(true),
+    metrics: z.object({
+      enabled: z.boolean().default(true),
+      adminOnly: z.boolean().default(false),
+      showUserSpecific: z.boolean().default(true),
+    }),
   }),
   invites: z.object({
     enabled: z.boolean().default(true),
@@ -186,7 +190,6 @@ export const schema = z.object({
       dark: z.string().default('builtin:dark_gray'),
       light: z.string().default('builtin:light_gray'),
     }),
-    metricsShowUserSpecific: z.boolean().default(true),
   }),
   mfa: z.object({
     totp: z.object({

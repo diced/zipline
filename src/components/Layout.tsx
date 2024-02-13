@@ -67,7 +67,9 @@ const navLinks: NavLinks[] = [
     icon: <IconGraph size='1rem' />,
     active: (path: string) => path === '/dashboard/metrics',
     href: '/dashboard/metrics',
-    if: (_, config) => config.features.metrics,
+    if: (user, config) =>
+      config.features.metrics.enabled &&
+      (config.features.metrics.adminOnly ? isAdministrator(user?.role) : true),
   },
   {
     label: 'Files',

@@ -34,7 +34,7 @@ export async function handler(req: NextApiReq<any, Query>, res: NextApiRes<ApiSt
     },
   });
 
-  if (!config.website.metricsShowUserSpecific) {
+  if (!config.features.metrics.showUserSpecific) {
     for (let i = 0; i !== stats.length; ++i) {
       const stat = stats[i].data;
 

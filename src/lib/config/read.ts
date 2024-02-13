@@ -57,7 +57,11 @@ export const rawConfig: any = {
       enabled: undefined,
       num_threads: undefined,
     },
-    metrics: undefined,
+    metrics: {
+      enabled: undefined,
+      adminOnly: undefined,
+      showUserSpecific: undefined,
+    },
   },
   invites: {
     enabled: undefined,
@@ -160,7 +164,9 @@ export const PROP_TO_ENV: Record<string, string> = {
   'features.deleteOnMaxViews': 'FEATURES_DELETE_ON_MAX_VIEWS',
   'features.thumbails.enabled': 'FEATURES_THUMBNAILS_ENABLED',
   'features.thumbnails.num_threads': 'FEATURES_THUMBNAILS_NUM_THREADS',
-  'features.metrics': 'FEATURES_METRICS',
+  'features.metrics.enabled': 'FEATURES_METRICS_ENABLED',
+  'features.metrics.adminOnly': 'FEATURES_METRICS_ADMIN_ONLY',
+  'features.metrics.showUserSpecific': 'FEATURES_METRICS_SHOW_USER_SPECIFIC',
 
   'invites.enabled': 'INVITES_ENABLED',
   'invites.length': 'INVITES_LENGTH',
@@ -172,7 +178,6 @@ export const PROP_TO_ENV: Record<string, string> = {
   'website.theme.default': 'WEBSITE_THEME_DEFAULT',
   'website.theme.dark': 'WEBSITE_THEME_DARK',
   'website.theme.light': 'WEBSITE_THEME_LIGHT',
-  'website.metricsShowUserSpecific': 'WEBSITE_METRICS_SHOW_USER_SPECIFIC',
 
   'mfa.totp.enabled': 'MFA_TOTP_ENABLED',
   'mfa.totp.issuer': 'MFA_TOTP_ISSUER',
@@ -273,7 +278,9 @@ export function readEnv() {
     env('features.deleteOnMaxViews', 'boolean'),
     env('features.thumbnails.enabled', 'boolean'),
     env('features.thumbnails.num_threads', 'number'),
-    env('features.metrics', 'boolean'),
+    env('features.metrics.enabled', 'boolean'),
+    env('features.metrics.adminOnly', 'boolean'),
+    env('features.metrics.showUserSpecific', 'boolean'),
 
     env('invites.enabled', 'boolean'),
     env('invites.length', 'number'),
@@ -285,7 +292,6 @@ export function readEnv() {
     env('website.theme.default', 'string'),
     env('website.theme.dark', 'string'),
     env('website.theme.light', 'string'),
-    env('website.metricsShowUserSpecific', 'boolean'),
 
     env('mfa.totp.enabled', 'boolean'),
     env('mfa.totp.issuer', 'string'),
