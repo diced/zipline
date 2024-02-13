@@ -75,7 +75,7 @@ export async function uploadPartialFiles(
   {
     setProgress,
     setLoading,
-    setToPartialFiles,
+    setFiles,
     clipboard,
     options,
     ephemeral,
@@ -83,7 +83,7 @@ export async function uploadPartialFiles(
   }: {
     setProgress: (progress: number) => void;
     setLoading: (loading: boolean) => void;
-    setToPartialFiles: (files: File[]) => void;
+    setFiles: (files: File[]) => void;
     clipboard: ReturnType<typeof useClipboard>;
     clearEphemeral: () => void;
     options: UploadOptionsStore['options'];
@@ -195,7 +195,7 @@ export async function uploadPartialFiles(
               loading: false,
             });
 
-            setToPartialFiles([]);
+            setFiles([]);
             setProgress(100);
             setLoading(false);
 

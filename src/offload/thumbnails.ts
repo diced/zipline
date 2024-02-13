@@ -1,4 +1,5 @@
 import { bytes } from '@/lib/bytes';
+import { config } from '@/lib/config';
 import { datasource } from '@/lib/datasource';
 import { prisma } from '@/lib/db';
 import { log } from '@/lib/logger';
@@ -93,7 +94,7 @@ async function generate(ids: string[]) {
     const stream = await datasource.get(file.name);
     if (!stream) return;
 
-    const tmpFile = join('/tmp', `zthumbnail_${file.id}.tmp`);
+    const tmpFile = join(config.core.tempDirectory, `zthumbnail_${file.id}.tmp`);
     const writeStream = createWriteStream(tmpFile);
     await new Promise((resolve, reject) => {
       stream.pipe(writeStream);
