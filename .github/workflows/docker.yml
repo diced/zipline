@@ -30,6 +30,7 @@ jobs:
           platforms: linux/amd64
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          provenance: false
           tags: |
             ghcr.io/diced/zipline:v4-amd64
             ghcr.io/diced/zipline:v4-${{ steps.sha.outputs.short_sha }}-amd64
@@ -57,6 +58,7 @@ jobs:
           platforms: linux/arm64
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          provenance: false
           tags: |
             ghcr.io/diced/zipline:v4-arm64
             ghcr.io/diced/zipline:v4-${{ steps.sha.outputs.short_sha }}-arm64
