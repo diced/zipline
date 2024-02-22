@@ -78,8 +78,8 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: pull images
         run: |
-          docker pull ghcr.io/diced/zipline:v4-${{ steps.sha.outputs.short_sha }}-amd64
-          docker pull ghcr.io/diced/zipline:v4-${{ steps.sha.outputs.short_sha }}-arm64
+          docker pull --platform=linux/amd64 ghcr.io/diced/zipline:v4-${{ steps.sha.outputs.short_sha }}-amd64
+          docker pull --platform=linux/arm64 ghcr.io/diced/zipline:v4-${{ steps.sha.outputs.short_sha }}-arm64
 
       - name: create manifests
         run: |
