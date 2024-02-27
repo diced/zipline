@@ -63,11 +63,15 @@ export default function EmbeddedFile({
 
     const img = new Image();
     img.addEventListener('load', function () {
-      if (this.naturalWidth > innerWidth)
-        imageEl.width = Math.floor(
-          this.naturalWidth * Math.min(innerHeight / this.naturalHeight, innerWidth / this.naturalWidth),
-        );
-      else imageEl.width = this.naturalWidth;
+      // my best attempt of recreating https://searchfox.org/mozilla-central/source/dom/html/ImageDocument.cpp#271-276
+      // and it actually works
+
+      const ratio = Math.min(innerHeight / this.naturalHeight, innerWidth / this.naturalWidth);
+      const newWidth = Math.max(1, Math.floor(ratio * this.naturalWidth));
+      const newHeight = Math.max(1, Math.floor(ratio * this.naturalHeight));
+
+      imageEl.width = newWidth;
+      imageEl.height = newHeight;
     });
 
     img.src = url || dataURL('/r');
