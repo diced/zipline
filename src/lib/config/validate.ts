@@ -12,6 +12,7 @@ declare global {
     interface ProcessEnv {
       ZIPLINE_BUILD?: string;
       ZIPLINE_DB_LOG?: string;
+      ZIPLINE_OVERRIDE_DISABLED_WORKER_LOG?: string;
     }
   }
 }

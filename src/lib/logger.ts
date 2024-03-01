@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import { green, red, yellow, gray, white, bold, blue } from 'colorette';
+import { isMainThread } from 'worker_threads';
 
 export type LoggerLevel = 'info' | 'warn' | 'error' | 'debug' | 'trace';
 
@@ -10,7 +11,6 @@ export function log(name: string) {
 export default class Logger {
   public constructor(public name: string) {}
 
-  // Creates child of this logger
   public c(name: string) {
     return new Logger(`${this.name}::${name}`);
   }
@@ -53,7 +53,15 @@ export default class Logger {
     return value;
   }
 
+  private workerDisabled(): boolean {
+    const s = ['db', 'config'];
+
+    return s.some((v) => this.name.startsWith(v));
+  }
+
   private write(message: string, level: LoggerLevel, extra?: Record<string, unknown>) {
+    if (!isMainThread && this.workerDisabled() && !process.env.ZIPLINE_OVERRIDE_DISABLED_WORKER_LOG) return;
+
     process.stdout.write(`${this.format(message, level)}${extra ? this.formatExtra(extra) : ''}\n`);
   }
 
