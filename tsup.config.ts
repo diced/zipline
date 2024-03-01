@@ -19,6 +19,19 @@ export default defineConfig([
     clean: false,
     sourcemap: true,
     entryPoints: {
+      ctl: 'src/ctl/index.ts',
+    },
+    outDir: 'build',
+    bundle: true,
+    minify: true,
+  },
+  {
+    platform: 'node',
+    format: 'cjs',
+    treeshake: true,
+    clean: false,
+    sourcemap: true,
+    entryPoints: {
       thumbnails: 'src/offload/thumbnails.ts',
     },
     outDir: 'build/offload',
