@@ -53,7 +53,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
       if (!invite || invite?.used) return res.badRequest('Bad invite');
       usedInvite = true;
     } else return res.badRequest('Bad Username/Password');
-  } else if (config.features.invites && !config.features.user_registration && !user?.administrator)
+  } else if (config.features.invites && !user?.administrator)
     return res.badRequest('Bad invite');
 
   const hashed = await hashPassword(password);
