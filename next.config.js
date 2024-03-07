@@ -7,6 +7,11 @@ const nextConfig = {
       destination: '/auth/register?code=:code',
     },
   ],
+  webpack: (config) => {
+    config.resolve.fallback = { worker_threads: false };
+
+    return config;
+  },
 };
 
 module.exports = nextConfig;

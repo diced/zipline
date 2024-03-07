@@ -4,6 +4,7 @@ import { parse } from 'url';
 import { prisma } from '@/lib/db';
 import { config } from '@/lib/config';
 import { log } from '@/lib/logger';
+import { verifyPassword } from '@/lib/crypto';
 
 const logger = log('server').c('urls');
 
@@ -14,12 +15,13 @@ export async function urlsRoute(
   res: Response,
 ) {
   const { id } = req.params;
+  const { pw } = req.query;
 
   const parsedUrl = parse(req.url!, true);
 
   const url = await prisma.url.findFirst({
     where: {
-      OR: [{ code: id }, { vanity: id }],
+      OR: [{ code: id }, { vanity: id }, { id }],
     },
   });
   if (!url) return app.render404(req, res, parsedUrl);
@@ -40,6 +42,13 @@ export async function urlsRoute(
     }
 
     return app.render404(req, res, parsedUrl);
+  }
+
+  if (url.password) {
+    if (!pw) return res.redirect(`/view/url/${url.id}`);
+    const verified = await verifyPassword(pw as string, url.password);
+
+    if (!verified) return res.redirect(`/view/url/${url.id}`);
   }
 
   await prisma.url.update({

@@ -1,5 +1,5 @@
 import { config } from '@/lib/config';
-import { randomCharacters } from '@/lib/crypto';
+import { hashPassword, randomCharacters } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
 import { Url } from '@/lib/db/models/url';
 import { log } from '@/lib/logger';
@@ -43,6 +43,7 @@ export async function handler(req: NextApiReq<Body, Query, Headers>, res: NextAp
   if (req.method === 'POST') {
     const { vanity, destination } = req.body;
     const noJson = !!req.headers['x-zipline-no-json'];
+
     let maxViews: number | undefined;
     const returnDomain = req.headers['x-zipline-domain'];
 
@@ -52,6 +53,10 @@ export async function handler(req: NextApiReq<Body, Query, Headers>, res: NextAp
       if (isNaN(maxViews)) return res.badRequest('Max views must be a number');
       if (maxViews < 0) return res.badRequest('Max views must be greater than 0');
     }
+
+    const password = req.headers['x-zipline-password']
+      ? await hashPassword(req.headers['x-zipline-password'])
+      : undefined;
 
     if (!destination) return res.badRequest('Destination is required');
 
@@ -72,6 +77,7 @@ export async function handler(req: NextApiReq<Body, Query, Headers>, res: NextAp
         code: randomCharacters(config.urls.length),
         ...(vanity && { vanity: vanity }),
         ...(maxViews && { maxViews: maxViews }),
+        ...(password && { password: password }),
       },
     });
 

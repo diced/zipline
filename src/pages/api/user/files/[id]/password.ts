@@ -26,7 +26,7 @@ export async function handler(req: NextApiReq<Body>, res: NextApiRes<ApiUserFile
     },
   });
   if (!file) return res.notFound();
-  if (!file.password) return res.forbidden("This file doesn't have a password");
+  if (!file.password) return res.notFound();
 
   const verified = await verifyPassword(req.body.password, file.password);
   if (!verified) return res.forbidden('Incorrect password');

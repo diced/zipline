@@ -9,6 +9,7 @@ import {
   Group,
   Modal,
   NumberInput,
+  PasswordInput,
   Stack,
   TextInput,
   Title,
@@ -35,11 +36,13 @@ export default function DashboardURLs() {
     url: string;
     vanity: string;
     maxViews: '' | number;
+    password: string;
   }>({
     initialValues: {
       url: '',
       vanity: '',
       maxViews: '',
+      password: '',
     },
     validate: {
       url: hasLength({ min: 1 }, 'URL is required'),
@@ -47,11 +50,7 @@ export default function DashboardURLs() {
   });
 
   const onSubmit = async (values: typeof form.values) => {
-    try {
-      new URL(values.url);
-    } catch {
-      return form.setFieldError('url', 'Invalid URL');
-    }
+    if (URL.canParse(values.url) === false) return form.setFieldError('url', 'Invalid URL');
 
     const { data, error } = await fetchApi<Extract<Response['/api/user/urls'], { url: string }>>(
       '/api/user/urls',
@@ -60,7 +59,10 @@ export default function DashboardURLs() {
         destination: values.url,
         vanity: values.vanity.trim() || null,
       },
-      values.maxViews !== '' ? { 'x-zipline-max-views': String(values.maxViews) } : {},
+      {
+        ...(values.maxViews !== '' && { 'x-zipline-max-views': String(values.maxViews) }),
+        ...(values.password !== '' && { 'x-zipline-password': values.password }),
+      },
     );
 
     if (error) {
@@ -137,6 +139,12 @@ export default function DashboardURLs() {
               description='Optional field, leave blank to disable a view limit.'
               min={0}
               {...form.getInputProps('maxViews')}
+            />
+
+            <PasswordInput
+              label='Password'
+              description='Protect your link with a password'
+              {...form.getInputProps('password')}
             />
 
             <Button type='submit' variant='outline' radius='sm' leftSection={<IconLink size='1rem' />}>

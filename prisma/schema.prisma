@@ -212,6 +212,7 @@ model Url {
   destination String
   views       Int     @default(0)
   maxViews    Int?
+  password    String?
 
   User   User?   @relation(fields: [userId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   userId String?
