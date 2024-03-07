@@ -59,10 +59,10 @@ export async function handler(req: NextApiReq<any, any, UploadHeaders>, res: Nex
         response,
       });
     } catch (e) {
-      if (e instanceof String) {
-        return res.badRequest(e as string);
+      if (typeof e === 'string') {
+        return res.badRequest(e);
       } else {
-        console.error(e);
+        logger.error('error while processing partial file ' + e);
 
         return res.serverError('An error occurred while processing the file');
       }
@@ -84,10 +84,10 @@ export async function handler(req: NextApiReq<any, any, UploadHeaders>, res: Nex
         req,
       });
     } catch (e) {
-      if (e instanceof String) {
-        return res.badRequest(e as string);
+      if (typeof e === 'string') {
+        return res.badRequest(e);
       } else {
-        console.error(e);
+        logger.error('error while processing file ' + e);
 
         return res.serverError('An error occurred while processing the file');
       }

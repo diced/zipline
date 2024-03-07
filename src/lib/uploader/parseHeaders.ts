@@ -52,6 +52,7 @@ export type UploadHeaders = {
 
   'x-zipline-filename'?: string;
   'x-zipline-domain'?: string;
+  'x-zipline-file-extension'?: string;
 
   'content-range'?: string;
   'x-zipline-p-filename'?: string;
@@ -71,6 +72,7 @@ export type UploadOptions = {
   overrides?: {
     filename?: string;
     returnDomain?: string;
+    extension?: string;
   };
 
   folder?: string;
@@ -195,6 +197,12 @@ export function parseHeaders(headers: UploadHeaders, fileConfig: Config['files']
   const filename = headers['x-zipline-filename'];
   if (filename) response.overrides.filename = filename;
 
+  const extension = headers['x-zipline-file-extension'];
+  if (extension) {
+    if (!extension.startsWith('.')) response.overrides.extension = `.${extension}`;
+    else response.overrides.extension = extension;
+  }
+
   const returnDomain = headers['x-zipline-domain'];
   if (returnDomain) response.overrides.returnDomain = returnDomain;
 
@@ -204,6 +212,9 @@ export function parseHeaders(headers: UploadHeaders, fileConfig: Config['files']
       .replace('-', '/')
       .split('/')
       .map((x) => Number(x));
+
+    if (isNaN(start) || isNaN(end) || isNaN(total))
+      return headerError('content-range', 'Invalid content-range');
 
     response.partial = {
       filename: headers['x-zipline-p-filename']!,

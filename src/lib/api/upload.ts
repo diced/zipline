@@ -1,19 +1,19 @@
-import { extname, parse } from 'path';
+import { ApiUploadResponse } from '@/pages/api/upload';
+import { extname } from 'path';
+import { bytes } from '../bytes';
+import { compress } from '../compress';
 import { config } from '../config';
+import { hashPassword } from '../crypto';
+import { datasource } from '../datasource';
 import { prisma } from '../db';
+import { fileSelect } from '../db/models/file';
+import { onUpload } from '../discord';
+import { removeGps } from '../gps';
+import { log } from '../logger';
+import { guess } from '../mimes';
 import { File, NextApiReq } from '../response';
 import { formatFileName } from '../uploader/formatFileName';
 import { UploadHeaders, UploadOptions } from '../uploader/parseHeaders';
-import { guess } from '../mimes';
-import { ApiUploadResponse } from '@/pages/api/upload';
-import { compress } from '../compress';
-import { bytes } from '../bytes';
-import { log } from '../logger';
-import { removeGps } from '../gps';
-import { hashPassword } from '../crypto';
-import { fileSelect } from '../db/models/file';
-import { datasource } from '../datasource';
-import { onUpload } from '../discord';
 
 const logger = log('api').c('upload');
 
@@ -32,8 +32,7 @@ export async function handleFile({
   response: ApiUploadResponse;
   req: NextApiReq<any, any, UploadHeaders>;
 }) {
-  const extension = extname(file.originalname);
-
+  const extension = options.overrides?.extension ?? extname(file.originalname);
   if (config.files.disabledExtensions.includes(extension)) throw `File extension ${extension} is not allowed`;
 
   if (file.size > config.files.maxFileSize)
@@ -55,8 +54,7 @@ export async function handleFile({
 
   let mimetype = file.mimetype;
   if (mimetype === 'application/octet-stream' && config.files.assumeMimetypes) {
-    const ext = parse(file.originalname).ext.replace('.', '');
-    const mime = await guess(ext);
+    const mime = await guess(extension.substring(1));
 
     if (!mime) response.assumedMimetypes![i] = false;
     else {

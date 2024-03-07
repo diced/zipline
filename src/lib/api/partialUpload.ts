@@ -1,15 +1,15 @@
+import { ApiUploadResponse } from '@/pages/api/upload';
+import { writeFile } from 'fs/promises';
+import { extname, join } from 'path';
+import { Worker } from 'worker_threads';
+import { config } from '../config';
+import { hashPassword } from '../crypto';
+import { prisma } from '../db';
 import { log } from '../logger';
+import { guess } from '../mimes';
+import { File, NextApiReq } from '../response';
 import { formatFileName } from '../uploader/formatFileName';
 import { UploadHeaders, UploadOptions } from '../uploader/parseHeaders';
-import { ApiUploadResponse } from '@/pages/api/upload';
-import { File, NextApiReq } from '../response';
-import { config } from '../config';
-import { writeFile } from 'fs/promises';
-import { extname, join, parse } from 'path';
-import { Worker } from 'worker_threads';
-import { prisma } from '../db';
-import { guess } from '../mimes';
-import { hashPassword } from '../crypto';
 
 const logger = log('api').c('upload');
 export async function handlePartialUpload({
@@ -31,7 +31,7 @@ export async function handlePartialUpload({
   if (!options.partial.identifier || !options.partial.range || options.partial.range.length !== 3)
     throw 'Invalid partial upload';
 
-  const extension = extname(options.partial.filename);
+  const extension = options.overrides?.extension ?? extname(options.partial.filename);
   if (config.files.disabledExtensions.includes(extension)) throw `File extension ${extension} is not allowed`;
 
   let fileName = formatFileName(options.format || config.files.defaultFormat, file.originalname);
@@ -49,8 +49,7 @@ export async function handlePartialUpload({
 
   let mimetype = options.partial.contentType;
   if (mimetype === 'application/octet-stream' && config.files.assumeMimetypes) {
-    const ext = parse(file.originalname).ext.replace('.', '');
-    const mime = await guess(ext);
+    const mime = await guess(extension.substring(1));
 
     if (mime) mimetype = mime;
   }
