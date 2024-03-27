@@ -1,7 +1,7 @@
 import { Response } from '@/lib/api/response';
 import { ErrorBody } from '@/lib/response';
 import { UploadOptionsStore } from '@/lib/store/uploadOptions';
-import { ActionIcon, Anchor, Group, Stack, Table, Title, Tooltip } from '@mantine/core';
+import { ActionIcon, Anchor, Button, Group, Stack, Table, Title, Tooltip } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
@@ -61,6 +61,31 @@ export function filesModal(
             </Group>
           ))}
         </Stack>
+        {files.length > 1 && (
+          <Group justify='right'>
+            <Tooltip label='Copy all links to clipboard'>
+              <Button
+                onClick={() => {
+                  clipboard.copy(files.map((file) => file.url).join('\n'));
+                  notifications.show({
+                    title: 'Copied URLs to clipboard',
+                    message: 'Copied all URLs to clipboard seperated by a new line.',
+                    color: 'blue',
+                    icon: <IconClipboardCopy size='1rem' />,
+                  });
+                }}
+                variant='filled'
+                color='blue'
+                size='compact-md'
+                mt='sm'
+                fullWidth
+                leftSection={<IconClipboardCopy size='1rem' />}
+              >
+                Copy {files.length} URLs to clipboard
+              </Button>
+            </Tooltip>
+          </Group>
+        )}
       </Table>
     ),
   });
