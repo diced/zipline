@@ -52,4 +52,11 @@ export class LocalDatasource extends Datasource {
       await rm(join(this.dir, file));
     }
   }
+
+  public async range(file: string, start: number, end: number): Promise<Readable> {
+    const path = join(this.dir, file);
+    const readStream = createReadStream(path, { start, end });
+
+    return readStream;
+  }
 }

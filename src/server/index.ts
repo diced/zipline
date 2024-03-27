@@ -19,6 +19,7 @@ import clearInvites from '@/lib/scheduler/jobs/clearInvites';
 import maxViews from '@/lib/scheduler/jobs/maxViews';
 import thumbnails from '@/lib/scheduler/jobs/thumbnails';
 import metrics from '@/lib/scheduler/jobs/metrics';
+import { parseRange } from '@/lib/api/range';
 
 const MODE = process.env.NODE_ENV || 'production';
 
@@ -108,8 +109,6 @@ async function main() {
       },
     });
 
-    const stream = await datasource.get(file?.name ?? id);
-    if (!stream) return app.render404(req, res, parsedUrl);
     if (file?.password) {
       if (!pw) return res.status(403).json({ code: 403, message: 'Password protected.' });
       const verified = await verifyPassword(pw as string, file.password!);
@@ -117,17 +116,56 @@ async function main() {
       if (!verified) return res.status(403).json({ code: 403, message: 'Incorrect password.' });
     }
 
-    const size = await datasource.size(file?.name ?? id);
+    const size = file?.size || (await datasource.size(file?.name ?? id));
 
-    res.setHeader('Content-Type', 'text/plain');
-    res.setHeader('Content-Length', size);
-    file?.originalName &&
-      res.setHeader(
-        'Content-Disposition',
-        `${req.query.download ? 'attachment; ' : ''}filename="${file.originalName}"`,
-      );
+    if (req.headers.range) {
+      const [start, end] = parseRange(req.headers.range, size);
+      if (start >= size || end >= size) {
+        res.writeHead(416, {
+          'Content-Length': size,
+          'Content-Type': file?.type || 'application/octet-stream',
+          ...(file?.originalName && {
+            'Content-Disposition': `${req.query.download ? 'attachment; ' : ''}filename="${
+              file.originalName
+            }"`,
+          }),
+        });
 
-    stream.pipe(res);
+        const buf = await datasource.get(file?.name ?? id);
+        if (!buf) return app.render404(req, res, parsedUrl);
+
+        return buf.pipe(res);
+      }
+
+      res.writeHead(206, {
+        'Content-Range': `bytes ${start}-${end}/${size}`,
+        'Accept-Ranges': 'bytes',
+        'Content-Length': end - start + 1,
+        'Content-Type': file?.type || 'application/octet-stream',
+        ...(file?.originalName && {
+          'Content-Disposition': `${req.query.download ? 'attachment; ' : ''}filename="${file.originalName}"`,
+        }),
+      });
+
+      const buf = await datasource.range(file?.name ?? id, start || 0, end);
+      if (!buf) return app.render404(req, res, parsedUrl);
+
+      return buf.pipe(res);
+    }
+
+    res.writeHead(200, {
+      'Content-Length': size,
+      'Accept-Ranges': 'bytes',
+      'Content-Type': file?.type || 'application/octet-stream',
+      ...(file?.originalName && {
+        'Content-Disposition': `${req.query.download ? 'attachment; ' : ''}filename="${file.originalName}"`,
+      }),
+    });
+
+    const buf = await datasource.get(file?.name ?? id);
+    if (!buf) return app.render404(req, res, parsedUrl);
+
+    return buf.pipe(res);
   });
 
   server.all('*', (req, res) => {
