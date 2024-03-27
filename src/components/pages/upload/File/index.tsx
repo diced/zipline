@@ -6,6 +6,7 @@ import {
   Collapse,
   Grid,
   Group,
+  Kbd,
   Paper,
   Progress,
   Text,
@@ -16,10 +17,10 @@ import {
 } from '@mantine/core';
 import { Dropzone } from '@mantine/dropzone';
 import { useClipboard, useColorScheme } from '@mantine/hooks';
-import { notifications } from '@mantine/notifications';
+import { notifications, showNotification } from '@mantine/notifications';
 import { IconDeviceSdCard, IconFiles, IconPhoto, IconUpload, IconX } from '@tabler/icons-react';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import UploadOptionsButton from '../UploadOptionsButton';
 import { uploadFiles } from '../uploadFiles';
 import ToUploadFile from './ToUploadFile';
@@ -41,6 +42,23 @@ export default function UploadFile() {
   const [files, setFiles] = useState<File[]>([]);
   const [progress, setProgress] = useState(0);
   const [dropLoading, setLoading] = useState(false);
+
+  const handlePaste = (e: ClipboardEvent) => {
+    if (!e.clipboardData) return;
+
+    for (let i = 0; i !== e.clipboardData.items.length; ++i) {
+      if (!e.clipboardData.items[i].type.startsWith('image')) return;
+
+      const blob = e.clipboardData.items[i].getAsFile();
+      if (!blob) return;
+
+      setFiles([...files, blob]);
+      showNotification({
+        message: `Image ${blob.name} pasted from clipboard`,
+        color: 'blue',
+      });
+    }
+  };
 
   const aggSize = () => files.reduce((acc, file) => acc + file.size, 0);
 
@@ -93,6 +111,14 @@ export default function UploadFile() {
     }
   };
 
+  useEffect(() => {
+    document.addEventListener('paste', handlePaste);
+
+    return () => {
+      document.removeEventListener('paste', handlePaste);
+    };
+  }, []);
+
   return (
     <>
       <Group gap='sm'>
@@ -129,6 +155,9 @@ export default function UploadFile() {
           <div>
             <Text size='xl' inline>
               Drag images here or click to select files
+            </Text>
+            <Text size='sm' inline mt='xs'>
+              Or <Kbd size='xs'>Ctrl</Kbd> + <Kbd size='xs'>V</Kbd> to paste images from clipboard
             </Text>
             <Text size='sm' c='dimmed' inline mt={7}>
               Attach as many files as you like, they will show up below to review before uploading.
