@@ -52,7 +52,7 @@ export default function App({ Component, pageProps }: AppProps) {
               centered: true,
             }}
           >
-            <Notifications />
+            <Notifications zIndex={100000000} />
             <Component {...pageProps} />
           </ModalsProvider>
         </Theming>

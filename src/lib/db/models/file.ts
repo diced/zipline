@@ -13,6 +13,7 @@ export type File = {
   size: number;
   type: string;
   views: number;
+  maxViews?: number;
   password?: string | boolean | null;
   folderId: string | null;
 
@@ -37,6 +38,7 @@ export const fileSelect = {
   size: true,
   type: true,
   views: true,
+  maxViews: true,
   folderId: true,
   thumbnail: {
     select: {
