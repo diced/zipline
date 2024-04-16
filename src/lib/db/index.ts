@@ -2,6 +2,7 @@ import { log } from '@/lib/logger';
 import { Prisma, PrismaClient } from '@prisma/client';
 import { userViewSchema } from './models/user';
 import { metricDataSchema } from './models/metric';
+import { metadataSchema } from './models/incompleteFile';
 
 const building = !!process.env.ZIPLINE_BUILD;
 
@@ -60,6 +61,14 @@ function getClient() {
           needs: { data: true },
           compute({ data }: { data: Prisma.JsonValue }) {
             return metricDataSchema.parse(data);
+          },
+        },
+      },
+      incompleteFile: {
+        metadata: {
+          needs: { metadata: true },
+          compute({ metadata }: { metadata: Prisma.JsonValue }) {
+            return metadataSchema.parse(metadata);
           },
         },
       },

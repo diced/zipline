@@ -16,6 +16,7 @@ import { ApiUserResponse } from '@/pages/api/user';
 import { ApiUserFilesResponse } from '@/pages/api/user/files';
 import { ApiUserFilesIdResponse } from '@/pages/api/user/files/[id]';
 import { ApiUserFilesIdPasswordResponse } from '@/pages/api/user/files/[id]/password';
+import { ApiUserFilesIncompleteResponse } from '@/pages/api/user/files/incomplete';
 import { ApiUserFilesTransactionResponse } from '@/pages/api/user/files/transaction';
 import { ApiUserFoldersResponse } from '@/pages/api/user/folders';
 import { ApiUserFoldersIdResponse } from '@/pages/api/user/folders/[id]';
@@ -47,6 +48,7 @@ export type Response = {
   '/api/user/files/[id]/password': ApiUserFilesIdPasswordResponse;
   '/api/user/files/[id]': ApiUserFilesIdResponse;
   '/api/user/files/transaction': ApiUserFilesTransactionResponse;
+  '/api/user/files/incomplete': ApiUserFilesIncompleteResponse;
   '/api/user/files': ApiUserFilesResponse;
   '/api/user/urls/[id]': ApiUserUrlsIdResponse;
   '/api/user/urls': ApiUserUrlsResponse;
