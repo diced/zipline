@@ -13,7 +13,7 @@ export type File = {
   size: number;
   type: string;
   views: number;
-  maxViews?: number;
+  maxViews?: number | null;
   password?: string | boolean | null;
   folderId: string | null;
 

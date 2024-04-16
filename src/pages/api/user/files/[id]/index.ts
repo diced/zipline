@@ -63,7 +63,6 @@ export async function handler(req: NextApiReq<Body, Query>, res: NextApiRes<ApiU
       if (tags.length !== req.body.tags.length) return res.badRequest('invalid tag somewhere');
     }
 
-
     const newFile = await prisma.file.update({
       where: {
         id: req.query.id,
