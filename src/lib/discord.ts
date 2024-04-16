@@ -46,7 +46,6 @@ export function parseContent(
   content: DiscordContent | null,
   value: ParseValue,
 ): (DiscordContent & { raw: string }) | null {
-  console.log(content, value);
   if (!content) return null;
   if (!value.link) return null;
 
