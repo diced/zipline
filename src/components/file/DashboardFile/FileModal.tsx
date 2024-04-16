@@ -209,7 +209,11 @@ export default function FileModal({
                 value={new Date(file.updatedAt).toLocaleString()}
               />
               {file.deletesAt && !reduce && (
-                <FileStat Icon={IconBombFilled} title='Deletes at' value={file.deletesAt.toLocaleString()} />
+                <FileStat
+                  Icon={IconBombFilled}
+                  title='Deletes at'
+                  value={new Date(file.deletesAt).toLocaleString()}
+                />
               )}
               <FileStat
                 Icon={IconEyeFilled}
