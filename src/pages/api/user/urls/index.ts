@@ -44,6 +44,14 @@ export async function handler(req: NextApiReq<Body, Query, Headers>, res: NextAp
     const { vanity, destination } = req.body;
     const noJson = !!req.headers['x-zipline-no-json'];
 
+    const countUrls = await prisma.url.count({
+      where: {
+        userId: req.user.id,
+      },
+    });
+    if (req.user.quota && req.user.quota.maxUrls && countUrls + 1 > req.user.quota.maxUrls)
+      return res.forbidden(`shortenning this url would exceed your quota of ${req.user.quota.maxUrls} urls`);
+
     let maxViews: number | undefined;
     const returnDomain = req.headers['x-zipline-domain'];
 

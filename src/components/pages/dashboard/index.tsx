@@ -20,6 +20,27 @@ export default function DashboardHome() {
       <Text size='sm' c='dimmed'>
         You have <b>{statsLoading ? '...' : stats?.filesUploaded}</b> files uploaded.
       </Text>
+      {user?.quota && (user.quota.maxBytes || user.quota.maxFiles) ? (
+        <Text size='sm' c='dimmed'>
+          {user.quota.filesQuota === 'BY_BYTES' ? (
+            <>
+              You have used <b>{statsLoading ? '...' : bytes(stats!.storageUsed)}</b> out of{' '}
+              <b>{user.quota.maxBytes}</b> of storage
+            </>
+          ) : (
+            <>
+              You have uploaded <b>{statsLoading ? '...' : stats?.filesUploaded}</b> files out of{' '}
+              <b>{user.quota.maxFiles}</b> files allowed.
+            </>
+          )}
+        </Text>
+      ) : null}
+      {user?.quota && user.quota.maxUrls ? (
+        <Text size='sm' c='dimmed'>
+          You have created <b>{statsLoading ? '...' : stats?.urlsCreated}</b> links out of{' '}
+          <b>{user.quota.maxUrls}</b> links allowed.
+        </Text>
+      ) : null}
 
       <Title order={2} mt='md' mb='xs'>
         Recent files

@@ -1,6 +1,8 @@
 import { handlePartialUpload } from '@/lib/api/partialUpload';
 import { handleFile } from '@/lib/api/upload';
+import { bytes } from '@/lib/bytes';
 import { config as zconfig } from '@/lib/config';
+import { prisma } from '@/lib/db';
 import { log } from '@/lib/logger';
 import { combine } from '@/lib/middleware/combine';
 import { file } from '@/lib/middleware/file';
@@ -31,6 +33,36 @@ export async function handler(req: NextApiReq<any, any, UploadHeaders>, res: Nex
   const options = parseHeaders(req.headers, zconfig.files);
 
   if (options.header) return res.badRequest('', options);
+
+  if (req.user.quota) {
+    const totalFileSize = options.partial
+      ? options.partial.contentLength
+      : req.files.reduce((acc, x) => acc + x.size, 0);
+
+    const userAggregateStats = await prisma.file.aggregate({
+      where: {
+        userId: req.user.id,
+      },
+      _sum: {
+        size: true,
+      },
+      _count: {
+        _all: true,
+      },
+    });
+    const aggSize = userAggregateStats!._sum?.size === null ? 0 : userAggregateStats!._sum?.size;
+
+    if (req.user.quota.filesQuota === 'BY_BYTES' && aggSize + totalFileSize > bytes(req.user.quota.maxBytes!))
+      return res.tooLarge(
+        `uploading will exceed your storage quota of ${bytes(req.user.quota.maxBytes!)} bytes`,
+      );
+
+    if (
+      req.user.quota.filesQuota === 'BY_FILES' &&
+      userAggregateStats!._count?._all + req.files.length > req.user.quota.maxFiles!
+    )
+      return res.tooLarge(`uploading will exceed your file count quota of ${req.user.quota.maxFiles} files`);
+  }
 
   const response: ApiUploadResponse = {
     files: [],

@@ -35,6 +35,7 @@ export interface NextApiRes<Data = any> extends NextApiResponse {
   unauthorized: (message?: string, data?: ErrorBody) => void;
   forbidden: (message?: string, data?: ErrorBody) => void;
   notFound: (message?: string, data?: ErrorBody) => void;
+  tooLarge: (message?: string, data?: ErrorBody) => void;
   ratelimited: (retryAfter: number, message?: string, data?: ErrorBody) => void;
   serverError: (message?: string, data?: ErrorBody) => void;
   methodNotAllowed: (message?: string, data?: ErrorBody) => void;

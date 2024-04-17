@@ -227,6 +227,7 @@ export async function uploadPartialFiles(
       req.setRequestHeader('x-zipline-p-filename', file.name);
       req.setRequestHeader('x-zipline-p-lastchunk', j === chunks.length - 1 ? 'true' : 'false');
       req.setRequestHeader('x-zipline-p-content-type', file.type);
+      req.setRequestHeader('x-zipline-p-content-length', file.size.toString());
       req.setRequestHeader('content-range', `bytes ${chunks[j].start}-${chunks[j].end}/${file.size}`);
 
       req.send(body);

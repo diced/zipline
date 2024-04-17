@@ -46,6 +46,14 @@ export function functions() {
         });
       };
 
+      res.tooLarge = (message: string = 'Payload Too Large', data: ErrorBody = {}) => {
+        return res.status(413).json({
+          code: 413,
+          message,
+          ...data,
+        });
+      };
+
       res.ratelimited = (retryAfter: number, message: string = 'Ratelimited', data: ErrorBody = {}) => {
         res.setHeader('Retry-After', retryAfter);
         return res.status(429).json({

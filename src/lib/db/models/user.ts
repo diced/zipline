@@ -1,4 +1,4 @@
-import { OAuthProvider, UserPasskey } from '@prisma/client';
+import { OAuthProvider, UserPasskey, UserQuota } from '@prisma/client';
 import { z } from 'zod';
 
 export type User = {
@@ -13,6 +13,8 @@ export type User = {
 
   totpSecret?: string | null;
   passkeys?: UserPasskey[];
+
+  quota?: UserQuota | null;
 
   avatar?: string | null;
   password?: string | null;
@@ -29,6 +31,7 @@ export const userSelect = {
   oauthProviders: true,
   totpSecret: true,
   passkeys: true,
+  quota: true,
 };
 
 export type UserViewSettings = z.infer<typeof userViewSchema>;

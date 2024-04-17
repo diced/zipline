@@ -30,14 +30,35 @@ model User {
   totpSecret String?
   passkeys   UserPasskey[]
 
+  quota UserQuota?
+
   files          File[]
   urls           Url[]
   folders        Folder[]
-  limits         UserLimit[]
   invites        Invite[]
   tags           Tag[]
   oauthProviders OAuthProvider[]
   IncompleteFile IncompleteFile[]
+}
+
+model UserQuota {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  filesQuota UserFilesQuota
+  maxBytes   String?
+  maxFiles   Int?
+
+  maxUrls Int?
+
+  User   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String? @unique
+}
+
+enum UserFilesQuota {
+  BY_BYTES
+  BY_FILES
 }
 
 model UserPasskey {
@@ -83,35 +104,6 @@ enum OAuthProviderType {
   GOOGLE
   GITHUB
   AUTHENTIK
-}
-
-model UserLimit {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  type      LimitType      @unique
-  value     Int
-  timeframe LimitTimeframe
-
-  User   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId String
-}
-
-enum LimitType {
-  UPLOAD_COUNT
-  UPLOAD_SIZE
-  SHORTEN_COUNT
-}
-
-enum LimitTimeframe {
-  SECONDLY
-  MINUTELY
-  HOURLY
-  DAILY
-  WEEKLY
-  MONTHLY
-  YEARLY
 }
 
 model File {

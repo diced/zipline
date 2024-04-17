@@ -59,6 +59,7 @@ export type UploadHeaders = {
   'x-zipline-p-content-type'?: string;
   'x-zipline-p-identifier'?: string;
   'x-zipline-p-lastchunk'?: StringBoolean;
+  'x-zipline-p-content-length'?: string;
 };
 
 export type UploadOptions = {
@@ -88,6 +89,7 @@ export type UploadOptions = {
     identifier: string;
     lastchunk: boolean;
     range: [number, number, number]; // start, end, total
+    contentLength: number;
   };
 };
 
@@ -222,6 +224,7 @@ export function parseHeaders(headers: UploadHeaders, fileConfig: Config['files']
       identifier: headers['x-zipline-p-identifier']!,
       lastchunk: headers['x-zipline-p-lastchunk'] === 'true',
       range: [start, end, total],
+      contentLength: Number(headers['x-zipline-p-content-length']!),
     };
   }
 
