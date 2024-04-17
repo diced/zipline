@@ -74,8 +74,6 @@ export default function EditUserModal({
   const onSubmit = async (values: typeof form.values) => {
     if (!user) return;
 
-    console.log(values);
-
     let avatar64: string | null = null;
     if (values.avatar) {
       if (!values.avatar.type.startsWith('image/')) return form.setFieldError('avatar', 'Invalid file type');
