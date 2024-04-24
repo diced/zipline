@@ -1,18 +1,23 @@
-import { NextServer } from 'next/dist/server/next';
-import express, { Request, Response } from 'express';
-import { parse } from 'url';
-import { prisma } from '@/lib/db';
 import { config } from '@/lib/config';
-import { log } from '@/lib/logger';
 import { verifyPassword } from '@/lib/crypto';
+import { prisma } from '@/lib/db';
+import { log } from '@/lib/logger';
+import { FastifyReply, FastifyRequest } from 'fastify';
+import { parse } from 'url';
+
+type Params = {
+  id: string;
+};
+
+type Query = {
+  pw?: string;
+};
 
 const logger = log('server').c('urls');
 
 export async function urlsRoute(
-  this: ReturnType<typeof express>,
-  app: NextServer,
-  req: Request,
-  res: Response,
+  req: FastifyRequest<{ Params: Params; Querystring: Query }>,
+  res: FastifyReply,
 ) {
   const { id } = req.params;
   const { pw } = req.query;
@@ -24,7 +29,7 @@ export async function urlsRoute(
       OR: [{ code: id }, { vanity: id }, { id }],
     },
   });
-  if (!url) return app.render404(req, res, parsedUrl);
+  if (!url) return req.server.nextServer.render404(req.raw, res.raw, parsedUrl);
 
   if (url.maxViews && url.views >= url.maxViews) {
     if (config.features.deleteOnMaxViews) {
@@ -41,7 +46,7 @@ export async function urlsRoute(
       });
     }
 
-    return app.render404(req, res, parsedUrl);
+    return req.server.nextServer.render404(req.raw, res.raw, parsedUrl);
   }
 
   if (url.password) {

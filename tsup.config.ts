@@ -1,50 +1,19 @@
+import glob from 'fast-glob';
 import { defineConfig } from 'tsup';
 
-export default defineConfig([
-  {
-    platform: 'node',
-    format: 'cjs',
-    treeshake: true,
-    clean: false,
-    sourcemap: true,
-    entryPoints: {
-      server: 'src/server/index.ts',
+export default defineConfig(async (_) => {
+  return [
+    {
+      platform: 'node',
+      format: 'cjs',
+      treeshake: true,
+      clean: false,
+      sourcemap: true,
+      entryPoints: await glob('./src/**/*.ts', {
+        ignore: ['./src/components/**/*.ts', './src/pages/**/*.ts'],
+      }),
+      outDir: 'build',
+      external: ['argon2'],
     },
-    outDir: 'build',
-  },
-  {
-    platform: 'node',
-    format: 'cjs',
-    treeshake: true,
-    clean: false,
-    sourcemap: true,
-    entryPoints: {
-      ctl: 'src/ctl/index.ts',
-    },
-    outDir: 'build',
-    bundle: true,
-    minify: true,
-  },
-  {
-    platform: 'node',
-    format: 'cjs',
-    treeshake: true,
-    clean: false,
-    sourcemap: true,
-    entryPoints: {
-      thumbnails: 'src/offload/thumbnails.ts',
-    },
-    outDir: 'build/offload',
-  },
-  {
-    platform: 'node',
-    format: 'cjs',
-    treeshake: true,
-    clean: false,
-    sourcemap: true,
-    entryPoints: {
-      partial: 'src/offload/partial.ts',
-    },
-    outDir: 'build/offload',
-  },
-]);
+  ];
+});

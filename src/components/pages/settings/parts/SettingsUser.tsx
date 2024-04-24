@@ -64,7 +64,7 @@ export default function SettingsUser() {
     const { data, error } = await fetchApi<Response['/api/user']>('/api/user', 'PATCH', send);
 
     if (!data && error) {
-      if (error.field === 'username') {
+      if (error.message === 'Username already exists') {
         form.setFieldError('username', error.message);
       } else {
         notifications.show({

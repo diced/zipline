@@ -8,12 +8,11 @@
     "build:prisma": "prisma generate",
     "build:next": "next build",
     "build:server": "tsup",
-    "dev": "pnpm run build:server && pnpm run dev:server",
-    "dev:server": "NODE_ENV=development DEBUG=zipline node --require dotenv/config --enable-source-maps ./build/server.js",
-    "dev:inspector": "NODE_ENV=development DEBUG=zipline node --require dotenv/config --inspect=0.0.0.0:9229 --enable-source-maps ./build/server.js",
+    "dev": "NODE_ENV=development DEBUG=zipline tsx --require dotenv/config --enable-source-maps ./src/server",
+    "dev:inspector": "NODE_ENV=development DEBUG=zipline tsx --require dotenv/config --inspect=0.0.0.0:9229 --enable-source-maps ./src/server",
     "dev:ctl": "tsup --config tsup.ctl.config.ts --watch",
-    "start": "NODE_ENV=production node --require dotenv/config --enable-source-maps ./build/server.js",
-    "start:inspector": "NODE_ENV=production node --require dotenv/config --inspect=0.0.0.0:9229 --enable-source-maps ./build/server.js",
+    "start": "NODE_ENV=production node --require dotenv/config --enable-source-maps ./build/server",
+    "start:inspector": "NODE_ENV=production node --require dotenv/config --inspect=0.0.0.0:9229 --enable-source-maps ./build/server",
     "ctl": "NODE_ENV=production node --require dotenv/config --enable-source-maps ./build/ctl.js",
     "validate": "pnpm run \"/^validate:.*/\"",
     "validate:lint": "eslint --cache --ignore-path .gitignore --fix .",
@@ -22,6 +21,9 @@
   },
   "dependencies": {
     "@ant-design/plots": "^1.2.6",
+    "@fastify/cookie": "^9.3.1",
+    "@fastify/cors": "^9.0.1",
+    "@fastify/sensible": "^5.5.0",
     "@github/webauthn-json": "^2.1.1",
     "@mantine/code-highlight": "^7.2.2",
     "@mantine/core": "^7.2.2",
@@ -44,6 +46,9 @@
     "dayjs": "^1.11.10",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
+    "fast-glob": "^3.3.2",
+    "fastify": "^4.26.2",
+    "fastify-plugin": "^4.5.1",
     "ffmpeg-static": "^5.2.0",
     "highlight.js": "^11.9.0",
     "isomorphic-dompurify": "^1.11.0",
@@ -92,5 +97,5 @@
   "engines": {
     "node": ">=18"
   },
-  "packageManager": "pnpm@8.7.0"
+  "packageManager": "pnpm@8.15.6"
 }

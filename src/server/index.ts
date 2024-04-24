@@ -1,30 +1,28 @@
 import { readEnv } from '@/lib/config/read';
 import { validateEnv } from '@/lib/config/validate';
-import { verifyPassword } from '@/lib/crypto';
-import { datasource } from '@/lib/datasource';
 import { prisma } from '@/lib/db';
 import { runMigrations } from '@/lib/db/migration';
 import { log } from '@/lib/logger';
-import express from 'express';
-import { mkdir } from 'fs/promises';
-import next from 'next';
-import { parse } from 'url';
-
-import { version } from '../../package.json';
-import { filesRoute } from './routes/files';
-import { urlsRoute } from './routes/urls';
 import { Scheduler } from '@/lib/scheduler';
-import deleteFiles from '@/lib/scheduler/jobs/deleteFiles';
 import clearInvites from '@/lib/scheduler/jobs/clearInvites';
+import deleteFiles from '@/lib/scheduler/jobs/deleteFiles';
 import maxViews from '@/lib/scheduler/jobs/maxViews';
-import thumbnails from '@/lib/scheduler/jobs/thumbnails';
 import metrics from '@/lib/scheduler/jobs/metrics';
-import { parseRange } from '@/lib/api/range';
+import thumbnails from '@/lib/scheduler/jobs/thumbnails';
+import { fastifyCookie } from '@fastify/cookie';
+import { fastifyCors } from '@fastify/cors';
+import { fastifySensible } from '@fastify/sensible';
+import fastify from 'fastify';
+import { mkdir } from 'fs/promises';
+import { parse } from 'url';
+import { version } from '../../package.json';
+import next, { ALL_METHODS } from './plugins/next';
+import loadRoutes from './routes';
+import { filesRoute } from './routes/files.dy';
+import { urlsRoute } from './routes/urls.dy';
 
 const MODE = process.env.NODE_ENV || 'production';
-
 const logger = log('server');
-const scheduler = new Scheduler();
 
 declare global {
   interface BigInt {
@@ -38,9 +36,6 @@ BigInt.prototype.toJSON = function () {
 
 async function main() {
   logger.info('starting zipline', { mode: MODE, version: version });
-
-  const server = express();
-
   logger.info('reading environment for configuration');
   const config = validateEnv(readEnv());
 
@@ -49,34 +44,30 @@ async function main() {
   }
 
   await mkdir(config.core.tempDirectory, { recursive: true });
-
   process.env.DATABASE_URL = config.core.databaseUrl;
 
   await runMigrations();
 
-  server.disable('x-powered-by');
-  server.use(express.static('public', { maxAge: '1h' }));
+  const server = fastify({ ignoreTrailingSlash: true });
 
-  const app = next({
-    dev: MODE === 'development',
-    quiet: MODE === 'production',
-    hostname: config.core.hostname,
-    port: config.core.port,
-    dir: '.',
+  await server.register(fastifyCookie, {
+    secret: config.core.secret,
+    hook: 'onRequest',
   });
-  const handle = app.getRequestHandler();
 
-  await app.prepare();
+  await server.register(fastifyCors);
+
+  await server.register(fastifySensible);
 
   if (config.files.route === '/' && config.urls.route === '/') {
-    logger.debug('files & urls route are both /, using catch-all route');
+    logger.debug('files & urls route = /, using catch-all route');
 
-    server.get('/:id', async (req, res) => {
+    server.get<{ Params: { id: string } }>('/:id', async (req, res) => {
       const { id } = req.params;
       const parsedUrl = parse(req.url!, true);
 
-      if (id === '') return app.render404(req, res, parsedUrl);
-      else if (id === 'dashboard') return app.render(req, res, '/dashboard');
+      if (id === '') return server.nextServer.render404(req.raw, res.raw, parsedUrl);
+      else if (id === 'dashboard') return server.nextServer.render(req.raw, res.raw, '/dashboard');
 
       const url = await prisma.url.findFirst({
         where: {
@@ -84,122 +75,78 @@ async function main() {
         },
       });
 
-      if (url) return urlsRoute.bind(server)(app, req, res);
-      else return filesRoute.bind(server)(app, req, res);
+      if (url) return urlsRoute(req as any, res);
+      else return filesRoute(req as any, res);
     });
   } else {
-    server.get(config.files.route === '/' ? '/:id' : `${config.files.route}/:id`, async (req, res) => {
-      filesRoute.bind(server)(app, req, res);
-    });
-
-    server.get(config.urls.route === '/' ? '/:id' : `${config.urls.route}/:id`, async (req, res) => {
-      urlsRoute.bind(server)(app, req, res);
-    });
+    server.get(config.files.route === '/' ? '/:id' : `${config.files.route}/:id`, filesRoute);
+    server.get(config.urls.route === '/' ? '/:id' : `${config.urls.route}/:id`, urlsRoute);
   }
 
-  server.get('/raw/:id', async (req, res) => {
-    const { id } = req.params;
-    const { pw } = req.query;
+  await server.register(next, {
+    dev: MODE === 'development',
+    quiet: MODE === 'production',
+    hostname: config.core.hostname,
+    port: config.core.port,
+    dir: '.',
+  });
 
-    const parsedUrl = parse(req.url!, true);
+  const routes = await loadRoutes();
+  const routesOptions = Object.values(routes);
+  Promise.all(routesOptions.map((route) => server.register(route)));
 
-    const file = await prisma.file.findFirst({
-      where: {
-        name: id,
-      },
-    });
+  server.next('/*', ALL_METHODS);
+  server.get('/', (_, res) => res.redirect('/dashboard'));
 
-    if (file?.password) {
-      if (!pw) return res.status(403).json({ code: 403, message: 'Password protected.' });
-      const verified = await verifyPassword(pw as string, file.password!);
-
-      if (!verified) return res.status(403).json({ code: 403, message: 'Incorrect password.' });
-    }
-
-    const size = file?.size || (await datasource.size(file?.name ?? id));
-
-    if (req.headers.range) {
-      const [start, end] = parseRange(req.headers.range, size);
-      if (start >= size || end >= size) {
-        res.writeHead(416, {
-          'Content-Length': size,
-          'Content-Type': file?.type || 'application/octet-stream',
-          ...(file?.originalName && {
-            'Content-Disposition': `${req.query.download ? 'attachment; ' : ''}filename="${
-              file.originalName
-            }"`,
-          }),
-        });
-
-        const buf = await datasource.get(file?.name ?? id);
-        if (!buf) return app.render404(req, res, parsedUrl);
-
-        return buf.pipe(res);
-      }
-
-      res.writeHead(206, {
-        'Content-Range': `bytes ${start}-${end}/${size}`,
-        'Accept-Ranges': 'bytes',
-        'Content-Length': end - start + 1,
-        'Content-Type': file?.type || 'application/octet-stream',
-        ...(file?.originalName && {
-          'Content-Disposition': `${req.query.download ? 'attachment; ' : ''}filename="${file.originalName}"`,
-        }),
+  // TODO: no longer need this when all the api routes are handled by fastify :)
+  const routeKeys = Object.keys(routes); // holds "currently migrated routes" so we can parse json through fastify
+  server.addContentTypeParser('application/json', (req, body, done) => {
+    if (routeKeys.includes(req.routeOptions.config.url)) {
+      let bodyString = '';
+      body.on('data', (chunk) => {
+        bodyString += chunk;
       });
 
-      const buf = await datasource.range(file?.name ?? id, start || 0, end);
-      if (!buf) return app.render404(req, res, parsedUrl);
+      body.on('end', () => {
+        server.getDefaultJsonParser('error', 'ignore')(req, bodyString, done);
+      });
+    } else done(null, body);
+  });
 
-      return buf.pipe(res);
+  // TODO: no longer need this when /api/upload is handled by fastify
+  server.addContentTypeParser('multipart/form-data', (_, body, done) => {
+    done(null, body);
+  });
+
+  await server.listen({
+    port: config.core.port,
+    host: config.core.hostname,
+  });
+
+  logger.info('server started', { hostname: config.core.hostname, port: config.core.port });
+
+  const scheduler = new Scheduler();
+  scheduler.interval('deletefiles', config.scheduler.deleteInterval, deleteFiles(prisma));
+  scheduler.interval('maxviews', config.scheduler.maxViewsInterval, maxViews(prisma));
+
+  if (config.features.metrics)
+    scheduler.interval('metrics', config.scheduler.metricsInterval, metrics(prisma));
+
+  if (config.features.thumbnails.enabled) {
+    scheduler.interval('thumbnails', config.scheduler.thumbnailsInterval, thumbnails(prisma));
+
+    for (let i = 0; i !== config.features.thumbnails.num_threads; ++i) {
+      scheduler.worker(`thumbnail-${i}`, './build/offload/thumbnails.js', {
+        id: `thumbnail-${i}`,
+        enabled: config.features.thumbnails.enabled,
+      });
     }
 
-    res.writeHead(200, {
-      'Content-Length': size,
-      'Accept-Ranges': 'bytes',
-      'Content-Type': file?.type || 'application/octet-stream',
-      ...(file?.originalName && {
-        'Content-Disposition': `${req.query.download ? 'attachment; ' : ''}filename="${file.originalName}"`,
-      }),
-    });
+    scheduler.interval('clearinvites', config.scheduler.clearInvitesInterval, clearInvites(prisma));
+  }
 
-    const buf = await datasource.get(file?.name ?? id);
-    if (!buf) return app.render404(req, res, parsedUrl);
-
-    return buf.pipe(res);
-  });
-
-  server.all('*', (req, res) => {
-    const parsedUrl = parse(req.url!, true);
-    return handle(req, res, parsedUrl);
-  });
-
-  server.listen(config.core.port, config.core.hostname, () => {
-    logger.info('server listening', {
-      hostname: config.core.hostname,
-      port: config.core.port,
-    });
-
-    scheduler.interval('deletefiles', config.scheduler.deleteInterval, deleteFiles(prisma));
-    scheduler.interval('maxviews', config.scheduler.maxViewsInterval, maxViews(prisma));
-
-    if (config.features.metrics)
-      scheduler.interval('metrics', config.scheduler.metricsInterval, metrics(prisma));
-
-    if (config.features.thumbnails.enabled) {
-      scheduler.interval('thumbnails', config.scheduler.thumbnailsInterval, thumbnails(prisma));
-
-      for (let i = 0; i !== config.features.thumbnails.num_threads; ++i) {
-        scheduler.worker(`thumbnail-${i}`, './build/offload/thumbnails.js', {
-          id: `thumbnail-${i}`,
-          enabled: config.features.thumbnails.enabled,
-        });
-      }
-
-      scheduler.interval('clearinvites', config.scheduler.clearInvitesInterval, clearInvites(prisma));
-    }
-
-    scheduler.start();
-  });
+  logger.info('starting scheduler');
+  scheduler.start();
 }
 
 main();

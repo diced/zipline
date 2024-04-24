@@ -5,14 +5,7 @@ import { ApiLogoutResponse } from '@/pages/api/auth/logout';
 import { ApiAuthOauthResponse } from '@/pages/api/auth/oauth';
 import { ApiAuthRegisterResponse } from '@/pages/api/auth/register';
 import { ApiAuthWebauthnResponse } from '@/pages/api/auth/webauthn';
-import { ApiHealthcheckResponse } from '@/pages/api/healthcheck';
-import { ApiServerClearTempResponse } from '@/pages/api/server/clear_temp';
-import { ApiServerClearZerosResponse } from '@/pages/api/server/clear_zeros';
-import { ApiServerRequerySizeResponse } from '@/pages/api/server/requery_size';
-import { ApiSetupResponse } from '@/pages/api/setup';
-import { ApiStatsResponse } from '@/pages/api/stats';
 import { ApiUploadResponse } from '@/pages/api/upload';
-import { ApiUserResponse } from '@/pages/api/user';
 import { ApiUserFilesResponse } from '@/pages/api/user/files';
 import { ApiUserFilesIdResponse } from '@/pages/api/user/files/[id]';
 import { ApiUserFilesIdPasswordResponse } from '@/pages/api/user/files/[id]/password';
@@ -22,16 +15,25 @@ import { ApiUserFoldersResponse } from '@/pages/api/user/folders';
 import { ApiUserFoldersIdResponse } from '@/pages/api/user/folders/[id]';
 import { ApiUserMfaPasskeyResponse } from '@/pages/api/user/mfa/passkey';
 import { ApiUserMfaTotpResponse } from '@/pages/api/user/mfa/totp';
-import { ApiUserRecentResponse } from '@/pages/api/user/recent';
-import { ApiUserStatsResponse } from '@/pages/api/user/stats';
 import { ApiUserTagsResponse } from '@/pages/api/user/tags';
 import { ApiUserTagsIdResponse } from '@/pages/api/user/tags/[id]';
-import { ApiUserTokenResponse } from '@/pages/api/user/token';
 import { ApiUserUrlsResponse } from '@/pages/api/user/urls';
 import { ApiUserUrlsIdResponse } from '@/pages/api/user/urls/[id]';
-import { ApiUsersResponse } from '@/pages/api/users';
-import { ApiUsersIdResponse } from '@/pages/api/users/[id]';
-import { ApiVersionResponse } from '@/pages/api/version';
+
+// migrated routes
+import { ApiHealthcheckResponse } from '@/server/routes/api/healthcheck';
+import { ApiServerClearTempResponse } from '@/server/routes/api/server/clear_temp';
+import { ApiServerClearZerosResponse } from '@/server/routes/api/server/clear_zeros';
+import { ApiServerRequerySizeResponse } from '@/server/routes/api/server/requery_size';
+import { ApiSetupResponse } from '@/server/routes/api/setup';
+import { ApiStatsResponse } from '@/server/routes/api/stats';
+import { ApiUserResponse } from '@/server/routes/api/user';
+import { ApiUserRecentResponse } from '@/server/routes/api/user/recent';
+import { ApiUserStatsResponse } from '@/server/routes/api/user/stats';
+import { ApiUserTokenResponse } from '@/server/routes/api/user/token';
+import { ApiUsersResponse } from '@/server/routes/api/users';
+import { ApiUsersIdResponse } from '@/server/routes/api/users/[id]';
+import { ApiVersionResponse } from '@/server/routes/api/version';
 
 export type Response = {
   '/api/auth/invites/[id]': ApiAuthInvitesIdResponse;
