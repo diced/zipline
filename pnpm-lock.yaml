@@ -119,6 +119,9 @@ dependencies:
   otplib:
     specifier: ^12.0.1
     version: 12.0.1
+  prisma:
+    specifier: ^5.6.0
+    version: 5.6.0
   qrcode:
     specifier: ^1.5.3
     version: 1.5.3
@@ -211,9 +214,6 @@ devDependencies:
   prettier:
     specifier: ^3.1.0
     version: 3.1.0
-  prisma:
-    specifier: ^5.6.0
-    version: 5.6.0
   tsup:
     specifier: ^7.2.0
     version: 7.2.0(postcss@8.4.31)(typescript@5.3.2)
@@ -1834,6 +1834,7 @@ packages:
   /@prisma/engines@5.6.0:
     resolution: {integrity: sha512-Mt2q+GNJpU2vFn6kif24oRSBQv1KOkYaterQsi0k2/lA+dLvhRX6Lm26gon6PYHwUM8/h8KRgXIUMU0PCLB6bw==}
     requiresBuild: true
+    dev: false
 
   /@prisma/fetch-engine@5.6.0:
     resolution: {integrity: sha512-B6jfOZMioKyAsSDjYeVkF7P9X7DTfqLJPVUeHt0wnF50cSOqB260GFaVVZLlYwMJUew4YVaI+qmbCuPBBZVAOQ==}
@@ -7070,6 +7071,7 @@ packages:
     requiresBuild: true
     dependencies:
       '@prisma/engines': 5.6.0
+    dev: false
 
   /process-nextick-args@2.0.1:
     resolution: {integrity: sha512-3ouUOpQhtgrbOa17J7+uxOTpITYWaGP7/AhoR3+A+/1e9skrzelGi/dXzEYyvbxubEF6Wn2ypscTKiKJFFn1ag==}
