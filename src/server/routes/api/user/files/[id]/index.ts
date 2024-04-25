@@ -49,7 +49,7 @@ export default fastifyPlugin(
 
           let password: string | null | undefined = undefined;
           if (req.body.password !== undefined) {
-            if (req.body.password === null) {
+            if (req.body.password === null || req.body.password === '') {
               password = null;
             } else if (typeof req.body.password === 'string') {
               password = await hashPassword(req.body.password);
