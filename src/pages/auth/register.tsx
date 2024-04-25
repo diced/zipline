@@ -61,7 +61,7 @@ export default function Register({ config, invite }: InferGetServerSidePropsType
     });
 
     if (error) {
-      if (error.username) form.setFieldError('username', 'Username is taken');
+      if (error.message === 'Username is taken') form.setFieldError('username', 'Username is taken');
       else {
         notifications.show({
           title: 'Failed to register',
