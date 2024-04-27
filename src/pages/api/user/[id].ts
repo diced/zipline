@@ -21,6 +21,9 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
         include: {
           thumbnail: true,
         },
+        orderBy: {
+          createdAt: 'desc',
+        },
       },
       Folder: true,
     },
