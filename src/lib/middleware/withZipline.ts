@@ -1,7 +1,7 @@
 import type { CookieSerializeOptions } from 'cookie';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { OAuth, User } from '@prisma/client';
+import { OAuth, Sessions, User } from '@prisma/client';
 import { serialize } from 'cookie';
 import { HTTPMethod } from 'find-my-way';
 import config from 'lib/config';
@@ -23,6 +23,7 @@ export interface UserOauth extends User {
 }
 export type UserExtended = UserOauth & {
   embed: UserEmbed;
+  sessions: Sessions[];
 };
 
 export interface UserEmbed {
@@ -54,7 +55,7 @@ export type NextApiRes = NextApiResponse &
   NextApiResExtraObj & {
     json: (json: Record<string, unknown>, status?: number) => void;
     setCookie: (name: string, value: unknown, options: CookieSerializeOptions) => void;
-    setUserCookie: (id: string) => void;
+    setUserCookie: (id: string) => Promise<void>;
   };
 
 export type ZiplineApiConfig = {
@@ -184,10 +185,15 @@ export const withZipline =
 
         const user = await prisma.user.findFirst({
           where: {
-            uuid: userId,
+            sessions: {
+              some: {
+                uuid: userId,
+              },
+            },
           },
           include: {
             oauth: true,
+            sessions: true,
           },
         });
 
@@ -215,9 +221,17 @@ export const withZipline =
       res.setHeader('Set-Cookie', serialize(name, signed, options));
     };
 
-    res.setUserCookie = (id: string) => {
+    res.setUserCookie = async (id: string) => {
+      const user = await prisma.user.findUnique({ where: { uuid: id } });
+      const session = await prisma.sessions.create({
+        data: {
+          expiresAt: new Date(Date.now() + 6.048e8 * 2),
+          ip: <string>req.headers['x-forwarded-for'] || req.socket.remoteAddress || null,
+          userId: user.id,
+        },
+      });
       req.cleanCookie('user');
-      res.setCookie('user', id, {
+      res.setCookie('user', session.uuid, {
         sameSite: 'lax',
         expires: new Date(Date.now() + 6.048e8 * 2),
         path: '/',

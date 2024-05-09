@@ -56,7 +56,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     if (!success) return res.badRequest('Invalid code', { totp: true });
   }
 
-  res.setUserCookie(user.uuid);
+  await res.setUserCookie(user.uuid);
   logger.info(`User ${user.username} (${user.id}) logged in`);
 
   return res.json({ success: true });
