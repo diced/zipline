@@ -9,6 +9,8 @@ services:
       - uploads:/zipline/uploads
       - node_modules:/zipline/node_modules
     command: sleep infinity
+    links:
+      - db:postgres
   db:
     image: postgres:latest
     restart: unless-stopped
