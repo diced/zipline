@@ -57,6 +57,8 @@ import ClearStorage from './ClearStorage';
 import Flameshot from './Flameshot';
 import ShareX from './ShareX';
 import { TotpModal } from './TotpModal';
+import { Sessions } from '@prisma/client';
+import { DataTable } from 'mantine-datatable';
 
 function ExportDataTooltip({ children }) {
   return (
@@ -84,6 +86,8 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
 
   const [user, setUser] = useRecoilState(userSelector);
   const modals = useModals();
+
+  const [sessions, setSessions] = useState<Sessions[]>(user.sessions);
 
   const [totpOpen, setTotpOpen] = useState(false);
   const [shareXOpen, setShareXOpen] = useState(false);
@@ -355,9 +359,19 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
     }
   };
 
+  const updateSessions = async () => {
+    const user = await useFetch('/api/user');
+    if (!user.error) {
+      setSessions(user.sessions);
+    } else {
+      setSessions([]);
+    }
+  };
+
   const interval = useInterval(() => getExports(), 30000);
   useEffect(() => {
     getExports();
+    updateSessions();
     interval.start();
     setTotpEnabled(() => !!user.totpSecret);
   }, [user]);
@@ -553,6 +567,29 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
           </Button>
           <Button onClick={saveAvatar}>Save Avatar</Button>
         </Group>
+      </Box>
+
+      <Box my='md'>
+        <Title>Current Sessions</Title>
+        <DataTable
+          highlightOnHover
+          verticalSpacing='sm'
+          columns={[
+            {
+              accessor: 'ip',
+              title: 'IP Address',
+              sortable: false,
+            },
+            {
+              accessor: 'expiresAt',
+              title: 'Expires',
+              sortable: true,
+              render: (session) => new Date(session.expiresAt).toLocaleString(),
+            },
+          ]}
+          records={sessions}
+          minHeight='calc(50vh - 100px)'
+        />
       </Box>
 
       <Box my='md'>
