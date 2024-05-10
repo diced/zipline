@@ -100,6 +100,10 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
         where: { id: target.id },
         data: { password: hashed },
       });
+
+      await prisma.sessions.deleteMany({
+        where: { userId: target.id },
+      });
     }
 
     if (typeof req.body.administrator != 'undefined') {
