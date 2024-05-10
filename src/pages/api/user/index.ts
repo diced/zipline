@@ -143,6 +143,15 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
         where: { id: user.id },
         data: { password: hashed },
       });
+
+      await prisma.sessions.deleteMany({
+        where: {
+          NOT: {
+            uuid: req.getCookie('user'),
+          },
+          userId: user.id,
+        },
+      });
     }
 
     if (req.body.username) {
