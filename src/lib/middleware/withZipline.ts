@@ -35,6 +35,7 @@ export interface UserEmbed {
 
 export type NextApiReq = NextApiRequest & {
   user: () => Promise<UserExtended | null>;
+  clearUser: () => Promise<void>;
   getCookie: (name: string) => string | null;
   cleanCookie: (name: string) => void;
   files?: NextApiFile[];
@@ -166,6 +167,16 @@ export const withZipline =
       );
     };
 
+    req.clearUser = async () => {
+      const sessionId = req.getCookie('user');
+      if (!sessionId) return null;
+
+      await prisma.sessions.delete({
+        where: { uuid: sessionId },
+      });
+      req.cleanCookie('user');
+    };
+
     req.user = async () => {
       try {
         const authHeader = req.headers.authorization;
@@ -180,14 +191,14 @@ export const withZipline =
           if (user) return user as UserExtended;
         }
 
-        const userId = req.getCookie('user');
-        if (!userId) return null;
+        const sessionId = req.getCookie('user');
+        if (!sessionId) return null;
 
         const user = await prisma.user.findFirst({
           where: {
             sessions: {
               some: {
-                uuid: userId,
+                uuid: sessionId,
               },
             },
           },
@@ -196,7 +207,15 @@ export const withZipline =
             sessions: true,
           },
         });
-
+        const session = user.sessions.filter((x) => x.uuid === sessionId)[0];
+        if (session.expiresAt < new Date()) {
+          await prisma.sessions.delete({
+            where: {
+              uuid: sessionId,
+            },
+          });
+          return null;
+        }
         if (!user) return null;
         return user as UserExtended;
       } catch (e) {
@@ -233,7 +252,7 @@ export const withZipline =
       req.cleanCookie('user');
       res.setCookie('user', session.uuid, {
         sameSite: 'lax',
-        expires: new Date(Date.now() + 6.048e8 * 2),
+        expires: new Date(Date.now() + 6.048e8 * 3),
         path: '/',
       });
     };

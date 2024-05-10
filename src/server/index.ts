@@ -194,6 +194,7 @@ Disallow: ${config.urls.route}
 
   setInterval(() => clearInvites.bind(server)(), config.core.invites_interval * 1000);
   setInterval(() => stats.bind(server)(), config.core.stats_interval * 1000);
+  setInterval(() => clearSessions.bind(server)(), 8.64e7);
   if (config.features.thumbnails)
     setInterval(() => thumbs.bind(server)(), config.core.thumbnails_interval * 1000);
 }
@@ -225,6 +226,16 @@ async function clearInvites(this: FastifyInstance) {
   });
 
   logger.child('invites').debug(`deleted ${count} used invites`);
+}
+
+async function clearSessions(this: FastifyInstance) {
+  const { count } = await this.prisma.sessions.deleteMany({
+    where: {
+      expiresAt: { lt: new Date() },
+    },
+  });
+
+  logger.child('sessions').debug(`cleared ${count} sessions`);
 }
 
 async function thumbs(this: FastifyInstance) {
