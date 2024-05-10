@@ -34,7 +34,6 @@ model Sessions {
   uuid         String @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   expiresAt    DateTime
   ip           String
-  token        String? @unique
 
   user         User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId       Int

@@ -3,7 +3,6 @@ CREATE TABLE "Sessions" (
     "uuid" UUID NOT NULL DEFAULT gen_random_uuid(),
     "expiresAt" TIMESTAMP(3) NOT NULL,
     "ip" TEXT NOT NULL,
-    "token" TEXT,
     "userId" INTEGER NOT NULL
 );
 
