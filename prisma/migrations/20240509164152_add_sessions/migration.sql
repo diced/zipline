@@ -9,8 +9,5 @@ CREATE TABLE "Sessions" (
 -- CreateIndex
 CREATE UNIQUE INDEX "Sessions_uuid_key" ON "Sessions"("uuid");
 
--- CreateIndex
-CREATE UNIQUE INDEX "Sessions_token_key" ON "Sessions"("token");
-
 -- AddForeignKey
 ALTER TABLE "Sessions" ADD CONSTRAINT "Sessions_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
