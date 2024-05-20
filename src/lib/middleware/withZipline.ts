@@ -252,7 +252,7 @@ export const withZipline =
       req.cleanCookie('user');
       res.setCookie('user', session.uuid, {
         sameSite: 'lax',
-        expires: new Date(Date.now() + 6.048e8 * 3),
+        expires: new Date(Date.now() + 6.048e8 * 2),
         path: '/',
       });
     };
