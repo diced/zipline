@@ -12,6 +12,7 @@ import thumbnails from '@/lib/scheduler/jobs/thumbnails';
 import { fastifyCookie } from '@fastify/cookie';
 import { fastifyCors } from '@fastify/cors';
 import { fastifySensible } from '@fastify/sensible';
+import { fastifyMultipart } from '@fastify/multipart';
 import fastify from 'fastify';
 import { mkdir } from 'fs/promises';
 import { parse } from 'url';
@@ -58,6 +59,8 @@ async function main() {
   await server.register(fastifyCors);
 
   await server.register(fastifySensible);
+
+  await server.register(fastifyMultipart);
 
   if (config.files.route === '/' && config.urls.route === '/') {
     logger.debug('files & urls route = /, using catch-all route');
@@ -113,11 +116,6 @@ async function main() {
     } else done(null, body);
   });
 
-  // TODO: no longer need this when /api/upload is handled by fastify
-  server.addContentTypeParser('multipart/form-data', (_, body, done) => {
-    done(null, body);
-  });
-
   await server.listen({
     port: config.core.port,
     host: config.core.hostname,
@@ -146,7 +144,7 @@ async function main() {
   }
 
   logger.info('starting scheduler');
-  scheduler.start();
+  // scheduler.start(); TODO: getting annoyed, remove this comment later
 }
 
 main();

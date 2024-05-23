@@ -1,5 +1,5 @@
 import { ApiAuthOauthResponse } from '@/pages/api/auth/oauth';
-import { ApiUploadResponse } from '@/pages/api/upload';
+import { ApiUploadResponse } from '@/pages/api/+upload';
 
 // migrated routes
 import { ApiAuthInvitesResponse } from '@/server/routes/api/auth/invites';

@@ -1,5 +1,7 @@
-import { ApiUploadResponse } from '@/pages/api/upload';
-import { writeFile } from 'fs/promises';
+import { ApiUploadResponse } from '@/server/routes/api/upload';
+import { SavedMultipartFile } from '@fastify/multipart';
+import { FastifyRequest } from 'fastify';
+import { rename } from 'fs/promises';
 import { extname, join } from 'path';
 import { Worker } from 'worker_threads';
 import { config } from '../config';
@@ -7,7 +9,6 @@ import { hashPassword } from '../crypto';
 import { prisma } from '../db';
 import { log } from '../logger';
 import { guess } from '../mimes';
-import { File, NextApiReq } from '../response';
 import { formatFileName } from '../uploader/formatFileName';
 import { UploadHeaders, UploadOptions } from '../uploader/parseHeaders';
 
@@ -19,11 +20,11 @@ export async function handlePartialUpload({
   response,
   req,
 }: {
-  file: File;
+  file: SavedMultipartFile;
   options: UploadOptions;
   domain: string;
   response: ApiUploadResponse;
-  req: NextApiReq<any, any, UploadHeaders>;
+  req: FastifyRequest<{ Headers: UploadHeaders }>;
 }) {
   if (!options.partial) throw 'No partial upload options provided';
   logger.debug('partial upload detected', { partial: options.partial });
@@ -34,7 +35,7 @@ export async function handlePartialUpload({
   const extension = options.overrides?.extension ?? extname(options.partial.filename);
   if (config.files.disabledExtensions.includes(extension)) throw `File extension ${extension} is not allowed`;
 
-  let fileName = formatFileName(options.format || config.files.defaultFormat, file.originalname);
+  let fileName = formatFileName(options.format || config.files.defaultFormat, file.filename);
   if (options.overrides?.filename) {
     fileName = options.overrides!.filename!;
     const existing = await prisma.file.findFirst({
@@ -50,7 +51,6 @@ export async function handlePartialUpload({
   let mimetype = options.partial.contentType;
   if (mimetype === 'application/octet-stream' && config.files.assumeMimetypes) {
     const mime = await guess(extension.substring(1));
-
     if (mime) mimetype = mime;
   }
 
@@ -69,7 +69,7 @@ export async function handlePartialUpload({
     config.core.tempDirectory,
     `zipline_partial_${options.partial.identifier}_${options.partial.range[0]}_${options.partial.range[1]}`,
   );
-  await writeFile(tempFile, file.buffer);
+  await rename(file.filepath, tempFile);
 
   if (options.partial.lastchunk) {
     const fileUpload = await prisma.file.create({
@@ -84,7 +84,7 @@ export async function handlePartialUpload({
         },
         ...(options.password && { password: await hashPassword(options.password) }),
         ...(options.folder && { Folder: { connect: { id: options.folder } } }),
-        ...(options.addOriginalName && { originalName: file.originalname }),
+        ...(options.addOriginalName && { originalName: file.filename }),
       },
     });
 

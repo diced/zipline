@@ -1,7 +1,7 @@
 // @ts-ignore
 import * as gmr from '@xoi/gps-metadata-remover';
 
-const removeLocation = gmr.removeLocation as (
+export const removeLocation = gmr.removeLocation as (
   photoUri: string,
   read: ReadFunction,
   write: WriteFunction,
