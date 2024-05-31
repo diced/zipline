@@ -104,14 +104,6 @@ export async function uploadPartialFiles(
       end: number;
     }[] = [];
 
-    notifications.show({
-      id: 'upload-partial',
-      title: 'Uploading partial file',
-      message: `Uploading partial ${i + 1}/${files.length}`,
-      loading: true,
-      autoClose: false,
-    });
-
     for (let j = 0; j !== nChunks; ++j) {
       const start = j * config.chunks.size;
       const end = Math.min(start + config.chunks.size, file.size);
@@ -121,6 +113,14 @@ export async function uploadPartialFiles(
         end,
       });
     }
+
+    notifications.show({
+      id: 'upload-partial',
+      title: 'Uploading partial file',
+      message: `Uploading partial ${i + 1}/${chunks.length}`,
+      loading: true,
+      autoClose: false,
+    });
 
     let ready = true;
     for (let j = 0; j !== nChunks; ++j) {
@@ -168,7 +168,7 @@ export async function uploadPartialFiles(
               title: 'Finalizing partial upload',
               message: (
                 <Text>
-                  The upload has bene offloaded and will complete in the background.
+                  The upload has been offloaded and will complete in the background.
                   <br />
                   <Anchor
                     component='span'

@@ -60,7 +60,11 @@ async function main() {
 
   await server.register(fastifySensible);
 
-  await server.register(fastifyMultipart);
+  await server.register(fastifyMultipart, {
+    limits: {
+      fileSize: config.files.maxFileSize,
+    },
+  });
 
   if (config.files.route === '/' && config.urls.route === '/') {
     logger.debug('files & urls route = /, using catch-all route');
@@ -131,8 +135,6 @@ async function main() {
     scheduler.interval('metrics', config.scheduler.metricsInterval, metrics(prisma));
 
   if (config.features.thumbnails.enabled) {
-    scheduler.interval('thumbnails', config.scheduler.thumbnailsInterval, thumbnails(prisma));
-
     for (let i = 0; i !== config.features.thumbnails.num_threads; ++i) {
       scheduler.worker(`thumbnail-${i}`, './build/offload/thumbnails.js', {
         id: `thumbnail-${i}`,
@@ -140,11 +142,13 @@ async function main() {
       });
     }
 
+    scheduler.interval('thumbnails', config.scheduler.thumbnailsInterval, thumbnails(prisma));
     scheduler.interval('clearinvites', config.scheduler.clearInvitesInterval, clearInvites(prisma));
   }
 
   logger.info('starting scheduler');
-  // scheduler.start(); TODO: getting annoyed, remove this comment later
+
+  scheduler.start();
 }
 
 main();

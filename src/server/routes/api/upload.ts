@@ -6,7 +6,10 @@ import { prisma } from '@/lib/db';
 import { log } from '@/lib/logger';
 import { UploadHeaders, parseHeaders } from '@/lib/uploader/parseHeaders';
 import { userMiddleware } from '@/server/middleware/user';
+import { MultipartFile } from '@fastify/multipart';
 import fastifyPlugin from 'fastify-plugin';
+
+export type MultipartFileBuffer = MultipartFile & { buffer: Buffer };
 
 export type ApiUploadResponse = {
   files: {
@@ -30,12 +33,16 @@ export default fastifyPlugin(
     server.post<{
       Headers: UploadHeaders;
     }>(PATH, { preHandler: [userMiddleware] }, async (req, res) => {
-      console.log(req.savedRequestFiles);
       const options = parseHeaders(req.headers, config.files);
       if (options.header) return res.badRequest('bad options, receieved: ' + JSON.stringify(options));
 
-      const files = await req.saveRequestFiles({ tmpdir: config.core.tempDirectory });
-      if (!files || !files.length) return res.badRequest('No files received');
+      const filesIterable = req.files();
+      const files: MultipartFileBuffer[] = [];
+
+      for await (const file of filesIterable) {
+        (<MultipartFileBuffer>file).buffer = await file.toBuffer();
+        files.push(<MultipartFileBuffer>file);
+      }
 
       if (req.user.quota) {
         const totalFileSize = options.partial
@@ -101,6 +108,8 @@ export default fastifyPlugin(
             response,
           });
         } catch (e) {
+          console.log(e);
+
           if (typeof e === 'string') {
             return res.badRequest(e);
           } else {
@@ -113,33 +122,27 @@ export default fastifyPlugin(
         return res.send(response);
       }
 
-      console.log(files.length);
-      console.log(req.savedRequestFiles);
+      for (let i = 0; i !== files.length; ++i) {
+        try {
+          await handleFile({
+            file: files[i],
+            i,
+            options,
+            domain,
+            response,
+            req,
+          });
+        } catch (e) {
+          console.log(e);
 
-      for (let i = 0; i !== req.files.length; ++i) {
-        const file = req.savedRequestFiles[i];
-        console.log(file.filename);
-        continue;
+          if (typeof e === 'string') {
+            return res.badRequest(e);
+          } else {
+            logger.error('error while processing file ' + e);
 
-        // try {
-        //   await handleFile({
-        //     file,
-        //     i,
-        //     options,
-        //     domain,
-        //     response,
-        //     req,
-        //   });
-        // } catch (e) {
-        //   if (typeof e === 'string') {
-        //     return res.badRequest(e);
-        //   } else {
-        //     logger.error('error while processing file ' + e);
-        //     console.log(e);
-
-        //     return res.internalServerError('An error occurred while processing the file');
-        //   }
-        // }
+            return res.internalServerError('An error occurred while processing the file');
+          }
+        }
       }
 
       if (options.noJson)

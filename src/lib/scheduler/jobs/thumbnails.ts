@@ -5,6 +5,7 @@ export default function thumbnails(prisma: typeof globalThis.__db__) {
     const thumbnailWorkers = this.scheduler.jobs.filter(
       (x) => 'worker' in x && x.id.startsWith('thumbnail'),
     ) as unknown as WorkerJob[];
+
     if (!thumbnailWorkers.length) return;
 
     const thumbnailNeeded = await prisma.file.findMany({

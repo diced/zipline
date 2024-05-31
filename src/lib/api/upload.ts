@@ -1,13 +1,11 @@
-import { SavedMultipartFile } from '@fastify/multipart';
+import { ApiUploadResponse, MultipartFileBuffer } from '@/server/routes/api/upload';
 import { FastifyRequest } from 'fastify';
-import { readFile, rename } from 'fs/promises';
-import { extname, join } from 'path';
+import { extname } from 'path';
 import { bytes } from '../bytes';
 import { compress } from '../compress';
 import { config } from '../config';
 import { hashPassword } from '../crypto';
 import { datasource } from '../datasource';
-import { LocalDatasource } from '../datasource/Local';
 import { prisma } from '../db';
 import { fileSelect } from '../db/models/file';
 import { onUpload } from '../discord';
@@ -16,7 +14,6 @@ import { log } from '../logger';
 import { guess } from '../mimes';
 import { formatFileName } from '../uploader/formatFileName';
 import { UploadHeaders, UploadOptions } from '../uploader/parseHeaders';
-import { ApiUploadResponse } from '@/server/routes/api/upload';
 
 const logger = log('api').c('upload');
 
@@ -28,7 +25,7 @@ export async function handleFile({
   response,
   req,
 }: {
-  file: SavedMultipartFile;
+  file: MultipartFileBuffer;
   i: number;
   options: UploadOptions;
   domain: string;
@@ -78,12 +75,10 @@ export async function handleFile({
   }
 
   let compressed = false;
-  let buffer: Buffer | null = null;
   if (mimetype.startsWith('image/') && options.imageCompressionPercent) {
-    buffer = await readFile(file.filepath); // unfortunately files will get loaded into memory when compressing
-    buffer = await compress(buffer, options.imageCompressionPercent);
+    file.buffer = await compress(file.buffer, options.imageCompressionPercent);
     logger.c('jpg').debug(`compressed file ${file.filename}`, {
-      nsize: bytes(buffer.length),
+      nsize: bytes(file.buffer.length),
     });
 
     compressed = true;
@@ -91,8 +86,7 @@ export async function handleFile({
 
   let removedGps = false;
   if (mimetype.startsWith('image/') && config.files.removeGpsMetadata) {
-    if (!buffer) buffer = await readFile(file.filepath);
-    removedGps = await removeGps(buffer);
+    removedGps = await removeGps(file.buffer);
 
     if (removedGps) {
       logger.c('gps').debug(`removed gps metadata from ${file.filename}`);
@@ -102,7 +96,7 @@ export async function handleFile({
   const fileUpload = await prisma.file.create({
     data: {
       name: `${fileName}${compressed ? '.jpg' : extension}`,
-      size: buffer ? buffer.length : file.file.bytesRead,
+      size: file.buffer ? file.buffer.length : file.file.bytesRead,
       type: compressed ? 'image/jpeg' : mimetype,
       User: {
         connect: {
@@ -118,11 +112,7 @@ export async function handleFile({
     select: fileSelect,
   });
 
-  if (config.datasource.type === 'local' && !buffer) {
-    await rename(file.filepath, join((<LocalDatasource>datasource).dir, fileUpload.name));
-  } else if (config.datasource.type === 'local' && buffer) {
-    await datasource.put(fileUpload.name, buffer);
-  }
+  await datasource.put(fileUpload.name, file.buffer);
   // TODO: add s3 implementation
 
   const responseUrl = `${domain}${

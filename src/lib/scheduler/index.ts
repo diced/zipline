@@ -110,7 +110,7 @@ export class Scheduler {
     if (start) this.startInterval(this.jobs[len - 1] as IntervalJob);
   }
 
-  public worker<Data = any>(id: string, path: string, data: Data, start: boolean = false): void {
+  public worker<Data = any>(id: string, path: string, data: Data, start: boolean = false): WorkerJob<Data> {
     const len = this.jobs.push({
       id,
       path,
@@ -119,5 +119,7 @@ export class Scheduler {
     } as WorkerJob<Data>);
 
     if (start) this.startWorker(this.jobs[len - 1] as WorkerJob<Data>);
+
+    return this.jobs[len - 1] as WorkerJob<Data>;
   }
 }

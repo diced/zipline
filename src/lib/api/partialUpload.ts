@@ -1,7 +1,6 @@
-import { ApiUploadResponse } from '@/server/routes/api/upload';
-import { SavedMultipartFile } from '@fastify/multipart';
+import { ApiUploadResponse, MultipartFileBuffer } from '@/server/routes/api/upload';
 import { FastifyRequest } from 'fastify';
-import { rename } from 'fs/promises';
+import { writeFile } from 'fs/promises';
 import { extname, join } from 'path';
 import { Worker } from 'worker_threads';
 import { config } from '../config';
@@ -20,7 +19,7 @@ export async function handlePartialUpload({
   response,
   req,
 }: {
-  file: SavedMultipartFile;
+  file: MultipartFileBuffer;
   options: UploadOptions;
   domain: string;
   response: ApiUploadResponse;
@@ -69,7 +68,7 @@ export async function handlePartialUpload({
     config.core.tempDirectory,
     `zipline_partial_${options.partial.identifier}_${options.partial.range[0]}_${options.partial.range[1]}`,
   );
-  await rename(file.filepath, tempFile);
+  await writeFile(tempFile, file.buffer);
 
   if (options.partial.lastchunk) {
     const fileUpload = await prisma.file.create({

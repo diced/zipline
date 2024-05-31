@@ -1,5 +1,4 @@
 import { ApiAuthOauthResponse } from '@/pages/api/auth/oauth';
-import { ApiUploadResponse } from '@/pages/api/+upload';
 
 // migrated routes
 import { ApiAuthInvitesResponse } from '@/server/routes/api/auth/invites';
@@ -14,6 +13,7 @@ import { ApiServerClearZerosResponse } from '@/server/routes/api/server/clear_ze
 import { ApiServerRequerySizeResponse } from '@/server/routes/api/server/requery_size';
 import { ApiSetupResponse } from '@/server/routes/api/setup';
 import { ApiStatsResponse } from '@/server/routes/api/stats';
+import { ApiUploadResponse } from '@/server/routes/api/upload';
 import { ApiUserResponse } from '@/server/routes/api/user';
 import { ApiUserFilesResponse } from '@/server/routes/api/user/files';
 import { ApiUserFilesIdResponse } from '@/server/routes/api/user/files/[id]';
