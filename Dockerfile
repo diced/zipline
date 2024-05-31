@@ -44,4 +44,4 @@ COPY --from=builder /zipline/code.json ./code.json
 RUN yarn cache clean --all
 RUN rm -rf /tmp/* /root/*
 
-CMD ["node", "--enable-source-maps", "build/server.js"]
+CMD ["node", "--enable-source-maps", "build/server"]

@@ -111,11 +111,11 @@ export const rawConfig: any = {
   discord: null,
 };
 
-export const PROP_TO_ENV: Record<string, string> = {
+export const PROP_TO_ENV: Record<string, string | string[]> = {
   'core.port': 'CORE_PORT',
   'core.hostname': 'CORE_HOSTNAME',
   'core.secret': 'CORE_SECRET',
-  'core.databaseUrl': 'CORE_DATABASE_URL',
+  'core.databaseUrl': ['CORE_DATABASE_URL', 'DATABASE_URL'],
   'core.returnHttpsUrls': 'CORE_RETURN_HTTPS_URLS',
   'core.defaultDomain': 'CORE_DEFAULT_DOMAIN',
   'core.tempDirectory': 'CORE_TEMP_DIRECTORY',
@@ -345,7 +345,12 @@ export function readEnv() {
 
   for (let i = 0; i !== envs.length; ++i) {
     const env = envs[i];
+    if (Array.isArray(env.variable)) {
+      env.variable = env.variable.find((v) => process.env[v] !== undefined) || 'DATABASE_URL';
+    }
+
     const value = process.env[env.variable];
+
     if (value === undefined) continue;
 
     if (env.variable === 'DATASOURCE_TYPE') {

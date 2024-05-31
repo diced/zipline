@@ -1,4 +1,3 @@
-version: '3'
 services:
   postgres:
     image: postgres:15
@@ -19,13 +18,16 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    # entrypoint: ['yarn', 'db:prototype'] ONLY USE THIS ONCE!
+    # UNCOMMENT THE BELOW LINE ON THE FIRST RUN!
+    # entrypoint: ['pnpm', 'db:prototype']
     ports:
       - '3000:3000'
     env_file:
       - .env
     environment:
       - DATABASE_URL=postgres://postgres:postgres@postgres/postgres
+      - CORE_SECRET=thissecretisverynotsecretbutshouldonlybeusedindevelopmentsoitsfineiguess
+      - CORE_HOSTNAME=0.0.0.0
     depends_on:
       - postgres
     volumes:

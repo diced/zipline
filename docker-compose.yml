@@ -1,4 +1,3 @@
-version: '3'
 services:
   postgres:
     image: postgres:15
@@ -18,15 +17,17 @@ services:
   zipline:
     image: ghcr.io/diced/zipline:v4
     # ATTENTION !
-    # entrypoint: ['yarn', 'db:prototype']
+    # entrypoint: ['pnpm', 'db:prototype']
     # Uncomment the above for the first run, then comment it out again after it runs once.
-    # The database is subject to change, this will reset to match the prisma schema.
+    # The database is subject to change, this will reset the current db to match the prisma schema.
     ports:
       - '3000:3000'
     env_file:
       - .env
     environment:
       - DATABASE_URL=postgres://postgres:postgres@postgres/postgres
+      - CORE_HOSTNAME=0.0.0.0
+      # add other needed variables like CORE_SECRET
     depends_on:
       - postgres
     volumes:
