@@ -1,5 +1,5 @@
-import { handlePartialUpload } from '@/lib/api/partialUpload';
-import { handleFile } from '@/lib/api/upload';
+import { handlePartialUpload } from '@/lib/api/upload/partialUpload';
+import { handleFile } from '@/lib/api/upload/upload';
 import { bytes } from '@/lib/bytes';
 import { config } from '@/lib/config';
 import { prisma } from '@/lib/db';

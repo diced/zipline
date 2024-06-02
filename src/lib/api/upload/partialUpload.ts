@@ -3,13 +3,13 @@ import { FastifyRequest } from 'fastify';
 import { writeFile } from 'fs/promises';
 import { extname, join } from 'path';
 import { Worker } from 'worker_threads';
-import { config } from '../config';
-import { hashPassword } from '../crypto';
-import { prisma } from '../db';
-import { log } from '../logger';
-import { guess } from '../mimes';
-import { formatFileName } from '../uploader/formatFileName';
-import { UploadHeaders, UploadOptions } from '../uploader/parseHeaders';
+import { config } from '../../config';
+import { hashPassword } from '../../crypto';
+import { prisma } from '../../db';
+import { log } from '../../logger';
+import { guess } from '../../mimes';
+import { formatFileName } from '../../uploader/formatFileName';
+import { UploadHeaders, UploadOptions } from '../../uploader/parseHeaders';
 
 const logger = log('api').c('upload');
 export async function handlePartialUpload({
@@ -34,9 +34,11 @@ export async function handlePartialUpload({
   const extension = options.overrides?.extension ?? extname(options.partial.filename);
   if (config.files.disabledExtensions.includes(extension)) throw `File extension ${extension} is not allowed`;
 
-  let fileName = formatFileName(options.format || config.files.defaultFormat, options.partial.filename);
-  if (options.overrides?.filename) {
-    fileName = options.overrides!.filename!;
+  const format = options.format || config.files.defaultFormat;
+  let fileName = formatFileName(format, options.partial.filename);
+
+  if (options.overrides?.filename || format === 'name') {
+    if (options.overrides?.filename) fileName = options.overrides!.filename!;
     const existing = await prisma.file.findFirst({
       where: {
         name: {

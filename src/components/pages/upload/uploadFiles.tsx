@@ -144,7 +144,7 @@ export function uploadFiles(
       setLoading(false);
       setProgress(0);
 
-      if ((res as ErrorBody).code) {
+      if ((res as ErrorBody).statusCode) {
         notifications.update({
           id: 'upload',
           title: 'Error uploading files',

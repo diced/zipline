@@ -21,6 +21,7 @@ export function openWarningModal(options: WarningModalOptions) {
     onCancel: () => modals.closeAll(),
     onConfirm: options.onConfirm,
     zIndex: 10320948239487,
+    size: 'auto',
   });
 }
 

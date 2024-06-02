@@ -24,7 +24,8 @@ export interface NextApiReq<Body = any, Query = any, Headers = any> extends Next
 export type ErrorBody = {
   message?: string;
   data?: any;
-  code?: any;
+  statusCode?: number;
+  error?: string;
 
   [key: string]: any;
 };

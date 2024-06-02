@@ -139,7 +139,9 @@ export async function uploadPartialFiles(
         () => {
           const res: Response['/api/upload'] = JSON.parse(req.responseText);
 
-          if ((res as ErrorBody).code) {
+          console.log(res);
+
+          if ((res as ErrorBody).message) {
             notifications.update({
               id: 'upload-partial',
               title: 'Error uploading files',
@@ -150,6 +152,9 @@ export async function uploadPartialFiles(
               loading: false,
             });
             ready = false;
+            setFiles([]);
+            setProgress(0);
+            setLoading(false);
             return;
           }
 

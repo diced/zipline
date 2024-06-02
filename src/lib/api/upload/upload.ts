@@ -1,19 +1,19 @@
 import { ApiUploadResponse, MultipartFileBuffer } from '@/server/routes/api/upload';
 import { FastifyRequest } from 'fastify';
 import { extname } from 'path';
-import { bytes } from '../bytes';
-import { compress } from '../compress';
-import { config } from '../config';
-import { hashPassword } from '../crypto';
-import { datasource } from '../datasource';
-import { prisma } from '../db';
-import { fileSelect } from '../db/models/file';
-import { onUpload } from '../discord';
-import { removeGps } from '../gps';
-import { log } from '../logger';
-import { guess } from '../mimes';
-import { formatFileName } from '../uploader/formatFileName';
-import { UploadHeaders, UploadOptions } from '../uploader/parseHeaders';
+import { bytes } from '../../bytes';
+import { compress } from '../../compress';
+import { config } from '../../config';
+import { hashPassword } from '../../crypto';
+import { datasource } from '../../datasource';
+import { prisma } from '../../db';
+import { fileSelect } from '../../db/models/file';
+import { onUpload } from '../../discord';
+import { removeGps } from '../../gps';
+import { log } from '../../logger';
+import { guess } from '../../mimes';
+import { formatFileName } from '../../uploader/formatFileName';
+import { UploadHeaders, UploadOptions } from '../../uploader/parseHeaders';
 
 const logger = log('api').c('upload');
 
@@ -38,10 +38,11 @@ export async function handleFile({
   if (file.file.bytesRead > config.files.maxFileSize)
     throw `File size is too large. Maximum file size is ${config.files.maxFileSize} bytes`;
 
-  let fileName = formatFileName(options.format || config.files.defaultFormat, file.filename);
+  const format = options.format || config.files.defaultFormat;
+  let fileName = formatFileName(format, file.filename);
 
-  if (options.overrides?.filename) {
-    fileName = options.overrides!.filename!;
+  if (options.overrides?.filename || format === 'name') {
+    if (options.overrides?.filename) fileName = options.overrides!.filename!;
     const existing = await prisma.file.findFirst({
       where: {
         name: {

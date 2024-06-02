@@ -29,7 +29,7 @@ export async function fetchApi<Response = any>(
     } else {
       error = {
         message: await res.text(),
-        code: res.status,
+        statusCode: res.status,
       } as ErrorBody;
     }
   }
