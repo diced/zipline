@@ -139,8 +139,6 @@ export async function uploadPartialFiles(
         () => {
           const res: Response['/api/upload'] = JSON.parse(req.responseText);
 
-          console.log(res);
-
           if ((res as ErrorBody).message) {
             notifications.update({
               id: 'upload-partial',

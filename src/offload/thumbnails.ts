@@ -3,9 +3,8 @@ import { config } from '@/lib/config';
 import { datasource } from '@/lib/datasource';
 import { prisma } from '@/lib/db';
 import { log } from '@/lib/logger';
-import { spawn } from 'child_process';
-import ffmpegPath from 'ffmpeg-static';
-import { createWriteStream } from 'fs';
+import ffmpeg from 'fluent-ffmpeg';
+import { createWriteStream, readFileSync, unlinkSync } from 'fs';
 import { join } from 'path';
 import { isMainThread, parentPort, workerData } from 'worker_threads';
 
@@ -30,43 +29,31 @@ if (!enabled) {
 
 logger.debug('started thumbnail worker');
 
-async function ffmpeg(file: string): Promise<Buffer | undefined> {
-  const args = ['-i', file, '-frames:v', '1', '-f', 'mjpeg', 'pipe:1'];
+function genThumbnail(file: string, thumbnailTmp: string): Promise<Buffer | undefined> {
+  return new Promise((resolve, reject) => {
+    ffmpeg(file)
+      .videoFilters('thumbnail')
+      .frames(1)
+      .format('mjpeg')
+      .output(thumbnailTmp)
+      .on('start', (cmd) => {
+        logger.debug('generating thumbnail', { cmd });
+      })
+      .on('error', (err) => {
+        logger.error('failed to generate thumbnail', { err: err.message });
+        reject(err);
+      })
+      .on('end', () => {
+        const buffer = readFileSync(thumbnailTmp);
 
-  const proc = spawn(ffmpegPath!, args, {
-    stdio: ['ignore', 'pipe', 'ignore'],
+        unlinkSync(thumbnailTmp);
+        unlinkSync(file);
+        logger.debug('removed temporary files', { file, thumbnail: thumbnailTmp });
+
+        resolve(buffer);
+      })
+      .run();
   });
-
-  try {
-    const buffer = await new Promise<Buffer>((resolve, reject) => {
-      const data: Buffer[] = [];
-
-      proc.stdout!.on('data', (d) => {
-        data.push(d);
-      });
-
-      proc.once('error', reject);
-
-      proc.once('close', (code) => {
-        if (code !== 0) {
-          const stringed = Buffer.concat([...data]).toString();
-
-          logger.error('ffmpeg exited with non-zero code');
-
-          reject(stringed);
-        } else {
-          resolve(Buffer.concat([...data]));
-        }
-      });
-    });
-
-    return buffer;
-  } catch (e) {
-    logger.error('failed to generate thumbnail', {
-      file,
-      error: e,
-    });
-  }
 }
 
 async function generate(ids: string[]) {
@@ -103,7 +90,8 @@ async function generate(ids: string[]) {
       writeStream.on('finish', resolve);
     });
 
-    const thumbnail = await ffmpeg(tmpFile);
+    const thumbnailTmpFile = join(config.core.tempDirectory, `zthumbnail_${file.id}.jpg`);
+    const thumbnail = await genThumbnail(tmpFile, thumbnailTmpFile);
     if (!thumbnail) return;
 
     await datasource.put(`.thumbnail.${file.id}.jpg`, thumbnail);
