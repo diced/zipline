@@ -263,6 +263,17 @@ export const schema = z.object({
     })
     .nullable()
     .default(null),
+  ratelimit: z.object({
+    enabled: z.boolean().default(true),
+    max: z.number().default(10),
+    window: z
+      .number()
+      .nullable()
+      .default(null)
+      .refine((v) => (v ? v > 0 : true)),
+    adminBypass: z.boolean().default(true),
+    allowList: z.array(z.string()).default([]),
+  }),
 });
 
 export type Config = z.infer<typeof schema>;
@@ -320,7 +331,7 @@ function handleError(error: ZodIssue) {
   const path =
     error.path[1] === 'externalLinks'
       ? `WEBSITE_EXTERNAL_LINKS[${error.path[2]}]`
-      : PROP_TO_ENV[error.path.join('.')] ?? error.path.join('.');
+      : PROP_TO_ENV[<keyof typeof PROP_TO_ENV>error.path.join('.')] ?? error.path.join('.');
 
   logger.error(`${path}: ${error.message}`);
 }

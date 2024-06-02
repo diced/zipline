@@ -11,16 +11,19 @@ import metrics from '@/lib/scheduler/jobs/metrics';
 import thumbnails from '@/lib/scheduler/jobs/thumbnails';
 import { fastifyCookie } from '@fastify/cookie';
 import { fastifyCors } from '@fastify/cors';
-import { fastifySensible } from '@fastify/sensible';
 import { fastifyMultipart } from '@fastify/multipart';
+import { fastifyRateLimit } from '@fastify/rate-limit';
+import { fastifySensible } from '@fastify/sensible';
 import fastify from 'fastify';
 import { mkdir } from 'fs/promises';
 import { parse } from 'url';
 import { version } from '../../package.json';
+import { checkRateLimit } from './plugins/checkRateLimit';
 import next, { ALL_METHODS } from './plugins/next';
 import loadRoutes from './routes';
 import { filesRoute } from './routes/files.dy';
 import { urlsRoute } from './routes/urls.dy';
+import { isAdministrator } from '@/lib/role';
 
 const MODE = process.env.NODE_ENV || 'production';
 const logger = log('server');
@@ -65,6 +68,36 @@ async function main() {
       fileSize: config.files.maxFileSize,
     },
   });
+
+  if (config.ratelimit.enabled) {
+    try {
+      checkRateLimit(config);
+
+      await server.register(fastifyRateLimit, {
+        global: false,
+        hook: 'preHandler',
+        max: config.ratelimit.max,
+        timeWindow: config.ratelimit.window ?? undefined,
+        keyGenerator: (req) => {
+          return req.user?.id;
+        },
+        allowList: async (req, key) => {
+          if (config.ratelimit.adminBypass && isAdministrator(req.user?.role)) return true;
+          if (config.ratelimit.allowList.includes(key)) return true;
+          if (Object.keys(req.headers).includes('x-zipline-p-filename')) return true;
+
+          return false;
+        },
+      });
+    } catch (e) {
+      if (process.env.DEBUG) console.error(e);
+
+      logger
+        .c('ratelimit')
+        .error((<Error>e).message)
+        .error('skipping ratelimit setup due to error above');
+    }
+  }
 
   if (config.files.route === '/' && config.urls.route === '/') {
     logger.debug('files & urls route = /, using catch-all route');

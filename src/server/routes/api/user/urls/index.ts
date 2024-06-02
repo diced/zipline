@@ -42,9 +42,11 @@ const logger = log('api').c('user').c('urls');
 
 export default fastifyPlugin(
   (server, _, done) => {
+    const rateLimit = server.rateLimit();
+
     server.post<{ Body: Body; Headers: Headers }>(
       PATH,
-      { preHandler: [userMiddleware] },
+      { preHandler: [userMiddleware, rateLimit] },
       async (req, res) => {
         const { vanity, destination } = req.body;
         const noJson = !!req.headers['x-zipline-no-json'];

@@ -109,9 +109,16 @@ export const rawConfig: any = {
     },
   },
   discord: null,
+  ratelimit: {
+    enabled: undefined,
+    max: undefined,
+    window: undefined,
+    adminBypass: undefined,
+    allowList: undefined,
+  },
 };
 
-export const PROP_TO_ENV: Record<string, string | string[]> = {
+export const PROP_TO_ENV = {
   'core.port': 'CORE_PORT',
   'core.hostname': 'CORE_HOSTNAME',
   'core.secret': 'CORE_SECRET',
@@ -162,7 +169,7 @@ export const PROP_TO_ENV: Record<string, string | string[]> = {
   'features.userRegistration': 'FEATURES_USER_REGISTRATION',
   'features.oauthRegistration': 'FEATURES_OAUTH_REGISTRATION',
   'features.deleteOnMaxViews': 'FEATURES_DELETE_ON_MAX_VIEWS',
-  'features.thumbails.enabled': 'FEATURES_THUMBNAILS_ENABLED',
+  'features.thumbnails.enabled': 'FEATURES_THUMBNAILS_ENABLED',
   'features.thumbnails.num_threads': 'FEATURES_THUMBNAILS_NUM_THREADS',
   'features.metrics.enabled': 'FEATURES_METRICS_ENABLED',
   'features.metrics.adminOnly': 'FEATURES_METRICS_ADMIN_ONLY',
@@ -224,6 +231,12 @@ export const PROP_TO_ENV: Record<string, string | string[]> = {
   'discord.onShorten.embed.color': 'DISCORD_ONSHORTEN_EMBED_COLOR',
   'discord.onShorten.embed.timestamp': 'DISCORD_ONSHORTEN_EMBED_TIMESTAMP',
   'discord.onShorten.embed.url': 'DISCORD_ONSHORTEN_EMBED_URL',
+
+  'ratelimit.enabled': 'RATELIMIT_ENABLED',
+  'ratelimit.max': 'RATELIMIT_MAX',
+  'ratelimit.window': 'RATELIMIT_WINDOW',
+  'ratelimit.adminBypass': 'RATELIMIT_ADMIN_BYPASS',
+  'ratelimit.allowList': 'RATELIMIT_ALLOW_LIST',
 };
 
 const logger = log('config').c('read');
@@ -272,7 +285,6 @@ export function readEnv() {
     env('features.imageCompression', 'boolean'),
     env('features.robotsTxt', 'boolean'),
     env('features.healthcheck', 'boolean'),
-    env('features.invites', 'boolean'),
     env('features.userRegistration', 'boolean'),
     env('features.oauthRegistration', 'boolean'),
     env('features.deleteOnMaxViews', 'boolean'),
@@ -338,6 +350,12 @@ export function readEnv() {
     env('discord.onShorten.embed.color', 'string'),
     env('discord.onShorten.embed.timestamp', 'boolean'),
     env('discord.onShorten.embed.url', 'boolean'),
+
+    env('ratelimit.enabled', 'boolean'),
+    env('ratelimit.max', 'number'),
+    env('ratelimit.window', 'ms'),
+    env('ratelimit.adminBypass', 'boolean'),
+    env('ratelimit.allowList', 'string[]'),
   ];
 
   // clone raw
@@ -377,7 +395,7 @@ export function readEnv() {
   return raw;
 }
 
-function env(property: string, type: EnvType) {
+function env(property: keyof typeof PROP_TO_ENV, type: EnvType) {
   return {
     variable: PROP_TO_ENV[property],
     property,
@@ -406,7 +424,7 @@ function setDotProp(obj: Record<string, any>, property: string, value: unknown) 
 function parse(value: string, type: EnvType) {
   switch (type) {
     case 'string':
-      return string(value);
+      return value;
     case 'string[]':
       return value
         .split(',')
@@ -430,10 +448,6 @@ function parse(value: string, type: EnvType) {
     default:
       return undefined;
   }
-}
-
-function string(value: string) {
-  return value;
 }
 
 function number(value: string) {

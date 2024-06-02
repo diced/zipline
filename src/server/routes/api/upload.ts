@@ -30,9 +30,11 @@ const logger = log('api').c('upload');
 export const PATH = '/api/upload';
 export default fastifyPlugin(
   (server, _, done) => {
+    const rateLimit = server.rateLimit();
+
     server.post<{
       Headers: UploadHeaders;
-    }>(PATH, { preHandler: [userMiddleware] }, async (req, res) => {
+    }>(PATH, { preHandler: [userMiddleware, rateLimit] }, async (req, res) => {
       const options = parseHeaders(req.headers, config.files);
       if (options.header) return res.badRequest('bad options, receieved: ' + JSON.stringify(options));
 
