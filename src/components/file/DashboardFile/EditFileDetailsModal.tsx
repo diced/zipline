@@ -12,13 +12,15 @@ export default function EditFileDetailsModal({
   open,
 }: {
   open: boolean;
-  file: File;
+  file: File | null;
   onClose: () => void;
 }) {
-  const [maxViews, setMaxViews] = useState<number | null>(file.maxViews! ?? null);
+  if (!file) return null;
+
+  const [maxViews, setMaxViews] = useState<number | null>(file?.maxViews ?? null);
   const [password, setPassword] = useState<string | null>('');
-  const [originalName, setOriginalName] = useState<string | null>(file.originalName ?? null);
-  const [type, setType] = useState<string | null>(file.type ?? null);
+  const [originalName, setOriginalName] = useState<string | null>(file?.originalName ?? null);
+  const [type, setType] = useState<string | null>(file?.type ?? null);
 
   const handleRemovePassword = async () => {
     if (!file.password) return;
@@ -74,6 +76,8 @@ export default function EditFileDetailsModal({
         color: 'green',
         icon: <IconPencil size='1rem' />,
       });
+
+      onClose();
 
       setPassword(null);
       mutateFiles();
