@@ -11,9 +11,9 @@ export function shell(token: string, type: 'file' | 'url', options: GeneratorOpt
 
   if (type === 'file') {
     curl.push('-F', 'file=@/tmp/screenshot.png');
-    curl.push('-H', 'content-type: multipart/form-data');
+    curl.push('-H', "'content-type: multipart/form-data'");
   } else {
-    curl.push('-H', 'content-type: application/json');
+    curl.push('-H', "'content-type: application/json'");
   }
 
   const toAddHeaders: UploadHeaders = {};

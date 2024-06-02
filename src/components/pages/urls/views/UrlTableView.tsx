@@ -191,7 +191,7 @@ export default function UrlTableView() {
             {
               accessor: 'vanity',
               sortable: true,
-              render: (url) => url.vanity ?? <b>None</b>,
+              render: (url) => url.vanity ?? '',
               filter: (
                 <SearchFilter
                   setSearchField={setSearchField}
@@ -227,7 +227,7 @@ export default function UrlTableView() {
             {
               accessor: 'maxViews',
               sortable: true,
-              render: (url) => (url.maxViews ? url.maxViews : <b>None</b>),
+              render: (url) => (url.maxViews ? url.maxViews : ''),
             },
             {
               accessor: 'createdAt',

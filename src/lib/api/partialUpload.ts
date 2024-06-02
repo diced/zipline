@@ -34,7 +34,7 @@ export async function handlePartialUpload({
   const extension = options.overrides?.extension ?? extname(options.partial.filename);
   if (config.files.disabledExtensions.includes(extension)) throw `File extension ${extension} is not allowed`;
 
-  let fileName = formatFileName(options.format || config.files.defaultFormat, file.filename);
+  let fileName = formatFileName(options.format || config.files.defaultFormat, options.partial.filename);
   if (options.overrides?.filename) {
     fileName = options.overrides!.filename!;
     const existing = await prisma.file.findFirst({

@@ -16,7 +16,7 @@ export default function FolderTableView() {
   const { data, isLoading } = useSWR<Extract<Response['/api/user/folders'], Folder[]>>('/api/user/folders');
 
   const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
-    columnAccessor: 'createdAt',
+    columnAccessor: 'updatedAt',
     direction: 'desc',
   });
   const [sorted, setSorted] = useState<Folder[]>(data ?? []);
@@ -97,6 +97,7 @@ export default function FolderTableView() {
                         e.stopPropagation();
                         copyFolderUrl(folder, clipboard);
                       }}
+                      disabled={!folder.public}
                     >
                       <IconCopy size='1rem' />
                     </ActionIcon>

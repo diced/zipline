@@ -51,9 +51,13 @@ export default fastifyPlugin(
             .type(file?.type || 'application/octet-stream')
             .headers({
               'Content-Length': size,
-              ...(file?.originalName && {
-                'Content-Disposition': `${download ? 'attachment; ' : ''}filename="${file.originalName}"`,
-              }),
+              ...(file?.originalName
+                ? {
+                    'Content-Disposition': `${download ? 'attachment; ' : ''}filename="${file.originalName}"`,
+                  }
+                : download && {
+                    'Content-Disposition': 'attachment;',
+                  }),
             })
             .status(416)
             .send(buf);
@@ -68,9 +72,13 @@ export default fastifyPlugin(
             'Content-Range': `bytes ${start}-${end}/${size}`,
             'Accept-Ranges': 'bytes',
             'Content-Length': end - start + 1,
-            ...(file?.originalName && {
-              'Content-Disposition': `${download ? 'attachment; ' : ''}filename="${file.originalName}"`,
-            }),
+            ...(file?.originalName
+              ? {
+                  'Content-Disposition': `${download ? 'attachment; ' : ''}filename="${file.originalName}"`,
+                }
+              : download && {
+                  'Content-Disposition': 'attachment;',
+                }),
           })
           .status(206)
           .send(buf);
@@ -84,9 +92,13 @@ export default fastifyPlugin(
         .headers({
           'Content-Length': size,
           'Accept-Ranges': 'bytes',
-          ...(file?.originalName && {
-            'Content-Disposition': `${download ? 'attachment; ' : ''}filename="${file.originalName}"`,
-          }),
+          ...(file?.originalName
+            ? {
+                'Content-Disposition': `${download ? 'attachment; ' : ''}filename="${file.originalName}"`,
+              }
+            : download && {
+                'Content-Disposition': 'attachment;',
+              }),
         })
         .status(200)
         .send(buf);

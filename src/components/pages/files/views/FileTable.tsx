@@ -431,7 +431,7 @@ export default function FileTable({ id }: { id?: string }) {
             {
               accessor: 'favorite',
               sortable: true,
-              render: (file) => (file.favorite ? 'Yes' : 'No'),
+              render: (file) => (file.favorite ? <Text c='yellow'>Yes</Text> : 'No'),
             },
             {
               accessor: 'actions',

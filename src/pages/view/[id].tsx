@@ -30,7 +30,7 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function ViewFile({
   file,
@@ -162,6 +162,9 @@ export default function ViewFile({
     </Head>
   );
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   return password && !pw ? (
     <Modal
       onClose={() => {}}
@@ -204,7 +207,7 @@ export default function ViewFile({
 
       <Collapse in={detailsOpen}>
         <Paper m='md' p='md' withBorder>
-          {user?.view.content && (
+          {mounted && user?.view.content && (
             <TypographyStylesProvider>
               <Text
                 ta={user?.view.align ?? 'left'}
@@ -240,15 +243,16 @@ export default function ViewFile({
       <Center h='100%'>
         <Paper m='md' p='md' shadow='md' radius='md' withBorder>
           <Group justify='space-between' mb='sm'>
-            <Text size='lg' fw={700} display='flex'>
-              {file.name}
-
+            <Group>
+              <Text size='lg' fw={700} display='flex'>
+                {file.name}
+              </Text>
               {user?.view.showMimetype && (
                 <Text size='sm' c='dimmed' ml='sm' style={{ alignSelf: 'center' }}>
                   {file.type}
                 </Text>
               )}
-            </Text>
+            </Group>
 
             <Button
               ml='sm'
@@ -265,7 +269,7 @@ export default function ViewFile({
 
           <DashboardFileType file={file} password={pw} show />
 
-          {user?.view.content && (
+          {mounted && user?.view.content && (
             <TypographyStylesProvider>
               <Text
                 mt='sm'

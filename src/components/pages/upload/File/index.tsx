@@ -179,7 +179,7 @@ export default function UploadFile() {
 
       <Collapse in={progress === 100}>
         <Paper withBorder p='xs' radius='sm'>
-          <Text ta='center' size='sm' color='yellow'>
+          <Text ta='center' size='sm' c='yellow'>
             Finalizing upload(s)...
           </Text>
         </Paper>
@@ -188,7 +188,11 @@ export default function UploadFile() {
       <Grid grow my='sm'>
         {files.map((file, i) => (
           <Grid.Col span={3} key={i}>
-            <ToUploadFile file={file} onDelete={() => setFiles(files.filter((_, j) => i !== j))} />
+            <ToUploadFile
+              loading={dropLoading}
+              file={file}
+              onDelete={() => setFiles(files.filter((_, j) => i !== j))}
+            />
           </Grid.Col>
         ))}
       </Grid>

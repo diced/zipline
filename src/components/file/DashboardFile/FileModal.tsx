@@ -17,6 +17,7 @@ import {
   Pill,
   PillsInput,
   SimpleGrid,
+  Stack,
   Title,
   Tooltip,
   useCombobox,
@@ -179,9 +180,16 @@ export default function FileModal({
         opened={open}
         onClose={() => setOpen(false)}
         title={
-          <Title order={3} fw={700}>
-            {file?.name ?? ''}
-          </Title>
+          <Stack gap={1}>
+            <Title order={3} fw={700}>
+              {file?.name ?? ''}
+            </Title>
+            {!reduce && (
+              <Title fw='normal' order={4} c='dimmed' size={14}>
+                {file?.id}
+              </Title>
+            )}
+          </Stack>
         }
         size='auto'
         centered
@@ -225,60 +233,62 @@ export default function FileModal({
               )}
             </SimpleGrid>
 
-            <>
-              <Title order={4} mt='lg' mb='xs'>
-                Tags
-              </Title>
-              <Combobox store={tagsCombobox} onOptionSubmit={handleValueSelect} withinPortal={false}>
-                <Combobox.DropdownTarget>
-                  <PillsInput
-                    onBlur={() => triggerSave()}
-                    pointer
-                    onClick={() => tagsCombobox.toggleDropdown()}
-                  >
-                    <Pill.Group>
-                      {values.length > 0 ? (
-                        values
-                      ) : (
-                        <Input.Placeholder>Pick one or more tags</Input.Placeholder>
-                      )}
+            {!reduce && (
+              <>
+                <Title order={4} mt='lg' mb='xs'>
+                  Tags
+                </Title>
+                <Combobox store={tagsCombobox} onOptionSubmit={handleValueSelect} withinPortal={false}>
+                  <Combobox.DropdownTarget>
+                    <PillsInput
+                      onBlur={() => triggerSave()}
+                      pointer
+                      onClick={() => tagsCombobox.toggleDropdown()}
+                    >
+                      <Pill.Group>
+                        {values.length > 0 ? (
+                          values
+                        ) : (
+                          <Input.Placeholder>Pick one or more tags</Input.Placeholder>
+                        )}
 
-                      <Combobox.EventsTarget>
-                        <PillsInput.Field
-                          type='hidden'
-                          onBlur={() => tagsCombobox.closeDropdown()}
-                          onKeyDown={(event) => {
-                            if (event.key === 'Backspace') {
-                              event.preventDefault();
-                              handleValueRemove(value[value.length - 1]);
-                            }
-                          }}
-                        />
-                      </Combobox.EventsTarget>
-                    </Pill.Group>
-                  </PillsInput>
-                </Combobox.DropdownTarget>
-
-                <Combobox.Dropdown>
-                  <Combobox.Options>
-                    {tags?.map((tag) => (
-                      <Combobox.Option value={tag.id} key={tag.id} active={value.includes(tag.id)}>
-                        <Group gap='sm'>
-                          <Checkbox
-                            checked={value.includes(tag.id)}
-                            onChange={() => {}}
-                            aria-hidden
-                            tabIndex={-1}
-                            style={{ pointerEvents: 'none' }}
+                        <Combobox.EventsTarget>
+                          <PillsInput.Field
+                            type='hidden'
+                            onBlur={() => tagsCombobox.closeDropdown()}
+                            onKeyDown={(event) => {
+                              if (event.key === 'Backspace') {
+                                event.preventDefault();
+                                handleValueRemove(value[value.length - 1]);
+                              }
+                            }}
                           />
-                          <TagPill tag={tag} />
-                        </Group>
-                      </Combobox.Option>
-                    ))}
-                  </Combobox.Options>
-                </Combobox.Dropdown>
-              </Combobox>
-            </>
+                        </Combobox.EventsTarget>
+                      </Pill.Group>
+                    </PillsInput>
+                  </Combobox.DropdownTarget>
+
+                  <Combobox.Dropdown>
+                    <Combobox.Options>
+                      {tags?.map((tag) => (
+                        <Combobox.Option value={tag.id} key={tag.id} active={value.includes(tag.id)}>
+                          <Group gap='sm'>
+                            <Checkbox
+                              checked={value.includes(tag.id)}
+                              onChange={() => {}}
+                              aria-hidden
+                              tabIndex={-1}
+                              style={{ pointerEvents: 'none' }}
+                            />
+                            <TagPill tag={tag} />
+                          </Group>
+                        </Combobox.Option>
+                      ))}
+                    </Combobox.Options>
+                  </Combobox.Dropdown>
+                </Combobox>
+              </>
+            )}
 
             <Group justify='space-between' mt='lg'>
               <Group>

@@ -45,6 +45,7 @@ export const getServerSideProps = withSafeConfig<{
         select: {
           ...fileSelect,
           password: true,
+          tags: false,
         },
       },
     },

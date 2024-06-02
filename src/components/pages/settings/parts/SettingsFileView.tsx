@@ -103,6 +103,8 @@ export default function SettingsFileView() {
             description='Change the content within view-routes. Most HTML is valid, while the use of JavaScript is unavailable.'
             disabled={!form.values.enabled}
             mb='xs'
+            minRows={5}
+            autosize
             {...form.getInputProps('content')}
           />
 

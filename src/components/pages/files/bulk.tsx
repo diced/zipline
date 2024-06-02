@@ -62,6 +62,7 @@ export async function bulkDelete(ids: string[], setSelectedFiles: (files: File[]
           icon: <IconTrashFilled size='1rem' />,
           id: 'bulk-delete',
           autoClose: true,
+          loading: false,
         });
       }
 
