@@ -163,6 +163,7 @@ export const schema = z.object({
   }),
   website: z.object({
     title: z.string().default('Zipline'),
+    titleLogo: z.string().url().nullable().default(null),
     externalLinks: z
       .array(
         z.object({

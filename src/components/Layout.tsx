@@ -227,6 +227,10 @@ export default function Layout({ children, config }: { children: React.ReactNode
             hiddenFrom='sm'
           />
 
+          {config.website.titleLogo && (
+            <Avatar src={config.website.titleLogo} alt='Zipline logo' radius='sm' size='md' mr='md' />
+          )}
+
           <Title fw={700}>Zipline</Title>
 
           <div style={{ marginLeft: 'auto' }}>

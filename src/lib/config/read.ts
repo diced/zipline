@@ -69,6 +69,7 @@ export const rawConfig: any = {
   },
   website: {
     title: undefined,
+    titleLogo: undefined,
     externalLinks: undefined,
     loginBackground: undefined,
     defaultAvatar: undefined,
@@ -179,6 +180,7 @@ export const PROP_TO_ENV = {
   'invites.length': 'INVITES_LENGTH',
 
   'website.title': 'WEBSITE_TITLE',
+  'website.titleLogo': 'WEBSITE_TITLE_LOGO',
   'website.externalLinks': 'WEBSITE_EXTERNAL_LINKS',
   'website.loginBackground': 'WEBSITE_LOGIN_BACKGROUND',
   'website.defaultAvatar': 'WEBSITE_DEFAULT_AVATAR',
@@ -298,6 +300,7 @@ export function readEnv() {
     env('invites.length', 'number'),
 
     env('website.title', 'string'),
+    env('website.titleLogo', 'string'),
     env('website.externalLinks', 'json[]'),
     env('website.loginBackground', 'string'),
     env('website.defaultAvatar', 'string'),
