@@ -122,6 +122,7 @@ export default function SettingsUser() {
         <PasswordInput
           label='Password'
           description='Leave blank to keep the same password'
+          autoComplete='new-password'
           {...form.getInputProps('password')}
           leftSection={<IconAsteriskSimple size='1rem' />}
         />

@@ -100,7 +100,7 @@ export default function Register({ config, invite }: InferGetServerSidePropsType
             </div>
           )}
 
-          <Text size='sm' color='dimmed'>
+          <Text size='sm' c='dimmed'>
             Create an account to get started.
           </Text>
 

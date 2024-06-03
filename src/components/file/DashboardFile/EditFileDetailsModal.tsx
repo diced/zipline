@@ -142,6 +142,7 @@ export default function EditFileDetailsModal({
             label='Password'
             description='Set a password for these files. Leave blank to disable password protection.'
             value={password ?? ''}
+            autoComplete='off'
             onChange={(event) =>
               setPassword(event.currentTarget.value.trim() === '' ? null : event.currentTarget.value.trim())
             }
