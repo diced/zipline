@@ -225,6 +225,7 @@ export default function UploadOptionsButton({ numFiles }: { numFiles: number }) 
             description='Set a password for these files. Leave blank to disable password protection. This value is not saved to your browser, and is cleared after uploading.'
             leftSection={<IconKey size='1rem' />}
             value={ephemeral.password ?? ''}
+            autoComplete='off'
             onChange={(event) =>
               setEphemeral(
                 'password',
@@ -233,7 +234,7 @@ export default function UploadOptionsButton({ numFiles }: { numFiles: number }) 
             }
           />
 
-          <Text color='dimmed' size='sm'>
+          <Text c='dimmed' size='sm'>
             <b>Other Options</b>
           </Text>
 

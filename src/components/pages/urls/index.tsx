@@ -144,6 +144,7 @@ export default function DashboardURLs() {
             <PasswordInput
               label='Password'
               description='Protect your link with a password'
+              autoComplete='off'
               {...form.getInputProps('password')}
             />
 

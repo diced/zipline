@@ -106,6 +106,7 @@ export default function DashboardUsers() {
             <PasswordInput
               label='Password'
               placeholder='Enter a password...'
+              autoComplete='new-password'
               {...form.getInputProps('password')}
             />
             <FileInput

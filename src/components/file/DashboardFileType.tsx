@@ -83,13 +83,7 @@ export default function DashboardFileType({
     return <Placeholder text={`Click to view file ${file.name}`} Icon={icon[type] ?? IconFileUnknown} />;
 
   if (dbFile && file.password === true && !show)
-    return (
-      <Placeholder
-        text={`Click to view protected ${file.name}`}
-        Icon={IconShieldLockFilled}
-        onClick={() => window.open(`/view/${file.name}${password ? `?pw=${password}` : ''}`)}
-      />
-    );
+    return <Placeholder text={`Click to view protected ${file.name}`} Icon={IconShieldLockFilled} />;
 
   if (dbFile && file.password === true && show)
     return (

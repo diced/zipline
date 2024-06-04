@@ -170,6 +170,7 @@ export default function EditUserModal({
             <PasswordInput
               label='Password'
               placeholder='Enter a password...'
+              autoComplete='new-password'
               {...form.getInputProps('password')}
             />
             <FileInput
