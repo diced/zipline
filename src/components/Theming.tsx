@@ -4,6 +4,10 @@ import { useEffect } from 'react';
 import ayu_dark from 'lib/themes/ayu_dark';
 import ayu_light from 'lib/themes/ayu_light';
 import ayu_mirage from 'lib/themes/ayu_mirage';
+import catppuccin_mocha from 'lib/themes/catppuccin_mocha';
+import catppuccin_macchiato from 'lib/themes/catppuccin_macchiato';
+import catppuccin_frappe from 'lib/themes/catppuccin_frappe';
+import catppuccin_latte from 'lib/themes/catppuccin_latte';
 import dark from 'lib/themes/dark';
 import dark_blue from 'lib/themes/dark_blue';
 import dracula from 'lib/themes/dracula';
@@ -32,6 +36,10 @@ export const themes = {
   ayu_dark,
   ayu_mirage,
   ayu_light,
+  catppuccin_mocha,
+  catppuccin_macchiato,
+  catppuccin_frappe,
+  catppuccin_latte,
   nord,
   dracula,
   matcha_dark_azul,
@@ -46,6 +54,10 @@ export const friendlyThemeName = {
   ayu_dark: 'Ayu Dark',
   ayu_mirage: 'Ayu Mirage',
   ayu_light: 'Ayu Light',
+  catppuccin_mocha: 'Catppuccin Mocha',
+  catppuccin_macchiato: 'Catppuccin Macchiato',
+  catppuccin_frappe: 'Catppuccin Frappé',
+  catppuccin_latte: 'Catppuccin Latte',
   nord: 'Nord',
   dracula: 'Dracula',
   matcha_dark_azul: 'Matcha Dark Azul',

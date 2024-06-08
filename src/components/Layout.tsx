@@ -356,7 +356,7 @@ export default function Layout({ children, props }) {
                       )
                     }
                     variant='subtle'
-                    color='gray'
+                    color={theme.colorScheme === 'dark' ? 'dark' : 'gray'}
                     compact
                     size='xl'
                     p='sm'
