@@ -5,14 +5,26 @@ import { exists } from '../fs';
 
 import dark_gray from './builtins/dark_gray.theme.json';
 import light_gray from './builtins/light_gray.theme.json';
+import { log } from '../logger';
 
 const THEMES_DIR = './themes';
+const logger = log('theme');
 
 export async function readThemes(includeBuiltins: boolean = true): Promise<ZiplineTheme[]> {
   const themes = await readThemesDir();
   const parsedThemes = await parseThemes(themes);
 
   for (let i = 0; i !== parsedThemes.length; ++i) {
+    const theme = parsedThemes[i];
+    if (!theme.mainBackgroundColor) {
+      logger.error(`Theme ${theme.id} is missing mainBackgroundColor property, using a default value.`);
+
+      theme.mainBackgroundColor =
+        theme.colorScheme === 'light'
+          ? 'color-mix(in srgb, var(--mantine-color-white), black 3%)' // darken(white 3%)
+          : 'color-mix(in srgb, var(--mantine-color-gray-9), black 45%)'; // darken(--mantine-color-gray-9 45%)
+    }
+
     parsedThemes[i] = await handleOverrideColors(parsedThemes[i]);
   }
 

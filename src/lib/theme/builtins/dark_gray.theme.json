@@ -2,5 +2,6 @@
   "name": "Dark Gray",
   "id": "builtin:dark_gray",
   "colorScheme": "dark",
-  "primaryColor": "gray"
+  "primaryColor": "gray",
+  "mainBackgroundColor": "color-mix(in srgb, var(--mantine-color-gray-9), black 45%)"
 }

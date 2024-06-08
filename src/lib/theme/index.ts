@@ -1,6 +1,11 @@
 import { AppShell, LoadingOverlay, MantineTheme, MantineThemeOverride, Modal } from '@mantine/core';
 
-export type ZiplineTheme = MantineTheme & { id: string; name: string; colorScheme: string };
+export type ZiplineTheme = MantineTheme & {
+  id: string;
+  name: string;
+  colorScheme: string;
+  mainBackgroundColor: string;
+};
 
 export function findTheme(id: string, themes: ZiplineTheme[] = []): ZiplineTheme | undefined {
   return themes.find((theme) => theme.id === id);
@@ -11,11 +16,11 @@ export function themeComponents(theme: ZiplineTheme): MantineThemeOverride {
     ...theme,
     components: {
       AppShell: AppShell.extend({
-        styles: (t) => ({
+        styles: {
           main: {
-            background: `${theme.colorScheme === 'dark' ? t.colors.dark[8] : t.colors.gray[0]} !important`,
+            backgroundColor: theme.mainBackgroundColor,
           },
-        }),
+        },
       }),
       LoadingOverlay: LoadingOverlay.extend({
         defaultProps: {

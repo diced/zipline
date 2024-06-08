@@ -15,5 +15,6 @@
       "#2C39A6"
     ]
   },
-  "primaryColor": "blue"
+  "primaryColor": "blue",
+  "mainBackgroundColor": "color-mix(in srgb, var(--mantine-color-white), black 2%)"
 }

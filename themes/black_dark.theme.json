@@ -15,5 +15,6 @@
       "#000000"
     ]
   },
-  "primaryColor": "gray"
+  "primaryColor": "gray",
+  "mainBackgroundColor": "#000"
 }

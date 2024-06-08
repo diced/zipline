@@ -27,5 +27,6 @@
       "#00001E"
     ]
   },
-  "primaryColor": "blue"
+  "primaryColor": "blue",
+  "mainBackgroundColor": "color-mix(in srgb, var(--mantine-color-dark-9), black 45%)"
 }
