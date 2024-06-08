@@ -1,17 +1,17 @@
 // https://github.com/SeaswimmerTheFsh
-// https://catppuccin.com/pallete
+// https://catppuccin.com/palette
 
 import createTheme from '.';
 
 export default createTheme({
-  colorScheme: 'light',
+  colorScheme: 'dark',
   primaryColor: 'blue',
   other: {
     AppShell_backgroundColor: '#dce0e8',
     hover: '#ccd0da',
   },
   colors: {
-    light: [
+    dark: [
       '#4c4f69',
       '#8c8fa1',
       '#8c8fa1',

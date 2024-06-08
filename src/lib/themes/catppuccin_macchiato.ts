@@ -1,5 +1,5 @@
 // https://github.com/SeaswimmerTheFsh
-// https://catppuccin.com/pallete
+// https://catppuccin.com/palette
 
 import createTheme from '.';
 
