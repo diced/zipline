@@ -48,6 +48,10 @@ export default function FavoriteFiles() {
     setPage(1);
   }
 
+  if (!isLoading && !data?.page.length) {
+    return null;
+  }
+
   return (
     <>
       <Accordion variant='separated'>

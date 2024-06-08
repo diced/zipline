@@ -451,6 +451,7 @@ export default function FileTable({ id }: { id?: string }) {
                         e.stopPropagation();
                         viewFile(file);
                       }}
+                      color='blue'
                     >
                       <IconExternalLink size='1rem' />
                     </ActionIcon>

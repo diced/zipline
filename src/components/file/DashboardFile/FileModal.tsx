@@ -8,6 +8,8 @@ import { fetchApi } from '@/lib/fetchApi';
 import { useSettingsStore } from '@/lib/store/settings';
 import {
   ActionIcon,
+  Box,
+  Button,
   Checkbox,
   Combobox,
   Group,
@@ -17,7 +19,7 @@ import {
   Pill,
   PillsInput,
   SimpleGrid,
-  Stack,
+  Text,
   Title,
   Tooltip,
   useCombobox,
@@ -180,16 +182,9 @@ export default function FileModal({
         opened={open}
         onClose={() => setOpen(false)}
         title={
-          <Stack gap={1}>
-            <Title order={3} fw={700}>
-              {file?.name ?? ''}
-            </Title>
-            {!reduce && (
-              <Title fw='normal' order={4} c='dimmed' size={14}>
-                {file?.id}
-              </Title>
-            )}
-          </Stack>
+          <Title order={3} fw={700}>
+            {file?.name ?? ''}
+          </Title>
         }
         size='auto'
         centered
@@ -234,74 +229,75 @@ export default function FileModal({
             </SimpleGrid>
 
             {!reduce && (
-              <>
-                <Title order={4} mt='lg' mb='xs'>
-                  Tags
-                </Title>
-                <Combobox store={tagsCombobox} onOptionSubmit={handleValueSelect} withinPortal={false}>
-                  <Combobox.DropdownTarget>
-                    <PillsInput
-                      onBlur={() => triggerSave()}
-                      pointer
-                      onClick={() => tagsCombobox.toggleDropdown()}
-                    >
-                      <Pill.Group>
-                        {values.length > 0 ? (
-                          values
-                        ) : (
-                          <Input.Placeholder>Pick one or more tags</Input.Placeholder>
-                        )}
+              <SimpleGrid cols={{ base: 1, md: 2 }} spacing='md' my='xs'>
+                <Box>
+                  <Title order={4} mt='lg' mb='xs'>
+                    Tags
+                  </Title>
+                  <Combobox store={tagsCombobox} onOptionSubmit={handleValueSelect} withinPortal={false}>
+                    <Combobox.DropdownTarget>
+                      <PillsInput
+                        onBlur={() => triggerSave()}
+                        pointer
+                        onClick={() => tagsCombobox.toggleDropdown()}
+                      >
+                        <Pill.Group>
+                          {values.length > 0 ? (
+                            values
+                          ) : (
+                            <Input.Placeholder>Pick one or more tags</Input.Placeholder>
+                          )}
 
-                        <Combobox.EventsTarget>
-                          <PillsInput.Field
-                            type='hidden'
-                            onBlur={() => tagsCombobox.closeDropdown()}
-                            onKeyDown={(event) => {
-                              if (event.key === 'Backspace') {
-                                event.preventDefault();
-                                handleValueRemove(value[value.length - 1]);
-                              }
-                            }}
-                          />
-                        </Combobox.EventsTarget>
-                      </Pill.Group>
-                    </PillsInput>
-                  </Combobox.DropdownTarget>
-
-                  <Combobox.Dropdown>
-                    <Combobox.Options>
-                      {tags?.map((tag) => (
-                        <Combobox.Option value={tag.id} key={tag.id} active={value.includes(tag.id)}>
-                          <Group gap='sm'>
-                            <Checkbox
-                              checked={value.includes(tag.id)}
-                              onChange={() => {}}
-                              aria-hidden
-                              tabIndex={-1}
-                              style={{ pointerEvents: 'none' }}
+                          <Combobox.EventsTarget>
+                            <PillsInput.Field
+                              type='hidden'
+                              onBlur={() => tagsCombobox.closeDropdown()}
+                              onKeyDown={(event) => {
+                                if (event.key === 'Backspace') {
+                                  event.preventDefault();
+                                  handleValueRemove(value[value.length - 1]);
+                                }
+                              }}
                             />
-                            <TagPill tag={tag} />
-                          </Group>
-                        </Combobox.Option>
-                      ))}
-                    </Combobox.Options>
-                  </Combobox.Dropdown>
-                </Combobox>
-              </>
-            )}
+                          </Combobox.EventsTarget>
+                        </Pill.Group>
+                      </PillsInput>
+                    </Combobox.DropdownTarget>
 
-            <Group justify='space-between' mt='lg'>
-              <Group>
-                {!reduce &&
-                  (file.folderId ? (
-                    <ActionButton
-                      Icon={IconFolderMinus}
-                      onClick={() => removeFromFolder(file)}
-                      tooltip={`Remove from folder "${
-                        folders?.find((f: any) => f.id === file.folderId)?.name ?? ''
-                      }"`}
+                    <Combobox.Dropdown>
+                      <Combobox.Options>
+                        {tags?.map((tag) => (
+                          <Combobox.Option value={tag.id} key={tag.id} active={value.includes(tag.id)}>
+                            <Group gap='sm'>
+                              <Checkbox
+                                checked={value.includes(tag.id)}
+                                onChange={() => {}}
+                                aria-hidden
+                                tabIndex={-1}
+                                style={{ pointerEvents: 'none' }}
+                              />
+                              <TagPill tag={tag} />
+                            </Group>
+                          </Combobox.Option>
+                        ))}
+                      </Combobox.Options>
+                    </Combobox.Dropdown>
+                  </Combobox>
+                </Box>
+                <Box>
+                  <Title order={4} mt='lg' mb='xs'>
+                    Folder
+                  </Title>
+                  {file.folderId ? (
+                    <Button
                       color='red'
-                    />
+                      leftSection={<IconFolderMinus size='1rem' />}
+                      onClick={() => removeFromFolder(file)}
+                      fullWidth
+                    >
+                      Remove from folder &quot;{folders?.find((f) => f.id === file.folderId)?.name ?? ''}
+                      &quot;
+                    </Button>
                   ) : (
                     <Combobox
                       store={folderCombobox}
@@ -346,7 +342,18 @@ export default function FileModal({
                         </Combobox.Options>
                       </Combobox.Dropdown>
                     </Combobox>
-                  ))}
+                  )}
+                </Box>
+              </SimpleGrid>
+            )}
+
+            <Group justify='space-between' mt='lg'>
+              <Group>
+                {!reduce && (
+                  <Text size='sm' c='gray'>
+                    {file.id}
+                  </Text>
+                )}
               </Group>
 
               <Group>
@@ -356,7 +363,7 @@ export default function FileModal({
                       Icon={IconPencil}
                       onClick={() => setEditFileOpen(true)}
                       tooltip='Edit file details'
-                      color='yellow'
+                      color='orange'
                     />
                     <ActionButton
                       Icon={IconTrashFilled}
@@ -376,6 +383,7 @@ export default function FileModal({
                   Icon={IconExternalLink}
                   onClick={() => viewFile(file)}
                   tooltip='View file in a new tab'
+                  color='blue'
                 />
                 <ActionButton
                   Icon={IconCopy}

@@ -1,5 +1,5 @@
 import type { File as DbFile } from '@/lib/db/models/file';
-import { Box, Center, Image, Paper, Stack, Text } from '@mantine/core';
+import { Box, Center, Image as MantineImage, Paper, Stack, Text } from '@mantine/core';
 import {
   Icon,
   IconFileText,
@@ -34,7 +34,7 @@ function Placeholder({ text, Icon, ...props }: { text: string; Icon: Icon; onCli
   );
 }
 
-const icon = {
+const icon: Record<string, Icon> = {
   video: IconVideo,
   image: IconPhoto,
   audio: IconMusic,
@@ -58,7 +58,7 @@ export default function DashboardFileType({
   const renderIn = renderMode(file.name.split('.').pop() || '');
 
   const [fileContent, setFileContent] = useState('');
-  const [type, setType] = useState(file.type.split('/')[0]);
+  const [type, setType] = useState<string>(file.type.split('/')[0]);
 
   const gettext = async () => {
     const res = await fetch(`/raw/${file.name}${password ? `?pw=${password}` : ''}`);
@@ -79,7 +79,6 @@ export default function DashboardFileType({
   }, []);
 
   if (disableMediaPreview && !show)
-    // @ts-ignore
     return <Placeholder text={`Click to view file ${file.name}`} Icon={icon[type] ?? IconFileUnknown} />;
 
   if (dbFile && file.password === true && !show)
@@ -107,25 +106,16 @@ export default function DashboardFileType({
           src={dbFile ? `/raw/${file.name}${password ? `?pw=${password}` : ''}` : URL.createObjectURL(file)}
         />
       ) : (file as DbFile).thumbnail && dbFile ? (
-        <Box>
-          <Image
-            styles={{
-              root: {
-                maxHeight: dbFile ? '100vh' : 100,
-              },
-            }}
-            src={`/raw/${(file as DbFile).thumbnail!.path}`}
-            alt={file.name}
-          />
+        <Box pos='relative'>
+          <MantineImage src={`/raw/${(file as DbFile).thumbnail!.path}`} alt={file.name} />
 
           <Center
+            pos='absolute'
+            h='100%'
+            top='50%'
+            left='50%'
             style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              height: '100%',
-              width: '100%',
-              cursor: 'pointer',
+              transform: 'translate(-50%, -50%)',
             }}
           >
             <IconPlayerPlay size='4rem' stroke={3} />
@@ -135,16 +125,20 @@ export default function DashboardFileType({
         <Placeholder text={`Click to play video ${file.name}`} Icon={IconPlayerPlay} />
       );
     case 'image':
-      return (
-        <Image
-          styles={{
-            root: {
-              maxHeight: dbFile ? '100vh' : 100,
-            },
-          }}
+      return show ? (
+        <Center>
+          <MantineImage
+            mah={400}
+            src={dbFile ? `/raw/${file.name}${password ? `?pw=${password}` : ''}` : URL.createObjectURL(file)}
+            alt={file.name}
+          />
+        </Center>
+      ) : (
+        <MantineImage
+          fit='contain'
+          mah={400}
           src={dbFile ? `/raw/${file.name}${password ? `?pw=${password}` : ''}` : URL.createObjectURL(file)}
           alt={file.name}
-          width={show ? 'auto' : undefined}
         />
       );
     case 'audio':

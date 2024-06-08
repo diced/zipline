@@ -12,8 +12,7 @@ export default function DashboardFile({ file, reduce }: { file: File; reduce?: b
   return (
     <>
       <FileModal open={open} setOpen={setOpen} file={file} reduce={reduce} />
-
-      <Card shadow='md' radius='md' p={0} h={300} onClick={() => setOpen(true)} className={styles.file}>
+      <Card shadow='md' radius='md' p={0} onClick={() => setOpen(true)} className={styles.file}>
         <DashboardFileType key={file.id} file={file} />
       </Card>
     </>
