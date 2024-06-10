@@ -1,6 +1,6 @@
 {
     "name": "Catppuccin Latte",
-    "colorScheme": "light",
+    "colorScheme": "dark",
     "colors": {
       "blue": [
         "#FFFFFF",
@@ -14,7 +14,7 @@
         "#1d89f5",
         "#1e66f5"
       ],
-      "light": [
+      "dark": [
         "#4c4f69",
         "#8c8fa1",
         "#8c8fa1",
@@ -28,5 +28,5 @@
       ]
     },
     "primaryColor": "blue",
-    "mainBackgroundColor": "var(--mantine-color-light-9)"
+    "mainBackgroundColor": "var(--mantine-color-dark-9)"
   }
