@@ -104,7 +104,7 @@ export function uploadFiles(
     options,
     ephemeral,
   }: {
-    setProgress: (progress: number) => void;
+    setProgress: (o: { percent: number; remaining: number; speed: number }) => void;
     setLoading: (loading: boolean) => void;
     setFiles: (files: File[]) => void;
     clipboard: ReturnType<typeof useClipboard>;
@@ -114,7 +114,7 @@ export function uploadFiles(
   },
 ) {
   setLoading(true);
-  setProgress(0);
+  setProgress({ percent: 0, remaining: 0, speed: 0 });
   const body = new FormData();
 
   for (let i = 0; i !== files.length; ++i) {
@@ -130,10 +130,18 @@ export function uploadFiles(
   });
 
   const req = new XMLHttpRequest();
+  const start = Date.now();
 
   req.upload.addEventListener('progress', (e) => {
     if (e.lengthComputable) {
-      setProgress(Math.round((e.loaded / e.total) * 100));
+      const speed = e.loaded / ((Date.now() - start) / 1000);
+      const remainingTime = (e.total - e.loaded) / speed;
+
+      setProgress({
+        percent: Math.round((e.loaded / e.total) * 100),
+        speed,
+        remaining: remainingTime,
+      });
     }
   });
 
@@ -142,7 +150,7 @@ export function uploadFiles(
     () => {
       const res: Response['/api/upload'] = JSON.parse(req.responseText);
       setLoading(false);
-      setProgress(0);
+      setProgress({ percent: 0, remaining: 0, speed: 0 });
 
       if ((res as ErrorBody).statusCode) {
         notifications.update({

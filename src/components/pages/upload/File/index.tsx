@@ -26,6 +26,7 @@ import { uploadFiles } from '../uploadFiles';
 import ToUploadFile from './ToUploadFile';
 import { bytes } from '@/lib/bytes';
 import { uploadPartialFiles } from '../uploadPartialFiles';
+import { humanizeDuration } from '@/lib/relativeTime';
 
 export default function UploadFile() {
   const theme = useMantineTheme();
@@ -40,7 +41,11 @@ export default function UploadFile() {
   ]);
 
   const [files, setFiles] = useState<File[]>([]);
-  const [progress, setProgress] = useState(0);
+  const [progress, setProgress] = useState<{ percent: number; remaining: number; speed: number }>({
+    percent: 0,
+    remaining: 0,
+    speed: 0,
+  });
   const [dropLoading, setLoading] = useState(false);
 
   const handlePaste = (e: ClipboardEvent) => {
@@ -169,15 +174,25 @@ export default function UploadFile() {
         </Group>
       </Dropzone>
 
-      <Collapse in={progress > 0 && progress < 100}>
-        {progress > 0 && progress < 100 && (
-          <Progress my='sm' size='xl' value={progress} animated>
-            <Progress.Label>{Math.floor(progress)}%</Progress.Label>
-          </Progress>
+      <Collapse in={progress.percent > 0 && progress.percent < 100}>
+        {progress.percent > 0 && progress.percent < 100 && (
+          <Progress.Root my='sm' size='xl'>
+            <Progress.Section value={progress.percent} animated>
+              <Progress.Label>{Math.floor(progress.percent)}%</Progress.Label>
+            </Progress.Section>
+          </Progress.Root>
         )}
       </Collapse>
 
-      <Collapse in={progress === 100}>
+      <Collapse in={progress.speed > 0 && progress.remaining > 0}>
+        <Paper withBorder p='xs' radius='sm'>
+          <Text ta='center' size='sm'>
+            {bytes(progress.speed)}/s, {humanizeDuration(progress.remaining)} remaining
+          </Text>
+        </Paper>
+      </Collapse>
+
+      <Collapse in={progress.percent === 100}>
         <Paper withBorder p='xs' radius='sm'>
           <Text ta='center' size='sm' c='yellow'>
             Finalizing upload(s)...
