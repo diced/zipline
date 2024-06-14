@@ -117,6 +117,8 @@ export default function PendingFilesButton() {
               </Group>
             </Card>
           ))}
+
+          {incompleteFiles?.length === 0 && <Text>Nothing here!</Text>}
         </Stack>
       </Modal>
 
