@@ -123,6 +123,9 @@ export async function uploadPartialFiles(
     });
 
     let ready = true;
+    let totalLoaded = 0;
+    const start = Date.now();
+
     for (let j = 0; j !== nChunks; ++j) {
       while (!ready) {
         await new Promise((resolve) => setTimeout(resolve, 100));
@@ -133,17 +136,19 @@ export async function uploadPartialFiles(
 
       setLoading(true);
       const req = new XMLHttpRequest();
-      const reqStart = Date.now();
+      let lastLoaded = 0;
 
       req.upload.addEventListener('progress', (e) => {
         if (e.lengthComputable) {
-          const speed = e.loaded / ((Date.now() - reqStart) / 1000);
-          // const remainingTime = (e.total - e.loaded) / speed;
-          // calculate remaining time from the total size of the chunks
-          const remainingTime = (file.size - e.loaded) / speed;
+          const sent = e.loaded - lastLoaded;
+          lastLoaded = e.loaded;
+          totalLoaded += sent;
+
+          const speed = totalLoaded / ((Date.now() - start) / 1000);
+          const remainingTime = (file.size - totalLoaded) / speed;
 
           setProgress({
-            percent: Math.round(((j + 1) / nChunks) * 100),
+            percent: Math.round((totalLoaded / file.size) * 100),
             speed,
             remaining: remainingTime,
           });
