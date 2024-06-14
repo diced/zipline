@@ -28,7 +28,7 @@ function PlaceholderContent({ text, Icon }: { text: string; Icon: Icon }) {
 
 function Placeholder({ text, Icon, ...props }: { text: string; Icon: Icon; onClick?: () => void }) {
   return (
-    <Center style={{ height: '100%', width: '100%', cursor: 'pointed' }} {...props}>
+    <Center py='xs' style={{ height: '100%', width: '100%', cursor: 'pointed' }} {...props}>
       <PlaceholderContent text={text} Icon={Icon} />
     </Center>
   );
