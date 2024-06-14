@@ -3,13 +3,13 @@ import { FastifyRequest } from 'fastify';
 import { writeFile } from 'fs/promises';
 import { extname, join } from 'path';
 import { Worker } from 'worker_threads';
-import { config } from '../../config';
-import { hashPassword } from '../../crypto';
-import { prisma } from '../../db';
-import { log } from '../../logger';
-import { guess } from '../../mimes';
-import { formatFileName } from '../../uploader/formatFileName';
-import { UploadHeaders, UploadOptions } from '../../uploader/parseHeaders';
+import { config } from '@/lib/config';
+import { hashPassword } from '@/lib/crypto';
+import { prisma } from '@/lib/db';
+import { log } from '@/lib/logger';
+import { guess } from '@/lib/mimes';
+import { formatFileName } from '@/lib/uploader/formatFileName';
+import { UploadHeaders, UploadOptions } from '@/lib/uploader/parseHeaders';
 
 const logger = log('api').c('upload');
 export async function handlePartialUpload({

@@ -1,14 +1,14 @@
 import { z } from 'zod';
-import { discordContent } from './config/validate';
-import { ParseValue, parseString } from './parser';
-import { config } from './config';
-import { File } from './db/models/file';
-import { User } from './db/models/user';
-import { log } from './logger';
-import { Url } from './db/models/url';
-import { parserMetrics } from './parser/metrics';
+import { discordContent } from '../config/validate';
+import { ParseValue, parseString } from '../parser';
+import { config } from '../config';
+import { File } from '../db/models/file';
+import { User } from '../db/models/user';
+import { log } from '../logger';
+import { Url } from '../db/models/url';
+import { parserMetrics } from '../parser/metrics';
 
-const logger = log('discord');
+const logger = log('webhooks').c('discord');
 
 export type DiscordContent = z.infer<typeof discordContent>;
 export type WebhooksExecuteBody = {

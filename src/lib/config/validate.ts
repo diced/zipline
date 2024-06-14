@@ -275,6 +275,10 @@ export const schema = z.object({
     adminBypass: z.boolean().default(true),
     allowList: z.array(z.string()).default([]),
   }),
+  httpWebhook: z.object({
+    onUpload: z.string().url().nullable().default(null),
+    onShorten: z.string().url().nullable().default(null),
+  }),
 });
 
 export type Config = z.infer<typeof schema>;

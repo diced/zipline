@@ -3,7 +3,7 @@ import { config } from '@/lib/config';
 import { prisma } from '@/lib/db';
 import { fileSelect } from '@/lib/db/models/file';
 import { userSelect } from '@/lib/db/models/user';
-import { onUpload } from '@/lib/discord';
+import { onUpload } from '@/lib/webhooks';
 import { log } from '@/lib/logger';
 import { UploadOptions } from '@/lib/uploader/parseHeaders';
 import { open, readFile, readdir, rm } from 'fs/promises';

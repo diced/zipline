@@ -1,19 +1,19 @@
 import { ApiUploadResponse, MultipartFileBuffer } from '@/server/routes/api/upload';
 import { FastifyRequest } from 'fastify';
 import { extname } from 'path';
-import { bytes } from '../../bytes';
-import { compress } from '../../compress';
-import { config } from '../../config';
-import { hashPassword } from '../../crypto';
-import { datasource } from '../../datasource';
-import { prisma } from '../../db';
-import { fileSelect } from '../../db/models/file';
-import { onUpload } from '../../discord';
-import { removeGps } from '../../gps';
-import { log } from '../../logger';
-import { guess } from '../../mimes';
-import { formatFileName } from '../../uploader/formatFileName';
-import { UploadHeaders, UploadOptions } from '../../uploader/parseHeaders';
+import { bytes } from '@/lib/bytes';
+import { compress } from '@/lib/compress';
+import { config } from '@/lib/config';
+import { hashPassword } from '@/lib/crypto';
+import { datasource } from '@/lib/datasource';
+import { prisma } from '@/lib/db';
+import { fileSelect } from '@/lib/db/models/file';
+import { onUpload } from '@/lib/webhooks';
+import { removeGps } from '@/lib/gps';
+import { log } from '@/lib/logger';
+import { guess } from '@/lib/mimes';
+import { formatFileName } from '@/lib/uploader/formatFileName';
+import { UploadHeaders, UploadOptions } from '@/lib/uploader/parseHeaders';
 
 const logger = log('api').c('upload');
 

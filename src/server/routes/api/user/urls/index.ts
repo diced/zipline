@@ -5,7 +5,7 @@ import { Url } from '@/lib/db/models/url';
 import { log } from '@/lib/logger';
 import { z } from 'zod';
 import { Prisma } from '@prisma/client';
-import { onShorten } from '@/lib/discord';
+import { onShorten } from '@/lib/webhooks';
 import fastifyPlugin from 'fastify-plugin';
 import { userMiddleware } from '@/server/middleware/user';
 

@@ -117,6 +117,10 @@ export const rawConfig: any = {
     adminBypass: undefined,
     allowList: undefined,
   },
+  httpWebhook: {
+    onUpload: undefined,
+    onShorten: undefined,
+  },
 };
 
 export const PROP_TO_ENV = {
@@ -239,6 +243,9 @@ export const PROP_TO_ENV = {
   'ratelimit.window': 'RATELIMIT_WINDOW',
   'ratelimit.adminBypass': 'RATELIMIT_ADMIN_BYPASS',
   'ratelimit.allowList': 'RATELIMIT_ALLOW_LIST',
+
+  'httpWebhook.onUpload': 'HTTP_WEBHOOK_ONUPLOAD',
+  'httpWebhook.onShorten': 'HTTP_WEBHOOK_ONSHORTEN',
 };
 
 const logger = log('config').c('read');
@@ -359,6 +366,9 @@ export function readEnv() {
     env('ratelimit.window', 'ms'),
     env('ratelimit.adminBypass', 'boolean'),
     env('ratelimit.allowList', 'string[]'),
+
+    env('httpWebhook.onUpload', 'string'),
+    env('httpWebhook.onShorten', 'string'),
   ];
 
   // clone raw
