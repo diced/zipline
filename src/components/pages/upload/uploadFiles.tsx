@@ -193,6 +193,7 @@ export function uploadFiles(
 
   ephemeral.password && req.setRequestHeader('x-zipline-password', ephemeral.password);
   ephemeral.filename && req.setRequestHeader('x-zipline-filename', ephemeral.filename);
+  ephemeral.folderId && req.setRequestHeader('x-zipline-folder', ephemeral.folderId);
 
   req.send(body);
 }

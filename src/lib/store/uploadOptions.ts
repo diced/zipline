@@ -14,6 +14,7 @@ export const defaultUploadOptions: UploadOptionsStore['options'] = {
 export const defaultEphemeralOptions: UploadOptionsStore['ephemeral'] = {
   password: null,
   filename: null,
+  folderId: null,
 };
 
 export type UploadOptionsStore = {
@@ -29,6 +30,7 @@ export type UploadOptionsStore = {
   ephemeral: {
     password: string | null;
     filename: string | null;
+    folderId: string | null;
   };
 
   setOption: <K extends keyof UploadOptionsStore['options']>(

@@ -1,8 +1,12 @@
+import { Response } from '@/lib/api/response';
+import { Folder } from '@/lib/db/models/folder';
 import { useUploadOptionsStore } from '@/lib/store/uploadOptions';
 import {
   Badge,
   Button,
+  Combobox,
   Group,
+  InputBase,
   Modal,
   NumberInput,
   PasswordInput,
@@ -12,12 +16,14 @@ import {
   Text,
   TextInput,
   Title,
+  useCombobox,
 } from '@mantine/core';
 import {
   IconAlarmFilled,
   IconArrowsMinimize,
   IconEyeFilled,
   IconFileInfo,
+  IconFolderPlus,
   IconGlobe,
   IconKey,
   IconPercentage,
@@ -25,6 +31,7 @@ import {
   IconWriting,
 } from '@tabler/icons-react';
 import { useState } from 'react';
+import useSWR from 'swr';
 
 export default function UploadOptionsButton({ numFiles }: { numFiles: number }) {
   const [opened, setOpen] = useState(false);
@@ -45,6 +52,12 @@ export default function UploadOptionsButton({ numFiles }: { numFiles: number }) 
     clearEphemeral();
     clearOptions();
   };
+
+  const { data: folders } = useSWR<Extract<Response['/api/user/folders'], Folder[]>>(
+    '/api/user/folders?noincl=true',
+  );
+  const combobox = useCombobox();
+  const [folderSearch, setFolderSearch] = useState('');
 
   return (
     <>
@@ -183,6 +196,54 @@ export default function UploadOptionsButton({ numFiles }: { numFiles: number }) 
             value={options.maxViews || ''}
             onChange={(value) => setOption('maxViews', value === '' ? null : Number(value))}
           />
+
+          <Combobox
+            store={combobox}
+            withinPortal={false}
+            onOptionSubmit={(value) => {
+              setFolderSearch(folders?.find((f) => f.id === value)?.name || '');
+              setEphemeral('folderId', value === 'no folder' || value === '' ? null : value);
+            }}
+          >
+            <Combobox.Target>
+              <InputBase
+                label={<>Add to a Folder</>}
+                description='Add this file to a folder. Use the "no folder" option not add the file to a folder. This value is not saved to your browser, and is cleared after uploading.'
+                rightSection={<Combobox.Chevron />}
+                leftSection={<IconFolderPlus size='1rem' />}
+                value={folderSearch}
+                onChange={(event) => {
+                  combobox.openDropdown();
+                  combobox.updateSelectedOptionIndex();
+                  setFolderSearch(event.currentTarget.value);
+                }}
+                onClick={() => combobox.openDropdown()}
+                onFocus={() => combobox.openDropdown()}
+                onBlur={() => {
+                  combobox.closeDropdown();
+                  setFolderSearch(folderSearch || '');
+                }}
+                placeholder='Add to folder...'
+                rightSectionPointerEvents='none'
+              />
+            </Combobox.Target>
+
+            <Combobox.Dropdown>
+              <Combobox.Options>
+                {folders
+                  ?.filter((f) => f.name.toLowerCase().includes(folderSearch.toLowerCase().trim()))
+                  .map((f) => (
+                    <Combobox.Option value={f.id} key={f.id}>
+                      {f.name}
+                    </Combobox.Option>
+                  ))}
+
+                <Combobox.Option defaultChecked={true} value='no folder'>
+                  No Folder
+                </Combobox.Option>
+              </Combobox.Options>
+            </Combobox.Dropdown>
+          </Combobox>
 
           <TextInput
             label={
