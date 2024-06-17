@@ -1,10 +1,10 @@
-import { IntervalJob, WorkerJob } from '..';
+import { IntervalTask, WorkerTask } from '..';
 
 export default function thumbnails(prisma: typeof globalThis.__db__) {
-  return async function (this: IntervalJob) {
-    const thumbnailWorkers = this.scheduler.jobs.filter(
+  return async function (this: IntervalTask) {
+    const thumbnailWorkers = this.tasks.tasks.filter(
       (x) => 'worker' in x && x.id.startsWith('thumbnail'),
-    ) as unknown as WorkerJob[];
+    ) as unknown as WorkerTask[];
 
     if (!thumbnailWorkers.length) return;
 

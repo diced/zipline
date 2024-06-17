@@ -25,7 +25,7 @@ export type PartialWorkerData = {
 };
 
 const { user, file, options, responseUrl, domain } = workerData as PartialWorkerData;
-const logger = log('scheduler').c('jobs').c('partial').c(file.filename);
+const logger = log('tasks').c('partial').c(file.filename);
 
 worker();
 

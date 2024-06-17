@@ -1,8 +1,8 @@
 import { queryStats } from '@/lib/stats';
-import { IntervalJob } from '..';
+import { IntervalTask } from '..';
 
 export default function metrics(prisma: typeof globalThis.__db__) {
-  return async function (this: IntervalJob) {
+  return async function (this: IntervalTask) {
     const stats = await queryStats();
 
     const metric = await prisma.metric.create({

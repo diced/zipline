@@ -20,7 +20,7 @@ export const rawConfig: any = {
     size: undefined,
     enabled: undefined,
   },
-  scheduler: {
+  tasks: {
     deleteInterval: undefined,
     clearInvitesInterval: undefined,
     maxViewsInterval: undefined,
@@ -136,11 +136,11 @@ export const PROP_TO_ENV = {
   'chunks.size': 'CHUNKS_SIZE',
   'chunks.enabled': 'CHUNKS_ENABLED',
 
-  'scheduler.deleteInterval': 'SCHEDULER_DELETE_INTERVAL',
-  'scheduler.clearInvitesInterval': 'SCHEDULER_CLEAR_INVITES_INTERVAL',
-  'scheduler.maxViewsInterval': 'SCHEDULER_MAX_VIEWS_INTERVAL',
-  'scheduler.thumbnailsInterval': 'SCHEDULER_THUMBNAILS_INTERVAL',
-  'scheduler.metricsInterval': 'SCHEDULER_METRICS_INTERVAL',
+  'tasks.deleteInterval': 'TASKS_DELETE_INTERVAL',
+  'tasks.clearInvitesInterval': 'TASKS_CLEAR_INVITES_INTERVAL',
+  'tasks.maxViewsInterval': 'TASKS_MAX_VIEWS_INTERVAL',
+  'tasks.thumbnailsInterval': 'TASKS_THUMBNAILS_INTERVAL',
+  'tasks.metricsInterval': 'TASKS_METRICS_INTERVAL',
 
   'files.route': 'FILES_ROUTE',
   'files.length': 'FILES_LENGTH',
@@ -264,11 +264,11 @@ export function readEnv() {
     env('chunks.size', 'byte'),
     env('chunks.enabled', 'boolean'),
 
-    env('scheduler.deleteInterval', 'ms'),
-    env('scheduler.clearInvitesInterval', 'ms'),
-    env('scheduler.maxViewsInterval', 'ms'),
-    env('scheduler.thumbnailsInterval', 'ms'),
-    env('scheduler.metricsInterval', 'ms'),
+    env('tasks.deleteInterval', 'ms'),
+    env('tasks.clearInvitesInterval', 'ms'),
+    env('tasks.maxViewsInterval', 'ms'),
+    env('tasks.thumbnailsInterval', 'ms'),
+    env('tasks.metricsInterval', 'ms'),
 
     env('files.route', 'string'),
     env('files.length', 'number'),

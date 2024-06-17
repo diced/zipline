@@ -1,7 +1,7 @@
-import { IntervalJob } from '..';
+import { IntervalTask } from '..';
 
 export default function clearInvites(prisma: typeof globalThis.__db__) {
-  return async function (this: IntervalJob) {
+  return async function (this: IntervalTask) {
     const expiredInvites = await prisma.invite.findMany({
       where: {
         expiresAt: {

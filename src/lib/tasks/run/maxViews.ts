@@ -1,9 +1,9 @@
 import { datasource } from '@/lib/datasource';
-import { IntervalJob } from '..';
+import { IntervalTask } from '..';
 import { bytes } from '@/lib/bytes';
 
 export default function maxViews(prisma: typeof globalThis.__db__) {
-  return async function (this: IntervalJob) {
+  return async function (this: IntervalTask) {
     const files = await prisma.file.findMany({
       where: {
         views: {

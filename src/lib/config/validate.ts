@@ -79,7 +79,7 @@ export const schema = z.object({
     size: z.number().default(bytes('25mb')),
     enabled: z.boolean().default(true),
   }),
-  scheduler: z.object({
+  tasks: z.object({
     deleteInterval: z.number().default(ms('30min')),
     clearInvitesInterval: z.number().default(ms('30min')),
     maxViewsInterval: z.number().default(ms('30min')),

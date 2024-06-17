@@ -15,7 +15,7 @@ export type ThumbnailWorkerData = {
 
 const { id, enabled } = workerData as ThumbnailWorkerData;
 
-const logger = log('scheduler').c('jobs').c(id);
+const logger = log('tasks').c(id);
 
 if (isMainThread) {
   logger.error("thumbnail worker can't run on the main thread");

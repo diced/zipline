@@ -3,12 +3,12 @@ import { validateEnv } from '@/lib/config/validate';
 import { prisma } from '@/lib/db';
 import { runMigrations } from '@/lib/db/migration';
 import { log } from '@/lib/logger';
-import { Scheduler } from '@/lib/scheduler';
-import clearInvites from '@/lib/scheduler/jobs/clearInvites';
-import deleteFiles from '@/lib/scheduler/jobs/deleteFiles';
-import maxViews from '@/lib/scheduler/jobs/maxViews';
-import metrics from '@/lib/scheduler/jobs/metrics';
-import thumbnails from '@/lib/scheduler/jobs/thumbnails';
+import { Tasks } from '@/lib/tasks';
+import clearInvites from '@/lib/tasks/run/clearInvites';
+import deleteFiles from '@/lib/tasks/run/deleteFiles';
+import maxViews from '@/lib/tasks/run/maxViews';
+import metrics from '@/lib/tasks/run/metrics';
+import thumbnails from '@/lib/tasks/run/thumbnails';
 import { fastifyCookie } from '@fastify/cookie';
 import { fastifyCors } from '@fastify/cors';
 import { fastifyMultipart } from '@fastify/multipart';
@@ -160,28 +160,25 @@ async function main() {
 
   logger.info('server started', { hostname: config.core.hostname, port: config.core.port });
 
-  const scheduler = new Scheduler();
-  scheduler.interval('deletefiles', config.scheduler.deleteInterval, deleteFiles(prisma));
-  scheduler.interval('maxviews', config.scheduler.maxViewsInterval, maxViews(prisma));
+  const tasks = new Tasks();
+  tasks.interval('deletefiles', config.tasks.deleteInterval, deleteFiles(prisma));
+  tasks.interval('maxviews', config.tasks.maxViewsInterval, maxViews(prisma));
 
-  if (config.features.metrics)
-    scheduler.interval('metrics', config.scheduler.metricsInterval, metrics(prisma));
+  if (config.features.metrics) tasks.interval('metrics', config.tasks.metricsInterval, metrics(prisma));
 
   if (config.features.thumbnails.enabled) {
     for (let i = 0; i !== config.features.thumbnails.num_threads; ++i) {
-      scheduler.worker(`thumbnail-${i}`, './build/offload/thumbnails.js', {
+      tasks.worker(`thumbnail-${i}`, './build/offload/thumbnails.js', {
         id: `thumbnail-${i}`,
         enabled: config.features.thumbnails.enabled,
       });
     }
 
-    scheduler.interval('thumbnails', config.scheduler.thumbnailsInterval, thumbnails(prisma));
-    scheduler.interval('clearinvites', config.scheduler.clearInvitesInterval, clearInvites(prisma));
+    tasks.interval('thumbnails', config.tasks.thumbnailsInterval, thumbnails(prisma));
+    tasks.interval('clearinvites', config.tasks.clearInvitesInterval, clearInvites(prisma));
   }
 
-  logger.info('starting scheduler');
-
-  scheduler.start();
+  tasks.start();
 }
 
 main();
