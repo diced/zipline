@@ -93,7 +93,7 @@ export default function DashboardHome() {
                 File types
               </Title>
               <Paper radius='sm' withBorder>
-                <ScrollArea h={400}>
+                <ScrollArea.Autosize mah={400} type='auto'>
                   <Table highlightOnHover>
                     <Table.Thead>
                       <Table.Tr>
@@ -112,7 +112,7 @@ export default function DashboardHome() {
                         ))}
                     </Table.Tbody>
                   </Table>
-                </ScrollArea>
+                </ScrollArea.Autosize>
               </Paper>
             </>
           )}

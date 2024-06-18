@@ -15,56 +15,60 @@ export default function StatsTables({ data }: { data: Metric[] }) {
     <>
       <SimpleGrid cols={{ base: 1, md: 2 }}>
         <Paper radius='sm' withBorder>
-          <Table highlightOnHover>
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>User</Table.Th>
-                <Table.Th>Files</Table.Th>
-                <Table.Th>Storage Used</Table.Th>
-                <Table.Th>Views</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>
-              {recent.data.filesUsers
-                .sort((a, b) => b.sum - a.sum)
-                .map((count, i) => (
-                  <Table.Tr key={i}>
-                    <Table.Td>{count.username}</Table.Td>
-                    <Table.Td>{count.sum}</Table.Td>
-                    <Table.Td>{bytes(count.storage)}</Table.Td>
-                    <Table.Td>{count.views}</Table.Td>
-                  </Table.Tr>
-                ))}
-            </Table.Tbody>
-          </Table>
+          <ScrollArea.Autosize mah={500} type='auto'>
+            <Table highlightOnHover stickyHeader>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>User</Table.Th>
+                  <Table.Th>Files</Table.Th>
+                  <Table.Th>Storage Used</Table.Th>
+                  <Table.Th>Views</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>
+                {recent.data.filesUsers
+                  .sort((a, b) => b.sum - a.sum)
+                  .map((count, i) => (
+                    <Table.Tr key={i}>
+                      <Table.Td>{count.username}</Table.Td>
+                      <Table.Td>{count.sum}</Table.Td>
+                      <Table.Td>{bytes(count.storage)}</Table.Td>
+                      <Table.Td>{count.views}</Table.Td>
+                    </Table.Tr>
+                  ))}
+              </Table.Tbody>
+            </Table>
+          </ScrollArea.Autosize>
+        </Paper>
+
+        <Paper radius='sm' withBorder mah={500}>
+          <ScrollArea.Autosize mah={500} type='auto'>
+            <Table highlightOnHover stickyHeader>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>User</Table.Th>
+                  <Table.Th>URLs</Table.Th>
+                  <Table.Th>Views</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>
+                {recent.data.urlsUsers
+                  .sort((a, b) => b.sum - a.sum)
+                  .map((count, i) => (
+                    <Table.Tr key={i}>
+                      <Table.Td>{count.username}</Table.Td>
+                      <Table.Td>{count.sum}</Table.Td>
+                      <Table.Td>{count.views}</Table.Td>
+                    </Table.Tr>
+                  ))}
+              </Table.Tbody>
+            </Table>
+          </ScrollArea.Autosize>
         </Paper>
 
         <Paper radius='sm' withBorder>
-          <Table highlightOnHover>
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>User</Table.Th>
-                <Table.Th>URLs</Table.Th>
-                <Table.Th>Views</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>
-              {recent.data.urlsUsers
-                .sort((a, b) => b.sum - a.sum)
-                .map((count, i) => (
-                  <Table.Tr key={i}>
-                    <Table.Td>{count.username}</Table.Td>
-                    <Table.Td>{count.sum}</Table.Td>
-                    <Table.Td>{count.views}</Table.Td>
-                  </Table.Tr>
-                ))}
-            </Table.Tbody>
-          </Table>
-        </Paper>
-
-        <ScrollArea mah={500}>
-          <Paper radius='sm' withBorder>
-            <Table highlightOnHover>
+          <ScrollArea.Autosize mah={500} type='auto'>
+            <Table highlightOnHover stickyHeader>
               <Table.Thead>
                 <Table.Tr>
                   <Table.Th>Type</Table.Th>
@@ -82,8 +86,8 @@ export default function StatsTables({ data }: { data: Metric[] }) {
                   ))}
               </Table.Tbody>
             </Table>
-          </Paper>
-        </ScrollArea>
+          </ScrollArea.Autosize>
+        </Paper>
 
         <Paper radius='sm' withBorder p='sm'>
           <TypesPieChart metric={recent} />
