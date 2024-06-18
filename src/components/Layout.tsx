@@ -215,6 +215,7 @@ export default function Layout({ children, config }: { children: React.ReactNode
     <AppShell
       navbar={{ breakpoint: 'sm', width: { sm: 200, lg: 230 }, collapsed: { mobile: !opened } }}
       header={{ height: { base: 50, md: 70 } }}
+      footer={{ height: { base: 0.1 } }}
     >
       <AppShell.Header px='md'>
         <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
@@ -360,6 +361,8 @@ export default function Layout({ children, config }: { children: React.ReactNode
           </Paper>
         </ConfigProvider>
       </AppShell.Main>
+
+      <AppShell.Footer display='none' />
     </AppShell>
   );
 }

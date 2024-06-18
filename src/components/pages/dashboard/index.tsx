@@ -3,7 +3,7 @@ import Stat from '@/components/Stat';
 import type { Response } from '@/lib/api/response';
 import { bytes } from '@/lib/bytes';
 import useLogin from '@/lib/hooks/useLogin';
-import { LoadingOverlay, Paper, SimpleGrid, Table, Text, Title } from '@mantine/core';
+import { LoadingOverlay, Paper, ScrollArea, SimpleGrid, Table, Text, Title } from '@mantine/core';
 import { IconDeviceSdCard, IconEyeFilled, IconFiles, IconLink, IconStarFilled } from '@tabler/icons-react';
 import useSWR from 'swr';
 
@@ -92,26 +92,27 @@ export default function DashboardHome() {
               <Title order={3} mt='lg' mb='xs'>
                 File types
               </Title>
-
               <Paper radius='sm' withBorder>
-                <Table highlightOnHover>
-                  <Table.Thead>
-                    <Table.Tr>
-                      <Table.Th>File Type</Table.Th>
-                      <Table.Th>Count</Table.Th>
-                    </Table.Tr>
-                  </Table.Thead>
-                  <Table.Tbody>
-                    {Object.entries(stats!.sortTypeCount)
-                      .sort(([, a], [, b]) => b - a)
-                      .map(([type, count]) => (
-                        <Table.Tr key={type}>
-                          <Table.Td>{type}</Table.Td>
-                          <Table.Td>{count}</Table.Td>
-                        </Table.Tr>
-                      ))}
-                  </Table.Tbody>
-                </Table>
+                <ScrollArea h={400}>
+                  <Table highlightOnHover>
+                    <Table.Thead>
+                      <Table.Tr>
+                        <Table.Th>File Type</Table.Th>
+                        <Table.Th>Count</Table.Th>
+                      </Table.Tr>
+                    </Table.Thead>
+                    <Table.Tbody>
+                      {Object.entries(stats!.sortTypeCount)
+                        .sort(([, a], [, b]) => b - a)
+                        .map(([type, count]) => (
+                          <Table.Tr key={type}>
+                            <Table.Td>{type}</Table.Td>
+                            <Table.Td>{count}</Table.Td>
+                          </Table.Tr>
+                        ))}
+                    </Table.Tbody>
+                  </Table>
+                </ScrollArea>
               </Paper>
             </>
           )}
