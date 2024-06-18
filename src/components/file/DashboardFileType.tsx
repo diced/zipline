@@ -1,19 +1,11 @@
 import type { File as DbFile } from '@/lib/db/models/file';
+import { useSettingsStore } from '@/lib/store/settings';
 import { Box, Center, Image as MantineImage, Paper, Stack, Text } from '@mantine/core';
-import {
-  Icon,
-  IconFileText,
-  IconFileUnknown,
-  IconMusic,
-  IconPhoto,
-  IconPlayerPlay,
-  IconShieldLockFilled,
-  IconVideo,
-} from '@tabler/icons-react';
+import { Icon, IconFileUnknown, IconPlayerPlay, IconShieldLockFilled } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { renderMode } from '../pages/upload/renderMode';
 import Render from '../render/Render';
-import { useSettingsStore } from '@/lib/store/settings';
+import fileIcon from './fileIcon';
 
 function PlaceholderContent({ text, Icon }: { text: string; Icon: Icon }) {
   return (
@@ -33,13 +25,6 @@ function Placeholder({ text, Icon, ...props }: { text: string; Icon: Icon; onCli
     </Center>
   );
 }
-
-const icon: Record<string, Icon> = {
-  video: IconVideo,
-  image: IconPhoto,
-  audio: IconMusic,
-  text: IconFileText,
-};
 
 export default function DashboardFileType({
   file,
@@ -79,7 +64,7 @@ export default function DashboardFileType({
   }, []);
 
   if (disableMediaPreview && !show)
-    return <Placeholder text={`Click to view file ${file.name}`} Icon={icon[type] ?? IconFileUnknown} />;
+    return <Placeholder text={`Click to view file ${file.name}`} Icon={fileIcon(file.type)} />;
 
   if (dbFile && file.password === true && !show)
     return <Placeholder text={`Click to view protected ${file.name}`} Icon={IconShieldLockFilled} />;
@@ -122,7 +107,7 @@ export default function DashboardFileType({
           </Center>
         </Box>
       ) : (
-        <Placeholder text={`Click to play video ${file.name}`} Icon={IconPlayerPlay} />
+        <Placeholder text={`Click to play video ${file.name}`} Icon={fileIcon(file.type)} />
       );
     case 'image':
       return show ? (
@@ -151,17 +136,17 @@ export default function DashboardFileType({
           src={dbFile ? `/raw/${file.name}${password ? `?pw=${password}` : ''}` : URL.createObjectURL(file)}
         />
       ) : (
-        <Placeholder text={`Click to play audio ${file.name}`} Icon={IconPlayerPlay} />
+        <Placeholder text={`Click to play audio ${file.name}`} Icon={fileIcon(file.type)} />
       );
     case 'text':
       return show ? (
         <Render mode={renderIn} language={file.name.split('.').pop() || ''} code={fileContent} />
       ) : (
-        <Placeholder text={`Click to view text ${file.name}`} Icon={IconFileText} />
+        <Placeholder text={`Click to view text ${file.name}`} Icon={fileIcon(file.type)} />
       );
     default:
       if (dbFile && !show)
-        return <Placeholder text={`Click to view file ${file.name}`} Icon={IconFileUnknown} />;
+        return <Placeholder text={`Click to view file ${file.name}`} Icon={fileIcon(file.type)} />;
 
       if (dbFile && show)
         return (
@@ -169,7 +154,7 @@ export default function DashboardFileType({
             <Placeholder
               onClick={() => window.open(`/raw/${file.name}${password ? `?pw=${password}` : ''}`)}
               text={`Click to view file ${file.name} in a new tab`}
-              Icon={IconFileUnknown}
+              Icon={fileIcon(file.type)}
             />
           </Paper>
         );
