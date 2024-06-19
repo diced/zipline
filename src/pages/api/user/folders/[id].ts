@@ -16,7 +16,13 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       id: idParsed,
     },
     select: {
-      files: !!req.query.files,
+      files: req.query.files
+        ? {
+            include: {
+              thumbnail: true,
+            },
+          }
+        : false,
       id: true,
       name: true,
       userId: true,
@@ -70,7 +76,13 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
         },
       },
       select: {
-        files: !!req.query.files,
+        files: req.query.files
+          ? {
+              include: {
+                thumbnail: true,
+              },
+            }
+          : false,
         id: true,
         name: true,
         userId: true,
@@ -111,7 +123,13 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
         public: !!publicFolder,
       },
       select: {
-        files: !!req.query.files,
+        files: req.query.files
+          ? {
+              include: {
+                thumbnail: true,
+              },
+            }
+          : false,
         id: true,
         name: true,
         userId: true,
@@ -200,7 +218,13 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
           },
         },
         select: {
-          files: !!req.query.files,
+          files: req.query.files
+            ? {
+                include: {
+                  thumbnail: true,
+                },
+              }
+            : false,
           id: true,
           name: true,
           userId: true,
