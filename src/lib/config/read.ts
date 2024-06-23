@@ -121,6 +121,10 @@ export const rawConfig: any = {
     onUpload: undefined,
     onShorten: undefined,
   },
+  ssl: {
+    key: undefined,
+    cert: undefined,
+  },
 };
 
 export const PROP_TO_ENV = {
@@ -246,6 +250,9 @@ export const PROP_TO_ENV = {
 
   'httpWebhook.onUpload': 'HTTP_WEBHOOK_ONUPLOAD',
   'httpWebhook.onShorten': 'HTTP_WEBHOOK_ONSHORTEN',
+
+  'ssl.key': 'SSL_KEY',
+  'ssl.cert': 'SSL_CERT',
 };
 
 const logger = log('config').c('read');
@@ -369,6 +376,9 @@ export function readEnv() {
 
     env('httpWebhook.onUpload', 'string'),
     env('httpWebhook.onShorten', 'string'),
+
+    env('ssl.key', 'string'),
+    env('ssl.cert', 'string'),
   ];
 
   // clone raw

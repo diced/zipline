@@ -279,6 +279,18 @@ export const schema = z.object({
     onUpload: z.string().url().nullable().default(null),
     onShorten: z.string().url().nullable().default(null),
   }),
+  ssl: z.object({
+    key: z
+      .string()
+      .transform((s) => resolve(s))
+      .nullable()
+      .default(null),
+    cert: z
+      .string()
+      .transform((s) => resolve(s))
+      .nullable()
+      .default(null),
+  }),
 });
 
 export type Config = z.infer<typeof schema>;

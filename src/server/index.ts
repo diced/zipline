@@ -24,6 +24,7 @@ import loadRoutes from './routes';
 import { filesRoute } from './routes/files.dy';
 import { urlsRoute } from './routes/urls.dy';
 import { isAdministrator } from '@/lib/role';
+import { notNull } from '@/lib/primitive';
 
 const MODE = process.env.NODE_ENV || 'production';
 const logger = log('server');
@@ -52,7 +53,15 @@ async function main() {
 
   await runMigrations();
 
-  const server = fastify({ ignoreTrailingSlash: true });
+  const server = fastify({
+    ignoreTrailingSlash: true,
+    https: notNull(config.ssl.key, config.ssl.cert)
+      ? {
+          key: config.ssl.key!,
+          cert: config.ssl.cert!,
+        }
+      : null,
+  });
 
   await server.register(fastifyCookie, {
     secret: config.core.secret,
