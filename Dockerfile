@@ -1,8 +1,8 @@
 # Use the Prisma binaries image as the first stage
-FROM ghcr.io/diced/prisma-binaries:5.1.x as prisma
+FROM ghcr.io/diced/prisma-binaries:5.1.x AS prisma
 
 # Use Alpine Linux as the second stage
-FROM node:18-alpine3.16 as base
+FROM node:18-alpine3.16 AS base
 
 # Set the working directory
 WORKDIR /zipline
@@ -27,7 +27,7 @@ ENV PRISMA_QUERY_ENGINE_BINARY=/prisma-engines/query-engine \
 # Install the dependencies
 RUN yarn install --immutable
 
-FROM base as builder
+FROM base AS builder
 
 COPY src ./src
 COPY next.config.js ./next.config.js
