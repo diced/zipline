@@ -364,7 +364,8 @@ export default function File({ chunks: chunks_config }) {
               <Button
                 leftIcon={<IconFileUpload size='1rem' />}
                 onClick={handleUpload}
-                disabled={files.length === 0 ? true : false}
+                loading={loading}
+                disabled={files.length === 0 || loading}
               >
                 Upload
               </Button>

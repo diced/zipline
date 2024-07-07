@@ -30,6 +30,45 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
   if (!user) return res.forbidden('authorization incorrect');
 
+  if (user.ratelimit && !req.headers['content-range']) {
+    const remaining = user.ratelimit.getTime() - Date.now();
+    logger.debug(`${user.id} encountered ratelimit, ${remaining}ms remaining`);
+    if (remaining <= 0) {
+      await prisma.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          ratelimit: null,
+        },
+      });
+    } else {
+      return res.ratelimited(remaining);
+    }
+  } else if (!user.ratelimit && !req.headers['content-range']) {
+    if (user.administrator && zconfig.ratelimit.admin > 0) {
+      await prisma.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          ratelimit: new Date(Date.now() + zconfig.ratelimit.admin * 1000),
+        },
+      });
+    } else if (!user.administrator && zconfig.ratelimit.user > 0) {
+      if (user.administrator && zconfig.ratelimit.user > 0) {
+        await prisma.user.update({
+          where: {
+            id: user.id,
+          },
+          data: {
+            ratelimit: new Date(Date.now() + zconfig.ratelimit.user * 1000),
+          },
+        });
+      }
+    }
+  }
+
   await new Promise((resolve, reject) => {
     uploader.array('file')(req as never, res as never, (result: unknown) => {
       if (result instanceof Error) reject(result.message);
@@ -197,23 +236,6 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     });
   }
 
-  if (user.ratelimit) {
-    const remaining = user.ratelimit.getTime() - Date.now();
-    logger.debug(`${user.id} encountered ratelimit, ${remaining}ms remaining`);
-    if (remaining <= 0) {
-      await prisma.user.update({
-        where: {
-          id: user.id,
-        },
-        data: {
-          ratelimit: null,
-        },
-      });
-    } else {
-      return res.ratelimited(remaining);
-    }
-  }
-
   if (!req.files) return res.badRequest('no files');
   if (req.files && req.files.length === 0) return res.badRequest('no files');
 
@@ -337,28 +359,6 @@ async function handler(req: NextApiReq, res: NextApiRes) {
 
         response.removed_gps = false;
       }
-    }
-  }
-
-  if (user.administrator && zconfig.ratelimit.admin > 0) {
-    await prisma.user.update({
-      where: {
-        id: user.id,
-      },
-      data: {
-        ratelimit: new Date(Date.now() + zconfig.ratelimit.admin * 1000),
-      },
-    });
-  } else if (!user.administrator && zconfig.ratelimit.user > 0) {
-    if (user.administrator && zconfig.ratelimit.user > 0) {
-      await prisma.user.update({
-        where: {
-          id: user.id,
-        },
-        data: {
-          ratelimit: new Date(Date.now() + zconfig.ratelimit.user * 1000),
-        },
-      });
     }
   }
 
