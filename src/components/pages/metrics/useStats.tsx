@@ -4,12 +4,14 @@ import useSWR from 'swr';
 type ApiStatsOptions = {
   from?: string;
   to?: string;
+  all?: boolean;
 };
 
 const fetcher = async ({ options }: { options: ApiStatsOptions } = { options: {} }) => {
   const searchParams = new URLSearchParams();
   if (options.from) searchParams.append('from', options.from);
   if (options.to) searchParams.append('to', options.to);
+  if (options.all) searchParams.append('all', 'true');
 
   const res = await fetch(`/api/stats${searchParams.toString() ? `?${searchParams.toString()}` : ''}`);
 

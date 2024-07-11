@@ -9,6 +9,7 @@ export type ApiStatsResponse = Metric[];
 type Query = {
   from?: string;
   to?: string;
+  all?: string;
 };
 
 export const PATH = '/api/stats';
@@ -17,19 +18,22 @@ export default fastifyPlugin(
     server.get<{ Querystring: Query }>(PATH, { preHandler: [userMiddleware] }, async (req, res) => {
       if (!config.features.metrics) return res.forbidden('metrics are disabled');
 
-      const { from, to } = req.query;
+      const { from, to, all } = req.query;
 
-      const fromDate = from ? new Date(from) : new Date(Date.now() - 86400000);
+      const fromDate = from ? new Date(from) : new Date(Date.now() - 86400000 * 7); // defaults to a week ago
       const toDate = to ? new Date(to) : new Date();
 
-      if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) return res.badRequest('invalid date(s)');
+      if (!all && (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())))
+        return res.badRequest('invalid date(s)');
 
       const stats = await prisma.metric.findMany({
         where: {
-          createdAt: {
-            gte: fromDate,
-            lte: toDate,
-          },
+          ...(!all && {
+            createdAt: {
+              gte: fromDate,
+              lte: toDate,
+            },
+          }),
         },
         orderBy: {
           createdAt: 'desc',
