@@ -19,6 +19,7 @@ import {
   Text,
   TextInput,
   Title,
+  Image,
 } from '@mantine/core';
 import { hasLength, useForm } from '@mantine/form';
 import { notifications, showNotification } from '@mantine/notifications';
@@ -219,27 +220,26 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
         </Group>
       </Modal>
 
-      <Center
-        h='100vh'
-        style={
-          config.website.loginBackground
-            ? {
-                backgroundImage: `url(${config.website.loginBackground})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat',
-              }
-            : undefined
-        }
-      >
-        <Card
-          p='xl'
-          style={{
-            backgroundColor: config.website.loginBackground ? 'rgba(255, 255, 255, 0.1)' : undefined,
-            backdropFilter: config.website.loginBackground ? 'blur(25px)' : undefined,
-          }}
-          withBorder
-        >
+      <Center h='100vh'>
+        {config.website.loginBackground && (
+          <Image
+            src={config.website.loginBackground}
+            alt={config.website.loginBackground + ' failed to load'}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              filter: 'blur(10px)',
+            }}
+          />
+        )}
+
+        <Card p='xl' withBorder>
           <Title order={1} size={50} ta='center'>
             <b>{config.website.title ?? 'Zipline'}</b>
           </Title>
