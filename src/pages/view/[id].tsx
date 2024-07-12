@@ -276,6 +276,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   delete user.password;
   delete user.totpSecret;
   delete user.token;
+  delete user.ratelimit;
 
   // @ts-ignore workaround because next wont allow date
   file.createdAt = file.createdAt.toString();
@@ -323,6 +324,17 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   // @ts-ignore
   if (file.password) file.password = true;
+
+  await prisma.file.update({
+    where: {
+      id: file.id,
+    },
+    data: {
+      views: {
+        increment: 1,
+      },
+    },
+  });
 
   return {
     props: {
