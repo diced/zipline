@@ -292,10 +292,12 @@ export default function FileModal({
                 onChange={addToFolder}
                 placeholder='Add to folder'
                 data={[
-                  ...(folders.data ? folders.data : []).map((folder) => ({
-                    value: String(folder.id),
-                    label: `${folder.id}: ${folder.name}`,
-                  })),
+                  ...(Array.isArray(folders.data) ? (folders.data ? folders.data : []) : []).map(
+                    (folder) => ({
+                      value: String(folder.id),
+                      label: `${folder.id}: ${folder.name}`,
+                    }),
+                  ),
                 ]}
                 searchable
                 creatable
