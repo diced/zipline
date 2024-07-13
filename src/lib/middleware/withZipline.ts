@@ -207,6 +207,7 @@ export const withZipline =
             sessions: true,
           },
         });
+        if (!user) return null;
         const session = user.sessions.filter((x) => x.uuid === sessionId)[0];
         if (session.expiresAt < new Date()) {
           await prisma.sessions.delete({
@@ -216,7 +217,6 @@ export const withZipline =
           });
           return null;
         }
-        if (!user) return null;
         return user as UserExtended;
       } catch (e) {
         Logger.get('withZipline').debug(e.message);
