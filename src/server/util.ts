@@ -22,9 +22,8 @@ export async function migrations() {
 
     if (diagnose.history?.diagnostic === 'databaseIsBehind') {
       if (!diagnose.hasMigrationsTable) {
-        logger.debug('no migrations table found, attempting schema push');
+        logger.info('no migrations table found, attempting schema push');
         try {
-          logger.debug('pushing schema');
           const migration = await migrate.push({ force: false });
           if (migration.unexecutable && migration.unexecutable.length > 0)
             throw new Error('This database is not empty, schema push is not possible.');
@@ -33,13 +32,13 @@ export async function migrations() {
           logger.error('failed to push schema');
           throw e;
         }
-        logger.debug('finished pushing schema, marking migrations as applied');
+        logger.info('finished pushing schema, marking migrations as applied');
         for (const migration of diagnose.history.unappliedMigrationNames) {
           await migrate.markMigrationApplied({ migrationId: migration });
         }
         migrate.stop();
         logger.info('finished migrating database');
-      } else if (diagnose.hasMigrationsTable) {
+      } else {
         logger.debug('database is behind, attempting to migrate');
         try {
           logger.debug('migrating database');
@@ -52,6 +51,9 @@ export async function migrations() {
         migrate.stop();
         logger.info('finished migrating database');
       }
+    } else if (['migrationsDirectoryIsBehind', 'historiesDiverge'].includes(diagnose.history?.diagnostic)) {
+      migrate.stop();
+      throw new Error('db migration history & directory are mismatched');
     } else {
       logger.info('exiting migrations engine - database is up to date');
       migrate.stop();
