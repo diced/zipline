@@ -22,6 +22,7 @@ export default function Text() {
 
   const [value, setValue] = useState('');
   const [lang, setLang] = useState('txt');
+  const [loading, setLoading] = useState(false);
 
   const [options, setOpened, OptionsModal] = useUploadOptions();
 
@@ -29,6 +30,9 @@ export default function Text() {
   const shouldRenderTex = lang === 'tex';
 
   const handleUpload = async () => {
+    if (value.trim().length === 0) return;
+
+    setLoading(true);
     const file = new File([value], 'text.' + lang);
 
     const expiresAt = options.expires === 'never' ? null : expireReadToDate(options.expires);
@@ -53,6 +57,16 @@ export default function Text() {
           message: '',
         });
         showFilesModal(clipboard, modals, json.files);
+        setLoading(false);
+        setValue('');
+      } else {
+        updateNotification({
+          id: 'upload-text',
+          title: 'Upload Failed',
+          message: json.error,
+          color: 'red',
+        });
+        setLoading(false);
       }
     });
 
@@ -136,7 +150,8 @@ export default function Text() {
         <Button
           leftIcon={<IconFileUpload size='1rem' />}
           onClick={handleUpload}
-          disabled={value.trim().length === 0 ? true : false}
+          disabled={value.trim().length === 0 || loading}
+          loading={loading}
         >
           Upload
         </Button>

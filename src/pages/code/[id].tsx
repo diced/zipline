@@ -115,6 +115,17 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     renderType = null;
   }
 
+  await prisma.file.update({
+    where: {
+      id: file.id,
+    },
+    data: {
+      views: {
+        increment: 1,
+      },
+    },
+  });
+
   return {
     props: {
       code: await streamToString(data),
