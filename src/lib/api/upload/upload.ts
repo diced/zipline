@@ -114,7 +114,6 @@ export async function handleFile({
   });
 
   await datasource.put(fileUpload.name, file.buffer);
-  // TODO: add s3 implementation
 
   const responseUrl = `${domain}${
     config.files.route === '/' || config.files.route === '' ? '' : `${config.files.route}`
