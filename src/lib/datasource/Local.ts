@@ -5,7 +5,7 @@ import { Readable } from 'stream';
 import { Datasource } from './Datasource';
 
 export class LocalDatasource extends Datasource {
-  public name = 'local';
+  name = 'local';
 
   constructor(public dir: string) {
     super();

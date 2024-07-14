@@ -27,19 +27,23 @@ export async function onUpload({ user, file, link }: Parameters<typeof discordOn
     },
   };
 
-  const res = await fetch(config.httpWebhook.onUpload, {
-    method: 'POST',
-    body: JSON.stringify(payload),
-    headers: {
-      'Content-Type': 'application/json',
-      'x-zipline-webhook': 'true',
-      'x-zipline-webhook-type': 'upload',
-    },
-  });
+  try {
+    const res = await fetch(config.httpWebhook.onUpload, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: {
+        'Content-Type': 'application/json',
+        'x-zipline-webhook': 'true',
+        'x-zipline-webhook-type': 'upload',
+      },
+    });
 
-  if (!res.ok) {
-    const text = await res.text();
-    logger.error('webhook failed', { response: text, status: res.status });
+    if (!res.ok) {
+      const text = await res.text();
+      logger.error('webhook failed', { response: text, status: res.status });
+    }
+  } catch (e) {
+    logger.error('error while sending webhook', { error: (e as TypeError).message });
   }
 
   return;
@@ -67,20 +71,23 @@ export async function onShorten({ user, url, link }: Parameters<typeof discordOn
       link,
     },
   };
+  try {
+    const res = await fetch(config.httpWebhook.onShorten, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: {
+        'Content-Type': 'application/json',
+        'x-zipline-webhook': 'true',
+        'x-zipline-webhook-type': 'shorten',
+      },
+    });
 
-  const res = await fetch(config.httpWebhook.onShorten, {
-    method: 'POST',
-    body: JSON.stringify(payload),
-    headers: {
-      'Content-Type': 'application/json',
-      'x-zipline-webhook': 'true',
-      'x-zipline-webhook-type': 'shorten',
-    },
-  });
-
-  if (!res.ok) {
-    const text = await res.text();
-    logger.error('webhook failed', { response: text, status: res.status });
+    if (!res.ok) {
+      const text = await res.text();
+      logger.error('webhook failed', { response: text, status: res.status });
+    }
+  } catch (e) {
+    logger.error('error while sending webhook', { error: (e as TypeError).message });
   }
 
   return;
