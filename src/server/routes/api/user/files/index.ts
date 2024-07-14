@@ -88,6 +88,15 @@ export default fastifyPlugin(
         const searchField = validateSearchField.safeParse(req.query.searchField || 'name');
         if (!searchField.success) return res.badRequest('Invalid searchField value');
 
+        const incompleteFiles = await prisma.incompleteFile.findMany({
+          where: {
+            userId: user.id,
+            status: {
+              not: 'COMPLETE',
+            },
+          },
+        });
+
         if (searchQuery) {
           let tagFiles: string[] = [];
 
@@ -150,12 +159,16 @@ export default fastifyPlugin(
                 ? {
                     id: {
                       in: tagFiles,
+                      notIn: incompleteFiles.map((file) => file.metadata.file.id),
                     },
                   }
                 : {
                     [searchField.data]: {
                       contains: searchQuery,
                       mode: 'insensitive',
+                    },
+                    id: {
+                      notIn: incompleteFiles.map((file) => file.metadata.file.id),
                     },
                   }),
             },
@@ -204,6 +217,9 @@ export default fastifyPlugin(
             filter !== 'all' && {
               favorite: true,
             }),
+          id: {
+            notIn: incompleteFiles.map((file) => file.metadata.file.id),
+          },
         };
 
         const count = await prisma.file.count({
