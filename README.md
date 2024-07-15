@@ -141,7 +141,7 @@ To upload files using flameshot we will use a script. Replace $TOKEN and $HOST w
 DATE=$(date '+%h_%Y_%d_%I_%m_%S.png');
 flameshot gui -r > ~/Pictures/$DATE;
 
-curl -H "Content-Type: multipart/form-data" -H "authorization: $TOKEN" -F file=@$1 $HOST/api/upload | jq -r 'files[0].url' | xsel -ib
+curl -H "Content-Type: multipart/form-data" -H "authorization: $TOKEN" -F file=@$1 $HOST/api/upload | jq -r '.files[0]' | xsel -ib
 ```
 
 # Contributing
