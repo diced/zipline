@@ -21,6 +21,11 @@ function dbFileDecorator(fastify: FastifyInstance, _, done) {
     this.header('Content-Length', size);
     this.header('Content-Type', download ? 'application/octet-stream' : file.mimetype);
     this.header('Content-Disposition', `inline; filename="${encodeURI(file.originalName || file.name)}"`);
+    if (file.mimetype.startsWith('video/') || file.mimetype.startsWith('audio/')) {
+      this.header('Accept-Ranges', 'bytes');
+      // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Range
+      this.header('Content-Range', `bytes 0-${size - 1}/${size}`);
+    }
 
     return this.send(data);
   }
