@@ -73,6 +73,7 @@ export const rawConfig: any = {
     externalLinks: undefined,
     loginBackground: undefined,
     defaultAvatar: undefined,
+    tos: undefined,
     theme: {
       default: undefined,
       dark: undefined,
@@ -192,6 +193,8 @@ export const PROP_TO_ENV = {
   'website.externalLinks': 'WEBSITE_EXTERNAL_LINKS',
   'website.loginBackground': 'WEBSITE_LOGIN_BACKGROUND',
   'website.defaultAvatar': 'WEBSITE_DEFAULT_AVATAR',
+  'website.tos': 'WEBSITE_TOS',
+
   'website.theme.default': 'WEBSITE_THEME_DEFAULT',
   'website.theme.dark': 'WEBSITE_THEME_DARK',
   'website.theme.light': 'WEBSITE_THEME_LIGHT',
@@ -318,6 +321,8 @@ export function readEnv() {
     env('website.externalLinks', 'json[]'),
     env('website.loginBackground', 'string'),
     env('website.defaultAvatar', 'string'),
+    env('website.tos', 'string'),
+
     env('website.theme.default', 'string'),
     env('website.theme.dark', 'string'),
     env('website.theme.light', 'string'),

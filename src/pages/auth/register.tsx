@@ -7,6 +7,7 @@ import { withSafeConfig } from '@/lib/middleware/next/withSafeConfig';
 import {
   Button,
   Center,
+  Checkbox,
   LoadingOverlay,
   Paper,
   PasswordInput,
@@ -19,6 +20,7 @@ import { hasLength, useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { IconPlus, IconX } from '@tabler/icons-react';
 import { InferGetServerSidePropsType } from 'next';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { mutate } from 'swr';
@@ -44,6 +46,7 @@ export default function Register({ config, invite }: InferGetServerSidePropsType
     initialValues: {
       username: '',
       password: '',
+      tos: false,
     },
     validate: {
       username: hasLength({ min: 1 }, 'Username is required'),
@@ -52,7 +55,12 @@ export default function Register({ config, invite }: InferGetServerSidePropsType
   });
 
   const onSubmit = async (values: typeof form.values) => {
-    const { username, password } = values;
+    const { username, password, tos } = values;
+
+    if (tos === false && config.website.tos) {
+      form.setFieldError('tos', 'You must agree to the Terms of Service to continue');
+      return;
+    }
 
     const { data, error } = await fetchApi<Response['/api/auth/register']>('/api/auth/register', 'POST', {
       username,
@@ -108,6 +116,21 @@ export default function Register({ config, invite }: InferGetServerSidePropsType
             <Stack gap='sm'>
               <TextInput label='Username' placeholder='Username' {...form.getInputProps('username')} />
               <PasswordInput label='Password' placeholder='Password' {...form.getInputProps('password')} />
+
+              {config.website.tos && (
+                <Checkbox
+                  label={
+                    <Text size='xs'>
+                      I agree to the{' '}
+                      <Link href='/auth/tos' target='_blank'>
+                        Terms of Service
+                      </Link>
+                    </Text>
+                  }
+                  required
+                  {...form.getInputProps('tos', { type: 'checkbox' })}
+                />
+              )}
 
               <Button type='submit' fullWidth leftSection={<IconPlus size='1rem' />}>
                 Register

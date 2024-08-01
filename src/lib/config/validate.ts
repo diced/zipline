@@ -192,6 +192,12 @@ export const schema = z.object({
       dark: z.string().default('builtin:dark_gray'),
       light: z.string().default('builtin:light_gray'),
     }),
+    tos: z
+      .string()
+      .transform((s) => resolve(s))
+      .refine((v) => (v ? v.endsWith('.md') : true))
+      .nullable()
+      .default(null),
   }),
   mfa: z.object({
     totp: z.object({

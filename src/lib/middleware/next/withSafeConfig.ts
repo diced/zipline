@@ -4,7 +4,7 @@ import { readThemes } from '@/lib/theme/file';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 
 export function withSafeConfig<T = unknown>(
-  fn: (ctx: GetServerSidePropsContext) => T | Promise<T> = (): any => {},
+  fn: (ctx: GetServerSidePropsContext, config: SafeConfig) => T | Promise<T> = (): any => {},
 ): GetServerSideProps<
   T & {
     config: SafeConfig;
@@ -15,7 +15,7 @@ export function withSafeConfig<T = unknown>(
   return async (ctx) => {
     const config = safeConfig();
 
-    const data = await fn(ctx);
+    const data = await fn(ctx, config);
 
     if ((data as any) && (data as any).notFound)
       return {
