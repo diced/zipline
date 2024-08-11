@@ -1,4 +1,3 @@
-version: '3'
 services:
   postgres:
     image: postgres:15
@@ -10,7 +9,7 @@ services:
     volumes:
       - pg_data:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -18,7 +17,7 @@ services:
   zipline:
     image: ghcr.io/diced/zipline
     ports:
-      - '3000:3000'
+      - "3000:3000"
     restart: unless-stopped
     environment:
       - CORE_RETURN_HTTPS=false
@@ -28,10 +27,10 @@ services:
       - CORE_DATABASE_URL=postgres://postgres:postgres@postgres/postgres
       - CORE_LOGGER=true
     volumes:
-      - './uploads:/zipline/uploads'
-      - './public:/zipline/public'
+      - "./uploads:/zipline/uploads"
+      - "./public:/zipline/public"
     depends_on:
-      - 'postgres'
+      - "postgres"
 
 volumes:
   pg_data:
