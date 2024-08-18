@@ -11,6 +11,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import zconfig from 'lib/config';
+import { log } from 'server/util';
 
 export default function EmbeddedFile({
   file,
@@ -250,6 +251,17 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   });
   let host = context.req.headers.host;
   if (!file) return { notFound: true };
+
+  const logger = log('view');
+
+  if (file.maxViews && file.views >= file.maxViews) {
+    await datasource.delete(file.name);
+    await prisma.file.delete({ where: { id: file.id } });
+
+    logger.child('file').info(`File ${file.name} has been deleted due to max views (${file.maxViews})`);
+
+    return { notFound: true };
+  }
 
   // @ts-ignore
   file.size = Number(file.size);
