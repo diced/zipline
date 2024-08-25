@@ -15,6 +15,7 @@ import { ApiSetupResponse } from '@/server/routes/api/setup';
 import { ApiStatsResponse } from '@/server/routes/api/stats';
 import { ApiUploadResponse } from '@/server/routes/api/upload';
 import { ApiUserResponse } from '@/server/routes/api/user';
+import { ApiUserExportResponse } from '@/server/routes/api/user/export';
 import { ApiUserFilesResponse } from '@/server/routes/api/user/files';
 import { ApiUserFilesIdResponse } from '@/server/routes/api/user/files/[id]';
 import { ApiUserFilesIdPasswordResponse } from '@/server/routes/api/user/files/[id]/password';
@@ -60,6 +61,7 @@ export type Response = {
   '/api/user/stats': ApiUserStatsResponse;
   '/api/user/recent': ApiUserRecentResponse;
   '/api/user/token': ApiUserTokenResponse;
+  '/api/user/export': ApiUserExportResponse;
   '/api/users': ApiUsersResponse;
   '/api/users/[id]': ApiUsersIdResponse;
   '/api/server/clear_temp': ApiServerClearTempResponse;

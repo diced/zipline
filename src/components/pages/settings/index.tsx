@@ -11,6 +11,7 @@ import SettingsMfa from './parts/SettingsMfa';
 import SettingsOAuth from './parts/SettingsOAuth';
 import SettingsServerActions from './parts/SettingsServerUtil';
 import SettingsUser from './parts/SettingsUser';
+import SettingsExports from './parts/SettingsExports';
 
 export default function DashboardSettings() {
   const config = useConfig();
@@ -37,6 +38,8 @@ export default function DashboardSettings() {
         <SettingsGenerators />
 
         {isAdministrator(user?.role) && <SettingsServerActions />}
+
+        <SettingsExports />
       </SimpleGrid>
     </>
   );

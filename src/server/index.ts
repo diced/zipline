@@ -14,6 +14,7 @@ import { fastifyCors } from '@fastify/cors';
 import { fastifyMultipart } from '@fastify/multipart';
 import { fastifyRateLimit } from '@fastify/rate-limit';
 import { fastifySensible } from '@fastify/sensible';
+import { fastifyStatic } from '@fastify/static';
 import fastify from 'fastify';
 import { mkdir } from 'fs/promises';
 import { parse } from 'url';
@@ -76,6 +77,11 @@ async function main() {
     limits: {
       fileSize: config.files.maxFileSize,
     },
+  });
+
+  await server.register(fastifyStatic, {
+    serve: false,
+    root: '/',
   });
 
   if (config.ratelimit.enabled) {
