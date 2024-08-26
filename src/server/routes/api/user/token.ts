@@ -31,7 +31,7 @@ export default fastifyPlugin(
       });
     });
 
-    server.patch(PATH, async (req, res) => {
+    server.patch(PATH, { preHandler: [userMiddleware] }, async (req, res) => {
       const user = await prisma.user.update({
         where: {
           id: req.user.id,

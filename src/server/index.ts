@@ -163,6 +163,8 @@ async function main() {
       });
 
       body.on('end', () => {
+        if (bodyString === '' || bodyString === null) return done(null, {});
+
         server.getDefaultJsonParser('error', 'ignore')(req, bodyString, done);
       });
     } else done(null, body);
