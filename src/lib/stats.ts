@@ -67,18 +67,18 @@ export async function queryStats(): Promise<MetricData> {
     files: file._count,
     urls: url._count,
     users: user._count,
-    storage: Number(file._sum.size!),
+    storage: Number(file._sum.size ?? 0),
 
-    fileViews: Number(file._sum.views!),
-    urlViews: url._sum.views!,
+    fileViews: Number(file._sum.views ?? 0),
+    urlViews: url._sum.views ?? 0,
 
     filesUsers: filesByUser.map((x) => ({
       username: x.userId!,
       sum: x._count,
-      storage: Number(x._sum.size!),
-      views: x._sum.views!,
+      storage: Number(x._sum.size ?? 0),
+      views: x._sum.views ?? 0,
     })),
-    urlsUsers: urlsByUser.map((x) => ({ username: x.userId!, sum: x._count, views: x._sum.views! })),
+    urlsUsers: urlsByUser.map((x) => ({ username: x.userId!, sum: x._count, views: x._sum.views ?? 0 })),
 
     types: types.map((x) => ({ type: x.type!, sum: x._count })),
   };
