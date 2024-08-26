@@ -11,7 +11,7 @@ export function sharex(token: string, type: 'file' | 'url', options: GeneratorOp
     Headers: {
       authorization: token,
     },
-    URL: '{json:files[0]}',
+    URL: '{json:files[0].url}',
     Body: 'MultipartFormData',
     FileFormName: 'file',
     Data: undefined,
