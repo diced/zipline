@@ -1,4 +1,5 @@
 import { userMiddleware } from '@/server/middleware/user';
+import { getSession } from '@/server/session';
 import fastifyPlugin from 'fastify-plugin';
 
 export type ApiLogoutResponse = {
@@ -14,8 +15,9 @@ export default fastifyPlugin(
       url: PATH,
       method: ['GET'],
       preHandler: [userMiddleware],
-      handler: async (_, res) => {
-        res.header('Set-Cookie', 'zipline_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT');
+      handler: async (req, res) => {
+        const session = await getSession(req, res);
+        session.destroy();
 
         return res.send({ loggedOut: true });
       },

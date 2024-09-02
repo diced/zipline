@@ -138,7 +138,7 @@ export default function Layout({ children, config }: { children: React.ReactNode
   const router = useRouter();
   const modals = useModals();
   const clipboard = useClipboard();
-  const [setUser, setToken] = useUserStore((s) => [s.setUser, s.setToken]);
+  const [setUser] = useUserStore((s) => [s.setUser]);
 
   const { user, mutate } = useLogin();
   const { avatar } = useAvatar();
@@ -163,7 +163,7 @@ export default function Layout({ children, config }: { children: React.ReactNode
             icon: <IconClipboardCopy size='1rem' />,
           });
         } else {
-          clipboard.copy(data?.token);
+          clipboard.copy(data?.token ?? '');
           showNotification({
             title: 'Copied',
             message: 'Your token has been copied to your clipboard.',
@@ -196,7 +196,6 @@ export default function Layout({ children, config }: { children: React.ReactNode
             icon: <IconRefreshDot size='1rem' />,
           });
         } else {
-          setToken(data?.token);
           setUser(data?.user);
           mutate(data as Response['/api/user']);
 

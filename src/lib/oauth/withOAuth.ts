@@ -5,9 +5,9 @@ import { parseUserToken } from '../middleware/ziplineAuth';
 import { findProvider } from './providerUtil';
 import { createToken } from '../crypto';
 import { config } from '../config';
-import { loginToken } from '../login';
 import { User } from '../db/models/user';
 import Logger, { log } from '../logger';
+import { getSession } from '@/server/session';
 
 export interface OAuthQuery {
   state?: string;
@@ -38,6 +38,8 @@ export const withOAuth =
     req.query.host = req.headers.host ?? 'localhost:3000';
 
     const response = await oauthProfile(req.query as OAuthQuery, logger);
+
+    const session = await getSession(req, res);
 
     if (response.error) {
       return res.serverError(response.error, {
@@ -120,7 +122,8 @@ export const withOAuth =
           },
         });
 
-        loginToken(res, user);
+        session.user = user;
+        await session.save();
 
         logger.info('linked oauth account', {
           provider,
@@ -150,7 +153,8 @@ export const withOAuth =
         },
       });
 
-      loginToken(res, user);
+      session.user = user;
+      await session.save();
 
       return res.redirect('/dashboard');
     } else if (existingOauth) {
@@ -169,7 +173,8 @@ export const withOAuth =
         },
       });
 
-      loginToken(res, login.user! as User);
+      session.user = login.user! as User;
+      await session.save();
 
       logger.info('logged in with oauth', {
         provider,
@@ -201,7 +206,8 @@ export const withOAuth =
         },
       });
 
-      loginToken(res, nuser as User);
+      session.user = nuser as User;
+      await session.save();
 
       logger.info('created user with oauth', {
         provider,

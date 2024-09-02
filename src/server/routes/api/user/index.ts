@@ -2,11 +2,11 @@ import { hashPassword } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
 import { User, userSelect } from '@/lib/db/models/user';
 import { userMiddleware } from '@/server/middleware/user';
+import { getSession } from '@/server/session';
 import fastifyPlugin from 'fastify-plugin';
 
 export type ApiUserResponse = {
   user?: User;
-  token?: string;
 };
 
 type Body = {
@@ -77,6 +77,12 @@ export default fastifyPlugin(
           ...userSelect,
         },
       });
+
+      const session = await getSession(req, res);
+      session.user = user;
+      await session.save();
+
+      delete (user as any).password;
 
       return res.send({ user, token: req.cookies.zipline_token });
     });

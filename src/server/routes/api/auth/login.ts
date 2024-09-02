@@ -2,12 +2,11 @@ import { verifyPassword } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
 import { User, userSelect } from '@/lib/db/models/user';
 import { verifyTotpCode } from '@/lib/totp';
-import { loginToken } from '@/server/loginToken';
+import { getSession } from '@/server/session';
 import fastifyPlugin from 'fastify-plugin';
 
 export type ApiLoginResponse = {
   user?: User;
-  token?: string;
   totp?: true;
 };
 
@@ -26,6 +25,10 @@ export default fastifyPlugin(
       url: PATH,
       method: ['POST'],
       handler: async (req, res) => {
+        const session = await getSession(req, res);
+
+        session.user = null;
+
         const { username, password, code } = req.body;
 
         if (!username) return res.badRequest('Username is required');
@@ -57,13 +60,12 @@ export default fastifyPlugin(
             totp: true,
           });
 
-        const token = loginToken(res, user);
+        session.user = user;
+        await session.save();
 
-        delete (user as any).token;
         delete (user as any).password;
 
         return res.send({
-          token,
           user,
         });
       },

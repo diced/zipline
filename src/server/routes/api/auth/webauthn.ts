@@ -1,13 +1,12 @@
 import { config } from '@/lib/config';
 import { prisma } from '@/lib/db';
 import { User, userSelect } from '@/lib/db/models/user';
-import { loginToken } from '@/server/loginToken';
+import { getSession } from '@/server/session';
 import { AuthenticationResponseJSON } from '@github/webauthn-json/dist/types/browser-ponyfill';
 import fastifyPlugin from 'fastify-plugin';
 
 export type ApiAuthWebauthnResponse = {
   user: User;
-  token: string;
 };
 
 type Body = {
@@ -23,6 +22,7 @@ export default fastifyPlugin(
       url: PATH,
       method: ['POST'],
       handler: async (req, res) => {
+        const session = await getSession(req, res);
         if (!config.mfa.passkeys) return res.badRequest('Passkeys are not enabled');
 
         const { auth } = req.body;
@@ -47,9 +47,9 @@ export default fastifyPlugin(
         });
         if (!user) return res.badRequest('Invalid passkey');
 
-        const token = loginToken(res, user);
+        session.user = user;
+        await session.save();
 
-        delete (user as any).token;
         delete (user as any).password;
 
         await prisma.userPasskey.updateMany({
@@ -65,7 +65,6 @@ export default fastifyPlugin(
         });
 
         return res.send({
-          token,
           user,
         });
       },

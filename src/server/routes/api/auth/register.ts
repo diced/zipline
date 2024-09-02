@@ -2,9 +2,9 @@ import { config } from '@/lib/config';
 import { createToken, hashPassword } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
 import { userSelect } from '@/lib/db/models/user';
+import { getSession } from '@/server/session';
 import fastifyPlugin from 'fastify-plugin';
 import { ApiLoginResponse } from './login';
-import { loginToken } from '@/server/loginToken';
 
 export type ApiAuthRegisterResponse = ApiLoginResponse;
 
@@ -22,6 +22,8 @@ export default fastifyPlugin(
       url: PATH,
       method: ['POST'],
       handler: async (req, res) => {
+        const session = await getSession(req, res);
+
         const { username, password, code } = req.body;
 
         if (code && !config.invites.enabled) return res.badRequest("Invites aren't enabled");
@@ -74,13 +76,12 @@ export default fastifyPlugin(
           },
         });
 
-        const token = loginToken(res, user);
+        session.user = user;
+        await session.save();
 
-        delete (user as any).token;
         delete (user as any).password;
 
         return res.send({
-          token,
           user,
         });
       },

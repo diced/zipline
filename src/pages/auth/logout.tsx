@@ -6,7 +6,7 @@ import { mutate } from 'swr';
 
 export default function Login() {
   const router = useRouter();
-  const [setUser, setToken] = useUserStore((state) => [state.setUser, state.setToken]);
+  const [setUser] = useUserStore((state) => [state.setUser]);
 
   useEffect(() => {
     (async () => {
@@ -16,7 +16,6 @@ export default function Login() {
 
         if (res.ok) {
           setUser(null);
-          setToken(null);
           mutate('/api/user', null);
           await router.push('/auth/login');
         }

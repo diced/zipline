@@ -7,15 +7,15 @@ import { isAdministrator } from '../role';
 
 export default function useLogin(administratorOnly: boolean = false) {
   const router = useRouter();
-  const { data, error, isLoading, mutate } = useSWR<Response['/api/user']>('/api/user');
+  const { data, error, isLoading, mutate } = useSWR<Response['/api/user']>('/api/user', {
+    fallbackData: { user: undefined },
+  });
 
   const [user, setUser] = useUserStore((state) => [state.user, state.setUser]);
-  const [token, setToken] = useUserStore((state) => [state.token, state.setToken]);
 
   useEffect(() => {
-    if (data?.user && data?.token) {
+    if (data?.user) {
       setUser(data.user);
-      setToken(data.token);
     } else if (error) {
       router.push('/auth/login');
     }
@@ -27,5 +27,5 @@ export default function useLogin(administratorOnly: boolean = false) {
     }
   }, [user]);
 
-  return { user, token, loading: isLoading || !user, mutate };
+  return { user, loading: isLoading || !user, mutate };
 }

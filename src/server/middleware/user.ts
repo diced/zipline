@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db';
 import { User, userSelect } from '@/lib/db/models/user';
 import { FastifyReply } from 'fastify';
 import { FastifyRequest } from 'fastify/types/request';
+import { getSession } from '../session';
 
 declare module 'fastify' {
   export interface FastifyRequest {
@@ -38,25 +39,17 @@ export function parseUserToken(
 }
 
 export async function userMiddleware(req: FastifyRequest, res: FastifyReply) {
-  let rawToken: string | undefined;
+  const session = await getSession(req, res);
 
-  if (req.cookies.zipline_token) rawToken = req.cookies.zipline_token;
-  else if (req.headers.authorization) rawToken = req.headers.authorization;
-
-  try {
-    // eslint-disable-next-line no-var
-    var token = parseUserToken(rawToken);
-  } catch (e) {
-    return res.unauthorized((e as { error: string }).error);
-  }
+  if (!session.user) return res.unauthorized('not logged in');
 
   const user = await prisma.user.findFirst({
     where: {
-      token,
+      password: session.user.password,
     },
     select: userSelect,
   });
-  if (!user) return res.unauthorized('invalid token');
+  if (!user) return res.unauthorized('invalid login session');
 
   req.user = user;
 }
