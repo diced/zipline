@@ -90,7 +90,7 @@ export default function GeneratorButton({
   icon: React.ReactNode;
   desc?: React.ReactNode;
 }) {
-  const token = useUserStore((state) => state.token);
+  const user = useUserStore((state) => state.user);
   const [opened, setOpen] = useState(false);
 
   const [generatorType, setGeneratorType] = useState('file');
@@ -280,7 +280,9 @@ export default function GeneratorButton({
           )}
 
           <Button
-            onClick={() => generators[name as keyof typeof generators](token!, generatorType as any, options)}
+            onClick={() =>
+              generators[name as keyof typeof generators](user!.token!, generatorType as any, options)
+            }
             fullWidth
             leftSection={<IconDownload size='1rem' />}
             size='sm'
