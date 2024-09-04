@@ -65,7 +65,7 @@ export const authentikAuth = {
   url: (clientId: string, origin: string, authorizeUrl: string, state?: string) =>
     `${authorizeUrl}?client_id=${clientId}&redirect_uri=${encodeURIComponent(
       `${origin}/api/auth/oauth/authentik`,
-    )}&response_type=code&scope=openid+email+profile${state ? `&state=${state}` : ''}`,
+    )}&response_type=code&scope=openid+email+profile+offline_access${state ? `&state=${state}` : ''}`,
   user: async (accessToken: string, userInfoUrl: string) => {
     const res = await fetch(userInfoUrl, {
       headers: {
