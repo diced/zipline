@@ -3,7 +3,7 @@ import Logger from '@/lib/logger';
 import { combine } from '@/lib/middleware/combine';
 import { method } from '@/lib/middleware/method';
 import enabled from '@/lib/oauth/enabled';
-import { authentikAuth } from '@/lib/oauth/providerUtil';
+import { oidcAuth } from '@/lib/oauth/providerUtil';
 import { OAuthQuery, OAuthResponse, withOAuth } from '@/lib/oauth/withOAuth';
 
 // thanks to @danejur for this https://github.com/diced/zipline/pull/372
@@ -14,33 +14,33 @@ async function handler({ code, state, host }: OAuthQuery, _logger: Logger): Prom
       error_code: 403,
     };
 
-  const { authentik: authentikEnabled } = enabled(config);
+  const { oidc: oidcEnabled } = enabled(config);
 
-  if (!authentikEnabled)
+  if (!oidcEnabled)
     return {
-      error: 'Authentik OAuth is not configured.',
+      error: 'OpenID Connect OAuth is not configured.',
       error_code: 401,
     };
 
   if (!code)
     return {
-      redirect: authentikAuth.url(
-        config.oauth.authentik.clientId!,
+      redirect: oidcAuth.url(
+        config.oauth.oidc.clientId!,
         `${config.core.returnHttpsUrls ? 'https' : 'http'}://${host}`,
-        config.oauth.authentik.authorizeUrl!,
+        config.oauth.oidc.authorizeUrl!,
         state,
       ),
     };
 
   const body = new URLSearchParams({
-    client_id: config.oauth.authentik.clientId!,
-    client_secret: config.oauth.authentik.clientSecret!,
+    client_id: config.oauth.oidc.clientId!,
+    client_secret: config.oauth.oidc.clientSecret!,
     grant_type: 'authorization_code',
     code,
-    redirect_uri: `${config.core.returnHttpsUrls ? 'https' : 'http'}://${host}/api/auth/oauth/authentik`,
+    redirect_uri: `${config.core.returnHttpsUrls ? 'https' : 'http'}://${host}/api/auth/oauth/oidc`,
   });
 
-  const res = await fetch(config.oauth.authentik.tokenUrl!, {
+  const res = await fetch(config.oauth.oidc.tokenUrl!, {
     method: 'POST',
     body,
     headers: {
@@ -57,7 +57,7 @@ async function handler({ code, state, host }: OAuthQuery, _logger: Logger): Prom
   if (!json.access_token) return { error: 'No access token in response' };
   if (!json.refresh_token) return { error: 'No refresh token in response' };
 
-  const userJson = await authentikAuth.user(json.access_token, config.oauth.authentik.userinfoUrl!);
+  const userJson = await oidcAuth.user(json.access_token, config.oauth.oidc.userinfoUrl!);
   if (!userJson) return { error: 'Failed to fetch user' };
 
   return {
@@ -68,4 +68,4 @@ async function handler({ code, state, host }: OAuthQuery, _logger: Logger): Prom
   };
 }
 
-export default combine([method(['GET'])], withOAuth('AUTHENTIK', handler));
+export default combine([method(['GET'])], withOAuth('OIDC', handler));

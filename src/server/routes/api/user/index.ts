@@ -2,7 +2,7 @@ import { hashPassword } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
 import { User, userSelect } from '@/lib/db/models/user';
 import { userMiddleware } from '@/server/middleware/user';
-import { getSession } from '@/server/session';
+import { getSession, saveSession } from '@/server/session';
 import fastifyPlugin from 'fastify-plugin';
 
 export type ApiUserResponse = {
@@ -75,12 +75,13 @@ export default fastifyPlugin(
         },
         select: {
           ...userSelect,
+          password: true,
+          token: true,
         },
       });
 
       const session = await getSession(req, res);
-      session.user = user;
-      await session.save();
+      await saveSession(session, <User>user);
 
       delete (user as any).password;
 

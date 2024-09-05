@@ -1,13 +1,12 @@
 import { NextApiReq, NextApiRes } from '@/lib/response';
 import { OAuthProviderType } from '@prisma/client';
 import { prisma } from '../db';
-import { parseUserToken } from '../middleware/ziplineAuth';
 import { findProvider } from './providerUtil';
 import { createToken } from '../crypto';
 import { config } from '../config';
 import { User } from '../db/models/user';
 import Logger, { log } from '../logger';
-import { getSession } from '@/server/session';
+import { getSession, saveSession } from '@/server/session';
 
 export interface OAuthQuery {
   state?: string;
@@ -76,15 +75,11 @@ export const withOAuth =
 
     const { state } = req.query as OAuthQuery;
 
-    let rawToken: string | undefined;
-
-    if (req.cookies.zipline_token) rawToken = req.cookies.zipline_token;
-    else if (req.headers.authorization) rawToken = req.headers.authorization;
-    const token = parseUserToken(rawToken, true);
-
     const user = await prisma.user.findFirst({
       where: {
-        token: token ?? '',
+        sessions: {
+          has: session.sessionId ?? '',
+        },
       },
       include: {
         oauthProviders: true,
@@ -94,7 +89,7 @@ export const withOAuth =
     const userOauth = findProvider(provider, user?.oauthProviders ?? []);
 
     if (state === 'link') {
-      if (!user) return res.unauthorized();
+      if (!user) return res.unauthorized('invalid session');
 
       if (findProvider(provider, user.oauthProviders))
         return res.badRequest('This account is already linked to this provider');
@@ -122,8 +117,7 @@ export const withOAuth =
           },
         });
 
-        session.user = user;
-        await session.save();
+        await saveSession(session, <User>user);
 
         logger.info('linked oauth account', {
           provider,
@@ -153,8 +147,7 @@ export const withOAuth =
         },
       });
 
-      session.user = user;
-      await session.save();
+      await saveSession(session, <User>user);
 
       return res.redirect('/dashboard');
     } else if (existingOauth) {
@@ -173,8 +166,7 @@ export const withOAuth =
         },
       });
 
-      session.user = login.user! as User;
-      await session.save();
+      await saveSession(session, <User>login.user!);
 
       logger.info('logged in with oauth', {
         provider,
@@ -206,8 +198,7 @@ export const withOAuth =
         },
       });
 
-      session.user = nuser as User;
-      await session.save();
+      await saveSession(session, <User>nuser);
 
       logger.info('created user with oauth', {
         provider,

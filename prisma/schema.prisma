@@ -29,6 +29,7 @@ model User {
 
   totpSecret String?
   passkeys   UserPasskey[]
+  sessions   String[]
 
   quota UserQuota?
 
@@ -103,7 +104,7 @@ enum OAuthProviderType {
   DISCORD
   GOOGLE
   GITHUB
-  AUTHENTIK
+  OIDC
 }
 
 model File {
@@ -112,7 +113,7 @@ model File {
   updatedAt DateTime  @updatedAt
   deletesAt DateTime?
 
-  name         String // name & file saved on datasource
+  name         String  // name & file saved on datasource
   originalName String? // original name of file when uploaded
   size         BigInt
   type         String

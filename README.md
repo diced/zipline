@@ -118,11 +118,11 @@ OAUTH_GITHUB_CLIENT_SECRET=x
 OAUTH_GOOGLE_CLIENT_ID=x-x.apps.googleusercontent.com
 OAUTH_GOOGLE_CLIENT_SECRET=x-x-x
 
-OAUTH_AUTHENTIK_CLIENT_ID=x
-OAUTH_AUTHENTIK_CLIENT_SECRET=x
-OAUTH_AUTHENTIK_AUTHORIZE_URL=http://localhost:9000/application/o/authorize/
-OAUTH_AUTHENTIK_USERINFO_URL=http://localhost:9000/application/o/userinfo/
-OAUTH_AUTHENTIK_TOKEN_URL=http://localhost:9000/application/o/token/
+OAUTH_OIDC_CLIENT_ID=x
+OAUTH_OIDC_CLIENT_SECRET=x
+OAUTH_OIDC_AUTHORIZE_URL=http://localhost:9000/application/o/authorize/
+OAUTH_OIDC_USERINFO_URL=http://localhost:9000/application/o/userinfo/
+OAUTH_OIDC_TOKEN_URL=http://localhost:9000/application/o/token/
 
 FEATURES_OAUTH_REGISTRATION=true
 FEATURES_USER_REGISTRATION=true

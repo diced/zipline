@@ -20,12 +20,12 @@ export default function enabled(config: Config) {
     config.features.oauthRegistration,
   );
 
-  const authentikEnabled = isTruthy(
-    config.oauth?.authentik?.clientId,
-    config.oauth?.authentik?.clientSecret,
-    config.oauth?.authentik?.authorizeUrl,
-    config.oauth?.authentik?.tokenUrl,
-    config.oauth?.authentik?.userinfoUrl,
+  const oidcEnabled = isTruthy(
+    config.oauth?.oidc?.clientId,
+    config.oauth?.oidc?.clientSecret,
+    config.oauth?.oidc?.authorizeUrl,
+    config.oauth?.oidc?.tokenUrl,
+    config.oauth?.oidc?.userinfoUrl,
     config.features.oauthRegistration,
   );
 
@@ -33,6 +33,6 @@ export default function enabled(config: Config) {
     discord: discordEnabled,
     github: githubEnabled,
     google: googleEnabled,
-    authentik: authentikEnabled,
+    oidc: oidcEnabled,
   };
 }

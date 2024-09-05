@@ -9,6 +9,8 @@ export type User = {
   role: 'USER' | 'ADMIN' | 'SUPERADMIN';
   view: UserViewSettings;
 
+  sessions: string[];
+
   oauthProviders: OAuthProvider[];
 
   totpSecret?: string | null;
@@ -32,6 +34,7 @@ export const userSelect = {
   totpSecret: true,
   passkeys: true,
   quota: true,
+  sessions: true,
 };
 
 export type UserViewSettings = z.infer<typeof userViewSchema>;

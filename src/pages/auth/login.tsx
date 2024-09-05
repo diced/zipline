@@ -332,8 +332,8 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
                 leftSection={<IconBrandGoogleFilled stroke={4} />}
               />
             )}
-            {config.oauthEnabled.authentik && (
-              <ExternalAuthButton provider='Authentik' alpha={0.2} leftSection={<IconCircleKeyFilled />} />
+            {config.oauthEnabled.oidc && (
+              <ExternalAuthButton provider='OIDC' alpha={0.2} leftSection={<IconCircleKeyFilled />} />
             )}
           </Stack>
         </Card>

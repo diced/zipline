@@ -41,11 +41,13 @@ export function parseUserToken(
 export async function userMiddleware(req: FastifyRequest, res: FastifyReply) {
   const session = await getSession(req, res);
 
-  if (!session.user) return res.unauthorized('not logged in');
+  if (!session.id || !session.sessionId) return res.unauthorized('not logged in');
 
   const user = await prisma.user.findFirst({
     where: {
-      password: session.user.password,
+      sessions: {
+        has: session.sessionId,
+      },
     },
     select: userSelect,
   });

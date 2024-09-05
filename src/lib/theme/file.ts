@@ -69,7 +69,7 @@ export async function handleOverrideColors(theme: ZiplineTheme) {
       ...theme.colors,
       google: theme.colors?.google || Array(10).fill('#4285F4'),
       github: theme.colors?.github || Array(10).fill('#24292E'),
-      authentik: theme.colors?.authentik || Array(10).fill('#FD4B2D'),
+      oidc: theme.colors?.oidc || Array(10).fill('#72abcf'),
       discord: theme.colors?.discord || Array(10).fill('#5865F2'),
     },
   } as ZiplineTheme;

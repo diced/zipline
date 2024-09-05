@@ -1,7 +1,7 @@
 import { config } from '@/lib/config';
 import { prisma } from '@/lib/db';
 import { User, userSelect } from '@/lib/db/models/user';
-import { getSession } from '@/server/session';
+import { getSession, saveSession } from '@/server/session';
 import { AuthenticationResponseJSON } from '@github/webauthn-json/dist/types/browser-ponyfill';
 import fastifyPlugin from 'fastify-plugin';
 
@@ -47,8 +47,7 @@ export default fastifyPlugin(
         });
         if (!user) return res.badRequest('Invalid passkey');
 
-        session.user = user;
-        await session.save();
+        await saveSession(session, <User>user);
 
         delete (user as any).password;
 

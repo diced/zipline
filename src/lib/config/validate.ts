@@ -242,7 +242,7 @@ export const schema = z.object({
           clientSecret: z.undefined(),
         }),
       ),
-    authentik: z
+    oidc: z
       .object({
         clientId: z.string(),
         clientSecret: z.string(),

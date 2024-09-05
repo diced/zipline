@@ -2,7 +2,7 @@ import { verifyPassword } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
 import { User, userSelect } from '@/lib/db/models/user';
 import { verifyTotpCode } from '@/lib/totp';
-import { getSession } from '@/server/session';
+import { getSession, saveSession } from '@/server/session';
 import fastifyPlugin from 'fastify-plugin';
 
 export type ApiLoginResponse = {
@@ -27,7 +27,8 @@ export default fastifyPlugin(
       handler: async (req, res) => {
         const session = await getSession(req, res);
 
-        session.user = null;
+        session.id = null;
+        session.sessionId = null;
 
         const { username, password, code } = req.body;
 
@@ -60,8 +61,7 @@ export default fastifyPlugin(
             totp: true,
           });
 
-        session.user = user;
-        await session.save();
+        await saveSession(session, user as User, false);
 
         delete (user as any).password;
 

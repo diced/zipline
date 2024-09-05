@@ -3,7 +3,6 @@ import { createToken, encryptToken } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
 import { User, userSelect } from '@/lib/db/models/user';
 import { userMiddleware } from '@/server/middleware/user';
-import { getSession } from '@/server/session';
 import fastifyPlugin from 'fastify-plugin';
 
 export type ApiUserTokenResponse = {
@@ -32,8 +31,6 @@ export default fastifyPlugin(
     });
 
     server.patch(PATH, { preHandler: [userMiddleware] }, async (req, res) => {
-      const session = await getSession(req, res);
-
       const user = await prisma.user.update({
         where: {
           id: req.user.id,
@@ -46,8 +43,6 @@ export default fastifyPlugin(
           token: true,
         },
       });
-
-      session.user!.token = user.token;
 
       delete (user as any).password;
 

@@ -1,8 +1,8 @@
 import { config } from '@/lib/config';
 import { createToken, hashPassword } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
-import { userSelect } from '@/lib/db/models/user';
-import { getSession } from '@/server/session';
+import { User, userSelect } from '@/lib/db/models/user';
+import { getSession, saveSession } from '@/server/session';
 import fastifyPlugin from 'fastify-plugin';
 import { ApiLoginResponse } from './login';
 
@@ -76,8 +76,7 @@ export default fastifyPlugin(
           },
         });
 
-        session.user = user;
-        await session.save();
+        await saveSession(session, <User>user);
 
         delete (user as any).password;
 
