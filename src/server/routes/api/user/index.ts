@@ -81,7 +81,7 @@ export default fastifyPlugin(
       });
 
       const session = await getSession(req, res);
-      await saveSession(session, <User>user);
+      await saveSession(session, user);
 
       delete (user as any).password;
 

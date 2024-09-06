@@ -117,7 +117,7 @@ export const withOAuth =
           },
         });
 
-        await saveSession(session, <User>user);
+        await saveSession(session, user);
 
         logger.info('linked oauth account', {
           provider,
@@ -147,7 +147,7 @@ export const withOAuth =
         },
       });
 
-      await saveSession(session, <User>user);
+      await saveSession(session, user);
 
       return res.redirect('/dashboard');
     } else if (existingOauth) {

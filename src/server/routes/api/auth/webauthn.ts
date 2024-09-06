@@ -47,7 +47,7 @@ export default fastifyPlugin(
         });
         if (!user) return res.badRequest('Invalid passkey');
 
-        await saveSession(session, <User>user);
+        await saveSession(session, user);
 
         delete (user as any).password;
 

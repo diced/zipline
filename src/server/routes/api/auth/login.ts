@@ -61,7 +61,7 @@ export default fastifyPlugin(
             totp: true,
           });
 
-        await saveSession(session, user as User, false);
+        await saveSession(session, user, false);
 
         delete (user as any).password;
 
