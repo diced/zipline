@@ -26,6 +26,7 @@ import { ApiUserFoldersIdResponse } from '@/server/routes/api/user/folders/[id]'
 import { ApiUserMfaPasskeyResponse } from '@/server/routes/api/user/mfa/passkey';
 import { ApiUserMfaTotpResponse } from '@/server/routes/api/user/mfa/totp';
 import { ApiUserRecentResponse } from '@/server/routes/api/user/recent';
+import { ApiUserSessionsResponse } from '@/server/routes/api/user/sessions';
 import { ApiUserStatsResponse } from '@/server/routes/api/user/stats';
 import { ApiUserTagsResponse } from '@/server/routes/api/user/tags';
 import { ApiUserTagsIdResponse } from '@/server/routes/api/user/tags/[id]';
@@ -57,6 +58,7 @@ export type Response = {
   '/api/user/urls': ApiUserUrlsResponse;
   '/api/user/tags/[id]': ApiUserTagsIdResponse;
   '/api/user/tags': ApiUserTagsResponse;
+  '/api/user/sessions': ApiUserSessionsResponse;
   '/api/user': ApiUserResponse;
   '/api/user/stats': ApiUserStatsResponse;
   '/api/user/recent': ApiUserRecentResponse;
