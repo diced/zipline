@@ -313,6 +313,9 @@ export const getServerSideProps: GetServerSideProps<{
   const { id, pw } = context.query;
   if (!id) return { notFound: true };
 
+  const { config: libConfig, reloadSettings } = await import('@/lib/config');
+  if (!libConfig) await reloadSettings();
+
   const file = await prisma.file.findFirst({
     where: {
       name: id as string,
@@ -376,7 +379,7 @@ export const getServerSideProps: GetServerSideProps<{
   const password = !!file.password;
   delete (file as any).password;
 
-  const config = safeConfig();
+  const config = safeConfig(libConfig);
 
   await prisma.file.update({
     where: {

@@ -153,30 +153,6 @@ export const PROP_TO_ENV = {
 
   'website.tos': 'WEBSITE_TOS',
 
-  // 'discord.onUpload.webhookUrl': 'DISCORD_ONUPLOAD_WEBHOOK_URL',
-  // 'discord.onUpload.username': 'DISCORD_ONUPLOAD_USERNAME',
-  // 'discord.onUpload.avatarUrl': 'DISCORD_ONUPLOAD_AVATAR_URL',
-  // 'discord.onUpload.content': 'DISCORD_ONUPLOAD_CONTENT',
-  // 'discord.onUpload.embed.title': 'DISCORD_ONUPLOAD_EMBED_TITLE',
-  // 'discord.onUpload.embed.description': 'DISCORD_ONUPLOAD_EMBED_DESCRIPTION',
-  // 'discord.onUpload.embed.footer': 'DISCORD_ONUPLOAD_EMBED_FOOTER',
-  // 'discord.onUpload.embed.color': 'DISCORD_ONUPLOAD_EMBED_COLOR',
-  // 'discord.onUpload.embed.thumbnail': 'DISCORD_ONUPLOAD_EMBED_THUMBNAIL',
-  // 'discord.onUpload.embed.timestamp': 'DISCORD_ONUPLOAD_EMBED_TIMESTAMP',
-  // 'discord.onUpload.embed.imageOrVideo': 'DISCORD_ONUPLOAD_EMBED_IMAGE_OR_VIDEO',
-  // 'discord.onUpload.embed.url': 'DISCORD_ONUPLOAD_EMBED_URL',
-
-  // 'discord.onShorten.webhookUrl': 'DISCORD_ONSHORTEN_WEBHOOK_URL',
-  // 'discord.onShorten.username': 'DISCORD_ONSHORTEN_USERNAME',
-  // 'discord.onShorten.avatarUrl': 'DISCORD_ONSHORTEN_AVATAR_URL',
-  // 'discord.onShorten.content': 'DISCORD_ONSHORTEN_CONTENT',
-  // 'discord.onShorten.embed.title': 'DISCORD_ONSHORTEN_EMBED_TITLE',
-  // 'discord.onShorten.embed.description': 'DISCORD_ONSHORTEN_EMBED_DESCRIPTION',
-  // 'discord.onShorten.embed.footer': 'DISCORD_ONSHORTEN_EMBED_FOOTER',
-  // 'discord.onShorten.embed.color': 'DISCORD_ONSHORTEN_EMBED_COLOR',
-  // 'discord.onShorten.embed.timestamp': 'DISCORD_ONSHORTEN_EMBED_TIMESTAMP',
-  // 'discord.onShorten.embed.url': 'DISCORD_ONSHORTEN_EMBED_URL',
-
   'ssl.key': 'SSL_KEY',
   'ssl.cert': 'SSL_CERT',
 };

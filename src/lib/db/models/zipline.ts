@@ -4,7 +4,9 @@ export async function getZipline() {
   const zipline = await prisma.zipline.findFirst();
   if (!zipline) {
     return prisma.zipline.create({
-      data: {},
+      data: {
+        coreTempDirectory: '/tmp/zipline',
+      },
     });
   }
 
