@@ -1,8 +1,10 @@
 import { Response } from '@/lib/api/response';
-import { ActionIcon, Button, Paper, ScrollArea, Table, Title } from '@mantine/core';
+import { bytes } from '@/lib/bytes';
+import { ActionIcon, Button, Group, Paper, ScrollArea, Table, Title } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import { showNotification } from '@mantine/notifications';
-import { IconPlus, IconTrashFilled } from '@tabler/icons-react';
+import { IconDownload, IconPlus, IconTrashFilled } from '@tabler/icons-react';
+import Link from 'next/link';
 import useSWR from 'swr';
 
 export default function SettingsExports() {
@@ -35,13 +37,12 @@ export default function SettingsExports() {
     });
   };
 
-  const handleDelete = async (name: string) => {
-    await fetch(`/api/user/export?name=${name}`, {
+  const handleDelete = async (id: string) => {
+    await fetch(`/api/user/export?id=${id}`, {
       method: 'DELETE',
     });
 
     showNotification({
-      title: 'Export deleted',
       message: 'Export has been deleted',
       color: 'red',
     });
@@ -65,54 +66,42 @@ export default function SettingsExports() {
       </Button>
 
       <Title order={4} mt='sm'>
-        Completed Exports
+        Exports
       </Title>
       <ScrollArea.Autosize mah={500} type='auto'>
         <Table highlightOnHover stickyHeader>
           <Table.Thead>
             <Table.Tr>
-              <Table.Th>Name</Table.Th>
+              <Table.Th>ID</Table.Th>
               <Table.Th>Started On</Table.Th>
               <Table.Th>Files</Table.Th>
+              <Table.Th>Size</Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
             {isLoading && <Table.Tr>Loading...</Table.Tr>}
-            {data?.complete.map((file) => (
-              <Table.Tr key={file.name}>
-                <Table.Td>{file.name}</Table.Td>
-                <Table.Td>{new Date(file.date).toLocaleString()}</Table.Td>
-                <Table.Td>{file.files}</Table.Td>
+            {data?.map((exportDb) => (
+              <Table.Tr key={exportDb.id}>
+                <Table.Td>{exportDb.id}</Table.Td>
+                <Table.Td>{new Date(exportDb.createdAt).toLocaleString()}</Table.Td>
+                <Table.Td>{exportDb.files}</Table.Td>
+                <Table.Td>{exportDb.completed ? bytes(Number(exportDb.size)) : ''}</Table.Td>
                 <Table.Td>
-                  <ActionIcon onClick={() => handleDelete(file.name)}>
-                    <IconTrashFilled size='1rem' />
-                  </ActionIcon>
-                </Table.Td>
-              </Table.Tr>
-            ))}
-          </Table.Tbody>
-        </Table>
-      </ScrollArea.Autosize>
+                  <Group>
+                    <ActionIcon onClick={() => handleDelete(exportDb.id)}>
+                      <IconTrashFilled size='1rem' />
+                    </ActionIcon>
 
-      <Title order={4} mt='sm'>
-        Running Exports
-      </Title>
-      <ScrollArea.Autosize mah={500} type='auto'>
-        <Table highlightOnHover stickyHeader>
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>Name</Table.Th>
-              <Table.Th>Started On</Table.Th>
-              <Table.Th>Files</Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>
-            {isLoading && <Table.Tr>Loading...</Table.Tr>}
-            {data?.running.map((file) => (
-              <Table.Tr key={file.name}>
-                <Table.Td>{file.name}</Table.Td>
-                <Table.Td>{new Date(file.date).toLocaleString()}</Table.Td>
-                <Table.Td>{file.files}</Table.Td>
+                    <ActionIcon
+                      component={Link}
+                      target='_blank'
+                      href={`/api/user/export?id=${exportDb.id}`}
+                      disabled={!exportDb.completed}
+                    >
+                      <IconDownload size='1rem' />
+                    </ActionIcon>
+                  </Group>
+                </Table.Td>
               </Table.Tr>
             ))}
           </Table.Tbody>

@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["omitApi"]
 }
 
@@ -69,23 +69,23 @@ model Zipline {
   websiteThemeDark    String @default("builtin:dark_gray")
   websiteThemeLight   String @default("builtin:light_gray")
 
-  oauthBypassLocalLogin  Boolean @default(false)
-  oauthLoginOnly         Boolean @default(false)
-  
-  oauthDiscordClientId   String?
+  oauthBypassLocalLogin Boolean @default(false)
+  oauthLoginOnly        Boolean @default(false)
+
+  oauthDiscordClientId     String?
   oauthDiscordClientSecret String?
 
-  oauthGoogleClientId    String?
+  oauthGoogleClientId     String?
   oauthGoogleClientSecret String?
 
-  oauthGithubClientId    String?
+  oauthGithubClientId     String?
   oauthGithubClientSecret String?
 
-  oauthOidcClientId      String?
-  oauthOidcClientSecret  String?
-  oauthOidcAuthorizeUrl  String?
-  oauthOidcTokenUrl      String?
-  oauthOidcUserinfoUrl   String?
+  oauthOidcClientId     String?
+  oauthOidcClientSecret String?
+  oauthOidcAuthorizeUrl String?
+  oauthOidcTokenUrl     String?
+  oauthOidcUserinfoUrl  String?
 
   mfaTotpEnabled Boolean @default(false)
   mfaTotpIssuer  String  @default("Zipline")
@@ -104,11 +104,11 @@ model Zipline {
   discordUsername   String?
   discordAvatarUrl  String?
 
-  discordOnUploadWebhookUrl  String?
-  discordOnUploadUsername    String?
-  discordOnUploadAvatarUrl   String?
-  discordOnUploadContent     String?
-  discordOnUploadEmbed       Json?
+  discordOnUploadWebhookUrl String?
+  discordOnUploadUsername   String?
+  discordOnUploadAvatarUrl  String?
+  discordOnUploadContent    String?
+  discordOnUploadEmbed      Json?
 
   discordOnShortenWebhookUrl String?
   discordOnShortenUsername   String?
@@ -142,6 +142,21 @@ model User {
   tags           Tag[]
   oauthProviders OAuthProvider[]
   IncompleteFile IncompleteFile[]
+  exports        Export[]
+}
+
+model Export {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  completed Boolean @default(false)
+  path      String
+  files     Int
+  size      String
+
+  User   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId String
 }
 
 model UserQuota {

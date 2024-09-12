@@ -3,25 +3,20 @@ import { datasource } from '@/lib/datasource';
 import { prisma } from '@/lib/db';
 import { log } from '@/lib/logger';
 import { userMiddleware } from '@/server/middleware/user';
+import { Export } from '@prisma/client';
 import fastifyPlugin from 'fastify-plugin';
 import { Zip, ZipPassThrough } from 'fflate';
 import { createWriteStream } from 'fs';
-import { readdir, rename, rm } from 'fs/promises';
+import { rm, stat } from 'fs/promises';
 import { join } from 'path';
 
 export type ApiUserExportResponse = {
   running?: boolean;
   deleted?: boolean;
-} & {
-  [key in 'running' | 'complete']: {
-    date: number;
-    files: number;
-    name: string;
-  }[];
-};
+} & Export[];
 
 type Query = {
-  name?: string;
+  id?: string;
 };
 
 export const PATH = '/api/user/export';
@@ -31,57 +26,40 @@ const logger = log('api').c('user').c('export');
 export default fastifyPlugin(
   (server, _, done) => {
     server.get<{ Querystring: Query }>(PATH, { preHandler: [userMiddleware] }, async (req, res) => {
-      const tmpFiles = await readdir(config.core.tempDirectory);
-      const userExports = tmpFiles
-        .filter((file) => file.startsWith(`zexport_${req.user.id}`) && file.endsWith('.zip'))
-        .map((file) => file.split('_'))
-        .filter((file) => file.length === 5);
+      const exports = await prisma.export.findMany({
+        where: { userId: req.user.id },
+      });
 
-      const incompleteExports = userExports
-        .filter((file) => file[file.length - 1] === 'incomplete.zip')
-        .map((file) => ({
-          date: Number(file[2]),
-          files: Number(file[3]),
-          name: file.join('_'),
-        }));
-      const completeExports = userExports
-        .filter((file) => file[file.length - 1] === 'complete.zip')
-        .map((file) => ({
-          date: Number(file[2]),
-          files: Number(file[3]),
-          name: file.join('_'),
-        }));
-
-      if (req.query.name) {
-        const file = completeExports.find((file) => file.name === req.query.name);
+      if (req.query.id) {
+        const file = exports.find((x) => x.id === req.query.id);
         if (!file) return res.notFound();
 
-        const path = join(config.core.tempDirectory, file.name);
+        if (!file.completed) return res.badRequest('Export is not completed');
+
+        const path = join(config.core.tempDirectory, file.path);
         return res.sendFile(path);
       }
 
-      return res.send({
-        running: incompleteExports,
-        complete: completeExports,
-      });
+      return res.send(exports);
     });
 
     server.delete<{ Querystring: Query }>(PATH, { preHandler: [userMiddleware] }, async (req, res) => {
-      if (!req.query.name) return res.badRequest('No name provided');
+      if (!req.query.id) return res.badRequest('No id provided');
 
-      const tmpFiles = await readdir(config.core.tempDirectory);
-      const userExports = tmpFiles
-        .filter((file) => file.startsWith(`zexport_${req.user.id}`) && file.endsWith('.zip'))
-        .map((file) => file.split('_'))
-        .filter((file) => file.length === 5 && file[file.length - 1] === 'complete.zip')
-        .map((file) => file.join('_'));
+      const exportDb = await prisma.export.findFirst({
+        where: {
+          userId: req.user.id,
+          id: req.query.id,
+        },
+      });
+      if (!exportDb) return res.notFound();
 
-      if (!userExports.includes(req.query.name)) return res.notFound();
+      const path = join(config.core.tempDirectory, exportDb.path);
 
-      const path = join(config.core.tempDirectory, req.query.name);
       await rm(path);
+      await prisma.export.delete({ where: { id: req.query.id } });
 
-      logger.info(`deleted export ${req.query.name}`);
+      logger.info(`deleted export ${exportDb.id}: ${exportDb.path}`);
 
       return res.send({ deleted: true });
     });
@@ -93,10 +71,19 @@ export default fastifyPlugin(
 
       if (!files.length) return res.badRequest('No files to export');
 
-      const exportFileName = `zexport_${req.user.id}_${Date.now()}_${files.length}_incomplete.zip`;
+      const exportFileName = `zexport_${req.user.id}_${Date.now()}_${files.length}.zip`;
       const exportPath = join(config.core.tempDirectory, exportFileName);
 
       logger.debug(`exporting ${req.user.id}`, { exportPath, files: files.length });
+
+      const exportDb = await prisma.export.create({
+        data: {
+          userId: req.user.id,
+          path: exportFileName,
+          files: files.length,
+          size: '0',
+        },
+      });
 
       const writeStream = createWriteStream(exportPath);
       const zip = new Zip();
@@ -150,6 +137,8 @@ export default fastifyPlugin(
           logger.debug('error while writing to zip', { err });
           logger.error(`export for ${req.user.id} failed`);
 
+          await prisma.export.delete({ where: { id: exportDb.id } });
+
           return;
         }
 
@@ -157,14 +146,17 @@ export default fastifyPlugin(
 
         if (!final) return;
 
-        const newExportName = `zexport_${req.user.id}_${Date.now()}_${files.length}_complete.zip`;
-        const path = join(config.core.tempDirectory, newExportName);
-
         writeStream.end();
-        logger.debug('exported', { path, bytes: data.length });
-        logger.info(`export for ${req.user.id} finished at ${path}`);
+        logger.debug('exported', { path: exportPath, bytes: data.length });
+        logger.info(`export for ${req.user.id} finished at ${exportPath}`);
 
-        await rename(exportPath, path);
+        await prisma.export.update({
+          where: { id: exportDb.id },
+          data: {
+            completed: true,
+            size: (await stat(exportPath)).size.toString(),
+          },
+        });
       };
 
       for (let i = 0; i !== files.length; ++i) {
