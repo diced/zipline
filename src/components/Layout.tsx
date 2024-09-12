@@ -34,6 +34,7 @@ import {
   IconLink,
   IconLogout,
   IconRefreshDot,
+  IconSettingsExclamation,
   IconSettingsFilled,
   IconShieldLockFilled,
   IconTags,
@@ -114,6 +115,12 @@ const navLinks: NavLinks[] = [
     if: (user) => isAdministrator(user?.role),
     active: (path: string) => path.startsWith('/dashboard/admin'),
     links: [
+      {
+        label: 'Settings',
+        icon: <IconSettingsFilled size='1rem' />,
+        active: (path: string) => path === '/dashboard/admin/settings',
+        href: '/dashboard/admin/settings',
+      },
       {
         label: 'Users',
         icon: <IconUsersGroup size='1rem' />,
@@ -231,7 +238,7 @@ export default function Layout({ children, config }: { children: React.ReactNode
             <Avatar src={config.website.titleLogo} alt='Zipline logo' radius='sm' size='md' mr='md' />
           )}
 
-          <Title fw={700}>Zipline</Title>
+          <Title fw={700}>{config.website.title.trim()}</Title>
 
           <div style={{ marginLeft: 'auto' }}>
             <Menu shadow='md' width={200}>
@@ -274,6 +281,16 @@ export default function Layout({ children, config }: { children: React.ReactNode
                 >
                   Settings
                 </Menu.Item>
+
+                {isAdministrator(user?.role) && (
+                  <Menu.Item
+                    leftSection={<IconSettingsExclamation size='1rem' />}
+                    component={Link}
+                    href='/dashboard/admin/settings'
+                  >
+                    Server Settings
+                  </Menu.Item>
+                )}
 
                 <Menu.Divider />
                 <Menu.Item

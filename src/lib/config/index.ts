@@ -1,5 +1,5 @@
-import { readEnv } from './read';
-import { validateEnv, Config } from './validate';
+import { read } from './read';
+import { validateConfigObject, Config } from './validate';
 
 let config: Config;
 
@@ -8,11 +8,10 @@ declare global {
   var __config__: Config;
 }
 
-if (!global.__config__) {
-  global.__config__ = validateEnv(readEnv());
-}
+const reloadSettings = async () => {
+  config = global.__config__ = validateConfigObject((await read()) as any);
+};
 
-// eslint-disable-next-line prefer-const
 config = global.__config__;
 
-export { config };
+export { config, reloadSettings };

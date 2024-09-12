@@ -42,7 +42,9 @@ const logger = log('api').c('user').c('urls');
 
 export default fastifyPlugin(
   (server, _, done) => {
-    const rateLimit = server.rateLimit();
+    const rateLimit = server.rateLimit
+      ? server.rateLimit()
+      : (_req: any, _res: any, next: () => any) => next();
 
     server.post<{ Body: Body; Headers: Headers }>(
       PATH,

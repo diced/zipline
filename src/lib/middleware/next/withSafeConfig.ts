@@ -1,3 +1,4 @@
+import { config as libConfig, reloadSettings } from '@/lib/config';
 import { SafeConfig, safeConfig } from '@/lib/config/safe';
 import { ZiplineTheme } from '@/lib/theme';
 import { readThemes } from '@/lib/theme/file';
@@ -13,8 +14,9 @@ export function withSafeConfig<T = unknown>(
   }
 > {
   return async (ctx) => {
-    const config = safeConfig();
+    if (!libConfig) await reloadSettings();
 
+    const config = safeConfig(libConfig);
     const data = await fn(ctx, config);
 
     if ((data as any) && (data as any).notFound)

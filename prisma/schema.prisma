@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["omitApi"]
 }
 
 datasource db {
@@ -13,6 +14,107 @@ model Zipline {
   updatedAt DateTime @updatedAt
 
   firstSetup Boolean @default(true)
+
+  coreReturnHttpsUrls Boolean @default(false)
+  coreDefaultDomain   String?
+  coreTempDirectory   String // default join(tmpdir(), 'zipline')
+
+  chunksEnabled Boolean @default(true)
+  chunksMax     Int     @default(99614720)
+  chunksSize    Int     @default(26214400)
+
+  tasksDeleteInterval       Int @default(1800000)
+  tasksClearInvitesInterval Int @default(1800000)
+  tasksMaxViewsInterval     Int @default(1800000)
+  tasksThumbnailsInterval   Int @default(1800000)
+  tasksMetricsInterval      Int @default(1800000)
+
+  filesRoute              String   @default("/u")
+  filesLength             Int      @default(6)
+  filesDefaultFormat      String   @default("random")
+  filesDisabledExtensions String[]
+  filesMaxFileSize        Int      @default(104857600)
+  filesDefaultExpiration  Int?
+  filesAssumeMimetypes    Boolean  @default(false)
+  filesDefaultDateFormat  String   @default("YYYY-MM-DD_HH:mm:ss")
+  filesRemoveGpsMetadata  Boolean  @default(false)
+
+  urlsRoute  String @default("/go")
+  urlsLength Int    @default(6)
+
+  featuresImageCompression  Boolean @default(true)
+  featuresRobotsTxt         Boolean @default(true)
+  featuresHealthcheck       Boolean @default(true)
+  featuresUserRegistration  Boolean @default(false)
+  featuresOauthRegistration Boolean @default(false)
+  featuresDeleteOnMaxViews  Boolean @default(true)
+
+  featuresThumbnailsEnabled       Boolean @default(true)
+  featuresThumbnailsNumberThreads Int     @default(4)
+
+  featuresMetricsEnabled          Boolean @default(true)
+  featuresMetricsAdminOnly        Boolean @default(false)
+  featuresMetricsShowUserSpecific Boolean @default(true)
+
+  invitesEnabled Boolean @default(true)
+  invitesLength  Int     @default(6)
+
+  websiteTitle           String  @default("Zipline")
+  websiteTitleLogo       String?
+  websiteExternalLinks   Json    @default("[{ \"name\": \"GitHub\", \"url\": \"https://github.com/diced/zipline\"}, { \"name\": \"Documentation\", \"url\": \"https://zipline.diced.sh/\"}]")
+  websiteLoginBackground String?
+  websiteDefaultAvatar   String?
+
+  websiteThemeDefault String @default("system")
+  websiteThemeDark    String @default("builtin:dark_gray")
+  websiteThemeLight   String @default("builtin:light_gray")
+
+  oauthBypassLocalLogin  Boolean @default(false)
+  oauthLoginOnly         Boolean @default(false)
+  
+  oauthDiscordClientId   String?
+  oauthDiscordClientSecret String?
+
+  oauthGoogleClientId    String?
+  oauthGoogleClientSecret String?
+
+  oauthGithubClientId    String?
+  oauthGithubClientSecret String?
+
+  oauthOidcClientId      String?
+  oauthOidcClientSecret  String?
+  oauthOidcAuthorizeUrl  String?
+  oauthOidcTokenUrl      String?
+  oauthOidcUserinfoUrl   String?
+
+  mfaTotpEnabled Boolean @default(false)
+  mfaTotpIssuer  String  @default("Zipline")
+  mfaPasskeys    Boolean @default(false)
+
+  ratelimitEnabled     Boolean  @default(true)
+  ratelimitMax         Int      @default(10)
+  ratelimitWindow      Int?
+  ratelimitAdminBypass Boolean  @default(true)
+  ratelimitAllowList   String[]
+
+  httpWebhookOnUpload  String?
+  httpWebhookOnShorten String?
+
+  discordWebhookUrl String?
+  discordUsername   String?
+  discordAvatarUrl  String?
+
+  discordOnUploadWebhookUrl  String?
+  discordOnUploadUsername    String?
+  discordOnUploadAvatarUrl   String?
+  discordOnUploadContent     String?
+  discordOnUploadEmbed       Json?
+
+  discordOnShortenWebhookUrl String?
+  discordOnShortenUsername   String?
+  discordOnShortenAvatarUrl  String?
+  discordOnShortenContent    String?
+  discordOnShortenEmbed      Json?
 }
 
 model User {
@@ -113,7 +215,7 @@ model File {
   updatedAt DateTime  @updatedAt
   deletesAt DateTime?
 
-  name         String  // name & file saved on datasource
+  name         String // name & file saved on datasource
   originalName String? // original name of file when uploaded
   size         BigInt
   type         String

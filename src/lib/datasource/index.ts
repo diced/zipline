@@ -11,15 +11,17 @@ declare global {
   var __datasource__: Datasource;
 }
 
-if (!global.__datasource__) {
+function getDatasource(conf?: typeof config): void {
+  if (!conf) return;
+
   const logger = log('datasource');
 
   switch (config.datasource.type) {
     case 'local':
-      global.__datasource__ = new LocalDatasource(config.datasource.local!.directory);
+      datasource = global.__datasource__ = new LocalDatasource(config.datasource.local!.directory);
       break;
     case 's3':
-      global.__datasource__ = new S3Datasource({
+      datasource = global.__datasource__ = new S3Datasource({
         accessKeyId: config.datasource.s3!.accessKeyId,
         secretAccessKey: config.datasource.s3!.secretAccessKey,
         region: config.datasource.s3?.region,
@@ -35,4 +37,8 @@ if (!global.__datasource__) {
 // eslint-disable-next-line prefer-const
 datasource = global.__datasource__;
 
-export { datasource };
+if (!global.__datasource__ && !datasource) {
+  getDatasource(config);
+}
+
+export { datasource, getDatasource };

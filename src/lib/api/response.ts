@@ -11,6 +11,7 @@ import { ApiHealthcheckResponse } from '@/server/routes/api/healthcheck';
 import { ApiServerClearTempResponse } from '@/server/routes/api/server/clear_temp';
 import { ApiServerClearZerosResponse } from '@/server/routes/api/server/clear_zeros';
 import { ApiServerRequerySizeResponse } from '@/server/routes/api/server/requery_size';
+import { ApiServerSettingsResponse } from '@/server/routes/api/server/settings';
 import { ApiSetupResponse } from '@/server/routes/api/setup';
 import { ApiStatsResponse } from '@/server/routes/api/stats';
 import { ApiUploadResponse } from '@/server/routes/api/upload';
@@ -69,6 +70,7 @@ export type Response = {
   '/api/server/clear_temp': ApiServerClearTempResponse;
   '/api/server/clear_zeros': ApiServerClearZerosResponse;
   '/api/server/requery_size': ApiServerRequerySizeResponse;
+  '/api/server/settings': ApiServerSettingsResponse;
   '/api/healthcheck': ApiHealthcheckResponse;
   '/api/setup': ApiSetupResponse;
   '/api/upload': ApiUploadResponse;

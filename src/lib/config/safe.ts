@@ -1,4 +1,3 @@
-import { config } from '.';
 import enabled from '../oauth/enabled';
 import { Config } from './validate';
 
@@ -11,9 +10,10 @@ export type SafeConfig = Omit<
     bypassLocalLogin: boolean;
     loginOnly: boolean;
   };
+  version: string;
 };
 
-export function safeConfig(): SafeConfig {
+export function safeConfig(config: Config): SafeConfig {
   const { datasource: _d, core: _c, oauth, discord: _di, ratelimit: _r, httpWebhook: _h, ...rest } = config;
 
   (rest as SafeConfig).oauthEnabled = enabled(config);

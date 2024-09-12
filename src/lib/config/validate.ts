@@ -1,5 +1,5 @@
 import { ZodError, ZodIssue, z } from 'zod';
-import { PROP_TO_ENV, ParsedEnv } from './read';
+import { PROP_TO_ENV, ParsedConfig } from './read';
 import { log } from '../logger';
 import { join, resolve } from 'path';
 import { bytes } from '../bytes';
@@ -303,7 +303,7 @@ export type Config = z.infer<typeof schema>;
 
 const logger = log('config').c('validate');
 
-export function validateEnv(env: ParsedEnv): Config {
+export function validateConfigObject(env: ParsedConfig): Config {
   const building = !!process.env.ZIPLINE_BUILD;
 
   if (building) {
@@ -320,7 +320,7 @@ export function validateEnv(env: ParsedEnv): Config {
       process.exit(1);
     }
 
-    logger.debug(`environment validated: ${JSON.stringify(validated)}`);
+    logger.debug('reloaded config');
 
     return validated;
   } catch (e) {

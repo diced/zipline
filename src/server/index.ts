@@ -1,8 +1,10 @@
-import { readEnv } from '@/lib/config/read';
-import { validateEnv } from '@/lib/config/validate';
+import { reloadSettings } from '@/lib/config';
+import { getDatasource } from '@/lib/datasource';
 import { prisma } from '@/lib/db';
 import { runMigrations } from '@/lib/db/migration';
 import { log } from '@/lib/logger';
+import { notNull } from '@/lib/primitive';
+import { isAdministrator } from '@/lib/role';
 import { Tasks } from '@/lib/tasks';
 import clearInvites from '@/lib/tasks/run/clearInvites';
 import deleteFiles from '@/lib/tasks/run/deleteFiles';
@@ -24,8 +26,6 @@ import next, { ALL_METHODS } from './plugins/next';
 import loadRoutes from './routes';
 import { filesRoute } from './routes/files.dy';
 import { urlsRoute } from './routes/urls.dy';
-import { isAdministrator } from '@/lib/role';
-import { notNull } from '@/lib/primitive';
 
 const MODE = process.env.NODE_ENV || 'production';
 const logger = log('server');
@@ -42,8 +42,11 @@ BigInt.prototype.toJSON = function () {
 
 async function main() {
   logger.info('starting zipline', { mode: MODE, version: version });
-  logger.info('reading environment for configuration');
-  const config = validateEnv(readEnv());
+  logger.info('reading settings...');
+  await reloadSettings();
+
+  const config = global.__config__;
+  getDatasource(config);
 
   if (config.datasource.type === 'local') {
     await mkdir(config.datasource.local!.directory, { recursive: true });
@@ -168,6 +171,18 @@ async function main() {
         server.getDefaultJsonParser('error', 'ignore')(req, bodyString, done);
       });
     } else done(null, body);
+  });
+
+  server.setErrorHandler((error, req, res) => {
+    logger.error(error);
+
+    if (error.statusCode) {
+      res.status(error.statusCode);
+      res.send({ error: error.message, statusCode: error.statusCode });
+    } else {
+      res.status(500);
+      res.send({ error: 'Internal Server Error', statusCode: 500, message: error.message });
+    }
   });
 
   await server.listen({
