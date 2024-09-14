@@ -1,4 +1,4 @@
-FROM node:18-alpine3.16 as base
+FROM node:20-alpine3.19 AS base
 
 ENV PNPM_HOME="/pnpm"
 RUN corepack enable pnpm
@@ -6,15 +6,14 @@ RUN corepack prepare pnpm@latest --activate
 
 WORKDIR /zipline
 
-
 COPY prisma ./prisma
 COPY package.json .
 COPY pnpm-lock.yaml .
 
-FROM base as deps
+FROM base AS deps
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
 
-FROM base as builder
+FROM base AS builder
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
 COPY src ./src
@@ -41,7 +40,6 @@ COPY --from=builder /zipline/mimes.json ./mimes.json
 COPY --from=builder /zipline/code.json ./code.json
 
 # clean
-RUN yarn cache clean --all
 RUN rm -rf /tmp/* /root/*
 
 CMD ["node", "--enable-source-maps", "build/server"]

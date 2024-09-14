@@ -4,7 +4,6 @@ import { bytes } from '../bytes';
 import { prisma } from '../db';
 import { join } from 'path';
 import { tmpdir } from 'os';
-import { setProperty } from 'dot-prop';
 
 type EnvType = 'string' | 'string[]' | 'number' | 'boolean' | 'byte' | 'ms' | 'json[]';
 
@@ -368,6 +367,31 @@ export async function read() {
   }
 
   return raw;
+}
+
+function isObject(value: any) {
+  return typeof value === 'object' && value !== null;
+}
+
+function setProperty(obj: any, path: string, value: any) {
+  if (!isObject(obj)) return obj;
+
+  const root = obj;
+  const dot = path.split('.');
+
+  for (let i = 0; i !== dot.length; ++i) {
+    const key = dot[i];
+
+    if (i === dot.length - 1) {
+      obj[key] = value;
+    } else if (!isObject(obj[key])) {
+      obj[key] = typeof dot[i + 1] === 'number' ? [] : {};
+    }
+
+    obj = obj[key];
+  }
+
+  return root;
 }
 
 function env(property: keyof typeof PROP_TO_ENV, type: EnvType) {

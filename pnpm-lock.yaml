@@ -92,9 +92,6 @@ importers:
       dayjs:
         specifier: ^1.11.10
         version: 1.11.10
-      dot-prop:
-        specifier: ^9.0.0
-        version: 9.0.0
       dotenv:
         specifier: ^16.3.1
         version: 16.3.1
@@ -2264,10 +2261,6 @@ packages:
 
   dompurify@3.0.6:
     resolution: {integrity: sha512-ilkD8YEnnGh1zJ240uJsW7AzE+2qpbOUYjacomn3AvJ6J4JhKGSZ2nh4wUIXPZrEPppaCLx5jFe8T89Rk8tQ7w==}
-
-  dot-prop@9.0.0:
-    resolution: {integrity: sha512-1gxPBJpI/pcjQhKgIU91II6Wkay+dLcN3M6rf2uwP8hRur3HtQXjVrdAK3sjC0piaEuxzMwjXChcETiJl47lAQ==}
-    engines: {node: '>=18'}
 
   dotenv@16.3.1:
     resolution: {integrity: sha512-IPzF4w4/Rd94bA9imS68tZBaYyBWSCE47V1RGuMrB94iyTOIEwRmVL2x/4An+6mETpLrKJ5hQkB8W4kFAadeIQ==}
@@ -4451,10 +4444,6 @@ packages:
   type-fest@3.13.1:
     resolution: {integrity: sha512-tLq3bSNx+xSpwvAJnzrK0Ep5CLNWjvFTOp71URMaAEWBfRb9nnJiBoUe0tF8bI4ZFO3omgBR6NvnbzVUT3Ly4g==}
     engines: {node: '>=14.16'}
-
-  type-fest@4.26.0:
-    resolution: {integrity: sha512-OduNjVJsFbifKb57UqZ2EMP1i4u64Xwow3NYXUtBbD4vIwJdQd4+xl8YDou1dlm4DVrtwT/7Ky8z8WyCULVfxw==}
-    engines: {node: '>=16'}
 
   type-is@1.6.18:
     resolution: {integrity: sha512-TkRKr9sUTxEH8MdfuCSP7VizJyzRNMjj2J2do2Jr3Kym598JVdEksuzPQCnlFPW4ky9Q+iA+ma9BGm06XQBy8g==}
@@ -7333,10 +7322,6 @@ snapshots:
 
   dompurify@3.0.6: {}
 
-  dot-prop@9.0.0:
-    dependencies:
-      type-fest: 4.26.0
-
   dotenv@16.3.1: {}
 
   dotignore@0.1.2:
@@ -10003,8 +9988,6 @@ snapshots:
   type-fest@0.20.2: {}
 
   type-fest@3.13.1: {}
-
-  type-fest@4.26.0: {}
 
   type-is@1.6.18:
     dependencies:

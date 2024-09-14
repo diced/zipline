@@ -34,19 +34,16 @@ export default function ServerSettingsDiscord({
   });
 
   const onSubmitMain = async (values: typeof formMain.values) => {
-    for (const key in values) {
-      if ((values[key as keyof typeof formMain.values] as string)?.trim() === '') {
-        // @ts-ignore
-        values[key as keyof typeof formMain.values] = null;
-      } else {
-        // @ts-ignore
-        values[key as keyof typeof formMain.values] = (
-          values[key as keyof typeof formMain.values] as string
-        )?.trim();
-      }
-    }
+    const sendValues: Record<string, any> = {};
 
-    return settingsOnSubmit(router, formMain)(values);
+    sendValues.discordWebhookUrl =
+      values.discordWebhookUrl?.trim() === '' ? null : values.discordWebhookUrl?.trim();
+    sendValues.discordUsername =
+      values.discordUsername?.trim() === '' ? null : values.discordUsername?.trim();
+    sendValues.discordAvatarUrl =
+      values.discordAvatarUrl?.trim() === '' ? null : values.discordAvatarUrl?.trim();
+
+    return settingsOnSubmit(router, formMain)(sendValues);
   };
 
   const formOnUpload = useForm({
@@ -91,6 +88,8 @@ export default function ServerSettingsDiscord({
 
   const onSubmitNotif = (type: 'upload' | 'shorten') => async (values: Record<string, any>) => {
     const sendValues: Record<string, any> = {};
+
+    console.log(values);
 
     const prefix = type === 'upload' ? 'discordOnUpload' : 'discordOnShorten';
 
@@ -212,21 +211,21 @@ export default function ServerSettingsDiscord({
               label='Webhook URL'
               description='The Discord webhook URL to send notifications to. If this is left blank, the main webhook url will be used'
               placeholder='https://discord.com/api/webhooks/...'
-              {...formMain.getInputProps('discordOnUploadWebhookUrl')}
+              {...formOnUpload.getInputProps('discordOnUploadWebhookUrl')}
             />
 
             <SimpleGrid mt='md' cols={{ base: 1, md: 2 }} spacing='lg'>
               <TextInput
                 label='Username'
                 description='The username to send notifications as. If this is left blank, the main username will be used'
-                {...formMain.getInputProps('discordOnUploadUsername')}
+                {...formOnUpload.getInputProps('discordOnUploadUsername')}
               />
 
               <TextInput
                 label='Avatar URL'
                 description='The avatar for the webhook. If this is left blank, the main avatar will be used'
                 placeholder='https://example.com/avatar.png'
-                {...formMain.getInputProps('discordOnUploadAvatarUrl')}
+                {...formOnUpload.getInputProps('discordOnUploadAvatarUrl')}
               />
             </SimpleGrid>
 
@@ -306,21 +305,21 @@ export default function ServerSettingsDiscord({
               label='Webhook URL'
               description='The Discord webhook URL to send notifications to. If this is left blank, the main webhook url will be used'
               placeholder='https://discord.com/api/webhooks/...'
-              {...formMain.getInputProps('discordOnShortenWebhookUrl')}
+              {...formOnShorten.getInputProps('discordOnShortenWebhookUrl')}
             />
 
             <SimpleGrid mt='md' cols={{ base: 1, md: 2 }} spacing='lg'>
               <TextInput
                 label='Username'
                 description='The username to send notifications as. If this is left blank, the main username will be used'
-                {...formMain.getInputProps('discordOnShortenUsername')}
+                {...formOnShorten.getInputProps('discordOnShortenUsername')}
               />
 
               <TextInput
                 label='Avatar URL'
                 description='The avatar for the webhook. If this is left blank, the main avatar will be used'
                 placeholder='https://example.com/avatar.png'
-                {...formMain.getInputProps('discordOnShortenAvatarUrl')}
+                {...formOnShorten.getInputProps('discordOnShortenAvatarUrl')}
               />
             </SimpleGrid>
 
