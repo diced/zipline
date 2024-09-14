@@ -28,21 +28,23 @@ export default function RequerySizeButton() {
         message: data.status,
         icon: <IconFileSearch size='1rem' />,
       });
+
+      modals.closeAll();
     }
   };
 
   return (
     <>
       <Modal title={<Title>Are you sure?</Title>} opened={open} onClose={() => setOpen(false)}>
-        <Stack>
+        <Stack mb='md'>
           <span>
             This will requery the size of every file stored within the database. Additionally you can use the
-            options below to delete file that aren&apos;t found in the database as well as force updating the
-            size of every file whether or not it has a size.
+            options below.
           </span>
 
           <Switch
             label='Force Update'
+            description='Force update the size of every file, even if it already has a size set.'
             checked={forceUpdate}
             onChange={() => setForceUpdate((val) => !val)}
             color='red'
@@ -50,6 +52,7 @@ export default function RequerySizeButton() {
 
           <Switch
             label='Force Delete'
+            description='Delete files that are not found in the database, or have a size of 0.'
             checked={forceDelete}
             onChange={() => setForceDelete((val) => !val)}
             color='red'

@@ -18,10 +18,12 @@ import {
 import { notifications } from '@mantine/notifications';
 import {
   IconChevronDown,
+  IconDeviceFloppy,
   IconPhoto,
   IconPhotoCancel,
   IconPhotoUp,
   IconSettingsFilled,
+  IconX,
 } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 
@@ -152,11 +154,17 @@ export default function SettingsAvatar() {
             </Button>
           )}
           {currentAvatar && (
-            <Button variant='outline' color='red' onClick={clearAvatar}>
+            <Button leftSection={<IconX size='1rem' />} color='red' onClick={clearAvatar}>
               Remove Avatar
             </Button>
           )}
-          <Button variant='outline' disabled={!avatar} onClick={saveAvatar}>
+
+          <Button
+            type='submit'
+            disabled={!avatar}
+            leftSection={<IconDeviceFloppy size='1rem' />}
+            onClick={saveAvatar}
+          >
             Save
           </Button>
         </Group>

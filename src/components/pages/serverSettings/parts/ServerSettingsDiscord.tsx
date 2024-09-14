@@ -1,5 +1,15 @@
 import { Response } from '@/lib/api/response';
-import { Button, Collapse, ColorInput, Paper, SimpleGrid, Switch, TextInput, Title } from '@mantine/core';
+import {
+  Button,
+  Collapse,
+  ColorInput,
+  LoadingOverlay,
+  Paper,
+  SimpleGrid,
+  Switch,
+  TextInput,
+  Title,
+} from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconDeviceFloppy } from '@tabler/icons-react';
 import { useRouter } from 'next/router';
@@ -159,7 +169,9 @@ export default function ServerSettingsDiscord({
   }, [data]);
 
   return (
-    <Paper withBorder p='sm'>
+    <Paper withBorder p='sm' pos='relative'>
+      <LoadingOverlay visible={isLoading} />
+
       <Title order={2}>Discord Webhook</Title>
 
       <form onSubmit={formMain.onSubmit(onSubmitMain)}>
@@ -186,13 +198,7 @@ export default function ServerSettingsDiscord({
           />
         </SimpleGrid>
 
-        <Button
-          type='submit'
-          color='blue'
-          mt='md'
-          loading={isLoading}
-          leftSection={<IconDeviceFloppy size='1rem' />}
-        >
+        <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
           Save
         </Button>
       </form>
@@ -285,13 +291,7 @@ export default function ServerSettingsDiscord({
               </Paper>
             </Collapse>
 
-            <Button
-              type='submit'
-              color='blue'
-              mt='md'
-              loading={isLoading}
-              leftSection={<IconDeviceFloppy size='1rem' />}
-            >
+            <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
               Save
             </Button>
           </form>
@@ -387,13 +387,7 @@ export default function ServerSettingsDiscord({
               </Paper>
             </Collapse>
 
-            <Button
-              type='submit'
-              color='blue'
-              mt='md'
-              loading={isLoading}
-              leftSection={<IconDeviceFloppy size='1rem' />}
-            >
+            <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
               Save
             </Button>
           </form>

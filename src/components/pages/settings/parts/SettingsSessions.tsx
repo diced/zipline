@@ -3,7 +3,7 @@ import { fetchApi } from '@/lib/fetchApi';
 import { Button, Paper, Text, Title } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import { showNotification } from '@mantine/notifications';
-import { IconLogout, IconLogout2 } from '@tabler/icons-react';
+import { IconLogout } from '@tabler/icons-react';
 import useSWR from 'swr';
 
 export default function SettingsSessions() {
@@ -39,17 +39,17 @@ export default function SettingsSessions() {
     <Paper withBorder p='sm'>
       <Title order={2}>Sessions</Title>
 
-      <Text c='muted' mt='sm'>
+      <Text c='dimmed' mt='sm'>
         You are currently logged into {isLoading ? '...' : data?.other?.length ?? '...'} other devices
       </Text>
 
       <Button
-        mt='sm'
         fullWidth
         color='red'
+        mt='md'
         disabled={isLoading || !data?.other?.length}
         onClick={handleLogOutOfAllDevices}
-        leftSection={<IconLogout2 size='1rem' />}
+        leftSection={<IconLogout size='1rem' />}
       >
         Log out everywhere
       </Button>

@@ -3,7 +3,8 @@ import { Response } from '@/lib/api/response';
 import { fetchApi } from '@/lib/fetchApi';
 import { findProvider } from '@/lib/oauth/providerUtil';
 import { useUserStore } from '@/lib/store/user';
-import { Button, ButtonProps, Group, Paper, Text, Title, useMantineTheme } from '@mantine/core';
+import { darken } from '@/lib/theme/color';
+import { Button, ButtonProps, Paper, SimpleGrid, Text, Title, useMantineTheme } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import type { OAuthProviderType } from '@prisma/client';
 import {
@@ -16,7 +17,6 @@ import {
 } from '@tabler/icons-react';
 import Link from 'next/link';
 import { mutate } from 'swr';
-import { darken } from '@/lib/theme/color';
 
 import styles from './index.module.css';
 
@@ -99,12 +99,12 @@ export default function SettingsOAuth() {
         Manage your connected OAuth providers.
       </Text>
 
-      <Group mt='xs'>
+      <SimpleGrid mt='xs' cols={{ base: 1, md: 2 }} spacing='lg'>
         {config.oauthEnabled.discord && <OAuthButton provider='DISCORD' linked={!!discordLinked} />}
         {config.oauthEnabled.github && <OAuthButton provider='GITHUB' linked={!!githubLinked} />}
         {config.oauthEnabled.google && <OAuthButton provider='GOOGLE' linked={!!googleLinked} />}
         {config.oauthEnabled.oidc && <OAuthButton provider='OIDC' linked={!!oidcLinked} />}
-      </Group>
+      </SimpleGrid>
     </Paper>
   );
 }

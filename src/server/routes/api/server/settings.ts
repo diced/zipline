@@ -6,7 +6,7 @@ import { readThemes } from '@/lib/theme/file';
 import { administratorMiddleware } from '@/server/middleware/administrator';
 import { userMiddleware } from '@/server/middleware/user';
 import fastifyPlugin from 'fastify-plugin';
-import { existsSync } from 'fs';
+import { statSync } from 'fs';
 import ms from 'ms';
 import { cpus } from 'os';
 import { z } from 'zod';
@@ -15,6 +15,16 @@ type Settings = Awaited<ReturnType<typeof readDatabaseSettings>>;
 
 export type ApiServerSettingsResponse = Settings;
 type Body = Partial<Settings>;
+
+const zMs = z
+  .union([z.number().min(1), z.string()])
+  .transform((value) => (typeof value === 'string' ? ms(value) : value))
+  .refine((value) => value > 0, 'Value must be greater than 0');
+
+const zBytes = z
+  .union([z.number().min(1), z.string()])
+  .transform((value) => (typeof value === 'string' ? bytes(value) : value))
+  .refine((value) => value > 0, 'Value must be greater than 0');
 
 const discordEmbed = z
   .union([
@@ -79,35 +89,25 @@ export default fastifyPlugin(
 
         const settingsBodySchema = z
           .object({
-            coreTempDirectory: z
-              .string()
-              .refine((dir) => !dir || existsSync(dir), 'temp directory does not exist'),
+            coreTempDirectory: z.string().refine((dir) => {
+              try {
+                return !dir || statSync(dir).isDirectory();
+              } catch {
+                return false;
+              }
+            }, 'Directory does not exist'),
             coreDefaultDomain: z.string().nullable(),
             coreReturnHttpsUrls: z.boolean(),
 
             chunksEnabled: z.boolean(),
-            chunksMax: z
-              .union([z.number(), z.string()])
-              .transform((value) => (typeof value === 'string' ? bytes(value) : value)),
-            chunksSize: z
-              .union([z.number(), z.string()])
-              .transform((value) => (typeof value === 'string' ? bytes(value) : value)),
+            chunksMax: zBytes,
+            chunksSize: zBytes,
 
-            tasksDeleteInterval: z
-              .union([z.number(), z.string()])
-              .transform((value) => (typeof value === 'string' ? ms(value) : value)),
-            tasksClearInvitesInterval: z
-              .union([z.number(), z.string()])
-              .transform((value) => (typeof value === 'string' ? ms(value) : value)),
-            tasksMaxViewsInterval: z
-              .union([z.number(), z.string()])
-              .transform((value) => (typeof value === 'string' ? ms(value) : value)),
-            tasksThumbnailsInterval: z
-              .union([z.number(), z.string()])
-              .transform((value) => (typeof value === 'string' ? ms(value) : value)),
-            tasksMetricsInterval: z
-              .union([z.number(), z.string()])
-              .transform((value) => (typeof value === 'string' ? ms(value) : value)),
+            tasksDeleteInterval: zMs,
+            tasksClearInvitesInterval: zMs,
+            tasksMaxViewsInterval: zMs,
+            tasksThumbnailsInterval: zMs,
+            tasksMetricsInterval: zMs,
 
             filesRoute: z.string().startsWith('/'),
             filesLength: z.number().min(1).max(64),
@@ -117,13 +117,9 @@ export default fastifyPlugin(
               .transform((value) =>
                 typeof value === 'string' ? value.split(',').map((ext) => ext.trim()) : value,
               ),
-            filesMaxFileSize: z
-              .union([z.number(), z.string()])
-              .transform((value) => (typeof value === 'string' ? bytes(value) : value)),
-            filesDefaultExpiration: z
-              .union([z.number(), z.string()])
-              .nullable()
-              .transform((value) => (typeof value === 'string' ? ms(value) : value)),
+            filesMaxFileSize: zMs,
+
+            filesDefaultExpiration: zBytes,
             filesAssumeMimetypes: z.boolean(),
             filesDefaultDateFormat: z.string(),
             filesRemoveGpsMetadata: z.boolean(),
@@ -143,7 +139,7 @@ export default fastifyPlugin(
 
             featuresMetricsEnabled: z.boolean(),
             featuresMetricsAdminOnly: z.boolean(),
-            feaeturesMetricsShowUserSpecific: z.boolean(),
+            featuresMetricsShowUserSpecific: z.boolean(),
 
             invitesEnabled: z.boolean(),
             invitesLength: z.number().min(1).max(64),
@@ -163,6 +159,17 @@ export default fastifyPlugin(
               .transform((value) => (typeof value === 'string' ? JSON.parse(value) : value)),
             websiteLoginBackground: z.string().url().nullable(),
             websiteDefaultAvatar: z.string().url().nullable(),
+            websiteTos: z
+              .string()
+              .nullable()
+              .refine((input) => !input || input.endsWith('.md'), 'File is not a markdown file')
+              .refine((input) => {
+                try {
+                  return !input || statSync(input).isFile();
+                } catch {
+                  return false;
+                }
+              }, 'File does not exist'),
 
             websiteThemeDefault: z.enum(['system', ...themes]),
             websiteThemeDark: z.enum(themes as unknown as readonly [string, ...string[]]),
@@ -188,7 +195,7 @@ export default fastifyPlugin(
             mfaPasskeys: z.boolean(),
 
             ratelimitEnabled: z.boolean(),
-            ratelimitMax: z.number(),
+            ratelimitMax: z.number().refine((value) => value > 0, 'Value must be greater than 0'),
             ratelimitWindow: z.number().nullable(),
             ratelimitAdminBypass: z.boolean(),
             ratelimitAllowList: z
@@ -264,7 +271,11 @@ export default fastifyPlugin(
                 'oauthOidcUserinfoUrl',
               ],
             },
-          );
+          )
+          .refine((data) => !data.ratelimitWindow || (data.ratelimitMax && data.ratelimitMax > 0), {
+            message: 'ratelimitMax must be set if ratelimitWindow is set',
+            path: ['ratelimitMax'],
+          });
 
         const result = settingsBodySchema.safeParse(req.body);
         if (!result.success) {

@@ -1,5 +1,15 @@
 import { Response } from '@/lib/api/response';
-import { Button, NumberInput, Paper, SimpleGrid, Switch, Text, TextInput, Title } from '@mantine/core';
+import {
+  Button,
+  LoadingOverlay,
+  NumberInput,
+  Paper,
+  SimpleGrid,
+  Switch,
+  Text,
+  TextInput,
+  Title,
+} from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconDeviceFloppy } from '@tabler/icons-react';
 import { useRouter } from 'next/router';
@@ -61,7 +71,9 @@ export default function ServerSettingsRatelimit({
   }, [data]);
 
   return (
-    <Paper withBorder p='sm'>
+    <Paper withBorder p='sm' pos='relative'>
+      <LoadingOverlay visible={isLoading} />
+
       <Title order={2}>Ratelimit</Title>
 
       <Text c='dimmed' size='sm'>
@@ -110,13 +122,7 @@ export default function ServerSettingsRatelimit({
           />
         </SimpleGrid>
 
-        <Button
-          type='submit'
-          color='blue'
-          mt='md'
-          loading={isLoading}
-          leftSection={<IconDeviceFloppy size='1rem' />}
-        >
+        <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
           Save
         </Button>
       </form>

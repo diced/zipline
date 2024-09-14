@@ -151,8 +151,6 @@ export const PROP_TO_ENV = {
 
   'datasource.local.directory': 'DATASOURCE_LOCAL_DIRECTORY',
 
-  'website.tos': 'WEBSITE_TOS',
-
   'ssl.key': 'SSL_KEY',
   'ssl.cert': 'SSL_CERT',
 };
@@ -207,6 +205,7 @@ export const DATABASE_TO_PROP = {
   websiteExternalLinks: 'website.externalLinks',
   websiteLoginBackground: 'website.loginBackground',
   websiteDefaultAvatar: 'website.defaultAvatar',
+  websiteTos: 'website.tos',
 
   websiteThemeDefault: 'website.theme.default',
   websiteThemeDark: 'website.theme.dark',
@@ -304,8 +303,6 @@ export function readEnv() {
     env('datasource.s3.bucket', 'string'),
 
     env('datasource.local.directory', 'string'),
-
-    env('website.tos', 'string'),
 
     env('ssl.key', 'string'),
     env('ssl.cert', 'string'),

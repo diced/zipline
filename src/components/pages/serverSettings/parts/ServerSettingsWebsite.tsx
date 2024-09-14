@@ -1,5 +1,5 @@
 import { Response } from '@/lib/api/response';
-import { Button, Paper, SimpleGrid, TextInput, Title } from '@mantine/core';
+import { Button, JsonInput, Paper, SimpleGrid, TextInput, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconDeviceFloppy } from '@tabler/icons-react';
 import { useRouter } from 'next/router';
@@ -30,6 +30,7 @@ export default function ServerSettingsWebsite({
       websiteExternalLinks: JSON.stringify(defaultExternalLinks),
       websiteLoginBackground: '',
       websiteDefaultAvatar: '',
+      websiteTos: '',
 
       websiteThemeDefault: 'system',
       websiteThemeDark: 'builtin:dark_gray',
@@ -58,6 +59,7 @@ export default function ServerSettingsWebsite({
       values.websiteLoginBackground.trim() === '' ? null : values.websiteLoginBackground.trim();
     sendValues.websiteDefaultAvatar =
       values.websiteDefaultAvatar.trim() === '' ? null : values.websiteDefaultAvatar.trim();
+    sendValues.websiteTos = values.websiteTos.trim() === '' ? null : values.websiteTos.trim();
 
     sendValues.websiteThemeDefault = values.websiteThemeDefault.trim();
     sendValues.websiteThemeDark = values.websiteThemeDark.trim();
@@ -73,9 +75,10 @@ export default function ServerSettingsWebsite({
     form.setValues({
       websiteTitle: data?.websiteTitle ?? 'Zipline',
       websiteTitleLogo: data?.websiteTitleLogo ?? '',
-      websiteExternalLinks: JSON.stringify(data?.websiteExternalLinks ?? defaultExternalLinks),
+      websiteExternalLinks: JSON.stringify(data?.websiteExternalLinks ?? defaultExternalLinks, null, 2),
       websiteLoginBackground: data?.websiteLoginBackground ?? '',
       websiteDefaultAvatar: data?.websiteDefaultAvatar ?? '',
+      websiteTos: data?.websiteTos ?? '',
       websiteThemeDefault: data?.websiteThemeDefault ?? 'system',
       websiteThemeDark: data?.websiteThemeDark ?? 'builtin:dark_gray',
       websiteThemeLight: data?.websiteThemeLight ?? 'builtin:light_gray',
@@ -102,10 +105,14 @@ export default function ServerSettingsWebsite({
             {...form.getInputProps('websiteTitleLogo')}
           />
 
-          <TextInput
+          <JsonInput
             label='External Links'
             description='The external links to show in the footer. This must be valid JSON.'
-            placeholder={JSON.stringify(defaultExternalLinks)}
+            formatOnBlur
+            minRows={1}
+            maxRows={7}
+            autosize
+            placeholder={JSON.stringify(defaultExternalLinks, null, 2)}
             {...form.getInputProps('websiteExternalLinks')}
           />
 
@@ -121,6 +128,13 @@ export default function ServerSettingsWebsite({
             description='The path to use for the default avatar. This must be a path to an image, not a URL.'
             placeholder='/zipline/avatar.png'
             {...form.getInputProps('websiteDefaultAvatar')}
+          />
+
+          <TextInput
+            label='Terms of Service'
+            description='Path to a Markdown (.md) file to use for the terms of service.'
+            placeholder='/zipline/TOS.md'
+            {...form.getInputProps('websiteTos')}
           />
 
           <TextInput
@@ -147,13 +161,7 @@ export default function ServerSettingsWebsite({
           />
         </SimpleGrid>
 
-        <Button
-          type='submit'
-          color='blue'
-          mt='md'
-          loading={isLoading}
-          leftSection={<IconDeviceFloppy size='1rem' />}
-        >
+        <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
           Save
         </Button>
       </form>

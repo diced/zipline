@@ -1,11 +1,11 @@
 import { Response } from '@/lib/api/response';
-import { Button, Paper, SimpleGrid, Switch, TextInput, Title } from '@mantine/core';
+import { bytes } from '@/lib/bytes';
+import { Button, LoadingOverlay, Paper, SimpleGrid, Switch, TextInput, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconDeviceFloppy } from '@tabler/icons-react';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { settingsOnSubmit } from '../settingsOnSubmit';
-import { bytes } from '@/lib/bytes';
 
 export default function ServerSettingsChunks({
   swr: { data, isLoading },
@@ -34,17 +34,20 @@ export default function ServerSettingsChunks({
   }, [data]);
 
   return (
-    <Paper withBorder p='sm'>
+    <Paper withBorder p='sm' pos='relative'>
+      <LoadingOverlay visible={isLoading} />
+
       <Title order={2}>Chunks</Title>
 
       <form onSubmit={form.onSubmit(onSubmit)}>
-        <SimpleGrid mt='md' cols={{ base: 1, md: 2 }} spacing='lg'>
-          <Switch
-            label='Enable Chunks'
-            description='Enable chunked uploads.'
-            {...form.getInputProps('chunksEnabled', { type: 'checkbox' })}
-          />
+        <Switch
+          mt='md'
+          label='Enable Chunks'
+          description='Enable chunked uploads.'
+          {...form.getInputProps('chunksEnabled', { type: 'checkbox' })}
+        />
 
+        <SimpleGrid mt='md' cols={{ base: 1, md: 2 }} spacing='lg'>
           <TextInput
             label='Max Chunk Size'
             description='Maximum size of an upload before it is split into chunks.'
@@ -62,13 +65,7 @@ export default function ServerSettingsChunks({
           />
         </SimpleGrid>
 
-        <Button
-          type='submit'
-          color='blue'
-          mt='md'
-          loading={isLoading}
-          leftSection={<IconDeviceFloppy size='1rem' />}
-        >
+        <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
           Save
         </Button>
       </form>

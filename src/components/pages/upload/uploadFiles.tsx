@@ -48,12 +48,12 @@ export function filesModal(
               </Group>
               <Group justify='right'>
                 <Tooltip label='Open link in a new tab'>
-                  <ActionIcon onClick={() => open(idx)} variant='filled' color='primary'>
+                  <ActionIcon onClick={() => open(idx)} variant='filled'>
                     <IconExternalLink size='1rem' />
                   </ActionIcon>
                 </Tooltip>
                 <Tooltip label='Copy link to clipboard'>
-                  <ActionIcon onClick={() => copy(idx)} variant='filled' color='primary'>
+                  <ActionIcon onClick={() => copy(idx)} variant='filled'>
                     <IconClipboardCopy size='1rem' />
                   </ActionIcon>
                 </Tooltip>

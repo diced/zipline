@@ -1,5 +1,5 @@
 import { Response } from '@/lib/api/response';
-import { Button, Paper, SimpleGrid, Switch, TextInput, Title } from '@mantine/core';
+import { Button, LoadingOverlay, Paper, SimpleGrid, Switch, TextInput, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconDeviceFloppy } from '@tabler/icons-react';
 import { useRouter } from 'next/router';
@@ -33,14 +33,16 @@ export default function ServerSettingsMfa({
   }, [data]);
 
   return (
-    <Paper withBorder p='sm'>
+    <Paper withBorder p='sm' pos='relative'>
+      <LoadingOverlay visible={isLoading} />
+
       <Title order={2}>Multi-Factor Authentication</Title>
 
       <form onSubmit={form.onSubmit(onSubmit)}>
         <SimpleGrid mt='md' cols={{ base: 1, md: 2 }} spacing='lg'>
           <Switch
             label='Passkeys'
-            description='Enable the use of passwordless login with the use of WebAuthn passkeys like your phone, security, etc.'
+            description='Enable the use of passwordless login with the use of WebAuthn passkeys like your phone, security keys, etc.'
             {...form.getInputProps('mfaPasskeys', { type: 'checkbox' })}
           />
 
@@ -57,13 +59,7 @@ export default function ServerSettingsMfa({
           />
         </SimpleGrid>
 
-        <Button
-          type='submit'
-          color='blue'
-          mt='md'
-          loading={isLoading}
-          leftSection={<IconDeviceFloppy size='1rem' />}
-        >
+        <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
           Save
         </Button>
       </form>

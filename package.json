@@ -17,7 +17,7 @@
     "validate": "pnpm run \"/^validate:.*/\"",
     "validate:lint": "eslint --cache --ignore-path .gitignore --fix .",
     "validate:format": "prettier --write --ignore-path .gitignore .",
-    "db:prototype": "prisma db push && prisma generate"
+    "db:prototype": "prisma db push --skip-generate && prisma generate --no-hints"
   },
   "dependencies": {
     "@ant-design/plots": "^1.2.6",

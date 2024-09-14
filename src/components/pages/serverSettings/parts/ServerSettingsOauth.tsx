@@ -1,5 +1,5 @@
 import { Response } from '@/lib/api/response';
-import { Button, Paper, SimpleGrid, Switch, Text, TextInput, Title } from '@mantine/core';
+import { Button, LoadingOverlay, Paper, SimpleGrid, Switch, TextInput, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconDeviceFloppy } from '@tabler/icons-react';
 import { useRouter } from 'next/router';
@@ -77,7 +77,9 @@ export default function ServerSettingsOauth({
   }, [data]);
 
   return (
-    <Paper withBorder p='sm'>
+    <Paper withBorder p='sm' pos='relative'>
+      <LoadingOverlay visible={isLoading} />
+
       <Title order={2}>OAuth</Title>
 
       <form onSubmit={form.onSubmit(onSubmit)}>
@@ -95,17 +97,18 @@ export default function ServerSettingsOauth({
           />
         </SimpleGrid>
         <SimpleGrid mt='md' cols={{ base: 1, md: 2 }} spacing='lg'>
-          <Paper withBorder p='sm' my='md'>
-            <Text size='md' fw={700}>
+          <Paper withBorder p='sm'>
+            <Title order={4} mb='sm'>
               Discord
-            </Text>
+            </Title>
+
             <TextInput label='Discord Client ID' {...form.getInputProps('oauthDiscordClientId')} />
             <TextInput label='Discord Client Secret' {...form.getInputProps('oauthDiscordClientSecret')} />
           </Paper>
-          <Paper withBorder p='sm' my='md'>
-            <Text size='md' fw={700}>
+          <Paper withBorder p='sm'>
+            <Title order={4} mb='sm'>
               Google
-            </Text>
+            </Title>
 
             <TextInput label='Google Client ID' {...form.getInputProps('oauthGoogleClientId')} />
             <TextInput label='Google Client Secret' {...form.getInputProps('oauthGoogleClientSecret')} />
@@ -113,9 +116,7 @@ export default function ServerSettingsOauth({
         </SimpleGrid>
 
         <Paper withBorder p='sm' my='md'>
-          <Text size='md' fw={700}>
-            GitHub
-          </Text>
+          <Title order={4}>GitHub</Title>
 
           <SimpleGrid mt='md' cols={{ base: 1, md: 2 }} spacing='lg'>
             <TextInput label='GitHub Client ID' {...form.getInputProps('oauthGithubClientId')} />
@@ -123,10 +124,8 @@ export default function ServerSettingsOauth({
           </SimpleGrid>
         </Paper>
 
-        <Paper withBorder p='sm' mt='md'>
-          <Text size='md' fw={700}>
-            OpenID Connect
-          </Text>
+        <Paper withBorder p='sm' my='md'>
+          <Title order={4}>OpenID Connect</Title>
 
           <SimpleGrid mt='md' cols={{ base: 1, md: 2 }} spacing='lg'>
             <TextInput label='OIDC Client ID' {...form.getInputProps('oauthOidcClientId')} />
@@ -137,13 +136,7 @@ export default function ServerSettingsOauth({
           </SimpleGrid>
         </Paper>
 
-        <Button
-          type='submit'
-          color='blue'
-          mt='md'
-          loading={isLoading}
-          leftSection={<IconDeviceFloppy size='1rem' />}
-        >
+        <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
           Save
         </Button>
       </form>

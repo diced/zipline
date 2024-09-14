@@ -25,7 +25,8 @@ export function themeComponents(theme: ZiplineTheme): MantineThemeOverride {
       LoadingOverlay: LoadingOverlay.extend({
         defaultProps: {
           overlayProps: {
-            opacity: 0.3,
+            blur: 2,
+            radius: 'sm',
           },
         },
       }),

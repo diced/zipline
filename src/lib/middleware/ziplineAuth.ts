@@ -48,6 +48,29 @@ export function parseUserToken(
 export function ziplineAuth(options?: ZiplineAuthOptions) {
   return (handler: Handler) => {
     return async (req: NextApiReq, res: NextApiRes) => {
+      const authorization = req.headers.authorization;
+
+      if (authorization) {
+        try {
+          // eslint-disable-next-line no-var
+          var token = parseUserToken(authorization);
+        } catch (e) {
+          return res.unauthorized((e as { error: string }).error);
+        }
+
+        const user = await prisma.user.findFirst({
+          where: {
+            token,
+          },
+          select: userSelect,
+        });
+        if (!user) return res.unauthorized('invalid authorization token');
+
+        req.user = user;
+
+        return handler(req, res);
+      }
+
       const session = await getSession(req, res);
       if (!session.id || !session.sessionId) return res.unauthorized('invalid session, not logged in');
 

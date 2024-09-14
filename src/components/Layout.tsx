@@ -14,6 +14,7 @@ import {
   Menu,
   NavLink,
   Paper,
+  ScrollArea,
   Title,
   useMantineColorScheme,
   useMantineTheme,
@@ -30,6 +31,7 @@ import {
   IconFileUpload,
   IconFiles,
   IconFolder,
+  IconGraph,
   IconHome,
   IconLink,
   IconLogout,
@@ -45,7 +47,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import ConfigProvider from './ConfigProvider';
-import { IconGraph } from '@tabler/icons-react';
 
 type NavLinks = {
   label: string;
@@ -355,19 +356,21 @@ export default function Layout({ children, config }: { children: React.ReactNode
             }
           })}
 
-        <Box mt='auto'>
-          {config.website.externalLinks.map(({ name, url }) => (
-            <NavLink
-              key={name}
-              label={name}
-              leftSection={<IconExternalLink size='1rem' />}
-              variant='light'
-              component={Link}
-              href={url}
-              target='_blank'
-            />
-          ))}
-        </Box>
+        <ScrollArea mah={200} mt='auto'>
+          <Box>
+            {config.website.externalLinks.map(({ name, url }, i) => (
+              <NavLink
+                key={i}
+                label={name}
+                leftSection={<IconExternalLink size='1rem' />}
+                variant='light'
+                component={Link}
+                href={url}
+                target='_blank'
+              />
+            ))}
+          </Box>
+        </ScrollArea>
       </AppShell.Navbar>
 
       <AppShell.Main>

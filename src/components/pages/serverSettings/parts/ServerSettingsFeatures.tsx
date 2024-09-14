@@ -1,7 +1,7 @@
 import { Response } from '@/lib/api/response';
-import { Button, NumberInput, Paper, SimpleGrid, Switch, Title } from '@mantine/core';
+import { Button, LoadingOverlay, NumberInput, Paper, SimpleGrid, Switch, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { IconCpu, IconDeviceFloppy } from '@tabler/icons-react';
+import { IconDeviceFloppy } from '@tabler/icons-react';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { settingsOnSubmit } from '../settingsOnSubmit';
@@ -47,19 +47,21 @@ export default function ServerSettingsFeatures({
   }, [data]);
 
   return (
-    <Paper withBorder p='sm'>
+    <Paper withBorder p='sm' pos='relative'>
+      <LoadingOverlay visible={isLoading} />
+
       <Title order={2}>Features</Title>
 
       <form onSubmit={form.onSubmit(onSubmit)}>
         <SimpleGrid mt='md' cols={{ base: 1, md: 2 }} spacing='lg'>
           <Switch
             label='Image Compression'
-            description='Automatically compresses images uploaded to the server.'
+            description='Allows the ability for users to compress images.'
             {...form.getInputProps('featuresImageCompression', { type: 'checkbox' })}
           />
 
           <Switch
-            label='Robots.txt'
+            label='/robots.txt'
             description='Enables a robots.txt file for search engine optimization. Requires a server restart.'
             {...form.getInputProps('featuresRobotsTxt', { type: 'checkbox' })}
           />
@@ -84,30 +86,30 @@ export default function ServerSettingsFeatures({
 
           <Switch
             label='Delete on Max Views'
-            description='Automatically deletes files after they reach the maximum view count.'
+            description='Automatically deletes files/urls after they reach the maximum view count. Requires a server restart.'
             {...form.getInputProps('featuresDeleteOnMaxViews', { type: 'checkbox' })}
           />
 
           <Switch
-            label='Metrics Enabled'
+            label='Enable Metrics'
             description='Enables metrics for the server. Requires a server restart.'
             {...form.getInputProps('featuresMetricsEnabled', { type: 'checkbox' })}
           />
 
           <Switch
-            label='Metrics Admin Only'
+            label='Admin Only Metrics'
             description='Requires an administrator to view metrics.'
             {...form.getInputProps('featuresMetricsAdminOnly', { type: 'checkbox' })}
           />
 
           <Switch
-            label='Metrics Show User Specific'
+            label='Show User Specific Metrics'
             description='Shows metrics specific to each user, for all users.'
             {...form.getInputProps('featuresMetricsShowUserSpecific', { type: 'checkbox' })}
           />
 
           <Switch
-            label='Thumbnails Enabled'
+            label='Enable Thumbnails'
             description='Enables thumbnail generation for images. Requires a server restart.'
             {...form.getInputProps('featuresThumbnailsEnabled', { type: 'checkbox' })}
           />
@@ -118,18 +120,11 @@ export default function ServerSettingsFeatures({
             placeholder='Enter a number...'
             min={1}
             max={16}
-            leftSection={<IconCpu size='1rem' />}
             {...form.getInputProps('featuresThumbnailsNumberThreads')}
           />
         </SimpleGrid>
 
-        <Button
-          type='submit'
-          color='blue'
-          mt='md'
-          loading={isLoading}
-          leftSection={<IconDeviceFloppy size='1rem' />}
-        >
+        <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
           Save
         </Button>
       </form>

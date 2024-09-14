@@ -18,7 +18,7 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
-import { IconCheck, IconFileX } from '@tabler/icons-react';
+import { IconCheck, IconDeviceFloppy, IconFileX } from '@tabler/icons-react';
 import { mutate } from 'swr';
 
 export default function SettingsFileView() {
@@ -116,11 +116,6 @@ export default function SettingsFileView() {
               { value: 'center', label: 'Center' },
               { value: 'right', label: 'Right' },
             ]}
-            // itemComponent={({ label, value, ...props }) => (
-            //   <Group position={value} {...props}>
-            //     {label}
-            //   </Group>
-            // )}
             disabled={!form.values.enabled}
             {...form.getInputProps('align')}
           />
@@ -158,7 +153,7 @@ export default function SettingsFileView() {
           </SimpleGrid>
 
           <Group justify='left' mt='sm'>
-            <Button variant='outline' type='submit'>
+            <Button type='submit' leftSection={<IconDeviceFloppy size='1rem' />}>
               Save
             </Button>
           </Group>

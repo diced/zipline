@@ -266,20 +266,26 @@ export default function FileModal({
 
                     <Combobox.Dropdown>
                       <Combobox.Options>
-                        {tags?.map((tag) => (
-                          <Combobox.Option value={tag.id} key={tag.id} active={value.includes(tag.id)}>
-                            <Group gap='sm'>
-                              <Checkbox
-                                checked={value.includes(tag.id)}
-                                onChange={() => {}}
-                                aria-hidden
-                                tabIndex={-1}
-                                style={{ pointerEvents: 'none' }}
-                              />
-                              <TagPill tag={tag} />
-                            </Group>
+                        {tags?.length ? (
+                          tags?.map((tag) => (
+                            <Combobox.Option value={tag.id} key={tag.id} active={value.includes(tag.id)}>
+                              <Group gap='sm'>
+                                <Checkbox
+                                  checked={value.includes(tag.id)}
+                                  onChange={() => {}}
+                                  aria-hidden
+                                  tabIndex={-1}
+                                  style={{ pointerEvents: 'none' }}
+                                />
+                                <TagPill tag={tag} />
+                              </Group>
+                            </Combobox.Option>
+                          ))
+                        ) : (
+                          <Combobox.Option value='no-tags' disabled>
+                            No tags found, create one outside of this menu.
                           </Combobox.Option>
-                        ))}
+                        )}
                       </Combobox.Options>
                     </Combobox.Dropdown>
                   </Combobox>
@@ -350,7 +356,7 @@ export default function FileModal({
             <Group justify='space-between' mt='lg'>
               <Group>
                 {!reduce && (
-                  <Text size='sm' c='gray'>
+                  <Text size='sm' c='dimmed'>
                     {file.id}
                   </Text>
                 )}

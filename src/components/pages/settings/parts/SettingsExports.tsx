@@ -57,7 +57,6 @@ export default function SettingsExports() {
       <Button
         mt='sm'
         fullWidth
-        color='blue'
         disabled={isLoading}
         onClick={handleNewExport}
         leftSection={<IconPlus size='1rem' />}

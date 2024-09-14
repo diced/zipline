@@ -1,5 +1,5 @@
 import { Response } from '@/lib/api/response';
-import { Button, Paper, SimpleGrid, Switch, TextInput, Title } from '@mantine/core';
+import { Button, LoadingOverlay, Paper, SimpleGrid, Switch, TextInput, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconDeviceFloppy } from '@tabler/icons-react';
 import { useRouter } from 'next/router';
@@ -43,17 +43,20 @@ export default function ServerSettingsCore({
   }, [data]);
 
   return (
-    <Paper withBorder p='sm'>
+    <Paper withBorder p='sm' pos='relative'>
+      <LoadingOverlay visible={isLoading} />
+
       <Title order={2}>Core</Title>
 
       <form onSubmit={form.onSubmit(onSubmit)}>
-        <SimpleGrid mt='md' cols={{ base: 1, md: 2 }} spacing='lg'>
-          <Switch
-            label='Return HTTPS URLs'
-            description='Return URLs with HTTPS protocol.'
-            {...form.getInputProps('coreReturnHttpsUrls', { type: 'checkbox' })}
-          />
+        <Switch
+          mt='md'
+          label='Return HTTPS URLs'
+          description='Return URLs with HTTPS protocol.'
+          {...form.getInputProps('coreReturnHttpsUrls', { type: 'checkbox' })}
+        />
 
+        <SimpleGrid mt='md' cols={{ base: 1, md: 2 }} spacing='lg'>
           <TextInput
             label='Default Domain'
             description='The domain to use when generating URLs.'
@@ -69,13 +72,7 @@ export default function ServerSettingsCore({
           />
         </SimpleGrid>
 
-        <Button
-          type='submit'
-          color='blue'
-          mt='md'
-          loading={isLoading}
-          leftSection={<IconDeviceFloppy size='1rem' />}
-        >
+        <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
           Save
         </Button>
       </form>

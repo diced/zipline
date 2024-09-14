@@ -56,7 +56,15 @@ export default fastifyPlugin(
 
       const path = join(config.core.tempDirectory, exportDb.path);
 
-      await rm(path);
+      try {
+        await rm(path);
+      } catch (e) {
+        logger.warn(
+          `failed to delete export file, it might already be deleted. ${exportDb.id}: ${exportDb.path}`,
+          { e },
+        );
+      }
+
       await prisma.export.delete({ where: { id: req.query.id } });
 
       logger.info(`deleted export ${exportDb.id}: ${exportDb.path}`);

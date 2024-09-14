@@ -1,5 +1,5 @@
 import { Response } from '@/lib/api/response';
-import { Button, Paper, SimpleGrid, Text, TextInput, Title } from '@mantine/core';
+import { Button, LoadingOverlay, Paper, SimpleGrid, Text, TextInput, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconDeviceFloppy } from '@tabler/icons-react';
 import ms from 'ms';
@@ -38,7 +38,9 @@ export default function ServerSettingsTasks({
   }, [data]);
 
   return (
-    <Paper withBorder p='sm'>
+    <Paper withBorder p='sm' pos='relative'>
+      <LoadingOverlay visible={isLoading} />
+
       <Title order={2}>Tasks</Title>
 
       <Text c='dimmed' size='sm'>
@@ -76,13 +78,7 @@ export default function ServerSettingsTasks({
           />
         </SimpleGrid>
 
-        <Button
-          type='submit'
-          color='blue'
-          mt='md'
-          loading={isLoading}
-          leftSection={<IconDeviceFloppy size='1rem' />}
-        >
+        <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
           Save
         </Button>
       </form>

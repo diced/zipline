@@ -5,10 +5,10 @@ import {
   ActionIcon,
   Button,
   CopyButton,
-  Group,
   Paper,
   PasswordInput,
   ScrollArea,
+  Text,
   TextInput,
   Title,
   Tooltip,
@@ -19,6 +19,7 @@ import {
   IconAsteriskSimple,
   IconCheck,
   IconCopy,
+  IconDeviceFloppy,
   IconKey,
   IconUser,
   IconUserCancel,
@@ -91,7 +92,11 @@ export default function SettingsUser() {
 
   return (
     <Paper withBorder p='sm'>
-      <Title order={2}>User info</Title>
+      <Title order={2}>User Info</Title>
+      <Text c='dimmed' size='sm' mb='sm'>
+        {user?.id}
+      </Text>
+
       <form onSubmit={form.onSubmit(onSubmit)}>
         <TextInput
           rightSection={
@@ -127,11 +132,9 @@ export default function SettingsUser() {
           leftSection={<IconAsteriskSimple size='1rem' />}
         />
 
-        <Group justify='left' mt='sm'>
-          <Button variant='outline' type='submit'>
-            Save
-          </Button>
-        </Group>
+        <Button type='submit' mt='md' loading={!user} leftSection={<IconDeviceFloppy size='1rem' />}>
+          Save
+        </Button>
       </form>
     </Paper>
   );
