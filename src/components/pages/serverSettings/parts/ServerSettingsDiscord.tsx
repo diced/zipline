@@ -89,8 +89,6 @@ export default function ServerSettingsDiscord({
   const onSubmitNotif = (type: 'upload' | 'shorten') => async (values: Record<string, any>) => {
     const sendValues: Record<string, any> = {};
 
-    console.log(values);
-
     const prefix = type === 'upload' ? 'discordOnUpload' : 'discordOnShorten';
 
     sendValues[`${prefix}WebhookUrl`] =

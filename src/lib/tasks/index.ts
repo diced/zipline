@@ -54,6 +54,21 @@ export class Tasks {
     }
   }
 
+  public runJob(id: string, ...args: any[]): void | any {
+    const task = this.tasks.find((x) => x.id === id);
+    if (!task) throw new Error(`task ${id} not found`);
+
+    if ('interval' in task) {
+      this.logger.debug('running job', {
+        id: task.id,
+      });
+
+      return (task as IntervalTask).func.bind(task, ...args)();
+    }
+
+    return;
+  }
+
   private startInterval(task: IntervalTask) {
     if (task.interval === 0) {
       this.logger.debug('not starting interval', {

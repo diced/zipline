@@ -185,6 +185,9 @@ async function main() {
     }
   });
 
+  const tasks = new Tasks();
+  server.decorate('tasks', tasks);
+
   await server.listen({
     port: config.core.port,
     host: config.core.hostname,
@@ -192,7 +195,7 @@ async function main() {
 
   logger.info('server started', { hostname: config.core.hostname, port: config.core.port });
 
-  const tasks = new Tasks();
+  // Tasks
   tasks.interval('deletefiles', config.tasks.deleteInterval, deleteFiles(prisma));
   tasks.interval('maxviews', config.tasks.maxViewsInterval, maxViews(prisma));
 
@@ -214,3 +217,9 @@ async function main() {
 }
 
 main();
+
+declare module 'fastify' {
+  interface FastifyInstance {
+    tasks: Tasks;
+  }
+}

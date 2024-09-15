@@ -1,18 +1,19 @@
 import { IntervalTask, WorkerTask } from '..';
 
 export default function thumbnails(prisma: typeof globalThis.__db__) {
-  return async function (this: IntervalTask) {
+  return async function (this: IntervalTask, rerun = false) {
     const thumbnailWorkers = this.tasks.tasks.filter(
       (x) => 'worker' in x && x.id.startsWith('thumbnail'),
     ) as unknown as WorkerTask[];
 
     if (!thumbnailWorkers.length) return;
 
+    if (rerun) this.logger.debug('regenerating thumbnails for all videos');
+
     const thumbnailNeeded = await prisma.file.findMany({
       where: {
-        thumbnail: {
-          is: null,
-        },
+        ...(rerun ? {} : { thumbnail: { is: null } }),
+
         type: {
           startsWith: 'video/',
         },

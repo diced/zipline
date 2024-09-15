@@ -1,5 +1,5 @@
 import { bytes } from '@/lib/bytes';
-import { config } from '@/lib/config';
+import { reloadSettings } from '@/lib/config';
 import { prisma } from '@/lib/db';
 import { fileSelect } from '@/lib/db/models/file';
 import { userSelect } from '@/lib/db/models/user';
@@ -15,7 +15,7 @@ import {
   CreateMultipartUploadCommand,
   UploadPartCommand,
 } from '@aws-sdk/client-s3';
-import { datasource } from '@/lib/datasource';
+import { getDatasource } from '@/lib/datasource';
 import { S3Datasource } from '@/lib/datasource/S3';
 
 export type PartialWorkerData = {
@@ -35,8 +35,6 @@ export type PartialWorkerData = {
 const { user, file, options, responseUrl, domain } = workerData as PartialWorkerData;
 const logger = log('tasks').c('partial').c(file.filename);
 
-worker();
-
 if (isMainThread) {
   logger.error("partial upload worker can't run on the main thread");
   process.exit(1);
@@ -52,12 +50,21 @@ if (!options.partial.lastchunk) {
   process.exit(1);
 }
 
-if (!config.chunks.enabled) {
-  logger.error('chunks are not enabled');
-  process.exit(1);
-}
+worker();
 
 async function worker() {
+  await reloadSettings();
+
+  const config = global.__config__;
+  getDatasource(config);
+
+  const datasource = global.__datasource__;
+
+  if (!config.chunks.enabled) {
+    logger.error('chunks are not enabled');
+    process.exit(1);
+  }
+
   logger.debug('started partial upload worker');
 
   const partials = await readdir(config.core.tempDirectory).then((files) =>
