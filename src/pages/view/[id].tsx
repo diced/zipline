@@ -64,9 +64,14 @@ export default function EmbeddedFile({
 
     const img = new Image();
     img.addEventListener('load', function () {
-      // my best attempt of recreating https://searchfox.org/mozilla-central/source/dom/html/ImageDocument.cpp#271-276
-      // and it actually works
+      // my best attempt of recreating
+      // firefox: https://searchfox.org/mozilla-central/source/dom/html/ImageDocument.cpp#271-276
+      // chromium-based: https://source.chromium.org/chromium/chromium/src/+/main:third_party/blink/renderer/core/html/image_document.cc
 
+      // keeps image original if smaller than screen
+      if (this.width <= window.innerWidth && this.height <= window.innerHeight) return;
+
+      // resizes to fit screen
       const ratio = Math.min(innerHeight / this.naturalHeight, innerWidth / this.naturalWidth);
       const newWidth = Math.max(1, Math.floor(ratio * this.naturalWidth));
       const newHeight = Math.max(1, Math.floor(ratio * this.naturalHeight));
