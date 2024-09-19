@@ -28,23 +28,42 @@ if (isMainThread) {
 async function loadThumbnail(path) {
   const args = ['-i', path, '-frames:v', '1', '-f', 'mjpeg', 'pipe:1'];
 
-  const child = spawn(ffmpeg, args, { stdio: ['ignore', 'pipe', 'ignore'] });
+  const child = spawn(ffmpeg, args, { stdio: ['ignore', 'pipe', 'pipe'] });
 
   const data: Buffer = await new Promise((resolve, reject) => {
     const buffers = [];
+    const errorBuffers = [];
+
+    child.stderr.on('data', (chunk) => {
+      errorBuffers.push(chunk);
+    });
 
     child.stdout.on('data', (chunk) => {
       buffers.push(chunk);
     });
 
-    child.once('error', reject);
+    child.once('error', (...a) => {
+      console.log(a);
+
+      reject();
+    });
     child.once('close', (code) => {
       if (code !== 0) {
-        const msg = buffers.join('').trim();
-        logger.debug(`cmd: ${ffmpeg} ${args.join(' ')}`);
-        logger.error(`while ${path} child exited with code ${code}: ${msg}`);
+        const msg = errorBuffers.join('').trim().split('\n');
 
-        reject(new Error(`child exited with code ${code}`));
+        logger.debug(`cmd: ${ffmpeg} ${args.join(' ')}\n${msg.join('\n')}`);
+        logger.error(`child exited with code ${code}: ${msg[msg.length - 1]}`);
+
+        if (msg[msg.length - 1].includes('does not contain any stream')) {
+          // mismatched mimetype, for example a video/ogg (.ogg) file with no video stream since
+          // for this specific case just set the mimetype to audio/ogg
+          // the method will return an empty buffer since there is no video stream
+
+          logger.error(`file ${path} does not contain any video stream, it is probably an audio file`);
+          resolve(Buffer.alloc(0));
+        }
+
+        reject(new Error(`child exited with code ${code} ffmpeg output:\n${msg.join('\n')}`));
       } else {
         const buffer = Buffer.allocUnsafe(buffers.reduce((acc, val) => acc + val.length, 0));
 
@@ -98,6 +117,22 @@ async function start() {
     logger.debug(`loaded file to tmp: ${tmpFile}`);
     const thumbnail = await loadThumbnail(tmpFile);
     logger.debug(`loaded thumbnail: ${thumbnail.length} bytes mjpeg`);
+
+    if (thumbnail.length === 0 && file.mimetype === 'video/ogg') {
+      logger.info('file might be an audio file, setting mimetype to audio/ogg to avoid future errors');
+      await prisma.file.update({
+        where: {
+          id: file.id,
+        },
+        data: {
+          mimetype: 'audio/ogg',
+        },
+      });
+
+      await rm(tmpFile);
+      await prisma.$disconnect();
+      process.exit(0);
+    }
 
     const { thumbnail: thumb } = await prisma.file.update({
       where: {
