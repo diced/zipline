@@ -297,6 +297,14 @@ export const schema = z.object({
       .nullable()
       .default(null),
   }),
+  pwa: z.object({
+    enabled: z.boolean().default(true),
+    title: z.string().default('Zipline'),
+    shortName: z.string().default('Zipline'),
+    description: z.string().default('Zipline'),
+    themeColor: z.string().default('#000000'),
+    backgroundColor: z.string().default('#000000'),
+  }),
 });
 
 export type Config = z.infer<typeof schema>;

@@ -12,7 +12,6 @@ import '@mantine/dropzone/styles.css';
 import '@mantine/notifications/styles.css';
 import 'mantine-datatable/styles.css';
 
-import '@/lib/theme/override.css';
 import '@/components/render/code/HighlightCode.theme.css';
 
 const fetcher = async (url: RequestInfo | URL) => {
@@ -35,6 +34,7 @@ export default function App({ Component, pageProps }: AppProps) {
       <Head>
         <title>Zipline</title>
         <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
+        <link rel='manifest' href='/manifest.json' />
       </Head>
 
       <SWRConfig

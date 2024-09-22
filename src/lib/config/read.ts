@@ -129,6 +129,14 @@ export const rawConfig: any = {
     key: undefined,
     cert: undefined,
   },
+  pwa: {
+    enabled: undefined,
+    title: undefined,
+    shortName: undefined,
+    description: undefined,
+    backgroundColor: undefined,
+    themeColor: undefined,
+  },
 };
 
 export const PROP_TO_ENV = {
@@ -256,6 +264,13 @@ export const DATABASE_TO_PROP = {
   discordOnShortenAvatarUrl: 'discord.onShorten.avatarUrl',
   discordOnShortenContent: 'discord.onShorten.content',
   discordOnShortenEmbed: 'discord.onShorten.embed',
+
+  pwaEnabled: 'pwa.enabled',
+  pwaTitle: 'pwa.title',
+  pwaShortName: 'pwa.shortName',
+  pwaDescription: 'pwa.description',
+  pwaThemeColor: 'pwa.themeColor',
+  pwaBackgroundColor: 'pwa.backgroundColor',
 };
 
 const logger = log('config').c('read');

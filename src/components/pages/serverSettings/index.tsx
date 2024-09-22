@@ -14,6 +14,7 @@ import ServerSettingsRatelimit from './parts/ServerSettingsRatelimit';
 import ServerSettingsTasks from './parts/ServerSettingsTasks';
 import ServerSettingsUrls from './parts/ServerSettingsUrls';
 import ServerSettingsWebsite from './parts/ServerSettingsWebsite';
+import ServerSettingsPWA from './parts/ServerSettingsPWA';
 
 export default function DashboardSettings() {
   const { data, isLoading, error } = useSWR<Response['/api/server/settings']>('/api/server/settings');
@@ -44,6 +45,10 @@ export default function DashboardSettings() {
             <ServerSettingsRatelimit swr={{ data, isLoading }} />
             <ServerSettingsWebsite swr={{ data, isLoading }} />
             <ServerSettingsOauth swr={{ data, isLoading }} />
+
+            <ServerSettingsPWA swr={{ data, isLoading }} />
+
+            <ServerSettingsHttpWebhook swr={{ data, isLoading }} />
           </>
         )}
       </SimpleGrid>
@@ -53,8 +58,6 @@ export default function DashboardSettings() {
           <div>Error loading server settings</div>
         ) : (
           <>
-            <ServerSettingsHttpWebhook swr={{ data, isLoading }} />
-
             <ServerSettingsDiscord swr={{ data, isLoading }} />
           </>
         )}

@@ -116,6 +116,13 @@ model Zipline {
   discordOnShortenAvatarUrl  String?
   discordOnShortenContent    String?
   discordOnShortenEmbed      Json?
+
+  pwaEnabled         Boolean @default(false)
+  pwaTitle           String  @default("Zipline")
+  pwaShortName       String  @default("Zipline")
+  pwaDescription     String  @default("Zipline")
+  pwaThemeColor      String  @default("#000000")
+  pwaBackgroundColor String  @default("#000000")
 }
 
 model User {

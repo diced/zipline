@@ -220,6 +220,13 @@ export default fastifyPlugin(
             discordOnShortenAvatarUrl: z.string().url().nullable(),
             discordOnShortenContent: z.string().nullable(),
             discordOnShortenEmbed: discordEmbed,
+
+            pwaEnabled: z.boolean(),
+            pwaTitle: z.string(),
+            pwaShortName: z.string(),
+            pwaDescription: z.string(),
+            pwaThemeColor: z.string().regex(/^#?([a-f0-9]{6}|[a-f0-9]{3})$/),
+            pwaBackgroundColor: z.string().regex(/^#?([a-f0-9]{6}|[a-f0-9]{3})/),
           })
           .partial()
           .refine(
