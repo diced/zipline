@@ -1,15 +1,17 @@
 services:
-  postgres:
+  postgresql:
     image: postgres:15
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DATABASE=postgres
+      POSTGRES_USER: ${POSTGRESQL_USER:-zipline}
+      POSTGRES_PASSWORD: ${POSTGRESQL_PASSWORD:?POSTGRESSQL_PASSWORD is required}
+      POSTGRES_DB: ${POSTGRESQL_DB:-zipline}
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD', 'pg_isready', '-U', 'postgres']
+      test: ['CMD', 'pg_isready', '-U', 'zipline']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -25,11 +27,9 @@ services:
     env_file:
       - .env
     environment:
-      - DATABASE_URL=postgres://postgres:postgres@postgres/postgres
-      - CORE_HOSTNAME=0.0.0.0
-      # add other needed variables like CORE_SECRET
+      - DATABASE_URL=postgres://${POSTGRESQL_USER:-zipline}:${POSTGRESQL_PASSWORD}@postgresql:5432/${POSTGRESQL_DB:-zipline}
     depends_on:
-      - postgres
+      - postgresql
     volumes:
       - './uploads:/zipline/uploads'
       - './public:/zipline/public'
