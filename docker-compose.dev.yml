@@ -19,7 +19,8 @@ services:
       context: .
       dockerfile: Dockerfile
     # UNCOMMENT THE BELOW LINE ON THE FIRST RUN!
-    # entrypoint: ['pnpm', 'db:prototype']
+    entrypoint: ['pnpm', 'db:prototype']
+    # entrypoint: ['pnpm', 'prisma', 'migrate', 'reset', '--force']
     ports:
       - '3000:3000'
     env_file:
