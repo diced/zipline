@@ -41,6 +41,7 @@ import {
   IconUserExclamation,
   IconUserMinus,
   IconUserX,
+  IconX,
 } from '@tabler/icons-react';
 import AnchorNext from 'components/AnchorNext';
 import { FlameshotIcon, ShareXIcon } from 'components/icons';
@@ -264,12 +265,32 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
     setExports(
       res.exports
         ?.map((s) => ({
-          date: new Date(Number(s.name.split('_')[3].slice(0, -4))),
+          date: new Date(s.createdAt),
           size: s.size,
           full: s.name,
         }))
         .sort((a, b) => a.date.getTime() - b.date.getTime()),
     );
+  };
+
+  const deleteExport = async (name) => {
+    const res = await useFetch('/api/user/export?name=' + name, 'DELETE');
+    if (res.error) {
+      showNotification({
+        title: 'Error deleting export',
+        message: res.error,
+        color: 'red',
+        icon: <IconX size='1rem' />,
+      });
+    } else {
+      showNotification({
+        message: 'Deleted export',
+        color: 'green',
+        icon: <IconFileZip size='1rem' />,
+      });
+
+      await getExports();
+    }
   };
 
   const handleDelete = async () => {
@@ -580,6 +601,7 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
               { id: 'name', name: 'Name' },
               { id: 'date', name: 'Date' },
               { id: 'size', name: 'Size' },
+              { id: 'actions', name: '' },
             ]}
             rows={
               exports
@@ -591,6 +613,11 @@ export default function Manage({ oauth_registration, oauth_providers: raw_oauth_
                     ),
                     date: x.date.toLocaleString(),
                     size: bytesToHuman(x.size),
+                    actions: (
+                      <ActionIcon onClick={() => deleteExport(x.full)}>
+                        <IconTrash size='1rem' />
+                      </ActionIcon>
+                    ),
                   }))
                 : []
             }

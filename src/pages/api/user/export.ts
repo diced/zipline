@@ -1,6 +1,6 @@
 import { Zip, ZipPassThrough } from 'fflate';
 import { createReadStream, createWriteStream } from 'fs';
-import { readdir, stat } from 'fs/promises';
+import { rm, stat } from 'fs/promises';
 import datasource from 'lib/datasource';
 import Logger from 'lib/logger';
 import prisma from 'lib/prisma';
@@ -22,6 +22,13 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     const zip = new Zip();
     const export_name = `zipline_export_${user.id}_${Date.now()}.zip`;
     const path = join(config.core.temp_directory, export_name);
+
+    const exportDb = await prisma.export.create({
+      data: {
+        path: export_name,
+        userId: user.id,
+      },
+    });
 
     logger.debug(`creating write stream at ${path}`);
     const write_stream = createWriteStream(path);
@@ -79,11 +86,27 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
           logger.info(
             `Export for ${user.username} (${user.id}) has completed and is available at ${export_name}`,
           );
+
+          await prisma.export.update({
+            where: {
+              id: exportDb.id,
+            },
+            data: {
+              complete: true,
+            },
+          });
         }
       } else {
         write_stream.close();
-        logger.debug(`error while writing to zip: ${err}`);
-        logger.error(`Export for ${user.username} (${user.id}) has failed\n${err}`);
+        logger.error(
+          `Export for ${user.username} (${user.id}) has failed and has been removed from the database\n${err}`,
+        );
+
+        await prisma.export.delete({
+          where: {
+            id: exportDb.id,
+          },
+        });
       }
     };
 
@@ -114,27 +137,62 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     res.json({
       url: '/api/user/export?name=' + export_name,
     });
-  } else {
-    const export_name = req.query.name as string;
-    if (export_name) {
-      const parts = export_name.split('_');
-      if (Number(parts[2]) !== user.id) return res.unauthorized('cannot access export owned by another user');
+  } else if (req.method === 'DELETE') {
+    const name = req.query.name as string;
+    if (!name) return res.badRequest('no name provided');
 
-      const stream = createReadStream(join(config.core.temp_directory, export_name));
+    const exportDb = await prisma.export.findFirst({
+      where: {
+        userId: user.id,
+        path: name,
+      },
+    });
+
+    if (!exportDb) return res.notFound('export not found');
+
+    await prisma.export.delete({
+      where: {
+        id: exportDb.id,
+      },
+    });
+
+    try {
+      await rm(join(config.core.temp_directory, exportDb.path));
+    } catch (e) {
+      logger
+        .error(`export file ${exportDb.path} has been removed from the database`)
+        .error(`but failed to remove the file from the filesystem: ${e}`);
+    }
+
+    res.json({
+      success: true,
+    });
+  } else {
+    const exportsDb = await prisma.export.findMany({
+      where: {
+        userId: user.id,
+      },
+    });
+
+    const name = req.query.name as string;
+    if (name) {
+      const exportDb = exportsDb.find((e) => e.path === name);
+      if (!exportDb) return res.notFound('export not found');
+
+      const stream = createReadStream(join(config.core.temp_directory, exportDb.path));
 
       res.setHeader('Content-Type', 'application/zip');
-      res.setHeader('Content-Disposition', `attachment; filename="${export_name}"`);
+      res.setHeader('Content-Disposition', `attachment; filename="${exportDb.path}"`);
       stream.pipe(res);
     } else {
-      const files = await readdir(config.core.temp_directory);
-      const exp = files.filter((f) => f.startsWith('zipline_export_'));
       const exports = [];
-      for (let i = 0; i !== exp.length; ++i) {
-        const name = exp[i];
-        const stats = await stat(join(config.core.temp_directory, name));
 
-        if (Number(exp[i].split('_')[2]) !== user.id) continue;
-        exports.push({ name, size: stats.size });
+      for (let i = 0; i !== exportsDb.length; ++i) {
+        const exportDb = exportsDb[i];
+        if (!exportDb.complete) continue;
+
+        const stats = await stat(join(config.core.temp_directory, exportDb.path));
+        exports.push({ name: exportDb.path, size: stats.size, createdAt: exportDb.createdAt });
       }
 
       res.json({
@@ -145,6 +203,6 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
 }
 
 export default withZipline(handler, {
-  methods: ['GET', 'POST'],
+  methods: ['GET', 'POST', 'DELETE'],
   user: true,
 });
