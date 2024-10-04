@@ -13,8 +13,7 @@ const MAX_USERNAME_LENGTH = 12;
 
 async function handler(req: NextApiReq, res: NextApiRes) {
   const user = await req.user();
-  let badRequest,
-    usedInvite = false;
+  let usedInvite = false;
 
   if (!config.features.user_registration && !config.features.invites && !user?.administrator)
     return res.badRequest('This endpoint is unavailable due to current configurations');
@@ -84,7 +83,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     });
 
   logger.debug(
-    `registered user${usedInvite ? ' via invite ' + code : ''} ${JSON.stringify(newUser, jsonUserReplacer)}`
+    `registered user${usedInvite ? ' via invite ' + code : ''} ${JSON.stringify(newUser, jsonUserReplacer)}`,
   );
 
   delete newUser.password;
