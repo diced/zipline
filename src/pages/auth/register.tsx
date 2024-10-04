@@ -47,7 +47,6 @@ export default function Register({ code = undefined, title, user_registration })
     }
   };
 
-
   const checkPassword = () => {
     setVerifyPasswordError('');
     setPassword(password.trim());
