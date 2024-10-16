@@ -15,7 +15,7 @@ export default function PrismCode({ code, ext, ...props }) {
 
   return (
     <Prism
-      sx={(t) => ({ height: '100vh', backgroundColor: t.colors.dark[8] })}
+      sx={(t) => ({ height: '100vh', overflow: 'scroll', backgroundColor: t.colors.dark[8] })}
       withLineNumbers
       language={exts[ext]?.toLowerCase()}
       {...props}
