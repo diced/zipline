@@ -58,7 +58,7 @@ export default function Code({ code, id, title, render, renderType }) {
 
       {!render && (
         <PrismCode
-          sx={(t) => ({ height: '100vh', backgroundColor: t.colors.dark[8] })}
+          sx={(t) => ({ height: '100vh', overflow: 'scroll', backgroundColor: t.colors.dark[8] })}
           code={code}
           ext={id.split('.').pop()}
         />
@@ -66,7 +66,7 @@ export default function Code({ code, id, title, render, renderType }) {
 
       {render && overrideRender && (
         <PrismCode
-          sx={(t) => ({ height: '100vh', backgroundColor: t.colors.dark[8] })}
+          sx={(t) => ({ height: '100vh', overflow: 'scroll', backgroundColor: t.colors.dark[8] })}
           code={code}
           ext={id.split('.').pop()}
         />
