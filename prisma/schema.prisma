@@ -75,18 +75,22 @@ model Zipline {
 
   oauthDiscordClientId     String?
   oauthDiscordClientSecret String?
+  oauthDiscordRedirectUri  String?
 
   oauthGoogleClientId     String?
   oauthGoogleClientSecret String?
+  oauthGoogleRedirectUri  String?
 
   oauthGithubClientId     String?
   oauthGithubClientSecret String?
+  oauthGithubRedirectUri  String?
 
   oauthOidcClientId     String?
   oauthOidcClientSecret String?
   oauthOidcAuthorizeUrl String?
   oauthOidcTokenUrl     String?
   oauthOidcUserinfoUrl  String?
+  oauthOidcRedirectUri  String?
 
   mfaTotpEnabled Boolean @default(false)
   mfaTotpIssuer  String  @default("Zipline")

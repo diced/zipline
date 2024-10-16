@@ -19,18 +19,22 @@ export default function ServerSettingsOauth({
 
       oauthDiscordClientId: '',
       oauthDiscordClientSecret: '',
+      oauthDiscordRedirectUri: '',
 
       oauthGoogleClientId: '',
       oauthGoogleClientSecret: '',
+      oauthGoogleRedirectUri: '',
 
       oauthGithubClientId: '',
       oauthGithubClientSecret: '',
+      oauthGithubRedirectUri: '',
 
       oauthOidcClientId: '',
       oauthOidcClientSecret: '',
       oauthOidcAuthorizeUrl: '',
       oauthOidcTokenUrl: '',
       oauthOidcUserinfoUrl: '',
+      oauthOidcRedirectUri: '',
     },
   });
 
@@ -61,18 +65,22 @@ export default function ServerSettingsOauth({
 
       oauthDiscordClientId: data?.oauthDiscordClientId ?? '',
       oauthDiscordClientSecret: data?.oauthDiscordClientSecret ?? '',
+      oauthDiscordRedirectUri: data?.oauthDiscordRedirectUri ?? '',
 
       oauthGoogleClientId: data?.oauthGoogleClientId ?? '',
       oauthGoogleClientSecret: data?.oauthGoogleClientSecret ?? '',
+      oauthGoogleRedirectUri: data?.oauthGoogleRedirectUri ?? '',
 
       oauthGithubClientId: data?.oauthGithubClientId ?? '',
       oauthGithubClientSecret: data?.oauthGithubClientSecret ?? '',
+      oauthGithubRedirectUri: data?.oauthGithubRedirectUri ?? '',
 
       oauthOidcClientId: data?.oauthOidcClientId ?? '',
       oauthOidcClientSecret: data?.oauthOidcClientSecret ?? '',
       oauthOidcAuthorizeUrl: data?.oauthOidcAuthorizeUrl ?? '',
       oauthOidcTokenUrl: data?.oauthOidcTokenUrl ?? '',
       oauthOidcUserinfoUrl: data?.oauthOidcUserinfoUrl ?? '',
+      oauthOidcRedirectUri: data?.oauthOidcRedirectUri ?? '',
     });
   }, [data]);
 
@@ -104,6 +112,11 @@ export default function ServerSettingsOauth({
 
             <TextInput label='Discord Client ID' {...form.getInputProps('oauthDiscordClientId')} />
             <TextInput label='Discord Client Secret' {...form.getInputProps('oauthDiscordClientSecret')} />
+            <TextInput
+              label='Discord Redirect URL'
+              description='The redirect URL to use instead of the host when logging in. This must end with /api/auth/oauth/discord'
+              {...form.getInputProps('oauthDiscordRedirectUri')}
+            />
           </Paper>
           <Paper withBorder p='sm'>
             <Title order={4} mb='sm'>
@@ -112,6 +125,11 @@ export default function ServerSettingsOauth({
 
             <TextInput label='Google Client ID' {...form.getInputProps('oauthGoogleClientId')} />
             <TextInput label='Google Client Secret' {...form.getInputProps('oauthGoogleClientSecret')} />
+            <TextInput
+              label='Google Redirect URL'
+              description='The redirect URL to use instead of the host when logging in. This must end with /api/auth/oauth/google'
+              {...form.getInputProps('oauthGoogleRedirectUri')}
+            />
           </Paper>
         </SimpleGrid>
 
@@ -121,6 +139,11 @@ export default function ServerSettingsOauth({
           <SimpleGrid mt='md' cols={{ base: 1, md: 2 }} spacing='lg'>
             <TextInput label='GitHub Client ID' {...form.getInputProps('oauthGithubClientId')} />
             <TextInput label='GitHub Client Secret' {...form.getInputProps('oauthGithubClientSecret')} />
+            <TextInput
+              label='GitHub Redirect URL'
+              description='The redirect URL to use instead of the host when logging in. This must end with /api/auth/oauth/github'
+              {...form.getInputProps('oauthGithubRedirectUri')}
+            />
           </SimpleGrid>
         </Paper>
 
@@ -133,6 +156,11 @@ export default function ServerSettingsOauth({
             <TextInput label='OIDC Authorize URL' {...form.getInputProps('oauthOidcAuthorizeUrl')} />
             <TextInput label='OIDC Token URL' {...form.getInputProps('oauthOidcTokenUrl')} />
             <TextInput label='OIDC Userinfo URL' {...form.getInputProps('oauthOidcUserinfoUrl')} />
+            <TextInput
+              label='OIDC Redirect URL'
+              description='The redirect URL to use instead of the host when logging in. This must end with /api/auth/oauth/oidc'
+              {...form.getInputProps('oauthOidcRedirectUri')}
+            />
           </SimpleGrid>
         </Paper>
 

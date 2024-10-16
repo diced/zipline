@@ -223,18 +223,22 @@ export const DATABASE_TO_PROP = {
 
   oauthDiscordClientId: 'oauth.discord.clientId',
   oauthDiscordClientSecret: 'oauth.discord.clientSecret',
+  oauthDiscordRedirectUri: 'oauth.discord.redirectUri',
 
   oauthGoogleClientId: 'oauth.google.clientId',
   oauthGoogleClientSecret: 'oauth.google.clientSecret',
+  oauthGoogleRedirectUri: 'oauth.google.redirectUri',
 
   oauthGithubClientId: 'oauth.github.clientId',
   oauthGithubClientSecret: 'oauth.github.clientSecret',
+  oauthGithubRedirectUri: 'oauth.github.redirectUri',
 
   oauthOidcClientId: 'oauth.oidc.clientId',
   oauthOidcClientSecret: 'oauth.oidc.clientSecret',
   oauthOidcAuthorizeUrl: 'oauth.oidc.authorizeUrl',
   oauthOidcUserinfoUrl: 'oauth.oidc.userinfoUrl',
   oauthOidcTokenUrl: 'oauth.oidc.tokenUrl',
+  oauthOidcRedirectUri: 'oauth.oidc.redirectUri',
 
   mfaTotpEnabled: 'mfa.totp.enabled',
   mfaTotpIssuer: 'mfa.totp.issuer',

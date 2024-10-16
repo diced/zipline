@@ -28,6 +28,7 @@ async function handler({ code, state, host }: OAuthQuery, _logger: Logger): Prom
         config.oauth.google.clientId!,
         `${config.core.returnHttpsUrls ? 'https' : 'http'}://${host}`,
         state,
+        config.oauth.google.redirectUri ?? undefined,
       ),
     };
 

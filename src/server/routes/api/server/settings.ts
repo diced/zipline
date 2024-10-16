@@ -180,15 +180,22 @@ export default fastifyPlugin(
 
             oauthDiscordClientId: z.string().nullable(),
             oauthDiscordClientSecret: z.string().nullable(),
+            oauthDiscordRedirectUri: z.string().url().endsWith('/api/auth/oauth/discord').nullable(),
+
             oauthGoogleClientId: z.string().nullable(),
             oauthGoogleClientSecret: z.string().nullable(),
+            oauthGoogleRedirectUri: z.string().url().endsWith('/api/auth/oauth/google').nullable(),
+
             oauthGithubClientId: z.string().nullable(),
             oauthGithubClientSecret: z.string().nullable(),
+            oauthGithubRedirectUri: z.string().url().endsWith('/api/auth/oauth/github').nullable(),
+
             oauthOidcClientId: z.string().nullable(),
             oauthOidcClientSecret: z.string().nullable(),
             oauthOidcAuthorizeUrl: z.string().url().nullable(),
             oauthOidcTokenUrl: z.string().url().nullable(),
             oauthOidcUserinfoUrl: z.string().url().nullable(),
+            oauthOidcRedirectUri: z.string().url().endsWith('/api/auth/oauth/oidc').nullable(),
 
             mfaTotpEnabled: z.boolean(),
             mfaTotpIssuer: z.string(),

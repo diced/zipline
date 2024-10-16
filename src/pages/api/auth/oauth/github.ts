@@ -24,7 +24,11 @@ async function handler({ code, state }: OAuthQuery, logger: Logger): Promise<OAu
 
   if (!code)
     return {
-      redirect: githubAuth.url(config.oauth.github.clientId!, state),
+      redirect: githubAuth.url(
+        config.oauth.github.clientId!,
+        state,
+        config.oauth.github.redirectUri ?? undefined,
+      ),
     };
 
   const body = JSON.stringify({

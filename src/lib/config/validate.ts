@@ -213,33 +213,39 @@ export const schema = z.object({
       .object({
         clientId: z.string(),
         clientSecret: z.string(),
+        redirectUri: z.string().url().nullable().default(null),
       })
       .or(
         z.object({
           clientId: z.undefined(),
           clientSecret: z.undefined(),
+          redirectUri: z.undefined(),
         }),
       ),
     github: z
       .object({
         clientId: z.string(),
         clientSecret: z.string(),
+        redirectUri: z.string().url().nullable().default(null),
       })
       .or(
         z.object({
           clientId: z.undefined(),
           clientSecret: z.undefined(),
+          redirectUri: z.undefined(),
         }),
       ),
     google: z
       .object({
         clientId: z.string(),
         clientSecret: z.string(),
+        redirectUri: z.string().url().nullable().default(null),
       })
       .or(
         z.object({
           clientId: z.undefined(),
           clientSecret: z.undefined(),
+          redirectUri: z.undefined(),
         }),
       ),
     oidc: z
@@ -249,6 +255,7 @@ export const schema = z.object({
         authorizeUrl: z.string().url(),
         userinfoUrl: z.string().url(),
         tokenUrl: z.string().url(),
+        redirectUri: z.string().url().nullable().default(null),
       })
       .or(
         z.object({
@@ -257,6 +264,7 @@ export const schema = z.object({
           authorizeUrl: z.undefined(),
           userinfoUrl: z.undefined(),
           tokenUrl: z.undefined(),
+          redirectUri: z.undefined(),
         }),
       ),
   }),
@@ -362,7 +370,7 @@ function handleError(error: ZodIssue) {
   const path =
     error.path[1] === 'externalLinks'
       ? `WEBSITE_EXTERNAL_LINKS[${error.path[2]}]`
-      : PROP_TO_ENV[<keyof typeof PROP_TO_ENV>error.path.join('.')] ?? error.path.join('.');
+      : (PROP_TO_ENV[<keyof typeof PROP_TO_ENV>error.path.join('.')] ?? error.path.join('.'));
 
   logger.error(`${path}: ${error.message}`);
 }

@@ -28,6 +28,7 @@ async function handler({ code, state, host }: OAuthQuery, logger: Logger): Promi
         config.oauth.discord.clientId!,
         `${config.core.returnHttpsUrls ? 'https' : 'http'}://${host}`,
         state,
+        config.oauth.discord.redirectUri ?? undefined,
       ),
     };
 

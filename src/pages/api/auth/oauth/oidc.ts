@@ -29,6 +29,7 @@ async function handler({ code, state, host }: OAuthQuery, _logger: Logger): Prom
         `${config.core.returnHttpsUrls ? 'https' : 'http'}://${host}`,
         config.oauth.oidc.authorizeUrl!,
         state,
+        config.oauth.oidc.redirectUri ?? undefined,
       ),
     };
 
