@@ -7,7 +7,9 @@ import { LoadingOverlay } from '@mantine/core';
 import { InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
 
-export default function DashboardIndex({ config }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function DashboardMetricsPage({
+  config,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter();
   const { loading, user } = useLogin();
   if (loading) return <LoadingOverlay visible />;

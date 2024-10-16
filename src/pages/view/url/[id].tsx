@@ -6,7 +6,7 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 
-export default function ViewUrl({ url, password }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function ViewUrlId({ url, password }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter();
 
   const [passwordValue, setPassword] = useState<string>('');

@@ -18,6 +18,7 @@ import {
   Modal,
   Pill,
   PillsInput,
+  ScrollArea,
   SimpleGrid,
   Text,
   Title,
@@ -188,11 +189,8 @@ export default function FileModal({
         }
         size='auto'
         centered
-        overlayProps={{
-          blur: 3,
-          opacity: 0.5,
-        }}
         zIndex={200}
+        scrollAreaComponent={ScrollArea.Autosize}
       >
         {file ? (
           <>

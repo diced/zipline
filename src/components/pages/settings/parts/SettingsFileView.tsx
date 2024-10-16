@@ -18,8 +18,21 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
-import { IconCheck, IconDeviceFloppy, IconFileX } from '@tabler/icons-react';
+import {
+  IconAlignCenter,
+  IconAlignLeft,
+  IconAlignRight,
+  IconCheck,
+  IconDeviceFloppy,
+  IconFileX,
+} from '@tabler/icons-react';
 import { mutate } from 'swr';
+
+const alignIcons: Record<string, React.ReactNode> = {
+  left: <IconAlignLeft size='1rem' />,
+  center: <IconAlignCenter size='1rem' />,
+  right: <IconAlignRight size='1rem' />,
+};
 
 export default function SettingsFileView() {
   const [user, setUser] = useUserStore((state) => [state.user, state.setUser]);
@@ -116,6 +129,12 @@ export default function SettingsFileView() {
               { value: 'center', label: 'Center' },
               { value: 'right', label: 'Right' },
             ]}
+            renderOption={({ option }) => (
+              <Group gap='xs'>
+                {alignIcons[option.value]}
+                {option.label}
+              </Group>
+            )}
             disabled={!form.values.enabled}
             {...form.getInputProps('align')}
           />

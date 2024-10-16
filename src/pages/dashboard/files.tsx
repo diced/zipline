@@ -5,7 +5,9 @@ import { withSafeConfig } from '@/lib/middleware/next/withSafeConfig';
 import { LoadingOverlay } from '@mantine/core';
 import { InferGetServerSidePropsType } from 'next';
 
-export default function DashboardIndex({ config }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function DashboardFilesPage({
+  config,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { loading } = useLogin();
   if (loading) return <LoadingOverlay visible />;
 

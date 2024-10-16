@@ -2,7 +2,7 @@ import { getZipline } from '@/lib/db/models/zipline';
 import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 
-export default function Home() {
+export default function Index() {
   return (
     <>
       <Head>

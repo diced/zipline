@@ -6,7 +6,7 @@ import { withSafeConfig } from '@/lib/middleware/next/withSafeConfig';
 import { Container, SimpleGrid, Title } from '@mantine/core';
 import { InferGetServerSidePropsType } from 'next';
 
-export default function ViewFolder({ folder }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function ViewFolderId({ folder }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   if (!folder) return null;
 
   return (

@@ -1,15 +1,15 @@
 import Layout from '@/components/Layout';
 import ViewFiles from '@/components/pages/users/ViewUserFiles';
 import { prisma } from '@/lib/db';
-import { User } from '@/lib/db/models/user';
+import { User, userSelect } from '@/lib/db/models/user';
 import useLogin from '@/lib/hooks/useLogin';
 import { withSafeConfig } from '@/lib/middleware/next/withSafeConfig';
-import { parseUserToken } from '@/lib/middleware/ziplineAuth';
 import { canInteract } from '@/lib/role';
+import { getSession } from '@/server/session';
 import { LoadingOverlay } from '@mantine/core';
 import { InferGetServerSidePropsType } from 'next';
 
-export default function DashboardIndex({
+export default function DashboardAdminUsersId({
   user,
   config,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
@@ -36,24 +36,24 @@ export const getServerSideProps = withSafeConfig(async (ctx) => {
     },
   });
 
-  try {
-    // eslint-disable-next-line no-var
-    var currentUserToken = parseUserToken(ctx.req.cookies['zipline_token']);
-  } catch (e) {
+  if (!user)
     return {
       notFound: true,
     };
-  }
 
-  const currentUser = await prisma.user.findUnique({
+  const session = await getSession(ctx.req, ctx.res);
+  if (!session.id || !session.sessionId)
+    return {
+      notFound: true,
+    };
+
+  const currentUser = await prisma.user.findFirst({
     where: {
-      token: currentUserToken,
+      sessions: {
+        has: session.sessionId,
+      },
     },
-    select: {
-      id: true,
-      username: true,
-      role: true,
-    },
+    select: userSelect,
   });
 
   if (!currentUser)

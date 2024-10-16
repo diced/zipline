@@ -3,6 +3,21 @@ import { useSettingsStore } from '@/lib/store/settings';
 import { Group, NumberInput, Paper, Select, Stack, Switch, Text, Title } from '@mantine/core';
 import { IconMoonFilled, IconPaintFilled, IconPercentage, IconSunFilled } from '@tabler/icons-react';
 
+const renderThemeOption =
+  (themes: ReturnType<typeof useThemes>) =>
+  ({ option }: { option: { value: string; label: string } }) => (
+    <Group gap='xs'>
+      {option.value === 'system' ? (
+        <IconPaintFilled size='1rem' />
+      ) : themes.find((theme) => theme.id === option.value)?.colorScheme === 'dark' ? (
+        <IconMoonFilled size='1rem' />
+      ) : (
+        <IconSunFilled size='1rem' />
+      )}
+      {option.label}
+    </Group>
+  );
+
 export default function SettingsDashboard() {
   const [settings, update] = useSettingsStore((state) => [state.settings, state.update]);
   const themes = useThemes();
@@ -52,6 +67,7 @@ export default function SettingsDashboard() {
           value={settings.theme}
           onChange={(value) => update('theme', value ?? 'builtin:dark_gray')}
           leftSection={<IconPaintFilled size='1rem' />}
+          renderOption={renderThemeOption(themes)}
         />
 
         {settings.theme === 'system' && (

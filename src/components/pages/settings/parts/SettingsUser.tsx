@@ -103,7 +103,7 @@ export default function SettingsUser() {
             <CopyButton value={token} timeout={1000}>
               {({ copied, copy }) => (
                 <Tooltip label='Click to copy token'>
-                  <ActionIcon onClick={copy} variant='transparent' color='white'>
+                  <ActionIcon onClick={copy} variant='subtle' color='gray'>
                     {copied ? <IconCheck color='green' size='1rem' /> : <IconCopy size='1rem' />}
                   </ActionIcon>
                 </Tooltip>
