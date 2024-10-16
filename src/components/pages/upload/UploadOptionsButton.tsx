@@ -1,3 +1,4 @@
+import { useConfig } from '@/components/ConfigProvider';
 import { Response } from '@/lib/api/response';
 import { Folder } from '@/lib/db/models/folder';
 import { useUploadOptionsStore } from '@/lib/store/uploadOptions';
@@ -30,10 +31,14 @@ import {
   IconTrashFilled,
   IconWriting,
 } from '@tabler/icons-react';
+import Link from 'next/link';
 import { useState } from 'react';
 import useSWR from 'swr';
+import ms from 'ms';
 
 export default function UploadOptionsButton({ numFiles }: { numFiles: number }) {
+  const config = useConfig();
+
   const [opened, setOpen] = useState(false);
   const [options, ephemeral, setOption, setEphemeral, changes] = useUploadOptionsStore((state) => [
     state.options,
@@ -113,7 +118,23 @@ export default function UploadOptionsButton({ numFiles }: { numFiles: number }) 
                 ) : null}
               </>
             }
-            description='The file will automatically delete itself after this time.'
+            description={
+              <>
+                The file will automatically delete itself after this time.{' '}
+                {config.files.defaultExpiration ? (
+                  <>
+                    The default expiration time is <b>{ms(config.files.defaultExpiration)}</b> (you can
+                    override this with the below option).
+                  </>
+                ) : (
+                  <>
+                    {'You can set a default expiration time in the '}
+                    <Link href='/dashboard/admin/settings'>settings</Link>
+                    {'.'}
+                  </>
+                )}
+              </>
+            }
             leftSection={<IconAlarmFilled size='1rem' />}
             value={options.deletesAt}
             onChange={(value) => setOption('deletesAt', value || 'never')}
@@ -129,7 +150,7 @@ export default function UploadOptionsButton({ numFiles }: { numFiles: number }) 
 
           <Select
             data={[
-              { value: 'default', label: 'Default' },
+              { value: 'default', label: `Default (${config.files.defaultFormat})` },
               { value: 'random', label: 'Random' },
               { value: 'date', label: 'Date' },
               { value: 'uuid', label: 'UUID' },

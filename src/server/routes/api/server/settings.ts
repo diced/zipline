@@ -117,9 +117,9 @@ export default fastifyPlugin(
               .transform((value) =>
                 typeof value === 'string' ? value.split(',').map((ext) => ext.trim()) : value,
               ),
-            filesMaxFileSize: zMs,
+            filesMaxFileSize: zBytes,
 
-            filesDefaultExpiration: zBytes,
+            filesDefaultExpiration: zMs,
             filesAssumeMimetypes: z.boolean(),
             filesDefaultDateFormat: z.string(),
             filesRemoveGpsMetadata: z.boolean(),

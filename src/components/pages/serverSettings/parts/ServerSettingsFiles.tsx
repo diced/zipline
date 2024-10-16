@@ -55,15 +55,23 @@ export default function ServerSettingsFiles({
       values.filesDefaultExpiration = values.filesDefaultExpiration.trim();
     }
 
-    if (values.filesDisabledExtensions?.trim() === '' || !values.filesDisabledExtensions) {
+    if (!values.filesDisabledExtensions) {
+      // @ts-ignore
+      values.filesDisabledExtensions = [];
+    } else if (
+      values.filesDisabledExtensions &&
+      typeof values.filesDisabledExtensions === 'string' &&
+      values.filesDisabledExtensions.trim() === ''
+    ) {
       // @ts-ignore
       values.filesDisabledExtensions = [];
     } else {
-      // @ts-ignore
-      values.filesDisabledExtensions = values.filesDisabledExtensions
-        .split(',')
-        .map((ext) => ext.trim())
-        .filter((ext) => ext !== '');
+      if (!Array.isArray(values.filesDisabledExtensions))
+        // @ts-ignore
+        values.filesDisabledExtensions = values.filesDisabledExtensions
+          .split(',')
+          .map((ext) => ext.trim())
+          .filter((ext) => ext !== '');
     }
 
     return settingsOnSubmit(router, form)(values);
