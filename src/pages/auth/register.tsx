@@ -21,6 +21,8 @@ export default function Register({ code = undefined, title, user_registration })
   const [verifyPasswordError, setVerifyPasswordError] = useState('');
   const [strength, setStrength] = useState(0);
 
+  const MAX_USERNAME_LENGTH = 16;
+
   const setUser = useSetRecoilState(userSelector);
   const router = useRouter();
 
@@ -29,6 +31,11 @@ export default function Register({ code = undefined, title, user_registration })
 
   const checkUsername = async () => {
     setUsername(username.trim());
+
+    if (username.length > MAX_USERNAME_LENGTH) {
+      setUsernameError(`Username cannot exceed ${MAX_USERNAME_LENGTH} characters`);
+      return;
+    }
 
     setUsernameError('');
 
@@ -101,7 +108,14 @@ export default function Register({ code = undefined, title, user_registration })
               <TextInput
                 label='Username'
                 value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                onChange={(e) => {
+                  setUsername(e.target.value);
+                  if (e.target.value.length > MAX_USERNAME_LENGTH) {
+                    setUsernameError(`Username cannot exceed ${MAX_USERNAME_LENGTH} characters`);
+                  } else {
+                    setUsernameError('');
+                  }
+                }}
                 error={usernameError}
                 onBlur={() => checkUsername()}
               />
