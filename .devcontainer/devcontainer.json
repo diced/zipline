@@ -41,7 +41,7 @@
   "remoteUser": "zipline",
   "updateRemoteUserUID": true,
   "remoteEnv": {
-    "CORE_DATABASE_URL": "postgres://postgres:postgres@localhost/zip10"
+    "CORE_DATABASE_URL": "postgres://postgres:postgres@db/zip10"
   },
   "portsAttributes": {
     "3000": {

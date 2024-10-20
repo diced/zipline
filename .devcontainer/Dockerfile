@@ -7,4 +7,6 @@ RUN usermod -l zipline node \
     && chmod 0440 /etc/sudoers.d/zipline \
     && sudo apt-get update && apt-get install gnupg2 -y
 
+EXPOSE 3000
+
 USER zipline
