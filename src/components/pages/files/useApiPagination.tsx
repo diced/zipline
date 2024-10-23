@@ -58,7 +58,7 @@ export function useApiPagination(
 ) {
   const { data, error, isLoading, mutate } = useSWR<Response['/api/user/files']>(
     { key: '/api/user/files', options },
-    fetcher,
+    { fetcher },
   );
 
   return {

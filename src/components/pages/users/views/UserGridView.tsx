@@ -15,7 +15,7 @@ export default function UserGridView() {
         <Paper withBorder h={200}>
           <LoadingOverlay visible />
         </Paper>
-      ) : users?.length ?? 0 !== 0 ? (
+      ) : (users?.length ?? 0 !== 0) ? (
         <SimpleGrid
           my='sm'
           spacing='md'

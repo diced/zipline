@@ -72,7 +72,7 @@ export default fastifyPlugin(
         if (isNaN(Number(perpage))) return res.badRequest('Perpage must be a number');
 
         const searchQuery = req.query.searchQuery
-          ? decodeURIComponent(req.query.searchQuery.trim()) ?? null
+          ? (decodeURIComponent(req.query.searchQuery.trim()) ?? null)
           : null;
 
         const { page, filter, favorite } = req.query;

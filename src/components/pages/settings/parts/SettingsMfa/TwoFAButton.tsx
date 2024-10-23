@@ -160,7 +160,7 @@ export default function TwoFAButton() {
                       width={180}
                       height={180}
                       src={twoData?.qrcode}
-                      alt={'qr code ' + twoData?.secret ?? ''}
+                      alt={'qr code ' + twoData?.secret}
                     />
                   </Center>
                 )}

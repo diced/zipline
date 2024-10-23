@@ -137,7 +137,7 @@ export default fastifyPlugin(
 
     server.get<{ Querystring: Query }>(PATH, { preHandler: [userMiddleware] }, async (req, res) => {
       const searchQuery = req.query.searchQuery
-        ? decodeURIComponent(req.query.searchQuery.trim()) ?? null
+        ? (decodeURIComponent(req.query.searchQuery.trim()) ?? null)
         : null;
       const searchField = validateSearchField.safeParse(req.query.searchField || 'destination');
       if (!searchField.success) return res.badRequest('Invalid searchField value');

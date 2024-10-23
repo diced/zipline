@@ -35,17 +35,17 @@ export default function Theming({
     state.settings.themeLight,
   ]);
   const systemTheme = useColorScheme();
-  const currentTheme = user ? userTheme : defaultTheme?.default ?? 'system';
+  const currentTheme = user ? userTheme : (defaultTheme?.default ?? 'system');
 
   let theme = findTheme(currentTheme, themes);
 
   if (currentTheme === 'system') {
     theme =
       systemTheme === 'dark'
-        ? findTheme(user ? preferredDark : defaultTheme?.dark ?? '', themes) ??
-          findTheme('builtin:dark_gray', themes)
-        : findTheme(user ? preferredLight : defaultTheme?.light ?? '', themes) ??
-          findTheme('builtin:light_gray', themes);
+        ? (findTheme(user ? preferredDark : (defaultTheme?.dark ?? ''), themes) ??
+          findTheme('builtin:dark_gray', themes))
+        : (findTheme(user ? preferredLight : (defaultTheme?.light ?? ''), themes) ??
+          findTheme('builtin:light_gray', themes));
   }
 
   if (!theme) {

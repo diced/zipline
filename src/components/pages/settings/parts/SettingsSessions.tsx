@@ -40,7 +40,7 @@ export default function SettingsSessions() {
       <Title order={2}>Sessions</Title>
 
       <Text c='dimmed' mt='sm'>
-        You are currently logged into {isLoading ? '...' : data?.other?.length ?? '...'} other devices
+        You are currently logged into {isLoading ? '...' : (data?.other?.length ?? '...')} other devices
       </Text>
 
       <Button

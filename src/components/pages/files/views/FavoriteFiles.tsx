@@ -64,7 +64,7 @@ export default function FavoriteFiles() {
                 cols={{
                   base: 1,
                   md: 2,
-                  lg: data?.page.length ?? 0 > 0 ? 3 : 1,
+                  lg: (data?.page.length ?? 0 > 0) ? 3 : 1,
                 }}
                 spacing='md'
                 pos='relative'
@@ -73,7 +73,7 @@ export default function FavoriteFiles() {
                   <Paper withBorder h={200}>
                     <LoadingOverlay visible />
                   </Paper>
-                ) : data?.page.length ?? 0 > 0 ? (
+                ) : (data?.page.length ?? 0 > 0) ? (
                   data?.page.map((file) => <DashboardFile key={file.id} file={file} />)
                 ) : (
                   <Paper withBorder p='sm'>

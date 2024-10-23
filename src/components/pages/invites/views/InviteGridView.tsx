@@ -15,7 +15,7 @@ export default function InviteGridView() {
         <Paper withBorder h={200}>
           <LoadingOverlay visible />
         </Paper>
-      ) : folders?.length ?? 0 !== 0 ? (
+      ) : (folders?.length ?? 0 !== 0) ? (
         <SimpleGrid
           my='sm'
           spacing='md'
