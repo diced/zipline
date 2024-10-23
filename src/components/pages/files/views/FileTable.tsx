@@ -1,6 +1,6 @@
 import RelativeDate from '@/components/RelativeDate';
 import FileModal from '@/components/file/DashboardFile/FileModal';
-import { addMultipleToFolder, copyFile, deleteFile, viewFile } from '@/components/file/actions';
+import { addMultipleToFolder, copyFile, deleteFile } from '@/components/file/actions';
 import { bytes } from '@/lib/bytes';
 import { type File } from '@/lib/db/models/file';
 import { useSettingsStore } from '@/lib/store/settings';
@@ -37,6 +37,7 @@ import { Response } from '@/lib/api/response';
 import { Folder } from '@/lib/db/models/folder';
 import TagPill from '../tags/TagPill';
 import { Tag } from '@/lib/db/models/tag';
+import Link from 'next/link';
 
 type ReducerQuery = {
   state: { name: string; originalName: string; type: string; tags: string };
@@ -46,16 +47,9 @@ type ReducerQuery = {
 const PER_PAGE_OPTIONS = [10, 20, 50];
 
 const NAMES = {
-  up: {
-    name: 'Name',
-    originalName: 'Original name',
-    type: 'Type',
-  },
-  low: {
-    name: 'name',
-    originalName: 'original name',
-    type: 'type',
-  },
+  name: 'Name',
+  originalName: 'Original name',
+  type: 'Type',
 };
 
 function SearchFilter({
@@ -84,8 +78,8 @@ function SearchFilter({
 
   return (
     <TextInput
-      label={NAMES.up[field]}
-      placeholder={`Search by ${NAMES.low[field]}`}
+      label={NAMES[field]}
+      placeholder={`Search by ${NAMES[field].toLowerCase()}`}
       value={searchQuery[field]}
       onChange={onChange}
       variant='filled'
@@ -446,15 +440,11 @@ export default function FileTable({ id }: { id?: string }) {
                   </Tooltip>
 
                   <Tooltip label='View file in new tab'>
-                    <ActionIcon
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        viewFile(file);
-                      }}
-                      color='blue'
-                    >
-                      <IconExternalLink size='1rem' />
-                    </ActionIcon>
+                    <Link href={`/view/${file.name}`} target='_blank'>
+                      <ActionIcon color='blue'>
+                        <IconExternalLink size='1rem' />
+                      </ActionIcon>
+                    </Link>
                   </Tooltip>
 
                   <Tooltip label='Copy file link to clipboard'>
@@ -484,7 +474,7 @@ export default function FileTable({ id }: { id?: string }) {
             },
           ]}
           fetching={isLoading}
-          totalRecords={searching ? data?.page.length : data?.total ?? 0}
+          totalRecords={searching ? data?.page.length : (data?.total ?? 0)}
           recordsPerPage={searching ? undefined : perpage}
           onRecordsPerPageChange={searching ? undefined : setPerpage}
           recordsPerPageOptions={searching ? undefined : PER_PAGE_OPTIONS}

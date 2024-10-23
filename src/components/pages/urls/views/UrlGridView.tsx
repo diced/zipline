@@ -14,7 +14,7 @@ export default function UrlGridView() {
         <Paper withBorder h={200}>
           <LoadingOverlay visible />
         </Paper>
-      ) : urls?.length ?? 0 !== 0 ? (
+      ) : (urls?.length ?? 0 !== 0) ? (
         <SimpleGrid
           my='sm'
           spacing='md'

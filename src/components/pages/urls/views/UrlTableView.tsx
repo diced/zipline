@@ -10,18 +10,12 @@ import { IconCopy, IconTrashFilled } from '@tabler/icons-react';
 import { useConfig } from '@/components/ConfigProvider';
 import { useClipboard } from '@mantine/hooks';
 import { useSettingsStore } from '@/lib/store/settings';
+import { formatRootUrl } from '@/lib/url';
 
 const NAMES = {
-  up: {
-    code: 'Code',
-    vanity: 'Vanity',
-    destination: 'Destination',
-  },
-  down: {
-    code: 'code',
-    vanity: 'vanity',
-    destination: 'destination',
-  },
+  code: 'Code',
+  vanity: 'Vanity',
+  destination: 'Destination',
 };
 
 function SearchFilter({
@@ -49,8 +43,8 @@ function SearchFilter({
 
   return (
     <TextInput
-      label={NAMES.up[field]}
-      placeholder={`Search by ${NAMES.up[field]}`}
+      label={NAMES[field]}
+      placeholder={`Search by ${NAMES[field].toLowerCase()}`}
       value={searchQuery[field]}
       onChange={onChange}
       variant='filled'
@@ -187,11 +181,15 @@ export default function UrlTableView() {
                 />
               ),
               filtering: searchField === 'code' && searchQuery.code.trim() !== '',
+              render: (url) => (
+                <Anchor href={formatRootUrl(config.urls.route, url.code)} target='_blank'>
+                  {url.code}
+                </Anchor>
+              ),
             },
             {
               accessor: 'vanity',
               sortable: true,
-              render: (url) => url.vanity ?? '',
               filter: (
                 <SearchFilter
                   setSearchField={setSearchField}
@@ -201,6 +199,14 @@ export default function UrlTableView() {
                 />
               ),
               filtering: searchField === 'vanity' && searchQuery.vanity.trim() !== '',
+              render: (url) =>
+                url.vanity ? (
+                  <Anchor href={formatRootUrl(config.urls.route, url.vanity)} target='_blank'>
+                    {url.vanity}
+                  </Anchor>
+                ) : (
+                  ''
+                ),
             },
             {
               accessor: 'destination',

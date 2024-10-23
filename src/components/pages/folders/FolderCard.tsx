@@ -1,6 +1,6 @@
 import RelativeDate from '@/components/RelativeDate';
 import { Folder } from '@/lib/db/models/folder';
-import { ActionIcon, Card, Group, Menu, Stack, Text } from '@mantine/core';
+import { ActionIcon, Anchor, Card, Group, Menu, Stack, Text } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { IconCopy, IconDots, IconFiles, IconLock, IconLockOpen, IconTrashFilled } from '@tabler/icons-react';
 import { useState } from 'react';
@@ -19,7 +19,15 @@ export default function FolderCard({ folder }: { folder: Folder }) {
       <Card withBorder shadow='sm' radius='sm'>
         <Card.Section withBorder inheritPadding py='xs'>
           <Group justify='space-between'>
-            <Text fw={400}>{folder.name}</Text>
+            <Text fw={400}>
+              {folder.public ? (
+                <Anchor href={`/folder/${folder.id}`} target='_blank'>
+                  {folder.name}
+                </Anchor>
+              ) : (
+                folder.name
+              )}
+            </Text>
 
             <Menu withinPortal position='bottom-end' shadow='sm'>
               <Group gap={2}>

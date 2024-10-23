@@ -66,6 +66,9 @@ export default function UserCard({ url }: { url: Url }) {
         <Card.Section inheritPadding py='xs'>
           <Stack gap={1}>
             <Text size='xs' c='dimmed'>
+              <b>Views:</b> {url.views.toLocaleString()}
+            </Text>
+            <Text size='xs' c='dimmed'>
               <b>Created:</b> <RelativeDate date={url.createdAt} />
             </Text>
             <Text size='xs' c='dimmed'>
@@ -81,7 +84,10 @@ export default function UserCard({ url }: { url: Url }) {
             </Text>
             {url.vanity && (
               <Text size='xs' c='dimmed'>
-                <b>Code:</b> {url.code}
+                <b>Code:</b>{' '}
+                <Anchor target='_blank' href={formatRootUrl(config.urls.route, url.code)}>
+                  {url.code}
+                </Anchor>
               </Text>
             )}
           </Stack>

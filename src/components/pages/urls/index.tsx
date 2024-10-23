@@ -102,12 +102,12 @@ export default function DashboardURLs() {
             </Group>
             <Group justify='right'>
               <Tooltip label='Open link in a new tab'>
-                <ActionIcon onClick={() => open()} variant='filled' color='primary'>
+                <ActionIcon onClick={() => open()} variant='filled'>
                   <IconExternalLink size='1rem' />
                 </ActionIcon>
               </Tooltip>
               <Tooltip label='Copy link to clipboard'>
-                <ActionIcon onClick={() => copy()} variant='filled' color='primary'>
+                <ActionIcon onClick={() => copy()} variant='filled'>
                   <IconClipboardCopy size='1rem' />
                 </ActionIcon>
               </Tooltip>

@@ -1,7 +1,7 @@
 import RelativeDate from '@/components/RelativeDate';
 import { Response } from '@/lib/api/response';
 import { Folder } from '@/lib/db/models/folder';
-import { ActionIcon, Box, Group, Tooltip } from '@mantine/core';
+import { ActionIcon, Anchor, Box, Group, Tooltip } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { useEffect, useState } from 'react';
@@ -58,6 +58,14 @@ export default function FolderTableView() {
             {
               accessor: 'name',
               sortable: true,
+              render: (folder) =>
+                folder.public ? (
+                  <Anchor href={`/folder/${folder.id}`} target='_blank'>
+                    {folder.name}
+                  </Anchor>
+                ) : (
+                  folder.name
+                ),
             },
             {
               accessor: 'public',
