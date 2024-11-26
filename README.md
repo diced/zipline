@@ -169,4 +169,4 @@ Create a pull request on GitHub. If your PR does not pass the action checks, the
 
 # Documentation
 
-Documentation source code is located in [diced/zipline-docs](https://github.com/diced/zipline-docs), and can be accessed [here](https://zipl.vercel.app).
+Documentation source code is located in [diced/zipline-docs](https://github.com/diced/zipline-docs), and can be accessed [here](https://zipline.diced.sh/docs/get-started).
