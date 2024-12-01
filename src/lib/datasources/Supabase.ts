@@ -72,7 +72,6 @@ export class Supabase extends Datasource {
     }
   }
 
-  // start and end aren't
   public async get(file: string, start: number = 0, end: number = Infinity): Promise<Readable> {
     // get a readable stream from the request
     const r = await fetch(`${this.config.url}/storage/v1/object/${this.config.bucket}/${file}`, {
