@@ -23,7 +23,6 @@ function dbFileDecorator(fastify: FastifyInstance, _, done) {
       return this.code(416)
         .header('Content-Range', `bytes */${size - 1}`)
         .send();
-
     if (rangeEnd === Infinity) rangeEnd = size - 1;
 
     const data = await this.server.datasource.get(file.name, rangeStart, rangeEnd);
