@@ -27,8 +27,12 @@ function dbFileDecorator(fastify: FastifyInstance, _, done) {
 
     const data = await this.server.datasource.get(file.name, rangeStart, rangeEnd);
 
-    this.code(206);
-    this.header('Content-Range', `bytes ${rangeStart}-${rangeEnd}/${size}`);
+    // only send content-range if the client asked for it
+    if (this.request.headers.range) {
+      this.code(206);
+      this.header('Content-Range', `bytes ${rangeStart}-${rangeEnd}/${size}`);
+    }
+
     this.header('Content-Length', rangeEnd - rangeStart + 1);
     this.header('Content-Type', download ? 'application/octet-stream' : file.mimetype);
     this.header('Content-Disposition', `inline; filename="${encodeURI(file.originalName || file.name)}"`);
