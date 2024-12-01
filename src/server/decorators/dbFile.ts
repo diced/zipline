@@ -14,22 +14,23 @@ function dbFileDecorator(fastify: FastifyInstance, _, done) {
     const ext = file.name.split('.').pop();
     if (Object.keys(exts).includes(ext)) return this.server.nextHandle(this.request.raw, this.raw);
 
-    // not zero indexed
     const size = await this.server.datasource.size(file.name);
     if (size === null) return this.notFound();
 
-    // zero indexed
-    const [rangeStart, rangeEnd] = parseRangeHeader(this.request.headers.range);
+    // eslint-disable-next-line prefer-const
+    let [rangeStart, rangeEnd] = parseRangeHeader(this.request.headers.range);
     if (rangeStart >= rangeEnd)
       return this.code(416)
         .header('Content-Range', `bytes */${size - 1}`)
         .send();
 
+    if (rangeEnd === Infinity) rangeEnd = size - 1;
+
     const data = await this.server.datasource.get(file.name, rangeStart, rangeEnd);
 
     this.code(206);
     this.header('Content-Range', `bytes ${rangeStart}-${rangeEnd}/${size}`);
-    this.header('Content-Length', (rangeEnd === Infinity ? size - 1 : rangeEnd) - rangeStart + 1);
+    this.header('Content-Length', rangeEnd - rangeStart + 1);
     this.header('Content-Type', download ? 'application/octet-stream' : file.mimetype);
     this.header('Content-Disposition', `inline; filename="${encodeURI(file.originalName || file.name)}"`);
     this.header('Accept-Ranges', 'bytes');
