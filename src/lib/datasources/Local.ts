@@ -26,20 +26,20 @@ export class Local extends Datasource {
     }
   }
 
-  public get(file: string): ReadStream {
+  public get(file: string, start: number = 0, end: number = Infinity): ReadStream {
     const full = join(this.path, file);
     if (!existsSync(full)) return null;
 
     try {
-      return createReadStream(full);
+      return createReadStream(full, { start, end });
     } catch (e) {
       return null;
     }
   }
 
-  public async size(file: string): Promise<number> {
+  public async size(file: string): Promise<number | null> {
     const full = join(this.path, file);
-    if (!existsSync(full)) return 0;
+    if (!existsSync(full)) return null;
     const stats = await stat(full);
 
     return stats.size;

@@ -72,12 +72,14 @@ export class Supabase extends Datasource {
     }
   }
 
-  public async get(file: string): Promise<Readable> {
+  // start and end aren't
+  public async get(file: string, start: number = 0, end: number = Infinity): Promise<Readable> {
     // get a readable stream from the request
     const r = await fetch(`${this.config.url}/storage/v1/object/${this.config.bucket}/${file}`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${this.config.key}`,
+        Range: `bytes=${start}-${end === Infinity ? '' : end}`,
       },
     });
 
@@ -102,11 +104,11 @@ export class Supabase extends Datasource {
         .then((j) => {
           if (j.error) {
             this.logger.error(`${j.error}: ${j.message}`);
-            res(0);
+            res(null);
           }
 
           if (j.length === 0) {
-            res(0);
+            res(null);
           } else {
             res(j[0].metadata.size);
           }
