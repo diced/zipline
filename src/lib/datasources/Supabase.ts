@@ -87,7 +87,7 @@ export class Supabase extends Datasource {
     return Readable.fromWeb(r.body as any);
   }
 
-  public size(file: string): Promise<number> {
+  public size(file: string): Promise<number | null> {
     return new Promise(async (res) => {
       fetch(`${this.config.url}/storage/v1/object/list/${this.config.bucket}`, {
         method: 'POST',

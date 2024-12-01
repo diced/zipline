@@ -61,7 +61,7 @@ export class S3 extends Datasource {
     });
   }
 
-  public size(file: string): Promise<number> {
+  public size(file: string): Promise<number | null> {
     return new Promise((res) => {
       this.s3.statObject(
         this.config.bucket,
