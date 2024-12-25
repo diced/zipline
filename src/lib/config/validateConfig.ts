@@ -278,7 +278,7 @@ export default function validate(config): Config {
       }
     }
 
-    const reserved = ['/view', '/dashboard', '/code', '/folder', '/api', '/auth'];
+    const reserved = ['/view', '/dashboard', '/code', '/folder', '/api', '/auth', '/r'];
     if (reserved.some((r) => validated.uploader.route.startsWith(r))) {
       throw {
         errors: [`The uploader route cannot be ${validated.uploader.route}, this is a reserved route.`],
