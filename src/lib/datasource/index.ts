@@ -27,6 +27,7 @@ function getDatasource(conf?: typeof config): void {
         region: config.datasource.s3?.region,
         bucket: config.datasource.s3!.bucket,
         endpoint: config.datasource.s3?.endpoint,
+        forcePathStyle: config.datasource.s3?.forcePathStyle,
       });
       break;
     default:

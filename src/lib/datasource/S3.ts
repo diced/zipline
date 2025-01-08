@@ -24,6 +24,7 @@ export class S3Datasource extends Datasource {
       region?: string;
       bucket: string;
       endpoint?: string | null;
+      forcePathStyle?: boolean;
     },
   ) {
     super();
@@ -35,6 +36,7 @@ export class S3Datasource extends Datasource {
       },
       region: this.options.region ?? undefined,
       endpoint: this.options.endpoint ?? undefined,
+      forcePathStyle: this.options.forcePathStyle ?? false,
     });
 
     this.ensureBucketExists();

@@ -156,6 +156,7 @@ export const PROP_TO_ENV = {
   'datasource.s3.region': 'DATASOURCE_S3_REGION',
   'datasource.s3.bucket': 'DATASOURCE_S3_BUCKET',
   'datasource.s3.endpoint': 'DATASOURCE_S3_ENDPOINT',
+  'datasource.s3.forcePathStyle': 'DATASOURCE_S3_FORCE_PATH_STYLE',
 
   'datasource.local.directory': 'DATASOURCE_LOCAL_DIRECTORY',
 
@@ -321,6 +322,7 @@ export function readEnv() {
     env('datasource.s3.region', 'string'),
     env('datasource.s3.bucket', 'string'),
     env('datasource.s3.endpoint', 'string'),
+    env('datasource.s3.forcePathStyle', 'boolean'),
 
     env('datasource.local.directory', 'string'),
 
