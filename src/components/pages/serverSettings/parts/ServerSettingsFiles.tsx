@@ -1,5 +1,4 @@
 import { Response } from '@/lib/api/response';
-import { bytes } from '@/lib/bytes';
 import {
   Button,
   LoadingOverlay,
@@ -82,7 +81,7 @@ export default function ServerSettingsFiles({
       filesLength: data?.filesLength ?? 6,
       filesDefaultFormat: data?.filesDefaultFormat ?? 'random',
       filesDisabledExtensions: data?.filesDisabledExtensions.join(', ') ?? '',
-      filesMaxFileSize: bytes(data?.filesMaxFileSize ?? 104857600),
+      filesMaxFileSize: data?.filesMaxFileSize ?? '100mb',
       filesDefaultExpiration: data?.filesDefaultExpiration ?? '',
       filesAssumeMimetypes: data?.filesAssumeMimetypes ?? false,
       filesDefaultDateFormat: data?.filesDefaultDateFormat ?? 'YYYY-MM-DD_HH:mm:ss',

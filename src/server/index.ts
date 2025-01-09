@@ -1,3 +1,4 @@
+import { bytes } from '@/lib/bytes';
 import { reloadSettings } from '@/lib/config';
 import { getDatasource } from '@/lib/datasource';
 import { prisma } from '@/lib/db';
@@ -19,6 +20,7 @@ import { fastifySensible } from '@fastify/sensible';
 import { fastifyStatic } from '@fastify/static';
 import fastify from 'fastify';
 import { mkdir } from 'fs/promises';
+import ms from 'ms';
 import { parse } from 'url';
 import { version } from '../../package.json';
 import { checkRateLimit } from './plugins/checkRateLimit';
@@ -84,7 +86,7 @@ async function main() {
 
   await server.register(fastifyMultipart, {
     limits: {
-      fileSize: config.files.maxFileSize,
+      fileSize: bytes(config.files.maxFileSize),
     },
   });
 
@@ -203,10 +205,10 @@ async function main() {
   logger.info('server started', { hostname: config.core.hostname, port: config.core.port });
 
   // Tasks
-  tasks.interval('deletefiles', config.tasks.deleteInterval, deleteFiles(prisma));
-  tasks.interval('maxviews', config.tasks.maxViewsInterval, maxViews(prisma));
+  tasks.interval('deletefiles', ms(config.tasks.deleteInterval), deleteFiles(prisma));
+  tasks.interval('maxviews', ms(config.tasks.maxViewsInterval), maxViews(prisma));
 
-  if (config.features.metrics) tasks.interval('metrics', config.tasks.metricsInterval, metrics(prisma));
+  if (config.features.metrics) tasks.interval('metrics', ms(config.tasks.metricsInterval), metrics(prisma));
 
   if (config.features.thumbnails.enabled) {
     for (let i = 0; i !== config.features.thumbnails.num_threads; ++i) {
@@ -216,8 +218,8 @@ async function main() {
       });
     }
 
-    tasks.interval('thumbnails', config.tasks.thumbnailsInterval, thumbnails(prisma));
-    tasks.interval('clearinvites', config.tasks.clearInvitesInterval, clearInvites(prisma));
+    tasks.interval('thumbnails', ms(config.tasks.thumbnailsInterval), thumbnails(prisma));
+    tasks.interval('clearinvites', ms(config.tasks.clearInvitesInterval), clearInvites(prisma));
   }
 
   tasks.start();

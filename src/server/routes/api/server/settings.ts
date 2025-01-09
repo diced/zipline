@@ -18,17 +18,8 @@ type Settings = Awaited<ReturnType<typeof readDatabaseSettings>>;
 export type ApiServerSettingsResponse = Settings;
 type Body = Partial<Settings>;
 
-const zMs = z
-  .union([z.number().min(1), z.string()])
-  .transform((value) => (typeof value === 'string' ? ms(value) : value))
-  .refine((value) => value > 0, 'Value must be greater than 0');
-
-const zMsString = z.string().refine((value) => ms(value) > 0, 'Value must be greater than 0');
-
-const zBytes = z
-  .union([z.number().min(1), z.string()])
-  .transform((value) => (typeof value === 'string' ? bytes(value) : value))
-  .refine((value) => value > 0, 'Value must be greater than 0');
+const zMs = z.string().refine((value) => ms(value) > 0, 'Value must be greater than 0');
+const zBytes = z.string().refine((value) => bytes(value) > 0, 'Value must be greater than 0');
 
 const discordEmbed = z
   .union([
@@ -125,7 +116,7 @@ export default fastifyPlugin(
               ),
             filesMaxFileSize: zBytes,
 
-            filesDefaultExpiration: zMsString.nullable(),
+            filesDefaultExpiration: zMs.nullable(),
             filesAssumeMimetypes: z.boolean(),
             filesDefaultDateFormat: z.string(),
             filesRemoveGpsMetadata: z.boolean(),

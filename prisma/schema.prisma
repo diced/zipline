@@ -20,20 +20,20 @@ model Zipline {
   coreTempDirectory   String // default join(tmpdir(), 'zipline')
 
   chunksEnabled Boolean @default(true)
-  chunksMax     Int     @default(99614720)
-  chunksSize    Int     @default(26214400)
+  chunksMax     String     @default("95mb")
+  chunksSize    String     @default("25mb")
 
-  tasksDeleteInterval       Int @default(1800000)
-  tasksClearInvitesInterval Int @default(1800000)
-  tasksMaxViewsInterval     Int @default(1800000)
-  tasksThumbnailsInterval   Int @default(1800000)
-  tasksMetricsInterval      Int @default(1800000)
+  tasksDeleteInterval       String @default("30m")
+  tasksClearInvitesInterval String @default("30m")
+  tasksMaxViewsInterval     String @default("30m")
+  tasksThumbnailsInterval   String @default("30m")
+  tasksMetricsInterval      String @default("30m")
 
   filesRoute              String   @default("/u")
   filesLength             Int      @default(6)
   filesDefaultFormat      String   @default("random")
   filesDisabledExtensions String[]
-  filesMaxFileSize        Int      @default(104857600)
+  filesMaxFileSize        String      @default("100mb")
   filesDefaultExpiration  String?
   filesAssumeMimetypes    Boolean  @default(false)
   filesDefaultDateFormat  String   @default("YYYY-MM-DD_HH:mm:ss")

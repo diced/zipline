@@ -35,8 +35,8 @@ export async function handleFile({
   const extension = options.overrides?.extension ?? extname(file.filename);
   if (config.files.disabledExtensions.includes(extension)) throw `File extension ${extension} is not allowed`;
 
-  if (file.file.bytesRead > config.files.maxFileSize)
-    throw `File size is too large. Maximum file size is ${config.files.maxFileSize} bytes`;
+  if (file.file.bytesRead > bytes(config.files.maxFileSize))
+    throw `File size is too large. Maximum file size is ${bytes(config.files.maxFileSize)} bytes`;
 
   const format = options.format || config.files.defaultFormat;
   let fileName = formatFileName(format, file.filename);

@@ -1,5 +1,4 @@
 import { Response } from '@/lib/api/response';
-import { bytes } from '@/lib/bytes';
 import { Button, LoadingOverlay, Paper, SimpleGrid, Switch, TextInput, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconDeviceFloppy } from '@tabler/icons-react';
@@ -28,8 +27,8 @@ export default function ServerSettingsChunks({
 
     form.setValues({
       chunksEnabled: data?.chunksEnabled ?? true,
-      chunksMax: bytes(data!.chunksMax),
-      chunksSize: bytes(data!.chunksSize),
+      chunksMax: data!.chunksMax ?? '',
+      chunksSize: data!.chunksSize ?? '',
     });
   }, [data]);
 

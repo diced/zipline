@@ -1,0 +1,17 @@
+-- AlterTable
+ALTER TABLE "Zipline" ALTER COLUMN "chunksMax" SET DEFAULT '95mb',
+ALTER COLUMN "chunksMax" SET DATA TYPE TEXT,
+ALTER COLUMN "chunksSize" SET DEFAULT '25mb',
+ALTER COLUMN "chunksSize" SET DATA TYPE TEXT,
+ALTER COLUMN "tasksDeleteInterval" SET DEFAULT '30m',
+ALTER COLUMN "tasksDeleteInterval" SET DATA TYPE TEXT,
+ALTER COLUMN "tasksClearInvitesInterval" SET DEFAULT '30m',
+ALTER COLUMN "tasksClearInvitesInterval" SET DATA TYPE TEXT,
+ALTER COLUMN "tasksMaxViewsInterval" SET DEFAULT '30m',
+ALTER COLUMN "tasksMaxViewsInterval" SET DATA TYPE TEXT,
+ALTER COLUMN "tasksThumbnailsInterval" SET DEFAULT '30m',
+ALTER COLUMN "tasksThumbnailsInterval" SET DATA TYPE TEXT,
+ALTER COLUMN "tasksMetricsInterval" SET DEFAULT '30m',
+ALTER COLUMN "tasksMetricsInterval" SET DATA TYPE TEXT,
+ALTER COLUMN "filesMaxFileSize" SET DEFAULT '100mb',
+ALTER COLUMN "filesMaxFileSize" SET DATA TYPE TEXT;

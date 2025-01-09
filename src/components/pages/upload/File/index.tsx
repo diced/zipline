@@ -70,7 +70,7 @@ export default function UploadFile() {
     const toPartialFiles: File[] = [];
     for (let i = 0; i !== files.length; ++i) {
       const file = files[i];
-      if (config.chunks.enabled && file.size >= config.chunks.max) {
+      if (config.chunks.enabled && file.size >= bytes(config.chunks.max)) {
         toPartialFiles.push(file);
       }
     }
@@ -88,7 +88,7 @@ export default function UploadFile() {
       });
     } else {
       const size = aggSize();
-      if (size > config.files.maxFileSize && !toPartialFiles.length) {
+      if (size > bytes(config.files.maxFileSize) && !toPartialFiles.length) {
         notifications.show({
           title: 'Upload may fail',
           color: 'yellow',
@@ -97,7 +97,7 @@ export default function UploadFile() {
             <>
               The upload may fail because the total size of the files (that are not being partially uploaded)
               you are trying to upload is <b>{bytes(size)}</b>, which is larger than the limit of{' '}
-              <b>{bytes(config.files.maxFileSize)}</b>
+              <b>{bytes(bytes(config.files.maxFileSize))}</b>
             </>
           ),
         });
@@ -167,7 +167,7 @@ export default function UploadFile() {
               Attach as many files as you like, they will show up below to review before uploading.
             </Text>
             <Text size='sm' c='dimmed' mt={7}>
-              <b>{bytes(config.files.maxFileSize)}</b> limit per file
+              <b>{bytes(bytes(config.files.maxFileSize))}</b> limit per file
             </Text>
           </div>
         </Group>

@@ -60,7 +60,6 @@ async function handler({ code, host, state }: OAuthQuery, _logger: Logger): Prom
 
   const json = await res.json();
   if (!json.access_token) return { error: 'No access token in response' };
-  if (!json.refresh_token) return { error: 'No refresh token in response' };
 
   const userJson = await googleAuth.user(json.access_token);
   if (!userJson) return { error: 'Failed to fetch user' };

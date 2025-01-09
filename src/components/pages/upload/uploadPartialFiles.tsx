@@ -1,5 +1,6 @@
 import { useConfig } from '@/components/ConfigProvider';
 import { Response } from '@/lib/api/response';
+import { bytes } from '@/lib/bytes';
 import { randomCharacters } from '@/lib/random';
 import { ErrorBody } from '@/lib/response';
 import { UploadOptionsStore } from '@/lib/store/uploadOptions';
@@ -94,10 +95,12 @@ export async function uploadPartialFiles(
   setLoading(true);
   setProgress({ percent: 0, remaining: 0, speed: 0 });
 
+  const chunkSize = bytes(config.chunks.size);
+
   for (let i = 0; i !== files.length; ++i) {
     const file = files[i];
     const identifier = randomCharacters(8);
-    const nChunks = Math.ceil(file.size / config.chunks.size);
+    const nChunks = Math.ceil(file.size / chunkSize);
     const chunks: {
       blob: Blob;
       start: number;
@@ -105,8 +108,8 @@ export async function uploadPartialFiles(
     }[] = [];
 
     for (let j = 0; j !== nChunks; ++j) {
-      const start = j * config.chunks.size;
-      const end = Math.min(start + config.chunks.size, file.size);
+      const start = j * chunkSize;
+      const end = Math.min(start + chunkSize, file.size);
       chunks.push({
         blob: file.slice(start, end),
         start,

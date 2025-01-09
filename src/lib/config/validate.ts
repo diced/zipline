@@ -1,10 +1,8 @@
-import { type ZodIssue, z } from 'zod';
-import { PROP_TO_ENV, ParsedConfig } from './read';
-import { log } from '../logger';
-import { join, resolve } from 'path';
-import { bytes } from '../bytes';
-import ms from 'ms';
 import { tmpdir } from 'os';
+import { join, resolve } from 'path';
+import { type ZodIssue, z } from 'zod';
+import { log } from '../logger';
+import { PROP_TO_ENV, ParsedConfig } from './read';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -75,23 +73,23 @@ export const schema = z.object({
       .default(join(tmpdir(), 'zipline')),
   }),
   chunks: z.object({
-    max: z.number().default(bytes('95mb')),
-    size: z.number().default(bytes('25mb')),
+    max: z.string().default('95mb'),
+    size: z.string().default('25mb'),
     enabled: z.boolean().default(true),
   }),
   tasks: z.object({
-    deleteInterval: z.number().default(ms('30min')),
-    clearInvitesInterval: z.number().default(ms('30min')),
-    maxViewsInterval: z.number().default(ms('30min')),
-    thumbnailsInterval: z.number().default(ms('30min')),
-    metricsInterval: z.number().default(ms('30min')),
+    deleteInterval: z.string().default('30min'),
+    clearInvitesInterval: z.string().default('30min'),
+    maxViewsInterval: z.string().default('30min'),
+    thumbnailsInterval: z.string().default('30min'),
+    metricsInterval: z.string().default('30min'),
   }),
   files: z.object({
     route: z.string().startsWith('/').min(1).trim().toLowerCase().default('/u'),
     length: z.number().default(6),
     defaultFormat: z.enum(['random', 'date', 'uuid', 'name', 'gfycat']).default('random'),
     disabledExtensions: z.array(z.string()).default([]),
-    maxFileSize: z.number().default(bytes('100mb')),
+    maxFileSize: z.string().default('100mb'),
     defaultExpiration: z.string().nullable().default(null),
     assumeMimetypes: z.boolean().default(false),
     defaultDateFormat: z.string().default('YYYY-MM-DD_HH:mm:ss'),

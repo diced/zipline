@@ -2,7 +2,6 @@ import { Response } from '@/lib/api/response';
 import { Button, LoadingOverlay, Paper, SimpleGrid, Text, TextInput, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconDeviceFloppy } from '@tabler/icons-react';
-import ms from 'ms';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { settingsOnSubmit } from '../settingsOnSubmit';
@@ -15,11 +14,11 @@ export default function ServerSettingsTasks({
   const router = useRouter();
   const form = useForm({
     initialValues: {
-      tasksDeleteInterval: ms(1800000),
-      tasksClearInvitesInterval: ms(1800000),
-      tasksMaxViewsInterval: ms(1800000),
-      tasksThumbnailsInterval: ms(1800000),
-      tasksMetricsInterval: ms(1800000),
+      tasksDeleteInterval: '30m',
+      tasksClearInvitesInterval: '30m',
+      tasksMaxViewsInterval: '30m',
+      tasksThumbnailsInterval: '30m',
+      tasksMetricsInterval: '30m',
     },
   });
 
@@ -29,11 +28,11 @@ export default function ServerSettingsTasks({
     if (!data) return;
 
     form.setValues({
-      tasksDeleteInterval: ms(data?.tasksDeleteInterval ?? 1800000),
-      tasksClearInvitesInterval: ms(data?.tasksClearInvitesInterval ?? 1800000),
-      tasksMaxViewsInterval: ms(data?.tasksMaxViewsInterval ?? 1800000),
-      tasksThumbnailsInterval: ms(data?.tasksThumbnailsInterval ?? 1800000),
-      tasksMetricsInterval: ms(data?.tasksMetricsInterval ?? 1800000),
+      tasksDeleteInterval: data?.tasksDeleteInterval ?? '30m',
+      tasksClearInvitesInterval: data?.tasksClearInvitesInterval ?? '30m',
+      tasksMaxViewsInterval: data?.tasksMaxViewsInterval ?? '30m',
+      tasksThumbnailsInterval: data?.tasksThumbnailsInterval ?? '30m',
+      tasksMetricsInterval: data?.tasksMetricsInterval ?? '30m',
     });
   }, [data]);
 

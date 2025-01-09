@@ -23,6 +23,7 @@ import { useClipboard } from '@mantine/hooks';
 import { useModals } from '@mantine/modals';
 import { showNotification } from '@mantine/notifications';
 import {
+  IconAdjustments,
   IconChevronDown,
   IconChevronRight,
   IconClipboardCopy,
@@ -36,7 +37,6 @@ import {
   IconLink,
   IconLogout,
   IconRefreshDot,
-  IconSettingsExclamation,
   IconSettingsFilled,
   IconShieldLockFilled,
   IconTags,
@@ -118,7 +118,7 @@ const navLinks: NavLinks[] = [
     links: [
       {
         label: 'Settings',
-        icon: <IconSettingsFilled size='1rem' />,
+        icon: <IconAdjustments size='1rem' />,
         active: (path: string) => path === '/dashboard/admin/settings',
         href: '/dashboard/admin/settings',
       },
@@ -277,7 +277,7 @@ export default function Layout({ children, config }: { children: React.ReactNode
 
                 {isAdministrator(user?.role) && (
                   <Menu.Item
-                    leftSection={<IconSettingsExclamation size='1rem' />}
+                    leftSection={<IconAdjustments size='1rem' />}
                     component={Link}
                     href='/dashboard/admin/settings'
                   >
