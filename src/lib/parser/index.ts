@@ -50,7 +50,7 @@ export function parseString(str: string, value: ParseValue) {
   };
 
   const re =
-    /\{(?<type>file|url|user|debug|link|metricsUser|metricsZipline)\.(?<prop>\w+)(::(?<mod>\w+))?(::(?<mod_tzlocale>\S+))?\}/gi;
+    /\{(?<type>file|url|user|debug|link|metricsUser|metricsZipline)\.(?<prop>\w+)(::(?<mod>\w+))?((::(?<mod_tzlocale>\S+))|(?<mod_check>\[(?<mod_check_true>".*")\|\|(?<mod_check_false>".*")\]))?\}/gi;
   let matches: RegExpMatchArray | null;
 
   while ((matches = re.exec(str))) {
@@ -59,6 +59,7 @@ export function parseString(str: string, value: ParseValue) {
     const index = matches.index as number;
 
     const getV = value[matches.groups.type as keyof ParseValue];
+
     if (!getV) {
       str = replaceCharsFromString(str, '{unknown_type}', index, re.lastIndex);
       re.lastIndex = index;
@@ -94,7 +95,14 @@ export function parseString(str: string, value: ParseValue) {
     if (matches.groups.mod) {
       str = replaceCharsFromString(
         str,
-        modifier(matches.groups.mod, v, matches.groups.mod_tzlocale ?? undefined),
+        modifier(
+          matches.groups.mod,
+          v,
+          matches.groups.mod_tzlocale ?? undefined,
+          matches.groups.mod_check_true ?? undefined,
+          matches.groups.mod_check_false ?? undefined,
+          value,
+        ),
         index,
         re.lastIndex,
       );
@@ -109,8 +117,17 @@ export function parseString(str: string, value: ParseValue) {
   return str;
 }
 
-function modifier(mod: string, value: unknown, tzlocale?: string): string {
+function modifier(
+  mod: string,
+  value: unknown,
+  tzlocale?: string,
+  check_true?: string,
+  check_false?: string,
+  _value?: ParseValue,
+): string {
   mod = mod.toLowerCase();
+  check_true = check_true?.slice(1, -1);
+  check_false = check_false?.slice(1, -1);
 
   if (value instanceof Date) {
     const args: [string?, { timeZone: string }?] = [undefined, undefined];
@@ -173,56 +190,223 @@ function modifier(mod: string, value: unknown, tzlocale?: string): string {
         return `{unknown_date_modifier(${mod})}`;
     }
   } else if (typeof value === 'string') {
-    switch (mod) {
-      case 'upper':
+    switch (true) {
+      case mod == 'upper':
         return value.toUpperCase();
-      case 'lower':
+      case mod == 'lower':
         return value.toLowerCase();
-      case 'title':
+      case mod == 'title':
         return value.charAt(0).toUpperCase() + value.slice(1);
-      case 'length':
+      case mod == 'length':
         return value.length.toString();
-      case 'reverse':
+      case mod == 'reverse':
         return value.split('').reverse().join('');
-      case 'base64':
+      case mod == 'base64':
         return btoa(value);
-      case 'hex':
+      case mod == 'hex':
         return toHex(value);
-      case 'string':
+      case mod == 'string':
         return value;
+      case mod.startsWith('equal'): {
+        if (typeof check_true !== 'string' || typeof check_false !== 'string') return `{unknown_str_modifier(${mod})}`;
+
+        const check = mod.replace('equal', '');
+
+        if (!check) return `{unknown_str_modifier(${mod})}`;
+
+        if (_value) {
+          return value.toLowerCase() == check
+            ? parseString(check_true, _value) || check_true
+            : parseString(check_false, _value) || check_false;
+        }
+
+        return value.toLowerCase() == check ? check_true : check_false;
+      }
+      case mod.startsWith('startswith'): {
+        if (typeof check_true !== 'string' || typeof check_false !== 'string') return `{unknown_str_modifier(${mod})}`;
+
+        const check = mod.replace('startswith', '');
+
+        if (!check) return `{unknown_str_modifier(${mod})}`;
+
+        if (_value) {
+          return value.toLowerCase().startsWith(check)
+            ? parseString(check_true, _value) || check_true
+            : parseString(check_false, _value) || check_false;
+        }
+
+        return value.toLowerCase().startsWith(check) ? check_true : check_false;
+      }
+      case mod.startsWith('endswith'): {
+        if (typeof check_true !== 'string' || typeof check_false !== 'string') return `{unknown_str_modifier(${mod})}`;
+
+        const check = mod.replace('endswith', '');
+
+        if (!check) return `{unknown_str_modifier(${mod})}`;
+
+        if (_value) {
+          return value.toLowerCase().endsWith(check)
+            ? parseString(check_true, _value) || check_true
+            : parseString(check_false, _value) || check_false;
+        }
+
+        return value.toLowerCase().endsWith(check) ? check_true : check_false;
+      }
+      case mod.startsWith('includes'): {
+        if (typeof check_true !== 'string' || typeof check_false !== 'string') return `{unknown_str_modifier(${mod})}`;
+
+        const check = mod.replace('includes', '');
+
+        if (!check) return `{unknown_str_modifier(${mod})}`;
+
+        if (_value) {
+          return value.toLowerCase().includes(check)
+            ? parseString(check_true, _value) || check_true
+            : parseString(check_false, _value) || check_false;
+        }
+
+        return value.toLowerCase().includes(check) ? check_true : check_false;
+      }
       default:
         return `{unknown_str_modifier(${mod})}`;
     }
   } else if (typeof value === 'number') {
-    switch (mod) {
-      case 'comma':
+    switch (true) {
+      case mod == 'comma':
         return value.toLocaleString();
-      case 'hex':
+      case mod == 'hex':
         return value.toString(16);
-      case 'octal':
+      case mod == 'octal':
         return value.toString(8);
-      case 'binary':
+      case mod == 'binary':
         return value.toString(2);
-      case 'bytes':
+      case mod == 'bytes':
         return bytes(value);
-      case 'string':
+      case mod == 'string':
         return value.toString();
+      case mod.startsWith('greaterequal'): {
+        if (typeof check_true !== 'string' || typeof check_false !== 'string') return `{unknown_int_modifier(${mod})}`;
+
+        const check = Number(mod.replace('greaterequal', ''));
+
+        if (Number.isNaN(check)) return `{unknown_int_modifier(${mod})}`;
+
+        if (_value) {
+          return value >= check
+            ? parseString(check_true, _value) || check_true
+            : parseString(check_false, _value) || check_false;
+        }
+
+        return value >= check ? check_true : check_false;
+      }
+      case mod.startsWith('greater'): {
+        if (typeof check_true !== 'string' || typeof check_false !== 'string') return `{unknown_int_modifier(${mod})}`;
+
+        const check = Number(mod.replace('greater', ''));
+
+        if (Number.isNaN(check)) return `{unknown_int_modifier(${mod})}`;
+
+        if (_value) {
+          return value > check
+            ? parseString(check_true, _value) || check_true
+            : parseString(check_false, _value) || check_false;
+        }
+
+        return value > check ? check_true : check_false;
+      }
+      case mod.startsWith('equal'): {
+        if (typeof check_true !== 'string' || typeof check_false !== 'string') return `{unknown_int_modifier(${mod})}`;
+
+        const check = Number(mod.replace('equal', ''));
+
+        if (Number.isNaN(check)) return `{unknown_int_modifier(${mod})}`;
+
+        if (_value) {
+          return value == check
+            ? parseString(check_true, _value) || check_true
+            : parseString(check_false, _value) || check_false;
+        }
+
+        return value == check ? check_true : check_false;
+      }
+      case mod.startsWith('lesserequal'): {
+        if (typeof check_true !== 'string' || typeof check_false !== 'string') return `{unknown_int_modifier(${mod})}`;
+
+        const check = Number(mod.replace('lesserequal', ''));
+
+        if (Number.isNaN(check)) return `{unknown_int_modifier(${mod})}`;
+
+        if (_value) {
+          return value <= check
+            ? parseString(check_true, _value) || check_true
+            : parseString(check_false, _value) || check_false;
+        }
+
+        return value <= check ? check_true : check_false;
+      }
+      case mod.startsWith('lesser'): {
+        if (typeof check_true !== 'string' || typeof check_false !== 'string') return `{unknown_int_modifier(${mod})}`;
+
+        const check = Number(mod.replace('lesser', ''));
+
+        if (Number.isNaN(check)) return `{unknown_int_modifier(${mod})}`;
+
+        if (_value) {
+          return value < check
+            ? parseString(check_true, _value) || check_true
+            : parseString(check_false, _value) || check_false;
+        }
+
+        return value < check ? check_true : check_false;
+      }
       default:
         return `{unknown_int_modifier(${mod})}`;
     }
   } else if (typeof value === 'boolean') {
-    switch (mod) {
-      case 'yesno':
+    switch (true) {
+      case mod == 'yesno':
         return value ? 'Yes' : 'No';
-      case 'onoff':
+      case mod == 'onoff':
         return value ? 'On' : 'Off';
-      case 'truefalse':
+      case mod == 'truefalse':
         return value ? 'True' : 'False';
-      case 'string':
+      case mod == 'string':
         return value ? 'true' : 'false';
+      case mod == 'istrue': {
+        if (typeof check_true !== 'string' || typeof check_false !== 'string') return `{unknown_bool_modifier(${mod})}`;
+
+        if (_value) {
+          return value
+            ? parseString(check_true, _value) || check_true
+            : parseString(check_false, _value) || check_false;
+        }
+
+        return value ? check_true : check_false;
+      }
+      case mod == 'isfalse': {
+        if (typeof check_true !== 'string' || typeof check_false !== 'string') return `{unknown_bool_modifier(${mod})}`;
+
+        if (_value) {
+          return !value
+            ? parseString(check_true, _value) || check_true
+            : parseString(check_false, _value) || check_false;
+        }
+
+        return !value ? check_true : check_false;
+      }
       default:
         return `{unknown_bool_modifier(${mod})}`;
     }
+  }
+  
+  if (typeof check_false == 'string' && ['greater', 'greaterequal','equal', 'lesser', 'lesserequal'].some(modif => mod.startsWith(modif))) {
+    if (_value) return parseString(check_false, _value) || check_false;
+    return check_false;
+  }
+
+  if (typeof check_false == 'string' && ['istrue', 'isfalse'].includes(mod)) {
+    if (_value) return parseString(check_false, _value) || check_false;
+    return check_false;
   }
 
   return `{unknown_modifier(${mod})}`;
