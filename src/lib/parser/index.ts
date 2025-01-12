@@ -399,7 +399,7 @@ function modifier(
     }
   }
   
-  if (typeof check_false == 'string' && ['greater', 'greaterequal','equal', 'lesser', 'lesserequal'].some(modif => mod.startsWith(modif))) {
+  if (typeof check_false == 'string' && ['>', '>=','=', '<=', '<', '~', '$', '^'].some(modif => mod.startsWith(modif))) {
     if (_value) return parseString(check_false, _value) || check_false;
     return check_false;
   }
