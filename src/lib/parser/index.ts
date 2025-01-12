@@ -207,6 +207,18 @@ function modifier(
         return toHex(value);
       case mod == 'string':
         return value;
+      case mod.startsWith('exists'): {
+        if (typeof check_true !== 'string' || typeof check_false !== 'string')
+          return `{unknown_str_modifier(${mod})}`;
+
+        if (_value) {
+          return value
+            ? parseString(check_true, _value) || check_true
+            : parseString(check_false, _value) || check_false;
+        }
+
+        return value ? check_true : check_false;
+      }
       case mod.startsWith('='): {
         if (typeof check_true !== 'string' || typeof check_false !== 'string')
           return `{unknown_str_modifier(${mod})}`;
@@ -385,18 +397,6 @@ function modifier(
 
         return value ? check_true : check_false;
       }
-      case mod == 'isfalse': {
-        if (typeof check_true !== 'string' || typeof check_false !== 'string')
-          return `{unknown_bool_modifier(${mod})}`;
-
-        if (_value) {
-          return !value
-            ? parseString(check_true, _value) || check_true
-            : parseString(check_false, _value) || check_false;
-        }
-
-        return !value ? check_true : check_false;
-      }
       default:
         return `{unknown_bool_modifier(${mod})}`;
     }
@@ -410,7 +410,7 @@ function modifier(
     return check_false;
   }
 
-  if (typeof check_false == 'string' && ['istrue', 'isfalse'].includes(mod)) {
+  if (typeof check_false == 'string' && ['istrue', 'isfalse', 'exists'].includes(mod)) {
     if (_value) return parseString(check_false, _value) || check_false;
     return check_false;
   }
