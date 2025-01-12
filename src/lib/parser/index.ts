@@ -373,14 +373,6 @@ function modifier(
     }
   } else if (typeof value === 'boolean') {
     switch (true) {
-      case mod == 'yesno':
-        return value ? 'Yes' : 'No';
-      case mod == 'onoff':
-        return value ? 'On' : 'Off';
-      case mod == 'truefalse':
-        return value ? 'True' : 'False';
-      case mod == 'string':
-        return value ? 'true' : 'false';
       case mod == 'istrue': {
         if (typeof check_true !== 'string' || typeof check_false !== 'string')
           return `{unknown_bool_modifier(${mod})}`;
