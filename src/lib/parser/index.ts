@@ -208,7 +208,8 @@ function modifier(
       case mod == 'string':
         return value;
       case mod.startsWith('='): {
-        if (typeof check_true !== 'string' || typeof check_false !== 'string') return `{unknown_str_modifier(${mod})}`;
+        if (typeof check_true !== 'string' || typeof check_false !== 'string')
+          return `{unknown_str_modifier(${mod})}`;
 
         const check = mod.replace('=', '');
 
@@ -223,7 +224,8 @@ function modifier(
         return value.toLowerCase() == check ? check_true : check_false;
       }
       case mod.startsWith('$'): {
-        if (typeof check_true !== 'string' || typeof check_false !== 'string') return `{unknown_str_modifier(${mod})}`;
+        if (typeof check_true !== 'string' || typeof check_false !== 'string')
+          return `{unknown_str_modifier(${mod})}`;
 
         const check = mod.replace('$', '');
 
@@ -238,7 +240,8 @@ function modifier(
         return value.toLowerCase().startsWith(check) ? check_true : check_false;
       }
       case mod.startsWith('^'): {
-        if (typeof check_true !== 'string' || typeof check_false !== 'string') return `{unknown_str_modifier(${mod})}`;
+        if (typeof check_true !== 'string' || typeof check_false !== 'string')
+          return `{unknown_str_modifier(${mod})}`;
 
         const check = mod.replace('^', '');
 
@@ -253,7 +256,8 @@ function modifier(
         return value.toLowerCase().endsWith(check) ? check_true : check_false;
       }
       case mod.startsWith('~'): {
-        if (typeof check_true !== 'string' || typeof check_false !== 'string') return `{unknown_str_modifier(${mod})}`;
+        if (typeof check_true !== 'string' || typeof check_false !== 'string')
+          return `{unknown_str_modifier(${mod})}`;
 
         const check = mod.replace('~', '');
 
@@ -285,7 +289,8 @@ function modifier(
       case mod == 'string':
         return value.toString();
       case mod.startsWith('>='): {
-        if (typeof check_true !== 'string' || typeof check_false !== 'string') return `{unknown_int_modifier(${mod})}`;
+        if (typeof check_true !== 'string' || typeof check_false !== 'string')
+          return `{unknown_int_modifier(${mod})}`;
 
         const check = Number(mod.replace('>=', ''));
 
@@ -300,7 +305,8 @@ function modifier(
         return value >= check ? check_true : check_false;
       }
       case mod.startsWith('>'): {
-        if (typeof check_true !== 'string' || typeof check_false !== 'string') return `{unknown_int_modifier(${mod})}`;
+        if (typeof check_true !== 'string' || typeof check_false !== 'string')
+          return `{unknown_int_modifier(${mod})}`;
 
         const check = Number(mod.replace('>', ''));
 
@@ -315,7 +321,8 @@ function modifier(
         return value > check ? check_true : check_false;
       }
       case mod.startsWith('='): {
-        if (typeof check_true !== 'string' || typeof check_false !== 'string') return `{unknown_int_modifier(${mod})}`;
+        if (typeof check_true !== 'string' || typeof check_false !== 'string')
+          return `{unknown_int_modifier(${mod})}`;
 
         const check = Number(mod.replace('=', ''));
 
@@ -330,7 +337,8 @@ function modifier(
         return value == check ? check_true : check_false;
       }
       case mod.startsWith('<='): {
-        if (typeof check_true !== 'string' || typeof check_false !== 'string') return `{unknown_int_modifier(${mod})}`;
+        if (typeof check_true !== 'string' || typeof check_false !== 'string')
+          return `{unknown_int_modifier(${mod})}`;
 
         const check = Number(mod.replace('<=', ''));
 
@@ -345,7 +353,8 @@ function modifier(
         return value <= check ? check_true : check_false;
       }
       case mod.startsWith('<'): {
-        if (typeof check_true !== 'string' || typeof check_false !== 'string') return `{unknown_int_modifier(${mod})}`;
+        if (typeof check_true !== 'string' || typeof check_false !== 'string')
+          return `{unknown_int_modifier(${mod})}`;
 
         const check = Number(mod.replace('<', ''));
 
@@ -373,7 +382,8 @@ function modifier(
       case mod == 'string':
         return value ? 'true' : 'false';
       case mod == 'istrue': {
-        if (typeof check_true !== 'string' || typeof check_false !== 'string') return `{unknown_bool_modifier(${mod})}`;
+        if (typeof check_true !== 'string' || typeof check_false !== 'string')
+          return `{unknown_bool_modifier(${mod})}`;
 
         if (_value) {
           return value
@@ -384,7 +394,8 @@ function modifier(
         return value ? check_true : check_false;
       }
       case mod == 'isfalse': {
-        if (typeof check_true !== 'string' || typeof check_false !== 'string') return `{unknown_bool_modifier(${mod})}`;
+        if (typeof check_true !== 'string' || typeof check_false !== 'string')
+          return `{unknown_bool_modifier(${mod})}`;
 
         if (_value) {
           return !value
@@ -398,8 +409,11 @@ function modifier(
         return `{unknown_bool_modifier(${mod})}`;
     }
   }
-  
-  if (typeof check_false == 'string' && ['>', '>=','=', '<=', '<', '~', '$', '^'].some(modif => mod.startsWith(modif))) {
+
+  if (
+    typeof check_false == 'string' &&
+    ['>', '>=', '=', '<=', '<', '~', '$', '^'].some((modif) => mod.startsWith(modif))
+  ) {
     if (_value) return parseString(check_false, _value) || check_false;
     return check_false;
   }
