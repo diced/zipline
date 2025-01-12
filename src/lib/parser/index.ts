@@ -50,7 +50,7 @@ export function parseString(str: string, value: ParseValue) {
   };
 
   const re =
-    /\{(?<type>file|url|user|debug|link|metricsUser|metricsZipline)\.(?<prop>\w+)(::(?<mod>\w+))?((::(?<mod_tzlocale>\S+))|(?<mod_check>\[(?<mod_check_true>".*")\|\|(?<mod_check_false>".*")\]))?\}/gi;
+    /\{(?<type>file|url|user|debug|link|metricsUser|metricsZipline)\.(?<prop>\w+)(::(?<mod>(\w+|<|<=|=|>=|>|\^|\$|~|\/)+))?((::(?<mod_tzlocale>\S+))|(?<mod_check>\[(?<mod_check_true>".*")\|\|(?<mod_check_false>".*")\]))?\}/gi;
   let matches: RegExpMatchArray | null;
 
   while ((matches = re.exec(str))) {
@@ -207,10 +207,10 @@ function modifier(
         return toHex(value);
       case mod == 'string':
         return value;
-      case mod.startsWith('equal'): {
+      case mod.startsWith('='): {
         if (typeof check_true !== 'string' || typeof check_false !== 'string') return `{unknown_str_modifier(${mod})}`;
 
-        const check = mod.replace('equal', '');
+        const check = mod.replace('=', '');
 
         if (!check) return `{unknown_str_modifier(${mod})}`;
 
@@ -222,10 +222,10 @@ function modifier(
 
         return value.toLowerCase() == check ? check_true : check_false;
       }
-      case mod.startsWith('startswith'): {
+      case mod.startsWith('$'): {
         if (typeof check_true !== 'string' || typeof check_false !== 'string') return `{unknown_str_modifier(${mod})}`;
 
-        const check = mod.replace('startswith', '');
+        const check = mod.replace('$', '');
 
         if (!check) return `{unknown_str_modifier(${mod})}`;
 
@@ -237,10 +237,10 @@ function modifier(
 
         return value.toLowerCase().startsWith(check) ? check_true : check_false;
       }
-      case mod.startsWith('endswith'): {
+      case mod.startsWith('^'): {
         if (typeof check_true !== 'string' || typeof check_false !== 'string') return `{unknown_str_modifier(${mod})}`;
 
-        const check = mod.replace('endswith', '');
+        const check = mod.replace('^', '');
 
         if (!check) return `{unknown_str_modifier(${mod})}`;
 
@@ -252,10 +252,10 @@ function modifier(
 
         return value.toLowerCase().endsWith(check) ? check_true : check_false;
       }
-      case mod.startsWith('includes'): {
+      case mod.startsWith('~'): {
         if (typeof check_true !== 'string' || typeof check_false !== 'string') return `{unknown_str_modifier(${mod})}`;
 
-        const check = mod.replace('includes', '');
+        const check = mod.replace('~', '');
 
         if (!check) return `{unknown_str_modifier(${mod})}`;
 
@@ -284,10 +284,10 @@ function modifier(
         return bytes(value);
       case mod == 'string':
         return value.toString();
-      case mod.startsWith('greaterequal'): {
+      case mod.startsWith('>='): {
         if (typeof check_true !== 'string' || typeof check_false !== 'string') return `{unknown_int_modifier(${mod})}`;
 
-        const check = Number(mod.replace('greaterequal', ''));
+        const check = Number(mod.replace('>=', ''));
 
         if (Number.isNaN(check)) return `{unknown_int_modifier(${mod})}`;
 
@@ -299,10 +299,10 @@ function modifier(
 
         return value >= check ? check_true : check_false;
       }
-      case mod.startsWith('greater'): {
+      case mod.startsWith('>'): {
         if (typeof check_true !== 'string' || typeof check_false !== 'string') return `{unknown_int_modifier(${mod})}`;
 
-        const check = Number(mod.replace('greater', ''));
+        const check = Number(mod.replace('>', ''));
 
         if (Number.isNaN(check)) return `{unknown_int_modifier(${mod})}`;
 
@@ -314,10 +314,10 @@ function modifier(
 
         return value > check ? check_true : check_false;
       }
-      case mod.startsWith('equal'): {
+      case mod.startsWith('='): {
         if (typeof check_true !== 'string' || typeof check_false !== 'string') return `{unknown_int_modifier(${mod})}`;
 
-        const check = Number(mod.replace('equal', ''));
+        const check = Number(mod.replace('=', ''));
 
         if (Number.isNaN(check)) return `{unknown_int_modifier(${mod})}`;
 
@@ -329,10 +329,10 @@ function modifier(
 
         return value == check ? check_true : check_false;
       }
-      case mod.startsWith('lesserequal'): {
+      case mod.startsWith('<='): {
         if (typeof check_true !== 'string' || typeof check_false !== 'string') return `{unknown_int_modifier(${mod})}`;
 
-        const check = Number(mod.replace('lesserequal', ''));
+        const check = Number(mod.replace('<=', ''));
 
         if (Number.isNaN(check)) return `{unknown_int_modifier(${mod})}`;
 
@@ -344,10 +344,10 @@ function modifier(
 
         return value <= check ? check_true : check_false;
       }
-      case mod.startsWith('lesser'): {
+      case mod.startsWith('<'): {
         if (typeof check_true !== 'string' || typeof check_false !== 'string') return `{unknown_int_modifier(${mod})}`;
 
-        const check = Number(mod.replace('lesser', ''));
+        const check = Number(mod.replace('<', ''));
 
         if (Number.isNaN(check)) return `{unknown_int_modifier(${mod})}`;
 
