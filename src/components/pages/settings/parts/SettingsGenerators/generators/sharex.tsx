@@ -22,7 +22,7 @@ export function sharex(token: string, type: 'file' | 'url', options: GeneratorOp
     config.RequestURL = `${window.location.origin}/api/user/urls`;
 
     delete (config as any).FileFormName;
-    (config as any).Data = JSON.stringify({ url: '{input}' });
+    (config as any).Data = JSON.stringify({ destination: '{input}' });
   }
 
   const toAddHeaders: UploadHeaders = {
