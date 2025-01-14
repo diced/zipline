@@ -155,37 +155,49 @@ function modifier(
       }
     }
 
-    switch (mod) {
-      case 'locale':
+    switch (true) {
+      case mod == 'locale':
         return value.toLocaleString(...args);
-      case 'time':
+      case mod == 'time':
         return value.toLocaleTimeString(...args);
-      case 'date':
+      case mod == 'date':
         return value.toLocaleDateString(...args);
-      case 'unix':
+      case mod == 'unix':
         return Math.floor(value.getTime() / 1000).toString();
-      case 'iso':
+      case mod == 'iso':
         return value.toISOString();
-      case 'utc':
+      case mod == 'utc':
         return value.toUTCString();
-      case 'year':
+      case mod == 'year':
         return value.getFullYear().toString();
-      case 'month':
+      case mod == 'month':
         return (value.getMonth() + 1).toString();
-      case 'day':
+      case mod == 'day':
         return value.getDate().toString();
-      case 'hour':
+      case mod == 'hour':
         return value.getHours().toString();
-      case 'minute':
+      case mod == 'minute':
         return value.getMinutes().toString();
-      case 'second':
+      case mod == 'second':
         return value.getSeconds().toString();
-      case 'string':
+      case mod == 'string':
         return value.toString();
-      case 'ampm':
+      case mod == 'ampm':
         return value.getHours() < 12 ? 'am' : 'pm';
-      case 'AMPM':
+      case mod == 'AMPM':
         return value.getHours() < 12 ? 'AM' : 'PM';
+      case mod == 'exists': {
+        if (typeof check_true !== 'string' || typeof check_false !== 'string')
+          return `{unknown_date_modifier(${mod})}`;
+
+        if (_value) {
+          return value
+            ? parseString(check_true, _value) || check_true
+            : parseString(check_false, _value) || check_false;
+        }
+
+        return value ? check_true : check_false;
+      }
       default:
         return `{unknown_date_modifier(${mod})}`;
     }
@@ -207,7 +219,7 @@ function modifier(
         return toHex(value);
       case mod == 'string':
         return value;
-      case mod.startsWith('exists'): {
+      case mod == 'exists': {
         if (typeof check_true !== 'string' || typeof check_false !== 'string')
           return `{unknown_str_modifier(${mod})}`;
 
