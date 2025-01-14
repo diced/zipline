@@ -35,10 +35,10 @@ export async function handlePartialUpload({
   if (config.files.disabledExtensions.includes(extension)) throw `File extension ${extension} is not allowed`;
 
   const format = options.format || config.files.defaultFormat;
-  let fileName = formatFileName(format, options.partial.filename);
+  let fileName = formatFileName(format, decodeURIComponent(options.partial.filename));
 
   if (options.overrides?.filename || format === 'name') {
-    if (options.overrides?.filename) fileName = options.overrides!.filename!;
+    if (options.overrides?.filename) fileName = decodeURIComponent(options.overrides!.filename!);
     const existing = await prisma.file.findFirst({
       where: {
         name: {
@@ -85,7 +85,11 @@ export async function handlePartialUpload({
         },
         ...(options.password && { password: await hashPassword(options.password) }),
         ...(options.folder && { Folder: { connect: { id: options.folder } } }),
-        ...(options.addOriginalName && { originalName: options.partial.filename ?? file.filename }),
+        ...(options.addOriginalName && {
+          originalName: options.partial.filename
+            ? decodeURIComponent(options.partial.filename)
+            : file.filename,
+        }),
       },
     });
 
@@ -101,14 +105,14 @@ export async function handlePartialUpload({
         },
         options,
         domain,
-        responseUrl: `${domain}/${fileUpload.name}`,
+        responseUrl: `${domain}/${encodeURIComponent(fileUpload.name)}`,
       },
     });
 
     response.files.push({
       id: fileUpload.id,
       type: fileUpload.type,
-      url: `${domain}/${fileUpload.name}`,
+      url: `${domain}/${encodeURIComponent(fileUpload.name)}`,
       pending: true,
     });
   }

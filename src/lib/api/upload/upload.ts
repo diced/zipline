@@ -42,7 +42,7 @@ export async function handleFile({
   let fileName = formatFileName(format, file.filename);
 
   if (options.overrides?.filename || format === 'name') {
-    if (options.overrides?.filename) fileName = options.overrides!.filename!;
+    if (options.overrides?.filename) fileName = decodeURIComponent(options.overrides!.filename!);
     const existing = await prisma.file.findFirst({
       where: {
         name: {
@@ -122,7 +122,7 @@ export async function handleFile({
   response.files.push({
     id: fileUpload.id,
     type: fileUpload.type,
-    url: responseUrl,
+    url: encodeURI(responseUrl),
 
     ...(removedGps && { removedGps: true }),
     ...(compressed && { compressed: true }),
@@ -134,8 +134,8 @@ export async function handleFile({
     user: req.user,
     file: fileUpload,
     link: {
-      raw: `${domain}/raw/${fileUpload.name}`,
-      returned: responseUrl,
+      raw: `${domain}/raw/${encodeURIComponent(fileUpload.name)}`,
+      returned: encodeURI(responseUrl),
     },
   });
 

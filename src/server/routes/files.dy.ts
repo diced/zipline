@@ -27,7 +27,7 @@ export async function filesRoute(
 
   const file = await prisma.file.findFirst({
     where: {
-      name: id,
+      name: decodeURIComponent(id),
     },
     include: {
       User: true,
@@ -36,12 +36,12 @@ export async function filesRoute(
 
   if (!file) return req.server.nextServer.render404(req.raw, res.raw, parsedUrl);
 
-  if (file.User?.view.enabled) return res.redirect(`/view/${file.name}`);
+  if (file.User?.view.enabled) return res.redirect(`/view/${encodeURIComponent(file.name)}`);
 
   const stream = await datasource.get(file.name);
   if (!stream) return req.server.nextServer.render404(req.raw, res.raw, parsedUrl);
   if (file.password) {
-    if (!pw) return res.redirect(`/view/${file.name}`);
+    if (!pw) return res.redirect(`/view/${encodeURIComponent(file.name)}`);
 
     const verified = await verifyPassword(pw as string, file.password!);
 
@@ -68,7 +68,7 @@ export async function filesRoute(
       'Content-Type': file.type || 'application/octet-stream',
       'Content-Length': file.size,
       ...(file.originalName && {
-        'Content-Disposition': `${download ? 'attachment; ' : ''}filename="${file.originalName}"`,
+        'Content-Disposition': `${download ? 'attachment; ' : ''}filename="${encodeURIComponent(file.originalName)}"`,
       }),
     })
     .send(stream);

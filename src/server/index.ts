@@ -187,12 +187,12 @@ async function main() {
   });
 
   server.setErrorHandler((error, _, res) => {
-    logger.error(error);
-
     if (error.statusCode) {
       res.status(error.statusCode);
       res.send({ error: error.message, statusCode: error.statusCode });
     } else {
+      if (process.env.DEBUG === 'zipline') console.error(error);
+
       res.status(500);
       res.send({ error: 'Internal Server Error', statusCode: 500, message: error.message });
     }

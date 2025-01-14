@@ -64,11 +64,13 @@ export default fastifyPlugin(
             _all: true,
           },
         });
-        const aggSize = userAggregateStats!._sum?.size === null ? 0 : userAggregateStats!._sum?.size;
-
+        const aggSize: bigint =
+          userAggregateStats!._sum?.size === null
+            ? 0n
+            : (userAggregateStats!._sum?.size as unknown as bigint);
         if (
           req.user.quota.filesQuota === 'BY_BYTES' &&
-          aggSize + totalFileSize > bytes(req.user.quota.maxBytes!)
+          Number(aggSize) + totalFileSize > bytes(req.user.quota.maxBytes!)
         )
           return res.payloadTooLarge(
             `uploading will exceed your storage quota of ${bytes(req.user.quota.maxBytes!)} bytes`,

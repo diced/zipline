@@ -163,11 +163,11 @@ export async function uploadPartialFiles(
         () => {
           const res: Response['/api/upload'] = JSON.parse(req.responseText);
 
-          if ((res as ErrorBody).message) {
+          if ((res as ErrorBody).error) {
             notifications.update({
               id: 'upload-partial',
               title: 'Error uploading files',
-              message: (res as ErrorBody).message,
+              message: (res as ErrorBody).error,
               color: 'red',
               icon: <IconFileXFilled size='1rem' />,
               autoClose: true,
@@ -247,11 +247,12 @@ export async function uploadPartialFiles(
         req.setRequestHeader('x-zipline-domain', options.overrides_returnDomain);
 
       ephemeral.password && req.setRequestHeader('x-zipline-password', ephemeral.password);
-      ephemeral.filename && req.setRequestHeader('x-zipline-filename', ephemeral.filename);
+      ephemeral.filename &&
+        req.setRequestHeader('x-zipline-filename', encodeURIComponent(ephemeral.filename));
       ephemeral.folderId && req.setRequestHeader('x-zipline-folder', ephemeral.folderId);
 
       req.setRequestHeader('x-zipline-p-identifier', identifier);
-      req.setRequestHeader('x-zipline-p-filename', file.name);
+      req.setRequestHeader('x-zipline-p-filename', encodeURIComponent(file.name));
       req.setRequestHeader('x-zipline-p-lastchunk', j === chunks.length - 1 ? 'true' : 'false');
       req.setRequestHeader('x-zipline-p-content-type', file.type);
       req.setRequestHeader('x-zipline-p-content-length', file.size.toString());

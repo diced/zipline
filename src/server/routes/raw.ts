@@ -28,7 +28,7 @@ export default fastifyPlugin(
 
       const file = await prisma.file.findFirst({
         where: {
-          name: id,
+          name: decodeURIComponent(id),
         },
       });
 
@@ -53,7 +53,7 @@ export default fastifyPlugin(
               'Content-Length': size,
               ...(file?.originalName
                 ? {
-                    'Content-Disposition': `${download ? 'attachment; ' : ''}filename="${file.originalName}"`,
+                    'Content-Disposition': `${download ? 'attachment; ' : ''}filename="${encodeURIComponent(file.originalName)}"`,
                   }
                 : download && {
                     'Content-Disposition': 'attachment;',
@@ -74,7 +74,7 @@ export default fastifyPlugin(
             'Content-Length': end - start + 1,
             ...(file?.originalName
               ? {
-                  'Content-Disposition': `${download ? 'attachment; ' : ''}filename="${file.originalName}"`,
+                  'Content-Disposition': `${download ? 'attachment; ' : ''}filename="${encodeURIComponent(file.originalName)}"`,
                 }
               : download && {
                   'Content-Disposition': 'attachment;',
@@ -94,7 +94,7 @@ export default fastifyPlugin(
           'Accept-Ranges': 'bytes',
           ...(file?.originalName
             ? {
-                'Content-Disposition': `${download ? 'attachment; ' : ''}filename="${file.originalName}"`,
+                'Content-Disposition': `${download ? 'attachment; ' : ''}filename="${encodeURIComponent(file.originalName)}"`,
               }
             : download && {
                 'Content-Disposition': 'attachment;',

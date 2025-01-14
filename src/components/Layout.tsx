@@ -11,6 +11,7 @@ import {
   Box,
   Burger,
   Button,
+  Divider,
   Menu,
   NavLink,
   Paper,
@@ -61,7 +62,7 @@ const navLinks: NavLinks[] = [
   {
     label: 'Home',
     icon: <IconHome size='1rem' />,
-    active: (path: string) => path === '/dashbaord',
+    active: (path: string) => path === '/dashboard',
     href: '/dashboard',
   },
   {
@@ -213,7 +214,7 @@ export default function Layout({ children, config }: { children: React.ReactNode
   return (
     <AppShell
       navbar={{ breakpoint: 'sm', width: { sm: 200, lg: 230 }, collapsed: { mobile: !opened } }}
-      header={{ height: { base: 50, md: 70 } }}
+      header={{ height: 60 }}
       footer={{ height: { base: 0.1 } }}
     >
       <AppShell.Header px='md'>
@@ -231,7 +232,9 @@ export default function Layout({ children, config }: { children: React.ReactNode
             <Avatar src={config.website.titleLogo} alt='Zipline logo' radius='sm' size='md' mr='md' />
           )}
 
-          <Title fw={700}>{config.website.title.trim()}</Title>
+          <Title visibleFrom='sm' lineClamp={1} size={32}>
+            {config.website.title.trim()}
+          </Title>
 
           <div style={{ marginLeft: 'auto' }}>
             <Menu shadow='md' width={200}>
@@ -301,6 +304,11 @@ export default function Layout({ children, config }: { children: React.ReactNode
       </AppShell.Header>
 
       <AppShell.Navbar hidden={!opened} zIndex={90}>
+        <Title hiddenFrom='sm' size={24} m='sm' style={{ marginBottom: 20 }}>
+          {config.website.title.trim()}
+        </Title>
+        <Divider hiddenFrom='sm' />
+
         {navLinks
           .filter((link) => !link.if || link.if(user as Response['/api/user']['user'], config))
           .map((link) => {

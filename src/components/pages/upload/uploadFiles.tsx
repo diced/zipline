@@ -156,7 +156,7 @@ export function uploadFiles(
         notifications.update({
           id: 'upload',
           title: 'Error uploading files',
-          message: (res as ErrorBody).message,
+          message: (res as ErrorBody).error,
           color: 'red',
           icon: <IconFileXFilled size='1rem' />,
           autoClose: true,
@@ -192,7 +192,7 @@ export function uploadFiles(
   options.overrides_returnDomain && req.setRequestHeader('x-zipline-domain', options.overrides_returnDomain);
 
   ephemeral.password && req.setRequestHeader('x-zipline-password', ephemeral.password);
-  ephemeral.filename && req.setRequestHeader('x-zipline-filename', ephemeral.filename);
+  ephemeral.filename && req.setRequestHeader('x-zipline-filename', encodeURIComponent(ephemeral.filename));
   ephemeral.folderId && req.setRequestHeader('x-zipline-folder', ephemeral.folderId);
 
   req.send(body);
