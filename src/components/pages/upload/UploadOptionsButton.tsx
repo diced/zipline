@@ -32,7 +32,7 @@ import {
 } from '@tabler/icons-react';
 import ms from 'ms';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import { useShallow } from 'zustand/shallow';
 
@@ -56,6 +56,7 @@ export default function UploadOptionsButton({ numFiles }: { numFiles: number }) 
   const clearSettings = () => {
     clearEphemeral();
     clearOptions();
+    setFolderSearch('');
   };
 
   const { data: folders } = useSWR<Extract<Response['/api/user/folders'], Folder[]>>(
@@ -63,6 +64,15 @@ export default function UploadOptionsButton({ numFiles }: { numFiles: number }) 
   );
   const combobox = useCombobox();
   const [folderSearch, setFolderSearch] = useState('');
+
+  useEffect(
+    () =>
+      useUploadOptionsStore.subscribe(
+        (state) => state.ephemeral,
+        (current) => (current.folderId === null ? setFolderSearch('') : null),
+      ),
+    [],
+  );
 
   return (
     <>
@@ -224,6 +234,7 @@ export default function UploadOptionsButton({ numFiles }: { numFiles: number }) 
             onOptionSubmit={(value) => {
               setFolderSearch(folders?.find((f) => f.id === value)?.name || '');
               setEphemeral('folderId', value === 'no folder' || value === '' ? null : value);
+              combobox.closeDropdown();
             }}
           >
             <Combobox.Target>
@@ -251,6 +262,10 @@ export default function UploadOptionsButton({ numFiles }: { numFiles: number }) 
 
             <Combobox.Dropdown>
               <Combobox.Options>
+                <Combobox.Option defaultChecked={true} value='no folder'>
+                  No Folder
+                </Combobox.Option>
+
                 {folders
                   ?.filter((f) => f.name.toLowerCase().includes(folderSearch.toLowerCase().trim()))
                   .map((f) => (
@@ -258,10 +273,6 @@ export default function UploadOptionsButton({ numFiles }: { numFiles: number }) 
                       {f.name}
                     </Combobox.Option>
                   ))}
-
-                <Combobox.Option defaultChecked={true} value='no folder'>
-                  No Folder
-                </Combobox.Option>
               </Combobox.Options>
             </Combobox.Dropdown>
           </Combobox>
@@ -332,7 +343,7 @@ export default function UploadOptionsButton({ numFiles }: { numFiles: number }) 
               </>
             }
             description={
-              'Add the original file name, so that the file can be downloaded with the original name. This will still use the "Name Format" option for it\'s file name.'
+              'Add the original file name, so that the file can be downloaded with the original name. This will still use the "Name Format" option for its file name.'
             }
             checked={options.addOriginalName ?? false}
             onChange={(event) => setOption('addOriginalName', event.currentTarget.checked ?? false)}

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, subscribeWithSelector } from 'zustand/middleware';
 import type { Config } from '../config/validate';
 
 export const defaultUploadOptions: UploadOptionsStore['options'] = {
@@ -50,52 +50,54 @@ export type UploadOptionsStore = {
 };
 
 export const useUploadOptionsStore = create<UploadOptionsStore>()(
-  persist(
-    (set, get) => ({
-      options: defaultUploadOptions,
-      ephemeral: defaultEphemeralOptions,
+  subscribeWithSelector(
+    persist(
+      (set, get) => ({
+        options: defaultUploadOptions,
+        ephemeral: defaultEphemeralOptions,
 
-      setOption: (key, value) =>
-        set((state) => ({
-          ...state,
-          options: {
-            ...state.options,
-            [key]: value,
-          },
-        })),
+        setOption: (key, value) =>
+          set((state) => ({
+            ...state,
+            options: {
+              ...state.options,
+              [key]: value,
+            },
+          })),
 
-      setEphemeral: (key, value) =>
-        set((state) => ({
-          ...state,
-          ephemeral: {
-            ...state.ephemeral,
-            [key]: value,
-          },
-        })),
+        setEphemeral: (key, value) =>
+          set((state) => ({
+            ...state,
+            ephemeral: {
+              ...state.ephemeral,
+              [key]: value,
+            },
+          })),
 
-      clearEphemeral: () =>
-        set((state) => ({
-          ...state,
-          ephemeral: defaultEphemeralOptions,
-        })),
+        clearEphemeral: () =>
+          set((state) => ({
+            ...state,
+            ephemeral: defaultEphemeralOptions,
+          })),
 
-      clearOptions: () =>
-        set((state) => ({
-          ...state,
-          options: defaultUploadOptions,
-        })),
+        clearOptions: () =>
+          set((state) => ({
+            ...state,
+            options: defaultUploadOptions,
+          })),
 
-      changes: () => {
-        const { options, ephemeral } = get();
-        return (
-          // @ts-ignore
-          Object.keys(options).filter((v) => options[v] !== defaultUploadOptions[v]).length +
-          Object.values(ephemeral).filter((v) => v !== null).length
-        );
+        changes: () => {
+          const { options, ephemeral } = get();
+          return (
+            // @ts-ignore
+            Object.keys(options).filter((v) => options[v] !== defaultUploadOptions[v]).length +
+            Object.values(ephemeral).filter((v) => v !== null).length
+          );
+        },
+      }),
+      {
+        name: 'zipline-upload-options',
       },
-    }),
-    {
-      name: 'zipline-upload-options',
-    },
+    ),
   ),
 );
