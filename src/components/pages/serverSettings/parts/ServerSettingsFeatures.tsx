@@ -79,8 +79,8 @@ export default function ServerSettingsFeatures({
           />
 
           <Switch
-            label='OAuth Registration'
-            description='Allows users to register an account using OAuth providers.'
+            label='OAuth Enabled'
+            description='Allows users to use OAuth providers.'
             {...form.getInputProps('featuresOauthRegistration', { type: 'checkbox' })}
           />
 
