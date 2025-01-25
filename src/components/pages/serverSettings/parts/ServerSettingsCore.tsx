@@ -60,7 +60,7 @@ export default function ServerSettingsCore({
           <TextInput
             label='Default Domain'
             description='The domain to use when generating URLs.'
-            placeholder='https://example.com'
+            placeholder='example.com'
             {...form.getInputProps('coreDefaultDomain')}
           />
 
