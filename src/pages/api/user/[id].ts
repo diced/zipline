@@ -187,6 +187,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     return res.json(newUser);
   } else {
     delete target.password;
+    delete target.totpSecret;
 
     if (user.superAdmin && target.superAdmin) {
       delete target.files;
