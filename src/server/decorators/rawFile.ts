@@ -40,11 +40,13 @@ function rawFileDecorator(fastify: FastifyInstance, _, done) {
 
     if (
       this.server.config.core.compression.enabled &&
-      compress?.match(/^true$/i) &&
-      !this.request.headers['X-Zipline-NoCompress'] &&
+      (compress?.match(/^true$/i) || !this.request.headers['X-Zipline-NoCompress']) &&
       !!this.request.headers['accept-encoding']
     )
-      if (size > this.server.config.core.compression.threshold && mimetype.match(/^(image|video|text)/))
+      if (
+        size > this.server.config.core.compression.threshold &&
+        mimetype.match(/^(image|video|text)\/(?!webp|webm)/)
+      )
         return this.send(useCompress.call(this, data));
 
     return this.send(data);
