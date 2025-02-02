@@ -45,28 +45,12 @@ export class S3 extends Datasource {
     });
   }
 
-  public get(file: string, start: number = 0, end: number = Infinity): Promise<Readable> {
-    if (start === 0 && end === Infinity) {
-      return new Promise((res) => {
-        this.s3.getObject(this.config.bucket, file, (err, stream) => {
-          if (err) res(null);
-          else res(stream);
-        });
-      });
-    }
-
+  public get(file: string): Promise<Readable> {
     return new Promise((res) => {
-      this.s3.getPartialObject(
-        this.config.bucket,
-        file,
-        start,
-        // undefined means to read the rest of the file from the start (offset)
-        end === Infinity ? undefined : end,
-        (err, stream) => {
-          if (err) res(null);
-          else res(stream);
-        },
-      );
+      this.s3.getObject(this.config.bucket, file, (err, stream) => {
+        if (err) res(null);
+        else res(stream);
+      });
     });
   }
 

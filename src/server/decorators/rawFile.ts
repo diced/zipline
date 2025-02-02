@@ -26,7 +26,7 @@ function rawFileDecorator(fastify: FastifyInstance, _, done) {
         .send();
     if (rangeEnd === Infinity) rangeEnd = size - 1;
 
-    const data = await this.server.datasource.get(id, rangeStart, rangeEnd + 1);
+    const data = await this.server.datasource.get(id);
 
     // only send content-range if the client asked for it
     if (this.request.headers.range) {

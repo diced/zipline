@@ -26,12 +26,12 @@ export class Local extends Datasource {
     }
   }
 
-  public get(file: string, start: number = 0, end: number = Infinity): ReadStream {
+  public get(file: string): ReadStream {
     const full = join(this.path, file);
     if (!existsSync(full)) return null;
 
     try {
-      return createReadStream(full, { start, end });
+      return createReadStream(full);
     } catch (e) {
       return null;
     }
