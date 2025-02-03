@@ -13,9 +13,7 @@ export default async function urlsRoute(this: FastifyInstance, req: FastifyReque
   });
   if (!url) return reply.notFound();
 
-  reply.postUrl(url);
-
-  reply.redirect(url.destination);
+  return await reply.redirect(url.destination);
 }
 
 export async function urlsRouteOnResponse(
@@ -32,8 +30,7 @@ export async function urlsRouteOnResponse(
         OR: [{ id }, { vanity: id }, { invisible: { invis: decodeURI(id) } }],
       },
     });
-
-    reply.postUrl(url);
+    await reply.postUrl(url);
   }
 
   done();
