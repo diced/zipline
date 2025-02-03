@@ -142,6 +142,7 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       size: bigint;
       originalName: string;
       thumbnail?: { name: string };
+      password: string | boolean;
     }[] = await prisma.file.findMany({
       where: {
         userId: user.id,
@@ -163,11 +164,13 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
         size: true,
         originalName: true,
         thumbnail: true,
+        password: true,
       },
     });
 
     for (let i = 0; i !== files.length; ++i) {
       (files[i] as unknown as { url: string }).url = formatRootUrl(config.uploader.route, files[i].name);
+      files[i].password = !!files[i].password;
 
       if (files[i].thumbnail) {
         (files[i].thumbnail as unknown as string) = formatRootUrl('/r', files[i].thumbnail.name);

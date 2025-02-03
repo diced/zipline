@@ -8,7 +8,20 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
 
   if (take >= 50) return res.badRequest("take can't be more than 50");
 
-  let files = await prisma.file.findMany({
+  let files: {
+    favorite: boolean;
+    createdAt: Date;
+    id: number;
+    name: string;
+    mimetype: string;
+    expiresAt: Date;
+    maxViews: number;
+    views: number;
+    folderId: number;
+    size: bigint;
+    password: string | boolean;
+    thumbnail?: { name: string };
+  }[] = await prisma.file.findMany({
     take,
     where: {
       userId: user.id,
@@ -28,14 +41,16 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
       size: true,
       favorite: true,
       thumbnail: true,
+      password: true,
     },
   });
 
   for (let i = 0; i !== files.length; ++i) {
     (files[i] as unknown as { url: string }).url = formatRootUrl(config.uploader.route, files[i].name);
-    if (files[i].thumbnail) {
+    files[i].password = !!files[i].password;
+
+    if (files[i].thumbnail)
       (files[i].thumbnail as unknown as string) = formatRootUrl('/r', files[i].thumbnail.name);
-    }
   }
 
   if (req.query.filter && req.query.filter === 'media')
