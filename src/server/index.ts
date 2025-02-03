@@ -46,7 +46,7 @@ async function start() {
   logger.debug('Starting server');
 
   // plugins
-  server
+  await server
     .register(loggerPlugin)
     .register(configPlugin, config)
     .register(datasourcePlugin, datasource)
@@ -61,7 +61,7 @@ async function start() {
     .register(allPlugin);
 
   // decorators
-  server
+  await server
     .register(notFound)
     .register(postUrlDecorator)
     .register(postFileDecorator)
