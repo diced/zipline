@@ -57,7 +57,6 @@ async function main() {
       fb = await readFile(join(directory, file));
     await datasource.save(file, fb, {
       type: data[i]?.mimetype ?? 'application/octet-stream',
-      size: fb.byteLength,
     });
   }
   console.log(`Finished copying files to ${config.datasource.type} storage.`);
