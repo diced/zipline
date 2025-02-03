@@ -1,5 +1,5 @@
 import { ActionIcon, Button, Center, Group, SimpleGrid, Title } from '@mantine/core';
-import { File } from '@prisma/client';
+import type { File } from '@prisma/client';
 import { IconArrowLeft, IconFile } from '@tabler/icons-react';
 import FileComponent from 'components/File';
 import MutedText from 'components/MutedText';

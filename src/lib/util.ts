@@ -1,4 +1,4 @@
-import { InvisibleFile, InvisibleUrl } from '@prisma/client';
+import type { InvisibleFile, InvisibleUrl } from '@prisma/client';
 import { hash, verify } from 'argon2';
 import { randomBytes } from 'crypto';
 import { readdir, stat } from 'fs/promises';

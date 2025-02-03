@@ -1,4 +1,4 @@
-import { File } from '@prisma/client';
+import type { File } from '@prisma/client';
 import { ExifTool, Tags } from 'exiftool-vendored';
 import { createWriteStream } from 'fs';
 import { readFile, rm } from 'fs/promises';
@@ -87,7 +87,7 @@ export async function removeGPSData(image: File): Promise<void> {
 
   logger.debug(`reading file to upload to datasource: ${file} -> ${image.name}`);
   const buffer = await readFile(file);
-  await datasource.save(image.name, buffer, { type: image.mimetype, size: buffer.byteLength });
+  await datasource.save(image.name, buffer, { type: image.mimetype });
 
   logger.debug(`removing temp file: ${file}`);
   await rm(file);

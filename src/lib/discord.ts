@@ -1,4 +1,4 @@
-import { File, Url, User } from '@prisma/client';
+import type { File, Url, User } from '@prisma/client';
 import config from 'lib/config';
 import { ConfigDiscordContent } from 'config/Config';
 import Logger from 'lib/logger';
