@@ -12,9 +12,11 @@ const logger = Logger.get('user');
 async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   const { id } = req.query as { id: string };
 
+  if (!id || isNaN(parseInt(id))) return res.notFound('no user provided');
+
   const target = await prisma.user.findFirst({
     where: {
-      id: Number(id),
+      id: parseInt(id),
     },
     include: {
       files: {
