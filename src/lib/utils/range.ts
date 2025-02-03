@@ -1,9 +1,20 @@
-export function parseRangeHeader(header?: string): [number, number] {
-  if (!header || !header.startsWith('bytes=')) return [0, Infinity];
+export function parseRange(header: string, length: number): [number, number] {
+  const range = header.trim().substring(6);
 
-  const range = header.replace('bytes=', '').split('-');
-  const start = Number(range[0]) || 0;
-  const end = Number(range[1]) || Infinity;
+  let start, end;
+
+  if (range.startsWith('-')) {
+    end = length - 1;
+    start = length - 1 - Number(range.substring(1));
+  } else {
+    const [s, e] = range.split('-').map(Number);
+    start = s;
+    end = e || length - 1;
+  }
+
+  if (end > length - 1) {
+    end = length - 1;
+  }
 
   return [start, end];
 }

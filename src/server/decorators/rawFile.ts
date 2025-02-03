@@ -5,7 +5,7 @@ import fastifyPlugin from 'fastify-plugin';
 import { createBrotliCompress, createDeflate, createGzip } from 'zlib';
 import pump from 'pump';
 import { Transform } from 'stream';
-import { parseRangeHeader } from 'lib/utils/range';
+import { parseRange } from 'lib/utils/range';
 
 function rawFileDecorator(fastify: FastifyInstance, _, done) {
   fastify.decorateReply('rawFile', rawFile);
@@ -18,25 +18,41 @@ function rawFileDecorator(fastify: FastifyInstance, _, done) {
 
     const mimetype = await guess(extname(id).slice(1));
 
-    // eslint-disable-next-line prefer-const
-    let [rangeStart, rangeEnd] = parseRangeHeader(this.request.headers.range);
-    if (rangeStart >= rangeEnd)
-      return this.code(416)
-        .header('Content-Range', `bytes 0/${size - 1}`)
-        .send();
-    if (rangeEnd === Infinity) rangeEnd = size - 1;
-
-    const data = await this.server.datasource.get(id);
-
-    // only send content-range if the client asked for it
     if (this.request.headers.range) {
-      this.code(206);
-      this.header('Content-Range', `bytes ${rangeStart}-${rangeEnd}/${size}`);
+      const [start, end] = parseRange(this.request.headers.range, size);
+      if (start >= size || end >= size) {
+        const buf = await datasource.get(id);
+        if (!buf) return this.server.nextServer.render404(this.request.raw, this.raw);
+
+        return this.type(mimetype || 'application/octet-stream')
+          .headers({
+            'Content-Length': size,
+            ...(download && {
+              'Content-Disposition': 'attachment;',
+            }),
+          })
+          .status(416)
+          .send(buf);
+      }
+
+      const buf = await datasource.range(id, start || 0, end);
+      if (!buf) return this.server.nextServer.render404(this.request.raw, this.raw);
+
+      return this.type(mimetype || 'application/octet-stream')
+        .headers({
+          'Content-Range': `bytes ${start}-${end}/${size}`,
+          'Accept-Ranges': 'bytes',
+          'Content-Length': end - start + 1,
+          ...(download && {
+            'Content-Disposition': 'attachment;',
+          }),
+        })
+        .status(206)
+        .send(buf);
     }
 
-    this.header('Content-Length', rangeEnd - rangeStart + 1);
-    this.header('Content-Type', download ? 'application/octet-stream' : mimetype);
-    this.header('Accept-Ranges', 'bytes');
+    const data = await datasource.get(id);
+    if (!data) return this.server.nextServer.render404(this.request.raw, this.raw);
 
     if (
       this.server.config.core.compression.enabled &&
@@ -49,7 +65,16 @@ function rawFileDecorator(fastify: FastifyInstance, _, done) {
       )
         return this.send(useCompress.call(this, data));
 
-    return this.send(data);
+    return this.type(mimetype || 'application/octet-stream')
+      .headers({
+        'Content-Length': size,
+        'Accept-Ranges': 'bytes',
+        ...(download && {
+          'Content-Disposition': 'attachment;',
+        }),
+      })
+      .status(200)
+      .send(data);
   }
 }
 

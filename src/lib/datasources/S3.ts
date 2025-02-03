@@ -81,4 +81,15 @@ export class S3 extends Datasource {
       });
     });
   }
+
+  public async range(file: string, start: number, end: number): Promise<Readable> {
+    return new Promise((res) => {
+      this.s3.getPartialObject(this.config.bucket, file, start, end, (err, stream) => {
+        if (err) {
+          console.log(err);
+          res(null);
+        } else res(stream);
+      });
+    });
+  }
 }

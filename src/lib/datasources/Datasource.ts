@@ -9,4 +9,5 @@ export abstract class Datasource {
   public abstract size(file: string): Promise<number | null>;
   public abstract get(file: string): Readable | Promise<Readable>;
   public abstract fullSize(): Promise<number>;
+  public abstract range(file: string, start: number, end: number): Promise<Readable>;
 }

@@ -2,7 +2,7 @@ import { File } from '@prisma/client';
 import { FastifyInstance, FastifyReply } from 'fastify';
 import fastifyPlugin from 'fastify-plugin';
 import exts from 'lib/exts';
-import { parseRangeHeader } from 'lib/utils/range';
+import { parseRange } from 'lib/utils/range';
 
 function dbFileDecorator(fastify: FastifyInstance, _, done) {
   fastify.decorateReply('dbFile', dbFile);
@@ -17,28 +17,70 @@ function dbFileDecorator(fastify: FastifyInstance, _, done) {
     const size = await this.server.datasource.size(file.name);
     if (size === null) return this.notFound();
 
-    // eslint-disable-next-line prefer-const
-    let [rangeStart, rangeEnd] = parseRangeHeader(this.request.headers.range);
-    if (rangeStart >= rangeEnd)
-      return this.code(416)
-        .header('Content-Range', `bytes 0/${size - 1}`)
-        .send();
-    if (rangeEnd === Infinity) rangeEnd = size - 1;
-
-    const data = await this.server.datasource.get(file.name);
-
-    // only send content-range if the client asked for it
     if (this.request.headers.range) {
-      this.code(206);
-      this.header('Content-Range', `bytes ${rangeStart}-${rangeEnd}/${size}`);
+      const [start, end] = parseRange(this.request.headers.range, size);
+      if (start >= size || end >= size) {
+        const buf = await datasource.get(file.name);
+        if (!buf) return this.server.nextServer.render404(this.request.raw, this.raw);
+
+        return this.type(file.mimetype || 'application/octet-stream')
+          .headers({
+            'Content-Length': size,
+            ...(file.originalName
+              ? {
+                  'Content-Disposition': `${download ? 'attachment; ' : ''}filename="${encodeURIComponent(
+                    file.originalName,
+                  )}"`,
+                }
+              : download && {
+                  'Content-Disposition': 'attachment;',
+                }),
+          })
+          .status(416)
+          .send(buf);
+      }
+
+      const buf = await datasource.range(file.name, start || 0, end);
+      if (!buf) return this.server.nextServer.render404(this.request.raw, this.raw);
+
+      return this.type(file.mimetype || 'application/octet-stream')
+        .headers({
+          'Content-Range': `bytes ${start}-${end}/${size}`,
+          'Accept-Ranges': 'bytes',
+          'Content-Length': end - start + 1,
+          ...(file.originalName
+            ? {
+                'Content-Disposition': `${download ? 'attachment; ' : ''}filename="${encodeURIComponent(
+                  file.originalName,
+                )}"`,
+              }
+            : download && {
+                'Content-Disposition': 'attachment;',
+              }),
+        })
+        .status(206)
+        .send(buf);
     }
 
-    this.header('Content-Length', rangeEnd - rangeStart + 1);
-    this.header('Content-Type', download ? 'application/octet-stream' : file.mimetype);
-    this.header('Content-Disposition', `inline; filename="${encodeURI(file.originalName || file.name)}"`);
-    this.header('Accept-Ranges', 'bytes');
+    const data = await datasource.get(file.name);
+    if (!data) return this.server.nextServer.render404(this.request.raw, this.raw);
 
-    return this.send(data);
+    return this.type(file.mimetype || 'application/octet-stream')
+      .headers({
+        'Content-Length': size,
+        'Accept-Ranges': 'bytes',
+        ...(file.originalName
+          ? {
+              'Content-Disposition': `${download ? 'attachment; ' : ''}filename="${encodeURIComponent(
+                file.originalName,
+              )}"`,
+            }
+          : download && {
+              'Content-Disposition': 'attachment;',
+            }),
+      })
+      .status(200)
+      .send(data);
   }
 }
 
