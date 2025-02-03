@@ -150,7 +150,7 @@ async function start() {
       },
     });
 
-    await datasource.save(thumb.name, thumbnail, { type: 'image/jpeg' });
+    await datasource.save(thumb.name, thumbnail, { type: 'image/jpeg', size: thumbnail.byteLength });
 
     logger.info(`thumbnail saved - ${thumb.name}`);
     logger.debug(`thumbnail ${JSON.stringify(thumb)}`);

@@ -53,9 +53,11 @@ async function main() {
   // copy files to local storage
   console.log(`Copying files to ${config.datasource.type} storage..`);
   for (let i = 0; i !== files.length; ++i) {
-    const file = files[i];
-    await datasource.save(file, await readFile(join(directory, file)), {
+    const file = files[i],
+      fb = await readFile(join(directory, file));
+    await datasource.save(file, fb, {
       type: data[i]?.mimetype ?? 'application/octet-stream',
+      size: fb.byteLength,
     });
   }
   console.log(`Finished copying files to ${config.datasource.type} storage.`);

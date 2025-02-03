@@ -123,6 +123,7 @@ async function start() {
     logger.debug('writing file to datasource');
     await datasource.save(file.filename, Buffer.from(fd as Uint8Array), {
       type: file.mimetype ?? 'application/octet-stream',
+      size: file.totalBytes,
     });
   }
 
