@@ -83,7 +83,8 @@ export function redirect(res: ServerResponse, url: string) {
 
 export async function getStats(prisma: PrismaClient, datasource: Datasource, logger: Logger) {
   const size = await datasource.fullSize();
-  logger.debug(`full size: ${size}`);
+  const llogger = logger.child('stats');
+  llogger.debug(`full size: ${size}`);
 
   const byUser = await prisma.file.groupBy({
     by: ['userId'],
@@ -91,15 +92,15 @@ export async function getStats(prisma: PrismaClient, datasource: Datasource, log
       _all: true,
     },
   });
-  logger.debug(`by user: ${JSON.stringify(byUser)}`);
+  llogger.debug(`by user: ${JSON.stringify(byUser)}`);
 
   const count_users = await prisma.user.count();
-  logger.debug(`count users: ${count_users}`);
+  llogger.debug(`count users: ${count_users}`);
 
   const count_by_user = [];
   for (let i = 0, L = byUser.length; i !== L; ++i) {
     if (!byUser[i].userId) {
-      logger.debug(`skipping user ${byUser[i]}`);
+      llogger.debug(`skipping user ${byUser[i]}`);
       continue;
     }
 
@@ -114,17 +115,17 @@ export async function getStats(prisma: PrismaClient, datasource: Datasource, log
       count: byUser[i]._count._all,
     });
   }
-  logger.debug(`count by user: ${JSON.stringify(count_by_user)}`);
+  llogger.debug(`count by user: ${JSON.stringify(count_by_user)}`);
 
   const count = await prisma.file.count();
-  logger.debug(`count files: ${JSON.stringify(count)}`);
+  llogger.debug(`count files: ${JSON.stringify(count)}`);
 
   const views = await prisma.file.aggregate({
     _sum: {
       views: true,
     },
   });
-  logger.debug(`sum views: ${JSON.stringify(views)}`);
+  llogger.debug(`sum views: ${JSON.stringify(views)}`);
 
   const typesCount = await prisma.file.groupBy({
     by: ['mimetype'],
@@ -132,7 +133,7 @@ export async function getStats(prisma: PrismaClient, datasource: Datasource, log
       mimetype: true,
     },
   });
-  logger.debug(`types count: ${JSON.stringify(typesCount)}`);
+  llogger.debug(`types count: ${JSON.stringify(typesCount)}`);
   const types_count = [];
   for (let i = 0, L = typesCount.length; i !== L; ++i)
     types_count.push({
@@ -140,7 +141,7 @@ export async function getStats(prisma: PrismaClient, datasource: Datasource, log
       count: typesCount[i]._count.mimetype,
     });
 
-  logger.debug(`types count: ${JSON.stringify(types_count)}`);
+  llogger.debug(`types count: ${JSON.stringify(types_count)}`);
 
   return {
     size: bytesToHuman(size),
