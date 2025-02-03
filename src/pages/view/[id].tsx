@@ -40,16 +40,18 @@ export default function EmbeddedFile({
 
   const [downloadWPass, setDownloadWPass] = useState(false);
 
+  const mimeMatch = new RegExp(/^((?<img>image)|(?<vid>video)|(?<aud>audio))/).exec(file.mimetype);
+
   // reapply date from workaround
   file.createdAt = new Date(file ? file.createdAt : 0);
 
   const check = async () => {
-    const res = await fetch(`/api/auth/image?id=${file.id}&password=${encodeURIComponent(password)}`);
+    const res = await fetch(`/api/auth/file?id=${file.id}&password=${encodeURIComponent(password)}`);
 
     if (res.ok) {
       setError('');
       if (prismRender) return router.push(`/code/${file.name}?password=${password}`);
-      updateImage(`/api/auth/image?id=${file.id}&password=${password}`);
+      updateFile(`/api/auth/file?id=${file.id}&password=${password}`);
       setOpened(false);
       setDownloadWPass(true);
     } else {
@@ -57,34 +59,40 @@ export default function EmbeddedFile({
     }
   };
 
-  const updateImage = async (url?: string) => {
-    if (!file.mimetype.startsWith('image')) return;
+  const updateFile = async (url?: string) => {
+    if (!mimeMatch) return;
 
-    const imageEl = document.getElementById('image_content') as HTMLImageElement;
+    const imageEl = document.getElementById('image_content') as HTMLImageElement,
+      videoEl = document.getElementById('video_content') as HTMLVideoElement,
+      audioEl = document.getElementById('audio_content') as HTMLAudioElement;
 
-    const img = new Image();
-    img.addEventListener('load', function () {
-      // my best attempt of recreating
-      // firefox: https://searchfox.org/mozilla-central/source/dom/html/ImageDocument.cpp#271-276
-      // chromium-based: https://source.chromium.org/chromium/chromium/src/+/main:third_party/blink/renderer/core/html/image_document.cc
+    if (mimeMatch?.groups?.img) {
+      const img = new Image();
+      img.addEventListener('load', function () {
+        // my best attempt of recreating
+        // firefox: https://searchfox.org/mozilla-central/source/dom/html/ImageDocument.cpp#271-276
+        // chromium-based: https://source.chromium.org/chromium/chromium/src/+/main:third_party/blink/renderer/core/html/image_document.cc
 
-      // keeps image original if smaller than screen
-      if (this.width <= window.innerWidth && this.height <= window.innerHeight) return;
+        // keeps image original if smaller than screen
+        if (this.width <= window.innerWidth && this.height <= window.innerHeight) return;
 
-      // resizes to fit screen
-      const ratio = Math.min(innerHeight / this.naturalHeight, innerWidth / this.naturalWidth);
-      const newWidth = Math.max(1, Math.floor(ratio * this.naturalWidth));
-      const newHeight = Math.max(1, Math.floor(ratio * this.naturalHeight));
+        // resizes to fit screen
+        const ratio = Math.min(innerHeight / this.naturalHeight, innerWidth / this.naturalWidth);
+        const newWidth = Math.max(1, Math.floor(ratio * this.naturalWidth));
+        const newHeight = Math.max(1, Math.floor(ratio * this.naturalHeight));
 
-      imageEl.width = newWidth;
-      imageEl.height = newHeight;
-    });
+        imageEl.width = newWidth;
+        imageEl.height = newHeight;
+      });
 
-    img.src = url || dataURL('/r');
-    if (url) {
-      imageEl.src = url;
+      img.src = url || dataURL('/r');
+      file.imageProps = img;
     }
-    file.imageProps = img;
+    if (url) {
+      if (mimeMatch?.groups?.img) imageEl.src = url;
+      if (mimeMatch?.groups?.vid) videoEl.src = url;
+      if (mimeMatch?.groups?.aud) audioEl.src = url;
+    }
   };
 
   useEffect(() => {
@@ -94,12 +102,12 @@ export default function EmbeddedFile({
   }, []);
 
   useEffect(() => {
-    if (!file?.mimetype?.startsWith('image')) return;
+    if (!mimeMatch) return;
 
-    updateImage();
-    window.addEventListener('resize', () => updateImage());
+    updateFile();
+    window.addEventListener('resize', () => updateFile());
     return () => {
-      window.removeEventListener('resize', () => updateImage());
+      window.removeEventListener('resize', () => updateFile());
     };
   }, []);
 
@@ -125,7 +133,7 @@ export default function EmbeddedFile({
           <meta property='theme-color' content={parseString(user.embed.color, { file: file, user })} />
         )}
 
-        {file.mimetype.startsWith('image') && (
+        {mimeMatch?.groups?.img && (
           <>
             <meta property='og:type' content='image' />
             <meta property='og:image' itemProp='image' content={`${host}/r/${file.name}`} />
@@ -137,7 +145,7 @@ export default function EmbeddedFile({
             <meta property='twitter:title' content={file.name} />
           </>
         )}
-        {file.mimetype.startsWith('video') && (
+        {mimeMatch?.groups?.vid && (
           <>
             <meta name='twitter:card' content='player' />
             <meta name='twitter:player' content={`${host}/r/${file.name}`} />
@@ -160,7 +168,7 @@ export default function EmbeddedFile({
             <meta property='og:video:type' content={file.mimetype} />
           </>
         )}
-        {file.mimetype.startsWith('audio') && (
+        {mimeMatch?.groups?.aud && (
           <>
             <meta name='twitter:card' content='player' />
             <meta name='twitter:player' content={`${host}/r/${file.name}`} />
@@ -177,9 +185,7 @@ export default function EmbeddedFile({
             <meta property='og:audio:type' content={file.mimetype} />
           </>
         )}
-        {!file.mimetype.startsWith('video') && !file.mimetype.startsWith('image') && (
-          <meta property='og:url' content={`${host}/r/${file.name}`} />
-        )}
+        {!mimeMatch && <meta property='og:url' content={`${host}/r/${file.name}`} />}
         <title>{file.name}</title>
       </Head>
       <Modal
@@ -209,11 +215,9 @@ export default function EmbeddedFile({
           justifyContent: 'center',
         }}
       >
-        {file.mimetype.startsWith('image') && (
-          <img src={dataURL('/r')} alt={dataURL('/r')} id='image_content' />
-        )}
+        {mimeMatch?.groups?.img && <img src={dataURL('/r')} alt={dataURL('/r')} id='image_content' />}
 
-        {file.mimetype.startsWith('video') && (
+        {mimeMatch?.groups?.vid && (
           <video
             style={{
               maxHeight: '100vh',
@@ -227,17 +231,13 @@ export default function EmbeddedFile({
           />
         )}
 
-        {file.mimetype.startsWith('audio') && (
-          <audio src={dataURL('/r')} controls autoPlay muted id='audio_content' />
-        )}
+        {mimeMatch?.groups?.aud && <audio src={dataURL('/r')} controls autoPlay muted id='audio_content' />}
 
-        {!file.mimetype.startsWith('video') &&
-          !file.mimetype.startsWith('image') &&
-          !file.mimetype.startsWith('audio') && (
-            <AnchorNext component={Link} href={dataURL('/r', downloadWPass ? password : undefined)}>
-              Can&#39;t preview this file. Click here to download it.
-            </AnchorNext>
-          )}
+        {!mimeMatch && (
+          <AnchorNext component={Link} href={dataURL('/r', downloadWPass ? password : undefined)}>
+            Can&#39;t preview this file. Click here to download it.
+          </AnchorNext>
+        )}
       </Box>
     </>
   );

@@ -7,21 +7,21 @@ export default async function uploadsRoute(this: FastifyInstance, req: FastifyRe
   else if (id === 'dashboard' && !this.config.features.headless)
     return this.nextServer.render(req.raw, reply.raw, '/dashboard');
 
-  const image = await this.prisma.file.findFirst({
+  const file = await this.prisma.file.findFirst({
     where: {
       OR: [{ name: id }, { name: decodeURI(id) }, { invisible: { invis: decodeURI(encodeURI(id)) } }],
     },
   });
-  if (!image) return reply.rawFile(id);
+  if (!file) return reply.rawFile(id);
 
-  const failed = await reply.preFile(image);
+  const failed = await reply.preFile(file);
   if (failed) return reply.notFound();
 
-  const ext = image.name.split('.').pop();
+  const ext = file.name.split('.').pop();
 
-  if (image.password || image.embed || image.mimetype.startsWith('text/') || Object.keys(exts).includes(ext))
-    return reply.redirect(`/view/${image.name}`);
-  else return reply.dbFile(image);
+  if (file.password || file.embed || file.mimetype.startsWith('text/') || Object.keys(exts).includes(ext))
+    return reply.redirect(`/view/${file.name}`);
+  else return reply.dbFile(file);
 }
 
 export async function uploadsRouteOnResponse(

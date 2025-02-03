@@ -15,7 +15,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
     },
   });
 
-  if (!file) return res.notFound('image not found');
+  if (!file) return res.notFound('file not found');
   if (!password) return res.badRequest('no password provided');
 
   const decoded = decodeURIComponent(password as string);
@@ -24,7 +24,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   if (!valid) return res.badRequest('wrong password');
 
   const data = await datasource.get(file.name);
-  if (!data) return res.notFound('image not found');
+  if (!data) return res.notFound('file not found');
 
   const size = await datasource.size(file.name);
 
@@ -33,7 +33,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
   res.setHeader('Content-Length', size);
 
   data.pipe(res);
-  data.on('error', () => res.notFound('image not found'));
+  data.on('error', () => res.notFound('file not found'));
   data.on('end', () => res.end());
 }
 
