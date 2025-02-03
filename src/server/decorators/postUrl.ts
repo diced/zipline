@@ -7,7 +7,6 @@ function postUrlDecorator(fastify: FastifyInstance, _, done: () => void) {
   done();
 
   async function postUrl(this: FastifyReply, url: Url) {
-    
     if (!url) return;
 
     const nUrl = await this.server.prisma.url.update({
