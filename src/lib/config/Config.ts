@@ -20,10 +20,9 @@ export interface ConfigCompression {
 }
 
 export interface ConfigDatasource {
-  type: 'local' | 's3' | 'supabase';
+  type: 'local' | 's3';
   local: ConfigLocalDatasource;
   s3?: ConfigS3Datasource;
-  supabase?: ConfigSupabaseDatasource;
 }
 
 export interface ConfigLocalDatasource {
@@ -39,12 +38,6 @@ export interface ConfigS3Datasource {
   force_s3_path: boolean;
   use_ssl: boolean;
   region?: string;
-}
-
-export interface ConfigSupabaseDatasource {
-  url: string;
-  key: string;
-  bucket: string;
 }
 
 export interface ConfigUploader {

@@ -1,5 +1,5 @@
 import config from './config';
-import { Datasource, Local, S3, Supabase } from './datasources';
+import { Datasource, Local, S3 } from './datasources';
 import Logger from './logger';
 
 const logger = Logger.get('datasource');
@@ -13,10 +13,6 @@ if (!global.datasource) {
     case 'local':
       global.datasource = new Local(config.datasource.local.directory);
       logger.info(`using Local(${config.datasource.local.directory}) datasource`);
-      break;
-    case 'supabase':
-      global.datasource = new Supabase(config.datasource.supabase);
-      logger.info(`using Supabase(${config.datasource.supabase.bucket}) datasource`);
       break;
     default:
       throw new Error('Invalid datasource type');

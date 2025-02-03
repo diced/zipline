@@ -85,10 +85,6 @@ export default function readConfig() {
     map('DATASOURCE_S3_REGION', 'string', 'datasource.s3.region'),
     map('DATASOURCE_S3_USE_SSL', 'boolean', 'datasource.s3.use_ssl'),
 
-    map('DATASOURCE_SUPABASE_URL', 'string', 'datasource.supabase.url'),
-    map('DATASOURCE_SUPABASE_KEY', 'string', 'datasource.supabase.key'),
-    map('DATASOURCE_SUPABASE_BUCKET', 'string', 'datasource.supabase.bucket'),
-
     map('UPLOADER_DEFAULT_FORMAT', 'string', 'uploader.default_format'),
     map('UPLOADER_ROUTE', 'string', 'uploader.route'),
     map('UPLOADER_LENGTH', 'number', 'uploader.length'),
