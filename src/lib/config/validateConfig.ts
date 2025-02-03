@@ -278,18 +278,17 @@ export default function validate(config): Config {
       }
     }
 
-    const reserved = ['/view', '/dashboard', '/code', '/folder', '/api', '/auth', '/r'];
-    if (reserved.some((r) => validated.uploader.route.startsWith(r))) {
+    const reserved = new RegExp(/^\/(view|code|folder|auth|r)(\/\S*)?$|^\/(api|dashboard)(\/\S*)*/);
+    if (reserved.exec(validated.uploader.route))
       throw {
         errors: [`The uploader route cannot be ${validated.uploader.route}, this is a reserved route.`],
         show: true,
       };
-    } else if (reserved.some((r) => validated.urls.route.startsWith(r))) {
+    if (reserved.exec(validated.urls.route))
       throw {
         errors: [`The urls route cannot be ${validated.urls.route}, this is a reserved route.`],
         show: true,
       };
-    }
 
     return validated as unknown as Config;
   } catch (e) {
