@@ -45,7 +45,7 @@ function rawFileDecorator(fastify: FastifyInstance, _, done) {
     )
       if (
         size > this.server.config.core.compression.threshold &&
-        mimetype.match(/^(image|video|text)\/(?!webp|webm)/)
+        mimetype.match(/^(image(?!\/(webp))|video(?!\/(webm))|text)/)
       )
         return this.send(useCompress.call(this, data));
 
