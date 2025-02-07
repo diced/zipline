@@ -1,10 +1,9 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
-import exts from 'lib/exts';
 
 export default async function uploadsRoute(this: FastifyInstance, req: FastifyRequest, reply: FastifyReply) {
   const { id } = req.params as { id: string };
   if (id === '') return reply.notFound();
-  else if (id === 'dashboard' && !this.config.features.headless)
+  else if (id === 'dashboard' && !this.config.features.headless && this.config.uploader.route === '/')
     return this.nextServer.render(req.raw, reply.raw, '/dashboard');
 
   const file = await this.prisma.file.findFirst({
@@ -12,16 +11,13 @@ export default async function uploadsRoute(this: FastifyInstance, req: FastifyRe
       OR: [{ name: id }, { name: decodeURI(id) }, { invisible: { invis: decodeURI(encodeURI(id)) } }],
     },
   });
-  if (!file) return reply.rawFile(id);
+
+  if (!file) return reply.notFound();
 
   const failed = await reply.preFile(file);
   if (failed) return reply.notFound();
 
-  const ext = file.name.split('.').pop();
-
-  if (file.password || file.embed || file.mimetype.startsWith('text/') || Object.keys(exts).includes(ext))
-    return reply.redirect(`/view/${file.name}`);
-  else return reply.dbFile(file);
+  return this.nextServer.render(req.raw, reply.raw, `/view/${file.name}`);
 }
 
 export async function uploadsRouteOnResponse(

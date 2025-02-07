@@ -10,28 +10,34 @@ export default async function rawRoute(this: FastifyInstance, req: FastifyReques
     where: {
       OR: [{ name: id }, { invisible: { invis: decodeURI(encodeURI(id)) } }],
     },
+    select: {
+      name: true,
+      originalName: true,
+      mimetype: true,
+      password: true,
+      favorite: true,
+      expiresAt: true,
+    },
   });
 
-  if (!file) return reply.rawFile(id);
-  else {
-    const failed = await reply.preFile(file);
-    if (failed) return reply.notFound();
+  if (!file) return reply.notFound();
 
-    if (file.password) {
-      if (!password)
-        return reply
-          .type('application/json')
-          .code(403)
-          .send({ error: 'password protected', url: `/view/${file.name}`, code: 403 });
-      const success = await checkPassword(password, file.password);
+  if (file.password) {
+    if (!password)
+      return reply
+        .type('application/json')
+        .code(403)
+        .send({ error: 'password protected', url: `/view/${file.name}`, code: 403 });
+    const success = await checkPassword(password, file.password);
 
-      if (!success)
-        return reply
-          .type('application/json')
-          .code(403)
-          .send({ error: 'incorrect password', url: `/view/${file.name}`, code: 403 });
-    }
-
-    return reply.rawFile(file.name);
+    if (!success)
+      return reply
+        .type('application/json')
+        .code(403)
+        .send({ error: 'incorrect password', url: `/view/${file.name}`, code: 403 });
   }
+
+  if (await reply.preFile(file)) return reply.notFound();
+
+  return reply.rawFile(file);
 }

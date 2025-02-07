@@ -7,7 +7,6 @@ import { version } from '../../package.json';
 import fastify, { FastifyInstance, FastifyServerOptions } from 'fastify';
 import { createReadStream, existsSync, readFileSync } from 'fs';
 import { Worker } from 'worker_threads';
-import dbFileDecorator from './decorators/dbFile';
 import notFound from './decorators/notFound';
 import postFileDecorator from './decorators/postFile';
 import postUrlDecorator from './decorators/postUrl';
@@ -66,8 +65,7 @@ async function start() {
     .register(postUrlDecorator)
     .register(postFileDecorator)
     .register(preFileDecorator)
-    .register(rawFileDecorator)
-    .register(dbFileDecorator);
+    .register(rawFileDecorator);
 
   server.addHook('onRequest', (req, reply, done) => {
     if (config.features.headless) {

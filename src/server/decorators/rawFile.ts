@@ -6,52 +6,53 @@ import { createBrotliCompress, createDeflate, createGzip } from 'zlib';
 import pump from 'pump';
 import { Transform } from 'stream';
 import { parseRange } from 'lib/utils/range';
+import { File } from '@prisma/client';
 
 function rawFileDecorator(fastify: FastifyInstance, _, done) {
   fastify.decorateReply('rawFile', rawFile);
   done();
 
-  async function rawFile(this: FastifyReply, id: string) {
+  async function rawFile(this: FastifyReply, file: Partial<File>) {
     const { download, compress = 'false' } = this.request.query as { download?: string; compress?: string };
-    const size = await this.server.datasource.size(id);
+    const size = await this.server.datasource.size(file.name);
     if (size === null) return this.notFound();
 
-    const mimetype = await guess(extname(id).slice(1));
+    const mimetype = await guess(extname(file.name).slice(1));
 
     if (this.request.headers.range) {
       const [start, end] = parseRange(this.request.headers.range, size);
       if (start >= size || end >= size) {
-        const buf = await datasource.get(id);
+        const buf = await datasource.get(file.name);
         if (!buf) return this.server.nextServer.render404(this.request.raw, this.raw);
 
-        return this.type(mimetype || 'application/octet-stream')
+        return this.type(file.mimetype || mimetype || 'application/octet-stream')
           .headers({
             'Content-Length': size,
-            ...(download && {
-              'Content-Disposition': 'attachment;',
-            }),
+            'Content-Disposition': `${download ? 'attachment; ' : ''}filename="${encodeURIComponent(
+              file.originalName ?? file.name,
+            )}`,
           })
           .status(416)
           .send(buf);
       }
 
-      const buf = await datasource.range(id, start || 0, end);
+      const buf = await datasource.range(file.name, start || 0, end);
       if (!buf) return this.server.nextServer.render404(this.request.raw, this.raw);
 
-      return this.type(mimetype || 'application/octet-stream')
+      return this.type(file.mimetype || mimetype || 'application/octet-stream')
         .headers({
           'Content-Range': `bytes ${start}-${end}/${size}`,
           'Accept-Ranges': 'bytes',
           'Content-Length': end - start + 1,
-          ...(download && {
-            'Content-Disposition': 'attachment;',
-          }),
+          'Content-Disposition': `${download ? 'attachment; ' : ''}filename="${encodeURIComponent(
+            file.originalName ?? file.name,
+          )}`,
         })
         .status(206)
         .send(buf);
     }
 
-    const data = await datasource.get(id);
+    const data = await datasource.get(file.name);
     if (!data) return this.server.nextServer.render404(this.request.raw, this.raw);
 
     if (
@@ -61,7 +62,7 @@ function rawFileDecorator(fastify: FastifyInstance, _, done) {
     )
       if (
         size > this.server.config.core.compression.threshold &&
-        mimetype.match(/^(image(?!\/(webp))|video(?!\/(webm))|text)/)
+        (file.mimetype || mimetype).match(/^(image(?!\/(webp))|vfileeo(?!\/(webm))|text)/)
       )
         return this.send(useCompress.call(this, data));
 
@@ -69,9 +70,9 @@ function rawFileDecorator(fastify: FastifyInstance, _, done) {
       .headers({
         'Content-Length': size,
         'Accept-Ranges': 'bytes',
-        ...(download && {
-          'Content-Disposition': 'attachment;',
-        }),
+        'Content-Disposition': `${download ? 'attachment; ' : ''}filename="${encodeURIComponent(
+          file.originalName ?? file.name,
+        )}`,
       })
       .status(200)
       .send(data);
@@ -115,6 +116,6 @@ export default fastifyPlugin(rawFileDecorator, {
 
 declare module 'fastify' {
   interface FastifyReply {
-    rawFile: (id: string) => Promise<void>;
+    rawFile: (file: Partial<File>) => Promise<void>;
   }
 }

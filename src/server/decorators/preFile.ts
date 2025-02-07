@@ -30,6 +30,6 @@ export default fastifyPlugin(preFileDecorator, {
 
 declare module 'fastify' {
   interface FastifyReply {
-    preFile: (file: File) => Promise<boolean>;
+    preFile: (file: Partial<File>) => Promise<boolean>;
   }
 }
