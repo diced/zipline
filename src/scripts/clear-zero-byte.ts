@@ -16,7 +16,7 @@ async function main() {
   for (let i = 0; i !== files.length; ++i) {
     const file = files[i];
     const size = await datasource.size(file.name);
-    if (size === 0) {
+    if (size === 0 || size == null) {
       toDelete.push(file.name);
     }
   }
