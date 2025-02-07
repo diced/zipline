@@ -37,6 +37,7 @@ export default function EmbeddedFile({
   const [opened, setOpened] = useState(pass || !!file.password);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [scale, setScale] = useState(2);
 
   const [downloadWPass, setDownloadWPass] = useState(false);
 
@@ -66,28 +67,6 @@ export default function EmbeddedFile({
       videoEl = document.getElementById('video_content') as HTMLVideoElement,
       audioEl = document.getElementById('audio_content') as HTMLAudioElement;
 
-    if (mimeMatch?.groups?.img) {
-      const img = new Image();
-      img.addEventListener('load', function () {
-        // my best attempt of recreating
-        // firefox: https://searchfox.org/mozilla-central/source/dom/html/ImageDocument.cpp#271-276
-        // chromium-based: https://source.chromium.org/chromium/chromium/src/+/main:third_party/blink/renderer/core/html/image_document.cc
-
-        // keeps image original if smaller than screen
-        if (this.width <= window.innerWidth && this.height <= window.innerHeight) return;
-
-        // resizes to fit screen
-        const ratio = Math.min(innerHeight / this.naturalHeight, innerWidth / this.naturalWidth);
-        const newWidth = Math.max(1, Math.floor(ratio * this.naturalWidth));
-        const newHeight = Math.max(1, Math.floor(ratio * this.naturalHeight));
-
-        imageEl.width = newWidth;
-        imageEl.height = newHeight;
-      });
-
-      img.src = url || dataURL('/r');
-      file.imageProps = img;
-    }
     if (url) {
       if (mimeMatch?.groups?.img) imageEl.src = url;
       if (mimeMatch?.groups?.vid) videoEl.src = url;
@@ -105,10 +84,6 @@ export default function EmbeddedFile({
     if (!mimeMatch) return;
 
     updateFile();
-    window.addEventListener('resize', () => updateFile());
-    return () => {
-      window.removeEventListener('resize', () => updateFile());
-    };
   }, []);
 
   return (
@@ -213,9 +188,71 @@ export default function EmbeddedFile({
           alignItems: 'center',
           minHeight: '100vh',
           justifyContent: 'center',
+          overflow: 'hidden',
+        }}
+        onMouseDown={(e) => {
+          if (!mimeMatch?.groups?.img || e.button !== 0) return;
+          if (e.button !== 0) return;
+
+          e.preventDefault();
+          const imageEl = document.getElementById('image_content') as HTMLImageElement,
+            posX = e.pageX - (imageEl.x + imageEl.width / 2),
+            posY = e.pageY - (imageEl.y + imageEl.height / 2);
+
+          if (imageEl.style.transform.startsWith('translate')) return;
+
+          imageEl.style.transform = `translate(${posX * -scale}px, ${posY * -scale}px) scale(${scale})`;
+          return true;
+        }}
+        onMouseUp={(e) => {
+          if (!mimeMatch?.groups?.img || e.button !== 0) return;
+
+          const imageEl = document.getElementById('image_content') as HTMLImageElement;
+          if (!imageEl.style.transform.startsWith('translate')) return;
+          imageEl.style.transform = 'scale(1)';
+          setScale(2);
+          return true;
+        }}
+        onMouseMove={(e) => {
+          if (!mimeMatch?.groups?.img || e.button !== 0) return;
+          if (e.button !== 0) return;
+
+          const imageEl = document.getElementById('image_content') as HTMLImageElement,
+            posX = e.pageX - (imageEl.x + imageEl.width / 2),
+            posY = e.pageY - (imageEl.y + imageEl.height / 2);
+
+          if (!imageEl.style.transform.startsWith('translate')) return;
+          imageEl.style.transform = `translate(${posX * -scale}px, ${posY * -scale}px) scale(${scale})`;
+          return true;
+        }}
+        onWheel={(e) => {
+          if (!mimeMatch?.groups?.img || e.button !== 0) return;
+
+          const imageEl = document.getElementById('image_content') as HTMLImageElement,
+            posX = e.pageX - (imageEl.x + imageEl.width / 2),
+            posY = e.pageY - (imageEl.y + imageEl.height / 2);
+          if (!imageEl.style.transform.startsWith('translate')) return;
+          let newScale = 0;
+          if (e.deltaY < 0) newScale = scale + 0.25;
+          if (e.deltaY > 0) newScale = scale - 0.25 == 0 ? scale : scale - 0.25;
+          setScale(newScale);
+          imageEl.style.transform = `translate(${posX * -newScale}px, ${
+            posY * -newScale
+          }px) scale(${newScale})`;
         }}
       >
-        {mimeMatch?.groups?.img && <img src={dataURL('/r')} alt={dataURL('/r')} id='image_content' />}
+        {mimeMatch?.groups?.img && (
+          <img
+            src={dataURL('/r')}
+            alt={dataURL('/r')}
+            id='image_content'
+            style={{
+              transition: 'transform 0.25s ease',
+              maxHeight: '100vh',
+              maxWidth: '100vw',
+            }}
+          />
+        )}
 
         {mimeMatch?.groups?.vid && (
           <video
@@ -297,6 +334,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   // @ts-ignore workaround because next wont allow date
   file.createdAt = file.createdAt.toString();
+  // @ts-ignore ditto
+  file.expiresAt = file.createdAt.toString();
 
   const prismRender = Object.keys(exts).includes(file.name.split('.').pop());
   if (prismRender && !file.password)
