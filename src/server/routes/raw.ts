@@ -11,6 +11,7 @@ export default async function rawRoute(this: FastifyInstance, req: FastifyReques
       OR: [{ name: id }, { invisible: { invis: decodeURI(encodeURI(id)) } }],
     },
     select: {
+      id: true,
       name: true,
       originalName: true,
       mimetype: true,
