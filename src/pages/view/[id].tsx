@@ -335,7 +335,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   // @ts-ignore workaround because next wont allow date
   file.createdAt = file.createdAt.toString();
   // @ts-ignore ditto
-  file.expiresAt = file.createdAt.toString();
+  if (file.expiresAt) file.expiresAt = file.createdAt.toString();
 
   const prismRender = Object.keys(exts).includes(file.name.split('.').pop());
   if (prismRender && !file.password)
