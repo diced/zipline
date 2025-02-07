@@ -3,7 +3,7 @@ import { bytesToHuman } from './bytes';
 import Logger from 'lib/logger';
 
 export type ParseValue = {
-  file?: File;
+  file?: Omit<Partial<File>, 'password'>;
   url?: Url;
   user?: User;
 

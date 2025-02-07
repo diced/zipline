@@ -11,19 +11,20 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import zconfig from 'lib/config';
-import { log } from 'server/util';
 
 export default function EmbeddedFile({
   file,
   user,
-  pass,
   prismRender,
   host,
   compress,
 }: {
-  file: File & { imageProps?: HTMLImageElement; thumbnail: Thumbnail };
+  file: Omit<Partial<File>, 'password'> & {
+    password: boolean;
+    imageProps?: HTMLImageElement;
+    thumbnail: Thumbnail;
+  };
   user: UserExtended;
-  pass: boolean;
   prismRender: boolean;
   host: string;
   compress?: boolean;
@@ -34,7 +35,7 @@ export default function EmbeddedFile({
     }`;
 
   const router = useRouter();
-  const [opened, setOpened] = useState(pass || !!file.password);
+  const [opened, setOpened] = useState(file.password);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [scale, setScale] = useState(2);
@@ -47,12 +48,12 @@ export default function EmbeddedFile({
   file.createdAt = new Date(file ? file.createdAt : 0);
 
   const check = async () => {
-    const res = await fetch(`/api/auth/file?id=${file.id}&password=${encodeURIComponent(password)}`);
+    const res = await fetch(dataURL('/r', password));
 
     if (res.ok) {
       setError('');
       if (prismRender) return router.push(`/code/${file.name}?password=${password}`);
-      updateFile(`/api/auth/file?id=${file.id}&password=${password}`);
+      updateFile(dataURL('/r', password));
       setOpened(false);
       setDownloadWPass(true);
     } else {
@@ -75,7 +76,7 @@ export default function EmbeddedFile({
   };
 
   useEffect(() => {
-    if (pass) {
+    if (file.password) {
       setOpened(true);
     }
   }, []);
@@ -282,7 +283,9 @@ export default function EmbeddedFile({
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { id } = context.params as { id: string };
-  const { compress = null } = context.query as unknown as { compress?: boolean };
+  const { compress = null } = context.query as {
+    compress?: string;
+  };
   const file = await prisma.file.findFirst({
     where: {
       OR: [{ name: id }, { invisible: { invis: decodeURI(encodeURI(id)) } }],
@@ -293,17 +296,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   });
   let host = context.req.headers.host;
   if (!file) return { notFound: true };
-
-  const logger = log('view');
-
-  if (file.maxViews && file.views >= file.maxViews) {
-    await datasource.delete(file.name);
-    await prisma.file.delete({ where: { id: file.id } });
-
-    logger.child('file').info(`File ${file.name} has been deleted due to max views (${file.maxViews})`);
-
-    return { notFound: true };
-  }
 
   // @ts-ignore
   file.size = Number(file.size);
@@ -336,6 +328,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   file.createdAt = file.createdAt.toString();
   // @ts-ignore ditto
   if (file.expiresAt) file.expiresAt = file.createdAt.toString();
+  // @ts-ignore
+  file.password = !!file.password;
 
   const prismRender = Object.keys(exts).includes(file.name.split('.').pop());
   if (prismRender && !file.password)
@@ -345,58 +339,20 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         permanent: true,
       },
     };
-  else if (prismRender && file.password) {
-    const pass = file.password ? true : false;
-    // @ts-ignore
-    if (file.password) file.password = true;
+  else if (prismRender && file.password)
     return {
       props: {
         file,
         user,
-        pass,
         prismRender: true,
         host,
       },
     };
-  }
-
-  if (!file.mimetype.startsWith('image') && !file.mimetype.startsWith('video')) {
-    const { default: datasource } = await import('lib/datasource');
-
-    const data = await datasource.get(file.name);
-    if (!data) return { notFound: true };
-
-    // @ts-ignore
-    if (file.password) file.password = true;
-
-    return {
-      props: {
-        file,
-        user,
-        host,
-      },
-    };
-  }
-
-  // @ts-ignore
-  if (file.password) file.password = true;
-
-  await prisma.file.update({
-    where: {
-      id: file.id,
-    },
-    data: {
-      views: {
-        increment: 1,
-      },
-    },
-  });
 
   return {
     props: {
       file,
       user,
-      pass: file.password ? true : false,
       host,
       compress,
     },

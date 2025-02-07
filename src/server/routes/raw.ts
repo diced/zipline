@@ -38,7 +38,5 @@ export default async function rawRoute(this: FastifyInstance, req: FastifyReques
         .send({ error: 'incorrect password', url: `/view/${file.name}`, code: 403 });
   }
 
-  if (await reply.preFile(file)) return reply.notFound();
-
-  return reply.rawFile(file);
+  return (await reply.preFile(file)) ? reply.notFound() : reply.rawFile(file);
 }
