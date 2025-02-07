@@ -28,7 +28,7 @@ export default async function rawRoute(this: FastifyInstance, req: FastifyReques
       return reply
         .type('application/json')
         .code(403)
-        .send({ error: 'incorrect protected', url: `/view/${file.name}`, code: 403 });
+        .send({ error: 'incorrect password', url: `/view/${file.name}`, code: 403 });
     const success = await checkPassword(password, file.password);
 
     if (!success)
