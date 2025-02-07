@@ -6,11 +6,9 @@ function notFound(fastify: FastifyInstance, _: unknown, done: () => void) {
   done();
 
   function notFound(this: FastifyReply) {
-    if (this.server.config.features.headless) {
-      return this.callNotFound();
-    } else {
-      return this.server.nextServer.render404(this.request.raw, this.raw);
-    }
+    if (process.env.NODE_ENV == 'development') return this.code(404).send('not found :(');
+    if (this.server.config.features.headless) return this.callNotFound();
+    return this.server.nextServer.render404(this.request.raw, this.raw);
   }
 }
 
