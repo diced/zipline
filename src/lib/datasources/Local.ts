@@ -15,7 +15,7 @@ export class Local extends Datasource {
   }
 
   public async delete(file: string): Promise<void> {
-    await rm(join(this.path, file));
+    await rm(join(this.path, file), { force: true });
   }
 
   public async clear(): Promise<void> {

@@ -31,7 +31,7 @@ export class S3 extends Datasource {
   }
 
   public async delete(file: string): Promise<void> {
-    await this.s3.removeObject(this.config.bucket, file);
+    await this.s3.removeObject(this.config.bucket, file, { forceDelete: true });
   }
 
   public async clear(): Promise<void> {
