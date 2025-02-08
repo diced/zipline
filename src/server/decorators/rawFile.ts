@@ -6,53 +6,57 @@ import { createBrotliCompress, createDeflate, createGzip } from 'zlib';
 import pump from 'pump';
 import { Transform } from 'stream';
 import { parseRange } from 'lib/utils/range';
-import { File } from '@prisma/client';
+import type { File, Thumbnail } from '@prisma/client';
 
 function rawFileDecorator(fastify: FastifyInstance, _, done) {
   fastify.decorateReply('rawFile', rawFile);
   done();
 
-  async function rawFile(this: FastifyReply, file: Partial<File>) {
+  async function rawFile(this: FastifyReply, file: Partial<File> & { thumbnail: Partial<Thumbnail> }) {
     const { download, compress = 'false' } = this.request.query as { download?: string; compress?: string };
-    const size = await this.server.datasource.size(file.name);
+    const isThumb = (this.request.params['id'] as string) === file.thumbnail?.name,
+      filename = isThumb ? file.thumbnail?.name : file.name,
+      fileMime = isThumb ? null : file.mimetype;
+
+    const size = await this.server.datasource.size(filename);
     if (size === null) return this.notFound();
 
-    const mimetype = await guess(extname(file.name).slice(1));
+    const mimetype = await guess(extname(filename).slice(1));
 
     if (this.request.headers.range) {
       const [start, end] = parseRange(this.request.headers.range, size);
       if (start >= size || end >= size) {
-        const buf = await datasource.get(file.name);
+        const buf = await datasource.get(filename);
         if (!buf) return this.server.nextServer.render404(this.request.raw, this.raw);
 
-        return this.type(file.mimetype || mimetype || 'application/octet-stream')
+        return this.type(fileMime || mimetype || 'application/octet-stream')
           .headers({
             'Content-Length': size,
             'Content-Disposition': `${download ? 'attachment; ' : ''}filename="${encodeURIComponent(
-              file.originalName ?? file.name,
+              isThumb ? filename : file.originalName ?? filename,
             )}`,
           })
           .status(416)
           .send(buf);
       }
 
-      const buf = await datasource.range(file.name, start || 0, end);
+      const buf = await datasource.range(filename, start || 0, end);
       if (!buf) return this.server.nextServer.render404(this.request.raw, this.raw);
 
-      return this.type(file.mimetype || mimetype || 'application/octet-stream')
+      return this.type(fileMime || mimetype || 'application/octet-stream')
         .headers({
           'Content-Range': `bytes ${start}-${end}/${size}`,
           'Accept-Ranges': 'bytes',
           'Content-Length': end - start + 1,
           'Content-Disposition': `${download ? 'attachment; ' : ''}filename="${encodeURIComponent(
-            file.originalName ?? file.name,
+            isThumb ? filename : file.originalName ?? filename,
           )}`,
         })
         .status(206)
         .send(buf);
     }
 
-    const data = await datasource.get(file.name);
+    const data = await datasource.get(filename);
     if (!data) return this.server.nextServer.render404(this.request.raw, this.raw);
 
     if (
@@ -62,7 +66,7 @@ function rawFileDecorator(fastify: FastifyInstance, _, done) {
     )
       if (
         size > this.server.config.core.compression.threshold &&
-        (file.mimetype || mimetype).match(/^(image(?!\/(webp))|vfileeo(?!\/(webm))|text)/)
+        (fileMime || mimetype).match(/^(image(?!\/(webp))|vfileeo(?!\/(webm))|text)/)
       )
         return this.send(useCompress.call(this, data));
 
@@ -71,7 +75,7 @@ function rawFileDecorator(fastify: FastifyInstance, _, done) {
         'Content-Length': size,
         'Accept-Ranges': 'bytes',
         'Content-Disposition': `${download ? 'attachment; ' : ''}filename="${encodeURIComponent(
-          file.originalName ?? file.name,
+          isThumb ? filename : file.originalName ?? filename,
         )}`,
       })
       .status(200)
@@ -116,6 +120,6 @@ export default fastifyPlugin(rawFileDecorator, {
 
 declare module 'fastify' {
   interface FastifyReply {
-    rawFile: (file: Partial<File>) => Promise<void>;
+    rawFile: (file: Partial<File> & { thumbnail: Partial<Thumbnail> }) => Promise<void>;
   }
 }
