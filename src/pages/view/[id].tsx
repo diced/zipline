@@ -10,7 +10,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import zconfig from 'lib/config';
+import config from 'lib/config';
 
 export default function EmbeddedFile({
   file,
@@ -305,12 +305,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     if (
       JSON.parse(context.req.headers['cf-visitor'] as string).scheme === 'https' ||
       proto === 'https' ||
-      zconfig.core.return_https
+      config.core.return_https
     )
       host = `https://${host}`;
     else host = `http://${host}`;
   } catch (e) {
-    if (proto === 'https' || zconfig.core.return_https) host = `https://${host}`;
+    if (proto === 'https' || config.core.return_https) host = `https://${host}`;
     else host = `http://${host}`;
   }
 
