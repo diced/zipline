@@ -241,7 +241,9 @@ async function thumbs(this: FastifyInstance) {
       mimetype: {
         startsWith: 'video/',
       },
-      thumbnail: null,
+      thumbnail: {
+        is: null,
+      },
     },
     include: {
       thumbnail: true,
