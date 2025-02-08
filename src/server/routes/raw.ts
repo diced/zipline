@@ -8,16 +8,10 @@ export default async function rawRoute(this: FastifyInstance, req: FastifyReques
 
   const file = await this.prisma.file.findFirst({
     where: {
-      OR: [{ name: id }, { invisible: { invis: decodeURI(encodeURI(id)) } }],
+      OR: [{ name: id }, { invisible: { invis: decodeURI(encodeURI(id)) } }, { thumbnail: { name: id } }],
     },
-    select: {
-      id: true,
-      name: true,
-      originalName: true,
-      mimetype: true,
-      password: true,
-      favorite: true,
-      expiresAt: true,
+    include: {
+      thumbnail: true,
     },
   });
 
