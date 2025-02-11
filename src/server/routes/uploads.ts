@@ -17,7 +17,8 @@ export default async function uploadsRoute(this: FastifyInstance, req: FastifyRe
   const failed = await reply.preFile(file);
   if (failed) return reply.notFound();
 
-  return this.nextServer.render(req.raw, reply.raw, `/view/${file.name}`);
+  // @ts-ignore
+  return this.nextServer.render(req.raw, reply.raw, `/view/${file.name}`, req.query);
 }
 
 export async function uploadsRouteOnResponse(
