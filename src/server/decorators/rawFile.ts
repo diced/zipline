@@ -12,7 +12,7 @@ function rawFileDecorator(fastify: FastifyInstance, _, done) {
   fastify.decorateReply('rawFile', rawFile);
   done();
 
-  async function rawFile(this: FastifyReply, file: Partial<File> & { thumbnail: Partial<Thumbnail> }) {
+  async function rawFile(this: FastifyReply, file: Partial<File> & { thumbnail?: Partial<Thumbnail> }) {
     const { download, compress = 'false' } = this.request.query as { download?: string; compress?: string };
     const isThumb = (this.request.params['id'] as string) === file.thumbnail?.name,
       filename = isThumb ? file.thumbnail?.name : file.name,
@@ -120,6 +120,6 @@ export default fastifyPlugin(rawFileDecorator, {
 
 declare module 'fastify' {
   interface FastifyReply {
-    rawFile: (file: Partial<File> & { thumbnail: Partial<Thumbnail> }) => Promise<void>;
+    rawFile: (file: Partial<File> & { thumbnail?: Partial<Thumbnail> }) => Promise<void>;
   }
 }
