@@ -58,7 +58,7 @@ async function handler(req: NextApiReq, res: NextApiRes) {
         type: 'video',
         version: '1.0',
         url: `${host}/r/${file.name}`,
-        thumbnail_url: file.thumbnail ? `${host}/r/${file.thumbnail.name}` : undefined,
+        thumbnail_url: file.thumbnail ? `${host}/r/${file.thumbnail?.name}` : undefined,
         html: `<video src="${host}/r/${file.name}"/>`,
       });
     return res.json({
