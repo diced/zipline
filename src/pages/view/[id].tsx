@@ -17,43 +17,52 @@ export default function EmbeddedFile({
   user,
   prismRender,
   host,
-  compress,
+  mediaType,
 }: {
-  file: Omit<Partial<File>, 'password'> & {
+  file: Omit<File, 'password'> & {
     password: boolean;
-    imageProps?: HTMLImageElement;
-    thumbnail: Thumbnail;
+    mediaProps?: {
+      width: number;
+      height: number;
+    };
+    thumbnail?: Pick<Thumbnail, 'name'>;
   };
   user: UserExtended;
   prismRender: boolean;
   host: string;
-  compress?: boolean;
+  mediaType: 'image' | 'video' | 'audio' | 'other';
 }) {
-  const dataURL = (route: string, pass?: string) =>
-    `${route}/${encodeURIComponent(file.name)}?compress=${compress ?? false}${
-      pass ? `&password=${encodeURIComponent(pass)}` : ''
-    }`;
-
   const router = useRouter();
+  const {
+    password: provPassword,
+    compress,
+    embed,
+  } = router.query as {
+    password?: string;
+    compress?: string;
+    embed?: string;
+  };
+  const dataURL = (route: string, opts?: { withHost?: boolean; useThumb?: boolean; pass?: string }) =>
+    `${opts?.withHost ? host : ''}${route}/${encodeURIComponent(
+      (opts?.useThumb && !!file.thumbnail && file.thumbnail.name) || file.name,
+    )}?compress=${compress ?? false}${opts?.pass ? `&password=${encodeURIComponent(opts?.pass)}` : ''}`;
   const [opened, setOpened] = useState(file.password);
-  const [password, setPassword] = useState('');
+  const [password, setPassword] = useState(provPassword || '');
   const [error, setError] = useState('');
   const [scale, setScale] = useState(2);
 
   const [downloadWPass, setDownloadWPass] = useState(false);
 
-  const mimeMatch = new RegExp(/^((?<img>image)|(?<vid>video)|(?<aud>audio))/).exec(file.mimetype);
-
   // reapply date from workaround
   file.createdAt = new Date(file ? file.createdAt : 0);
 
   const check = async () => {
-    const res = await fetch(dataURL('/r', password));
+    const res = await fetch(dataURL('/r', { pass: password }));
 
     if (res.ok) {
       setError('');
-      if (prismRender) return router.push(`/code/${file.name}?password=${password}`);
-      updateFile(dataURL('/r', password));
+      if (prismRender) return router.push(`/code/${file.name}?password=${encodeURIComponent(password)}`);
+      updateMedia(dataURL('/r', { pass: password }));
       setOpened(false);
       setDownloadWPass(true);
     } else {
@@ -61,107 +70,219 @@ export default function EmbeddedFile({
     }
   };
 
-  const updateFile = async (url?: string) => {
-    if (!mimeMatch) return;
+  const updateMedia: (url?: string) => void = function (url?: string) {
+    if (mediaType === 'other') return;
 
-    const imageEl = document.getElementById('image_content') as HTMLImageElement,
-      videoEl = document.getElementById('video_content') as HTMLVideoElement,
-      audioEl = document.getElementById('audio_content') as HTMLAudioElement;
+    const mediaContent = document.getElementById(`${mediaType}_content`) as
+      | HTMLImageElement
+      | HTMLVideoElement
+      | HTMLAudioElement;
 
-    if (url) {
-      if (mimeMatch?.groups?.img) imageEl.src = url;
-      if (mimeMatch?.groups?.vid) videoEl.src = url;
-      if (mimeMatch?.groups?.aud) audioEl.src = url;
+    if (mediaType === 'image') {
+      if (document.getElementsByClassName('dynamic').length !== 0) return;
+      const img = new Image();
+      img.onload = function () {
+        if (document.getElementsByClassName('dynamic').length !== 0) return;
+        file.mediaProps = {
+          width: img.naturalWidth,
+          height: img.naturalHeight,
+        };
+        const metas: HTMLMetaElement[] = [];
+        for (let i = 0; i !== 2; i++) {
+          const metaW = document.createElement('meta');
+          const metaH = document.createElement('meta');
+          metaW.setAttribute('name', i % 2 ? 'twitter:image:width' : 'og:image:width');
+          metaH.setAttribute('name', i % 2 ? 'twitter:image:height' : 'og:image:height');
+          metaW.setAttribute('content', file.mediaProps.width.toString());
+          metaH.setAttribute('content', file.mediaProps.width.toString());
+          metaW.className = 'dynamic';
+          metaH.className = 'dynamic';
+          metas.push(...[metaW, metaH]);
+        }
+        for (const meta of metas) document.head.appendChild(meta);
+        img.remove();
+      };
+      img.src = dataURL('/r', { pass: password.length !== 0 ? password : undefined });
     }
+    if (mediaType === 'video') {
+      if (document.getElementsByClassName('dynamic').length !== 0) return;
+      const vid = document.createElement('video');
+      vid.onloadedmetadata = function () {
+        if (document.getElementsByClassName('dynamic').length !== 0) return;
+        file.mediaProps = {
+          width: vid.videoWidth,
+          height: vid.videoHeight,
+        };
+        const metas: HTMLMetaElement[] = [];
+        for (let i = 0; i !== 2; i++) {
+          const metaW = document.createElement('meta');
+          const metaH = document.createElement('meta');
+          metaW.setAttribute('name', i % 2 ? 'twitter:player:width' : 'og:video:width');
+          metaH.setAttribute('name', i % 2 ? 'twitter:player:height' : 'og:video:height');
+          metaW.setAttribute('content', file.mediaProps.width.toString());
+          metaH.setAttribute('content', file.mediaProps.width.toString());
+          metaW.className = 'dynamic';
+          metaH.className = 'dynamic';
+          metas.push(...[metaW, metaH]);
+        }
+        for (const meta of metas) document.head.appendChild(meta);
+        vid.remove();
+      };
+      vid.src = dataURL('/r', { pass: password.length !== 0 ? password : undefined });
+      vid.load();
+    }
+    if (url) mediaContent.src = url;
   };
 
   useEffect(() => {
     if (file.password) {
-      setOpened(true);
+      if (password) check();
+      else setOpened(true);
     }
-  }, []);
 
-  useEffect(() => {
-    if (!mimeMatch) return;
-
-    updateFile();
+    if (mediaType === 'other') return;
+    updateMedia();
+    return () => {
+      const metas = document.head.getElementsByClassName('dynamic');
+      for (const meta of metas) meta.remove();
+    };
   }, []);
 
   return (
     <>
       <Head>
+        <meta
+          property='og:url'
+          content={dataURL(router.asPath.replace(('/' + router.query['id']) as string, ''), {
+            withHost: true,
+          })}
+        />
+        {!embed && !file.embed && mediaType === 'image' && (
+          <link rel='alternate' type='application/json+oembed' href={`${host}/api/oembed/${file.id}`} />
+        )}
         {user.embed.title && file.embed && (
           <meta property='og:title' content={parseString(user.embed.title, { file: file, user })} />
         )}
-
         {user.embed.description && file.embed && (
           <meta
             property='og:description'
             content={parseString(user.embed.description, { file: file, user })}
           />
         )}
-
         {user.embed.siteName && file.embed && (
           <meta property='og:site_name' content={parseString(user.embed.siteName, { file: file, user })} />
         )}
-
         {user.embed.color && file.embed && (
           <meta property='theme-color' content={parseString(user.embed.color, { file: file, user })} />
         )}
-
-        {mimeMatch?.groups?.img && (
+        {embed?.toLowerCase() === 'true' && !file.embed && (
           <>
-            <meta property='og:type' content='image' />
-            <meta property='og:image' itemProp='image' content={`${host}/r/${file.name}`} />
-            <meta property='og:url' content={`${host}/r/${file.name}`} />
-            <meta property='og:image:width' content={file.imageProps?.naturalWidth.toString()} />
-            <meta property='og:image:height' content={file.imageProps?.naturalHeight.toString()} />
-            <meta property='twitter:card' content='summary_large_image' />
-            <meta property='twitter:image' content={`${host}/r/${file.name}`} />
+            <meta name='og:title' content={file.name} />
             <meta property='twitter:title' content={file.name} />
-          </>
-        )}
-        {mimeMatch?.groups?.vid && (
-          <>
-            <meta name='twitter:card' content='player' />
-            <meta name='twitter:player' content={`${host}/r/${file.name}`} />
-            <meta name='twitter:player:stream' content={`${host}/r/${file.name}`} />
-            <meta name='twitter:player:stream:content_type' content={file.mimetype} />
-            <meta name='twitter:title' content={file.name} />
-
-            {file.thumbnail && (
-              <>
-                <meta name='twitter:image' content={`${host}/r/${file.thumbnail.name}`} />
-                <meta property='og:image' content={`${host}/r/${file.thumbnail.name}`} />
-              </>
+            {mediaType === 'image' && (
+              <meta
+                name='twitter:image'
+                content={dataURL('/r', { withHost: true, pass: password.length == 0 ? undefined : password })}
+              />
             )}
-
-            <meta property='og:type' content={'video.other'} />
-            <meta property='og:url' content={`${host}/r/${file.name}`} />
-            <meta property='og:video' content={`${host}/r/${file.name}`} />
-            <meta property='og:video:url' content={`${host}/r/${file.name}`} />
-            <meta property='og:video:secure_url' content={`${host}/r/${file.name}`} />
-            <meta property='og:video:type' content={file.mimetype} />
+            {mediaType === 'image' && <meta property='twitter:card' content='summary_large_image' />}
           </>
         )}
-        {mimeMatch?.groups?.aud && (
+        {mediaType === 'image' && (
           <>
-            <meta name='twitter:card' content='player' />
-            <meta name='twitter:player' content={`${host}/r/${file.name}`} />
-            <meta name='twitter:player:stream' content={`${host}/r/${file.name}`} />
-            <meta name='twitter:player:stream:content_type' content={file.mimetype} />
-            <meta name='twitter:title' content={file.name} />
-            <meta name='twitter:player:width' content='720' />
-            <meta name='twitter:player:height' content='480' />
-
+            <meta
+              property='og:image'
+              itemProp='image'
+              content={dataURL('/r', { withHost: true, pass: password.length == 0 ? undefined : password })}
+            />
+            <meta
+              property='og:image:secure_url'
+              content={dataURL('/r', {
+                withHost: true,
+                useThumb: true,
+                pass: password.length == 0 ? undefined : password,
+              })}
+            />
+            <meta property='og:image:alt' content={file.name} />
+            <meta property='og:image:type' content={file.mimetype} />
+          </>
+        )}
+        {mediaType === 'video' && [
+          ...(!!file.thumbnail
+            ? [
+                <meta
+                  property='og:image:url'
+                  key='og:image:url'
+                  content={dataURL('/r', {
+                    withHost: true,
+                    useThumb: true,
+                    pass: password.length == 0 ? undefined : password,
+                  })}
+                />,
+                <meta
+                  property='og:image:secure_url'
+                  key='og:image:secure_url'
+                  content={dataURL('/r', {
+                    withHost: true,
+                    useThumb: true,
+                    pass: password.length == 0 ? undefined : password,
+                  })}
+                />,
+                <meta property='og:image:type' key='og:image:type' content='image/jpeg' />,
+                <meta
+                  name='twitter:image'
+                  key='twitter:image'
+                  content={dataURL('/r', {
+                    withHost: true,
+                    useThumb: true,
+                    pass: password.length == 0 ? undefined : password,
+                  })}
+                />,
+              ]
+            : []),
+          <meta name='twitter:card' key='twitter:card' content='player' />,
+          <meta
+            name='twitter:player'
+            key='twitter:player'
+            content={dataURL('/r', { withHost: true, pass: password.length == 0 ? undefined : password })}
+          />,
+          <meta
+            name='twitter:player:stream'
+            key='twitter:player:stream'
+            content={dataURL('/r', { withHost: true, pass: password.length == 0 ? undefined : password })}
+          />,
+          <meta
+            name='twitter:player:stream:content_type'
+            key='twitter:player:stream:content_type'
+            content={file.mimetype}
+          />,
+          <meta property='og:type' key='og:type' content='video.movie' />,
+          <meta
+            property='og:video'
+            key='og:video'
+            content={dataURL('/r', { withHost: true, pass: password.length == 0 ? undefined : password })}
+          />,
+          <meta
+            property='og:video:secure_url'
+            key='og:video:secure_url'
+            content={dataURL('/r', { withHost: true, pass: password.length == 0 ? undefined : password })}
+          />,
+          <meta property='og:video:type' key='og:video:type' content={file.mimetype} />,
+        ]}
+        {mediaType === 'audio' && (
+          <>
             <meta property='og:type' content='music.song' />
-            <meta property='og:url' content={`${host}/r/${file.name}`} />
-            <meta property='og:audio' content={`${host}/r/${file.name}`} />
-            <meta property='og:audio:secure_url' content={`${host}/r/${file.name}`} />
+            <meta
+              property='og:audio'
+              content={dataURL('/r', { withHost: true, pass: password.length == 0 ? undefined : password })}
+            />
+            <meta
+              property='og:audio:secure_url'
+              content={dataURL('/r', { withHost: true, pass: password.length == 0 ? undefined : password })}
+            />
             <meta property='og:audio:type' content={file.mimetype} />
           </>
         )}
-        {!mimeMatch && <meta property='og:url' content={`${host}/r/${file.name}`} />}
         <title>{file.name}</title>
       </Head>
       <Modal
@@ -192,7 +313,7 @@ export default function EmbeddedFile({
           overflow: 'hidden',
         }}
         onMouseDown={(e) => {
-          if (!mimeMatch?.groups?.img || e.button !== 0) return;
+          if (mediaType !== 'image' || e.button !== 0) return;
           if (e.button !== 0) return;
 
           e.preventDefault();
@@ -206,7 +327,7 @@ export default function EmbeddedFile({
           return true;
         }}
         onMouseUp={(e) => {
-          if (!mimeMatch?.groups?.img || e.button !== 0) return;
+          if (mediaType !== 'image' || e.button !== 0) return;
 
           const imageEl = document.getElementById('image_content') as HTMLImageElement;
           if (!imageEl.style.transform.startsWith('translate')) return;
@@ -215,7 +336,7 @@ export default function EmbeddedFile({
           return true;
         }}
         onMouseMove={(e) => {
-          if (!mimeMatch?.groups?.img || e.button !== 0) return;
+          if (mediaType !== 'image' || e.button !== 0) return;
           if (e.button !== 0) return;
 
           const imageEl = document.getElementById('image_content') as HTMLImageElement,
@@ -227,7 +348,7 @@ export default function EmbeddedFile({
           return true;
         }}
         onWheel={(e) => {
-          if (!mimeMatch?.groups?.img || e.button !== 0) return;
+          if (mediaType !== 'image' || e.button !== 0) return;
 
           const imageEl = document.getElementById('image_content') as HTMLImageElement,
             posX = e.pageX - (imageEl.x + imageEl.width / 2),
@@ -242,7 +363,7 @@ export default function EmbeddedFile({
           }px) scale(${newScale})`;
         }}
       >
-        {mimeMatch?.groups?.img && (
+        {mediaType === 'image' && (
           <img
             src={dataURL('/r')}
             alt={dataURL('/r')}
@@ -251,11 +372,12 @@ export default function EmbeddedFile({
               transition: 'transform 0.25s ease',
               maxHeight: '100vh',
               maxWidth: '100vw',
+              objectFit: 'contain',
             }}
           />
         )}
 
-        {mimeMatch?.groups?.vid && (
+        {mediaType === 'video' && (
           <video
             style={{
               maxHeight: '100vh',
@@ -269,10 +391,10 @@ export default function EmbeddedFile({
           />
         )}
 
-        {mimeMatch?.groups?.aud && <audio src={dataURL('/r')} controls autoPlay muted id='audio_content' />}
+        {mediaType === 'audio' && <audio src={dataURL('/r')} controls autoPlay muted id='audio_content' />}
 
-        {!mimeMatch && (
-          <AnchorNext component={Link} href={dataURL('/r', downloadWPass ? password : undefined)}>
+        {mediaType === 'other' && (
+          <AnchorNext component={Link} href={dataURL('/r', { pass: downloadWPass ? password : undefined })}>
             Can&#39;t preview this file. Click here to download it.
           </AnchorNext>
         )}
@@ -283,22 +405,23 @@ export default function EmbeddedFile({
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { id } = context.params as { id: string };
-  const { compress = null } = context.query as {
-    compress?: string;
-  };
   const file = await prisma.file.findFirst({
     where: {
       OR: [{ name: id }, { invisible: { invis: decodeURI(encodeURI(id)) } }],
     },
     include: {
-      thumbnail: true,
+      thumbnail: {
+        select: {
+          name: true,
+        },
+      },
     },
   });
   let host = context.req.headers.host;
   if (!file) return { notFound: true };
 
   // @ts-ignore
-  file.size = Number(file.size);
+  file.size = parseInt(file.size);
 
   const proto = context.req.headers['x-forwarded-proto'];
   try {
@@ -313,6 +436,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     if (proto === 'https' || config.core.return_https) host = `https://${host}`;
     else host = `http://${host}`;
   }
+
+  const mediaType: 'image' | 'video' | 'audio' | 'other' =
+    (new RegExp(/^(?<type>image|video|audio)/).exec(file.mimetype)?.groups?.type as
+      | 'image'
+      | 'video'
+      | 'audio') || 'other';
 
   const user = await prisma.user.findFirst({
     where: {
@@ -354,7 +483,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       file,
       user,
       host,
-      compress,
+      mediaType,
     },
   };
 };
