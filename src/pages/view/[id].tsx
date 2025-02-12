@@ -42,29 +42,29 @@ export default function EmbeddedFile({
     compress?: string;
     embed?: string;
   };
-  const dataURL = (route: string, opts?: { withHost?: boolean; useThumb?: boolean; pass?: string }) =>
-    `${opts?.withHost ? host : ''}${route}/${encodeURIComponent(
-      (opts?.useThumb && !!file.thumbnail && file.thumbnail.name) || file.name,
-    )}?compress=${compress ?? false}${opts?.pass ? `&password=${encodeURIComponent(opts?.pass)}` : ''}`;
+
+  const dataURL = (route: string, useThumb?: boolean, withoutHost?: boolean, pass?: string) =>
+    `${withoutHost ? '' : host}${route}/${encodeURIComponent(
+      (useThumb && !!file.thumbnail && file.thumbnail.name) || file.name,
+    )}?compress=${compress?.toLowerCase() === 'true' || false}${
+      !!pass ? `&password=${encodeURIComponent(pass)}` : ''
+    }`;
   const [opened, setOpened] = useState(file.password);
   const [password, setPassword] = useState(provPassword || '');
   const [error, setError] = useState('');
   const [scale, setScale] = useState(2);
 
-  const [downloadWPass, setDownloadWPass] = useState(false);
-
   // reapply date from workaround
   file.createdAt = new Date(file ? file.createdAt : 0);
 
   const check = async () => {
-    const res = await fetch(dataURL('/r', { pass: password }));
+    const res = await fetch(dataURL('/r'));
 
     if (res.ok) {
       setError('');
       if (prismRender) return router.push(`/code/${file.name}?password=${encodeURIComponent(password)}`);
-      updateMedia(dataURL('/r', { pass: password }));
+      updateMedia(dataURL('/r', false, true, password));
       setOpened(false);
-      setDownloadWPass(true);
     } else {
       setError('Invalid password');
     }
@@ -78,59 +78,58 @@ export default function EmbeddedFile({
       | HTMLVideoElement
       | HTMLAudioElement;
 
-    if (mediaType === 'image') {
-      if (document.getElementsByClassName('dynamic').length !== 0) return;
-      const img = new Image();
-      img.onload = function () {
-        if (document.getElementsByClassName('dynamic').length !== 0) return;
-        file.mediaProps = {
-          width: img.naturalWidth,
-          height: img.naturalHeight,
+    if (document.head.getElementsByClassName('dynamic').length === 0) {
+      const metas: HTMLMetaElement[][] = [];
+      const twType = mediaType === 'video' ? 'player' : 'image';
+      const ogType = mediaType === 'video' ? 'video' : 'image';
+      for (let i = 0; i !== 2; i++) {
+        const metaW = document.createElement('meta');
+        const metaH = document.createElement('meta');
+        metaW.setAttribute('name', i % 2 ? `twitter:${twType}:width` : `og:${ogType}:width`);
+        metaH.setAttribute('name', i % 2 ? `twitter:${twType}:height` : `og:${ogType}:height`);
+        metaW.className = 'dynamic';
+        metaH.className = 'dynamic';
+        metas.push([metaW, metaH]);
+      }
+      if (mediaType === 'image') {
+        const img = new Image();
+        img.onload = function () {
+          if (document.head.getElementsByClassName('dynamic').length !== 0) return;
+          file.mediaProps = {
+            width: img.naturalWidth,
+            height: img.naturalHeight,
+          };
+          for (const meta of metas) {
+            meta[0].setAttribute('content', file.mediaProps.width.toString());
+            meta[1].setAttribute('content', file.mediaProps.height.toString());
+            document.head.appendChild(meta[0]);
+            document.head.appendChild(meta[1]);
+          }
+          img.remove();
         };
-        const metas: HTMLMetaElement[] = [];
-        for (let i = 0; i !== 2; i++) {
-          const metaW = document.createElement('meta');
-          const metaH = document.createElement('meta');
-          metaW.setAttribute('name', i % 2 ? 'twitter:image:width' : 'og:image:width');
-          metaH.setAttribute('name', i % 2 ? 'twitter:image:height' : 'og:image:height');
-          metaW.setAttribute('content', file.mediaProps.width.toString());
-          metaH.setAttribute('content', file.mediaProps.width.toString());
-          metaW.className = 'dynamic';
-          metaH.className = 'dynamic';
-          metas.push(...[metaW, metaH]);
-        }
-        for (const meta of metas) document.head.appendChild(meta);
-        img.remove();
-      };
-      img.src = dataURL('/r', { pass: password.length !== 0 ? password : undefined });
-    }
-    if (mediaType === 'video') {
-      if (document.getElementsByClassName('dynamic').length !== 0) return;
-      const vid = document.createElement('video');
-      vid.onloadedmetadata = function () {
-        if (document.getElementsByClassName('dynamic').length !== 0) return;
-        file.mediaProps = {
-          width: vid.videoWidth,
-          height: vid.videoHeight,
+        img.src = dataURL('/r', false, false, password);
+      }
+      if (mediaType === 'video') {
+        const vid = document.createElement('video');
+        vid.onloadedmetadata = function () {
+          if (document.head.getElementsByClassName('dynamic').length !== 0) return;
+          file.mediaProps = {
+            width: vid.videoWidth,
+            height: vid.videoHeight,
+          };
+          for (const meta of metas) {
+            meta[0].setAttribute('content', file.mediaProps.width.toString());
+            meta[1].setAttribute('content', file.mediaProps.height.toString());
+            document.head.appendChild(meta[0]);
+            document.head.appendChild(meta[1]);
+          }
+          vid.remove();
         };
-        const metas: HTMLMetaElement[] = [];
-        for (let i = 0; i !== 2; i++) {
-          const metaW = document.createElement('meta');
-          const metaH = document.createElement('meta');
-          metaW.setAttribute('name', i % 2 ? 'twitter:player:width' : 'og:video:width');
-          metaH.setAttribute('name', i % 2 ? 'twitter:player:height' : 'og:video:height');
-          metaW.setAttribute('content', file.mediaProps.width.toString());
-          metaH.setAttribute('content', file.mediaProps.width.toString());
-          metaW.className = 'dynamic';
-          metaH.className = 'dynamic';
-          metas.push(...[metaW, metaH]);
-        }
-        for (const meta of metas) document.head.appendChild(meta);
-        vid.remove();
-      };
-      vid.src = dataURL('/r', { pass: password.length !== 0 ? password : undefined });
-      vid.load();
+        vid.src = dataURL('/r', false, false, password);
+        vid.load();
+      }
     }
+
     if (url) mediaContent.src = url;
   };
 
@@ -153,11 +152,9 @@ export default function EmbeddedFile({
       <Head>
         <meta
           property='og:url'
-          content={dataURL(router.asPath.replace(('/' + router.query['id']) as string, ''), {
-            withHost: true,
-          })}
+          content={dataURL(router.asPath.replace(('/' + router.query['id']) as string, ''))}
         />
-        {!embed && !file.embed && mediaType === 'image' && (
+        {!embed && !file.embed && (
           <link rel='alternate' type='application/json+oembed' href={`${host}/api/oembed/${file.id}`} />
         )}
         {user.embed.title && file.embed && (
@@ -180,29 +177,15 @@ export default function EmbeddedFile({
             <meta name='og:title' content={file.name} />
             <meta property='twitter:title' content={file.name} />
             {mediaType === 'image' && (
-              <meta
-                name='twitter:image'
-                content={dataURL('/r', { withHost: true, pass: password.length == 0 ? undefined : password })}
-              />
+              <meta name='twitter:image' content={dataURL('/r', false, false, password)} />
             )}
             {mediaType === 'image' && <meta property='twitter:card' content='summary_large_image' />}
           </>
         )}
         {mediaType === 'image' && (
           <>
-            <meta
-              property='og:image'
-              itemProp='image'
-              content={dataURL('/r', { withHost: true, pass: password.length == 0 ? undefined : password })}
-            />
-            <meta
-              property='og:image:secure_url'
-              content={dataURL('/r', {
-                withHost: true,
-                useThumb: true,
-                pass: password.length == 0 ? undefined : password,
-              })}
-            />
+            <meta property='og:image' itemProp='image' content={dataURL('/r', false, false, password)} />
+            <meta property='og:image:secure_url' content={dataURL('/r', false, false, password)} />
             <meta property='og:image:alt' content={file.name} />
             <meta property='og:image:type' content={file.mimetype} />
           </>
@@ -213,73 +196,47 @@ export default function EmbeddedFile({
                 <meta
                   property='og:image:url'
                   key='og:image:url'
-                  content={dataURL('/r', {
-                    withHost: true,
-                    useThumb: true,
-                    pass: password.length == 0 ? undefined : password,
-                  })}
+                  content={dataURL('/r', true, false, password)}
                 />,
                 <meta
                   property='og:image:secure_url'
                   key='og:image:secure_url'
-                  content={dataURL('/r', {
-                    withHost: true,
-                    useThumb: true,
-                    pass: password.length == 0 ? undefined : password,
-                  })}
+                  content={dataURL('/r', true)}
                 />,
                 <meta property='og:image:type' key='og:image:type' content='image/jpeg' />,
                 <meta
                   name='twitter:image'
                   key='twitter:image'
-                  content={dataURL('/r', {
-                    withHost: true,
-                    useThumb: true,
-                    pass: password.length == 0 ? undefined : password,
-                  })}
+                  content={dataURL('/r', true, false, password)}
                 />,
               ]
             : []),
           <meta name='twitter:card' key='twitter:card' content='player' />,
-          <meta
-            name='twitter:player'
-            key='twitter:player'
-            content={dataURL('/r', { withHost: true, pass: password.length == 0 ? undefined : password })}
-          />,
+          <meta name='twitter:player' key='twitter:player' content={dataURL('/r', false, false, password)} />,
           <meta
             name='twitter:player:stream'
             key='twitter:player:stream'
-            content={dataURL('/r', { withHost: true, pass: password.length == 0 ? undefined : password })}
+            content={dataURL('/r', false, false, password)}
           />,
           <meta
             name='twitter:player:stream:content_type'
             key='twitter:player:stream:content_type'
             content={file.mimetype}
           />,
-          <meta property='og:type' key='og:type' content='video.movie' />,
-          <meta
-            property='og:video'
-            key='og:video'
-            content={dataURL('/r', { withHost: true, pass: password.length == 0 ? undefined : password })}
-          />,
+          <meta property='og:type' key='og:type' content='video.other' />,
+          <meta property='og:video' key='og:video' content={dataURL('/r', false, false, password)} />,
           <meta
             property='og:video:secure_url'
             key='og:video:secure_url'
-            content={dataURL('/r', { withHost: true, pass: password.length == 0 ? undefined : password })}
+            content={dataURL('/r', false, false, password)}
           />,
           <meta property='og:video:type' key='og:video:type' content={file.mimetype} />,
         ]}
         {mediaType === 'audio' && (
           <>
             <meta property='og:type' content='music.song' />
-            <meta
-              property='og:audio'
-              content={dataURL('/r', { withHost: true, pass: password.length == 0 ? undefined : password })}
-            />
-            <meta
-              property='og:audio:secure_url'
-              content={dataURL('/r', { withHost: true, pass: password.length == 0 ? undefined : password })}
-            />
+            <meta property='og:audio' content={dataURL('/r', false, false, password)} />
+            <meta property='og:audio:secure_url' content={dataURL('/r', false, false, password)} />
             <meta property='og:audio:type' content={file.mimetype} />
           </>
         )}
@@ -365,8 +322,8 @@ export default function EmbeddedFile({
       >
         {mediaType === 'image' && (
           <img
-            src={dataURL('/r')}
-            alt={dataURL('/r')}
+            src={dataURL('/r', false, true, password)}
+            alt={dataURL('/r', false, true, password)}
             id='image_content'
             style={{
               transition: 'transform 0.25s ease',
@@ -383,7 +340,7 @@ export default function EmbeddedFile({
               maxHeight: '100vh',
               maxWidth: '100vw',
             }}
-            src={dataURL('/r')}
+            src={dataURL('/r', false, true, password)}
             controls
             autoPlay
             muted
@@ -391,10 +348,12 @@ export default function EmbeddedFile({
           />
         )}
 
-        {mediaType === 'audio' && <audio src={dataURL('/r')} controls autoPlay muted id='audio_content' />}
+        {mediaType === 'audio' && (
+          <audio src={dataURL('/r', false, true)} controls autoPlay muted id='audio_content' />
+        )}
 
         {mediaType === 'other' && (
-          <AnchorNext component={Link} href={dataURL('/r', { pass: downloadWPass ? password : undefined })}>
+          <AnchorNext component={Link} href={dataURL('/r', false, true, password)}>
             Can&#39;t preview this file. Click here to download it.
           </AnchorNext>
         )}
