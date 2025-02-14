@@ -281,7 +281,9 @@ async function thumbs(this: FastifyInstance) {
 }
 
 function genFastifyOpts(): FastifyServerOptions {
-  const opts = {};
+  const opts: FastifyServerOptions = {
+    pluginTimeout: 25000,
+  };
 
   if (config.ssl?.cert && config.ssl?.key) {
     opts['https'] = {
