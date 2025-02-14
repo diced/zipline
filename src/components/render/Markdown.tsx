@@ -13,7 +13,6 @@ export default function Markdown({ code, ...props }) {
           return <Code>{children}</Code>;
         },
         pre({ children }) {
-          console.log(children);
           // @ts-expect-error someone find the type for this :sob:
           const match = /language-(\w+)/.exec(children.props?.className || '');
           // @ts-ignore
