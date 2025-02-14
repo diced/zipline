@@ -7,16 +7,24 @@ import { Language } from 'prism-react-renderer';
 export default function Markdown({ code, ...props }) {
   return (
     <ReactMarkdown
-      remarkPlugins={[remarkGfm]}
+      remarkPlugins={[[remarkGfm, { singleTilde: false }]]}
       components={{
-        code({ inline, className, children, ...props }) {
-          const match = /language-(\w+)/.exec(className || '');
-          return !inline && match ? (
-            <Prism language={match[1] as Language} {...props}>
-              {String(children).replace(/\n$/, '')}
+        code({ children }) {
+          return <Code>{children}</Code>;
+        },
+        pre({ children }) {
+          console.log(children);
+          // @ts-expect-error someone find the type for this :sob:
+          const match = /language-(\w+)/.exec(children.props?.className || '');
+          // @ts-ignore
+          if (!children.props?.children) return code;
+          return (
+            <Prism language={match ? (match[1] as Language) : 'markdown'}>
+              {
+                // @ts-expect-error
+                String(children.props?.children).replace(/\n$/, '')
+              }
             </Prism>
-          ) : (
-            <Code {...props}>{children}</Code>
           );
         },
         img(props) {
