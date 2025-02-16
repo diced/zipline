@@ -3,10 +3,10 @@ import { guess } from 'lib/mimes';
 import { extname } from 'path';
 import fastifyPlugin from 'fastify-plugin';
 import { createBrotliCompress, createDeflate, createGzip } from 'zlib';
-import pump from 'pump';
 import { Transform } from 'stream';
 import { parseRange } from 'lib/utils/range';
 import type { File, Thumbnail } from '@prisma/client';
+import { pipeline } from 'stream/promises';
 
 function rawFileDecorator(fastify: FastifyInstance, _, done) {
   fastify.decorateReply('rawFile', rawFile);
@@ -18,12 +18,15 @@ function rawFileDecorator(fastify: FastifyInstance, _, done) {
       filename = isThumb ? file.thumbnail?.name : file.name,
       fileMime = isThumb ? null : file.mimetype;
 
+    const logger = this.server.logger.child('rawRoute');
+
     const size = await this.server.datasource.size(filename);
     if (size === null) return this.notFound();
 
     const mimetype = await guess(extname(filename).slice(1));
 
-    if (this.request.headers.range) {
+    if (this.request.headers.range && !compress?.match(/^true$/i)) {
+      logger.debug('responding raw file with ranged');
       const [start, end] = parseRange(this.request.headers.range, size);
       if (start >= size || end >= size) {
         const buf = await datasource.get(filename);
@@ -61,14 +64,18 @@ function rawFileDecorator(fastify: FastifyInstance, _, done) {
 
     if (
       this.server.config.core.compression.enabled &&
-      (compress?.match(/^true$/i) || !this.request.headers['X-Zipline-NoCompress']) &&
-      !!this.request.headers['accept-encoding']
-    )
-      if (
-        size > this.server.config.core.compression.threshold &&
-        (fileMime || mimetype).match(/^(image(?!\/(webp))|vfileeo(?!\/(webm))|text)/)
-      )
-        return this.send(useCompress.call(this, data));
+      compress?.match(/^true$/i) &&
+      !this.request.headers['X-Zipline-NoCompress'] &&
+      !!this.request.headers['accept-encoding'] &&
+      size > this.server.config.core.compression.threshold &&
+      (fileMime || mimetype).match(/^(image(?!\/(webp))|video|text)/)
+    ) {
+      logger.debug('responding raw file with compressed');
+      this.hijack();
+      return await useCompress.call(this, data);
+    }
+
+    logger.debug('responding raw file with full size');
 
     return this.type(mimetype || 'application/octet-stream')
       .headers({
@@ -83,32 +90,33 @@ function rawFileDecorator(fastify: FastifyInstance, _, done) {
   }
 }
 
-function useCompress(this: FastifyReply, data: NodeJS.ReadableStream) {
+async function useCompress(this: FastifyReply, data: NodeJS.ReadableStream) {
   let compress: Transform;
 
   switch ((this.request.headers['accept-encoding'] as string).split(', ')[0]) {
     case 'gzip':
     case 'x-gzip':
       compress = createGzip();
-      this.header('Content-Encoding', 'gzip');
+      this.raw.writeHead(200, { 'Content-Encoding': 'gzip' });
       break;
     case 'deflate':
       compress = createDeflate();
-      this.header('Content-Encoding', 'deflate');
+      this.raw.writeHead(200, { 'Content-Encoding': 'deflate' });
       break;
     case 'br':
       compress = createBrotliCompress();
-      this.header('Content-Encoding', 'br');
+      this.raw.writeHead(200, { 'Content-Encoding': 'br' });
       break;
     default:
       this.server.logger
         .child('response')
-        .error(`Unsupported encoding: ${this.request.headers['accept-encoding']}}`);
+        .debug(`Unsupported supplied encoding: ${this.request.headers['accept-encoding']}`);
+      this.raw.writeHead(200, {});
       break;
   }
-  if (!compress) return data;
-  setTimeout(() => compress.destroy(), 2000);
-  return pump(data, compress, (err) => (err ? this.server.logger.error(err) : null));
+  if (!compress) return await pipeline(data, this.raw);
+
+  return await pipeline(data, compress, this.raw);
 }
 
 export default fastifyPlugin(rawFileDecorator, {
