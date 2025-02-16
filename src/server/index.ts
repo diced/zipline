@@ -80,12 +80,12 @@ async function start() {
     done();
   });
 
-  server.addHook('onResponse', (req, reply, done) => {
+  server.addHook('onRequest', (req, reply, done) => {
     if (config.core.logger) {
       if (req.url.startsWith('/_next')) return done();
 
-      server.logger.child('response').info(`${req.method} ${req.url} -> ${reply.statusCode}`);
-      server.logger.child('response').debug(
+      server.logger.child('request').info(`${req.method} ${req.url} -> ${reply.statusCode}`);
+      server.logger.child('request').debug(
         JSON.stringify({
           method: req.method,
           url: req.url,
