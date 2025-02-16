@@ -125,6 +125,17 @@ export default function Type({ file, popup = false, disableMediaPreview, ...prop
     );
   };
 
+  if (file.password) {
+    return (
+      <Placeholder
+        Icon={IconFileAlert}
+        text={`This file is password protected. Click to view file (${file.name})`}
+        onClick={() => window.open(file.url)}
+        {...props}
+      />
+    );
+  }
+
   if ((shouldRenderMarkdown || shouldRenderTex || shouldRenderCode) && !props.overrideRender && popup)
     return (
       <>
@@ -141,17 +152,6 @@ export default function Type({ file, popup = false, disableMediaPreview, ...prop
 
   if (media && disableMediaPreview) {
     return <Placeholder Icon={IconFile} text={`Click to view file (${file.name})`} {...props} />;
-  }
-
-  if (file.password) {
-    return (
-      <Placeholder
-        Icon={IconFileAlert}
-        text={`This file is password protected. Click to view file (${file.name})`}
-        onClick={() => window.open(file.url)}
-        {...props}
-      />
-    );
   }
 
   return popup ? (
