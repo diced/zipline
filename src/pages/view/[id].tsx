@@ -160,10 +160,7 @@ export default function EmbeddedFile({
           <meta property='og:title' content={parseString(user.embed.title, { file, user })} />
         )}
         {user.embed.description && file.embed && (
-          <meta
-            property='og:description'
-            content={parseString(user.embed.description, { file, user })}
-          />
+          <meta property='og:description' content={parseString(user.embed.description, { file, user })} />
         )}
         {user.embed.siteName && file.embed && (
           <meta property='og:site_name' content={parseString(user.embed.siteName, { file, user })} />
