@@ -1,11 +1,12 @@
-import type { File, User, Url } from '@prisma/client';
+import type { File, Url } from '@prisma/client';
 import { bytesToHuman } from './bytes';
 import Logger from 'lib/logger';
+import type { UserExtended } from 'middleware/withZipline';
 
 export type ParseValue = {
   file?: Omit<Partial<File>, 'password'>;
   url?: Url;
-  user?: User;
+  user?: Omit<UserExtended, 'password' | 'secret' | 'totpSecret' | 'ratelimit'>;
 
   link?: string;
   raw_link?: string;
