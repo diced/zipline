@@ -27,7 +27,7 @@ export default function EmbeddedFile({
     };
     thumbnail?: Pick<Thumbnail, 'name'>;
   };
-  user: UserExtended;
+  user: Omit<UserExtended, 'password' | 'secret' | 'totpSecret' | 'ratelimit'>;
   prismRender: boolean;
   host: string;
   mediaType: 'image' | 'video' | 'audio' | 'other';
@@ -35,20 +35,26 @@ export default function EmbeddedFile({
   const router = useRouter();
   const {
     password: provPassword,
-    compress,
-    embed,
+    compress = 'false',
+    embed = 'false',
   } = router.query as {
     password?: string;
     compress?: string;
     embed?: string;
   };
 
-  const dataURL = (route: string, useThumb?: boolean, withoutHost?: boolean, pass?: string) =>
+  const dataURL = (
+    route: string,
+    useThumb?: boolean,
+    withoutHost?: boolean,
+    pass?: string,
+    forcedl?: boolean,
+  ) =>
     `${withoutHost ? '' : host}${route}/${encodeURIComponent(
       (useThumb && !!file.thumbnail && file.thumbnail.name) || file.name,
-    )}?compress=${compress?.toLowerCase() === 'true' || false}${
+    )}${compress.match(/^true/i) ? '?compress=true' : '?compress=false'}${
       !!pass ? `&password=${encodeURIComponent(pass)}` : ''
-    }`;
+    }${forcedl ? '&download=true' : ''}`;
   const [opened, setOpened] = useState(file.password);
   const [password, setPassword] = useState(provPassword || '');
   const [error, setError] = useState('');
@@ -58,7 +64,7 @@ export default function EmbeddedFile({
   file.createdAt = new Date(file ? file.createdAt : 0);
 
   const check = async () => {
-    const res = await fetch(dataURL('/r'));
+    const res = await fetch(dataURL('/r', false, true, password));
 
     if (res.ok) {
       setError('');
@@ -73,10 +79,7 @@ export default function EmbeddedFile({
   const updateMedia: (url?: string) => void = function (url?: string) {
     if (mediaType === 'other') return;
 
-    const mediaContent = document.getElementById(`${mediaType}_content`) as
-      | HTMLImageElement
-      | HTMLVideoElement
-      | HTMLAudioElement;
+    const mediaContent = document.getElementById(`${mediaType}_content`) as HTMLMediaElement;
 
     if (document.head.getElementsByClassName('dynamic').length === 0) {
       const metas: HTMLMetaElement[][] = [];
@@ -150,40 +153,37 @@ export default function EmbeddedFile({
   return (
     <>
       <Head>
-        <meta
-          property='og:url'
-          content={dataURL(router.asPath.replace(('/' + router.query['id']) as string, ''))}
-        />
-        {!embed && !file.embed && (
+        {!embed.match(/^true/i) && !file.embed && mediaType === 'image' && (
           <link rel='alternate' type='application/json+oembed' href={`${host}/api/oembed/${file.id}`} />
         )}
         {user.embed.title && file.embed && (
-          <meta property='og:title' content={parseString(user.embed.title, { file: file, user })} />
+          <meta property='og:title' content={parseString(user.embed.title, { file, user })} />
         )}
         {user.embed.description && file.embed && (
           <meta
             property='og:description'
-            content={parseString(user.embed.description, { file: file, user })}
+            content={parseString(user.embed.description, { file, user })}
           />
         )}
         {user.embed.siteName && file.embed && (
-          <meta property='og:site_name' content={parseString(user.embed.siteName, { file: file, user })} />
+          <meta property='og:site_name' content={parseString(user.embed.siteName, { file, user })} />
         )}
         {user.embed.color && file.embed && (
-          <meta property='theme-color' content={parseString(user.embed.color, { file: file, user })} />
+          <meta property='theme-color' content={parseString(user.embed.color, { file, user })} />
         )}
-        {embed?.toLowerCase() === 'true' && !file.embed && (
+        {(embed.match(/^true/i) || file.embed) && (
           <>
             <meta name='og:title' content={file.name} />
             <meta property='twitter:title' content={file.name} />
+            {mediaType === 'image' && <meta property='twitter:card' content='summary_large_image' />}
             {mediaType === 'image' && (
               <meta name='twitter:image' content={dataURL('/r', false, false, password)} />
             )}
-            {mediaType === 'image' && <meta property='twitter:card' content='summary_large_image' />}
           </>
         )}
         {mediaType === 'image' && (
           <>
+            <meta property='og:type' content='image' />
             <meta property='og:image' itemProp='image' content={dataURL('/r', false, false, password)} />
             <meta property='og:image:secure_url' content={dataURL('/r', false, false, password)} />
             <meta property='og:image:alt' content={file.name} />
@@ -193,44 +193,27 @@ export default function EmbeddedFile({
         {mediaType === 'video' && [
           ...(!!file.thumbnail
             ? [
+                <meta key={1} property='og:image' content={dataURL('/r', true, false, password)} />,
                 <meta
-                  property='og:image:url'
-                  key='og:image:url'
-                  content={dataURL('/r', true, false, password)}
-                />,
-                <meta
+                  key={2}
                   property='og:image:secure_url'
-                  key='og:image:secure_url'
-                  content={dataURL('/r', true)}
-                />,
-                <meta property='og:image:type' key='og:image:type' content='image/jpeg' />,
-                <meta
-                  name='twitter:image'
-                  key='twitter:image'
                   content={dataURL('/r', true, false, password)}
+                />,
+                <meta
+                  key={3}
+                  property='og:image:type'
+                  content={file.thumbnail.name.split('.').pop() === 'jpg' ? 'image/jpg' : 'image/gif'}
                 />,
               ]
             : []),
-          <meta name='twitter:card' key='twitter:card' content='player' />,
-          <meta name='twitter:player' key='twitter:player' content={dataURL('/r', false, false, password)} />,
-          <meta
-            name='twitter:player:stream'
-            key='twitter:player:stream'
-            content={dataURL('/r', false, false, password)}
-          />,
-          <meta
-            name='twitter:player:stream:content_type'
-            key='twitter:player:stream:content_type'
-            content={file.mimetype}
-          />,
-          <meta property='og:type' key='og:type' content='video.other' />,
-          <meta property='og:video' key='og:video' content={dataURL('/r', false, false, password)} />,
-          <meta
-            property='og:video:secure_url'
-            key='og:video:secure_url'
-            content={dataURL('/r', false, false, password)}
-          />,
-          <meta property='og:video:type' key='og:video:type' content={file.mimetype} />,
+          <meta key={4} property='og:type' content='video.other' />,
+          <meta key={5} property='og:video:url' content={dataURL('/r', false, false, password)} />,
+          <meta key={6} property='og:video:secure_url' content={dataURL('/r', false, false, password)} />,
+          <meta key={7} property='og:video:type' content={file.mimetype} />,
+          <meta key={8} name='twitter:card' content='player' />,
+          <meta key={9} name='twitter:player' content={dataURL('/r', false, false, password)} />,
+          <meta key={10} name='twitter:player:stream' content={dataURL('/r', false, false, password)} />,
+          <meta key={11} name='twitter:player:stream:content_type' content={file.mimetype} />,
         ]}
         {mediaType === 'audio' && (
           <>
@@ -340,12 +323,16 @@ export default function EmbeddedFile({
               maxHeight: '100vh',
               maxWidth: '100vw',
             }}
-            src={dataURL('/r', false, true, password)}
             controls
-            autoPlay
             muted
+            poster={dataURL('/r', true, true, password)}
             id='video_content'
-          />
+          >
+            <source src={dataURL('/r', false, true, password)} />
+            <AnchorNext component={Link} href={dataURL('/r', false, true, password, true)}>
+              Can&#39;t preview this file. Click here to download it.
+            </AnchorNext>
+          </video>
         )}
 
         {mediaType === 'audio' && (
@@ -353,7 +340,7 @@ export default function EmbeddedFile({
         )}
 
         {mediaType === 'other' && (
-          <AnchorNext component={Link} href={dataURL('/r', false, true, password)}>
+          <AnchorNext component={Link} href={dataURL('/r', false, true, password, true)}>
             Can&#39;t preview this file. Click here to download it.
           </AnchorNext>
         )}
