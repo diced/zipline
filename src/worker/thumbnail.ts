@@ -1,5 +1,5 @@
 import { type File, PrismaClient, type Thumbnail } from '@prisma/client';
-import { spawn } from 'child_process';
+import { type ChildProcess, spawn } from 'child_process';
 import ffmpeg from 'ffmpeg-static';
 import { createWriteStream } from 'fs';
 import { rm } from 'fs/promises';
@@ -25,12 +25,58 @@ if (isMainThread) {
   process.exit(1);
 }
 
-async function loadThumbnail(path) {
-  const args = ['-i', path, '-frames:v', '1', '-f', 'mjpeg', 'pipe:1'];
+async function getDuration(path): Promise<number> {
+  const args = ['-hide_banner', '-nostdin', '-i', path, '-f', 'null', 'pipe:1'];
+  const lengthMatch = new RegExp(/time=(?<time>(\d{2,}:){2}\d{2}\.\d{2})/);
 
   const child = spawn(ffmpeg, args, { stdio: ['ignore', 'pipe', 'pipe'] });
 
-  const data: Buffer = await new Promise((resolve, reject) => {
+  const data: string = await new Promise((resolve, reject) => {
+    const buffers: string[] = [];
+
+    child.stderr.on('data', (d) => child.stdout.emit('data', d));
+
+    child.stdout.on('data', (d) => buffers.push(d.toString()));
+
+    child.once('error', (...a) => {
+      console.log(a);
+
+      reject();
+    });
+    child.once('close', (code) => {
+      if (code !== 0) {
+        const msg = buffers.join('').trim().split('\n');
+
+        logger.debug(`cmd: ${ffmpeg} ${args.join(' ')}\n${msg.join('\n')}`);
+        logger.error(`child exited with code ${code}: ${msg[msg.length - 1]}`);
+
+        if (msg[msg.length - 1].includes('does not contain any stream')) {
+          // mismatched mimetype, for example a video/ogg (.ogg) file with no video stream since
+          // for this specific case just set the mimetype to audio/ogg
+          // the method will return an empty buffer since there is no video stream
+
+          logger.error(`file ${path} does not contain any video stream, it is probably an audio file`);
+          resolve('ow');
+        }
+
+        reject(new Error(`child exited with code ${code} ffmpeg output:\n${msg.join('\n')}`));
+      } else {
+        const trimBuffs: string[] = buffers.filter((val) => lengthMatch.exec(val));
+        resolve(trimBuffs[trimBuffs.length - 1].split('\n')[0]);
+      }
+    });
+  });
+
+  const matchLength = lengthMatch.exec(data);
+  if (!matchLength) return 0;
+
+  const timeArr = matchLength.groups.time.split(':');
+
+  return parseFloat(timeArr.reduce((prev, curr) => (parseFloat(prev) * 60 + parseFloat(curr)).toString()));
+}
+
+async function handleChild(child: ChildProcess, path: string, args: string[]): Promise<Buffer> {
+  return await new Promise((resolve, reject) => {
     const buffers = [];
     const errorBuffers = [];
 
@@ -78,6 +124,46 @@ async function loadThumbnail(path) {
       }
     });
   });
+}
+
+async function loadGifThumbnail(path): Promise<Buffer> {
+  const duration = await getDuration(path);
+
+  if (duration <= 5) return;
+
+  let start: number = duration;
+  const re = () => (start = Math.floor(Math.random() * duration * 100) / 100);
+  while (start + 3 >= duration) re();
+
+  const args = [
+    '-i',
+    path,
+    '-ss',
+    start.toString(),
+    '-t',
+    '3',
+    '-vf',
+    'fps=10,scale=320:-1:flags=lanczos,split[s0][s1];[s0]palettegen=stats_mode=diff[p];[s1][p]paletteuse',
+    '-loop',
+    '0',
+    '-f',
+    'gif',
+    'pipe:1',
+  ];
+
+  const child = spawn(ffmpeg, args, { stdio: ['ignore', 'pipe', 'pipe'] });
+
+  const data: Buffer = await handleChild(child, path, args);
+
+  return data;
+}
+
+async function loadThumbnail(path): Promise<Buffer> {
+  const args = ['-i', path, '-frames:v', '1', '-f', 'mjpeg', 'pipe:1'];
+
+  const child = spawn(ffmpeg, args, { stdio: ['ignore', 'pipe', 'pipe'] });
+
+  const data: Buffer = await handleChild(child, path, args);
 
   return data;
 }
@@ -86,7 +172,10 @@ async function loadFileTmp(file: File) {
   const stream = await datasource.get(file.name);
 
   // pipe to tmp file
-  const tmpFile = join(config.core.temp_directory, `zipline_thumb_${file.id}_${file.id}.tmp`);
+  const tmpFile = join(
+    config.core.temp_directory,
+    `zipline_thumb_${file.id}_${file.mimetype.replace('/', '_')}.tmp`,
+  );
   const fileWriteStream = createWriteStream(tmpFile);
 
   await new Promise((resolve, reject) => {
@@ -105,18 +194,23 @@ async function start() {
     const file = videos[i];
     if (!file.mimetype.startsWith('video/')) {
       logger.info('file is not a video');
-      process.exit(0);
+      continue;
     }
 
     if (file.thumbnail) {
       logger.info('thumbnail already exists');
-      process.exit(0);
+      continue;
     }
 
     const tmpFile = await loadFileTmp(file);
     logger.debug(`loaded file to tmp: ${tmpFile}`);
-    const thumbnail = await loadThumbnail(tmpFile);
-    logger.debug(`loaded thumbnail: ${thumbnail.length} bytes mjpeg`);
+    let useStill = false,
+      thumbnail: Buffer = await loadGifThumbnail(tmpFile);
+    if (!thumbnail) {
+      useStill = true;
+      thumbnail = await loadThumbnail(tmpFile);
+    }
+    logger.debug(`loaded thumbnail: ${thumbnail.length} bytes ${useStill ? 'mjpeg' : 'gif'}`);
 
     if (thumbnail.length === 0 && file.mimetype === 'video/ogg') {
       logger.info('file might be an audio file, setting mimetype to audio/ogg to avoid future errors');
@@ -141,7 +235,7 @@ async function start() {
       data: {
         thumbnail: {
           create: {
-            name: `.thumb-${file.id}.jpg`,
+            name: `.thumb-${file.id}.${useStill ? 'jpg' : 'gif'}`,
           },
         },
       },
@@ -150,7 +244,7 @@ async function start() {
       },
     });
 
-    await datasource.save(thumb.name, thumbnail, { type: 'image/jpeg' });
+    await datasource.save(thumb.name, thumbnail, { type: useStill ? 'image/jpeg' : 'image/gif' });
 
     logger.info(`thumbnail saved - ${thumb.name}`);
     logger.debug(`thumbnail ${JSON.stringify(thumb)}`);
