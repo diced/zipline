@@ -6,7 +6,7 @@ import type { UserExtended } from 'middleware/withZipline';
 export type ParseValue = {
   file?: Omit<Partial<File>, 'password'>;
   url?: Url;
-  user?: Omit<UserExtended, 'password' | 'secret' | 'totpSecret' | 'ratelimit'>;
+  user?: Partial<UserExtended>;
 
   link?: string;
   raw_link?: string;
