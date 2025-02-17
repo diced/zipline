@@ -1,0 +1,54 @@
+name: Bug
+description: File a bug report
+title: 'Bug: '
+labels: ['bug']
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Provide steps to reproduce the bug, and some context.
+      value: 'A bug happened!'
+    validations:
+      required: true
+  - type: dropdown
+    id: version
+    attributes:
+      label: Version
+      description: What version (or docker image) of Zipline are you using?
+      options:
+        - Latest v4 release (ghcr.io/diced/zipline or ghcr.io/diced/zipline:latest)
+        - Latest v4 commit (ghcr.io/diced/zipline:trunk)
+        - Latest v3 release (ghcr.io/diced/zipline:v3)
+        - Latest v3 commit (ghcr.io/diced/zipline:v3-trunk)
+        - other (provide version in additional info)
+    validations:
+      required: true
+  - type: dropdown
+    id: browsers
+    attributes:
+      label: What browser(s) are you seeing the problem on?
+      multiple: true
+      options:
+        - Firefox
+        - Chromium-based (Chrome, Edge, Brave, Opera, mobile chrome/chromium based, etc)
+        - Safari
+        - Firefox Mobile
+        - Safari Mobile
+  - type: textarea
+    id: zipline-logs
+    attributes:
+      label: Zipline Logs
+      description: Please copy and paste any relevant log output. Not seeing anything interesting? Try adding the `DEBUG=true` environment variable to see more logs, make sure to review the output and remove any sensitive information as it can be VERY verbose at times.
+      render: shell
+  - type: textarea
+    id: browser-logs
+    attributes:
+      label: Browser Logs
+      description: Please copy and paste any relevant log output.
+      render: shell
+  - type: textarea
+    id: additional-info
+    attributes:
+      label: Additional Info
+      description: Anything else that could be used to narrow down the issue, like your config.
