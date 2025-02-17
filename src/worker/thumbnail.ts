@@ -127,6 +127,7 @@ async function handleChild(child: ChildProcess, path: string, args: string[]): P
 }
 
 async function loadGifThumbnail(path): Promise<Buffer> {
+  if (!config.features.gif_thumbnails) return;
   const duration = await getDuration(path);
 
   if (duration <= 5) return;

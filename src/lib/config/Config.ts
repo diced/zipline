@@ -119,6 +119,7 @@ export interface ConfigFeatures {
   robots_txt: string;
 
   thumbnails: boolean;
+  gif_thumbnails: boolean;
 }
 
 export interface ConfigOAuth {
