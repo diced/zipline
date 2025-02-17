@@ -39,7 +39,7 @@ body:
     id: zipline-logs
     attributes:
       label: Zipline Logs
-      description: Please copy and paste any relevant log output. Not seeing anything interesting? Try adding the `DEBUG=true` environment variable to see more logs, make sure to review the output and remove any sensitive information as it can be VERY verbose at times.
+      description: Please copy and paste any relevant log output. Not seeing anything interesting? Try adding the `DEBUG=zipline` (v4) or `DEBUG=true` (v3) environment variable to see more logs, make sure to review the output and remove any sensitive information as it can be VERY verbose at times.
       render: shell
   - type: textarea
     id: browser-logs
