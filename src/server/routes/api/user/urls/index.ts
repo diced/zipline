@@ -62,14 +62,15 @@ export default fastifyPlugin(
           );
 
         let maxViews: number | undefined;
-        
-        let returnDomain = req.headers['x-zipline-domain'];
-        
-        if (typeof returnDomain === 'string') {
-          const domainArray = returnDomain.split(",");
-          returnDomain = domainArray[Math.floor(Math.random() * domainArray.length)].trim();
-        }
 
+        let returnDomain;
+        const headerDomain = req.headers['x-zipline-domain'];
+        if (headerDomain && typeof headerDomain === 'string') {
+          const domainArray = headerDomain.split(',');
+          returnDomain = domainArray[Math.floor(Math.random() * domainArray.length)].trim();
+        } else {
+          returnDomain = req.headers['x-zipline-domain'];
+        }
 
         const maxViewsHeader = req.headers['x-zipline-max-views'];
         if (maxViewsHeader) {
