@@ -65,7 +65,7 @@ export default fastifyPlugin(
 
         let returnDomain;
         const headerDomain = req.headers['x-zipline-domain'];
-        if (headerDomain && typeof headerDomain === 'string') {
+        if (headerDomain) {
           const domainArray = headerDomain.split(',');
           returnDomain = domainArray[Math.floor(Math.random() * domainArray.length)].trim();
         } else {
