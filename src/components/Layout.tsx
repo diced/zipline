@@ -357,7 +357,9 @@ export default function Layout({ children, config }: { children: React.ReactNode
             }
           })}
 
-        <ScrollArea mah={200} mt='auto'>
+        <Divider mt='auto' />
+
+        <ScrollArea mah='auto'>
           <Box>
             {config.website.externalLinks.map(({ name, url }, i) => (
               <NavLink

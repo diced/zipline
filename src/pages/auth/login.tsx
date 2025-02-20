@@ -296,17 +296,19 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
               <Divider label='or' />
             )}
 
-            <Button
-              onClick={handlePasskeyLogin}
-              size='md'
-              fullWidth
-              variant='outline'
-              leftSection={<IconKey size='1rem' />}
-              color={passkeyErrored ? 'red' : undefined}
-              loading={passkeyLoading}
-            >
-              Login with passkey
-            </Button>
+            {config.mfa.passkeys && (
+              <Button
+                onClick={handlePasskeyLogin}
+                size='md'
+                fullWidth
+                variant='outline'
+                leftSection={<IconKey size='1rem' />}
+                color={passkeyErrored ? 'red' : undefined}
+                loading={passkeyLoading}
+              >
+                Login with passkey
+              </Button>
+            )}
 
             {config.features.userRegistration && (
               <Button

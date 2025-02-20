@@ -95,6 +95,7 @@ export default function ImportButton() {
       });
 
       await fetch('/reload');
+      await fetch('/api/reload');
     }
   };
 
