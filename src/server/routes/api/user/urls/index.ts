@@ -68,8 +68,6 @@ export default fastifyPlugin(
         if (headerDomain) {
           const domainArray = headerDomain.split(',');
           returnDomain = domainArray[Math.floor(Math.random() * domainArray.length)].trim();
-        } else {
-          returnDomain = req.headers['x-zipline-domain'];
         }
 
         const maxViewsHeader = req.headers['x-zipline-max-views'];
