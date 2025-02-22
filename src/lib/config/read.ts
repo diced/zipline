@@ -1,4 +1,4 @@
-import msFn from 'ms';
+import msFn, { StringValue } from 'ms';
 import { log } from '../logger';
 import { bytes } from '../bytes';
 import { prisma } from '../db';
@@ -446,7 +446,7 @@ function parse(value: string, type: EnvType) {
     case 'byte':
       return bytes(value);
     case 'ms':
-      return msFn(value);
+      return msFn(value as StringValue);
     case 'json[]':
       try {
         return JSON.parse(value);

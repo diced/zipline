@@ -144,7 +144,8 @@ export default function SettingsFileView() {
 
           <Switch
             label='Enable Embed'
-            description='Enable the following embed properties. These properties take advantage of OpenGraph tags.'
+            description='Enable the following embed properties. These properties take advantage of OpenGraph tags. View routes will need to be enabled for this to work.'
+            disabled={!form.values.enabled}
             my='xs'
             {...form.getInputProps('embed', { type: 'checkbox' })}
           />
@@ -152,22 +153,22 @@ export default function SettingsFileView() {
           <SimpleGrid cols={{ base: 1, md: 2 }} spacing='sm'>
             <TextInput
               label='Embed Title'
-              disabled={!form.values.embed}
+              disabled={!form.values.embed || !form.values.enabled}
               {...form.getInputProps('embedTitle')}
             />
             <TextInput
               label='Embed Description'
-              disabled={!form.values.embed}
+              disabled={!form.values.embed || !form.values.enabled}
               {...form.getInputProps('embedDescription')}
             />
             <TextInput
               label='Embed Site Name'
-              disabled={!form.values.embed}
+              disabled={!form.values.embed || !form.values.enabled}
               {...form.getInputProps('embedSiteName')}
             />
             <ColorInput
               label='Embed Color'
-              disabled={!form.values.embed}
+              disabled={!form.values.embed || !form.values.enabled}
               {...form.getInputProps('embedColor')}
             />
           </SimpleGrid>

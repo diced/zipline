@@ -40,7 +40,6 @@ export function settingsOnSubmit(router: NextRouter, form: ReturnType<typeof use
       });
 
       await fetch('/reload');
-      await fetch('/api/reload');
       mutate('/api/server/settings', data);
       router.replace(router.asPath, undefined, { scroll: false });
     }

@@ -1,4 +1,4 @@
-import { Anchor, Code, Group, Paper, Text, Title } from '@mantine/core';
+import { Anchor, Code, Group, Paper, Text, Title, Image as MantineImage } from '@mantine/core';
 import { IconPrompt } from '@tabler/icons-react';
 import Image from 'next/image';
 import GeneratorButton from './GeneratorButton';
@@ -49,6 +49,23 @@ export default function SettingsGenerators() {
                 <Code>xclip</Code> (linux only)
               </Anchor>{' '}
               installed. This script is intended for use on Linux and macOS only (see options below).
+            </>
+          }
+        />
+        <GeneratorButton
+          name='ishare'
+          icon={
+            <MantineImage
+              width={24}
+              height={24}
+              alt='ishare logo'
+              src='https://isharemac.app/ishare/Util/Assets.xcassets/AppIcon.appiconset/AppIcon-128.png'
+            />
+          }
+          desc={
+            <>
+              This generator requires <Anchor href='https://isharemac.app/'>ishare</Anchor> to be installed on
+              macOS. This uploader is intended for use on macOS only.
             </>
           }
         />

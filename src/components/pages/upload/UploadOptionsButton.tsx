@@ -30,7 +30,7 @@ import {
   IconTrashFilled,
   IconWriting,
 } from '@tabler/icons-react';
-import ms from 'ms';
+import ms, { StringValue } from 'ms';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import useSWR from 'swr';
@@ -133,8 +133,8 @@ export default function UploadOptionsButton({ numFiles }: { numFiles: number }) 
                 The file will automatically delete itself after this time.{' '}
                 {config.files.defaultExpiration ? (
                   <>
-                    The default expiration time is <b>{ms(config.files.defaultExpiration)}</b> (you can
-                    override this with the below option).
+                    The default expiration time is <b>{ms(config.files.defaultExpiration as StringValue)}</b>{' '}
+                    (you can override this with the below option).
                   </>
                 ) : (
                   <>

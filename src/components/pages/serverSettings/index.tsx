@@ -88,13 +88,7 @@ export default function DashboardSettings() {
       </SimpleGrid>
 
       <Stack mt='md' gap='md'>
-        {error ? (
-          <div>Error loading server settings</div>
-        ) : (
-          <>
-            <ServerSettingsDiscord swr={{ data, isLoading }} />
-          </>
-        )}
+        {error ? null : <ServerSettingsDiscord swr={{ data, isLoading }} />}
       </Stack>
     </>
   );

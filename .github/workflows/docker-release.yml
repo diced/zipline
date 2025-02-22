@@ -33,7 +33,7 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -51,7 +51,6 @@ jobs:
             ghcr.io/diced/zipline:${{ steps.version.outputs.zipline_version }}-${{ steps.sha.outputs.short_sha }}-${{ matrix.arch }}
             ${{ secrets.DOCKERHUB_USERNAME }}/zipline:${{ steps.version.outputs.zipline_version }}-${{ matrix.arch }}
             ${{ secrets.DOCKERHUB_USERNAME }}/zipline:${{ steps.version.outputs.zipline_version }}-${{ steps.sha.outputs.short_sha }}-${{ matrix.arch }}
-
 
   amend-builds:
     runs-on: ubuntu-24.04
@@ -102,7 +101,6 @@ jobs:
           docker manifest create ${{ secrets.DOCKERHUB_USERNAME }}/zipline:latest \
             --amend ${{ secrets.DOCKERHUB_USERNAME }}/zipline:${{ steps.version.outputs.zipline_version }}-amd64 \
             --amend ${{ secrets.DOCKERHUB_USERNAME }}/zipline:${{ steps.version.outputs.zipline_version }}-arm64
-
 
       - name: push manifests
         run: |

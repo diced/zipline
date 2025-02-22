@@ -84,7 +84,7 @@ async function generate(config: Config, datasource: Datasource, ids: string[]) {
       stream.pipe(writeStream);
       stream.on('error', reject);
       writeStream.on('error', reject);
-      writeStream.on('finish', resolve);
+      writeStream.on('finish', resolve as any);
     });
 
     const thumbnailTmpFile = join(config.core.tempDirectory, `zthumbnail_${file.id}.jpg`);

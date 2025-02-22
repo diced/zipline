@@ -20,6 +20,7 @@ import useSWR from 'swr';
 import { flameshot } from './generators/flameshot';
 import { sharex } from './generators/sharex';
 import { shell } from './generators/shell';
+import { ishare } from './generators/ishare';
 
 export type GeneratorOptions = {
   deletesAt: string | null;
@@ -84,6 +85,7 @@ const generators = {
   Flameshot: flameshot,
   ShareX: sharex,
   'Shell Script': shell,
+  ishare,
 };
 
 export default function GeneratorButton({
@@ -110,7 +112,7 @@ export default function GeneratorButton({
 
   return (
     <>
-      <Modal opened={opened} onClose={() => setOpen(false)} title={`Generate ${name}`}>
+      <Modal opened={opened} onClose={() => setOpen(false)} title={`Generate ${name} Uploader`}>
         {desc && (
           <Text size='sm' c='dimmed'>
             {desc}
@@ -121,7 +123,7 @@ export default function GeneratorButton({
           <Select
             data={[
               { label: 'Upload File', value: 'file' },
-              { label: 'Shorten URL', value: 'url' },
+              { label: 'Shorten URL', value: 'url', disabled: name === 'ishare' },
             ]}
             description='Select which type of destination you want to generate'
             label='Destination Type'

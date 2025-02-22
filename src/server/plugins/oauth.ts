@@ -1,12 +1,12 @@
-import { NextApiReq, NextApiRes } from '@/lib/response';
-import { OAuthProviderType } from '@prisma/client';
-import { prisma } from '../db';
-import { findProvider } from './providerUtil';
-import { createToken, decrypt } from '../crypto';
-import { config } from '../config';
-import { User } from '../db/models/user';
-import Logger, { log } from '../logger';
-import { getSession, saveSession } from '@/server/session';
+import { config } from '@/lib/config';
+import { createToken, decrypt } from '@/lib/crypto';
+import { prisma } from '@/lib/db';
+import Logger, { log } from '@/lib/logger';
+import { findProvider } from '@/lib/oauth/providerUtil';
+import { OAuthProviderType, User } from '@prisma/client';
+import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import fastifyPlugin from 'fastify-plugin';
+import { getSession, saveSession } from '../session';
 
 export interface OAuthQuery {
   state?: string;
@@ -26,31 +26,31 @@ export interface OAuthResponse {
   redirect?: string;
 }
 
-export const withOAuth =
-  (
+async function oauthPlugin(fastify: FastifyInstance) {
+  fastify.decorateRequest('oauthHandle', oauthHandle);
+
+  async function oauthHandle(
+    this: FastifyRequest,
+    reply: FastifyReply,
     provider: OAuthProviderType,
-    oauthProfile: (query: OAuthQuery, logger: Logger) => Promise<OAuthResponse>,
-  ) =>
-  async (req: NextApiReq, res: NextApiRes) => {
+    handler: (query: OAuthQuery, logger: Logger) => Promise<OAuthResponse>,
+  ) {
     const logger = log('api').c('auth').c('oauth').c(provider.toLowerCase());
 
-    req.query.host = req.headers.host ?? 'localhost:3000';
+    (this.query as any).host = this.headers.host ?? 'localhost:3000';
 
-    const response = await oauthProfile(req.query as OAuthQuery, logger);
-
-    const session = await getSession(req, res);
+    const response = await handler(this.query as OAuthQuery, logger);
+    const session = await getSession(this, reply);
 
     if (response.error) {
       logger.warn('invalid oauth request', {
         error: response.error,
       });
-      return res.serverError(response.error, {
-        oauth: response.error_code,
-      });
+      return reply.internalServerError(response.error_code + ' ' + response.error);
     }
 
     if (response.redirect) {
-      return res.redirect(response.redirect);
+      return reply.redirect(response.redirect);
     }
 
     logger.debug('oauth response', {
@@ -76,7 +76,7 @@ export const withOAuth =
       },
     });
 
-    const { state } = req.query as OAuthQuery;
+    const { state } = this.query as OAuthQuery;
 
     const user = await prisma.user.findFirst({
       where: {
@@ -99,10 +99,10 @@ export const withOAuth =
     }
 
     if (urlState === 'link') {
-      if (!user) return res.unauthorized('invalid session');
+      if (!user) return reply.unauthorized('invalid session');
 
       if (findProvider(provider, user.oauthProviders))
-        return res.badRequest('This account is already linked to this provider');
+        return reply.badRequest('This account is already linked to this provider');
 
       logger.debug('attempting to link oauth account', {
         provider,
@@ -134,7 +134,7 @@ export const withOAuth =
           user: user.id,
         });
 
-        return res.redirect('/dashboard/settings');
+        return reply.redirect('/dashboard/settings');
       } catch (e) {
         logger.error('failed to link oauth account', {
           provider,
@@ -142,7 +142,7 @@ export const withOAuth =
           error: e,
         });
 
-        return res.badRequest('Cant link account, already linked with this provider');
+        return reply.badRequest('Cant link account, already linked with this provider');
       }
     } else if (user && userOauth) {
       await prisma.oAuthProvider.update({
@@ -164,7 +164,7 @@ export const withOAuth =
         user: user.id,
       });
 
-      return res.redirect('/dashboard');
+      return reply.redirect('/dashboard');
     } else if (existingOauth) {
       const login = await prisma.oAuthProvider.update({
         where: {
@@ -188,15 +188,15 @@ export const withOAuth =
         user: login.user!.id,
       });
 
-      return res.redirect('/dashboard');
+      return reply.redirect('/dashboard');
     } else if (config.oauth.loginOnly) {
       logger.warn('user tried to create account with oauth, but login only is enabled', {
         oauth: response.username || 'unknown',
-        ua: req.headers['user-agent'],
+        ua: this.headers['user-agent'],
       });
-      return res.badRequest("Can't create users through oauth.");
+      return reply.badRequest("Can't create users through oauth.");
     } else if (existingUser) {
-      return res.badRequest('This username is already taken');
+      return reply.badRequest('This username is already taken');
     }
 
     try {
@@ -224,20 +224,36 @@ export const withOAuth =
         user: nuser.id,
       });
 
-      return res.redirect('/dashboard');
+      return reply.redirect('/dashboard');
     } catch (e) {
       if ((e as { code: string }).code === 'P2002') {
         // already linked can't create, last failsafe lol
         logger.warn('user tried to create account with oauth, but already linked', {
           oauth: response.username || 'unknown',
-          ua: req.headers['user-agent'],
+          ua: this.headers['user-agent'],
         });
         logger.debug('oauth create error', {
           error: e,
           response,
         });
 
-        return res.badRequest('Cant create user, already linked with this provider');
+        return reply.badRequest('Cant create user, already linked with this provider');
       } else throw e;
     }
-  };
+  }
+}
+
+export default fastifyPlugin(oauthPlugin, {
+  name: 'oauth',
+  fastify: '5.x',
+});
+
+declare module 'fastify' {
+  interface FastifyRequest {
+    oauthHandle: (
+      reply: FastifyReply,
+      provider: OAuthProviderType,
+      handler: (query: OAuthQuery, logger: Logger) => Promise<OAuthResponse>,
+    ) => void;
+  }
+}

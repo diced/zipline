@@ -24,7 +24,6 @@ services:
       - .env
     environment:
       - DATABASE_URL=postgres://postgres:postgres@postgres/postgres2
-      - CORE_SECRET=thissecretisverynotsecretbutshouldonlybeusedindevelopmentsoitsfineiguess
       - CORE_HOSTNAME=0.0.0.0
     depends_on:
       - postgres

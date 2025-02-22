@@ -8,9 +8,9 @@ export default function Markdown({ md }: { md: string }) {
     <Paper withBorder p='md'>
       <ReactMarkdown
         components={{
-          code({ node: _, inline, className, children, ...props }) {
+          code({ node: _, className, children, ...props }) {
             const match = /language-(\w+)/.exec(className || '');
-            return !inline && match ? (
+            return match ? (
               <HighlightCode language={match[1]} code={String(children).replace(/\n$/, '')} />
             ) : (
               <Code className={className} {...props}>

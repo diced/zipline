@@ -3,18 +3,7 @@ import fastifyPlugin from 'fastify-plugin';
 import next from 'next';
 import { NextServerOptions, RequestHandler } from 'next/dist/server/next';
 
-export const ALL_METHODS: HTTPMethods[] = [
-  'DELETE',
-  'GET',
-  'HEAD',
-  'PATCH',
-  'POST',
-  'PUT',
-  // 'OPTIONS',
-  'COPY',
-  'MOVE',
-  'TRACE',
-];
+export const ALL_METHODS: HTTPMethods[] = ['DELETE', 'GET', 'HEAD', 'PATCH', 'POST', 'PUT'];
 
 async function nextPlugin(fastify: FastifyInstance, options: NextServerOptions) {
   const nextServer = next(options);
@@ -48,7 +37,7 @@ async function nextPlugin(fastify: FastifyInstance, options: NextServerOptions) 
 
 export default fastifyPlugin(nextPlugin, {
   name: 'next',
-  fastify: '4.x',
+  fastify: '5.x',
 });
 
 declare module 'fastify' {

@@ -8,7 +8,7 @@ import { administratorMiddleware } from '@/server/middleware/administrator';
 import { userMiddleware } from '@/server/middleware/user';
 import fastifyPlugin from 'fastify-plugin';
 import { statSync } from 'fs';
-import ms from 'ms';
+import ms, { StringValue } from 'ms';
 import { cpus } from 'os';
 import { resolve } from 'path';
 import { z } from 'zod';
@@ -20,7 +20,7 @@ type Body = Partial<Settings>;
 
 const reservedRoutes = ['/dashboard', '/api', '/raw', '/robots.txt', '/manifest.json', '/favicon.ico'];
 
-const zMs = z.string().refine((value) => ms(value) > 0, 'Value must be greater than 0');
+const zMs = z.string().refine((value) => ms(value as StringValue) > 0, 'Value must be greater than 0');
 const zBytes = z.string().refine((value) => bytes(value) > 0, 'Value must be greater than 0');
 
 const discordEmbed = z

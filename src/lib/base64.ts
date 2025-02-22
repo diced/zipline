@@ -7,7 +7,9 @@ export async function readToDataURL(file: File): Promise<string> {
   });
 }
 
-export async function fetchToDataURL(url: string) {
+export async function fetchToDataURL(url?: string) {
+  if (!url) return null;
+
   const res = await fetch(url);
   if (!res.ok) return null;
 

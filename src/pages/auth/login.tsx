@@ -247,9 +247,16 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
             backdropFilter: config.website.loginBackgroundBlur ? 'blur(35px)' : undefined,
           }}
         >
-          <Title order={1} size={50} ta='center'>
-            <b>{config.website.title ?? 'Zipline'}</b>
-          </Title>
+          <div style={{ width: '100%', overflowWrap: 'break-word' }}>
+            <Title
+              order={1}
+              size={(config.website.title ?? 'Zipline').length > 50 ? 20 : 50}
+              ta='center'
+              style={{ whiteSpace: 'normal' }}
+            >
+              <b>{config.website.title ?? 'Zipline'}</b>
+            </Title>
+          </div>
 
           {showLocalLogin && (
             <>

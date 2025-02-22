@@ -1,29 +1,19 @@
 import { UploadHeaders } from '@/lib/uploader/parseHeaders';
 import { GeneratorOptions, download } from '../GeneratorButton';
 
-export function sharex(token: string, type: 'file' | 'url', options: GeneratorOptions) {
-  const config = {
-    Version: '17.0.0',
-    Name: `Zipline - ${window.location.origin} - ${type === 'file' ? 'File' : 'URL'}`,
-    DestinationType: 'ImageUploader, TextUploader, FileUploader',
-    RequestMethod: 'POST',
-    RequestURL: `${window.location.origin}/api/upload`,
-    Headers: {},
-    URL: options.sharex_xshareCompatibility ? '$json:files[0].url$' : '{json:files[0].url}',
-    Body: 'MultipartFormData',
-    FileFormName: 'file',
-    Data: undefined,
-  };
-
+export function ishare(token: string, type: 'file' | 'url', options: GeneratorOptions) {
   if (type === 'url') {
-    config.URL = '{json:url}';
-    config.Body = 'JSON';
-    config.DestinationType = 'URLShortener,URLSharingService';
-    config.RequestURL = `${window.location.origin}/api/user/urls`;
-
-    delete (config as any).FileFormName;
-    (config as any).Data = JSON.stringify({ destination: '{input}' });
+    // unsupported in ishare
+    return;
   }
+
+  const config = {
+    requesturl: `${window.location.origin}/api/upload`,
+    name: `Zipline - ${window.location.origin} - File`,
+    headers: {},
+    fileformname: 'file',
+    responseurl: '{{files[0].url}}',
+  };
 
   const toAddHeaders: UploadHeaders = {
     authorization: token,
@@ -53,13 +43,6 @@ export function sharex(token: string, type: 'file' | 'url', options: GeneratorOp
     delete toAddHeaders['x-zipline-max-views'];
   }
 
-  if (options.noJson === true) {
-    toAddHeaders['x-zipline-no-json'] = 'true';
-    config.URL = '{response}';
-  } else {
-    delete toAddHeaders['x-zipline-no-json'];
-  }
-
   if (options.addOriginalName === true && type === 'file') {
     toAddHeaders['x-zipline-original-name'] = 'true';
   } else {
@@ -73,8 +56,8 @@ export function sharex(token: string, type: 'file' | 'url', options: GeneratorOp
   }
 
   for (const [key, value] of Object.entries(toAddHeaders)) {
-    (config as any).Headers[key] = value;
+    (config as any).headers[key] = value;
   }
 
-  return download(`zipline-${type}.sxcu`, JSON.stringify(config, null, 2));
+  return download(`zipline-${type}.iscu`, JSON.stringify(config, null, 2));
 }

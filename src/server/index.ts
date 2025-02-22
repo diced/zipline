@@ -20,7 +20,7 @@ import { fastifySensible } from '@fastify/sensible';
 import { fastifyStatic } from '@fastify/static';
 import fastify from 'fastify';
 import { mkdir, readFile } from 'fs/promises';
-import ms from 'ms';
+import ms, { StringValue } from 'ms';
 import { parse } from 'url';
 import { version } from '../../package.json';
 import { checkRateLimit } from './plugins/checkRateLimit';
@@ -28,6 +28,7 @@ import next, { ALL_METHODS } from './plugins/next';
 import loadRoutes from './routes';
 import { filesRoute } from './routes/files.dy';
 import { urlsRoute } from './routes/urls.dy';
+import oauthPlugin from './plugins/oauth';
 
 const MODE = process.env.NODE_ENV || 'production';
 const logger = log('server');
@@ -94,6 +95,8 @@ async function main() {
     serve: false,
     root: config.core.tempDirectory,
   });
+
+  await server.register(oauthPlugin);
 
   if (config.ratelimit.enabled) {
     try {
@@ -169,22 +172,22 @@ async function main() {
     server.next('/reload', ALL_METHODS);
   }
 
-  // TODO: no longer need this when all the api routes are handled by fastify :)
-  const routeKeys = Object.keys(routes); // holds "currently migrated routes" so we can parse json through fastify
-  server.addContentTypeParser('application/json', (req, body, done) => {
-    if (routeKeys.includes(req.routeOptions.config.url)) {
-      let bodyString = '';
-      body.on('data', (chunk) => {
-        bodyString += chunk;
-      });
+  // // TODO: no longer need this when all the api routes are handled by fastify :)
+  // const routeKeys = Object.keys(routes); // holds "currently migrated routes" so we can parse json through fastify
+  // server.addContentTypeParser('application/json', (req, body, done) => {
+  //   if (routeKeys.includes(req.routeOptions.config.url)) {
+  //     let bodyString = '';
+  //     body.on('data', (chunk) => {
+  //       bodyString += chunk;
+  //     });
 
-      body.on('end', () => {
-        if (bodyString === '' || bodyString === null) return done(null, {});
+  //     body.on('end', () => {
+  //       if (bodyString === '' || bodyString === null) return done(null, {});
 
-        server.getDefaultJsonParser('error', 'ignore')(req, bodyString, done);
-      });
-    } else done(null, body);
-  });
+  //       server.getDefaultJsonParser('error', 'ignore')(req, bodyString, done);
+  //     });
+  //   } else done(null, body);
+  // });
 
   server.setErrorHandler((error, _, res) => {
     if (error.statusCode) {
@@ -209,10 +212,11 @@ async function main() {
   logger.info('server started', { hostname: config.core.hostname, port: config.core.port });
 
   // Tasks
-  tasks.interval('deletefiles', ms(config.tasks.deleteInterval), deleteFiles(prisma));
-  tasks.interval('maxviews', ms(config.tasks.maxViewsInterval), maxViews(prisma));
+  tasks.interval('deletefiles', ms(config.tasks.deleteInterval as StringValue), deleteFiles(prisma));
+  tasks.interval('maxviews', ms(config.tasks.maxViewsInterval as StringValue), maxViews(prisma));
 
-  if (config.features.metrics) tasks.interval('metrics', ms(config.tasks.metricsInterval), metrics(prisma));
+  if (config.features.metrics)
+    tasks.interval('metrics', ms(config.tasks.metricsInterval as StringValue), metrics(prisma));
 
   if (config.features.thumbnails.enabled) {
     for (let i = 0; i !== config.features.thumbnails.num_threads; ++i) {
@@ -222,8 +226,12 @@ async function main() {
       });
     }
 
-    tasks.interval('thumbnails', ms(config.tasks.thumbnailsInterval), thumbnails(prisma));
-    tasks.interval('clearinvites', ms(config.tasks.clearInvitesInterval), clearInvites(prisma));
+    tasks.interval('thumbnails', ms(config.tasks.thumbnailsInterval as StringValue), thumbnails(prisma));
+    tasks.interval(
+      'clearinvites',
+      ms(config.tasks.clearInvitesInterval as StringValue),
+      clearInvites(prisma),
+    );
   }
 
   tasks.start();

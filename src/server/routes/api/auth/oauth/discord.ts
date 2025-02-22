@@ -1,14 +1,13 @@
+import { fetchToDataURL } from '@/lib/base64';
 import { config } from '@/lib/config';
-import { combine } from '@/lib/middleware/combine';
-import { method } from '@/lib/middleware/method';
-import { OAuthQuery, OAuthResponse, withOAuth } from '@/lib/oauth/withOAuth';
+import { encrypt } from '@/lib/crypto';
+import Logger from '@/lib/logger';
 import enabled from '@/lib/oauth/enabled';
 import { discordAuth } from '@/lib/oauth/providerUtil';
-import { fetchToDataURL } from '@/lib/base64';
-import Logger from '@/lib/logger';
-import { encrypt } from '@/lib/crypto';
+import { OAuthQuery, OAuthResponse } from '@/server/plugins/oauth';
+import fastifyPlugin from 'fastify-plugin';
 
-async function handler({ code, host, state }: OAuthQuery, logger: Logger): Promise<OAuthResponse> {
+async function discordOauth({ code, host, state }: OAuthQuery, logger: Logger): Promise<OAuthResponse> {
   if (!config.features.oauthRegistration)
     return {
       error: 'OAuth registration is disabled.',
@@ -72,6 +71,8 @@ async function handler({ code, host, state }: OAuthQuery, logger: Logger): Promi
   const userJson = await discordAuth.user(json.access_token);
   if (!userJson) return { error: 'Failed to fetch user' };
 
+  logger.debug('user', { '@me': userJson });
+
   const avatar = userJson.avatar
     ? `https://cdn.discordapp.com/avatars/${userJson.id}/${userJson.avatar}.png`
     : `https://cdn.discordapp.com/embed/avatars/${userJson.discriminator % 5}.png`;
@@ -85,4 +86,14 @@ async function handler({ code, host, state }: OAuthQuery, logger: Logger): Promi
   };
 }
 
-export default combine([method(['GET'])], withOAuth('DISCORD', handler));
+export const PATH = '/api/auth/oauth/discord';
+export default fastifyPlugin(
+  (server, _, done) => {
+    server.get(PATH, async (req, res) => {
+      return req.oauthHandle(res, 'DISCORD', discordOauth);
+    });
+
+    done();
+  },
+  { name: PATH },
+);

@@ -1,6 +1,5 @@
 import { config } from '@/lib/config';
 import { prisma } from '@/lib/db';
-import { User } from '@/lib/db/models/user';
 import { randomCharacters } from '@/lib/random';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { IncomingMessage, ServerResponse } from 'http';
@@ -54,7 +53,7 @@ export async function getSession(
 
 export async function saveSession(
   session: Awaited<ReturnType<typeof getSession>>,
-  user: User,
+  user: { id: string } & Record<string, any>,
   overwriteSessions = true,
 ) {
   session.id = user.id;

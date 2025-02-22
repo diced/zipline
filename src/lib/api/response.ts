@@ -1,9 +1,8 @@
-import { ApiAuthOauthResponse } from '@/pages/api/auth/oauth';
-
 import { ApiAuthInvitesResponse } from '@/server/routes/api/auth/invites';
 import { ApiAuthInvitesIdResponse } from '@/server/routes/api/auth/invites/[id]';
 import { ApiLoginResponse } from '@/server/routes/api/auth/login';
 import { ApiLogoutResponse } from '@/server/routes/api/auth/logout';
+import { ApiAuthOauthResponse } from '@/server/routes/api/auth/oauth';
 import { ApiAuthRegisterResponse } from '@/server/routes/api/auth/register';
 import { ApiAuthWebauthnResponse } from '@/server/routes/api/auth/webauthn';
 import { ApiHealthcheckResponse } from '@/server/routes/api/healthcheck';
