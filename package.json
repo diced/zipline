@@ -41,7 +41,7 @@
     "@prisma/internals": "^6.4.1",
     "@prisma/migrate": "^6.4.1",
     "@tabler/icons-react": "^3.30.0",
-    "@xoi/gps-metadata-remover": "^2.0.0",
+    "@xoi/gps-metadata-remover": "^1.1.2",
     "argon2": "^0.41.1",
     "bytes": "^3.1.2",
     "clsx": "^2.1.1",

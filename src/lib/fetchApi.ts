@@ -1,5 +1,7 @@
 import { ErrorBody } from './response';
 
+const bodyMethods = ['POST', 'PUT', 'PATCH', 'DELETE'];
+
 export async function fetchApi<Response = any>(
   route: string,
   method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' = 'GET',
@@ -12,12 +14,13 @@ export async function fetchApi<Response = any>(
   let data: Response | null = null;
   let error: ErrorBody | null = null;
 
+  if ((bodyMethods.includes(method) && body !== null) || (body && !Object.keys(body).length)) {
+    headers['Content-Type'] = 'application/json';
+  }
+
   const res = await fetch(route, {
     method,
-    headers: {
-      'Content-Type': 'application/json',
-      ...headers,
-    },
+    headers,
     body: body ? JSON.stringify(body) : null,
   });
 
