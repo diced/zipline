@@ -7,7 +7,7 @@ import { useState } from 'react';
 
 export default function ClearStorage({ open, setOpen }) {
   const [check, setCheck] = useState(false);
-  const handleDelete = async (datasource: boolean, orphaned?: boolean) => {
+  const handleDelete = async (orphaned?: boolean) => {
     showNotification({
       id: 'clear-uploads',
       title: 'Clearing...',
@@ -16,7 +16,7 @@ export default function ClearStorage({ open, setOpen }) {
       autoClose: false,
     });
 
-    const res = await useFetch('/api/admin/clear', 'POST', { datasource, orphaned });
+    const res = await useFetch('/api/admin/clear', 'POST', { orphaned });
 
     if (res.error) {
       updateNotification({
@@ -65,21 +65,13 @@ export default function ClearStorage({ open, setOpen }) {
           onClick={() => {
             setOpen(false);
             openConfirmModal({
-              title: 'Do you want to clear storage too?',
-              labels: { confirm: 'Yes', cancel: check ? 'Ok' : 'No' },
-              children: check && (
-                <Text size='sm' color='gray'>
-                  Due to clearing orphaned files, storage clearing will be unavailable.
-                </Text>
-              ),
-              confirmProps: { disabled: check },
+              title: 'Are you sure?',
+              confirmProps: { color: 'red' },
+              children: <Text size='sm'>This action is destructive and irreversible.</Text>,
+              labels: { confirm: 'Yes', cancel: 'No' },
               onConfirm: () => {
                 closeAllModals();
-                handleDelete(true);
-              },
-              onCancel: () => {
-                closeAllModals();
-                handleDelete(false, check);
+                handleDelete(check);
               },
               onClose: () => setCheck(false),
             });

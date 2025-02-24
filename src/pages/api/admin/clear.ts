@@ -8,21 +8,23 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
   try {
     const { orphaned } = req.body;
     if (orphaned) {
+      const files = await prisma.file.findMany({
+        where: {
+          userId: null,
+        },
+      });
       const { count } = await prisma.file.deleteMany({
         where: {
           userId: null,
         },
       });
+      for (const file of files) await datasource.delete(file.name);
       logger.info(`User ${user.username} (${user.id}) cleared the database of ${count} orphaned files`);
       return res.json({ message: 'cleared storage (orphaned only)' });
     }
     const { count } = await prisma.file.deleteMany({});
+    await datasource.clear();
     logger.info(`User ${user.username} (${user.id}) cleared the database of ${count} files`);
-
-    if (req.body.datasource) {
-      await datasource.clear();
-      logger.info(`User ${user.username} (${user.id}) cleared storage`);
-    }
   } catch (e) {
     logger.error(`User ${user.username} (${user.id}) failed to clear the database or storage`);
     logger.error(e);
