@@ -3,7 +3,10 @@ import { NextApiReq, NextApiRes, withZipline } from 'middleware/withZipline';
 
 async function handler(_: NextApiReq, res: NextApiRes) {
   const users = await prisma.user.findMany();
-  for (let i = 0; i !== users.length; ++i) delete users[i].password;
+  for (let i = 0; i !== users.length; ++i) {
+    delete users[i].password;
+    delete users[i].uuid;
+  }
 
   return res.json(users);
 }
