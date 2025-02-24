@@ -5,24 +5,29 @@ import { NextApiReq, NextApiRes, withZipline } from 'middleware/withZipline';
 async function handler(_: NextApiReq, res: NextApiRes) {
   if (!config.website.show_version) return res.forbidden('version hidden');
 
-  const pkg = JSON.parse(await readFile('package.json', 'utf8'));
+  const pRev = await (async function () {
+    try {
+      return await readFile('.git/HEAD', 'utf8');
+    } catch (e) {
+      return JSON.parse(await readFile('package.json', 'utf8')).version;
+    }
+  })();
+  const { groups } = new RegExp(/^ref: (?<ref>(\w+\/?)*)/).exec(pRev) || { groups: null };
+  let rev: string;
 
-  const re = await fetch('https://zipline.diced.sh/api/version?c=' + pkg.version);
+  if (!groups) rev = pRev;
+  else rev = await readFile(`.git/${groups.ref}`, 'utf8');
+
+  const re = await fetch(`https://v3.zipline.diced.sh/api/version?c=?c=${rev}`);
   const json = await re.json();
 
+  if (!re.ok) return res.badRequest(json.error);
   let updateToType = 'stable';
-
-  if (json.isUpstream) {
-    updateToType = 'upstream';
-
-    if (json.update?.stable) {
-      updateToType = 'stable';
-    }
-  }
+  if (json.isUpstream) updateToType = 'upstream';
 
   return res.json({
-    isUpstream: true,
-    update: json.update?.stable || json.update?.upstream,
+    isUpstream: json.isUpstream,
+    update: json.isUpstream ? json.update?.upstream : json.update?.stable,
     updateToType,
     versions: {
       stable: json.git.stable,

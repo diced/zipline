@@ -316,7 +316,9 @@ export default function Layout({ children, props }) {
                   variant='dot'
                   color={version.data.update ? 'red' : 'primary'}
                 >
-                  {version.data.versions.current}
+                  {version.data.isUpstream
+                    ? version.data.versions.current.slice(0, 7)
+                    : version.data.versions.current}
                 </Badge>
               </Tooltip>
             </Navbar.Section>
