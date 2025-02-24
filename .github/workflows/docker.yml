@@ -13,7 +13,7 @@ on:
 
 jobs:
   push:
-    name: Push Image
+    name: Push Commit Image
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
@@ -22,7 +22,7 @@ jobs:
       - name: Get version
         id: version
         run: |
-          echo "zipline_version=$(jq .version package.json -r)" >> $GITHUB_OUTPUT
+          echo "zipline_commit=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
 
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v2
@@ -51,8 +51,8 @@ jobs:
           platforms: linux/amd64,linux/arm64
           tags: |
             ghcr.io/diced/zipline:v3-trunk
-            ghcr.io/diced/zipline:v3-trunk-${{ steps.version.outputs.zipline_version }}
+            ghcr.io/diced/zipline:v3-trunk-${{ steps.version.outputs.zipline_commit }}
             ${{ secrets.DOCKERHUB_USERNAME }}/zipline:v3-trunk
-            ${{ secrets.DOCKERHUB_USERNAME }}/zipline:v3-trunk-${{ steps.version.outputs.zipline_version }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/zipline:v3-trunk-${{ steps.version.outputs.zipline_commit }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
