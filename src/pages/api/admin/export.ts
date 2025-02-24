@@ -283,14 +283,6 @@ async function handler(req: NextApiReq, res: NextApiRes, user: UserExtended) {
     };
   }
 
-  const stats = await prisma.stats.findMany();
-  for (const stat of stats) {
-    exportData.stats.push({
-      created_at: stat.createdAt.toISOString(),
-      data: stat.data,
-    });
-  }
-
   exportData.request.user = exportData.user_map[user.id];
 
   for (const folder of folders) {
