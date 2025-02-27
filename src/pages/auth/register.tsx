@@ -9,7 +9,6 @@ import {
   Center,
   Checkbox,
   Divider,
-  Group,
   Image,
   LoadingOverlay,
   Paper,
