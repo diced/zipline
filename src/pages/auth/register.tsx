@@ -8,6 +8,9 @@ import {
   Button,
   Center,
   Checkbox,
+  Divider,
+  Group,
+  Image,
   LoadingOverlay,
   Paper,
   PasswordInput,
@@ -18,7 +21,7 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
-import { IconPlus, IconX } from '@tabler/icons-react';
+import { IconPlus, IconX, IconUserPlus, IconLogin } from '@tabler/icons-react';
 import { InferGetServerSidePropsType } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -98,28 +101,75 @@ export default function Register({ config, invite }: InferGetServerSidePropsType
   return (
     <>
       <Center h='100vh'>
-        <Paper withBorder p='sm'>
-          {invite ? (
-            <div>
-              <Title order={4} fw={500}>
-                You have been invited to join <b>{config?.website?.title ?? 'Zipline'}</b> by{' '}
-                <b>{invite.inviter!.username}</b>
-              </Title>
-            </div>
-          ) : (
-            <Title order={4} fw={500}>
-              Register for <b>{config?.website?.title ?? 'Zipline'}</b>
-            </Title>
-          )}
+        {config.website.loginBackground && (
+          <Image
+            src={config.website.loginBackground}
+            alt={config.website.loginBackground + ' failed to load'}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              ...(config.website.loginBackgroundBlur && { filter: 'blur(10px)' }),
+            }}
+          />
+        )}
 
-          <Text size='sm' c='dimmed'>
-            Create an account to get started.
-          </Text>
+        <Paper
+          w='350px'
+          p='xl'
+          shadow='xl'
+          withBorder
+          style={{
+            backgroundColor: config.website.loginBackground ? 'rgba(0, 0, 0, 0)' : undefined,
+            backdropFilter: config.website.loginBackgroundBlur ? 'blur(35px)' : undefined,
+          }}
+        >
+          <div style={{ width: '100%', overflowWrap: 'break-word' }}>
+            <Title
+              order={1}
+              size={(config.website.title ?? 'Zipline').length > 50 ? 20 : 50}
+              ta='center'
+              style={{ whiteSpace: 'normal' }}
+            >
+              <b>{config.website.title ?? 'Zipline'}</b>
+            </Title>
+          </div>
+
+          {invite ? (
+            <Text ta='center' size='sm' c='dimmed'>
+              You have been invited to join <b>{config?.website?.title ?? 'Zipline'}</b> by{' '}
+              <b>{invite.inviter!.username}</b>
+            </Text>
+          ) : null}
 
           <form onSubmit={form.onSubmit(onSubmit)}>
-            <Stack gap='sm'>
-              <TextInput label='Username' placeholder='Username' {...form.getInputProps('username')} />
-              <PasswordInput label='Password' placeholder='Password' {...form.getInputProps('password')} />
+            <Stack my='sm'>
+              <TextInput
+                size='md'
+                placeholder='Enter your username...'
+                styles={{
+                  input: {
+                    backgroundColor: config.website.loginBackground ? 'transparent' : undefined,
+                  },
+                }}
+                {...form.getInputProps('username', { withError: true })}
+              />
+
+              <PasswordInput
+                size='md'
+                placeholder='Enter your password...'
+                styles={{
+                  input: {
+                    backgroundColor: config.website.loginBackground ? 'transparent' : undefined,
+                  },
+                }}
+                {...form.getInputProps('password')}
+              />
 
               {config.website.tos && (
                 <Checkbox
@@ -136,11 +186,32 @@ export default function Register({ config, invite }: InferGetServerSidePropsType
                 />
               )}
 
-              <Button type='submit' fullWidth leftSection={<IconPlus size='1rem' />}>
+              <Button
+                size='md'
+                fullWidth
+                type='submit'
+                variant={config.website.loginBackground ? 'outline' : 'filled'}
+                leftSection={<IconUserPlus size='1rem' />}
+              >
                 Register
               </Button>
             </Stack>
           </form>
+
+          <Stack my='xs'>
+            <Divider label='or' />
+
+            <Button
+              component={Link}
+              href='/auth/login'
+              size='md'
+              fullWidth
+              variant='outline'
+              leftSection={<IconLogin size='1rem' />}
+            >
+              Login
+            </Button>
+          </Stack>
         </Paper>
       </Center>
     </>
