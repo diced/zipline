@@ -19,7 +19,6 @@ import {
   IconCheck,
   IconFiles,
   IconFolders,
-  IconGraph,
   IconLink,
   IconQuestionMark,
   IconTags,
