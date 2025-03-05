@@ -29,6 +29,8 @@ RUN yarn install --immutable
 
 FROM base AS builder
 
+COPY .git/refs ./.git/refs
+COPY .git/HEAD ./.git/HEAD
 COPY src ./src
 COPY next.config.js ./next.config.js
 COPY tsup.config.ts ./tsup.config.ts
@@ -53,11 +55,8 @@ ENV PRISMA_QUERY_ENGINE_BINARY=/prisma-engines/query-engine \
   ZIPLINE_DOCKER_BUILD=true \
   NEXT_TELEMETRY_DISABLED=1
 
-COPY .git/refs ./.git/refs
-COPY .git/HEAD ./.git/HEAD
-
-
 # Copy only the necessary files from the previous stage
+COPY --from=builder /zipline/.git ./.git
 COPY --from=builder /zipline/dist ./dist
 COPY --from=builder /zipline/.next ./.next
 
