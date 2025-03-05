@@ -56,3 +56,5 @@ jobs:
             ${{ secrets.DOCKERHUB_USERNAME }}/zipline:v3-trunk-${{ steps.version.outputs.zipline_commit }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: |
+            BUILDKIT_CONTEXT_KEEP_GIT_DIR=1
