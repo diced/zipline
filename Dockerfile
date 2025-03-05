@@ -29,8 +29,7 @@ RUN yarn install --immutable
 
 FROM base AS builder
 
-COPY .git/refs ./.git/refs
-COPY .git/HEAD ./.git/HEAD
+COPY .git ./.git
 COPY src ./src
 COPY next.config.js ./next.config.js
 COPY tsup.config.ts ./tsup.config.ts
