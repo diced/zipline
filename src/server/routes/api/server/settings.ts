@@ -1,6 +1,6 @@
 import { bytes } from '@/lib/bytes';
 import { reloadSettings } from '@/lib/config';
-import { DATABASE_TO_PROP, databaseToEnv, readDatabaseSettings, valueIsFromEnv } from '@/lib/config/read';
+import { DATABASE_TO_PROP, readDatabaseSettings, valueIsFromEnv } from '@/lib/config/read';
 import { prisma } from '@/lib/db';
 import { log } from '@/lib/logger';
 import { readThemes } from '@/lib/theme/file';
@@ -74,7 +74,7 @@ export default fastifyPlugin(
         });
 
         if (!settings) return res.notFound('no settings table found');
-        var settingsResponse: ApiServerSettingsResponse = {
+        const settingsResponse: ApiServerSettingsResponse = {
           ...settings,
           locked: {},
         };
@@ -101,7 +101,7 @@ export default fastifyPlugin(
         const settings = await prisma.zipline.findFirst();
         if (!settings) return res.notFound('no settings table found');
 
-        var result: any = await parseSettings(req.body);
+        const result: any = await parseSettings(req.body);
 
         if (!result.success) {
           logger.warn('invalid settings update', {
@@ -155,7 +155,7 @@ export default fastifyPlugin(
   { name: PATH },
 );
 
-export async function parseSettings(body: Object) {
+export async function parseSettings(body: object) {
   const themes = (await readThemes()).map((x) => x.id);
   const settingsBodySchema = z
     .object({
