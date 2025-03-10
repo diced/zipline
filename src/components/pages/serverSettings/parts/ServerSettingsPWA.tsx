@@ -125,14 +125,19 @@ export default function ServerSettingsPWA({
         </SimpleGrid>
 
         <Group mt='md'>
-          <Button type='submit' loading={isLoading} disabled={
-            data?.locked['pwaEnabled'] &&
-            data?.locked['pwaTitle'] &&
-            data?.locked['pwaShortName'] &&
-            data?.locked['pwaDescription'] &&
-            data?.locked['pwaThemeColor'] &&
-            data?.locked['pwaBackgroundColor']
-          } leftSection={<IconDeviceFloppy size='1rem' />}>
+          <Button
+            type='submit'
+            loading={isLoading}
+            disabled={
+              data?.locked['pwaEnabled'] &&
+              data?.locked['pwaTitle'] &&
+              data?.locked['pwaShortName'] &&
+              data?.locked['pwaDescription'] &&
+              data?.locked['pwaThemeColor'] &&
+              data?.locked['pwaBackgroundColor']
+            }
+            leftSection={<IconDeviceFloppy size='1rem' />}
+          >
             Save
           </Button>
           <Button onClick={() => router.reload()} leftSection={<IconRefresh size='1rem' />}>

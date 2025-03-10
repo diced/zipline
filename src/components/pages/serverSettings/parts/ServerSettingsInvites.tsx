@@ -56,9 +56,13 @@ export default function ServerSettingsInvites({
           />
         </SimpleGrid>
 
-        <Button type='submit' mt='md' loading={isLoading} disabled={
-          data?.locked['invitesEnabled'] && data?.locked['invitesLength']
-        } leftSection={<IconDeviceFloppy size='1rem' />}>
+        <Button
+          type='submit'
+          mt='md'
+          loading={isLoading}
+          disabled={data?.locked['invitesEnabled'] && data?.locked['invitesLength']}
+          leftSection={<IconDeviceFloppy size='1rem' />}
+        >
           Save
         </Button>
       </form>

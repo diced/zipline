@@ -123,13 +123,19 @@ export default function ServerSettingsRatelimit({
           />
         </SimpleGrid>
 
-        <Button type='submit' mt='md' loading={isLoading} disabled={
-          data?.locked['ratelimitEnabled'] && 
-          data?.locked['ratelimitMax'] &&
-          data?.locked['ratelimitWindow'] &&
-          data?.locked['ratelimitAdminBypass'] &&
-          data?.locked['ratelimitAllowList']
-        } leftSection={<IconDeviceFloppy size='1rem' />}>
+        <Button
+          type='submit'
+          mt='md'
+          loading={isLoading}
+          disabled={
+            data?.locked['ratelimitEnabled'] &&
+            data?.locked['ratelimitMax'] &&
+            data?.locked['ratelimitWindow'] &&
+            data?.locked['ratelimitAdminBypass'] &&
+            data?.locked['ratelimitAllowList']
+          }
+          leftSection={<IconDeviceFloppy size='1rem' />}
+        >
           Save
         </Button>
       </form>

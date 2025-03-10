@@ -325,9 +325,7 @@ export default function ServerSettingsDiscord({
               type='submit'
               mt='md'
               loading={isLoading}
-              disabled={
-                data?.locked['discordOnUploadEmbed']
-              }
+              disabled={data?.locked['discordOnUploadEmbed']}
               leftSection={<IconDeviceFloppy size='1rem' />}
             >
               Save
@@ -435,9 +433,7 @@ export default function ServerSettingsDiscord({
               type='submit'
               mt='md'
               loading={isLoading}
-              disabled={
-                data?.locked['discordOnShortenEmbed']
-              }
+              disabled={data?.locked['discordOnShortenEmbed']}
               leftSection={<IconDeviceFloppy size='1rem' />}
             >
               Save

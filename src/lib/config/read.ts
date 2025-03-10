@@ -165,107 +165,10 @@ export const PROP_TO_ENV = {
   'ssl.key': 'SSL_KEY',
   'ssl.cert': 'SSL_CERT',
 
-  // sourced from zipline table in database
-  // none of these need default values, as we will just use the db value if the env value is missing or invalid (if invalid, log an error though)
-  
-  // coreReturnHttpsUrls	boolean [false]
-  // coreDefaultDomain	text NULL
-  // coreTempDirectory	text
-  // chunksEnabled	boolean [true]
-  // chunksMax	text [95mb]
-  // chunksSize	text [25mb]
-  // tasksDeleteInterval	text [30m]
-  // tasksClearInvitesInterval	text [30m]
-  // tasksMaxViewsInterval	text [30m]
-  // tasksThumbnailsInterval	text [30m]
-  // tasksMetricsInterval	text [30m]
-  // filesRoute	text [/u]
-  // filesLength	integer [6]
-  // filesDefaultFormat	text [random]
-  // filesDisabledExtensions	text[] NULL
-  // filesMaxFileSize	text [100mb]
-  // filesDefaultExpiration	text NULL
-  // filesAssumeMimetypes	boolean [false]
-  // filesDefaultDateFormat	text [YYYY-MM-DD_HH:mm:ss]
-  // filesRemoveGpsMetadata	boolean [false]
-  // urlsRoute	text [/go]
-  // urlsLength	integer [6]
-  // featuresImageCompression	boolean [true]
-  // featuresRobotsTxt	boolean [true]
-  // featuresHealthcheck	boolean [true]
-  // featuresUserRegistration	boolean [false]
-  // featuresOauthRegistration	boolean [false]
-  // featuresDeleteOnMaxViews	boolean [true]
-  // featuresThumbnailsEnabled	boolean [true]
-  // featuresThumbnailsNumberThreads	integer [4]
-  // featuresMetricsEnabled	boolean [true]
-  // featuresMetricsAdminOnly	boolean [false]
-  // featuresMetricsShowUserSpecific	boolean [true]
-  // invitesEnabled	boolean [true]
-  // invitesLength	integer [6]
-  // websiteTitle	text [Zipline]
-  // websiteTitleLogo	text NULL
-  // websiteExternalLinks	jsonb [[{"url": "https://github.com/diced/zipline", "name": "GitHub"}, {"url": "https://zipline.diced.sh/", "name": "Documentation"}]]
-  // websiteLoginBackground	text NULL
-  // websiteDefaultAvatar	text NULL
-  // websiteTos	text NULL
-  // websiteThemeDefault	text [system]
-  // websiteThemeDark	text [builtin:dark_gray]
-  // websiteThemeLight	text [builtin:light_gray]
-  // oauthBypassLocalLogin	boolean [false]
-  // oauthLoginOnly	boolean [false]
-  // oauthDiscordClientId	text NULL
-  // oauthDiscordClientSecret	text NULL
-  // oauthDiscordRedirectUri	text NULL
-  // oauthGoogleClientId	text NULL
-  // oauthGoogleClientSecret	text NULL
-  // oauthGoogleRedirectUri	text NULL
-  // oauthGithubClientId	text NULL
-  // oauthGithubClientSecret	text NULL
-  // oauthGithubRedirectUri	text NULL
-  // oauthOidcClientId	text NULL
-  // oauthOidcClientSecret	text NULL
-  // oauthOidcAuthorizeUrl	text NULL
-  // oauthOidcTokenUrl	text NULL
-  // oauthOidcUserinfoUrl	text NULL
-  // oauthOidcRedirectUri	text NULL
-  // mfaTotpEnabled	boolean [false]
-  // mfaTotpIssuer	text [Zipline]
-  // mfaPasskeys	boolean [false]
-  // ratelimitEnabled	boolean [true]
-  // ratelimitMax	integer [10]
-  // ratelimitWindow	integer NULL
-  // ratelimitAdminBypass	boolean [true]
-  // ratelimitAllowList	text[] NULL
-  // httpWebhookOnUpload	text NULL
-  // httpWebhookOnShorten	text NULL
-  // discordWebhookUrl	text NULL
-  // discordUsername	text NULL
-  // discordAvatarUrl	text NULL
-  // discordOnUploadWebhookUrl	text NULL
-  // discordOnUploadUsername	text NULL
-  // discordOnUploadAvatarUrl	text NULL
-  // discordOnUploadContent	text NULL
-  // discordOnUploadEmbed	jsonb NULL
-  // discordOnShortenWebhookUrl	text NULL
-  // discordOnShortenUsername	text NULL
-  // discordOnShortenAvatarUrl	text NULL
-  // discordOnShortenContent	text NULL
-  // discordOnShortenEmbed	jsonb NULL
-  // pwaEnabled	boolean [false]
-  // pwaTitle	text [Zipline]
-  // pwaShortName	text [Zipline]
-  // pwaDescription	text [Zipline]
-  // pwaThemeColor	text [#000000]
-  // pwaBackgroundColor	text [#000000]
-  // websiteLoginBackgroundBlur	boolean [true]
-  // filesRandomWordsNumAdjectives	integer [2]
-  // filesRandomWordsSeparator	text [-]
-  
   'core.returnHttpsUrls': 'CORE_RETURN_HTTPS_URLS',
   'core.defaultDomain': 'CORE_DEFAULT_DOMAIN',
   'core.tempDirectory': 'CORE_TEMP_DIRECTORY',
-  
+
   'chunks.max': 'CHUNKS_MAX',
   'chunks.size': 'CHUNKS_SIZE',
   'chunks.enabled': 'CHUNKS_ENABLED',
@@ -541,7 +444,7 @@ export function readEnv() {
     env('core.returnHttpsUrls', 'boolean'),
     env('core.defaultDomain', 'string'),
     env('core.tempDirectory', 'string'),
-    
+
     env('chunks.max', 'string'),
     env('chunks.size', 'string'),
     env('chunks.enabled', 'boolean'),
@@ -578,7 +481,7 @@ export function readEnv() {
     env('features.metrics.enabled', 'boolean'),
     env('features.metrics.adminOnly', 'boolean'),
     env('features.metrics.showUserSpecific', 'boolean'),
-    
+
     env('invites.enabled', 'boolean'),
     env('invites.length', 'number'),
 
@@ -708,7 +611,11 @@ export async function read() {
   return raw;
 }
 
-export function replaceDatabaseValueWithEnv<T>(Key: keyof typeof DATABASE_TO_PROP, databaseValue: T, typeString: EnvType): T {
+export function replaceDatabaseValueWithEnv<T>(
+  Key: keyof typeof DATABASE_TO_PROP,
+  databaseValue: T,
+  typeString: EnvType,
+): T {
   const envKeys = databaseToEnv(Key);
 
   for (let i = 0; i !== envKeys.length; ++i) {
@@ -718,7 +625,7 @@ export function replaceDatabaseValueWithEnv<T>(Key: keyof typeof DATABASE_TO_PRO
     const parsed = parse(value, typeString);
     if (parsed === undefined) continue;
 
-    return parsed
+    return parsed;
   }
 
   return databaseValue;
@@ -789,7 +696,7 @@ function parse(value: string, type: EnvType) {
       try {
         return JSON.parse(value);
       } catch {
-        logger.error('Failed to parse JSON array', { value },);
+        logger.error('Failed to parse JSON array', { value });
         return undefined;
       }
     default:

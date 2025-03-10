@@ -67,9 +67,13 @@ export default function ServerSettingsHttpWebhook({
           />
         </SimpleGrid>
 
-        <Button type='submit' mt='md' loading={isLoading} disabled={
-          data?.locked['httpWebhookOnUpload'] && data?.locked['httpWebhookOnShorten']
-        } leftSection={<IconDeviceFloppy size='1rem' />}>
+        <Button
+          type='submit'
+          mt='md'
+          loading={isLoading}
+          disabled={data?.locked['httpWebhookOnUpload'] && data?.locked['httpWebhookOnShorten']}
+          leftSection={<IconDeviceFloppy size='1rem' />}
+        >
           Save
         </Button>
       </form>

@@ -75,11 +75,17 @@ export default function ServerSettingsCore({
           />
         </SimpleGrid>
 
-        <Button type='submit' mt='md' loading={isLoading} disabled={
-          data?.locked['coreReturnHttpsUrls'] &&
-          data?.locked['coreDefaultDomain'] &&
-          data?.locked['coreTempDirectory']
-        } leftSection={<IconDeviceFloppy size='1rem' />}>
+        <Button
+          type='submit'
+          mt='md'
+          loading={isLoading}
+          disabled={
+            data?.locked['coreReturnHttpsUrls'] &&
+            data?.locked['coreDefaultDomain'] &&
+            data?.locked['coreTempDirectory']
+          }
+          leftSection={<IconDeviceFloppy size='1rem' />}
+        >
           Save
         </Button>
       </form>

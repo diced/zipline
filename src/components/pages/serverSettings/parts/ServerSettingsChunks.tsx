@@ -65,11 +65,13 @@ export default function ServerSettingsChunks({
           />
         </SimpleGrid>
 
-        <Button type='submit' mt='md' loading={isLoading} disabled={
-          data?.locked['chunksEnabled'] &&
-          data?.locked['chunksMax'] &&
-          data?.locked['chunksSize']
-        } leftSection={<IconDeviceFloppy size='1rem' />}>
+        <Button
+          type='submit'
+          mt='md'
+          loading={isLoading}
+          disabled={data?.locked['chunksEnabled'] && data?.locked['chunksMax'] && data?.locked['chunksSize']}
+          leftSection={<IconDeviceFloppy size='1rem' />}
+        >
           Save
         </Button>
       </form>

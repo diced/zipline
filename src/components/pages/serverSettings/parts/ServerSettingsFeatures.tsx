@@ -135,19 +135,25 @@ export default function ServerSettingsFeatures({
           />
         </SimpleGrid>
 
-        <Button type='submit' mt='md' loading={isLoading} disabled={
-          data?.locked['featuresImageCompression'] &&
-          data?.locked['featuresRobotsTxt'] &&
-          data?.locked['featuresHealthcheck'] &&
-          data?.locked['featuresUserRegistration'] &&
-          data?.locked['featuresOauthRegistration'] &&
-          data?.locked['featuresDeleteOnMaxViews'] &&
-          data?.locked['featuresThumbnailsEnabled'] &&
-          data?.locked['featuresThumbnailsNumberThreads'] &&
-          data?.locked['featuresMetricsEnabled'] &&
-          data?.locked['featuresMetricsAdminOnly'] &&
-          data?.locked['featuresMetricsShowUserSpecific']
-        } leftSection={<IconDeviceFloppy size='1rem' />}>
+        <Button
+          type='submit'
+          mt='md'
+          loading={isLoading}
+          disabled={
+            data?.locked['featuresImageCompression'] &&
+            data?.locked['featuresRobotsTxt'] &&
+            data?.locked['featuresHealthcheck'] &&
+            data?.locked['featuresUserRegistration'] &&
+            data?.locked['featuresOauthRegistration'] &&
+            data?.locked['featuresDeleteOnMaxViews'] &&
+            data?.locked['featuresThumbnailsEnabled'] &&
+            data?.locked['featuresThumbnailsNumberThreads'] &&
+            data?.locked['featuresMetricsEnabled'] &&
+            data?.locked['featuresMetricsAdminOnly'] &&
+            data?.locked['featuresMetricsShowUserSpecific']
+          }
+          leftSection={<IconDeviceFloppy size='1rem' />}
+        >
           Save
         </Button>
       </form>

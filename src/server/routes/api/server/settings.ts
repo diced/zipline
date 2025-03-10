@@ -16,7 +16,7 @@ import { z } from 'zod';
 type Settings = Awaited<ReturnType<typeof readDatabaseSettings>>;
 
 type LockedSettings = {
-  locked: any
+  locked: any;
 };
 
 export type ApiServerSettingsResponse = Settings & LockedSettings;
@@ -102,7 +102,7 @@ export default fastifyPlugin(
         if (!settings) return res.notFound('no settings table found');
 
         var result: any = await parseSettings(req.body);
-        
+
         if (!result.success) {
           logger.warn('invalid settings update', {
             issues: result.error.issues,
@@ -399,6 +399,6 @@ export async function parseSettings(body: Object) {
     });
 
   const result = settingsBodySchema.safeParse(body);
-  
+
   return result;
 }

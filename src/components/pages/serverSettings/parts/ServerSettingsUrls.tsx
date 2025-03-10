@@ -57,10 +57,13 @@ export default function ServerSettingsUrls({
           />
         </SimpleGrid>
 
-        <Button type='submit' mt='md' loading={isLoading} disabled={
-          data?.locked['urlsRoute'] &&
-          data?.locked['urlsLength']
-        } leftSection={<IconDeviceFloppy size='1rem' />}>
+        <Button
+          type='submit'
+          mt='md'
+          loading={isLoading}
+          disabled={data?.locked['urlsRoute'] && data?.locked['urlsLength']}
+          leftSection={<IconDeviceFloppy size='1rem' />}
+        >
           Save
         </Button>
       </form>

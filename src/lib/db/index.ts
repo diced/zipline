@@ -73,228 +73,6 @@ function getClient() {
           },
         },
       },
-      // coreReturnHttpsUrls: 'core.returnHttpsUrls',
-      // coreDefaultDomain: 'core.defaultDomain',
-      // coreTempDirectory: 'core.tempDirectory',
-
-      // chunksMax: 'chunks.max',
-      // chunksSize: 'chunks.size',
-      // chunksEnabled: 'chunks.enabled',
-
-      // tasksDeleteInterval: 'tasks.deleteInterval',
-      // tasksClearInvitesInterval: 'tasks.clearInvitesInterval',
-      // tasksMaxViewsInterval: 'tasks.maxViewsInterval',
-      // tasksThumbnailsInterval: 'tasks.thumbnailsInterval',
-      // tasksMetricsInterval: 'tasks.metricsInterval',
-
-      // filesRoute: 'files.route',
-      // filesLength: 'files.length',
-      // filesDefaultFormat: 'files.defaultFormat',
-      // filesDisabledExtensions: 'files.disabledExtensions',
-      // filesMaxFileSize: 'files.maxFileSize',
-      // filesDefaultExpiration: 'files.defaultExpiration',
-      // filesAssumeMimetypes: 'files.assumeMimetypes',
-      // filesDefaultDateFormat: 'files.defaultDateFormat',
-      // filesRemoveGpsMetadata: 'files.removeGpsMetadata',
-      // filesRandomWordsNumAdjectives: 'files.randomWordsNumAdjectives',
-      // filesRandomWordsSeparator: 'files.randomWordsSeparator',
-
-      // urlsRoute: 'urls.route',
-      // urlsLength: 'urls.length',
-
-      // featuresImageCompression: 'features.imageCompression',
-      // featuresRobotsTxt: 'features.robotsTxt',
-      // featuresHealthcheck: 'features.healthcheck',
-      // featuresUserRegistration: 'features.userRegistration',
-      // featuresOauthRegistration: 'features.oauthRegistration',
-      // featuresDeleteOnMaxViews: 'features.deleteOnMaxViews',
-
-      // featuresThumbnailsEnabled: 'features.thumbnails.enabled',
-      // featuresThumbnailsNumberThreads: 'features.thumbnails.num_threads',
-
-      // featuresMetricsEnabled: 'features.metrics.enabled',
-      // featuresMetricsAdminOnly: 'features.metrics.adminOnly',
-      // featuresMetricsShowUserSpecific: 'features.metrics.showUserSpecific',
-
-      // invitesEnabled: 'invites.enabled',
-      // invitesLength: 'invites.length',
-
-      // websiteTitle: 'website.title',
-      // websiteTitleLogo: 'website.titleLogo',
-      // websiteExternalLinks: 'website.externalLinks',
-      // websiteLoginBackground: 'website.loginBackground',
-      // websiteLoginBackgroundBlur: 'website.loginBackgroundBlur',
-      // websiteDefaultAvatar: 'website.defaultAvatar',
-      // websiteTos: 'website.tos',
-
-      // websiteThemeDefault: 'website.theme.default',
-      // websiteThemeDark: 'website.theme.dark',
-      // websiteThemeLight: 'website.theme.light',
-
-      // oauthBypassLocalLogin: 'oauth.bypassLocalLogin',
-      // oauthLoginOnly: 'oauth.loginOnly',
-
-      // oauthDiscordClientId: 'oauth.discord.clientId',
-      // oauthDiscordClientSecret: 'oauth.discord.clientSecret',
-      // oauthDiscordRedirectUri: 'oauth.discord.redirectUri',
-
-      // oauthGoogleClientId: 'oauth.google.clientId',
-      // oauthGoogleClientSecret: 'oauth.google.clientSecret',
-      // oauthGoogleRedirectUri: 'oauth.google.redirectUri',
-
-      // oauthGithubClientId: 'oauth.github.clientId',
-      // oauthGithubClientSecret: 'oauth.github.clientSecret',
-      // oauthGithubRedirectUri: 'oauth.github.redirectUri',
-
-      // oauthOidcClientId: 'oauth.oidc.clientId',
-      // oauthOidcClientSecret: 'oauth.oidc.clientSecret',
-      // oauthOidcAuthorizeUrl: 'oauth.oidc.authorizeUrl',
-      // oauthOidcUserinfoUrl: 'oauth.oidc.userinfoUrl',
-      // oauthOidcTokenUrl: 'oauth.oidc.tokenUrl',
-      // oauthOidcRedirectUri: 'oauth.oidc.redirectUri',
-
-      // mfaTotpEnabled: 'mfa.totp.enabled',
-      // mfaTotpIssuer: 'mfa.totp.issuer',
-      // mfaPasskeys: 'mfa.passkeys',
-
-      // ratelimitEnabled: 'ratelimit.enabled',
-      // ratelimitMax: 'ratelimit.max',
-      // ratelimitWindow: 'ratelimit.window',
-      // ratelimitAdminBypass: 'ratelimit.adminBypass',
-      // ratelimitAllowList: 'ratelimit.allowList',
-
-      // httpWebhookOnUpload: 'httpWebhook.onUpload',
-      // httpWebhookOnShorten: 'httpWebhook.onShorten',
-
-      // discordWebhookUrl: 'discord.webhookUrl',
-      // discordUsername: 'discord.username',
-      // discordAvatarUrl: 'discord.avatarUrl',
-
-      // discordOnUploadWebhookUrl: 'discord.onUpload.webhookUrl',
-      // discordOnUploadUsername: 'discord.onUpload.username',
-      // discordOnUploadAvatarUrl: 'discord.onUpload.avatarUrl',
-      // discordOnUploadContent: 'discord.onUpload.content',
-      // discordOnUploadEmbed: 'discord.onUpload.embed',
-
-      // discordOnShortenWebhookUrl: 'discord.onShorten.webhookUrl',
-      // discordOnShortenUsername: 'discord.onShorten.username',
-      // discordOnShortenAvatarUrl: 'discord.onShorten.avatarUrl',
-      // discordOnShortenContent: 'discord.onShorten.content',
-      // discordOnShortenEmbed: 'discord.onShorten.embed',
-
-      // pwaEnabled: 'pwa.enabled',
-      // pwaTitle: 'pwa.title',
-      // pwaShortName: 'pwa.shortName',
-      // pwaDescription: 'pwa.description',
-      // pwaThemeColor: 'pwa.themeColor',
-      // pwaBackgroundColor: 'pwa.backgroundColor',
-
-      // env('core.returnHttpsUrls', 'boolean'),
-      // env('core.defaultDomain', 'string'),
-      // env('core.tempDirectory', 'string'),
-      
-      // env('chunks.max', 'string'),
-      // env('chunks.size', 'string'),
-      // env('chunks.enabled', 'boolean'),
-
-      // env('tasks.deleteInterval', 'ms'),
-      // env('tasks.clearInvitesInterval', 'ms'),
-      // env('tasks.maxViewsInterval', 'ms'),
-      // env('tasks.thumbnailsInterval', 'ms'),
-      // env('tasks.metricsInterval', 'ms'),
-
-      // env('files.route', 'string'),
-      // env('files.length', 'number'),
-      // env('files.defaultFormat', 'string'),
-      // env('files.disabledExtensions', 'string[]'),
-      // env('files.maxFileSize', 'byte'),
-      // env('files.defaultExpiration', 'string'),
-      // env('files.assumeMimetypes', 'boolean'),
-      // env('files.defaultDateFormat', 'string'),
-      // env('files.removeGpsMetadata', 'boolean'),
-      // env('files.randomWordsNumAdjectives', 'number'),
-      // env('files.randomWordsSeparator', 'string'),
-
-      // env('urls.route', 'string'),
-      // env('urls.length', 'number'),
-
-      // env('features.imageCompression', 'boolean'),
-      // env('features.robotsTxt', 'boolean'),
-      // env('features.healthcheck', 'boolean'),
-      // env('features.userRegistration', 'boolean'),
-      // env('features.oauthRegistration', 'boolean'),
-      // env('features.deleteOnMaxViews', 'boolean'),
-      // env('features.thumbnails.enabled', 'boolean'),
-      // env('features.thumbnails.num_threads', 'number'),
-      // env('features.metrics.enabled', 'boolean'),
-      // env('features.metrics.adminOnly', 'boolean'),
-      // env('features.metrics.showUserSpecific', 'boolean'),
-      
-      // env('invites.enabled', 'boolean'),
-      // env('invites.length', 'number'),
-
-      // env('website.title', 'string'),
-      // env('website.titleLogo', 'string'),
-      // env('website.externalLinks', 'json[]'),
-      // env('website.loginBackground', 'string'),
-      // env('website.loginBackgroundBlur', 'boolean'),
-      // env('website.defaultAvatar', 'string'),
-      // env('website.tos', 'string'),
-      // env('website.theme.default', 'string'),
-      // env('website.theme.dark', 'string'),
-      // env('website.theme.light', 'string'),
-
-      // env('oauth.bypassLocalLogin', 'boolean'),
-      // env('oauth.loginOnly', 'boolean'),
-      // env('oauth.discord.clientId', 'string'),
-      // env('oauth.discord.clientSecret', 'string'),
-      // env('oauth.discord.redirectUri', 'string'),
-      // env('oauth.google.clientId', 'string'),
-      // env('oauth.google.clientSecret', 'string'),
-      // env('oauth.google.redirectUri', 'string'),
-      // env('oauth.github.clientId', 'string'),
-      // env('oauth.github.clientSecret', 'string'),
-      // env('oauth.github.redirectUri', 'string'),
-      // env('oauth.oidc.clientId', 'string'),
-      // env('oauth.oidc.clientSecret', 'string'),
-      // env('oauth.oidc.authorizeUrl', 'string'),
-      // env('oauth.oidc.userinfoUrl', 'string'),
-      // env('oauth.oidc.tokenUrl', 'string'),
-      // env('oauth.oidc.redirectUri', 'string'),
-
-      // env('mfa.totp.enabled', 'boolean'),
-      // env('mfa.totp.issuer', 'string'),
-      // env('mfa.passkeys', 'boolean'),
-
-      // env('ratelimit.enabled', 'boolean'),
-      // env('ratelimit.max', 'number'),
-      // env('ratelimit.window', 'number'),
-      // env('ratelimit.adminBypass', 'boolean'),
-      // env('ratelimit.allowList', 'string[]'),
-
-      // env('httpWebhook.onUpload', 'string'),
-      // env('httpWebhook.onShorten', 'string'),
-
-      // env('discord.webhookUrl', 'string'),
-      // env('discord.username', 'string'),
-      // env('discord.avatarUrl', 'string'),
-      // env('discord.onUpload.webhookUrl', 'string'),
-      // env('discord.onUpload.username', 'string'),
-      // env('discord.onUpload.avatarUrl', 'string'),
-      // env('discord.onUpload.content', 'string'),
-      // env('discord.onUpload.embed', 'json[]'),
-      // env('discord.onShorten.webhookUrl', 'string'),
-      // env('discord.onShorten.username', 'string'),
-      // env('discord.onShorten.avatarUrl', 'string'),
-      // env('discord.onShorten.content', 'string'),
-      // env('discord.onShorten.embed', 'json[]'),
-
-      // env('pwa.enabled', 'boolean'),
-      // env('pwa.title', 'string'),
-      // env('pwa.shortName', 'string'),
-      // env('pwa.description', 'string'),
-      // env('pwa.themeColor', 'string'),
-      // env('pwa.backgroundColor', 'string'),
       zipline: {
         coreReturnHttpsUrls: {
           needs: { coreReturnHttpsUrls: true },
@@ -383,12 +161,16 @@ function getClient() {
         filesDisabledExtensions: {
           needs: { filesDisabledExtensions: true },
           compute({ filesDisabledExtensions }: { filesDisabledExtensions: string[] }) {
-            return replaceDatabaseValueWithEnv('filesDisabledExtensions', filesDisabledExtensions, 'string[]');
+            return replaceDatabaseValueWithEnv(
+              'filesDisabledExtensions',
+              filesDisabledExtensions,
+              'string[]',
+            );
           },
         },
         filesMaxFileSize: {
           needs: { filesMaxFileSize: true },
-          compute({ filesMaxFileSize }: { filesMaxFileSize: string}) {
+          compute({ filesMaxFileSize }: { filesMaxFileSize: string }) {
             return replaceDatabaseValueWithEnv('filesMaxFileSize', filesMaxFileSize, 'byte');
           },
         },
@@ -419,13 +201,21 @@ function getClient() {
         filesRandomWordsNumAdjectives: {
           needs: { filesRandomWordsNumAdjectives: true },
           compute({ filesRandomWordsNumAdjectives }: { filesRandomWordsNumAdjectives: number }) {
-            return replaceDatabaseValueWithEnv('filesRandomWordsNumAdjectives', filesRandomWordsNumAdjectives, 'number');
+            return replaceDatabaseValueWithEnv(
+              'filesRandomWordsNumAdjectives',
+              filesRandomWordsNumAdjectives,
+              'number',
+            );
           },
         },
         filesRandomWordsSeparator: {
           needs: { filesRandomWordsSeparator: true },
           compute({ filesRandomWordsSeparator }: { filesRandomWordsSeparator: string }) {
-            return replaceDatabaseValueWithEnv('filesRandomWordsSeparator', filesRandomWordsSeparator, 'string');
+            return replaceDatabaseValueWithEnv(
+              'filesRandomWordsSeparator',
+              filesRandomWordsSeparator,
+              'string',
+            );
           },
         },
         urlsRoute: {
@@ -443,7 +233,11 @@ function getClient() {
         featuresImageCompression: {
           needs: { featuresImageCompression: true },
           compute({ featuresImageCompression }: { featuresImageCompression: boolean }) {
-            return replaceDatabaseValueWithEnv('featuresImageCompression', featuresImageCompression, 'boolean');
+            return replaceDatabaseValueWithEnv(
+              'featuresImageCompression',
+              featuresImageCompression,
+              'boolean',
+            );
           },
         },
         featuresRobotsTxt: {
@@ -461,31 +255,51 @@ function getClient() {
         featuresUserRegistration: {
           needs: { featuresUserRegistration: true },
           compute({ featuresUserRegistration }: { featuresUserRegistration: boolean }) {
-            return replaceDatabaseValueWithEnv('featuresUserRegistration', featuresUserRegistration, 'boolean');
+            return replaceDatabaseValueWithEnv(
+              'featuresUserRegistration',
+              featuresUserRegistration,
+              'boolean',
+            );
           },
         },
         featuresOauthRegistration: {
           needs: { featuresOauthRegistration: true },
           compute({ featuresOauthRegistration }: { featuresOauthRegistration: boolean }) {
-            return replaceDatabaseValueWithEnv('featuresOauthRegistration', featuresOauthRegistration, 'boolean');
+            return replaceDatabaseValueWithEnv(
+              'featuresOauthRegistration',
+              featuresOauthRegistration,
+              'boolean',
+            );
           },
         },
         featuresDeleteOnMaxViews: {
           needs: { featuresDeleteOnMaxViews: true },
           compute({ featuresDeleteOnMaxViews }: { featuresDeleteOnMaxViews: boolean }) {
-            return replaceDatabaseValueWithEnv('featuresDeleteOnMaxViews', featuresDeleteOnMaxViews, 'boolean');
+            return replaceDatabaseValueWithEnv(
+              'featuresDeleteOnMaxViews',
+              featuresDeleteOnMaxViews,
+              'boolean',
+            );
           },
         },
         featuresThumbnailsEnabled: {
           needs: { featuresThumbnailsEnabled: true },
           compute({ featuresThumbnailsEnabled }: { featuresThumbnailsEnabled: boolean }) {
-            return replaceDatabaseValueWithEnv('featuresThumbnailsEnabled', featuresThumbnailsEnabled, 'boolean');
+            return replaceDatabaseValueWithEnv(
+              'featuresThumbnailsEnabled',
+              featuresThumbnailsEnabled,
+              'boolean',
+            );
           },
         },
         featuresThumbnailsNumberThreads: {
           needs: { featuresThumbnailsNumberThreads: true },
           compute({ featuresThumbnailsNumberThreads }: { featuresThumbnailsNumberThreads: number }) {
-            return replaceDatabaseValueWithEnv('featuresThumbnailsNumberThreads', featuresThumbnailsNumberThreads, 'number');
+            return replaceDatabaseValueWithEnv(
+              'featuresThumbnailsNumberThreads',
+              featuresThumbnailsNumberThreads,
+              'number',
+            );
           },
         },
         featuresMetricsEnabled: {
@@ -497,13 +311,21 @@ function getClient() {
         featuresMetricsAdminOnly: {
           needs: { featuresMetricsAdminOnly: true },
           compute({ featuresMetricsAdminOnly }: { featuresMetricsAdminOnly: boolean }) {
-            return replaceDatabaseValueWithEnv('featuresMetricsAdminOnly', featuresMetricsAdminOnly, 'boolean');
+            return replaceDatabaseValueWithEnv(
+              'featuresMetricsAdminOnly',
+              featuresMetricsAdminOnly,
+              'boolean',
+            );
           },
         },
         featuresMetricsShowUserSpecific: {
           needs: { featuresMetricsShowUserSpecific: true },
           compute({ featuresMetricsShowUserSpecific }: { featuresMetricsShowUserSpecific: boolean }) {
-            return replaceDatabaseValueWithEnv('featuresMetricsShowUserSpecific', featuresMetricsShowUserSpecific, 'boolean');
+            return replaceDatabaseValueWithEnv(
+              'featuresMetricsShowUserSpecific',
+              featuresMetricsShowUserSpecific,
+              'boolean',
+            );
           },
         },
         invitesEnabled: {
@@ -545,7 +367,11 @@ function getClient() {
         websiteLoginBackgroundBlur: {
           needs: { websiteLoginBackgroundBlur: true },
           compute({ websiteLoginBackgroundBlur }: { websiteLoginBackgroundBlur: boolean }) {
-            return replaceDatabaseValueWithEnv('websiteLoginBackgroundBlur', websiteLoginBackgroundBlur, 'boolean');
+            return replaceDatabaseValueWithEnv(
+              'websiteLoginBackgroundBlur',
+              websiteLoginBackgroundBlur,
+              'boolean',
+            );
           },
         },
         websiteDefaultAvatar: {
@@ -599,7 +425,11 @@ function getClient() {
         oauthDiscordClientSecret: {
           needs: { oauthDiscordClientSecret: true },
           compute({ oauthDiscordClientSecret }: { oauthDiscordClientSecret: string }) {
-            return replaceDatabaseValueWithEnv('oauthDiscordClientSecret', oauthDiscordClientSecret, 'string');
+            return replaceDatabaseValueWithEnv(
+              'oauthDiscordClientSecret',
+              oauthDiscordClientSecret,
+              'string',
+            );
           },
         },
         oauthDiscordRedirectUri: {
@@ -761,7 +591,11 @@ function getClient() {
         discordOnUploadWebhookUrl: {
           needs: { discordOnUploadWebhookUrl: true },
           compute({ discordOnUploadWebhookUrl }: { discordOnUploadWebhookUrl: string }) {
-            return replaceDatabaseValueWithEnv('discordOnUploadWebhookUrl', discordOnUploadWebhookUrl, 'string');
+            return replaceDatabaseValueWithEnv(
+              'discordOnUploadWebhookUrl',
+              discordOnUploadWebhookUrl,
+              'string',
+            );
           },
         },
         discordOnUploadUsername: {
@@ -773,7 +607,11 @@ function getClient() {
         discordOnUploadAvatarUrl: {
           needs: { discordOnUploadAvatarUrl: true },
           compute({ discordOnUploadAvatarUrl }: { discordOnUploadAvatarUrl: string }) {
-            return replaceDatabaseValueWithEnv('discordOnUploadAvatarUrl', discordOnUploadAvatarUrl, 'string');
+            return replaceDatabaseValueWithEnv(
+              'discordOnUploadAvatarUrl',
+              discordOnUploadAvatarUrl,
+              'string',
+            );
           },
         },
         discordOnUploadContent: {
@@ -791,19 +629,31 @@ function getClient() {
         discordOnShortenWebhookUrl: {
           needs: { discordOnShortenWebhookUrl: true },
           compute({ discordOnShortenWebhookUrl }: { discordOnShortenWebhookUrl: string }) {
-            return replaceDatabaseValueWithEnv('discordOnShortenWebhookUrl', discordOnShortenWebhookUrl, 'string');
+            return replaceDatabaseValueWithEnv(
+              'discordOnShortenWebhookUrl',
+              discordOnShortenWebhookUrl,
+              'string',
+            );
           },
         },
         discordOnShortenUsername: {
           needs: { discordOnShortenUsername: true },
           compute({ discordOnShortenUsername }: { discordOnShortenUsername: string }) {
-            return replaceDatabaseValueWithEnv('discordOnShortenUsername', discordOnShortenUsername, 'string');
+            return replaceDatabaseValueWithEnv(
+              'discordOnShortenUsername',
+              discordOnShortenUsername,
+              'string',
+            );
           },
         },
         discordOnShortenAvatarUrl: {
           needs: { discordOnShortenAvatarUrl: true },
           compute({ discordOnShortenAvatarUrl }: { discordOnShortenAvatarUrl: string }) {
-            return replaceDatabaseValueWithEnv('discordOnShortenAvatarUrl', discordOnShortenAvatarUrl, 'string');
+            return replaceDatabaseValueWithEnv(
+              'discordOnShortenAvatarUrl',
+              discordOnShortenAvatarUrl,
+              'string',
+            );
           },
         },
         discordOnShortenContent: {

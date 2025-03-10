@@ -81,12 +81,18 @@ export default function ServerSettingsTasks({
           />
         </SimpleGrid>
 
-        <Button type='submit' mt='md' loading={isLoading} disabled={
-          data?.locked['tasksDeleteInterval'] &&
-          data?.locked['tasksClearInvitesInterval'] &&
-          data?.locked['tasksMaxViewsInterval'] &&
-          data?.locked['tasksThumbnailsInterval']
-        } leftSection={<IconDeviceFloppy size='1rem' />}>
+        <Button
+          type='submit'
+          mt='md'
+          loading={isLoading}
+          disabled={
+            data?.locked['tasksDeleteInterval'] &&
+            data?.locked['tasksClearInvitesInterval'] &&
+            data?.locked['tasksMaxViewsInterval'] &&
+            data?.locked['tasksThumbnailsInterval']
+          }
+          leftSection={<IconDeviceFloppy size='1rem' />}
+        >
           Save
         </Button>
       </form>

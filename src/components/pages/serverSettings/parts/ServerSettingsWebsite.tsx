@@ -200,18 +200,24 @@ export default function ServerSettingsWebsite({
           </Grid.Col>
         </Grid>
 
-        <Button type='submit' mt='md' loading={isLoading} disabled={
-          data?.locked['websiteTitle'] &&
-          data?.locked['websiteTitleLogo'] &&
-          data?.locked['websiteExternalLinks'] &&
-          data?.locked['websiteLoginBackground'] &&
-          data?.locked['websiteLoginBackgroundBlur'] &&
-          data?.locked['websiteDefaultAvatar'] &&
-          data?.locked['websiteTos'] &&
-          data?.locked['websiteThemeDefault'] &&
-          data?.locked['websiteThemeDark'] &&
-          data?.locked['websiteThemeLight']
-        } leftSection={<IconDeviceFloppy size='1rem' />}>
+        <Button
+          type='submit'
+          mt='md'
+          loading={isLoading}
+          disabled={
+            data?.locked['websiteTitle'] &&
+            data?.locked['websiteTitleLogo'] &&
+            data?.locked['websiteExternalLinks'] &&
+            data?.locked['websiteLoginBackground'] &&
+            data?.locked['websiteLoginBackgroundBlur'] &&
+            data?.locked['websiteDefaultAvatar'] &&
+            data?.locked['websiteTos'] &&
+            data?.locked['websiteThemeDefault'] &&
+            data?.locked['websiteThemeDark'] &&
+            data?.locked['websiteThemeLight']
+          }
+          leftSection={<IconDeviceFloppy size='1rem' />}
+        >
           Save
         </Button>
       </form>

@@ -193,19 +193,25 @@ export default function ServerSettingsFiles({
           />
         </SimpleGrid>
 
-        <Button type='submit' mt='md' loading={isLoading} disabled={
-          data?.locked['filesRoute'] &&
-          data?.locked['filesLength'] &&
-          data?.locked['filesDefaultFormat'] &&
-          data?.locked['filesDisabledExtensions'] &&
-          data?.locked['filesMaxFileSize'] &&
-          data?.locked['filesDefaultExpiration'] &&
-          data?.locked['filesAssumeMimetypes'] &&
-          data?.locked['filesDefaultDateFormat'] &&
-          data?.locked['filesRemoveGpsMetadata'] &&
-          data?.locked['filesRandomWordsNumAdjectives'] &&
-          data?.locked['filesRandomWordsSeparator']
-        } leftSection={<IconDeviceFloppy size='1rem' />}>
+        <Button
+          type='submit'
+          mt='md'
+          loading={isLoading}
+          disabled={
+            data?.locked['filesRoute'] &&
+            data?.locked['filesLength'] &&
+            data?.locked['filesDefaultFormat'] &&
+            data?.locked['filesDisabledExtensions'] &&
+            data?.locked['filesMaxFileSize'] &&
+            data?.locked['filesDefaultExpiration'] &&
+            data?.locked['filesAssumeMimetypes'] &&
+            data?.locked['filesDefaultDateFormat'] &&
+            data?.locked['filesRemoveGpsMetadata'] &&
+            data?.locked['filesRandomWordsNumAdjectives'] &&
+            data?.locked['filesRandomWordsSeparator']
+          }
+          leftSection={<IconDeviceFloppy size='1rem' />}
+        >
           Save
         </Button>
       </form>
