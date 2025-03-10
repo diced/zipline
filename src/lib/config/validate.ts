@@ -3,6 +3,7 @@ import { join, resolve } from 'path';
 import { type ZodIssue, z } from 'zod';
 import { log } from '../logger';
 import { PROP_TO_ENV, ParsedConfig } from './read';
+import { parseSettings } from '@/server/routes/api/server/settings';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -95,7 +96,7 @@ export const schema = z.object({
     defaultDateFormat: z.string().default('YYYY-MM-DD_HH:mm:ss'),
     removeGpsMetadata: z.boolean().default(false),
     randomWordsNumAdjectives: z.number().default(3),
-    randomWordsSeperator: z.string().default('-'),
+    randomWordsSeparator: z.string().default('-'),
   }),
   urls: z.object({
     route: z.string().startsWith('/').min(1).trim().toLowerCase().default('/go'),
@@ -323,7 +324,7 @@ export type Config = z.infer<typeof schema>;
 
 const logger = log('config').c('validate');
 
-export function validateConfigObject(env: ParsedConfig): Config {
+export async function validateConfigObject(env: ParsedConfig): Promise<Config> {
   const building = !!process.env.ZIPLINE_BUILD;
 
   if (building) {
@@ -337,6 +338,113 @@ export function validateConfigObject(env: ParsedConfig): Config {
     logger.error('There was an error while validating the environment.');
 
     for (const error of validated.error.errors) {
+      handleError(error);
+    }
+
+    process.exit(1);
+  }
+
+  // flatten object for use with settingsValidator
+  const flat = {
+    "coreReturnHttpsUrls": validated.data.core.returnHttpsUrls,
+    "corePort": validated.data.core.port,
+    "coreHostname": validated.data.core.hostname,
+    "coreSecret": validated.data.core.secret,
+    "coreDatabaseUrl": validated.data.core.databaseUrl,
+    "coreDefaultDomain": validated.data.core.defaultDomain,
+    "coreTempDirectory": validated.data.core.tempDirectory,
+    "chunksMax": validated.data.chunks.max,
+    "chunksSize": validated.data.chunks.size,
+    "chunksEnabled": validated.data.chunks.enabled,
+    "tasksDeleteInterval": validated.data.tasks.deleteInterval,
+    "tasksClearInvitesInterval": validated.data.tasks.clearInvitesInterval,
+    "tasksMaxViewsInterval": validated.data.tasks.maxViewsInterval,
+    "tasksThumbnailsInterval": validated.data.tasks.thumbnailsInterval,
+    "tasksMetricsInterval": validated.data.tasks.metricsInterval,
+    "filesRoute": validated.data.files.route,
+    "filesLength": validated.data.files.length,
+    "filesDefaultFormat": validated.data.files.defaultFormat,
+    "filesDisabledExtensions": validated.data.files.disabledExtensions,
+    "filesMaxFileSize": validated.data.files.maxFileSize,
+    "filesDefaultExpiration": validated.data.files.defaultExpiration,
+    "filesAssumeMimetypes": validated.data.files.assumeMimetypes,
+    "filesDefaultDateFormat": validated.data.files.defaultDateFormat,
+    "filesRemoveGpsMetadata": validated.data.files.removeGpsMetadata,
+    "filesRandomWordsNumAdjectives": validated.data.files.randomWordsNumAdjectives,
+    "filesRandomWordsSeparator": validated.data.files.randomWordsSeparator,
+    "urlsRoute": validated.data.urls.route,
+    "urlsLength": validated.data.urls.length,
+    "datasourceType": validated.data.datasource.type,
+    "datasourceS3AccessKeyId": validated.data.datasource.s3?.accessKeyId,
+    "datasourceS3SecretAccessKey": validated.data.datasource.s3?.secretAccessKey,
+    "datasourceS3Region": validated.data.datasource.s3?.region,
+    "datasourceS3Bucket": validated.data.datasource.s3?.bucket,
+    "datasourceS3Endpoint": validated.data.datasource.s3?.endpoint,
+    "datasourceS3ForcePathStyle": validated.data.datasource.s3?.forcePathStyle,
+    "datasourceLocalDirectory": validated.data.datasource.local.directory,
+    "featuresImageCompression": validated.data.features.imageCompression,
+    "featuresRobotsTxt": validated.data.features.robotsTxt,
+    "featuresHealthcheck": validated.data.features.healthcheck,
+    "featuresUserRegistration": validated.data.features.userRegistration,
+    "featuresOauthRegistration": validated.data.features.oauthRegistration,
+    "featuresDeleteOnMaxViews": validated.data.features.deleteOnMaxViews,
+    "featuresThumbnailsEnabled": validated.data.features.thumbnails.enabled,
+    "featuresThumbnailsNumThreads": validated.data.features.thumbnails.num_threads,
+    "featuresMetricsEnabled": validated.data.features.metrics.enabled,
+    "featuresMetricsAdminOnly": validated.data.features.metrics.adminOnly,
+    "featuresMetricsShowUserSpecific": validated.data.features.metrics.showUserSpecific,
+    "invitesEnabled": validated.data.invites.enabled,
+    "invitesLength": validated.data.invites.length,
+    "websiteTitle": validated.data.website.title,
+    "websiteTitleLogo": validated.data.website.titleLogo,
+    "websiteExternalLinks": validated.data.website.externalLinks,
+    "websiteLoginBackground": validated.data.website.loginBackground,
+    "websiteLoginBackgroundBlur": validated.data.website.loginBackgroundBlur,
+    "websiteDefaultAvatar": validated.data.website.defaultAvatar,
+    "websiteThemeDefault": validated.data.website.theme.default,
+    "websiteThemeDark": validated.data.website.theme.dark,
+    "websiteThemeLight": validated.data.website.theme.light,
+    "websiteTos": validated.data.website.tos,
+    "mfaTotpEnabled": validated.data.mfa.totp.enabled,
+    "mfaTotpIssuer": validated.data.mfa.totp.issuer,
+    "mfaPasskeys": validated.data.mfa.passkeys,
+    "oauthBypassLocalLogin": validated.data.oauth.bypassLocalLogin,
+    "oauthLoginOnly": validated.data.oauth.loginOnly,
+    "oauthDiscordClientId": validated.data.oauth.discord.clientId,
+    "oauthDiscordClientSecret": validated.data.oauth.discord.clientSecret,
+    "oauthDiscordRedirectUri": validated.data.oauth.discord.redirectUri,
+    "oauthGithubClientId": validated.data.oauth.github.clientId,
+    "oauthGithubClientSecret": validated.data.oauth.github.clientSecret,
+    "oauthGithubRedirectUri": validated.data.oauth.github.redirectUri,
+    "oauthGoogleClientId": validated.data.oauth.google.clientId,
+    "oauthGoogleClientSecret": validated.data.oauth.google.clientSecret,
+    "oauthGoogleRedirectUri": validated.data.oauth.google.redirectUri,
+    "oauthOidcClientId": validated.data.oauth.oidc.clientId,
+    "oauthOidcClientSecret": validated.data.oauth.oidc.clientSecret,
+    "oauthOidcAuthorizeUrl": validated.data.oauth.oidc.authorizeUrl,
+    "oauthOidcUserinfoUrl": validated.data.oauth.oidc.userinfoUrl,
+    "oauthOidcTokenUrl": validated.data.oauth.oidc.tokenUrl,
+    "oauthOidcRedirectUri": validated.data.oauth.oidc.redirectUri,
+    "discordWebhookUrl": validated.data.discord?.webhookUrl,
+    "discordUsername": validated.data.discord?.username,
+    "discordAvatarUrl": validated.data.discord?.avatarUrl,
+    "discordOnUpload": validated.data.discord?.onUpload,
+    "discordOnShorten": validated.data.discord?.onShorten,
+    "ratelimitEnabled": validated.data.ratelimit.enabled,
+    "ratelimitMax": validated.data.ratelimit.max,
+    "ratelimitWindow": validated.data.ratelimit.window,
+    "ratelimitAdminBypass": validated.data.ratelimit.adminBypass,
+    "ratelimitAllowList": validated.data.ratelimit.allowList,
+    "httpWebhookOnUpload": validated.data.httpWebhook.onUpload,
+    "httpWebhookOnShorten": validated.data.httpWebhook.onShorten,
+  };
+
+  const result = await parseSettings(flat);
+
+  if (!result.success) {
+    logger.error('There was an error while validating the environment.');
+
+    for (const error of result.error?.issues ?? []) {
       handleError(error);
     }
 

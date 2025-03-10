@@ -57,60 +57,70 @@ export default function ServerSettingsFeatures({
           <Switch
             label='Image Compression'
             description='Allows the ability for users to compress images.'
+            disabled={data?.locked['featuresImageCompression']}
             {...form.getInputProps('featuresImageCompression', { type: 'checkbox' })}
           />
 
           <Switch
             label='/robots.txt'
             description='Enables a robots.txt file for search engine optimization. Requires a server restart.'
+            disabled={data?.locked['featuresRobotsTxt']}
             {...form.getInputProps('featuresRobotsTxt', { type: 'checkbox' })}
           />
 
           <Switch
             label='Healthcheck'
             description='Enables a healthcheck route for uptime monitoring. Requires a server restart.'
+            disabled={data?.locked['featuresHealthcheck']}
             {...form.getInputProps('featuresHealthcheck', { type: 'checkbox' })}
           />
 
           <Switch
             label='User Registration'
             description='Allows users to register an account on the server.'
+            disabled={data?.locked['featuresUserRegistration']}
             {...form.getInputProps('featuresUserRegistration', { type: 'checkbox' })}
           />
 
           <Switch
             label='OAuth Registration'
             description='Allows users to register an account using OAuth providers.'
+            disabled={data?.locked['featuresOauthRegistration']}
             {...form.getInputProps('featuresOauthRegistration', { type: 'checkbox' })}
           />
 
           <Switch
             label='Delete on Max Views'
             description='Automatically deletes files/urls after they reach the maximum view count. Requires a server restart.'
+            disabled={data?.locked['featuresDeleteOnMaxViews']}
             {...form.getInputProps('featuresDeleteOnMaxViews', { type: 'checkbox' })}
           />
 
           <Switch
             label='Enable Metrics'
             description='Enables metrics for the server. Requires a server restart.'
+            disabled={data?.locked['featuresMetricsEnabled']}
             {...form.getInputProps('featuresMetricsEnabled', { type: 'checkbox' })}
           />
 
           <Switch
             label='Admin Only Metrics'
             description='Requires an administrator to view metrics.'
+            disabled={data?.locked['featuresMetricsAdminOnly']}
             {...form.getInputProps('featuresMetricsAdminOnly', { type: 'checkbox' })}
           />
 
           <Switch
             label='Show User Specific Metrics'
             description='Shows metrics specific to each user, for all users.'
+            disabled={data?.locked['featuresMetricsShowUserSpecific']}
             {...form.getInputProps('featuresMetricsShowUserSpecific', { type: 'checkbox' })}
           />
 
           <Switch
             label='Enable Thumbnails'
             description='Enables thumbnail generation for images. Requires a server restart.'
+            disabled={data?.locked['featuresThumbnailsEnabled']}
             {...form.getInputProps('featuresThumbnailsEnabled', { type: 'checkbox' })}
           />
 
@@ -120,11 +130,24 @@ export default function ServerSettingsFeatures({
             placeholder='Enter a number...'
             min={1}
             max={16}
+            disabled={data?.locked['featuresThumbnailsNumberThreads']}
             {...form.getInputProps('featuresThumbnailsNumberThreads')}
           />
         </SimpleGrid>
 
-        <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
+        <Button type='submit' mt='md' loading={isLoading} disabled={
+          data?.locked['featuresImageCompression'] &&
+          data?.locked['featuresRobotsTxt'] &&
+          data?.locked['featuresHealthcheck'] &&
+          data?.locked['featuresUserRegistration'] &&
+          data?.locked['featuresOauthRegistration'] &&
+          data?.locked['featuresDeleteOnMaxViews'] &&
+          data?.locked['featuresThumbnailsEnabled'] &&
+          data?.locked['featuresThumbnailsNumberThreads'] &&
+          data?.locked['featuresMetricsEnabled'] &&
+          data?.locked['featuresMetricsAdminOnly'] &&
+          data?.locked['featuresMetricsShowUserSpecific']
+        } leftSection={<IconDeviceFloppy size='1rem' />}>
           Save
         </Button>
       </form>

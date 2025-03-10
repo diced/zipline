@@ -52,6 +52,7 @@ export default function ServerSettingsTasks({
             label='Delete Files Interval'
             description='How often to check and delete expired files.'
             placeholder='30m'
+            disabled={data?.locked['tasksDeleteInterval']}
             {...form.getInputProps('tasksDeleteInterval')}
           />
 
@@ -59,6 +60,7 @@ export default function ServerSettingsTasks({
             label='Clear Invites Interval'
             description='How often to check and clear expired/used invites.'
             placeholder='30m'
+            disabled={data?.locked['tasksClearInvitesInterval']}
             {...form.getInputProps('tasksClearInvitesInterval')}
           />
 
@@ -66,6 +68,7 @@ export default function ServerSettingsTasks({
             label='Max Views Interval'
             description='How often to check and delete files that have reached max views.'
             placeholder='30m'
+            disabled={data?.locked['tasksMaxViewsInterval']}
             {...form.getInputProps('tasksMaxViewsInterval')}
           />
 
@@ -73,11 +76,17 @@ export default function ServerSettingsTasks({
             label='Thumbnails Interval'
             description='How often to check and generate thumbnails for video files.'
             placeholder='30m'
+            disabled={data?.locked['tasksThumbnailsInterval']}
             {...form.getInputProps('tasksThumbnailsInterval')}
           />
         </SimpleGrid>
 
-        <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
+        <Button type='submit' mt='md' loading={isLoading} disabled={
+          data?.locked['tasksDeleteInterval'] &&
+          data?.locked['tasksClearInvitesInterval'] &&
+          data?.locked['tasksMaxViewsInterval'] &&
+          data?.locked['tasksThumbnailsInterval']
+        } leftSection={<IconDeviceFloppy size='1rem' />}>
           Save
         </Button>
       </form>

@@ -20,7 +20,7 @@ export function formatFileName(nameFormat: Config['files']['defaultFormat'], ori
       return name;
     case 'random-words':
     case 'gfycat':
-      return randomWords(config.files.randomWordsNumAdjectives, config.files.randomWordsSeperator);
+      return randomWords(config.files.randomWordsNumAdjectives, config.files.randomWordsSeparator);
     default:
       return randomCharacters(config.files.length);
   }

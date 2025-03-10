@@ -53,6 +53,7 @@ export default function ServerSettingsCore({
           mt='md'
           label='Return HTTPS URLs'
           description='Return URLs with HTTPS protocol.'
+          disabled={data?.locked['coreReturnHttpsUrls'] ? true : false}
           {...form.getInputProps('coreReturnHttpsUrls', { type: 'checkbox' })}
         />
 
@@ -61,6 +62,7 @@ export default function ServerSettingsCore({
             label='Default Domain'
             description='The domain to use when generating URLs. This value should not include the protocol.'
             placeholder='example.com'
+            disabled={data?.locked['coreDefaultDomain']}
             {...form.getInputProps('coreDefaultDomain')}
           />
 
@@ -68,11 +70,16 @@ export default function ServerSettingsCore({
             label='Temporary Directory'
             description='The directory to store temporary files. If the path is invalid, certain functions may break. Requires a server restart.'
             placeholder='/tmp/zipline'
+            disabled={data?.locked['coreTempDirectory']}
             {...form.getInputProps('coreTempDirectory')}
           />
         </SimpleGrid>
 
-        <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
+        <Button type='submit' mt='md' loading={isLoading} disabled={
+          data?.locked['coreReturnHttpsUrls'] &&
+          data?.locked['coreDefaultDomain'] &&
+          data?.locked['coreTempDirectory']
+        } leftSection={<IconDeviceFloppy size='1rem' />}>
           Save
         </Button>
       </form>

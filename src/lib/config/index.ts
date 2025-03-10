@@ -9,7 +9,7 @@ declare global {
 }
 
 const reloadSettings = async () => {
-  config = global.__config__ = validateConfigObject((await read()) as any);
+  config = global.__config__ = await validateConfigObject((await read()) as any);
 };
 
 config = global.__config__;

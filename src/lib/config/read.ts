@@ -41,7 +41,7 @@ export const rawConfig: any = {
     defaultDateFormat: undefined,
     removeGpsMetadata: undefined,
     randomWordsNumAdjectives: undefined,
-    randomWordsSeperator: undefined,
+    randomWordsSeparator: undefined,
   },
   urls: {
     route: undefined,
@@ -164,6 +164,210 @@ export const PROP_TO_ENV = {
 
   'ssl.key': 'SSL_KEY',
   'ssl.cert': 'SSL_CERT',
+
+  // sourced from zipline table in database
+  // none of these need default values, as we will just use the db value if the env value is missing or invalid (if invalid, log an error though)
+  
+  // coreReturnHttpsUrls	boolean [false]
+  // coreDefaultDomain	text NULL
+  // coreTempDirectory	text
+  // chunksEnabled	boolean [true]
+  // chunksMax	text [95mb]
+  // chunksSize	text [25mb]
+  // tasksDeleteInterval	text [30m]
+  // tasksClearInvitesInterval	text [30m]
+  // tasksMaxViewsInterval	text [30m]
+  // tasksThumbnailsInterval	text [30m]
+  // tasksMetricsInterval	text [30m]
+  // filesRoute	text [/u]
+  // filesLength	integer [6]
+  // filesDefaultFormat	text [random]
+  // filesDisabledExtensions	text[] NULL
+  // filesMaxFileSize	text [100mb]
+  // filesDefaultExpiration	text NULL
+  // filesAssumeMimetypes	boolean [false]
+  // filesDefaultDateFormat	text [YYYY-MM-DD_HH:mm:ss]
+  // filesRemoveGpsMetadata	boolean [false]
+  // urlsRoute	text [/go]
+  // urlsLength	integer [6]
+  // featuresImageCompression	boolean [true]
+  // featuresRobotsTxt	boolean [true]
+  // featuresHealthcheck	boolean [true]
+  // featuresUserRegistration	boolean [false]
+  // featuresOauthRegistration	boolean [false]
+  // featuresDeleteOnMaxViews	boolean [true]
+  // featuresThumbnailsEnabled	boolean [true]
+  // featuresThumbnailsNumberThreads	integer [4]
+  // featuresMetricsEnabled	boolean [true]
+  // featuresMetricsAdminOnly	boolean [false]
+  // featuresMetricsShowUserSpecific	boolean [true]
+  // invitesEnabled	boolean [true]
+  // invitesLength	integer [6]
+  // websiteTitle	text [Zipline]
+  // websiteTitleLogo	text NULL
+  // websiteExternalLinks	jsonb [[{"url": "https://github.com/diced/zipline", "name": "GitHub"}, {"url": "https://zipline.diced.sh/", "name": "Documentation"}]]
+  // websiteLoginBackground	text NULL
+  // websiteDefaultAvatar	text NULL
+  // websiteTos	text NULL
+  // websiteThemeDefault	text [system]
+  // websiteThemeDark	text [builtin:dark_gray]
+  // websiteThemeLight	text [builtin:light_gray]
+  // oauthBypassLocalLogin	boolean [false]
+  // oauthLoginOnly	boolean [false]
+  // oauthDiscordClientId	text NULL
+  // oauthDiscordClientSecret	text NULL
+  // oauthDiscordRedirectUri	text NULL
+  // oauthGoogleClientId	text NULL
+  // oauthGoogleClientSecret	text NULL
+  // oauthGoogleRedirectUri	text NULL
+  // oauthGithubClientId	text NULL
+  // oauthGithubClientSecret	text NULL
+  // oauthGithubRedirectUri	text NULL
+  // oauthOidcClientId	text NULL
+  // oauthOidcClientSecret	text NULL
+  // oauthOidcAuthorizeUrl	text NULL
+  // oauthOidcTokenUrl	text NULL
+  // oauthOidcUserinfoUrl	text NULL
+  // oauthOidcRedirectUri	text NULL
+  // mfaTotpEnabled	boolean [false]
+  // mfaTotpIssuer	text [Zipline]
+  // mfaPasskeys	boolean [false]
+  // ratelimitEnabled	boolean [true]
+  // ratelimitMax	integer [10]
+  // ratelimitWindow	integer NULL
+  // ratelimitAdminBypass	boolean [true]
+  // ratelimitAllowList	text[] NULL
+  // httpWebhookOnUpload	text NULL
+  // httpWebhookOnShorten	text NULL
+  // discordWebhookUrl	text NULL
+  // discordUsername	text NULL
+  // discordAvatarUrl	text NULL
+  // discordOnUploadWebhookUrl	text NULL
+  // discordOnUploadUsername	text NULL
+  // discordOnUploadAvatarUrl	text NULL
+  // discordOnUploadContent	text NULL
+  // discordOnUploadEmbed	jsonb NULL
+  // discordOnShortenWebhookUrl	text NULL
+  // discordOnShortenUsername	text NULL
+  // discordOnShortenAvatarUrl	text NULL
+  // discordOnShortenContent	text NULL
+  // discordOnShortenEmbed	jsonb NULL
+  // pwaEnabled	boolean [false]
+  // pwaTitle	text [Zipline]
+  // pwaShortName	text [Zipline]
+  // pwaDescription	text [Zipline]
+  // pwaThemeColor	text [#000000]
+  // pwaBackgroundColor	text [#000000]
+  // websiteLoginBackgroundBlur	boolean [true]
+  // filesRandomWordsNumAdjectives	integer [2]
+  // filesRandomWordsSeparator	text [-]
+  
+  'core.returnHttpsUrls': 'CORE_RETURN_HTTPS_URLS',
+  'core.defaultDomain': 'CORE_DEFAULT_DOMAIN',
+  'core.tempDirectory': 'CORE_TEMP_DIRECTORY',
+  
+  'chunks.max': 'CHUNKS_MAX',
+  'chunks.size': 'CHUNKS_SIZE',
+  'chunks.enabled': 'CHUNKS_ENABLED',
+
+  'tasks.deleteInterval': 'TASKS_DELETE_INTERVAL',
+  'tasks.clearInvitesInterval': 'TASKS_CLEAR_INVITES_INTERVAL',
+  'tasks.maxViewsInterval': 'TASKS_MAX_VIEWS_INTERVAL',
+  'tasks.thumbnailsInterval': 'TASKS_THUMBNAILS_INTERVAL',
+  'tasks.metricsInterval': 'TASKS_METRICS_INTERVAL',
+
+  'files.route': 'FILES_ROUTE',
+  'files.length': 'FILES_LENGTH',
+  'files.defaultFormat': 'FILES_DEFAULT_FORMAT',
+  'files.disabledExtensions': 'FILES_DISABLED_EXTENSIONS',
+  'files.maxFileSize': 'FILES_MAX_FILE_SIZE',
+  'files.defaultExpiration': 'FILES_DEFAULT_EXPIRATION',
+  'files.assumeMimetypes': 'FILES_ASSUME_MIMETYPES',
+  'files.defaultDateFormat': 'FILES_DEFAULT_DATE_FORMAT',
+  'files.removeGpsMetadata': 'FILES_REMOVE_GPS_METADATA',
+  'files.randomWordsNumAdjectives': 'FILES_RANDOM_WORDS_NUM_ADJECTIVES',
+  'files.randomWordsSeparator': 'FILES_RANDOM_WORDS_SEPARATOR',
+
+  'urls.route': 'URLS_ROUTE',
+  'urls.length': 'URLS_LENGTH',
+
+  'features.imageCompression': 'FEATURES_IMAGE_COMPRESSION',
+  'features.robotsTxt': 'FEATURES_ROBOTS_TXT',
+  'features.healthcheck': 'FEATURES_HEALTHCHECK',
+  'features.userRegistration': 'FEATURES_USER_REGISTRATION',
+  'features.oauthRegistration': 'FEATURES_OAUTH_REGISTRATION',
+  'features.deleteOnMaxViews': 'FEATURES_DELETE_ON_MAX_VIEWS',
+  'features.thumbnails.enabled': 'FEATURES_THUMBNAILS_ENABLED',
+  'features.thumbnails.num_threads': 'FEATURES_THUMBNAILS_NUMBER_THREADS',
+  'features.metrics.enabled': 'FEATURES_METRICS_ENABLED',
+  'features.metrics.adminOnly': 'FEATURES_METRICS_ADMIN_ONLY',
+  'features.metrics.showUserSpecific': 'FEATURES_METRICS_SHOW_USER_SPECIFIC',
+
+  'invites.enabled': 'INVITES_ENABLED',
+  'invites.length': 'INVITES_LENGTH',
+
+  'website.title': 'WEBSITE_TITLE',
+  'website.titleLogo': 'WEBSITE_TITLE_LOGO',
+  'website.externalLinks': 'WEBSITE_EXTERNAL_LINKS',
+  'website.loginBackground': 'WEBSITE_LOGIN_BACKGROUND',
+  'website.loginBackgroundBlur': 'WEBSITE_LOGIN_BACKGROUND_BLUR',
+  'website.defaultAvatar': 'WEBSITE_DEFAULT_AVATAR',
+  'website.tos': 'WEBSITE_TOS',
+  'website.theme.default': 'WEBSITE_THEME_DEFAULT',
+  'website.theme.dark': 'WEBSITE_THEME_DARK',
+  'website.theme.light': 'WEBSITE_THEME_LIGHT',
+
+  'oauth.bypassLocalLogin': 'OAUTH_BYPASS_LOCAL_LOGIN',
+  'oauth.loginOnly': 'OAUTH_LOGIN_ONLY',
+  'oauth.discord.clientId': 'OAUTH_DISCORD_CLIENT_ID',
+  'oauth.discord.clientSecret': 'OAUTH_DISCORD_CLIENT_SECRET',
+  'oauth.discord.redirectUri': 'OAUTH_DISCORD_REDIRECT_URI',
+  'oauth.google.clientId': 'OAUTH_GOOGLE_CLIENT_ID',
+  'oauth.google.clientSecret': 'OAUTH_GOOGLE_CLIENT_SECRET',
+  'oauth.google.redirectUri': 'OAUTH_GOOGLE_REDIRECT_URI',
+  'oauth.github.clientId': 'OAUTH_GITHUB_CLIENT_ID',
+  'oauth.github.clientSecret': 'OAUTH_GITHUB_CLIENT_SECRET',
+  'oauth.github.redirectUri': 'OAUTH_GITHUB_REDIRECT_URI',
+  'oauth.oidc.clientId': 'OAUTH_OIDC_CLIENT_ID',
+  'oauth.oidc.clientSecret': 'OAUTH_OIDC_CLIENT_SECRET',
+  'oauth.oidc.authorizeUrl': 'OAUTH_OIDC_AUTHORIZE_URL',
+  'oauth.oidc.userinfoUrl': 'OAUTH_OIDC_USERINFO_URL',
+  'oauth.oidc.tokenUrl': 'OAUTH_OIDC_TOKEN_URL',
+  'oauth.oidc.redirectUri': 'OAUTH_OIDC_REDIRECT_URI',
+
+  'mfa.totp.enabled': 'MFA_TOTP_ENABLED',
+  'mfa.totp.issuer': 'MFA_TOTP_ISSUER',
+  'mfa.passkeys': 'MFA_PASSKEYS',
+
+  'ratelimit.enabled': 'RATELIMIT_ENABLED',
+  'ratelimit.max': 'RATELIMIT_MAX',
+  'ratelimit.window': 'RATELIMIT_WINDOW',
+  'ratelimit.adminBypass': 'RATELIMIT_ADMIN_BYPASS',
+  'ratelimit.allowList': 'RATELIMIT_ALLOW_LIST',
+
+  'httpWebhook.onUpload': 'HTTPWEBHOOK_ON_UPLOAD',
+  'httpWebhook.onShorten': 'HTTPWEBHOOK_ON_SHORTEN',
+
+  'discord.webhookUrl': 'DISCORD_WEBHOOK_URL',
+  'discord.username': 'DISCORD_USERNAME',
+  'discord.avatarUrl': 'DISCORD_AVATAR_URL',
+  'discord.onUpload.webhookUrl': 'DISCORD_ON_UPLOAD_WEBHOOK_URL',
+  'discord.onUpload.username': 'DISCORD_ON_UPLOAD_USERNAME',
+  'discord.onUpload.avatarUrl': 'DISCORD_ON_UPLOAD_AVATAR_URL',
+  'discord.onUpload.content': 'DISCORD_ON_UPLOAD_CONTENT',
+  'discord.onUpload.embed': 'DISCORD_ON_UPLOAD_EMBED',
+  'discord.onShorten.webhookUrl': 'DISCORD_ON_SHORTEN_WEBHOOK_URL',
+  'discord.onShorten.username': 'DISCORD_ON_SHORTEN_USERNAME',
+  'discord.onShorten.avatarUrl': 'DISCORD_ON_SHORTEN_AVATAR_URL',
+  'discord.onShorten.content': 'DISCORD_ON_SHORTEN_CONTENT',
+  'discord.onShorten.embed': 'DISCORD_ON_SHORTEN_EMBED',
+
+  'pwa.enabled': 'PWA_ENABLED',
+  'pwa.title': 'PWA_TITLE',
+  'pwa.shortName': 'PWA_SHORT_NAME',
+  'pwa.description': 'PWA_DESCRIPTION',
+  'pwa.themeColor': 'PWA_THEME_COLOR',
+  'pwa.backgroundColor': 'PWA_BACKGROUND_COLOR',
 };
 
 export const DATABASE_TO_PROP = {
@@ -191,7 +395,7 @@ export const DATABASE_TO_PROP = {
   filesDefaultDateFormat: 'files.defaultDateFormat',
   filesRemoveGpsMetadata: 'files.removeGpsMetadata',
   filesRandomWordsNumAdjectives: 'files.randomWordsNumAdjectives',
-  filesRandomWordsSeperator: 'files.randomWordsSeperator',
+  filesRandomWordsSeparator: 'files.randomWordsSeparator',
 
   urlsRoute: 'urls.route',
   urlsLength: 'urls.length',
@@ -333,6 +537,113 @@ export function readEnv() {
 
     env('ssl.key', 'string'),
     env('ssl.cert', 'string'),
+
+    env('core.returnHttpsUrls', 'boolean'),
+    env('core.defaultDomain', 'string'),
+    env('core.tempDirectory', 'string'),
+    
+    env('chunks.max', 'string'),
+    env('chunks.size', 'string'),
+    env('chunks.enabled', 'boolean'),
+
+    env('tasks.deleteInterval', 'string'),
+    env('tasks.clearInvitesInterval', 'string'),
+    env('tasks.maxViewsInterval', 'string'),
+    env('tasks.thumbnailsInterval', 'string'),
+    env('tasks.metricsInterval', 'string'),
+
+    env('files.route', 'string'),
+    env('files.length', 'number'),
+    env('files.defaultFormat', 'string'),
+    env('files.disabledExtensions', 'string[]'),
+    env('files.maxFileSize', 'string'),
+    env('files.defaultExpiration', 'string'),
+    env('files.assumeMimetypes', 'boolean'),
+    env('files.defaultDateFormat', 'string'),
+    env('files.removeGpsMetadata', 'boolean'),
+    env('files.randomWordsNumAdjectives', 'number'),
+    env('files.randomWordsSeparator', 'string'),
+
+    env('urls.route', 'string'),
+    env('urls.length', 'number'),
+
+    env('features.imageCompression', 'boolean'),
+    env('features.robotsTxt', 'boolean'),
+    env('features.healthcheck', 'boolean'),
+    env('features.userRegistration', 'boolean'),
+    env('features.oauthRegistration', 'boolean'),
+    env('features.deleteOnMaxViews', 'boolean'),
+    env('features.thumbnails.enabled', 'boolean'),
+    env('features.thumbnails.num_threads', 'number'),
+    env('features.metrics.enabled', 'boolean'),
+    env('features.metrics.adminOnly', 'boolean'),
+    env('features.metrics.showUserSpecific', 'boolean'),
+    
+    env('invites.enabled', 'boolean'),
+    env('invites.length', 'number'),
+
+    env('website.title', 'string'),
+    env('website.titleLogo', 'string'),
+    env('website.externalLinks', 'json[]'),
+    env('website.loginBackground', 'string'),
+    env('website.loginBackgroundBlur', 'boolean'),
+    env('website.defaultAvatar', 'string'),
+    env('website.tos', 'string'),
+    env('website.theme.default', 'string'),
+    env('website.theme.dark', 'string'),
+    env('website.theme.light', 'string'),
+
+    env('oauth.bypassLocalLogin', 'boolean'),
+    env('oauth.loginOnly', 'boolean'),
+    env('oauth.discord.clientId', 'string'),
+    env('oauth.discord.clientSecret', 'string'),
+    env('oauth.discord.redirectUri', 'string'),
+    env('oauth.google.clientId', 'string'),
+    env('oauth.google.clientSecret', 'string'),
+    env('oauth.google.redirectUri', 'string'),
+    env('oauth.github.clientId', 'string'),
+    env('oauth.github.clientSecret', 'string'),
+    env('oauth.github.redirectUri', 'string'),
+    env('oauth.oidc.clientId', 'string'),
+    env('oauth.oidc.clientSecret', 'string'),
+    env('oauth.oidc.authorizeUrl', 'string'),
+    env('oauth.oidc.userinfoUrl', 'string'),
+    env('oauth.oidc.tokenUrl', 'string'),
+    env('oauth.oidc.redirectUri', 'string'),
+
+    env('mfa.totp.enabled', 'boolean'),
+    env('mfa.totp.issuer', 'string'),
+    env('mfa.passkeys', 'boolean'),
+
+    env('ratelimit.enabled', 'boolean'),
+    env('ratelimit.max', 'number'),
+    env('ratelimit.window', 'number'),
+    env('ratelimit.adminBypass', 'boolean'),
+    env('ratelimit.allowList', 'string[]'),
+
+    env('httpWebhook.onUpload', 'string'),
+    env('httpWebhook.onShorten', 'string'),
+
+    env('discord.webhookUrl', 'string'),
+    env('discord.username', 'string'),
+    env('discord.avatarUrl', 'string'),
+    env('discord.onUpload.webhookUrl', 'string'),
+    env('discord.onUpload.username', 'string'),
+    env('discord.onUpload.avatarUrl', 'string'),
+    env('discord.onUpload.content', 'string'),
+    env('discord.onUpload.embed', 'json[]'),
+    env('discord.onShorten.webhookUrl', 'string'),
+    env('discord.onShorten.username', 'string'),
+    env('discord.onShorten.avatarUrl', 'string'),
+    env('discord.onShorten.content', 'string'),
+    env('discord.onShorten.embed', 'json[]'),
+
+    env('pwa.enabled', 'boolean'),
+    env('pwa.title', 'string'),
+    env('pwa.shortName', 'string'),
+    env('pwa.description', 'string'),
+    env('pwa.themeColor', 'string'),
+    env('pwa.backgroundColor', 'string'),
   ];
 
   const raw: Record<keyof typeof rawConfig, any> = {};
@@ -397,6 +708,33 @@ export async function read() {
   return raw;
 }
 
+export function replaceDatabaseValueWithEnv<T>(Key: keyof typeof DATABASE_TO_PROP, databaseValue: T, typeString: EnvType): T {
+  const envKeys = databaseToEnv(Key);
+
+  for (let i = 0; i !== envKeys.length; ++i) {
+    const value = process.env[envKeys[i]];
+    if (value === undefined) continue;
+
+    const parsed = parse(value, typeString);
+    if (parsed === undefined) continue;
+
+    return parsed
+  }
+
+  return databaseValue;
+}
+
+export function valueIsFromEnv(Key: keyof typeof DATABASE_TO_PROP): boolean {
+  return databaseToEnv(Key).some((key) => process.env[key] !== undefined);
+}
+
+export function databaseToEnv(key: keyof typeof DATABASE_TO_PROP): string[] {
+  const prop = PROP_TO_ENV[DATABASE_TO_PROP[key] as keyof typeof PROP_TO_ENV];
+  if (!prop) return [];
+  if (typeof prop === 'string') return [prop];
+  return prop;
+}
+
 function isObject(value: any) {
   return typeof value === 'object' && value !== null;
 }
@@ -451,7 +789,7 @@ function parse(value: string, type: EnvType) {
       try {
         return JSON.parse(value);
       } catch {
-        logger.error('Failed to parse JSON array', { value });
+        logger.error('Failed to parse JSON array', { value },);
         return undefined;
       }
     default:

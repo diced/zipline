@@ -85,13 +85,14 @@ export default function ServerSettingsRatelimit({
           <Switch
             label='Enable Ratelimit'
             description='Enable ratelimiting for the server.'
+            disabled={data?.locked['ratelimitEnabled']}
             {...form.getInputProps('ratelimitEnabled', { type: 'checkbox' })}
           />
 
           <Switch
             label='Admin Bypass'
             description='Allow admins to bypass the ratelimit.'
-            disabled={!form.values.ratelimitEnabled}
+            disabled={!form.values.ratelimitEnabled || data?.locked['ratelimitAdminBypass']}
             {...form.getInputProps('ratelimitAdminBypass', { type: 'checkbox' })}
           />
 
@@ -100,7 +101,7 @@ export default function ServerSettingsRatelimit({
             description='The maximum number of requests allowed within the window. If no window is set, this is the maximum number of requests until it reaches the limit.'
             placeholder='10'
             min={1}
-            disabled={!form.values.ratelimitEnabled}
+            disabled={!form.values.ratelimitEnabled || data?.locked['ratelimitMax']}
             {...form.getInputProps('ratelimitMax')}
           />
 
@@ -109,7 +110,7 @@ export default function ServerSettingsRatelimit({
             description='The window in seconds to allow the max requests.'
             placeholder='60'
             min={1}
-            disabled={!form.values.ratelimitEnabled}
+            disabled={!form.values.ratelimitEnabled || data?.locked['ratelimitWindow']}
             {...form.getInputProps('ratelimitWindow')}
           />
 
@@ -117,12 +118,18 @@ export default function ServerSettingsRatelimit({
             label='Allow List'
             description='A comma-separated list of IP addresses to bypass the ratelimit.'
             placeholder='1.1.1.1, 8.8.8.8'
-            disabled={!form.values.ratelimitEnabled}
+            disabled={!form.values.ratelimitEnabled || data?.locked['ratelimitAllowList']}
             {...form.getInputProps('ratelimitAllowList')}
           />
         </SimpleGrid>
 
-        <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
+        <Button type='submit' mt='md' loading={isLoading} disabled={
+          data?.locked['ratelimitEnabled'] && 
+          data?.locked['ratelimitMax'] &&
+          data?.locked['ratelimitWindow'] &&
+          data?.locked['ratelimitAdminBypass'] &&
+          data?.locked['ratelimitAllowList']
+        } leftSection={<IconDeviceFloppy size='1rem' />}>
           Save
         </Button>
       </form>

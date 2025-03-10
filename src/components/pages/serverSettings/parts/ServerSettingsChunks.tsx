@@ -43,6 +43,7 @@ export default function ServerSettingsChunks({
           mt='md'
           label='Enable Chunks'
           description='Enable chunked uploads.'
+          disabled={data?.locked['chunksEnabled'] ? true : false}
           {...form.getInputProps('chunksEnabled', { type: 'checkbox' })}
         />
 
@@ -51,7 +52,7 @@ export default function ServerSettingsChunks({
             label='Max Chunk Size'
             description='Maximum size of an upload before it is split into chunks.'
             placeholder='95mb'
-            disabled={!form.values.chunksEnabled}
+            disabled={!form.values.chunksEnabled || data?.locked['chunksMax']}
             {...form.getInputProps('chunksMax')}
           />
 
@@ -59,12 +60,16 @@ export default function ServerSettingsChunks({
             label='Chunk Size'
             description='Size of each chunk.'
             placeholder='25mb'
-            disabled={!form.values.chunksEnabled}
+            disabled={!form.values.chunksEnabled || data?.locked['chunksSize']}
             {...form.getInputProps('chunksSize')}
           />
         </SimpleGrid>
 
-        <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
+        <Button type='submit' mt='md' loading={isLoading} disabled={
+          data?.locked['chunksEnabled'] &&
+          data?.locked['chunksMax'] &&
+          data?.locked['chunksSize']
+        } leftSection={<IconDeviceFloppy size='1rem' />}>
           Save
         </Button>
       </form>

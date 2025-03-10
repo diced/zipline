@@ -42,6 +42,7 @@ export default function ServerSettingsUrls({
             label='Route'
             description='The route to use for short URLs. Requires a server restart.'
             placeholder='/go'
+            disabled={data?.locked['urlsRoute']}
             {...form.getInputProps('urlsRoute')}
           />
 
@@ -51,11 +52,15 @@ export default function ServerSettingsUrls({
             placeholder='6'
             min={1}
             max={64}
+            disabled={data?.locked['urlsLength']}
             {...form.getInputProps('urlsLength')}
           />
         </SimpleGrid>
 
-        <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
+        <Button type='submit' mt='md' loading={isLoading} disabled={
+          data?.locked['urlsRoute'] &&
+          data?.locked['urlsLength']
+        } leftSection={<IconDeviceFloppy size='1rem' />}>
           Save
         </Button>
       </form>

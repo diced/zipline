@@ -43,23 +43,28 @@ export default function ServerSettingsMfa({
           <Switch
             label='Passkeys'
             description='Enable the use of passwordless login with the use of WebAuthn passkeys like your phone, security keys, etc.'
+            disabled={data?.locked['mfaPasskeys']}
             {...form.getInputProps('mfaPasskeys', { type: 'checkbox' })}
           />
 
           <Switch
             label='Enable TOTP'
             description='Enable Time-based One-Time Passwords with the use of an authenticator app.'
+            disabled={data?.locked['mfaTotpEnabled']}
             {...form.getInputProps('mfaTotpEnabled', { type: 'checkbox' })}
           />
           <TextInput
             label='Issuer'
             description='The issuer to use for the TOTP token.'
             placeholder='Zipline'
+            disabled={data?.locked['mfaTotpIssuer']}
             {...form.getInputProps('mfaTotpIssuer')}
           />
         </SimpleGrid>
 
-        <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
+        <Button type='submit' mt='md' loading={isLoading} disabled={
+          data?.locked['mfaTotpEnabled'] && data?.locked['mfaTotpIssuer'] && data?.locked['mfaPasskeys']
+        } leftSection={<IconDeviceFloppy size='1rem' />}>
           Save
         </Button>
       </form>

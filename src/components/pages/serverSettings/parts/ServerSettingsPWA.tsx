@@ -78,6 +78,7 @@ export default function ServerSettingsPWA({
           mt='md'
           label='PWA Enabled'
           description='Allow users to install the Zipline PWA on their devices.'
+          disabled={data?.locked['pwaEnabled']}
           {...form.getInputProps('pwaEnabled', { type: 'checkbox' })}
         />
 
@@ -86,7 +87,7 @@ export default function ServerSettingsPWA({
             label='Title'
             description='The title for the PWA'
             placeholder='Zipline'
-            disabled={!form.values.pwaEnabled}
+            disabled={!form.values.pwaEnabled || data?.locked['pwaTitle']}
             {...form.getInputProps('pwaTitle')}
           />
 
@@ -94,7 +95,7 @@ export default function ServerSettingsPWA({
             label='Short Name'
             description='The short name for the PWA'
             placeholder='Zipline'
-            disabled={!form.values.pwaEnabled}
+            disabled={!form.values.pwaEnabled || data?.locked['pwaShortName']}
             {...form.getInputProps('pwaShortName')}
           />
 
@@ -102,7 +103,7 @@ export default function ServerSettingsPWA({
             label='Description'
             description='The description for the PWA'
             placeholder='Zipline'
-            disabled={!form.values.pwaEnabled}
+            disabled={!form.values.pwaEnabled || data?.locked['pwaDescription']}
             {...form.getInputProps('pwaDescription')}
           />
 
@@ -110,7 +111,7 @@ export default function ServerSettingsPWA({
             label='Theme Color'
             description='The theme color for the PWA'
             placeholder='#000000'
-            disabled={!form.values.pwaEnabled}
+            disabled={!form.values.pwaEnabled || data?.locked['pwaThemeColor']}
             {...form.getInputProps('pwaThemeColor')}
           />
 
@@ -118,13 +119,20 @@ export default function ServerSettingsPWA({
             label='Background Color'
             description='The background color for the PWA'
             placeholder='#ffffff'
-            disabled={!form.values.pwaEnabled}
+            disabled={!form.values.pwaEnabled || data?.locked['pwaBackgroundColor']}
             {...form.getInputProps('pwaBackgroundColor')}
           />
         </SimpleGrid>
 
         <Group mt='md'>
-          <Button type='submit' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
+          <Button type='submit' loading={isLoading} disabled={
+            data?.locked['pwaEnabled'] &&
+            data?.locked['pwaTitle'] &&
+            data?.locked['pwaShortName'] &&
+            data?.locked['pwaDescription'] &&
+            data?.locked['pwaThemeColor'] &&
+            data?.locked['pwaBackgroundColor']
+          } leftSection={<IconDeviceFloppy size='1rem' />}>
             Save
           </Button>
           <Button onClick={() => router.reload()} leftSection={<IconRefresh size='1rem' />}>

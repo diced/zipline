@@ -174,6 +174,7 @@ export default function ServerSettingsDiscord({
           label='Webhook URL'
           description='The Discord webhook URL to send notifications to'
           placeholder='https://discord.com/api/webhooks/...'
+          disabled={data?.locked['discordWebhookUrl']}
           {...formMain.getInputProps('discordWebhookUrl')}
         />
 
@@ -181,6 +182,7 @@ export default function ServerSettingsDiscord({
           <TextInput
             label='Username'
             description='The username to send notifications as'
+            disabled={data?.locked['discordUsername']}
             {...formMain.getInputProps('discordUsername')}
           />
 
@@ -188,11 +190,22 @@ export default function ServerSettingsDiscord({
             label='Avatar URL'
             description='The avatar for the webhook'
             placeholder='https://example.com/avatar.png'
+            disabled={data?.locked['discordAvatarUrl']}
             {...formMain.getInputProps('discordAvatarUrl')}
           />
         </SimpleGrid>
 
-        <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
+        <Button
+          type='submit'
+          mt='md'
+          loading={isLoading}
+          disabled={
+            data?.locked['discordWebhookUrl'] &&
+            data?.locked['discordUsername'] &&
+            data?.locked['discordAvatarUrl']
+          }
+          leftSection={<IconDeviceFloppy size='1rem' />}
+        >
           Save
         </Button>
       </form>
@@ -207,6 +220,7 @@ export default function ServerSettingsDiscord({
               label='Webhook URL'
               description='The Discord webhook URL to send notifications to. If this is left blank, the main webhook url will be used'
               placeholder='https://discord.com/api/webhooks/...'
+              disabled={data?.locked['discordOnUploadWebhookUrl']}
               {...formOnUpload.getInputProps('discordOnUploadWebhookUrl')}
             />
 
@@ -214,6 +228,7 @@ export default function ServerSettingsDiscord({
               <TextInput
                 label='Username'
                 description='The username to send notifications as. If this is left blank, the main username will be used'
+                disabled={data?.locked['discordOnUploadUsername']}
                 {...formOnUpload.getInputProps('discordOnUploadUsername')}
               />
 
@@ -221,6 +236,7 @@ export default function ServerSettingsDiscord({
                 label='Avatar URL'
                 description='The avatar for the webhook. If this is left blank, the main avatar will be used'
                 placeholder='https://example.com/avatar.png'
+                disabled={data?.locked['discordOnUploadAvatarUrl']}
                 {...formOnUpload.getInputProps('discordOnUploadAvatarUrl')}
               />
             </SimpleGrid>
@@ -231,6 +247,7 @@ export default function ServerSettingsDiscord({
               description='The content of the notification. This can be blank, but at least one of the content or embed fields must be filled out'
               minRows={1}
               maxRows={7}
+              disabled={data?.locked['discordOnUploadContent']}
               {...formOnUpload.getInputProps('discordOnUploadContent')}
             />
 
@@ -238,6 +255,7 @@ export default function ServerSettingsDiscord({
               mt='md'
               label='Embed'
               description='Send the notification as an embed. This will allow for more customization below.'
+              disabled={data?.locked['discordOnUploadEmbed']}
               {...formOnUpload.getInputProps('discordOnUploadEmbed', { type: 'checkbox' })}
             />
 
@@ -247,55 +265,71 @@ export default function ServerSettingsDiscord({
                   <TextInput
                     label='Title'
                     description='The title of the embed'
+                    disabled={data?.locked['discordOnUploadEmbed']}
                     {...formOnUpload.getInputProps('discordOnUploadEmbedTitle')}
                   />
 
                   <TextInput
                     label='Description'
                     description='The description of the embed'
+                    disabled={data?.locked['discordOnUploadEmbed']}
                     {...formOnUpload.getInputProps('discordOnUploadEmbedDescription')}
                   />
 
                   <TextInput
                     label='Footer'
                     description='The footer of the embed'
+                    disabled={data?.locked['discordOnUploadEmbed']}
                     {...formOnUpload.getInputProps('discordOnUploadEmbedFooter')}
                   />
 
                   <ColorInput
                     label='Color'
                     description='The color of the embed'
+                    disabled={data?.locked['discordOnUploadEmbed']}
                     {...formOnUpload.getInputProps('discordOnUploadEmbedColor')}
                   />
 
                   <Switch
                     label='Thumbnail'
                     description="Show the thumbnail (it will show the file if it's an image) in the embed"
+                    disabled={data?.locked['discordOnUploadEmbed']}
                     {...formOnUpload.getInputProps('discordOnUploadEmbedThumbnail', { type: 'checkbox' })}
                   />
 
                   <Switch
                     label='Image/Video'
                     description='Show the image or video in the embed'
+                    disabled={data?.locked['discordOnUploadEmbed']}
                     {...formOnUpload.getInputProps('discordOnUploadEmbedImageOrVideo', { type: 'checkbox' })}
                   />
 
                   <Switch
                     label='Timestamp'
                     description='Show the timestamp in the embed'
+                    disabled={data?.locked['discordOnUploadEmbed']}
                     {...formOnUpload.getInputProps('discordOnUploadEmbedTimestamp', { type: 'checkbox' })}
                   />
 
                   <Switch
                     label='URL'
                     description='Makes the title clickable and links to the URL of the file'
+                    disabled={data?.locked['discordOnUploadEmbed']}
                     {...formOnUpload.getInputProps('discordOnUploadEmbedUrl', { type: 'checkbox' })}
                   />
                 </SimpleGrid>
               </Paper>
             </Collapse>
 
-            <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
+            <Button
+              type='submit'
+              mt='md'
+              loading={isLoading}
+              disabled={
+                data?.locked['discordOnUploadEmbed']
+              }
+              leftSection={<IconDeviceFloppy size='1rem' />}
+            >
               Save
             </Button>
           </form>
@@ -310,6 +344,7 @@ export default function ServerSettingsDiscord({
               label='Webhook URL'
               description='The Discord webhook URL to send notifications to. If this is left blank, the main webhook url will be used'
               placeholder='https://discord.com/api/webhooks/...'
+              disabled={data?.locked['discordOnShortenWebhookUrl']}
               {...formOnShorten.getInputProps('discordOnShortenWebhookUrl')}
             />
 
@@ -317,6 +352,7 @@ export default function ServerSettingsDiscord({
               <TextInput
                 label='Username'
                 description='The username to send notifications as. If this is left blank, the main username will be used'
+                disabled={data?.locked['discordOnShortenUsername']}
                 {...formOnShorten.getInputProps('discordOnShortenUsername')}
               />
 
@@ -324,6 +360,7 @@ export default function ServerSettingsDiscord({
                 label='Avatar URL'
                 description='The avatar for the webhook. If this is left blank, the main avatar will be used'
                 placeholder='https://example.com/avatar.png'
+                disabled={data?.locked['discordOnShortenAvatarUrl']}
                 {...formOnShorten.getInputProps('discordOnShortenAvatarUrl')}
               />
             </SimpleGrid>
@@ -334,6 +371,7 @@ export default function ServerSettingsDiscord({
               description='The content of the notification. This can be blank, but at least one of the content or embed fields must be filled out'
               minRows={1}
               maxRows={7}
+              disabled={data?.locked['discordOnShortenContent']}
               {...formOnShorten.getInputProps('discordOnShortenContent')}
             />
 
@@ -341,6 +379,7 @@ export default function ServerSettingsDiscord({
               mt='md'
               label='Embed'
               description='Send the notification as an embed. This will allow for more customization below.'
+              disabled={data?.locked['discordOnShortenEmbed']}
               {...formOnShorten.getInputProps('discordOnShortenEmbed', { type: 'checkbox' })}
             />
 
@@ -350,43 +389,57 @@ export default function ServerSettingsDiscord({
                   <TextInput
                     label='Title'
                     description='The title of the embed'
+                    disabled={data?.locked['discordOnShortenEmbed']}
                     {...formOnShorten.getInputProps('discordOnShortenEmbedTitle')}
                   />
 
                   <TextInput
                     label='Description'
                     description='The description of the embed'
+                    disabled={data?.locked['discordOnShortenEmbed']}
                     {...formOnShorten.getInputProps('discordOnShortenEmbedDescription')}
                   />
 
                   <TextInput
                     label='Footer'
                     description='The footer of the embed'
+                    disabled={data?.locked['discordOnShortenEmbed']}
                     {...formOnShorten.getInputProps('discordOnShortenEmbedFooter')}
                   />
 
                   <ColorInput
                     label='Color'
                     description='The color of the embed'
+                    disabled={data?.locked['discordOnShortenEmbed']}
                     {...formOnShorten.getInputProps('discordOnShortenEmbedColor')}
                   />
 
                   <Switch
                     label='Timestamp'
                     description='Show the timestamp in the embed'
+                    disabled={data?.locked['discordOnShortenEmbed']}
                     {...formOnShorten.getInputProps('discordOnShortenEmbedTimestamp', { type: 'checkbox' })}
                   />
 
                   <Switch
                     label='URL'
                     description='Makes the title clickable and links to the URL of the file'
+                    disabled={data?.locked['discordOnShortenEmbed']}
                     {...formOnShorten.getInputProps('discordOnShortenEmbedUrl', { type: 'checkbox' })}
                   />
                 </SimpleGrid>
               </Paper>
             </Collapse>
 
-            <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
+            <Button
+              type='submit'
+              mt='md'
+              loading={isLoading}
+              disabled={
+                data?.locked['discordOnShortenEmbed']
+              }
+              leftSection={<IconDeviceFloppy size='1rem' />}
+            >
               Save
             </Button>
           </form>

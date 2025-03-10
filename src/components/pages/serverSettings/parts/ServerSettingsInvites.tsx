@@ -41,6 +41,7 @@ export default function ServerSettingsInvites({
           <Switch
             label='Enable Invites'
             description='Enable the use of invite links to register new users.'
+            disabled={data?.locked['invitesEnabled']}
             {...form.getInputProps('invitesEnabled', { type: 'checkbox' })}
           />
 
@@ -50,12 +51,14 @@ export default function ServerSettingsInvites({
             placeholder='6'
             min={1}
             max={64}
-            disabled={!form.values.invitesEnabled}
+            disabled={!form.values.invitesEnabled || data?.locked['invitesLength']}
             {...form.getInputProps('invitesLength')}
           />
         </SimpleGrid>
 
-        <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
+        <Button type='submit' mt='md' loading={isLoading} disabled={
+          data?.locked['invitesEnabled'] && data?.locked['invitesLength']
+        } leftSection={<IconDeviceFloppy size='1rem' />}>
           Save
         </Button>
       </form>

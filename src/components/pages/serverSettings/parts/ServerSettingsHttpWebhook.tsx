@@ -54,6 +54,7 @@ export default function ServerSettingsHttpWebhook({
             label='On Upload'
             description='The URL to send a POST request to when a file is uploaded.'
             placeholder='https://example.com/upload'
+            disabled={data?.locked['httpWebhookOnUpload']}
             {...form.getInputProps('httpWebhookOnUpload')}
           />
 
@@ -61,11 +62,14 @@ export default function ServerSettingsHttpWebhook({
             label='On Shorten'
             description='The URL to send a POST request to when a URL is shortened.'
             placeholder='https://example.com/shorten'
+            disabled={data?.locked['httpWebhookOnShorten']}
             {...form.getInputProps('httpWebhookOnShorten')}
           />
         </SimpleGrid>
 
-        <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
+        <Button type='submit' mt='md' loading={isLoading} disabled={
+          data?.locked['httpWebhookOnUpload'] && data?.locked['httpWebhookOnShorten']
+        } leftSection={<IconDeviceFloppy size='1rem' />}>
           Save
         </Button>
       </form>

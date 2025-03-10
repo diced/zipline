@@ -107,6 +107,7 @@ export default function ServerSettingsFiles({
             label='Route'
             description='The route to use for file uploads. Requires a server restart.'
             placeholder='/u'
+            disabled={data?.locked['filesRoute']}
             {...form.getInputProps('filesRoute')}
           />
 
@@ -115,18 +116,21 @@ export default function ServerSettingsFiles({
             description='The length of the file name (for randomly generated names).'
             min={1}
             max={64}
+            disabled={data?.locked['filesLength']}
             {...form.getInputProps('filesLength')}
           />
 
           <Switch
             label='Assume Mimetypes'
             description='Assume the mimetype of a file for its extension.'
+            disabled={data?.locked['filesAssumeMimetypes']}
             {...form.getInputProps('filesAssumeMimetypes', { type: 'checkbox' })}
           />
 
           <Switch
             label='Remove GPS Metadata'
             description='Remove GPS metadata from files.'
+            disabled={data?.locked['filesRemoveGpsMetadata']}
             {...form.getInputProps('filesRemoveGpsMetadata', { type: 'checkbox' })}
           />
 
@@ -135,6 +139,7 @@ export default function ServerSettingsFiles({
             description='The default format to use for file names.'
             placeholder='random'
             data={['random', 'date', 'uuid', 'name', 'gfycat']}
+            disabled={data?.locked['filesDefaultFormat']}
             {...form.getInputProps('filesDefaultFormat')}
           />
 
@@ -142,6 +147,7 @@ export default function ServerSettingsFiles({
             label='Disabled Extensions'
             description='Extensions to disable, separated by commas.'
             placeholder='exe, bat, sh'
+            disabled={data?.locked['filesDisabledExtensions']}
             {...form.getInputProps('filesDisabledExtensions')}
           />
 
@@ -149,6 +155,7 @@ export default function ServerSettingsFiles({
             label='Max File Size'
             description='The maximum file size allowed.'
             placeholder='100mb'
+            disabled={data?.locked['filesMaxFileSize']}
             {...form.getInputProps('filesMaxFileSize')}
           />
 
@@ -156,6 +163,7 @@ export default function ServerSettingsFiles({
             label='Default Expiration'
             description='The default expiration time for files.'
             placeholder='30d'
+            disabled={data?.locked['filesDefaultExpiration']}
             {...form.getInputProps('filesDefaultExpiration')}
           />
 
@@ -163,6 +171,7 @@ export default function ServerSettingsFiles({
             label='Default Date Format'
             description='The default date format to use.'
             placeholder='YYYY-MM-DD_HH:mm:ss'
+            disabled={data?.locked['filesDefaultDateFormat']}
             {...form.getInputProps('filesDefaultDateFormat')}
           />
 
@@ -171,6 +180,7 @@ export default function ServerSettingsFiles({
             description='The number of adjectives to use for the random-words/gfycat format.'
             min={1}
             max={10}
+            disabled={data?.locked['filesRandomWordsNumAdjectives']}
             {...form.getInputProps('filesRandomWordsNumAdjectives')}
           />
 
@@ -178,11 +188,24 @@ export default function ServerSettingsFiles({
             label='Random Words Separator'
             description='The separator to use for the random-words/gfycat format.'
             placeholder='-'
+            disabled={data?.locked['filesRandomWordsSeparator']}
             {...form.getInputProps('filesRandomWordsSeparator')}
           />
         </SimpleGrid>
 
-        <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
+        <Button type='submit' mt='md' loading={isLoading} disabled={
+          data?.locked['filesRoute'] &&
+          data?.locked['filesLength'] &&
+          data?.locked['filesDefaultFormat'] &&
+          data?.locked['filesDisabledExtensions'] &&
+          data?.locked['filesMaxFileSize'] &&
+          data?.locked['filesDefaultExpiration'] &&
+          data?.locked['filesAssumeMimetypes'] &&
+          data?.locked['filesDefaultDateFormat'] &&
+          data?.locked['filesRemoveGpsMetadata'] &&
+          data?.locked['filesRandomWordsNumAdjectives'] &&
+          data?.locked['filesRandomWordsSeparator']
+        } leftSection={<IconDeviceFloppy size='1rem' />}>
           Save
         </Button>
       </form>
