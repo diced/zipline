@@ -46,4 +46,3 @@ next-env.d.ts
 uploads*/
 *.crt
 *.key
-package-lock.json
