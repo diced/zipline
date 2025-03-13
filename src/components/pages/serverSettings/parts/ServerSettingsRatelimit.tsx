@@ -15,6 +15,7 @@ import { IconDeviceFloppy } from '@tabler/icons-react';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { settingsOnSubmit } from '../settingsOnSubmit';
+import { EnvTooltip } from '..';
 
 export default function ServerSettingsRatelimit({
   swr: { data, isLoading },
@@ -82,45 +83,54 @@ export default function ServerSettingsRatelimit({
 
       <form onSubmit={form.onSubmit(onSubmit)}>
         <SimpleGrid mt='md' cols={{ base: 1, md: 2 }} spacing='lg'>
-          <Switch
-            label='Enable Ratelimit'
-            description='Enable ratelimiting for the server.'
-            disabled={data?.locked['ratelimitEnabled']}
-            {...form.getInputProps('ratelimitEnabled', { type: 'checkbox' })}
-          />
+          <EnvTooltip envVar='RATELIMIT_ENABLED' data={data} varKey='ratelimitEnabled'>
+            <Switch
+              label='Enable Ratelimit'
+              description='Enable ratelimiting for the server.'
+              {...form.getInputProps('ratelimitEnabled', { type: 'checkbox' })}
+            />
+          </EnvTooltip>
 
-          <Switch
-            label='Admin Bypass'
-            description='Allow admins to bypass the ratelimit.'
-            disabled={!form.values.ratelimitEnabled || data?.locked['ratelimitAdminBypass']}
-            {...form.getInputProps('ratelimitAdminBypass', { type: 'checkbox' })}
-          />
+          <EnvTooltip envVar='RATELIMIT_ADMIN_BYPASS' data={data} varKey='ratelimitAdminBypass'>
+            <Switch
+              label='Admin Bypass'
+              description='Allow admins to bypass the ratelimit.'
+              disabled={!form.values.ratelimitEnabled}
+              {...form.getInputProps('ratelimitAdminBypass', { type: 'checkbox' })}
+            />
+          </EnvTooltip>
 
-          <NumberInput
-            label='Max Requests'
-            description='The maximum number of requests allowed within the window. If no window is set, this is the maximum number of requests until it reaches the limit.'
-            placeholder='10'
-            min={1}
-            disabled={!form.values.ratelimitEnabled || data?.locked['ratelimitMax']}
-            {...form.getInputProps('ratelimitMax')}
-          />
+          <EnvTooltip envVar='RATELIMIT_MAX' data={data} varKey='ratelimitMax'>
+            <NumberInput
+              label='Max Requests'
+              description='The maximum number of requests allowed within the window. If no window is set, this is the maximum number of requests until it reaches the limit.'
+              placeholder='10'
+              min={1}
+              disabled={!form.values.ratelimitEnabled}
+              {...form.getInputProps('ratelimitMax')}
+            />
+          </EnvTooltip>
 
-          <NumberInput
-            label='Window'
-            description='The window in seconds to allow the max requests.'
-            placeholder='60'
-            min={1}
-            disabled={!form.values.ratelimitEnabled || data?.locked['ratelimitWindow']}
-            {...form.getInputProps('ratelimitWindow')}
-          />
+          <EnvTooltip envVar='RATELIMIT_WINDOW' data={data} varKey='ratelimitWindow'>
+            <NumberInput
+              label='Window'
+              description='The window in seconds to allow the max requests.'
+              placeholder='60'
+              min={1}
+              disabled={!form.values.ratelimitEnabled}
+              {...form.getInputProps('ratelimitWindow')}
+            />
+          </EnvTooltip>
 
-          <TextInput
-            label='Allow List'
-            description='A comma-separated list of IP addresses to bypass the ratelimit.'
-            placeholder='1.1.1.1, 8.8.8.8'
-            disabled={!form.values.ratelimitEnabled || data?.locked['ratelimitAllowList']}
-            {...form.getInputProps('ratelimitAllowList')}
-          />
+          <EnvTooltip envVar='RATELIMIT_ALLOW_LIST' data={data} varKey='ratelimitAllowList'>
+            <TextInput
+              label='Allow List'
+              description='A comma-separated list of IP addresses to bypass the ratelimit.'
+              placeholder='1.1.1.1, 8.8.8.8'
+              disabled={!form.values.ratelimitEnabled}
+              {...form.getInputProps('ratelimitAllowList')}
+            />
+          </EnvTooltip>
         </SimpleGrid>
 
         <Button

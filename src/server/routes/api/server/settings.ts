@@ -1,6 +1,6 @@
 import { bytes } from '@/lib/bytes';
 import { reloadSettings } from '@/lib/config';
-import { DATABASE_TO_PROP, readDatabaseSettings, valueIsFromEnv } from '@/lib/config/read';
+import { DATABASE_TO_PROP, readDatabaseSettings, valueIsFromEnv as valueFromEnv } from '@/lib/config/read';
 import { prisma } from '@/lib/db';
 import { log } from '@/lib/logger';
 import { readThemes } from '@/lib/theme/file';
@@ -64,7 +64,7 @@ export default fastifyPlugin(
         preHandler: [userMiddleware, administratorMiddleware],
       },
       async (_, res) => {
-        const settings = await prisma.zipline.findFirst({
+        const settings = await prisma.zipline.getSettingsRaw({
           omit: {
             createdAt: true,
             updatedAt: true,
@@ -80,12 +80,11 @@ export default fastifyPlugin(
         };
 
         for (const key in DATABASE_TO_PROP) {
-          if (DATABASE_TO_PROP.hasOwnProperty(key)) {
-            if (valueIsFromEnv(key as keyof typeof DATABASE_TO_PROP)) {
-              // settingsResponse.locked[key] = "This value has been set by the " + databaseToEnv(key as keyof typeof DATABASE_TO_PROP) + " environment variable and cannot be changed here.";
-              settingsResponse.locked[key] = true;
-            }
+          const val = valueFromEnv(key as keyof typeof DATABASE_TO_PROP);
+          if (val === undefined) {
+            continue;
           }
+          settingsResponse.locked[key] = val;
         }
 
         return res.send(settingsResponse);
@@ -98,7 +97,7 @@ export default fastifyPlugin(
         preHandler: [userMiddleware, administratorMiddleware],
       },
       async (req, res) => {
-        const settings = await prisma.zipline.findFirst();
+        const settings = await prisma.zipline.getSettingsRaw();
         if (!settings) return res.notFound('no settings table found');
 
         const result: any = await parseSettings(req.body);
@@ -112,15 +111,6 @@ export default fastifyPlugin(
             statusCode: 400,
             issues: result.error.issues,
           });
-        }
-
-        // iterate through every database_to_prop object key
-        for (const key in DATABASE_TO_PROP) {
-          if (DATABASE_TO_PROP.hasOwnProperty(key)) {
-            if (valueIsFromEnv(key as keyof typeof DATABASE_TO_PROP)) {
-              result.data[key] = undefined;
-            }
-          }
         }
 
         const newSettings = await prisma.zipline.update({
@@ -146,7 +136,22 @@ export default fastifyPlugin(
           by: req.user.username,
         });
 
-        return res.send(newSettings);
+        const settingsResponse: ApiServerSettingsResponse = {
+          ...newSettings,
+          locked: {},
+        };
+
+        for (const key in DATABASE_TO_PROP) {
+          if (DATABASE_TO_PROP.hasOwnProperty(key)) {
+            const val = valueFromEnv(key as keyof typeof DATABASE_TO_PROP);
+            if (val === undefined) {
+              continue;
+            }
+            settingsResponse.locked[key] = val;
+          }
+        }
+
+        return res.send(settingsResponse);
       },
     );
 

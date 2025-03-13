@@ -5,6 +5,7 @@ import { IconDeviceFloppy } from '@tabler/icons-react';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { settingsOnSubmit } from '../settingsOnSubmit';
+import { EnvTooltip } from '..';
 
 export default function ServerSettingsChunks({
   swr: { data, isLoading },
@@ -39,39 +40,38 @@ export default function ServerSettingsChunks({
       <Title order={2}>Chunks</Title>
 
       <form onSubmit={form.onSubmit(onSubmit)}>
-        <Switch
-          mt='md'
-          label='Enable Chunks'
-          description='Enable chunked uploads.'
-          disabled={data?.locked['chunksEnabled'] ? true : false}
-          {...form.getInputProps('chunksEnabled', { type: 'checkbox' })}
-        />
+        <EnvTooltip envVar='CHUNKS_ENABLED' data={data} varKey='chunksEnabled'>
+          <Switch
+            mt='md'
+            label='Enable Chunks'
+            description='Enable chunked uploads.'
+            {...form.getInputProps('chunksEnabled', { type: 'checkbox' })}
+          />
+        </EnvTooltip>
 
         <SimpleGrid mt='md' cols={{ base: 1, md: 2 }} spacing='lg'>
-          <TextInput
-            label='Max Chunk Size'
-            description='Maximum size of an upload before it is split into chunks.'
-            placeholder='95mb'
-            disabled={!form.values.chunksEnabled || data?.locked['chunksMax']}
-            {...form.getInputProps('chunksMax')}
-          />
+          <EnvTooltip envVar='CHUNKS_MAX' data={data} varKey='chunksMax'>
+            <TextInput
+              label={'Max Chunk Size'}
+              description='Maximum size of an upload before it is split into chunks.'
+              placeholder='95mb'
+              disabled={!form.values.chunksEnabled}
+              {...form.getInputProps('chunksMax')}
+            />
+          </EnvTooltip>
 
-          <TextInput
-            label='Chunk Size'
-            description='Size of each chunk.'
-            placeholder='25mb'
-            disabled={!form.values.chunksEnabled || data?.locked['chunksSize']}
-            {...form.getInputProps('chunksSize')}
-          />
+          <EnvTooltip envVar='CHUNKS_SIZE' data={data} varKey='chunksSize'>
+            <TextInput
+              label='Chunk Size'
+              description='Size of each chunk.'
+              placeholder='25mb'
+              disabled={!form.values.chunksEnabled}
+              {...form.getInputProps('chunksSize')}
+            />
+          </EnvTooltip>
         </SimpleGrid>
 
-        <Button
-          type='submit'
-          mt='md'
-          loading={isLoading}
-          disabled={data?.locked['chunksEnabled'] && data?.locked['chunksMax'] && data?.locked['chunksSize']}
-          leftSection={<IconDeviceFloppy size='1rem' />}
-        >
+        <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
           Save
         </Button>
       </form>

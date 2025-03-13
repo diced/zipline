@@ -15,6 +15,7 @@ import { IconDeviceFloppy } from '@tabler/icons-react';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { settingsOnSubmit } from '../settingsOnSubmit';
+import { EnvTooltip } from '..';
 
 export default function ServerSettingsFiles({
   swr: { data, isLoading },
@@ -103,115 +104,112 @@ export default function ServerSettingsFiles({
 
       <form onSubmit={form.onSubmit(onSubmit)}>
         <SimpleGrid mt='md' cols={{ base: 1, md: 2 }} spacing='lg'>
-          <TextInput
-            label='Route'
-            description='The route to use for file uploads. Requires a server restart.'
-            placeholder='/u'
-            disabled={data?.locked['filesRoute']}
-            {...form.getInputProps('filesRoute')}
-          />
+          <EnvTooltip envVar='FILES_ROUTE' data={data} varKey='filesRoute'>
+            <TextInput
+              label='Route'
+              description='The route to use for file uploads. Requires a server restart.'
+              placeholder='/u'
+              {...form.getInputProps('filesRoute')}
+            />
+          </EnvTooltip>
 
-          <NumberInput
-            label='Length'
-            description='The length of the file name (for randomly generated names).'
-            min={1}
-            max={64}
-            disabled={data?.locked['filesLength']}
-            {...form.getInputProps('filesLength')}
-          />
+          <EnvTooltip envVar='FILES_LENGTH' data={data} varKey='filesLength'>
+            <NumberInput
+              label='Length'
+              description='The length of the file name (for randomly generated names).'
+              min={1}
+              max={64}
+              {...form.getInputProps('filesLength')}
+            />
+          </EnvTooltip>
 
-          <Switch
-            label='Assume Mimetypes'
-            description='Assume the mimetype of a file for its extension.'
-            disabled={data?.locked['filesAssumeMimetypes']}
-            {...form.getInputProps('filesAssumeMimetypes', { type: 'checkbox' })}
-          />
+          <EnvTooltip envVar='FILES_ASSUME_MIMETYPES' data={data} varKey='filesAssumeMimetypes'>
+            <Switch
+              label='Assume Mimetypes'
+              description='Assume the mimetype of a file for its extension.'
+              {...form.getInputProps('filesAssumeMimetypes', { type: 'checkbox' })}
+            />
+          </EnvTooltip>
 
-          <Switch
-            label='Remove GPS Metadata'
-            description='Remove GPS metadata from files.'
-            disabled={data?.locked['filesRemoveGpsMetadata']}
-            {...form.getInputProps('filesRemoveGpsMetadata', { type: 'checkbox' })}
-          />
+          <EnvTooltip envVar='FILES_REMOVE_GPS_METADATA' data={data} varKey='filesRemoveGpsMetadata'>
+            <Switch
+              label='Remove GPS Metadata'
+              description='Remove GPS metadata from files.'
+              {...form.getInputProps('filesRemoveGpsMetadata', { type: 'checkbox' })}
+            />
+          </EnvTooltip>
 
-          <Select
-            label='Default Format'
-            description='The default format to use for file names.'
-            placeholder='random'
-            data={['random', 'date', 'uuid', 'name', 'gfycat']}
-            disabled={data?.locked['filesDefaultFormat']}
-            {...form.getInputProps('filesDefaultFormat')}
-          />
+          <EnvTooltip envVar='FILES_DEFAULT_FORMAT' data={data} varKey='filesDefaultFormat'>
+            <Select
+              label='Default Format'
+              description='The default format to use for file names.'
+              placeholder='random'
+              data={['random', 'date', 'uuid', 'name', 'gfycat']}
+              {...form.getInputProps('filesDefaultFormat')}
+            />
+          </EnvTooltip>
 
-          <TextInput
-            label='Disabled Extensions'
-            description='Extensions to disable, separated by commas.'
-            placeholder='exe, bat, sh'
-            disabled={data?.locked['filesDisabledExtensions']}
-            {...form.getInputProps('filesDisabledExtensions')}
-          />
+          <EnvTooltip envVar='FILES_DISABLED_EXTENSIONS' data={data} varKey='filesDisabledExtensions'>
+            <TextInput
+              label='Disabled Extensions'
+              description='Extensions to disable, separated by commas.'
+              placeholder='exe, bat, sh'
+              {...form.getInputProps('filesDisabledExtensions')}
+            />
+          </EnvTooltip>
 
-          <TextInput
-            label='Max File Size'
-            description='The maximum file size allowed.'
-            placeholder='100mb'
-            disabled={data?.locked['filesMaxFileSize']}
-            {...form.getInputProps('filesMaxFileSize')}
-          />
+          <EnvTooltip envVar='FILES_MAX_FILE_SIZE' data={data} varKey='filesMaxFileSize'>
+            <TextInput
+              label='Max File Size'
+              description='The maximum file size allowed.'
+              placeholder='100mb'
+              {...form.getInputProps('filesMaxFileSize')}
+            />
+          </EnvTooltip>
 
-          <TextInput
-            label='Default Expiration'
-            description='The default expiration time for files.'
-            placeholder='30d'
-            disabled={data?.locked['filesDefaultExpiration']}
-            {...form.getInputProps('filesDefaultExpiration')}
-          />
+          <EnvTooltip envVar='FILES_DEFAULT_EXPIRATION' data={data} varKey='filesDefaultExpiration'>
+            <TextInput
+              label='Default Expiration'
+              description='The default expiration time for files.'
+              placeholder='30d'
+              {...form.getInputProps('filesDefaultExpiration')}
+            />
+          </EnvTooltip>
 
-          <TextInput
-            label='Default Date Format'
-            description='The default date format to use.'
-            placeholder='YYYY-MM-DD_HH:mm:ss'
-            disabled={data?.locked['filesDefaultDateFormat']}
-            {...form.getInputProps('filesDefaultDateFormat')}
-          />
+          <EnvTooltip envVar='FILES_DEFAULT_DATE_FORMAT' data={data} varKey='filesDefaultDateFormat'>
+            <TextInput
+              label='Default Date Format'
+              description='The default date format to use.'
+              placeholder='YYYY-MM-DD_HH:mm:ss'
+              {...form.getInputProps('filesDefaultDateFormat')}
+            />
+          </EnvTooltip>
 
-          <NumberInput
-            label='Random Words Num Adjectives'
-            description='The number of adjectives to use for the random-words/gfycat format.'
-            min={1}
-            max={10}
-            disabled={data?.locked['filesRandomWordsNumAdjectives']}
-            {...form.getInputProps('filesRandomWordsNumAdjectives')}
-          />
+          <EnvTooltip
+            envVar='FILES_RANDOM_WORDS_NUM_ADJECTIVES'
+            data={data}
+            varKey='filesRandomWordsNumAdjectives'
+          >
+            <NumberInput
+              label='Random Words Num Adjectives'
+              description='The number of adjectives to use for the random-words/gfycat format.'
+              min={1}
+              max={10}
+              {...form.getInputProps('filesRandomWordsNumAdjectives')}
+            />
+          </EnvTooltip>
 
-          <TextInput
-            label='Random Words Separator'
-            description='The separator to use for the random-words/gfycat format.'
-            placeholder='-'
-            disabled={data?.locked['filesRandomWordsSeparator']}
-            {...form.getInputProps('filesRandomWordsSeparator')}
-          />
+          <EnvTooltip envVar='FILES_RANDOM_WORDS_SEPARATOR' data={data} varKey='filesRandomWordsSeparator'>
+            <TextInput
+              label='Random Words Separator'
+              description='The separator to use for the random-words/gfycat format.'
+              placeholder='-'
+              {...form.getInputProps('filesRandomWordsSeparator')}
+            />
+          </EnvTooltip>
         </SimpleGrid>
 
-        <Button
-          type='submit'
-          mt='md'
-          loading={isLoading}
-          disabled={
-            data?.locked['filesRoute'] &&
-            data?.locked['filesLength'] &&
-            data?.locked['filesDefaultFormat'] &&
-            data?.locked['filesDisabledExtensions'] &&
-            data?.locked['filesMaxFileSize'] &&
-            data?.locked['filesDefaultExpiration'] &&
-            data?.locked['filesAssumeMimetypes'] &&
-            data?.locked['filesDefaultDateFormat'] &&
-            data?.locked['filesRemoveGpsMetadata'] &&
-            data?.locked['filesRandomWordsNumAdjectives'] &&
-            data?.locked['filesRandomWordsSeparator']
-          }
-          leftSection={<IconDeviceFloppy size='1rem' />}
-        >
+        <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
           Save
         </Button>
       </form>

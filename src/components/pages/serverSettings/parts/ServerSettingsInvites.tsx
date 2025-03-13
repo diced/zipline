@@ -5,6 +5,7 @@ import { IconDeviceFloppy } from '@tabler/icons-react';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { settingsOnSubmit } from '../settingsOnSubmit';
+import { EnvTooltip } from '..';
 
 export default function ServerSettingsInvites({
   swr: { data, isLoading },
@@ -38,31 +39,28 @@ export default function ServerSettingsInvites({
 
       <form onSubmit={form.onSubmit(onSubmit)}>
         <SimpleGrid mt='md' cols={{ base: 1, md: 2 }} spacing='lg'>
-          <Switch
-            label='Enable Invites'
-            description='Enable the use of invite links to register new users.'
-            disabled={data?.locked['invitesEnabled']}
-            {...form.getInputProps('invitesEnabled', { type: 'checkbox' })}
-          />
+          <EnvTooltip envVar='INVITES_ENABLED' data={data} varKey='invitesEnabled'>
+            <Switch
+              label='Enable Invites'
+              description='Enable the use of invite links to register new users.'
+              {...form.getInputProps('invitesEnabled', { type: 'checkbox' })}
+            />
+          </EnvTooltip>
 
-          <NumberInput
-            label='Length'
-            description='The length of the invite code.'
-            placeholder='6'
-            min={1}
-            max={64}
-            disabled={!form.values.invitesEnabled || data?.locked['invitesLength']}
-            {...form.getInputProps('invitesLength')}
-          />
+          <EnvTooltip envVar='INVITES_LENGTH' data={data} varKey='invitesLength'>
+            <NumberInput
+              label='Length'
+              description='The length of the invite code.'
+              placeholder='6'
+              min={1}
+              max={64}
+              disabled={!form.values.invitesEnabled}
+              {...form.getInputProps('invitesLength')}
+            />
+          </EnvTooltip>
         </SimpleGrid>
 
-        <Button
-          type='submit'
-          mt='md'
-          loading={isLoading}
-          disabled={data?.locked['invitesEnabled'] && data?.locked['invitesLength']}
-          leftSection={<IconDeviceFloppy size='1rem' />}
-        >
+        <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
           Save
         </Button>
       </form>

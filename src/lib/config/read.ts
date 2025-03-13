@@ -631,8 +631,15 @@ export function replaceDatabaseValueWithEnv<T>(
   return databaseValue;
 }
 
-export function valueIsFromEnv(Key: keyof typeof DATABASE_TO_PROP): boolean {
-  return databaseToEnv(Key).some((key) => process.env[key] !== undefined);
+export function valueIsFromEnv(Key: keyof typeof DATABASE_TO_PROP): string | undefined {
+  const envKeys = databaseToEnv(Key);
+
+  for (let i = 0; i !== envKeys.length; ++i) {
+    const value = process.env[envKeys[i]];
+    if (value !== undefined) return value;
+  }
+
+  return undefined;
 }
 
 export function databaseToEnv(key: keyof typeof DATABASE_TO_PROP): string[] {

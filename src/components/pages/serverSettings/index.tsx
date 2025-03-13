@@ -1,5 +1,5 @@
 import { Response } from '@/lib/api/response';
-import { Group, SimpleGrid, Skeleton, Stack, Title } from '@mantine/core';
+import { Group, SimpleGrid, Skeleton, Stack, Title, Tooltip } from '@mantine/core';
 import useSWR from 'swr';
 import dynamic from 'next/dynamic';
 
@@ -92,4 +92,43 @@ export default function DashboardSettings() {
       </Stack>
     </>
   );
+}
+
+export function EnvTooltip(
+  props: React.PropsWithChildren<{
+    envVar: string;
+    data: any;
+    varKey: string;
+  }>,
+) {
+  const state = checkPropSafe(props);
+  const enabled = state !== false;
+
+  return (
+    <Tooltip
+      label={
+        enabled
+          ? `WARNING: The ${props.envVar} environment variable takes priority over this value. Currently "${state}"`
+          : ''
+      }
+      color='red'
+      events={{
+        hover: enabled,
+        focus: false,
+        touch: false,
+      }}
+    >
+      <div>{props.children}</div>
+    </Tooltip>
+  );
+}
+
+function checkPropSafe(props: any): boolean | string {
+  const data = props.data;
+  if (data === undefined) return false;
+  const locked = data.locked;
+  if (locked === undefined) return false;
+  const val = locked[props.varKey];
+  if (val === undefined) return false;
+  return val;
 }

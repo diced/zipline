@@ -5,6 +5,7 @@ import { IconDeviceFloppy } from '@tabler/icons-react';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { settingsOnSubmit } from '../settingsOnSubmit';
+import { EnvTooltip } from '..';
 
 const defaultExternalLinks = [
   {
@@ -97,127 +98,126 @@ export default function ServerSettingsWebsite({
         {/* <SimpleGrid mt='md' cols={{ base: 1, md: 2 }} spacing='lg'> */}
         <Grid>
           <Grid.Col span={{ base: 12, md: 6 }}>
-            <TextInput
-              label='Title'
-              description='The title of the website in browser tabs and at the top.'
-              placeholder='Zipline'
-              disabled={data?.locked['websiteTitle']}
-              {...form.getInputProps('websiteTitle')}
-            />
+            <EnvTooltip envVar='WEBSITE_TITLE' data={data} varKey='websiteTitle'>
+              <TextInput
+                label='Title'
+                description='The title of the website in browser tabs and at the top.'
+                placeholder='Zipline'
+                {...form.getInputProps('websiteTitle')}
+              />
+            </EnvTooltip>
           </Grid.Col>
 
           <Grid.Col span={{ base: 12, md: 6 }}>
-            <TextInput
-              label='Title Logo'
-              description='The URL to use for the title logo. This is placed to the left of the title.'
-              placeholder='https://example.com/logo.png'
-              disabled={data?.locked['websiteTitleLogo']}
-              {...form.getInputProps('websiteTitleLogo')}
-            />
+            <EnvTooltip envVar='WEBSITE_TITLE_LOGO' data={data} varKey='websiteTitleLogo'>
+              <TextInput
+                label='Title Logo'
+                description='The URL to use for the title logo. This is placed to the left of the title.'
+                placeholder='https://example.com/logo.png'
+                {...form.getInputProps('websiteTitleLogo')}
+              />
+            </EnvTooltip>
           </Grid.Col>
 
           <Grid.Col span={12}>
-            <JsonInput
-              label='External Links'
-              description='The external links to show in the footer. This must be valid JSON.'
-              formatOnBlur
-              minRows={1}
-              maxRows={7}
-              autosize
-              placeholder={JSON.stringify(defaultExternalLinks, null, 2)}
-              disabled={data?.locked['websiteExternalLinks']}
-              {...form.getInputProps('websiteExternalLinks')}
-            />
+            <EnvTooltip envVar='WEBSITE_EXTERNAL_LINKS' data={data} varKey='websiteExternalLinks'>
+              <JsonInput
+                label='External Links'
+                description='The external links to show in the footer. This must be valid JSON.'
+                formatOnBlur
+                minRows={1}
+                maxRows={7}
+                autosize
+                placeholder={JSON.stringify(defaultExternalLinks, null, 2)}
+                {...form.getInputProps('websiteExternalLinks')}
+              />
+            </EnvTooltip>
           </Grid.Col>
 
           <Grid.Col span={{ base: 12, md: 6 }}>
-            <TextInput
-              label='Login Background'
-              description='The URL to use for the login background.'
-              placeholder='https://example.com/background.png'
-              disabled={data?.locked['websiteLoginBackground']}
-              {...form.getInputProps('websiteLoginBackground')}
-            />
+            <EnvTooltip envVar='WEBSITE_LOGIN_BACKGROUND' data={data} varKey='websiteLoginBackground'>
+              <TextInput
+                label='Login Background'
+                description='The URL to use for the login background.'
+                placeholder='https://example.com/background.png'
+                {...form.getInputProps('websiteLoginBackground')}
+              />
+            </EnvTooltip>
           </Grid.Col>
 
           <Grid.Col span={{ base: 12, md: 6 }}>
-            <Switch
-              label='Login Background Blur'
-              description='Whether to blur the login background.'
-              disabled={data?.locked['websiteLoginBackgroundBlur']}
-              {...form.getInputProps('websiteLoginBackgroundBlur', { type: 'checkbox' })}
-            />
+            <EnvTooltip
+              envVar='WEBSITE_LOGIN_BACKGROUND_BLUR'
+              data={data}
+              varKey='websiteLoginBackgroundBlur'
+            >
+              <Switch
+                label='Login Background Blur'
+                description='Whether to blur the login background.'
+                {...form.getInputProps('websiteLoginBackgroundBlur', { type: 'checkbox' })}
+              />
+            </EnvTooltip>
           </Grid.Col>
 
           <Grid.Col span={{ base: 12, md: 6 }}>
-            <TextInput
-              label='Default Avatar'
-              description='The path to use for the default avatar. This must be a path to an image, not a URL.'
-              placeholder='/zipline/avatar.png'
-              disabled={data?.locked['websiteDefaultAvatar']}
-              {...form.getInputProps('websiteDefaultAvatar')}
-            />
+            <EnvTooltip envVar='WEBSITE_DEFAULT_AVATAR' data={data} varKey='websiteDefaultAvatar'>
+              <TextInput
+                label='Default Avatar'
+                description='The path to use for the default avatar. This must be a path to an image, not a URL.'
+                placeholder='/zipline/avatar.png'
+                {...form.getInputProps('websiteDefaultAvatar')}
+              />
+            </EnvTooltip>
           </Grid.Col>
 
           <Grid.Col span={{ base: 12, md: 6 }}>
-            <TextInput
-              label='Terms of Service'
-              description='Path to a Markdown (.md) file to use for the terms of service.'
-              placeholder='/zipline/TOS.md'
-              disabled={data?.locked['websiteTos']}
-              {...form.getInputProps('websiteTos')}
-            />
+            <EnvTooltip envVar='WEBSITE_TOS' data={data} varKey='websiteTos'>
+              <TextInput
+                label='Terms of Service'
+                description='Path to a Markdown (.md) file to use for the terms of service.'
+                placeholder='/zipline/TOS.md'
+                {...form.getInputProps('websiteTos')}
+              />
+            </EnvTooltip>
           </Grid.Col>
 
           <Grid.Col span={12}>
-            <TextInput
-              label='Default Theme'
-              description='The default theme to use for the website.'
-              placeholder='system'
-              disabled={data?.locked['websiteThemeDefault']}
-              {...form.getInputProps('websiteThemeDefault')}
-            />
+            <EnvTooltip envVar='WEBSITE_THEME_DEFAULT' data={data} varKey='websiteThemeDefault'>
+              <TextInput
+                label='Default Theme'
+                description='The default theme to use for the website.'
+                placeholder='system'
+                {...form.getInputProps('websiteThemeDefault')}
+              />
+            </EnvTooltip>
           </Grid.Col>
 
           <Grid.Col span={{ base: 12, md: 6 }}>
-            <TextInput
-              label='Dark Theme'
-              description='The dark theme to use for the website when the default theme is "system".'
-              placeholder='builtin:dark_gray'
-              disabled={form.values.websiteThemeDefault !== 'system' || data?.locked['websiteThemeDark']}
-              {...form.getInputProps('websiteThemeDark')}
-            />
+            <EnvTooltip envVar='WEBSITE_THEME_DARK' data={data} varKey='websiteThemeDark'>
+              <TextInput
+                label='Dark Theme'
+                description='The dark theme to use for the website when the default theme is "system".'
+                placeholder='builtin:dark_gray'
+                disabled={form.values.websiteThemeDefault !== 'system'}
+                {...form.getInputProps('websiteThemeDark')}
+              />
+            </EnvTooltip>
           </Grid.Col>
 
           <Grid.Col span={{ base: 12, md: 6 }}>
-            <TextInput
-              label='Light Theme'
-              description='The light theme to use for the website when the default theme is "system".'
-              placeholder='builtin:light_gray'
-              disabled={form.values.websiteThemeDefault !== 'system' || data?.locked['websiteThemeLight']}
-              {...form.getInputProps('websiteThemeLight')}
-            />
+            <EnvTooltip envVar='WEBSITE_THEME_LIGHT' data={data} varKey='websiteThemeLight'>
+              <TextInput
+                label='Light Theme'
+                description='The light theme to use for the website when the default theme is "system".'
+                placeholder='builtin:light_gray'
+                disabled={form.values.websiteThemeDefault !== 'system'}
+                {...form.getInputProps('websiteThemeLight')}
+              />
+            </EnvTooltip>
           </Grid.Col>
         </Grid>
 
-        <Button
-          type='submit'
-          mt='md'
-          loading={isLoading}
-          disabled={
-            data?.locked['websiteTitle'] &&
-            data?.locked['websiteTitleLogo'] &&
-            data?.locked['websiteExternalLinks'] &&
-            data?.locked['websiteLoginBackground'] &&
-            data?.locked['websiteLoginBackgroundBlur'] &&
-            data?.locked['websiteDefaultAvatar'] &&
-            data?.locked['websiteTos'] &&
-            data?.locked['websiteThemeDefault'] &&
-            data?.locked['websiteThemeDark'] &&
-            data?.locked['websiteThemeLight']
-          }
-          leftSection={<IconDeviceFloppy size='1rem' />}
-        >
+        <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
           Save
         </Button>
       </form>

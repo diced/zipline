@@ -5,6 +5,7 @@ import { IconDeviceFloppy } from '@tabler/icons-react';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { settingsOnSubmit } from '../settingsOnSubmit';
+import { EnvTooltip } from '..';
 
 export default function ServerSettingsHttpWebhook({
   swr: { data, isLoading },
@@ -50,30 +51,26 @@ export default function ServerSettingsHttpWebhook({
 
       <form onSubmit={form.onSubmit(onSubmit)}>
         <SimpleGrid mt='md' cols={{ base: 1, md: 2 }} spacing='lg'>
-          <TextInput
-            label='On Upload'
-            description='The URL to send a POST request to when a file is uploaded.'
-            placeholder='https://example.com/upload'
-            disabled={data?.locked['httpWebhookOnUpload']}
-            {...form.getInputProps('httpWebhookOnUpload')}
-          />
+          <EnvTooltip envVar='HTTP_WEBHOOK_ON_UPLOAD' data={data} varKey='httpWebhookOnUpload'>
+            <TextInput
+              label='On Upload'
+              description='The URL to send a POST request to when a file is uploaded.'
+              placeholder='https://example.com/upload'
+              {...form.getInputProps('httpWebhookOnUpload')}
+            />
+          </EnvTooltip>
 
-          <TextInput
-            label='On Shorten'
-            description='The URL to send a POST request to when a URL is shortened.'
-            placeholder='https://example.com/shorten'
-            disabled={data?.locked['httpWebhookOnShorten']}
-            {...form.getInputProps('httpWebhookOnShorten')}
-          />
+          <EnvTooltip envVar='HTTP_WEBHOOK_ON_SHORTEN' data={data} varKey='httpWebhookOnShorten'>
+            <TextInput
+              label='On Shorten'
+              description='The URL to send a POST request to when a URL is shortened.'
+              placeholder='https://example.com/shorten'
+              {...form.getInputProps('httpWebhookOnShorten')}
+            />
+          </EnvTooltip>
         </SimpleGrid>
 
-        <Button
-          type='submit'
-          mt='md'
-          loading={isLoading}
-          disabled={data?.locked['httpWebhookOnUpload'] && data?.locked['httpWebhookOnShorten']}
-          leftSection={<IconDeviceFloppy size='1rem' />}
-        >
+        <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
           Save
         </Button>
       </form>

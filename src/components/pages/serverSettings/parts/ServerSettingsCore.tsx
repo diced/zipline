@@ -5,6 +5,7 @@ import { IconDeviceFloppy } from '@tabler/icons-react';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { settingsOnSubmit } from '../settingsOnSubmit';
+import { EnvTooltip } from '..';
 
 export default function ServerSettingsCore({
   swr: { data, isLoading },
@@ -49,43 +50,36 @@ export default function ServerSettingsCore({
       <Title order={2}>Core</Title>
 
       <form onSubmit={form.onSubmit(onSubmit)}>
-        <Switch
-          mt='md'
-          label='Return HTTPS URLs'
-          description='Return URLs with HTTPS protocol.'
-          disabled={data?.locked['coreReturnHttpsUrls'] ? true : false}
-          {...form.getInputProps('coreReturnHttpsUrls', { type: 'checkbox' })}
-        />
+        <EnvTooltip envVar='CORE_RETURN_HTTPS_URLS' data={data} varKey='coreReturnHttpsUrls'>
+          <Switch
+            mt='md'
+            label='Return HTTPS URLs'
+            description='Return URLs with HTTPS protocol.'
+            {...form.getInputProps('coreReturnHttpsUrls', { type: 'checkbox' })}
+          />
+        </EnvTooltip>
 
         <SimpleGrid mt='md' cols={{ base: 1, md: 2 }} spacing='lg'>
-          <TextInput
-            label='Default Domain'
-            description='The domain to use when generating URLs. This value should not include the protocol.'
-            placeholder='example.com'
-            disabled={data?.locked['coreDefaultDomain']}
-            {...form.getInputProps('coreDefaultDomain')}
-          />
+          <EnvTooltip envVar='CORE_DEFAULT_DOMAIN' data={data} varKey='coreDefaultDomain'>
+            <TextInput
+              label='Default Domain'
+              description='The domain to use when generating URLs. This value should not include the protocol.'
+              placeholder='example.com'
+              {...form.getInputProps('coreDefaultDomain')}
+            />
+          </EnvTooltip>
 
-          <TextInput
-            label='Temporary Directory'
-            description='The directory to store temporary files. If the path is invalid, certain functions may break. Requires a server restart.'
-            placeholder='/tmp/zipline'
-            disabled={data?.locked['coreTempDirectory']}
-            {...form.getInputProps('coreTempDirectory')}
-          />
+          <EnvTooltip envVar='CORE_TEMP_DIRECTORY' data={data} varKey='coreTempDirectory'>
+            <TextInput
+              label='Temporary Directory'
+              description='The directory to store temporary files. If the path is invalid, certain functions may break. Requires a server restart.'
+              placeholder='/tmp/zipline'
+              {...form.getInputProps('coreTempDirectory')}
+            />
+          </EnvTooltip>
         </SimpleGrid>
 
-        <Button
-          type='submit'
-          mt='md'
-          loading={isLoading}
-          disabled={
-            data?.locked['coreReturnHttpsUrls'] &&
-            data?.locked['coreDefaultDomain'] &&
-            data?.locked['coreTempDirectory']
-          }
-          leftSection={<IconDeviceFloppy size='1rem' />}
-        >
+        <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
           Save
         </Button>
       </form>

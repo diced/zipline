@@ -5,6 +5,7 @@ import { IconDeviceFloppy } from '@tabler/icons-react';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { settingsOnSubmit } from '../settingsOnSubmit';
+import { EnvTooltip } from '..';
 
 export default function ServerSettingsMfa({
   swr: { data, isLoading },
@@ -40,37 +41,33 @@ export default function ServerSettingsMfa({
 
       <form onSubmit={form.onSubmit(onSubmit)}>
         <SimpleGrid mt='md' cols={{ base: 1, md: 2 }} spacing='lg'>
-          <Switch
-            label='Passkeys'
-            description='Enable the use of passwordless login with the use of WebAuthn passkeys like your phone, security keys, etc.'
-            disabled={data?.locked['mfaPasskeys']}
-            {...form.getInputProps('mfaPasskeys', { type: 'checkbox' })}
-          />
+          <EnvTooltip envVar='MFA_TOTP_ENABLED' data={data} varKey='mfaTotpEnabled'>
+            <Switch
+              label='Passkeys'
+              description='Enable the use of passwordless login with the use of WebAuthn passkeys like your phone, security keys, etc.'
+              {...form.getInputProps('mfaPasskeys', { type: 'checkbox' })}
+            />
+          </EnvTooltip>
 
-          <Switch
-            label='Enable TOTP'
-            description='Enable Time-based One-Time Passwords with the use of an authenticator app.'
-            disabled={data?.locked['mfaTotpEnabled']}
-            {...form.getInputProps('mfaTotpEnabled', { type: 'checkbox' })}
-          />
-          <TextInput
-            label='Issuer'
-            description='The issuer to use for the TOTP token.'
-            placeholder='Zipline'
-            disabled={data?.locked['mfaTotpIssuer']}
-            {...form.getInputProps('mfaTotpIssuer')}
-          />
+          <EnvTooltip envVar='MFA_TOTP_ENABLED' data={data} varKey='mfaTotpEnabled'>
+            <Switch
+              label='Enable TOTP'
+              description='Enable Time-based One-Time Passwords with the use of an authenticator app.'
+              {...form.getInputProps('mfaTotpEnabled', { type: 'checkbox' })}
+            />
+          </EnvTooltip>
+
+          <EnvTooltip envVar='MFA_TOTP_ISSUER' data={data} varKey='mfaTotpIssuer'>
+            <TextInput
+              label='Issuer'
+              description='The issuer to use for the TOTP token.'
+              placeholder='Zipline'
+              {...form.getInputProps('mfaTotpIssuer')}
+            />
+          </EnvTooltip>
         </SimpleGrid>
 
-        <Button
-          type='submit'
-          mt='md'
-          loading={isLoading}
-          disabled={
-            data?.locked['mfaTotpEnabled'] && data?.locked['mfaTotpIssuer'] && data?.locked['mfaPasskeys']
-          }
-          leftSection={<IconDeviceFloppy size='1rem' />}
-        >
+        <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
           Save
         </Button>
       </form>

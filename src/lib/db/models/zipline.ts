@@ -1,7 +1,7 @@
 import { prisma } from '..';
 
 export async function getZipline() {
-  const zipline = await prisma.zipline.findFirst();
+  const zipline = await prisma.zipline.getSettings();
   if (!zipline) {
     return prisma.zipline.create({
       data: {

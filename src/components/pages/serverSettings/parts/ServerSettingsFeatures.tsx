@@ -5,6 +5,7 @@ import { IconDeviceFloppy } from '@tabler/icons-react';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { settingsOnSubmit } from '../settingsOnSubmit';
+import { EnvTooltip } from '..';
 
 export default function ServerSettingsFeatures({
   swr: { data, isLoading },
@@ -54,106 +55,107 @@ export default function ServerSettingsFeatures({
 
       <form onSubmit={form.onSubmit(onSubmit)}>
         <SimpleGrid mt='md' cols={{ base: 1, md: 2 }} spacing='lg'>
-          <Switch
-            label='Image Compression'
-            description='Allows the ability for users to compress images.'
-            disabled={data?.locked['featuresImageCompression']}
-            {...form.getInputProps('featuresImageCompression', { type: 'checkbox' })}
-          />
+          <EnvTooltip envVar='FEATURES_IMAGE_COMPRESSION' data={data} varKey='featuresImageCompression'>
+            <Switch
+              label='Image Compression'
+              description='Allows the ability for users to compress images.'
+              {...form.getInputProps('featuresImageCompression', { type: 'checkbox' })}
+            />
+          </EnvTooltip>
 
-          <Switch
-            label='/robots.txt'
-            description='Enables a robots.txt file for search engine optimization. Requires a server restart.'
-            disabled={data?.locked['featuresRobotsTxt']}
-            {...form.getInputProps('featuresRobotsTxt', { type: 'checkbox' })}
-          />
+          <EnvTooltip envVar='FEATURES_ROBOTS_TXT' data={data} varKey='featuresRobotsTxt'>
+            <Switch
+              label='/robots.txt'
+              description='Enables a robots.txt file for search engine optimization. Requires a server restart.'
+              {...form.getInputProps('featuresRobotsTxt', { type: 'checkbox' })}
+            />
+          </EnvTooltip>
 
-          <Switch
-            label='Healthcheck'
-            description='Enables a healthcheck route for uptime monitoring. Requires a server restart.'
-            disabled={data?.locked['featuresHealthcheck']}
-            {...form.getInputProps('featuresHealthcheck', { type: 'checkbox' })}
-          />
+          <EnvTooltip envVar='FEATURES_HEALTHCHECK' data={data} varKey='featuresHealthcheck'>
+            <Switch
+              label='Healthcheck'
+              description='Enables a healthcheck route for uptime monitoring. Requires a server restart.'
+              {...form.getInputProps('featuresHealthcheck', { type: 'checkbox' })}
+            />
+          </EnvTooltip>
 
-          <Switch
-            label='User Registration'
-            description='Allows users to register an account on the server.'
-            disabled={data?.locked['featuresUserRegistration']}
-            {...form.getInputProps('featuresUserRegistration', { type: 'checkbox' })}
-          />
+          <EnvTooltip envVar='FEATURES_USER_REGISTRATION' data={data} varKey='featuresUserRegistration'>
+            <Switch
+              label='User Registration'
+              description='Allows users to register an account on the server.'
+              {...form.getInputProps('featuresUserRegistration', { type: 'checkbox' })}
+            />
+          </EnvTooltip>
 
-          <Switch
-            label='OAuth Registration'
-            description='Allows users to register an account using OAuth providers.'
-            disabled={data?.locked['featuresOauthRegistration']}
-            {...form.getInputProps('featuresOauthRegistration', { type: 'checkbox' })}
-          />
+          <EnvTooltip envVar='FEATURES_OAUTH_REGISTRATION' data={data} varKey='featuresOauthRegistration'>
+            <Switch
+              label='OAuth Registration'
+              description='Allows users to register an account using OAuth providers.'
+              {...form.getInputProps('featuresOauthRegistration', { type: 'checkbox' })}
+            />
+          </EnvTooltip>
 
-          <Switch
-            label='Delete on Max Views'
-            description='Automatically deletes files/urls after they reach the maximum view count. Requires a server restart.'
-            disabled={data?.locked['featuresDeleteOnMaxViews']}
-            {...form.getInputProps('featuresDeleteOnMaxViews', { type: 'checkbox' })}
-          />
+          <EnvTooltip envVar='FEATURES_DELETE_ON_MAX_VIEWS' data={data} varKey='featuresDeleteOnMaxViews'>
+            <Switch
+              label='Delete on Max Views'
+              description='Automatically deletes files/urls after they reach the maximum view count. Requires a server restart.'
+              {...form.getInputProps('featuresDeleteOnMaxViews', { type: 'checkbox' })}
+            />
+          </EnvTooltip>
 
-          <Switch
-            label='Enable Metrics'
-            description='Enables metrics for the server. Requires a server restart.'
-            disabled={data?.locked['featuresMetricsEnabled']}
-            {...form.getInputProps('featuresMetricsEnabled', { type: 'checkbox' })}
-          />
+          <EnvTooltip envVar='FEATURES_METRICS_ENABLED' data={data} varKey='featuresMetricsEnabled'>
+            <Switch
+              label='Enable Metrics'
+              description='Enables metrics for the server. Requires a server restart.'
+              {...form.getInputProps('featuresMetricsEnabled', { type: 'checkbox' })}
+            />
+          </EnvTooltip>
 
-          <Switch
-            label='Admin Only Metrics'
-            description='Requires an administrator to view metrics.'
-            disabled={data?.locked['featuresMetricsAdminOnly']}
-            {...form.getInputProps('featuresMetricsAdminOnly', { type: 'checkbox' })}
-          />
+          <EnvTooltip envVar='FEATURES_METRICS_ADMIN_ONLY' data={data} varKey='featuresMetricsAdminOnly'>
+            <Switch
+              label='Admin Only Metrics'
+              description='Requires an administrator to view metrics.'
+              {...form.getInputProps('featuresMetricsAdminOnly', { type: 'checkbox' })}
+            />
+          </EnvTooltip>
 
-          <Switch
-            label='Show User Specific Metrics'
-            description='Shows metrics specific to each user, for all users.'
-            disabled={data?.locked['featuresMetricsShowUserSpecific']}
-            {...form.getInputProps('featuresMetricsShowUserSpecific', { type: 'checkbox' })}
-          />
+          <EnvTooltip
+            envVar='FEATURES_METRICS_SHOW_USER_SPECIFIC'
+            data={data}
+            varKey='featuresMetricsShowUserSpecific'
+          >
+            <Switch
+              label='Show User Specific Metrics'
+              description='Shows metrics specific to each user, for all users.'
+              {...form.getInputProps('featuresMetricsShowUserSpecific', { type: 'checkbox' })}
+            />
+          </EnvTooltip>
 
-          <Switch
-            label='Enable Thumbnails'
-            description='Enables thumbnail generation for images. Requires a server restart.'
-            disabled={data?.locked['featuresThumbnailsEnabled']}
-            {...form.getInputProps('featuresThumbnailsEnabled', { type: 'checkbox' })}
-          />
+          <EnvTooltip envVar='FEATURES_THUMBNAILS_ENABLED' data={data} varKey='featuresThumbnailsEnabled'>
+            <Switch
+              label='Enable Thumbnails'
+              description='Enables thumbnail generation for images. Requires a server restart.'
+              {...form.getInputProps('featuresThumbnailsEnabled', { type: 'checkbox' })}
+            />
+          </EnvTooltip>
 
-          <NumberInput
-            label='Thumbnails Number Threads'
-            description='Number of threads to use for thumbnail generation, usually the number of CPU threads. Requires a server restart.'
-            placeholder='Enter a number...'
-            min={1}
-            max={16}
-            disabled={data?.locked['featuresThumbnailsNumberThreads']}
-            {...form.getInputProps('featuresThumbnailsNumberThreads')}
-          />
+          <EnvTooltip
+            envVar='FEATURES_THUMBNAILS_NUMBER_THREADS'
+            data={data}
+            varKey='featuresThumbnailsNumberThreads'
+          >
+            <NumberInput
+              label='Thumbnails Number Threads'
+              description='Number of threads to use for thumbnail generation, usually the number of CPU threads. Requires a server restart.'
+              placeholder='Enter a number...'
+              min={1}
+              max={16}
+              {...form.getInputProps('featuresThumbnailsNumberThreads')}
+            />
+          </EnvTooltip>
         </SimpleGrid>
 
-        <Button
-          type='submit'
-          mt='md'
-          loading={isLoading}
-          disabled={
-            data?.locked['featuresImageCompression'] &&
-            data?.locked['featuresRobotsTxt'] &&
-            data?.locked['featuresHealthcheck'] &&
-            data?.locked['featuresUserRegistration'] &&
-            data?.locked['featuresOauthRegistration'] &&
-            data?.locked['featuresDeleteOnMaxViews'] &&
-            data?.locked['featuresThumbnailsEnabled'] &&
-            data?.locked['featuresThumbnailsNumberThreads'] &&
-            data?.locked['featuresMetricsEnabled'] &&
-            data?.locked['featuresMetricsAdminOnly'] &&
-            data?.locked['featuresMetricsShowUserSpecific']
-          }
-          leftSection={<IconDeviceFloppy size='1rem' />}
-        >
+        <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
           Save
         </Button>
       </form>

@@ -16,6 +16,7 @@ import { IconDeviceFloppy, IconRefresh } from '@tabler/icons-react';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { settingsOnSubmit } from '../settingsOnSubmit';
+import { EnvTooltip } from '..';
 
 export default function ServerSettingsPWA({
   swr: { data, isLoading },
@@ -74,70 +75,69 @@ export default function ServerSettingsPWA({
       </Text>
 
       <form onSubmit={form.onSubmit(onSubmit)}>
-        <Switch
-          mt='md'
-          label='PWA Enabled'
-          description='Allow users to install the Zipline PWA on their devices.'
-          disabled={data?.locked['pwaEnabled']}
-          {...form.getInputProps('pwaEnabled', { type: 'checkbox' })}
-        />
+        <EnvTooltip envVar='PWA_ENABLED' data={data} varKey='pwaEnabled'>
+          <Switch
+            mt='md'
+            label='PWA Enabled'
+            description='Allow users to install the Zipline PWA on their devices.'
+            {...form.getInputProps('pwaEnabled', { type: 'checkbox' })}
+          />
+        </EnvTooltip>
 
         <SimpleGrid mt='md' cols={{ base: 1, md: 2 }} spacing='lg'>
-          <TextInput
-            label='Title'
-            description='The title for the PWA'
-            placeholder='Zipline'
-            disabled={!form.values.pwaEnabled || data?.locked['pwaTitle']}
-            {...form.getInputProps('pwaTitle')}
-          />
+          <EnvTooltip envVar='PWA_TITLE' data={data} varKey='pwaTitle'>
+            <TextInput
+              label='Title'
+              description='The title for the PWA'
+              placeholder='Zipline'
+              disabled={!form.values.pwaEnabled}
+              {...form.getInputProps('pwaTitle')}
+            />
+          </EnvTooltip>
 
-          <TextInput
-            label='Short Name'
-            description='The short name for the PWA'
-            placeholder='Zipline'
-            disabled={!form.values.pwaEnabled || data?.locked['pwaShortName']}
-            {...form.getInputProps('pwaShortName')}
-          />
+          <EnvTooltip envVar='PWA_SHORT_NAME' data={data} varKey='pwaShortName'>
+            <TextInput
+              label='Short Name'
+              description='The short name for the PWA'
+              placeholder='Zipline'
+              disabled={!form.values.pwaEnabled}
+              {...form.getInputProps('pwaShortName')}
+            />
+          </EnvTooltip>
 
-          <TextInput
-            label='Description'
-            description='The description for the PWA'
-            placeholder='Zipline'
-            disabled={!form.values.pwaEnabled || data?.locked['pwaDescription']}
-            {...form.getInputProps('pwaDescription')}
-          />
+          <EnvTooltip envVar='PWA_DESCRIPTION' data={data} varKey='pwaDescription'>
+            <TextInput
+              label='Description'
+              description='The description for the PWA'
+              placeholder='Zipline'
+              disabled={!form.values.pwaEnabled}
+              {...form.getInputProps('pwaDescription')}
+            />
+          </EnvTooltip>
 
-          <ColorInput
-            label='Theme Color'
-            description='The theme color for the PWA'
-            placeholder='#000000'
-            disabled={!form.values.pwaEnabled || data?.locked['pwaThemeColor']}
-            {...form.getInputProps('pwaThemeColor')}
-          />
+          <EnvTooltip envVar='PWA_THEME_COLOR' data={data} varKey='pwaThemeColor'>
+            <ColorInput
+              label='Theme Color'
+              description='The theme color for the PWA'
+              placeholder='#000000'
+              disabled={!form.values.pwaEnabled}
+              {...form.getInputProps('pwaThemeColor')}
+            />
+          </EnvTooltip>
 
-          <ColorInput
-            label='Background Color'
-            description='The background color for the PWA'
-            placeholder='#ffffff'
-            disabled={!form.values.pwaEnabled || data?.locked['pwaBackgroundColor']}
-            {...form.getInputProps('pwaBackgroundColor')}
-          />
+          <EnvTooltip envVar='PWA_BACKGROUND_COLOR' data={data} varKey='pwaBackgroundColor'>
+            <ColorInput
+              label='Background Color'
+              description='The background color for the PWA'
+              placeholder='#ffffff'
+              disabled={!form.values.pwaEnabled}
+              {...form.getInputProps('pwaBackgroundColor')}
+            />
+          </EnvTooltip>
         </SimpleGrid>
 
         <Group mt='md'>
-          <Button
-            type='submit'
-            loading={isLoading}
-            disabled={
-              data?.locked['pwaEnabled'] &&
-              data?.locked['pwaTitle'] &&
-              data?.locked['pwaShortName'] &&
-              data?.locked['pwaDescription'] &&
-              data?.locked['pwaThemeColor'] &&
-              data?.locked['pwaBackgroundColor']
-            }
-            leftSection={<IconDeviceFloppy size='1rem' />}
-          >
+          <Button type='submit' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
             Save
           </Button>
           <Button onClick={() => router.reload()} leftSection={<IconRefresh size='1rem' />}>

@@ -5,6 +5,7 @@ import { IconDeviceFloppy } from '@tabler/icons-react';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { settingsOnSubmit } from '../settingsOnSubmit';
+import { EnvTooltip } from '..';
 
 export default function ServerSettingsTasks({
   swr: { data, isLoading },
@@ -48,51 +49,44 @@ export default function ServerSettingsTasks({
 
       <form onSubmit={form.onSubmit(onSubmit)}>
         <SimpleGrid mt='md' cols={{ base: 1, md: 2 }} spacing='lg'>
-          <TextInput
-            label='Delete Files Interval'
-            description='How often to check and delete expired files.'
-            placeholder='30m'
-            disabled={data?.locked['tasksDeleteInterval']}
-            {...form.getInputProps('tasksDeleteInterval')}
-          />
+          <EnvTooltip envVar='TASKS_DELETE_INTERVAL' data={data} varKey='tasksDeleteInterval'>
+            <TextInput
+              label='Delete Files Interval'
+              description='How often to check and delete expired files.'
+              placeholder='30m'
+              {...form.getInputProps('tasksDeleteInterval')}
+            />
+          </EnvTooltip>
 
-          <TextInput
-            label='Clear Invites Interval'
-            description='How often to check and clear expired/used invites.'
-            placeholder='30m'
-            disabled={data?.locked['tasksClearInvitesInterval']}
-            {...form.getInputProps('tasksClearInvitesInterval')}
-          />
+          <EnvTooltip envVar='TASKS_METRICS_INTERVAL' data={data} varKey='tasksMetricsInterval'>
+            <TextInput
+              label='Clear Invites Interval'
+              description='How often to check and clear expired/used invites.'
+              placeholder='30m'
+              {...form.getInputProps('tasksClearInvitesInterval')}
+            />
+          </EnvTooltip>
 
-          <TextInput
-            label='Max Views Interval'
-            description='How often to check and delete files that have reached max views.'
-            placeholder='30m'
-            disabled={data?.locked['tasksMaxViewsInterval']}
-            {...form.getInputProps('tasksMaxViewsInterval')}
-          />
+          <EnvTooltip envVar='TASKS_MAX_VIEWS_INTERVAL' data={data} varKey='tasksMaxViewsInterval'>
+            <TextInput
+              label='Max Views Interval'
+              description='How often to check and delete files that have reached max views.'
+              placeholder='30m'
+              {...form.getInputProps('tasksMaxViewsInterval')}
+            />
+          </EnvTooltip>
 
-          <TextInput
-            label='Thumbnails Interval'
-            description='How often to check and generate thumbnails for video files.'
-            placeholder='30m'
-            disabled={data?.locked['tasksThumbnailsInterval']}
-            {...form.getInputProps('tasksThumbnailsInterval')}
-          />
+          <EnvTooltip envVar='TASKS_THUMBNAILS_INTERVAL' data={data} varKey='tasksThumbnailsInterval'>
+            <TextInput
+              label='Thumbnails Interval'
+              description='How often to check and generate thumbnails for video files.'
+              placeholder='30m'
+              {...form.getInputProps('tasksThumbnailsInterval')}
+            />
+          </EnvTooltip>
         </SimpleGrid>
 
-        <Button
-          type='submit'
-          mt='md'
-          loading={isLoading}
-          disabled={
-            data?.locked['tasksDeleteInterval'] &&
-            data?.locked['tasksClearInvitesInterval'] &&
-            data?.locked['tasksMaxViewsInterval'] &&
-            data?.locked['tasksThumbnailsInterval']
-          }
-          leftSection={<IconDeviceFloppy size='1rem' />}
-        >
+        <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
           Save
         </Button>
       </form>
