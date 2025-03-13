@@ -233,7 +233,12 @@ export default function FileModal({
                   <Title order={4} mt='lg' mb='xs'>
                     Tags
                   </Title>
-                  <Combobox store={tagsCombobox} onOptionSubmit={handleValueSelect} withinPortal={false}>
+                  <Combobox
+                    zIndex={90000}
+                    store={tagsCombobox}
+                    onOptionSubmit={handleValueSelect}
+                    withinPortal={false}
+                  >
                     <Combobox.DropdownTarget>
                       <PillsInput
                         onBlur={() => triggerSave()}
