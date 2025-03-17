@@ -480,6 +480,11 @@ export default function FileTable({ id }: { id?: string }) {
               render: (file) => (file.favorite ? <Text c='yellow'>Yes</Text> : 'No'),
             },
             {
+              accessor: 'views',
+              sortable: true,
+              render: (file) => file.views,
+            },
+            {
               accessor: 'id',
               hidden: searchField !== 'id' || searchQuery.id.trim() === '',
               filtering: searchField === 'id' && searchQuery.id.trim() !== '',
