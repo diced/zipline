@@ -252,8 +252,8 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
               order={1}
               ta='center'
               style={{
-              whiteSpace: 'normal',
-              fontSize: `clamp(20px, ${Math.max(50 - (config.website.title?.length ?? 0) / 2, 20)}px, 50px)`,
+                whiteSpace: 'normal',
+                fontSize: `clamp(20px, ${Math.max(50 - (config.website.title?.length ?? 0) / 2, 20)}px, 50px)`,
               }}
             >
               <b>{config.website.title ?? 'Zipline'}</b>
