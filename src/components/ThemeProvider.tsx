@@ -57,7 +57,10 @@ export default function Theming({
       <MantineProvider
         defaultColorScheme={theme.colorScheme as unknown as any}
         forceColorScheme={theme.colorScheme as unknown as any}
-        theme={createTheme(themeComponents(theme))}
+        theme={createTheme({
+          ...themeComponents(theme),
+          defaultRadius: 'md',
+        })}
       >
         {children}
       </MantineProvider>
