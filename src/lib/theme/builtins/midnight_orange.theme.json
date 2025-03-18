@@ -3,7 +3,7 @@
   "id": "builtin:midnight_orange",
   "colorScheme": "dark",
   "colors": {
-    "blue": [
+    "orange": [
       "#666666",
       "#f5994b",
       "#f48c35",
@@ -28,6 +28,6 @@
       "#00001E"
     ]
   },
-  "primaryColor": "blue",
+  "primaryColor": "orange",
   "mainBackgroundColor": "#0a0a0a"
 }
