@@ -1,16 +1,4 @@
-import {
-  Button,
-  Center,
-  Group,
-  Pagination,
-  Paper,
-  Select,
-  SimpleGrid,
-  Skeleton,
-  Stack,
-  Text,
-  Title,
-} from '@mantine/core';
+import { Button, Center, Group, Pagination, Paper, Select, SimpleGrid, Skeleton, Stack, Text, Title } from '@mantine/core';
 import { IconFileUpload, IconFilesOff } from '@tabler/icons-react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
