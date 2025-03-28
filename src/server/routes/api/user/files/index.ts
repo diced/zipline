@@ -70,7 +70,7 @@ export default fastifyPlugin(
 
         if (!user) return res.notFound('User not found');
 
-        const perpage = Number(req.query.perpage || '9');
+        const perpage = Number(req.query.perpage || '15');
         if (isNaN(Number(perpage))) return res.badRequest('Perpage must be a number');
 
         const searchQuery = req.query.searchQuery

@@ -1,4 +1,16 @@
-import { Button, Center, Group, Pagination, Paper, SimpleGrid, Skeleton, Stack, Title } from '@mantine/core';
+import {
+  Button,
+  Center,
+  Group,
+  Pagination,
+  Paper,
+  Select,
+  SimpleGrid,
+  Skeleton,
+  Stack,
+  Text,
+  Title,
+} from '@mantine/core';
 import { IconFileUpload, IconFilesOff } from '@tabler/icons-react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
@@ -10,16 +22,20 @@ const DashboardFile = dynamic(() => import('@/components/file/DashboardFile'), {
   loading: () => <Skeleton height={350} animate />,
 });
 
+const PER_PAGE_OPTIONS = [9, 12, 15, 30, 45];
+
 export default function Files({ id }: { id?: string }) {
   const router = useRouter();
 
   const [page, setPage] = useState<number>(router.query.page ? parseInt(router.query.page as string) : 1);
+  const [perpage, setPerpage] = useState<number>(15);
+  const [cachedPages, setCachedPages] = useState<number>(1);
+
   const { data, isLoading } = useApiPagination({
     page,
+    perpage,
     id,
   });
-
-  const [cachedPages, setCachedPages] = useState<number>(1);
 
   useEffect(() => {
     if (data?.pages) {
@@ -39,6 +55,10 @@ export default function Files({ id }: { id?: string }) {
       { shallow: true },
     );
   }, [page]);
+
+  const from = (page - 1) * perpage + 1;
+  const to = Math.min(page * perpage, data?.total ?? 0);
+  const totalRecords = data?.total ?? 0;
 
   return (
     <>
@@ -81,9 +101,25 @@ export default function Files({ id }: { id?: string }) {
         )}
       </SimpleGrid>
 
-      <Center>
-        <Pagination my='sm' value={page} onChange={setPage} total={cachedPages} />
-      </Center>
+      <Group justify='space-between' align='center' mt='md'>
+        <Text size='sm'>{`${from} - ${to} / ${totalRecords} files`}</Text>
+
+        <Group gap='sm'>
+          <Select
+            value={perpage.toString()}
+            data={PER_PAGE_OPTIONS.map((val) => ({ value: val.toString(), label: `${val}` }))}
+            onChange={(value) => {
+              setPerpage(Number(value));
+              setPage(1);
+            }}
+            w={80}
+            size='xs'
+            variant='filled'
+          />
+
+          <Pagination value={page} onChange={setPage} total={cachedPages} size='sm' withControls withEdges />
+        </Group>
+      </Group>
     </>
   );
 }

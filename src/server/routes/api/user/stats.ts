@@ -38,6 +38,7 @@ export default fastifyPlugin(
 
       const favCount = await prisma.file.count({
         where: {
+          userId: req.user.id,
           favorite: true,
         },
       });

@@ -131,9 +131,11 @@ export default function Register({ config, invite }: InferGetServerSidePropsType
           <div style={{ width: '100%', overflowWrap: 'break-word' }}>
             <Title
               order={1}
-              size={(config.website.title ?? 'Zipline').length > 50 ? 20 : 50}
               ta='center'
-              style={{ whiteSpace: 'normal' }}
+              style={{
+                whiteSpace: 'normal',
+                fontSize: `clamp(20px, ${Math.max(50 - (config.website.title?.length ?? 0) / 2, 20)}px, 50px)`,
+              }}
             >
               <b>{config.website.title ?? 'Zipline'}</b>
             </Title>

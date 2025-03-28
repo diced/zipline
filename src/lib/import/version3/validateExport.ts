@@ -259,12 +259,14 @@ export const export3Schema = z.object({
     }),
   ),
 
-  stats: z.array(
-    z.object({
-      created_at: z.string(),
-      data: z.any(),
-    }),
-  ),
+  stats: z
+    .array(
+      z.object({
+        created_at: z.string(),
+        data: z.any(),
+      }),
+    )
+    .optional(),
 });
 
 export type Export3 = z.infer<typeof export3Schema>;

@@ -11,7 +11,9 @@ import {
 } from '@aws-sdk/client-s3';
 import Logger, { log } from '../logger';
 import { ReadableStream } from 'stream/web';
-
+import { NodeHttpHandler } from '@smithy/node-http-handler';
+import { Agent as HttpAgent } from 'http';
+import { Agent as HttpsAgent } from 'https';
 export class S3Datasource extends Datasource {
   name = 's3';
   client: S3Client;
@@ -37,6 +39,18 @@ export class S3Datasource extends Datasource {
       region: this.options.region ?? undefined,
       endpoint: this.options.endpoint ?? undefined,
       forcePathStyle: this.options.forcePathStyle ?? false,
+      requestHandler: new NodeHttpHandler({
+        connectionTimeout: 10_000,
+        socketTimeout: 120_000,
+        httpAgent: new HttpAgent({
+          maxSockets: 1000,
+          keepAlive: true,
+        }),
+        httpsAgent: new HttpsAgent({
+          maxSockets: 1000,
+          keepAlive: true,
+        }),
+      }),
     });
 
     this.ensureBucketExists();

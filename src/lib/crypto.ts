@@ -4,8 +4,6 @@ import { randomCharacters } from './random';
 
 const ALGORITHM = 'aes-256-cbc';
 
-export { randomCharacters } from './random';
-
 export function createKey(secret: string) {
   const hash = crypto.createHash('sha256');
   hash.update(secret);

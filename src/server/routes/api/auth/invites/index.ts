@@ -1,5 +1,5 @@
 import { config } from '@/lib/config';
-import { randomCharacters } from '@/lib/crypto';
+import { randomCharacters } from '@/lib/random';
 import { prisma } from '@/lib/db';
 import { Invite, inviteInviterSelect } from '@/lib/db/models/invite';
 import { log } from '@/lib/logger';

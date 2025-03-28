@@ -15,6 +15,9 @@ import cat_latte from './builtins/catppuccin_latte.theme.json';
 import cat_macchiato from './builtins/catppuccin_macchiato.theme.json';
 import cat_mocha from './builtins/catppuccin_mocha.theme.json';
 
+import midnight_orange from './builtins/midnight_orange.theme.json';
+import midnight_blue from './builtins/midnight_blue.theme.json';
+
 import { log } from '../logger';
 
 const THEMES_DIR = './themes';
@@ -48,6 +51,8 @@ export async function readThemes(): Promise<ZiplineTheme[]> {
     handleOverrideColors(cat_latte as unknown as ZiplineTheme),
     handleOverrideColors(cat_macchiato as unknown as ZiplineTheme),
     handleOverrideColors(cat_mocha as unknown as ZiplineTheme),
+    handleOverrideColors(midnight_orange as unknown as ZiplineTheme),
+    handleOverrideColors(midnight_blue as unknown as ZiplineTheme),
   );
 
   return parsedThemes;

@@ -1,0 +1,33 @@
+{
+  "name": "Midnight Orange",
+  "id": "builtin:midnight_orange",
+  "colorScheme": "dark",
+  "colors": {
+    "orange": [
+      "#FFFFFF",
+      "#f5994b",
+      "#f5994b",
+      "#f48c35",
+      "#f48c35",
+      "#f3801f",
+      "#f3801f",
+      "#da731b",
+      "#da731b",
+      "#c26618"
+    ],
+    "dark": [
+      "#FFFFFF",
+      "#999999",
+      "#a8a8a8",
+      "#666666",
+      "#282828",
+      "#181818",
+      "#151515",
+      "#111111",
+      "#181818",
+      "#00001E"
+    ]
+  },
+  "primaryColor": "orange",
+  "mainBackgroundColor": "#0a0a0a"
+}

@@ -1,5 +1,6 @@
 import { config } from '@/lib/config';
-import { hashPassword, randomCharacters } from '@/lib/crypto';
+import { hashPassword } from '@/lib/crypto';
+import { randomCharacters } from '@/lib/random';
 import { prisma } from '@/lib/db';
 import { Url } from '@/lib/db/models/url';
 import { log } from '@/lib/logger';
