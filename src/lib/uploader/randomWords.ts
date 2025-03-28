@@ -34,7 +34,7 @@ export function randomWords(numAdjectives: number = 2, separator: string = '-') 
   let words = '';
 
   for (let i = 0; i !== numAdjectives; ++i) {
-    words += adjectives[randomIndex(adjectives.length)] + seperator;
+    words += adjectives[randomIndex(adjectives.length)] + separator;
   }
 
   words += animals[randomIndex(animals.length)];
