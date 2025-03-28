@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import { config } from '../config';
 import { Config } from '../config/validate';
-import { randomCharacters } from '../crypto';
+import { randomCharacters } from '../random';
 import { randomUUID } from 'crypto';
 import { parse } from 'path';
 import { randomWords } from './randomWords';

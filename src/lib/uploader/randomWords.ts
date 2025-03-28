@@ -2,6 +2,7 @@ import { readFileSync } from 'fs';
 import fallbackAdjectives from './wordlists/adjectives';
 import fallbackAnimals from './wordlists/animals';
 import { log } from '../logger';
+import { randomIndex } from '../random';
 
 const logger = log('random_words');
 
@@ -33,10 +34,10 @@ export function randomWords(numAdjectives: number = 2, seperator: string = '-') 
   let words = '';
 
   for (let i = 0; i !== numAdjectives; ++i) {
-    words += adjectives[Math.floor(Math.random() * adjectives.length)] + seperator;
+    words += adjectives[randomIndex(adjectives.length)] + seperator;
   }
 
-  words += animals[Math.floor(Math.random() * animals.length)];
+  words += animals[randomIndex(animals.length)];
 
   return words;
 }
