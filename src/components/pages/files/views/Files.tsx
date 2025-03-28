@@ -22,7 +22,7 @@ const DashboardFile = dynamic(() => import('@/components/file/DashboardFile'), {
   loading: () => <Skeleton height={350} animate />,
 });
 
-const PER_PAGE_OPTIONS = [15, 30, 45];
+const PER_PAGE_OPTIONS = [9, 12, 15, 30, 45];
 
 export default function Files({ id }: { id?: string }) {
   const router = useRouter();
