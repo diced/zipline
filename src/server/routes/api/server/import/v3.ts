@@ -31,6 +31,8 @@ export default fastifyPlugin(
       PATH,
       {
         preHandler: [userMiddleware, administratorMiddleware],
+        // 24gb, just in case
+        bodyLimit: 24 * 1024 * 1024 * 1024,
       },
       async (req, res) => {
         if (req.user.role !== 'SUPERADMIN') return res.forbidden('not super admin');
