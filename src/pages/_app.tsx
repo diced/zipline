@@ -1,19 +1,20 @@
-import { AppProps } from 'next/app';
-import { NuqsAdapter } from 'nuqs/adapters/next/pages';
-import Head from 'next/head';
-import { SWRConfig } from 'swr';
+import Theming from '@/components/ThemeProvider';
+import { ZiplineTheme } from '@/lib/theme';
 import { ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';
-import { ZiplineTheme } from '@/lib/theme';
-import Theming from '@/components/ThemeProvider';
+import { AppProps } from 'next/app';
+import Head from 'next/head';
+import { NuqsAdapter } from 'nuqs/adapters/next/pages';
+import { SWRConfig } from 'swr';
 
+import '@mantine/charts/styles.css';
 import '@mantine/core/styles.css';
 import '@mantine/dates/styles.css';
 import '@mantine/dropzone/styles.css';
 import '@mantine/notifications/styles.css';
-import '@mantine/charts/styles.css';
 import 'mantine-datatable/styles.css';
 
+import '@/styles/3dm.css';
 import '@/styles/global.css';
 
 import '@/components/render/code/HighlightCode.theme.scss';

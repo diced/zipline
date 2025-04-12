@@ -1,0 +1,64 @@
+/* Light Mode CSS */
+
+:root {
+    --cta-color: #d4967d;
+    --contrast-color: #495a58;
+    --base-color: #e5e3dc;
+    --light-shade: #d1cbb7;
+    --darker-shade: #d9ad9a;
+}
+
+body {
+    background-color: #fff;
+    /* background-color: var(--base-color); */
+    color: var(--contrast-color);
+    font-family: Poppins, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: var(--light-shade);
+    color: var(--contrast-color);
+    padding: 1rem;
+    text-align: center;
+}
+
+button.cta {
+    background-color: var(--cta-color);
+    color: var(--base-color);
+    border: none;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-size: 1rem;
+    border-radius: 5px;
+}
+
+button.cta:hover {
+    background-color: var(--darker-shade);
+}
+
+footer {
+    background-color: var(--light-shade);
+    color: var(--contrast-color);
+    text-align: center;
+    padding: 1rem;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+
+.memories-logo-container {
+    background-color: var(--base-color);
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.memories-logo {
+    width: 100px;
+    height: auto;
+    margin: 0 auto;
+    display: block;
+    object-fit: contain;
+}

@@ -373,13 +373,13 @@ export default function UploadOptionsButton({ folder, numFiles }: { folder?: str
         </Group>
       </Modal>
 
-      <Button
+      {/* <Button
         variant={changes() !== 0 ? 'light' : 'outline'}
         rightSection={changes() !== 0 ? <Badge variant='outline'>{changes()}</Badge> : null}
         onClick={() => setOpen(true)}
       >
         Options
-      </Button>
+      </Button> */}
     </>
   );
 }

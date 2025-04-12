@@ -3,20 +3,22 @@ import { basename, join } from 'path';
 import { ZiplineTheme } from '.';
 import { exists } from '../fs';
 
+import black_dark from './builtins/black_dark.theme.json';
 import dark_gray from './builtins/dark_gray.theme.json';
 import light_gray from './builtins/light_gray.theme.json';
-import black_dark from './builtins/black_dark.theme.json';
 
-import light_blue from './builtins/light_blue.theme.json';
 import dark_blue from './builtins/dark_blue.theme.json';
+import light_blue from './builtins/light_blue.theme.json';
 
 import cat_frappe from './builtins/catppuccin_frappe.theme.json';
 import cat_latte from './builtins/catppuccin_latte.theme.json';
 import cat_macchiato from './builtins/catppuccin_macchiato.theme.json';
 import cat_mocha from './builtins/catppuccin_mocha.theme.json';
 
-import midnight_orange from './builtins/midnight_orange.theme.json';
 import midnight_blue from './builtins/midnight_blue.theme.json';
+import midnight_orange from './builtins/midnight_orange.theme.json';
+
+import dreid_memories from './builtins/dreid_memories.theme.json';
 
 import { log } from '../logger';
 
@@ -53,6 +55,7 @@ export async function readThemes(): Promise<ZiplineTheme[]> {
     handleOverrideColors(cat_mocha as unknown as ZiplineTheme),
     handleOverrideColors(midnight_orange as unknown as ZiplineTheme),
     handleOverrideColors(midnight_blue as unknown as ZiplineTheme),
+    handleOverrideColors(dreid_memories as unknown as ZiplineTheme),
   );
 
   return parsedThemes;

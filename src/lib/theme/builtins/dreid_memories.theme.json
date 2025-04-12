@@ -1,0 +1,69 @@
+{
+  "name": "3D Memories",
+  "id": "builtin:3d_memories",
+  "colorScheme": "light",
+  "colors": {
+    "cta": [
+      "#fbeee9",
+      "#f6d4c7",
+      "#f0bba5",
+      "#eaa184",
+      "#e48862",
+      "#d96f49",
+      "#b3583a",
+      "#8c422c",
+      "#662c1d",
+      "#40160f"
+    ],
+    "contrast": [
+      "#e9edec",
+      "#c4cdcb",
+      "#9eaead",
+      "#798f8e",
+      "#546f6f",
+      "#3a5655",
+      "#2e4343",
+      "#223131",
+      "#161f20",
+      "#0b0d0d"
+    ],
+    "base": [
+      "#ffffff",
+      "#f9f8f6",
+      "#f3f2ef",
+      "#edebe8",
+      "#e7e5e1",
+      "#dbd9d4",
+      "#aea8a1",
+      "#827d77",
+      "#55524e",
+      "#292725"
+    ],
+    "lightShade": [
+      "#ffffff",
+      "#faf8f4",
+      "#f5f2eb",
+      "#efebdf",
+      "#eae5d4",
+      "#dfdac7",
+      "#b3af9f",
+      "#878578",
+      "#5c5a50",
+      "#302d28"
+    ],
+    "darkShade": [
+      "#fdeeea",
+      "#f7d3c9",
+      "#f1b8a8",
+      "#eba087",
+      "#e58566",
+      "#da6b4c",
+      "#b4553d",
+      "#8e3f2e",
+      "#68291e",
+      "#42140f"
+    ]
+  },
+  "primaryColor": "cta",
+  "mainBackgroundColor": "var(--mantine-color-base-0)"
+}
