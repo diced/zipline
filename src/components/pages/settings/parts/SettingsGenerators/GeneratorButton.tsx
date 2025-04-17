@@ -45,7 +45,6 @@ export type GeneratorOptions = {
 };
 
 export const copier = (options: GeneratorOptions) => {
-  if (options.unix_useEcho) return 'echo';
   if (options.mac_enableCompatibility) return 'pbcopy';
   if (options.wl_enableCompatibility) return 'wl-copy';
   return 'xclip -selection clipboard';

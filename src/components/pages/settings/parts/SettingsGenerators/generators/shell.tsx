@@ -69,7 +69,8 @@ export function shell(token: string, type: 'file' | 'url', options: GeneratorOpt
   if (type === 'file') {
     script = `#!/bin/bash
 ${curl.join(' ')}${options.noJson ? '' : ' | jq -r .files[0].url'}${
-    options.unix_useEcho ? '' : ` | ${copier(options)}`}
+      options.unix_useEcho ? '' : ` | ${copier(options)}`
+    }
 `;
   } else {
     script = `#!/bin/bash
