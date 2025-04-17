@@ -79,6 +79,10 @@ export default function SettingsGenerators() {
                 <Code>curl</Code>
               </Anchor>
               ,{' '}
+              <Anchor component={Link} href='https://darwinsys.com/file/'>
+                <Code>file</Code>
+              </Anchor>
+              ,{' '}
               <Anchor component={Link} href='https://github.com/stedolan/jq'>
                 <Code>jq</Code>
               </Anchor>

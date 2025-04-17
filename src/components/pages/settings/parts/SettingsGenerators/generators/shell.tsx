@@ -10,7 +10,7 @@ export function shell(token: string, type: 'file' | 'url', options: GeneratorOpt
   ];
 
   if (type === 'file') {
-    curl.push('-F', 'file=@$1');
+    curl.push('-F', '"file=@$1;type=$(file --mime-type -b "$1")"');
     curl.push('-H', "'content-type: multipart/form-data'");
   } else {
     curl.push('-H', "'content-type: application/json'");
