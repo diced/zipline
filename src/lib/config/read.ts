@@ -139,6 +139,11 @@ export const rawConfig: any = {
     backgroundColor: undefined,
     themeColor: undefined,
   },
+  encryption: {
+    enabled: undefined,
+    key: undefined,
+    algorithm: undefined,
+  },
 };
 
 export const PROP_TO_ENV = {
@@ -164,6 +169,10 @@ export const PROP_TO_ENV = {
 
   'ssl.key': 'SSL_KEY',
   'ssl.cert': 'SSL_CERT',
+
+  'encryption.enabled': 'ENCRYPTION_ENABLED',
+  'encryption.key': 'ENCRYPTION_KEY',
+  'encryption.algorithm': 'ENCRYPTION_ALGORITHM',
 };
 
 export const DATABASE_TO_PROP = {
@@ -282,6 +291,10 @@ export const DATABASE_TO_PROP = {
   pwaDescription: 'pwa.description',
   pwaThemeColor: 'pwa.themeColor',
   pwaBackgroundColor: 'pwa.backgroundColor',
+
+  encryptionEnabled: 'encryption.enabled',
+  encryptionKey: 'encryption.key',
+  encryptionAlgorithm: 'encryption.algorithm',
 };
 
 const logger = log('config').c('read');
@@ -333,6 +346,10 @@ export function readEnv() {
 
     env('ssl.key', 'string'),
     env('ssl.cert', 'string'),
+
+    env('encryption.enabled', 'boolean'),
+    env('encryption.key', 'string'),
+    env('encryption.algorithm', 'string'),
   ];
 
   const raw: Record<keyof typeof rawConfig, any> = {};

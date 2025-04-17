@@ -1,8 +1,11 @@
-import crypto from 'crypto';
+import crypto, { CipherGCMTypes } from 'crypto';
 import { hash, verify } from 'argon2';
 import { randomCharacters } from './random';
 
 const ALGORITHM = 'aes-256-cbc';
+
+const IV_LENGTH = 12;
+const AUTH_TAG_LENGTH = 16;
 
 export function createKey(secret: string) {
   const hash = crypto.createHash('sha256');
@@ -88,4 +91,84 @@ export async function hashPassword(password: string) {
 
 export async function verifyPassword(password: string, hash: string) {
   return verify(hash, password);
+}
+
+/**
+ * Derives a 32-byte key from a base64 encoded string.
+ * Throws an error if the decoded key is not 32 bytes.
+ */
+function deriveKey(base64Key: string): Buffer {
+  const key = Buffer.from(base64Key, 'base64');
+  if (key.length !== 32) {
+    throw new Error('Encryption key must be a base64 encoded 32-byte key.');
+  }
+  return key;
+}
+
+/**
+ * Encrypts a buffer using AES-256-GCM or ChaCha20-Poly1305.
+ * Prepends IV and appends Auth Tag to the ciphertext.
+ * @param buffer The buffer to encrypt.
+ * @param base64Key The base64 encoded 32-byte encryption key.
+ * @param algorithm The encryption algorithm to use.
+ * @returns A buffer containing [IV][Ciphertext][AuthTag].
+ */
+export async function encryptBuffer(
+  buffer: Buffer,
+  base64Key: string,
+  algorithm: 'aes-256-gcm' | 'chacha20-poly1305',
+): Promise<Buffer> {
+  try {
+    const key = deriveKey(base64Key);
+    const iv = crypto.randomBytes(IV_LENGTH);
+    const cipher = crypto.createCipheriv(algorithm as CipherGCMTypes, key, iv);
+
+    const encrypted = Buffer.concat([cipher.update(buffer), cipher.final()]);
+    const authTag = cipher.getAuthTag();
+
+    if (authTag.length !== AUTH_TAG_LENGTH) {
+      throw new Error(`invalid auth tag length: ${authTag.length}`);
+    }
+
+    return Buffer.concat([iv, encrypted, authTag]);
+  } catch (error) {
+    console.error('encryption failed:', error);
+    throw new Error('Failed to encrypt buffer.');
+  }
+}
+
+/**
+ * Decrypts a buffer encrypted with AES-256-GCM or ChaCha20-Poly1305.
+ * Expects the buffer format: [IV][Ciphertext][AuthTag].
+ * @param encryptedBuffer The buffer containing the encrypted data.
+ * @param base64Key The base64 encoded 32-byte encryption key.
+ * @param algorithm The encryption algorithm used.
+ * @returns The original decrypted buffer, or null if decryption fails (e.g., bad key, tampered data).
+ */
+export async function decryptBuffer(
+  encryptedBuffer: Buffer,
+  base64Key: string,
+  algorithm: 'aes-256-gcm' | 'chacha20-poly1305',
+): Promise<Buffer | null> {
+  try {
+    const key = deriveKey(base64Key);
+
+    if (encryptedBuffer.length < IV_LENGTH + AUTH_TAG_LENGTH) {
+      console.error('decryption failed: encrypted buffer is too short.');
+      return null;
+    }
+
+    const iv = encryptedBuffer.subarray(0, IV_LENGTH);
+    const authTag = encryptedBuffer.subarray(encryptedBuffer.length - AUTH_TAG_LENGTH);
+    const encrypted = encryptedBuffer.subarray(IV_LENGTH, encryptedBuffer.length - AUTH_TAG_LENGTH);
+
+    const decipher = crypto.createDecipheriv(algorithm as CipherGCMTypes, key, iv);
+    decipher.setAuthTag(authTag);
+
+    const decrypted = Buffer.concat([decipher.update(encrypted), decipher.final()]);
+    return decrypted;
+  } catch (error) {
+    console.error('decryption failed:', error);
+    return null;
+  }
 }

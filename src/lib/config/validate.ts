@@ -317,6 +317,22 @@ export const schema = z.object({
     themeColor: z.string().default('#000000'),
     backgroundColor: z.string().default('#000000'),
   }),
+  encryption: z
+    .object({
+      key: z.string().min(32, 'Encryption key must be at least 32 characters').optional(),
+      algorithm: z.enum(['chacha20-poly1305', 'aes-256-gcm']).default('chacha20-poly1305'),
+      enabled: z.boolean().default(false),
+    })
+    .default({ enabled: false, algorithm: 'chacha20-poly1305' })
+    .superRefine((data, ctx) => {
+      if (data.enabled && !data.key) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Encryption key is required when encryption is enabled.',
+          path: ['key'],
+        });
+      }
+    }),
 });
 
 export type Config = z.infer<typeof schema>;

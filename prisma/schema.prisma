@@ -252,6 +252,8 @@ model File {
   maxViews     Int?
   favorite     Boolean @default(false)
   password     String?
+  isEncrypted  Boolean @default(false)
+  originalSize BigInt?
 
   tags Tag[]
 

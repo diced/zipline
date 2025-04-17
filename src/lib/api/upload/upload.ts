@@ -4,7 +4,7 @@ import { extname } from 'path';
 import { bytes } from '@/lib/bytes';
 import { compress } from '@/lib/compress';
 import { config } from '@/lib/config';
-import { hashPassword } from '@/lib/crypto';
+import { hashPassword, encryptBuffer } from '@/lib/crypto';
 import { datasource } from '@/lib/datasource';
 import { prisma } from '@/lib/db';
 import { fileSelect } from '@/lib/db/models/file';
@@ -118,10 +118,30 @@ export async function handleFile({
     }
   }
 
+  // encrypt file
+  let fileBuffer = file.buffer;
+  let isEncrypted = false;
+  let originalSize: bigint | null = null;
+
+  if (config.encryption.enabled && config.encryption.key) {
+    try {
+      originalSize = BigInt(fileBuffer.length);
+      fileBuffer = await encryptBuffer(fileBuffer, config.encryption.key, config.encryption.algorithm);
+      isEncrypted = true;
+      logger.info(`encrypted file ${file.filename} using ${config.encryption.algorithm}`);
+    } catch (e) {
+      const errorContext = e instanceof Error ? { error: e.message, stack: e.stack } : { error: String(e) };
+      logger.error(`failed to encrypt file ${file.filename}`, errorContext);
+      throw 'Failed to encrypt file';
+    }
+  }
+
   const fileUpload = await prisma.file.create({
     data: {
       name: `${fileName}${compressed ? '.jpg' : extension}`,
-      size: file.buffer ? file.buffer.length : file.file.bytesRead,
+      size: BigInt(fileBuffer.length),
+      originalSize: originalSize,
+      isEncrypted: isEncrypted,
       type: compressed ? 'image/jpeg' : mimetype,
       User: {
         connect: {
@@ -137,7 +157,7 @@ export async function handleFile({
     select: fileSelect,
   });
 
-  await datasource.put(fileUpload.name, file.buffer, {
+  await datasource.put(fileUpload.name, fileBuffer, {
     mimetype: fileUpload.type,
   });
 
