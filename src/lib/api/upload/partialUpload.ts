@@ -80,7 +80,9 @@ export async function handlePartialUpload({
     const fileUpload = await prisma.file.create({
       data: {
         name: `${fileName}${extension}`,
-        size: 0,
+        size: BigInt(0),
+        originalSize: options.partial.contentLength ? BigInt(options.partial.contentLength) : null,
+        isEncrypted: !!(config.encryption.enabled && config.encryption.key),
         type: mimetype,
         User: {
           connect: {
@@ -110,6 +112,11 @@ export async function handlePartialUpload({
         options,
         domain,
         responseUrl: `${domain}/${encodeURIComponent(fileUpload.name)}`,
+        encryption: {
+          enabled: config.encryption.enabled,
+          key: config.encryption.key,
+          algorithm: config.encryption.algorithm,
+        },
       },
     });
 

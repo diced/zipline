@@ -4,6 +4,7 @@ import { getDatasource } from '@/lib/datasource';
 import { S3Datasource } from '@/lib/datasource/S3';
 import { prisma } from '@/lib/db';
 import { fileSelect } from '@/lib/db/models/file';
+import { encryptBuffer } from '@/lib/crypto';
 import { IncompleteFile } from '@/lib/db/models/incompleteFile';
 import { userSelect } from '@/lib/db/models/user';
 import { log } from '@/lib/logger';
@@ -15,6 +16,7 @@ import { createReadStream, createWriteStream } from 'fs';
 import { open, readdir, rm } from 'fs/promises';
 import { join } from 'path';
 import { isMainThread, workerData } from 'worker_threads';
+import { Readable } from 'stream';
 
 export type PartialWorkerData = {
   user: {
@@ -28,9 +30,14 @@ export type PartialWorkerData = {
   options: UploadOptions;
   domain: string;
   responseUrl: string;
+  encryption: {
+    enabled?: boolean;
+    key?: string;
+    algorithm?: 'aes-256-gcm' | 'chacha20-poly1305';
+  };
 };
 
-const { user, file, options, responseUrl, domain } = workerData as PartialWorkerData;
+const { user, file, options, responseUrl, domain, encryption } = workerData as PartialWorkerData;
 const logger = log('tasks').c('partial').c(file.filename);
 
 if (isMainThread) {
@@ -139,10 +146,49 @@ async function main() {
     }
   }
 
+  let finalBuffer: Buffer;
+  let finalSize: number;
+  try {
+    const assembledHandle = await open(finalPath, 'r');
+    finalBuffer = await assembledHandle.readFile();
+    await assembledHandle.close();
+    logger.debug(`read assembled file from ${finalPath}, size: ${finalBuffer.length}`);
+
+    if (encryption?.enabled && encryption.key && encryption.algorithm) {
+      logger.info(`encrypting assembled file using ${encryption.algorithm}`);
+      try {
+        const encryptedBuffer = await encryptBuffer(finalBuffer, encryption.key, encryption.algorithm);
+        logger.info(
+          `encryption successful; original size: ${finalBuffer.length}, encrypted size: ${encryptedBuffer.length}`,
+        );
+        finalBuffer = encryptedBuffer;
+      } catch (encError) {
+        const errorContext =
+          encError instanceof Error
+            ? { error: encError.message, stack: encError.stack }
+            : { error: String(encError) };
+        logger.error('Failed to encrypt assembled file', errorContext);
+        await failPartial(incompleteFile);
+        process.exit(1);
+      }
+    } else {
+      logger.info('encryption not enabled or key/algorithm missing, skipping encryption');
+    }
+    finalSize = finalBuffer.length;
+  } catch (readError) {
+    const errorContext =
+      readError instanceof Error
+        ? { error: readError.message, stack: readError.stack }
+        : { error: String(readError) };
+    logger.error('failed to read assembled file for final processing', errorContext);
+    await failPartial(incompleteFile);
+    process.exit(1);
+  }
+
   if (config.datasource.type === 's3') {
     logger.debug('starting multipart upload process for s3');
 
-    const bodyStream = createReadStream(finalPath);
+    const bodyStream = Readable.from(finalBuffer);
     const s3datasource = datasource as S3Datasource;
 
     try {
@@ -163,10 +209,26 @@ async function main() {
 
       await rm(finalPath);
     } catch (e) {
-      logger.error('error while uploading multipart file');
+      logger.error('error while uploading multipart file to S3');
       console.error(e);
       await failPartial(incompleteFile);
 
+      process.exit(1);
+    }
+  } else if (config.datasource.type === 'local') {
+    logger.debug(`writing final buffer to local datasource path: ${finalPath}`);
+    try {
+      const localHandle = await open(finalPath, 'w');
+      await localHandle.writeFile(finalBuffer);
+      await localHandle.close();
+      logger.debug(`successfully wrote final buffer to ${finalPath}`);
+    } catch (writeError) {
+      const errorContext =
+        writeError instanceof Error
+          ? { error: writeError.message, stack: writeError.stack }
+          : { error: String(writeError) };
+      logger.error('failed to write final buffer to local datasource path', errorContext);
+      await failPartial(incompleteFile);
       process.exit(1);
     }
   }
@@ -180,10 +242,10 @@ async function main() {
     },
   });
 
-  await runComplete(file.id);
+  await runComplete(file.id, BigInt(finalSize));
 }
 
-async function runComplete(id: string) {
+async function runComplete(id: string, finalSize: bigint) {
   const userr = await prisma.user.findUnique({
     where: {
       id: user.id,
@@ -197,7 +259,7 @@ async function runComplete(id: string) {
       id,
     },
     data: {
-      size: options.partial!.range[2],
+      size: finalSize,
       ...(options.maxViews && { maxViews: options.maxViews }),
       ...(options.deletesAt && { deletesAt: options.deletesAt }),
     },
