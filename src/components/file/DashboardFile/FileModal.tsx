@@ -34,7 +34,6 @@ import {
   IconRefresh,
   IconTags,
   IconTagsOff,
-  IconTextRecognition,
   IconUpload,
 } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
@@ -42,7 +41,6 @@ import useSWR, { mutate } from 'swr';
 import DashboardFileType from '../DashboardFileType';
 import { addToFolder, createFolderAndAdd, mutateFiles } from '../actions';
 import FileStat from './FileStat';
-import EditFileDetailsModal from './EditFileDetailsModal';
 
 function ActionButton({
   Icon,

@@ -2,7 +2,6 @@ import Render from '@/components/render/Render';
 import { useUploadOptionsStore } from '@/lib/store/uploadOptions';
 import DashboardUploadText from '@/pages/dashboard/upload/text';
 import {
-  ActionIcon,
   Button,
   Center,
   Group,
@@ -10,8 +9,6 @@ import {
   Tabs,
   Text,
   Textarea,
-  Title,
-  Tooltip,
 } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { IconCursorText, IconEyeFilled, IconUpload } from '@tabler/icons-react';

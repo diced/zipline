@@ -1,6 +1,5 @@
 import GridTableSwitcher from '@/components/GridTableSwitcher';
 import { useViewStore } from '@/lib/store/view';
-import { usePathname, useRouter } from 'next/navigation';
 import {
   ActionIcon,
   Button,
@@ -13,7 +12,6 @@ import {
   Title,
   Tooltip,
 } from '@mantine/core';
-import FavoriteFiles from './views/FavoriteFiles';
 import FileTable from './views/FileTable';
 import Files from './views/Files';
 import TagsButton from './tags/TagsButton';
@@ -26,7 +24,6 @@ import { Response } from '@/lib/api/response';
 import { Folder } from '@/lib/db/models/folder';
 import { notifications } from '@mantine/notifications';
 import useSWR, { mutate } from 'swr';
-import { useEffect } from 'react';
 import UploadFile from '@/components/pages/upload/File';
 import { FilesSystemState, useFilesSystemState } from '@/components/pages/files/state/FileSystemState';
 import { mutateFolders } from '@/components/file/actions';

@@ -5,7 +5,6 @@ import { log } from '@/lib/logger';
 import { verifyTotpCode } from '@/lib/totp';
 import { getSession, saveSession } from '@/server/session';
 import fastifyPlugin from 'fastify-plugin';
-import { fileSelect } from '@/lib/db/models/file';
 
 export type ApiLoginResponse = {
   user?: User;

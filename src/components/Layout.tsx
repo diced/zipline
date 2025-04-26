@@ -29,10 +29,7 @@ import {
   IconChevronRight,
   IconClipboardCopy,
   IconExternalLink,
-  IconFileText,
-  IconFileUpload,
   IconFiles,
-  IconFolder,
   IconGraph,
   IconHome,
   IconLink,
@@ -41,7 +38,6 @@ import {
   IconSettingsFilled,
   IconShieldLockFilled,
   IconTags,
-  IconUpload,
   IconUsersGroup,
 } from '@tabler/icons-react';
 import Link from 'next/link';
