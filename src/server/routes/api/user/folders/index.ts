@@ -8,10 +8,12 @@ import fastifyPlugin from 'fastify-plugin';
 export type ApiUserFoldersResponse = Folder | Folder[];
 
 type Body = {
+  id?: string;
   files?: string[];
 
   name?: string;
   isPublic?: boolean;
+  parentFolderId?: string;
 };
 
 type Query = {
@@ -65,7 +67,7 @@ export default fastifyPlugin(
       method: 'POST',
       preHandler: [userMiddleware],
       handler: async (req, res) => {
-        const { name, isPublic } = req.body;
+        const { name, isPublic, parentFolderId } = req.body;
         let files = req.body.files;
         if (!name) return res.badRequest('Name is required');
 
@@ -88,6 +90,7 @@ export default fastifyPlugin(
 
         const folder = await prisma.folder.create({
           data: {
+            id: req.body.id,
             name,
             userId: req.user.id,
             ...(files?.length && {
@@ -96,6 +99,7 @@ export default fastifyPlugin(
               },
             }),
             public: isPublic ?? false,
+            parentFolderId: parentFolderId ?? 'root'
           },
           include: {
             files: {

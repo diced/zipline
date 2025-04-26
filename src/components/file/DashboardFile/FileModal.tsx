@@ -9,12 +9,10 @@ import { useSettingsStore } from '@/lib/store/settings';
 import {
   ActionIcon,
   Box,
-  Button,
   Checkbox,
   Combobox,
   Group,
   Input,
-  InputBase,
   Modal,
   Pill,
   PillsInput,
@@ -30,37 +28,19 @@ import { showNotification } from '@mantine/notifications';
 import {
   Icon,
   IconBombFilled,
-  IconCopy,
   IconDeviceSdCard,
-  IconDownload,
-  IconExternalLink,
   IconEyeFilled,
   IconFileInfo,
-  IconFolderMinus,
-  IconPencil,
   IconRefresh,
-  IconStar,
-  IconStarFilled,
   IconTags,
   IconTagsOff,
   IconTextRecognition,
-  IconTrashFilled,
   IconUpload,
 } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import useSWR, { mutate } from 'swr';
 import DashboardFileType from '../DashboardFileType';
-import {
-  addToFolder,
-  copyFile,
-  createFolderAndAdd,
-  deleteFile,
-  downloadFile,
-  favoriteFile,
-  mutateFiles,
-  removeFromFolder,
-  viewFile,
-} from '../actions';
+import { addToFolder, createFolderAndAdd, mutateFiles } from '../actions';
 import FileStat from './FileStat';
 import EditFileDetailsModal from './EditFileDetailsModal';
 
@@ -97,8 +77,6 @@ export default function FileModal({
 }) {
   const clipboard = useClipboard();
   const warnDeletion = useSettingsStore((state) => state.settings.warnDeletion);
-
-  const [editFileOpen, setEditFileOpen] = useState(false);
 
   const { data: folders } = useSWR<Extract<Response['/api/user/folders'], Folder[]>>(
     '/api/user/folders?noincl=true',
@@ -178,14 +156,12 @@ export default function FileModal({
 
   return (
     <>
-      <EditFileDetailsModal open={editFileOpen} onClose={() => setEditFileOpen(false)} file={file!} />
-
       <Modal
         opened={open}
         onClose={() => setOpen(false)}
         title={
           <Text size='xl' fw={700}>
-            {file?.name ?? ''}
+            {file?.originalName ?? ''}
           </Text>
         }
         size='auto'
@@ -222,9 +198,6 @@ export default function FileModal({
                 title='Views'
                 value={file.maxViews ? `${file.views} / ${file.maxViews}` : file.views}
               />
-              {file.originalName && (
-                <FileStat Icon={IconTextRecognition} title='Original Name' value={file.originalName} />
-              )}
             </SimpleGrid>
 
             {!reduce && (
@@ -294,119 +267,8 @@ export default function FileModal({
                     </Combobox.Dropdown>
                   </Combobox>
                 </Box>
-                <Box>
-                  <Title order={4} mt='lg' mb='xs'>
-                    Folder
-                  </Title>
-                  {file.folderId ? (
-                    <Button
-                      color='red'
-                      leftSection={<IconFolderMinus size='1rem' />}
-                      onClick={() => removeFromFolder(file)}
-                      fullWidth
-                    >
-                      Remove from folder &quot;{folders?.find((f) => f.id === file.folderId)?.name ?? ''}
-                      &quot;
-                    </Button>
-                  ) : (
-                    <Combobox
-                      store={folderCombobox}
-                      withinPortal={false}
-                      onOptionSubmit={(value) => handleAdd(value)}
-                    >
-                      <Combobox.Target>
-                        <InputBase
-                          rightSection={<Combobox.Chevron />}
-                          value={search}
-                          onChange={(event) => {
-                            folderCombobox.openDropdown();
-                            folderCombobox.updateSelectedOptionIndex();
-                            setSearch(event.currentTarget.value);
-                          }}
-                          onClick={() => folderCombobox.openDropdown()}
-                          onFocus={() => folderCombobox.openDropdown()}
-                          onBlur={() => {
-                            folderCombobox.closeDropdown();
-                            setSearch(search || '');
-                          }}
-                          placeholder='Add to folder...'
-                          rightSectionPointerEvents='none'
-                        />
-                      </Combobox.Target>
-
-                      <Combobox.Dropdown>
-                        <Combobox.Options>
-                          {folders
-                            ?.filter((f) => f.name.toLowerCase().includes(search.toLowerCase().trim()))
-                            .map((f) => (
-                              <Combobox.Option value={f.id} key={f.id}>
-                                {f.name}
-                              </Combobox.Option>
-                            ))}
-
-                          {!folders?.some((f) => f.name === search) && search.trim().length > 0 && (
-                            <Combobox.Option value='$create'>
-                              + Create folder &quot;{search}&quot;
-                            </Combobox.Option>
-                          )}
-                        </Combobox.Options>
-                      </Combobox.Dropdown>
-                    </Combobox>
-                  )}
-                </Box>
               </SimpleGrid>
             )}
-
-            <Group justify='space-between' mt='sm'>
-              <Group>
-                {!reduce && (
-                  <Text size='sm' c='dimmed'>
-                    {file.id}
-                  </Text>
-                )}
-              </Group>
-
-              <Group>
-                {!reduce && (
-                  <>
-                    <ActionButton
-                      Icon={IconPencil}
-                      onClick={() => setEditFileOpen(true)}
-                      tooltip='Edit file details'
-                      color='orange'
-                    />
-                    <ActionButton
-                      Icon={IconTrashFilled}
-                      onClick={() => deleteFile(warnDeletion, file, setOpen)}
-                      tooltip='Delete file'
-                      color='red'
-                    />
-                    <ActionButton
-                      Icon={file.favorite ? IconStarFilled : IconStar}
-                      onClick={() => favoriteFile(file)}
-                      tooltip={file.favorite ? 'Unfavorite file' : 'Favorite file'}
-                      color={file.favorite ? 'gray' : 'yellow'}
-                    />
-                  </>
-                )}
-                <ActionButton
-                  Icon={IconExternalLink}
-                  onClick={() => viewFile(file)}
-                  tooltip='View file in a new tab'
-                  color='blue'
-                />
-                <ActionButton
-                  Icon={IconCopy}
-                  onClick={() => copyFile(file, clipboard)}
-                  tooltip='Copy file link'
-                />
-                <ActionButton
-                  Icon={IconDownload}
-                  onClick={() => downloadFile(file)}
-                  tooltip='Download file'
-                />
-              </Group>
-            </Group>
           </>
         ) : (
           <></>

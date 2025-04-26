@@ -249,7 +249,7 @@ export default function ViewFileId({
           <Group justify='space-between' mb='sm'>
             <Group>
               <Text size='lg' fw={700} display='flex'>
-                {file.name}
+                {file.originalName}
               </Text>
               {user?.view!.showMimetype && (
                 <Text size='sm' c='dimmed' ml='sm' style={{ alignSelf: 'center' }}>

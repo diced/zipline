@@ -14,8 +14,7 @@ import {
   Tooltip,
 } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
-import { IconCursorText, IconEyeFilled, IconFiles, IconUpload } from '@tabler/icons-react';
-import Link from 'next/link';
+import { IconCursorText, IconEyeFilled, IconUpload } from '@tabler/icons-react';
 import { useState } from 'react';
 import UploadOptionsButton from '../UploadOptionsButton';
 import { renderMode } from '../renderMode';
@@ -23,11 +22,16 @@ import { uploadFiles } from '../uploadFiles';
 
 import styles from './index.module.css';
 import { useShallow } from 'zustand/shallow';
+import { Folder } from '@/lib/db/models/folder';
 
 export default function UploadText({
   codeMeta,
+  folder,
+  onUploaded,
 }: {
   codeMeta: Parameters<typeof DashboardUploadText>[0]['codeMeta'];
+  folder?: Folder;
+  onUploaded: () => void;
 }) {
   const clipboard = useClipboard();
 
@@ -59,6 +63,8 @@ export default function UploadText({
     });
 
     uploadFiles([file], {
+      folder: folder,
+      onUploaded: onUploaded,
       clipboard,
       setFiles: () => {},
       setLoading,
@@ -71,16 +77,6 @@ export default function UploadText({
 
   return (
     <>
-      <Group gap='sm'>
-        <Title order={1}>Upload text</Title>
-
-        <Tooltip label='View your files'>
-          <ActionIcon component={Link} href='/dashboard/files' variant='outline' radius='sm'>
-            <IconFiles size={18} />
-          </ActionIcon>
-        </Tooltip>
-      </Group>
-
       <Tabs defaultValue='textarea' variant='pills' my='sm'>
         <Tabs.List my='sm'>
           <Tabs.Tab value='textarea' leftSection={<IconCursorText size='1rem' />}>

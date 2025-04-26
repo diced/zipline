@@ -245,7 +245,7 @@ model File {
   deletesAt DateTime?
 
   name         String // name & file saved on datasource
-  originalName String? // original name of file when uploaded
+  originalName String // original name of file when uploaded
   size         BigInt
   type         String
   views        Int     @default(0)
@@ -287,6 +287,7 @@ model Folder {
   allowUploads Boolean @default(false)
 
   files File[]
+  parentFolderId String
 
   User   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId String

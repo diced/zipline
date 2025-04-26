@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/db';
 import { fileSelect } from '@/lib/db/models/file';
-import { Folder, cleanFolder } from '@/lib/db/models/folder';
+import { cleanFolder, Folder } from '@/lib/db/models/folder';
 import { log } from '@/lib/logger';
 import { userMiddleware } from '@/server/middleware/user';
 import fastifyPlugin from 'fastify-plugin';
@@ -16,6 +16,7 @@ type Body = {
   isPublic?: boolean;
   name?: string;
   allowUploads?: boolean;
+  parentFolderId?: string;
 
   delete?: 'file' | 'folder';
 };
@@ -101,7 +102,7 @@ export default fastifyPlugin(
 
           return res.send(cleanFolder(nFolder));
         } else if (req.method === 'PATCH') {
-          const { isPublic, name, allowUploads } = req.body;
+          const { isPublic, name, allowUploads, parentFolderId } = req.body;
 
           const nFolder = await prisma.folder.update({
             where: {
@@ -111,6 +112,7 @@ export default fastifyPlugin(
               ...(isPublic !== undefined && { public: isPublic }),
               ...(name && { name }),
               ...(allowUploads !== undefined && { allowUploads }),
+              ...(parentFolderId !== undefined && { parentFolderId }),
             },
             include: {
               files: {
@@ -127,6 +129,7 @@ export default fastifyPlugin(
             isPublic,
             name,
             allowUploads,
+            parentFolderId
           });
 
           return res.send(cleanFolder(nFolder));

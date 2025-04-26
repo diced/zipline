@@ -8,6 +8,7 @@ import { ActionIcon, Anchor, Group, Stack, Table, Text, Tooltip } from '@mantine
 import { useClipboard } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
 import { hideNotification, notifications } from '@mantine/notifications';
+import { Folder } from '@prisma/client';
 import { IconClipboardCopy, IconExternalLink, IconFileUpload, IconFileXFilled } from '@tabler/icons-react';
 import Link from 'next/link';
 
@@ -91,7 +92,7 @@ export async function uploadPartialFiles(
     options: UploadOptionsStore['options'];
     ephemeral: UploadOptionsStore['ephemeral'];
     config: ReturnType<typeof useConfig>;
-    folder?: string;
+    folder?: Folder;
   },
 ) {
   setLoading(true);
@@ -244,7 +245,7 @@ export async function uploadPartialFiles(
           options.imageCompressionPercent.toString(),
         );
       options.maxViews && req.setRequestHeader('x-zipline-max-views', options.maxViews.toString());
-      options.addOriginalName && req.setRequestHeader('x-zipline-original-name', 'true');
+      req.setRequestHeader('x-zipline-original-name', 'true');
       options.overrides_returnDomain &&
         req.setRequestHeader('x-zipline-domain', options.overrides_returnDomain);
 
@@ -252,8 +253,8 @@ export async function uploadPartialFiles(
       ephemeral.filename &&
         req.setRequestHeader('x-zipline-filename', encodeURIComponent(ephemeral.filename));
 
-      if (folder) {
-        req.setRequestHeader('x-zipline-folder', folder);
+      if (folder?.id) {
+        req.setRequestHeader('x-zipline-folder', folder.id);
       } else if (ephemeral.folderId) {
         req.setRequestHeader('x-zipline-folder', ephemeral.folderId);
       }

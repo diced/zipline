@@ -13,7 +13,6 @@ import {
   PasswordInput,
   Select,
   Stack,
-  Switch,
   Text,
   TextInput,
   useCombobox,
@@ -332,24 +331,6 @@ export default function UploadOptionsButton({ folder, numFiles }: { folder?: str
           <Text c='dimmed' size='sm'>
             <b>Other Options</b>
           </Text>
-
-          <Switch
-            label={
-              <>
-                Add Original Name{' '}
-                {options.addOriginalName ? (
-                  <Badge variant='outline' size='xs'>
-                    saved
-                  </Badge>
-                ) : null}
-              </>
-            }
-            description={
-              'Add the original file name, so that the file can be downloaded with the original name. This will still use the "Name Format" option for its file name.'
-            }
-            checked={options.addOriginalName ?? false}
-            onChange={(event) => setOption('addOriginalName', event.currentTarget.checked ?? false)}
-          />
         </Stack>
 
         <Group justify='right' my='sm' gap='sm'>

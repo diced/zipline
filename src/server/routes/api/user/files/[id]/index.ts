@@ -16,6 +16,7 @@ type Body = {
   originalName?: string;
   type?: string;
   tags?: string[];
+  name?: string;
 };
 
 type Params = {
@@ -81,6 +82,7 @@ export default fastifyPlugin(
               ...(req.body.originalName !== undefined && { originalName: req.body.originalName }),
               ...(req.body.type !== undefined && { type: req.body.type }),
               ...(password !== undefined && { password }),
+              ...(req.body.name !== undefined && { name: req.body.name }),
               ...(req.body.tags !== undefined && {
                 tags: {
                   set: req.body.tags.map((tag) => ({ id: tag })),

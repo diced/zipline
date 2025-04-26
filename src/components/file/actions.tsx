@@ -75,7 +75,7 @@ export async function handleDeleteFile(file: File, setOpen: (open: boolean) => v
     setOpen(false);
   }
 
-  mutateFiles();
+  mutateFolders();
 }
 
 export async function favoriteFile(file: File) {
@@ -103,7 +103,7 @@ export async function favoriteFile(file: File) {
     });
   }
 
-  mutateFiles();
+  mutateFolders();
 }
 
 export function createFolderAndAdd(file: File, folderName: string | null) {
@@ -192,7 +192,34 @@ export async function addToFolder(file: File, folderId: string | null) {
   }
 
   mutateFolders();
-  mutateFiles();
+}
+
+export async function renameFile(file: File, newName: string) {
+  const { data, error } = await fetchApi<Response['/api/user/files/[id]']>(
+    `/api/user/files/${file.id}`,
+    'PATCH',
+    {
+      originalName: newName,
+    },
+  );
+
+  if (error) {
+    notifications.show({
+      title: 'Error while renaming file',
+      message: error.error,
+      color: 'red',
+      icon: <IconFolderOff size='1rem' />,
+    });
+  } else {
+    notifications.show({
+      title: 'File renamed',
+      message: `File ${file.originalName} have been renamed to ${newName}`,
+      color: 'green',
+      icon: <IconFolderPlus size='1rem' />,
+    });
+  }
+
+  mutateFolders();
 }
 
 export async function addMultipleToFolder(files: File[], folderId: string | null) {

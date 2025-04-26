@@ -1,20 +1,37 @@
 import type { File } from '@/lib/db/models/file';
 import { Card } from '@mantine/core';
-import { useState } from 'react';
+import React, { forwardRef } from 'react';
+import { IconStar } from '@tabler/icons-react';
 import DashboardFileType from '../DashboardFileType';
-import FileModal from './FileModal';
 
 import styles from './index.module.css';
 
-export default function DashboardFile({ file, reduce }: { file: File; reduce?: boolean }) {
-  const [open, setOpen] = useState(false);
+const starStyle = {
+  position: 'absolute' as const,
+  top: '8px',
+  right: '8px',
+  color: '#FFD700',
+};
 
-  return (
-    <>
-      <FileModal open={open} setOpen={setOpen} file={file} reduce={reduce} />
-      <Card shadow='md' radius='md' p={0} onClick={() => setOpen(true)} className={styles.file}>
-        <DashboardFileType key={file.id} file={file} />
-      </Card>
-    </>
-  );
-}
+type DashboardFileProps = React.ComponentPropsWithoutRef<'div'> & {
+  file: File;
+  reduce?: boolean;
+  onOpenFile?: (file: File) => void;
+};
+
+const DashboardFile = forwardRef<HTMLDivElement, DashboardFileProps>(
+  ({ file, reduce, style, className, onOpenFile, ...rest }, ref) => {
+    return (
+      <div ref={ref} style={style} className={className} {...rest}>
+        <Card shadow='md' radius='md' p={0} onClick={() => onOpenFile?.(file)} className={styles.file}>
+          {file.favorite && <IconStar style={starStyle} size={20} fill='currentColor' />}
+          <DashboardFileType key={file.id} file={file} />
+        </Card>
+      </div>
+    );
+  },
+);
+
+export default DashboardFile;
+
+DashboardFile.displayName = 'DashboardFile';

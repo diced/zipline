@@ -9,10 +9,9 @@ import {
   Kbd,
   Paper,
   Progress,
-  Text,
-  Title,
-  Tooltip,
   rem,
+  Text,
+  Tooltip,
   useMantineTheme,
 } from '@mantine/core';
 import { Dropzone } from '@mantine/dropzone';
@@ -28,8 +27,17 @@ import { bytes } from '@/lib/bytes';
 import { uploadPartialFiles } from '../uploadPartialFiles';
 import { humanizeDuration } from '@/lib/relativeTime';
 import { useShallow } from 'zustand/shallow';
+import { Folder } from '@/lib/db/models/folder';
 
-export default function UploadFile({ title, folder }: { title?: string; folder?: string }) {
+export default function UploadFile({
+  title,
+  folder,
+  onUploaded,
+}: {
+  title?: string;
+  folder?: Folder;
+  onUploaded: () => void;
+}) {
   const theme = useMantineTheme();
   const colorScheme = useColorScheme();
   const clipboard = useClipboard();
@@ -66,7 +74,7 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
 
   const aggSize = () => files.reduce((acc, file) => acc + file.size, 0);
 
-  const upload = () => {
+  const upload = async () => {
     const toPartialFiles: File[] = [];
     for (let i = 0; i !== files.length; ++i) {
       const file = files[i];
@@ -76,7 +84,7 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
     }
 
     if (toPartialFiles.length > 0) {
-      uploadPartialFiles(toPartialFiles, {
+      await uploadPartialFiles(toPartialFiles, {
         setFiles,
         setLoading,
         setProgress,
@@ -86,6 +94,8 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
         ephemeral,
         config,
         folder,
+      }).then(() => {
+        onUploaded();
       });
     } else {
       const size = aggSize();
@@ -113,6 +123,7 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
         options,
         ephemeral,
         folder,
+        onUploaded
       });
     }
   };
@@ -128,8 +139,6 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
   return (
     <>
       <Group gap='sm'>
-        <Title order={1}>{title ?? 'Upload files'}</Title>
-
         {!folder && (
           <Tooltip label='View your files'>
             <ActionIcon component={Link} href='/dashboard/files' variant='outline' radius='sm'>
@@ -216,7 +225,7 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
       </Grid>
 
       <Group justify='right' gap='sm' my='md'>
-        <UploadOptionsButton folder={folder} numFiles={files.length} />
+        <UploadOptionsButton folder={folder?.id} numFiles={files.length} />
 
         <Button
           variant='outline'

@@ -5,6 +5,7 @@ import { log } from '@/lib/logger';
 import { verifyTotpCode } from '@/lib/totp';
 import { getSession, saveSession } from '@/server/session';
 import fastifyPlugin from 'fastify-plugin';
+import { fileSelect } from '@/lib/db/models/file';
 
 export type ApiLoginResponse = {
   user?: User;
@@ -82,6 +83,24 @@ export default fastifyPlugin(
         await saveSession(session, user, false);
 
         delete (user as any).password;
+
+        const rootFolder = await prisma.folder.findUnique({
+          where: {
+            id: "root",
+          },
+        });
+        if (!rootFolder) {
+          console.log(user.id);
+          await prisma.folder.create({
+            data: {
+              id: "root",
+              name: "Files",
+              userId: user.id,
+              public: false,
+              parentFolderId: '',
+            }
+          });
+        }
 
         logger.info('user logged in successfully', {
           username,

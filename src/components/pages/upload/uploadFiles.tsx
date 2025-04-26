@@ -7,6 +7,7 @@ import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import { IconClipboardCopy, IconExternalLink, IconFileUpload, IconFileXFilled } from '@tabler/icons-react';
 import Link from 'next/link';
+import { Folder } from '@/lib/db/models/folder';
 
 export function filesModal(
   files: Response['/api/upload']['files'],
@@ -104,6 +105,7 @@ export function uploadFiles(
     options,
     ephemeral,
     folder,
+    onUploaded
   }: {
     setProgress: (o: { percent: number; remaining: number; speed: number }) => void;
     setLoading: (loading: boolean) => void;
@@ -112,7 +114,8 @@ export function uploadFiles(
     clearEphemeral: () => void;
     options: UploadOptionsStore['options'];
     ephemeral: UploadOptionsStore['ephemeral'];
-    folder?: string;
+    folder?: Folder;
+    onUploaded: () => void;
   },
 ) {
   setLoading(true);
@@ -179,6 +182,7 @@ export function uploadFiles(
       });
       setFiles([]);
       filesModal(res.files, { clipboard, clearEphemeral });
+      onUploaded();
     },
     false,
   );
@@ -190,14 +194,14 @@ export function uploadFiles(
   options.imageCompressionPercent &&
     req.setRequestHeader('x-zipline-image-compression-percent', options.imageCompressionPercent.toString());
   options.maxViews && req.setRequestHeader('x-zipline-max-views', options.maxViews.toString());
-  options.addOriginalName && req.setRequestHeader('x-zipline-original-name', 'true');
+  req.setRequestHeader('x-zipline-original-name', 'true');
   options.overrides_returnDomain && req.setRequestHeader('x-zipline-domain', options.overrides_returnDomain);
 
   ephemeral.password && req.setRequestHeader('x-zipline-password', ephemeral.password);
   ephemeral.filename && req.setRequestHeader('x-zipline-filename', encodeURIComponent(ephemeral.filename));
 
-  if (folder) {
-    req.setRequestHeader('x-zipline-folder', folder);
+  if (folder?.id) {
+    req.setRequestHeader('x-zipline-folder', folder.id);
   } else if (ephemeral.folderId) {
     req.setRequestHeader('x-zipline-folder', ephemeral.folderId);
   }

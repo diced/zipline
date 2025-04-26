@@ -7,7 +7,6 @@ export const defaultUploadOptions: UploadOptionsStore['options'] = {
   format: 'default',
   imageCompressionPercent: null,
   maxViews: null,
-  addOriginalName: false,
   overrides_returnDomain: null,
 };
 
@@ -23,7 +22,6 @@ export type UploadOptionsStore = {
     format: Config['files']['defaultFormat'] | 'default';
     imageCompressionPercent: number | null;
     maxViews: number | null;
-    addOriginalName: boolean | null;
     overrides_returnDomain: string | null;
   };
 

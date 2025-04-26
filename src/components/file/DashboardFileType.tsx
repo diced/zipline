@@ -83,6 +83,7 @@ export default function DashboardFileType({
   const disableMediaPreview = useSettingsStore((state) => state.settings.disableMediaPreview);
 
   const dbFile = 'id' in file;
+  const fileName = (file as DbFile).originalName ?? file.name;
   const renderIn = renderMode(file.name.split('.').pop() || '');
 
   const [fileContent, setFileContent] = useState('');
@@ -140,16 +141,16 @@ export default function DashboardFileType({
   }, []);
 
   if (disableMediaPreview && !show)
-    return <Placeholder text={`Click to view file ${file.name}`} Icon={fileIcon(file.type)} />;
+    return <Placeholder text={`Click to view file ${fileName}`} Icon={fileIcon(file.type)} />;
 
   if (dbFile && file.password === true && !show)
-    return <Placeholder text={`Click to view protected ${file.name}`} Icon={IconShieldLockFilled} />;
+    return <Placeholder text={`Click to view protected ${fileName}`} Icon={IconShieldLockFilled} />;
 
   if (dbFile && file.password === true && show)
     return (
       <Paper withBorder p='xs' style={{ cursor: 'pointer' }}>
         <Placeholder
-          text={`Click to view protected ${file.name}`}
+          text={`Click to view protected ${fileName}`}
           Icon={IconShieldLockFilled}
           onClick={() => window.open(`/view/${file.name}${password ? `?pw=${password}` : ''}`)}
         />
@@ -188,7 +189,7 @@ export default function DashboardFileType({
           </Center>
         </Box>
       ) : (
-        <Placeholder text={`Click to play video ${file.name}`} Icon={fileIcon(file.type)} />
+        <Placeholder text={`Click to play video ${fileName}`} Icon={fileIcon(file.type)} />
       );
     case 'image':
       return show ? (
@@ -241,7 +242,7 @@ export default function DashboardFileType({
           src={dbFile ? `/raw/${file.name}${password ? `?pw=${password}` : ''}` : URL.createObjectURL(file)}
         />
       ) : (
-        <Placeholder text={`Click to play audio ${file.name}`} Icon={fileIcon(file.type)} />
+        <Placeholder text={`Click to play audio ${fileName}`} Icon={fileIcon(file.type)} />
       );
     case 'text':
       return show ? (
@@ -265,18 +266,18 @@ export default function DashboardFileType({
           <Render mode={renderIn} language={file.name.split('.').pop() || ''} code={fileContent} />
         )
       ) : (
-        <Placeholder text={`Click to view text ${file.name}`} Icon={fileIcon(file.type)} />
+        <Placeholder text={`Click to view text ${fileName}`} Icon={fileIcon(file.type)} />
       );
     default:
       if (dbFile && !show)
-        return <Placeholder text={`Click to view file ${file.name}`} Icon={fileIcon(file.type)} />;
+        return <Placeholder text={`Click to view file ${fileName}`} Icon={fileIcon(file.type)} />;
 
       if (dbFile && show)
         return (
           <Paper withBorder p='xs' style={{ cursor: 'pointer' }}>
             <Placeholder
               onClick={() => window.open(`/raw/${file.name}${password ? `?pw=${password}` : ''}`)}
-              text={`Click to view file ${file.name} in a new tab`}
+              text={`Click to view file ${fileName} in a new tab`}
               Icon={fileIcon(file.type)}
             />
           </Paper>

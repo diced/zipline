@@ -8,7 +8,7 @@ export type File = {
   deletesAt: Date | null;
   favorite: boolean;
   id: string;
-  originalName: string | null;
+  originalName: string;
   name: string;
   size: number;
   type: string;

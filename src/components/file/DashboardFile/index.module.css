@@ -1,5 +1,7 @@
 .file {
   transition: all 0.2s ease-in-out;
+  width: 150px;
+  height: 160px
 }
 
 .file:hover {
@@ -8,4 +10,5 @@
     0 0 0 1px rgba(0, 0, 0, 0.1),
     0 4px 12px -1px rgba(0, 0, 0, 0.1);
   filter: brightness(0.86);
+  transform: scale(1.02);
 }

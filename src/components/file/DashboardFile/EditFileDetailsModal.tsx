@@ -19,7 +19,6 @@ export default function EditFileDetailsModal({
 
   const [maxViews, setMaxViews] = useState<number | null>(file?.maxViews ?? null);
   const [password, setPassword] = useState<string | null>('');
-  const [originalName, setOriginalName] = useState<string | null>(file?.originalName ?? null);
   const [type, setType] = useState<string | null>(file?.type ?? null);
 
   const handleRemovePassword = async () => {
@@ -58,7 +57,6 @@ export default function EditFileDetailsModal({
 
     if (maxViews !== null) data['maxViews'] = maxViews;
     if (password !== null) data['password'] = password?.trim();
-    if (originalName !== null) data['originalName'] = originalName?.trim();
     if (type !== null) data['type'] = type?.trim();
 
     const { error } = await fetchApi(`/api/user/files/${file.id}`, 'PATCH', data);
@@ -96,15 +94,6 @@ export default function EditFileDetailsModal({
           value={maxViews || ''}
           onChange={(value) => setMaxViews(value === '' ? null : Number(value))}
           leftSection={<IconEye size='1rem' />}
-        />
-
-        <TextInput
-          label='Original Name'
-          description='Add an original name. When downloading this file, instead of using the generated file name (if chosen), it will download with this "original name" instead.'
-          value={originalName ?? ''}
-          onChange={(event) =>
-            setOriginalName(event.currentTarget.value.trim() === '' ? null : event.currentTarget.value.trim())
-          }
         />
 
         <TextInput

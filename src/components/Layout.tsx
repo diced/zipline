@@ -81,31 +81,6 @@ const navLinks: NavLinks[] = [
     href: '/dashboard/files',
   },
   {
-    label: 'Folders',
-    icon: <IconFolder size='1rem' />,
-    active: (path: string) => path === '/dashboard/folders',
-    href: '/dashboard/folders',
-  },
-  {
-    label: 'Upload',
-    icon: <IconUpload size='1rem' />,
-    active: (path: string) => path.startsWith('/dashboard/upload'),
-    links: [
-      {
-        label: 'File',
-        icon: <IconFileUpload size='1rem' />,
-        active: (path: string) => path === '/dashboard/upload/file',
-        href: '/dashboard/upload/file',
-      },
-      {
-        label: 'Text',
-        icon: <IconFileText size='1rem' />,
-        active: (path: string) => path === '/dashboard/upload/text',
-        href: '/dashboard/upload/text',
-      },
-    ],
-  },
-  {
     label: 'URLs',
     icon: <IconLink size='1rem' />,
     active: (path: string) => path === '/dashboard/urls',

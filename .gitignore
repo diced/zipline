@@ -46,3 +46,6 @@ next-env.d.ts
 uploads*/
 *.crt
 *.key
+
+# idea
+/.idea/

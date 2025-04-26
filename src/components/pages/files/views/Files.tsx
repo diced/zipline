@@ -1,110 +1,68 @@
-import {
-  Button,
-  Center,
-  Group,
-  Pagination,
-  Paper,
-  Select,
-  SimpleGrid,
-  Skeleton,
-  Stack,
-  Text,
-  Title,
-} from '@mantine/core';
-import { IconFileUpload, IconFilesOff } from '@tabler/icons-react';
-import dynamic from 'next/dynamic';
-import Link from 'next/link';
-import { parseAsInteger, useQueryState } from 'nuqs';
-import { useEffect, useState } from 'react';
-import { useApiPagination } from '../useApiPagination';
+import { FileExplorer } from '@/components/file/FileSystem/FileExplorer';
+import { addToFolder } from '@/components/file/actions';
+import { File } from '@/lib/db/models/file';
+import { FilesSystemState, useFilesSystemState } from '@/components/pages/files/state/FileSystemState';
+import { Folder } from '@/lib/db/models/folder';
+import { moveFolderToAnotherFolder } from '@/components/pages/folders/actions';
+import { useRouter } from 'next/router';
+import { useCallback, useEffect, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
 
-const DashboardFile = dynamic(() => import('@/components/file/DashboardFile'), {
-  loading: () => <Skeleton height={350} animate />,
-});
+export default function Files() {
+  const fileSystemState = useFilesSystemState();
 
-const PER_PAGE_OPTIONS = [9, 12, 15, 30, 45];
+  const handleMoveFile = async (file: File, toFolderId: string | null) => {
+    console.log(`Move file ${file} to folder ${toFolderId}`);
+    addToFolder(file, toFolderId);
+  };
 
-export default function Files({ id }: { id?: string }) {
-  const [page, setPage] = useQueryState('page', parseAsInteger.withDefault(1));
-  const [perpage, setPerpage] = useState<number>(15);
-  const [cachedPages, setCachedPages] = useState<number>(1);
+  const handleMoveFolder = async (folder: Folder, toFolderId: string | null) => {
+    console.log(`Move folder ${folder.id} to folder ${toFolderId}`);
+    moveFolderToAnotherFolder(folder, toFolderId);
+  };
 
-  const { data, isLoading } = useApiPagination({
-    page,
-    perpage,
-    id,
-  });
-
-  useEffect(() => {
-    if (data?.pages) {
-      setCachedPages(data.pages);
-    }
-  }, [data?.pages]);
-
-  const from = (page - 1) * perpage + 1;
-  const to = Math.min(page * perpage, data?.total ?? 0);
-  const totalRecords = data?.total ?? 0;
+  useSyncFolderWithUrl(fileSystemState);
 
   return (
-    <>
-      <SimpleGrid
-        my='sm'
-        cols={{
-          base: 1,
-          md: 2,
-          lg: (data?.page.length ?? 0 > 0) || isLoading ? 3 : 1,
-        }}
-        spacing='md'
-        pos='relative'
-      >
-        {isLoading ? (
-          [...Array(9)].map((_, i) => <Skeleton key={i} height={350} animate />)
-        ) : (data?.page?.length ?? 0 > 0) ? (
-          data?.page.map((file) => <DashboardFile key={file.id} file={file} />)
-        ) : (
-          <Paper withBorder p='sm'>
-            <Center>
-              <Stack>
-                <Group>
-                  <IconFilesOff size='2rem' />
-                  <Title order={2}>No files found</Title>
-                </Group>
-                {!id && (
-                  <Button
-                    variant='outline'
-                    size='compact-sm'
-                    leftSection={<IconFileUpload size='1rem' />}
-                    component={Link}
-                    href='/dashboard/upload/file'
-                  >
-                    Upload a file
-                  </Button>
-                )}
-              </Stack>
-            </Center>
-          </Paper>
-        )}
-      </SimpleGrid>
-
-      <Group justify='space-between' align='center' mt='md'>
-        <Text size='sm'>{`${from} - ${to} / ${totalRecords} files`}</Text>
-
-        <Group gap='sm'>
-          <Select
-            value={perpage.toString()}
-            data={PER_PAGE_OPTIONS.map((val) => ({ value: val.toString(), label: `${val}` }))}
-            onChange={(value) => {
-              setPerpage(Number(value));
-              setPage(1);
-            }}
-            w={80}
-            size='xs'
-            variant='filled'
-          />
-
-          <Pagination value={page} onChange={setPage} total={cachedPages} size='sm' withControls withEdges />
-        </Group>
-      </Group>
-    </>
+    fileSystemState.folders != undefined && (
+      <FileExplorer onMoveFile={handleMoveFile} onMoveFolder={handleMoveFolder} />
+    )
   );
+}
+
+function useSyncFolderWithUrl(fileSystemState: FilesSystemState) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const isFirstRender = useRef(true);
+
+  const updateUrlWithFolder = useCallback(() => {
+    const params = new URLSearchParams(searchParams?.toString());
+    const urlFolderId = params.get('folder');
+    const currentFolderId = fileSystemState.currentFolder?.id;
+
+    if (isFirstRender.current) {
+      if (urlFolderId) {
+        const folder = fileSystemState.folders.find((f) => f.id === urlFolderId);
+        if (folder) {
+          fileSystemState.setCurrentFolder(folder);
+        }
+      }
+      isFirstRender.current = false;
+      return;
+    }
+
+    if (currentFolderId && currentFolderId !== urlFolderId) {
+      params.set('folder', currentFolderId);
+      const newSearch = params.toString();
+      const currentSearch = searchParams?.toString() || '';
+
+      if (newSearch !== currentSearch) {
+        router.replace(`?${newSearch}`);
+      }
+    }
+  }, [fileSystemState, router, searchParams]);
+
+  useEffect(() => {
+    updateUrlWithFolder();
+  }, [updateUrlWithFolder]);
 }
