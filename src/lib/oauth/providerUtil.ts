@@ -29,7 +29,7 @@ export const discordAuth = {
   url: (clientId: string, origin: string, state?: string, redirectUri?: string) =>
     `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(
       redirectUri ?? `${origin}/api/auth/oauth/discord`,
-    )}&response_type=code&scope=identify${state ? `&state=${encodeURIComponent(state)}` : ''}`,
+    )}&response_type=code&scope=identify&prompt=none${state ? `&state=${encodeURIComponent(state)}` : ''}`,
   user: async (accessToken: string) => {
     const res = await fetch('https://discord.com/api/users/@me', {
       headers: {
