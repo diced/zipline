@@ -317,6 +317,9 @@ export const schema = z.object({
     themeColor: z.string().default('#000000'),
     backgroundColor: z.string().default('#000000'),
   }),
+  login: z.object({
+    loginDuration: z.number().default(7),
+  }),
 });
 
 export type Config = z.infer<typeof schema>;

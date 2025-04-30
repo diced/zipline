@@ -5,20 +5,23 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 import { IncomingMessage, ServerResponse } from 'http';
 import { getIronSession, type SessionOptions } from 'iron-session';
 
-const cookieOptions: SessionOptions['cookieOptions'] = {
-  // week
-  maxAge: 60 * 60 * 24 * 7,
-  expires: new Date(Date.now() + 60 * 60 * 24 * 7 * 1000),
-  path: '/',
-  sameSite: 'lax',
-  httpOnly: false,
-  secure: false,
-};
-
 export type ZiplineSession = {
   id: string | null;
   sessionId: string | null;
 };
+
+export function computeCookieOptions(): SessionOptions['cookieOptions'] {
+  const loginDuration = config.login.loginDuration;
+
+  return {
+    maxAge: 60 * 60 * 24 * loginDuration,
+    expires: new Date(Date.now() + 60 * 60 * 24 * loginDuration * 1000),
+    path: '/',
+    sameSite: 'lax',
+    httpOnly: false,
+    secure: false,
+  };
+}
 
 export async function getSession(
   req: FastifyRequest | IncomingMessage,
@@ -31,7 +34,7 @@ export async function getSession(
       {
         password: config.core.secret,
         cookieName: 'zipline_session',
-        cookieOptions,
+        cookieOptions: computeCookieOptions(),
       },
     );
 
@@ -44,7 +47,7 @@ export async function getSession(
     {
       password: config.core.secret,
       cookieName: 'zipline_session',
-      cookieOptions,
+      cookieOptions: computeCookieOptions(),
     },
   );
 

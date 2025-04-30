@@ -1,5 +1,14 @@
 import { Response } from '@/lib/api/response';
-import { Button, LoadingOverlay, Paper, SimpleGrid, Switch, TextInput, Title } from '@mantine/core';
+import {
+  Button,
+  NumberInput,
+  LoadingOverlay,
+  Paper,
+  SimpleGrid,
+  Switch,
+  TextInput,
+  Title,
+} from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconDeviceFloppy } from '@tabler/icons-react';
 import { useRouter } from 'next/router';
@@ -16,11 +25,13 @@ export default function ServerSettingsCore({
     coreReturnHttpsUrls: boolean;
     coreDefaultDomain: string | null | undefined;
     coreTempDirectory: string;
+    loginDuration: number;
   }>({
     initialValues: {
       coreReturnHttpsUrls: false,
       coreDefaultDomain: '',
       coreTempDirectory: '/tmp/zipline',
+      loginDuration: 7,
     },
   });
 
@@ -39,6 +50,7 @@ export default function ServerSettingsCore({
       coreReturnHttpsUrls: data?.coreReturnHttpsUrls ?? false,
       coreDefaultDomain: data?.coreDefaultDomain ?? '',
       coreTempDirectory: data?.coreTempDirectory ?? '/tmp/zipline',
+      loginDuration: data?.loginDuration ?? 7,
     });
   }, [data]);
 
@@ -69,6 +81,14 @@ export default function ServerSettingsCore({
             description='The directory to store temporary files. If the path is invalid, certain functions may break. Requires a server restart.'
             placeholder='/tmp/zipline'
             {...form.getInputProps('coreTempDirectory')}
+          />
+
+          <NumberInput
+            label='Session duration'
+            description='Number of days that users stay logged in for'
+            placeholder='7'
+            min={1}
+            {...form.getInputProps('loginDuration')}
           />
         </SimpleGrid>
 

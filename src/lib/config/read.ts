@@ -282,6 +282,8 @@ export const DATABASE_TO_PROP = {
   pwaDescription: 'pwa.description',
   pwaThemeColor: 'pwa.themeColor',
   pwaBackgroundColor: 'pwa.backgroundColor',
+
+  loginDuration: 'login.loginDuration',
 };
 
 const logger = log('config').c('read');

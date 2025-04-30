@@ -129,6 +129,8 @@ model Zipline {
   pwaDescription     String  @default("Zipline")
   pwaThemeColor      String  @default("#000000")
   pwaBackgroundColor String  @default("#000000")
+
+  loginDuration   Int @default(7)
 }
 
 model User {

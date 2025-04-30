@@ -270,6 +270,7 @@ export default fastifyPlugin(
             pwaDescription: z.string(),
             pwaThemeColor: z.string().regex(/^#?([a-f0-9]{6}|[a-f0-9]{3})$/),
             pwaBackgroundColor: z.string().regex(/^#?([a-f0-9]{6}|[a-f0-9]{3})/),
+            loginDuration: z.number().refine((value) => value > 0, 'Value must be greater than 0'),
           })
           .partial()
           .refine(
