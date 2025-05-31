@@ -32,6 +32,11 @@ services:
       - './uploads:/zipline/uploads'
       - './public:/zipline/public'
       - './themes:/zipline/themes'
+    healthcheck:
+      test: ['CMD', 'wget', '-q', '--spider', 'http://localhost:3000/api/healthcheck']
+      interval: 15s
+      timeout: 2s
+      retries: 2
 
 volumes:
   pgdata:
