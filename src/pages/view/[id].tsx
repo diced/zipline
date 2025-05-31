@@ -1,4 +1,5 @@
 import DashboardFileType from '@/components/file/DashboardFileType';
+import TagPill from '@/components/pages/files/tags/TagPill';
 import { isCode } from '@/lib/code';
 import { config as zConfig } from '@/lib/config';
 import { verifyPassword } from '@/lib/crypto';
@@ -13,6 +14,7 @@ import { readThemes } from '@/lib/theme/file';
 import { formatRootUrl } from '@/lib/url';
 import {
   ActionIcon,
+  Anchor,
   Box,
   Button,
   Center,
@@ -22,9 +24,10 @@ import {
   Paper,
   PasswordInput,
   Text,
+  Tooltip,
   TypographyStylesProvider,
 } from '@mantine/core';
-import { IconDownload, IconInfoCircleFilled } from '@tabler/icons-react';
+import { IconDownload, IconExternalLink, IconInfoCircleFilled } from '@tabler/icons-react';
 import { sanitize } from 'isomorphic-dompurify';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Head from 'next/head';
@@ -76,7 +79,11 @@ export default function ViewFileId({
         <meta
           property='og:title'
           content={
-            parseString(user.view.embedTitle, { file: file as File, user: user as User, ...metrics }) ?? ''
+            parseString(user.view.embedTitle, {
+              file: file as unknown as File,
+              user: user as User,
+              ...metrics,
+            }) ?? ''
           }
         />
       )}
@@ -84,8 +91,11 @@ export default function ViewFileId({
         <meta
           property='og:description'
           content={
-            parseString(user.view.embedDescription, { file: file as File, user: user as User, ...metrics }) ??
-            ''
+            parseString(user.view.embedDescription, {
+              file: file as unknown as File,
+              user: user as User,
+              ...metrics,
+            }) ?? ''
           }
         />
       )}
@@ -93,7 +103,11 @@ export default function ViewFileId({
         <meta
           property='og:site_name'
           content={
-            parseString(user.view.embedSiteName, { file: file as File, user: user as User, ...metrics }) ?? ''
+            parseString(user.view.embedSiteName, {
+              file: file as unknown as File,
+              user: user as User,
+              ...metrics,
+            }) ?? ''
           }
         />
       )}
@@ -101,7 +115,11 @@ export default function ViewFileId({
         <meta
           property='theme-color'
           content={
-            parseString(user.view.embedColor, { file: file as File, user: user as User, ...metrics }) ?? ''
+            parseString(user.view.embedColor, {
+              file: file as unknown as File,
+              user: user as User,
+              ...metrics,
+            }) ?? ''
           }
         />
       )}
@@ -212,7 +230,7 @@ export default function ViewFileId({
                 dangerouslySetInnerHTML={{
                   __html: sanitize(
                     parseString(user.view.content, {
-                      file: file as File,
+                      file: file as unknown as File,
                       link: {
                         returned: `${host}${formatRootUrl(filesRoute ?? '/u', file.name!)}`,
                         raw: `${host}/raw/${file.name}`,
@@ -233,11 +251,11 @@ export default function ViewFileId({
 
       {file.name!.endsWith('.md') || file.name!.endsWith('.tex') ? (
         <Paper m='md' p='md' withBorder>
-          <DashboardFileType file={file as File} password={pw} show code={code} />
+          <DashboardFileType file={file as unknown as File} password={pw} show code={code} />
         </Paper>
       ) : (
         <Box m='sm'>
-          <DashboardFileType file={file as File} password={pw} show code={code} />
+          <DashboardFileType file={file as unknown as File} password={pw} show code={code} />
         </Box>
       )}
     </>
@@ -249,8 +267,24 @@ export default function ViewFileId({
           <Group justify='space-between' mb='sm'>
             <Group>
               <Text size='lg' fw={700} display='flex'>
-                {file.name}
+                {file.name}{' '}
               </Text>
+              {user?.view!.showTags && (
+                <Group gap={4}>{file.tags?.map((tag) => <TagPill key={tag.id} tag={tag} />)}</Group>
+              )}
+              {user?.view!.showFolder &&
+                file.Folder &&
+                (file.Folder.public ? (
+                  <Tooltip label='View folder'>
+                    <Anchor component={Link} ml='sm' href={`/folder/${file.Folder.id}`}>
+                      {file.Folder.name}
+                    </Anchor>
+                  </Tooltip>
+                ) : (
+                  <Text ml='sm' size='sm' c='dimmed'>
+                    {file.Folder.name}
+                  </Text>
+                ))}
               {user?.view!.showMimetype && (
                 <Text size='sm' c='dimmed' ml='sm' style={{ alignSelf: 'center' }}>
                   {file.type}
@@ -258,18 +292,33 @@ export default function ViewFileId({
               )}
             </Group>
 
-            <ActionIcon
-              size='md'
-              variant='outline'
-              component={Link}
-              href={`/raw/${file.name}?download=true${pw ? `&pw=${pw}` : ''}`}
-              target='_blank'
-            >
-              <IconDownload size='1rem' />
-            </ActionIcon>
+            <ActionIcon.Group>
+              <Tooltip label='View raw file'>
+                <ActionIcon
+                  size='md'
+                  variant='outline'
+                  component={Link}
+                  href={`/raw/${file.name}${pw ? `?pw=${pw}` : ''}`}
+                  target='_blank'
+                >
+                  <IconExternalLink size='1rem' />
+                </ActionIcon>
+              </Tooltip>
+              <Tooltip label='Download file'>
+                <ActionIcon
+                  size='md'
+                  variant='outline'
+                  component={Link}
+                  href={`/raw/${file.name}?download=true${pw ? `&pw=${pw}` : ''}`}
+                  target='_blank'
+                >
+                  <IconDownload size='1rem' />
+                </ActionIcon>
+              </Tooltip>
+            </ActionIcon.Group>
           </Group>
 
-          <DashboardFileType allowZoom file={file as File} password={pw} show />
+          <DashboardFileType allowZoom file={file as unknown as File} password={pw} show />
 
           {mounted && user?.view!.content && (
             <TypographyStylesProvider>
@@ -279,7 +328,7 @@ export default function ViewFileId({
                 dangerouslySetInnerHTML={{
                   __html: sanitize(
                     parseString(user?.view.content, {
-                      file: file as File,
+                      file: file as unknown as File,
                       link: {
                         returned: `${host}${formatRootUrl(filesRoute ?? '/u', file.name!)}`,
                         raw: `${host}/raw/${file.name}`,
@@ -302,8 +351,40 @@ export default function ViewFileId({
   );
 }
 
+const getFile = async (id: string) =>
+  prisma.file.findFirst({
+    where: {
+      name: id as string,
+    },
+    select: {
+      ...fileSelect,
+      password: true,
+      userId: true,
+      thumbnail: {
+        select: {
+          path: true,
+        },
+      },
+      tags: {
+        select: {
+          id: true,
+          name: true,
+          color: true,
+        },
+      },
+
+      Folder: {
+        select: {
+          id: true,
+          public: true,
+          name: true,
+        },
+      },
+    },
+  });
+
 export const getServerSideProps: GetServerSideProps<{
-  file: Partial<File>;
+  file: Partial<NonNullable<Awaited<ReturnType<typeof getFile>>>>;
   password?: boolean;
   pw?: string;
   code: boolean;
@@ -319,22 +400,7 @@ export const getServerSideProps: GetServerSideProps<{
   const { config: libConfig, reloadSettings } = await import('@/lib/config');
   if (!libConfig) await reloadSettings();
 
-  const file = await prisma.file.findFirst({
-    where: {
-      name: id as string,
-    },
-    select: {
-      ...fileSelect,
-      password: true,
-      userId: true,
-      tags: false,
-      thumbnail: {
-        select: {
-          path: true,
-        },
-      },
-    },
-  });
+  const file = await getFile(id as string);
   if (!file || !file.userId) return { notFound: true };
 
   if (file.maxViews && file.views >= file.maxViews) return { notFound: true };

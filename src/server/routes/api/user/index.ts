@@ -24,6 +24,8 @@ type Body = {
     enabled?: boolean;
     align?: 'left' | 'center' | 'right';
     showMimetype?: boolean;
+    showTags?: boolean;
+    showFolder?: boolean;
   };
 };
 
@@ -72,6 +74,10 @@ export default fastifyPlugin(
               ...(req.body.view.align !== undefined && { align: req.body.view.align || 'center' }),
               ...(req.body.view.showMimetype !== undefined && {
                 showMimetype: req.body.view.showMimetype || false,
+              }),
+              ...(req.body.view.showTags !== undefined && { showTags: req.body.view.showTags || false }),
+              ...(req.body.view.showFolder !== undefined && {
+                showFolder: req.body.view.showFolder || false,
               }),
             },
           }),

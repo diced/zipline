@@ -1,11 +1,10 @@
-import { Tag } from '@/lib/db/models/tag';
 import { Pill, isLightColor } from '@mantine/core';
 
 export default function TagPill({
   tag,
   ...other
 }: {
-  tag: Tag | null;
+  tag: { color: string; name: string } | null;
   withRemoveButton?: boolean;
   onRemove?: () => void;
 }) {

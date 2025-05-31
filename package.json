@@ -2,7 +2,7 @@
   "name": "zipline",
   "private": true,
   "license": "MIT",
-  "version": "4.0.2",
+  "version": "4.1.0",
   "scripts": {
     "build": "cross-env pnpm run --stream \"/^build:.*/\"",
     "build:prisma": "prisma generate --no-hints",

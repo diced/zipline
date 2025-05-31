@@ -49,6 +49,8 @@ export default function SettingsFileView() {
       embedColor: user?.view.embedColor ?? '',
       align: user?.view.align ?? 'left',
       showMimetype: user?.view.showMimetype ?? false,
+      showTags: user?.view.showTags ?? false,
+      showFolder: user?.view.showFolder ?? false,
     },
   });
 
@@ -63,6 +65,8 @@ export default function SettingsFileView() {
       embedColor: values.embedColor.trim() || null,
       align: values.align,
       showMimetype: values.showMimetype,
+      showTags: values.showTags,
+      showFolder: values.showFolder,
     };
 
     const { data, error } = await fetchApi<Response['/api/user']>('/api/user', 'PATCH', {
@@ -109,6 +113,20 @@ export default function SettingsFileView() {
               description='Show the mimetype of the file in the view-route'
               disabled={!form.values.enabled}
               {...form.getInputProps('showMimetype', { type: 'checkbox' })}
+            />
+
+            <Switch
+              label='Show tags'
+              description="Show the file's tags in the view-route"
+              disabled={!form.values.enabled}
+              {...form.getInputProps('showTags', { type: 'checkbox' })}
+            />
+
+            <Switch
+              label='Show folder'
+              description='Show the name/link of the folder if possible in the view-route'
+              disabled={!form.values.enabled}
+              {...form.getInputProps('showFolder', { type: 'checkbox' })}
             />
           </SimpleGrid>
 

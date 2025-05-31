@@ -139,6 +139,14 @@ export default function DashboardFileType({
     }
   }, []);
 
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+  }, [open]);
+
   if (disableMediaPreview && !show)
     return <Placeholder text={`Click to view file ${file.name}`} Icon={fileIcon(file.type)} />;
 
@@ -165,7 +173,7 @@ export default function DashboardFileType({
           muted
           controls
           src={dbFile ? `/raw/${file.name}${password ? `?pw=${password}` : ''}` : URL.createObjectURL(file)}
-          style={{ cursor: 'pointer' }}
+          style={{ cursor: 'pointer', maxWidth: '85vw', maxHeight: '85vh' }}
         />
       ) : (file as DbFile).thumbnail && dbFile ? (
         <Box pos='relative'>
@@ -194,14 +202,12 @@ export default function DashboardFileType({
       return show ? (
         <Center>
           <MantineImage
-            mah={400}
             src={dbFile ? `/raw/${file.name}${password ? `?pw=${password}` : ''}` : URL.createObjectURL(file)}
             alt={file.name}
             style={{
-              maxWidth: '90vw',
-              maxHeight: '90vh',
               cursor: allowZoom ? 'zoom-in' : 'default',
-              width: 'auto',
+              maxWidth: '70vw',
+              maxHeight: '70vw',
             }}
             onClick={() => setOpen(true)}
           />
@@ -213,8 +219,8 @@ export default function DashboardFileType({
                 }
                 alt={file.name}
                 style={{
-                  maxWidth: '90vw',
-                  maxHeight: '90vh',
+                  maxWidth: '95vw',
+                  maxHeight: '95vh',
                   objectFit: 'contain',
                   cursor: 'zoom-out',
                   width: 'auto',

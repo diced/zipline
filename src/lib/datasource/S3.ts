@@ -55,6 +55,7 @@ export class S3Datasource extends Datasource {
         httpsAgent: new HttpsAgent({
           maxSockets: 1000,
           keepAlive: true,
+          rejectUnauthorized: false,
         }),
       }),
     });

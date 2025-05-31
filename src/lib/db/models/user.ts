@@ -43,6 +43,8 @@ export const userViewSchema = z
     enabled: z.boolean().nullish(),
     align: z.enum(['left', 'center', 'right']).nullish(),
     showMimetype: z.boolean().nullish(),
+    showTags: z.boolean().nullish(),
+    showFolder: z.boolean().nullish(),
     content: z.string().nullish(),
     embed: z.boolean().nullish(),
     embedTitle: z.string().nullish(),
