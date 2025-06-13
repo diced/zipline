@@ -51,6 +51,7 @@ export const DATABASE_TO_PROP = {
 
   invitesEnabled: 'invites.enabled',
   invitesLength: 'invites.length',
+  domains: 'domains',
 
   websiteTitle: 'website.title',
   websiteTitleLogo: 'website.titleLogo',

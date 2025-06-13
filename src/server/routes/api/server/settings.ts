@@ -295,6 +295,24 @@ export default fastifyPlugin(
             pwaDescription: z.string(),
             pwaThemeColor: z.string().regex(/^#?([a-f0-9]{6}|[a-f0-9]{3})$/),
             pwaBackgroundColor: z.string().regex(/^#?([a-f0-9]{6}|[a-f0-9]{3})/),
+
+            domains: z.string().transform((value) => {
+              try {
+                const domains = JSON.parse(value);
+                if (!Array.isArray(domains)) throw new Error('Domains must be an array');
+                for (const domain of domains) {
+                  if (typeof domain !== 'object' || !domain.domain || typeof domain.domain !== 'string') {
+                    throw new Error('Invalid domain format');
+                  }
+                  if (domain.expiresAt && typeof domain.expiresAt !== 'string') {
+                    throw new Error('Invalid expiration date format');
+                  }
+                }
+                return domains;
+              } catch {
+                return value;
+              }
+            }),
           })
           .partial()
           .refine(

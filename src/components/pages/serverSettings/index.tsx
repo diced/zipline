@@ -3,6 +3,7 @@ import { Alert, Anchor, Collapse, Group, SimpleGrid, Skeleton, Stack, Title } fr
 import useSWR from 'swr';
 import dynamic from 'next/dynamic';
 import { useDisclosure } from '@mantine/hooks';
+import Domains from './parts/Domains';
 
 function SettingsSkeleton() {
   return <Skeleton height={280} animate />;
@@ -105,6 +106,8 @@ export default function DashboardSettings() {
             <PWA swr={{ data, isLoading }} />
 
             <HttpWebhook swr={{ data, isLoading }} />
+
+            <Domains swr={{ data, isLoading }} />
           </>
         )}
       </SimpleGrid>

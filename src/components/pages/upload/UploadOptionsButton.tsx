@@ -63,8 +63,18 @@ export default function UploadOptionsButton({ folder, numFiles }: { folder?: str
   const { data: folders } = useSWR<Extract<Response['/api/user/folders'], Folder[]>>(
     '/api/user/folders?noincl=true',
   );
+  const { data: settingsData } = useSWR<Response['/api/server/settings']>('/api/server/settings');
+
   const combobox = useCombobox();
   const [folderSearch, setFolderSearch] = useState('');
+
+  const domains = settingsData?.settings.domains ? settingsData.settings.domains : [];
+  const domainOptions = (typeof domains === 'string' ? JSON.parse(domains) : domains).map(
+    (domain: { domain: string; expiresAt: string | null }) => ({
+      value: domain.domain,
+      label: domain.domain + (domain.expiresAt ? ` (expires: ${domain.expiresAt})` : ''),
+    }),
+  );
 
   useEffect(() => {
     if (folder) return;
@@ -279,7 +289,11 @@ export default function UploadOptionsButton({ folder, numFiles }: { folder?: str
             </Combobox.Dropdown>
           </Combobox>
 
-          <TextInput
+          <Select
+            data={[
+              { value: '', label: 'Default Domain' },
+              ...domainOptions,
+            ]}
             label={
               <>
                 Override Domain{' '}
@@ -293,12 +307,15 @@ export default function UploadOptionsButton({ folder, numFiles }: { folder?: str
             description='Override the domain with this value. This will change the domain returned in your uploads. Leave blank to use the default domain.'
             leftSection={<IconGlobe size='1rem' />}
             value={options.overrides_returnDomain ?? ''}
-            onChange={(event) =>
-              setOption(
-                'overrides_returnDomain',
-                event.currentTarget.value.trim() === '' ? null : event.currentTarget.value.trim(),
-              )
-            }
+            onChange={(value) => setOption('overrides_returnDomain', value || null)}
+            comboboxProps={{
+              withinPortal: true,
+              portalProps: {
+                style: {
+                  zIndex: 100000000,
+                },
+              },
+            }}
           />
 
           <TextInput
