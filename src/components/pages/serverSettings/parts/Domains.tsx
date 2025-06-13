@@ -1,7 +1,7 @@
 import { Response } from '@/lib/api/response';
 import { Button, Group, LoadingOverlay, Paper, TextInput, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { IconDeviceFloppy, IconPlus, IconTrash } from '@tabler/icons-react';
+import { IconPlus, IconTrash } from '@tabler/icons-react';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { settingsOnSubmit } from '../settingsOnSubmit';

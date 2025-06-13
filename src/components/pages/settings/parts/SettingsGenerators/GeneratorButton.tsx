@@ -11,7 +11,6 @@ import {
   Stack,
   Switch,
   Text,
-  TextInput,
 } from '@mantine/core';
 import { IconDownload, IconEyeFilled, IconGlobe, IconPercentage, IconWriting } from '@tabler/icons-react';
 import Link from 'next/link';
