@@ -59,7 +59,7 @@ export default fastifyPlugin(
         });
         if (req.user.quota && req.user.quota.maxUrls && countUrls + 1 > req.user.quota.maxUrls)
           return res.forbidden(
-            `shortenning this url would exceed your quota of ${req.user.quota.maxUrls} urls`,
+            `Shortening this URL would exceed your quota of ${req.user.quota.maxUrls} URLs.`,
           );
 
         let maxViews: number | undefined;
