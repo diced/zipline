@@ -197,10 +197,7 @@ export default function GeneratorButton({
           />
 
           <Select
-            data={[
-              { value: '', label: 'Default Domain' },
-              ...domainOptions,
-            ]}
+            data={[{ value: '', label: 'Default Domain' }, ...domainOptions]}
             label='Override Domain'
             description='Override the domain with this value. This will change the domain returned in your uploads. Leave blank to use the default domain.'
             leftSection={<IconGlobe size='1rem' />}

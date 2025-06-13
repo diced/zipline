@@ -290,10 +290,7 @@ export default function UploadOptionsButton({ folder, numFiles }: { folder?: str
           </Combobox>
 
           <Select
-            data={[
-              { value: '', label: 'Default Domain' },
-              ...domainOptions,
-            ]}
+            data={[{ value: '', label: 'Default Domain' }, ...domainOptions]}
             label={
               <>
                 Override Domain{' '}

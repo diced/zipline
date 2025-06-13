@@ -30,9 +30,10 @@ export default function Domains({
   useEffect(() => {
     if (!data) return;
 
-    const parsedDomains = typeof data.settings.domains === 'string' 
-      ? JSON.parse(data.settings.domains)
-      : data.settings.domains || [];
+    const parsedDomains =
+      typeof data.settings.domains === 'string'
+        ? JSON.parse(data.settings.domains)
+        : data.settings.domains || [];
     setDomains(parsedDomains);
   }, [data]);
 
@@ -90,9 +91,7 @@ export default function Domains({
               <div>
                 <strong>{domain.domain}</strong>
                 {domain.expiresAt && (
-                  <div style={{ fontSize: '0.8em', color: 'gray' }}>
-                    Expires: {domain.expiresAt}
-                  </div>
+                  <div style={{ fontSize: '0.8em', color: 'gray' }}>Expires: {domain.expiresAt}</div>
                 )}
               </div>
               <Button
@@ -101,7 +100,12 @@ export default function Domains({
                 size='xs'
                 onClick={() => removeDomain(index)}
                 px={8}
-                style={{ aspectRatio: '1/1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                style={{
+                  aspectRatio: '1/1',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
               >
                 <IconTrash size='1rem' />
               </Button>
@@ -111,4 +115,4 @@ export default function Domains({
       </Group>
     </Paper>
   );
-} 
+}
