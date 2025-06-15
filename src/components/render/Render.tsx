@@ -42,10 +42,20 @@ export default function Render({
   mode,
   language,
   code,
+  onUploadToPaste,
+  isUploading,
+  fileName,
+  fileId,
+  inModal = false,
 }: {
   mode: RenderMode;
   language: string;
   code: string;
+  onUploadToPaste?: () => Promise<void>;
+  isUploading?: boolean;
+  fileName?: string;
+  fileId?: string;
+  inModal?: boolean;
 }) {
   const [overrideRender] = useQueryState('orender', parseAsStringEnum<RenderMode>(Object.values(RenderMode)));
 
@@ -57,7 +67,7 @@ export default function Render({
         <>
           <RenderAlert renderer='KaTeX' state={highlight} change={(s) => setHighlight(s)} />
 
-          {highlight ? <HighlightCode language={language} code={code} /> : <KaTeX tex={code} />}
+          {highlight ? <HighlightCode language={language} code={code} onUploadToPaste={onUploadToPaste} isUploading={isUploading} fileName={fileName} fileId={fileId} inModal={inModal} /> : <KaTeX tex={code} />}
         </>
       );
     case RenderMode.Markdown:
@@ -65,10 +75,9 @@ export default function Render({
         <>
           <RenderAlert renderer='Markdown' state={highlight} change={(s) => setHighlight(s)} />
 
-          {highlight ? <HighlightCode language={language} code={code} /> : <Markdown md={code} />}
+          {highlight ? <HighlightCode language={language} code={code} onUploadToPaste={onUploadToPaste} isUploading={isUploading} fileName={fileName} fileId={fileId} inModal={inModal} /> : <Markdown md={code} />}
         </>
-      );
-    default:
-      return <HighlightCode language={language} code={code} />;
+      );    default:
+      return <HighlightCode language={language} code={code} onUploadToPaste={onUploadToPaste} isUploading={isUploading} fileName={fileName} fileId={fileId} inModal={inModal} />;
   }
 }

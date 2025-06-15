@@ -22,12 +22,6 @@ export default function DashboardHome() {
         Welcome back, <b>{user?.username}</b>
       </Title>
 
-      <Skeleton visible={statsLoading} animate>
-        <Text size='sm' c='dimmed'>
-          You have <b>{statsLoading ? '...' : stats?.filesUploaded}</b> files uploaded.
-        </Text>
-      </Skeleton>
-
       {user?.quota && (user.quota.maxBytes || user.quota.maxFiles) ? (
         <Text size='sm' c='dimmed'>
           {user.quota.filesQuota === 'BY_BYTES' ? (
@@ -49,28 +43,6 @@ export default function DashboardHome() {
           <b>{user.quota.maxUrls}</b> links allowed.
         </Text>
       ) : null}
-
-      <Title order={2} mt='md' mb='xs'>
-        Recent files
-      </Title>
-
-      {recentLoading ? (
-        <SimpleGrid cols={{ base: 1, md: 2, lg: 3 }} spacing={{ base: 'sm', md: 'md' }}>
-          {[...Array(3)].map((_, i) => (
-            <Skeleton key={i} height={350} animate />
-          ))}
-        </SimpleGrid>
-      ) : recent?.length !== 0 ? (
-        <SimpleGrid cols={{ base: 1, md: 2, lg: 3 }} spacing={{ base: 'sm', md: 'md' }}>
-          {recent!.map((file, i) => (
-            <DashboardFile key={i} file={file} />
-          ))}
-        </SimpleGrid>
-      ) : (
-        <Text size='sm' c='dimmed'>
-          You have no recent files. The last three files you uploaded will appear here.
-        </Text>
-      )}
 
       <Title order={2} mt='md'>
         Stats

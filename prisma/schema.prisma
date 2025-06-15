@@ -259,6 +259,11 @@ model File {
   favorite     Boolean @default(false)
   password     String?
 
+  // Paste service integration
+  pasteId      String? // ID from paste service
+  pasteUrl     String? // Full URL to the paste
+  pasteCreatedAt DateTime? // When the paste was created
+
   tags Tag[]
 
   User   User?   @relation(fields: [userId], references: [id], onDelete: SetNull, onUpdate: Cascade)

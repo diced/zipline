@@ -9,8 +9,11 @@ import {
   Paper,
   Stack,
   Text,
+  Button,
+  Group,
 } from '@mantine/core';
-import { Icon, IconFileUnknown, IconPlayerPlay, IconShieldLockFilled } from '@tabler/icons-react';
+import { Icon, IconFileUnknown, IconPlayerPlay, IconShieldLockFilled, IconExternalLink, IconUpload } from '@tabler/icons-react';
+import { showNotification, updateNotification } from '@mantine/notifications';
 import { useEffect, useState } from 'react';
 import { renderMode } from '../pages/upload/renderMode';
 import Render from '../render/Render';
@@ -71,71 +74,166 @@ export default function DashboardFileType({
   password,
   code,
   allowZoom,
+  inModal = false,
 }: {
   file: DbFile | File;
   show?: boolean;
   password?: string | null;
   code?: boolean;
   allowZoom?: boolean;
+  inModal?: boolean;
 }) {
   const [overrideType] = useQueryState('otype', parseAsStringLiteral(['video', 'audio', 'image', 'text']));
 
   const disableMediaPreview = useSettingsStore((state) => state.settings.disableMediaPreview);
-
   const dbFile = 'id' in file;
   const renderIn = renderMode(file.name.split('.').pop() || '');
-
   const [fileContent, setFileContent] = useState('');
+  const [fullFileContent, setFullFileContent] = useState('');
   const [type, setType] = useState<string>(file.type.split('/')[0]);
+  const [isUploading, setIsUploading] = useState(false);
 
+  // Check if file should be treated as text/code based on extension
+  const isCodeFile = (filename: string) => {
+    const extension = filename.split('.').pop()?.toLowerCase() || '';
+    const codeExtensions = [
+      'js', 'jsx', 'ts', 'tsx', 'json', 'json5', 'html', 'htm', 'css', 'scss', 'sass', 'less',
+      'py', 'java', 'c', 'cpp', 'h', 'hpp', 'cs', 'php', 'rb', 'go', 'rs', 'swift', 'kt',
+      'vue', 'svelte', 'xml', 'yaml', 'yml', 'toml', 'ini', 'cfg', 'conf', 'sh', 'bash',
+      'ps1', 'bat', 'cmd', 'sql', 'r', 'scala', 'clj', 'elm', 'dart', 'lua', 'pl', 'pm',
+      'hs', 'ml', 'fs', 'ex', 'exs', 'erl', 'hrl', 'nim', 'cr', 'jl', 'rkt', 'scm',
+      'asm', 's', 'makefile', 'dockerfile', 'gitignore', 'gitattributes', 'editorconfig',
+      'prettierrc', 'eslintrc', 'babelrc', 'tsconfig', 'package', 'composer', 'gemfile',
+      'rakefile', 'procfile', 'cmakelists', 'gradle', 'maven', 'ant', 'sbt', 'cabal',
+      'tex', 'md', 'rst', 'adoc', 'org', 'txt', 'log', 'csv', 'tsv'
+    ];
+    return codeExtensions.includes(extension) || filename.toLowerCase().includes('config');
+  };
   const [open, setOpen] = useState(false);
+  
+  const uploadToPaste = async () => {
+    if (!dbFile) return; // Only works for database files now
+    
+    setIsUploading(true);
+    
+    showNotification({
+      id: 'paste-uploading',
+      title: 'Uploading to Paste',
+      message: 'Uploading file content to paste service...',
+      loading: true,
+      autoClose: false,
+    });
 
+    try {
+      const response = await fetch('/api/paste', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          fileId: file.id,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to upload to paste service');
+      }
+
+      const result = await response.json();
+      
+      // Update the existing notification
+      updateNotification({
+        id: 'paste-uploading',
+        title: result.alreadyExists ? 'Paste Already Exists' : 'Upload Complete',
+        message: `File ${result.alreadyExists ? 'was already pasted' : 'uploaded successfully'}! Click here to open: ${result.pasteUrl}`,
+        color: 'green',
+        autoClose: 10000,
+        onClick: () => window.open(result.pasteUrl, '_blank'),
+        style: { cursor: 'pointer' },
+        loading: false,
+      });
+    } catch (error) {
+      // Update the existing notification with error
+      updateNotification({
+        id: 'paste-uploading',
+        title: 'Upload Failed',
+        message: 'Failed to upload file to paste service. Please try again.',
+        color: 'red',
+        autoClose: 5000,
+        loading: false,      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+  
   const gettext = async () => {
     if (!dbFile) {
       const reader = new FileReader();
       reader.onload = () => {
-        if ((reader.result! as string).length > 1 * 1024 * 1024) {
+        const fullContent = reader.result as string;
+        setFullFileContent(fullContent);
+        const lines = fullContent.split('\n');
+        if (lines.length > 498) {
           setFileContent(
-            reader.result!.slice(0, 1 * 1024 * 1024) +
-              '\n...\nThe file is too big to display click the download icon to view/download it.',
+            lines.slice(0, 498).join('\n') +
+              '\n...\nShowing first 500 lines. Click "Pastey" to view the full file.'
           );
         } else {
-          setFileContent(reader.result as string);
+          setFileContent(fullContent);
         }
       };
       reader.readAsText(file);
-
       return;
     }
-
-    if (file.size > 1 * 1024 * 1024) {
-      const res = await fetch(`/raw/${file.name}${password ? `?pw=${password}` : ''}`, {
-        headers: {
-          Range: 'bytes=0-' + 1 * 1024 * 1024, // 0 mb to 1 mb
-        },
-      });
-
-      const text = await res.text();
-      setFileContent(
-        text + '\n...\nThe file is too big to display click the download icon to view/download it.',
-      );
-      return;
-    }
-
+    
     const res = await fetch(`/raw/${file.name}${password ? `?pw=${password}` : ''}`);
-    const text = await res.text();
-
-    setFileContent(text);
+    const fullContent = await res.text();
+    setFullFileContent(fullContent);
+    const lines = fullContent.split('\n');
+    if (lines.length > 498) {
+      setFileContent(
+        lines.slice(0, 498).join('\n') +
+        '\n...\nShowing first 500 lines. Click "Pastey" to view the full file.'
+      );
+    } else {
+      setFileContent(fullContent);
+    }
   };
 
   useEffect(() => {
-    if (code) {
+    // Check if file should be treated as code/text based on extension or MIME type
+    const shouldTreatAsText = () => {
+      // First check if it's explicitly marked as code or text type
+      if (code || overrideType === 'text') return true;
+      
+      // Check MIME type
+      if (type === 'text') return true;
+      
+      // Check for common code file extensions
+      const extension = file.name.split('.').pop()?.toLowerCase() || '';
+      const codeExtensions = [
+        'js', 'jsx', 'ts', 'tsx', 'json', 'json5', 'html', 'htm', 'css', 'scss', 'sass', 'less',
+        'py', 'java', 'c', 'cpp', 'h', 'hpp', 'cs', 'php', 'rb', 'go', 'rs', 'swift', 'kt',
+        'vue', 'svelte', 'xml', 'yaml', 'yml', 'toml', 'ini', 'cfg', 'conf', 'sh', 'bash',
+        'ps1', 'bat', 'cmd', 'sql', 'r', 'scala', 'clj', 'elm', 'dart', 'lua', 'pl', 'pm',
+        'hs', 'ml', 'fs', 'ex', 'exs', 'erl', 'hrl', 'nim', 'cr', 'jl', 'rkt', 'scm',
+        'asm', 's', 'makefile', 'dockerfile', 'gitignore', 'gitattributes', 'editorconfig',
+        'prettierrc', 'eslintrc', 'babelrc', 'tsconfig', 'package', 'composer', 'gemfile',
+        'rakefile', 'procfile', 'cmakelists', 'gradle', 'maven', 'ant', 'sbt', 'cabal',
+        'tex', 'md', 'rst', 'adoc', 'org', 'txt', 'log', 'csv', 'tsv'
+      ];
+      
+      return codeExtensions.includes(extension) || 
+             file.name.toLowerCase().includes('config') ||
+             file.type.includes('json') ||
+             file.type.includes('javascript') ||
+             file.type.includes('text');
+    };
+
+    if (shouldTreatAsText()) {
       setType('text');
       gettext();
-    } else if (overrideType === 'text' || type === 'text') {
-      gettext();
-    } else {
-      return;
     }
   }, []);
 
@@ -145,6 +243,10 @@ export default function DashboardFileType({
     } else {
       document.body.style.overflow = 'auto';
     }
+    
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
   }, [open]);
 
   if (disableMediaPreview && !show)
@@ -231,10 +333,14 @@ export default function DashboardFileType({
         </Center>
       ) : (
         <MantineImage
-          fit='contain'
-          mah={400}
           src={dbFile ? `/raw/${file.name}${password ? `?pw=${password}` : ''}` : URL.createObjectURL(file)}
           alt={file.name}
+          style={{
+            width: '100%',
+            height: 'auto',
+            objectFit: 'contain',
+            display: 'block',
+          }}
         />
       );
     case 'audio':
@@ -268,7 +374,16 @@ export default function DashboardFileType({
             }}
           />
         ) : (
-          <Render mode={renderIn} language={file.name.split('.').pop() || ''} code={fileContent} />
+          <Render 
+            mode={renderIn} 
+            language={file.name.split('.').pop() || ''} 
+            code={fileContent}
+            onUploadToPaste={dbFile ? uploadToPaste : undefined}
+            isUploading={isUploading}
+            fileName={file.name}
+            fileId={dbFile ? file.id : undefined}
+            inModal={inModal}
+          />
         )
       ) : (
         <Placeholder text={`Click to view text ${file.name}`} Icon={fileIcon(file.type)} />
