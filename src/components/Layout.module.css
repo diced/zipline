@@ -1,0 +1,75 @@
+/* Smooth animations for sidebar transitions */
+.navbar {
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.navbarContent {
+  transition: padding 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.navItem {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.navItem:hover {
+  transform: translateX(2px);
+}
+
+.navItemCollapsed {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 90% !important;
+  margin: 0 auto !important;
+  box-sizing: border-box;
+}
+
+.navItemCollapsed:hover {
+  transform: scale(1.05);
+  background-color: var(--mantine-color-gray-1);
+}
+
+[data-mantine-color-scheme='dark'] .navItemCollapsed:hover {
+  background-color: var(--mantine-color-dark-5);
+}
+
+.iconWrapper {
+  transition: font-size 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bottomSection {
+  transition: padding 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.versionWrapper {
+  transition: justify-content 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Smooth fade in/out for tooltips */
+.tooltip {
+  transition: opacity 0.2s ease-in-out;
+}
+
+/* Enhanced menu animation */
+.menuDropdown {
+  animation: slideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Utility class for collapsed sidebar items */
+.collapsedItem {
+  width: 90% !important;
+  margin: 0 auto !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  box-sizing: border-box !important;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
