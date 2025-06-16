@@ -74,13 +74,18 @@ export default function DashboardFile({
           width: '100%',
           position: 'relative',
           cursor: 'pointer',
+          ...(file.size === 0 && {
+            backgroundColor: 'rgba(255, 255, 0, 0.1)',
+            border: '2px solid #ffd43b',
+            boxShadow: '0 0 8px rgba(255, 212, 59, 0.3)',
+          }),
         }}
       >
         {' '}
         <DashboardFileType key={file.id} file={file} />
         {/* File size - bottom right */}
         <div className={`${styles.fileOverlay} ${styles.fileOverlayRight}`}>
-          <Text size='xs' c='white' fw={500}>
+          <Text size='xs' c={file.size === 0 ? 'yellow' : 'white'} fw={file.size === 0 ? 600 : 500}>
             {formatFileSize(file.size)}
           </Text>
         </div>

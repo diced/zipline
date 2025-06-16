@@ -7,8 +7,10 @@ import {
   Group,
   Kbd,
   Modal,
+  Pagination,
   Paper,
   Progress,
+  Table,
   Text,
   Title,
   Tooltip,
@@ -42,6 +44,8 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
   );
 
   const [files, setFiles] = useState<File[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 250;
   const [progress, setProgress] = useState<{ percent: number; remaining: number; speed: number }>({
     percent: 0,
     remaining: 0,
@@ -76,6 +80,19 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
 
   const aggSize = () => files.reduce((acc, file) => acc + file.size, 0);
 
+  // Helper function to truncate filename for table view
+  const truncateFileName = (fileName: string, maxLength: number = 30): string => {
+    if (fileName.length <= maxLength) return fileName;
+    const extension = fileName.split('.').pop() || '';
+    const nameWithoutExt = fileName.slice(0, fileName.lastIndexOf('.'));
+    if (nameWithoutExt.length <= maxLength - extension.length - 4) {
+      return fileName;
+    }
+    const truncatedLength = maxLength - extension.length - 7;
+    const truncated = nameWithoutExt.slice(0, truncatedLength) + '...' + nameWithoutExt.slice(-3);
+    return `${truncated}.${extension}`;
+  };
+
   // Function to check if upload is large and needs confirmation
   const checkLargeUpload = (newFiles: File[], existingFiles: File[]) => {
     const allFiles = [...existingFiles, ...newFiles];
@@ -103,16 +120,44 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
       setShowWarningModal(true);
     } else {
       // Add files directly if not large
-      setFiles([...newFiles, ...files]);
+      const newFileList = [...newFiles, ...files];
+      setFiles(newFileList);
+
+      // Reset to first page when adding files
+      setCurrentPage(1);
+
+      // Check if we exceed 500 files and show notification
+      if (newFileList.length > 500) {
+        showNotification({
+          title: 'Large File Count Detected',
+          message: `You have ${newFileList.length} files. Switching to table view for better performance.`,
+          color: 'yellow',
+          autoClose: 5000,
+        });
+      }
     }
   };
 
   const confirmLargeUpload = () => {
     // User confirmed, add the pending files
-    setFiles([...pendingFiles, ...files]);
+    const newFileList = [...pendingFiles, ...files];
+    setFiles(newFileList);
     setShowWarningModal(false);
     setPendingFiles([]);
     setWarningDetails({ fileCount: 0, totalSize: 0 });
+
+    // Reset to first page when adding files
+    setCurrentPage(1);
+
+    // Check if we exceed 500 files and show notification
+    if (newFileList.length > 500) {
+      showNotification({
+        title: 'Large File Count Detected',
+        message: `You have ${newFileList.length} files. Switching to table view for better performance.`,
+        color: 'yellow',
+        autoClose: 5000,
+      });
+    }
   };
 
   const cancelLargeUpload = () => {
@@ -255,25 +300,23 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
         </Paper>
       </Collapse>
 
-      <div
+      {/* Action Buttons - Sticky at top */}
+      <Group
+        justify='space-between'
+        gap='sm'
+        my='md'
+        p='md'
         style={{
-          columnCount: 'auto',
-          columnWidth: '280px',
-          columnGap: '1rem',
-          margin: '1rem 0',
+          position: 'sticky',
+          top: '60px', // Offset for navbar
+          zIndex: 100,
+          backgroundColor:
+            colorScheme === 'dark' ? 'var(--mantine-color-dark-7)' : 'var(--mantine-color-white)',
+          borderBottom: '1px solid var(--mantine-color-default-border)',
+          margin: '0 -1rem',
+          padding: '1rem',
         }}
       >
-        {files.map((file, i) => (
-          <ToUploadFile
-            key={i}
-            loading={dropLoading}
-            file={file}
-            onDelete={() => setFiles(files.filter((_, j) => i !== j))}
-          />
-        ))}
-      </div>
-
-      <Group justify='space-between' gap='sm' my='md'>
         <Button
           variant='outline'
           color='red'
@@ -297,6 +340,198 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
           </Button>
         </Group>
       </Group>
+
+      {files.length > 500 ? (
+        // Table view for 500+ files - Split into two columns
+        <Paper withBorder radius='md' m='md'>
+          <Group gap='md' align='flex-start' style={{ width: '100%' }}>
+            {/* Left Table */}
+            <div style={{ flex: 1 }}>
+              <Table striped highlightOnHover>
+                <Table.Thead>
+                  <Table.Tr>
+                    <Table.Th>File Name</Table.Th>
+                    <Table.Th>Type</Table.Th>
+                    <Table.Th>Size</Table.Th>
+                    <Table.Th style={{ width: '60px' }}>Action</Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>
+                  {files
+                    .slice(
+                      (currentPage - 1) * itemsPerPage,
+                      (currentPage - 1) * itemsPerPage + Math.ceil(itemsPerPage / 2),
+                    )
+                    .map((file, i) => {
+                      const actualIndex = (currentPage - 1) * itemsPerPage + i;
+                      return (
+                        <Table.Tr
+                          key={actualIndex}
+                          style={
+                            file.size === 0
+                              ? {
+                                  backgroundColor: 'rgba(255, 255, 0, 0.1)',
+                                  borderLeft: '3px solid #ffd43b',
+                                }
+                              : {}
+                          }
+                        >
+                          <Table.Td>
+                            <Text size='sm' title={file.name}>
+                              {truncateFileName(file.name)}
+                            </Text>
+                          </Table.Td>
+                          <Table.Td>
+                            <Text size='sm' c='dimmed'>
+                              {file.type.split('/')[0] || 'file'}
+                            </Text>
+                          </Table.Td>
+                          <Table.Td>
+                            <Text
+                              size='sm'
+                              c={file.size === 0 ? 'yellow' : 'dimmed'}
+                              fw={file.size === 0 ? 600 : undefined}
+                            >
+                              {bytes(file.size)}
+                            </Text>
+                          </Table.Td>
+                          <Table.Td>
+                            <ActionIcon
+                              variant='subtle'
+                              color='red'
+                              size='sm'
+                              onClick={() => {
+                                const newFiles = files.filter((_, j) => actualIndex !== j);
+                                setFiles(newFiles);
+                                // Reset to page 1 if current page would be empty
+                                const totalPages = Math.ceil(newFiles.length / itemsPerPage);
+                                if (currentPage > totalPages && totalPages > 0) {
+                                  setCurrentPage(totalPages);
+                                }
+                              }}
+                              disabled={dropLoading}
+                            >
+                              <IconTrashFilled size='1rem' />
+                            </ActionIcon>
+                          </Table.Td>
+                        </Table.Tr>
+                      );
+                    })}
+                </Table.Tbody>
+              </Table>
+            </div>
+
+            {/* Right Table */}
+            <div style={{ flex: 1 }}>
+              <Table striped highlightOnHover>
+                <Table.Thead>
+                  <Table.Tr>
+                    <Table.Th>File Name</Table.Th>
+                    <Table.Th>Type</Table.Th>
+                    <Table.Th>Size</Table.Th>
+                    <Table.Th style={{ width: '60px' }}>Action</Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>
+                  {files
+                    .slice(
+                      (currentPage - 1) * itemsPerPage + Math.ceil(itemsPerPage / 2),
+                      currentPage * itemsPerPage,
+                    )
+                    .map((file, i) => {
+                      const actualIndex = (currentPage - 1) * itemsPerPage + Math.ceil(itemsPerPage / 2) + i;
+                      return (
+                        <Table.Tr
+                          key={actualIndex}
+                          style={
+                            file.size === 0
+                              ? {
+                                  backgroundColor: 'rgba(255, 255, 0, 0.1)',
+                                  borderLeft: '3px solid #ffd43b',
+                                }
+                              : {}
+                          }
+                        >
+                          <Table.Td>
+                            <Text size='sm' title={file.name}>
+                              {truncateFileName(file.name)}
+                            </Text>
+                          </Table.Td>
+                          <Table.Td>
+                            <Text size='sm' c='dimmed'>
+                              {file.type.split('/')[0] || 'file'}
+                            </Text>
+                          </Table.Td>
+                          <Table.Td>
+                            <Text
+                              size='sm'
+                              c={file.size === 0 ? 'yellow' : 'dimmed'}
+                              fw={file.size === 0 ? 600 : undefined}
+                            >
+                              {bytes(file.size)}
+                            </Text>
+                          </Table.Td>
+                          <Table.Td>
+                            <ActionIcon
+                              variant='subtle'
+                              color='red'
+                              size='sm'
+                              onClick={() => {
+                                const newFiles = files.filter((_, j) => actualIndex !== j);
+                                setFiles(newFiles);
+                                // Reset to page 1 if current page would be empty
+                                const totalPages = Math.ceil(newFiles.length / itemsPerPage);
+                                if (currentPage > totalPages && totalPages > 0) {
+                                  setCurrentPage(totalPages);
+                                }
+                              }}
+                              disabled={dropLoading}
+                            >
+                              <IconTrashFilled size='1rem' />
+                            </ActionIcon>
+                          </Table.Td>
+                        </Table.Tr>
+                      );
+                    })}
+                </Table.Tbody>
+              </Table>
+            </div>
+          </Group>
+
+          {/* Pagination */}
+          <Group justify='center' p='md'>
+            <Pagination
+              total={Math.ceil(files.length / itemsPerPage)}
+              value={currentPage}
+              onChange={setCurrentPage}
+              size='sm'
+            />
+            <Text size='sm' c='dimmed'>
+              Showing {Math.min((currentPage - 1) * itemsPerPage + 1, files.length)}-
+              {Math.min(currentPage * itemsPerPage, files.length)} of {files.length} files
+            </Text>
+          </Group>
+        </Paper>
+      ) : (
+        // Masonry view for <500 files
+        <div
+          style={{
+            columnCount: 'auto',
+            columnWidth: '25vh',
+            columnGap: '1rem',
+            margin: '1rem',
+          }}
+        >
+          {files.map((file, i) => (
+            <ToUploadFile
+              key={i}
+              loading={dropLoading}
+              file={file}
+              onDelete={() => setFiles(files.filter((_, j) => i !== j))}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Large Upload Warning Modal */}
       <Modal

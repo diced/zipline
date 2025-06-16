@@ -38,7 +38,8 @@ export default fastifyPlugin(
           const user = await prisma.user.findUnique({
             where: { id: req.user.id },
             select: { password: true },
-          });          if (!user || !user.password) {
+          });
+          if (!user || !user.password) {
             return res.status(401).send({ error: 'Invalid credentials' });
           }
 
@@ -50,7 +51,7 @@ export default fastifyPlugin(
           logger.warn('Starting reset of all files', {
             requester: req.user.username,
             userId: req.user.id,
-          });          // Get all files from database
+          }); // Get all files from database
           const files = await prisma.file.findMany({
             select: {
               id: true,
@@ -90,7 +91,7 @@ export default fastifyPlugin(
 
           // Delete all file records from database
           await prisma.file.deleteMany({});
-          
+
           // Delete all thumbnail records
           await prisma.thumbnail.deleteMany({});
 
@@ -105,19 +106,18 @@ export default fastifyPlugin(
             totalFiles: files.length,
           });
 
-          return res.send({ 
+          return res.send({
             status,
-            deletedCount 
+            deletedCount,
           });
-
         } catch (error) {
           logger.error('Failed to reset all files', {
             error,
             requester: req.user.username,
           });
 
-          return res.status(500).send({ 
-            error: 'Failed to reset files' 
+          return res.status(500).send({
+            error: 'Failed to reset files',
           });
         }
       },

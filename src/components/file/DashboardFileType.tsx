@@ -20,18 +20,18 @@ import fileIcon from './fileIcon';
 import { parseAsStringLiteral, useQueryState } from 'nuqs';
 
 // Image component with error fallback
-function ImageWithFallback({ 
-  src, 
-  alt, 
-  style, 
+function ImageWithFallback({
+  src,
+  alt,
+  style,
   onClick,
   fileName,
   isModal = false,
-  ...props 
-}: { 
-  src: string; 
-  alt: string; 
-  style?: React.CSSProperties; 
+  ...props
+}: {
+  src: string;
+  alt: string;
+  style?: React.CSSProperties;
   onClick?: (e?: React.MouseEvent) => void;
   fileName?: string;
   isModal?: boolean;
@@ -53,35 +53,36 @@ function ImageWithFallback({
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      cursor: onClick ? 'pointer' : 'default'
+      cursor: onClick ? 'pointer' : 'default',
     };
 
     return (
-      <div 
-        style={errorStyle}
-        onClick={(e) => onClick?.(e)}
-      >
+      <div style={errorStyle} onClick={(e) => onClick?.(e)}>
         <div style={{ textAlign: 'center', color: '#adb5bd' }}>
-          <IconPhoto 
+          <IconPhoto
             size={isModal ? '4rem' : '3rem'}
-            stroke={1.5} 
-            color='#adb5bd' 
+            stroke={1.5}
+            color='#adb5bd'
             style={{ marginBottom: '0.5rem' }}
           />
-          <div style={{ 
-            fontSize: isModal ? '1rem' : '0.875rem',
-            fontWeight: 500, 
-            marginBottom: '0.25rem', 
-            color: '#dee2e6',
-            maxWidth: isModal ? '400px' : '200px',
-            wordWrap: 'break-word'
-          }}>
+          <div
+            style={{
+              fontSize: isModal ? '1rem' : '0.875rem',
+              fontWeight: 500,
+              marginBottom: '0.25rem',
+              color: '#dee2e6',
+              maxWidth: isModal ? '400px' : '200px',
+              wordWrap: 'break-word',
+            }}
+          >
             {fileName || alt}
           </div>
-          <div style={{ 
-            fontSize: isModal ? '0.875rem' : '0.75rem',
-            opacity: 0.7 
-          }}>
+          <div
+            style={{
+              fontSize: isModal ? '0.875rem' : '0.75rem',
+              opacity: 0.7,
+            }}
+          >
             Failed to load
           </div>
         </div>
@@ -279,8 +280,8 @@ export default function DashboardFileType({
     // Handle Shift+Click to copy file link
     if (e?.shiftKey) {
       e.stopPropagation();
-      const fileUrl = dbFile 
-        ? `${window.location.origin}/raw/${file.name}` 
+      const fileUrl = dbFile
+        ? `${window.location.origin}/raw/${file.name}`
         : URL.createObjectURL(file as File);
       clipboard.copy(fileUrl);
       showNotification({
@@ -548,8 +549,8 @@ export default function DashboardFileType({
         />
       ) : (file as DbFile).thumbnail && dbFile ? (
         <Box pos='relative'>
-          <ImageWithFallback 
-            src={`/raw/${(file as DbFile).thumbnail!.path}`} 
+          <ImageWithFallback
+            src={`/raw/${(file as DbFile).thumbnail!.path}`}
             alt={file.name}
             fileName={file.name}
           />
@@ -574,6 +575,32 @@ export default function DashboardFileType({
         <Placeholder text={`Video: ${file.name}`} Icon={fileIcon(file.type)} />
       );
     case 'image':
+      // Check if image is over 10MB (10,485,760 bytes)
+      const isImageTooLarge = file.size > 10 * 1024 * 1024;
+
+      if (isImageTooLarge && !show) {
+        return (
+          <Center py='xs' style={{ height: '100%', width: '100%', minHeight: '200px' }}>
+            <Stack align='center' gap='sm'>
+              <IconPhoto
+                size='3rem'
+                stroke={1.5}
+                style={{
+                  filter: 'drop-shadow(0 0 10px rgba(0, 0, 0, 0.9))',
+                  color: '#ffd43b',
+                }}
+              />
+              <Text size='md' ta='center' c='dimmed'>
+                Image Too Large
+              </Text>
+              <Text size='sm' ta='center' c='dimmed' style={{ opacity: 0.7 }}>
+                {(file.size / (1024 * 1024)).toFixed(1)} MB - Click to view
+              </Text>
+            </Stack>
+          </Center>
+        );
+      }
+
       return show ? (
         <Center>
           <ImageWithFallback

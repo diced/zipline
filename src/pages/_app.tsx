@@ -60,9 +60,9 @@ export default function App({
               centered: true,
             }}
           >
-            <Notifications 
-              zIndex={100000000} 
-              position="top-right"
+            <Notifications
+              zIndex={100000000}
+              position='top-right'
               style={{ marginTop: '70px', marginRight: '16px', opacity: 0.9 }}
             />
             <NuqsAdapter>

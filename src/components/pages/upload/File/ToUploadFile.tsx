@@ -88,6 +88,12 @@ export default function ToUploadFile({
       style={{
         width: '100%',
         height: 'fit-content',
+        ...(file.size === 0 && {
+          backgroundColor: 'rgba(255, 255, 0, 0.1)',
+          borderColor: '#ffd43b',
+          borderWidth: '2px',
+          boxShadow: '0 0 8px rgba(255, 212, 59, 0.3)',
+        }),
       }}
       className={styles.uploadFileCard}
     >
@@ -142,7 +148,12 @@ export default function ToUploadFile({
               <Text size='xs' c='dimmed' flex={1} lineClamp={1}>
                 {getFileTypeDisplay(file)}
               </Text>
-              <Text size='xs' c='dimmed' style={{ whiteSpace: 'nowrap' }}>
+              <Text
+                size='xs'
+                c={file.size === 0 ? 'yellow' : 'dimmed'}
+                style={{ whiteSpace: 'nowrap' }}
+                fw={file.size === 0 ? 600 : undefined}
+              >
                 {bytes(file.size)}
               </Text>
             </Group>
