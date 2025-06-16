@@ -1,5 +1,7 @@
 import type { File } from '@/lib/db/models/file';
-import { Card, Text } from '@mantine/core';
+import { Card, Text, Tooltip } from '@mantine/core';
+import { useClipboard } from '@mantine/hooks';
+import { showNotification } from '@mantine/notifications';
 import { useState } from 'react';
 import DashboardFileType from '../DashboardFileType';
 import FileModal from './FileModal';
@@ -29,7 +31,22 @@ export default function DashboardFile({
   onSelect?: (selected: boolean) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const clipboard = useClipboard();
+
   const handleCardClick = (e: React.MouseEvent) => {
+    // Handle Shift+Click to copy file link
+    if (e.shiftKey) {
+      e.stopPropagation();
+      const fileUrl = `${window.location.origin}/raw/${file.name}`;
+      clipboard.copy(fileUrl);
+      showNotification({
+        title: 'Link Copied',
+        message: `File link copied to clipboard: ${file.name}`,
+        color: 'green',
+      });
+      return;
+    }
+
     if (selectionMode) {
       e.stopPropagation();
       onSelect?.(!selected);

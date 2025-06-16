@@ -10,13 +10,96 @@ import {
   Stack,
   Text,
 } from '@mantine/core';
-import { Icon, IconFileUnknown, IconPlayerPlay, IconShieldLockFilled } from '@tabler/icons-react';
+import { useClipboard } from '@mantine/hooks';
+import { Icon, IconFileUnknown, IconPlayerPlay, IconShieldLockFilled, IconPhoto } from '@tabler/icons-react';
 import { showNotification, updateNotification } from '@mantine/notifications';
 import { useEffect, useState } from 'react';
 import { renderMode } from '../pages/upload/renderMode';
 import Render from '../render/Render';
 import fileIcon from './fileIcon';
 import { parseAsStringLiteral, useQueryState } from 'nuqs';
+
+// Image component with error fallback
+function ImageWithFallback({ 
+  src, 
+  alt, 
+  style, 
+  onClick,
+  fileName,
+  isModal = false,
+  ...props 
+}: { 
+  src: string; 
+  alt: string; 
+  style?: React.CSSProperties; 
+  onClick?: (e?: React.MouseEvent) => void;
+  fileName?: string;
+  isModal?: boolean;
+  [key: string]: any;
+}) {
+  const [imageError, setImageError] = useState(false);
+
+  if (imageError) {
+    const errorStyle = {
+      ...style,
+      minHeight: isModal ? '400px' : '200px',
+      minWidth: isModal ? '500px' : 'auto',
+      width: isModal ? '40vw' : style?.width || 'auto',
+      height: isModal ? '20vh' : style?.height || 'auto',
+      background: 'rgba(37, 38, 43, 0.8)',
+      border: '2px dashed #495057',
+      borderRadius: '8px',
+      transition: 'all 0.2s ease-in-out',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      cursor: onClick ? 'pointer' : 'default'
+    };
+
+    return (
+      <div 
+        style={errorStyle}
+        onClick={(e) => onClick?.(e)}
+      >
+        <div style={{ textAlign: 'center', color: '#adb5bd' }}>
+          <IconPhoto 
+            size={isModal ? '4rem' : '3rem'}
+            stroke={1.5} 
+            color='#adb5bd' 
+            style={{ marginBottom: '0.5rem' }}
+          />
+          <div style={{ 
+            fontSize: isModal ? '1rem' : '0.875rem',
+            fontWeight: 500, 
+            marginBottom: '0.25rem', 
+            color: '#dee2e6',
+            maxWidth: isModal ? '400px' : '200px',
+            wordWrap: 'break-word'
+          }}>
+            {fileName || alt}
+          </div>
+          <div style={{ 
+            fontSize: isModal ? '0.875rem' : '0.75rem',
+            opacity: 0.7 
+          }}>
+            Failed to load
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <MantineImage
+      src={src}
+      alt={alt}
+      style={style}
+      onClick={(e) => onClick?.(e)}
+      onError={() => setImageError(true)}
+      {...props}
+    />
+  );
+}
 
 function PlaceholderContent({ text, Icon }: { text: string; Icon: Icon }) {
   return (
@@ -82,6 +165,7 @@ export default function DashboardFileType({
   inModal?: boolean;
 }) {
   const [overrideType] = useQueryState('otype', parseAsStringLiteral(['video', 'audio', 'image', 'text']));
+  const clipboard = useClipboard();
 
   const disableMediaPreview = useSettingsStore((state) => state.settings.disableMediaPreview);
   const dbFile = 'id' in file;
@@ -190,6 +274,26 @@ export default function DashboardFileType({
     return codeExtensions.includes(extension) || filename.toLowerCase().includes('config');
   };
   const [open, setOpen] = useState(false);
+
+  const handleImageClick = (e?: React.MouseEvent) => {
+    // Handle Shift+Click to copy file link
+    if (e?.shiftKey) {
+      e.stopPropagation();
+      const fileUrl = dbFile 
+        ? `${window.location.origin}/raw/${file.name}` 
+        : URL.createObjectURL(file as File);
+      clipboard.copy(fileUrl);
+      showNotification({
+        title: 'Link Copied',
+        message: `File link copied to clipboard: ${file.name}`,
+        color: 'green',
+      });
+      return;
+    }
+
+    // Default behavior - open zoom modal
+    setOpen(true);
+  };
 
   const uploadToPaste = async () => {
     if (!dbFile) return; // Only works for database files now
@@ -444,7 +548,11 @@ export default function DashboardFileType({
         />
       ) : (file as DbFile).thumbnail && dbFile ? (
         <Box pos='relative'>
-          <MantineImage src={`/raw/${(file as DbFile).thumbnail!.path}`} alt={file.name} />
+          <ImageWithFallback 
+            src={`/raw/${(file as DbFile).thumbnail!.path}`} 
+            alt={file.name}
+            fileName={file.name}
+          />
 
           <Center
             pos='absolute'
@@ -468,23 +576,27 @@ export default function DashboardFileType({
     case 'image':
       return show ? (
         <Center>
-          <MantineImage
+          <ImageWithFallback
             src={dbFile ? `/raw/${file.name}${password ? `?pw=${password}` : ''}` : URL.createObjectURL(file)}
             alt={file.name}
+            fileName={file.name}
+            isModal={true}
             style={{
               cursor: allowZoom ? 'zoom-in' : 'default',
               maxWidth: '70vw',
               maxHeight: '70vw',
             }}
-            onClick={() => setOpen(true)}
+            onClick={handleImageClick}
           />
           {allowZoom && open && (
             <FileZoomModal setOpen={setOpen}>
-              <MantineImage
+              <ImageWithFallback
                 src={
                   dbFile ? `/raw/${file.name}${password ? `?pw=${password}` : ''}` : URL.createObjectURL(file)
                 }
                 alt={file.name}
+                fileName={file.name}
+                isModal={true}
                 style={{
                   maxWidth: '95vw',
                   maxHeight: '95vh',
@@ -497,9 +609,11 @@ export default function DashboardFileType({
           )}
         </Center>
       ) : (
-        <MantineImage
+        <ImageWithFallback
           src={dbFile ? `/raw/${file.name}${password ? `?pw=${password}` : ''}` : URL.createObjectURL(file)}
           alt={file.name}
+          fileName={file.name}
+          isModal={false}
           style={{
             width: '100%',
             height: 'auto',

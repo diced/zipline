@@ -4,6 +4,7 @@ import ClearZerosButton from './ClearZerosButton';
 import GenThumbsButton from './GenThumbsButton';
 import RequerySizeButton from './RequerySizeButton';
 import ImportButton from './ImportButton';
+import ResetAllFilesButton from './ResetAllFilesButton';
 
 export default function SettingsServerActions() {
   return (
@@ -19,6 +20,7 @@ export default function SettingsServerActions() {
         <RequerySizeButton />
         <GenThumbsButton />
         <ImportButton />
+        <ResetAllFilesButton />
       </Group>
     </Paper>
   );

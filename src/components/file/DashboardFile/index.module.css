@@ -18,20 +18,26 @@
 .fileSelectionMode:hover {
   cursor: pointer;
   filter: brightness(0.9);
+  box-shadow:
+    0 0 0 2px rgba(34, 139, 34, 0.4),
+    0 2px 8px -1px rgba(34, 139, 34, 0.2);
 }
 
 .fileSelected {
   transition: all 0.2s ease-in-out;
   filter: brightness(1) !important;
   box-shadow:
-    0 0 0 2px rgba(64, 192, 87, 0.6),
-    0 2px 8px -1px rgba(64, 192, 87, 0.3);
+    0 0 0 2px rgba(64, 192, 87, 0.8),
+    0 2px 8px -1px rgba(64, 192, 87, 0.4);
 }
 
 /* Ensure selected state overrides selection mode hover */
 .fileSelected:hover {
   cursor: pointer;
   filter: brightness(1) !important;
+  box-shadow:
+    0 0 0 2px rgba(64, 192, 87, 0.9),
+    0 2px 8px -1px rgba(64, 192, 87, 0.5);
 }
 
 .fileOverlay {
@@ -53,4 +59,36 @@
 .fileOverlayRight {
   bottom: 8px;
   right: 8px;
+}
+
+.imageError {
+  background: rgba(37, 38, 43, 0.8);
+  border: 2px dashed #495057;
+  border-radius: 8px;
+  transition: all 0.2s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.imageError:hover {
+  background: rgba(37, 38, 43, 0.9);
+  border-color: #6c757d;
+}
+
+.imageErrorContent {
+  text-align: center;
+  color: #adb5bd;
+}
+
+.imageErrorTitle {
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+  color: #dee2e6;
+}
+
+.imageErrorSubtitle {
+  font-size: 0.75rem;
+  opacity: 0.7;
 }
