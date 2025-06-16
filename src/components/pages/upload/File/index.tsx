@@ -7,6 +7,7 @@ import {
   Grid,
   Group,
   Kbd,
+  Modal,
   Paper,
   Progress,
   Text,
@@ -48,25 +49,79 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
     speed: 0,
   });
   const [dropLoading, setLoading] = useState(false);
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const [showWarningModal, setShowWarningModal] = useState(false);
+  const [warningDetails, setWarningDetails] = useState({ fileCount: 0, totalSize: 0 });
 
   const handlePaste = (e: ClipboardEvent) => {
     if (!e.clipboardData) return;
 
+    const pastedFiles: File[] = [];
     for (let i = 0; i !== e.clipboardData.items.length; ++i) {
       if (!e.clipboardData.items[i].type.startsWith('image')) return;
 
       const blob = e.clipboardData.items[i].getAsFile();
       if (!blob) return;
 
-      setFiles([...files, blob]);
+      pastedFiles.push(blob);
       showNotification({
         message: `Image ${blob.name} pasted from clipboard`,
         color: 'blue',
       });
     }
+
+    if (pastedFiles.length > 0) {
+      handleFilesAdded(pastedFiles);
+    }
   };
 
   const aggSize = () => files.reduce((acc, file) => acc + file.size, 0);
+
+  // Function to check if upload is large and needs confirmation
+  const checkLargeUpload = (newFiles: File[], existingFiles: File[]) => {
+    const allFiles = [...existingFiles, ...newFiles];
+    const totalSize = allFiles.reduce((acc, file) => acc + file.size, 0);
+    const fileCount = allFiles.length;
+    const sizeLimitMB = 100 * 1024 * 1024; // 100 MB in bytes
+    const fileCountLimit = 100;
+
+    return {
+      isLarge: fileCount > fileCountLimit || totalSize > sizeLimitMB,
+      fileCount,
+      totalSize,
+      exceedsFileLimit: fileCount > fileCountLimit,
+      exceedsSizeLimit: totalSize > sizeLimitMB,
+    };
+  };
+
+  const handleFilesAdded = (newFiles: File[]) => {
+    const uploadCheck = checkLargeUpload(newFiles, files);
+    
+    if (uploadCheck.isLarge) {
+      // Show confirmation modal before adding files
+      setPendingFiles(newFiles);
+      setWarningDetails({ fileCount: uploadCheck.fileCount, totalSize: uploadCheck.totalSize });
+      setShowWarningModal(true);
+    } else {
+      // Add files directly if not large
+      setFiles([...newFiles, ...files]);
+    }
+  };
+
+  const confirmLargeUpload = () => {
+    // User confirmed, add the pending files
+    setFiles([...pendingFiles, ...files]);
+    setShowWarningModal(false);
+    setPendingFiles([]);
+    setWarningDetails({ fileCount: 0, totalSize: 0 });
+  };
+
+  const cancelLargeUpload = () => {
+    // User cancelled, clear pending files
+    setShowWarningModal(false);
+    setPendingFiles([]);
+    setWarningDetails({ fileCount: 0, totalSize: 0 });
+  };
 
   const upload = () => {
     const toPartialFiles: File[] = [];
@@ -142,7 +197,7 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
       </Group>
 
       <Dropzone
-        onDrop={(f) => setFiles([...f, ...files])}
+        onDrop={handleFilesAdded}
         my='sm'
         loading={dropLoading}
         disabled={dropLoading}
@@ -248,6 +303,43 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
           </Button>
         </Group>
       </Group>
+
+      {/* Large Upload Warning Modal */}
+      <Modal
+        opened={showWarningModal}
+        onClose={cancelLargeUpload}
+        title="Large Upload Warning"
+        size="md"
+        centered
+      >
+        <Text mb="md">
+          <strong>Warning:</strong> You have selected{' '}
+          {warningDetails.fileCount > 100 && (
+            <>
+              <b>{warningDetails.fileCount} files</b> (over 100 files)
+            </>
+          )}
+          {warningDetails.fileCount > 100 && warningDetails.totalSize > 100 * 1024 * 1024 && <> and </>}
+          {warningDetails.totalSize > 100 * 1024 * 1024 && (
+            <>
+              <b>{bytes(warningDetails.totalSize)}</b> (over 100 MB)
+            </>
+          )}
+          .
+        </Text>
+        <Text mb="lg" c="dimmed">
+          Generating previews for this many files may cause your browser to freeze temporarily. 
+          Consider uploading fewer files at once for better performance.
+        </Text>
+        <Group justify="flex-end" gap="sm">
+          <Button variant="outline" onClick={cancelLargeUpload}>
+            Cancel
+          </Button>
+          <Button color="orange" onClick={confirmLargeUpload}>
+            Continue Anyway
+          </Button>
+        </Group>
+      </Modal>
     </>
   );
 }
