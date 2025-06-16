@@ -13,7 +13,7 @@ export default function DashbaordFiles() {
 
   return (
     <>
-      <Group justify="space-between">
+      <Group justify='space-between'>
         <Group>
           <Title>Files</Title>
 
@@ -34,11 +34,7 @@ export default function DashbaordFiles() {
         </Group>
       </Group>
 
-      {view === 'grid' ? (
-        <Files />
-      ) : (
-        <FileTable />
-      )}
+      {view === 'grid' ? <Files /> : <FileTable />}
     </>
   );
 }

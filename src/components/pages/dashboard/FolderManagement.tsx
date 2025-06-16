@@ -15,14 +15,7 @@ import {
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { showNotification } from '@mantine/notifications';
-import {
-  IconFolder,
-  IconFolderPlus,
-  IconTrash,
-  IconFiles,
-  IconEye,
-  IconUpload,
-} from '@tabler/icons-react';
+import { IconFolder, IconFolderPlus, IconTrash, IconFiles, IconEye, IconUpload } from '@tabler/icons-react';
 import { useState } from 'react';
 import useSWR, { mutate } from 'swr';
 

@@ -4,7 +4,6 @@ import {
   ActionIcon,
   Button,
   Collapse,
-  Grid,
   Group,
   Kbd,
   Modal,
@@ -96,7 +95,7 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
 
   const handleFilesAdded = (newFiles: File[]) => {
     const uploadCheck = checkLargeUpload(newFiles, files);
-    
+
     if (uploadCheck.isLarge) {
       // Show confirmation modal before adding files
       setPendingFiles(newFiles);
@@ -196,12 +195,7 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
         )}
       </Group>
 
-      <Dropzone
-        onDrop={handleFilesAdded}
-        my='sm'
-        loading={dropLoading}
-        disabled={dropLoading}
-      >
+      <Dropzone onDrop={handleFilesAdded} my='sm' loading={dropLoading} disabled={dropLoading}>
         <Group justify='center' gap='xl' style={{ minHeight: rem(220), pointerEvents: 'none' }}>
           <Dropzone.Accept>
             <IconUpload
@@ -308,11 +302,11 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
       <Modal
         opened={showWarningModal}
         onClose={cancelLargeUpload}
-        title="Large Upload Warning"
-        size="md"
+        title='Large Upload Warning'
+        size='md'
         centered
       >
-        <Text mb="md">
+        <Text mb='md'>
           <strong>Warning:</strong> You have selected{' '}
           {warningDetails.fileCount > 100 && (
             <>
@@ -327,15 +321,15 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
           )}
           .
         </Text>
-        <Text mb="lg" c="dimmed">
-          Generating previews for this many files may cause your browser to freeze temporarily. 
-          Consider uploading fewer files at once for better performance.
+        <Text mb='lg' c='dimmed'>
+          Generating previews for this many files may cause your browser to freeze temporarily. Consider
+          uploading fewer files at once for better performance.
         </Text>
-        <Group justify="flex-end" gap="sm">
-          <Button variant="outline" onClick={cancelLargeUpload}>
+        <Group justify='flex-end' gap='sm'>
+          <Button variant='outline' onClick={cancelLargeUpload}>
             Cancel
           </Button>
-          <Button color="orange" onClick={confirmLargeUpload}>
+          <Button color='orange' onClick={confirmLargeUpload}>
             Continue Anyway
           </Button>
         </Group>

@@ -105,9 +105,9 @@ export default fastifyPlugin(
           if (!Array.isArray(tags)) {
             return res.badRequest('tags must be an array');
           }
-          
+
           // Check if all tag IDs are strings
-          if (!tags.every(tagId => typeof tagId === 'string')) {
+          if (!tags.every((tagId) => typeof tagId === 'string')) {
             return res.badRequest('all tag IDs must be strings');
           }
 
@@ -153,7 +153,7 @@ export default fastifyPlugin(
                 },
                 select: { id: true },
               });
-            })
+            }),
           );
 
           const successCount = updatedFiles.filter(Boolean).length;

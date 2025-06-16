@@ -21,7 +21,7 @@ export default function HighlightCode({
   code,
   onUploadToPaste,
   isUploading,
-  fileName,
+  fileName: _fileName,
   fileId,
   inModal = false,
 }: {

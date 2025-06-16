@@ -30,7 +30,6 @@ import {
 } from '@tabler/icons-react';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { mutate } from 'swr';
 import { useShallow } from 'zustand/shallow';
 
 export default function SettingsUser() {
@@ -79,9 +78,13 @@ export default function SettingsUser() {
 
   // Verify password and show token
   const handleShowToken = async (currentPassword: string) => {
-    const { data, error } = await fetchApi<{ valid: boolean; token?: string }>('/api/user/verify-password', 'POST', {
-      password: currentPassword,
-    });
+    const { data, error } = await fetchApi<{ valid: boolean; token?: string }>(
+      '/api/user/verify-password',
+      'POST',
+      {
+        password: currentPassword,
+      },
+    );
 
     if (error || !data?.valid) {
       passwordForm.setFieldError('currentPassword', 'Invalid password');
@@ -162,7 +165,7 @@ export default function SettingsUser() {
     // Clear form and logout user after update
     form.reset();
     setUser(null);
-    
+
     // Redirect to login after a short delay
     setTimeout(() => {
       router.push('/auth/logout');
@@ -172,7 +175,7 @@ export default function SettingsUser() {
   const onSubmit = async (values: typeof form.values) => {
     // Check if any changes were made
     const hasChanges = values.username !== user?.username || values.password;
-    
+
     if (!hasChanges) {
       notifications.show({
         message: 'No changes to save',
@@ -194,7 +197,7 @@ export default function SettingsUser() {
 
   const handleTokenClick = () => {
     if (tokenShown) return; // Token already shown
-    
+
     setModalType('token');
     setShowPasswordModal(true);
   };
@@ -213,11 +216,7 @@ export default function SettingsUser() {
               <CopyButton value={token} timeout={1000}>
                 {({ copied, copy }) => (
                   <Tooltip label={tokenShown ? 'Click to copy token' : 'Enter password to view'}>
-                    <ActionIcon 
-                      onClick={tokenShown ? copy : handleTokenClick} 
-                      variant='subtle' 
-                      color='gray'
-                    >
+                    <ActionIcon onClick={tokenShown ? copy : handleTokenClick} variant='subtle' color='gray'>
                       {copied ? (
                         <IconCheck color='green' size='1rem' />
                       ) : tokenShown ? (
@@ -247,7 +246,7 @@ export default function SettingsUser() {
             {...form.getInputProps('username')}
             leftSection={<IconUser size='1rem' />}
           />
-          
+
           <PasswordInput
             label='New Password'
             description='Leave blank to keep the same password'
@@ -278,7 +277,9 @@ export default function SettingsUser() {
           setShowPasswordModal(false);
           passwordForm.reset();
         }}
-        title={modalType === 'token' ? 'Enter Password to View Token' : 'Confirm Current Password to Save Changes'}
+        title={
+          modalType === 'token' ? 'Enter Password to View Token' : 'Confirm Current Password to Save Changes'
+        }
         centered
       >
         <form

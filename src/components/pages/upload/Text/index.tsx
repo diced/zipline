@@ -42,7 +42,7 @@ export default function UploadText({
   const [detectedLanguage, setDetectedLanguage] = useState<string | null>(null);
   const [hasAutoDetected, setHasAutoDetected] = useState(false); // Track if we've already auto-detected
 
-  const renderIn = renderMode(selectedLanguage === 'auto' ? (detectedLanguage || 'txt') : selectedLanguage);
+  const renderIn = renderMode(selectedLanguage === 'auto' ? detectedLanguage || 'txt' : selectedLanguage);
 
   const detectLanguage = async (textContent: string) => {
     if (!textContent.trim() || textContent.length < 10) {
@@ -76,7 +76,7 @@ export default function UploadText({
 
   const handleTextChange = (value: string) => {
     setText(value);
-    
+
     // Only auto-detect language on the first change when using auto mode
     if (selectedLanguage === 'auto' && !hasAutoDetected && value.trim()) {
       detectLanguage(value);
@@ -112,9 +112,9 @@ export default function UploadText({
 
   const upload = () => {
     const blob = new Blob([text]);
-    
+
     // Use detected language when in auto mode, otherwise use selected language
-    const finalLanguage = selectedLanguage === 'auto' ? (detectedLanguage || 'txt') : selectedLanguage;
+    const finalLanguage = selectedLanguage === 'auto' ? detectedLanguage || 'txt' : selectedLanguage;
 
     const file = new File([blob], `text.${finalLanguage}`, {
       type: codeMeta.find((meta) => meta.ext === finalLanguage)?.mime,
@@ -173,10 +173,10 @@ export default function UploadText({
               </Text>
             </Center>
           ) : (
-            <Render 
-              mode={renderIn} 
-              code={text} 
-              language={selectedLanguage === 'auto' ? (detectedLanguage || 'txt') : selectedLanguage} 
+            <Render
+              mode={renderIn}
+              code={text}
+              language={selectedLanguage === 'auto' ? detectedLanguage || 'txt' : selectedLanguage}
             />
           )}
         </Tabs.Panel>
@@ -188,16 +188,19 @@ export default function UploadText({
             searchable
             value={selectedLanguage}
             data={[
-              { value: 'auto', label: `Auto${detectedLanguage && selectedLanguage === 'auto' ? ` (${codeMeta.find(m => m.ext === detectedLanguage)?.name || detectedLanguage})` : ''}` },
-              ...codeMeta.map((meta) => ({ value: meta.ext, label: meta.name }))
+              {
+                value: 'auto',
+                label: `Auto${detectedLanguage && selectedLanguage === 'auto' ? ` (${codeMeta.find((m) => m.ext === detectedLanguage)?.name || detectedLanguage})` : ''}`,
+              },
+              ...codeMeta.map((meta) => ({ value: meta.ext, label: meta.name })),
             ]}
             onChange={(value) => setSelectedLanguage(value as string)}
           />
-          
+
           {selectedLanguage === 'auto' && (
-            <Tooltip label="Re-guess language">
+            <Tooltip label='Re-guess language'>
               <Button
-                variant="outline"
+                variant='outline'
                 onClick={handleReguesLanguage}
                 disabled={!text.trim() || detectingLanguage}
                 loading={detectingLanguage}
@@ -207,7 +210,7 @@ export default function UploadText({
             </Tooltip>
           )}
         </Group>
-        
+
         <UploadOptionsButton numFiles={1} />
         <Button
           variant='outline'

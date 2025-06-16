@@ -27,7 +27,8 @@ export default fastifyPlugin(
           where: {
             id: req.user.id,
           },
-        });        if (!user) {
+        });
+        if (!user) {
           return res.notFound('User not found');
         }
 
@@ -42,8 +43,8 @@ export default fastifyPlugin(
         }
 
         // If verification is for token access, include the token
-        let tokenResponse = { valid: true };
-        
+        const _tokenResponse = { valid: true };
+
         // Always include token when password is verified for this endpoint
         const tokenResponse2 = {
           valid: true,

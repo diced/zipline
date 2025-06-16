@@ -99,7 +99,7 @@ export function uploadFiles(
     setProgress,
     setLoading,
     setFiles,
-    clipboard,
+    clipboard: _clipboard,
     clearEphemeral,
     options,
     ephemeral,

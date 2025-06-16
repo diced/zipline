@@ -60,7 +60,7 @@ export default fastifyPlugin(
           }
 
           const data: LanguageDetectResponse = await response.json();
-          
+
           logger.info('Language detected', {
             languageId: data.languageId,
             languageName: data.languageName,
@@ -71,7 +71,7 @@ export default fastifyPlugin(
           return res.send(data);
         } catch (error) {
           logger.error('Language detection failed', { error: (error as Error).message });
-          
+
           // Return a fallback response
           return res.send({
             languageId: 'txt',

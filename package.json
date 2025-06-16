@@ -4,7 +4,7 @@
   "license": "MIT",
   "version": "4.1.2",
   "scripts": {
-    "build": "cross-env pnpm run --stream \"/^build:.*/\"",
+    "build": "npx prettier --write \"src/**/*.{js,jsx,ts,tsx}\" --ignore-path .gitignore && cross-env pnpm run --stream \"/^build:.*/\"",
     "build:prisma": "prisma generate --no-hints",
     "build:next": "cross-env ZIPLINE_BUILD=true next build",
     "build:server": "tsup",

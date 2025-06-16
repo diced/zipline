@@ -107,7 +107,7 @@ export async function favoriteFile(file: File) {
 }
 
 export function createFolderAndAdd(file: File, folderName: string | null) {
-  fetchApi<Extract<Response['/api/user/folders'], Folder>>('/api/user/folders', 'POST', {
+  fetchApi<Folder>('/api/user/folders', 'POST', {
     name: folderName,
     files: [file.id],
   }).then(({ data, error }) => {

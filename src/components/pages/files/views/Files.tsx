@@ -156,7 +156,7 @@ export default function Files({ id }: { id?: string }) {
       const response = await fetch('/api/files/move-to-folder', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           fileIds: Array.from(selectedFiles),
           folderId: folderId === '' ? null : folderId,
         }),
@@ -197,7 +197,7 @@ export default function Files({ id }: { id?: string }) {
       setTagModalOpened(false);
       // Refresh the data to show updated tags
       mutate();
-    } catch (error) {
+    } catch {
       showNotification({
         title: 'Error',
         message: 'Failed to add tags to files',
@@ -259,10 +259,7 @@ export default function Files({ id }: { id?: string }) {
                     <Menu.Item leftSection={<IconHeart size='1rem' />} onClick={handleBulkFavorite}>
                       Add to Favorites
                     </Menu.Item>
-                    <Menu.Item
-                      leftSection={<IconTags size='1rem' />}
-                      onClick={() => setTagModalOpened(true)}
-                    >
+                    <Menu.Item leftSection={<IconTags size='1rem' />} onClick={() => setTagModalOpened(true)}>
                       Add Tags
                     </Menu.Item>
                     <Menu.Item
@@ -276,7 +273,7 @@ export default function Files({ id }: { id?: string }) {
               )}
             </>
           )}
-          
+
           <Button
             variant={selectionMode ? 'filled' : 'outline'}
             size='sm'
@@ -304,7 +301,9 @@ export default function Files({ id }: { id?: string }) {
               margin: '1rem 0',
             }}
           >
-            {[...Array(9)].map((_, i) => <Skeleton key={i} height={350} animate />)}
+            {[...Array(9)].map((_, i) => (
+              <Skeleton key={i} height={350} animate />
+            ))}
           </div>
         ) : (data?.page?.length ?? 0 > 0) ? (
           <div
@@ -390,8 +389,8 @@ export default function Files({ id }: { id?: string }) {
         onClose={() => setTagModalOpened(false)}
         onConfirm={handleAddTags}
         selectedCount={selectedFiles.size}
-        title="Add Tags to Files"
-        confirmText="Add Tags"
+        title='Add Tags to Files'
+        confirmText='Add Tags'
       />
     </>
   );

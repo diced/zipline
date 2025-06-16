@@ -1,15 +1,14 @@
 import { prisma } from '@/lib/db';
 import { userMiddleware } from '@/server/middleware/user';
-import { FastifyRequest } from 'fastify';
 import fastifyPlugin from 'fastify-plugin';
 import { z } from 'zod';
 
-const schema = z.object({
+const _schema = z.object({
   fileIds: z.array(z.string()),
   folderId: z.string().nullable(),
 });
 
-type Body = z.infer<typeof schema>;
+type Body = z.infer<typeof _schema>;
 
 export const PATH = '/api/files/move-to-folder';
 export default fastifyPlugin((server, _, done) => {

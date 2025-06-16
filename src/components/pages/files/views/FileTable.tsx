@@ -182,9 +182,7 @@ export default function FileTable({ id }: { id?: string }) {
   const clipboard = useClipboard();
   const warnDeletion = useSettingsStore((state) => state.settings.warnDeletion);
 
-  const { data: folders } = useSWR<Extract<Response['/api/user/folders'], Folder[]>>(
-    '/api/user/folders?noincl=true',
-  );
+  const { data: folders } = useSWR<Folder[]>('/api/user/folders?noincl=true');
 
   const [page, setPage] = useQueryState('page', parseAsInteger.withDefault(1));
   const [perpage, setPerpage] = useState<number>(20);
@@ -374,8 +372,10 @@ export default function FileTable({ id }: { id?: string }) {
                   <Combobox.Dropdown>
                     <Combobox.Options>
                       {folders
-                        ?.filter((f) => f.name.toLowerCase().includes(folderSearch.toLowerCase().trim()))
-                        .map((f) => (
+                        ?.filter((f: Folder) =>
+                          f.name.toLowerCase().includes(folderSearch.toLowerCase().trim()),
+                        )
+                        .map((f: Folder) => (
                           <Combobox.Option value={f.id} key={f.id}>
                             {f.name}
                           </Combobox.Option>

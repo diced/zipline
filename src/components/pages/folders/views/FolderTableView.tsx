@@ -1,5 +1,4 @@
 import RelativeDate from '@/components/RelativeDate';
-import { Response } from '@/lib/api/response';
 import { Folder } from '@/lib/db/models/folder';
 import { ActionIcon, Anchor, Box, Checkbox, Group, Tooltip } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
@@ -23,7 +22,7 @@ import EditFolderNameModal from '../EditFolderNameModal';
 export default function FolderTableView() {
   const clipboard = useClipboard();
 
-  const { data, isLoading } = useSWR<Extract<Response['/api/user/folders'], Folder[]>>('/api/user/folders');
+  const { data, isLoading } = useSWR<Folder[]>('/api/user/folders');
 
   const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
     columnAccessor: 'createdAt',
@@ -36,7 +35,7 @@ export default function FolderTableView() {
 
   useEffect(() => {
     if (data) {
-      const sorted = data.sort((a, b) => {
+      const sorted = data.sort((a: Folder, b: Folder) => {
         const cl = sortStatus.columnAccessor as keyof Folder;
 
         return sortStatus.direction === 'asc' ? (a[cl]! > b[cl]! ? 1 : -1) : a[cl]! < b[cl]! ? 1 : -1;

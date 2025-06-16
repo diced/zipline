@@ -1,49 +1,38 @@
 import fileIcon from '@/components/file/fileIcon';
 import { bytes } from '@/lib/bytes';
-import {
-  ActionIcon,
-  Box,
-  Card,
-  Center,
-  Group,
-  Image,
-  Overlay,
-  Stack,
-  Text,
-  Tooltip,
-} from '@mantine/core';
+import { ActionIcon, Box, Card, Center, Group, Image, Overlay, Stack, Text, Tooltip } from '@mantine/core';
 import { IconTrashFilled } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import styles from './ToUploadFile.module.css';
 
 function truncateFileName(fileName: string, maxLength: number = 20): string {
   if (fileName.length <= maxLength) return fileName;
-  
+
   const extension = fileName.split('.').pop() || '';
   const nameWithoutExt = fileName.slice(0, fileName.lastIndexOf('.'));
-  
+
   if (nameWithoutExt.length <= maxLength - extension.length - 4) {
     return fileName;
   }
-  
+
   const truncatedLength = maxLength - extension.length - 7; // 7 for "..." and "." and extension
   const truncated = nameWithoutExt.slice(0, truncatedLength) + '...' + nameWithoutExt.slice(-3);
-  
+
   return `${truncated}.${extension}`;
 }
 
 function getFileTypeDisplay(file: File): string {
   const type = file.type.split('/')[0] || 'file';
   const extension = file.name.split('.').pop()?.toUpperCase() || '';
-  
+
   const typeMap: Record<string, string> = {
-    'image': 'Image',
-    'video': 'Video', 
-    'audio': 'Audio',
-    'text': 'Text',
-    'application': 'Document'
+    image: 'Image',
+    video: 'Video',
+    audio: 'Audio',
+    text: 'Text',
+    application: 'Document',
   };
-  
+
   const displayType = typeMap[type] || 'File';
   return extension ? `${displayType} - ${extension}` : displayType;
 }
@@ -75,15 +64,17 @@ export default function ToUploadFile({
         withBorder
         radius='md'
         pos='relative'
-        style={{ 
+        style={{
           width: '100%',
           minHeight: 150,
-          marginBottom: '1rem'
+          marginBottom: '1rem',
         }}
       >
         <Overlay radius='md' backgroundOpacity={0.2} />
         <Center h='100%'>
-          <Text size='sm' c='dimmed'>Uploading...</Text>
+          <Text size='sm' c='dimmed'>
+            Uploading...
+          </Text>
         </Center>
       </Card>
     );
@@ -94,9 +85,9 @@ export default function ToUploadFile({
       withBorder
       radius='md'
       pos='relative'
-      style={{ 
+      style={{
         width: '100%',
-        height: 'fit-content'
+        height: 'fit-content',
       }}
       className={styles.uploadFileCard}
     >
@@ -123,12 +114,12 @@ export default function ToUploadFile({
               src={previewUrl}
               alt={file.name}
               fit='contain'
-              style={{ 
+              style={{
                 width: '100%',
                 maxHeight: 250,
                 height: 'auto',
                 display: 'block',
-                borderRadius: '4px 4px 0 0'
+                borderRadius: '4px 4px 0 0',
               }}
             />
           ) : (
@@ -146,7 +137,7 @@ export default function ToUploadFile({
                 {truncateFileName(file.name)}
               </Text>
             </Tooltip>
-            
+
             <Group justify='space-between' gap='xs'>
               <Text size='xs' c='dimmed' flex={1} lineClamp={1}>
                 {getFileTypeDisplay(file)}

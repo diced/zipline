@@ -1,4 +1,3 @@
-import { Response } from '@/lib/api/response';
 import { Folder } from '@/lib/db/models/folder';
 import { Center, Group, Paper, SimpleGrid, Skeleton, Stack, Text, Title } from '@mantine/core';
 import { IconLink } from '@tabler/icons-react';
@@ -6,8 +5,7 @@ import useSWR from 'swr';
 import FolderCard from '../FolderCard';
 
 export default function FolderGridView() {
-  const { data: folders, isLoading } =
-    useSWR<Extract<Response['/api/user/folders'], Folder[]>>('/api/user/folders');
+  const { data: folders, isLoading } = useSWR<Folder[]>('/api/user/folders');
 
   return (
     <>
@@ -37,7 +35,7 @@ export default function FolderGridView() {
           }}
           pos='relative'
         >
-          {folders?.map((folder) => <FolderCard key={folder.id} folder={folder} />)}
+          {folders?.map((folder: Folder) => <FolderCard key={folder.id} folder={folder} />)}
         </SimpleGrid>
       ) : (
         <Paper withBorder p='sm' my='sm'>

@@ -1,5 +1,4 @@
 import { useConfig } from '@/components/ConfigProvider';
-import { Response } from '@/lib/api/response';
 import { Folder } from '@/lib/db/models/folder';
 import { useUploadOptionsStore } from '@/lib/store/uploadOptions';
 import {
@@ -62,9 +61,7 @@ export default function UploadOptionsButton({ folder, numFiles }: { folder?: str
     setFolderSearch('');
   };
 
-  const { data: folders } = useSWR<Extract<Response['/api/user/folders'], Folder[]>>(
-    '/api/user/folders?noincl=true',
-  );
+  const { data: folders } = useSWR<Folder[]>('/api/user/folders?noincl=true');
   const combobox = useCombobox();
   const [folderSearch, setFolderSearch] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -236,7 +233,7 @@ export default function UploadOptionsButton({ folder, numFiles }: { folder?: str
             store={combobox}
             withinPortal={false}
             onOptionSubmit={(value) => {
-              setFolderSearch(folders?.find((f) => f.id === value)?.name || '');
+              setFolderSearch(folders?.find((f: Folder) => f.id === value)?.name || '');
               setEphemeral('folderId', value === 'no folder' || value === '' ? null : value);
               combobox.closeDropdown();
             }}
@@ -272,8 +269,8 @@ export default function UploadOptionsButton({ folder, numFiles }: { folder?: str
                 </Combobox.Option>
 
                 {folders
-                  ?.filter((f) => f.name.toLowerCase().includes(folderSearch.toLowerCase().trim()))
-                  .map((f) => (
+                  ?.filter((f: Folder) => f.name.toLowerCase().includes(folderSearch.toLowerCase().trim()))
+                  .map((f: Folder) => (
                     <Combobox.Option value={f.id} key={f.id}>
                       {f.name}
                     </Combobox.Option>

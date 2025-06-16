@@ -1,8 +1,6 @@
 import { prisma } from '@/lib/db';
 import { userMiddleware } from '@/server/middleware/user';
-import { FastifyRequest } from 'fastify';
 import fastifyPlugin from 'fastify-plugin';
-import { z } from 'zod';
 
 type Params = {
   id: string;

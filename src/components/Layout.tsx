@@ -658,7 +658,12 @@ export default function Layout({ children, config }: { children: React.ReactNode
       </AppShell.Navbar>
       <AppShell.Main>
         <ConfigProvider config={config}>
-          <Paper m='lg' withBorder p='md' style={{ paddingLeft: 'var(--mantine-spacing-lg)', paddingRight: 'var(--mantine-spacing-lg)' }}>
+          <Paper
+            m='lg'
+            withBorder
+            p='md'
+            style={{ paddingLeft: 'var(--mantine-spacing-lg)', paddingRight: 'var(--mantine-spacing-lg)' }}
+          >
             {children}
           </Paper>
         </ConfigProvider>

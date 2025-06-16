@@ -8,7 +8,6 @@ import {
   Group,
   Input,
   Modal,
-  Paper,
   Pill,
   PillsInput,
   Stack,
@@ -36,13 +35,13 @@ export default function TagSelectModal({
   selectedCount = 0,
 }: TagSelectModalProps) {
   const { data: tags } = useSWR<Extract<Response['/api/user/tags'], Tag[]>>('/api/user/tags');
-  
+
   const combobox = useCombobox();
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   const handleTagSelect = (tagId: string) => {
     setSelectedTags((current) =>
-      current.includes(tagId) ? current.filter((id) => id !== tagId) : [...current, tagId]
+      current.includes(tagId) ? current.filter((id) => id !== tagId) : [...current, tagId],
     );
   };
 
@@ -64,47 +63,45 @@ export default function TagSelectModal({
   const values = selectedTags.map((tagId) => {
     const tag = tags?.find((t) => t.id === tagId);
     return tag ? (
-      <TagPill
-        key={tagId}
-        tag={tag}
-        withRemoveButton
-        onRemove={() => handleRemoveTag(tagId)}
-      />
+      <TagPill key={tagId} tag={tag} withRemoveButton onRemove={() => handleRemoveTag(tagId)} />
     ) : null;
   });
 
-  return (    <Modal 
-      opened={opened} 
-      onClose={handleClose} 
-      title={title} 
-      size="lg"
+  return (
+    <Modal
+      opened={opened}
+      onClose={handleClose}
+      title={title}
+      size='lg'
       styles={{
-        body: { 
+        body: {
           minHeight: '300px',
           padding: '24px',
           display: 'flex',
-          flexDirection: 'column'
+          flexDirection: 'column',
         },
-        content: { 
+        content: {
           maxHeight: '50vh',
           display: 'flex',
-          flexDirection: 'column'
-        }
+          flexDirection: 'column',
+        },
       }}
-    >      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: '300px' }}>        <div style={{ flex: '1', display: 'flex', flexDirection: 'column' }}>
-          <Stack gap="lg" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-            <Text size="sm" c="dimmed">
+    >
+      {' '}
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: '300px' }}>
+        {' '}
+        <div style={{ flex: '1', display: 'flex', flexDirection: 'column' }}>
+          <Stack gap='lg' style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <Text size='sm' c='dimmed'>
               Select tags to add to {selectedCount} selected file{selectedCount === 1 ? '' : 's'}
               {selectedTags.length > 0 && (
                 <span style={{ fontWeight: 'bold', color: 'var(--mantine-color-blue-6)' }}>
-                  {' • '}{selectedTags.length} tag{selectedTags.length === 1 ? '' : 's'} selected
+                  {' • '}
+                  {selectedTags.length} tag{selectedTags.length === 1 ? '' : 's'} selected
                 </span>
               )}
-            </Text>            <Combobox 
-              store={combobox} 
-              onOptionSubmit={handleTagSelect} 
-              withinPortal={false}
-            >
+            </Text>{' '}
+            <Combobox store={combobox} onOptionSubmit={handleTagSelect} withinPortal={false}>
               <Combobox.DropdownTarget>
                 <PillsInput
                   pointer
@@ -116,7 +113,7 @@ export default function TagSelectModal({
                     {values.length > 0 ? values : <Input.Placeholder>Select tags to add</Input.Placeholder>}
                     <Combobox.EventsTarget>
                       <PillsInput.Field
-                        type="hidden"
+                        type='hidden'
                         onBlur={() => combobox.closeDropdown()}
                         onKeyDown={(event) => {
                           if (event.key === 'Backspace' && selectedTags.length > 0) {
@@ -128,12 +125,13 @@ export default function TagSelectModal({
                     </Combobox.EventsTarget>
                   </Pill.Group>
                 </PillsInput>
-              </Combobox.DropdownTarget>              <Combobox.Dropdown style={{ zIndex: 1000 }}>
+              </Combobox.DropdownTarget>{' '}
+              <Combobox.Dropdown style={{ zIndex: 1000 }}>
                 <Combobox.Options mah={150} style={{ overflowY: 'auto' }}>
                   {tags?.length ? (
                     tags.map((tag) => (
                       <Combobox.Option value={tag.id} key={tag.id} active={selectedTags.includes(tag.id)}>
-                        <Group gap="sm">
+                        <Group gap='sm'>
                           <Checkbox
                             checked={selectedTags.includes(tag.id)}
                             onChange={() => {}}
@@ -142,14 +140,14 @@ export default function TagSelectModal({
                             style={{ pointerEvents: 'none' }}
                           />
                           <TagPill tag={tag} />
-                          <Text size="sm" c="dimmed">
+                          <Text size='sm' c='dimmed'>
                             {tag.files?.length || 0} file{(tag.files?.length || 0) === 1 ? '' : 's'}
                           </Text>
                         </Group>
                       </Combobox.Option>
                     ))
                   ) : (
-                    <Combobox.Option value="no-tags" disabled>
+                    <Combobox.Option value='no-tags' disabled>
                       No tags found. Create tags first.
                     </Combobox.Option>
                   )}
@@ -157,14 +155,16 @@ export default function TagSelectModal({
               </Combobox.Dropdown>
             </Combobox>
           </Stack>
-        </div>        {/* Fixed buttons at bottom */}
+        </div>{' '}
+        {/* Fixed buttons at bottom */}
         <div style={{ marginTop: 'auto', paddingTop: '24px' }}>
-          <Group justify="flex-end">
-            <Button variant="outline" onClick={handleClose}>
+          <Group justify='flex-end'>
+            <Button variant='outline' onClick={handleClose}>
               Cancel
             </Button>
             <Button onClick={handleConfirm} disabled={selectedTags.length === 0}>
-              {confirmText}{selectedTags.length > 0 ? ` (${selectedTags.length})` : ''}
+              {confirmText}
+              {selectedTags.length > 0 ? ` (${selectedTags.length})` : ''}
             </Button>
           </Group>
         </div>

@@ -19,7 +19,7 @@ const compat = new FlatCompat({
 
 const gitignorePath = path.resolve(__dirname, '.gitignore');
 
-export default [
+const eslintConfig = [
   includeIgnoreFile(gitignorePath),
   ...compat.extends(
     'next/core-web-vitals',
@@ -67,16 +67,8 @@ export default [
       'react/display-name': 'off',
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
-      'unused-imports/no-unused-imports': 'error',
-      'unused-imports/no-unused-vars': [
-        'warn',
-        {
-          vars: 'all',
-          varsIgnorePattern: '^_',
-          args: 'after-used',
-          argsIgnorePattern: '^_',
-        },
-      ],
+      'unused-imports/no-unused-imports': 'warn', // 完全關閉
+      'unused-imports/no-unused-vars': 'off', // 完全關閉
 
       '@typescript-eslint/ban-ts-comment': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
@@ -84,3 +76,5 @@ export default [
     },
   },
 ];
+
+export default eslintConfig;

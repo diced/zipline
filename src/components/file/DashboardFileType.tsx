@@ -554,8 +554,7 @@ export default function DashboardFileType({
         <Placeholder text={`File: ${file.name}`} Icon={fileIcon(file.type)} />
       );
     default:
-      if (dbFile && !show)
-        return <Placeholder text={`File: ${file.name}`} Icon={fileIcon(file.type)} />;
+      if (dbFile && !show) return <Placeholder text={`File: ${file.name}`} Icon={fileIcon(file.type)} />;
 
       if (dbFile && show)
         return (

@@ -100,9 +100,7 @@ export default function FileModal({
 
   const [editFileOpen, setEditFileOpen] = useState(false);
 
-  const { data: folders } = useSWR<Extract<Response['/api/user/folders'], Folder[]>>(
-    '/api/user/folders?noincl=true',
-  );
+  const { data: folders } = useSWR<Folder[]>('/api/user/folders?noincl=true');
 
   const folderCombobox = useCombobox();
   const [search, setSearch] = useState('');

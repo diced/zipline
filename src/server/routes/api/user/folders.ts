@@ -2,9 +2,20 @@ import { prisma } from '@/lib/db';
 import { userMiddleware } from '@/server/middleware/user';
 import fastifyPlugin from 'fastify-plugin';
 
+export type ApiUserFoldersResponse = {
+  id: string;
+  name: string;
+  createdAt: Date;
+  public: boolean;
+  allowUploads: boolean;
+  _count: {
+    files: number;
+  };
+}[];
+
 export const PATH = '/api/user/folders';
 export default fastifyPlugin((server, _, done) => {
-  server.get(PATH, { preHandler: [userMiddleware] }, async (req, res) => {
+  server.get(PATH, { preHandler: [userMiddleware] }, async (req, _res) => {
     const folders = await prisma.folder.findMany({
       where: {
         userId: req.user.id,
