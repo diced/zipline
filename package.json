@@ -6,7 +6,7 @@
   "scripts": {
     "build": "cross-env pnpm run --stream \"/^build:.*/\"",
     "build:prisma": "prisma generate --no-hints",
-    "build:next": "ZIPLINE_BUILD=true next build",
+    "build:next": "cross-env ZIPLINE_BUILD=true next build",
     "build:server": "tsup",
     "dev": "cross-env TURBOPACK=1 NODE_ENV=development DEBUG=zipline tsx --require dotenv/config --enable-source-maps ./src/server",
     "dev:nd": "cross-env TURBOPACK=1 NODE_ENV=development tsx --require dotenv/config --enable-source-maps ./src/server",

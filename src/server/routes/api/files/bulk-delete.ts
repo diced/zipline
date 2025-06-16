@@ -28,8 +28,8 @@ export default fastifyPlugin((server: FastifyInstance, _, done) => {
         const userFiles = await prisma.file.findMany({
           where: {
             id: { in: fileIds },
-            userId: userId
-          }
+            userId: userId,
+          },
         });
 
         if (userFiles.length !== fileIds.length) {
@@ -42,8 +42,8 @@ export default fastifyPlugin((server: FastifyInstance, _, done) => {
         await prisma.file.deleteMany({
           where: {
             id: { in: fileIds },
-            userId: userId
-          }
+            userId: userId,
+          },
         });
 
         return reply.send({
@@ -56,7 +56,7 @@ export default fastifyPlugin((server: FastifyInstance, _, done) => {
           error: 'Failed to delete files',
         });
       }
-    }
+    },
   });
 
   done();

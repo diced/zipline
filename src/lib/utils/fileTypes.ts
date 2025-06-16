@@ -1,25 +1,109 @@
 export function shouldTreatAsCodeFile(filename: string, mimeType: string): boolean {
   // Check MIME type first
-  if (mimeType.startsWith('text/') || 
-      mimeType.includes('json') || 
-      mimeType.includes('javascript') ||
-      mimeType.includes('typescript')) {
+  if (
+    mimeType.startsWith('text/') ||
+    mimeType.includes('json') ||
+    mimeType.includes('javascript') ||
+    mimeType.includes('typescript')
+  ) {
     return true;
   }
 
   // Check file extension
   const extension = filename.split('.').pop()?.toLowerCase() || '';
   const codeExtensions = [
-    'js', 'jsx', 'ts', 'tsx', 'json', 'json5', 'html', 'htm', 'css', 'scss', 'sass', 'less',
-    'py', 'java', 'c', 'cpp', 'h', 'hpp', 'cs', 'php', 'rb', 'go', 'rs', 'swift', 'kt',
-    'vue', 'svelte', 'xml', 'yaml', 'yml', 'toml', 'ini', 'cfg', 'conf', 'sh', 'bash',
-    'ps1', 'bat', 'cmd', 'sql', 'r', 'scala', 'clj', 'elm', 'dart', 'lua', 'pl', 'pm',
-    'hs', 'ml', 'fs', 'ex', 'exs', 'erl', 'hrl', 'nim', 'cr', 'jl', 'rkt', 'scm',
-    'asm', 's', 'makefile', 'dockerfile', 'gitignore', 'gitattributes', 'editorconfig',
-    'prettierrc', 'eslintrc', 'babelrc', 'tsconfig', 'package', 'composer', 'gemfile',
-    'rakefile', 'procfile', 'cmakelists', 'gradle', 'maven', 'ant', 'sbt', 'cabal',
-    'tex', 'md', 'rst', 'adoc', 'org', 'txt', 'log', 'csv', 'tsv'
+    'js',
+    'jsx',
+    'ts',
+    'tsx',
+    'json',
+    'json5',
+    'html',
+    'htm',
+    'css',
+    'scss',
+    'sass',
+    'less',
+    'py',
+    'java',
+    'c',
+    'cpp',
+    'h',
+    'hpp',
+    'cs',
+    'php',
+    'rb',
+    'go',
+    'rs',
+    'swift',
+    'kt',
+    'vue',
+    'svelte',
+    'xml',
+    'yaml',
+    'yml',
+    'toml',
+    'ini',
+    'cfg',
+    'conf',
+    'sh',
+    'bash',
+    'ps1',
+    'bat',
+    'cmd',
+    'sql',
+    'r',
+    'scala',
+    'clj',
+    'elm',
+    'dart',
+    'lua',
+    'pl',
+    'pm',
+    'hs',
+    'ml',
+    'fs',
+    'ex',
+    'exs',
+    'erl',
+    'hrl',
+    'nim',
+    'cr',
+    'jl',
+    'rkt',
+    'scm',
+    'asm',
+    's',
+    'makefile',
+    'dockerfile',
+    'gitignore',
+    'gitattributes',
+    'editorconfig',
+    'prettierrc',
+    'eslintrc',
+    'babelrc',
+    'tsconfig',
+    'package',
+    'composer',
+    'gemfile',
+    'rakefile',
+    'procfile',
+    'cmakelists',
+    'gradle',
+    'maven',
+    'ant',
+    'sbt',
+    'cabal',
+    'tex',
+    'md',
+    'rst',
+    'adoc',
+    'org',
+    'txt',
+    'log',
+    'csv',
+    'tsv',
   ];
-  
+
   return codeExtensions.includes(extension) || filename.toLowerCase().includes('config');
 }

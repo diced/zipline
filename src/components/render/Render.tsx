@@ -67,7 +67,19 @@ export default function Render({
         <>
           <RenderAlert renderer='KaTeX' state={highlight} change={(s) => setHighlight(s)} />
 
-          {highlight ? <HighlightCode language={language} code={code} onUploadToPaste={onUploadToPaste} isUploading={isUploading} fileName={fileName} fileId={fileId} inModal={inModal} /> : <KaTeX tex={code} />}
+          {highlight ? (
+            <HighlightCode
+              language={language}
+              code={code}
+              onUploadToPaste={onUploadToPaste}
+              isUploading={isUploading}
+              fileName={fileName}
+              fileId={fileId}
+              inModal={inModal}
+            />
+          ) : (
+            <KaTeX tex={code} />
+          )}
         </>
       );
     case RenderMode.Markdown:
@@ -75,9 +87,32 @@ export default function Render({
         <>
           <RenderAlert renderer='Markdown' state={highlight} change={(s) => setHighlight(s)} />
 
-          {highlight ? <HighlightCode language={language} code={code} onUploadToPaste={onUploadToPaste} isUploading={isUploading} fileName={fileName} fileId={fileId} inModal={inModal} /> : <Markdown md={code} />}
+          {highlight ? (
+            <HighlightCode
+              language={language}
+              code={code}
+              onUploadToPaste={onUploadToPaste}
+              isUploading={isUploading}
+              fileName={fileName}
+              fileId={fileId}
+              inModal={inModal}
+            />
+          ) : (
+            <Markdown md={code} />
+          )}
         </>
-      );    default:
-      return <HighlightCode language={language} code={code} onUploadToPaste={onUploadToPaste} isUploading={isUploading} fileName={fileName} fileId={fileId} inModal={inModal} />;
+      );
+    default:
+      return (
+        <HighlightCode
+          language={language}
+          code={code}
+          onUploadToPaste={onUploadToPaste}
+          isUploading={isUploading}
+          fileName={fileName}
+          fileId={fileId}
+          inModal={inModal}
+        />
+      );
   }
 }

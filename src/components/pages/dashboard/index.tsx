@@ -7,13 +7,14 @@ import { IconDeviceSdCard, IconEyeFilled, IconFiles, IconLink, IconStarFilled } 
 import dynamic from 'next/dynamic';
 import useSWR from 'swr';
 
-const DashboardFile = dynamic(() => import('@/components/file/DashboardFile'), {
+const _DashboardFile = dynamic(() => import('@/components/file/DashboardFile'), {
   loading: () => <Skeleton height={350} animate />,
 });
 
 export default function DashboardHome() {
   const { user } = useLogin();
-  const { data: recent, isLoading: recentLoading } = useSWR<Response['/api/user/recent']>('/api/user/recent');
+  const { data: _recent, isLoading: _recentLoading } =
+    useSWR<Response['/api/user/recent']>('/api/user/recent');
   const { data: stats, isLoading: statsLoading } = useSWR<Response['/api/user/stats']>('/api/user/stats');
 
   return (

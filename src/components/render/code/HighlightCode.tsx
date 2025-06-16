@@ -1,5 +1,11 @@
-import { ActionIcon, CopyButton, Paper, ScrollArea, Text, useMantineTheme, Button } from '@mantine/core';
-import { IconCheck, IconClipboardCopy, IconUpload, IconArrowDown, IconExternalLink } from '@tabler/icons-react';
+import { CopyButton, Paper, ScrollArea, Text, useMantineTheme, Button } from '@mantine/core';
+import {
+  IconCheck,
+  IconClipboardCopy,
+  IconUpload,
+  IconArrowDown,
+  IconExternalLink,
+} from '@tabler/icons-react';
 import hljs from 'highlight.js';
 import { useRef, useEffect, useState } from 'react';
 
@@ -17,7 +23,7 @@ export default function HighlightCode({
   isUploading,
   fileName,
   fileId,
-  inModal = false
+  inModal = false,
 }: {
   language: string;
   code: string;
@@ -26,7 +32,8 @@ export default function HighlightCode({
   fileName?: string;
   fileId?: string;
   inModal?: boolean;
-}) {  const theme = useMantineTheme();
+}) {
+  const _theme = useMantineTheme();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const paperRef = useRef<HTMLDivElement>(null);
   const [pasteInfo, setPasteInfo] = useState<PasteInfo>({ exists: false });
@@ -41,13 +48,13 @@ export default function HighlightCode({
 
   const checkPasteStatus = async () => {
     if (!fileId) return;
-    
+
     setLoadingPasteInfo(true);
     try {
       const response = await fetch(`/api/paste/${fileId}`, {
         credentials: 'include',
       });
-      
+
       if (response.ok) {
         const data: PasteInfo = await response.json();
         setPasteInfo(data);
@@ -73,13 +80,13 @@ export default function HighlightCode({
     if (scrollAreaRef.current) {
       const allElements = scrollAreaRef.current.querySelectorAll('*');
       const scrollableElements: Element[] = [];
-      
+
       allElements.forEach((el) => {
         if (el.scrollHeight > el.clientHeight) {
           scrollableElements.push(el);
         }
       });
-      
+
       // Try scrolling each scrollable element
       scrollableElements.forEach((el) => {
         try {
@@ -88,12 +95,12 @@ export default function HighlightCode({
           } else {
             (el as any).scrollTop = el.scrollHeight;
           }
-        } catch (e) {
+        } catch {
           // Silently handle any scroll errors
         }
       });
     }
-    
+
     // Fallback: scroll the last code line into view
     if (paperRef.current) {
       const lastElement = paperRef.current.querySelector('code > div:last-child');
@@ -108,70 +115,76 @@ export default function HighlightCode({
 
   if (!hljs.getLanguage(language)) {
     language = 'text';
-  }  return (
+  }
+  return (
     <Paper ref={paperRef} withBorder p='xs' my='md' pos='relative'>
-      {/* Fixed button container at top right */}      <div style={{
-        position: 'sticky',
-        top: inModal ? '0.5rem' : '1.2rem',
-        right: inModal ? '0.5rem' : '1.2rem',
-        zIndex: inModal ? 1000 : 100,
-        display: 'flex',
-        gap: '0.5rem',
-        float: 'right',
-        backgroundColor: 'var(--mantine-color-body)',
-        borderRadius: '4px',
-        padding: '0.25rem',
-        marginBottom: '0.5rem',
-        boxShadow: inModal ? '0 2px 8px rgba(0, 0, 0, 0.15)' : 'none'
-      }}>      {onUploadToPaste && !pasteInfo.exists && (
-        <Button
-          onClick={handleUploadToPaste}
-          variant='outline'
-          color='blue'
-          size='compact-sm'
-          leftSection={<IconUpload size='1rem' />}
-          loading={isUploading || loadingPasteInfo}
-          disabled={isUploading || loadingPasteInfo}
-        >
-          Pastey
-        </Button>
-      )}
-
-      {pasteInfo.exists && pasteInfo.pasteUrl && (
-        <Button
-          onClick={() => window.open(pasteInfo.pasteUrl!, '_blank')}
-          variant='outline'
-          color='green'
-          size='compact-sm'
-          leftSection={<IconExternalLink size='1rem' />}
-          title={`Pasted on ${pasteInfo.pasteCreatedAt ? new Date(pasteInfo.pasteCreatedAt).toLocaleDateString() : 'Unknown date'}`}
-        >
-          View Paste
-        </Button>
-      )}<CopyButton value={code}>
-          {({ copied, copy }) => (<Button
-            onClick={copy}
+      {/* Fixed button container at top right */}{' '}
+      <div
+        style={{
+          position: 'sticky',
+          top: inModal ? '0.5rem' : '1.2rem',
+          right: inModal ? '0.5rem' : '1.2rem',
+          zIndex: inModal ? 1000 : 100,
+          display: 'flex',
+          gap: '0.5rem',
+          float: 'right',
+          backgroundColor: 'var(--mantine-color-body)',
+          borderRadius: '4px',
+          padding: '0.25rem',
+          marginBottom: '0.5rem',
+          boxShadow: inModal ? '0 2px 8px rgba(0, 0, 0, 0.15)' : 'none',
+        }}
+      >
+        {' '}
+        {onUploadToPaste && !pasteInfo.exists && (
+          <Button
+            onClick={handleUploadToPaste}
             variant='outline'
-            color={copied ? 'green' : 'gray'}
+            color='blue'
             size='compact-sm'
-            leftSection={!copied ? <IconClipboardCopy size='1rem' /> : <IconCheck size='1rem' />}
+            leftSection={<IconUpload size='1rem' />}
+            loading={isUploading || loadingPasteInfo}
+            disabled={isUploading || loadingPasteInfo}
           >
-            {copied ? 'Copied!' : 'Copy'}
+            Pastey
           </Button>
+        )}
+        {pasteInfo.exists && pasteInfo.pasteUrl && (
+          <Button
+            onClick={() => window.open(pasteInfo.pasteUrl!, '_blank')}
+            variant='outline'
+            color='green'
+            size='compact-sm'
+            leftSection={<IconExternalLink size='1rem' />}
+            title={`Pasted on ${pasteInfo.pasteCreatedAt ? new Date(pasteInfo.pasteCreatedAt).toLocaleDateString() : 'Unknown date'}`}
+          >
+            View Paste
+          </Button>
+        )}
+        <CopyButton value={code}>
+          {({ copied, copy }) => (
+            <Button
+              onClick={copy}
+              variant='outline'
+              color={copied ? 'green' : 'gray'}
+              size='compact-sm'
+              leftSection={!copied ? <IconClipboardCopy size='1rem' /> : <IconCheck size='1rem' />}
+            >
+              {copied ? 'Copied!' : 'Copy'}
+            </Button>
           )}
         </CopyButton>
-          <Button
+        <Button
           onClick={scrollToBottom}
           variant='outline'
           color='gray'
           size='compact-sm'
           leftSection={<IconArrowDown size='1rem' />}
-          title="Scroll to bottom"
+          title='Scroll to bottom'
         >
           Bottom
         </Button>
       </div>
-
       <ScrollArea ref={scrollAreaRef} type='auto' dir='ltr' offsetScrollbars={false}>
         <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }} className='theme'>
           <code className='theme' style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
@@ -187,7 +200,7 @@ export default function HighlightCode({
                     fontFamily: 'monospace',
                     minWidth: '3em',
                     textAlign: 'right',
-                    flexShrink: 0
+                    flexShrink: 0,
                   }}
                 >
                   {lineNumbers[i]}
@@ -198,7 +211,7 @@ export default function HighlightCode({
                     whiteSpace: 'pre-wrap',
                     wordBreak: 'break-word',
                     flex: 1,
-                    overflow: 'hidden'
+                    overflow: 'hidden',
                   }}
                   dangerouslySetInnerHTML={{
                     __html: language === 'none' ? line : hljs.highlight(line, { language }).value,

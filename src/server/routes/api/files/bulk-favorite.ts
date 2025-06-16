@@ -28,8 +28,8 @@ export default fastifyPlugin((server: FastifyInstance, _, done) => {
         const userFiles = await prisma.file.findMany({
           where: {
             id: { in: fileIds },
-            userId: userId
-          }
+            userId: userId,
+          },
         });
 
         if (userFiles.length !== fileIds.length) {
@@ -42,11 +42,11 @@ export default fastifyPlugin((server: FastifyInstance, _, done) => {
         await prisma.file.updateMany({
           where: {
             id: { in: fileIds },
-            userId: userId
+            userId: userId,
           },
           data: {
-            favorite: true
-          }
+            favorite: true,
+          },
         });
 
         return reply.send({
@@ -59,7 +59,7 @@ export default fastifyPlugin((server: FastifyInstance, _, done) => {
           error: 'Failed to favorite files',
         });
       }
-    }
+    },
   });
 
   done();
