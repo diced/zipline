@@ -18,7 +18,7 @@ import {
 import { Dropzone } from '@mantine/dropzone';
 import { useClipboard, useColorScheme } from '@mantine/hooks';
 import { notifications, showNotification } from '@mantine/notifications';
-import { IconDeviceSdCard, IconFiles, IconUpload, IconX } from '@tabler/icons-react';
+import { IconDeviceSdCard, IconFiles, IconTrashFilled, IconUpload, IconX } from '@tabler/icons-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import UploadOptionsButton from '../UploadOptionsButton';
@@ -191,7 +191,7 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
       </Collapse>
 
       <Collapse in={progress.speed > 0 && progress.remaining > 0}>
-        <Paper withBorder p='xs' radius='sm'>
+        <Paper withBorder p='xs' radius='sm' my='sm'>
           <Text ta='center' size='sm'>
             {bytes(progress.speed)}/s, {humanizeDuration(progress.remaining)} remaining
           </Text>
@@ -199,36 +199,54 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
       </Collapse>
 
       <Collapse in={progress.percent === 100}>
-        <Paper withBorder p='xs' radius='sm'>
+        <Paper withBorder p='xs' radius='sm' my='sm'>
           <Text ta='center' size='sm' c='yellow' fw={500}>
             Finalizing upload(s)...
           </Text>
         </Paper>
       </Collapse>
 
-      <Grid grow my='sm'>
+      <div
+        style={{
+          columnCount: 'auto',
+          columnWidth: '280px',
+          columnGap: '1rem',
+          margin: '1rem 0',
+        }}
+      >
         {files.map((file, i) => (
-          <Grid.Col span={3} key={i}>
-            <ToUploadFile
-              loading={dropLoading}
-              file={file}
-              onDelete={() => setFiles(files.filter((_, j) => i !== j))}
-            />
-          </Grid.Col>
+          <ToUploadFile
+            key={i}
+            loading={dropLoading}
+            file={file}
+            onDelete={() => setFiles(files.filter((_, j) => i !== j))}
+          />
         ))}
-      </Grid>
+      </div>
 
-      <Group justify='right' gap='sm' my='md'>
-        <UploadOptionsButton folder={folder} numFiles={files.length} />
-
+      <Group justify='space-between' gap='sm' my='md'>
         <Button
           variant='outline'
-          leftSection={<IconUpload size={18} />}
+          color='red'
+          leftSection={<IconTrashFilled size={18} />}
           disabled={files.length === 0 || dropLoading}
-          onClick={upload}
+          onClick={() => setFiles([])}
         >
-          Upload {files.length} files ({bytes(aggSize())})
+          Clear All
         </Button>
+
+        <Group gap='sm'>
+          <UploadOptionsButton folder={folder} numFiles={files.length} />
+
+          <Button
+            variant='outline'
+            leftSection={<IconUpload size={18} />}
+            disabled={files.length === 0 || dropLoading}
+            onClick={upload}
+          >
+            Upload {files.length} files ({bytes(aggSize())})
+          </Button>
+        </Group>
       </Group>
     </>
   );

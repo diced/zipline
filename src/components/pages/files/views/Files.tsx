@@ -294,55 +294,66 @@ export default function Files({ id }: { id?: string }) {
         </Group>
       </Group>
 
-      <div
-        className='masonry-container'
-        style={{
-          columns: '5',
-          columnGap: '1rem',
-          margin: '1rem 0',
-        }}
-      >
+      <div>
         {isLoading ? (
-          [...Array(9)].map((_, i) => <Skeleton key={i} height={350} animate />)
+          <div
+            className='masonry-container'
+            style={{
+              columns: '5',
+              columnGap: '1rem',
+              margin: '1rem 0',
+            }}
+          >
+            {[...Array(9)].map((_, i) => <Skeleton key={i} height={350} animate />)}
+          </div>
         ) : (data?.page?.length ?? 0 > 0) ? (
-          data?.page.map((file) => (
-            <DashboardFile
-              key={file.id}
-              file={file}
-              selectionMode={selectionMode}
-              selected={selectedFiles.has(file.id)}
-              onSelect={(selected) => handleFileSelect(file.id, selected)}
-            />
-          ))
+          <div
+            className='masonry-container'
+            style={{
+              columns: '5',
+              columnGap: '1rem',
+              margin: '1rem 0',
+            }}
+          >
+            {data?.page.map((file) => (
+              <DashboardFile
+                key={file.id}
+                file={file}
+                selectionMode={selectionMode}
+                selected={selectedFiles.has(file.id)}
+                onSelect={(selected) => handleFileSelect(file.id, selected)}
+              />
+            ))}
+          </div>
         ) : (
-          <Paper withBorder p='sm'>
-            <Center>
-              <Stack>
-                <Group>
-                  {favoritesOnly ? <IconHeart size='2rem' /> : <IconFilesOff size='2rem' />}
-                  <Title order={2}>
-                    {favoritesOnly ? 'No favorite files found' : 'No files found'}
-                  </Title>
-                </Group>
+          <Center my='xl' py='xl'>
+            <Paper withBorder p='xl' radius='md' style={{ maxWidth: 400, width: '100%' }}>
+              <Stack align='center' gap='md'>
+                <div style={{ color: 'var(--mantine-color-dimmed)' }}>
+                  {favoritesOnly ? <IconHeart size='3rem' /> : <IconFilesOff size='3rem' />}
+                </div>
+                <Title order={3} ta='center' c='dimmed'>
+                  {favoritesOnly ? 'No favorite files found' : 'No files found'}
+                </Title>
                 {!id && !favoritesOnly && (
                   <Button
                     variant='outline'
-                    size='compact-sm'
+                    size='sm'
                     leftSection={<IconFileUpload size='1rem' />}
                     component={Link}
                     href='/dashboard/upload/file'
                   >
-                    Upload a file
+                    Upload your first file
                   </Button>
                 )}
                 {favoritesOnly && (
-                  <Text size='sm' c='dimmed' ta='center'>
+                  <Text size='sm' c='dimmed' ta='center' style={{ lineHeight: 1.5 }}>
                     Click the heart icon above to show all files, or add some files to favorites first.
                   </Text>
                 )}
               </Stack>
-            </Center>
-          </Paper>
+            </Paper>
+          </Center>
         )}
       </div>
 

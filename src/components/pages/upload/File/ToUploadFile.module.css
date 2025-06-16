@@ -1,0 +1,33 @@
+.uploadFileCard {
+  transition: all 0.2s ease-in-out;
+  height: fit-content;
+  break-inside: avoid;
+  margin-bottom: 0.9rem;
+}
+
+.uploadFileCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.uploadFileCard:hover .deleteButton {
+  opacity: 1;
+}
+
+.deleteButton {
+  opacity: 0.7;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.deleteButton:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.previewArea {
+  background: var(--mantine-color-gray-0);
+}
+
+[data-mantine-color-scheme="dark"] .previewArea {
+  background: var(--mantine-color-dark-8);
+}

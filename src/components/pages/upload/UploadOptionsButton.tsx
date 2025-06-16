@@ -3,6 +3,7 @@ import { Response } from '@/lib/api/response';
 import { Folder } from '@/lib/db/models/folder';
 import { useUploadOptionsStore } from '@/lib/store/uploadOptions';
 import {
+  ActionIcon,
   Badge,
   Button,
   Combobox,
@@ -10,7 +11,6 @@ import {
   InputBase,
   Modal,
   NumberInput,
-  PasswordInput,
   Select,
   Stack,
   Switch,
@@ -21,7 +21,9 @@ import {
 import {
   IconAlarmFilled,
   IconArrowsMinimize,
+  IconEye,
   IconEyeFilled,
+  IconEyeOff,
   IconFileInfo,
   IconFolderPlus,
   IconGlobe,
@@ -65,6 +67,7 @@ export default function UploadOptionsButton({ folder, numFiles }: { folder?: str
   );
   const combobox = useCombobox();
   const [folderSearch, setFolderSearch] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (folder) return;
@@ -315,12 +318,24 @@ export default function UploadOptionsButton({ folder, numFiles }: { folder?: str
             disabled={numFiles > 1}
           />
 
-          <PasswordInput
+          <TextInput
             label='Password'
             description='Set a password for these files. Leave blank to disable password protection. This value is not saved to your browser, and is cleared after uploading.'
             leftSection={<IconKey size='1rem' />}
+            rightSection={
+              <ActionIcon
+                variant='subtle'
+                onClick={() => setShowPassword(!showPassword)}
+                style={{ marginRight: 4 }}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <IconEyeOff size='1rem' /> : <IconEye size='1rem' />}
+              </ActionIcon>
+            }
+            type={showPassword ? 'text' : 'password'}
             value={ephemeral.password ?? ''}
-            autoComplete='off'
+            autoComplete='new-password'
+            data-form-type='other'
             onChange={(event) =>
               setEphemeral(
                 'password',

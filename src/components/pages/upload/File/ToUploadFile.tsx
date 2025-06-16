@@ -1,18 +1,52 @@
-import DashboardFileType from '@/components/file/DashboardFileType';
+import fileIcon from '@/components/file/fileIcon';
 import { bytes } from '@/lib/bytes';
 import {
+  ActionIcon,
   Box,
-  Button,
+  Card,
   Center,
   Group,
-  HoverCard,
+  Image,
   Overlay,
-  Paper,
-  ScrollArea,
   Stack,
   Text,
+  Tooltip,
 } from '@mantine/core';
-import { IconFileUpload, IconTrashFilled } from '@tabler/icons-react';
+import { IconTrashFilled } from '@tabler/icons-react';
+import { useEffect, useState } from 'react';
+import styles from './ToUploadFile.module.css';
+
+function truncateFileName(fileName: string, maxLength: number = 20): string {
+  if (fileName.length <= maxLength) return fileName;
+  
+  const extension = fileName.split('.').pop() || '';
+  const nameWithoutExt = fileName.slice(0, fileName.lastIndexOf('.'));
+  
+  if (nameWithoutExt.length <= maxLength - extension.length - 4) {
+    return fileName;
+  }
+  
+  const truncatedLength = maxLength - extension.length - 7; // 7 for "..." and "." and extension
+  const truncated = nameWithoutExt.slice(0, truncatedLength) + '...' + nameWithoutExt.slice(-3);
+  
+  return `${truncated}.${extension}`;
+}
+
+function getFileTypeDisplay(file: File): string {
+  const type = file.type.split('/')[0] || 'file';
+  const extension = file.name.split('.').pop()?.toUpperCase() || '';
+  
+  const typeMap: Record<string, string> = {
+    'image': 'Image',
+    'video': 'Video', 
+    'audio': 'Audio',
+    'text': 'Text',
+    'application': 'Document'
+  };
+  
+  const displayType = typeMap[type] || 'File';
+  return extension ? `${displayType} - ${extension}` : displayType;
+}
 
 export default function ToUploadFile({
   file,
@@ -23,59 +57,107 @@ export default function ToUploadFile({
   file: File;
   onDelete: () => void;
 }) {
-  if (loading)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const isImage = file.type.startsWith('image/');
+  const FileIcon = fileIcon(file.type);
+
+  useEffect(() => {
+    if (isImage) {
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+      return () => URL.revokeObjectURL(url);
+    }
+  }, [file, isImage]);
+
+  if (loading) {
     return (
-      <Paper withBorder p='md' radius='md' pos='relative'>
+      <Card
+        withBorder
+        radius='md'
+        pos='relative'
+        style={{ 
+          width: '100%',
+          minHeight: 150,
+          marginBottom: '1rem'
+        }}
+      >
         <Overlay radius='md' backgroundOpacity={0.2} />
         <Center h='100%'>
-          <Group justify='center' gap='xl'>
-            <IconFileUpload size={48} />
-            <Text size='md'>{file.name}</Text>
-          </Group>
+          <Text size='sm' c='dimmed'>Uploading...</Text>
         </Center>
-      </Paper>
+      </Card>
     );
+  }
 
   return (
-    <HoverCard shadow='md' position='top'>
-      <HoverCard.Target>
-        <Paper withBorder p='md' radius='md' pos='relative'>
-          <Center h='100%'>
-            <Group justify='center' gap='xl'>
-              <IconFileUpload size={48} />
-              <Text size='md'>{file.name}</Text>
-            </Group>
-          </Center>
-        </Paper>
-      </HoverCard.Target>
-      <HoverCard.Dropdown>
-        <Group maw={400}>
-          <ScrollArea>
-            <Box mah={250} maw={400}>
-              <DashboardFileType file={file} show />
-            </Box>
-          </ScrollArea>
+    <Card
+      withBorder
+      radius='md'
+      pos='relative'
+      style={{ 
+        width: '100%',
+        height: 'fit-content'
+      }}
+      className={styles.uploadFileCard}
+    >
+      {/* Delete button */}
+      <ActionIcon
+        variant='filled'
+        color='red'
+        size='md'
+        pos='absolute'
+        top={8}
+        right={8}
+        style={{ zIndex: 10 }}
+        onClick={onDelete}
+        className={styles.deleteButton}
+      >
+        <IconTrashFilled size='1rem' />
+      </ActionIcon>
 
-          <Stack justify='xs'>
-            <Text size='sm' c='dimmed'>
-              <b>{file.name}</b> {file.type || file.type === '' ? `(${file.type})` : ''}
-            </Text>
-            <Text size='sm' c='dimmed'>
-              {bytes(file.size)}
-            </Text>
-            <Button
-              size='compact-sm'
-              variant='outline'
-              color='red'
-              fullWidth
-              onClick={onDelete}
-              leftSection={<IconTrashFilled size='1rem' />}
-            >
-              Remove
-            </Button>
+      <Stack gap={0}>
+        {/* Preview area - adaptive height */}
+        <Box pos='relative' style={{ maxHeight: 250 }} className={styles.previewArea}>
+          {isImage && previewUrl ? (
+            <Image
+              src={previewUrl}
+              alt={file.name}
+              fit='contain'
+              style={{ 
+                width: '100%',
+                maxHeight: 250,
+                height: 'auto',
+                display: 'block',
+                borderRadius: '4px 4px 0 0'
+              }}
+            />
+          ) : (
+            <Center p='xl' style={{ minHeight: 120 }}>
+              <FileIcon size={48} style={{ color: 'var(--mantine-color-dimmed)' }} />
+            </Center>
+          )}
+        </Box>
+
+        {/* File info area */}
+        <Box p='xs' style={{ borderTop: '1px solid var(--mantine-color-default-border)' }}>
+          <Stack gap={4}>
+            <Tooltip label={file.name} withArrow>
+              <Text size='sm' fw={500} lineClamp={1} style={{ lineHeight: 1.2 }}>
+                {truncateFileName(file.name)}
+              </Text>
+            </Tooltip>
+            
+            <Group justify='space-between' gap='xs'>
+              <Text size='xs' c='dimmed' flex={1} lineClamp={1}>
+                {getFileTypeDisplay(file)}
+              </Text>
+              <Text size='xs' c='dimmed' style={{ whiteSpace: 'nowrap' }}>
+                {bytes(file.size)}
+              </Text>
+            </Group>
           </Stack>
-        </Group>
-      </HoverCard.Dropdown>
-    </HoverCard>
+        </Box>
+      </Stack>
+    </Card>
   );
 }

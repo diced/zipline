@@ -178,7 +178,9 @@ export function uploadFiles(
         loading: false,
       });
       setFiles([]);
-      filesModal(res.files, { clipboard, clearEphemeral });
+      // Modal popup disabled - files uploaded successfully without popup
+      // filesModal(res.files, { clipboard, clearEphemeral });
+      clearEphemeral();
     },
     false,
   );
