@@ -1,7 +1,6 @@
 import GridTableSwitcher from '@/components/GridTableSwitcher';
 import { useViewStore } from '@/lib/store/view';
 import { ActionIcon, Group, Title, Tooltip } from '@mantine/core';
-import FavoriteFiles from './views/FavoriteFiles';
 import FileTable from './views/FileTable';
 import Files from './views/Files';
 import TagsButton from './tags/TagsButton';
@@ -14,29 +13,29 @@ export default function DashbaordFiles() {
 
   return (
     <>
-      <Group>
-        <Title>Files</Title>
+      <Group justify="space-between">
+        <Group>
+          <Title>Files</Title>
 
-        <Tooltip label='Upload a file'>
-          <Link href='/dashboard/upload/file'>
-            <ActionIcon variant='outline'>
-              <IconFileUpload size='1rem' />
-            </ActionIcon>
-          </Link>
-        </Tooltip>
+          <Tooltip label='Upload a file'>
+            <Link href='/dashboard/upload/file'>
+              <ActionIcon variant='outline'>
+                <IconFileUpload size='1rem' />
+              </ActionIcon>
+            </Link>
+          </Tooltip>
 
-        <TagsButton />
-        <PendingFilesButton />
+          <TagsButton />
+          <PendingFilesButton />
+        </Group>
 
-        <GridTableSwitcher type='files' />
+        <Group>
+          <GridTableSwitcher type='files' />
+        </Group>
       </Group>
 
       {view === 'grid' ? (
-        <>
-          <FavoriteFiles />
-
-          <Files />
-        </>
+        <Files />
       ) : (
         <FileTable />
       )}

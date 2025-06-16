@@ -45,6 +45,20 @@ export default fastifyPlugin(
                 createdAt: 'desc',
               },
             },
+            _count: {
+              select: {
+                files: true,
+              },
+            },
+          },
+        }),
+        ...(noincl && {
+          include: {
+            _count: {
+              select: {
+                files: true,
+              },
+            },
           },
         }),
       });

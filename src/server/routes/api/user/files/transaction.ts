@@ -17,6 +17,8 @@ type Body = {
 
   folder?: string;
 
+  tags?: string[];
+
   delete_datasourceFiles?: boolean;
 };
 
@@ -33,7 +35,7 @@ export default fastifyPlugin(
       preHandler: [userMiddleware],
       ...secondlyRatelimit(2),
       handler: async (req, res) => {
-        const { files, favorite, folder } = req.body;
+        const { files, favorite, folder, tags } = req.body;
 
         if (!files || !files.length) return res.badRequest('Cannot process transaction without files');
 
@@ -78,7 +80,7 @@ export default fastifyPlugin(
           return res.send(resp);
         }
 
-        if (favorite) {
+        if (typeof favorite === 'boolean') {
           const resp = await prisma.file.updateMany({
             where: {
               id: {
@@ -87,7 +89,7 @@ export default fastifyPlugin(
             },
 
             data: {
-              favorite: favorite ?? false,
+              favorite: favorite,
             },
           });
 
@@ -98,37 +100,106 @@ export default fastifyPlugin(
           return res.send(resp);
         }
 
-        if (!folder) return res.badRequest("can't PATCH without an action");
+        if (tags && tags.length > 0) {
+          // Additional validation
+          if (!Array.isArray(tags)) {
+            return res.badRequest('tags must be an array');
+          }
+          
+          // Check if all tag IDs are strings
+          if (!tags.every(tagId => typeof tagId === 'string')) {
+            return res.badRequest('all tag IDs must be strings');
+          }
 
-        const f = await prisma.folder.findUnique({
-          where: {
-            id: folder,
-            userId: req.user.id,
-          },
-        });
-        if (!f) return res.notFound('folder not found');
-
-        const resp = await prisma.file.updateMany({
-          where: {
-            id: {
-              in: files,
+          // Verify all tags belong to the user
+          const userTags = await prisma.tag.findMany({
+            where: {
+              userId: req.user.id,
+              id: {
+                in: tags,
+              },
             },
-          },
+          });
 
-          data: {
-            folderId: folder,
-          },
-        });
+          if (userTags.length !== tags.length) {
+            return res.badRequest('invalid tag somewhere');
+          }
 
-        logger.info(`${req.user.username} moved ${resp.count} files to ${f.name}`, {
-          user: req.user.id,
-          folderId: f.id,
-        });
+          // For bulk tag operations, we need to update each file individually
+          // because we're adding tags, not replacing them
+          const updatedFiles = await Promise.all(
+            files.map(async (fileId) => {
+              // Get current tags for the file
+              const currentFile = await prisma.file.findUnique({
+                where: { id: fileId },
+                select: {
+                  id: true,
+                  tags: { select: { id: true } },
+                },
+              });
 
-        return res.send({
-          ...resp,
-          name: f.name,
-        });
+              if (!currentFile) return null;
+
+              // Combine current tags with new tags (avoiding duplicates)
+              const currentTagIds = currentFile.tags.map((tag) => tag.id);
+              const allTagIds = [...new Set([...currentTagIds, ...tags])];
+
+              return prisma.file.update({
+                where: { id: fileId },
+                data: {
+                  tags: {
+                    set: allTagIds.map((tagId) => ({ id: tagId })),
+                  },
+                },
+                select: { id: true },
+              });
+            })
+          );
+
+          const successCount = updatedFiles.filter(Boolean).length;
+
+          logger.info(`${req.user.username} added tags to ${successCount} files`, {
+            user: req.user.id,
+            tags: tags.length,
+          });
+
+          return res.send({ count: successCount });
+        }
+
+        if (folder) {
+          const f = await prisma.folder.findUnique({
+            where: {
+              id: folder,
+              userId: req.user.id,
+            },
+          });
+          if (!f) return res.notFound('folder not found');
+
+          const resp = await prisma.file.updateMany({
+            where: {
+              id: {
+                in: files,
+              },
+            },
+
+            data: {
+              folderId: folder,
+            },
+          });
+
+          logger.info(`${req.user.username} moved ${resp.count} files to ${f.name}`, {
+            user: req.user.id,
+            folderId: f.id,
+          });
+
+          return res.send({
+            ...resp,
+            name: f.name,
+          });
+        }
+
+        // If we reach here, no valid action was provided
+        return res.badRequest("can't PATCH without an action");
       },
     });
 

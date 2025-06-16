@@ -4,7 +4,7 @@ import { File } from '@/lib/db/models/file';
 import { fetchApi } from '@/lib/fetchApi';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
-import { IconFilesOff, IconStarsFilled, IconStarsOff, IconTrashFilled } from '@tabler/icons-react';
+import { IconFilesOff, IconStarsFilled, IconStarsOff, IconTags, IconTrashFilled } from '@tabler/icons-react';
 
 export async function bulkDelete(ids: string[], setSelectedFiles: (files: File[]) => void) {
   modals.openConfirmModal({
@@ -123,4 +123,48 @@ export async function bulkFavorite(ids: string[]) {
     },
     onCancel: modals.closeAll,
   });
+}
+
+export async function bulkAddTags(ids: string[], tagIds: string[]) {
+  notifications.show({
+    title: 'Adding tags',
+    message: `Adding ${tagIds.length} tag${tagIds.length === 1 ? '' : 's'} to ${ids.length} file${ids.length === 1 ? '' : 's'}`,
+    color: 'blue',
+    loading: true,
+    id: 'bulk-add-tags',
+    autoClose: false,
+  });
+
+  const { data, error } = await fetchApi<Response['/api/user/files/transaction']>(
+    '/api/user/files/transaction',
+    'PATCH',
+    {
+      files: ids,
+      tags: tagIds,
+    },
+  );
+
+  if (error) {
+    notifications.update({
+      title: 'Error while adding tags',
+      message: error.error,
+      color: 'red',
+      icon: <IconTags size='1rem' />,
+      id: 'bulk-add-tags',
+      autoClose: true,
+      loading: false,
+    });
+  } else if (data) {
+    notifications.update({
+      title: 'Tags added',
+      message: `Added tags to ${data.count} file${data.count === 1 ? '' : 's'}`,
+      color: 'green',
+      icon: <IconTags size='1rem' />,
+      id: 'bulk-add-tags',
+      autoClose: true,
+      loading: false,
+    });
+  }
+
+  mutateFiles();
 }

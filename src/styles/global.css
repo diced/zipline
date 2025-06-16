@@ -1,3 +1,14 @@
+/* Custom spacing overrides for Mantine */
+:root {
+  --mantine-spacing-md: 1.25rem; /* Change this to your desired value */
+  /* You can also override other spacing values:
+  --mantine-spacing-xs: 0.5rem;
+  --mantine-spacing-sm: 0.75rem;
+  --mantine-spacing-lg: 1.5rem;
+  --mantine-spacing-xl: 2.5rem;
+  */
+}
+
 .mantine-Modal-title {
   line-height: 1;
   padding: 0;

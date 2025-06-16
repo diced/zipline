@@ -415,16 +415,16 @@ export default function DashboardFileType({
   }, [open]);
 
   if (disableMediaPreview && !show)
-    return <Placeholder text={`Click to view file ${file.name}`} Icon={fileIcon(file.type)} />;
+    return <Placeholder text={`FIle: ${file.name}`} Icon={fileIcon(file.type)} />;
 
   if (dbFile && file.password === true && !show)
-    return <Placeholder text={`Click to view protected ${file.name}`} Icon={IconShieldLockFilled} />;
+    return <Placeholder text={`Protected: ${file.name}`} Icon={IconShieldLockFilled} />;
 
   if (dbFile && file.password === true && show)
     return (
       <Paper withBorder p='xs' style={{ cursor: 'pointer' }}>
         <Placeholder
-          text={`Click to view protected ${file.name}`}
+          text={`Protected: ${file.name}`}
           Icon={IconShieldLockFilled}
           onClick={() => window.open(`/view/${file.name}${password ? `?pw=${password}` : ''}`)}
         />
@@ -463,7 +463,7 @@ export default function DashboardFileType({
           </Center>
         </Box>
       ) : (
-        <Placeholder text={`Click to play video ${file.name}`} Icon={fileIcon(file.type)} />
+        <Placeholder text={`Video: ${file.name}`} Icon={fileIcon(file.type)} />
       );
     case 'image':
       return show ? (
@@ -518,7 +518,7 @@ export default function DashboardFileType({
           src={dbFile ? `/raw/${file.name}${password ? `?pw=${password}` : ''}` : URL.createObjectURL(file)}
         />
       ) : (
-        <Placeholder text={`Click to play audio ${file.name}`} Icon={fileIcon(file.type)} />
+        <Placeholder text={`Audio: ${file.name}`} Icon={fileIcon(file.type)} />
       );
     case 'text':
       return show ? (
@@ -551,11 +551,11 @@ export default function DashboardFileType({
           />
         )
       ) : (
-        <Placeholder text={`Click to view text ${file.name}`} Icon={fileIcon(file.type)} />
+        <Placeholder text={`File: ${file.name}`} Icon={fileIcon(file.type)} />
       );
     default:
       if (dbFile && !show)
-        return <Placeholder text={`Click to view file ${file.name}`} Icon={fileIcon(file.type)} />;
+        return <Placeholder text={`File: ${file.name}`} Icon={fileIcon(file.type)} />;
 
       if (dbFile && show)
         return (

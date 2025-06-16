@@ -1,4 +1,5 @@
 import {
+  ActionIcon,
   Button,
   Center,
   Group,
@@ -10,16 +11,19 @@ import {
   Stack,
   Text,
   Title,
+  Tooltip,
 } from '@mantine/core';
 import {
   IconFileUpload,
   IconFilesOff,
   IconTrash,
   IconHeart,
+  IconHeartFilled,
   IconFolder,
   IconSelect,
   IconSelectAll,
   IconX,
+  IconTags,
 } from '@tabler/icons-react';
 import { showNotification } from '@mantine/notifications';
 import dynamic from 'next/dynamic';
@@ -27,6 +31,9 @@ import Link from 'next/link';
 import { parseAsInteger, useQueryState } from 'nuqs';
 import { useEffect, useState } from 'react';
 import { useApiPagination } from '../useApiPagination';
+import FolderSelectModal from '../FolderSelectModal';
+import TagSelectModal from '../TagSelectModal';
+import { bulkAddTags } from '../bulk';
 
 const DashboardFile = dynamic(() => import('@/components/file/DashboardFile'), {
   loading: () => <Skeleton height={350} animate />,
@@ -40,11 +47,16 @@ export default function Files({ id }: { id?: string }) {
   const [cachedPages, setCachedPages] = useState<number>(1);
   const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
   const [selectionMode, setSelectionMode] = useState(false);
+  const [folderModalOpened, setFolderModalOpened] = useState(false);
+  const [tagModalOpened, setTagModalOpened] = useState(false);
+  const [movingToFolder, setMovingToFolder] = useState(false);
+  const [favoritesOnly, setFavoritesOnly] = useState(false);
 
-  const { data, isLoading } = useApiPagination({
+  const { data, isLoading, mutate } = useApiPagination({
     page,
     perpage,
     id,
+    favorite: favoritesOnly || undefined,
   });
 
   useEffect(() => {
@@ -52,6 +64,11 @@ export default function Files({ id }: { id?: string }) {
       setCachedPages(data.pages);
     }
   }, [data?.pages]);
+
+  useEffect(() => {
+    // Reset to first page when favorites filter changes
+    setPage(1);
+  }, [favoritesOnly, setPage]);
 
   const handleFileSelect = (fileId: string, selected: boolean) => {
     const newSelected = new Set(selectedFiles);
@@ -90,8 +107,8 @@ export default function Files({ id }: { id?: string }) {
           color: 'green',
         });
         setSelectedFiles(new Set());
-        // Refresh the data
-        window.location.reload();
+        // Refresh the data without reloading the page
+        mutate();
       }
     } catch {
       showNotification({
@@ -119,11 +136,71 @@ export default function Files({ id }: { id?: string }) {
           color: 'green',
         });
         setSelectedFiles(new Set());
+        // Refresh the data to show updated favorite status
+        mutate();
       }
     } catch {
       showNotification({
         title: 'Error',
         message: 'Failed to add files to favorites',
+        color: 'red',
+      });
+    }
+  };
+
+  const handleMoveToFolder = async (folderId: string | null) => {
+    if (selectedFiles.size === 0) return;
+
+    setMovingToFolder(true);
+    try {
+      const response = await fetch('/api/files/move-to-folder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          fileIds: Array.from(selectedFiles),
+          folderId: folderId === '' ? null : folderId,
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        showNotification({
+          title: 'Success',
+          message: `Moved ${result.moved} files to ${folderId ? 'folder' : 'root'}`,
+          color: 'green',
+        });
+        setSelectedFiles(new Set());
+        setFolderModalOpened(false);
+        // Refresh the data without reloading the page
+        mutate();
+      } else {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to move files');
+      }
+    } catch (error) {
+      showNotification({
+        title: 'Error',
+        message: error instanceof Error ? error.message : 'Failed to move files to folder',
+        color: 'red',
+      });
+    } finally {
+      setMovingToFolder(false);
+    }
+  };
+
+  const handleAddTags = async (tagIds: string[]) => {
+    if (selectedFiles.size === 0 || tagIds.length === 0) return;
+
+    try {
+      await bulkAddTags(Array.from(selectedFiles), tagIds);
+      setSelectedFiles(new Set());
+      setTagModalOpened(false);
+      // Refresh the data to show updated tags
+      mutate();
+    } catch (error) {
+      showNotification({
+        title: 'Error',
+        message: 'Failed to add tags to files',
         color: 'red',
       });
     }
@@ -137,6 +214,69 @@ export default function Files({ id }: { id?: string }) {
       {/* Selection Controls */}
       <Group justify='space-between' mb='md' mt='md'>
         <Group>
+          <Tooltip label={favoritesOnly ? 'Show all files' : 'Show only favorite files'}>
+            <ActionIcon
+              variant={favoritesOnly ? 'filled' : 'outline'}
+              color={favoritesOnly ? 'red' : 'gray'}
+              size='lg'
+              onClick={() => setFavoritesOnly(!favoritesOnly)}
+            >
+              {favoritesOnly ? <IconHeartFilled size='1.2rem' /> : <IconHeart size='1.2rem' />}
+            </ActionIcon>
+          </Tooltip>
+        </Group>
+
+        <Group>
+          {selectionMode && (
+            <>
+              <Button
+                variant='subtle'
+                size='xs'
+                leftSection={<IconX size='0.8rem' />}
+                onClick={handleDeselectAll}
+              >
+                Deselect All
+              </Button>
+              <Button
+                variant='subtle'
+                size='xs'
+                leftSection={<IconSelectAll size='0.8rem' />}
+                onClick={handleSelectAll}
+              >
+                Select All
+              </Button>
+              {selectedFiles.size > 0 && (
+                <Menu>
+                  <Menu.Target>
+                    <Button variant='light' size='sm'>
+                      Actions ({selectedFiles.size})
+                    </Button>
+                  </Menu.Target>
+                  <Menu.Dropdown>
+                    <Menu.Item leftSection={<IconTrash size='1rem' />} color='red' onClick={handleBulkDelete}>
+                      Delete Selected
+                    </Menu.Item>
+                    <Menu.Item leftSection={<IconHeart size='1rem' />} onClick={handleBulkFavorite}>
+                      Add to Favorites
+                    </Menu.Item>
+                    <Menu.Item
+                      leftSection={<IconTags size='1rem' />}
+                      onClick={() => setTagModalOpened(true)}
+                    >
+                      Add Tags
+                    </Menu.Item>
+                    <Menu.Item
+                      leftSection={<IconFolder size='1rem' />}
+                      onClick={() => setFolderModalOpened(true)}
+                    >
+                      Move to Folder
+                    </Menu.Item>
+                  </Menu.Dropdown>
+                </Menu>
+              )}
+            </>
+          )}
+          
           <Button
             variant={selectionMode ? 'filled' : 'outline'}
             size='sm'
@@ -151,63 +291,7 @@ export default function Files({ id }: { id?: string }) {
           >
             {selectionMode ? 'Exit Selection' : 'Select Files'}
           </Button>
-
-          {selectionMode && (
-            <Group gap='xs'>
-              <Button
-                variant='subtle'
-                size='xs'
-                leftSection={<IconSelectAll size='0.8rem' />}
-                onClick={handleSelectAll}
-              >
-                Select All
-              </Button>
-              <Button
-                variant='subtle'
-                size='xs'
-                leftSection={<IconX size='0.8rem' />}
-                onClick={handleDeselectAll}
-              >
-                Deselect All
-              </Button>
-            </Group>
-          )}
         </Group>
-
-        {selectionMode && selectedFiles.size > 0 && (
-          <Group gap='xs'>
-            <Text size='sm' c='dimmed'>
-              {selectedFiles.size} selected
-            </Text>
-            <Menu>
-              <Menu.Target>
-                <Button variant='light' size='sm'>
-                  Actions
-                </Button>
-              </Menu.Target>
-              <Menu.Dropdown>
-                <Menu.Item leftSection={<IconTrash size='1rem' />} color='red' onClick={handleBulkDelete}>
-                  Delete Selected
-                </Menu.Item>
-                <Menu.Item leftSection={<IconHeart size='1rem' />} onClick={handleBulkFavorite}>
-                  Add to Favorites
-                </Menu.Item>
-                <Menu.Item
-                  leftSection={<IconFolder size='1rem' />}
-                  onClick={() => {
-                    showNotification({
-                      title: 'Coming Soon',
-                      message: 'Folder management feature will be available soon',
-                      color: 'blue',
-                    });
-                  }}
-                >
-                  Move to Folder
-                </Menu.Item>
-              </Menu.Dropdown>
-            </Menu>
-          </Group>
-        )}
       </Group>
 
       <div
@@ -235,10 +319,12 @@ export default function Files({ id }: { id?: string }) {
             <Center>
               <Stack>
                 <Group>
-                  <IconFilesOff size='2rem' />
-                  <Title order={2}>No files found</Title>
+                  {favoritesOnly ? <IconHeart size='2rem' /> : <IconFilesOff size='2rem' />}
+                  <Title order={2}>
+                    {favoritesOnly ? 'No favorite files found' : 'No files found'}
+                  </Title>
                 </Group>
-                {!id && (
+                {!id && !favoritesOnly && (
                   <Button
                     variant='outline'
                     size='compact-sm'
@@ -248,6 +334,11 @@ export default function Files({ id }: { id?: string }) {
                   >
                     Upload a file
                   </Button>
+                )}
+                {favoritesOnly && (
+                  <Text size='sm' c='dimmed' ta='center'>
+                    Click the heart icon above to show all files, or add some files to favorites first.
+                  </Text>
                 )}
               </Stack>
             </Center>
@@ -274,6 +365,23 @@ export default function Files({ id }: { id?: string }) {
           <Pagination value={page} onChange={setPage} total={cachedPages} size='sm' withControls withEdges />
         </Group>
       </Group>
+
+      <FolderSelectModal
+        opened={folderModalOpened}
+        onClose={() => setFolderModalOpened(false)}
+        onSelect={handleMoveToFolder}
+        loading={movingToFolder}
+        selectedCount={selectedFiles.size}
+      />
+
+      <TagSelectModal
+        opened={tagModalOpened}
+        onClose={() => setTagModalOpened(false)}
+        onConfirm={handleAddTags}
+        selectedCount={selectedFiles.size}
+        title="Add Tags to Files"
+        confirmText="Add Tags"
+      />
     </>
   );
 }

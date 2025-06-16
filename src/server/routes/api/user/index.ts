@@ -1,4 +1,4 @@
-import { hashPassword } from '@/lib/crypto';
+import { hashPassword, verifyPassword } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
 import { User, userSelect } from '@/lib/db/models/user';
 import { log } from '@/lib/logger';
@@ -14,6 +14,7 @@ export type ApiUserResponse = {
 type Body = {
   username?: string;
   password?: string;
+  currentPassword?: string;
   avatar?: string;
   view?: {
     content?: string;
@@ -46,6 +47,38 @@ export default fastifyPlugin(
         ...secondlyRatelimit(1),
       },
       async (req, res) => {
+        // Check if any changes require current password verification
+        const requiresPassword = req.body.username || req.body.password;
+        
+        if (requiresPassword && !req.body.currentPassword) {
+          return res.badRequest('Current password is required for username or password changes');
+        }
+
+        // Verify current password if provided
+        if (req.body.currentPassword) {
+          const currentUser = await prisma.user.findFirst({
+            where: {
+              id: req.user.id,
+            },
+            select: {
+              password: true,
+            },
+          });
+
+          if (!currentUser) {
+            return res.notFound('User not found');
+          }
+
+          if (!currentUser.password) {
+            return res.badRequest('User does not have a password');
+          }
+
+          const validPassword = await verifyPassword(req.body.currentPassword, currentUser.password);
+          if (!validPassword) {
+            return res.badRequest('Invalid password');
+          }
+        }
+
         if (req.body.username) {
           const existing = await prisma.user.findUnique({
             where: {
