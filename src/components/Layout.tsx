@@ -387,7 +387,7 @@ export default function Layout({ children, config }: { children: React.ReactNode
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
             filter: 'blur(4px)',
-            transition: 'filter 0.3s ease-in-out',
+            transition: 'filter 0.5s ease-in-out',
           }}
         />
       )}
@@ -404,10 +404,10 @@ export default function Layout({ children, config }: { children: React.ReactNode
         footer={{ height: { base: 0.1 } }}
         styles={{
           navbar: {
-            transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1), backdrop-filter 0.3s ease-in-out, background 0.3s ease-in-out',
+            transition: 'all 0.5s ease-in-out, backdrop-filter 0.5s ease-in-out, background 0.5s ease-in-out',
           },
           header: {
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1), backdrop-filter 0.3s ease-in-out, background 0.3s ease-in-out',
+            transition: 'all 0.5s ease-in-out, backdrop-filter 0.5s ease-in-out, background 0.5s ease-in-out',
             borderRadius: isScrolled ? '0' : '0 0 0 10px',
             width: navbarCollapsed ? 'calc(100vw - 100px)' : 'calc(100vw - 250px)',
             display: 'flex',
@@ -425,7 +425,7 @@ export default function Layout({ children, config }: { children: React.ReactNode
             }),
           },
           main: {
-            transition: 'margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), backdrop-filter 0.3s ease-in-out',
+            transition: 'all 0.5s ease-in-out',
           },
         }}
       >
@@ -531,7 +531,7 @@ export default function Layout({ children, config }: { children: React.ReactNode
             WebkitBackdropFilter: 'blur(8px)',
             borderRight: `1px solid ${colorScheme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.2)'}`,
           }),
-          transition: 'background-color 0.3s ease-in-out, backdrop-filter 0.3s ease-in-out',
+          transition: 'background-color 0.5s ease-in-out, backdrop-filter 0.5s ease-in-out',
         }}
       >
         {/* Desktop logo section */}
@@ -567,7 +567,7 @@ export default function Layout({ children, config }: { children: React.ReactNode
             lineClamp={1}
             ta='center'
             style={{
-              transition: 'opacity 0.3s ease-in-out, transform 0.3s ease-in-out, margin-left 0.3s ease-in-out, max-width 0.3s ease-in-out',
+              transition: 'opacity 0.5s ease-in-out, transform 0.5s ease-in-out, margin-left 0.5s ease-in-out, max-width 0.5s ease-in-out',
               opacity: showLogoText ? 1 : 0,
               transform: showLogoText ? 'translateX(0px) scale(1)' : 'translateX(-20px) scale(0.8)',
               whiteSpace: 'nowrap',
@@ -744,7 +744,7 @@ export default function Layout({ children, config }: { children: React.ReactNode
                             </div>
                           </Menu.Target>
                           <Menu.Dropdown 
-                            style={{ zIndex: 999999 }}
+                            style={{ zIndex: 1001 }}
                             className={styles.collapsedMenuDropdown}
                           >
                             <Menu.Label>{link.label}</Menu.Label>
@@ -852,7 +852,7 @@ export default function Layout({ children, config }: { children: React.ReactNode
             onClick={() => setNavbarCollapsed(!navbarCollapsed)}
             style={{
               borderRadius: theme.radius.md,
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
               width: navbarCollapsed ? '60px' : '240px',
               height: '40px',
             }}

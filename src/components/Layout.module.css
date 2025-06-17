@@ -1,6 +1,6 @@
 /* Smooth animations for sidebar transitions */
 .navbar {
-  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: width 0.5s ease-in-out;
   height: 100vh;
   top: 0;
   position: fixed;
@@ -11,12 +11,12 @@
 }
 
 .navbarContent {
-  transition: padding 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: padding 0.5s ease-in-out;
   overflow: visible !important; /* Allow menu dropdowns to extend beyond container */
 }
 
 .navItem {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .navItem:hover {
@@ -24,7 +24,7 @@
 }
 
 .navItemCollapsed {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.5s ease-in-out;
   width: 48px ;
   height: 48px ;
   margin: 8px auto 4px auto ;
@@ -45,15 +45,15 @@
 }
 
 .iconWrapper {
-  transition: font-size 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: font-size 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .bottomSection {
-  transition: padding 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: padding 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .versionWrapper {
-  transition: justify-content 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: justify-content 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Smooth fade in/out for tooltips */
@@ -64,12 +64,12 @@
 /* Enhanced menu animation */
 .menuDropdown {
   animation: slideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 999999 !important; /* Ensure dropdowns appear above all other elements */
+  z-index: 9999 !important; /* Ensure dropdowns appear above all other elements */
 }
 
 /* Specific dropdown menu for collapsed sidebar */
 .collapsedMenuDropdown {
-  z-index: 999999 !important;
+  z-index: 9999 !important;
   animation: slideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
   transform-origin: left center !important;
 }
@@ -104,7 +104,7 @@
 
 /* Responsive styles for main content */
 .mainContent {
-  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: margin-left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @media (max-width: 768px) {
@@ -122,7 +122,7 @@
     position: relative;
     height: auto;
     z-index: 90;
-    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
@@ -131,13 +131,12 @@
   animation: slideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
   opacity: 1 !important;
   transform-origin: top left !important;
-  z-index: 999999 !important; /* Very high z-index for collapsed sidebar menus */
-  position: fixed !important; /* Use fixed positioning to escape any container overflow restrictions */
+  z-index: 9999 !important; /* High z-index for collapsed sidebar menus */
 }
 
 /* Global AppShell navbar animation override */
 :global(.mantine-AppShell-navbar) {
-  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
   will-change: width !important;
   transform: translateZ(0) !important; /* Force GPU acceleration */
   overflow: visible !important; /* Allow dropdown menus to extend beyond navbar boundaries */
@@ -146,7 +145,7 @@
 /* Specific navbar animation for desktop */
 @media (min-width: 769px) {
   :global(.mantine-AppShell-navbar) {
-    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
   }
 }
 
@@ -154,8 +153,7 @@
 :global(.mantine-Menu-dropdown[data-position="right-start"]) {
   transform-origin: left top !important;
   animation: slideInFromLeft 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  z-index: 999999 !important; /* Ensure it's above all other elements */
-  position: fixed !important; /* Fixed positioning to escape container overflow */
+  z-index: 9999 !important; /* Ensure it's above all other elements */
 }
 
 @keyframes slideInFromLeft {

@@ -77,7 +77,7 @@ export default function Theming({
               defaultProps: {
                 transitionProps: { transition: 'fade', duration: 200 },
                 withinPortal: true,
-                zIndex: 999999,
+                zIndex: 9999,
               },
             },
           },
