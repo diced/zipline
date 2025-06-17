@@ -1,13 +1,13 @@
 packages:
-- '.'
+  - '.'
 
 ignoredBuiltDependencies:
-- unrs-resolver
+  - unrs-resolver
 onlyBuiltDependencies:
-- '@parcel/watcher'
-- '@prisma/client'
-- '@prisma/engines'
-- argon2
-- esbuild
-- prisma
-- sharp
+  - '@parcel/watcher'
+  - '@prisma/client'
+  - '@prisma/engines'
+  - argon2
+  - esbuild
+  - prisma
+  - sharp

@@ -1,5 +1,5 @@
 import type { File } from '@/lib/db/models/file';
-import { Card, Text, Tooltip } from '@mantine/core';
+import { Card, Text } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { showNotification } from '@mantine/notifications';
 import { useState } from 'react';

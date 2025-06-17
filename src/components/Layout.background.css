@@ -81,5 +81,8 @@
 
 /* Smooth transitions for blur effects */
 .blur-transition {
-  transition: backdrop-filter 0.3s ease-in-out, filter 0.3s ease-in-out, background 0.3s ease-in-out;
+  transition:
+    backdrop-filter 0.3s ease-in-out,
+    filter 0.3s ease-in-out,
+    background 0.3s ease-in-out;
 }

@@ -38,7 +38,7 @@ export default function DashboardSettings() {
         <Box style={{ breakInside: 'avoid', marginBottom: '1.5rem' }}>
           <SettingsUser />
         </Box>
-        
+
         <Box style={{ breakInside: 'avoid', marginBottom: '1.5rem' }}>
           <SettingsSessions />
         </Box>
@@ -59,7 +59,6 @@ export default function DashboardSettings() {
         <Box style={{ breakInside: 'avoid', marginBottom: '1.5rem' }}>
           <SettingsAvatar />
         </Box>
-
 
         {eitherTrue(config.mfa.totp.enabled, config.mfa.passkeys) && (
           <Box style={{ breakInside: 'avoid', marginBottom: '1.5rem' }}>

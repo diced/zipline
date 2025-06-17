@@ -66,10 +66,10 @@ export default function Theming({
             ...themeComponents(theme).components,
             AppShell: {
               defaultProps: {
-                transitionProps: { 
-                  transition: 'slide-right', 
+                transitionProps: {
+                  transition: 'slide-right',
                   duration: 300,
-                  timingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)'
+                  timingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
                 },
               },
             },

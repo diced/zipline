@@ -8,7 +8,6 @@ import { useUserStore } from '@/lib/store/user';
 import { useSettingsStore } from '@/lib/store/settings';
 import React from 'react';
 import styles from './Layout.module.css';
-import './Layout.background.css';
 import {
   AppShell,
   Avatar,
@@ -27,7 +26,6 @@ import {
   useMantineColorScheme,
   useMantineTheme,
   ActionIcon,
-  Tooltip,
 } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { useForm } from '@mantine/form';
@@ -56,7 +54,6 @@ import {
   IconUpload,
   IconUsersGroup,
   IconMenu2,
-  IconMenuDeep,
 } from '@tabler/icons-react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -160,10 +157,9 @@ const navLinks: NavLinks[] = [
 export default function Layout({ children, config }: { children: React.ReactNode; config: SafeConfig }) {
   const theme = useMantineTheme();
   const { colorScheme } = useMantineColorScheme();
-  const [backgroundType, backgroundImageUrl] = useSettingsStore(useShallow((state) => [
-    state.settings.backgroundType, 
-    state.settings.backgroundImageUrl
-  ]));
+  const [backgroundType, backgroundImageUrl] = useSettingsStore(
+    useShallow((state) => [state.settings.backgroundType, state.settings.backgroundImageUrl]),
+  );
   const [opened, setOpened] = useState(false);
   const [navbarCollapsed, setNavbarCollapsed] = useState(() => {
     // Restore collapsed state from localStorage
@@ -182,7 +178,8 @@ export default function Layout({ children, config }: { children: React.ReactNode
   const clipboard = useClipboard();
 
   // Check if custom background should be applied
-  const hasCustomBackground = backgroundType === 'image' && backgroundImageUrl.trim() !== '';
+  const hasCustomBackground =
+    backgroundType === 'image' && backgroundImageUrl && backgroundImageUrl.trim() !== '';
   const appShellClassName = hasCustomBackground ? 'app-shell-with-background' : '';
 
   // Debug logging
@@ -316,7 +313,7 @@ export default function Layout({ children, config }: { children: React.ReactNode
       const timer = setTimeout(() => {
         setShowLogoText(false);
       }, 50); // Very short delay to ensure state change triggers animation
-      
+
       return () => clearTimeout(timer);
     } else {
       // Show text after a small delay when expanding
@@ -374,7 +371,7 @@ export default function Layout({ children, config }: { children: React.ReactNode
       {/* Custom Background Image */}
       {hasCustomBackground && (
         <div
-          className="custom-background blur-transition"
+          className='custom-background blur-transition'
           style={{
             position: 'fixed',
             top: 0,
@@ -391,9 +388,9 @@ export default function Layout({ children, config }: { children: React.ReactNode
           }}
         />
       )}
-      
+
       <AppShell
-        className={`${appShellClassName} blur-transition`}
+        className={`${appShellClassName} blur-transition ${styles.mobileHeaderFix} ${styles.menuDropdownFix} ${styles.navbarAnimationFix} ${styles.sidebarMenuFix}`}
         navbar={{
           breakpoint: 'sm',
           // width: { sm: navbarCollapsed ? 64 : 240, lg: navbarCollapsed ? 260 : 260 },
@@ -415,7 +412,7 @@ export default function Layout({ children, config }: { children: React.ReactNode
             transform: `translateX(${navbarCollapsed ? '100px' : '280px'})`,
             alignItems: 'center',
             position: 'fixed',
-            boxShadow: `0 8px 20px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.08)`,
+            boxShadow: '0 8px 20px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.08)',
             // borderLeft: '1px solid var(--app-shell-border-color)',
             ...(hasCustomBackground && {
               backdropFilter: 'blur(8px)',
@@ -429,544 +426,545 @@ export default function Layout({ children, config }: { children: React.ReactNode
           },
         }}
       >
-      <AppShell.Header px='md'>
-        <div
-          style={{ display: 'flex', alignItems: 'center', height: '100%', justifyContent: 'space-between' }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <Burger
-              opened={opened}
-              onClick={() => setOpened((o) => !o)}
-              size='sm'
-              color={theme.colors.gray[6]}
-              mr='xl'
-              hiddenFrom='sm'
-            />
-
-            {/* Version badge on the left side */}
-          </div>
-
-          <div>
-            <Menu shadow='md' width={200}>
-              <Menu.Target>
-                <Button
-                  variant='transparent'
-                  color={colorScheme === 'dark' ? 'white' : 'black'}
-                  leftSection={
-                    avatar ? (
-                      <Avatar src={avatar} radius='sm' size='sm' alt={user?.username ?? 'User avatar'} />
-                    ) : (
-                      <IconSettingsFilled size='1rem' />
-                    )
-                  }
-                  rightSection={<IconChevronDown size='0.7rem' />}
-                  size='sm'
-                >
-                  {user?.username}
-                </Button>
-              </Menu.Target>
-
-              <Menu.Dropdown>
-                <Menu.Label>
-                  {user?.username}
-                  {isAdministrator(user?.role) ? ' (Administrator)' : ''}
-                </Menu.Label>
-
-                <Menu.Item leftSection={<IconClipboardCopy size='1rem' />} onClick={copyToken}>
-                  Copy token
-                </Menu.Item>
-                <Menu.Item color='red' leftSection={<IconRefreshDot size='1rem' />} onClick={refreshToken}>
-                  Refresh token
-                </Menu.Item>
-                <Menu.Divider />
-
-                <Menu.Item
-                  leftSection={<IconSettingsFilled size='1rem' />}
-                  component={Link}
-                  href='/dashboard/settings'
-                >
-                  Settings
-                </Menu.Item>
-
-                {user?.role === 'SUPERADMIN' && (
-                  <Menu.Item
-                    leftSection={<IconAdjustments size='1rem' />}
-                    component={Link}
-                    href='/dashboard/admin/settings'
-                  >
-                    Server Settings
-                  </Menu.Item>
-                )}
-
-                <Menu.Divider />
-                <Menu.Item
-                  color='red'
-                  leftSection={<IconLogout size='1rem' />}
-                  component={Link}
-                  href='/auth/logout'
-                >
-                  Logout
-                </Menu.Item>
-              </Menu.Dropdown>
-            </Menu>
-          </div>
-          <Box visibleFrom='sm'>
-            <VersionBadge />
-          </Box>
-        </div>{' '}
-      </AppShell.Header>{' '}
-      <AppShell.Navbar
-        hidden={!opened}
-        zIndex={90}
-        className={styles.navbar}
-        style={{
-          overflow: 'hidden',
-          display: 'flex',
-          flexDirection: 'column',
-          backgroundColor: hasCustomBackground 
-            ? (colorScheme === 'dark' ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.8)')
-            : (colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[0]),
-          ...(hasCustomBackground && {
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
-            borderRight: `1px solid ${colorScheme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.2)'}`,
-          }),
-          transition: 'background-color 0.5s ease-in-out, backdrop-filter 0.5s ease-in-out',
-        }}
-      >
-        {/* Desktop logo section */}
-        <Box
-          visibleFrom='sm'
-          style={{
-            borderBottom: `1px solid ${colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[3]}`,
-            minHeight: '62px', // Fixed height to prevent layout shifts
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '12px 16px', // Reduced vertical padding to accommodate smaller height
-            position: 'relative', // For absolute positioning of text
-          }}
-        >
-          {/* Logo image - always visible */}
-          {config.website.titleLogo && (
-            <Avatar
-              src={config.website.titleLogo}
-              alt='Zipline logo'
-              radius='sm'
-              size='md'
-              style={{
-                flexShrink: 0,
-                zIndex: 1,
-              }}
-            />
-          )}
-
-          {/* Logo text - animated */}
-          <Title
-            size={20}
-            lineClamp={1}
-            ta='center'
-            style={{
-              transition: 'opacity 0.5s ease-in-out, transform 0.5s ease-in-out, margin-left 0.5s ease-in-out, max-width 0.5s ease-in-out',
-              opacity: showLogoText ? 1 : 0,
-              transform: showLogoText ? 'translateX(0px) scale(1)' : 'translateX(-20px) scale(0.8)',
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              marginLeft: showLogoText ? '8px' : '0px',
-              maxWidth: showLogoText ? '200px' : '0px',
-            }}
-          >
-            {config.website.title.trim()}
-          </Title>
-        </Box>
-        {/* Mobile title */}
-        <Box hiddenFrom='sm' p='md' pb='xs'>
-          <Title size={24} style={{ marginBottom: 8 }}>
-            {config.website.title.trim()}
-          </Title>
-          <Divider />
-        </Box>{' '}
-        {/* Main navigation section */}
-        <ScrollArea
-          flex={1}
-          type='never'
-          className={styles.navbarContent}
-          style={{
-            padding: '16px 9px',
-          }}
-        >
+        <AppShell.Header px='md'>
           <div
+            style={{ display: 'flex', alignItems: 'center', height: '100%', justifyContent: 'space-between' }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <Burger
+                opened={opened}
+                onClick={() => setOpened((o) => !o)}
+                size='sm'
+                color={theme.colors.gray[6]}
+                mr='xl'
+                hiddenFrom='sm'
+              />
+
+              {/* Version badge on the left side */}
+            </div>
+
+            <div>
+              <Menu shadow='md' width={200}>
+                <Menu.Target>
+                  <Button
+                    variant='transparent'
+                    color={colorScheme === 'dark' ? 'white' : 'black'}
+                    leftSection={
+                      avatar ? (
+                        <Avatar src={avatar} radius='sm' size='sm' alt={user?.username ?? 'User avatar'} />
+                      ) : (
+                        <IconSettingsFilled size='1rem' />
+                      )
+                    }
+                    rightSection={<IconChevronDown size='0.7rem' />}
+                    size='sm'
+                  >
+                    {user?.username}
+                  </Button>
+                </Menu.Target>
+
+                <Menu.Dropdown>
+                  <Menu.Label>
+                    {user?.username}
+                    {isAdministrator(user?.role) ? ' (Administrator)' : ''}
+                  </Menu.Label>
+
+                  <Menu.Item leftSection={<IconClipboardCopy size='1rem' />} onClick={copyToken}>
+                    Copy token
+                  </Menu.Item>
+                  <Menu.Item color='red' leftSection={<IconRefreshDot size='1rem' />} onClick={refreshToken}>
+                    Refresh token
+                  </Menu.Item>
+                  <Menu.Divider />
+
+                  <Menu.Item
+                    leftSection={<IconSettingsFilled size='1rem' />}
+                    component={Link}
+                    href='/dashboard/settings'
+                  >
+                    Settings
+                  </Menu.Item>
+
+                  {user?.role === 'SUPERADMIN' && (
+                    <Menu.Item
+                      leftSection={<IconAdjustments size='1rem' />}
+                      component={Link}
+                      href='/dashboard/admin/settings'
+                    >
+                      Server Settings
+                    </Menu.Item>
+                  )}
+
+                  <Menu.Divider />
+                  <Menu.Item
+                    color='red'
+                    leftSection={<IconLogout size='1rem' />}
+                    component={Link}
+                    href='/auth/logout'
+                  >
+                    Logout
+                  </Menu.Item>
+                </Menu.Dropdown>
+              </Menu>
+            </div>
+            <Box visibleFrom='sm'>
+              <VersionBadge />
+            </Box>
+          </div>{' '}
+        </AppShell.Header>{' '}
+        <AppShell.Navbar
+          hidden={!opened}
+          zIndex={90}
+          className={styles.navbar}
+          style={{
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            backgroundColor: hasCustomBackground
+              ? colorScheme === 'dark'
+                ? 'rgba(0, 0, 0, 0.6)'
+                : 'rgba(255, 255, 255, 0.8)'
+              : colorScheme === 'dark'
+                ? theme.colors.dark[8]
+                : theme.colors.gray[0],
+            ...(hasCustomBackground && {
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+              borderRight: `1px solid ${colorScheme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.2)'}`,
+            }),
+            transition: 'background-color 0.5s ease-in-out, backdrop-filter 0.5s ease-in-out',
+          }}
+        >
+          {/* Desktop logo section */}
+          <Box
+            visibleFrom='sm'
             style={{
-              display: navbarCollapsed ? 'flex' : '',
+              borderBottom: `1px solid ${colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[3]}`,
+              minHeight: '62px', // Fixed height to prevent layout shifts
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '12px 16px', // Reduced vertical padding to accommodate smaller height
+              position: 'relative', // For absolute positioning of text
             }}
           >
-            <Box>
-              {navLinks
-                .filter((link) => !link.if || link.if(user as Response['/api/user']['user'], config))
-                .map((link) => {
-                  if (!link.links) {
-                    if (navbarCollapsed) {
-                      // For collapsed state, use a simple div with native HTML title tooltip
-                      return (
-                        <div
-                          key={link.label}
-                          title={link.label} // Use native HTML title for tooltip
-                          style={{
-                            borderRadius: theme.radius.md,
-                            marginBottom: '4px',
-                            padding: '0',
-                            minHeight: '48px',
-                            height: '48px',
-                            cursor: 'pointer',
-                            backgroundColor:
-                              router.pathname === link.href
-                                ? colorScheme === 'dark'
-                                  ? theme.colors.dark[6]
-                                  : theme.colors.gray[2]
-                                : 'transparent',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            width: '60px',
-                            margin: '0px auto 0px auto',
-                          }}
-                          className={`${styles.navItemCollapsed} ${styles.collapsedItem}`}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            // Ensure sidebar stays collapsed when navigating
-                            router.push(link.href || '');
-                          }}
-                        >
-                          <Box
-                            className={styles.iconWrapper}
+            {/* Logo image - always visible */}
+            {config.website.titleLogo && (
+              <Avatar
+                src={config.website.titleLogo}
+                alt='Zipline logo'
+                radius='sm'
+                size='md'
+                style={{
+                  flexShrink: 0,
+                  zIndex: 1,
+                }}
+              />
+            )}
+
+            {/* Logo text - animated */}
+            <Title
+              size={20}
+              lineClamp={1}
+              ta='center'
+              style={{
+                transition:
+                  'opacity 0.5s ease-in-out, transform 0.5s ease-in-out, margin-left 0.5s ease-in-out, max-width 0.5s ease-in-out',
+                opacity: showLogoText ? 1 : 0,
+                transform: showLogoText ? 'translateX(0px) scale(1)' : 'translateX(-20px) scale(0.8)',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                marginLeft: showLogoText ? '8px' : '0px',
+                maxWidth: showLogoText ? '200px' : '0px',
+              }}
+            >
+              {config.website.title?.trim() || 'Zipline'}
+            </Title>
+          </Box>
+          {/* Mobile title */}
+          <Box hiddenFrom='sm' p='md' pb='xs'>
+            <Title size={24} style={{ marginBottom: 8 }}>
+              {config.website.title?.trim() || 'Zipline'}
+            </Title>
+            <Divider />
+          </Box>{' '}
+          {/* Main navigation section */}
+          <ScrollArea
+            flex={1}
+            type='never'
+            className={styles.navbarContent}
+            style={{
+              padding: '16px 9px',
+            }}
+          >
+            <div
+              style={{
+                display: navbarCollapsed ? 'flex' : '',
+              }}
+            >
+              <Box>
+                {navLinks
+                  .filter((link) => !link.if || link.if(user as Response['/api/user']['user'], config))
+                  .map((link) => {
+                    if (!link.links) {
+                      if (navbarCollapsed) {
+                        // For collapsed state, use a simple div with native HTML title tooltip
+                        return (
+                          <div
+                            key={link.label}
+                            title={link.label} // Use native HTML title for tooltip
                             style={{
-                              fontSize: '1.2rem',
+                              borderRadius: theme.radius.md,
+                              marginBottom: '4px',
+                              padding: '0',
+                              minHeight: '48px',
+                              height: '48px',
+                              cursor: 'pointer',
+                              backgroundColor:
+                                router.pathname === link.href
+                                  ? colorScheme === 'dark'
+                                    ? theme.colors.dark[6]
+                                    : theme.colors.gray[2]
+                                  : 'transparent',
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
-                              width: '50px',
-                              height: '20px',
+                              width: '60px',
+                              margin: '0px auto 0px auto',
+                            }}
+                            className={`${styles.navItemCollapsed} ${styles.collapsedItem}`}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              // Ensure sidebar stays collapsed when navigating
+                              router.push(link.href || '');
                             }}
                           >
-                            {link.icon}
-                          </Box>
-                        </div>
-                      );
-                    } else {
-                      // For expanded state, use regular NavLink without tooltip
-                      return (
-                        <NavLink
-                          key={link.label}
-                          label={link.label}
-                          leftSection={
                             <Box
                               className={styles.iconWrapper}
                               style={{
-                                fontSize: '1rem',
+                                fontSize: '1.2rem',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                width: '20px',
+                                width: '50px',
                                 height: '20px',
-                                marginRight: '8px',
                               }}
                             >
                               {link.icon}
                             </Box>
-                          }
-                          variant='light'
-                          rightSection={<IconChevronRight size='0.7rem' />}
-                          active={router.pathname === link.href}
-                          component={Link}
-                          href={link.href || ''}
-                          style={{
-                            borderRadius: theme.radius.md,
-                            marginBottom: '0px',
-                            padding: '12px 20px',
-                            height: '48px',
-                            display: 'flex',
-                            alignItems: 'center',
-                          }}
-                          className={styles.navItem}
-                        />
-                      );
-                    }
-                  } else {
-                    if (navbarCollapsed) {
-                      // In collapsed mode, show a menu for parent items with children
-                      return (
-                        <Menu 
-                          key={link.label} 
-                          position='right-start' 
-                          offset={12} 
-                          withinPortal={true}
-                          transitionProps={{ transition: 'fade', duration: 200 }}
-                        >
-                          <Menu.Target>
-                            <div
-                              title={link.label} // Use native HTML title for tooltip
-                              style={{
-                            borderRadius: theme.radius.md,
-                            marginBottom: '4px',
-                            padding: '0',
-                            minHeight: '48px',
-                            height: '48px',
-                            cursor: 'pointer',
-                            backgroundColor:
-                              router.pathname === link.href
-                                ? colorScheme === 'dark'
-                                  ? theme.colors.dark[6]
-                                  : theme.colors.gray[2]
-                                : 'transparent',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            width: '60px',
-                            margin: '0px auto 0px auto',
-                          }}
-                              className={`${styles.navItemCollapsed} ${styles.collapsedItem}`}
-                            >
+                          </div>
+                        );
+                      } else {
+                        // For expanded state, use regular NavLink without tooltip
+                        return (
+                          <NavLink
+                            key={link.label}
+                            label={link.label}
+                            leftSection={
                               <Box
-                            className={styles.iconWrapper}
-                            style={{
-                              fontSize: '1.2rem',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              width: '50px',
-                              height: '20px',
-                            }}
-                          >
+                                className={styles.iconWrapper}
+                                style={{
+                                  fontSize: '1rem',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  width: '20px',
+                                  height: '20px',
+                                  marginRight: '8px',
+                                }}
+                              >
                                 {link.icon}
                               </Box>
-                            </div>
-                          </Menu.Target>
-                          <Menu.Dropdown 
-                            style={{ zIndex: 1001 }}
-                            className={styles.collapsedMenuDropdown}
+                            }
+                            variant='light'
+                            rightSection={<IconChevronRight size='0.7rem' />}
+                            active={router.pathname === link.href}
+                            component={Link}
+                            href={link.href || ''}
+                            style={{
+                              borderRadius: theme.radius.md,
+                              marginBottom: '0px',
+                              padding: '12px 20px',
+                              height: '48px',
+                              display: 'flex',
+                              alignItems: 'center',
+                            }}
+                            className={styles.navItem}
+                          />
+                        );
+                      }
+                    } else {
+                      if (navbarCollapsed) {
+                        // In collapsed mode, show a menu for parent items with children
+                        return (
+                          <Menu
+                            key={link.label}
+                            position='right-start'
+                            offset={12}
+                            withinPortal={true}
+                            transitionProps={{ transition: 'fade', duration: 200 }}
                           >
-                            <Menu.Label>{link.label}</Menu.Label>
+                            <Menu.Target>
+                              <div
+                                title={link.label} // Use native HTML title for tooltip
+                                style={{
+                                  borderRadius: theme.radius.md,
+                                  marginBottom: '4px',
+                                  padding: '0',
+                                  minHeight: '48px',
+                                  height: '48px',
+                                  cursor: 'pointer',
+                                  backgroundColor:
+                                    router.pathname === link.href
+                                      ? colorScheme === 'dark'
+                                        ? theme.colors.dark[6]
+                                        : theme.colors.gray[2]
+                                      : 'transparent',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  width: '60px',
+                                  margin: '0px auto 0px auto',
+                                }}
+                                className={`${styles.navItemCollapsed} ${styles.collapsedItem}`}
+                              >
+                                <Box
+                                  className={styles.iconWrapper}
+                                  style={{
+                                    fontSize: '1.2rem',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    width: '50px',
+                                    height: '20px',
+                                  }}
+                                >
+                                  {link.icon}
+                                </Box>
+                              </div>
+                            </Menu.Target>
+                            <Menu.Dropdown style={{ zIndex: 1001 }} className={styles.collapsedMenuDropdown}>
+                              <Menu.Label>{link.label}</Menu.Label>
+                              {link.links
+                                .filter(
+                                  (sublink) =>
+                                    !sublink.if || sublink.if(user as Response['/api/user']['user'], config),
+                                )
+                                .map((sublink) => (
+                                  <Menu.Item
+                                    key={sublink.label}
+                                    leftSection={sublink.icon}
+                                    component={Link}
+                                    href={sublink.href || ''}
+                                  >
+                                    {sublink.label}
+                                  </Menu.Item>
+                                ))}
+                            </Menu.Dropdown>
+                          </Menu>
+                        );
+                      } else {
+                        return (
+                          <NavLink
+                            key={link.label}
+                            label={link.label}
+                            leftSection={
+                              <Box
+                                className={styles.iconWrapper}
+                                style={{
+                                  fontSize: '1rem',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  width: '20px',
+                                  height: '20px',
+                                  marginRight: '8px',
+                                }}
+                              >
+                                {link.icon}
+                              </Box>
+                            }
+                            variant='light'
+                            rightSection={<IconChevronRight size='0.7rem' />}
+                            active={router.pathname === link.href}
+                            component={Link}
+                            href={link.href || ''}
+                            style={{
+                              borderRadius: theme.radius.md,
+                              marginBottom: '0px',
+                              padding: '12px 20px',
+                              height: '48px',
+                              display: 'flex',
+                              alignItems: 'center',
+                            }}
+                            className={styles.navItem}
+                          >
                             {link.links
                               .filter(
                                 (sublink) =>
                                   !sublink.if || sublink.if(user as Response['/api/user']['user'], config),
                               )
                               .map((sublink) => (
-                                <Menu.Item
+                                <NavLink
                                   key={sublink.label}
+                                  label={sublink.label}
                                   leftSection={sublink.icon}
+                                  rightSection={<IconChevronRight size='0.7rem' />}
+                                  variant='light'
+                                  active={router.pathname === sublink.href}
                                   component={Link}
                                   href={sublink.href || ''}
-                                >
-                                  {sublink.label}
-                                </Menu.Item>
+                                  style={{
+                                    borderRadius: theme.radius.sm,
+                                    marginTop: '2px',
+                                    transition: 'all 0.2s ease',
+                                    marginRight: '8px',
+                                  }}
+                                />
                               ))}
-                          </Menu.Dropdown>
-                        </Menu>
-                      );
-                    } else {
-                      return (
-                        <NavLink
-                          key={link.label}
-                          label={link.label}
-                          leftSection={
-                            <Box
-                              className={styles.iconWrapper}
-                              style={{
-                                fontSize: '1rem',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                width: '20px',
-                                height: '20px',
-                                marginRight: '8px',
-                              }}
-                            >
-                              {link.icon}
-                            </Box>
-                          }
-                          variant='light'
-                          rightSection={<IconChevronRight size='0.7rem' />}
-                          active={router.pathname === link.href}
-                          component={Link}
-                          href={link.href || ''}
-                          style={{
-                            borderRadius: theme.radius.md,
-                            marginBottom: '0px',
-                            padding: '12px 20px',
-                            height: '48px',
-                            display: 'flex',
-                            alignItems: 'center',
-                          }}
-                          className={styles.navItem}
-                        >
-                          {link.links
-                            .filter(
-                              (sublink) =>
-                                !sublink.if || sublink.if(user as Response['/api/user']['user'], config),
-                            )
-                            .map((sublink) => (
-                              <NavLink
-                                key={sublink.label}
-                                label={sublink.label}
-                                leftSection={sublink.icon}
-                                rightSection={<IconChevronRight size='0.7rem' />}
-                                variant='light'
-                                active={router.pathname === sublink.href}
-                                component={Link}
-                                href={sublink.href || ''}
-                                style={{
-                                  borderRadius: theme.radius.sm,
-                                  marginTop: '2px',
-                                  transition: 'all 0.2s ease',
-                                  marginRight: '8px',
-                                }}
-                              />
-                            ))}
-                        </NavLink>
-                      );
+                          </NavLink>
+                        );
+                      }
                     }
-                  }
-                })}
+                  })}
 
-              {/* Desktop sidebar toggle button */}
-            </Box>
-          </div>
-        </ScrollArea>
-        {/* Bottom section with version and external links */}
-        <Box
-          mt='sm'
-          visibleFrom='sm'
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            padding: navbarCollapsed ? '8px' : '10px',
-            marginTop: '8px',
-          }}
-        >
-          <ActionIcon
-            variant='light'
-            size='lg'
-            onClick={() => setNavbarCollapsed(!navbarCollapsed)}
+                {/* Desktop sidebar toggle button */}
+              </Box>
+            </div>
+          </ScrollArea>
+          {/* Bottom section with version and external links */}
+          <Box
+            mt='sm'
+            visibleFrom='sm'
             style={{
-              borderRadius: theme.radius.md,
-              transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-              width: navbarCollapsed ? '60px' : '240px',
-              height: '40px',
+              display: 'flex',
+              justifyContent: 'center',
+              padding: navbarCollapsed ? '8px' : '10px',
+              marginTop: '8px',
             }}
           >
-            <Group gap='xs'>
-              <IconMenu2 size='1.5rem' />
-            </Group>
-          </ActionIcon>
-        </Box>
-        <Box
-          className={styles.bottomSection}
-          style={{
-            borderTop: `1px solid ${colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[3]}`,
-            padding: '12px',
-            display: 'flex'
-          }}
-        >
-          {/* External links */}
-          {config.website.externalLinks.length > 0 && (
-            <Box>
-              {' '}
-              {config.website.externalLinks.map(({ name, url }, i) => {
-                if (navbarCollapsed) {
-                  return (
-                    <div
-                      key={i}
-                      title={name} // Use native HTML title for tooltip
-                      style={{
-                        borderRadius: theme.radius.sm,
-                        padding: '0',
-                        minHeight: '48px',
-                        height: '48px',
-                        cursor: 'pointer',
-                        fontSize: '0.875rem',
-                        width: '48px',
-                        margin: '0px auto',
-                        marginLeft: '4px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
-                      className={`${styles.navItemCollapsed} ${styles.collapsedItem}`}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        window.open(url, '_blank');
-                      }}
-                    >
-                      <Box
+            <ActionIcon
+              variant='light'
+              size='lg'
+              onClick={() => setNavbarCollapsed(!navbarCollapsed)}
+              style={{
+                borderRadius: theme.radius.md,
+                transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+                width: navbarCollapsed ? '60px' : '240px',
+                height: '40px',
+              }}
+            >
+              <Group gap='xs'>
+                <IconMenu2 size='1.5rem' />
+              </Group>
+            </ActionIcon>
+          </Box>
+          <Box
+            className={styles.bottomSection}
+            style={{
+              borderTop: `1px solid ${colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[3]}`,
+              padding: '12px',
+              display: 'flex',
+            }}
+          >
+            {/* External links */}
+            {config.website.externalLinks.length > 0 && (
+              <Box>
+                {' '}
+                {config.website.externalLinks.map(({ name, url }, i) => {
+                  if (navbarCollapsed) {
+                    return (
+                      <div
+                        key={i}
+                        title={name} // Use native HTML title for tooltip
                         style={{
-                          fontSize: '1.2rem',
+                          borderRadius: theme.radius.sm,
+                          padding: '0',
+                          minHeight: '48px',
+                          height: '48px',
+                          cursor: 'pointer',
+                          fontSize: '0.875rem',
+                          width: '48px',
+                          margin: '0px auto',
+                          marginLeft: '4px',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                         }}
+                        className={`${styles.navItemCollapsed} ${styles.collapsedItem}`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          window.open(url, '_blank');
+                        }}
                       >
-                        <IconExternalLink />
-                      </Box>
-                    </div>
-                  );
-                } else {
-                  return (
-                    <NavLink
-                      key={i}
-                      label={name}
-                      leftSection={
                         <Box
                           style={{
-                            fontSize: '1rem',
+                            fontSize: '1.2rem',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            marginLeft: '4px',
                           }}
                         >
                           <IconExternalLink />
                         </Box>
-                      }
-                      variant='subtle'
-                      component={Link}
-                      href={url}
-                      target='_blank'
-                      style={{
-                        borderRadius: theme.radius.sm,
-                        fontSize: '0.875rem',
-                        padding: '12px 12px',
-                      }}
-                    />
-                  );
-                }
-              })}
-            </Box>
-          )}
-        </Box>
-      </AppShell.Navbar>        <AppShell.Main className={styles.mainContent}>
+                      </div>
+                    );
+                  } else {
+                    return (
+                      <NavLink
+                        key={i}
+                        label={name}
+                        leftSection={
+                          <Box
+                            style={{
+                              fontSize: '1rem',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              marginLeft: '4px',
+                            }}
+                          >
+                            <IconExternalLink />
+                          </Box>
+                        }
+                        variant='subtle'
+                        component={Link}
+                        href={url}
+                        target='_blank'
+                        style={{
+                          borderRadius: theme.radius.sm,
+                          fontSize: '0.875rem',
+                          padding: '12px 12px',
+                        }}
+                      />
+                    );
+                  }
+                })}
+              </Box>
+            )}
+          </Box>
+        </AppShell.Navbar>{' '}
+        <AppShell.Main className={styles.mainContent}>
           <ConfigProvider config={config}>
             <Paper
               m='lg'
               withBorder
               p='md'
               className={hasCustomBackground ? 'blur-transition' : ''}
-              style={{ 
-                paddingLeft: 'var(--mantine-spacing-lg)', 
+              style={{
+                paddingLeft: 'var(--mantine-spacing-lg)',
                 paddingRight: 'var(--mantine-spacing-lg)',
                 ...(hasCustomBackground && {
                   backdropFilter: 'blur(8px)',
                   WebkitBackdropFilter: 'blur(8px)',
-                  background: colorScheme === 'dark' 
-                    ? 'rgba(0, 0, 0, 0.7)' 
-                    : 'rgba(255, 255, 255, 0.85)',
-                  border: `1px solid ${colorScheme === 'dark' 
-                    ? 'rgba(255, 255, 255, 0.1)' 
-                    : 'rgba(255, 255, 255, 0.2)'}`,
-                })
+                  background: colorScheme === 'dark' ? 'rgba(0, 0, 0, 0.7)' : 'rgba(255, 255, 255, 0.85)',
+                  border: `1px solid ${
+                    colorScheme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.2)'
+                  }`,
+                }),
               }}
             >
               {children}
@@ -974,45 +972,45 @@ export default function Layout({ children, config }: { children: React.ReactNode
           </ConfigProvider>
         </AppShell.Main>
         <AppShell.Footer display='none' />
-      {/* Password Confirmation Modal */}
-      <Modal
-        opened={showPasswordModal}
-        onClose={() => {
-          setShowPasswordModal(false);
-          passwordForm.reset();
-          setPendingAction(null);
-        }}
-        title={`Enter Password to ${pendingAction === 'copy' ? 'Copy' : 'Refresh'} Token`}
-        centered
-      >
-        <form onSubmit={passwordForm.onSubmit(handlePasswordConfirmation)}>
-          <PasswordInput
-            label='Current Password'
-            placeholder='Enter your current password to confirm this action'
-            autoComplete='current-password'
-            {...passwordForm.getInputProps('currentPassword')}
-            leftSection={<IconLock size='1rem' />}
-            data-autofocus
-          />
+        {/* Password Confirmation Modal */}
+        <Modal
+          opened={showPasswordModal}
+          onClose={() => {
+            setShowPasswordModal(false);
+            passwordForm.reset();
+            setPendingAction(null);
+          }}
+          title={`Enter Password to ${pendingAction === 'copy' ? 'Copy' : 'Refresh'} Token`}
+          centered
+        >
+          <form onSubmit={passwordForm.onSubmit(handlePasswordConfirmation)}>
+            <PasswordInput
+              label='Current Password'
+              placeholder='Enter your current password to confirm this action'
+              autoComplete='current-password'
+              {...passwordForm.getInputProps('currentPassword')}
+              leftSection={<IconLock size='1rem' />}
+              data-autofocus
+            />
 
-          <Group justify='flex-end' mt='md'>
-            <Button
-              variant='outline'
-              onClick={() => {
-                setShowPasswordModal(false);
-                passwordForm.reset();
-                setPendingAction(null);
-              }}
-            >
-              Cancel
-            </Button>
-            <Button type='submit' leftSection={<IconCheck size='1rem' />}>
-              {pendingAction === 'copy' ? 'Copy Token' : 'Refresh Token'}
-            </Button>
-          </Group>
-        </form>
-      </Modal>
-    </AppShell>
+            <Group justify='flex-end' mt='md'>
+              <Button
+                variant='outline'
+                onClick={() => {
+                  setShowPasswordModal(false);
+                  passwordForm.reset();
+                  setPendingAction(null);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button type='submit' leftSection={<IconCheck size='1rem' />}>
+                {pendingAction === 'copy' ? 'Copy Token' : 'Refresh Token'}
+              </Button>
+            </Group>
+          </form>
+        </Modal>
+      </AppShell>
     </>
   );
 }

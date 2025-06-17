@@ -25,14 +25,14 @@
 
 .navItemCollapsed {
   transition: all 0.5s ease-in-out;
-  width: 48px ;
-  height: 48px ;
-  margin: 8px auto 4px auto ;
+  width: 48px;
+  height: 48px;
+  margin: 8px auto 4px auto;
   box-sizing: border-box;
-  display: flex ;
-  align-items: center ;
-  justify-content: center ;
-  padding: 0 ;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
 }
 
 .navItemCollapsed:hover {
@@ -132,14 +132,14 @@
 
 /* Utility class for collapsed sidebar items */
 .collapsedItem {
-  width: 48px ;
-  height: 48px ;
-  margin: 8px auto 4px auto ;
-  display: flex ;
-  justify-content: center ;
-  align-items: center ;
-  box-sizing: border-box ;
-  padding: 0 ;
+  width: 48px;
+  height: 48px;
+  margin: 8px auto 4px auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 0;
 }
 
 @keyframes slideIn {
@@ -160,12 +160,7 @@
   .mainContent {
     margin-left: 0;
   }
-  
-  /* Override header margin for mobile */
-  :global(.mantine-AppShell-header) {
-    margin-left: 0;
-  }
-  
+
   /* Override navbar styles for mobile - but keep transitions */
   .navbar {
     position: relative;
@@ -175,8 +170,25 @@
   }
 }
 
+/* Override header margin for mobile */
+.mobileHeaderFix {
+  /* Wrapper class for CSS Modules global selector compliance */
+  position: relative;
+}
+
+@media (max-width: 768px) {
+  .mobileHeaderFix :global(.mantine-AppShell-header) {
+    margin-left: 0;
+  }
+}
+
 /* Ensure menu animations work */
-:global(.mantine-Menu-dropdown) {
+.menuDropdownFix {
+  /* Wrapper class for global menu dropdown styles */
+  position: relative;
+}
+
+.menuDropdownFix :global(.mantine-Menu-dropdown) {
   animation: slideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
   opacity: 0.9 !important;
   transform-origin: top left !important;
@@ -185,9 +197,11 @@
   /* Background with transparency */
   background: rgba(255, 255, 255, 0.85) !important;
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 
-              0 1px 3px rgba(0, 0, 0, 0.1) !important;  border-radius: 8px !important;
-  
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.15),
+    0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 8px !important;
+
   /* Ensure proper rendering context */
   will-change: backdrop-filter !important;
   isolation: isolate !important;
@@ -195,13 +209,13 @@
 
 /* Fallback for browsers that don't support backdrop-filter */
 @supports not (backdrop-filter: blur(12px)) {
-  :global(.mantine-Menu-dropdown) {
+  .menuDropdownFix :global(.mantine-Menu-dropdown) {
     background: rgba(255, 255, 255, 0.95) !important;
   }
 }
 
 /* Dark theme support for dropdown */
-[data-mantine-color-scheme='dark'] :global(.mantine-Menu-dropdown) {
+.menuDropdownFix[data-mantine-color-scheme='dark'] :global(.mantine-Menu-dropdown) {
   background: rgba(25, 25, 25, 0.75) !important;
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8) !important;
@@ -209,13 +223,18 @@
 
 /* Dark theme fallback for browsers that don't support backdrop-filter */
 @supports not (backdrop-filter: blur(12px)) {
-  [data-mantine-color-scheme='dark'] :global(.mantine-Menu-dropdown) {
+  .menuDropdownFix[data-mantine-color-scheme='dark'] :global(.mantine-Menu-dropdown) {
     background: rgba(25, 25, 25, 0.95) !important;
   }
 }
 
 /* Global AppShell navbar animation override */
-:global(.mantine-AppShell-navbar) {
+.navbarAnimationFix {
+  /* Wrapper class for navbar animation styles */
+  position: relative;
+}
+
+.navbarAnimationFix :global(.mantine-AppShell-navbar) {
   transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
   will-change: width !important;
   transform: translateZ(0) !important; /* Force GPU acceleration */
@@ -224,13 +243,18 @@
 
 /* Specific navbar animation for desktop */
 @media (min-width: 769px) {
-  :global(.mantine-AppShell-navbar) {
+  .navbarAnimationFix :global(.mantine-AppShell-navbar) {
     transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
   }
 }
 
 /* Enhanced sidebar menu dropdown animation */
-:global(.mantine-Menu-dropdown[data-position="right-start"]) {
+.sidebarMenuFix {
+  /* Wrapper class for sidebar menu dropdown styles */
+  position: relative;
+}
+
+.sidebarMenuFix :global(.mantine-Menu-dropdown[data-position='right-start']) {
   transform-origin: left top !important;
   animation: slideInFromLeft 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
   z-index: 9999 !important; /* Ensure it's above all other elements */
@@ -243,7 +267,7 @@
 }
 
 /* Dark theme support for right-start positioned dropdown */
-[data-mantine-color-scheme='dark'] :global(.mantine-Menu-dropdown[data-position="right-start"]) {
+.sidebarMenuFix[data-mantine-color-scheme='dark'] :global(.mantine-Menu-dropdown[data-position='right-start']) {
   background: rgba(42, 42, 42, 0.85) !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;

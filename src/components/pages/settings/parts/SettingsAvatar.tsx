@@ -20,7 +20,6 @@ import {
   Select,
   TextInput,
   Radio,
-  Box,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import {
@@ -145,7 +144,9 @@ export default function SettingsAvatar() {
       <Stack gap='lg'>
         {/* Avatar Section */}
         <Stack gap='sm'>
-          <Text size='sm' fw={500}>Avatar</Text>
+          <Text size='sm' fw={500}>
+            Avatar
+          </Text>
           <FileInput
             accept='image/*'
             placeholder='Upload new avatar...'
@@ -213,7 +214,9 @@ export default function SettingsAvatar() {
 
         {/* Theme Section */}
         <Stack gap='sm'>
-          <Text size='sm' fw={500}>Theme Settings</Text>
+          <Text size='sm' fw={500}>
+            Theme Settings
+          </Text>
           <Text size='xs' c='dimmed'>
             These settings are saved in your browser and apply only to your view.
           </Text>
@@ -262,7 +265,9 @@ export default function SettingsAvatar() {
 
         {/* Background Section */}
         <Stack gap='sm'>
-          <Text size='sm' fw={500}>Background Settings</Text>
+          <Text size='sm' fw={500}>
+            Background Settings
+          </Text>
           <Text size='xs' c='dimmed'>
             Customize your dashboard background with blur effects.
           </Text>
