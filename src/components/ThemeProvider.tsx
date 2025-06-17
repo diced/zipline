@@ -60,6 +60,27 @@ export default function Theming({
         theme={createTheme({
           ...themeComponents(theme),
           defaultRadius: 'md',
+          // Enable motion and animations
+          respectReducedMotion: false,
+          components: {
+            ...themeComponents(theme).components,
+            AppShell: {
+              defaultProps: {
+                transitionProps: { 
+                  transition: 'slide-right', 
+                  duration: 300,
+                  timingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)'
+                },
+              },
+            },
+            Menu: {
+              defaultProps: {
+                transitionProps: { transition: 'fade', duration: 200 },
+                withinPortal: true,
+                zIndex: 999999,
+              },
+            },
+          },
           spacing: {
             xs: '0.5rem', // 8px
             sm: '0.75rem', // 12px

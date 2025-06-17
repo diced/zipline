@@ -1,0 +1,85 @@
+/* Custom background styles with blur effects */
+.custom-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: blur(4px);
+  transition: filter 0.3s ease-in-out;
+}
+
+/* Base blur for background image */
+.background-blur-base {
+  filter: blur(4px);
+}
+
+/* Enhanced blur for components over background */
+.background-blur-enhanced {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Component overlay styles */
+.component-overlay {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  transition: backdrop-filter 0.3s ease-in-out;
+}
+
+[data-mantine-color-scheme='dark'] .component-overlay {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* AppShell with custom background */
+.app-shell-with-background .mantine-AppShell-navbar {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.8);
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+[data-mantine-color-scheme='dark'] .app-shell-with-background .mantine-AppShell-navbar {
+  background: rgba(0, 0, 0, 0.6);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.app-shell-with-background .mantine-AppShell-header {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.8);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+[data-mantine-color-scheme='dark'] .app-shell-with-background .mantine-AppShell-header {
+  background: rgba(0, 0, 0, 0.6);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.app-shell-with-background .mantine-AppShell-main {
+  background: transparent;
+}
+
+/* Paper components with enhanced backdrop blur */
+.app-shell-with-background .mantine-Paper-root {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+[data-mantine-color-scheme='dark'] .app-shell-with-background .mantine-Paper-root {
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Smooth transitions for blur effects */
+.blur-transition {
+  transition: backdrop-filter 0.3s ease-in-out, filter 0.3s ease-in-out, background 0.3s ease-in-out;
+}

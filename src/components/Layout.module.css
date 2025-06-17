@@ -1,10 +1,18 @@
 /* Smooth animations for sidebar transitions */
 .navbar {
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 100vh;
+  top: 0;
+  position: fixed;
+  z-index: 90;
+  will-change: width;
+  transform: translateZ(0); /* Force GPU acceleration */
+  overflow: visible !important; /* Allow menu dropdowns to extend beyond sidebar boundaries */
 }
 
 .navbarContent {
   transition: padding 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: visible !important; /* Allow menu dropdowns to extend beyond container */
 }
 
 .navItem {
@@ -16,10 +24,15 @@
 }
 
 .navItemCollapsed {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  width: 90% !important;
-  margin: 0 auto !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 48px ;
+  height: 48px ;
+  margin: 8px auto 4px auto ;
   box-sizing: border-box;
+  display: flex ;
+  align-items: center ;
+  justify-content: center ;
+  padding: 0 ;
 }
 
 .navItemCollapsed:hover {
@@ -51,16 +64,31 @@
 /* Enhanced menu animation */
 .menuDropdown {
   animation: slideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 999999 !important; /* Ensure dropdowns appear above all other elements */
+}
+
+/* Specific dropdown menu for collapsed sidebar */
+.collapsedMenuDropdown {
+  z-index: 999999 !important;
+  animation: slideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transform-origin: left center !important;
+}
+
+/* Global menu dropdown animation override */
+:global(.mantine-Menu-dropdown) {
+  animation: slideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Utility class for collapsed sidebar items */
 .collapsedItem {
-  width: 90% !important;
-  margin: 0 auto !important;
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-  box-sizing: border-box !important;
+  width: 48px ;
+  height: 48px ;
+  margin: 8px auto 4px auto ;
+  display: flex ;
+  justify-content: center ;
+  align-items: center ;
+  box-sizing: border-box ;
+  padding: 0 ;
 }
 
 @keyframes slideIn {
@@ -71,5 +99,72 @@
   to {
     opacity: 1;
     transform: translateX(0);
+  }
+}
+
+/* Responsive styles for main content */
+.mainContent {
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (max-width: 768px) {
+  .mainContent {
+    margin-left: 0;
+  }
+  
+  /* Override header margin for mobile */
+  :global(.mantine-AppShell-header) {
+    margin-left: 0;
+  }
+  
+  /* Override navbar styles for mobile - but keep transitions */
+  .navbar {
+    position: relative;
+    height: auto;
+    z-index: 90;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+/* Ensure menu animations work */
+:global(.mantine-Menu-dropdown) {
+  animation: slideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  opacity: 1 !important;
+  transform-origin: top left !important;
+  z-index: 999999 !important; /* Very high z-index for collapsed sidebar menus */
+  position: fixed !important; /* Use fixed positioning to escape any container overflow restrictions */
+}
+
+/* Global AppShell navbar animation override */
+:global(.mantine-AppShell-navbar) {
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  will-change: width !important;
+  transform: translateZ(0) !important; /* Force GPU acceleration */
+  overflow: visible !important; /* Allow dropdown menus to extend beyond navbar boundaries */
+}
+
+/* Specific navbar animation for desktop */
+@media (min-width: 769px) {
+  :global(.mantine-AppShell-navbar) {
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+}
+
+/* Enhanced sidebar menu dropdown animation */
+:global(.mantine-Menu-dropdown[data-position="right-start"]) {
+  transform-origin: left top !important;
+  animation: slideInFromLeft 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  z-index: 999999 !important; /* Ensure it's above all other elements */
+  position: fixed !important; /* Fixed positioning to escape container overflow */
+}
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
   }
 }

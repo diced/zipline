@@ -2,7 +2,7 @@ import { useConfig } from '@/components/ConfigProvider';
 import { eitherTrue } from '@/lib/primitive';
 import { isAdministrator } from '@/lib/role';
 import { useUserStore } from '@/lib/store/user';
-import { Group, SimpleGrid, Title } from '@mantine/core';
+import { Box, Group, Title } from '@mantine/core';
 import SettingsAvatar from './parts/SettingsAvatar';
 import SettingsDashboard from './parts/SettingsDashboard';
 import SettingsFileView from './parts/SettingsFileView';
@@ -24,27 +24,63 @@ export default function DashboardSettings() {
         <Title order={1}>Settings</Title>
       </Group>
 
-      <SimpleGrid mt='md' cols={{ base: 1, md: 2 }} spacing='lg'>
-        <SettingsUser />
+      <Box
+        mt='md'
+        style={{
+          columnCount: 2,
+          columnGap: '1.5rem',
+          columnFill: 'balance',
+          '@media (max-width: 768px)': {
+            columnCount: 1,
+          },
+        }}
+      >
+        <Box style={{ breakInside: 'avoid', marginBottom: '1.5rem' }}>
+          <SettingsUser />
+        </Box>
+        
+        <Box style={{ breakInside: 'avoid', marginBottom: '1.5rem' }}>
+          <SettingsSessions />
+        </Box>
 
-        <SettingsAvatar />
+        {config.features.oauthRegistration && (
+          <Box style={{ breakInside: 'avoid', marginBottom: '1.5rem' }}>
+            <SettingsOAuth />
+          </Box>
+        )}
+        <Box style={{ breakInside: 'avoid', marginBottom: '1.5rem' }}>
+          <SettingsFileView />
+        </Box>
 
-        <SettingsSessions />
+        <Box style={{ breakInside: 'avoid', marginBottom: '1.5rem' }}>
+          <SettingsExports />
+        </Box>
 
-        {config.features.oauthRegistration && <SettingsOAuth />}
+        <Box style={{ breakInside: 'avoid', marginBottom: '1.5rem' }}>
+          <SettingsAvatar />
+        </Box>
 
-        <SettingsDashboard />
 
-        <SettingsFileView />
+        {eitherTrue(config.mfa.totp.enabled, config.mfa.passkeys) && (
+          <Box style={{ breakInside: 'avoid', marginBottom: '1.5rem' }}>
+            <SettingsMfa />
+          </Box>
+        )}
 
-        {eitherTrue(config.mfa.totp.enabled, config.mfa.passkeys) && <SettingsMfa />}
+        <Box style={{ breakInside: 'avoid', marginBottom: '1.5rem' }}>
+          <SettingsGenerators />
+        </Box>
 
-        <SettingsGenerators />
+        <Box style={{ breakInside: 'avoid', marginBottom: '1.5rem' }}>
+          <SettingsDashboard />
+        </Box>
 
-        <SettingsExports />
-
-        {isAdministrator(user?.role) && <SettingsServerActions />}
-      </SimpleGrid>
+        {isAdministrator(user?.role) && (
+          <Box style={{ breakInside: 'avoid', marginBottom: '1.5rem' }}>
+            <SettingsServerActions />
+          </Box>
+        )}
+      </Box>
     </>
   );
 }
