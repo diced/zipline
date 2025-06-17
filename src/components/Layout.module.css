@@ -178,18 +178,12 @@
 /* Ensure menu animations work */
 :global(.mantine-Menu-dropdown) {
   animation: slideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  opacity: 0.95 !important;
+  opacity: 0.9 !important;
   transform-origin: top left !important;
   z-index: 9999 !important; /* High z-index for collapsed sidebar menus */
-  
-  /* Backdrop filter with multiple fallbacks */
-  backdrop-filter: blur(12px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
-  -moz-backdrop-filter: blur(12px) saturate(180%) !important;
-  -ms-backdrop-filter: blur(12px) saturate(180%) !important;
-  
+  transform: translate(10px, 10px) !important;
   /* Background with transparency */
-  background: rgba(255, 255, 255, 0.75) !important;
+  background: rgba(255, 255, 255, 0.85) !important;
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 
               0 1px 3px rgba(0, 0, 0, 0.1) !important;  border-radius: 8px !important;
@@ -208,9 +202,9 @@
 
 /* Dark theme support for dropdown */
 [data-mantine-color-scheme='dark'] :global(.mantine-Menu-dropdown) {
-  background: rgba(25, 25, 25, 0.8) !important;
+  background: rgba(25, 25, 25, 0.75) !important;
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8) !important;
 }
 
 /* Dark theme fallback for browsers that don't support backdrop-filter */
@@ -240,10 +234,10 @@
   transform-origin: left top !important;
   animation: slideInFromLeft 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
   z-index: 9999 !important; /* Ensure it's above all other elements */
-  opacity: 0.95 !important;
+  opacity: 0.9 !important;
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
-  background: rgba(255, 255, 255, 0.85) !important;
+  background: rgba(255, 255, 255, 0.8) !important;
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
 }

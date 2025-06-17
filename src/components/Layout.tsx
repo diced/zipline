@@ -9,7 +9,6 @@ import { useSettingsStore } from '@/lib/store/settings';
 import React from 'react';
 import styles from './Layout.module.css';
 import './Layout.background.css';
-import { BackdropFilterDebug } from './BackdropFilterDebug';
 import {
   AppShell,
   Avatar,
@@ -372,9 +371,6 @@ export default function Layout({ children, config }: { children: React.ReactNode
   };
   return (
     <>
-      {/* Backdrop Filter Debug Component */}
-      <BackdropFilterDebug />
-      
       {/* Custom Background Image */}
       {hasCustomBackground && (
         <div
