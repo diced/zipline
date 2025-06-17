@@ -65,6 +65,34 @@
 .menuDropdown {
   animation: slideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 9999 !important; /* Ensure dropdowns appear above all other elements */
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  opacity: 0.95;
+  border-radius: 8px;
+}
+
+/* Fallback for browsers that don't support backdrop-filter */
+@supports not (backdrop-filter: blur(12px)) {
+  .menuDropdown {
+    background: rgba(255, 255, 255, 0.95);
+  }
+}
+
+/* Dark theme support for local menu dropdown */
+[data-mantine-color-scheme='dark'] .menuDropdown {
+  background: rgba(25, 25, 25, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* Dark theme fallback for browsers that don't support backdrop-filter */
+@supports not (backdrop-filter: blur(12px)) {
+  [data-mantine-color-scheme='dark'] .menuDropdown {
+    background: rgba(25, 25, 25, 0.95);
+  }
 }
 
 /* Specific dropdown menu for collapsed sidebar */
@@ -72,11 +100,34 @@
   z-index: 9999 !important;
   animation: slideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
   transform-origin: left center !important;
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  opacity: 0.95;
+  border-radius: 8px;
 }
 
-/* Global menu dropdown animation override */
-:global(.mantine-Menu-dropdown) {
-  animation: slideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+/* Fallback for collapsed menu dropdown */
+@supports not (backdrop-filter: blur(12px)) {
+  .collapsedMenuDropdown {
+    background: rgba(255, 255, 255, 0.95);
+  }
+}
+
+/* Dark theme support for collapsed menu dropdown */
+[data-mantine-color-scheme='dark'] .collapsedMenuDropdown {
+  background: rgba(25, 25, 25, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* Dark theme fallback for collapsed menu dropdown */
+@supports not (backdrop-filter: blur(12px)) {
+  [data-mantine-color-scheme='dark'] .collapsedMenuDropdown {
+    background: rgba(25, 25, 25, 0.95);
+  }
 }
 
 /* Utility class for collapsed sidebar items */
@@ -94,11 +145,9 @@
 @keyframes slideIn {
   from {
     opacity: 0;
-    transform: translateX(-8px);
   }
   to {
     opacity: 1;
-    transform: translateX(0);
   }
 }
 
@@ -129,9 +178,46 @@
 /* Ensure menu animations work */
 :global(.mantine-Menu-dropdown) {
   animation: slideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  opacity: 1 !important;
+  opacity: 0.95 !important;
   transform-origin: top left !important;
   z-index: 9999 !important; /* High z-index for collapsed sidebar menus */
+  
+  /* Backdrop filter with multiple fallbacks */
+  backdrop-filter: blur(12px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
+  -moz-backdrop-filter: blur(12px) saturate(180%) !important;
+  -ms-backdrop-filter: blur(12px) saturate(180%) !important;
+  
+  /* Background with transparency */
+  background: rgba(255, 255, 255, 0.75) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 
+              0 1px 3px rgba(0, 0, 0, 0.1) !important;  border-radius: 8px !important;
+  
+  /* Ensure proper rendering context */
+  will-change: backdrop-filter !important;
+  isolation: isolate !important;
+}
+
+/* Fallback for browsers that don't support backdrop-filter */
+@supports not (backdrop-filter: blur(12px)) {
+  :global(.mantine-Menu-dropdown) {
+    background: rgba(255, 255, 255, 0.95) !important;
+  }
+}
+
+/* Dark theme support for dropdown */
+[data-mantine-color-scheme='dark'] :global(.mantine-Menu-dropdown) {
+  background: rgba(25, 25, 25, 0.8) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Dark theme fallback for browsers that don't support backdrop-filter */
+@supports not (backdrop-filter: blur(12px)) {
+  [data-mantine-color-scheme='dark'] :global(.mantine-Menu-dropdown) {
+    background: rgba(25, 25, 25, 0.95) !important;
+  }
 }
 
 /* Global AppShell navbar animation override */
@@ -154,6 +240,19 @@
   transform-origin: left top !important;
   animation: slideInFromLeft 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
   z-index: 9999 !important; /* Ensure it's above all other elements */
+  opacity: 0.95 !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Dark theme support for right-start positioned dropdown */
+[data-mantine-color-scheme='dark'] :global(.mantine-Menu-dropdown[data-position="right-start"]) {
+  background: rgba(42, 42, 42, 0.85) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
 }
 
 @keyframes slideInFromLeft {
