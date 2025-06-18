@@ -389,10 +389,10 @@ export default function Layout({ children, config }: { children: React.ReactNode
         footer={{ height: { base: 0.1 } }}
         styles={{
           navbar: {
-            transition: 'all 1s ease-in-out, backdrop-filter 0.5s ease-in-out, background 0.5s ease-in-out',
+            transition: 'all 0.5s ease-in-out',
           },
           header: {
-            transition: 'all 0.5s ease-in-out, backdrop-filter 0.5s ease-in-out, background 0.5s ease-in-out',
+            transition: 'all 0.5s ease-in-out',
           },
           main: {
             transition: 'all 0.5s ease-in-out',
@@ -417,7 +417,7 @@ export default function Layout({ children, config }: { children: React.ReactNode
               {/* Version badge on the left side */}
             </div>
 
-            <div>
+            <div className={styles.menuEnhancedWrapper}>
               <Menu shadow='md' width={200}>
                 <Menu.Target>
                   <Button
@@ -437,7 +437,7 @@ export default function Layout({ children, config }: { children: React.ReactNode
                   </Button>
                 </Menu.Target>
 
-                <Menu.Dropdown>
+                <Menu.Dropdown className={styles.accountMenuDropdown}>
                   <Menu.Label>
                     {user?.username}
                     {isAdministrator(user?.role) ? ' (Administrator)' : ''}

@@ -7,7 +7,7 @@
   height: 100vh;
   z-index: 90;
   overflow: visible; /* Keep visible for dropdown menus */
-  transition: width 11s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: width 0.5s ease-in-out;
   transform: translateZ(0); /* Enable hardware acceleration */
   will-change: width;
 }
@@ -64,44 +64,71 @@
 /* =================================
    DROPDOWN MENU STYLES
    ================================= */
-/* Base dropdown with glass morphism effect */
-.menuDropdown,
-.collapsedMenuDropdown {
-  z-index: 9999 !important;
-  backdrop-filter: blur(12px) saturate(180%);
-  -webkit-backdrop-filter: blur(12px) saturate(180%);
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-  border-radius: 8px;
-  opacity: 0.95;
-  animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
+/* Base dropdown with enhanced glass morphism effect */
 
 .collapsedMenuDropdown {
-  animation-duration: 0.2s;
+  animation-duration: 0.1s;
   transform-origin: left center;
+  transform: translate(10px, 10px); /* Slightly more offset for collapsed menus */
 }
 
-/* Dark theme dropdowns */
+/* Dark theme dropdowns with enhanced glass effect */
 [data-mantine-color-scheme='dark'] .menuDropdown,
 [data-mantine-color-scheme='dark'] .collapsedMenuDropdown {
-  background: rgba(25, 25, 25, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  background: rgba(15, 15, 15, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(4px);
 }
 
-/* Fallback for browsers without backdrop-filter */
-@supports not (backdrop-filter: blur(12px)) {
-  .menuDropdown,
-  .collapsedMenuDropdown {
-    background: rgba(255, 255, 255, 0.95);
-  }
+/* Account menu dropdown styling */
+.accountMenuDropdown {
+  z-index: 9999;
+  backdrop-filter: blur(16px);
+  transform: translate(20px, 0px);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.15),
+    0 4px 16px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  border-radius: 12px;
+  transform-origin: top right;
+}
 
-  [data-mantine-color-scheme='dark'] .menuDropdown,
-  [data-mantine-color-scheme='dark'] .collapsedMenuDropdown {
-    background: rgba(25, 25, 25, 0.95);
-  }
+[data-mantine-color-scheme='dark'] .accountMenuDropdown {
+  background: rgba(25, 25, 25, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.4),
+    0 4px 16px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Enhanced wrapper for menu dropdowns to increase specificity */
+.menuEnhancedWrapper :global(.mantine-Menu-dropdown) {
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.15),
+    0 4px 16px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  border-radius: 12px;
+  animation: slideInWithOffset 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-mantine-color-scheme='dark'] .menuEnhancedWrapper :global(.mantine-Menu-dropdown) {
+  background: rgba(25, 25, 25, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.4),
+    0 4px 16px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 /* =================================
@@ -116,49 +143,6 @@
   .mobileHeaderFix :global(.mantine-AppShell-header) {
     margin-left: 0;
   }
-}
-
-/* Menu dropdown enhancements */
-.menuDropdownFix :global(.mantine-Menu-dropdown) {
-  animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  z-index: 9999 !important;
-  background: rgba(255, 255, 255, 0.85) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
-  border-radius: 8px !important;
-}
-
-[data-mantine-color-scheme='dark'] .menuDropdownFix :global(.mantine-Menu-dropdown) {
-  background: rgba(25, 25, 25, 0.85) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6) !important;
-}
-
-/* Navbar transition enhancement */
-.navbarAnimationFix :global(.mantine-AppShell-navbar) {
-  transition: width 0.5s ease-in-out !important;
-  will-change: width !important;
-  transform: translateZ(0) !important;
-  overflow: visible !important;
-}
-
-/* Sidebar positioned dropdowns */
-.sidebarMenuFix :global(.mantine-Menu-dropdown[data-position='right-start']) {
-  transform-origin: left top !important;
-  animation: slideInFromLeft 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  z-index: 9999 !important;
-  backdrop-filter: blur(12px) saturate(180%) !important;
-  background: rgba(255, 255, 255, 0.85) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
-}
-
-[data-mantine-color-scheme='dark']
-  .sidebarMenuFix
-  :global(.mantine-Menu-dropdown[data-position='right-start']) {
-  background: rgba(42, 42, 42, 0.85) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
 }
 
 /* =================================
@@ -200,6 +184,17 @@
   }
 }
 
+@keyframes slideInWithOffset {
+  from {
+    opacity: 0;
+    transform: translate(-2px, -6px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(4px, 4px) scale(1);
+  }
+}
+
 @keyframes slideInFromLeft {
   from {
     opacity: 0;
@@ -208,6 +203,17 @@
   to {
     opacity: 1;
     transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes slideInFromLeftWithOffset {
+  from {
+    opacity: 0;
+    transform: translate(-8px, -4px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(6px, 6px) scale(1);
   }
 }
 
