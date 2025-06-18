@@ -180,7 +180,6 @@ export default function Layout({ children, config }: { children: React.ReactNode
   // Check if custom background should be applied
   const hasCustomBackground =
     backgroundType === 'image' && backgroundImageUrl && backgroundImageUrl.trim() !== '';
-  const appShellClassName = hasCustomBackground ? 'app-shell-with-background' : '';
 
   // Debug logging
   useEffect(() => {
@@ -371,26 +370,15 @@ export default function Layout({ children, config }: { children: React.ReactNode
       {/* Custom Background Image */}
       {hasCustomBackground && (
         <div
-          className='custom-background blur-transition'
+          className={styles.customBackground}
           style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: -1,
             backgroundImage: `url("${backgroundImageUrl}")`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-            filter: 'blur(4px)',
-            transition: 'filter 0.5s ease-in-out',
           }}
         />
       )}
 
       <AppShell
-        className={`${appShellClassName} blur-transition ${styles.mobileHeaderFix} ${styles.menuDropdownFix} ${styles.navbarAnimationFix} ${styles.sidebarMenuFix}`}
+        className={`${hasCustomBackground ? styles.appShellWithBackground : ''} ${styles.mobileHeaderFix} ${styles.menuDropdownFix} ${styles.navbarAnimationFix} ${styles.sidebarMenuFix}`}
         navbar={{
           breakpoint: 'sm',
           // width: { sm: navbarCollapsed ? 64 : 240, lg: navbarCollapsed ? 260 : 260 },
@@ -401,36 +389,22 @@ export default function Layout({ children, config }: { children: React.ReactNode
         footer={{ height: { base: 0.1 } }}
         styles={{
           navbar: {
-            transition: 'all 0.5s ease-in-out, backdrop-filter 0.5s ease-in-out, background 0.5s ease-in-out',
+            transition: 'all 1s ease-in-out, backdrop-filter 0.5s ease-in-out, background 0.5s ease-in-out',
           },
           header: {
             transition: 'all 0.5s ease-in-out, backdrop-filter 0.5s ease-in-out, background 0.5s ease-in-out',
-            borderRadius: isScrolled ? '0' : '0 0 0 10px',
-            width: navbarCollapsed ? 'calc(100vw - 100px)' : 'calc(100vw - 250px)',
-            display: 'flex',
-            justifyContent: 'space-between',
-            transform: `translateX(${navbarCollapsed ? '100px' : '280px'})`,
-            alignItems: 'center',
-            position: 'fixed',
-            boxShadow: '0 8px 20px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.08)',
-            // borderLeft: '1px solid var(--app-shell-border-color)',
-            ...(hasCustomBackground && {
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
-              backgroundColor: colorScheme === 'dark' ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.8)',
-              borderBottom: `1px solid ${colorScheme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.2)'}`,
-            }),
           },
           main: {
             transition: 'all 0.5s ease-in-out',
           },
         }}
       >
-        <AppShell.Header px='md'>
-          <div
-            style={{ display: 'flex', alignItems: 'center', height: '100%', justifyContent: 'space-between' }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center' }}>
+        <AppShell.Header
+          px='md'
+          className={`${styles.header} ${isScrolled ? styles.headerScrolled : ''} ${navbarCollapsed ? styles.headerCollapsed : styles.headerExpanded} ${hasCustomBackground ? styles.headerWithBackground : ''}`}
+        >
+          <div className={styles.headerContent}>
+            <div className={styles.headerLeft}>
               <Burger
                 opened={opened}
                 onClick={() => setOpened((o) => !o)}
@@ -515,39 +489,10 @@ export default function Layout({ children, config }: { children: React.ReactNode
         <AppShell.Navbar
           hidden={!opened}
           zIndex={90}
-          className={styles.navbar}
-          style={{
-            overflow: 'hidden',
-            display: 'flex',
-            flexDirection: 'column',
-            backgroundColor: hasCustomBackground
-              ? colorScheme === 'dark'
-                ? 'rgba(0, 0, 0, 0.6)'
-                : 'rgba(255, 255, 255, 0.8)'
-              : colorScheme === 'dark'
-                ? theme.colors.dark[8]
-                : theme.colors.gray[0],
-            ...(hasCustomBackground && {
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
-              borderRight: `1px solid ${colorScheme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.2)'}`,
-            }),
-            transition: 'background-color 0.5s ease-in-out, backdrop-filter 0.5s ease-in-out',
-          }}
+          className={`${styles.navbar} ${styles.navbarBase} ${hasCustomBackground ? styles.navbarWithBackground : ''}`}
         >
           {/* Desktop logo section */}
-          <Box
-            visibleFrom='sm'
-            style={{
-              borderBottom: `1px solid ${colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[3]}`,
-              minHeight: '62px', // Fixed height to prevent layout shifts
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '12px 16px', // Reduced vertical padding to accommodate smaller height
-              position: 'relative', // For absolute positioning of text
-            }}
-          >
+          <Box visibleFrom='sm' className={styles.logoSection}>
             {/* Logo image - always visible */}
             {config.website.titleLogo && (
               <Avatar
@@ -555,10 +500,7 @@ export default function Layout({ children, config }: { children: React.ReactNode
                 alt='Zipline logo'
                 radius='sm'
                 size='md'
-                style={{
-                  flexShrink: 0,
-                  zIndex: 1,
-                }}
+                className={styles.logoImage}
               />
             )}
 
@@ -567,17 +509,7 @@ export default function Layout({ children, config }: { children: React.ReactNode
               size={20}
               lineClamp={1}
               ta='center'
-              style={{
-                transition:
-                  'opacity 0.5s ease-in-out, transform 0.5s ease-in-out, margin-left 0.5s ease-in-out, max-width 0.5s ease-in-out',
-                opacity: showLogoText ? 1 : 0,
-                transform: showLogoText ? 'translateX(0px) scale(1)' : 'translateX(-20px) scale(0.8)',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                marginLeft: showLogoText ? '8px' : '0px',
-                maxWidth: showLogoText ? '200px' : '0px',
-              }}
+              className={`${styles.logoText} ${showLogoText ? styles.logoTextVisible : styles.logoTextHidden}`}
             >
               {config.website.title?.trim() || 'Zipline'}
             </Title>
@@ -590,19 +522,8 @@ export default function Layout({ children, config }: { children: React.ReactNode
             <Divider />
           </Box>{' '}
           {/* Main navigation section */}
-          <ScrollArea
-            flex={1}
-            type='never'
-            className={styles.navbarContent}
-            style={{
-              padding: '16px 9px',
-            }}
-          >
-            <div
-              style={{
-                display: navbarCollapsed ? 'flex' : '',
-              }}
-            >
+          <ScrollArea flex={1} type='never' className={`${styles.navbarContent} ${styles.navSection}`}>
+            <div className={navbarCollapsed ? styles.navSectionCollapsed : ''}>
               <Box>
                 {navLinks
                   .filter((link) => !link.if || link.if(user as Response['/api/user']['user'], config))
@@ -614,26 +535,15 @@ export default function Layout({ children, config }: { children: React.ReactNode
                           <div
                             key={link.label}
                             title={link.label} // Use native HTML title for tooltip
+                            className={`${styles.navItemCollapsed} ${styles.collapsedItem} ${styles.navItemCollapsedBase}`}
                             style={{
-                              borderRadius: theme.radius.md,
-                              marginBottom: '4px',
-                              padding: '0',
-                              minHeight: '48px',
-                              height: '48px',
-                              cursor: 'pointer',
                               backgroundColor:
                                 router.pathname === link.href
                                   ? colorScheme === 'dark'
                                     ? theme.colors.dark[6]
                                     : theme.colors.gray[2]
                                   : 'transparent',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              width: '60px',
-                              margin: '0px auto 0px auto',
                             }}
-                            className={`${styles.navItemCollapsed} ${styles.collapsedItem}`}
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
@@ -642,15 +552,7 @@ export default function Layout({ children, config }: { children: React.ReactNode
                             }}
                           >
                             <Box
-                              className={styles.iconWrapper}
-                              style={{
-                                fontSize: '1.2rem',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                width: '50px',
-                                height: '20px',
-                              }}
+                              className={`${styles.iconWrapper} ${styles.iconWrapperBase} ${styles.iconWrapperCollapsed}`}
                             >
                               {link.icon}
                             </Box>
@@ -664,16 +566,7 @@ export default function Layout({ children, config }: { children: React.ReactNode
                             label={link.label}
                             leftSection={
                               <Box
-                                className={styles.iconWrapper}
-                                style={{
-                                  fontSize: '1rem',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  width: '20px',
-                                  height: '20px',
-                                  marginRight: '8px',
-                                }}
+                                className={`${styles.iconWrapper} ${styles.iconWrapperBase} ${styles.iconWrapperExpanded}`}
                               >
                                 {link.icon}
                               </Box>
@@ -683,15 +576,7 @@ export default function Layout({ children, config }: { children: React.ReactNode
                             active={router.pathname === link.href}
                             component={Link}
                             href={link.href || ''}
-                            style={{
-                              borderRadius: theme.radius.md,
-                              marginBottom: '0px',
-                              padding: '12px 20px',
-                              height: '48px',
-                              display: 'flex',
-                              alignItems: 'center',
-                            }}
-                            className={styles.navItem}
+                            className={`${styles.navItem} ${styles.navItemBase}`}
                           />
                         );
                       }
@@ -709,37 +594,18 @@ export default function Layout({ children, config }: { children: React.ReactNode
                             <Menu.Target>
                               <div
                                 title={link.label} // Use native HTML title for tooltip
+                                className={`${styles.navItemCollapsed} ${styles.collapsedItem} ${styles.navItemCollapsedBase}`}
                                 style={{
-                                  borderRadius: theme.radius.md,
-                                  marginBottom: '4px',
-                                  padding: '0',
-                                  minHeight: '48px',
-                                  height: '48px',
-                                  cursor: 'pointer',
                                   backgroundColor:
                                     router.pathname === link.href
                                       ? colorScheme === 'dark'
                                         ? theme.colors.dark[6]
                                         : theme.colors.gray[2]
                                       : 'transparent',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  width: '60px',
-                                  margin: '0px auto 0px auto',
                                 }}
-                                className={`${styles.navItemCollapsed} ${styles.collapsedItem}`}
                               >
                                 <Box
-                                  className={styles.iconWrapper}
-                                  style={{
-                                    fontSize: '1.2rem',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    width: '50px',
-                                    height: '20px',
-                                  }}
+                                  className={`${styles.iconWrapper} ${styles.iconWrapperBase} ${styles.iconWrapperCollapsed}`}
                                 >
                                   {link.icon}
                                 </Box>
@@ -772,16 +638,7 @@ export default function Layout({ children, config }: { children: React.ReactNode
                             label={link.label}
                             leftSection={
                               <Box
-                                className={styles.iconWrapper}
-                                style={{
-                                  fontSize: '1rem',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  width: '20px',
-                                  height: '20px',
-                                  marginRight: '8px',
-                                }}
+                                className={`${styles.iconWrapper} ${styles.iconWrapperBase} ${styles.iconWrapperExpanded}`}
                               >
                                 {link.icon}
                               </Box>
@@ -791,15 +648,7 @@ export default function Layout({ children, config }: { children: React.ReactNode
                             active={router.pathname === link.href}
                             component={Link}
                             href={link.href || ''}
-                            style={{
-                              borderRadius: theme.radius.md,
-                              marginBottom: '0px',
-                              padding: '12px 20px',
-                              height: '48px',
-                              display: 'flex',
-                              alignItems: 'center',
-                            }}
-                            className={styles.navItem}
+                            className={`${styles.navItem} ${styles.navItemBase}`}
                           >
                             {link.links
                               .filter(
@@ -816,12 +665,7 @@ export default function Layout({ children, config }: { children: React.ReactNode
                                   active={router.pathname === sublink.href}
                                   component={Link}
                                   href={sublink.href || ''}
-                                  style={{
-                                    borderRadius: theme.radius.sm,
-                                    marginTop: '2px',
-                                    transition: 'all 0.2s ease',
-                                    marginRight: '8px',
-                                  }}
+                                  className={styles.subNavItem}
                                 />
                               ))}
                           </NavLink>
@@ -849,29 +693,17 @@ export default function Layout({ children, config }: { children: React.ReactNode
               variant='light'
               size='lg'
               onClick={() => setNavbarCollapsed(!navbarCollapsed)}
-              style={{
-                borderRadius: theme.radius.md,
-                transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-                width: navbarCollapsed ? '60px' : '240px',
-                height: '40px',
-              }}
+              className={`${styles.sidebarToggle} ${navbarCollapsed ? styles.sidebarToggleCollapsed : styles.sidebarToggleExpanded}`}
             >
               <Group gap='xs'>
                 <IconMenu2 size='1.5rem' />
               </Group>
             </ActionIcon>
           </Box>
-          <Box
-            className={styles.bottomSection}
-            style={{
-              borderTop: `1px solid ${colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[3]}`,
-              padding: '12px',
-              display: 'flex',
-            }}
-          >
+          <Box className={styles.bottomSectionBase}>
             {/* External links */}
             {config.website.externalLinks.length > 0 && (
-              <Box>
+              <Box className={styles.externalLinksContainer}>
                 {' '}
                 {config.website.externalLinks.map(({ name, url }, i) => {
                   if (navbarCollapsed) {
@@ -879,21 +711,7 @@ export default function Layout({ children, config }: { children: React.ReactNode
                       <div
                         key={i}
                         title={name} // Use native HTML title for tooltip
-                        style={{
-                          borderRadius: theme.radius.sm,
-                          padding: '0',
-                          minHeight: '48px',
-                          height: '48px',
-                          cursor: 'pointer',
-                          fontSize: '0.875rem',
-                          width: '48px',
-                          margin: '0px auto',
-                          marginLeft: '4px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}
-                        className={`${styles.navItemCollapsed} ${styles.collapsedItem}`}
+                        className={`${styles.navItemCollapsed} ${styles.collapsedItem} ${styles.externalLink} ${styles.externalLinkCollapsed}`}
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
@@ -934,11 +752,7 @@ export default function Layout({ children, config }: { children: React.ReactNode
                         component={Link}
                         href={url}
                         target='_blank'
-                        style={{
-                          borderRadius: theme.radius.sm,
-                          fontSize: '0.875rem',
-                          padding: '12px 12px',
-                        }}
+                        className={`${styles.externalLink} ${styles.externalLinkExpanded}`}
                       />
                     );
                   }
@@ -953,19 +767,7 @@ export default function Layout({ children, config }: { children: React.ReactNode
               m='lg'
               withBorder
               p='md'
-              className={hasCustomBackground ? 'blur-transition' : ''}
-              style={{
-                paddingLeft: 'var(--mantine-spacing-lg)',
-                paddingRight: 'var(--mantine-spacing-lg)',
-                ...(hasCustomBackground && {
-                  backdropFilter: 'blur(8px)',
-                  WebkitBackdropFilter: 'blur(8px)',
-                  background: colorScheme === 'dark' ? 'rgba(0, 0, 0, 0.7)' : 'rgba(255, 255, 255, 0.85)',
-                  border: `1px solid ${
-                    colorScheme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.2)'
-                  }`,
-                }),
-              }}
+              className={`${styles.mainContentPaper} ${hasCustomBackground ? styles.mainContentPaperWithBackground : ''}`}
             >
               {children}
             </Paper>

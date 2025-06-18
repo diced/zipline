@@ -1,178 +1,114 @@
-/* Smooth animations for sidebar transitions */
+/* =================================
+   SIDEBAR BASE STYLES
+   ================================= */
 .navbar {
-  transition: width 0.5s ease-in-out;
-  height: 100vh;
-  top: 0;
   position: fixed;
+  top: 0;
+  height: 100vh;
   z-index: 90;
+  overflow: visible; /* Keep visible for dropdown menus */
+  transition: width 11s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateZ(0); /* Enable hardware acceleration */
   will-change: width;
-  transform: translateZ(0); /* Force GPU acceleration */
-  overflow: visible !important; /* Allow menu dropdowns to extend beyond sidebar boundaries */
 }
 
 .navbarContent {
-  transition: padding 0.5s ease-in-out;
-  overflow: visible !important; /* Allow menu dropdowns to extend beyond container */
+  overflow: visible;
+  transition: padding 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* =================================
+   NAVIGATION ITEMS
+   ================================= */
 .navItem {
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .navItem:hover {
   transform: translateX(2px);
 }
 
-.navItemCollapsed {
-  transition: all 0.5s ease-in-out;
+/* Collapsed sidebar items - consolidated styles */
+.navItemCollapsed,
+.collapsedItem {
   width: 48px;
   height: 48px;
-  margin: 8px auto 4px auto;
-  box-sizing: border-box;
+  margin: 8px auto 4px;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-sizing: border-box;
 }
 
-.navItemCollapsed:hover {
+.navItemCollapsed:hover,
+.collapsedItem:hover {
   transform: scale(1.05);
   background-color: var(--mantine-color-gray-1);
 }
 
-[data-mantine-color-scheme='dark'] .navItemCollapsed:hover {
+/* Dark theme hover states */
+[data-mantine-color-scheme='dark'] .navItemCollapsed:hover,
+[data-mantine-color-scheme='dark'] .collapsedItem:hover {
   background-color: var(--mantine-color-dark-5);
 }
 
-.iconWrapper {
-  transition: font-size 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.bottomSection {
-  transition: padding 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
+/* Sidebar section transitions */
+.iconWrapper,
+.bottomSection,
 .versionWrapper {
-  transition: justify-content 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Smooth fade in/out for tooltips */
-.tooltip {
-  transition: opacity 0.2s ease-in-out;
-}
-
-/* Enhanced menu animation */
-.menuDropdown {
-  animation: slideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 9999 !important; /* Ensure dropdowns appear above all other elements */
-  backdrop-filter: blur(12px) saturate(180%);
-  -webkit-backdrop-filter: blur(12px) saturate(180%);
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-  opacity: 0.95;
-  border-radius: 8px;
-}
-
-/* Fallback for browsers that don't support backdrop-filter */
-@supports not (backdrop-filter: blur(12px)) {
-  .menuDropdown {
-    background: rgba(255, 255, 255, 0.95);
-  }
-}
-
-/* Dark theme support for local menu dropdown */
-[data-mantine-color-scheme='dark'] .menuDropdown {
-  background: rgba(25, 25, 25, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-}
-
-/* Dark theme fallback for browsers that don't support backdrop-filter */
-@supports not (backdrop-filter: blur(12px)) {
-  [data-mantine-color-scheme='dark'] .menuDropdown {
-    background: rgba(25, 25, 25, 0.95);
-  }
-}
-
-/* Specific dropdown menu for collapsed sidebar */
+/* =================================
+   DROPDOWN MENU STYLES
+   ================================= */
+/* Base dropdown with glass morphism effect */
+.menuDropdown,
 .collapsedMenuDropdown {
   z-index: 9999 !important;
-  animation: slideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  transform-origin: left center !important;
   backdrop-filter: blur(12px) saturate(180%);
   -webkit-backdrop-filter: blur(12px) saturate(180%);
   background: rgba(255, 255, 255, 0.8);
   border: 1px solid rgba(255, 255, 255, 0.18);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-  opacity: 0.95;
   border-radius: 8px;
+  opacity: 0.95;
+  animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Fallback for collapsed menu dropdown */
-@supports not (backdrop-filter: blur(12px)) {
-  .collapsedMenuDropdown {
-    background: rgba(255, 255, 255, 0.95);
-  }
+.collapsedMenuDropdown {
+  animation-duration: 0.2s;
+  transform-origin: left center;
 }
 
-/* Dark theme support for collapsed menu dropdown */
+/* Dark theme dropdowns */
+[data-mantine-color-scheme='dark'] .menuDropdown,
 [data-mantine-color-scheme='dark'] .collapsedMenuDropdown {
   background: rgba(25, 25, 25, 0.8);
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
-/* Dark theme fallback for collapsed menu dropdown */
+/* Fallback for browsers without backdrop-filter */
 @supports not (backdrop-filter: blur(12px)) {
+  .menuDropdown,
+  .collapsedMenuDropdown {
+    background: rgba(255, 255, 255, 0.95);
+  }
+
+  [data-mantine-color-scheme='dark'] .menuDropdown,
   [data-mantine-color-scheme='dark'] .collapsedMenuDropdown {
     background: rgba(25, 25, 25, 0.95);
   }
 }
 
-/* Utility class for collapsed sidebar items */
-.collapsedItem {
-  width: 48px;
-  height: 48px;
-  margin: 8px auto 4px auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  box-sizing: border-box;
-  padding: 0;
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-/* Responsive styles for main content */
-.mainContent {
-  transition: margin-left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-@media (max-width: 768px) {
-  .mainContent {
-    margin-left: 0;
-  }
-
-  /* Override navbar styles for mobile - but keep transitions */
-  .navbar {
-    position: relative;
-    height: auto;
-    z-index: 90;
-    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-}
-
-/* Override header margin for mobile */
+/* =================================
+   MANTINE GLOBAL OVERRIDES
+   ================================= */
+/* Mobile header positioning */
 .mobileHeaderFix {
-  /* Wrapper class for CSS Modules global selector compliance */
   position: relative;
 }
 
@@ -182,95 +118,86 @@
   }
 }
 
-/* Ensure menu animations work */
-.menuDropdownFix {
-  /* Wrapper class for global menu dropdown styles */
-  position: relative;
-}
-
+/* Menu dropdown enhancements */
 .menuDropdownFix :global(.mantine-Menu-dropdown) {
-  animation: slideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  opacity: 0.9 !important;
-  transform-origin: top left !important;
-  z-index: 9999 !important; /* High z-index for collapsed sidebar menus */
-  transform: translate(10px, 10px) !important;
-  /* Background with transparency */
+  animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  z-index: 9999 !important;
   background: rgba(255, 255, 255, 0.85) !important;
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.15),
-    0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
   border-radius: 8px !important;
-
-  /* Ensure proper rendering context */
-  will-change: backdrop-filter !important;
-  isolation: isolate !important;
 }
 
-/* Fallback for browsers that don't support backdrop-filter */
-@supports not (backdrop-filter: blur(12px)) {
-  .menuDropdownFix :global(.mantine-Menu-dropdown) {
-    background: rgba(255, 255, 255, 0.95) !important;
-  }
-}
-
-/* Dark theme support for dropdown */
-.menuDropdownFix[data-mantine-color-scheme='dark'] :global(.mantine-Menu-dropdown) {
-  background: rgba(25, 25, 25, 0.75) !important;
+[data-mantine-color-scheme='dark'] .menuDropdownFix :global(.mantine-Menu-dropdown) {
+  background: rgba(25, 25, 25, 0.85) !important;
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6) !important;
 }
 
-/* Dark theme fallback for browsers that don't support backdrop-filter */
-@supports not (backdrop-filter: blur(12px)) {
-  .menuDropdownFix[data-mantine-color-scheme='dark'] :global(.mantine-Menu-dropdown) {
-    background: rgba(25, 25, 25, 0.95) !important;
-  }
-}
-
-/* Global AppShell navbar animation override */
-.navbarAnimationFix {
-  /* Wrapper class for navbar animation styles */
-  position: relative;
-}
-
+/* Navbar transition enhancement */
 .navbarAnimationFix :global(.mantine-AppShell-navbar) {
-  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transition: width 0.5s ease-in-out !important;
   will-change: width !important;
-  transform: translateZ(0) !important; /* Force GPU acceleration */
-  overflow: visible !important; /* Allow dropdown menus to extend beyond navbar boundaries */
+  transform: translateZ(0) !important;
+  overflow: visible !important;
 }
 
-/* Specific navbar animation for desktop */
-@media (min-width: 769px) {
-  .navbarAnimationFix :global(.mantine-AppShell-navbar) {
-    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  }
-}
-
-/* Enhanced sidebar menu dropdown animation */
-.sidebarMenuFix {
-  /* Wrapper class for sidebar menu dropdown styles */
-  position: relative;
-}
-
+/* Sidebar positioned dropdowns */
 .sidebarMenuFix :global(.mantine-Menu-dropdown[data-position='right-start']) {
   transform-origin: left top !important;
-  animation: slideInFromLeft 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  z-index: 9999 !important; /* Ensure it's above all other elements */
-  opacity: 0.9 !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
-  background: rgba(255, 255, 255, 0.8) !important;
+  animation: slideInFromLeft 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  z-index: 9999 !important;
+  backdrop-filter: blur(12px) saturate(180%) !important;
+  background: rgba(255, 255, 255, 0.85) !important;
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
 }
 
-/* Dark theme support for right-start positioned dropdown */
-.sidebarMenuFix[data-mantine-color-scheme='dark'] :global(.mantine-Menu-dropdown[data-position='right-start']) {
+[data-mantine-color-scheme='dark']
+  .sidebarMenuFix
+  :global(.mantine-Menu-dropdown[data-position='right-start']) {
   background: rgba(42, 42, 42, 0.85) !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* =================================
+   RESPONSIVE LAYOUT
+   ================================= */
+.mainContent {
+  transition: margin-left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (max-width: 768px) {
+  .mainContent {
+    margin-left: 0;
+  }
+
+  .navbar {
+    position: relative;
+    height: auto;
+  }
+
+  /* Mobile header - full width */
+  .headerExpanded,
+  .headerCollapsed {
+    left: 0;
+    width: 100vw;
+  }
+}
+
+/* =================================
+   ANIMATIONS
+   ================================= */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 @keyframes slideInFromLeft {
@@ -282,4 +209,400 @@
     opacity: 1;
     transform: translateX(0) scale(1);
   }
+}
+
+/* =================================
+   UTILITIES
+   ================================= */
+.tooltip {
+  transition: opacity 0.2s ease-in-out;
+}
+
+/* Performance optimizations */
+.navbar,
+.navItem,
+.navItemCollapsed,
+.collapsedItem {
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  .navbar,
+  .navbarContent,
+  .navItem,
+  .navItemCollapsed,
+  .collapsedItem,
+  .iconWrapper,
+  .bottomSection,
+  .versionWrapper,
+  .mainContent,
+  .tooltip {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .menuDropdown,
+  .collapsedMenuDropdown {
+    animation: none !important;
+  }
+}
+
+/* =================================
+   BACKGROUND & BLUR EFFECTS
+   ================================= */
+/* Custom background image with blur */
+.customBackground {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: blur(4px);
+  transition: filter 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Component overlays with glass morphism */
+.componentOverlay {
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  transition: backdrop-filter 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-mantine-color-scheme='dark'] .componentOverlay {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* AppShell components with background blur */
+.appShellWithBackground {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.appShellWithBackground :global(.mantine-AppShell-navbar) {
+  backdrop-filter: blur(12px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
+  background: rgba(255, 255, 255, 0.8) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+[data-mantine-color-scheme='dark'] .appShellWithBackground :global(.mantine-AppShell-navbar) {
+  background: rgba(0, 0, 0, 0.6) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.appShellWithBackground :global(.mantine-AppShell-header) {
+  backdrop-filter: blur(12px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
+  background: rgba(255, 255, 255, 0.8) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+[data-mantine-color-scheme='dark'] .appShellWithBackground :global(.mantine-AppShell-header) {
+  background: rgba(0, 0, 0, 0.6) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.appShellWithBackground :global(.mantine-AppShell-main) {
+  background: transparent !important;
+}
+
+/* Paper components with enhanced backdrop blur */
+.appShellWithBackground :global(.mantine-Paper-root) {
+  backdrop-filter: blur(12px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+[data-mantine-color-scheme='dark'] .appShellWithBackground :global(.mantine-Paper-root) {
+  background: rgba(0, 0, 0, 0.7) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* =================================
+   LAYOUT SPECIFIC STYLES
+   ================================= */
+/* Header styles - Modern approach */
+.header {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 0 0 0 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 62.5px;
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.3),
+    0 1px 3px rgba(0, 0, 0, 0.08);
+  z-index: 100;
+}
+
+.headerScrolled {
+  border-radius: 0;
+}
+
+.headerExpanded {
+  left: 280px;
+  width: 100%;
+}
+
+.headerCollapsed {
+  left: 100px;
+  width: 100%;
+}
+
+.headerWithBackground {
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  background: rgba(255, 255, 255, 0.8);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+[data-mantine-color-scheme='dark'] .headerWithBackground {
+  background: rgba(0, 0, 0, 0.6);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Navbar styles */
+.navbarBase {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--mantine-color-gray-0);
+  transition:
+    background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    backdrop-filter 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-mantine-color-scheme='dark'] .navbarBase {
+  background-color: var(--mantine-color-dark-8);
+}
+
+.navbarWithBackground {
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  background: rgba(255, 255, 255, 0.8);
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+[data-mantine-color-scheme='dark'] .navbarWithBackground {
+  background: rgba(0, 0, 0, 0.6);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Logo section */
+.logoSection {
+  border-bottom: 1px solid var(--mantine-color-gray-3);
+  min-height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;
+  position: relative;
+  overflow: hidden; /* Prevent text overflow outside the container */
+  width: 100%; /* Ensure full width constraint */
+  gap: 6px; /* Small consistent gap between logo and text */
+}
+
+[data-mantine-color-scheme='dark'] .logoSection {
+  border-bottom: 1px solid var(--mantine-color-dark-5);
+}
+
+.logoImage {
+  flex-shrink: 0;
+  z-index: 2; /* Higher than text to stay on top */
+  position: relative;
+}
+
+.logoText {
+  transition:
+    opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    margin-left 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    max-width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  z-index: 1; /* Lower than image */
+  position: relative;
+  min-width: 0; /* Allow flex item to shrink */
+}
+
+.logoTextVisible {
+  opacity: 1;
+  transform: translateX(0px) scale(1);
+  margin-left: 0px; /* Remove margin to make text closer to image */
+  max-width: 180px; /* Fixed reasonable width */
+}
+
+.logoTextHidden {
+  opacity: 0;
+  transform: translateX(-20px) scale(0.8);
+  margin-left: 0px;
+  max-width: 0px;
+}
+
+/* Navigation sections */
+.navSection {
+  padding: 16px 9px;
+}
+
+.navSectionCollapsed {
+  display: flex;
+}
+
+/* Sidebar toggle button */
+.sidebarToggle {
+  border-radius: 8px;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 40px;
+}
+
+.sidebarToggleExpanded {
+  width: 240px;
+}
+
+.sidebarToggleCollapsed {
+  width: 60px;
+}
+
+/* Bottom section */
+.bottomSectionBase {
+  border-top: 1px solid var(--mantine-color-gray-3);
+  padding: 12px;
+  display: flex;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+[data-mantine-color-scheme='dark'] .bottomSectionBase {
+  border-top: 1px solid var(--mantine-color-dark-5);
+}
+
+/* External link styles */
+.externalLink {
+  border-radius: var(--mantine-radius-sm);
+  font-size: 0.875rem;
+}
+
+.externalLinkCollapsed {
+  padding: 0;
+  min-height: 48px;
+  height: 48px;
+  cursor: pointer;
+  width: 48px;
+  margin: 0px auto;
+  margin-left: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.externalLinkExpanded {
+  padding: 12px;
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* External links container */
+.externalLinksContainer {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* Main content area */
+.mainContentPaper {
+  padding-left: var(--mantine-spacing-lg);
+  padding-right: var(--mantine-spacing-lg);
+}
+
+.mainContentPaperWithBackground {
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+[data-mantine-color-scheme='dark'] .mainContentPaperWithBackground {
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Header content layouts */
+.headerContent {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  justify-content: space-between;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+}
+
+/* Navigation item styles */
+.navItemBase {
+  border-radius: var(--mantine-radius-md);
+  margin-bottom: 0px;
+  padding: 12px 20px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+}
+
+.navItemCollapsedBase {
+  border-radius: var(--mantine-radius-md);
+  padding: 0;
+  min-height: 48px;
+  height: 48px;
+  cursor: pointer;
+  width: 60px;
+  margin: 0 0 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iconWrapperBase {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iconWrapperExpanded {
+  font-size: 1rem;
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+}
+
+.iconWrapperCollapsed {
+  font-size: 1.2rem;
+  width: 50px;
+  height: 20px;
+}
+
+/* Sub-navigation items */
+.subNavItem {
+  border-radius: var(--mantine-radius-sm);
+  margin-top: 2px;
+  transition: all 0.2s ease;
+  margin-right: 8px;
 }
