@@ -44,7 +44,7 @@
 
 .navItemCollapsed:hover,
 .collapsedItem:hover {
-  transform: scale(1.05);
+  transform: scale(1.3);
   background-color: var(--mantine-color-gray-1);
 }
 
@@ -119,7 +119,6 @@
     0 4px 16px rgba(0, 0, 0, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.4);
   border-radius: 12px;
-  animation: slideInWithOffset 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 [data-mantine-color-scheme='dark'] .menuEnhancedWrapper :global(.mantine-Menu-dropdown) {
@@ -225,16 +224,16 @@
 }
 
 /* Performance optimizations */
-.navbar,
+/* .navbar,
 .navItem,
 .navItemCollapsed,
 .collapsedItem {
   backface-visibility: hidden;
   -webkit-font-smoothing: antialiased;
-}
+} */
 
 /* Accessibility improvements */
-@media (prefers-reduced-motion: reduce) {
+/* @media (prefers-reduced-motion: reduce) {
   .navbar,
   .navbarContent,
   .navItem,
@@ -253,7 +252,7 @@
   .collapsedMenuDropdown {
     animation: none !important;
   }
-}
+} */
 
 /* =================================
    BACKGROUND & BLUR EFFECTS

@@ -418,7 +418,11 @@ export default function Layout({ children, config }: { children: React.ReactNode
             </div>
 
             <div className={styles.menuEnhancedWrapper}>
-              <Menu shadow='md' width={200}>
+              <Menu 
+                shadow='md'
+                width={200}
+                withinPortal={false}  
+              >
                 <Menu.Target>
                   <Button
                     variant='transparent'
@@ -587,9 +591,9 @@ export default function Layout({ children, config }: { children: React.ReactNode
                           <Menu
                             key={link.label}
                             position='right-start'
-                            offset={12}
                             withinPortal={true}
-                            transitionProps={{ transition: 'fade', duration: 200 }}
+                            transitionProps={{ duration: 0 }}
+                            width={150}
                           >
                             <Menu.Target>
                               <div
@@ -611,7 +615,7 @@ export default function Layout({ children, config }: { children: React.ReactNode
                                 </Box>
                               </div>
                             </Menu.Target>
-                            <Menu.Dropdown style={{ zIndex: 1001 }} className={styles.collapsedMenuDropdown}>
+                            <Menu.Dropdown className={styles.collapsedMenuDropdown}>
                               <Menu.Label>{link.label}</Menu.Label>
                               {link.links
                                 .filter(
