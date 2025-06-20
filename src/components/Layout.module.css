@@ -410,12 +410,12 @@
   min-height: 62px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: center; /* Changed back to center for centered alignment */
   padding: 12px 16px;
   position: relative;
   overflow: hidden; /* Prevent text overflow outside the container */
   width: 100%; /* Ensure full width constraint */
-  gap: 6px; /* Small consistent gap between logo and text */
+  gap: 8px; /* Slightly increased gap between logo and text */
 }
 
 [data-mantine-color-scheme='dark'] .logoSection {
@@ -430,23 +430,26 @@
 
 .logoText {
   transition:
-    opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-    transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-    margin-left 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-    max-width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   z-index: 1; /* Lower than image */
   position: relative;
   min-width: 0; /* Allow flex item to shrink */
+  font-weight: 600; /* Make text more prominent */
+  color: var(--mantine-color-text); /* Ensure proper text color */
 }
 
 .logoTextVisible {
   opacity: 1;
   transform: translateX(0px) scale(1);
-  margin-left: 0px; /* Remove margin to make text closer to image */
+  margin-left: 8px; /* Add some margin for better spacing */
   max-width: 180px; /* Fixed reasonable width */
+  pointer-events: auto;
 }
 
 .logoTextHidden {
@@ -454,6 +457,7 @@
   transform: translateX(-20px) scale(0.8);
   margin-left: 0px;
   max-width: 0px;
+  pointer-events: none;
 }
 
 /* Navigation sections */

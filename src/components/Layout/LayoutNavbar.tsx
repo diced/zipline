@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import type { Response } from '@/lib/api/response';
 import type { SafeConfig } from '@/lib/config/safe';
 import useLogin from '@/lib/hooks/useLogin';
@@ -10,7 +11,6 @@ import {
   Divider,
   ScrollArea,
   NavLink,
-  Menu,
   Group,
   ActionIcon,
   useMantineColorScheme,
@@ -150,6 +150,52 @@ export function LayoutNavbar({
   const { user } = useLogin();
   const router = useRouter();
   const { showLogoText } = useLayoutState();
+    // Local state to ensure logo text shows when sidebar is expanded
+  const [localShowLogoText, setLocalShowLogoText] = useState(!navbarCollapsed);
+  
+  // Update local logo text state when navbarCollapsed changes
+  useEffect(() => {
+    if (navbarCollapsed) {
+      setLocalShowLogoText(false);
+    } else {
+      // Small delay to allow for smooth animation
+      const timer = setTimeout(() => {
+        setLocalShowLogoText(true);
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [navbarCollapsed]);  // State to track which submenu should be expanded
+  const [expandedSubmenu, setExpandedSubmenu] = useState<string | null>(null);
+  const [manuallyClosedSubmenu, setManuallyClosedSubmenu] = useState<string | null>(null);
+    // Clear expanded submenu when sidebar is collapsed
+  useEffect(() => {
+    if (navbarCollapsed) {
+      setExpandedSubmenu(null);
+      setManuallyClosedSubmenu(null); // Reset manual close state when sidebar collapses
+    }
+  }, [navbarCollapsed]);  // Auto-expand submenu if user is currently on a submenu page
+  useEffect(() => {
+    if (!navbarCollapsed) {
+      const currentSubmenu = navLinks.find(link => 
+        link.links && link.active(router.pathname)
+      );
+      // Auto-expand the submenu for the current page, unless user manually closed it
+      if (currentSubmenu && manuallyClosedSubmenu !== currentSubmenu.label) {
+        setExpandedSubmenu(currentSubmenu.label);
+      }
+    }
+  }, [router.pathname, navbarCollapsed, manuallyClosedSubmenu]);
+
+  // Reset manual close state when navigating to a different section
+  useEffect(() => {
+    const currentSubmenu = navLinks.find(link => 
+      link.links && link.active(router.pathname)
+    );
+    // If we navigate to a different submenu section, reset the manual close state
+    if (currentSubmenu && manuallyClosedSubmenu && manuallyClosedSubmenu !== currentSubmenu.label) {
+      setManuallyClosedSubmenu(null);
+    }
+  }, [router.pathname, manuallyClosedSubmenu]);
 
   return (
     <AppShell.Navbar
@@ -167,13 +213,11 @@ export function LayoutNavbar({
             size='md'
             className={styles.logoImage}
           />
-        )}
-
-        <Title
+        )}        <Title
           size={20}
           lineClamp={1}
           ta='center'
-          className={`${styles.logoText} ${showLogoText ? styles.logoTextVisible : styles.logoTextHidden}`}
+          className={`${styles.logoText} ${localShowLogoText ? styles.logoTextVisible : styles.logoTextHidden}`}
         >
           {config.website.title?.trim() || 'Zipline'}
         </Title>
@@ -243,59 +287,41 @@ export function LayoutNavbar({
                       />
                     );
                   }
-                } else {
-                  // Handle links with children
+                } else {                  // Handle links with children
                   if (navbarCollapsed) {
+                    // In collapsed mode, clicking expands the sidebar to show submenu
                     return (
-                      <Menu
+                      <div
                         key={link.label}
-                        position='right-start'
-                        withinPortal={true}
-                        transitionProps={{ duration: 0 }}
-                        width={150}
+                        title={`Click to expand ${link.label} menu`}
+                        className={`${styles.navItemCollapsed} ${styles.collapsedItem} ${styles.navItemCollapsedBase}`}
+                        style={{
+                          cursor: 'pointer',
+                          backgroundColor:
+                            link.active(router.pathname)
+                              ? colorScheme === 'dark'
+                                ? theme.colors.dark[6]
+                                : theme.colors.gray[2]
+                              : 'transparent',
+                        }}                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          // First expand the sidebar
+                          setNavbarCollapsed(false);
+                          // Then after a delay, open the submenu to allow for sidebar animation
+                          setTimeout(() => {
+                            setExpandedSubmenu(link.label);
+                          }, 300); // Delay to allow sidebar expand animation to complete
+                        }}
                       >
-                        <Menu.Target>
-                          <div
-                            title={link.label}
-                            className={`${styles.navItemCollapsed} ${styles.collapsedItem} ${styles.navItemCollapsedBase}`}
-                            style={{
-                              backgroundColor:
-                                router.pathname === link.href
-                                  ? colorScheme === 'dark'
-                                    ? theme.colors.dark[6]
-                                    : theme.colors.gray[2]
-                                  : 'transparent',
-                            }}
-                          >
-                            <Box
-                              className={`${styles.iconWrapper} ${styles.iconWrapperBase} ${styles.iconWrapperCollapsed}`}
-                            >
-                              {link.icon}
-                            </Box>
-                          </div>
-                        </Menu.Target>
-                        <Menu.Dropdown className={styles.collapsedMenuDropdown}>
-                          <Menu.Label>{link.label}</Menu.Label>
-                          {link.links
-                            .filter(
-                              (sublink) =>
-                                !sublink.if || sublink.if(user as Response['/api/user']['user'], config),
-                            )
-                            .map((sublink) => (
-                              <Menu.Item
-                                key={sublink.label}
-                                leftSection={sublink.icon}
-                                component={Link}
-                                href={sublink.href || ''}
-                              >
-                                {sublink.label}
-                              </Menu.Item>
-                            ))}
-                        </Menu.Dropdown>
-                      </Menu>
+                        <Box
+                          className={`${styles.iconWrapper} ${styles.iconWrapperBase} ${styles.iconWrapperCollapsed}`}
+                        >
+                          {link.icon}
+                        </Box>
+                      </div>
                     );
-                  } else {
-                    return (
+                  } else {                    return (
                       <NavLink
                         key={link.label}
                         label={link.label}
@@ -308,10 +334,38 @@ export function LayoutNavbar({
                         }
                         variant='light'
                         rightSection={<IconChevronRight size='0.7rem' />}
-                        active={router.pathname === link.href}
-                        component={Link}
-                        href={link.href || ''}
+                        active={link.active(router.pathname)}
                         className={`${styles.navItem} ${styles.navItemBase}`}
+                        opened={expandedSubmenu === link.label}                        onChange={(opened) => {
+                          // Handle manual control of submenu
+                          if (opened) {
+                            setExpandedSubmenu(link.label);
+                            // Clear manual close state when opening
+                            if (manuallyClosedSubmenu === link.label) {
+                              setManuallyClosedSubmenu(null);
+                            }
+                          } else {
+                            setExpandedSubmenu(null);
+                            // Track that this submenu was manually closed
+                            setManuallyClosedSubmenu(link.label);
+                          }
+                        }}                        onClick={(e) => {
+                          // Handle click on the main nav item
+                          if (expandedSubmenu === link.label) {
+                            // If already expanded, close it
+                            e.preventDefault();
+                            setExpandedSubmenu(null);
+                            // Track that this submenu was manually closed
+                            setManuallyClosedSubmenu(link.label);
+                          } else {
+                            // Opening a new submenu
+                            setExpandedSubmenu(link.label);
+                            // Clear manual close state when opening
+                            if (manuallyClosedSubmenu === link.label) {
+                              setManuallyClosedSubmenu(null);
+                            }
+                          }
+                        }}
                       >
                         {link.links
                           .filter(
