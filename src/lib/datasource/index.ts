@@ -7,7 +7,6 @@ import { S3Datasource } from './S3';
 let datasource: Datasource;
 
 declare global {
-  // eslint-disable-next-line no-var
   var __datasource__: Datasource;
 }
 
