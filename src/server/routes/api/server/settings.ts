@@ -304,9 +304,6 @@ export default fastifyPlugin(
                   if (typeof domain !== 'object' || !domain.domain || typeof domain.domain !== 'string') {
                     throw new Error('Invalid domain format');
                   }
-                  if (domain.expiresAt && typeof domain.expiresAt !== 'string') {
-                    throw new Error('Invalid expiration date format');
-                  }
                 }
                 return domains;
               } catch {

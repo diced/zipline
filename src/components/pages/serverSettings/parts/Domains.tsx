@@ -8,7 +8,6 @@ import { settingsOnSubmit } from '../settingsOnSubmit';
 
 type Domain = {
   domain: string;
-  expiresAt: string | null;
 };
 
 export default function Domains({
@@ -21,7 +20,6 @@ export default function Domains({
   const form = useForm({
     initialValues: {
       newDomain: '',
-      newExpiresAt: '',
     },
   });
 
@@ -38,19 +36,18 @@ export default function Domains({
   }, [data]);
 
   const addDomain = () => {
-    const { newDomain, newExpiresAt } = form.values;
+    const { newDomain } = form.values;
     if (!newDomain) return;
 
     const updatedDomains = [
       ...domains,
       {
         domain: newDomain.trim(),
-        expiresAt: newExpiresAt.trim() || null,
       },
     ];
 
     setDomains(updatedDomains);
-    form.setValues({ newDomain: '', newExpiresAt: '' });
+    form.setValues({ newDomain: '' });
     onSubmit({ domains: JSON.stringify(updatedDomains) });
   };
 
@@ -73,12 +70,6 @@ export default function Domains({
           placeholder='example.com'
           {...form.getInputProps('newDomain')}
         />
-        <TextInput
-          label='Expiration Date'
-          description='Optional expiration date (YYYY-MM-DD)'
-          placeholder='2024-12-31'
-          {...form.getInputProps('newExpiresAt')}
-        />
         <Button onClick={addDomain} leftSection={<IconPlus size='1rem' />}>
           Add Domain
         </Button>
@@ -90,9 +81,6 @@ export default function Domains({
             <Group justify='space-between'>
               <div>
                 <strong>{domain.domain}</strong>
-                {domain.expiresAt && (
-                  <div style={{ fontSize: '0.8em', color: 'gray' }}>Expires: {domain.expiresAt}</div>
-                )}
               </div>
               <Button
                 variant='subtle'

@@ -70,9 +70,9 @@ export default function UploadOptionsButton({ folder, numFiles }: { folder?: str
 
   const domains = settingsData?.settings.domains ? settingsData.settings.domains : [];
   const domainOptions = (typeof domains === 'string' ? JSON.parse(domains) : domains).map(
-    (domain: { domain: string; expiresAt: string | null }) => ({
+    (domain: { domain: string }) => ({
       value: domain.domain,
-      label: domain.domain + (domain.expiresAt ? ` (expires: ${domain.expiresAt})` : ''),
+      label: domain.domain,
     }),
   );
 
