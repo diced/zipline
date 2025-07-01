@@ -1,12 +1,16 @@
-import { ActionIcon, CopyButton, Paper, ScrollArea, Text, useMantineTheme } from '@mantine/core';
-import { IconCheck, IconClipboardCopy } from '@tabler/icons-react';
+import { ActionIcon, Button, CopyButton, Paper, ScrollArea, Text, useMantineTheme } from '@mantine/core';
+import { IconCheck, IconClipboardCopy, IconChevronDown, IconChevronUp } from '@tabler/icons-react';
 import hljs from 'highlight.js';
+import { useState } from 'react';
 
 export default function HighlightCode({ language, code }: { language: string; code: string }) {
   const theme = useMantineTheme();
+  const [expanded, setExpanded] = useState(false);
 
   const lines = code.split('\n');
   const lineNumbers = lines.map((_, i) => i + 1);
+  const displayLines = expanded ? lines : lines.slice(0, 50);
+  const displayLineNumbers = expanded ? lineNumbers : lineNumbers.slice(0, 50);
 
   if (!hljs.getLanguage(language)) {
     language = 'text';
@@ -35,7 +39,7 @@ export default function HighlightCode({ language, code }: { language: string; co
       <ScrollArea type='auto' dir='ltr' offsetScrollbars={false}>
         <pre style={{ margin: 0 }} className='theme'>
           <code className='theme'>
-            {lines.map((line, i) => (
+            {displayLines.map((line, i) => (
               <div key={i}>
                 <Text
                   component='span'
@@ -44,7 +48,7 @@ export default function HighlightCode({ language, code }: { language: string; co
                   mr='md'
                   style={{ userSelect: 'none', fontFamily: 'monospace' }}
                 >
-                  {lineNumbers[i]}
+                  {displayLineNumbers[i]}
                 </Text>
                 <span
                   className='line'
@@ -57,6 +61,18 @@ export default function HighlightCode({ language, code }: { language: string; co
           </code>
         </pre>
       </ScrollArea>
+
+      {lines.length > 50 && (
+        <Button
+          variant='outline'
+          size='compact-sm'
+          onClick={() => setExpanded(!expanded)}
+          leftSection={expanded ? <IconChevronUp size='1rem' /> : <IconChevronDown size='1rem' />}
+          style={{ position: 'absolute', bottom: '0.5rem', right: '0.5rem' }}
+        >
+          {expanded ? 'Show Less' : `Show More (${lines.length - 50} more lines)`}
+        </Button>
+      )}
     </Paper>
   );
 }
