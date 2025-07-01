@@ -1,44 +1,70 @@
-// TODO: migrate everything to use eslint 9 features instead of compatibility layers
-
 import unusedImports from 'eslint-plugin-unused-imports';
-import typescriptEslint from '@typescript-eslint/eslint-plugin';
-import tsParser from '@typescript-eslint/parser';
+import tseslint from 'typescript-eslint';
+import prettier from 'eslint-plugin-prettier';
+import prettierConfig from 'eslint-config-prettier';
+import nextConfig from '@next/eslint-plugin-next';
+import reactHooksPlugin from 'eslint-plugin-react-hooks';
+import reactPlugin from 'eslint-plugin-react';
+import jsxA11yPlugin from 'eslint-plugin-jsx-a11y';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import js from '@eslint/js';
-import { FlatCompat } from '@eslint/eslintrc';
-import { includeIgnoreFile } from '@eslint/compat';
+import fs from 'node:fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  recommendedConfig: js.configs.recommended,
-  allConfig: js.configs.all,
-});
 
 const gitignorePath = path.resolve(__dirname, '.gitignore');
+const gitignoreContent = fs.readFileSync(gitignorePath, 'utf8');
+const gitignorePatterns = gitignoreContent
+  .split('\n')
+  .filter((line) => line.trim() && !line.startsWith('#'))
+  .map((pattern) => pattern.trim());
 
-export default [
-  includeIgnoreFile(gitignorePath),
-  ...compat.extends(
-    'next/core-web-vitals',
-    'plugin:prettier/recommended',
-    'plugin:@typescript-eslint/recommended',
-  ),
+export default tseslint.config(
+  { ignores: gitignorePatterns },
+
+  ...tseslint.configs.recommended,
+
   {
+    files: ['**/*.{js,mjs,cjs,ts,tsx}'],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
+    },
     plugins: {
       'unused-imports': unusedImports,
-      '@typescript-eslint': typescriptEslint,
+      prettier: prettier,
+      '@next/next': nextConfig,
+      'react-hooks': reactHooksPlugin,
+      react: reactPlugin,
+      'jsx-a11y': jsxA11yPlugin,
     },
-
-    languageOptions: {
-      parser: tsParser,
-    },
-
     rules: {
-      'linebreak-style': ['error', 'unix'],
+      ...reactPlugin.configs.recommended.rules,
 
+      ...reactHooksPlugin.configs.recommended.rules,
+
+      ...nextConfig.configs.recommended.rules,
+      ...nextConfig.configs['core-web-vitals'].rules,
+
+      ...prettierConfig.rules,
+      'prettier/prettier': [
+        'error',
+        {},
+        {
+          fileInfoOptions: {
+            withNodeModules: false,
+          },
+          ignoreFileExtensions: ['pnpm-lock.yaml'],
+        },
+      ],
+
+      'linebreak-style': ['error', 'unix'],
       quotes: [
         'error',
         'single',
@@ -46,7 +72,6 @@ export default [
           avoidEscape: true,
         },
       ],
-
       semi: ['error', 'always'],
       'jsx-quotes': ['error', 'prefer-single'],
       indent: 'off',
@@ -77,10 +102,17 @@ export default [
           argsIgnorePattern: '^_',
         },
       ],
-
       '@typescript-eslint/ban-ts-comment': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unused-expressions': 'off',
     },
+    settings: {
+      react: {
+        version: 'detect',
+      },
+      next: {
+        rootDir: __dirname,
+      },
+    },
   },
-];
+);

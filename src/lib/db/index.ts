@@ -9,7 +9,6 @@ const building = !!process.env.ZIPLINE_BUILD;
 let prisma: ExtendedPrismaClient;
 
 declare global {
-  // eslint-disable-next-line no-var
   var __db__: ExtendedPrismaClient;
 }
 
