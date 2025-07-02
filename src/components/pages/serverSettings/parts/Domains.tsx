@@ -23,8 +23,8 @@ export default function Domains({
 
   useEffect(() => {
     if (!data) return;
-    const domainsData = Array.isArray(data.settings.domains) 
-      ? data.settings.domains.map(d => String(d))
+    const domainsData = Array.isArray(data.settings.domains)
+      ? data.settings.domains.map((d) => String(d))
       : [];
     setDomains(domainsData);
   }, [data]);

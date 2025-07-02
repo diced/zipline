@@ -68,15 +68,13 @@ export default function UploadOptionsButton({ folder, numFiles }: { folder?: str
   const combobox = useCombobox();
   const [folderSearch, setFolderSearch] = useState('');
 
-  const domains = Array.isArray(settingsData?.settings.domains) 
-    ? settingsData.settings.domains 
-    : [];
+  const domains = Array.isArray(settingsData?.settings.domains) ? settingsData.settings.domains : [];
   const domainOptions = [
     { value: '', label: 'Default Domain' },
     ...domains.map((domain) => ({
       value: domain,
       label: domain,
-    }))
+    })),
   ];
 
   useEffect(() => {
@@ -277,9 +275,7 @@ export default function UploadOptionsButton({ folder, numFiles }: { folder?: str
 
             <Combobox.Dropdown>
               <Combobox.Options>
-                <Combobox.Option value='no folder'>
-                  No Folder
-                </Combobox.Option>
+                <Combobox.Option value='no folder'>No Folder</Combobox.Option>
 
                 {folders
                   ?.filter((f) => f.name.toLowerCase().includes(folderSearch.toLowerCase().trim()))

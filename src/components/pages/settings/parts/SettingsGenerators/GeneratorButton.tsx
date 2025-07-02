@@ -109,15 +109,15 @@ export default function GeneratorButton({
   const isUnixLike = name === 'Flameshot' || name === 'Shell Script';
   const onlyFile = generatorType === 'file';
 
-  const domains = Array.isArray(settingsData?.settings.domains) 
-    ? settingsData?.settings.domains.map(d => String(d))
+  const domains = Array.isArray(settingsData?.settings.domains)
+    ? settingsData?.settings.domains.map((d) => String(d))
     : [];
   const domainOptions = [
     { value: '', label: 'Default Domain' },
     ...domains.map((domain) => ({
       value: domain,
       label: domain,
-    }))
+    })),
   ] as { value: string; label: string; disabled?: boolean }[];
 
   return (
