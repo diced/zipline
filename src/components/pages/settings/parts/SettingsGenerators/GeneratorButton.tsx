@@ -109,13 +109,16 @@ export default function GeneratorButton({
   const isUnixLike = name === 'Flameshot' || name === 'Shell Script';
   const onlyFile = generatorType === 'file';
 
-  const domains = settingsData?.settings.domains ? settingsData.settings.domains : [];
-  const domainOptions = (typeof domains === 'string' ? JSON.parse(domains) : domains).map(
-    (domain: { domain: string }) => ({
-      value: domain.domain,
-      label: domain.domain,
-    }),
-  );
+  const domains = Array.isArray(settingsData?.settings.domains) 
+    ? settingsData?.settings.domains.map(d => String(d))
+    : [];
+  const domainOptions = [
+    { value: '', label: 'Default Domain' },
+    ...domains.map((domain) => ({
+      value: domain,
+      label: domain,
+    }))
+  ] as { value: string; label: string; disabled?: boolean }[];
 
   return (
     <>
@@ -196,7 +199,7 @@ export default function GeneratorButton({
           />
 
           <Select
-            data={[{ value: '', label: 'Default Domain' }, ...domainOptions]}
+            data={domainOptions}
             label='Override Domain'
             description='Override the domain with this value. This will change the domain returned in your uploads. Leave blank to use the default domain.'
             leftSection={<IconGlobe size='1rem' />}

@@ -296,20 +296,10 @@ export default fastifyPlugin(
             pwaThemeColor: z.string().regex(/^#?([a-f0-9]{6}|[a-f0-9]{3})$/),
             pwaBackgroundColor: z.string().regex(/^#?([a-f0-9]{6}|[a-f0-9]{3})/),
 
-            domains: z.string().transform((value) => {
-              try {
-                const domains = JSON.parse(value);
-                if (!Array.isArray(domains)) throw new Error('Domains must be an array');
-                for (const domain of domains) {
-                  if (typeof domain !== 'object' || !domain.domain || typeof domain.domain !== 'string') {
-                    throw new Error('Invalid domain format');
-                  }
-                }
-                return domains;
-              } catch {
-                return value;
-              }
-            }),
+            domains: z.union([
+              z.array(z.string()),
+              z.string().transform((value) => value.split(',').map((s) => s.trim())),
+            ]),
           })
           .partial()
           .refine(

@@ -1,14 +1,10 @@
 import { Response } from '@/lib/api/response';
-import { Button, Group, LoadingOverlay, Paper, TextInput, Title } from '@mantine/core';
+import { Button, Group, LoadingOverlay, Paper, SimpleGrid, TextInput, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconPlus, IconTrash } from '@tabler/icons-react';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { settingsOnSubmit } from '../settingsOnSubmit';
-
-type Domain = {
-  domain: string;
-};
 
 export default function Domains({
   swr: { data, isLoading },
@@ -16,7 +12,7 @@ export default function Domains({
   swr: { data: Response['/api/server/settings'] | undefined; isLoading: boolean };
 }) {
   const router = useRouter();
-  const [domains, setDomains] = useState<Domain[]>([]);
+  const [domains, setDomains] = useState<string[]>([]);
   const form = useForm({
     initialValues: {
       newDomain: '',
@@ -27,34 +23,26 @@ export default function Domains({
 
   useEffect(() => {
     if (!data) return;
-
-    const parsedDomains =
-      typeof data.settings.domains === 'string'
-        ? JSON.parse(data.settings.domains)
-        : data.settings.domains || [];
-    setDomains(parsedDomains);
+    const domainsData = Array.isArray(data.settings.domains) 
+      ? data.settings.domains.map(d => String(d))
+      : [];
+    setDomains(domainsData);
   }, [data]);
 
   const addDomain = () => {
     const { newDomain } = form.values;
     if (!newDomain) return;
 
-    const updatedDomains = [
-      ...domains,
-      {
-        domain: newDomain.trim(),
-      },
-    ];
-
+    const updatedDomains = [...domains, newDomain.trim()];
     setDomains(updatedDomains);
     form.setValues({ newDomain: '' });
-    onSubmit({ domains: JSON.stringify(updatedDomains) });
+    onSubmit({ domains: updatedDomains });
   };
 
   const removeDomain = (index: number) => {
     const updatedDomains = domains.filter((_, i) => i !== index);
     setDomains(updatedDomains);
-    onSubmit({ domains: JSON.stringify(updatedDomains) });
+    onSubmit({ domains: updatedDomains });
   };
 
   return (
@@ -75,12 +63,12 @@ export default function Domains({
         </Button>
       </Group>
 
-      <Group mt='md' gap='xs'>
+      <SimpleGrid mt='md' cols={{ base: 1, sm: 2, md: 3 }} spacing='xs'>
         {domains.map((domain, index) => (
-          <Paper key={index} withBorder p='xs' style={{ flex: 1 }}>
+          <Paper key={index} withBorder p='xs'>
             <Group justify='space-between'>
               <div>
-                <strong>{domain.domain}</strong>
+                <strong>{domain}</strong>
               </div>
               <Button
                 variant='subtle'
@@ -100,7 +88,7 @@ export default function Domains({
             </Group>
           </Paper>
         ))}
-      </Group>
+      </SimpleGrid>
     </Paper>
   );
 }

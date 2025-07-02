@@ -136,7 +136,7 @@ model Zipline {
   pwaThemeColor      String  @default("#000000")
   pwaBackgroundColor String  @default("#000000")
 
-  domains            Json    @default("[]")
+  domains            String[] @default([])
 }
 
 model User {
