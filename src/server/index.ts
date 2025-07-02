@@ -225,10 +225,43 @@ async function main() {
 
   if (config.features.thumbnails.enabled) {
     for (let i = 0; i !== config.features.thumbnails.num_threads; ++i) {
-      tasks.worker(`thumbnail-${i}`, './build/offload/thumbnails.js', {
-        id: `thumbnail-${i}`,
-        enabled: config.features.thumbnails.enabled,
-      });
+      tasks.worker(
+        `thumbnail-${i}`,
+        './build/offload/thumbnails.js',
+        {
+          id: `thumbnail-${i}`,
+          enabled: config.features.thumbnails.enabled,
+        },
+        async function (this: Worker, message: any) {
+          if (message.type === 'query') {
+            const { id, query, data } = message;
+
+            let result: any = null;
+            switch (query) {
+              case 'file.findUnique':
+                result = await prisma.file.findUnique(data);
+                break;
+              case 'thumbnail.findFirst':
+                result = await prisma.thumbnail.findFirst(data);
+                break;
+              case 'thumbnail.create':
+                result = await prisma.thumbnail.create(data);
+                break;
+              case 'thumbnail.update':
+                result = await prisma.thumbnail.update(data);
+                break;
+              default:
+                console.error(`Unknown DB query: ${query}`);
+            }
+
+            this.postMessage({
+              type: 'response',
+              id,
+              result: JSON.stringify(result),
+            });
+          }
+        },
+      );
     }
 
     tasks.interval('thumbnails', ms(config.tasks.thumbnailsInterval as StringValue), thumbnails(prisma));

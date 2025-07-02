@@ -98,7 +98,9 @@ export default fastifyPlugin(
 
       const response: ApiUploadResponse = {
         files: [],
-        ...(options.deletesAt && { deletesAt: options.deletesAt.toISOString() }),
+        ...(options.deletesAt && {
+          deletesAt: options.deletesAt === 'never' ? 'never' : options.deletesAt.toISOString(),
+        }),
         ...(config.files.assumeMimetypes && { assumedMimetypes: Array(req.files.length) }),
       };
 

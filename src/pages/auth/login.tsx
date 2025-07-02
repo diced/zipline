@@ -95,9 +95,10 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
     });
 
     if (error) {
-      if (error.error === 'Invalid username') form.setFieldError('username', 'Invalid username');
-      else if (error.error === 'Invalid password') form.setFieldError('password', 'Invalid password');
-      else if (error.error === 'Invalid code') setPinError(error.error!);
+      if (error.error === 'Invalid username or password') {
+        form.setFieldError('username', 'Invalid username');
+        form.setFieldError('password', 'Invalid password');
+      } else if (error.error === 'Invalid code') setPinError(error.error!);
       setPinDisabled(false);
     } else {
       if (data!.totp) {

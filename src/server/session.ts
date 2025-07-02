@@ -6,9 +6,9 @@ import { IncomingMessage, ServerResponse } from 'http';
 import { getIronSession, type SessionOptions } from 'iron-session';
 
 const cookieOptions: SessionOptions['cookieOptions'] = {
-  // week
-  maxAge: 60 * 60 * 24 * 7,
-  expires: new Date(Date.now() + 60 * 60 * 24 * 7 * 1000),
+  // 2 weeks
+  maxAge: 60 * 60 * 24 * 14,
+  expires: new Date(Date.now() + 60 * 60 * 24 * 14 * 1000),
   path: '/',
   sameSite: 'lax',
   httpOnly: false,

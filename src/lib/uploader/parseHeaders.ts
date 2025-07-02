@@ -65,7 +65,7 @@ export type UploadHeaders = {
 };
 
 export type UploadOptions = {
-  deletesAt?: Date;
+  deletesAt?: Date | 'never';
   format?: Config['files']['defaultFormat'];
   imageCompressionPercent?: number;
   password?: string;
@@ -141,10 +141,14 @@ export function parseHeaders(headers: UploadHeaders, fileConfig: Config['files']
   const response: UploadOptions = {};
 
   if (headers['x-zipline-deletes-at']) {
-    const expiresAt = parseExpiry(headers['x-zipline-deletes-at']);
-    if (!expiresAt) return headerError('x-zipline-deletes-at', 'Invalid expiry date');
+    if (headers['x-zipline-deletes-at'].toLowerCase() === 'never') {
+      response.deletesAt = 'never' as any;
+    } else {
+      const expiresAt = parseExpiry(headers['x-zipline-deletes-at']);
+      if (!expiresAt) return headerError('x-zipline-deletes-at', 'Invalid expiry date');
 
-    response.deletesAt = expiresAt;
+      response.deletesAt = expiresAt;
+    }
   } else {
     if (fileConfig.defaultExpiration) {
       const expiresAt = new Date(Date.now() + ms(fileConfig.defaultExpiration as StringValue));

@@ -136,7 +136,9 @@ export async function handleFile({
       },
       ...(options.maxViews && { maxViews: options.maxViews }),
       ...(options.password && { password: await hashPassword(options.password) }),
-      ...(options.deletesAt && { deletesAt: options.deletesAt }),
+      ...(options.deletesAt && options.deletesAt !== 'never'
+        ? { deletesAt: options.deletesAt }
+        : { deletesAt: null }),
       ...(options.folder && { Folder: { connect: { id: options.folder } } }),
       ...(options.addOriginalName && { originalName: file.filename }),
     },

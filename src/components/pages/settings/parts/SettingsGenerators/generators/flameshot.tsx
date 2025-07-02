@@ -68,7 +68,7 @@ export function flameshot(token: string, type: 'file' | 'url', options: Generato
 
   if (type === 'file') {
     script = `#!/bin/bash${options.wl_compositorUnsupported ? '\nexport XDG_CURRENT_DESKTOP=sway' : ''}
-flameshot gui -r > /tmp/screenshot.png
+${options.mac_enableCompatibility ? '/Applications/flameshot.app/Contents/MacOS/flameshot' : 'flameshot'} gui -r > /tmp/screenshot.png
 ${curl.join(' ')}${options.noJson ? '' : ' | jq -r .files[0].url'} | tr -d '\\n' | ${copier(options)}
 `;
   } else {

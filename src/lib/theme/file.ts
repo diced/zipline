@@ -17,6 +17,7 @@ import cat_mocha from './builtins/catppuccin_mocha.theme.json';
 
 import midnight_orange from './builtins/midnight_orange.theme.json';
 import midnight_blue from './builtins/midnight_blue.theme.json';
+import midnight_purple from './builtins/midnight_purple.theme.json';
 
 import { log } from '../logger';
 
@@ -45,14 +46,18 @@ export async function readThemes(): Promise<ZiplineTheme[]> {
     handleOverrideColors(dark_gray as ZiplineTheme),
     handleOverrideColors(light_gray as unknown as ZiplineTheme),
     handleOverrideColors(black_dark as unknown as ZiplineTheme),
+
     handleOverrideColors(light_blue as unknown as ZiplineTheme),
     handleOverrideColors(dark_blue as unknown as ZiplineTheme),
+
     handleOverrideColors(cat_frappe as unknown as ZiplineTheme),
     handleOverrideColors(cat_latte as unknown as ZiplineTheme),
     handleOverrideColors(cat_macchiato as unknown as ZiplineTheme),
     handleOverrideColors(cat_mocha as unknown as ZiplineTheme),
+
     handleOverrideColors(midnight_orange as unknown as ZiplineTheme),
     handleOverrideColors(midnight_blue as unknown as ZiplineTheme),
+    handleOverrideColors(midnight_purple as unknown as ZiplineTheme),
   );
 
   return parsedThemes;

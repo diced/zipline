@@ -2,10 +2,9 @@ import { bytes } from '@/lib/bytes';
 import { reloadSettings } from '@/lib/config';
 import { getDatasource } from '@/lib/datasource';
 import { S3Datasource } from '@/lib/datasource/S3';
-import { prisma } from '@/lib/db';
-import { fileSelect } from '@/lib/db/models/file';
+import { File, fileSelect } from '@/lib/db/models/file';
 import { IncompleteFile } from '@/lib/db/models/incompleteFile';
-import { userSelect } from '@/lib/db/models/user';
+import { User, userSelect } from '@/lib/db/models/user';
 import { log } from '@/lib/logger';
 import { randomCharacters } from '@/lib/random';
 import { UploadOptions } from '@/lib/uploader/parseHeaders';
@@ -15,6 +14,7 @@ import { createReadStream, createWriteStream } from 'fs';
 import { open, readdir, rm } from 'fs/promises';
 import { join } from 'path';
 import { isMainThread, workerData } from 'worker_threads';
+import { dbProxy } from './proxiedDb';
 
 export type PartialWorkerData = {
   user: {
@@ -76,7 +76,7 @@ async function main() {
     })
     .sort((a, b) => a.start - b.start);
 
-  const incompleteFile = await prisma.incompleteFile.create({
+  const incompleteFile = await dbProxy<IncompleteFile>('incompleteFile.create', {
     data: {
       chunksTotal: readChunks.length,
       chunksComplete: 0,
@@ -114,7 +114,7 @@ async function main() {
       });
 
       await rm(chunkPath);
-      await prisma.incompleteFile.update({
+      await dbProxy('incompleteFile.update', {
         where: {
           id: incompleteFile.id,
         },
@@ -171,7 +171,7 @@ async function main() {
     }
   }
 
-  await prisma.incompleteFile.update({
+  await dbProxy('incompleteFile.update', {
     where: {
       id: incompleteFile.id,
     },
@@ -184,7 +184,7 @@ async function main() {
 }
 
 async function runComplete(id: string) {
-  const userr = await prisma.user.findUnique({
+  const userr = await dbProxy<User>('user.findUnique', {
     where: {
       id: user.id,
     },
@@ -192,14 +192,16 @@ async function runComplete(id: string) {
   });
   if (!userr) return;
 
-  const fileUpload = await prisma.file.update({
+  const fileUpload = await dbProxy<File>('file.update', {
     where: {
       id,
     },
     data: {
       size: options.partial!.range[2],
       ...(options.maxViews && { maxViews: options.maxViews }),
-      ...(options.deletesAt && { deletesAt: options.deletesAt }),
+      ...(options.deletesAt && options.deletesAt !== 'never'
+        ? { deletesAt: options.deletesAt }
+        : { deletesAt: null }),
     },
     select: fileSelect,
   });
@@ -218,7 +220,7 @@ async function runComplete(id: string) {
 
 function failPartial(incompleteFile: IncompleteFile) {
   logger.error('failing incomplete file', { id: incompleteFile.id });
-  return prisma.incompleteFile.update({
+  return dbProxy('incompleteFile.update', {
     where: {
       id: incompleteFile.id,
     },

@@ -1,0 +1,33 @@
+{
+  "name": "Midnight Purple",
+  "id": "builtin:midnight_purple",
+  "colorScheme": "dark",
+  "colors": {
+    "pink": [
+      "#f6ecff",
+      "#e6d7fa",
+      "#caabef",
+      "#ac7de6",
+      "#9356dd",
+      "#833ed9",
+      "#7b31d7",
+      "#6422b5",
+      "#5e1fab",
+      "#511797"
+    ],
+    "dark": [
+      "#FFFFFF",
+      "#999999",
+      "#a8a8a8",
+      "#666666",
+      "#282828",
+      "#181818",
+      "#151515",
+      "#111111",
+      "#181818",
+      "#00001E"
+    ]
+  },
+  "primaryColor": "pink",
+  "mainBackgroundColor": "#0a0a0a"
+}

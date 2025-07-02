@@ -3,7 +3,7 @@ import { persist, subscribeWithSelector } from 'zustand/middleware';
 import type { Config } from '../config/validate';
 
 export const defaultUploadOptions: UploadOptionsStore['options'] = {
-  deletesAt: 'never',
+  deletesAt: 'default',
   format: 'default',
   imageCompressionPercent: null,
   maxViews: null,

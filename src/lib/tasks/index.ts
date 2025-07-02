@@ -14,6 +14,8 @@ export interface WorkerTask<Data = any> extends Task {
   path: string;
   data: Data;
 
+  onMessage?: (message: any) => void;
+
   worker?: Worker;
 }
 
@@ -109,6 +111,10 @@ export class Tasks {
       this.tasks.splice(index, 1);
     });
 
+    if (task.onMessage) {
+      worker.on('message', task.onMessage.bind(worker));
+    }
+
     task.worker = worker;
 
     this.logger.debug('started worker', {
@@ -127,12 +133,19 @@ export class Tasks {
     if (start) this.startInterval(this.tasks[len - 1] as IntervalTask);
   }
 
-  public worker<Data = any>(id: string, path: string, data: Data, start: boolean = false): WorkerTask<Data> {
+  public worker<Data = any>(
+    id: string,
+    path: string,
+    data: Data,
+    onMessage: WorkerTask['onMessage'],
+    start: boolean = false,
+  ): WorkerTask<Data> {
     const len = this.tasks.push({
       id,
       path,
       data,
       started: false,
+      onMessage,
     } as WorkerTask<Data>);
 
     if (start) this.startWorker(this.tasks[len - 1] as WorkerTask<Data>);

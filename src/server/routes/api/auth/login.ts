@@ -2,6 +2,7 @@ import { verifyPassword } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
 import { User, userSelect } from '@/lib/db/models/user';
 import { log } from '@/lib/logger';
+import { secondlyRatelimit } from '@/lib/ratelimits';
 import { verifyTotpCode } from '@/lib/totp';
 import { getSession, saveSession } from '@/server/session';
 import fastifyPlugin from 'fastify-plugin';
@@ -22,7 +23,7 @@ const logger = log('api').c('auth').c('login');
 export const PATH = '/api/auth/login';
 export default fastifyPlugin(
   (server, _, done) => {
-    server.post<{ Body: Body }>(PATH, async (req, res) => {
+    server.post<{ Body: Body }>(PATH, secondlyRatelimit(2), async (req, res) => {
       const session = await getSession(req, res);
 
       session.id = null;
@@ -43,7 +44,7 @@ export default fastifyPlugin(
           token: true,
         },
       });
-      if (!user) return res.badRequest('Invalid username');
+      if (!user) return res.badRequest('Invalid username or password');
 
       if (!user.password) return res.badRequest('User does not have a password, login through a provider');
       const valid = await verifyPassword(password, user.password);
@@ -53,7 +54,7 @@ export default fastifyPlugin(
           ip: req.ip ?? 'unknown',
           ua: req.headers['user-agent'],
         });
-        return res.badRequest('Invalid password');
+        return res.badRequest('Invalid username or password');
       }
 
       if (user.totpSecret && code) {

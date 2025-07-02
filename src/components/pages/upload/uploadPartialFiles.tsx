@@ -218,6 +218,10 @@ export async function uploadPartialFiles(
                   >
                     Click here to copy the URL to clipboard while it&apos;s being processed.
                   </Anchor>
+                  <br />
+                  <Anchor component={Link} href='/dashboard/files?popen=true'>
+                    View processing files
+                  </Anchor>
                 </Text>
               ),
               color: 'green',
@@ -239,7 +243,7 @@ export async function uploadPartialFiles(
       );
 
       req.open('POST', '/api/upload');
-      options.deletesAt !== 'never' && req.setRequestHeader('x-zipline-deletes-at', options.deletesAt);
+      options.deletesAt !== 'default' && req.setRequestHeader('x-zipline-deletes-at', options.deletesAt);
       options.format !== 'default' && req.setRequestHeader('x-zipline-format', options.format);
       options.imageCompressionPercent &&
         req.setRequestHeader(

@@ -30,7 +30,6 @@ import {
   IconTrashFilled,
   IconWriting,
 } from '@tabler/icons-react';
-import ms, { StringValue } from 'ms';
 import Link from 'next/link';
 import { parseAsBoolean, useQueryState } from 'nuqs';
 import { useEffect, useState } from 'react';
@@ -96,6 +95,7 @@ export default function UploadOptionsButton({ folder, numFiles }: { folder?: str
         <Stack gap='xs' my='sm'>
           <Select
             data={[
+              { value: 'default', label: `Default (${config.files.defaultExpiration ?? 'never'})` },
               { value: 'never', label: 'Never' },
               { value: '5min', label: '5 minutes' },
               { value: '10min', label: '10 minutes' },
@@ -133,7 +133,7 @@ export default function UploadOptionsButton({ folder, numFiles }: { folder?: str
             label={
               <>
                 Deletes at{' '}
-                {options.deletesAt !== 'never' ? (
+                {options.deletesAt !== 'default' ? (
                   <Badge variant='outline' size='xs'>
                     saved
                   </Badge>
@@ -145,8 +145,8 @@ export default function UploadOptionsButton({ folder, numFiles }: { folder?: str
                 The file will automatically delete itself after this time.{' '}
                 {config.files.defaultExpiration ? (
                   <>
-                    The default expiration time is <b>{ms(config.files.defaultExpiration as StringValue)}</b>{' '}
-                    (you can override this with the below option).
+                    The default expiration time is <b>{config.files.defaultExpiration}</b> (you can override
+                    this with the below option).
                   </>
                 ) : (
                   <>
@@ -159,7 +159,7 @@ export default function UploadOptionsButton({ folder, numFiles }: { folder?: str
             }
             leftSection={<IconAlarmFilled size='1rem' />}
             value={options.deletesAt}
-            onChange={(value) => setOption('deletesAt', value || 'never')}
+            onChange={(value) => setOption('deletesAt', value || 'default')}
             comboboxProps={{
               withinPortal: true,
               portalProps: {
