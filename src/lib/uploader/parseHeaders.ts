@@ -137,7 +137,7 @@ function headerError(header: keyof UploadHeaders, message: string) {
 
 const FORMATS = ['random', 'uuid', 'date', 'name', 'gfycat', 'random-words'];
 
-export function parseHeaders(headers: UploadHeaders, fileConfig: Config['files']): UploadOptions {
+export function parseHeaders(headers: UploadHeaders, fileConfig: Config['files'], user?: { id: string; role: string }): UploadOptions {
   const response: UploadOptions = {};
 
   if (headers['x-zipline-deletes-at']) {
@@ -152,6 +152,30 @@ export function parseHeaders(headers: UploadHeaders, fileConfig: Config['files']
   } else {
     if (fileConfig.defaultExpiration) {
       const expiresAt = new Date(Date.now() + ms(fileConfig.defaultExpiration as StringValue));
+      response.deletesAt = expiresAt;
+    }
+  }
+
+  // Check if enforced expiration should be applied
+  if (fileConfig.enforcedExpirationEnabled && fileConfig.enforcedExpiration) {
+    // Check if user can bypass enforced expiration
+    let canBypass = false;
+    
+    if (user) {
+      // Check if administrators can bypass
+      if (fileConfig.enforcedExpirationBypassAdmins && (user.role === 'ADMIN' || user.role === 'SUPERADMIN')) {
+        canBypass = true;
+      }
+      
+      // Check if user is in the bypass users list
+      if (fileConfig.enforcedExpirationBypassUsers && fileConfig.enforcedExpirationBypassUsers.includes(user.id)) {
+        canBypass = true;
+      }
+    }
+    
+    // Apply enforced expiration if user cannot bypass
+    if (!canBypass) {
+      const expiresAt = new Date(Date.now() + ms(fileConfig.enforcedExpiration as StringValue));
       response.deletesAt = expiresAt;
     }
   }

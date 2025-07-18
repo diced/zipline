@@ -38,7 +38,7 @@ export default fastifyPlugin(
     server.post<{
       Headers: UploadHeaders;
     }>(PATH, { preHandler: [userMiddleware, rateLimit] }, async (req, res) => {
-      const options = parseHeaders(req.headers, config.files);
+      const options = parseHeaders(req.headers, config.files, req.user ? { id: req.user.id, role: req.user.role } : undefined);
       if (options.header) return res.badRequest('bad options, receieved: ' + JSON.stringify(options));
 
       if (options.folder) {

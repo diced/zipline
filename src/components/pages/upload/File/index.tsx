@@ -103,6 +103,7 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
         options,
         ephemeral,
         folder,
+        config,
       });
     }
   };

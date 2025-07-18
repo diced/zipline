@@ -104,6 +104,7 @@ export function uploadFiles(
     options,
     ephemeral,
     folder,
+    config,
   }: {
     setProgress: (o: { percent: number; remaining: number; speed: number }) => void;
     setLoading: (loading: boolean) => void;
@@ -113,6 +114,7 @@ export function uploadFiles(
     options: UploadOptionsStore['options'];
     ephemeral: UploadOptionsStore['ephemeral'];
     folder?: string;
+    config?: { files: { enforcedExpirationEnabled?: boolean } };
   },
 ) {
   setLoading(true);
@@ -185,6 +187,7 @@ export function uploadFiles(
 
   req.open('POST', '/api/upload');
 
+  // Send deletesAt header - server will handle bypass logic
   options.deletesAt !== 'default' && req.setRequestHeader('x-zipline-deletes-at', options.deletesAt);
   options.format !== 'default' && req.setRequestHeader('x-zipline-format', options.format);
   options.imageCompressionPercent &&

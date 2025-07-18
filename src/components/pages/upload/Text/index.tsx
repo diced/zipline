@@ -1,3 +1,4 @@
+import { useConfig } from '@/components/ConfigProvider';
 import Render from '@/components/render/Render';
 import { useUploadOptionsStore } from '@/lib/store/uploadOptions';
 import DashboardUploadText from '@/pages/dashboard/upload/text';
@@ -30,6 +31,7 @@ export default function UploadText({
   codeMeta: Parameters<typeof DashboardUploadText>[0]['codeMeta'];
 }) {
   const clipboard = useClipboard();
+  const config = useConfig();
   const [options, ephemeral, clearEphemeral] = useUploadOptionsStore(
     useShallow((state) => [state.options, state.ephemeral, state.clearEphemeral]),
   );
@@ -75,6 +77,7 @@ export default function UploadText({
       clearEphemeral,
       options,
       ephemeral,
+      config,
     });
   };
 

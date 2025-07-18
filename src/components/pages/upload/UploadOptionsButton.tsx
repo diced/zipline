@@ -2,6 +2,7 @@ import { useConfig } from '@/components/ConfigProvider';
 import { Response } from '@/lib/api/response';
 import { Folder } from '@/lib/db/models/folder';
 import { useUploadOptionsStore } from '@/lib/store/uploadOptions';
+import { useUserStore } from '@/lib/store/user';
 import {
   Badge,
   Button,
@@ -38,6 +39,7 @@ import { useShallow } from 'zustand/shallow';
 
 export default function UploadOptionsButton({ folder, numFiles }: { folder?: string; numFiles: number }) {
   const config = useConfig();
+  const user = useUserStore((state) => state.user);
 
   const [opened, setOpen] = useQueryState('upopen', parseAsBoolean.withDefault(false));
   const [options, ephemeral, setOption, setEphemeral, changes, clearEphemeral, clearOptions] =
@@ -75,6 +77,23 @@ export default function UploadOptionsButton({ folder, numFiles }: { folder?: str
       label: domain,
     })),
   ];
+
+  // Check if user can bypass enforced expiration
+  const canBypassEnforcedExpiration = () => {
+    if (!config.files.enforcedExpirationEnabled || !user) return false;
+    
+    // Check if administrators can bypass
+    if (config.files.enforcedExpirationBypassAdmins && (user.role === 'ADMIN' || user.role === 'SUPERADMIN')) {
+      return true;
+    }
+    
+    // Check if user is in the bypass users list
+    if (config.files.enforcedExpirationBypassUsers && config.files.enforcedExpirationBypassUsers.includes(user.id)) {
+      return true;
+    }
+    
+    return false;
+  };
 
   useEffect(() => {
     if (folder) return;
@@ -138,28 +157,51 @@ export default function UploadOptionsButton({ folder, numFiles }: { folder?: str
                     saved
                   </Badge>
                 ) : null}
+                {config.files.enforcedExpirationEnabled && (
+                  <Badge variant='filled' color='red' size='xs'>
+                    enforced
+                  </Badge>
+                )}
+                {canBypassEnforcedExpiration() && (
+                  <Badge variant='filled' color='green' size='xs'>
+                    can bypass
+                  </Badge>
+                )}
               </>
             }
             description={
-              <>
-                The file will automatically delete itself after this time.{' '}
-                {config.files.defaultExpiration ? (
-                  <>
-                    The default expiration time is <b>{config.files.defaultExpiration}</b> (you can override
-                    this with the below option).
-                  </>
-                ) : (
-                  <>
-                    {'You can set a default expiration time in the '}
-                    <Link href='/dashboard/admin/settings'>settings</Link>
-                    {'.'}
-                  </>
-                )}
-              </>
+              config.files.enforcedExpirationEnabled ? (
+                <>
+                  <b>Enforced expiration is enabled.</b> All files will automatically delete after{' '}
+                  <b>{config.files.enforcedExpiration}</b>.
+                  {canBypassEnforcedExpiration() ? (
+                    <> You can bypass this setting due to your permissions.</>
+                  ) : (
+                    <> This setting cannot be changed.</>
+                  )}
+                </>
+              ) : (
+                <>
+                  The file will automatically delete itself after this time.{' '}
+                  {config.files.defaultExpiration ? (
+                    <>
+                      The default expiration time is <b>{config.files.defaultExpiration}</b> (you can override
+                      this with the below option).
+                    </>
+                  ) : (
+                    <>
+                      {'You can set a default expiration time in the '}
+                      <Link href='/dashboard/admin/settings'>settings</Link>
+                      {'.'}
+                    </>
+                  )}
+                </>
+              )
             }
             leftSection={<IconAlarmFilled size='1rem' />}
             value={options.deletesAt}
             onChange={(value) => setOption('deletesAt', value || 'default')}
+            disabled={config.files.enforcedExpirationEnabled && !canBypassEnforcedExpiration()}
             comboboxProps={{
               withinPortal: true,
               portalProps: {

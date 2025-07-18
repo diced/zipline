@@ -133,6 +133,10 @@ export default fastifyPlugin(
             filesMaxFileSize: zBytes,
 
             filesDefaultExpiration: zMs.nullable(),
+            filesEnforcedExpirationEnabled: z.boolean(),
+            filesEnforcedExpiration: zMs.nullable(),
+            filesEnforcedExpirationBypassAdmins: z.boolean(),
+            filesEnforcedExpirationBypassUsers: z.array(z.string()),
             filesAssumeMimetypes: z.boolean(),
             filesDefaultDateFormat: z.string(),
             filesRemoveGpsMetadata: z.boolean(),

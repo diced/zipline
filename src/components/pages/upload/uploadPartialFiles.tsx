@@ -243,6 +243,7 @@ export async function uploadPartialFiles(
       );
 
       req.open('POST', '/api/upload');
+      // Send deletesAt header - server will handle bypass logic
       options.deletesAt !== 'default' && req.setRequestHeader('x-zipline-deletes-at', options.deletesAt);
       options.format !== 'default' && req.setRequestHeader('x-zipline-format', options.format);
       options.imageCompressionPercent &&
