@@ -65,14 +65,14 @@ export async function handleFile({
 
   if (options.overrides?.filename || format === 'name') {
     if (options.overrides?.filename) fileName = decodeURIComponent(options.overrides!.filename!);
+    const fullFileName = `${fileName}${extension}`;
+
     const existing = await prisma.file.findFirst({
       where: {
-        name: {
-          startsWith: fileName,
-        },
+        name: fullFileName,
       },
     });
-    if (existing) throw `A file with the name "${fileName}*" already exists`;
+    if (existing) throw `A file with the name "${fullFileName}" already exists`;
   }
 
   let mimetype = file.mimetype;

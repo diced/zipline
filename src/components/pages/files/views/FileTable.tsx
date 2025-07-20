@@ -307,9 +307,8 @@ export default function FileTable({ id }: { id?: string }) {
             onClick={() => {
               setIdSearchOpen((open) => !open);
             }}
-            color='blue'
             // lol if it works it works :shrug:
-            style={{ position: 'relative', top: '-36.4px', left: '219px', margin: 0 }}
+            style={{ position: 'relative', top: '-36.4px', left: '221px', margin: 0 }}
           >
             <IconGridPatternFilled size='1rem' />
           </ActionIcon>
