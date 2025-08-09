@@ -119,7 +119,7 @@ export const ENVS = [
 
   env('ratelimit.enabled', 'RATELIMIT_ENABLED', 'boolean', true),
   env('ratelimit.max', 'RATELIMIT_MAX', 'number', true),
-  env('ratelimit.window', 'RATELIMIT_WINDOW', 'string', true),
+  env('ratelimit.window', 'RATELIMIT_WINDOW', 'number', true),
   env('ratelimit.adminBypass', 'RATELIMIT_ADMIN_BYPASS', 'boolean', true),
   env('ratelimit.allowList', 'RATELIMIT_ALLOW_LIST', 'string[]', true),
 
