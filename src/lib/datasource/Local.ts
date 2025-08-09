@@ -42,6 +42,8 @@ export class LocalDatasource extends Datasource {
 
       await copyFile(data, path);
       await rm(data);
+
+      return;
     }
 
     return writeFile(path, data);
