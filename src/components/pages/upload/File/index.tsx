@@ -309,10 +309,12 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
         style={{
           position: 'sticky',
           top: '60px', // Offset for navbar
-          zIndex: 100,
+          zIndex: 99,
           backgroundColor:
-            colorScheme === 'dark' ? 'var(--mantine-color-dark-7)' : 'var(--mantine-color-white)',
-          borderBottom: '1px solid var(--mantine-color-default-border)',
+            colorScheme === 'dark' 
+              ? 'rgba(19, 19, 19, 0.8)' // Semi-transparent dark background
+              : 'rgb(0, 0, 0)', // Semi-transparent white background
+          backdropFilter: 'blur(8px)', // Add blur effect for better readability
           margin: '0 -1rem',
           padding: '1rem',
         }}

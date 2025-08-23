@@ -77,10 +77,9 @@ export default fastifyPlugin(
           }
 
           // Read the file content
-          const fileUrl = `${req.protocol}://${req.hostname}${req.hostname === 'localhost' ? ':3000' : ''}/raw/${file.name}`;
+          const fileUrl = `${req.protocol}://${req.hostname}${req.hostname === 'localhost' ? ':4000' : ''}/raw/${file.name}`;
           const response = await fetch(fileUrl);
           const fileContent = await response.text();
-
           // Upload to paste service
           const pasteResponse = await fetch('https://code.whitedragon.life/api/v2/paste', {
             method: 'POST',
@@ -116,8 +115,6 @@ export default fastifyPlugin(
             },
           });
 
-          logger.info('Paste created for file', { fileId, pasteId, pasteUrl });
-
           return res.send({
             success: true,
             pasteId,
@@ -125,7 +122,7 @@ export default fastifyPlugin(
             alreadyExists: false,
           } as PasteResponse);
         } catch (error) {
-          logger.error('Error creating paste').error(error as Error);
+          logger.error('Error creating paste a').error(error as Error);
           return res.status(500).send({ error: 'Failed to create paste' });
         }
       },

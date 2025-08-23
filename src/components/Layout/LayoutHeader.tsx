@@ -78,11 +78,16 @@ export function LayoutHeader({
       },
     });
   };
-
   return (
     <AppShell.Header
       px='md'
       className={`${styles.header} ${isScrolled ? styles.headerScrolled : ''} ${navbarCollapsed ? styles.headerCollapsed : styles.headerExpanded} ${hasCustomBackground ? styles.headerWithBackground : ''}`}
+      style={{
+        backdropFilter: 'blur(8px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(16px) saturate(180%)',
+        background: colorScheme === 'dark' ? 'rgba(26, 27, 30, 0.85)' : 'rgba(255, 255, 255, 0.85)',
+        borderBottom: colorScheme === 'dark' ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(255, 255, 255, 0.3)',
+      }}
     >
       <div className={styles.headerContent}>
         <div className={styles.headerLeft}>
@@ -95,9 +100,18 @@ export function LayoutHeader({
             hiddenFrom='sm'
           />
         </div>
-
         <div className={styles.menuEnhancedWrapper}>
-          <Menu shadow='md' width={200} withinPortal={false}>
+          <Menu
+            shadow='md'
+            width={200}
+            withinPortal={true}
+            floatingStrategy="fixed"
+            styles={{
+              dropdown: {
+                transform: 'translateX(20px)',
+              }
+            }}
+          >
             <Menu.Target>
               <Button
                 variant='transparent'
@@ -116,7 +130,15 @@ export function LayoutHeader({
               </Button>
             </Menu.Target>
 
-            <Menu.Dropdown className={styles.accountMenuDropdown}>
+            <Menu.Dropdown
+              className={styles.accountMenuDropdown}
+              style={{
+                backdropFilter: 'blur(16px) saturate(180%)',
+                WebkitBackdropFilter: 'blur(16px) saturate(180%)',
+                background: colorScheme === 'dark' ? 'rgba(26, 27, 30, 0.85)' : 'rgba(255, 255, 255, 0.85)',
+                border: colorScheme === 'dark' ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(255, 255, 255, 0.3)',
+              }}
+            >
               <Menu.Label>
                 {user?.username}
                 {isAdministrator(user?.role) ? ' (Administrator)' : ''}

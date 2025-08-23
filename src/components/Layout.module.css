@@ -1,4 +1,19 @@
 /* =================================
+   CSS CUSTOM PROPERTIES
+   ================================= */
+:root {
+  --blur-effect-12: blur(12px) saturate(180%);
+  --blur-effect-16: blur(16px) saturate(180%);
+  --transition-smooth: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-quick: 0.2s ease-in-out;
+  --glass-light: rgba(255, 255, 255, 0.85);
+  --glass-light-border: rgba(255, 255, 255, 0.3);
+  --glass-dark: rgba(26, 27, 30, 0.85);
+  --glass-dark-border: rgba(255, 255, 255, 0.15);
+}
+
+/* =================================
    SIDEBAR BASE STYLES
    ================================= */
 .navbar {
@@ -14,14 +29,14 @@
 
 .navbarContent {
   overflow: visible;
-  transition: padding 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: padding var(--transition-smooth);
 }
 
 /* =================================
    NAVIGATION ITEMS
    ================================= */
 .navItem {
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform var(--transition-fast);
 }
 
 .navItem:hover {
@@ -38,7 +53,7 @@
   align-items: center;
   justify-content: center;
   padding: 0;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all var(--transition-fast);
   box-sizing: border-box;
 }
 
@@ -58,7 +73,7 @@
 .iconWrapper,
 .bottomSection,
 .versionWrapper {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all var(--transition-fast);
 }
 
 /* =================================
@@ -87,7 +102,8 @@
 /* Account menu dropdown styling */
 .accountMenuDropdown {
   z-index: 9999;
-  backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
   transform: translate(20px, 0px);
   background: rgba(255, 255, 255, 0.85);
   border: 1px solid rgba(255, 255, 255, 0.3);
@@ -100,7 +116,7 @@
 }
 
 [data-mantine-color-scheme='dark'] .accountMenuDropdown {
-  background: rgba(25, 25, 25, 0.4);
+  background: rgba(26, 27, 30, 0.85);
   border: 1px solid rgba(255, 255, 255, 0.15);
   box-shadow: 
     0 12px 40px rgba(0, 0, 0, 0.4),
@@ -122,7 +138,7 @@
 }
 
 [data-mantine-color-scheme='dark'] .menuEnhancedWrapper :global(.mantine-Menu-dropdown) {
-  background: rgba(25, 25, 25, 0.85);
+  background: rgba(26, 27, 30, 0.85);
   border: 1px solid rgba(255, 255, 255, 0.15);
   box-shadow: 
     0 12px 40px rgba(0, 0, 0, 0.4),
@@ -220,7 +236,7 @@
    UTILITIES
    ================================= */
 .tooltip {
-  transition: opacity 0.2s ease-in-out;
+  transition: opacity var(--transition-quick);
 }
 
 /* Performance optimizations */
@@ -274,11 +290,11 @@
 
 /* Component overlays with glass morphism */
 .componentOverlay {
-  backdrop-filter: blur(12px) saturate(180%);
-  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  backdrop-filter: var(--blur-effect-12);
+  -webkit-backdrop-filter: var(--blur-effect-12);
   background: rgba(255, 255, 255, 0.1);
   border-radius: 8px;
-  transition: backdrop-filter 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: backdrop-filter var(--transition-fast);
 }
 
 [data-mantine-color-scheme='dark'] .componentOverlay {
@@ -366,15 +382,15 @@
 }
 
 .headerWithBackground {
-  backdrop-filter: blur(12px) saturate(180%);
-  -webkit-backdrop-filter: blur(12px) saturate(180%);
-  background: rgba(255, 255, 255, 0.8);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: var(--blur-effect-16);
+  -webkit-backdrop-filter: var(--blur-effect-16);
+  background: var(--glass-light);
+  border-bottom: 1px solid var(--glass-light-border);
 }
 
 [data-mantine-color-scheme='dark'] .headerWithBackground {
-  background: rgba(0, 0, 0, 0.6);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--glass-dark);
+  border-bottom: 1px solid var(--glass-dark-border);
 }
 
 /* Navbar styles */
@@ -382,10 +398,9 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  background-color: var(--mantine-color-gray-0);
-  transition:
-    background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-    backdrop-filter 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  background-color: var(--mantine-color-gray-0);  transition:
+    background-color var(--transition-smooth),
+    backdrop-filter var(--transition-smooth);
 }
 
 [data-mantine-color-scheme='dark'] .navbarBase {
@@ -393,8 +408,8 @@
 }
 
 .navbarWithBackground {
-  backdrop-filter: blur(12px) saturate(180%);
-  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  backdrop-filter: var(--blur-effect-12);
+  -webkit-backdrop-filter: var(--blur-effect-12);
   background: rgba(255, 255, 255, 0.8);
   border-right: 1px solid rgba(255, 255, 255, 0.2);
 }
@@ -430,10 +445,10 @@
 
 .logoText {
   transition:
-    opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-    margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-    max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity var(--transition-fast),
+    transform var(--transition-fast),
+    margin-left var(--transition-fast),
+    max-width var(--transition-fast);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -460,6 +475,11 @@
   pointer-events: none;
 }
 
+/* Disable logo text animation on initial load */
+.logoTextNoAnimation {
+  transition: none !important;
+}
+
 /* Navigation sections */
 .navSection {
   padding: 16px 9px;
@@ -472,7 +492,7 @@
 /* Sidebar toggle button */
 .sidebarToggle {
   border-radius: 8px;
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all var(--transition-smooth);
   height: 40px;
 }
 
@@ -542,9 +562,9 @@
 }
 
 .mainContentPaperWithBackground {
-  backdrop-filter: blur(12px) saturate(180%);
-  -webkit-backdrop-filter: blur(12px) saturate(180%);
-  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: var(--blur-effect-12);
+  -webkit-backdrop-filter: var(--blur-effect-12);
+  background: var(--glass-light);
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
@@ -614,4 +634,14 @@
   margin-top: 2px;
   transition: all 0.2s ease;
   margin-right: 8px;
+}
+
+/* Disable submenu animation on initial load */
+.noAnimation :global(.mantine-Collapse-root),
+.noAnimation :global([data-mantine-component="Collapse"]) {
+  transition: none !important;
+}
+
+.noAnimation :global(.mantine-NavLink-children) {
+  transition: none !important;
 }
