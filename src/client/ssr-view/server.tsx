@@ -25,7 +25,7 @@ import { createRoutes } from './routes';
 
 export const getFile = async (id: string) =>
   prisma.file.findFirst({
-    where: { name: id as string },
+    where: { name: decodeURIComponent(id) },
     select: {
       ...fileSelect,
       password: true,

@@ -10,5 +10,5 @@ export function useTitle(title?: string) {
   useEffect(() => {
     if (!data || error || isLoading) return;
     document.title = title ? `${data.website.title} – ${title}` : data.website.title || 'Zipline';
-  }, [title, location]);
+  }, [title, location, data, isLoading]);
 }
