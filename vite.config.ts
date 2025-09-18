@@ -14,6 +14,8 @@ export default defineConfig(({ mode }) => {
       },
       server: {
         middlewareMode: true,
+        // not safe in production, but fine in dev
+        allowedHosts: true,
       },
       resolve: {
         alias: {
