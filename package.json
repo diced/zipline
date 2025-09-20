@@ -21,8 +21,8 @@
     "docker:compose:dev:logs": "docker-compose --file docker-compose.dev.yml logs -f"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "3.879.0",
-    "@aws-sdk/lib-storage": "3.879.0",
+    "@aws-sdk/client-s3": "3.726.1",
+    "@aws-sdk/lib-storage": "3.726.1",
     "@fastify/cookie": "^11.0.2",
     "@fastify/cors": "^11.1.0",
     "@fastify/multipart": "^9.0.3",
