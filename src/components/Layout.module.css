@@ -416,10 +416,19 @@
   overflow: hidden; /* Prevent text overflow outside the container */
   width: 100%; /* Ensure full width constraint */
   gap: 8px; /* Slightly increased gap between logo and text */
+  transition: background-color 0.2s ease;
+}
+
+.logoSection:hover {
+  background-color: rgba(0, 0, 0, 0.04);
 }
 
 [data-mantine-color-scheme='dark'] .logoSection {
   border-bottom: 1px solid var(--mantine-color-dark-5);
+}
+
+[data-mantine-color-scheme='dark'] .logoSection:hover {
+  background-color: rgba(255, 255, 255, 0.06);
 }
 
 .logoImage {

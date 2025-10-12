@@ -348,36 +348,59 @@ export function LayoutNavbar({
   return (
     <AppShell.Navbar
       hidden={!opened}
-      zIndex={90}
+      zIndex={100}
       className={`${styles.navbar} ${styles.navbarBase} ${hasCustomBackground ? styles.navbarWithBackground : ''}`}
     >
-      {/* Desktop logo section */}
-      <Box visibleFrom='sm' className={styles.logoSection}>
-        {config.website.titleLogo && (
-          <Avatar
-            src={config.website.titleLogo}
-            alt='logo'
-            radius='sm'
-            size='md'
-            className={styles.logoImage}
-          />
-        )}{' '}
-        <Title
-          size={20}
-          lineClamp={1}
-          ta='center'
-          className={`${styles.logoText} ${localShowLogoText ? styles.logoTextVisible : styles.logoTextHidden} ${!hasUserInteracted ? styles.logoTextNoAnimation : ''}`}
+      <Link 
+        href='/' 
+        style={{ 
+          textDecoration: 'none', 
+          color: 'inherit',
+          display: 'block',
+          width: '100%'
+        }}
+      >
+        <Box 
+          visibleFrom='sm' 
+          className={styles.logoSection}
+          style={{ cursor: 'pointer' }}
         >
-          {config.website.title?.trim() || 'Zipline'}
-        </Title>
-      </Box>
+          {config.website.titleLogo && (
+            <Avatar
+              src={config.website.titleLogo}
+              alt='logo'
+              radius='sm'
+              size='md'
+              className={styles.logoImage}
+            />
+          )}{' '}
+          <Title
+            size={20}
+            lineClamp={1}
+            ta='center'
+            className={`${styles.logoText} ${localShowLogoText ? styles.logoTextVisible : styles.logoTextHidden} ${!hasUserInteracted ? styles.logoTextNoAnimation : ''}`}
+          >
+            {config.website.title?.trim() || 'Zipline'}
+          </Title>
+        </Box>
+      </Link>
       {/* Mobile title */}
-      <Box hiddenFrom='sm' p='md' pb='xs'>
-        <Title size={24} style={{ marginBottom: 8 }}>
-          {config.website.title?.trim() || 'Zipline'}
-        </Title>
-        <Divider />
-      </Box>
+      <Link 
+        href='/' 
+        style={{ 
+          textDecoration: 'none', 
+          color: 'inherit',
+          display: 'block',
+          width: '100%'
+        }}
+      >
+        <Box hiddenFrom='sm' p='md' pb='xs' style={{ cursor: 'pointer' }}>
+          <Title size={24} style={{ marginBottom: 8 }}>
+            {config.website.title?.trim() || 'Zipline'}
+          </Title>
+          <Divider />
+        </Box>
+      </Link>
       {/* Main navigation section */}{' '}
       <ScrollArea flex={1} type='never' className={`${styles.navbarContent} ${styles.navSection}`}>
         <div className={navbarCollapsed ? styles.navSectionCollapsed : ''}>
