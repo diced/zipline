@@ -37,6 +37,7 @@ export default function Features({
       featuresMetricsShowUserSpecific: true,
       featuresVersionChecking: true,
       featuresVersionAPI: 'https://zipline-version.diced.sh/',
+      featuresPublicUpload: false,
     },
     enhanceGetInputProps: (payload) => ({
       disabled: data?.tampered?.includes(payload.field) || false,
@@ -62,6 +63,7 @@ export default function Features({
       featuresMetricsShowUserSpecific: data.settings.featuresMetricsShowUserSpecific ?? true,
       featuresVersionChecking: data.settings.featuresVersionChecking ?? true,
       featuresVersionAPI: data.settings.featuresVersionAPI ?? 'https://zipline-version.diced.sh/',
+      featuresPublicUpload: data.settings.featuresPublicUpload ?? false,
     });
   }, [data]);
 
@@ -73,6 +75,11 @@ export default function Features({
 
       <form onSubmit={form.onSubmit(onSubmit)}>
         <SimpleGrid mt='md' cols={{ base: 1, md: 2 }} spacing='lg'>
+          <Switch
+            label='Enable Public Upload'
+            description='Allow unauthenticated users to upload files. Public uploads will be stored under the default user.'
+            {...form.getInputProps('featuresPublicUpload', { type: 'checkbox' })}
+          />
           <Switch
             label='Image Compression'
             description='Allows the ability for users to compress images.'

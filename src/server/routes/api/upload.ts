@@ -38,6 +38,60 @@ export default fastifyPlugin(
     server.post<{
       Headers: UploadHeaders;
     }>(PATH, { preHandler: [userMiddleware, rateLimit] }, async (req, res) => {
+
+
+            // Public upload 開關檢查
+      if (!req.user) {
+        if (!(config.features?.publicUpload)) {
+          return res.forbidden('Public upload is disabled');
+        }
+        // 若允許 public upload,將 req.user 指向 default user
+        let defaultUser = await prisma.user.findFirst({ 
+          where: { username: 'public' },
+          select: {
+            id: true,
+            username: true,
+            createdAt: true,
+            updatedAt: true,
+            role: true,
+            view: true,
+            oauthProviders: true,
+            totpSecret: true,
+            passkeys: true,
+            quota: true,
+            sessions: true,
+            avatar: true,
+          }
+        });
+        if (!defaultUser) {
+          defaultUser = await prisma.user.create({
+            data: {
+              username: 'public',
+              password: null,
+              avatar: null,
+              token: 'public-' + Math.random().toString(36).slice(2),
+              role: 'USER',
+              sessions: [],
+            },
+            select: {
+              id: true,
+              username: true,
+              createdAt: true,
+              updatedAt: true,
+              role: true,
+              view: true,
+              oauthProviders: true,
+              totpSecret: true,
+              passkeys: true,
+              quota: true,
+              sessions: true,
+              avatar: true,
+            }
+          });
+        }
+        req.user = defaultUser;
+      }
+
       const options = parseHeaders(req.headers, config.files);
       if (options.header) return res.badRequest('bad options, receieved: ' + JSON.stringify(options));
 

@@ -50,6 +50,16 @@ export async function userMiddleware(req: FastifyRequest, res: FastifyReply) {
     !cookies.has('zipline_session');
   if (anonFolderUpload) return;
 
+  // Allow public upload when feature is enabled
+  const isPublicUploadEnabled = config.features?.publicUpload === true;
+  const isUploadRoute = req.url.toLowerCase().trim() === '/api/upload';
+  const hasNoAuth = !req.headers.authorization && !cookies.has('zipline_session');
+  
+  if (isPublicUploadEnabled && isUploadRoute && hasNoAuth) {
+    // Let the upload route handle creating the public user
+    return;
+  }
+
   const authorization = req.headers.authorization;
 
   if (authorization) {

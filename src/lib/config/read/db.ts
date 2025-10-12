@@ -46,8 +46,10 @@ export const DATABASE_TO_PROP = {
   featuresMetricsAdminOnly: 'features.metrics.adminOnly',
   featuresMetricsShowUserSpecific: 'features.metrics.showUserSpecific',
 
+
   featuresVersionChecking: 'features.versionChecking',
   featuresVersionAPI: 'features.versionAPI',
+  featuresPublicUpload: 'features.publicUpload',
 
   invitesEnabled: 'invites.enabled',
   invitesLength: 'invites.length',

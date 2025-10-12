@@ -152,6 +152,7 @@ export const schema = z.object({
     userRegistration: z.boolean().default(false),
     oauthRegistration: z.boolean().default(false),
     deleteOnMaxViews: z.boolean().default(true),
+    publicUpload: z.boolean().default(false),
     thumbnails: z.object({
       enabled: z.boolean().default(true),
       num_threads: z.number().default(4),

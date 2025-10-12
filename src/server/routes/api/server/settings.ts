@@ -154,6 +154,7 @@ export default fastifyPlugin(
             featuresUserRegistration: z.boolean(),
             featuresOauthRegistration: z.boolean(),
             featuresDeleteOnMaxViews: z.boolean(),
+            featuresPublicUpload: z.boolean(),
 
             featuresThumbnailsEnabled: z.boolean(),
             featuresThumbnailsNumberThreads: z

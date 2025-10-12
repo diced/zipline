@@ -58,8 +58,11 @@ model Zipline {
   featuresMetricsAdminOnly        Boolean @default(false)
   featuresMetricsShowUserSpecific Boolean @default(true)
 
+
   featuresVersionChecking Boolean @default(true)
   featuresVersionAPI      String @default("https://zipline-version.diced.sh")
+
+  featuresPublicUpload    Boolean @default(false)
 
   invitesEnabled Boolean @default(true)
   invitesLength  Int     @default(6)
