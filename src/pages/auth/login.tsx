@@ -7,8 +7,11 @@ import { withSafeConfig } from '@/lib/middleware/next/withSafeConfig';
 import { authenticateWeb } from '@/lib/passkey';
 import { eitherTrue } from '@/lib/primitive';
 import {
+  Avatar,
+  Box,
   Button,
   Center,
+  Container,
   Divider,
   Group,
   Image,
@@ -20,6 +23,7 @@ import {
   Stack,
   Text,
   TextInput,
+  ThemeIcon,
   Title,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
@@ -29,8 +33,11 @@ import {
   IconBrandGithubFilled,
   IconBrandGoogleFilled,
   IconCircleKeyFilled,
+  IconCloudUpload,
   IconKey,
+  IconLock,
   IconShieldQuestion,
+  IconUser,
   IconUserPlus,
   IconX,
 } from '@tabler/icons-react';
@@ -175,52 +182,86 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
     <>
       {willRedirect && !showLocalLogin && <LoadingOverlay visible />}
 
-      <Modal onClose={() => {}} title='Enter code' opened={totpOpen} withCloseButton={false}>
-        <Center>
-          <PinInput
-            data-autofocus
-            length={6}
-            oneTimeCode
-            type='number'
-            placeholder=''
-            onChange={handlePinChange}
-            autoFocus={true}
-            error={!!pinError}
-            disabled={pinDisabled}
-            size='xl'
-          />
-        </Center>
-        {pinError && (
-          <Text ta='center' size='sm' c='red' mt={0}>
-            {pinError}
+      <Modal
+        onClose={() => { }}
+        title={
+          <Group gap='xs'>
+            <ThemeIcon variant='light' size='lg' radius='md'>
+              <IconShieldQuestion size='1.2rem' />
+            </ThemeIcon>
+            <Text size='lg' fw={600}>Two-Factor Authentication</Text>
+          </Group>
+        }
+        opened={totpOpen}
+        withCloseButton={false}
+        centered
+        radius='lg'
+        size='md'
+      >
+        <Stack gap='lg' mt='md'>
+          <Text size='sm' c='dimmed' ta='center'>
+            Enter the 6-digit code from your authenticator app
           </Text>
-        )}
+          <Center>
+            <PinInput
+              data-autofocus
+              length={6}
+              oneTimeCode
+              type='number'
+              placeholder=''
+              onChange={handlePinChange}
+              autoFocus={true}
+              error={!!pinError}
+              disabled={pinDisabled}
+              size='xl'
+            />
+          </Center>
+          {pinError && (
+            <Text ta='center' size='sm' c='red' mt={0}>
+              {pinError}
+            </Text>
+          )}
 
-        <Group mt='sm' grow>
-          <Button
-            leftSection={<IconX size='1rem' />}
-            color='red'
-            variant='outline'
-            onClick={() => {
-              setTotpOpen(false);
-              form.reset();
-            }}
-          >
-            Cancel login attempt
-          </Button>
-          <Button
-            leftSection={<IconShieldQuestion size='1rem' />}
-            loading={pinDisabled}
-            type='submit'
-            onClick={() => onSubmit(form.values, pin)}
-          >
-            Verify
-          </Button>
-        </Group>
+          <Group mt='sm' grow>
+            <Button
+              leftSection={<IconX size='1rem' />}
+              color='red'
+              variant='light'
+              onClick={() => {
+                setTotpOpen(false);
+                form.reset();
+              }}
+              size='md'
+            >
+              Cancel
+            </Button>
+            <Button
+              leftSection={<IconShieldQuestion size='1rem' />}
+              loading={pinDisabled}
+              type='submit'
+              onClick={() => onSubmit(form.values, pin)}
+              size='md'
+              variant='gradient'
+              gradient={{ from: 'blue', to: 'cyan' }}
+            >
+              Verify
+            </Button>
+          </Group>
+        </Stack>
       </Modal>
 
-      <Center h='100vh'>
-        {config.website.loginBackground && (
+      <Box
+        style={{
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
+        {/* Background */}
+        {config.website.loginBackground ? (
           <Image
             src={config.website.loginBackground}
             alt={config.website.loginBackground + ' failed to load'}
@@ -236,125 +277,262 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
               ...(config.website.loginBackgroundBlur && { filter: 'blur(10px)' }),
             }}
           />
+        ) : (
+          <Box
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #0f0f0f 100%)',
+            }}
+          />
         )}
 
-        <Paper
-          w='350px'
-          p='xl'
-          shadow='xl'
-          withBorder
+        {/* Animated gradient overlay */}
+        <Box
           style={{
-            backgroundColor: config.website.loginBackground ? 'rgba(0, 0, 0, 0)' : undefined,
-            backdropFilter: config.website.loginBackgroundBlur ? 'blur(35px)' : undefined,
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: config.website.loginBackground
+              ? 'rgba(0, 0, 0, 0.5)'
+              : 'rgba(0, 0, 0, 0.2)',
+            backdropFilter: 'blur(10px)',
           }}
-        >
-          <div style={{ width: '100%', overflowWrap: 'break-word' }}>
-            <Title
-              order={1}
-              ta='center'
-              style={{
-                whiteSpace: 'normal',
-                fontSize: `clamp(20px, ${Math.max(50 - (config.website.title?.length ?? 0) / 2, 20)}px, 50px)`,
-              }}
-            >
-              <b>{config.website.title ?? 'Zipline'}</b>
-            </Title>
-          </div>
+        />
 
-          {showLocalLogin && (
-            <>
+        <Container size='xs' style={{ position: 'relative', zIndex: 1 }}>
+          <Paper
+            p='xl'
+            radius='xl'
+            shadow='xl'
+            style={{
+              backgroundColor: 'rgba(20, 20, 20, 0.95)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
+            }}
+          >
+            {/* Logo and Title */}
+            <Stack gap='lg' align='center' mb='xl'>
+              {config.website.titleLogo ? (
+                <Avatar
+                  src={config.website.titleLogo}
+                  alt='logo'
+                  size={100}
+                />
+              ) : (
+                <ThemeIcon
+                  size={100}
+                  radius='xl'
+                  variant='gradient'
+                  gradient={{ from: 'blue', to: 'cyan', deg: 135 }}
+                  style={{
+                    boxShadow: '0 8px 32px rgba(102, 126, 234, 0.4)',
+                  }}
+                >
+                  <IconCloudUpload size='3rem' />
+                </ThemeIcon>
+              )}
+
+              <div style={{ width: '100%', overflowWrap: 'break-word' }}>
+                <Title
+                  order={1}
+                  ta='center'
+                  style={{
+                    whiteSpace: 'normal',
+                    fontSize: `clamp(24px, ${Math.max(50 - (config.website.title?.length ?? 0) / 2, 24)}px, 50px)`,
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    fontWeight: 800,
+                    letterSpacing: '-0.5px',
+                  }}
+                >
+                  {config.website.title ?? 'Zipline'}
+                </Title>
+              </div>
+            </Stack>
+
+            {/* Login Form */}
+            {showLocalLogin && (
               <form onSubmit={form.onSubmit((v) => onSubmit(v))}>
-                <Stack my='sm'>
+                <Stack gap='md'>
                   <TextInput
-                    size='md'
-                    placeholder='Enter your username...'
+                    size='lg'
+                    placeholder='Username'
+                    leftSection={<IconUser size='1.2rem' style={{ color: 'rgba(255, 255, 255, 0.5)' }} />}
                     styles={{
                       input: {
-                        backgroundColor: config.website.loginBackground ? 'transparent' : undefined,
+                        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        borderRadius: '12px',
+                        paddingLeft: '42px',
+                        color: '#fff',
+                        '&::placeholder': {
+                          color: 'rgba(255, 255, 255, 0.4)',
+                        },
+                        '&:focus': {
+                          backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                          borderColor: '#667eea',
+                          boxShadow: '0 0 0 2px rgba(102, 126, 234, 0.3)',
+                        },
+                        '&:hover': {
+                          backgroundColor: 'rgba(255, 255, 255, 0.07)',
+                        },
                       },
                     }}
                     {...form.getInputProps('username', { withError: true })}
                   />
 
                   <PasswordInput
-                    size='md'
-                    placeholder='Enter your password...'
+                    size='lg'
+                    placeholder='Password'
+                    leftSection={<IconLock size='1.2rem' style={{ color: 'rgba(255, 255, 255, 0.5)' }} />}
                     styles={{
                       input: {
-                        backgroundColor: config.website.loginBackground ? 'transparent' : undefined,
+                        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        borderRadius: '12px',
+                        paddingLeft: '42px',
+                        color: '#fff',
+                        '&::placeholder': {
+                          color: 'rgba(255, 255, 255, 0.4)',
+                        },
+                        '&:focus': {
+                          backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                          borderColor: '#667eea',
+                          boxShadow: '0 0 0 2px rgba(102, 126, 234, 0.3)',
+                        },
+                        '&:hover': {
+                          backgroundColor: 'rgba(255, 255, 255, 0.07)',
+                        },
+                      },
+                      visibilityToggle: {
+                        color: 'rgba(255, 255, 255, 0.5)',
+                        '&:hover': {
+                          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                        },
                       },
                     }}
                     {...form.getInputProps('password')}
                   />
 
                   <Button
-                    size='md'
-                    fullWidth
+                    size='lg'
                     type='submit'
                     loading={isLoading}
-                    variant={config.website.loginBackground ? 'outline' : 'filled'}
+                    variant='gradient'
+                    gradient={{ from: 'gray', to: 'rgba(102, 126, 234, 0.4)', deg: 135 }}
+                    radius='12px'
+                    style={{
+                      marginTop: '8px',
+                      fontWeight: 600,
+                      fontSize: '16px',
+                      transition: 'all 0.3s ease rgba(102, 126, 234, 0.4)',
+                      justifyContent: 'center',
+                    }}
                   >
-                    Login
+                    Login to Account
                   </Button>
                 </Stack>
               </form>
-            </>
-          )}
-
-          <Stack my='xs'>
-            {eitherTrue(config.features.oauthRegistration, config.features.userRegistration) && (
-              <Divider label='or' />
             )}
 
-            {config.mfa.passkeys && (
-              <Button
-                onClick={handlePasskeyLogin}
-                size='md'
-                fullWidth
-                variant='outline'
-                leftSection={<IconKey size='1rem' />}
-                color={passkeyErrored ? 'red' : undefined}
-                loading={passkeyLoading}
-              >
-                Login with passkey
-              </Button>
-            )}
-
-            {config.features.userRegistration && (
-              <Button
-                component={Link}
-                href='/auth/register'
-                size='md'
-                fullWidth
-                variant='outline'
-                leftSection={<IconUserPlus size='1rem' />}
-              >
-                Sign up
-              </Button>
-            )}
-            <Group grow>
-              {config.oauthEnabled.discord && (
-                <ExternalAuthButton
-                  provider='Discord'
-                  leftSection={<IconBrandDiscordFilled stroke={4} size='1.1rem' />}
+            {/* Divider */}
+            {(eitherTrue(config.features.oauthRegistration, config.features.userRegistration) ||
+              config.mfa.passkeys ||
+              Object.values(config.oauthEnabled).some(x => x === true)) && showLocalLogin && (
+                <Divider
+                  label={<Text size='sm' fw={500} style={{ color: 'rgba(255, 255, 255, 0.5)' }}>OR CONTINUE WITH</Text>}
+                  labelPosition='center'
+                  my='xl'
+                  style={{ borderColor: 'rgba(255, 255, 255, 0.1)' }}
                 />
               )}
-              {config.oauthEnabled.github && (
-                <ExternalAuthButton provider='GitHub' leftSection={<IconBrandGithubFilled size='1.1rem' />} />
+
+            {/* Additional Options */}
+            <Stack
+              gap='md'
+              style={{
+                width: '20vw'
+              }}
+            >
+              {config.mfa.passkeys && (
+                <Button
+                  onClick={handlePasskeyLogin}
+                  size='lg'
+                  fullWidth
+                  variant='light'
+                  leftSection={<IconKey size='1.2rem' />}
+                  color={passkeyErrored ? 'red' : 'blue'}
+                  loading={passkeyLoading}
+                  radius='xl'
+                  style={{
+                    fontWeight: 500,
+                    transition: 'all 0.3s ease',
+                  }}
+                >
+                  Login with Passkey
+                </Button>
               )}
-              {config.oauthEnabled.google && (
-                <ExternalAuthButton
-                  provider='Google'
-                  leftSection={<IconBrandGoogleFilled stroke={4} size='1.1rem' />}
-                />
+
+              {config.features.userRegistration && (
+                <Button
+                  component={Link}
+                  href='/auth/register'
+                  size='lg'
+                  fullWidth
+                  variant='light'
+                  color='violet'
+                  leftSection={<IconUserPlus size='1.2rem' />}
+                  radius='xl'
+                  style={{
+                    fontWeight: 500,
+                    transition: 'all 0.3s ease',
+                  }}
+                >
+                  Create New Account
+                </Button>
               )}
-              {config.oauthEnabled.oidc && (
-                <ExternalAuthButton provider='OIDC' leftSection={<IconCircleKeyFilled size='1.1rem' />} />
+
+              {/* OAuth Providers */}
+              {Object.values(config.oauthEnabled).some(x => x === true) && (
+                <Group grow>
+                  {config.oauthEnabled.discord && (
+                    <ExternalAuthButton
+                      provider='Discord'
+                      leftSection={<IconBrandDiscordFilled stroke={4} size='1.1rem' />}
+                    />
+                  )}
+                  {config.oauthEnabled.github && (
+                    <ExternalAuthButton
+                      provider='GitHub'
+                      leftSection={<IconBrandGithubFilled size='1.1rem' />}
+                    />
+                  )}
+                  {config.oauthEnabled.google && (
+                    <ExternalAuthButton
+                      provider='Google'
+                      leftSection={<IconBrandGoogleFilled stroke={4} size='1.1rem' />}
+                    />
+                  )}
+                  {config.oauthEnabled.oidc && (
+                    <ExternalAuthButton
+                      provider='OIDC'
+                      leftSection={<IconCircleKeyFilled size='1.1rem' />}
+                    />
+                  )}
+                </Group>
               )}
-            </Group>
-          </Stack>
-        </Paper>
-      </Center>
+            </Stack>
+          </Paper>
+        </Container>
+      </Box>
     </>
   );
 }
