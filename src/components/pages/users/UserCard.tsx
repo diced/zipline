@@ -28,7 +28,7 @@ export default function UserCard({ user }: { user: User }) {
                 radius='sm'
                 src={user.avatar ?? null}
               >
-                {user.username[0].toUpperCase()}
+                {user.username?.[0]?.toUpperCase() || '?'}
               </Avatar>
 
               <Stack gap={1}>

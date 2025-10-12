@@ -1,13 +1,4 @@
-import {
-  Paper,
-  Container,
-  Group,
-  ThemeIcon,
-  Text,
-  Button,
-  Avatar,
-  Menu,
-} from '@mantine/core';
+import { Paper, Container, Group, ThemeIcon, Text, Button, Avatar, Menu } from '@mantine/core';
 import {
   IconCloudUpload,
   IconDashboard,
@@ -66,36 +57,44 @@ export function UploadHeader({ isAuthenticated, avatar, username, logoUrl, title
             {isAuthenticated ? (
               <>
                 <Link href='/dashboard' passHref legacyBehavior>
-                  <Button
-                    component='a'
-                    leftSection={<IconDashboard size='1rem' />}
-                    variant='light'
-                  >
+                  <Button component='a' leftSection={<IconDashboard size='1rem' />} variant='light'>
                     Dashboard
                   </Button>
                 </Link>
                 <Menu shadow='md' width={220}>
                   <Menu.Target>
-                    <Avatar
-                      src={avatar}
-                      alt={username}
-                      radius='xl'
-                      style={{ cursor: 'pointer' }}
-                    />
+                    <Avatar src={avatar} alt={username} radius='xl' style={{ cursor: 'pointer' }} />
                   </Menu.Target>
                   <Menu.Dropdown>
                     <Menu.Label>{username || 'Account'}</Menu.Label>
-                    <Menu.Item leftSection={<IconFiles size='0.9rem' />} component={Link} href='/dashboard/files'>
+                    <Menu.Item
+                      leftSection={<IconFiles size='0.9rem' />}
+                      component={Link}
+                      href='/dashboard/files'
+                    >
                       Files
                     </Menu.Item>
-                    <Menu.Item leftSection={<IconLink size='0.9rem' />} component={Link} href='/dashboard/urls'>
+                    <Menu.Item
+                      leftSection={<IconLink size='0.9rem' />}
+                      component={Link}
+                      href='/dashboard/urls'
+                    >
                       URLs
                     </Menu.Item>
-                    <Menu.Item leftSection={<IconSettings size='0.9rem' />} component={Link} href='/dashboard/settings'>
+                    <Menu.Item
+                      leftSection={<IconSettings size='0.9rem' />}
+                      component={Link}
+                      href='/dashboard/settings'
+                    >
                       Settings
                     </Menu.Item>
                     <Menu.Divider />
-                    <Menu.Item color='red' leftSection={<IconLogout size='0.9rem' />} component={Link} href='/auth/logout'>
+                    <Menu.Item
+                      color='red'
+                      leftSection={<IconLogout size='0.9rem' />}
+                      component={Link}
+                      href='/auth/logout'
+                    >
                       Logout
                     </Menu.Item>
                   </Menu.Dropdown>
@@ -122,11 +121,7 @@ export function UploadHeader({ isAuthenticated, avatar, username, logoUrl, title
                   Discord
                 </Button>
                 <Link href='/auth/login' passHref legacyBehavior>
-                  <Button
-                    component='a'
-                    leftSection={<IconLogin size='1rem' />}
-                    variant='light'
-                  >
+                  <Button component='a' leftSection={<IconLogin size='1rem' />} variant='light'>
                     Login
                   </Button>
                 </Link>

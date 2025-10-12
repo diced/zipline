@@ -207,7 +207,7 @@ function modifier(
       default:
         return `{unknown_date_modifier(${mod})}`;
     }
-  } else if (typeof value === 'string') {
+  } else if (typeof value === 'string' && value != null) {
     switch (true) {
       case mod == 'upper':
         return value.toUpperCase();

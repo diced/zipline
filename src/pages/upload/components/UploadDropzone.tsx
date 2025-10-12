@@ -44,12 +44,7 @@ export function UploadDropzone({
         >
           <Center style={{ cursor: 'pointer', padding: '40px 20px' }}>
             <Stack align='center' gap='md'>
-              <ThemeIcon
-                size={80}
-                radius='xl'
-                variant='gradient'
-                gradient={{ from: 'blue', to: 'cyan' }}
-              >
+              <ThemeIcon size={80} radius='xl' variant='gradient' gradient={{ from: 'blue', to: 'cyan' }}>
                 <IconCloudUpload size='3rem' />
               </ThemeIcon>
               <Title order={2} fw={700} style={{ color: '#74b9ff' }}>

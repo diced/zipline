@@ -351,20 +351,16 @@ export function LayoutNavbar({
       zIndex={100}
       className={`${styles.navbar} ${styles.navbarBase} ${hasCustomBackground ? styles.navbarWithBackground : ''}`}
     >
-      <Link 
-        href='/' 
-        style={{ 
-          textDecoration: 'none', 
+      <Link
+        href='/'
+        style={{
+          textDecoration: 'none',
           color: 'inherit',
           display: 'block',
-          width: '100%'
+          width: '100%',
         }}
       >
-        <Box 
-          visibleFrom='sm' 
-          className={styles.logoSection}
-          style={{ cursor: 'pointer' }}
-        >
+        <Box visibleFrom='sm' className={styles.logoSection} style={{ cursor: 'pointer' }}>
           {config.website.titleLogo && (
             <Avatar
               src={config.website.titleLogo}
@@ -385,13 +381,13 @@ export function LayoutNavbar({
         </Box>
       </Link>
       {/* Mobile title */}
-      <Link 
-        href='/' 
-        style={{ 
-          textDecoration: 'none', 
+      <Link
+        href='/'
+        style={{
+          textDecoration: 'none',
           color: 'inherit',
           display: 'block',
-          width: '100%'
+          width: '100%',
         }}
       >
         <Box hiddenFrom='sm' p='md' pb='xs' style={{ cursor: 'pointer' }}>

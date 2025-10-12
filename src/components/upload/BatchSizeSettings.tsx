@@ -10,8 +10,12 @@ export function BatchSizeSettings({ batchSize, onBatchSizeChange }: BatchSizeSet
     <Box mt='md' pt='md' style={{ borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
       <Group justify='space-between' align='center'>
         <Group gap='xs'>
-          <Text size='sm' c='dimmed'>Batch Upload Size:</Text>
-          <Text size='sm' fw={600}>{batchSize} files per batch</Text>
+          <Text size='sm' c='dimmed'>
+            Batch Upload Size:
+          </Text>
+          <Text size='sm' fw={600}>
+            {batchSize} files per batch
+          </Text>
         </Group>
         <Group gap='xs'>
           <Button
@@ -30,17 +34,14 @@ export function BatchSizeSettings({ batchSize, onBatchSizeChange }: BatchSizeSet
           >
             +
           </Button>
-          <Button
-            variant='subtle'
-            size='xs'
-            onClick={() => onBatchSizeChange(5)}
-          >
+          <Button variant='subtle' size='xs' onClick={() => onBatchSizeChange(5)}>
             Reset
           </Button>
         </Group>
       </Group>
       <Text size='xs' c='dimmed' mt='xs'>
-        When uploading many files, they will be processed in batches of {batchSize}. Adjust between 1-50 files per batch.
+        When uploading many files, they will be processed in batches of {batchSize}. Adjust between 1-50 files
+        per batch.
       </Text>
     </Box>
   );

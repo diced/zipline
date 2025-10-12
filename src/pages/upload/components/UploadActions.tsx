@@ -1,11 +1,5 @@
 import { Paper, Group, Button } from '@mantine/core';
-import {
-  IconFiles,
-  IconFolder,
-  IconDownload,
-  IconClipboard,
-  IconUpload,
-} from '@tabler/icons-react';
+import { IconFiles, IconFolder, IconDownload, IconClipboard, IconUpload } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 
 interface UploadActionsProps {

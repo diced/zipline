@@ -77,23 +77,23 @@ export function useFileUpload({
           const currentTime = Date.now();
           const timeDiff = (currentTime - lastTime) / 1000;
           const loadedDiff = e.loaded - lastLoaded;
-          
+
           if (timeDiff >= 0.1 && loadedDiff > 0) {
             const instantSpeed = loadedDiff / timeDiff;
             speedValues.push(instantSpeed);
-            
+
             if (speedValues.length > 5) {
               speedValues.shift();
             }
-            
+
             const avgSpeed = speedValues.reduce((sum, s) => sum + s, 0) / speedValues.length;
-            
+
             const updatedSpeed: { [key: string]: number } = {};
             files.forEach((file) => {
               updatedSpeed[file.name] = avgSpeed;
             });
             onSpeedUpdate?.(updatedSpeed);
-            
+
             lastLoaded = e.loaded;
             lastTime = currentTime;
           }
@@ -180,7 +180,7 @@ export function useFileUpload({
       });
 
       xhr.open('POST', '/api/upload');
-      
+
       Object.entries(headers).forEach(([key, value]) => {
         xhr.setRequestHeader(key, value);
       });

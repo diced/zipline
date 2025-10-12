@@ -46,8 +46,8 @@ async function downloadFromUrlRoute(fastify: FastifyInstance) {
       });
 
       if (!response.ok) {
-        return reply.status(400).send({ 
-          error: `Failed to download file: ${response.status} ${response.statusText}` 
+        return reply.status(400).send({
+          error: `Failed to download file: ${response.status} ${response.statusText}`,
         });
       }
 
@@ -63,15 +63,17 @@ async function downloadFromUrlRoute(fastify: FastifyInstance) {
 
       // Convert response to buffer and send
       const buffer = Buffer.from(await response.arrayBuffer());
-      
-      logger.info(`Successfully downloaded file from URL: ${url}, size: ${buffer.length} bytes`);
-      
-      return reply.send(buffer);
 
+      logger.info(`Successfully downloaded file from URL: ${url}, size: ${buffer.length} bytes`);
+
+      return reply.send(buffer);
     } catch (error) {
-      logger.error('Download error:', error instanceof Error ? { message: error.message, stack: error.stack } : { error });
-      return reply.status(500).send({ 
-        error: error instanceof Error ? error.message : 'Internal server error' 
+      logger.error(
+        'Download error:',
+        error instanceof Error ? { message: error.message, stack: error.stack } : { error },
+      );
+      return reply.status(500).send({
+        error: error instanceof Error ? error.message : 'Internal server error',
       });
     }
   });

@@ -15,7 +15,6 @@ export function useBatchUpload({
   onQueueUpdate,
   onBatchIndexUpdate,
 }: UseBatchUploadProps) {
-  
   const uploadFilesInBatches = async (allFiles: File[]) => {
     if (allFiles.length === 0) return;
 
@@ -24,7 +23,7 @@ export function useBatchUpload({
 
     const totalFiles = allFiles.length;
     const batches = [];
-    
+
     for (let i = 0; i < allFiles.length; i += batchSize) {
       batches.push(allFiles.slice(i, i + batchSize));
     }
@@ -40,10 +39,10 @@ export function useBatchUpload({
     for (let i = 0; i < batches.length; i++) {
       const batch = batches[i];
       onBatchIndexUpdate?.(i);
-      
+
       try {
         await uploadFiles(batch);
-        
+
         if (i < batches.length - 1) {
           notifications.show({
             title: 'Batch completed',

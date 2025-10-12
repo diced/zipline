@@ -179,7 +179,7 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
       const totalSize = uploadQueue.reduce((sum, file) => sum + file.size, 0);
       const uploadedSize = uploadQueue.reduce((sum, file) => {
         const progress = fileProgress[file.name] || 0;
-        return sum + (file.size * (progress / 100));
+        return sum + file.size * (progress / 100);
       }, 0);
       const overallProgress = totalSize > 0 ? (uploadedSize / totalSize) * 100 : 0;
 
@@ -232,7 +232,11 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
 
   // Custom upload function that captures response and auto-copies links
   // suppressIntermediateNotifications: when true, skip non-final notifications
-  const customUploadFiles = async (files: File[], isBatchMode = false, suppressIntermediateNotifications = false) => {
+  const customUploadFiles = async (
+    files: File[],
+    isBatchMode = false,
+    suppressIntermediateNotifications = false,
+  ) => {
     // Initialize or reset progress for current batch files
     setFileProgress((prev) => {
       const updated = { ...prev };
@@ -357,7 +361,7 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
               ...uploadedFile,
               name: files[idx]?.name || uploadedFile.name || `file-${idx}`,
             }));
-            
+
             console.log('Uploaded files with names:', filesWithNames);
             setUploadedFiles((prev) => [...prev, ...filesWithNames]);
 
@@ -427,13 +431,13 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
             icon: <IconFileXFilled size='1rem' />,
             autoClose: 8000,
           });
-          
+
           console.error('Upload failed:', {
             status: xhr.status,
             statusText: xhr.statusText,
             response: xhr.responseText,
           });
-          
+
           reject(new Error('Upload failed'));
         }
       });
@@ -692,14 +696,14 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
   const backgroundStyle =
     isAuthenticated && backgroundType === 'image' && backgroundImageUrl && backgroundImageUrl.trim() !== ''
       ? {
-        backgroundImage: `url("${backgroundImageUrl}")`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        filter: 'blur(10px)',
-      }
+          backgroundImage: `url("${backgroundImageUrl}")`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          filter: 'blur(10px)',
+        }
       : {
-        background: 'linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%)', // Darker background
-      };
+          background: 'linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%)', // Darker background
+        };
 
   // ✅ 不需要客戶端條件檢查 - SSR 已經處理認證
   // 如果執行到這裡,表示用戶已通過 getServerSideProps 驗證
@@ -717,280 +721,285 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
         <meta name='viewport' content='width=device-width, initial-scale=1' />
       </Head>
 
-        {/* Background */}
-        <UploadBackground
-          backgroundStyle={backgroundStyle}
-          isAuthenticated={isAuthenticated}
-          backgroundType={backgroundType}
-          backgroundImageUrl={backgroundImageUrl}
-        />
+      {/* Background */}
+      <UploadBackground
+        backgroundStyle={backgroundStyle}
+        isAuthenticated={isAuthenticated}
+        backgroundType={backgroundType}
+        backgroundImageUrl={backgroundImageUrl}
+      />
 
-        {/* Header */}
-        <UploadHeader
-          isAuthenticated={isAuthenticated}
-          avatar={avatar}
-          username={user?.username}
-          logoUrl={config?.website?.titleLogo ?? null}
-          titleText={config?.website?.title ?? 'Zipline'}
-        />
+      {/* Header */}
+      <UploadHeader
+        isAuthenticated={isAuthenticated}
+        avatar={avatar}
+        username={user?.username}
+        logoUrl={config?.website?.titleLogo ?? null}
+        titleText={config?.website?.title ?? 'Zipline'}
+      />
 
-        {/* Main Content */}
-        <Box style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <Container size='md' py='lg'>
-            <Stack gap='lg' maw={800}>
-              {/* Upload Actions */}
-              <Paper
-                p='md'
-                radius='lg'
+      {/* Main Content */}
+      <Box style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <Container size='md' py='lg'>
+          <Stack gap='lg' maw={800}>
+            {/* Upload Actions */}
+            <Paper
+              p='md'
+              radius='lg'
+              style={{
+                backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                backdropFilter: 'blur(20px)',
+                border: 'none',
+                opacity: !isAuthenticated && !publicUploadEnabled ? 0.5 : 1,
+                pointerEvents: !isAuthenticated && !publicUploadEnabled ? 'none' : 'auto',
+              }}
+            >
+              <Group justify='center' gap='sm'>
+                <Button
+                  variant='light'
+                  leftSection={<IconFiles size='0.8rem' />}
+                  onClick={() => {
+                    if (isLocked) {
+                      notifications.show({
+                        title: 'Upload in progress',
+                        message: 'Please wait for the current upload to complete',
+                        color: 'yellow',
+                        icon: <IconUpload size='1rem' />,
+                        autoClose: 3000,
+                      });
+                      return;
+                    }
+
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.multiple = true;
+                    input.onchange = (e) => {
+                      const target = e.target as HTMLInputElement;
+                      if (target.files && target.files.length > 0) {
+                        handleFilesAdded(Array.from(target.files));
+                      }
+                    };
+                    input.click();
+                  }}
+                  radius='md'
+                  size='md'
+                  disabled={isLocked}
+                >
+                  Select Files
+                </Button>
+                <Button
+                  variant='light'
+                  leftSection={<IconFolder size='0.8rem' />}
+                  onClick={() => {
+                    if (isLocked) {
+                      notifications.show({
+                        title: 'Upload in progress',
+                        message: 'Please wait for the current upload to complete',
+                        color: 'yellow',
+                        icon: <IconUpload size='1rem' />,
+                      });
+                      return;
+                    }
+
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.webkitdirectory = true;
+                    input.multiple = true;
+                    input.onchange = (e) => {
+                      const target = e.target as HTMLInputElement;
+                      if (target.files) {
+                        const fileArray = Array.from(target.files);
+                        if (fileArray.length > 0) {
+                          // Group files by directory
+                          const folderMap = new Map<string, File[]>();
+                          fileArray.forEach((file) => {
+                            const pathParts = file.webkitRelativePath.split('/');
+                            const folderName = pathParts[0];
+                            if (!folderMap.has(folderName)) {
+                              folderMap.set(folderName, []);
+                            }
+                            folderMap.get(folderName)!.push(file);
+                          });
+
+                          // Convert to folder structure
+                          const newFolders = Array.from(folderMap.entries()).map(([name, files]) => ({
+                            name,
+                            files,
+                          }));
+
+                          setFolders((prev) => [...prev, ...newFolders]);
+                          // Folder upload notifications removed for cleaner UX
+
+                          // Use the same file-added path for auto-upload & queueing
+                          setTimeout(() => {
+                            console.log(
+                              '📁 Folder: delegating to handleFilesAdded with',
+                              fileArray.length,
+                              'files',
+                            );
+                            if (isLocked) {
+                              notifications.show({
+                                title: 'Upload in progress',
+                                message: 'Please wait for the current upload to complete',
+                                color: 'yellow',
+                                icon: <IconUpload size='1rem' />,
+                                autoClose: 3000,
+                              });
+                              return;
+                            }
+                            if (!isAuthenticated && !publicUploadEnabled) {
+                              notifications.show({
+                                title: 'Upload not allowed',
+                                message:
+                                  'Please log in to upload files or contact admin to enable public uploads',
+                                color: 'red',
+                                autoClose: 5000,
+                              });
+                              return;
+                            }
+                            if (fileArray.length > 0) {
+                              handleFilesAdded(fileArray);
+                            }
+                          }, 100);
+                        }
+                      }
+                    };
+                    input.click();
+                  }}
+                  radius='md'
+                  size='md'
+                  disabled={isLocked}
+                >
+                  Select Folder
+                </Button>
+                <Button
+                  variant='light'
+                  leftSection={<IconDownload size='0.8rem' />}
+                  onClick={openUrlDownload}
+                  radius='md'
+                  size='md'
+                  disabled={isLocked}
+                >
+                  Download from URL
+                </Button>
+                <Button
+                  variant='light'
+                  leftSection={<IconClipboard size='0.8rem' />}
+                  onClick={() => {
+                    if (isLocked) {
+                      notifications.show({
+                        title: 'Upload in progress',
+                        message: 'Please wait for the current upload to complete',
+                        color: 'yellow',
+                        icon: <IconUpload size='1rem' />,
+                        autoClose: 3000,
+                      });
+                      return;
+                    }
+                    // Paste ready notifications removed for cleaner UX
+                  }}
+                  radius='md'
+                  size='md'
+                  disabled={isLocked}
+                >
+                  Paste from Clipboard
+                </Button>
+              </Group>
+
+              {/* Batch Size Settings */}
+              <Box
+                mt='md'
+                pt='md'
                 style={{
-                  backgroundColor: 'rgba(0, 0, 0, 0.6)',
-                  backdropFilter: 'blur(20px)',
-                  border: 'none',
-                  opacity: (!isAuthenticated && !publicUploadEnabled) ? 0.5 : 1,
-                  pointerEvents: (!isAuthenticated && !publicUploadEnabled) ? 'none' : 'auto',
+                  borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+                  opacity: isLocked ? 0.6 : 1,
+                  pointerEvents: isLocked ? ('none' as const) : 'auto',
                 }}
               >
-                <Group justify='center' gap='sm'>
-                  <Button
-                    variant='light'
-                    leftSection={<IconFiles size='0.8rem' />}
-                    onClick={() => {
-                      if (isLocked) {
-                        notifications.show({
-                          title: 'Upload in progress',
-                          message: 'Please wait for the current upload to complete',
-                          color: 'yellow',
-                          icon: <IconUpload size='1rem' />,
-                          autoClose: 3000,
-                        });
-                        return;
-                      }
-
-                      const input = document.createElement('input');
-                      input.type = 'file';
-                      input.multiple = true;
-                      input.onchange = (e) => {
-                        const target = e.target as HTMLInputElement;
-                        if (target.files && target.files.length > 0) {
-                          handleFilesAdded(Array.from(target.files));
-                        }
-                      };
-                      input.click();
-                    }}
-                    radius='md'
-                    size='md'
-                    disabled={isLocked}
-                  >
-                    Select Files
-                  </Button>
-                  <Button
-                    variant='light'
-                    leftSection={<IconFolder size='0.8rem' />}
-                    onClick={() => {
-                      if (isLocked) {
-                        notifications.show({
-                          title: 'Upload in progress',
-                          message: 'Please wait for the current upload to complete',
-                          color: 'yellow',
-                          icon: <IconUpload size='1rem' />,
-                        });
-                        return;
-                      }
-
-                      const input = document.createElement('input');
-                      input.type = 'file';
-                      input.webkitdirectory = true;
-                      input.multiple = true;
-                      input.onchange = (e) => {
-                        const target = e.target as HTMLInputElement;
-                        if (target.files) {
-                          const fileArray = Array.from(target.files);
-                          if (fileArray.length > 0) {
-                            // Group files by directory
-                            const folderMap = new Map<string, File[]>();
-                            fileArray.forEach((file) => {
-                              const pathParts = file.webkitRelativePath.split('/');
-                              const folderName = pathParts[0];
-                              if (!folderMap.has(folderName)) {
-                                folderMap.set(folderName, []);
-                              }
-                              folderMap.get(folderName)!.push(file);
-                            });
-
-                            // Convert to folder structure
-                            const newFolders = Array.from(folderMap.entries()).map(([name, files]) => ({
-                              name,
-                              files,
-                            }));
-
-                            setFolders((prev) => [...prev, ...newFolders]);
-                            // Folder upload notifications removed for cleaner UX
-
-                            // Use the same file-added path for auto-upload & queueing
-                            setTimeout(() => {
-                              console.log('📁 Folder: delegating to handleFilesAdded with', fileArray.length, 'files');
-                              if (isLocked) {
-                                notifications.show({
-                                  title: 'Upload in progress',
-                                  message: 'Please wait for the current upload to complete',
-                                  color: 'yellow',
-                                  icon: <IconUpload size='1rem' />,
-                                  autoClose: 3000,
-                                });
-                                return;
-                              }
-                              if (!isAuthenticated && !publicUploadEnabled) {
-                                notifications.show({
-                                  title: 'Upload not allowed',
-                                  message: 'Please log in to upload files or contact admin to enable public uploads',
-                                  color: 'red',
-                                  autoClose: 5000,
-                                });
-                                return;
-                              }
-                              if (fileArray.length > 0) {
-                                handleFilesAdded(fileArray);
-                              }
-                            }, 100);
-                          }
-                        }
-                      };
-                      input.click();
-                    }}
-                    radius='md'
-                    size='md'
-                    disabled={isLocked}
-                  >
-                    Select Folder
-                  </Button>
-                  <Button
-                    variant='light'
-                    leftSection={<IconDownload size='0.8rem' />}
-                    onClick={openUrlDownload}
-                    radius='md'
-                    size='md'
-                    disabled={isLocked}
-                  >
-                    Download from URL
-                  </Button>
-                  <Button
-                    variant='light'
-                    leftSection={<IconClipboard size='0.8rem' />}
-                    onClick={() => {
-                      if (isLocked) {
-                        notifications.show({
-                          title: 'Upload in progress',
-                          message: 'Please wait for the current upload to complete',
-                          color: 'yellow',
-                          icon: <IconUpload size='1rem' />,
-                          autoClose: 3000,
-                        });
-                        return;
-                      }
-                      // Paste ready notifications removed for cleaner UX
-                    }}
-                    radius='md'
-                    size='md'
-                    disabled={isLocked}
-                  >
-                    Paste from Clipboard
-                  </Button>
-                </Group>
-
-                {/* Batch Size Settings */}
-                <Box
-                  mt='md'
-                  pt='md'
-                  style={{
-                    borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-                    opacity: isLocked ? 0.6 : 1,
-                    pointerEvents: isLocked ? 'none' as const : 'auto',
-                  }}
-                >
-                  <Group justify='space-between' align='center'>
-                    <Group gap='xs'>
-                      <Text size='sm' c='dimmed'>Batch Upload Size:</Text>
-                      <Text size='sm' fw={600}>{batchSize} files per batch</Text>
-                    </Group>
-                    <Group gap='xs'>
-                      <Button
-                        variant='subtle'
-                        size='xs'
-                        onClick={() => setBatchSize(Math.max(1, batchSize - 1))}
-                        disabled={isLocked || batchSize <= 1}
-                      >
-                        -
-                      </Button>
-                      <Button
-                        variant='subtle'
-                        size='xs'
-                        onClick={() => setBatchSize(Math.min(50, batchSize + 1))}
-                        disabled={isLocked || batchSize >= 50}
-                      >
-                        +
-                      </Button>
-                      <Button
-                        variant='subtle'
-                        size='xs'
-                        onClick={() => setBatchSize(5)}
-                        disabled={isLocked}
-                      >
-                        Reset
-                      </Button>
-                    </Group>
+                <Group justify='space-between' align='center'>
+                  <Group gap='xs'>
+                    <Text size='sm' c='dimmed'>
+                      Batch Upload Size:
+                    </Text>
+                    <Text size='sm' fw={600}>
+                      {batchSize} files per batch
+                    </Text>
                   </Group>
-                  <Text size='xs' c='dimmed' mt='xs'>
-                    When uploading many files, they will be processed in batches of {batchSize}. Adjust between 1-50 files per batch.
-                  </Text>
-                </Box>
-              </Paper>
-
-              {/* Dropzone - Only show if authenticated or public upload enabled */}
-              {(isAuthenticated || publicUploadEnabled) && (
-                <Paper
-                  p='lg'
-                  radius='lg'
-                  style={{
-                    backgroundColor: 'rgba(0, 0, 0, 0.4)',
-                    backdropFilter: 'blur(20px)',
-                    border: 'none',
-                    transition: 'all 0.3s ease',
-                    minHeight: (uploading || Object.keys(fileProgress).length > 0) ? '400px' : '200px',
-                  }}
-                >
-                  {!uploading && Object.keys(fileProgress).length === 0 ? (
-                    <Dropzone
-                      onDrop={(files) => {
-                        handleFilesAdded(files);
-                      }}
-                      maxFiles={100}
-                      maxSize={bytes(config.files.maxFileSize)}
-                      style={{
-                        border: 'none',
-                        backgroundColor: 'transparent',
-                        minHeight: '200px',
-                      }}
+                  <Group gap='xs'>
+                    <Button
+                      variant='subtle'
+                      size='xs'
+                      onClick={() => setBatchSize(Math.max(1, batchSize - 1))}
+                      disabled={isLocked || batchSize <= 1}
                     >
-                      <Center style={{ cursor: 'pointer', padding: '40px 20px' }}>
-                        <Stack align='center' gap='md'>
-                          <ThemeIcon
-                            size={80}
-                            radius='xl'
-                            variant='gradient'
-                            gradient={{ from: 'gray', to: 'dark' }}
-                          >
-                            <IconCloudUpload size='3rem' />
-                          </ThemeIcon>
-                          <Title order={2} fw={700} style={{ color: '#74b9ff' }}>
-                            Upload Something
-                          </Title>
-                          <Text size='sm' c='dimmed'>
-                            Drop files here or click to select
-                          </Text>
-                        </Stack>
-                      </Center>
-                    </Dropzone>
-                  ) : (
+                      -
+                    </Button>
+                    <Button
+                      variant='subtle'
+                      size='xs'
+                      onClick={() => setBatchSize(Math.min(50, batchSize + 1))}
+                      disabled={isLocked || batchSize >= 50}
+                    >
+                      +
+                    </Button>
+                    <Button variant='subtle' size='xs' onClick={() => setBatchSize(5)} disabled={isLocked}>
+                      Reset
+                    </Button>
+                  </Group>
+                </Group>
+                <Text size='xs' c='dimmed' mt='xs'>
+                  When uploading many files, they will be processed in batches of {batchSize}. Adjust between
+                  1-50 files per batch.
+                </Text>
+              </Box>
+            </Paper>
+
+            {/* Dropzone - Only show if authenticated or public upload enabled */}
+            {(isAuthenticated || publicUploadEnabled) && (
+              <Paper
+                p='lg'
+                radius='lg'
+                style={{
+                  backgroundColor: 'rgba(0, 0, 0, 0.4)',
+                  backdropFilter: 'blur(20px)',
+                  border: 'none',
+                  transition: 'all 0.3s ease',
+                  minHeight: uploading || Object.keys(fileProgress).length > 0 ? '400px' : '200px',
+                }}
+              >
+                {!uploading && Object.keys(fileProgress).length === 0 ? (
+                  <Dropzone
+                    onDrop={(files) => {
+                      handleFilesAdded(files);
+                    }}
+                    maxFiles={100}
+                    maxSize={bytes(config.files.maxFileSize)}
+                    style={{
+                      border: 'none',
+                      backgroundColor: 'transparent',
+                      minHeight: '200px',
+                    }}
+                  >
+                    <Center style={{ cursor: 'pointer', padding: '40px 20px' }}>
+                      <Stack align='center' gap='md'>
+                        <ThemeIcon
+                          size={80}
+                          radius='xl'
+                          variant='gradient'
+                          gradient={{ from: 'gray', to: 'dark' }}
+                        >
+                          <IconCloudUpload size='3rem' />
+                        </ThemeIcon>
+                        <Title order={2} fw={700} style={{ color: '#74b9ff' }}>
+                          Upload Something
+                        </Title>
+                        <Text size='sm' c='dimmed'>
+                          Drop files here or click to select
+                        </Text>
+                      </Stack>
+                    </Center>
+                  </Dropzone>
+                ) : (
                   <Box p='lg' style={{ cursor: 'default' }}>
                     <Stack gap='lg'>
                       {/* Total Progress Bar */}
@@ -1005,7 +1014,7 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
                                 const totalSize = uploadQueue.reduce((sum, file) => sum + file.size, 0);
                                 const uploadedSize = uploadQueue.reduce((sum, file) => {
                                   const progress = fileProgress[file.name] || 0;
-                                  return sum + (file.size * (progress / 100));
+                                  return sum + file.size * (progress / 100);
                                 }, 0);
                                 const overallProgress = totalSize > 0 ? (uploadedSize / totalSize) * 100 : 0;
                                 return `${bytes(uploadedSize)} / ${bytes(totalSize)} (${Math.round(overallProgress)}%)`;
@@ -1017,7 +1026,7 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
                               const totalSize = uploadQueue.reduce((sum, file) => sum + file.size, 0);
                               const uploadedSize = uploadQueue.reduce((sum, file) => {
                                 const progress = fileProgress[file.name] || 0;
-                                return sum + (file.size * (progress / 100));
+                                return sum + file.size * (progress / 100);
                               }, 0);
                               return totalSize > 0 ? (uploadedSize / totalSize) * 100 : 0;
                             })()}
@@ -1080,8 +1089,9 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
                                       key={`unfinished-${fileName}-${index}`}
                                       p='md'
                                       style={{
-                                        border: `1px solid ${isUploading ? 'rgba(24, 144, 255, 0.5)' : 'rgba(255, 255, 255, 0.2)'
-                                          }`,
+                                        border: `1px solid ${
+                                          isUploading ? 'rgba(24, 144, 255, 0.5)' : 'rgba(255, 255, 255, 0.2)'
+                                        }`,
                                         borderRadius: '8px',
                                         backgroundColor: isUploading
                                           ? 'rgba(24, 144, 255, 0.1)'
@@ -1105,7 +1115,8 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
                                             }}
                                             title={fileName}
                                           >
-                                            {isUploading ? '⏳ ' : '⏸ '}{fileName}
+                                            {isUploading ? '⏳ ' : '⏸ '}
+                                            {fileName}
                                           </Text>
                                           {isWaiting && (
                                             <Badge size='xs' variant='light' color='gray'>
@@ -1149,7 +1160,7 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
                                 .map(({ file, index }) => {
                                   const fileName = file.name;
                                   const percent = fileProgress[fileName];
-                                  const uploadedFile = uploadedFiles.find(f => f.name === fileName);
+                                  const uploadedFile = uploadedFiles.find((f) => f.name === fileName);
 
                                   return (
                                     <Box
@@ -1204,12 +1215,7 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
                                           </Text>
                                         </Group>
                                       </Group>
-                                      <Progress
-                                        value={100}
-                                        size='lg'
-                                        radius='xl'
-                                        color='green'
-                                      />
+                                      <Progress value={100} size='lg' radius='xl' color='green' />
                                     </Box>
                                   );
                                 })}
@@ -1230,17 +1236,30 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
                                     {(() => {
                                       // For non-queue uploads, we need to estimate file sizes
                                       // Since we don't have access to original files here, we'll use a different approach
-                                      const totalProgress = Object.values(fileProgress).reduce((sum, p) => sum + p, 0);
-                                      const avgProgress = Object.keys(fileProgress).length > 0 ? totalProgress / Object.keys(fileProgress).length : 0;
-                                      const completedFiles = Object.values(fileProgress).filter((p) => p === 100).length;
+                                      const totalProgress = Object.values(fileProgress).reduce(
+                                        (sum, p) => sum + p,
+                                        0,
+                                      );
+                                      const avgProgress =
+                                        Object.keys(fileProgress).length > 0
+                                          ? totalProgress / Object.keys(fileProgress).length
+                                          : 0;
+                                      const completedFiles = Object.values(fileProgress).filter(
+                                        (p) => p === 100,
+                                      ).length;
                                       return `${completedFiles}/${Object.keys(fileProgress).length} files (${Math.round(avgProgress)}%)`;
                                     })()}
                                   </Text>
                                 </Group>
                                 <Progress
                                   value={(() => {
-                                    const totalProgress = Object.values(fileProgress).reduce((sum, p) => sum + p, 0);
-                                    return Object.keys(fileProgress).length > 0 ? totalProgress / Object.keys(fileProgress).length : 0;
+                                    const totalProgress = Object.values(fileProgress).reduce(
+                                      (sum, p) => sum + p,
+                                      0,
+                                    );
+                                    return Object.keys(fileProgress).length > 0
+                                      ? totalProgress / Object.keys(fileProgress).length
+                                      : 0;
                                   })()}
                                   size='xl'
                                   radius='xl'
@@ -1253,8 +1272,8 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
 
                             {/* Fallback for non-queue uploads */}
                             {Object.entries(fileProgress).map(([fileName, percent]) => {
-                              const uploadedFile = uploadedFiles.find(f => f.name === fileName);
-                              
+                              const uploadedFile = uploadedFiles.find((f) => f.name === fileName);
+
                               return (
                                 <Box
                                   key={fileName}
@@ -1277,7 +1296,8 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
                                       }}
                                       title={fileName}
                                     >
-                                      {percent === 100 ? '✓ ' : '⏳ '}{fileName}
+                                      {percent === 100 ? '✓ ' : '⏳ '}
+                                      {fileName}
                                     </Text>
                                     <Group gap='xs' wrap='nowrap'>
                                       {percent === 100 && uploadedFile?.url && (
@@ -1323,90 +1343,90 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
                   </Box>
                 )}
               </Paper>
-              )}
+            )}
 
-              {/* Login Required Notice */}
-              {!isAuthenticated && !publicUploadEnabled && (
-                <Paper
-                  p='xl'
-                  radius='lg'
-                  style={{
-                    backgroundColor: 'rgba(255, 193, 7, 0.1)',
-                    backdropFilter: 'blur(20px)',
-                    border: '2px solid rgba(255, 193, 7, 0.3)',
-                  }}
-                >
-                  <Stack gap='md' align='center'>
-                    <ThemeIcon size={60} radius='xl' variant='light' color='yellow'>
-                      <IconUpload size='2rem' />
-                    </ThemeIcon>
-                    <Title order={2} ta='center' c='yellow'>
-                      Login Required
-                    </Title>
-                    <Text size='md' ta='center' c='dimmed'>
-                      Please log in to upload files. Public uploads are currently disabled.
-                    </Text>
-                    <Button
-                      size='lg'
-                      radius='md'
-                      variant='light'
-                      color='gray'
-                      onClick={() => router.push('/auth/login')}
-                      leftSection={<IconUpload size='1.2rem' />}
-                    >
-                      Go to Login
-                    </Button>
-                  </Stack>
-                </Paper>
-              )}
-            </Stack>
-          </Container>
-        </Box>
-
-        {/* Footer */}
-        <Paper
-          radius={0}
-          p='lg'
-          mt='lg'
-          style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.15)',
-            backdropFilter: 'blur(20px)',
-            borderTop: '1px solid rgba(255, 255, 255, 0.2)',
-          }}
-        >
-          <Container size='xl'>
-            <Group justify='space-between' align='center'>
-              <Text c='dimmed'>© 2024 Zipline. Made with ❤️ for file sharing.</Text>
-              <Group gap='xl'>
-                <Group gap='xs'>
-                  <IconDatabase size='1rem' color='var(--mantine-color-blue-4)' />
-                  <Text size='sm' c='dimmed'>
-                    {footerMetrics.totalStorage} stored
+            {/* Login Required Notice */}
+            {!isAuthenticated && !publicUploadEnabled && (
+              <Paper
+                p='xl'
+                radius='lg'
+                style={{
+                  backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                  backdropFilter: 'blur(20px)',
+                  border: '2px solid rgba(255, 193, 7, 0.3)',
+                }}
+              >
+                <Stack gap='md' align='center'>
+                  <ThemeIcon size={60} radius='xl' variant='light' color='yellow'>
+                    <IconUpload size='2rem' />
+                  </ThemeIcon>
+                  <Title order={2} ta='center' c='yellow'>
+                    Login Required
+                  </Title>
+                  <Text size='md' ta='center' c='dimmed'>
+                    Please log in to upload files. Public uploads are currently disabled.
                   </Text>
-                </Group>
-                <Group gap='xs'>
-                  <IconFiles size='1rem' color='var(--mantine-color-green-4)' />
-                  <Text size='sm' c='dimmed'>
-                    {footerMetrics.totalFiles} files
-                  </Text>
-                </Group>
-                {/* Hide global users/uptime on standalone upload page for now */}
-              </Group>
-            </Group>
-          </Container>
-        </Paper>
-
-        {/* URL Download Modal */}
-        <UrlDownloadModal
-          opened={urlDownloadOpened}
-          onClose={closeUrlDownload}
-          uploading={downloadingFromUrl}
-          downloadUrl={downloadUrl}
-          onDownloadUrlChange={setDownloadUrl}
-          onSubmit={handleUrlDownload}
-        />
+                  <Button
+                    size='lg'
+                    radius='md'
+                    variant='light'
+                    color='gray'
+                    onClick={() => router.push('/auth/login')}
+                    leftSection={<IconUpload size='1.2rem' />}
+                  >
+                    Go to Login
+                  </Button>
+                </Stack>
+              </Paper>
+            )}
+          </Stack>
+        </Container>
       </Box>
-    );
+
+      {/* Footer */}
+      <Paper
+        radius={0}
+        p='lg'
+        mt='lg'
+        style={{
+          backgroundColor: 'rgba(255, 255, 255, 0.15)',
+          backdropFilter: 'blur(20px)',
+          borderTop: '1px solid rgba(255, 255, 255, 0.2)',
+        }}
+      >
+        <Container size='xl'>
+          <Group justify='space-between' align='center'>
+            <Text c='dimmed'>© 2024 Zipline. Made with ❤️ for file sharing.</Text>
+            <Group gap='xl'>
+              <Group gap='xs'>
+                <IconDatabase size='1rem' color='var(--mantine-color-blue-4)' />
+                <Text size='sm' c='dimmed'>
+                  {footerMetrics.totalStorage} stored
+                </Text>
+              </Group>
+              <Group gap='xs'>
+                <IconFiles size='1rem' color='var(--mantine-color-green-4)' />
+                <Text size='sm' c='dimmed'>
+                  {footerMetrics.totalFiles} files
+                </Text>
+              </Group>
+              {/* Hide global users/uptime on standalone upload page for now */}
+            </Group>
+          </Group>
+        </Container>
+      </Paper>
+
+      {/* URL Download Modal */}
+      <UrlDownloadModal
+        opened={urlDownloadOpened}
+        onClose={closeUrlDownload}
+        uploading={downloadingFromUrl}
+        downloadUrl={downloadUrl}
+        onDownloadUrlChange={setDownloadUrl}
+        onSubmit={handleUrlDownload}
+      />
+    </Box>
+  );
 }
 
 import { getSession } from '@/server/session';

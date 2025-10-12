@@ -16,10 +16,9 @@ export function UploadProgress({
   fileUploadSpeed,
   onClear,
 }: UploadProgressProps) {
-
   // Calculate total upload speed
   const totalSpeed = Object.values(fileUploadSpeed)
-    .filter(speed => speed > 0)
+    .filter((speed) => speed > 0)
     .reduce((sum, speed) => sum + speed, 0);
 
   return (
@@ -29,9 +28,7 @@ export function UploadProgress({
         <Group justify='space-between' align='center'>
           <Stack gap='xs'>
             <Group gap='md' align='center'>
-              <Title order={4}>
-                {uploading ? '� Uploading Files...' : '✅ Upload Complete!'}
-              </Title>
+              <Title order={4}>{uploading ? '� Uploading Files...' : '✅ Upload Complete!'}</Title>
               {uploading && totalSpeed > 0 && (
                 <Badge size='lg' variant='light' color='gray'>
                   ⚡ {bytes(totalSpeed)}/s
@@ -45,12 +42,7 @@ export function UploadProgress({
             )}
           </Stack>
           {!uploading && (
-            <Button
-              variant='light'
-              color='gray'
-              size='sm'
-              onClick={onClear}
-            >
+            <Button variant='light' color='gray' size='sm' onClick={onClear}>
               Clear
             </Button>
           )}
@@ -62,9 +54,9 @@ export function UploadProgress({
             {files.map((file, index) => {
               const progress = fileProgress[file.name] || 0;
               const isCompleted = progress === 100;
-              
+
               return (
-                <Box 
+                <Box
                   key={file.name}
                   p='md'
                   style={{
@@ -74,8 +66,8 @@ export function UploadProgress({
                   }}
                 >
                   <Group justify='space-between' mb='xs'>
-                    <Text 
-                      size='sm' 
+                    <Text
+                      size='sm'
                       fw={500}
                       style={{
                         overflow: 'hidden',
@@ -85,7 +77,8 @@ export function UploadProgress({
                       }}
                       title={file.name}
                     >
-                      {isCompleted ? '✅ ' : '📁 '}{file.name}
+                      {isCompleted ? '✅ ' : '📁 '}
+                      {file.name}
                     </Text>
                     <Text size='sm' fw={600}>
                       {isCompleted ? 'Done' : `${Math.round(progress)}%`}
@@ -107,7 +100,7 @@ export function UploadProgress({
           <Stack gap='md'>
             {/* Fallback for non-queue uploads */}
             {Object.entries(fileProgress).map(([fileName, percent]) => (
-              <Box 
+              <Box
                 key={fileName}
                 p='md'
                 style={{
@@ -117,8 +110,8 @@ export function UploadProgress({
                 }}
               >
                 <Group justify='space-between' mb='xs'>
-                  <Text 
-                    size='sm' 
+                  <Text
+                    size='sm'
                     fw={500}
                     style={{
                       overflow: 'hidden',
@@ -128,7 +121,8 @@ export function UploadProgress({
                     }}
                     title={fileName}
                   >
-                    {percent === 100 ? '✓ ' : '⏳ '}{fileName}
+                    {percent === 100 ? '✓ ' : '⏳ '}
+                    {fileName}
                   </Text>
                   <Text size='sm' fw={600} c={percent === 100 ? 'green' : 'gray'}>
                     {Math.round(percent)}%

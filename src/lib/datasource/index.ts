@@ -3,6 +3,9 @@ import { log } from '../logger';
 import { Datasource } from './Datasource';
 import { LocalDatasource } from './Local';
 import { S3Datasource } from './S3';
+import { WebDAVDatasource } from './WebDAV';
+import { SMBDatasource } from './SMB';
+import { prisma } from '../db';
 
 let datasource: Datasource;
 
@@ -11,11 +14,65 @@ declare global {
   var __datasource__: Datasource;
 }
 
-function getDatasource(conf?: typeof config): void {
+async function getDatasource(conf?: typeof config): Promise<void> {
   if (!conf) return;
 
   const logger = log('datasource');
 
+  // Check if mount is enabled in database settings
+  try {
+    const settings = await prisma.zipline.findFirst();
+
+    if (settings?.filesMountEnabled && settings.filesMountType === 'webdav') {
+      logger.info('using webdav datasource from database settings');
+
+      if (!settings.filesMountHost) {
+        logger.error('WebDAV mount enabled but no host configured');
+        process.exit(1);
+      }
+
+      datasource = global.__datasource__ = new WebDAVDatasource({
+        url: settings.filesMountHost,
+        username: settings.filesMountUsername || undefined,
+        password: settings.filesMountPassword || undefined,
+      });
+      return;
+    }
+
+    if (settings?.filesMountEnabled && settings.filesMountType === 'smb') {
+      logger.info('using smb datasource from database settings');
+
+      if (!settings.filesMountHost) {
+        logger.error('SMB mount enabled but no host configured');
+        process.exit(1);
+      }
+
+      // Parse host, share, and path from filesMountHost (format: host/share/path)
+      const parts = settings.filesMountHost.split('/');
+      const host = parts[0];
+      const share = parts[1] || 'share';
+      const basePath = parts.slice(2).join('/'); // Everything after share is the base path
+
+      // Use '.' for local accounts (standard SMB practice)
+      const domain = settings.filesMountDomain || 'WORKGROUP';
+
+      logger.info('parsed smb configuration', { host, share, basePath, domain });
+
+      datasource = global.__datasource__ = new SMBDatasource({
+        host: host,
+        share: share,
+        basePath: basePath || undefined,
+        username: settings.filesMountUsername || undefined,
+        password: settings.filesMountPassword || undefined,
+        domain: domain,
+      });
+      return;
+    }
+  } catch (error: any) {
+    logger.warn('failed to check database mount settings, falling back to config', { error: error.message });
+  }
+
+  // Fall back to config-based datasource
   switch (config.datasource.type) {
     case 'local':
       datasource = global.__datasource__ = new LocalDatasource(config.datasource.local!.directory);
@@ -40,7 +97,11 @@ function getDatasource(conf?: typeof config): void {
 datasource = global.__datasource__;
 
 if (!global.__datasource__ && !datasource) {
-  getDatasource(config);
+  // getDatasource is now async, so we need to handle it properly
+  getDatasource(config).catch((error) => {
+    log('datasource').error('failed to initialize datasource', { error: error.message });
+    process.exit(1);
+  });
 }
 
 export { datasource, getDatasource };

@@ -41,6 +41,15 @@ model Zipline {
   filesRandomWordsNumAdjectives       Int      @default(2)
   filesRandomWordsSeparator           String   @default("-")
 
+  filesMountType                      String   @default("local")
+  filesMountHost                      String?
+  filesMountPort                      Int?
+  filesMountPath                      String?
+  filesMountUsername                  String?
+  filesMountPassword                  String?
+  filesMountDomain                    String?
+  filesMountEnabled                   Boolean  @default(false)
+
   urlsRoute  String @default("/go")
   urlsLength Int    @default(6)
 

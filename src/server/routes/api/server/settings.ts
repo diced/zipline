@@ -139,6 +139,15 @@ export default fastifyPlugin(
             filesRandomWordsNumAdjectives: z.number().min(1).max(20),
             filesRandomWordsSeparator: z.string(),
 
+            filesMountType: z.enum(['local', 'webdav', 'smb']),
+            filesMountHost: z.string().nullable(),
+            filesMountPort: z.number().nullable(),
+            filesMountPath: z.string().nullable(),
+            filesMountUsername: z.string().nullable(),
+            filesMountPassword: z.string().nullable(),
+            filesMountDomain: z.string().nullable(),
+            filesMountEnabled: z.boolean(),
+
             urlsRoute: z
               .string()
               .startsWith('/')
@@ -365,6 +374,16 @@ export default fastifyPlugin(
           });
         }
 
+        // Log mount settings before update
+        if (result.data.filesMountType || result.data.filesMountEnabled !== undefined) {
+          logger.info('mount settings update', {
+            filesMountType: result.data.filesMountType,
+            filesMountHost: result.data.filesMountHost,
+            filesMountUsername: result.data.filesMountUsername,
+            filesMountEnabled: result.data.filesMountEnabled,
+          });
+        }
+
         const newSettings = await prisma.zipline.update({
           where: {
             id: settings.id,
@@ -383,10 +402,34 @@ export default fastifyPlugin(
 
         await reloadSettings();
 
+        // Reload datasource if mount settings changed
+        if (
+          result.data.filesMountType ||
+          result.data.filesMountEnabled !== undefined ||
+          result.data.filesMountHost ||
+          result.data.filesMountUsername ||
+          result.data.filesMountPassword
+        ) {
+          logger.info('mount settings changed, reloading datasource');
+          const { getDatasource } = await import('@/lib/datasource');
+          await getDatasource();
+          logger.info('datasource reloaded successfully');
+        }
+
         logger.info('settings updated', {
           updated: Object.keys(result.data),
           by: req.user.username,
         });
+
+        // Log mount settings after update
+        if (result.data.filesMountType || result.data.filesMountEnabled !== undefined) {
+          logger.info('mount settings after update', {
+            filesMountType: newSettings.filesMountType,
+            filesMountHost: newSettings.filesMountHost,
+            filesMountUsername: newSettings.filesMountUsername,
+            filesMountEnabled: newSettings.filesMountEnabled,
+          });
+        }
 
         return res.send({ settings: newSettings, tampered: global.__tamperedConfig__ || [] });
       },

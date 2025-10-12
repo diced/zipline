@@ -32,7 +32,7 @@ export function UrlDownloadModal({
     <Modal
       opened={opened}
       onClose={handleClose}
-      title="Download from URL"
+      title='Download from URL'
       centered
       styles={{
         content: {
@@ -47,24 +47,24 @@ export function UrlDownloadModal({
         },
       }}
     >
-      <Stack gap="md">
-        <Text size="sm" c="dimmed">
+      <Stack gap='md'>
+        <Text size='sm' c='dimmed'>
           Enter a URL to download the file and upload it to Zipline
         </Text>
         <TextInput
-          placeholder="https://example.com/file.pdf"
+          placeholder='https://example.com/file.pdf'
           value={downloadUrl}
           onChange={(e) => onDownloadUrlChange(e.currentTarget.value)}
           disabled={uploading}
-          leftSection={<IconLink size="1rem" />}
+          leftSection={<IconLink size='1rem' />}
           onKeyDown={(e) => {
             if (e.key === 'Enter' && downloadUrl.trim()) {
               handleSubmit();
             }
           }}
         />
-        <Group justify="flex-end" gap="sm">
-          <Button variant="subtle" onClick={handleClose} disabled={uploading}>
+        <Group justify='flex-end' gap='sm'>
+          <Button variant='subtle' onClick={handleClose} disabled={uploading}>
             Cancel
           </Button>
           <Button onClick={handleSubmit} disabled={uploading || !downloadUrl.trim()} loading={uploading}>

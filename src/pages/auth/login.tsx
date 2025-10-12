@@ -183,13 +183,15 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
       {willRedirect && !showLocalLogin && <LoadingOverlay visible />}
 
       <Modal
-        onClose={() => { }}
+        onClose={() => {}}
         title={
           <Group gap='xs'>
             <ThemeIcon variant='light' size='lg' radius='md'>
               <IconShieldQuestion size='1.2rem' />
             </ThemeIcon>
-            <Text size='lg' fw={600}>Two-Factor Authentication</Text>
+            <Text size='lg' fw={600}>
+              Two-Factor Authentication
+            </Text>
           </Group>
         }
         opened={totpOpen}
@@ -298,9 +300,7 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
             left: 0,
             right: 0,
             bottom: 0,
-            background: config.website.loginBackground
-              ? 'rgba(0, 0, 0, 0.5)'
-              : 'rgba(0, 0, 0, 0.2)',
+            background: config.website.loginBackground ? 'rgba(0, 0, 0, 0.5)' : 'rgba(0, 0, 0, 0.2)',
             backdropFilter: 'blur(10px)',
           }}
         />
@@ -320,11 +320,7 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
             {/* Logo and Title */}
             <Stack gap='lg' align='center' mb='xl'>
               {config.website.titleLogo ? (
-                <Avatar
-                  src={config.website.titleLogo}
-                  alt='logo'
-                  size={100}
-                />
+                <Avatar src={config.website.titleLogo} alt='logo' size={100} />
               ) : (
                 <ThemeIcon
                   size={100}
@@ -446,9 +442,14 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
             {/* Divider */}
             {(eitherTrue(config.features.oauthRegistration, config.features.userRegistration) ||
               config.mfa.passkeys ||
-              Object.values(config.oauthEnabled).some(x => x === true)) && showLocalLogin && (
+              Object.values(config.oauthEnabled).some((x) => x === true)) &&
+              showLocalLogin && (
                 <Divider
-                  label={<Text size='sm' fw={500} style={{ color: 'rgba(255, 255, 255, 0.5)' }}>OR CONTINUE WITH</Text>}
+                  label={
+                    <Text size='sm' fw={500} style={{ color: 'rgba(255, 255, 255, 0.5)' }}>
+                      OR CONTINUE WITH
+                    </Text>
+                  }
                   labelPosition='center'
                   my='xl'
                   style={{ borderColor: 'rgba(255, 255, 255, 0.1)' }}
@@ -459,7 +460,7 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
             <Stack
               gap='md'
               style={{
-                width: '20vw'
+                width: '20vw',
               }}
             >
               {config.mfa.passkeys && (
@@ -501,7 +502,7 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
               )}
 
               {/* OAuth Providers */}
-              {Object.values(config.oauthEnabled).some(x => x === true) && (
+              {Object.values(config.oauthEnabled).some((x) => x === true) && (
                 <Group grow>
                   {config.oauthEnabled.discord && (
                     <ExternalAuthButton
@@ -522,10 +523,7 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
                     />
                   )}
                   {config.oauthEnabled.oidc && (
-                    <ExternalAuthButton
-                      provider='OIDC'
-                      leftSection={<IconCircleKeyFilled size='1.1rem' />}
-                    />
+                    <ExternalAuthButton provider='OIDC' leftSection={<IconCircleKeyFilled size='1.1rem' />} />
                   )}
                 </Group>
               )}

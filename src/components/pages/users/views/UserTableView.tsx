@@ -57,7 +57,7 @@ export default function UserTableView() {
               accessor: 'avatar',
               render: (user) => (
                 <Avatar radius='sm' src={user.avatar}>
-                  {user.username[0].toUpperCase()}
+                  {user.username?.[0]?.toUpperCase() || '?'}
                 </Avatar>
               ),
             },

@@ -54,7 +54,7 @@ export async function userMiddleware(req: FastifyRequest, res: FastifyReply) {
   const isPublicUploadEnabled = config.features?.publicUpload === true;
   const isUploadRoute = req.url.toLowerCase().trim() === '/api/upload';
   const hasNoAuth = !req.headers.authorization && !cookies.has('zipline_session');
-  
+
   if (isPublicUploadEnabled && isUploadRoute && hasNoAuth) {
     // Let the upload route handle creating the public user
     return;
