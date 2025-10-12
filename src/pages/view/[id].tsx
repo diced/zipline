@@ -27,7 +27,7 @@ import {
   TypographyStylesProvider,
 } from '@mantine/core';
 import { IconDownload, IconExternalLink, IconInfoCircleFilled } from '@tabler/icons-react';
-import { sanitize } from 'isomorphic-dompurify';
+import DOMPurify from 'isomorphic-dompurify';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
@@ -232,7 +232,7 @@ export default function ViewFileId({
               <Text
                 ta={user?.view!.align ?? 'left'}
                 dangerouslySetInnerHTML={{
-                  __html: sanitize(
+                  __html: DOMPurify.sanitize(
                     parseString(user.view.content, {
                       file: file as unknown as File,
                       link: {
@@ -330,7 +330,7 @@ export default function ViewFileId({
                 mt='sm'
                 ta={user?.view.align ?? 'left'}
                 dangerouslySetInnerHTML={{
-                  __html: sanitize(
+                  __html: DOMPurify.sanitize(
                     parseString(user?.view.content, {
                       file: file as unknown as File,
                       link: {

@@ -52,12 +52,11 @@ import { UploadProgress } from '../../components/upload/UploadProgress';
 import { BatchSizeSettings } from '../../components/upload/BatchSizeSettings';
 import { useFileUpload } from '../../hooks/useFileUpload';
 import { useBatchUpload } from '../../hooks/useBatchUpload';
-import { UploadHeader } from './components/UploadHeader';
-import { UploadActions } from './components/UploadActions';
-import { UploadDropzone } from './components/UploadDropzone';
-import { UploadBackground } from './components/UploadBackground';
-import { UrlDownloadModal } from './components/UrlDownloadModal';
-import '@/styles/upload-animations.css';
+import { UploadHeader } from '../../components/upload/UploadHeader';
+import { UploadActions } from '../../components/upload/UploadActions';
+import { UploadDropzone } from '../../components/upload/UploadDropzone';
+import { UploadBackground } from '../../components/upload/UploadBackground';
+import { UrlDownloadModal } from '../../components/upload/UrlDownloadModal';
 
 import { bytes } from '@/lib/bytes';
 import { humanizeDuration } from '@/lib/relativeTime';
@@ -280,6 +279,7 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
       const xhr = new XMLHttpRequest();
       let lastLoaded = 0;
       let lastTime = Date.now();
+      // eslint-disable-next-line prefer-const
       let speedValues: number[] = []; // Store last few speed values for smoothing
 
       xhr.upload.addEventListener('progress', (e) => {

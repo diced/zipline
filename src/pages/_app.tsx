@@ -15,6 +15,7 @@ import '@mantine/charts/styles.css';
 import 'mantine-datatable/styles.css';
 
 import '@/styles/global.css';
+import '@/styles/upload-animations.css';
 
 import '@/components/render/code/HighlightCode.theme.scss';
 

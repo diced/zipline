@@ -2,7 +2,7 @@ import RelativeDate from '@/components/RelativeDate';
 import { fetchApi } from '@/lib/fetchApi';
 import { registerWeb } from '@/lib/passkey';
 import { useUserStore } from '@/lib/store/user';
-import { RegistrationResponseJSON } from '@github/webauthn-json/dist/types/browser-ponyfill';
+import type { RegistrationResponseJSON } from '@github/webauthn-json/browser-ponyfill';
 import { ActionIcon, Button, Group, Modal, Paper, Stack, Text, TextInput } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';

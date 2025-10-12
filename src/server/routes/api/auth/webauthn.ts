@@ -3,7 +3,7 @@ import { prisma } from '@/lib/db';
 import { User, userSelect } from '@/lib/db/models/user';
 import { log } from '@/lib/logger';
 import { getSession, saveSession } from '@/server/session';
-import { AuthenticationResponseJSON } from '@github/webauthn-json/dist/types/browser-ponyfill';
+import type { AuthenticationResponseJSON } from '@github/webauthn-json/browser-ponyfill';
 import fastifyPlugin from 'fastify-plugin';
 
 export type ApiAuthWebauthnResponse = {

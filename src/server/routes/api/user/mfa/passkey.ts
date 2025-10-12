@@ -4,7 +4,7 @@ import { User } from '@/lib/db/models/user';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { userMiddleware } from '@/server/middleware/user';
-import { RegistrationResponseJSON } from '@github/webauthn-json/dist/types/browser-ponyfill';
+import type { RegistrationResponseJSON } from '@github/webauthn-json/browser-ponyfill';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import fastifyPlugin from 'fastify-plugin';
 import { Prisma } from '../../../../../../generated/client';

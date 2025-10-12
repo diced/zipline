@@ -1,4 +1,4 @@
-import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { userMiddleware } from '@/server/middleware/user';
 import { administratorMiddleware } from '@/server/middleware/administrator';
@@ -15,7 +15,7 @@ const testMountSchema = z.object({
   domain: z.string().optional(),
 });
 
-export default async function (server: FastifyInstance) {
+export default async function mountTestRoute(server: FastifyInstance) {
   server.post<{ Body: z.infer<typeof testMountSchema> }>(
     PATH,
     {
