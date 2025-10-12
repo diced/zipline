@@ -192,7 +192,8 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
     const headers: Record<string, string> = {};
     options.deletesAt !== 'never' && (headers['x-zipline-deletes-at'] = options.deletesAt);
     options.format !== 'default' && (headers['x-zipline-format'] = options.format);
-    options.imageCompressionPercent && (headers['x-zipline-image-compression-percent'] = options.imageCompressionPercent.toString());
+    options.imageCompressionPercent &&
+      (headers['x-zipline-image-compression-percent'] = options.imageCompressionPercent.toString());
     options.maxViews && (headers['x-zipline-max-views'] = options.maxViews.toString());
     options.addOriginalName && (headers['x-zipline-original-name'] = 'true');
     options.overrides_returnDomain && (headers['x-zipline-domain'] = options.overrides_returnDomain);
@@ -211,11 +212,11 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
 
       if (response.ok) {
         const result = await response.json();
-        
+
         // Update uploaded files state with the response
         if (result.files && Array.isArray(result.files)) {
           setUploadedFiles((prev) => [...prev, ...result.files]);
-          
+
           // Auto-copy links to clipboard
           const urls = result.files.map((f: any) => f.url);
           if (urls.length > 0) {
@@ -236,7 +237,7 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
               textArea.select();
               document.execCommand('copy');
               document.body.removeChild(textArea);
-              
+
               notifications.show({
                 title: 'Links copied to clipboard!',
                 message: `${urls.length} file link${urls.length !== 1 ? 's' : ''} automatically copied`,
@@ -247,11 +248,11 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
             }
           }
         }
-        
+
         // Clear files after successful upload
         setFiles([]);
         setFolders([]);
-        
+
         notifications.show({
           title: 'Upload successful!',
           message: `Successfully uploaded ${files.length} file${files.length !== 1 ? 's' : ''}`,
@@ -290,16 +291,16 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
 
   const handleFilesAdded = (newFiles: File[]) => {
     if (newFiles.length === 0) return;
-    
+
     // SIMPLE: Just add files to state
     setFiles((prev) => {
       const newFileList = [...prev, ...newFiles];
-      
+
       // Trigger upload after state update
       setTimeout(() => {
         startAutoUpload(newFiles);
       }, 50);
-      
+
       return newFileList;
     });
   };
@@ -309,7 +310,7 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
     if (isUploadingRef.current || uploading || uploadInProgress) {
       return;
     }
-    
+
     // Check if upload is allowed
     if (!isAuthenticated && !publicUploadEnabled) {
       notifications.show({
@@ -320,12 +321,12 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
       });
       return;
     }
-    
+
     // Mark as uploading
     isUploadingRef.current = true;
     setUploadInProgress(true);
     setUploading(true);
-    
+
     notifications.show({
       title: 'Auto-upload started',
       message: `Uploading ${filesToUpload.length} file${filesToUpload.length !== 1 ? 's' : ''} automatically`,
@@ -333,7 +334,7 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
       icon: <IconUpload size='1rem' />,
       autoClose: 3000,
     });
-    
+
     // Start upload
     customUploadFiles(filesToUpload);
   };
@@ -345,7 +346,7 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
       fileElement.style.transition = 'all 0.3s ease';
       fileElement.style.opacity = '0';
       fileElement.style.transform = 'translateX(-20px)';
-      
+
       setTimeout(() => {
         setFiles((prev) => prev.filter((_, i) => i !== index));
       }, 300);
@@ -385,7 +386,7 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
           message: 'Successfully downloaded from URL',
           color: 'green',
         });
-        
+
         // handleFilesAdded now handles auto-upload automatically
       } else {
         throw new Error('Failed to download');
@@ -458,16 +459,17 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
   }, []);
 
   // Background style - only show custom background if user is logged in
-  const backgroundStyle = isAuthenticated && backgroundType === 'image' && backgroundImageUrl && backgroundImageUrl.trim() !== ''
-    ? {
-        backgroundImage: `url("${backgroundImageUrl}")`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        filter: 'blur(10px)',
-      }
-    : {
-        background: 'linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%)', // Darker background
-      };
+  const backgroundStyle =
+    isAuthenticated && backgroundType === 'image' && backgroundImageUrl && backgroundImageUrl.trim() !== ''
+      ? {
+          backgroundImage: `url("${backgroundImageUrl}")`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          filter: 'blur(10px)',
+        }
+      : {
+          background: 'linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%)', // Darker background
+        };
 
   // Show loading overlay while authentication is loading
   if (authLoading) {
@@ -586,20 +588,23 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
       />
 
       {/* Background overlay for blur effect - only for logged in users */}
-      {isAuthenticated && backgroundType === 'image' && backgroundImageUrl && backgroundImageUrl.trim() !== '' && (
-        <Box
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.3)',
-            backdropFilter: 'blur(10px)',
-            zIndex: -1,
-          }}
-        />
-      )}
+      {isAuthenticated &&
+        backgroundType === 'image' &&
+        backgroundImageUrl &&
+        backgroundImageUrl.trim() !== '' && (
+          <Box
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.3)',
+              backdropFilter: 'blur(10px)',
+              zIndex: -1,
+            }}
+          />
+        )}
       {/* Header */}
       <Paper
         radius={0}
@@ -719,8 +724,6 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
       <Box style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <Container size='md' py='lg'>
           <Stack gap='lg' maw={800}>
-
-
             {/* Upload Actions */}
             <Paper
               p='md'
@@ -746,7 +749,7 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
                       });
                       return;
                     }
-                    
+
                     const input = document.createElement('input');
                     input.type = 'file';
                     input.multiple = true;
@@ -764,7 +767,7 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
                 >
                   Select Files
                 </Button>
-                                <Button
+                <Button
                   variant='light'
                   leftSection={<IconFolder size='0.8rem' />}
                   onClick={() => {
@@ -777,7 +780,7 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
                       });
                       return;
                     }
-                    
+
                     const input = document.createElement('input');
                     input.type = 'file';
                     input.webkitdirectory = true;
@@ -810,31 +813,32 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
                             message: `Added ${newFolders.length} folder(s) with ${fileArray.length} files`,
                             color: 'green',
                           });
-                          
+
                           // Auto-upload folder contents immediately
                           setTimeout(() => {
                             console.log('📁 Folder upload timeout triggered for:', fileArray.length, 'files');
-                            
+
                             // Prevent multiple simultaneous uploads
                             if (uploadInProgress) {
                               console.log('⚠️ Folder upload: Upload already in progress, skipping this call');
                               return;
                             }
-                            
+
                             if (fileArray.length > 0) {
                               // Check if upload is allowed
                               if (!isAuthenticated && !publicUploadEnabled) {
                                 notifications.show({
                                   title: 'Upload not allowed',
-                                  message: 'Please log in to upload files or contact admin to enable public uploads',
+                                  message:
+                                    'Please log in to upload files or contact admin to enable public uploads',
                                   color: 'red',
                                 });
                                 return;
                               }
-                              
+
                               // Set upload in progress flag
                               setUploadInProgress(true);
-                              
+
                               // Start upload immediately
                               setUploading(true);
                               notifications.show({
@@ -845,9 +849,13 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
                                 autoClose: false,
                                 withCloseButton: true,
                               });
-                              
+
                               // Use the same custom upload function - only upload the new folder files
-                              console.log('🚀 Folder: Calling customUploadFiles with:', fileArray.length, 'files');
+                              console.log(
+                                '🚀 Folder: Calling customUploadFiles with:',
+                                fileArray.length,
+                                'files',
+                              );
                               customUploadFiles(fileArray);
                             }
                           }, 100);
@@ -924,29 +932,29 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
                   minHeight: '200px',
                 }}
               >
-                               <Center>
-                 <Stack align='center' gap='md'>
-                   <ThemeIcon
-                     size={60}
-                     radius='xl'
-                     variant='gradient'
-                     gradient={{ from: 'blue', to: 'cyan' }}
-                   >
-                     <IconDragDrop size='2.5rem' />
-                   </ThemeIcon>
-                   <div style={{ textAlign: 'center' }}>
-                     <Title order={3} size='h4' fw={600} mb='xs'>
-                       Drop files here or click to select
-                     </Title>
-                     <Text size='sm' c='dimmed' mb='sm'>
-                       Supports files, folders, images from clipboard, and URL downloads
-                     </Text>
-                     <Text size='xs' c='dimmed'>
-                       Max file size: {bytes(config.files.maxFileSize)}
-                     </Text>
-                   </div>
-                 </Stack>
-               </Center>
+                <Center>
+                  <Stack align='center' gap='md'>
+                    <ThemeIcon
+                      size={60}
+                      radius='xl'
+                      variant='gradient'
+                      gradient={{ from: 'blue', to: 'cyan' }}
+                    >
+                      <IconDragDrop size='2.5rem' />
+                    </ThemeIcon>
+                    <div style={{ textAlign: 'center' }}>
+                      <Title order={3} size='h4' fw={600} mb='xs'>
+                        Drop files here or click to select
+                      </Title>
+                      <Text size='sm' c='dimmed' mb='sm'>
+                        Supports files, folders, images from clipboard, and URL downloads
+                      </Text>
+                      <Text size='xs' c='dimmed'>
+                        Max file size: {bytes(config.files.maxFileSize)}
+                      </Text>
+                    </div>
+                  </Stack>
+                </Center>
               </Dropzone>
             </Paper>
 
@@ -965,58 +973,60 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
                   <Group justify='space-between'>
                     <Title order={3}>
                       {uploading ? '🔄 ' : ''}Files Uploading Automatically (
-                      <span style={{ 
-                        color: uploading ? '#74b9ff' : 'inherit',
-                        transition: 'color 0.3s ease'
-                      }}>
+                      <span
+                        style={{
+                          color: uploading ? '#74b9ff' : 'inherit',
+                          transition: 'color 0.3s ease',
+                        }}
+                      >
                         {getAllFiles().length} files
                       </span>
                       )
                     </Title>
                     <Group>
-                                           <Button
-                       variant='light'
-                       color='red'
-                       leftSection={<IconTrashFilled size='0.8rem' />}
-                       onClick={handleClearAll}
-                       radius='md'
-                       size='md'
-                     >
-                       Clear All
-                     </Button>
-                                           <Button
-                       variant='light'
-                       color='blue'
-                       leftSection={<IconUpload size='0.8rem' />}
-                       disabled
-                       size='md'
-                       radius='md'
-                       style={{
-                         opacity: 0.6,
-                         cursor: 'not-allowed',
-                         border: '1px dashed rgba(255, 255, 255, 0.3)',
-                       }}
-                       title="Files upload automatically when selected - no manual upload needed"
-                     >
-                       🚀 Auto-Upload Active
-                     </Button>
+                      <Button
+                        variant='light'
+                        color='red'
+                        leftSection={<IconTrashFilled size='0.8rem' />}
+                        onClick={handleClearAll}
+                        radius='md'
+                        size='md'
+                      >
+                        Clear All
+                      </Button>
+                      <Button
+                        variant='light'
+                        color='blue'
+                        leftSection={<IconUpload size='0.8rem' />}
+                        disabled
+                        size='md'
+                        radius='md'
+                        style={{
+                          opacity: 0.6,
+                          cursor: 'not-allowed',
+                          border: '1px dashed rgba(255, 255, 255, 0.3)',
+                        }}
+                        title='Files upload automatically when selected - no manual upload needed'
+                      >
+                        🚀 Auto-Upload Active
+                      </Button>
                     </Group>
                   </Group>
 
                   <Stack gap='sm'>
                     {/* Individual Files */}
                     {files.map((file, index) => (
-                                           <Card
-                       key={`file-${index}`}
-                       p='md'
-                       radius='md'
-                       className='file-added'
-                       data-file-index={index}
-                       style={{
-                         backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                         border: 'none',
-                       }}
-                     >
+                      <Card
+                        key={`file-${index}`}
+                        p='md'
+                        radius='md'
+                        className='file-added'
+                        data-file-index={index}
+                        style={{
+                          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                          border: 'none',
+                        }}
+                      >
                         <Group justify='space-between'>
                           <Group>
                             <ThemeIcon variant='light' color='blue'>
@@ -1036,18 +1046,18 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
                       </Card>
                     ))}
 
-                                         {/* Folders */}
-                     {folders.map((folder, folderIndex) => (
-                       <Card
-                         key={`folder-${folderIndex}`}
-                         p='md'
-                         radius='md'
-                         className='file-added'
-                         style={{
-                           backgroundColor: 'rgba(255, 255, 255, 0.15)',
-                           border: 'none',
-                         }}
-                       >
+                    {/* Folders */}
+                    {folders.map((folder, folderIndex) => (
+                      <Card
+                        key={`folder-${folderIndex}`}
+                        p='md'
+                        radius='md'
+                        className='file-added'
+                        style={{
+                          backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                          border: 'none',
+                        }}
+                      >
                         <Stack gap='sm'>
                           <Group justify='space-between'>
                             <Group>
@@ -1076,15 +1086,15 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
                           {/* Files within folder */}
                           <Stack gap='xs' ml='md'>
                             {folder.files.map((file, fileIndex) => (
-                                                             <Card
-                                 key={`folder-${folderIndex}-file-${fileIndex}`}
-                                 p='sm'
-                                 radius='sm'
-                                 style={{
-                                   backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                                   border: 'none',
-                                 }}
-                               >
+                              <Card
+                                key={`folder-${folderIndex}-file-${fileIndex}`}
+                                p='sm'
+                                radius='sm'
+                                style={{
+                                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                                  border: 'none',
+                                }}
+                              >
                                 <Group justify='space-between'>
                                   <Group>
                                     <ThemeIcon variant='light' color='blue' size='sm'>
@@ -1141,67 +1151,54 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
                 display: uploading ? 'block' : 'none',
               }}
             >
-                <Stack gap='lg'>
-                  <Group justify='space-between'>
-                    <Title order={3} style={{ animation: 'fadeIn 0.5s ease-out' }}>
-                      Upload Progress
-                    </Title>
-                    <RingProgress
-                      size={60}
-                      thickness={4}
-                      sections={[{ value: progress.percent, color: 'blue' }]}
-                      label={
-                        <Text ta='center' size='xs' fw={700}>
-                          {progress.percent}%
-                        </Text>
-                      }
-                      style={{ animation: 'scaleIn 0.4s ease-out' }}
-                    />
-                  </Group>
-
-                  <Progress 
-                    value={progress.percent} 
-                    size='xl' 
-                    radius='md' 
-                    color='blue' 
-                    striped 
-                    animated
-                    style={{ 
-                      animation: 'slideInLeft 0.5s ease-out',
-                      transition: 'all 0.3s ease'
-                    }}
+              <Stack gap='lg'>
+                <Group justify='space-between'>
+                  <Title order={3} style={{ animation: 'fadeIn 0.5s ease-out' }}>
+                    Upload Progress
+                  </Title>
+                  <RingProgress
+                    size={60}
+                    thickness={4}
+                    sections={[{ value: progress.percent, color: 'blue' }]}
+                    label={
+                      <Text ta='center' size='xs' fw={700}>
+                        {progress.percent}%
+                      </Text>
+                    }
+                    style={{ animation: 'scaleIn 0.4s ease-out' }}
                   />
+                </Group>
 
-                  <Group justify='space-between'>
-                    <Group gap='md'>
-                      <Badge 
-                        variant='light' 
-                        color='blue'
-                        style={{ animation: 'fadeIn 0.6s ease-out' }}
-                      >
-                        Speed: {bytes(progress.speed)}/s
+                <Progress
+                  value={progress.percent}
+                  size='xl'
+                  radius='md'
+                  color='blue'
+                  striped
+                  animated
+                  style={{
+                    animation: 'slideInLeft 0.5s ease-out',
+                    transition: 'all 0.3s ease',
+                  }}
+                />
+
+                <Group justify='space-between'>
+                  <Group gap='md'>
+                    <Badge variant='light' color='blue' style={{ animation: 'fadeIn 0.6s ease-out' }}>
+                      Speed: {bytes(progress.speed)}/s
+                    </Badge>
+                    {progress.remaining > 0 && (
+                      <Badge variant='light' color='green' style={{ animation: 'fadeIn 0.7s ease-out' }}>
+                        Remaining: {humanizeDuration(progress.remaining * 1000)}
                       </Badge>
-                      {progress.remaining > 0 && (
-                        <Badge 
-                          variant='light' 
-                          color='green'
-                          style={{ animation: 'fadeIn 0.7s ease-out' }}
-                        >
-                          Remaining: {humanizeDuration(progress.remaining * 1000)}
-                        </Badge>
-                      )}
-                    </Group>
-                    <Text 
-                      size='lg' 
-                      fw={600} 
-                      c='blue'
-                      style={{ animation: 'fadeIn 0.8s ease-out' }}
-                    >
-                      {progress.percent}% Complete
-                    </Text>
+                    )}
                   </Group>
-                </Stack>
-              </Paper>
+                  <Text size='lg' fw={600} c='blue' style={{ animation: 'fadeIn 0.8s ease-out' }}>
+                    {progress.percent}% Complete
+                  </Text>
+                </Group>
+              </Stack>
+            </Paper>
 
             {/* Uploaded Files Results */}
             {uploadedFiles.length > 0 && (
@@ -1251,15 +1248,15 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
 
                   <Stack gap='sm'>
                     {uploadedFiles.map((file, index) => (
-                                           <Card
-                       key={`uploaded-${index}`}
-                       p='md'
-                       radius='md'
-                       style={{
-                         backgroundColor: 'rgba(34, 197, 94, 0.1)',
-                         border: 'none',
-                       }}
-                     >
+                      <Card
+                        key={`uploaded-${index}`}
+                        p='md'
+                        radius='md'
+                        style={{
+                          backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                          border: 'none',
+                        }}
+                      >
                         <Group justify='space-between'>
                           <Group>
                             <ThemeIcon variant='light' color='green'>

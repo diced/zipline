@@ -5,7 +5,7 @@ import StandaloneUpload from './upload/index';
 
 export default StandaloneUpload;
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { firstSetup } = await getZipline();
 
   if (firstSetup) {
@@ -18,5 +18,5 @@ export const getServerSideProps: GetServerSideProps = async () => {
   }
 
   // No redirect - show upload page at root
-  return withSafeConfig()({});
+  return withSafeConfig()(ctx);
 };

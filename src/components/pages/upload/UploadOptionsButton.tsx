@@ -38,7 +38,15 @@ import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import { useShallow } from 'zustand/shallow';
 
-export default function UploadOptionsButton({ folder, numFiles, sticked }: { folder?: string; numFiles: number, sticked?: boolean }) {
+export default function UploadOptionsButton({
+  folder,
+  numFiles,
+  sticked,
+}: {
+  folder?: string;
+  numFiles: number;
+  sticked?: boolean;
+}) {
   const config = useConfig();
 
   const [opened, setOpen] = useQueryState('upopen', parseAsBoolean.withDefault(false));
@@ -159,7 +167,14 @@ export default function UploadOptionsButton({ folder, numFiles, sticked }: { fol
             }}
           />
 
-          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', minHeight: '100px' }}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'flex-end',
+              minHeight: '100px',
+            }}
+          >
             <Select
               data={[
                 { value: 'default', label: `Default (${config.files.defaultFormat})` },
@@ -393,7 +408,7 @@ export default function UploadOptionsButton({ folder, numFiles, sticked }: { fol
         onClick={() => setOpen(true)}
         style={{
           display: !numFiles ? 'none' : 'block',
-          background: sticked ? 'rgba(20, 20, 20, 0.8)' : ''
+          background: sticked ? 'rgba(20, 20, 20, 0.8)' : '',
         }}
       >
         Options

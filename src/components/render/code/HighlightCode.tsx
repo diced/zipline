@@ -278,20 +278,20 @@ export default function HighlightCode({
           alignSelf: 'flex-end',
           display: 'flex',
           gap: '0.5rem',
-          padding: '0.25rem', 
+          padding: '0.25rem',
           width: '100%',
           justifyContent: 'space-between',
           alignItems: 'center',
           boxSizing: 'border-box',
-          border: inModal ? isSticky ? 'transparent' : `1px solid ${theme.colors.dark[4]}` : '',
+          border: inModal ? (isSticky ? 'transparent' : `1px solid ${theme.colors.dark[4]}`) : '',
           borderRadius: theme.radius.md,
           pointerEvents: 'auto',
-          backgroundColor: isSticky ? 'transparent' : theme.colors.dark[7] ,
+          backgroundColor: isSticky ? 'transparent' : theme.colors.dark[7],
           zIndex: inModal ? 1000 : 200,
-          transition: 'opacity 0.3s ease, transform 0.3s ease, box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease',
+          transition:
+            'opacity 0.3s ease, transform 0.3s ease, box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease',
         }}
       >
-
         <Text
           size='sm'
           c='dimmed'
@@ -304,15 +304,16 @@ export default function HighlightCode({
           {code.length} characters
         </Text>
 
-        <div style={{
-          display: 'flex',
-          gap: '0.5rem',
-          padding: '0.25rem',
-          borderRadius: '10px',
-          backgroundColor: isSticky ? 'rgba(61, 61, 61, 0.5)' : 'transparent',
-          transition: 'all 0.2s ease',
-        }}>
-
+        <div
+          style={{
+            display: 'flex',
+            gap: '0.5rem',
+            padding: '0.25rem',
+            borderRadius: '10px',
+            backgroundColor: isSticky ? 'rgba(61, 61, 61, 0.5)' : 'transparent',
+            transition: 'all 0.2s ease',
+          }}
+        >
           {onUploadToPaste && !pasteInfo.exists && (
             <Button
               onClick={handleUploadToPasteClick}
@@ -349,9 +350,7 @@ export default function HighlightCode({
                 variant='outline'
                 color={copied ? 'green' : 'gray'}
                 size='compact-sm'
-                leftSection={
-                  copied ? <IconCheck size='1rem' /> : <IconClipboardCopy size='1rem' />
-                }
+                leftSection={copied ? <IconCheck size='1rem' /> : <IconClipboardCopy size='1rem' />}
               >
                 {copied ? 'Copied!' : 'Copy'}
               </Button>
@@ -377,16 +376,22 @@ export default function HighlightCode({
         offsetScrollbars={false}
         style={{ overflow: 'hidden' }}
       >
-        <pre style={{
-          margin: 0,
-          whiteSpace: 'pre-wrap',
-          wordBreak: 'break-word',
-          borderRadius: theme.radius.sm,
-        }} className='theme'>
-          <code className='theme' style={{
+        <pre
+          style={{
+            margin: 0,
             whiteSpace: 'pre-wrap',
-            wordBreak: 'break-word'
-          }}>
+            wordBreak: 'break-word',
+            borderRadius: theme.radius.sm,
+          }}
+          className='theme'
+        >
+          <code
+            className='theme'
+            style={{
+              whiteSpace: 'pre-wrap',
+              wordBreak: 'break-word',
+            }}
+          >
             {plainLines.map((_, index) => {
               const isFirst = index === 0;
               const isLast = index === plainLines.length - 1;

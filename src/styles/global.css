@@ -7,6 +7,17 @@
   --mantine-spacing-lg: 1.5rem;
   --mantine-spacing-xl: 2.5rem;
   */
+  
+  /* Custom CSS properties for Layout */
+  --blur-effect-12: blur(12px) saturate(180%);
+  --blur-effect-16: blur(16px) saturate(180%);
+  --transition-smooth: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-quick: 0.2s ease-in-out;
+  --glass-light: rgba(255, 255, 255, 0.85);
+  --glass-light-border: rgba(255, 255, 255, 0.3);
+  --glass-dark: rgba(26, 27, 30, 0.85);
+  --glass-dark-border: rgba(255, 255, 255, 0.15);
 }
 
 .mantine-Modal-title {

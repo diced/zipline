@@ -326,7 +326,9 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
           zIndex: 99,
           backgroundColor:
             colorScheme === 'dark'
-              ? (isSticky ? '#0009' : 'rgba(24, 28, 40, 0.6)') // Semi-transparent dark background
+              ? isSticky
+                ? '#0009'
+                : 'rgba(24, 28, 40, 0.6)' // Semi-transparent dark background
               : 'rgb(0, 0, 0)', // Semi-transparent white background
           backdropFilter: 'blur(10px)', // Add blur effect for better readability
           padding: '1rem',
@@ -351,11 +353,7 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
         </Button>
 
         <Group gap='sm'>
-          <UploadOptionsButton
-            folder={folder}
-            numFiles={files.length}
-            sticked={isSticky}
-          />
+          <UploadOptionsButton folder={folder} numFiles={files.length} sticked={isSticky} />
 
           <Button
             variant='outline'
@@ -401,9 +399,9 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
                           style={
                             file.size === 0
                               ? {
-                                backgroundColor: 'rgba(255, 255, 0, 0.1)',
-                                borderLeft: '3px solid #ffd43b',
-                              }
+                                  backgroundColor: 'rgba(255, 255, 0, 0.1)',
+                                  borderLeft: '3px solid #ffd43b',
+                                }
                               : {}
                           }
                         >
@@ -477,9 +475,9 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
                           style={
                             file.size === 0
                               ? {
-                                backgroundColor: 'rgba(255, 255, 0, 0.1)',
-                                borderLeft: '3px solid #ffd43b',
-                              }
+                                  backgroundColor: 'rgba(255, 255, 0, 0.1)',
+                                  borderLeft: '3px solid #ffd43b',
+                                }
                               : {}
                           }
                         >
