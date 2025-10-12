@@ -16,7 +16,6 @@ import 'mantine-datatable/styles.css';
 
 import '@/styles/global.css';
 import '@/styles/upload-animations.css';
-// @ts-expect-error -- CSS module import for side-effects only
 import '@/components/render/code/HighlightCode.theme.scss';
 
 const fetcher = async (url: RequestInfo | URL) => {

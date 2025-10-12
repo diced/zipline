@@ -89,9 +89,9 @@ export const useUploadOptionsStore = create<UploadOptionsStore>()(
         changes: () => {
           const { options, ephemeral } = get();
           return (
-            // @ts-ignore
-            Object.keys(options).filter((v) => options[v] !== defaultUploadOptions[v]).length +
-            Object.values(ephemeral).filter((v) => v !== null).length
+            Object.keys(options).filter(
+              (v) => options[v as keyof typeof options] !== defaultUploadOptions[v as keyof typeof defaultUploadOptions],
+            ).length + Object.values(ephemeral).filter((v) => v !== null).length
           );
         },
       }),
