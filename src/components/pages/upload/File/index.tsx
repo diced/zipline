@@ -55,6 +55,7 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const [showWarningModal, setShowWarningModal] = useState(false);
   const [warningDetails, setWarningDetails] = useState({ fileCount: 0, totalSize: 0 });
+  const [isSticky, setIsSticky] = useState(false);
 
   const handlePaste = (e: ClipboardEvent) => {
     if (!e.clipboardData) return;
@@ -226,6 +227,19 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
     };
   }, []);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      const buttonGroup = document.querySelector('[data-sticky-buttons]');
+      if (buttonGroup) {
+        const rect = buttonGroup.getBoundingClientRect();
+        setIsSticky(rect.top <= 70); // 70px is the sticky top value
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
     <>
       <Group gap='sm'>
@@ -302,21 +316,24 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
 
       {/* Action Buttons - Sticky at top */}
       <Group
+        data-sticky-buttons
         justify='space-between'
         gap='sm'
-        my='md'
         p='md'
         style={{
           position: 'sticky',
-          top: '60px', // Offset for navbar
+          top: '60px',
           zIndex: 99,
           backgroundColor:
-            colorScheme === 'dark' 
-              ? 'rgba(19, 19, 19, 0.8)' // Semi-transparent dark background
+            colorScheme === 'dark'
+              ? (isSticky ? '#0009' : 'rgba(24, 28, 40, 0.6)') // Semi-transparent dark background
               : 'rgb(0, 0, 0)', // Semi-transparent white background
-          backdropFilter: 'blur(8px)', // Add blur effect for better readability
-          margin: '0 -1rem',
+          backdropFilter: 'blur(10px)', // Add blur effect for better readability
           padding: '1rem',
+          border: '1px solid ' + (colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[2]),
+          borderRadius: !isSticky ? '0.5rem' : ' 0 0 0.5rem 0.5rem',
+          margin: files.length > 0 ? '8px 0 16px 0' : '8px 0 0 0',
+          transition: 'all 0.2s ease',
         }}
       >
         <Button
@@ -325,18 +342,30 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
           leftSection={<IconTrashFilled size={18} />}
           disabled={files.length === 0 || dropLoading}
           onClick={() => setFiles([])}
+          style={{
+            backgroundColor: isSticky ? 'rgba(20, 20, 20, 0.8)' : '',
+            color: !files.length ? 'var(--button-color, var(--mantine-color-white))' : '',
+          }}
         >
           Clear All
         </Button>
 
         <Group gap='sm'>
-          <UploadOptionsButton folder={folder} numFiles={files.length} />
+          <UploadOptionsButton
+            folder={folder}
+            numFiles={files.length}
+            sticked={isSticky}
+          />
 
           <Button
             variant='outline'
             leftSection={<IconUpload size={18} />}
             disabled={files.length === 0 || dropLoading}
             onClick={upload}
+            style={{
+              backgroundColor: isSticky ? 'rgba(20, 20, 20, 0.8)' : '',
+              color: !files.length ? 'var(--button-color, var(--mantine-color-white))' : '',
+            }}
           >
             Upload {files.length} files ({bytes(aggSize())})
           </Button>
@@ -372,9 +401,9 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
                           style={
                             file.size === 0
                               ? {
-                                  backgroundColor: 'rgba(255, 255, 0, 0.1)',
-                                  borderLeft: '3px solid #ffd43b',
-                                }
+                                backgroundColor: 'rgba(255, 255, 0, 0.1)',
+                                borderLeft: '3px solid #ffd43b',
+                              }
                               : {}
                           }
                         >
@@ -448,9 +477,9 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
                           style={
                             file.size === 0
                               ? {
-                                  backgroundColor: 'rgba(255, 255, 0, 0.1)',
-                                  borderLeft: '3px solid #ffd43b',
-                                }
+                                backgroundColor: 'rgba(255, 255, 0, 0.1)',
+                                borderLeft: '3px solid #ffd43b',
+                              }
                               : {}
                           }
                         >
@@ -521,7 +550,7 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
             columnCount: 'auto',
             columnWidth: '25vh',
             columnGap: '1rem',
-            margin: '1rem',
+            // margin: '1rem',
           }}
         >
           {files.map((file, i) => (

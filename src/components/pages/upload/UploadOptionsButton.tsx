@@ -38,7 +38,7 @@ import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import { useShallow } from 'zustand/shallow';
 
-export default function UploadOptionsButton({ folder, numFiles }: { folder?: string; numFiles: number }) {
+export default function UploadOptionsButton({ folder, numFiles, sticked }: { folder?: string; numFiles: number, sticked?: boolean }) {
   const config = useConfig();
 
   const [opened, setOpen] = useQueryState('upopen', parseAsBoolean.withDefault(false));
@@ -159,38 +159,40 @@ export default function UploadOptionsButton({ folder, numFiles }: { folder?: str
             }}
           />
 
-          <Select
-            data={[
-              { value: 'default', label: `Default (${config.files.defaultFormat})` },
-              { value: 'random', label: 'Random' },
-              { value: 'date', label: 'Date' },
-              { value: 'uuid', label: 'UUID' },
-              { value: 'name', label: 'Use file name' },
-              { value: 'gfycat', label: 'Gfycat-style name' },
-            ]}
-            label={
-              <>
-                Name Format{' '}
-                {options.format !== 'default' ? (
-                  <Badge variant='outline' size='xs'>
-                    saved
-                  </Badge>
-                ) : null}
-              </>
-            }
-            description='The file name format to use when upload this file, the "File name" field will override this value.'
-            leftSection={<IconWriting size='1rem' />}
-            value={options.format}
-            onChange={(value) => setOption('format', value || ('default' as any))}
-            comboboxProps={{
-              withinPortal: true,
-              portalProps: {
-                style: {
-                  zIndex: 100000000,
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', minHeight: '100px' }}>
+            <Select
+              data={[
+                { value: 'default', label: `Default (${config.files.defaultFormat})` },
+                { value: 'random', label: 'Random' },
+                { value: 'date', label: 'Date' },
+                { value: 'uuid', label: 'UUID' },
+                { value: 'name', label: 'Use file name' },
+                { value: 'gfycat', label: 'Gfycat-style name' },
+              ]}
+              label={
+                <>
+                  Name Format{' '}
+                  {options.format !== 'default' ? (
+                    <Badge variant='outline' size='xs'>
+                      saved
+                    </Badge>
+                  ) : null}
+                </>
+              }
+              description='The file name format to use when upload this file, the "File name" field will override this value.'
+              leftSection={<IconWriting size='1rem' />}
+              value={options.format}
+              onChange={(value) => setOption('format', value || ('default' as any))}
+              comboboxProps={{
+                withinPortal: true,
+                portalProps: {
+                  style: {
+                    zIndex: 100000000,
+                  },
                 },
-              },
-            }}
-          />
+              }}
+            />
+          </div>
 
           <NumberInput
             label={
@@ -389,6 +391,10 @@ export default function UploadOptionsButton({ folder, numFiles }: { folder?: str
         variant={changes() !== 0 ? 'light' : 'outline'}
         rightSection={changes() !== 0 ? <Badge variant='outline'>{changes()}</Badge> : null}
         onClick={() => setOpen(true)}
+        style={{
+          display: !numFiles ? 'none' : 'block',
+          background: sticked ? 'rgba(20, 20, 20, 0.8)' : ''
+        }}
       >
         Options
       </Button>

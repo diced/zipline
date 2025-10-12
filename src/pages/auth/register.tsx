@@ -91,7 +91,7 @@ export default function Register({ config, invite }: InferGetServerSidePropsType
       });
 
       mutate('/api/user');
-      await router.push('/dashboard');
+      await router.push('/');
     }
   };
 

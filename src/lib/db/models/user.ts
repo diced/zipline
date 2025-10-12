@@ -35,6 +35,7 @@ export const userSelect = {
   passkeys: true,
   quota: true,
   sessions: true,
+  avatar: true,
 };
 
 export type UserViewSettings = z.infer<typeof userViewSchema>;

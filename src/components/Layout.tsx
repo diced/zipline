@@ -1,4 +1,3 @@
-import type { Response } from '@/lib/api/response';
 import type { SafeConfig } from '@/lib/config/safe';
 import { useSettingsStore } from '@/lib/store/settings';
 import React from 'react';
@@ -29,7 +28,7 @@ export default function Layout({ children, config }: { children: React.ReactNode
   } = useLayoutState();
   // Check if custom background should be applied
   const hasCustomBackground = Boolean(
-    backgroundType === 'image' && backgroundImageUrl && backgroundImageUrl.trim() !== ''
+    backgroundType === 'image' && backgroundImageUrl && backgroundImageUrl.trim() !== '',
   );
 
   return (

@@ -2,21 +2,11 @@ import type { Response } from '@/lib/api/response';
 import { fetchApi } from '@/lib/fetchApi';
 import { useUserStore } from '@/lib/store/user';
 import useLogin from '@/lib/hooks/useLogin';
-import {
-  Modal,
-  PasswordInput,
-  Group,
-  Button,
-} from '@mantine/core';
+import { Modal, PasswordInput, Group, Button } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useClipboard } from '@mantine/hooks';
 import { showNotification } from '@mantine/notifications';
-import {
-  IconLock,
-  IconCheck,
-  IconClipboardCopy,
-  IconRefreshDot,
-} from '@tabler/icons-react';
+import { IconLock, IconCheck, IconClipboardCopy, IconRefreshDot } from '@tabler/icons-react';
 
 interface TokenManagementModalProps {
   showPasswordModal: boolean;

@@ -67,7 +67,7 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
 
   useEffect(() => {
     if (data?.user) {
-      router.push('/dashboard');
+      router.push('/');
     }
   }, [data]);
 

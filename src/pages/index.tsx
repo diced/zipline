@@ -1,17 +1,9 @@
 import { getZipline } from '@/lib/db/models/zipline';
 import { GetServerSideProps } from 'next';
-import Head from 'next/head';
+import { withSafeConfig } from '@/lib/middleware/next/withSafeConfig';
+import StandaloneUpload from './upload/index';
 
-export default function Index() {
-  return (
-    <>
-      <Head>
-        <title>Zipline</title>
-        <meta name='viewport' content='width=device-width, initial-scale=1' />
-      </Head>
-    </>
-  );
-}
+export default StandaloneUpload;
 
 export const getServerSideProps: GetServerSideProps = async () => {
   const { firstSetup } = await getZipline();
@@ -25,10 +17,6 @@ export const getServerSideProps: GetServerSideProps = async () => {
     };
   }
 
-  return {
-    redirect: {
-      destination: '/dashboard',
-      permanent: false,
-    },
-  };
+  // No redirect - show upload page at root
+  return withSafeConfig()({});
 };

@@ -36,7 +36,6 @@ import {
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import styles from '../Layout.module.css';
-import { useLayoutState } from '../../hooks/useLayoutState';
 
 type NavLinks = {
   label: string;
@@ -45,7 +44,7 @@ type NavLinks = {
   href?: string;
   links?: NavLinks[];
   if?: (user: Response['/api/user']['user'], config: SafeConfig) => boolean;
-};  
+};
 
 const navLinks: NavLinks[] = [
   {
@@ -90,7 +89,7 @@ const navLinks: NavLinks[] = [
         label: 'Text',
         icon: <IconFileText size='1rem' />,
         active: (path: string) => path === '/dashboard/upload/text',
-        href: '/dashboard/upload/text'
+        href: '/dashboard/upload/text',
       },
     ],
   },
@@ -146,17 +145,18 @@ export function LayoutNavbar({
   config,
 }: LayoutNavbarProps) {
   const { colorScheme } = useMantineColorScheme();
-  const theme = useMantineTheme();  const { user } = useLogin();
+  const theme = useMantineTheme();
+  const { user } = useLogin();
   const router = useRouter();
 
   // Local state management for logo text animation
   const [localShowLogoText, setLocalShowLogoText] = useState(!navbarCollapsed);
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
-  
+
   // Simplified state management
   const [expandedSubmenu, setExpandedSubmenu] = useState<string | null>(null);
   const [manuallyClosedSubmenu, setManuallyClosedSubmenu] = useState<string | null>(null);
-    // Clear expanded submenu when sidebar is collapsed
+  // Clear expanded submenu when sidebar is collapsed
   useEffect(() => {
     if (navbarCollapsed) {
       setExpandedSubmenu(null);
@@ -181,14 +181,12 @@ export function LayoutNavbar({
       setLocalShowLogoText(!navbarCollapsed);
     }
   }, [navbarCollapsed, hasUserInteracted]);
-  
+
   // Auto-expand submenu for current page
   useEffect(() => {
     if (!navbarCollapsed) {
-      const currentSubmenu = navLinks.find(link => 
-        link.links && link.active(router.pathname)
-      );
-      
+      const currentSubmenu = navLinks.find((link) => link.links && link.active(router.pathname));
+
       if (currentSubmenu && manuallyClosedSubmenu !== currentSubmenu.label) {
         setExpandedSubmenu(currentSubmenu.label);
       }
@@ -196,9 +194,7 @@ export function LayoutNavbar({
   }, [router.pathname, navbarCollapsed, manuallyClosedSubmenu]);
   // Reset manual close state when navigating to different sections
   useEffect(() => {
-    const currentSubmenu = navLinks.find(link => 
-      link.links && link.active(router.pathname)
-    );
+    const currentSubmenu = navLinks.find((link) => link.links && link.active(router.pathname));
     // If we navigate to a different submenu section, reset the manual close state
     if (currentSubmenu && manuallyClosedSubmenu && manuallyClosedSubmenu !== currentSubmenu.label) {
       setManuallyClosedSubmenu(null);
@@ -206,9 +202,9 @@ export function LayoutNavbar({
   }, [router.pathname, manuallyClosedSubmenu]);
 
   // Memoized filtered navigation links
-  const filteredNavLinks = useMemo(() => 
-    navLinks.filter((link) => !link.if || link.if(user as Response['/api/user']['user'], config)),
-    [user, config]
+  const filteredNavLinks = useMemo(
+    () => navLinks.filter((link) => !link.if || link.if(user as Response['/api/user']['user'], config)),
+    [user, config],
   );
   // Memoized event handlers
   const handleNavbarToggle = useCallback(() => {
@@ -216,45 +212,57 @@ export function LayoutNavbar({
     setNavbarCollapsed(!navbarCollapsed);
   }, [navbarCollapsed, setNavbarCollapsed]);
 
-  const handleSubmenuToggle = useCallback((linkLabel: string, opened: boolean) => {
-    if (opened) {
-      setExpandedSubmenu(linkLabel);
-      if (manuallyClosedSubmenu === linkLabel) {
-        setManuallyClosedSubmenu(null);
+  const handleSubmenuToggle = useCallback(
+    (linkLabel: string, opened: boolean) => {
+      if (opened) {
+        setExpandedSubmenu(linkLabel);
+        if (manuallyClosedSubmenu === linkLabel) {
+          setManuallyClosedSubmenu(null);
+        }
+      } else {
+        setExpandedSubmenu(null);
+        setManuallyClosedSubmenu(linkLabel);
       }
-    } else {
-      setExpandedSubmenu(null);
-      setManuallyClosedSubmenu(linkLabel);
-    }
-  }, [manuallyClosedSubmenu]);
+    },
+    [manuallyClosedSubmenu],
+  );
 
-  const handleSubmenuClick = useCallback((e: React.MouseEvent, linkLabel: string) => {
-    if (expandedSubmenu === linkLabel) {
+  const handleSubmenuClick = useCallback(
+    (e: React.MouseEvent, linkLabel: string) => {
+      if (expandedSubmenu === linkLabel) {
+        e.preventDefault();
+        setExpandedSubmenu(null);
+        setManuallyClosedSubmenu(linkLabel);
+      } else {
+        setExpandedSubmenu(linkLabel);
+        if (manuallyClosedSubmenu === linkLabel) {
+          setManuallyClosedSubmenu(null);
+        }
+      }
+    },
+    [expandedSubmenu, manuallyClosedSubmenu],
+  );
+
+  const handleCollapsedSubmenuClick = useCallback(
+    (e: React.MouseEvent, linkLabel: string) => {
       e.preventDefault();
-      setExpandedSubmenu(null);
-      setManuallyClosedSubmenu(linkLabel);
-    } else {
-      setExpandedSubmenu(linkLabel);
-      if (manuallyClosedSubmenu === linkLabel) {
-        setManuallyClosedSubmenu(null);
-      }
-    }
-  }, [expandedSubmenu, manuallyClosedSubmenu]);
+      e.stopPropagation();
+      setNavbarCollapsed(false);
+      setTimeout(() => {
+        setExpandedSubmenu(linkLabel);
+      }, 0);
+    },
+    [setNavbarCollapsed],
+  );
 
-  const handleCollapsedSubmenuClick = useCallback((e: React.MouseEvent, linkLabel: string) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setNavbarCollapsed(false);
-    setTimeout(() => {
-      setExpandedSubmenu(linkLabel);
-    }, 0);
-  }, [setNavbarCollapsed]);
-
-  const handleCollapsedNavClick = useCallback((e: React.MouseEvent, href: string) => {
-    e.preventDefault();
-    e.stopPropagation();
-    router.push(href);
-  }, [router]);
+  const handleCollapsedNavClick = useCallback(
+    (e: React.MouseEvent, href: string) => {
+      e.preventDefault();
+      e.stopPropagation();
+      router.push(href);
+    },
+    [router],
+  );
 
   const handleExternalLinkClick = useCallback((e: React.MouseEvent, url: string) => {
     e.preventDefault();
@@ -263,63 +271,81 @@ export function LayoutNavbar({
   }, []);
 
   // Memoized style functions
-  const getCollapsedItemStyle = useCallback((isActive: boolean) => ({
-    backgroundColor: isActive
-      ? colorScheme === 'dark'
-        ? theme.colors.dark[6]
-        : theme.colors.gray[2]
-      : 'transparent',
-  }), [colorScheme, theme]);
-  const getSubmenuCollapsedStyle = useCallback((isActive: boolean) => ({
-    cursor: 'pointer',
-    backgroundColor: isActive
-      ? colorScheme === 'dark'
-        ? theme.colors.dark[6]
-        : theme.colors.gray[2]
-      : 'transparent',
-  }), [colorScheme, theme]);
+  const getCollapsedItemStyle = useCallback(
+    (isActive: boolean) => ({
+      backgroundColor: isActive
+        ? colorScheme === 'dark'
+          ? theme.colors.dark[6]
+          : theme.colors.gray[2]
+        : 'transparent',
+    }),
+    [colorScheme, theme],
+  );
+  const getSubmenuCollapsedStyle = useCallback(
+    (isActive: boolean) => ({
+      cursor: 'pointer',
+      backgroundColor: isActive
+        ? colorScheme === 'dark'
+          ? theme.colors.dark[6]
+          : theme.colors.gray[2]
+        : 'transparent',
+    }),
+    [colorScheme, theme],
+  );
   // Memoized submenu renderer
-  const renderSubLinks = useCallback((subLinks: NavLinks[]) => 
-    subLinks
-      .filter((sublink) => !sublink.if || sublink.if(user as Response['/api/user']['user'], config))
-      .map((sublink) => (
-        <NavLink
-          key={sublink.label}
-          label={sublink.label}
-          leftSection={sublink.icon}
-          rightSection={<IconChevronRight size='0.7rem' />}
-          variant='light'
-          active={router.pathname === sublink.href}
-          component={Link}
-          href={sublink.href || ''}
-          className={styles.subNavItem}
-        />
-      )), [user, config, router.pathname]);
+  const renderSubLinks = useCallback(
+    (subLinks: NavLinks[]) =>
+      subLinks
+        .filter((sublink) => !sublink.if || sublink.if(user as Response['/api/user']['user'], config))
+        .map((sublink) => (
+          <NavLink
+            key={sublink.label}
+            label={sublink.label}
+            leftSection={sublink.icon}
+            rightSection={<IconChevronRight size='0.7rem' />}
+            variant='light'
+            active={router.pathname === sublink.href}
+            component={Link}
+            href={sublink.href || ''}
+            className={styles.subNavItem}
+          />
+        )),
+    [user, config, router.pathname],
+  );
 
   // Memoized inline styles
-  const toggleButtonStyle = useMemo(() => ({
-    display: 'flex',
-    justifyContent: 'center',
-    padding: navbarCollapsed ? '8px' : '10px',
-    marginTop: '8px',
-  }), [navbarCollapsed]);
+  const toggleButtonStyle = useMemo(
+    () => ({
+      display: 'flex',
+      justifyContent: 'center',
+      padding: navbarCollapsed ? '8px' : '10px',
+      marginTop: '8px',
+    }),
+    [navbarCollapsed],
+  );
 
-  const externalLinkIconStyleCollapsed = useMemo(() => ({
-    fontSize: '1.2rem',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  }), []);
+  const externalLinkIconStyleCollapsed = useMemo(
+    () => ({
+      fontSize: '1.2rem',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+    }),
+    [],
+  );
 
-  const externalLinkIconStyleExpanded = useMemo(() => ({
-    fontSize: '1rem',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: '4px',
-  }), []);
+  const externalLinkIconStyleExpanded = useMemo(
+    () => ({
+      fontSize: '1rem',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginLeft: '4px',
+    }),
+    [],
+  );
 
-  return (  
+  return (
     <AppShell.Navbar
       hidden={!opened}
       zIndex={90}
@@ -335,7 +361,8 @@ export function LayoutNavbar({
             size='md'
             className={styles.logoImage}
           />
-        )}        <Title
+        )}{' '}
+        <Title
           size={20}
           lineClamp={1}
           ta='center'
@@ -344,7 +371,6 @@ export function LayoutNavbar({
           {config.website.title?.trim() || 'Zipline'}
         </Title>
       </Box>
-
       {/* Mobile title */}
       <Box hiddenFrom='sm' p='md' pb='xs'>
         <Title size={24} style={{ marginBottom: 8 }}>
@@ -352,98 +378,100 @@ export function LayoutNavbar({
         </Title>
         <Divider />
       </Box>
-
-      {/* Main navigation section */}      <ScrollArea flex={1} type='never' className={`${styles.navbarContent} ${styles.navSection}`}>
+      {/* Main navigation section */}{' '}
+      <ScrollArea flex={1} type='never' className={`${styles.navbarContent} ${styles.navSection}`}>
         <div className={navbarCollapsed ? styles.navSectionCollapsed : ''}>
           <Box>
             {filteredNavLinks.map((link) => {
-                if (!link.links) {
-                  if (navbarCollapsed) {
-                    return (
-                      <div
-                        key={link.label}
-                        title={link.label}
-                        className={`${styles.navItemCollapsed} ${styles.collapsedItem} ${styles.navItemCollapsedBase}`}
-                        style={getCollapsedItemStyle(router.pathname === link.href)}
-                        onClick={(e) => handleCollapsedNavClick(e, link.href || '')}
+              if (!link.links) {
+                if (navbarCollapsed) {
+                  return (
+                    <div
+                      key={link.label}
+                      title={link.label}
+                      className={`${styles.navItemCollapsed} ${styles.collapsedItem} ${styles.navItemCollapsedBase}`}
+                      style={getCollapsedItemStyle(router.pathname === link.href)}
+                      onClick={(e) => handleCollapsedNavClick(e, link.href || '')}
+                    >
+                      <Box
+                        className={`${styles.iconWrapper} ${styles.iconWrapperBase} ${styles.iconWrapperCollapsed}`}
                       >
+                        {link.icon}
+                      </Box>
+                    </div>
+                  );
+                } else {
+                  return (
+                    <NavLink
+                      key={link.label}
+                      label={link.label}
+                      leftSection={
                         <Box
-                          className={`${styles.iconWrapper} ${styles.iconWrapperBase} ${styles.iconWrapperCollapsed}`}
+                          className={`${styles.iconWrapper} ${styles.iconWrapperBase} ${styles.iconWrapperExpanded}`}
                         >
                           {link.icon}
                         </Box>
-                      </div>
-                    );
-                  } else {
-                    return (
-                      <NavLink
-                        key={link.label}
-                        label={link.label}
-                        leftSection={
-                          <Box
-                            className={`${styles.iconWrapper} ${styles.iconWrapperBase} ${styles.iconWrapperExpanded}`}
-                          >
-                            {link.icon}
-                          </Box>
-                        }
-                        variant='light'
-                        rightSection={<IconChevronRight size='0.7rem' />}
-                        active={router.pathname === link.href}
-                        component={Link}
-                        href={link.href || ''}
-                        className={`${styles.navItem} ${styles.navItemBase}`}
-                      />
-                    );
-                  }                } else {
-                  // Handle links with children
-                  if (navbarCollapsed) {
-                    // In collapsed mode, clicking expands the sidebar to show submenu
-                    return (
-                      <div
-                        key={link.label}
-                        title={`Click to expand ${link.label} menu`}
-                        className={`${styles.navItemCollapsed} ${styles.collapsedItem} ${styles.navItemCollapsedBase}`}
-                        style={getSubmenuCollapsedStyle(link.active(router.pathname))}
-                        onClick={(e) => handleCollapsedSubmenuClick(e, link.label)}
-                      >
-                        <Box
-                          className={`${styles.iconWrapper} ${styles.iconWrapperBase} ${styles.iconWrapperCollapsed}`}
-                        >
-                          {link.icon}
-                        </Box>
-                      </div>
-                    );
-                  } else {                    return (
-                      <NavLink
-                        key={link.label}
-                        label={link.label}
-                        leftSection={
-                          <Box
-                            className={`${styles.iconWrapper} ${styles.iconWrapperBase} ${styles.iconWrapperExpanded}`}
-                          >
-                            {link.icon}
-                          </Box>
-                        }
-                        variant='light'
-                        rightSection={<IconChevronRight size='0.7rem' />}                        active={link.active(router.pathname)}
-                        className={`${styles.navItem} ${styles.navItemBase}`}                        opened={expandedSubmenu === link.label}
-                        onChange={(opened) => handleSubmenuToggle(link.label, opened)}
-                        onClick={(e) => handleSubmenuClick(e, link.label)}                      >
-                        {renderSubLinks(link.links)}
-                      </NavLink>
-                    );
-                  }
+                      }
+                      variant='light'
+                      rightSection={<IconChevronRight size='0.7rem' />}
+                      active={router.pathname === link.href}
+                      component={Link}
+                      href={link.href || ''}
+                      className={`${styles.navItem} ${styles.navItemBase}`}
+                    />
+                  );
                 }
-              })}
+              } else {
+                // Handle links with children
+                if (navbarCollapsed) {
+                  // In collapsed mode, clicking expands the sidebar to show submenu
+                  return (
+                    <div
+                      key={link.label}
+                      title={`Click to expand ${link.label} menu`}
+                      className={`${styles.navItemCollapsed} ${styles.collapsedItem} ${styles.navItemCollapsedBase}`}
+                      style={getSubmenuCollapsedStyle(link.active(router.pathname))}
+                      onClick={(e) => handleCollapsedSubmenuClick(e, link.label)}
+                    >
+                      <Box
+                        className={`${styles.iconWrapper} ${styles.iconWrapperBase} ${styles.iconWrapperCollapsed}`}
+                      >
+                        {link.icon}
+                      </Box>
+                    </div>
+                  );
+                } else {
+                  return (
+                    <NavLink
+                      key={link.label}
+                      label={link.label}
+                      leftSection={
+                        <Box
+                          className={`${styles.iconWrapper} ${styles.iconWrapperBase} ${styles.iconWrapperExpanded}`}
+                        >
+                          {link.icon}
+                        </Box>
+                      }
+                      variant='light'
+                      rightSection={<IconChevronRight size='0.7rem' />}
+                      active={link.active(router.pathname)}
+                      className={`${styles.navItem} ${styles.navItemBase}`}
+                      opened={expandedSubmenu === link.label}
+                      onChange={(opened) => handleSubmenuToggle(link.label, opened)}
+                      onClick={(e) => handleSubmenuClick(e, link.label)}
+                    >
+                      {renderSubLinks(link.links)}
+                    </NavLink>
+                  );
+                }
+              }
+            })}
           </Box>
         </div>
       </ScrollArea>
-
-      {/* Bottom section with toggle button */}      <Box
-        mt='sm'
-        visibleFrom='sm'
-        style={toggleButtonStyle}
-      ><ActionIcon
+      {/* Bottom section with toggle button */}{' '}
+      <Box mt='sm' visibleFrom='sm' style={toggleButtonStyle}>
+        <ActionIcon
           variant='light'
           size='lg'
           onClick={handleNavbarToggle}
@@ -454,7 +482,6 @@ export function LayoutNavbar({
           </Group>
         </ActionIcon>
       </Box>
-
       {/* External links section */}
       <Box className={styles.bottomSectionBase}>
         {config.website.externalLinks.length > 0 && (
@@ -465,8 +492,11 @@ export function LayoutNavbar({
                   <div
                     key={i}
                     title={name}
-                    className={`${styles.navItemCollapsed} ${styles.collapsedItem} ${styles.externalLink} ${styles.externalLinkCollapsed}`}                    onClick={(e) => handleExternalLinkClick(e, url)}
-                  >                    <Box style={externalLinkIconStyleCollapsed}>
+                    className={`${styles.navItemCollapsed} ${styles.collapsedItem} ${styles.externalLink} ${styles.externalLinkCollapsed}`}
+                    onClick={(e) => handleExternalLinkClick(e, url)}
+                  >
+                    {' '}
+                    <Box style={externalLinkIconStyleCollapsed}>
                       <IconExternalLink />
                     </Box>
                   </div>
@@ -476,7 +506,8 @@ export function LayoutNavbar({
                   <NavLink
                     key={i}
                     label={name}
-                    leftSection={                      <Box style={externalLinkIconStyleExpanded}>
+                    leftSection={
+                      <Box style={externalLinkIconStyleExpanded}>
                         <IconExternalLink />
                       </Box>
                     }

@@ -172,7 +172,7 @@ async function main() {
   Promise.all(routesOptions.map((route) => server.register(route)));
 
   if (!argv.includes('--skip-next')) {
-    server.get('/', (_, res) => res.redirect('/dashboard'));
+    // server.get('/', (_, res) => res.redirect('/dashboard')); // Commented out to allow root page to render upload component
     server.next('/*', ALL_METHODS);
     server.next('/dashboard', ALL_METHODS);
     server.next('/reload', ALL_METHODS);

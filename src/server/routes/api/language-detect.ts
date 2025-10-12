@@ -44,12 +44,12 @@ export default fastifyPlugin(
           }
 
           // Make request to local language detection service
-            const detectUrl = process.env.LANGUAGE_DETECT_URL;
-            if (!detectUrl) {
+          const detectUrl = process.env.LANGUAGE_DETECT_URL;
+          if (!detectUrl) {
             throw new Error('Missing LANGUAGE_DETECT_URL environment variable');
-            }
+          }
 
-            const response = await fetch(detectUrl, {
+          const response = await fetch(detectUrl, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -58,7 +58,7 @@ export default fastifyPlugin(
               text,
               verbose,
             }),
-            });
+          });
 
           if (!response.ok) {
             throw new Error(`Language detection service returned ${response.status}`);

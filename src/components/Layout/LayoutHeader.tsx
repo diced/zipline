@@ -1,4 +1,3 @@
-import type { Response } from '@/lib/api/response';
 import type { SafeConfig } from '@/lib/config/safe';
 import useAvatar from '@/lib/hooks/useAvatar';
 import useLogin from '@/lib/hooks/useLogin';
@@ -86,7 +85,10 @@ export function LayoutHeader({
         backdropFilter: 'blur(8px) saturate(180%)',
         WebkitBackdropFilter: 'blur(16px) saturate(180%)',
         background: colorScheme === 'dark' ? 'rgba(26, 27, 30, 0.85)' : 'rgba(255, 255, 255, 0.85)',
-        borderBottom: colorScheme === 'dark' ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(255, 255, 255, 0.3)',
+        borderBottom:
+          colorScheme === 'dark'
+            ? '1px solid rgba(255, 255, 255, 0.15)'
+            : '1px solid rgba(255, 255, 255, 0.3)',
       }}
     >
       <div className={styles.headerContent}>
@@ -105,11 +107,11 @@ export function LayoutHeader({
             shadow='md'
             width={200}
             withinPortal={true}
-            floatingStrategy="fixed"
+            floatingStrategy='fixed'
             styles={{
               dropdown: {
                 transform: 'translateX(20px)',
-              }
+              },
             }}
           >
             <Menu.Target>
@@ -136,7 +138,10 @@ export function LayoutHeader({
                 backdropFilter: 'blur(16px) saturate(180%)',
                 WebkitBackdropFilter: 'blur(16px) saturate(180%)',
                 background: colorScheme === 'dark' ? 'rgba(26, 27, 30, 0.85)' : 'rgba(255, 255, 255, 0.85)',
-                border: colorScheme === 'dark' ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(255, 255, 255, 0.3)',
+                border:
+                  colorScheme === 'dark'
+                    ? '1px solid rgba(255, 255, 255, 0.15)'
+                    : '1px solid rgba(255, 255, 255, 0.3)',
               }}
             >
               <Menu.Label>
