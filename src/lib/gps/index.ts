@@ -1,5 +1,3 @@
-// heavily modified from @xoi/gps-metadata-remover to fit the needs of zipline
-
 import {
   PNG_TAG,
   PNG_IEND,

@@ -16,7 +16,6 @@ export function UploadProgress({
   fileUploadSpeed,
   onClear,
 }: UploadProgressProps) {
-  // Calculate total upload speed
   const totalSpeed = Object.values(fileUploadSpeed)
     .filter((speed) => speed > 0)
     .reduce((sum, speed) => sum + speed, 0);
@@ -24,7 +23,6 @@ export function UploadProgress({
   return (
     <Box p='lg' style={{ cursor: 'default' }}>
       <Stack gap='lg'>
-        {/* Header with speed */}
         <Group justify='space-between' align='center'>
           <Stack gap='xs'>
             <Group gap='md' align='center'>
@@ -48,7 +46,6 @@ export function UploadProgress({
           )}
         </Group>
 
-        {/* Simple File List */}
         {files.length > 0 ? (
           <Stack gap='md'>
             {files.map((file, index) => {
@@ -98,7 +95,6 @@ export function UploadProgress({
           </Stack>
         ) : (
           <Stack gap='md'>
-            {/* Fallback for non-queue uploads */}
             {Object.entries(fileProgress).map(([fileName, percent]) => (
               <Box
                 key={fileName}

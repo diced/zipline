@@ -34,7 +34,6 @@ export default fastifyPlugin(
         try {
           const { password } = req.body;
 
-          // Verify password
           const user = await prisma.user.findUnique({
             where: { id: req.user.id },
             select: { password: true },
@@ -51,7 +50,7 @@ export default fastifyPlugin(
           logger.warn('Starting reset of all files', {
             requester: req.user.username,
             userId: req.user.id,
-          }); // Get all files from database
+          });
           const files = await prisma.file.findMany({
             select: {
               id: true,
@@ -66,15 +65,12 @@ export default fastifyPlugin(
 
           let deletedCount = 0;
 
-          // Delete physical files using datasource
           for (const file of files) {
             try {
-              // Delete main file
               if (file.name) {
                 await datasource.delete(file.name);
               }
 
-              // Delete thumbnail if exists
               if (file.thumbnail?.path) {
                 await datasource.delete(file.thumbnail.path);
               }
@@ -89,13 +85,10 @@ export default fastifyPlugin(
             }
           }
 
-          // Delete all file records from database
           await prisma.file.deleteMany({});
 
-          // Delete all thumbnail records
           await prisma.thumbnail.deleteMany({});
 
-          // Delete all URL records (if they exist)
           await prisma.url.deleteMany({});
 
           const status = `Successfully deleted ${deletedCount} files and cleared all database records`;

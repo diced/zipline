@@ -47,14 +47,12 @@ export default fastifyPlugin(
         ...secondlyRatelimit(1),
       },
       async (req, res) => {
-        // Check if any changes require current password verification
         const requiresPassword = req.body.username || req.body.password;
 
         if (requiresPassword && !req.body.currentPassword) {
           return res.badRequest('Current password is required for username or password changes');
         }
 
-        // Verify current password if provided
         if (req.body.currentPassword) {
           const currentUser = await prisma.user.findFirst({
             where: {

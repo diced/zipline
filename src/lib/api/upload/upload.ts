@@ -31,7 +31,6 @@ const commonDoubleExts = [
   '.log.gz',
   '.csv.gz',
   '.pdf.gz',
-  // feel free to PR more
 ];
 
 export const getExtension = (filename: string, override?: string): string => {

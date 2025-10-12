@@ -41,7 +41,6 @@ export default function SettingsUser() {
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [modalType, setModalType] = useState<'token' | 'update'>('token');
 
-  // Password confirmation form for modal
   const passwordForm = useForm({
     initialValues: {
       currentPassword: '',
@@ -51,7 +50,6 @@ export default function SettingsUser() {
     },
   });
 
-  // Main form for user updates
   const form = useForm({
     initialValues: {
       username: user?.username ?? '',
@@ -69,14 +67,12 @@ export default function SettingsUser() {
     },
   });
 
-  // Clear confirm password when password is cleared
   useEffect(() => {
     if (!form.values.password && form.values.confirmPassword) {
       form.setFieldValue('confirmPassword', '');
     }
   }, [form.values.password]);
 
-  // Verify password and show token
   const handleShowToken = async (currentPassword: string) => {
     const { data, error } = await fetchApi<{ valid: boolean; token?: string }>(
       '/api/user/verify-password',
@@ -104,7 +100,6 @@ export default function SettingsUser() {
     }
   };
 
-  // Verify password for updates
   const handlePasswordConfirmation = async (currentPassword: string) => {
     const { data, error } = await fetchApi<{ valid: boolean }>('/api/user/verify-password', 'POST', {
       password: currentPassword,
@@ -115,13 +110,11 @@ export default function SettingsUser() {
       return;
     }
 
-    // Password is valid, proceed with the actual update
     setShowPasswordModal(false);
     passwordForm.reset();
     await performUserUpdate();
   };
 
-  // Perform the actual user update after password verification
   const performUserUpdate = async () => {
     const values = form.values;
     const send: {
@@ -162,18 +155,15 @@ export default function SettingsUser() {
       autoClose: 3000,
     });
 
-    // Clear form and logout user after update
     form.reset();
     setUser(null);
 
-    // Redirect to login after a short delay
     setTimeout(() => {
       router.push('/auth/logout');
     }, 3000);
   };
 
   const onSubmit = async (values: typeof form.values) => {
-    // Check if any changes were made
     const hasChanges = values.username !== user?.username || values.password;
 
     if (!hasChanges) {
@@ -184,19 +174,17 @@ export default function SettingsUser() {
       return;
     }
 
-    // Validate password confirmation if password is being changed
     if (values.password && values.password !== values.confirmPassword) {
       form.setFieldError('confirmPassword', 'Passwords do not match');
       return;
     }
 
-    // Show password confirmation modal for updates
     setModalType('update');
     setShowPasswordModal(true);
   };
 
   const handleTokenClick = () => {
-    if (tokenShown) return; // Token already shown
+    if (tokenShown) return;
 
     setModalType('token');
     setShowPasswordModal(true);
@@ -270,7 +258,6 @@ export default function SettingsUser() {
         </form>
       </Paper>
 
-      {/* Password Confirmation Modal */}
       <Modal
         opened={showPasswordModal}
         onClose={() => {

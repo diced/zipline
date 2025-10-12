@@ -262,7 +262,6 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
           overflow: 'hidden',
         }}
       >
-        {/* Background */}
         {config.website.loginBackground ? (
           <Image
             src={config.website.loginBackground}
@@ -292,7 +291,6 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
           />
         )}
 
-        {/* Animated gradient overlay */}
         <Box
           style={{
             position: 'absolute',
@@ -317,7 +315,6 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
               boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
             }}
           >
-            {/* Logo and Title */}
             <Stack gap='lg' align='center' mb='xl'>
               {config.website.titleLogo ? (
                 <Avatar src={config.website.titleLogo} alt='logo' size={100} />
@@ -354,7 +351,6 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
               </div>
             </Stack>
 
-            {/* Login Form */}
             {showLocalLogin && (
               <form onSubmit={form.onSubmit((v) => onSubmit(v))}>
                 <Stack gap='md'>
@@ -439,7 +435,6 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
               </form>
             )}
 
-            {/* Divider */}
             {(eitherTrue(config.features.oauthRegistration, config.features.userRegistration) ||
               config.mfa.passkeys ||
               Object.values(config.oauthEnabled).some((x) => x === true)) &&
@@ -456,7 +451,6 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
                 />
               )}
 
-            {/* Additional Options */}
             <Stack
               gap='md'
               style={{
@@ -501,7 +495,6 @@ export default function Login({ config }: InferGetServerSidePropsType<typeof get
                 </Button>
               )}
 
-              {/* OAuth Providers */}
               {Object.values(config.oauthEnabled).some((x) => x === true) && (
                 <Group grow>
                   {config.oauthEnabled.discord && (

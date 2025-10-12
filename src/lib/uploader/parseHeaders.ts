@@ -1,7 +1,6 @@
 import ms from 'ms';
 import { Config } from '../config/validate';
 
-// from ms@3.0.0-canary.1
 type Unit =
   | 'Years'
   | 'Year'
@@ -80,17 +79,15 @@ export type UploadOptions = {
 
   folder?: string;
 
-  // error
   header?: string;
   message?: string;
 
-  // partials
   partial?: {
     filename: string;
     contentType: string;
     identifier: string;
     lastchunk: boolean;
-    range: [number, number, number]; // start, end, total
+    range: [number, number, number];
     contentLength: number;
   };
 };

@@ -42,10 +42,8 @@ export default fastifyPlugin(
           return res.send({ valid: false });
         }
 
-        // If verification is for token access, include the token
         const _tokenResponse = { valid: true };
 
-        // Always include token when password is verified for this endpoint
         const tokenResponse2 = {
           valid: true,
           token: user.token,

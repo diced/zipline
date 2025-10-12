@@ -42,7 +42,6 @@ export function parseUserToken(
 export async function userMiddleware(req: FastifyRequest, res: FastifyReply) {
   const cookies = parseCookie(req.headers.cookie ?? '');
 
-  // conditions met to allow anonymous folder uploads but later handled in the upload route
   const anonFolderUpload =
     req.headers['x-zipline-folder'] &&
     req.url.toLowerCase().trim() === '/api/upload' &&
@@ -50,13 +49,11 @@ export async function userMiddleware(req: FastifyRequest, res: FastifyReply) {
     !cookies.has('zipline_session');
   if (anonFolderUpload) return;
 
-  // Allow public upload when feature is enabled
   const isPublicUploadEnabled = config.features?.publicUpload === true;
   const isUploadRoute = req.url.toLowerCase().trim() === '/api/upload';
   const hasNoAuth = !req.headers.authorization && !cookies.has('zipline_session');
 
   if (isPublicUploadEnabled && isUploadRoute && hasNoAuth) {
-    // Let the upload route handle creating the public user
     return;
   }
 

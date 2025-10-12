@@ -3,7 +3,6 @@ import { GeneratorOptions, download } from '../GeneratorButton';
 
 export function ishare(token: string, type: 'file' | 'url', options: GeneratorOptions) {
   if (type === 'url') {
-    // unsupported in ishare
     return;
   }
 

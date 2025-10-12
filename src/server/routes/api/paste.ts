@@ -28,7 +28,6 @@ export const PATH = '/api/paste';
 
 export default fastifyPlugin(
   (server: FastifyInstance, _, done) => {
-    // Create paste endpoint
     server.post<{
       Body: PasteRequest;
     }>(
@@ -54,7 +53,6 @@ export default fastifyPlugin(
         }
 
         try {
-          // Get the file
           const file = await prisma.file.findFirst({
             where: {
               id: fileId,
@@ -66,7 +64,6 @@ export default fastifyPlugin(
             return res.status(404).send({ error: 'File not found' });
           }
 
-          // Check if paste already exists
           if (file.pasteId && file.pasteUrl) {
             return res.send({
               success: true,
@@ -76,11 +73,10 @@ export default fastifyPlugin(
             } as PasteResponse);
           }
 
-          // Read the file content
           const fileUrl = `${req.protocol}://${req.hostname}${req.hostname === 'localhost' ? ':4000' : ''}/raw/${file.name}`;
           const response = await fetch(fileUrl);
           const fileContent = await response.text();
-          // Upload to paste service
+
           const pasteResponse = await fetch('https://code.whitedragon.life/api/v2/paste', {
             method: 'POST',
             headers: {
@@ -105,7 +101,6 @@ export default fastifyPlugin(
           const pasteId = pasteResult._id;
           const pasteUrl = `https://code.whitedragon.life/${pasteId}`;
 
-          // Update the file record with paste information
           await prisma.file.update({
             where: { id: fileId },
             data: {
@@ -127,7 +122,7 @@ export default fastifyPlugin(
         }
       },
     );
-    // Get paste info endpoint
+
     server.get<{
       Params: { fileId: string };
     }>(

@@ -49,7 +49,7 @@ export default function Theming({
   }
 
   if (!theme) {
-    theme = findTheme('builtin:dark_blue') ?? (dark_blue as unknown as ZiplineTheme); // back up theme if all else fails lol
+    theme = findTheme('builtin:dark_blue') ?? (dark_blue as unknown as ZiplineTheme);
   }
 
   return (
@@ -60,7 +60,7 @@ export default function Theming({
         theme={createTheme({
           ...themeComponents(theme),
           defaultRadius: 'md',
-          // Enable motion and animations
+
           respectReducedMotion: false,
           components: {
             ...themeComponents(theme).components,
@@ -82,11 +82,11 @@ export default function Theming({
             },
           },
           spacing: {
-            xs: '0.5rem', // 8px
-            sm: '0.75rem', // 12px
-            md: '1rem', // 16px (default)
-            lg: '1.25rem', // 20px
-            xl: '2rem', // 32px
+            xs: '0.5rem',
+            sm: '0.75rem',
+            md: '1rem',
+            lg: '1.25rem',
+            xl: '2rem',
           },
         })}
       >

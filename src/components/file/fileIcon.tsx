@@ -40,7 +40,6 @@ const genericIcons: Record<string, Icon> = {
 };
 
 const icons: Record<string, Icon> = {
-  // common compressed files
   'application/zip': IconFileZip,
   'application/x-7z-compressed': IconFileZip,
   'application/x-rar-compressed': IconFileZip,
@@ -48,7 +47,6 @@ const icons: Record<string, Icon> = {
   'application/x-bzip2': IconFileZip,
   'application/x-gzip': IconFileZip,
 
-  // common text/document files that are not detected by the 'text' type
   'application/pdf': IconFileText,
   'application/msword': IconFileTypeDocx,
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document': IconFileTypeDocx,
@@ -58,7 +56,6 @@ const icons: Record<string, Icon> = {
   'application/vnd.openxmlformats-officedocument.presentationml.presentation': IconFileTypePpt,
   'text/csv': IconFileTypeCsv,
 
-  // other random stuff
   'text/x-sql': IconFileTypeSql,
   'text/css': IconFileTypeCss,
   'text/html': IconFileTypeHtml,
@@ -68,7 +65,6 @@ const icons: Record<string, Icon> = {
   'application/json': IconBracketsContain,
   'text/xml': IconFileTypeXml,
 
-  // zipline text uploads
   'text/x-zipline-html': IconFileTypeHtml,
   'text/x-zipline-css': IconFileTypeCss,
   'text/x-zipline-javascript': IconFileTypeJs,
@@ -112,8 +108,6 @@ const icons: Record<string, Icon> = {
   'text/x-zipline-http': IconFileCode,
   'text/x-zipline-ini': IconFileCode,
   'text/x-zipline-coffeescript': IconFileCode,
-
-  // feel free to PR more icons if you want :D
 };
 
 export default function fileIcon(type: string): Icon {

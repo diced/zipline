@@ -30,7 +30,6 @@ export default async function mountTestRoute(server: FastifyInstance) {
 
       try {
         if (type === 'local') {
-          // For local, just check if the path exists
           const fs = await import('fs/promises');
 
           if (!path) {
@@ -51,21 +50,17 @@ export default async function mountTestRoute(server: FastifyInstance) {
             });
           }
         } else if (type === 'webdav') {
-          // For WebDAV, attempt HTTP request
           if (!host) {
             return reply.code(400).send({ error: 'WebDAV URL is required' });
           }
 
           try {
-            // Parse the URL - host field now contains full URL
             let url = host;
 
-            // Add protocol if missing
             if (!url.startsWith('http://') && !url.startsWith('https://')) {
               url = 'https://' + url;
             }
 
-            // Parse URL to potentially override port
             const urlObj = new URL(url);
             if (port) {
               urlObj.port = port.toString();
@@ -130,30 +125,23 @@ export default async function mountTestRoute(server: FastifyInstance) {
             });
           }
         } else if (type === 'smb') {
-          // For SMB, test connection using smb2 library
           if (!host) {
             return reply.code(400).send({ error: 'SMB server is required (format: server/share/path)' });
           }
 
           try {
-            // Dynamically import SMB library
             const SMB2Module = await import('@marsaud/smb2');
             const SMB2 = (SMB2Module as any).default || SMB2Module;
 
-            // Parse host, share, and path from host field (format: server/share/path)
             const parts = host.split('/');
             const smbHost = parts[0];
             const share = parts[1] || 'share';
-            const basePath = parts.slice(2).join('/'); // Everything after share is the base path
+            const basePath = parts.slice(2).join('/');
 
-            // Handle domain properly for different scenarios
             let effectiveDomain: string | undefined;
             if (domain && domain.trim() !== '' && domain.trim() !== '.') {
-              // Use provided domain if it's not empty or '.'
               effectiveDomain = domain.trim();
             } else {
-              // For local accounts, don't include domain at all
-              // This often works better than empty string or 'WORKGROUP'
               effectiveDomain = undefined;
             }
 
@@ -166,9 +154,7 @@ export default async function mountTestRoute(server: FastifyInstance) {
               username,
             });
 
-            // Try different authentication configurations for @marsaud/smb2
             const smbConfigs = [
-              // First try: No domain (often works for local accounts)
               {
                 share: `\\\\${smbHost}\\${share}`,
                 domain: '',
@@ -176,7 +162,7 @@ export default async function mountTestRoute(server: FastifyInstance) {
                 password: password || '',
                 autoCloseTimeout: 0,
               },
-              // Second try: With '.' domain for local accounts
+
               {
                 share: `\\\\${smbHost}\\${share}`,
                 domain: '.',
@@ -184,7 +170,7 @@ export default async function mountTestRoute(server: FastifyInstance) {
                 password: password || '',
                 autoCloseTimeout: 0,
               },
-              // Third try: With WORKGROUP domain
+
               {
                 share: `\\\\${smbHost}\\${share}`,
                 domain: 'WORKGROUP',
@@ -192,7 +178,7 @@ export default async function mountTestRoute(server: FastifyInstance) {
                 password: password || '',
                 autoCloseTimeout: 0,
               },
-              // Fourth try: With server IP as domain
+
               {
                 share: `\\\\${smbHost}\\${share}`,
                 domain: smbHost,
@@ -204,13 +190,10 @@ export default async function mountTestRoute(server: FastifyInstance) {
 
             console.log('SMB Config (primary):', { ...smbConfigs[0], password: password });
 
-            // Test connection by listing the base path or root directory
             const testPath = basePath ? '/' + basePath : '/';
 
-            // Try configurations in order
             const tryConnection = async (configIndex: number): Promise<any> => {
               if (configIndex >= smbConfigs.length) {
-                // All configurations failed, return the last error
                 throw new Error('All authentication methods failed');
               }
 
@@ -223,12 +206,10 @@ export default async function mountTestRoute(server: FastifyInstance) {
               return new Promise((resolve, reject) => {
                 const client = new SMB2(config);
 
-                // Use the new @marsaud/smb2 API with callback
                 client.readdir(testPath === '/' ? '' : testPath, (err: any, files: any[]) => {
                   if (err) {
                     console.log(`SMB config ${configIndex + 1} failed:`, err.code, err.message);
 
-                    // If it's an authentication error, try the next config
                     if (err.code === 'STATUS_LOGON_FAILURE' && configIndex < smbConfigs.length - 1) {
                       tryConnection(configIndex + 1)
                         .then(resolve)
@@ -236,12 +217,10 @@ export default async function mountTestRoute(server: FastifyInstance) {
                       return;
                     }
 
-                    // For other errors or if this was the last config, reject
                     reject(err);
                   } else {
                     console.log(`SMB config ${configIndex + 1} succeeded!`);
 
-                    // Close the connection
                     try {
                       client.disconnect();
                     } catch (disconnectErr) {

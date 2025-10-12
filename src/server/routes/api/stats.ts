@@ -20,7 +20,7 @@ export default fastifyPlugin(
 
       const { from, to, all } = req.query;
 
-      const fromDate = from ? new Date(from) : new Date(Date.now() - 86400000 * 7); // defaults to a week ago
+      const fromDate = from ? new Date(from) : new Date(Date.now() - 86400000 * 7);
       const toDate = to ? new Date(to) : new Date();
 
       if (!all) {

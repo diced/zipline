@@ -149,14 +149,12 @@ export function LayoutNavbar({
   const { user } = useLogin();
   const router = useRouter();
 
-  // Local state management for logo text animation
   const [localShowLogoText, setLocalShowLogoText] = useState(!navbarCollapsed);
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
 
-  // Simplified state management
   const [expandedSubmenu, setExpandedSubmenu] = useState<string | null>(null);
   const [manuallyClosedSubmenu, setManuallyClosedSubmenu] = useState<string | null>(null);
-  // Clear expanded submenu when sidebar is collapsed
+
   useEffect(() => {
     if (navbarCollapsed) {
       setExpandedSubmenu(null);
@@ -164,25 +162,21 @@ export function LayoutNavbar({
     }
   }, [navbarCollapsed]);
 
-  // Manage logo text animation - only animate on user interaction
   useEffect(() => {
     if (hasUserInteracted) {
       if (navbarCollapsed) {
         setLocalShowLogoText(false);
       } else {
-        // Small delay to allow for smooth animation when expanding
         const timer = setTimeout(() => {
           setLocalShowLogoText(true);
         }, 150);
         return () => clearTimeout(timer);
       }
     } else {
-      // On initial load, set immediately without animation
       setLocalShowLogoText(!navbarCollapsed);
     }
   }, [navbarCollapsed, hasUserInteracted]);
 
-  // Auto-expand submenu for current page
   useEffect(() => {
     if (!navbarCollapsed) {
       const currentSubmenu = navLinks.find((link) => link.links && link.active(router.pathname));
@@ -192,23 +186,22 @@ export function LayoutNavbar({
       }
     }
   }, [router.pathname, navbarCollapsed, manuallyClosedSubmenu]);
-  // Reset manual close state when navigating to different sections
+
   useEffect(() => {
     const currentSubmenu = navLinks.find((link) => link.links && link.active(router.pathname));
-    // If we navigate to a different submenu section, reset the manual close state
+
     if (currentSubmenu && manuallyClosedSubmenu && manuallyClosedSubmenu !== currentSubmenu.label) {
       setManuallyClosedSubmenu(null);
     }
   }, [router.pathname, manuallyClosedSubmenu]);
 
-  // Memoized filtered navigation links
   const filteredNavLinks = useMemo(
     () => navLinks.filter((link) => !link.if || link.if(user as Response['/api/user']['user'], config)),
     [user, config],
   );
-  // Memoized event handlers
+
   const handleNavbarToggle = useCallback(() => {
-    setHasUserInteracted(true); // Mark that user has interacted
+    setHasUserInteracted(true);
     setNavbarCollapsed(!navbarCollapsed);
   }, [navbarCollapsed, setNavbarCollapsed]);
 
@@ -270,7 +263,6 @@ export function LayoutNavbar({
     window.open(url, '_blank');
   }, []);
 
-  // Memoized style functions
   const getCollapsedItemStyle = useCallback(
     (isActive: boolean) => ({
       backgroundColor: isActive
@@ -292,7 +284,7 @@ export function LayoutNavbar({
     }),
     [colorScheme, theme],
   );
-  // Memoized submenu renderer
+
   const renderSubLinks = useCallback(
     (subLinks: NavLinks[]) =>
       subLinks
@@ -313,7 +305,6 @@ export function LayoutNavbar({
     [user, config, router.pathname],
   );
 
-  // Memoized inline styles
   const toggleButtonStyle = useMemo(
     () => ({
       display: 'flex',
@@ -380,7 +371,6 @@ export function LayoutNavbar({
           </Title>
         </Box>
       </Link>
-      {/* Mobile title */}
       <Link
         href='/'
         style={{
@@ -396,8 +386,7 @@ export function LayoutNavbar({
           </Title>
           <Divider />
         </Box>
-      </Link>
-      {/* Main navigation section */}{' '}
+      </Link>{' '}
       <ScrollArea flex={1} type='never' className={`${styles.navbarContent} ${styles.navSection}`}>
         <div className={navbarCollapsed ? styles.navSectionCollapsed : ''}>
           <Box>
@@ -441,9 +430,7 @@ export function LayoutNavbar({
                   );
                 }
               } else {
-                // Handle links with children
                 if (navbarCollapsed) {
-                  // In collapsed mode, clicking expands the sidebar to show submenu
                   return (
                     <div
                       key={link.label}
@@ -487,8 +474,7 @@ export function LayoutNavbar({
             })}
           </Box>
         </div>
-      </ScrollArea>
-      {/* Bottom section with toggle button */}{' '}
+      </ScrollArea>{' '}
       <Box mt='sm' visibleFrom='sm' style={toggleButtonStyle}>
         <ActionIcon
           variant='light'
@@ -501,7 +487,6 @@ export function LayoutNavbar({
           </Group>
         </ActionIcon>
       </Box>
-      {/* External links section */}
       <Box className={styles.bottomSectionBase}>
         {config.website.externalLinks.length > 0 && (
           <Box className={styles.externalLinksContainer}>

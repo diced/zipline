@@ -172,7 +172,6 @@ async function main() {
   Promise.all(routesOptions.map((route) => server.register(route)));
 
   if (!argv.includes('--skip-next')) {
-    // server.get('/', (_, res) => res.redirect('/dashboard')); // Commented out to allow root page to render upload component
     server.next('/*', ALL_METHODS);
     server.next('/dashboard', ALL_METHODS);
     server.next('/reload', ALL_METHODS);
@@ -185,7 +184,6 @@ async function main() {
       try {
         const parsedBody = querystring.parse(body.toString());
 
-        // setting the inner request.body so that next.js can access it.
         req.raw.body = parsedBody;
         done(null, parsedBody);
       } catch {
@@ -216,7 +214,6 @@ async function main() {
 
   logger.info('server started', { hostname: config.core.hostname, port: config.core.port });
 
-  // Tasks
   tasks.interval('deletefiles', ms(config.tasks.deleteInterval as StringValue), deleteFiles(prisma));
   tasks.interval('maxviews', ms(config.tasks.maxViewsInterval as StringValue), maxViews(prisma));
 

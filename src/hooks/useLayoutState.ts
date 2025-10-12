@@ -4,7 +4,6 @@ import { useRouter } from 'next/router';
 export function useLayoutState() {
   const [opened, setOpened] = useState(false);
   const [navbarCollapsed, setNavbarCollapsed] = useState(() => {
-    // Restore collapsed state from localStorage
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('sidebar-collapsed');
       return saved ? JSON.parse(saved) : false;
@@ -17,7 +16,6 @@ export function useLayoutState() {
   const [isScrolled, setIsScrolled] = useState(false);
   const router = useRouter();
 
-  // Prevent sidebar from auto-expanding on route changes
   useEffect(() => {
     const handleRouteChange = () => {
       setOpened(false);
@@ -29,14 +27,12 @@ export function useLayoutState() {
     };
   }, [router.events]);
 
-  // Initialize logo text state after component mounts
   useEffect(() => {
     if (!navbarCollapsed) {
       setShowLogoText(true);
     }
   }, []);
 
-  // Save collapsed state to localStorage and handle logo text animation
   useEffect(() => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('sidebar-collapsed', JSON.stringify(navbarCollapsed));
@@ -55,7 +51,6 @@ export function useLayoutState() {
     }
   }, [navbarCollapsed]);
 
-  // Handle scroll events for header border radius
   useEffect(() => {
     const handleScroll = () => {
       const scrollY = window.scrollY;

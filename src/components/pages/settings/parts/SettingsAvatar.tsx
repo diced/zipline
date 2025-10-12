@@ -142,7 +142,6 @@ export default function SettingsAvatar() {
       <Title order={2}>Avatar & Theme</Title>
 
       <Stack gap='lg'>
-        {/* Avatar Section */}
         <Stack gap='sm'>
           <Text size='sm' fw={500}>
             Avatar
@@ -212,7 +211,6 @@ export default function SettingsAvatar() {
 
         <Divider />
 
-        {/* Theme Section */}
         <Stack gap='sm'>
           <Text size='sm' fw={500}>
             Theme Settings
@@ -263,7 +261,6 @@ export default function SettingsAvatar() {
 
         <Divider />
 
-        {/* Background Section */}
         <Stack gap='sm'>
           <Text size='sm' fw={500}>
             Background Settings

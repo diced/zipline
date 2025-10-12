@@ -66,7 +66,6 @@ export default function Files({ id }: { id?: string }) {
   }, [data?.pages]);
 
   useEffect(() => {
-    // Reset to first page when favorites filter changes
     setPage(1);
   }, [favoritesOnly, setPage]);
 
@@ -107,7 +106,7 @@ export default function Files({ id }: { id?: string }) {
           color: 'green',
         });
         setSelectedFiles(new Set());
-        // Refresh the data without reloading the page
+
         mutate();
       }
     } catch {
@@ -136,7 +135,7 @@ export default function Files({ id }: { id?: string }) {
           color: 'green',
         });
         setSelectedFiles(new Set());
-        // Refresh the data to show updated favorite status
+
         mutate();
       }
     } catch {
@@ -171,7 +170,7 @@ export default function Files({ id }: { id?: string }) {
         });
         setSelectedFiles(new Set());
         setFolderModalOpened(false);
-        // Refresh the data without reloading the page
+
         mutate();
       } else {
         const error = await response.json();
@@ -195,7 +194,7 @@ export default function Files({ id }: { id?: string }) {
       await bulkAddTags(Array.from(selectedFiles), tagIds);
       setSelectedFiles(new Set());
       setTagModalOpened(false);
-      // Refresh the data to show updated tags
+
       mutate();
     } catch {
       showNotification({
@@ -211,7 +210,6 @@ export default function Files({ id }: { id?: string }) {
   const totalRecords = data?.total ?? 0;
   return (
     <>
-      {/* Selection Controls */}
       <Group justify='space-between' mb='md' mt='md'>
         <Group>
           <Tooltip label={favoritesOnly ? 'Show all files' : 'Show only favorite files'}>
@@ -281,7 +279,6 @@ export default function Files({ id }: { id?: string }) {
             onClick={() => {
               setSelectionMode(!selectionMode);
               if (selectionMode) {
-                // Exiting selection mode - clear all selections
                 setSelectedFiles(new Set());
               }
             }}

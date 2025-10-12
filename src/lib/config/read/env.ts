@@ -31,7 +31,6 @@ export const ENVS = [
   env('ssl.key', 'SSL_KEY', 'string'),
   env('ssl.cert', 'SSL_CERT', 'string'),
 
-  // database stuff
   env('core.returnHttpsUrls', 'CORE_RETURN_HTTPS_URLS', 'boolean', true),
   env('core.defaultDomain', 'CORE_DEFAULT_DOMAIN', 'string', true),
   env('core.tempDirectory', 'CORE_TEMP_DIRECTORY', 'string', true),

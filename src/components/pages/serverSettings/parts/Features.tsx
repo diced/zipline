@@ -160,7 +160,7 @@ export default function Features({
               <>
                 The URL of the version checking server. The default is{' '}
                 <Anchor size='xs' href='zipline-version.diced.sh' target='_blank'>
-                  https://zipline-version.diced.sh
+                  https:
                 </Anchor>
                 . Visit the{' '}
                 <Anchor size='xs' href='https://github.com/diced/zipline-version-worker' target='_blank'>

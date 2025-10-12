@@ -15,7 +15,7 @@ function truncateFileName(fileName: string, maxLength: number = 20): string {
     return fileName;
   }
 
-  const truncatedLength = maxLength - extension.length - 7; // 7 for "..." and "." and extension
+  const truncatedLength = maxLength - extension.length - 7;
   const truncated = nameWithoutExt.slice(0, truncatedLength) + '...' + nameWithoutExt.slice(-3);
 
   return `${truncated}.${extension}`;
@@ -97,7 +97,6 @@ export default function ToUploadFile({
       }}
       className={styles.uploadFileCard}
     >
-      {/* Delete button */}
       <ActionIcon
         variant='filled'
         color='red'
@@ -113,7 +112,6 @@ export default function ToUploadFile({
       </ActionIcon>
 
       <Stack gap={0}>
-        {/* Preview area - adaptive height */}
         <Box pos='relative' style={{ maxHeight: 250 }} className={styles.previewArea}>
           {isImage && previewUrl ? (
             <Image
@@ -135,7 +133,6 @@ export default function ToUploadFile({
           )}
         </Box>
 
-        {/* File info area */}
         <Box p='xs' style={{ borderTop: '1px solid var(--mantine-color-default-border)' }}>
           <Stack gap={4}>
             <Tooltip label={file.name} withArrow>

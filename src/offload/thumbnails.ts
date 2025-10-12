@@ -43,10 +43,6 @@ function genThumbnail(file: string, thumbnailTmp: string): Promise<Buffer | unde
       })
       .on('error', (err, _, stderr) => {
         if (stderr && stderr.includes('does not contain any stream')) {
-          // mismatched mimetype, for example a video/ogg (.ogg) file with no video stream since
-          // for this specific case just set the mimetype to audio/ogg
-          // the method will return an empty buffer since there is no video stream
-
           logger.error(
             `file ${file} does not contain any video stream, it is probably an audio file... ignoring...`,
           );

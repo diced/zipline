@@ -32,7 +32,7 @@ export default fastifyPlugin(
       PATH,
       {
         preHandler: [userMiddleware, administratorMiddleware],
-        // 24gb, just in case
+
         bodyLimit: 24 * 1024 * 1024 * 1024,
         ...secondlyRatelimit(5),
       },
@@ -53,7 +53,6 @@ export default fastifyPlugin(
           });
         }
 
-        // users
         const usersImportedToId: Record<string, string> = {};
 
         const users = Object.entries(export3.users);
@@ -68,7 +67,6 @@ export default fastifyPlugin(
             importFrom = true;
           }
 
-          // determines a users role
           const role =
             (user.super_administrator && 'SUPERADMIN') || (user.administrator && 'ADMIN') || 'USER';
 
@@ -159,7 +157,6 @@ export default fastifyPlugin(
 
         logger.debug('imported users', { users: usersImportedToId });
 
-        // files, they are mapped to the users they belong to
         const filesImportedToId: Record<string, string> = {};
 
         for (const [id, file] of Object.entries(export3.files)) {
@@ -206,7 +203,6 @@ export default fastifyPlugin(
 
         logger.debug('imported files', { files: filesImportedToId });
 
-        // folders, they are mapped to the users they belong to + files they contain
         const foldersImportedToId: Record<string, string> = {};
 
         for (const [id, folder] of Object.entries(export3.folders)) {
@@ -243,7 +239,6 @@ export default fastifyPlugin(
 
         logger.debug('imported folders', { folders: foldersImportedToId });
 
-        // urls, they are mapped to the users they belong to
         const urlsImportedToId: Record<string, string> = {};
 
         for (const [id, url] of Object.entries(export3.urls)) {

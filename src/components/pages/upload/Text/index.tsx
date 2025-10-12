@@ -40,7 +40,7 @@ export default function UploadText({
   const [loading, setLoading] = useState(false);
   const [detectingLanguage, setDetectingLanguage] = useState(false);
   const [detectedLanguage, setDetectedLanguage] = useState<string | null>(null);
-  const [hasAutoDetected, setHasAutoDetected] = useState(false); // Track if we've already auto-detected
+  const [hasAutoDetected, setHasAutoDetected] = useState(false);
 
   const renderIn = renderMode(selectedLanguage === 'auto' ? detectedLanguage || 'txt' : selectedLanguage);
 
@@ -68,7 +68,7 @@ export default function UploadText({
       }
     } catch (error) {
       console.error('Language detection failed:', error);
-      setDetectedLanguage('txt'); // Fallback to plain text
+      setDetectedLanguage('txt');
     } finally {
       setDetectingLanguage(false);
     }
@@ -77,7 +77,6 @@ export default function UploadText({
   const handleTextChange = (value: string) => {
     setText(value);
 
-    // Only auto-detect language on the first change when using auto mode
     if (selectedLanguage === 'auto' && !hasAutoDetected && value.trim()) {
       detectLanguage(value);
       setHasAutoDetected(true);
@@ -90,14 +89,13 @@ export default function UploadText({
     }
   };
 
-  // Auto-detect language when switching to auto mode
   useEffect(() => {
     if (selectedLanguage === 'auto' && text.trim() && !hasAutoDetected) {
       detectLanguage(text);
       setHasAutoDetected(true);
     } else if (selectedLanguage !== 'auto') {
       setDetectedLanguage(null);
-      setHasAutoDetected(false); // Reset when switching away from auto
+      setHasAutoDetected(false);
     }
   }, [selectedLanguage]);
 
@@ -113,7 +111,6 @@ export default function UploadText({
   const upload = () => {
     const blob = new Blob([text]);
 
-    // Use detected language when in auto mode, otherwise use selected language
     const finalLanguage = selectedLanguage === 'auto' ? detectedLanguage || 'txt' : selectedLanguage;
 
     const file = new File([blob], `text.${finalLanguage}`, {

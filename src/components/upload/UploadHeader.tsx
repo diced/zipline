@@ -36,7 +36,6 @@ export function UploadHeader({ isAuthenticated, avatar, username, logoUrl, title
     >
       <Container size='xl'>
         <Group justify='space-between' align='center'>
-          {/* Logo */}
           <Link href='/' style={{ textDecoration: 'none', color: 'inherit' }}>
             <Group gap='md'>
               {logoUrl ? (
@@ -52,7 +51,6 @@ export function UploadHeader({ isAuthenticated, avatar, username, logoUrl, title
             </Group>
           </Link>
 
-          {/* Navigation */}
           <Group gap='md'>
             {isAuthenticated ? (
               <>

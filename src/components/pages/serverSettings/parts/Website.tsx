@@ -101,7 +101,6 @@ export default function Website({
       <Title order={2}>Website</Title>
 
       <form onSubmit={form.onSubmit(onSubmit)}>
-        {/* <SimpleGrid mt='md' cols={{ base: 1, md: 2 }} spacing='lg'> */}
         <Grid>
           <Grid.Col span={{ base: 12, md: 6 }}>
             <TextInput

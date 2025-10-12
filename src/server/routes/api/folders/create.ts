@@ -16,7 +16,6 @@ export default fastifyPlugin((server, _, done) => {
   server.post<{ Body: Body }>(PATH, { preHandler: [userMiddleware] }, async (req, res) => {
     const { name, public: isPublic, allowUploads } = req.body;
 
-    // Check if folder name already exists for this user
     const existingFolder = await prisma.folder.findFirst({
       where: {
         userId: req.user.id,

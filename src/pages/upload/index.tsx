@@ -82,7 +82,6 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
   const router = useRouter();
   const clipboard = useClipboard();
 
-  // Use SWR directly for user data without forced redirects
   const {
     data: userData,
     error: userError,
@@ -96,16 +95,13 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
     useShallow((state) => [state.settings.backgroundType, state.settings.backgroundImageUrl]),
   );
 
-  // Use avatar hook like dashboard
   const { avatar } = useAvatar();
 
-  // Use SWR for stats like dashboard，10 秒自動刷新
   const { data: stats } = useSWR<Response['/api/user/stats']>('/api/user/stats', { refreshInterval: 10000 });
 
   const user = userData?.user;
   const isAuthenticated = !!user;
 
-  // Set user in store if available, but don't force redirects
   useEffect(() => {
     if (userData?.user) {
       console.log('User data received:', userData.user);
@@ -113,20 +109,13 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
     }
   }, [userData, setUserStoreUser]);
 
-  // Debug avatar data
   useEffect(() => {
     console.log('Avatar data:', avatar);
     console.log('User data:', user);
   }, [avatar, user]);
 
-  // 根據 config.features.publicUpload 決定是否允許未登入用戶
   const publicUploadEnabled = config?.features?.publicUpload ?? false;
 
-  // ⚠️ 不需要客戶端重定向檢查 - SSR 階段已經處理
-  // getServerSideProps 會在伺服器端檢查認證狀態並進行重定向
-  // 如果程式碼執行到這裡,表示用戶已經通過 SSR 驗證
-
-  // Upload state
   const { options, ephemeral, clearEphemeral, setOption } = useUploadOptionsStore(
     useShallow((state) => ({
       options: state.options,
@@ -147,9 +136,9 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [fileProgress, setFileProgress] = useState<{ [key: string]: number }>({});
   const [fileUploadSpeed, setFileUploadSpeed] = useState<{ [key: string]: number }>({});
-  const [batchSize, setBatchSize] = useState(5); // Default batch size
-  const [uploadQueue, setUploadQueue] = useState<File[]>([]); // Queue of all files to upload
-  const [currentBatchIndex, setCurrentBatchIndex] = useState(0); // Current batch being processed
+  const [batchSize, setBatchSize] = useState(5);
+  const [uploadQueue, setUploadQueue] = useState<File[]>([]);
+  const [currentBatchIndex, setCurrentBatchIndex] = useState(0);
   const [urlDownloadOpened, { open: openUrlDownload, close: closeUrlDownload }] = useDisclosure(false);
   const [downloadUrl, setDownloadUrl] = useState('');
   const [downloadingFromUrl, setDownloadingFromUrl] = useState(false);
@@ -157,22 +146,18 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
   const uploadRef = useRef<{ [key: string]: boolean }>({});
   const isUploadingRef = useRef(false);
 
-  // Central lock: true while any upload is in progress
   const isLocked = uploadInProgress || uploading || isUploadingRef.current;
 
-  // Notification suppression helper: suppress when queue size is large
   const shouldSuppressNotifications = (countOverride?: number) => {
     const count = typeof countOverride === 'number' ? countOverride : uploadQueue.length;
     return count > 3;
   };
 
-  // Footer metrics derived from stats (user-scoped)
   const footerMetrics = {
     totalStorage: bytes(stats?.storageUsed ?? 0),
     totalFiles: stats?.filesUploaded ?? 0,
   };
 
-  // Monitor queue progress and show notification when complete
   useEffect(() => {
     if (uploadQueue.length > 1 && !uploading) {
       const totalSize = uploadQueue.reduce((sum, file) => sum + file.size, 0);
@@ -194,9 +179,7 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
     }
   }, [fileProgress, uploadQueue, uploading]);
 
-  // Clipboard paste handler
   const handleClipboardPaste = (e: ClipboardEvent) => {
-    // Prevent adding files while uploading
     if (isUploadingRef.current || uploadInProgress || uploading) {
       notifications.show({
         title: 'Upload in progress',
@@ -225,31 +208,26 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
 
     if (pastedFiles.length > 0) {
       handleFilesAdded(pastedFiles);
-      // Clipboard paste notifications removed for cleaner UX
     }
   };
 
-  // Custom upload function that captures response and auto-copies links
-  // suppressIntermediateNotifications: when true, skip non-final notifications
   const customUploadFiles = async (
     files: File[],
     isBatchMode = false,
     suppressIntermediateNotifications = false,
   ) => {
-    // Initialize or reset progress for current batch files
     setFileProgress((prev) => {
       const updated = { ...prev };
       files.forEach((file) => {
-        updated[file.name] = 0; // Reset to 0 for fresh start
+        updated[file.name] = 0;
       });
       return updated;
     });
 
-    // Initialize or reset speed for current batch files
     setFileUploadSpeed((prev) => {
       const updated = { ...prev };
       files.forEach((file) => {
-        updated[file.name] = 0; // Reset to 0 for fresh start
+        updated[file.name] = 0;
       });
       return updated;
     });
@@ -274,34 +252,29 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
       headers['x-zipline-folder'] = ephemeral.folderId;
     }
 
-    // Use XMLHttpRequest for real upload progress tracking
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       let lastLoaded = 0;
       let lastTime = Date.now();
       // eslint-disable-next-line prefer-const
-      let speedValues: number[] = []; // Store last few speed values for smoothing
+      let speedValues: number[] = [];
 
       xhr.upload.addEventListener('progress', (e) => {
         if (e.lengthComputable) {
           const currentTime = Date.now();
-          const timeDiff = (currentTime - lastTime) / 1000; // seconds
+          const timeDiff = (currentTime - lastTime) / 1000;
           const loadedDiff = e.loaded - lastLoaded;
 
-          // Calculate speed in bytes per second (only if enough time has passed)
           if (timeDiff >= 0.1 && loadedDiff > 0) {
             const instantSpeed = loadedDiff / timeDiff;
             speedValues.push(instantSpeed);
 
-            // Keep only last 5 speed values for smoothing
             if (speedValues.length > 5) {
               speedValues.shift();
             }
 
-            // Calculate average speed for smoother display
             const avgSpeed = speedValues.reduce((sum, s) => sum + s, 0) / speedValues.length;
 
-            // Update speed for all files in this batch
             setFileUploadSpeed((prev) => {
               const updated = { ...prev };
               files.forEach((file) => {
@@ -313,7 +286,6 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
             lastLoaded = e.loaded;
             lastTime = currentTime;
 
-            // Also update progress at the same frequency (0.1s)
             const overallPercent = (e.loaded / e.total) * 100;
             setFileProgress((prev) => {
               const updated = { ...prev };
@@ -323,7 +295,6 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
               return updated;
             });
           } else if (timeDiff >= 0.1) {
-            // Update progress even if no speed calculation (for very slow uploads)
             const overallPercent = (e.loaded / e.total) * 100;
             setFileProgress((prev) => {
               const updated = { ...prev };
@@ -341,7 +312,6 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
         if (xhr.status >= 200 && xhr.status < 300) {
           const result = JSON.parse(xhr.responseText);
 
-          // Set only the current batch files to 100% progress
           setFileProgress((prev) => {
             const completed = { ...prev };
             files.forEach((file) => {
@@ -350,13 +320,7 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
             return completed;
           });
 
-          // DON'T clear speed for completed files during batch uploads
-          // Speed should persist to show total upload speed across all batches
-          // Only clear speeds when ALL uploads are completely finished
-
-          // Update uploaded files state with the response
           if (result.files && Array.isArray(result.files)) {
-            // Map uploaded files to include original file names
             const filesWithNames = result.files.map((uploadedFile: any, idx: number) => ({
               ...uploadedFile,
               name: files[idx]?.name || uploadedFile.name || `file-${idx}`,
@@ -365,13 +329,11 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
             console.log('Uploaded files with names:', filesWithNames);
             setUploadedFiles((prev) => [...prev, ...filesWithNames]);
 
-            // Auto-copy links to clipboard only for single file uploads
             const urls = result.files.map((f: any) => f.url);
             if (urls.length === 1 && !isBatchMode) {
               try {
                 navigator.clipboard.writeText(urls[0]);
               } catch (err) {
-                // Fallback for older browsers
                 const textArea = document.createElement('textarea');
                 textArea.value = urls[0];
                 document.body.appendChild(textArea);
@@ -382,35 +344,29 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
             }
           }
 
-          // Clear file list but keep progress display
           setFiles([]);
           setFolders([]);
 
-          // Upload completion notifications removed for cleaner UX
-
-          // Only reset uploading state if not in batch mode
           if (!isBatchMode) {
             setUploading(false);
             setUploadInProgress(false);
             isUploadingRef.current = false;
           }
           setProgress({ percent: 0, remaining: 0, speed: 0 });
-          // Keep upload speeds to show connection performance
+
           clearEphemeral();
 
           resolve(result);
         } else {
-          // Only reset uploading state if not in batch mode
           if (!isBatchMode) {
             setUploading(false);
             setUploadInProgress(false);
             isUploadingRef.current = false;
           }
           setProgress({ percent: 0, remaining: 0, speed: 0 });
-          // Keep upload speeds to show last connection performance
+
           clearEphemeral();
 
-          // Try to parse error response
           let errorMessage = `Server returned status ${xhr.status}`;
           try {
             const errorData = JSON.parse(xhr.responseText);
@@ -418,7 +374,6 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
               errorMessage = errorData.message || errorData.error;
             }
           } catch (e) {
-            // If response is not JSON, use status text
             if (xhr.statusText) {
               errorMessage = `${xhr.status} - ${xhr.statusText}`;
             }
@@ -443,14 +398,13 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
       });
 
       xhr.addEventListener('error', () => {
-        // Only reset uploading state if not in batch mode
         if (!isBatchMode) {
           setUploading(false);
           setUploadInProgress(false);
           isUploadingRef.current = false;
         }
         setProgress({ percent: 0, remaining: 0, speed: 0 });
-        // Keep upload speeds to show last connection performance
+
         clearEphemeral();
 
         notifications.show({
@@ -464,14 +418,13 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
       });
 
       xhr.addEventListener('abort', () => {
-        // Only reset uploading state if not in batch mode
         if (!isBatchMode) {
           setUploading(false);
           setUploadInProgress(false);
           isUploadingRef.current = false;
         }
         setProgress({ percent: 0, remaining: 0, speed: 0 });
-        // Keep upload speeds to show last connection performance
+
         clearEphemeral();
 
         notifications.show({
@@ -486,7 +439,6 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
 
       xhr.open('POST', '/api/upload');
 
-      // Set headers
       Object.entries(headers).forEach(([key, value]) => {
         xhr.setRequestHeader(key, value);
       });
@@ -495,15 +447,12 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
     });
   };
 
-  // Batch upload function - uploads files in batches
   const uploadFilesInBatches = async (allFiles: File[]) => {
     if (allFiles.length === 0) return;
 
-    // Set the upload queue
     setUploadQueue(allFiles);
     setCurrentBatchIndex(0);
 
-    // Initialize progress for all files
     const initialProgress: { [key: string]: number } = {};
     const initialSpeed: { [key: string]: number } = {};
     allFiles.forEach((file) => {
@@ -516,26 +465,18 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
     const totalFiles = allFiles.length;
     const batches = [];
 
-    // Split files into batches
     for (let i = 0; i < allFiles.length; i += batchSize) {
       batches.push(allFiles.slice(i, i + batchSize));
     }
 
     const suppressIntermediateNotifications = shouldSuppressNotifications(totalFiles);
-    // Upload start notifications removed for cleaner UX
 
-    // Upload batches sequentially
     for (let i = 0; i < batches.length; i++) {
       const batch = batches[i];
       setCurrentBatchIndex(i);
 
       try {
-        await customUploadFiles(batch, true, suppressIntermediateNotifications); // batch mode + suppression
-
-        // DON'T reorder queue - keep files in original positions
-        // This prevents index mismatch bugs in the UI
-
-        // Batch progress notifications removed for cleaner UX
+        await customUploadFiles(batch, true, suppressIntermediateNotifications);
       } catch (error) {
         notifications.show({
           title: 'Batch upload failed',
@@ -544,22 +485,14 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
           icon: <IconFileXFilled size='1rem' />,
           autoClose: 5000,
         });
-        // Continue with next batch even if one fails
       }
     }
 
-    // Reset uploading state after all batches are complete
     setUploading(false);
     setUploadInProgress(false);
     isUploadingRef.current = false;
-
-    // Keep upload speeds after completion to show connection speed
-    // Don't clear speeds - they represent connection performance
-
-    // Notification will be triggered by useEffect when progress reaches 100%
   };
 
-  // File handling
   const getAllFiles = () => {
     const allFiles = [...files];
     folders.forEach((folder) => {
@@ -571,11 +504,9 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
   const handleFilesAdded = (newFiles: File[]) => {
     if (newFiles.length === 0) return;
 
-    // SIMPLE: Just add files to state
     setFiles((prev) => {
       const newFileList = [...prev, ...newFiles];
 
-      // Trigger upload after state update
       setTimeout(() => {
         startAutoUpload(newFiles);
       }, 50);
@@ -585,7 +516,6 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
   };
 
   const startAutoUpload = (filesToUpload: File[]) => {
-    // Prevent multiple uploads
     if (isUploadingRef.current || uploading || uploadInProgress) {
       return;
     }
@@ -600,27 +530,22 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
       return;
     }
 
-    // Mark as uploading
     isUploadingRef.current = true;
     setUploadInProgress(true);
     setUploading(true);
 
-    // Use batch upload if there are more than batchSize files
     if (filesToUpload.length > batchSize) {
       uploadFilesInBatches(filesToUpload);
     } else {
-      // For small uploads, also set queue for consistent UI
       setUploadQueue(filesToUpload);
       setCurrentBatchIndex(0);
 
-      // Auto-upload start notifications removed for cleaner UX
       const suppressIntermediateNotifications = shouldSuppressNotifications(filesToUpload.length);
       customUploadFiles(filesToUpload, false, suppressIntermediateNotifications);
     }
   };
 
   const handleFileRemove = (index: number) => {
-    // Add fade-out animation before removing
     const fileElement = document.querySelector(`[data-file-index="${index}"]`) as HTMLElement;
     if (fileElement) {
       fileElement.style.transition = 'all 0.3s ease';
@@ -642,7 +567,6 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
     clearEphemeral();
   };
 
-  // URL download handler
   const handleUrlDownload = async () => {
     if (!downloadUrl.trim()) return;
 
@@ -661,9 +585,6 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
         handleFilesAdded([file]);
         setDownloadUrl('');
         closeUrlDownload();
-        // URL download success notifications removed for cleaner UX
-
-        // handleFilesAdded now handles auto-upload automatically
       } else {
         throw new Error('Failed to download');
       }
@@ -679,9 +600,6 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
     setDownloadingFromUrl(false);
   };
 
-  // Upload handler - no longer needed since auto-upload is enabled
-  // const handleUpload = () => { ... };
-
   useEffect(() => {
     document.addEventListener('paste', handleClipboardPaste);
     window.addEventListener('beforeunload', clearEphemeral);
@@ -692,7 +610,6 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
     };
   }, []);
 
-  // Background style - only show custom background if user is logged in
   const backgroundStyle =
     isAuthenticated && backgroundType === 'image' && backgroundImageUrl && backgroundImageUrl.trim() !== ''
       ? {
@@ -702,11 +619,9 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
           filter: 'blur(10px)',
         }
       : {
-          background: 'linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%)', // Darker background
+          background: 'linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%)',
         };
 
-  // ✅ 不需要客戶端條件檢查 - SSR 已經處理認證
-  // 如果執行到這裡,表示用戶已通過 getServerSideProps 驗證
   return (
     <Box
       style={{
@@ -721,7 +636,6 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
         <meta name='viewport' content='width=device-width, initial-scale=1' />
       </Head>
 
-      {/* Background */}
       <UploadBackground
         backgroundStyle={backgroundStyle}
         isAuthenticated={isAuthenticated}
@@ -729,7 +643,6 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
         backgroundImageUrl={backgroundImageUrl}
       />
 
-      {/* Header */}
       <UploadHeader
         isAuthenticated={isAuthenticated}
         avatar={avatar}
@@ -738,11 +651,9 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
         titleText={config?.website?.title ?? 'Zipline'}
       />
 
-      {/* Main Content */}
       <Box style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <Container size='md' py='lg'>
           <Stack gap='lg' maw={800}>
-            {/* Upload Actions */}
             <Paper
               p='md'
               radius='lg'
@@ -810,7 +721,6 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
                       if (target.files) {
                         const fileArray = Array.from(target.files);
                         if (fileArray.length > 0) {
-                          // Group files by directory
                           const folderMap = new Map<string, File[]>();
                           fileArray.forEach((file) => {
                             const pathParts = file.webkitRelativePath.split('/');
@@ -821,16 +731,13 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
                             folderMap.get(folderName)!.push(file);
                           });
 
-                          // Convert to folder structure
                           const newFolders = Array.from(folderMap.entries()).map(([name, files]) => ({
                             name,
                             files,
                           }));
 
                           setFolders((prev) => [...prev, ...newFolders]);
-                          // Folder upload notifications removed for cleaner UX
 
-                          // Use the same file-added path for auto-upload & queueing
                           setTimeout(() => {
                             console.log(
                               '📁 Folder: delegating to handleFilesAdded with',
@@ -896,7 +803,6 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
                       });
                       return;
                     }
-                    // Paste ready notifications removed for cleaner UX
                   }}
                   radius='md'
                   size='md'
@@ -906,7 +812,6 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
                 </Button>
               </Group>
 
-              {/* Batch Size Settings */}
               <Box
                 mt='md'
                 pt='md'
@@ -954,7 +859,6 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
               </Box>
             </Paper>
 
-            {/* Dropzone - Only show if authenticated or public upload enabled */}
             {(isAuthenticated || publicUploadEnabled) && (
               <Paper
                 p='lg'
@@ -1002,7 +906,6 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
                 ) : (
                   <Box p='lg' style={{ cursor: 'default' }}>
                     <Stack gap='lg'>
-                      {/* Total Progress Bar */}
                       {uploadQueue.length > 0 && (
                         <Stack gap='xs'>
                           <Group justify='space-between' align='center'>
@@ -1040,7 +943,7 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
                       )}
 
                       <Group justify='space-between' align='center'>
-                        <Box /> {/* Empty box for spacing */}
+                        <Box />
                         {!uploading && (
                           <Button
                             variant='light'
@@ -1059,10 +962,8 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
                       </Group>
 
                       {uploadQueue.length > 0 ? (
-                        // Split into unfinished (left) and finished (right) sections
                         <Box style={{ maxHeight: '50vh', overflowY: 'auto', paddingRight: 8 }}>
                           <Group align='flex-start' gap='lg' style={{ width: '100%' }}>
-                            {/* Unfinished Files (Uploading + Waiting) */}
                             <Stack gap='md' style={{ flex: 1, minWidth: 0 }}>
                               <Group gap='xs'>
                                 <Text size='sm' fw={600} c='gray'>
@@ -1143,7 +1044,6 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
                                 })}
                             </Stack>
 
-                            {/* Finished Files (Right) */}
                             <Stack gap='md' style={{ flex: 1, minWidth: 0 }}>
                               <Group gap='xs'>
                                 <Text size='sm' fw={600} c='green'>
@@ -1225,7 +1125,6 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
                       ) : (
                         <Box style={{ maxHeight: '50vh', overflowY: 'auto', paddingRight: 8 }}>
                           <Stack gap='md'>
-                            {/* Total Progress Bar for non-queue uploads */}
                             {Object.keys(fileProgress).length > 0 && (
                               <Stack gap='xs'>
                                 <Group justify='space-between' align='center'>
@@ -1234,8 +1133,6 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
                                   </Text>
                                   <Text size='sm' fw={600} c='gray'>
                                     {(() => {
-                                      // For non-queue uploads, we need to estimate file sizes
-                                      // Since we don't have access to original files here, we'll use a different approach
                                       const totalProgress = Object.values(fileProgress).reduce(
                                         (sum, p) => sum + p,
                                         0,
@@ -1270,7 +1167,6 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
                               </Stack>
                             )}
 
-                            {/* Fallback for non-queue uploads */}
                             {Object.entries(fileProgress).map(([fileName, percent]) => {
                               const uploadedFile = uploadedFiles.find((f) => f.name === fileName);
 
@@ -1345,7 +1241,6 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
               </Paper>
             )}
 
-            {/* Login Required Notice */}
             {!isAuthenticated && !publicUploadEnabled && (
               <Paper
                 p='xl'
@@ -1383,7 +1278,6 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
         </Container>
       </Box>
 
-      {/* Footer */}
       <Paper
         radius={0}
         p='lg'
@@ -1410,13 +1304,11 @@ export default function StandaloneUpload({ config }: InferGetServerSidePropsType
                   {footerMetrics.totalFiles} files
                 </Text>
               </Group>
-              {/* Hide global users/uptime on standalone upload page for now */}
             </Group>
           </Group>
         </Container>
       </Paper>
 
-      {/* URL Download Modal */}
       <UrlDownloadModal
         opened={urlDownloadOpened}
         onClose={closeUrlDownload}
@@ -1433,7 +1325,6 @@ import { getSession } from '@/server/session';
 import { prisma } from '@/lib/db';
 
 export const getServerSideProps = withSafeConfig(async (ctx, config) => {
-  // 所有用戶都可以看到上傳頁面,但未登入用戶會被限制功能
   return {
     props: {
       config,

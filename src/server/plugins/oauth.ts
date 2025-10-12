@@ -228,7 +228,6 @@ async function oauthPlugin(fastify: FastifyInstance) {
       return reply.redirect('/dashboard');
     } catch (e) {
       if ((e as { code: string }).code === 'P2002') {
-        // already linked can't create, last failsafe lol
         logger.warn('user tried to create account with oauth, but already linked', {
           oauth: response.username || 'unknown',
           ua: this.headers['user-agent'],

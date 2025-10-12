@@ -101,17 +101,14 @@ export default fastifyPlugin(
         }
 
         if (tags && tags.length > 0) {
-          // Additional validation
           if (!Array.isArray(tags)) {
             return res.badRequest('tags must be an array');
           }
 
-          // Check if all tag IDs are strings
           if (!tags.every((tagId) => typeof tagId === 'string')) {
             return res.badRequest('all tag IDs must be strings');
           }
 
-          // Verify all tags belong to the user
           const userTags = await prisma.tag.findMany({
             where: {
               userId: req.user.id,
@@ -125,11 +122,8 @@ export default fastifyPlugin(
             return res.badRequest('invalid tag somewhere');
           }
 
-          // For bulk tag operations, we need to update each file individually
-          // because we're adding tags, not replacing them
           const updatedFiles = await Promise.all(
             files.map(async (fileId) => {
-              // Get current tags for the file
               const currentFile = await prisma.file.findUnique({
                 where: { id: fileId },
                 select: {
@@ -140,7 +134,6 @@ export default fastifyPlugin(
 
               if (!currentFile) return null;
 
-              // Combine current tags with new tags (avoiding duplicates)
               const currentTagIds = currentFile.tags.map((tag) => tag.id);
               const allTagIds = [...new Set([...currentTagIds, ...tags])];
 
@@ -198,7 +191,6 @@ export default fastifyPlugin(
           });
         }
 
-        // If we reach here, no valid action was provided
         return res.badRequest("can't PATCH without an action");
       },
     });

@@ -374,7 +374,6 @@ export default fastifyPlugin(
           });
         }
 
-        // Log mount settings before update
         if (result.data.filesMountType || result.data.filesMountEnabled !== undefined) {
           logger.info('mount settings update', {
             filesMountType: result.data.filesMountType,
@@ -402,7 +401,6 @@ export default fastifyPlugin(
 
         await reloadSettings();
 
-        // Reload datasource if mount settings changed
         if (
           result.data.filesMountType ||
           result.data.filesMountEnabled !== undefined ||
@@ -421,7 +419,6 @@ export default fastifyPlugin(
           by: req.user.username,
         });
 
-        // Log mount settings after update
         if (result.data.filesMountType || result.data.filesMountEnabled !== undefined) {
           logger.info('mount settings after update', {
             filesMountType: newSettings.filesMountType,

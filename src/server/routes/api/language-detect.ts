@@ -43,7 +43,6 @@ export default fastifyPlugin(
             return res.status(400).send({ error: 'Text is required' });
           }
 
-          // Make request to local language detection service
           const detectUrl = process.env.LANGUAGE_DETECT_URL;
           if (!detectUrl) {
             throw new Error('Missing LANGUAGE_DETECT_URL environment variable');
@@ -77,7 +76,6 @@ export default fastifyPlugin(
         } catch (error) {
           logger.error('Language detection failed', { error: (error as Error).message });
 
-          // Return a fallback response
           return res.send({
             languageId: 'txt',
             languageName: 'Plain Text',

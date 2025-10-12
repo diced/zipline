@@ -229,7 +229,7 @@ export async function addMultipleToFolder(files: File[], folderId: string | null
 
 export function mutateFiles() {
   mutate('/api/user/recent');
-  mutate((key) => (key as Record<any, any>)?.key === '/api/user/files'); // paged files
+  mutate((key) => (key as Record<any, any>)?.key === '/api/user/files');
 }
 
 export function mutateFolders() {

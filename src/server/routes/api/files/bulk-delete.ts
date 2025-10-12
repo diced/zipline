@@ -24,7 +24,6 @@ export default fastifyPlugin((server: FastifyInstance, _, done) => {
         const { fileIds } = bulkDeleteSchema.parse(request.body);
         const userId = request.user.id;
 
-        // First, verify all files belong to the user
         const userFiles = await prisma.file.findMany({
           where: {
             id: { in: fileIds },
@@ -38,7 +37,6 @@ export default fastifyPlugin((server: FastifyInstance, _, done) => {
           });
         }
 
-        // Delete the files
         await prisma.file.deleteMany({
           where: {
             id: { in: fileIds },

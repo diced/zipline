@@ -31,16 +31,14 @@ export type GeneratorOptions = {
   overrides_returnDomain: string | null;
   noJson: boolean | null;
 
-  // changes {json:...} to $json:...$ for the Xshare app on Android
   sharex_xshareCompatibility: boolean | null;
 
-  // echo instead of copying
   unix_useEcho: boolean | null;
-  // uses pbcopy instead of xclip
+
   mac_enableCompatibility: boolean | null;
-  // uses wl-copy instead of xclip
+
   wl_enableCompatibility: boolean | null;
-  // set XDG_CURRENT_DESKTOP=sway to fool flameshot
+
   wl_compositorUnsupported: boolean | null;
 };
 

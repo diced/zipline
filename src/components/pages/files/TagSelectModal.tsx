@@ -156,7 +156,6 @@ export default function TagSelectModal({
             </Combobox>
           </Stack>
         </div>{' '}
-        {/* Fixed buttons at bottom */}
         <div style={{ marginTop: 'auto', paddingTop: '24px' }}>
           <Group justify='flex-end'>
             <Button variant='outline' onClick={handleClose}>

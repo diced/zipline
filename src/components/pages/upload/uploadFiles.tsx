@@ -178,8 +178,7 @@ export function uploadFiles(
         loading: false,
       });
       setFiles([]);
-      // Modal popup disabled - files uploaded successfully without popup
-      // filesModal(res.files, { clipboard, clearEphemeral });
+
       clearEphemeral();
     },
     false,

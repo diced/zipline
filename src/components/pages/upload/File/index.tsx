@@ -81,7 +81,6 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
 
   const aggSize = () => files.reduce((acc, file) => acc + file.size, 0);
 
-  // Helper function to truncate filename for table view
   const truncateFileName = (fileName: string, maxLength: number = 30): string => {
     if (fileName.length <= maxLength) return fileName;
     const extension = fileName.split('.').pop() || '';
@@ -94,12 +93,11 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
     return `${truncated}.${extension}`;
   };
 
-  // Function to check if upload is large and needs confirmation
   const checkLargeUpload = (newFiles: File[], existingFiles: File[]) => {
     const allFiles = [...existingFiles, ...newFiles];
     const totalSize = allFiles.reduce((acc, file) => acc + file.size, 0);
     const fileCount = allFiles.length;
-    const sizeLimitMB = 100 * 1024 * 1024; // 100 MB in bytes
+    const sizeLimitMB = 100 * 1024 * 1024;
     const fileCountLimit = 100;
 
     return {
@@ -115,19 +113,15 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
     const uploadCheck = checkLargeUpload(newFiles, files);
 
     if (uploadCheck.isLarge) {
-      // Show confirmation modal before adding files
       setPendingFiles(newFiles);
       setWarningDetails({ fileCount: uploadCheck.fileCount, totalSize: uploadCheck.totalSize });
       setShowWarningModal(true);
     } else {
-      // Add files directly if not large
       const newFileList = [...newFiles, ...files];
       setFiles(newFileList);
 
-      // Reset to first page when adding files
       setCurrentPage(1);
 
-      // Check if we exceed 500 files and show notification
       if (newFileList.length > 500) {
         showNotification({
           title: 'Large File Count Detected',
@@ -140,17 +134,14 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
   };
 
   const confirmLargeUpload = () => {
-    // User confirmed, add the pending files
     const newFileList = [...pendingFiles, ...files];
     setFiles(newFileList);
     setShowWarningModal(false);
     setPendingFiles([]);
     setWarningDetails({ fileCount: 0, totalSize: 0 });
 
-    // Reset to first page when adding files
     setCurrentPage(1);
 
-    // Check if we exceed 500 files and show notification
     if (newFileList.length > 500) {
       showNotification({
         title: 'Large File Count Detected',
@@ -162,7 +153,6 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
   };
 
   const cancelLargeUpload = () => {
-    // User cancelled, clear pending files
     setShowWarningModal(false);
     setPendingFiles([]);
     setWarningDetails({ fileCount: 0, totalSize: 0 });
@@ -232,7 +222,7 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
       const buttonGroup = document.querySelector('[data-sticky-buttons]');
       if (buttonGroup) {
         const rect = buttonGroup.getBoundingClientRect();
-        setIsSticky(rect.top <= 70); // 70px is the sticky top value
+        setIsSticky(rect.top <= 70);
       }
     };
 
@@ -314,7 +304,6 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
         </Paper>
       </Collapse>
 
-      {/* Action Buttons - Sticky at top */}
       <Group
         data-sticky-buttons
         justify='space-between'
@@ -325,12 +314,8 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
           top: '60px',
           zIndex: 99,
           backgroundColor:
-            colorScheme === 'dark'
-              ? isSticky
-                ? '#0009'
-                : 'rgba(24, 28, 40, 0.6)' // Semi-transparent dark background
-              : 'rgb(0, 0, 0)', // Semi-transparent white background
-          backdropFilter: 'blur(10px)', // Add blur effect for better readability
+            colorScheme === 'dark' ? (isSticky ? '#0009' : 'rgba(24, 28, 40, 0.6)') : 'rgb(0, 0, 0)',
+          backdropFilter: 'blur(10px)',
           padding: '1rem',
           border: '1px solid ' + (colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[2]),
           borderRadius: !isSticky ? '0.5rem' : ' 0 0 0.5rem 0.5rem',
@@ -371,10 +356,8 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
       </Group>
 
       {files.length > 500 ? (
-        // Table view for 500+ files - Split into two columns
         <Paper withBorder radius='md' m='md'>
           <Group gap='md' align='flex-start' style={{ width: '100%' }}>
-            {/* Left Table */}
             <div style={{ flex: 1 }}>
               <Table striped highlightOnHover>
                 <Table.Thead>
@@ -432,7 +415,7 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
                               onClick={() => {
                                 const newFiles = files.filter((_, j) => actualIndex !== j);
                                 setFiles(newFiles);
-                                // Reset to page 1 if current page would be empty
+
                                 const totalPages = Math.ceil(newFiles.length / itemsPerPage);
                                 if (currentPage > totalPages && totalPages > 0) {
                                   setCurrentPage(totalPages);
@@ -450,7 +433,6 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
               </Table>
             </div>
 
-            {/* Right Table */}
             <div style={{ flex: 1 }}>
               <Table striped highlightOnHover>
                 <Table.Thead>
@@ -508,7 +490,7 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
                               onClick={() => {
                                 const newFiles = files.filter((_, j) => actualIndex !== j);
                                 setFiles(newFiles);
-                                // Reset to page 1 if current page would be empty
+
                                 const totalPages = Math.ceil(newFiles.length / itemsPerPage);
                                 if (currentPage > totalPages && totalPages > 0) {
                                   setCurrentPage(totalPages);
@@ -527,7 +509,6 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
             </div>
           </Group>
 
-          {/* Pagination */}
           <Group justify='center' p='md'>
             <Pagination
               total={Math.ceil(files.length / itemsPerPage)}
@@ -542,13 +523,11 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
           </Group>
         </Paper>
       ) : (
-        // Masonry view for <500 files
         <div
           style={{
             columnCount: 'auto',
             columnWidth: '25vh',
             columnGap: '1rem',
-            // margin: '1rem',
           }}
         >
           {files.map((file, i) => (
@@ -562,7 +541,6 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
         </div>
       )}
 
-      {/* Large Upload Warning Modal */}
       <Modal
         opened={showWarningModal}
         onClose={cancelLargeUpload}

@@ -122,14 +122,11 @@ export class WebDAVDatasource extends Datasource {
   }
 
   async totalSize(): Promise<number> {
-    // WebDAV doesn't have a simple way to get total size
-    // This would require listing all files and summing their sizes
     logger.warn('totalSize not implemented for WebDAV datasource');
     return 0;
   }
 
   async clear(): Promise<void> {
-    // This is dangerous and not recommended for WebDAV
     logger.warn('clear() called on WebDAV datasource - not implemented for safety');
     throw new Error('clear() is not supported for WebDAV datasource');
   }

@@ -1,5 +1,4 @@
 export function shouldTreatAsCodeFile(filename: string, mimeType: string): boolean {
-  // Check MIME type first
   if (
     mimeType.startsWith('text/') ||
     mimeType.includes('json') ||
@@ -9,7 +8,6 @@ export function shouldTreatAsCodeFile(filename: string, mimeType: string): boole
     return true;
   }
 
-  // Check file extension
   const extension = filename.split('.').pop()?.toLowerCase() || '';
   const codeExtensions = [
     'js',

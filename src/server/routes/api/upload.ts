@@ -38,12 +38,11 @@ export default fastifyPlugin(
     server.post<{
       Headers: UploadHeaders;
     }>(PATH, { preHandler: [userMiddleware, rateLimit] }, async (req, res) => {
-      // Public upload 開關檢查
       if (!req.user) {
         if (!config.features?.publicUpload) {
           return res.forbidden('Public upload is disabled');
         }
-        // 若允許 public upload,將 req.user 指向 default user
+
         let defaultUser = await prisma.user.findFirst({
           where: { username: 'public' },
           select: {

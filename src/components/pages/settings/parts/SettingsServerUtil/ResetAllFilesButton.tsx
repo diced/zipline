@@ -62,7 +62,6 @@ function CountdownModal({ onConfirm, onCancel }: CountdownModalProps) {
 
 export default function ResetAllFilesButton() {
   const openPasswordModal = () => {
-    // Create local state for the modal
     let modalPassword = '';
     let modalConfirmText = '';
 
@@ -75,11 +74,10 @@ export default function ResetAllFilesButton() {
       const passwordRef = useRef<HTMLInputElement>(null);
 
       useEffect(() => {
-        // Focus the password input after the modal is rendered
         const timer = setTimeout(() => {
           if (passwordRef.current) {
             passwordRef.current.focus();
-            // Remove readonly after focus to prevent autofill
+
             setIsReadOnly(false);
           }
         }, 100);
@@ -88,13 +86,12 @@ export default function ResetAllFilesButton() {
       }, []);
 
       const handleProceed = async () => {
-        setError(''); // Clear any previous errors
+        setError('');
 
         if (password.trim() && confirmText === 'confirm delete') {
           setIsVerifying(true);
 
           try {
-            // Check if user is logged in first
             const { data: userData, error: userError } = await fetchApi('/api/user');
 
             if (userError || !userData) {
@@ -103,7 +100,6 @@ export default function ResetAllFilesButton() {
               return;
             }
 
-            // Verify password
             const { data: passwordData, error: passwordError } = await fetchApi(
               '/api/user/verify-password',
               'POST',
@@ -118,11 +114,9 @@ export default function ResetAllFilesButton() {
               return;
             }
 
-            // Store password and close modal
             modalPassword = password;
             modalConfirmText = confirmText;
 
-            // Close modal and show countdown
             modals.closeAll();
 
             showNotification({
@@ -132,7 +126,6 @@ export default function ResetAllFilesButton() {
               autoClose: 2000,
             });
 
-            // Wait a moment then show countdown
             setTimeout(() => {
               openCountdownModal(modalPassword);
             }, 500);
@@ -159,7 +152,6 @@ export default function ResetAllFilesButton() {
               This will permanently delete ALL uploaded files. Complete the following to confirm:
             </Text>
 
-            {/* Hidden fake inputs to confuse autofill */}
             <div style={{ display: 'none' }}>
               <input type='text' name='fake-username' autoComplete='username' />
               <input type='password' name='fake-password' autoComplete='current-password' />
@@ -279,7 +271,6 @@ export default function ResetAllFilesButton() {
     });
 
     try {
-      // Password was already verified, so we can proceed directly to deletion
       const { data, error } = await fetchApi('/api/server/reset_all_files', 'DELETE', {
         password: userPassword,
       });

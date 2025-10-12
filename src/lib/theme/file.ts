@@ -34,8 +34,8 @@ export async function readThemes(): Promise<ZiplineTheme[]> {
 
       theme.mainBackgroundColor =
         theme.colorScheme === 'light'
-          ? 'color-mix(in srgb, var(--mantine-color-white), black 3%)' // darken(white 3%)
-          : 'color-mix(in srgb, var(--mantine-color-gray-9), black 45%)'; // darken(--mantine-color-gray-9 45%)
+          ? 'color-mix(in srgb, var(--mantine-color-white), black 3%)'
+          : 'color-mix(in srgb, var(--mantine-color-gray-9), black 45%)';
     }
 
     parsedThemes[i] = handleOverrideColors(parsedThemes[i]);

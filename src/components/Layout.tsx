@@ -26,14 +26,13 @@ export default function Layout({ children, config }: { children: React.ReactNode
     setPendingAction,
     isScrolled,
   } = useLayoutState();
-  // Check if custom background should be applied
+
   const hasCustomBackground = Boolean(
     backgroundType === 'image' && backgroundImageUrl && backgroundImageUrl.trim() !== '',
   );
 
   return (
     <>
-      {/* Custom Background Image */}
       {hasCustomBackground && (
         <div
           className={styles.customBackground}

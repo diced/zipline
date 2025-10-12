@@ -4,14 +4,6 @@ import { isAdministrator } from '@/lib/role';
 import { getSession } from '@/server/session';
 import { GetServerSideProps } from 'next';
 
-/*
-  Serves as a "reload config", since we have to reload the config on next.js as well as the server.
-  This takes care of the next.js side.
-  
-  It can be called by fetch('/reload') to do it manually/after saving settings.
-    After that you have to reload the page to see the changes.
-*/
-
 export default function Reload() {
   return null;
 }

@@ -8,7 +8,6 @@ import FileModal from './FileModal';
 
 import styles from './index.module.css';
 
-// Helper function to format file size
 function formatFileSize(bytes: number): string {
   if (bytes === 0) return '0 B';
   const k = 1024;
@@ -34,7 +33,6 @@ export default function DashboardFile({
   const clipboard = useClipboard();
 
   const handleCardClick = (e: React.MouseEvent) => {
-    // Handle Shift+Click to copy file link
     if (e.shiftKey) {
       e.stopPropagation();
       const fileUrl = `${window.location.origin}/raw/${file.name}`;
@@ -83,7 +81,6 @@ export default function DashboardFile({
       >
         {' '}
         <DashboardFileType key={file.id} file={file} />
-        {/* File size - bottom right */}
         <div className={`${styles.fileOverlay} ${styles.fileOverlayRight}`}>
           <Text size='xs' c={file.size === 0 ? 'yellow' : 'white'} fw={file.size === 0 ? 600 : 500}>
             {formatFileSize(file.size)}

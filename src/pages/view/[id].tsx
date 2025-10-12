@@ -441,7 +441,6 @@ export const getServerSideProps: GetServerSideProps<{
     else host = `http://${host}`;
   }
 
-  // convert date to string dumb nextjs :@
   (file as any).createdAt = file.createdAt.toISOString();
   (file as any).updatedAt = file.updatedAt.toISOString();
   (file as any).deletesAt = file.deletesAt?.toISOString() || null;

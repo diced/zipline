@@ -41,7 +41,6 @@ export class SMBDatasource extends Datasource {
   }
 
   private getFullPath(file: string): string {
-    // Combine basePath with file path, ensuring proper path separators
     if (this.basePath) {
       return path.posix.join(this.basePath, file);
     }
@@ -52,11 +51,8 @@ export class SMBDatasource extends Datasource {
     if (this.smbClient) return this.smbClient;
 
     try {
-      // Dynamically import smb2
       const SMB2 = (await import('smb2')).default || (await import('smb2'));
 
-      // For local accounts (no domain), use empty string or '.'
-      // Format: domain\username or just username for local accounts
       const domain = this.domain && this.domain !== 'WORKGROUP' ? this.domain : '.';
 
       this.smbClient = new (SMB2 as any)({
@@ -109,7 +105,6 @@ export class SMBDatasource extends Datasource {
       });
       const client = await this.getSmbClient();
 
-      // Ensure directory exists
       const dir = path.posix.dirname(fullPath);
       if (dir !== '.' && dir !== '/') {
         await this.ensureDirectory(dir);

@@ -19,7 +19,6 @@ async function getDatasource(conf?: typeof config): Promise<void> {
 
   const logger = log('datasource');
 
-  // Check if mount is enabled in database settings
   try {
     const settings = await prisma.zipline.findFirst();
 
@@ -47,13 +46,11 @@ async function getDatasource(conf?: typeof config): Promise<void> {
         process.exit(1);
       }
 
-      // Parse host, share, and path from filesMountHost (format: host/share/path)
       const parts = settings.filesMountHost.split('/');
       const host = parts[0];
       const share = parts[1] || 'share';
-      const basePath = parts.slice(2).join('/'); // Everything after share is the base path
+      const basePath = parts.slice(2).join('/');
 
-      // Use '.' for local accounts (standard SMB practice)
       const domain = settings.filesMountDomain || 'WORKGROUP';
 
       logger.info('parsed smb configuration', { host, share, basePath, domain });
@@ -72,7 +69,6 @@ async function getDatasource(conf?: typeof config): Promise<void> {
     logger.warn('failed to check database mount settings, falling back to config', { error: error.message });
   }
 
-  // Fall back to config-based datasource
   switch (config.datasource.type) {
     case 'local':
       datasource = global.__datasource__ = new LocalDatasource(config.datasource.local!.directory);
@@ -97,7 +93,6 @@ async function getDatasource(conf?: typeof config): Promise<void> {
 datasource = global.__datasource__;
 
 if (!global.__datasource__ && !datasource) {
-  // getDatasource is now async, so we need to handle it properly
   getDatasource(config).catch((error) => {
     log('datasource').error('failed to initialize datasource', { error: error.message });
     process.exit(1);

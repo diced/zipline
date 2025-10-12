@@ -15,7 +15,6 @@ export function UploadBackground({
 }: UploadBackgroundProps) {
   return (
     <>
-      {/* Background */}
       <Box
         style={{
           position: 'fixed',
@@ -28,7 +27,6 @@ export function UploadBackground({
         }}
       />
 
-      {/* Background overlay for blur effect - only for logged in users */}
       {isAuthenticated &&
         backgroundType === 'image' &&
         backgroundImageUrl &&

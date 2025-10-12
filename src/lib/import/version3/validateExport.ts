@@ -32,8 +32,6 @@ export type Zipline3Export = {
     env: NodeJS.ProcessEnv;
   };
 
-  // Creates a unique identifier for each model
-  // used to map the user's stuff to other data owned by the user
   user_map: Record<number, string>;
   thumbnail_map: Record<number, string>;
   folder_map: Record<number, string>;

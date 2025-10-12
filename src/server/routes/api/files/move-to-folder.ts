@@ -15,7 +15,6 @@ export default fastifyPlugin((server, _, done) => {
   server.post<{ Body: Body }>(PATH, { preHandler: [userMiddleware] }, async (req, res) => {
     const { fileIds, folderId } = req.body;
 
-    // Verify that all files belong to the current user
     const files = await prisma.file.findMany({
       where: {
         id: { in: fileIds },
@@ -28,7 +27,6 @@ export default fastifyPlugin((server, _, done) => {
       return res.status(404).send({ error: 'Some files do not exist or do not belong to you' });
     }
 
-    // If folderId is provided, verify that the folder belongs to the current user
     if (folderId) {
       const folder = await prisma.folder.findFirst({
         where: {
@@ -42,7 +40,6 @@ export default fastifyPlugin((server, _, done) => {
       }
     }
 
-    // Update all files
     await prisma.file.updateMany({
       where: {
         id: { in: fileIds },

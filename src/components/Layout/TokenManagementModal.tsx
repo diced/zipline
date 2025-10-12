@@ -25,7 +25,6 @@ export function TokenManagementModal({
   const { mutate } = useLogin();
   const clipboard = useClipboard();
 
-  // Password confirmation form
   const passwordForm = useForm({
     initialValues: {
       currentPassword: '',
@@ -35,7 +34,6 @@ export function TokenManagementModal({
     },
   });
 
-  // Password verification function
   const verifyPassword = async (password: string) => {
     const { data, error } = await fetchApi<{ valid: boolean }>('/api/user/verify-password', 'POST', {
       password: password,
@@ -49,7 +47,6 @@ export function TokenManagementModal({
     return true;
   };
 
-  // Perform actual token copy after password verification
   const performCopyToken = async () => {
     const { data, error } = await fetchApi<Response['/api/user/token']>('/api/user/token');
     if (error) {
@@ -70,7 +67,6 @@ export function TokenManagementModal({
     }
   };
 
-  // Perform actual token refresh after password verification
   const performRefreshToken = async () => {
     const { data, error } = await fetchApi<Response['/api/user/token']>('/api/user/token', 'PATCH');
     if (error) {
@@ -93,7 +89,6 @@ export function TokenManagementModal({
     }
   };
 
-  // Handle password confirmation
   const handlePasswordConfirmation = async (values: { currentPassword: string }) => {
     const isValid = await verifyPassword(values.currentPassword);
 
@@ -101,7 +96,6 @@ export function TokenManagementModal({
       return;
     }
 
-    // Password is valid, proceed with the pending action
     setShowPasswordModal(false);
     passwordForm.reset();
 

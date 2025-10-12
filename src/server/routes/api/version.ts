@@ -43,7 +43,6 @@ export default fastifyPlugin(
 
       const details = getVersion();
 
-      // 6 hrs cache
       if (cachedData && Date.now() - cachedAt < 6 * 60 * 60 * 1000) {
         return res.send({ data: cachedData, details, cached: true });
       }

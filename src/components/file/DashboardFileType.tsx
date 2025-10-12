@@ -19,7 +19,6 @@ import Render from '../render/Render';
 import fileIcon from './fileIcon';
 import { parseAsStringLiteral, useQueryState } from 'nuqs';
 
-// Image component with error fallback
 function ImageWithFallback({
   src,
   alt,
@@ -176,7 +175,6 @@ export default function DashboardFileType({
   const [type, setType] = useState<string>(file.type.split('/')[0]);
   const [isUploading, setIsUploading] = useState(false);
 
-  // Check if file should be treated as text/code based on extension
   const _isCodeFile = (filename: string) => {
     const extension = filename.split('.').pop()?.toLowerCase() || '';
     const codeExtensions = [
@@ -277,7 +275,6 @@ export default function DashboardFileType({
   const [open, setOpen] = useState(false);
 
   const handleImageClick = (e?: React.MouseEvent) => {
-    // Handle Shift+Click to copy file link
     if (e?.shiftKey) {
       e.stopPropagation();
       const fileUrl = dbFile
@@ -292,12 +289,11 @@ export default function DashboardFileType({
       return;
     }
 
-    // Default behavior - open zoom modal
     setOpen(true);
   };
 
   const uploadToPaste = async () => {
-    if (!dbFile) return; // Only works for database files now
+    if (!dbFile) return;
 
     setIsUploading(true);
 
@@ -327,7 +323,6 @@ export default function DashboardFileType({
 
       const result = await response.json();
 
-      // Update the existing notification
       updateNotification({
         id: 'paste-uploading',
         title: result.alreadyExists ? 'Paste Already Exists' : 'Upload Complete',
@@ -339,7 +334,6 @@ export default function DashboardFileType({
         loading: false,
       });
     } catch {
-      // Update the existing notification with error
       updateNotification({
         id: 'paste-uploading',
         title: 'Upload Failed',
@@ -388,15 +382,11 @@ export default function DashboardFileType({
   };
 
   useEffect(() => {
-    // Check if file should be treated as code/text based on extension or MIME type
     const shouldTreatAsText = () => {
-      // First check if it's explicitly marked as code or text type
       if (code || overrideType === 'text') return true;
 
-      // Check MIME type
       if (type === 'text') return true;
 
-      // Check for common code file extensions
       const extension = file.name.split('.').pop()?.toLowerCase() || '';
       const codeExtensions = [
         'js',
@@ -575,7 +565,6 @@ export default function DashboardFileType({
         <Placeholder text={`Video: ${file.name}`} Icon={fileIcon(file.type)} />
       );
     case 'image':
-      // Check if image is over 10MB (10,485,760 bytes)
       const isImageTooLarge = file.size > 10 * 1024 * 1024;
 
       if (isImageTooLarge && !show) {

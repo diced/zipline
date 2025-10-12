@@ -17,6 +17,5 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     };
   }
 
-  // No redirect - show upload page at root
   return withSafeConfig()(ctx);
 };

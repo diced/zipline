@@ -35,7 +35,6 @@ export function useFileUpload({
   const isUploadingRef = useRef(false);
 
   const uploadFiles = async (files: File[]): Promise<any> => {
-    // Reset progress and speed for current batch
     const resetProgress: { [key: string]: number } = {};
     const resetSpeed: { [key: string]: number } = {};
     files.forEach((file) => {
@@ -65,7 +64,6 @@ export function useFileUpload({
       headers['x-zipline-folder'] = ephemeral.folderId;
     }
 
-    // Use XMLHttpRequest for real upload progress tracking
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       let lastLoaded = 0;
@@ -111,7 +109,6 @@ export function useFileUpload({
         if (xhr.status >= 200 && xhr.status < 300) {
           const result = JSON.parse(xhr.responseText);
 
-          // Set files to 100%
           const completedProgress: { [key: string]: number } = {};
           const clearedSpeed: { [key: string]: number } = {};
           files.forEach((file) => {
@@ -126,7 +123,6 @@ export function useFileUpload({
             if (urls.length > 0) {
               try {
                 await navigator.clipboard.writeText(urls.join('\n'));
-                // Links copied notification removed for cleaner UX
               } catch (err) {
                 const textArea = document.createElement('textarea');
                 textArea.value = urls.join('\n');
@@ -134,15 +130,11 @@ export function useFileUpload({
                 textArea.select();
                 document.execCommand('copy');
                 document.body.removeChild(textArea);
-
-                // Links copied fallback notification removed for cleaner UX
               }
             }
 
             onUploadComplete?.(result.files);
           }
-
-          // Upload success notification removed for cleaner UX
 
           resolve(result);
         } else {

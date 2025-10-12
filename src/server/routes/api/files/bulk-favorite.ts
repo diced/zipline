@@ -24,7 +24,6 @@ export default fastifyPlugin((server: FastifyInstance, _, done) => {
         const { fileIds } = bulkFavoriteSchema.parse(request.body);
         const userId = request.user.id;
 
-        // First, verify all files belong to the user
         const userFiles = await prisma.file.findMany({
           where: {
             id: { in: fileIds },
@@ -38,7 +37,6 @@ export default fastifyPlugin((server: FastifyInstance, _, done) => {
           });
         }
 
-        // Update files to add to favorites
         await prisma.file.updateMany({
           where: {
             id: { in: fileIds },

@@ -11,7 +11,6 @@ export default fastifyPlugin((server, _, done) => {
   server.delete<{ Params: Params }>(PATH, { preHandler: [userMiddleware] }, async (req, res) => {
     const { id } = req.params;
 
-    // Verify that the folder belongs to the current user
     const folder = await prisma.folder.findFirst({
       where: {
         id,
@@ -30,7 +29,6 @@ export default fastifyPlugin((server, _, done) => {
       return res.status(404).send({ error: 'Folder not found or does not belong to you' });
     }
 
-    // Move all files in this folder to root (no folder)
     if (folder._count.files > 0) {
       await prisma.file.updateMany({
         where: {
@@ -42,7 +40,6 @@ export default fastifyPlugin((server, _, done) => {
       });
     }
 
-    // Delete the folder
     await prisma.folder.delete({
       where: {
         id,

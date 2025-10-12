@@ -89,7 +89,6 @@ export default function Files({
     }),
   });
 
-  // Standalone test connection function
   const testConnection = async () => {
     if (form.values.filesMountType === 'local') {
       notifications.show({
@@ -202,11 +201,9 @@ export default function Files({
           .filter((ext) => ext !== '');
     }
 
-    // Auto-enable mount if not local, disable if local
     if (values.filesMountType !== 'local') {
       values.filesMountEnabled = true;
 
-      // Test mount connection
       try {
         const response = await fetch('/api/admin/mount-test', {
           method: 'POST',
@@ -225,7 +222,6 @@ export default function Files({
         const result = await response.json();
 
         if (!response.ok || !result.success) {
-          // Log full error details to console for debugging
           console.error('Mount test failed:', {
             status: response.status,
             statusText: response.statusText,
@@ -237,7 +233,6 @@ export default function Files({
           const errorMessage = result.error || 'Cannot connect to mount';
           const errorDetails = result.details ? `\n\nDetails: ${result.details}` : '';
 
-          // Update the test result state
           setLastTestResult({
             success: false,
             message: `${errorMessage}${errorDetails}`,
@@ -256,7 +251,6 @@ export default function Files({
 
         console.log('✅ Mount test successful, proceeding to save');
 
-        // Update the test result state
         setLastTestResult({
           success: true,
           message: result.message || 'Connection verified. Saving settings...',
@@ -271,12 +265,10 @@ export default function Files({
           autoClose: 3000,
         });
       } catch (error: any) {
-        // Log network errors to console
         console.error('Mount test network error:', error);
 
         const errorMessage = `Network error: ${error.message || 'Failed to test mount connection'}`;
 
-        // Update the test result state
         setLastTestResult({
           success: false,
           message: errorMessage,
@@ -293,7 +285,6 @@ export default function Files({
         return;
       }
     } else {
-      // Disable mount if local storage is selected
       values.filesMountEnabled = false;
     }
 
@@ -426,7 +417,6 @@ export default function Files({
           />
         </SimpleGrid>
 
-        {/* Mount Configuration Section */}
         <Box mt='xl'>
           <Group gap='sm' mb='md' justify='space-between'>
             <Group gap='sm'>
@@ -434,7 +424,6 @@ export default function Files({
               <Title order={3}>Storage Configuration</Title>
             </Group>
 
-            {/* Connection Status Indicator */}
             {form.values.filesMountType !== 'local' && lastTestResult && (
               <Group gap='xs'>
                 <Text size='xs' c='dimmed'>
@@ -575,7 +564,6 @@ export default function Files({
               />
             )}
 
-            {/* Test Connection Section */}
             {form.values.filesMountType !== 'local' && (
               <Box mt='md' p='md' style={{ backgroundColor: 'rgba(0, 0, 0, 0.02)', borderRadius: '8px' }}>
                 <Group justify='space-between' align='flex-start'>

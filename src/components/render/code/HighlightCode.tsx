@@ -26,7 +26,7 @@ interface HighlightCodeProps {
   inModal?: boolean;
 }
 
-const STICKY_OFFSET_MODAL_PX = 137; // 0.5rem assuming 16px root size
+const STICKY_OFFSET_MODAL_PX = 137;
 const STICKY_OFFSET_PAGE_PX = 70;
 
 const escapeHtml = (value: string) =>

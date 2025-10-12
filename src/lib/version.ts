@@ -1,5 +1,3 @@
-// TODO: implement version checking against the API at https://zipline.diced.sh
-
 import { version } from '../../package.json';
 import { execSync } from 'child_process';
 

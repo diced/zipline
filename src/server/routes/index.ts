@@ -14,7 +14,6 @@ const loadRoutes = async (): Promise<Record<string, ReturnType<typeof fastifyPlu
   for (const file of files) {
     const a = await import(pathToFileURL(file).href);
     if (file.includes('download-from-url')) {
-      // Debug: Log keys to diagnose missing PATH export
       console.log('Route debug for', file, 'exports:', Object.keys(a));
     }
     if (!a.default) throw new Error(`Route ${file} does not have a default export.`);
