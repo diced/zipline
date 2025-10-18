@@ -64,7 +64,7 @@ export class S3Datasource extends Datasource {
     this.ensureReadWriteAccess();
   }
 
-  private key(path: string): string {
+  public key(path: string): string {
     if (this.options.subdirectory) {
       return this.options.subdirectory.endsWith('/')
         ? this.options.subdirectory + path

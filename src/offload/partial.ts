@@ -152,7 +152,7 @@ async function main() {
         client: s3datasource.client,
         params: {
           Bucket: s3datasource.options.bucket,
-          Key: file.filename,
+          Key: s3datasource.key(file.filename),
           Body: bodyStream,
         },
         partSize: bytes(config.chunks.size),
