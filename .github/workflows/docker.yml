@@ -2,7 +2,7 @@ name: 'Push Docker Images'
 
 on:
   push:
-    branches: [v4, trunk]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
