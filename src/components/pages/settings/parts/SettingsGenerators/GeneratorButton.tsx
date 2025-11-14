@@ -232,7 +232,7 @@ export default function GeneratorButton({
           {name === 'ShareX' && (
             <Switch
               label='Xshare Compatibility'
-              description='If you choose to use the Xshare app on Android, enable this option for compatibility. The genereated config will not work with ShareX.'
+              description='If you choose to use the Xshare app on Android, enable this option for compatibility. The generated config will not work with ShareX.'
               checked={options.sharex_xshareCompatibility ?? false}
               onChange={(event) => setOption({ sharex_xshareCompatibility: event.currentTarget.checked })}
               disabled={!onlyFile}
