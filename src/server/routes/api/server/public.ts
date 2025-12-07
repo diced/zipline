@@ -37,6 +37,7 @@ export type ApiServerPublicResponse = {
   files: {
     maxFileSize: string;
     defaultFormat: Config['files']['defaultFormat'];
+    maxExpiration?: string | null;
   };
   chunks: Config['chunks'];
   firstSetup: boolean;
@@ -75,6 +76,7 @@ export default fastifyPlugin(
         files: {
           maxFileSize: config.files.maxFileSize,
           defaultFormat: config.files.defaultFormat,
+          maxExpiration: config.files.maxExpiration,
         },
         chunks: config.chunks,
         firstSetup: zipline.firstSetup,

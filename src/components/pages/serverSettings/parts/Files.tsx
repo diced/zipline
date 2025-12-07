@@ -30,6 +30,7 @@ export default function Files({
     filesDisabledExtensions: string;
     filesMaxFileSize: string;
     filesDefaultExpiration: string | null;
+    filesMaxExpiration: string | null;
     filesAssumeMimetypes: boolean;
     filesDefaultDateFormat: string;
     filesRemoveGpsMetadata: boolean;
@@ -44,6 +45,7 @@ export default function Files({
       filesDisabledExtensions: '',
       filesMaxFileSize: '100mb',
       filesDefaultExpiration: '',
+      filesMaxExpiration: '365d',
       filesAssumeMimetypes: false,
       filesDefaultDateFormat: 'YYYY-MM-DD_HH:mm:ss',
       filesRemoveGpsMetadata: false,
@@ -61,6 +63,12 @@ export default function Files({
       values.filesDefaultExpiration = null;
     } else {
       values.filesDefaultExpiration = values.filesDefaultExpiration.trim();
+    }
+
+    if (values.filesMaxExpiration?.trim() === '' || !values.filesMaxExpiration) {
+      values.filesMaxExpiration = null;
+    } else {
+      values.filesMaxExpiration = values.filesMaxExpiration.trim();
     }
 
     if (!values.filesDisabledExtensions) {
@@ -95,6 +103,7 @@ export default function Files({
       filesDisabledExtensions: data.settings.filesDisabledExtensions.join(', ') ?? '',
       filesMaxFileSize: data.settings.filesMaxFileSize ?? '100mb',
       filesDefaultExpiration: data.settings.filesDefaultExpiration ?? '',
+      filesMaxExpiration: data.settings.filesMaxExpiration ?? '365d',
       filesAssumeMimetypes: data.settings.filesAssumeMimetypes ?? false,
       filesDefaultDateFormat: data.settings.filesDefaultDateFormat ?? 'YYYY-MM-DD_HH:mm:ss',
       filesRemoveGpsMetadata: data.settings.filesRemoveGpsMetadata ?? false,
@@ -162,6 +171,13 @@ export default function Files({
           />
 
           <TextInput
+            label='Default Date Format'
+            description='The default date format to use.'
+            placeholder='YYYY-MM-DD_HH:mm:ss'
+            {...form.getInputProps('filesDefaultDateFormat')}
+          />
+
+          <TextInput
             label='Default Expiration'
             description='The default expiration time for files.'
             placeholder='30d'
@@ -169,10 +185,10 @@ export default function Files({
           />
 
           <TextInput
-            label='Default Date Format'
-            description='The default date format to use.'
-            placeholder='YYYY-MM-DD_HH:mm:ss'
-            {...form.getInputProps('filesDefaultDateFormat')}
+            label='Max Expiration'
+            description='The maximum expiration time allowed for files.'
+            placeholder='365d'
+            {...form.getInputProps('filesMaxExpiration')}
           />
 
           <NumberInput

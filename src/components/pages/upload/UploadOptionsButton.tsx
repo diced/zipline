@@ -34,6 +34,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import useSWR from 'swr';
 import { useShallow } from 'zustand/shallow';
+import ms from 'ms';
 
 function checkDomains(domains?: unknown): string[] {
   if (!domains) return [];
@@ -101,42 +102,65 @@ export default function UploadOptionsButton({ folder, numFiles }: { folder?: str
 
         <Stack gap='xs' my='sm'>
           <Select
-            data={[
-              { value: 'default', label: `Default (${config.files.defaultExpiration ?? 'never'})` },
-              { value: 'never', label: 'Never' },
-              { value: '5min', label: '5 minutes' },
-              { value: '10min', label: '10 minutes' },
-              { value: '15min', label: '15 minutes' },
-              { value: '30min', label: '30 minutes' },
-              { value: '1h', label: '1 hour' },
-              { value: '2h', label: '2 hours' },
-              { value: '3h', label: '3 hours' },
-              { value: '4h', label: '4 hours' },
-              { value: '5h', label: '5 hours' },
-              { value: '6h', label: '6 hours' },
-              { value: '8h', label: '8 hours' },
-              { value: '12h', label: '12 hours' },
-              { value: '1d', label: '1 day' },
-              { value: '3d', label: '3 days' },
-              { value: '5d', label: '5 days' },
-              { value: '7d', label: '7 days' },
-              { value: '1w', label: '1 week' },
-              { value: '1.5w', label: '1.5 weeks' },
-              { value: '2w', label: '2 weeks' },
-              { value: '3w', label: '3 weeks' },
-              { value: '30d', label: '1 month (30 days)' },
-              { value: '45.625d', label: '1.5 months (~45 days)' },
-              { value: '60d', label: '2 months (60 days)' },
-              { value: '90d', label: '3 months (90 days)' },
-              { value: '120d', label: '4 months (120 days)' },
-              { value: '0.5 year', label: '6 months (0.5 year)' },
-              { value: '1y', label: '1 year' },
-              {
-                value: '_',
-                label: 'Need more freedom? Set an exact date and time through the API.',
-                disabled: true,
-              },
-            ]}
+            data={(() => {
+              // Build the full option list, then clamp by config.files.maxExpiration if provided.
+              const opts = [
+                { value: 'default', label: `Default (${config.files.defaultExpiration ?? 'never'})` },
+                { value: 'never', label: 'Never' },
+                { value: '5min', label: '5 minutes' },
+                { value: '10min', label: '10 minutes' },
+                { value: '15min', label: '15 minutes' },
+                { value: '30min', label: '30 minutes' },
+                { value: '1h', label: '1 hour' },
+                { value: '2h', label: '2 hours' },
+                { value: '3h', label: '3 hours' },
+                { value: '4h', label: '4 hours' },
+                { value: '5h', label: '5 hours' },
+                { value: '6h', label: '6 hours' },
+                { value: '8h', label: '8 hours' },
+                { value: '12h', label: '12 hours' },
+                { value: '1d', label: '1 day' },
+                { value: '3d', label: '3 days' },
+                { value: '5d', label: '5 days' },
+                { value: '7d', label: '7 days' },
+                { value: '1w', label: '1 week' },
+                { value: '1.5w', label: '1.5 weeks' },
+                { value: '2w', label: '2 weeks' },
+                { value: '3w', label: '3 weeks' },
+                { value: '30d', label: '1 month (30 days)' },
+                { value: '45.625d', label: '1.5 months (~45 days)' },
+                { value: '60d', label: '2 months (60 days)' },
+                { value: '90d', label: '3 months (90 days)' },
+                { value: '120d', label: '4 months (120 days)' },
+                { value: '0.5 year', label: '6 months (0.5 year)' },
+                { value: '1y', label: '1 year' },
+                {
+                  value: '_',
+                  label: 'Need more freedom? Set an exact date and time through the API.',
+                  disabled: true,
+                },
+              ];
+
+              try {
+                const maxExp = settingsData?.files?.maxExpiration ?? null;
+                if (!maxExp) return opts;
+
+                const maxMs = ms(String(maxExp) as any);
+                if (!maxMs || isNaN(Number(maxMs))) return opts;
+
+                // Keep 'default' and 'never' always visible; clamp other duration options.
+                return opts.filter((o) => {
+                  if (o.value === 'default' || o.value === 'never' || o.value === '_') return true;
+                  const val = String(o.value);
+                  const parsed = (ms as unknown as (v: string) => number)(val);
+                  // Some labels like '45.625d' or '0.5 year' may be parseable; if not parseable, keep them to avoid excessive hiding.
+                  if (!parsed || isNaN(Number(parsed))) return true;
+                  return parsed <= Number(maxMs);
+                });
+              } catch {
+                return opts;
+              }
+            })()}
             label={
               <>
                 Deletes at{' '}
@@ -162,6 +186,11 @@ export default function UploadOptionsButton({ folder, numFiles }: { folder?: str
                     {'.'}
                   </>
                 )}
+                {settingsData?.files?.maxExpiration ? (
+                  <div style={{ marginTop: 6, color: 'var(--mantine-color-dimmed)' }}>
+                    Note: maximum allowed expiration is <b>{settingsData.files.maxExpiration}</b>.
+                  </div>
+                ) : null}
               </>
             }
             leftSection={<IconAlarmFilled size='1rem' />}

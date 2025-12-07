@@ -1,7 +1,7 @@
 generator client {
   provider        = "prisma-client"
-  output = "../src/prisma"
-  moduleFormat = "cjs"
+  output          = "../src/prisma"
+  moduleFormat    = "cjs"
   previewFeatures = ["queryCompiler", "driverAdapters"]
 }
 
@@ -32,18 +32,19 @@ model Zipline {
   tasksThumbnailsInterval   String @default("30m")
   tasksMetricsInterval      String @default("30m")
 
-  filesRoute                          String   @default("/u")
-  filesLength                         Int      @default(6)
-  filesDefaultFormat                  String   @default("random")
-  filesDisabledExtensions             String[]
-  filesMaxFileSize                    String   @default("100mb")
-  filesDefaultExpiration              String?
-  filesAssumeMimetypes                Boolean  @default(false)
-  filesDefaultDateFormat              String   @default("YYYY-MM-DD_HH:mm:ss")
-  filesRemoveGpsMetadata              Boolean  @default(false)
-  filesRandomWordsNumAdjectives       Int      @default(2)
-  filesRandomWordsSeparator           String   @default("-")
-  filesDefaultCompressionFormat       String?  @default("jpg")
+  filesRoute                    String   @default("/u")
+  filesLength                   Int      @default(6)
+  filesDefaultFormat            String   @default("random")
+  filesDisabledExtensions       String[]
+  filesMaxFileSize              String   @default("100mb")
+  filesDefaultExpiration        String?
+  filesMaxExpiration            String?
+  filesAssumeMimetypes          Boolean  @default(false)
+  filesDefaultDateFormat        String   @default("YYYY-MM-DD_HH:mm:ss")
+  filesRemoveGpsMetadata        Boolean  @default(false)
+  filesRandomWordsNumAdjectives Int      @default(2)
+  filesRandomWordsSeparator     String   @default("-")
+  filesDefaultCompressionFormat String?  @default("jpg")
 
   urlsRoute  String @default("/go")
   urlsLength Int    @default(6)
@@ -64,7 +65,7 @@ model Zipline {
   featuresMetricsShowUserSpecific Boolean @default(true)
 
   featuresVersionChecking Boolean @default(true)
-  featuresVersionAPI      String @default("https://zipline-version.diced.sh")
+  featuresVersionAPI      String  @default("https://zipline-version.diced.sh")
 
   invitesEnabled Boolean @default(true)
   invitesLength  Int     @default(6)
@@ -141,7 +142,7 @@ model Zipline {
   pwaThemeColor      String  @default("#000000")
   pwaBackgroundColor String  @default("#000000")
 
-  domains            String[] @default([])
+  domains String[] @default([])
 }
 
 model User {
@@ -295,8 +296,8 @@ model Folder {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  name   String
-  public Boolean @default(false)
+  name         String
+  public       Boolean @default(false)
   allowUploads Boolean @default(false)
 
   files File[]
