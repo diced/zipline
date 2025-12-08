@@ -1,10 +1,31 @@
-import { ModalsProvider } from '@mantine/modals';
+import { ContextModalProps, ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';
 import { Outlet } from 'react-router-dom';
 import { SWRConfig } from 'swr';
 import ThemeProvider from '@/components/ThemeProvider';
 import { type ZiplineTheme } from '@/lib/theme';
 import { type Config } from '@/lib/config/validate';
+import { Button, Text } from '@mantine/core';
+
+const AlertModal = ({ context, id, innerProps }: ContextModalProps<{ modalBody: string }>) => (
+  <>
+    <Text size='sm'>{innerProps.modalBody}</Text>
+
+    <Button fullWidth mt='md' onClick={() => context.closeModal(id)}>
+      OK
+    </Button>
+  </>
+);
+
+const contextModals = {
+  alert: AlertModal,
+};
+
+declare module '@mantine/modals' {
+  export interface MantineModalsOverride {
+    modals: typeof contextModals;
+  }
+}
 
 export default function Root({
   themes,
@@ -37,6 +58,7 @@ export default function Root({
             },
             centered: true,
           }}
+          modals={contextModals}
         >
           <Notifications zIndex={10000000} />
           <Outlet />

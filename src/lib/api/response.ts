@@ -11,6 +11,7 @@ import { ApiServerClearTempResponse } from '@/server/routes/api/server/clear_tem
 import { ApiServerClearZerosResponse } from '@/server/routes/api/server/clear_zeros';
 import { ApiServerFolderResponse } from '@/server/routes/api/server/folder';
 import { ApiServerImportV3 } from '@/server/routes/api/server/import/v3';
+import { ApiServerImportV4 } from '@/server/routes/api/server/import/v4';
 import { ApiServerPublicResponse } from '@/server/routes/api/server/public';
 import { ApiServerRequerySizeResponse } from '@/server/routes/api/server/requery_size';
 import { ApiServerSettingsResponse, ApiServerSettingsWebResponse } from '@/server/routes/api/server/settings';
@@ -83,6 +84,7 @@ export type Response = {
   '/api/server/themes': ApiServerThemesResponse;
   '/api/server/thumbnails': ApiServerThumbnailsResponse;
   '/api/server/import/v3': ApiServerImportV3;
+  '/api/server/import/v4': ApiServerImportV4;
   '/api/healthcheck': ApiHealthcheckResponse;
   '/api/setup': ApiSetupResponse;
   '/api/upload': ApiUploadResponse;

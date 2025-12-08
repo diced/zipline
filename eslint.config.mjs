@@ -1,14 +1,16 @@
-import unusedImports from 'eslint-plugin-unused-imports';
-import tseslint from 'typescript-eslint';
-import prettier from 'eslint-plugin-prettier';
-import prettierConfig from 'eslint-config-prettier';
-import reactHooksPlugin from 'eslint-plugin-react-hooks';
-import reactPlugin from 'eslint-plugin-react';
-import reactRefreshPlugin from 'eslint-plugin-react-refresh';
-import jsxA11yPlugin from 'eslint-plugin-jsx-a11y';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import fs from 'node:fs';
+
+import tseslint from 'typescript-eslint';
+
+import reactPlugin from 'eslint-plugin-react';
+import reactHooksPlugin from 'eslint-plugin-react-hooks';
+import reactRefreshPlugin from 'eslint-plugin-react-refresh';
+import jsxA11yPlugin from 'eslint-plugin-jsx-a11y';
+import prettier from 'eslint-plugin-prettier';
+import prettierConfig from 'eslint-config-prettier';
+import unusedImports from 'eslint-plugin-unused-imports';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -20,63 +22,57 @@ const gitignorePatterns = gitignoreContent
   .filter((line) => line.trim() && !line.startsWith('#'))
   .map((pattern) => pattern.trim());
 
-export default tseslint.config(
+const reactRecommendedRules = reactPlugin.configs.recommended.rules;
+const reactHooksRecommendedRules = reactHooksPlugin.configs['recommended-latest'].rules;
+const reactRefreshRules = reactRefreshPlugin.configs.vite.rules;
+
+import { defineConfig } from 'eslint/config';
+
+export default defineConfig(
+  tseslint.configs.recommended,
+
+  jsxA11yPlugin.flatConfigs.recommended,
+  reactPlugin.configs.flat.recommended,
+  reactHooksPlugin.configs.flat.recommended,
+  reactRefreshPlugin.configs.vite,
+
   { ignores: gitignorePatterns },
 
   {
-    extends: [
-      tseslint.configs.recommended,
-      reactHooksPlugin.configs['recommended-latest'],
-      reactRefreshPlugin.configs.vite,
-    ],
-  },
-
-  {
     files: ['**/*.{js,mjs,cjs,ts,tsx}'],
+
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
       parserOptions: {
-        ecmaFeatures: {
-          jsx: true,
-        },
+        ecmaFeatures: { jsx: true },
       },
     },
-    plugins: {
-      'unused-imports': unusedImports,
-      prettier: prettier,
-      react: reactPlugin,
-      'jsx-a11y': jsxA11yPlugin,
-    },
-    rules: {
-      ...reactPlugin.configs.recommended.rules,
 
+    plugins: {
+      react: reactPlugin,
+      'react-hooks': reactHooksPlugin,
+      prettier,
+      'unused-imports': unusedImports,
+    },
+
+    rules: {
       ...prettierConfig.rules,
-      'prettier/prettier': [
-        'error',
-        {},
-        {
-          fileInfoOptions: {
-            withNodeModules: false,
-          },
-        },
-      ],
+
+      'prettier/prettier': ['error', {}, { fileInfoOptions: { withNodeModules: false } }],
 
       'linebreak-style': ['error', 'unix'],
-      quotes: [
-        'error',
-        'single',
-        {
-          avoidEscape: true,
-        },
-      ],
+      quotes: ['error', 'single', { avoidEscape: true }],
       semi: ['error', 'always'],
       'jsx-quotes': ['error', 'prefer-single'],
       indent: 'off',
+
       'react/prop-types': 'off',
       'react-hooks/rules-of-hooks': 'off',
       'react-hooks/exhaustive-deps': 'off',
+      'react-hooks/set-state-in-effect': 'warn',
       'react-refresh/only-export-components': 'off',
+
       'react/jsx-uses-react': 'warn',
       'react/jsx-uses-vars': 'warn',
       'react/no-danger-with-children': 'warn',
@@ -87,28 +83,29 @@ export default tseslint.config(
       'react/react-in-jsx-scope': 'off',
       'react/require-render-return': 'error',
       'react/style-prop-object': 'warn',
-      'jsx-a11y/alt-text': 'off',
       'react/display-name': 'off',
+
+      'jsx-a11y/alt-text': 'off',
+      'jsx-a11y/no-autofocus': 'off',
+      'jsx-a11y/click-events-have-key-events': 'off',
+      'jsx-a11y/no-static-element-interactions': 'off',
+
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
+
       'unused-imports/no-unused-imports': 'error',
       'unused-imports/no-unused-vars': [
         'warn',
-        {
-          vars: 'all',
-          varsIgnorePattern: '^_',
-          args: 'after-used',
-          argsIgnorePattern: '^_',
-        },
+        { vars: 'all', varsIgnorePattern: '^_', args: 'after-used', argsIgnorePattern: '^_' },
       ],
+
       '@typescript-eslint/ban-ts-comment': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unused-expressions': 'off',
     },
+
     settings: {
-      react: {
-        version: 'detect',
-      },
+      react: { version: 'detect' },
     },
   },
 );

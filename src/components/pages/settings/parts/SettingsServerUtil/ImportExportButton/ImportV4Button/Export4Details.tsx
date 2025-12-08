@@ -21,7 +21,6 @@ import {
   IconFolder,
   IconGraphFilled,
   IconLink,
-  IconSettings,
   IconTag,
   IconTagPlus,
   IconTarget,
@@ -66,18 +65,9 @@ export default function Export3Details({ export4 }: { export4: Export4 }) {
     </Table.Tr>
   ));
 
-  const settingsRows = Object.entries(export4.data.settings)
-    .filter(([key]) => !['id', 'createdAt', 'updatedAt'].includes(key))
-    .map(([key, value]) => (
-      <Table.Tr key={key}>
-        <Table.Td ff='monospace'>{key}</Table.Td>
-        <Table.Td ff='monospace'>{String(value)}</Table.Td>
-      </Table.Tr>
-    ));
-
   const userRows = export4.data.users.map((user, i) => (
     <Table.Tr key={i}>
-      <Table.Td>{user.avatar ? <Avatar src={user.avatar} size={24} /> : ''}</Table.Td>
+      <Table.Td>{user.avatar ? <Avatar src={user.avatar} size={24} radius='sm' /> : ''}</Table.Td>
       <Table.Td>{user.id}</Table.Td>
       <Table.Td>{user.username}</Table.Td>
       <Table.Td>{user.password ? <IconCheck size='1rem' /> : <IconX size='1rem' />}</Table.Td>
@@ -465,23 +455,6 @@ export default function Export3Details({ export4 }: { export4: Export4 }) {
                 )}
               />
             </Stack>
-          </Accordion.Panel>
-        </Accordion.Item>
-
-        <Accordion.Item value='settings'>
-          <Accordion.Control icon={<IconSettings size='1rem' />}>Settings</Accordion.Control>
-          <Accordion.Panel>
-            <Paper withBorder>
-              <Table>
-                <Table.Thead>
-                  <Table.Tr>
-                    <Table.Th>Key</Table.Th>
-                    <Table.Th>Value</Table.Th>
-                  </Table.Tr>
-                </Table.Thead>
-                <Table.Tbody>{settingsRows}</Table.Tbody>
-              </Table>
-            </Paper>
           </Accordion.Panel>
         </Accordion.Item>
       </Accordion>

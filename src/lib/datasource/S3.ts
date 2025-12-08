@@ -1,11 +1,15 @@
 import {
+  CompleteMultipartUploadCommand,
   CopyObjectCommand,
+  CreateMultipartUploadCommand,
   DeleteObjectCommand,
   DeleteObjectsCommand,
   GetObjectCommand,
+  HeadObjectCommand,
   ListObjectsCommand,
   PutObjectCommand,
   S3Client,
+  UploadPartCopyCommand,
 } from '@aws-sdk/client-s3';
 import { NodeHttpHandler } from '@smithy/node-http-handler';
 import { createReadStream } from 'fs';
@@ -225,7 +229,7 @@ export class S3Datasource extends Datasource {
   }
 
   public async size(file: string): Promise<number> {
-    const command = new GetObjectCommand({
+    const command = new HeadObjectCommand({
       Bucket: this.options.bucket,
       Key: this.key(file),
     });
@@ -323,6 +327,96 @@ export class S3Datasource extends Datasource {
   }
 
   public async rename(from: string, to: string): Promise<void> {
+    const size = await this.size(from);
+
+    if (size !== 0 && size > 5 * 1024 * 1024 * 1024) {
+      this.logger.debug('object larger than 5GB, using multipart copy for rename', { from, to, size });
+
+      const createCommand = new CreateMultipartUploadCommand({
+        Bucket: this.options.bucket,
+        Key: this.key(to),
+      });
+
+      let uploadId: string;
+      try {
+        const createRes = await this.client.send(createCommand);
+        if (!isOk(createRes.$metadata.httpStatusCode || 0)) {
+          this.logger.error('there was an error while initiating multipart upload');
+          this.logger.error('error metadata', createRes.$metadata as Record<string, unknown>);
+          throw new Error('Failed to initiate multipart upload');
+        }
+
+        if (!createRes.UploadId) {
+          this.logger.error('no upload ID returned while initiating multipart upload');
+          throw new Error('Failed to initiate multipart upload');
+        }
+
+        uploadId = createRes.UploadId;
+      } catch (e) {
+        this.logger.error('there was an error while initiating multipart upload');
+        this.logger.error('error metadata', e as Record<string, unknown>);
+
+        throw new Error('Failed to initiate multipart upload');
+      }
+
+      const partSize = 5 * 1024 * 1024;
+      const eTags = [];
+
+      for (let start = 0, part = 1; start < size; start += partSize, part++) {
+        const end = Math.min(start + partSize - 1, size - 1);
+
+        const uploadPartCopyCommand = new UploadPartCopyCommand({
+          Bucket: this.options.bucket,
+          Key: this.key(to),
+          CopySource: this.options.bucket + '/' + this.key(from),
+          CopySourceRange: `bytes=${start}-${end}`,
+          PartNumber: part,
+          UploadId: uploadId,
+        });
+
+        try {
+          const copyRes = await this.client.send(uploadPartCopyCommand);
+          if (!isOk(copyRes.$metadata.httpStatusCode || 0)) {
+            this.logger.error('there was an error while copying part of the object');
+            this.logger.error('error metadata', copyRes.$metadata as Record<string, unknown>);
+            throw new Error('Failed to copy part of the object');
+          }
+
+          eTags.push({ ETag: copyRes.CopyPartResult?.ETag, PartNumber: part });
+        } catch (e) {
+          this.logger.error('there was an error while renaming object using multipart copy');
+          this.logger.error('error metadata', e as Record<string, unknown>);
+
+          throw new Error('Failed to rename object using multipart copy');
+        }
+      }
+
+      const completeMultipartUploadCommand = new CompleteMultipartUploadCommand({
+        Bucket: this.options.bucket,
+        Key: this.key(to),
+        UploadId: uploadId,
+        MultipartUpload: {
+          Parts: eTags,
+        },
+      });
+
+      try {
+        const completeRes = await this.client.send(completeMultipartUploadCommand);
+        if (!isOk(completeRes.$metadata.httpStatusCode || 0)) {
+          this.logger.error('there was an error while completing multipart upload');
+          this.logger.error('error metadata', completeRes.$metadata as Record<string, unknown>);
+          throw new Error('Failed to complete multipart upload');
+        }
+      } catch (e) {
+        this.logger.error('there was an error while completing multipart upload');
+        this.logger.error('error metadata', e as Record<string, unknown>);
+
+        throw new Error('Failed to complete multipart upload');
+      }
+
+      return;
+    }
+
     const copyCommand = new CopyObjectCommand({
       Bucket: this.options.bucket,
       Key: this.key(to),

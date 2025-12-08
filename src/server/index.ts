@@ -209,7 +209,7 @@ async function main() {
     }
   });
 
-  server.setErrorHandler((error, _, res) => {
+  server.setErrorHandler((error: { statusCode: number; message: string }, _, res) => {
     if (error.statusCode) {
       res.status(error.statusCode);
       res.send({ error: error.message, statusCode: error.statusCode });
