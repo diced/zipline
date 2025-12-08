@@ -32,22 +32,26 @@ export default function DashboardFiles() {
         <TagsButton />
         <PendingFilesButton />
 
-        <Tooltip label='Table Options'>
-          <ActionIcon variant='outline' onClick={() => setTableEditOpen((open) => !open)}>
-            <IconTableOptions size='1rem' />
-          </ActionIcon>
-        </Tooltip>
+        {view === 'table' && (
+          <>
+            <Tooltip label='Table Options'>
+              <ActionIcon variant='outline' onClick={() => setTableEditOpen((open) => !open)}>
+                <IconTableOptions size='1rem' />
+              </ActionIcon>
+            </Tooltip>
 
-        <Tooltip label='Search by ID'>
-          <ActionIcon
-            variant='outline'
-            onClick={() => {
-              setIdSearchOpen((open) => !open);
-            }}
-          >
-            <IconGridPatternFilled size='1rem' />
-          </ActionIcon>
-        </Tooltip>
+            <Tooltip label='Search by ID'>
+              <ActionIcon
+                variant='outline'
+                onClick={() => {
+                  setIdSearchOpen((open) => !open);
+                }}
+              >
+                <IconGridPatternFilled size='1rem' />
+              </ActionIcon>
+            </Tooltip>
+          </>
+        )}
 
         <GridTableSwitcher type='files' />
       </Group>
