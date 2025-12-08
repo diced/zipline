@@ -33,7 +33,6 @@ CREATE TABLE "Zipline" (
     "filesDisabledExtensions" TEXT[],
     "filesMaxFileSize" INTEGER NOT NULL DEFAULT 104857600,
     "filesDefaultExpiration" INTEGER,
-    "filesMaxExpiration" INTEGER,
     "filesAssumeMimetypes" BOOLEAN NOT NULL DEFAULT false,
     "filesDefaultDateFormat" TEXT NOT NULL DEFAULT 'YYYY-MM-DD_HH:mm:ss',
     "filesRemoveGpsMetadata" BOOLEAN NOT NULL DEFAULT false,

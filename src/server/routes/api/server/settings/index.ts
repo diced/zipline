@@ -398,51 +398,35 @@ export default fastifyPlugin(
           });
         }
 
-        // Normalize files expiration settings:
-        // - Clamp filesMaxExpiration to between 5min and 1y if set.
-        // - If filesDefaultExpiration is set and exceeds the (clamped) max, lower it to the max.
-        const normalized = { ...result.data };
+        const parsed = { ...result.data };
 
         try {
-          const MIN_EXP_MS = ms('5min' as StringValue) as number;
-          const MAX_EXP_MS = ms('1y' as StringValue) as number;
-
-          if (normalized.filesMaxExpiration) {
-            const parsedMax = ms(String(normalized.filesMaxExpiration) as StringValue) as number;
-            if (!isNaN(Number(parsedMax)) && parsedMax > 0) {
-              if (parsedMax < MIN_EXP_MS) {
-                normalized.filesMaxExpiration = '5min';
-              } else if (parsedMax > MAX_EXP_MS) {
-                normalized.filesMaxExpiration = '1y';
-              }
-            }
-          }
-
-          if (normalized.filesDefaultExpiration && normalized.filesMaxExpiration) {
-            const parsedDefault = ms(String(normalized.filesDefaultExpiration) as StringValue) as number;
-            const parsedMaxAfter = ms(String(normalized.filesMaxExpiration) as StringValue) as number;
+          if (parsed.filesDefaultExpiration && parsed.filesMaxExpiration) {
+            const parsedDefault = ms(String(parsed.filesDefaultExpiration) as StringValue) as number;
+            const parsedMaxAfter = ms(String(parsed.filesMaxExpiration) as StringValue) as number;
             if (
               !isNaN(Number(parsedDefault)) &&
               !isNaN(Number(parsedMaxAfter)) &&
               parsedDefault > parsedMaxAfter
             ) {
-              // set default to the clamped max value
-              normalized.filesDefaultExpiration = String(normalized.filesMaxExpiration);
+              // set default to the provided max value
+              parsed.filesDefaultExpiration = String(parsed.filesMaxExpiration);
             }
           }
         } catch (e) {
-          // If anything goes wrong during normalization, just proceed with original values.
+          // If normalization fails, log the error and proceed with original values.
           logger.debug('error normalizing expiration settings', { err: e });
         }
 
-        // Only include keys that actually exist on the database row we fetched.
-        // This prevents passing unexpected/invalid keys to Prisma.update.
-        const allowed = new Set(Object.keys(settings));
-        // Never allow updating internal fields
-        ['id', 'createdAt', 'updatedAt', 'firstSetup'].forEach((k) => allowed.delete(k));
+        // Use the keys present in the Zod-parsed object as the allowed set.
+        const allowedFromSchema = new Set(Object.keys(parsed));
+        const filteredData = Object.fromEntries(
+          Object.entries(parsed).filter(([k]) => allowedFromSchema.has(k)),
+        );
 
-        const filteredData = Object.fromEntries(Object.entries(normalized).filter(([k]) => allowed.has(k)));
-
+        if (Object.keys(filteredData).length === 0) {
+          return res.status(400).send({ statusCode: 400, message: 'No valid fields to update' });
+        }
         const newSettings = await prisma.zipline.update({
           where: {
             id: settings.id,
