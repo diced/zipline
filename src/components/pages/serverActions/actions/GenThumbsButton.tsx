@@ -2,8 +2,9 @@ import { Response } from '@/lib/api/response';
 import { fetchApi } from '@/lib/fetchApi';
 import { Button, Group, Modal, Stack, Switch } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
-import { IconVideo, IconVideoOff } from '@tabler/icons-react';
+import { IconVideoOff, IconVideoPlusFilled } from '@tabler/icons-react';
 import { useState } from 'react';
+import ActionButton from '../ActionButton';
 
 export default function GenThumbsButton() {
   const [rerun, setRerun] = useState(false);
@@ -53,9 +54,8 @@ export default function GenThumbsButton() {
           </Button>
         </Group>
       </Modal>
-      <Button size='sm' leftSection={<IconVideo size='1rem' />} onClick={() => setOpen(true)}>
-        Generate Thumbnails
-      </Button>
+
+      <ActionButton onClick={() => setOpen(true)} Icon={IconVideoPlusFilled} />
     </>
   );
 }

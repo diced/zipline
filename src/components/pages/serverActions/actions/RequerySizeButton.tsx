@@ -4,6 +4,7 @@ import { Button, Group, Modal, Stack, Switch } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { IconFileSearch } from '@tabler/icons-react';
 import { useState } from 'react';
+import ActionButton from '../ActionButton';
 
 export default function RequerySizeButton() {
   const [forceUpdate, setForceUpdate] = useState(false);
@@ -65,9 +66,8 @@ export default function RequerySizeButton() {
           </Button>
         </Group>
       </Modal>
-      <Button size='sm' leftSection={<IconFileSearch size='1rem' />} onClick={() => setOpen(true)}>
-        Requery Size of Files
-      </Button>
+
+      <ActionButton onClick={() => setOpen(true)} />
     </>
   );
 }

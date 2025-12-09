@@ -1,9 +1,9 @@
 import { Response } from '@/lib/api/response';
 import { fetchApi } from '@/lib/fetchApi';
-import { Button } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import { showNotification } from '@mantine/notifications';
 import { IconTrashFilled } from '@tabler/icons-react';
+import ActionButton from '../ActionButton';
 
 export default function ClearTempButton() {
   const openModal = () =>
@@ -30,11 +30,5 @@ export default function ClearTempButton() {
       },
     });
 
-  return (
-    <>
-      <Button size='sm' leftSection={<IconTrashFilled size='1rem' />} onClick={openModal}>
-        Clear Temp Files
-      </Button>
-    </>
-  );
+  return <ActionButton onClick={openModal} Icon={IconTrashFilled} />;
 }

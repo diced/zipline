@@ -1,9 +1,10 @@
-import { Button, Divider, Group, Modal } from '@mantine/core';
-import { IconDatabaseExport } from '@tabler/icons-react';
+import { Divider, Group, Modal } from '@mantine/core';
 import { useState } from 'react';
 import ImportV3Button from './ImportV3Button';
 import ImportV4Button from './ImportV4Button';
 import ExportButton from './ExportButton';
+import ActionButton from '../../ActionButton';
+import { IconDatabasePlus } from '@tabler/icons-react';
 
 export default function ImportExport() {
   const [open, setOpen] = useState(false);
@@ -21,9 +22,7 @@ export default function ImportExport() {
         <ExportButton />
       </Modal>
 
-      <Button size='sm' leftSection={<IconDatabaseExport size='1rem' />} onClick={() => setOpen(true)}>
-        Import / Export Data
-      </Button>
+      <ActionButton onClick={() => setOpen(true)} Icon={IconDatabasePlus} />
     </>
   );
 }

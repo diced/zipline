@@ -93,8 +93,6 @@ export default function ImportV3Button() {
         color: 'green',
         icon: <IconDeviceFloppy size='1rem' />,
       });
-
-      await fetch('/reload');
     }
   };
 

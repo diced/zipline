@@ -1,10 +1,10 @@
 import { Response } from '@/lib/api/response';
 import { fetchApi } from '@/lib/fetchApi';
-import { Button } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import { showNotification } from '@mantine/notifications';
 import { IconTrashFilled } from '@tabler/icons-react';
 import useSWR from 'swr';
+import ActionButton from '../ActionButton';
 
 export default function ClearZerosButton() {
   const { data } = useSWR<Response['/api/server/clear_zeros']>('/api/server/clear_zeros');
@@ -32,11 +32,5 @@ export default function ClearZerosButton() {
       },
     });
 
-  return (
-    <>
-      <Button size='sm' leftSection={<IconTrashFilled size='1rem' />} onClick={openModal}>
-        Clear Zero Byte Files
-      </Button>
-    </>
-  );
+  return <ActionButton onClick={openModal} Icon={IconTrashFilled} />;
 }

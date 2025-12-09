@@ -11,6 +11,7 @@ import { useUserStore } from '@/lib/store/user';
 import { modals } from '@mantine/modals';
 import { fetchApi } from '@/lib/fetchApi';
 import { Response } from '@/lib/api/response';
+import { mutate } from 'swr';
 
 export default function ImportV4Button() {
   const [open, setOpen] = useState(false);
@@ -52,6 +53,36 @@ export default function ImportV4Button() {
     setExport4(validated.data);
   };
 
+  const handleImportSettings = async () => {
+    if (!export4) return;
+
+    const { error } = await fetchApi<Response['/api/server/settings']>(
+      '/api/server/settings',
+      'PATCH',
+      export4.data.settings,
+    );
+
+    if (error) {
+      showNotification({
+        title: 'Failed to import settings',
+        message: error.issues
+          ? error.issues.map((x: { message: string }) => x.message).join('\n')
+          : error.error,
+        color: 'red',
+      });
+    } else {
+      showNotification({
+        title: 'Settings imported',
+        message: 'To ensure that all settings take effect, it is recommended to restart Zipline.',
+        color: 'green',
+      });
+
+      mutate('/api/server/settings');
+      mutate('/api/server/settings/web');
+      mutate('/api/server/public');
+    }
+  };
+
   const handleImport = async () => {
     if (!export4) return;
 
@@ -87,6 +118,8 @@ export default function ImportV4Button() {
         });
 
         setOpen(false);
+
+        await handleImportSettings();
 
         const { error, data } = await fetchApi<Response['/api/server/import/v4']>(
           '/api/server/import/v4',
