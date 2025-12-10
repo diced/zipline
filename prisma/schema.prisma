@@ -104,6 +104,10 @@ model Zipline {
   oauthOidcTokenUrl     String?
   oauthOidcUserinfoUrl  String?
   oauthOidcRedirectUri  String?
+  oauthOidcScopeOpenid  Boolean @default(true)
+  oauthOidcScopeProfile Boolean @default(true)
+  oauthOidcScopeEmail   Boolean @default(true)
+  oauthOidcScopeOfflineAccess Boolean @default(true)
 
   mfaTotpEnabled Boolean @default(false)
   mfaTotpIssuer  String  @default("Zipline")

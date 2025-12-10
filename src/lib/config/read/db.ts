@@ -92,6 +92,10 @@ export const DATABASE_TO_PROP = {
   oauthOidcUserinfoUrl: 'oauth.oidc.userinfoUrl',
   oauthOidcTokenUrl: 'oauth.oidc.tokenUrl',
   oauthOidcRedirectUri: 'oauth.oidc.redirectUri',
+  oauthOidcScopeOpenid: 'oauth.oidc.scopeOpenid',
+  oauthOidcScopeProfile: 'oauth.oidc.scopeProfile',
+  oauthOidcScopeEmail: 'oauth.oidc.scopeEmail',
+  oauthOidcScopeOfflineAccess: 'oauth.oidc.scopeOfflineAccess',
 
   mfaTotpEnabled: 'mfa.totp.enabled',
   mfaTotpIssuer: 'mfa.totp.issuer',

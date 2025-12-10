@@ -278,6 +278,10 @@ export default fastifyPlugin(
             oauthOidcTokenUrl: z.url().nullable(),
             oauthOidcUserinfoUrl: z.url().nullable(),
             oauthOidcRedirectUri: z.url().endsWith('/api/auth/oauth/oidc').nullable(),
+            oauthOidcScopeOpenid: z.boolean(),
+            oauthOidcScopeProfile: z.boolean(),
+            oauthOidcScopeEmail: z.boolean(),
+            oauthOidcScopeOfflineAccess: z.boolean(),
 
             mfaTotpEnabled: z.boolean(),
             mfaTotpIssuer: z.string(),

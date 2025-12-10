@@ -33,6 +33,12 @@ async function oidcOauth({ code, host, state }: OAuthQuery, logger: Logger): Pro
         config.oauth.oidc.authorizeUrl!,
         state === 'link' ? linkState : defaultState,
         config.oauth.oidc.redirectUri ?? undefined,
+        {
+          openid: config.oauth.oidc.scopeOpenid,
+          profile: config.oauth.oidc.scopeProfile,
+          email: config.oauth.oidc.scopeEmail,
+          offline_access: config.oauth.oidc.scopeOfflineAccess,
+        },
       ),
     };
   }
