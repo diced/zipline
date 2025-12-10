@@ -128,6 +128,10 @@ export const ENVS = [
   env('oauth.oidc.userinfoUrl', 'OAUTH_OIDC_USERINFO_URL', 'string', true),
   env('oauth.oidc.tokenUrl', 'OAUTH_OIDC_TOKEN_URL', 'string', true),
   env('oauth.oidc.redirectUri', 'OAUTH_OIDC_REDIRECT_URI', 'string', true),
+  env('oauth.oidc.scopeOpenid', 'OAUTH_OIDC_SCOPE_OPENID', 'boolean', true),
+  env('oauth.oidc.scopeProfile', 'OAUTH_OIDC_SCOPE_PROFILE', 'boolean', true),
+  env('oauth.oidc.scopeEmail', 'OAUTH_OIDC_SCOPE_EMAIL', 'boolean', true),
+  env('oauth.oidc.scopeOfflineAccess', 'OAUTH_OIDC_SCOPE_OFFLINE_ACCESS', 'boolean', true),
 
   env('mfa.totp.enabled', 'MFA_TOTP_ENABLED', 'boolean', true),
   env('mfa.totp.issuer', 'MFA_TOTP_ISSUER', 'string', true),

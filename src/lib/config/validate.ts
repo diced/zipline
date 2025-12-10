@@ -299,6 +299,10 @@ export const schema = z.object({
         userinfoUrl: z.url(),
         tokenUrl: z.url(),
         redirectUri: z.url().nullable().default(null),
+        scopeOpenid: z.boolean().default(true),
+        scopeProfile: z.boolean().default(true),
+        scopeEmail: z.boolean().default(true),
+        scopeOfflineAccess: z.boolean().default(true),
       })
       .or(
         z.object({
@@ -308,6 +312,10 @@ export const schema = z.object({
           userinfoUrl: z.undefined(),
           tokenUrl: z.undefined(),
           redirectUri: z.undefined(),
+          scopeOpenid: z.undefined(),
+          scopeProfile: z.undefined(),
+          scopeEmail: z.undefined(),
+          scopeOfflineAccess: z.undefined(),
         }),
       ),
   }),
