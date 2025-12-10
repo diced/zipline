@@ -76,15 +76,15 @@ export const oidcAuth = {
     },
   ) => {
     const scopeArray: string[] = [];
-    
+
     // Add scopes based on configuration, defaulting to all enabled
     if (scopes?.openid !== false) scopeArray.push('openid');
     if (scopes?.profile !== false) scopeArray.push('profile');
     if (scopes?.email !== false) scopeArray.push('email');
     if (scopes?.offline_access !== false) scopeArray.push('offline_access');
-    
+
     const scopeString = scopeArray.join('+');
-    
+
     return `${authorizeUrl}?client_id=${clientId}&redirect_uri=${encodeURIComponent(
       redirectUri ?? `${origin}/api/auth/oauth/oidc`,
     )}&response_type=code&scope=${scopeString}${state ? `&state=${encodeURIComponent(state)}` : ''}`;
