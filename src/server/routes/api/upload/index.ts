@@ -16,6 +16,7 @@ import { userMiddleware } from '@/server/middleware/user';
 import fastifyPlugin from 'fastify-plugin';
 import { stat } from 'fs/promises';
 import { extname } from 'path';
+import { sanitizeFilename } from '@/lib/fs';
 
 const commonDoubleExts = [
   '.tar.gz',
@@ -152,7 +153,13 @@ export default fastifyPlugin(
         const format = options.format || config.files.defaultFormat;
         let fileName = formatFileName(format, file.filename);
         if (options.overrides?.filename || format === 'name') {
-          if (options.overrides?.filename) fileName = decodeURIComponent(options.overrides!.filename!);
+          if (options.overrides?.filename) {
+            const sanitized = sanitizeFilename(options.overrides.filename!);
+            if (!sanitized) return res.badRequest(`file[${i}]: Invalid characters in filename override`);
+
+            fileName = sanitized;
+          }
+
           const fullFileName = `${fileName}${extension}`;
           const existing = await prisma.file.findFirst({ where: { name: fullFileName } });
           if (existing)

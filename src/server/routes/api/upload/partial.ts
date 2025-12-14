@@ -14,6 +14,7 @@ import { readdir, rename, rm } from 'fs/promises';
 import { join } from 'path';
 import { Worker } from 'worker_threads';
 import { ApiUploadResponse, getExtension } from '.';
+import { sanitizeFilename } from '@/lib/fs';
 
 const logger = log('api').c('upload').c('partial');
 
@@ -157,7 +158,12 @@ export default fastifyPlugin(
         let fileName = formatFileName(format, decodeURIComponent(options.partial.filename));
 
         if (options.overrides?.filename || format === 'name') {
-          if (options.overrides?.filename) fileName = decodeURIComponent(options.overrides!.filename!);
+          if (options.overrides?.filename) {
+            const sanitized = sanitizeFilename(options.overrides!.filename!);
+            if (!sanitized) return res.badRequest('Invalid characters in filename override');
+
+            fileName = sanitized;
+          }
           const fullFileName = `${fileName}${extension}`;
 
           const existing = await prisma.file.findFirst({

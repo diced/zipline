@@ -2,7 +2,7 @@
   "name": "zipline",
   "private": true,
   "license": "MIT",
-  "version": "4.3.2",
+  "version": "4.4.0",
   "scripts": {
     "build": "tsx scripts/build.ts",
     "dev": "cross-env NODE_ENV=development DEBUG=zipline tsx --require dotenv/config --enable-source-maps ./src/server",
