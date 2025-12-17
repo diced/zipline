@@ -183,7 +183,12 @@ export default fastifyPlugin(
             type: options.imageCompression.type,
           });
 
-          logger.c('compress').debug(`compressed file ${file.filename}`);
+          if (compressed.failed) {
+            compressed = undefined;
+            logger.warn('failed to compress file, using original.');
+          } else {
+            logger.c('compress').debug(`compressed file ${file.filename}`);
+          }
         }
 
         // remove gps metadata if requested
