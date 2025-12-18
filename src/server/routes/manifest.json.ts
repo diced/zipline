@@ -1,5 +1,6 @@
 import { config } from '@/lib/config';
 import fastifyPlugin from 'fastify-plugin';
+import { FAVICON_SIZES } from './favicon';
 
 function generateIcons(sizes: number[]) {
   return sizes.map((size) => ({
@@ -12,7 +13,7 @@ function generateIcons(sizes: number[]) {
 export const PATH = '/manifest.json';
 export default fastifyPlugin(
   (server, _, done) => {
-    server.get(PATH, async (req, res) => {
+    server.get(PATH, async (_, res) => {
       if (!config.pwa.enabled) return res.callNotFound();
 
       return {
@@ -24,7 +25,7 @@ export default fastifyPlugin(
 
         start_url: '/',
         display: 'standalone',
-        icons: generateIcons([16, 32, 64, 128, 512]),
+        icons: generateIcons(FAVICON_SIZES),
       };
     });
 
