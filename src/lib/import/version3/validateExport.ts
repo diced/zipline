@@ -289,7 +289,6 @@ export const V3_COMPATIBLE_SETTINGS: Record<string, string> = {
   UPLOADER_LENGTH: 'filesLength',
   UPLOADER_DISABLED_EXTENSIONS: 'filesDisabledExtensions',
   UPLOADER_DEFAULT_EXPIRATION: 'filesDefaultExpiration',
-  UPLOADER_MAX_EXPIRATION: 'filesMaxExpiration',
   UPLOADER_ASSUME_MIMETYPES: 'filesAssumeMimetypes',
   EXIF_REMOVE_GPS: 'filesRemoveGpsMetadata',
 
