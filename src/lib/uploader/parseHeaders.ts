@@ -165,6 +165,18 @@ export function parseHeaders(headers: UploadHeaders, fileConfig: Config['files']
       const expiresAt = parseExpiry(headers['x-zipline-deletes-at']);
       if (!expiresAt) return headerError('x-zipline-deletes-at', 'Invalid expiry date');
 
+      if (fileConfig.maxExpiration) {
+        const maxExpiryTime = ms(fileConfig.maxExpiration as StringValue);
+        const requestedExpiryTime = expiresAt.getTime() - Date.now();
+
+        if (requestedExpiryTime > maxExpiryTime) {
+          return headerError(
+            'x-zipline-deletes-at',
+            `Expiry exceeds maximum allowed expiration of ${fileConfig.maxExpiration}`,
+          );
+        }
+      }
+
       response.deletesAt = expiresAt;
     }
   } else {
