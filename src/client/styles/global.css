@@ -5,3 +5,10 @@
   font-weight: 700;
   font-size: var(--mantine-font-size-xl);
 }
+
+.mantine-Modal-content {
+  overflow-y: visible !important;
+}
+.mantine-Combobox-dropdown {
+  z-index: 999999 !important;
+}
