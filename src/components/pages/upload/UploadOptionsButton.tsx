@@ -45,7 +45,6 @@ function checkDomains(domains?: unknown): string[] {
   return domains;
 }
 
-
 export default function UploadOptionsButton({ folder, numFiles }: { folder?: string; numFiles: number }) {
   const config = useConfig();
 

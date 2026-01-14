@@ -7,7 +7,6 @@ import { IconFolderSymlink } from '@tabler/icons-react';
 import React, { useMemo, useState } from 'react';
 import useSWR, { mutate } from 'swr';
 
-
 interface MoveFolderModalProps {
   folder: Folder | null;
   opened: boolean;
