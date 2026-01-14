@@ -79,14 +79,14 @@ export default function DashboardFolders() {
 
     if (currentFolder) {
       // Walk up parent chain
-      const path: Folder[] = [];
-      let folder: Folder | undefined | null = currentFolder;
+      const path: Partial<Folder>[] = [];
+      let folder: Partial<Folder> | undefined | null = currentFolder;
       while (folder) {
         path.unshift(folder);
         folder = folder.parent;
       }
       for (const f of path) {
-        items.push({ id: f.id, name: f.name });
+        items.push({ id: f.id!, name: f.name! });
       }
     }
 
