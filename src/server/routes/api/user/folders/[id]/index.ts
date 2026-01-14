@@ -60,6 +60,20 @@ export default typedPlugin(
             },
           },
           User: true,
+          children: {
+            orderBy: { createdAt: 'desc' },
+            include: {
+              _count: {
+                select: { children: true, files: true },
+              },
+            },
+          },
+          parent: {
+            select: { id: true, name: true, parentId: true },
+          },
+          _count: {
+            select: { children: true, files: true },
+          },
         },
       });
       if (!folder) return res.notFound('Folder not found');
@@ -143,6 +157,7 @@ export default typedPlugin(
             isPublic: z.boolean().optional(),
             name: z.string().min(1).optional(),
             allowUploads: z.boolean().optional(),
+            parentId: z.string().nullable().optional(),
           }),
           params: paramsSchema,
         },
@@ -150,7 +165,39 @@ export default typedPlugin(
       },
       async (req, res) => {
         const { id: folderId } = req.params;
-        const { isPublic, name, allowUploads } = req.body;
+        const { isPublic, name, allowUploads, parentId } = req.body;
+
+        // Handle parentId change (moving folder)
+        if (parentId !== undefined) {
+          // Can't make a folder its own parent
+          if (parentId === folderId) {
+            return res.badRequest('A folder cannot be its own parent');
+          }
+
+          if (parentId !== null) {
+            // Verify new parent exists and belongs to user
+            const newParent = await prisma.folder.findUnique({
+              where: { id: parentId },
+              select: { id: true, userId: true, parentId: true },
+            });
+
+            if (!newParent) return res.notFound('Parent folder not found');
+            if (newParent.userId !== req.user.id) return res.forbidden('Parent folder does not belong to you');
+
+            // Check for circular reference - walk up the tree from new parent
+            let currentParentId: string | null = newParent.parentId;
+            while (currentParentId) {
+              if (currentParentId === folderId) {
+                return res.badRequest('Cannot move folder into one of its descendants');
+              }
+              const parent = await prisma.folder.findUnique({
+                where: { id: currentParentId },
+                select: { parentId: true },
+              });
+              currentParentId = parent?.parentId ?? null;
+            }
+          }
+        }
 
         const nFolder = await prisma.folder.update({
           where: {
@@ -160,6 +207,7 @@ export default typedPlugin(
             ...(isPublic !== undefined && { public: isPublic }),
             ...(name && { name }),
             ...(allowUploads !== undefined && { allowUploads }),
+            ...(parentId !== undefined && { parentId }),
           },
           include: {
             files: {
@@ -167,6 +215,12 @@ export default typedPlugin(
                 ...fileSelect,
                 password: true,
               },
+            },
+            _count: {
+              select: { children: true, files: true },
+            },
+            parent: {
+              select: { id: true, name: true, parentId: true },
             },
           },
         });
@@ -176,6 +230,7 @@ export default typedPlugin(
           isPublic,
           name,
           allowUploads,
+          parentId,
         });
 
         return res.send(cleanFolder(nFolder));

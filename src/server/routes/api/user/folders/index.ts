@@ -23,12 +23,14 @@ export default typedPlugin(
           querystring: z.object({
             noincl: zQsBoolean.optional(),
             user: z.string().optional(),
+            parentId: z.string().optional(),
+            root: z.string().optional(),
           }),
         },
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const { noincl, user } = req.query;
+        const { noincl, user, parentId, root } = req.query;
 
         if (user) {
           const user = await prisma.user.findUnique({
@@ -46,12 +48,14 @@ export default typedPlugin(
         const folders = await prisma.folder.findMany({
           where: {
             userId: user || req.user.id,
+            ...(root !== undefined && { parentId: null }),
+            ...(parentId && { parentId }),
           },
           orderBy: {
             createdAt: 'desc',
           },
-          ...(!noincl && {
-            include: {
+          include: {
+            ...(!noincl && {
               files: {
                 select: {
                   ...fileSelect,
@@ -61,8 +65,21 @@ export default typedPlugin(
                   createdAt: 'desc',
                 },
               },
+            }),
+            _count: {
+              select: {
+                children: true,
+                files: true,
+              },
             },
-          }),
+            parent: {
+              select: {
+                id: true,
+                name: true,
+                parentId: true,
+              },
+            },
+          },
         });
 
         return res.send(cleanFolders(folders));
@@ -77,14 +94,25 @@ export default typedPlugin(
             name: z.string().trim().min(1),
             isPublic: z.boolean().optional(),
             files: z.array(z.string()).optional(),
+            parentId: z.string().optional(),
           }),
         },
         preHandler: [userMiddleware],
         ...secondlyRatelimit(2),
       },
       async (req, res) => {
-        const { name, isPublic } = req.body;
+        const { name, isPublic, parentId } = req.body;
         let files = req.body.files;
+
+        if (parentId) {
+          const parentFolder = await prisma.folder.findUnique({
+            where: { id: parentId },
+            select: { id: true, userId: true },
+          });
+
+          if (!parentFolder) return res.notFound('Parent folder not found');
+          if (parentFolder.userId !== req.user.id) return res.forbidden('Parent folder does not belong to you');
+        }
 
         if (files) {
           const filesAdd = await prisma.file.findMany({
@@ -107,6 +135,7 @@ export default typedPlugin(
           data: {
             name,
             userId: req.user.id,
+            ...(parentId && { parentId }),
             ...(files?.length && {
               files: {
                 connect: files!.map((f) => ({ id: f })),
@@ -121,6 +150,19 @@ export default typedPlugin(
                 password: true,
               },
             },
+            _count: {
+              select: {
+                children: true,
+                files: true,
+              },
+            },
+            parent: {
+              select: {
+                id: true,
+                name: true,
+                parentId: true,
+              },
+            },
           },
         });
 
@@ -128,6 +170,7 @@ export default typedPlugin(
           folder: folder.name,
           user: req.user.username,
           files: files?.length || undefined,
+          parentId: parentId || undefined,
         });
 
         return res.send(cleanFolder(folder));

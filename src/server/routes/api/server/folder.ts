@@ -40,6 +40,23 @@ export default typedPlugin(
                 createdAt: 'desc',
               },
             },
+            children: {
+              where: { public: true },
+              orderBy: { createdAt: 'desc' },
+              select: {
+                id: true,
+                name: true,
+                createdAt: true,
+                updatedAt: true,
+                public: true,
+                _count: {
+                  select: { children: true, files: true },
+                },
+              },
+            },
+            parent: {
+              select: { id: true, name: true, public: true, parentId: true },
+            },
           },
         });
 
