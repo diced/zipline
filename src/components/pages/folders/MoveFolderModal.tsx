@@ -4,8 +4,20 @@ import { fetchApi } from '@/lib/fetchApi';
 import { Button, Modal, Select, Stack, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconFolderSymlink } from '@tabler/icons-react';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import useSWR, { mutate } from 'swr';
+
+function buildFolderPath(folder: Folder, foldersMap: Map<string, Folder>): string {
+  const parts: string[] = [];
+  let current: Folder | undefined = folder;
+
+  while (current) {
+    parts.unshift(current.name);
+    current = current.parentId ? foldersMap.get(current.parentId) : undefined;
+  }
+
+  return parts.join(' / ');
+}
 
 interface MoveFolderModalProps {
   folder: Folder | null;
@@ -29,10 +41,6 @@ export default function MoveFolderModal({ folder, opened, onClose }: MoveFolderM
     }
   }, [folder]);
 
-  if (!folder) {
-    return null;
-  }
-
   // Filter out the current folder and its descendants to prevent circular references
   const getDescendantIds = (folderId: string, folders: Folder[]): Set<string> => {
     const descendants = new Set<string>();
@@ -48,17 +56,26 @@ export default function MoveFolderModal({ folder, opened, onClose }: MoveFolderM
     return descendants;
   };
 
-  const descendantIds = allFolders ? getDescendantIds(folder.id, allFolders) : new Set<string>();
+  const folderOptions = useMemo(() => {
+    if (!allFolders || !folder) return [{ value: '__root__', label: '/ (Root)' }];
 
-  const folderOptions = [
-    { value: '__root__', label: '/ (Root)' },
-    ...(allFolders
-      ?.filter((f) => f.id !== folder.id && !descendantIds.has(f.id))
+    const foldersMap = new Map(allFolders.map((f) => [f.id, f]));
+    const descendantIds = getDescendantIds(folder.id, allFolders);
+
+    const options = allFolders
+      .filter((f) => f.id !== folder.id && !descendantIds.has(f.id))
       .map((f) => ({
         value: f.id,
-        label: f.name,
-      })) ?? []),
-  ];
+        label: buildFolderPath(f, foldersMap),
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+
+    return [{ value: '__root__', label: '/ (Root)' }, ...options];
+  }, [allFolders, folder]);
+
+  if (!folder) {
+    return null;
+  }
 
   const handleMove = async () => {
     setLoading(true);
