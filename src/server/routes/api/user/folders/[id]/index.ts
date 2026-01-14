@@ -23,6 +23,27 @@ function checkInteraction(current?: Partial<User> | null, owner?: Partial<User> 
 
 const logger = log('api').c('user').c('folders').c('[id]');
 
+// Recursively fetch and build the full parent chain
+async function buildParentChain(
+  parentId: string | null,
+): Promise<{ id: string; name: string; parentId: string | null } | null> {
+  if (!parentId) return null;
+
+  const parent = await prisma.folder.findUnique({
+    where: { id: parentId },
+    select: { id: true, name: true, parentId: true },
+  });
+
+  if (!parent) return null;
+
+  const grandparent = await buildParentChain(parent.parentId);
+
+  return {
+    ...parent,
+    parent: grandparent,
+  } as { id: string; name: string; parentId: string | null };
+}
+
 const paramsSchema = z.object({
   id: z.string(),
 });
@@ -78,6 +99,11 @@ export default typedPlugin(
       });
       if (!folder) return res.notFound('Folder not found');
       if (!checkInteraction(req.user, folder.User)) return res.notFound('Folder not found');
+
+      // Build full parent chain for breadcrumbs
+      if (folder.parentId) {
+        (folder as any).parent = await buildParentChain(folder.parentId);
+      }
 
       return res.send(cleanFolder(folder));
     });

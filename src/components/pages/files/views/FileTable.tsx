@@ -42,6 +42,18 @@ import { lazy, useEffect, useMemo, useReducer, useState } from 'react';
 import { Link } from 'react-router-dom';
 import useSWR from 'swr';
 
+function getFolderDepth(folder: Folder, foldersMap: Map<string, Folder>): number {
+  let depth = 0;
+  let current: Folder | undefined = folder.parentId ? foldersMap.get(folder.parentId) : undefined;
+
+  while (current) {
+    depth++;
+    current = current.parentId ? foldersMap.get(current.parentId) : undefined;
+  }
+
+  return depth;
+}
+
 function buildFolderPath(folder: Folder, foldersMap: Map<string, Folder>): string {
   const parts: string[] = [];
   let current: Folder | undefined = folder;
@@ -220,7 +232,7 @@ export default function FileTable({
         id: f.id,
         name: f.name,
         path: buildFolderPath(f, foldersMap),
-        depth: buildFolderPath(f, foldersMap).split(' / ').length - 1,
+        depth: getFolderDepth(f, foldersMap),
       }))
       .sort((a, b) => a.path.localeCompare(b.path));
   }, [folders]);

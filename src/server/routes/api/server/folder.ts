@@ -6,6 +6,27 @@ import z from 'zod';
 
 export type ApiServerFolderResponse = Partial<Folder>;
 
+// Recursively fetch public parent chain for breadcrumbs
+async function buildPublicParentChain(
+  parentId: string | null,
+): Promise<{ id: string; name: string; public: boolean; parentId: string | null; parent?: unknown } | null> {
+  if (!parentId) return null;
+
+  const parent = await prisma.folder.findUnique({
+    where: { id: parentId },
+    select: { id: true, name: true, public: true, parentId: true },
+  });
+
+  if (!parent || !parent.public) return null;
+
+  const grandparent = await buildPublicParentChain(parent.parentId);
+
+  return {
+    ...parent,
+    parent: grandparent,
+  };
+}
+
 export const PATH = '/api/server/folder/:id';
 export default typedPlugin(
   async (server) => {
@@ -63,6 +84,11 @@ export default typedPlugin(
         if (!folder) return res.notFound();
 
         if ((uploads && !folder.allowUploads) || (!uploads && !folder.public)) return res.notFound();
+
+        // Build full public parent chain for breadcrumbs
+        if (folder.parentId) {
+          (folder as any).parent = await buildPublicParentChain(folder.parentId);
+        }
 
         return res.send(cleanFolder(folder, true));
       },
