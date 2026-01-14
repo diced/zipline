@@ -20,13 +20,13 @@ import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { IconFolderPlus, IconHome, IconPlus } from '@tabler/icons-react';
 import { useState, useCallback } from 'react';
-import { mutate } from 'swr';
-import useSWR from 'swr';
+import useSWR, { useSWRConfig } from 'swr';
 import FolderGridView from './views/FolderGridView';
 import FolderTableView from './views/FolderTableView';
 
 export default function DashboardFolders() {
   const view = useViewStore((state) => state.folders);
+  const { mutate } = useSWRConfig();
 
   const [open, setOpen] = useState(false);
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
@@ -63,7 +63,9 @@ export default function DashboardFolders() {
         color: 'red',
       });
     } else {
-      mutate((key: string) => key.startsWith('/api/user/folders'));
+      mutate((key) => typeof key === 'string' && key.startsWith('/api/user/folders'), undefined, {
+        revalidate: true,
+      });
       setOpen(false);
       form.reset();
     }

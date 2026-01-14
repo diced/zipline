@@ -5,7 +5,7 @@ import { Button, Modal, Select, Stack, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconFolderSymlink } from '@tabler/icons-react';
 import { useState } from 'react';
-import useSWR, { mutate } from 'swr';
+import useSWR, { useSWRConfig } from 'swr';
 
 interface MoveFolderModalProps {
   folder: Folder;
@@ -14,6 +14,7 @@ interface MoveFolderModalProps {
 }
 
 export default function MoveFolderModal({ folder, opened, onClose }: MoveFolderModalProps) {
+  const { mutate } = useSWRConfig();
   const [selectedParentId, setSelectedParentId] = useState<string | null>(folder.parentId ?? null);
   const [loading, setLoading] = useState(false);
 
@@ -74,7 +75,9 @@ export default function MoveFolderModal({ folder, opened, onClose }: MoveFolderM
         message: `${folder.name} has been moved`,
         color: 'green',
       });
-      mutate((key: string) => typeof key === 'string' && key.startsWith('/api/user/folders'));
+      mutate((key) => typeof key === 'string' && key.startsWith('/api/user/folders'), undefined, {
+        revalidate: true,
+      });
       onClose();
     }
   };
