@@ -4,24 +4,34 @@ import { fetchApi } from '@/lib/fetchApi';
 import { Button, Modal, Select, Stack, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconFolderSymlink } from '@tabler/icons-react';
-import { useState } from 'react';
-import useSWR, { useSWRConfig } from 'swr';
+import React, { useState } from 'react';
+import useSWR, { mutate } from 'swr';
 
 interface MoveFolderModalProps {
-  folder: Folder;
+  folder: Folder | null;
   opened: boolean;
   onClose: () => void;
 }
 
 export default function MoveFolderModal({ folder, opened, onClose }: MoveFolderModalProps) {
-  const { mutate } = useSWRConfig();
-  const [selectedParentId, setSelectedParentId] = useState<string | null>(folder.parentId ?? null);
+  const [selectedParentId, setSelectedParentId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   // Fetch all folders to build the selection list
   const { data: allFolders } = useSWR<Extract<Response['/api/user/folders'], Folder[]>>(
     opened ? '/api/user/folders?noincl=true' : null,
   );
+
+  // Reset selected parent when folder changes
+  React.useEffect(() => {
+    if (folder) {
+      setSelectedParentId(folder.parentId ?? null);
+    }
+  }, [folder]);
+
+  if (!folder) {
+    return null;
+  }
 
   // Filter out the current folder and its descendants to prevent circular references
   const getDescendantIds = (folderId: string, folders: Folder[]): Set<string> => {
@@ -75,9 +85,7 @@ export default function MoveFolderModal({ folder, opened, onClose }: MoveFolderM
         message: `${folder.name} has been moved`,
         color: 'green',
       });
-      mutate((key) => typeof key === 'string' && key.startsWith('/api/user/folders'), undefined, {
-        revalidate: true,
-      });
+      mutate((key: string) => typeof key === 'string' && key.startsWith('/api/user/folders'));
       onClose();
     }
   };

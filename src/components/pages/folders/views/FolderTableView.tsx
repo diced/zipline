@@ -75,7 +75,7 @@ export default function FolderTableView({ currentFolderId, onNavigate }: FolderT
         onClose={() => setEditNameOpen(null)}
       />
 
-      <MoveFolderModal opened={!!moveOpen} folder={moveOpen!} onClose={() => setMoveOpen(null)} />
+      <MoveFolderModal opened={!!moveOpen} folder={moveOpen} onClose={() => setMoveOpen(null)} />
 
       <Box my='sm'>
         <DataTable
