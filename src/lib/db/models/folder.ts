@@ -15,10 +15,8 @@ export type Folder = PrismaFolder & {
 export function cleanFolder(folder: any, stringifyDates = false): any {
   if (folder.files) cleanFiles(folder.files, stringifyDates);
 
-  if (folder.createdAt)
-    folder.createdAt = stringifyDates ? folder.createdAt.toISOString() : folder.createdAt;
-  if (folder.updatedAt)
-    folder.updatedAt = stringifyDates ? folder.updatedAt.toISOString() : folder.updatedAt;
+  if (folder.createdAt) folder.createdAt = stringifyDates ? folder.createdAt.toISOString() : folder.createdAt;
+  if (folder.updatedAt) folder.updatedAt = stringifyDates ? folder.updatedAt.toISOString() : folder.updatedAt;
 
   if (folder.children) {
     for (const child of folder.children) {
