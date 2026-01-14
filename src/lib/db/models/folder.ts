@@ -3,21 +3,22 @@ import { File, cleanFiles } from './file';
 
 export type Folder = PrismaFolder & {
   files?: File[];
-  parent?: Folder | null;
-  children?: Folder[];
+  parent?: Partial<PrismaFolder> | null;
+  children?: Partial<Folder>[];
   _count?: {
     children?: number;
     files?: number;
   };
 };
 
-export function cleanFolder(folder: Partial<Folder>, stringifyDates = false): Partial<Folder> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function cleanFolder(folder: any, stringifyDates = false): any {
   if (folder.files) cleanFiles(folder.files, stringifyDates);
 
   if (folder.createdAt)
-    (folder as any).createdAt = stringifyDates ? folder.createdAt.toISOString() : folder.createdAt;
+    folder.createdAt = stringifyDates ? folder.createdAt.toISOString() : folder.createdAt;
   if (folder.updatedAt)
-    (folder as any).updatedAt = stringifyDates ? folder.updatedAt.toISOString() : folder.updatedAt;
+    folder.updatedAt = stringifyDates ? folder.updatedAt.toISOString() : folder.updatedAt;
 
   if (folder.children) {
     for (const child of folder.children) {
@@ -32,7 +33,8 @@ export function cleanFolder(folder: Partial<Folder>, stringifyDates = false): Pa
   return folder;
 }
 
-export function cleanFolders(folders: Folder[], stringifyDates = false): Folder[] {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function cleanFolders(folders: any[], stringifyDates = false): any[] {
   for (let i = 0; i !== folders.length; ++i) {
     cleanFolder(folders[i], stringifyDates);
   }

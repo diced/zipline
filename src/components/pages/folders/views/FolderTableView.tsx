@@ -84,7 +84,7 @@ export default function FolderTableView({ currentFolderId, onNavigate }: FolderT
           minHeight={200}
           records={sorted ?? []}
           onRowClick={({ record }) => onNavigate(record.id)}
-          rowStyle={{ cursor: 'pointer' }}
+          rowStyle={() => ({ cursor: 'pointer' })}
           columns={[
             {
               accessor: 'name',
