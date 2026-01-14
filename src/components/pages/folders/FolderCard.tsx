@@ -44,22 +44,13 @@ export default function FolderCard({ folder, onNavigate }: FolderCardProps) {
       <MoveFolderModal folder={folder} opened={moveOpen} onClose={() => setMoveOpen(false)} />
 
       <Card withBorder shadow='sm' radius='sm' style={{ cursor: onNavigate ? 'pointer' : 'default' }}>
-        <Card.Section
-          withBorder
-          inheritPadding
-          py='xs'
-          onClick={() => onNavigate?.(folder.id)}
-        >
+        <Card.Section withBorder inheritPadding py='xs' onClick={() => onNavigate?.(folder.id)}>
           <Group justify='space-between'>
             <Group gap='xs'>
               <IconFolder size='1rem' />
               <Text fw={400}>
                 {folder.public ? (
-                  <Anchor
-                    href={`/folder/${folder.id}`}
-                    target='_blank'
-                    onClick={(e) => e.stopPropagation()}
-                  >
+                  <Anchor href={`/folder/${folder.id}`} target='_blank' onClick={(e) => e.stopPropagation()}>
                     {folder.name}
                   </Anchor>
                 ) : (
@@ -89,10 +80,7 @@ export default function FolderCard({ folder, onNavigate }: FolderCardProps) {
                 <Menu.Item leftSection={<IconFiles size='1rem' />} onClick={() => setViewOpen(true)}>
                   View Files
                 </Menu.Item>
-                <Menu.Item
-                  leftSection={<IconFolderSymlink size='1rem' />}
-                  onClick={() => setMoveOpen(true)}
-                >
+                <Menu.Item leftSection={<IconFolderSymlink size='1rem' />} onClick={() => setMoveOpen(true)}>
                   Move Folder
                 </Menu.Item>
                 <Menu.Item

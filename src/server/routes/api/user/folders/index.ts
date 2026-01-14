@@ -111,7 +111,8 @@ export default typedPlugin(
           });
 
           if (!parentFolder) return res.notFound('Parent folder not found');
-          if (parentFolder.userId !== req.user.id) return res.forbidden('Parent folder does not belong to you');
+          if (parentFolder.userId !== req.user.id)
+            return res.forbidden('Parent folder does not belong to you');
         }
 
         if (files) {

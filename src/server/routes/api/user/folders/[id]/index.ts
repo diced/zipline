@@ -182,7 +182,8 @@ export default typedPlugin(
             });
 
             if (!newParent) return res.notFound('Parent folder not found');
-            if (newParent.userId !== req.user.id) return res.forbidden('Parent folder does not belong to you');
+            if (newParent.userId !== req.user.id)
+              return res.forbidden('Parent folder does not belong to you');
 
             // Check for circular reference - walk up the tree from new parent
             let currentParentId: string | null = newParent.parentId;
