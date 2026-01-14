@@ -50,29 +50,6 @@ import {
 import { useMemo, useState } from 'react';
 import useSWR, { mutate } from 'swr';
 
-function getFolderDepth(folder: Folder, foldersMap: Map<string, Folder>): number {
-  let depth = 0;
-  let current: Folder | undefined = folder.parentId ? foldersMap.get(folder.parentId) : undefined;
-
-  while (current) {
-    depth++;
-    current = current.parentId ? foldersMap.get(current.parentId) : undefined;
-  }
-
-  return depth;
-}
-
-function buildFolderPath(folder: Folder, foldersMap: Map<string, Folder>): string {
-  const parts: string[] = [];
-  let current: Folder | undefined = folder;
-
-  while (current) {
-    parts.unshift(current.name);
-    current = current.parentId ? foldersMap.get(current.parentId) : undefined;
-  }
-
-  return parts.join(' / ');
-}
 import DashboardFileType from '../DashboardFileType';
 import {
   addToFolder,
@@ -130,20 +107,48 @@ export default function FileModal({
     '/api/user/folders?noincl=true' + (user ? `&user=${user}` : ''),
   );
 
-  // Build folder options with full path for hierarchy display
+  // Build folder options with hierarchy using depth-first traversal
   const folderOptions = useMemo(() => {
     if (!folders) return [];
 
-    const foldersMap = new Map(folders.map((f: Folder) => [f.id, f]));
+    // Group children by parent
+    const childrenMap = new Map<string | null, Folder[]>();
+    for (const folder of folders) {
+      const parentId = folder.parentId ?? null;
+      const siblings = childrenMap.get(parentId) || [];
+      siblings.push(folder);
+      childrenMap.set(parentId, siblings);
+    }
 
-    return folders
-      .map((f: Folder) => ({
-        id: f.id,
-        name: f.name,
-        path: buildFolderPath(f, foldersMap),
-        depth: getFolderDepth(f, foldersMap),
-      }))
-      .sort((a, b) => a.path.localeCompare(b.path));
+    // Sort children alphabetically within each level
+    for (const children of childrenMap.values()) {
+      children.sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    // Depth-first traversal to build ordered list
+    const result: Array<{ id: string; name: string; path: string; depth: number }> = [];
+
+    const traverse = (folder: Folder, depth: number, pathParts: string[]) => {
+      const currentPath = [...pathParts, folder.name];
+      result.push({
+        id: folder.id,
+        name: folder.name,
+        path: currentPath.join(' / '),
+        depth,
+      });
+
+      const children = childrenMap.get(folder.id) || [];
+      for (const child of children) {
+        traverse(child, depth + 1, currentPath);
+      }
+    };
+
+    const rootFolders = childrenMap.get(null) || [];
+    for (const root of rootFolders) {
+      traverse(root, 0, []);
+    }
+
+    return result;
   }, [folders]);
 
   const folderCombobox = useCombobox();

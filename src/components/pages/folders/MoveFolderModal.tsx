@@ -7,17 +7,6 @@ import { IconFolderSymlink } from '@tabler/icons-react';
 import React, { useMemo, useState } from 'react';
 import useSWR, { mutate } from 'swr';
 
-function buildFolderPath(folder: Folder, foldersMap: Map<string, Folder>): string {
-  const parts: string[] = [];
-  let current: Folder | undefined = folder;
-
-  while (current) {
-    parts.unshift(current.name);
-    current = current.parentId ? foldersMap.get(current.parentId) : undefined;
-  }
-
-  return parts.join(' / ');
-}
 
 interface MoveFolderModalProps {
   folder: Folder | null;
@@ -59,18 +48,47 @@ export default function MoveFolderModal({ folder, opened, onClose }: MoveFolderM
   const folderOptions = useMemo(() => {
     if (!allFolders || !folder) return [{ value: '__root__', label: '/ (Root)' }];
 
-    const foldersMap = new Map(allFolders.map((f) => [f.id, f]));
     const descendantIds = getDescendantIds(folder.id, allFolders);
+    const validFolders = allFolders.filter((f) => f.id !== folder.id && !descendantIds.has(f.id));
 
-    const options = allFolders
-      .filter((f) => f.id !== folder.id && !descendantIds.has(f.id))
-      .map((f) => ({
+    // Group children by parent
+    const childrenMap = new Map<string | null, Folder[]>();
+    for (const f of validFolders) {
+      const parentId = f.parentId ?? null;
+      // Skip if parent is excluded (the folder being moved or its descendants)
+      if (parentId && (parentId === folder.id || descendantIds.has(parentId))) continue;
+      const siblings = childrenMap.get(parentId) || [];
+      siblings.push(f);
+      childrenMap.set(parentId, siblings);
+    }
+
+    // Sort children alphabetically within each level
+    for (const children of childrenMap.values()) {
+      children.sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    // Depth-first traversal
+    const result: Array<{ value: string; label: string }> = [];
+
+    const traverse = (f: Folder, pathParts: string[]) => {
+      const currentPath = [...pathParts, f.name];
+      result.push({
         value: f.id,
-        label: buildFolderPath(f, foldersMap),
-      }))
-      .sort((a, b) => a.label.localeCompare(b.label));
+        label: currentPath.join(' / '),
+      });
 
-    return [{ value: '__root__', label: '/ (Root)' }, ...options];
+      const children = childrenMap.get(f.id) || [];
+      for (const child of children) {
+        traverse(child, currentPath);
+      }
+    };
+
+    const rootFolders = childrenMap.get(null) || [];
+    for (const root of rootFolders) {
+      traverse(root, []);
+    }
+
+    return [{ value: '__root__', label: '/ (Root)' }, ...result];
   }, [allFolders, folder]);
 
   if (!folder) {
