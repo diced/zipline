@@ -38,9 +38,21 @@ import {
   IconTrashFilled,
 } from '@tabler/icons-react';
 import { DataTable } from 'mantine-datatable';
-import { lazy, useEffect, useReducer, useState } from 'react';
+import { lazy, useEffect, useMemo, useReducer, useState } from 'react';
 import { Link } from 'react-router-dom';
 import useSWR from 'swr';
+
+function buildFolderPath(folder: Folder, foldersMap: Map<string, Folder>): string {
+  const parts: string[] = [];
+  let current: Folder | undefined = folder;
+
+  while (current) {
+    parts.unshift(current.name);
+    current = current.parentId ? foldersMap.get(current.parentId) : undefined;
+  }
+
+  return parts.join(' / ');
+}
 import TableEditModal, { NAMES } from '../TableEditModal';
 import { bulkDelete, bulkFavorite } from '../bulk';
 import TagPill from '../tags/TagPill';
@@ -196,6 +208,22 @@ export default function FileTable({
   const { data: folders } = useSWR<Extract<Response['/api/user/folders'], Folder[]>>(
     '/api/user/folders?noincl=true',
   );
+
+  // Build folder options with full path for hierarchy display
+  const folderOptions = useMemo(() => {
+    if (!folders) return [];
+
+    const foldersMap = new Map(folders.map((f) => [f.id, f]));
+
+    return folders
+      .map((f) => ({
+        id: f.id,
+        name: f.name,
+        path: buildFolderPath(f, foldersMap),
+        depth: buildFolderPath(f, foldersMap).split(' / ').length - 1,
+      }))
+      .sort((a, b) => a.path.localeCompare(b.path));
+  }, [folders]);
 
   const [page, setPage] = useQueryState('page', 1);
   const [perpage, setPerpage] = useState(20);
@@ -447,11 +475,14 @@ export default function FileTable({
 
                     <Combobox.Dropdown>
                       <Combobox.Options>
-                        {folders
-                          ?.filter((f) => f.name.toLowerCase().includes(folderSearch.toLowerCase().trim()))
+                        {folderOptions
+                          .filter((f) => f.path.toLowerCase().includes(folderSearch.toLowerCase().trim()))
                           .map((f) => (
                             <Combobox.Option value={f.id} key={f.id}>
-                              {f.name}
+                              <Text size='sm' style={{ paddingLeft: f.depth * 12 }}>
+                                {f.depth > 0 ? '└ ' : ''}
+                                {f.name}
+                              </Text>
                             </Combobox.Option>
                           ))}
                       </Combobox.Options>
