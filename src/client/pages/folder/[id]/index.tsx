@@ -42,7 +42,9 @@ function PublicFolderCard({ folder }: { folder: Partial<Folder> }) {
         </Card.Section>
         <Card.Section inheritPadding py='xs'>
           <Stack gap={2}>
-            <Text size='xs' c='dimmed'>{folder._count?.files ?? 0} files</Text>
+            <Text size='xs' c='dimmed'>
+              {folder._count?.files ?? 0} files
+            </Text>
             {(folder._count?.children ?? 0) > 0 && (
               <Text size='xs' c='dimmed'>
                 {folder._count?.children} subfolders
