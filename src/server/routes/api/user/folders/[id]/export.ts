@@ -36,6 +36,9 @@ export default typedPlugin(
 
         res.hijack();
 
+        res.raw.setHeader('Content-Type', 'application/zip');
+        res.raw.setHeader('Content-Disposition', `attachment; filename="${folder.name}.zip"`);
+
         const zip = archiver('zip', {
           zlib: { level: 9 },
         });
