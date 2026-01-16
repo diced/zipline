@@ -6,7 +6,7 @@ services:
       - .env
     environment:
       POSTGRES_USER: ${POSTGRESQL_USER:-zipline}
-      POSTGRES_PASSWORD: ${POSTGRESQL_PASSWORD:?POSTGRESSQL_PASSWORD is required}
+      POSTGRES_PASSWORD: ${POSTGRESQL_PASSWORD:?POSTGRESQL_PASSWORD is required}
       POSTGRES_DB: ${POSTGRESQL_DB:-zipline}
     volumes:
       - pgdata:/var/lib/postgresql/data
