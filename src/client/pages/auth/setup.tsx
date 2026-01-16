@@ -178,12 +178,14 @@ export function Component() {
               <Title order={2}>Create your super-admin account</Title>
 
               <TextInput
+                name='username'
                 label='Username'
                 placeholder='Enter a username...'
                 {...form.getInputProps('username')}
               />
 
               <PasswordInput
+                name='password'
                 label='Password'
                 placeholder='Enter a password...'
                 {...form.getInputProps('password')}

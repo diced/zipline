@@ -312,6 +312,7 @@ export default function Login() {
             <form onSubmit={form.onSubmit((v) => onSubmit(v))}>
               <Stack my='sm'>
                 <TextInput
+                  name='username'
                   size='md'
                   placeholder='Enter your username...'
                   styles={{
@@ -323,6 +324,7 @@ export default function Login() {
                 />
 
                 <PasswordInput
+                  name='password'
                   size='md'
                   placeholder='Enter your password...'
                   styles={{

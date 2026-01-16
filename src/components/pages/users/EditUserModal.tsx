@@ -163,11 +163,13 @@ export default function EditUserModal({
         <form onSubmit={form.onSubmit(onSubmit)}>
           <Stack gap='sm'>
             <TextInput
+              name='username'
               label='Username'
               placeholder='Enter a username...'
               {...form.getInputProps('username')}
             />
             <PasswordInput
+              name='password'
               label='Password'
               placeholder='Enter a password...'
               autoComplete='new-password'

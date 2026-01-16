@@ -212,6 +212,7 @@ export function Component() {
         <form onSubmit={form.onSubmit(onSubmit)}>
           <Stack my='sm'>
             <TextInput
+              name='username'
               size='md'
               placeholder='Enter your username...'
               styles={{
@@ -223,6 +224,7 @@ export function Component() {
             />
 
             <PasswordInput
+              name='password'
               size='md'
               placeholder='Enter your password...'
               styles={{
