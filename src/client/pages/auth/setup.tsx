@@ -65,6 +65,9 @@ export function Component() {
       username: (value) => (value.length < 1 ? 'Username is required' : null),
       password: (value) => (value.length < 1 ? 'Password is required' : null),
     },
+    enhanceGetInputProps: ({ field }) => ({
+      name: field,
+    }),
   });
 
   const onSubmit = async (values: typeof form.values) => {
@@ -178,16 +181,16 @@ export function Component() {
               <Title order={2}>Create your super-admin account</Title>
 
               <TextInput
-                name='username'
                 label='Username'
                 placeholder='Enter a username...'
+                autoComplete='username'
                 {...form.getInputProps('username')}
               />
 
               <PasswordInput
-                name='password'
                 label='Password'
                 placeholder='Enter a password...'
+                autoComplete='new-password'
                 {...form.getInputProps('password')}
               />
             </Stack>

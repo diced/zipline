@@ -86,6 +86,9 @@ export default function Login() {
       username: (value) => (value.length > 1 ? null : 'Username is required'),
       password: (value) => (value.length > 1 ? null : 'Password is required'),
     },
+    enhanceGetInputProps: ({ field }) => ({
+      name: field,
+    }),
   });
 
   const onSubmit = async (values: typeof form.values, code: string | undefined = undefined) => {
@@ -312,9 +315,9 @@ export default function Login() {
             <form onSubmit={form.onSubmit((v) => onSubmit(v))}>
               <Stack my='sm'>
                 <TextInput
-                  name='username'
                   size='md'
                   placeholder='Enter your username...'
+                  autoComplete='username'
                   styles={{
                     input: {
                       backgroundColor: config.website.loginBackground ? 'transparent' : undefined,
@@ -324,9 +327,9 @@ export default function Login() {
                 />
 
                 <PasswordInput
-                  name='password'
                   size='md'
                   placeholder='Enter your password...'
+                  autoComplete='current-password'
                   styles={{
                     input: {
                       backgroundColor: config.website.loginBackground ? 'transparent' : undefined,

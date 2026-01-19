@@ -69,6 +69,9 @@ export default function EditUserModal({
         if (typeof value !== 'number' || value < 0) return 'Invalid value';
       },
     },
+    enhanceGetInputProps: ({ field }) => ({
+      name: field,
+    }),
   });
 
   const onSubmit = async (values: typeof form.values) => {
@@ -163,13 +166,12 @@ export default function EditUserModal({
         <form onSubmit={form.onSubmit(onSubmit)}>
           <Stack gap='sm'>
             <TextInput
-              name='username'
               label='Username'
               placeholder='Enter a username...'
+              autoComplete='username'
               {...form.getInputProps('username')}
             />
             <PasswordInput
-              name='password'
               label='Password'
               placeholder='Enter a password...'
               autoComplete='new-password'
