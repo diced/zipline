@@ -72,7 +72,7 @@ export const schema = z.object({
     tempDirectory: z
       .string()
       .transform((s) => resolve(s))
-      .default(join(tmpdir(), 'zipline')),
+      .default(join(tmpdir(), 'flux')),
     trustProxy: z.boolean().default(false),
 
     databaseUrl: z.url(),
@@ -202,7 +202,7 @@ export const schema = z.object({
     length: z.number().default(8),
   }),
   website: z.object({
-    title: z.string().default('Zipline'),
+    title: z.string().default('Flux'),
     titleLogo: z.url().nullable().default(null),
     externalLinks: z
       .array(
@@ -214,7 +214,7 @@ export const schema = z.object({
       .default([
         {
           name: 'GitHub',
-          url: 'https://github.com/diced/zipline',
+          url: 'https://github.com/devmirkoo/Flux',
         },
         {
           name: 'Documentation',
@@ -243,7 +243,7 @@ export const schema = z.object({
   mfa: z.object({
     totp: z.object({
       enabled: z.boolean().default(false),
-      issuer: z.string().default('Zipline'),
+      issuer: z.string().default('Flux'),
     }),
     passkeys: z.object({
       enabled: z.boolean().default(false),
@@ -367,9 +367,9 @@ export const schema = z.object({
   }),
   pwa: z.object({
     enabled: z.boolean().default(true),
-    title: z.string().default('Zipline'),
-    shortName: z.string().default('Zipline'),
-    description: z.string().default('Zipline'),
+    title: z.string().default('Flux'),
+    shortName: z.string().default('Flux'),
+    description: z.string().default('Flux'),
     themeColor: z.string().default('#000000'),
     backgroundColor: z.string().default('#000000'),
   }),
