@@ -11,6 +11,8 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 const viewsCache = new Map<string, number>();
 const VIEW_WINDOW = 5 * 1000;
 
+import { getFilePath } from '@/lib/datasource/helpers';
+
 type Params = {
   id: string;
 };
@@ -65,7 +67,8 @@ export const rawFileHandler = async (
 
   if (file?.deletesAt && file.deletesAt <= new Date()) {
     try {
-      await datasource.delete(file.name);
+      const filePath = getFilePath({ userId: file.userId, type: file.type, name: file.name });
+      await datasource.delete(filePath);
       await prisma.file.delete({
         where: {
           id: file.id,
@@ -84,7 +87,8 @@ export const rawFileHandler = async (
     if (!verified) return res.forbidden('Incorrect password.');
   }
 
-  const size = file?.size || (await datasource.size(file?.name ?? id));
+  const filePath = getFilePath({ userId: file.userId, type: file.type, name: file.name });
+  const size = file?.size || (await datasource.size(filePath));
 
   // view stuff
   const now = Date.now();
@@ -99,7 +103,7 @@ export const rawFileHandler = async (
   if (file.maxViews && updatedViews > file.maxViews) {
     if (config.features.deleteOnMaxViews) {
       try {
-        await datasource.delete(file.name);
+        await datasource.delete(filePath);
         await prisma.file.delete({
           where: { id: file.id },
         });
@@ -127,7 +131,7 @@ export const rawFileHandler = async (
   if (req.headers.range) {
     const [start, end] = parseRange(req.headers.range, size);
     if (start >= size || end >= size) {
-      const buf = await datasource.get(file?.name ?? id);
+      const buf = await datasource.get(filePath);
       if (!buf) return res.callNotFound();
 
       await countView();
@@ -146,7 +150,7 @@ export const rawFileHandler = async (
         .send(buf);
     }
 
-    const buf = await datasource.range(file?.name ?? id, start || 0, end);
+    const buf = await datasource.range(filePath, start || 0, end);
     if (!buf) return res.callNotFound();
 
     await countView();
@@ -167,7 +171,7 @@ export const rawFileHandler = async (
       .send(buf);
   }
 
-  const buf = await datasource.get(file?.name ?? id);
+  const buf = await datasource.get(filePath);
   if (!buf) return res.callNotFound();
 
   await countView();

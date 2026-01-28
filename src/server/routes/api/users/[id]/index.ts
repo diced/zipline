@@ -9,6 +9,7 @@ import { Role, UserFilesQuota } from '@/prisma/client';
 import { administratorMiddleware } from '@/server/middleware/administrator';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
+import { getFilePath } from '@/lib/datasource/helpers';
 import { z } from 'zod';
 
 export type ApiUsersIdResponse = User;
@@ -182,6 +183,7 @@ export default typedPlugin(
             },
             select: {
               name: true,
+              type: true,
             },
           });
 
@@ -203,7 +205,13 @@ export default typedPlugin(
           });
 
           for (let i = 0; i !== files.length; ++i) {
-            await datasource.delete(files[i].name);
+            await datasource.delete(
+              getFilePath({
+                userId: user.id,
+                type: files[i].type,
+                name: files[i].name,
+              }),
+            );
           }
 
           logger.info(`${req.user.username} deleted another user's files & urls`, {

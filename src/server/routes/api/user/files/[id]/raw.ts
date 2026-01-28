@@ -10,6 +10,8 @@ import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
 import z from 'zod';
 
+import { getFilePath } from '@/lib/datasource/helpers';
+
 const logger = log('routes').c('raw');
 
 export const PATH = '/api/user/files/:id/raw';
@@ -70,7 +72,8 @@ export default typedPlugin(
 
         if (file?.deletesAt && file.deletesAt <= new Date()) {
           try {
-            await datasource.delete(file.name);
+            const filePath = getFilePath({ userId: file.userId, type: file.type, name: file.name });
+            await datasource.delete(filePath);
             await prisma.file.delete({
               where: {
                 id: file.id,
@@ -91,7 +94,8 @@ export default typedPlugin(
           if (!config.features.deleteOnMaxViews) return res.callNotFound();
 
           try {
-            await datasource.delete(file.name);
+            const filePath = getFilePath({ userId: file.userId, type: file.type, name: file.name });
+            await datasource.delete(filePath);
             await prisma.file.delete({
               where: {
                 id: file.id,
@@ -115,12 +119,37 @@ export default typedPlugin(
           if (!verified) return res.forbidden('Incorrect password.');
         }
 
-        const size = file?.size || (await datasource.size(file?.name ?? id));
+        const filePath = getFilePath({
+          userId: file ? file.userId : req.user.id,
+          type: file ? file.type : 'application/octet-stream', // fallback, likely wont happen if file found
+          name: file ? file.name : id,
+        });
+
+        // If file not found in DB, we constructed path with potentially wrong info.
+        // But logic above: `const file = ... await findFirst`.
+        // If !file (lines 58-65), we might continue?
+        // Wait, lines 58-65 finds file. There is NO check `if (!file) return res.callNotFound()`.
+        // However, standard logic implies we should handle it.
+        // The original code used `file?.name ?? id`.
+        // If file is null, we can't really guess the path `userId/type/name` correctly.
+        // Actually, if !file, we probably should 404. But strictly keeping to replace logic:
+
+        let lookPath = '';
+        if (file) {
+          lookPath = getFilePath({ userId: file.userId, type: file.type, name: file.name });
+        } else {
+          // Fallback for weird edge case if generic ID passed? Unlikely to work with new structure.
+          // We'll proceed assuming file exists or let datasource fail.
+          // Actually, without file metadata we CANNOT find the file in the new structure (recursive search too expensive).
+          return res.callNotFound();
+        }
+
+        const size = file?.size || (await datasource.size(lookPath));
 
         if (req.headers.range) {
           const [start, end] = parseRange(req.headers.range, size);
           if (start >= size || end >= size) {
-            const buf = await datasource.get(file?.name ?? id);
+            const buf = await datasource.get(lookPath);
             if (!buf) return res.callNotFound();
 
             return res
@@ -139,7 +168,7 @@ export default typedPlugin(
               .send(buf);
           }
 
-          const buf = await datasource.range(file?.name ?? id, start || 0, end);
+          const buf = await datasource.range(lookPath, start || 0, end);
           if (!buf) return res.callNotFound();
 
           return res
@@ -160,7 +189,7 @@ export default typedPlugin(
             .send(buf);
         }
 
-        const buf = await datasource.get(file?.name ?? id);
+        const buf = await datasource.get(lookPath);
         if (!buf) return res.callNotFound();
 
         return res

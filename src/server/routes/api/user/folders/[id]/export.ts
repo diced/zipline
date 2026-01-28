@@ -1,3 +1,4 @@
+import { getFilePath } from '@/lib/datasource/helpers';
 import { datasource } from '@/lib/datasource';
 import { prisma } from '@/lib/db';
 import { log } from '@/lib/logger';
@@ -43,7 +44,8 @@ export default typedPlugin(
         zip.pipe(res.raw);
 
         for (const file of folder.files) {
-          const stream = await datasource.get(file.name);
+          const filePath = getFilePath({ userId: folder.userId, type: file.type, name: file.name });
+          const stream = await datasource.get(filePath);
           if (!stream) {
             logger.warn('failed to get file stream for folder export', { file: file.id, folder: folder.id });
             continue;

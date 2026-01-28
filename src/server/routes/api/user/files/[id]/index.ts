@@ -8,8 +8,10 @@ import { canInteract } from '@/lib/role';
 import { zValidatePath } from '@/lib/validation';
 import { Prisma } from '@/prisma/client';
 import { userMiddleware } from '@/server/middleware/user';
+import { getFilePath } from '@/lib/datasource/helpers';
 import typedPlugin from '@/server/typedPlugin';
 import z from 'zod';
+import { getExtension } from '@/server/routes/api/upload';
 
 export type ApiUserFilesIdResponse = File;
 
@@ -102,23 +104,38 @@ export default typedPlugin(
         }
 
         if (req.body.name !== undefined && req.body.name !== file.name) {
-          const name = req.body.name!;
-          const existingFile = await prisma.file.findFirst({
-            where: {
-              name,
-            },
-          });
+          let name = req.body.name!;
+          const extension = getExtension(file.name);
+          if (!name.endsWith(extension)) name = `${name}${extension}`;
 
-          if (existingFile && existingFile.id !== file.id)
-            return res.badRequest('File with this name already exists');
+          if (name !== file.name) {
+            const existingFile = await prisma.file.findFirst({
+              where: {
+                name,
+              },
+            });
 
-          data.name = name;
+            if (existingFile && existingFile.id !== file.id)
+              return res.badRequest('File with this name already exists');
 
-          try {
-            await datasource.rename(file.name, data.name);
-          } catch (error) {
-            logger.error('Failed to rename file in datasource', { error });
-            return res.internalServerError('Failed to rename file in datasource');
+            data.name = name;
+
+            try {
+              const oldPath = getFilePath({
+                userId: file.User?.id ?? null,
+                type: file.type,
+                name: file.name,
+              });
+              const newPath = getFilePath({
+                userId: file.User?.id ?? null,
+                type: file.type,
+                name: name,
+              });
+              await datasource.rename(oldPath, newPath);
+            } catch (error) {
+              logger.error('Failed to rename file in datasource', { error });
+              return res.internalServerError('Failed to rename file in datasource');
+            }
           }
         }
 
@@ -167,7 +184,13 @@ export default typedPlugin(
           select: fileSelect,
         });
 
-        await datasource.delete(deletedFile.name);
+        await datasource.delete(
+          getFilePath({
+            userId: file.User?.id ?? null,
+            type: deletedFile.type,
+            name: deletedFile.name,
+          }),
+        );
 
         logger.info(`${req.user.username} deleted file ${deletedFile.name}`, {
           size: bytes(deletedFile.size),
