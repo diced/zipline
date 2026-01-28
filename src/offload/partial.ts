@@ -11,9 +11,11 @@ import { UploadOptions } from '@/lib/uploader/parseHeaders';
 import { onUpload } from '@/lib/webhooks';
 import { Upload } from '@aws-sdk/lib-storage';
 import { createReadStream, createWriteStream } from 'fs';
-import { open, readdir, rm } from 'fs/promises';
-import { join } from 'path';
+import { existsSync } from 'fs';
+import { mkdir, open, readdir, rm } from 'fs/promises';
+import { join, resolve } from 'path';
 import { isMainThread, workerData } from 'worker_threads';
+import { getFilePath } from '@/lib/datasource/helpers';
 import { dbProxy } from './proxiedDb';
 
 export type PartialWorkerData = {
@@ -90,10 +92,16 @@ async function main() {
     },
   });
 
-  finalPath =
-    config.datasource.type === 'local'
-      ? join(config.datasource.local!.directory, file.filename)
-      : join(config.core.tempDirectory, randomCharacters(16));
+  if (config.datasource.type === 'local') {
+    const filePath = getFilePath({ userId: user.id || null, type: file.type, name: file.filename });
+    finalPath = join(config.datasource.local!.directory, filePath);
+    const dir = resolve(finalPath, '..');
+    if (!existsSync(dir)) {
+      await mkdir(dir, { recursive: true });
+    }
+  } else {
+    finalPath = join(config.core.tempDirectory, randomCharacters(16));
+  }
 
   const fd = await open(finalPath, 'w');
   await fd.close();
