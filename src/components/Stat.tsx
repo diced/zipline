@@ -1,7 +1,17 @@
 import { Paper, Group, Title, Text } from '@mantine/core';
 import { Icon } from '@tabler/icons-react';
 
-export default function Stat({ title, value, Icon }: { title: string; value: any; Icon: Icon }) {
+export default function Stat({
+  title,
+  value,
+  Icon,
+  color,
+}: {
+  title: string;
+  value: any;
+  Icon: Icon;
+  color?: string;
+}) {
   return (
     <Paper p='md' radius='md' withBorder>
       <Group justify='space-between'>
@@ -12,7 +22,7 @@ export default function Stat({ title, value, Icon }: { title: string; value: any
         <Icon size='1.2rem' />
       </Group>
 
-      <Title order={1} fw={700}>
+      <Title order={1} fw={700} c={color}>
         {value}
       </Title>
     </Paper>

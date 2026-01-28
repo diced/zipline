@@ -2,6 +2,7 @@ import Stat from '@/components/Stat';
 import type { Response } from '@/lib/api/response';
 import { bytes } from '@/lib/bytes';
 import useLogin from '@/lib/hooks/useLogin';
+import { isAdministrator } from '@/lib/role';
 import { Paper, ScrollArea, SimpleGrid, Skeleton, Table, Text, Title } from '@mantine/core';
 import { IconDeviceSdCard, IconEyeFilled, IconFiles, IconLink, IconStarFilled } from '@tabler/icons-react';
 import { lazy, Suspense } from 'react';
@@ -13,6 +14,19 @@ export default function DashboardHome() {
   const { user } = useLogin();
   const { data: recent, isLoading: recentLoading } = useSWR<Response['/api/user/recent']>('/api/user/recent');
   const { data: stats, isLoading: statsLoading } = useSWR<Response['/api/user/stats']>('/api/user/stats');
+  const { data: diskUsage, isLoading: diskUsageLoading } = useSWR<Response['/api/system/disk-usage']>(
+    user && isAdministrator(user.role) ? '/api/system/disk-usage' : null,
+  );
+
+  // Determine color based on remaining space percentage
+  const getDiskColor = () => {
+    if (!diskUsage) return undefined;
+    const remainingPercentage = 100 - diskUsage.usedPercentage;
+    if (remainingPercentage > 50) return 'green';
+    if (remainingPercentage > 30) return 'yellow';
+    if (remainingPercentage > 15) return 'orange';
+    return 'red';
+  };
   return (
     <>
       <Title>
@@ -131,6 +145,15 @@ export default function DashboardHome() {
 
             <Stat Icon={IconLink} title='Links created' value={stats!.urlsCreated} />
             <Stat Icon={IconLink} title='Total link views' value={Math.round(stats!.urlViews)} />
+
+            {user && isAdministrator(user.role) && (
+              <Stat
+                Icon={IconDeviceSdCard}
+                title='Disk Space Available'
+                value={diskUsageLoading ? '...' : bytes(diskUsage!.availableBytes)}
+                color={getDiskColor()}
+              />
+            )}
           </SimpleGrid>
 
           {Object.keys(stats!.sortTypeCount).length !== 0 && (
