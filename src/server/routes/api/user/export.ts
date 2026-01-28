@@ -1,3 +1,4 @@
+import { getFilePath } from '@/lib/datasource/helpers';
 import { bytes } from '@/lib/bytes';
 import { config } from '@/lib/config';
 import { datasource } from '@/lib/datasource';
@@ -120,7 +121,8 @@ export default typedPlugin(
 
       let totalSize = 0;
       for (const file of files) {
-        const stream = await datasource.get(file.name);
+        const filePath = getFilePath({ userId: req.user.id, type: file.type, name: file.name });
+        const stream = await datasource.get(filePath);
         if (!stream) {
           logger.warn(`failed to get file ${file.name}`);
           continue;

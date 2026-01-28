@@ -6,6 +6,7 @@ import { canInteract } from '@/lib/role';
 import { Role } from '@/prisma/client';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
+import { getFilePath } from '@/lib/datasource/helpers';
 import z from 'zod';
 
 export type ApiUserFilesTransactionResponse = {
@@ -166,7 +167,13 @@ export default typedPlugin(
 
         if (delete_datasourceFiles) {
           for (let i = 0; i !== toDeleteFiles.length; ++i) {
-            await datasource.delete(toDeleteFiles[i].name);
+            await datasource.delete(
+              getFilePath({
+                userId: toDeleteFiles[i].userId ?? null,
+                type: toDeleteFiles[i].type,
+                name: toDeleteFiles[i].name,
+              }),
+            );
           }
 
           logger.info(`${req.user.username} deleted ${toDeleteFiles.length} files from datasource`, {

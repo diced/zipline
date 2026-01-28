@@ -17,6 +17,7 @@ import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
 import { stat } from 'fs/promises';
 import { extname } from 'path';
+import { getFilePath } from '@/lib/datasource/helpers';
 
 const commonDoubleExts = [
   '.tar.gz',
@@ -220,7 +221,13 @@ export default typedPlugin(
           select: fileSelect,
         });
 
-        await datasource.put(fileUpload.name, compressed?.buffer ?? file.filepath, {
+        const filePath = getFilePath({
+          userId: req.user ? req.user.id : options.folder ? (folder?.userId ?? null) : null,
+          type: fileUpload.type,
+          name: fileUpload.name,
+        });
+
+        await datasource.put(filePath, compressed?.buffer ?? file.filepath, {
           mimetype: fileUpload.type,
         });
 
