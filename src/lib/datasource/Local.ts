@@ -1,5 +1,5 @@
 import { createReadStream, existsSync } from 'fs';
-import { access, constants, copyFile, readdir, rename, rm, stat, writeFile } from 'fs/promises';
+import { access, constants, copyFile, mkdir, readdir, rename, rm, stat, writeFile } from 'fs/promises';
 import { join, resolve, sep } from 'path';
 import { Readable } from 'stream';
 import { Datasource, ListOptions, PutOptions } from './Datasource';
@@ -42,6 +42,12 @@ export class LocalDatasource extends Datasource {
     const path = this.resolvePath(file);
     if (!path) {
       throw new Error('Invalid path provided');
+    }
+
+    // Ensure parent directory exists
+    const dir = resolve(path, '..');
+    if (!existsSync(dir)) {
+      await mkdir(dir, { recursive: true });
     }
 
     // handles if given a path to a file, it will just move it instead of doing unecessary writes
