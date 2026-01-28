@@ -33,6 +33,7 @@ export const router = createBrowserRouter([
       {
         ErrorBoundary: RootErrorBoundary,
         children: [
+          { index: true, lazy: () => import('./pages/home') },
           { path: '*', Component: FourOhFour },
           {
             path: '/auth',
