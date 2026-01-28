@@ -1,0 +1,117 @@
+/* Dark background - Dashboard theme */
+
+/* Container */
+.authContainer {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Paper Styling - Dashboard theme */
+.authPaper {
+  background: #25262b !important;
+  border: 1px solid #373A40 !important;
+  box-shadow: none !important;
+  backdrop-filter: none;
+}
+
+/* Text Styling */
+.title {
+  color: #ffffff !important;
+}
+
+.subtitle {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* Link Styling */
+.accountLink {
+  display: block;
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.accountLink:hover {
+  color: #C1C2C5;
+  text-decoration: underline;
+}
+
+.accountLinkButton {
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+}
+
+/* Form Inputs - Dashboard theme */
+.input {
+  background: #1A1B1E !important;
+  border: 1px solid #373A40 !important;
+  color: #ffffff !important;
+}
+
+.input:focus {
+  border-color: #5C5F66 !important;
+  box-shadow: none !important;
+}
+
+/* Buttons - Dashboard theme */
+.button {
+  background: #373A40 !important;
+  color: #ffffff !important;
+  border: 1px solid #373A40 !important;
+  box-shadow: none;
+  transition: all 0.2s ease;
+}
+
+.button:hover {
+  background: #5C5F66 !important;
+  border-color: #5C5F66 !important;
+  box-shadow: none;
+}
+
+/* Modal Styling */
+.modalBody {
+  color: #ffffff;
+  line-height: 1.6;
+}
+
+.modalSocialLinks {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+.modalSocialLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  background: #373A40;
+  border: 1px solid #373A40;
+  border-radius: 4px;
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  box-shadow: none;
+}
+
+.modalSocialLink:hover {
+  background: #5C5F66;
+  border-color: #5C5F66;
+  box-shadow: none;
+  transform: translateY(-2px);
+}

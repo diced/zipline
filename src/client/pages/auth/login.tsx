@@ -36,6 +36,8 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import useSWR from 'swr';
 import GenericError from '../../error/GenericError';
+import styles from './auth.module.css';
+import { IconBrandGithub, IconBrandDiscord, IconBrandX } from '@tabler/icons-react';
 
 export default function Login() {
   useTitle('Login');
@@ -76,6 +78,7 @@ export default function Login() {
 
   const [passkeyErrored, setPasskeyErrored] = useState(false);
   const [passkeyLoading, setPasskeyLoading] = useState(false);
+  const [inviteModalOpened, setInviteModalOpened] = useState(false);
 
   const form = useForm({
     initialValues: {
@@ -266,146 +269,218 @@ export default function Login() {
         </Group>
       </Modal>
 
-      <Center h='100vh'>
-        {config.website.loginBackground && (
-          <Image
-            src={config.website.loginBackground}
-            alt={config.website.loginBackground + ' failed to load'}
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              ...(config.website.loginBackgroundBlur && { filter: 'blur(10px)' }),
-            }}
-          />
-        )}
+      {/* Invitation Info Modal */}
+      <Modal
+        opened={inviteModalOpened}
+        onClose={() => setInviteModalOpened(false)}
+        title='Registrazione su Invito'
+        centered
+      >
+        <div className={styles.modalBody}>
+          <Text size='sm' mb='md'>
+            Flux è attualmente disponibile <strong>solo su invito</strong>. Per registrarti al servizio, devi
+            ricevere un link di invito personalizzato da parte di un amministratore.
+          </Text>
 
-        <Paper
-          w='350px'
-          p='xl'
-          shadow='xl'
-          withBorder
-          style={{
-            backgroundColor: config.website.loginBackground ? 'rgba(0, 0, 0, 0)' : undefined,
-            backdropFilter: config.website.loginBackgroundBlur ? 'blur(35px)' : undefined,
-          }}
-        >
-          <div style={{ width: '100%', overflowWrap: 'break-word' }}>
-            <Title
-              order={1}
-              ta='center'
-              style={{
-                whiteSpace: 'normal',
-                fontSize: `clamp(20px, ${Math.max(
-                  50 - (config.website.title?.length ?? 0) / 2,
-                  20,
-                )}px, 50px)`,
-              }}
+          <Text size='sm' mb='sm'>
+            Per richiedere un invito, puoi contattare il creatore del servizio:
+          </Text>
+
+          <div className={styles.modalSocialLinks}>
+            <a
+              href='https://github.com/devmirkoo'
+              target='_blank'
+              rel='noopener noreferrer'
+              className={styles.modalSocialLink}
             >
-              <b>{config.website.title ?? 'Zipline'}</b>
-            </Title>
+              <IconBrandGithub size={16} />
+              @devmirkoo
+            </a>
+            <a
+              href='https://discord.com'
+              target='_blank'
+              rel='noopener noreferrer'
+              className={styles.modalSocialLink}
+              title='Discord: @devmirko'
+            >
+              <IconBrandDiscord size={16} />
+              @devmirko
+            </a>
+            <a
+              href='https://x.com/devmirkoo'
+              target='_blank'
+              rel='noopener noreferrer'
+              className={styles.modalSocialLink}
+            >
+              <IconBrandX size={16} />
+              @devmirkoo
+            </a>
           </div>
+        </div>
+      </Modal>
 
-          {showLocalLogin && (
-            <form onSubmit={form.onSubmit((v) => onSubmit(v))}>
-              <Stack my='sm'>
-                <TextInput
-                  size='md'
-                  placeholder='Enter your username...'
-                  autoComplete='username'
-                  styles={{
-                    input: {
-                      backgroundColor: config.website.loginBackground ? 'transparent' : undefined,
-                    },
-                  }}
-                  {...form.getInputProps('username', { withError: true })}
-                />
+      <div className={styles.authContainer}>
+        {/* Ambient Background */}
+        <div className={`${styles.bgGlow} ${styles.bgGlow1}`} />
+        <div className={`${styles.bgGlow} ${styles.bgGlow2}`} />
 
-                <PasswordInput
-                  size='md'
-                  placeholder='Enter your password...'
-                  autoComplete='current-password'
-                  styles={{
-                    input: {
-                      backgroundColor: config.website.loginBackground ? 'transparent' : undefined,
-                    },
-                  }}
-                  {...form.getInputProps('password')}
-                />
-
-                <Button
-                  size='md'
-                  fullWidth
-                  type='submit'
-                  loading={!config}
-                  variant={config.website.loginBackground ? 'outline' : 'filled'}
-                >
-                  Login
-                </Button>
-              </Stack>
-            </form>
+        <Center h='100vh'>
+          {config.website.loginBackground && (
+            <Image
+              src={config.website.loginBackground}
+              alt={config.website.loginBackground + ' failed to load'}
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                ...(config.website.loginBackgroundBlur && { filter: 'blur(10px)' }),
+              }}
+            />
           )}
 
-          <Stack my='xs'>
-            {(config.features.oauthRegistration || config.features.userRegistration) && (
-              <Divider label='or' />
-            )}
-
-            {config.mfa.passkeys && browserSupportsWebAuthn() && (
-              <Button
-                onClick={handlePasskeyLogin}
-                size='md'
-                fullWidth
-                variant='outline'
-                leftSection={<IconKey size='1rem' />}
-                color={passkeyErrored ? 'red' : undefined}
-                loading={passkeyLoading}
+          <Paper
+            w='350px'
+            p='xl'
+            shadow='xl'
+            withBorder
+            className={styles.authPaper}
+            style={{
+              backgroundColor: config.website.loginBackground ? 'rgba(0, 0, 0, 0)' : undefined,
+              backdropFilter: config.website.loginBackgroundBlur ? 'blur(35px)' : undefined,
+            }}
+          >
+            <div style={{ width: '100%', overflowWrap: 'break-word' }}>
+              <Title
+                order={1}
+                ta='center'
+                className={styles.title}
+                style={{
+                  whiteSpace: 'normal',
+                  fontSize: `clamp(20px, ${Math.max(
+                    50 - (config.website.title?.length ?? 0) / 2,
+                    20,
+                  )}px, 50px)`,
+                }}
               >
-                Login with passkey
-              </Button>
+                <b>{config.website.title ?? 'Zipline'}</b>
+              </Title>
+            </div>
+
+            {showLocalLogin && (
+              <form onSubmit={form.onSubmit((v) => onSubmit(v))}>
+                <Stack my='sm'>
+                  <TextInput
+                    size='md'
+                    placeholder='Enter your username...'
+                    autoComplete='username'
+                    styles={{
+                      input: {
+                        backgroundColor: config.website.loginBackground ? 'transparent' : undefined,
+                      },
+                    }}
+                    {...form.getInputProps('username', { withError: true })}
+                  />
+
+                  <PasswordInput
+                    size='md'
+                    placeholder='Enter your password...'
+                    autoComplete='current-password'
+                    styles={{
+                      input: {
+                        backgroundColor: config.website.loginBackground ? 'transparent' : undefined,
+                      },
+                    }}
+                    {...form.getInputProps('password')}
+                  />
+
+                  <Button
+                    size='md'
+                    fullWidth
+                    type='submit'
+                    loading={!config}
+                    variant={config.website.loginBackground ? 'outline' : 'filled'}
+                  >
+                    Login
+                  </Button>
+                </Stack>
+              </form>
             )}
 
-            {config.features.userRegistration && (
-              <Button
-                component={Link}
-                to='/auth/register'
-                size='md'
-                fullWidth
-                variant='outline'
-                leftSection={<IconUserPlus size='1rem' />}
+            {/* Invitation Link */}
+            {!config.features.userRegistration && (
+              <button
+                className={`${styles.accountLink} ${styles.accountLinkButton}`}
+                onClick={() => setInviteModalOpened(true)}
+                type='button'
               >
-                Sign up
-              </Button>
+                Non possiedi un account?
+              </button>
             )}
 
-            <Group grow>
-              {config.oauthEnabled.discord && (
-                <ExternalAuthButton
-                  provider='Discord'
-                  leftSection={<IconBrandDiscordFilled stroke={4} size='1.1rem' />}
-                />
+            <Stack my='xs'>
+              {(config.features.oauthRegistration || config.features.userRegistration) && (
+                <Divider label='or' />
               )}
-              {config.oauthEnabled.github && (
-                <ExternalAuthButton provider='GitHub' leftSection={<IconBrandGithubFilled size='1.1rem' />} />
+
+              {config.mfa.passkeys && browserSupportsWebAuthn() && (
+                <Button
+                  onClick={handlePasskeyLogin}
+                  size='md'
+                  fullWidth
+                  variant='outline'
+                  leftSection={<IconKey size='1rem' />}
+                  color={passkeyErrored ? 'red' : undefined}
+                  loading={passkeyLoading}
+                >
+                  Login with passkey
+                </Button>
               )}
-              {config.oauthEnabled.google && (
-                <ExternalAuthButton
-                  provider='Google'
-                  leftSection={<IconBrandGoogleFilled stroke={4} size='1.1rem' />}
-                />
+
+              {config.features.userRegistration && (
+                <Button
+                  component={Link}
+                  to='/auth/register'
+                  size='md'
+                  fullWidth
+                  variant='outline'
+                  leftSection={<IconUserPlus size='1rem' />}
+                >
+                  Sign up
+                </Button>
               )}
-              {config.oauthEnabled.oidc && (
-                <ExternalAuthButton provider='OIDC' leftSection={<IconCircleKeyFilled size='1.1rem' />} />
-              )}
-            </Group>
-          </Stack>
-        </Paper>
-      </Center>
+
+              <Group grow>
+                {config.oauthEnabled.discord && (
+                  <ExternalAuthButton
+                    provider='Discord'
+                    leftSection={<IconBrandDiscordFilled stroke={4} size='1.1rem' />}
+                  />
+                )}
+                {config.oauthEnabled.github && (
+                  <ExternalAuthButton
+                    provider='GitHub'
+                    leftSection={<IconBrandGithubFilled size='1.1rem' />}
+                  />
+                )}
+                {config.oauthEnabled.google && (
+                  <ExternalAuthButton
+                    provider='Google'
+                    leftSection={<IconBrandGoogleFilled stroke={4} size='1.1rem' />}
+                  />
+                )}
+                {config.oauthEnabled.oidc && (
+                  <ExternalAuthButton provider='OIDC' leftSection={<IconCircleKeyFilled size='1.1rem' />} />
+                )}
+              </Group>
+            </Stack>
+          </Paper>
+        </Center>
+      </div>
     </>
   );
 }

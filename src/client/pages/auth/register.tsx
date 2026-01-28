@@ -22,6 +22,7 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import useSWR, { mutate } from 'swr';
 import GenericError from '../../error/GenericError';
+import styles from './auth.module.css';
 
 export function Component() {
   useTitle('Register');
@@ -158,128 +159,143 @@ export function Component() {
   }
 
   return (
-    <Center h='100vh'>
-      {config.website.loginBackground && (
-        <Image
-          src={config.website.loginBackground}
-          alt='Background'
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            ...(config.website.loginBackgroundBlur && { filter: 'blur(10px)' }),
-          }}
-        />
-      )}
+    <>
+      <div className={styles.authContainer}>
+        {/* Ambient Background */}
+        <div className={`${styles.bgGlow} ${styles.bgGlow1}`} />
+        <div className={`${styles.bgGlow} ${styles.bgGlow2}`} />
 
-      <Paper
-        w='350px'
-        p='xl'
-        shadow='xl'
-        withBorder
-        style={{
-          backgroundColor: config.website.loginBackground ? 'rgba(0, 0, 0, 0)' : undefined,
-          backdropFilter: config.website.loginBackgroundBlur ? 'blur(35px)' : undefined,
-        }}
-      >
-        <div style={{ width: '100%', overflowWrap: 'break-word' }}>
-          <Title
-            order={1}
-            ta='center'
+        <Center h='100vh'>
+          {config.website.loginBackground && (
+            <Image
+              src={config.website.loginBackground}
+              alt='Background'
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                ...(config.website.loginBackgroundBlur && { filter: 'blur(10px)' }),
+              }}
+            />
+          )}
+
+          <Paper
+            w='350px'
+            p='xl'
+            shadow='xl'
+            withBorder
+            className={styles.authPaper}
             style={{
-              whiteSpace: 'normal',
-              fontSize: `clamp(20px, ${Math.max(50 - (config.website.title?.length ?? 0) / 2, 20)}px, 50px)`,
+              backgroundColor: config.website.loginBackground ? 'rgba(0, 0, 0, 0)' : undefined,
+              backdropFilter: config.website.loginBackgroundBlur ? 'blur(35px)' : undefined,
             }}
           >
-            <b>{config.website.title ?? 'Zipline'}</b>
-          </Title>
-        </div>
+            <div style={{ width: '100%', overflowWrap: 'break-word' }}>
+              <Title
+                order={1}
+                ta='center'
+                className={styles.title}
+                style={{
+                  whiteSpace: 'normal',
+                  fontSize: `clamp(20px, ${Math.max(50 - (config.website.title?.length ?? 0) / 2, 20)}px, 50px)`,
+                }}
+              >
+                <b>{config.website.title ?? 'Zipline'}</b>
+              </Title>
+            </div>
 
-        {invite && (
-          <Text ta='center' size='sm' c='dimmed'>
-            You’ve been invited to join <b>{config?.website?.title ?? 'Zipline'}</b>
-            {invite.inviter && (
-              <>
-                {' '}
-                by <b>{invite.inviter.username}</b>
-              </>
-            )}
-          </Text>
-        )}
-
-        <form onSubmit={form.onSubmit(onSubmit)}>
-          <Stack my='sm'>
-            <TextInput
-              size='md'
-              placeholder='Enter your username...'
-              autoComplete='username'
-              styles={{
-                input: {
-                  backgroundColor: config.website.loginBackground ? 'transparent' : undefined,
-                },
-              }}
-              {...form.getInputProps('username', { withError: true })}
-            />
-
-            <PasswordInput
-              size='md'
-              placeholder='Enter your password...'
-              autoComplete='new-password'
-              styles={{
-                input: {
-                  backgroundColor: config.website.loginBackground ? 'transparent' : undefined,
-                },
-              }}
-              {...form.getInputProps('password')}
-            />
-
-            {config.website.tos && (
-              <Checkbox
-                label={
-                  <Text size='xs'>
-                    I agree to the{' '}
-                    <Link to='/auth/tos' target='_blank'>
-                      Terms of Service
-                    </Link>
-                  </Text>
-                }
-                required
-                {...form.getInputProps('tos', { type: 'checkbox' })}
-              />
+            {invite && (
+              <Text ta='center' size='sm' c='dimmed'>
+                You’ve been invited to join <b>{config?.website?.title ?? 'Zipline'}</b>
+                {invite.inviter && (
+                  <>
+                    {' '}
+                    by <b>{invite.inviter.username}</b>
+                  </>
+                )}
+              </Text>
             )}
 
-            <Button
-              size='md'
-              fullWidth
-              type='submit'
-              variant={config.website.loginBackground ? 'outline' : 'filled'}
-              leftSection={<IconUserPlus size='1rem' />}
-            >
-              Register
-            </Button>
-          </Stack>
-        </form>
+            <form onSubmit={form.onSubmit(onSubmit)}>
+              <Stack my='sm'>
+                <TextInput
+                  size='md'
+                  placeholder='Enter your username...'
+                  autoComplete='username'
+                  styles={{
+                    input: {
+                      backgroundColor: config.website.loginBackground ? 'transparent' : undefined,
+                    },
+                  }}
+                  {...form.getInputProps('username', { withError: true })}
+                />
 
-        <Stack my='xs'>
-          <Divider label='or' />
-          <Button
-            component={Link}
-            to='/auth/login'
-            size='md'
-            fullWidth
-            variant='outline'
-            leftSection={<IconLogin size='1rem' />}
-          >
-            Login
-          </Button>
-        </Stack>
-      </Paper>
-    </Center>
+                <PasswordInput
+                  size='md'
+                  placeholder='Enter your password...'
+                  autoComplete='new-password'
+                  styles={{
+                    input: {
+                      backgroundColor: config.website.loginBackground ? 'transparent' : undefined,
+                    },
+                  }}
+                  {...form.getInputProps('password')}
+                />
+
+                {config.website.tos && (
+                  <Checkbox
+                    label={
+                      <Text size='xs'>
+                        I agree to the{' '}
+                        <Link to='/auth/tos' target='_blank'>
+                          Terms of Service
+                        </Link>
+                      </Text>
+                    }
+                    required
+                    {...form.getInputProps('tos', { type: 'checkbox' })}
+                  />
+                )}
+
+                <Button
+                  size='md'
+                  fullWidth
+                  type='submit'
+                  variant={config.website.loginBackground ? 'outline' : 'filled'}
+                  leftSection={<IconUserPlus size='1rem' />}
+                >
+                  Register
+                </Button>
+              </Stack>
+            </form>
+
+            <Stack my='xs'>
+              <Divider label='or' />
+              <Button
+                component={Link}
+                to='/auth/login'
+                size='md'
+                fullWidth
+                variant='outline'
+                leftSection={<IconLogin size='1rem' />}
+              >
+                Login
+              </Button>
+            </Stack>
+
+            {/* Account Link
+            <Link to='/auth/login' className={styles.accountLink}>
+              Possiedi già un account?
+            </Link> */}
+          </Paper>
+        </Center>
+      </div>
+    </>
   );
 }
 
