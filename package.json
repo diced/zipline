@@ -46,6 +46,7 @@
     "@mantine/hooks": "^8.3.9",
     "@mantine/modals": "^8.3.9",
     "@mantine/notifications": "^8.3.9",
+    "@marsidev/react-turnstile": "^1.4.1",
     "@prisma/adapter-pg": "6.13.0",
     "@prisma/client": "6.13.0",
     "@prisma/engines": "6.13.0",
