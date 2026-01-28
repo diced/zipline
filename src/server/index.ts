@@ -219,12 +219,11 @@ async function main() {
   Promise.all(routesOptions.map((route) => server.register(route)));
 
   if (MODE === 'production') {
+    server.serveIndex('/');
     server.serveIndex('/dashboard*');
     server.serveIndex('/auth*');
     server.serveIndex('/folder*');
   }
-
-  server.get('/', (_, res) => res.redirect('/dashboard', 301));
 
   server.setNotFoundHandler((req, res) => {
     if (MODE === 'development' && server.vite)
