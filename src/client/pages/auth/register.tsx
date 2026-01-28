@@ -21,6 +21,7 @@ import { IconLogin, IconPlus, IconUserPlus, IconX } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import useSWR, { mutate } from 'swr';
+import { Turnstile } from '@marsidev/react-turnstile';
 import GenericError from '../../error/GenericError';
 import styles from './auth.module.css';
 
@@ -73,6 +74,8 @@ export function Component() {
     }),
   });
 
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+
   useEffect(() => {
     (async () => {
       const res = await fetch('/api/user');
@@ -100,10 +103,22 @@ export function Component() {
       return;
     }
 
+    // Check Turnstile if enabled
+    if (config?.turnstile.enabled && !turnstileToken) {
+      notifications.show({
+        title: 'CAPTCHA required',
+        message: 'Please complete the CAPTCHA verification',
+        color: 'red',
+        icon: <IconX size='1rem' />,
+      });
+      return;
+    }
+
     const { data, error } = await fetchApi('/api/auth/register', 'POST', {
       username,
       password,
       code,
+      turnstileToken: turnstileToken ?? undefined,
     });
 
     if (error) {
@@ -259,6 +274,18 @@ export function Component() {
                     }
                     required
                     {...form.getInputProps('tos', { type: 'checkbox' })}
+                  />
+                )}
+
+                {config?.turnstile.enabled && (
+                  <Turnstile
+                    siteKey={config.turnstile.siteKey!}
+                    onSuccess={(token: string) => setTurnstileToken(token)}
+                    onError={() => setTurnstileToken(null)}
+                    onExpire={() => setTurnstileToken(null)}
+                    options={{
+                      theme: 'dark',
+                    }}
                   />
                 )}
 

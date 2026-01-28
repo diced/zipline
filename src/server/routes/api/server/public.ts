@@ -32,6 +32,10 @@ export type ApiServerPublicResponse = {
   mfa: {
     passkeys: boolean;
   };
+  turnstile: {
+    enabled: boolean;
+    siteKey?: string;
+  };
   tos?: string | null;
   files: {
     maxFileSize: string;
@@ -71,6 +75,10 @@ export default typedPlugin(
             config.mfa.passkeys.rpID,
             config.mfa.passkeys.origin,
           ),
+        },
+        turnstile: {
+          enabled: config.turnstile.enabled,
+          siteKey: config.turnstile.siteKey,
         },
         files: {
           maxFileSize: config.files.maxFileSize,

@@ -19,6 +19,11 @@ declare global {
 const reloadSettings = async () => {
   config = global.__config__ = validateConfigObject((await read()) as any);
 
+  // Enable Turnstile if secret key is defined
+  if (config.turnstile.secretKey) {
+    config.turnstile.enabled = true;
+  }
+
   if (!global.__cachedConfigValues__) {
     global.__cachedConfigValues__ = {};
 

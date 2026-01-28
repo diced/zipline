@@ -4,10 +4,12 @@ import { User, userSelect } from '@/lib/db/models/user';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { verifyTotpCode } from '@/lib/totp';
+import { verifyTurnstile } from '@/lib/turnstile';
 import { zStringTrimmed } from '@/lib/validation';
 import { getSession, saveSession } from '@/server/session';
 import typedPlugin from '@/server/typedPlugin';
 import z from 'zod';
+import { config } from '@/lib/config';
 
 export type ApiLoginResponse = {
   user?: User;
@@ -27,6 +29,7 @@ export default typedPlugin(
             username: zStringTrimmed,
             password: zStringTrimmed,
             code: z.string().min(1).optional(),
+            turnstileToken: z.string().optional(),
           }),
         },
         ...secondlyRatelimit(2),
@@ -37,7 +40,19 @@ export default typedPlugin(
         session.id = null;
         session.sessionId = null;
 
-        const { username, password, code } = req.body;
+        const { username, password, code, turnstileToken } = req.body;
+
+        // Verify Turnstile CAPTCHA (skip in dev mode)
+        if (config.turnstile.enabled && process.env.NODE_ENV !== 'development') {
+          if (!turnstileToken) {
+            return res.badRequest('CAPTCHA verification required');
+          }
+
+          const isValid = await verifyTurnstile(turnstileToken, config.turnstile.secretKey!);
+          if (!isValid) {
+            return res.badRequest('CAPTCHA verification failed');
+          }
+        }
 
         const user = await prisma.user.findUnique({
           where: {

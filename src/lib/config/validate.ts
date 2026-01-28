@@ -262,6 +262,11 @@ export const schema = z.object({
         .default(null),
     }),
   }),
+  turnstile: z.object({
+    enabled: z.boolean().default(false),
+    siteKey: z.string().optional(),
+    secretKey: z.string().optional(),
+  }),
   oauth: z.object({
     bypassLocalLogin: z.boolean().default(false),
     loginOnly: z.boolean().default(false),

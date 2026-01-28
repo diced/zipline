@@ -103,6 +103,11 @@ export const rawConfig: any = {
       origin: undefined,
     },
   },
+  turnstile: {
+    enabled: undefined,
+    siteKey: undefined,
+    secretKey: undefined,
+  },
   oauth: {
     bypassLocalLogin: undefined,
     loginOnly: undefined,

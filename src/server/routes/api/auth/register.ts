@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db';
 import { User, userSelect } from '@/lib/db/models/user';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
+import { verifyTurnstile } from '@/lib/turnstile';
 import { getSession, saveSession } from '@/server/session';
 import typedPlugin from '@/server/typedPlugin';
 import z from 'zod';
@@ -24,6 +25,7 @@ export default typedPlugin(
             username: z.string().min(1),
             password: z.string().min(1),
             code: z.string().min(1).optional(),
+            turnstileToken: z.string().optional(),
           }),
         },
         ...secondlyRatelimit(5),
@@ -31,7 +33,19 @@ export default typedPlugin(
       async (req, res) => {
         const session = await getSession(req, res);
 
-        const { username, password, code } = req.body;
+        const { username, password, code, turnstileToken } = req.body;
+
+        // Verify Turnstile CAPTCHA (skip in dev mode)
+        if (config.turnstile.enabled && process.env.NODE_ENV !== 'development') {
+          if (!turnstileToken) {
+            return res.badRequest('CAPTCHA verification required');
+          }
+
+          const isValid = await verifyTurnstile(turnstileToken, config.turnstile.secretKey!);
+          if (!isValid) {
+            return res.badRequest('CAPTCHA verification failed');
+          }
+        }
 
         if (code && !config.invites.enabled) return res.badRequest("Invites aren't enabled");
         if (!code && !config.features.userRegistration)

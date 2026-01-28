@@ -136,6 +136,9 @@ export const ENVS = [
   env('mfa.passkeys.rpID', 'MFA_PASSKEYS_RP_ID', 'string', true),
   env('mfa.passkeys.origin', 'MFA_PASSKEYS_ORIGIN', 'string', true),
 
+  env('turnstile.siteKey', 'CLOUDFLARE_TURNSTILE_SITE_KEY', 'string', true),
+  env('turnstile.secretKey', 'CLOUDFLARE_TURNSTILE_SECRET', 'string', true),
+
   env('ratelimit.enabled', 'RATELIMIT_ENABLED', 'boolean', true),
   env('ratelimit.max', 'RATELIMIT_MAX', 'number', true),
   env('ratelimit.window', 'RATELIMIT_WINDOW', 'number', true),
