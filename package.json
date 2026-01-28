@@ -14,6 +14,7 @@
     "validate": "tsx scripts/validate.ts",
     "db:prototype": "prisma db push --skip-generate && prisma generate --no-hints",
     "db:migrate": "prisma migrate dev --create-only",
+    "docker:compose:dev2": "docker compose --env-file .env --file docker-compose.dev2.yml up -d",
     "docker:engine": "colima start --mount $PWD/themes:w --mount $PWD/uploads:w --mount $PWD/public:w",
     "docker:compose:dev:build": "docker-compose --file docker-compose.dev.yml build --build-arg ZIPLINE_GIT_SHA=$(git rev-parse HEAD)",
     "docker:compose:dev:up": "docker-compose --file docker-compose.dev.yml up -d",
