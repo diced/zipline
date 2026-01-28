@@ -6,6 +6,7 @@ import { ApiLogoutResponse } from '@/server/routes/api/auth/logout';
 import { ApiAuthOauthResponse } from '@/server/routes/api/auth/oauth';
 import { ApiAuthRegisterResponse } from '@/server/routes/api/auth/register';
 import { ApiAuthWebauthnOptionsResponse, ApiAuthWebauthnResponse } from '@/server/routes/api/auth/webauthn';
+import { ApiAdminStatsResponse } from '@/server/routes/api/admin/stats';
 import { ApiHealthcheckResponse } from '@/server/routes/api/healthcheck';
 import { ApiServerClearTempResponse } from '@/server/routes/api/server/clear_temp';
 import { ApiServerClearZerosResponse } from '@/server/routes/api/server/clear_zeros';
@@ -94,4 +95,5 @@ export type Response = {
   '/api/version': ApiVersionResponse;
   '/api/stats': ApiStatsResponse;
   '/api/system/disk-usage': ApiSystemDiskUsageResponse;
+  '/api/admin/stats': ApiAdminStatsResponse;
 };
