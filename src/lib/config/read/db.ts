@@ -101,6 +101,9 @@ export const DATABASE_TO_PROP = {
   mfaPasskeysRpID: 'mfa.passkeys.rpID',
   mfaPasskeysOrigin: 'mfa.passkeys.origin',
 
+  turnstileSiteKey: 'turnstile.siteKey',
+  turnstileSecretKey: 'turnstile.secretKey',
+
   ratelimitEnabled: 'ratelimit.enabled',
   ratelimitMax: 'ratelimit.max',
   ratelimitWindow: 'ratelimit.window',
