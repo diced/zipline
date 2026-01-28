@@ -17,6 +17,7 @@ import { ApiServerRequerySizeResponse } from '@/server/routes/api/server/requery
 import { ApiServerSettingsResponse, ApiServerSettingsWebResponse } from '@/server/routes/api/server/settings';
 import { ApiServerThemesResponse } from '@/server/routes/api/server/themes';
 import { ApiServerThumbnailsResponse } from '@/server/routes/api/server/thumbnails';
+import { ApiSystemDiskUsageResponse } from '@/server/routes/api/system/disk_usage';
 import { ApiSetupResponse } from '@/server/routes/api/setup';
 import { ApiStatsResponse } from '@/server/routes/api/stats';
 import { ApiUploadResponse } from '@/server/routes/api/upload';
@@ -92,4 +93,5 @@ export type Response = {
   '/api/upload/partial': ApiUploadPartialResponse;
   '/api/version': ApiVersionResponse;
   '/api/stats': ApiStatsResponse;
+  '/api/system/disk-usage': ApiSystemDiskUsageResponse;
 };
