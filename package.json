@@ -1,5 +1,5 @@
 {
-  "name": "zipline",
+  "name": "Flux",
   "private": true,
   "license": "MIT",
   "version": "4.4.1",
@@ -19,7 +19,10 @@
     "docker:compose:dev:build": "docker-compose --file docker-compose.dev.yml build --build-arg ZIPLINE_GIT_SHA=$(git rev-parse HEAD)",
     "docker:compose:dev:up": "docker-compose --file docker-compose.dev.yml up -d",
     "docker:compose:dev:down": "docker-compose --file docker-compose.dev.yml down",
-    "docker:compose:dev:logs": "docker-compose --file docker-compose.dev.yml logs -f"
+    "docker:compose:dev:logs": "docker-compose --file docker-compose.dev.yml logs -f",
+    "db:reset": "docker compose --env-file .env down -v && docker compose --env-file .env up -d && npx prisma migrate deploy",
+    "db:reset:dev": "docker compose --env-file .env --file docker-compose.dev.yml down -v && docker compose --env-file .env --file docker-compose.dev.yml up -d && npx prisma migrate deploy",
+    "db:reset:dev2": "docker compose --env-file .env --file docker-compose.dev2.yml down -v && docker compose --env-file .env --file docker-compose.dev2.yml up -d && npx prisma migrate deploy"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "3.726.1",
@@ -52,6 +55,7 @@
     "@simplewebauthn/server": "^13.2.2",
     "@smithy/node-http-handler": "^4.1.1",
     "@tabler/icons-react": "^3.35.0",
+    "@types/three": "^0.182.0",
     "archiver": "^7.0.1",
     "argon2": "^0.44.0",
     "asciinema-player": "^3.12.1",
@@ -86,6 +90,7 @@
     "remark-gfm": "^4.0.1",
     "sharp": "^0.34.5",
     "swr": "^2.3.7",
+    "three": "^0.182.0",
     "typescript-eslint": "^8.48.1",
     "vite": "^7.2.7",
     "zod": "^4.1.13",
