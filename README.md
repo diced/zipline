@@ -1,8 +1,8 @@
-# Flux
+# vxlt.space
 
 **Modern file sharing and management platform**
 
-Flux is a personal file sharing solution forked from [Zipline](https://github.com/diced/zipline), enhanced with custom features and optimizations tailored for private deployments.
+vxlt is a personal file sharing solution forked from [Zipline](https://github.com/diced/zipline), enhanced with custom features and optimizations tailored for private deployments.
 
 ---
 
