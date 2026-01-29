@@ -2,7 +2,7 @@ import { config } from '@/lib/config';
 import { join } from 'path';
 import typedPlugin from '../typedPlugin';
 
-export const FAVICON_SIZES = [16, 32, 64, 128, 512];
+export const FAVICON_SIZES = [16, 32, 64, 128, 512, 1024];
 
 export const PATH = '/favicon.ico';
 export default typedPlugin(
