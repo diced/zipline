@@ -10,7 +10,7 @@ import {
   IconBolt,
   IconArrowUpRight,
   IconBrandGithub,
-  IconBrandDiscord,
+  // IconBrandDiscord,
   IconBrandX,
 } from '@tabler/icons-react';
 import styles from './home.module.css';
@@ -121,23 +121,23 @@ export function Component() {
         <div className={styles.footerContent}>
           <div className={styles.footerLinks}>
             <Anchor
-              href='https://github.com/diced/zipline'
+              href='https://github.com/devmirkoo/Flux'
               target='_blank'
               className={styles.footerLink}
               aria-label='GitHub'
             >
               <IconBrandGithub />
             </Anchor>
-            <Anchor
+            {/* <Anchor
               href='https://discord.gg/zipline'
               target='_blank'
               className={styles.footerLink}
               aria-label='Discord'
             >
               <IconBrandDiscord />
-            </Anchor>
+            </Anchor> */}
             <Anchor
-              href='https://x.com/zipline'
+              href='https://x.com/devmirkoo'
               target='_blank'
               className={styles.footerLink}
               aria-label='X (Twitter)'
@@ -145,7 +145,12 @@ export function Component() {
               <IconBrandX />
             </Anchor>
           </div>
-          <p className={styles.footerCopyright}>© 2026 Flux. All rights reserved.</p>
+          <Text size='sm' c='dimmed' className={styles.footerCredit}>
+            Made with ❤️ by{' '}
+            <Anchor href='https://zipline.diced.sh' target='_blank' inherit>
+              Zipline
+            </Anchor>
+          </Text>
         </div>
       </footer>
     </div>
