@@ -56,9 +56,9 @@ export default typedPlugin(
             quota: z
               .object({
                 filesType: z.enum(['BY_BYTES', 'BY_FILES', 'NONE']).optional(),
-                maxFiles: z.number().min(1).optional(),
-                maxBytes: z.string().min(1).optional(),
-                maxUrls: z.number().min(1).optional(),
+                maxFiles: z.number().min(1).optional().nullable(),
+                maxBytes: z.string().min(1).optional().nullable(),
+                maxUrls: z.number().min(1).optional().nullable(),
               })
               .optional(),
           }),
