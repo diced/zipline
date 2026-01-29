@@ -146,7 +146,7 @@ export function Component() {
             </Anchor>
           </div>
           <Text size='sm' c='dimmed' className={styles.footerCredit}>
-            Made with ❤️ by{' '}
+            Made with ❤️ with{' '}
             <Anchor href='https://zipline.diced.sh' target='_blank' inherit>
               Zipline
             </Anchor>
