@@ -293,8 +293,8 @@ export default function Login() {
       >
         <div className={styles.modalBody}>
           <Text size='sm' mb='md'>
-            Flux è attualmente disponibile <strong>solo su invito</strong>. Per registrarti al servizio, devi
-            ricevere un link di invito personalizzato da parte di un amministratore.
+            vxlt.space è attualmente disponibile <strong>solo su invito</strong>. Per registrarti al servizio,
+            devi ricevere un link di invito personalizzato da parte di un amministratore.
           </Text>
 
           <Text size='sm' mb='sm'>

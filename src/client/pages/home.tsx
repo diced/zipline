@@ -121,7 +121,7 @@ export function Component() {
         <div className={styles.footerContent}>
           <div className={styles.footerLinks}>
             <Anchor
-              href='https://github.com/devmirkoo/Flux'
+              href='https://github.com/devmirkoo/vxlt.space'
               target='_blank'
               className={styles.footerLink}
               aria-label='GitHub'

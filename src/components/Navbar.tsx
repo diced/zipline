@@ -22,7 +22,7 @@ const defaultNavigationLinks: NavLink[] = [
 ];
 
 export function Navbar({
-  brandName = 'Flux',
+  brandName = 'vxlt.space',
   navigationLinks = defaultNavigationLinks,
   isLoggedIn = false,
 }: NavbarProps) {
