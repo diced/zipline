@@ -56,7 +56,7 @@ export default function ViewFileId() {
   const [passwordError, setPasswordError] = useState<string>('');
   const [detailsOpen, setDetailsOpen] = useState<boolean>(false);
 
-  useTitle(file.name ?? 'View File');
+  useTitle(file.originalName ?? file.name ?? 'View File');
 
   return password && !pw ? (
     <Modal onClose={() => {}} opened={true} withCloseButton={false} centered title='Password required'>
@@ -101,7 +101,7 @@ export default function ViewFileId() {
     <>
       <Paper withBorder style={{ borderTop: 0, borderLeft: 0, borderRight: 0 }}>
         <Group justify='space-between' py={5} px='xs'>
-          <Text c='dimmed'>{file.name}</Text>
+          <Text c='dimmed'>{file.originalName ?? file.name}</Text>
 
           <Group>
             <ActionIcon size='md' variant='outline' onClick={() => setDetailsOpen((o) => !o)}>
@@ -167,7 +167,7 @@ export default function ViewFileId() {
           <Group justify='space-between' mb='sm'>
             <Group>
               <Text size='lg' fw={700} display='flex'>
-                {file.name}{' '}
+                {file.originalName ?? file.name}{' '}
               </Text>
               {user?.view!.showTags && (
                 <Group gap={4}>
