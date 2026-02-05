@@ -3,10 +3,10 @@ import { Response } from '@/lib/api/response';
 import { Folder } from '@/lib/db/models/folder';
 import { fetchApi } from '@/lib/fetchApi';
 import { useViewStore } from '@/lib/store/view';
-import { ActionIcon, Button, Group, Modal, Stack, Switch, TextInput, Title, Tooltip } from '@mantine/core';
+import { Button, Group, Modal, Stack, Switch, TextInput, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
-import { IconFolderPlus, IconPlus } from '@tabler/icons-react';
+import { IconFolderPlus } from '@tabler/icons-react';
 import { useState } from 'react';
 import { mutate } from 'swr';
 import FolderGridView from './views/FolderGridView';
@@ -71,11 +71,14 @@ export default function DashboardFolders() {
       <Group>
         <Title>Folders</Title>
 
-        <Tooltip label='Create a new folder'>
-          <ActionIcon variant='outline' onClick={() => setOpen(true)}>
-            <IconPlus size='1rem' />
-          </ActionIcon>
-        </Tooltip>
+        <Button
+          size='compact-sm'
+          variant='outline'
+          leftSection={<IconFolderPlus size='1rem' />}
+          onClick={() => setOpen(true)}
+        >
+          Create
+        </Button>
 
         <GridTableSwitcher type='folders' />
       </Group>

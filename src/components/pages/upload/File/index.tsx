@@ -3,7 +3,6 @@ import { bytes } from '@/lib/bytes';
 import { humanizeDuration } from '@/lib/relativeTime';
 import { useUploadOptionsStore } from '@/lib/store/uploadOptions';
 import {
-  ActionIcon,
   Button,
   Collapse,
   Grid,
@@ -13,7 +12,6 @@ import {
   Progress,
   Text,
   Title,
-  Tooltip,
   rem,
   useMantineTheme,
 } from '@mantine/core';
@@ -134,11 +132,15 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
         <Title order={1}>{title ?? 'Upload files'}</Title>
 
         {!folder && (
-          <Tooltip label='View your files'>
-            <ActionIcon component={Link} to='/dashboard/files' variant='outline' radius='sm'>
-              <IconFiles size={18} />
-            </ActionIcon>
-          </Tooltip>
+          <Button
+            variant='outline'
+            size='compact-sm'
+            component={Link}
+            to='/dashboard/files'
+            leftSection={<IconFiles size='1rem' />}
+          >
+            Go to files
+          </Button>
         )}
       </Group>
 

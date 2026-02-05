@@ -1,17 +1,6 @@
 import Render from '@/components/render/Render';
 import { useUploadOptionsStore } from '@/lib/store/uploadOptions';
-import {
-  ActionIcon,
-  Button,
-  Center,
-  Group,
-  Select,
-  Tabs,
-  Text,
-  Textarea,
-  Title,
-  Tooltip,
-} from '@mantine/core';
+import { Button, Center, Group, Select, Tabs, Text, Textarea, Title } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { IconCursorText, IconEyeFilled, IconFiles, IconUpload } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
@@ -82,11 +71,15 @@ export default function UploadText() {
       <Group gap='sm'>
         <Title order={1}>Upload text</Title>
 
-        <Tooltip label='View your files'>
-          <ActionIcon component={Link} to='/dashboard/files' variant='outline' radius='sm'>
-            <IconFiles size={18} />
-          </ActionIcon>
-        </Tooltip>
+        <Button
+          variant='outline'
+          size='compact-sm'
+          component={Link}
+          to='/dashboard/files'
+          leftSection={<IconFiles size='1rem' />}
+        >
+          Go to files
+        </Button>
       </Group>
 
       <Tabs defaultValue='textarea' variant='pills' my='sm'>

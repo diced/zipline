@@ -1,10 +1,20 @@
+import { useConfig } from '@/components/ConfigProvider';
 import Stat from '@/components/Stat';
 import type { Response } from '@/lib/api/response';
 import { bytes } from '@/lib/bytes';
 import useLogin from '@/lib/hooks/useLogin';
-import { Paper, ScrollArea, SimpleGrid, Skeleton, Table, Text, Title } from '@mantine/core';
-import { IconDeviceSdCard, IconEyeFilled, IconFiles, IconLink, IconStarFilled } from '@tabler/icons-react';
+import { isAdministrator } from '@/lib/role';
+import { Button, Group, Paper, ScrollArea, SimpleGrid, Skeleton, Table, Text, Title } from '@mantine/core';
+import {
+  IconDeviceSdCard,
+  IconEyeFilled,
+  IconFiles,
+  IconGraphFilled,
+  IconLink,
+  IconStarFilled,
+} from '@tabler/icons-react';
 import { lazy, Suspense } from 'react';
+import { Link } from 'react-router-dom';
 import useSWR from 'swr';
 
 const DashboardFile = lazy(() => import('@/components/file/DashboardFile'));
@@ -13,6 +23,9 @@ export default function DashboardHome() {
   const { user } = useLogin();
   const { data: recent, isLoading: recentLoading } = useSWR<Response['/api/user/recent']>('/api/user/recent');
   const { data: stats, isLoading: statsLoading } = useSWR<Response['/api/user/stats']>('/api/user/stats');
+
+  const config = useConfig();
+
   return (
     <>
       <Title>
@@ -47,9 +60,18 @@ export default function DashboardHome() {
         </Text>
       ) : null}
 
-      <Title order={2} mt='md' mb='xs'>
-        Recent files
-      </Title>
+      <Group mt='md' mb='xs' style={{ alignItems: 'center' }}>
+        <Title order={2}>Recent files</Title>
+        <Button
+          variant='outline'
+          size='compact-xs'
+          component={Link}
+          to='/dashboard/files'
+          leftSection={<IconFiles size='1rem' />}
+        >
+          View all files
+        </Button>
+      </Group>
 
       {recentLoading ? (
         <SimpleGrid cols={{ base: 1, md: 2, lg: 3 }} spacing={{ base: 'sm', md: 'md' }}>
@@ -71,9 +93,21 @@ export default function DashboardHome() {
         </Text>
       )}
 
-      <Title order={2} mt='md'>
-        Stats
-      </Title>
+      <Group mt='md' style={{ alignItems: 'center' }}>
+        <Title order={2}>Stats</Title>
+        {(!config.features?.metrics?.adminOnly || isAdministrator(user?.role)) && (
+          <Button
+            variant='outline'
+            size='compact-xs'
+            component={Link}
+            to='/dashboard/metrics'
+            leftSection={<IconGraphFilled size='1rem' />}
+          >
+            View instance metrics
+          </Button>
+        )}
+      </Group>
+
       <Text size='sm' c='dimmed' mb='xs'>
         These statistics are based on your uploads only.
       </Text>

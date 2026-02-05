@@ -154,11 +154,14 @@ export default function DashboardUsers() {
       <Group>
         <Title>Users</Title>
 
-        <Tooltip label='Create a new user'>
-          <ActionIcon variant='outline' onClick={() => setOpen(true)}>
-            <IconUserPlus size='1rem' />
-          </ActionIcon>
-        </Tooltip>
+        <Button
+          variant='outline'
+          size='compact-sm'
+          leftSection={<IconUserPlus size='1rem' />}
+          onClick={() => setOpen(true)}
+        >
+          Create
+        </Button>
 
         <GridTableSwitcher type='users' />
       </Group>

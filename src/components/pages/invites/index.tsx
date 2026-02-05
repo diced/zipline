@@ -3,7 +3,7 @@ import { Response } from '@/lib/api/response';
 import { Invite } from '@/lib/db/models/invite';
 import { fetchApi } from '@/lib/fetchApi';
 import { useViewStore } from '@/lib/store/view';
-import { ActionIcon, Button, Group, Modal, NumberInput, Select, Stack, Title, Tooltip } from '@mantine/core';
+import { Button, Group, Modal, NumberInput, Select, Stack, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { IconPlus, IconTagOff } from '@tabler/icons-react';
@@ -112,11 +112,14 @@ export default function DashboardInvites() {
       <Group>
         <Title>Invites</Title>
 
-        <Tooltip label='Create a new invite'>
-          <ActionIcon variant='outline' onClick={() => setOpen(true)}>
-            <IconPlus size='1rem' />
-          </ActionIcon>
-        </Tooltip>
+        <Button
+          variant='outline'
+          size='compact-sm'
+          leftSection={<IconPlus size='1rem' />}
+          onClick={() => setOpen(true)}
+        >
+          Create
+        </Button>
 
         <GridTableSwitcher type='invites' />
       </Group>

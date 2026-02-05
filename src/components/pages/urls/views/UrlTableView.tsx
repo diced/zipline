@@ -164,11 +164,14 @@ export default function UrlTableView() {
                 />
               ),
               filtering: searchField === 'code' && searchQuery.code.trim() !== '',
-              render: (url) => (
-                <Anchor href={formatRootUrl(config.urls.route, url.code)} target='_blank'>
-                  {url.code}
-                </Anchor>
-              ),
+              render: (url) =>
+                url.enabled ? (
+                  <Anchor href={formatRootUrl(config.urls.route, url.code)} target='_blank'>
+                    {url.code}
+                  </Anchor>
+                ) : (
+                  url.code
+                ),
             },
             {
               accessor: 'vanity',
@@ -184,9 +187,13 @@ export default function UrlTableView() {
               filtering: searchField === 'vanity' && searchQuery.vanity.trim() !== '',
               render: (url) =>
                 url.vanity ? (
-                  <Anchor href={formatRootUrl(config.urls.route, url.vanity)} target='_blank'>
-                    {url.vanity}
-                  </Anchor>
+                  url.enabled ? (
+                    <Anchor href={formatRootUrl(config.urls.route, url.vanity)} target='_blank'>
+                      {url.vanity}
+                    </Anchor>
+                  ) : (
+                    url.vanity
+                  )
                 ) : (
                   ''
                 ),
