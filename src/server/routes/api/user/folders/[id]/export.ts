@@ -17,7 +17,6 @@ type FolderWithFilesAndChildren = {
   children: FolderWithFilesAndChildren[];
 };
 
-// Recursively fetch folder with all descendants
 async function getFolderTree(folderId: string, userId: string): Promise<FolderWithFilesAndChildren | null> {
   const folder = await prisma.folder.findUnique({
     where: { id: folderId, userId },
@@ -45,7 +44,6 @@ async function getFolderTree(folderId: string, userId: string): Promise<FolderWi
   };
 }
 
-// Recursively add files to zip with proper paths
 async function addFolderToZip(
   zip: Archiver,
   folder: FolderWithFilesAndChildren,
@@ -91,7 +89,6 @@ export default typedPlugin(
         if (!folder) return res.notFound('Folder not found');
         if (req.user.id !== folder.userId) return res.forbidden('You do not own this folder');
 
-        // Get full folder tree with all descendants
         const folderTree = await getFolderTree(id, req.user.id);
         if (!folderTree) return res.notFound('Folder not found');
 

@@ -1,5 +1,4 @@
 import { type Response } from '@/lib/api/response';
-import { useTitle } from '@/lib/hooks/useTitle';
 import { Folder } from '@/lib/db/models/folder';
 import {
   ActionIcon,
@@ -61,18 +60,15 @@ export function Component() {
   const { folder } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
 
-  // Build breadcrumb from parent chain
   const buildBreadcrumbs = () => {
     const items: { id: string | null; name: string; public: boolean }[] = [];
 
-    // Walk up parent chain (only public parents)
     let current = folder.parent as Partial<Folder> | undefined;
     while (current && current.public) {
       items.unshift({ id: current.id!, name: current.name!, public: true });
       current = current.parent as Partial<Folder> | undefined;
     }
 
-    // Add current folder
     items.push({ id: folder.id!, name: folder.name!, public: true });
 
     return items;

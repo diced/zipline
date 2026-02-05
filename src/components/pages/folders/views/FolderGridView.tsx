@@ -5,12 +5,13 @@ import { IconFolder } from '@tabler/icons-react';
 import useSWR from 'swr';
 import FolderCard from '../FolderCard';
 
-interface FolderGridViewProps {
+export default function FolderGridView({
+  currentFolderId,
+  onNavigate,
+}: {
   currentFolderId: string | null;
   onNavigate: (folderId: string | null) => void;
-}
-
-export default function FolderGridView({ currentFolderId, onNavigate }: FolderGridViewProps) {
+}) {
   const queryParam = currentFolderId ? `?parentId=${currentFolderId}` : '?root=true';
   const { data: folders, isLoading } = useSWR<Extract<Response['/api/user/folders'], Folder[]>>(
     `/api/user/folders${queryParam}`,

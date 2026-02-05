@@ -19,7 +19,8 @@ import {
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { IconFolderPlus, IconHome, IconPlus } from '@tabler/icons-react';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { mutate } from 'swr';
 import useSWR from 'swr';
 import FolderGridView from './views/FolderGridView';
@@ -27,11 +28,19 @@ import FolderTableView from './views/FolderTableView';
 
 export default function DashboardFolders() {
   const view = useViewStore((state) => state.folders);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
-  const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
 
-  // Fetch current folder details for breadcrumb
+  const folderPath = useMemo(() => {
+    const pathname = location.pathname.replace('/dashboard/folders', '');
+    if (!pathname || pathname === '/') return [];
+    return pathname.split('/').filter(Boolean);
+  }, [location.pathname]);
+
+  const currentFolderId = folderPath.length > 0 ? folderPath[folderPath.length - 1] : null;
+
   const { data: currentFolder } = useSWR<Folder>(
     currentFolderId ? `/api/user/folders/${currentFolderId}` : null,
   );
@@ -69,24 +78,39 @@ export default function DashboardFolders() {
     }
   };
 
-  const navigateToFolder = useCallback((folderId: string | null) => {
-    setCurrentFolderId(folderId);
-  }, []);
+  const navigateToFolder = useCallback(
+    (folderId: string | null) => {
+      if (folderId === null) {
+        navigate('/dashboard/folders');
+      } else {
+        const newPath = [...folderPath, folderId];
+        navigate(`/dashboard/folders/${newPath.join('/')}`);
+      }
+    },
+    [navigate, folderPath],
+  );
 
-  // Build breadcrumb path from current folder
   const buildBreadcrumbs = () => {
-    const items: { id: string | null; name: string }[] = [{ id: null, name: 'Root' }];
+    const items: { id: string | null; name: string; path: string }[] = [
+      { id: null, name: 'Root', path: '/dashboard/folders' },
+    ];
 
     if (currentFolder) {
-      // Walk up parent chain
       const path: Partial<Folder>[] = [];
       let folder: Partial<Folder> | undefined | null = currentFolder;
       while (folder) {
         path.unshift(folder);
         folder = folder.parent;
       }
+
+      const folderIds: string[] = [];
       for (const f of path) {
-        items.push({ id: f.id!, name: f.name! });
+        folderIds.push(f.id!);
+        items.push({
+          id: f.id!,
+          name: f.name!,
+          path: `/dashboard/folders/${folderIds.join('/')}`,
+        });
       }
     }
 
@@ -136,7 +160,7 @@ export default function DashboardFolders() {
           {breadcrumbs.map((item, index) => (
             <Anchor
               key={item.id ?? 'root'}
-              onClick={() => navigateToFolder(item.id)}
+              onClick={() => navigate(item.path)}
               style={{ cursor: 'pointer' }}
               fw={index === breadcrumbs.length - 1 ? 600 : 400}
             >

@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/db';
 import { fileSelect } from '@/lib/db/models/file';
-import { Folder, cleanFolder } from '@/lib/db/models/folder';
+import { buildParentChain, Folder, cleanFolder } from '@/lib/db/models/folder';
 import { User } from '@/lib/db/models/user';
 import { log } from '@/lib/logger';
 import { canInteract } from '@/lib/role';
@@ -22,27 +22,6 @@ function checkInteraction(current?: Partial<User> | null, owner?: Partial<User> 
 }
 
 const logger = log('api').c('user').c('folders').c('[id]');
-
-// Recursively fetch and build the full parent chain
-async function buildParentChain(
-  parentId: string | null,
-): Promise<{ id: string; name: string; parentId: string | null } | null> {
-  if (!parentId) return null;
-
-  const parent = await prisma.folder.findUnique({
-    where: { id: parentId },
-    select: { id: true, name: true, parentId: true },
-  });
-
-  if (!parent) return null;
-
-  const grandparent = await buildParentChain(parent.parentId);
-
-  return {
-    ...parent,
-    parent: grandparent,
-  } as { id: string; name: string; parentId: string | null };
-}
 
 const paramsSchema = z.object({
   id: z.string(),
@@ -100,7 +79,6 @@ export default typedPlugin(
       if (!folder) return res.notFound('Folder not found');
       if (!checkInteraction(req.user, folder.User)) return res.notFound('Folder not found');
 
-      // Build full parent chain for breadcrumbs
       if (folder.parentId) {
         (folder as any).parent = await buildParentChain(folder.parentId);
       }
@@ -193,15 +171,12 @@ export default typedPlugin(
         const { id: folderId } = req.params;
         const { isPublic, name, allowUploads, parentId } = req.body;
 
-        // Handle parentId change (moving folder)
         if (parentId !== undefined) {
-          // Can't make a folder its own parent
           if (parentId === folderId) {
             return res.badRequest('A folder cannot be its own parent');
           }
 
           if (parentId !== null) {
-            // Verify new parent exists and belongs to user
             const newParent = await prisma.folder.findUnique({
               where: { id: parentId },
               select: { id: true, userId: true, parentId: true },
@@ -271,6 +246,8 @@ export default typedPlugin(
           body: z.object({
             delete: z.enum(['file', 'folder']),
             id: z.string().min(1).optional(),
+            childrenAction: z.enum(['moveToRoot', 'moveToFolder', 'cascade']).optional(),
+            targetFolderId: z.string().optional(),
           }),
           params: paramsSchema,
         },
@@ -278,29 +255,79 @@ export default typedPlugin(
       },
       async (req, res) => {
         const { id: folderId } = req.params;
-        const { delete: del } = req.body;
+        const { delete: del, childrenAction, targetFolderId } = req.body;
 
         if (del === 'folder') {
-          const nFolder = await prisma.folder.delete({
-            where: {
-              id: folderId,
-            },
-            include: {
-              files: {
-                select: {
-                  ...fileSelect,
-                  password: true,
-                },
+          if (childrenAction === 'moveToFolder' && targetFolderId) {
+            const targetFolder = await prisma.folder.findUnique({
+              where: { id: targetFolderId },
+              select: { id: true, userId: true },
+            });
+            if (!targetFolder) return res.notFound('Target folder not found');
+            if (targetFolder.userId !== req.user.id)
+              return res.forbidden('Target folder does not belong to you');
+          }
+
+          if (childrenAction === 'moveToRoot') {
+            await prisma.folder.updateMany({
+              where: { parentId: folderId },
+              data: { parentId: null },
+            });
+            await prisma.file.updateMany({
+              where: { folderId: folderId },
+              data: { folderId: null },
+            });
+          } else if (childrenAction === 'moveToFolder' && targetFolderId) {
+            await prisma.folder.updateMany({
+              where: { parentId: folderId },
+              data: { parentId: targetFolderId },
+            });
+            await prisma.file.updateMany({
+              where: { folderId: folderId },
+              data: { folderId: targetFolderId },
+            });
+          } else if (childrenAction === 'cascade') {
+            const deleteRecursive = async (id: string) => {
+              const children = await prisma.folder.findMany({
+                where: { parentId: id },
+                select: { id: true },
+              });
+              for (const child of children) {
+                await deleteRecursive(child.id);
+              }
+              await prisma.folder.delete({ where: { id } });
+            };
+            await deleteRecursive(folderId);
+          }
+
+          if (!childrenAction || childrenAction !== 'cascade') {
+            const nFolder = await prisma.folder.delete({
+              where: {
+                id: folderId,
               },
-              User: true,
-            },
-          });
+              include: {
+                files: {
+                  select: {
+                    ...fileSelect,
+                    password: true,
+                  },
+                },
+                User: true,
+              },
+            });
 
-          logger.info('folder deleted', {
-            folder: nFolder.id,
-          });
+            logger.info('folder deleted', {
+              folder: nFolder.id,
+              childrenAction: childrenAction || 'default',
+            });
 
-          return res.send(cleanFolder(nFolder));
+            return res.send(cleanFolder(nFolder));
+          } else {
+            logger.info('folder cascade deleted', {
+              folder: folderId,
+            });
+            return res.send({ success: true });
+          }
         } else if (del === 'file') {
           const { id } = req.body;
           if (!id) return res.badRequest('File id is required');

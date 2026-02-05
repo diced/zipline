@@ -1,10 +1,12 @@
+import FolderComboboxOptions from '@/components/folders/FolderComboboxOptions';
 import RelativeDate from '@/components/RelativeDate';
 import { addMultipleToFolder, copyFile, deleteFile, downloadFile } from '@/components/file/actions';
 import { Response } from '@/lib/api/response';
 import { bytes } from '@/lib/bytes';
 import { type File } from '@/lib/db/models/file';
-import { Folder } from '@/lib/db/models/folder';
 import { Tag } from '@/lib/db/models/tag';
+import { buildFolderHierarchy } from '@/lib/folderHierarchy';
+import { useFolders } from '@/lib/hooks/useFolders';
 import { useQueryState } from '@/lib/hooks/useQueryState';
 import { useFileTableSettingsStore } from '@/lib/store/fileTableSettings';
 import { useSettingsStore } from '@/lib/store/settings';
@@ -194,52 +196,11 @@ export default function FileTable({
 
   const fields = useFileTableSettingsStore((state) => state.fields);
 
-  const { data: folders } = useSWR<Extract<Response['/api/user/folders'], Folder[]>>(
-    '/api/user/folders?noincl=true',
-  );
+  const { data: folders } = useFolders();
 
-  // Build folder options with hierarchy using depth-first traversal
   const folderOptions = useMemo(() => {
     if (!folders) return [];
-
-    // Group children by parent
-    const childrenMap = new Map<string | null, Folder[]>();
-    for (const folder of folders) {
-      const parentId = folder.parentId ?? null;
-      const siblings = childrenMap.get(parentId) || [];
-      siblings.push(folder);
-      childrenMap.set(parentId, siblings);
-    }
-
-    // Sort children alphabetically within each level
-    for (const children of childrenMap.values()) {
-      children.sort((a, b) => a.name.localeCompare(b.name));
-    }
-
-    // Depth-first traversal to build ordered list
-    const result: Array<{ id: string; name: string; path: string; depth: number }> = [];
-
-    const traverse = (folder: Folder, depth: number, pathParts: string[]) => {
-      const currentPath = [...pathParts, folder.name];
-      result.push({
-        id: folder.id,
-        name: folder.name,
-        path: currentPath.join(' / '),
-        depth,
-      });
-
-      const children = childrenMap.get(folder.id) || [];
-      for (const child of children) {
-        traverse(child, depth + 1, currentPath);
-      }
-    };
-
-    const rootFolders = childrenMap.get(null) || [];
-    for (const root of rootFolders) {
-      traverse(root, 0, []);
-    }
-
-    return result;
+    return buildFolderHierarchy(folders);
   }, [folders]);
 
   const [page, setPage] = useQueryState('page', 1);
@@ -479,11 +440,17 @@ export default function FileTable({
                           combobox.updateSelectedOptionIndex();
                           setFolderSearch(event.currentTarget.value);
                         }}
-                        onClick={() => combobox.openDropdown()}
-                        onFocus={() => combobox.openDropdown()}
+                        onClick={() => {
+                          combobox.openDropdown();
+                          setFolderSearch('');
+                        }}
+                        onFocus={() => {
+                          combobox.openDropdown();
+                          setFolderSearch('');
+                        }}
                         onBlur={() => {
                           combobox.closeDropdown();
-                          setFolderSearch(folderSearch || '');
+                          setFolderSearch('');
                         }}
                         placeholder='Add to folder...'
                         rightSectionPointerEvents='none'
@@ -491,18 +458,7 @@ export default function FileTable({
                     </Combobox.Target>
 
                     <Combobox.Dropdown>
-                      <Combobox.Options>
-                        {folderOptions
-                          .filter((f) => f.path.toLowerCase().includes(folderSearch.toLowerCase().trim()))
-                          .map((f) => (
-                            <Combobox.Option value={f.id} key={f.id}>
-                              <Text size='sm' style={{ paddingLeft: f.depth * 12 }}>
-                                {f.depth > 0 ? '└ ' : ''}
-                                {f.name}
-                              </Text>
-                            </Combobox.Option>
-                          ))}
-                      </Combobox.Options>
+                      <FolderComboboxOptions folderOptions={folderOptions} searchValue={folderSearch} />
                     </Combobox.Dropdown>
                   </Combobox>
                 )}

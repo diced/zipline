@@ -59,7 +59,7 @@ export const router = createBrowserRouter([
                   { path: 'metrics', lazy: () => import('./pages/dashboard/metrics') },
                   { path: 'settings', lazy: () => import('./pages/dashboard/settings') },
                   { path: 'files', lazy: () => import('./pages/dashboard/files') },
-                  { path: 'folders', lazy: () => import('./pages/dashboard/folders') },
+                  { path: 'folders/*', lazy: () => import('./pages/dashboard/folders') },
                   { path: 'urls', lazy: () => import('./pages/dashboard/urls') },
                   {
                     path: 'upload',

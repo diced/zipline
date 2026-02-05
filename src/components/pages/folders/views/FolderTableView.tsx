@@ -1,7 +1,7 @@
 import RelativeDate from '@/components/RelativeDate';
 import { Response } from '@/lib/api/response';
 import { Folder } from '@/lib/db/models/folder';
-import { ActionIcon, Anchor, Badge, Box, Checkbox, Group, Tooltip } from '@mantine/core';
+import { ActionIcon, Badge, Box, Checkbox, Group, Text, Tooltip } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import {
   IconCopy,
@@ -20,17 +20,19 @@ import {
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { useMemo, useState } from 'react';
 import useSWR from 'swr';
-import { copyFolderUrl, deleteFolder, editFolderUploads, editFolderVisibility } from '../actions';
+import { copyFolderUrl, editFolderUploads, editFolderVisibility } from '../actions';
+import DeleteFolderModal from '../DeleteFolderModal';
 import EditFolderNameModal from '../EditFolderNameModal';
 import MoveFolderModal from '../MoveFolderModal';
 import ViewFilesModal from '../ViewFilesModal';
 
-interface FolderTableViewProps {
+export default function FolderTableView({
+  currentFolderId,
+  onNavigate,
+}: {
   currentFolderId: string | null;
   onNavigate: (folderId: string | null) => void;
-}
-
-export default function FolderTableView({ currentFolderId, onNavigate }: FolderTableViewProps) {
+}) {
   const clipboard = useClipboard();
 
   const queryParam = currentFolderId ? `?parentId=${currentFolderId}` : '?root=true';
@@ -45,6 +47,7 @@ export default function FolderTableView({ currentFolderId, onNavigate }: FolderT
   const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
   const [editNameOpen, setEditNameOpen] = useState<Folder | null>(null);
   const [moveOpen, setMoveOpen] = useState<Folder | null>(null);
+  const [deleteOpen, setDeleteOpen] = useState<Folder | null>(null);
 
   const sorted = useMemo<Folder[]>(() => {
     if (!data) return [];
@@ -77,6 +80,8 @@ export default function FolderTableView({ currentFolderId, onNavigate }: FolderT
 
       <MoveFolderModal opened={!!moveOpen} folder={moveOpen} onClose={() => setMoveOpen(null)} />
 
+      <DeleteFolderModal opened={!!deleteOpen} folder={deleteOpen} onClose={() => setDeleteOpen(null)} />
+
       <Box my='sm'>
         <DataTable
           borderRadius='sm'
@@ -92,17 +97,7 @@ export default function FolderTableView({ currentFolderId, onNavigate }: FolderT
               render: (folder) => (
                 <Group gap='xs'>
                   <IconFolder size='1rem' />
-                  {folder.public ? (
-                    <Anchor
-                      href={`/folder/${folder.id}`}
-                      target='_blank'
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      {folder.name}
-                    </Anchor>
-                  ) : (
-                    folder.name
-                  )}
+                  <Text>{folder.name}</Text>
                   {(folder._count?.children ?? 0) > 0 && (
                     <Badge size='xs' variant='light'>
                       {folder._count?.children} subfolder{(folder._count?.children ?? 0) > 1 ? 's' : ''}
@@ -139,16 +134,18 @@ export default function FolderTableView({ currentFolderId, onNavigate }: FolderT
               textAlign: 'right',
               render: (folder) => (
                 <Group gap='sm' justify='right' wrap='nowrap'>
-                  <Tooltip label='Open folder'>
-                    <ActionIcon
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onNavigate(folder.id);
-                      }}
-                    >
-                      <IconFolderOpen size='1rem' />
-                    </ActionIcon>
-                  </Tooltip>
+                  {folder.public && (
+                    <Tooltip label='Open public link'>
+                      <ActionIcon
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          window.open(`/folder/${folder.id}`, '_blank');
+                        }}
+                      >
+                        <IconFolderOpen size='1rem' />
+                      </ActionIcon>
+                    </Tooltip>
+                  )}
                   <Tooltip label='View files'>
                     <ActionIcon
                       onClick={(e) => {
@@ -231,7 +228,7 @@ export default function FolderTableView({ currentFolderId, onNavigate }: FolderT
                       color='red'
                       onClick={(e) => {
                         e.stopPropagation();
-                        deleteFolder(folder);
+                        setDeleteOpen(folder);
                       }}
                     >
                       <IconTrashFilled size='1rem' />

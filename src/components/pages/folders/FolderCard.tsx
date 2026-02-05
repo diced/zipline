@@ -18,21 +18,24 @@ import {
 } from '@tabler/icons-react';
 import { useState } from 'react';
 import ViewFilesModal from './ViewFilesModal';
-import { copyFolderUrl, deleteFolder, editFolderUploads, editFolderVisibility } from './actions';
+import { copyFolderUrl, editFolderUploads, editFolderVisibility } from './actions';
+import DeleteFolderModal from './DeleteFolderModal';
 import EditFolderNameModal from './EditFolderNameModal';
 import MoveFolderModal from './MoveFolderModal';
 
-interface FolderCardProps {
+export default function FolderCard({
+  folder,
+  onNavigate,
+}: {
   folder: Folder;
   onNavigate?: (folderId: string | null) => void;
-}
-
-export default function FolderCard({ folder, onNavigate }: FolderCardProps) {
+}) {
   const clipboard = useClipboard();
 
   const [viewOpen, setViewOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [moveOpen, setMoveOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
 
   const childrenCount = folder._count?.children ?? 0;
   const filesCount = folder._count?.files ?? folder.files?.length ?? 0;
@@ -42,6 +45,7 @@ export default function FolderCard({ folder, onNavigate }: FolderCardProps) {
       <ViewFilesModal opened={viewOpen} onClose={() => setViewOpen(false)} folder={folder} />
       <EditFolderNameModal folder={folder} opened={editOpen} onClose={() => setEditOpen(false)} />
       <MoveFolderModal folder={folder} opened={moveOpen} onClose={() => setMoveOpen(false)} />
+      <DeleteFolderModal opened={deleteOpen} folder={folder} onClose={() => setDeleteOpen(false)} />
 
       <Card withBorder shadow='sm' radius='sm' style={{ cursor: onNavigate ? 'pointer' : 'default' }}>
         <Card.Section withBorder inheritPadding py='xs' onClick={() => onNavigate?.(folder.id)}>
@@ -108,7 +112,7 @@ export default function FolderCard({ folder, onNavigate }: FolderCardProps) {
                 <Menu.Item
                   leftSection={<IconTrashFilled size='1rem' />}
                   color='red'
-                  onClick={() => deleteFolder(folder)}
+                  onClick={() => setDeleteOpen(true)}
                 >
                   Delete
                 </Menu.Item>

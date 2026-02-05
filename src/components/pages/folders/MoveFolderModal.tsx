@@ -1,11 +1,14 @@
+import FolderComboboxOptions from '@/components/folders/FolderComboboxOptions';
 import { Response } from '@/lib/api/response';
 import { Folder } from '@/lib/db/models/folder';
 import { fetchApi } from '@/lib/fetchApi';
-import { Button, Modal, Select, Stack, Text } from '@mantine/core';
+import { buildFolderHierarchy, getDescendantIds } from '@/lib/folderHierarchy';
+import { useFolders } from '@/lib/hooks/useFolders';
+import { Button, Combobox, InputBase, Modal, Stack, Text, useCombobox } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconFolderSymlink } from '@tabler/icons-react';
-import React, { useMemo, useState } from 'react';
-import useSWR, { mutate } from 'swr';
+import { useMemo, useState } from 'react';
+import { mutate } from 'swr';
 
 interface MoveFolderModalProps {
   folder: Folder | null;
@@ -16,79 +19,28 @@ interface MoveFolderModalProps {
 export default function MoveFolderModal({ folder, opened, onClose }: MoveFolderModalProps) {
   const [selectedParentId, setSelectedParentId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState('');
+  const combobox = useCombobox();
 
-  // Fetch all folders to build the selection list
-  const { data: allFolders } = useSWR<Extract<Response['/api/user/folders'], Folder[]>>(
-    opened ? '/api/user/folders?noincl=true' : null,
-  );
-
-  // Reset selected parent when folder changes
-  React.useEffect(() => {
-    if (folder) {
-      setSelectedParentId(folder.parentId ?? null);
-    }
-  }, [folder]);
-
-  // Filter out the current folder and its descendants to prevent circular references
-  const getDescendantIds = (folderId: string, folders: Folder[]): Set<string> => {
-    const descendants = new Set<string>();
-    const addDescendants = (parentId: string) => {
-      for (const f of folders) {
-        if (f.parentId === parentId) {
-          descendants.add(f.id);
-          addDescendants(f.id);
-        }
-      }
-    };
-    addDescendants(folderId);
-    return descendants;
-  };
+  const { data: allFolders } = useFolders(undefined, opened);
 
   const folderOptions = useMemo(() => {
-    if (!allFolders || !folder) return [{ value: '__root__', label: '/ (Root)' }];
+    if (!allFolders || !folder) return [];
 
     const descendantIds = getDescendantIds(folder.id, allFolders);
-    const validFolders = allFolders.filter((f) => f.id !== folder.id && !descendantIds.has(f.id));
+    // Exclude the folder being moved and its descendants
+    const excludeIds = new Set([folder.id, ...descendantIds]);
 
-    // Group children by parent
-    const childrenMap = new Map<string | null, Folder[]>();
-    for (const f of validFolders) {
-      const parentId = f.parentId ?? null;
-      // Skip if parent is excluded (the folder being moved or its descendants)
-      if (parentId && (parentId === folder.id || descendantIds.has(parentId))) continue;
-      const siblings = childrenMap.get(parentId) || [];
-      siblings.push(f);
-      childrenMap.set(parentId, siblings);
-    }
-
-    // Sort children alphabetically within each level
-    for (const children of childrenMap.values()) {
-      children.sort((a, b) => a.name.localeCompare(b.name));
-    }
-
-    // Depth-first traversal
-    const result: Array<{ value: string; label: string }> = [];
-
-    const traverse = (f: Folder, pathParts: string[]) => {
-      const currentPath = [...pathParts, f.name];
-      result.push({
-        value: f.id,
-        label: currentPath.join(' / '),
-      });
-
-      const children = childrenMap.get(f.id) || [];
-      for (const child of children) {
-        traverse(child, currentPath);
-      }
-    };
-
-    const rootFolders = childrenMap.get(null) || [];
-    for (const root of rootFolders) {
-      traverse(root, []);
-    }
-
-    return [{ value: '__root__', label: '/ (Root)' }, ...result];
+    return buildFolderHierarchy(allFolders, excludeIds);
   }, [allFolders, folder]);
+
+  const getDisplayValue = () => {
+    if (selectedParentId === '__root__' || selectedParentId === null) {
+      return '/ (Root)';
+    }
+    const selected = folderOptions.find((f) => f.id === selectedParentId);
+    return selected?.path || '';
+  };
 
   if (!folder) {
     return null;
@@ -125,20 +77,58 @@ export default function MoveFolderModal({ folder, opened, onClose }: MoveFolderM
   };
 
   return (
-    <Modal centered opened={opened} onClose={onClose} title={`Move "${folder.name}"`}>
+    <Modal key={folder.id} centered opened={opened} onClose={onClose} title={`Move "${folder.name}"`}>
       <Stack gap='sm'>
         <Text size='sm' c='dimmed'>
           Select a destination folder for this folder.
         </Text>
 
-        <Select
-          label='Destination'
-          placeholder='Select a folder'
-          data={folderOptions}
-          value={selectedParentId ?? '__root__'}
-          onChange={(value) => setSelectedParentId(value)}
-          searchable
-        />
+        <Combobox
+          store={combobox}
+          withinPortal={true}
+          onOptionSubmit={(value) => {
+            setSelectedParentId(value);
+            setSearch(
+              value === '__root__' ? '/ (Root)' : folderOptions.find((f) => f.id === value)?.path || '',
+            );
+            combobox.closeDropdown();
+          }}
+        >
+          <Combobox.Target>
+            <InputBase
+              label='Destination'
+              placeholder='Select a folder'
+              rightSection={<Combobox.Chevron />}
+              value={search || getDisplayValue()}
+              onChange={(event) => {
+                combobox.openDropdown();
+                combobox.updateSelectedOptionIndex();
+                setSearch(event.currentTarget.value);
+              }}
+              onClick={() => {
+                combobox.openDropdown();
+                setSearch('');
+              }}
+              onFocus={() => {
+                combobox.openDropdown();
+                setSearch('');
+              }}
+              onBlur={() => {
+                combobox.closeDropdown();
+                setSearch('');
+              }}
+              rightSectionPointerEvents='none'
+            />
+          </Combobox.Target>
+
+          <Combobox.Dropdown>
+            <FolderComboboxOptions
+              folderOptions={folderOptions}
+              searchValue={search}
+              additionalOptions={<Combobox.Option value='__root__'>/ (Root)</Combobox.Option>}
+            />
+          </Combobox.Dropdown>
+        </Combobox>
 
         <Button
           onClick={handleMove}

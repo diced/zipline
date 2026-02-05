@@ -1,10 +1,12 @@
+import FolderComboboxOptions from '@/components/folders/FolderComboboxOptions';
 import TagPill from '@/components/pages/files/tags/TagPill';
 import { Response } from '@/lib/api/response';
 import { bytes } from '@/lib/bytes';
 import { File } from '@/lib/db/models/file';
-import { Folder } from '@/lib/db/models/folder';
 import { Tag } from '@/lib/db/models/tag';
 import { fetchApi } from '@/lib/fetchApi';
+import { buildFolderHierarchy } from '@/lib/folderHierarchy';
+import { useFolders } from '@/lib/hooks/useFolders';
 import { useSettingsStore } from '@/lib/store/settings';
 import {
   ActionIcon,
@@ -103,52 +105,11 @@ export default function FileModal({
 
   const [editFileOpen, setEditFileOpen] = useState(false);
 
-  const { data: folders } = useSWR<Extract<Response['/api/user/folders'], Folder[]>>(
-    '/api/user/folders?noincl=true' + (user ? `&user=${user}` : ''),
-  );
+  const { data: folders } = useFolders(user);
 
-  // Build folder options with hierarchy using depth-first traversal
   const folderOptions = useMemo(() => {
     if (!folders) return [];
-
-    // Group children by parent
-    const childrenMap = new Map<string | null, Folder[]>();
-    for (const folder of folders) {
-      const parentId = folder.parentId ?? null;
-      const siblings = childrenMap.get(parentId) || [];
-      siblings.push(folder);
-      childrenMap.set(parentId, siblings);
-    }
-
-    // Sort children alphabetically within each level
-    for (const children of childrenMap.values()) {
-      children.sort((a, b) => a.name.localeCompare(b.name));
-    }
-
-    // Depth-first traversal to build ordered list
-    const result: Array<{ id: string; name: string; path: string; depth: number }> = [];
-
-    const traverse = (folder: Folder, depth: number, pathParts: string[]) => {
-      const currentPath = [...pathParts, folder.name];
-      result.push({
-        id: folder.id,
-        name: folder.name,
-        path: currentPath.join(' / '),
-        depth,
-      });
-
-      const children = childrenMap.get(folder.id) || [];
-      for (const child of children) {
-        traverse(child, depth + 1, currentPath);
-      }
-    };
-
-    const rootFolders = childrenMap.get(null) || [];
-    for (const root of rootFolders) {
-      traverse(root, 0, []);
-    }
-
-    return result;
+    return buildFolderHierarchy(folders);
   }, [folders]);
 
   const folderCombobox = useCombobox();
@@ -370,11 +331,17 @@ export default function FileModal({
                             folderCombobox.updateSelectedOptionIndex();
                             setSearch(event.currentTarget.value);
                           }}
-                          onClick={() => folderCombobox.openDropdown()}
-                          onFocus={() => folderCombobox.openDropdown()}
+                          onClick={() => {
+                            folderCombobox.openDropdown();
+                            setSearch('');
+                          }}
+                          onFocus={() => {
+                            folderCombobox.openDropdown();
+                            setSearch('');
+                          }}
                           onBlur={() => {
                             folderCombobox.closeDropdown();
-                            setSearch(search || '');
+                            setSearch('');
                           }}
                           placeholder='Add to folder...'
                           rightSectionPointerEvents='none'
@@ -382,25 +349,18 @@ export default function FileModal({
                       </Combobox.Target>
 
                       <Combobox.Dropdown>
-                        <Combobox.Options>
-                          {folderOptions
-                            .filter((f) => f.path.toLowerCase().includes(search.toLowerCase().trim()))
-                            .map((f) => (
-                              <Combobox.Option value={f.id} key={f.id}>
-                                <Text size='sm' style={{ paddingLeft: f.depth * 12 }}>
-                                  {f.depth > 0 ? '└ ' : ''}
-                                  {f.name}
-                                </Text>
-                              </Combobox.Option>
-                            ))}
-
-                          {!folders?.some((f: { name: string }) => f.name === search) &&
-                            search.trim().length > 0 && (
+                        <FolderComboboxOptions
+                          folderOptions={folderOptions}
+                          searchValue={search}
+                          additionalOptions={
+                            !folders?.some((f: { name: string }) => f.name === search) &&
+                            search.trim().length > 0 ? (
                               <Combobox.Option value='$create'>
                                 + Create folder &quot;{search}&quot;
                               </Combobox.Option>
-                            )}
-                        </Combobox.Options>
+                            ) : null
+                          }
+                        />
                       </Combobox.Dropdown>
                     </Combobox>
                   )}
