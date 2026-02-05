@@ -275,7 +275,7 @@ export default typedPlugin(
         }
 
         return res
-          .header('Content-Disposition', `attachment; filename="zipline4_export_${Date.now()}.json"`)
+          .header('Content-Disposition', `attachment; filename*=utf-8''zipline4_export_${Date.now()}.json`)
           .type('application/json')
           .send(export4);
       },

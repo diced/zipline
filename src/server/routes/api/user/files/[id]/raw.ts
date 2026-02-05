@@ -117,6 +117,8 @@ export default typedPlugin(
         }
 
         const size = file?.size || (await datasource.size(file?.name ?? id));
+        const fileType = file?.type || 'application/octet-stream';
+        const contentType = fileType.startsWith('text/') ? `${fileType}; charset=utf-8` : fileType;
 
         if (req.headers.range) {
           const [start, end] = parseRange(req.headers.range, size);
@@ -125,12 +127,12 @@ export default typedPlugin(
             if (!buf) return res.callNotFound();
 
             return res
-              .type(file?.type || 'application/octet-stream')
+              .type(contentType)
               .headers({
                 'Content-Length': size,
                 ...(file?.originalName
                   ? {
-                      'Content-Disposition': `${download ? 'attachment; ' : ''}filename="${encodeURIComponent(file.originalName)}"`,
+                      'Content-Disposition': `${download ? 'attachment; ' : ''}filename*=utf-8''${encodeURIComponent(file.originalName)}`,
                     }
                   : download && {
                       'Content-Disposition': 'attachment;',
@@ -144,14 +146,14 @@ export default typedPlugin(
           if (!buf) return res.callNotFound();
 
           return res
-            .type(file?.type || 'application/octet-stream')
+            .type(contentType)
             .headers({
               'Content-Range': `bytes ${start}-${end}/${size}`,
               'Accept-Ranges': 'bytes',
               'Content-Length': end - start + 1,
               ...(file?.originalName
                 ? {
-                    'Content-Disposition': `${download ? 'attachment; ' : ''}filename="${encodeURIComponent(file.originalName)}"`,
+                    'Content-Disposition': `${download ? 'attachment; ' : ''}filename*=utf-8''${encodeURIComponent(file.originalName)}`,
                   }
                 : download && {
                     'Content-Disposition': 'attachment;',
@@ -165,13 +167,13 @@ export default typedPlugin(
         if (!buf) return res.callNotFound();
 
         return res
-          .type(file?.type || 'application/octet-stream')
+          .type(contentType)
           .headers({
             'Content-Length': size,
             'Accept-Ranges': 'bytes',
             ...(file?.originalName
               ? {
-                  'Content-Disposition': `${download ? 'attachment; ' : ''}filename="${encodeURIComponent(file.originalName)}"`,
+                  'Content-Disposition': `${download ? 'attachment; ' : ''}filename*=utf-8''${encodeURIComponent(file.originalName)}`,
                 }
               : download && {
                   'Content-Disposition': 'attachment;',
