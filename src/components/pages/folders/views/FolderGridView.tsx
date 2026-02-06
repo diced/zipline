@@ -1,13 +1,21 @@
 import { Response } from '@/lib/api/response';
 import { Folder } from '@/lib/db/models/folder';
 import { Center, Group, Paper, SimpleGrid, Skeleton, Stack, Text, Title } from '@mantine/core';
-import { IconLink } from '@tabler/icons-react';
+import { IconFolder } from '@tabler/icons-react';
 import useSWR from 'swr';
 import FolderCard from '../FolderCard';
 
-export default function FolderGridView() {
-  const { data: folders, isLoading } =
-    useSWR<Extract<Response['/api/user/folders'], Folder[]>>('/api/user/folders');
+export default function FolderGridView({
+  currentFolderId,
+  onNavigate,
+}: {
+  currentFolderId: string | null;
+  onNavigate: (folderId: string | null) => void;
+}) {
+  const queryParam = currentFolderId ? `?parentId=${currentFolderId}` : '?root=true';
+  const { data: folders, isLoading } = useSWR<Extract<Response['/api/user/folders'], Folder[]>>(
+    `/api/user/folders${queryParam}`,
+  );
 
   return (
     <>
@@ -26,7 +34,7 @@ export default function FolderGridView() {
             <Skeleton key={i} height={120} animate />
           ))}
         </SimpleGrid>
-      ) : (folders?.length ?? 0 !== 0) ? (
+      ) : (folders?.length ?? 0) !== 0 ? (
         <SimpleGrid
           my='sm'
           spacing='md'
@@ -38,7 +46,7 @@ export default function FolderGridView() {
           pos='relative'
         >
           {folders?.map((folder) => (
-            <FolderCard key={folder.id} folder={folder} />
+            <FolderCard key={folder.id} folder={folder} onNavigate={onNavigate} />
           ))}
         </SimpleGrid>
       ) : (
@@ -46,11 +54,11 @@ export default function FolderGridView() {
           <Center>
             <Stack>
               <Group>
-                <IconLink size='2rem' />
+                <IconFolder size='2rem' />
                 <Title order={2}>No Folders found</Title>
               </Group>
               <Text size='sm' c='dimmed'>
-                Create a folder to see it here
+                {currentFolderId ? 'This folder is empty' : 'Create a folder to see it here'}
               </Text>
             </Stack>
           </Center>

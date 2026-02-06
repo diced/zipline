@@ -1,10 +1,10 @@
-export interface File {
+export type File = {
   fieldname: string;
   originalname: string;
   mimetype: string;
   size: number;
   buffer: Buffer;
-}
+};
 
 export type Cookies = {
   zipline_token?: string;

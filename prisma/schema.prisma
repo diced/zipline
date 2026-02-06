@@ -306,6 +306,10 @@ model Folder {
 
   files File[]
 
+  parentId String?
+  parent   Folder?  @relation("FolderToFolder", fields: [parentId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  children Folder[] @relation("FolderToFolder")
+
   User   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId String
 }

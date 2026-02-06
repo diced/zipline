@@ -10,7 +10,7 @@ export type ApiVersionResponse = {
   cached: true;
 };
 
-interface VersionAPI {
+type VersionAPI = {
   isUpstream: boolean;
   isRelease: boolean;
   isLatest: boolean;
@@ -28,7 +28,7 @@ interface VersionAPI {
       pull: boolean;
     };
   };
-}
+};
 
 const logger = log('api').c('version');
 

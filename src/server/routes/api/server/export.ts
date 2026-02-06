@@ -194,6 +194,7 @@ export default typedPlugin(
               allowUploads: folder.allowUploads,
               userId: folder.userId,
               files: folder.files.map((file) => file.id),
+              parentId: folder.parentId,
             });
           }
 

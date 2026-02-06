@@ -172,6 +172,14 @@ export default typedPlugin(
             },
           });
           if (existing) return res.badRequest(`A file with the name "${fullFileName}" already exists`);
+        } else if (format === 'random') {
+          let fullFileName = `${fileName}${extension}`;
+          let existing = await prisma.file.findFirst({ where: { name: fullFileName } });
+          while (existing) {
+            fileName = formatFileName(format, decodeURIComponent(options.partial.filename));
+            fullFileName = `${fileName}${extension}`;
+            existing = await prisma.file.findFirst({ where: { name: fullFileName } });
+          }
         }
 
         // determine mimetype

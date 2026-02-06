@@ -1,11 +1,14 @@
 import RelativeDate from '@/components/RelativeDate';
 import { Response } from '@/lib/api/response';
 import { Folder } from '@/lib/db/models/folder';
-import { ActionIcon, Anchor, Box, Checkbox, Group, Tooltip } from '@mantine/core';
+import { ActionIcon, Badge, Box, Checkbox, Group, Text, Tooltip } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import {
   IconCopy,
   IconFiles,
+  IconFolder,
+  IconFolderOpen,
+  IconFolderSymlink,
   IconLock,
   IconLockOpen,
   IconPencil,
@@ -17,14 +20,25 @@ import {
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { useMemo, useState } from 'react';
 import useSWR from 'swr';
-import { copyFolderUrl, deleteFolder, editFolderUploads, editFolderVisibility } from '../actions';
-import EditFolderNameModal from '../EditFolderNameModal';
-import ViewFilesModal from '../ViewFilesModal';
+import { copyFolderUrl, editFolderUploads, editFolderVisibility } from '../actions';
+import DeleteFolderModal from '../modals/DeleteFolderModal';
+import EditFolderNameModal from '../modals/EditFolderNameModal';
+import MoveFolderModal from '../modals/MoveFolderModal';
+import ViewFilesModal from '../modals/ViewFilesModal';
 
-export default function FolderTableView() {
+export default function FolderTableView({
+  currentFolderId,
+  onNavigate,
+}: {
+  currentFolderId: string | null;
+  onNavigate: (folderId: string | null) => void;
+}) {
   const clipboard = useClipboard();
 
-  const { data, isLoading } = useSWR<Extract<Response['/api/user/folders'], Folder[]>>('/api/user/folders');
+  const queryParam = currentFolderId ? `?parentId=${currentFolderId}` : '?root=true';
+  const { data, isLoading } = useSWR<Extract<Response['/api/user/folders'], Folder[]>>(
+    `/api/user/folders${queryParam}`,
+  );
 
   const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
     columnAccessor: 'createdAt',
@@ -32,6 +46,8 @@ export default function FolderTableView() {
   });
   const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
   const [editNameOpen, setEditNameOpen] = useState<Folder | null>(null);
+  const [moveOpen, setMoveOpen] = useState<Folder | null>(null);
+  const [deleteOpen, setDeleteOpen] = useState<Folder | null>(null);
 
   const sorted = useMemo<Folder[]>(() => {
     if (!data) return [];
@@ -62,35 +78,44 @@ export default function FolderTableView() {
         onClose={() => setEditNameOpen(null)}
       />
 
+      <MoveFolderModal opened={!!moveOpen} folder={moveOpen} onClose={() => setMoveOpen(null)} />
+
+      <DeleteFolderModal opened={!!deleteOpen} folder={deleteOpen} onClose={() => setDeleteOpen(null)} />
+
       <Box my='sm'>
         <DataTable
           borderRadius='sm'
           withTableBorder
           minHeight={200}
           records={sorted ?? []}
+          onRowClick={({ record }) => onNavigate(record.id)}
+          rowStyle={() => ({ cursor: 'pointer' })}
           columns={[
             {
               accessor: 'name',
               sortable: true,
-              render: (folder) =>
-                folder.public ? (
-                  <Anchor href={`/folder/${folder.id}`} target='_blank'>
-                    {folder.name}
-                  </Anchor>
-                ) : (
-                  folder.name
-                ),
+              render: (folder) => (
+                <Group gap='xs'>
+                  <IconFolder size='1rem' />
+                  <Text>{folder.name}</Text>
+                  {(folder._count?.children ?? 0) > 0 && (
+                    <Badge size='xs' variant='light'>
+                      {folder._count?.children} subfolder{(folder._count?.children ?? 0) > 1 ? 's' : ''}
+                    </Badge>
+                  )}
+                </Group>
+              ),
             },
             {
               accessor: 'public',
               sortable: true,
-              render: (folder) => <Checkbox checked={folder.public} />,
+              render: (folder) => <Checkbox checked={folder.public} readOnly />,
             },
             {
               accessor: 'allowUploads',
               title: 'Uploads?',
               sortable: true,
-              render: (folder) => <Checkbox checked={folder.allowUploads} />,
+              render: (folder) => <Checkbox checked={folder.allowUploads} readOnly />,
             },
             {
               accessor: 'createdAt',
@@ -109,6 +134,18 @@ export default function FolderTableView() {
               textAlign: 'right',
               render: (folder) => (
                 <Group gap='sm' justify='right' wrap='nowrap'>
+                  {folder.public && (
+                    <Tooltip label='Open public link'>
+                      <ActionIcon
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          window.open(`/folder/${folder.id}`, '_blank');
+                        }}
+                      >
+                        <IconFolderOpen size='1rem' />
+                      </ActionIcon>
+                    </Tooltip>
+                  )}
                   <Tooltip label='View files'>
                     <ActionIcon
                       onClick={(e) => {
@@ -117,6 +154,16 @@ export default function FolderTableView() {
                       }}
                     >
                       <IconFiles size='1rem' />
+                    </ActionIcon>
+                  </Tooltip>
+                  <Tooltip label='Move folder'>
+                    <ActionIcon
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMoveOpen(folder);
+                      }}
+                    >
+                      <IconFolderSymlink size='1rem' />
                     </ActionIcon>
                   </Tooltip>
                   <Tooltip label='Copy folder link'>
@@ -168,7 +215,10 @@ export default function FolderTableView() {
                   <Tooltip label='Export folder as ZIP'>
                     <ActionIcon
                       color='blue'
-                      onClick={() => window.open(`/api/user/folders/${folder.id}/export`, '_blank')}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        window.open(`/api/user/folders/${folder.id}/export`, '_blank');
+                      }}
                     >
                       <IconZip size='1rem' />
                     </ActionIcon>
@@ -178,7 +228,7 @@ export default function FolderTableView() {
                       color='red'
                       onClick={(e) => {
                         e.stopPropagation();
-                        deleteFolder(folder);
+                        setDeleteOpen(folder);
                       }}
                     >
                       <IconTrashFilled size='1rem' />

@@ -85,11 +85,17 @@ export default typedPlugin(
           if (existingVanity) return res.badRequest('Vanity already taken');
         }
 
+        let code, existingCode;
+        do {
+          code = randomCharacters(config.urls.length);
+          existingCode = await prisma.url.findFirst({ where: { code } });
+        } while (existingCode);
+
         const url = await prisma.url.create({
           data: {
             userId: req.user.id,
             destination: destination,
-            code: randomCharacters(config.urls.length),
+            code,
             ...(vanity && { vanity: vanity }),
             ...(maxViews && { maxViews: maxViews }),
             ...(password && { password: password }),
