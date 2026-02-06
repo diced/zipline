@@ -63,9 +63,11 @@ export function cleanFiles(files: File[], stringifyDates = false) {
     const file = files[i];
     if (file.password) file.password = true;
 
-    (file as any).createdAt = stringifyDates ? file.createdAt.toISOString() : file.createdAt;
-    (file as any).updatedAt = stringifyDates ? file.updatedAt.toISOString() : file.updatedAt;
-    (file as any).deletesAt = stringifyDates ? file.deletesAt?.toISOString() || null : file.deletesAt;
+    if (stringifyDates) {
+      (file as any).createdAt = file.createdAt.toISOString();
+      (file as any).updatedAt = file.updatedAt.toISOString();
+      (file as any).deletesAt = file.deletesAt?.toISOString() || null;
+    }
 
     file.url = formatRootUrl(config.files.route, file.name);
   }

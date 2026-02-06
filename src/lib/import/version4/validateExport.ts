@@ -139,6 +139,7 @@ export const export4Schema = z.object({
         allowUploads: z.boolean(),
         files: z.array(z.string()),
         userId: z.string(),
+        parentId: z.string().nullable().optional(),
       }),
     ),
     urls: z.array(

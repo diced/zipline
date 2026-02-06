@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/db';
 import { fileSelect } from '@/lib/db/models/file';
-import { cleanFolder, Folder } from '@/lib/db/models/folder';
+import { buildPublicParentChain, cleanFolder, Folder } from '@/lib/db/models/folder';
 import typedPlugin from '@/server/typedPlugin';
 import z from 'zod';
 
@@ -40,12 +40,33 @@ export default typedPlugin(
                 createdAt: 'desc',
               },
             },
+            children: {
+              where: { public: true },
+              orderBy: { createdAt: 'desc' },
+              select: {
+                id: true,
+                name: true,
+                createdAt: true,
+                updatedAt: true,
+                public: true,
+                _count: {
+                  select: { children: true, files: true },
+                },
+              },
+            },
+            parent: {
+              select: { id: true, name: true, public: true, parentId: true },
+            },
           },
         });
 
         if (!folder) return res.notFound();
 
         if ((uploads && !folder.allowUploads) || (!uploads && !folder.public)) return res.notFound();
+
+        if (folder.parentId) {
+          (folder as any).parent = await buildPublicParentChain(folder.parentId);
+        }
 
         return res.send(cleanFolder(folder, true));
       },

@@ -110,32 +110,33 @@ export async function favoriteFile(file: File) {
   mutateFiles();
 }
 
-export function createFolderAndAdd(file: File, folderName: string | null) {
-  fetchApi<Extract<Response['/api/user/folders'], Folder>>('/api/user/folders', 'POST', {
-    name: folderName,
-    files: [file.id],
-  }).then(({ data, error }) => {
-    if (error) {
-      notifications.show({
-        title: 'Error while creating folder',
-        message: error.error,
-        color: 'red',
-        icon: <IconFolderOff size='1rem' />,
-      });
-    } else {
-      notifications.show({
-        title: 'Folder created',
-        message: `${data!.name} has been created with ${file.name}`,
-        color: 'green',
-        icon: <IconFolderPlus size='1rem' />,
-      });
-    }
-  });
+export async function createFolderAndAdd(file: File, folderName: string | null) {
+  const { data, error } = await fetchApi<Extract<Response['/api/user/folders'], Folder>>(
+    '/api/user/folders',
+    'POST',
+    {
+      name: folderName,
+      files: [file.id],
+    },
+  );
+  if (error) {
+    notifications.show({
+      title: 'Error while creating folder',
+      message: error.error,
+      color: 'red',
+      icon: <IconFolderOff size='1rem' />,
+    });
+  } else {
+    notifications.show({
+      title: 'Folder created',
+      message: `${data!.name} has been created with ${file.name}`,
+      color: 'green',
+      icon: <IconFolderPlus size='1rem' />,
+    });
+  }
 
   mutateFolders();
   mutateFiles();
-
-  return undefined;
 }
 
 export async function removeFromFolder(file: File) {

@@ -8,13 +8,13 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import fastifyPlugin from 'fastify-plugin';
 import { getSession, saveSession } from '../session';
 
-export interface OAuthQuery {
+export type OAuthQuery = {
   state?: string;
   code: string;
   host: string;
-}
+};
 
-export interface OAuthResponse {
+export type OAuthResponse = {
   username?: string;
   user_id?: string;
   access_token?: string;
@@ -24,7 +24,7 @@ export interface OAuthResponse {
   error?: string;
   error_code?: number;
   redirect?: string;
-}
+};
 
 async function oauthPlugin(fastify: FastifyInstance) {
   fastify.decorateRequest('oauthHandle', oauthHandle);

@@ -247,8 +247,9 @@ export default typedPlugin(
 
         logger.debug('imported passkeys', { passkeys: importedPasskeys });
 
-        // folders
+        // folders - first pass: create all folders without parent relationships
         const importedFolders: Record<string, string> = {};
+        const folderParentMap: Record<string, string> = {};
 
         for (const folder of export4.data.folders) {
           const userId = importedUsers[folder.userId ?? ''];
@@ -288,7 +289,31 @@ export default typedPlugin(
           });
 
           importedFolders[folder.id] = created.id;
+
+          if (folder.parentId) {
+            folderParentMap[folder.id] = folder.parentId;
+          }
         }
+
+        // folders - second pass: set parent relationships
+        for (const [oldFolderId, oldParentId] of Object.entries(folderParentMap)) {
+          const newFolderId = importedFolders[oldFolderId];
+          const newParentId = importedFolders[oldParentId];
+
+          if (newFolderId && newParentId) {
+            await prisma.folder.update({
+              where: { id: newFolderId },
+              data: { parentId: newParentId },
+            });
+          } else {
+            logger.warn('failed to set parent for folder', {
+              folder: oldFolderId,
+              parent: oldParentId,
+            });
+          }
+        }
+
+        logger.debug('imported folders', { folders: importedFolders });
 
         // files
         const importedFiles: Record<string, string> = {};

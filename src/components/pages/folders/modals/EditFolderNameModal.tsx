@@ -7,6 +7,7 @@ import { useForm } from '@mantine/form';
 import { showNotification } from '@mantine/notifications';
 import { IconPencil } from '@tabler/icons-react';
 import { useEffect } from 'react';
+
 export default function EditFolderNameModal({
   folder,
   onClose,
@@ -28,7 +29,7 @@ export default function EditFolderNameModal({
   const onSubmit = async (values: typeof form.values) => {
     if (!folder) return;
 
-    const { error } = await fetchApi<Response['/api/user/folders/[id]']>(
+    const { data, error } = await fetchApi<Response['/api/user/folders/[id]']>(
       `/api/user/folders/${folder?.id}`,
       'PATCH',
       {
@@ -45,7 +46,7 @@ export default function EditFolderNameModal({
       mutateFolders();
       showNotification({
         title: 'Folder name updated',
-        message: 'Folder name has been updated successfully to ' + name,
+        message: 'Folder name has been updated successfully to ' + data?.name,
       });
       onClose();
     }
