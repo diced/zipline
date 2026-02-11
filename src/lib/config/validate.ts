@@ -5,7 +5,7 @@ import { log } from '../logger';
 import { ParsedConfig } from './read';
 import { PROP_TO_ENV } from './read/env';
 import { checkOutput, COMPRESS_TYPES } from '../compress';
-import {ms, StringValue } from 'ms';
+import ms, { StringValue } from 'ms';
 
 // Maximum safe timeout value for JavaScript timers (32-bit signed integer limit)
 // Approximately 24.8 days
