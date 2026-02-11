@@ -24,12 +24,12 @@ declare global {
 
 // Helper function to validate interval strings
 function validateInterval(value: string): boolean {
-  try {
-    const intervalMs = ms(value as StringValue);
-    return intervalMs <= MAX_SAFE_TIMEOUT_MS;
-  } catch {
+  const intervalMs = ms(value as StringValue);
+  // ms() returns undefined for invalid strings, not throw
+  if (typeof intervalMs !== 'number') {
     return false;
   }
+  return intervalMs <= MAX_SAFE_TIMEOUT_MS;
 }
 
 // Reusable interval schema with validation
