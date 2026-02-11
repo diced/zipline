@@ -25,7 +25,7 @@ declare global {
 // Helper function to validate interval strings
 function validateInterval(value: string): boolean {
   try {
-    const intervalMs = ms(value);
+    const intervalMs = ms(value as StringValue);
     return intervalMs <= MAX_SAFE_TIMEOUT_MS;
   } catch {
     return false;
