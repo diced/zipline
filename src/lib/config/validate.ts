@@ -5,6 +5,11 @@ import { log } from '../logger';
 import { ParsedConfig } from './read';
 import { PROP_TO_ENV } from './read/env';
 import { checkOutput, COMPRESS_TYPES } from '../compress';
+import ms from 'ms';
+
+// Maximum safe timeout value for JavaScript timers (32-bit signed integer limit)
+// Approximately 24.8 days
+const MAX_SAFE_TIMEOUT_MS = 2147483647;
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -16,6 +21,23 @@ declare global {
     }
   }
 }
+
+// Helper function to validate interval strings
+function validateInterval(value: string): boolean {
+  try {
+    const intervalMs = ms(value);
+    return intervalMs <= MAX_SAFE_TIMEOUT_MS;
+  } catch {
+    return false;
+  }
+}
+
+// Reusable interval schema with validation
+const intervalSchema = (defaultValue: string) =>
+  z
+    .string()
+    .default(defaultValue)
+    .refine(validateInterval, 'Interval exceeds maximum safe timeout of ~24 days (2147483647ms)');
 
 export const discordContent = z
   .object({
@@ -104,12 +126,12 @@ export const schema = z.object({
     enabled: z.boolean().default(true),
   }),
   tasks: z.object({
-    deleteInterval: z.string().default('30min'),
-    clearInvitesInterval: z.string().default('30min'),
-    maxViewsInterval: z.string().default('30min'),
-    thumbnailsInterval: z.string().default('30min'),
-    metricsInterval: z.string().default('30min'),
-    cleanThumbnailsInterval: z.string().default('1d'),
+    deleteInterval: intervalSchema('30min'),
+    clearInvitesInterval: intervalSchema('30min'),
+    maxViewsInterval: intervalSchema('30min'),
+    thumbnailsInterval: intervalSchema('30min'),
+    metricsInterval: intervalSchema('30min'),
+    cleanThumbnailsInterval: intervalSchema('1d'),
   }),
   files: z.object({
     route: z.string().startsWith('/').min(1).trim().toLowerCase().default('/u'),

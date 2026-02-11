@@ -82,6 +82,21 @@ export class Tasks {
       return;
     }
 
+    // Maximum safe timeout for JavaScript timers (32-bit signed integer limit)
+    // Approximately 24.8 days or 2,147,483,647 milliseconds
+    const MAX_SAFE_TIMEOUT_MS = 2147483647;
+
+    if (task.interval > MAX_SAFE_TIMEOUT_MS) {
+      this.logger.error('interval exceeds maximum safe timeout', {
+        id: task.id,
+        interval: task.interval,
+        maxSafeTimeout: MAX_SAFE_TIMEOUT_MS,
+        message: 'Interval exceeds JavaScript timer limit (~24 days). Task will not be started.',
+      });
+
+      return;
+    }
+
     task.started = true;
 
     const timeout = setInterval(task.func.bind(task), task.interval);
