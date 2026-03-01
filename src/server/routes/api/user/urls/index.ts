@@ -1,7 +1,7 @@
 import { config } from '@/lib/config';
 import { hashPassword } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
-import { cleanUrlPasswords, Url } from '@/lib/db/models/url';
+import { cleanUrlPasswords, Url, urlSchema } from '@/lib/db/models/url';
 import { log } from '@/lib/logger';
 import { randomCharacters } from '@/lib/random';
 import { zStringTrimmed } from '@/lib/validation';
@@ -43,6 +43,14 @@ export default typedPlugin(
             'x-zipline-domain': z.string().optional(),
             'x-zipline-password': z.string().optional(),
           }),
+          response: {
+            200: z.union([
+              z.string(),
+              urlSchema.omit({ password: true }).extend({
+                url: z.string(),
+              }),
+            ]),
+          },
         },
         preHandler: [userMiddleware, rateLimit],
       },
@@ -150,6 +158,9 @@ export default typedPlugin(
             searchField: z.enum(['destination', 'vanity', 'code']).default('destination'),
             searchQuery: z.string().min(1).optional(),
           }),
+          response: {
+            200: z.array(urlSchema.omit({ password: true })),
+          },
         },
         preHandler: [userMiddleware],
       },

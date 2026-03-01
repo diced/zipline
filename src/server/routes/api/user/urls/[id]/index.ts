@@ -1,6 +1,6 @@
 import { hashPassword } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
-import { Url } from '@/lib/db/models/url';
+import { Url, urlSchema } from '@/lib/db/models/url';
 import { log } from '@/lib/logger';
 import { zStringTrimmed } from '@/lib/validation';
 import { userMiddleware } from '@/server/middleware/user';
@@ -21,7 +21,12 @@ export default typedPlugin(
     server.get(
       PATH,
       {
-        schema: { params: paramsSchema },
+        schema: {
+          params: paramsSchema,
+          response: {
+            200: urlSchema.omit({ password: true }),
+          },
+        },
         preHandler: [userMiddleware],
       },
       async (req, res) => {
@@ -54,6 +59,9 @@ export default typedPlugin(
             destination: z.httpUrl().optional(),
             enabled: z.boolean().optional(),
           }),
+          response: {
+            200: urlSchema.omit({ password: true }),
+          },
         },
         preHandler: [userMiddleware],
       },
@@ -117,7 +125,12 @@ export default typedPlugin(
     server.delete(
       PATH,
       {
-        schema: { params: paramsSchema },
+        schema: {
+          params: paramsSchema,
+          response: {
+            200: urlSchema.omit({ password: true }),
+          },
+        },
         preHandler: [userMiddleware],
       },
       async (req, res) => {

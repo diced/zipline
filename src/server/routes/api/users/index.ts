@@ -1,7 +1,7 @@
 import { config } from '@/lib/config';
 import { createToken, hashPassword } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
-import { User, userSelect } from '@/lib/db/models/user';
+import { User, userSchema, userSelect } from '@/lib/db/models/user';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { canInteract } from '@/lib/role';
@@ -29,6 +29,9 @@ export default typedPlugin(
       {
         schema: {
           querystring: querySchema,
+          response: {
+            200: z.array(userSchema),
+          },
         },
         preHandler: [userMiddleware, administratorMiddleware],
       },
@@ -58,6 +61,9 @@ export default typedPlugin(
             avatar: z.string().optional(),
             role: z.enum(Role).default('USER').optional(),
           }),
+          response: {
+            200: userSchema,
+          },
         },
         preHandler: [userMiddleware, administratorMiddleware],
         ...secondlyRatelimit(1),

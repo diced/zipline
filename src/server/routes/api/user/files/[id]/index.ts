@@ -22,20 +22,32 @@ const paramsSchema = z.object({
 export const PATH = '/api/user/files/:id';
 export default typedPlugin(
   async (server) => {
-    server.get(PATH, { schema: { params: paramsSchema }, preHandler: [userMiddleware] }, async (req, res) => {
-      const file = await prisma.file.findFirst({
-        where: {
-          OR: [{ id: req.params.id }, { name: req.params.id }],
+    server.get(
+      PATH,
+      {
+        schema: {
+          params: paramsSchema,
+          response: {
+            200: z.custom<File>(),
+          },
         },
-        select: { User: true, ...fileSelect },
-      });
-      if (!file) return res.notFound();
+        preHandler: [userMiddleware],
+      },
+      async (req, res) => {
+        const file = await prisma.file.findFirst({
+          where: {
+            OR: [{ id: req.params.id }, { name: req.params.id }],
+          },
+          select: { User: true, ...fileSelect },
+        });
+        if (!file) return res.notFound();
 
-      if (req.user.id !== file.User?.id && !canInteract(req.user.role, file.User?.role ?? 'USER'))
-        return res.notFound();
+        if (req.user.id !== file.User?.id && !canInteract(req.user.role, file.User?.role ?? 'USER'))
+          return res.notFound();
 
-      return res.send(file);
-    });
+        return res.send(file);
+      },
+    );
 
     server.patch(
       PATH,
@@ -51,6 +63,9 @@ export default typedPlugin(
             tags: z.array(z.string()).optional(),
             name: z.string().trim().min(1).optional().transform(zValidatePath),
           }),
+          response: {
+            200: z.any(),
+          },
         },
         preHandler: [userMiddleware],
       },

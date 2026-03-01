@@ -53,3 +53,24 @@ export const userViewSchema = z
     embedSiteName: z.string().nullish(),
   })
   .partial();
+
+export const userSchema = z.object({
+  id: z.string(),
+  username: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+  role: z.enum(['USER', 'ADMIN', 'SUPERADMIN']),
+  view: userViewSchema,
+
+  sessions: z.array(z.any()),
+  oauthProviders: z.array(z.any()),
+
+  totpSecret: z.string().nullable().optional(),
+  passkeys: z.array(z.any()).optional(),
+
+  quota: z.any().nullable().optional(),
+
+  avatar: z.string().nullable().optional(),
+  password: z.string().nullable().optional(),
+  token: z.string().nullable().optional(),
+});

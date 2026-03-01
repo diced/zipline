@@ -39,3 +39,10 @@ export const metricDataSchema = z.object({
     }),
   ),
 });
+
+export const metricSchema = z.object({
+  id: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+  data: metricDataSchema,
+});

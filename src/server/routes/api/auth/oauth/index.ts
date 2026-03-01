@@ -12,13 +12,32 @@ const logger = log('api').c('auth').c('oauth');
 export const PATH = '/api/auth/oauth';
 export default typedPlugin(
   async (server) => {
-    server.get(PATH, { preHandler: [userMiddleware] }, async (req, res) => {
-      return res.send(req.user.oauthProviders);
-    });
+    server.get(
+      PATH,
+      {
+        schema: {
+          response: {
+            200: z.array(z.custom<OAuthProvider>()),
+          },
+        },
+        preHandler: [userMiddleware],
+      },
+      async (req, res) => {
+        return res.send(req.user.oauthProviders);
+      },
+    );
 
     server.delete(
       PATH,
-      { schema: { body: z.object({ provider: z.enum(OAuthProviderType) }) }, preHandler: [userMiddleware] },
+      {
+        schema: {
+          body: z.object({ provider: z.enum(OAuthProviderType) }),
+          response: {
+            200: z.array(z.custom<OAuthProvider>()),
+          },
+        },
+        preHandler: [userMiddleware],
+      },
       async (req, res) => {
         const { password } = (await prisma.user.findFirst({
           where: {

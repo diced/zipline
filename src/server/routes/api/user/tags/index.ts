@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/db';
-import { Tag, tagSelect } from '@/lib/db/models/tag';
+import { Tag, tagSchema, tagSelect } from '@/lib/db/models/tag';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { zStringTrimmed } from '@/lib/validation';
@@ -14,16 +14,27 @@ const logger = log('api').c('user').c('tags');
 export const PATH = '/api/user/tags';
 export default typedPlugin(
   async (server) => {
-    server.get(PATH, { preHandler: [userMiddleware] }, async (req, res) => {
-      const tags = await prisma.tag.findMany({
-        where: {
-          userId: req.user.id,
+    server.get(
+      PATH,
+      {
+        schema: {
+          response: {
+            200: z.array(tagSchema),
+          },
         },
-        select: tagSelect,
-      });
+        preHandler: [userMiddleware],
+      },
+      async (req, res) => {
+        const tags = await prisma.tag.findMany({
+          where: {
+            userId: req.user.id,
+          },
+          select: tagSelect,
+        });
 
-      return res.send(tags);
-    });
+        return res.send(tags);
+      },
+    );
 
     server.post(
       PATH,
@@ -33,6 +44,9 @@ export default typedPlugin(
             name: zStringTrimmed,
             color: z.string().regex(/^#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{3})$/),
           }),
+          response: {
+            200: tagSchema,
+          },
         },
         preHandler: [userMiddleware],
         ...secondlyRatelimit(1),

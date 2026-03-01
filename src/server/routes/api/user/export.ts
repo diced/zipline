@@ -33,6 +33,9 @@ export default typedPlugin(
       {
         schema: {
           querystring: querySchema,
+          response: {
+            200: z.union([z.array(z.custom<Export>()), z.any()]),
+          },
         },
         preHandler: [userMiddleware],
       },
@@ -57,7 +60,14 @@ export default typedPlugin(
     server.delete(
       PATH,
       {
-        schema: { querystring: querySchema },
+        schema: {
+          querystring: querySchema,
+          response: {
+            200: z.object({
+              deleted: z.boolean(),
+            }),
+          },
+        },
         preHandler: [userMiddleware],
       },
       async (req, res) => {
@@ -90,70 +100,84 @@ export default typedPlugin(
       },
     );
 
-    server.post(PATH, { preHandler: [userMiddleware], ...secondlyRatelimit(5) }, async (req, res) => {
-      const files = await prisma.file.findMany({
-        where: { userId: req.user.id },
-      });
-
-      if (!files.length) return res.badRequest('No files to export');
-
-      const exportFileName = `zexport_${req.user.id}_${Date.now()}_${files.length}.zip`;
-      const exportPath = join(config.core.tempDirectory, exportFileName);
-
-      logger.debug(`exporting ${req.user.id}`, { exportPath, files: files.length });
-
-      const exportDb = await prisma.export.create({
-        data: {
-          userId: req.user.id,
-          path: exportFileName,
-          files: files.length,
-          size: '0',
+    server.post(
+      PATH,
+      {
+        schema: {
+          response: {
+            200: z.object({
+              running: z.boolean(),
+            }),
+          },
         },
-      });
-      const writeStream = createWriteStream(exportPath);
+        preHandler: [userMiddleware],
+        ...secondlyRatelimit(5),
+      },
+      async (req, res) => {
+        const files = await prisma.file.findMany({
+          where: { userId: req.user.id },
+        });
 
-      const zip = archiver('zip', {
-        zlib: { level: 9 },
-      });
+        if (!files.length) return res.badRequest('No files to export');
 
-      zip.pipe(writeStream);
+        const exportFileName = `zexport_${req.user.id}_${Date.now()}_${files.length}.zip`;
+        const exportPath = join(config.core.tempDirectory, exportFileName);
 
-      let totalSize = 0;
-      for (const file of files) {
-        const stream = await datasource.get(file.name);
-        if (!stream) {
-          logger.warn(`failed to get file ${file.name}`);
-          continue;
-        }
+        logger.debug(`exporting ${req.user.id}`, { exportPath, files: files.length });
 
-        zip.append(stream, { name: file.name });
-        totalSize += file.size;
-        logger.debug('file added to zip', { name: file.name, size: file.size });
-      }
-
-      writeStream.on('close', async () => {
-        logger.debug('exported', { path: exportPath, bytes: zip.pointer() });
-        logger.info(`export for ${req.user.id} finished at ${exportPath}`);
-
-        await prisma.export.update({
-          where: { id: exportDb.id },
+        const exportDb = await prisma.export.create({
           data: {
-            completed: true,
-            size: (await stat(exportPath)).size.toString(),
+            userId: req.user.id,
+            path: exportFileName,
+            files: files.length,
+            size: '0',
           },
         });
-      });
+        const writeStream = createWriteStream(exportPath);
 
-      zip.on('error', (err) => {
-        logger.error('export zip error', { err, exportId: exportDb.id });
-      });
+        const zip = archiver('zip', {
+          zlib: { level: 9 },
+        });
 
-      zip.finalize();
+        zip.pipe(writeStream);
 
-      logger.info(`export for ${req.user.id} started`, { totalSize: bytes(totalSize) });
+        let totalSize = 0;
+        for (const file of files) {
+          const stream = await datasource.get(file.name);
+          if (!stream) {
+            logger.warn(`failed to get file ${file.name}`);
+            continue;
+          }
 
-      return res.send({ running: true });
-    });
+          zip.append(stream, { name: file.name });
+          totalSize += file.size;
+          logger.debug('file added to zip', { name: file.name, size: file.size });
+        }
+
+        writeStream.on('close', async () => {
+          logger.debug('exported', { path: exportPath, bytes: zip.pointer() });
+          logger.info(`export for ${req.user.id} finished at ${exportPath}`);
+
+          await prisma.export.update({
+            where: { id: exportDb.id },
+            data: {
+              completed: true,
+              size: (await stat(exportPath)).size.toString(),
+            },
+          });
+        });
+
+        zip.on('error', (err) => {
+          logger.error('export zip error', { err, exportId: exportDb.id });
+        });
+
+        zip.finalize();
+
+        logger.info(`export for ${req.user.id} started`, { totalSize: bytes(totalSize) });
+
+        return res.send({ running: true });
+      },
+    );
   },
   { name: PATH },
 );

@@ -44,6 +44,9 @@ export default typedPlugin(
             nometrics: z.string().optional(),
             counts: z.string().optional(),
           }),
+          response: {
+            200: z.any(),
+          },
         },
         preHandler: [userMiddleware, administratorMiddleware],
       },

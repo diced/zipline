@@ -19,6 +19,11 @@ export default typedPlugin(
       {
         schema: {
           querystring: z.object({ code: z.string().optional() }),
+          response: {
+            200: z.object({
+              invite: z.any().nullable(),
+            }),
+          },
         },
         ...secondlyRatelimit(10),
       },

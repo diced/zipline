@@ -89,6 +89,14 @@ export default typedPlugin(
     server.get(
       PATH,
       {
+        schema: {
+          response: {
+            200: z.object({
+              settings: z.custom<Settings>(),
+              tampered: z.array(z.string()),
+            }),
+          },
+        },
         preHandler: [userMiddleware, administratorMiddleware],
       },
       async (_, res) => {
@@ -112,6 +120,9 @@ export default typedPlugin(
       {
         schema: {
           body: z.custom<Partial<Settings>>(),
+          response: {
+            200: z.custom<ApiServerSettingsResponse>(),
+          },
         },
         preHandler: [userMiddleware, administratorMiddleware],
         ...secondlyRatelimit(1),
@@ -459,10 +470,8 @@ export default typedPlugin(
             issues: result.error.issues,
           });
 
-          return res.status(400).send({
-            statusCode: 400,
-            issues: result.error.issues,
-          });
+          // tODO: bring back issues field
+          return res.badRequest('Invalid settings update');
         }
 
         const newSettings = await prisma.zipline.update({

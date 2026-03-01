@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 export type Tag = {
   id: string;
   createdAt: Date;
@@ -29,3 +31,18 @@ export const tagSelectNoFiles = {
   name: true,
   color: true,
 };
+
+export const tagSchema = z.object({
+  id: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+  name: z.string(),
+  color: z.string(),
+  files: z
+    .array(
+      z.object({
+        id: z.string(),
+      }),
+    )
+    .optional(),
+});

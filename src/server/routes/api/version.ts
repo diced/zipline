@@ -3,6 +3,7 @@ import { log } from '@/lib/logger';
 import { getVersion } from '@/lib/version';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
+import z from 'zod';
 
 export type ApiVersionResponse = {
   details: ReturnType<typeof getVersion>;
@@ -38,48 +39,63 @@ let cachedAt = 0;
 export const PATH = '/api/version';
 export default typedPlugin(
   async (server) => {
-    server.get(PATH, { preHandler: [userMiddleware] }, async (_, res) => {
-      if (!config.features.versionChecking) return res.notFound();
+    server.get(
+      PATH,
+      {
+        schema: {
+          response: {
+            200: z.object({
+              data: z.custom<VersionAPI>(),
+              details: z.custom<ReturnType<typeof getVersion>>(),
+              cached: z.boolean(),
+            }),
+          },
+        },
+        preHandler: [userMiddleware],
+      },
+      async (_, res) => {
+        if (!config.features.versionChecking) return res.notFound();
 
-      const details = getVersion();
+        const details = getVersion();
 
-      // 6 hrs cache
-      if (cachedData && Date.now() - cachedAt < 6 * 60 * 60 * 1000) {
-        return res.send({ data: cachedData, details, cached: true });
-      }
-
-      const url = new URL(config.features.versionAPI);
-      url.pathname = '/';
-      url.searchParams.set('details', JSON.stringify(details));
-
-      try {
-        const resp = await fetch(url);
-
-        if (!resp.ok) {
-          logger.error('failed to fetch version details', {
-            status: resp.status,
-            statusText: resp.statusText,
-            text: await resp.text(),
-          });
-
-          return res.internalServerError('failed to fetch version details');
+        // 6 hrs cache
+        if (cachedData && Date.now() - cachedAt < 6 * 60 * 60 * 1000) {
+          return res.send({ data: cachedData, details, cached: true });
         }
 
-        const data: VersionAPI = await resp.json();
+        const url = new URL(config.features.versionAPI);
+        url.pathname = '/';
+        url.searchParams.set('details', JSON.stringify(details));
 
-        cachedData = data;
-        cachedAt = Date.now();
+        try {
+          const resp = await fetch(url);
 
-        return res.send({
-          data,
-          details,
-          cached: false,
-        });
-      } catch (e) {
-        logger.error('failed to fetch version details').error(e as Error);
-        return res.internalServerError('failed to fetch version details');
-      }
-    });
+          if (!resp.ok) {
+            logger.error('failed to fetch version details', {
+              status: resp.status,
+              statusText: resp.statusText,
+              text: await resp.text(),
+            });
+
+            return res.internalServerError('failed to fetch version details');
+          }
+
+          const data: VersionAPI = await resp.json();
+
+          cachedData = data;
+          cachedAt = Date.now();
+
+          return res.send({
+            data,
+            details,
+            cached: false,
+          });
+        } catch (e) {
+          logger.error('failed to fetch version details').error(e as Error);
+          return res.internalServerError('failed to fetch version details');
+        }
+      },
+    );
   },
   { name: PATH },
 );

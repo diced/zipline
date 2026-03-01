@@ -23,6 +23,11 @@ export default typedPlugin(
             forceDelete: z.boolean().default(false),
             forceUpdate: z.boolean().default(false),
           }),
+          response: {
+            200: z.object({
+              status: z.string().optional(),
+            }),
+          },
         },
         preHandler: [userMiddleware, administratorMiddleware],
         ...secondlyRatelimit(1),

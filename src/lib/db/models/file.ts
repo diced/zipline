@@ -1,6 +1,7 @@
 import { config } from '@/lib/config';
 import { formatRootUrl } from '@/lib/url';
-import { Tag, tagSelectNoFiles } from './tag';
+import { z } from 'zod';
+import { Tag, tagSchema, tagSelectNoFiles } from './tag';
 
 export type File = {
   createdAt: Date;
@@ -74,3 +75,30 @@ export function cleanFiles(files: File[], stringifyDates = false) {
 
   return files;
 }
+
+export const fileSchema = z.object({
+  createdAt: z.date(),
+  updatedAt: z.date(),
+  deletesAt: z.date().nullable(),
+  favorite: z.boolean(),
+  id: z.string(),
+  originalName: z.string().nullable(),
+  name: z.string(),
+  size: z.number(),
+  type: z.string(),
+  views: z.number(),
+  maxViews: z.number().nullable().optional(),
+  password: z.union([z.string(), z.boolean()]).nullable().optional(),
+  folderId: z.string().nullable(),
+
+  thumbnail: z
+    .object({
+      path: z.string(),
+    })
+    .nullable(),
+
+  tags: z.array(tagSchema).optional(),
+
+  url: z.string().optional(),
+  similarity: z.number().optional(),
+});

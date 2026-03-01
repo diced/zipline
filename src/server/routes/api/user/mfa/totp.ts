@@ -1,6 +1,6 @@
 import { config } from '@/lib/config';
 import { prisma } from '@/lib/db';
-import { User, userSelect } from '@/lib/db/models/user';
+import { User, userSchema, userSelect } from '@/lib/db/models/user';
 import { log } from '@/lib/logger';
 import { generateKey, totpQrcode, verifyTotpCode } from '@/lib/totp';
 import { userMiddleware } from '@/server/middleware/user';
@@ -21,29 +21,48 @@ const totpEnabledMiddleware = (_: FastifyRequest, res: FastifyReply, next: () =>
 export const PATH = '/api/user/mfa/totp';
 export default typedPlugin(
   async (server) => {
-    server.get(PATH, { preHandler: [userMiddleware, totpEnabledMiddleware] }, async (req, res) => {
-      if (!req.user.totpSecret) {
-        const secret = generateKey();
-        const qrcode = await totpQrcode({
-          issuer: config.mfa.totp.issuer,
-          username: req.user.username,
-          secret,
-        });
+    server.get(
+      PATH,
+      {
+        schema: {
+          response: {
+            200: z.union([
+              z.object({
+                secret: z.string(),
+              }),
+              z.object({
+                secret: z.string(),
+                qrcode: z.string(),
+              }),
+            ]),
+          },
+        },
+        preHandler: [userMiddleware, totpEnabledMiddleware],
+      },
+      async (req, res) => {
+        if (!req.user.totpSecret) {
+          const secret = generateKey();
+          const qrcode = await totpQrcode({
+            issuer: config.mfa.totp.issuer,
+            username: req.user.username,
+            secret,
+          });
 
-        logger.info('user generated TOTP secret', {
-          user: req.user.username,
-        });
+          logger.info('user generated TOTP secret', {
+            user: req.user.username,
+          });
+
+          return res.send({
+            secret,
+            qrcode,
+          });
+        }
 
         return res.send({
-          secret,
-          qrcode,
+          secret: req.user.totpSecret,
         });
-      }
-
-      return res.send({
-        secret: req.user.totpSecret,
-      });
-    });
+      },
+    );
 
     server.post(
       PATH,
@@ -53,6 +72,9 @@ export default typedPlugin(
             code: z.string().min(6).max(6),
             secret: z.string(),
           }),
+          response: {
+            200: userSchema,
+          },
         },
         preHandler: [userMiddleware, totpEnabledMiddleware],
       },
@@ -83,6 +105,9 @@ export default typedPlugin(
           body: z.object({
             code: z.string().min(6).max(6),
           }),
+          response: {
+            200: userSchema,
+          },
         },
         preHandler: [userMiddleware, totpEnabledMiddleware],
       },

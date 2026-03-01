@@ -1,7 +1,7 @@
 import { ziplineClientParseSchema } from '@/lib/api/detect';
 import { verifyPassword } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
-import { User, userSelect } from '@/lib/db/models/user';
+import { User, userSchema, userSelect } from '@/lib/db/models/user';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { verifyTotpCode } from '@/lib/totp';
@@ -32,6 +32,12 @@ export default typedPlugin(
           headers: z.object({
             'x-zipline-client': ziplineClientParseSchema.optional(),
           }),
+          response: {
+            200: z.object({
+              user: userSchema.optional(),
+              totp: z.literal(true).optional(),
+            }),
+          },
         },
         ...secondlyRatelimit(2),
       },

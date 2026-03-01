@@ -4,6 +4,7 @@ import { getZipline } from '@/lib/db/models/zipline';
 import enabled from '@/lib/oauth/enabled';
 import { isTruthy } from '@/lib/primitive';
 import typedPlugin from '@/server/typedPlugin';
+import z from 'zod';
 
 export type ApiServerPublicResponse = {
   oauth: {
@@ -47,53 +48,62 @@ export type ApiServerPublicResponse = {
 export const PATH = '/api/server/public';
 export default typedPlugin(
   async (server) => {
-    server.get<{ Body: Body }>(PATH, async (_, res) => {
-      const zipline = await getZipline();
+    server.get<{ Body: Body }>(
+      PATH,
+      {
+        schema: {
+          response: {
+            200: z.custom<ApiServerPublicResponse>(),
+          },
+        },
+      },
+      async (_, res) => {
+        const zipline = await getZipline();
 
-      const response: ApiServerPublicResponse = {
-        oauth: {
-          bypassLocalLogin: config.oauth.bypassLocalLogin,
-          loginOnly: config.oauth.loginOnly,
-        },
-        oauthEnabled: enabled(config),
-        website: {
-          loginBackground: config.website.loginBackground,
-          loginBackgroundBlur: config.website.loginBackgroundBlur,
-          title: config.website.title,
-          tos: config.website.tos !== undefined,
-        },
-        features: {
-          oauthRegistration: config.features.oauthRegistration,
-          userRegistration: config.features.userRegistration,
-        },
-        mfa: {
-          passkeys: isTruthy(
-            config.mfa.passkeys.enabled,
-            config.mfa.passkeys.rpID,
-            config.mfa.passkeys.origin,
-          ),
-        },
-        files: {
-          maxFileSize: config.files.maxFileSize,
-          defaultFormat: config.files.defaultFormat,
-          maxExpiration: config.files.maxExpiration,
-        },
-        chunks: config.chunks,
-        firstSetup: zipline.firstSetup,
-        domains: config.domains,
-        returnHttps: config.core.returnHttpsUrls,
-      };
+        const response: ApiServerPublicResponse = {
+          oauth: {
+            bypassLocalLogin: config.oauth.bypassLocalLogin,
+            loginOnly: config.oauth.loginOnly,
+          },
+          oauthEnabled: enabled(config),
+          website: {
+            loginBackground: config.website.loginBackground,
+            loginBackgroundBlur: config.website.loginBackgroundBlur,
+            title: config.website.title,
+            tos: config.website.tos !== undefined,
+          },
+          features: {
+            oauthRegistration: config.features.oauthRegistration,
+            userRegistration: config.features.userRegistration,
+          },
+          mfa: {
+            passkeys: isTruthy(
+              config.mfa.passkeys.enabled,
+              config.mfa.passkeys.rpID,
+              config.mfa.passkeys.origin,
+            ),
+          },
+          files: {
+            maxFileSize: config.files.maxFileSize,
+            defaultFormat: config.files.defaultFormat,
+            maxExpiration: config.files.maxExpiration,
+          },
+          chunks: config.chunks,
+          firstSetup: zipline.firstSetup,
+          domains: config.domains,
+          returnHttps: config.core.returnHttpsUrls,
+        };
 
-      if (config.features.metrics.adminOnly) {
-        response.features.metrics = { adminOnly: true };
-      }
+        if (config.features.metrics.adminOnly) {
+          response.features.metrics = { adminOnly: true };
+        }
 
-      if (config.website.tos) {
-        response.tos = global.__cachedConfigValues__.tos!;
-      }
-
-      return res.send(response);
-    });
+        if (config.website.tos) {
+          response.tos = global.__cachedConfigValues__.tos!;
+        }
+        return res.send(response);
+      },
+    );
   },
   { name: PATH },
 );

@@ -15,18 +15,32 @@ const logger = log('api').c('user').c('sessions');
 export const PATH = '/api/user/sessions';
 export default typedPlugin(
   async (server) => {
-    server.get(PATH, { preHandler: [userMiddleware] }, async (req, res) => {
-      const currentSession = await getSession(req, res);
+    server.get(
+      PATH,
+      {
+        schema: {
+          response: {
+            200: z.object({
+              current: z.any(),
+              other: z.array(z.any()),
+            }),
+          },
+        },
+        preHandler: [userMiddleware],
+      },
+      async (req, res) => {
+        const currentSession = await getSession(req, res);
 
-      const currentDbSession = req.user.sessions.find((session) => session.id === currentSession.sessionId);
+        const currentDbSession = req.user.sessions.find((session) => session.id === currentSession.sessionId);
 
-      if (!currentDbSession) return res.unauthorized('invalid login session');
+        if (!currentDbSession) return res.unauthorized('invalid login session');
 
-      return res.send({
-        current: currentDbSession,
-        other: req.user.sessions.filter((session) => session.id !== currentSession.sessionId),
-      });
-    });
+        return res.send({
+          current: currentDbSession,
+          other: req.user.sessions.filter((session) => session.id !== currentSession.sessionId),
+        });
+      },
+    );
 
     server.delete(
       PATH,
@@ -36,6 +50,12 @@ export default typedPlugin(
             sessionId: z.string().optional(),
             all: z.boolean().optional(),
           }),
+          response: {
+            200: z.object({
+              current: z.any(),
+              other: z.array(z.any()),
+            }),
+          },
         },
         preHandler: [userMiddleware],
       },

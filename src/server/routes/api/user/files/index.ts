@@ -52,6 +52,19 @@ export default typedPlugin(
             id: z.string().optional(),
             folder: z.string().optional(),
           }),
+          response: {
+            200: z.object({
+              page: z.array(z.any()),
+              search: z
+                .object({
+                  field: z.string(),
+                  query: z.union([z.string(), z.array(z.string())]),
+                })
+                .optional(),
+              total: z.number().optional(),
+              pages: z.number().optional(),
+            }),
+          },
         },
         preHandler: [userMiddleware],
       },

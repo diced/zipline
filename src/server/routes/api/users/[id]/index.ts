@@ -2,7 +2,7 @@ import { bytes } from '@/lib/bytes';
 import { hashPassword } from '@/lib/crypto';
 import { datasource } from '@/lib/datasource';
 import { prisma } from '@/lib/db';
-import { User, userSelect } from '@/lib/db/models/user';
+import { User, userSchema, userSelect } from '@/lib/db/models/user';
 import { log } from '@/lib/logger';
 import { canInteract } from '@/lib/role';
 import { zStringTrimmed } from '@/lib/validation';
@@ -26,7 +26,12 @@ export default typedPlugin(
     server.get(
       PATH,
       {
-        schema: { params: paramsSchema },
+        schema: {
+          params: paramsSchema,
+          response: {
+            200: userSchema,
+          },
+        },
         preHandler: [userMiddleware, administratorMiddleware],
       },
       async (req, res) => {
@@ -62,6 +67,9 @@ export default typedPlugin(
               })
               .optional(),
           }),
+          response: {
+            200: userSchema,
+          },
         },
         preHandler: [userMiddleware, administratorMiddleware],
       },
@@ -161,6 +169,9 @@ export default typedPlugin(
           body: z.object({
             delete: z.boolean().optional(),
           }),
+          response: {
+            200: userSchema,
+          },
         },
         preHandler: [userMiddleware, administratorMiddleware],
       },

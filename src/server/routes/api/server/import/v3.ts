@@ -13,7 +13,6 @@ export type ApiServerImportV3 = {
   files: Record<string, string>;
   folders: Record<string, string>;
   urls: Record<string, string>;
-  settings: string[];
 };
 const parseDate = (date: string) => (isNaN(Date.parse(date)) ? new Date() : new Date(date));
 
@@ -30,6 +29,9 @@ export default typedPlugin(
             export3: export3Schema.required(),
             importFromUser: z.string().optional(),
           }),
+          response: {
+            200: z.custom<ApiServerImportV3>(),
+          },
         },
         preHandler: [userMiddleware, administratorMiddleware],
         // 24gb, just in case
@@ -288,7 +290,7 @@ export default typedPlugin(
           files: filesImportedToId,
           folders: foldersImportedToId,
           urls: urlsImportedToId,
-        });
+        } satisfies ApiServerImportV3);
       },
     );
   },

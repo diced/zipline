@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/db';
-import { Tag, tagSelect } from '@/lib/db/models/tag';
+import { Tag, tagSchema, tagSelect } from '@/lib/db/models/tag';
 import { log } from '@/lib/logger';
 import { zStringTrimmed } from '@/lib/validation';
 import { userMiddleware } from '@/server/middleware/user';
@@ -17,25 +17,44 @@ const paramsSchema = z.object({
 export const PATH = '/api/user/tags/:id';
 export default typedPlugin(
   async (server) => {
-    server.get(PATH, { schema: { params: paramsSchema }, preHandler: [userMiddleware] }, async (req, res) => {
-      const { id } = req.params;
-
-      const tag = await prisma.tag.findFirst({
-        where: {
-          userId: req.user.id,
-          id,
+    server.get(
+      PATH,
+      {
+        schema: {
+          params: paramsSchema,
+          response: {
+            200: tagSchema,
+          },
         },
-        select: tagSelect,
-      });
-      if (!tag) return res.notFound();
+        preHandler: [userMiddleware],
+      },
+      async (req, res) => {
+        const { id } = req.params;
 
-      return res.send(tag);
-    });
+        const tag = await prisma.tag.findFirst({
+          where: {
+            userId: req.user.id,
+            id,
+          },
+          select: tagSelect,
+        });
+        if (!tag) return res.notFound();
+
+        return res.send(tag);
+      },
+    );
 
     server.delete(
       PATH,
       {
-        schema: { params: paramsSchema },
+        schema: {
+          params: paramsSchema,
+          response: {
+            200: z.object({
+              success: z.boolean(),
+            }),
+          },
+        },
         preHandler: [userMiddleware],
       },
       async (req, res) => {
@@ -71,6 +90,9 @@ export default typedPlugin(
               .regex(/^#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{3})$/)
               .optional(),
           }),
+          response: {
+            200: tagSchema,
+          },
         },
         preHandler: [userMiddleware],
       },

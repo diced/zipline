@@ -44,6 +44,12 @@ export default typedPlugin(
             favorite: z.boolean().optional(),
             folder: z.string().optional(),
           }),
+          response: {
+            200: z.object({
+              count: z.number(),
+              name: z.string().optional(),
+            }),
+          },
         },
         preHandler: [userMiddleware],
         ...secondlyRatelimit(2),
@@ -134,6 +140,11 @@ export default typedPlugin(
             files: z.array(z.string()).min(1),
             delete_datasourceFiles: z.boolean().optional(),
           }),
+          response: {
+            200: z.object({
+              count: z.number(),
+            }),
+          },
         },
         preHandler: [userMiddleware],
         ...secondlyRatelimit(2),

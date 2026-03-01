@@ -1,6 +1,6 @@
 import { createToken, hashPassword } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
-import { User, userSelect } from '@/lib/db/models/user';
+import { User, userSchema, userSelect } from '@/lib/db/models/user';
 import { getZipline } from '@/lib/db/models/zipline';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
@@ -18,12 +18,24 @@ const logger = log('api').c('setup');
 export const PATH = '/api/setup';
 export default typedPlugin(
   async (server) => {
-    server.get(PATH, async (_, res) => {
-      const { firstSetup } = await getZipline();
-      if (!firstSetup) return res.forbidden();
+    server.get(
+      PATH,
+      {
+        schema: {
+          response: {
+            200: z.object({
+              firstSetup: z.boolean(),
+            }),
+          },
+        },
+      },
+      async (_, res) => {
+        const { firstSetup } = await getZipline();
+        if (!firstSetup) return res.forbidden();
 
-      return res.send({ firstSetup });
-    });
+        return res.send({ firstSetup });
+      },
+    );
 
     server.post(
       PATH,
@@ -33,6 +45,12 @@ export default typedPlugin(
             username: zStringTrimmed,
             password: zStringTrimmed,
           }),
+          response: {
+            200: z.object({
+              firstSetup: z.boolean(),
+              user: userSchema,
+            }),
+          },
         },
         ...secondlyRatelimit(5),
       },

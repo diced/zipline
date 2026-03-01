@@ -26,6 +26,9 @@ export default typedPlugin(
             parentId: z.string().optional(),
             root: zQsBoolean.optional(),
           }),
+          response: {
+            200: z.array(z.any()),
+          },
         },
         preHandler: [userMiddleware],
       },
@@ -96,6 +99,9 @@ export default typedPlugin(
             files: z.array(z.string()).optional(),
             parentId: z.string().optional(),
           }),
+          response: {
+            200: z.any(),
+          },
         },
         preHandler: [userMiddleware],
         ...secondlyRatelimit(2),

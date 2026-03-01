@@ -30,6 +30,11 @@ export default typedPlugin(
           headers: z.object({
             'x-zipline-client': ziplineClientParseSchema.optional(),
           }),
+          response: {
+            200: z.object({
+              user: z.any().optional(),
+            }),
+          },
         },
         ...secondlyRatelimit(5),
       },

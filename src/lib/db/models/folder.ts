@@ -1,6 +1,7 @@
 import type { Folder as PrismaFolder } from '@/prisma/client';
 import { prisma } from '@/lib/db';
-import { File, cleanFiles } from './file';
+import { z } from 'zod';
+import { File, fileSchema, cleanFiles } from './file';
 
 export type Folder = PrismaFolder & {
   files?: File[];
@@ -87,3 +88,45 @@ export function cleanFolders(folders: Partial<Folder>[], stringifyDates = false)
 
   return folders;
 }
+
+export const folderSchema = z.object({
+  id: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+
+  name: z.string(),
+  public: z.boolean(),
+  allowUploads: z.boolean(),
+
+  parentId: z.string().nullable(),
+  userId: z.string(),
+
+  files: z.array(fileSchema).optional(),
+  parent: z.any().nullable().optional(),
+  children: z.array(z.any()).optional(),
+  _count: z
+    .object({
+      children: z.number().optional(),
+      files: z.number().optional(),
+    })
+    .optional(),
+});
+
+export const folderParentSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  parentId: z.string().nullable(),
+  get parent() {
+    return folderParentSchema.nullable().optional();
+  },
+});
+
+export const folderParentPublicSchema = z.object({
+  public: z.boolean(),
+  id: z.string(),
+  name: z.string(),
+  parentId: z.string().nullable(),
+  get parent() {
+    return folderParentPublicSchema.nullable().optional();
+  },
+});

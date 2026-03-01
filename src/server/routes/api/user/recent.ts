@@ -16,6 +16,9 @@ export default typedPlugin(
           querystring: z.object({
             take: z.coerce.number().min(1).max(100).default(3),
           }),
+          response: {
+            200: z.array(z.any()),
+          },
         },
         preHandler: [userMiddleware],
       },

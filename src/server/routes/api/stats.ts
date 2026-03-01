@@ -1,6 +1,6 @@
 import { config } from '@/lib/config';
 import { prisma } from '@/lib/db';
-import { Metric } from '@/lib/db/models/metric';
+import { Metric, metricSchema } from '@/lib/db/models/metric';
 import { isAdministrator } from '@/lib/role';
 import { zQsBoolean } from '@/lib/validation';
 import { userMiddleware } from '@/server/middleware/user';
@@ -35,6 +35,9 @@ export default typedPlugin(
               }, 'Invalid date'),
             all: zQsBoolean.default(false),
           }),
+          response: {
+            200: z.array(metricSchema),
+          },
         },
         preHandler: [userMiddleware],
       },

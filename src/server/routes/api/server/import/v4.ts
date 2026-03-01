@@ -39,6 +39,9 @@ export default typedPlugin(
               mergeCurrentUser: z.string().nullish().default(null),
             }),
           }),
+          response: {
+            200: z.custom<ApiServerImportV4>(),
+          },
         },
         preHandler: [userMiddleware, administratorMiddleware],
         // 24gb, just in case

@@ -23,3 +23,17 @@ export const metadataSchema = z.object({
     id: z.string(),
   }),
 });
+
+export const incompleteFileSchema = z.object({
+  id: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+
+  status: z.nativeEnum(IncompleteFileStatus),
+  chunksTotal: z.number(),
+  chunksComplete: z.number(),
+
+  userId: z.string(),
+
+  metadata: metadataSchema,
+});

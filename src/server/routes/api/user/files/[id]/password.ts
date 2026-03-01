@@ -25,6 +25,11 @@ export default typedPlugin(
           params: z.object({
             id: z.string(),
           }),
+          response: {
+            200: z.object({
+              success: z.boolean(),
+            }),
+          },
         },
         ...secondlyRatelimit(2),
       },

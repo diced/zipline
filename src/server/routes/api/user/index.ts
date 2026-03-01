@@ -18,9 +18,23 @@ const logger = log('api').c('user');
 export const PATH = '/api/user';
 export default typedPlugin(
   async (server) => {
-    server.get(PATH, { preHandler: [userMiddleware] }, async (req, res) => {
-      return res.send({ user: req.user, token: req.cookies.zipline_token });
-    });
+    server.get(
+      PATH,
+      {
+        schema: {
+          response: {
+            200: z.object({
+              user: z.any().optional(),
+              token: z.string().optional(),
+            }),
+          },
+        },
+        preHandler: [userMiddleware],
+      },
+      async (req, res) => {
+        return res.send({ user: req.user, token: req.cookies.zipline_token });
+      },
+    );
 
     server.patch(
       PATH,
@@ -47,6 +61,12 @@ export default typedPlugin(
               .partial()
               .optional(),
           }),
+          response: {
+            200: z.object({
+              user: z.any().optional(),
+              token: z.string().optional(),
+            }),
+          },
         },
         preHandler: [userMiddleware],
         ...secondlyRatelimit(1),

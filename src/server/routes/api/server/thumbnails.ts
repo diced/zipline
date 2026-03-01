@@ -21,6 +21,11 @@ export default typedPlugin(
           body: z.object({
             rerun: z.boolean().default(false),
           }),
+          response: {
+            200: z.object({
+              status: z.string(),
+            }),
+          },
         },
         preHandler: [userMiddleware, administratorMiddleware],
         ...secondlyRatelimit(1),

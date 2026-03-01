@@ -4,6 +4,7 @@ import { clearZeros, clearZerosFiles } from '@/lib/server-util/clearZeros';
 import { administratorMiddleware } from '@/server/middleware/administrator';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
+import z from 'zod';
 
 export type ApiServerClearZerosResponse = {
   status?: string;
@@ -18,6 +19,13 @@ export default typedPlugin(
     server.get(
       PATH,
       {
+        schema: {
+          response: {
+            200: z.object({
+              files: z.any(),
+            }),
+          },
+        },
         preHandler: [userMiddleware, administratorMiddleware],
       },
       async (_, res) => {
@@ -30,6 +38,13 @@ export default typedPlugin(
     server.delete(
       PATH,
       {
+        schema: {
+          response: {
+            200: z.object({
+              status: z.string().optional(),
+            }),
+          },
+        },
         preHandler: [userMiddleware, administratorMiddleware],
         ...secondlyRatelimit(1),
       },

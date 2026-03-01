@@ -19,6 +19,9 @@ export default typedPlugin(
           querystring: z.object({
             uploads: z.string().optional(),
           }),
+          response: {
+            200: z.any(),
+          },
         },
       },
       async (req, res) => {

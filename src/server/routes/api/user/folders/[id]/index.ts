@@ -49,7 +49,15 @@ export default typedPlugin(
   async (server) => {
     server.get(
       PATH,
-      { schema: { params: paramsSchema }, preHandler: [userMiddleware, folderExistsAndEditable] },
+      {
+        schema: {
+          params: paramsSchema,
+          response: {
+            200: z.any(),
+          },
+        },
+        preHandler: [userMiddleware, folderExistsAndEditable],
+      },
       async (req, res) => {
         const { id } = req.params;
 
@@ -99,6 +107,9 @@ export default typedPlugin(
             id: z.string(),
           }),
           params: paramsSchema,
+          response: {
+            200: z.any(),
+          },
         },
         preHandler: [userMiddleware, folderExistsAndEditable],
       },
@@ -164,6 +175,9 @@ export default typedPlugin(
             parentId: z.string().nullish(),
           }),
           params: paramsSchema,
+          response: {
+            200: z.any(),
+          },
         },
         preHandler: [userMiddleware, folderExistsAndEditable],
       },
@@ -251,6 +265,9 @@ export default typedPlugin(
             targetFolderId: z.string().optional(),
           }),
           params: paramsSchema,
+          response: {
+            200: z.any(),
+          },
         },
         preHandler: [userMiddleware, folderExistsAndEditable],
       },
