@@ -1,16 +1,5 @@
 import { z } from 'zod';
 
-export type Tag = {
-  id: string;
-  createdAt: Date;
-  updatedAt: Date;
-  name: string;
-  color: string;
-  files?: {
-    id: string;
-  }[];
-};
-
 export const tagSelect = {
   id: true,
   createdAt: true,
@@ -46,3 +35,5 @@ export const tagSchema = z.object({
     )
     .optional(),
 });
+
+export type Tag = z.infer<typeof tagSchema>;

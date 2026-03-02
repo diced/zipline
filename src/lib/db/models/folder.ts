@@ -1,28 +1,6 @@
-import type { Folder as PrismaFolder } from '@/prisma/client';
 import { prisma } from '@/lib/db';
 import { z } from 'zod';
-import { File, fileSchema, cleanFiles } from './file';
-
-export type Folder = PrismaFolder & {
-  files?: File[];
-  parent?: Partial<PrismaFolder> | null;
-  children?: Partial<Folder>[];
-  _count?: {
-    children?: number;
-    files?: number;
-  };
-};
-
-export type FolderParent = {
-  id: string;
-  name: string;
-  parentId: string | null;
-  parent?: FolderParent | null;
-};
-
-export type FolderParentPublic = {
-  public: boolean;
-} & FolderParent;
+import { fileSchema, cleanFiles } from './file';
 
 export async function buildParentChain(parentId: string | null): Promise<FolderParent | null> {
   if (!parentId) return null;
@@ -112,6 +90,8 @@ export const folderSchema = z.object({
     .optional(),
 });
 
+export type Folder = z.infer<typeof folderSchema>;
+
 export const folderParentSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -130,3 +110,6 @@ export const folderParentPublicSchema = z.object({
     return folderParentPublicSchema.nullable().optional();
   },
 });
+
+export type FolderParent = z.infer<typeof folderParentSchema>;
+export type FolderParentPublic = z.infer<typeof folderParentPublicSchema>;

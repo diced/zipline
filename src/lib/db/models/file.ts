@@ -1,32 +1,7 @@
 import { config } from '@/lib/config';
 import { formatRootUrl } from '@/lib/url';
 import { z } from 'zod';
-import { Tag, tagSchema, tagSelectNoFiles } from './tag';
-
-export type File = {
-  createdAt: Date;
-  updatedAt: Date;
-  deletesAt: Date | null;
-  favorite: boolean;
-  id: string;
-  originalName: string | null;
-  name: string;
-  size: number;
-  type: string;
-  views: number;
-  maxViews?: number | null;
-  password?: string | boolean | null;
-  folderId: string | null;
-
-  thumbnail: {
-    path: string;
-  } | null;
-
-  tags?: Tag[];
-
-  url?: string;
-  similarity?: number;
-};
+import { tagSchema, tagSelectNoFiles } from './tag';
 
 export const fileSelect = {
   createdAt: true,
@@ -102,3 +77,5 @@ export const fileSchema = z.object({
   url: z.string().optional(),
   similarity: z.number().optional(),
 });
+
+export type File = z.infer<typeof fileSchema>;

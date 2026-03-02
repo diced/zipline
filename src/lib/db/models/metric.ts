@@ -1,14 +1,7 @@
 import { z } from 'zod';
 
-export type Metric = {
-  id: string;
-  createdAt: Date;
-  updatedAt: Date;
-
-  data: MetricData;
-};
-
 export type MetricData = z.infer<typeof metricDataSchema>;
+
 export const metricDataSchema = z.object({
   users: z.number(),
   files: z.number(),
@@ -46,3 +39,5 @@ export const metricSchema = z.object({
   updatedAt: z.date(),
   data: metricDataSchema,
 });
+
+export type Metric = z.infer<typeof metricSchema>;

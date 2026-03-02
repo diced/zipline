@@ -1,9 +1,4 @@
-import type { Url as PrismaUrl } from '@/prisma/client';
 import { z } from 'zod';
-
-export type Url = PrismaUrl & {
-  similarity?: number;
-};
 
 export function cleanUrlPasswords(urls: Url[]) {
   for (const url of urls) {
@@ -23,10 +18,12 @@ export const urlSchema = z.object({
   destination: z.string(),
   views: z.number(),
   maxViews: z.number().nullable(),
-  password: z.string().nullable(),
+  password: z.union([z.string(), z.boolean()]).nullable(),
   enabled: z.boolean(),
 
   userId: z.string().nullable(),
 
   similarity: z.number().optional(),
 });
+
+export type Url = z.infer<typeof urlSchema>;

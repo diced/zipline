@@ -1,20 +1,6 @@
 import { IncompleteFileStatus } from '@/prisma/client';
 import { z } from 'zod';
 
-export type IncompleteFile = {
-  id: string;
-  createdAt: Date;
-  updatedAt: Date;
-
-  status: IncompleteFileStatus;
-  chunksTotal: number;
-  chunksComplete: number;
-
-  userId: string;
-
-  metadata: IncompleteFileMetadata;
-};
-
 export type IncompleteFileMetadata = z.infer<typeof metadataSchema>;
 export const metadataSchema = z.object({
   file: z.object({
@@ -29,7 +15,7 @@ export const incompleteFileSchema = z.object({
   createdAt: z.date(),
   updatedAt: z.date(),
 
-  status: z.nativeEnum(IncompleteFileStatus),
+  status: z.enum(IncompleteFileStatus),
   chunksTotal: z.number(),
   chunksComplete: z.number(),
 
@@ -37,3 +23,5 @@ export const incompleteFileSchema = z.object({
 
   metadata: metadataSchema,
 });
+
+export type IncompleteFile = z.infer<typeof incompleteFileSchema>;

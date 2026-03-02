@@ -1,14 +1,5 @@
-import type { Invite as PrismaInvite } from '@/prisma/client';
-import type { User } from './user';
+import { Role } from '@/prisma/client';
 import { z } from 'zod';
-
-export type Invite = PrismaInvite & {
-  inviter?: {
-    username: string;
-    id: string;
-    role: User['role'];
-  };
-};
 
 export const inviteInviterSelect = {
   select: {
@@ -34,7 +25,9 @@ export const inviteSchema = z.object({
     .object({
       username: z.string(),
       id: z.string(),
-      role: z.enum(['USER', 'ADMIN', 'SUPERADMIN']),
+      role: z.enum(Role),
     })
     .optional(),
 });
+
+export type Invite = z.infer<typeof inviteSchema>;
