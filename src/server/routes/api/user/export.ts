@@ -2,6 +2,7 @@ import { bytes } from '@/lib/bytes';
 import { config } from '@/lib/config';
 import { datasource } from '@/lib/datasource';
 import { prisma } from '@/lib/db';
+import { exportSchema } from '@/lib/db/models/export';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { Export } from '@/prisma/client';
@@ -35,7 +36,7 @@ export default typedPlugin(
           description: 'List your exports or download a specific completed export archive by ID.',
           querystring: querySchema,
           response: {
-            200: z.union([z.array(z.custom<Export>()), z.any()]),
+            200: z.array(exportSchema),
           },
         },
         preHandler: [userMiddleware],

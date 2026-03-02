@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/db';
 import { log } from '@/lib/logger';
-import type { UserSession } from '@/prisma/client';
+import { UserSession, userSessionSchema } from '@/lib/db/models/user';
 import { userMiddleware } from '@/server/middleware/user';
 import { getSession } from '@/server/session';
 import typedPlugin from '@/server/typedPlugin';
@@ -23,8 +23,8 @@ export default typedPlugin(
             'List the current browser session and other active sessions for the authenticated user.',
           response: {
             200: z.object({
-              current: z.any(),
-              other: z.array(z.any()),
+              current: userSessionSchema,
+              other: z.array(userSessionSchema),
             }),
           },
         },
@@ -55,8 +55,8 @@ export default typedPlugin(
           }),
           response: {
             200: z.object({
-              current: z.any(),
-              other: z.array(z.any()),
+              current: userSessionSchema,
+              other: z.array(userSessionSchema),
             }),
           },
         },

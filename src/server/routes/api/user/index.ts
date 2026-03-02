@@ -1,6 +1,6 @@
 import { hashPassword } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
-import { User, userSelect } from '@/lib/db/models/user';
+import { User, userSchema, userSelect } from '@/lib/db/models/user';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { zStringTrimmed } from '@/lib/validation';
@@ -25,7 +25,7 @@ export default typedPlugin(
           description: 'Get the currently authenticated user and their token.',
           response: {
             200: z.object({
-              user: z.any().optional(),
+              user: userSchema.optional(),
               token: z.string().optional(),
             }),
           },
@@ -65,7 +65,7 @@ export default typedPlugin(
           }),
           response: {
             200: z.object({
-              user: z.any().optional(),
+              user: userSchema.optional(),
               token: z.string().optional(),
             }),
           },

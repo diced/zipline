@@ -32,7 +32,7 @@ export const userViewSchema = z
 
 export type UserViewSettings = z.infer<typeof userViewSchema>;
 
-const userSessionSchema = z.object({
+export const userSessionSchema = z.object({
   id: z.string(),
   createdAt: z.date(),
   ua: z.string(),

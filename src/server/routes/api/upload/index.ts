@@ -1,6 +1,6 @@
 import { checkQuota, getDomain, getExtension, getFilename, getMimetype } from '@/lib/api/upload';
 import { bytes } from '@/lib/bytes';
-import { compressFile, CompressResult } from '@/lib/compress';
+import { COMPRESS_TYPES, compressFile, CompressResult } from '@/lib/compress';
 import { config } from '@/lib/config';
 import { hashPassword } from '@/lib/crypto';
 import { datasource } from '@/lib/datasource';
@@ -50,6 +50,7 @@ export default typedPlugin(
         schema: {
           description:
             'Upload one or more files for the authenticated user, applying quota, folder, and upload option restrictions.',
+          consumes: ['multipart/form-data'],
           response: {
             200: z.union([
               z.string(),
@@ -62,7 +63,13 @@ export default typedPlugin(
                     url: z.string(),
                     pending: z.boolean().optional(),
                     removedGps: z.boolean().optional(),
-                    compressed: z.any().optional(),
+                    compressed: z
+                      .object({
+                        mimetype: z.string(),
+                        ext: z.enum(COMPRESS_TYPES),
+                        failed: z.boolean().optional(),
+                      })
+                      .optional(),
                   }),
                 ),
                 deletesAt: z.string().optional(),

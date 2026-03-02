@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/db';
 import { fileSelect } from '@/lib/db/models/file';
-import { buildParentChain, Folder, cleanFolder } from '@/lib/db/models/folder';
+import { buildParentChain, Folder, cleanFolder, folderSchema } from '@/lib/db/models/folder';
 import { User } from '@/lib/db/models/user';
 import { log } from '@/lib/logger';
 import { canInteract } from '@/lib/role';
@@ -54,7 +54,7 @@ export default typedPlugin(
           description: 'Fetch a specific folder by ID, including files, children, and its parent chain.',
           params: paramsSchema,
           response: {
-            200: z.any(),
+            200: folderSchema.partial(),
           },
         },
         preHandler: [userMiddleware, folderExistsAndEditable],
@@ -110,7 +110,7 @@ export default typedPlugin(
           }),
           params: paramsSchema,
           response: {
-            200: z.any(),
+            200: folderSchema.partial(),
           },
         },
         preHandler: [userMiddleware, folderExistsAndEditable],
@@ -179,7 +179,7 @@ export default typedPlugin(
           }),
           params: paramsSchema,
           response: {
-            200: z.any(),
+            200: folderSchema.partial(),
           },
         },
         preHandler: [userMiddleware, folderExistsAndEditable],
@@ -269,7 +269,12 @@ export default typedPlugin(
           }),
           params: paramsSchema,
           response: {
-            200: z.any(),
+            200: z.union([
+              folderSchema.partial(),
+              z.object({
+                success: z.boolean(),
+              }),
+            ]),
           },
         },
         preHandler: [userMiddleware, folderExistsAndEditable],

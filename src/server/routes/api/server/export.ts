@@ -1,4 +1,4 @@
-import { Export4 } from '@/lib/import/version4/validateExport';
+import { Export4, export4Schema } from '@/lib/import/version4/validateExport';
 import { log } from '@/lib/logger';
 import { administratorMiddleware } from '@/server/middleware/administrator';
 import { userMiddleware } from '@/server/middleware/user';
@@ -9,7 +9,19 @@ import { cpus, hostname, platform, release } from 'os';
 import z from 'zod';
 import { version } from '../../../../../package.json';
 
-async function getCounts() {
+const exportCountsSchema = z.object({
+  users: z.number(),
+  files: z.number(),
+  urls: z.number(),
+  folders: z.number(),
+  invites: z.number(),
+  thumbnails: z.number(),
+  metrics: z.number(),
+});
+
+type ExportCounts = z.infer<typeof exportCountsSchema>;
+
+async function getCounts(): Promise<ExportCounts> {
   const users = await prisma.user.count();
   const files = await prisma.file.count();
   const urls = await prisma.url.count();
@@ -47,7 +59,7 @@ export default typedPlugin(
             counts: z.string().optional(),
           }),
           response: {
-            200: z.any(),
+            200: z.union([exportCountsSchema, export4Schema]),
           },
         },
         preHandler: [userMiddleware, administratorMiddleware],

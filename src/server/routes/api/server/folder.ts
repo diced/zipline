@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/db';
 import { fileSelect } from '@/lib/db/models/file';
-import { buildPublicParentChain, cleanFolder, Folder } from '@/lib/db/models/folder';
+import { buildPublicParentChain, cleanFolder, Folder, folderSchema } from '@/lib/db/models/folder';
 import typedPlugin from '@/server/typedPlugin';
 import z from 'zod';
 
@@ -22,7 +22,7 @@ export default typedPlugin(
             uploads: z.string().optional(),
           }),
           response: {
-            200: z.any(),
+            200: folderSchema.partial(),
           },
         },
       },

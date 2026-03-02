@@ -23,7 +23,14 @@ export default typedPlugin(
           querystring: z.object({ code: z.string().optional() }),
           response: {
             200: z.object({
-              invite: z.any().nullable(),
+              invite: z
+                .object({
+                  code: z.string(),
+                  maxUses: z.number().nullable(),
+                  uses: z.number(),
+                  inviter: z.object({ username: z.string() }),
+                })
+                .nullable(),
             }),
           },
         },

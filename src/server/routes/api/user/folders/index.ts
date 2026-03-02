@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/db';
 import { fileSelect } from '@/lib/db/models/file';
-import { Folder, cleanFolder, cleanFolders } from '@/lib/db/models/folder';
+import { Folder, cleanFolder, cleanFolders, folderSchema } from '@/lib/db/models/folder';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { canInteract } from '@/lib/role';
@@ -29,7 +29,7 @@ export default typedPlugin(
             root: zQsBoolean.optional(),
           }),
           response: {
-            200: z.array(z.any()),
+            200: z.array(folderSchema),
           },
         },
         preHandler: [userMiddleware],
@@ -87,7 +87,7 @@ export default typedPlugin(
           },
         });
 
-        return res.send(cleanFolders(folders as unknown as Partial<Folder>[]));
+        return res.send(cleanFolders(folders as unknown as Folder[]));
       },
     );
 
@@ -104,7 +104,7 @@ export default typedPlugin(
             parentId: z.string().optional(),
           }),
           response: {
-            200: z.any(),
+            200: folderSchema,
           },
         },
         preHandler: [userMiddleware],

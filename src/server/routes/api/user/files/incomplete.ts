@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/db';
-import { IncompleteFile } from '@/lib/db/models/incompleteFile';
+import { IncompleteFile, incompleteFileSchema } from '@/lib/db/models/incompleteFile';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { userMiddleware } from '@/server/middleware/user';
@@ -19,7 +19,7 @@ export default typedPlugin(
         schema: {
           description: 'List incomplete or still-processing file uploads for the authenticated user.',
           response: {
-            200: z.array(z.any()),
+            200: z.array(incompleteFileSchema),
           },
         },
         preHandler: [userMiddleware],

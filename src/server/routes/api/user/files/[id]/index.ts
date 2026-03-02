@@ -2,7 +2,7 @@ import { bytes } from '@/lib/bytes';
 import { hashPassword } from '@/lib/crypto';
 import { datasource } from '@/lib/datasource';
 import { prisma } from '@/lib/db';
-import { File, fileSelect } from '@/lib/db/models/file';
+import { File, fileSchema, fileSelect } from '@/lib/db/models/file';
 import { log } from '@/lib/logger';
 import { canInteract } from '@/lib/role';
 import { zValidatePath } from '@/lib/validation';
@@ -68,7 +68,7 @@ export default typedPlugin(
             name: z.string().trim().min(1).optional().transform(zValidatePath),
           }),
           response: {
-            200: z.any(),
+            200: fileSchema,
           },
         },
         preHandler: [userMiddleware],

@@ -38,7 +38,7 @@ export async function buildPublicParentChain(parentId: string | null): Promise<F
   };
 }
 
-export function cleanFolder(folder: Partial<Folder>, stringifyDates = false): Partial<Folder> {
+export function cleanFolder<T extends Partial<Folder>>(folder: T, stringifyDates = false): T {
   if (folder.files && Array.isArray(folder.files)) cleanFiles(folder.files as any, stringifyDates);
 
   if (stringifyDates) {
@@ -59,7 +59,7 @@ export function cleanFolder(folder: Partial<Folder>, stringifyDates = false): Pa
   return folder;
 }
 
-export function cleanFolders(folders: Partial<Folder>[], stringifyDates = false): Partial<Folder>[] {
+export function cleanFolders<T extends Partial<Folder>>(folders: T[], stringifyDates = false): T[] {
   for (let i = 0; i !== folders.length; ++i) {
     cleanFolder(folders[i], stringifyDates);
   }

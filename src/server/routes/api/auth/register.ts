@@ -1,7 +1,7 @@
 import { config } from '@/lib/config';
 import { createToken, hashPassword } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
-import { User, userSelect } from '@/lib/db/models/user';
+import { User, userSchema, userSelect } from '@/lib/db/models/user';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { getSession, saveSession } from '@/server/session';
@@ -34,7 +34,7 @@ export default typedPlugin(
           }),
           response: {
             200: z.object({
-              user: z.any().optional(),
+              user: userSchema.optional(),
             }),
           },
         },

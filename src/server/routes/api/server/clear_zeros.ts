@@ -24,7 +24,12 @@ export default typedPlugin(
             'Scan for zero-byte files on disk and return the list of candidates to delete (admin only).',
           response: {
             200: z.object({
-              files: z.any(),
+              files: z.array(
+                z.object({
+                  id: z.string(),
+                  name: z.string(),
+                }),
+              ),
             }),
           },
         },

@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/db';
-import { File, cleanFiles, fileSelect } from '@/lib/db/models/file';
+import { File, cleanFiles, fileSchema, fileSelect } from '@/lib/db/models/file';
 import { canInteract } from '@/lib/role';
 import { zQsBoolean } from '@/lib/validation';
 import { userMiddleware } from '@/server/middleware/user';
@@ -56,10 +56,10 @@ export default typedPlugin(
           }),
           response: {
             200: z.object({
-              page: z.array(z.any()),
+              page: z.array(fileSchema),
               search: z
                 .object({
-                  field: z.string(),
+                  field: z.enum(['name', 'originalName', 'type', 'tags', 'id']),
                   query: z.union([z.string(), z.array(z.string())]),
                 })
                 .optional(),
