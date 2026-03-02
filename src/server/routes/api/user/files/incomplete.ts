@@ -17,6 +17,7 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description: 'List incomplete or still-processing file uploads for the authenticated user.',
           response: {
             200: z.array(z.any()),
           },
@@ -38,6 +39,7 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description: 'Delete one or more incomplete file records owned by the authenticated user.',
           body: z.object({
             id: z.array(z.string()),
           }),

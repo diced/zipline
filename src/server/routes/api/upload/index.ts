@@ -48,6 +48,8 @@ export default typedPlugin(
       {
         preHandler: [userMiddleware, rateLimit],
         schema: {
+          description:
+            'Upload one or more files for the authenticated user, applying quota, folder, and upload option restrictions.',
           response: {
             200: z.union([
               z.string(),

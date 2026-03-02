@@ -77,7 +77,13 @@ export default typedPlugin(
   async (server) => {
     server.get(
       PATH,
-      { schema: { params: z.object({ id: z.string() }) }, preHandler: [userMiddleware] },
+      {
+        schema: {
+          description: 'Download a ZIP archive of all files contained in a folder and its subfolders.',
+          params: z.object({ id: z.string() }),
+        },
+        preHandler: [userMiddleware],
+      },
       async (req, res) => {
         const { id } = req.params;
 

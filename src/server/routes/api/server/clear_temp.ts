@@ -19,6 +19,8 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description:
+            'Delete temporary files on the Zipline server and return a short status message (admin only).',
           response: {
             200: z.object({
               status: z.string().optional(),

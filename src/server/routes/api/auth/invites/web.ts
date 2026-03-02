@@ -18,6 +18,8 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description:
+            'Look up a public invite by code for the web UI, returning basic information about the inviter and usage limits.',
           querystring: z.object({ code: z.string().optional() }),
           response: {
             200: z.object({

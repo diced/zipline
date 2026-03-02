@@ -29,6 +29,8 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description:
+            'Create a new shortened URL for the authenticated user, with optional vanity, password, and max-views settings.',
           body: z.object({
             vanity: zStringTrimmed.max(100).nullish(),
             destination: z.string().min(1),
@@ -154,6 +156,7 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description: 'List or search shortened URLs owned by the authenticated user.',
           querystring: z.object({
             searchField: z.enum(['destination', 'vanity', 'code']).default('destination'),
             searchQuery: z.string().min(1).optional(),

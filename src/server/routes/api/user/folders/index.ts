@@ -20,6 +20,8 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description:
+            'List folders for the authenticated user, optionally including files or filtering by parent/root.',
           querystring: z.object({
             noincl: zQsBoolean.optional(),
             user: z.string().optional(),
@@ -93,6 +95,8 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description:
+            'Create a new folder for the authenticated user, optionally public and/or seeded with files.',
           body: z.object({
             name: z.string().trim().min(1),
             isPublic: z.boolean().optional(),

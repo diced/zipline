@@ -21,6 +21,8 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description:
+            'Fetch a specific invite by ID or code, including information about the inviter (admin only).',
           params: paramsSchema,
           response: {
             200: inviteSchema,
@@ -49,6 +51,7 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description: 'Delete a specific invite by ID (admin only).',
           params: paramsSchema,
           response: {
             200: inviteSchema,

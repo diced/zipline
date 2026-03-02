@@ -17,6 +17,8 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description:
+            'List tags owned by the specified user, enforcing role-based interaction rules (admin only).',
           params: z.object({
             id: z.string(),
           }),

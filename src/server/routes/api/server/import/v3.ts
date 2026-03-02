@@ -25,6 +25,8 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description:
+            'Import data from a legacy Zipline v3 export file, creating users, files, folders and URLs and returning a mapping of old IDs to new IDs.',
           body: z.object({
             export3: export3Schema.required(),
             importFromUser: z.string().optional(),

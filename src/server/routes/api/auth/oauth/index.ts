@@ -16,6 +16,7 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description: 'List OAuth providers currently linked to the authenticated user.',
           response: {
             200: z.array(z.custom<OAuthProvider>()),
           },
@@ -31,6 +32,8 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description:
+            'Unlink one OAuth provider from the authenticated user, enforcing that at least one login method remains.',
           body: z.object({ provider: z.enum(OAuthProviderType) }),
           response: {
             200: z.array(z.custom<OAuthProvider>()),

@@ -26,6 +26,8 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description:
+            'Fetch a single file owned by the authenticated user (or another user if permitted) by ID or short name.',
           params: paramsSchema,
           response: {
             200: z.custom<File>(),
@@ -53,6 +55,8 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description:
+            'Update metadata for a single file, including favorite, name, tags, password, and view limits.',
           params: paramsSchema,
           body: z.object({
             favorite: z.boolean().optional(),

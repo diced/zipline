@@ -90,6 +90,8 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description:
+            'Fetch the full Zipline server settings row along with a list of configuration keys that were overridden at runtime (admin only).',
           response: {
             200: z.object({
               settings: z.custom<Settings>(),
@@ -119,6 +121,8 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description:
+            'Partially update Zipline server settings using a validated subset of configuration keys (admin only).',
           body: z.custom<Partial<Settings>>(),
           response: {
             200: z.custom<ApiServerSettingsResponse>(),

@@ -22,6 +22,7 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description: 'Get the currently authenticated user and their token.',
           response: {
             200: z.object({
               user: z.any().optional(),
@@ -40,6 +41,7 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description: "Update the current user's profile, credentials, avatar, and view settings.",
           body: z.object({
             username: zStringTrimmed.optional(),
             password: zStringTrimmed.optional(),

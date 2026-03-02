@@ -28,6 +28,8 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description:
+            'List users in the instance, optionally excluding the current admin from the results (admin only).',
           querystring: querySchema,
           response: {
             200: z.array(userSchema),
@@ -54,6 +56,7 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description: 'Create a new user with the given username, password, avatar, and role (admin only).',
           querystring: querySchema,
           body: z.object({
             username: zStringTrimmed,

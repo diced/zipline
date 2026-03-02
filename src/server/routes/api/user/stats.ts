@@ -24,6 +24,7 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description: "View aggregate statistics for the authenticated user's files and URLs.",
           response: {
             200: z.object({
               filesUploaded: z.number(),

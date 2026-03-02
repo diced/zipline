@@ -52,6 +52,8 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description:
+            'Return the public Zipline configuration used by the client, including OAuth, website, feature, file and chunk settings.',
           response: {
             200: z.custom<ApiServerPublicResponse>(),
           },

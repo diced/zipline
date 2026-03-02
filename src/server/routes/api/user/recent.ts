@@ -13,6 +13,7 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description: 'Get the most recently uploaded files for the authenticated user.',
           querystring: z.object({
             take: z.coerce.number().min(1).max(100).default(3),
           }),

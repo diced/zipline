@@ -32,6 +32,7 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description: 'List your exports or download a specific completed export archive by ID.',
           querystring: querySchema,
           response: {
             200: z.union([z.array(z.custom<Export>()), z.any()]),
@@ -61,6 +62,7 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description: 'Delete a specific export and remove its archive file from storage.',
           querystring: querySchema,
           response: {
             200: z.object({
@@ -104,6 +106,7 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description: 'Start an export job that zips all of your files into a downloadable archive.',
           response: {
             200: z.object({
               running: z.boolean(),

@@ -20,6 +20,8 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description:
+            'Stream a file or thumbnail owned by the authenticated user by ID, with optional password and download handling.',
           params: z.object({
             id: z.string(),
           }),

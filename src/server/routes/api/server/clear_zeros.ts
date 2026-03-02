@@ -20,6 +20,8 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description:
+            'Scan for zero-byte files on disk and return the list of candidates to delete (admin only).',
           response: {
             200: z.object({
               files: z.any(),
@@ -39,6 +41,8 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description:
+            'Delete zero-byte files previously detected on disk and return a short status message (admin only).',
           response: {
             200: z.object({
               status: z.string().optional(),

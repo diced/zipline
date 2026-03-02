@@ -32,6 +32,8 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description:
+            'Import data from a Zipline v4 export file, optionally merging into the current user and returning counts of imported records.',
           body: z.object({
             export4: export4Schema.required(),
             config: z.object({

@@ -17,6 +17,8 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description:
+            'List all available themes and indicate which theme is currently configured as the default.',
           response: {
             200: z.object({
               themes: z.array(z.custom<ZiplineTheme>()),

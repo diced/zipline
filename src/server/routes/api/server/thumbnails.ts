@@ -18,6 +18,8 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description:
+            'Manually trigger the thumbnails background task, optionally rerunning it for existing files (admin only).',
           body: z.object({
             rerun: z.boolean().default(false),
           }),

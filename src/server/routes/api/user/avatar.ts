@@ -12,6 +12,7 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description: "Return the current user's avatar as a base64 data URL.",
           response: {
             200: z.string(),
           },

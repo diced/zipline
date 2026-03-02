@@ -22,6 +22,7 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description: 'Return an encrypted API token for the authenticated user.',
           response: {
             200: z.object({
               token: z.string().optional(),
@@ -61,6 +62,8 @@ export default typedPlugin(
         preHandler: [userMiddleware],
         ...secondlyRatelimit(1),
         schema: {
+          description:
+            "Refresh the user's underlying token secret and return an updated token and user object.",
           response: {
             200: z.object({
               user: userSchema.optional(),

@@ -16,6 +16,8 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description:
+            'Get instance-wide metrics and statistics for Zipline over a given date range or for all time.',
           querystring: z.object({
             from: z
               .string()

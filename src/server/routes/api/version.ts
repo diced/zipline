@@ -43,6 +43,8 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description:
+            'Return backend version information, including current build details and upstream/latest version metadata.',
           response: {
             200: z.object({
               data: z.custom<VersionAPI>(),

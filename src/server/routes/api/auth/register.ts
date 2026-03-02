@@ -22,6 +22,8 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description:
+            'Register a new user account and immediately authenticate them, optionally consuming an invite code.',
           body: z.object({
             username: zStringTrimmed,
             password: zStringTrimmed,

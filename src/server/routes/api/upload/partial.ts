@@ -62,6 +62,8 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description:
+            'Upload a single file in chunks as a partial upload session, using headers to control chunking and resumption.',
           response: {
             200: z.custom<ApiUploadPartialResponse>(),
           },

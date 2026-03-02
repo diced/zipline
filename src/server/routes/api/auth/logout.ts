@@ -18,6 +18,7 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description: 'Log out the currently authenticated user and invalidate their active session.',
           response: {
             200: z.object({
               loggedOut: z.boolean().optional(),

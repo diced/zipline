@@ -17,9 +17,11 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description:
+            'Perform a simple healthcheck on the database and backend of Zipline. Returns a simple pass/fail response.',
           response: {
             200: z.object({
-              pass: z.boolean(),
+              pass: z.boolean().describe('true if the server and db are reachable and functioning.'),
             }),
           },
         },

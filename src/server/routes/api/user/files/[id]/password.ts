@@ -19,6 +19,7 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description: 'Verify the password for a password-protected file by ID or name.',
           body: z.object({
             password: zStringTrimmed,
           }),

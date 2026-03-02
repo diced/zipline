@@ -26,6 +26,8 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description:
+            'List, filter, and search files for the authenticated user (or another user if permitted).',
           querystring: z.object({
             page: z.coerce.number(),
             perpage: z.coerce.number().default(15),

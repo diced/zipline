@@ -19,6 +19,8 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description:
+            'List the current browser session and other active sessions for the authenticated user.',
           response: {
             200: z.object({
               current: z.any(),
@@ -46,6 +48,7 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description: 'Invalidate one or all other sessions for the authenticated user.',
           body: z.object({
             sessionId: z.string().optional(),
             all: z.boolean().optional(),

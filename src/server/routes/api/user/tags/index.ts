@@ -18,6 +18,7 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description: 'List all tags created by the authenticated user.',
           response: {
             200: z.array(tagSchema),
           },
@@ -40,6 +41,7 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description: 'Create a new tag with a name and color for organizing files.',
           body: z.object({
             name: zStringTrimmed,
             color: z.string().regex(/^#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{3})$/),

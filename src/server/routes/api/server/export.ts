@@ -40,6 +40,8 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description:
+            'Export Zipline server data as a version 4 export bundle or return aggregate counts of core resources.',
           querystring: z.object({
             nometrics: z.string().optional(),
             counts: z.string().optional(),

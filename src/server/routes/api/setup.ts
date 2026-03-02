@@ -22,6 +22,7 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description: 'Return whether Zipline is in first-time setup mode, used by the initial setup flow.',
           response: {
             200: z.object({
               firstSetup: z.boolean(),
@@ -41,6 +42,7 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description: 'Perform the first-time setup by creating the initial SUPERADMIN user.',
           body: z.object({
             username: zStringTrimmed,
             password: zStringTrimmed,

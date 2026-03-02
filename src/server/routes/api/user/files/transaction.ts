@@ -39,6 +39,7 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description: 'Bulk update files owned by the user: favorite/unfavorite or move them into a folder.',
           body: z.object({
             files: z.array(z.string()).min(1),
             favorite: z.boolean().optional(),
@@ -136,6 +137,7 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description: 'Bulk delete files (and optionally delete the underlying datasource objects).',
           body: z.object({
             files: z.array(z.string()).min(1),
             delete_datasourceFiles: z.boolean().optional(),

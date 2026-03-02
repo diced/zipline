@@ -21,6 +21,7 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description: 'Fetch a specific tag by ID, ensuring it is owned by the authenticated user.',
           params: paramsSchema,
           response: {
             200: tagSchema,
@@ -48,6 +49,7 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description: 'Delete a specific tag owned by the authenticated user.',
           params: paramsSchema,
           response: {
             200: z.object({
@@ -82,6 +84,7 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description: 'Update the name and/or color of a specific tag.',
           params: paramsSchema,
           body: z.object({
             name: zStringTrimmed.optional(),

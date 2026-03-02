@@ -19,6 +19,8 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description:
+            'Re-scan stored files to update their sizes and optionally delete missing ones, returning a short status message (admin only).',
           body: z.object({
             forceDelete: z.boolean().default(false),
             forceUpdate: z.boolean().default(false),

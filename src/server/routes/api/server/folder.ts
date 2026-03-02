@@ -13,6 +13,8 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description:
+            'Fetch a public view of a folder by ID, including files, child folders, and parent chain when allowed.',
           params: z.object({
             id: z.string(),
           }),

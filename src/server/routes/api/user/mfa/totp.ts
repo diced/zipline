@@ -25,6 +25,7 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description: 'Get your current TOTP secret, generating one (and a QR code) if not yet enabled.',
           response: {
             200: z.union([
               z.object({
@@ -68,6 +69,7 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description: 'Enable TOTP for your account by verifying a code for the provided secret.',
           body: z.object({
             code: z.string().min(6).max(6),
             secret: z.string(),
@@ -102,6 +104,7 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description: 'Disable TOTP for your account after confirming a valid TOTP code.',
           body: z.object({
             code: z.string().min(6).max(6),
           }),

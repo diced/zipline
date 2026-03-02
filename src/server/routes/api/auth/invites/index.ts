@@ -21,6 +21,8 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description:
+            'Create a new invite code for user registration, optionally limiting uses and expiration (admin only).',
           body: z.object({
             expiresAt: z
               .string()
@@ -64,6 +66,7 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description: 'List all existing invite codes and their metadata (admin only).',
           response: {
             200: z.array(inviteSchema),
           },

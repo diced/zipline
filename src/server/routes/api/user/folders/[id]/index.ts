@@ -51,6 +51,7 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description: 'Fetch a specific folder by ID, including files, children, and its parent chain.',
           params: paramsSchema,
           response: {
             200: z.any(),
@@ -103,6 +104,7 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description: 'Add a file to a specific folder owned by the user.',
           body: z.object({
             id: z.string(),
           }),
@@ -168,6 +170,7 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description: "Update a folder's visibility, name, upload permissions, or parent.",
           body: z.object({
             isPublic: z.boolean().optional(),
             name: zStringTrimmed.optional(),

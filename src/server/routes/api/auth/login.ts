@@ -24,6 +24,8 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description:
+            'Authenticate a user, creating a session and optionally requiring a TOTP code when multi-factor auth is enabled.',
           body: z.object({
             username: zStringTrimmed,
             password: zStringTrimmed,

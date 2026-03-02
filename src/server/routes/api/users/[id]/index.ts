@@ -27,6 +27,7 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description: 'Fetch a specific user by ID, including their profile and role (admin only).',
           params: paramsSchema,
           response: {
             200: userSchema,
@@ -52,6 +53,8 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description:
+            "Update another user's profile, credentials, role, and optional file quota limits (admin only).",
           params: paramsSchema,
           body: z.object({
             username: zStringTrimmed.optional(),
@@ -165,6 +168,8 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description:
+            'Delete another user by ID, optionally cascading deletion of their files and URLs (admin only).',
           params: paramsSchema,
           body: z.object({
             delete: z.boolean().optional(),

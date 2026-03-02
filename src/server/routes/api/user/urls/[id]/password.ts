@@ -19,6 +19,7 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description: 'Verify the password for a password-protected short URL by ID, code, or vanity.',
           params: z.object({
             id: z.string(),
           }),

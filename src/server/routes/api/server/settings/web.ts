@@ -24,6 +24,7 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description: 'Return the safe dashboard configuration and MIME type code map used by the web UI.',
           response: {
             200: z.custom<ApiServerSettingsWebResponse>(),
           },

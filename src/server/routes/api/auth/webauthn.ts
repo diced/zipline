@@ -36,7 +36,16 @@ export default typedPlugin(
   async (server) => {
     server.get(
       PATH + '/options',
-      { preHandler: [passkeysEnabledHandler], ...secondlyRatelimit(20) },
+      {
+        schema: {
+          description: 'Generate WebAuthn authentication options for logging in with an existing passkey.',
+          response: {
+            200: z.custom<ApiAuthWebauthnOptionsResponse>(),
+          },
+        },
+        preHandler: [passkeysEnabledHandler],
+        ...secondlyRatelimit(20),
+      },
       async (req, res) => {
         if (req.cookies['webauthn-challenge-id']) {
           const existing = OPTIONS_CACHE.get(req.cookies['webauthn-challenge-id']);
@@ -72,6 +81,8 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description:
+            'Verify a WebAuthn authentication response and log in the user associated with the matching passkey.',
           body: z.object({
             response: z.custom<AuthenticationResponseJSON>(),
           }),

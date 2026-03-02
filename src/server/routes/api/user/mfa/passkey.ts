@@ -63,7 +63,13 @@ export default typedPlugin(
 
     server.get(
       PATH + '/options',
-      { preHandler: [userMiddleware, passkeysEnabledHandler], ...secondlyRatelimit(1) },
+      {
+        schema: {
+          description: 'Generate WebAuthn registration options for creating a new passkey.',
+        },
+        preHandler: [userMiddleware, passkeysEnabledHandler],
+        ...secondlyRatelimit(1),
+      },
       async (req, res) => {
         if (OPTIONS_CACHE.has(req.user.id)) return res.send(OPTIONS_CACHE.get(req.user.id)!);
 
@@ -108,6 +114,7 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description: 'Register a new WebAuthn passkey for the authenticated user.',
           body: z.object({
             response: z.custom<RegistrationResponseJSON>(),
             name: zStringTrimmed,
@@ -176,6 +183,7 @@ export default typedPlugin(
       PATH,
       {
         schema: {
+          description: 'Remove an existing passkey credential from your account.',
           body: z.object({
             id: z.string(),
           }),
