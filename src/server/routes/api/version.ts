@@ -12,25 +12,29 @@ export type ApiVersionResponse = {
   cached: true;
 };
 
-type VersionAPI = {
-  isUpstream: boolean;
-  isRelease: boolean;
-  isLatest: boolean;
-  version: {
-    tag: string;
-    sha: string;
-    url: string;
-  };
-  latest: {
-    tag: string;
-    url: string;
-    commit?: {
-      sha: string;
-      url: string;
-      pull: boolean;
-    };
-  };
-};
+const versionApiSchema = z.object({
+  isUpstream: z.boolean(),
+  isRelease: z.boolean(),
+  isLatest: z.boolean(),
+  version: z.object({
+    tag: z.string(),
+    sha: z.string(),
+    url: z.string(),
+  }),
+  latest: z.object({
+    tag: z.string(),
+    url: z.string(),
+    commit: z
+      .object({
+        sha: z.string(),
+        url: z.string(),
+        pull: z.boolean(),
+      })
+      .optional(),
+  }),
+});
+
+type VersionAPI = z.infer<typeof versionApiSchema>;
 
 const logger = log('api').c('version');
 
@@ -48,8 +52,11 @@ export default typedPlugin(
             'Return backend version information, including current build details and upstream/latest version metadata.',
           response: {
             200: z.object({
-              data: z.custom<VersionAPI>(),
-              details: z.custom<ReturnType<typeof getVersion>>(),
+              data: versionApiSchema.describe('version information from the version checking API'),
+              details: z.object({
+                version: z.string(),
+                sha: z.string().nullable(),
+              }),
               cached: z.boolean(),
             }),
           },

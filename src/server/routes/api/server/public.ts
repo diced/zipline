@@ -1,49 +1,53 @@
 import { config } from '@/lib/config';
-import { Config } from '@/lib/config/validate';
+import { schema as configSchema } from '@/lib/config/validate';
 import { getZipline } from '@/lib/db/models/zipline';
 import enabled from '@/lib/oauth/enabled';
 import { isTruthy } from '@/lib/primitive';
 import typedPlugin from '@/server/typedPlugin';
 import z from 'zod';
 
-export type ApiServerPublicResponse = {
-  oauth: {
-    bypassLocalLogin: boolean;
-    loginOnly: boolean;
-  };
-  oauthEnabled: {
-    discord: boolean;
-    github: boolean;
-    google: boolean;
-    oidc: boolean;
-  };
-  website: {
-    loginBackground?: string | null;
-    loginBackgroundBlur?: boolean;
-    title?: string;
-    tos: boolean;
-  };
-  features: {
-    oauthRegistration: boolean;
-    userRegistration: boolean;
-    metrics?: {
-      adminOnly?: boolean;
-    };
-  };
-  mfa: {
-    passkeys: boolean;
-  };
-  tos?: string | null;
-  files: {
-    maxFileSize: string;
-    defaultFormat: Config['files']['defaultFormat'];
-    maxExpiration?: string | null;
-  };
-  chunks: Config['chunks'];
-  firstSetup: boolean;
-  domains?: string[];
-  returnHttps: boolean;
-};
+export type ApiServerPublicResponse = z.infer<typeof publicConfigSchema>;
+
+const publicConfigSchema = z.object({
+  oauth: z.object({
+    bypassLocalLogin: z.boolean(),
+    loginOnly: z.boolean(),
+  }),
+  oauthEnabled: z.object({
+    discord: z.boolean(),
+    github: z.boolean(),
+    google: z.boolean(),
+    oidc: z.boolean(),
+  }),
+  website: z.object({
+    loginBackground: z.string().nullable().optional(),
+    loginBackgroundBlur: z.boolean().optional(),
+    title: z.string().optional(),
+    tos: z.boolean(),
+  }),
+  features: z.object({
+    oauthRegistration: z.boolean(),
+    userRegistration: z.boolean(),
+    metrics: z
+      .object({
+        adminOnly: z.boolean().optional(),
+      })
+      .optional(),
+  }),
+  mfa: z.object({
+    passkeys: z.boolean(),
+  }),
+  tos: z.string().nullable().optional(),
+  files: z.object({
+    maxFileSize: z.string(),
+    defaultFormat: configSchema.shape.files.shape.defaultFormat,
+    maxExpiration: z.string().nullable().optional(),
+  }),
+  chunks: configSchema.shape.chunks,
+  firstSetup: z.boolean(),
+  domains: z.array(z.string()).optional(),
+  returnHttps: z.boolean(),
+});
 
 export const PATH = '/api/server/public';
 export default typedPlugin(
@@ -55,7 +59,7 @@ export default typedPlugin(
           description:
             'Return the public Zipline configuration used by the client, including OAuth, website, feature, file and chunk settings.',
           response: {
-            200: z.custom<ApiServerPublicResponse>(),
+            200: publicConfigSchema.describe('the public configuration for the Zipline instance'),
           },
         },
       },

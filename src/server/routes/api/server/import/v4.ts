@@ -9,20 +9,22 @@ import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
 import z from 'zod';
 
-export type ApiServerImportV4 = {
-  imported: {
-    users: number;
-    oauthProviders: number;
-    quotas: number;
-    passkeys: number;
-    folders: number;
-    files: number;
-    tags: number;
-    urls: number;
-    invites: number;
-    metrics: number;
-  };
-};
+export type ApiServerImportV4 = z.infer<typeof serverImportSchema>;
+
+const serverImportSchema = z.object({
+  imported: z.object({
+    users: z.number(),
+    oauthProviders: z.number(),
+    quotas: z.number(),
+    passkeys: z.number(),
+    folders: z.number(),
+    files: z.number(),
+    tags: z.number(),
+    urls: z.number(),
+    invites: z.number(),
+    metrics: z.number(),
+  }),
+});
 
 const logger = log('api').c('server').c('import').c('v4');
 
@@ -43,7 +45,7 @@ export default typedPlugin(
             }),
           }),
           response: {
-            200: z.custom<ApiServerImportV4>(),
+            200: serverImportSchema,
           },
         },
         preHandler: [userMiddleware, administratorMiddleware],

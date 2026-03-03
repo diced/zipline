@@ -9,12 +9,15 @@ import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
 import z from 'zod';
 
-export type ApiServerImportV3 = {
-  users: Record<string, string>;
-  files: Record<string, string>;
-  folders: Record<string, string>;
-  urls: Record<string, string>;
-};
+export type ApiServerImportV3 = z.infer<typeof serverImportSchema>;
+
+const serverImportSchema = z.object({
+  users: z.record(z.string(), z.string()),
+  files: z.record(z.string(), z.string()),
+  folders: z.record(z.string(), z.string()),
+  urls: z.record(z.string(), z.string()),
+});
+
 const parseDate = (date: string) => (isNaN(Date.parse(date)) ? new Date() : new Date(date));
 
 const logger = log('api').c('server').c('import').c('v3');
@@ -33,7 +36,7 @@ export default typedPlugin(
             importFromUser: z.string().optional(),
           }),
           response: {
-            200: z.custom<ApiServerImportV3>(),
+            200: serverImportSchema,
           },
         },
         preHandler: [userMiddleware, administratorMiddleware],
