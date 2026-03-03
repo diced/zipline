@@ -1,3 +1,4 @@
+import { ApiError } from '@/lib/api/errors';
 import { prisma } from '@/lib/db';
 import { log } from '@/lib/logger';
 import { UserSession, userSessionSchema } from '@/lib/db/models/user';
@@ -35,7 +36,7 @@ export default typedPlugin(
 
         const currentDbSession = req.user.sessions.find((session) => session.id === currentSession.sessionId);
 
-        if (!currentDbSession) return res.unauthorized('invalid login session');
+        if (!currentDbSession) throw new ApiError(2000);
 
         return res.send({
           current: currentDbSession,
@@ -94,10 +95,8 @@ export default typedPlugin(
           });
         }
 
-        if (req.body.sessionId === currentSession.sessionId)
-          return res.badRequest('Cannot delete current session, use log out instead.');
-        if (!req.user.sessions.find((session) => session.id === req.body.sessionId))
-          return res.badRequest('Session not found in logged in sessions');
+        if (req.body.sessionId === currentSession.sessionId) throw new ApiError(1021);
+        if (!req.user.sessions.find((session) => session.id === req.body.sessionId)) throw new ApiError(1031);
 
         const user = await prisma.user.update({
           where: {

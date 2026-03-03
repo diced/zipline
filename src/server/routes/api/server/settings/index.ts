@@ -1,3 +1,4 @@
+import { ApiError } from '@/lib/api/errors';
 import { bytes } from '@/lib/bytes';
 import { checkOutput, COMPRESS_TYPES } from '@/lib/compress';
 import { reloadSettings } from '@/lib/config';
@@ -111,7 +112,7 @@ export default typedPlugin(
           },
         });
 
-        if (!settings) return res.notFound('no settings table found');
+        if (!settings) throw new ApiError(4010);
 
         return res.send({ settings, tampered: global.__tamperedConfig__ || [] });
       },
@@ -133,7 +134,7 @@ export default typedPlugin(
       },
       async (req, res) => {
         const settings = await prisma.zipline.findFirst();
-        if (!settings) return res.notFound('no settings table found');
+        if (!settings) throw new ApiError(4010);
 
         const themes = (await readThemes()).map((x) => x.id);
 
@@ -475,7 +476,7 @@ export default typedPlugin(
           });
 
           // tODO: bring back issues field
-          return res.badRequest('Invalid settings update');
+          throw new ApiError(1022);
         }
 
         const newSettings = await prisma.zipline.update({

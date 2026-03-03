@@ -1,3 +1,4 @@
+import { ApiError } from '@/lib/api/errors';
 import { checkQuota, getDomain, getExtension, getFilename } from '@/lib/api/upload';
 import { bytes } from '@/lib/bytes';
 import { config } from '@/lib/config';
@@ -72,10 +73,9 @@ export default typedPlugin(
       },
       async (req, res) => {
         const options = parseHeaders(req.headers, config.files);
-        if (options.header) return res.badRequest('bad options, receieved: ' + JSON.stringify(options));
-        if (!options.partial) return res.badRequest('partial upload was not detected');
-        if (!options.partial.range || options.partial.range.length !== 3)
-          return res.badRequest('Invalid partial upload');
+        if (options.header) throw new ApiError(1001, 'bad options, receieved: ' + JSON.stringify(options));
+        if (!options.partial) throw new ApiError(1004);
+        if (!options.partial.range || options.partial.range.length !== 3) throw new ApiError(1002);
 
         let folder = null;
         if (options.folder) {
@@ -84,8 +84,8 @@ export default typedPlugin(
               id: options.folder,
             },
           });
-          if (!folder) return res.badRequest('folder not found');
-          if (!req.user && !folder.allowUploads) return res.forbidden('folder is not open');
+          if (!folder) throw new ApiError(4001);
+          if (!req.user && !folder.allowUploads) throw new ApiError(3002);
         }
 
         const files = await req.saveRequestFiles({ tmpdir: config.core.tempDirectory });
@@ -109,7 +109,7 @@ export default typedPlugin(
           files: files.map((x) => x.filename),
         });
 
-        if (files.length > 1) return res.badRequest('partial uploads only support one file field');
+        if (files.length > 1) throw new ApiError(1005);
         const file = files[0];
         const fileSize = file.file.bytesRead;
 
@@ -118,25 +118,23 @@ export default typedPlugin(
           options.partial.identifier = createPartial(fileSize, options);
         } else {
           if (!options.partial.identifier || !partialsCache.has(options.partial.identifier))
-            return res.badRequest('No/Invalid partial upload identifier provided');
+            throw new ApiError(1003);
         }
 
         const cache = partialsCache.get(options.partial.identifier);
-        if (!cache) return res.badRequest('No/Invalid partial upload identifier provided');
+        if (!cache) throw new ApiError(1003);
 
         // check quota, using the current added length, and only just adding one file
         const quotaCheck = await checkQuota(req.user, cache.length + fileSize, 1);
         if (quotaCheck !== true) {
           await deletePartial(options.partial.identifier);
-
-          return res.payloadTooLarge(quotaCheck);
+          throw new ApiError(5002, typeof quotaCheck === 'string' ? quotaCheck : undefined);
         }
 
         // file is too large so we delete everything
         if (cache.length + fileSize > bytes(config.files.maxFileSize)) {
           await deletePartial(options.partial.identifier!);
-
-          return res.payloadTooLarge('File is too large');
+          throw new ApiError(5001);
         }
 
         cache.length += fileSize;
@@ -145,15 +143,14 @@ export default typedPlugin(
         const sanitized = sanitizeFilename(
           `${cache.prefix}${options.partial.range[0]}_${options.partial.range[1]}`,
         );
-        if (!sanitized) return res.badRequest('Invalid characters in filename');
+        if (!sanitized) throw new ApiError(1007);
 
         const tempFile = join(config.core.tempDirectory, sanitized);
         await rename(file.filepath, tempFile);
 
         if (options.partial.lastchunk) {
           const extension = getExtension(options.partial.filename, options.overrides?.extension);
-          if (config.files.disabledExtensions.includes(extension))
-            return res.badRequest(`File extension ${extension} is not allowed`);
+          if (config.files.disabledExtensions.includes(extension)) throw new ApiError(1006);
 
           // determine filename
           const format = options.format || config.files.defaultFormat;
@@ -163,7 +160,7 @@ export default typedPlugin(
             extension,
             options.overrides?.filename,
           );
-          if ('error' in nameResult) return res.badRequest(nameResult.error);
+          if ('error' in nameResult) throw new ApiError(1009, nameResult.error);
 
           const { fileName } = nameResult;
 
@@ -195,7 +192,7 @@ export default typedPlugin(
           if (folder) data.Folder = { connect: { id: folder.id } };
           if (options.addOriginalName) {
             const sanitizedOG = sanitizeFilename(options.partial.filename);
-            if (!sanitizedOG) return res.badRequest('Invalid characters in original filename');
+            if (!sanitizedOG) throw new ApiError(1008);
 
             data.originalName = sanitizedOG || file.filename; // this will prolly be "blob" but should hopefully never happen
           }

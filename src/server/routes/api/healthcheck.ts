@@ -1,3 +1,4 @@
+import { ApiError } from '@/lib/api/errors';
 import { config } from '@/lib/config';
 import { prisma } from '@/lib/db';
 import { log } from '@/lib/logger';
@@ -27,14 +28,14 @@ export default typedPlugin(
         },
       },
       async (_, res) => {
-        if (!config.features.healthcheck) return res.notFound();
+        if (!config.features.healthcheck) throw new ApiError(9002);
 
         try {
           await prisma.$queryRaw`SELECT 1;`;
           return res.send({ pass: true });
         } catch (e) {
           logger.error('there was an error during a healthcheck').error(e as Error);
-          return res.internalServerError('there was an error during a healthcheck');
+          throw new ApiError(6003);
         }
       },
     );

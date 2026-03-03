@@ -1,3 +1,4 @@
+import { ApiError } from '@/lib/api/errors';
 import { parseRange } from '@/lib/api/range';
 import { config } from '@/lib/config';
 import { verifyPassword } from '@/lib/crypto';
@@ -36,7 +37,7 @@ export default typedPlugin(
         const { pw, download } = req.query;
 
         const id = sanitizeFilename(req.params.id);
-        if (!id) return res.callNotFound();
+        if (!id) throw new ApiError(9002);
 
         if (id.startsWith('.thumbnail')) {
           const thumbnail = await prisma.thumbnail.findFirst({
@@ -52,9 +53,9 @@ export default typedPlugin(
             },
           });
 
-          if (!thumbnail) return res.callNotFound();
+          if (!thumbnail) throw new ApiError(9002);
           if (thumbnail.file && thumbnail.file.userId !== req.user.id) {
-            if (!canInteract(req.user.role, thumbnail.file.User?.role)) return res.callNotFound();
+            if (!canInteract(req.user.role, thumbnail.file.User?.role)) throw new ApiError(9002);
           }
         }
 
@@ -68,7 +69,7 @@ export default typedPlugin(
         });
 
         if (file && file.userId !== req.user.id) {
-          if (!canInteract(req.user.role, file.User?.role)) return res.callNotFound();
+          if (!canInteract(req.user.role, file.User?.role)) throw new ApiError(9002);
         }
 
         if (file?.deletesAt && file.deletesAt <= new Date()) {
@@ -87,11 +88,11 @@ export default typedPlugin(
               .error(e as Error);
           }
 
-          return res.callNotFound();
+          throw new ApiError(9002);
         }
 
         if (file?.maxViews && file.views >= file.maxViews) {
-          if (!config.features.deleteOnMaxViews) return res.callNotFound();
+          if (!config.features.deleteOnMaxViews) throw new ApiError(9002);
 
           try {
             await datasource.delete(file.name);
@@ -108,14 +109,13 @@ export default typedPlugin(
               .error(e as Error);
           }
 
-          return res.callNotFound();
+          throw new ApiError(9002);
         }
 
         if (file?.password) {
-          if (!pw) return res.forbidden('Password protected.');
+          if (!pw) throw new ApiError(3004);
           const verified = await verifyPassword(pw, file.password!);
-
-          if (!verified) return res.forbidden('Incorrect password.');
+          if (!verified) throw new ApiError(3005);
         }
 
         const size = file?.size || (await datasource.size(file?.name ?? id));
@@ -126,7 +126,7 @@ export default typedPlugin(
           const [start, end] = parseRange(req.headers.range, size);
           if (start >= size || end >= size) {
             const buf = await datasource.get(file?.name ?? id);
-            if (!buf) return res.callNotFound();
+            if (!buf) throw new ApiError(9002);
 
             return res
               .type(contentType)
@@ -145,7 +145,7 @@ export default typedPlugin(
           }
 
           const buf = await datasource.range(file?.name ?? id, start || 0, end);
-          if (!buf) return res.callNotFound();
+          if (!buf) throw new ApiError(9002);
 
           return res
             .type(contentType)
@@ -166,7 +166,7 @@ export default typedPlugin(
         }
 
         const buf = await datasource.get(file?.name ?? id);
-        if (!buf) return res.callNotFound();
+        if (!buf) throw new ApiError(9002);
 
         return res
           .type(contentType)

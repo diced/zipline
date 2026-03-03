@@ -1,3 +1,4 @@
+import { ApiError } from '@/lib/api/errors';
 import { hashPassword } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
 import { User, userSchema, userSelect } from '@/lib/db/models/user';
@@ -81,7 +82,7 @@ export default typedPlugin(
             },
           });
 
-          if (existing) return res.badRequest('Username already exists');
+          if (existing) throw new ApiError(1038);
         }
 
         const user = await prisma.user.update({

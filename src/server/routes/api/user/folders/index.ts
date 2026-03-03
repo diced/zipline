@@ -1,3 +1,4 @@
+import { ApiError } from '@/lib/api/errors';
 import { prisma } from '@/lib/db';
 import { fileSelect } from '@/lib/db/models/file';
 import { Folder, cleanFolder, cleanFolders, folderSchema } from '@/lib/db/models/folder';
@@ -44,9 +45,9 @@ export default typedPlugin(
             },
           });
 
-          if (!user) return res.notFound();
+          if (!user) throw new ApiError(4009);
           if (req.user.id !== user.id) {
-            if (!canInteract(req.user.role, user.role)) return res.notFound();
+            if (!canInteract(req.user.role, user.role)) throw new ApiError(4009);
           }
         }
 
@@ -120,9 +121,8 @@ export default typedPlugin(
             select: { id: true, userId: true },
           });
 
-          if (!parentFolder) return res.notFound('Parent folder not found');
-          if (parentFolder.userId !== req.user.id)
-            return res.forbidden('Parent folder does not belong to you');
+          if (!parentFolder) throw new ApiError(4007);
+          if (parentFolder.userId !== req.user.id) throw new ApiError(3003);
         }
 
         if (files) {
@@ -137,7 +137,7 @@ export default typedPlugin(
             },
           });
 
-          if (!filesAdd.length) return res.badRequest('No files found, with given request');
+          if (!filesAdd.length) throw new ApiError(1026);
 
           files = filesAdd.map((f) => f.id);
         }

@@ -1,3 +1,4 @@
+import { ApiError } from '@/lib/api/errors';
 import { bytes } from '@/lib/bytes';
 import { hashPassword } from '@/lib/crypto';
 import { datasource } from '@/lib/datasource';
@@ -43,7 +44,7 @@ export default typedPlugin(
           select: userSelect,
         });
 
-        if (!user) return res.notFound('User not found');
+        if (!user) throw new ApiError(4009);
 
         return res.send(user);
       },
@@ -83,10 +84,10 @@ export default typedPlugin(
           },
           select: userSelect,
         });
-        if (!user) return res.notFound('User not found');
+        if (!user) throw new ApiError(4009);
 
         const { username, password, avatar, role, quota } = req.body;
-        if (role && !canInteract(req.user.role, role)) return res.forbidden('You cannot assign this role');
+        if (role && !canInteract(req.user.role, role)) throw new ApiError(3007);
 
         let finalQuota:
           | {
@@ -97,10 +98,8 @@ export default typedPlugin(
             }
           | undefined = undefined;
         if (quota) {
-          if (quota.filesType === 'BY_BYTES' && quota.maxBytes === undefined)
-            return res.badRequest('maxBytes is required');
-          if (quota.filesType === 'BY_FILES' && quota.maxFiles === undefined)
-            return res.badRequest('maxFiles is required');
+          if (quota.filesType === 'BY_BYTES' && quota.maxBytes === undefined) throw new ApiError(1056);
+          if (quota.filesType === 'BY_FILES' && quota.maxFiles === undefined) throw new ApiError(1057);
 
           finalQuota = {
             ...(quota.filesType === 'BY_BYTES' && {
@@ -188,9 +187,9 @@ export default typedPlugin(
           select: userSelect,
         });
 
-        if (!user) return res.notFound('User not found');
-        if (user.id === req.user.id) return res.forbidden('You cannot delete yourself');
-        if (!canInteract(req.user.role, user.role)) return res.forbidden('You cannot delete this user');
+        if (!user) throw new ApiError(4009);
+        if (user.id === req.user.id) throw new ApiError(3010);
+        if (!canInteract(req.user.role, user.role)) throw new ApiError(3009);
 
         if (req.body.delete) {
           const files = await prisma.file.findMany({

@@ -1,3 +1,4 @@
+import { ApiError } from '@/lib/api/errors';
 import { verifyPassword } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
 import { log } from '@/lib/logger';
@@ -39,8 +40,8 @@ export default typedPlugin(
             id: true,
           },
         });
-        if (!url) return res.notFound();
-        if (!url.password) return res.notFound();
+        if (!url) throw new ApiError(9002);
+        if (!url.password) throw new ApiError(9002);
 
         const verified = await verifyPassword(req.body.password, url.password);
         if (!verified) {
@@ -50,7 +51,7 @@ export default typedPlugin(
             ua: req.headers['user-agent'],
           });
 
-          return res.notFound();
+          throw new ApiError(9002);
         }
 
         logger.info(`url ${url.id} was accessed with the correct password`, {

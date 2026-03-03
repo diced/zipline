@@ -1,3 +1,4 @@
+import { ApiError } from '@/lib/api/errors';
 import { config } from '@/lib/config';
 import { prisma } from '@/lib/db';
 import { User, userSchema, userSelect } from '@/lib/db/models/user';
@@ -12,8 +13,8 @@ export type ApiUserMfaTotpResponse = User | { secret: string } | { secret: strin
 
 const logger = log('api').c('user').c('mfa').c('totp');
 
-const totpEnabledMiddleware = (_: FastifyRequest, res: FastifyReply, next: () => void) => {
-  if (!config.mfa.totp.enabled) return res.badRequest('TOTP is disabled');
+const totpEnabledMiddleware = (_: FastifyRequest, __: FastifyReply, next: () => void) => {
+  if (!config.mfa.totp.enabled) throw new ApiError(1054);
 
   next();
 };
@@ -84,7 +85,7 @@ export default typedPlugin(
         const { code, secret } = req.body;
 
         const valid = verifyTotpCode(code, secret);
-        if (!valid) return res.badRequest('Invalid code');
+        if (!valid) throw new ApiError(1045);
 
         const user = await prisma.user.update({
           where: { id: req.user.id },
@@ -115,12 +116,12 @@ export default typedPlugin(
         preHandler: [userMiddleware, totpEnabledMiddleware],
       },
       async (req, res) => {
-        if (!req.user.totpSecret) return res.badRequest("You don't have TOTP enabled");
+        if (!req.user.totpSecret) throw new ApiError(1053);
 
         const { code } = req.body;
 
         const valid = verifyTotpCode(code, req.user.totpSecret);
-        if (!valid) return res.badRequest('Invalid code');
+        if (!valid) throw new ApiError(1045);
 
         const user = await prisma.user.update({
           where: { id: req.user.id },

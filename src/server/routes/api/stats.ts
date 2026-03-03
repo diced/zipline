@@ -1,3 +1,4 @@
+import { ApiError } from '@/lib/api/errors';
 import { config } from '@/lib/config';
 import { prisma } from '@/lib/db';
 import { Metric, metricSchema } from '@/lib/db/models/metric';
@@ -44,10 +45,9 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        if (!config.features.metrics) return res.forbidden('metrics are disabled');
+        if (!config.features.metrics) throw new ApiError(3001);
 
-        if (config.features.metrics.adminOnly && !isAdministrator(req.user.role))
-          return res.forbidden('admin only');
+        if (config.features.metrics.adminOnly && !isAdministrator(req.user.role)) throw new ApiError(3000);
 
         const { from, to, all } = req.query;
 
@@ -55,8 +55,8 @@ export default typedPlugin(
         const toDate = to ? new Date(to) : new Date();
 
         if (!all) {
-          if (fromDate > toDate) return res.badRequest('from date must be before to date');
-          if (fromDate > new Date()) return res.badRequest('from date must be in the past');
+          if (fromDate > toDate) throw new ApiError(1058);
+          if (fromDate > new Date()) throw new ApiError(1059);
         }
 
         const stats = await prisma.metric.findMany({

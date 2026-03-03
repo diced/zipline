@@ -1,3 +1,4 @@
+import { ApiError } from '@/lib/api/errors';
 import { bytes } from '@/lib/bytes';
 import { config } from '@/lib/config';
 import { datasource } from '@/lib/datasource';
@@ -48,9 +49,9 @@ export default typedPlugin(
 
         if (req.query.id) {
           const file = exports.find((x) => x.id === req.query.id);
-          if (!file) return res.notFound();
+          if (!file) throw new ApiError(9002);
 
-          if (!file.completed) return res.badRequest('Export is not completed');
+          if (!file.completed) throw new ApiError(1024);
 
           return res.sendFile(file.path);
         }
@@ -74,7 +75,7 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        if (!req.query.id) return res.badRequest('No id provided');
+        if (!req.query.id) throw new ApiError(1029);
 
         const exportDb = await prisma.export.findFirst({
           where: {
@@ -82,7 +83,7 @@ export default typedPlugin(
             id: req.query.id,
           },
         });
-        if (!exportDb) return res.notFound();
+        if (!exportDb) throw new ApiError(9002);
 
         const path = join(config.core.tempDirectory, exportDb.path);
 
@@ -122,7 +123,7 @@ export default typedPlugin(
           where: { userId: req.user.id },
         });
 
-        if (!files.length) return res.badRequest('No files to export');
+        if (!files.length) throw new ApiError(1025);
 
         const exportFileName = `zexport_${req.user.id}_${Date.now()}_${files.length}.zip`;
         const exportPath = join(config.core.tempDirectory, exportFileName);

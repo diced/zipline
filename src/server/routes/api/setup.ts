@@ -1,3 +1,4 @@
+import { ApiError } from '@/lib/api/errors';
 import { createToken, hashPassword } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
 import { User, userSchema, userSelect } from '@/lib/db/models/user';
@@ -32,7 +33,7 @@ export default typedPlugin(
       },
       async (_, res) => {
         const { firstSetup } = await getZipline();
-        if (!firstSetup) return res.forbidden();
+        if (!firstSetup) throw new ApiError(9001);
 
         return res.send({ firstSetup });
       },
@@ -59,7 +60,7 @@ export default typedPlugin(
       async (req, res) => {
         const { firstSetup, id } = await getZipline();
 
-        if (!firstSetup) return res.forbidden();
+        if (!firstSetup) throw new ApiError(9001);
 
         logger.info('first setup running');
 

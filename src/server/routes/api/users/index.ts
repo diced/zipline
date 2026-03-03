@@ -1,3 +1,4 @@
+import { ApiError } from '@/lib/api/errors';
 import { config } from '@/lib/config';
 import { createToken, hashPassword } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
@@ -79,7 +80,7 @@ export default typedPlugin(
             username,
           },
         });
-        if (existing) return res.badRequest('a user with this username already exists');
+        if (existing) throw new ApiError(1040);
 
         let avatar64 = null;
 
@@ -93,7 +94,7 @@ export default typedPlugin(
           logger.debug('failed to read default avatar', { path: config.website.defaultAvatar });
         }
 
-        if (role && !canInteract(req.user.role, role)) return res.forbidden('You cannot create this role');
+        if (role && !canInteract(req.user.role, role)) throw new ApiError(3008);
 
         const user = await prisma.user.create({
           data: {

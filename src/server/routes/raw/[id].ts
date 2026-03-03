@@ -1,3 +1,4 @@
+import { ApiError } from '@/lib/api/errors';
 import { parseRange } from '@/lib/api/range';
 import { config } from '@/lib/config';
 import { verifyPassword } from '@/lib/crypto';
@@ -78,10 +79,10 @@ export const rawFileHandler = async (
   }
 
   if (file?.password) {
-    if (!pw) return res.forbidden('Password protected.');
+    if (!pw) throw new ApiError(3004);
     const verified = await verifyPassword(pw, file.password!);
 
-    if (!verified) return res.forbidden('Incorrect password.');
+    if (!verified) throw new ApiError(3005);
   }
 
   const size = file?.size || (await datasource.size(file?.name ?? id));

@@ -1,3 +1,4 @@
+import { ApiError } from '@/lib/api/errors';
 import { config } from '@/lib/config';
 import { log } from '@/lib/logger';
 import { getVersion } from '@/lib/version';
@@ -56,7 +57,7 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (_, res) => {
-        if (!config.features.versionChecking) return res.notFound();
+        if (!config.features.versionChecking) throw new ApiError(9002);
 
         const details = getVersion();
 
@@ -79,7 +80,7 @@ export default typedPlugin(
               text: await resp.text(),
             });
 
-            return res.internalServerError('failed to fetch version details');
+            throw new ApiError(6001);
           }
 
           const data: VersionAPI = await resp.json();
@@ -94,7 +95,7 @@ export default typedPlugin(
           });
         } catch (e) {
           logger.error('failed to fetch version details').error(e as Error);
-          return res.internalServerError('failed to fetch version details');
+          throw new ApiError(6001);
         }
       },
     );

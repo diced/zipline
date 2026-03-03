@@ -1,3 +1,4 @@
+import { ApiError } from '@/lib/api/errors';
 import { Export4, export4Schema } from '@/lib/import/version4/validateExport';
 import { log } from '@/lib/logger';
 import { administratorMiddleware } from '@/server/middleware/administrator';
@@ -74,10 +75,7 @@ export default typedPlugin(
         logger.debug('exporting server data', { format: '4', requester: req.user.username });
 
         const settingsTable = await prisma.zipline.findFirst();
-        if (!settingsTable)
-          return res.badRequest(
-            'Invalid setup, no settings found. Run the setup process again before exporting data.',
-          );
+        if (!settingsTable) throw new ApiError(1023);
 
         const export4: Export4 = {
           versions: {

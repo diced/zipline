@@ -1,3 +1,4 @@
+import { ApiError } from '@/lib/api/errors';
 import { prisma } from '@/lib/db';
 import { log } from '@/lib/logger';
 import { OAuthProvider, OAuthProviderType } from '@/prisma/client';
@@ -51,9 +52,8 @@ export default typedPlugin(
           },
         }))!;
 
-        if (!req.user.oauthProviders.length) return res.badRequest('No providers to delete');
-        if (req.user.oauthProviders.length === 1 && !password)
-          return res.badRequest("You can't delete your last oauth provider without a password");
+        if (!req.user.oauthProviders.length) throw new ApiError(1030);
+        if (req.user.oauthProviders.length === 1 && !password) throw new ApiError(1043);
 
         const { provider } = req.body;
 

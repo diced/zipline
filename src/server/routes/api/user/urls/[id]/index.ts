@@ -1,3 +1,4 @@
+import { ApiError } from '@/lib/api/errors';
 import { hashPassword } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
 import { Url, urlSchema } from '@/lib/db/models/url';
@@ -41,7 +42,7 @@ export default typedPlugin(
             password: true,
           },
         });
-        if (!url) return res.notFound();
+        if (!url) throw new ApiError(9002);
 
         return res.send(url);
       },
@@ -75,7 +76,7 @@ export default typedPlugin(
           },
         });
 
-        if (!url) return res.notFound();
+        if (!url) throw new ApiError(9002);
 
         let password: string | null | undefined = undefined;
         if (req.body.password !== undefined) {
@@ -84,7 +85,7 @@ export default typedPlugin(
           } else if (typeof req.body.password === 'string') {
             password = await hashPassword(req.body.password);
           } else {
-            return res.badRequest('password must be a string');
+            throw new ApiError(1055);
           }
         }
 
@@ -95,7 +96,7 @@ export default typedPlugin(
             },
           });
 
-          if (existingUrl) return res.badRequest('vanity already exists');
+          if (existingUrl) throw new ApiError(1041);
         }
 
         const updatedUrl = await prisma.url.update({
@@ -143,7 +144,7 @@ export default typedPlugin(
           },
         });
 
-        if (!url) return res.notFound();
+        if (!url) throw new ApiError(9002);
 
         const deletedUrl = await prisma.url.delete({
           where: {

@@ -1,3 +1,4 @@
+import { ApiError } from '@/lib/api/errors';
 import { createToken } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
 import { export3Schema } from '@/lib/import/version3/validateExport';
@@ -41,7 +42,7 @@ export default typedPlugin(
         ...secondlyRatelimit(5),
       },
       async (req, res) => {
-        if (req.user.role !== 'SUPERADMIN') return res.forbidden('not super admin');
+        if (req.user.role !== 'SUPERADMIN') throw new ApiError(3015);
 
         const { export3 } = req.body;
 

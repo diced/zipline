@@ -1,3 +1,4 @@
+import { ApiError } from '@/lib/api/errors';
 import { ziplineClientParseSchema } from '@/lib/api/detect';
 import { verifyPassword } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
@@ -61,8 +62,8 @@ export default typedPlugin(
             token: true,
           },
         });
-        if (!user) return res.badRequest('Invalid username or password');
-        if (!user.password) return res.badRequest('Invalid username or password');
+        if (!user) throw new ApiError(1044);
+        if (!user.password) throw new ApiError(1044);
 
         const valid = await verifyPassword(password, user.password);
         if (!valid) {
@@ -72,7 +73,7 @@ export default typedPlugin(
             ua: req.headers['user-agent'],
           });
 
-          return res.badRequest('Invalid username or password');
+          throw new ApiError(1044);
         }
 
         if (user.totpSecret && code) {
@@ -84,7 +85,7 @@ export default typedPlugin(
               ua: req.headers['user-agent'],
             });
 
-            return res.badRequest('Invalid code');
+            throw new ApiError(1045);
           }
         }
 

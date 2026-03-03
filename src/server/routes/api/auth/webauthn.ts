@@ -1,3 +1,5 @@
+import { ApiError } from '@/lib/api/errors';
+import { ziplineClientParseSchema } from '@/lib/api/detect';
 import { config } from '@/lib/config';
 import { createToken } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
@@ -16,7 +18,6 @@ import {
 } from '@simplewebauthn/server';
 import z from 'zod';
 import { PasskeyReg, passkeysEnabledHandler } from '../user/mfa/passkey';
-import { ziplineClientParseSchema } from '@/lib/api/detect';
 
 export type ApiAuthWebauthnResponse = {
   user: User;
@@ -97,13 +98,13 @@ export default typedPlugin(
         const session = await getSession(req, res);
 
         const webauthnChallengeId = req.cookies['webauthn-challenge-id'];
-        if (!webauthnChallengeId) return res.badRequest('Missing webauthn challenge id');
+        if (!webauthnChallengeId) throw new ApiError(1046);
 
         const { response } = req.body;
-        if (!response) return res.badRequest('Missing webauthn payload');
+        if (!response) throw new ApiError(1047);
 
         const cachedOptions = OPTIONS_CACHE.get(webauthnChallengeId);
-        if (!cachedOptions) return res.badRequest();
+        if (!cachedOptions) throw new ApiError(1048);
 
         const user = await prisma.user.findFirst({
           where: {
@@ -130,7 +131,7 @@ export default typedPlugin(
             request: response,
           });
 
-          return res.badRequest();
+          throw new ApiError(1052);
         }
 
         const passkey = user.passkeys.find((pk) => {
@@ -139,12 +140,12 @@ export default typedPlugin(
           return webauthn.id === response.id;
         });
 
-        if (!passkey) return res.badRequest();
+        if (!passkey) throw new ApiError(1052);
         const reg = passkey.reg as PasskeyReg;
 
         if (!reg.webauthn) {
           logger.debug('invalid webauthn attempt, legacy passkey found...');
-          return res.badRequest();
+          throw new ApiError(1060);
         }
 
         OPTIONS_CACHE.delete(webauthnChallengeId);
@@ -165,14 +166,14 @@ export default typedPlugin(
         } catch (e) {
           console.error(e);
           logger.warn('error verifying passkey authentication');
-          return res.badRequest('Error verifying passkey authentication');
+          throw new ApiError(1051);
         }
 
         if (!verification.verified) {
           logger.warn('failed passkey authentication attempt', {
             user: user.username,
           });
-          return res.badRequest('Could not verify passkey authentication');
+          throw new ApiError(1052);
         }
 
         const { newCounter } = verification.authenticationInfo;

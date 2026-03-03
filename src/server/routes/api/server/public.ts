@@ -103,6 +103,7 @@ export default typedPlugin(
         if (config.website.tos) {
           response.tos = global.__cachedConfigValues__.tos!;
         }
+
         return res.send(response);
       },
     );

@@ -1,3 +1,4 @@
+import { ApiError } from '@/lib/api/errors';
 import { datasource } from '@/lib/datasource';
 import { prisma } from '@/lib/db';
 import { log } from '@/lib/logger';
@@ -92,11 +93,11 @@ export default typedPlugin(
           select: { id: true, name: true, userId: true },
         });
 
-        if (!folder) return res.notFound('Folder not found');
-        if (req.user.id !== folder.userId) return res.forbidden('You do not own this folder');
+        if (!folder) throw new ApiError(4001);
+        if (req.user.id !== folder.userId) throw new ApiError(3011);
 
         const folderTree = await getFolderTree(id, req.user.id);
-        if (!folderTree) return res.notFound('Folder not found');
+        if (!folderTree) throw new ApiError(4001);
 
         logger.info(`folder export requested: ${folder.name}`, { user: req.user.id, folder: folder.id });
 

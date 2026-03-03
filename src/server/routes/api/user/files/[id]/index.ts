@@ -1,3 +1,4 @@
+import { ApiError } from '@/lib/api/errors';
 import { bytes } from '@/lib/bytes';
 import { hashPassword } from '@/lib/crypto';
 import { datasource } from '@/lib/datasource';
@@ -42,10 +43,10 @@ export default typedPlugin(
           },
           select: { User: true, ...fileSelect },
         });
-        if (!file) return res.notFound();
+        if (!file) throw new ApiError(4000);
 
         if (req.user.id !== file.User?.id && !canInteract(req.user.role, file.User?.role ?? 'USER'))
-          return res.notFound();
+          throw new ApiError(4000);
 
         return res.send(file);
       },
@@ -80,10 +81,10 @@ export default typedPlugin(
           },
           select: { User: true, ...fileSelect },
         });
-        if (!file) return res.notFound();
+        if (!file) throw new ApiError(4000);
 
         if (req.user.id !== file.User?.id && !canInteract(req.user.role, file.User?.role ?? 'USER'))
-          return res.notFound();
+          throw new ApiError(4000);
 
         const data: Prisma.FileUpdateInput = {};
 
@@ -113,7 +114,7 @@ export default typedPlugin(
             },
           });
 
-          if (tags.length !== req.body.tags.length) return res.badRequest('invalid tag somewhere');
+          if (tags.length !== req.body.tags.length) throw new ApiError(1032);
 
           data.tags = {
             set: req.body.tags.map((tag) => ({ id: tag })),
@@ -128,8 +129,7 @@ export default typedPlugin(
             },
           });
 
-          if (existingFile && existingFile.id !== file.id)
-            return res.badRequest('File with this name already exists');
+          if (existingFile && existingFile.id !== file.id) throw new ApiError(1014);
 
           data.name = name;
 
@@ -137,7 +137,7 @@ export default typedPlugin(
             await datasource.rename(file.name, data.name);
           } catch (error) {
             logger.error('Failed to rename file in datasource', { error });
-            return res.internalServerError('Failed to rename file in datasource');
+            throw new ApiError(6002);
           }
         }
 
@@ -174,10 +174,10 @@ export default typedPlugin(
             User: true,
           },
         });
-        if (!file) return res.notFound();
+        if (!file) throw new ApiError(4000);
 
         if (req.user.id !== file.User?.id && !canInteract(req.user.role, file.User?.role ?? 'USER'))
-          return res.notFound();
+          throw new ApiError(4000);
 
         const deletedFile = await prisma.file.delete({
           where: {

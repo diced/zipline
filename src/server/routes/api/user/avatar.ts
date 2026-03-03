@@ -1,3 +1,4 @@
+import { ApiError } from '@/lib/api/errors';
 import { prisma } from '@/lib/db';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
@@ -29,7 +30,7 @@ export default typedPlugin(
           },
         });
 
-        if (!u.avatar) return res.notFound();
+        if (!u.avatar) throw new ApiError(9002);
 
         return res.send(u.avatar);
       },

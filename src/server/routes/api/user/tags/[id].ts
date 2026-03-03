@@ -1,3 +1,4 @@
+import { ApiError } from '@/lib/api/errors';
 import { prisma } from '@/lib/db';
 import { Tag, tagSchema, tagSelect } from '@/lib/db/models/tag';
 import { log } from '@/lib/logger';
@@ -39,7 +40,7 @@ export default typedPlugin(
           },
           select: tagSelect,
         });
-        if (!tag) return res.notFound();
+        if (!tag) throw new ApiError(9002);
 
         return res.send(tag);
       },
@@ -69,7 +70,7 @@ export default typedPlugin(
           },
         });
 
-        if (tag.count === 0) return res.notFound();
+        if (tag.count === 0) throw new ApiError(9002);
 
         logger.info('tag deleted', {
           id,
@@ -109,7 +110,7 @@ export default typedPlugin(
             id,
           },
         });
-        if (!existingTag) return res.notFound();
+        if (!existingTag) throw new ApiError(9002);
 
         if (name) {
           const existing = await prisma.tag.findFirst({
@@ -118,7 +119,7 @@ export default typedPlugin(
             },
           });
 
-          if (existing) return res.badRequest('tag name already exists');
+          if (existing) throw new ApiError(1034);
         }
 
         const tag = await prisma.tag.update({

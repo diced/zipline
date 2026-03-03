@@ -1,3 +1,4 @@
+import { ApiError } from '@/lib/api/errors';
 import { prisma } from '@/lib/db';
 import { fileSelect } from '@/lib/db/models/file';
 import { buildPublicParentChain, cleanFolder, Folder, folderSchema } from '@/lib/db/models/folder';
@@ -65,9 +66,10 @@ export default typedPlugin(
           },
         });
 
-        if (!folder) return res.notFound();
+        if (!folder) throw new ApiError(9002);
 
-        if ((uploads && !folder.allowUploads) || (!uploads && !folder.public)) return res.notFound();
+        if (uploads && !folder.allowUploads) throw new ApiError(3002);
+        if (!uploads && !folder.public) throw new ApiError(9002);
 
         if (folder.parentId) {
           (folder as any).parent = await buildPublicParentChain(folder.parentId);

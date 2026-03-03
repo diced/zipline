@@ -1,3 +1,4 @@
+import { ApiError } from '@/lib/api/errors';
 import { prisma } from '@/lib/db';
 import { fileSelect } from '@/lib/db/models/file';
 import { buildParentChain, Folder, cleanFolder, folderSchema } from '@/lib/db/models/folder';
@@ -7,7 +8,7 @@ import { canInteract } from '@/lib/role';
 import { zStringTrimmed } from '@/lib/validation';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
-import { FastifyReply, FastifyRequest } from 'fastify';
+import { FastifyRequest } from 'fastify';
 import z from 'zod';
 
 export type ApiUserFoldersIdResponse = Folder;
@@ -28,7 +29,7 @@ const paramsSchema = z.object({
   id: z.string(),
 });
 
-const folderExistsAndEditable = async (req: FastifyRequest, res: FastifyReply) => {
+const folderExistsAndEditable = async (req: FastifyRequest) => {
   const { id } = req.params as z.infer<typeof paramsSchema>;
 
   const folder = await prisma.folder.findUnique({
@@ -40,8 +41,8 @@ const folderExistsAndEditable = async (req: FastifyRequest, res: FastifyReply) =
     },
   });
 
-  if (!folder) return res.notFound('Folder not found');
-  if (!checkInteraction(req.user, folder.User)) return res.notFound('Folder not found');
+  if (!folder) throw new ApiError(4001);
+  if (!checkInteraction(req.user, folder.User)) throw new ApiError(4001);
 };
 
 export const PATH = '/api/user/folders/:id';
@@ -90,7 +91,7 @@ export default typedPlugin(
             },
           },
         });
-        if (!folder) return res.notFound('Folder not found');
+        if (!folder) throw new ApiError(4001);
 
         if (folder.parentId) {
           (folder as any).parent = await buildParentChain(folder.parentId);
@@ -127,8 +128,8 @@ export default typedPlugin(
             User: true,
           },
         });
-        if (!file) return res.notFound('File not found');
-        if (!checkInteraction(req.user, file.User)) return res.notFound('File not found');
+        if (!file) throw new ApiError(4000);
+        if (!checkInteraction(req.user, file.User)) throw new ApiError(4000);
 
         const fileInFolder = await prisma.file.findFirst({
           where: {
@@ -138,7 +139,7 @@ export default typedPlugin(
             },
           },
         });
-        if (fileInFolder) return res.badRequest('File already in folder');
+        if (fileInFolder) throw new ApiError(1011);
 
         try {
           const nFolder = await prisma.folder.update({
@@ -160,7 +161,7 @@ export default typedPlugin(
           logger.info('file added to folder', { folder: folderId, file: id });
           return res.send(cleanFolder(nFolder));
         } catch (error: any) {
-          if (error.code === 'P2025') return res.notFound('Folder or File not found');
+          if (error.code === 'P2025') throw new ApiError(4002);
           throw error;
         }
       },
@@ -189,7 +190,7 @@ export default typedPlugin(
         const { isPublic, name, allowUploads, parentId } = req.body;
 
         if (parentId !== undefined) {
-          if (parentId === folderId) return res.badRequest('A folder cannot be its own parent');
+          if (parentId === folderId) throw new ApiError(1015);
 
           if (parentId !== null) {
             const newParent = await prisma.folder.findUnique({
@@ -197,14 +198,13 @@ export default typedPlugin(
               select: { id: true, userId: true, parentId: true },
             });
 
-            if (!newParent) return res.notFound('Parent folder not found');
-            if (newParent.userId !== req.user.id)
-              return res.forbidden('Parent folder does not belong to you');
+            if (!newParent) throw new ApiError(4007);
+            if (newParent.userId !== req.user.id) throw new ApiError(3003);
 
             let currentParentId: string | null = newParent.parentId;
             while (currentParentId) {
               if (currentParentId === folderId) {
-                return res.badRequest('Cannot move folder into one of its descendants');
+                throw new ApiError(1016);
               }
               const parent = await prisma.folder.findUnique({
                 where: { id: currentParentId },
@@ -250,7 +250,7 @@ export default typedPlugin(
 
           return res.send(cleanFolder(nFolder));
         } catch (error: any) {
-          if (error.code === 'P2025') return res.notFound('Folder not found');
+          if (error.code === 'P2025') throw new ApiError(4001);
           throw error;
         }
       },
@@ -289,9 +289,8 @@ export default typedPlugin(
               where: { id: targetFolderId },
               select: { id: true, User: true },
             });
-            if (!targetFolder) return res.notFound('Target folder not found');
-            if (!checkInteraction(req.user, targetFolder.User))
-              return res.forbidden('Target folder not found');
+            if (!targetFolder) throw new ApiError(4008);
+            if (!checkInteraction(req.user, targetFolder.User)) throw new ApiError(4008, undefined, 403);
           }
 
           try {
@@ -335,7 +334,7 @@ export default typedPlugin(
               }
             });
 
-            if (!result?.success) return res.badRequest('Invalid action');
+            if (!result?.success) throw new ApiError(1019);
 
             if (result?.isCascade) {
               logger.info('folder cascade deleted', { folder: folderId });
@@ -347,21 +346,20 @@ export default typedPlugin(
             logger.info('folder deleted', { folder: folderId, childrenAction, targetFolderId });
             return res.send({ success: true });
           } catch (error: any) {
-            if (error.code === 'P2025')
-              return res.notFound('Folder or related records not found during deletion');
+            if (error.code === 'P2025') throw new ApiError(4003);
             throw error;
           }
         } else if (del === 'file') {
           const { id } = req.body;
-          if (!id) return res.badRequest('File id is required');
+          if (!id) throw new ApiError(1013);
 
           const file = await prisma.file.findUnique({
             where: { id },
             include: { User: true },
           });
 
-          if (!file) return res.notFound('File not found');
-          if (!checkInteraction(req.user, file.User)) return res.notFound('File not found');
+          if (!file) throw new ApiError(4000);
+          if (!checkInteraction(req.user, file.User)) throw new ApiError(4000);
 
           const fileInFolder = await prisma.file.findFirst({
             where: {
@@ -369,7 +367,7 @@ export default typedPlugin(
               Folder: { id: folderId },
             },
           });
-          if (!fileInFolder) return res.badRequest('File not in folder');
+          if (!fileInFolder) throw new ApiError(1012);
 
           try {
             const nFolder = await prisma.folder.update({
@@ -390,7 +388,7 @@ export default typedPlugin(
             logger.info('file removed from folder', { folder: nFolder.id, file: id });
             return res.send(cleanFolder(nFolder));
           } catch (error: any) {
-            if (error.code === 'P2025') return res.notFound('Folder or file not found');
+            if (error.code === 'P2025') throw new ApiError(4002);
             throw error;
           }
         }

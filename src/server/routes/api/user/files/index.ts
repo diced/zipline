@@ -1,3 +1,4 @@
+import { ApiError } from '@/lib/api/errors';
 import { prisma } from '@/lib/db';
 import { File, cleanFiles, fileSchema, fileSelect } from '@/lib/db/models/file';
 import { canInteract } from '@/lib/role';
@@ -77,8 +78,9 @@ export default typedPlugin(
           },
         });
 
-        if (user && user.id !== req.user.id && !canInteract(req.user.role, user.role)) return res.notFound();
-        if (!user) return res.notFound();
+        if (user && user.id !== req.user.id && !canInteract(req.user.role, user.role))
+          throw new ApiError(9002);
+        if (!user) throw new ApiError(9002);
 
         const { perpage, searchQuery, searchField, page, filter, favorite, sortBy, order, folder } =
           req.query;
@@ -93,8 +95,8 @@ export default typedPlugin(
               User: true,
             },
           });
-          if (!f) return res.notFound();
-          if (!checkInteraction(req.user, f?.User)) return res.notFound();
+          if (!f) throw new ApiError(9002);
+          if (!checkInteraction(req.user, f?.User)) throw new ApiError(9002);
 
           folderId = f.id;
         }
@@ -136,7 +138,7 @@ export default typedPlugin(
               },
             });
 
-            if (foundTags.length !== parsedTags.length) return res.badRequest('invalid tag somewhere');
+            if (foundTags.length !== parsedTags.length) throw new ApiError(1032);
 
             tagFiles = foundTags
               .map((tag) => tag.files.map((file) => file.id))

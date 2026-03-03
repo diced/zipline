@@ -1,3 +1,4 @@
+import { ApiError } from '@/lib/api/errors';
 import { config } from '@/lib/config';
 import { hashPassword } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
@@ -66,7 +67,8 @@ export default typedPlugin(
           },
         });
         if (req.user.quota && req.user.quota.maxUrls && countUrls + 1 > req.user.quota.maxUrls)
-          return res.forbidden(
+          throw new ApiError(
+            3012,
             `Shortening this URL would exceed your quota of ${req.user.quota.maxUrls} URLs.`,
           );
 
@@ -83,8 +85,6 @@ export default typedPlugin(
           ? await hashPassword(req.headers['x-zipline-password'])
           : undefined;
 
-        if (!destination) return res.badRequest('Destination is required');
-
         if (vanity) {
           const existingVanity = await prisma.url.findFirst({
             where: {
@@ -92,7 +92,7 @@ export default typedPlugin(
             },
           });
 
-          if (existingVanity) return res.badRequest('Vanity already taken');
+          if (existingVanity) throw new ApiError(1042);
         }
 
         let code, existingCode;

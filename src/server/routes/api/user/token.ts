@@ -1,3 +1,4 @@
+import { ApiError } from '@/lib/api/errors';
 import { config } from '@/lib/config';
 import { createToken, encryptToken } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
@@ -45,7 +46,8 @@ export default typedPlugin(
           logger.warn('something went very wrong! user not found or token not found', {
             userId: req.user.id,
           });
-          return res.internalServerError();
+
+          throw new ApiError(9004);
         }
 
         const token = encryptToken(user!.token, config.core.secret);

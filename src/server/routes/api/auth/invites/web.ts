@@ -1,3 +1,4 @@
+import { ApiError } from '@/lib/api/errors';
 import { config } from '@/lib/config';
 import { prisma } from '@/lib/db';
 import { Invite } from '@/lib/db/models/invite';
@@ -40,7 +41,7 @@ export default typedPlugin(
         const { code } = req.query;
 
         if (!code) return res.send({ invite: null });
-        if (!config.invites.enabled) return res.notFound();
+        if (!config.invites.enabled) throw new ApiError(9002);
 
         const invite = await prisma.invite.findFirst({
           where: {
@@ -62,7 +63,7 @@ export default typedPlugin(
           (invite.expiresAt && new Date(invite.expiresAt) < new Date()) ||
           (invite.maxUses && invite.uses >= invite.maxUses)
         ) {
-          return res.notFound();
+          throw new ApiError(9002);
         }
 
         delete (invite as any).expiresAt;

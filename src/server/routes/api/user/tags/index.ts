@@ -1,3 +1,4 @@
+import { ApiError } from '@/lib/api/errors';
 import { prisma } from '@/lib/db';
 import { Tag, tagSchema, tagSelect } from '@/lib/db/models/tag';
 import { log } from '@/lib/logger';
@@ -63,7 +64,7 @@ export default typedPlugin(
           },
         });
 
-        if (existingTag) return res.badRequest('Cannot create tag with the same name');
+        if (existingTag) throw new ApiError(1033);
 
         const tag = await prisma.tag.create({
           data: {

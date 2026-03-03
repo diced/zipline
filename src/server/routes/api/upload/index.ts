@@ -1,3 +1,4 @@
+import { ApiError } from '@/lib/api/errors';
 import { checkQuota, getDomain, getExtension, getFilename, getMimetype } from '@/lib/api/upload';
 import { bytes } from '@/lib/bytes';
 import { COMPRESS_TYPES, compressFile, CompressResult } from '@/lib/compress';
@@ -81,9 +82,9 @@ export default typedPlugin(
       },
       async (req, res) => {
         const options = parseHeaders(req.headers, config.files);
-        if (options.header) return res.badRequest(`bad options: ${options.message}`);
+        if (options.header) throw new ApiError(1001, `bad options: ${options.message}`);
 
-        if (options.partial) return res.badRequest('bad options, receieved: partial upload');
+        if (options.partial) throw new ApiError(1001, 'bad options, receieved: partial upload');
 
         let folder = null;
         if (options.folder) {
@@ -92,15 +93,16 @@ export default typedPlugin(
               id: options.folder,
             },
           });
-          if (!folder) return res.badRequest('folder not found');
-          if (!req.user && !folder.allowUploads) return res.forbidden('folder is not open');
+          if (!folder) throw new ApiError(4001);
+          if (!req.user && !folder.allowUploads) throw new ApiError(3002);
         }
 
         const files = await req.saveRequestFiles({ tmpdir: config.core.tempDirectory });
 
         const totalFileSize = files.reduce((acc, x) => acc + x.file.bytesRead, 0);
         const quotaCheck = await checkQuota(req.user, totalFileSize, files.length);
-        if (quotaCheck !== true) return res.payloadTooLarge(quotaCheck);
+        if (quotaCheck !== true)
+          throw new ApiError(5002, typeof quotaCheck === 'string' ? quotaCheck : undefined);
 
         const response: ApiUploadResponse = {
           files: [],
@@ -123,16 +125,17 @@ export default typedPlugin(
           const extension = getExtension(file.filename, options.overrides?.extension);
 
           if (config.files.disabledExtensions.includes(extension))
-            return res.badRequest(`file[${i}]: File extension ${extension} is not allowed`);
+            throw new ApiError(1006, `file[${i}]: File extension ${extension} is not allowed`);
           if (file.file.bytesRead > bytes(config.files.maxFileSize))
-            return res.payloadTooLarge(
+            throw new ApiError(
+              5001,
               `file[${i}]: File size is too large. Maximum file size is ${bytes(config.files.maxFileSize)} bytes`,
             );
 
           // determine filename
           const format = options.format || config.files.defaultFormat;
           const nameResult = await getFilename(format, file.filename, extension, options.overrides?.filename);
-          if ('error' in nameResult) return res.badRequest(`file[${i}]: ${nameResult.error}`);
+          if ('error' in nameResult) throw new ApiError(1009, `file[${i}]: ${nameResult.error}`);
 
           const { fileName } = nameResult;
 
@@ -142,8 +145,8 @@ export default typedPlugin(
             logger.warn(
               `file[${i}]: mimetype ${file.mimetype} was not recognized, to ignore this warning, turn off assume mimetypes.`,
             );
-
-            return res.badRequest(
+            throw new ApiError(
+              1010,
               `file[${i}]: mimetype ${file.mimetype} was not recognized, supply a valid mimetype`,
             );
           }
@@ -187,7 +190,7 @@ export default typedPlugin(
           if (folder) data.Folder = { connect: { id: folder.id } };
           if (options.addOriginalName) {
             const sanitizedOG = sanitizeFilename(file.filename);
-            if (!sanitizedOG) return res.badRequest(`file[${i}]: Invalid characters in original filename`);
+            if (!sanitizedOG) throw new ApiError(1008, `file[${i}]: Invalid characters in original filename`);
 
             data.originalName = sanitizedOG;
           }
