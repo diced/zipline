@@ -29,13 +29,17 @@ export default typedPlugin(
           description: 'Get your current TOTP secret, generating one (and a QR code) if not yet enabled.',
           response: {
             200: z.union([
-              z.object({
-                secret: z.string(),
-              }),
-              z.object({
-                secret: z.string(),
-                qrcode: z.string(),
-              }),
+              z
+                .object({
+                  secret: z.string(),
+                })
+                .describe('TOTP is enabled, returning the existing secret'),
+              z
+                .object({
+                  secret: z.string(),
+                  qrcode: z.string(),
+                })
+                .describe('TOTP is not yet enabled, returning a new secret and QR code data URL'),
             ]),
           },
         },

@@ -1,7 +1,7 @@
 import { ApiError } from '@/lib/api/errors';
 import { prisma } from '@/lib/db';
+import { OAuthProvider, oauthProviderSchema } from '@/lib/db/models/user';
 import { log } from '@/lib/logger';
-import { OAuthProvider, OAuthProviderType } from '@/prisma/client';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
 import z from 'zod';
@@ -19,7 +19,7 @@ export default typedPlugin(
         schema: {
           description: 'List OAuth providers currently linked to the authenticated user.',
           response: {
-            200: z.array(z.custom<OAuthProvider>()),
+            200: z.array(oauthProviderSchema),
           },
         },
         preHandler: [userMiddleware],
@@ -35,9 +35,9 @@ export default typedPlugin(
         schema: {
           description:
             'Unlink one OAuth provider from the authenticated user, enforcing that at least one login method remains.',
-          body: z.object({ provider: z.enum(OAuthProviderType) }),
+          body: z.object({ provider: oauthProviderSchema.shape.provider }),
           response: {
-            200: z.array(z.custom<OAuthProvider>()),
+            200: z.array(oauthProviderSchema),
           },
         },
         preHandler: [userMiddleware],

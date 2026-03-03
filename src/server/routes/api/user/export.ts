@@ -39,6 +39,7 @@ export default typedPlugin(
           response: {
             200: z.array(exportSchema),
           },
+          produces: ['application/json', 'application/zip'],
         },
         preHandler: [userMiddleware],
       },

@@ -1,4 +1,4 @@
-import { ErrorBody } from './response';
+import { ApiErrorPayload } from './api/errors';
 
 const bodyMethods = ['POST', 'PUT', 'PATCH', 'DELETE'];
 
@@ -9,10 +9,10 @@ export async function fetchApi<Response = any>(
   headers: Record<string, string> = {},
 ): Promise<{
   data: Response | null;
-  error: ErrorBody | null;
+  error: ApiErrorPayload | null;
 }> {
   let data: Response | null = null;
-  let error: ErrorBody | null = null;
+  let error: ApiErrorPayload | null = null;
 
   if ((bodyMethods.includes(method) && body !== null) || (body && !Object.keys(body).length)) {
     headers['Content-Type'] = 'application/json';
@@ -31,9 +31,10 @@ export async function fetchApi<Response = any>(
       error = await res.json();
     } else {
       error = {
-        message: await res.text(),
+        code: 9000,
+        error: await res.text(),
         statusCode: res.status,
-      } as ErrorBody;
+      } as ApiErrorPayload;
     }
   }
 

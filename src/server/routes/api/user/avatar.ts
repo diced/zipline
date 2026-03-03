@@ -15,7 +15,7 @@ export default typedPlugin(
         schema: {
           description: "Return the current user's avatar as a base64 data URL.",
           response: {
-            200: z.string(),
+            200: z.string().describe('data URL with base64'),
           },
         },
         preHandler: [userMiddleware],

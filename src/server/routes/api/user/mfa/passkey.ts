@@ -117,7 +117,9 @@ export default typedPlugin(
         schema: {
           description: 'Register a new WebAuthn passkey for the authenticated user.',
           body: z.object({
-            response: z.custom<RegistrationResponseJSON>(),
+            response: z
+              .custom<RegistrationResponseJSON>()
+              .describe('The registration response from the client, containing the new passkey credential.'),
             name: zStringTrimmed,
           }),
         },

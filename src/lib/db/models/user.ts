@@ -43,7 +43,7 @@ export const userSessionSchema = z.object({
 
 export type UserSession = z.infer<typeof userSessionSchema>;
 
-const userQuotaSchema = z.object({
+export const userQuotaSchema = z.object({
   id: z.string(),
   createdAt: z.date(),
   updatedAt: z.date(),
@@ -56,7 +56,7 @@ const userQuotaSchema = z.object({
 
 export type UserQuota = z.infer<typeof userQuotaSchema>;
 
-const userPasskeySchema = z.object({
+export const userPasskeySchema = z.object({
   id: z.string(),
   createdAt: z.date(),
   updatedAt: z.date(),
@@ -68,7 +68,7 @@ const userPasskeySchema = z.object({
 
 export type UserPasskey = z.infer<typeof userPasskeySchema>;
 
-const oauthProviderSchema = z.object({
+export const oauthProviderSchema = z.object({
   id: z.string(),
   createdAt: z.date(),
   updatedAt: z.date(),
@@ -81,6 +81,7 @@ const oauthProviderSchema = z.object({
 });
 
 export type OAuthProvider = z.infer<typeof oauthProviderSchema>;
+export type OAuthProviderType = OAuthProvider['provider'];
 
 export const userSchema = z.object({
   id: z.string(),

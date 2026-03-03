@@ -17,7 +17,6 @@ export const API_ERRORS = {
   1014: 'File with this name already exists',
   1015: 'A folder cannot be its own parent',
   1016: 'Cannot move folder into one of its descendants',
-
   1019: 'Invalid action',
   1020: 'Cannot PATCH without an action',
   1021: 'Cannot delete current session, use log out instead.',
@@ -61,8 +60,10 @@ export const API_ERRORS = {
   1059: 'From date must be in the past',
   1060: 'Passkey has legacy registration data and cannot be used',
 
-  // 2xxx, logouts
+  // 2xxx, session errors
   2000: 'Invalid login session',
+  2001: 'Invalid token',
+  2002: 'Not logged in',
 
   // 3xxx, permission errors
   3000: 'Admin only',
@@ -137,10 +138,14 @@ export class ApiError extends Error {
 
   toJSON(): ApiErrorPayload {
     const formattedMessage = API_ERRORS[this.code]
-      ? `${API_ERRORS[this.code]}${this.message ? `: ${this.message}` : ''}`
+      ? `${this.code}${this.message ? `: ${this.message}` : ''}`
       : this.message;
 
     return { error: formattedMessage, code: this.code, statusCode: this.status };
+  }
+
+  public static check(payload: ApiErrorPayload, code: ApiErrorCode): boolean {
+    return payload.code === code;
   }
 
   private static codeToHttpStatus(code: ApiErrorCode): number {

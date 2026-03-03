@@ -23,6 +23,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import useSWR, { mutate } from 'swr';
 import GenericError from '../../error/GenericError';
 import { getWebClient } from '@/lib/api/detect';
+import { ApiError } from '@/lib/api/errors';
 
 export function Component() {
   useTitle('Register');
@@ -114,7 +115,7 @@ export function Component() {
     );
 
     if (error) {
-      if (error.error === 'Username is taken') {
+      if (ApiError.check(error, 1039)) {
         form.setFieldError('username', 'Username is taken');
       } else {
         notifications.show({

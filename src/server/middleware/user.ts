@@ -5,8 +5,8 @@ import { User, userSelect } from '@/lib/db/models/user';
 import { FastifyReply } from 'fastify';
 import { FastifyRequest } from 'fastify/types/request';
 import { getSession } from '../session';
-// import cookie from 'cookie';
 import * as cookie from 'cookie';
+import { ApiError } from '@/lib/api/errors';
 
 declare module 'fastify' {
   export interface FastifyRequest {
@@ -28,13 +28,15 @@ export function parseUserToken(
   const decryptedToken = decryptToken(encryptedToken, config.core.secret);
   if (!decryptedToken) {
     if (noThrow) return null;
-    throw { error: 'could not decrypt token' };
+    // throw { error: 'could not decrypt token' };
+    throw new ApiError(2001);
   }
 
   const [date, token] = decryptedToken;
   if (isNaN(new Date(date).getTime())) {
     if (noThrow) return null;
-    throw { error: 'invalid token' };
+
+    throw new ApiError(2001);
   }
 
   return token;
@@ -58,7 +60,7 @@ export async function userMiddleware(req: FastifyRequest, res: FastifyReply) {
       // eslint-disable-next-line no-var
       var token = parseUserToken(authorization);
     } catch (e) {
-      return res.unauthorized((e as { error: string }).error);
+      throw e;
     }
 
     const user = await prisma.user.findFirst({
@@ -67,7 +69,7 @@ export async function userMiddleware(req: FastifyRequest, res: FastifyReply) {
       },
       select: userSelect,
     });
-    if (!user) return res.unauthorized('invalid authorization token');
+    if (!user) throw new ApiError(2001);
 
     req.user = user;
 
@@ -76,7 +78,7 @@ export async function userMiddleware(req: FastifyRequest, res: FastifyReply) {
 
   const session = await getSession(req, res);
 
-  if (!session.id || !session.sessionId) return res.unauthorized('not logged in');
+  if (!session.id || !session.sessionId) throw new ApiError(2000);
 
   const user = await prisma.user.findFirst({
     where: {
@@ -88,7 +90,7 @@ export async function userMiddleware(req: FastifyRequest, res: FastifyReply) {
     },
     select: userSelect,
   });
-  if (!user) return res.unauthorized('invalid login session');
+  if (!user) throw new ApiError(2001);
 
   req.user = user;
 }

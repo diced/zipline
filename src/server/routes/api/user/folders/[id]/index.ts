@@ -270,10 +270,14 @@ export default typedPlugin(
           params: paramsSchema,
           response: {
             200: z.union([
-              folderSchema.partial(),
-              z.object({
-                success: z.boolean(),
-              }),
+              folderSchema
+                .partial()
+                .describe('if deleting a file from the folder, returns the updated folder'),
+              z
+                .object({
+                  success: z.boolean(),
+                })
+                .describe('if deleting the folder, returns success status'),
             ]),
           },
         },
@@ -295,10 +299,9 @@ export default typedPlugin(
 
           try {
             const result = await prisma.$transaction(async (tx) => {
-              if (!childrenAction)
-                return {
-                  success: false,
-                };
+              if (!childrenAction) {
+                return { success: true };
+              }
 
               if (childrenAction === 'root') {
                 await tx.folder.updateMany({ where: { parentId: folderId }, data: { parentId: null } });

@@ -60,7 +60,10 @@ export default typedPlugin(
             counts: z.string().optional(),
           }),
           response: {
-            200: z.union([exportCountsSchema, export4Schema]),
+            200: z.union([
+              exportCountsSchema.describe('if ?counts=true'),
+              export4Schema.describe('if ?counts is not true or not there'),
+            ]),
           },
         },
         preHandler: [userMiddleware, administratorMiddleware],

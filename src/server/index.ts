@@ -37,6 +37,7 @@ import loadRoutes from './routes';
 import { filesRoute } from './routes/files.dy';
 import { urlsRoute } from './routes/urls.dy';
 import cleanThumbnails from '@/lib/tasks/run/cleanThumbnails';
+import { API_ERRORS, ApiError } from '@/lib/api/errors';
 
 const MODE = process.env.NODE_ENV || 'production';
 const logger = log('server');
@@ -241,20 +242,24 @@ async function main() {
   server.setErrorHandler((error: any, _, res) => {
     if (hasZodFastifySchemaValidationErrors(error)) {
       return res.status(400).send({
-        error: error.message ?? 'Response Validation Error',
+        error: error.message ?? '1000: Invalid response schema',
         statusCode: 400,
+        code: API_ERRORS[1000],
         issues: error.validation,
       });
     }
 
+    if (error instanceof ApiError) {
+      const apiError = error as ApiError;
+      return res.status(apiError.status).send(apiError.toJSON());
+    }
+
     if (error.statusCode) {
-      res.status(error.statusCode);
-      res.send({ error: error.message, statusCode: error.statusCode });
+      return res.status(error.statusCode).send({ error: error.message, statusCode: error.statusCode });
     } else {
       console.error(error);
 
-      res.status(500);
-      res.send({ error: 'Internal Server Error', statusCode: 500 });
+      return res.status(500).send({ error: 'Internal Server Error', statusCode: 500 });
     }
   });
 

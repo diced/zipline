@@ -54,7 +54,7 @@ export default typedPlugin(
           consumes: ['multipart/form-data'],
           response: {
             200: z.union([
-              z.string(),
+              z.string().describe('if the noJson option is true, returns a comma-separated list of URLs'),
               z.object({
                 files: z.array(
                   z.object({

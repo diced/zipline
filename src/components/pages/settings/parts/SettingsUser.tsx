@@ -1,3 +1,4 @@
+import { ApiError } from '@/lib/api/errors';
 import { Response } from '@/lib/api/response';
 import { fetchApi } from '@/lib/fetchApi';
 import { useUserStore } from '@/lib/store/user';
@@ -66,7 +67,7 @@ export default function SettingsUser() {
     const { data, error } = await fetchApi<Response['/api/user']>('/api/user', 'PATCH', send);
 
     if (!data && error) {
-      if (error.error === 'Username already exists') {
+      if (ApiError.check(error, 1039)) {
         form.setFieldError('username', error.error);
       } else {
         notifications.show({

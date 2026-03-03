@@ -31,7 +31,7 @@ export default typedPlugin(
             'Fetch a single file owned by the authenticated user (or another user if permitted) by ID or short name.',
           params: paramsSchema,
           response: {
-            200: z.custom<File>(),
+            200: fileSchema,
           },
         },
         preHandler: [userMiddleware],

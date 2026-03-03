@@ -4,6 +4,7 @@ import PasskeyAuthButton from '@/components/pages/login/PasskeyAuthButton';
 import SecureWarningModal from '@/components/pages/login/SecureWarningModal';
 import TotpModal from '@/components/pages/login/TotpModal';
 import { getWebClient } from '@/lib/api/detect';
+import { ApiError } from '@/lib/api/errors';
 import { fetchApi } from '@/lib/fetchApi';
 import useLogin from '@/lib/hooks/useLogin';
 import useObjectState from '@/lib/hooks/useObjectState';
@@ -22,6 +23,7 @@ import {
   Title,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { showNotification } from '@mantine/notifications';
 import { browserSupportsWebAuthn } from '@simplewebauthn/browser';
 import {
   IconBrandDiscordFilled,
@@ -34,7 +36,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useSWR from 'swr';
 import GenericError from '../../error/GenericError';
-import { showNotification } from '@mantine/notifications';
 
 export default function Login() {
   useTitle('Login');
@@ -103,7 +104,7 @@ export default function Login() {
     );
 
     if (error) {
-      if (error.error === 'Invalid username or password') {
+      if (ApiError.check(error, 1044)) {
         form.setFieldError('username', 'Invalid username');
         form.setFieldError('password', 'Invalid password');
       } else {

@@ -80,7 +80,7 @@ export async function editFolderUploads(folder: Folder, allowUploads: boolean) {
 }
 
 export async function mutateFolder(folderId?: string) {
-  if (!folderId) return mutate(`/api/user/folders/${folderId}`);
+  if (folderId) return mutate(`/api/user/folders/${folderId}`);
 
   return mutate((key) => typeof key === 'string' && key.startsWith('/api/user/folders'));
 }
