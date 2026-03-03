@@ -121,19 +121,29 @@ export type ApiErrorPayload = {
   error: string;
   code: ApiErrorCode;
   statusCode: number;
+
+  [key: string]: any;
 };
 
 export class ApiError extends Error {
   public readonly code: ApiErrorCode;
   public readonly status: number;
+  public additional: Record<string, any>;
 
   constructor(code: ApiErrorCode, message?: string, status?: number) {
     super(message ?? API_ERRORS[code] ?? 'Unknown API error');
 
     this.code = code;
     this.status = status ?? ApiError.codeToHttpStatus(code);
+    this.additional = {} as Record<string, any>;
 
     Object.setPrototypeOf(this, new.target.prototype);
+  }
+
+  add(key: string, value: any): this {
+    this.additional[key] = value;
+
+    return this;
   }
 
   toJSON(): ApiErrorPayload {
@@ -141,7 +151,12 @@ export class ApiError extends Error {
       ? `${this.code}${this.message ? `: ${this.message}` : ''}`
       : this.message;
 
-    return { error: formattedMessage, code: this.code, statusCode: this.status };
+    return {
+      error: formattedMessage,
+      code: this.code,
+      statusCode: this.status,
+      ...this.additional,
+    };
   }
 
   public static check(payload: ApiErrorPayload, code: ApiErrorCode): boolean {

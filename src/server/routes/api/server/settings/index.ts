@@ -9,6 +9,7 @@ import { prisma } from '@/lib/db';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { readThemes } from '@/lib/theme/file';
+import { zStringTrimmed } from '@/lib/validation';
 import { administratorMiddleware } from '@/server/middleware/administrator';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
@@ -48,8 +49,11 @@ const jsonTransform = (value: any, ctx: z.RefinementCtx) => {
   }
 };
 
-const zMs = z.string().refine((value) => ms(value as StringValue) > 0, 'Value must be greater than 0');
-const zBytes = z.string().refine((value) => bytes(value) > 0, 'Value must be greater than 0');
+const zMs = zStringTrimmed.refine(
+  (value) => ms((value ?? '0') as StringValue) > 0,
+  'Value must be greater than 0',
+);
+const zBytes = zStringTrimmed.refine((value) => bytes(value) > 0, 'Value must be greater than 0');
 
 const zIntervalMs = zMs.refine(
   (value) => ms(value as StringValue) <= MAX_SAFE_TIMEOUT_MS,
@@ -475,8 +479,7 @@ export default typedPlugin(
             issues: result.error.issues,
           });
 
-          // tODO: bring back issues field
-          throw new ApiError(1022);
+          throw new ApiError(1022).add('issues', result.error.issues);
         }
 
         const newSettings = await prisma.zipline.update({
