@@ -78,13 +78,12 @@ jobs:
             sleep 2
           done
 
-      - name: Run app
+      - name: Run generator
         env:
           DATABASE_URL: postgres://zipline:zipline@localhost:5432/zipline
           CORE_SECRET: ${{ steps.secret.outputs.secret }}
-          ZIPLINE_OUTPUT_OPENAPI: true
-
-        run: pnpm start
+          NODE_ENV: production
+        run: pnpm openapi
 
       - name: Verify openapi.json exists
         run: |

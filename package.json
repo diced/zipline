@@ -12,6 +12,7 @@
     "start:inspector": "cross-env NODE_ENV=production node --require dotenv/config --inspect=0.0.0.0:9229 --enable-source-maps ./build/server",
     "ctl": "NODE_ENV=production node --require dotenv/config --enable-source-maps ./build/ctl",
     "validate": "tsx scripts/validate.ts",
+    "openapi": "tsx scripts/openapi.ts",
     "db:prototype": "prisma db push --skip-generate && prisma generate --no-hints",
     "db:migrate": "prisma migrate dev --create-only",
     "docker:engine": "colima start --mount $PWD/themes:w --mount $PWD/uploads:w --mount $PWD/public:w",

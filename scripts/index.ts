@@ -1,4 +1,6 @@
-export function step(name: string, command: string, condition: () => boolean = () => true) {
+type StepCommand = string | (() => void | Promise<void>);
+
+export function step(name: string, command: StepCommand, condition: () => boolean = () => true) {
   return {
     name,
     command,
@@ -35,7 +37,11 @@ export async function run(name: string, ...steps: Step[]) {
 
     try {
       log(`> Running step "${name}/${step.name}"...`);
-      execSync(step.command, { stdio: 'inherit' });
+      if (typeof step.command === 'string') {
+        execSync(step.command, { stdio: 'inherit' });
+      } else {
+        await step.command();
+      }
     } catch {
       console.error(`x Step "${name}/${step.name}" failed.`);
       process.exit(1);

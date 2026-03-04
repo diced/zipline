@@ -148,7 +148,7 @@ export class ApiError extends Error {
 
   toJSON(): ApiErrorPayload {
     const formattedMessage = API_ERRORS[this.code]
-      ? `${this.code}${this.message ? `: ${this.message}` : ''}`
+      ? `E${this.code}${this.message ? `: ${this.message}` : ''}`
       : this.message;
 
     return {
@@ -163,7 +163,7 @@ export class ApiError extends Error {
     return payload.code === code;
   }
 
-  private static codeToHttpStatus(code: ApiErrorCode): number {
+  public static codeToHttpStatus(code: ApiErrorCode): number {
     const override = {
       9000: 400,
       9001: 403,
