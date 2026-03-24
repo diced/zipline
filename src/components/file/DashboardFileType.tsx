@@ -191,9 +191,7 @@ export default function DashboardFileType({
         <Placeholder
           text={`Click to view protected ${file.name}`}
           Icon={IconShieldLockFilled}
-          onClick={() =>
-            window.open(`/view/${file.name}${password ? `?pw=${encodeURIComponent(password)}` : ''}`)
-          }
+          onClick={() => window.open(appendPassword(`/view/${file.name}`, password))}
         />
       </Paper>
     );
