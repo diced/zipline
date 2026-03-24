@@ -112,7 +112,7 @@ export default function ViewFileId() {
               size='md'
               variant='outline'
               component={Link}
-              to={`/raw/${file.name}?download=true${pw ? `&pw=${pw}` : ''}`}
+              to={`/raw/${file.name}?download=true${pw ? `&pw=${encodeURIComponent(pw)}` : ''}`}
               target='_blank'
             >
               <IconDownload size='1rem' />
@@ -208,7 +208,7 @@ export default function ViewFileId() {
                   size='md'
                   variant='outline'
                   component={Link}
-                  to={`/raw/${file.name}${pw ? `?pw=${pw}` : ''}`}
+                  to={`/raw/${file.name}${pw ? `?pw=${encodeURIComponent(pw)}` : ''}`}
                   target='_blank'
                 >
                   <IconExternalLink size='1rem' />
@@ -219,7 +219,7 @@ export default function ViewFileId() {
                   size='md'
                   variant='outline'
                   component={Link}
-                  to={`/raw/${file.name}?download=true${pw ? `&pw=${pw}` : ''}`}
+                  to={`/raw/${file.name}?download=true${pw ? `&pw=${encodeURIComponent(pw)}` : ''}`}
                   target='_blank'
                 >
                   <IconDownload size='1rem' />
