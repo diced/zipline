@@ -6,6 +6,7 @@ import { FixedSizeList as List } from 'react-window';
 
 import { useLocation } from 'react-router-dom';
 import './HighlightCode.theme.scss';
+import * as sanitize from 'isomorphic-dompurify';
 
 export default function HighlightCode({ language, code }: { language: string; code: string }) {
   const { pathname } = useLocation();
@@ -69,7 +70,9 @@ export default function HighlightCode({ language, code }: { language: string; co
       <code
         className='theme hljs'
         style={{ flex: 1, fontSize: '0.8rem' }}
-        dangerouslySetInnerHTML={{ __html: hlLines[index] }}
+        dangerouslySetInnerHTML={{
+          __html: sanitize.sanitize(hlLines[index], { USE_PROFILES: { html: true } }),
+        }}
       />
     </div>
   );
