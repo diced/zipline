@@ -22,6 +22,7 @@ export const DATABASE_TO_PROP = {
   filesRoute: 'files.route',
   filesLength: 'files.length',
   filesDefaultFormat: 'files.defaultFormat',
+  filesCustomFormat: 'files.customFormat',
   filesDisabledExtensions: 'files.disabledExtensions',
   filesMaxFileSize: 'files.maxFileSize',
   filesDefaultExpiration: 'files.defaultExpiration',

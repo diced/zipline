@@ -41,6 +41,7 @@ const publicConfigSchema = z.object({
   files: z.object({
     maxFileSize: z.string(),
     defaultFormat: configSchema.shape.files.shape.defaultFormat,
+    customFormat: z.string().nullable().optional(),
     maxExpiration: z.string().nullable().optional(),
   }),
   chunks: configSchema.shape.chunks,
@@ -92,6 +93,7 @@ export default typedPlugin(
           files: {
             maxFileSize: config.files.maxFileSize,
             defaultFormat: config.files.defaultFormat,
+            customFormat: config.files.customFormat,
             maxExpiration: config.files.maxExpiration,
           },
           chunks: config.chunks,

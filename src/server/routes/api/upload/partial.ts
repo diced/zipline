@@ -6,6 +6,8 @@ import { hashPassword } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
 import { sanitizeFilename } from '@/lib/fs';
 import { log } from '@/lib/logger';
+import { parserMetrics } from '@/lib/parser/metrics';
+import type { CustomFormatOptions } from '@/lib/uploader/formatFileName';
 import { guess } from '@/lib/mimes';
 import { randomCharacters } from '@/lib/random';
 import { UploadHeaders, UploadOptions, parseHeaders } from '@/lib/uploader/parseHeaders';
@@ -155,11 +157,42 @@ export default typedPlugin(
 
           // determine filename
           const format = options.format || config.files.defaultFormat;
+          const customFormatOptions =
+            format === 'custom'
+              ? ({
+                  customFormat: options.customFormat || config.files.customFormat,
+                  metrics: req.user?.id != null ? await parserMetrics(req.user.id) : null,
+                  user: req.user ?? {
+                    id: 'anonymous',
+                    username: 'anonymous',
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    role: 'USER',
+                  },
+                  file: {
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    originalName: options.partial.filename,
+                    name: options.partial.filename,
+                    size: options.partial.range[2],
+                    type: file.mimetype,
+                    deletesAt: options.deletesAt && options.deletesAt !== 'never' ? options.deletesAt : null,
+                    favorite: false,
+                    folderId: options.folder ?? null,
+                    views: 0,
+                    anonymous: !req.user && options.folder ? true : false,
+                    id: 'no-id-yet',
+                    thumbnail: null,
+                    maxViews: options.maxViews ?? null,
+                  },
+                } satisfies CustomFormatOptions)
+              : undefined;
           const nameResult = await getFilename(
             format,
             options.partial.filename,
             extension,
             options.overrides?.filename,
+            customFormatOptions,
           );
           if ('error' in nameResult) throw new ApiError(1009, nameResult.error);
 

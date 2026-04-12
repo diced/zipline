@@ -127,25 +127,40 @@ export const schema = z.object({
     metricsInterval: intervalSchema('30min'),
     cleanThumbnailsInterval: intervalSchema('1d'),
   }),
-  files: z.object({
-    route: z.string().startsWith('/').min(1).trim().toLowerCase().default('/u'),
-    length: z.number().default(6),
-    defaultFormat: z.enum(['random', 'date', 'uuid', 'name', 'gfycat', 'random-words']).default('random'),
-    disabledExtensions: z.array(z.string()).default([]),
-    maxFileSize: z.string().default('100mb'),
-    defaultExpiration: z.string().nullable().default(null),
-    maxExpiration: z.string().nullable().default(null),
-    assumeMimetypes: z.boolean().default(false),
-    defaultDateFormat: z.string().default('YYYY-MM-DD_HH:mm:ss'),
-    removeGpsMetadata: z.boolean().default(false),
-    randomWordsNumAdjectives: z.number().default(3),
-    randomWordsSeparator: z.string().default('-'),
-    defaultCompressionFormat: z
-      .enum(COMPRESS_TYPES)
-      .default('jpg')
-      .refine((v) => checkOutput(v), 'System does not support outputting this image format.'),
-    maxFilesPerUpload: z.number().max(2147483647).min(1).default(1000),
-  }),
+  files: z
+    .object({
+      route: z.string().startsWith('/').min(1).trim().toLowerCase().default('/u'),
+      length: z.number().default(6),
+      defaultFormat: z
+        .enum(['random', 'date', 'uuid', 'name', 'gfycat', 'random-words', 'custom'])
+        .default('random'),
+      customFormat: z.string().nullable().default(null),
+      disabledExtensions: z.array(z.string()).default([]),
+      maxFileSize: z.string().default('100mb'),
+      defaultExpiration: z.string().nullable().default(null),
+      maxExpiration: z.string().nullable().default(null),
+      assumeMimetypes: z.boolean().default(false),
+      defaultDateFormat: z.string().default('YYYY-MM-DD_HH:mm:ss'),
+      removeGpsMetadata: z.boolean().default(false),
+      randomWordsNumAdjectives: z.number().default(3),
+      randomWordsSeparator: z.string().default('-'),
+      defaultCompressionFormat: z
+        .enum(COMPRESS_TYPES)
+        .default('jpg')
+        .refine((v) => checkOutput(v), 'System does not support outputting this image format.'),
+      maxFilesPerUpload: z.number().max(2147483647).min(1).default(1000),
+    })
+    .superRefine((data, ctx) => {
+      if (data.defaultFormat !== 'custom') return;
+
+      if (!data.customFormat?.trim()) {
+        ctx.addIssue({
+          path: ['customFormat'],
+          message: 'customFormat must be set when defaultFormat is custom',
+          code: 'custom',
+        });
+      }
+    }),
   urls: z.object({
     route: z.string().startsWith('/').min(1).trim().toLowerCase().default('/go'),
     length: z.number().default(6),

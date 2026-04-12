@@ -17,6 +17,7 @@ export default function Files({
     filesRoute: string;
     filesLength: number;
     filesDefaultFormat: string;
+    filesCustomFormat: string | null;
     filesDisabledExtensions: string;
     filesMaxFileSize: string;
     filesDefaultExpiration: string | null;
@@ -33,6 +34,7 @@ export default function Files({
       filesRoute: '/u',
       filesLength: 6,
       filesDefaultFormat: 'random',
+      filesCustomFormat: '',
       filesDisabledExtensions: '',
       filesMaxFileSize: '100mb',
       filesDefaultExpiration: '',
@@ -55,6 +57,12 @@ export default function Files({
       values.filesDefaultExpiration = null;
     } else {
       values.filesDefaultExpiration = values.filesDefaultExpiration.trim();
+    }
+
+    if (values.filesCustomFormat?.trim() === '' || !values.filesCustomFormat) {
+      values.filesCustomFormat = null;
+    } else {
+      values.filesCustomFormat = values.filesCustomFormat.trim();
     }
 
     if (values.filesMaxExpiration?.trim() === '' || !values.filesMaxExpiration) {
@@ -92,6 +100,7 @@ export default function Files({
       filesRoute: data.settings.filesRoute ?? '/u',
       filesLength: data.settings.filesLength ?? 6,
       filesDefaultFormat: data.settings.filesDefaultFormat ?? 'random',
+      filesCustomFormat: data.settings.filesCustomFormat ?? '',
       filesDisabledExtensions: data.settings.filesDisabledExtensions.join(', ') ?? '',
       filesMaxFileSize: data.settings.filesMaxFileSize ?? '100mb',
       filesDefaultExpiration: data.settings.filesDefaultExpiration ?? '',
@@ -143,8 +152,16 @@ export default function Files({
             label='Default Format'
             description='The default format to use for file names.'
             placeholder='random'
-            data={['random', 'date', 'uuid', 'name', 'gfycat']}
+            data={['random', 'date', 'uuid', 'name', 'gfycat', 'custom']}
             {...form.getInputProps('filesDefaultFormat')}
+          />
+
+          <TextInput
+            label='Custom Format'
+            description='Used only when Default Format is set to "custom". This supports the same variables as webhooks and view routes.'
+            placeholder='file-{file.originalName}-{file.size}-{user.username::upper}'
+            {...form.getInputProps('filesCustomFormat')}
+            disabled={form.values.filesDefaultFormat !== 'custom'}
           />
 
           <TextInput

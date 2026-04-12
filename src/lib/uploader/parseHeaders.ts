@@ -46,6 +46,7 @@ type StringBoolean = 'true' | 'false';
 export type UploadHeaders = {
   'x-zipline-deletes-at'?: string;
   'x-zipline-format'?: Config['files']['defaultFormat'];
+  'x-zipline-custom-format'?: string;
 
   'x-zipline-image-compression-type'?: CompressType;
   'x-zipline-image-compression-percent'?: string;
@@ -73,6 +74,7 @@ export type UploadHeaders = {
 export type UploadOptions = {
   deletesAt?: Date | 'never';
   format?: Config['files']['defaultFormat'];
+  customFormat?: string | null;
   password?: string;
   maxViews?: number;
   noJson?: boolean;
@@ -150,7 +152,7 @@ function parsePercent(header: keyof UploadHeaders, percent: string) {
   return num;
 }
 
-const FORMATS = ['random', 'uuid', 'date', 'name', 'gfycat', 'random-words'];
+const FORMATS = ['random', 'uuid', 'date', 'name', 'gfycat', 'random-words', 'custom'];
 
 export function parseHeaders(headers: UploadHeaders, fileConfig: Config['files']): UploadOptions {
   const response: UploadOptions = {};
@@ -190,6 +192,25 @@ export function parseHeaders(headers: UploadHeaders, fileConfig: Config['files']
     response.format = format;
   } else {
     response.format = fileConfig.defaultFormat;
+  }
+
+  const customFormat = headers['x-zipline-custom-format'];
+  if (customFormat) {
+    if (response.format === 'custom') {
+      response.customFormat = customFormat;
+    }
+  } else {
+    response.customFormat = fileConfig.customFormat;
+  }
+  if (response.format === 'custom') {
+    const effectiveCustomFormat = response.customFormat?.trim();
+    if (!effectiveCustomFormat)
+      return throwHeaderError(
+        'x-zipline-custom-format',
+        'Custom format is required when x-zipline-format is set to custom',
+      );
+
+    response.customFormat = effectiveCustomFormat;
   }
 
   const imageCompressionPercent = headers['x-zipline-image-compression-percent'];

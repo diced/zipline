@@ -70,8 +70,15 @@ export function applyUploadHeaders(
   req: XMLHttpRequest,
   { options, ephemeral, folder }: UploadHeadersOptions,
 ) {
+  const selectedFormat = options.format === 'default' ? null : options.format;
+  const trimmedCustomFormat = typeof options.customFormat === 'string' ? options.customFormat.trim() : null;
+
   options.deletesAt !== 'default' && req.setRequestHeader('x-zipline-deletes-at', options.deletesAt);
-  options.format !== 'default' && req.setRequestHeader('x-zipline-format', options.format);
+  selectedFormat && req.setRequestHeader('x-zipline-format', selectedFormat);
+  selectedFormat === 'custom' &&
+    typeof trimmedCustomFormat === 'string' &&
+    trimmedCustomFormat.length > 0 &&
+    req.setRequestHeader('x-zipline-custom-format', trimmedCustomFormat);
   options.imageCompressionPercent &&
     req.setRequestHeader('x-zipline-image-compression-percent', options.imageCompressionPercent.toString());
   options.imageCompressionFormat !== 'default' &&

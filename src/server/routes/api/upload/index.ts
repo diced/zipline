@@ -10,6 +10,8 @@ import { fileSelect } from '@/lib/db/models/file';
 import { sanitizeFilename } from '@/lib/fs';
 import { removeGps } from '@/lib/gps';
 import { log } from '@/lib/logger';
+import { parserMetrics } from '@/lib/parser/metrics';
+import type { CustomFormatOptions } from '@/lib/uploader/formatFileName';
 import { runThumbnailWorkers } from '@/lib/tasks/run/thumbnails';
 import { parseHeaders, UploadHeaders } from '@/lib/uploader/parseHeaders';
 import { onUpload } from '@/lib/webhooks';
@@ -131,6 +133,9 @@ export default typedPlugin(
           req.headers.host,
         );
 
+        const metrics =
+          options.format === 'custom' && req.user?.id != null ? await parserMetrics(req.user.id) : null;
+
         logger.debug('uploading files', { files: files.map((x) => x.filename) });
 
         for (let i = 0; i !== files.length; ++i) {
@@ -147,7 +152,43 @@ export default typedPlugin(
 
           // determine filename
           const format = options.format || config.files.defaultFormat;
-          const nameResult = await getFilename(format, file.filename, extension, options.overrides?.filename);
+          const customFormatOptions =
+            format === 'custom'
+              ? ({
+                  customFormat: options.customFormat || config.files.customFormat,
+                  user: req.user ?? {
+                    id: 'anonymous',
+                    username: 'anonymous',
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    role: 'USER',
+                  },
+                  file: {
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    originalName: file.filename,
+                    name: file.filename,
+                    size: file.file.bytesRead,
+                    type: file.mimetype,
+                    deletesAt: options.deletesAt && options.deletesAt !== 'never' ? options.deletesAt : null,
+                    favorite: false,
+                    folderId: options.folder ?? null,
+                    views: 0,
+                    anonymous: !req.user && options.folder ? true : false,
+                    id: 'no-id-yet',
+                    thumbnail: null,
+                    maxViews: options.maxViews ?? null,
+                  },
+                  metrics,
+                } satisfies CustomFormatOptions)
+              : undefined;
+          const nameResult = await getFilename(
+            format,
+            file.filename,
+            extension,
+            options.overrides?.filename,
+            customFormatOptions,
+          );
           if ('error' in nameResult) throw new ApiError(1009, `file[${i}]: ${nameResult.error}`);
 
           const { fileName } = nameResult;

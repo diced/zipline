@@ -39,6 +39,7 @@ export const rawConfig: any = {
     route: undefined,
     length: undefined,
     defaultFormat: undefined,
+    customFormat: undefined,
     disabledExtensions: undefined,
     maxFileSize: undefined,
     defaultExpiration: undefined,

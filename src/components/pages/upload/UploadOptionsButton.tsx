@@ -209,6 +209,7 @@ export default function UploadOptionsButton({ folder, numFiles }: { folder?: str
               { value: 'uuid', label: 'UUID' },
               { value: 'name', label: 'Use file name' },
               { value: 'gfycat', label: 'Gfycat-style name' },
+              { value: 'custom', label: 'Custom format' },
             ]}
             label={
               <>
@@ -233,6 +234,23 @@ export default function UploadOptionsButton({ folder, numFiles }: { folder?: str
               },
             }}
           />
+
+          {options.format === 'custom' && (
+            <TextInput
+              label='Custom Name Format'
+              description={
+                <>
+                  Used only when Name Format is set to &quot;custom&quot;. This supports the same variables as
+                  webhooks and view routes.
+                </>
+              }
+              placeholder='file-{file.originalName}-{file.size}-{user.username::upper}'
+              value={options.customFormat || ''}
+              onChange={(event) => {
+                setOption('customFormat', event.target.value || null);
+              }}
+            />
+          )}
 
           <Select
             data={[

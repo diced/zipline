@@ -5,7 +5,7 @@ import { bytes } from '@/lib/bytes';
 import { config } from '../config';
 import { Config } from '../config/validate';
 import { sanitizeFilename } from '../fs';
-import { formatFileName } from '../uploader/formatFileName';
+import { type CustomFormatOptions, formatFileName } from '../uploader/formatFileName';
 import { guess } from '../mimes';
 import { log } from '../logger';
 
@@ -81,9 +81,12 @@ export async function getFilename(
   originalName: string,
   extension: string,
   override?: string,
+  customFormatOptions?: CustomFormatOptions,
 ): Promise<{ error: string } | { fileName: string }> {
   try {
-    let fileName = override ? sanitizeFilename(override) : formatFileName(format, originalName);
+    let fileName = override
+      ? sanitizeFilename(override)
+      : formatFileName(format, originalName, customFormatOptions);
 
     if (!fileName) return { error: 'invalid file name' };
 
@@ -100,6 +103,21 @@ export async function getFilename(
 
       fullFileName = `${fileName}${extension}`;
       existing = await prisma.file.findFirst({ where: { name: fullFileName } });
+    }
+
+    let customFormatAttempts = 0;
+    while (existing && format === 'custom' && customFormatAttempts++ < 5) {
+      fileName = formatFileName(format, originalName, customFormatOptions);
+      if (!fileName) return { error: 'invalid file name' };
+
+      fullFileName = `${fileName}${extension}`;
+      existing = await prisma.file.findFirst({ where: { name: fullFileName } });
+    }
+    if (existing && format === 'custom') {
+      return {
+        error:
+          'file with the same name already exists, and custom format did not produce a unique name after multiple attempts',
+      };
     }
 
     return { fileName };

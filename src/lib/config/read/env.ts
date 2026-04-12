@@ -56,6 +56,7 @@ export const ENVS = [
   env('files.route', 'FILES_ROUTE', 'string', true),
   env('files.length', 'FILES_LENGTH', 'number', true),
   env('files.defaultFormat', 'FILES_DEFAULT_FORMAT', 'string', true),
+  env('files.customFormat', 'FILES_CUSTOM_FORMAT', 'string', true),
   env('files.disabledExtensions', 'FILES_DISABLED_EXTENSIONS', 'string[]', true),
   env('files.maxFileSize', 'FILES_MAX_FILE_SIZE', 'string', true),
   env('files.defaultExpiration', 'FILES_DEFAULT_EXPIRATION', 'string', true),

@@ -5,6 +5,7 @@ import type { Config } from '@/lib/config/validate';
 export const defaultUploadOptions: UploadOptionsStore['options'] = {
   deletesAt: 'default',
   format: 'default',
+  customFormat: null,
   imageCompressionPercent: null,
   imageCompressionFormat: 'default',
   maxViews: null,
@@ -22,6 +23,7 @@ export type UploadOptionsStore = {
   options: {
     deletesAt: string | 'never';
     format: Config['files']['defaultFormat'] | 'default';
+    customFormat: Config['files']['customFormat'] | null;
     imageCompressionPercent: number | null;
     imageCompressionFormat: Config['files']['defaultCompressionFormat'] | 'default';
     maxViews: number | null;

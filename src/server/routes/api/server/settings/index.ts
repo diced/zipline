@@ -181,7 +181,8 @@ export default typedPlugin(
                 'Provided route is reserved',
               ),
             filesLength: z.number().min(1).max(64),
-            filesDefaultFormat: z.enum(['random', 'date', 'uuid', 'name', 'gfycat']),
+            filesDefaultFormat: z.enum(['random', 'date', 'uuid', 'name', 'gfycat', 'custom']),
+            filesCustomFormat: z.string().nullable(),
             filesDisabledExtensions: z
               .union([
                 z.array(z.string().refine((s) => !s.startsWith('.'), 'extension can\'t include "."')),
@@ -440,6 +441,19 @@ export default typedPlugin(
           .refine((data) => !data.ratelimitWindow || (data.ratelimitMax && data.ratelimitMax > 0), {
             message: 'ratelimitMax must be set if ratelimitWindow is set',
             path: ['ratelimitMax'],
+          })
+          .superRefine((data, ctx) => {
+            const effectiveDefaultFormat = data.filesDefaultFormat ?? settings.filesDefaultFormat;
+            if (effectiveDefaultFormat !== 'custom') return;
+
+            const effectiveCustomFormat = data.filesCustomFormat ?? settings.filesCustomFormat;
+            if (!effectiveCustomFormat?.trim()) {
+              ctx.addIssue({
+                path: ['filesCustomFormat'],
+                message: 'filesCustomFormat must be set when filesDefaultFormat is custom',
+                code: 'custom',
+              });
+            }
           })
           .superRefine((data, ctx) => {
             if (!data.filesDefaultExpiration || !data.filesMaxExpiration) return;
