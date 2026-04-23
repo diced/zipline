@@ -19,6 +19,7 @@ export function registerHandlers(server: FastifyInstance, mode: string) {
         statusCode: 404,
       });
     } else {
+      res.status(404);
       return res.serveIndex();
     }
   });
