@@ -209,7 +209,7 @@ async function oauthPlugin(fastify: FastifyInstance) {
         },
       });
 
-      await saveSession(session, <User>nuser);
+      await saveSession(session, <User>nuser, false);
 
       logger.info('created user with oauth', {
         provider,
