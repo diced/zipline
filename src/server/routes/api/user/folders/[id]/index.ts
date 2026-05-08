@@ -52,7 +52,8 @@ export default typedPlugin(
       PATH,
       {
         schema: {
-          description: 'Fetch a specific folder by ID, optionally including files, children, and its parent chain.',
+          description:
+            'Fetch a specific folder by ID, optionally including files, children, and its parent chain.',
           params: paramsSchema,
           querystring: z.object({
             noincl: zQsBoolean.optional(),
