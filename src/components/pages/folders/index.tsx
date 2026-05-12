@@ -66,7 +66,7 @@ export default function DashboardFolders() {
       name: (value) => (value.length < 1 ? 'Name is required' : null),
     },
   });
- 
+
   const onSubmit = async (values: typeof form.values) => {
     const { error } = await fetchApi<Extract<Response['/api/user/folders'], Folder>>(
       '/api/user/folders',
