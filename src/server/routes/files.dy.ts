@@ -20,8 +20,15 @@ export async function filesRoute(
     where: {
       name: decodeURIComponent(id),
     },
-    include: {
-      User: true,
+    select: {
+      name: true,
+      type: true,
+      password: true,
+      User: {
+        select: {
+          view: true,
+        },
+      },
     },
   });
   if (!file) return res.callNotFound();
