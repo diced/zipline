@@ -85,7 +85,6 @@ async function oauthPlugin(fastify: FastifyInstance) {
         oauthProviders: true,
       },
     });
-
     const userOauth = findProvider(provider, user?.oauthProviders ?? []);
 
     if (state.mode === 'link') {

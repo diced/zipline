@@ -1675,8 +1675,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@scure/base@2.0.0':
-    resolution: {integrity: sha512-3E1kpuZginKkek01ovG8krQ0Z44E3DHPjc5S2rjJw9lZn3KSQOs8S7wqikF/AH7iRanHypj85uGyxk0XAyC37w==}
+  '@scure/base@2.2.0':
+    resolution: {integrity: sha512-b8XEupJibegiXV+tDUseI8oLQc8ei3d/4Jkb2RpbHh3MfE054ov3uIz2dhFkB3FI8iwYkEh0gGCApkrYggkPNg==}
 
   '@simplewebauthn/browser@13.3.0':
     resolution: {integrity: sha512-BE/UWv6FOToAdVk0EokzkqQQDOWtNydYlY6+OrmiZ5SCNmb41VehttboTetUM3T/fr6EAFYVXjz4My2wg230rQ==}
@@ -6035,7 +6035,7 @@ snapshots:
   '@otplib/plugin-base32-scure@13.4.0':
     dependencies:
       '@otplib/core': 13.4.0
-      '@scure/base': 2.0.0
+      '@scure/base': 2.2.0
 
   '@otplib/plugin-crypto-noble@13.4.0':
     dependencies:
@@ -6515,7 +6515,7 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.53.3':
     optional: true
 
-  '@scure/base@2.0.0': {}
+  '@scure/base@2.2.0': {}
 
   '@simplewebauthn/browser@13.3.0': {}
 

@@ -90,7 +90,7 @@ export default typedPlugin(
       async (req, res) => {
         const { code, secret } = req.body;
 
-        const valid = verifyTotpCode(code, secret);
+        const valid = await verifyTotpCode(code, secret);
         if (!valid) throw new ApiError(1045);
 
         const user = await prisma.user.update({
@@ -126,7 +126,7 @@ export default typedPlugin(
 
         const { code } = req.body;
 
-        const valid = verifyTotpCode(code, req.user.totpSecret);
+        const valid = await verifyTotpCode(code, req.user.totpSecret);
         if (!valid) throw new ApiError(1045);
 
         const user = await prisma.user.update({

@@ -14,32 +14,39 @@ export default function TotpModal({
 }) {
   return (
     <Modal onClose={onCancel} title='Enter code' opened={state.open} withCloseButton={false}>
-      <Center>
-        <PinInput
-          length={6}
-          oneTimeCode
-          type='number'
-          onChange={onPinChange}
-          error={!!state.error}
-          disabled={state.disabled}
-          size='xl'
-          autoFocus
-        />
-      </Center>
-      {state.error && (
-        <Text ta='center' size='sm' c='red' mt='xs'>
-          {state.error}
-        </Text>
-      )}
+      <form onSubmit={onVerify}>
+        <Center>
+          <PinInput
+            length={6}
+            oneTimeCode
+            type='number'
+            onChange={onPinChange}
+            error={!!state.error}
+            disabled={state.disabled}
+            size='xl'
+            autoFocus
+          />
+        </Center>
+        {state.error && (
+          <Text ta='center' size='sm' c='red' mt='xs'>
+            {state.error}
+          </Text>
+        )}
 
-      <Group mt='sm' grow>
-        <Button leftSection={<IconX size='1rem' />} color='red' variant='outline' onClick={onCancel}>
-          Cancel
-        </Button>
-        <Button leftSection={<IconShieldQuestion size='1rem' />} loading={state.disabled} onClick={onVerify}>
-          Verify
-        </Button>
-      </Group>
+        <Group mt='sm' grow>
+          <Button leftSection={<IconX size='1rem' />} color='red' variant='outline' onClick={onCancel}>
+            Cancel
+          </Button>
+          <Button
+            leftSection={<IconShieldQuestion size='1rem' />}
+            loading={state.disabled}
+            onClick={onVerify}
+            type='submit'
+          >
+            Verify
+          </Button>
+        </Group>
+      </form>
     </Modal>
   );
 }

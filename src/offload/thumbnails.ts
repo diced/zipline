@@ -4,6 +4,7 @@ import { getDatasource } from '@/lib/datasource';
 import { Datasource } from '@/lib/datasource/Datasource';
 import type { File } from '@/lib/db/models/file';
 import { log } from '@/lib/logger';
+import { randomCharacters } from '@/lib/random';
 import ffmpeg from 'fluent-ffmpeg';
 import { createWriteStream, existsSync, readFileSync, unlinkSync } from 'fs';
 import { join } from 'path';
@@ -40,6 +41,8 @@ const formatMimes = {
   webp: 'image/webp',
 };
 
+const workerId = randomCharacters(8);
+
 function name(str: string) {
   return `${str}.${config.features.thumbnails.format}`;
 }
@@ -63,6 +66,7 @@ function genThumbnail(input: string, output: string): Promise<Buffer | undefined
             `file ${input} does not contain any video stream, it is probably an audio file... ignoring...`,
           );
           resolve(Buffer.alloc(0));
+          return;
         }
 
         logger.error('failed to generate thumbnail', { err: err.message });
@@ -98,16 +102,26 @@ async function generate(config: Config, datasource: Datasource, ids: string[]) {
       },
     });
 
-    if (!file) return;
+    if (!file) continue;
     if (!file.type.startsWith('video/')) {
-      logger.debug('received file that is not a video', { id: file.id, type: file.type });
+      logger.debug('received file that is not a video, skipping', { id: file.id, type: file.type });
+      continue;
+    }
+
+    if (file.size === 0) {
+      logger.debug('thumbnail with file of 0 size, skipping', {
+        id: file.id,
+      });
       continue;
     }
 
     const stream = await datasource.get(file.name);
-    if (!stream) return;
+    if (!stream) {
+      logger.debug('could not read file from datasource, skipping', { id: file.id });
+      continue;
+    }
 
-    const tmpFile = join(config.core.tempDirectory, `zthumbnail_${file.id}.tmp`);
+    const tmpFile = join(config.core.tempDirectory, `zthumbnail_${file.id}_${workerId}.tmp`);
     const writeStream = createWriteStream(tmpFile);
     await new Promise((resolve, reject) => {
       stream.pipe(writeStream);
@@ -116,15 +130,14 @@ async function generate(config: Config, datasource: Datasource, ids: string[]) {
       writeStream.on('finish', resolve as any);
     });
 
-    const thumbnailTmpFile = join(config.core.tempDirectory, name(`zthumbnail_${file.id}`));
+    const thumbnailTmpFile = join(config.core.tempDirectory, name(`zthumbnail_${file.id}_${workerId}`));
     const thumbnail = await genThumbnail(tmpFile, thumbnailTmpFile);
-    if (!thumbnail) return;
+    if (!thumbnail || thumbnail.length === 0) continue;
 
     const existing = await datasource.size(name(`.thumbnail.${file.id}`));
     if (existing || existing === 0) {
       await datasource.delete(name(`.thumbnail.${file.id}`));
     }
-
     await datasource.put(name(`.thumbnail.${file.id}`), thumbnail, {
       mimetype: formatMimes[config.features.thumbnails.format] || 'image/jpeg',
     });
@@ -172,7 +185,13 @@ async function main() {
     switch (type) {
       case 0:
         logger.debug('received thumbnail generation request', { ids: data });
-        await generate(config, datasource, data!);
+        try {
+          await generate(config, datasource, data!);
+        } catch (err) {
+          logger.error('thumbnail generation failed', {
+            err: err instanceof Error ? err.message : String(err),
+          });
+        }
         break;
       case 1:
         logger.debug('received kill request');

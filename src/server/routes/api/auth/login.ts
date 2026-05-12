@@ -77,7 +77,7 @@ export default typedPlugin(
         }
 
         if (user.totpSecret && code) {
-          const valid = verifyTotpCode(code, user.totpSecret);
+          const valid = await verifyTotpCode(code, user.totpSecret);
           if (!valid) {
             logger.warn('invalid totp code', {
               username,

@@ -4,7 +4,8 @@ export function runThumbnailWorkers(workers: WorkerTask[], files: string[]) {
   const thumbToWorker: { id: string; worker: number }[] = [];
 
   let workerIndex = 0;
-  for (const file of files) {
+  const unique = new Set(files);
+  for (const file of unique) {
     thumbToWorker.push({
       id: file,
       worker: workerIndex,
@@ -42,6 +43,7 @@ export default function thumbnails(prisma: typeof globalThis.__db__) {
         type: {
           startsWith: 'video/',
         },
+        size: { gt: 0 },
       },
     });
     if (!thumbnailNeeded.length) return;

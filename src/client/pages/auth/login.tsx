@@ -128,6 +128,12 @@ export default function Login() {
     }
   };
 
+  const handleTotpChange = async (val: string) => {
+    setTotp('pin', val);
+
+    if (val.length === 6) await handleLoginSubmit(form.values, val);
+  };
+
   if (configLoading || !config) return <LoadingOverlay visible />;
   if (configError) return <GenericError title='Error' message='Config load failed' details={configError} />;
 
@@ -139,7 +145,7 @@ export default function Login() {
 
       <TotpModal
         state={totp}
-        onPinChange={(val) => setTotp('pin', val)}
+        onPinChange={(val) => handleTotpChange(val)}
         onVerify={() => handleLoginSubmit(form.values, totp.pin)}
         onCancel={() => {
           setTotp('open', false);

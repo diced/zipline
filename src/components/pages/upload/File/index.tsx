@@ -66,23 +66,12 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
   }, []);
 
   const upload = async () => {
-    const toPartialFiles: File[] = files.filter(
-      (file) => config.chunks.enabled && file.size >= bytes(config.chunks.max),
-    );
-    if (toPartialFiles.length > 0) {
-      uploadPartialFiles(toPartialFiles, {
-        setFiles,
-        setLoading,
-        setProgress,
-        clipboard,
-        clearEphemeral,
-        options,
-        ephemeral,
-        config,
-        folder,
-      });
-    } else {
-      const size = aggSize();
+    const maxBytes = config.chunks.enabled && bytes(config.chunks.max);
+    const partialUploads: File[] = maxBytes ? files.filter((file) => file.size >= maxBytes) : [];
+    const normalUploads: File[] = maxBytes ? files.filter((file) => file.size < maxBytes) : files;
+
+    if (normalUploads.length > 0) {
+      const size = normalUploads.reduce((acc, file) => acc + file.size, 0);
       if (size > bytes(config.files.maxFileSize)) {
         notifications.show({
           title: 'Upload may fail',
@@ -98,7 +87,7 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
         });
       }
 
-      await uploadFiles(files, {
+      await uploadFiles(normalUploads, {
         setFiles,
         setLoading,
         setProgress,
@@ -106,6 +95,20 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
         clearEphemeral,
         options,
         ephemeral,
+        folder,
+      });
+    }
+
+    if (partialUploads.length > 0) {
+      await uploadPartialFiles(partialUploads, {
+        setFiles,
+        setLoading,
+        setProgress,
+        clipboard,
+        clearEphemeral,
+        options,
+        ephemeral,
+        config,
         folder,
       });
     }
