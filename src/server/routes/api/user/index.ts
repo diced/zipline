@@ -52,6 +52,7 @@ export default typedPlugin(
               .object({
                 content: z.string().nullish(),
                 embed: z.boolean().optional(),
+                embedMediaOnly: z.boolean().optional(),
                 embedTitle: z.string().nullish(),
                 embedDescription: z.string().nullish(),
                 embedColor: z.string().nullish(),
@@ -101,6 +102,14 @@ export default typedPlugin(
                 ...(req.body.view.enabled !== undefined && { enabled: req.body.view.enabled || false }),
                 ...(req.body.view.content !== undefined && { content: req.body.view.content || null }),
                 ...(req.body.view.embed !== undefined && { embed: req.body.view.embed || false }),
+                ...(req.body.view.embedMediaOnly !== undefined && {
+                  embedMediaOnly: (() => {
+                    const embedOn = !!(req.body.view.embed !== undefined
+                      ? req.body.view.embed
+                      : (req.user.view as { embed?: boolean }).embed);
+                    return embedOn ? false : req.body.view.embedMediaOnly || false;
+                  })(),
+                }),
                 ...(req.body.view.embedTitle !== undefined && {
                   embedTitle: req.body.view.embedTitle || null,
                 }),

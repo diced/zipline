@@ -168,9 +168,13 @@ export async function render(
   const safeOriginalName = stripHtml(file.originalName || '');
   const safeType = stripHtml(file.type || '');
 
-  const meta = `
-  ${
-    user?.view?.embedTitle && user.view.embed
+  const viewEnabled = !!user.view?.enabled;
+  const showRichOg = viewEnabled && !!user.view.embed;
+  const showMediaOg = viewEnabled && (!!user.view.embed || !!user.view.embedMediaOnly);
+  const pageUrl = `${host}${url.split('?')[0]}`;
+
+  const richMeta = [
+    showRichOg && user?.view?.embedTitle
       ? `<meta property="og:title" content="${stripHtml(
           parseString(user.view.embedTitle, {
             file: file as unknown as File,
@@ -178,10 +182,8 @@ export async function render(
             ...metrics,
           }) ?? '',
         )}" />`
-      : ''
-  }
-  ${
-    user?.view?.embedDescription && user.view.embed
+      : '',
+    showRichOg && user?.view?.embedDescription
       ? `<meta property="og:description" content="${stripHtml(
           parseString(user.view.embedDescription, {
             file: file as unknown as File,
@@ -189,10 +191,8 @@ export async function render(
             ...metrics,
           }) ?? '',
         )}" />`
-      : ''
-  }
-  ${
-    user?.view?.embedSiteName && user.view.embed
+      : '',
+    showRichOg && user?.view?.embedSiteName
       ? `<meta property="og:site_name" content="${stripHtml(
           parseString(user.view.embedSiteName, {
             file: file as unknown as File,
@@ -200,10 +200,8 @@ export async function render(
             ...metrics,
           }) ?? '',
         )}" />`
-      : ''
-  }
-  ${
-    user?.view?.embedColor && user.view.embed
+      : '',
+    showRichOg && user?.view?.embedColor
       ? `<meta property="theme-color" content="${stripHtml(
           parseString(user.view.embedColor, {
             file: file as unknown as File,
@@ -211,67 +209,70 @@ export async function render(
             ...metrics,
           }) ?? '',
         )}" />`
-      : ''
-  }
+      : '',
+  ]
+    .filter(Boolean)
+    .join('\n  ');
 
-  ${
-    file.type?.startsWith('image')
+  const imageOg =
+    showMediaOg && file.type?.startsWith('image')
       ? `
     <meta property="og:type" content="image" />
     <meta property="og:image" itemProp="image" content="${host}/raw/${safeFilename}" />
-    <meta property="og:url" content="${host}/raw/${safeFilename}" />
+    <meta property="og:url" content="${pageUrl}" />
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:image" content="${host}/raw/${safeFilename}" />
-    <meta property="twitter:title" content="${safeFilename}" />
+    ${showRichOg ? `<meta property="twitter:title" content="${safeFilename}" />` : ''}
   `
-      : ''
-  }
+      : '';
 
-  ${
-    file.type?.startsWith('video')
+  const videoOg =
+    showMediaOg && file.type?.startsWith('video')
       ? `
     ${file.thumbnail ? `<meta property="og:image" content="${host}/raw/${file.thumbnail.path}" />` : ''}
     <meta property="og:type" content="video.other" />
+    <meta property="og:url" content="${pageUrl}" />
     <meta property="og:video:url" content="${host}/raw/${safeFilename}" />
     <meta property="og:video:width" content="1920" />
     <meta property="og:video:height" content="1080" />
   `
-      : ''
-  }
+      : '';
 
-  ${
-    file.type?.startsWith('audio')
+  const audioOg =
+    showMediaOg && file.type?.startsWith('audio')
       ? `
     <meta name="twitter:card" content="player" />
     <meta name="twitter:player" content="${host}/raw/${safeFilename}" />
     <meta name="twitter:player:stream" content="${host}/raw/${safeFilename}" />
     <meta name="twitter:player:stream:content_type" content="${safeType}" />
-    <meta name="twitter:title" content="${safeFilename}" />
+    ${showRichOg ? `<meta name="twitter:title" content="${safeFilename}" />` : ''}
     <meta name="twitter:player:width" content="720" />
     <meta name="twitter:player:height" content="480" />
 
     <meta property="og:type" content="music.song" />
-    <meta property="og:url" content="${host}/raw/${safeFilename}" />
+    <meta property="og:url" content="${pageUrl}" />
     <meta property="og:audio" content="${host}/raw/${safeFilename}" />
     <meta property="og:audio:secure_url" content="${host}/raw/${safeFilename}" />
     <meta property="og:audio:type" content="${safeType}" />
   `
-      : ''
-  }
+      : '';
 
-  ${
-    !file.type?.startsWith('video') && !file.type?.startsWith('image')
+  const otherOg =
+    showRichOg && !file.type?.startsWith('video') && !file.type?.startsWith('image')
       ? `
-    <meta property="og:url" content="${host}/raw/${safeFilename}" />
+    <meta property="og:url" content="${pageUrl}" />
   `
-      : ''
-  }
+      : '';
 
-  <title>${file.originalName ? safeOriginalName : safeFilename}</title>
-`;
+  const docTitle = `<title>${file.originalName ? safeOriginalName : safeFilename}</title>`;
+
+  const includeHead = showRichOg || showMediaOg;
+  const headMeta = includeHead
+    ? [richMeta, imageOg, videoOg, audioOg, otherOg, docTitle].filter(Boolean).join('\n')
+    : '';
 
   return {
     html,
-    meta: `${user.view.embed ? meta : ''}\n${createZiplineSsr(data)}`,
+    meta: `${headMeta ? `${headMeta}\n` : ''}${createZiplineSsr(data)}`,
   };
 }

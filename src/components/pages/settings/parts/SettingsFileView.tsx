@@ -60,6 +60,7 @@ function Form({ user, setUser }: { user: User; setUser: (u: User) => void }) {
       enabled: user.view.enabled || false,
       content: user.view.content || '',
       embed: user.view.embed || false,
+      embedMediaOnly: user.view.embedMediaOnly || false,
       embedTitle: user.view.embedTitle || '',
       embedDescription: user.view.embedDescription || '',
       embedSiteName: user.view.embedSiteName || '',
@@ -75,6 +76,7 @@ function Form({ user, setUser }: { user: User; setUser: (u: User) => void }) {
     const valuesTrimmed = {
       enabled: values.enabled,
       embed: values.embed,
+      embedMediaOnly: values.embed ? false : values.embedMediaOnly,
       content: values.content.trim() || null,
       embedTitle: values.embedTitle.trim() || null,
       embedDescription: values.embedDescription.trim() || null,
@@ -186,6 +188,20 @@ function Form({ user, setUser }: { user: User; setUser: (u: User) => void }) {
             disabled={!form.values.enabled}
             my='xs'
             {...form.getInputProps('embed', { type: 'checkbox' })}
+            onChange={(event) => {
+              form.getInputProps('embed', { type: 'checkbox' }).onChange(event);
+              if (event.currentTarget.checked) {
+                form.setFieldValue('embedMediaOnly', false);
+              }
+            }}
+          />
+
+          <Switch
+            label='Media-only link preview'
+            description='When embeds are off, still add OpenGraph image/video tags so Discord and similar apps unfurl the media only (no custom title, description, or site name). The URL you paste stays in the message as plain text.'
+            disabled={!form.values.enabled || form.values.embed}
+            my='xs'
+            {...form.getInputProps('embedMediaOnly', { type: 'checkbox' })}
           />
 
           <SimpleGrid cols={{ base: 1, md: 2 }} spacing='sm'>

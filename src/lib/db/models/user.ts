@@ -23,6 +23,7 @@ export const userViewSchema = z
     showFolder: z.boolean().nullish(),
     content: z.string().nullish(),
     embed: z.boolean().nullish(),
+    embedMediaOnly: z.boolean().nullish(),
     embedTitle: z.string().nullish(),
     embedDescription: z.string().nullish(),
     embedColor: z.string().nullish(),
