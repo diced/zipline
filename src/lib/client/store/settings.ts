@@ -4,6 +4,7 @@ import { persist } from 'zustand/middleware';
 export type SettingsStore = {
   settings: {
     disableMediaPreview: boolean;
+    mediaAutoMuted: boolean;
     warnDeletion: boolean;
     fileNavButtons: boolean;
     fileViewer: 'default' | 'fullscreen';
@@ -18,6 +19,7 @@ export type SettingsStore = {
 
 const defaultSettings: SettingsStore['settings'] = {
   disableMediaPreview: false,
+  mediaAutoMuted: true,
   warnDeletion: true,
   fileNavButtons: true,
   fileViewer: 'fullscreen',

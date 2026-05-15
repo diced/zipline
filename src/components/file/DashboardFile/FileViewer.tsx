@@ -542,7 +542,7 @@ export default function FileViewer({
             overscrollBehavior: 'contain',
           }}
         >
-          {file ? (
+          {open && file ? (
             <Box
               onClick={(e) => e.stopPropagation()}
               style={{
@@ -569,7 +569,7 @@ export default function FileViewer({
                 scrollParent={scrollParent}
               />
 
-              {open && sequenced && fileNavButtons && file && (
+              {sequenced && fileNavButtons && file && (
                 <>
                   <ActionButton
                     Icon={IconChevronLeft}

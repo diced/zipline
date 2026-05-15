@@ -72,6 +72,8 @@ export default function DashboardFileType({
   scrollParent?: HTMLElement | null;
 }) {
   const disableMediaPreview = useSettingsStore((state) => state.settings.disableMediaPreview);
+  const mediaAutoMuted = useSettingsStore((state) => state.settings.mediaAutoMuted);
+
   const { fileUrl, thumbnailUrl, viewUrl } = useFileUrls({ file, token });
   const db = isDbFile(file) ? file : null;
 
@@ -142,7 +144,7 @@ export default function DashboardFileType({
       <video
         width={fullscreen ? undefined : '100%'}
         autoPlay
-        muted
+        muted={mediaAutoMuted}
         controls
         src={fileUrl}
         style={{
@@ -207,7 +209,7 @@ export default function DashboardFileType({
   if (type === 'audio') {
     if (!fileUrl) return <Loader />;
     return show ? (
-      <audio autoPlay muted controls style={{ width: '100%' }} src={fileUrl} />
+      <audio autoPlay muted={mediaAutoMuted} controls style={{ width: '100%' }} src={fileUrl} />
     ) : (
       <Placeholder text={`Click to play audio ${file.name}`} Icon={fileIcon(file.type)} />
     );

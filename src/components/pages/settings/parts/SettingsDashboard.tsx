@@ -46,6 +46,12 @@ export default function SettingsDashboard() {
             onChange={(event) => update('disableMediaPreview', event.currentTarget.checked)}
           />
           <Switch
+            label='Mute video and audio previews'
+            description='When enabled, video and audio in the file viewer autoplay muted. Turning this off tries to play sound immediately. Browsers may block unmuted autoplay until you interact with the page.'
+            checked={settings.mediaAutoMuted}
+            onChange={(event) => update('mediaAutoMuted', event.currentTarget.checked)}
+          />
+          <Switch
             label='Warn on deletion'
             description='Show a warning when deleting stuff. When this is disabled, files, urls, etc will be deleted with no prior warning! Folders, users, and bulk-transactions are exempt from this rule and will always warn you before deleting anything.'
             checked={settings.warnDeletion}
