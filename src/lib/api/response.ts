@@ -34,6 +34,7 @@ import { ApiUserMfaPasskeyResponse } from '@/server/routes/api/user/mfa/passkey'
 import { ApiUserMfaTotpResponse } from '@/server/routes/api/user/mfa/totp';
 import { ApiUserRecentResponse } from '@/server/routes/api/user/recent';
 import { ApiUserSessionsResponse } from '@/server/routes/api/user/sessions';
+import { ApiUserActivityResponse } from '@/server/routes/api/user/activity';
 import { ApiUserStatsResponse } from '@/server/routes/api/user/stats';
 import { ApiUserTagsResponse } from '@/server/routes/api/user/tags';
 import { ApiUserTagsIdResponse } from '@/server/routes/api/user/tags/[id]';
@@ -70,6 +71,7 @@ export type Response = {
   '/api/user/sessions': ApiUserSessionsResponse;
   '/api/user': ApiUserResponse;
   '/api/user/stats': ApiUserStatsResponse;
+  '/api/user/activity': ApiUserActivityResponse;
   '/api/user/recent': ApiUserRecentResponse;
   '/api/user/token': ApiUserTokenResponse;
   '/api/user/export': ApiUserExportResponse;
