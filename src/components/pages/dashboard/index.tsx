@@ -3,6 +3,7 @@ import Stat from '@/components/Stat';
 import type { Response } from '@/lib/api/response';
 import { bytes } from '@/lib/bytes';
 import useLogin from '@/lib/client/hooks/useLogin';
+import { useSettingsStore } from '@/lib/client/store/settings';
 import { isAdministrator } from '@/lib/role';
 import { Button, Group, Paper, ScrollArea, SimpleGrid, Skeleton, Table, Text, Title } from '@mantine/core';
 import {
@@ -18,9 +19,11 @@ import { Link } from 'react-router-dom';
 import useSWR from 'swr';
 
 const ActivityChart = lazy(() => import('./parts/ActivityChart'));
+const Recents = lazy(() => import('./parts/Recents'));
 
 export default function DashboardHome() {
   const { user } = useLogin();
+  const { homeShowActivity, homeShowRecents, homeShowTypes } = useSettingsStore((state) => state.settings);
   const { data: stats, isLoading: statsLoading } = useSWR<Response['/api/user/stats']>('/api/user/stats');
 
   const config = useConfig();
@@ -36,6 +39,32 @@ export default function DashboardHome() {
           You have <b>{statsLoading ? '...' : stats?.filesUploaded}</b> files uploaded.
         </Text>
       </Skeleton>
+
+      {homeShowRecents && (
+        <Suspense
+          fallback={
+            <Paper radius='md' withBorder p='md' mt='lg'>
+              <Skeleton height={24} width={180} mb='xs' animate />
+              <Skeleton height={260} mt='md' animate />
+            </Paper>
+          }
+        >
+          <Group mt='md' mb='xs' style={{ alignItems: 'center' }}>
+            <Title order={2}>Recent files</Title>
+            <Button
+              variant='outline'
+              size='compact-xs'
+              component={Link}
+              to='/dashboard/files'
+              leftSection={<IconFiles size='1rem' />}
+            >
+              View all files
+            </Button>
+          </Group>
+
+          <Recents />
+        </Suspense>
+      )}
 
       {user?.quota && (user.quota.maxBytes || user.quota.maxFiles) ? (
         <Text size='sm' c='dimmed'>
@@ -61,15 +90,7 @@ export default function DashboardHome() {
 
       <Group mt='md' style={{ alignItems: 'center' }}>
         <Title order={2}>Stats</Title>
-        <Button
-          variant='outline'
-          size='compact-xs'
-          component={Link}
-          to='/dashboard/files'
-          leftSection={<IconFiles size='1rem' />}
-        >
-          View all files
-        </Button>
+
         {(!config.features?.metrics?.adminOnly || isAdministrator(user?.role)) && (
           <Button
             variant='outline'
@@ -107,16 +128,18 @@ export default function DashboardHome() {
         </SimpleGrid>
       )}
 
-      <Suspense
-        fallback={
-          <Paper radius='md' withBorder p='md' mt='lg'>
-            <Skeleton height={24} width={180} mb='xs' animate />
-            <Skeleton height={260} mt='md' animate />
-          </Paper>
-        }
-      >
-        <ActivityChart />
-      </Suspense>
+      {homeShowActivity && (
+        <Suspense
+          fallback={
+            <Paper radius='md' withBorder p='md' mt='lg'>
+              <Skeleton height={24} width={180} mb='xs' animate />
+              <Skeleton height={260} mt='md' animate />
+            </Paper>
+          }
+        >
+          <ActivityChart />
+        </Suspense>
+      )}
 
       {statsLoading ? (
         <Paper withBorder my='md'>
@@ -148,7 +171,8 @@ export default function DashboardHome() {
           </ScrollArea.Autosize>
         </Paper>
       ) : (
-        Object.keys(stats!.sortTypeCount).length !== 0 && (
+        Object.keys(stats!.sortTypeCount).length !== 0 &&
+        homeShowTypes && (
           <>
             <Title order={3} mt='lg' mb='xs'>
               File types

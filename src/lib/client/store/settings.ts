@@ -12,6 +12,9 @@ export type SettingsStore = {
     themeDark: string;
     themeLight: string;
     domain: '' | string;
+    homeShowRecents: boolean;
+    homeShowActivity: boolean;
+    homeShowTypes: boolean;
   };
 
   update: <K extends keyof SettingsStore['settings']>(key: K, value: SettingsStore['settings'][K]) => void;
@@ -27,6 +30,9 @@ const defaultSettings: SettingsStore['settings'] = {
   themeDark: 'builtin:dark_blue',
   themeLight: 'builtin:light_blue',
   domain: '',
+  homeShowRecents: true,
+  homeShowActivity: true,
+  homeShowTypes: true,
 };
 
 export const useSettingsStore = create<SettingsStore>()(

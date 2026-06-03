@@ -63,6 +63,26 @@ export default function SettingsDashboard() {
             checked={settings.fileNavButtons}
             onChange={(event) => update('fileNavButtons', event.currentTarget.checked)}
           />
+          <Switch
+            label='Show recents'
+            description='Show recent uploads and logins on the home page.'
+            checked={settings.homeShowRecents}
+            onChange={(event) => update('homeShowRecents', event.currentTarget.checked)}
+          />
+
+          <Switch
+            label='Show activity'
+            description='Show your recent activity as a graph on the home page.'
+            checked={settings.homeShowActivity}
+            onChange={(event) => update('homeShowActivity', event.currentTarget.checked)}
+          />
+
+          <Switch
+            label='Show file types'
+            description='Show the file types table on the home page.'
+            checked={settings.homeShowTypes}
+            onChange={(event) => update('homeShowTypes', event.currentTarget.checked)}
+          />
         </Stack>
 
         <Select
