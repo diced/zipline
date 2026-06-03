@@ -1,8 +1,9 @@
 import type { Response } from '@/lib/api/response';
 import { ChartTooltip, LineChart } from '@mantine/charts';
-import { Box, Group, Paper, Skeleton, Text, Title } from '@mantine/core';
+import { Box, Group, Paper, Select, Skeleton, Text, Title } from '@mantine/core';
 import { IconChartAreaLine, IconLogin2, IconUpload } from '@tabler/icons-react';
 import dayjs from 'dayjs';
+import { useState } from 'react';
 import useSWR from 'swr';
 
 const CHART_HEIGHT = 260;
@@ -34,7 +35,8 @@ function formatDayLabel(value: unknown) {
 }
 
 export default function ActivityChart() {
-  const { data, isLoading } = useSWR<Response['/api/user/activity']>('/api/user/activity?days=14');
+  const [days, setDays] = useState(14);
+  const { data, isLoading } = useSWR<Response['/api/user/activity']>('/api/user/activity?days=' + days);
 
   if (isLoading) {
     return (
@@ -59,7 +61,7 @@ export default function ActivityChart() {
         logins: point.logins,
       };
     })
-    .filter((point): point is NonNullable<typeof point> => point !== null);
+    .filter((point) => point !== null);
 
   if (chartData.length === 0) return null;
 
@@ -72,17 +74,51 @@ export default function ActivityChart() {
           <Title order={3} fw={600}>
             Activity
           </Title>
-          <Text size='sm' c='dimmed' mt={4}>
-            Your uploads and logins over the last{' '}
-            <Text span c='var(--mantine-primary-color-filled)' fw={500}>
-              {data.days} days
+          <Group gap='xs' style={{ alignItems: 'center' }}>
+            <Text size='sm' c='dimmed' mt={4}>
+              Your uploads and logins over the last{' '}
             </Text>
-          </Text>
+            <Select
+              value={String(days)}
+              onChange={(v) => setDays(Number(v))}
+              data={[
+                { value: '1', label: '1 day' },
+                { value: '7', label: '7 days' },
+                { value: '14', label: '14 days' },
+                { value: '30', label: '30 days' },
+              ]}
+              size='0.4rem'
+              variant='filled'
+              p={0}
+              m={0}
+              fw={500}
+              styles={{
+                input: {
+                  color: 'var(--mantine-primary-color-filled)',
+                  padding: 10,
+                  width: '10em',
+                  fontSize: '0.875rem',
+                },
+                section: {
+                  margin: 0,
+                },
+                option: {
+                  fontSize: '1rem',
+                },
+                wrapper: {
+                  borderRadius: 1,
+                },
+              }}
+              comboboxProps={{
+                dropdownPadding: 0,
+              }}
+            />
+          </Group>
         </Box>
 
         <Group gap='lg' visibleFrom='sm'>
           <Group gap='xs'>
-            <IconUpload size='1rem' style={{ opacity: 0.85 }} color='var(--mantine-color-violet-4)' />
+            <IconUpload size='1rem' style={{ opacity: 0.85 }} color='var(--mantine-primary-color-filled)' />
             <Box>
               <Text size='xs' c='dimmed' lh={1.2}>
                 Uploads
@@ -107,22 +143,14 @@ export default function ActivityChart() {
       </Group>
 
       {!hasActivity ? (
-        <Box
-          h={CHART_HEIGHT}
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: 'var(--mantine-radius-md)',
-            border: '1px dashed var(--mantine-color-dark-4)',
-          }}
-        >
-          <IconChartAreaLine size='1.75rem' style={{ opacity: 0.35 }} />
-          <Text size='sm' c='dimmed' mt='xs'>
-            No uploads or logins in this period yet
-          </Text>
-        </Box>
+        <Paper withBorder h={CHART_HEIGHT} radius='md' p='md' ta='center'>
+          <Group align='center' justify='center' h='100%'>
+            <IconChartAreaLine size='1.75rem' style={{ opacity: 0.35 }} />
+            <Text size='sm' c='dimmed'>
+              No uploads or logins in this period yet
+            </Text>
+          </Group>
+        </Paper>
       ) : (
         <LineChart
           h={CHART_HEIGHT}
@@ -140,7 +168,7 @@ export default function ActivityChart() {
             {
               name: 'uploads',
               label: 'Uploads',
-              color: 'violet.5',
+              color: 'var(--mantine-primary-color-filled)',
             },
             {
               name: 'logins',
@@ -163,7 +191,7 @@ export default function ActivityChart() {
                 label={formatDayLabel(label) || '—'}
                 payload={payload}
                 series={[
-                  { name: 'uploads', label: 'Uploads', color: 'violet.5' },
+                  { name: 'uploads', label: 'Uploads', color: 'var(--mantine-primary-color-filled)' },
                   { name: 'logins', label: 'Logins', color: 'gray.5' },
                 ]}
               />
