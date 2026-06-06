@@ -17,6 +17,9 @@ export const fileSelect = {
   maxViews: true,
   folderId: true,
   anonymous: true,
+  public: true,
+  width: true,
+  height: true,
   thumbnail: {
     select: {
       path: true,
@@ -67,6 +70,9 @@ export const fileSchema = z.object({
   password: z.union([z.string(), z.boolean()]).nullish(),
   folderId: z.string().nullable(),
   anonymous: z.boolean().nullish(),
+  public: z.boolean().nullish(),
+  width: z.number().nullable().optional(),
+  height: z.number().nullable().optional(),
 
   thumbnail: z
     .object({

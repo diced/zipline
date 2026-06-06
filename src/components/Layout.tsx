@@ -44,9 +44,10 @@ import {
   IconStopwatch,
   IconTags,
   IconUpload,
+  IconUser,
   IconUsersGroup,
 } from '@tabler/icons-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, NavigateFunction, Outlet, useLoaderData, useLocation, useNavigate } from 'react-router-dom';
 import { dashboardLoader } from '../client/routes';
 import ConfigProvider from './ConfigProvider';
@@ -234,6 +235,43 @@ export default function Layout() {
   const { user, mutate } = useLogin();
   const { avatar } = useAvatar();
 
+  useEffect(() => {
+    const handleDragStart = (e: DragEvent) => {
+      const target = e.target as HTMLElement;
+      if (target && (target.tagName === 'IMG' || target.tagName === 'VIDEO')) {
+        e.preventDefault();
+      }
+    };
+
+    const handleLinkClick = (e: MouseEvent) => {
+      let target = e.target as HTMLElement | null;
+      while (target && target.tagName !== 'A') {
+        target = target.parentElement;
+      }
+      if (target && target.tagName === 'A') {
+        const href = target.getAttribute('href');
+        if (
+          href &&
+          (href.startsWith('http://') ||
+            href.startsWith('https://') ||
+            href.startsWith('/raw/') ||
+            href.startsWith('/view/') ||
+            href.startsWith('/u/'))
+        ) {
+          target.setAttribute('target', '_blank');
+          target.setAttribute('rel', 'noopener noreferrer');
+        }
+      }
+    };
+
+    document.addEventListener('dragstart', handleDragStart);
+    document.addEventListener('click', handleLinkClick);
+    return () => {
+      document.removeEventListener('dragstart', handleDragStart);
+      document.removeEventListener('click', handleLinkClick);
+    };
+  }, []);
+
   const [prev, setPrev] = useState(location.pathname);
   if (prev !== location.pathname) {
     setPrev(location.pathname);
@@ -366,6 +404,14 @@ export default function Layout() {
                   prefetch='intent'
                 >
                   Settings
+                </Menu.Item>
+
+                <Menu.Item
+                  leftSection={<IconUser size='1rem' />}
+                  component={Link}
+                  to={`/user/${user?.username}`}
+                >
+                  View Public Profile
                 </Menu.Item>
 
                 {user?.role === 'SUPERADMIN' && (

@@ -6,6 +6,7 @@ import { lazy } from 'react';
 const SettingsAvatar = lazy(() => import('./parts/SettingsAvatar'));
 const SettingsDashboard = lazy(() => import('./parts/SettingsDashboard'));
 const SettingsFileView = lazy(() => import('./parts/SettingsFileView'));
+const SettingsPublicProfile = lazy(() => import('./parts/SettingsPublicProfile'));
 const SettingsGenerators = lazy(() => import('./parts/SettingsGenerators'));
 const SettingsMfa = lazy(() => import('./parts/SettingsMfa'));
 const SettingsUser = lazy(() => import('./parts/SettingsUser'));
@@ -33,6 +34,8 @@ export default function DashboardSettings() {
         </Stack>
 
         <SettingsFileView />
+
+        <SettingsPublicProfile />
 
         {eitherTrue(
           config.oauthEnabled.discord,

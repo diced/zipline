@@ -1,9 +1,10 @@
 import { ApiError, RedirectError } from '@/lib/api/errors';
 import type { FastifyInstance } from 'fastify';
 import { hasZodFastifySchemaValidationErrors, isResponseSerializationError } from 'fastify-type-provider-zod';
+import { prisma } from '@/lib/db';
 
 export function registerHandlers(server: FastifyInstance, mode: string) {
-  server.setNotFoundHandler((req, res) => {
+  server.setNotFoundHandler(async (req, res) => {
     if (mode === 'development' && server.vite)
       return res.status(404).send({
         message: `Route ${req.method}:${req.url} not found`,
@@ -19,6 +20,26 @@ export function registerHandlers(server: FastifyInstance, mode: string) {
         statusCode: 404,
       });
     } else {
+      const path = req.url.split('?')[0];
+      const username = path.startsWith('/') ? path.substring(1) : path;
+      if (
+        username &&
+        !username.includes('/') &&
+        !['dashboard', 'auth', 'folder', 'view', 'raw', 'r', 'oembed'].includes(username.toLowerCase())
+      ) {
+        const user = await prisma.user.findFirst({
+          where: {
+            username: {
+              equals: username,
+              mode: 'insensitive',
+            },
+          },
+        });
+        if (user) {
+          return res.serveProfile(user.username);
+        }
+      }
+
       res.status(404);
       return res.serveIndex();
     }

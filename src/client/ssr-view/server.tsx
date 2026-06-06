@@ -173,42 +173,94 @@ export async function render(
   const showMediaOg = viewEnabled && (!!user.view.embed || !!user.view.embedMediaOnly);
   const pageUrl = `${host}${url.split('?')[0]}`;
 
-  const richMeta = [
+  const parsedTitle =
     showRichOg && user?.view?.embedTitle
-      ? `<meta property="og:title" content="${stripHtml(
+      ? stripHtml(
           parseString(user.view.embedTitle, {
             file: file as unknown as File,
             user: user as User,
             ...metrics,
           }) ?? '',
-        )}" />`
-      : '',
+        )
+      : '';
+
+  const parsedDescription =
     showRichOg && user?.view?.embedDescription
-      ? `<meta property="og:description" content="${stripHtml(
+      ? stripHtml(
           parseString(user.view.embedDescription, {
             file: file as unknown as File,
             user: user as User,
             ...metrics,
           }) ?? '',
-        )}" />`
-      : '',
+        )
+      : '';
+
+  const parsedSiteName =
     showRichOg && user?.view?.embedSiteName
-      ? `<meta property="og:site_name" content="${stripHtml(
+      ? stripHtml(
           parseString(user.view.embedSiteName, {
             file: file as unknown as File,
             user: user as User,
             ...metrics,
           }) ?? '',
-        )}" />`
-      : '',
+        )
+      : '';
+
+  const parsedColor =
     showRichOg && user?.view?.embedColor
-      ? `<meta property="theme-color" content="${stripHtml(
+      ? stripHtml(
           parseString(user.view.embedColor, {
             file: file as unknown as File,
             user: user as User,
             ...metrics,
           }) ?? '',
-        )}" />`
+        )
+      : '';
+
+  const parsedAuthor =
+    showRichOg && user?.view?.embedAuthor
+      ? stripHtml(
+          parseString(user.view.embedAuthor, {
+            file: file as unknown as File,
+            user: user as User,
+            ...metrics,
+          }) ?? '',
+        )
+      : user.username;
+
+  const parsedAuthorUrl =
+    showRichOg && user?.view?.embedAuthorUrl
+      ? stripHtml(
+          parseString(user.view.embedAuthorUrl, {
+            file: file as unknown as File,
+            user: user as User,
+            ...metrics,
+          }) ?? '',
+        )
+      : `${host}/user/${user.username}`;
+
+  const parsedProviderUrl =
+    showRichOg && user?.view?.embedProviderUrl
+      ? stripHtml(
+          parseString(user.view.embedProviderUrl, {
+            file: file as unknown as File,
+            user: user as User,
+            ...metrics,
+          }) ?? '',
+        )
+      : host;
+
+  const richMeta = [
+    parsedTitle ? `<meta property="og:title" content="${parsedTitle}" />` : '',
+    parsedDescription ? `<meta property="og:description" content="${parsedDescription}" />` : '',
+    parsedSiteName ? `<meta property="og:site_name" content="${parsedSiteName}" />` : '',
+    parsedColor ? `<meta property="theme-color" content="${parsedColor}" />` : '',
+    showRichOg
+      ? `<link rel="alternate" type="application/json+oembed" href="${host}/oembed?title=${encodeURIComponent(
+          parsedTitle || file.name,
+        )}&author=${encodeURIComponent(parsedAuthor)}&author_url=${encodeURIComponent(
+          parsedAuthorUrl,
+        )}${parsedSiteName ? `&provider=${encodeURIComponent(parsedSiteName)}` : ''}&provider_url=${encodeURIComponent(parsedProviderUrl)}" title="${stripHtml(file.name)}" />`
       : '',
   ]
     .filter(Boolean)
@@ -220,11 +272,18 @@ export async function render(
     <meta property="og:type" content="image" />
     <meta property="og:image" itemProp="image" content="${host}/raw/${safeFilename}" />
     <meta property="og:url" content="${pageUrl}" />
+    ${file.width ? `<meta property="og:image:width" content="${file.width}" />` : ''}
+    ${file.height ? `<meta property="og:image:height" content="${file.height}" />` : ''}
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:image" content="${host}/raw/${safeFilename}" />
+    ${file.width ? `<meta property="twitter:image:width" content="${file.width}" />` : ''}
+    ${file.height ? `<meta property="twitter:image:height" content="${file.height}" />` : ''}
     ${showRichOg ? `<meta property="twitter:title" content="${safeFilename}" />` : ''}
   `
       : '';
+
+  const videoWidth = file.width ?? 1920;
+  const videoHeight = file.height ?? 1080;
 
   const videoOg =
     showMediaOg && file.type?.startsWith('video')
@@ -232,9 +291,18 @@ export async function render(
     ${file.thumbnail ? `<meta property="og:image" content="${host}/raw/${file.thumbnail.path}" />` : ''}
     <meta property="og:type" content="video.other" />
     <meta property="og:url" content="${pageUrl}" />
+    <meta property="og:video" content="${host}/raw/${safeFilename}" />
     <meta property="og:video:url" content="${host}/raw/${safeFilename}" />
-    <meta property="og:video:width" content="1920" />
-    <meta property="og:video:height" content="1080" />
+    <meta property="og:video:secure_url" content="${host}/raw/${safeFilename}" />
+    <meta property="og:video:width" content="${videoWidth}" />
+    <meta property="og:video:height" content="${videoHeight}" />
+    <meta property="og:video:type" content="${safeType}" />
+    <meta property="twitter:card" content="player" />
+    <meta property="twitter:player" content="${host}/raw/${safeFilename}" />
+    <meta property="twitter:player:stream" content="${host}/raw/${safeFilename}" />
+    <meta property="twitter:player:stream:content_type" content="${safeType}" />
+    <meta property="twitter:player:width" content="${videoWidth}" />
+    <meta property="twitter:player:height" content="${videoHeight}" />
   `
       : '';
 

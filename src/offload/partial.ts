@@ -15,6 +15,37 @@ import { open, readdir, rm } from 'fs/promises';
 import { join } from 'path';
 import { isMainThread, workerData } from 'worker_threads';
 import { dbProxy } from './proxiedDb';
+import sharp from 'sharp';
+import ffmpeg from 'fluent-ffmpeg';
+
+async function getImageDimensions(path: string): Promise<{ width: number; height: number } | null> {
+  try {
+    const metadata = await sharp(path).metadata();
+    if (metadata.width && metadata.height) {
+      return { width: metadata.width, height: metadata.height };
+    }
+  } catch {
+    // ignore
+  }
+  return null;
+}
+
+function getVideoDimensions(path: string): Promise<{ width: number; height: number } | null> {
+  return new Promise((resolve) => {
+    ffmpeg.ffprobe(path, (err, metadata) => {
+      if (err || !metadata) {
+        resolve(null);
+        return;
+      }
+      const stream = metadata.streams.find((s) => s.codec_type === 'video');
+      if (stream && stream.width && stream.height) {
+        resolve({ width: stream.width, height: stream.height });
+      } else {
+        resolve(null);
+      }
+    });
+  });
+}
 
 export type PartialWorkerData = {
   user: {
@@ -194,12 +225,34 @@ async function runComplete(id: string) {
   });
   if (!userr) return;
 
+  // Extract dimensions from the assembled file
+  let width: number | null = null;
+  let height: number | null = null;
+
+  if (finalPath) {
+    if (file.type.startsWith('image/')) {
+      const dims = await getImageDimensions(finalPath);
+      if (dims) {
+        width = dims.width;
+        height = dims.height;
+      }
+    } else if (file.type.startsWith('video/')) {
+      const dims = await getVideoDimensions(finalPath);
+      if (dims) {
+        width = dims.width;
+        height = dims.height;
+      }
+    }
+  }
+
   const fileUpload = await dbProxy<File>('file.update', {
     where: {
       id,
     },
     data: {
       size: options.partial!.range[2],
+      ...(width !== null && { width }),
+      ...(height !== null && { height }),
       ...(options.maxViews && { maxViews: options.maxViews }),
       ...(options.deletesAt && options.deletesAt !== 'never'
         ? { deletesAt: options.deletesAt }

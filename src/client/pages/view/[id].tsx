@@ -19,12 +19,11 @@ import {
   PasswordInput,
   Text,
   Tooltip,
-  Typography,
 } from '@mantine/core';
 import { IconDownload, IconExternalLink, IconInfoCircleFilled } from '@tabler/icons-react';
-import * as sanitize from 'isomorphic-dompurify';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import Markdown from '@/components/render/Markdown';
 import { getFile } from '../../ssr-view/server';
 
 type SsrData = {
@@ -49,6 +48,43 @@ export default function ViewFileId() {
   const [detailsOpen, setDetailsOpen] = useState<boolean>(false);
 
   useTitle(file.originalName ?? file.name ?? 'View File');
+
+  useEffect(() => {
+    const handleDragStart = (e: DragEvent) => {
+      const target = e.target as HTMLElement;
+      if (target && (target.tagName === 'IMG' || target.tagName === 'VIDEO')) {
+        e.preventDefault();
+      }
+    };
+
+    const handleLinkClick = (e: MouseEvent) => {
+      let target = e.target as HTMLElement | null;
+      while (target && target.tagName !== 'A') {
+        target = target.parentElement;
+      }
+      if (target && target.tagName === 'A') {
+        const href = target.getAttribute('href');
+        if (
+          href &&
+          (href.startsWith('http://') ||
+            href.startsWith('https://') ||
+            href.startsWith('/raw/') ||
+            href.startsWith('/view/') ||
+            href.startsWith('/u/'))
+        ) {
+          target.setAttribute('target', '_blank');
+          target.setAttribute('rel', 'noopener noreferrer');
+        }
+      }
+    };
+
+    document.addEventListener('dragstart', handleDragStart);
+    document.addEventListener('click', handleLinkClick);
+    return () => {
+      document.removeEventListener('dragstart', handleDragStart);
+      document.removeEventListener('click', handleLinkClick);
+    };
+  }, []);
 
   return password && !token ? (
     <Modal onClose={() => {}} opened={true} withCloseButton={false} centered title='Password required'>
@@ -117,28 +153,22 @@ export default function ViewFileId() {
       <Collapse expanded={detailsOpen}>
         <Paper m='md' p='md' withBorder>
           {user?.view!.content && (
-            <Typography>
-              <Text
-                ta={user?.view!.align ?? 'left'}
-                dangerouslySetInnerHTML={{
-                  __html: sanitize.sanitize(
-                    parseString(user.view.content, {
-                      file: file as unknown as File,
-                      user: user as User,
-                      link: {
-                        returned: `${host}${formatRootUrl(filesRoute ?? '/u', file.name!)}`,
-                        raw: `${host}/raw/${file.name}`,
-                      },
-                      ...metrics,
-                    }) ?? '',
-                    {
-                      USE_PROFILES: { html: true },
-                      FORBID_TAGS: ['style', 'script'],
+            <div style={{ textAlign: user?.view!.align ?? 'left' }}>
+              <Markdown
+                plain
+                md={
+                  parseString(user.view.content, {
+                    file: file as unknown as File,
+                    user: user as User,
+                    link: {
+                      returned: `${host}${formatRootUrl(filesRoute ?? '/u', file.name!)}`,
+                      raw: `${host}/raw/${file.name}`,
                     },
-                  ),
-                }}
+                    ...metrics,
+                  }) ?? ''
+                }
               />
-            </Typography>
+            </div>
           )}
         </Paper>
       </Collapse>
@@ -218,29 +248,22 @@ export default function ViewFileId() {
           <DashboardFileType allowZoom file={file as unknown as File} token={token} show />
 
           {user?.view!.content && (
-            <Typography>
-              <Text
-                mt='sm'
-                ta={user?.view.align ?? 'left'}
-                dangerouslySetInnerHTML={{
-                  __html: sanitize.sanitize(
-                    parseString(user?.view.content, {
-                      file: file as unknown as File,
-                      link: {
-                        returned: `${host}${formatRootUrl(filesRoute ?? '/u', file.name!)}`,
-                        raw: `${host}/raw/${file.name}`,
-                      },
-                      user: user as User,
-                      ...metrics,
-                    }) ?? '',
-                    {
-                      USE_PROFILES: { html: true },
-                      FORBID_TAGS: ['script'],
+            <div style={{ marginTop: '0.5rem', textAlign: user?.view.align ?? 'left' }}>
+              <Markdown
+                plain
+                md={
+                  parseString(user?.view.content, {
+                    file: file as unknown as File,
+                    link: {
+                      returned: `${host}${formatRootUrl(filesRoute ?? '/u', file.name!)}`,
+                      raw: `${host}/raw/${file.name}`,
                     },
-                  ),
-                }}
+                    user: user as User,
+                    ...metrics,
+                  }) ?? ''
+                }
               />
-            </Typography>
+            </div>
           )}
         </Paper>
       </Center>

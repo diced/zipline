@@ -237,7 +237,7 @@ export default function FileModal({
       >
         {file ? (
           <>
-            {open && <DashboardFileType file={file} show />}
+            {open && <DashboardFileType file={file} show forceRaw={reduce} />}
 
             <SimpleGrid cols={{ base: 1, md: 2, lg: 3 }} spacing='md' my='xs'>
               <FileStat Icon={IconFileInfo} title='Type' value={file.type} />

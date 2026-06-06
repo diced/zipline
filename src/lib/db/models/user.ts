@@ -28,6 +28,15 @@ export const userViewSchema = z
     embedDescription: z.string().nullish(),
     embedColor: z.string().nullish(),
     embedSiteName: z.string().nullish(),
+    embedAuthor: z.string().nullish(),
+    embedAuthorUrl: z.string().nullish(),
+    embedProviderUrl: z.string().nullish(),
+    banner: z.string().nullish(),
+    bio: z.string().nullish(),
+    publicShowTotalViews: z.boolean().nullish(),
+    publicShowTotalUploads: z.boolean().nullish(),
+    publicShowPrivateStats: z.boolean().nullish(),
+    publicShowPublicStats: z.boolean().nullish(),
   })
   .partial();
 

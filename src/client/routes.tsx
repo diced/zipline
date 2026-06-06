@@ -104,6 +104,14 @@ export const router = createBrowserRouter([
               },
             ],
           },
+          {
+            path: 'user/:username',
+            lazy: () => import('./pages/user/[username]'),
+          },
+          {
+            path: ':username',
+            lazy: () => import('./pages/user/[username]'),
+          },
         ],
       },
     ],

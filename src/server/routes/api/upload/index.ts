@@ -19,6 +19,37 @@ import typedPlugin from '@/server/typedPlugin';
 import { SavedMultipartFile } from '@fastify/multipart';
 import { stat } from 'fs/promises';
 import { z } from 'zod';
+import sharp from 'sharp';
+import ffmpeg from 'fluent-ffmpeg';
+
+async function getImageDimensions(path: string): Promise<{ width: number; height: number } | null> {
+  try {
+    const metadata = await sharp(path).metadata();
+    if (metadata.width && metadata.height) {
+      return { width: metadata.width, height: metadata.height };
+    }
+  } catch {
+    // ignore
+  }
+  return null;
+}
+
+function getVideoDimensions(path: string): Promise<{ width: number; height: number } | null> {
+  return new Promise((resolve) => {
+    ffmpeg.ffprobe(path, (err, metadata) => {
+      if (err || !metadata) {
+        resolve(null);
+        return;
+      }
+      const stream = metadata.streams.find((s) => s.codec_type === 'video');
+      if (stream && stream.width && stream.height) {
+        resolve({ width: stream.width, height: stream.height });
+      } else {
+        resolve(null);
+      }
+    });
+  });
+}
 
 export type ApiUploadResponse = {
   files: {
@@ -204,10 +235,29 @@ export default typedPlugin(
 
           const tempFileStats = await stat(file.filepath);
 
+          let width: number | null = null;
+          let height: number | null = null;
+
+          if (mimetype.startsWith('image/')) {
+            const dims = await getImageDimensions(file.filepath);
+            if (dims) {
+              width = dims.width;
+              height = dims.height;
+            }
+          } else if (mimetype.startsWith('video/')) {
+            const dims = await getVideoDimensions(file.filepath);
+            if (dims) {
+              width = dims.width;
+              height = dims.height;
+            }
+          }
+
           const data: Prisma.FileCreateInput = {
             name: `${fileName}${compressed ? '.' + compressed.ext : extension}`,
             size: compressed?.buffer?.length ?? tempFileStats.size,
             type: compressed?.mimetype ?? mimetype,
+            width,
+            height,
             User: { connect: { id: req.user ? req.user.id : options.folder ? folder?.userId : undefined } },
           };
 

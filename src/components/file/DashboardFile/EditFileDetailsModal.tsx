@@ -1,7 +1,7 @@
 import { File } from '@/lib/db/models/file';
 import { fetchApi } from '@/lib/fetchApi';
 import useObjectState from '@/lib/client/hooks/useObjectState';
-import { Button, Divider, Modal, NumberInput, PasswordInput, Stack, TextInput } from '@mantine/core';
+import { Button, Divider, Modal, NumberInput, PasswordInput, Stack, Switch, TextInput } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { IconEye, IconKey, IconPencil, IconPencilOff, IconTrashFilled } from '@tabler/icons-react';
 import { useEffect } from 'react';
@@ -22,12 +22,14 @@ export default function EditFileDetailsModal({
     password: string | null;
     originalName: string | null;
     type: string | null;
+    public: boolean;
   }>({
     name: file?.name ?? '',
     maxViews: file?.maxViews ?? null,
     password: file?.password ? '' : null,
     originalName: file?.originalName ?? null,
     type: file?.type ?? null,
+    public: file?.public ?? false,
   });
 
   useEffect(() => {
@@ -38,6 +40,7 @@ export default function EditFileDetailsModal({
         password: file?.password ? '' : null,
         originalName: file?.originalName ?? null,
         type: file?.type ?? null,
+        public: file?.public ?? false,
       });
     } else {
       setFormData({
@@ -46,6 +49,7 @@ export default function EditFileDetailsModal({
         password: null,
         originalName: null,
         type: null,
+        public: false,
       });
     }
   }, [open, file]);
@@ -85,12 +89,14 @@ export default function EditFileDetailsModal({
       originalName?: string;
       type?: string;
       name?: string;
+      public?: boolean;
     } = {};
 
     if (formData.maxViews !== null) data['maxViews'] = formData.maxViews;
     if (formData.originalName !== null) data['originalName'] = formData.originalName?.trim();
     if (formData.type !== null) data['type'] = formData.type?.trim();
     if (formData.name !== file.name) data['name'] = formData.name.trim();
+    if (formData.public !== file.public) data['public'] = formData.public;
 
     const passwordTrimmed = formData.password?.trim();
     if (passwordTrimmed !== '') data['password'] = passwordTrimmed;
@@ -167,6 +173,13 @@ export default function EditFileDetailsModal({
             )
           }
           c='red'
+        />
+
+        <Switch
+          label='Public File'
+          description='Show this file on your public profile gallery.'
+          checked={formData.public || false}
+          onChange={(event) => setFormData('public', event.currentTarget.checked)}
         />
 
         <Divider />

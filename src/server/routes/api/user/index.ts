@@ -57,11 +57,20 @@ export default typedPlugin(
                 embedDescription: z.string().nullish(),
                 embedColor: z.string().nullish(),
                 embedSiteName: z.string().nullish(),
+                embedAuthor: z.string().nullish(),
+                embedAuthorUrl: z.string().nullish(),
+                embedProviderUrl: z.string().nullish(),
                 enabled: z.boolean().optional(),
                 align: z.enum(['left', 'center', 'right']).optional(),
                 showMimetype: z.boolean().optional(),
                 showTags: z.boolean().optional(),
                 showFolder: z.boolean().optional(),
+                banner: z.string().nullish(),
+                bio: z.string().nullish(),
+                publicShowTotalViews: z.boolean().optional(),
+                publicShowTotalUploads: z.boolean().optional(),
+                publicShowPrivateStats: z.boolean().optional(),
+                publicShowPublicStats: z.boolean().optional(),
               })
               .partial()
               .optional(),
@@ -75,6 +84,7 @@ export default typedPlugin(
           tags: ['auth'],
         },
         preHandler: [userMiddleware],
+        bodyLimit: 100 * 1024 * 1024,
         ...secondlyRatelimit(1),
       },
       async (req, res) => {
@@ -122,6 +132,15 @@ export default typedPlugin(
                 ...(req.body.view.embedSiteName !== undefined && {
                   embedSiteName: req.body.view.embedSiteName || null,
                 }),
+                ...(req.body.view.embedAuthor !== undefined && {
+                  embedAuthor: req.body.view.embedAuthor || null,
+                }),
+                ...(req.body.view.embedAuthorUrl !== undefined && {
+                  embedAuthorUrl: req.body.view.embedAuthorUrl || null,
+                }),
+                ...(req.body.view.embedProviderUrl !== undefined && {
+                  embedProviderUrl: req.body.view.embedProviderUrl || null,
+                }),
                 ...(req.body.view.align !== undefined && { align: req.body.view.align || 'center' }),
                 ...(req.body.view.showMimetype !== undefined && {
                   showMimetype: req.body.view.showMimetype || false,
@@ -129,6 +148,20 @@ export default typedPlugin(
                 ...(req.body.view.showTags !== undefined && { showTags: req.body.view.showTags || false }),
                 ...(req.body.view.showFolder !== undefined && {
                   showFolder: req.body.view.showFolder || false,
+                }),
+                ...(req.body.view.banner !== undefined && { banner: req.body.view.banner || null }),
+                ...(req.body.view.bio !== undefined && { bio: req.body.view.bio || null }),
+                ...(req.body.view.publicShowTotalViews !== undefined && {
+                  publicShowTotalViews: req.body.view.publicShowTotalViews,
+                }),
+                ...(req.body.view.publicShowTotalUploads !== undefined && {
+                  publicShowTotalUploads: req.body.view.publicShowTotalUploads,
+                }),
+                ...(req.body.view.publicShowPrivateStats !== undefined && {
+                  publicShowPrivateStats: req.body.view.publicShowPrivateStats,
+                }),
+                ...(req.body.view.publicShowPublicStats !== undefined && {
+                  publicShowPublicStats: req.body.view.publicShowPublicStats,
                 }),
               },
             }),

@@ -22,6 +22,10 @@ export async function registerRoutes(server: FastifyInstance, mode: string) {
     return res.ssr('view-url');
   });
 
+  server.get<{ Params: { username: string } }>('/user/:username', async (req, res) => {
+    return res.serveProfile(req.params.username);
+  });
+
   if (config.files.route === '/' && config.urls.route === '/') {
     logger.debug('files & urls route = /, using catch-all route');
 
@@ -53,6 +57,7 @@ export async function registerRoutes(server: FastifyInstance, mode: string) {
     server.serveIndex('/dashboard*');
     server.serveIndex('/auth*');
     server.serveIndex('/folder*');
+    server.serveIndex('/user*');
   }
 
   server.get('/', (_, res) => res.redirect('/dashboard', 301));

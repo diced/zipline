@@ -65,6 +65,9 @@ function Form({ user, setUser }: { user: User; setUser: (u: User) => void }) {
       embedDescription: user.view.embedDescription || '',
       embedSiteName: user.view.embedSiteName || '',
       embedColor: user.view.embedColor || '',
+      embedAuthor: user.view.embedAuthor || '',
+      embedAuthorUrl: user.view.embedAuthorUrl || '',
+      embedProviderUrl: user.view.embedProviderUrl || '',
       align: user.view.align || 'left',
       showMimetype: user.view.showMimetype || false,
       showTags: user.view.showTags || false,
@@ -82,6 +85,9 @@ function Form({ user, setUser }: { user: User; setUser: (u: User) => void }) {
       embedDescription: values.embedDescription.trim() || null,
       embedSiteName: values.embedSiteName.trim() || null,
       embedColor: values.embedColor.trim() || null,
+      embedAuthor: values.embedAuthor.trim() || null,
+      embedAuthorUrl: values.embedAuthorUrl.trim() || null,
+      embedProviderUrl: values.embedProviderUrl.trim() || null,
       align: values.align,
       showMimetype: values.showMimetype,
       showTags: values.showTags,
@@ -207,25 +213,151 @@ function Form({ user, setUser }: { user: User; setUser: (u: User) => void }) {
           <SimpleGrid cols={{ base: 1, md: 2 }} spacing='sm'>
             <TextInput
               label='Embed Title'
+              description='The bold linked title. Leave blank to use the filename.'
               disabled={!form.values.embed || !form.values.enabled}
               {...form.getInputProps('embedTitle')}
             />
             <TextInput
               label='Embed Description'
+              description='Text shown below the title.'
               disabled={!form.values.embed || !form.values.enabled}
               {...form.getInputProps('embedDescription')}
             />
             <TextInput
               label='Embed Site Name'
+              description='Provider/site label shown at the top. Leave blank for "Zipline".'
               disabled={!form.values.embed || !form.values.enabled}
               {...form.getInputProps('embedSiteName')}
             />
+            <TextInput
+              label='Embed Author'
+              description='Clickable name shown below the site name. Leave blank to use your username.'
+              disabled={!form.values.embed || !form.values.enabled}
+              {...form.getInputProps('embedAuthor')}
+            />
+            <TextInput
+              label='Embed Author URL'
+              description='The URL the author name links to. Leave blank to use your profile URL.'
+              disabled={!form.values.embed || !form.values.enabled}
+              {...form.getInputProps('embedAuthorUrl')}
+            />
+            <TextInput
+              label='Embed Provider URL'
+              description='The URL the provider/site name links to. Leave blank to use the site host.'
+              disabled={!form.values.embed || !form.values.enabled}
+              {...form.getInputProps('embedProviderUrl')}
+            />
             <ColorInput
               label='Embed Color'
+              description='The accent stripe color on the left of the embed.'
               disabled={!form.values.embed || !form.values.enabled}
               {...form.getInputProps('embedColor')}
             />
           </SimpleGrid>
+
+          {form.values.embed && form.values.enabled && (
+            <Stack gap='xs' mt='md'>
+              <Text size='sm' fw={500}>
+                Live Discord Embed Preview
+              </Text>
+              <Paper
+                p='md'
+                radius='sm'
+                style={{
+                  backgroundColor: '#313338',
+                  color: '#dbdee1',
+                  fontFamily: 'gg sans, "Segoe UI", Tahoma, sans-serif',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    backgroundColor: '#2b2d31',
+                    borderRadius: '4px',
+                    borderLeft: `4px solid ${form.values.embedColor || '#202225'}`,
+                    padding: '12px 16px',
+                    maxWidth: '520px',
+                  }}
+                >
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '100%' }}>
+                    {/* Provider */}
+                    <span style={{ fontSize: '12px', color: '#b5bac1', lineHeight: '16px' }}>
+                      {parsePreviewText(form.values.embedSiteName, user.username) || 'Zipline'}
+                    </span>
+
+                    {/* Author */}
+                    <span
+                      style={{
+                        fontSize: '14px',
+                        fontWeight: 600,
+                        color: '#00a8fc',
+                        lineHeight: '18px',
+                        cursor: 'pointer',
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.textDecoration = 'underline')}
+                      onMouseLeave={(e) => (e.currentTarget.style.textDecoration = 'none')}
+                    >
+                      {parsePreviewText(form.values.embedAuthor, user.username) || user.username}
+                    </span>
+
+                    {/* Title */}
+                    <span
+                      style={{
+                        fontSize: '16px',
+                        fontWeight: 600,
+                        color: '#00a8fc',
+                        lineHeight: '22px',
+                        cursor: 'pointer',
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.textDecoration = 'underline')}
+                      onMouseLeave={(e) => (e.currentTarget.style.textDecoration = 'none')}
+                    >
+                      {parsePreviewText(form.values.embedTitle, user.username) || 'image.png'}
+                    </span>
+
+                    {/* Description */}
+                    {form.values.embedDescription && (
+                      <span
+                        style={{
+                          fontSize: '14px',
+                          color: '#dbdee1',
+                          lineHeight: '18px',
+                          marginTop: '4px',
+                          whiteSpace: 'pre-wrap',
+                        }}
+                      >
+                        {parsePreviewText(form.values.embedDescription, user.username)}
+                      </span>
+                    )}
+
+                    {/* Mock Image Preview */}
+                    <div
+                      style={{
+                        marginTop: '8px',
+                        borderRadius: '4px',
+                        overflow: 'hidden',
+                        maxWidth: '400px',
+                        aspectRatio: '16/9',
+                        backgroundColor: '#1e1f22',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        border: '1px solid #232428',
+                        color: '#949ba4',
+                        fontSize: '13px',
+                      }}
+                    >
+                      <span style={{ fontWeight: 600 }}>Video / Image Preview</span>
+                      <span style={{ fontSize: '11px', color: '#80848e', marginTop: '2px' }}>
+                        Media content renders here in Discord
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </Paper>
+            </Stack>
+          )}
 
           <Group justify='left' mt='sm'>
             <Button type='submit' leftSection={<IconDeviceFloppy size='1rem' />}>
@@ -236,4 +368,16 @@ function Form({ user, setUser }: { user: User; setUser: (u: User) => void }) {
       </Stack>
     </Paper>
   );
+}
+
+function parsePreviewText(str: string, username: string) {
+  if (!str) return '';
+  return str
+    .replace(/{file\.name}/gi, 'image.png')
+    .replace(/{file\.originalName}/gi, 'original_image.png')
+    .replace(/{file\.size}/gi, '1.2 MB')
+    .replace(/{file\.type}/gi, 'image/png')
+    .replace(/{user\.username}/gi, username || 'diced')
+    .replace(/{user\.role}/gi, 'ADMIN')
+    .replace(/{file\.views}/gi, '42');
 }

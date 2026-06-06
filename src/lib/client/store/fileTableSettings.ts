@@ -10,7 +10,8 @@ type Field =
   | 'createdAt'
   | 'favorite'
   | 'views'
-  | 'anonymous';
+  | 'anonymous'
+  | 'public';
 
 const FIELDS: {
   property: Field;
@@ -26,6 +27,7 @@ const FIELDS: {
   { property: 'favorite', visible: true, title: 'Favorite' },
   { property: 'views', visible: true, title: 'Views' },
   { property: 'anonymous', visible: false, title: 'Anonymous?' },
+  { property: 'public', visible: false, title: 'Public?' },
 ];
 
 export const defaultFields: FieldSettings[] = FIELDS.map(({ property, visible }) => ({

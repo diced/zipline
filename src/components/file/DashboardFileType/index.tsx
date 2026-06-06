@@ -62,6 +62,7 @@ export default function DashboardFileType({
   allowZoom,
   fullscreen,
   scrollParent,
+  forceRaw,
 }: {
   file: DbFile | File;
   show?: boolean;
@@ -70,11 +71,11 @@ export default function DashboardFileType({
   allowZoom?: boolean;
   fullscreen?: boolean;
   scrollParent?: HTMLElement | null;
+  forceRaw?: boolean;
 }) {
   const disableMediaPreview = useSettingsStore((state) => state.settings.disableMediaPreview);
-  const mediaAutoMuted = useSettingsStore((state) => state.settings.mediaAutoMuted);
 
-  const { fileUrl, thumbnailUrl, viewUrl } = useFileUrls({ file, token });
+  const { fileUrl, thumbnailUrl, viewUrl } = useFileUrls({ file, token, forceRaw });
   const db = isDbFile(file) ? file : null;
 
   const extension = file.name.split('.').pop() || '';
@@ -144,7 +145,8 @@ export default function DashboardFileType({
       <video
         width={fullscreen ? undefined : '100%'}
         autoPlay
-        muted={mediaAutoMuted}
+        loop
+        muted={false}
         controls
         src={fileUrl}
         style={{
@@ -209,7 +211,7 @@ export default function DashboardFileType({
   if (type === 'audio') {
     if (!fileUrl) return <Loader />;
     return show ? (
-      <audio autoPlay muted={mediaAutoMuted} controls style={{ width: '100%' }} src={fileUrl} />
+      <audio autoPlay loop muted={false} controls style={{ width: '100%' }} src={fileUrl} />
     ) : (
       <Placeholder text={`Click to play audio ${file.name}`} Icon={fileIcon(file.type)} />
     );
@@ -240,13 +242,15 @@ export default function DashboardFileType({
 
     return (
       <FullscreenFrame fullscreen={fullscreen} parent={scrollParent}>
-        <Render
-          mode={renderIn}
-          language={extension}
-          code={fileContent}
-          noClamp={fullscreen}
-          scrollParent={scrollParent}
-        />
+        <div className='selectable-text'>
+          <Render
+            mode={renderIn}
+            language={extension}
+            code={fileContent}
+            noClamp={fullscreen}
+            scrollParent={scrollParent}
+          />
+        </div>
       </FullscreenFrame>
     );
   }

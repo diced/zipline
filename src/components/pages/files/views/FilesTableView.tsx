@@ -366,6 +366,12 @@ export default function FileTable({
       title: 'Anonymous?',
       render: (file: File) => (file.anonymous ? <Text c='green'>Yes</Text> : 'No'),
     },
+    {
+      accessor: 'public',
+      sortable: true,
+      title: 'Public?',
+      render: (file: File) => (file.public ? <Text c='blue'>Yes</Text> : 'No'),
+    },
   ];
 
   const visibleFields = fields.filter((f) => f.visible).map((f) => f.field);

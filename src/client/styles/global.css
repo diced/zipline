@@ -13,3 +13,30 @@
 .mantine-datatable {
   border-radius: var(--mantine-radius-default);
 }
+
+body {
+  user-select: none;
+}
+
+input,
+textarea,
+[contenteditable='true'],
+.selectable-text,
+.selectable-text *,
+pre,
+code,
+pre *,
+code *,
+.mantine-CodeHighlight-code,
+.mantine-CodeHighlight-code * {
+  user-select: text !important;
+}
+
+img,
+video {
+  -webkit-user-drag: none !important;
+  -khtml-user-drag: none !important;
+  -moz-user-drag: none !important;
+  -o-user-drag: none !important;
+  user-drag: none !important;
+}

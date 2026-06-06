@@ -12,7 +12,15 @@ export function isDbFile(file: DbFile | File): file is DbFile {
   return typeof globalThis.File !== 'undefined' ? !(file instanceof globalThis.File) : 'thumbnail' in file;
 }
 
-export default function useFileUrls({ file, token }: { file: DbFile | File; token?: string | null }): {
+export default function useFileUrls({
+  file,
+  token,
+  forceRaw,
+}: {
+  file: DbFile | File;
+  token?: string | null;
+  forceRaw?: boolean;
+}): {
   fileUrl: string;
   thumbnailUrl: string | null;
   viewUrl: string | null;
@@ -25,12 +33,13 @@ export default function useFileUrls({ file, token }: { file: DbFile | File; toke
     if (!isDbFile(file)) return { fileUrl: blobUrl ?? '', thumbnailUrl: null, viewUrl: null };
 
     const thumb = file.thumbnail?.path;
-    const thumbnailUrl = thumb ? (user ? `/api/user/files/${thumb}/raw` : `/raw/${thumb}`) : null;
+    const useUserApi = user && !forceRaw;
+    const thumbnailUrl = thumb ? (useUserApi ? `/api/user/files/${thumb}/raw` : `/raw/${thumb}`) : null;
 
     return {
-      fileUrl: appendToken(user ? `/api/user/files/${file.id}/raw` : `/raw/${file.name}`, token),
+      fileUrl: appendToken(useUserApi ? `/api/user/files/${file.id}/raw` : `/raw/${file.name}`, token),
       viewUrl: appendToken(`/view/${file.name}`, token),
       thumbnailUrl,
     };
-  }, [token, blobUrl, file, user]);
+  }, [token, blobUrl, file, user, forceRaw]);
 }

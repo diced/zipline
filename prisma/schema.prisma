@@ -287,6 +287,10 @@ model File {
   favorite     Boolean @default(false)
   password     String?
   anonymous    Boolean @default(false)
+  public       Boolean @default(false)
+
+  width        Int?
+  height       Int?
 
   tags Tag[]
 

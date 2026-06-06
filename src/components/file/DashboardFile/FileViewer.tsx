@@ -567,6 +567,7 @@ export default function FileViewer({
                 fullscreen
                 allowZoom={false}
                 scrollParent={scrollParent}
+                forceRaw={reduce}
               />
 
               {sequenced && fileNavButtons && file && (
