@@ -19,6 +19,8 @@ export async function unixSocketPath() {
     logger.warn('removed existing unix socket before listen', { path });
     return path;
   } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return path;
+
     logger.warn('error while checking for existing unix socket', { path, error });
     process.exit(1);
   }
