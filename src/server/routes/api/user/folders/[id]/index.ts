@@ -30,6 +30,11 @@ const paramsSchema = z.object({
   id: z.string(),
 });
 
+const folderMutationInclude = {
+  _count: { select: { children: true, files: true } },
+  parent: { select: { id: true, name: true, parentId: true } },
+} as const;
+
 const folderExistsAndEditable = async (req: FastifyRequest) => {
   const { id } = req.params as z.infer<typeof paramsSchema>;
 
@@ -157,15 +162,7 @@ export default typedPlugin(
             data: {
               files: { connect: { id } },
             },
-            include: {
-              files: {
-                select: {
-                  ...fileSelect,
-                  password: true,
-                },
-              },
-              User: true,
-            },
+            include: folderMutationInclude,
           });
 
           logger.info('file added to folder', { folder: folderId, file: id });
@@ -235,20 +232,7 @@ export default typedPlugin(
               ...(allowUploads !== undefined && { allowUploads }),
               ...(parentId !== undefined && { parentId }),
             },
-            include: {
-              files: {
-                select: {
-                  ...fileSelect,
-                  password: true,
-                },
-              },
-              _count: {
-                select: { children: true, files: true },
-              },
-              parent: {
-                select: { id: true, name: true, parentId: true },
-              },
-            },
+            include: folderMutationInclude,
           });
 
           logger.info('folder updated', {
@@ -405,14 +389,7 @@ export default typedPlugin(
               data: {
                 files: { disconnect: { id } },
               },
-              include: {
-                files: {
-                  select: {
-                    ...fileSelect,
-                    password: true,
-                  },
-                },
-              },
+              include: folderMutationInclude,
             });
 
             logger.info('file removed from folder', { folder: nFolder.id, file: id });
