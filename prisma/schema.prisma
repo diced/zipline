@@ -36,6 +36,8 @@ model Zipline {
   filesRoute                    String   @default("/u")
   filesLength                   Int      @default(6)
   filesDefaultFormat            String   @default("random")
+  filesDisabledTypes            String[] @default([])
+  filesDisabledTypesDefault     String?
   filesDisabledExtensions       String[]
   filesMaxFileSize              String   @default("100mb")
   filesDefaultExpiration        String?

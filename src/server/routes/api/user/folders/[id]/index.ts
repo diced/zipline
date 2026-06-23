@@ -1,4 +1,5 @@
 import { ApiError } from '@/lib/api/errors';
+import { datasource } from '@/lib/datasource';
 import { prisma } from '@/lib/db';
 import { fileSelect } from '@/lib/db/models/file';
 import { buildParentChain, Folder, cleanFolder, folderSchema } from '@/lib/db/models/folder';
@@ -274,7 +275,7 @@ export default typedPlugin(
             delete: z.enum(['file', 'folder']),
             id: zStringTrimmed.optional(),
 
-            childrenAction: z.enum(['root', 'folder', 'cascade']).optional(),
+            childrenAction: z.enum(['root', 'folder', 'cascade', 'cascade-files']).optional(),
             targetFolderId: z.string().optional(),
           }),
           params: paramsSchema,
@@ -306,6 +307,8 @@ export default typedPlugin(
           }
 
           try {
+            const toDeleteFiles: string[] = [];
+
             const result = await prisma.$transaction(async (tx) => {
               if (!childrenAction) {
                 return { success: true };
@@ -327,7 +330,9 @@ export default typedPlugin(
                 });
 
                 return { success: true };
-              } else if (childrenAction === 'cascade') {
+              } else if (childrenAction === 'cascade' || childrenAction === 'cascade-files') {
+                const deleteFiles = childrenAction === 'cascade-files';
+
                 const deleteRecursive = async (id: string) => {
                   const children = await tx.folder.findMany({
                     where: { parentId: id },
@@ -336,6 +341,16 @@ export default typedPlugin(
                   for (const child of children) {
                     await deleteRecursive(child.id);
                   }
+
+                  if (deleteFiles) {
+                    const files = await tx.file.findMany({
+                      where: { folderId: id },
+                      select: { name: true },
+                    });
+                    toDeleteFiles.push(...files.map((f) => f.name));
+                    await tx.file.deleteMany({ where: { folderId: id } });
+                  }
+
                   await tx.folder.delete({ where: { id } });
                 };
 
@@ -348,7 +363,11 @@ export default typedPlugin(
             if (!result?.success) throw new ApiError(1019);
 
             if (result?.isCascade) {
-              logger.info('folder cascade deleted', { folder: folderId });
+              for (const name of toDeleteFiles) {
+                await datasource.delete(name);
+              }
+
+              logger.info('folder cascade deleted', { folder: folderId, files: toDeleteFiles.length });
               return res.send({ success: true });
             } else {
               await prisma.folder.delete({ where: { id: folderId } });

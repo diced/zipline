@@ -36,6 +36,24 @@ export function Placeholder({ text, Icon, ...props }: { text: string; Icon: Icon
   );
 }
 
+function FullscreenSizedMedia({ children }: { children: React.ReactNode }) {
+  return (
+    <Box
+      style={{
+        flex: 1,
+        alignSelf: 'stretch',
+        minHeight: 0,
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      {children}
+    </Box>
+  );
+}
+
 export default function DashboardFileType({
   file,
   show,
@@ -54,6 +72,8 @@ export default function DashboardFileType({
   scrollParent?: HTMLElement | null;
 }) {
   const disableMediaPreview = useSettingsStore((state) => state.settings.disableMediaPreview);
+  const mediaAutoMuted = useSettingsStore((state) => state.settings.mediaAutoMuted);
+
   const { fileUrl, thumbnailUrl, viewUrl } = useFileUrls({ file, token });
   const db = isDbFile(file) ? file : null;
 
@@ -97,9 +117,6 @@ export default function DashboardFileType({
   }
 
   const isAsciicast = file.type === 'application/x-asciicast' || file.name.endsWith('.cast');
-  const mediaMax = fullscreen
-    ? { maxWidth: 'min(96vw, calc(100vw - 3rem))', maxHeight: 'calc(100vh - 7.5rem)' }
-    : undefined;
 
   if (type === 'video') {
     if (!fileUrl) return <Loader />;
@@ -123,21 +140,24 @@ export default function DashboardFileType({
       return <Placeholder text={`Click to play video ${file.name}`} Icon={fileIcon(file.type)} />;
     }
 
-    return (
+    const video = (
       <video
-        width='100%'
+        width={fullscreen ? undefined : '100%'}
         autoPlay
-        muted
+        muted={mediaAutoMuted}
         controls
         src={fileUrl}
         style={{
           cursor: 'pointer',
+          objectFit: 'contain',
           ...(fullscreen
-            ? { ...mediaMax, width: 'auto', height: 'auto' }
-            : { maxWidth: '85vw', maxHeight: '85vh' }),
+            ? { maxWidth: '100%', maxHeight: '100%', width: 'auto', height: 'auto' }
+            : { maxWidth: '85vw', maxHeight: '85vh', width: '100%' }),
         }}
       />
     );
+
+    return fullscreen ? <FullscreenSizedMedia>{video}</FullscreenSizedMedia> : video;
   }
 
   if (type === 'image') {
@@ -147,20 +167,26 @@ export default function DashboardFileType({
       return <MantineImage fit='contain' mah={400} src={fileUrl} alt={file.name || 'Image'} />;
     }
 
+    const image = (
+      <MantineImage
+        src={fileUrl}
+        alt={file.name || 'Image'}
+        fit='contain'
+        style={{
+          cursor: allowZoom ? 'zoom-in' : 'default',
+          objectFit: 'contain',
+          display: 'block',
+          ...(fullscreen
+            ? { maxWidth: '100%', maxHeight: '100%', width: 'auto', height: 'auto' }
+            : { maxWidth: '70vw', maxHeight: '70vw' }),
+        }}
+        onClick={() => allowZoom && setZoomOpen(true)}
+      />
+    );
+
     return (
-      <Center>
-        <MantineImage
-          src={fileUrl}
-          alt={file.name || 'Image'}
-          style={{
-            cursor: allowZoom ? 'zoom-in' : 'default',
-            objectFit: 'contain',
-            ...(fullscreen
-              ? { ...mediaMax, width: 'auto', height: 'auto' }
-              : { maxWidth: '70vw', maxHeight: '70vw' }),
-          }}
-          onClick={() => allowZoom && setZoomOpen(true)}
-        />
+      <>
+        {fullscreen ? <FullscreenSizedMedia>{image}</FullscreenSizedMedia> : <Center>{image}</Center>}
         {allowZoom && zoomOpen && (
           <FileZoomModal setOpen={setZoomOpen}>
             <MantineImage
@@ -176,14 +202,14 @@ export default function DashboardFileType({
             />
           </FileZoomModal>
         )}
-      </Center>
+      </>
     );
   }
 
   if (type === 'audio') {
     if (!fileUrl) return <Loader />;
     return show ? (
-      <audio autoPlay muted controls style={{ width: '100%' }} src={fileUrl} />
+      <audio autoPlay muted={mediaAutoMuted} controls style={{ width: '100%' }} src={fileUrl} />
     ) : (
       <Placeholder text={`Click to play audio ${file.name}`} Icon={fileIcon(file.type)} />
     );

@@ -1,4 +1,4 @@
-import { useQueryState } from '@/lib/client/hooks/useQueryState';
+import DashboardFile from '@/components/file/DashboardFile';
 import { useFileNavStore } from '@/lib/client/store/fileNav';
 import {
   Button,
@@ -14,20 +14,19 @@ import {
   Title,
 } from '@mantine/core';
 import { IconFilesOff, IconFileUpload } from '@tabler/icons-react';
-import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
+import { parseAsInteger, useQueryState } from 'nuqs';
+import { lazy, Suspense, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useShallow } from 'zustand/shallow';
-
-import DashboardFile from '@/components/file/DashboardFile';
 import { useApiPagination } from '../useApiPagination';
 
 const DashboardFileModal = lazy(() => import('@/components/file/DashboardFile/DashboardFileModal'));
 
-const PER_PAGE_OPTIONS = [9, 12, 15, 30, 45];
+const PER_PAGE_OPTIONS = [9, 12, 15, 30, 45, 60];
 
 export default function Files({ id, folderId }: { id?: string; folderId?: string }) {
-  const [page, setPage] = useQueryState('page', 1);
-  const [perpage, setPerpage] = useState(15);
+  const [page, setPage] = useQueryState('page', parseAsInteger.withDefault(1));
+  const [perpage, setPerpage] = useQueryState('perpage', parseAsInteger.withDefault(15));
 
   const { data, isLoading } = useApiPagination({
     page,

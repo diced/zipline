@@ -4,7 +4,7 @@ import { checkOutput, COMPRESS_TYPES } from '@/lib/compress';
 import { reloadSettings } from '@/lib/config';
 import type { readDatabaseSettings } from '@/lib/config/read/db';
 import { safeConfig } from '@/lib/config/safe';
-import { MAX_SAFE_TIMEOUT_MS } from '@/lib/config/validate';
+import { MAX_SAFE_TIMEOUT_MS, MIME_REGEX } from '@/lib/config/validate';
 import { prisma } from '@/lib/db';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
@@ -181,6 +181,8 @@ export default typedPlugin(
                 'Provided route is reserved',
               ),
             filesLength: z.number().min(1).max(64),
+            filesDisabledTypes: z.array(z.string().regex(MIME_REGEX, 'Invalid MIME type')),
+            filesDisabledTypesDefault: z.string().regex(MIME_REGEX, 'Invalid MIME type').nullable(),
             filesDefaultFormat: z.enum(['random', 'date', 'uuid', 'name', 'gfycat']),
             filesDisabledExtensions: z
               .union([
@@ -191,7 +193,6 @@ export default typedPlugin(
                 typeof value === 'string' ? value.split(',').map((ext) => ext.trim()) : value,
               ),
             filesMaxFileSize: zBytes,
-
             filesDefaultExpiration: zMs.nullable(),
             filesMaxExpiration: zMs.nullable(),
             filesAssumeMimetypes: z.boolean(),

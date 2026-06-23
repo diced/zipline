@@ -2,10 +2,10 @@ import { ApiError } from '@/lib/api/errors';
 import { config } from '@/lib/config';
 import { createToken, hashPassword } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
-import { User, userSchema, userSelect } from '@/lib/db/models/user';
+import { LimitedUser, limitedUserSchema, limitedUserSelect } from '@/lib/db/models/user';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
-import { canInteract } from '@/lib/role';
+import { canInteract, interactableRoles } from '@/lib/role';
 import { zQsBoolean, zStringTrimmed } from '@/lib/validation';
 import { Role } from '@/prisma/client';
 import { administratorMiddleware } from '@/server/middleware/administrator';
@@ -14,7 +14,7 @@ import typedPlugin from '@/server/typedPlugin';
 import { readFile } from 'fs/promises';
 import { z } from 'zod';
 
-export type ApiUsersResponse = User[] | User;
+export type ApiUsersResponse = LimitedUser[] | LimitedUser;
 
 const logger = log('api').c('users');
 
@@ -33,19 +33,22 @@ export default typedPlugin(
             'List users in the instance, optionally excluding the current admin from the results (admin only).',
           querystring: querySchema,
           response: {
-            200: z.array(userSchema),
+            200: z.array(limitedUserSchema),
           },
           tags: ['auth', 'admin'],
         },
         preHandler: [userMiddleware, administratorMiddleware],
       },
       async (req, res) => {
+        const roles = interactableRoles(req.user.role);
+
         const users = await prisma.user.findMany({
           select: {
-            ...userSelect,
+            ...limitedUserSelect,
             avatar: true,
           },
           where: {
+            role: { in: roles },
             ...(req.query.noincl && { id: { not: req.user.id } }),
           },
         });
@@ -67,7 +70,7 @@ export default typedPlugin(
             role: z.enum(Role).default('USER').optional(),
           }),
           response: {
-            200: userSchema,
+            200: limitedUserSchema,
           },
           tags: ['auth', 'admin'],
         },
@@ -106,11 +109,7 @@ export default typedPlugin(
             avatar: avatar64 ?? null,
             token: createToken(),
           },
-          select: {
-            ...userSelect,
-            totpSecret: false,
-            passkeys: false,
-          },
+          select: limitedUserSelect,
         });
 
         logger.info(`${req.user.username} created a new user`, {

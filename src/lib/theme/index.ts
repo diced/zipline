@@ -47,6 +47,7 @@ export function themeComponents(theme: ZiplineTheme): MantineThemeOverride {
   return {
     ...rest,
     variantColorResolver: variantColorResolver,
+    defaultRadius: 'md',
     components: {
       ...components,
       AppShell: AppShell.extend({

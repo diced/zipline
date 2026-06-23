@@ -37,24 +37,23 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const { noincl, user, parentId, root } = req.query;
+        const { noincl, user: userId, parentId, root } = req.query;
 
-        if (user) {
-          const user = await prisma.user.findUnique({
+        if (userId) {
+          const targetUser = await prisma.user.findUnique({
             where: {
-              id: req.user.id,
+              id: userId,
             },
           });
 
-          if (!user) throw new ApiError(4009);
-          if (req.user.id !== user.id) {
-            if (!canInteract(req.user.role, user.role)) throw new ApiError(4009);
-          }
+          if (!targetUser) throw new ApiError(4009);
+          if (req.user.id !== targetUser.id && !canInteract(req.user.role, targetUser.role))
+            throw new ApiError(4009);
         }
 
         const folders = await prisma.folder.findMany({
           where: {
-            userId: user || req.user.id,
+            userId: userId || req.user.id,
             ...(root && { parentId: null }),
             ...(parentId && { parentId }),
           },
@@ -133,6 +132,7 @@ export default typedPlugin(
               id: {
                 in: files,
               },
+              userId: req.user.id,
             },
             select: {
               id: true,

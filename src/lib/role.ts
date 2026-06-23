@@ -11,6 +11,12 @@ export function canInteract(current?: Role, target?: Role) {
   );
 }
 
+export function interactableRoles(current?: Role): Role[] {
+  if (current === 'SUPERADMIN') return ['USER', 'ADMIN'];
+  if (current === 'ADMIN') return ['USER'];
+  return [];
+}
+
 export function roleName(role?: Role) {
   switch (role) {
     case 'USER':

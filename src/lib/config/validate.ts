@@ -18,6 +18,8 @@ declare global {
   }
 }
 
+export const MIME_REGEX = /^[a-zA-Z0-9!#$&^_\-\+.]+\/[a-zA-Z0-9!#$&^_\-\+.]+$/gi;
+
 export const MAX_SAFE_TIMEOUT_MS = 2147483647;
 
 export function validateInterval(value: string): boolean {
@@ -131,6 +133,8 @@ export const schema = z.object({
     route: z.string().startsWith('/').min(1).trim().toLowerCase().default('/u'),
     length: z.number().default(6),
     defaultFormat: z.enum(['random', 'date', 'uuid', 'name', 'gfycat', 'random-words']).default('random'),
+    disabledTypes: z.array(z.string().regex(MIME_REGEX, 'Invalid MIME type format')).default([]),
+    disabledTypesDefault: z.string().nullable().default(null),
     disabledExtensions: z.array(z.string()).default([]),
     maxFileSize: z.string().default('100mb'),
     defaultExpiration: z.string().nullable().default(null),

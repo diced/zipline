@@ -96,13 +96,7 @@ export default function DashboardInvites() {
               {...form.getInputProps('maxUses')}
             />
 
-            <Button
-              type='submit'
-              variant='outline'
-              fullWidth
-              radius='sm'
-              leftSection={<IconPlus size='1rem' />}
-            >
+            <Button type='submit' variant='outline' fullWidth leftSection={<IconPlus size='1rem' />}>
               Create
             </Button>
           </Stack>

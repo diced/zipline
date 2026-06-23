@@ -3,6 +3,7 @@ import { access, constants, copyFile, readdir, rename, rm, stat, writeFile } fro
 import { join, resolve, sep } from 'path';
 import { Readable } from 'stream';
 import { Datasource, ListOptions, PutOptions } from './Datasource';
+import { log } from '../logger';
 
 async function existsAndCanRW(path: string): Promise<boolean> {
   try {
@@ -19,6 +20,7 @@ function isCrossDeviceMove(error: unknown): boolean {
 
 export class LocalDatasource extends Datasource {
   name = 'local';
+  logger = log('datasource').c('local');
 
   constructor(public dir: string) {
     super();
@@ -44,9 +46,7 @@ export class LocalDatasource extends Datasource {
 
   public async put(file: string, data: Buffer | string, { noDelete }: PutOptions): Promise<void> {
     const path = this.resolvePath(file);
-    if (!path) {
-      throw new Error('Invalid path provided');
-    }
+    if (!path) throw new Error('Invalid path provided');
 
     // handles path-based writes without duplicating bytes when the source can be consumed
     if (typeof data === 'string' && data.startsWith('/')) {
@@ -82,14 +82,17 @@ export class LocalDatasource extends Datasource {
       return;
     }
 
-    const path = join(this.dir, file);
+    const path = this.resolvePath(file);
+    if (!path) throw new Error('Invalid path provided');
+
     if (!existsSync(path)) return Promise.resolve();
 
     return rm(path);
   }
 
   public async size(file: string): Promise<number> {
-    const path = join(this.dir, file);
+    const path = this.resolvePath(file);
+    if (!path) throw new Error('Invalid path provided');
     if (!existsSync(path)) return 0;
 
     const { size } = await stat(path);
@@ -111,15 +114,18 @@ export class LocalDatasource extends Datasource {
   }
 
   public async range(file: string, start: number, end: number): Promise<Readable> {
-    const path = join(this.dir, file);
+    const path = this.resolvePath(file);
+    if (!path) throw new Error('Invalid path provided');
+
     const readStream = createReadStream(path, { start, end });
 
     return readStream;
   }
 
   public async rename(from: string, to: string): Promise<void> {
-    const fromPath = join(this.dir, from);
-    const toPath = join(this.dir, to);
+    const fromPath = this.resolvePath(from);
+    const toPath = this.resolvePath(to);
+    if (!fromPath || !toPath) throw new Error('Invalid path provided');
 
     if (!existsSync(fromPath))
       throw new Error(`Something went very wrong! File ${from} does not exist in local datasource.`);

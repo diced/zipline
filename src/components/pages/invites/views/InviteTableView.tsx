@@ -49,7 +49,6 @@ export default function InviteTableView() {
 
       <Box my='sm'>
         <DataTable
-          borderRadius='sm'
           withTableBorder
           minHeight={200}
           records={sorted ?? []}

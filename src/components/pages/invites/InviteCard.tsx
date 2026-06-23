@@ -19,7 +19,7 @@ export default function InviteCard({
 
   return (
     <>
-      <Card withBorder shadow='sm' radius='sm'>
+      <Card withBorder shadow='sm'>
         <Card.Section withBorder inheritPadding py='xs'>
           <Group justify='space-between'>
             <Anchor href={`/invite/${invite.code}`} target='_blank' fw={400}>

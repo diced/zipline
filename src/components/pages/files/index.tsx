@@ -1,5 +1,4 @@
 import GridTableSwitcher from '@/components/GridTableSwitcher';
-import useObjectState, { type UpdateFn } from '@/lib/client/hooks/useObjectState';
 import { useViewStore } from '@/lib/client/store/view';
 import { ActionIcon, Group, Menu, Title, Tooltip } from '@mantine/core';
 import {
@@ -10,7 +9,8 @@ import {
   IconTableOptions,
   IconTags,
 } from '@tabler/icons-react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { parseAsBoolean, useQueryStates } from 'nuqs';
+import { Link } from 'react-router-dom';
 import PendingFilesModal from './PendingFilesModal';
 import TagsModal from './tags/TagsModal';
 import FavoriteFiles from './views/FavoriteFiles';
@@ -24,48 +24,21 @@ export type DashboardFilesModals = {
   pending: boolean;
 };
 
+export function useModals() {
+  return useQueryStates({
+    table: parseAsBoolean.withDefault(false),
+    idSearch: parseAsBoolean.withDefault(false),
+    tags: parseAsBoolean.withDefault(false),
+    pending: parseAsBoolean.withDefault(false),
+  });
+}
+
+export type DashboardFilesModalsUpdate = ReturnType<typeof useModals>[1];
+
 export default function DashboardFiles() {
   const view = useViewStore((state) => state.files);
-  const [searchParams, setSearchParams] = useSearchParams();
-  const modalKeys: Array<keyof DashboardFilesModals> = ['table', 'idSearch', 'tags', 'pending'];
 
-  const modalQS = (key: keyof DashboardFilesModals) => searchParams.get(key) === 'true';
-
-  const [modals, setModalState] = useObjectState<DashboardFilesModals>({
-    table: modalQS('table'),
-    idSearch: modalQS('idSearch'),
-    tags: modalQS('tags'),
-    pending: modalQS('pending'),
-  });
-
-  const updateModalQuery = (updates: Partial<DashboardFilesModals>) => {
-    setSearchParams(
-      (prev) => {
-        const next = new URLSearchParams(prev);
-
-        for (const key of modalKeys) {
-          if (!(key in updates)) continue;
-
-          if (updates[key]) next.set(key, 'true');
-          else next.delete(key);
-        }
-
-        return next;
-      },
-      { replace: true },
-    );
-  };
-
-  const setModals: UpdateFn<DashboardFilesModals> = (keyOrObj: any, value?: any) => {
-    if (typeof keyOrObj === 'object' && value === undefined) {
-      setModalState(keyOrObj);
-      updateModalQuery(keyOrObj);
-      return;
-    }
-
-    setModalState(keyOrObj, value);
-    updateModalQuery({ [keyOrObj]: value });
-  };
+  const [modals, setModals] = useModals();
 
   return (
     <>
@@ -92,12 +65,15 @@ export default function DashboardFiles() {
             </Tooltip>
           </Menu.Target>
           <Menu.Dropdown>
-            <Menu.Item leftSection={<IconTags size='1rem' />} onClick={() => setModals('tags', !modals.tags)}>
+            <Menu.Item
+              leftSection={<IconTags size='1rem' />}
+              onClick={() => setModals({ tags: !modals.tags })}
+            >
               Manage Tags
             </Menu.Item>
             <Menu.Item
               leftSection={<IconFileDots size='1rem' />}
-              onClick={() => setModals('pending', !modals.pending)}
+              onClick={() => setModals({ pending: !modals.pending })}
             >
               View Pending Files
             </Menu.Item>
@@ -106,13 +82,13 @@ export default function DashboardFiles() {
                 <Menu.Label>Table Options</Menu.Label>
                 <Menu.Item
                   leftSection={<IconGridPatternFilled size='1rem' />}
-                  onClick={() => setModals('idSearch', !modals.idSearch)}
+                  onClick={() => setModals({ idSearch: !modals.idSearch })}
                 >
                   Search by ID
                 </Menu.Item>
                 <Menu.Item
                   leftSection={<IconTableOptions size='1rem' />}
-                  onClick={() => setModals('table', !modals.table)}
+                  onClick={() => setModals({ table: !modals.table })}
                 >
                   Table Options
                 </Menu.Item>

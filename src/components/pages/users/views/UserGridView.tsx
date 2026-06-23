@@ -1,13 +1,11 @@
-import { Response } from '@/lib/api/response';
-import { User } from '@/lib/db/models/user';
+import { LimitedUser } from '@/lib/db/models/user';
 import { Center, Group, Paper, SimpleGrid, Skeleton, Stack, Text, Title } from '@mantine/core';
 import { IconFilesOff } from '@tabler/icons-react';
 import useSWR from 'swr';
 import UserCard from '../UserCard';
 
 export default function UserGridView() {
-  const { data: users, isLoading } =
-    useSWR<Extract<Response['/api/users'], User[]>>('/api/users?noincl=true');
+  const { data: users, isLoading } = useSWR<LimitedUser[]>('/api/users?noincl=true');
 
   return (
     <>

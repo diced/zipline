@@ -4,7 +4,6 @@ import FolderComboboxOptions from '@/components/folders/FolderComboboxOptions';
 import { Response } from '@/lib/api/response';
 import { bytes } from '@/lib/bytes';
 import { useFolders } from '@/lib/client/hooks/useFolders';
-import { useQueryState } from '@/lib/client/hooks/useQueryState';
 import { useFileNavStore } from '@/lib/client/store/fileNav';
 import { NAMES, useFileTableSettingsStore } from '@/lib/client/store/fileTableSettings';
 import { useSettingsStore } from '@/lib/client/store/settings';
@@ -41,13 +40,12 @@ import {
   IconTrashFilled,
 } from '@tabler/icons-react';
 import { DataTable } from 'mantine-datatable';
+import { parseAsInteger, useQueryState } from 'nuqs';
 import { lazy, useEffect, useMemo, useReducer, useState } from 'react';
 import { Link } from 'react-router-dom';
 import useSWR from 'swr';
 import { useShallow } from 'zustand/shallow';
-
-import { UpdateFn } from '@/lib/client/hooks/useObjectState';
-import { DashboardFilesModals } from '..';
+import { DashboardFilesModals, DashboardFilesModalsUpdate } from '..';
 import TableEditModal from '../TableEditModal';
 import { bulkDelete, bulkFavorite } from '../bulk';
 import TagPill from '../tags/TagPill';
@@ -60,7 +58,7 @@ type ReducerQuery = {
   action: { field: string; query: string };
 };
 
-const PER_PAGE_OPTIONS = [10, 20, 50];
+const PER_PAGE_OPTIONS = [10, 20, 50, 70, 100];
 
 function SearchFilter({
   setSearchField,
@@ -189,7 +187,7 @@ export default function FileTable({
   id?: string;
   folderId?: string;
   modals?: Partial<DashboardFilesModals>;
-  setModals?: UpdateFn<DashboardFilesModals>;
+  setModals?: DashboardFilesModalsUpdate;
 }) {
   const clipboard = useClipboard();
   const warnDeletion = useSettingsStore((state) => state.settings.warnDeletion);
@@ -203,8 +201,8 @@ export default function FileTable({
     return buildFolderHierarchy(folders);
   }, [folders]);
 
-  const [page, setPage] = useQueryState('page', 1);
-  const [perpage, setPerpage] = useState(20);
+  const [page, setPage] = useQueryState('page', parseAsInteger.withDefault(1));
+  const [perpage, setPerpage] = useQueryState('perpage', parseAsInteger.withDefault(20));
   const [sort, setSort] = useState<
     | 'id'
     | 'createdAt'
@@ -394,7 +392,7 @@ export default function FileTable({
       />
 
       {modals && setModals && (
-        <TableEditModal opened={!!modals.table} onClose={() => setModals('table', false)} />
+        <TableEditModal opened={!!modals.table} onClose={() => setModals({ table: false })} />
       )}
 
       <Box>
@@ -510,7 +508,6 @@ export default function FileTable({
         {/*@ts-ignore*/}
         <DataTable
           mt='xs'
-          borderRadius='sm'
           withTableBorder
           minHeight={200}
           records={data?.page ?? []}

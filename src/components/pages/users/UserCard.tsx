@@ -1,4 +1,4 @@
-import { User } from '@/lib/db/models/user';
+import { LimitedUser } from '@/lib/db/models/user';
 import { ActionIcon, Avatar, Card, Group, Menu, Stack, Text } from '@mantine/core';
 import { useUserStore } from '@/lib/client/store/user';
 import { IconDots, IconFiles, IconTrashFilled, IconUserEdit } from '@tabler/icons-react';
@@ -9,7 +9,7 @@ import RelativeDate from '@/components/RelativeDate';
 import { canInteract, isAdministrator, roleName } from '@/lib/role';
 import { Link } from 'react-router-dom';
 
-export default function UserCard({ user }: { user: User }) {
+export default function UserCard({ user }: { user: LimitedUser }) {
   const currentUser = useUserStore((state) => state.user);
 
   const [opened, setOpen] = useState(false);
@@ -18,7 +18,7 @@ export default function UserCard({ user }: { user: User }) {
     <>
       <EditUserModal user={user} opened={opened} onClose={() => setOpen(false)} />
 
-      <Card withBorder shadow='sm' radius='sm'>
+      <Card withBorder shadow='sm'>
         <Card.Section withBorder inheritPadding py='xs'>
           <Group justify='space-between'>
             <Group>

@@ -13,7 +13,10 @@ export const defaultChartProps: Partial<LineChartProps> & { dataKey: string } = 
   dataKey: 'date',
 };
 
-export function percentChange(a: number, b: number): [string, string] {
+export function percentChange(a: number | bigint, b: number | bigint): [string, string] {
+  if (typeof a === 'bigint') a = Number(a);
+  if (typeof b === 'bigint') b = Number(b);
+
   const change = Math.round(((b - a) / a) * 100);
   const color = change > 0 ? 'green' : change < 0 ? 'red' : 'gray';
 

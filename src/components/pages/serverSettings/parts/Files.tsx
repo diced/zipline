@@ -3,7 +3,7 @@ import { Button, LoadingOverlay, NumberInput, Select, Stack, Switch, TextInput }
 import { useForm } from '@mantine/form';
 import { IconDeviceFloppy } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
-import { settingsOnSubmit } from '../settingsOnSubmit';
+import { checkCommaArray, settingsOnSubmit } from '../settingsOnSubmit';
 import useServerSettings from '../useServerSettings';
 
 export default function Files() {
@@ -25,6 +25,8 @@ function Form({ data, isLoading }: { data: Response['/api/server/settings']; isL
       filesRoute: data.settings.filesRoute,
       filesLength: data.settings.filesLength,
       filesDefaultFormat: data.settings.filesDefaultFormat,
+      filesDisabledTypes: data.settings.filesDisabledTypes.join(', '),
+      filesDisabledTypesDefault: data.settings.filesDisabledTypesDefault,
       filesDisabledExtensions: data.settings.filesDisabledExtensions.join(', '),
       filesMaxFileSize: data.settings.filesMaxFileSize,
       filesDefaultExpiration: data.settings.filesDefaultExpiration,
@@ -55,24 +57,16 @@ function Form({ data, isLoading }: { data: Response['/api/server/settings']; isL
       values.filesMaxExpiration = values.filesMaxExpiration.trim();
     }
 
-    if (!values.filesDisabledExtensions) {
-      // @ts-ignore
-      values.filesDisabledExtensions = [];
-    } else if (
-      values.filesDisabledExtensions &&
-      typeof values.filesDisabledExtensions === 'string' &&
-      values.filesDisabledExtensions.trim() === ''
-    ) {
-      // @ts-ignore
-      values.filesDisabledExtensions = [];
+    if (values.filesDisabledTypesDefault?.trim() === '' || !values.filesDisabledTypesDefault) {
+      values.filesDisabledTypesDefault = null;
     } else {
-      if (!Array.isArray(values.filesDisabledExtensions))
-        // @ts-ignore
-        values.filesDisabledExtensions = values.filesDisabledExtensions
-          .split(',')
-          .map((ext) => ext.trim())
-          .filter((ext) => ext !== '');
+      values.filesDisabledTypesDefault = values.filesDisabledTypesDefault.trim();
     }
+
+    // @ts-ignore
+    values.filesDisabledExtensions = checkCommaArray(values.filesDisabledExtensions);
+    // @ts-ignore
+    values.filesDisabledTypes = checkCommaArray(values.filesDisabledTypes);
 
     return settingsOnSubmit(navigate, form)(values);
   };
@@ -84,6 +78,20 @@ function Form({ data, isLoading }: { data: Response['/api/server/settings']; isL
           label='Assume Mimetypes'
           description='Assume the mimetype of a file for its extension.'
           {...form.getInputProps('filesAssumeMimetypes', { type: 'checkbox' })}
+        />
+
+        <TextInput
+          label='Disabled Types'
+          description='Mimetypes to disable, separated by commas. It is recommended to have the Assume Mimetypes setting enabled if you are disabling mimetypes, as this will also block files with the corresponding extensions.'
+          placeholder='text/html, application/javascript'
+          {...form.getInputProps('filesDisabledTypes')}
+        />
+
+        <TextInput
+          label='Default MIME for Disabled Types'
+          description='The default MIME type to use for disabled types. Leave blank to completely block disabled types.'
+          placeholder='application/octet-stream'
+          {...form.getInputProps('filesDisabledTypesDefault')}
         />
 
         <Switch

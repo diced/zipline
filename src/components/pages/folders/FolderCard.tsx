@@ -48,7 +48,7 @@ export default function FolderCard({
       <MoveFolderModal folder={folder} opened={moveOpen} onClose={() => setMoveOpen(false)} />
       <DeleteFolderModal opened={deleteOpen} folder={folder} onClose={() => setDeleteOpen(false)} />
 
-      <Card withBorder shadow='sm' radius='sm' style={{ cursor: onNavigate ? 'pointer' : 'default' }}>
+      <Card withBorder shadow='sm' style={{ cursor: onNavigate ? 'pointer' : 'default' }}>
         <Card.Section withBorder inheritPadding py='xs' onClick={() => onNavigate?.(folder.id)}>
           <Group justify='space-between'>
             <Group gap='xs'>

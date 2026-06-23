@@ -3,6 +3,7 @@ import { Response } from '@/lib/api/response';
 import { Folder } from '@/lib/db/models/folder';
 import { fetchApi } from '@/lib/fetchApi';
 import { buildFolderHierarchy } from '@/lib/folderHierarchy';
+import { openWarningModal } from '@/lib/client/warningModal';
 import { useFolders } from '@/lib/client/hooks/useFolders';
 import { Button, Combobox, InputBase, Modal, Radio, Stack, Text, useCombobox } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
@@ -10,7 +11,7 @@ import { IconTrashFilled } from '@tabler/icons-react';
 import { useMemo, useState } from 'react';
 import { mutateFolder } from '../actions';
 
-type ChildrenAction = 'root' | 'folder' | 'cascade';
+type ChildrenAction = 'root' | 'folder' | 'cascade' | 'cascade-files';
 
 export default function DeleteFolderModal({
   folder,
@@ -47,28 +48,8 @@ export default function DeleteFolderModal({
     return selected?.path || '';
   };
 
-  const handleDelete = async () => {
+  const performDelete = async (body: any) => {
     setLoading(true);
-
-    const body: any = {
-      delete: 'folder',
-    };
-
-    if (hasContent) {
-      body.childrenAction = childrenAction;
-      if (childrenAction === 'folder') {
-        if (!targetFolderId) {
-          notifications.show({
-            title: 'No folder selected',
-            message: 'Please select a folder to move contents to',
-            color: 'red',
-          });
-          setLoading(false);
-          return;
-        }
-        body.targetFolderId = targetFolderId;
-      }
-    }
 
     const { error } = await fetchApi<Response['/api/user/folders/[id]']>(
       `/api/user/folders/${folder.id}`,
@@ -95,6 +76,46 @@ export default function DeleteFolderModal({
     }
   };
 
+  const handleDelete = async () => {
+    const body: any = {
+      delete: 'folder',
+    };
+
+    if (hasContent) {
+      body.childrenAction = childrenAction;
+      if (childrenAction === 'folder') {
+        if (!targetFolderId) {
+          notifications.show({
+            title: 'No folder selected',
+            message: 'Please select a folder to move contents to',
+            color: 'red',
+          });
+          return;
+        }
+        body.targetFolderId = targetFolderId;
+      }
+    }
+
+    if (hasContent && (childrenAction === 'cascade' || childrenAction === 'cascade-files')) {
+      openWarningModal({
+        confirmLabel: `Delete '${folder.name}' and ${childrenAction === 'cascade-files' ? 'all subfolders and files' : 'all subfolders'}?`,
+        message: (
+          <Stack gap='sm'>
+            <Text c='red' fw={500}>
+              {childrenAction === 'cascade-files'
+                ? 'All subfolders and every file within them will be permanently deleted from storage. This action cannot be undone.'
+                : 'All subfolders will be permanently deleted (files will be moved to the root). This action cannot be undone.'}
+            </Text>
+          </Stack>
+        ),
+        onConfirm: () => performDelete(body),
+      });
+      return;
+    }
+
+    await performDelete(body);
+  };
+
   return (
     <Modal centered opened={opened} onClose={onClose} title={`Delete "${folder.name}"?`}>
       <Stack gap='sm'>
@@ -118,7 +139,15 @@ export default function DeleteFolderModal({
                   value='cascade'
                   label={
                     <Text size='sm' c='red'>
-                      Delete everything (cascade delete)
+                      Delete subfolders (files moved to root)
+                    </Text>
+                  }
+                />
+                <Radio
+                  value='cascade-files'
+                  label={
+                    <Text size='sm' c='red'>
+                      Delete subfolders and their files (cascade delete)
                     </Text>
                   }
                 />
@@ -171,8 +200,15 @@ export default function DeleteFolderModal({
 
             {childrenAction === 'cascade' && (
               <Text size='sm' c='red' fw={500}>
-                Warning: This will permanently delete all contents within this folder (subfolders will be
-                deleted, and files will be unlinked from their folders).
+                Warning: This will permanently delete all subfolders within this folder. Files will be
+                unlinked from their folders and moved to the root.
+              </Text>
+            )}
+
+            {childrenAction === 'cascade-files' && (
+              <Text size='sm' c='red' fw={500}>
+                Warning: This will permanently delete all subfolders within this folder, along with every file
+                contained in them. The files will be removed from storage and cannot be recovered.
               </Text>
             )}
           </>

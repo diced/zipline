@@ -4,6 +4,7 @@ import { parseRange } from '@/lib/api/range';
 import { config } from '@/lib/config';
 import { datasource } from '@/lib/datasource';
 import { prisma } from '@/lib/db';
+import { sanitizeFilename } from '@/lib/fs';
 import { log } from '@/lib/logger';
 import { guess } from '@/lib/mimes';
 import { TimedCache } from '@/lib/timedCache';
@@ -34,10 +35,16 @@ export const rawFileHandler = async (
   const { id } = req.params;
   const { token, download } = req.query;
 
+  const idSanitized = sanitizeFilename(id);
+  if (!idSanitized) return res.callNotFound();
+
   if (id.startsWith('.thumbnail')) {
     const thumbnail = await prisma.thumbnail.findFirst({
       where: {
-        path: id,
+        path: idSanitized,
+        file: {
+          password: null,
+        },
       },
     });
 

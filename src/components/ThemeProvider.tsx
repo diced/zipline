@@ -74,7 +74,6 @@ export default function ThemeProvider({
           forceColorScheme={theme.colorScheme as unknown as any}
           theme={createTheme({
             ...themeComponents(theme),
-            defaultRadius: 'md',
           })}
         >
           {children}

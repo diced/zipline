@@ -1,6 +1,7 @@
 import { ApiError } from '@/lib/api/errors';
 import { config } from '@/lib/config';
 import { log } from '@/lib/logger';
+import { isAdministrator } from '@/lib/role';
 import { getVersion } from '@/lib/version';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
@@ -64,8 +65,8 @@ export default typedPlugin(
         },
         preHandler: [userMiddleware],
       },
-      async (_, res) => {
-        if (!config.features.versionChecking) throw new ApiError(9002);
+      async (req, res) => {
+        if (!config.features.versionChecking && !isAdministrator(req.user.role)) throw new ApiError(9002);
 
         const details = getVersion();
 

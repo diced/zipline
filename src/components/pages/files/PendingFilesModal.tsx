@@ -1,14 +1,13 @@
 import { Response } from '@/lib/api/response';
 import { IncompleteFile } from '@/lib/db/models/incompleteFile';
 import { fetchApi } from '@/lib/fetchApi';
-import { UpdateFn } from '@/lib/client/hooks/useObjectState';
 import { IncompleteFileStatus } from '@/prisma/client';
 import { Badge, Button, Card, Group, Modal, Paper, Stack, Text } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { IconFileDots, IconTrashFilled } from '@tabler/icons-react';
 import { ReactNode } from 'react';
 import useSWR from 'swr';
-import { DashboardFilesModals } from '.';
+import { DashboardFilesModals, DashboardFilesModalsUpdate } from '.';
 
 const badgeMap: Record<IncompleteFileStatus, ReactNode> = {
   PENDING: (
@@ -38,7 +37,7 @@ export default function PendingFilesModal({
   setModals,
 }: {
   modals: DashboardFilesModals;
-  setModals: UpdateFn<DashboardFilesModals>;
+  setModals: DashboardFilesModalsUpdate;
 }) {
   const { data: incompleteFiles, mutate } = useSWR<
     Extract<IncompleteFile[], Response['/api/user/files/incomplete']>
@@ -72,7 +71,7 @@ export default function PendingFilesModal({
   };
 
   return (
-    <Modal opened={modals.pending} onClose={() => setModals('pending', false)} title='Pending Files'>
+    <Modal opened={modals.pending} onClose={() => setModals({ pending: false })} title='Pending Files'>
       <Stack gap='xs'>
         {incompleteFiles?.map((incompleteFile) => (
           <Card key={incompleteFile.id} withBorder>

@@ -63,6 +63,7 @@ export const API_ERRORS = {
   1062: 'No files in multipart/form-data request',
   1063: 'Already linked to this OAuth provider',
   1064: 'Invalid OAuth state parameter',
+  1065: 'Invalid MIME type',
 
   // 2xxx, session errors
   2000: 'Invalid login session',
@@ -91,6 +92,7 @@ export const API_ERRORS = {
   3016: 'OAuth registration is disabled',
   3017: 'OAuth login is not allowed for this account',
   3018: 'Invalid access token provided.',
+  3019: 'You cannot modify this user',
 
   // 4xxx, not founds
   4000: 'File not found',

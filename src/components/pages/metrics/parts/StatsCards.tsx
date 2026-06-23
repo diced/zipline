@@ -1,5 +1,5 @@
 import { bytes } from '@/lib/bytes';
-import { Metric } from '@/lib/db/models/metric';
+import { MetricsPoint } from '@/lib/metrics';
 import { Group, Paper, rgba, SimpleGrid, Skeleton, Text } from '@mantine/core';
 import {
   IconArrowDown,
@@ -21,8 +21,8 @@ function StatCard({
   Icon,
 }: {
   title: string;
-  first: number;
-  last: number;
+  first: number | bigint;
+  last: number | bigint;
   Icon: TablerIcon;
   formatter?: (value: number) => string;
 }) {
@@ -35,9 +35,9 @@ function StatCard({
   }[color];
 
   return (
-    <Paper radius='sm' withBorder p='sm'>
+    <Paper radius='md' withBorder p='sm'>
       <Group justify='space-between'>
-        <Text size='xl' fw='bolder'>
+        <Text size='xl' fw={900}>
           {title}
         </Text>
 
@@ -45,8 +45,8 @@ function StatCard({
       </Group>
 
       <Group justify='flex-start' gap='xs'>
-        <Text size='xl' fw='bolder'>
-          {formatter ? formatter(first) : first}
+        <Text size='lg' fw={600}>
+          {formatter ? formatter(Number(first)) : first}
         </Text>
 
         <Paper
@@ -54,7 +54,6 @@ function StatCard({
           py={2}
           pl={5}
           pr={8}
-          radius='sm'
           display='flex'
           bg={rgba(`var(--mantine-color-${color}-6)`, 0.25)}
         >
@@ -87,14 +86,11 @@ export function StatsCardsSkeleton() {
   );
 }
 
-export default function StatsCards({ data }: { data: Metric[] }) {
-  if (!data.length) return null;
-  const sortedMetrics = data.sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-  );
+export default function StatsCards({ points }: { points: MetricsPoint[] }) {
+  if (!points.length) return null;
 
-  const recent = sortedMetrics[0];
-  const last = sortedMetrics[sortedMetrics.length - 1];
+  const recent = points[0];
+  const last = points[points.length - 1];
 
   return (
     <SimpleGrid
@@ -105,28 +101,18 @@ export default function StatsCards({ data }: { data: Metric[] }) {
       }}
       mb='sm'
     >
-      <StatCard title='Files' first={recent.data.files} last={last.data.files} Icon={IconFiles} />
-      <StatCard title='URLs' first={recent.data.urls} last={last.data.urls} Icon={IconLink} />
+      <StatCard title='Files' first={recent.files} last={last.files} Icon={IconFiles} />
+      <StatCard title='URLs' first={recent.urls} last={last.urls} Icon={IconLink} />
       <StatCard
         title='Storage Used'
-        first={recent.data.storage}
-        last={last.data.storage}
+        first={recent.storage}
+        last={last.storage}
         formatter={bytes}
         Icon={IconDatabase}
       />
-      <StatCard title='Users' first={recent.data.users} last={last.data.users} Icon={IconUsers} />
-      <StatCard
-        title='File Views'
-        first={recent.data.fileViews}
-        last={last.data.fileViews}
-        Icon={IconEyeFilled}
-      />
-      <StatCard
-        title='URL Views'
-        first={recent.data.urlViews}
-        last={last.data.urlViews}
-        Icon={IconEyeFilled}
-      />
+      <StatCard title='Users' first={recent.users} last={last.users} Icon={IconUsers} />
+      <StatCard title='File Views' first={recent.fileViews} last={last.fileViews} Icon={IconEyeFilled} />
+      <StatCard title='URL Views' first={recent.urlViews} last={last.urlViews} Icon={IconEyeFilled} />
     </SimpleGrid>
   );
 }

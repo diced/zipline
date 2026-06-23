@@ -70,6 +70,8 @@ export default typedPlugin(
         preHandler: [userMiddleware, administratorMiddleware],
       },
       async (req, res) => {
+        if (req.user.role !== 'SUPERADMIN') throw new ApiError(3015);
+
         if (req.query.counts) {
           const counts = await getCounts();
 

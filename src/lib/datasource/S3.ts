@@ -7,6 +7,7 @@ import {
   GetObjectCommand,
   HeadObjectCommand,
   ListObjectsCommand,
+  ListObjectsV2Command,
   PutObjectCommand,
   S3Client,
   UploadPartCopyCommand,
@@ -256,23 +257,31 @@ export class S3Datasource extends Datasource {
   }
 
   public async totalSize(): Promise<number> {
-    const command = new ListObjectsCommand({
-      Bucket: this.options.bucket,
-      Prefix: this.options.subdirectory ?? undefined,
-      Delimiter: this.options.subdirectory ? undefined : '/',
-    });
+    let total = 0;
+    let continuationToken: string | undefined;
 
     try {
-      const res = await this.client.send(command);
+      do {
+        const res = await this.client.send(
+          new ListObjectsV2Command({
+            Bucket: this.options.bucket,
+            Prefix: this.options.subdirectory ?? undefined,
+            ContinuationToken: continuationToken,
+          }),
+        );
 
-      if (!isOk(res.$metadata.httpStatusCode || 0)) {
-        this.logger.error('there was an error while listing objects');
-        this.logger.error('error metadata', res.$metadata as Record<string, unknown>);
+        if (!isOk(res.$metadata.httpStatusCode || 0)) {
+          this.logger.error('there was an error while listing objects');
+          this.logger.error('error metadata', res.$metadata as Record<string, unknown>);
 
-        return 0;
-      }
+          return 0;
+        }
 
-      return res.Contents?.reduce((acc, obj) => acc + Number(obj.Size), 0) ?? 0;
+        total += res.Contents?.reduce((acc, obj) => acc + Number(obj.Size ?? 0), 0) ?? 0;
+        continuationToken = res.IsTruncated ? res.NextContinuationToken : undefined;
+      } while (continuationToken);
+
+      return total;
     } catch (e) {
       this.logger.error('there was an error while listing objects');
       this.logger.error('error metadata', e as Record<string, unknown>);

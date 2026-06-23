@@ -1,4 +1,5 @@
 import { Modal, Center, PinInput, Text, Group, Button } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import { IconX, IconShieldQuestion } from '@tabler/icons-react';
 
 export default function TotpModal({
@@ -12,6 +13,8 @@ export default function TotpModal({
   onVerify: () => void;
   onCancel: () => void;
 }) {
+  const mobile = useMediaQuery('(max-width: 600px)');
+
   return (
     <Modal onClose={onCancel} title='Enter code' opened={state.open} withCloseButton={false}>
       <form onSubmit={onVerify}>
@@ -23,7 +26,7 @@ export default function TotpModal({
             onChange={onPinChange}
             error={!!state.error}
             disabled={state.disabled}
-            size='xl'
+            size={mobile ? 'md' : 'xl'}
             autoFocus
           />
         </Center>

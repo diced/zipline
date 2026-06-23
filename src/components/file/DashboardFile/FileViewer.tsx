@@ -542,7 +542,7 @@ export default function FileViewer({
             overscrollBehavior: 'contain',
           }}
         >
-          {file ? (
+          {open && file ? (
             <Box
               onClick={(e) => e.stopPropagation()}
               style={{
@@ -550,10 +550,11 @@ export default function FileViewer({
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'flex-start',
-                width: '100%',
-                height: 'fit-content',
+                alignSelf: 'stretch',
+                flex: 1,
                 minWidth: 0,
                 minHeight: 0,
+                width: '100%',
                 overflow: 'visible',
                 paddingLeft: '4rem',
                 paddingRight: '4rem',
@@ -568,7 +569,7 @@ export default function FileViewer({
                 scrollParent={scrollParent}
               />
 
-              {open && sequenced && fileNavButtons && file && (
+              {sequenced && fileNavButtons && file && (
                 <>
                   <ActionButton
                     Icon={IconChevronLeft}
