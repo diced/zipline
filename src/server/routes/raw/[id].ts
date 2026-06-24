@@ -59,7 +59,7 @@ export const rawFileHandler = async (
       .send(buf);
   }
 
-  const file = await findFileByName(id);
+  const file = await findFileByName(id, (where) => prisma.file.findFirst({ where }));
   if (!file) return res.callNotFound();
 
   if (file?.deletesAt && file.deletesAt <= new Date()) {

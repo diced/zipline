@@ -1,4 +1,5 @@
 import { findFileByName } from '@/lib/db/models/file';
+import { prisma } from '@/lib/db';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { rawFileHandler } from './raw/[id]';
 
@@ -16,11 +17,7 @@ export async function filesRoute(
   res: FastifyReply,
 ) {
   const { id } = req.params;
-  const file = await findFileByName(id, {
-    include: {
-      User: true,
-    },
-  });
+  const file = await findFileByName(id, (where) => prisma.file.findFirst({ where, include: { User: true } }));
   if (!file) return res.callNotFound();
 
   if (file.User?.view.enabled) return res.redirect(`/view/${encodeURIComponent(file.name)}`);

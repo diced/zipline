@@ -24,16 +24,19 @@ import { createStaticHandler, createStaticRouter, StaticRouterProvider } from 'r
 import { createRoutes } from './routes';
 
 export const getFile = async (id: string) =>
-  findFileByName(id, {
-    select: {
-      ...fileSelect,
-      password: true,
-      userId: true,
-      thumbnail: { select: { path: true } },
-      tags: { select: { id: true, name: true, color: true } },
-      Folder: { select: { id: true, public: true, name: true } },
-    },
-  });
+  findFileByName(id, (where) =>
+    prisma.file.findFirst({
+      where,
+      select: {
+        ...fileSelect,
+        password: true,
+        userId: true,
+        thumbnail: { select: { path: true } },
+        tags: { select: { id: true, name: true, color: true } },
+        Folder: { select: { id: true, public: true, name: true } },
+      },
+    }),
+  );
 
 export async function render(
   {

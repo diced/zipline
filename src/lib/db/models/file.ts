@@ -1,5 +1,4 @@
 import { config } from '@/lib/config';
-import { prisma } from '@/lib/db';
 import { formatRootUrl } from '@/lib/url';
 import type { Prisma } from '@/prisma/client';
 import { z } from 'zod';
@@ -29,19 +28,14 @@ export const fileSelect = {
   },
 };
 
-export async function findFileByName<T extends Prisma.FileFindFirstArgs = Prisma.FileFindFirstArgs>(
+export async function findFileByName<TResult>(
   id: string,
-  args?: Omit<T, 'where'>,
-): Promise<Prisma.FileGetPayload<T> | null> {
+  query: (where: Prisma.FileWhereInput) => Promise<TResult | null>,
+) {
   const name = decodeURIComponent(id);
-  const file = await prisma.file.findFirst({ ...(args as T), where: { name } } as T);
-  if (file || !config.files.extensionlessUrls || name.includes('.')) {
-    return file as Prisma.FileGetPayload<T> | null;
-  }
-  return prisma.file.findFirst({
-    ...(args as T),
-    where: { name: { startsWith: `${name}.` } },
-  } as T) as Prisma.FileGetPayload<T> | null;
+  const file = await query({ name });
+  if (file || !config.files.extensionlessUrls || name.includes('.')) return file;
+  return query({ name: { startsWith: `${name}.` } });
 }
 
 export function cleanFile(file: File) {
