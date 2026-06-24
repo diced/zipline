@@ -203,6 +203,7 @@ export default typedPlugin(
               .enum(COMPRESS_TYPES)
               .refine((v) => checkOutput(v), 'System does not support outputting this image format.'),
             filesMaxFilesPerUpload: z.number().min(1).max(2147483647),
+            filesExtensionlessUrls: z.boolean(),
 
             urlsRoute: z
               .string()

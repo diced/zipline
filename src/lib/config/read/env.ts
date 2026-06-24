@@ -66,6 +66,7 @@ export const ENVS = [
   env('files.randomWordsSeparator', 'FILES_RANDOM_WORDS_SEPARATOR', 'string', true),
   env('files.defaultCompressionFormat', 'FILES_DEFAULT_COMPRESSION_FORMAT', 'string', true),
   env('files.maxFilesPerUpload', 'FILES_MAX_FILES_PER_UPLOAD', 'number', true),
+  env('files.extensionlessUrls', 'FILES_EXTENSIONLESS_URLS', 'boolean', true),
 
   env('urls.route', 'URLS_ROUTE', 'string', true),
   env('urls.length', 'URLS_LENGTH', 'number', true),

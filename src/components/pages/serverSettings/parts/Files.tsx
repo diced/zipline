@@ -36,6 +36,7 @@ function Form({ data, isLoading }: { data: Response['/api/server/settings']; isL
       filesRandomWordsSeparator: data.settings.filesRandomWordsSeparator,
       filesDefaultCompressionFormat: data.settings.filesDefaultCompressionFormat,
       filesMaxFilesPerUpload: data.settings.filesMaxFilesPerUpload,
+      filesExtensionlessUrls: data.settings.filesExtensionlessUrls,
     },
     enhanceGetInputProps: (payload) => ({
       disabled: data.tampered.includes(payload.field) || false,
@@ -90,6 +91,12 @@ function Form({ data, isLoading }: { data: Response['/api/server/settings']; isL
           label='Remove GPS Metadata'
           description='Remove GPS metadata from files.'
           {...form.getInputProps('filesRemoveGpsMetadata', { type: 'checkbox' })}
+        />
+
+        <Switch
+          label='Extensionless URLs'
+          description='Allow file links without the extension (e.g. /u/uuid instead of /u/uuid.png). Ulpoad responses still include the extension.'
+          {...form.getInputProps('filesExtensionlessUrls', { type: 'checkbox' })}
         />
 
         <TextInput

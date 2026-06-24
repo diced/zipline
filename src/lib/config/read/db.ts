@@ -33,6 +33,7 @@ export const DATABASE_TO_PROP = {
   filesRandomWordsSeparator: 'files.randomWordsSeparator',
   filesDefaultCompressionFormat: 'files.defaultCompressionFormat',
   filesMaxFilesPerUpload: 'files.maxFilesPerUpload',
+  filesExtensionlessUrls: 'files.extensionlessUrls',
 
   urlsRoute: 'urls.route',
   urlsLength: 'urls.length',

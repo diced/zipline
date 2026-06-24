@@ -49,6 +49,7 @@ export const rawConfig: any = {
     randomWordsSeparator: undefined,
     defaultCompressionFormat: undefined,
     maxFilesPerUpload: undefined,
+    extensionlessUrls: undefined,
   },
   urls: {
     route: undefined,

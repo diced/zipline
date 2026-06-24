@@ -145,6 +145,7 @@ export const schema = z.object({
       .default('jpg')
       .refine((v) => checkOutput(v), 'System does not support outputting this image format.'),
     maxFilesPerUpload: z.number().max(2147483647).min(1).default(1000),
+    extensionlessUrls: z.boolean().default(false),
   }),
   urls: z.object({
     route: z.string().startsWith('/').min(1).trim().toLowerCase().default('/go'),
