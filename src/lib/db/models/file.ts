@@ -29,11 +29,19 @@ export const fileSelect = {
   },
 };
 
-export async function findFileByName(id: string, args?: Omit<Prisma.FileFindFirstArgs, 'where'>) {
+export async function findFileByName<T extends Prisma.FileFindFirstArgs = Prisma.FileFindFirstArgs>(
+  id: string,
+  args?: Omit<T, 'where'>,
+): Promise<Prisma.FileGetPayload<T> | null> {
   const name = decodeURIComponent(id);
-  const file = await prisma.file.findFirst({ ...args, where: { name } });
-  if (file || !config.files.extensionlessUrls || name.includes('.')) return file;
-  return prisma.file.findFirst({ ...args, where: { name: { startsWith: `${name}.` } } });
+  const file = await prisma.file.findFirst({ ...(args as T), where: { name } } as T);
+  if (file || !config.files.extensionlessUrls || name.includes('.')) {
+    return file as Prisma.FileGetPayload<T> | null;
+  }
+  return prisma.file.findFirst({
+    ...(args as T),
+    where: { name: { startsWith: `${name}.` } },
+  } as T) as Prisma.FileGetPayload<T> | null;
 }
 
 export function cleanFile(file: File) {
