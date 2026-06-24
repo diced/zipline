@@ -11,6 +11,7 @@ import { config as zConfig } from '@/lib/config';
 import type { Config } from '@/lib/config/validate';
 import { prisma } from '@/lib/db';
 import { File, fileSelect } from '@/lib/db/models/file';
+import { resolveFileByName } from '@/lib/files/resolve';
 import { User, userSelect } from '@/lib/db/models/user';
 import { parseString } from '@/lib/parser';
 import { parserMetrics } from '@/lib/parser/metrics';
@@ -24,8 +25,7 @@ import { createStaticHandler, createStaticRouter, StaticRouterProvider } from 'r
 import { createRoutes } from './routes';
 
 export const getFile = async (id: string) =>
-  prisma.file.findFirst({
-    where: { name: decodeURIComponent(id) },
+  resolveFileByName(id, {
     select: {
       ...fileSelect,
       password: true,

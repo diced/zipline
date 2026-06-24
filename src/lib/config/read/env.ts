@@ -60,6 +60,7 @@ export const ENVS = [
   env('files.maxFileSize', 'FILES_MAX_FILE_SIZE', 'string', true),
   env('files.defaultExpiration', 'FILES_DEFAULT_EXPIRATION', 'string', true),
   env('files.assumeMimetypes', 'FILES_ASSUME_MIMETYPES', 'boolean', true),
+  env('files.omitExtension', 'FILES_OMIT_EXTENSION', 'boolean', true),
   env('files.defaultDateFormat', 'FILES_DEFAULT_DATE_FORMAT', 'string', true),
   env('files.removeGpsMetadata', 'FILES_REMOVE_GPS_METADATA', 'boolean', true),
   env('files.randomWordsNumAdjectives', 'FILES_RANDOM_WORDS_NUM_ADJECTIVES', 'number', true),

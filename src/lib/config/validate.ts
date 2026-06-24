@@ -136,6 +136,7 @@ export const schema = z.object({
     defaultExpiration: z.string().nullable().default(null),
     maxExpiration: z.string().nullable().default(null),
     assumeMimetypes: z.boolean().default(false),
+    omitExtension: z.boolean().default(false),
     defaultDateFormat: z.string().default('YYYY-MM-DD_HH:mm:ss'),
     removeGpsMetadata: z.boolean().default(false),
     randomWordsNumAdjectives: z.number().default(3),

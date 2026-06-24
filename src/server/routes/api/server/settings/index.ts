@@ -195,6 +195,7 @@ export default typedPlugin(
             filesDefaultExpiration: zMs.nullable(),
             filesMaxExpiration: zMs.nullable(),
             filesAssumeMimetypes: z.boolean(),
+            filesOmitExtension: z.boolean(),
             filesDefaultDateFormat: z.string(),
             filesRemoveGpsMetadata: z.boolean(),
             filesRandomWordsNumAdjectives: z.number().min(1).max(20),

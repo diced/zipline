@@ -4,6 +4,7 @@ import { parseRange } from '@/lib/api/range';
 import { config } from '@/lib/config';
 import { datasource } from '@/lib/datasource';
 import { prisma } from '@/lib/db';
+import { resolveFileByName } from '@/lib/files/resolve';
 import { log } from '@/lib/logger';
 import { guess } from '@/lib/mimes';
 import { TimedCache } from '@/lib/timedCache';
@@ -58,11 +59,7 @@ export const rawFileHandler = async (
       .send(buf);
   }
 
-  const file = await prisma.file.findFirst({
-    where: {
-      name: decodeURIComponent(id),
-    },
-  });
+  const file = await resolveFileByName(id);
   if (!file) return res.callNotFound();
 
   if (file?.deletesAt && file.deletesAt <= new Date()) {
