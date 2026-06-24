@@ -3,7 +3,7 @@ import { bytes } from '@/lib/bytes';
 import { hashPassword } from '@/lib/crypto';
 import { datasource } from '@/lib/datasource';
 import { prisma } from '@/lib/db';
-import { User, userSchema, userSelect } from '@/lib/db/models/user';
+import { LimitedUser, limitedUserSchema, limitedUserSelect } from '@/lib/db/models/user';
 import { log } from '@/lib/logger';
 import { canInteract } from '@/lib/role';
 import { zStringTrimmed } from '@/lib/validation';
@@ -13,7 +13,7 @@ import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
 import { z } from 'zod';
 
-export type ApiUsersIdResponse = User;
+export type ApiUsersIdResponse = LimitedUser;
 
 const logger = log('api').c('users').c('[id]');
 
@@ -31,7 +31,7 @@ export default typedPlugin(
           description: 'Fetch a specific user by ID, including their profile and role (admin only).',
           params: paramsSchema,
           response: {
-            200: userSchema,
+            200: limitedUserSchema,
           },
           tags: ['auth', 'admin'],
         },
@@ -42,10 +42,11 @@ export default typedPlugin(
           where: {
             id: req.params.id,
           },
-          select: userSelect,
+          select: limitedUserSelect,
         });
 
         if (!user) throw new ApiError(4009);
+        if (!canInteract(req.user.role, user.role)) throw new ApiError(4009);
 
         return res.send(user);
       },
@@ -73,7 +74,7 @@ export default typedPlugin(
               .optional(),
           }),
           response: {
-            200: userSchema,
+            200: limitedUserSchema,
           },
           tags: ['auth', 'admin'],
         },
@@ -84,9 +85,13 @@ export default typedPlugin(
           where: {
             id: req.params.id,
           },
-          select: userSelect,
+          select: {
+            id: true,
+            role: true,
+          },
         });
         if (!user) throw new ApiError(4009);
+        if (!canInteract(req.user.role, user.role)) throw new ApiError(3019);
 
         const { username, password, avatar, role, quota } = req.body;
         if (role && !canInteract(req.user.role, role)) throw new ApiError(3007);
@@ -149,11 +154,7 @@ export default typedPlugin(
               },
             }),
           },
-          select: {
-            ...userSelect,
-            totpSecret: false,
-            passkeys: false,
-          },
+          select: limitedUserSelect,
         });
 
         logger.info(`${req.user.username} updated another user`, {
@@ -176,7 +177,7 @@ export default typedPlugin(
             delete: z.boolean().optional(),
           }),
           response: {
-            200: userSchema,
+            200: limitedUserSchema,
           },
           tags: ['auth', 'admin'],
         },
@@ -187,7 +188,11 @@ export default typedPlugin(
           where: {
             id: req.params.id,
           },
-          select: userSelect,
+          select: {
+            id: true,
+            role: true,
+            username: true,
+          },
         });
 
         if (!user) throw new ApiError(4009);
@@ -242,10 +247,7 @@ export default typedPlugin(
           where: {
             id: user.id,
           },
-          select: {
-            ...userSelect,
-            totpSecret: false,
-          },
+          select: limitedUserSelect,
         });
 
         logger.info(`${req.user.username} deleted another user`, {

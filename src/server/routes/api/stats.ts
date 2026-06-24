@@ -1,16 +1,22 @@
 import { ApiError } from '@/lib/api/errors';
 import { config } from '@/lib/config';
-import { prisma } from '@/lib/db';
-import { Metric, metricSchema } from '@/lib/db/models/metric';
+import { metricSchema } from '@/lib/db/models/metric';
+import { downsample, getLatestMetricsPoint, getMetricsPoints, metricsPointSchema } from '@/lib/metrics';
 import { isAdministrator } from '@/lib/role';
 import { zQsBoolean } from '@/lib/validation';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
 import z from 'zod';
 
-export type ApiStatsResponse = Metric[];
+export const apiStatsResponseSchema = z.object({
+  latest: metricSchema.nullable(),
+  points: z.array(metricsPointSchema),
+});
+
+export type ApiStatsResponse = z.infer<typeof apiStatsResponseSchema>;
 
 export const PATH = '/api/stats';
+
 export default typedPlugin(
   async (server) => {
     server.get(
@@ -39,7 +45,7 @@ export default typedPlugin(
             all: zQsBoolean.default(false),
           }),
           response: {
-            200: z.array(metricSchema),
+            200: apiStatsResponseSchema,
           },
           tags: ['auth'],
         },
@@ -60,30 +66,20 @@ export default typedPlugin(
           if (fromDate > new Date()) throw new ApiError(1059);
         }
 
-        const stats = await prisma.metric.findMany({
-          where: {
-            ...(!all && {
-              createdAt: {
-                gte: fromDate,
-                lte: toDate,
-              },
-            }),
-          },
-          orderBy: {
-            createdAt: 'desc',
-          },
-        });
+        const [latest, points] = await Promise.all([
+          getLatestMetricsPoint(!all ? fromDate : undefined, !all ? toDate : undefined),
+          all ? getMetricsPoints() : getMetricsPoints(fromDate, toDate),
+        ]);
 
-        if (!config.features.metrics.showUserSpecific) {
-          for (let i = 0; i !== stats.length; ++i) {
-            const stat = stats[i].data;
-
-            stat.filesUsers = [];
-            stat.urlsUsers = [];
-          }
+        if (latest && !config.features.metrics.showUserSpecific) {
+          latest.data.filesUsers = [];
+          latest.data.urlsUsers = [];
         }
 
-        return res.send(stats);
+        return res.send({
+          latest,
+          points: downsample(points),
+        });
       },
     );
   },

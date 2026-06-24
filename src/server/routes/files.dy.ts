@@ -20,9 +20,17 @@ export async function filesRoute(
   const file = await findFileByName(id, (where) => prisma.file.findFirst({ where, include: { User: true } }));
   if (!file) return res.callNotFound();
 
-  if (file.User?.view.enabled) return res.redirect(`/view/${encodeURIComponent(file.name)}`);
-  if (file.type.startsWith('text/')) return res.redirect(`/view/${encodeURIComponent(file.name)}`);
-  if (file.password) return res.redirect(`/view/${encodeURIComponent(file.name)}`);
+  const viewUrl = `/view/${encodeURIComponent(file.name)}`;
+
+  if (file.password) return res.redirect(viewUrl);
+
+  if (file.type.startsWith('text/')) {
+    if (file.User?.view?.disableTextFiles) return rawFileHandler(req, res);
+
+    return res.redirect(viewUrl);
+  }
+
+  if (file.User?.view?.enabled) return res.redirect(viewUrl);
 
   return rawFileHandler(req, res);
 }

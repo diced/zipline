@@ -1,22 +1,27 @@
-import { Metric } from '@/lib/db/models/metric';
+import { MetricsPoint } from '@/lib/metrics';
 import { ChartTooltip, LineChart } from '@mantine/charts';
 import { Paper, Title } from '@mantine/core';
+import { useMemo } from 'react';
 import { defaultChartProps } from '../statsHelpers';
 
-export default function ViewsGraph({ metrics }: { metrics: Metric[] }) {
-  const sortedMetrics = metrics.sort(
-    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+export default function ViewsGraph({ points }: { points: MetricsPoint[] }) {
+  const data = useMemo(
+    () =>
+      points
+        .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+        .map((point) => ({
+          date: new Date(point.createdAt).getTime(),
+          files: point.fileViews,
+          urls: point.urlViews,
+        })),
+    [points],
   );
 
   return (
-    <Paper radius='sm' withBorder p='sm'>
+    <Paper radius='md' withBorder p='sm'>
       <Title order={3}>Views</Title>
       <LineChart
-        data={sortedMetrics.map((metric) => ({
-          date: new Date(metric.createdAt).getTime(),
-          files: metric.data.fileViews,
-          urls: metric.data.urlViews,
-        }))}
+        data={data}
         series={[
           {
             name: 'files',

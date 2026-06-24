@@ -155,7 +155,6 @@ export default function UrlTableView() {
 
       <Box my='sm'>
         <DataTable
-          borderRadius='sm'
           withTableBorder
           minHeight={200}
           records={sorted ?? []}

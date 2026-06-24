@@ -2,13 +2,12 @@ import { mutateFiles } from '@/components/file/actions';
 import { Response } from '@/lib/api/response';
 import { Tag } from '@/lib/db/models/tag';
 import { fetchApi } from '@/lib/fetchApi';
-import { UpdateFn } from '@/lib/client/hooks/useObjectState';
 import { ActionIcon, Group, Modal, Paper, Stack, Text, Title, Tooltip } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { IconPencil, IconPlus, IconTagOff, IconTrashFilled } from '@tabler/icons-react';
 import { useState } from 'react';
 import useSWR from 'swr';
-import { DashboardFilesModals } from '..';
+import { DashboardFilesModals, DashboardFilesModalsUpdate } from '..';
 import CreateTagModal from './CreateTagModal';
 import EditTagModal from './EditTagModal';
 import TagPill from './TagPill';
@@ -18,7 +17,7 @@ export default function TagsModals({
   setModals,
 }: {
   modals: DashboardFilesModals;
-  setModals: UpdateFn<DashboardFilesModals>;
+  setModals: DashboardFilesModalsUpdate;
 }) {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
@@ -55,7 +54,7 @@ export default function TagsModals({
 
       <Modal
         opened={modals.tags}
-        onClose={() => setModals('tags', false)}
+        onClose={() => setModals({ tags: false })}
         title={
           <Group>
             <Title>Tags</Title>

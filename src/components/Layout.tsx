@@ -122,16 +122,22 @@ const navLinks: NavLinks[] = [
     active: (path: string) => path.startsWith('/dashboard/admin'),
     links: [
       {
+        label: 'Dashboard',
+        icon: <IconHome size='1rem' />,
+        active: (path: string) => path === '/dashboard/admin',
+        href: '/dashboard/admin',
+      },
+      {
         label: 'Settings',
         icon: <IconAdjustments size='1rem' />,
         active: (path: string) => path.startsWith('/dashboard/admin/settings'),
         if: (user) => user?.role === 'SUPERADMIN',
         href: '/dashboard/admin/settings',
-        links: SETTINGS_EXTERNAL_LINKS.map(({ name, url, icon }) => ({
-          label: name,
-          icon,
-          active: (path: string) => path === url,
-          href: url,
+        links: SETTINGS_EXTERNAL_LINKS.map(({ label, href, icon: Icon }) => ({
+          label,
+          icon: <Icon size='1rem' />,
+          active: (path: string) => path === href,
+          href,
         })),
       },
       {

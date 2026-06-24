@@ -1,3 +1,4 @@
+import { LinksList } from '@/components/LinksList';
 import { Response } from '@/lib/api/response';
 import { useTitle } from '@/lib/client/hooks/useTitle';
 import {
@@ -9,8 +10,6 @@ import {
   Collapse,
   Group,
   LoadingOverlay,
-  Paper,
-  Stack,
   Text,
   Title,
 } from '@mantine/core';
@@ -176,9 +175,10 @@ const SETTINGS_COMPONENTS = {
 export const SETTINGS_EXTERNAL_LINKS = Object.values(SETTINGS_COMPONENTS)
   .filter((setting) => setting.component !== null)
   .map((setting) => ({
-    name: setting.name,
-    url: `/dashboard/admin/settings/${setting.key}`,
-    icon: setting.Icon ? <setting.Icon size='1rem' /> : <IconAdjustmentsHorizontalFilled size='1rem' />,
+    label: setting.name,
+    description: setting.desc,
+    href: `/dashboard/admin/settings/${setting.key}`,
+    icon: setting.Icon ? setting.Icon : IconAdjustmentsHorizontalFilled,
   }));
 
 const SETTINGS_PART_KEYS = Object.keys(SETTINGS_COMPONENTS)
@@ -332,31 +332,9 @@ export default function DashboardServerSettings() {
           </Suspense>
         </Box>
       ) : (
-        <Stack mt='md' gap='md'>
-          {Object.entries(SETTINGS_COMPONENTS)
-            .filter(([key]) => key !== 'settings')
-            .map(([k, { key, Icon, name, desc }]) => (
-              <Anchor
-                key={k}
-                component={Link}
-                to={`/dashboard/admin/settings/${key}`}
-                style={{ textDecoration: 'none' }}
-              >
-                <Paper withBorder p='sm'>
-                  <Group gap='md'>
-                    <ActionIcon variant='filled' radius='md' size='xl'>
-                      {Icon ? <Icon size='1.75rem' /> : <IconAdjustmentsHorizontalFilled size='1.75rem' />}
-                    </ActionIcon>
-
-                    <div>
-                      <Title order={4}>{name}</Title>
-                      <Text c='dimmed'>{desc}</Text>
-                    </div>
-                  </Group>
-                </Paper>
-              </Anchor>
-            ))}
-        </Stack>
+        <Box my='sm'>
+          <LinksList links={SETTINGS_EXTERNAL_LINKS} />
+        </Box>
       )}
     </>
   );

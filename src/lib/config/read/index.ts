@@ -170,9 +170,10 @@ export async function read() {
       }
 
       global.__tamperedConfig__.push(col);
-      logger.info('overriding database value from env', { col, value: val });
     }
   }
+
+  logger.debug('overridden db settings from env vars', { overridden: global.__tamperedConfig__ });
 
   const raw = structuredClone(rawConfig);
 

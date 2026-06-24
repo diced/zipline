@@ -1,12 +1,12 @@
 import { Response } from '@/lib/api/response';
-import { User } from '@/lib/db/models/user';
+import { LimitedUser } from '@/lib/db/models/user';
 import { fetchApi } from '@/lib/fetchApi';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import { IconUserCancel, IconUserMinus } from '@tabler/icons-react';
 import { mutate } from 'swr';
 
-export async function deleteUser(user: User) {
+export async function deleteUser(user: LimitedUser) {
   modals.openConfirmModal({
     centered: true,
     title: `Delete ${user.username}?`,
@@ -33,7 +33,7 @@ export async function deleteUser(user: User) {
   });
 }
 
-async function handleDeleteUser(user: User, deleteFiles: boolean = false) {
+async function handleDeleteUser(user: LimitedUser, deleteFiles: boolean = false) {
   const { data, error } = await fetchApi<Response['/api/users/[id]']>(`/api/users/${user.id}`, 'DELETE', {
     delete: deleteFiles,
   });

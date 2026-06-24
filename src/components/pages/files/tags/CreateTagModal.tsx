@@ -82,7 +82,7 @@ export default function CreateTagModal({ open, onClose }: { open: boolean; onClo
             {...form.getInputProps('color')}
           />
 
-          <Button type='submit' variant='outline' radius='sm'>
+          <Button type='submit' variant='outline'>
             Create tag
           </Button>
         </Stack>

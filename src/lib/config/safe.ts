@@ -1,4 +1,5 @@
 import enabled from '../oauth/enabled';
+import { version } from '../../../package.json';
 import { Config } from './validate';
 
 export type SafeConfig = Omit<
@@ -21,6 +22,7 @@ export function safeConfig(config: Config): SafeConfig {
     bypassLocalLogin: oauth.bypassLocalLogin,
     loginOnly: oauth.loginOnly,
   };
+  (rest as SafeConfig).version = version;
 
   return rest as SafeConfig;
 }

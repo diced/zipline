@@ -1,7 +1,7 @@
 import { Response } from '@/lib/api/response';
 import { readToDataURL } from '@/lib/base64';
 import { bytes } from '@/lib/bytes';
-import { User } from '@/lib/db/models/user';
+import { LimitedUser } from '@/lib/db/models/user';
 import { fetchApi } from '@/lib/fetchApi';
 import { canInteract } from '@/lib/role';
 import { useUserStore } from '@/lib/client/store/user';
@@ -31,7 +31,7 @@ export default function EditUserModal({
   opened,
   onClose,
 }: {
-  user?: User | null;
+  user?: LimitedUser | null;
   opened: boolean;
   onClose: () => void;
 }) {
@@ -268,13 +268,7 @@ export default function EditUserModal({
             />
             <Divider />
 
-            <Button
-              type='submit'
-              variant='outline'
-              color='blue'
-              radius='sm'
-              leftSection={<IconUserEdit size='1rem' />}
-            >
+            <Button type='submit' variant='outline' color='blue' leftSection={<IconUserEdit size='1rem' />}>
               Update user
             </Button>
           </Stack>

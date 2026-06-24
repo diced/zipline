@@ -14,6 +14,7 @@ import { ApiServerImportV3 } from '@/server/routes/api/server/import/v3';
 import { ApiServerImportV4 } from '@/server/routes/api/server/import/v4';
 import { ApiServerPublicResponse } from '@/server/routes/api/server/public';
 import { ApiServerRequerySizeResponse } from '@/server/routes/api/server/requery_size';
+import { ApiServerStatusResponse } from '@/server/routes/api/server/status';
 import { ApiServerSettingsResponse, ApiServerSettingsWebResponse } from '@/server/routes/api/server/settings';
 import { ApiServerThemesResponse } from '@/server/routes/api/server/themes';
 import { ApiServerThumbnailsResponse } from '@/server/routes/api/server/thumbnails';
@@ -34,6 +35,7 @@ import { ApiUserMfaPasskeyResponse } from '@/server/routes/api/user/mfa/passkey'
 import { ApiUserMfaTotpResponse } from '@/server/routes/api/user/mfa/totp';
 import { ApiUserRecentResponse } from '@/server/routes/api/user/recent';
 import { ApiUserSessionsResponse } from '@/server/routes/api/user/sessions';
+import { ApiUserActivityResponse } from '@/server/routes/api/user/activity';
 import { ApiUserStatsResponse } from '@/server/routes/api/user/stats';
 import { ApiUserTagsResponse } from '@/server/routes/api/user/tags';
 import { ApiUserTagsIdResponse } from '@/server/routes/api/user/tags/[id]';
@@ -70,6 +72,7 @@ export type Response = {
   '/api/user/sessions': ApiUserSessionsResponse;
   '/api/user': ApiUserResponse;
   '/api/user/stats': ApiUserStatsResponse;
+  '/api/user/activity': ApiUserActivityResponse;
   '/api/user/recent': ApiUserRecentResponse;
   '/api/user/token': ApiUserTokenResponse;
   '/api/user/export': ApiUserExportResponse;
@@ -78,6 +81,7 @@ export type Response = {
   '/api/server/clear_temp': ApiServerClearTempResponse;
   '/api/server/clear_zeros': ApiServerClearZerosResponse;
   '/api/server/requery_size': ApiServerRequerySizeResponse;
+  '/api/server/status': ApiServerStatusResponse;
   '/api/server/settings': ApiServerSettingsResponse;
   '/api/server/settings/web': ApiServerSettingsWebResponse;
   '/api/server/public': ApiServerPublicResponse;

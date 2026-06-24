@@ -58,8 +58,10 @@ function Form({ user, setUser }: { user: User; setUser: (u: User) => void }) {
   const form = useForm({
     initialValues: {
       enabled: user.view.enabled || false,
+      disableTextFiles: user.view.disableTextFiles || false,
       content: user.view.content || '',
       embed: user.view.embed || false,
+      embedMediaOnly: user.view.embedMediaOnly || false,
       embedTitle: user.view.embedTitle || '',
       embedDescription: user.view.embedDescription || '',
       embedSiteName: user.view.embedSiteName || '',
@@ -72,9 +74,11 @@ function Form({ user, setUser }: { user: User; setUser: (u: User) => void }) {
   });
 
   const onSubmit = async (values: typeof form.values) => {
-    const valuesTrimmed = {
+    const view = {
       enabled: values.enabled,
+      disableTextFiles: values.disableTextFiles,
       embed: values.embed,
+      embedMediaOnly: values.embed ? false : values.embedMediaOnly,
       content: values.content.trim() || null,
       embedTitle: values.embedTitle.trim() || null,
       embedDescription: values.embedDescription.trim() || null,
@@ -87,7 +91,7 @@ function Form({ user, setUser }: { user: User; setUser: (u: User) => void }) {
     };
 
     const { data, error } = await fetchApi<Response['/api/user']>('/api/user', 'PATCH', {
-      view: valuesTrimmed,
+      view,
     });
 
     if (!data && error) {
@@ -122,6 +126,12 @@ function Form({ user, setUser }: { user: User; setUser: (u: User) => void }) {
       <Stack gap='sm' mt='xs'>
         <form onSubmit={form.onSubmit(onSubmit)}>
           <SimpleGrid cols={{ base: 1, md: 2 }} spacing='sm' mb='xs'>
+            <Switch
+              label='Disable text files'
+              description='Disable viewing text files through view-routes. This has no effect on other file types and will work even if view-routes are disabled.'
+              {...form.getInputProps('disableTextFiles', { type: 'checkbox' })}
+            />
+
             <Switch
               label='Enable View Routes'
               description='Enable viewing files through customizable view-routes'
@@ -186,6 +196,20 @@ function Form({ user, setUser }: { user: User; setUser: (u: User) => void }) {
             disabled={!form.values.enabled}
             my='xs'
             {...form.getInputProps('embed', { type: 'checkbox' })}
+            onChange={(event) => {
+              form.getInputProps('embed', { type: 'checkbox' }).onChange(event);
+              if (event.currentTarget.checked) {
+                form.setFieldValue('embedMediaOnly', false);
+              }
+            }}
+          />
+
+          <Switch
+            label='Media-only link preview'
+            description='When embeds are off, still add OpenGraph image/video tags so Discord and similar apps unfurl the media only (no custom title, description, or site name). The URL you paste stays in the message as plain text.'
+            disabled={!form.values.enabled || form.values.embed}
+            my='xs'
+            {...form.getInputProps('embedMediaOnly', { type: 'checkbox' })}
           />
 
           <SimpleGrid cols={{ base: 1, md: 2 }} spacing='sm'>

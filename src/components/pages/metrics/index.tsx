@@ -3,11 +3,11 @@ import { DatePicker } from '@mantine/dates';
 import { IconCalendarSearch, IconCalendarTime } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import { lazy, useState } from 'react';
-import FilesUrlsCountGraph from './parts/FilesUrlsCountGraph';
 import { StatsCardsSkeleton } from './parts/StatsCards';
 import { StatsTablesSkeleton } from './parts/StatsTables';
 import { useApiStats } from './useStats';
 
+const FilesUrlsCountGraph = lazy(() => import('./parts/FilesUrlsCountGraph'));
 const StorageGraph = lazy(() => import('./parts/StorageGraph'));
 const ViewsGraph = lazy(() => import('./parts/ViewsGraph'));
 const StatsCards = lazy(() => import('./parts/StatsCards'));
@@ -133,16 +133,16 @@ export default function DashboardMetrics() {
             <StatsCardsSkeleton />
             <StatsTablesSkeleton />
           </div>
-        ) : data?.length ? (
+        ) : data?.points.length ? (
           <div>
-            <StatsCards data={data} />
-            <StatsTables data={data} />
+            <StatsCards points={data.points} />
+            <StatsTables latest={data.latest} />
             <SimpleGrid mt='md' cols={{ base: 1, md: 2 }}>
-              <FilesUrlsCountGraph metrics={data} />
-              <ViewsGraph metrics={data} />
+              <FilesUrlsCountGraph points={data.points} />
+              <ViewsGraph points={data.points} />
             </SimpleGrid>
             <div>
-              <StorageGraph metrics={data} />
+              <StorageGraph points={data.points} />
             </div>
           </div>
         ) : (

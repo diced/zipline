@@ -1,4 +1,3 @@
-import { useQueryState } from '@/lib/client/hooks/useQueryState';
 import {
   Accordion,
   Button,
@@ -16,11 +15,12 @@ import { IconFileUpload, IconFilesOff } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 import { useApiPagination } from '../useApiPagination';
 import { lazy, Suspense } from 'react';
+import { parseAsInteger, useQueryState } from 'nuqs';
 
 const DashboardFile = lazy(() => import('@/components/file/DashboardFile'));
 
 export default function FavoriteFiles() {
-  const [page, setPage] = useQueryState('fpage', 1);
+  const [page, setPage] = useQueryState('fpage', parseAsInteger.withDefault(1));
 
   const { data, isLoading } = useApiPagination({
     page,

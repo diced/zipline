@@ -198,7 +198,7 @@ export default function DashboardURLs() {
               {...form.getInputProps('password')}
             />
 
-            <Button type='submit' variant='outline' radius='sm' leftSection={<IconLink size='1rem' />}>
+            <Button type='submit' variant='outline' leftSection={<IconLink size='1rem' />}>
               Create
             </Button>
           </Stack>

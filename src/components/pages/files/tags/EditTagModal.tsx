@@ -99,7 +99,7 @@ export default function EditTagModal({
             {...form.getInputProps('color')}
           />
 
-          <Button type='submit' variant='outline' radius='sm' disabled={!form.isDirty}>
+          <Button type='submit' variant='outline' disabled={!form.isDirty}>
             Edit tag
           </Button>
         </Stack>

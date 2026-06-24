@@ -1,8 +1,10 @@
 import { ApiError } from '@/lib/api/errors';
 import { createToken } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
+import { sanitizeFilename } from '@/lib/fs';
 import { export3Schema } from '@/lib/import/version3/validateExport';
 import { log } from '@/lib/logger';
+import { randomCharacters } from '@/lib/random';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { administratorMiddleware } from '@/server/middleware/administrator';
 import { userMiddleware } from '@/server/middleware/user';
@@ -182,10 +184,16 @@ export default typedPlugin(
             continue;
           }
 
+          let sanitizedFilename = sanitizeFilename(file.name);
+          if (!sanitizedFilename) {
+            sanitizedFilename = randomCharacters(12);
+            logger.warn('file has invalid name, using random name', { file: id, new: sanitizedFilename });
+          }
+
           const created = await prisma.file.create({
             data: {
               userId: user,
-              name: file.name,
+              name: sanitizedFilename,
               originalName: file.original_name || null,
               type: file.type,
               size: file.size,

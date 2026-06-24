@@ -1,4 +1,5 @@
 import { Group, Paper, Stack, Text, Title } from '@mantine/core';
+import { useUserStore } from '@/lib/client/store/user';
 import ClearTempButton from './actions/ClearTempButton';
 import ClearZerosButton from './actions/ClearZerosButton';
 import GenThumbsButton from './actions/GenThumbsButton';
@@ -10,6 +11,7 @@ const ACTIONS = [
     name: 'Import/Export Data',
     desc: 'Allows you to import or export server data and configurations.',
     Component: ImportExport,
+    superAdminOnly: true,
   },
   {
     name: 'Clear Temporary Files',
@@ -34,6 +36,9 @@ const ACTIONS = [
 ];
 
 export default function DashboardServerActions() {
+  const user = useUserStore((state) => state.user);
+  const actions = ACTIONS.filter((action) => !action.superAdminOnly || user?.role === 'SUPERADMIN');
+
   return (
     <>
       <Group gap='sm'>
@@ -43,7 +48,7 @@ export default function DashboardServerActions() {
         Useful tools and scripts for server management.
       </Text>
       <Stack gap='xs' my='sm'>
-        {ACTIONS.map(({ name, desc, Component }) => (
+        {actions.map(({ name, desc, Component }) => (
           <Paper withBorder p='sm' key={name}>
             <Group gap='md'>
               <Component />

@@ -14,15 +14,27 @@ export const userSelect = {
   sessions: true,
 };
 
+export const limitedUserSelect = {
+  id: true,
+  username: true,
+  createdAt: true,
+  updatedAt: true,
+  role: true,
+  view: true,
+  quota: true,
+};
+
 export const userViewSchema = z
   .object({
     enabled: z.boolean().nullish(),
+    disableTextFiles: z.boolean().nullish(),
     align: z.enum(['left', 'center', 'right']).nullish(),
     showMimetype: z.boolean().nullish(),
     showTags: z.boolean().nullish(),
     showFolder: z.boolean().nullish(),
     content: z.string().nullish(),
     embed: z.boolean().nullish(),
+    embedMediaOnly: z.boolean().nullish(),
     embedTitle: z.string().nullish(),
     embedDescription: z.string().nullish(),
     embedColor: z.string().nullish(),
@@ -105,3 +117,14 @@ export const userSchema = z.object({
 });
 
 export type User = z.infer<typeof userSchema>;
+
+export const limitedUserSchema = userSchema.omit({
+  oauthProviders: true,
+  totpSecret: true,
+  passkeys: true,
+  sessions: true,
+  password: true,
+  token: true,
+});
+
+export type LimitedUser = z.infer<typeof limitedUserSchema>;

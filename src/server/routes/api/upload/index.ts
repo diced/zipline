@@ -155,7 +155,8 @@ export default typedPlugin(
           const { fileName } = nameResult;
 
           // determine mimetype
-          const { mimetype, assumed } = await getMimetype(file.mimetype, extension);
+          const { assumed, ...mimeRes } = await getMimetype(file.mimetype, extension);
+          let mimetype = mimeRes.mimetype;
 
           if (config.files.assumeMimetypes) {
             response.assumedMimetypes![i] = assumed;
@@ -168,6 +169,12 @@ export default typedPlugin(
                 `file[${i}]: mimetype ${file.mimetype} was not recognized, supply a valid mimetype`,
               );
             }
+          }
+
+          if (config.files.disabledTypes.includes(mimetype.trim().toLowerCase())) {
+            console.log(mimetype, config.files.disabledTypesDefault);
+            if (config.files.disabledTypesDefault) mimetype = config.files.disabledTypesDefault;
+            else throw new ApiError(1065, `file[${i}]: File type ${mimetype} is not allowed`);
           }
 
           // compress the image if requested

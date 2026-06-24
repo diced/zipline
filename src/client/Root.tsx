@@ -6,6 +6,7 @@ import ThemeProvider from '@/components/ThemeProvider';
 import { type ZiplineTheme } from '@/lib/theme';
 import { type Config } from '@/lib/config/validate';
 import { Button, Text } from '@mantine/core';
+import { NuqsAdapter } from 'nuqs/adapters/react-router/v7';
 
 const AlertModal = ({ context, id, innerProps }: ContextModalProps<{ modalBody: string }>) => (
   <>
@@ -61,7 +62,10 @@ export default function Root({
           modals={contextModals}
         >
           <Notifications position='top-center' zIndex={10000000} />
-          <Outlet />
+
+          <NuqsAdapter>
+            <Outlet />
+          </NuqsAdapter>
         </ModalsProvider>
       </ThemeProvider>
     </SWRConfig>

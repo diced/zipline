@@ -1,6 +1,5 @@
 import { useApiPagination } from '@/components/pages/files/useApiPagination';
 import { type Response } from '@/lib/api/response';
-import { useQueryState } from '@/lib/client/hooks/useQueryState';
 import { useTitle } from '@/lib/client/hooks/useTitle';
 import { useFileNavStore } from '@/lib/client/store/fileNav';
 import { Folder } from '@/lib/db/models/folder';
@@ -24,6 +23,7 @@ import { IconFolder, IconUpload } from '@tabler/icons-react';
 import { lazy, Suspense, useEffect, useMemo } from 'react';
 import { Link, Params, useLoaderData, useNavigate, useSearchParams } from 'react-router-dom';
 import { useShallow } from 'zustand/shallow';
+import { useQueryState, parseAsInteger } from 'nuqs';
 
 const DashboardFile = lazy(() => import('@/components/file/DashboardFile'));
 const DashboardFileModal = lazy(() => import('@/components/file/DashboardFile/DashboardFileModal'));
@@ -47,7 +47,7 @@ export async function loader({ params, request }: { params: Params<string>; requ
 function PublicFolderCard({ folder }: { folder: Partial<Folder> }) {
   return (
     <Link to={`/folder/${folder.id}`} style={{ textDecoration: 'none' }}>
-      <Card withBorder shadow='sm' radius='sm' style={{ cursor: 'pointer' }}>
+      <Card withBorder shadow='sm' style={{ cursor: 'pointer' }}>
         <Card.Section withBorder inheritPadding py='xs'>
           <Group gap='xs'>
             <IconFolder size='1.2rem' />
@@ -78,8 +78,8 @@ export function Component() {
   const navigate = useNavigate();
 
   const [, setSearchParams] = useSearchParams();
-  const [page, setPage] = useQueryState('page', 1);
-  const [perpage] = useQueryState('perpage', 15);
+  const [page, setPage] = useQueryState('page', parseAsInteger.withDefault(1));
+  const [perpage] = useQueryState('perpage', parseAsInteger.withDefault(15));
 
   const { data, isLoading } = useApiPagination<Response['/api/server/folder/[id]']>(
     {

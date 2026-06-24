@@ -19,5 +19,5 @@ export default function useVersion() {
     revalidateOnReconnect: false,
   });
 
-  return { version: data?.data, isLoading };
+  return { version: data?.data, details: data?.details, cached: data?.cached, isLoading };
 }
