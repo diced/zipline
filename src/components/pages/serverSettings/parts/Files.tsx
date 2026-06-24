@@ -32,6 +32,7 @@ function Form({ data, isLoading }: { data: Response['/api/server/settings']; isL
       filesDefaultExpiration: data.settings.filesDefaultExpiration,
       filesMaxExpiration: data.settings.filesMaxExpiration,
       filesAssumeMimetypes: data.settings.filesAssumeMimetypes,
+      filesOmitExtension: data.settings.filesOmitExtension,
       filesDefaultDateFormat: data.settings.filesDefaultDateFormat,
       filesRemoveGpsMetadata: data.settings.filesRemoveGpsMetadata,
       filesRandomWordsNumAdjectives: data.settings.filesRandomWordsNumAdjectives,
@@ -78,6 +79,12 @@ function Form({ data, isLoading }: { data: Response['/api/server/settings']; isL
           label='Assume Mimetypes'
           description='Assume the mimetype of a file for its extension.'
           {...form.getInputProps('filesAssumeMimetypes', { type: 'checkbox' })}
+        />
+
+        <Switch
+          label='Omit Extension in URLs'
+          description='Allow accessing files without the extension in the URL (e.g. /u/uuid serves uuid.png). Upload URLs are unchagned.'
+          {...form.getInputProps('filesOmitExtension', { type: 'checkbox' })}
         />
 
         <TextInput

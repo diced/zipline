@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/db';
+import { resolveFileByName } from '@/lib/files/resolve';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { rawFileHandler } from './raw/[id]';
 
@@ -16,18 +16,13 @@ export async function filesRoute(
   res: FastifyReply,
 ) {
   const { id } = req.params;
-  const file = await prisma.file.findFirst({
-    where: {
-      name: decodeURIComponent(id),
-    },
-    select: {
-      name: true,
-      type: true,
-      password: true,
-      User: {
-        select: {
-          view: true,
-        },
+  const file = await resolveFileByName(id, {
+    name: true,
+    type: true,
+    password: true,
+    User: {
+      select: {
+        view: true,
       },
     },
   });

@@ -29,6 +29,7 @@ export const DATABASE_TO_PROP = {
   filesDefaultExpiration: 'files.defaultExpiration',
   filesMaxExpiration: 'files.maxExpiration',
   filesAssumeMimetypes: 'files.assumeMimetypes',
+  filesOmitExtension: 'files.omitExtension',
   filesDefaultDateFormat: 'files.defaultDateFormat',
   filesRemoveGpsMetadata: 'files.removeGpsMetadata',
   filesRandomWordsNumAdjectives: 'files.randomWordsNumAdjectives',

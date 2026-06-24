@@ -43,6 +43,7 @@ export const rawConfig: any = {
     maxFileSize: undefined,
     defaultExpiration: undefined,
     assumeMimetypes: undefined,
+    omitExtension: undefined,
     defaultDateFormat: undefined,
     removeGpsMetadata: undefined,
     randomWordsNumAdjectives: undefined,
