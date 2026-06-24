@@ -29,10 +29,7 @@ export const fileSelect = {
   },
 };
 
-export async function findFileByName(
-  id: string,
-  args?: Omit<Prisma.FileFindFirstArgs, 'where'>,
-) {
+export async function findFileByName(id: string, args?: Omit<Prisma.FileFindFirstArgs, 'where'>) {
   const name = decodeURIComponent(id);
   const file = await prisma.file.findFirst({ ...args, where: { name } });
   if (file || !config.files.extensionlessUrls || name.includes('.')) return file;
