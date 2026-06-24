@@ -4,7 +4,7 @@ import { prisma } from '@/lib/db';
 import { TimedCache } from '@/lib/timedCache';
 import type { Prisma } from '@/prisma/client';
 
-const resolveCache = new TimedCache<string, string>(60_000); // 1 min
+const resolveCache = new TimedCache<string, string>(60_000);
 
 export function isExtensionlessName(name: string) {
   return getExtension(name) === '';
@@ -18,39 +18,32 @@ function decodeRouteId(id: string) {
   }
 }
 
-export async function resolveFileByName<S extends Prisma.FileSelect | undefined>(
-  id: string,
-  select?: S,
-): Promise<Prisma.FileGetPayload<{ select: S }> | null> {
+type FindArgs = Omit<Prisma.FileFindFirstArgs, 'where'>;
+
+export async function resolveFileByName(id: string, args?: FindArgs) {
   const decoded = decodeRouteId(id);
 
   const cachedName = resolveCache.get(decoded);
   if (cachedName) {
-    return prisma.file.findFirst({
-      where: { name: cachedName },
-      ...(select && { select }),
-    }) as Promise<Prisma.FileGetPayload<{ select: S }> | null>;
+    return prisma.file.findFirst({ where: { name: cachedName }, ...args });
   }
 
-  const exact = await prisma.file.findFirst({
-    where: { name: decoded },
-    ...(select && { select }),
-  });
-  if (exact) return exact as Prisma.FileGetPayload<{ select: S }>;
+  const exact = await prisma.file.findFirst({ where: { name: decoded }, ...args });
+  if (exact) return exact;
 
   if (!config.files.omitExtension || !isExtensionlessName(decoded)) return null;
 
-  const fallbackSelect = select ? ({ ...select, name: true } as S & { name: true }) : undefined;
+  const fallbackArgs = args?.select ? { ...args, select: { ...args.select, name: true } } : args;
   const matches = await prisma.file.findMany({
     where: { name: { startsWith: `${decoded}.` } },
     take: 2,
-    ...(fallbackSelect && { select: fallbackSelect }),
+    ...fallbackArgs,
   });
 
   if (matches.length !== 1) return null;
 
   resolveCache.set(decoded, matches[0].name);
-  return matches[0] as Prisma.FileGetPayload<{ select: S }>;
+  return matches[0];
 }
 
 function selfCheck() {

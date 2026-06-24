@@ -26,12 +26,14 @@ import { createRoutes } from './routes';
 
 export const getFile = async (id: string) =>
   resolveFileByName(id, {
-    ...fileSelect,
-    password: true,
-    userId: true,
-    thumbnail: { select: { path: true } },
-    tags: { select: { id: true, name: true, color: true } },
-    Folder: { select: { id: true, public: true, name: true } },
+    select: {
+      ...fileSelect,
+      password: true,
+      userId: true,
+      thumbnail: { select: { path: true } },
+      tags: { select: { id: true, name: true, color: true } },
+      Folder: { select: { id: true, public: true, name: true } },
+    },
   });
 
 export async function render(

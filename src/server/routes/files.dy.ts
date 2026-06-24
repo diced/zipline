@@ -17,12 +17,14 @@ export async function filesRoute(
 ) {
   const { id } = req.params;
   const file = await resolveFileByName(id, {
-    name: true,
-    type: true,
-    password: true,
-    User: {
-      select: {
-        view: true,
+    select: {
+      name: true,
+      type: true,
+      password: true,
+      User: {
+        select: {
+          view: true,
+        },
       },
     },
   });

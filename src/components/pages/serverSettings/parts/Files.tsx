@@ -83,7 +83,7 @@ function Form({ data, isLoading }: { data: Response['/api/server/settings']; isL
 
         <Switch
           label='Omit Extension in URLs'
-          description='Allow accessing files without the extension in the URL (e.g. /u/uuid serves uuid.png). Upload URLs are unchagned.'
+          description='Allow accessing files without the extension in the URL (e.g. /u/uuid serves uuid.png). Upload URLs are unchanged.'
           {...form.getInputProps('filesOmitExtension', { type: 'checkbox' })}
         />
 
