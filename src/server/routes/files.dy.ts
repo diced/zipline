@@ -18,7 +18,20 @@ export async function filesRoute(
 ) {
   const { id } = req.params;
   const file = await findFileByName(id, (where, orderBy) =>
-    prisma.file.findFirst({ where, ...(orderBy && { orderBy }), include: { User: true } }),
+    prisma.file.findFirst({
+      where,
+      ...(orderBy && { orderBy }),
+      select: {
+        name: true,
+        type: true,
+        password: true,
+        User: {
+          select: {
+            view: true,
+          },
+        },
+      },
+    }),
   );
   if (!file) return res.callNotFound();
 
