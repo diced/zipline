@@ -103,7 +103,7 @@ function Form({ data, isLoading }: { data: Response['/api/server/settings']; isL
 
         <Switch
           label='Extensionless URLs'
-          description='Allow file links without the extension (e.g. /u/uuid instead of /u/uuid.png). Ulpoad responses still include the extension.'
+          description='Allow file links without the extension (e.g. /u/uuid instead of /u/uuid.png). Upload responses still include the extension.'
           {...form.getInputProps('filesExtensionlessUrls', { type: 'checkbox' })}
         />
 
