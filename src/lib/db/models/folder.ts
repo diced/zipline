@@ -38,30 +38,39 @@ export async function buildPublicParentChain(parentId: string | null): Promise<F
   };
 }
 
-export function cleanFolder<T extends Partial<Folder>>(folder: T, stringifyDates = false): T {
+type CleanableFolder = {
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
+  files?: unknown;
+  children?: unknown;
+  parent?: unknown;
+  [key: string]: unknown;
+};
+
+export function cleanFolder<T extends CleanableFolder>(folder: T, stringifyDates = false): T {
   if (folder.files && Array.isArray(folder.files)) cleanFiles(folder.files as any, stringifyDates);
 
   if (stringifyDates) {
     if (folder.createdAt && folder.createdAt instanceof Date)
-      folder.createdAt = folder.createdAt.toISOString();
+      (folder as CleanableFolder).createdAt = folder.createdAt.toISOString();
     if (folder.updatedAt && folder.updatedAt instanceof Date)
-      folder.updatedAt = folder.updatedAt.toISOString();
+      (folder as CleanableFolder).updatedAt = folder.updatedAt.toISOString();
   }
 
   if (folder.children && Array.isArray(folder.children)) {
     for (const child of folder.children) {
-      cleanFolder(child, stringifyDates);
+      if (child && typeof child === 'object') cleanFolder(child as CleanableFolder, stringifyDates);
     }
   }
 
   if (folder.parent && typeof folder.parent === 'object') {
-    cleanFolder(folder.parent, stringifyDates);
+    cleanFolder(folder.parent as CleanableFolder, stringifyDates);
   }
 
   return folder;
 }
 
-export function cleanFolders<T extends Partial<Folder>>(folders: T[], stringifyDates = false): T[] {
+export function cleanFolders<T extends CleanableFolder>(folders: T[], stringifyDates = false): T[] {
   for (let i = 0; i !== folders.length; ++i) {
     cleanFolder(folders[i], stringifyDates);
   }

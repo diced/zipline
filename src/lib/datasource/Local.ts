@@ -14,6 +14,10 @@ async function existsAndCanRW(path: string): Promise<boolean> {
   }
 }
 
+function isCrossDeviceMove(error: unknown): boolean {
+  return typeof error === 'object' && error !== null && 'code' in error && error.code === 'EXDEV';
+}
+
 export class LocalDatasource extends Datasource {
   name = 'local';
   logger = log('datasource').c('local');
@@ -44,13 +48,22 @@ export class LocalDatasource extends Datasource {
     const path = this.resolvePath(file);
     if (!path) throw new Error('Invalid path provided');
 
-    // handles if given a path to a file, it will just move it instead of doing unecessary writes
+    // handles path-based writes without duplicating bytes when the source can be consumed
     if (typeof data === 'string' && data.startsWith('/')) {
       const exists = await existsAndCanRW(data);
       if (!exists)
         throw new Error(
           "Something went very wrong! the temporary directory wasn't readable or the file doesn't exist.",
         );
+
+      if (!noDelete) {
+        try {
+          await rename(data, path);
+          return;
+        } catch (e) {
+          if (!isCrossDeviceMove(e)) throw e;
+        }
+      }
 
       await copyFile(data, path);
 

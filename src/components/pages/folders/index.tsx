@@ -55,7 +55,7 @@ export default function DashboardFolders() {
     data: currentFolder,
     error: currentFolderError,
     isLoading,
-  } = useSWR<Folder>(currentFolderId ? `/api/user/folders/${currentFolderId}` : null);
+  } = useSWR<Folder>(currentFolderId ? `/api/user/folders/${currentFolderId}?noincl=true` : null);
 
   const form = useForm({
     initialValues: {

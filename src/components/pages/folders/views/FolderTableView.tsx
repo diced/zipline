@@ -119,7 +119,7 @@ export default function FolderTableView({
 }) {
   const clipboard = useClipboard();
 
-  const queryParam = currentFolderId ? `?parentId=${currentFolderId}` : '?root=true';
+  const queryParam = currentFolderId ? `?parentId=${currentFolderId}&noincl=true` : '?root=true&noincl=true';
   const { data, isLoading } = useSWR<Extract<Response['/api/user/folders'], Folder[]>>(
     `/api/user/folders${queryParam}`,
   );
