@@ -24,9 +24,10 @@ import { createStaticHandler, createStaticRouter, StaticRouterProvider } from 'r
 import { createRoutes } from './routes';
 
 export const getFile = async (id: string) =>
-  findFileByName(id, (where) =>
+  findFileByName(id, (where, orderBy) =>
     prisma.file.findFirst({
       where,
+      ...(orderBy && { orderBy }),
       select: {
         ...fileSelect,
         password: true,

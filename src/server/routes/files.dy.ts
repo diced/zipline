@@ -17,7 +17,9 @@ export async function filesRoute(
   res: FastifyReply,
 ) {
   const { id } = req.params;
-  const file = await findFileByName(id, (where) => prisma.file.findFirst({ where, include: { User: true } }));
+  const file = await findFileByName(id, (where, orderBy) =>
+    prisma.file.findFirst({ where, ...(orderBy && { orderBy }), include: { User: true } }),
+  );
   if (!file) return res.callNotFound();
 
   const viewUrl = `/view/${encodeURIComponent(file.name)}`;
