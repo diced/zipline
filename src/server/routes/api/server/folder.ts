@@ -72,7 +72,7 @@ export default typedPlugin(
         if (!folder.public && !folder.allowUploads) throw new ApiError(9002);
 
         const { page, perpage, sortBy, order } = req.query;
-        if (!page && folder.allowUploads) {
+        if ((!page && folder.allowUploads) || !folder.public) {
           return res.send({
             folder: {
               id: folder.id,
