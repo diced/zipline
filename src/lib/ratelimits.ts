@@ -1,3 +1,3 @@
-export const secondlyRatelimit = (seconds: number) => ({
-  config: { rateLimit: { max: 1, timeWindow: `${seconds} seconds`, allowList: [] } },
+export const secondlyRatelimit = (seconds: number, max: number = 1) => ({
+  config: { rateLimit: { max, timeWindow: `${seconds} seconds`, allowList: [] } },
 });

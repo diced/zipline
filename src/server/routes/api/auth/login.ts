@@ -42,7 +42,7 @@ export default typedPlugin(
             }),
           },
         },
-        ...secondlyRatelimit(2),
+        ...secondlyRatelimit(10, 7),
       },
       async (req, res) => {
         const session = await getSession(req, res);
