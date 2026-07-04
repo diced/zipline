@@ -5,7 +5,7 @@ import { Datasource } from '@/lib/datasource/Datasource';
 import type { File } from '@/lib/db/models/file';
 import { log } from '@/lib/logger';
 import { randomCharacters } from '@/lib/random';
-import ffmpeg from 'fluent-ffmpeg';
+import ffmpeg from '@/lib/ffmpeg';
 import { createWriteStream, existsSync, readFileSync, unlinkSync } from 'fs';
 import { join } from 'path';
 import { isMainThread, parentPort, workerData } from 'worker_threads';
