@@ -3,8 +3,7 @@ import { DatePicker } from '@mantine/dates';
 import { IconCalendarSearch, IconCalendarTime } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import { lazy, useState } from 'react';
-import { StatsCardsSkeleton } from './parts/StatsCards';
-import { StatsTablesSkeleton } from './parts/StatsTables';
+import { StatsCardsSkeleton, StatsTablesSkeleton } from './parts/Skeletons';
 import { useApiStats } from './useStats';
 
 const FilesUrlsCountGraph = lazy(() => import('./parts/FilesUrlsCountGraph'));
