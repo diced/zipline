@@ -14,6 +14,15 @@ declare global {
       ZIPLINE_BUILD?: string;
       ZIPLINE_DB_LOG?: string;
       ZIPLINE_OVERRIDE_DISABLED_WORKER_LOG?: string;
+      ZIPLINE_OVERRIDE_LOG_DATE_FORMAT?: string;
+      ZIPLINE_MONITOR_MEMORY?: string;
+      ZIPLINE_NO_COLOR?: string;
+      ZIPLINE_OUTPUT_OPENAPI?: string;
+      ZIPLINE_GIT_SHA?: string;
+
+      FFMPEG_PATH?: string;
+
+      DEBUG?: string;
     }
   }
 }
@@ -305,11 +314,11 @@ export const schema = z.object({
       })
       .or(
         z.object({
-          clientId: z.undefined(),
-          clientSecret: z.undefined(),
-          redirectUri: z.undefined(),
-          allowedIds: z.undefined().or(z.array(z.string()).default([])),
-          deniedIds: z.undefined().or(z.array(z.string()).default([])),
+          clientId: z.undefined().optional(),
+          clientSecret: z.undefined().optional(),
+          redirectUri: z.undefined().optional(),
+          allowedIds: z.undefined().optional().or(z.array(z.string()).default([])),
+          deniedIds: z.undefined().optional().or(z.array(z.string()).default([])),
         }),
       ),
     github: z
@@ -320,9 +329,9 @@ export const schema = z.object({
       })
       .or(
         z.object({
-          clientId: z.undefined(),
-          clientSecret: z.undefined(),
-          redirectUri: z.undefined(),
+          clientId: z.undefined().optional(),
+          clientSecret: z.undefined().optional(),
+          redirectUri: z.undefined().optional(),
         }),
       ),
     google: z
@@ -333,9 +342,9 @@ export const schema = z.object({
       })
       .or(
         z.object({
-          clientId: z.undefined(),
-          clientSecret: z.undefined(),
-          redirectUri: z.undefined(),
+          clientId: z.undefined().optional(),
+          clientSecret: z.undefined().optional(),
+          redirectUri: z.undefined().optional(),
         }),
       ),
     oidc: z
@@ -349,12 +358,12 @@ export const schema = z.object({
       })
       .or(
         z.object({
-          clientId: z.undefined(),
-          clientSecret: z.undefined(),
-          authorizeUrl: z.undefined(),
-          userinfoUrl: z.undefined(),
-          tokenUrl: z.undefined(),
-          redirectUri: z.undefined(),
+          clientId: z.undefined().optional(),
+          clientSecret: z.undefined().optional(),
+          authorizeUrl: z.undefined().optional(),
+          userinfoUrl: z.undefined().optional(),
+          tokenUrl: z.undefined().optional(),
+          redirectUri: z.undefined().optional(),
         }),
       ),
   }),
