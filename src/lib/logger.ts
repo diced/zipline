@@ -24,11 +24,13 @@ export function log(name: string) {
   return new Logger(name);
 }
 
+const SEPARATOR = '.';
+
 export default class Logger {
   public constructor(public name: string) {}
 
   public c(name: string) {
-    return new Logger(`${this.name}.${name}`);
+    return new Logger(`${this.name}${SEPARATOR}${name}`);
   }
 
   private isZiplineDebug(): boolean {
@@ -44,9 +46,18 @@ export default class Logger {
   }
 
   private format(message: string, level: LoggerLevel) {
-    const timestamp = dayjs().format('YYYY-MM-DDTHH:mm:ss');
+    const timestamp = dayjs().format(process.env.ZIPLINE_OVERRIDE_LOG_DATE_FORMAT ?? 'YYYY-MM-DDTHH:mm:ss');
 
-    return `${colors.gray('[')}${timestamp} ${this.formatLevel(level)}  ${this.name}${colors.gray(']')} ${message}`;
+    return `${colors.gray('[')}${timestamp} ${this.formatLevel(level)}  ${this.formatName()}${colors.gray(']')} ${message}`;
+  }
+
+  private formatName() {
+    if (!canStyle) return this.name;
+
+    return this.name
+      .split(SEPARATOR)
+      .map((part) => part)
+      .join(colors.gray(SEPARATOR));
   }
 
   private formatLevel(level: LoggerLevel) {
