@@ -2,7 +2,7 @@ import { detectClient, ZiplineClient } from '@/lib/api/detect';
 import { config } from '@/lib/config';
 import { prisma } from '@/lib/db';
 import { randomCharacters } from '@/lib/random';
-import { parse } from 'cookie';
+import { fastifyCookie } from '@fastify/cookie';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { IncomingMessage, ServerResponse } from 'http';
 import { getIronSession, type SessionOptions } from 'iron-session';
@@ -50,7 +50,7 @@ export async function getSession(
 
   const headers = (req as FastifyRequest).headers || (req as IncomingMessage).headers;
   session.client = detectClient(<Record<string, string>>headers);
-  const cookies = parse(headers.cookie || '');
+  const cookies = fastifyCookie.parse(headers.cookie || '');
 
   if (headers['authorization'] && !cookies['zipline_session']) {
     const token = parseUserToken(headers['authorization'], true);

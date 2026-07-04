@@ -1,6 +1,22 @@
 import dayjs from 'dayjs';
-import { green, red, yellow, gray, white, bold, blue } from 'colorette';
+import { isatty } from 'tty';
+import { styleText } from 'util';
 import { isMainThread } from 'worker_threads';
+
+const canStyle = !process.env.ZIPLINE_NO_COLOR && isatty(1);
+
+const style = (format: Parameters<typeof styleText>[0], text: string) =>
+  canStyle ? styleText(format, text, { validateStream: false }) : text;
+
+const colors: Record<string, (text: string) => string> = {
+  green: (text: string) => style('green', text),
+  red: (text: string) => style('red', text),
+  yellow: (text: string) => style('yellow', text),
+  gray: (text: string) => style('gray', text),
+  white: (text: string) => style('white', text),
+  bold: (text: string) => style('bold', text),
+  blue: (text: string) => style('blue', text),
+};
 
 export type LoggerLevel = 'info' | 'warn' | 'error' | 'debug' | 'trace';
 
@@ -12,7 +28,7 @@ export default class Logger {
   public constructor(public name: string) {}
 
   public c(name: string) {
-    return new Logger(`${this.name}::${name}`);
+    return new Logger(`${this.name}.${name}`);
   }
 
   private isZiplineDebug(): boolean {
@@ -30,23 +46,23 @@ export default class Logger {
   private format(message: string, level: LoggerLevel) {
     const timestamp = dayjs().format('YYYY-MM-DDTHH:mm:ss');
 
-    return `${gray('[')}${timestamp} ${this.formatLevel(level)}  ${this.name}${gray(']')} ${message}`;
+    return `${colors.gray('[')}${timestamp} ${this.formatLevel(level)}  ${this.name}${colors.gray(']')} ${message}`;
   }
 
   private formatLevel(level: LoggerLevel) {
     switch (level) {
       case 'info':
-        return green('INFO ');
+        return colors.green('INFO ');
       case 'warn':
-        return yellow('WARN ');
+        return colors.yellow('WARN ');
       case 'error':
-        return red('ERROR');
+        return colors.red('ERROR');
       case 'debug':
-        return yellow(bold('DEBUG'));
+        return colors.yellow(colors.bold('DEBUG'));
       case 'trace':
-        return gray(bold('TRACE'));
+        return colors.gray(colors.bold('TRACE'));
       default:
-        return white(bold('?????'));
+        return colors.white(colors.bold('?????'));
     }
   }
 
@@ -54,7 +70,9 @@ export default class Logger {
     return (
       ' ' +
       Object.entries(extra)
-        .map(([key, value]) => `${blue(key)}${gray('=')}${JSON.stringify(value, this.replacer)}`)
+        .map(
+          ([key, value]) => `${colors.blue(key)}${colors.gray('=')}${JSON.stringify(value, this.replacer)}`,
+        )
         .join(' ')
     );
   }
