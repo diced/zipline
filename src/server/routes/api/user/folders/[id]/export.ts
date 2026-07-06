@@ -104,8 +104,14 @@ export default typedPlugin(
 
         res.hijack();
 
+        const dl = `${folder.name}.zip`;
+        const sanitized = dl.replace(/[^\x20-\x7e]/g, '_').replace(/["\\]/g, '_');
+
         res.raw.setHeader('Content-Type', 'application/zip');
-        res.raw.setHeader('Content-Disposition', `attachment; filename="${folder.name}.zip"`);
+        res.raw.setHeader(
+          'Content-Disposition',
+          `attachment; filename="${sanitized}"; filename*=UTF-8''${encodeURIComponent(dl)}`,
+        );
 
         const zip = archiver('zip', {
           zlib: { level: 9 },
