@@ -3,12 +3,12 @@ import { fetchToDataURL } from '@/lib/base64';
 import { config } from '@/lib/config';
 import Logger from '@/lib/logger';
 import enabled from '@/lib/oauth/enabled';
-import { encryptOAuthState } from '@/lib/oauth/state';
+import { generateOAuthState } from '@/lib/oauth/state';
 import { googleAuthorizeURL, googleUser } from '@/lib/oauth/providers';
 import { OAuthQuery, OAuthResponse } from '@/server/plugins/oauth';
 import typedPlugin from '@/server/typedPlugin';
 
-async function googleOauth({ code, host, state }: OAuthQuery, logger: Logger): Promise<OAuthResponse> {
+async function googleOauth({ code, host, state, session }: OAuthQuery, logger: Logger): Promise<OAuthResponse> {
   if (!config.features.oauthRegistration) throw new ApiError(3016);
 
   const { google: googleEnabled } = enabled(config);
@@ -20,7 +20,7 @@ async function googleOauth({ code, host, state }: OAuthQuery, logger: Logger): P
       googleAuthorizeURL({
         clientId: config.oauth.google.clientId!,
         origin: `${config.core.returnHttpsUrls ? 'https' : 'http'}://${host}`,
-        state: encryptOAuthState({ mode: state === 'link' ? 'link' : 'default' }),
+        state: await generateOAuthState(session, state === 'link' ? 'link' : 'default'),
         redirectUri: config.oauth.google.redirectUri!,
       }),
     );

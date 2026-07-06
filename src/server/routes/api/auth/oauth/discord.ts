@@ -3,12 +3,12 @@ import { fetchToDataURL } from '@/lib/base64';
 import { config } from '@/lib/config';
 import Logger from '@/lib/logger';
 import enabled from '@/lib/oauth/enabled';
-import { encryptOAuthState } from '@/lib/oauth/state';
+import { generateOAuthState } from '@/lib/oauth/state';
 import { discordAuthorizeURL, discordUser } from '@/lib/oauth/providers';
 import { OAuthQuery, OAuthResponse } from '@/server/plugins/oauth';
 import typedPlugin from '@/server/typedPlugin';
 
-async function discordOauth({ code, host, state }: OAuthQuery, logger: Logger): Promise<OAuthResponse> {
+async function discordOauth({ code, host, state, session }: OAuthQuery, logger: Logger): Promise<OAuthResponse> {
   if (!config.features.oauthRegistration) throw new ApiError(3016);
 
   const { discord: discordEnabled } = enabled(config);
@@ -20,7 +20,7 @@ async function discordOauth({ code, host, state }: OAuthQuery, logger: Logger): 
       discordAuthorizeURL({
         clientId: config.oauth.discord.clientId!,
         origin: `${config.core.returnHttpsUrls ? 'https' : 'http'}://${host}`,
-        state: encryptOAuthState({ mode: state === 'link' ? 'link' : 'default' }),
+        state: await generateOAuthState(session, state === 'link' ? 'link' : 'default'),
         redirectUri: config.oauth.discord.redirectUri!,
       }),
     );

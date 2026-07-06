@@ -5,7 +5,7 @@ import Logger from '@/lib/logger';
 import enabled from '@/lib/oauth/enabled';
 import { generatePKCEChallenge, generatePKCEVerifier } from '@/lib/oauth/pkce';
 import { oidcAuthorizeURL, oidcUser } from '@/lib/oauth/providers';
-import { encryptOAuthState } from '@/lib/oauth/state';
+import { generateOAuthState } from '@/lib/oauth/state';
 import { OAuthQuery, OAuthResponse } from '@/server/plugins/oauth';
 import typedPlugin from '@/server/typedPlugin';
 
@@ -21,13 +21,13 @@ async function oidcOauth({ code, host, state, session }: OAuthQuery, logger: Log
     const codeChallenge = generatePKCEChallenge(pkceVerifier);
 
     session.pkceVerifier = pkceVerifier;
-    await session.save();
+    const oauthState = await generateOAuthState(session, state === 'link' ? 'link' : 'default');
 
     throw new RedirectError(
       oidcAuthorizeURL({
         clientId: config.oauth.oidc.clientId!,
         origin: `${config.core.returnHttpsUrls ? 'https' : 'http'}://${host}`,
-        state: encryptOAuthState({ mode: state === 'link' ? 'link' : 'default' }),
+        state: oauthState,
         redirectUri: config.oauth.oidc.redirectUri!,
         authorizeUrl: config.oauth.oidc.authorizeUrl!,
         codeChallenge,

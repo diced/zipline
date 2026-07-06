@@ -73,6 +73,18 @@ async function oauthPlugin(fastify: FastifyInstance) {
     const state = parseOAuthState(query.state);
     if (!state) throw new ApiError(1064);
 
+    if (!state.nonce || !session.oauthState || state.nonce !== session.oauthState) {
+      logger.warn('oauth state nonce mismatch!!', {
+        provider,
+        ua: this.headers['user-agent'],
+      });
+
+      throw new ApiError(1064);
+    }
+
+    delete session.oauthState;
+    await session.save();
+
     const user = await prisma.user.findFirst({
       where: {
         sessions: {

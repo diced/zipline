@@ -24,6 +24,7 @@ export type ZiplineSession = {
   client: ZiplineClient;
 
   pkceVerifier?: string;
+  oauthState?: string;
   tokenAuth?: boolean;
 };
 
