@@ -8,6 +8,7 @@ import { prisma } from '@/lib/db';
 import { sanitizeFilename } from '@/lib/fs';
 import { log } from '@/lib/logger';
 import { guess } from '@/lib/mimes';
+import { setContentSecurity } from '@/lib/api/contentSecurity';
 import { TimedCache } from '@/lib/timedCache';
 import typedPlugin from '@/server/typedPlugin';
 import { FastifyReply, FastifyRequest } from 'fastify';
@@ -35,6 +36,8 @@ export const rawFileHandler = async (
 ) => {
   const { id } = req.params;
   const { token, download } = req.query;
+
+  setContentSecurity(res);
 
   const idSanitized = sanitizeFilename(id);
   if (!idSanitized) return res.callNotFound();

@@ -1,4 +1,5 @@
 import { verifyAccessToken } from '@/lib/accessToken';
+import { setContentSecurity } from '@/lib/api/contentSecurity';
 import { ApiError } from '@/lib/api/errors';
 import { parseRange } from '@/lib/api/range';
 import { config } from '@/lib/config';
@@ -36,6 +37,8 @@ export default typedPlugin(
       },
       async (req, res) => {
         const { token, download } = req.query;
+
+        setContentSecurity(res);
 
         const id = sanitizeFilename(req.params.id);
         if (!id) throw new ApiError(9002);
