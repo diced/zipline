@@ -22,12 +22,12 @@ const logger = log('api').c('upload').c('partial');
 
 const partialsCache = new Map<string, { length: number; options: UploadOptions; prefix: string }>();
 
-function createPartial(length: number, options: UploadOptions) {
+function createPartial(options: UploadOptions) {
   const identifier = randomCharacters(8);
 
   const prefix = `zipline_partial_${identifier}_`;
 
-  partialsCache.set(identifier, { length, options, prefix });
+  partialsCache.set(identifier, { length: 0, options, prefix });
   return identifier;
 }
 
@@ -114,9 +114,21 @@ export default typedPlugin(
         const file = files[0];
         const fileSize = file.file.bytesRead;
 
+        const [start, end, total] = options.partial.range;
+
+        if (start < 0 || end < start || total < 0 || end > total || end - start !== fileSize) {
+          if (options.partial.identifier) await deletePartial(options.partial.identifier);
+          throw new ApiError(1002);
+        }
+
+        if (total > bytes(config.files.maxFileSize)) {
+          if (options.partial.identifier) await deletePartial(options.partial.identifier);
+          throw new ApiError(5001);
+        }
+
         // caching for partial uploads server side checks and performance
-        if (options.partial.range[0] === 0) {
-          options.partial.identifier = createPartial(fileSize, options);
+        if (start === 0) {
+          options.partial.identifier = createPartial(options);
         } else {
           if (!options.partial.identifier || !partialsCache.has(options.partial.identifier))
             throw new ApiError(1003);
@@ -139,6 +151,11 @@ export default typedPlugin(
         }
 
         cache.length += fileSize;
+
+        if (options.partial.lastchunk && cache.length !== total) {
+          await deletePartial(options.partial.identifier);
+          throw new ApiError(1002);
+        }
 
         // handle partial stuff
         const sanitized = sanitizeFilename(

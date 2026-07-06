@@ -11,7 +11,7 @@ import { UploadOptions } from '@/lib/uploader/parseHeaders';
 import { onUpload } from '@/lib/webhooks';
 import { Upload } from '@aws-sdk/lib-storage';
 import { createReadStream, createWriteStream } from 'fs';
-import { open, readdir, rm } from 'fs/promises';
+import { open, readdir, rm, stat } from 'fs/promises';
 import { join } from 'path';
 import { isMainThread, workerData } from 'worker_threads';
 import { dbProxy } from './proxiedDb';
@@ -141,6 +141,8 @@ async function main() {
     }
   }
 
+  const finalSize = await stat(finalPath).then((s) => s.size);
+
   if (config.datasource.type === 's3') {
     logger.debug('starting multipart upload process for s3');
 
@@ -182,10 +184,10 @@ async function main() {
     },
   });
 
-  await runComplete(file.id);
+  await runComplete(file.id, finalSize);
 }
 
-async function runComplete(id: string) {
+async function runComplete(id: string, size: number) {
   const userr = await dbProxy<User>('user.findUnique', {
     where: {
       id: user.id,
@@ -199,7 +201,7 @@ async function runComplete(id: string) {
       id,
     },
     data: {
-      size: options.partial!.range[2],
+      size,
       ...(options.maxViews && { maxViews: options.maxViews }),
       ...(options.deletesAt && options.deletesAt !== 'never'
         ? { deletesAt: options.deletesAt }

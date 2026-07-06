@@ -277,7 +277,7 @@ export function parseHeaders(headers: UploadHeaders, fileConfig: Config['files']
       .split('/')
       .map((x) => Number(x));
 
-    if (isNaN(start) || isNaN(end) || isNaN(total))
+    if (!Number.isInteger(start) || !Number.isInteger(end) || !Number.isInteger(total))
       throwHeaderError('content-range', 'Invalid content-range');
 
     response.partial = {
