@@ -86,7 +86,9 @@ export default typedPlugin(
             },
           });
           if (!folder) throw new ApiError(4001);
-          if (!req.user && !folder.allowUploads) throw new ApiError(3002);
+
+          const ownsFolder = req.user ? folder.userId === req.user.id : false;
+          if (!ownsFolder && !folder.allowUploads) throw new ApiError(req.user ? 3011 : 3002);
         }
 
         const { files } = await req.saveRequestFiles({ tmpdir: config.core.tempDirectory });
