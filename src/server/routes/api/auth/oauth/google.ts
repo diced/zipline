@@ -8,7 +8,10 @@ import { googleAuthorizeURL, googleUser } from '@/lib/oauth/providers';
 import { OAuthQuery, OAuthResponse } from '@/server/plugins/oauth';
 import typedPlugin from '@/server/typedPlugin';
 
-async function googleOauth({ code, host, state, session }: OAuthQuery, logger: Logger): Promise<OAuthResponse> {
+async function googleOauth(
+  { code, host, state, session }: OAuthQuery,
+  logger: Logger,
+): Promise<OAuthResponse> {
   if (!config.features.oauthRegistration) throw new ApiError(3016);
 
   const { google: googleEnabled } = enabled(config);
