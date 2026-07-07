@@ -10,7 +10,7 @@ import { fastifyStatic } from '@fastify/static';
 import fastifySwagger from '@fastify/swagger';
 import type { FastifyInstance } from 'fastify';
 import { jsonSchemaTransform, serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod';
-import { version } from '../../../package.json';
+import { version } from '@/lib/version';
 import { checkRateLimit } from '../plugins/checkRateLimit';
 import oauthPlugin from '../plugins/oauth';
 import vitePlugin from '../plugins/vite';

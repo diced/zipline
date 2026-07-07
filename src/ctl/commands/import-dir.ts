@@ -1,5 +1,7 @@
 import { bytes } from '@/lib/bytes';
 import { config, reloadSettings } from '@/lib/config';
+import { getDatasource } from '@/lib/datasource';
+import { prisma } from '@/lib/db';
 import { guess } from '@/lib/mimes';
 import { statSync } from 'fs';
 import { mkdir, readdir } from 'fs/promises';
@@ -14,7 +16,6 @@ export async function importDir(
 
   await reloadSettings();
 
-  const { prisma } = await import('@/lib/db/index.js');
   let userId: string;
 
   if (id) {
@@ -85,7 +86,6 @@ export async function importDir(
   if (config.datasource.type === 'local')
     await mkdir(config.datasource.local!.directory, { recursive: true });
 
-  const { getDatasource } = await import('@/lib/datasource/index.js');
   const datasource = getDatasource(config);
   if (!datasource) return console.error('No datasource configured');
 

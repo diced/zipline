@@ -3,21 +3,21 @@ import { basename, join } from 'path';
 import { ZiplineTheme } from '.';
 import { exists } from '../fs';
 
-import dark_gray from './builtins/dark_gray.theme.json';
-import light_gray from './builtins/light_gray.theme.json';
-import black_dark from './builtins/black_dark.theme.json';
+import dark_gray from './builtins/dark_gray.theme.json' with { type: 'json' };
+import light_gray from './builtins/light_gray.theme.json' with { type: 'json' };
+import black_dark from './builtins/black_dark.theme.json' with { type: 'json' };
 
-import light_blue from './builtins/light_blue.theme.json';
-import dark_blue from './builtins/dark_blue.theme.json';
+import light_blue from './builtins/light_blue.theme.json' with { type: 'json' };
+import dark_blue from './builtins/dark_blue.theme.json' with { type: 'json' };
 
-import cat_frappe from './builtins/catppuccin_frappe.theme.json';
-import cat_latte from './builtins/catppuccin_latte.theme.json';
-import cat_macchiato from './builtins/catppuccin_macchiato.theme.json';
-import cat_mocha from './builtins/catppuccin_mocha.theme.json';
+import cat_frappe from './builtins/catppuccin_frappe.theme.json' with { type: 'json' };
+import cat_latte from './builtins/catppuccin_latte.theme.json' with { type: 'json' };
+import cat_macchiato from './builtins/catppuccin_macchiato.theme.json' with { type: 'json' };
+import cat_mocha from './builtins/catppuccin_mocha.theme.json' with { type: 'json' };
 
-import midnight_orange from './builtins/midnight_orange.theme.json';
-import midnight_blue from './builtins/midnight_blue.theme.json';
-import midnight_purple from './builtins/midnight_purple.theme.json';
+import midnight_orange from './builtins/midnight_orange.theme.json' with { type: 'json' };
+import midnight_blue from './builtins/midnight_blue.theme.json' with { type: 'json' };
+import midnight_purple from './builtins/midnight_purple.theme.json' with { type: 'json' };
 
 import { log } from '../logger';
 

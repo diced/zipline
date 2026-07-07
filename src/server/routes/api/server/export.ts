@@ -9,7 +9,7 @@ import { zQsBoolean } from '@/lib/validation';
 import typedPlugin from '@/server/typedPlugin';
 import { cpus, hostname, platform, release } from 'os';
 import z from 'zod';
-import { version } from '../../../../../package.json';
+import { version } from '@/lib/version';
 
 const exportCountsSchema = z.object({
   users: z.number(),

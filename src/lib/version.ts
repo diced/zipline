@@ -1,8 +1,10 @@
-import { version } from '../../package.json';
+import packageJson from '../../package.json' with { type: 'json' };
 import { execSync } from 'child_process';
 import { log } from './logger';
 
 const logger = log('version');
+
+export const version = packageJson.version;
 
 export function gitSha() {
   const envValue = process.env.ZIPLINE_GIT_SHA;

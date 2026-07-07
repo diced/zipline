@@ -4,6 +4,7 @@ import { DATABASE_TO_PROP } from '@/lib/config/read/db';
 import { ENVS } from '@/lib/config/read/env';
 import { getProperty } from '@/lib/config/read/transform';
 import { validateConfigObject } from '@/lib/config/validate';
+import { prisma } from '@/lib/db';
 import { randomCharacters } from '@/lib/random';
 
 function convertValueToEnv(
@@ -56,8 +57,6 @@ export async function exportConfig({ yml, showDefaults }: { yml?: boolean; showD
   const defaultConfig = validateConfigObject(clonedDefault);
 
   await reloadSettings();
-
-  const { prisma } = await import('@/lib/db/index.js');
 
   const ziplineTable = await prisma.zipline.findFirst({
     omit: {

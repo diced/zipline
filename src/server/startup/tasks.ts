@@ -32,7 +32,7 @@ export function startTasks(server: FastifyInstance) {
     for (let i = 0; i !== config.features.thumbnails.num_threads; ++i) {
       tasks.worker(
         `thumbnail-${i}`,
-        './build/offload/thumbnails.js',
+        'offload/thumbnails.js',
         {
           id: `thumbnail-${i}`,
           enabled: config.features.thumbnails.enabled,

@@ -2,6 +2,7 @@ import { Worker } from 'worker_threads';
 import Logger, { log } from '../logger';
 import { config } from '../config';
 import { MAX_SAFE_TIMEOUT_MS } from '../config/validate';
+import { createWorker } from '../worker';
 
 export interface Task {
   id: string;
@@ -112,7 +113,7 @@ export class Tasks {
       task.data.config = config;
     }
 
-    const worker = new Worker(task.path, {
+    const worker = createWorker(task.path, {
       workerData: task.data,
     });
 

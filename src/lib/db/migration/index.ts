@@ -1,15 +1,19 @@
-import { Migrate } from '@prisma/migrate';
+import migratePkg from '@prisma/migrate';
 import { defineConfig } from 'prisma/config';
-import {
+import prismaInternals from '@prisma/internals';
+import { log } from '@/lib/logger';
+
+import ensureDatabaseExistsPkg from '@prisma/migrate/dist/utils/ensureDatabaseExists.js';
+
+const { Migrate } = migratePkg;
+const { ensureDatabaseExists } = ensureDatabaseExistsPkg;
+const {
   createSchemaPathInput,
   getSchemaDatasourceProvider,
   inferDirectoryConfig,
   loadSchemaContext,
   validatePrismaConfigWithDatasource,
-} from '@prisma/internals';
-import { log } from '@/lib/logger';
-
-import { ensureDatabaseExists } from '@prisma/migrate/dist/utils/ensureDatabaseExists';
+} = prismaInternals;
 
 export async function runMigrations() {
   const baseDir = process.cwd();

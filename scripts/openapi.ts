@@ -1,10 +1,11 @@
 import { readFile, writeFile } from 'fs/promises';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import { run, step } from '.';
 import { API_ERRORS, ApiError, ApiErrorCode } from '../src/lib/api/errors';
 
 const ALL_METHODS = ['delete', 'get', 'head', 'patch', 'post', 'put'];
-const GEN_PATH = path.resolve(__dirname, '..', 'openapi.json');
+const GEN_PATH = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'openapi.json');
 
 const ALL_ERRORS = Object.keys(API_ERRORS)
   .map((code) => new ApiError(Number(code) as ApiErrorCode).toJSON())

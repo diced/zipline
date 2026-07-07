@@ -1,5 +1,5 @@
 import { Command } from 'commander';
-import { version } from '../../package.json';
+import packageJson from '../../package.json' with { type: 'json' };
 import { listUsers } from './commands/list-users';
 import { readConfig } from './commands/read-config';
 import { setUser } from './commands/set-user';
@@ -8,7 +8,7 @@ import { exportConfig } from './commands/export-config';
 
 const cli = new Command();
 
-cli.name('ziplinectl').version(version).description('controll utility for zipline');
+cli.name('ziplinectl').version(packageJson.version).description('control utility for zipline');
 
 cli
   .command('read-config')

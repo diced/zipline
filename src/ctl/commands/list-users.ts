@@ -1,4 +1,5 @@
 import { userSelect } from '@/lib/db/models/user';
+import { prisma } from '@/lib/db';
 
 export async function listUsers({ extra, format, id }: { extra?: string[]; format?: boolean; id?: string }) {
   if (extra?.includes('list')) {
@@ -20,7 +21,6 @@ export async function listUsers({ extra, format, id }: { extra?: string[]; forma
     }
   }
 
-  const { prisma } = await import('@/lib/db/index.js');
   const users = await prisma.user.findMany({
     where: id ? { id } : undefined,
     select,

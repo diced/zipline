@@ -1,5 +1,5 @@
 import enabled from '../oauth/enabled';
-import { version } from '../../../package.json';
+import { version } from '../version';
 import { Config } from './validate';
 
 export type SafeConfig = Omit<

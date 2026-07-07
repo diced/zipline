@@ -16,7 +16,7 @@ import typedPlugin from '@/server/typedPlugin';
 import { z } from 'zod';
 import { readdir, rename, rm } from 'fs/promises';
 import { join } from 'path';
-import { Worker } from 'worker_threads';
+import { createWorker } from '@/lib/worker';
 import { ApiUploadResponse } from '.';
 
 const logger = log('api').c('upload').c('partial');
@@ -234,7 +234,7 @@ export default typedPlugin(
             config.files.route === '/' || config.files.route === '' ? '' : `${config.files.route}`
           }/${fileUpload.name}`;
 
-          const worker = new Worker('./build/offload/partial.js', {
+          const worker = createWorker('offload/partial.js', {
             workerData: {
               user: {
                 id: req.user ? req.user.id : options.folder ? folder?.userId : undefined,

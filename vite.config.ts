@@ -1,6 +1,9 @@
 import react from '@vitejs/plugin-react';
-import path from 'path';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig(({ mode }) => {
   const isSSR = mode.startsWith('ssr');
@@ -18,7 +21,7 @@ export default defineConfig(({ mode }) => {
           'ssr-view-url': path.resolve(__dirname, 'src/client/ssr-view-url/index.html'),
         },
         output: {
-          format: isSSR ? 'cjs' : 'esm',
+          format: 'esm',
           entryFileNames: isSSR ? `${mode}.js` : 'assets/[name]-[hash].js',
         },
       },
