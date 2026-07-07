@@ -7,6 +7,7 @@ import { hashPassword } from '@/lib/crypto';
 import { datasource } from '@/lib/datasource';
 import { prisma } from '@/lib/db';
 import { fileSelect } from '@/lib/db/models/file';
+import { userSelect } from '@/lib/db/models/user';
 import { sanitizeFilename } from '@/lib/fs';
 import { removeGps } from '@/lib/gps';
 import { log } from '@/lib/logger';
@@ -117,7 +118,15 @@ export default typedPlugin(
         if (!files.length) throw new ApiError(1062);
 
         const totalFileSize = files.reduce((acc, x) => acc + x.file.bytesRead, 0);
-        const quotaCheck = await checkQuota(req.user, totalFileSize, files.length);
+
+        // use quota of user if anonymous
+        const quotaUser = req.user
+          ? req.user
+          : folder?.userId
+            ? await prisma.user.findUnique({ where: { id: folder.userId }, select: userSelect })
+            : null;
+
+        const quotaCheck = await checkQuota(quotaUser, totalFileSize, files.length);
         if (quotaCheck !== true)
           throw new ApiError(5002, typeof quotaCheck === 'string' ? quotaCheck : undefined);
 

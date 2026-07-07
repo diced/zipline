@@ -1,5 +1,5 @@
 import { ApiError } from '@/lib/api/errors';
-import { hashPassword } from '@/lib/crypto';
+import { hashPassword, verifyPassword } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
 import { User, userSchema, userSelect } from '@/lib/db/models/user';
 import { log } from '@/lib/logger';
@@ -47,6 +47,7 @@ export default typedPlugin(
           body: z.object({
             username: zStringTrimmed.optional(),
             password: zStringTrimmed.optional(),
+            currentPassword: z.string().optional(),
             avatar: z.string().nullish(),
             view: z
               .object({
@@ -89,6 +90,26 @@ export default typedPlugin(
           if (existing) throw new ApiError(1038);
         }
 
+        const changingPassword = !!req.body.password;
+        if (changingPassword) {
+          if (req.user.password) {
+            if (!req.body.currentPassword) throw new ApiError(1067);
+
+            const valid = await verifyPassword(req.body.currentPassword, req.user.password);
+            if (!valid) {
+              logger.warn('invalid current password on password change', {
+                user: req.user.username,
+                ip: req.ip ?? 'unknown',
+                ua: req.headers['user-agent'],
+              });
+
+              throw new ApiError(1066);
+            }
+          }
+        }
+
+        const currentSession = await getSession(req, res);
+
         const user = await prisma.user.update({
           where: {
             id: req.user.id,
@@ -96,6 +117,13 @@ export default typedPlugin(
           data: {
             ...(req.body.username && { username: req.body.username }),
             ...(req.body.password && { password: await hashPassword(req.body.password) }),
+            ...(changingPassword && {
+              sessions: {
+                deleteMany: {
+                  NOT: { id: currentSession.sessionId ?? '' },
+                },
+              },
+            }),
             ...(req.body.avatar !== undefined && { avatar: req.body.avatar || null }),
             ...(req.body.view && {
               view: {
@@ -144,8 +172,7 @@ export default typedPlugin(
           },
         });
 
-        const session = await getSession(req, res);
-        await saveSession(session, user, false);
+        await saveSession(currentSession, user, false);
 
         delete (user as any).password;
 

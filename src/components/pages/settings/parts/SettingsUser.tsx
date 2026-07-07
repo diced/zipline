@@ -57,9 +57,12 @@ function Form({ user, setUser, token }: { user: User; setUser: (u: User) => void
     initialValues: {
       username: user.username,
       password: '',
+      currentPassword: '',
     },
     validate: {
       username: (value) => (value.length < 1 ? 'Username is required' : null),
+      currentPassword: (value, values) =>
+        values.password && !value ? 'Enter your current password to change it' : null,
     },
   });
 
@@ -67,16 +70,22 @@ function Form({ user, setUser, token }: { user: User; setUser: (u: User) => void
     const send: {
       username?: string;
       password?: string;
+      currentPassword?: string;
     } = {};
 
     if (values.username !== user.username) send['username'] = values.username.trim();
-    if (values.password) send['password'] = values.password.trim();
+    if (values.password) {
+      send['password'] = values.password.trim();
+      send['currentPassword'] = values.currentPassword;
+    }
 
     const { data, error } = await fetchApi<Response['/api/user']>('/api/user', 'PATCH', send);
 
     if (!data && error) {
       if (ApiError.check(error, 1039)) {
         form.setFieldError('username', error.error);
+      } else if (ApiError.check(error, 1066) || ApiError.check(error, 1067)) {
+        form.setFieldError('currentPassword', error.error);
       } else {
         notifications.show({
           title: 'Error while updating user',
@@ -90,6 +99,9 @@ function Form({ user, setUser, token }: { user: User; setUser: (u: User) => void
     }
 
     if (!data?.user) return;
+
+    form.setFieldValue('password', '');
+    form.setFieldValue('currentPassword', '');
 
     mutate('/api/user');
     mutate('/api/user/token');
@@ -142,6 +154,15 @@ function Form({ user, setUser, token }: { user: User; setUser: (u: User) => void
           {...form.getInputProps('password')}
           leftSection={<IconAsteriskSimple size='1rem' />}
         />
+        {form.values.password && (
+          <PasswordInput
+            label='Current password'
+            description='Required to change your password.'
+            autoComplete='current-password'
+            {...form.getInputProps('currentPassword')}
+            leftSection={<IconAsteriskSimple size='1rem' />}
+          />
+        )}
 
         <Button type='submit' mt='md' leftSection={<IconDeviceFloppy size='1rem' />}>
           Save

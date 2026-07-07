@@ -147,7 +147,7 @@ export default typedPlugin(
 
         const newFile = await prisma.file.update({
           where: {
-            id: req.params.id,
+            id: file.id,
           },
           data,
           select: fileSelect,

@@ -64,6 +64,8 @@ export const API_ERRORS = {
   1063: 'Already linked to this OAuth provider',
   1064: 'Invalid OAuth state parameter',
   1065: 'Invalid MIME type',
+  1066: 'Current password is incorrect',
+  1067: 'Current password is required to set a new password',
 
   // 2xxx, session errors
   2000: 'Invalid login session',

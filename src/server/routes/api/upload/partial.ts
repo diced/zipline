@@ -4,6 +4,7 @@ import { bytes } from '@/lib/bytes';
 import { config } from '@/lib/config';
 import { hashPassword } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
+import { userSelect } from '@/lib/db/models/user';
 import { sanitizeFilename } from '@/lib/fs';
 import { log } from '@/lib/logger';
 import { guess } from '@/lib/mimes';
@@ -139,8 +140,15 @@ export default typedPlugin(
         const cache = partialsCache.get(options.partial.identifier);
         if (!cache) throw new ApiError(1003);
 
+        // use quota of user if anonymous
+        const quotaUser = req.user
+          ? req.user
+          : folder?.userId
+            ? await prisma.user.findUnique({ where: { id: folder.userId }, select: userSelect })
+            : null;
+
         // check quota, using the current added length, and only just adding one file
-        const quotaCheck = await checkQuota(req.user, cache.length + fileSize, 1);
+        const quotaCheck = await checkQuota(quotaUser, cache.length + fileSize, 1);
         if (quotaCheck !== true) {
           await deletePartial(options.partial.identifier);
           throw new ApiError(5002, typeof quotaCheck === 'string' ? quotaCheck : undefined);
