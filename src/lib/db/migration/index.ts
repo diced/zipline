@@ -1,19 +1,38 @@
 import { Migrate } from '@prisma/migrate';
+import { defineConfig } from 'prisma/config';
+import {
+  createSchemaPathInput,
+  getSchemaDatasourceProvider,
+  inferDirectoryConfig,
+  loadSchemaContext,
+  validatePrismaConfigWithDatasource,
+} from '@prisma/internals';
 import { log } from '@/lib/logger';
-import { loadSchemaContext } from '@prisma/internals';
 
-// @ts-ignore
 import { ensureDatabaseExists } from '@prisma/migrate/dist/utils/ensureDatabaseExists';
 
 export async function runMigrations() {
+  const baseDir = process.cwd();
+
+  const config = defineConfig({
+    schema: './prisma/schema.prisma',
+    migrations: { path: './prisma/migrations' },
+    datasource: { url: process.env.DATABASE_URL! },
+  });
+
   const schemaContext = await loadSchemaContext({
-    schemaPathFromArg: './prisma/schema.prisma',
+    schemaPath: createSchemaPathInput({ schemaPathFromConfig: config.schema, baseDir }),
     printLoadMessage: false,
   });
 
+  const { migrationsDirPath } = inferDirectoryConfig(schemaContext, config);
+  const validatedConfig = validatePrismaConfigWithDatasource({ config, cmd: 'migrate deploy' });
+
   const migrate = await Migrate.setup({
+    schemaEngineConfig: config,
+    baseDir,
+    migrationsDirPath,
     schemaContext,
-    migrationsDirPath: './prisma/migrations',
   });
 
   const logger = log('migrations');
@@ -22,7 +41,11 @@ export async function runMigrations() {
   try {
     logger.debug('ensuring database exists...');
 
-    const dbCreated = await ensureDatabaseExists(schemaContext.primaryDatasource);
+    const dbCreated = await ensureDatabaseExists(
+      baseDir,
+      getSchemaDatasourceProvider(schemaContext),
+      validatedConfig,
+    );
     if (dbCreated) {
       logger.info('database created');
     }
@@ -30,7 +53,7 @@ export async function runMigrations() {
     logger.error('failed to create database' + e);
     logger.error('try creating the database manually and running the server again');
 
-    migrate.stop();
+    await migrate.stop();
     process.exit(1);
   }
 
@@ -42,10 +65,10 @@ export async function runMigrations() {
   } catch (e) {
     logger.error('failed to apply migrations' + e);
 
-    migrate.stop();
+    await migrate.stop();
     process.exit(1);
   } finally {
-    migrate.stop();
+    await migrate.stop();
   }
 
   if (migrationIds?.length === 0) {
