@@ -101,6 +101,7 @@ export default function FileModal({
   reduce,
   user,
   sequenced,
+  onDelete,
 }: {
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -108,6 +109,7 @@ export default function FileModal({
   reduce?: boolean;
   user?: string;
   sequenced?: boolean;
+  onDelete?: () => void;
 }) {
   const clipboard = useClipboard();
   const warnDeletion = useSettingsStore((state) => state.settings.warnDeletion);
@@ -428,7 +430,7 @@ export default function FileModal({
                     />
                     <ActionButton
                       Icon={IconTrashFilled}
-                      onClick={() => deleteFile(warnDeletion, file, setOpen)}
+                      onClick={() => deleteFile(warnDeletion, file, setOpen, onDelete)}
                       tooltip='Delete file'
                       color='red'
                     />

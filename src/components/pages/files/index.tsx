@@ -1,20 +1,25 @@
-import GridTableSwitcher from '@/components/GridTableSwitcher';
+import GridTableSwitcher, { GridSizeSwitcher } from '@/components/GridTableSwitcher';
+import FolderBookmarksBar from '@/components/folders/FolderBookmarksBar';
+import DropUploadOverlay from '@/components/upload/DropUploadOverlay';
 import { useViewStore } from '@/lib/client/store/view';
-import { ActionIcon, Group, Menu, Title, Tooltip } from '@mantine/core';
+import { ActionIcon, Group, Menu, TextInput, Title, Tooltip } from '@mantine/core';
 import {
   IconDots,
   IconFileDots,
   IconFileUpload,
   IconGridPatternFilled,
+  IconSearch,
   IconTableOptions,
   IconTags,
+  IconX,
 } from '@tabler/icons-react';
 import { parseAsBoolean, useQueryStates } from 'nuqs';
+import { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import PendingFilesModal from './PendingFilesModal';
 import TagsModal from './tags/TagsModal';
 import FavoriteFiles from './views/FavoriteFiles';
-import Files from './views/FilesGridView';
+import Files, { type FilesGridViewRef } from './views/FilesGridView';
 import FileTable from './views/FilesTableView';
 
 export type DashboardFilesModals = {
@@ -39,13 +44,17 @@ export default function DashboardFiles() {
   const view = useViewStore((state) => state.files);
 
   const [modals, setModals] = useModals();
+  const [search, setSearch] = useState('');
+  const [folderId, setFolderId] = useState<string | null>(null);
+  const filesRef = useRef<FilesGridViewRef>(null);
 
   return (
     <>
       <TagsModal modals={modals} setModals={setModals} />
       <PendingFilesModal modals={modals} setModals={setModals} />
+      <DropUploadOverlay folderId={folderId} onUploaded={() => filesRef.current?.refresh()} />
 
-      <Group>
+      <Group wrap='nowrap'>
         <Title>Files</Title>
 
         <Tooltip label='Upload a file'>
@@ -55,6 +64,27 @@ export default function DashboardFiles() {
             </ActionIcon>
           </Link>
         </Tooltip>
+
+        {view === 'grid' && (
+          <TextInput
+            placeholder='Search files by name...'
+            value={search}
+            onChange={(e) => setSearch(e.currentTarget.value)}
+            leftSection={<IconSearch size='1rem' />}
+            rightSection={
+              search ? (
+                <ActionIcon variant='subtle' size='xs' onClick={() => setSearch('')}>
+                  <IconX size='1rem' />
+                </ActionIcon>
+              ) : null
+            }
+            size='sm'
+            w={260}
+            variant='filled'
+          />
+        )}
+
+        {view === 'grid' && <FolderBookmarksBar folderId={folderId} onChange={setFolderId} />}
 
         <Menu>
           <Menu.Target>
@@ -97,6 +127,7 @@ export default function DashboardFiles() {
           </Menu.Dropdown>
         </Menu>
 
+        {view === 'grid' && <GridSizeSwitcher />}
         <GridTableSwitcher type='files' />
       </Group>
 
@@ -104,7 +135,7 @@ export default function DashboardFiles() {
         <>
           <FavoriteFiles />
 
-          <Files />
+          <Files ref={filesRef} search={search} folderId={folderId ?? undefined} infinite />
         </>
       ) : (
         <FileTable modals={modals} setModals={setModals} />

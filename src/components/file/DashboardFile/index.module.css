@@ -1,5 +1,7 @@
 .file {
   transition: all 0.2s ease-in-out;
+  overflow: hidden;
+  height: fit-content;
 }
 
 .file:hover {
@@ -8,4 +10,19 @@
     0 0 0 1px rgba(0, 0, 0, 0.1),
     0 4px 12px -1px rgba(0, 0, 0, 0.1);
   filter: brightness(0.86);
+}
+
+.file :global(.mantine-Image-root),
+.file :global(img) {
+  width: 100%;
+  display: block;
+}
+
+.item {
+  break-inside: avoid;
+  margin-bottom: var(--masonry-row-gap, 6px);
+}
+
+.item:last-child {
+  margin-bottom: 0;
 }

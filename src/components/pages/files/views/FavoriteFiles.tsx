@@ -16,11 +16,14 @@ import { Link } from 'react-router-dom';
 import { useApiPagination } from '../useApiPagination';
 import { lazy, Suspense } from 'react';
 import { parseAsInteger, useQueryState } from 'nuqs';
+import { useViewStore } from '@/lib/client/store/view';
+import { getGridCols, getGridSkeletonHeight } from '@/components/GridTableSwitcher';
 
 const DashboardFile = lazy(() => import('@/components/file/DashboardFile'));
 
 export default function FavoriteFiles() {
   const [page, setPage] = useQueryState('fpage', parseAsInteger.withDefault(1));
+  const gridSize = useViewStore((state) => state.filesGridSize);
 
   const { data, isLoading } = useApiPagination({
     page,
@@ -32,6 +35,9 @@ export default function FavoriteFiles() {
     return null;
   }
 
+  const cols = getGridCols(gridSize);
+  const skeletonHeight = getGridSkeletonHeight(gridSize);
+
   return (
     <Accordion variant='separated' my='xs'>
       <Accordion.Item value='favorite'>
@@ -41,21 +47,22 @@ export default function FavoriteFiles() {
           <SimpleGrid
             my='sm'
             cols={{
-              base: 1,
-              md: 2,
-              lg: (data?.page.length ?? 0 > 0) ? 3 : 1,
+              base: cols.base,
+              md: cols.md,
+              lg: cols.lg,
+              xl: cols.xl,
             }}
-            spacing='md'
+            spacing={gridSize === 'compact' ? 'xs' : 'md'}
             pos='relative'
           >
             {isLoading ? (
-              <Paper withBorder h={200}>
+              <Paper withBorder h={skeletonHeight}>
                 <LoadingOverlay visible />
               </Paper>
             ) : (data?.page.length ?? 0 > 0) ? (
               data?.page.map((file) => (
-                <Suspense fallback={<Skeleton height={350} animate />} key={file.id}>
-                  <DashboardFile file={file} />
+                <Suspense fallback={<Skeleton height={skeletonHeight} animate />} key={file.id}>
+                  <DashboardFile file={file} compact={gridSize === 'compact'} />
                 </Suspense>
               ))
             ) : (

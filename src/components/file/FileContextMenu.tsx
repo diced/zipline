@@ -71,12 +71,14 @@ export default function FileContextMenu({
   reduce,
   user,
   onView,
+  onDelete,
   children,
 }: {
   file: File;
   reduce?: boolean;
   user?: string;
   onView?: () => void;
+  onDelete?: () => void;
   children: React.ReactNode;
 }) {
   const [opened, setOpened] = useState(false);
@@ -316,7 +318,13 @@ export default function FileContextMenu({
               <Menu.Item
                 color='red'
                 leftSection={<IconTrashFilled size='1rem' />}
-                onClick={stop(run(() => deleteFile(warnDeletion, file, () => {})))}
+                onClick={stop(
+                  run(() =>
+                    deleteFile(warnDeletion, file, () => {
+                      onDelete?.();
+                    }),
+                  ),
+                )}
               >
                 Delete
               </Menu.Item>

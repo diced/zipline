@@ -1,0 +1,85 @@
+.masonry {
+  --masonry-gap: var(--mantine-spacing-md);
+  --masonry-row-gap: 6px;
+
+  column-gap: var(--masonry-gap);
+  margin-top: 6px;
+}
+
+.compact {
+  --masonry-gap: var(--mantine-spacing-xs);
+  --masonry-row-gap: 4px;
+}
+
+@media (max-width: 48em) {
+  .masonry {
+    column-count: 2;
+  }
+
+  .compact {
+    column-count: 3;
+  }
+
+  .large {
+    column-count: 1;
+  }
+}
+
+@media (min-width: 48em) and (max-width: 62em) {
+  .masonry {
+    column-count: 3;
+  }
+
+  .compact {
+    column-count: 4;
+  }
+
+  .large {
+    column-count: 2;
+  }
+}
+
+@media (min-width: 62em) and (max-width: 80em) {
+  .masonry {
+    column-count: 4;
+  }
+
+  .compact {
+    column-count: 6;
+  }
+
+  .large {
+    column-count: 3;
+  }
+}
+
+@media (min-width: 80em) {
+  .masonry {
+    column-count: 6;
+  }
+
+  .compact {
+    column-count: 8;
+  }
+
+  .large {
+    column-count: 4;
+  }
+}
+
+.empty {
+  column-span: all;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}

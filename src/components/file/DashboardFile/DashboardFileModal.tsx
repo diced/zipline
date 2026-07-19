@@ -11,6 +11,7 @@ export default function DashboardFileModal(props: {
   reduce?: boolean;
   user?: string;
   sequenced?: boolean;
+  onDelete?: () => void;
 }) {
   const fileModal = useSettingsStore((state) => state.settings.fileViewer);
 

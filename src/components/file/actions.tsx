@@ -50,15 +50,20 @@ export function copyFile(file: File, clipboard: ReturnType<typeof useClipboard>,
   });
 }
 
-export async function deleteFile(warnDeletion: boolean, file: File, setOpen: (open: boolean) => void) {
+export async function deleteFile(
+  warnDeletion: boolean,
+  file: File,
+  setOpen: (open: boolean) => void,
+  onDelete?: () => void,
+) {
   conditionalWarning(warnDeletion, {
     confirmLabel: `Delete ${file.name}`,
     message: `Are you sure you want to delete ${file.name}? This action cannot be undone.`,
-    onConfirm: () => handleDeleteFile(file, setOpen),
+    onConfirm: () => handleDeleteFile(file, setOpen, onDelete),
   });
 }
 
-export async function handleDeleteFile(file: File, setOpen: (open: boolean) => void) {
+export async function handleDeleteFile(file: File, setOpen: (open: boolean) => void, onDelete?: () => void) {
   const { error } = await fetchApi(`/api/user/files/${file.id}`, 'DELETE');
 
   if (error) {
@@ -80,6 +85,7 @@ export async function handleDeleteFile(file: File, setOpen: (open: boolean) => v
   }
 
   mutateFiles();
+  onDelete?.();
 }
 
 export async function favoriteFile(file: File) {
@@ -230,5 +236,6 @@ export async function addMultipleToFolder(files: File[], folderId: string | null
 
 export function mutateFiles() {
   mutate('/api/user/recent');
-  mutate((key) => (key as Record<any, any>)?.key === '/api/user/files'); // paged files
+  mutate('/api/user/stats');
+  mutate(() => true, undefined, { revalidate: true });
 }

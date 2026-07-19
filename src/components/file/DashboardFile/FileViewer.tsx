@@ -111,6 +111,7 @@ export default function FileViewer({
   reduce,
   user,
   sequenced,
+  onDelete,
 }: {
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -118,6 +119,7 @@ export default function FileViewer({
   reduce?: boolean;
   user?: string;
   sequenced?: boolean;
+  onDelete?: () => void;
 }) {
   const clipboard = useClipboard();
   const warnDeletion = useSettingsStore((state) => state.settings.warnDeletion);
@@ -246,7 +248,7 @@ export default function FileViewer({
           />
           <ActionButton
             Icon={IconTrashFilled}
-            onClick={() => deleteFile(warnDeletion, file, setOpen)}
+            onClick={() => deleteFile(warnDeletion, file, setOpen, onDelete)}
             tooltip='Delete file'
             color='red'
           />

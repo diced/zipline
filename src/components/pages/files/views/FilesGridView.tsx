@@ -7,7 +7,6 @@ import {
   Pagination,
   Paper,
   Select,
-  SimpleGrid,
   Skeleton,
   Stack,
   Text,
@@ -15,40 +14,136 @@ import {
 } from '@mantine/core';
 import { IconFilesOff, IconFileUpload } from '@tabler/icons-react';
 import { parseAsInteger, useQueryState } from 'nuqs';
-import { lazy, Suspense, useEffect, useMemo } from 'react';
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  forwardRef,
+} from 'react';
 import { Link } from 'react-router-dom';
 import { useShallow } from 'zustand/shallow';
 import { useApiPagination } from '../useApiPagination';
+import { useInfiniteFiles } from '../useInfiniteFiles';
+import { useViewStore } from '@/lib/client/store/view';
+import { getGridSkeletonHeight } from '@/components/GridTableSwitcher';
+import { File } from '@/lib/db/models/file';
+import styles from './FilesGridView.module.css';
 
 const DashboardFileModal = lazy(() => import('@/components/file/DashboardFile/DashboardFileModal'));
 
-const PER_PAGE_OPTIONS = [9, 12, 15, 30, 45, 60];
+const PER_PAGE_OPTIONS = [12, 24, 36, 48, 72, 96];
 
-export default function Files({ id, folderId }: { id?: string; folderId?: string }) {
+export type FilesGridViewRef = { refresh: () => void };
+
+export default forwardRef<
+  FilesGridViewRef,
+  {
+    id?: string;
+    folderId?: string;
+    search?: string;
+    infinite?: boolean;
+  }
+>(function Files({ id, folderId, search, infinite }, ref) {
+  const gridSize = useViewStore((state) => state.filesGridSize);
   const [page, setPage] = useQueryState('page', parseAsInteger.withDefault(1));
-  const [perpage, setPerpage] = useQueryState('perpage', parseAsInteger.withDefault(15));
+  const [perpage, setPerpage] = useQueryState('perpage', parseAsInteger.withDefault(24));
 
-  const { data, isLoading } = useApiPagination({
+  const paginationQuery = useApiPagination({
     page,
     perpage,
     id,
     folderId,
+    ...(search?.trim() && {
+      search: {
+        field: 'name',
+        query: search.trim(),
+      },
+    }),
   });
 
-  const from = (page - 1) * perpage + 1;
-  const to = Math.min(page * perpage, data?.total ?? 0);
-  const totalRecords = data?.total ?? 0;
-  const cachedPages = data?.pages ?? 1;
+  const infiniteQuery = useInfiniteFiles({
+    perpage,
+    id,
+    folderId,
+    ...(search?.trim() && {
+      search: {
+        field: 'name',
+        query: search.trim(),
+      },
+    }),
+  });
+
+  useImperativeHandle(ref, () => ({
+    refresh,
+  }));
+
+  useEffect(() => {
+    if (infinite) {
+      infiniteQuery.reset();
+    } else {
+      setPage(1);
+    }
+  }, [search, folderId, perpage, infinite, setPage]);
+
+  const refresh = useCallback(() => {
+    if (infinite) {
+      infiniteQuery.mutate();
+    } else {
+      paginationQuery.mutate();
+    }
+  }, [infinite, infiniteQuery, paginationQuery]);
+
+  const data = infinite ? infiniteQuery.data : ((paginationQuery.data?.page as File[] | undefined) ?? []);
+  const isLoading = infinite ? infiniteQuery.isLoading : paginationQuery.isLoading;
+  const totalRecords = infinite ? infiniteQuery.totalRecords : (paginationQuery.data?.total ?? 0);
+  const cachedPages = infinite ? infiniteQuery.totalPages : (paginationQuery.data?.pages ?? 1);
 
   const [current, setCurrent, setFiles] = useFileNavStore(
     useShallow((state) => [state.current, state.setCurrent, state.setFiles]),
   );
-  const currentFile = current ? (data?.page.find((file) => file.id === current) ?? null) : null;
-  const ids = useMemo(() => (data?.page ?? []).map((file) => file.id), [data?.page]);
+
+  const from = infinite ? 1 : (page - 1) * perpage + 1;
+  const to = infinite ? data.length : Math.min(page * perpage, paginationQuery.data?.total ?? 0);
+
+  const currentFile = current ? (data.find((file) => file.id === current) ?? null) : null;
+  const ids = useMemo(() => data.map((file) => file.id), [data]);
 
   useEffect(() => {
     setFiles(ids);
   }, [ids]);
+
+  const skeletonHeight = getGridSkeletonHeight(gridSize);
+  const itemCount = perpage;
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!infinite || !loadMoreRef.current) return;
+    if (!('IntersectionObserver' in window)) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting && infiniteQuery.hasMore && !infiniteQuery.isLoadingMore) {
+          infiniteQuery.loadMore();
+        }
+      },
+      { rootMargin: '400px' },
+    );
+
+    observer.observe(loadMoreRef.current);
+    return () => observer.disconnect();
+  }, [infinite, infiniteQuery.hasMore, infiniteQuery.isLoadingMore, infiniteQuery.loadMore]);
+
+  const gridClass = [
+    styles.masonry,
+    gridSize === 'compact' && styles.compact,
+    gridSize === 'large' && styles.large,
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <>
@@ -60,28 +155,28 @@ export default function Files({ id, folderId }: { id?: string; folderId?: string
         file={currentFile}
         user={id}
         sequenced
+        onDelete={refresh}
       />
 
-      <SimpleGrid
-        my='sm'
-        cols={{
-          base: 1,
-          md: 2,
-          lg: (data?.page.length ?? 0 > 0) || isLoading ? 3 : 1,
-        }}
-        spacing='md'
-        pos='relative'
-      >
+      <div className={gridClass}>
         {isLoading ? (
-          [...Array(9)].map((_, i) => <Skeleton key={i} height={350} animate />)
-        ) : (data?.page?.length ?? 0 > 0) ? (
-          data?.page.map((file) => (
-            <Suspense fallback={<Skeleton height={350} animate />} key={file.id}>
-              <DashboardFile file={file} id={id} onOpen={(fileId) => setCurrent(fileId)} />
+          [...Array(itemCount)].map((_, i) => (
+            <Skeleton key={i} height={skeletonHeight} radius='md' animate />
+          ))
+        ) : data.length > 0 ? (
+          data.map((file) => (
+            <Suspense fallback={<Skeleton height={skeletonHeight} radius='md' animate />} key={file.id}>
+              <DashboardFile
+                file={file}
+                id={id}
+                onOpen={(fileId) => setCurrent(fileId)}
+                onDelete={refresh}
+                compact={gridSize === 'compact'}
+              />
             </Suspense>
           ))
         ) : (
-          <Paper withBorder p='sm'>
+          <Paper withBorder p='sm' className={styles.empty}>
             <Center>
               <Stack>
                 <Group>
@@ -103,27 +198,56 @@ export default function Files({ id, folderId }: { id?: string; folderId?: string
             </Center>
           </Paper>
         )}
-      </SimpleGrid>
+      </div>
 
-      <Group justify='space-between' align='center' mt='md'>
-        <Text size='sm'>{`${from} - ${to} / ${totalRecords} files`}</Text>
+      {infinite ? (
+        <div ref={loadMoreRef} style={{ minHeight: 1 }}>
+          <Group justify='space-between' align='center' mt='md'>
+            <Text size='sm'>{`${data.length} / ${totalRecords} files`}</Text>
 
-        <Group gap='sm'>
-          <Select
-            value={perpage.toString()}
-            data={PER_PAGE_OPTIONS.map((val) => ({ value: val.toString(), label: `${val}` }))}
-            onChange={(value) => {
-              setPerpage(Number(value));
-              setPage(1);
-            }}
-            w={80}
-            size='xs'
-            variant='filled'
-          />
+            {infiniteQuery.isLoadingMore ? (
+              <Text size='sm' c='dimmed'>
+                Loading more...
+              </Text>
+            ) : infiniteQuery.hasMore ? (
+              <Text size='sm' c='dimmed'>
+                Scroll to load more
+              </Text>
+            ) : (
+              <Text size='sm' c='dimmed'>
+                All files loaded
+              </Text>
+            )}
+          </Group>
+        </div>
+      ) : (
+        <Group justify='space-between' align='center' mt='md'>
+          <Text size='sm'>{`${from} - ${to} / ${totalRecords} files`}</Text>
 
-          <Pagination value={page} onChange={setPage} total={cachedPages} size='sm' withControls withEdges />
+          <Group gap='sm'>
+            <Select
+              value={perpage.toString()}
+              data={PER_PAGE_OPTIONS.map((val) => ({ value: val.toString(), label: `${val}` }))}
+              onChange={(value) => {
+                setPerpage(Number(value));
+                setPage(1);
+              }}
+              w={80}
+              size='xs'
+              variant='filled'
+            />
+
+            <Pagination
+              value={page}
+              onChange={setPage}
+              total={cachedPages}
+              size='sm'
+              withControls
+              withEdges
+            />
+          </Group>
         </Group>
-      </Group>
+      )}
     </>
   );
-}
+});
