@@ -1,18 +1,24 @@
 import DashboardFile from '@/components/file/DashboardFile';
+import { addMultipleToFolder, createZipShare, deleteMultipleFiles } from '@/components/file/actions';
+import FolderSelectModal from '@/components/folders/FolderSelectModal';
 import { useFileNavStore } from '@/lib/client/store/fileNav';
 import {
   Button,
   Center,
   Group,
+  Modal,
   Pagination,
   Paper,
   Select,
   Skeleton,
   Stack,
   Text,
+  TextInput,
   Title,
 } from '@mantine/core';
-import { IconFilesOff, IconFileUpload } from '@tabler/icons-react';
+import { useClipboard } from '@mantine/hooks';
+import { modals } from '@mantine/modals';
+import { IconFilesOff, IconFileUpload, IconFolder, IconTrash, IconArchive } from '@tabler/icons-react';
 import { parseAsInteger, useQueryState } from 'nuqs';
 import {
   lazy,
@@ -22,6 +28,7 @@ import {
   useImperativeHandle,
   useMemo,
   useRef,
+  useState,
   forwardRef,
 } from 'react';
 import { Link } from 'react-router-dom';
@@ -116,6 +123,71 @@ export default forwardRef<
     setFiles(ids);
   }, [ids]);
 
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [zipModalOpen, setZipModalOpen] = useState(false);
+  const [zipName, setZipName] = useState('archive.zip');
+  const clipboard = useClipboard();
+
+  const selectedFiles = useMemo(() => data.filter((file) => selectedIds.has(file.id)), [data, selectedIds]);
+
+  useEffect(() => {
+    setSelectedIds(new Set());
+  }, [search, folderId, page, infinite]);
+
+  const handleSelect = useCallback(
+    (fileId: string) => {
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        if (next.has(fileId)) next.delete(fileId);
+        else next.add(fileId);
+        return next;
+      });
+    },
+    [setSelectedIds],
+  );
+
+  const handleClear = useCallback(() => setSelectedIds(new Set()), []);
+
+  const handleMove = useCallback(() => {
+    const modalId = modals.open({
+      title: 'Move to folder',
+      size: 'lg',
+      centered: true,
+      children: (
+        <FolderSelectModal
+          allowNoFolder={false}
+          confirmLabel='Move'
+          onSelect={async (folderId) => {
+            if (folderId === undefined) return;
+            await addMultipleToFolder(selectedFiles, folderId);
+            modals.close(modalId);
+            handleClear();
+            refresh();
+          }}
+          onCancel={() => modals.close(modalId)}
+        />
+      ),
+      onClose: () => modals.close(modalId),
+    });
+  }, [selectedFiles, handleClear, refresh]);
+
+  const handleDelete = useCallback(async () => {
+    await deleteMultipleFiles(selectedFiles);
+    handleClear();
+    refresh();
+  }, [selectedFiles, handleClear, refresh]);
+
+  const handleZip = useCallback(async () => {
+    const name = zipName.trim() || 'archive.zip';
+    const url = await createZipShare(selectedFiles, name.endsWith('.zip') ? name : `${name}.zip`);
+    if (url) {
+      clipboard.copy(url);
+      setZipModalOpen(false);
+      handleClear();
+      refresh();
+    }
+  }, [selectedFiles, zipName, clipboard, handleClear, refresh]);
+
   const skeletonHeight = getGridSkeletonHeight(gridSize);
   const itemCount = perpage;
   const loadMoreRef = useRef<HTMLDivElement>(null);
@@ -158,6 +230,72 @@ export default forwardRef<
         onDelete={refresh}
       />
 
+      {selectedIds.size > 0 && (
+        <Paper withBorder p='sm' mb='md'>
+          <Group justify='space-between' align='center' wrap='nowrap'>
+            <Text size='sm' fw={600}>
+              {selectedIds.size} selected
+            </Text>
+
+            <Group gap='xs'>
+              <Button
+                size='compact-sm'
+                variant='light'
+                leftSection={<IconFolder size='1rem' />}
+                onClick={handleMove}
+              >
+                Move
+              </Button>
+              <Button
+                size='compact-sm'
+                variant='light'
+                color='red'
+                leftSection={<IconTrash size='1rem' />}
+                onClick={handleDelete}
+              >
+                Delete
+              </Button>
+              <Button
+                size='compact-sm'
+                variant='light'
+                color='teal'
+                leftSection={<IconArchive size='1rem' />}
+                onClick={() => setZipModalOpen(true)}
+              >
+                Zip & Share
+              </Button>
+              <Button size='compact-sm' variant='subtle' onClick={handleClear}>
+                Clear
+              </Button>
+            </Group>
+          </Group>
+        </Paper>
+      )}
+
+      <Modal opened={zipModalOpen} onClose={() => setZipModalOpen(false)} title='Zip & share' centered>
+        <Stack>
+          <Text size='sm' c='dimmed'>
+            Create a zip archive from {selectedIds.size} selected file(s) and generate a shareable link. Saved
+            to the &ldquo;zip shares&rdquo; folder.
+          </Text>
+          <TextInput
+            label='Zip file name'
+            description='Will be saved as a regular .zip file.'
+            value={zipName}
+            onChange={(e) => setZipName(e.currentTarget.value)}
+            placeholder='my-files.zip'
+          />
+          <Group justify='right' mt='md'>
+            <Button variant='default' onClick={() => setZipModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleZip} leftSection={<IconArchive size='1rem' />}>
+              Create & copy link
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
+
       <div className={gridClass}>
         {isLoading ? (
           [...Array(itemCount)].map((_, i) => (
@@ -171,6 +309,8 @@ export default forwardRef<
                 id={id}
                 onOpen={(fileId) => setCurrent(fileId)}
                 onDelete={refresh}
+                selected={selectedIds.has(file.id)}
+                onSelect={() => handleSelect(file.id)}
                 compact={gridSize === 'compact'}
               />
             </Suspense>

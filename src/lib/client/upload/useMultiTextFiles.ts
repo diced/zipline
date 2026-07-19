@@ -4,6 +4,7 @@ export type MultiTextFileState = {
   files: {
     text: string;
     lang: string;
+    name: string;
   }[];
   selected: number;
 };
@@ -12,6 +13,7 @@ export const initialState: MultiTextFileState['files'] = [
   {
     text: '',
     lang: 'txt',
+    name: 'snippet.txt',
   },
 ];
 
@@ -41,6 +43,7 @@ export default function useMultiTextFiles(): [
     const newFile: MultiTextFileState['files'][number] = {
       text: '',
       lang: 'txt',
+      name: 'snippet.txt',
     };
 
     const newFiles = [...state.files];
@@ -65,6 +68,7 @@ export default function useMultiTextFiles(): [
         {
           text: '',
           lang: 'txt',
+          name: 'snippet.txt',
         },
       ]);
       setState('selected', 0);

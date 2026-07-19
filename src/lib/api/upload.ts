@@ -8,6 +8,11 @@ import { sanitizeFilename } from '../fs';
 import { formatFileName } from '../uploader/formatFileName';
 import { guess } from '../mimes';
 import { log } from '../logger';
+import { readFileSync } from 'fs';
+
+const codeMap: { ext: string; mime: string; name: string }[] = JSON.parse(
+  readFileSync('./code.json', 'utf8'),
+);
 
 const logger = log('upload');
 
@@ -118,13 +123,17 @@ export async function getMimetype(
   originalMimetype: string,
   extension: string,
 ): Promise<{ mimetype: string; assumed: boolean }> {
-  const mimetype = originalMimetype;
+  const ext = extension.startsWith('.') ? extension.substring(1) : extension;
+
+  const codeEntry = codeMap.find((meta) => meta.ext === ext);
+  if (codeEntry) {
+    return { mimetype: codeEntry.mime, assumed: true };
+  }
 
   if (config.files.assumeMimetypes) {
-    const mime = await guess(extension.substring(1));
-
+    const mime = await guess(ext);
     if (mime) return { mimetype: mime, assumed: true };
   }
 
-  return { mimetype, assumed: false };
+  return { mimetype: originalMimetype, assumed: false };
 }

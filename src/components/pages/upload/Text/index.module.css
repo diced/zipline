@@ -1,4 +1,12 @@
 .textarea textarea {
-  font-family: monospace;
+  font-family: var(--mantine-font-family-monospace), ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   height: 25vh;
+  background: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-6));
+}
+
+.snippet {
+  border: 1px solid var(--mantine-color-default-border);
+  border-radius: var(--mantine-radius-md);
+  padding: var(--mantine-spacing-sm);
+  margin-bottom: var(--mantine-spacing-md);
 }

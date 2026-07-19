@@ -21,8 +21,29 @@
 .item {
   break-inside: avoid;
   margin-bottom: var(--masonry-row-gap, 6px);
+  position: relative;
+  cursor: pointer;
 }
 
 .item:last-child {
   margin-bottom: 0;
+}
+
+.item::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border: 2px solid transparent;
+  border-radius: var(--mantine-radius-md);
+  pointer-events: none;
+  z-index: 1;
+  transition: border-color 0.15s ease;
+}
+
+.selected::before {
+  border-color: var(--mantine-primary-color-filled);
+}
+
+.selected :global(.mantine-Card-root) {
+  box-shadow: 0 0 0 2px var(--mantine-primary-color-filled);
 }

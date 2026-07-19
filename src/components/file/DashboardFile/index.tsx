@@ -14,6 +14,8 @@ export default function DashboardFile({
   id,
   onOpen,
   onDelete,
+  selected,
+  onSelect,
 }: {
   file: File;
   reduce?: boolean;
@@ -21,13 +23,27 @@ export default function DashboardFile({
   id?: string;
   onOpen?: (fileId: string) => void;
   onDelete?: () => void;
+  selected?: boolean;
+  onSelect?: (e: React.MouseEvent) => void;
 }) {
   const [open, setOpen] = useState(false);
 
   const handleView = () => (onOpen ? onOpen(file.id) : setOpen(true));
 
+  const handleClick = (e: React.MouseEvent) => {
+    if (e.ctrlKey || e.metaKey) {
+      e.preventDefault();
+      onSelect?.(e);
+      return;
+    }
+    handleView();
+  };
+
   return (
-    <div className={styles.item}>
+    <div
+      className={[styles.item, selected && styles.selected].filter(Boolean).join(' ')}
+      onClick={handleClick}
+    >
       {!onOpen && (
         <DashboardFileModal
           open={open}
@@ -40,7 +56,7 @@ export default function DashboardFile({
       )}
 
       <FileContextMenu file={file} reduce={reduce} user={id} onView={handleView} onDelete={onDelete}>
-        <Card shadow='md' radius='md' p={0} onClick={handleView} className={styles.file}>
+        <Card shadow='md' radius='md' p={0} className={styles.file}>
           <DashboardFileType key={file.id} file={file} compact={compact} />
         </Card>
       </FileContextMenu>

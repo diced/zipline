@@ -5,10 +5,10 @@ import { bytes } from '@/lib/bytes';
 import { uploadFiles } from '@/lib/client/upload/files';
 import useMultiTextFiles from '@/lib/client/upload/useMultiTextFiles';
 import { useUploadOptionsStore } from '@/lib/client/store/uploadOptions';
-import { ActionIcon, Button, Group, Select, Tabs, Textarea, Title } from '@mantine/core';
+import { ActionIcon, Button, Group, Select, Tabs, Textarea, TextInput, Title } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import {
-  IconCursorText,
+  IconCode,
   IconEyeFilled,
   IconFiles,
   IconPlus,
@@ -61,6 +61,16 @@ export default function UploadText() {
     [selected, setFile],
   );
 
+  const handleLangChange = useCallback(
+    (index: number, lang: string) => {
+      setFile(index, 'lang', lang);
+      const current = files[index].name;
+      const base = current.includes('.') ? current.slice(0, current.lastIndexOf('.')) : current;
+      setFile(index, 'name', `${base || 'snippet'}.${lang}`);
+    },
+    [files, setFile],
+  );
+
   const aggSize = useCallback(
     () => files.reduce((acc, file) => acc + new Blob([file.text]).size, 0),
     [files],
@@ -69,10 +79,12 @@ export default function UploadText() {
   const upload = async () => {
     const fileBlobs = files.map((file) => {
       const blob = new Blob([file.text], {
-        type: codeMap.find((meta) => meta.ext === file.lang)?.mime,
+        type: codeMap.find((meta) => meta.ext === file.lang)?.mime || 'text/plain',
       });
 
-      return new File([blob], `text.${file.lang}`, {
+      const name = file.name.trim() || `snippet.${file.lang}`;
+
+      return new File([blob], name, {
         type: blob.type,
         lastModified: Date.now(),
       });
@@ -92,7 +104,7 @@ export default function UploadText() {
   return (
     <>
       <Group gap='sm'>
-        <Title order={1}>Upload text</Title>
+        <Title order={1}>Upload snippet</Title>
 
         <Button
           variant='outline'
@@ -107,8 +119,8 @@ export default function UploadText() {
 
       <Tabs defaultValue='textareas' variant='pills' my='sm'>
         <Tabs.List my='sm'>
-          <Tabs.Tab value='textareas' leftSection={<IconCursorText size='1rem' />}>
-            Text
+          <Tabs.Tab value='textareas' leftSection={<IconCode size='1rem' />}>
+            Editor
           </Tabs.Tab>
           <Tabs.Tab value='preview' leftSection={<IconEyeFilled size='1rem' />}>
             Preview
@@ -117,32 +129,48 @@ export default function UploadText() {
 
         <Tabs.Panel value='textareas'>
           {files.map((file, index) => (
-            <div key={index} style={{ position: 'relative' }}>
+            <div key={index} className={styles.snippet}>
+              <Group gap='xs' mb='xs'>
+                <TextInput
+                  size='xs'
+                  placeholder='snippet.js'
+                  label='Filename'
+                  value={file.name}
+                  onChange={(e) => setFile(index, 'name', e.currentTarget.value)}
+                  style={{ flex: 1 }}
+                />
+                <Select
+                  size='xs'
+                  label='Language'
+                  data={codeMap.map((meta) => ({ value: meta.ext, label: meta.name }))}
+                  value={file.lang}
+                  onChange={(value) => value && handleLangChange(index, value)}
+                  searchable
+                />
+
+                {files.length > 1 && (
+                  <ActionIcon
+                    onClick={() => removeFile(index)}
+                    variant='outline'
+                    color='red'
+                    size='md'
+                    style={{ alignSelf: 'flex-end' }}
+                  >
+                    <IconTrashFilled size='1rem' />
+                  </ActionIcon>
+                )}
+              </Group>
+
               <Textarea
                 value={file.text}
                 onChange={(e) => setFile(index, 'text', e.currentTarget.value)}
                 onKeyDown={handleTab}
                 disabled={loading}
                 className={styles.textarea}
-                my='sm'
                 resize='vertical'
+                placeholder='Paste your code here...'
+                rows={16}
               />
-
-              <Group style={{ position: 'absolute', bottom: 10, right: 10 }} gap='xs'>
-                <Select
-                  size='xs'
-                  data={codeMap.map((meta) => ({ value: meta.ext, label: meta.name }))}
-                  value={file.lang}
-                  onChange={(value) => setFile(index, 'lang', value as string)}
-                  searchable
-                />
-
-                {files.length > 1 && (
-                  <ActionIcon onClick={() => removeFile(index)} variant='outline' color='red' size='md'>
-                    <IconTrashFilled size='1rem' />
-                  </ActionIcon>
-                )}
-              </Group>
             </div>
           ))}
           <Group my='sm' justify='center'>
@@ -152,7 +180,7 @@ export default function UploadText() {
               size='compact-sm'
               leftSection={<IconPlus size='1rem' />}
             >
-              Add text file
+              Add snippet
             </Button>
 
             {files.some((file) => file.text.length > 0) && (
@@ -171,7 +199,7 @@ export default function UploadText() {
         <Tabs.Panel value='preview'>
           {files.map((file, index) => (
             <div key={index}>
-              <Title order={4}>File {index + 1}</Title>
+              <Title order={4}>{file.name || `snippet.${file.lang}`}</Title>
               <Render mode={renderMode(file.lang)} code={file.text} language={file.lang} />
             </div>
           ))}
@@ -186,7 +214,7 @@ export default function UploadText() {
           disabled={files.some((file) => file.text.length === 0) || loading}
           onClick={upload}
         >
-          Upload {files.length} file{files.length !== 1 && 's'} ({bytes(aggSize())})
+          Upload {files.length} snippet{files.length !== 1 && 's'} ({bytes(aggSize())})
         </Button>
       </Group>
     </>

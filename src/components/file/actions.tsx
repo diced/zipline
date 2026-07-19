@@ -234,6 +234,65 @@ export async function addMultipleToFolder(files: File[], folderId: string | null
   mutateFiles();
 }
 
+export async function deleteMultipleFiles(files: File[]) {
+  const { data, error } = await fetchApi<Response['/api/user/files/transaction']>(
+    '/api/user/files/transaction',
+    'DELETE',
+    {
+      files: files.map((file) => file.id),
+    },
+  );
+
+  if (error) {
+    notifications.show({
+      title: 'Error while deleting files',
+      message: error.error,
+      color: 'red',
+      icon: <IconTrashXFilled size='1rem' />,
+    });
+  } else {
+    notifications.show({
+      title: 'Files deleted',
+      message: `${data!.count} file(s) have been deleted`,
+      color: 'green',
+      icon: <IconTrashFilled size='1rem' />,
+    });
+  }
+
+  mutateFiles();
+}
+
+export async function createZipShare(files: File[], zipName: string) {
+  const { data, error } = await fetchApi<{ url: string; fileId: string; urlId: string }>(
+    '/api/user/files/zip-share',
+    'POST',
+    {
+      files: files.map((file) => file.id),
+      zipName,
+    },
+  );
+
+  if (error || !data) {
+    notifications.show({
+      title: 'Error while creating zip share',
+      message: error?.error ?? 'Unknown error',
+      color: 'red',
+      icon: <IconFolderOff size='1rem' />,
+    });
+    return null;
+  }
+
+  notifications.show({
+    title: 'Zip share created',
+    message: data.url,
+    color: 'green',
+    icon: <IconFolderPlus size='1rem' />,
+  });
+
+  mutateFiles();
+  return data.url;
+}
+
 export function mutateFiles() {
   mutate('/api/user/recent');
   mutate('/api/user/stats');
