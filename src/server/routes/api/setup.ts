@@ -58,37 +58,38 @@ export default typedPlugin(
         ...secondlyRatelimit(5),
       },
       async (req, res) => {
-        const { firstSetup, id } = await getZipline();
-
-        if (!firstSetup) throw new ApiError(9001);
-
-        logger.info('first setup running');
+        await getZipline();
 
         const { username, password } = req.body;
 
-        const user = await prisma.user.create({
-          data: {
-            username,
-            password: await hashPassword(password),
-            role: 'SUPERADMIN',
-            token: createToken(),
-          },
-          select: userSelect,
+        const hashed = await hashPassword(password);
+        const token = createToken();
+
+        logger.info('first setup running');
+
+        const user = await prisma.$transaction(async (tx) => {
+          const claimed = await tx.zipline.updateMany({
+            where: { firstSetup: true },
+            data: { firstSetup: false },
+          });
+
+          if (claimed.count === 0) throw new ApiError(9001);
+
+          return tx.user.create({
+            data: {
+              username,
+              password: hashed,
+              role: 'SUPERADMIN',
+              token,
+            },
+            select: userSelect,
+          });
         });
 
         logger.info('first setup complete');
 
-        await prisma.zipline.update({
-          where: {
-            id,
-          },
-          data: {
-            firstSetup: false,
-          },
-        });
-
         return res.send({
-          firstSetup,
+          firstSetup: false,
           user,
         });
       },
