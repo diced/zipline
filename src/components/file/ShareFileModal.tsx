@@ -170,30 +170,42 @@ export default function ShareFileModal({
         {shares.length > 0 && (
           <Stack gap='xs'>
             <Text fw={600}>Active shares</Text>
-            {shares.map((share) => (
-              <Group key={share.id} justify='space-between' wrap='nowrap'>
-                <Text size='sm' c='dimmed' style={{ fontFamily: 'monospace' }}>
-                  {share.token.slice(0, 8)}…
-                </Text>
-                <Group gap='xs'>
-                  {share.maxViews && (
-                    <Text size='xs' c='dimmed'>
-                      {share.views}/{share.maxViews} views
-                    </Text>
-                  )}
-                  {share.expiresAt && (
-                    <Text size='xs' c='dimmed'>
-                      until {new Date(share.expiresAt).toLocaleString()}
-                    </Text>
-                  )}
-                  <Tooltip label='Revoke'>
-                    <ActionIcon color='red' variant='light' onClick={() => revokeShare(share.id)}>
-                      <IconTrash size='1rem' />
-                    </ActionIcon>
-                  </Tooltip>
+            {shares.map((share) => {
+              const shareUrl = `${window.location.origin}/u/${encodeURIComponent(file.name)}?share=${share.token}`;
+              return (
+                <Group key={share.id} justify='space-between' wrap='nowrap'>
+                  <TextInput
+                    value={shareUrl}
+                    readOnly
+                    style={{ flex: 1 }}
+                    onFocus={(e) => e.currentTarget.select()}
+                    size='sm'
+                  />
+                  <Group gap='xs' wrap='nowrap'>
+                    <Tooltip label='Copy'>
+                      <ActionIcon
+                        variant='light'
+                        onClick={() => {
+                          clipboard.copy(shareUrl);
+                          notifications.show({
+                            title: 'Copied',
+                            message: 'Share link copied',
+                            color: 'green',
+                          });
+                        }}
+                      >
+                        <IconCopy size='1rem' />
+                      </ActionIcon>
+                    </Tooltip>
+                    <Tooltip label='Revoke'>
+                      <ActionIcon color='red' variant='light' onClick={() => revokeShare(share.id)}>
+                        <IconTrash size='1rem' />
+                      </ActionIcon>
+                    </Tooltip>
+                  </Group>
                 </Group>
-              </Group>
-            ))}
+              );
+            })}
           </Stack>
         )}
       </Stack>
