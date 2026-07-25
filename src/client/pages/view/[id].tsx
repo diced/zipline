@@ -36,13 +36,14 @@ type SsrData = {
   token?: string | null;
   metrics?: Awaited<ReturnType<typeof parserMetrics>>;
   filesRoute?: string;
+  share?: string | null;
 };
 
 export default function ViewFileId() {
   const data = useSsrData<SsrData>();
   if (!data) return null;
 
-  const { file, password, code, user, host, metrics, filesRoute, token } = data;
+  const { file, password, code, user, host, metrics, filesRoute, token, share } = data;
 
   const [passwordValue, setPassword] = useState<string>('');
   const [passwordError, setPasswordError] = useState<string>('');
@@ -105,7 +106,7 @@ export default function ViewFileId() {
               size='md'
               variant='outline'
               component={Link}
-              to={`/raw/${file.name}?download=true${token ? `&token=${encodeURIComponent(token)}` : ''}`}
+              to={`/raw/${file.name}?download=true${token || share ? `&${new URLSearchParams({ ...(token && { token }), ...(share && { share }) }).toString()}` : ''}`}
               target='_blank'
             >
               <IconDownload size='1rem' />
@@ -144,7 +145,14 @@ export default function ViewFileId() {
       </Collapse>
 
       <Center m='sm'>
-        <DashboardFileType file={file as unknown as File} token={token} show code={code} fullscreen />
+        <DashboardFileType
+          file={file as unknown as File}
+          token={token}
+          share={share}
+          show
+          code={code}
+          fullscreen
+        />
       </Center>
     </>
   ) : (
@@ -195,7 +203,7 @@ export default function ViewFileId() {
                   size='md'
                   variant='outline'
                   component={Link}
-                  to={`/raw/${file.name}${token ? `?token=${encodeURIComponent(token)}` : ''}`}
+                  to={`/raw/${file.name}${token || share ? `?${new URLSearchParams({ ...(token && { token }), ...(share && { share }) }).toString()}` : ''}`}
                   target='_blank'
                 >
                   <IconExternalLink size='1rem' />
@@ -206,7 +214,7 @@ export default function ViewFileId() {
                   size='md'
                   variant='outline'
                   component={Link}
-                  to={`/raw/${file.name}?download=true${token ? `&token=${encodeURIComponent(token)}` : ''}`}
+                  to={`/raw/${file.name}?download=true${token || share ? `&${new URLSearchParams({ ...(token && { token }), ...(share && { share }) }).toString()}` : ''}`}
                   target='_blank'
                 >
                   <IconDownload size='1rem' />
@@ -215,7 +223,7 @@ export default function ViewFileId() {
             </ActionIcon.Group>
           </Group>
 
-          <DashboardFileType allowZoom file={file as unknown as File} token={token} show />
+          <DashboardFileType allowZoom file={file as unknown as File} token={token} share={share} show />
 
           {user?.view!.content && (
             <Typography>

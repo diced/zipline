@@ -46,6 +46,7 @@ export const DATABASE_TO_PROP = {
   featuresUserRegistration: 'features.userRegistration',
   featuresOauthRegistration: 'features.oauthRegistration',
   featuresDeleteOnMaxViews: 'features.deleteOnMaxViews',
+  featuresFilesPrivateByDefault: 'features.filesPrivateByDefault',
 
   featuresThumbnailsEnabled: 'features.thumbnails.enabled',
   featuresThumbnailsNumberThreads: 'features.thumbnails.num_threads',

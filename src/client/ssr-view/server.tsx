@@ -18,7 +18,8 @@ import { createZiplineSsr } from '@/lib/ssr/createZiplineSsr';
 import { stripHtml } from '@/lib/stripHtml';
 import type { ZiplineTheme } from '@/lib/theme';
 import { readThemes } from '@/lib/theme/file';
-import { FastifyRequest } from 'fastify';
+import { verifyFileAccess } from '@/server/middleware/fileAccess';
+import { FastifyReply, FastifyRequest } from 'fastify';
 import { renderToString } from 'react-dom/server';
 import { createStaticHandler, createStaticRouter, StaticRouterProvider } from 'react-router-dom';
 import { createRoutes } from './routes';
@@ -43,10 +44,12 @@ export async function render(
   {
     defaultTheme,
     req,
+    res,
   }: {
     themes: ZiplineTheme[];
     defaultTheme: Config['website']['theme'];
     req: FastifyRequest<{ Params: { id: string }; Querystring: { token?: string } }>;
+    res: FastifyReply;
   },
   url: string,
 ) {
@@ -58,6 +61,9 @@ export async function render(
 
   const file = await getFile(id);
   if (!file || !file.userId) return { html: 'Not Found', meta: '', status: 404 };
+
+  const access = await verifyFileAccess(req, res, file);
+  if (!access.allowed) return { html: 'Not Found', meta: '', status: 404 };
 
   if (file.maxViews && file.views >= file.maxViews) return { html: 'Gone', meta: '', status: 410 };
   if (file.deletesAt && file.deletesAt <= new Date()) return { html: 'Expired', meta: '', status: 410 };
@@ -149,6 +155,7 @@ export async function render(
     metrics,
     filesRoute: zConfig.files.route,
     config,
+    share: access.share?.token ?? null,
   };
 
   const routes = createRoutes(themes, defaultTheme);

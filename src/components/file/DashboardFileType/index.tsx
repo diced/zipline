@@ -58,6 +58,7 @@ export default function DashboardFileType({
   file,
   show,
   token,
+  share,
   code,
   allowZoom,
   fullscreen,
@@ -67,6 +68,7 @@ export default function DashboardFileType({
   file: DbFile | File;
   show?: boolean;
   token?: string | null;
+  share?: string | null;
   code?: boolean;
   allowZoom?: boolean;
   fullscreen?: boolean;
@@ -76,7 +78,7 @@ export default function DashboardFileType({
   const disableMediaPreview = useSettingsStore((state) => state.settings.disableMediaPreview);
   const mediaAutoMuted = useSettingsStore((state) => state.settings.mediaAutoMuted);
 
-  const { fileUrl, thumbnailUrl, viewUrl } = useFileUrls({ file, token });
+  const { fileUrl, thumbnailUrl, viewUrl } = useFileUrls({ file, token, share });
   const db = isDbFile(file) ? file : null;
 
   const extension = file.name.split('.').pop() || '';

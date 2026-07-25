@@ -8,6 +8,7 @@ import { sanitizeFilename } from '../fs';
 import { formatFileName } from '../uploader/formatFileName';
 import { guess } from '../mimes';
 import { log } from '../logger';
+import { randomCharacters } from '../random';
 import { readFileSync } from 'fs';
 
 const codeMap: { ext: string; mime: string; name: string }[] = JSON.parse(
@@ -96,7 +97,19 @@ export async function getFilename(
     let existing = await prisma.file.findFirst({ where: { name: fullFileName } });
 
     if (existing && (override || format === 'name')) {
-      return { error: 'file with the same name already exists' };
+      let collisionRetries = 0;
+      const maxRetries = 10;
+      const baseName = fileName;
+
+      while (existing && collisionRetries < maxRetries) {
+        const suffix = randomCharacters(4).toLowerCase();
+        fileName = `${baseName}-${suffix}`;
+        fullFileName = `${fileName}${extension}`;
+        existing = await prisma.file.findFirst({ where: { name: fullFileName } });
+        collisionRetries++;
+      }
+
+      if (existing) return { error: 'file with the same name already exists' };
     }
 
     let dateIncrement = 1;

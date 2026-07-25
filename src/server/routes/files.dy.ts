@@ -1,6 +1,7 @@
 import { findFileByName } from '@/lib/db/models/file';
 import { prisma } from '@/lib/db';
 import { FastifyReply, FastifyRequest } from 'fastify';
+import { verifyFileAccess } from '@/server/middleware/fileAccess';
 import { rawFileHandler } from './raw/[id]';
 
 type Params = {
@@ -10,6 +11,8 @@ type Params = {
 type Query = {
   token?: string;
   download?: string;
+  share?: string;
+  sharePassword?: string;
 };
 
 export async function filesRoute(
@@ -22,9 +25,11 @@ export async function filesRoute(
       where,
       ...(orderBy && { orderBy }),
       select: {
+        id: true,
         name: true,
         type: true,
         password: true,
+        userId: true,
         User: {
           select: {
             view: true,
@@ -35,7 +40,10 @@ export async function filesRoute(
   );
   if (!file) return res.callNotFound();
 
-  const viewUrl = `/view/${encodeURIComponent(file.name)}`;
+  const access = await verifyFileAccess(req, res, file);
+  if (!access.allowed) return res.callNotFound();
+
+  const viewUrl = `/view/${encodeURIComponent(file.name)}${req.query.share ? `?share=${encodeURIComponent(req.query.share)}` : ''}`;
 
   if (file.password) return res.redirect(viewUrl);
 

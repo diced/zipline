@@ -41,6 +41,8 @@ async function vitePlugin(fastify: FastifyInstance) {
         ...reservedRoutes.filter((x) => x !== '/dashboard' && x !== '/auth' && x !== '/r'),
         config.files.route,
         config.urls.route,
+        '/view',
+        '/view/url',
       ]
         .filter((url) => url.trim() !== '/')
         .some((route) => url.startsWith(route));
@@ -80,6 +82,7 @@ async function vitePlugin(fastify: FastifyInstance) {
           themes: await readThemes(),
           defaultTheme: config.website.theme,
           req: this.request,
+          res: this,
         },
         url,
       );

@@ -141,7 +141,7 @@ export const schema = z.object({
   files: z.object({
     route: z.string().startsWith('/').min(1).trim().toLowerCase().default('/u'),
     length: z.number().default(6),
-    defaultFormat: z.enum(['random', 'date', 'uuid', 'name', 'gfycat', 'random-words']).default('random'),
+    defaultFormat: z.enum(['random', 'date', 'uuid', 'name', 'gfycat', 'random-words']).default('name'),
     disabledTypes: z.array(z.string().regex(MIME_REGEX, 'Invalid MIME type format')).default([]),
     disabledTypesDefault: z.string().nullable().default(null),
     disabledExtensions: z.array(z.string()).default([]),
@@ -214,6 +214,7 @@ export const schema = z.object({
     userRegistration: z.boolean().default(false),
     oauthRegistration: z.boolean().default(false),
     deleteOnMaxViews: z.boolean().default(true),
+    filesPrivateByDefault: z.boolean().default(true),
     thumbnails: z.object({
       enabled: z.boolean().default(true),
       num_threads: z.number().default(4),

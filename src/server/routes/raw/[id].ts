@@ -11,6 +11,7 @@ import { guess } from '@/lib/mimes';
 import { setContentSecurity } from '@/lib/api/contentSecurity';
 import { TimedCache } from '@/lib/timedCache';
 import typedPlugin from '@/server/typedPlugin';
+import { verifyFileAccess } from '@/server/middleware/fileAccess';
 import { FastifyReply, FastifyRequest } from 'fastify';
 
 const VIEW_WINDOW = 5 * 1000;
@@ -23,6 +24,8 @@ type Params = {
 type Querystring = {
   token?: string;
   download?: string;
+  share?: string;
+  sharePassword?: string;
 };
 
 const logger = log('routes').c('raw');
@@ -73,6 +76,9 @@ export const rawFileHandler = async (
     prisma.file.findFirst({ where, ...(orderBy && { orderBy }) }),
   );
   if (!file) return res.callNotFound();
+
+  const access = await verifyFileAccess(req, res, file);
+  if (!access.allowed) return res.callNotFound();
 
   if (file?.deletesAt && file.deletesAt <= new Date()) {
     try {

@@ -221,6 +221,7 @@ export default typedPlugin(
             featuresUserRegistration: z.boolean(),
             featuresOauthRegistration: z.boolean(),
             featuresDeleteOnMaxViews: z.boolean(),
+            featuresFilesPrivateByDefault: z.boolean(),
 
             featuresThumbnailsEnabled: z.boolean(),
             featuresThumbnailsNumberThreads: z

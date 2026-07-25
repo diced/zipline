@@ -52,12 +52,13 @@ model Zipline {
   urlsRoute  String @default("/go")
   urlsLength Int    @default(6)
 
-  featuresImageCompression  Boolean @default(true)
-  featuresRobotsTxt         Boolean @default(true)
-  featuresHealthcheck       Boolean @default(true)
-  featuresUserRegistration  Boolean @default(false)
-  featuresOauthRegistration Boolean @default(false)
-  featuresDeleteOnMaxViews  Boolean @default(true)
+  featuresImageCompression      Boolean @default(true)
+  featuresRobotsTxt             Boolean @default(true)
+  featuresHealthcheck           Boolean @default(true)
+  featuresUserRegistration      Boolean @default(false)
+  featuresOauthRegistration     Boolean @default(false)
+  featuresDeleteOnMaxViews      Boolean @default(true)
+  featuresFilesPrivateByDefault Boolean @default(true)
 
   featuresThumbnailsEnabled        Boolean  @default(true)
   featuresThumbnailsNumberThreads  Int      @default(4)
@@ -296,9 +297,27 @@ model File {
   folderId String?
 
   thumbnail Thumbnail?
+  shares    FileShare[]
 
   @@index([name])
   @@index([folderId, createdAt])
+}
+
+model FileShare {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  token     String   @unique
+  fileId    String
+  file      File     @relation(fields: [fileId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  expiresAt DateTime?
+  maxViews  Int?
+  views     Int      @default(0)
+  password  String?
+
+  @@index([token])
+  @@index([fileId])
 }
 
 model Thumbnail {

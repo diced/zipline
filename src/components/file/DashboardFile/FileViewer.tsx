@@ -47,6 +47,7 @@ import {
   IconInfoCircle,
   IconPencil,
   IconRefresh,
+  IconShare,
   IconStar,
   IconStarFilled,
   IconTags,
@@ -75,6 +76,7 @@ import {
 } from '../actions';
 import EditFileDetailsModal from './EditFileDetailsModal';
 import FileStat from './FileStat';
+import ShareFileModal from '../ShareFileModal';
 
 function ActionButton({
   Icon,
@@ -200,6 +202,7 @@ export default function FileViewer({
 
   const values = value.map((id) => <TagPill key={id} tag={tags?.find((t) => t.id === id) || null} />);
 
+  const [shareOpen, setShareOpen] = useState(false);
   const [editFileOpen, setEditFileOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
   const [scrollParent, setScrollParent] = useState<HTMLDivElement | null>(null);
@@ -278,6 +281,7 @@ export default function FileViewer({
         onClick={() => copyFile(file, clipboard, true)}
         tooltip='Copy raw file link'
       />
+      <ActionButton Icon={IconShare} onClick={() => setShareOpen(true)} tooltip='Create share link' />
       <ActionButton Icon={IconCopy} onClick={() => copyFile(file, clipboard)} tooltip='Copy file link' />
       <ActionButton Icon={IconDownload} onClick={() => downloadFile(file)} tooltip='Download' />
     </ActionIcon.Group>
@@ -286,7 +290,10 @@ export default function FileViewer({
   return (
     <>
       {file && (
-        <EditFileDetailsModal open={editFileOpen} onClose={() => setEditFileOpen(false)} file={file} />
+        <>
+          <ShareFileModal file={file} open={shareOpen} onClose={() => setShareOpen(false)} />
+          <EditFileDetailsModal open={editFileOpen} onClose={() => setEditFileOpen(false)} file={file} />
+        </>
       )}
 
       <Drawer
