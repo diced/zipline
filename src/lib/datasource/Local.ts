@@ -101,15 +101,15 @@ export class LocalDatasource extends Datasource {
   }
 
   public async totalSize(): Promise<number> {
-    const files = await readdir(this.dir);
-    const sizes = await Promise.all(files.map((file) => this.size(file)));
+    const files = (await readdir(this.dir, { withFileTypes: true })).filter((file) => file.isFile());
+    const sizes = await Promise.all(files.map((file) => this.size(file.name)));
 
     return sizes.reduce((a, b) => a + b, 0);
   }
 
   public async clear(): Promise<void> {
-    for (const file of await readdir(this.dir)) {
-      await rm(join(this.dir, file));
+    for (const file of await readdir(this.dir, { withFileTypes: true })) {
+      if (file.isFile()) await rm(join(this.dir, file.name));
     }
   }
 

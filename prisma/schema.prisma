@@ -298,6 +298,7 @@ model File {
   thumbnail Thumbnail?
 
   @@index([name])
+  @@index([userId, size])
   @@index([folderId, createdAt])
 }
 

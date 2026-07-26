@@ -33,30 +33,26 @@ export function getExtension(filename: string, override?: string) {
 }
 
 export async function checkQuota(
-  user: User | null,
+  user: Pick<User, 'id' | 'quota'> | null,
   newSize: number,
   fileCount: number,
 ): Promise<true | string> {
   if (!user?.quota) return true;
 
-  const stats = await prisma.file.aggregate({
-    where: {
-      userId: user.id,
-    },
-    _sum: {
-      size: true,
-    },
-    _count: {
-      _all: true,
-    },
-  });
+  if (user.quota.filesQuota === 'BY_BYTES') {
+    const stats = await prisma.file.aggregate({
+      where: { userId: user.id },
+      _sum: { size: true },
+    });
 
-  const aggSize = stats?._sum?.size ? stats._sum.size : 0n;
+    if (Number(stats._sum.size ?? 0n) + newSize > bytes(user.quota.maxBytes!))
+      return `uploading will exceed your storage quota of ${user.quota.maxBytes}`;
 
-  if (user.quota.filesQuota === 'BY_BYTES' && Number(aggSize) + newSize > bytes(user.quota.maxBytes!))
-    return `uploading will exceed your storage quota of ${user.quota.maxFiles} files`;
+    return true;
+  }
 
-  if (user.quota.filesQuota === 'BY_FILES' && stats?._count?._all + fileCount > user.quota.maxFiles!)
+  const count = await prisma.file.count({ where: { userId: user.id } });
+  if (count + fileCount > user.quota.maxFiles!)
     return `uploading will exceed your file count quota of ${user.quota.maxFiles} files`;
 
   return true;
@@ -81,6 +77,7 @@ export async function getFilename(
   originalName: string,
   extension: string,
   override?: string,
+  reservedNames?: Set<string>,
 ): Promise<{ error: string } | { fileName: string }> {
   try {
     let fileName = override ? sanitizeFilename(override) : formatFileName(format, originalName);
@@ -88,7 +85,8 @@ export async function getFilename(
     if (!fileName) return { error: 'invalid file name' };
 
     let fullFileName = `${fileName}${extension}`;
-    let existing = await prisma.file.findFirst({ where: { name: fullFileName } });
+    let existing =
+      reservedNames?.has(fullFileName) || (await prisma.file.findFirst({ where: { name: fullFileName } }));
 
     if (existing && (override || format === 'name')) {
       return { error: 'file with the same name already exists' };
@@ -101,9 +99,11 @@ export async function getFilename(
       if (!fileName) return { error: 'invalid file name' };
 
       fullFileName = `${fileName}${extension}`;
-      existing = await prisma.file.findFirst({ where: { name: fullFileName } });
+      existing =
+        reservedNames?.has(fullFileName) || (await prisma.file.findFirst({ where: { name: fullFileName } }));
     }
 
+    reservedNames?.add(fullFileName);
     return { fileName };
   } catch (e) {
     logger.warn(`error generating file name: ${e}`);

@@ -1,7 +1,7 @@
 import { config } from '@/lib/config';
 import { decryptToken } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
-import { User, userSelect } from '@/lib/db/models/user';
+import { limitedUserSelect, User, userSelect } from '@/lib/db/models/user';
 import { FastifyReply } from 'fastify';
 import { FastifyRequest } from 'fastify/types/request';
 import { getSession } from '../session';
@@ -41,10 +41,14 @@ export function parseUserToken(
 }
 
 export async function userMiddleware(req: FastifyRequest, res: FastifyReply) {
+  const path = req.url.toLowerCase().split('?')[0];
+  const upload = ['/api/upload', '/api/upload/partial'].includes(path);
+  const leanUpload = upload && !config.discord?.onUpload && !config.httpWebhook.onUpload;
+
   // conditions met to allow anonymous folder uploads but later handled in the upload route
   const anonFolderUpload =
     req.headers['x-zipline-folder'] &&
-    ['/api/upload', '/api/upload/partial'].includes(req.url.toLowerCase().split('?')[0]) &&
+    upload &&
     !req.headers.authorization &&
     !req.cookies['zipline_session'];
   if (anonFolderUpload) return;
@@ -58,11 +62,11 @@ export async function userMiddleware(req: FastifyRequest, res: FastifyReply) {
       where: {
         token,
       },
-      select: userSelect,
+      select: leanUpload ? limitedUserSelect : userSelect,
     });
     if (!user) throw new ApiError(2001);
 
-    req.user = user;
+    req.user = user as User;
 
     return;
   }
@@ -80,9 +84,9 @@ export async function userMiddleware(req: FastifyRequest, res: FastifyReply) {
         },
       },
     },
-    select: userSelect,
+    select: leanUpload ? limitedUserSelect : userSelect,
   });
   if (!user) throw new ApiError(2001);
 
-  req.user = user;
+  req.user = user as User;
 }

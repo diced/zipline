@@ -25,6 +25,7 @@ services:
     environment:
       - DATABASE_URL=postgres://postgres:postgres@postgres/postgres2
       - CORE_HOSTNAME=0.0.0.0
+      - CORE_TEMP_DIRECTORY=${CORE_TEMP_DIRECTORY:-/zipline/uploads/.tmp}
     depends_on:
       - postgres
     volumes:

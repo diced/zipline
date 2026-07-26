@@ -4,7 +4,7 @@ import { bytes } from '@/lib/bytes';
 import { config } from '@/lib/config';
 import { hashPassword } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
-import { userSelect } from '@/lib/db/models/user';
+import { limitedUserSelect } from '@/lib/db/models/user';
 import { sanitizeFilename } from '@/lib/fs';
 import { log } from '@/lib/logger';
 import { guess } from '@/lib/mimes';
@@ -99,7 +99,7 @@ export default typedPlugin(
           ...(options.deletesAt && {
             deletesAt: options.deletesAt === 'never' ? 'never' : options.deletesAt.toISOString(),
           }),
-          ...(config.files.assumeMimetypes && { assumedMimetypes: Array(req.files.length) }),
+          ...(config.files.assumeMimetypes && { assumedMimetypes: Array(files.length) }),
         };
 
         const domain = getDomain(
@@ -144,7 +144,7 @@ export default typedPlugin(
         const quotaUser = req.user
           ? req.user
           : folder?.userId
-            ? await prisma.user.findUnique({ where: { id: folder.userId }, select: userSelect })
+            ? await prisma.user.findUnique({ where: { id: folder.userId }, select: limitedUserSelect })
             : null;
 
         // check quota, using the current added length, and only just adding one file
@@ -175,6 +175,7 @@ export default typedPlugin(
 
         const tempFile = join(config.core.tempDirectory, sanitized);
         await rename(file.filepath, tempFile);
+        if (req.tmpUploads) req.tmpUploads = req.tmpUploads.filter((path) => path !== file.filepath);
 
         if (options.partial.lastchunk) {
           const extension = getExtension(options.partial.filename, options.overrides?.extension);
