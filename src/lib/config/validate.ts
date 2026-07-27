@@ -1,5 +1,4 @@
-import { tmpdir } from 'os';
-import { join, resolve } from 'path';
+import { resolve } from 'path';
 import { z } from 'zod';
 import { log } from '../logger';
 import { ParsedConfig } from './read';
@@ -99,7 +98,7 @@ export const schema = z.object({
     tempDirectory: z
       .string()
       .transform((s) => resolve(s))
-      .default(join(tmpdir(), 'zipline')),
+      .default(resolve('./uploads/.tmp')),
     trustProxy: z.boolean().default(false),
 
     databaseUrl: z.url(),

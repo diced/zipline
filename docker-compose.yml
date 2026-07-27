@@ -25,7 +25,6 @@ services:
       - .env
     environment:
       - DATABASE_URL=postgres://${POSTGRESQL_USER:-zipline}:${POSTGRESQL_PASSWORD}@postgresql:5432/${POSTGRESQL_DB:-zipline}
-      - CORE_TEMP_DIRECTORY=${CORE_TEMP_DIRECTORY:-/zipline/uploads/.tmp}
     depends_on:
       postgresql:
         condition: service_healthy

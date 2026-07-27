@@ -100,6 +100,8 @@ volumes:
 - `./public` - The folder where all the public assets are stored (must mount to `/zipline/public`)
 - `./themes` - The folder where all the custom themes are stored (must mount to `/zipline/themes`)
 
+Temporary files default to `./uploads/.tmp`. Setting `CORE_TEMP_DIRECTORY` to another filesystem, such as tmpfs, can reduce local upload performance.
+
 ### Generating Secrets
 
 ```bash

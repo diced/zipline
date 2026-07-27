@@ -17,7 +17,7 @@ model Zipline {
 
   coreReturnHttpsUrls Boolean @default(false)
   coreDefaultDomain   String?
-  coreTempDirectory   String // default join(tmpdir(), 'zipline')
+  coreTempDirectory   String // default resolve('./uploads/.tmp')
   coreTrustProxy      Boolean @default(false)
 
   chunksEnabled Boolean @default(true)
