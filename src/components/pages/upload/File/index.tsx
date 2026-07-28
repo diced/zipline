@@ -1,10 +1,11 @@
 import { useConfig } from '@/components/ConfigProvider';
 import { bytes } from '@/lib/bytes';
+import { useUploadOptionsStore } from '@/lib/client/store/uploadOptions';
 import { uploadFiles } from '@/lib/client/upload/files';
 import { uploadPartialFiles } from '@/lib/client/upload/partial';
+import { showUploadModal } from '@/lib/client/upload/shared';
 import { useProgress } from '@/lib/client/upload/useProgress';
 import { humanizeDuration } from '@/lib/relativeTime';
-import { useUploadOptionsStore } from '@/lib/client/store/uploadOptions';
 import {
   Button,
   Collapse,
@@ -69,6 +70,10 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
     const maxBytes = config.chunks.enabled && bytes(config.chunks.max);
     const partialUploads: File[] = maxBytes ? files.filter((file) => file.size >= maxBytes) : [];
     const normalUploads: File[] = maxBytes ? files.filter((file) => file.size < maxBytes) : files;
+    const hasBoth = normalUploads.length > 0 && partialUploads.length > 0;
+
+    let uploadedNormal: Awaited<ReturnType<typeof uploadFiles>> = null;
+    let uploadedPartial: Awaited<ReturnType<typeof uploadPartialFiles>> = null;
 
     if (normalUploads.length > 0) {
       const size = normalUploads.reduce((acc, file) => acc + file.size, 0);
@@ -87,7 +92,7 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
         });
       }
 
-      await uploadFiles(normalUploads, {
+      uploadedNormal = await uploadFiles(normalUploads, {
         setFiles,
         setLoading,
         setProgress,
@@ -96,11 +101,12 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
         options,
         ephemeral,
         folder,
+        partials: partialUploads.length,
       });
     }
 
-    if (partialUploads.length > 0) {
-      await uploadPartialFiles(partialUploads, {
+    if (partialUploads.length > 0 && (!hasBoth || uploadedNormal)) {
+      uploadedPartial = await uploadPartialFiles(partialUploads, {
         setFiles,
         setLoading,
         setProgress,
@@ -112,6 +118,10 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
         folder,
       });
     }
+
+    const allFiles = [...(uploadedNormal?.files ?? []), ...(uploadedPartial?.files ?? [])];
+    if (allFiles.length > 0 && (hasBoth || partialUploads.length > 0))
+      showUploadModal(allFiles, { clipboard, clearEphemeral, showCopyAll: true });
   };
 
   useEffect(() => {

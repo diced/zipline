@@ -59,10 +59,13 @@ export async function uploadFiles(
     options,
     ephemeral,
     folder,
+    partials,
   }: UploadContextHandlers & UploadHeadersOptions,
-) {
+): Promise<{ files: Response['/api/upload']['files'] } | null> {
   setLoading(true);
   setProgress({ percent: 0, remaining: 0, speed: 0 });
+
+  const partialCount = partials || 0;
 
   const batches = Math.ceil(files.length / FILES_PER_REQUEST);
   const aggBytes = files.reduce((acc, file) => acc + file.size, 0);
@@ -152,16 +155,28 @@ export async function uploadFiles(
 
     notifications.update({
       id: 'upload',
-      title: 'Upload complete',
-      message: `Uploaded ${files.length} file${files.length === 1 ? '' : 's'}`,
+      title: partialCount > 0 ? 'Regular uploads complete' : 'Upload complete',
+      message:
+        partialCount > 0
+          ? `Uploaded ${files.length} file${files.length === 1 ? '' : 's'}. Starting ${partialCount} large file upload${partialCount === 1 ? '' : 's'}...`
+          : `Uploaded ${files.length} file${files.length === 1 ? '' : 's'}`,
       color: 'green',
       icon: <IconFileUpload size='1rem' />,
       autoClose: true,
       loading: false,
     });
 
-    setFiles([]);
-    showUploadModal(uploadedFiles, { clipboard, clearEphemeral, showCopyAll: true });
+    setFiles((prev) => prev.filter((file) => !files.includes(file)));
+
+    if (partialCount === 0) {
+      showUploadModal(uploadedFiles, {
+        clipboard,
+        clearEphemeral,
+        showCopyAll: true,
+      });
+    }
+
+    return { files: uploadedFiles };
   } catch (error) {
     notifications.update({
       id: 'upload',
@@ -172,8 +187,15 @@ export async function uploadFiles(
       autoClose: true,
       loading: false,
     });
-  } finally {
+
     setLoading(false);
     setProgress({ percent: 0, remaining: 0, speed: 0 });
+
+    return null;
+  } finally {
+    if (!partials) {
+      setLoading(false);
+      setProgress({ percent: 0, remaining: 0, speed: 0 });
+    }
   }
 }

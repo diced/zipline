@@ -1,12 +1,10 @@
 import { useConfig } from '@/components/ConfigProvider';
 import { Response } from '@/lib/api/response';
 import { bytes } from '@/lib/bytes';
-import { Anchor, Text } from '@mantine/core';
-import { hideNotification, notifications } from '@mantine/notifications';
+import { notifications } from '@mantine/notifications';
 import { IconFileUpload, IconFileXFilled } from '@tabler/icons-react';
-import { Link } from 'react-router-dom';
+import { applyUploadHeaders, handleUploadResponse, UploadHandlers, UploadHeadersOptions } from './shared';
 import { UploadProgress } from './useProgress';
-import { applyUploadHeaders, handleUploadResponse, UploadHeadersOptions, UploadHandlers } from './shared';
 
 export function progressTracker(size: number) {
   const alpha = 0.2;
@@ -53,7 +51,6 @@ export async function uploadPartialFiles(
     setProgress,
     setLoading,
     setFiles,
-    clipboard,
     options,
     ephemeral,
     config,
@@ -64,11 +61,13 @@ export async function uploadPartialFiles(
       clearEphemeral?: () => void;
       config: ReturnType<typeof useConfig>;
     },
-) {
+): Promise<{ files: Response['/api/upload/partial']['files'] } | null> {
   setLoading(true);
   setProgress({ percent: 0, remaining: 0, speed: 0 });
 
   const chunkSize = bytes(config.chunks.size);
+  const totalFiles = files.length;
+  const uploadedFiles: Response['/api/upload/partial']['files'] = [];
 
   for (let i = 0; i !== files.length; ++i) {
     const file = files[i];
@@ -93,26 +92,42 @@ export async function uploadPartialFiles(
       });
     }
 
+    const fileLabel =
+      totalFiles > 1 ? `Uploading large file (${i + 1}/${totalFiles})` : 'Uploading large file';
+
     notifications.show({
       id: 'upload-partial',
-      title: 'Uploading partial file',
-      message: `Uploading partial ${i + 1}/${chunks.length}`,
+      title: fileLabel,
+      message: file.name,
       loading: true,
       autoClose: false,
     });
 
     let ready = true;
     let identifier: string | undefined;
+    let failed = false;
 
     for (let j = 0; j !== nChunks; ++j) {
-      while (!ready) {
+      while (!ready && !failed) {
         await new Promise((resolve) => setTimeout(resolve, 100));
       }
+
+      if (failed) break;
 
       const body = new FormData();
       body.append('file', chunks[j].blob);
 
       setLoading(true);
+
+      notifications.update({
+        id: 'upload-partial',
+        title: fileLabel,
+        message: `Chunk ${j + 1}/${nChunks}`,
+        loading: true,
+        autoClose: false,
+        color: 'blue',
+      });
+
       const req = new XMLHttpRequest();
 
       req.upload.addEventListener('progress', (e) => {
@@ -135,74 +150,48 @@ export async function uploadPartialFiles(
           if (error || !res) {
             notifications.update({
               id: 'upload-partial',
-              title: 'Error uploading files',
-              message: error?.error ?? 'An unknown error occurred',
+              title: 'Error uploading file',
+              message: `${file.name}: ${error?.error ?? 'An unknown error occurred'}`,
               color: 'red',
               icon: <IconFileXFilled size='1rem' />,
               autoClose: false,
               loading: false,
             });
-            ready = false;
-            setFiles([]);
+            failed = true;
             setProgress({ percent: 0, remaining: 0, speed: 0 });
             setLoading(false);
             return;
           }
-
-          notifications.update({
-            id: 'upload-partial',
-            title: 'Uploading partial file',
-            message: `Uploading partial ${j + 1}/${nChunks} successful`,
-            loading: false,
-            autoClose: false,
-          });
 
           if (j === 0) {
             identifier = res.partialIdentifier;
           }
 
           if (j === chunks.length - 1) {
+            uploadedFiles.push(...res.files);
+            setFiles((prev) => prev.filter((f) => f !== file));
+
+            const isLastFile = i === totalFiles - 1;
+
             notifications.update({
               id: 'upload-partial',
-              title: 'Finalizing partial upload',
-              message: (
-                <Text>
-                  The upload has been offloaded and will complete in the background.
-                  <br />
-                  <Anchor
-                    component='span'
-                    onClick={() => {
-                      hideNotification('upload-partial');
-                      clipboard.copy(res.files[0].url);
-                      notifications.show({
-                        title: 'Copied URL to clipboard',
-                        message: (
-                          <Anchor component={Link} to={res.files[0].url} target='_blank'>
-                            {res.files[0].url}
-                          </Anchor>
-                        ),
-                      });
-                    }}
-                  >
-                    Click here to copy the URL to clipboard while it&apos;s being processed.
-                  </Anchor>
-                  <br />
-                  <Anchor component={Link} to='/dashboard/files?pending=true'>
-                    View processing files
-                  </Anchor>
-                </Text>
-              ),
+              title: isLastFile ? 'Large file uploads complete' : 'Large file offloaded',
+              message: isLastFile
+                ? `Offloaded ${uploadedFiles.length} large file${uploadedFiles.length === 1 ? '' : 's'} for background processing`
+                : `${file.name} offloaded (${i + 1}/${totalFiles})`,
               color: 'green',
               icon: <IconFileUpload size='1rem' />,
-              autoClose: true,
+              autoClose: isLastFile,
               loading: false,
             });
 
-            setFiles([]);
-            setProgress({ percent: 100, remaining: 0, speed: 0 });
-            setLoading(false);
-
-            setTimeout(() => setProgress({ percent: 0, remaining: 0, speed: 0 }), 1000);
+            if (isLastFile) {
+              setProgress({ percent: 100, remaining: 0, speed: 0 });
+              setLoading(false);
+              setTimeout(() => setProgress({ percent: 0, remaining: 0, speed: 0 }), 1000);
+            } else {
+              setProgress({ percent: 0, remaining: 0, speed: 0 });
+            }
           }
 
           tracker.finish(chunks[j].blob.size);
@@ -226,5 +215,13 @@ export async function uploadPartialFiles(
 
       ready = false;
     }
+
+    while (!ready && !failed) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+
+    if (failed) return uploadedFiles.length ? { files: uploadedFiles } : null;
   }
+
+  return uploadedFiles.length ? { files: uploadedFiles } : null;
 }

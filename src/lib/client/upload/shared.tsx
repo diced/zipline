@@ -1,7 +1,7 @@
 import { Response } from '@/lib/api/response';
 import { ErrorBody } from '@/lib/response';
 import { UploadOptionsStore } from '@/lib/client/store/uploadOptions';
-import { ActionIcon, Anchor, Button, Group, Stack, Tooltip } from '@mantine/core';
+import { ActionIcon, Anchor, Badge, Button, Group, Stack, Text, Tooltip } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
@@ -14,6 +14,7 @@ export type UploadHeadersOptions = {
   options: UploadOptionsStore['options'];
   ephemeral: UploadOptionsStore['ephemeral'];
   folder?: string;
+  partials?: number;
 };
 
 export type UploadHandlers = {
@@ -120,6 +121,8 @@ export function showUploadModal(
     });
   };
 
+  const pendingCount = files.filter((file) => file.pending).length;
+
   modals.open({
     title: `Uploaded ${files.length} file${files.length > 1 ? 's' : ''}`,
     size: 'auto',
@@ -128,8 +131,13 @@ export function showUploadModal(
         <Stack>
           {files.map((file, i) => (
             <Group key={i} justify='space-between'>
-              <Group justify='left'>
-                <Anchor component={Link} to={file.url} target='_blank'>
+              <Group justify='left' gap='xs'>
+                <Anchor
+                  component={Link}
+                  to={file.url}
+                  target='_blank'
+                  c={file.pending ? 'dimmed' : undefined}
+                >
                   {file.url}
                 </Anchor>
               </Group>
@@ -148,6 +156,14 @@ export function showUploadModal(
             </Group>
           ))}
         </Stack>
+        {pendingCount > 0 && (
+          <Text size='sm' c='dimmed' mt='sm'>
+            {pendingCount} large file{pendingCount === 1 ? '' : 's'} will finish{' '}
+            <Anchor component={Link} to='/dashboard/files?pending=true' onClick={() => modals.closeAll()}>
+              processing in the background.
+            </Anchor>
+          </Text>
+        )}
         {showCopyAll && files.length > 1 && (
           <Group justify='right'>
             <Tooltip label='Copy all links to clipboard (seperated by a new line)'>
