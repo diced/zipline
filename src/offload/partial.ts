@@ -4,7 +4,7 @@ import { getDatasource } from '@/lib/datasource';
 import { S3Datasource } from '@/lib/datasource/S3';
 import { File, fileSelect } from '@/lib/db/models/file';
 import { IncompleteFile } from '@/lib/db/models/incompleteFile';
-import { User, userSelect } from '@/lib/db/models/user';
+import { limitedUserSelect, User, userSelect } from '@/lib/db/models/user';
 import { log } from '@/lib/logger';
 import { randomCharacters } from '@/lib/random';
 import { UploadOptions } from '@/lib/uploader/parseHeaders';
@@ -192,7 +192,7 @@ async function runComplete(id: string, size: number) {
     where: {
       id: user.id,
     },
-    select: userSelect,
+    select: config.discord?.onUpload || config.httpWebhook.onUpload ? userSelect : limitedUserSelect,
   });
   if (!userr) return;
 

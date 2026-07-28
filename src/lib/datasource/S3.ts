@@ -13,7 +13,9 @@ import {
   UploadPartCopyCommand,
 } from '@aws-sdk/client-s3';
 import { NodeHttpHandler } from '@smithy/node-http-handler';
+import { Upload } from '@aws-sdk/lib-storage';
 import { createReadStream } from 'fs';
+import { stat } from 'fs/promises';
 import { Agent as HttpAgent } from 'http';
 import { Agent as HttpsAgent } from 'https';
 import { Readable } from 'stream';
@@ -168,36 +170,49 @@ export class S3Datasource extends Datasource {
   }
 
   public async put(file: string, data: Buffer | string, options: PutOptions = {}): Promise<void> {
-    let command = new PutObjectCommand({
-      Bucket: this.options.bucket,
-      Key: this.key(file),
-      Body: data,
-      ...(options.mimetype ? { ContentType: options.mimetype } : {}),
-    });
+    try {
+      if (typeof data === 'string') {
+        const size = await stat(data).then((file) => file.size);
+        if (size > 25 * 1024 * 1024) {
+          // 25mb
+          this.logger.debug('putting object with multipart upload', { file, key: this.key(file) });
 
-    if (typeof data === 'string') {
-      const readStream = createReadStream(data);
-      command = new PutObjectCommand({
+          try {
+            const upload = new Upload({
+              client: this.client,
+              params: {
+                Bucket: this.options.bucket,
+                Key: this.key(file),
+                Body: createReadStream(data),
+                ...(options.mimetype ? { ContentType: options.mimetype } : {}),
+              },
+              leavePartsOnError: false,
+            });
+
+            await upload.done();
+            return;
+          } catch (error) {
+            this.logger.warn('multipart upload failed, retrying with a single request', {
+              error: error instanceof Error ? error.message : error,
+            });
+          }
+        }
+      }
+
+      const command = new PutObjectCommand({
         Bucket: this.options.bucket,
         Key: this.key(file),
-        Body: readStream,
+        Body: typeof data === 'string' ? createReadStream(data) : data,
         ...(options.mimetype ? { ContentType: options.mimetype } : {}),
       });
-
-      this.logger.debug('putting object from stream', { file, key: this.key(file) });
-    }
-
-    try {
       const res = await this.client.send(command);
 
       if (!isOk(res.$metadata.httpStatusCode || 0)) {
-        this.logger.error(
-          'there was an error while putting object',
-          res.$metadata as Record<string, unknown>,
-        );
+        throw new Error(`S3 put failed with status ${res.$metadata.httpStatusCode ?? 'unknown'}`);
       }
     } catch (e) {
       this.logger.error('there was an error while putting object', e as Record<string, unknown>);
+      throw e;
     }
   }
 

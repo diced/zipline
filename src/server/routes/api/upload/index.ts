@@ -11,6 +11,7 @@ import { userSelect } from '@/lib/db/models/user';
 import { sanitizeFilename } from '@/lib/fs';
 import { removeGps } from '@/lib/gps';
 import { log } from '@/lib/logger';
+import { mapConcurrent } from '@/lib/mapConcurrent';
 import { runThumbnailWorkers } from '@/lib/tasks/run/thumbnails';
 import { parseHeaders, UploadHeaders } from '@/lib/uploader/parseHeaders';
 import { onUpload } from '@/lib/webhooks';
@@ -18,7 +19,6 @@ import { Prisma } from '@/prisma/client';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
 import { SavedMultipartFile } from '@fastify/multipart';
-import { stat } from 'fs/promises';
 import { z } from 'zod';
 
 export type ApiUploadResponse = {
@@ -29,7 +29,7 @@ export type ApiUploadResponse = {
     url: string;
     pending?: boolean;
     removedGps?: boolean;
-    compressed?: CompressResult;
+    compressed?: Omit<CompressResult, 'buffer'>;
   }[];
 
   deletesAt?: string;
@@ -135,7 +135,7 @@ export default typedPlugin(
           ...(options.deletesAt && {
             deletesAt: options.deletesAt === 'never' ? 'never' : options.deletesAt.toISOString(),
           }),
-          ...(config.files.assumeMimetypes && { assumedMimetypes: Array(req.files.length) }),
+          ...(config.files.assumeMimetypes && { assumedMimetypes: Array(files.length) }),
         };
 
         const domain = getDomain(
@@ -146,8 +146,8 @@ export default typedPlugin(
 
         logger.debug('uploading files', { files: files.map((x) => x.filename) });
 
-        for (let i = 0; i !== files.length; ++i) {
-          const file = files[i];
+        // todo: maybe make configurable?
+        const prepared = await mapConcurrent(files, 4, async (file, i) => {
           const extension = getExtension(file.filename, options.overrides?.extension);
 
           if (config.files.disabledExtensions.includes(extension))
@@ -157,13 +157,6 @@ export default typedPlugin(
               5001,
               `file[${i}]: File size is too large. Maximum file size is ${bytes(config.files.maxFileSize)} bytes`,
             );
-
-          // determine filename
-          const format = options.format || config.files.defaultFormat;
-          const nameResult = await getFilename(format, file.filename, extension, options.overrides?.filename);
-          if ('error' in nameResult) throw new ApiError(1009, `file[${i}]: ${nameResult.error}`);
-
-          const { fileName } = nameResult;
 
           // determine mimetype
           const { assumed, ...mimeRes } = await getMimetype(file.mimetype, extension);
@@ -183,7 +176,6 @@ export default typedPlugin(
           }
 
           if (config.files.disabledTypes.includes(mimetype.trim().toLowerCase())) {
-            console.log(mimetype, config.files.disabledTypesDefault);
             if (config.files.disabledTypesDefault) mimetype = config.files.disabledTypesDefault;
             else throw new ApiError(1065, `file[${i}]: File type ${mimetype} is not allowed`);
           }
@@ -207,18 +199,46 @@ export default typedPlugin(
           // remove gps metadata if requested
           let removedGps = false;
           if (mimetype.startsWith('image/') && config.files.removeGpsMetadata) {
-            const removed = removeGps(file.filepath);
+            const removed = removeGps(compressed?.buffer ?? file.filepath);
             if (removed) logger.c('gps').debug(`removed gps metadata from ${file.filename}`);
 
             removedGps = removed;
           }
 
-          const tempFileStats = await stat(file.filepath);
+          return {
+            file,
+            extension: compressed ? `.${compressed.ext}` : extension,
+            mimetype: compressed?.mimetype ?? mimetype,
+            size: compressed?.buffer.length ?? file.file.bytesRead,
+            compressed,
+            removedGps,
+          };
+        });
+
+        const reservedNames = new Set<string>();
+        const format = options.format || config.files.defaultFormat;
+        const named: ((typeof prepared)[number] & { fileName: string })[] = [];
+        for (let i = 0; i < prepared.length; i++) {
+          const item = prepared[i];
+          const nameResult = await getFilename(
+            format,
+            item.file.filename,
+            item.extension,
+            options.overrides?.filename,
+            reservedNames,
+          );
+          if ('error' in nameResult) throw new ApiError(1009, `file[${i}]: ${nameResult.error}`);
+
+          named.push({ ...item, fileName: nameResult.fileName });
+        }
+
+        response.files = await mapConcurrent(named, 4, async (item, i) => {
+          const { file, fileName, extension, mimetype, size, compressed, removedGps } = item;
 
           const data: Prisma.FileCreateInput = {
-            name: `${fileName}${compressed ? '.' + compressed.ext : extension}`,
-            size: compressed?.buffer?.length ?? tempFileStats.size,
-            type: compressed?.mimetype ?? mimetype,
+            name: `${fileName}${extension}`,
+            size,
+            type: mimetype,
             User: { connect: { id: req.user ? req.user.id : options.folder ? folder?.userId : undefined } },
           };
 
@@ -241,24 +261,32 @@ export default typedPlugin(
             select: fileSelect,
           });
 
-          await datasource.put(fileUpload.name, compressed?.buffer ?? file.filepath, {
+          const storageData = compressed?.buffer ?? file.filepath;
+          await datasource.put(fileUpload.name, storageData, {
             mimetype: fileUpload.type,
           });
+          if (typeof storageData === 'string' && datasource.name === 'local' && req.tmpUploads) {
+            req.tmpUploads = req.tmpUploads.filter((path) => path !== storageData);
+          }
 
           const responseUrl = `${domain}${config.files.route === '/' || config.files.route === '' ? '' : `${config.files.route}`}/${fileUpload.name}`;
 
-          response.files.push({
+          const compressedResponse = compressed
+            ? { mimetype: compressed.mimetype, ext: compressed.ext, failed: compressed.failed }
+            : undefined;
+
+          const responseFile = {
             id: fileUpload.id,
             name: fileUpload.name,
             type: fileUpload.type,
             url: encodeURI(responseUrl),
             removedGps: removedGps || undefined,
-            compressed: compressed || undefined,
-          });
+            compressed: compressedResponse,
+          };
 
           logger.info(
             `${req.user ? req.user.username : '[anonymous folder upload]'} uploaded ${fileUpload.name}`,
-            { size: bytes(compressed?.buffer?.length ?? fileUpload.size), ip: req.ip },
+            { size: bytes(fileUpload.size), ip: req.ip },
           );
 
           await onUpload(config, {
@@ -275,7 +303,9 @@ export default typedPlugin(
               returned: encodeURI(responseUrl),
             },
           });
-        }
+
+          return responseFile;
+        });
 
         if (options.noJson)
           return res

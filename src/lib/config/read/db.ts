@@ -1,6 +1,5 @@
 import { prisma } from '@/lib/db';
-import { tmpdir } from 'os';
-import { join } from 'path';
+import { resolve } from 'path';
 
 export const DATABASE_TO_PROP = {
   coreReturnHttpsUrls: 'core.returnHttpsUrls',
@@ -154,7 +153,7 @@ export async function readDatabaseSettings() {
   if (!ziplineTable) {
     ziplineTable = await prisma.zipline.create({
       data: {
-        coreTempDirectory: join(tmpdir(), 'zipline'),
+        coreTempDirectory: resolve('./uploads/.tmp'),
       },
       omit: {
         createdAt: true,
