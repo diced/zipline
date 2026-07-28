@@ -1,7 +1,7 @@
 import { Response } from '@/lib/api/response';
-import { ErrorBody } from '@/lib/response';
 import { UploadOptionsStore } from '@/lib/client/store/uploadOptions';
-import { ActionIcon, Anchor, Badge, Button, Group, Stack, Text, Tooltip } from '@mantine/core';
+import { ErrorBody } from '@/lib/response';
+import { ActionIcon, Anchor, Button, Group, Stack, Text, Tooltip } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
