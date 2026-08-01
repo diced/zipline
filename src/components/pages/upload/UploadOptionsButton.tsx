@@ -440,6 +440,25 @@ export default function UploadOptionsButton({ folder, numFiles }: { folder?: str
             checked={options.addOriginalName ?? false}
             onChange={(event) => setOption('addOriginalName', event.currentTarget.checked ?? false)}
           />
+
+          {config.files.extensionlessUrls ? (
+            <Switch
+              label={
+                <>
+                  Extensionless URL{' '}
+                  {options.extensionless ? (
+                    <Badge variant='outline' size='xs'>
+                      saved
+                    </Badge>
+                  ) : null}
+                </>
+              }
+              description='Remove the file extension from the returned URL. The file can still be accessed with its extension. THis option will only work if the server is configured to allow extensionless URLs.'
+              checked={options.extensionless ?? false}
+              onChange={(event) => setOption('extensionless', event.currentTarget.checked ?? false)}
+              disabled={!config.files.extensionlessUrls}
+            />
+          ) : null}
         </Stack>
 
         <Group justify='right' my='sm' gap='sm'>

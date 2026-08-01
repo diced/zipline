@@ -27,6 +27,7 @@ export type GeneratorOptions = {
   imageCompressionPercent: number | null;
   maxViews: number | null;
   addOriginalName: boolean | null;
+  extensionless: boolean | null;
   overrides_returnDomain: string | null;
   noJson: boolean | null;
 
@@ -68,6 +69,7 @@ export const defaultGeneratorOptions: GeneratorOptions = {
   imageCompressionPercent: null,
   maxViews: null,
   addOriginalName: null,
+  extensionless: null,
   overrides_returnDomain: null,
   noJson: null,
 
@@ -226,6 +228,16 @@ export default function GeneratorButton({
             onChange={(event) => setOption({ addOriginalName: event.currentTarget.checked ?? false })}
             disabled={!onlyFile}
           />
+
+          {settingsData?.files?.extensionlessUrls && (
+            <Switch
+              label='Extensionless URL'
+              description='Remove the file extension from the returned URL. The file can still be accessed with its extension. This option will only work if the server is configured to allow extensionless URLs.'
+              checked={options.extensionless ?? false}
+              onChange={(event) => setOption({ extensionless: event.currentTarget.checked ?? false })}
+              disabled={!onlyFile}
+            />
+          )}
 
           {name === 'ShareX' && (
             <Switch

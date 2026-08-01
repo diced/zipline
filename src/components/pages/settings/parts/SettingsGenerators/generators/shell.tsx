@@ -54,6 +54,12 @@ export function shell(token: string, type: 'file' | 'url', options: GeneratorOpt
     delete toAddHeaders['x-zipline-original-name'];
   }
 
+  if (options.extensionless === true && type === 'file') {
+    toAddHeaders['x-zipline-extensionless'] = 'true';
+  } else {
+    delete toAddHeaders['x-zipline-extensionless'];
+  }
+
   if (options.overrides_returnDomain !== null) {
     toAddHeaders['x-zipline-domain'] = options.overrides_returnDomain;
   } else {

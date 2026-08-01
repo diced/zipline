@@ -231,9 +231,14 @@ export default typedPlugin(
             data,
           });
 
+          const urlPath =
+            options.extensionless && config.files.extensionlessUrls
+              ? fileUpload.name.slice(0, -extension.length)
+              : fileUpload.name;
+
           const responseUrl = `${domain}${
             config.files.route === '/' || config.files.route === '' ? '' : `${config.files.route}`
-          }/${fileUpload.name}`;
+          }/${urlPath}`;
 
           const worker = createWorker('offload/partial.js', {
             workerData: {

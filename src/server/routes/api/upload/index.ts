@@ -269,7 +269,12 @@ export default typedPlugin(
             req.tmpUploads = req.tmpUploads.filter((path) => path !== storageData);
           }
 
-          const responseUrl = `${domain}${config.files.route === '/' || config.files.route === '' ? '' : `${config.files.route}`}/${fileUpload.name}`;
+          const urlPath =
+            options.extensionless && config.files.extensionlessUrls
+              ? fileUpload.name.slice(0, -extension.length)
+              : fileUpload.name;
+
+          const responseUrl = `${domain}${config.files.route === '/' || config.files.route === '' ? '' : `${config.files.route}`}/${urlPath}`;
 
           const compressedResponse = compressed
             ? { mimetype: compressed.mimetype, ext: compressed.ext, failed: compressed.failed }
@@ -289,7 +294,7 @@ export default typedPlugin(
             { size: bytes(fileUpload.size), ip: req.ip },
           );
 
-          await onUpload(config, {
+          onUpload(config, {
             user: req.user ?? {
               id: 'anonymous',
               username: 'anonymous',
