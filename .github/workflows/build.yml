@@ -16,16 +16,16 @@ jobs:
     runs-on: ubuntu-24.04${{ matrix.arch == 'arm64' && '-arm' || '' }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Use node@${{ matrix.node }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node }}
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/setup@v2
         with:
-          run_install: false
+          install: false
 
       - name: Get pnpm store directory
         shell: bash
@@ -33,7 +33,7 @@ jobs:
         run: |
           echo "store_path=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: |
             ${{ steps.pnpm-cache.outputs.store_path }}
