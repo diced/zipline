@@ -60,6 +60,9 @@ async function main() {
 
   const server = fastify({
     trustProxy: config.core.trustProxy,
+    routerOptions: {
+      maxParamLength: 1024,
+    },
   }).withTypeProvider<ZodTypeProvider>();
 
   await registerPlugins(server);
