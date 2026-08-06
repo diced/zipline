@@ -101,6 +101,20 @@ export const useUploadOptionsStore = create<UploadOptionsStore>()(
       }),
       {
         name: 'zipline-upload-options',
+        merge: (persistedState: any, currentState) => {
+          return {
+            ...currentState,
+            ...persistedState,
+            options: {
+              ...currentState.options,
+              ...persistedState?.options,
+            },
+            ephemeral: {
+              ...currentState.ephemeral,
+              ...persistedState?.ephemeral,
+            },
+          };
+        },
       },
     ),
   ),
