@@ -10,17 +10,37 @@ declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace NodeJS {
     interface ProcessEnv {
+      // if running a build, dont connect db
       ZIPLINE_BUILD?: string;
+
+      // run with extra prisma db logs
       ZIPLINE_DB_LOG?: string;
+
+      // enables worker threads to log inits
       ZIPLINE_OVERRIDE_DISABLED_WORKER_LOG?: string;
+
+      // overrides the log date format
       ZIPLINE_OVERRIDE_LOG_DATE_FORMAT?: string;
+
+      // outputs a file with memory usage every x seconds, see docs for more info
       ZIPLINE_MONITOR_MEMORY?: string;
+
+      // removes log color
       ZIPLINE_NO_COLOR?: string;
+
+      // generate openapi.json and exit
       ZIPLINE_OUTPUT_OPENAPI?: string;
+
+      // current git sha, for version checking (will fallback to git command)
       ZIPLINE_GIT_SHA?: string;
 
+      // github token (optional) for version checking
+      ZIPLINE_GITHUB_TOKEN?: string;
+
+      // provide custom ffmpeg path if not in PATH
       FFMPEG_PATH?: string;
 
+      // output debug logs, syntax: DEBUG=comma,separated
       DEBUG?: string;
     }
   }
