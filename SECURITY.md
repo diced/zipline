@@ -4,7 +4,7 @@
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 4.4.x   | :white_check_mark: |
+| 4.6.x   | :white_check_mark: |
 | < 3     | :x:                |
 | < 2     | :x:                |
 

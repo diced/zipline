@@ -15,7 +15,6 @@ export default defineConfig(async (_) => {
         ignore: ['./src/components/**/*.ts', './src/client/**/*.(ts|tsx|html)'],
       }),
       shims: false,
-      esbuildPlugins: [],
       outDir: 'build',
       bundle: false,
       onSuccess: async () => {
