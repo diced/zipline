@@ -238,7 +238,6 @@ export default typedPlugin(
             featuresMetricsShowUserSpecific: z.boolean(),
 
             featuresVersionChecking: z.boolean(),
-            featuresVersionAPI: z.url(),
 
             invitesEnabled: z.boolean(),
             invitesLength: z.number().min(1).max(64),

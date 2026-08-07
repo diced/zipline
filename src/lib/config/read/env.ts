@@ -90,7 +90,6 @@ export const ENVS = [
   env('features.metrics.showUserSpecific', 'FEATURES_METRICS_SHOW_USER_SPECIFIC', 'boolean', true),
 
   env('features.versionChecking', 'FEATURES_VERSION_CHECKING', 'boolean', true),
-  env('features.versionAPI', 'FEATURES_VERSION_API', 'string', true),
 
   env('domains', 'DOMAINS', 'string[]', true),
 

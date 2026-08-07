@@ -1,6 +1,5 @@
 import type { Response } from '@/lib/api/response';
 import {
-  Anchor,
   Button,
   Divider,
   LoadingOverlay,
@@ -9,7 +8,6 @@ import {
   SimpleGrid,
   Stack,
   Switch,
-  TextInput,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconDeviceFloppy } from '@tabler/icons-react';
@@ -50,7 +48,6 @@ function Form({ data, isLoading }: { data: Response['/api/server/settings']; isL
       featuresMetricsShowUserSpecific: data.settings.featuresMetricsShowUserSpecific,
 
       featuresVersionChecking: data.settings.featuresVersionChecking,
-      featuresVersionAPI: data.settings.featuresVersionAPI,
     },
     enhanceGetInputProps: (payload) => ({
       disabled: data.tampered.includes(payload.field) || false,
@@ -155,27 +152,8 @@ function Form({ data, isLoading }: { data: Response['/api/server/settings']; isL
 
         <Switch
           label='Version Checking'
-          description='Enable version checking for the server. This will check for updates and display the status on the sidebar to all users.'
+          description='Query GitHub for updates and display the status on the sidebar to all users.'
           {...form.getInputProps('featuresVersionChecking', { type: 'checkbox' })}
-        />
-
-        <TextInput
-          label='Version API URL'
-          description={
-            <>
-              The URL of the version checking server. The default is{' '}
-              <Anchor size='xs' href='https://zipline-version.diced.sh' target='_blank'>
-                https://zipline-version.diced.sh
-              </Anchor>
-              . Visit the{' '}
-              <Anchor size='xs' href='https://github.com/diced/zipline-version-worker' target='_blank'>
-                GitHub
-              </Anchor>{' '}
-              to host your own version checking server.
-            </>
-          }
-          placeholder='https://zipline-version.diced.sh/'
-          {...form.getInputProps('featuresVersionAPI')}
         />
       </Stack>
 

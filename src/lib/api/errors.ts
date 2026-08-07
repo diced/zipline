@@ -117,7 +117,7 @@ export const API_ERRORS = {
 
   // 6xxx, internal errors
   6000: 'Failed to delete invite',
-  6001: 'Failed to fetch version details',
+  6001: 'Failed to check for updates',
   6002: 'Failed to rename file in datasource',
   6003: 'There was an error during a healthcheck',
   6004: 'Failed to fetch OAuth access token',
