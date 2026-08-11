@@ -232,7 +232,8 @@ export default typedPlugin(
           named.push({ ...item, fileName: nameResult.fileName });
         }
 
-        response.files = await mapConcurrent(named, 4, async (item, i) => {
+        const password = options.password ? await hashPassword(options.password) : undefined;
+        const uploads = named.map((item, i) => {
           const { file, fileName, extension, mimetype, size, compressed, removedGps } = item;
 
           const data: Prisma.FileCreateInput = {
@@ -245,7 +246,7 @@ export default typedPlugin(
           if (!req.user && folder) data.anonymous = true;
 
           if (options.maxViews) data.maxViews = options.maxViews;
-          if (options.password) data.password = await hashPassword(options.password);
+          if (password) data.password = password;
           if (folder) data.Folder = { connect: { id: folder.id } };
           if (options.addOriginalName) {
             const sanitizedOG = sanitizeFilename(file.filename);
@@ -256,10 +257,39 @@ export default typedPlugin(
 
           data.deletesAt = options.deletesAt && options.deletesAt !== 'never' ? options.deletesAt : null;
 
-          const fileUpload = await prisma.file.create({
-            data,
-            select: fileSelect,
-          });
+          return { compressed, data, extension, file, removedGps, size };
+        });
+
+        const fileUploads = await prisma.$transaction(async (tx) => {
+          if (quotaUser?.quota) {
+            await tx.$queryRaw`SELECT "id" FROM "User" WHERE "id" = ${quotaUser.id} FOR UPDATE`;
+
+            const quotaCheck = await checkQuota(
+              quotaUser,
+              uploads.reduce((total, upload) => total + upload.size, 0),
+              uploads.length,
+              tx,
+            );
+            if (quotaCheck !== true)
+              throw new ApiError(5002, typeof quotaCheck === 'string' ? quotaCheck : undefined);
+          }
+
+          const created = [];
+          for (const upload of uploads) {
+            created.push(
+              await tx.file.create({
+                data: upload.data,
+                select: fileSelect,
+              }),
+            );
+          }
+
+          return created;
+        });
+
+        response.files = await mapConcurrent(uploads, 4, async (upload, uploadIndex) => {
+          const { compressed, extension, file, removedGps } = upload;
+          const fileUpload = fileUploads[uploadIndex];
 
           const storageData = compressed?.buffer ?? file.filepath;
           await datasource.put(fileUpload.name, storageData, {

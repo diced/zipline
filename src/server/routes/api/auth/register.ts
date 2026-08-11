@@ -56,45 +56,55 @@ export default typedPlugin(
         });
         if (oUser) throw new ApiError(1039);
 
-        if (code) {
-          const invite = await prisma.invite.findFirst({
-            where: {
-              OR: [{ id: code }, { code }],
-            },
-          });
+        const hashedPassword = await hashPassword(password);
+        const token = createToken();
 
-          if (!invite) throw new ApiError(1035);
-          if (invite.expiresAt && new Date(invite.expiresAt) < new Date()) throw new ApiError(1035);
-          if (invite.maxUses && invite.uses >= invite.maxUses) throw new ApiError(1035);
-
-          await prisma.invite.update({
-            where: {
-              id: invite.id,
-            },
+        const createUser = (db: Pick<typeof prisma, 'user'>) =>
+          db.user.create({
             data: {
-              uses: invite.uses + 1,
+              username,
+              password: hashedPassword,
+              role: 'USER',
+              token,
+            },
+            select: {
+              ...userSelect,
+              password: true,
+              token: true,
             },
           });
+
+        let user;
+        if (code) {
+          const result = await prisma.$transaction(async (tx) => {
+            const [invite] = await tx.invite.updateManyAndReturn({
+              where: {
+                AND: [
+                  { OR: [{ id: code }, { code }] },
+                  { OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }] },
+                  {
+                    OR: [{ maxUses: null }, { uses: { lt: tx.invite.fields.maxUses } }],
+                  },
+                ],
+              },
+              data: { uses: { increment: 1 } },
+              select: { id: true },
+            });
+
+            if (!invite) throw new ApiError(1035);
+
+            return { inviteId: invite.id, user: await createUser(tx) };
+          });
+
+          user = result.user;
 
           logger.info('invite used', {
             user: username,
-            invite: invite.id,
+            invite: result.inviteId,
           });
+        } else {
+          user = await createUser(prisma);
         }
-
-        const user = await prisma.user.create({
-          data: {
-            username,
-            password: await hashPassword(password),
-            role: 'USER',
-            token: createToken(),
-          },
-          select: {
-            ...userSelect,
-            password: true,
-            token: true,
-          },
-        });
 
         await saveSession(session, <User>user);
 

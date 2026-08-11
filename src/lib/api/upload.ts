@@ -36,11 +36,12 @@ export async function checkQuota(
   user: Pick<User, 'id' | 'quota'> | null,
   newSize: number,
   fileCount: number,
+  db: Pick<typeof prisma, 'file'> = prisma,
 ): Promise<true | string> {
   if (!user?.quota) return true;
 
   if (user.quota.filesQuota === 'BY_BYTES') {
-    const stats = await prisma.file.aggregate({
+    const stats = await db.file.aggregate({
       where: { userId: user.id },
       _sum: { size: true },
     });
@@ -51,7 +52,7 @@ export async function checkQuota(
     return true;
   }
 
-  const count = await prisma.file.count({ where: { userId: user.id } });
+  const count = await db.file.count({ where: { userId: user.id } });
   if (count + fileCount > user.quota.maxFiles!)
     return `uploading will exceed your file count quota of ${user.quota.maxFiles} files`;
 

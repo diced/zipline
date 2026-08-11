@@ -70,16 +70,25 @@ function createPartial(options: UploadOptions, actorKey: string, quotaUserId: st
 }
 
 function activePartials(actorKey: string) {
-  return [...partialsCache.values()].filter((partial) => partial.actorKey === actorKey).length;
+  let count = 0;
+  for (const partial of partialsCache.values()) {
+    if (partial.actorKey === actorKey && ++count >= MAX_PARTIALS) return count;
+  }
+
+  return count;
 }
 
 function quotaReservations(quotaUserId: string) {
-  const reservations = [...partialsCache.values()].filter((partial) => partial.quotaUserId === quotaUserId);
+  let size = 0;
+  let files = 0;
+  for (const partial of partialsCache.values()) {
+    if (partial.quotaUserId !== quotaUserId || partial.finalized) continue;
 
-  return {
-    size: reservations.reduce((total, partial) => total + partial.total, 0),
-    files: reservations.filter((partial) => !partial.finalized).length,
-  };
+    size += partial.total;
+    files++;
+  }
+
+  return { size, files };
 }
 
 async function deletePartial(identifier: string, deleteFiles = true) {
@@ -98,12 +107,16 @@ async function deletePartial(identifier: string, deleteFiles = true) {
 }
 
 async function deleteOrphanedPartialFiles() {
-  const activePrefixes = [...partialsCache.values()].map((partial) => partial.prefix);
   const tempFiles = await readdir(config.core.tempDirectory);
-  const orphaned = tempFiles.filter(
-    (file) =>
-      file.startsWith('zipline_partial_') && !activePrefixes.some((prefix) => file.startsWith(prefix)),
-  );
+  const orphaned = tempFiles.filter((file) => {
+    if (!file.startsWith('zipline_partial_')) return false;
+
+    for (const partial of partialsCache.values()) {
+      if (file.startsWith(partial.prefix)) return false;
+    }
+
+    return true;
+  });
 
   await Promise.all(orphaned.map((file) => rm(join(config.core.tempDirectory, file), { force: true })));
 
@@ -307,7 +320,7 @@ export default typedPlugin(
 
           const data: Prisma.FileCreateInput = {
             name: `${fileName}${extension}`,
-            size: 0,
+            size: total,
             type: mimetype,
             User: {
               connect: {
@@ -327,9 +340,23 @@ export default typedPlugin(
           }
           if (!req.user && folder) data.anonymous = true;
 
-          const fileUpload = await prisma.file.create({
-            data,
-          });
+          let fileUpload;
+          try {
+            fileUpload = await prisma.$transaction(async (tx) => {
+              if (quotaUser?.quota) {
+                await tx.$queryRaw`SELECT "id" FROM "User" WHERE "id" = ${quotaUser.id} FOR UPDATE`;
+
+                const quotaCheck = await checkQuota(quotaUser, total, 1, tx);
+                if (quotaCheck !== true)
+                  throw new ApiError(5002, typeof quotaCheck === 'string' ? quotaCheck : undefined);
+              }
+
+              return tx.file.create({ data });
+            });
+          } catch (error) {
+            await deletePartial(options.partial.identifier);
+            throw error;
+          }
 
           const urlPath =
             options.extensionless && config.files.extensionlessUrls
@@ -377,6 +404,9 @@ export default typedPlugin(
                 case 'file.update':
                   result = await prisma.file.update(msg.data);
                   await deletePartial(partialIdentifier, false);
+                  break;
+                case 'file.delete':
+                  result = await prisma.file.delete(msg.data);
                   break;
                 case 'user.findUnique':
                   result = await prisma.user.findUnique(msg.data);

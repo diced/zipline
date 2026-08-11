@@ -228,6 +228,8 @@ async function runComplete(id: string, size: number) {
 async function failPartial(config: Config, incompleteFile: IncompleteFile) {
   logger.error('failing incomplete file', { id: incompleteFile.id });
 
+  await dbProxy('file.delete', { where: { id: file.id } });
+
   const partials = await readdir(config.core.tempDirectory).then((files) =>
     files.filter((file) => file.startsWith(`zipline_partial_${options.partial!.identifier}`)),
   );
