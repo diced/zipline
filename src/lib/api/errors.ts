@@ -67,6 +67,7 @@ export const API_ERRORS = {
   1066: 'Current password is incorrect',
   1067: 'Current password is required to set a new password',
   1068: "Couldn't find current password for this account",
+  1069: 'TOTP is already enabled',
 
   // 2xxx, session errors
   2000: 'Invalid login session',

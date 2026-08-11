@@ -88,16 +88,22 @@ export default typedPlugin(
         preHandler: [userMiddleware, totpEnabledMiddleware],
       },
       async (req, res) => {
+        if (req.user.totpEnabled) throw new ApiError(1069);
+
         const { code, secret } = req.body;
 
         const valid = await verifyTotpCode(code, secret);
         if (!valid) throw new ApiError(1045);
 
-        const user = await prisma.user.update({
-          where: { id: req.user.id },
+        const [user] = await prisma.user.updateManyAndReturn({
+          where: {
+            id: req.user.id,
+            totpSecret: null,
+          },
           data: { totpSecret: secret },
           select: userSelect,
         });
+        if (!user) throw new ApiError(1069);
 
         logger.info('user enabled TOTP', {
           user: user.username,
