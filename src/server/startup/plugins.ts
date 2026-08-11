@@ -75,10 +75,15 @@ export async function registerPlugins(server: FastifyInstance) {
           if (config.ratelimit.adminBypass && isAdministrator(req.user?.role)) return true;
           if (config.ratelimit.allowList.includes(key)) return true;
 
+          const contentRange = req.headers['content-range'];
+          const partialStart =
+            typeof contentRange === 'string' ? Number(/^bytes\s+(\d+)-/.exec(contentRange)?.[1]) : 0;
           if (
             req.method === 'POST' &&
             req.routeOptions?.url === '/api/upload/partial' &&
-            Object.keys(req.headers).includes('x-zipline-p-filename')
+            Object.keys(req.headers).includes('x-zipline-p-filename') &&
+            Object.keys(req.headers).includes('x-zipline-p-identifier') &&
+            partialStart > 0
           )
             return true;
 

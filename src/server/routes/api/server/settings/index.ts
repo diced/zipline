@@ -98,18 +98,20 @@ export default typedPlugin(
       {
         schema: {
           description:
-            'Fetch the full Zipline server settings row along with a list of configuration keys that were overridden at runtime (admin only).',
+            'Fetch the full Zipline server settings row along with a list of configuration keys that were overridden at runtime.',
           response: {
             200: z.object({
               settings: z.custom<Settings>(),
               tampered: z.array(z.string()),
             }),
           },
-          tags: ['auth', 'admin'],
+          tags: ['auth', 'superadmin'],
         },
         preHandler: [userMiddleware, administratorMiddleware],
       },
-      async (_, res) => {
+      async (req, res) => {
+        if (req.user.role !== 'SUPERADMIN') throw new ApiError(3015);
+
         const settings = await prisma.zipline.findFirst({
           omit: {
             createdAt: true,
@@ -129,18 +131,19 @@ export default typedPlugin(
       PATH,
       {
         schema: {
-          description:
-            'Partially update Zipline server settings using a validated subset of configuration keys (admin only).',
+          description: 'Partially update Zipline server settings.',
           body: z.custom<Partial<Settings>>(),
           response: {
             200: z.custom<ApiServerSettingsResponse>(),
           },
-          tags: ['auth', 'admin'],
+          tags: ['auth', 'superadmin'],
         },
         preHandler: [userMiddleware, administratorMiddleware],
         ...secondlyRatelimit(1),
       },
       async (req, res) => {
+        if (req.user.role !== 'SUPERADMIN') throw new ApiError(3015);
+
         const settings = await prisma.zipline.findFirst();
         if (!settings) throw new ApiError(4010);
 
