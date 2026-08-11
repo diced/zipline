@@ -25,7 +25,6 @@ COPY src ./src
 COPY .gitignore ./.gitignore
 
 COPY postcss.config.mjs ./postcss.config.mjs
-COPY prettier.config.mjs ./prettier.config.mjs
 COPY eslint.config.mjs ./eslint.config.mjs
 COPY vite.config.ts ./vite.config.ts
 COPY tsup.config.ts ./tsup.config.ts
