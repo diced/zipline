@@ -1,6 +1,6 @@
 import { ApiError } from '@/lib/api/errors';
 import { prisma } from '@/lib/db';
-import { OAuthProvider, oauthProviderSchema } from '@/lib/db/models/user';
+import { OAuthProvider, oauthProviderSchema, oauthProviderSelect } from '@/lib/db/models/user';
 import { log } from '@/lib/logger';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
@@ -66,8 +66,10 @@ export default typedPlugin(
               deleteMany: [{ provider }],
             },
           },
-          include: {
-            oauthProviders: true,
+          select: {
+            oauthProviders: {
+              select: oauthProviderSelect,
+            },
           },
         });
 

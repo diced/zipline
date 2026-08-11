@@ -69,7 +69,7 @@ export async function render(
       oauthProviders: false,
       passkeys: false,
       sessions: false,
-      totpSecret: false,
+      totpEnabled: false,
       quota: false,
     },
   });

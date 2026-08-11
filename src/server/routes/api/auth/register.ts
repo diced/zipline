@@ -3,7 +3,7 @@ import { ziplineClientParseSchema } from '@/lib/api/detect';
 import { config } from '@/lib/config';
 import { createToken, hashPassword } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
-import { User, userSchema, userSelect } from '@/lib/db/models/user';
+import { userSchema, userSelect } from '@/lib/db/models/user';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { getSession, saveSession } from '@/server/session';
@@ -67,11 +67,7 @@ export default typedPlugin(
               role: 'USER',
               token,
             },
-            select: {
-              ...userSelect,
-              password: true,
-              token: true,
-            },
+            select: userSelect,
           });
 
         let user;
@@ -106,9 +102,7 @@ export default typedPlugin(
           user = await createUser(prisma);
         }
 
-        await saveSession(session, <User>user);
-
-        delete (user as any).password;
+        await saveSession(session, user);
 
         logger.info('user registered successfully', {
           username,

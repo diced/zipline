@@ -1,5 +1,15 @@
 import { z } from 'zod';
 
+export const oauthProviderSelect = {
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  userId: true,
+  provider: true,
+  username: true,
+  oauthId: true,
+};
+
 export const userSelect = {
   id: true,
   username: true,
@@ -7,11 +17,19 @@ export const userSelect = {
   updatedAt: true,
   role: true,
   view: true,
-  oauthProviders: true,
-  totpSecret: true,
+  oauthProviders: {
+    select: oauthProviderSelect,
+  },
+  totpEnabled: true,
   passkeys: true,
   quota: true,
   sessions: true,
+};
+
+export const loginUserSelect = {
+  ...userSelect,
+  password: true,
+  totpSecret: true,
 };
 
 export const limitedUserSelect = {
@@ -87,8 +105,6 @@ export const oauthProviderSchema = z.object({
   userId: z.string(),
   provider: z.enum(['DISCORD', 'GOOGLE', 'GITHUB', 'OIDC']),
   username: z.string(),
-  accessToken: z.string(),
-  refreshToken: z.string().nullable(),
   oauthId: z.string().nullable(),
 });
 
@@ -106,25 +122,21 @@ export const userSchema = z.object({
   sessions: z.array(userSessionSchema),
   oauthProviders: z.array(oauthProviderSchema),
 
-  totpSecret: z.string().nullable().optional(),
+  totpEnabled: z.boolean(),
   passkeys: z.array(userPasskeySchema).optional(),
 
   quota: userQuotaSchema.nullable().optional(),
 
   avatar: z.string().nullable().optional(),
-  password: z.string().nullable().optional(),
-  token: z.string().nullable().optional(),
 });
 
 export type User = z.infer<typeof userSchema>;
 
 export const limitedUserSchema = userSchema.omit({
   oauthProviders: true,
-  totpSecret: true,
+  totpEnabled: true,
   passkeys: true,
   sessions: true,
-  password: true,
-  token: true,
 });
 
 export type LimitedUser = z.infer<typeof limitedUserSchema>;

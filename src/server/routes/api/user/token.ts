@@ -90,8 +90,6 @@ export default typedPlugin(
           },
         });
 
-        delete (user as any).password;
-
         logger.info('user reset their token', {
           user: user.username,
         });

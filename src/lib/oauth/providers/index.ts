@@ -1,10 +1,9 @@
 import type { OAuthProviderType } from '@/prisma/client';
-import { User } from '../../db/models/user';
 
-export function findProvider(
+export function findProvider<T extends { provider: OAuthProviderType }>(
   provider: OAuthProviderType,
-  providers: User['oauthProviders'],
-): User['oauthProviders'][0] | undefined {
+  providers: T[],
+): T | undefined {
   return providers.find((p) => p.provider === provider);
 }
 

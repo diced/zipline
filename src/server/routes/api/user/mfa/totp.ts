@@ -10,7 +10,17 @@ import typedPlugin from '@/server/typedPlugin';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import z from 'zod';
 
-export type ApiUserMfaTotpResponse = User | { secret: string } | { secret: string; qrcode: string };
+const totpEnrollmentSchema = z.object({
+  secret: z.string().describe('the TOTP secret key'),
+  qrcode: z.string().describe('a data URL for a QR code encoding the secret and account info'),
+});
+
+const totpStatusSchema = z.object({
+  enabled: z.literal(true),
+});
+
+export type ApiUserMfaTotpResponse =
+  User | z.infer<typeof totpEnrollmentSchema> | z.infer<typeof totpStatusSchema>;
 
 const logger = log('api').c('user').c('mfa').c('totp');
 
@@ -27,19 +37,9 @@ export default typedPlugin(
       PATH,
       {
         schema: {
-          description: 'Get your current TOTP secret, generating one (and a QR code) if not yet enabled.',
+          description: 'Generate a TOTP enrollment secret, or report that TOTP is already enabled.',
           response: {
-            200: z.object({
-              secret: z
-                .string()
-                .describe('the TOTP secret key, used to generate codes in an authenticator app'),
-              qrcode: z
-                .string()
-                .nullish()
-                .describe(
-                  "if the user hasn't enabled TOTP yet, a data URL for a QR code encoding the secret and account info",
-                ),
-            }),
+            200: z.union([totpEnrollmentSchema, totpStatusSchema]),
           },
           tags: ['auth'],
         },
@@ -47,7 +47,7 @@ export default typedPlugin(
         preHandler: [userMiddleware, totpEnabledMiddleware],
       },
       async (req, res) => {
-        if (!req.user.totpSecret) {
+        if (!req.user.totpEnabled) {
           const secret = generateKey();
           const qrcode = await totpQrcode({
             issuer: config.mfa.totp.issuer,
@@ -66,7 +66,7 @@ export default typedPlugin(
         }
 
         return res.send({
-          secret: req.user.totpSecret,
+          enabled: true,
         });
       },
     );
@@ -122,11 +122,17 @@ export default typedPlugin(
         preHandler: [userMiddleware, totpEnabledMiddleware],
       },
       async (req, res) => {
-        if (!req.user.totpSecret) throw new ApiError(1053);
+        if (!req.user.totpEnabled) throw new ApiError(1053);
+
+        const current = await prisma.user.findUniqueOrThrow({
+          where: { id: req.user.id },
+          select: { totpSecret: true },
+        });
+        if (!current.totpSecret) throw new ApiError(1053);
 
         const { code } = req.body;
 
-        const valid = await verifyTotpCode(code, req.user.totpSecret);
+        const valid = await verifyTotpCode(code, current.totpSecret);
         if (!valid) throw new ApiError(1045);
 
         const user = await prisma.user.update({

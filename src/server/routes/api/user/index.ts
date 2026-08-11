@@ -92,10 +92,17 @@ export default typedPlugin(
 
         const changingPassword = !!req.body.password;
         if (changingPassword) {
-          if (req.user.password) {
+          const passwdReq = await prisma.user.findUnique({
+            where: { id: req.user.id },
+            select: { password: true },
+          });
+
+          if (!passwdReq) throw new ApiError(1068);
+
+          if (passwdReq.password) {
             if (!req.body.currentPassword) throw new ApiError(1067);
 
-            const valid = await verifyPassword(req.body.currentPassword, req.user.password);
+            const valid = await verifyPassword(req.body.currentPassword, passwdReq.password);
             if (!valid) {
               logger.warn('invalid current password on password change', {
                 user: req.user.username,
@@ -165,16 +172,10 @@ export default typedPlugin(
               },
             }),
           },
-          select: {
-            ...userSelect,
-            password: true,
-            token: true,
-          },
+          select: userSelect,
         });
 
         await saveSession(currentSession, user, false);
-
-        delete (user as any).password;
 
         logger.info(`${req.user.username} updated their user`, {
           updated: Object.keys(req.body),

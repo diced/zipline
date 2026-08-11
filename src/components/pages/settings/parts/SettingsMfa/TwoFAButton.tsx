@@ -33,7 +33,7 @@ export default function TwoFAButton() {
     error: mfaError,
     isLoading: mfaLoading,
   } = useSWR<Extract<Response['/api/user/mfa/totp'], { secret: string; qrcode: string }>>(
-    totpOpen && !user?.totpSecret ? '/api/user/mfa/totp' : null,
+    totpOpen && !user?.totpEnabled ? '/api/user/mfa/totp' : null,
     null,
     {
       revalidateOnFocus: false,
@@ -107,7 +107,7 @@ export default function TwoFAButton() {
   const handlePinChange = (value: string) => {
     if (value.length === 6) {
       setPinDisabled(true);
-      user?.totpSecret ? disable2fa(value) : enable2fa(value);
+      user?.totpEnabled ? disable2fa(value) : enable2fa(value);
     } else {
       setPinError('');
     }
@@ -116,13 +116,13 @@ export default function TwoFAButton() {
   return (
     <>
       <Modal
-        title={user?.totpSecret ? 'Disable Two-Factor Authentication' : 'Enable Two-Factor Authentication'}
+        title={user?.totpEnabled ? 'Disable Two-Factor Authentication' : 'Enable Two-Factor Authentication'}
         opened={totpOpen}
         onClose={() => setTotpOpen(false)}
         size='md'
       >
         <Stack gap='sm'>
-          {user?.totpSecret ? (
+          {user?.totpEnabled ? (
             <Text size='sm' c='dimmed'>
               Enter the 6-digit code from your authenticator app below to confirm disabling 2FA.
             </Text>
@@ -213,10 +213,10 @@ export default function TwoFAButton() {
       <Button
         size='sm'
         leftSection={<IconShieldLockFilled size='1rem' />}
-        color={user?.totpSecret ? 'red' : undefined}
+        color={user?.totpEnabled ? 'red' : undefined}
         onClick={() => setTotpOpen(true)}
       >
-        {user?.totpSecret ? 'Disable 2FA' : 'Enable 2FA'}
+        {user?.totpEnabled ? 'Disable 2FA' : 'Enable 2FA'}
       </Button>
     </>
   );

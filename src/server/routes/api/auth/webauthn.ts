@@ -3,7 +3,7 @@ import { ziplineClientParseSchema } from '@/lib/api/detect';
 import { config } from '@/lib/config';
 import { createToken } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
-import { User, userSelect } from '@/lib/db/models/user';
+import { User, userSchema, userSelect } from '@/lib/db/models/user';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { TimedCache } from '@/lib/timedCache';
@@ -90,6 +90,11 @@ export default typedPlugin(
           headers: z.object({
             'x-zipline-client': ziplineClientParseSchema.optional(),
           }),
+          response: {
+            200: z.object({
+              user: userSchema,
+            }),
+          },
         },
         preHandler: [passkeysEnabledHandler],
         ...secondlyRatelimit(10),
@@ -117,11 +122,7 @@ export default typedPlugin(
               },
             },
           },
-          select: {
-            ...userSelect,
-            password: true,
-            token: true,
-          },
+          select: userSelect,
         });
         if (!user) {
           logger.warn('invalid webauthn attempt', {
@@ -179,8 +180,6 @@ export default typedPlugin(
         const { newCounter } = verification.authenticationInfo;
 
         await saveSession(session, user, false);
-
-        delete (user as any).password;
 
         await prisma.userPasskey.update({
           where: {

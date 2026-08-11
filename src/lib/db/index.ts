@@ -74,6 +74,12 @@ function getClient() {
             return userViewSchema.parse(view);
           },
         },
+        totpEnabled: {
+          needs: { totpSecret: true },
+          compute({ totpSecret }: { totpSecret: string | null }) {
+            return !!totpSecret;
+          },
+        },
       },
       metric: {
         data: {

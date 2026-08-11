@@ -2,7 +2,7 @@ import { ApiError } from '@/lib/api/errors';
 import { ziplineClientParseSchema } from '@/lib/api/detect';
 import { verifyPassword } from '@/lib/crypto';
 import { prisma } from '@/lib/db';
-import { User, userSchema, userSelect } from '@/lib/db/models/user';
+import { loginUserSelect, User, userSchema } from '@/lib/db/models/user';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { verifyTotpCode } from '@/lib/totp';
@@ -56,11 +56,7 @@ export default typedPlugin(
           where: {
             username,
           },
-          select: {
-            ...userSelect,
-            password: true,
-            token: true,
-          },
+          select: loginUserSelect,
         });
         if (!user) throw new ApiError(1044);
         if (!user.password) throw new ApiError(1044);
@@ -95,8 +91,6 @@ export default typedPlugin(
           });
 
         await saveSession(session, user, false);
-
-        delete (user as any).password;
 
         logger.info('user logged in successfully', {
           username,

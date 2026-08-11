@@ -13,9 +13,6 @@ export async function onUpload(config: Config, { user, file, link }: Parameters<
 
   delete (<any>user).oauthProviders;
   delete user.passkeys;
-  delete user.token;
-  delete user.password;
-  delete user.totpSecret;
   delete (<any>file).password;
 
   const payload = {
@@ -60,9 +57,6 @@ export async function onShorten(config: Config, { user, url, link }: Parameters<
 
   delete (<any>user).oauthProviders;
   delete user.passkeys;
-  delete user.token;
-  delete user.password;
-  delete user.totpSecret;
   delete (<any>url).password;
 
   const payload = {
