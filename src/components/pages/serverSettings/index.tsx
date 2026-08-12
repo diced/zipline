@@ -2,18 +2,17 @@ import { LinksList } from '@/components/LinksList';
 import { Response } from '@/lib/api/response';
 import { useTitle } from '@/lib/client/hooks/useTitle';
 import {
+  Accordion,
   ActionIcon,
-  Alert,
   Anchor,
+  Badge,
   Box,
-  Button,
-  Collapse,
   Group,
   LoadingOverlay,
   Text,
+  ThemeIcon,
   Title,
 } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
 import {
   IconAdjustmentsHorizontalFilled,
   IconAppWindowFilled,
@@ -23,7 +22,6 @@ import {
   IconClickFilled,
   IconClockPause,
   IconDatabase,
-  IconExclamationMark,
   IconFiles,
   IconHttpPost,
   IconKeyFilled,
@@ -31,6 +29,7 @@ import {
   IconLink,
   IconSubtask,
   IconTagsFilled,
+  IconVariable,
   IconWorldPlus,
 } from '@tabler/icons-react';
 import { lazy, Suspense, useCallback } from 'react';
@@ -190,7 +189,6 @@ export default function DashboardServerSettings() {
   const navigate = useNavigate();
 
   const { data } = useSWR<Response['/api/server/settings']>('/api/server/settings');
-  const [opened, { toggle }] = useDisclosure(false);
 
   const toSettingSection = useCallback((settingKey: string) => {
     const normalizedSetting = settingKey.toLowerCase();
@@ -246,9 +244,7 @@ export default function DashboardServerSettings() {
   );
 
   const onTamperedClick = useCallback(
-    (e: React.MouseEvent<HTMLAnchorElement>, setting: string) => {
-      e.preventDefault();
-
+    (setting: string) => {
       const section = toSettingSection(setting);
       const url = `/dashboard/admin/settings/${section}`;
 
@@ -282,41 +278,48 @@ export default function DashboardServerSettings() {
           </ActionIcon>
         )}
         <Title order={1}>{setting.name}</Title>
-
-        {(data?.tampered?.length ?? 0) > 0 && (
-          <Button
-            variant='outline'
-            color={opened ? 'red' : 'blue'}
-            size='xs'
-            onClick={toggle}
-            leftSection={<IconExclamationMark size='1rem' />}
-          >
-            {opened ? 'Hide' : 'Show'} Tampered ({data!.tampered.length})
-          </Button>
-        )}
       </Group>
 
       {(data?.tampered?.length ?? 0) > 0 && (
-        <Collapse expanded={opened} transitionDuration={180}>
-          <Alert
-            my='md'
-            color='red'
-            title='Environment Variable Settings'
-            icon={<IconExclamationMark size='1rem' />}
-            variant='outline'
-          >
-            <Text size='sm' mb='xs'>
-              These settings are controlled by environment variables:
-            </Text>
-            <Group gap='xs'>
-              {data!.tampered.map((setting) => (
-                <Anchor key={setting} onClick={(e) => onTamperedClick(e, setting)} size='sm'>
-                  {setting}
-                </Anchor>
-              ))}
-            </Group>
-          </Alert>
-        </Collapse>
+        <Accordion variant='contained' radius='md' my='md'>
+          <Accordion.Item value='environment-overrides'>
+            <Accordion.Control
+              icon={
+                <ThemeIcon color='orange' variant='light' size='xl' radius='md'>
+                  <IconVariable size='1.75rem' />
+                </ThemeIcon>
+              }
+            >
+              <Box miw={0}>
+                <Group gap='xs'>
+                  <Text fw={600}>Environment overrides</Text>
+                  <Badge color='orange' variant='light' size='sm'>
+                    {data!.tampered.length}
+                  </Badge>
+                </Group>
+                <Text c='dimmed' size='sm'>
+                  Some settings are managed by environment variables and cannot be changed here.
+                </Text>
+              </Box>
+            </Accordion.Control>
+
+            <Accordion.Panel>
+              <Group gap='xs' wrap='wrap'>
+                {data!.tampered.map((setting) => (
+                  <Anchor
+                    key={setting}
+                    component='button'
+                    type='button'
+                    onClick={() => onTamperedClick(setting)}
+                    size='sm'
+                  >
+                    {setting}
+                  </Anchor>
+                ))}
+              </Group>
+            </Accordion.Panel>
+          </Accordion.Item>
+        </Accordion>
       )}
 
       {part !== 'settings' ? (
