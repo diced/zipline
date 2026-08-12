@@ -36,9 +36,18 @@ export function Placeholder({ text, Icon, ...props }: { text: string; Icon: Icon
   );
 }
 
-function FullscreenSizedMedia({ children }: { children: React.ReactNode }) {
+function FullscreenSizedMedia({
+  children,
+  onBackdropClick,
+}: {
+  children: React.ReactNode;
+  onBackdropClick?: () => void;
+}) {
   return (
     <Box
+      onClick={(event) => {
+        if (event.target === event.currentTarget) onBackdropClick?.();
+      }}
       style={{
         flex: 1,
         alignSelf: 'stretch',
@@ -62,6 +71,7 @@ export default function DashboardFileType({
   allowZoom,
   fullscreen,
   scrollParent,
+  onFullscreenBackdropClick,
 }: {
   file: DbFile | File;
   show?: boolean;
@@ -70,6 +80,7 @@ export default function DashboardFileType({
   allowZoom?: boolean;
   fullscreen?: boolean;
   scrollParent?: HTMLElement | null;
+  onFullscreenBackdropClick?: () => void;
 }) {
   const disableMediaPreview = useSettingsStore((state) => state.settings.disableMediaPreview);
   const mediaAutoMuted = useSettingsStore((state) => state.settings.mediaAutoMuted);
@@ -157,7 +168,11 @@ export default function DashboardFileType({
       />
     );
 
-    return fullscreen ? <FullscreenSizedMedia>{video}</FullscreenSizedMedia> : video;
+    return fullscreen ? (
+      <FullscreenSizedMedia onBackdropClick={onFullscreenBackdropClick}>{video}</FullscreenSizedMedia>
+    ) : (
+      video
+    );
   }
 
   if (type === 'image') {
@@ -186,7 +201,11 @@ export default function DashboardFileType({
 
     return (
       <>
-        {fullscreen ? <FullscreenSizedMedia>{image}</FullscreenSizedMedia> : <Center>{image}</Center>}
+        {fullscreen ? (
+          <FullscreenSizedMedia onBackdropClick={onFullscreenBackdropClick}>{image}</FullscreenSizedMedia>
+        ) : (
+          <Center>{image}</Center>
+        )}
         {allowZoom && zoomOpen && (
           <FileZoomModal setOpen={setZoomOpen}>
             <MantineImage
