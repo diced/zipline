@@ -95,15 +95,21 @@ export default typedPlugin(
         const valid = await verifyTotpCode(code, secret);
         if (!valid) throw new ApiError(1045);
 
-        const [user] = await prisma.user.updateManyAndReturn({
-          where: {
-            id: req.user.id,
-            totpSecret: null,
-          },
-          data: { totpSecret: secret },
-          select: userSelect,
+        const user = await prisma.$transaction(async (tx) => {
+          const updated = await tx.user.updateMany({
+            where: {
+              id: req.user.id,
+              totpSecret: null,
+            },
+            data: { totpSecret: secret },
+          });
+          if (!updated.count) throw new ApiError(1069);
+
+          return tx.user.findUniqueOrThrow({
+            where: { id: req.user.id },
+            select: userSelect,
+          });
         });
-        if (!user) throw new ApiError(1069);
 
         logger.info('user enabled TOTP', {
           user: user.username,
