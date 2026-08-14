@@ -159,7 +159,14 @@ export function parseHeaders(headers: UploadHeaders, fileConfig: Config['files']
 
   if (headers['x-zipline-deletes-at']) {
     if (headers['x-zipline-deletes-at'].toLowerCase() === 'never') {
-      response.deletesAt = 'never' as any;
+      if (fileConfig.maxExpiration) {
+        throwHeaderError(
+          'x-zipline-deletes-at',
+          `Expiry exceeds maximum allowed expiration of ${fileConfig.maxExpiration}`,
+        );
+      }
+
+      response.deletesAt = 'never';
     } else {
       const expiresAt = parseExpiry(headers['x-zipline-deletes-at']);
       if (!expiresAt) throwHeaderError('x-zipline-deletes-at', 'Invalid expiry date');

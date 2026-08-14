@@ -120,7 +120,8 @@ export default function UploadOptionsButton({ folder, numFiles }: { folder?: str
       if (!maxMs || isNaN(Number(maxMs))) return opts;
 
       return opts.filter((o) => {
-        if (o.value === 'default' || o.value === 'never' || o.value === '_') return true;
+        if (o.value === 'never') return false;
+        if (o.value === 'default' || o.value === '_') return true;
         const val = String(o.value);
         const parsed = (ms as unknown as (v: string) => number)(val);
 
