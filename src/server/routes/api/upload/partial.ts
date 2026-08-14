@@ -1,5 +1,5 @@
 import { ApiError } from '@/lib/api/errors';
-import { checkQuota, getDomain, getExtension, getFilename } from '@/lib/api/upload';
+import { checkQuota, getDomain, getExtension, getFilename, resolveUploadMimetype } from '@/lib/api/upload';
 import { bytes } from '@/lib/bytes';
 import { config } from '@/lib/config';
 import { hashPassword } from '@/lib/crypto';
@@ -7,7 +7,6 @@ import { prisma } from '@/lib/db';
 import { limitedUserSelect } from '@/lib/db/models/user';
 import { sanitizeFilename } from '@/lib/fs';
 import { log } from '@/lib/logger';
-import { guess } from '@/lib/mimes';
 import { randomCharacters } from '@/lib/random';
 import { UploadHeaders, UploadOptions, parseHeaders } from '@/lib/uploader/parseHeaders';
 import { Prisma } from '@/prisma/client';
@@ -307,16 +306,9 @@ export default typedPlugin(
           const { fileName } = nameResult;
 
           // determine mimetype
-          let mimetype = options.partial.contentType;
-          if (mimetype === 'application/octet-stream' && config.files.assumeMimetypes) {
-            const mime = await guess(extension.substring(1));
+          const { assumed, mimetype } = await resolveUploadMimetype(options.partial.contentType, extension);
 
-            if (!mime) response.assumedMimetypes![0] = false;
-            else {
-              response.assumedMimetypes![0] = true;
-              mimetype = mime;
-            }
-          }
+          if (config.files.assumeMimetypes) response.assumedMimetypes![0] = assumed;
 
           const data: Prisma.FileCreateInput = {
             name: `${fileName}${extension}`,

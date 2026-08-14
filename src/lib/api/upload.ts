@@ -6,8 +6,9 @@ import { config } from '../config';
 import { Config } from '../config/validate';
 import { sanitizeFilename } from '../fs';
 import { formatFileName } from '../uploader/formatFileName';
-import { guess } from '../mimes';
+import { guess, normalizeMimetype } from '../mimes';
 import { log } from '../logger';
+import { ApiError } from './errors';
 
 const logger = log('upload');
 
@@ -115,17 +116,37 @@ export async function getFilename(
   }
 }
 
-export async function getMimetype(
-  originalMimetype: string,
+export function enforceMimetypePolicy(
+  mimetype: string,
+  context?: string,
+): { mimetype: string; remapped: boolean } {
+  const normalized = normalizeMimetype(mimetype) ?? 'application/octet-stream';
+  const disabledTypes = new Set(
+    config.files.disabledTypes
+      .map((type) => normalizeMimetype(type))
+      .filter((type): type is string => type !== null),
+  );
+
+  if (!disabledTypes.has(normalized)) return { mimetype: normalized, remapped: false };
+
+  const defaultType = normalizeMimetype(config.files.disabledTypesDefault);
+  if (defaultType && !disabledTypes.has(defaultType)) return { mimetype: defaultType, remapped: true };
+
+  throw new ApiError(1065, `${context ? `${context}: ` : ''}File type ${normalized} is not allowed`);
+}
+
+export async function resolveUploadMimetype(
+  originalMimetype: string | null | undefined,
   extension: string,
-): Promise<{ mimetype: string; assumed: boolean }> {
-  const mimetype = originalMimetype;
+  context?: string,
+): Promise<{ mimetype: string; assumed: boolean; remapped: boolean }> {
+  const declaredMimetype = normalizeMimetype(originalMimetype) ?? 'application/octet-stream';
+  const assumedMimetype = config.files.assumeMimetypes
+    ? normalizeMimetype(await guess(extension.substring(1)))
+    : null;
+  const assumed = assumedMimetype !== null;
+  const resolvedMimetype = assumedMimetype ?? declaredMimetype;
+  const enforced = enforceMimetypePolicy(resolvedMimetype, context);
 
-  if (config.files.assumeMimetypes) {
-    const mime = await guess(extension.substring(1));
-
-    if (mime) return { mimetype: mime, assumed: true };
-  }
-
-  return { mimetype, assumed: false };
+  return { ...enforced, assumed };
 }

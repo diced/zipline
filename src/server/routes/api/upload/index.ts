@@ -1,5 +1,12 @@
 import { ApiError } from '@/lib/api/errors';
-import { checkQuota, getDomain, getExtension, getFilename, getMimetype } from '@/lib/api/upload';
+import {
+  checkQuota,
+  enforceMimetypePolicy,
+  getDomain,
+  getExtension,
+  getFilename,
+  resolveUploadMimetype,
+} from '@/lib/api/upload';
 import { bytes } from '@/lib/bytes';
 import { COMPRESS_TYPES, compressFile, CompressResult } from '@/lib/compress';
 import { config } from '@/lib/config';
@@ -159,26 +166,9 @@ export default typedPlugin(
             );
 
           // determine mimetype
-          const { assumed, ...mimeRes } = await getMimetype(file.mimetype, extension);
-          let mimetype = mimeRes.mimetype;
+          const { assumed, mimetype } = await resolveUploadMimetype(file.mimetype, extension, `file[${i}]`);
 
-          if (config.files.assumeMimetypes) {
-            response.assumedMimetypes![i] = assumed;
-
-            if (!assumed) {
-              logger.warn(`file[${i}]: mimetype ${file.mimetype} was not recognized`);
-
-              throw new ApiError(
-                1010,
-                `file[${i}]: mimetype ${file.mimetype} was not recognized, supply a valid mimetype`,
-              );
-            }
-          }
-
-          if (config.files.disabledTypes.includes(mimetype.trim().toLowerCase())) {
-            if (config.files.disabledTypesDefault) mimetype = config.files.disabledTypesDefault;
-            else throw new ApiError(1065, `file[${i}]: File type ${mimetype} is not allowed`);
-          }
+          if (config.files.assumeMimetypes) response.assumedMimetypes![i] = assumed;
 
           // compress the image if requested
           let compressed;
@@ -205,10 +195,15 @@ export default typedPlugin(
             removedGps = removed;
           }
 
+          const storedMimetype = enforceMimetypePolicy(
+            compressed?.mimetype ?? mimetype,
+            `file[${i}]`,
+          ).mimetype;
+
           return {
             file,
             extension: compressed ? `.${compressed.ext}` : extension,
-            mimetype: compressed?.mimetype ?? mimetype,
+            mimetype: storedMimetype,
             size: compressed?.buffer.length ?? file.file.bytesRead,
             compressed,
             removedGps,
