@@ -295,15 +295,17 @@ export default typedPlugin(
 
           // determine filename
           const format = options.format || config.files.defaultFormat;
-          const nameResult = await getFilename(
-            format,
-            options.partial.filename,
-            extension,
-            options.overrides?.filename,
-          );
-          if ('error' in nameResult) throw new ApiError(1009, nameResult.error);
-
-          const { fileName } = nameResult;
+          let fileName: string;
+          try {
+            fileName = await getFilename(
+              format,
+              options.partial.filename,
+              extension,
+              options.overrides?.filename,
+            );
+          } catch (error) {
+            throw new ApiError(1009, String(error));
+          }
 
           // determine mimetype
           const { assumed, mimetype } = await resolveUploadMimetype(options.partial.contentType, extension);

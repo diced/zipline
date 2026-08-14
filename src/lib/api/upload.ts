@@ -80,39 +80,42 @@ export async function getFilename(
   extension: string,
   override?: string,
   reservedNames?: Set<string>,
-): Promise<{ error: string } | { fileName: string }> {
+  alternateExtensions: string[] = [],
+): Promise<string> {
   try {
     let fileName = override ? sanitizeFilename(override) : formatFileName(format, originalName);
 
-    if (!fileName) return { error: 'invalid file name' };
+    if (!fileName) throw 'invalid file name';
 
-    let fullFileName = `${fileName}${extension}`;
+    const extensions = [...new Set([extension, ...alternateExtensions])];
+    let fullFileNames = extensions.map((ext) => `${fileName}${ext}`);
     let existing =
-      reservedNames?.has(fullFileName) || (await prisma.file.findFirst({ where: { name: fullFileName } }));
+      fullFileNames.some((name) => reservedNames?.has(name)) ||
+      (await prisma.file.findFirst({ where: { name: { in: fullFileNames } } }));
 
     if (existing && (override || format === 'name')) {
-      return { error: 'file with the same name already exists' };
+      throw 'file with the same name already exists';
     }
 
     let dateIncrement = 1;
 
     while (existing && (format === 'random' || format === 'date')) {
       fileName = formatFileName(format, originalName, dateIncrement++);
-      if (!fileName) return { error: 'invalid file name' };
+      if (!fileName) throw 'invalid file name';
 
-      fullFileName = `${fileName}${extension}`;
+      fullFileNames = extensions.map((ext) => `${fileName}${ext}`);
       existing =
-        reservedNames?.has(fullFileName) || (await prisma.file.findFirst({ where: { name: fullFileName } }));
+        fullFileNames.some((name) => reservedNames?.has(name)) ||
+        (await prisma.file.findFirst({ where: { name: { in: fullFileNames } } }));
     }
 
-    reservedNames?.add(fullFileName);
-    return { fileName };
+    for (const name of fullFileNames) reservedNames?.add(name);
+    return fileName;
   } catch (e) {
     logger.warn(`error generating file name: ${e}`);
 
-    return {
-      error: e instanceof URIError ? 'invalid file name: make sure it is URL encoded' : 'invalid file name',
-    };
+    if (typeof e === 'string') throw e;
+    throw e instanceof URIError ? 'invalid file name: make sure it is URL encoded' : 'invalid file name';
   }
 }
 
