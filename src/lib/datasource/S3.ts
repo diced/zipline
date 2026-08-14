@@ -440,6 +440,25 @@ export class S3Datasource extends Datasource {
         throw new Error('Failed to complete multipart upload');
       }
 
+      const deleteCommand = new DeleteObjectCommand({
+        Bucket: this.options.bucket,
+        Key: this.key(from),
+      });
+
+      try {
+        const deleteRes = await this.client.send(deleteCommand);
+        if (!isOk(deleteRes.$metadata.httpStatusCode || 0)) {
+          this.logger.error('there was an error while deleting old object');
+          this.logger.error('error metadata', deleteRes.$metadata as Record<string, unknown>);
+          throw new Error('Failed to delete old object');
+        }
+      } catch (e) {
+        this.logger.error('there was an error while deleting old object');
+        this.logger.error('error metadata', e as Record<string, unknown>);
+
+        throw new Error('Failed to delete old object');
+      }
+
       return;
     }
 
