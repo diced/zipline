@@ -58,7 +58,7 @@ export const useSettingsStore = create<SettingsStore>()(
           ...typedPersisted,
           settings: {
             ...currentState.settings,
-            ...(typedPersisted?.settings || {}),
+            ...typedPersisted?.settings,
           },
         };
       },

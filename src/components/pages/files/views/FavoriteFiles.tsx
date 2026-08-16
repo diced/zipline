@@ -43,7 +43,7 @@ export default function FavoriteFiles() {
             cols={{
               base: 1,
               md: 2,
-              lg: (data?.page.length ?? 0 > 0) ? 3 : 1,
+              lg: (data?.page.length ?? 0) > 0 ? 3 : 1,
             }}
             spacing='md'
             pos='relative'
@@ -52,7 +52,7 @@ export default function FavoriteFiles() {
               <Paper withBorder h={200}>
                 <LoadingOverlay visible />
               </Paper>
-            ) : (data?.page.length ?? 0 > 0) ? (
+            ) : (data?.page.length ?? 0) > 0 ? (
               data?.page.map((file) => (
                 <Suspense fallback={<Skeleton height={350} animate />} key={file.id}>
                   <DashboardFile file={file} />

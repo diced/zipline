@@ -7,7 +7,6 @@ build
 node_modules
 uploads*
 .env*
-.eslintcache
 .memory.log*
 *.crt
 *.key

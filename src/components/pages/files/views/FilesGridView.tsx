@@ -67,14 +67,14 @@ export default function Files({ id, folderId }: { id?: string; folderId?: string
         cols={{
           base: 1,
           md: 2,
-          lg: (data?.page.length ?? 0 > 0) || isLoading ? 3 : 1,
+          lg: (data?.page.length ?? 0) > 0 || isLoading ? 3 : 1,
         }}
         spacing='md'
         pos='relative'
       >
         {isLoading ? (
           [...Array(9)].map((_, i) => <Skeleton key={i} height={350} animate />)
-        ) : (data?.page?.length ?? 0 > 0) ? (
+        ) : (data?.page?.length ?? 0) > 0 ? (
           data?.page.map((file) => (
             <Suspense fallback={<Skeleton height={350} animate />} key={file.id}>
               <DashboardFile file={file} id={id} onOpen={(fileId) => setCurrent(fileId)} />

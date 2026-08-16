@@ -2,7 +2,15 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 type Field =
-  'name' | 'originalName' | 'tags' | 'type' | 'size' | 'createdAt' | 'favorite' | 'views' | 'anonymous';
+  | 'name'
+  | 'originalName'
+  | 'tags'
+  | 'type'
+  | 'size'
+  | 'createdAt'
+  | 'favorite'
+  | 'views'
+  | 'anonymous';
 
 const FIELDS: {
   property: Field;

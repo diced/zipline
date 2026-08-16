@@ -20,7 +20,9 @@ const totpStatusSchema = z.object({
 });
 
 export type ApiUserMfaTotpResponse =
-  User | z.infer<typeof totpEnrollmentSchema> | z.infer<typeof totpStatusSchema>;
+  | User
+  | z.infer<typeof totpEnrollmentSchema>
+  | z.infer<typeof totpStatusSchema>;
 
 const logger = log('api').c('user').c('mfa').c('totp');
 

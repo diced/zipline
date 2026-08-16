@@ -1,3 +1,3 @@
 import { step } from '.';
 
-export const lintStep = step('lint', 'eslint .');
+export const lintStep = step('lint', 'oxlint .');

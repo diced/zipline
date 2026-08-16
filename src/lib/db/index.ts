@@ -8,6 +8,7 @@ import { readDbVars, REQUIRED_DB_VARS } from '../config/read/env';
 
 const building = !!process.env.ZIPLINE_BUILD;
 
+// oxlint-disable-next-line prefer-const
 let prisma: ExtendedPrismaClient;
 
 declare global {
@@ -18,7 +19,6 @@ if (!global.__db__) {
   if (!building) global.__db__ = getClient();
 }
 
-// eslint-disable-next-line prefer-const
 prisma = global.__db__;
 
 type ExtendedPrismaClient = ReturnType<typeof getClient>;

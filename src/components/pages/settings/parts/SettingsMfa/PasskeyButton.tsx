@@ -159,7 +159,7 @@ export default function PasskeyButton() {
                     </>
                   )}
                 </Text>
-                {!(passkey?.reg as Record<string, any>).webauthn && (
+                {!(passkey.reg as Record<string, any>)?.webauthn && (
                   <Text size='xs' mt='xs' c='red'>
                     Warning: This passkey was created with an older version of Zipline and <b>WILL NOT</b>{' '}
                     work with this version. Please delete and recreate this passkey to ensure compatibility.

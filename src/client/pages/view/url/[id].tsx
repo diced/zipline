@@ -8,16 +8,19 @@ export default function ViewUrlId() {
     password?: boolean;
     token?: string | null;
   }>();
-  if (!data) return null;
-
-  const { url, password, token } = data;
-
   const [passwordValue, setPassword] = useState<string>('');
   const [passwordError, setPasswordError] = useState<string>('');
 
+  const password = data?.password;
+  const destination = data?.url.destination;
+
   useEffect(() => {
-    if (!password && url.destination) window.location.href = url.destination;
-  }, []);
+    if (!password && destination) window.location.href = destination;
+  }, [destination, password]);
+
+  if (!data) return null;
+
+  const { url, token } = data;
 
   return password && !token ? (
     <Modal onClose={() => {}} opened={true} withCloseButton={false} centered title='Password required'>

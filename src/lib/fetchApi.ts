@@ -18,11 +18,17 @@ export async function fetchApi<Response = any>(
     headers['Content-Type'] = 'application/json';
   }
 
-  const res = await fetch(route, {
-    method,
-    headers,
-    body: body ? JSON.stringify(body) : null,
-  });
+  const requestInit: RequestInit = { method, headers };
+
+  if (body) {
+    if (!bodyMethods.includes(method)) {
+      throw new TypeError(`Request with ${method} method cannot have a body.`);
+    }
+
+    requestInit.body = JSON.stringify(body);
+  }
+
+  const res = await fetch(route, requestInit);
 
   if (res.ok) {
     data = await res.json();

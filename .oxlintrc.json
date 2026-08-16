@@ -1,0 +1,45 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["oxc", "unicorn", "typescript", "jsx-a11y", "react"],
+  "categories": {
+    "correctness": "error"
+  },
+  "rules": {
+    "no-unused-expressions": "off",
+    "no-unused-vars": [
+      "error",
+      {
+        "vars": "all",
+        "varsIgnorePattern": "^_",
+        "args": "after-used",
+        "argsIgnorePattern": "^_",
+        "fix": {
+          "imports": "safe-fix",
+          "variables": "off"
+        }
+      }
+    ],
+    "no-var": "error",
+    "prefer-const": "error",
+    "prefer-rest-params": "error",
+    "prefer-spread": "error",
+
+    "typescript/ban-ts-comment": "off",
+    "typescript/no-explicit-any": "off",
+
+    "jsx-a11y/alt-text": "off",
+    "jsx-a11y/click-events-have-key-events": "off",
+    "jsx-a11y/media-has-caption": "off",
+    "jsx-a11y/no-autofocus": "off",
+    "jsx-a11y/no-static-element-interactions": "off",
+
+    "react/exhaustive-deps": "off",
+    "react/rules-of-hooks": "off",
+    "react/no-danger-with-children": "warn",
+    "react/no-direct-mutation-state": "warn",
+    "react/no-is-mounted": "warn",
+    "react/react-compiler": "error",
+    "react/require-render-return": "error",
+    "react/style-prop-object": "warn"
+  }
+}

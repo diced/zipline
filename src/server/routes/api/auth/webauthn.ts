@@ -136,7 +136,7 @@ export default typedPlugin(
         }
 
         const passkey = user.passkeys.find((pk) => {
-          const webauthn = (pk?.reg as JsonObject).webauthn as { id: string };
+          const webauthn = (pk.reg as JsonObject | null)?.webauthn as { id: string } | undefined;
           if (!webauthn) return false;
           return webauthn.id === response.id;
         });

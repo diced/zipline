@@ -49,7 +49,7 @@ export async function getSession(
     },
   );
 
-  const headers = (req as FastifyRequest).headers || (req as IncomingMessage).headers;
+  const headers = req.headers;
   session.client = detectClient(<Record<string, string>>headers);
   const cookies = fastifyCookie.parse(headers.cookie || '');
 

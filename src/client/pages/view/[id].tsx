@@ -40,15 +40,15 @@ type SsrData = {
 
 export default function ViewFileId() {
   const data = useSsrData<SsrData>();
-  if (!data) return null;
-
-  const { file, password, code, user, host, metrics, filesRoute, token } = data;
-
   const [passwordValue, setPassword] = useState<string>('');
   const [passwordError, setPasswordError] = useState<string>('');
   const [detailsOpen, setDetailsOpen] = useState<boolean>(false);
 
-  useTitle(file.originalName ?? file.name ?? 'View File');
+  useTitle(data?.file.originalName ?? data?.file.name ?? 'View File');
+
+  if (!data) return null;
+
+  const { file, password, code, user, host, metrics, filesRoute, token } = data;
 
   return password && !token ? (
     <Modal onClose={() => {}} opened={true} withCloseButton={false} centered title='Password required'>

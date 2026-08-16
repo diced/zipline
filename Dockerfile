@@ -25,7 +25,8 @@ COPY src ./src
 COPY .gitignore ./.gitignore
 
 COPY postcss.config.mjs ./postcss.config.mjs
-COPY eslint.config.mjs ./eslint.config.mjs
+COPY .oxfmtrc.json ./.oxfmtrc.json
+COPY .oxlintrc.json ./.oxlintrc.json
 COPY vite.config.ts ./vite.config.ts
 COPY tsup.config.ts ./tsup.config.ts
 COPY tsconfig.json ./tsconfig.json

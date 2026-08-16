@@ -4,6 +4,6 @@ import { lintStep } from './lint';
 run(
   'validate',
 
-  step('format', 'prettier --write --ignore-path .gitignore --ignore-path .prettierignore .'),
+  step('format', 'oxfmt'),
   lintStep,
 );
