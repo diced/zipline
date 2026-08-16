@@ -25,7 +25,7 @@ import { IconDownload, IconExternalLink, IconInfoCircleFilled } from '@tabler/ic
 import * as sanitize from 'isomorphic-dompurify';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getFile } from '../../ssr-view/server';
+import type { getFile } from '../../ssr-view/server';
 
 type SsrData = {
   file: Partial<NonNullable<Awaited<ReturnType<typeof getFile>>>>;

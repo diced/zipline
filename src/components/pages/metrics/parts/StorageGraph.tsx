@@ -3,17 +3,15 @@ import { MetricsPoint } from '@/lib/metrics';
 import { ChartTooltip, LineChart } from '@mantine/charts';
 import { Paper, Title } from '@mantine/core';
 import { useMemo } from 'react';
-import { defaultChartProps } from '../statsHelpers';
+import { defaultChartProps, formatChartDate, sortByCreatedAt } from '../statsHelpers';
 
 export default function StorageGraph({ points }: { points: MetricsPoint[] }) {
   const data = useMemo(
     () =>
-      points
-        .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
-        .map((point) => ({
-          date: new Date(point.createdAt).getTime(),
-          storage: point.storage,
-        })),
+      sortByCreatedAt(points).map((point) => ({
+        date: new Date(point.createdAt).getTime(),
+        storage: point.storage,
+      })),
     [points],
   );
 
@@ -33,12 +31,12 @@ export default function StorageGraph({ points }: { points: MetricsPoint[] }) {
         ]}
         valueFormatter={(v) => bytes(Number(v))}
         xAxisProps={{
-          tickFormatter: (v) => new Date(v).toLocaleString(),
+          tickFormatter: formatChartDate,
         }}
         tooltipProps={{
           content: ({ label, payload }) => (
             <ChartTooltip
-              label={new Date(label).toLocaleString()}
+              label={formatChartDate(label)}
               payload={payload}
               valueFormatter={(v) => bytes(Number(v))}
               series={[{ name: 'storage', label: 'Storage Used' }]}

@@ -384,9 +384,7 @@ export default typedPlugin(
           const fileIds = response.files.map((x) => x.id);
 
           const thumbnailWorkers = server.tasks.workersBy('thumbnail');
-          if (!thumbnailWorkers.length) return;
-
-          runThumbnailWorkers(thumbnailWorkers, fileIds);
+          if (thumbnailWorkers.length) runThumbnailWorkers(thumbnailWorkers, fileIds);
         }
 
         return res.send(response);

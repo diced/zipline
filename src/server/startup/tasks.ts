@@ -23,7 +23,7 @@ export function startTasks(server: FastifyInstance) {
     cleanThumbnails(prisma),
   );
 
-  if (config.features.metrics)
+  if (config.features.metrics.enabled)
     tasks.interval('metrics', ms(config.tasks.metricsInterval as StringValue), metrics(prisma));
 
   if (config.features.thumbnails.enabled) {

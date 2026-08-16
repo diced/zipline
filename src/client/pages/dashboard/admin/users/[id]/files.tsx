@@ -5,7 +5,6 @@ import { Params, redirect, useLoaderData } from 'react-router-dom';
 export async function loader({ params }: { params: Params<string> }) {
   const res = await fetch('/api/users/' + params.id);
   if (!res.ok) {
-    console.log("can't get user", res.status);
     return redirect('/dashboard/admin/users');
   }
 

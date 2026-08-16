@@ -15,7 +15,7 @@ import {
 export type ZiplineTheme = MantineTheme & {
   id: string;
   name: string;
-  colorScheme: string;
+  colorScheme: 'light' | 'dark';
   mainBackgroundColor: string;
   extraCss?: string;
 };

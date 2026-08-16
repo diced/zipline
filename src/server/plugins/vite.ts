@@ -3,15 +3,13 @@ import fastifyPlugin from 'fastify-plugin';
 import { readFile } from 'fs/promises';
 import { resolve } from 'path';
 import { createServer } from 'vite';
-import { reservedRoutes } from '../routes/api/server/settings';
+import { RESERVED_ROUTES } from '@/lib/reservedRoutes';
 import { config } from '@/lib/config';
 import fastifyStatic from '@fastify/static';
 import { renderHtml } from '@/lib/ssr/renderHtml';
 import { readThemes } from '@/lib/theme/file';
 import { ZIPLINE_SSR_INSERT, ZIPLINE_SSR_META } from '@/lib/ssr/constants';
 import { log } from '@/lib/logger';
-
-export const ALL_METHODS: HTTPMethods[] = ['DELETE', 'GET', 'HEAD', 'PATCH', 'POST', 'PUT'];
 
 const MODE = process.env.NODE_ENV || 'development';
 const logger = log('server').c('plugin').c('vite');
@@ -38,7 +36,7 @@ async function vitePlugin(fastify: FastifyInstance) {
       const url = req.raw.url || '';
 
       const reserved = [
-        ...reservedRoutes.filter((x) => x !== '/dashboard' && x !== '/auth' && x !== '/r'),
+        ...RESERVED_ROUTES.filter((x) => x !== '/dashboard' && x !== '/auth' && x !== '/r'),
         config.files.route,
         config.urls.route,
       ]

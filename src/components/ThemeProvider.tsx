@@ -3,7 +3,7 @@ import { Config } from '@/lib/config/validate';
 import { useSettingsStore } from '@/lib/client/store/settings';
 import { useUserStore } from '@/lib/client/store/user';
 import { ZiplineTheme, findTheme, themeComponents } from '@/lib/theme';
-import dark_blue from '@/lib/theme/builtins/dark_blue';
+import dark_blue from '@/lib/theme/builtins/dark_blue.theme.json' with { type: 'json' };
 import { MantineProvider, createTheme } from '@mantine/core';
 import { useColorScheme } from '@mantine/hooks';
 import { createContext, useContext } from 'react';
@@ -70,8 +70,8 @@ export default function ThemeProvider({
 
       <ThemeContext.Provider value={{ themes: themes ?? [] }}>
         <MantineProvider
-          defaultColorScheme={theme.colorScheme as unknown as any}
-          forceColorScheme={theme.colorScheme as unknown as any}
+          defaultColorScheme={theme.colorScheme}
+          forceColorScheme={theme.colorScheme}
           theme={createTheme({
             ...themeComponents(theme),
           })}

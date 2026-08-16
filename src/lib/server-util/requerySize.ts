@@ -47,10 +47,10 @@ export async function requerySize({
           },
         });
         continue;
-      } else {
-        notFound ? null : (notFound = true);
-        continue;
       }
+
+      notFound = true;
+      continue;
     }
 
     const size = await datasource.size(file.name);

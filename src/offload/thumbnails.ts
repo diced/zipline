@@ -9,7 +9,7 @@ import ffmpeg from '@/lib/ffmpeg';
 import { createWriteStream, existsSync, readFileSync, unlinkSync } from 'fs';
 import { join } from 'path';
 import { isMainThread, parentPort, workerData } from 'worker_threads';
-import { dbProxy, pending } from './proxiedDb';
+import { dbProxy } from './proxiedDb';
 
 export type ThumbnailWorkerData = {
   id: string;
@@ -134,10 +134,7 @@ async function generate(config: Config, datasource: Datasource, ids: string[]) {
     const thumbnail = await genThumbnail(tmpFile, thumbnailTmpFile);
     if (!thumbnail || thumbnail.length === 0) continue;
 
-    const existing = await datasource.size(name(`.thumbnail.${file.id}`));
-    if (existing || existing === 0) {
-      await datasource.delete(name(`.thumbnail.${file.id}`));
-    }
+    await datasource.delete(name(`.thumbnail.${file.id}`));
     await datasource.put(name(`.thumbnail.${file.id}`), thumbnail, {
       mimetype: formatMimes[config.features.thumbnails.format] || 'image/jpeg',
     });
@@ -182,6 +179,8 @@ async function main() {
       data?: string[];
     };
 
+    if (type === 'response') return;
+
     switch (type) {
       case 0:
         logger.debug('received thumbnail generation request', { ids: data });
@@ -196,18 +195,6 @@ async function main() {
       case 1:
         logger.debug('received kill request');
         process.exit(0);
-      case 'response':
-        const { id, result } = message;
-        if (pending[id]) {
-          try {
-            pending[id](JSON.parse(result));
-          } catch (e) {
-            pending[id](null);
-            console.error(e);
-          }
-          delete pending[id];
-        }
-        break;
       default:
         logger.error('unknown message type', { type, message });
         break;

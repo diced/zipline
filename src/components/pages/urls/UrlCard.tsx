@@ -8,7 +8,7 @@ import { IconCopy, IconDots, IconPencil, IconQrcode, IconTrashFilled } from '@ta
 import { copyUrl, deleteUrl } from './actions';
 import { useSettingsStore } from '@/lib/client/store/settings';
 
-export default function UserCard({
+export default function UrlCard({
   url,
   setSelectedUrl,
   setQrOpen,

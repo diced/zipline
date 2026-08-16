@@ -1,45 +1,8 @@
-import ms from 'ms';
+import ms, { type StringValue } from 'ms';
 import { checkOutput, COMPRESS_TYPES, CompressType } from '../compress';
-import { config } from '../config';
 import { Config } from '../config/validate';
 import { sanitizeExtension } from '../fs';
 import { ApiError } from '../api/errors';
-
-// from ms@3.0.0-canary.1
-type Unit =
-  | 'Years'
-  | 'Year'
-  | 'Yrs'
-  | 'Yr'
-  | 'Y'
-  | 'Weeks'
-  | 'Week'
-  | 'W'
-  | 'Days'
-  | 'Day'
-  | 'D'
-  | 'Hours'
-  | 'Hour'
-  | 'Hrs'
-  | 'Hr'
-  | 'H'
-  | 'Minutes'
-  | 'Minute'
-  | 'Mins'
-  | 'Min'
-  | 'M'
-  | 'Seconds'
-  | 'Second'
-  | 'Secs'
-  | 'Sec'
-  | 's'
-  | 'Milliseconds'
-  | 'Millisecond'
-  | 'Msecs'
-  | 'Msec'
-  | 'Ms';
-type UnitAnyCase = Unit | Uppercase<Unit> | Lowercase<Unit>;
-type StringValue = `${number}` | `${number}${UnitAnyCase}` | `${number} ${UnitAnyCase}`;
 
 type StringBoolean = 'true' | 'false';
 
@@ -219,7 +182,6 @@ export function parseHeaders(headers: UploadHeaders, fileConfig: Config['files']
 
     if (imageCompressionPercent) {
       const percent = parsePercent('x-zipline-image-compression-percent', imageCompressionPercent);
-      if (typeof percent === 'object') return percent;
 
       response.imageCompression = {
         type: imageCompressionType,
@@ -228,10 +190,9 @@ export function parseHeaders(headers: UploadHeaders, fileConfig: Config['files']
     }
   } else if (imageCompressionPercent) {
     const percent = parsePercent('x-zipline-image-compression-percent', imageCompressionPercent);
-    if (typeof percent === 'object') return percent;
 
     response.imageCompression = {
-      type: config.files.defaultCompressionFormat,
+      type: fileConfig.defaultCompressionFormat,
       percent,
     };
   }

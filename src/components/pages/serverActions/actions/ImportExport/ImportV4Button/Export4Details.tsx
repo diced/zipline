@@ -45,7 +45,7 @@ function TextDetail({ name, children }: { name: string; children: React.ReactNod
   );
 }
 
-export default function Export3Details({ export4 }: { export4: Export4 }) {
+export default function Export4Details({ export4 }: { export4: Export4 }) {
   const [envOpened, { toggle: toggleEnv }] = useDisclosure(false);
   const [osOpened, { toggle: toggleOs }] = useDisclosure(false);
 

@@ -33,7 +33,7 @@ function toReadableTime(value: number) {
 export async function run(name: string, ...steps: Step[]) {
   const { execSync } = await import('child_process');
 
-  const runOne = process.argv[2];
+  const runOne = process.argv.slice(2).find((argument) => !argument.startsWith('--'));
   if (runOne) {
     const match = steps.find((s) => `${name}/${s.name}` === runOne);
     if (!match) {

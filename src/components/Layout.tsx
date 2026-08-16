@@ -48,7 +48,7 @@ import {
 } from '@tabler/icons-react';
 import { useState } from 'react';
 import { Link, NavigateFunction, Outlet, useLoaderData, useLocation, useNavigate } from 'react-router-dom';
-import { dashboardLoader } from '../client/routes';
+import type { dashboardLoader } from '../client/routes';
 import ConfigProvider from './ConfigProvider';
 import VersionBadge from './VersionBadge';
 import { SETTINGS_EXTERNAL_LINKS } from './pages/serverSettings';

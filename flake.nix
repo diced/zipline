@@ -6,7 +6,7 @@
       flake = false;
     };
 
-    # node 24.14, postgres 17
+    # node 24, postgres 17
     nixpkgs.url = "github:nixos/nixpkgs/812b3986fd1568f7a858f97fcf425ad996ba7d25";
     flake-parts.url = "github:hercules-ci/flake-parts";
 
@@ -78,7 +78,7 @@
 
             enterShell = ''
               export name="zipline-env";
-              echo -e "\n[$name]: run 'pgup' to start services, 'pgdown' to stop services";
+              echo -e "\n[$name]: run 'pgup' to start services, 'downall' to stop services";
             '';
 
             languages.javascript = {

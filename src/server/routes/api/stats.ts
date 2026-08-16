@@ -52,7 +52,7 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        if (!config.features.metrics) throw new ApiError(3001);
+        if (!config.features.metrics.enabled) throw new ApiError(3001);
 
         if (config.features.metrics.adminOnly && !isAdministrator(req.user.role)) throw new ApiError(3000);
 

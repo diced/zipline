@@ -1,12 +1,11 @@
 import { ApiError } from '@/lib/api/errors';
 import { prisma } from '@/lib/db';
 import { File, cleanFiles, fileSchema, fileSelect } from '@/lib/db/models/file';
-import { canInteract } from '@/lib/role';
+import { canInteract, canManage } from '@/lib/role';
 import { paginationQs } from '@/lib/validation';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
 import z from 'zod';
-import { checkInteraction } from '../folders/[id]';
 
 export type FileSearchField = 'name' | 'originalName' | 'type' | 'tags' | 'id';
 
@@ -77,7 +76,7 @@ export default typedPlugin(
             },
           });
           if (!f) throw new ApiError(9002);
-          if (!checkInteraction(req.user, f?.User)) throw new ApiError(9002);
+          if (!canManage(req.user, f.User)) throw new ApiError(9002);
 
           folderId = f.id;
         }

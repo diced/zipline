@@ -8,7 +8,7 @@ import { useState } from 'react';
 import QRCodeModal from '@/components/QRCodeModal';
 
 export default function InviteGridView() {
-  const { data: folders, isLoading } =
+  const { data: invites, isLoading } =
     useSWR<Extract<Response['/api/auth/invites'], Invite[]>>('/api/auth/invites');
 
   const [qrOpen, setQrOpen] = useState<Invite | null>(null);
@@ -36,7 +36,7 @@ export default function InviteGridView() {
             <Skeleton key={i} height={120} animate />
           ))}
         </SimpleGrid>
-      ) : (folders?.length ?? 0 !== 0) ? (
+      ) : (invites?.length ?? 0) !== 0 ? (
         <SimpleGrid
           my='sm'
           spacing='md'
@@ -47,7 +47,7 @@ export default function InviteGridView() {
           }}
           pos='relative'
         >
-          {folders?.map((invite) => (
+          {invites?.map((invite) => (
             <InviteCard setQrOpen={setQrOpen} key={invite.id} invite={invite} />
           ))}
         </SimpleGrid>

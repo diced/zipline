@@ -1,4 +1,4 @@
-import { ApiServerSettingsWebResponse } from '@/server/routes/api/server/settings';
+import type { ApiServerSettingsWebResponse } from '@/server/routes/api/server/settings';
 import { createContext, useContext } from 'react';
 
 type ConfigContextType = ApiServerSettingsWebResponse;

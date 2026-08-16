@@ -1,5 +1,10 @@
 import type { Role } from '@/prisma/client';
 
+type RoleIdentity = {
+  id: string;
+  role: Role;
+};
+
 export function isAdministrator(role?: Role) {
   return role === 'ADMIN' || role === 'SUPERADMIN';
 }
@@ -9,6 +14,12 @@ export function canInteract(current?: Role, target?: Role) {
     (current === 'SUPERADMIN' && (target === 'USER' || target === 'ADMIN')) ||
     (current === 'ADMIN' && target === 'USER')
   );
+}
+
+export function canManage(current?: RoleIdentity | null, target?: RoleIdentity | null) {
+  if (!current || !target) return false;
+
+  return current.id === target.id || canInteract(current.role, target.role);
 }
 
 export function interactableRoles(current?: Role): Role[] {

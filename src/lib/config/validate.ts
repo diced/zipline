@@ -46,7 +46,7 @@ declare global {
   }
 }
 
-export const MIME_REGEX = /^[a-zA-Z0-9!#$&^_\-\+.]+\/[a-zA-Z0-9!#$&^_\-\+.]+$/gi;
+export const MIME_REGEX = /^[a-zA-Z0-9!#$&^_\-\+.]+\/[a-zA-Z0-9!#$&^_\-\+.]+$/i;
 
 export const MAX_SAFE_TIMEOUT_MS = 2147483647;
 

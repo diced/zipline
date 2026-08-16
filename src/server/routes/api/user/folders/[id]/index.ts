@@ -3,9 +3,8 @@ import { datasource } from '@/lib/datasource';
 import { prisma } from '@/lib/db';
 import { fileSelect } from '@/lib/db/models/file';
 import { buildParentChain, Folder, cleanFolder, folderSchema } from '@/lib/db/models/folder';
-import { User } from '@/lib/db/models/user';
 import { log } from '@/lib/logger';
-import { canInteract } from '@/lib/role';
+import { canManage } from '@/lib/role';
 import { zQsBoolean, zStringTrimmed } from '@/lib/validation';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
@@ -13,16 +12,6 @@ import { FastifyRequest } from 'fastify';
 import z from 'zod';
 
 export type ApiUserFoldersIdResponse = Folder;
-
-// TODO: need to refactor interaction checks to use this function in the future
-export function checkInteraction(current?: Partial<User> | null, owner?: Partial<User> | null) {
-  if (!current || !owner) return false;
-  if (current.id === owner.id) return true;
-
-  const can = canInteract(current.role, owner.role);
-
-  return can;
-}
 
 const logger = log('api').c('user').c('folders').c('[id]');
 
@@ -48,7 +37,7 @@ const folderExistsAndEditable = async (req: FastifyRequest) => {
   });
 
   if (!folder) throw new ApiError(4001);
-  if (!checkInteraction(req.user, folder.User)) throw new ApiError(4001);
+  if (!canManage(req.user, folder.User)) throw new ApiError(4001);
 };
 
 export const PATH = '/api/user/folders/:id';
@@ -144,7 +133,7 @@ export default typedPlugin(
           },
         });
         if (!file) throw new ApiError(4000);
-        if (!checkInteraction(req.user, file.User)) throw new ApiError(4000);
+        if (!canManage(req.user, file.User)) throw new ApiError(4000);
 
         const fileInFolder = await prisma.file.findFirst({
           where: {
@@ -287,7 +276,7 @@ export default typedPlugin(
               select: { id: true, User: true },
             });
             if (!targetFolder) throw new ApiError(4008);
-            if (!checkInteraction(req.user, targetFolder.User)) throw new ApiError(4008, undefined, 403);
+            if (!canManage(req.user, targetFolder.User)) throw new ApiError(4008, undefined, 403);
           }
 
           try {
@@ -373,7 +362,7 @@ export default typedPlugin(
           });
 
           if (!file) throw new ApiError(4000);
-          if (!checkInteraction(req.user, file.User)) throw new ApiError(4000);
+          if (!canManage(req.user, file.User)) throw new ApiError(4000);
 
           const fileInFolder = await prisma.file.findFirst({
             where: {

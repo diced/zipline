@@ -1,13 +1,12 @@
 import { Response } from '@/lib/api/response';
+import { copyLink } from '@/lib/client/copyLink';
 import { Invite } from '@/lib/db/models/invite';
 import { fetchApi } from '@/lib/fetchApi';
 import { conditionalWarning } from '@/lib/client/warningModal';
 import { getDomain } from '@/lib/client/webDomain';
-import { Anchor } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
-import { IconCheck, IconCopy, IconTagOff } from '@tabler/icons-react';
-import { Link } from 'react-router-dom';
+import { IconCheck, IconTagOff } from '@tabler/icons-react';
 import { mutate } from 'swr';
 
 export async function deleteInvite(warnDeletion: boolean, invite: Invite) {
@@ -20,18 +19,7 @@ export async function deleteInvite(warnDeletion: boolean, invite: Invite) {
 
 export function copyInviteUrl(invite: Invite, clipboard: ReturnType<typeof useClipboard>) {
   const url = getDomain(`/invite/${invite.code}`);
-  clipboard.copy(url);
-
-  notifications.show({
-    title: 'Copied link',
-    message: (
-      <Anchor component={Link} to={`/invite/${invite.code}`}>
-        {url}
-      </Anchor>
-    ),
-    color: 'green',
-    icon: <IconCopy size='1rem' />,
-  });
+  copyLink(url, clipboard, `/invite/${invite.code}`);
 }
 
 async function handleDeleteInvite(invite: Invite) {

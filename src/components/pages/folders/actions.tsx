@@ -1,28 +1,16 @@
 import { Response } from '@/lib/api/response';
+import { copyLink } from '@/lib/client/copyLink';
 import { Folder } from '@/lib/db/models/folder';
 import { fetchApi } from '@/lib/fetchApi';
 import { getDomain } from '@/lib/client/webDomain';
-import { Anchor } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
-import { IconCheck, IconCopy, IconFolderOff } from '@tabler/icons-react';
-import { Link } from 'react-router-dom';
+import { IconCheck, IconFolderOff } from '@tabler/icons-react';
 import { mutate } from 'swr';
 
 export function copyFolderUrl(folder: Folder, clipboard: ReturnType<typeof useClipboard>) {
   const url = getDomain(`/folder/${folder.id}`);
-  clipboard.copy(url);
-
-  notifications.show({
-    title: 'Copied link',
-    message: (
-      <Anchor component={Link} to={`/folder/${folder.id}`}>
-        {url}
-      </Anchor>
-    ),
-    color: 'green',
-    icon: <IconCopy size='1rem' />,
-  });
+  copyLink(url, clipboard, `/folder/${folder.id}`);
 }
 
 export async function editFolderVisibility(folder: Folder, isPublic: boolean) {

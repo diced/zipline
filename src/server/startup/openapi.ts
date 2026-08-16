@@ -5,8 +5,7 @@ import { writeFile } from 'fs/promises';
 const logger = log('server');
 
 export function generateOpenApiSpec(server: FastifyInstance) {
-  server.ready(async (a) => {
-    console.log(a);
+  server.ready(async () => {
     const openapi = server.swagger();
     await writeFile('./openapi.json', JSON.stringify(openapi, null, 2), 'utf8');
 

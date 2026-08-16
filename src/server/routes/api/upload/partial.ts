@@ -330,7 +330,7 @@ export default typedPlugin(
             const sanitizedOG = sanitizeFilename(options.partial.filename);
             if (!sanitizedOG) throw new ApiError(1008);
 
-            data.originalName = sanitizedOG || file.filename; // this will prolly be "blob" but should hopefully never happen
+            data.originalName = sanitizedOG;
           }
           if (!req.user && folder) data.anonymous = true;
 

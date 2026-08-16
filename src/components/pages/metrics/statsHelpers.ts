@@ -13,6 +13,14 @@ export const defaultChartProps: Partial<LineChartProps> & { dataKey: string } = 
   dataKey: 'date',
 };
 
+export function sortByCreatedAt<T extends { createdAt: string | number | Date }>(points: readonly T[]): T[] {
+  return [...points].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+}
+
+export function formatChartDate(value: string | number | undefined): string {
+  return value === undefined ? '' : new Date(value).toLocaleString();
+}
+
 export function percentChange(a: number | bigint, b: number | bigint): [string, string] {
   if (typeof a === 'bigint') a = Number(a);
   if (typeof b === 'bigint') b = Number(b);

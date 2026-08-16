@@ -56,7 +56,7 @@ services:
       - .env
     environment:
       POSTGRES_USER: ${POSTGRESQL_USER:-zipline}
-      POSTGRES_PASSWORD: ${POSTGRESQL_PASSWORD:?POSTGRESSQL_PASSWORD is required}
+      POSTGRES_PASSWORD: ${POSTGRESQL_PASSWORD:?POSTGRESQL_PASSWORD is required}
       POSTGRES_DB: ${POSTGRESQL_DB:-zipline}
     volumes:
       - pgdata:/var/lib/postgresql/data
@@ -230,8 +230,8 @@ After familiarizing yourself with the environment, you can continue below (skipp
 
 #### Prerequisites
 
-- nodejs (lts -> 20.x, 22.x)
-- pnpm (10.x)
+- Node.js (22 or newer; Node.js 24 recommended)
+- pnpm (11.x)
 - a postgresql server
 
 #### Setup
@@ -295,7 +295,7 @@ pnpm start
 
 Zipline uses [prisma](https://www.prisma.io/) as its ORM, and as such, you will need to use the prisma CLI to facilitate any changes to the database schema.
 
-Once you have made a change to `prisma.schema`, you can run the script `db:migrate` to generate a migration file. This script doesn't apply the migration, as Zipline handles applying migrations itself on startup.
+Once you have made a change to `prisma/schema.prisma`, you can run the script `db:migrate` to generate a migration file. This script doesn't apply the migration, as Zipline handles applying migrations itself on startup.
 
 ```bash
 pnpm db:migrate
@@ -320,7 +320,7 @@ pnpm validate
 To build the ctl, you can run the following command:
 
 ```bash
-pnpm build:server
+pnpm build
 ```
 
 then run any command you want

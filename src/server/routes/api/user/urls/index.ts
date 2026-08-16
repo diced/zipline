@@ -5,12 +5,12 @@ import { prisma } from '@/lib/db';
 import { cleanUrlPasswords, Url, urlSchema } from '@/lib/db/models/url';
 import { log } from '@/lib/logger';
 import { randomCharacters } from '@/lib/random';
+import { RESERVED_ROUTES } from '@/lib/reservedRoutes';
 import { zStringTrimmed } from '@/lib/validation';
 import { onShorten } from '@/lib/webhooks';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
 import { z } from 'zod';
-import { reservedRoutes } from '../../server/settings';
 
 export type ApiUserUrlsResponse =
   | Url[]
@@ -39,7 +39,7 @@ export default typedPlugin(
               .refine((str) => !str.startsWith('/'), 'Vanity cannot start with a slash.')
               .refine(
                 (str) =>
-                  !reservedRoutes.some((route) => {
+                  !RESERVED_ROUTES.some((route) => {
                     const nStr = `/${str}`.toLowerCase();
                     const nRoute = route.toLowerCase();
 

@@ -20,12 +20,10 @@ export async function dashboardLoader() {
       return redirect('/auth/login');
     }
 
-    const data = await res.json();
-    console.log('Loaded settings:', data);
-
-    return data as ApiResponse['/api/server/settings/web'];
+    return (await res.json()) as ApiResponse['/api/server/settings/web'];
   } catch (error) {
-    throw data('Failed to load settings' + (error as any).message, { status: 500 });
+    const message = error instanceof Error ? `: ${error.message}` : '';
+    throw data(`Failed to load settings${message}`, { status: 500 });
   }
 }
 

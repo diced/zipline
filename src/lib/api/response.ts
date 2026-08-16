@@ -42,6 +42,7 @@ import { ApiUserTagsIdResponse } from '@/server/routes/api/user/tags/[id]';
 import { ApiUserTokenResponse } from '@/server/routes/api/user/token';
 import { ApiUserUrlsResponse } from '@/server/routes/api/user/urls';
 import { ApiUserUrlsIdResponse } from '@/server/routes/api/user/urls/[id]';
+import { ApiUserUrlsIdPasswordResponse } from '@/server/routes/api/user/urls/[id]/password';
 import { ApiUsersResponse } from '@/server/routes/api/users';
 import { ApiUsersIdResponse } from '@/server/routes/api/users/[id]';
 import { ApiVersionResponse } from '@/server/routes/api/version';
@@ -66,6 +67,7 @@ export type Response = {
   '/api/user/files/incomplete': ApiUserFilesIncompleteResponse;
   '/api/user/files': ApiUserFilesResponse;
   '/api/user/urls/[id]': ApiUserUrlsIdResponse;
+  '/api/user/urls/[id]/password': ApiUserUrlsIdPasswordResponse;
   '/api/user/urls': ApiUserUrlsResponse;
   '/api/user/tags/[id]': ApiUserTagsIdResponse;
   '/api/user/tags': ApiUserTagsResponse;

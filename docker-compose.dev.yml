@@ -5,7 +5,7 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DATABASE=postgres2
+      - POSTGRES_DB=postgres2
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -26,7 +26,8 @@ services:
       - DATABASE_URL=postgres://postgres:postgres@postgres/postgres2
       - CORE_HOSTNAME=0.0.0.0
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     volumes:
       - './uploads:/zipline/uploads'
       - './public:/zipline/public'

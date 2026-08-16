@@ -64,10 +64,7 @@ export default class Logger {
   private formatName() {
     if (!canStyle) return this.name;
 
-    return this.name
-      .split(Logger.SEPARATOR)
-      .map((part) => part)
-      .join(Logger.COLORS.gray(Logger.SEPARATOR));
+    return this.name.split(Logger.SEPARATOR).join(Logger.COLORS.gray(Logger.SEPARATOR));
   }
 
   private formatLevel(level: LoggerLevel) {

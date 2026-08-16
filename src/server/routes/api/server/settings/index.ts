@@ -8,6 +8,7 @@ import { MAX_SAFE_TIMEOUT_MS, MIME_REGEX } from '@/lib/config/validate';
 import { prisma } from '@/lib/db';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
+import { RESERVED_ROUTES } from '@/lib/reservedRoutes';
 import { readThemes } from '@/lib/theme/file';
 import { zStringTrimmed } from '@/lib/validation';
 import { administratorMiddleware } from '@/server/middleware/administrator';
@@ -26,19 +27,6 @@ export type ApiServerSettingsWebResponse = {
   config: ReturnType<typeof safeConfig>;
   codeMap: { ext: string; mime: string; name: string }[];
 };
-export const reservedRoutes = [
-  '/dashboard',
-  '/auth',
-  '/api',
-  '/raw',
-  '/r',
-  '/invite',
-  '/view',
-  '/robots.txt',
-  '/manifest.json',
-  '/favicon.ico',
-];
-
 const jsonTransform = (value: any, ctx: z.RefinementCtx) => {
   if (typeof value !== 'string') return value;
   try {
@@ -180,7 +168,7 @@ export default typedPlugin(
               .string()
               .startsWith('/')
               .refine(
-                (value) => !reservedRoutes.some((route) => value.startsWith(route)),
+                (value) => !RESERVED_ROUTES.some((route) => value.startsWith(route)),
                 'Provided route is reserved',
               ),
             filesLength: z.number().min(1).max(64),
@@ -213,7 +201,7 @@ export default typedPlugin(
               .string()
               .startsWith('/')
               .refine(
-                (value) => !reservedRoutes.some((route) => value.startsWith(route)),
+                (value) => !RESERVED_ROUTES.some((route) => value.startsWith(route)),
                 'Provided route is reserved',
               ),
             urlsLength: z.number().min(1).max(64),

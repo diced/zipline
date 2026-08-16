@@ -11,15 +11,14 @@ export async function onUpload(config: Config, { user, file, link }: Parameters<
     return;
   }
 
-  delete (<any>user).oauthProviders;
-  delete user.passkeys;
-  delete (<any>file).password;
+  const { oauthProviders: _oauthProviders, passkeys: _passkeys, ...safeUser } = user;
+  const { password: _password, ...safeFile } = file;
 
   const payload = {
     type: 'upload',
     data: {
-      user,
-      file,
+      user: safeUser,
+      file: safeFile,
       link,
     },
   };
@@ -55,15 +54,14 @@ export async function onShorten(config: Config, { user, url, link }: Parameters<
     return;
   }
 
-  delete (<any>user).oauthProviders;
-  delete user.passkeys;
-  delete (<any>url).password;
+  const { oauthProviders: _oauthProviders, passkeys: _passkeys, ...safeUser } = user;
+  const { password: _password, ...safeUrl } = url;
 
   const payload = {
     type: 'shorten',
     data: {
-      user,
-      url,
+      user: safeUser,
+      url: safeUrl,
       link,
     },
   };

@@ -44,7 +44,7 @@ export class LocalDatasource extends Datasource {
     return readStream;
   }
 
-  public async put(file: string, data: Buffer | string, { noDelete }: PutOptions): Promise<void> {
+  public async put(file: string, data: Buffer | string, { noDelete }: PutOptions = {}): Promise<void> {
     const path = this.resolvePath(file);
     if (!path) throw new Error('Invalid path provided');
 

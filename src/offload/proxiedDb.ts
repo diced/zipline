@@ -1,7 +1,7 @@
 import { randomCharacters } from '@/lib/random';
 import { parentPort } from 'worker_threads';
 
-export const pending: Record<string, (result: any) => void> = {};
+const pending: Record<string, (result: any) => void> = {};
 
 parentPort?.on('message', (message) => {
   if (message.type === 'response') {

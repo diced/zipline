@@ -10,6 +10,7 @@ import z from 'zod';
 
 export type ApiUserFilesIdPasswordResponse = {
   success: boolean;
+  token: string;
 };
 
 const logger = log('api').c('user').c('files').c('[id]').c('password');

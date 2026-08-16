@@ -1,7 +1,8 @@
 import { Paper, Group, Title, Text } from '@mantine/core';
-import { Icon } from '@tabler/icons-react';
+import type { Icon } from '@tabler/icons-react';
+import type { ReactNode } from 'react';
 
-export default function Stat({ title, value, Icon }: { title: string; value: any; Icon: Icon }) {
+export default function Stat({ title, value, Icon }: { title: string; value: ReactNode; Icon: Icon }) {
   return (
     <Paper p='md' radius='md' withBorder>
       <Group justify='space-between'>

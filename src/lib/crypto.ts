@@ -4,12 +4,12 @@ import { randomCharacters } from './random';
 
 const ALGORITHM = 'aes-256-gcm';
 
-export function createKey(secret: string): Buffer {
+function createKey(secret: string): Buffer {
   return crypto.createHash('sha256').update(secret, 'utf8').digest();
 }
 
 export function encrypt(value: string, secret: string): string {
-  const key = crypto.createHash('sha256').update(secret, 'utf8').digest();
+  const key = createKey(secret);
   const iv = crypto.randomBytes(12);
 
   const cipher = crypto.createCipheriv(ALGORITHM, key, iv);
@@ -21,7 +21,7 @@ export function encrypt(value: string, secret: string): string {
 }
 
 export function decrypt(value: string, secret: string): string {
-  const key = crypto.createHash('sha256').update(secret, 'utf8').digest();
+  const key = createKey(secret);
   const [ivHex, encryptedHex, tagHex] = value.split('.');
   if (!ivHex || !encryptedHex || !tagHex) throw new Error('Invalid values');
 

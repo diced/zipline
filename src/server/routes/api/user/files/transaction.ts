@@ -3,7 +3,7 @@ import { datasource } from '@/lib/datasource';
 import { prisma } from '@/lib/db';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
-import { canInteract } from '@/lib/role';
+import { canManage } from '@/lib/role';
 import { Role } from '@/prisma/client';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
@@ -16,16 +16,14 @@ export type ApiUserFilesTransactionResponse = {
 
 const logger = log('api').c('user').c('files').c('transaction');
 
-function checkInteraction(
+function findInvalidTargets(
   current: { id: string; role: Role },
   roles: { id: string; role: Role }[],
 ): number[] {
   const indices: number[] = [];
 
   for (let i = 0; i !== roles.length; ++i) {
-    if (roles[i].id === current.id) continue;
-
-    if (!canInteract(current.role, roles[i].role)) {
+    if (!canManage(current, roles[i])) {
       indices.push(i);
     }
   }
@@ -70,7 +68,7 @@ export default typedPlugin(
             },
           });
 
-          const invalids = checkInteraction(
+          const invalids = findInvalidTargets(
             { id: req.user.id, role: req.user.role },
             toFavoriteFiles.map((f) => ({ id: f.userId ?? '', role: f.User?.role ?? 'USER' })),
           );
@@ -172,7 +170,7 @@ export default typedPlugin(
           },
         });
 
-        const invalids = checkInteraction(
+        const invalids = findInvalidTargets(
           { id: req.user.id, role: req.user.role },
           toDeleteFiles.map((f) => ({ id: f.userId ?? '', role: f.User?.role ?? 'USER' })),
         );

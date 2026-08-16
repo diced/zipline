@@ -1,15 +1,14 @@
 import { mutateFolder } from '@/components/pages/folders/actions';
 import { Response } from '@/lib/api/response';
+import { copyLink } from '@/lib/client/copyLink';
 import type { File } from '@/lib/db/models/file';
 import { Folder } from '@/lib/db/models/folder';
 import { fetchApi } from '@/lib/fetchApi';
 import { conditionalWarning } from '@/lib/client/warningModal';
 import { getDomain } from '@/lib/client/webDomain';
-import { Anchor } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import {
-  IconCopy,
   IconFolderMinus,
   IconFolderOff,
   IconFolderPlus,
@@ -18,7 +17,6 @@ import {
   IconTrashFilled,
   IconTrashXFilled,
 } from '@tabler/icons-react';
-import { Link } from 'react-router-dom';
 import { mutate } from 'swr';
 
 export function viewFile(file: File) {
@@ -36,18 +34,7 @@ export function copyFile(file: File, clipboard: ReturnType<typeof useClipboard>,
       ? getDomain(file.url)
       : getDomain(`/view/${file.name}`);
 
-  clipboard.copy(url);
-
-  notifications.show({
-    title: 'Copied link',
-    message: (
-      <Anchor component={Link} to={url}>
-        {url}
-      </Anchor>
-    ),
-    color: 'green',
-    icon: <IconCopy size='1rem' />,
-  });
+  copyLink(url, clipboard);
 }
 
 export async function deleteFile(warnDeletion: boolean, file: File, setOpen: (open: boolean) => void) {
