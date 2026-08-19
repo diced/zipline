@@ -1,5 +1,5 @@
 import { ApiError } from '@/lib/api/errors';
-import { prisma } from '@/lib/db';
+import { findUserRowById } from '@/lib/db/models/user';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
 import z from 'zod';
@@ -22,16 +22,9 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const u = await prisma.user.findFirstOrThrow({
-          where: {
-            id: req.user.id,
-          },
-          select: {
-            avatar: true,
-          },
-        });
+        const u = await findUserRowById(req.user.id);
 
-        if (!u.avatar) throw new ApiError(9002);
+        if (!u?.avatar) throw new ApiError(9002);
 
         return res.send(u.avatar);
       },

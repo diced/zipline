@@ -3,13 +3,25 @@ import { checkQuota, getDomain, getExtension, getFilename, resolveUploadMimetype
 import { bytes } from '@/lib/bytes';
 import { config } from '@/lib/config';
 import { hashPassword } from '@/lib/crypto';
-import { prisma } from '@/lib/db';
-import { limitedUserSelect } from '@/lib/db/models/user';
+import { db } from '@/lib/db';
+import {
+  createFile,
+  deleteFileById,
+  type FileInsert,
+  lockFileOwner,
+  updateFileHydrated,
+} from '@/lib/db/models/file';
+import { findFolderRowById } from '@/lib/db/models/folder';
+import {
+  createIncompleteFile,
+  incrementIncompleteFileChunks,
+  updateIncompleteFile,
+} from '@/lib/db/models/incompleteFile';
+import { findFullUserById } from '@/lib/db/models/user';
 import { sanitizeFilename } from '@/lib/fs';
 import { log } from '@/lib/logger';
 import { randomCharacters } from '@/lib/random';
 import { UploadHeaders, UploadOptions, parseHeaders } from '@/lib/uploader/parseHeaders';
-import { Prisma } from '@/prisma/client';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
 import { z } from 'zod';
@@ -17,6 +29,7 @@ import { readdir, rename, rm } from 'fs/promises';
 import { join } from 'path';
 import { createWorker } from '@/lib/worker';
 import { ApiUploadResponse } from '.';
+import type { DomainDbRequest, DomainDbResponse } from '@/offload/proxiedDb';
 
 const logger = log('api').c('upload').c('partial');
 
@@ -173,11 +186,7 @@ export default typedPlugin(
 
         let folder = null;
         if (options.folder) {
-          folder = await prisma.folder.findFirst({
-            where: {
-              id: options.folder,
-            },
-          });
+          folder = await findFolderRowById(options.folder);
           if (!folder) throw new ApiError(4001);
 
           const ownsFolder = req.user ? folder.userId === req.user.id : false;
@@ -185,11 +194,7 @@ export default typedPlugin(
         }
 
         // use quota of folder owner for anonymous uploads
-        const quotaUser = req.user
-          ? req.user
-          : folder?.userId
-            ? await prisma.user.findUnique({ where: { id: folder.userId }, select: limitedUserSelect })
-            : null;
+        const quotaUser = req.user ? req.user : folder?.userId ? await findFullUserById(folder.userId) : null;
 
         const actorKey = req.user ? `user:${req.user.id}` : `anonymous:${folder?.id ?? 'unknown'}:${req.ip}`;
 
@@ -312,20 +317,16 @@ export default typedPlugin(
 
           if (config.files.assumeMimetypes) response.assumedMimetypes![0] = assumed;
 
-          const data: Prisma.FileCreateInput = {
+          const data: FileInsert = {
             name: `${fileName}${extension}`,
             size: total,
             type: mimetype,
-            User: {
-              connect: {
-                id: req.user ? req.user.id : options.folder ? folder?.userId : undefined,
-              },
-            },
+            userId: req.user ? req.user.id : options.folder ? folder?.userId : undefined,
           };
 
           if (options.password) data.password = await hashPassword(options.password);
           if (options.maxViews) data.maxViews = options.maxViews;
-          if (folder) data.Folder = { connect: { id: folder.id } };
+          if (folder) data.folderId = folder.id;
           if (options.addOriginalName) {
             const sanitizedOG = sanitizeFilename(options.partial.filename);
             if (!sanitizedOG) throw new ApiError(1008);
@@ -336,16 +337,16 @@ export default typedPlugin(
 
           let fileUpload;
           try {
-            fileUpload = await prisma.$transaction(async (tx) => {
+            fileUpload = await db.transaction(async (tx) => {
               if (quotaUser?.quota) {
-                await tx.$queryRaw`SELECT "id" FROM "User" WHERE "id" = ${quotaUser.id} FOR UPDATE`;
+                await lockFileOwner(quotaUser.id, tx);
 
                 const quotaCheck = await checkQuota(quotaUser, total, 1, tx);
                 if (quotaCheck !== true)
                   throw new ApiError(5002, typeof quotaCheck === 'string' ? quotaCheck : undefined);
               }
 
-              return tx.file.create({ data });
+              return createFile(data, tx);
             });
           } catch (error) {
             await deletePartial(options.partial.identifier);
@@ -384,38 +385,45 @@ export default typedPlugin(
 
           const partialIdentifier = options.partial.identifier;
 
-          worker.on('message', async (msg) => {
-            if (msg.type === 'query') {
-              let result;
+          worker.on('message', async (message: DomainDbRequest) => {
+            if (message.type !== 'db') return;
+            let result: unknown = null;
 
-              switch (msg.query) {
-                case 'incompleteFile.create':
-                  result = await prisma.incompleteFile.create(msg.data);
-                  break;
-                case 'incompleteFile.update':
-                  result = await prisma.incompleteFile.update(msg.data);
-                  break;
-                case 'file.update':
-                  result = await prisma.file.update(msg.data);
-                  await deletePartial(partialIdentifier, false);
-                  break;
-                case 'file.delete':
-                  result = await prisma.file.delete(msg.data);
-                  break;
-                case 'user.findUnique':
-                  result = await prisma.user.findUnique(msg.data);
-                  break;
-                default:
-                  console.error(`Unknown query type: ${msg.query}`);
-                  result = null;
+            switch (message.command) {
+              case 'incomplete.create':
+                result = await createIncompleteFile(message.payload);
+                break;
+              case 'incomplete.increment':
+                result = await incrementIncompleteFileChunks(message.payload.id, message.payload.status);
+                break;
+              case 'incomplete.status':
+                result = await updateIncompleteFile(message.payload.id, {
+                  status: message.payload.status,
+                });
+                break;
+              case 'file.finalizePartial':
+                result = await updateFileHydrated(message.payload.id, message.payload.changes);
+                await deletePartial(partialIdentifier, false);
+                break;
+              case 'file.delete': {
+                const deleted = await deleteFileById(message.payload.id);
+                result = deleted ? { id: deleted.id } : null;
+                break;
               }
-
-              worker.postMessage({
-                type: 'response',
-                id: msg.id,
-                result: JSON.stringify(result),
-              });
+              case 'user.uploadContext':
+                result = await findFullUserById(message.payload.id);
+                break;
+              default:
+                logger.error('unsupported partial worker database command', {
+                  command: message.command,
+                });
             }
+
+            worker.postMessage({
+              type: 'db-response',
+              id: message.id,
+              result: JSON.stringify(result),
+            } satisfies DomainDbResponse);
           });
 
           worker.once('exit', () => {

@@ -1,8 +1,6 @@
 import { ApiError } from '@/lib/api/errors';
-import { prisma } from '@/lib/db';
-import { Invite, inviteInviterSelect, inviteSchema } from '@/lib/db/models/invite';
+import { deleteInviteById, findInviteByIdentifier, Invite, inviteSchema } from '@/lib/db/models/invite';
 import { log } from '@/lib/logger';
-import { Prisma } from '@/prisma/client';
 import { administratorMiddleware } from '@/server/middleware/administrator';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
@@ -35,14 +33,7 @@ export default typedPlugin(
       async (req, res) => {
         const { id } = req.params;
 
-        const invite = await prisma.invite.findFirst({
-          where: {
-            OR: [{ id }, { code: id }],
-          },
-          include: {
-            inviter: inviteInviterSelect,
-          },
-        });
+        const invite = await findInviteByIdentifier(id);
         if (!invite) throw new ApiError(4005);
 
         return res.send(invite);
@@ -64,30 +55,22 @@ export default typedPlugin(
       async (req, res) => {
         const { id } = req.params;
 
+        let invite;
         try {
-          const invite = await prisma.invite.delete({
-            where: {
-              id: id,
-            },
-            include: {
-              inviter: inviteInviterSelect,
-            },
-          });
-
-          logger.info(`${req.user.username} deleted an invite`, {
-            id: invite.id,
-            code: invite.code,
-          });
-
-          return res.send(invite);
+          invite = await deleteInviteById(id);
         } catch (error) {
-          if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
-            throw new ApiError(4004);
-          }
-
           logger.error(`Failed to delete invite with id ${id}`, { error });
           throw new ApiError(6000);
         }
+
+        if (!invite) throw new ApiError(4004);
+
+        logger.info(`${req.user.username} deleted an invite`, {
+          id: invite.id,
+          code: invite.code,
+        });
+
+        return res.send(invite);
       },
     );
   },

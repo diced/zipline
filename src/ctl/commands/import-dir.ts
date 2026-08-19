@@ -1,7 +1,9 @@
 import { bytes } from '@/lib/bytes';
 import { config, reloadSettings } from '@/lib/config';
 import { getDatasource } from '@/lib/datasource';
-import { prisma } from '@/lib/db';
+import { createFiles } from '@/lib/db/models/file';
+import { findOwnedFolderById } from '@/lib/db/models/folder';
+import { findUserRowByUsername, listUserRows } from '@/lib/db/models/user';
 import { guess } from '@/lib/mimes';
 import { statSync } from 'fs';
 import { mkdir, readdir } from 'fs/promises';
@@ -21,16 +23,11 @@ export async function importDir(
   if (id) {
     userId = id;
   } else {
-    const user = await prisma.user.findFirst({
-      where: { username: 'administrator', role: 'SUPERADMIN' },
-    });
+    const candidate = await findUserRowByUsername('administrator');
+    const user = candidate?.role === 'SUPERADMIN' ? candidate : null;
 
     if (!user) {
-      const firstSuperAdmin = await prisma.user.findFirst({
-        where: {
-          role: 'SUPERADMIN',
-        },
-      });
+      const firstSuperAdmin = (await listUserRows()).find((entry) => entry.role === 'SUPERADMIN');
 
       if (!firstSuperAdmin) return console.error('No superadmin found or "administrator" user.');
 
@@ -43,12 +40,7 @@ export async function importDir(
   }
 
   if (folder) {
-    const exists = await prisma.folder.findFirst({
-      where: {
-        id: folder,
-        userId,
-      },
-    });
+    const exists = await findOwnedFolderById(folder, userId);
 
     if (!exists) return console.error('Folder not found:', folder);
   }
@@ -73,10 +65,8 @@ export async function importDir(
   }
 
   if (!skipDb) {
-    const { count } = await prisma.file.createMany({
-      data,
-    });
-    console.log(`Inserted ${count} files into the database.`);
+    const created = await createFiles(data);
+    console.log(`Inserted ${created.length} files into the database.`);
   }
 
   const totalSize = data.reduce((acc, file) => acc + file.size, 0);

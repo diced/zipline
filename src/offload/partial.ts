@@ -2,9 +2,7 @@ import { bytes } from '@/lib/bytes';
 import { Config } from '@/lib/config/validate';
 import { getDatasource } from '@/lib/datasource';
 import { S3Datasource } from '@/lib/datasource/S3';
-import { File, fileSelect } from '@/lib/db/models/file';
 import { IncompleteFile } from '@/lib/db/models/incompleteFile';
-import { limitedUserSelect, User, userSelect } from '@/lib/db/models/user';
 import { log } from '@/lib/logger';
 import { randomCharacters } from '@/lib/random';
 import { UploadOptions } from '@/lib/uploader/parseHeaders';
@@ -78,15 +76,13 @@ async function main() {
     })
     .sort((a, b) => a.start - b.start);
 
-  const incompleteFile = await dbProxy<IncompleteFile>('incompleteFile.create', {
-    data: {
-      chunksTotal: readChunks.length,
-      chunksComplete: 0,
-      status: 'PENDING',
-      userId: user.id,
-      metadata: {
-        file,
-      },
+  const incompleteFile = await dbProxy('incomplete.create', {
+    chunksTotal: readChunks.length,
+    chunksComplete: 0,
+    status: 'PENDING',
+    userId: user.id,
+    metadata: {
+      file,
     },
   });
 
@@ -116,16 +112,9 @@ async function main() {
       });
 
       await rm(chunkPath);
-      await dbProxy('incompleteFile.update', {
-        where: {
-          id: incompleteFile.id,
-        },
-        data: {
-          chunksComplete: {
-            increment: 1,
-          },
-          status: 'PROCESSING',
-        },
+      await dbProxy('incomplete.increment', {
+        id: incompleteFile.id,
+        status: 'PROCESSING',
       });
 
       logger.debug(`wrote chunk ${i + 1}/${readChunks.length}`, {
@@ -175,40 +164,29 @@ async function main() {
     }
   }
 
-  await dbProxy('incompleteFile.update', {
-    where: {
-      id: incompleteFile.id,
-    },
-    data: {
-      status: 'COMPLETE',
-    },
+  await dbProxy('incomplete.status', {
+    id: incompleteFile.id,
+    status: 'COMPLETE',
   });
 
   await runComplete(file.id, finalSize);
 }
 
 async function runComplete(id: string, size: number) {
-  const userr = await dbProxy<User>('user.findUnique', {
-    where: {
-      id: user.id,
-    },
-    select: config.discord?.onUpload || config.httpWebhook.onUpload ? userSelect : limitedUserSelect,
-  });
+  const userr = await dbProxy('user.uploadContext', { id: user.id });
   if (!userr) return;
 
-  const fileUpload = await dbProxy<File>('file.update', {
-    where: {
-      id,
-    },
-    data: {
+  const fileUpload = await dbProxy('file.finalizePartial', {
+    id,
+    changes: {
       size,
       ...(options.maxViews && { maxViews: options.maxViews }),
       ...(options.deletesAt && options.deletesAt !== 'never'
         ? { deletesAt: options.deletesAt }
         : { deletesAt: null }),
     },
-    select: fileSelect,
   });
+  if (!fileUpload) return;
 
   logger.info(`${userr.username} uploaded ${fileUpload.name}`, {
     size: bytes(fileUpload.size),
@@ -228,7 +206,7 @@ async function runComplete(id: string, size: number) {
 async function failPartial(config: Config, incompleteFile: IncompleteFile) {
   logger.error('failing incomplete file', { id: incompleteFile.id });
 
-  await dbProxy('file.delete', { where: { id: file.id } });
+  await dbProxy('file.delete', { id: file.id });
 
   const partials = await readdir(config.core.tempDirectory).then((files) =>
     files.filter((file) => file.startsWith(`zipline_partial_${options.partial!.identifier}`)),
@@ -240,12 +218,8 @@ async function failPartial(config: Config, incompleteFile: IncompleteFile) {
     } catch {}
   }
 
-  return dbProxy('incompleteFile.update', {
-    where: {
-      id: incompleteFile.id,
-    },
-    data: {
-      status: 'FAILED',
-    },
+  return dbProxy('incomplete.status', {
+    id: incompleteFile.id,
+    status: 'FAILED',
   });
 }

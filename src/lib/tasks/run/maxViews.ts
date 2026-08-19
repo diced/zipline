@@ -2,37 +2,19 @@ import { datasource } from '@/lib/datasource';
 import { IntervalTask } from '..';
 import { bytes } from '@/lib/bytes';
 import { config } from '@/lib/config';
+import { db } from '@/lib/db';
+import { deleteFilesByIds, listFilesAtMaxViews } from '@/lib/db/models/file';
+import { deleteUrlsByIds, listUrlsAtMaxViews } from '@/lib/db/models/url';
 
-export default function maxViews(prisma: typeof globalThis.__db__) {
+export default function maxViews() {
   return async function (this: IntervalTask) {
-    const files = await prisma.file.findMany({
-      where: {
-        views: {
-          gte: prisma.file.fields.maxViews,
-        },
-      },
-      select: {
-        name: true,
-        id: true,
-        size: true,
-      },
-    });
+    const files = await listFilesAtMaxViews();
 
     this.logger.debug(`found ${files.length} expired files`, {
       files: files.map((f) => f.name),
     });
 
-    const urls = await prisma.url.findMany({
-      where: {
-        views: {
-          gte: prisma.url.fields.maxViews,
-        },
-      },
-      select: {
-        id: true,
-        destination: true,
-      },
-    });
+    const urls = await listUrlsAtMaxViews();
 
     this.logger.debug(`found ${urls.length} expired urls`, {
       dests: urls.map((u) => u.destination),
@@ -53,23 +35,18 @@ export default function maxViews(prisma: typeof globalThis.__db__) {
       }
     }
 
-    const fileDelete = prisma.file.deleteMany({
-      where: {
-        id: {
-          in: files.map((f) => f.id),
-        },
-      },
-    });
-
-    const urlDelete = prisma.url.deleteMany({
-      where: {
-        id: {
-          in: urls.map((u) => u.id),
-        },
-      },
-    });
-
-    const [{ count: fileCount }, { count: urlCount }] = await prisma.$transaction([fileDelete, urlDelete]);
+    const [fileCount, urlCount] = await db.transaction(async (tx) =>
+      Promise.all([
+        deleteFilesByIds(
+          files.map((f) => f.id),
+          tx,
+        ),
+        deleteUrlsByIds(
+          urls.map((u) => u.id),
+          tx,
+        ),
+      ]),
+    );
 
     if (fileCount)
       this.logger.info(`deleted ${fileCount} files due to max views`, {

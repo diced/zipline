@@ -2,7 +2,7 @@ import RelativeDate from '@/components/RelativeDate';
 import { fetchApi } from '@/lib/fetchApi';
 import useObjectState from '@/lib/client/hooks/useObjectState';
 import { useUserStore } from '@/lib/client/store/user';
-import { UserPasskey } from '@/prisma/client';
+import type { UserPasskey } from '@/lib/db/models/user';
 import { ActionIcon, Button, Group, Modal, Paper, Stack, Text, TextInput } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';

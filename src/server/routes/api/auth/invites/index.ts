@@ -1,6 +1,5 @@
 import { config } from '@/lib/config';
-import { prisma } from '@/lib/db';
-import { Invite, inviteInviterSelect, inviteSchema } from '@/lib/db/models/invite';
+import { createInvite, Invite, inviteSchema, listInvites } from '@/lib/db/models/invite';
 import { log } from '@/lib/logger';
 import { randomCharacters } from '@/lib/random';
 import { secondlyRatelimit } from '@/lib/ratelimits';
@@ -41,16 +40,11 @@ export default typedPlugin(
       async (req, res) => {
         const { expiresAt, maxUses } = req.body;
 
-        const invite = await prisma.invite.create({
-          data: {
-            code: randomCharacters(config.invites.length),
-            expiresAt,
-            maxUses: maxUses ?? null,
-            inviterId: req.user.id,
-          },
-          include: {
-            inviter: inviteInviterSelect,
-          },
+        const invite = await createInvite({
+          code: randomCharacters(config.invites.length),
+          expiresAt,
+          maxUses: maxUses ?? null,
+          inviterId: req.user.id,
         });
 
         logger.info(`${req.user.username} created an invite`, {
@@ -75,11 +69,7 @@ export default typedPlugin(
         preHandler: [userMiddleware, administratorMiddleware],
       },
       async (_, res) => {
-        const invites = await prisma.invite.findMany({
-          include: {
-            inviter: inviteInviterSelect,
-          },
-        });
+        const invites = await listInvites();
 
         return res.send(invites);
       },

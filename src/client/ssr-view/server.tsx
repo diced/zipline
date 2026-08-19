@@ -9,9 +9,8 @@ import { verifyAccessToken } from '@/lib/accessToken';
 import { isCode } from '@/lib/code';
 import { config as zConfig } from '@/lib/config';
 import type { Config } from '@/lib/config/validate';
-import { prisma } from '@/lib/db';
-import { findFileByName, File, fileSelect } from '@/lib/db/models/file';
-import { User, userSelect } from '@/lib/db/models/user';
+import { findFileByName, File } from '@/lib/db/models/file';
+import { findLimitedUserById, User } from '@/lib/db/models/user';
 import { parseString } from '@/lib/parser';
 import { parserMetrics } from '@/lib/parser/metrics';
 import { createZiplineSsr } from '@/lib/ssr/createZiplineSsr';
@@ -24,20 +23,7 @@ import { createStaticHandler, createStaticRouter, StaticRouterProvider } from 'r
 import { createRoutes } from './routes';
 
 export const getFile = async (id: string) =>
-  findFileByName(id, (where, orderBy) =>
-    prisma.file.findFirst({
-      where,
-      ...(orderBy && { orderBy }),
-      select: {
-        ...fileSelect,
-        password: true,
-        userId: true,
-        thumbnail: { select: { path: true } },
-        tags: { select: { id: true, name: true, color: true } },
-        Folder: { select: { id: true, public: true, name: true } },
-      },
-    }),
-  );
+  findFileByName(id, { thumbnail: true, tags: true, folder: true });
 
 export async function render(
   {
@@ -62,18 +48,9 @@ export async function render(
   if (file.maxViews && file.views >= file.maxViews) return { html: 'Gone', meta: '', status: 410 };
   if (file.deletesAt && file.deletesAt <= new Date()) return { html: 'Expired', meta: '', status: 410 };
 
-  const user = await prisma.user.findFirst({
-    where: { id: file.userId },
-    select: {
-      ...userSelect,
-      oauthProviders: false,
-      passkeys: false,
-      sessions: false,
-      totpEnabled: false,
-      quota: false,
-    },
-  });
-  if (!user) return { html: 'Not Found', meta: '', status: 404 };
+  const limitedUser = await findLimitedUserById(file.userId);
+  if (!limitedUser) return { html: 'Not Found', meta: '', status: 404 };
+  const { quota: _quota, avatar: _avatar, ...user } = limitedUser;
 
   let host = req.headers.host || 'localhost';
   const proto = req.headers['x-forwarded-proto'];

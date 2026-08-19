@@ -1,8 +1,16 @@
 import { ApiError } from '@/lib/api/errors';
 import { config } from '@/lib/config';
 import { hashPassword } from '@/lib/crypto';
-import { prisma } from '@/lib/db';
-import { cleanUrlPasswords, Url, urlSchema } from '@/lib/db/models/url';
+import {
+  cleanUrlPasswords,
+  createUrlForUser,
+  listUserUrls,
+  searchUserUrls,
+  Url,
+  urlCodeExists,
+  urlSchema,
+  urlVanityExists,
+} from '@/lib/db/models/url';
 import { log } from '@/lib/logger';
 import { randomCharacters } from '@/lib/random';
 import { RESERVED_ROUTES } from '@/lib/reservedRoutes';
@@ -90,48 +98,32 @@ export default typedPlugin(
           : undefined;
 
         if (vanity) {
-          const existingVanity = await prisma.url.findFirst({
-            where: {
-              vanity: vanity,
-            },
-          });
-
-          if (existingVanity) throw new ApiError(1042);
+          if (await urlVanityExists(vanity)) throw new ApiError(1042);
         }
 
         let code, existingCode;
         do {
           code = randomCharacters(config.urls.length);
-          existingCode = await prisma.url.findFirst({ where: { code } });
+          existingCode = await urlCodeExists(code);
         } while (existingCode);
 
-        const url = await prisma.$transaction(async (tx) => {
-          await tx.$queryRaw`SELECT "id" FROM "User" WHERE "id" = ${req.user.id} FOR UPDATE`;
-
-          const countUrls = await tx.url.count({
-            where: { userId: req.user.id },
-          });
-          if (req.user.quota?.maxUrls && countUrls + 1 > req.user.quota.maxUrls)
-            throw new ApiError(
-              3012,
-              `Shortening this URL would exceed your quota of ${req.user.quota.maxUrls} URLs.`,
-            );
-
-          return tx.url.create({
-            data: {
-              userId: req.user.id,
-              destination: destination,
-              code,
-              ...(vanity && { vanity: vanity }),
-              ...(maxViews && { maxViews: maxViews }),
-              ...(password && { password: password }),
-              ...(enabled !== undefined && { enabled: enabled }),
-            },
-            omit: {
-              password: true,
-            },
-          });
-        });
+        const url = await createUrlForUser(
+          {
+            userId: req.user.id,
+            destination,
+            code,
+            vanity,
+            maxViews,
+            password,
+            enabled,
+          },
+          req.user.quota?.maxUrls,
+        );
+        if (!url)
+          throw new ApiError(
+            3012,
+            `Shortening this URL would exceed your quota of ${req.user.quota?.maxUrls} URLs.`,
+          );
 
         let domain;
         if (returnDomain) {
@@ -188,27 +180,12 @@ export default typedPlugin(
         const { searchField, searchQuery } = req.query;
 
         if (searchQuery) {
-          const similarityResult = await prisma.url.findMany({
-            where: {
-              [searchField]: {
-                mode: 'insensitive',
-                contains: searchQuery,
-              },
-              userId: req.user.id,
-            },
-            omit: {
-              password: true,
-            },
-          });
+          const similarityResult = await searchUserUrls(req.user.id, searchField, searchQuery);
 
           return res.send(similarityResult);
         }
 
-        const urls = await prisma.url.findMany({
-          where: {
-            userId: req.user.id,
-          },
-        });
+        const urls = await listUserUrls(req.user.id);
 
         return res.send(cleanUrlPasswords(urls));
       },

@@ -1,5 +1,10 @@
-import { prisma } from '@/lib/db';
-import { IncompleteFile, incompleteFileSchema } from '@/lib/db/models/incompleteFile';
+import {
+  deleteIncompleteFilesByIds,
+  IncompleteFile,
+  incompleteFileSchema,
+  listIncompleteFilesForUser,
+  listOwnedIncompleteFiles,
+} from '@/lib/db/models/incompleteFile';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { userMiddleware } from '@/server/middleware/user';
@@ -26,11 +31,7 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const incompleteFiles = await prisma.incompleteFile.findMany({
-          where: {
-            userId: req.user.id,
-          },
-        });
+        const incompleteFiles = await listIncompleteFilesForUser(req.user.id);
 
         return res.send(incompleteFiles);
       },
@@ -55,22 +56,9 @@ export default typedPlugin(
         ...secondlyRatelimit(1),
       },
       async (req, res) => {
-        const existingFiles = await prisma.incompleteFile.findMany({
-          where: {
-            id: {
-              in: req.body.id,
-            },
-            userId: req.user.id,
-          },
-        });
-
-        const incompleteFiles = await prisma.incompleteFile.deleteMany({
-          where: {
-            id: {
-              in: existingFiles.map((x) => x.id),
-            },
-          },
-        });
+        const existingFiles = await listOwnedIncompleteFiles(req.body.id, req.user.id);
+        const count = await deleteIncompleteFilesByIds(existingFiles.map((file) => file.id));
+        const incompleteFiles = { count };
 
         logger.info('incomplete files deleted', {
           count: incompleteFiles.count,

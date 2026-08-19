@@ -1,6 +1,17 @@
 import { ApiError } from '@/lib/api/errors';
 import { createToken } from '@/lib/crypto';
-import { prisma } from '@/lib/db';
+import {
+  createImportFile,
+  createImportUrl,
+  createV3ImportFolder,
+  createV3ImportUser,
+  findImportFileByName,
+  findImportOauthProviderByOauthId,
+  findImportUrlByCode,
+  findImportUserByUsername,
+  type ImportedOauthProviderInput,
+  updateV3ImportUser,
+} from '@/lib/db/models/serverData';
 import { sanitizeFilename } from '@/lib/fs';
 import { export3Schema } from '@/lib/import/version3/validateExport';
 import { log } from '@/lib/logger';
@@ -71,11 +82,7 @@ export default typedPlugin(
           const role =
             (user.super_administrator && 'SUPERADMIN') || (user.administrator && 'ADMIN') || 'USER';
 
-          const existing = await prisma.user.findFirst({
-            where: {
-              username: user.username,
-            },
-          });
+          const existing = await findImportUserByUsername(user.username);
 
           if (!importFrom && existing) {
             logger.warn('user already exists, skipping importing', {
@@ -86,13 +93,9 @@ export default typedPlugin(
             continue;
           }
 
-          const oauthProviders = [];
+          const oauthProviders: ImportedOauthProviderInput[] = [];
           for (const provider of user.oauth) {
-            const existing = await prisma.oAuthProvider.findFirst({
-              where: {
-                oauthId: provider.oauth_id,
-              },
-            });
+            const existing = await findImportOauthProviderByOauthId(provider.oauth_id);
 
             if (existing) {
               logger.warn('oauth provider already exists, skipping importing', {
@@ -104,54 +107,40 @@ export default typedPlugin(
             }
 
             oauthProviders.push({
-              provider: provider.provider as any,
-              accessToken: provider.access_token!,
+              provider: provider.provider,
+              accessToken: provider.access_token as string,
               refreshToken: provider.refresh_token ?? null,
               oauthId: provider.oauth_id ?? null,
-              username: provider.username!,
+              username: provider.username,
             });
           }
 
           if (importFrom) {
-            const updated = await prisma.user.update({
-              where: {
-                id: req.user.id,
-              },
-              data: {
+            const updated = await updateV3ImportUser(
+              req.user.id,
+              {
                 avatar: user.avatar ?? null,
                 totpSecret: user.totp_secret ?? null,
-                ...(user.oauth.length > 0 && {
-                  oauthProviders: {
-                    createMany: {
-                      data: oauthProviders,
-                    },
-                  },
-                }),
               },
-            });
+              oauthProviders,
+            );
 
             usersImportedToId[id] = updated.id;
 
             continue;
           }
 
-          const created = await prisma.user.create({
-            data: {
+          const created = await createV3ImportUser(
+            {
               username: user.username,
               password: user.password || null,
               role,
               token: createToken(),
               avatar: user.avatar ?? null,
               totpSecret: user.totp_secret ?? null,
-              ...(user.oauth.length > 0 && {
-                oauthProviders: {
-                  createMany: {
-                    data: oauthProviders,
-                  },
-                },
-              }),
             },
-          });
+            oauthProviders,
+          );
 
           usersImportedToId[id] = created.id;
         }
@@ -169,11 +158,7 @@ export default typedPlugin(
             continue;
           }
 
-          const existing = await prisma.file.findFirst({
-            where: {
-              name: file.name,
-            },
-          });
+          const existing = await findImportFileByName(file.name);
 
           if (existing) {
             logger.warn('file already exists, skipping importing', {
@@ -190,20 +175,18 @@ export default typedPlugin(
             logger.warn('file has invalid name, using random name', { file: id, new: sanitizedFilename });
           }
 
-          const created = await prisma.file.create({
-            data: {
-              userId: user,
-              name: sanitizedFilename,
-              originalName: file.original_name || null,
-              type: file.type,
-              size: file.size,
-              maxViews: file.max_views || null,
-              views: file.views || 0,
-              deletesAt: file.expires_at ? parseDate(file.expires_at) : null,
-              createdAt: parseDate(file.created_at),
-              favorite: file.favorite || false,
-              password: file.password || null,
-            },
+          const created = await createImportFile({
+            userId: user,
+            name: sanitizedFilename,
+            originalName: file.original_name || null,
+            type: file.type,
+            size: Number(file.size),
+            maxViews: file.max_views || null,
+            views: file.views || 0,
+            deletesAt: file.expires_at ? parseDate(file.expires_at) : null,
+            createdAt: parseDate(file.created_at),
+            favorite: file.favorite || false,
+            password: file.password || null,
           });
 
           filesImportedToId[id] = created.id;
@@ -229,18 +212,12 @@ export default typedPlugin(
             continue;
           }
 
-          const created = await prisma.folder.create({
-            data: {
-              userId: user,
-              name: folder.name,
-              public: folder.public,
-              createdAt: parseDate(folder.created_at),
-              files: {
-                connect: folder.files.map((file) => ({
-                  id: filesImportedToId[file],
-                })),
-              },
-            },
+          const created = await createV3ImportFolder({
+            userId: user,
+            name: folder.name,
+            public: folder.public,
+            createdAt: parseDate(folder.created_at),
+            fileIds: folder.files.map((file) => filesImportedToId[file]),
           });
 
           foldersImportedToId[id] = created.id;
@@ -259,11 +236,7 @@ export default typedPlugin(
             continue;
           }
 
-          const existing = await prisma.url.findFirst({
-            where: {
-              code: url.code,
-            },
-          });
+          const existing = await findImportUrlByCode(url.code);
 
           if (existing) {
             logger.warn('url already exists, skipping importing', {
@@ -274,16 +247,14 @@ export default typedPlugin(
             continue;
           }
 
-          const created = await prisma.url.create({
-            data: {
-              userId: user,
-              destination: url.destination,
-              vanity: url.vanity || null,
-              code: url.code,
-              maxViews: url.max_views || null,
-              views: url.views || 0,
-              createdAt: parseDate(url.created_at),
-            },
+          const created = await createImportUrl({
+            userId: user,
+            destination: url.destination,
+            vanity: url.vanity || null,
+            code: url.code,
+            maxViews: url.max_views || null,
+            views: url.views || 0,
+            createdAt: parseDate(url.created_at),
           });
 
           urlsImportedToId[id] = created.id;

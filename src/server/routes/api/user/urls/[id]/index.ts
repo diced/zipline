@@ -1,7 +1,14 @@
 import { ApiError } from '@/lib/api/errors';
 import { hashPassword } from '@/lib/crypto';
-import { prisma } from '@/lib/db';
-import { Url, urlSchema } from '@/lib/db/models/url';
+import {
+  deleteOwnedUrlById,
+  findOwnedUrlById,
+  findOwnedUrlByIdWithoutPassword,
+  updateOwnedUrlById,
+  Url,
+  urlSchema,
+  urlVanityExists,
+} from '@/lib/db/models/url';
 import { log } from '@/lib/logger';
 import { zStringTrimmed } from '@/lib/validation';
 import { userMiddleware } from '@/server/middleware/user';
@@ -34,15 +41,7 @@ export default typedPlugin(
       async (req, res) => {
         const { id } = req.params;
 
-        const url = await prisma.url.findFirst({
-          where: {
-            id: id,
-            userId: req.user.id,
-          },
-          omit: {
-            password: true,
-          },
-        });
+        const url = await findOwnedUrlByIdWithoutPassword(id, req.user.id);
         if (!url) throw new ApiError(9002);
 
         return res.send(url);
@@ -71,12 +70,7 @@ export default typedPlugin(
       async (req, res) => {
         const { id } = req.params;
 
-        const url = await prisma.url.findFirst({
-          where: {
-            id: id,
-            userId: req.user.id,
-          },
-        });
+        const url = await findOwnedUrlById(id, req.user.id);
 
         if (!url) throw new ApiError(9002);
 
@@ -92,30 +86,17 @@ export default typedPlugin(
         }
 
         if (req.body.vanity) {
-          const existingUrl = await prisma.url.findFirst({
-            where: {
-              vanity: req.body.vanity,
-            },
-          });
-
-          if (existingUrl) throw new ApiError(1041);
+          if (await urlVanityExists(req.body.vanity)) throw new ApiError(1041);
         }
 
-        const updatedUrl = await prisma.url.update({
-          where: {
-            id: id,
-          },
-          data: {
-            ...(req.body.vanity !== undefined && { vanity: req.body.vanity }),
-            ...(req.body.password !== undefined && { password }),
-            ...(req.body.maxViews !== undefined && { maxViews: req.body.maxViews }),
-            ...(req.body.destination !== undefined && { destination: req.body.destination }),
-            ...(req.body.enabled !== undefined && { enabled: req.body.enabled }),
-          },
-          omit: {
-            password: true,
-          },
+        const updatedUrl = await updateOwnedUrlById(id, req.user.id, {
+          ...(req.body.vanity !== undefined && { vanity: req.body.vanity }),
+          ...(req.body.password !== undefined && { password }),
+          ...(req.body.maxViews !== undefined && { maxViews: req.body.maxViews }),
+          ...(req.body.destination !== undefined && { destination: req.body.destination }),
+          ...(req.body.enabled !== undefined && { enabled: req.body.enabled }),
         });
+        if (!updatedUrl) throw new ApiError(9002);
 
         logger.info(`${req.user.username} updated URL ${updatedUrl.id}`, {
           updated: Object.keys(req.body),
@@ -140,23 +121,8 @@ export default typedPlugin(
       async (req, res) => {
         const { id } = req.params;
 
-        const url = await prisma.url.findFirst({
-          where: {
-            id: id,
-            userId: req.user.id,
-          },
-        });
-
-        if (!url) throw new ApiError(9002);
-
-        const deletedUrl = await prisma.url.delete({
-          where: {
-            id: id,
-          },
-          omit: {
-            password: true,
-          },
-        });
+        const deletedUrl = await deleteOwnedUrlById(id, req.user.id);
+        if (!deletedUrl) throw new ApiError(9002);
 
         logger.info(`${req.user.username} deleted URL ${deletedUrl.id}`, {
           dest: deletedUrl.destination,

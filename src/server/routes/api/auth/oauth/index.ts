@@ -1,6 +1,12 @@
 import { ApiError } from '@/lib/api/errors';
-import { prisma } from '@/lib/db';
-import { OAuthProvider, oauthProviderSchema, oauthProviderSelect } from '@/lib/db/models/user';
+import { db } from '@/lib/db';
+import { deleteOAuthProviders } from '@/lib/db/models/oauth';
+import {
+  findFullUserById,
+  findUserRowById,
+  type OAuthProvider,
+  oauthProviderSchema,
+} from '@/lib/db/models/user';
 import { log } from '@/lib/logger';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
@@ -43,41 +49,24 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const { password } = (await prisma.user.findFirst({
-          where: {
-            id: req.user.id,
-          },
-          select: {
-            password: true,
-          },
-        }))!;
+        const { password } = (await findUserRowById(req.user.id))!;
 
         if (!req.user.oauthProviders.length) throw new ApiError(1030);
         if (req.user.oauthProviders.length === 1 && !password) throw new ApiError(1043);
 
         const { provider } = req.body;
 
-        const providers = await prisma.user.update({
-          where: {
-            id: req.user.id,
-          },
-          data: {
-            oauthProviders: {
-              deleteMany: [{ provider }],
-            },
-          },
-          select: {
-            oauthProviders: {
-              select: oauthProviderSelect,
-            },
-          },
+        const user = await db.transaction(async (tx) => {
+          await deleteOAuthProviders(req.user.id, provider, tx);
+          return findFullUserById(req.user.id, tx);
         });
+        if (!user) throw new Error(`User ${req.user.id} no longer exists`);
 
         logger.info(`${req.user.username} unlinked an oauth provider`, {
           provider,
         });
 
-        return res.send(providers.oauthProviders);
+        return res.send(user.oauthProviders);
       },
     );
   },

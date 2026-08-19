@@ -1,7 +1,14 @@
 import { ApiError } from '@/lib/api/errors';
 import { config } from '@/lib/config';
-import { prisma } from '@/lib/db';
-import { User, userSchema, userSelect } from '@/lib/db/models/user';
+import { db } from '@/lib/db';
+import {
+  disableTotp,
+  enableTotpIfUnset,
+  findFullUserById,
+  findUserRowById,
+  type User,
+  userSchema,
+} from '@/lib/db/models/user';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { generateKey, totpQrcode, verifyTotpCode } from '@/lib/totp';
@@ -97,20 +104,11 @@ export default typedPlugin(
         const valid = await verifyTotpCode(code, secret);
         if (!valid) throw new ApiError(1045);
 
-        const user = await prisma.$transaction(async (tx) => {
-          const updated = await tx.user.updateMany({
-            where: {
-              id: req.user.id,
-              totpSecret: null,
-            },
-            data: { totpSecret: secret },
-          });
-          if (!updated.count) throw new ApiError(1069);
-
-          return tx.user.findUniqueOrThrow({
-            where: { id: req.user.id },
-            select: userSelect,
-          });
+        const user = await db.transaction(async (tx) => {
+          if (!(await enableTotpIfUnset(req.user.id, secret, tx))) throw new ApiError(1069);
+          const current = await findFullUserById(req.user.id, tx);
+          if (!current) throw new ApiError(1069);
+          return current;
         });
 
         logger.info('user enabled TOTP', {
@@ -138,22 +136,16 @@ export default typedPlugin(
       async (req, res) => {
         if (!req.user.totpEnabled) throw new ApiError(1053);
 
-        const current = await prisma.user.findUniqueOrThrow({
-          where: { id: req.user.id },
-          select: { totpSecret: true },
-        });
-        if (!current.totpSecret) throw new ApiError(1053);
+        const current = await findUserRowById(req.user.id);
+        if (!current?.totpSecret) throw new ApiError(1053);
 
         const { code } = req.body;
 
         const valid = await verifyTotpCode(code, current.totpSecret);
         if (!valid) throw new ApiError(1045);
 
-        const user = await prisma.user.update({
-          where: { id: req.user.id },
-          data: { totpSecret: null },
-          select: userSelect,
-        });
+        const user = await disableTotp(req.user.id);
+        if (!user) throw new ApiError(1053);
 
         logger.info('user disabled TOTP', {
           user: user.username,

@@ -1,6 +1,5 @@
 import { ApiError } from '@/lib/api/errors';
-import { prisma } from '@/lib/db';
-import { Tag, tagSchema, tagSelect } from '@/lib/db/models/tag';
+import { createTag, findTagByName, listTagsForUser, Tag, tagSchema } from '@/lib/db/models/tag';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { zStringTrimmed } from '@/lib/validation';
@@ -28,12 +27,7 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const tags = await prisma.tag.findMany({
-          where: {
-            userId: req.user.id,
-          },
-          select: tagSelect,
-        });
+        const tags = await listTagsForUser(req.user.id);
 
         return res.send(tags);
       },
@@ -59,23 +53,11 @@ export default typedPlugin(
       async (req, res) => {
         const { name, color } = req.body;
 
-        const existingTag = await prisma.tag.findFirst({
-          where: {
-            name,
-            userId: req.user.id,
-          },
-        });
+        const existingTag = await findTagByName(name, req.user.id);
 
         if (existingTag) throw new ApiError(1033);
 
-        const tag = await prisma.tag.create({
-          data: {
-            name,
-            color,
-            userId: req.user.id,
-          },
-          select: tagSelect,
-        });
+        const tag = await createTag({ name, color, userId: req.user.id });
 
         logger.info('tag created', {
           id: tag.id,

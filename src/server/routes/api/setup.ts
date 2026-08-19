@@ -1,8 +1,8 @@
 import { ApiError } from '@/lib/api/errors';
 import { createToken, hashPassword } from '@/lib/crypto';
-import { prisma } from '@/lib/db';
-import { User, userSchema, userSelect } from '@/lib/db/models/user';
-import { getZipline } from '@/lib/db/models/zipline';
+import { db } from '@/lib/db';
+import { createFullUser, type User, userSchema } from '@/lib/db/models/user';
+import { claimFirstSetup, getZipline } from '@/lib/db/models/zipline';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { zStringTrimmed } from '@/lib/validation';
@@ -67,23 +67,18 @@ export default typedPlugin(
 
         logger.info('first setup running');
 
-        const user = await prisma.$transaction(async (tx) => {
-          const claimed = await tx.zipline.updateMany({
-            where: { firstSetup: true },
-            data: { firstSetup: false },
-          });
+        const user = await db.transaction(async (tx) => {
+          if (!(await claimFirstSetup(tx))) throw new ApiError(9001);
 
-          if (claimed.count === 0) throw new ApiError(9001);
-
-          return tx.user.create({
-            data: {
+          return createFullUser(
+            {
               username,
               password: hashed,
               role: 'SUPERADMIN',
               token,
             },
-            select: userSelect,
-          });
+            tx,
+          );
         });
 
         logger.info('first setup complete');

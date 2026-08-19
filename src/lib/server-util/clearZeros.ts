@@ -1,33 +1,20 @@
 import { datasource } from '../datasource';
-import { prisma } from '../db';
+import { listFileRows, deleteFilesByIds } from '../db/models/file';
+import { files as fileTable } from '../db/schema';
 import { log } from '../logger';
+import { eq } from 'drizzle-orm';
 
 const logger = log('serverutil').c('clearZeros');
 
 export async function clearZerosFiles(): Promise<{ id: string; name: string }[]> {
-  const files = await prisma.file.findMany({
-    where: {
-      size: 0,
-    },
-    select: {
-      id: true,
-      name: true,
-    },
-  });
-
-  return files;
+  const files = await listFileRows({ where: eq(fileTable.size, 0) });
+  return files.map(({ id, name }) => ({ id, name }));
 }
 
 export async function clearZeros(files: Awaited<ReturnType<typeof clearZerosFiles>>): Promise<string> {
   logger.info('preparing to clear files with a size of 0', { count: files.length });
 
-  const { count } = await prisma.file.deleteMany({
-    where: {
-      id: {
-        in: files.map((file) => file.id),
-      },
-    },
-  });
+  const count = await deleteFilesByIds(files.map((file) => file.id));
 
   logger.info('cleared files from the database with a size of 0', { count });
 

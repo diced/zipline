@@ -1,8 +1,19 @@
 import { ApiError } from '@/lib/api/errors';
 import { datasource } from '@/lib/datasource';
-import { prisma } from '@/lib/db';
-import { fileSelect } from '@/lib/db/models/file';
-import { buildParentChain, Folder, cleanFolder, folderSchema } from '@/lib/db/models/folder';
+import { fileBelongsToFolder, findFileById } from '@/lib/db/models/file';
+import {
+  buildParentChain,
+  deleteFolderWithChildren,
+  findFolderWithOwner,
+  folderParentStatus,
+  Folder,
+  cleanFolder,
+  folderSchema,
+  getFolderDetails,
+  moveFileToFolder,
+  removeFileFromFolder,
+  updateFolder,
+} from '@/lib/db/models/folder';
 import { log } from '@/lib/logger';
 import { canManage } from '@/lib/role';
 import { zQsBoolean, zStringTrimmed } from '@/lib/validation';
@@ -19,22 +30,10 @@ const paramsSchema = z.object({
   id: z.string(),
 });
 
-const folderMutationInclude = {
-  _count: { select: { children: true, files: true } },
-  parent: { select: { id: true, name: true, parentId: true } },
-} as const;
-
 const folderExistsAndEditable = async (req: FastifyRequest) => {
   const { id } = req.params as z.infer<typeof paramsSchema>;
 
-  const folder = await prisma.folder.findUnique({
-    where: {
-      id,
-    },
-    include: {
-      User: true,
-    },
-  });
+  const folder = await findFolderWithOwner(id);
 
   if (!folder) throw new ApiError(4001);
   if (!canManage(req.user, folder.User)) throw new ApiError(4001);
@@ -64,36 +63,7 @@ export default typedPlugin(
         const { id } = req.params;
         const { noincl } = req.query;
 
-        const folder = await prisma.folder.findUnique({
-          where: {
-            id,
-          },
-          include: {
-            ...(!noincl && {
-              files: {
-                select: {
-                  ...fileSelect,
-                  password: true,
-                },
-              },
-            }),
-            User: true,
-            children: {
-              orderBy: { createdAt: 'desc' },
-              include: {
-                _count: {
-                  select: { children: true, files: true },
-                },
-              },
-            },
-            parent: {
-              select: { id: true, name: true, parentId: true },
-            },
-            _count: {
-              select: { children: true, files: true },
-            },
-          },
-        });
+        const folder = await getFolderDetails(id, !noincl);
         if (!folder) throw new ApiError(4001);
 
         if (folder.parentId) {
@@ -124,42 +94,21 @@ export default typedPlugin(
         const { id: folderId } = req.params;
         const { id } = req.body;
 
-        const file = await prisma.file.findUnique({
-          where: {
-            id,
-          },
-          include: {
-            User: true,
-          },
+        const file = await findFileById(id, {
+          thumbnail: false,
+          tags: false,
+          owner: true,
         });
         if (!file) throw new ApiError(4000);
         if (!canManage(req.user, file.User)) throw new ApiError(4000);
 
-        const fileInFolder = await prisma.file.findFirst({
-          where: {
-            id,
-            Folder: {
-              id: folderId,
-            },
-          },
-        });
-        if (fileInFolder) throw new ApiError(1011);
+        if (await fileBelongsToFolder(file.id, folderId)) throw new ApiError(1011);
 
-        try {
-          const nFolder = await prisma.folder.update({
-            where: { id: folderId },
-            data: {
-              files: { connect: { id } },
-            },
-            include: folderMutationInclude,
-          });
+        const nFolder = await moveFileToFolder(file.id, folderId);
+        if (!nFolder) throw new ApiError(4002);
 
-          logger.info('file added to folder', { folder: folderId, file: id });
-          return res.send(cleanFolder(nFolder));
-        } catch (error: any) {
-          if (error.code === 'P2025') throw new ApiError(4002);
-          throw error;
-        }
+        logger.info('file added to folder', { folder: folderId, file: id });
+        return res.send(cleanFolder(nFolder));
       },
     );
 
@@ -190,53 +139,30 @@ export default typedPlugin(
           if (parentId === folderId) throw new ApiError(1015);
 
           if (parentId !== null) {
-            const newParent = await prisma.folder.findUnique({
-              where: { id: parentId },
-              select: { id: true, userId: true, parentId: true },
-            });
-
-            if (!newParent) throw new ApiError(4007);
-            if (newParent.userId !== req.user.id) throw new ApiError(3003);
-
-            let currentParentId: string | null = newParent.parentId;
-            while (currentParentId) {
-              if (currentParentId === folderId) {
-                throw new ApiError(1016);
-              }
-              const parent = await prisma.folder.findUnique({
-                where: { id: currentParentId },
-                select: { parentId: true },
-              });
-              currentParentId = parent?.parentId ?? null;
-            }
+            const status = await folderParentStatus(folderId, parentId, req.user.id);
+            if (status === 'missing') throw new ApiError(4007);
+            if (status === 'foreign') throw new ApiError(3003);
+            if (status === 'cycle') throw new ApiError(1016);
           }
         }
 
-        try {
-          const nFolder = await prisma.folder.update({
-            where: { id: folderId },
-            data: {
-              ...(isPublic !== undefined && { public: isPublic }),
-              ...(name && { name }),
-              ...(allowUploads !== undefined && { allowUploads }),
-              ...(parentId !== undefined && { parentId }),
-            },
-            include: folderMutationInclude,
-          });
+        const nFolder = await updateFolder(folderId, {
+          ...(isPublic !== undefined && { public: isPublic }),
+          ...(name && { name }),
+          ...(allowUploads !== undefined && { allowUploads }),
+          ...(parentId !== undefined && { parentId }),
+        });
+        if (!nFolder) throw new ApiError(4001);
 
-          logger.info('folder updated', {
-            folder: nFolder.id,
-            isPublic,
-            name,
-            allowUploads,
-            parentId,
-          });
+        logger.info('folder updated', {
+          folder: nFolder.id,
+          isPublic,
+          name,
+          allowUploads,
+          parentId,
+        });
 
-          return res.send(cleanFolder(nFolder));
-        } catch (error: any) {
-          if (error.code === 'P2025') throw new ApiError(4001);
-          throw error;
-        }
+        return res.send(cleanFolder(nFolder));
       },
     );
 
@@ -271,122 +197,53 @@ export default typedPlugin(
 
         if (del === 'folder') {
           if (childrenAction === 'folder' && targetFolderId) {
-            const targetFolder = await prisma.folder.findUnique({
-              where: { id: targetFolderId },
-              select: { id: true, User: true },
-            });
+            const targetFolder = await findFolderWithOwner(targetFolderId);
             if (!targetFolder) throw new ApiError(4008);
             if (!canManage(req.user, targetFolder.User)) throw new ApiError(4008, undefined, 403);
+            if ((await folderParentStatus(folderId, targetFolderId, targetFolder.userId)) === 'cycle')
+              throw new ApiError(1016);
           }
 
           try {
-            const toDeleteFiles: string[] = [];
-
-            const result = await prisma.$transaction(async (tx) => {
-              if (!childrenAction) {
-                return { success: true };
-              }
-
-              if (childrenAction === 'root') {
-                await tx.folder.updateMany({ where: { parentId: folderId }, data: { parentId: null } });
-                await tx.file.updateMany({ where: { folderId: folderId }, data: { folderId: null } });
-
-                return { success: true };
-              } else if (childrenAction === 'folder' && targetFolderId) {
-                await tx.folder.updateMany({
-                  where: { parentId: folderId },
-                  data: { parentId: targetFolderId },
-                });
-                await tx.file.updateMany({
-                  where: { folderId: folderId },
-                  data: { folderId: targetFolderId },
-                });
-
-                return { success: true };
-              } else if (childrenAction === 'cascade' || childrenAction === 'cascade-files') {
-                const deleteFiles = childrenAction === 'cascade-files';
-
-                const deleteRecursive = async (id: string) => {
-                  const children = await tx.folder.findMany({
-                    where: { parentId: id },
-                    select: { id: true },
-                  });
-                  for (const child of children) {
-                    await deleteRecursive(child.id);
-                  }
-
-                  if (deleteFiles) {
-                    const files = await tx.file.findMany({
-                      where: { folderId: id },
-                      select: { name: true },
-                    });
-                    toDeleteFiles.push(...files.map((f) => f.name));
-                    await tx.file.deleteMany({ where: { folderId: id } });
-                  }
-
-                  await tx.folder.delete({ where: { id } });
-                };
-
-                await deleteRecursive(folderId);
-
-                return { success: true, isCascade: true };
-              }
-            });
+            const result = await deleteFolderWithChildren(folderId, childrenAction, targetFolderId);
 
             if (!result?.success) throw new ApiError(1019);
 
             if (result?.isCascade) {
-              for (const name of toDeleteFiles) {
+              for (const name of result.fileNames) {
                 await datasource.delete(name);
               }
 
-              logger.info('folder cascade deleted', { folder: folderId, files: toDeleteFiles.length });
+              logger.info('folder cascade deleted', { folder: folderId, files: result.fileNames.length });
               return res.send({ success: true });
-            } else {
-              await prisma.folder.delete({ where: { id: folderId } });
             }
 
             logger.info('folder deleted', { folder: folderId, childrenAction, targetFolderId });
             return res.send({ success: true });
-          } catch (error: any) {
-            if (error.code === 'P2025') throw new ApiError(4003);
-            throw error;
+          } catch (error) {
+            if (error instanceof ApiError) throw error;
+            throw new ApiError(4003);
           }
         } else if (del === 'file') {
           const { id } = req.body;
           if (!id) throw new ApiError(1013);
 
-          const file = await prisma.file.findUnique({
-            where: { id },
-            include: { User: true },
+          const file = await findFileById(id, {
+            thumbnail: false,
+            tags: false,
+            owner: true,
           });
 
           if (!file) throw new ApiError(4000);
           if (!canManage(req.user, file.User)) throw new ApiError(4000);
 
-          const fileInFolder = await prisma.file.findFirst({
-            where: {
-              id,
-              Folder: { id: folderId },
-            },
-          });
-          if (!fileInFolder) throw new ApiError(1012);
+          if (!(await fileBelongsToFolder(file.id, folderId))) throw new ApiError(1012);
 
-          try {
-            const nFolder = await prisma.folder.update({
-              where: { id: folderId },
-              data: {
-                files: { disconnect: { id } },
-              },
-              include: folderMutationInclude,
-            });
+          const nFolder = await removeFileFromFolder(file.id, folderId);
+          if (!nFolder) throw new ApiError(4002);
 
-            logger.info('file removed from folder', { folder: nFolder.id, file: id });
-            return res.send({ folder: cleanFolder(nFolder) });
-          } catch (error: any) {
-            if (error.code === 'P2025') throw new ApiError(4002);
-            throw error;
-          }
+          logger.info('file removed from folder', { folder: nFolder.id, file: id });
+          return res.send({ folder: cleanFolder(nFolder) });
         }
       },
     );

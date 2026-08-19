@@ -2,11 +2,18 @@ import { ApiError } from '@/lib/api/errors';
 import { bytes } from '@/lib/bytes';
 import { config } from '@/lib/config';
 import { datasource } from '@/lib/datasource';
-import { prisma } from '@/lib/db';
-import { exportSchema } from '@/lib/db/models/export';
+import {
+  completeUserExport,
+  createUserExport,
+  deleteUserExport,
+  Export,
+  exportSchema,
+  findUserExport,
+  listUserExportFiles,
+  listUserExports,
+} from '@/lib/db/models/export';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
-import { Export } from '@/prisma/client';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
 import archiver from 'archiver';
@@ -45,9 +52,7 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const exports = await prisma.export.findMany({
-          where: { userId: req.user.id },
-        });
+        const exports = await listUserExports(req.user.id);
 
         if (req.query.id) {
           const file = exports.find((x) => x.id === req.query.id);
@@ -80,12 +85,7 @@ export default typedPlugin(
       async (req, res) => {
         if (!req.query.id) throw new ApiError(1029);
 
-        const exportDb = await prisma.export.findFirst({
-          where: {
-            userId: req.user.id,
-            id: req.query.id,
-          },
-        });
+        const exportDb = await findUserExport(req.query.id, req.user.id);
         if (!exportDb) throw new ApiError(9002);
 
         const path = join(config.core.tempDirectory, exportDb.path);
@@ -99,7 +99,8 @@ export default typedPlugin(
           );
         }
 
-        await prisma.export.delete({ where: { id: req.query.id } });
+        const deleted = await deleteUserExport(req.query.id, req.user.id);
+        if (!deleted) throw new ApiError(9002);
 
         logger.info(`deleted export ${exportDb.id}: ${exportDb.path}`);
 
@@ -123,9 +124,7 @@ export default typedPlugin(
         ...secondlyRatelimit(5),
       },
       async (req, res) => {
-        const files = await prisma.file.findMany({
-          where: { userId: req.user.id },
-        });
+        const files = await listUserExportFiles(req.user.id);
 
         if (!files.length) throw new ApiError(1025);
 
@@ -134,13 +133,11 @@ export default typedPlugin(
 
         logger.debug(`exporting ${req.user.id}`, { exportPath, files: files.length });
 
-        const exportDb = await prisma.export.create({
-          data: {
-            userId: req.user.id,
-            path: exportFileName,
-            files: files.length,
-            size: '0',
-          },
+        const exportDb = await createUserExport({
+          userId: req.user.id,
+          path: exportFileName,
+          files: files.length,
+          size: '0',
         });
         const writeStream = createWriteStream(exportPath);
 
@@ -167,13 +164,7 @@ export default typedPlugin(
           logger.debug('exported', { path: exportPath, bytes: zip.pointer() });
           logger.info(`export for ${req.user.id} finished at ${exportPath}`);
 
-          await prisma.export.update({
-            where: { id: exportDb.id },
-            data: {
-              completed: true,
-              size: (await stat(exportPath)).size.toString(),
-            },
-          });
+          await completeUserExport(exportDb.id, (await stat(exportPath)).size.toString());
         });
 
         zip.on('error', (err) => {

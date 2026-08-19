@@ -1,4 +1,4 @@
-import type { OAuthProviderType } from '@/prisma/client';
+import type { OAuthProviderType } from '@/lib/db/enums';
 
 export function findProvider<T extends { provider: OAuthProviderType }>(
   provider: OAuthProviderType,

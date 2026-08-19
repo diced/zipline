@@ -1,107 +1,88 @@
+import { readDbVars } from '@/lib/config/read/env';
 import { log } from '@/lib/logger';
-import { PrismaPg } from '@prisma/adapter-pg';
-import { type Prisma, PrismaClient } from '@/prisma/client';
-import { metadataSchema } from './models/incompleteFile';
-import { metricDataSchema } from './models/metric';
-import { userViewSchema } from './models/user';
-import { readDbVars, REQUIRED_DB_VARS } from '../config/read/env';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import { Pool, type ClientConfig } from 'pg';
+import * as relations from './relations';
+import * as schema from './schema';
 
 const building = !!process.env.ZIPLINE_BUILD;
+const logger = log('db');
+const databaseSchema = { ...schema, ...relations };
 
-// oxlint-disable-next-line prefer-const
-let prisma: ExtendedPrismaClient;
+export type Database = NodePgDatabase<typeof databaseSchema>;
+export type Transaction = Parameters<Parameters<Database['transaction']>[0]>[0];
 
 declare global {
-  var __db__: ExtendedPrismaClient;
+  // eslint-disable-next-line no-var
+  var __db__: Database | undefined;
+  // eslint-disable-next-line no-var
+  var __dbPool__: Pool | undefined;
 }
 
-if (!global.__db__) {
-  if (!building) global.__db__ = getClient();
-}
-
-prisma = global.__db__;
-
-type ExtendedPrismaClient = ReturnType<typeof getClient>;
-
-function parseDbLog(env: string): Prisma.LogLevel[] {
-  if (env === 'true') return ['query'];
-
-  return env
-    .split(',')
-    .map((v) => v.trim())
-    .filter((v) => v) as unknown as Prisma.LogLevel[];
-}
-
-function pgConnectionString() {
+export function getDatabaseUrl() {
   const vars = readDbVars();
   if (vars.DATABASE_URL) return vars.DATABASE_URL;
 
-  return `postgresql://${vars.DATABASE_USERNAME}:${vars.DATABASE_PASSWORD}@${vars.DATABASE_HOST}:${vars.DATABASE_PORT}/${vars.DATABASE_NAME}`;
+  const username = encodeURIComponent(vars.DATABASE_USERNAME);
+  const password = encodeURIComponent(vars.DATABASE_PASSWORD);
+  return `postgresql://${username}:${password}@${vars.DATABASE_HOST}:${vars.DATABASE_PORT}/${vars.DATABASE_NAME}`;
 }
 
-function getClient() {
-  const logger = log('db');
+export function postgresConnectionConfig(connectionString: string): ClientConfig {
+  const url = new URL(connectionString);
+  const configuredOptions = url.searchParams.get('options')?.trim();
+  const timezoneOption = '-c timezone=UTC';
 
-  const connectionString = pgConnectionString();
-  if (!connectionString) {
-    logger.error(`either DATABASE_URL or all of [${REQUIRED_DB_VARS.join(', ')}] not set, exiting...`);
-    process.exit(1);
-  }
+  // PostgreSQL timestamps are stored without a time zone. Keep every session in UTC so database
+  // defaults and JavaScript Date parameters represent the same wall-clock value on every host.
+  url.searchParams.set(
+    'options',
+    configuredOptions ? `${configuredOptions} ${timezoneOption}` : timezoneOption,
+  );
 
-  process.env.DATABASE_URL = connectionString;
+  return { connectionString: url.toString() };
+}
 
-  logger.info('connecting to database');
-  logger.debug('connecting to database', { url: connectionString });
+function queryLogger() {
+  const value = process.env.ZIPLINE_DB_LOG;
+  if (!value) return undefined;
 
-  const adapter = new PrismaPg({ connectionString });
-  const client = new PrismaClient({
-    adapter,
-    log: process.env.ZIPLINE_DB_LOG ? parseDbLog(process.env.ZIPLINE_DB_LOG) : undefined,
-  }).$extends({
-    result: {
-      file: {
-        size: {
-          needs: { size: true },
-          compute({ size }: { size: bigint }) {
-            return Number(size);
-          },
-        },
-      },
-      user: {
-        view: {
-          needs: { view: true },
-          compute({ view }: { view: Prisma.JsonValue }) {
-            return userViewSchema.parse(view);
-          },
-        },
-        totpEnabled: {
-          needs: { totpSecret: true },
-          compute({ totpSecret }: { totpSecret: string | null }) {
-            return !!totpSecret;
-          },
-        },
-      },
-      metric: {
-        data: {
-          needs: { data: true },
-          compute({ data }: { data: Prisma.JsonValue }) {
-            return metricDataSchema.parse(data);
-          },
-        },
-      },
-      incompleteFile: {
-        metadata: {
-          needs: { metadata: true },
-          compute({ metadata }: { metadata: Prisma.JsonValue }) {
-            return metadataSchema.parse(metadata);
-          },
-        },
-      },
+  const levels = value.split(',').map((level) => level.trim().toLowerCase());
+  if (value !== 'true' && !levels.includes('query')) return undefined;
+
+  return {
+    logQuery(query: string, params: unknown[]) {
+      logger.debug('query', { query, params });
     },
-  });
-  client.$connect();
-
-  return client;
+  };
 }
 
-export { prisma };
+function createDatabase() {
+  const connectionString = getDatabaseUrl();
+  logger.info('connecting to database');
+
+  const pool = new Pool(postgresConnectionConfig(connectionString));
+  const db = drizzle({ client: pool, schema: databaseSchema, logger: queryLogger() });
+  return { db, pool };
+}
+
+if (!building && (!globalThis.__db__ || !globalThis.__dbPool__)) {
+  const created = createDatabase();
+  globalThis.__db__ = created.db;
+  globalThis.__dbPool__ = created.pool;
+}
+
+export const db = globalThis.__db__ as Database;
+export const pool = globalThis.__dbPool__ as Pool;
+
+export async function closeDatabase() {
+  if (!globalThis.__dbPool__) return;
+
+  const activePool = globalThis.__dbPool__;
+  globalThis.__db__ = undefined;
+  globalThis.__dbPool__ = undefined;
+  await activePool.end();
+}
+
+export { databaseSchema };

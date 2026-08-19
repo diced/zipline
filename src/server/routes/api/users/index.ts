@@ -1,13 +1,18 @@
 import { ApiError } from '@/lib/api/errors';
 import { config } from '@/lib/config';
 import { createToken, hashPassword } from '@/lib/crypto';
-import { prisma } from '@/lib/db';
-import { LimitedUser, limitedUserSchema, limitedUserSelect } from '@/lib/db/models/user';
+import { Role } from '@/lib/db/enums';
+import {
+  createLimitedUser,
+  findUserRowByUsername,
+  listLimitedUsers,
+  type LimitedUser,
+  limitedUserSchema,
+} from '@/lib/db/models/user';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { canInteract, interactableRoles } from '@/lib/role';
 import { zQsBoolean, zStringTrimmed } from '@/lib/validation';
-import { Role } from '@/prisma/client';
 import { administratorMiddleware } from '@/server/middleware/administrator';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
@@ -42,15 +47,10 @@ export default typedPlugin(
       async (req, res) => {
         const roles = interactableRoles(req.user.role);
 
-        const users = await prisma.user.findMany({
-          select: {
-            ...limitedUserSelect,
-            avatar: true,
-          },
-          where: {
-            role: { in: roles },
-            ...(req.query.noincl && { id: { not: req.user.id } }),
-          },
+        const users = await listLimitedUsers({
+          roles,
+          excludeId: req.query.noincl ? req.user.id : undefined,
+          avatar: true,
         });
 
         return res.send(users);
@@ -80,11 +80,7 @@ export default typedPlugin(
       async (req, res) => {
         const { username, password, avatar, role } = req.body;
 
-        const existing = await prisma.user.findUnique({
-          where: {
-            username,
-          },
-        });
+        const existing = await findUserRowByUsername(username);
         if (existing) throw new ApiError(1040);
 
         let avatar64 = null;
@@ -101,15 +97,12 @@ export default typedPlugin(
 
         if (role && !canInteract(req.user.role, role)) throw new ApiError(3008);
 
-        const user = await prisma.user.create({
-          data: {
-            username,
-            password: await hashPassword(password),
-            role: role,
-            avatar: avatar64 ?? null,
-            token: createToken(),
-          },
-          select: limitedUserSelect,
+        const user = await createLimitedUser({
+          username,
+          password: await hashPassword(password),
+          role: role,
+          avatar: avatar64 ?? null,
+          token: createToken(),
         });
 
         logger.info(`${req.user.username} created a new user`, {

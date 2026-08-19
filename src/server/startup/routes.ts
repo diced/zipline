@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/db';
+import { urlSlugExists } from '@/lib/db/models/url';
 import { log } from '@/lib/logger';
 import type { FastifyInstance } from 'fastify';
 import loadRoutes from '../routes';
@@ -31,13 +31,7 @@ export async function registerRoutes(server: FastifyInstance, mode: string) {
       if (id === '') return res.callNotFound();
       else if (id === 'dashboard') return res.callNotFound(); // todo render dashboard
 
-      const url = await prisma.url.findFirst({
-        where: {
-          OR: [{ code: id }, { vanity: id }],
-        },
-      });
-
-      if (url) return urlsRoute(req as any, res);
+      if (await urlSlugExists(id)) return urlsRoute(req as any, res);
       else return filesRoute(req as any, res);
     });
   } else {

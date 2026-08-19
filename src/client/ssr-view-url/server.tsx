@@ -1,7 +1,7 @@
 import { verifyAccessToken } from '@/lib/accessToken';
 import { config as zConfig } from '@/lib/config';
 import { Config } from '@/lib/config/validate';
-import { prisma } from '@/lib/db';
+import { deleteUrlById, findUrlForViewByIdentifier, incrementUrlViews } from '@/lib/db/models/url';
 import { renderHtml } from '@/lib/ssr/renderHtml';
 import { ZiplineTheme } from '@/lib/theme';
 import { FastifyRequest } from 'fastify';
@@ -25,25 +25,13 @@ export async function render(
   const { config: libConfig, reloadSettings } = await import('@/lib/config');
   if (!libConfig) await reloadSettings();
 
-  const urlEntry = await prisma.url.findFirst({
-    where: {
-      OR: [{ vanity: id }, { code: id }, { id }],
-    },
-    select: {
-      id: true,
-      password: true,
-      destination: true,
-      maxViews: true,
-      views: true,
-      enabled: true,
-    },
-  });
+  const urlEntry = await findUrlForViewByIdentifier(id);
 
   if (!urlEntry || !urlEntry.enabled) return { html: 'Not Found', meta: '', status: 404 };
 
   if (urlEntry.maxViews && urlEntry.views >= urlEntry.maxViews) {
     if (zConfig.features.deleteOnMaxViews) {
-      await prisma.url.delete({ where: { id: urlEntry.id } });
+      await deleteUrlById(urlEntry.id);
     }
     return { html: 'Gone', meta: '', status: 410 };
   }
@@ -69,10 +57,7 @@ export async function render(
     }
   }
 
-  await prisma.url.update({
-    where: { id: urlEntry.id },
-    data: { views: { increment: 1 } },
-  });
+  await incrementUrlViews(urlEntry.id);
 
   if (data.url.destination) {
     return {

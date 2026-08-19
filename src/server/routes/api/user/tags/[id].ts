@@ -1,6 +1,12 @@
 import { ApiError } from '@/lib/api/errors';
-import { prisma } from '@/lib/db';
-import { Tag, tagSchema, tagSelect } from '@/lib/db/models/tag';
+import {
+  deleteOwnedTag,
+  findOwnedTagById,
+  findTagByName,
+  Tag,
+  tagSchema,
+  updateTag,
+} from '@/lib/db/models/tag';
 import { log } from '@/lib/logger';
 import { zStringTrimmed } from '@/lib/validation';
 import { userMiddleware } from '@/server/middleware/user';
@@ -34,13 +40,7 @@ export default typedPlugin(
       async (req, res) => {
         const { id } = req.params;
 
-        const tag = await prisma.tag.findFirst({
-          where: {
-            userId: req.user.id,
-            id,
-          },
-          select: tagSelect,
-        });
+        const tag = await findOwnedTagById(id, req.user.id);
         if (!tag) throw new ApiError(9002);
 
         return res.send(tag);
@@ -65,14 +65,7 @@ export default typedPlugin(
       async (req, res) => {
         const { id } = req.params;
 
-        const tag = await prisma.tag.deleteMany({
-          where: {
-            userId: req.user.id,
-            id,
-          },
-        });
-
-        if (tag.count === 0) throw new ApiError(9002);
+        if (!(await deleteOwnedTag(id, req.user.id))) throw new ApiError(9002);
 
         logger.info('tag deleted', {
           id,
@@ -107,34 +100,20 @@ export default typedPlugin(
         const { id } = req.params;
         const { name, color } = req.body;
 
-        const existingTag = await prisma.tag.findFirst({
-          where: {
-            userId: req.user.id,
-            id,
-          },
-        });
+        const existingTag = await findOwnedTagById(id, req.user.id);
         if (!existingTag) throw new ApiError(9002);
 
         if (name) {
-          const existing = await prisma.tag.findFirst({
-            where: {
-              name,
-            },
-          });
+          const existing = await findTagByName(name);
 
           if (existing) throw new ApiError(1034);
         }
 
-        const tag = await prisma.tag.update({
-          where: {
-            id: existingTag.id,
-          },
-          data: {
-            ...(name && { name }),
-            ...(color && { color }),
-          },
-          select: tagSelect,
+        const tag = await updateTag(existingTag.id, {
+          ...(name && { name }),
+          ...(color && { color }),
         });
+        if (!tag) throw new ApiError(9002);
 
         logger.info('tag updated', {
           id: tag.id,

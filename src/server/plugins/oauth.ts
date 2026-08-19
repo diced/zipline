@@ -1,9 +1,17 @@
 import { config } from '@/lib/config';
 import { createToken } from '@/lib/crypto';
-import { prisma } from '@/lib/db';
+import { db } from '@/lib/db';
+import { type OAuthProviderType } from '@/lib/db/enums';
+import { createOAuthProvider, findOAuthProvider, updateOAuthProvider } from '@/lib/db/models/oauth';
+import {
+  createFullUser,
+  findFullUserById,
+  findFullUserBySessionId,
+  findUserRowByUsername,
+} from '@/lib/db/models/user';
+import { isPostgresError } from '@/lib/db/utils';
 import Logger, { log } from '@/lib/logger';
 import { findProvider } from '@/lib/oauth/providers';
-import { OAuthProviderType, User } from '@/prisma/client';
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import fastifyPlugin from 'fastify-plugin';
 import { getSession, saveSession, ZiplineIronSession } from '../session';
@@ -24,6 +32,16 @@ export type OAuthResponse = {
   refresh_token?: string | null;
   avatar?: string | null;
 };
+
+function safeOAuthResponse(response: OAuthResponse) {
+  return {
+    ...response,
+    access_token: '[redacted]',
+    ...(response.refresh_token !== undefined && {
+      refresh_token: response.refresh_token ? '[redacted]' : response.refresh_token,
+    }),
+  };
+}
 
 async function oauthPlugin(fastify: FastifyInstance) {
   fastify.decorateRequest('oauthHandle', oauthHandle);
@@ -48,27 +66,11 @@ async function oauthPlugin(fastify: FastifyInstance) {
     const response = await handler(query, logger);
 
     logger.debug('oauth response', {
-      response,
+      response: safeOAuthResponse(response),
     });
 
-    const existingOauth = await prisma.oAuthProvider.findUnique({
-      where: {
-        provider_oauthId: {
-          provider: provider,
-          oauthId: response.user_id!,
-        },
-      },
-    });
-
-    const existingUser = await prisma.user.findFirst({
-      where: {
-        username: response.username!,
-      },
-      select: {
-        id: true,
-        username: true,
-      },
-    });
+    const existingOauth = await findOAuthProvider(provider, response.user_id);
+    const existingUser = await findUserRowByUsername(response.username);
 
     const state = parseOAuthState(query.state);
     if (!state) throw new ApiError(1064);
@@ -85,18 +87,7 @@ async function oauthPlugin(fastify: FastifyInstance) {
     delete session.oauthState;
     await session.save();
 
-    const user = await prisma.user.findFirst({
-      where: {
-        sessions: {
-          some: {
-            id: session.sessionId ?? '',
-          },
-        },
-      },
-      include: {
-        oauthProviders: true,
-      },
-    });
+    const user = session.sessionId ? await findFullUserBySessionId(session.sessionId) : null;
     const userOauth = findProvider(provider, user?.oauthProviders ?? []);
 
     if (state.mode === 'link') {
@@ -110,21 +101,13 @@ async function oauthPlugin(fastify: FastifyInstance) {
       });
 
       try {
-        await prisma.user.update({
-          where: {
-            id: user.id,
-          },
-          data: {
-            oauthProviders: {
-              create: {
-                provider: provider,
-                accessToken: response.access_token!,
-                refreshToken: response.refresh_token!,
-                username: response.username!,
-                oauthId: response.user_id!,
-              },
-            },
-          },
+        await createOAuthProvider({
+          userId: user.id,
+          provider,
+          accessToken: response.access_token,
+          refreshToken: response.refresh_token,
+          username: response.username,
+          oauthId: response.user_id,
         });
 
         await saveSession(session, user, false);
@@ -145,17 +128,13 @@ async function oauthPlugin(fastify: FastifyInstance) {
         throw new ApiError(1063);
       }
     } else if (user && userOauth) {
-      await prisma.oAuthProvider.update({
-        where: {
-          id: userOauth.id,
-        },
-        data: {
-          accessToken: response.access_token!,
-          refreshToken: response.refresh_token!,
-          username: response.username!,
-          oauthId: response.user_id!,
-        },
+      const updated = await updateOAuthProvider(userOauth.id, {
+        accessToken: response.access_token,
+        refreshToken: response.refresh_token,
+        username: response.username,
+        oauthId: response.user_id,
       });
+      if (!updated) throw new Error(`OAuth provider ${userOauth.id} no longer exists`);
 
       await saveSession(session, user, false);
 
@@ -166,28 +145,30 @@ async function oauthPlugin(fastify: FastifyInstance) {
 
       return reply.redirect('/dashboard');
     } else if (existingOauth) {
-      const login = await prisma.oAuthProvider.update({
-        where: {
-          id: existingOauth.id,
-        },
-        data: {
-          accessToken: response.access_token!,
-          refreshToken: response.refresh_token!,
-          username: response.username!,
-          oauthId: response.user_id!,
-        },
-        include: {
-          user: true,
-        },
+      const loginUser = await db.transaction(async (tx) => {
+        const updated = await updateOAuthProvider(
+          existingOauth.id,
+          {
+            accessToken: response.access_token,
+            refreshToken: response.refresh_token,
+            username: response.username,
+            oauthId: response.user_id,
+          },
+          tx,
+        );
+        if (!updated) throw new Error(`OAuth provider ${existingOauth.id} no longer exists`);
+
+        return findFullUserById(existingOauth.userId, tx);
       });
+      if (!loginUser) throw new ApiError(2001);
 
       if (session?.sessionId) session.destroy();
 
-      await saveSession(session, <User>login.user!, false);
+      await saveSession(session, loginUser, false);
 
       logger.info('logged in with oauth', {
         provider,
-        user: login.user!.id,
+        user: loginUser.id,
       });
 
       return reply.redirect('/dashboard');
@@ -203,24 +184,30 @@ async function oauthPlugin(fastify: FastifyInstance) {
     }
 
     try {
-      const nuser = await prisma.user.create({
-        data: {
-          username: response.username!,
-          token: createToken(),
-          oauthProviders: {
-            create: {
-              provider: provider,
-              accessToken: response.access_token!,
-              refreshToken: response.refresh_token!,
-              username: response.username!,
-              oauthId: response.user_id!,
-            },
+      const nuser = await db.transaction(async (tx) => {
+        const created = await createFullUser(
+          {
+            username: response.username!,
+            token: createToken(),
+            avatar: response.avatar ?? null,
           },
-          avatar: response.avatar ?? null,
-        },
+          tx,
+        );
+        await createOAuthProvider(
+          {
+            userId: created.id,
+            provider,
+            accessToken: response.access_token,
+            refreshToken: response.refresh_token,
+            username: response.username,
+            oauthId: response.user_id,
+          },
+          tx,
+        );
+        return created;
       });
 
-      await saveSession(session, <User>nuser, false);
+      await saveSession(session, nuser, false);
 
       logger.info('created user with oauth', {
         provider,
@@ -229,7 +216,7 @@ async function oauthPlugin(fastify: FastifyInstance) {
 
       return reply.redirect('/dashboard');
     } catch (e) {
-      if ((e as { code: string }).code === 'P2002') {
+      if (isPostgresError(e, '23505')) {
         // already linked can't create, last failsafe lol
         logger.warn('user tried to create account with oauth, but already linked', {
           oauth: response.username || 'unknown',
@@ -237,7 +224,7 @@ async function oauthPlugin(fastify: FastifyInstance) {
         });
         logger.debug('oauth create error', {
           error: e,
-          response,
+          response: safeOAuthResponse(response),
         });
 
         throw new ApiError(1063);

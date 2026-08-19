@@ -1,6 +1,6 @@
 import { ApiError } from '@/lib/api/errors';
-import { prisma } from '@/lib/db';
-import { Tag, tagSelect } from '@/lib/db/models/tag';
+import { listTagsForUser, Tag } from '@/lib/db/models/tag';
+import { findUserRowById } from '@/lib/db/models/user';
 import { canInteract } from '@/lib/role';
 import { administratorMiddleware } from '@/server/middleware/administrator';
 import { userMiddleware } from '@/server/middleware/user';
@@ -30,21 +30,12 @@ export default typedPlugin(
       async (req, res) => {
         const { id } = req.params;
 
-        const user = await prisma.user.findUnique({
-          where: {
-            id,
-          },
-        });
+        const user = await findUserRowById(id);
 
         if (!user) throw new ApiError(9002);
         if (!canInteract(req.user.role, user.role)) throw new ApiError(9002);
 
-        const tags = await prisma.tag.findMany({
-          where: {
-            userId: user.id,
-          },
-          select: tagSelect,
-        });
+        const tags = await listTagsForUser(user.id);
 
         return res.send(tags);
       },

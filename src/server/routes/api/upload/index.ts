@@ -12,9 +12,10 @@ import { COMPRESS_TYPES, compressFile, CompressResult } from '@/lib/compress';
 import { config } from '@/lib/config';
 import { hashPassword } from '@/lib/crypto';
 import { datasource } from '@/lib/datasource';
-import { prisma } from '@/lib/db';
-import { fileSelect } from '@/lib/db/models/file';
-import { userSelect } from '@/lib/db/models/user';
+import { db } from '@/lib/db';
+import { createFileHydrated, type FileInsert, lockFileOwner } from '@/lib/db/models/file';
+import { findFolderRowById } from '@/lib/db/models/folder';
+import { findFullUserById } from '@/lib/db/models/user';
 import { sanitizeFilename } from '@/lib/fs';
 import { removeGps } from '@/lib/gps';
 import { log } from '@/lib/logger';
@@ -22,7 +23,6 @@ import { mapConcurrent } from '@/lib/mapConcurrent';
 import { runThumbnailWorkers } from '@/lib/tasks/run/thumbnails';
 import { parseHeaders, UploadHeaders } from '@/lib/uploader/parseHeaders';
 import { onUpload } from '@/lib/webhooks';
-import { Prisma } from '@/prisma/client';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
 import { SavedMultipartFile } from '@fastify/multipart';
@@ -98,11 +98,7 @@ export default typedPlugin(
 
         let folder = null;
         if (options.folder) {
-          folder = await prisma.folder.findFirst({
-            where: {
-              id: options.folder,
-            },
-          });
+          folder = await findFolderRowById(options.folder);
           if (!folder) throw new ApiError(4001);
 
           const ownsFolder = req.user ? folder.userId === req.user.id : false;
@@ -127,11 +123,7 @@ export default typedPlugin(
         const totalFileSize = files.reduce((acc, x) => acc + x.file.bytesRead, 0);
 
         // use quota of user if anonymous
-        const quotaUser = req.user
-          ? req.user
-          : folder?.userId
-            ? await prisma.user.findUnique({ where: { id: folder.userId }, select: userSelect })
-            : null;
+        const quotaUser = req.user ? req.user : folder?.userId ? await findFullUserById(folder.userId) : null;
 
         const quotaCheck = await checkQuota(quotaUser, totalFileSize, files.length);
         if (quotaCheck !== true)
@@ -269,18 +261,18 @@ export default typedPlugin(
         const uploads = prepared.map((item) => {
           const { file, fileName, extension, mimetype, size, compressed, removedGps, originalName } = item;
 
-          const data: Prisma.FileCreateInput = {
+          const data: FileInsert = {
             name: `${fileName}${extension}`,
             size,
             type: mimetype,
-            User: { connect: { id: req.user ? req.user.id : options.folder ? folder?.userId : undefined } },
+            userId: req.user ? req.user.id : options.folder ? folder?.userId : undefined,
           };
 
           if (!req.user && folder) data.anonymous = true;
 
           if (options.maxViews) data.maxViews = options.maxViews;
           if (password) data.password = password;
-          if (folder) data.Folder = { connect: { id: folder.id } };
+          if (folder) data.folderId = folder.id;
           if (originalName) data.originalName = originalName;
 
           data.deletesAt = options.deletesAt && options.deletesAt !== 'never' ? options.deletesAt : null;
@@ -288,9 +280,9 @@ export default typedPlugin(
           return { compressed, data, extension, file, removedGps, size };
         });
 
-        const fileUploads = await prisma.$transaction(async (tx) => {
+        const fileUploads = await db.transaction(async (tx) => {
           if (quotaUser?.quota) {
-            await tx.$queryRaw`SELECT "id" FROM "User" WHERE "id" = ${quotaUser.id} FOR UPDATE`;
+            await lockFileOwner(quotaUser.id, tx);
 
             const quotaCheck = await checkQuota(
               quotaUser,
@@ -304,12 +296,7 @@ export default typedPlugin(
 
           const created = [];
           for (const upload of uploads) {
-            created.push(
-              await tx.file.create({
-                data: upload.data,
-                select: fileSelect,
-              }),
-            );
+            created.push(await createFileHydrated(upload.data, { thumbnail: true, tags: true }, tx));
           }
 
           return created;

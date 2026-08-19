@@ -1,17 +1,15 @@
 import { hashPassword } from '@/lib/crypto';
-import { prisma } from '@/lib/db';
+import { findUserRowById, updateUserRow, type UserUpdate } from '@/lib/db/models/user';
 const SUPPORTED_FIELDS = ['username', 'password', 'role', 'avatar', 'token', 'totpSecret'];
 
 export async function setUser(property: string, value: string, { id }: { id: string }) {
   if (!SUPPORTED_FIELDS.includes(property)) return console.error('Unsupported field:', property);
 
-  const user = await prisma.user.findFirst({
-    where: { id },
-  });
+  const user = await findUserRowById(id);
 
   if (!user) return console.error('User not found');
 
-  let parsed;
+  let parsed: string | boolean | null = value;
 
   if (value === 'true') parsed = true;
   else if (value === 'false') parsed = false;
@@ -24,12 +22,7 @@ export async function setUser(property: string, value: string, { id }: { id: str
     parsed = value.toUpperCase();
   }
 
-  await prisma.user.update({
-    where: { id },
-    data: {
-      [property]: parsed,
-    },
-  });
+  await updateUserRow(id, { [property]: parsed } as UserUpdate);
 
   if (property === 'password') parsed = '*********';
 

@@ -1,6 +1,7 @@
 import { extname } from 'path';
 import { User } from '@/lib/db/models/user';
-import { prisma } from '@/lib/db';
+import { fileNamesExist, fileUsageForUser } from '@/lib/db/models/file';
+import type { DbClient } from '@/lib/db/models/user';
 import { bytes } from '@/lib/bytes';
 import { config } from '../config';
 import { Config } from '../config/validate';
@@ -37,24 +38,19 @@ export async function checkQuota(
   user: Pick<User, 'id' | 'quota'> | null,
   newSize: number,
   fileCount: number,
-  db: Pick<typeof prisma, 'file'> = prisma,
+  client?: DbClient,
 ): Promise<true | string> {
   if (!user?.quota) return true;
 
+  const usage = await fileUsageForUser(user.id, client);
   if (user.quota.filesQuota === 'BY_BYTES') {
-    const stats = await db.file.aggregate({
-      where: { userId: user.id },
-      _sum: { size: true },
-    });
-
-    if (Number(stats._sum.size ?? 0n) + newSize > bytes(user.quota.maxBytes!))
+    if (usage.size + newSize > bytes(user.quota.maxBytes!))
       return `uploading will exceed your storage quota of ${user.quota.maxBytes}`;
 
     return true;
   }
 
-  const count = await db.file.count({ where: { userId: user.id } });
-  if (count + fileCount > user.quota.maxFiles!)
+  if (usage.count + fileCount > user.quota.maxFiles!)
     return `uploading will exceed your file count quota of ${user.quota.maxFiles} files`;
 
   return true;
@@ -90,8 +86,7 @@ export async function getFilename(
     const extensions = [...new Set([extension, ...alternateExtensions])];
     let fullFileNames = extensions.map((ext) => `${fileName}${ext}`);
     let existing =
-      fullFileNames.some((name) => reservedNames?.has(name)) ||
-      (await prisma.file.findFirst({ where: { name: { in: fullFileNames } } }));
+      fullFileNames.some((name) => reservedNames?.has(name)) || (await fileNamesExist(fullFileNames));
 
     if (existing && (override || format === 'name')) {
       throw 'file with the same name already exists';
@@ -105,8 +100,7 @@ export async function getFilename(
 
       fullFileNames = extensions.map((ext) => `${fileName}${ext}`);
       existing =
-        fullFileNames.some((name) => reservedNames?.has(name)) ||
-        (await prisma.file.findFirst({ where: { name: { in: fullFileNames } } }));
+        fullFileNames.some((name) => reservedNames?.has(name)) || (await fileNamesExist(fullFileNames));
     }
 
     for (const name of fullFileNames) reservedNames?.add(name);

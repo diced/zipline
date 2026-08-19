@@ -1,7 +1,7 @@
 import { Response } from '@/lib/api/response';
 import { IncompleteFile } from '@/lib/db/models/incompleteFile';
+import { IncompleteFileStatus } from '@/lib/db/enums';
 import { fetchApi } from '@/lib/fetchApi';
-import { IncompleteFileStatus } from '@/prisma/client';
 import { Badge, Button, Card, Group, Modal, Paper, Stack, Text } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { IconFileDots, IconTrashFilled } from '@tabler/icons-react';

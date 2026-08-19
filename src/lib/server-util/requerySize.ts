@@ -1,6 +1,8 @@
 import { datasource } from '../datasource';
-import { prisma } from '../db';
+import { deleteFileById, listFileRows, updateFile } from '../db/models/file';
+import { files as fileTable } from '../db/schema';
 import { log } from '../logger';
+import { eq } from 'drizzle-orm';
 
 const logger = log('serverutil').c('requerySize');
 
@@ -13,19 +15,8 @@ export async function requerySize({
 }): Promise<string> {
   logger.info('preparing to requery size of all files', { forceDelete, forceUpdate });
 
-  const files = await prisma.file.findMany({
-    ...(forceUpdate
-      ? undefined
-      : {
-          where: {
-            size: 0,
-          },
-        }),
-    select: {
-      id: true,
-      name: true,
-      size: true,
-    },
+  const files = await listFileRows({
+    where: forceUpdate ? undefined : eq(fileTable.size, 0),
   });
   logger.info('found files to requery size', { count: files.length });
 
@@ -41,11 +32,7 @@ export async function requerySize({
           name: file.name,
         });
 
-        await prisma.file.delete({
-          where: {
-            id: file.id,
-          },
-        });
+        await deleteFileById(file.id);
         continue;
       }
 
@@ -58,14 +45,7 @@ export async function requerySize({
       logger.info('file has a size of 0 bytes', { id: file.id, name: file.name });
     } else {
       logger.info('file has a size', { id: file.id, name: file.name, size });
-      await prisma.file.update({
-        where: {
-          id: file.id,
-        },
-        data: {
-          size,
-        },
-      });
+      await updateFile(file.id, { size });
     }
   }
 

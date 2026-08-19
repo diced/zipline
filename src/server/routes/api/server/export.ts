@@ -1,10 +1,17 @@
 import { ApiError } from '@/lib/api/errors';
+import {
+  getFilesForServerExport,
+  getMetricsForServerExport,
+  getServerResourceCounts,
+  getSettingsForServerExport,
+  getThumbnailsForServerExport,
+  getUsersForServerExport,
+} from '@/lib/db/models/serverData';
 import { Export4, export4Schema } from '@/lib/import/version4/validateExport';
 import { log } from '@/lib/logger';
 import { administratorMiddleware } from '@/server/middleware/administrator';
 import { userMiddleware } from '@/server/middleware/user';
 
-import { prisma } from '@/lib/db';
 import { zQsBoolean } from '@/lib/validation';
 import typedPlugin from '@/server/typedPlugin';
 import { cpus, hostname, platform, release } from 'os';
@@ -20,28 +27,6 @@ const exportCountsSchema = z.object({
   thumbnails: z.number(),
   metrics: z.number(),
 });
-
-type ExportCounts = z.infer<typeof exportCountsSchema>;
-
-async function getCounts(): Promise<ExportCounts> {
-  const users = await prisma.user.count();
-  const files = await prisma.file.count();
-  const urls = await prisma.url.count();
-  const folders = await prisma.folder.count();
-  const invites = await prisma.invite.count();
-  const thumbnails = await prisma.thumbnail.count();
-  const metrics = await prisma.metric.count();
-
-  return {
-    users,
-    files,
-    urls,
-    folders,
-    invites,
-    thumbnails,
-    metrics,
-  };
-}
 
 export type ApiServerExport = Export4;
 
@@ -73,14 +58,14 @@ export default typedPlugin(
         if (req.user.role !== 'SUPERADMIN') throw new ApiError(3015);
 
         if (req.query.counts) {
-          const counts = await getCounts();
+          const counts = await getServerResourceCounts();
 
           return res.send(counts);
         }
 
         logger.debug('exporting server data', { format: '4', requester: req.user.username });
 
-        const settingsTable = await prisma.zipline.findFirst();
+        const settingsTable = await getSettingsForServerExport();
         if (!settingsTable) throw new ApiError(1023);
 
         const env = Object.fromEntries(
@@ -125,33 +110,7 @@ export default typedPlugin(
           },
         };
 
-        const users = await prisma.user.findMany({
-          include: {
-            passkeys: true,
-            quota: true,
-            oauthProviders: true,
-            invites: true,
-            urls: true,
-            tags: {
-              include: {
-                files: {
-                  select: {
-                    id: true,
-                  },
-                },
-              },
-            },
-            folders: {
-              include: {
-                files: {
-                  select: {
-                    id: true,
-                  },
-                },
-              },
-            },
-          },
-        });
+        const users = await getUsersForServerExport();
 
         for (const user of users) {
           export4.data.users.push({
@@ -171,7 +130,7 @@ export default typedPlugin(
               id: passkey.id,
               lastUsed: passkey.lastUsed ? passkey.lastUsed.toISOString() : null,
               name: passkey.name,
-              reg: passkey.reg as Record<string, any>,
+              reg: passkey.reg,
               userId: passkey.userId,
             });
           }
@@ -253,7 +212,7 @@ export default typedPlugin(
           }
         }
 
-        const files = await prisma.file.findMany();
+        const files = await getFilesForServerExport();
 
         for (const file of files) {
           if (!file.userId)
@@ -279,7 +238,7 @@ export default typedPlugin(
           });
         }
 
-        const thumbnails = await prisma.thumbnail.findMany();
+        const thumbnails = await getThumbnailsForServerExport();
 
         for (const thumbnail of thumbnails) {
           export4.data.thumbnails.push({
@@ -293,12 +252,12 @@ export default typedPlugin(
         }
 
         if (req.query.nometrics === undefined) {
-          const metrics = await prisma.metric.findMany();
+          const metrics = await getMetricsForServerExport();
 
           export4.data.metrics = metrics.map((metric) => ({
             createdAt: metric.createdAt.toISOString(),
             id: metric.id,
-            data: metric.data as Record<string, unknown>,
+            data: metric.data,
           }));
         }
 

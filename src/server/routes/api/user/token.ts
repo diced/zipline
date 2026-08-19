@@ -1,8 +1,7 @@
 import { ApiError } from '@/lib/api/errors';
 import { config } from '@/lib/config';
 import { createToken, encryptToken } from '@/lib/crypto';
-import { prisma } from '@/lib/db';
-import { User, userSchema, userSelect } from '@/lib/db/models/user';
+import { findUserRowById, updateFullUser, type User, userSchema } from '@/lib/db/models/user';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { userMiddleware } from '@/server/middleware/user';
@@ -34,14 +33,7 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const user = await prisma.user.findUnique({
-          where: {
-            id: req.user.id,
-          },
-          select: {
-            token: true,
-          },
-        });
+        const user = await findUserRowById(req.user.id);
 
         if (!user || !user.token) {
           logger.warn('something went very wrong! user not found or token not found', {
@@ -77,18 +69,9 @@ export default typedPlugin(
         },
       },
       async (req, res) => {
-        const user = await prisma.user.update({
-          where: {
-            id: req.user.id,
-          },
-          data: {
-            token: createToken(),
-          },
-          select: {
-            ...userSelect,
-            token: true,
-          },
-        });
+        const token = createToken();
+        const user = await updateFullUser(req.user.id, { token });
+        if (!user) throw new ApiError(9004);
 
         logger.info('user reset their token', {
           user: user.username,
@@ -96,7 +79,7 @@ export default typedPlugin(
 
         return res.send({
           user,
-          token: encryptToken(user.token, config.core.secret),
+          token: encryptToken(token, config.core.secret),
         });
       },
     );

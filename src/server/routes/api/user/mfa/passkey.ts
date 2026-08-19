@@ -1,13 +1,13 @@
 import { ApiError } from '@/lib/api/errors';
 import { config } from '@/lib/config';
-import { prisma } from '@/lib/db';
-import { User, userPasskeySchema, userSchema, userSelect } from '@/lib/db/models/user';
+import { db } from '@/lib/db';
+import { createUserPasskey, deleteUserPasskey, listUserPasskeys } from '@/lib/db/models/passkey';
+import { findFullUserById, type User, userPasskeySchema, userSchema } from '@/lib/db/models/user';
 import { log } from '@/lib/logger';
 import { isTruthy } from '@/lib/primitive';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { TimedCache } from '@/lib/timedCache';
 import { zStringTrimmed } from '@/lib/validation';
-import { Prisma } from '@/prisma/client';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
 import {
@@ -36,7 +36,12 @@ export type PasskeyReg = {
   webauthn: {
     webAuthnUserID: string;
     id: string;
-    publicKey: string;
+    publicKey:
+      | string
+      | number[]
+      | Record<string, number>
+      | { $type: 'Bytes'; value: string }
+      | { type: 'Buffer'; data: number[] };
     counter: number;
     transports?: string[];
     deviceType?: string;
@@ -62,14 +67,7 @@ export default typedPlugin(
         preHandler: [userMiddleware, passkeysEnabledHandler],
       },
       async (req, res) => {
-        const passkeys = await prisma.userPasskey.findMany({
-          where: {
-            userId: req.user.id,
-          },
-          omit: {
-            reg: true,
-          },
-        });
+        const passkeys = (await listUserPasskeys(req.user.id)).map(({ reg: _reg, ...passkey }) => passkey);
 
         return res.send(passkeys);
       },
@@ -88,12 +86,9 @@ export default typedPlugin(
       async (req, res) => {
         if (OPTIONS_CACHE.has(req.user.id)) return res.send(OPTIONS_CACHE.get(req.user.id)!);
 
-        const existingPasskeys = (await prisma.userPasskey.findMany({
-          where: { userId: req.user.id },
-          select: {
-            reg: true,
-          },
-        })) as { reg: PasskeyReg | null }[];
+        const existingPasskeys = (await listUserPasskeys(req.user.id)) as unknown as {
+          reg: PasskeyReg | null;
+        }[];
 
         const options: PublicKeyCredentialCreationOptionsJSON = await generateRegistrationOptions({
           rpName: 'Zipline',
@@ -168,29 +163,32 @@ export default typedPlugin(
 
         if (!verification.verified) throw new ApiError(1050);
 
-        const user = await prisma.user.update({
-          where: { id: req.user.id },
-          data: {
-            passkeys: {
-              create: {
-                name,
-                reg: {
-                  webauthn: {
-                    webAuthnUserID: optionsCached.user.id,
-                    id: verification.registrationInfo.credential.id,
-                    publicKey: verification.registrationInfo.credential.publicKey,
-                    counter: verification.registrationInfo.credential.counter,
-                    transports: verification.registrationInfo.credential.transports,
-                    deviceType: verification.registrationInfo.credentialDeviceType,
-                    backedUp: verification.registrationInfo.credentialBackedUp,
-                  },
-                } as unknown as Prisma.InputJsonValue,
-                lastUsed: new Date(),
+        const user = await db.transaction(async (tx) => {
+          await createUserPasskey(
+            {
+              userId: req.user.id,
+              name,
+              reg: {
+                webauthn: {
+                  webAuthnUserID: optionsCached.user.id,
+                  id: verification.registrationInfo.credential.id,
+                  publicKey: Buffer.from(verification.registrationInfo.credential.publicKey).toString(
+                    'base64',
+                  ),
+                  counter: verification.registrationInfo.credential.counter,
+                  transports: verification.registrationInfo.credential.transports,
+                  deviceType: verification.registrationInfo.credentialDeviceType,
+                  backedUp: verification.registrationInfo.credentialBackedUp,
+                },
               },
+              lastUsed: new Date(),
             },
-          },
-          select: userSelect,
+            tx,
+          );
+
+          return findFullUserById(req.user.id, tx);
         });
+        if (!user) throw new ApiError(2001);
 
         logger.info('user created a new passkey', {
           user: user.username,
@@ -219,15 +217,12 @@ export default typedPlugin(
       async (req, res) => {
         const { id } = req.body;
 
-        const user = await prisma.user.update({
-          where: { id: req.user.id },
-          data: {
-            passkeys: {
-              delete: { id },
-            },
-          },
-          select: userSelect,
+        const user = await db.transaction(async (tx) => {
+          const deleted = await deleteUserPasskey(req.user.id, id, tx);
+          if (!deleted) throw new Error(`Passkey ${id} does not belong to user ${req.user.id}`);
+          return findFullUserById(req.user.id, tx);
         });
+        if (!user) throw new ApiError(2001);
 
         logger.info('user deleted a passkey', {
           user: user.username,

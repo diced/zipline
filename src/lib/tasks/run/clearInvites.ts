@@ -1,31 +1,15 @@
+import { deleteInvitesByIds, findExpiredInvites, findMaxUsedInvites } from '@/lib/db/models/invite';
 import { IntervalTask } from '..';
 
-export default function clearInvites(prisma: typeof globalThis.__db__) {
+export default function clearInvites() {
   return async function (this: IntervalTask) {
-    const expiredInvites = await prisma.invite.findMany({
-      where: {
-        expiresAt: {
-          lte: new Date(),
-        },
-      },
-      select: {
-        code: true,
-        id: true,
-        uses: true,
-      },
-    });
+    const expiredInvites = await findExpiredInvites();
 
     this.logger.debug(`found ${expiredInvites.length} expired invites`, {
       files: expiredInvites.map((i) => i.code),
     });
 
-    const maxUsedInvites = await prisma.invite.findMany({
-      where: {
-        uses: {
-          gte: prisma.invite.fields.maxUses,
-        },
-      },
-    });
+    const maxUsedInvites = await findMaxUsedInvites();
 
     this.logger.debug(`found ${maxUsedInvites.length} max used invites`, {
       files: maxUsedInvites.map((i) => i.code),
@@ -33,13 +17,7 @@ export default function clearInvites(prisma: typeof globalThis.__db__) {
 
     const toDelete = [...expiredInvites, ...maxUsedInvites];
 
-    const { count } = await prisma.invite.deleteMany({
-      where: {
-        id: {
-          in: toDelete.map((i) => i.id),
-        },
-      },
-    });
+    const count = await deleteInvitesByIds(toDelete.map((invite) => invite.id));
 
     if (count)
       this.logger.info(`deleted ${count} expired/max used invites`, {

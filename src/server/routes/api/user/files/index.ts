@@ -1,11 +1,16 @@
 import { ApiError } from '@/lib/api/errors';
-import { prisma } from '@/lib/db';
-import { File, cleanFiles, fileSchema, fileSelect } from '@/lib/db/models/file';
+import { files as fileTable } from '@/lib/db/schema';
+import { File, cleanFiles, countFiles, fileOrderBy, fileSchema, listFiles } from '@/lib/db/models/file';
+import { findFolderWithOwner } from '@/lib/db/models/folder';
+import { listIncompleteFilesForUser } from '@/lib/db/models/incompleteFile';
+import { commonFileIdsForTags } from '@/lib/db/models/tag';
+import { findUserRowById } from '@/lib/db/models/user';
 import { canInteract, canManage } from '@/lib/role';
 import { paginationQs } from '@/lib/validation';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
 import z from 'zod';
+import { and, eq, ilike, inArray, notInArray, or, sql, type SQL } from 'drizzle-orm';
 
 export type FileSearchField = 'name' | 'originalName' | 'type' | 'tags' | 'id';
 
@@ -52,11 +57,7 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const user = await prisma.user.findUnique({
-          where: {
-            id: req.query.id ?? req.user.id,
-          },
-        });
+        const user = await findUserRowById(req.query.id ?? req.user.id);
 
         if (user && user.id !== req.user.id && !canInteract(req.user.role, user.role))
           throw new ApiError(9002);
@@ -67,28 +68,30 @@ export default typedPlugin(
 
         let folderId: string | null = null;
         if (folder) {
-          const f = await prisma.folder.findFirst({
-            where: {
-              id: folder,
-            },
-            include: {
-              User: true,
-            },
-          });
+          const f = await findFolderWithOwner(folder);
           if (!f) throw new ApiError(9002);
           if (!canManage(req.user, f.User)) throw new ApiError(9002);
 
           folderId = f.id;
         }
 
-        const incompleteFiles = await prisma.incompleteFile.findMany({
-          where: {
-            userId: user.id,
-            status: {
-              not: 'COMPLETE',
-            },
-          },
-        });
+        const incompleteFiles = await listIncompleteFilesForUser(user.id, { excludeComplete: true });
+        const incompleteIds = incompleteFiles.map((file) => file.metadata.file.id);
+
+        const sharedConditions: SQL[] = [eq(fileTable.userId, user.id)];
+        if (filter === 'dashboard') {
+          sharedConditions.push(
+            or(
+              sql`${fileTable.type} LIKE 'image/%'`,
+              sql`${fileTable.type} LIKE 'video/%'`,
+              sql`${fileTable.type} LIKE 'audio/%'`,
+              sql`${fileTable.type} LIKE 'text/%'`,
+            )!,
+          );
+        }
+        if (favorite && filter !== 'all') sharedConditions.push(eq(fileTable.favorite, true));
+        if (folderId) sharedConditions.push(eq(fileTable.folderId, folderId));
+        if (incompleteIds.length) sharedConditions.push(notInArray(fileTable.id, incompleteIds));
 
         if (searchQuery) {
           let tagFiles: string[] = [];
@@ -99,93 +102,36 @@ export default typedPlugin(
               .map((tag) => tag.trim())
               .filter((tag) => tag);
 
-            const foundTags = await prisma.tag.findMany({
-              where: {
-                userId: user.id,
-                id: {
-                  in: searchQuery
-                    .split(',')
-                    .map((tag) => tag.trim())
-                    .filter((tag) => tag),
-                },
-              },
-              include: {
-                files: {
-                  select: {
-                    id: true,
-                  },
-                },
-              },
-            });
-
-            if (foundTags.length !== parsedTags.length) throw new ApiError(1032);
-
-            tagFiles = foundTags
-              .map((tag) => tag.files.map((file) => file.id))
-              .reduce((a, b) => a.filter((c) => b.includes(c)));
+            const commonIds = await commonFileIdsForTags(parsedTags, user.id);
+            if (commonIds === null) throw new ApiError(1032);
+            tagFiles = commonIds;
           }
 
-          const similarityResult = await prisma.file.findMany({
-            where: {
-              userId: user.id,
-              ...(filter === 'dashboard' && {
-                OR: [
-                  {
-                    type: { startsWith: 'image/' },
-                  },
-                  {
-                    type: { startsWith: 'video/' },
-                  },
-                  {
-                    type: { startsWith: 'audio/' },
-                  },
-                  {
-                    type: { startsWith: 'text/' },
-                  },
-                ],
-              }),
-              ...(favorite &&
-                filter !== 'all' && {
-                  favorite: true,
-                }),
-              ...(searchField === 'tags'
-                ? {
-                    id: {
-                      in: tagFiles,
-                      notIn: incompleteFiles.map((file) => file.metadata.file.id),
-                    },
-                  }
-                : searchField === 'id'
-                  ? {
-                      id: {
-                        contains: searchQuery,
-                        notIn: incompleteFiles.map((file) => file.metadata.file.id),
-                        mode: 'insensitive',
-                      },
-                    }
-                  : {
-                      [searchField]: {
-                        contains: searchQuery,
-                        mode: 'insensitive',
-                      },
-                      id: {
-                        notIn: incompleteFiles.map((file) => file.metadata.file.id),
-                      },
-                    }),
-              ...(folderId && {
-                folderId,
-              }),
-            },
-            select: fileSelect,
-            orderBy: {
-              [sortBy]: order,
-            },
-            skip: (Number(page) - 1) * perpage,
-            take: perpage,
+          const searchColumn = {
+            id: fileTable.id,
+            name: fileTable.name,
+            originalName: fileTable.originalName,
+            type: fileTable.type,
+          }[searchField === 'tags' ? 'id' : searchField];
+          sharedConditions.push(
+            searchField === 'tags'
+              ? tagFiles.length
+                ? inArray(fileTable.id, tagFiles)
+                : sql`false`
+              : ilike(searchColumn, `%${searchQuery}%`),
+          );
+
+          const similarityResult = await listFiles({
+            where: and(...sharedConditions),
+            orderBy: fileOrderBy(sortBy, order),
+            offset: (Number(page) - 1) * perpage,
+            limit: perpage,
           });
 
+          const safeResults = similarityResult.map(({ password: _password, ...file }) => file);
+
           return res.send({
-            page: cleanFiles(similarityResult),
+            page: cleanFiles(safeResults),
             search: {
               field: searchField,
               query:
@@ -199,52 +145,15 @@ export default typedPlugin(
           });
         }
 
-        const where = {
-          userId: user.id,
-          ...(filter === 'dashboard' && {
-            OR: [
-              {
-                type: { startsWith: 'image/' },
-              },
-              {
-                type: { startsWith: 'video/' },
-              },
-              {
-                type: { startsWith: 'audio/' },
-              },
-              {
-                type: { startsWith: 'text/' },
-              },
-            ],
-          }),
-          ...(favorite &&
-            filter !== 'all' && {
-              favorite: true,
-            }),
-          id: {
-            notIn: incompleteFiles.map((file) => file.metadata.file.id),
-          },
-          ...(folderId && {
-            folderId,
-          }),
-        };
-
-        const count = await prisma.file.count({
-          where,
-        });
+        const where = and(...sharedConditions);
+        const count = await countFiles(where);
 
         const files = cleanFiles(
-          await prisma.file.findMany({
+          await listFiles({
             where,
-            select: {
-              ...fileSelect,
-              password: true,
-            },
-            orderBy: {
-              [sortBy]: order,
-            },
-            skip: (Number(page) - 1) * perpage,
-            take: perpage,
+            orderBy: fileOrderBy(sortBy, order),
+            offset: (Number(page) - 1) * perpage,
+            limit: perpage,
           }),
         );
 

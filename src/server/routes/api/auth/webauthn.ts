@@ -2,14 +2,13 @@ import { ApiError } from '@/lib/api/errors';
 import { ziplineClientParseSchema } from '@/lib/api/detect';
 import { config } from '@/lib/config';
 import { createToken } from '@/lib/crypto';
-import { prisma } from '@/lib/db';
-import { User, userSchema, userSelect } from '@/lib/db/models/user';
+import { findPasskeyByCredentialId, updateUserPasskey } from '@/lib/db/models/passkey';
+import { findFullUserById, type User, userSchema } from '@/lib/db/models/user';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { TimedCache } from '@/lib/timedCache';
 import { getSession, saveSession } from '@/server/session';
 import typedPlugin from '@/server/typedPlugin';
-import { JsonObject } from '@prisma/client/runtime/client';
 import { AuthenticationResponseJSON } from '@simplewebauthn/browser';
 import {
   generateAuthenticationOptions,
@@ -31,6 +30,31 @@ export type ApiAuthWebauthnOptionsResponse = {
 const logger = log('api').c('auth').c('webauthn');
 
 const OPTIONS_CACHE = new TimedCache<string, PublicKeyCredentialRequestOptionsJSON>(2 * 60_000);
+
+function decodePublicKey(value: PasskeyReg['webauthn']['publicKey']): Uint8Array<ArrayBuffer> {
+  if (typeof value === 'string') return Uint8Array.from(Buffer.from(value, 'base64'));
+  if (Array.isArray(value)) return Uint8Array.from(value);
+  if ('$type' in value && value.$type === 'Bytes' && 'value' in value && typeof value.value === 'string') {
+    return Uint8Array.from(Buffer.from(value.value, 'base64'));
+  }
+  if ('type' in value && value.type === 'Buffer' && 'data' in value && Array.isArray(value.data)) {
+    return Uint8Array.from(value.data);
+  }
+
+  const bytes = Object.entries(value)
+    .filter(
+      (entry): entry is [string, number] =>
+        /^\d+$/.test(entry[0]) &&
+        typeof entry[1] === 'number' &&
+        Number.isInteger(entry[1]) &&
+        entry[1] >= 0 &&
+        entry[1] <= 255,
+    )
+    .sort(([left], [right]) => Number(left) - Number(right))
+    .map(([, byte]) => byte);
+  if (!bytes.length) throw new Error('Passkey public key is not a recognized byte encoding');
+  return Uint8Array.from(bytes);
+}
 
 export const PATH = '/api/auth/webauthn';
 export default typedPlugin(
@@ -111,20 +135,9 @@ export default typedPlugin(
         const cachedOptions = OPTIONS_CACHE.get(webauthnChallengeId);
         if (!cachedOptions) throw new ApiError(1048);
 
-        const user = await prisma.user.findFirst({
-          where: {
-            passkeys: {
-              some: {
-                reg: {
-                  path: ['webauthn', 'id'],
-                  equals: response.id,
-                },
-              },
-            },
-          },
-          select: userSelect,
-        });
-        if (!user) {
+        const passkey = await findPasskeyByCredentialId(response.id);
+        const user = passkey ? await findFullUserById(passkey.userId) : null;
+        if (!passkey || !user) {
           logger.warn('invalid webauthn attempt', {
             req: webauthnChallengeId,
           });
@@ -135,13 +148,6 @@ export default typedPlugin(
           throw new ApiError(1052);
         }
 
-        const passkey = user.passkeys.find((pk) => {
-          const webauthn = (pk.reg as JsonObject | null)?.webauthn as { id: string } | undefined;
-          if (!webauthn) return false;
-          return webauthn.id === response.id;
-        });
-
-        if (!passkey) throw new ApiError(1052);
         const reg = passkey.reg as PasskeyReg;
 
         if (!reg.webauthn) {
@@ -161,7 +167,7 @@ export default typedPlugin(
             credential: {
               id: reg.webauthn.id,
               counter: reg.webauthn.counter,
-              publicKey: new Uint8Array(Buffer.from(reg.webauthn.publicKey, 'base64')),
+              publicKey: decodePublicKey(reg.webauthn.publicKey),
             },
           });
         } catch (e) {
@@ -181,15 +187,11 @@ export default typedPlugin(
 
         await saveSession(session, user, false);
 
-        await prisma.userPasskey.update({
-          where: {
-            id: passkey.id,
-          },
-          data: {
-            lastUsed: new Date(),
-            reg: { webauthn: { ...reg.webauthn, counter: newCounter } },
-          },
+        const updated = await updateUserPasskey(passkey.id, {
+          lastUsed: new Date(),
+          reg: { webauthn: { ...reg.webauthn, counter: newCounter } },
         });
+        if (!updated) throw new Error(`Passkey ${passkey.id} no longer exists`);
 
         logger.info('user logged in with passkey', {
           user: user.username,

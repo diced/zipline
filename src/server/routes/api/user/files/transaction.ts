@@ -1,10 +1,11 @@
 import { ApiError } from '@/lib/api/errors';
 import { datasource } from '@/lib/datasource';
-import { prisma } from '@/lib/db';
+import { deleteFilesByIds, findFilesByIds, updateFilesByIds } from '@/lib/db/models/file';
+import { findOwnedFolderById } from '@/lib/db/models/folder';
+import { Role } from '@/lib/db/enums';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { canManage } from '@/lib/role';
-import { Role } from '@/prisma/client';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
 import z from 'zod';
@@ -59,13 +60,10 @@ export default typedPlugin(
         const { files, favorite, folder } = req.body;
 
         if (typeof favorite === 'boolean') {
-          const toFavoriteFiles = await prisma.file.findMany({
-            where: {
-              id: { in: files },
-            },
-            include: {
-              User: true,
-            },
+          const toFavoriteFiles = await findFilesByIds(files, {
+            thumbnail: false,
+            tags: false,
+            owner: true,
           });
 
           const invalids = findInvalidTargets(
@@ -75,16 +73,7 @@ export default typedPlugin(
           if (invalids.length > 0)
             throw new ApiError(3014, `You don't have the permission to modify files[${invalids.join(', ')}]`);
 
-          const resp = await prisma.file.updateMany({
-            where: {
-              id: {
-                in: files,
-              },
-            },
-            data: {
-              favorite: favorite,
-            },
-          });
+          const resp = { count: await updateFilesByIds(files, { favorite }) };
 
           if (resp.count === 0) throw new ApiError(1028);
 
@@ -98,26 +87,10 @@ export default typedPlugin(
 
         if (!folder) throw new ApiError(1020);
 
-        const f = await prisma.folder.findUnique({
-          where: {
-            id: folder,
-            userId: req.user.id,
-          },
-        });
+        const f = await findOwnedFolderById(folder, req.user.id);
         if (!f) throw new ApiError(4001);
 
-        const resp = await prisma.file.updateMany({
-          where: {
-            id: {
-              in: files,
-            },
-            userId: req.user.id,
-          },
-
-          data: {
-            folderId: folder,
-          },
-        });
+        const resp = { count: await updateFilesByIds(files, { folderId: folder }, req.user.id) };
 
         if (resp.count === 0) throw new ApiError(4006);
 
@@ -161,13 +134,10 @@ export default typedPlugin(
           files: files.length,
         });
 
-        const toDeleteFiles = await prisma.file.findMany({
-          where: {
-            id: { in: files },
-          },
-          include: {
-            User: true,
-          },
+        const toDeleteFiles = await findFilesByIds(files, {
+          thumbnail: false,
+          tags: false,
+          owner: true,
         });
 
         const invalids = findInvalidTargets(
@@ -187,13 +157,7 @@ export default typedPlugin(
           });
         }
 
-        const resp = await prisma.file.deleteMany({
-          where: {
-            id: {
-              in: files,
-            },
-          },
-        });
+        const resp = { count: await deleteFilesByIds(files) };
 
         if (resp.count === 0) throw new ApiError(1027);
 

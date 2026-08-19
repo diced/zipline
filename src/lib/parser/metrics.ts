@@ -1,4 +1,4 @@
-import { prisma } from '../db';
+import { queryTotals } from '../stats';
 
 export type ParseValueMetrics = {
   files?: number;
@@ -12,54 +12,22 @@ export async function parserMetrics(id: string): Promise<{
   metricsUser: ParseValueMetrics;
   metricsZipline: ParseValueMetrics;
 }> {
-  const fileUser = await prisma.file.aggregate({
-    _sum: {
-      views: true,
-      size: true,
-    },
-    _count: true,
-    where: {
-      userId: id,
-    },
-  });
-  const urlUserCount = await prisma.url.aggregate({
-    _sum: {
-      views: true,
-    },
-    _count: true,
-    where: {
-      userId: id,
-    },
-  });
-
-  const filesAll = await prisma.file.aggregate({
-    _sum: {
-      views: true,
-      size: true,
-    },
-    _count: true,
-  });
-  const urlsAll = await prisma.url.aggregate({
-    _sum: {
-      views: true,
-    },
-    _count: true,
-  });
+  const [user, zipline] = await Promise.all([queryTotals(id), queryTotals()]);
 
   return {
     metricsUser: {
-      files: fileUser._count,
-      urls: urlUserCount._count,
-      storage: Number(fileUser._sum.size ?? 0),
-      fileViews: Number(fileUser._sum.views ?? 0),
-      urlViews: urlUserCount._sum.views ?? 0,
+      files: user.files,
+      urls: user.urls,
+      storage: user.storage,
+      fileViews: user.fileViews,
+      urlViews: user.urlViews,
     },
     metricsZipline: {
-      files: filesAll._count,
-      urls: urlsAll._count,
-      storage: Number(filesAll._sum.size ?? 0),
-      fileViews: Number(filesAll._sum.views ?? 0),
-      urlViews: urlsAll._sum.views ?? 0,
+      files: zipline.files,
+      urls: zipline.urls,
+      storage: zipline.storage,
+      fileViews: zipline.fileViews,
+      urlViews: zipline.urlViews,
     },
   };
 }

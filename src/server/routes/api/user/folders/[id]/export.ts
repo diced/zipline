@@ -1,6 +1,6 @@
 import { ApiError } from '@/lib/api/errors';
 import { datasource } from '@/lib/datasource';
-import { prisma } from '@/lib/db';
+import { findFolderRowById, getOwnedFolderTree, type FolderTree } from '@/lib/db/models/folder';
 import { log } from '@/lib/logger';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
@@ -11,43 +11,9 @@ export type ApiUserFoldersIdExportResponse = null;
 
 const logger = log('api').c('user').c('folders').c('[id]').c('export');
 
-type FolderWithFilesAndChildren = {
-  id: string;
-  name: string;
-  files: { id: string; name: string }[];
-  children: FolderWithFilesAndChildren[];
-};
-
-async function getFolderTree(folderId: string, userId: string): Promise<FolderWithFilesAndChildren | null> {
-  const folder = await prisma.folder.findUnique({
-    where: { id: folderId, userId },
-    select: {
-      id: true,
-      name: true,
-      files: { select: { id: true, name: true } },
-      children: { select: { id: true } },
-    },
-  });
-
-  if (!folder) return null;
-
-  const children: FolderWithFilesAndChildren[] = [];
-  for (const child of folder.children) {
-    const childTree = await getFolderTree(child.id, userId);
-    if (childTree) children.push(childTree);
-  }
-
-  return {
-    id: folder.id,
-    name: folder.name,
-    files: folder.files,
-    children,
-  };
-}
-
 async function addFolderToZip(
   zip: Archiver,
-  folder: FolderWithFilesAndChildren,
+  folder: FolderTree,
   basePath: string,
   logger: ReturnType<typeof log>,
 ): Promise<number> {
@@ -89,15 +55,12 @@ export default typedPlugin(
       async (req, res) => {
         const { id } = req.params;
 
-        const folder = await prisma.folder.findUnique({
-          where: { id },
-          select: { id: true, name: true, userId: true },
-        });
+        const folder = await findFolderRowById(id);
 
         if (!folder) throw new ApiError(4001);
         if (req.user.id !== folder.userId) throw new ApiError(3011);
 
-        const folderTree = await getFolderTree(id, req.user.id);
+        const folderTree = await getOwnedFolderTree(id, req.user.id);
         if (!folderTree) throw new ApiError(4001);
 
         logger.info(`folder export requested: ${folder.name}`, { user: req.user.id, folder: folder.id });

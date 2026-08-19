@@ -2,8 +2,9 @@ import { ApiError } from '@/lib/api/errors';
 import { ziplineClientParseSchema } from '@/lib/api/detect';
 import { config } from '@/lib/config';
 import { createToken, hashPassword } from '@/lib/crypto';
-import { prisma } from '@/lib/db';
-import { userSchema, userSelect } from '@/lib/db/models/user';
+import { db } from '@/lib/db';
+import { consumeInvite } from '@/lib/db/models/invite';
+import { createFullUser, findUserRowByUsername, userSchema } from '@/lib/db/models/user';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { getSession, saveSession } from '@/server/session';
@@ -49,43 +50,27 @@ export default typedPlugin(
         if (code && !config.invites.enabled) throw new ApiError(1036);
         if (!code && !config.features.userRegistration) throw new ApiError(1037);
 
-        const oUser = await prisma.user.findUnique({
-          where: {
-            username,
-          },
-        });
+        const oUser = await findUserRowByUsername(username);
         if (oUser) throw new ApiError(1039);
 
         const hashedPassword = await hashPassword(password);
         const token = createToken();
 
-        const createUser = (db: Pick<typeof prisma, 'user'>) =>
-          db.user.create({
-            data: {
+        const createUser = (client?: Parameters<typeof createFullUser>[1]) =>
+          createFullUser(
+            {
               username,
               password: hashedPassword,
               role: 'USER',
               token,
             },
-            select: userSelect,
-          });
+            client,
+          );
 
         let user;
         if (code) {
-          const result = await prisma.$transaction(async (tx) => {
-            const [invite] = await tx.invite.updateManyAndReturn({
-              where: {
-                AND: [
-                  { OR: [{ id: code }, { code }] },
-                  { OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }] },
-                  {
-                    OR: [{ maxUses: null }, { uses: { lt: tx.invite.fields.maxUses } }],
-                  },
-                ],
-              },
-              data: { uses: { increment: 1 } },
-              select: { id: true },
-            });
+          const result = await db.transaction(async (tx) => {
+            const invite = await consumeInvite(code, tx);
 
             if (!invite) throw new ApiError(1035);
 
@@ -99,7 +84,7 @@ export default typedPlugin(
             invite: result.inviteId,
           });
         } else {
-          user = await createUser(prisma);
+          user = await createUser();
         }
 
         await saveSession(session, user);

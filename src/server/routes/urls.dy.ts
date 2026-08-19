@@ -1,6 +1,6 @@
 import { verifyAccessToken } from '@/lib/accessToken';
 import { config } from '@/lib/config';
-import { prisma } from '@/lib/db';
+import { deleteUrlById, findUrlByIdentifier, incrementUrlViews } from '@/lib/db/models/url';
 import { log } from '@/lib/logger';
 import { FastifyReply, FastifyRequest } from 'fastify';
 
@@ -21,21 +21,13 @@ export async function urlsRoute(
   const { id } = req.params;
   const { token } = req.query;
 
-  const url = await prisma.url.findFirst({
-    where: {
-      OR: [{ code: id }, { vanity: id }, { id }],
-    },
-  });
+  const url = await findUrlByIdentifier(id);
   if (!url) return res.callNotFound();
   if (!url.enabled) return res.callNotFound();
 
   if (url.maxViews && url.views >= url.maxViews) {
     if (config.features.deleteOnMaxViews) {
-      await prisma.url.delete({
-        where: {
-          id: url.id,
-        },
-      });
+      await deleteUrlById(url.id);
 
       logger.info(`${url.code} deleted due to reaching max views`, {
         id: url.id,
@@ -52,16 +44,7 @@ export async function urlsRoute(
     if (!valid) return res.redirect(`/view/url/${url.id}`);
   }
 
-  await prisma.url.update({
-    where: {
-      id: url.id,
-    },
-    data: {
-      views: {
-        increment: 1,
-      },
-    },
-  });
+  await incrementUrlViews(url.id);
 
   return res.redirect(url.destination);
 }

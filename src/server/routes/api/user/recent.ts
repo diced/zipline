@@ -1,8 +1,9 @@
-import { prisma } from '@/lib/db';
-import { File, cleanFiles, fileSchema, fileSelect } from '@/lib/db/models/file';
+import { files as fileTable } from '@/lib/db/schema';
+import { File, cleanFiles, fileSchema, listFiles } from '@/lib/db/models/file';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
 import z from 'zod';
+import { desc, eq } from 'drizzle-orm';
 
 export type ApiUserRecentResponse = File[];
 
@@ -28,18 +29,10 @@ export default typedPlugin(
         const { take } = req.query;
 
         const files = cleanFiles(
-          await prisma.file.findMany({
-            where: {
-              userId: req.user.id,
-            },
-            select: {
-              ...fileSelect,
-              password: true,
-            },
-            orderBy: {
-              createdAt: 'desc',
-            },
-            take,
+          await listFiles({
+            where: eq(fileTable.userId, req.user.id),
+            orderBy: desc(fileTable.createdAt),
+            limit: take,
           }),
         );
 

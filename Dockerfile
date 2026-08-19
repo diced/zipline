@@ -8,7 +8,7 @@ RUN corepack enable \
 
 WORKDIR /zipline
 
-COPY prisma ./prisma
+COPY drizzle ./drizzle
 COPY package.json .
 COPY pnpm-lock.yaml .
 COPY pnpm-workspace.yaml .
@@ -45,9 +45,6 @@ COPY --from=builder /zipline/build ./build
 
 COPY --from=builder /zipline/mimes.json ./mimes.json
 COPY --from=builder /zipline/code.json ./code.json
-
-RUN pnpm prisma generate \
-    && rm -rf /tmp/* /root/*
 
 ENV NODE_ENV=production
 ENV ZIPLINE_ROOT=/zipline

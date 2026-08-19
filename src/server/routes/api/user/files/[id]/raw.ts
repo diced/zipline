@@ -4,7 +4,8 @@ import { ApiError } from '@/lib/api/errors';
 import { parseRange } from '@/lib/api/range';
 import { config } from '@/lib/config';
 import { datasource } from '@/lib/datasource';
-import { prisma } from '@/lib/db';
+import { deleteFileById, findFileByIdentifier } from '@/lib/db/models/file';
+import { findThumbnailWithOwnerByPath } from '@/lib/db/models/thumbnail';
 import { sanitizeFilename } from '@/lib/fs';
 import { log } from '@/lib/logger';
 import { guess } from '@/lib/mimes';
@@ -45,18 +46,7 @@ export default typedPlugin(
         if (!id) throw new ApiError(9002);
 
         if (id.startsWith('.thumbnail')) {
-          const thumbnail = await prisma.thumbnail.findFirst({
-            where: {
-              path: id,
-            },
-            include: {
-              file: {
-                include: {
-                  User: true,
-                },
-              },
-            },
-          });
+          const thumbnail = await findThumbnailWithOwnerByPath(id);
 
           if (!thumbnail) throw new ApiError(9002);
           if (thumbnail.file && thumbnail.file.userId !== req.user.id) {
@@ -78,14 +68,7 @@ export default typedPlugin(
             .send(buf);
         }
 
-        const file = await prisma.file.findFirst({
-          where: {
-            OR: [{ id }, { name: id }],
-          },
-          include: {
-            User: true,
-          },
-        });
+        const file = await findFileByIdentifier(id, { thumbnail: false, tags: false, owner: true });
         if (!file) throw new ApiError(9002);
 
         if (file.userId !== req.user.id) {
@@ -95,11 +78,7 @@ export default typedPlugin(
         if (file.deletesAt && file.deletesAt <= new Date()) {
           try {
             await datasource.delete(file.name);
-            await prisma.file.delete({
-              where: {
-                id: file.id,
-              },
-            });
+            await deleteFileById(file.id);
           } catch (e) {
             logger
               .error('failed to delete file on expiration', {
@@ -116,11 +95,7 @@ export default typedPlugin(
 
           try {
             await datasource.delete(file.name);
-            await prisma.file.delete({
-              where: {
-                id: file.id,
-              },
-            });
+            await deleteFileById(file.id);
           } catch (e) {
             logger
               .error('failed to delete file on max views', {

@@ -1,7 +1,7 @@
 import { ApiError } from '@/lib/api/errors';
 import { createAccessToken } from '@/lib/accessToken';
 import { verifyPassword } from '@/lib/crypto';
-import { prisma } from '@/lib/db';
+import { findFileRowByIdentifier } from '@/lib/db/models/file';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { zStringTrimmed } from '@/lib/validation';
@@ -40,16 +40,7 @@ export default typedPlugin(
         ...secondlyRatelimit(2),
       },
       async (req, res) => {
-        const file = await prisma.file.findFirst({
-          where: {
-            OR: [{ id: req.params.id }, { name: req.params.id }],
-          },
-          select: {
-            name: true,
-            password: true,
-            id: true,
-          },
-        });
+        const file = await findFileRowByIdentifier(req.params.id);
         if (!file) throw new ApiError(4000);
         if (!file.password) throw new ApiError(4000);
 

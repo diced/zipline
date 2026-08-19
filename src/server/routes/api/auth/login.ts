@@ -1,8 +1,7 @@
 import { ApiError } from '@/lib/api/errors';
 import { ziplineClientParseSchema } from '@/lib/api/detect';
 import { verifyPassword } from '@/lib/crypto';
-import { prisma } from '@/lib/db';
-import { loginUserSelect, User, userSchema } from '@/lib/db/models/user';
+import { findLoginUserByUsername, type User, userSchema } from '@/lib/db/models/user';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { verifyTotpCode } from '@/lib/totp';
@@ -52,12 +51,7 @@ export default typedPlugin(
 
         const { username, password, code } = req.body;
 
-        const user = await prisma.user.findUnique({
-          where: {
-            username,
-          },
-          select: loginUserSelect,
-        });
+        const user = await findLoginUserByUsername(username);
         if (!user) throw new ApiError(1044);
         if (!user.password) throw new ApiError(1044);
 
@@ -98,8 +92,10 @@ export default typedPlugin(
           ua: req.headers['user-agent'],
         });
 
+        const { password: _password, totpSecret: _totpSecret, ...publicUser } = user;
+
         return res.send({
-          user,
+          user: publicUser,
         });
       },
     );

@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/db';
+import { deleteUserSession } from '@/lib/db/models/session';
 import { log } from '@/lib/logger';
 import { userMiddleware } from '@/server/middleware/user';
 import { getSession } from '@/server/session';
@@ -31,12 +31,7 @@ export default typedPlugin(
       async (req, res) => {
         const current = await getSession(req, res);
 
-        await prisma.userSession.deleteMany({
-          where: {
-            id: current.sessionId!,
-            userId: req.user.id,
-          },
-        });
+        await deleteUserSession(req.user.id, current.sessionId!);
 
         current.destroy();
 

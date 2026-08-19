@@ -1,3 +1,4 @@
+import { listVideoFilesNeedingThumbnails } from '@/lib/db/models/file';
 import { IntervalTask, WorkerTask } from '..';
 
 export function runThumbnailWorkers(workers: WorkerTask[], files: string[]) {
@@ -26,7 +27,7 @@ export function runThumbnailWorkers(workers: WorkerTask[], files: string[]) {
   }
 }
 
-export default function thumbnails(prisma: typeof globalThis.__db__) {
+export default function thumbnails() {
   return async function (this: IntervalTask, rerun = false) {
     const thumbnailWorkers = this.tasks.tasks.filter(
       (x) => 'worker' in x && x.id.startsWith('thumbnail'),
@@ -36,16 +37,7 @@ export default function thumbnails(prisma: typeof globalThis.__db__) {
 
     if (rerun) this.logger.debug('regenerating thumbnails for all videos');
 
-    const thumbnailNeeded = await prisma.file.findMany({
-      where: {
-        ...(rerun ? {} : { thumbnail: { is: null } }),
-
-        type: {
-          startsWith: 'video/',
-        },
-        size: { gt: 0 },
-      },
-    });
+    const thumbnailNeeded = await listVideoFilesNeedingThumbnails(rerun);
     if (!thumbnailNeeded.length) return;
 
     this.logger.debug(`found ${thumbnailNeeded.length} files that need thumbnails`);

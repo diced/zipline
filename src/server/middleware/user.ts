@@ -1,7 +1,12 @@
 import { config } from '@/lib/config';
 import { decryptToken } from '@/lib/crypto';
-import { prisma } from '@/lib/db';
-import { limitedUserSelect, User, userSelect } from '@/lib/db/models/user';
+import {
+  findFullUserBySessionId,
+  findFullUserByToken,
+  findLimitedUserBySessionId,
+  findLimitedUserByToken,
+  type User,
+} from '@/lib/db/models/user';
 import { FastifyReply } from 'fastify';
 import { FastifyRequest } from 'fastify/types/request';
 import { getSession } from '../session';
@@ -58,12 +63,7 @@ export async function userMiddleware(req: FastifyRequest, res: FastifyReply) {
   if (authorization) {
     const token = parseUserToken(authorization);
 
-    const user = await prisma.user.findFirst({
-      where: {
-        token,
-      },
-      select: leanUpload ? limitedUserSelect : userSelect,
-    });
+    const user = leanUpload ? await findLimitedUserByToken(token) : await findFullUserByToken(token);
     if (!user) throw new ApiError(2001);
 
     req.user = user as User;
@@ -76,16 +76,9 @@ export async function userMiddleware(req: FastifyRequest, res: FastifyReply) {
 
   if (!session.id || !session.sessionId) throw new ApiError(2000);
 
-  const user = await prisma.user.findFirst({
-    where: {
-      sessions: {
-        some: {
-          id: session.sessionId,
-        },
-      },
-    },
-    select: leanUpload ? limitedUserSelect : userSelect,
-  });
+  const user = leanUpload
+    ? await findLimitedUserBySessionId(session.sessionId)
+    : await findFullUserBySessionId(session.sessionId);
   if (!user) throw new ApiError(2001);
 
   req.user = user as User;

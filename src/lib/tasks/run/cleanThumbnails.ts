@@ -1,15 +1,11 @@
 import { datasource } from '@/lib/datasource';
+import { deleteThumbnailById, listThumbnails } from '@/lib/db/models/thumbnail';
 import { IntervalTask } from '..';
 
-export default function cleanThumbnails(prisma: typeof globalThis.__db__) {
+export default function cleanThumbnails() {
   return async function (this: IntervalTask) {
     const fsThumbnails = await datasource.list({ prefix: '.thumbnail.' });
-    const dbThumbnails = await prisma.thumbnail.findMany({
-      select: {
-        id: true,
-        path: true,
-      },
-    });
+    const dbThumbnails = await listThumbnails();
 
     const paths = new Set(dbThumbnails.map((t) => t.path));
     const fsOrphaned = fsThumbnails.filter((path) => !paths.has(path));
@@ -28,11 +24,7 @@ export default function cleanThumbnails(prisma: typeof globalThis.__db__) {
 
     for (const thumb of dbOrphaned) {
       try {
-        await prisma.thumbnail.delete({
-          where: {
-            id: thumb.id,
-          },
-        });
+        await deleteThumbnailById(thumb.id);
         this.logger.info('deleted orphaned thumbnail from database', { path: thumb.path });
       } catch (err) {
         this.logger.error('failed to delete orphaned thumbnail from database', {

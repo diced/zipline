@@ -13,7 +13,7 @@ declare global {
       // if running a build, dont connect db
       ZIPLINE_BUILD?: string;
 
-      // run with extra prisma db logs
+      // run with extra database query logs
       ZIPLINE_DB_LOG?: string;
 
       // enables worker threads to log inits

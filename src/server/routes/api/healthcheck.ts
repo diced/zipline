@@ -1,8 +1,9 @@
 import { ApiError } from '@/lib/api/errors';
 import { config } from '@/lib/config';
-import { prisma } from '@/lib/db';
+import { db } from '@/lib/db';
 import { log } from '@/lib/logger';
 import typedPlugin from '@/server/typedPlugin';
+import { sql } from 'drizzle-orm';
 import z from 'zod';
 
 export type ApiHealthcheckResponse = {
@@ -31,7 +32,7 @@ export default typedPlugin(
         if (!config.features.healthcheck) throw new ApiError(9002);
 
         try {
-          await prisma.$queryRaw`SELECT 1;`;
+          await db.execute(sql`SELECT 1`);
           return res.send({ pass: true });
         } catch (e) {
           logger.error('there was an error during a healthcheck').error(e as Error);

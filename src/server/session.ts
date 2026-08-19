@@ -1,6 +1,6 @@
 import { detectClient, ZiplineClient } from '@/lib/api/detect';
 import { config } from '@/lib/config';
-import { prisma } from '@/lib/db';
+import { createUserSession, replaceUserSessions } from '@/lib/db/models/session';
 import { randomCharacters } from '@/lib/random';
 import { fastifyCookie } from '@fastify/cookie';
 import { FastifyReply, FastifyRequest } from 'fastify';
@@ -83,37 +83,16 @@ export async function saveSession(
     const sessionId = randomCharacters(32);
     session.sessionId = sessionId;
 
-    if (overwriteSessions) {
-      await prisma.user.update({
-        where: { id: user.id },
-        data: {
-          sessions: {
-            set: [
-              {
-                id: sessionId,
-                client: session.client.client,
-                device: session.client.device,
-                ua: session.client.ua,
-              },
-            ],
-          },
-        },
-      });
-    } else {
-      await prisma.user.update({
-        where: { id: user.id },
-        data: {
-          sessions: {
-            create: {
-              id: sessionId,
-              client: session.client.client,
-              device: session.client.device,
-              ua: session.client.ua,
-            },
-          },
-        },
-      });
-    }
+    const dbSession = {
+      id: sessionId,
+      userId: user.id,
+      client: session.client.client,
+      device: session.client.device,
+      ua: session.client.ua,
+    };
+
+    if (overwriteSessions) await replaceUserSessions(dbSession);
+    else await createUserSession(dbSession);
   }
 
   await session.save();

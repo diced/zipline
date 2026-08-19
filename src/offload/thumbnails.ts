@@ -2,7 +2,6 @@ import { bytes } from '@/lib/bytes';
 import { Config } from '@/lib/config/validate';
 import { getDatasource } from '@/lib/datasource';
 import { Datasource } from '@/lib/datasource/Datasource';
-import type { File } from '@/lib/db/models/file';
 import { log } from '@/lib/logger';
 import { randomCharacters } from '@/lib/random';
 import ffmpeg from '@/lib/ffmpeg';
@@ -16,8 +15,6 @@ export type ThumbnailWorkerData = {
   enabled: boolean;
   config: Config;
 };
-
-type ThumbnailId = File['thumbnail'] & { id: string };
 
 const { id, enabled, config } = workerData as ThumbnailWorkerData;
 
@@ -93,14 +90,7 @@ function genThumbnail(input: string, output: string): Promise<Buffer | undefined
 
 async function generate(config: Config, datasource: Datasource, ids: string[]) {
   for (const id of ids) {
-    const file = await dbProxy<File>('file.findUnique', {
-      where: {
-        id,
-      },
-      include: {
-        thumbnail: true,
-      },
-    });
+    const file = await dbProxy('file.thumbnailSource', { id });
 
     if (!file) continue;
     if (!file.type.startsWith('video/')) {
@@ -139,32 +129,22 @@ async function generate(config: Config, datasource: Datasource, ids: string[]) {
       mimetype: formatMimes[config.features.thumbnails.format] || 'image/jpeg',
     });
 
-    const existingThumbnail = await dbProxy<ThumbnailId>('thumbnail.findFirst', {
-      where: {
-        fileId: file.id,
-      },
-    });
+    const existingThumbnail = await dbProxy('thumbnail.byFile', { fileId: file.id });
 
     let t;
     if (!existingThumbnail) {
-      t = await dbProxy<ThumbnailId>('thumbnail.create', {
-        data: {
-          fileId: file.id,
-          path: name(`.thumbnail.${file.id}`),
-        },
+      t = await dbProxy('thumbnail.create', {
+        fileId: file.id,
+        path: name(`.thumbnail.${file.id}`),
       });
     } else {
-      t = await dbProxy<ThumbnailId>('thumbnail.update', {
-        where: {
-          id: existingThumbnail.id,
-        },
-        data: {
-          createdAt: new Date(),
-        },
+      t = await dbProxy('thumbnail.touch', {
+        id: existingThumbnail.id,
+        createdAt: new Date(),
       });
     }
 
-    logger.info('generated thumbnail', { id: t.id, fileId: file.id, size: bytes(thumbnail.length) });
+    if (t) logger.info('generated thumbnail', { id: t.id, fileId: file.id, size: bytes(thumbnail.length) });
   }
 }
 
