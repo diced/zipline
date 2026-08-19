@@ -9,7 +9,7 @@ import {
   deleteFileById,
   type FileInsert,
   lockFileOwner,
-  updateFileHydrated,
+  updateFileWithRelations,
 } from '@/lib/db/models/file';
 import { findFolderRowById } from '@/lib/db/models/folder';
 import {
@@ -402,7 +402,7 @@ export default typedPlugin(
                 });
                 break;
               case 'file.finalizePartial':
-                result = await updateFileHydrated(message.payload.id, message.payload.changes);
+                result = await updateFileWithRelations(message.payload.id, message.payload.changes);
                 await deletePartial(partialIdentifier, false);
                 break;
               case 'file.delete': {

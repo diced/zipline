@@ -1,85 +1,67 @@
 import { db, type Transaction } from '@/lib/db';
 import { urls, users } from '@/lib/db/schema';
 import { firstOrNull } from '@/lib/db/utils';
-import { and, count, eq, getTableColumns, gte, inArray, isNotNull, or, sql } from 'drizzle-orm';
+import { and, eq, getTableColumns, gte, inArray, isNotNull, or, sql } from 'drizzle-orm';
+import type { PgUpdateSetSource } from 'drizzle-orm/pg-core';
+import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
 const { password: _password, ...urlWithoutPasswordColumns } = getTableColumns(urls);
 
 export type UrlSearchField = 'destination' | 'vanity' | 'code';
 
-export type CreateUrlInput = {
-  userId: string;
-  destination: string;
-  code: string;
-  vanity?: string | null;
-  maxViews?: number;
-  password?: string;
-  enabled?: boolean;
-};
+type UrlInsert = typeof urls.$inferInsert;
+export type CreateUrlInput = Required<Pick<UrlInsert, 'destination' | 'code'>> &
+  Pick<UrlInsert, 'vanity' | 'maxViews' | 'password' | 'enabled'> & { userId: string };
 
-export type UpdateUrlInput = {
-  vanity?: string | null;
-  password?: string | null;
-  maxViews?: number | null;
-  destination?: string;
-  enabled?: boolean;
-};
+export type UpdateUrlInput = Omit<
+  PgUpdateSetSource<typeof urls>,
+  'id' | 'createdAt' | 'updatedAt' | 'views' | 'userId' | 'code'
+>;
 
 export async function findUrlByIdentifier(identifier: string) {
-  const rows = await db
-    .select()
-    .from(urls)
-    .where(or(eq(urls.code, identifier), eq(urls.vanity, identifier), eq(urls.id, identifier)))
-    .limit(1);
-
-  return firstOrNull(rows);
+  return (
+    (await db.query.urls.findFirst({
+      where: or(eq(urls.code, identifier), eq(urls.vanity, identifier), eq(urls.id, identifier)),
+    })) ?? null
+  );
 }
 
 export async function findUrlForViewByIdentifier(identifier: string) {
-  const rows = await db
-    .select({
-      id: urls.id,
-      password: urls.password,
-      destination: urls.destination,
-      maxViews: urls.maxViews,
-      views: urls.views,
-      enabled: urls.enabled,
-    })
-    .from(urls)
-    .where(or(eq(urls.vanity, identifier), eq(urls.code, identifier), eq(urls.id, identifier)))
-    .limit(1);
-
-  return firstOrNull(rows);
+  return (
+    (await db.query.urls.findFirst({
+      columns: {
+        id: true,
+        password: true,
+        destination: true,
+        maxViews: true,
+        views: true,
+        enabled: true,
+      },
+      where: or(eq(urls.vanity, identifier), eq(urls.code, identifier), eq(urls.id, identifier)),
+    })) ?? null
+  );
 }
 
 export async function findUrlPasswordByIdentifier(identifier: string) {
-  const rows = await db
-    .select({ id: urls.id, password: urls.password })
-    .from(urls)
-    .where(or(eq(urls.id, identifier), eq(urls.code, identifier), eq(urls.vanity, identifier)))
-    .limit(1);
-
-  return firstOrNull(rows);
+  return (
+    (await db.query.urls.findFirst({
+      columns: { id: true, password: true },
+      where: or(eq(urls.id, identifier), eq(urls.code, identifier), eq(urls.vanity, identifier)),
+    })) ?? null
+  );
 }
 
 export async function urlVanityExists(vanity: string) {
-  const rows = await db.select({ id: urls.id }).from(urls).where(eq(urls.vanity, vanity)).limit(1);
-  return rows.length !== 0;
+  return (await db.$count(urls, eq(urls.vanity, vanity))) > 0;
 }
 
 export async function urlCodeExists(code: string) {
-  const rows = await db.select({ id: urls.id }).from(urls).where(eq(urls.code, code)).limit(1);
-  return rows.length !== 0;
+  return (await db.$count(urls, eq(urls.code, code))) > 0;
 }
 
 export async function urlSlugExists(slug: string) {
-  const rows = await db
-    .select({ id: urls.id })
-    .from(urls)
-    .where(or(eq(urls.code, slug), eq(urls.vanity, slug)))
-    .limit(1);
-  return rows.length !== 0;
+  return (await db.$count(urls, or(eq(urls.code, slug), eq(urls.vanity, slug)))) > 0;
 }
 
 /**
@@ -92,8 +74,7 @@ export async function createUrlForUser(input: CreateUrlInput, maxUrls?: number |
   return db.transaction(async (tx) => {
     await tx.select({ id: users.id }).from(users).where(eq(users.id, input.userId)).for('update');
 
-    const countRows = await tx.select({ value: count() }).from(urls).where(eq(urls.userId, input.userId));
-    const currentCount = countRows[0]?.value ?? 0;
+    const currentCount = await tx.$count(urls, eq(urls.userId, input.userId));
 
     if (maxUrls && currentCount + 1 > maxUrls) return null;
 
@@ -117,23 +98,20 @@ export async function createUrlForUser(input: CreateUrlInput, maxUrls?: number |
 }
 
 export async function findOwnedUrlById(id: string, userId: string) {
-  const rows = await db
-    .select()
-    .from(urls)
-    .where(and(eq(urls.id, id), eq(urls.userId, userId)))
-    .limit(1);
-
-  return firstOrNull(rows);
+  return (
+    (await db.query.urls.findFirst({
+      where: and(eq(urls.id, id), eq(urls.userId, userId)),
+    })) ?? null
+  );
 }
 
 export async function findOwnedUrlByIdWithoutPassword(id: string, userId: string) {
-  const rows = await db
-    .select(urlWithoutPasswordColumns)
-    .from(urls)
-    .where(and(eq(urls.id, id), eq(urls.userId, userId)))
-    .limit(1);
-
-  return firstOrNull(rows);
+  return (
+    (await db.query.urls.findFirst({
+      columns: { password: false },
+      where: and(eq(urls.id, id), eq(urls.userId, userId)),
+    })) ?? null
+  );
 }
 
 export async function updateOwnedUrlById(id: string, userId: string, changes: UpdateUrlInput) {
@@ -180,14 +158,14 @@ export async function searchUserUrls(userId: string, searchField: UrlSearchField
   }[searchField];
   const escaped = searchQuery.replaceAll('\\', '\\\\').replaceAll('%', '\\%').replaceAll('_', '\\_');
 
-  return db
-    .select(urlWithoutPasswordColumns)
-    .from(urls)
-    .where(and(eq(urls.userId, userId), sql`${searchColumn} ILIKE ${`%${escaped}%`} ESCAPE '\\'`));
+  return db.query.urls.findMany({
+    columns: { password: false },
+    where: and(eq(urls.userId, userId), sql`${searchColumn} ILIKE ${`%${escaped}%`} ESCAPE '\\'`),
+  });
 }
 
 export function listUserUrls(userId: string) {
-  return db.select().from(urls).where(eq(urls.userId, userId));
+  return db.query.urls.findMany({ where: eq(urls.userId, userId) });
 }
 
 export function listUrlsAtMaxViews() {
@@ -206,28 +184,14 @@ export async function deleteUrlsByIds(ids: string[], tx?: Transaction) {
 
 export function cleanUrlPasswords(urls: Url[]) {
   for (const url of urls) {
-    (url as any).password = !!url.password;
+    url.password = !!url.password;
   }
 
   return urls;
 }
 
-export const urlSchema = z.object({
-  id: z.string(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
-
-  code: z.string(),
-  vanity: z.string().nullable(),
-  destination: z.string(),
-  views: z.number(),
-  maxViews: z.number().nullable(),
-  password: z.union([z.string(), z.boolean()]).nullable(),
-  enabled: z.boolean(),
-
-  userId: z.string().nullable(),
-
-  similarity: z.number().optional(),
-});
+export const urlSchema = createSelectSchema(urls, {
+  password: (schema) => z.union([schema, z.boolean()]),
+}).extend({ similarity: z.number().optional() });
 
 export type Url = z.infer<typeof urlSchema>;

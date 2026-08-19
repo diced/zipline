@@ -1,7 +1,7 @@
 import { db } from '@/lib/db';
 import { metrics } from '@/lib/db/schema';
-import { firstOrNull } from '@/lib/db/utils';
 import { and, desc, gte, lte } from 'drizzle-orm';
+import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
 export type MetricData = z.infer<typeof metricDataSchema>;
@@ -37,20 +37,12 @@ export const metricDataSchema = z.object({
   ),
 });
 
-export const metricSchema = z.object({
-  id: z.string(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
-  data: metricDataSchema,
-});
+export const metricSchema = createSelectSchema(metrics, { data: metricDataSchema });
 
 export type Metric = z.infer<typeof metricSchema>;
 
 function parseMetric(row: typeof metrics.$inferSelect): Metric {
-  return metricSchema.parse({
-    ...row,
-    data: metricDataSchema.parse(row.data),
-  });
+  return metricSchema.parse(row);
 }
 
 export async function createMetric(data: MetricData): Promise<Metric> {
@@ -73,13 +65,14 @@ export async function createMetrics(data: MetricData[]): Promise<Metric[]> {
 }
 
 export async function listMetrics(): Promise<Metric[]> {
-  return (await db.select().from(metrics)).map(parseMetric);
+  return (await db.query.metrics.findMany()).map(parseMetric);
 }
 
 export async function getLatestMetric(from?: Date, to?: Date): Promise<Metric | null> {
   const dateRange = from && to ? and(gte(metrics.createdAt, from), lte(metrics.createdAt, to)) : undefined;
-  const row = firstOrNull(
-    await db.select().from(metrics).where(dateRange).orderBy(desc(metrics.createdAt)).limit(1),
-  );
+  const row = await db.query.metrics.findFirst({
+    where: dateRange,
+    orderBy: desc(metrics.createdAt),
+  });
   return row ? parseMetric(row) : null;
 }

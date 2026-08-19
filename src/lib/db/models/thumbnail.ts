@@ -1,41 +1,44 @@
-import { db } from '@/lib/db';
-import { files, thumbnails, users } from '@/lib/db/schema';
+import { db, type Database } from '@/lib/db';
+import { files, thumbnails } from '@/lib/db/schema';
 import { and, eq, inArray, isNull } from 'drizzle-orm';
 import type { DbClient } from './user';
 
 export type Thumbnail = typeof thumbnails.$inferSelect;
 export type ThumbnailInsert = typeof thumbnails.$inferInsert;
 
+type ThumbnailFindFirstConfig = NonNullable<Parameters<Database['query']['thumbnails']['findFirst']>[0]>;
+const thumbnailOwnerRelations = {
+  file: {
+    columns: { userId: true },
+    with: {
+      User: { columns: { id: true, role: true } },
+    },
+  },
+} as const satisfies NonNullable<ThumbnailFindFirstConfig['with']>;
+
 export async function listThumbnails(client: DbClient = db) {
-  return client.select().from(thumbnails);
+  return client.query.thumbnails.findMany();
 }
 
 export async function findThumbnailByFileId(fileId: string, client: DbClient = db) {
-  const rows = await client.select().from(thumbnails).where(eq(thumbnails.fileId, fileId)).limit(1);
-  return rows[0] ?? null;
+  return (await client.query.thumbnails.findFirst({ where: eq(thumbnails.fileId, fileId) })) ?? null;
 }
 
 export async function findPublicThumbnailByPath(path: string, client: DbClient = db) {
-  const rows = await client
-    .select({ thumbnail: thumbnails })
-    .from(thumbnails)
-    .innerJoin(files, eq(files.id, thumbnails.fileId))
-    .where(and(eq(thumbnails.path, path), isNull(files.password)))
-    .limit(1);
-  return rows[0]?.thumbnail ?? null;
+  const publicFiles = client.select({ id: files.id }).from(files).where(isNull(files.password));
+  return (
+    (await client.query.thumbnails.findFirst({
+      where: and(eq(thumbnails.path, path), inArray(thumbnails.fileId, publicFiles)),
+    })) ?? null
+  );
 }
 
 export async function findThumbnailWithOwnerByPath(path: string, client: DbClient = db) {
-  const rows = await client
-    .select({ thumbnail: thumbnails, file: files, owner: { id: users.id, role: users.role } })
-    .from(thumbnails)
-    .innerJoin(files, eq(files.id, thumbnails.fileId))
-    .leftJoin(users, eq(users.id, files.userId))
-    .where(eq(thumbnails.path, path))
-    .limit(1);
-  const row = rows[0];
-  if (!row) return null;
-  return { ...row.thumbnail, file: { ...row.file, User: row.owner?.id ? row.owner : null } };
+  const row = await client.query.thumbnails.findFirst({
+    where: eq(thumbnails.path, path),
+    with: thumbnailOwnerRelations,
+  });
+  return row ?? null;
 }
 
 export async function createThumbnail(data: ThumbnailInsert, client: DbClient = db) {

@@ -2,7 +2,12 @@ import { ApiError } from '@/lib/api/errors';
 import { ziplineClientParseSchema } from '@/lib/api/detect';
 import { config } from '@/lib/config';
 import { createToken } from '@/lib/crypto';
-import { findPasskeyByCredentialId, updateUserPasskey } from '@/lib/db/models/passkey';
+import {
+  findPasskeyByCredentialId,
+  passkeyRegSchema,
+  updateUserPasskey,
+  type PasskeyReg,
+} from '@/lib/db/models/passkey';
 import { findFullUserById, type User, userSchema } from '@/lib/db/models/user';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
@@ -16,7 +21,7 @@ import {
   verifyAuthenticationResponse,
 } from '@simplewebauthn/server';
 import z from 'zod';
-import { PasskeyReg, passkeysEnabledHandler } from '../user/mfa/passkey';
+import { passkeysEnabledHandler } from '../user/mfa/passkey';
 
 export type ApiAuthWebauthnResponse = {
   user: User;
@@ -148,12 +153,12 @@ export default typedPlugin(
           throw new ApiError(1052);
         }
 
-        const reg = passkey.reg as PasskeyReg;
-
-        if (!reg.webauthn) {
+        const parsedReg = passkeyRegSchema.safeParse(passkey.reg);
+        if (!parsedReg.success) {
           logger.debug('invalid webauthn attempt, legacy passkey found...');
           throw new ApiError(1060);
         }
+        const reg = parsedReg.data;
 
         OPTIONS_CACHE.delete(webauthnChallengeId);
 

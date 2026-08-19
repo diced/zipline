@@ -5,8 +5,8 @@ import {
   buildPublicParentChain,
   cleanFolder,
   Folder,
-  folderSchema,
   getPublicFolderDetails,
+  publicFolderSchema,
 } from '@/lib/db/models/folder';
 import { paginationQs } from '@/lib/validation';
 import typedPlugin from '@/server/typedPlugin';
@@ -41,7 +41,7 @@ export default typedPlugin(
             .partial({ page: true }),
           response: {
             200: z.object({
-              folder: folderSchema.partial(),
+              folder: publicFolderSchema.partial(),
               page: z.array(fileSchema),
               total: z.number(),
               pages: z.number(),
@@ -91,7 +91,7 @@ export default typedPlugin(
           folder.parent = await buildPublicParentChain(folder.parentId);
         }
 
-        const cleanedFolder = cleanFolder(folder, true);
+        const cleanedFolder = publicFolderSchema.parse(cleanFolder(folder, true));
 
         return res.send({
           folder: cleanedFolder,

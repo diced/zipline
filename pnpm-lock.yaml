@@ -113,6 +113,9 @@ importers:
       drizzle-orm:
         specifier: 0.45.2
         version: 0.45.2(@types/pg@8.15.5)(pg@8.16.3)
+      drizzle-zod:
+        specifier: 0.8.3
+        version: 0.8.3(drizzle-orm@0.45.2(@types/pg@8.15.5)(pg@8.16.3))(zod@4.4.3)
       fast-glob:
         specifier: ^3.3.3
         version: 3.3.3
@@ -2812,6 +2815,12 @@ packages:
         optional: true
       sqlite3:
         optional: true
+
+  drizzle-zod@0.8.3:
+    resolution: {integrity: sha512-66yVOuvGhKJnTdiqj1/Xaaz9/qzOdRJADpDa68enqS6g3t0kpNkwNYjUuaeXgZfO/UWuIM9HIhSlJ6C5ZraMww==}
+    peerDependencies:
+      drizzle-orm: '>=0.36.0'
+      zod: ^3.25.0 || ^4.0.0
 
   eastasianwidth@0.2.0:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
@@ -6255,6 +6264,11 @@ snapshots:
     optionalDependencies:
       '@types/pg': 8.15.5
       pg: 8.16.3
+
+  drizzle-zod@0.8.3(drizzle-orm@0.45.2(@types/pg@8.15.5)(pg@8.16.3))(zod@4.4.3):
+    dependencies:
+      drizzle-orm: 0.45.2(@types/pg@8.15.5)(pg@8.16.3)
+      zod: 4.4.3
 
   eastasianwidth@0.2.0: {}
 

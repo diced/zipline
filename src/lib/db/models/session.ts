@@ -1,4 +1,4 @@
-import { db, type Transaction } from '@/lib/db';
+import { db } from '@/lib/db';
 import { userSessions } from '@/lib/db/schema';
 import { and, eq, ne } from 'drizzle-orm';
 import type { DbClient, UserSession } from './user';
@@ -12,7 +12,7 @@ export async function createUserSession(data: NewUserSession, client: DbClient =
 }
 
 export async function replaceUserSessions(data: NewUserSession) {
-  return db.transaction(async (tx: Transaction) => {
+  return db.transaction(async (tx) => {
     await tx.delete(userSessions).where(eq(userSessions.userId, data.userId));
     return createUserSession(data, tx);
   });
@@ -37,5 +37,5 @@ export async function deleteOtherUserSessions(
 }
 
 export async function listUserSessions(userId: string, client: DbClient = db) {
-  return client.select().from(userSessions).where(eq(userSessions.userId, userId));
+  return client.query.userSessions.findMany({ where: eq(userSessions.userId, userId) });
 }

@@ -5,7 +5,7 @@ import { secondlyRatelimit } from '@/lib/ratelimits';
 import typedPlugin from '@/server/typedPlugin';
 import z from 'zod';
 
-export type ApiAuthInvitesWebResponse = Invite & {
+export type ApiAuthInvitesWebResponse = Pick<Invite, 'code' | 'maxUses' | 'uses'> & {
   inviter: {
     username: string;
   };
@@ -52,9 +52,8 @@ export default typedPlugin(
           throw new ApiError(9002);
         }
 
-        delete (invite as any).expiresAt;
-
-        return res.send({ invite });
+        const { expiresAt: _expiresAt, ...publicInvite } = invite;
+        return res.send({ invite: publicInvite });
       },
     );
   },

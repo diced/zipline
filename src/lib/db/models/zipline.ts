@@ -2,6 +2,7 @@ import { db, type Database, type Transaction } from '@/lib/db';
 import { zipline } from '@/lib/db/schema';
 import { first } from '@/lib/db/utils';
 import { eq, getTableColumns } from 'drizzle-orm';
+import type { PgUpdateSetSource } from 'drizzle-orm/pg-core';
 import { resolve } from 'node:path';
 
 type DbClient = Database | Transaction;
@@ -23,6 +24,10 @@ export type DatabaseSettings = Omit<ZiplineRow, 'id' | 'createdAt' | 'updatedAt'
   oauthDiscordDeniedIds: string[];
   ratelimitAllowList: string[];
 };
+export type DatabaseSettingsUpdate = Omit<
+  PgUpdateSetSource<typeof zipline>,
+  'id' | 'createdAt' | 'updatedAt' | 'firstSetup'
+>;
 
 const initialSettings = {
   coreTempDirectory: resolve('./uploads/.tmp'),
@@ -34,7 +39,17 @@ const initialSettings = {
   ratelimitAllowList: [],
 } satisfies typeof zipline.$inferInsert;
 
-function normalizeSettingsArrays<T extends ZiplineRow>(row: T): T & DatabaseSettings {
+type SettingsWithNullableArrays = Pick<
+  ZiplineRow,
+  | 'domains'
+  | 'filesDisabledExtensions'
+  | 'filesDisabledTypes'
+  | 'oauthDiscordAllowedIds'
+  | 'oauthDiscordDeniedIds'
+  | 'ratelimitAllowList'
+>;
+
+function normalizeSettingsArrays<T extends SettingsWithNullableArrays>(row: T) {
   return {
     ...row,
     domains: row.domains ?? [],
@@ -47,7 +62,7 @@ function normalizeSettingsArrays<T extends ZiplineRow>(row: T): T & DatabaseSett
 }
 
 export async function findZipline(client: DbClient = db) {
-  const existing = first(await client.select().from(zipline).limit(1));
+  const existing = await client.query.zipline.findFirst();
   return existing ? normalizeSettingsArrays(existing) : null;
 }
 
@@ -61,10 +76,12 @@ export async function getZipline(client: DbClient = db) {
 }
 
 export async function getDatabaseSettings(client: DbClient = db): Promise<DatabaseSettings | null> {
-  const settings = first(await client.select(databaseSettingsColumns).from(zipline).limit(1));
+  const settings = await client.query.zipline.findFirst({
+    columns: { id: false, createdAt: false, updatedAt: false, firstSetup: false },
+  });
   if (!settings) return null;
 
-  return normalizeSettingsArrays(settings as ZiplineRow);
+  return normalizeSettingsArrays(settings);
 }
 
 export async function getOrCreateDatabaseSettings(client: DbClient = db): Promise<DatabaseSettings> {
@@ -84,7 +101,7 @@ export async function getOrCreateDatabaseSettings(client: DbClient = db): Promis
 
 export async function updateDatabaseSettings(
   settingsId: string,
-  values: Partial<DatabaseSettings>,
+  values: DatabaseSettingsUpdate,
   client: DbClient = db,
 ): Promise<DatabaseSettings | null> {
   const updated = first(
@@ -95,7 +112,7 @@ export async function updateDatabaseSettings(
       .returning(databaseSettingsColumns),
   );
 
-  return updated ? normalizeSettingsArrays(updated as ZiplineRow) : null;
+  return updated ? normalizeSettingsArrays(updated) : null;
 }
 
 export async function claimFirstSetup(client: Transaction): Promise<boolean> {

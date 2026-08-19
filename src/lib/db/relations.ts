@@ -51,7 +51,7 @@ export const exportsRelations = relations(exports, ({ one }) => ({
 }));
 
 export const foldersRelations = relations(folders, ({ many, one }) => ({
-  user: one(users, { fields: [folders.userId], references: [users.id] }),
+  User: one(users, { fields: [folders.userId], references: [users.id] }),
   parent: one(folders, {
     relationName: 'FolderToFolder',
     fields: [folders.parentId],
@@ -62,8 +62,8 @@ export const foldersRelations = relations(folders, ({ many, one }) => ({
 }));
 
 export const filesRelations = relations(files, ({ many, one }) => ({
-  user: one(users, { fields: [files.userId], references: [users.id] }),
-  folder: one(folders, { fields: [files.folderId], references: [folders.id] }),
+  User: one(users, { fields: [files.userId], references: [users.id] }),
+  Folder: one(folders, { fields: [files.folderId], references: [folders.id] }),
   thumbnail: one(thumbnails),
   fileTags: many(filesToTags),
 }));

@@ -67,10 +67,10 @@ export default typedPlugin(
         if (!folder) throw new ApiError(4001);
 
         if (folder.parentId) {
-          (folder as any).parent = await buildParentChain(folder.parentId);
+          folder.parent = await buildParentChain(folder.parentId);
         }
 
-        return res.send(cleanFolder(folder as unknown as Partial<Folder>));
+        return res.send(cleanFolder(folder));
       },
     );
 

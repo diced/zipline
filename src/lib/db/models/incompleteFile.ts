@@ -1,7 +1,8 @@
 import { db } from '@/lib/db';
-import { IncompleteFileStatus } from '@/lib/db/enums';
 import { incompleteFiles } from '@/lib/db/schema';
 import { and, eq, inArray, ne, sql } from 'drizzle-orm';
+import type { PgUpdateSetSource } from 'drizzle-orm/pg-core';
+import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 import type { DbClient } from './user';
 
@@ -17,24 +18,19 @@ export const metadataSchema = z.object({
   }),
 });
 
-export const incompleteFileSchema = z.object({
-  id: z.string(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
-  status: z.enum(IncompleteFileStatus),
-  chunksTotal: z.number(),
-  chunksComplete: z.number(),
-  userId: z.string(),
-  metadata: metadataSchema,
-});
+export const incompleteFileSchema = createSelectSchema(incompleteFiles, { metadata: metadataSchema });
 
 export type IncompleteFile = z.infer<typeof incompleteFileSchema>;
 export type IncompleteFileInsert = Omit<typeof incompleteFiles.$inferInsert, 'metadata'> & {
   metadata: IncompleteFileMetadata;
 };
+export type IncompleteFileUpdate = Pick<
+  PgUpdateSetSource<typeof incompleteFiles>,
+  'status' | 'chunksComplete' | 'chunksTotal'
+>;
 
 function parseIncomplete(row: typeof incompleteFiles.$inferSelect): IncompleteFile {
-  return incompleteFileSchema.parse({ ...row, metadata: metadataSchema.parse(row.metadata) });
+  return incompleteFileSchema.parse(row);
 }
 
 export async function createIncompleteFile(data: IncompleteFileInsert, client: DbClient = db) {
@@ -48,32 +44,24 @@ export async function listIncompleteFilesForUser(
   options: { excludeComplete?: boolean } = {},
   client: DbClient = db,
 ) {
-  const rows = await client
-    .select()
-    .from(incompleteFiles)
-    .where(
-      and(
-        eq(incompleteFiles.userId, userId),
-        options.excludeComplete ? ne(incompleteFiles.status, 'COMPLETE') : undefined,
-      ),
-    );
+  const rows = await client.query.incompleteFiles.findMany({
+    where: and(
+      eq(incompleteFiles.userId, userId),
+      options.excludeComplete ? ne(incompleteFiles.status, 'COMPLETE') : undefined,
+    ),
+  });
   return rows.map(parseIncomplete);
 }
 
 export async function listOwnedIncompleteFiles(ids: string[], userId: string, client: DbClient = db) {
   if (!ids.length) return [];
-  const rows = await client
-    .select()
-    .from(incompleteFiles)
-    .where(and(eq(incompleteFiles.userId, userId), inArray(incompleteFiles.id, ids)));
+  const rows = await client.query.incompleteFiles.findMany({
+    where: and(eq(incompleteFiles.userId, userId), inArray(incompleteFiles.id, ids)),
+  });
   return rows.map(parseIncomplete);
 }
 
-export async function updateIncompleteFile(
-  id: string,
-  data: Partial<Pick<IncompleteFile, 'status' | 'chunksComplete' | 'chunksTotal'>>,
-  client: DbClient = db,
-) {
+export async function updateIncompleteFile(id: string, data: IncompleteFileUpdate, client: DbClient = db) {
   const rows = await client.update(incompleteFiles).set(data).where(eq(incompleteFiles.id, id)).returning();
   return rows[0] ? parseIncomplete(rows[0]) : null;
 }

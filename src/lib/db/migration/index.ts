@@ -2,7 +2,7 @@ import { getDatabaseUrl, postgresConnectionConfig } from '@/lib/db';
 import { log } from '@/lib/logger';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
-import { readMigrationFiles, type MigrationMeta } from 'drizzle-orm/migrator';
+import { readMigrationFiles, type MigrationConfig, type MigrationMeta } from 'drizzle-orm/migrator';
 import { join } from 'node:path';
 import { Client } from 'pg';
 import { assertPrismaBaselineCatalog, baselineTableNames } from './catalog';
@@ -10,7 +10,13 @@ import { assertCompletePrismaMigrationHistory, hasPrismaMigrationHistory } from 
 
 const logger = log('migrations');
 const advisoryLockName = 'zipline:drizzle-migrations';
-const migrationsFolder = join(process.cwd(), 'drizzle');
+const migrationsSchema = 'drizzle';
+const migrationsTable = '__drizzle_migrations';
+const migrationConfig = {
+  migrationsFolder: join(process.cwd(), 'drizzle'),
+  migrationsSchema,
+  migrationsTable,
+} satisfies MigrationConfig;
 
 type NativeMigrationRow = {
   hash: string;
@@ -58,23 +64,25 @@ async function ensureDatabaseExists(connectionString: string) {
 }
 
 async function nativeMigrationTableExists(client: Client) {
-  const result = await client.query<{ exists: boolean }>(
-    `SELECT to_regclass('drizzle.__drizzle_migrations') IS NOT NULL AS exists`,
-  );
+  const result = await client.query<{ exists: boolean }>(`SELECT to_regclass($1) IS NOT NULL AS exists`, [
+    `${migrationsSchema}.${migrationsTable}`,
+  ]);
   return result.rows[0]?.exists === true;
 }
 
 async function readNativeMigrationHistory(client: Client) {
   if (!(await nativeMigrationTableExists(client))) return [];
 
-  const result = await client.query<NativeMigrationRow>(`
-    SELECT hash, created_at
-    FROM drizzle.__drizzle_migrations
-    ORDER BY created_at, id
-  `);
+  const qualifiedTable = `${quoteIdentifier(migrationsSchema)}.${quoteIdentifier(migrationsTable)}`;
+  const result = await client.query<NativeMigrationRow>(
+    `SELECT hash, created_at FROM ${qualifiedTable} ORDER BY created_at, id`,
+  );
   return result.rows;
 }
 
+// Drizzle owns migration ordering and application. This guard only rejects a history that could not
+// have been produced by the bundled journal; Drizzle 0.45 otherwise trusts the latest timestamp and
+// does not verify the hashes it stores.
 function assertKnownNativeMigrationHistory(rows: NativeMigrationRow[], migrations: MigrationMeta[]) {
   if (rows.length > migrations.length) {
     throw new Error(
@@ -107,9 +115,12 @@ async function hasBaselineTables(client: Client) {
 }
 
 async function createNativeMigrationTable(client: Client) {
-  await client.query(`CREATE SCHEMA IF NOT EXISTS drizzle`);
+  const schema = quoteIdentifier(migrationsSchema);
+  const table = `${schema}.${quoteIdentifier(migrationsTable)}`;
+
+  await client.query(`CREATE SCHEMA IF NOT EXISTS ${schema}`);
   await client.query(`
-    CREATE TABLE IF NOT EXISTS drizzle.__drizzle_migrations (
+    CREATE TABLE IF NOT EXISTS ${table} (
       id serial PRIMARY KEY,
       hash text NOT NULL,
       created_at bigint
@@ -117,6 +128,7 @@ async function createNativeMigrationTable(client: Client) {
   `);
 }
 
+// to work with old prisma migrations 
 async function baselinePrismaDatabase(client: Client, baseline: MigrationMeta) {
   await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ');
   try {
@@ -124,12 +136,12 @@ async function baselinePrismaDatabase(client: Client, baseline: MigrationMeta) {
     await assertPrismaBaselineCatalog(client);
     await createNativeMigrationTable(client);
 
-    const existing = await readNativeMigrationHistory(client);
-    if (existing.length) {
+    if ((await readNativeMigrationHistory(client)).length) {
       throw new Error('Drizzle migration history appeared while preparing the Prisma baseline');
     }
 
-    await client.query(`INSERT INTO drizzle.__drizzle_migrations (hash, created_at) VALUES ($1, $2)`, [
+    const table = `${quoteIdentifier(migrationsSchema)}.${quoteIdentifier(migrationsTable)}`;
+    await client.query(`INSERT INTO ${table} (hash, created_at) VALUES ($1, $2)`, [
       baseline.hash,
       baseline.folderMillis,
     ]);
@@ -154,9 +166,9 @@ export async function runMigrations() {
 
   if (await ensureDatabaseExists(connectionString)) logger.info('database created');
 
-  const migrations = readMigrationFiles({ migrationsFolder });
+  const migrations = readMigrationFiles(migrationConfig);
   const baseline = migrations[0];
-  if (!baseline) throw new Error(`no Drizzle migrations found in ${migrationsFolder}`);
+  if (!baseline) throw new Error(`no Drizzle migrations found in ${migrationConfig.migrationsFolder}`);
 
   const client = new Client(postgresConnectionConfig(connectionString));
   let lockAcquired = false;
@@ -189,14 +201,9 @@ export async function runMigrations() {
       }
     }
 
-    const historyBeforeMigrate = await readNativeMigrationHistory(client);
     logger.debug('applying Drizzle migrations');
-    await migrate(drizzle(client), { migrationsFolder });
-
-    const updatedHistory = await readNativeMigrationHistory(client);
-    assertKnownNativeMigrationHistory(updatedHistory, migrations);
-    if (updatedHistory.length === historyBeforeMigrate.length) logger.debug('no migrations applied');
-    else logger.info(`applied ${updatedHistory.length - historyBeforeMigrate.length} migration(s)`);
+    await migrate(drizzle(client), migrationConfig);
+    logger.debug('Drizzle migrations complete');
   } catch (error) {
     logger.error(error as Error);
     throw error;

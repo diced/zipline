@@ -13,7 +13,7 @@ import { config } from '@/lib/config';
 import { hashPassword } from '@/lib/crypto';
 import { datasource } from '@/lib/datasource';
 import { db } from '@/lib/db';
-import { createFileHydrated, type FileInsert, lockFileOwner } from '@/lib/db/models/file';
+import { createFileWithRelations, type FileInsert, lockFileOwner } from '@/lib/db/models/file';
 import { findFolderRowById } from '@/lib/db/models/folder';
 import { findFullUserById } from '@/lib/db/models/user';
 import { sanitizeFilename } from '@/lib/fs';
@@ -296,7 +296,7 @@ export default typedPlugin(
 
           const created = [];
           for (const upload of uploads) {
-            created.push(await createFileHydrated(upload.data, { thumbnail: true, tags: true }, tx));
+            created.push(await createFileWithRelations(upload.data, { thumbnail: true, tags: true }, tx));
           }
 
           return created;

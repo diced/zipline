@@ -1,43 +1,6 @@
 import baselineSnapshot from '../../../../drizzle/meta/0000_snapshot.json' with { type: 'json' };
+import type { DrizzleSnapshotJSON } from 'drizzle-kit/api';
 import type { Client } from 'pg';
-
-type SnapshotColumn = {
-  name: string;
-  type: string;
-  primaryKey: boolean;
-  notNull: boolean;
-  default?: unknown;
-};
-
-type SnapshotIndex = {
-  name: string;
-  columns: { expression: string }[];
-  isUnique: boolean;
-  method: string;
-};
-
-type SnapshotForeignKey = {
-  name: string;
-  tableFrom: string;
-  tableTo: string;
-  columnsFrom: string[];
-  columnsTo: string[];
-  onDelete?: string;
-  onUpdate?: string;
-};
-
-type SnapshotTable = {
-  name: string;
-  columns: Record<string, SnapshotColumn>;
-  indexes: Record<string, SnapshotIndex>;
-  foreignKeys: Record<string, SnapshotForeignKey>;
-  compositePrimaryKeys: Record<string, { name: string; columns: string[] }>;
-};
-
-type Snapshot = {
-  tables: Record<string, SnapshotTable>;
-  enums: Record<string, { name: string; values: string[] }>;
-};
 
 type CatalogColumn = {
   table_name: string;
@@ -67,7 +30,13 @@ type CatalogForeignKey = {
   on_update: string;
 };
 
-const snapshot = baselineSnapshot as Snapshot;
+// This file is emitted by drizzle-kit. Validate it against drizzle-kit's public snapshot shape while
+// retaining the imported JSON's concrete table and column types for the catalog comparison below.
+function defineSnapshot<T extends DrizzleSnapshotJSON>(value: T) {
+  return value;
+}
+
+const snapshot = defineSnapshot(baselineSnapshot);
 export const baselineTableNames = Object.values(snapshot.tables).map((table) => table.name);
 
 function normalizeType(type: string) {
@@ -168,6 +137,8 @@ async function assertColumns(client: Client) {
         errors.push(`missing column ${key}`);
         continue;
       }
+      const hasExpectedDefault = 'default' in column;
+      const expectedDefault = hasExpectedDefault ? column.default : undefined;
 
       if (normalizeType(current.data_type) !== normalizeType(column.type)) {
         errors.push(`${key} has type ${current.data_type}, expected ${column.type}`);
@@ -175,14 +146,14 @@ async function assertColumns(client: Client) {
       if (current.not_null !== column.notNull) {
         errors.push(`${key} has unexpected nullability`);
       }
-      if (current.has_default !== Object.hasOwn(column, 'default')) {
+      if (current.has_default !== hasExpectedDefault) {
         errors.push(`${key} has unexpected default state`);
       } else if (
         current.has_default &&
         normalizeDefault(current.default_expression, current.data_type) !==
-          normalizeDefault(column.default, column.type)
+          normalizeDefault(expectedDefault, column.type)
       ) {
-        errors.push(`${key} has default ${current.default_expression}, expected ${String(column.default)}`);
+        errors.push(`${key} has default ${current.default_expression}, expected ${String(expectedDefault)}`);
       }
     }
   }
@@ -332,12 +303,11 @@ async function assertForeignKeys(client: Client) {
   );
 
   const actual = new Map(result.rows.map((entry) => [`${entry.table_from}.${entry.name}`, entry]));
-  const expected = new Map<string, SnapshotForeignKey>();
-  for (const table of Object.values(snapshot.tables)) {
-    for (const foreignKey of Object.values(table.foreignKeys)) {
-      expected.set(`${table.name}.${foreignKey.name}`, foreignKey);
-    }
-  }
+  const expected = new Map(
+    Object.values(snapshot.tables).flatMap((table) =>
+      Object.values(table.foreignKeys).map((foreignKey) => [`${table.name}.${foreignKey.name}`, foreignKey]),
+    ),
+  );
 
   const errors: string[] = [];
   for (const [key, foreignKey] of expected) {

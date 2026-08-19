@@ -61,7 +61,7 @@ export default typedPlugin(
           includeFiles: !noincl,
         });
 
-        return res.send(cleanFolders(folders as unknown as Folder[]));
+        return res.send(cleanFolders(folders));
       },
     );
 

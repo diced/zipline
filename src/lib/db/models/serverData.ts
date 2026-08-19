@@ -1,5 +1,4 @@
 import { db, type Transaction } from '@/lib/db';
-import type { OAuthProviderType, Role, UserFilesQuota } from '@/lib/db/enums';
 import {
   files,
   filesToTags,
@@ -13,13 +12,21 @@ import {
   userPasskeys,
   userQuotas,
   users,
-  zipline,
-  type JsonValue,
 } from '@/lib/db/schema';
-import { firstOrNull } from '@/lib/db/utils';
 import { and, eq, inArray, isNull, or } from 'drizzle-orm';
+import type { PgUpdateSetSource } from 'drizzle-orm/pg-core';
 
-type JsonObject = Record<string, JsonValue | undefined>;
+type UserInsert = typeof users.$inferInsert;
+type UserUpdate = PgUpdateSetSource<typeof users>;
+type OAuthProviderInsert = typeof oauthProviders.$inferInsert;
+type QuotaInsert = typeof userQuotas.$inferInsert;
+type PasskeyInsert = typeof userPasskeys.$inferInsert;
+type FileInsert = typeof files.$inferInsert;
+type FolderInsert = typeof folders.$inferInsert;
+type TagInsert = typeof tags.$inferInsert;
+type UrlInsert = typeof urls.$inferInsert;
+type InviteInsert = typeof invites.$inferInsert;
+type MetricInsert = typeof metrics.$inferInsert;
 
 export async function getServerResourceCounts() {
   const [userCount, fileCount, urlCount, folderCount, inviteCount, thumbnailCount, metricCount] =
@@ -45,117 +52,73 @@ export async function getServerResourceCounts() {
 }
 
 export async function getSettingsForServerExport() {
-  const rows = await db.select().from(zipline).limit(1);
-  return firstOrNull(rows);
+  return (await db.query.zipline.findFirst()) ?? null;
 }
 
-function appendToMap<T>(map: Map<string, T[]>, key: string | null, value: T) {
-  if (!key) return;
-  const values = map.get(key);
-  if (values) values.push(value);
-  else map.set(key, [value]);
-}
-
-/** Recreates the relation shape used by the v4 server export without N+1 queries. */
+/** Loads the v4 export graph through Drizzle's declared relations in one query. */
 export async function getUsersForServerExport() {
-  const [
-    userRows,
-    passkeyRows,
-    quotaRows,
-    providerRows,
-    inviteRows,
-    urlRows,
-    tagRows,
-    folderRows,
-    fileRelationRows,
-    tagFileRows,
-  ] = await Promise.all([
-    db.select().from(users),
-    db.select().from(userPasskeys),
-    db.select().from(userQuotas),
-    db.select().from(oauthProviders),
-    db.select().from(invites),
-    db.select().from(urls),
-    db.select().from(tags),
-    db.select().from(folders),
-    db.select({ id: files.id, folderId: files.folderId }).from(files),
-    db.select().from(filesToTags),
-  ]);
+  const userRows = await db.query.users.findMany({
+    with: {
+      passkeys: true,
+      quota: true,
+      oauthProviders: true,
+      invites: true,
+      urls: true,
+      tags: {
+        with: {
+          fileTags: {
+            columns: {},
+            with: { file: { columns: { id: true } } },
+          },
+        },
+      },
+      folders: { with: { files: { columns: { id: true } } } },
+    },
+  });
 
-  const passkeysByUser = new Map<string, typeof passkeyRows>();
-  const providersByUser = new Map<string, typeof providerRows>();
-  const invitesByUser = new Map<string, typeof inviteRows>();
-  const urlsByUser = new Map<string, typeof urlRows>();
-  const tagsByUser = new Map<string, ((typeof tagRows)[number] & { files: { id: string }[] })[]>();
-  const foldersByUser = new Map<string, ((typeof folderRows)[number] & { files: { id: string }[] })[]>();
-  const quotaByUser = new Map(
-    quotaRows.flatMap((quota) => (quota.userId ? [[quota.userId, quota] as const] : [])),
-  );
-
-  for (const passkey of passkeyRows) appendToMap(passkeysByUser, passkey.userId, passkey);
-  for (const provider of providerRows) appendToMap(providersByUser, provider.userId, provider);
-  for (const invite of inviteRows) appendToMap(invitesByUser, invite.inviterId, invite);
-  for (const url of urlRows) appendToMap(urlsByUser, url.userId, url);
-
-  const fileIdsByFolder = new Map<string, { id: string }[]>();
-  for (const file of fileRelationRows) appendToMap(fileIdsByFolder, file.folderId, { id: file.id });
-
-  const fileIdsByTag = new Map<string, { id: string }[]>();
-  for (const relation of tagFileRows) appendToMap(fileIdsByTag, relation.tagId, { id: relation.fileId });
-
-  for (const tag of tagRows)
-    appendToMap(tagsByUser, tag.userId, { ...tag, files: fileIdsByTag.get(tag.id) ?? [] });
-  for (const folder of folderRows)
-    appendToMap(foldersByUser, folder.userId, {
-      ...folder,
-      files: fileIdsByFolder.get(folder.id) ?? [],
-    });
-
-  return userRows.map((user) => ({
+  return userRows.map(({ tags: userTags, ...user }) => ({
     ...user,
-    passkeys: passkeysByUser.get(user.id) ?? [],
-    quota: quotaByUser.get(user.id) ?? null,
-    oauthProviders: providersByUser.get(user.id) ?? [],
-    invites: invitesByUser.get(user.id) ?? [],
-    urls: urlsByUser.get(user.id) ?? [],
-    tags: tagsByUser.get(user.id) ?? [],
-    folders: foldersByUser.get(user.id) ?? [],
+    tags: userTags.map(({ fileTags, ...tag }) => ({
+      ...tag,
+      files: fileTags.map(({ file }) => file),
+    })),
   }));
 }
 
 export function getFilesForServerExport() {
-  return db.select().from(files);
+  return db.query.files.findMany();
 }
 
 export function getThumbnailsForServerExport() {
-  return db.select().from(thumbnails);
+  return db.query.thumbnails.findMany();
 }
 
 export function getMetricsForServerExport() {
-  return db.select().from(metrics);
+  return db.query.metrics.findMany();
 }
 
 export async function findImportUserByUsername(username: string) {
-  const rows = await db.select({ id: users.id }).from(users).where(eq(users.username, username)).limit(1);
-  return firstOrNull(rows);
+  return (
+    (await db.query.users.findFirst({
+      columns: { id: true },
+      where: eq(users.username, username),
+    })) ?? null
+  );
 }
 
 export async function findImportUserByUsernameOrId(username: string, id: string) {
-  const rows = await db
-    .select({ id: users.id })
-    .from(users)
-    .where(or(eq(users.username, username), eq(users.id, id)))
-    .limit(1);
-  return firstOrNull(rows);
+  return (
+    (await db.query.users.findFirst({
+      columns: { id: true },
+      where: or(eq(users.username, username), eq(users.id, id)),
+    })) ?? null
+  );
 }
 
-export type ImportedOauthProviderInput = {
-  provider: OAuthProviderType;
-  accessToken: string;
-  refreshToken: string | null;
-  oauthId?: string | null;
-  username: string;
-};
+export type ImportedOauthProviderInput = Pick<
+  OAuthProviderInsert,
+  'provider' | 'accessToken' | 'refreshToken' | 'oauthId' | 'username'
+>;
 
 async function insertOauthProviders(
   tx: Transaction,
@@ -167,17 +130,17 @@ async function insertOauthProviders(
 }
 
 export async function findImportOauthProviderByOauthId(oauthId: string | null) {
-  const rows = await db
-    .select({ id: oauthProviders.id })
-    .from(oauthProviders)
-    .where(oauthId === null ? isNull(oauthProviders.oauthId) : eq(oauthProviders.oauthId, oauthId))
-    .limit(1);
-  return firstOrNull(rows);
+  return (
+    (await db.query.oauthProviders.findFirst({
+      columns: { id: true },
+      where: oauthId === null ? isNull(oauthProviders.oauthId) : eq(oauthProviders.oauthId, oauthId),
+    })) ?? null
+  );
 }
 
 export async function updateV3ImportUser(
   id: string,
-  input: { avatar: string | null; totpSecret: string | null },
+  input: Pick<UserUpdate, 'avatar' | 'totpSecret'>,
   providers: ImportedOauthProviderInput[],
 ) {
   return db.transaction(async (tx) => {
@@ -190,14 +153,7 @@ export async function updateV3ImportUser(
 }
 
 export async function createV3ImportUser(
-  input: {
-    username: string;
-    password: string | null;
-    role: Role;
-    token: string;
-    avatar: string | null;
-    totpSecret: string | null;
-  },
+  input: Pick<UserInsert, 'username' | 'password' | 'role' | 'token' | 'avatar' | 'totpSecret'>,
   providers: ImportedOauthProviderInput[],
 ) {
   return db.transaction(async (tx) => {
@@ -211,7 +167,7 @@ export async function createV3ImportUser(
 
 export async function updateV4ImportUser(
   id: string,
-  input: { avatar: string | null; totpSecret: string | null; view: JsonObject },
+  input: Pick<UserUpdate, 'avatar' | 'totpSecret' | 'view'>,
 ) {
   const rows = await db.update(users).set(input).where(eq(users.id, id)).returning({ id: users.id });
   const updated = rows[0];
@@ -219,16 +175,12 @@ export async function updateV4ImportUser(
   return updated;
 }
 
-export async function createV4ImportUser(input: {
-  username: string;
-  password: string | null;
-  avatar: string | null;
-  role: Role;
-  view: JsonObject;
-  totpSecret: string | null;
-  token: string;
-  createdAt: Date;
-}) {
+export async function createV4ImportUser(
+  input: Pick<
+    UserInsert,
+    'username' | 'password' | 'avatar' | 'role' | 'view' | 'totpSecret' | 'token' | 'createdAt'
+  >,
+) {
   const rows = await db.insert(users).values(input).returning({ id: users.id });
   const created = rows[0];
   if (!created) throw new Error('User insert did not return a row');
@@ -236,7 +188,7 @@ export async function createV4ImportUser(input: {
 }
 
 export async function findImportOauthProvider(
-  provider: OAuthProviderType,
+  provider: OAuthProviderInsert['provider'],
   oauthId: string | null | undefined,
 ) {
   const condition =
@@ -246,8 +198,7 @@ export async function findImportOauthProvider(
           eq(oauthProviders.provider, provider),
           oauthId === null ? isNull(oauthProviders.oauthId) : eq(oauthProviders.oauthId, oauthId),
         );
-  const rows = await db.select({ id: oauthProviders.id }).from(oauthProviders).where(condition).limit(1);
-  return firstOrNull(rows);
+  return (await db.query.oauthProviders.findFirst({ columns: { id: true }, where: condition })) ?? null;
 }
 
 export async function createImportOauthProvider(input: ImportedOauthProviderInput & { userId: string }) {
@@ -258,22 +209,19 @@ export async function createImportOauthProvider(input: ImportedOauthProviderInpu
 }
 
 export async function findImportQuotaByUserId(userId: string) {
-  const rows = await db
-    .select({ id: userQuotas.id })
-    .from(userQuotas)
-    .where(eq(userQuotas.userId, userId))
-    .limit(1);
-  return firstOrNull(rows);
+  return (
+    (await db.query.userQuotas.findFirst({
+      columns: { id: true },
+      where: eq(userQuotas.userId, userId),
+    })) ?? null
+  );
 }
 
-export async function createImportQuota(input: {
-  filesQuota: UserFilesQuota;
-  maxBytes: string | null;
-  maxFiles: number | null;
-  maxUrls: number | null;
-  userId: string;
-  createdAt: Date;
-}) {
+export async function createImportQuota(
+  input: Pick<QuotaInsert, 'filesQuota' | 'maxBytes' | 'maxFiles' | 'maxUrls' | 'createdAt'> & {
+    userId: string;
+  },
+) {
   const rows = await db.insert(userQuotas).values(input).returning({ id: userQuotas.id });
   const created = rows[0];
   if (!created) throw new Error('Quota insert did not return a row');
@@ -281,15 +229,15 @@ export async function createImportQuota(input: {
 }
 
 export async function findImportPasskey(name: string, userId: string) {
-  const rows = await db
-    .select({ id: userPasskeys.id })
-    .from(userPasskeys)
-    .where(and(eq(userPasskeys.name, name), eq(userPasskeys.userId, userId)))
-    .limit(1);
-  return firstOrNull(rows);
+  return (
+    (await db.query.userPasskeys.findFirst({
+      columns: { id: true },
+      where: and(eq(userPasskeys.name, name), eq(userPasskeys.userId, userId)),
+    })) ?? null
+  );
 }
 
-export async function createImportPasskey(input: { name: string; reg: JsonObject; userId: string }) {
+export async function createImportPasskey(input: Pick<PasskeyInsert, 'name' | 'reg'> & { userId: string }) {
   const rows = await db.insert(userPasskeys).values(input).returning({ id: userPasskeys.id });
   const created = rows[0];
   if (!created) throw new Error('Passkey insert did not return a row');
@@ -297,24 +245,25 @@ export async function createImportPasskey(input: { name: string; reg: JsonObject
 }
 
 export async function findImportFileByName(name: string) {
-  const rows = await db.select({ id: files.id }).from(files).where(eq(files.name, name)).limit(1);
-  return firstOrNull(rows);
+  return (await db.query.files.findFirst({ columns: { id: true }, where: eq(files.name, name) })) ?? null;
 }
 
-export async function createImportFile(input: {
-  userId: string;
-  name: string;
-  originalName: string | null;
-  type: string;
-  size: number;
-  maxViews: number | null;
-  views: number;
-  deletesAt: Date | null;
-  createdAt: Date;
-  favorite: boolean;
-  password: string | null;
-  folderId?: string | null;
-}) {
+export async function createImportFile(
+  input: Pick<
+    FileInsert,
+    | 'name'
+    | 'originalName'
+    | 'type'
+    | 'size'
+    | 'maxViews'
+    | 'views'
+    | 'deletesAt'
+    | 'createdAt'
+    | 'favorite'
+    | 'password'
+    | 'folderId'
+  > & { userId: string },
+) {
   const rows = await db.insert(files).values(input).returning({ id: files.id });
   const created = rows[0];
   if (!created) throw new Error('File insert did not return a row');
@@ -322,21 +271,20 @@ export async function createImportFile(input: {
 }
 
 export async function findImportFolder(name: string, userId: string) {
-  const rows = await db
-    .select({ id: folders.id })
-    .from(folders)
-    .where(and(eq(folders.name, name), eq(folders.userId, userId)))
-    .limit(1);
-  return firstOrNull(rows);
+  return (
+    (await db.query.folders.findFirst({
+      columns: { id: true },
+      where: and(eq(folders.name, name), eq(folders.userId, userId)),
+    })) ?? null
+  );
 }
 
-export async function createV3ImportFolder(input: {
-  userId: string;
-  name: string;
-  public: boolean;
-  createdAt: Date;
-  fileIds: string[];
-}) {
+export async function createV3ImportFolder(
+  input: Pick<FolderInsert, 'name' | 'public' | 'createdAt'> & {
+    userId: string;
+    fileIds: string[];
+  },
+) {
   return db.transaction(async (tx) => {
     const rows = await tx
       .insert(folders)
@@ -365,13 +313,9 @@ export async function createV3ImportFolder(input: {
   });
 }
 
-export async function createV4ImportFolder(input: {
-  userId: string;
-  name: string;
-  allowUploads: boolean;
-  public: boolean;
-  createdAt: Date;
-}) {
+export async function createV4ImportFolder(
+  input: Pick<FolderInsert, 'name' | 'allowUploads' | 'public' | 'createdAt'> & { userId: string },
+) {
   const rows = await db.insert(folders).values(input).returning({ id: folders.id });
   const created = rows[0];
   if (!created) throw new Error('Folder insert did not return a row');
@@ -388,26 +332,21 @@ export async function setImportFolderParent(id: string, parentId: string) {
 }
 
 export async function findImportTag(name: string, userId: string | null, createdAt: Date) {
-  const rows = await db
-    .select({ id: tags.id })
-    .from(tags)
-    .where(
-      and(
+  return (
+    (await db.query.tags.findFirst({
+      columns: { id: true },
+      where: and(
         eq(tags.name, name),
         userId === null ? isNull(tags.userId) : eq(tags.userId, userId),
         eq(tags.createdAt, createdAt),
       ),
-    )
-    .limit(1);
-  return firstOrNull(rows);
+    })) ?? null
+  );
 }
 
-export async function createImportTag(input: {
-  name: string;
-  color: string;
-  userId: string;
-  fileIds: string[];
-}) {
+export async function createImportTag(
+  input: Pick<TagInsert, 'name' | 'color'> & { userId: string; fileIds: string[] },
+) {
   return db.transaction(async (tx) => {
     const rows = await tx
       .insert(tags)
@@ -424,25 +363,20 @@ export async function createImportTag(input: {
 }
 
 export async function findImportUrlByCode(code: string, userId?: string) {
-  const rows = await db
-    .select({ id: urls.id })
-    .from(urls)
-    .where(userId ? and(eq(urls.code, code), eq(urls.userId, userId)) : eq(urls.code, code))
-    .limit(1);
-  return firstOrNull(rows);
+  return (
+    (await db.query.urls.findFirst({
+      columns: { id: true },
+      where: userId ? and(eq(urls.code, code), eq(urls.userId, userId)) : eq(urls.code, code),
+    })) ?? null
+  );
 }
 
-export async function createImportUrl(input: {
-  userId: string;
-  destination: string;
-  vanity: string | null;
-  code: string;
-  maxViews: number | null;
-  views: number;
-  createdAt: Date;
-  enabled?: boolean;
-  password?: string | null;
-}) {
+export async function createImportUrl(
+  input: Pick<
+    UrlInsert,
+    'destination' | 'vanity' | 'code' | 'maxViews' | 'views' | 'createdAt' | 'enabled' | 'password'
+  > & { userId: string },
+) {
   const rows = await db.insert(urls).values(input).returning({ id: urls.id });
   const created = rows[0];
   if (!created) throw new Error('URL insert did not return a row');
@@ -450,29 +384,24 @@ export async function createImportUrl(input: {
 }
 
 export async function findImportInvite(code: string, inviterId: string) {
-  const rows = await db
-    .select({ id: invites.id })
-    .from(invites)
-    .where(and(eq(invites.code, code), eq(invites.inviterId, inviterId)))
-    .limit(1);
-  return firstOrNull(rows);
+  return (
+    (await db.query.invites.findFirst({
+      columns: { id: true },
+      where: and(eq(invites.code, code), eq(invites.inviterId, inviterId)),
+    })) ?? null
+  );
 }
 
-export async function createImportInvite(input: {
-  code: string;
-  uses: number;
-  maxUses: number | null;
-  inviterId: string;
-  createdAt: Date;
-  expiresAt: Date | null;
-}) {
+export async function createImportInvite(
+  input: Pick<InviteInsert, 'code' | 'uses' | 'maxUses' | 'inviterId' | 'createdAt' | 'expiresAt'>,
+) {
   const rows = await db.insert(invites).values(input).returning({ id: invites.id });
   const created = rows[0];
   if (!created) throw new Error('Invite insert did not return a row');
   return created;
 }
 
-export async function createImportMetrics(input: { createdAt: Date; data: JsonObject }[]) {
+export async function createImportMetrics(input: Pick<MetricInsert, 'createdAt' | 'data'>[]) {
   if (input.length === 0) return 0;
   const rows = await db.insert(metrics).values(input).returning({ id: metrics.id });
   return rows.length;
