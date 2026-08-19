@@ -1,17 +1,18 @@
 import { ApiError } from '@/lib/api/errors';
 import { createToken } from '@/lib/crypto';
+import { db } from '@/lib/db';
 import {
-  createImportFile,
-  createImportUrl,
-  createV3ImportFolder,
-  createV3ImportUser,
-  findImportFileByName,
-  findImportOauthProviderByOauthId,
-  findImportUrlByCode,
-  findImportUserByUsername,
-  type ImportedOauthProviderInput,
-  updateV3ImportUser,
+  createV3Folder,
+  createV3User,
+  type ImportOauthProvider,
+  updateV3User,
 } from '@/lib/db/models/serverData';
+import {
+  files as fileRecords,
+  oauthProviders as oauthProviderRecords,
+  urls as urlRecords,
+  users as userRecords,
+} from '@/lib/db/schema';
 import { sanitizeFilename } from '@/lib/fs';
 import { export3Schema } from '@/lib/import/version3/validateExport';
 import { log } from '@/lib/logger';
@@ -20,6 +21,7 @@ import { secondlyRatelimit } from '@/lib/ratelimits';
 import { administratorMiddleware } from '@/server/middleware/administrator';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
+import { eq, isNull } from 'drizzle-orm';
 import z from 'zod';
 
 export type ApiServerImportV3 = z.infer<typeof serverImportSchema>;
@@ -54,7 +56,6 @@ export default typedPlugin(
           tags: ['auth', 'superadmin'],
         },
         preHandler: [userMiddleware, administratorMiddleware],
-        // 24gb, just in case
         bodyLimit: 24 * 1024 * 1024 * 1024,
         ...secondlyRatelimit(5),
       },
@@ -63,7 +64,6 @@ export default typedPlugin(
 
         const { export3 } = req.body;
 
-        // users
         const usersImportedToId: Record<string, string> = {};
 
         const users = Object.entries(export3.users);
@@ -78,11 +78,13 @@ export default typedPlugin(
             importFrom = true;
           }
 
-          // determines a users role
           const role =
             (user.super_administrator && 'SUPERADMIN') || (user.administrator && 'ADMIN') || 'USER';
 
-          const existing = await findImportUserByUsername(user.username);
+          const existing = await db.query.users.findFirst({
+            columns: { id: true },
+            where: eq(userRecords.username, user.username),
+          });
 
           if (!importFrom && existing) {
             logger.warn('user already exists, skipping importing', {
@@ -93,9 +95,15 @@ export default typedPlugin(
             continue;
           }
 
-          const oauthProviders: ImportedOauthProviderInput[] = [];
+          const importedProviders: ImportOauthProvider[] = [];
           for (const provider of user.oauth) {
-            const existing = await findImportOauthProviderByOauthId(provider.oauth_id);
+            const existing = await db.query.oauthProviders.findFirst({
+              columns: { id: true },
+              where:
+                provider.oauth_id === null
+                  ? isNull(oauthProviderRecords.oauthId)
+                  : eq(oauthProviderRecords.oauthId, provider.oauth_id),
+            });
 
             if (existing) {
               logger.warn('oauth provider already exists, skipping importing', {
@@ -106,7 +114,7 @@ export default typedPlugin(
               continue;
             }
 
-            oauthProviders.push({
+            importedProviders.push({
               provider: provider.provider,
               accessToken: provider.access_token as string,
               refreshToken: provider.refresh_token ?? null,
@@ -116,13 +124,13 @@ export default typedPlugin(
           }
 
           if (importFrom) {
-            const updated = await updateV3ImportUser(
+            const updated = await updateV3User(
               req.user.id,
               {
                 avatar: user.avatar ?? null,
                 totpSecret: user.totp_secret ?? null,
               },
-              oauthProviders,
+              importedProviders,
             );
 
             usersImportedToId[id] = updated.id;
@@ -130,7 +138,7 @@ export default typedPlugin(
             continue;
           }
 
-          const created = await createV3ImportUser(
+          const created = await createV3User(
             {
               username: user.username,
               password: user.password || null,
@@ -139,7 +147,7 @@ export default typedPlugin(
               avatar: user.avatar ?? null,
               totpSecret: user.totp_secret ?? null,
             },
-            oauthProviders,
+            importedProviders,
           );
 
           usersImportedToId[id] = created.id;
@@ -147,7 +155,6 @@ export default typedPlugin(
 
         logger.debug('imported users', { users: usersImportedToId });
 
-        // files, they are mapped to the users they belong to
         const filesImportedToId: Record<string, string> = {};
 
         for (const [id, file] of Object.entries(export3.files)) {
@@ -158,7 +165,10 @@ export default typedPlugin(
             continue;
           }
 
-          const existing = await findImportFileByName(file.name);
+          const existing = await db.query.files.findFirst({
+            columns: { id: true },
+            where: eq(fileRecords.name, file.name),
+          });
 
           if (existing) {
             logger.warn('file already exists, skipping importing', {
@@ -175,26 +185,29 @@ export default typedPlugin(
             logger.warn('file has invalid name, using random name', { file: id, new: sanitizedFilename });
           }
 
-          const created = await createImportFile({
-            userId: user,
-            name: sanitizedFilename,
-            originalName: file.original_name || null,
-            type: file.type,
-            size: Number(file.size),
-            maxViews: file.max_views || null,
-            views: file.views || 0,
-            deletesAt: file.expires_at ? parseDate(file.expires_at) : null,
-            createdAt: parseDate(file.created_at),
-            favorite: file.favorite || false,
-            password: file.password || null,
-          });
+          const [created] = await db
+            .insert(fileRecords)
+            .values({
+              userId: user,
+              name: sanitizedFilename,
+              originalName: file.original_name || null,
+              type: file.type,
+              size: Number(file.size),
+              maxViews: file.max_views || null,
+              views: file.views || 0,
+              deletesAt: file.expires_at ? parseDate(file.expires_at) : null,
+              createdAt: parseDate(file.created_at),
+              favorite: file.favorite || false,
+              password: file.password || null,
+            })
+            .returning({ id: fileRecords.id });
+          if (!created) throw new Error('File insert did not return a row');
 
           filesImportedToId[id] = created.id;
         }
 
         logger.debug('imported files', { files: filesImportedToId });
 
-        // folders, they are mapped to the users they belong to + files they contain
         const foldersImportedToId: Record<string, string> = {};
 
         for (const [id, folder] of Object.entries(export3.folders)) {
@@ -212,7 +225,7 @@ export default typedPlugin(
             continue;
           }
 
-          const created = await createV3ImportFolder({
+          const created = await createV3Folder({
             userId: user,
             name: folder.name,
             public: folder.public,
@@ -225,7 +238,6 @@ export default typedPlugin(
 
         logger.debug('imported folders', { folders: foldersImportedToId });
 
-        // urls, they are mapped to the users they belong to
         const urlsImportedToId: Record<string, string> = {};
 
         for (const [id, url] of Object.entries(export3.urls)) {
@@ -236,7 +248,10 @@ export default typedPlugin(
             continue;
           }
 
-          const existing = await findImportUrlByCode(url.code);
+          const existing = await db.query.urls.findFirst({
+            columns: { id: true },
+            where: eq(urlRecords.code, url.code),
+          });
 
           if (existing) {
             logger.warn('url already exists, skipping importing', {
@@ -247,15 +262,19 @@ export default typedPlugin(
             continue;
           }
 
-          const created = await createImportUrl({
-            userId: user,
-            destination: url.destination,
-            vanity: url.vanity || null,
-            code: url.code,
-            maxViews: url.max_views || null,
-            views: url.views || 0,
-            createdAt: parseDate(url.created_at),
-          });
+          const [created] = await db
+            .insert(urlRecords)
+            .values({
+              userId: user,
+              destination: url.destination,
+              vanity: url.vanity || null,
+              code: url.code,
+              maxViews: url.max_views || null,
+              views: url.views || 0,
+              createdAt: parseDate(url.created_at),
+            })
+            .returning({ id: urlRecords.id });
+          if (!created) throw new Error('URL insert did not return a row');
 
           urlsImportedToId[id] = created.id;
         }

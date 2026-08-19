@@ -1,7 +1,12 @@
 import { ApiError } from '@/lib/api/errors';
-import { deleteOtherUserSessions, deleteUserSession, listUserSessions } from '@/lib/db/models/session';
+import {
+  listSessions,
+  removeOtherSessions,
+  removeSession,
+  type UserSession,
+  userSessionSchema,
+} from '@/lib/db/models/session';
 import { log } from '@/lib/logger';
-import { UserSession, userSessionSchema } from '@/lib/db/models/user';
 import { userMiddleware } from '@/server/middleware/user';
 import { getSession } from '@/server/session';
 import typedPlugin from '@/server/typedPlugin';
@@ -67,8 +72,8 @@ export default typedPlugin(
         const currentSession = await getSession(req, res);
 
         if (req.body.all) {
-          await deleteOtherUserSessions(req.user.id, currentSession.sessionId!);
-          const sessions = await listUserSessions(req.user.id);
+          await removeOtherSessions(req.user.id, currentSession.sessionId!);
+          const sessions = await listSessions(req.user.id);
 
           logger.info('user logged out all logged in sessions', {
             user: req.user.username,
@@ -83,8 +88,8 @@ export default typedPlugin(
         if (req.body.sessionId === currentSession.sessionId) throw new ApiError(1021);
         if (!req.user.sessions.find((session) => session.id === req.body.sessionId)) throw new ApiError(1031);
 
-        await deleteUserSession(req.user.id, req.body.sessionId!);
-        const sessions = await listUserSessions(req.user.id);
+        await removeSession(req.user.id, req.body.sessionId!);
+        const sessions = await listSessions(req.user.id);
 
         logger.info('user logged out of session', {
           user: req.user.username,

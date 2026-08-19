@@ -1,11 +1,15 @@
 import { datasource } from '@/lib/datasource';
-import { deleteThumbnailById, listThumbnails } from '@/lib/db/models/thumbnail';
+import { db } from '@/lib/db';
+import { thumbnails } from '@/lib/db/schema';
+import { eq } from 'drizzle-orm';
 import { IntervalTask } from '..';
 
 export default function cleanThumbnails() {
   return async function (this: IntervalTask) {
     const fsThumbnails = await datasource.list({ prefix: '.thumbnail.' });
-    const dbThumbnails = await listThumbnails();
+    const dbThumbnails = await db.query.thumbnails.findMany({
+      columns: { id: true, path: true },
+    });
 
     const paths = new Set(dbThumbnails.map((t) => t.path));
     const fsOrphaned = fsThumbnails.filter((path) => !paths.has(path));
@@ -24,7 +28,7 @@ export default function cleanThumbnails() {
 
     for (const thumb of dbOrphaned) {
       try {
-        await deleteThumbnailById(thumb.id);
+        await db.delete(thumbnails).where(eq(thumbnails.id, thumb.id));
         this.logger.info('deleted orphaned thumbnail from database', { path: thumb.path });
       } catch (err) {
         this.logger.error('failed to delete orphaned thumbnail from database', {

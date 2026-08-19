@@ -16,15 +16,7 @@ const thumbnailOwnerRelations = {
   },
 } as const satisfies NonNullable<ThumbnailFindFirstConfig['with']>;
 
-export async function listThumbnails(client: DbClient = db) {
-  return client.query.thumbnails.findMany();
-}
-
-export async function findThumbnailByFileId(fileId: string, client: DbClient = db) {
-  return (await client.query.thumbnails.findFirst({ where: eq(thumbnails.fileId, fileId) })) ?? null;
-}
-
-export async function findPublicThumbnailByPath(path: string, client: DbClient = db) {
+export async function getPublicThumbnail(path: string, client: DbClient = db) {
   const publicFiles = client.select({ id: files.id }).from(files).where(isNull(files.password));
   return (
     (await client.query.thumbnails.findFirst({
@@ -33,35 +25,10 @@ export async function findPublicThumbnailByPath(path: string, client: DbClient =
   );
 }
 
-export async function findThumbnailWithOwnerByPath(path: string, client: DbClient = db) {
+export async function getThumbnailWithOwner(path: string, client: DbClient = db) {
   const row = await client.query.thumbnails.findFirst({
     where: eq(thumbnails.path, path),
     with: thumbnailOwnerRelations,
   });
   return row ?? null;
-}
-
-export async function createThumbnail(data: ThumbnailInsert, client: DbClient = db) {
-  const rows = await client.insert(thumbnails).values(data).returning();
-  if (!rows[0]) throw new Error('Thumbnail insert did not return a row');
-  return rows[0];
-}
-
-export async function touchThumbnail(id: string, createdAt = new Date(), client: DbClient = db) {
-  const rows = await client.update(thumbnails).set({ createdAt }).where(eq(thumbnails.id, id)).returning();
-  return rows[0] ?? null;
-}
-
-export async function deleteThumbnailById(id: string, client: DbClient = db) {
-  const rows = await client.delete(thumbnails).where(eq(thumbnails.id, id)).returning({ id: thumbnails.id });
-  return rows.length > 0;
-}
-
-export async function deleteThumbnailsByIds(ids: string[], client: DbClient = db) {
-  if (!ids.length) return 0;
-  const rows = await client
-    .delete(thumbnails)
-    .where(inArray(thumbnails.id, ids))
-    .returning({ id: thumbnails.id });
-  return rows.length;
 }

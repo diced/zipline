@@ -1,7 +1,7 @@
 import { ApiError } from '@/lib/api/errors';
 import { ziplineClientParseSchema } from '@/lib/api/detect';
 import { verifyPassword } from '@/lib/crypto';
-import { findLoginUserByUsername, type User, userSchema } from '@/lib/db/models/user';
+import { getLoginUser, type User, userSchema } from '@/lib/db/models/user';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { verifyTotpCode } from '@/lib/totp';
@@ -51,7 +51,7 @@ export default typedPlugin(
 
         const { username, password, code } = req.body;
 
-        const user = await findLoginUserByUsername(username);
+        const user = await getLoginUser(username);
         if (!user) throw new ApiError(1044);
         if (!user.password) throw new ApiError(1044);
 

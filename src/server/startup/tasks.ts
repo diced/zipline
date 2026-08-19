@@ -1,5 +1,6 @@
-import { findFilesByIds } from '@/lib/db/models/file';
-import { createThumbnail, findThumbnailByFileId, touchThumbnail } from '@/lib/db/models/thumbnail';
+import { db } from '@/lib/db';
+import { getFiles } from '@/lib/db/models/file';
+import { thumbnails as thumbnailTable } from '@/lib/db/schema';
 import { Tasks } from '@/lib/tasks';
 import cleanThumbnails from '@/lib/tasks/run/cleanThumbnails';
 import clearInvites from '@/lib/tasks/run/clearInvites';
@@ -11,6 +12,7 @@ import type { DomainDbRequest, DomainDbResponse } from '@/offload/proxiedDb';
 import type { FastifyInstance } from 'fastify';
 import ms, { StringValue } from 'ms';
 import type { Worker } from 'worker_threads';
+import { eq } from 'drizzle-orm';
 
 export function startTasks(server: FastifyInstance) {
   const config = global.__config__;
@@ -45,22 +47,33 @@ export function startTasks(server: FastifyInstance) {
             let result: unknown = null;
             switch (message.command) {
               case 'file.thumbnailSource': {
-                const [file] = await findFilesByIds([message.payload.id], { thumbnail: true, tags: false });
+                const [file] = await getFiles([message.payload.id], { thumbnail: true, tags: false });
                 result = file ?? null;
                 break;
               }
               case 'thumbnail.byFile':
-                result = await findThumbnailByFileId(message.payload.fileId);
+                result =
+                  (await db.query.thumbnails.findFirst({
+                    where: eq(thumbnailTable.fileId, message.payload.fileId),
+                  })) ?? null;
                 break;
-              case 'thumbnail.create':
-                result = await createThumbnail(message.payload);
+              case 'thumbnail.create': {
+                const [created] = await db.insert(thumbnailTable).values(message.payload).returning();
+                if (!created) throw new Error('Thumbnail insert did not return a row');
+                result = created;
                 break;
+              }
               case 'thumbnail.touch': {
                 const createdAt =
                   message.payload.createdAt instanceof Date
                     ? message.payload.createdAt
                     : new Date(message.payload.createdAt);
-                result = await touchThumbnail(message.payload.id, createdAt);
+                const [updated] = await db
+                  .update(thumbnailTable)
+                  .set({ createdAt })
+                  .where(eq(thumbnailTable.id, message.payload.id))
+                  .returning();
+                result = updated ?? null;
                 break;
               }
               default:

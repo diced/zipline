@@ -1,5 +1,7 @@
-import { urlSlugExists } from '@/lib/db/models/url';
+import { db } from '@/lib/db';
+import { urls } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
+import { eq, or } from 'drizzle-orm';
 import type { FastifyInstance } from 'fastify';
 import loadRoutes from '../routes';
 import { filesRoute } from '../routes/files.dy';
@@ -31,7 +33,8 @@ export async function registerRoutes(server: FastifyInstance, mode: string) {
       if (id === '') return res.callNotFound();
       else if (id === 'dashboard') return res.callNotFound(); // todo render dashboard
 
-      if (await urlSlugExists(id)) return urlsRoute(req as any, res);
+      if ((await db.$count(urls, or(eq(urls.code, id), eq(urls.vanity, id)))) > 0)
+        return urlsRoute(req as any, res);
       else return filesRoute(req as any, res);
     });
   } else {

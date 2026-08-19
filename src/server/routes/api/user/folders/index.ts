@@ -1,15 +1,14 @@
 import { ApiError } from '@/lib/api/errors';
-import { findFilesByIds } from '@/lib/db/models/file';
+import { getFiles } from '@/lib/db/models/file';
 import {
-  createFolderWithFiles,
-  findFolderRowById,
+  createFolder,
+  getFolderMetadata,
   Folder,
-  cleanFolder,
-  cleanFolders,
+  formatFolder,
   folderSchema,
-  listFoldersForUser,
+  listFolders,
 } from '@/lib/db/models/folder';
-import { findUserRowById } from '@/lib/db/models/user';
+import { getUserIdentity } from '@/lib/db/models/user';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { canInteract } from '@/lib/role';
@@ -48,20 +47,20 @@ export default typedPlugin(
         const { noincl, user: userId, parentId, root } = req.query;
 
         if (userId) {
-          const targetUser = await findUserRowById(userId);
+          const targetUser = await getUserIdentity(userId);
 
           if (!targetUser) throw new ApiError(4009);
           if (req.user.id !== targetUser.id && !canInteract(req.user.role, targetUser.role))
             throw new ApiError(4009);
         }
 
-        const folders = await listFoldersForUser(userId || req.user.id, {
+        const folders = await listFolders(userId || req.user.id, {
           root,
           parentId,
           includeFiles: !noincl,
         });
 
-        return res.send(cleanFolders(folders));
+        return res.send(folders.map((folder) => formatFolder(folder)));
       },
     );
 
@@ -90,14 +89,14 @@ export default typedPlugin(
         let files = req.body.files;
 
         if (parentId) {
-          const parentFolder = await findFolderRowById(parentId);
+          const parentFolder = await getFolderMetadata(parentId);
 
           if (!parentFolder) throw new ApiError(4007);
           if (parentFolder.userId !== req.user.id) throw new ApiError(3003);
         }
 
         if (files) {
-          const filesAdd = (await findFilesByIds(files, { thumbnail: false, tags: false })).filter(
+          const filesAdd = (await getFiles(files, { thumbnail: false, tags: false })).filter(
             (file) => file.userId === req.user.id,
           );
 
@@ -106,7 +105,7 @@ export default typedPlugin(
           files = filesAdd.map((f) => f.id);
         }
 
-        const folder = await createFolderWithFiles(
+        const folder = await createFolder(
           {
             name,
             userId: req.user.id,
@@ -123,7 +122,7 @@ export default typedPlugin(
           parentId: parentId || undefined,
         });
 
-        return res.send(cleanFolder(folder));
+        return res.send(formatFolder(folder));
       },
     );
   },

@@ -1,15 +1,17 @@
 import {
-  deleteIncompleteFilesByIds,
   IncompleteFile,
   incompleteFileSchema,
-  listIncompleteFilesForUser,
+  listIncompleteFiles,
   listOwnedIncompleteFiles,
 } from '@/lib/db/models/incompleteFile';
+import { db } from '@/lib/db';
+import { incompleteFiles as incompleteFileTable } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
 import z from 'zod';
+import { inArray } from 'drizzle-orm';
 
 export type ApiUserFilesIncompleteResponse = IncompleteFile[] | { count: number };
 
@@ -31,7 +33,7 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const incompleteFiles = await listIncompleteFilesForUser(req.user.id);
+        const incompleteFiles = await listIncompleteFiles(req.user.id);
 
         return res.send(incompleteFiles);
       },
@@ -57,7 +59,18 @@ export default typedPlugin(
       },
       async (req, res) => {
         const existingFiles = await listOwnedIncompleteFiles(req.body.id, req.user.id);
-        const count = await deleteIncompleteFilesByIds(existingFiles.map((file) => file.id));
+        const removed = existingFiles.length
+          ? await db
+              .delete(incompleteFileTable)
+              .where(
+                inArray(
+                  incompleteFileTable.id,
+                  existingFiles.map((file) => file.id),
+                ),
+              )
+              .returning({ id: incompleteFileTable.id })
+          : [];
+        const count = removed.length;
         const incompleteFiles = { count };
 
         logger.info('incomplete files deleted', {

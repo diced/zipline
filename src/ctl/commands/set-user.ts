@@ -1,11 +1,14 @@
 import { hashPassword } from '@/lib/crypto';
-import { findUserRowById, updateUserRow, type UserUpdate } from '@/lib/db/models/user';
+import { db } from '@/lib/db';
+import { getUserIdentity, type UserUpdate } from '@/lib/db/models/user';
+import { users } from '@/lib/db/schema';
+import { eq } from 'drizzle-orm';
 const SUPPORTED_FIELDS = ['username', 'password', 'role', 'avatar', 'token', 'totpSecret'];
 
 export async function setUser(property: string, value: string, { id }: { id: string }) {
   if (!SUPPORTED_FIELDS.includes(property)) return console.error('Unsupported field:', property);
 
-  const user = await findUserRowById(id);
+  const user = await getUserIdentity(id);
 
   if (!user) return console.error('User not found');
 
@@ -22,7 +25,10 @@ export async function setUser(property: string, value: string, { id }: { id: str
     parsed = value.toUpperCase();
   }
 
-  await updateUserRow(id, { [property]: parsed } as UserUpdate);
+  await db
+    .update(users)
+    .set({ [property]: parsed } as UserUpdate)
+    .where(eq(users.id, id));
 
   if (property === 'password') parsed = '*********';
 

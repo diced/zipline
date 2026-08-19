@@ -1,22 +1,23 @@
 import { ApiError } from '@/lib/api/errors';
 import { hashPassword, verifyPassword } from '@/lib/crypto';
 import { db } from '@/lib/db';
-import { deleteOtherUserSessions } from '@/lib/db/models/session';
+import { removeOtherSessions } from '@/lib/db/models/session';
 import {
-  findFullUserById,
-  findUserRowById,
-  findUserRowByUsername,
-  updateFullUser,
+  getUser,
+  updateUser,
+  usernameExists,
   type User,
   type UserUpdate,
   userSchema,
 } from '@/lib/db/models/user';
+import { users } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { zStringTrimmed } from '@/lib/validation';
 import { userMiddleware } from '@/server/middleware/user';
 import { getSession, saveSession } from '@/server/session';
 import typedPlugin from '@/server/typedPlugin';
+import { eq } from 'drizzle-orm';
 import z from 'zod';
 
 export type ApiUserResponse = {
@@ -90,14 +91,15 @@ export default typedPlugin(
       },
       async (req, res) => {
         if (req.body.username) {
-          const existing = await findUserRowByUsername(req.body.username);
-
-          if (existing) throw new ApiError(1038);
+          if (await usernameExists(req.body.username)) throw new ApiError(1038);
         }
 
         const changingPassword = !!req.body.password;
         if (changingPassword) {
-          const passwdReq = await findUserRowById(req.user.id);
+          const passwdReq = await db.query.users.findFirst({
+            columns: { password: true },
+            where: eq(users.id, req.user.id),
+          });
 
           if (!passwdReq) throw new ApiError(1068);
 
@@ -166,12 +168,12 @@ export default typedPlugin(
 
         const user = changingPassword
           ? await db.transaction(async (tx) => {
-              await deleteOtherUserSessions(req.user.id, currentSession.sessionId ?? '', tx);
-              return updateFullUser(req.user.id, data, tx);
+              await removeOtherSessions(req.user.id, currentSession.sessionId ?? '', tx);
+              return updateUser(req.user.id, data, tx);
             })
           : Object.keys(data).length
-            ? await updateFullUser(req.user.id, data)
-            : await findFullUserById(req.user.id);
+            ? await updateUser(req.user.id, data)
+            : await getUser(req.user.id);
         if (!user) throw new ApiError(1068);
 
         await saveSession(currentSession, user, false);

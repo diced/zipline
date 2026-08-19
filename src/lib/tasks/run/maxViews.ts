@@ -3,18 +3,26 @@ import { IntervalTask } from '..';
 import { bytes } from '@/lib/bytes';
 import { config } from '@/lib/config';
 import { db } from '@/lib/db';
-import { deleteFilesByIds, listFilesAtMaxViews } from '@/lib/db/models/file';
-import { deleteUrlsByIds, listUrlsAtMaxViews } from '@/lib/db/models/url';
+import { removeFiles } from '@/lib/db/models/file';
+import { removeUrls } from '@/lib/db/models/url';
+import { files as fileRecords, urls as urlRecords } from '@/lib/db/schema';
+import { and, gte, isNotNull } from 'drizzle-orm';
 
 export default function maxViews() {
   return async function (this: IntervalTask) {
-    const files = await listFilesAtMaxViews();
+    const files = await db.query.files.findMany({
+      columns: { id: true, name: true, size: true },
+      where: and(isNotNull(fileRecords.maxViews), gte(fileRecords.views, fileRecords.maxViews)),
+    });
 
     this.logger.debug(`found ${files.length} expired files`, {
       files: files.map((f) => f.name),
     });
 
-    const urls = await listUrlsAtMaxViews();
+    const urls = await db
+      .select({ id: urlRecords.id, destination: urlRecords.destination })
+      .from(urlRecords)
+      .where(and(isNotNull(urlRecords.maxViews), gte(urlRecords.views, urlRecords.maxViews)));
 
     this.logger.debug(`found ${urls.length} expired urls`, {
       dests: urls.map((u) => u.destination),
@@ -37,11 +45,11 @@ export default function maxViews() {
 
     const [fileCount, urlCount] = await db.transaction(async (tx) =>
       Promise.all([
-        deleteFilesByIds(
+        removeFiles(
           files.map((f) => f.id),
           tx,
         ),
-        deleteUrlsByIds(
+        removeUrls(
           urls.map((u) => u.id),
           tx,
         ),

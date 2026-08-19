@@ -2,22 +2,24 @@ import { ApiError } from '@/lib/api/errors';
 import { bytes } from '@/lib/bytes';
 import { hashPassword } from '@/lib/crypto';
 import { datasource } from '@/lib/datasource';
+import { db } from '@/lib/db';
 import {
-  deleteFileById,
+  removeFile,
   File,
   type FileUpdate,
   fileSchema,
-  findFileByIdentifier,
-  findFileRowByName,
+  getFile,
   updateFileAndTags,
 } from '@/lib/db/models/file';
-import { findOwnedTagsByIds } from '@/lib/db/models/tag';
+import { files as fileTable } from '@/lib/db/schema';
+import { listOwnedTags } from '@/lib/db/models/tag';
 import { log } from '@/lib/logger';
 import { canInteract } from '@/lib/role';
 import { zValidatePath } from '@/lib/validation';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
 import z from 'zod';
+import { eq } from 'drizzle-orm';
 
 export type ApiUserFilesIdResponse = File;
 
@@ -45,7 +47,7 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const file = await findFileByIdentifier(req.params.id, {
+        const file = await getFile(req.params.id, {
           thumbnail: true,
           tags: true,
           owner: true,
@@ -85,7 +87,7 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const file = await findFileByIdentifier(req.params.id, {
+        const file = await getFile(req.params.id, {
           thumbnail: true,
           tags: true,
           owner: true,
@@ -115,7 +117,7 @@ export default typedPlugin(
         }
 
         if (req.body.tags !== undefined) {
-          const tags = await findOwnedTagsByIds(
+          const tags = await listOwnedTags(
             req.body.tags,
             req.user.id !== file.User?.id ? (file.User?.id ?? req.user.id) : req.user.id,
           );
@@ -125,7 +127,10 @@ export default typedPlugin(
 
         if (req.body.name !== undefined && req.body.name !== file.name) {
           const name = req.body.name!;
-          const existingFile = await findFileRowByName(name);
+          const existingFile = await db.query.files.findFirst({
+            columns: { id: true },
+            where: eq(fileTable.name, name),
+          });
 
           if (existingFile && existingFile.id !== file.id) throw new ApiError(1014);
 
@@ -166,7 +171,7 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const file = await findFileByIdentifier(req.params.id, {
+        const file = await getFile(req.params.id, {
           thumbnail: true,
           tags: true,
           owner: true,
@@ -176,7 +181,7 @@ export default typedPlugin(
         if (req.user.id !== file.User?.id && !canInteract(req.user.role, file.User?.role ?? 'USER'))
           throw new ApiError(4000);
 
-        const deleted = await deleteFileById(file.id);
+        const deleted = await removeFile(file.id);
         if (!deleted) throw new ApiError(4000);
         const { password: _password, User: _owner, ...deletedFile } = file;
 

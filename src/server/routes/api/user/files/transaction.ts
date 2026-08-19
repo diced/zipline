@@ -1,7 +1,7 @@
 import { ApiError } from '@/lib/api/errors';
 import { datasource } from '@/lib/datasource';
-import { deleteFilesByIds, findFilesByIds, updateFilesByIds } from '@/lib/db/models/file';
-import { findOwnedFolderById } from '@/lib/db/models/folder';
+import { removeFiles, getFiles, updateFiles } from '@/lib/db/models/file';
+import { getOwnedFolder } from '@/lib/db/models/folder';
 import { Role } from '@/lib/db/enums';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
@@ -60,7 +60,7 @@ export default typedPlugin(
         const { files, favorite, folder } = req.body;
 
         if (typeof favorite === 'boolean') {
-          const toFavoriteFiles = await findFilesByIds(files, {
+          const toFavoriteFiles = await getFiles(files, {
             thumbnail: false,
             tags: false,
             owner: true,
@@ -73,7 +73,7 @@ export default typedPlugin(
           if (invalids.length > 0)
             throw new ApiError(3014, `You don't have the permission to modify files[${invalids.join(', ')}]`);
 
-          const resp = { count: await updateFilesByIds(files, { favorite }) };
+          const resp = { count: await updateFiles(files, { favorite }) };
 
           if (resp.count === 0) throw new ApiError(1028);
 
@@ -87,10 +87,10 @@ export default typedPlugin(
 
         if (!folder) throw new ApiError(1020);
 
-        const f = await findOwnedFolderById(folder, req.user.id);
+        const f = await getOwnedFolder(folder, req.user.id);
         if (!f) throw new ApiError(4001);
 
-        const resp = { count: await updateFilesByIds(files, { folderId: folder }, req.user.id) };
+        const resp = { count: await updateFiles(files, { folderId: folder }, req.user.id) };
 
         if (resp.count === 0) throw new ApiError(4006);
 
@@ -134,7 +134,7 @@ export default typedPlugin(
           files: files.length,
         });
 
-        const toDeleteFiles = await findFilesByIds(files, {
+        const toDeleteFiles = await getFiles(files, {
           thumbnail: false,
           tags: false,
           owner: true,
@@ -157,7 +157,7 @@ export default typedPlugin(
           });
         }
 
-        const resp = { count: await deleteFilesByIds(files) };
+        const resp = { count: await removeFiles(files) };
 
         if (resp.count === 0) throw new ApiError(1027);
 

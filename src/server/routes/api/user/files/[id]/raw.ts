@@ -4,8 +4,8 @@ import { ApiError } from '@/lib/api/errors';
 import { parseRange } from '@/lib/api/range';
 import { config } from '@/lib/config';
 import { datasource } from '@/lib/datasource';
-import { deleteFileById, findFileByIdentifier } from '@/lib/db/models/file';
-import { findThumbnailWithOwnerByPath } from '@/lib/db/models/thumbnail';
+import { removeFile, getFile } from '@/lib/db/models/file';
+import { getThumbnailWithOwner } from '@/lib/db/models/thumbnail';
 import { sanitizeFilename } from '@/lib/fs';
 import { log } from '@/lib/logger';
 import { guess } from '@/lib/mimes';
@@ -46,7 +46,7 @@ export default typedPlugin(
         if (!id) throw new ApiError(9002);
 
         if (id.startsWith('.thumbnail')) {
-          const thumbnail = await findThumbnailWithOwnerByPath(id);
+          const thumbnail = await getThumbnailWithOwner(id);
 
           if (!thumbnail) throw new ApiError(9002);
           if (thumbnail.file && thumbnail.file.userId !== req.user.id) {
@@ -68,7 +68,7 @@ export default typedPlugin(
             .send(buf);
         }
 
-        const file = await findFileByIdentifier(id, { thumbnail: false, tags: false, owner: true });
+        const file = await getFile(id, { thumbnail: false, tags: false, owner: true });
         if (!file) throw new ApiError(9002);
 
         if (file.userId !== req.user.id) {
@@ -78,7 +78,7 @@ export default typedPlugin(
         if (file.deletesAt && file.deletesAt <= new Date()) {
           try {
             await datasource.delete(file.name);
-            await deleteFileById(file.id);
+            await removeFile(file.id);
           } catch (e) {
             logger
               .error('failed to delete file on expiration', {
@@ -95,7 +95,7 @@ export default typedPlugin(
 
           try {
             await datasource.delete(file.name);
-            await deleteFileById(file.id);
+            await removeFile(file.id);
           } catch (e) {
             logger
               .error('failed to delete file on max views', {

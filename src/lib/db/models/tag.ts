@@ -33,20 +33,16 @@ function mapTagFiles(row: Awaited<ReturnType<typeof queryTagsWithFiles>>[number]
   return { ...tag, files: fileTags.map(({ fileId }) => ({ id: fileId })) };
 }
 
-export async function listTagsForUser(userId: string, client: DbClient = db) {
+export async function listTags(userId: string, client: DbClient = db) {
   return (await queryTagsWithFiles(eq(tags.userId, userId), client)).map(mapTagFiles);
 }
 
-export async function findTagById(id: string, client: DbClient = db) {
-  return (await client.query.tags.findFirst({ columns: tagColumns, where: eq(tags.id, id) })) ?? null;
-}
-
-export async function findOwnedTagById(id: string, userId: string, client: DbClient = db) {
+export async function getOwnedTag(id: string, userId: string, client: DbClient = db) {
   const [row] = await queryTagsWithFiles(and(eq(tags.id, id), eq(tags.userId, userId)), client);
   return row ? mapTagFiles(row) : null;
 }
 
-export async function findTagByName(name: string, userId?: string, client: DbClient = db) {
+export async function getTagByName(name: string, userId?: string, client: DbClient = db) {
   return (
     (await client.query.tags.findFirst({
       columns: tagColumns,
@@ -55,7 +51,7 @@ export async function findTagByName(name: string, userId?: string, client: DbCli
   );
 }
 
-export async function findOwnedTagsByIds(ids: string[], userId: string, client: DbClient = db) {
+export async function listOwnedTags(ids: string[], userId: string, client: DbClient = db) {
   if (!ids.length) return [];
   return client.query.tags.findMany({
     columns: tagColumns,
@@ -63,7 +59,7 @@ export async function findOwnedTagsByIds(ids: string[], userId: string, client: 
   });
 }
 
-export async function commonFileIdsForTags(ids: string[], userId: string, client: DbClient = db) {
+export async function getCommonFileIds(ids: string[], userId: string, client: DbClient = db) {
   const owned = await queryTagsWithFiles(and(eq(tags.userId, userId), inArray(tags.id, ids)), client);
   if (owned.length !== ids.length) return null;
   if (!owned.length) return [];
@@ -87,7 +83,7 @@ export async function updateTag(id: string, data: TagUpdate, client: DbClient = 
   return updated ? mapTagFiles(updated) : null;
 }
 
-export async function deleteOwnedTag(id: string, userId: string, client: DbClient = db) {
+export async function removeOwnedTag(id: string, userId: string, client: DbClient = db) {
   const rows = await client
     .delete(tags)
     .where(and(eq(tags.id, id), eq(tags.userId, userId)))

@@ -5,7 +5,7 @@ import { reloadSettings } from '@/lib/config';
 import type { readDatabaseSettings } from '@/lib/config/read/db';
 import { safeConfig } from '@/lib/config/safe';
 import { MAX_SAFE_TIMEOUT_MS, MIME_REGEX } from '@/lib/config/validate';
-import { findZipline, getDatabaseSettings, updateDatabaseSettings } from '@/lib/db/models/zipline';
+import { getSettings, getSettingsRow, updateSettings } from '@/lib/db/models/zipline';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { RESERVED_ROUTES } from '@/lib/reservedRoutes';
@@ -100,7 +100,7 @@ export default typedPlugin(
       async (req, res) => {
         if (req.user.role !== 'SUPERADMIN') throw new ApiError(3015);
 
-        const settings = await getDatabaseSettings();
+        const settings = await getSettings();
 
         if (!settings) throw new ApiError(4010);
 
@@ -125,7 +125,7 @@ export default typedPlugin(
       async (req, res) => {
         if (req.user.role !== 'SUPERADMIN') throw new ApiError(3015);
 
-        const settings = await findZipline();
+        const settings = await getSettingsRow();
         if (!settings) throw new ApiError(4010);
 
         const themes = (await readThemes()).map((x) => x.id);
@@ -480,7 +480,7 @@ export default typedPlugin(
           throw new ApiError(1022).add('issues', result.error.issues);
         }
 
-        const newSettings = await updateDatabaseSettings(settings.id, result.data);
+        const newSettings = await updateSettings(settings.id, result.data);
         if (!newSettings) throw new ApiError(4010);
 
         await reloadSettings();

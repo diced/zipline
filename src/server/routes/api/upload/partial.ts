@@ -4,20 +4,11 @@ import { bytes } from '@/lib/bytes';
 import { config } from '@/lib/config';
 import { hashPassword } from '@/lib/crypto';
 import { db } from '@/lib/db';
-import {
-  createFile,
-  deleteFileById,
-  type FileInsert,
-  lockFileOwner,
-  updateFileWithRelations,
-} from '@/lib/db/models/file';
-import { findFolderRowById } from '@/lib/db/models/folder';
-import {
-  createIncompleteFile,
-  incrementIncompleteFileChunks,
-  updateIncompleteFile,
-} from '@/lib/db/models/incompleteFile';
-import { findFullUserById } from '@/lib/db/models/user';
+import { removeFile, type FileInsert, lockFileOwner, updateFile } from '@/lib/db/models/file';
+import { getFolderMetadata } from '@/lib/db/models/folder';
+import { createIncompleteFile, completeChunk, updateIncompleteFile } from '@/lib/db/models/incompleteFile';
+import { files as fileTable } from '@/lib/db/schema';
+import { getUser } from '@/lib/db/models/user';
 import { sanitizeFilename } from '@/lib/fs';
 import { log } from '@/lib/logger';
 import { randomCharacters } from '@/lib/random';
@@ -186,7 +177,7 @@ export default typedPlugin(
 
         let folder = null;
         if (options.folder) {
-          folder = await findFolderRowById(options.folder);
+          folder = await getFolderMetadata(options.folder);
           if (!folder) throw new ApiError(4001);
 
           const ownsFolder = req.user ? folder.userId === req.user.id : false;
@@ -194,7 +185,7 @@ export default typedPlugin(
         }
 
         // use quota of folder owner for anonymous uploads
-        const quotaUser = req.user ? req.user : folder?.userId ? await findFullUserById(folder.userId) : null;
+        const quotaUser = req.user ? req.user : folder?.userId ? await getUser(folder.userId) : null;
 
         const actorKey = req.user ? `user:${req.user.id}` : `anonymous:${folder?.id ?? 'unknown'}:${req.ip}`;
 
@@ -346,7 +337,9 @@ export default typedPlugin(
                   throw new ApiError(5002, typeof quotaCheck === 'string' ? quotaCheck : undefined);
               }
 
-              return createFile(data, tx);
+              const [created] = await tx.insert(fileTable).values(data).returning();
+              if (!created) throw new Error('File insert did not return a row');
+              return created;
             });
           } catch (error) {
             await deletePartial(options.partial.identifier);
@@ -394,7 +387,7 @@ export default typedPlugin(
                 result = await createIncompleteFile(message.payload);
                 break;
               case 'incomplete.increment':
-                result = await incrementIncompleteFileChunks(message.payload.id, message.payload.status);
+                result = await completeChunk(message.payload.id, message.payload.status);
                 break;
               case 'incomplete.status':
                 result = await updateIncompleteFile(message.payload.id, {
@@ -402,16 +395,16 @@ export default typedPlugin(
                 });
                 break;
               case 'file.finalizePartial':
-                result = await updateFileWithRelations(message.payload.id, message.payload.changes);
+                result = await updateFile(message.payload.id, message.payload.changes);
                 await deletePartial(partialIdentifier, false);
                 break;
               case 'file.delete': {
-                const deleted = await deleteFileById(message.payload.id);
+                const deleted = await removeFile(message.payload.id);
                 result = deleted ? { id: deleted.id } : null;
                 break;
               }
               case 'user.uploadContext':
-                result = await findFullUserById(message.payload.id);
+                result = await getUser(message.payload.id);
                 break;
               default:
                 logger.error('unsupported partial worker database command', {

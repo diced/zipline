@@ -1,6 +1,6 @@
 import { detectClient, ZiplineClient } from '@/lib/api/detect';
 import { config } from '@/lib/config';
-import { createUserSession, replaceUserSessions } from '@/lib/db/models/session';
+import { createSession, replaceSessions } from '@/lib/db/models/session';
 import { randomCharacters } from '@/lib/random';
 import { fastifyCookie } from '@fastify/cookie';
 import { FastifyReply, FastifyRequest } from 'fastify';
@@ -9,13 +9,11 @@ import { getIronSession, type SessionOptions } from 'iron-session';
 import { parseUserToken } from './middleware/user';
 
 const cookieOptions: NonNullable<SessionOptions['cookieOptions']> = {
-  // 2 weeks
   maxAge: 60 * 60 * 24 * 14,
   expires: new Date(Date.now() + 60 * 60 * 24 * 14 * 1000),
   path: '/',
   sameSite: 'lax',
   httpOnly: true,
-  // secure is set in below session functions based on config
 };
 
 export type ZiplineSession = {
@@ -91,8 +89,8 @@ export async function saveSession(
       ua: session.client.ua,
     };
 
-    if (overwriteSessions) await replaceUserSessions(dbSession);
-    else await createUserSession(dbSession);
+    if (overwriteSessions) await replaceSessions(dbSession);
+    else await createSession(dbSession);
   }
 
   await session.save();

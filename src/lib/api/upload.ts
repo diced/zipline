@@ -1,6 +1,6 @@
 import { extname } from 'path';
 import { User } from '@/lib/db/models/user';
-import { fileNamesExist, fileUsageForUser } from '@/lib/db/models/file';
+import { fileNamesExist, getFileUsage } from '@/lib/db/models/file';
 import type { DbClient } from '@/lib/db/models/user';
 import { bytes } from '@/lib/bytes';
 import { config } from '../config';
@@ -42,7 +42,7 @@ export async function checkQuota(
 ): Promise<true | string> {
   if (!user?.quota) return true;
 
-  const usage = await fileUsageForUser(user.id, client);
+  const usage = await getFileUsage(user.id, client);
   if (user.quota.filesQuota === 'BY_BYTES') {
     if (usage.size + newSize > bytes(user.quota.maxBytes!))
       return `uploading will exceed your storage quota of ${user.quota.maxBytes}`;

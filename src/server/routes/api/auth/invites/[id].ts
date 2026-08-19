@@ -1,9 +1,12 @@
 import { ApiError } from '@/lib/api/errors';
-import { deleteInviteById, findInviteByIdentifier, Invite, inviteSchema } from '@/lib/db/models/invite';
+import { db } from '@/lib/db';
+import { Invite, inviteSchema, removeInvite } from '@/lib/db/models/invite';
+import { invites } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { administratorMiddleware } from '@/server/middleware/administrator';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
+import { eq, or } from 'drizzle-orm';
 import z from 'zod';
 
 export type ApiAuthInvitesIdResponse = Invite;
@@ -33,7 +36,10 @@ export default typedPlugin(
       async (req, res) => {
         const { id } = req.params;
 
-        const invite = await findInviteByIdentifier(id);
+        const invite = await db.query.invites.findFirst({
+          where: or(eq(invites.id, id), eq(invites.code, id)),
+          with: { inviter: { columns: { username: true, id: true, role: true } } },
+        });
         if (!invite) throw new ApiError(4005);
 
         return res.send(invite);
@@ -57,7 +63,7 @@ export default typedPlugin(
 
         let invite;
         try {
-          invite = await deleteInviteById(id);
+          invite = await removeInvite(id);
         } catch (error) {
           logger.error(`Failed to delete invite with id ${id}`, { error });
           throw new ApiError(6000);

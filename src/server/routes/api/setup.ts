@@ -1,8 +1,8 @@
 import { ApiError } from '@/lib/api/errors';
 import { createToken, hashPassword } from '@/lib/crypto';
 import { db } from '@/lib/db';
-import { createFullUser, type User, userSchema } from '@/lib/db/models/user';
-import { claimFirstSetup, getZipline } from '@/lib/db/models/zipline';
+import { createUser, type User, userSchema } from '@/lib/db/models/user';
+import { claimFirstSetup, ensureSettingsRow } from '@/lib/db/models/zipline';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { zStringTrimmed } from '@/lib/validation';
@@ -32,7 +32,7 @@ export default typedPlugin(
         },
       },
       async (_, res) => {
-        const { firstSetup } = await getZipline();
+        const { firstSetup } = await ensureSettingsRow();
         if (!firstSetup) throw new ApiError(9001);
 
         return res.send({ firstSetup });
@@ -58,7 +58,7 @@ export default typedPlugin(
         ...secondlyRatelimit(5),
       },
       async (req, res) => {
-        await getZipline();
+        await ensureSettingsRow();
 
         const { username, password } = req.body;
 
@@ -70,7 +70,7 @@ export default typedPlugin(
         const user = await db.transaction(async (tx) => {
           if (!(await claimFirstSetup(tx))) throw new ApiError(9001);
 
-          return createFullUser(
+          return createUser(
             {
               username,
               password: hashed,

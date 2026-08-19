@@ -1,18 +1,13 @@
 import { ApiError } from '@/lib/api/errors';
 import { hashPassword } from '@/lib/crypto';
-import {
-  deleteOwnedUrlById,
-  findOwnedUrlById,
-  findOwnedUrlByIdWithoutPassword,
-  updateOwnedUrlById,
-  Url,
-  urlSchema,
-  urlVanityExists,
-} from '@/lib/db/models/url';
+import { db } from '@/lib/db';
+import { removeUserUrl, updateUserUrl, Url, urlSchema } from '@/lib/db/models/url';
+import { urls } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { zStringTrimmed } from '@/lib/validation';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
+import { and, eq } from 'drizzle-orm';
 import z from 'zod';
 
 export type ApiUserUrlsIdResponse = Url;
@@ -22,6 +17,15 @@ const logger = log('api').c('user').c('urls').c('[id]');
 const paramsSchema = z.object({
   id: z.string(),
 });
+
+async function getUserUrl(id: string, userId: string) {
+  return (
+    (await db.query.urls.findFirst({
+      columns: { password: false, userId: false },
+      where: and(eq(urls.id, id), eq(urls.userId, userId)),
+    })) ?? null
+  );
+}
 
 export const PATH = '/api/user/urls/:id';
 export default typedPlugin(
@@ -41,7 +45,7 @@ export default typedPlugin(
       async (req, res) => {
         const { id } = req.params;
 
-        const url = await findOwnedUrlByIdWithoutPassword(id, req.user.id);
+        const url = await getUserUrl(id, req.user.id);
         if (!url) throw new ApiError(9002);
 
         return res.send(url);
@@ -70,7 +74,7 @@ export default typedPlugin(
       async (req, res) => {
         const { id } = req.params;
 
-        const url = await findOwnedUrlById(id, req.user.id);
+        const url = await getUserUrl(id, req.user.id);
 
         if (!url) throw new ApiError(9002);
 
@@ -86,10 +90,10 @@ export default typedPlugin(
         }
 
         if (req.body.vanity) {
-          if (await urlVanityExists(req.body.vanity)) throw new ApiError(1041);
+          if ((await db.$count(urls, eq(urls.vanity, req.body.vanity))) > 0) throw new ApiError(1041);
         }
 
-        const updatedUrl = await updateOwnedUrlById(id, req.user.id, {
+        const updatedUrl = await updateUserUrl(id, req.user.id, {
           ...(req.body.vanity !== undefined && { vanity: req.body.vanity }),
           ...(req.body.password !== undefined && { password }),
           ...(req.body.maxViews !== undefined && { maxViews: req.body.maxViews }),
@@ -121,7 +125,7 @@ export default typedPlugin(
       async (req, res) => {
         const { id } = req.params;
 
-        const deletedUrl = await deleteOwnedUrlById(id, req.user.id);
+        const deletedUrl = await removeUserUrl(id, req.user.id);
         if (!deletedUrl) throw new ApiError(9002);
 
         logger.info(`${req.user.username} deleted URL ${deletedUrl.id}`, {

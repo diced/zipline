@@ -4,7 +4,7 @@ import { config } from '@/lib/config';
 import { createToken, hashPassword } from '@/lib/crypto';
 import { db } from '@/lib/db';
 import { consumeInvite } from '@/lib/db/models/invite';
-import { createFullUser, findUserRowByUsername, userSchema } from '@/lib/db/models/user';
+import { createUser, usernameExists, userSchema } from '@/lib/db/models/user';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { getSession, saveSession } from '@/server/session';
@@ -50,14 +50,13 @@ export default typedPlugin(
         if (code && !config.invites.enabled) throw new ApiError(1036);
         if (!code && !config.features.userRegistration) throw new ApiError(1037);
 
-        const oUser = await findUserRowByUsername(username);
-        if (oUser) throw new ApiError(1039);
+        if (await usernameExists(username)) throw new ApiError(1039);
 
         const hashedPassword = await hashPassword(password);
         const token = createToken();
 
-        const createUser = (client?: Parameters<typeof createFullUser>[1]) =>
-          createFullUser(
+        const registerUser = (client?: Parameters<typeof createUser>[1]) =>
+          createUser(
             {
               username,
               password: hashedPassword,
@@ -74,7 +73,7 @@ export default typedPlugin(
 
             if (!invite) throw new ApiError(1035);
 
-            return { inviteId: invite.id, user: await createUser(tx) };
+            return { inviteId: invite.id, user: await registerUser(tx) };
           });
 
           user = result.user;
@@ -84,7 +83,7 @@ export default typedPlugin(
             invite: result.inviteId,
           });
         } else {
-          user = await createUser();
+          user = await registerUser();
         }
 
         await saveSession(session, user);

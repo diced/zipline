@@ -1,4 +1,4 @@
-import { getOrCreateDatabaseSettings } from '@/lib/db/models/zipline';
+import { ensureSettings } from '@/lib/db/models/zipline';
 
 export const DATABASE_TO_PROP = {
   coreReturnHttpsUrls: 'core.returnHttpsUrls',
@@ -139,5 +139,5 @@ export const DATABASE_TO_PROP = {
 export type DatabaseToPropKey = keyof typeof DATABASE_TO_PROP;
 
 export async function readDatabaseSettings() {
-  return getOrCreateDatabaseSettings();
+  return ensureSettings();
 }

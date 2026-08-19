@@ -1,6 +1,6 @@
 import { ApiError } from '@/lib/api/errors';
 import { datasource } from '@/lib/datasource';
-import { findFolderRowById, getOwnedFolderTree, type FolderTree } from '@/lib/db/models/folder';
+import { getFolderMetadata, getOwnedTree, type FolderTree } from '@/lib/db/models/folder';
 import { log } from '@/lib/logger';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
@@ -55,12 +55,12 @@ export default typedPlugin(
       async (req, res) => {
         const { id } = req.params;
 
-        const folder = await findFolderRowById(id);
+        const folder = await getFolderMetadata(id);
 
         if (!folder) throw new ApiError(4001);
         if (req.user.id !== folder.userId) throw new ApiError(3011);
 
-        const folderTree = await getOwnedFolderTree(id, req.user.id);
+        const folderTree = await getOwnedTree(id, req.user.id);
         if (!folderTree) throw new ApiError(4001);
 
         logger.info(`folder export requested: ${folder.name}`, { user: req.user.id, folder: folder.id });

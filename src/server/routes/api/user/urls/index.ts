@@ -1,16 +1,9 @@
 import { ApiError } from '@/lib/api/errors';
 import { config } from '@/lib/config';
 import { hashPassword } from '@/lib/crypto';
-import {
-  cleanUrlPasswords,
-  createUrlForUser,
-  listUserUrls,
-  searchUserUrls,
-  Url,
-  urlCodeExists,
-  urlSchema,
-  urlVanityExists,
-} from '@/lib/db/models/url';
+import { db } from '@/lib/db';
+import { createUrl, Url, urlSchema } from '@/lib/db/models/url';
+import { urls as urlRecords } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { randomCharacters } from '@/lib/random';
 import { RESERVED_ROUTES } from '@/lib/reservedRoutes';
@@ -18,6 +11,7 @@ import { zStringTrimmed } from '@/lib/validation';
 import { onShorten } from '@/lib/webhooks';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
+import { and, eq, sql } from 'drizzle-orm';
 import { z } from 'zod';
 
 export type ApiUserUrlsResponse =
@@ -28,6 +22,12 @@ export type ApiUserUrlsResponse =
 
 export const PATH = '/api/user/urls';
 const logger = log('api').c('user').c('urls');
+const urlListConfig = {
+  columns: { password: false, userId: false },
+  extras: {
+    password: sql<boolean>`case when ${urlRecords.password} is null then false else true end`.as('password'),
+  },
+} as const;
 
 export default typedPlugin(
   async (server) => {
@@ -98,16 +98,16 @@ export default typedPlugin(
           : undefined;
 
         if (vanity) {
-          if (await urlVanityExists(vanity)) throw new ApiError(1042);
+          if ((await db.$count(urlRecords, eq(urlRecords.vanity, vanity))) > 0) throw new ApiError(1042);
         }
 
         let code, existingCode;
         do {
           code = randomCharacters(config.urls.length);
-          existingCode = await urlCodeExists(code);
+          existingCode = (await db.$count(urlRecords, eq(urlRecords.code, code))) > 0;
         } while (existingCode);
 
-        const url = await createUrlForUser(
+        const url = await createUrl(
           {
             userId: req.user.id,
             destination,
@@ -171,7 +171,7 @@ export default typedPlugin(
             searchQuery: z.string().min(1).optional(),
           }),
           response: {
-            200: z.array(urlSchema.omit({ password: true })),
+            200: z.array(urlSchema),
           },
         },
         preHandler: [userMiddleware],
@@ -180,14 +180,29 @@ export default typedPlugin(
         const { searchField, searchQuery } = req.query;
 
         if (searchQuery) {
-          const similarityResult = await searchUserUrls(req.user.id, searchField, searchQuery);
+          const searchColumn = {
+            destination: urlRecords.destination,
+            vanity: urlRecords.vanity,
+            code: urlRecords.code,
+          }[searchField];
+          const escaped = searchQuery.replaceAll('\\', '\\\\').replaceAll('%', '\\%').replaceAll('_', '\\_');
+          const similarityResult = await db.query.urls.findMany({
+            ...urlListConfig,
+            where: and(
+              eq(urlRecords.userId, req.user.id),
+              sql`${searchColumn} ILIKE ${`%${escaped}%`} ESCAPE '\\'`,
+            ),
+          });
 
           return res.send(similarityResult);
         }
 
-        const urls = await listUserUrls(req.user.id);
-
-        return res.send(cleanUrlPasswords(urls));
+        return res.send(
+          await db.query.urls.findMany({
+            ...urlListConfig,
+            where: eq(urlRecords.userId, req.user.id),
+          }),
+        );
       },
     );
   },

@@ -2,16 +2,9 @@ import { ApiError } from '@/lib/api/errors';
 import { bytes } from '@/lib/bytes';
 import { config } from '@/lib/config';
 import { datasource } from '@/lib/datasource';
-import {
-  completeUserExport,
-  createUserExport,
-  deleteUserExport,
-  Export,
-  exportSchema,
-  findUserExport,
-  listUserExportFiles,
-  listUserExports,
-} from '@/lib/db/models/export';
+import { db } from '@/lib/db';
+import { Export, exportSchema } from '@/lib/db/models/export';
+import { exports as exportRecords, files as fileRecords } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { userMiddleware } from '@/server/middleware/user';
@@ -19,6 +12,7 @@ import typedPlugin from '@/server/typedPlugin';
 import archiver from 'archiver';
 import { createWriteStream } from 'fs';
 import { rm, stat } from 'fs/promises';
+import { and, eq } from 'drizzle-orm';
 import { join } from 'path';
 import z from 'zod';
 
@@ -52,7 +46,10 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const exports = await listUserExports(req.user.id);
+        const exports = await db.query.exports.findMany({
+          columns: { userId: false },
+          where: eq(exportRecords.userId, req.user.id),
+        });
 
         if (req.query.id) {
           const file = exports.find((x) => x.id === req.query.id);
@@ -85,7 +82,10 @@ export default typedPlugin(
       async (req, res) => {
         if (!req.query.id) throw new ApiError(1029);
 
-        const exportDb = await findUserExport(req.query.id, req.user.id);
+        const exportDb = await db.query.exports.findFirst({
+          columns: { id: true, path: true },
+          where: and(eq(exportRecords.id, req.query.id), eq(exportRecords.userId, req.user.id)),
+        });
         if (!exportDb) throw new ApiError(9002);
 
         const path = join(config.core.tempDirectory, exportDb.path);
@@ -99,7 +99,10 @@ export default typedPlugin(
           );
         }
 
-        const deleted = await deleteUserExport(req.query.id, req.user.id);
+        const [deleted] = await db
+          .delete(exportRecords)
+          .where(and(eq(exportRecords.id, req.query.id), eq(exportRecords.userId, req.user.id)))
+          .returning({ id: exportRecords.id });
         if (!deleted) throw new ApiError(9002);
 
         logger.info(`deleted export ${exportDb.id}: ${exportDb.path}`);
@@ -124,7 +127,10 @@ export default typedPlugin(
         ...secondlyRatelimit(5),
       },
       async (req, res) => {
-        const files = await listUserExportFiles(req.user.id);
+        const files = await db
+          .select({ name: fileRecords.name, size: fileRecords.size })
+          .from(fileRecords)
+          .where(eq(fileRecords.userId, req.user.id));
 
         if (!files.length) throw new ApiError(1025);
 
@@ -133,12 +139,16 @@ export default typedPlugin(
 
         logger.debug(`exporting ${req.user.id}`, { exportPath, files: files.length });
 
-        const exportDb = await createUserExport({
-          userId: req.user.id,
-          path: exportFileName,
-          files: files.length,
-          size: '0',
-        });
+        const [exportDb] = await db
+          .insert(exportRecords)
+          .values({
+            userId: req.user.id,
+            path: exportFileName,
+            files: files.length,
+            size: '0',
+          })
+          .returning();
+        if (!exportDb) throw new Error('Export insert did not return a row');
         const writeStream = createWriteStream(exportPath);
 
         const zip = archiver('zip', {
@@ -164,7 +174,12 @@ export default typedPlugin(
           logger.debug('exported', { path: exportPath, bytes: zip.pointer() });
           logger.info(`export for ${req.user.id} finished at ${exportPath}`);
 
-          await completeUserExport(exportDb.id, (await stat(exportPath)).size.toString());
+          const [completed] = await db
+            .update(exportRecords)
+            .set({ completed: true, size: (await stat(exportPath)).size.toString() })
+            .where(eq(exportRecords.id, exportDb.id))
+            .returning({ id: exportRecords.id });
+          if (!completed) throw new Error(`Export ${exportDb.id} disappeared before it could be completed`);
         });
 
         zip.on('error', (err) => {

@@ -2,13 +2,10 @@ import { ApiError } from '@/lib/api/errors';
 import { ziplineClientParseSchema } from '@/lib/api/detect';
 import { config } from '@/lib/config';
 import { createToken } from '@/lib/crypto';
-import {
-  findPasskeyByCredentialId,
-  passkeyRegSchema,
-  updateUserPasskey,
-  type PasskeyReg,
-} from '@/lib/db/models/passkey';
-import { findFullUserById, type User, userSchema } from '@/lib/db/models/user';
+import { db } from '@/lib/db';
+import { getPasskeyByCredential, passkeyRegSchema, type PasskeyReg } from '@/lib/db/models/passkey';
+import { getUser, type User, userSchema } from '@/lib/db/models/user';
+import { userPasskeys } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { TimedCache } from '@/lib/timedCache';
@@ -20,6 +17,7 @@ import {
   PublicKeyCredentialRequestOptionsJSON,
   verifyAuthenticationResponse,
 } from '@simplewebauthn/server';
+import { eq } from 'drizzle-orm';
 import z from 'zod';
 import { passkeysEnabledHandler } from '../user/mfa/passkey';
 
@@ -140,8 +138,8 @@ export default typedPlugin(
         const cachedOptions = OPTIONS_CACHE.get(webauthnChallengeId);
         if (!cachedOptions) throw new ApiError(1048);
 
-        const passkey = await findPasskeyByCredentialId(response.id);
-        const user = passkey ? await findFullUserById(passkey.userId) : null;
+        const passkey = await getPasskeyByCredential(response.id);
+        const user = passkey ? await getUser(passkey.userId) : null;
         if (!passkey || !user) {
           logger.warn('invalid webauthn attempt', {
             req: webauthnChallengeId,
@@ -192,10 +190,14 @@ export default typedPlugin(
 
         await saveSession(session, user, false);
 
-        const updated = await updateUserPasskey(passkey.id, {
-          lastUsed: new Date(),
-          reg: { webauthn: { ...reg.webauthn, counter: newCounter } },
-        });
+        const [updated] = await db
+          .update(userPasskeys)
+          .set({
+            lastUsed: new Date(),
+            reg: { webauthn: { ...reg.webauthn, counter: newCounter } },
+          })
+          .where(eq(userPasskeys.id, passkey.id))
+          .returning({ id: userPasskeys.id });
         if (!updated) throw new Error(`Passkey ${passkey.id} no longer exists`);
 
         logger.info('user logged in with passkey', {

@@ -1,5 +1,5 @@
 import { ApiError } from '@/lib/api/errors';
-import { createTag, findTagByName, listTagsForUser, Tag, tagSchema } from '@/lib/db/models/tag';
+import { createTag, getTagByName, listTags, Tag, tagSchema } from '@/lib/db/models/tag';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { zStringTrimmed } from '@/lib/validation';
@@ -27,7 +27,7 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const tags = await listTagsForUser(req.user.id);
+        const tags = await listTags(req.user.id);
 
         return res.send(tags);
       },
@@ -53,7 +53,7 @@ export default typedPlugin(
       async (req, res) => {
         const { name, color } = req.body;
 
-        const existingTag = await findTagByName(name, req.user.id);
+        const existingTag = await getTagByName(name, req.user.id);
 
         if (existingTag) throw new ApiError(1033);
 

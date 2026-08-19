@@ -1,7 +1,10 @@
 import { verifyAccessToken } from '@/lib/accessToken';
 import { config } from '@/lib/config';
-import { deleteUrlById, findUrlByIdentifier, incrementUrlViews } from '@/lib/db/models/url';
+import { db } from '@/lib/db';
+import { recordUrlView, removeUrl } from '@/lib/db/models/url';
+import { urls } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
+import { eq, or } from 'drizzle-orm';
 import { FastifyReply, FastifyRequest } from 'fastify';
 
 type Params = {
@@ -21,13 +24,15 @@ export async function urlsRoute(
   const { id } = req.params;
   const { token } = req.query;
 
-  const url = await findUrlByIdentifier(id);
+  const url = await db.query.urls.findFirst({
+    where: or(eq(urls.code, id), eq(urls.vanity, id), eq(urls.id, id)),
+  });
   if (!url) return res.callNotFound();
   if (!url.enabled) return res.callNotFound();
 
   if (url.maxViews && url.views >= url.maxViews) {
     if (config.features.deleteOnMaxViews) {
-      await deleteUrlById(url.id);
+      await removeUrl(url.id);
 
       logger.info(`${url.code} deleted due to reaching max views`, {
         id: url.id,
@@ -44,7 +49,7 @@ export async function urlsRoute(
     if (!valid) return res.redirect(`/view/url/${url.id}`);
   }
 
-  await incrementUrlViews(url.id);
+  await recordUrlView(url.id);
 
   return res.redirect(url.destination);
 }

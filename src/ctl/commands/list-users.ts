@@ -1,4 +1,4 @@
-import { listFullUsers, userSchema } from '@/lib/db/models/user';
+import { listUserDetails, userSchema } from '@/lib/db/models/user';
 
 const selectableUserKeys = new Set(Object.keys(userSchema.shape));
 
@@ -22,7 +22,7 @@ export async function listUsers({ extra, format, id }: { extra?: string[]; forma
     }
   }
 
-  const rows = await listFullUsers({ id, avatar: extra?.includes('avatar') });
+  const rows = await listUserDetails({ id, avatar: extra?.includes('avatar') });
   const users = [];
   for (const full of rows) {
     const selected: Record<string, unknown> = {};

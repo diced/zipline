@@ -1,17 +1,17 @@
 import { ApiError } from '@/lib/api/errors';
 import { datasource } from '@/lib/datasource';
-import { fileBelongsToFolder, findFileById } from '@/lib/db/models/file';
+import { isFileInFolder, getFileById } from '@/lib/db/models/file';
 import {
-  buildParentChain,
-  deleteFolderWithChildren,
-  findFolderWithOwner,
-  folderParentStatus,
+  getParentChain,
+  removeFolder,
+  getFolderWithOwner,
+  getParentStatus,
   Folder,
-  cleanFolder,
+  formatFolder,
   folderSchema,
-  getFolderDetails,
-  moveFileToFolder,
-  removeFileFromFolder,
+  getFolder,
+  addFile,
+  removeFile,
   updateFolder,
 } from '@/lib/db/models/folder';
 import { log } from '@/lib/logger';
@@ -33,7 +33,7 @@ const paramsSchema = z.object({
 const folderExistsAndEditable = async (req: FastifyRequest) => {
   const { id } = req.params as z.infer<typeof paramsSchema>;
 
-  const folder = await findFolderWithOwner(id);
+  const folder = await getFolderWithOwner(id);
 
   if (!folder) throw new ApiError(4001);
   if (!canManage(req.user, folder.User)) throw new ApiError(4001);
@@ -63,14 +63,14 @@ export default typedPlugin(
         const { id } = req.params;
         const { noincl } = req.query;
 
-        const folder = await getFolderDetails(id, !noincl);
+        const folder = await getFolder(id, !noincl);
         if (!folder) throw new ApiError(4001);
 
         if (folder.parentId) {
-          folder.parent = await buildParentChain(folder.parentId);
+          folder.parent = await getParentChain(folder.parentId);
         }
 
-        return res.send(cleanFolder(folder));
+        return res.send(formatFolder(folder));
       },
     );
 
@@ -94,7 +94,7 @@ export default typedPlugin(
         const { id: folderId } = req.params;
         const { id } = req.body;
 
-        const file = await findFileById(id, {
+        const file = await getFileById(id, {
           thumbnail: false,
           tags: false,
           owner: true,
@@ -102,13 +102,13 @@ export default typedPlugin(
         if (!file) throw new ApiError(4000);
         if (!canManage(req.user, file.User)) throw new ApiError(4000);
 
-        if (await fileBelongsToFolder(file.id, folderId)) throw new ApiError(1011);
+        if (await isFileInFolder(file.id, folderId)) throw new ApiError(1011);
 
-        const nFolder = await moveFileToFolder(file.id, folderId);
+        const nFolder = await addFile(file.id, folderId);
         if (!nFolder) throw new ApiError(4002);
 
         logger.info('file added to folder', { folder: folderId, file: id });
-        return res.send(cleanFolder(nFolder));
+        return res.send(formatFolder(nFolder));
       },
     );
 
@@ -139,7 +139,7 @@ export default typedPlugin(
           if (parentId === folderId) throw new ApiError(1015);
 
           if (parentId !== null) {
-            const status = await folderParentStatus(folderId, parentId, req.user.id);
+            const status = await getParentStatus(folderId, parentId, req.user.id);
             if (status === 'missing') throw new ApiError(4007);
             if (status === 'foreign') throw new ApiError(3003);
             if (status === 'cycle') throw new ApiError(1016);
@@ -162,7 +162,7 @@ export default typedPlugin(
           parentId,
         });
 
-        return res.send(cleanFolder(nFolder));
+        return res.send(formatFolder(nFolder));
       },
     );
 
@@ -197,15 +197,15 @@ export default typedPlugin(
 
         if (del === 'folder') {
           if (childrenAction === 'folder' && targetFolderId) {
-            const targetFolder = await findFolderWithOwner(targetFolderId);
+            const targetFolder = await getFolderWithOwner(targetFolderId);
             if (!targetFolder) throw new ApiError(4008);
             if (!canManage(req.user, targetFolder.User)) throw new ApiError(4008, undefined, 403);
-            if ((await folderParentStatus(folderId, targetFolderId, targetFolder.userId)) === 'cycle')
+            if ((await getParentStatus(folderId, targetFolderId, targetFolder.userId)) === 'cycle')
               throw new ApiError(1016);
           }
 
           try {
-            const result = await deleteFolderWithChildren(folderId, childrenAction, targetFolderId);
+            const result = await removeFolder(folderId, childrenAction, targetFolderId);
 
             if (!result?.success) throw new ApiError(1019);
 
@@ -228,7 +228,7 @@ export default typedPlugin(
           const { id } = req.body;
           if (!id) throw new ApiError(1013);
 
-          const file = await findFileById(id, {
+          const file = await getFileById(id, {
             thumbnail: false,
             tags: false,
             owner: true,
@@ -237,13 +237,13 @@ export default typedPlugin(
           if (!file) throw new ApiError(4000);
           if (!canManage(req.user, file.User)) throw new ApiError(4000);
 
-          if (!(await fileBelongsToFolder(file.id, folderId))) throw new ApiError(1012);
+          if (!(await isFileInFolder(file.id, folderId))) throw new ApiError(1012);
 
-          const nFolder = await removeFileFromFolder(file.id, folderId);
+          const nFolder = await removeFile(file.id, folderId);
           if (!nFolder) throw new ApiError(4002);
 
           logger.info('file removed from folder', { folder: nFolder.id, file: id });
-          return res.send({ folder: cleanFolder(nFolder) });
+          return res.send({ folder: formatFolder(nFolder) });
         }
       },
     );

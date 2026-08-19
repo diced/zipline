@@ -1,10 +1,13 @@
 import { verifyAccessToken } from '@/lib/accessToken';
 import { config as zConfig } from '@/lib/config';
 import { Config } from '@/lib/config/validate';
-import { deleteUrlById, findUrlForViewByIdentifier, incrementUrlViews } from '@/lib/db/models/url';
+import { db } from '@/lib/db';
+import { recordUrlView, removeUrl } from '@/lib/db/models/url';
+import { urls } from '@/lib/db/schema';
 import { renderHtml } from '@/lib/ssr/renderHtml';
 import { ZiplineTheme } from '@/lib/theme';
 import { FastifyRequest } from 'fastify';
+import { eq, or } from 'drizzle-orm';
 import { createRoutes } from './routes';
 
 export async function render(
@@ -25,13 +28,23 @@ export async function render(
   const { config: libConfig, reloadSettings } = await import('@/lib/config');
   if (!libConfig) await reloadSettings();
 
-  const urlEntry = await findUrlForViewByIdentifier(id);
+  const urlEntry = await db.query.urls.findFirst({
+    columns: {
+      id: true,
+      password: true,
+      destination: true,
+      maxViews: true,
+      views: true,
+      enabled: true,
+    },
+    where: or(eq(urls.vanity, id), eq(urls.code, id), eq(urls.id, id)),
+  });
 
   if (!urlEntry || !urlEntry.enabled) return { html: 'Not Found', meta: '', status: 404 };
 
   if (urlEntry.maxViews && urlEntry.views >= urlEntry.maxViews) {
     if (zConfig.features.deleteOnMaxViews) {
-      await deleteUrlById(urlEntry.id);
+      await removeUrl(urlEntry.id);
     }
     return { html: 'Gone', meta: '', status: 410 };
   }
@@ -57,7 +70,7 @@ export async function render(
     }
   }
 
-  await incrementUrlViews(urlEntry.id);
+  await recordUrlView(urlEntry.id);
 
   if (data.url.destination) {
     return {

@@ -1,4 +1,4 @@
-import { deleteUserSession } from '@/lib/db/models/session';
+import { removeSession } from '@/lib/db/models/session';
 import { log } from '@/lib/logger';
 import { userMiddleware } from '@/server/middleware/user';
 import { getSession } from '@/server/session';
@@ -31,7 +31,7 @@ export default typedPlugin(
       async (req, res) => {
         const current = await getSession(req, res);
 
-        await deleteUserSession(req.user.id, current.sessionId!);
+        await removeSession(req.user.id, current.sessionId!);
 
         current.destroy();
 

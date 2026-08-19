@@ -1,5 +1,6 @@
 import { datasource } from '../datasource';
-import { listFileRows, deleteFilesByIds } from '../db/models/file';
+import { db } from '../db';
+import { removeFiles } from '../db/models/file';
 import { files as fileTable } from '../db/schema';
 import { log } from '../logger';
 import { eq } from 'drizzle-orm';
@@ -7,14 +8,16 @@ import { eq } from 'drizzle-orm';
 const logger = log('serverutil').c('clearZeros');
 
 export async function clearZerosFiles(): Promise<{ id: string; name: string }[]> {
-  const files = await listFileRows({ where: eq(fileTable.size, 0) });
-  return files.map(({ id, name }) => ({ id, name }));
+  return db.query.files.findMany({
+    columns: { id: true, name: true },
+    where: eq(fileTable.size, 0),
+  });
 }
 
 export async function clearZeros(files: Awaited<ReturnType<typeof clearZerosFiles>>): Promise<string> {
   logger.info('preparing to clear files with a size of 0', { count: files.length });
 
-  const count = await deleteFilesByIds(files.map((file) => file.id));
+  const count = await removeFiles(files.map((file) => file.id));
 
   logger.info('cleared files from the database with a size of 0', { count });
 

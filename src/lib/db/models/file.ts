@@ -10,8 +10,6 @@ import {
   desc,
   eq,
   inArray,
-  isNotNull,
-  lte,
   notInArray,
   or,
   sql,
@@ -40,6 +38,7 @@ export type FileRelationOptions = {
 };
 
 export type FileListOptions = FileRelationOptions & {
+  password?: boolean;
   where?: SQL;
   orderBy?: SQL | SQL[];
   offset?: number;
@@ -78,12 +77,12 @@ export function fileOrderBy(field: FileSortField, order: 'asc' | 'desc') {
 type FileFindManyConfig = NonNullable<Parameters<Database['query']['files']['findMany']>[0]>;
 type FileWith = NonNullable<FileFindManyConfig['with']>;
 
-export const publicFileScalarConfig = {
+const fileScalarConfig = {
   columns: { userId: false, password: false },
 } as const satisfies Pick<FileFindManyConfig, 'columns'>;
 
-export const defaultFileScalarConfig = {
-  ...publicFileScalarConfig,
+export const filePasswordScalarConfig = {
+  ...fileScalarConfig,
   extras: {
     password: sql<boolean | null>`case when ${files.password} is null then null else true end`.as('password'),
   },
@@ -101,7 +100,7 @@ export const defaultFileRelationConfig = {
   },
 } as const satisfies FileWith;
 
-export function fileRelationConfig(options: FileRelationOptions = { thumbnail: true, tags: true }) {
+function fileRelationConfig(options: FileRelationOptions = { thumbnail: true, tags: true }) {
   return {
     thumbnail:
       options.thumbnail === false
@@ -145,7 +144,7 @@ async function queryFileRelations(options: FileListOptions, client: DbClient) {
 
 async function queryProjectedFileRelations(options: FileListOptions, client: DbClient) {
   return client.query.files.findMany({
-    ...defaultFileScalarConfig,
+    ...(options.password === false ? fileScalarConfig : filePasswordScalarConfig),
     where: options.where,
     orderBy: options.orderBy,
     offset: options.offset,
@@ -166,32 +165,32 @@ async function queryFirstFileRelations(
 }
 
 export type FileRelationResult = Awaited<ReturnType<typeof queryFileRelations>>[number];
-type ProjectedFileRelationResult = Awaited<ReturnType<typeof queryProjectedFileRelations>>[number];
+type ListedFileRelationResult = Awaited<ReturnType<typeof queryProjectedFileRelations>>[number];
 type RelationalSchema = ExtractTablesWithRelations<typeof databaseSchema>;
-export type DefaultProjectedFileRow = BuildQueryResult<
+export type ProjectedFileRow = BuildQueryResult<
   RelationalSchema,
   RelationalSchema['files'],
-  typeof defaultFileScalarConfig
+  typeof fileScalarConfig
 >;
-export type PublicProjectedFileRow = BuildQueryResult<
+export type PasswordProjectedFileRow = BuildQueryResult<
   RelationalSchema,
   RelationalSchema['files'],
-  typeof publicFileScalarConfig
+  typeof filePasswordScalarConfig
 >;
 export type DefaultFileRelationResult = BuildQueryResult<
   RelationalSchema,
   RelationalSchema['files'],
   { with: typeof defaultFileRelationConfig }
 >;
-export type DefaultProjectedFileRelationResult = BuildQueryResult<
+export type ProjectedFileRelationResult = BuildQueryResult<
   RelationalSchema,
   RelationalSchema['files'],
-  typeof defaultFileScalarConfig & { with: typeof defaultFileRelationConfig }
+  typeof fileScalarConfig & { with: typeof defaultFileRelationConfig }
 >;
-export type PublicProjectedFileRelationResult = BuildQueryResult<
+export type PasswordProjectedFileRelationResult = BuildQueryResult<
   RelationalSchema,
   RelationalSchema['files'],
-  typeof publicFileScalarConfig & { with: typeof defaultFileRelationConfig }
+  typeof filePasswordScalarConfig & { with: typeof defaultFileRelationConfig }
 >;
 export type FileTag = DefaultFileRelationResult['fileTags'][number]['tag'];
 
@@ -199,8 +198,7 @@ type FlattenFileTags<TRow extends { fileTags: { tag: unknown }[] }> = Omit<TRow,
   tags: TRow['fileTags'][number]['tag'][];
 };
 
-export type DefaultProjectedFile = FlattenFileTags<DefaultProjectedFileRelationResult>;
-export type PublicProjectedFile = FlattenFileTags<PublicProjectedFileRelationResult>;
+export type PasswordProjectedFile = FlattenFileTags<PasswordProjectedFileRelationResult>;
 
 type FileRelationFields = {
   thumbnail: DefaultFileRelationResult['thumbnail'];
@@ -209,22 +207,26 @@ type FileRelationFields = {
   Folder: FileFolder | null;
 };
 
-export type FileWithRelationsFor<T extends FileRelationOptions> = FileRow &
+export type FileResultFor<T extends FileRelationOptions> = FileRow &
   (T extends { thumbnail: false } ? object : Pick<FileRelationFields, 'thumbnail'>) &
   (T extends { tags: false } ? object : Pick<FileRelationFields, 'tags'>) &
   (T extends { owner: true } ? Pick<FileRelationFields, 'User'> : object) &
   (T extends { folder: true } ? Pick<FileRelationFields, 'Folder'> : object);
 
-export type FileWithRelations = FileWithRelationsFor<{ thumbnail: true; tags: true }>;
-type PartialFileWithRelations = FileRow & Partial<FileRelationFields>;
+export type FileResult = FileResultFor<{ thumbnail: true; tags: true }>;
+type PartialFileResult = FileRow & Partial<FileRelationFields>;
 
-export type ProjectedFileFor<T extends FileRelationOptions> = DefaultProjectedFileRow &
+type FileListRow<T extends FileListOptions> = T extends { password: false }
+  ? ProjectedFileRow
+  : PasswordProjectedFileRow;
+
+export type ProjectedFileFor<T extends FileListOptions> = FileListRow<T> &
   (T extends { thumbnail: false } ? object : Pick<FileRelationFields, 'thumbnail'>) &
   (T extends { tags: false } ? object : Pick<FileRelationFields, 'tags'>) &
   (T extends { owner: true } ? Pick<FileRelationFields, 'User'> : object) &
   (T extends { folder: true } ? Pick<FileRelationFields, 'Folder'> : object);
 
-type PartiallyProjectedFile = DefaultProjectedFileRow & Partial<FileRelationFields>;
+type PartiallyProjectedFile = (ProjectedFileRow | PasswordProjectedFileRow) & Partial<FileRelationFields>;
 
 type DefaultFileRelations = {
   thumbnail?: true;
@@ -233,24 +235,21 @@ type DefaultFileRelations = {
   folder?: false;
 };
 
-export function mapFileRelations(
-  row: DefaultFileRelationResult,
-  options?: DefaultFileRelations,
-): FileWithRelations;
-export function mapFileRelations<const T extends FileRelationOptions>(
+function mapFileRelations(row: DefaultFileRelationResult, options?: DefaultFileRelations): FileResult;
+function mapFileRelations<const T extends FileRelationOptions>(
   row: FileRelationResult,
   options: T,
-): FileWithRelationsFor<T>;
-export function mapFileRelations(
+): FileResultFor<T>;
+function mapFileRelations(
   row: FileRow | FileRelationResult | DefaultFileRelationResult,
   options: FileRelationOptions = { thumbnail: true, tags: true },
-): PartialFileWithRelations {
+): PartialFileResult {
   const { fileTags, ...file } = {
     fileTags: undefined,
     ...row,
   };
   const User = 'User' in file ? file.User : undefined;
-  const result: PartialFileWithRelations = {
+  const result: PartialFileResult = {
     ...file,
     ...(options.tags !== false && {
       tags: fileTags?.flatMap((link) => ('tag' in link ? [link.tag] : [])) ?? [],
@@ -262,15 +261,15 @@ export function mapFileRelations(
   return result;
 }
 
-export function mapProjectedFileRelations<
-  const T extends DefaultProjectedFileRelationResult | PublicProjectedFileRelationResult,
+export function mapFileTags<
+  const T extends ProjectedFileRelationResult | PasswordProjectedFileRelationResult,
 >(row: T): FlattenFileTags<T> {
   const { fileTags, ...file } = row;
   return { ...file, tags: fileTags.map(({ tag }) => tag) };
 }
 
 function mapProjectedListRelations(
-  row: ProjectedFileRelationResult,
+  row: ListedFileRelationResult,
   options: FileRelationOptions,
 ): PartiallyProjectedFile {
   const { fileTags, ...file } = row;
@@ -287,7 +286,7 @@ function mapProjectedListRelations(
   return result;
 }
 
-export function listFiles(options?: undefined, client?: DbClient): Promise<DefaultProjectedFile[]>;
+export function listFiles(options?: undefined, client?: DbClient): Promise<PasswordProjectedFile[]>;
 export function listFiles<const T extends FileListOptions>(
   options: T,
   client?: DbClient,
@@ -300,19 +299,12 @@ export async function listFiles(
   return rows.map((row) => mapProjectedListRelations(row, options));
 }
 
-export async function listFileRows(
-  options: Pick<FileListOptions, 'where' | 'orderBy' | 'offset' | 'limit'> = {},
-  client: DbClient = db,
-) {
-  return client.query.files.findMany(options);
-}
-
 export async function countFiles(where?: SQL, client: DbClient = db) {
   const rows = await client.select({ value: count() }).from(files).where(where);
   return rows[0]?.value ?? 0;
 }
 
-export async function fileUsageForUser(userId: string, client: DbClient = db) {
+export async function getFileUsage(userId: string, client: DbClient = db) {
   const rows = await client
     .select({ count: count(), size: sum(files.size) })
     .from(files)
@@ -324,33 +316,17 @@ export async function lockFileOwner(userId: string, client: DbClient) {
   return client.select({ id: users.id }).from(users).where(eq(users.id, userId)).for('update');
 }
 
-export async function findFileRowById(id: string, client: DbClient = db) {
-  return (await client.query.files.findFirst({ where: eq(files.id, id) })) ?? null;
-}
-
-export async function findFileRowByName(name: string, client: DbClient = db) {
-  return (await client.query.files.findFirst({ where: eq(files.name, name) })) ?? null;
-}
-
-export async function findFileRowByIdentifier(identifier: string, client: DbClient = db) {
-  return (
-    (await client.query.files.findFirst({
-      where: or(eq(files.id, identifier), eq(files.name, identifier)),
-    })) ?? null
-  );
-}
-
-export function findFileByIdentifier(
+export function getFile(
   identifier: string,
   options?: undefined,
   client?: DbClient,
-): Promise<FileWithRelations | null>;
-export function findFileByIdentifier<const T extends FileRelationOptions>(
+): Promise<FileResult | null>;
+export function getFile<const T extends FileRelationOptions>(
   identifier: string,
   options: T,
   client?: DbClient,
-): Promise<FileWithRelationsFor<T> | null>;
-export async function findFileByIdentifier(
+): Promise<FileResultFor<T> | null>;
+export async function getFile(
   identifier: string,
   options: FileRelationOptions = { thumbnail: true, tags: true },
   client: DbClient = db,
@@ -365,17 +341,13 @@ export async function findFileByIdentifier(
   return row ? mapFileRelations(row, options) : null;
 }
 
-export function findFileById(
-  id: string,
-  options?: undefined,
-  client?: DbClient,
-): Promise<FileWithRelations | null>;
-export function findFileById<const T extends FileRelationOptions>(
+export function getFileById(id: string, options?: undefined, client?: DbClient): Promise<FileResult | null>;
+export function getFileById<const T extends FileRelationOptions>(
   id: string,
   options: T,
   client?: DbClient,
-): Promise<FileWithRelationsFor<T> | null>;
-export async function findFileById(
+): Promise<FileResultFor<T> | null>;
+export async function getFileById(
   id: string,
   options: FileRelationOptions = { thumbnail: true, tags: true },
   client: DbClient = db,
@@ -390,17 +362,17 @@ export async function findFileById(
   return row ? mapFileRelations(row, options) : null;
 }
 
-export function findFileByName(
+export function getFileByName(
   identifier: string,
   options?: undefined,
   client?: DbClient,
-): Promise<FileWithRelations | null>;
-export function findFileByName<const T extends FileRelationOptions>(
+): Promise<FileResult | null>;
+export function getFileByName<const T extends FileRelationOptions>(
   identifier: string,
   options: T,
   client?: DbClient,
-): Promise<FileWithRelationsFor<T> | null>;
-export async function findFileByName(
+): Promise<FileResultFor<T> | null>;
+export async function getFileByName(
   identifier: string,
   options: FileRelationOptions = { thumbnail: true, tags: true },
   client: DbClient = db,
@@ -430,17 +402,17 @@ export async function findFileByName(
   return row ? mapFileRelations(row, options) : null;
 }
 
-export function findFilesByIds(
+export function getFiles(
   ids: string[],
   options?: undefined,
   client?: DbClient,
-): Promise<FileWithRelationsFor<{ thumbnail: false; tags: false }>[]>;
-export function findFilesByIds<const T extends FileRelationOptions>(
+): Promise<FileResultFor<{ thumbnail: false; tags: false }>[]>;
+export function getFiles<const T extends FileRelationOptions>(
   ids: string[],
   options: T,
   client?: DbClient,
-): Promise<FileWithRelationsFor<T>[]>;
-export async function findFilesByIds(
+): Promise<FileResultFor<T>[]>;
+export async function getFiles(
   ids: string[],
   options: FileRelationOptions = { thumbnail: false, tags: false },
   client: DbClient = db,
@@ -464,63 +436,54 @@ export async function fileNamesExist(names: string[], client: DbClient = db) {
   }));
 }
 
-export async function createFile(data: FileInsert, client: DbClient = db) {
+async function insertFile(data: FileInsert, client: DbClient) {
   const rows = await client.insert(files).values(data).returning();
   if (!rows[0]) throw new Error('File insert did not return a row');
   return rows[0];
 }
 
-export async function createFiles(data: FileInsert[], client: DbClient = db) {
-  if (!data.length) return [];
-  return client.insert(files).values(data).returning();
-}
-
-export function createFileWithRelations(
-  data: FileInsert,
-  options?: undefined,
-  client?: DbClient,
-): Promise<FileWithRelations>;
-export function createFileWithRelations<const T extends FileRelationOptions>(
+export function createFile(data: FileInsert, options?: undefined, client?: DbClient): Promise<FileResult>;
+export function createFile<const T extends FileRelationOptions>(
   data: FileInsert,
   options: T,
   client?: DbClient,
-): Promise<FileWithRelationsFor<T>>;
-export async function createFileWithRelations(
+): Promise<FileResultFor<T>>;
+export async function createFile(
   data: FileInsert,
   options: FileRelationOptions = { thumbnail: true, tags: true },
   client: DbClient = db,
 ) {
-  const row = await createFile(data, client);
-  const created = await findFileById(row.id, options, client);
+  const row = await insertFile(data, client);
+  const created = await getFileById(row.id, options, client);
   if (!created) throw new Error('Inserted file could not be read back');
   return created;
 }
 
-export async function updateFile(id: string, data: FileUpdate, client: DbClient = db) {
+async function updateFileRecord(id: string, data: FileUpdate, client: DbClient) {
   const rows = await client.update(files).set(data).where(eq(files.id, id)).returning();
   return rows[0] ?? null;
 }
 
-export function updateFileWithRelations(
+export function updateFile(
   id: string,
   data: FileUpdate,
   options?: undefined,
   client?: DbClient,
-): Promise<FileWithRelations | null>;
-export function updateFileWithRelations<const T extends FileRelationOptions>(
+): Promise<FileResult | null>;
+export function updateFile<const T extends FileRelationOptions>(
   id: string,
   data: FileUpdate,
   options: T,
   client?: DbClient,
-): Promise<FileWithRelationsFor<T> | null>;
-export async function updateFileWithRelations(
+): Promise<FileResultFor<T> | null>;
+export async function updateFile(
   id: string,
   data: FileUpdate,
   options: FileRelationOptions = { thumbnail: true, tags: true },
   client: DbClient = db,
 ) {
-  const row = await updateFile(id, data, client);
-  return row ? findFileById(row.id, options, client) : null;
+  const row = await updateFileRecord(id, data, client);
+  return row ? getFileById(row.id, options, client) : null;
 }
 
 export async function incrementFileViews(id: string, client: DbClient = db) {
@@ -532,12 +495,7 @@ export async function incrementFileViews(id: string, client: DbClient = db) {
   return rows.length > 0;
 }
 
-export async function updateFilesByIds(
-  ids: string[],
-  data: FileUpdate,
-  userId?: string,
-  client: DbClient = db,
-) {
+export async function updateFiles(ids: string[], data: FileUpdate, userId?: string, client: DbClient = db) {
   if (!ids.length) return 0;
   const rows = await client
     .update(files)
@@ -547,18 +505,18 @@ export async function updateFilesByIds(
   return rows.length;
 }
 
-export async function deleteFileById(id: string, client: DbClient = db) {
+export async function removeFile(id: string, client: DbClient = db) {
   const rows = await client.delete(files).where(eq(files.id, id)).returning();
   return rows[0] ?? null;
 }
 
-export async function deleteFilesByIds(ids: string[], client: DbClient = db) {
+export async function removeFiles(ids: string[], client: DbClient = db) {
   if (!ids.length) return 0;
   const rows = await client.delete(files).where(inArray(files.id, ids)).returning({ id: files.id });
   return rows.length;
 }
 
-export async function replaceFileTags(fileId: string, tagIds: string[], client: DbClient = db) {
+async function replaceFileTags(fileId: string, tagIds: string[], client: DbClient) {
   await client.delete(filesToTags).where(eq(filesToTags.fileId, fileId));
   if (tagIds.length) {
     await client
@@ -570,28 +528,14 @@ export async function replaceFileTags(fileId: string, tagIds: string[], client: 
 
 export async function updateFileAndTags(id: string, data: FileUpdate, tagIds?: string[]) {
   return db.transaction(async (tx) => {
-    const row = await updateFile(id, data, tx);
+    const row = await updateFileRecord(id, data, tx);
     if (!row) return null;
     if (tagIds) await replaceFileTags(id, tagIds, tx);
-    return findFileById(row.id, { thumbnail: true, tags: true }, tx);
+    return getFileById(row.id, { thumbnail: true, tags: true }, tx);
   });
 }
 
-export async function listExpiredFiles(now = new Date(), client: DbClient = db) {
-  return client.query.files.findMany({
-    columns: { id: true, name: true, size: true },
-    where: and(isNotNull(files.deletesAt), lte(files.deletesAt, now)),
-  });
-}
-
-export async function listFilesAtMaxViews(client: DbClient = db) {
-  return client.query.files.findMany({
-    columns: { id: true, name: true, size: true },
-    where: and(isNotNull(files.maxViews), sql`${files.views} >= ${files.maxViews}`),
-  });
-}
-
-export async function listVideoFilesNeedingThumbnails(rerun = false, client: DbClient = db) {
+export async function listThumbnailCandidates(rerun = false, client: DbClient = db) {
   const conditions: SQL[] = [sql`${files.type} LIKE 'video/%'`, sql`${files.size} > 0`];
   if (!rerun) {
     const thumbnailFileIds = client.select({ fileId: thumbnails.fileId }).from(thumbnails);
@@ -603,14 +547,14 @@ export async function listVideoFilesNeedingThumbnails(rerun = false, client: DbC
   });
 }
 
-export async function fileBelongsToFolder(fileId: string, folderId: string, client: DbClient = db) {
+export async function isFileInFolder(fileId: string, folderId: string, client: DbClient = db) {
   return !!(await client.query.files.findFirst({
     columns: { id: true },
     where: and(eq(files.id, fileId), eq(files.folderId, folderId)),
   }));
 }
 
-export function cleanFiles<T extends Partial<File>>(rows: T[], stringifyDates = false): T[] {
+export function formatFiles<T extends Partial<File>>(rows: T[], stringifyDates = false): T[] {
   for (const file of rows) {
     if (file.password) file.password = true;
 

@@ -3,8 +3,8 @@ import { ApiError } from '@/lib/api/errors';
 import { parseRange } from '@/lib/api/range';
 import { config } from '@/lib/config';
 import { datasource } from '@/lib/datasource';
-import { deleteFileById, findFileByName, incrementFileViews } from '@/lib/db/models/file';
-import { findPublicThumbnailByPath } from '@/lib/db/models/thumbnail';
+import { removeFile, getFileByName, incrementFileViews } from '@/lib/db/models/file';
+import { getPublicThumbnail } from '@/lib/db/models/thumbnail';
 import { sanitizeFilename } from '@/lib/fs';
 import { log } from '@/lib/logger';
 import { guess } from '@/lib/mimes';
@@ -43,7 +43,7 @@ export const rawFileHandler = async (
   if (!idSanitized) return res.callNotFound();
 
   if (id.startsWith('.thumbnail')) {
-    const thumbnail = await findPublicThumbnailByPath(idSanitized);
+    const thumbnail = await getPublicThumbnail(idSanitized);
 
     if (!thumbnail) return res.callNotFound();
 
@@ -62,13 +62,13 @@ export const rawFileHandler = async (
       .send(buf);
   }
 
-  const file = await findFileByName(idSanitized, { thumbnail: false, tags: false });
+  const file = await getFileByName(idSanitized, { thumbnail: false, tags: false });
   if (!file) return res.callNotFound();
 
   if (file?.deletesAt && file.deletesAt <= new Date()) {
     try {
       await datasource.delete(file.name);
-      await deleteFileById(file.id);
+      await removeFile(file.id);
     } catch (e) {
       logger.error('failed to delete file on expiration', { id: file.id }).error(e as Error);
     }
@@ -96,7 +96,7 @@ export const rawFileHandler = async (
     if (config.features.deleteOnMaxViews) {
       try {
         await datasource.delete(file.name);
-        await deleteFileById(file.id);
+        await removeFile(file.id);
       } catch (e) {
         logger.error('failed to delete file on max views', { id: file.id }).error(e as Error);
       }

@@ -1,12 +1,6 @@
 import { ApiError } from '@/lib/api/errors';
-import {
-  getFilesForServerExport,
-  getMetricsForServerExport,
-  getServerResourceCounts,
-  getSettingsForServerExport,
-  getThumbnailsForServerExport,
-  getUsersForServerExport,
-} from '@/lib/db/models/serverData';
+import { db } from '@/lib/db';
+import { countServerResources, listExportUsers } from '@/lib/db/models/serverData';
 import { Export4, export4Schema } from '@/lib/import/version4/validateExport';
 import { log } from '@/lib/logger';
 import { administratorMiddleware } from '@/server/middleware/administrator';
@@ -58,14 +52,14 @@ export default typedPlugin(
         if (req.user.role !== 'SUPERADMIN') throw new ApiError(3015);
 
         if (req.query.counts) {
-          const counts = await getServerResourceCounts();
+          const counts = await countServerResources();
 
           return res.send(counts);
         }
 
         logger.debug('exporting server data', { format: '4', requester: req.user.username });
 
-        const settingsTable = await getSettingsForServerExport();
+        const settingsTable = await db.query.zipline.findFirst();
         if (!settingsTable) throw new ApiError(1023);
 
         const env = Object.fromEntries(
@@ -110,7 +104,7 @@ export default typedPlugin(
           },
         };
 
-        const users = await getUsersForServerExport();
+        const users = await listExportUsers();
 
         for (const user of users) {
           export4.data.users.push({
@@ -212,7 +206,7 @@ export default typedPlugin(
           }
         }
 
-        const files = await getFilesForServerExport();
+        const files = await db.query.files.findMany();
 
         for (const file of files) {
           if (!file.userId)
@@ -238,7 +232,7 @@ export default typedPlugin(
           });
         }
 
-        const thumbnails = await getThumbnailsForServerExport();
+        const thumbnails = await db.query.thumbnails.findMany();
 
         for (const thumbnail of thumbnails) {
           export4.data.thumbnails.push({
@@ -252,7 +246,7 @@ export default typedPlugin(
         }
 
         if (req.query.nometrics === undefined) {
-          const metrics = await getMetricsForServerExport();
+          const metrics = await db.query.metrics.findMany();
 
           export4.data.metrics = metrics.map((metric) => ({
             createdAt: metric.createdAt.toISOString(),

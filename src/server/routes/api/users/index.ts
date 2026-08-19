@@ -3,9 +3,9 @@ import { config } from '@/lib/config';
 import { createToken, hashPassword } from '@/lib/crypto';
 import { Role } from '@/lib/db/enums';
 import {
-  createLimitedUser,
-  findUserRowByUsername,
-  listLimitedUsers,
+  createUserSummary,
+  listUsers,
+  usernameExists,
   type LimitedUser,
   limitedUserSchema,
 } from '@/lib/db/models/user';
@@ -47,7 +47,7 @@ export default typedPlugin(
       async (req, res) => {
         const roles = interactableRoles(req.user.role);
 
-        const users = await listLimitedUsers({
+        const users = await listUsers({
           roles,
           excludeId: req.query.noincl ? req.user.id : undefined,
           avatar: true,
@@ -80,8 +80,7 @@ export default typedPlugin(
       async (req, res) => {
         const { username, password, avatar, role } = req.body;
 
-        const existing = await findUserRowByUsername(username);
-        if (existing) throw new ApiError(1040);
+        if (await usernameExists(username)) throw new ApiError(1040);
 
         let avatar64 = null;
 
@@ -97,7 +96,7 @@ export default typedPlugin(
 
         if (role && !canInteract(req.user.role, role)) throw new ApiError(3008);
 
-        const user = await createLimitedUser({
+        const user = await createUserSummary({
           username,
           password: await hashPassword(password),
           role: role,

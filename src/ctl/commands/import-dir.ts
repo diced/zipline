@@ -1,10 +1,11 @@
 import { bytes } from '@/lib/bytes';
 import { config, reloadSettings } from '@/lib/config';
 import { getDatasource } from '@/lib/datasource';
-import { createFiles } from '@/lib/db/models/file';
-import { findOwnedFolderById } from '@/lib/db/models/folder';
-import { findUserRowByUsername, listUserRows } from '@/lib/db/models/user';
+import { db } from '@/lib/db';
+import { getOwnedFolder } from '@/lib/db/models/folder';
+import { files as fileTable, users } from '@/lib/db/schema';
 import { guess } from '@/lib/mimes';
+import { eq } from 'drizzle-orm';
 import { statSync } from 'fs';
 import { mkdir, readdir } from 'fs/promises';
 import { join, parse, resolve } from 'path';
@@ -23,11 +24,17 @@ export async function importDir(
   if (id) {
     userId = id;
   } else {
-    const candidate = await findUserRowByUsername('administrator');
+    const candidate = await db.query.users.findFirst({
+      columns: { id: true, username: true, role: true },
+      where: eq(users.username, 'administrator'),
+    });
     const user = candidate?.role === 'SUPERADMIN' ? candidate : null;
 
     if (!user) {
-      const firstSuperAdmin = (await listUserRows()).find((entry) => entry.role === 'SUPERADMIN');
+      const firstSuperAdmin = await db.query.users.findFirst({
+        columns: { id: true, username: true, role: true },
+        where: eq(users.role, 'SUPERADMIN'),
+      });
 
       if (!firstSuperAdmin) return console.error('No superadmin found or "administrator" user.');
 
@@ -40,7 +47,7 @@ export async function importDir(
   }
 
   if (folder) {
-    const exists = await findOwnedFolderById(folder, userId);
+    const exists = await getOwnedFolder(folder, userId);
 
     if (!exists) return console.error('Folder not found:', folder);
   }
@@ -65,7 +72,7 @@ export async function importDir(
   }
 
   if (!skipDb) {
-    const created = await createFiles(data);
+    const created = data.length ? await db.insert(fileTable).values(data).returning() : [];
     console.log(`Inserted ${created.length} files into the database.`);
   }
 

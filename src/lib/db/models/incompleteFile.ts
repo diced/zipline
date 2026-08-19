@@ -10,7 +10,7 @@ export { IncompleteFileStatus } from '@/lib/db/enums';
 export type { IncompleteFileStatus as IncompleteFileStatusValue } from '@/lib/db/enums';
 
 export type IncompleteFileMetadata = z.infer<typeof metadataSchema>;
-export const metadataSchema = z.object({
+const metadataSchema = z.object({
   file: z.object({
     filename: z.string(),
     type: z.string(),
@@ -39,7 +39,7 @@ export async function createIncompleteFile(data: IncompleteFileInsert, client: D
   return parseIncomplete(rows[0]);
 }
 
-export async function listIncompleteFilesForUser(
+export async function listIncompleteFiles(
   userId: string,
   options: { excludeComplete?: boolean } = {},
   client: DbClient = db,
@@ -66,24 +66,11 @@ export async function updateIncompleteFile(id: string, data: IncompleteFileUpdat
   return rows[0] ? parseIncomplete(rows[0]) : null;
 }
 
-export async function incrementIncompleteFileChunks(
-  id: string,
-  status: IncompleteFile['status'],
-  client: DbClient = db,
-) {
+export async function completeChunk(id: string, status: IncompleteFile['status'], client: DbClient = db) {
   const rows = await client
     .update(incompleteFiles)
     .set({ chunksComplete: sql`${incompleteFiles.chunksComplete} + 1`, status })
     .where(eq(incompleteFiles.id, id))
     .returning();
   return rows[0] ? parseIncomplete(rows[0]) : null;
-}
-
-export async function deleteIncompleteFilesByIds(ids: string[], client: DbClient = db) {
-  if (!ids.length) return 0;
-  const rows = await client
-    .delete(incompleteFiles)
-    .where(inArray(incompleteFiles.id, ids))
-    .returning({ id: incompleteFiles.id });
-  return rows.length;
 }

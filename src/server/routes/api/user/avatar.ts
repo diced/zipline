@@ -1,7 +1,9 @@
 import { ApiError } from '@/lib/api/errors';
-import { findUserRowById } from '@/lib/db/models/user';
+import { db } from '@/lib/db';
+import { users } from '@/lib/db/schema';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
+import { eq } from 'drizzle-orm';
 import z from 'zod';
 
 export type ApiUserAvatarResponse = string;
@@ -22,7 +24,10 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const u = await findUserRowById(req.user.id);
+        const u = await db.query.users.findFirst({
+          columns: { avatar: true },
+          where: eq(users.id, req.user.id),
+        });
 
         if (!u?.avatar) throw new ApiError(9002);
 

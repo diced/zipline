@@ -1,8 +1,11 @@
 import { ApiError } from '@/lib/api/errors';
 import { config } from '@/lib/config';
-import { findPublicInvite, Invite } from '@/lib/db/models/invite';
+import { db } from '@/lib/db';
+import { Invite } from '@/lib/db/models/invite';
+import { invites } from '@/lib/db/schema';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import typedPlugin from '@/server/typedPlugin';
+import { eq, or } from 'drizzle-orm';
 import z from 'zod';
 
 export type ApiAuthInvitesWebResponse = Pick<Invite, 'code' | 'maxUses' | 'uses'> & {
@@ -42,7 +45,11 @@ export default typedPlugin(
         if (!code) return res.send({ invite: null });
         if (!config.invites.enabled) throw new ApiError(9002);
 
-        const invite = await findPublicInvite(code);
+        const invite = await db.query.invites.findFirst({
+          columns: { code: true, maxUses: true, uses: true, expiresAt: true },
+          where: or(eq(invites.id, code), eq(invites.code, code)),
+          with: { inviter: { columns: { username: true } } },
+        });
 
         if (
           !invite ||

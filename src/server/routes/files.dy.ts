@@ -1,4 +1,4 @@
-import { findFileByName } from '@/lib/db/models/file';
+import { getFileByName } from '@/lib/db/models/file';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { rawFileHandler } from './raw/[id]';
 
@@ -16,7 +16,7 @@ export async function filesRoute(
   res: FastifyReply,
 ) {
   const { id } = req.params;
-  const file = await findFileByName(id, { thumbnail: false, tags: false, owner: true });
+  const file = await getFileByName(id, { thumbnail: false, tags: false, owner: true });
   if (!file) return res.callNotFound();
 
   const viewUrl = `/view/${encodeURIComponent(file.name)}`;

@@ -9,8 +9,8 @@ import { verifyAccessToken } from '@/lib/accessToken';
 import { isCode } from '@/lib/code';
 import { config as zConfig } from '@/lib/config';
 import type { Config } from '@/lib/config/validate';
-import { findFileByName, File } from '@/lib/db/models/file';
-import { findLimitedUserById, User } from '@/lib/db/models/user';
+import { getFileByName, File } from '@/lib/db/models/file';
+import { getUserSummary, User } from '@/lib/db/models/user';
 import { parseString } from '@/lib/parser';
 import { parserMetrics } from '@/lib/parser/metrics';
 import { createZiplineSsr } from '@/lib/ssr/createZiplineSsr';
@@ -22,8 +22,7 @@ import { renderToString } from 'react-dom/server';
 import { createStaticHandler, createStaticRouter, StaticRouterProvider } from 'react-router-dom';
 import { createRoutes } from './routes';
 
-export const getFile = async (id: string) =>
-  findFileByName(id, { thumbnail: true, tags: true, folder: true });
+export const getFile = async (id: string) => getFileByName(id, { thumbnail: true, tags: true, folder: true });
 
 export async function render(
   {
@@ -48,7 +47,7 @@ export async function render(
   if (file.maxViews && file.views >= file.maxViews) return { html: 'Gone', meta: '', status: 410 };
   if (file.deletesAt && file.deletesAt <= new Date()) return { html: 'Expired', meta: '', status: 410 };
 
-  const limitedUser = await findLimitedUserById(file.userId);
+  const limitedUser = await getUserSummary(file.userId);
   if (!limitedUser) return { html: 'Not Found', meta: '', status: 404 };
   const { quota: _quota, avatar: _avatar, ...user } = limitedUser;
 

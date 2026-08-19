@@ -13,9 +13,9 @@ import { config } from '@/lib/config';
 import { hashPassword } from '@/lib/crypto';
 import { datasource } from '@/lib/datasource';
 import { db } from '@/lib/db';
-import { createFileWithRelations, type FileInsert, lockFileOwner } from '@/lib/db/models/file';
-import { findFolderRowById } from '@/lib/db/models/folder';
-import { findFullUserById } from '@/lib/db/models/user';
+import { createFile, type FileInsert, lockFileOwner } from '@/lib/db/models/file';
+import { getFolderMetadata } from '@/lib/db/models/folder';
+import { getUser } from '@/lib/db/models/user';
 import { sanitizeFilename } from '@/lib/fs';
 import { removeGps } from '@/lib/gps';
 import { log } from '@/lib/logger';
@@ -98,7 +98,7 @@ export default typedPlugin(
 
         let folder = null;
         if (options.folder) {
-          folder = await findFolderRowById(options.folder);
+          folder = await getFolderMetadata(options.folder);
           if (!folder) throw new ApiError(4001);
 
           const ownsFolder = req.user ? folder.userId === req.user.id : false;
@@ -123,7 +123,7 @@ export default typedPlugin(
         const totalFileSize = files.reduce((acc, x) => acc + x.file.bytesRead, 0);
 
         // use quota of user if anonymous
-        const quotaUser = req.user ? req.user : folder?.userId ? await findFullUserById(folder.userId) : null;
+        const quotaUser = req.user ? req.user : folder?.userId ? await getUser(folder.userId) : null;
 
         const quotaCheck = await checkQuota(quotaUser, totalFileSize, files.length);
         if (quotaCheck !== true)
@@ -296,7 +296,7 @@ export default typedPlugin(
 
           const created = [];
           for (const upload of uploads) {
-            created.push(await createFileWithRelations(upload.data, { thumbnail: true, tags: true }, tx));
+            created.push(await createFile(upload.data, { thumbnail: true, tags: true }, tx));
           }
 
           return created;

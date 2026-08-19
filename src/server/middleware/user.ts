@@ -1,10 +1,10 @@
 import { config } from '@/lib/config';
 import { decryptToken } from '@/lib/crypto';
 import {
-  findFullUserBySessionId,
-  findFullUserByToken,
-  findLimitedUserBySessionId,
-  findLimitedUserByToken,
+  getUserBySession,
+  getUserByToken,
+  getUserSummaryBySession,
+  getUserSummaryByToken,
   type User,
 } from '@/lib/db/models/user';
 import { FastifyReply } from 'fastify';
@@ -63,7 +63,7 @@ export async function userMiddleware(req: FastifyRequest, res: FastifyReply) {
   if (authorization) {
     const token = parseUserToken(authorization);
 
-    const user = leanUpload ? await findLimitedUserByToken(token) : await findFullUserByToken(token);
+    const user = leanUpload ? await getUserSummaryByToken(token) : await getUserByToken(token);
     if (!user) throw new ApiError(2001);
 
     req.user = user as User;
@@ -77,8 +77,8 @@ export async function userMiddleware(req: FastifyRequest, res: FastifyReply) {
   if (!session.id || !session.sessionId) throw new ApiError(2000);
 
   const user = leanUpload
-    ? await findLimitedUserBySessionId(session.sessionId)
-    : await findFullUserBySessionId(session.sessionId);
+    ? await getUserSummaryBySession(session.sessionId)
+    : await getUserBySession(session.sessionId);
   if (!user) throw new ApiError(2001);
 
   req.user = user as User;

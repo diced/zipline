@@ -2,13 +2,8 @@ import { config } from '@/lib/config';
 import { createToken } from '@/lib/crypto';
 import { db } from '@/lib/db';
 import { type OAuthProviderType } from '@/lib/db/enums';
-import { createOAuthProvider, findOAuthProvider, updateOAuthProvider } from '@/lib/db/models/oauth';
-import {
-  createFullUser,
-  findFullUserById,
-  findFullUserBySessionId,
-  findUserRowByUsername,
-} from '@/lib/db/models/user';
+import { createUser, getUser, getUserBySession, usernameExists } from '@/lib/db/models/user';
+import { oauthProviders } from '@/lib/db/schema';
 import { isPostgresError } from '@/lib/db/utils';
 import Logger, { log } from '@/lib/logger';
 import { findProvider } from '@/lib/oauth/providers';
@@ -17,6 +12,7 @@ import fastifyPlugin from 'fastify-plugin';
 import { getSession, saveSession, ZiplineIronSession } from '../session';
 import { parseOAuthState } from '@/lib/oauth/state';
 import { ApiError } from '@/lib/api/errors';
+import { and, eq } from 'drizzle-orm';
 
 export type OAuthQuery = {
   state?: string;
@@ -69,8 +65,12 @@ async function oauthPlugin(fastify: FastifyInstance) {
       response: safeOAuthResponse(response),
     });
 
-    const existingOauth = await findOAuthProvider(provider, response.user_id);
-    const existingUser = await findUserRowByUsername(response.username);
+    const existingOauth =
+      (await db.query.oauthProviders.findFirst({
+        columns: { id: true, userId: true },
+        where: and(eq(oauthProviders.provider, provider), eq(oauthProviders.oauthId, response.user_id)),
+      })) ?? null;
+    const existingUser = await usernameExists(response.username);
 
     const state = parseOAuthState(query.state);
     if (!state) throw new ApiError(1064);
@@ -87,7 +87,7 @@ async function oauthPlugin(fastify: FastifyInstance) {
     delete session.oauthState;
     await session.save();
 
-    const user = session.sessionId ? await findFullUserBySessionId(session.sessionId) : null;
+    const user = session.sessionId ? await getUserBySession(session.sessionId) : null;
     const userOauth = findProvider(provider, user?.oauthProviders ?? []);
 
     if (state.mode === 'link') {
@@ -101,14 +101,18 @@ async function oauthPlugin(fastify: FastifyInstance) {
       });
 
       try {
-        await createOAuthProvider({
-          userId: user.id,
-          provider,
-          accessToken: response.access_token,
-          refreshToken: response.refresh_token,
-          username: response.username,
-          oauthId: response.user_id,
-        });
+        const [createdProvider] = await db
+          .insert(oauthProviders)
+          .values({
+            userId: user.id,
+            provider,
+            accessToken: response.access_token,
+            refreshToken: response.refresh_token,
+            username: response.username,
+            oauthId: response.user_id,
+          })
+          .returning({ id: oauthProviders.id });
+        if (!createdProvider) throw new Error('OAuth provider insert did not return a row');
 
         await saveSession(session, user, false);
 
@@ -128,12 +132,16 @@ async function oauthPlugin(fastify: FastifyInstance) {
         throw new ApiError(1063);
       }
     } else if (user && userOauth) {
-      const updated = await updateOAuthProvider(userOauth.id, {
-        accessToken: response.access_token,
-        refreshToken: response.refresh_token,
-        username: response.username,
-        oauthId: response.user_id,
-      });
+      const [updated] = await db
+        .update(oauthProviders)
+        .set({
+          accessToken: response.access_token,
+          refreshToken: response.refresh_token,
+          username: response.username,
+          oauthId: response.user_id,
+        })
+        .where(eq(oauthProviders.id, userOauth.id))
+        .returning({ id: oauthProviders.id });
       if (!updated) throw new Error(`OAuth provider ${userOauth.id} no longer exists`);
 
       await saveSession(session, user, false);
@@ -146,19 +154,19 @@ async function oauthPlugin(fastify: FastifyInstance) {
       return reply.redirect('/dashboard');
     } else if (existingOauth) {
       const loginUser = await db.transaction(async (tx) => {
-        const updated = await updateOAuthProvider(
-          existingOauth.id,
-          {
+        const [updated] = await tx
+          .update(oauthProviders)
+          .set({
             accessToken: response.access_token,
             refreshToken: response.refresh_token,
             username: response.username,
             oauthId: response.user_id,
-          },
-          tx,
-        );
+          })
+          .where(eq(oauthProviders.id, existingOauth.id))
+          .returning({ id: oauthProviders.id });
         if (!updated) throw new Error(`OAuth provider ${existingOauth.id} no longer exists`);
 
-        return findFullUserById(existingOauth.userId, tx);
+        return getUser(existingOauth.userId, tx);
       });
       if (!loginUser) throw new ApiError(2001);
 
@@ -185,7 +193,7 @@ async function oauthPlugin(fastify: FastifyInstance) {
 
     try {
       const nuser = await db.transaction(async (tx) => {
-        const created = await createFullUser(
+        const created = await createUser(
           {
             username: response.username!,
             token: createToken(),
@@ -193,17 +201,18 @@ async function oauthPlugin(fastify: FastifyInstance) {
           },
           tx,
         );
-        await createOAuthProvider(
-          {
+        const [createdProvider] = await tx
+          .insert(oauthProviders)
+          .values({
             userId: created.id,
             provider,
             accessToken: response.access_token,
             refreshToken: response.refresh_token,
             username: response.username,
             oauthId: response.user_id,
-          },
-          tx,
-        );
+          })
+          .returning({ id: oauthProviders.id });
+        if (!createdProvider) throw new Error('OAuth provider insert did not return a row');
         return created;
       });
 
@@ -217,7 +226,7 @@ async function oauthPlugin(fastify: FastifyInstance) {
       return reply.redirect('/dashboard');
     } catch (e) {
       if (isPostgresError(e, '23505')) {
-        // already linked can't create, last failsafe lol
+        // The unique constraint closes the race between the provider lookup and account creation.
         logger.warn('user tried to create account with oauth, but already linked', {
           oauth: response.username || 'unknown',
           ua: this.headers['user-agent'],

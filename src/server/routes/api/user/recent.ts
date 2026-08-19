@@ -1,5 +1,5 @@
 import { files as fileTable } from '@/lib/db/schema';
-import { File, cleanFiles, fileSchema, listFiles } from '@/lib/db/models/file';
+import { File, formatFiles, fileSchema, listFiles } from '@/lib/db/models/file';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
 import z from 'zod';
@@ -28,7 +28,7 @@ export default typedPlugin(
       async (req, res) => {
         const { take } = req.query;
 
-        const files = cleanFiles(
+        const files = formatFiles(
           await listFiles({
             where: eq(fileTable.userId, req.user.id),
             orderBy: desc(fileTable.createdAt),

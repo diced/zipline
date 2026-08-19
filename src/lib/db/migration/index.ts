@@ -128,7 +128,6 @@ async function createNativeMigrationTable(client: Client) {
   `);
 }
 
-// to work with old prisma migrations 
 async function baselinePrismaDatabase(client: Client, baseline: MigrationMeta) {
   await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ');
   try {

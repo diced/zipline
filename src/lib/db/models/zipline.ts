@@ -16,7 +16,7 @@ const {
   ...databaseSettingsColumns
 } = getTableColumns(zipline);
 
-export type DatabaseSettings = Omit<ZiplineRow, 'id' | 'createdAt' | 'updatedAt' | 'firstSetup'> & {
+type DatabaseSettings = Omit<ZiplineRow, 'id' | 'createdAt' | 'updatedAt' | 'firstSetup'> & {
   domains: string[];
   filesDisabledExtensions: string[];
   filesDisabledTypes: string[];
@@ -24,7 +24,7 @@ export type DatabaseSettings = Omit<ZiplineRow, 'id' | 'createdAt' | 'updatedAt'
   oauthDiscordDeniedIds: string[];
   ratelimitAllowList: string[];
 };
-export type DatabaseSettingsUpdate = Omit<
+type DatabaseSettingsUpdate = Omit<
   PgUpdateSetSource<typeof zipline>,
   'id' | 'createdAt' | 'updatedAt' | 'firstSetup'
 >;
@@ -61,13 +61,13 @@ function normalizeSettingsArrays<T extends SettingsWithNullableArrays>(row: T) {
   };
 }
 
-export async function findZipline(client: DbClient = db) {
+export async function getSettingsRow(client: DbClient = db) {
   const existing = await client.query.zipline.findFirst();
   return existing ? normalizeSettingsArrays(existing) : null;
 }
 
-export async function getZipline(client: DbClient = db) {
-  const existing = await findZipline(client);
+export async function ensureSettingsRow(client: DbClient = db) {
+  const existing = await getSettingsRow(client);
   if (existing) return existing;
 
   const created = first(await client.insert(zipline).values(initialSettings).returning());
@@ -75,7 +75,7 @@ export async function getZipline(client: DbClient = db) {
   return normalizeSettingsArrays(created);
 }
 
-export async function getDatabaseSettings(client: DbClient = db): Promise<DatabaseSettings | null> {
+export async function getSettings(client: DbClient = db): Promise<DatabaseSettings | null> {
   const settings = await client.query.zipline.findFirst({
     columns: { id: false, createdAt: false, updatedAt: false, firstSetup: false },
   });
@@ -84,11 +84,11 @@ export async function getDatabaseSettings(client: DbClient = db): Promise<Databa
   return normalizeSettingsArrays(settings);
 }
 
-export async function getOrCreateDatabaseSettings(client: DbClient = db): Promise<DatabaseSettings> {
-  const settings = await getDatabaseSettings(client);
+export async function ensureSettings(client: DbClient = db): Promise<DatabaseSettings> {
+  const settings = await getSettings(client);
   if (settings) return settings;
 
-  const created = await getZipline(client);
+  const created = await ensureSettingsRow(client);
   const {
     id: _id,
     createdAt: _createdAt,
@@ -99,7 +99,7 @@ export async function getOrCreateDatabaseSettings(client: DbClient = db): Promis
   return result;
 }
 
-export async function updateDatabaseSettings(
+export async function updateSettings(
   settingsId: string,
   values: DatabaseSettingsUpdate,
   client: DbClient = db,

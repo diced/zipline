@@ -4,18 +4,17 @@ import { hashPassword } from '@/lib/crypto';
 import { datasource } from '@/lib/datasource';
 import { db } from '@/lib/db';
 import { Role, type UserFilesQuota } from '@/lib/db/enums';
-import { deleteOAuthProviders } from '@/lib/db/models/oauth';
-import { upsertUserQuota } from '@/lib/db/models/quota';
+import { removeOAuthProviders } from '@/lib/db/models/oauth';
 import {
-  deleteUserReturningLimited,
-  findLimitedUserById,
-  findUserRowById,
-  updateLimitedUser,
+  getUserIdentity,
+  getUserSummary,
+  removeUser,
+  updateUserSummary,
   type LimitedUser,
   type UserUpdate,
   limitedUserSchema,
 } from '@/lib/db/models/user';
-import { files as filesTable, urls } from '@/lib/db/schema';
+import { files as filesTable, urls, userQuotas } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { canInteract } from '@/lib/role';
 import { zStringTrimmed } from '@/lib/validation';
@@ -50,7 +49,7 @@ export default typedPlugin(
         preHandler: [userMiddleware, administratorMiddleware],
       },
       async (req, res) => {
-        const user = await findLimitedUserById(req.params.id);
+        const user = await getUserSummary(req.params.id);
 
         if (!user) throw new ApiError(4009);
         if (!canInteract(req.user.role, user.role)) throw new ApiError(4009);
@@ -88,7 +87,7 @@ export default typedPlugin(
         preHandler: [userMiddleware, administratorMiddleware],
       },
       async (req, res) => {
-        const user = await findUserRowById(req.params.id);
+        const user = await getUserIdentity(req.params.id);
         if (!user) throw new ApiError(4009);
         if (!canInteract(req.user.role, user.role)) throw new ApiError(3019);
 
@@ -136,22 +135,23 @@ export default typedPlugin(
 
         const updatedUser = await db.transaction(async (tx) => {
           if (finalQuota) {
-            await upsertUserQuota(
-              {
+            const [savedQuota] = await tx
+              .insert(userQuotas)
+              .values({
                 userId: user.id,
                 filesQuota: finalQuota.filesQuota || 'BY_BYTES',
                 maxFiles: finalQuota.maxFiles ?? null,
                 maxBytes: finalQuota.maxBytes ?? null,
                 maxUrls: finalQuota.maxUrls ?? null,
-              },
-              tx,
-              finalQuota,
-            );
+              })
+              .onConflictDoUpdate({ target: userQuotas.userId, set: finalQuota })
+              .returning({ id: userQuotas.id });
+            if (!savedQuota) throw new Error('User quota upsert did not return a row');
           }
 
           return Object.keys(update).length
-            ? updateLimitedUser(user.id, update, tx)
-            : findLimitedUserById(user.id, tx);
+            ? updateUserSummary(user.id, update, tx)
+            : getUserSummary(user.id, tx);
         });
         if (!updatedUser) throw new ApiError(4009);
 
@@ -182,7 +182,7 @@ export default typedPlugin(
         preHandler: [userMiddleware, administratorMiddleware],
       },
       async (req, res) => {
-        const user = await findUserRowById(req.params.id);
+        const user = await getUserIdentity(req.params.id);
 
         if (!user) throw new ApiError(4009);
         if (user.id === req.user.id) throw new ApiError(3010);
@@ -222,8 +222,8 @@ export default typedPlugin(
         }
 
         const deletedUser = await db.transaction(async (tx) => {
-          await deleteOAuthProviders(user.id, undefined, tx);
-          return deleteUserReturningLimited(user.id, tx);
+          await removeOAuthProviders(user.id, undefined, tx);
+          return removeUser(user.id, tx);
         });
         if (!deletedUser) throw new ApiError(4009);
 

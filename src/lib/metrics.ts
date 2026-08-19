@@ -1,6 +1,6 @@
 import z from 'zod';
 import { db } from './db';
-import { getLatestMetric, type Metric } from './db/models/metric';
+import { metricSchema, type Metric } from './db/models/metric';
 import { metrics } from './db/schema';
 import { and, desc, gte, lte, sql } from 'drizzle-orm';
 
@@ -42,8 +42,13 @@ export async function getMetricsPoints(from?: Date, to?: Date): Promise<MetricsP
   );
 }
 
-export function getLatestMetricsPoint(from?: Date, to?: Date): Promise<Metric | null> {
-  return getLatestMetric(from, to);
+export async function getLatestMetricsPoint(from?: Date, to?: Date): Promise<Metric | null> {
+  const dateRange = from && to ? and(gte(metrics.createdAt, from), lte(metrics.createdAt, to)) : undefined;
+  const row = await db.query.metrics.findFirst({
+    where: dateRange,
+    orderBy: desc(metrics.createdAt),
+  });
+  return row ? metricSchema.parse(row) : null;
 }
 
 export function downsample(points: MetricsPoint[], max: number = 500): MetricsPoint[] {

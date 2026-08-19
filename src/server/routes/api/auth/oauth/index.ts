@@ -1,15 +1,12 @@
 import { ApiError } from '@/lib/api/errors';
 import { db } from '@/lib/db';
-import { deleteOAuthProviders } from '@/lib/db/models/oauth';
-import {
-  findFullUserById,
-  findUserRowById,
-  type OAuthProvider,
-  oauthProviderSchema,
-} from '@/lib/db/models/user';
+import { type OAuthProvider, oauthProviderSchema, removeOAuthProviders } from '@/lib/db/models/oauth';
+import { getUser } from '@/lib/db/models/user';
+import { users } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
+import { eq } from 'drizzle-orm';
 import z from 'zod';
 
 export type ApiAuthOauthResponse = OAuthProvider[];
@@ -49,7 +46,12 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const { password } = (await findUserRowById(req.user.id))!;
+        const credentials = await db.query.users.findFirst({
+          columns: { password: true },
+          where: eq(users.id, req.user.id),
+        });
+        if (!credentials) throw new Error(`User ${req.user.id} no longer exists`);
+        const { password } = credentials;
 
         if (!req.user.oauthProviders.length) throw new ApiError(1030);
         if (req.user.oauthProviders.length === 1 && !password) throw new ApiError(1043);
@@ -57,8 +59,8 @@ export default typedPlugin(
         const { provider } = req.body;
 
         const user = await db.transaction(async (tx) => {
-          await deleteOAuthProviders(req.user.id, provider, tx);
-          return findFullUserById(req.user.id, tx);
+          await removeOAuthProviders(req.user.id, provider, tx);
+          return getUser(req.user.id, tx);
         });
         if (!user) throw new Error(`User ${req.user.id} no longer exists`);
 

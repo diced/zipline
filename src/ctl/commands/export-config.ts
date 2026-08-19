@@ -4,7 +4,7 @@ import { DATABASE_TO_PROP } from '@/lib/config/read/db';
 import { ENVS } from '@/lib/config/read/env';
 import { getProperty } from '@/lib/config/read/transform';
 import { validateConfigObject } from '@/lib/config/validate';
-import { getDatabaseSettings } from '@/lib/db/models/zipline';
+import { getSettings } from '@/lib/db/models/zipline';
 import { randomCharacters } from '@/lib/random';
 
 function convertValueToEnv(
@@ -58,7 +58,7 @@ export async function exportConfig({ yml, showDefaults }: { yml?: boolean; showD
 
   await reloadSettings();
 
-  const ziplineTable = await getDatabaseSettings();
+  const ziplineTable = await getSettings();
   if (!ziplineTable) {
     console.error('No Zipline configuration found in the database, run the setup again.');
     return;

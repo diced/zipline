@@ -1,11 +1,11 @@
 import { ApiError } from '@/lib/api/errors';
 import { files as fileTable } from '@/lib/db/schema';
-import { File, cleanFiles, countFiles, fileOrderBy, fileSchema, listFiles } from '@/lib/db/models/file';
+import { File, formatFiles, countFiles, fileOrderBy, fileSchema, listFiles } from '@/lib/db/models/file';
 import {
-  buildPublicParentChain,
-  cleanFolder,
+  getPublicParentChain,
+  formatFolder,
   Folder,
-  getPublicFolderDetails,
+  getPublicFolder,
   publicFolderSchema,
 } from '@/lib/db/models/folder';
 import { paginationQs } from '@/lib/validation';
@@ -52,7 +52,7 @@ export default typedPlugin(
       async (req, res) => {
         const { id } = req.params;
 
-        const folder = await getPublicFolderDetails(id);
+        const folder = await getPublicFolder(id);
 
         if (!folder) throw new ApiError(9002);
         if (!folder.public && !folder.allowUploads) throw new ApiError(9002);
@@ -76,7 +76,7 @@ export default typedPlugin(
         const total = await countFiles(where);
         const pages = total === 0 ? 0 : Math.ceil(total / perpage);
 
-        const files = cleanFiles(
+        const files = formatFiles(
           await listFiles({
             where,
             orderBy: fileOrderBy(sortBy, order),
@@ -88,10 +88,10 @@ export default typedPlugin(
         );
 
         if (folder.parentId) {
-          folder.parent = await buildPublicParentChain(folder.parentId);
+          folder.parent = await getPublicParentChain(folder.parentId);
         }
 
-        const cleanedFolder = publicFolderSchema.parse(cleanFolder(folder, true));
+        const cleanedFolder = publicFolderSchema.parse(formatFolder(folder, true));
 
         return res.send({
           folder: cleanedFolder,

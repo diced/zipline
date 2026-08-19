@@ -1,5 +1,6 @@
 import { datasource } from '../datasource';
-import { deleteFileById, listFileRows, updateFile } from '../db/models/file';
+import { db } from '../db';
+import { removeFile } from '../db/models/file';
 import { files as fileTable } from '../db/schema';
 import { log } from '../logger';
 import { eq } from 'drizzle-orm';
@@ -15,7 +16,8 @@ export async function requerySize({
 }): Promise<string> {
   logger.info('preparing to requery size of all files', { forceDelete, forceUpdate });
 
-  const files = await listFileRows({
+  const files = await db.query.files.findMany({
+    columns: { id: true, name: true },
     where: forceUpdate ? undefined : eq(fileTable.size, 0),
   });
   logger.info('found files to requery size', { count: files.length });
@@ -32,7 +34,7 @@ export async function requerySize({
           name: file.name,
         });
 
-        await deleteFileById(file.id);
+        await removeFile(file.id);
         continue;
       }
 
@@ -45,7 +47,7 @@ export async function requerySize({
       logger.info('file has a size of 0 bytes', { id: file.id, name: file.name });
     } else {
       logger.info('file has a size', { id: file.id, name: file.name, size });
-      await updateFile(file.id, { size });
+      await db.update(fileTable).set({ size }).where(eq(fileTable.id, file.id));
     }
   }
 

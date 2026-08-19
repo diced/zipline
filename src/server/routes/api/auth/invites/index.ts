@@ -1,5 +1,6 @@
 import { config } from '@/lib/config';
-import { createInvite, Invite, inviteSchema, listInvites } from '@/lib/db/models/invite';
+import { db } from '@/lib/db';
+import { createInvite, Invite, inviteSchema } from '@/lib/db/models/invite';
 import { log } from '@/lib/logger';
 import { randomCharacters } from '@/lib/random';
 import { secondlyRatelimit } from '@/lib/ratelimits';
@@ -69,9 +70,11 @@ export default typedPlugin(
         preHandler: [userMiddleware, administratorMiddleware],
       },
       async (_, res) => {
-        const invites = await listInvites();
-
-        return res.send(invites);
+        return res.send(
+          await db.query.invites.findMany({
+            with: { inviter: { columns: { username: true, id: true, role: true } } },
+          }),
+        );
       },
     );
   },

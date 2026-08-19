@@ -1,10 +1,10 @@
 import { ApiError } from '@/lib/api/errors';
 import { files as fileTable } from '@/lib/db/schema';
-import { File, cleanFiles, countFiles, fileOrderBy, fileSchema, listFiles } from '@/lib/db/models/file';
-import { findFolderWithOwner } from '@/lib/db/models/folder';
-import { listIncompleteFilesForUser } from '@/lib/db/models/incompleteFile';
-import { commonFileIdsForTags } from '@/lib/db/models/tag';
-import { findUserRowById } from '@/lib/db/models/user';
+import { File, formatFiles, countFiles, fileOrderBy, fileSchema, listFiles } from '@/lib/db/models/file';
+import { getFolderWithOwner } from '@/lib/db/models/folder';
+import { listIncompleteFiles } from '@/lib/db/models/incompleteFile';
+import { getCommonFileIds } from '@/lib/db/models/tag';
+import { getUserIdentity } from '@/lib/db/models/user';
 import { canInteract, canManage } from '@/lib/role';
 import { paginationQs } from '@/lib/validation';
 import { userMiddleware } from '@/server/middleware/user';
@@ -57,7 +57,7 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const user = await findUserRowById(req.query.id ?? req.user.id);
+        const user = await getUserIdentity(req.query.id ?? req.user.id);
 
         if (user && user.id !== req.user.id && !canInteract(req.user.role, user.role))
           throw new ApiError(9002);
@@ -68,14 +68,14 @@ export default typedPlugin(
 
         let folderId: string | null = null;
         if (folder) {
-          const f = await findFolderWithOwner(folder);
+          const f = await getFolderWithOwner(folder);
           if (!f) throw new ApiError(9002);
           if (!canManage(req.user, f.User)) throw new ApiError(9002);
 
           folderId = f.id;
         }
 
-        const incompleteFiles = await listIncompleteFilesForUser(user.id, { excludeComplete: true });
+        const incompleteFiles = await listIncompleteFiles(user.id, { excludeComplete: true });
         const incompleteIds = incompleteFiles.map((file) => file.metadata.file.id);
 
         const sharedConditions: SQL[] = [eq(fileTable.userId, user.id)];
@@ -102,7 +102,7 @@ export default typedPlugin(
               .map((tag) => tag.trim())
               .filter((tag) => tag);
 
-            const commonIds = await commonFileIdsForTags(parsedTags, user.id);
+            const commonIds = await getCommonFileIds(parsedTags, user.id);
             if (commonIds === null) throw new ApiError(1032);
             tagFiles = commonIds;
           }
@@ -122,16 +122,15 @@ export default typedPlugin(
           );
 
           const similarityResult = await listFiles({
+            password: false,
             where: and(...sharedConditions),
             orderBy: fileOrderBy(sortBy, order),
             offset: (Number(page) - 1) * perpage,
             limit: perpage,
           });
 
-          const safeResults = similarityResult.map(({ password: _password, ...file }) => file);
-
           return res.send({
-            page: cleanFiles(safeResults),
+            page: formatFiles(similarityResult),
             search: {
               field: searchField,
               query:
@@ -148,7 +147,7 @@ export default typedPlugin(
         const where = and(...sharedConditions);
         const count = await countFiles(where);
 
-        const files = cleanFiles(
+        const files = formatFiles(
           await listFiles({
             where,
             orderBy: fileOrderBy(sortBy, order),

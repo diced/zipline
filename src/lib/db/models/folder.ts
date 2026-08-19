@@ -5,14 +5,14 @@ import type { PgUpdateSetSource } from 'drizzle-orm/pg-core';
 import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 import {
-  cleanFiles,
+  formatFiles,
   defaultFileRelationConfig,
-  defaultFileScalarConfig,
+  filePasswordScalarConfig,
   fileSchema,
-  mapProjectedFileRelations,
-  updateFilesByIds,
-  type DefaultProjectedFile,
-  type DefaultProjectedFileRelationResult,
+  mapFileTags,
+  updateFiles,
+  type PasswordProjectedFile,
+  type PasswordProjectedFileRelationResult,
 } from './file';
 import type { DbClient } from './user';
 
@@ -36,8 +36,8 @@ export type FolderParent = {
 
 export type FolderParentPublic = FolderParent & { public: boolean; parent?: FolderParentPublic | null };
 
-export type FolderWithRelations = FolderRow & {
-  files?: DefaultProjectedFile[];
+export type FolderResult = FolderRow & {
+  files?: PasswordProjectedFile[];
   parent?: FolderParent | FolderParentPublic | null;
   children?: ((FolderRow | PublicFolderChild) & {
     _count?: { children?: number; files?: number };
@@ -80,7 +80,7 @@ function folderRelationConfig(options: FolderQueryOptions) {
   return {
     files: options.files
       ? {
-          ...defaultFileScalarConfig,
+          ...filePasswordScalarConfig,
           orderBy: desc(files.createdAt),
           with: defaultFileRelationConfig,
         }
@@ -135,14 +135,14 @@ type FolderRelationResult = Awaited<ReturnType<typeof queryFolderRelations>>[num
 
 function hasDefaultFileRelations(
   file: NonNullable<FolderRelationResult['files']>[number],
-): file is DefaultProjectedFileRelationResult {
+): file is PasswordProjectedFileRelationResult {
   return 'fileTags' in file && 'thumbnail' in file;
 }
 
-function mapFolderFile(file: NonNullable<FolderRelationResult['files']>[number]): DefaultProjectedFile {
+function mapFolderFile(file: NonNullable<FolderRelationResult['files']>[number]): PasswordProjectedFile {
   if (!hasDefaultFileRelations(file)) throw new Error('Folder file relations were not selected');
 
-  return mapProjectedFileRelations(file);
+  return mapFileTags(file);
 }
 
 function mapFolderParent(
@@ -165,10 +165,10 @@ function mapFolderRelations(
     counts?: boolean;
     childrenCounts?: boolean;
   },
-): FolderWithRelations {
+): FolderResult {
   const { files: relatedFiles, parent, children, childrenCount, filesCount, ...folder } = row;
 
-  const result: FolderWithRelations = {
+  const result: FolderResult = {
     ...folder,
     ...(options.files && {
       files: (relatedFiles ?? []).map(mapFolderFile),
@@ -198,11 +198,16 @@ function mapFolderRelations(
   return result;
 }
 
-export async function findFolderRowById(id: string, client: DbClient = db) {
-  return (await client.query.folders.findFirst({ where: eq(folders.id, id) })) ?? null;
+export async function getFolderMetadata(id: string, client: DbClient = db) {
+  return (
+    (await client.query.folders.findFirst({
+      columns: { id: true, name: true, userId: true, allowUploads: true },
+      where: eq(folders.id, id),
+    })) ?? null
+  );
 }
 
-export async function findOwnedFolderById(id: string, userId: string, client: DbClient = db) {
+export async function getOwnedFolder(id: string, userId: string, client: DbClient = db) {
   return (
     (await client.query.folders.findFirst({
       where: and(eq(folders.id, id), eq(folders.userId, userId)),
@@ -210,15 +215,7 @@ export async function findOwnedFolderById(id: string, userId: string, client: Db
   );
 }
 
-export async function findFolderByIdentifier(identifier: string, client: DbClient = db) {
-  return (
-    (await client.query.folders.findFirst({
-      where: or(eq(folders.id, identifier), eq(folders.name, identifier)),
-    })) ?? null
-  );
-}
-
-export async function findFolderWithOwner(id: string, client: DbClient = db) {
+export async function getFolderWithOwner(id: string, client: DbClient = db) {
   const row = await client.query.folders.findFirst({
     where: eq(folders.id, id),
     with: {
@@ -230,7 +227,7 @@ export async function findFolderWithOwner(id: string, client: DbClient = db) {
   return row ?? null;
 }
 
-export async function listFoldersForUser(
+export async function listFolders(
   userId: string,
   options: { root?: boolean; parentId?: string; includeFiles?: boolean } = {},
   client: DbClient = db,
@@ -254,7 +251,7 @@ export async function listFoldersForUser(
   );
 }
 
-export async function getFolderDetails(id: string, includeFiles = true, client: DbClient = db) {
+export async function getFolder(id: string, includeFiles = true, client: DbClient = db) {
   const [row] = await queryFolderRelations(
     {
       where: eq(folders.id, id),
@@ -278,7 +275,7 @@ export async function getFolderDetails(id: string, includeFiles = true, client: 
     : null;
 }
 
-export async function getPublicFolderDetails(identifier: string, client: DbClient = db) {
+export async function getPublicFolder(identifier: string, client: DbClient = db) {
   const [row] = await queryFolderRelations(
     {
       where: or(eq(folders.id, identifier), eq(folders.name, identifier)),
@@ -301,12 +298,12 @@ export async function getPublicFolderDetails(identifier: string, client: DbClien
     : null;
 }
 
-export async function createFolderWithFiles(data: FolderInsert, fileIds: string[] = []) {
+export async function createFolder(data: FolderInsert, fileIds: string[] = []) {
   return db.transaction(async (tx) => {
     const rows = await tx.insert(folders).values(data).returning();
     const row = rows[0];
     if (!row) throw new Error('Folder insert did not return a row');
-    if (fileIds.length) await updateFilesByIds(fileIds, { folderId: row.id }, data.userId, tx);
+    if (fileIds.length) await updateFiles(fileIds, { folderId: row.id }, data.userId, tx);
     const [created] = await queryFolderRelations(
       { where: eq(folders.id, row.id), limit: 1, files: true, parent: true, counts: true },
       tx,
@@ -326,7 +323,7 @@ export async function updateFolder(id: string, data: FolderUpdate, client: DbCli
   return updated ? mapFolderRelations(updated, { parent: true, counts: true }) : null;
 }
 
-export async function moveFileToFolder(fileId: string, folderId: string, client: DbClient = db) {
+export async function addFile(fileId: string, folderId: string, client: DbClient = db) {
   const rows = await client
     .update(files)
     .set({ folderId })
@@ -340,7 +337,7 @@ export async function moveFileToFolder(fileId: string, folderId: string, client:
   return folder ? mapFolderRelations(folder, { parent: true, counts: true }) : null;
 }
 
-export async function removeFileFromFolder(fileId: string, folderId: string, client: DbClient = db) {
+export async function removeFile(fileId: string, folderId: string, client: DbClient = db) {
   const rows = await client
     .update(files)
     .set({ folderId: null })
@@ -402,7 +399,7 @@ async function folderAncestors(parentId: string | null, publicOnly = false, clie
   return result.rows;
 }
 
-export async function buildParentChain(
+export async function getParentChain(
   parentId: string | null,
   client: DbClient = db,
 ): Promise<FolderParent | null> {
@@ -414,7 +411,7 @@ export async function buildParentChain(
   return parent;
 }
 
-export async function buildPublicParentChain(
+export async function getPublicParentChain(
   parentId: string | null,
   client: DbClient = db,
 ): Promise<FolderParentPublic | null> {
@@ -426,7 +423,7 @@ export async function buildPublicParentChain(
   return parent;
 }
 
-export async function folderParentStatus(folderId: string, parentId: string, userId: string) {
+export async function getParentStatus(folderId: string, parentId: string, userId: string) {
   if (folderId === parentId) return 'cycle' as const;
   const ancestors = await folderAncestors(parentId);
   const parent = ancestors[0];
@@ -443,7 +440,7 @@ export type FolderTree = {
   children: FolderTree[];
 };
 
-export async function getOwnedFolderTree(
+export async function getOwnedTree(
   folderId: string,
   userId: string,
   client: DbClient = db,
@@ -495,7 +492,7 @@ async function folderDescendantIds(folderId: string, client: DbClient) {
   return result.rows.map(({ id }) => id);
 }
 
-export async function deleteFolderWithChildren(
+export async function removeFolder(
   folderId: string,
   action?: 'root' | 'folder' | 'cascade' | 'cascade-files',
   targetFolderId?: string,
@@ -546,20 +543,15 @@ type CleanableFolder = {
   parent?: CleanableFolder | null;
 };
 
-export function cleanFolder<T extends CleanableFolder>(folder: T, stringifyDates = false): T {
-  if (folder.files) cleanFiles(folder.files, stringifyDates);
+export function formatFolder<T extends CleanableFolder>(folder: T, stringifyDates = false): T {
+  if (folder.files) formatFiles(folder.files, stringifyDates);
   if (stringifyDates) {
     if (folder.createdAt instanceof Date) folder.createdAt = folder.createdAt.toISOString();
     if (folder.updatedAt instanceof Date) folder.updatedAt = folder.updatedAt.toISOString();
   }
-  if (folder.children) for (const child of folder.children) cleanFolder(child, stringifyDates);
-  if (folder.parent) cleanFolder(folder.parent, stringifyDates);
+  if (folder.children) for (const child of folder.children) formatFolder(child, stringifyDates);
+  if (folder.parent) formatFolder(folder.parent, stringifyDates);
   return folder;
-}
-
-export function cleanFolders<T extends CleanableFolder>(rows: T[], stringifyDates = false): T[] {
-  for (const row of rows) cleanFolder(row, stringifyDates);
-  return rows;
 }
 
 const folderScalarSchema = createSelectSchema(folders, {
@@ -578,7 +570,7 @@ const folderParentScalarSchema = createSelectSchema(folders).pick({
   parentId: true,
 });
 
-export const folderParentSchema: z.ZodType<FolderParent> = z.lazy(() =>
+const folderParentSchema: z.ZodType<FolderParent> = z.lazy(() =>
   folderParentScalarSchema.extend({
     parent: folderParentSchema.nullable().optional(),
   }),
@@ -591,7 +583,7 @@ const folderParentPublicScalarSchema = createSelectSchema(folders).pick({
   parentId: true,
 });
 
-export const folderParentPublicSchema: z.ZodType<FolderParentPublic> = z.lazy(() =>
+const folderParentPublicSchema: z.ZodType<FolderParentPublic> = z.lazy(() =>
   folderParentPublicScalarSchema.extend({
     parent: folderParentPublicSchema.nullable().optional(),
   }),

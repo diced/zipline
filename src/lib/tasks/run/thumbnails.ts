@@ -1,4 +1,4 @@
-import { listVideoFilesNeedingThumbnails } from '@/lib/db/models/file';
+import { listThumbnailCandidates } from '@/lib/db/models/file';
 import { IntervalTask, WorkerTask } from '..';
 
 export function runThumbnailWorkers(workers: WorkerTask[], files: string[]) {
@@ -37,7 +37,7 @@ export default function thumbnails() {
 
     if (rerun) this.logger.debug('regenerating thumbnails for all videos');
 
-    const thumbnailNeeded = await listVideoFilesNeedingThumbnails(rerun);
+    const thumbnailNeeded = await listThumbnailCandidates(rerun);
     if (!thumbnailNeeded.length) return;
 
     this.logger.debug(`found ${thumbnailNeeded.length} files that need thumbnails`);
