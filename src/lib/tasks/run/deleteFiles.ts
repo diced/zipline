@@ -8,10 +8,10 @@ import { IntervalTask } from '..';
 
 export default function deleteFiles() {
   return async function (this: IntervalTask) {
-    const expiredFiles = await db.query.files.findMany({
-      columns: { id: true, name: true, size: true },
-      where: and(isNotNull(files.deletesAt), lte(files.deletesAt, new Date())),
-    });
+    const expiredFiles = await db
+      .select({ id: files.id, name: files.name, size: files.size })
+      .from(files)
+      .where(and(isNotNull(files.deletesAt), lte(files.deletesAt, new Date())));
 
     this.logger.debug(`found ${expiredFiles.length} expired files`, {
       files: expiredFiles.map((f) => f.name),

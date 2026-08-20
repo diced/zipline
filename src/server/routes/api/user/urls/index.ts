@@ -2,8 +2,9 @@ import { ApiError } from '@/lib/api/errors';
 import { config } from '@/lib/config';
 import { hashPassword } from '@/lib/crypto';
 import { db } from '@/lib/db';
-import { createUrl, Url, urlSchema } from '@/lib/db/models/url';
+import { createUrl, publicUrlColumns, Url, urlSchema } from '@/lib/db/models/url';
 import { urls as urlRecords } from '@/lib/db/schema';
+import { containsText } from '@/lib/db/utils';
 import { log } from '@/lib/logger';
 import { randomCharacters } from '@/lib/random';
 import { RESERVED_ROUTES } from '@/lib/reservedRoutes';
@@ -11,7 +12,7 @@ import { zStringTrimmed } from '@/lib/validation';
 import { onShorten } from '@/lib/webhooks';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
-import { and, eq, sql } from 'drizzle-orm';
+import { and, eq, isNotNull } from 'drizzle-orm';
 import { z } from 'zod';
 
 export type ApiUserUrlsResponse =
@@ -22,12 +23,10 @@ export type ApiUserUrlsResponse =
 
 export const PATH = '/api/user/urls';
 const logger = log('api').c('user').c('urls');
-const urlListConfig = {
-  columns: { password: false, userId: false },
-  extras: {
-    password: sql<boolean>`case when ${urlRecords.password} is null then false else true end`.as('password'),
-  },
-} as const;
+const urlListColumns = {
+  ...publicUrlColumns,
+  password: isNotNull(urlRecords.password).mapWith(Boolean).as('password'),
+};
 
 export default typedPlugin(
   async (server) => {
@@ -179,29 +178,21 @@ export default typedPlugin(
       async (req, res) => {
         const { searchField, searchQuery } = req.query;
 
+        let search;
         if (searchQuery) {
           const searchColumn = {
             destination: urlRecords.destination,
             vanity: urlRecords.vanity,
             code: urlRecords.code,
           }[searchField];
-          const escaped = searchQuery.replaceAll('\\', '\\\\').replaceAll('%', '\\%').replaceAll('_', '\\_');
-          const similarityResult = await db.query.urls.findMany({
-            ...urlListConfig,
-            where: and(
-              eq(urlRecords.userId, req.user.id),
-              sql`${searchColumn} ILIKE ${`%${escaped}%`} ESCAPE '\\'`,
-            ),
-          });
-
-          return res.send(similarityResult);
+          search = containsText(searchColumn, searchQuery);
         }
 
         return res.send(
-          await db.query.urls.findMany({
-            ...urlListConfig,
-            where: eq(urlRecords.userId, req.user.id),
-          }),
+          await db
+            .select(urlListColumns)
+            .from(urlRecords)
+            .where(and(eq(urlRecords.userId, req.user.id), search)),
         );
       },
     );

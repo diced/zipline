@@ -1,5 +1,7 @@
 import { ApiError } from '@/lib/api/errors';
-import { createTag, getTagByName, listTags, Tag, tagSchema } from '@/lib/db/models/tag';
+import { db } from '@/lib/db';
+import { getTagByName, listTags, Tag, tagSchema } from '@/lib/db/models/tag';
+import { tags as tagTable } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { zStringTrimmed } from '@/lib/validation';
@@ -57,7 +59,10 @@ export default typedPlugin(
 
         if (existingTag) throw new ApiError(1033);
 
-        const tag = await createTag({ name, color, userId: req.user.id });
+        const [row] = await db.insert(tagTable).values({ name, color, userId: req.user.id }).returning();
+        if (!row) throw new Error('Tag insert did not return a row');
+        const { userId: _, ...created } = row;
+        const tag = { ...created, files: [] };
 
         logger.info('tag created', {
           id: tag.id,

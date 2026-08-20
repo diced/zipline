@@ -24,10 +24,11 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const u = await db.query.users.findFirst({
-          columns: { avatar: true },
-          where: eq(users.id, req.user.id),
-        });
+        const [u] = await db
+          .select({ avatar: users.avatar })
+          .from(users)
+          .where(eq(users.id, req.user.id))
+          .limit(1);
 
         if (!u?.avatar) throw new ApiError(9002);
 

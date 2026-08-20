@@ -42,10 +42,11 @@ export default typedPlugin(
         ...secondlyRatelimit(2),
       },
       async (req, res) => {
-        const file = await db.query.files.findFirst({
-          columns: { id: true, name: true, password: true },
-          where: or(eq(files.id, req.params.id), eq(files.name, req.params.id)),
-        });
+        const [file] = await db
+          .select({ id: files.id, name: files.name, password: files.password })
+          .from(files)
+          .where(or(eq(files.id, req.params.id), eq(files.name, req.params.id)))
+          .limit(1);
         if (!file) throw new ApiError(4000);
         if (!file.password) throw new ApiError(4000);
 

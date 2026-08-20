@@ -9,8 +9,6 @@ import z from 'zod';
 
 export type ApiUsersIdTagsResponse = Tag[];
 
-// const logger = log('api').c('user').c('id').c('tags');
-
 export const PATH = '/api/users/:id/tags';
 export default typedPlugin(
   async (server) => {

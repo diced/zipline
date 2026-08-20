@@ -16,10 +16,10 @@ export async function requerySize({
 }): Promise<string> {
   logger.info('preparing to requery size of all files', { forceDelete, forceUpdate });
 
-  const files = await db.query.files.findMany({
-    columns: { id: true, name: true },
-    where: forceUpdate ? undefined : eq(fileTable.size, 0),
-  });
+  const files = await db
+    .select({ id: fileTable.id, name: fileTable.name })
+    .from(fileTable)
+    .where(forceUpdate ? undefined : eq(fileTable.size, 0));
   logger.info('found files to requery size', { count: files.length });
 
   let notFound = false;

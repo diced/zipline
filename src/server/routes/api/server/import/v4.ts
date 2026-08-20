@@ -87,10 +87,11 @@ export default typedPlugin(
             mergeCurrent = true;
           }
 
-          const existing = await db.query.users.findFirst({
-            columns: { id: true },
-            where: or(eq(userRecords.username, user.username), eq(userRecords.id, user.id)),
-          });
+          const [existing] = await db
+            .select({ id: userRecords.id })
+            .from(userRecords)
+            .where(or(eq(userRecords.username, user.username), eq(userRecords.id, user.id)))
+            .limit(1);
 
           if (!mergeCurrent && existing) {
             logger.warn('user already exists with a username or id, skipping importing', {
@@ -151,9 +152,10 @@ export default typedPlugin(
             continue;
           }
 
-          const existing = await db.query.oauthProviders.findFirst({
-            columns: { id: true },
-            where:
+          const [existing] = await db
+            .select({ id: oauthProviderRecords.id })
+            .from(oauthProviderRecords)
+            .where(
               oauthProvider.oauthId === undefined
                 ? eq(oauthProviderRecords.provider, oauthProvider.provider)
                 : and(
@@ -162,7 +164,8 @@ export default typedPlugin(
                       ? isNull(oauthProviderRecords.oauthId)
                       : eq(oauthProviderRecords.oauthId, oauthProvider.oauthId),
                   ),
-          });
+            )
+            .limit(1);
 
           if (existing) {
             logger.warn('oauth provider already exists, skipping importing', {
@@ -204,10 +207,11 @@ export default typedPlugin(
             continue;
           }
 
-          const existing = await db.query.userQuotas.findFirst({
-            columns: { id: true },
-            where: eq(quotaRecords.userId, userId),
-          });
+          const [existing] = await db
+            .select({ id: quotaRecords.id })
+            .from(quotaRecords)
+            .where(eq(quotaRecords.userId, userId))
+            .limit(1);
 
           if (existing) {
             logger.warn('quota already exists for user, skipping importing', {
@@ -249,10 +253,11 @@ export default typedPlugin(
             continue;
           }
 
-          const existing = await db.query.userPasskeys.findFirst({
-            columns: { id: true },
-            where: and(eq(passkeyRecords.name, passkey.name), eq(passkeyRecords.userId, userId)),
-          });
+          const [existing] = await db
+            .select({ id: passkeyRecords.id })
+            .from(passkeyRecords)
+            .where(and(eq(passkeyRecords.name, passkey.name), eq(passkeyRecords.userId, userId)))
+            .limit(1);
 
           if (existing) {
             logger.warn('passkey already exists for user, skipping importing', {
@@ -288,10 +293,11 @@ export default typedPlugin(
             continue;
           }
 
-          const existing = await db.query.folders.findFirst({
-            columns: { id: true },
-            where: and(eq(folderRecords.name, folder.name), eq(folderRecords.userId, userId)),
-          });
+          const [existing] = await db
+            .select({ id: folderRecords.id })
+            .from(folderRecords)
+            .where(and(eq(folderRecords.name, folder.name), eq(folderRecords.userId, userId)))
+            .limit(1);
 
           if (existing) {
             logger.warn('folder already exists, skipping importing', {
@@ -355,10 +361,11 @@ export default typedPlugin(
             continue;
           }
 
-          const existing = await db.query.files.findFirst({
-            columns: { id: true },
-            where: eq(fileRecords.name, file.name),
-          });
+          const [existing] = await db
+            .select({ id: fileRecords.id })
+            .from(fileRecords)
+            .where(eq(fileRecords.name, file.name))
+            .limit(1);
 
           if (existing) {
             logger.warn('file already exists, skipping importing', {
@@ -415,14 +422,17 @@ export default typedPlugin(
             continue;
           }
 
-          const existing = await db.query.tags.findFirst({
-            columns: { id: true },
-            where: and(
-              eq(tagRecords.name, tag.name),
-              eq(tagRecords.userId, userId),
-              eq(tagRecords.createdAt, new Date(tag.createdAt)),
-            ),
-          });
+          const [existing] = await db
+            .select({ id: tagRecords.id })
+            .from(tagRecords)
+            .where(
+              and(
+                eq(tagRecords.name, tag.name),
+                eq(tagRecords.userId, userId),
+                eq(tagRecords.createdAt, new Date(tag.createdAt)),
+              ),
+            )
+            .limit(1);
 
           if (existing) {
             logger.warn('tag already exists, skipping importing', {
@@ -467,10 +477,11 @@ export default typedPlugin(
             continue;
           }
 
-          const existing = await db.query.urls.findFirst({
-            columns: { id: true },
-            where: and(eq(urlRecords.code, url.code), eq(urlRecords.userId, userId)),
-          });
+          const [existing] = await db
+            .select({ id: urlRecords.id })
+            .from(urlRecords)
+            .where(and(eq(urlRecords.code, url.code), eq(urlRecords.userId, userId)))
+            .limit(1);
 
           if (existing) {
             logger.warn('url already exists, skipping importing', {
@@ -515,10 +526,11 @@ export default typedPlugin(
             continue;
           }
 
-          const existing = await db.query.invites.findFirst({
-            columns: { id: true },
-            where: and(eq(inviteRecords.code, invite.code), eq(inviteRecords.inviterId, inviterId)),
-          });
+          const [existing] = await db
+            .select({ id: inviteRecords.id })
+            .from(inviteRecords)
+            .where(and(eq(inviteRecords.code, invite.code), eq(inviteRecords.inviterId, inviterId)))
+            .limit(1);
 
           if (existing) {
             logger.warn('invite already exists, skipping importing', {

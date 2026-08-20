@@ -1,7 +1,7 @@
 import { ApiError } from '@/lib/api/errors';
 import { config } from '@/lib/config';
 import { db } from '@/lib/db';
-import { passkeyRegSchema, userPasskeySchema } from '@/lib/db/models/passkey';
+import { passkeyRegSchema, publicPasskeyColumns, userPasskeySchema } from '@/lib/db/models/passkey';
 import { getUser, type User, userSchema } from '@/lib/db/models/user';
 import { userPasskeys } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
@@ -52,10 +52,10 @@ export default typedPlugin(
         preHandler: [userMiddleware, passkeysEnabledHandler],
       },
       async (req, res) => {
-        const passkeys = await db.query.userPasskeys.findMany({
-          columns: { reg: false },
-          where: eq(userPasskeys.userId, req.user.id),
-        });
+        const passkeys = await db
+          .select(publicPasskeyColumns)
+          .from(userPasskeys)
+          .where(eq(userPasskeys.userId, req.user.id));
 
         return res.send(passkeys);
       },
@@ -74,10 +74,10 @@ export default typedPlugin(
       async (req, res) => {
         if (OPTIONS_CACHE.has(req.user.id)) return res.send(OPTIONS_CACHE.get(req.user.id)!);
 
-        const registrations = await db.query.userPasskeys.findMany({
-          columns: { reg: true },
-          where: eq(userPasskeys.userId, req.user.id),
-        });
+        const registrations = await db
+          .select({ reg: userPasskeys.reg })
+          .from(userPasskeys)
+          .where(eq(userPasskeys.userId, req.user.id));
         const existingPasskeys = registrations.flatMap((passkey) => {
           const parsed = passkeyRegSchema.safeParse(passkey.reg);
           return parsed.success ? [parsed.data] : [];

@@ -1,16 +1,5 @@
 import { db, type Transaction } from '@/lib/db';
-import {
-  files,
-  filesToTags,
-  folders,
-  invites,
-  metrics,
-  oauthProviders,
-  tags,
-  thumbnails,
-  urls,
-  users,
-} from '@/lib/db/schema';
+import { files, filesToTags, folders, oauthProviders, tags, users } from '@/lib/db/schema';
 import { eq, inArray } from 'drizzle-orm';
 import type { PgUpdateSetSource } from 'drizzle-orm/pg-core';
 
@@ -20,31 +9,8 @@ type OAuthProviderInsert = typeof oauthProviders.$inferInsert;
 type FolderInsert = typeof folders.$inferInsert;
 type TagInsert = typeof tags.$inferInsert;
 
-export async function countServerResources() {
-  const [userCount, fileCount, urlCount, folderCount, inviteCount, thumbnailCount, metricCount] =
-    await Promise.all([
-      db.$count(users),
-      db.$count(files),
-      db.$count(urls),
-      db.$count(folders),
-      db.$count(invites),
-      db.$count(thumbnails),
-      db.$count(metrics),
-    ]);
-
-  return {
-    users: userCount,
-    files: fileCount,
-    urls: urlCount,
-    folders: folderCount,
-    invites: inviteCount,
-    thumbnails: thumbnailCount,
-    metrics: metricCount,
-  };
-}
-
 export async function listExportUsers() {
-  const userRows = await db.query.users.findMany({
+  return db.query.users.findMany({
     with: {
       passkeys: true,
       quota: true,
@@ -52,24 +18,11 @@ export async function listExportUsers() {
       invites: true,
       urls: true,
       tags: {
-        with: {
-          fileTags: {
-            columns: {},
-            with: { file: { columns: { id: true } } },
-          },
-        },
+        with: { files: { columns: { id: true } } },
       },
       folders: { with: { files: { columns: { id: true } } } },
     },
   });
-
-  return userRows.map(({ tags: userTags, ...user }) => ({
-    ...user,
-    tags: userTags.map(({ fileTags, ...tag }) => ({
-      ...tag,
-      files: fileTags.map(({ file }) => file),
-    })),
-  }));
 }
 
 export type ImportOauthProvider = Pick<

@@ -66,10 +66,13 @@ async function oauthPlugin(fastify: FastifyInstance) {
     });
 
     const existingOauth =
-      (await db.query.oauthProviders.findFirst({
-        columns: { id: true, userId: true },
-        where: and(eq(oauthProviders.provider, provider), eq(oauthProviders.oauthId, response.user_id)),
-      })) ?? null;
+      (
+        await db
+          .select({ id: oauthProviders.id, userId: oauthProviders.userId })
+          .from(oauthProviders)
+          .where(and(eq(oauthProviders.provider, provider), eq(oauthProviders.oauthId, response.user_id)))
+          .limit(1)
+      )[0] ?? null;
     const existingUser = await usernameExists(response.username);
 
     const state = parseOAuthState(query.state);

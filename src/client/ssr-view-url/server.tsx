@@ -28,17 +28,18 @@ export async function render(
   const { config: libConfig, reloadSettings } = await import('@/lib/config');
   if (!libConfig) await reloadSettings();
 
-  const urlEntry = await db.query.urls.findFirst({
-    columns: {
-      id: true,
-      password: true,
-      destination: true,
-      maxViews: true,
-      views: true,
-      enabled: true,
-    },
-    where: or(eq(urls.vanity, id), eq(urls.code, id), eq(urls.id, id)),
-  });
+  const [urlEntry] = await db
+    .select({
+      id: urls.id,
+      password: urls.password,
+      destination: urls.destination,
+      maxViews: urls.maxViews,
+      views: urls.views,
+      enabled: urls.enabled,
+    })
+    .from(urls)
+    .where(or(eq(urls.vanity, id), eq(urls.code, id), eq(urls.id, id)))
+    .limit(1);
 
   if (!urlEntry || !urlEntry.enabled) return { html: 'Not Found', meta: '', status: 404 };
 

@@ -24,17 +24,19 @@ export async function importDir(
   if (id) {
     userId = id;
   } else {
-    const candidate = await db.query.users.findFirst({
-      columns: { id: true, username: true, role: true },
-      where: eq(users.username, 'administrator'),
-    });
+    const [candidate] = await db
+      .select({ id: users.id, username: users.username, role: users.role })
+      .from(users)
+      .where(eq(users.username, 'administrator'))
+      .limit(1);
     const user = candidate?.role === 'SUPERADMIN' ? candidate : null;
 
     if (!user) {
-      const firstSuperAdmin = await db.query.users.findFirst({
-        columns: { id: true, username: true, role: true },
-        where: eq(users.role, 'SUPERADMIN'),
-      });
+      const [firstSuperAdmin] = await db
+        .select({ id: users.id, username: users.username, role: users.role })
+        .from(users)
+        .where(eq(users.role, 'SUPERADMIN'))
+        .limit(1);
 
       if (!firstSuperAdmin) return console.error('No superadmin found or "administrator" user.');
 

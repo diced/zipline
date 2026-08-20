@@ -96,10 +96,11 @@ export default typedPlugin(
 
         const changingPassword = !!req.body.password;
         if (changingPassword) {
-          const passwdReq = await db.query.users.findFirst({
-            columns: { password: true },
-            where: eq(users.id, req.user.id),
-          });
+          const [passwdReq] = await db
+            .select({ password: users.password })
+            .from(users)
+            .where(eq(users.id, req.user.id))
+            .limit(1);
 
           if (!passwdReq) throw new ApiError(1068);
 

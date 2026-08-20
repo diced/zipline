@@ -47,17 +47,13 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const file = await getFile(req.params.id, {
-          thumbnail: true,
-          tags: true,
-          owner: true,
-        });
+        const file = await getFile(req.params.id);
         if (!file) throw new ApiError(4000);
 
-        if (req.user.id !== file.User?.id && !canInteract(req.user.role, file.User?.role ?? 'USER'))
+        if (req.user.id !== file.user?.id && !canInteract(req.user.role, file.user?.role ?? 'USER'))
           throw new ApiError(4000);
 
-        const { password: _password, User: _owner, ...responseFile } = file;
+        const { password: _password, user: _owner, ...responseFile } = file;
         return res.send(responseFile);
       },
     );
@@ -87,14 +83,10 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const file = await getFile(req.params.id, {
-          thumbnail: true,
-          tags: true,
-          owner: true,
-        });
+        const file = await getFile(req.params.id);
         if (!file) throw new ApiError(4000);
 
-        if (req.user.id !== file.User?.id && !canInteract(req.user.role, file.User?.role ?? 'USER'))
+        if (req.user.id !== file.user?.id && !canInteract(req.user.role, file.user?.role ?? 'USER'))
           throw new ApiError(4000);
 
         const data: FileUpdate = {};
@@ -119,7 +111,7 @@ export default typedPlugin(
         if (req.body.tags !== undefined) {
           const tags = await listOwnedTags(
             req.body.tags,
-            req.user.id !== file.User?.id ? (file.User?.id ?? req.user.id) : req.user.id,
+            req.user.id !== file.user?.id ? (file.user?.id ?? req.user.id) : req.user.id,
           );
 
           if (tags.length !== req.body.tags.length) throw new ApiError(1032);
@@ -127,10 +119,11 @@ export default typedPlugin(
 
         if (req.body.name !== undefined && req.body.name !== file.name) {
           const name = req.body.name!;
-          const existingFile = await db.query.files.findFirst({
-            columns: { id: true },
-            where: eq(fileTable.name, name),
-          });
+          const [existingFile] = await db
+            .select({ id: fileTable.id })
+            .from(fileTable)
+            .where(eq(fileTable.name, name))
+            .limit(1);
 
           if (existingFile && existingFile.id !== file.id) throw new ApiError(1014);
 
@@ -150,7 +143,7 @@ export default typedPlugin(
         logger.info(`${req.user.username} updated file ${newFile.name}`, {
           updated: Object.keys(req.body),
           id: newFile.id,
-          owner: file.User?.id,
+          owner: file.user?.id,
         });
 
         const { password: _password, ...responseFile } = newFile;
@@ -171,25 +164,21 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const file = await getFile(req.params.id, {
-          thumbnail: true,
-          tags: true,
-          owner: true,
-        });
+        const file = await getFile(req.params.id);
         if (!file) throw new ApiError(4000);
 
-        if (req.user.id !== file.User?.id && !canInteract(req.user.role, file.User?.role ?? 'USER'))
+        if (req.user.id !== file.user?.id && !canInteract(req.user.role, file.user?.role ?? 'USER'))
           throw new ApiError(4000);
 
         const deleted = await removeFile(file.id);
         if (!deleted) throw new ApiError(4000);
-        const { password: _password, User: _owner, ...deletedFile } = file;
+        const { password: _password, user: _owner, ...deletedFile } = file;
 
         await datasource.delete(deletedFile.name);
 
         logger.info(`${req.user.username} deleted file ${deletedFile.name}`, {
           size: bytes(deletedFile.size),
-          owner: file.User?.id,
+          owner: file.user?.id,
         });
 
         return res.send(deletedFile);

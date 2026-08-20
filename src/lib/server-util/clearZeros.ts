@@ -8,10 +8,7 @@ import { eq } from 'drizzle-orm';
 const logger = log('serverutil').c('clearZeros');
 
 export async function clearZerosFiles(): Promise<{ id: string; name: string }[]> {
-  return db.query.files.findMany({
-    columns: { id: true, name: true },
-    where: eq(fileTable.size, 0),
-  });
+  return db.select({ id: fileTable.id, name: fileTable.name }).from(fileTable).where(eq(fileTable.size, 0));
 }
 
 export async function clearZeros(files: Awaited<ReturnType<typeof clearZerosFiles>>): Promise<string> {

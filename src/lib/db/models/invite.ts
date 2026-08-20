@@ -1,6 +1,5 @@
 import { db, type Transaction } from '@/lib/db';
 import { invites, users } from '@/lib/db/schema';
-import { firstOrNull } from '@/lib/db/utils';
 import { and, eq, gt, isNull, lt, or, sql } from 'drizzle-orm';
 import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
@@ -21,10 +20,11 @@ export async function createInvite(
     if (!invite) throw new Error('Invite insert did not return a row');
 
     const created = await tx.query.invites.findFirst({
-      where: eq(invites.id, invite.id),
+      where: { id: invite.id },
       with: { inviter: inviterRelation },
     });
     if (!created) throw new Error('Inserted invite could not be read back');
+
     return created;
   });
 }
@@ -32,7 +32,7 @@ export async function createInvite(
 export async function removeInvite(id: string) {
   return db.transaction(async (tx) => {
     const invite = await tx.query.invites.findFirst({
-      where: eq(invites.id, id),
+      where: { id },
       with: { inviter: inviterRelation },
     });
     if (!invite) return null;
@@ -56,7 +56,7 @@ export async function consumeInvite(code: string, tx: Transaction) {
     )
     .returning({ id: invites.id });
 
-  return firstOrNull(rows);
+  return rows[0] ?? null;
 }
 
 const inviterSchema = createSelectSchema(users).pick({

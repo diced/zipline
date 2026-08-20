@@ -7,9 +7,7 @@ import { IntervalTask } from '..';
 export default function cleanThumbnails() {
   return async function (this: IntervalTask) {
     const fsThumbnails = await datasource.list({ prefix: '.thumbnail.' });
-    const dbThumbnails = await db.query.thumbnails.findMany({
-      columns: { id: true, path: true },
-    });
+    const dbThumbnails = await db.select({ id: thumbnails.id, path: thumbnails.path }).from(thumbnails);
 
     const paths = new Set(dbThumbnails.map((t) => t.path));
     const fsOrphaned = fsThumbnails.filter((path) => !paths.has(path));

@@ -131,10 +131,11 @@ export default typedPlugin(
       async (req, res) => {
         if (!req.user.totpEnabled) throw new ApiError(1053);
 
-        const current = await db.query.users.findFirst({
-          columns: { totpSecret: true },
-          where: eq(users.id, req.user.id),
-        });
+        const [current] = await db
+          .select({ totpSecret: users.totpSecret })
+          .from(users)
+          .where(eq(users.id, req.user.id))
+          .limit(1);
         if (!current?.totpSecret) throw new ApiError(1053);
 
         const { code } = req.body;

@@ -22,7 +22,13 @@ import { renderToString } from 'react-dom/server';
 import { createStaticHandler, createStaticRouter, StaticRouterProvider } from 'react-router-dom';
 import { createRoutes } from './routes';
 
-export const getFile = async (id: string) => getFileByName(id, { thumbnail: true, tags: true, folder: true });
+export const getFile = async (id: string) => {
+  const file = await getFileByName(id, 'view');
+  if (!file) return null;
+
+  const { folder, ...rest } = file;
+  return { ...rest, Folder: folder };
+};
 
 export async function render(
   {

@@ -12,6 +12,7 @@ const logger = log('migrations');
 const advisoryLockName = 'zipline:drizzle-migrations';
 const migrationsSchema = 'drizzle';
 const migrationsTable = '__drizzle_migrations';
+const legacyBaselineFolderMillis = 1787113356379;
 const migrationConfig = {
   migrationsFolder: join(process.cwd(), 'drizzle'),
   migrationsSchema,
@@ -21,6 +22,8 @@ const migrationConfig = {
 type NativeMigrationRow = {
   hash: string;
   created_at: string;
+  name: string | null;
+  has_name: boolean;
 };
 
 function postgresErrorCode(error: unknown) {
@@ -75,14 +78,17 @@ async function readNativeMigrationHistory(client: Client) {
 
   const qualifiedTable = `${quoteIdentifier(migrationsSchema)}.${quoteIdentifier(migrationsTable)}`;
   const result = await client.query<NativeMigrationRow>(
-    `SELECT hash, created_at FROM ${qualifiedTable} ORDER BY created_at, id`,
+    `SELECT
+      history.hash,
+      history.created_at,
+      to_jsonb(history)->>'name' AS name,
+      to_jsonb(history) ? 'name' AS has_name
+    FROM ${qualifiedTable} AS history
+    ORDER BY history.created_at, history.id`,
   );
   return result.rows;
 }
 
-// Drizzle owns migration ordering and application. This guard only rejects a history that could not
-// have been produced by the bundled journal; Drizzle 0.45 otherwise trusts the latest timestamp and
-// does not verify the hashes it stores.
 function assertKnownNativeMigrationHistory(rows: NativeMigrationRow[], migrations: MigrationMeta[]) {
   if (rows.length > migrations.length) {
     throw new Error(
@@ -93,7 +99,16 @@ function assertKnownNativeMigrationHistory(rows: NativeMigrationRow[], migration
   for (let index = 0; index < rows.length; index++) {
     const row = rows[index];
     const expected = migrations[index];
-    if (!expected || Number(row.created_at) !== expected.folderMillis || row.hash !== expected.hash) {
+    const recordedAt = Number(row.created_at);
+    const matchesLegacyBaseline =
+      index === 0 && recordedAt === legacyBaselineFolderMillis && row.hash === expected?.hash;
+
+    if (
+      !expected ||
+      (recordedAt !== expected.folderMillis && !matchesLegacyBaseline) ||
+      row.hash !== expected.hash ||
+      (row.has_name && row.name !== expected.name)
+    ) {
       throw new Error(`Drizzle migration history is unknown or has been modified at entry ${index + 1}`);
     }
   }
@@ -201,7 +216,7 @@ export async function runMigrations() {
     }
 
     logger.debug('applying Drizzle migrations');
-    await migrate(drizzle(client), migrationConfig);
+    await migrate(drizzle({ client }), migrationConfig);
     logger.debug('Drizzle migrations complete');
   } catch (error) {
     logger.error(error as Error);

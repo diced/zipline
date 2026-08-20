@@ -1,11 +1,13 @@
 import { detectClient, ZiplineClient } from '@/lib/api/detect';
 import { config } from '@/lib/config';
-import { createSession, replaceSessions } from '@/lib/db/models/session';
+import { db } from '@/lib/db';
+import { userSessions } from '@/lib/db/schema';
 import { randomCharacters } from '@/lib/random';
 import { fastifyCookie } from '@fastify/cookie';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { IncomingMessage, ServerResponse } from 'http';
 import { getIronSession, type SessionOptions } from 'iron-session';
+import { eq } from 'drizzle-orm';
 import { parseUserToken } from './middleware/user';
 
 const cookieOptions: NonNullable<SessionOptions['cookieOptions']> = {
@@ -89,8 +91,14 @@ export async function saveSession(
       ua: session.client.ua,
     };
 
-    if (overwriteSessions) await replaceSessions(dbSession);
-    else await createSession(dbSession);
+    if (overwriteSessions) {
+      await db.transaction(async (tx) => {
+        await tx.delete(userSessions).where(eq(userSessions.userId, user.id));
+        await tx.insert(userSessions).values(dbSession);
+      });
+    } else {
+      await db.insert(userSessions).values(dbSession);
+    }
   }
 
   await session.save();

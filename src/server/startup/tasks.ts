@@ -1,5 +1,4 @@
 import { db } from '@/lib/db';
-import { getFiles } from '@/lib/db/models/file';
 import { thumbnails as thumbnailTable } from '@/lib/db/schema';
 import { Tasks } from '@/lib/tasks';
 import cleanThumbnails from '@/lib/tasks/run/cleanThumbnails';
@@ -47,15 +46,22 @@ export function startTasks(server: FastifyInstance) {
             let result: unknown = null;
             switch (message.command) {
               case 'file.thumbnailSource': {
-                const [file] = await getFiles([message.payload.id], { thumbnail: true, tags: false });
+                const file = await db.query.files.findFirst({
+                  where: { id: message.payload.id },
+                  with: { thumbnail: { columns: { path: true } } },
+                });
                 result = file ?? null;
                 break;
               }
               case 'thumbnail.byFile':
                 result =
-                  (await db.query.thumbnails.findFirst({
-                    where: eq(thumbnailTable.fileId, message.payload.fileId),
-                  })) ?? null;
+                  (
+                    await db
+                      .select()
+                      .from(thumbnailTable)
+                      .where(eq(thumbnailTable.fileId, message.payload.fileId))
+                      .limit(1)
+                  )[0] ?? null;
                 break;
               case 'thumbnail.create': {
                 const [created] = await db.insert(thumbnailTable).values(message.payload).returning();

@@ -4,10 +4,10 @@ import { bytes } from '@/lib/bytes';
 import { config } from '@/lib/config';
 import { hashPassword } from '@/lib/crypto';
 import { db } from '@/lib/db';
-import { removeFile, type FileInsert, lockFileOwner, updateFile } from '@/lib/db/models/file';
+import { removeFile, type FileInsert, updateFile } from '@/lib/db/models/file';
 import { getFolderMetadata } from '@/lib/db/models/folder';
-import { createIncompleteFile, completeChunk, updateIncompleteFile } from '@/lib/db/models/incompleteFile';
-import { files as fileTable } from '@/lib/db/schema';
+import { incompleteFileSchema } from '@/lib/db/models/incompleteFile';
+import { files as fileTable, incompleteFiles, users as userTable } from '@/lib/db/schema';
 import { getUser } from '@/lib/db/models/user';
 import { sanitizeFilename } from '@/lib/fs';
 import { log } from '@/lib/logger';
@@ -21,6 +21,7 @@ import { join } from 'path';
 import { createWorker } from '@/lib/worker';
 import { ApiUploadResponse } from '.';
 import type { DomainDbRequest, DomainDbResponse } from '@/offload/proxiedDb';
+import { eq, sql } from 'drizzle-orm';
 
 const logger = log('api').c('upload').c('partial');
 
@@ -330,7 +331,11 @@ export default typedPlugin(
           try {
             fileUpload = await db.transaction(async (tx) => {
               if (quotaUser?.quota) {
-                await lockFileOwner(quotaUser.id, tx);
+                await tx
+                  .select({ id: userTable.id })
+                  .from(userTable)
+                  .where(eq(userTable.id, quotaUser.id))
+                  .for('update');
 
                 const quotaCheck = await checkQuota(quotaUser, total, 1, tx);
                 if (quotaCheck !== true)
@@ -384,15 +389,34 @@ export default typedPlugin(
 
             switch (message.command) {
               case 'incomplete.create':
-                result = await createIncompleteFile(message.payload);
+                {
+                  const [created] = await db.insert(incompleteFiles).values(message.payload).returning();
+                  if (!created) throw new Error('Incomplete file insert did not return a row');
+                  result = incompleteFileSchema.parse(created);
+                }
                 break;
               case 'incomplete.increment':
-                result = await completeChunk(message.payload.id, message.payload.status);
+                {
+                  const [updated] = await db
+                    .update(incompleteFiles)
+                    .set({
+                      chunksComplete: sql`${incompleteFiles.chunksComplete} + 1`,
+                      status: message.payload.status,
+                    })
+                    .where(eq(incompleteFiles.id, message.payload.id))
+                    .returning();
+                  result = updated ? incompleteFileSchema.parse(updated) : null;
+                }
                 break;
               case 'incomplete.status':
-                result = await updateIncompleteFile(message.payload.id, {
-                  status: message.payload.status,
-                });
+                {
+                  const [updated] = await db
+                    .update(incompleteFiles)
+                    .set({ status: message.payload.status })
+                    .where(eq(incompleteFiles.id, message.payload.id))
+                    .returning();
+                  result = updated ? incompleteFileSchema.parse(updated) : null;
+                }
                 break;
               case 'file.finalizePartial':
                 result = await updateFile(message.payload.id, message.payload.changes);

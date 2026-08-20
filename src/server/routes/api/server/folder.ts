@@ -1,17 +1,18 @@
 import { ApiError } from '@/lib/api/errors';
-import { files as fileTable } from '@/lib/db/schema';
-import { File, formatFiles, countFiles, fileOrderBy, fileSchema, listFiles } from '@/lib/db/models/file';
+import { db } from '@/lib/db';
+import { File, fileSchema, formatFiles, listFiles } from '@/lib/db/models/file';
 import {
-  getPublicParentChain,
-  formatFolder,
   Folder,
+  formatFolder,
   getPublicFolder,
+  getPublicParentChain,
   publicFolderSchema,
 } from '@/lib/db/models/folder';
+import { files as fileTable } from '@/lib/db/schema';
 import { paginationQs } from '@/lib/validation';
 import typedPlugin from '@/server/typedPlugin';
-import z from 'zod';
 import { eq } from 'drizzle-orm';
+import z from 'zod';
 
 export type ApiServerFolderResponse = {
   folder: Partial<Folder>;
@@ -73,16 +74,17 @@ export default typedPlugin(
         }
 
         const where = eq(fileTable.folderId, folder.id);
-        const total = await countFiles(where);
+        const total = await db.$count(fileTable, where);
         const pages = total === 0 ? 0 : Math.ceil(total / perpage);
 
         const files = formatFiles(
           await listFiles({
-            where,
-            orderBy: fileOrderBy(sortBy, order),
+            password: true,
+            tags: false,
+            where: { folderId: folder.id },
+            orderBy: (file, { asc, desc }) => (order === 'asc' ? asc(file[sortBy]) : desc(file[sortBy])),
             offset: (Number(page) - 1) * perpage,
             limit: perpage,
-            tags: false,
           }),
           true,
         );

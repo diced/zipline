@@ -3,15 +3,13 @@ import { log } from '@/lib/logger';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { Pool, type ClientConfig } from 'pg';
-import * as relations from './relations';
-import * as schema from './schema';
+import { relations } from './relations';
 
 const building = !!process.env.ZIPLINE_BUILD;
 const logger = log('db');
-const databaseSchema = { ...schema, ...relations };
-
-export type Database = NodePgDatabase<typeof databaseSchema>;
+export type Database = NodePgDatabase<typeof relations>;
 export type Transaction = Parameters<Parameters<Database['transaction']>[0]>[0];
+export type DbClient = Database | Transaction;
 
 declare global {
   // eslint-disable-next-line no-var
@@ -34,8 +32,6 @@ export function postgresConnectionConfig(connectionString: string): ClientConfig
   const configuredOptions = url.searchParams.get('options')?.trim();
   const timezoneOption = '-c timezone=UTC';
 
-  // PostgreSQL timestamps are stored without a time zone. Keep every session in UTC so database
-  // defaults and JavaScript Date parameters represent the same wall-clock value on every host.
   url.searchParams.set(
     'options',
     configuredOptions ? `${configuredOptions} ${timezoneOption}` : timezoneOption,
@@ -63,7 +59,7 @@ function createDatabase() {
   logger.info('connecting to database');
 
   const pool = new Pool(postgresConnectionConfig(connectionString));
-  const db = drizzle({ client: pool, schema: databaseSchema, logger: queryLogger() });
+  const db = drizzle({ client: pool, relations, logger: queryLogger() });
   return { db, pool };
 }
 
@@ -74,15 +70,3 @@ if (!building && (!globalThis.__db__ || !globalThis.__dbPool__)) {
 }
 
 export const db = globalThis.__db__ as Database;
-export const pool = globalThis.__dbPool__ as Pool;
-
-export async function closeDatabase() {
-  if (!globalThis.__dbPool__) return;
-
-  const activePool = globalThis.__dbPool__;
-  globalThis.__db__ = undefined;
-  globalThis.__dbPool__ = undefined;
-  await activePool.end();
-}
-
-export { databaseSchema };

@@ -1,16 +1,11 @@
-import { db, type Database } from '@/lib/db';
-import { files, tags } from '@/lib/db/schema';
-import { and, eq, inArray } from 'drizzle-orm';
+import { db, type Database, type DbClient } from '@/lib/db';
+import { files, filesToTags, tags } from '@/lib/db/schema';
+import { and, countDistinct, eq, getTableColumns, inArray } from 'drizzle-orm';
 import type { PgUpdateSetSource } from 'drizzle-orm/pg-core';
 import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
-import type { DbClient } from './user';
 
-export type TagRow = typeof tags.$inferSelect;
-export type TagInsert = typeof tags.$inferInsert;
-export type TagUpdate = Pick<PgUpdateSetSource<typeof tags>, 'name' | 'color'>;
-export type TagPublicRow = Pick<TagRow, 'id' | 'createdAt' | 'updatedAt' | 'name' | 'color'>;
-export type TagWithFiles = TagPublicRow & { files: { id: string }[] };
+type TagUpdate = Pick<PgUpdateSetSource<typeof tags>, 'name' | 'color'>;
 
 type TagFindManyConfig = NonNullable<Parameters<Database['query']['tags']['findMany']>[0]>;
 export const tagColumns = {
@@ -20,67 +15,61 @@ export const tagColumns = {
   name: true,
   color: true,
 } as const satisfies NonNullable<TagFindManyConfig['columns']>;
+const { userId: _userId, ...publicTagColumns } = getTableColumns(tags);
 const tagFileRelations = {
-  fileTags: { columns: { fileId: true } },
+  files: { columns: { id: true } },
 } as const satisfies NonNullable<TagFindManyConfig['with']>;
 
-async function queryTagsWithFiles(where: TagFindManyConfig['where'], client: DbClient) {
+async function queryTagsWithFiles(where: NonNullable<TagFindManyConfig['where']>, client: DbClient) {
   return client.query.tags.findMany({ columns: tagColumns, where, with: tagFileRelations });
 }
 
-function mapTagFiles(row: Awaited<ReturnType<typeof queryTagsWithFiles>>[number]): TagWithFiles {
-  const { fileTags, ...tag } = row;
-  return { ...tag, files: fileTags.map(({ fileId }) => ({ id: fileId })) };
-}
-
 export async function listTags(userId: string, client: DbClient = db) {
-  return (await queryTagsWithFiles(eq(tags.userId, userId), client)).map(mapTagFiles);
+  return queryTagsWithFiles({ userId }, client);
 }
 
 export async function getOwnedTag(id: string, userId: string, client: DbClient = db) {
-  const [row] = await queryTagsWithFiles(and(eq(tags.id, id), eq(tags.userId, userId)), client);
-  return row ? mapTagFiles(row) : null;
+  const [row] = await queryTagsWithFiles({ id, userId }, client);
+  return row ?? null;
 }
 
 export async function getTagByName(name: string, userId?: string, client: DbClient = db) {
-  return (
-    (await client.query.tags.findFirst({
-      columns: tagColumns,
-      where: and(eq(tags.name, name), userId ? eq(tags.userId, userId) : undefined),
-    })) ?? null
-  );
+  const rows = await client
+    .select(publicTagColumns)
+    .from(tags)
+    .where(and(eq(tags.name, name), userId ? eq(tags.userId, userId) : undefined))
+    .limit(1);
+  return rows[0] ?? null;
 }
 
 export async function listOwnedTags(ids: string[], userId: string, client: DbClient = db) {
   if (!ids.length) return [];
-  return client.query.tags.findMany({
-    columns: tagColumns,
-    where: and(eq(tags.userId, userId), inArray(tags.id, ids)),
-  });
+  return client
+    .select(publicTagColumns)
+    .from(tags)
+    .where(and(eq(tags.userId, userId), inArray(tags.id, ids)));
 }
 
 export async function getCommonFileIds(ids: string[], userId: string, client: DbClient = db) {
-  const owned = await queryTagsWithFiles(and(eq(tags.userId, userId), inArray(tags.id, ids)), client);
-  if (owned.length !== ids.length) return null;
-  if (!owned.length) return [];
+  if (!ids.length) return [];
 
-  const byId = new Map(owned.map((tag) => [tag.id, tag.fileTags]));
-  const groups = ids.map((id) => new Set((byId.get(id) ?? []).map((link) => link.fileId)));
-  return [...groups[0]].filter((fileId) => groups.every((group) => group.has(fileId)));
-}
+  const ownedCount = await client.$count(tags, and(eq(tags.userId, userId), inArray(tags.id, ids)));
+  if (ownedCount !== ids.length) return null;
 
-export async function createTag(data: TagInsert, client: DbClient = db) {
-  const rows = await client.insert(tags).values(data).returning();
-  if (!rows[0]) throw new Error('Tag insert did not return a row');
-  const { userId: _, ...tag } = rows[0];
-  return { ...tag, files: [] } satisfies TagWithFiles;
+  const rows = await client
+    .select({ fileId: filesToTags.fileId })
+    .from(filesToTags)
+    .where(inArray(filesToTags.tagId, ids))
+    .groupBy(filesToTags.fileId)
+    .having(eq(countDistinct(filesToTags.tagId), ids.length));
+  return rows.map((row) => row.fileId);
 }
 
 export async function updateTag(id: string, data: TagUpdate, client: DbClient = db) {
   const rows = await client.update(tags).set(data).where(eq(tags.id, id)).returning();
   if (!rows[0]) return null;
-  const [updated] = await queryTagsWithFiles(eq(tags.id, id), client);
-  return updated ? mapTagFiles(updated) : null;
+  const [updated] = await queryTagsWithFiles({ id }, client);
+  return updated ?? null;
 }
 
 export async function removeOwnedTag(id: string, userId: string, client: DbClient = db) {

@@ -46,10 +46,11 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const credentials = await db.query.users.findFirst({
-          columns: { password: true },
-          where: eq(users.id, req.user.id),
-        });
+        const [credentials] = await db
+          .select({ password: users.password })
+          .from(users)
+          .where(eq(users.id, req.user.id))
+          .limit(1);
         if (!credentials) throw new Error(`User ${req.user.id} no longer exists`);
         const { password } = credentials;
 

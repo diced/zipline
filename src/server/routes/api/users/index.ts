@@ -1,14 +1,16 @@
 import { ApiError } from '@/lib/api/errors';
 import { config } from '@/lib/config';
 import { createToken, hashPassword } from '@/lib/crypto';
+import { db } from '@/lib/db';
 import { Role } from '@/lib/db/enums';
 import {
-  createUserSummary,
+  getUserSummary,
   listUsers,
   usernameExists,
   type LimitedUser,
   limitedUserSchema,
 } from '@/lib/db/models/user';
+import { users as userTable } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { canInteract, interactableRoles } from '@/lib/role';
@@ -96,13 +98,19 @@ export default typedPlugin(
 
         if (role && !canInteract(req.user.role, role)) throw new ApiError(3008);
 
-        const user = await createUserSummary({
-          username,
-          password: await hashPassword(password),
-          role: role,
-          avatar: avatar64 ?? null,
-          token: createToken(),
-        });
+        const [created] = await db
+          .insert(userTable)
+          .values({
+            username,
+            password: await hashPassword(password),
+            role: role,
+            avatar: avatar64 ?? null,
+            token: createToken(),
+          })
+          .returning({ id: userTable.id });
+        if (!created) throw new Error('User insert did not return a row');
+        const user = await getUserSummary(created.id);
+        if (!user) throw new Error('Inserted user could not be read back');
 
         logger.info(`${req.user.username} created a new user`, {
           username: user.username,

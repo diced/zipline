@@ -1,6 +1,16 @@
 import { ApiError } from '@/lib/api/errors';
 import { db } from '@/lib/db';
-import { countServerResources, listExportUsers } from '@/lib/db/models/serverData';
+import { listExportUsers } from '@/lib/db/models/serverData';
+import {
+  files as fileRecords,
+  folders as folderRecords,
+  invites as inviteRecords,
+  metrics as metricRecords,
+  thumbnails as thumbnailRecords,
+  urls as urlRecords,
+  users as userRecords,
+  zipline,
+} from '@/lib/db/schema';
 import { Export4, export4Schema } from '@/lib/import/version4/validateExport';
 import { log } from '@/lib/logger';
 import { administratorMiddleware } from '@/server/middleware/administrator';
@@ -52,14 +62,22 @@ export default typedPlugin(
         if (req.user.role !== 'SUPERADMIN') throw new ApiError(3015);
 
         if (req.query.counts) {
-          const counts = await countServerResources();
+          const [users, files, urls, folders, invites, thumbnails, metrics] = await Promise.all([
+            db.$count(userRecords),
+            db.$count(fileRecords),
+            db.$count(urlRecords),
+            db.$count(folderRecords),
+            db.$count(inviteRecords),
+            db.$count(thumbnailRecords),
+            db.$count(metricRecords),
+          ]);
 
-          return res.send(counts);
+          return res.send({ users, files, urls, folders, invites, thumbnails, metrics });
         }
 
         logger.debug('exporting server data', { format: '4', requester: req.user.username });
 
-        const settingsTable = await db.query.zipline.findFirst();
+        const [settingsTable] = await db.select().from(zipline).limit(1);
         if (!settingsTable) throw new ApiError(1023);
 
         const env = Object.fromEntries(
@@ -206,7 +224,7 @@ export default typedPlugin(
           }
         }
 
-        const files = await db.query.files.findMany();
+        const files = await db.select().from(fileRecords);
 
         for (const file of files) {
           if (!file.userId)
@@ -232,7 +250,7 @@ export default typedPlugin(
           });
         }
 
-        const thumbnails = await db.query.thumbnails.findMany();
+        const thumbnails = await db.select().from(thumbnailRecords);
 
         for (const thumbnail of thumbnails) {
           export4.data.thumbnails.push({
@@ -246,7 +264,7 @@ export default typedPlugin(
         }
 
         if (req.query.nometrics === undefined) {
-          const metrics = await db.query.metrics.findMany();
+          const metrics = await db.select().from(metricRecords);
 
           export4.data.metrics = metrics.map((metric) => ({
             createdAt: metric.createdAt.toISOString(),

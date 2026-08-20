@@ -44,10 +44,7 @@ export async function getMetricsPoints(from?: Date, to?: Date): Promise<MetricsP
 
 export async function getLatestMetricsPoint(from?: Date, to?: Date): Promise<Metric | null> {
   const dateRange = from && to ? and(gte(metrics.createdAt, from), lte(metrics.createdAt, to)) : undefined;
-  const row = await db.query.metrics.findFirst({
-    where: dateRange,
-    orderBy: desc(metrics.createdAt),
-  });
+  const [row] = await db.select().from(metrics).where(dateRange).orderBy(desc(metrics.createdAt)).limit(1);
   return row ? metricSchema.parse(row) : null;
 }
 

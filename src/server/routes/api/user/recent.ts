@@ -1,9 +1,7 @@
-import { files as fileTable } from '@/lib/db/schema';
 import { File, formatFiles, fileSchema, listFiles } from '@/lib/db/models/file';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
 import z from 'zod';
-import { desc, eq } from 'drizzle-orm';
 
 export type ApiUserRecentResponse = File[];
 
@@ -30,8 +28,9 @@ export default typedPlugin(
 
         const files = formatFiles(
           await listFiles({
-            where: eq(fileTable.userId, req.user.id),
-            orderBy: desc(fileTable.createdAt),
+            password: true,
+            where: { userId: req.user.id },
+            orderBy: { createdAt: 'desc' },
             limit: take,
           }),
         );

@@ -2,10 +2,8 @@ import { ApiError } from '@/lib/api/errors';
 import { config } from '@/lib/config';
 import { db } from '@/lib/db';
 import { Invite } from '@/lib/db/models/invite';
-import { invites } from '@/lib/db/schema';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import typedPlugin from '@/server/typedPlugin';
-import { eq, or } from 'drizzle-orm';
 import z from 'zod';
 
 export type ApiAuthInvitesWebResponse = Pick<Invite, 'code' | 'maxUses' | 'uses'> & {
@@ -47,7 +45,7 @@ export default typedPlugin(
 
         const invite = await db.query.invites.findFirst({
           columns: { code: true, maxUses: true, uses: true, expiresAt: true },
-          where: or(eq(invites.id, code), eq(invites.code, code)),
+          where: { OR: [{ id: code }, { code }] },
           with: { inviter: { columns: { username: true } } },
         });
 

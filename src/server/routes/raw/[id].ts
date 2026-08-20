@@ -3,7 +3,7 @@ import { ApiError } from '@/lib/api/errors';
 import { parseRange } from '@/lib/api/range';
 import { config } from '@/lib/config';
 import { datasource } from '@/lib/datasource';
-import { removeFile, getFileByName, incrementFileViews } from '@/lib/db/models/file';
+import { getFileByName, removeFile } from '@/lib/db/models/file';
 import { getPublicThumbnail } from '@/lib/db/models/thumbnail';
 import { sanitizeFilename } from '@/lib/fs';
 import { log } from '@/lib/logger';
@@ -12,6 +12,9 @@ import { setContentSecurity } from '@/lib/api/contentSecurity';
 import { TimedCache } from '@/lib/timedCache';
 import typedPlugin from '@/server/typedPlugin';
 import { FastifyReply, FastifyRequest } from 'fastify';
+import { db } from '@/lib/db';
+import { files } from '@/lib/db/schema';
+import { eq, sql } from 'drizzle-orm';
 
 const VIEW_WINDOW = 5 * 1000;
 const viewsCache = new TimedCache<string, number>(VIEW_WINDOW);
@@ -62,7 +65,7 @@ export const rawFileHandler = async (
       .send(buf);
   }
 
-  const file = await getFileByName(idSanitized, { thumbnail: false, tags: false });
+  const file = await getFileByName(idSanitized);
   if (!file) return res.callNotFound();
 
   if (file?.deletesAt && file.deletesAt <= new Date()) {
@@ -109,7 +112,10 @@ export const rawFileHandler = async (
     viewsCache.set(key, now);
 
     try {
-      await incrementFileViews(file.id);
+      await db
+        .update(files)
+        .set({ views: sql`${files.views} + 1` })
+        .where(eq(files.id, file.id));
     } catch (e) {
       logger.error('failed to increment view counter', { id: file.id }).error(e as Error);
     }

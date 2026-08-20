@@ -1,9 +1,7 @@
-import { db } from '@/lib/db';
 import { userPasskeys } from '@/lib/db/schema';
-import { sql } from 'drizzle-orm';
+import { getTableColumns } from 'drizzle-orm';
 import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
-import type { DbClient } from './user';
 
 const byteSchema = z.number().int().min(0).max(255);
 
@@ -30,10 +28,5 @@ export type PasskeyReg = z.infer<typeof passkeyRegSchema>;
 export const userPasskeySchema = createSelectSchema(userPasskeys, { reg: z.unknown() });
 export type UserPasskey = typeof userPasskeys.$inferSelect;
 
-export async function getPasskeyByCredential(credentialId: string, client: DbClient = db) {
-  return (
-    (await client.query.userPasskeys.findFirst({
-      where: sql`${userPasskeys.reg} #>> '{webauthn,id}' = ${credentialId}`,
-    })) ?? null
-  );
-}
+const { reg: _reg, ...publicPasskeyColumns } = getTableColumns(userPasskeys);
+export { publicPasskeyColumns };

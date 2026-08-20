@@ -1,11 +1,9 @@
-import { db, type Database, type Transaction } from '@/lib/db';
+import { db, type DbClient, type Transaction } from '@/lib/db';
 import { zipline } from '@/lib/db/schema';
-import { first } from '@/lib/db/utils';
 import { eq, getTableColumns } from 'drizzle-orm';
 import type { PgUpdateSetSource } from 'drizzle-orm/pg-core';
 import { resolve } from 'node:path';
 
-type DbClient = Database | Transaction;
 type ZiplineRow = typeof zipline.$inferSelect;
 
 const {
@@ -62,7 +60,7 @@ function normalizeSettingsArrays<T extends SettingsWithNullableArrays>(row: T) {
 }
 
 export async function getSettingsRow(client: DbClient = db) {
-  const existing = await client.query.zipline.findFirst();
+  const existing = (await client.select().from(zipline).limit(1))[0];
   return existing ? normalizeSettingsArrays(existing) : null;
 }
 
@@ -70,15 +68,13 @@ export async function ensureSettingsRow(client: DbClient = db) {
   const existing = await getSettingsRow(client);
   if (existing) return existing;
 
-  const created = first(await client.insert(zipline).values(initialSettings).returning());
+  const created = (await client.insert(zipline).values(initialSettings).returning())[0];
   if (!created) throw new Error('Failed to create the Zipline settings row');
   return normalizeSettingsArrays(created);
 }
 
 export async function getSettings(client: DbClient = db): Promise<DatabaseSettings | null> {
-  const settings = await client.query.zipline.findFirst({
-    columns: { id: false, createdAt: false, updatedAt: false, firstSetup: false },
-  });
+  const settings = (await client.select(databaseSettingsColumns).from(zipline).limit(1))[0];
   if (!settings) return null;
 
   return normalizeSettingsArrays(settings);
@@ -104,13 +100,13 @@ export async function updateSettings(
   values: DatabaseSettingsUpdate,
   client: DbClient = db,
 ): Promise<DatabaseSettings | null> {
-  const updated = first(
+  const updated = (
     await client
       .update(zipline)
       .set(values)
       .where(eq(zipline.id, settingsId))
-      .returning(databaseSettingsColumns),
-  );
+      .returning(databaseSettingsColumns)
+  )[0];
 
   return updated ? normalizeSettingsArrays(updated) : null;
 }

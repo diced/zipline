@@ -41,10 +41,11 @@ export default typedPlugin(
         ...secondlyRatelimit(2),
       },
       async (req, res) => {
-        const url = await db.query.urls.findFirst({
-          columns: { id: true, password: true },
-          where: or(eq(urls.id, req.params.id), eq(urls.code, req.params.id), eq(urls.vanity, req.params.id)),
-        });
+        const [url] = await db
+          .select({ id: urls.id, password: urls.password })
+          .from(urls)
+          .where(or(eq(urls.id, req.params.id), eq(urls.code, req.params.id), eq(urls.vanity, req.params.id)))
+          .limit(1);
         if (!url) throw new ApiError(9002);
         if (!url.password) throw new ApiError(9002);
 

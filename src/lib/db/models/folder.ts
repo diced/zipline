@@ -1,225 +1,142 @@
-import { db, type Database } from '@/lib/db';
-import { files, folders, users } from '@/lib/db/schema';
-import { and, asc, desc, eq, inArray, isNull, or, sql, type SQL } from 'drizzle-orm';
+import { db, type Database, type DbClient } from '@/lib/db';
+import { files, folders } from '@/lib/db/schema';
+import { and, eq, inArray, sql } from 'drizzle-orm';
 import type { PgUpdateSetSource } from 'drizzle-orm/pg-core';
 import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 import {
   formatFiles,
-  defaultFileRelationConfig,
+  fileListRelations,
   filePasswordScalarConfig,
   fileSchema,
-  mapFileTags,
   updateFiles,
-  type PasswordProjectedFile,
-  type PasswordProjectedFileRelationResult,
+  type ProjectedFile,
 } from './file';
-import type { DbClient } from './user';
 
-export type FolderRow = typeof folders.$inferSelect;
-export type FolderInsert = typeof folders.$inferInsert;
-export type FolderUpdate = Omit<
-  PgUpdateSetSource<typeof folders>,
-  'id' | 'createdAt' | 'updatedAt' | 'userId'
->;
-export type FolderOwner = Pick<typeof users.$inferSelect, 'id' | 'role'>;
-export type PublicFolderChild = Pick<FolderRow, 'id' | 'name' | 'createdAt' | 'updatedAt' | 'public'> & {
-  _count?: { children?: number; files?: number };
-};
+type FolderRow = typeof folders.$inferSelect;
+type FolderInsert = typeof folders.$inferInsert;
+type FolderUpdate = Omit<PgUpdateSetSource<typeof folders>, 'id' | 'createdAt' | 'updatedAt' | 'userId'>;
 
-export type FolderParent = {
+type FolderParent = {
   id: string;
   name: string;
   parentId: string | null;
   parent?: FolderParent | null;
 };
 
-export type FolderParentPublic = FolderParent & { public: boolean; parent?: FolderParentPublic | null };
+type FolderParentPublic = FolderParent & { public: boolean; parent?: FolderParentPublic | null };
 
-export type FolderResult = FolderRow & {
-  files?: PasswordProjectedFile[];
-  parent?: FolderParent | FolderParentPublic | null;
-  children?: ((FolderRow | PublicFolderChild) & {
-    _count?: { children?: number; files?: number };
+type FolderCount = { children: number; files: number };
+
+type FolderSummary = FolderRow & {
+  parent: FolderParent | null;
+  _count: FolderCount;
+  files?: ProjectedFile[];
+};
+
+type FolderDetail = FolderSummary & {
+  children: (FolderRow & { _count: FolderCount })[];
+};
+
+type PublicFolder = FolderRow & {
+  parent: FolderParentPublic | null;
+  children: (Pick<FolderRow, 'id' | 'name' | 'createdAt' | 'updatedAt' | 'public'> & {
+    _count: FolderCount;
   })[];
-  _count?: { children?: number; files?: number };
-  User?: FolderOwner;
-};
-
-const folderCountExtras = {
-  childrenCount: sql<number>`(
-    select count(*)::int
-    from "Folder" as "countedChildren"
-    where "countedChildren"."parentId" = ${folders.id}
-  )`.as('childrenCount'),
-  filesCount: sql<number>`(
-    select count(*)::int
-    from "File" as "countedFiles"
-    where "countedFiles"."folderId" = ${folders.id}
-  )`.as('filesCount'),
-};
-
-type FolderQueryOptions = {
-  where?: SQL;
-  orderBy?: SQL | SQL[];
-  offset?: number;
-  limit?: number;
-  files?: boolean;
-  children?: boolean;
-  publicChildrenOnly?: boolean;
-  parent?: boolean;
-  publicParentOnly?: boolean;
-  counts?: boolean;
-  childrenCounts?: boolean;
 };
 
 type FolderFindManyConfig = NonNullable<Parameters<Database['query']['folders']['findMany']>[0]>;
-type FolderWith = NonNullable<FolderFindManyConfig['with']>;
+type FolderQueryOptions = Pick<FolderFindManyConfig, 'where' | 'orderBy' | 'limit' | 'offset'>;
 
-function folderRelationConfig(options: FolderQueryOptions) {
-  return {
-    files: options.files
-      ? {
-          ...filePasswordScalarConfig,
-          orderBy: desc(files.createdAt),
-          with: defaultFileRelationConfig,
-        }
-      : undefined,
-    parent: options.parent
-      ? {
-          columns: options.publicParentOnly
-            ? {
-                id: true as const,
-                name: true as const,
-                parentId: true as const,
-                public: true as const,
-              }
-            : {
-                id: true as const,
-                name: true as const,
-                parentId: true as const,
-              },
-        }
-      : undefined,
-    children: options.children
-      ? {
-          where: options.publicChildrenOnly ? eq(folders.public, true) : undefined,
-          orderBy: desc(folders.createdAt),
-          columns: options.publicChildrenOnly
-            ? {
-                id: true as const,
-                name: true as const,
-                createdAt: true as const,
-                updatedAt: true as const,
-                public: true as const,
-              }
-            : undefined,
-          extras: folderCountExtras,
-        }
-      : undefined,
-  } satisfies FolderWith;
-}
+// TODO: i dont like this but whatever
+const folderCountExtras = {
+  childrenCount: (folder) => sql<number>`(
+      select count(*)::int
+      from "Folder" as "countedChildren"
+      where "countedChildren"."parentId" = ${folder.id}
+    )`,
+  filesCount: (folder) => sql<number>`(
+      select count(*)::int
+      from "File" as "countedFiles"
+      where "countedFiles"."folderId" = ${folder.id}
+    )`,
+} as const satisfies NonNullable<FolderFindManyConfig['extras']>;
 
-async function queryFolderRelations(options: FolderQueryOptions, client: DbClient) {
+const folderParentColumns = { id: true, name: true, parentId: true } as const;
+
+const folderFilesConfig = {
+  ...filePasswordScalarConfig,
+  orderBy: { createdAt: 'desc' },
+  with: fileListRelations,
+} as const;
+
+const folderChildrenConfig = {
+  orderBy: { createdAt: 'desc' },
+  extras: folderCountExtras,
+} as const;
+
+async function queryFolderSummaries(options: FolderQueryOptions, client: DbClient) {
   return client.query.folders.findMany({
-    where: options.where,
-    orderBy: options.orderBy,
-    offset: options.offset,
-    limit: options.limit,
-    with: folderRelationConfig(options),
+    ...options,
     extras: folderCountExtras,
+    with: { parent: { columns: folderParentColumns } },
   });
 }
 
-type FolderRelationResult = Awaited<ReturnType<typeof queryFolderRelations>>[number];
-
-function hasDefaultFileRelations(
-  file: NonNullable<FolderRelationResult['files']>[number],
-): file is PasswordProjectedFileRelationResult {
-  return 'fileTags' in file && 'thumbnail' in file;
+async function queryFolderSummariesWithFiles(options: FolderQueryOptions, client: DbClient) {
+  return client.query.folders.findMany({
+    ...options,
+    extras: folderCountExtras,
+    with: { parent: { columns: folderParentColumns }, files: folderFilesConfig },
+  });
 }
 
-function mapFolderFile(file: NonNullable<FolderRelationResult['files']>[number]): PasswordProjectedFile {
-  if (!hasDefaultFileRelations(file)) throw new Error('Folder file relations were not selected');
-
-  return mapFileTags(file);
+function mapCounts<T extends { childrenCount: number; filesCount: number }>(row: T) {
+  const { childrenCount, filesCount, ...rest } = row;
+  return { ...rest, _count: { children: childrenCount, files: filesCount } };
 }
 
-function mapFolderParent(
-  parent: FolderRelationResult['parent'],
-  publicOnly: boolean,
-): FolderParent | FolderParentPublic | null {
-  if (!parent) return null;
-  if (!publicOnly) return { id: parent.id, name: parent.name, parentId: parent.parentId };
-  if (!('public' in parent) || !parent.public) return null;
-  return { id: parent.id, name: parent.name, parentId: parent.parentId, public: true };
+type FolderSummaryRow = Awaited<ReturnType<typeof queryFolderSummaries>>[number];
+
+function mapFolderSummary(row: FolderSummaryRow): FolderSummary {
+  return mapCounts(row);
 }
 
-function mapFolderRelations(
-  row: FolderRelationResult,
-  options: {
-    files?: boolean;
-    children?: boolean;
-    publicParentOnly?: boolean;
-    parent?: boolean;
-    counts?: boolean;
-    childrenCounts?: boolean;
-  },
-): FolderResult {
-  const { files: relatedFiles, parent, children, childrenCount, filesCount, ...folder } = row;
-
-  const result: FolderResult = {
-    ...folder,
-    ...(options.files && {
-      files: (relatedFiles ?? []).map(mapFolderFile),
-    }),
-    ...(options.parent && {
-      parent: mapFolderParent(parent, !!options.publicParentOnly),
-    }),
-    ...(options.children && {
-      children: (children ?? []).map((row) => {
-        const { childrenCount, filesCount, ...child } = {
-          childrenCount: undefined,
-          filesCount: undefined,
-          ...row,
-        };
-        return {
-          ...child,
-          ...((options.childrenCounts ?? options.counts) && {
-            _count: { children: childrenCount ?? 0, files: filesCount ?? 0 },
-          }),
-        };
-      }),
-    }),
-    ...(options.counts && {
-      _count: { children: childrenCount ?? 0, files: filesCount ?? 0 },
-    }),
-  };
-  return result;
+function mapFolderSummaryWithFiles(
+  row: Awaited<ReturnType<typeof queryFolderSummariesWithFiles>>[number],
+): FolderSummary {
+  return mapCounts(row);
 }
 
 export async function getFolderMetadata(id: string, client: DbClient = db) {
-  return (
-    (await client.query.folders.findFirst({
-      columns: { id: true, name: true, userId: true, allowUploads: true },
-      where: eq(folders.id, id),
-    })) ?? null
-  );
+  const rows = await client
+    .select({
+      id: folders.id,
+      name: folders.name,
+      userId: folders.userId,
+      allowUploads: folders.allowUploads,
+    })
+    .from(folders)
+    .where(eq(folders.id, id))
+    .limit(1);
+  return rows[0] ?? null;
 }
 
 export async function getOwnedFolder(id: string, userId: string, client: DbClient = db) {
-  return (
-    (await client.query.folders.findFirst({
-      where: and(eq(folders.id, id), eq(folders.userId, userId)),
-    })) ?? null
-  );
+  const rows = await client
+    .select()
+    .from(folders)
+    .where(and(eq(folders.id, id), eq(folders.userId, userId)))
+    .limit(1);
+  return rows[0] ?? null;
 }
 
 export async function getFolderWithOwner(id: string, client: DbClient = db) {
   const row = await client.query.folders.findFirst({
-    where: eq(folders.id, id),
+    columns: { id: true, userId: true },
+    where: { id },
     with: {
-      User: {
+      user: {
         columns: { id: true, role: true },
       },
     },
@@ -231,96 +148,101 @@ export async function listFolders(
   userId: string,
   options: { root?: boolean; parentId?: string; includeFiles?: boolean } = {},
   client: DbClient = db,
-) {
-  const rows = await queryFolderRelations(
-    {
-      where: and(
-        eq(folders.userId, userId),
-        options.root ? isNull(folders.parentId) : undefined,
-        options.parentId ? eq(folders.parentId, options.parentId) : undefined,
-      ),
-      orderBy: desc(folders.createdAt),
-      files: options.includeFiles,
-      parent: true,
-      counts: true,
+): Promise<FolderSummary[]> {
+  const query: FolderQueryOptions = {
+    where: {
+      AND: [
+        { userId },
+        ...(options.root ? [{ parentId: { isNull: true } } as const] : []),
+        ...(options.parentId ? [{ parentId: options.parentId }] : []),
+      ],
     },
-    client,
-  );
-  return rows.map((row) =>
-    mapFolderRelations(row, { files: options.includeFiles, parent: true, counts: true }),
-  );
+    orderBy: { createdAt: 'desc' },
+  };
+  if (options.includeFiles) {
+    return (await queryFolderSummariesWithFiles(query, client)).map(mapFolderSummaryWithFiles);
+  }
+  return (await queryFolderSummaries(query, client)).map(mapFolderSummary);
 }
 
-export async function getFolder(id: string, includeFiles = true, client: DbClient = db) {
-  const [row] = await queryFolderRelations(
-    {
-      where: eq(folders.id, id),
-      limit: 1,
-      files: includeFiles,
-      children: true,
-      parent: true,
-      counts: true,
-      childrenCounts: true,
+export async function getFolder(
+  id: string,
+  includeFiles = true,
+  client: DbClient = db,
+): Promise<FolderDetail | null> {
+  if (includeFiles) {
+    const row = await client.query.folders.findFirst({
+      where: { id },
+      extras: folderCountExtras,
+      with: {
+        parent: { columns: folderParentColumns },
+        children: folderChildrenConfig,
+        files: folderFilesConfig,
+      },
+    });
+    if (!row) return null;
+    const { children, ...rest } = row;
+    return { ...mapCounts(rest), children: children.map(mapCounts) };
+  }
+
+  const row = await client.query.folders.findFirst({
+    where: { id },
+    extras: folderCountExtras,
+    with: {
+      parent: { columns: folderParentColumns },
+      children: folderChildrenConfig,
     },
-    client,
-  );
-  return row
-    ? mapFolderRelations(row, {
-        files: includeFiles,
-        children: true,
-        parent: true,
-        counts: true,
-        childrenCounts: true,
-      })
-    : null;
+  });
+  if (!row) return null;
+  const { children, ...rest } = row;
+  return { ...mapCounts(rest), children: children.map(mapCounts) };
 }
 
-export async function getPublicFolder(identifier: string, client: DbClient = db) {
-  const [row] = await queryFolderRelations(
-    {
-      where: or(eq(folders.id, identifier), eq(folders.name, identifier)),
-      limit: 1,
-      children: true,
-      publicChildrenOnly: true,
-      childrenCounts: true,
-      parent: true,
-      publicParentOnly: true,
+export async function getPublicFolder(
+  identifier: string,
+  client: DbClient = db,
+): Promise<PublicFolder | null> {
+  const row = await client.query.folders.findFirst({
+    where: { OR: [{ id: identifier }, { name: identifier }] },
+    with: {
+      parent: { columns: { ...folderParentColumns, public: true } },
+      children: {
+        ...folderChildrenConfig,
+        where: { public: true },
+        columns: { id: true, name: true, createdAt: true, updatedAt: true, public: true },
+      },
     },
-    client,
-  );
-  return row
-    ? mapFolderRelations(row, {
-        children: true,
-        childrenCounts: true,
-        parent: true,
-        publicParentOnly: true,
-      })
-    : null;
+  });
+  if (!row) return null;
+  const { children, parent, ...rest } = row;
+  return {
+    ...rest,
+    parent: parent?.public ? parent : null,
+    children: children.map(mapCounts),
+  };
 }
 
-export async function createFolder(data: FolderInsert, fileIds: string[] = []) {
+export async function createFolder(data: FolderInsert, fileIds: string[] = []): Promise<FolderSummary> {
   return db.transaction(async (tx) => {
-    const rows = await tx.insert(folders).values(data).returning();
+    const rows = await tx.insert(folders).values(data).returning({ id: folders.id });
     const row = rows[0];
     if (!row) throw new Error('Folder insert did not return a row');
     if (fileIds.length) await updateFiles(fileIds, { folderId: row.id }, data.userId, tx);
-    const [created] = await queryFolderRelations(
-      { where: eq(folders.id, row.id), limit: 1, files: true, parent: true, counts: true },
-      tx,
-    );
+    const [created] = await queryFolderSummariesWithFiles({ where: { id: row.id }, limit: 1 }, tx);
     if (!created) throw new Error('Inserted folder could not be read back');
-    return mapFolderRelations(created, { files: true, parent: true, counts: true });
+    return mapFolderSummaryWithFiles(created);
   });
 }
 
+async function getFolderSummary(id: string, client: DbClient) {
+  const [row] = await queryFolderSummaries({ where: { id }, limit: 1 }, client);
+  return row ? mapFolderSummary(row) : null;
+}
+
 export async function updateFolder(id: string, data: FolderUpdate, client: DbClient = db) {
-  const rows = await client.update(folders).set(data).where(eq(folders.id, id)).returning();
+  const rows = await client.update(folders).set(data).where(eq(folders.id, id)).returning({ id: folders.id });
   if (!rows[0]) return null;
-  const [updated] = await queryFolderRelations(
-    { where: eq(folders.id, id), limit: 1, parent: true, counts: true },
-    client,
-  );
-  return updated ? mapFolderRelations(updated, { parent: true, counts: true }) : null;
+  return getFolderSummary(id, client);
 }
 
 export async function addFile(fileId: string, folderId: string, client: DbClient = db) {
@@ -330,11 +252,7 @@ export async function addFile(fileId: string, folderId: string, client: DbClient
     .where(eq(files.id, fileId))
     .returning({ id: files.id });
   if (!rows[0]) return null;
-  const [folder] = await queryFolderRelations(
-    { where: eq(folders.id, folderId), limit: 1, parent: true, counts: true },
-    client,
-  );
-  return folder ? mapFolderRelations(folder, { parent: true, counts: true }) : null;
+  return getFolderSummary(folderId, client);
 }
 
 export async function removeFile(fileId: string, folderId: string, client: DbClient = db) {
@@ -344,11 +262,7 @@ export async function removeFile(fileId: string, folderId: string, client: DbCli
     .where(and(eq(files.id, fileId), eq(files.folderId, folderId)))
     .returning({ id: files.id });
   if (!rows[0]) return null;
-  const [folder] = await queryFolderRelations(
-    { where: eq(folders.id, folderId), limit: 1, parent: true, counts: true },
-    client,
-  );
-  return folder ? mapFolderRelations(folder, { parent: true, counts: true }) : null;
+  return getFolderSummary(folderId, client);
 }
 
 type FolderAncestorRow = Pick<FolderRow, 'id' | 'name' | 'parentId' | 'public' | 'userId'> & {
@@ -445,10 +359,13 @@ export async function getOwnedTree(
   userId: string,
   client: DbClient = db,
 ): Promise<FolderTree | null> {
+  const descendantIds = await folderDescendantIds(folderId, client);
+  if (!descendantIds.length) return null;
+
   const rows = await client.query.folders.findMany({
     columns: { id: true, name: true, parentId: true },
-    where: eq(folders.userId, userId),
-    orderBy: asc(folders.createdAt),
+    where: { userId, id: { in: descendantIds } },
+    orderBy: { createdAt: 'asc' },
     with: {
       files: { columns: { id: true, name: true } },
     },
@@ -512,19 +429,11 @@ export async function removeFolder(
       const deleteFiles = action === 'cascade-files';
       const descendantIds = await folderDescendantIds(folderId, tx);
       if (deleteFiles && descendantIds.length) {
-        const fileRows = await tx.query.files.findMany({
-          columns: { id: true, name: true },
-          where: inArray(files.folderId, descendantIds),
-        });
-        fileNames.push(...fileRows.map((file) => file.name));
-        if (fileRows.length) {
-          await tx.delete(files).where(
-            inArray(
-              files.id,
-              fileRows.map((file) => file.id),
-            ),
-          );
-        }
+        const deletedFiles = await tx
+          .delete(files)
+          .where(inArray(files.folderId, descendantIds))
+          .returning({ name: files.name });
+        fileNames.push(...deletedFiles.map((file) => file.name));
       }
       if (descendantIds.length) await tx.delete(folders).where(inArray(folders.id, descendantIds));
       return { success: true, isCascade: true, fileNames };

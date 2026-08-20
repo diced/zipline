@@ -1,7 +1,7 @@
 import { ApiError } from '@/lib/api/errors';
 import { hashPassword } from '@/lib/crypto';
 import { db } from '@/lib/db';
-import { removeUserUrl, updateUserUrl, Url, urlSchema } from '@/lib/db/models/url';
+import { publicUrlColumns, Url, urlSchema } from '@/lib/db/models/url';
 import { urls } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { zStringTrimmed } from '@/lib/validation';
@@ -19,12 +19,12 @@ const paramsSchema = z.object({
 });
 
 async function getUserUrl(id: string, userId: string) {
-  return (
-    (await db.query.urls.findFirst({
-      columns: { password: false, userId: false },
-      where: and(eq(urls.id, id), eq(urls.userId, userId)),
-    })) ?? null
-  );
+  const rows = await db
+    .select(publicUrlColumns)
+    .from(urls)
+    .where(and(eq(urls.id, id), eq(urls.userId, userId)))
+    .limit(1);
+  return rows[0] ?? null;
 }
 
 export const PATH = '/api/user/urls/:id';
@@ -93,13 +93,22 @@ export default typedPlugin(
           if ((await db.$count(urls, eq(urls.vanity, req.body.vanity))) > 0) throw new ApiError(1041);
         }
 
-        const updatedUrl = await updateUserUrl(id, req.user.id, {
+        const changes = {
           ...(req.body.vanity !== undefined && { vanity: req.body.vanity }),
           ...(req.body.password !== undefined && { password }),
           ...(req.body.maxViews !== undefined && { maxViews: req.body.maxViews }),
           ...(req.body.destination !== undefined && { destination: req.body.destination }),
           ...(req.body.enabled !== undefined && { enabled: req.body.enabled }),
-        });
+        };
+        const updatedUrl = Object.keys(changes).length
+          ? (
+              await db
+                .update(urls)
+                .set(changes)
+                .where(and(eq(urls.id, id), eq(urls.userId, req.user.id)))
+                .returning(publicUrlColumns)
+            )[0]
+          : url;
         if (!updatedUrl) throw new ApiError(9002);
 
         logger.info(`${req.user.username} updated URL ${updatedUrl.id}`, {
@@ -125,7 +134,12 @@ export default typedPlugin(
       async (req, res) => {
         const { id } = req.params;
 
-        const deletedUrl = await removeUserUrl(id, req.user.id);
+        const deletedUrl = (
+          await db
+            .delete(urls)
+            .where(and(eq(urls.id, id), eq(urls.userId, req.user.id)))
+            .returning(publicUrlColumns)
+        )[0];
         if (!deletedUrl) throw new ApiError(9002);
 
         logger.info(`${req.user.username} deleted URL ${deletedUrl.id}`, {

@@ -3,7 +3,7 @@ import { ziplineClientParseSchema } from '@/lib/api/detect';
 import { config } from '@/lib/config';
 import { createToken } from '@/lib/crypto';
 import { db } from '@/lib/db';
-import { getPasskeyByCredential, passkeyRegSchema, type PasskeyReg } from '@/lib/db/models/passkey';
+import { passkeyRegSchema, type PasskeyReg } from '@/lib/db/models/passkey';
 import { getUser, type User, userSchema } from '@/lib/db/models/user';
 import { userPasskeys } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
@@ -17,7 +17,7 @@ import {
   PublicKeyCredentialRequestOptionsJSON,
   verifyAuthenticationResponse,
 } from '@simplewebauthn/server';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import z from 'zod';
 import { passkeysEnabledHandler } from '../user/mfa/passkey';
 
@@ -138,7 +138,13 @@ export default typedPlugin(
         const cachedOptions = OPTIONS_CACHE.get(webauthnChallengeId);
         if (!cachedOptions) throw new ApiError(1048);
 
-        const passkey = await getPasskeyByCredential(response.id);
+        const passkey = (
+          await db
+            .select()
+            .from(userPasskeys)
+            .where(sql`${userPasskeys.reg} #>> '{webauthn,id}' = ${response.id}`)
+            .limit(1)
+        )[0];
         const user = passkey ? await getUser(passkey.userId) : null;
         if (!passkey || !user) {
           logger.warn('invalid webauthn attempt', {

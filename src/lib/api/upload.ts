@@ -1,8 +1,9 @@
 import { extname } from 'path';
+import { db, type DbClient } from '@/lib/db';
+import { files } from '@/lib/db/schema';
 import { User } from '@/lib/db/models/user';
-import { fileNamesExist, getFileUsage } from '@/lib/db/models/file';
-import type { DbClient } from '@/lib/db/models/user';
 import { bytes } from '@/lib/bytes';
+import { count, eq, inArray, sum } from 'drizzle-orm';
 import { config } from '../config';
 import { Config } from '../config/validate';
 import { sanitizeFilename } from '../fs';
@@ -42,7 +43,11 @@ export async function checkQuota(
 ): Promise<true | string> {
   if (!user?.quota) return true;
 
-  const usage = await getFileUsage(user.id, client);
+  const rows = await (client ?? db)
+    .select({ count: count(), size: sum(files.size) })
+    .from(files)
+    .where(eq(files.userId, user.id));
+  const usage = { count: rows[0]?.count ?? 0, size: Number(rows[0]?.size ?? 0) };
   if (user.quota.filesQuota === 'BY_BYTES') {
     if (usage.size + newSize > bytes(user.quota.maxBytes!))
       return `uploading will exceed your storage quota of ${user.quota.maxBytes}`;
@@ -68,6 +73,12 @@ export function getDomain(
 
   // using localhost as a fallback in the 1% chance theres no host header
   return base + (hostDomain ?? 'localhost');
+}
+
+async function fileNamesExist(names: string[]) {
+  if (!names.length) return false;
+  const rows = await db.select({ id: files.id }).from(files).where(inArray(files.name, names)).limit(1);
+  return rows.length > 0;
 }
 
 export async function getFilename(

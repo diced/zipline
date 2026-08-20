@@ -1,12 +1,10 @@
 import { ApiError } from '@/lib/api/errors';
 import { db } from '@/lib/db';
 import { Invite, inviteSchema, removeInvite } from '@/lib/db/models/invite';
-import { invites } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { administratorMiddleware } from '@/server/middleware/administrator';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
-import { eq, or } from 'drizzle-orm';
 import z from 'zod';
 
 export type ApiAuthInvitesIdResponse = Invite;
@@ -37,7 +35,7 @@ export default typedPlugin(
         const { id } = req.params;
 
         const invite = await db.query.invites.findFirst({
-          where: or(eq(invites.id, id), eq(invites.code, id)),
+          where: { OR: [{ id }, { code: id }] },
           with: { inviter: { columns: { username: true, id: true, role: true } } },
         });
         if (!invite) throw new ApiError(4005);

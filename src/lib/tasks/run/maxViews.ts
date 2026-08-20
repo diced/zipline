@@ -10,10 +10,10 @@ import { and, gte, isNotNull } from 'drizzle-orm';
 
 export default function maxViews() {
   return async function (this: IntervalTask) {
-    const files = await db.query.files.findMany({
-      columns: { id: true, name: true, size: true },
-      where: and(isNotNull(fileRecords.maxViews), gte(fileRecords.views, fileRecords.maxViews)),
-    });
+    const files = await db
+      .select({ id: fileRecords.id, name: fileRecords.name, size: fileRecords.size })
+      .from(fileRecords)
+      .where(and(isNotNull(fileRecords.maxViews), gte(fileRecords.views, fileRecords.maxViews)));
 
     this.logger.debug(`found ${files.length} expired files`, {
       files: files.map((f) => f.name),

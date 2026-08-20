@@ -24,9 +24,11 @@ export async function urlsRoute(
   const { id } = req.params;
   const { token } = req.query;
 
-  const url = await db.query.urls.findFirst({
-    where: or(eq(urls.code, id), eq(urls.vanity, id), eq(urls.id, id)),
-  });
+  const [url] = await db
+    .select()
+    .from(urls)
+    .where(or(eq(urls.code, id), eq(urls.vanity, id), eq(urls.id, id)))
+    .limit(1);
   if (!url) return res.callNotFound();
   if (!url.enabled) return res.callNotFound();
 

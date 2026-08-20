@@ -1,6 +1,6 @@
 import { ApiError } from '@/lib/api/errors';
 import { datasource } from '@/lib/datasource';
-import { isFileInFolder, getFileById } from '@/lib/db/models/file';
+import { getFilesWithUser, isFileInFolder } from '@/lib/db/models/file';
 import {
   getParentChain,
   removeFolder,
@@ -36,7 +36,7 @@ const folderExistsAndEditable = async (req: FastifyRequest) => {
   const folder = await getFolderWithOwner(id);
 
   if (!folder) throw new ApiError(4001);
-  if (!canManage(req.user, folder.User)) throw new ApiError(4001);
+  if (!canManage(req.user, folder.user)) throw new ApiError(4001);
 };
 
 export const PATH = '/api/user/folders/:id';
@@ -94,13 +94,9 @@ export default typedPlugin(
         const { id: folderId } = req.params;
         const { id } = req.body;
 
-        const file = await getFileById(id, {
-          thumbnail: false,
-          tags: false,
-          owner: true,
-        });
+        const [file] = await getFilesWithUser([id]);
         if (!file) throw new ApiError(4000);
-        if (!canManage(req.user, file.User)) throw new ApiError(4000);
+        if (!canManage(req.user, file.user)) throw new ApiError(4000);
 
         if (await isFileInFolder(file.id, folderId)) throw new ApiError(1011);
 
@@ -199,7 +195,7 @@ export default typedPlugin(
           if (childrenAction === 'folder' && targetFolderId) {
             const targetFolder = await getFolderWithOwner(targetFolderId);
             if (!targetFolder) throw new ApiError(4008);
-            if (!canManage(req.user, targetFolder.User)) throw new ApiError(4008, undefined, 403);
+            if (!canManage(req.user, targetFolder.user)) throw new ApiError(4008, undefined, 403);
             if ((await getParentStatus(folderId, targetFolderId, targetFolder.userId)) === 'cycle')
               throw new ApiError(1016);
           }
@@ -228,14 +224,10 @@ export default typedPlugin(
           const { id } = req.body;
           if (!id) throw new ApiError(1013);
 
-          const file = await getFileById(id, {
-            thumbnail: false,
-            tags: false,
-            owner: true,
-          });
+          const [file] = await getFilesWithUser([id]);
 
           if (!file) throw new ApiError(4000);
-          if (!canManage(req.user, file.User)) throw new ApiError(4000);
+          if (!canManage(req.user, file.user)) throw new ApiError(4000);
 
           if (!(await isFileInFolder(file.id, folderId))) throw new ApiError(1012);
 

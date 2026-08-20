@@ -4,7 +4,8 @@ import { ApiError } from '@/lib/api/errors';
 import { parseRange } from '@/lib/api/range';
 import { config } from '@/lib/config';
 import { datasource } from '@/lib/datasource';
-import { removeFile, getFile } from '@/lib/db/models/file';
+import { db } from '@/lib/db';
+import { removeFile } from '@/lib/db/models/file';
 import { getThumbnailWithOwner } from '@/lib/db/models/thumbnail';
 import { sanitizeFilename } from '@/lib/fs';
 import { log } from '@/lib/logger';
@@ -50,7 +51,7 @@ export default typedPlugin(
 
           if (!thumbnail) throw new ApiError(9002);
           if (thumbnail.file && thumbnail.file.userId !== req.user.id) {
-            if (!canInteract(req.user.role, thumbnail.file.User?.role)) throw new ApiError(9002);
+            if (!canInteract(req.user.role, thumbnail.file.user?.role)) throw new ApiError(9002);
           }
 
           const size = await datasource.size(thumbnail.path);
@@ -68,11 +69,14 @@ export default typedPlugin(
             .send(buf);
         }
 
-        const file = await getFile(id, { thumbnail: false, tags: false, owner: true });
+        const file = await db.query.files.findFirst({
+          where: { OR: [{ id }, { name: id }] },
+          with: { user: { columns: { role: true } } },
+        });
         if (!file) throw new ApiError(9002);
 
         if (file.userId !== req.user.id) {
-          if (!canInteract(req.user.role, file.User?.role)) throw new ApiError(9002);
+          if (!canInteract(req.user.role, file.user?.role)) throw new ApiError(9002);
         }
 
         if (file.deletesAt && file.deletesAt <= new Date()) {

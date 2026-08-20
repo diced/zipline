@@ -81,10 +81,11 @@ export default typedPlugin(
           const role =
             (user.super_administrator && 'SUPERADMIN') || (user.administrator && 'ADMIN') || 'USER';
 
-          const existing = await db.query.users.findFirst({
-            columns: { id: true },
-            where: eq(userRecords.username, user.username),
-          });
+          const [existing] = await db
+            .select({ id: userRecords.id })
+            .from(userRecords)
+            .where(eq(userRecords.username, user.username))
+            .limit(1);
 
           if (!importFrom && existing) {
             logger.warn('user already exists, skipping importing', {
@@ -97,13 +98,15 @@ export default typedPlugin(
 
           const importedProviders: ImportOauthProvider[] = [];
           for (const provider of user.oauth) {
-            const existing = await db.query.oauthProviders.findFirst({
-              columns: { id: true },
-              where:
+            const [existing] = await db
+              .select({ id: oauthProviderRecords.id })
+              .from(oauthProviderRecords)
+              .where(
                 provider.oauth_id === null
                   ? isNull(oauthProviderRecords.oauthId)
                   : eq(oauthProviderRecords.oauthId, provider.oauth_id),
-            });
+              )
+              .limit(1);
 
             if (existing) {
               logger.warn('oauth provider already exists, skipping importing', {
@@ -165,10 +168,11 @@ export default typedPlugin(
             continue;
           }
 
-          const existing = await db.query.files.findFirst({
-            columns: { id: true },
-            where: eq(fileRecords.name, file.name),
-          });
+          const [existing] = await db
+            .select({ id: fileRecords.id })
+            .from(fileRecords)
+            .where(eq(fileRecords.name, file.name))
+            .limit(1);
 
           if (existing) {
             logger.warn('file already exists, skipping importing', {
@@ -248,10 +252,11 @@ export default typedPlugin(
             continue;
           }
 
-          const existing = await db.query.urls.findFirst({
-            columns: { id: true },
-            where: eq(urlRecords.code, url.code),
-          });
+          const [existing] = await db
+            .select({ id: urlRecords.id })
+            .from(urlRecords)
+            .where(eq(urlRecords.code, url.code))
+            .limit(1);
 
           if (existing) {
             logger.warn('url already exists, skipping importing', {

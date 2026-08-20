@@ -13,9 +13,10 @@ import { config } from '@/lib/config';
 import { hashPassword } from '@/lib/crypto';
 import { datasource } from '@/lib/datasource';
 import { db } from '@/lib/db';
-import { createFile, type FileInsert, lockFileOwner } from '@/lib/db/models/file';
+import { createFile, type FileInsert } from '@/lib/db/models/file';
 import { getFolderMetadata } from '@/lib/db/models/folder';
 import { getUser } from '@/lib/db/models/user';
+import { users as userTable } from '@/lib/db/schema';
 import { sanitizeFilename } from '@/lib/fs';
 import { removeGps } from '@/lib/gps';
 import { log } from '@/lib/logger';
@@ -26,6 +27,7 @@ import { onUpload } from '@/lib/webhooks';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
 import { SavedMultipartFile } from '@fastify/multipart';
+import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 
 export type ApiUploadResponse = {
@@ -282,7 +284,11 @@ export default typedPlugin(
 
         const fileUploads = await db.transaction(async (tx) => {
           if (quotaUser?.quota) {
-            await lockFileOwner(quotaUser.id, tx);
+            await tx
+              .select({ id: userTable.id })
+              .from(userTable)
+              .where(eq(userTable.id, quotaUser.id))
+              .for('update');
 
             const quotaCheck = await checkQuota(
               quotaUser,
@@ -296,7 +302,7 @@ export default typedPlugin(
 
           const created = [];
           for (const upload of uploads) {
-            created.push(await createFile(upload.data, { thumbnail: true, tags: true }, tx));
+            created.push(await createFile(upload.data, tx));
           }
 
           return created;

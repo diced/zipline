@@ -1,21 +1,15 @@
 import { db, type Transaction } from '@/lib/db';
 import { urls, users } from '@/lib/db/schema';
-import { firstOrNull } from '@/lib/db/utils';
-import { and, eq, getTableColumns, inArray, sql } from 'drizzle-orm';
-import type { PgUpdateSetSource } from 'drizzle-orm/pg-core';
+import { eq, getTableColumns, inArray, sql } from 'drizzle-orm';
 import { createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
 const { password: _password, userId: _userId, ...publicUrlColumns } = getTableColumns(urls);
+export { publicUrlColumns };
 
 type UrlInsert = typeof urls.$inferInsert;
 type CreateUrlInput = Required<Pick<UrlInsert, 'destination' | 'code'>> &
   Pick<UrlInsert, 'vanity' | 'maxViews' | 'password' | 'enabled'> & { userId: string };
-
-type UpdateUrlInput = Omit<
-  PgUpdateSetSource<typeof urls>,
-  'id' | 'createdAt' | 'updatedAt' | 'views' | 'userId' | 'code'
->;
 
 export async function createUrl(input: CreateUrlInput, maxUrls?: number | null) {
   return db.transaction(async (tx) => {
@@ -44,36 +38,9 @@ export async function createUrl(input: CreateUrlInput, maxUrls?: number | null) 
   });
 }
 
-export async function updateUserUrl(id: string, userId: string, changes: UpdateUrlInput) {
-  if (Object.keys(changes).length === 0)
-    return (
-      (await db.query.urls.findFirst({
-        columns: { password: false, userId: false },
-        where: and(eq(urls.id, id), eq(urls.userId, userId)),
-      })) ?? null
-    );
-
-  const rows = await db
-    .update(urls)
-    .set(changes)
-    .where(and(eq(urls.id, id), eq(urls.userId, userId)))
-    .returning(publicUrlColumns);
-
-  return firstOrNull(rows);
-}
-
-export async function removeUserUrl(id: string, userId: string) {
-  const rows = await db
-    .delete(urls)
-    .where(and(eq(urls.id, id), eq(urls.userId, userId)))
-    .returning(publicUrlColumns);
-
-  return firstOrNull(rows);
-}
-
 export async function removeUrl(id: string) {
   const rows = await db.delete(urls).where(eq(urls.id, id)).returning({ id: urls.id });
-  return firstOrNull(rows);
+  return rows[0] ?? null;
 }
 
 export async function recordUrlView(id: string) {

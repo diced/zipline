@@ -1,5 +1,5 @@
 import { ApiError } from '@/lib/api/errors';
-import { getFiles } from '@/lib/db/models/file';
+import { getFilesWithUser } from '@/lib/db/models/file';
 import {
   createFolder,
   getFolderMetadata,
@@ -96,9 +96,7 @@ export default typedPlugin(
         }
 
         if (files) {
-          const filesAdd = (await getFiles(files, { thumbnail: false, tags: false })).filter(
-            (file) => file.userId === req.user.id,
-          );
+          const filesAdd = (await getFilesWithUser(files)).filter((file) => file.userId === req.user.id);
 
           if (!filesAdd.length) throw new ApiError(1026);
 

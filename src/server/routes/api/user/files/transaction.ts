@@ -1,6 +1,6 @@
 import { ApiError } from '@/lib/api/errors';
 import { datasource } from '@/lib/datasource';
-import { removeFiles, getFiles, updateFiles } from '@/lib/db/models/file';
+import { getFilesWithUser, removeFiles, updateFiles } from '@/lib/db/models/file';
 import { getOwnedFolder } from '@/lib/db/models/folder';
 import { Role } from '@/lib/db/enums';
 import { log } from '@/lib/logger';
@@ -60,15 +60,11 @@ export default typedPlugin(
         const { files, favorite, folder } = req.body;
 
         if (typeof favorite === 'boolean') {
-          const toFavoriteFiles = await getFiles(files, {
-            thumbnail: false,
-            tags: false,
-            owner: true,
-          });
+          const toFavoriteFiles = await getFilesWithUser(files);
 
           const invalids = findInvalidTargets(
             { id: req.user.id, role: req.user.role },
-            toFavoriteFiles.map((f) => ({ id: f.userId ?? '', role: f.User?.role ?? 'USER' })),
+            toFavoriteFiles.map((f) => ({ id: f.userId ?? '', role: f.user?.role ?? 'USER' })),
           );
           if (invalids.length > 0)
             throw new ApiError(3014, `You don't have the permission to modify files[${invalids.join(', ')}]`);
@@ -134,15 +130,11 @@ export default typedPlugin(
           files: files.length,
         });
 
-        const toDeleteFiles = await getFiles(files, {
-          thumbnail: false,
-          tags: false,
-          owner: true,
-        });
+        const toDeleteFiles = await getFilesWithUser(files);
 
         const invalids = findInvalidTargets(
           { id: req.user.id, role: req.user.role },
-          toDeleteFiles.map((f) => ({ id: f.userId ?? '', role: f.User?.role ?? 'USER' })),
+          toDeleteFiles.map((f) => ({ id: f.userId ?? '', role: f.user?.role ?? 'USER' })),
         );
         if (invalids.length > 0)
           throw new ApiError(3013, `You don't have the permission to delete files[${invalids.join(', ')}]`);

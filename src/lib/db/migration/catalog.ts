@@ -1,6 +1,11 @@
-import baselineSnapshot from '../../../../drizzle/meta/0000_snapshot.json' with { type: 'json' };
-import type { DrizzleSnapshotJSON } from 'drizzle-kit/api';
+import baselineSnapshot from '../../../../drizzle/20260819042236_baseline/snapshot.json' with { type: 'json' };
+import type { generateDrizzleJson } from 'drizzle-kit/api-postgres';
 import type { Client } from 'pg';
+
+type DrizzleSnapshotJSON = Awaited<ReturnType<typeof generateDrizzleJson>>;
+type SnapshotEntity = DrizzleSnapshotJSON['ddl'][number];
+type SnapshotEntityType = SnapshotEntity['entityType'];
+type SnapshotEntityOf<Type extends SnapshotEntityType> = Extract<SnapshotEntity, { entityType: Type }>;
 
 type CatalogColumn = {
   table_name: string;
@@ -30,14 +35,24 @@ type CatalogForeignKey = {
   on_update: string;
 };
 
-// This file is emitted by drizzle-kit. Validate it against drizzle-kit's public snapshot shape while
-// retaining the imported JSON's concrete table and column types for the catalog comparison below.
-function defineSnapshot<T extends DrizzleSnapshotJSON>(value: T) {
-  return value;
+const snapshot = baselineSnapshot as DrizzleSnapshotJSON;
+
+function snapshotEntities<Type extends SnapshotEntityType>(type: Type) {
+  return snapshot.ddl.filter((entity): entity is SnapshotEntityOf<Type> => entity.entityType === type);
 }
 
-const snapshot = defineSnapshot(baselineSnapshot);
-export const baselineTableNames = Object.values(snapshot.tables).map((table) => table.name);
+const snapshotTables = snapshotEntities('tables');
+const snapshotColumns = snapshotEntities('columns');
+const snapshotIndexes = snapshotEntities('indexes');
+const snapshotPrimaryKeys = snapshotEntities('pks');
+const snapshotForeignKeys = snapshotEntities('fks');
+const snapshotEnums = snapshotEntities('enums');
+
+export const baselineTableNames = snapshotTables.map((table) => table.name);
+
+function snapshotColumnType(column: SnapshotEntityOf<'columns'>) {
+  return `${column.type}${'[]'.repeat(column.dimensions)}`;
+}
 
 function normalizeType(type: string) {
   return type
@@ -76,7 +91,7 @@ function normalizeDefault(value: unknown, columnType: string) {
   }
 
   if (type === 'jsonb') {
-    const match = /^'(.*)'::jsonb$/s.exec(expression);
+    const match = /^'(.*)'(?:::jsonb)?$/s.exec(expression);
     if (match) {
       try {
         const parsed = JSON.parse(match[1].replaceAll("''", "'"));
@@ -128,33 +143,31 @@ async function assertColumns(client: Client) {
   const expectedKeys = new Set<string>();
   const errors: string[] = [];
 
-  for (const table of Object.values(snapshot.tables)) {
-    for (const column of Object.values(table.columns)) {
-      const key = `${table.name}.${column.name}`;
-      expectedKeys.add(key);
-      const current = actual.get(key);
-      if (!current) {
-        errors.push(`missing column ${key}`);
-        continue;
-      }
-      const hasExpectedDefault = 'default' in column;
-      const expectedDefault = hasExpectedDefault ? column.default : undefined;
+  for (const column of snapshotColumns) {
+    const key = `${column.table}.${column.name}`;
+    const expectedType = snapshotColumnType(column);
+    expectedKeys.add(key);
+    const current = actual.get(key);
+    if (!current) {
+      errors.push(`missing column ${key}`);
+      continue;
+    }
+    const hasExpectedDefault = column.default !== null;
 
-      if (normalizeType(current.data_type) !== normalizeType(column.type)) {
-        errors.push(`${key} has type ${current.data_type}, expected ${column.type}`);
-      }
-      if (current.not_null !== column.notNull) {
-        errors.push(`${key} has unexpected nullability`);
-      }
-      if (current.has_default !== hasExpectedDefault) {
-        errors.push(`${key} has unexpected default state`);
-      } else if (
-        current.has_default &&
-        normalizeDefault(current.default_expression, current.data_type) !==
-          normalizeDefault(expectedDefault, column.type)
-      ) {
-        errors.push(`${key} has default ${current.default_expression}, expected ${String(expectedDefault)}`);
-      }
+    if (normalizeType(current.data_type) !== normalizeType(expectedType)) {
+      errors.push(`${key} has type ${current.data_type}, expected ${expectedType}`);
+    }
+    if (current.not_null !== column.notNull) {
+      errors.push(`${key} has unexpected nullability`);
+    }
+    if (current.has_default !== hasExpectedDefault) {
+      errors.push(`${key} has unexpected default state`);
+    } else if (
+      current.has_default &&
+      normalizeDefault(current.default_expression, current.data_type) !==
+        normalizeDefault(column.default, expectedType)
+    ) {
+      errors.push(`${key} has default ${current.default_expression}, expected ${String(column.default)}`);
     }
   }
 
@@ -196,41 +209,26 @@ async function assertIndexes(client: Client) {
     { table: string; name: string; unique: boolean; primary: boolean; method: string; columns: string[] }
   >();
 
-  for (const table of Object.values(snapshot.tables)) {
-    const columnPrimaryKey = Object.values(table.columns).filter((column) => column.primaryKey);
-    if (columnPrimaryKey.length) {
-      const name = `${table.name}_pkey`;
-      expected.set(`${table.name}.${name}`, {
-        table: table.name,
-        name,
-        unique: true,
-        primary: true,
-        method: 'btree',
-        columns: columnPrimaryKey.map((column) => column.name),
-      });
-    }
+  for (const primaryKey of snapshotPrimaryKeys) {
+    expected.set(`${primaryKey.table}.${primaryKey.name}`, {
+      table: primaryKey.table,
+      name: primaryKey.name,
+      unique: true,
+      primary: true,
+      method: 'btree',
+      columns: primaryKey.columns,
+    });
+  }
 
-    for (const primaryKey of Object.values(table.compositePrimaryKeys)) {
-      expected.set(`${table.name}.${primaryKey.name}`, {
-        table: table.name,
-        name: primaryKey.name,
-        unique: true,
-        primary: true,
-        method: 'btree',
-        columns: primaryKey.columns,
-      });
-    }
-
-    for (const index of Object.values(table.indexes)) {
-      expected.set(`${table.name}.${index.name}`, {
-        table: table.name,
-        name: index.name,
-        unique: index.isUnique,
-        primary: false,
-        method: index.method,
-        columns: index.columns.map((column) => column.expression),
-      });
-    }
+  for (const index of snapshotIndexes) {
+    expected.set(`${index.table}.${index.name}`, {
+      table: index.table,
+      name: index.name,
+      unique: index.isUnique,
+      primary: false,
+      method: index.method,
+      columns: index.columns.map((column) => column.value),
+    });
   }
 
   const errors: string[] = [];
@@ -304,9 +302,7 @@ async function assertForeignKeys(client: Client) {
 
   const actual = new Map(result.rows.map((entry) => [`${entry.table_from}.${entry.name}`, entry]));
   const expected = new Map(
-    Object.values(snapshot.tables).flatMap((table) =>
-      Object.values(table.foreignKeys).map((foreignKey) => [`${table.name}.${foreignKey.name}`, foreignKey]),
-    ),
+    snapshotForeignKeys.map((foreignKey) => [`${foreignKey.table}.${foreignKey.name}`, foreignKey]),
   );
 
   const errors: string[] = [];
@@ -319,10 +315,10 @@ async function assertForeignKeys(client: Client) {
 
     if (
       current.table_to !== foreignKey.tableTo ||
-      !sameValues(current.columns_from, foreignKey.columnsFrom) ||
+      !sameValues(current.columns_from, foreignKey.columns) ||
       !sameValues(current.columns_to, foreignKey.columnsTo) ||
-      foreignKeyAction[current.on_delete] !== (foreignKey.onDelete ?? 'no action') ||
-      foreignKeyAction[current.on_update] !== (foreignKey.onUpdate ?? 'no action')
+      foreignKeyAction[current.on_delete] !== (foreignKey.onDelete?.toLowerCase() ?? 'no action') ||
+      foreignKeyAction[current.on_update] !== (foreignKey.onUpdate?.toLowerCase() ?? 'no action')
     ) {
       errors.push(`foreign key ${key} has an unexpected definition`);
     }
@@ -334,7 +330,6 @@ async function assertForeignKeys(client: Client) {
 }
 
 async function assertEnums(client: Client) {
-  const expectedEnums = Object.values(snapshot.enums);
   const result = await client.query<{ name: string; value: string }>(
     `
       SELECT enum_type.typname AS name, enum_value.enumlabel AS value
@@ -345,7 +340,7 @@ async function assertEnums(client: Client) {
         AND enum_type.typname = ANY($1::text[])
       ORDER BY enum_type.typname, enum_value.enumsortorder
     `,
-    [expectedEnums.map((entry) => entry.name)],
+    [snapshotEnums.map((entry) => entry.name)],
   );
 
   const actual = new Map<string, string[]>();
@@ -356,7 +351,7 @@ async function assertEnums(client: Client) {
   }
 
   const errors: string[] = [];
-  for (const expected of expectedEnums) {
+  for (const expected of snapshotEnums) {
     const values = actual.get(expected.name);
     if (!values) errors.push(`missing enum ${expected.name}`);
     else if (!sameValues(values, expected.values)) errors.push(`enum ${expected.name} has unexpected values`);
