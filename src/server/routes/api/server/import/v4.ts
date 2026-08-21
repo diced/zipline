@@ -1,9 +1,9 @@
 import { ApiError } from '@/lib/api/errors';
 import { createToken } from '@/lib/crypto';
 import { db } from '@/lib/db';
-import { createTagWithFiles } from '@/lib/db/models/serverData';
 import {
   files as fileRecords,
+  filesToTags,
   folders as folderRecords,
   invites as inviteRecords,
   metrics as metricRecords,
@@ -451,11 +451,18 @@ export default typedPlugin(
             return [];
           });
 
-          const created = await createTagWithFiles({
-            name: tag.name,
-            color: tag.color ?? '#000000',
-            fileIds,
-            userId,
+          const created = await db.transaction(async (tx) => {
+            const [created] = await tx
+              .insert(tagRecords)
+              .values({ name: tag.name, color: tag.color ?? '#000000', userId })
+              .returning({ id: tagRecords.id });
+            if (!created) throw new Error('Tag insert did not return a row');
+
+            if (fileIds.length) {
+              await tx.insert(filesToTags).values(fileIds.map((fileId) => ({ fileId, tagId: created.id })));
+            }
+
+            return created;
           });
 
           importedTags[tag.id] = created.id;

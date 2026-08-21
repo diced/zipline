@@ -164,22 +164,22 @@ export default function ViewFileId() {
                 </Group>
               )}
               {user?.view!.showFolder &&
-                file.Folder &&
-                (file.Folder.public ? (
+                file.folder &&
+                (file.folder.public ? (
                   <Tooltip label='View folder'>
                     <Anchor
                       component={Link}
                       ml='sm'
-                      to={`/folder/${file.Folder.id}`}
+                      to={`/folder/${file.folder.id}`}
                       target='_blank'
                       reloadDocument
                     >
-                      {file.Folder.name}
+                      {file.folder.name}
                     </Anchor>
                   </Tooltip>
                 ) : (
                   <Text ml='sm' size='sm' c='dimmed'>
-                    {file.Folder.name}
+                    {file.folder.name}
                   </Text>
                 ))}
               {user?.view!.showMimetype && (

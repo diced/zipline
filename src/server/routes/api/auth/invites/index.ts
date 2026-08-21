@@ -1,6 +1,7 @@
 import { config } from '@/lib/config';
 import { db } from '@/lib/db';
-import { createInvite, Invite, inviteSchema } from '@/lib/db/models/invite';
+import { Invite, inviteSchema } from '@/lib/db/models/invite';
+import { invites } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { randomCharacters } from '@/lib/random';
 import { secondlyRatelimit } from '@/lib/ratelimits';
@@ -41,11 +42,24 @@ export default typedPlugin(
       async (req, res) => {
         const { expiresAt, maxUses } = req.body;
 
-        const invite = await createInvite({
-          code: randomCharacters(config.invites.length),
-          expiresAt,
-          maxUses: maxUses ?? null,
-          inviterId: req.user.id,
+        const invite = await db.transaction(async (tx) => {
+          const [created] = await tx
+            .insert(invites)
+            .values({
+              code: randomCharacters(config.invites.length),
+              expiresAt,
+              maxUses: maxUses ?? null,
+              inviterId: req.user.id,
+            })
+            .returning({ id: invites.id });
+          if (!created) throw new Error('Invite insert did not return a row');
+
+          const invite = await tx.query.invites.findFirst({
+            where: { id: created.id },
+            with: { inviter: { columns: { username: true, id: true, role: true } } },
+          });
+          if (!invite) throw new Error('Inserted invite could not be read back');
+          return invite;
         });
 
         logger.info(`${req.user.username} created an invite`, {

@@ -1,11 +1,10 @@
-import { ilike } from 'drizzle-orm';
+import { ilike, type Column } from 'drizzle-orm';
 
-// TODO: replace with something else?
 export function escapeLike(value: string) {
   return value.replaceAll('\\', '\\\\').replaceAll('%', '\\%').replaceAll('_', '\\_');
 }
 
-export function containsText(column: Parameters<typeof ilike>[0], value: string) {
+export function containsText(column: Column, value: string) {
   return ilike(column, `%${escapeLike(value)}%`);
 }
 

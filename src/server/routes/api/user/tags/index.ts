@@ -1,6 +1,6 @@
 import { ApiError } from '@/lib/api/errors';
 import { db } from '@/lib/db';
-import { getTagByName, listTags, Tag, tagSchema } from '@/lib/db/models/tag';
+import { tagColumns, Tag, tagSchema } from '@/lib/db/models/tag';
 import { tags as tagTable } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
@@ -29,7 +29,11 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const tags = await listTags(req.user.id);
+        const tags = await db.query.tags.findMany({
+          columns: tagColumns,
+          where: { userId: req.user.id },
+          with: { files: { columns: { id: true } } },
+        });
 
         return res.send(tags);
       },
@@ -55,14 +59,22 @@ export default typedPlugin(
       async (req, res) => {
         const { name, color } = req.body;
 
-        const existingTag = await getTagByName(name, req.user.id);
+        const existingTag = await db.query.tags.findFirst({
+          columns: { id: true },
+          where: { name, userId: req.user.id },
+        });
 
         if (existingTag) throw new ApiError(1033);
 
-        const [row] = await db.insert(tagTable).values({ name, color, userId: req.user.id }).returning();
+        const [row] = await db.insert(tagTable).values({ name, color, userId: req.user.id }).returning({
+          id: tagTable.id,
+          createdAt: tagTable.createdAt,
+          updatedAt: tagTable.updatedAt,
+          name: tagTable.name,
+          color: tagTable.color,
+        });
         if (!row) throw new Error('Tag insert did not return a row');
-        const { userId: _, ...created } = row;
-        const tag = { ...created, files: [] };
+        const tag = { ...row, files: [] };
 
         logger.info('tag created', {
           id: tag.id,

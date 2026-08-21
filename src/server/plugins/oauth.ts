@@ -12,7 +12,7 @@ import fastifyPlugin from 'fastify-plugin';
 import { getSession, saveSession, ZiplineIronSession } from '../session';
 import { parseOAuthState } from '@/lib/oauth/state';
 import { ApiError } from '@/lib/api/errors';
-import { and, eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 
 export type OAuthQuery = {
   state?: string;
@@ -65,14 +65,10 @@ async function oauthPlugin(fastify: FastifyInstance) {
       response: safeOAuthResponse(response),
     });
 
-    const existingOauth =
-      (
-        await db
-          .select({ id: oauthProviders.id, userId: oauthProviders.userId })
-          .from(oauthProviders)
-          .where(and(eq(oauthProviders.provider, provider), eq(oauthProviders.oauthId, response.user_id)))
-          .limit(1)
-      )[0] ?? null;
+    const existingOauth = await db.query.oauthProviders.findFirst({
+      columns: { id: true, userId: true },
+      where: { provider, oauthId: response.user_id },
+    });
     const existingUser = await usernameExists(response.username);
 
     const state = parseOAuthState(query.state);

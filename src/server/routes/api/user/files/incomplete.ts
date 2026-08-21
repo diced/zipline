@@ -28,11 +28,9 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const incompleteFiles = incompleteFileSchema
-          .array()
-          .parse(
-            await db.select().from(incompleteFileTable).where(eq(incompleteFileTable.userId, req.user.id)),
-          );
+        const incompleteFiles = await db.query.incompleteFiles.findMany({
+          where: { userId: req.user.id },
+        });
 
         return res.send(incompleteFiles);
       },

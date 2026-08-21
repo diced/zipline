@@ -195,7 +195,7 @@ async function runComplete(id: string, size: number) {
 
   await onUpload(config, {
     user: userr,
-    file: fileUpload,
+    file: { ...fileUpload, thumbnail: null, tags: [] },
     link: {
       raw: `${domain}/raw/${fileUpload.name}`,
       returned: responseUrl,

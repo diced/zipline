@@ -91,8 +91,6 @@ export async function assertCompletePrismaMigrationHistory(client: Client) {
   const successful = new Set<string>();
 
   for (const row of result.rows) {
-    // Prisma retains failed attempts after `migrate resolve --rolled-back`. They no longer represent
-    // applied schema state, and the catalog assertion which follows verifies that the repaired DB is exact.
     if (row.rolled_back) continue;
 
     const expectedChecksum = expected.get(row.migration_name);

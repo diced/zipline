@@ -13,10 +13,10 @@ import { config } from '@/lib/config';
 import { hashPassword } from '@/lib/crypto';
 import { datasource } from '@/lib/datasource';
 import { db } from '@/lib/db';
-import { createFile, type FileInsert } from '@/lib/db/models/file';
+import type { FileInsert } from '@/lib/db/models/file';
 import { getFolderMetadata } from '@/lib/db/models/folder';
 import { getUser } from '@/lib/db/models/user';
-import { users as userTable } from '@/lib/db/schema';
+import { files as fileTable, users as userTable } from '@/lib/db/schema';
 import { sanitizeFilename } from '@/lib/fs';
 import { removeGps } from '@/lib/gps';
 import { log } from '@/lib/logger';
@@ -27,7 +27,7 @@ import { onUpload } from '@/lib/webhooks';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
 import { SavedMultipartFile } from '@fastify/multipart';
-import { eq } from 'drizzle-orm';
+import { eq, getColumns } from 'drizzle-orm';
 import { z } from 'zod';
 
 export type ApiUploadResponse = {
@@ -46,6 +46,7 @@ export type ApiUploadResponse = {
 };
 
 const logger = log('api').c('upload');
+const { password: _password, userId: _userId, ...uploadFileColumns } = getColumns(fileTable);
 
 export const PATH = '/api/upload';
 export default typedPlugin(
@@ -302,7 +303,9 @@ export default typedPlugin(
 
           const created = [];
           for (const upload of uploads) {
-            created.push(await createFile(upload.data, tx));
+            const [file] = await tx.insert(fileTable).values(upload.data).returning(uploadFileColumns);
+            if (!file) throw new Error('File insert did not return a row');
+            created.push(file);
           }
 
           return created;
@@ -353,7 +356,7 @@ export default typedPlugin(
               updatedAt: new Date(),
               role: 'USER',
             },
-            file: fileUpload,
+            file: { ...fileUpload, thumbnail: null, tags: [] },
             link: {
               raw: `${domain}/raw/${encodeURIComponent(fileUpload.name)}`,
               returned: encodeURI(responseUrl),

@@ -2,11 +2,13 @@ import { ApiError } from '@/lib/api/errors';
 import { createToken, hashPassword } from '@/lib/crypto';
 import { db } from '@/lib/db';
 import { createUser, type User, userSchema } from '@/lib/db/models/user';
-import { claimFirstSetup, ensureSettingsRow } from '@/lib/db/models/zipline';
+import { ensureSettingsRow } from '@/lib/db/models/zipline';
+import { zipline } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { zStringTrimmed } from '@/lib/validation';
 import typedPlugin from '@/server/typedPlugin';
+import { eq } from 'drizzle-orm';
 import z from 'zod';
 
 export type ApiSetupResponse = {
@@ -68,7 +70,12 @@ export default typedPlugin(
         logger.info('first setup running');
 
         const user = await db.transaction(async (tx) => {
-          if (!(await claimFirstSetup(tx))) throw new ApiError(9001);
+          const [claimed] = await tx
+            .update(zipline)
+            .set({ firstSetup: false })
+            .where(eq(zipline.firstSetup, true))
+            .returning({ id: zipline.id });
+          if (!claimed) throw new ApiError(9001);
 
           return createUser(
             {

@@ -1,21 +1,13 @@
-import { db, type Database, type DbClient } from '@/lib/db';
+import { db, type DbClient } from '@/lib/db';
 import { files, folders } from '@/lib/db/schema';
 import { and, eq, inArray, sql } from 'drizzle-orm';
-import type { PgUpdateSetSource } from 'drizzle-orm/pg-core';
-import { createSelectSchema } from 'drizzle-zod';
+import { createSelectSchema } from 'drizzle-orm/zod';
 import { z } from 'zod';
-import {
-  formatFiles,
-  fileListRelations,
-  filePasswordScalarConfig,
-  fileSchema,
-  updateFiles,
-  type ProjectedFile,
-} from './file';
+import { fileColumns, filePasswordExtra, fileRelations, fileSchema, formatFiles } from './file';
 
 type FolderRow = typeof folders.$inferSelect;
 type FolderInsert = typeof folders.$inferInsert;
-type FolderUpdate = Omit<PgUpdateSetSource<typeof folders>, 'id' | 'createdAt' | 'updatedAt' | 'userId'>;
+type FolderUpdate = Partial<Omit<FolderInsert, 'id' | 'createdAt' | 'updatedAt' | 'userId'>>;
 
 type FolderParent = {
   id: string;
@@ -28,107 +20,38 @@ type FolderParentPublic = FolderParent & { public: boolean; parent?: FolderParen
 
 type FolderCount = { children: number; files: number };
 
-type FolderSummary = FolderRow & {
-  parent: FolderParent | null;
-  _count: FolderCount;
-  files?: ProjectedFile[];
-};
-
-type FolderDetail = FolderSummary & {
-  children: (FolderRow & { _count: FolderCount })[];
-};
-
-type PublicFolder = FolderRow & {
-  parent: FolderParentPublic | null;
-  children: (Pick<FolderRow, 'id' | 'name' | 'createdAt' | 'updatedAt' | 'public'> & {
-    _count: FolderCount;
-  })[];
-};
-
-type FolderFindManyConfig = NonNullable<Parameters<Database['query']['folders']['findMany']>[0]>;
-type FolderQueryOptions = Pick<FolderFindManyConfig, 'where' | 'orderBy' | 'limit' | 'offset'>;
-
-// TODO: i dont like this but whatever
-const folderCountExtras = {
-  childrenCount: (folder) => sql<number>`(
-      select count(*)::int
-      from "Folder" as "countedChildren"
-      where "countedChildren"."parentId" = ${folder.id}
-    )`,
-  filesCount: (folder) => sql<number>`(
-      select count(*)::int
-      from "File" as "countedFiles"
-      where "countedFiles"."folderId" = ${folder.id}
-    )`,
-} as const satisfies NonNullable<FolderFindManyConfig['extras']>;
+const folderCountExtra = {
+  _count: (folder: typeof folders) => sql<FolderCount>`json_build_object(
+    'children', ${db.$count(folders, eq(folders.parentId, folder.id))},
+    'files', ${db.$count(files, eq(files.folderId, folder.id))}
+  )`,
+} as const;
 
 const folderParentColumns = { id: true, name: true, parentId: true } as const;
 
 const folderFilesConfig = {
-  ...filePasswordScalarConfig,
+  columns: fileColumns,
+  extras: filePasswordExtra,
   orderBy: { createdAt: 'desc' },
-  with: fileListRelations,
+  with: fileRelations,
 } as const;
 
 const folderChildrenConfig = {
   orderBy: { createdAt: 'desc' },
-  extras: folderCountExtras,
+  extras: folderCountExtra,
 } as const;
 
-async function queryFolderSummaries(options: FolderQueryOptions, client: DbClient) {
-  return client.query.folders.findMany({
-    ...options,
-    extras: folderCountExtras,
-    with: { parent: { columns: folderParentColumns } },
-  });
-}
-
-async function queryFolderSummariesWithFiles(options: FolderQueryOptions, client: DbClient) {
-  return client.query.folders.findMany({
-    ...options,
-    extras: folderCountExtras,
-    with: { parent: { columns: folderParentColumns }, files: folderFilesConfig },
-  });
-}
-
-function mapCounts<T extends { childrenCount: number; filesCount: number }>(row: T) {
-  const { childrenCount, filesCount, ...rest } = row;
-  return { ...rest, _count: { children: childrenCount, files: filesCount } };
-}
-
-type FolderSummaryRow = Awaited<ReturnType<typeof queryFolderSummaries>>[number];
-
-function mapFolderSummary(row: FolderSummaryRow): FolderSummary {
-  return mapCounts(row);
-}
-
-function mapFolderSummaryWithFiles(
-  row: Awaited<ReturnType<typeof queryFolderSummariesWithFiles>>[number],
-): FolderSummary {
-  return mapCounts(row);
-}
-
 export async function getFolderMetadata(id: string, client: DbClient = db) {
-  const rows = await client
-    .select({
-      id: folders.id,
-      name: folders.name,
-      userId: folders.userId,
-      allowUploads: folders.allowUploads,
-    })
-    .from(folders)
-    .where(eq(folders.id, id))
-    .limit(1);
-  return rows[0] ?? null;
+  const folder = await client.query.folders.findFirst({
+    columns: { id: true, name: true, userId: true, allowUploads: true },
+    where: { id },
+  });
+  return folder ?? null;
 }
 
 export async function getOwnedFolder(id: string, userId: string, client: DbClient = db) {
-  const rows = await client
-    .select()
-    .from(folders)
-    .where(and(eq(folders.id, id), eq(folders.userId, userId)))
-    .limit(1);
-  return rows[0] ?? null;
+  const folder = await client.query.folders.findFirst({ where: { id, userId } });
+  return folder ?? null;
 }
 
 export async function getFolderWithOwner(id: string, client: DbClient = db) {
@@ -141,6 +64,7 @@ export async function getFolderWithOwner(id: string, client: DbClient = db) {
       },
     },
   });
+
   return row ?? null;
 }
 
@@ -148,64 +72,62 @@ export async function listFolders(
   userId: string,
   options: { root?: boolean; parentId?: string; includeFiles?: boolean } = {},
   client: DbClient = db,
-): Promise<FolderSummary[]> {
-  const query: FolderQueryOptions = {
-    where: {
-      AND: [
-        { userId },
-        ...(options.root ? [{ parentId: { isNull: true } } as const] : []),
-        ...(options.parentId ? [{ parentId: options.parentId }] : []),
-      ],
-    },
-    orderBy: { createdAt: 'desc' },
+) {
+  const where = {
+    AND: [
+      { userId },
+      ...(options.root ? [{ parentId: { isNull: true as const } }] : []),
+      ...(options.parentId ? [{ parentId: options.parentId }] : []),
+    ],
   };
+
   if (options.includeFiles) {
-    return (await queryFolderSummariesWithFiles(query, client)).map(mapFolderSummaryWithFiles);
+    return client.query.folders.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+      extras: folderCountExtra,
+      with: { parent: { columns: folderParentColumns }, files: folderFilesConfig },
+    });
   }
-  return (await queryFolderSummaries(query, client)).map(mapFolderSummary);
+
+  return client.query.folders.findMany({
+    where,
+    orderBy: { createdAt: 'desc' },
+    extras: folderCountExtra,
+    with: { parent: { columns: folderParentColumns } },
+  });
 }
 
-export async function getFolder(
-  id: string,
-  includeFiles = true,
-  client: DbClient = db,
-): Promise<FolderDetail | null> {
+export async function getFolder(id: string, includeFiles = true, client: DbClient = db) {
   if (includeFiles) {
     const row = await client.query.folders.findFirst({
       where: { id },
-      extras: folderCountExtras,
+      extras: folderCountExtra,
       with: {
         parent: { columns: folderParentColumns },
         children: folderChildrenConfig,
         files: folderFilesConfig,
       },
     });
-    if (!row) return null;
-    const { children, ...rest } = row;
-    return { ...mapCounts(rest), children: children.map(mapCounts) };
+    return row ?? null;
   }
 
   const row = await client.query.folders.findFirst({
     where: { id },
-    extras: folderCountExtras,
+    extras: folderCountExtra,
     with: {
       parent: { columns: folderParentColumns },
       children: folderChildrenConfig,
     },
   });
-  if (!row) return null;
-  const { children, ...rest } = row;
-  return { ...mapCounts(rest), children: children.map(mapCounts) };
+  return row ?? null;
 }
 
-export async function getPublicFolder(
-  identifier: string,
-  client: DbClient = db,
-): Promise<PublicFolder | null> {
+export async function getPublicFolder(identifier: string, client: DbClient = db) {
   const row = await client.query.folders.findFirst({
     where: { OR: [{ id: identifier }, { name: identifier }] },
     with: {
-      parent: { columns: { ...folderParentColumns, public: true } },
+      parent: { columns: { ...folderParentColumns, public: true }, where: { public: true } },
       children: {
         ...folderChildrenConfig,
         where: { public: true },
@@ -213,55 +135,73 @@ export async function getPublicFolder(
       },
     },
   });
-  if (!row) return null;
-  const { children, parent, ...rest } = row;
-  return {
-    ...rest,
-    parent: parent?.public ? parent : null,
-    children: children.map(mapCounts),
-  };
+  return row ?? null;
 }
 
-export async function createFolder(data: FolderInsert, fileIds: string[] = []): Promise<FolderSummary> {
+export async function createFolder(data: FolderInsert, fileIds: string[] = []) {
   return db.transaction(async (tx) => {
-    const rows = await tx.insert(folders).values(data).returning({ id: folders.id });
-    const row = rows[0];
+    const [row] = await tx.insert(folders).values(data).returning({ id: folders.id });
     if (!row) throw new Error('Folder insert did not return a row');
-    if (fileIds.length) await updateFiles(fileIds, { folderId: row.id }, data.userId, tx);
-    const [created] = await queryFolderSummariesWithFiles({ where: { id: row.id }, limit: 1 }, tx);
+
+    if (fileIds.length) {
+      await tx
+        .update(files)
+        .set({ folderId: row.id })
+        .where(and(inArray(files.id, fileIds), eq(files.userId, data.userId)));
+    }
+
+    const created = await tx.query.folders.findFirst({
+      where: { id: row.id },
+      extras: folderCountExtra,
+      with: { parent: { columns: folderParentColumns }, files: folderFilesConfig },
+    });
     if (!created) throw new Error('Inserted folder could not be read back');
-    return mapFolderSummaryWithFiles(created);
+
+    return created;
   });
 }
 
 async function getFolderSummary(id: string, client: DbClient) {
-  const [row] = await queryFolderSummaries({ where: { id }, limit: 1 }, client);
-  return row ? mapFolderSummary(row) : null;
+  const row = await client.query.folders.findFirst({
+    where: { id },
+    extras: folderCountExtra,
+    with: { parent: { columns: folderParentColumns } },
+  });
+  return row ?? null;
 }
 
 export async function updateFolder(id: string, data: FolderUpdate, client: DbClient = db) {
-  const rows = await client.update(folders).set(data).where(eq(folders.id, id)).returning({ id: folders.id });
-  if (!rows[0]) return null;
+  if (Object.keys(data).length) {
+    const [row] = await client
+      .update(folders)
+      .set(data)
+      .where(eq(folders.id, id))
+      .returning({ id: folders.id });
+    if (!row) return null;
+  }
+
   return getFolderSummary(id, client);
 }
 
 export async function addFile(fileId: string, folderId: string, client: DbClient = db) {
-  const rows = await client
+  const [row] = await client
     .update(files)
     .set({ folderId })
     .where(eq(files.id, fileId))
     .returning({ id: files.id });
-  if (!rows[0]) return null;
+  if (!row) return null;
+
   return getFolderSummary(folderId, client);
 }
 
 export async function removeFile(fileId: string, folderId: string, client: DbClient = db) {
-  const rows = await client
+  const [row] = await client
     .update(files)
     .set({ folderId: null })
     .where(and(eq(files.id, fileId), eq(files.folderId, folderId)))
     .returning({ id: files.id });
-  if (!rows[0]) return null;
+  if (!row) return null;
+
   return getFolderSummary(folderId, client);
 }
 
@@ -444,22 +384,13 @@ export async function removeFolder(
   });
 }
 
-type CleanableFolder = {
-  createdAt?: string | Date;
-  updatedAt?: string | Date;
+type FolderWithFiles = {
   files?: Partial<z.infer<typeof fileSchema>>[];
-  children?: CleanableFolder[];
-  parent?: CleanableFolder | null;
+  [key: string]: unknown;
 };
 
-export function formatFolder<T extends CleanableFolder>(folder: T, stringifyDates = false): T {
-  if (folder.files) formatFiles(folder.files, stringifyDates);
-  if (stringifyDates) {
-    if (folder.createdAt instanceof Date) folder.createdAt = folder.createdAt.toISOString();
-    if (folder.updatedAt instanceof Date) folder.updatedAt = folder.updatedAt.toISOString();
-  }
-  if (folder.children) for (const child of folder.children) formatFolder(child, stringifyDates);
-  if (folder.parent) formatFolder(folder.parent, stringifyDates);
+export function formatFolder<T extends FolderWithFiles>(folder: T): T {
+  if (folder.files) formatFiles(folder.files);
   return folder;
 }
 

@@ -19,7 +19,7 @@ export type MetricsPoint = z.infer<typeof metricsPointSchema>;
 
 export async function getMetricsPoints(from?: Date, to?: Date): Promise<MetricsPoint[]> {
   const dateRange = from && to ? and(gte(metrics.createdAt, from), lte(metrics.createdAt, to)) : undefined;
-  const points = await db
+  return db
     .select({
       id: metrics.id,
       createdAt: metrics.createdAt,
@@ -28,18 +28,11 @@ export async function getMetricsPoints(from?: Date, to?: Date): Promise<MetricsP
       fileViews: sql<number>`(${metrics.data}->>'fileViews')::int`,
       urls: sql<number>`(${metrics.data}->>'urls')::int`,
       urlViews: sql<number>`(${metrics.data}->>'urlViews')::int`,
-      storage: sql<string>`(${metrics.data}->>'storage')::bigint`,
+      storage: sql<string>`(${metrics.data}->>'storage')::bigint`.mapWith(BigInt),
     })
     .from(metrics)
     .where(dateRange)
     .orderBy(desc(metrics.createdAt));
-
-  return points.map((point) =>
-    metricsPointSchema.parse({
-      ...point,
-      storage: BigInt(point.storage),
-    }),
-  );
 }
 
 export async function getLatestMetricsPoint(from?: Date, to?: Date): Promise<Metric | null> {

@@ -1,17 +1,22 @@
 import { ApiError } from '@/lib/api/errors';
 import { db } from '@/lib/db';
-import { File, fileSchema, formatFiles, listFiles } from '@/lib/db/models/file';
+import {
+  File,
+  fileColumns,
+  filePasswordExtra,
+  fileRelations,
+  fileSchema,
+  formatFiles,
+} from '@/lib/db/models/file';
 import { getFolderWithOwner } from '@/lib/db/models/folder';
-import { incompleteFileSchema } from '@/lib/db/models/incompleteFile';
-import { getCommonFileIds } from '@/lib/db/models/tag';
 import { getUserIdentity } from '@/lib/db/models/user';
-import { files as fileTable, incompleteFiles as incompleteFileTable } from '@/lib/db/schema';
+import { files as fileTable, tags as tagTable } from '@/lib/db/schema';
 import { containsText } from '@/lib/db/utils';
 import { canInteract, canManage } from '@/lib/role';
 import { paginationQs } from '@/lib/validation';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
-import { and, eq, inArray, like, ne, notInArray, or, sql, type SQL } from 'drizzle-orm';
+import { and, eq, inArray, like, notInArray, or, type SQL } from 'drizzle-orm';
 import z from 'zod';
 
 export type FileSearchField = 'name' | 'originalName' | 'type' | 'tags' | 'id';
@@ -77,17 +82,10 @@ export default typedPlugin(
           folderId = f.id;
         }
 
-        const incompleteFiles = incompleteFileSchema
-          .pick({ metadata: true })
-          .array()
-          .parse(
-            await db
-              .select({ metadata: incompleteFileTable.metadata })
-              .from(incompleteFileTable)
-              .where(
-                and(eq(incompleteFileTable.userId, user.id), ne(incompleteFileTable.status, 'COMPLETE')),
-              ),
-          );
+        const incompleteFiles = await db.query.incompleteFiles.findMany({
+          columns: { metadata: true },
+          where: { userId: user.id, status: { ne: 'COMPLETE' } },
+        });
         const incompleteIds = incompleteFiles.map((file) => file.metadata.file.id);
 
         const sharedConditions = (file: typeof fileTable) => {
@@ -109,43 +107,54 @@ export default typedPlugin(
         };
 
         if (searchQuery) {
-          let tagFiles: string[] = [];
+          let tagIds: string[] = [];
 
           if (searchField === 'tags') {
-            const parsedTags = searchQuery
+            tagIds = searchQuery
               .split(',')
               .map((tag) => tag.trim())
               .filter((tag) => tag);
 
-            const commonIds = await getCommonFileIds(parsedTags, user.id);
-            if (commonIds === null) throw new ApiError(1032);
-            tagFiles = commonIds;
+            if (!tagIds.length) {
+              return res.send({ page: [], search: { field: searchField, query: tagIds } });
+            }
+
+            const ownedTagCount = await db.$count(
+              tagTable,
+              and(eq(tagTable.userId, user.id), inArray(tagTable.id, tagIds)),
+            );
+            if (ownedTagCount !== tagIds.length) throw new ApiError(1032);
           }
 
           const searchConditions = (file: typeof fileTable) => {
             const conditions = sharedConditions(file);
-            const searchColumn = {
-              id: file.id,
-              name: file.name,
-              originalName: file.originalName,
-              type: file.type,
-            }[searchField === 'tags' ? 'id' : searchField];
-            conditions.push(
-              searchField === 'tags'
-                ? tagFiles.length
-                  ? inArray(file.id, tagFiles)
-                  : sql`false`
-                : containsText(searchColumn, searchQuery),
-            );
+            if (searchField !== 'tags') {
+              const searchColumn = {
+                id: file.id,
+                name: file.name,
+                originalName: file.originalName,
+                type: file.type,
+              }[searchField];
+              conditions.push(containsText(searchColumn, searchQuery));
+            }
             return and(...conditions)!;
           };
 
-          const similarityResult = await listFiles({
-            password: false,
-            where: { RAW: (file) => searchConditions(file) },
+          const similarityResult = await db.query.files.findMany({
+            columns: fileColumns,
+            where:
+              searchField === 'tags'
+                ? {
+                    AND: [
+                      { RAW: (file) => searchConditions(file) },
+                      ...tagIds.map((tagId) => ({ tags: { id: tagId } })),
+                    ],
+                  }
+                : { RAW: (file) => searchConditions(file) },
             orderBy: (file, { asc, desc }) => (order === 'asc' ? asc(file[sortBy]) : desc(file[sortBy])),
             offset: (Number(page) - 1) * perpage,
             limit: perpage,
+            with: fileRelations,
           });
 
           return res.send({
@@ -167,12 +176,14 @@ export default typedPlugin(
         const total = await db.$count(fileTable, where);
 
         const files = formatFiles(
-          await listFiles({
-            password: true,
+          await db.query.files.findMany({
+            columns: fileColumns,
+            extras: filePasswordExtra,
             where: { RAW: (file) => and(...sharedConditions(file))! },
             orderBy: (file, { asc, desc }) => (order === 'asc' ? asc(file[sortBy]) : desc(file[sortBy])),
             offset: (Number(page) - 1) * perpage,
             limit: perpage,
+            with: fileRelations,
           }),
         );
 

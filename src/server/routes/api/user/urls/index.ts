@@ -2,8 +2,8 @@ import { ApiError } from '@/lib/api/errors';
 import { config } from '@/lib/config';
 import { hashPassword } from '@/lib/crypto';
 import { db } from '@/lib/db';
-import { createUrl, publicUrlColumns, Url, urlSchema } from '@/lib/db/models/url';
-import { urls as urlRecords } from '@/lib/db/schema';
+import { Url, urlSchema } from '@/lib/db/models/url';
+import { urls as urlRecords, users } from '@/lib/db/schema';
 import { containsText } from '@/lib/db/utils';
 import { log } from '@/lib/logger';
 import { randomCharacters } from '@/lib/random';
@@ -12,7 +12,7 @@ import { zStringTrimmed } from '@/lib/validation';
 import { onShorten } from '@/lib/webhooks';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
-import { and, eq, isNotNull } from 'drizzle-orm';
+import { and, eq, getColumns, isNotNull } from 'drizzle-orm';
 import { z } from 'zod';
 
 export type ApiUserUrlsResponse =
@@ -23,8 +23,9 @@ export type ApiUserUrlsResponse =
 
 export const PATH = '/api/user/urls';
 const logger = log('api').c('user').c('urls');
+const { password: _password, ...urlColumns } = getColumns(urlRecords);
 const urlListColumns = {
-  ...publicUrlColumns,
+  ...urlColumns,
   password: isNotNull(urlRecords.password).mapWith(Boolean).as('password'),
 };
 
@@ -106,18 +107,27 @@ export default typedPlugin(
           existingCode = (await db.$count(urlRecords, eq(urlRecords.code, code))) > 0;
         } while (existingCode);
 
-        const url = await createUrl(
-          {
-            userId: req.user.id,
-            destination,
-            code,
-            vanity,
-            maxViews,
-            password,
-            enabled,
-          },
-          req.user.quota?.maxUrls,
-        );
+        const url = await db.transaction(async (tx) => {
+          await tx.select({ id: users.id }).from(users).where(eq(users.id, req.user.id)).for('update');
+
+          const count = await tx.$count(urlRecords, eq(urlRecords.userId, req.user.id));
+          if (req.user.quota?.maxUrls && count + 1 > req.user.quota.maxUrls) return null;
+
+          const [created] = await tx
+            .insert(urlRecords)
+            .values({
+              userId: req.user.id,
+              destination,
+              code,
+              vanity,
+              maxViews,
+              password,
+              enabled,
+            })
+            .returning(urlColumns);
+          if (!created) throw new Error('URL insert did not return a row');
+          return created;
+        });
         if (!url)
           throw new ApiError(
             3012,

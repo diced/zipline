@@ -6,7 +6,6 @@ import { config } from '@/lib/config';
 import { datasource } from '@/lib/datasource';
 import { db } from '@/lib/db';
 import { removeFile } from '@/lib/db/models/file';
-import { getThumbnailWithOwner } from '@/lib/db/models/thumbnail';
 import { sanitizeFilename } from '@/lib/fs';
 import { log } from '@/lib/logger';
 import { guess } from '@/lib/mimes';
@@ -47,7 +46,15 @@ export default typedPlugin(
         if (!id) throw new ApiError(9002);
 
         if (id.startsWith('.thumbnail')) {
-          const thumbnail = await getThumbnailWithOwner(id);
+          const thumbnail = await db.query.thumbnails.findFirst({
+            where: { path: id },
+            with: {
+              file: {
+                columns: { userId: true },
+                with: { user: { columns: { id: true, role: true } } },
+              },
+            },
+          });
 
           if (!thumbnail) throw new ApiError(9002);
           if (thumbnail.file && thumbnail.file.userId !== req.user.id) {

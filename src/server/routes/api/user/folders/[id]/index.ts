@@ -1,6 +1,6 @@
 import { ApiError } from '@/lib/api/errors';
 import { datasource } from '@/lib/datasource';
-import { getFilesWithUser, isFileInFolder } from '@/lib/db/models/file';
+import { getFilesWithUser } from '@/lib/db/models/file';
 import {
   getParentChain,
   removeFolder,
@@ -98,7 +98,7 @@ export default typedPlugin(
         if (!file) throw new ApiError(4000);
         if (!canManage(req.user, file.user)) throw new ApiError(4000);
 
-        if (await isFileInFolder(file.id, folderId)) throw new ApiError(1011);
+        if (file.folderId === folderId) throw new ApiError(1011);
 
         const nFolder = await addFile(file.id, folderId);
         if (!nFolder) throw new ApiError(4002);
@@ -229,7 +229,7 @@ export default typedPlugin(
           if (!file) throw new ApiError(4000);
           if (!canManage(req.user, file.user)) throw new ApiError(4000);
 
-          if (!(await isFileInFolder(file.id, folderId))) throw new ApiError(1012);
+          if (file.folderId !== folderId) throw new ApiError(1012);
 
           const nFolder = await removeFile(file.id, folderId);
           if (!nFolder) throw new ApiError(4002);

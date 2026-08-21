@@ -3,8 +3,8 @@ import { ziplineClientParseSchema } from '@/lib/api/detect';
 import { config } from '@/lib/config';
 import { createToken, hashPassword } from '@/lib/crypto';
 import { db } from '@/lib/db';
-import { consumeInvite } from '@/lib/db/models/invite';
 import { createUser, usernameExists, userSchema } from '@/lib/db/models/user';
+import { invites } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { getSession, saveSession } from '@/server/session';
@@ -12,6 +12,7 @@ import typedPlugin from '@/server/typedPlugin';
 import z from 'zod';
 import { ApiLoginResponse } from './login';
 import { zStringTrimmed } from '@/lib/validation';
+import { and, eq, gt, isNull, lt, or, sql } from 'drizzle-orm';
 
 export type ApiAuthRegisterResponse = ApiLoginResponse;
 
@@ -55,38 +56,46 @@ export default typedPlugin(
         const hashedPassword = await hashPassword(password);
         const token = createToken();
 
-        const registerUser = (client?: Parameters<typeof createUser>[1]) =>
-          createUser(
+        const result = await db.transaction(async (tx) => {
+          let inviteId: string | undefined;
+          if (code) {
+            const [invite] = await tx
+              .update(invites)
+              .set({ uses: sql`${invites.uses} + 1` })
+              .where(
+                and(
+                  or(eq(invites.id, code), eq(invites.code, code)),
+                  or(isNull(invites.expiresAt), gt(invites.expiresAt, new Date())),
+                  or(isNull(invites.maxUses), lt(invites.uses, invites.maxUses)),
+                ),
+              )
+              .returning({ id: invites.id });
+
+            if (!invite) throw new ApiError(1035);
+            inviteId = invite.id;
+          }
+
+          const user = await createUser(
             {
               username,
               password: hashedPassword,
               role: 'USER',
               token,
             },
-            client,
+            tx,
           );
 
-        let user;
-        if (code) {
-          const result = await db.transaction(async (tx) => {
-            const invite = await consumeInvite(code, tx);
+          return { inviteId, user };
+        });
 
-            if (!invite) throw new ApiError(1035);
-
-            return { inviteId: invite.id, user: await registerUser(tx) };
-          });
-
-          user = result.user;
-
+        if (result.inviteId) {
           logger.info('invite used', {
             user: username,
             invite: result.inviteId,
           });
-        } else {
-          user = await registerUser();
         }
 
-        await saveSession(session, user);
+        await saveSession(session, result.user);
 
         logger.info('user registered successfully', {
           username,
@@ -95,7 +104,7 @@ export default typedPlugin(
         });
 
         return res.send({
-          user,
+          user: result.user,
         });
       },
     );

@@ -4,17 +4,14 @@ import { hashPassword } from '@/lib/crypto';
 import { datasource } from '@/lib/datasource';
 import { db } from '@/lib/db';
 import { Role, type UserFilesQuota } from '@/lib/db/enums';
-import { removeOAuthProviders } from '@/lib/db/models/oauth';
 import {
   getUserIdentity,
   getUserSummary,
-  removeUser,
-  updateUserSummary,
   type LimitedUser,
   type UserUpdate,
   limitedUserSchema,
 } from '@/lib/db/models/user';
-import { files as filesTable, urls, userQuotas } from '@/lib/db/schema';
+import { files as filesTable, oauthProviders, urls, userQuotas, users } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { canInteract } from '@/lib/role';
 import { zStringTrimmed } from '@/lib/validation';
@@ -149,9 +146,16 @@ export default typedPlugin(
             if (!savedQuota) throw new Error('User quota upsert did not return a row');
           }
 
-          return Object.keys(update).length
-            ? updateUserSummary(user.id, update, tx)
-            : getUserSummary(user.id, tx);
+          if (Object.keys(update).length) {
+            const [updated] = await tx
+              .update(users)
+              .set(update)
+              .where(eq(users.id, user.id))
+              .returning({ id: users.id });
+            if (!updated) return null;
+          }
+
+          return getUserSummary(user.id, tx);
         });
         if (!updatedUser) throw new ApiError(4009);
 
@@ -222,8 +226,13 @@ export default typedPlugin(
         }
 
         const deletedUser = await db.transaction(async (tx) => {
-          await removeOAuthProviders(user.id, undefined, tx);
-          return removeUser(user.id, tx);
+          await tx.delete(oauthProviders).where(eq(oauthProviders.userId, user.id));
+
+          const selected = await getUserSummary(user.id, tx);
+          if (!selected) return null;
+
+          const [deleted] = await tx.delete(users).where(eq(users.id, user.id)).returning({ id: users.id });
+          return deleted ? selected : null;
         });
         if (!deletedUser) throw new ApiError(4009);
 

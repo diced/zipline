@@ -10,9 +10,9 @@ import { secondlyRatelimit } from '@/lib/ratelimits';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
 import archiver from 'archiver';
+import { and, eq } from 'drizzle-orm';
 import { createWriteStream } from 'fs';
 import { rm, stat } from 'fs/promises';
-import { and, eq, getTableColumns } from 'drizzle-orm';
 import { join } from 'path';
 import z from 'zod';
 
@@ -28,7 +28,6 @@ const querySchema = z.object({
 });
 
 const logger = log('api').c('user').c('export');
-const { userId: _userId, ...exportColumns } = getTableColumns(exportRecords);
 
 export default typedPlugin(
   async (server) => {
@@ -47,10 +46,10 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const exports = await db
-          .select(exportColumns)
-          .from(exportRecords)
-          .where(eq(exportRecords.userId, req.user.id));
+        const exports = await db.query.exports.findMany({
+          columns: { userId: false },
+          where: { userId: req.user.id },
+        });
 
         if (req.query.id) {
           const file = exports.find((x) => x.id === req.query.id);
@@ -83,11 +82,10 @@ export default typedPlugin(
       async (req, res) => {
         if (!req.query.id) throw new ApiError(1029);
 
-        const [exportDb] = await db
-          .select({ id: exportRecords.id, path: exportRecords.path })
-          .from(exportRecords)
-          .where(and(eq(exportRecords.id, req.query.id), eq(exportRecords.userId, req.user.id)))
-          .limit(1);
+        const exportDb = await db.query.exports.findFirst({
+          columns: { id: true, path: true },
+          where: { id: req.query.id, userId: req.user.id },
+        });
         if (!exportDb) throw new ApiError(9002);
 
         const path = join(config.core.tempDirectory, exportDb.path);
@@ -149,7 +147,7 @@ export default typedPlugin(
             files: files.length,
             size: '0',
           })
-          .returning();
+          .returning({ id: exportRecords.id });
         if (!exportDb) throw new Error('Export insert did not return a row');
         const writeStream = createWriteStream(exportPath);
 

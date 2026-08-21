@@ -24,20 +24,19 @@ export type UserStats = {
 };
 
 export async function queryTotals(userId?: string): Promise<DatabaseTotals> {
-  const number = (value: unknown) => Number(value ?? 0);
   const [fileRows, urlRows] = await Promise.all([
     db
       .select({
         count: count(),
-        views: sql<number>`coalesce(sum(${files.views}), 0)`.mapWith(number),
-        storage: sql<number>`coalesce(sum(${files.size}), 0)`.mapWith(number),
+        views: sql<number>`coalesce(sum(${files.views}), 0)`.mapWith(Number),
+        storage: sql<number>`coalesce(sum(${files.size}), 0)`.mapWith(Number),
       })
       .from(files)
       .where(userId ? eq(files.userId, userId) : undefined),
     db
       .select({
         count: count(),
-        views: sql<number>`coalesce(sum(${urls.views}), 0)`.mapWith(number),
+        views: sql<number>`coalesce(sum(${urls.views}), 0)`.mapWith(Number),
       })
       .from(urls)
       .where(userId ? eq(urls.userId, userId) : undefined),
@@ -55,23 +54,22 @@ export async function queryTotals(userId?: string): Promise<DatabaseTotals> {
 }
 
 export async function queryUserStats(userId: string): Promise<UserStats> {
-  const number = (value: unknown) => Number(value ?? 0);
   const [fileRows, urlRows, types] = await Promise.all([
     db
       .select({
         count: count(),
-        favorites: sql<number>`count(*) filter (where ${files.favorite} = true)`.mapWith(number),
-        views: sql<number>`coalesce(sum(${files.views}), 0)`.mapWith(number),
-        avgViews: sql<number>`coalesce(avg(${files.views}), 0)`.mapWith(number),
-        storage: sql<number>`coalesce(sum(${files.size}), 0)`.mapWith(number),
-        avgStorage: sql<number>`coalesce(avg(${files.size}), 0)`.mapWith(number),
+        favorites: sql<number>`count(*) filter (where ${files.favorite} = true)`.mapWith(Number),
+        views: sql<number>`coalesce(sum(${files.views}), 0)`.mapWith(Number),
+        avgViews: sql<number>`coalesce(avg(${files.views}), 0)`.mapWith(Number),
+        storage: sql<number>`coalesce(sum(${files.size}), 0)`.mapWith(Number),
+        avgStorage: sql<number>`coalesce(avg(${files.size}), 0)`.mapWith(Number),
       })
       .from(files)
       .where(eq(files.userId, userId)),
     db
       .select({
         count: count(),
-        views: sql<number>`coalesce(sum(${urls.views}), 0)`.mapWith(number),
+        views: sql<number>`coalesce(sum(${urls.views}), 0)`.mapWith(Number),
       })
       .from(urls)
       .where(eq(urls.userId, userId)),
@@ -121,28 +119,27 @@ export async function queryUserActivityDates(userId: string, since: Date) {
 }
 
 export async function queryStats(): Promise<MetricData> {
-  const number = (value: unknown) => Number(value ?? 0);
-  const [fileRows, urlRows, userRows, filesByUser, urlsByUser, types] = await Promise.all([
+  const [fileRows, urlRows, userCount, filesByUser, urlsByUser, types] = await Promise.all([
     db
       .select({
         count: count(),
-        views: sql<number>`coalesce(sum(${files.views}), 0)`.mapWith(number),
-        storage: sql<number>`coalesce(sum(${files.size}), 0)`.mapWith(number),
+        views: sql<number>`coalesce(sum(${files.views}), 0)`.mapWith(Number),
+        storage: sql<number>`coalesce(sum(${files.size}), 0)`.mapWith(Number),
       })
       .from(files),
     db
       .select({
         count: count(),
-        views: sql<number>`coalesce(sum(${urls.views}), 0)`.mapWith(number),
+        views: sql<number>`coalesce(sum(${urls.views}), 0)`.mapWith(Number),
       })
       .from(urls),
-    db.select({ count: count() }).from(users),
+    db.$count(users),
     db
       .select({
         username: users.username,
-        count: count(),
-        views: sql<number>`coalesce(sum(${files.views}), 0)`.mapWith(number),
-        storage: sql<number>`coalesce(sum(${files.size}), 0)`.mapWith(number),
+        sum: count(),
+        views: sql<number>`coalesce(sum(${files.views}), 0)`.mapWith(Number),
+        storage: sql<number>`coalesce(sum(${files.size}), 0)`.mapWith(Number),
       })
       .from(files)
       .leftJoin(users, eq(files.userId, users.id))
@@ -150,36 +147,29 @@ export async function queryStats(): Promise<MetricData> {
     db
       .select({
         username: users.username,
-        count: count(),
-        views: sql<number>`coalesce(sum(${urls.views}), 0)`.mapWith(number),
+        sum: count(),
+        views: sql<number>`coalesce(sum(${urls.views}), 0)`.mapWith(Number),
       })
       .from(urls)
       .leftJoin(users, eq(urls.userId, users.id))
       .groupBy(urls.userId, users.username),
-    db.select({ type: files.type, count: count() }).from(files).groupBy(files.type),
+    db.select({ type: files.type, sum: count() }).from(files).groupBy(files.type),
   ]);
 
   const file = fileRows[0] ?? { count: 0, views: 0, storage: 0 };
   const url = urlRows[0] ?? { count: 0, views: 0 };
-  const user = userRows[0] ?? { count: 0 };
 
   return {
     files: file.count,
     urls: url.count,
-    users: user.count,
+    users: userCount,
     storage: file.storage,
 
     fileViews: file.views,
     urlViews: url.views,
 
-    filesUsers: filesByUser.map((x) => ({
-      username: x.username,
-      sum: x.count,
-      storage: x.storage,
-      views: x.views,
-    })),
-    urlsUsers: urlsByUser.map((x) => ({ username: x.username, sum: x.count, views: x.views })),
-
-    types: types.map((x) => ({ type: x.type, sum: x.count })),
+    filesUsers: filesByUser,
+    urlsUsers: urlsByUser,
+    types,
   };
 }

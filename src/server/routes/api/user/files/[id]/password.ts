@@ -2,12 +2,10 @@ import { ApiError } from '@/lib/api/errors';
 import { createAccessToken } from '@/lib/accessToken';
 import { verifyPassword } from '@/lib/crypto';
 import { db } from '@/lib/db';
-import { files } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { zStringTrimmed } from '@/lib/validation';
 import typedPlugin from '@/server/typedPlugin';
-import { eq, or } from 'drizzle-orm';
 import z from 'zod';
 
 export type ApiUserFilesIdPasswordResponse = {
@@ -42,11 +40,10 @@ export default typedPlugin(
         ...secondlyRatelimit(2),
       },
       async (req, res) => {
-        const [file] = await db
-          .select({ id: files.id, name: files.name, password: files.password })
-          .from(files)
-          .where(or(eq(files.id, req.params.id), eq(files.name, req.params.id)))
-          .limit(1);
+        const file = await db.query.files.findFirst({
+          columns: { id: true, name: true, password: true },
+          where: { OR: [{ id: req.params.id }, { name: req.params.id }] },
+        });
         if (!file) throw new ApiError(4000);
         if (!file.password) throw new ApiError(4000);
 

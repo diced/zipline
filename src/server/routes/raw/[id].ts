@@ -3,8 +3,8 @@ import { ApiError } from '@/lib/api/errors';
 import { parseRange } from '@/lib/api/range';
 import { config } from '@/lib/config';
 import { datasource } from '@/lib/datasource';
-import { getFileByName, removeFile } from '@/lib/db/models/file';
-import { getPublicThumbnail } from '@/lib/db/models/thumbnail';
+import { removeFile } from '@/lib/db/models/file';
+import { escapeLike } from '@/lib/db/utils';
 import { sanitizeFilename } from '@/lib/fs';
 import { log } from '@/lib/logger';
 import { guess } from '@/lib/mimes';
@@ -46,7 +46,9 @@ export const rawFileHandler = async (
   if (!idSanitized) return res.callNotFound();
 
   if (id.startsWith('.thumbnail')) {
-    const thumbnail = await getPublicThumbnail(idSanitized);
+    const thumbnail = await db.query.thumbnails.findFirst({
+      where: { path: idSanitized, file: { password: { isNull: true } } },
+    });
 
     if (!thumbnail) return res.callNotFound();
 
@@ -65,7 +67,13 @@ export const rawFileHandler = async (
       .send(buf);
   }
 
-  const file = await getFileByName(idSanitized);
+  let file = await db.query.files.findFirst({ where: { name: idSanitized } });
+  if (!file && config.files.extensionlessUrls && !idSanitized.includes('.')) {
+    file = await db.query.files.findFirst({
+      where: { name: { like: `${escapeLike(idSanitized)}.%` } },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
   if (!file) return res.callNotFound();
 
   if (file?.deletesAt && file.deletesAt <= new Date()) {

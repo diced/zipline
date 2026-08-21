@@ -4,22 +4,22 @@ import { hashPassword } from '@/lib/crypto';
 import { datasource } from '@/lib/datasource';
 import { db } from '@/lib/db';
 import {
-  removeFile,
   File,
-  type FileUpdate,
+  fileColumns,
+  fileRelations,
   fileSchema,
   getFile,
-  updateFileAndTags,
+  removeFile,
+  type FileUpdate,
 } from '@/lib/db/models/file';
-import { files as fileTable } from '@/lib/db/schema';
-import { listOwnedTags } from '@/lib/db/models/tag';
+import { files as fileTable, filesToTags, tags as tagTable } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { canInteract } from '@/lib/role';
 import { zValidatePath } from '@/lib/validation';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
 import z from 'zod';
-import { eq } from 'drizzle-orm';
+import { and, eq, inArray } from 'drizzle-orm';
 
 export type ApiUserFilesIdResponse = File;
 
@@ -53,7 +53,7 @@ export default typedPlugin(
         if (req.user.id !== file.user?.id && !canInteract(req.user.role, file.user?.role ?? 'USER'))
           throw new ApiError(4000);
 
-        const { password: _password, user: _owner, ...responseFile } = file;
+        const { user: _owner, ...responseFile } = file;
         return res.send(responseFile);
       },
     );
@@ -109,21 +109,18 @@ export default typedPlugin(
         }
 
         if (req.body.tags !== undefined) {
-          const tags = await listOwnedTags(
-            req.body.tags,
-            req.user.id !== file.user?.id ? (file.user?.id ?? req.user.id) : req.user.id,
+          const ownerId = req.user.id !== file.user?.id ? (file.user?.id ?? req.user.id) : req.user.id;
+          const tagCount = await db.$count(
+            tagTable,
+            and(eq(tagTable.userId, ownerId), inArray(tagTable.id, req.body.tags)),
           );
 
-          if (tags.length !== req.body.tags.length) throw new ApiError(1032);
+          if (tagCount !== req.body.tags.length) throw new ApiError(1032);
         }
 
         if (req.body.name !== undefined && req.body.name !== file.name) {
           const name = req.body.name!;
-          const [existingFile] = await db
-            .select({ id: fileTable.id })
-            .from(fileTable)
-            .where(eq(fileTable.name, name))
-            .limit(1);
+          const existingFile = await db.query.files.findFirst({ columns: { id: true }, where: { name } });
 
           if (existingFile && existingFile.id !== file.id) throw new ApiError(1014);
 
@@ -137,7 +134,33 @@ export default typedPlugin(
           }
         }
 
-        const newFile = await updateFileAndTags(file.id, data, req.body.tags);
+        const newFile = await db.transaction(async (tx) => {
+          if (Object.keys(data).length) {
+            const [updated] = await tx
+              .update(fileTable)
+              .set(data)
+              .where(eq(fileTable.id, file.id))
+              .returning({ id: fileTable.id });
+            if (!updated) return null;
+          }
+
+          if (req.body.tags !== undefined) {
+            await tx.delete(filesToTags).where(eq(filesToTags.fileId, file.id));
+
+            if (req.body.tags.length) {
+              await tx
+                .insert(filesToTags)
+                .values(req.body.tags.map((tagId) => ({ fileId: file.id, tagId })))
+                .onConflictDoNothing();
+            }
+          }
+
+          return tx.query.files.findFirst({
+            columns: fileColumns,
+            where: { id: file.id },
+            with: fileRelations,
+          });
+        });
         if (!newFile) throw new ApiError(4000);
 
         logger.info(`${req.user.username} updated file ${newFile.name}`, {
@@ -146,8 +169,7 @@ export default typedPlugin(
           owner: file.user?.id,
         });
 
-        const { password: _password, ...responseFile } = newFile;
-        return res.send(responseFile);
+        return res.send(newFile);
       },
     );
 
@@ -172,7 +194,7 @@ export default typedPlugin(
 
         const deleted = await removeFile(file.id);
         if (!deleted) throw new ApiError(4000);
-        const { password: _password, user: _owner, ...deletedFile } = file;
+        const { user: _owner, ...deletedFile } = file;
 
         await datasource.delete(deletedFile.name);
 

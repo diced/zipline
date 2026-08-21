@@ -1,9 +1,7 @@
 import { ApiError } from '@/lib/api/errors';
 import { db } from '@/lib/db';
-import { users } from '@/lib/db/schema';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
-import { eq } from 'drizzle-orm';
 import z from 'zod';
 
 export type ApiUserAvatarResponse = string;
@@ -24,11 +22,10 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const [u] = await db
-          .select({ avatar: users.avatar })
-          .from(users)
-          .where(eq(users.id, req.user.id))
-          .limit(1);
+        const u = await db.query.users.findFirst({
+          columns: { avatar: true },
+          where: { id: req.user.id },
+        });
 
         if (!u?.avatar) throw new ApiError(9002);
 

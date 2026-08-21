@@ -1,9 +1,8 @@
-import { db, type Database, type DbClient } from '@/lib/db';
+import { db, type DbClient } from '@/lib/db';
 import type { Role } from '@/lib/db/enums';
 import { users } from '@/lib/db/schema';
-import { and, eq, isNotNull, isNull } from 'drizzle-orm';
-import type { PgUpdateSetSource } from 'drizzle-orm/pg-core';
-import { createSelectSchema } from 'drizzle-zod';
+import { eq, isNotNull } from 'drizzle-orm';
+import { createSelectSchema } from 'drizzle-orm/zod';
 import { z } from 'zod';
 import { oauthProviderSchema } from './oauth';
 import { userPasskeySchema } from './passkey';
@@ -27,8 +26,6 @@ export const userViewSchema = z
     embedSiteName: z.string().nullish(),
   })
   .partial();
-
-type UserViewSettings = z.infer<typeof userViewSchema>;
 
 const userScalarSchema = createSelectSchema(users, { view: userViewSchema }).pick({
   id: true,
@@ -55,11 +52,13 @@ export const limitedUserSchema = userSchema.omit({
   sessions: true,
 });
 
+export type User = z.infer<typeof userSchema>;
+export type LimitedUser = z.infer<typeof limitedUserSchema>;
+type LoginUser = User & Pick<typeof users.$inferSelect, 'password' | 'totpSecret'>;
+
 type UserInsert = typeof users.$inferInsert;
-export type UserUpdate = Omit<PgUpdateSetSource<typeof users>, 'id' | 'createdAt' | 'updatedAt'>;
-type UserFindManyConfig = NonNullable<Parameters<Database['query']['users']['findMany']>[0]>;
-type UserWhere = NonNullable<UserFindManyConfig['where']>;
-type UserColumns = NonNullable<UserFindManyConfig['columns']>;
+export type UserUpdate = Partial<Omit<UserInsert, 'id' | 'createdAt' | 'updatedAt'>>;
+type UserWhere = Partial<Pick<typeof users.$inferSelect, 'id' | 'username' | 'token'>>;
 
 const publicUserColumns = {
   id: true,
@@ -68,16 +67,14 @@ const publicUserColumns = {
   updatedAt: true,
   role: true,
   view: true,
-} as const satisfies UserColumns;
+} as const;
 
 const publicUserColumnsWithAvatar = {
   ...publicUserColumns,
   avatar: true,
-} as const satisfies UserColumns;
+} as const;
 
-const userTotpExtras = {
-  totpEnabled: (user) => isNotNull(user.totpSecret).mapWith(Boolean),
-} satisfies NonNullable<UserFindManyConfig['extras']>;
+const totpEnabled = (user: typeof users) => isNotNull(user.totpSecret).mapWith(Boolean);
 
 const userRelations = {
   sessions: true,
@@ -89,137 +86,81 @@ const userRelations = {
   },
   passkeys: true,
   quota: true,
-} as const satisfies NonNullable<UserFindManyConfig['with']>;
+} as const;
 
 function parseView<T extends { view: unknown }>(row: T) {
   return { ...row, view: userViewSchema.parse(row.view) };
 }
 
-async function queryUserSummary(where: UserWhere, client: DbClient) {
-  return client.query.users.findFirst({
+async function findUser(where: UserWhere, client: DbClient): Promise<User | null> {
+  const row = await client.query.users.findFirst({
     columns: publicUserColumns,
-    where,
-    with: { quota: true },
-  });
-}
-
-async function queryUser(where: UserWhere, client: DbClient) {
-  return client.query.users.findFirst({
-    columns: publicUserColumns,
-    extras: userTotpExtras,
+    extras: { totpEnabled },
     where,
     with: userRelations,
   });
+  return row ? parseView(row) : null;
 }
-
-async function queryLoginUser(where: UserWhere, client: DbClient) {
-  return client.query.users.findFirst({
-    columns: { ...publicUserColumns, password: true, totpSecret: true },
-    extras: userTotpExtras,
-    where,
-    with: userRelations,
-  });
-}
-
-function parseUser(row: NonNullable<Awaited<ReturnType<typeof queryUser>>>): User {
-  return parseView(row);
-}
-
-function parseUserSummary(row: NonNullable<Awaited<ReturnType<typeof queryUserSummary>>>): LimitedUser {
-  return parseView(row);
-}
-
-function parseLoginUser(row: NonNullable<Awaited<ReturnType<typeof queryLoginUser>>>): LoginUser {
-  const { password, totpSecret, ...user } = row;
-  return { ...parseView(user), password, totpSecret };
-}
-
-type UserQueryRow = NonNullable<Awaited<ReturnType<typeof queryUser>>>;
-type UserSummaryQueryRow = NonNullable<Awaited<ReturnType<typeof queryUserSummary>>>;
-type LoginUserQueryRow = NonNullable<Awaited<ReturnType<typeof queryLoginUser>>>;
-
-export type User = Omit<UserQueryRow, 'view'> & {
-  view: UserViewSettings;
-  avatar?: string | null;
-};
-export type LimitedUser = Omit<UserSummaryQueryRow, 'view'> & {
-  view: UserViewSettings;
-  avatar?: string | null;
-};
-type LoginUser = User & Pick<LoginUserQueryRow, 'password' | 'totpSecret'>;
 
 export async function getUserIdentity(id: string, client: DbClient = db) {
-  const rows = await client
-    .select({ id: users.id, username: users.username, role: users.role })
-    .from(users)
-    .where(eq(users.id, id))
-    .limit(1);
-  return rows[0] ?? null;
+  return (
+    (await client.query.users.findFirst({
+      columns: { id: true, username: true, role: true },
+      where: { id },
+    })) ?? null
+  );
 }
 
 export async function usernameExists(username: string, client: DbClient = db) {
-  const rows = await client.select({ id: users.id }).from(users).where(eq(users.username, username)).limit(1);
-  return rows.length > 0;
+  return !!(await client.query.users.findFirst({ columns: { id: true }, where: { username } }));
 }
 
 export async function getUser(id: string, client: DbClient = db) {
-  const row = await queryUser({ id }, client);
-  return row ? parseUser(row) : null;
+  return findUser({ id }, client);
 }
 
-export async function getLoginUser(username: string, client: DbClient = db) {
-  const row = await queryLoginUser({ username }, client);
-  return row ? parseLoginUser(row) : null;
+export async function getLoginUser(username: string, client: DbClient = db): Promise<LoginUser | null> {
+  const row = await client.query.users.findFirst({
+    columns: { ...publicUserColumns, password: true, totpSecret: true },
+    extras: { totpEnabled },
+    where: { username },
+    with: userRelations,
+  });
+  return row ? parseView(row) : null;
 }
 
 export async function getUserByToken(token: string, client: DbClient = db) {
-  const row = await queryUser({ token }, client);
-  return row ? parseUser(row) : null;
+  return findUser({ token }, client);
 }
 
-export async function getUserSummaryByToken(token: string, client: DbClient = db) {
-  const row = await queryUserSummary({ token }, client);
-  return row ? parseUserSummary(row) : null;
-}
-
-export async function getUserBySession(sessionId: string, client: DbClient = db) {
+export async function getUserBySession(sessionId: string, client: DbClient = db): Promise<User | null> {
   const session = await client.query.userSessions.findFirst({
     columns: {},
     where: { id: sessionId },
     with: {
       user: {
         columns: publicUserColumns,
-        extras: userTotpExtras,
+        extras: { totpEnabled },
         with: userRelations,
       },
     },
   });
-  return session ? parseUser(session.user) : null;
-}
-
-export async function getUserSummaryBySession(sessionId: string, client: DbClient = db) {
-  const session = await client.query.userSessions.findFirst({
-    columns: {},
-    where: { id: sessionId },
-    with: {
-      user: {
-        columns: publicUserColumns,
-        with: { quota: true },
-      },
-    },
-  });
-  return session ? parseUserSummary(session.user) : null;
+  return session ? parseView(session.user) : null;
 }
 
 export async function getUserSummary(id: string, client: DbClient = db) {
-  const row = await queryUserSummary({ id }, client);
-  return row ? parseUserSummary(row) : null;
+  const row = await client.query.users.findFirst({
+    columns: publicUserColumns,
+    where: { id },
+    with: { quota: true },
+  });
+  return row ? parseView(row) : null;
 }
 
 export async function listUsers(
   options: { roles?: readonly Role[]; excludeId?: string; avatar?: boolean } = {},
   client: DbClient = db,
-) {
+): Promise<LimitedUser[]> {
   if (options.roles?.length === 0) return [];
   const rows = await client.query.users.findMany({
     columns: options.avatar ? publicUserColumnsWithAvatar : publicUserColumns,
@@ -232,20 +173,20 @@ export async function listUsers(
         : undefined,
     with: { quota: true },
   });
-  return rows.map(parseUserSummary);
+  return rows.map(parseView);
 }
 
 export async function listUserDetails(
   options: { id?: string; avatar?: boolean } = {},
   client: DbClient = db,
-) {
+): Promise<User[]> {
   const rows = await client.query.users.findMany({
     columns: options.avatar ? publicUserColumnsWithAvatar : publicUserColumns,
-    extras: userTotpExtras,
+    extras: { totpEnabled },
     where: options.id ? { id: options.id } : undefined,
     with: userRelations,
   });
-  return rows.map(parseUser);
+  return rows.map(parseView);
 }
 
 export async function createUser(data: UserInsert, client: DbClient = db) {
@@ -259,25 +200,4 @@ export async function createUser(data: UserInsert, client: DbClient = db) {
 export async function updateUser(id: string, data: UserUpdate, client: DbClient = db) {
   const [updated] = await client.update(users).set(data).where(eq(users.id, id)).returning({ id: users.id });
   return updated ? getUser(updated.id, client) : null;
-}
-
-export async function updateUserSummary(id: string, data: UserUpdate, client: DbClient = db) {
-  const [updated] = await client.update(users).set(data).where(eq(users.id, id)).returning({ id: users.id });
-  return updated ? getUserSummary(updated.id, client) : null;
-}
-
-export async function enableTotp(id: string, secret: string, client: DbClient = db) {
-  const rows = await client
-    .update(users)
-    .set({ totpSecret: secret })
-    .where(and(eq(users.id, id), isNull(users.totpSecret)))
-    .returning({ id: users.id });
-  return rows.length > 0;
-}
-
-export async function removeUser(id: string, client: DbClient = db) {
-  const selected = await getUserSummary(id, client);
-  if (!selected) return null;
-  const deleted = await client.delete(users).where(eq(users.id, id)).returning({ id: users.id });
-  return deleted[0] ? selected : null;
 }

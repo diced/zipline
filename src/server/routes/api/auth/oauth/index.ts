@@ -1,12 +1,12 @@
 import { ApiError } from '@/lib/api/errors';
 import { db } from '@/lib/db';
-import { type OAuthProvider, oauthProviderSchema, removeOAuthProviders } from '@/lib/db/models/oauth';
+import { type OAuthProvider, oauthProviderSchema } from '@/lib/db/models/oauth';
 import { getUser } from '@/lib/db/models/user';
-import { users } from '@/lib/db/schema';
+import { oauthProviders } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import z from 'zod';
 
 export type ApiAuthOauthResponse = OAuthProvider[];
@@ -46,11 +46,10 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const [credentials] = await db
-          .select({ password: users.password })
-          .from(users)
-          .where(eq(users.id, req.user.id))
-          .limit(1);
+        const credentials = await db.query.users.findFirst({
+          columns: { password: true },
+          where: { id: req.user.id },
+        });
         if (!credentials) throw new Error(`User ${req.user.id} no longer exists`);
         const { password } = credentials;
 
@@ -60,7 +59,9 @@ export default typedPlugin(
         const { provider } = req.body;
 
         const user = await db.transaction(async (tx) => {
-          await removeOAuthProviders(req.user.id, provider, tx);
+          await tx
+            .delete(oauthProviders)
+            .where(and(eq(oauthProviders.userId, req.user.id), eq(oauthProviders.provider, provider)));
           return getUser(req.user.id, tx);
         });
         if (!user) throw new Error(`User ${req.user.id} no longer exists`);

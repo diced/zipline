@@ -1,17 +1,12 @@
 import { ApiError } from '@/lib/api/errors';
 import { db } from '@/lib/db';
-import {
-  removeOtherSessions,
-  removeSession,
-  type UserSession,
-  userSessionSchema,
-} from '@/lib/db/models/session';
+import { type UserSession, userSessionSchema } from '@/lib/db/models/session';
 import { userSessions } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { userMiddleware } from '@/server/middleware/user';
 import { getSession } from '@/server/session';
 import typedPlugin from '@/server/typedPlugin';
-import { eq } from 'drizzle-orm';
+import { and, eq, ne } from 'drizzle-orm';
 import z from 'zod';
 
 export type ApiUserSessionsResponse = {
@@ -74,7 +69,9 @@ export default typedPlugin(
         const currentSession = await getSession(req, res);
 
         if (req.body.all) {
-          await removeOtherSessions(req.user.id, currentSession.sessionId!);
+          await db
+            .delete(userSessions)
+            .where(and(eq(userSessions.userId, req.user.id), ne(userSessions.id, currentSession.sessionId!)));
           const sessions = await db.select().from(userSessions).where(eq(userSessions.userId, req.user.id));
 
           logger.info('user logged out all logged in sessions', {
@@ -90,7 +87,9 @@ export default typedPlugin(
         if (req.body.sessionId === currentSession.sessionId) throw new ApiError(1021);
         if (!req.user.sessions.find((session) => session.id === req.body.sessionId)) throw new ApiError(1031);
 
-        await removeSession(req.user.id, req.body.sessionId!);
+        await db
+          .delete(userSessions)
+          .where(and(eq(userSessions.userId, req.user.id), eq(userSessions.id, req.body.sessionId!)));
         const sessions = await db.select().from(userSessions).where(eq(userSessions.userId, req.user.id));
 
         logger.info('user logged out of session', {

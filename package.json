@@ -59,7 +59,6 @@
     "detect-browser": "^5.3.0",
     "devalue": "^5.8.1",
     "drizzle-orm": "1.0.0-rc.4",
-    "drizzle-zod": "0.8.3",
     "fast-glob": "^3.3.3",
     "fastify": "^5.9.0",
     "fastify-plugin": "^6.0.0",

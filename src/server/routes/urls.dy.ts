@@ -1,10 +1,9 @@
 import { verifyAccessToken } from '@/lib/accessToken';
 import { config } from '@/lib/config';
 import { db } from '@/lib/db';
-import { recordUrlView, removeUrl } from '@/lib/db/models/url';
 import { urls } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
-import { eq, or } from 'drizzle-orm';
+import { eq, or, sql } from 'drizzle-orm';
 import { FastifyReply, FastifyRequest } from 'fastify';
 
 type Params = {
@@ -34,7 +33,7 @@ export async function urlsRoute(
 
   if (url.maxViews && url.views >= url.maxViews) {
     if (config.features.deleteOnMaxViews) {
-      await removeUrl(url.id);
+      await db.delete(urls).where(eq(urls.id, url.id));
 
       logger.info(`${url.code} deleted due to reaching max views`, {
         id: url.id,
@@ -51,7 +50,12 @@ export async function urlsRoute(
     if (!valid) return res.redirect(`/view/url/${url.id}`);
   }
 
-  await recordUrlView(url.id);
+  const [updated] = await db
+    .update(urls)
+    .set({ views: sql`${urls.views} + 1` })
+    .where(eq(urls.id, url.id))
+    .returning({ id: urls.id });
+  if (!updated) throw new Error(`URL ${url.id} disappeared before its view could be recorded`);
 
   return res.redirect(url.destination);
 }

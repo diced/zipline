@@ -70,13 +70,9 @@ export function startTasks(server: FastifyInstance) {
                 break;
               }
               case 'thumbnail.touch': {
-                const createdAt =
-                  message.payload.createdAt instanceof Date
-                    ? message.payload.createdAt
-                    : new Date(message.payload.createdAt);
                 const [updated] = await db
                   .update(thumbnailTable)
-                  .set({ createdAt })
+                  .set({ createdAt: message.payload.createdAt })
                   .where(eq(thumbnailTable.id, message.payload.id))
                   .returning();
                 result = updated ?? null;
@@ -89,7 +85,7 @@ export function startTasks(server: FastifyInstance) {
             this.postMessage({
               type: 'db-response',
               id: message.id,
-              result: JSON.stringify(result),
+              result,
             } satisfies DomainDbResponse);
           }
         },

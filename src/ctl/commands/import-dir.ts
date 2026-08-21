@@ -74,7 +74,9 @@ export async function importDir(
   }
 
   if (!skipDb) {
-    const created = data.length ? await db.insert(fileTable).values(data).returning() : [];
+    const created = data.length
+      ? await db.insert(fileTable).values(data).returning({ id: fileTable.id })
+      : [];
     console.log(`Inserted ${created.length} files into the database.`);
   }
 

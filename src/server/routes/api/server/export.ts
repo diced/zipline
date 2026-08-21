@@ -1,6 +1,5 @@
 import { ApiError } from '@/lib/api/errors';
 import { db } from '@/lib/db';
-import { listExportUsers } from '@/lib/db/models/serverData';
 import {
   files as fileRecords,
   folders as folderRecords,
@@ -9,7 +8,6 @@ import {
   thumbnails as thumbnailRecords,
   urls as urlRecords,
   users as userRecords,
-  zipline,
 } from '@/lib/db/schema';
 import { Export4, export4Schema } from '@/lib/import/version4/validateExport';
 import { log } from '@/lib/logger';
@@ -77,7 +75,7 @@ export default typedPlugin(
 
         logger.debug('exporting server data', { format: '4', requester: req.user.username });
 
-        const [settingsTable] = await db.select().from(zipline).limit(1);
+        const settingsTable = await db.query.zipline.findFirst();
         if (!settingsTable) throw new ApiError(1023);
 
         const env = Object.fromEntries(
@@ -122,7 +120,17 @@ export default typedPlugin(
           },
         };
 
-        const users = await listExportUsers();
+        const users = await db.query.users.findMany({
+          with: {
+            passkeys: true,
+            quota: true,
+            oauthProviders: true,
+            invites: true,
+            urls: true,
+            tags: { with: { files: { columns: { id: true } } } },
+            folders: { with: { files: { columns: { id: true } } } },
+          },
+        });
 
         for (const user of users) {
           export4.data.users.push({

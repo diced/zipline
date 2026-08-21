@@ -2,13 +2,8 @@ import { ApiError } from '@/lib/api/errors';
 import { createToken } from '@/lib/crypto';
 import { db } from '@/lib/db';
 import {
-  createV3Folder,
-  createV3User,
-  type ImportOauthProvider,
-  updateV3User,
-} from '@/lib/db/models/serverData';
-import {
   files as fileRecords,
+  folders as folderRecords,
   oauthProviders as oauthProviderRecords,
   urls as urlRecords,
   users as userRecords,
@@ -21,7 +16,7 @@ import { secondlyRatelimit } from '@/lib/ratelimits';
 import { administratorMiddleware } from '@/server/middleware/administrator';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
-import { eq, isNull } from 'drizzle-orm';
+import { eq, inArray, isNull } from 'drizzle-orm';
 import z from 'zod';
 
 export type ApiServerImportV3 = z.infer<typeof serverImportSchema>;
@@ -34,6 +29,11 @@ const serverImportSchema = z.object({
 });
 
 const parseDate = (date: string) => (isNaN(Date.parse(date)) ? new Date() : new Date(date));
+
+type ImportOauthProvider = Pick<
+  typeof oauthProviderRecords.$inferInsert,
+  'provider' | 'accessToken' | 'refreshToken' | 'oauthId' | 'username'
+>;
 
 const logger = log('api').c('server').c('import').c('v3');
 
@@ -127,31 +127,50 @@ export default typedPlugin(
           }
 
           if (importFrom) {
-            const updated = await updateV3User(
-              req.user.id,
-              {
-                avatar: user.avatar ?? null,
-                totpSecret: user.totp_secret ?? null,
-              },
-              importedProviders,
-            );
+            const updated = await db.transaction(async (tx) => {
+              const [updated] = await tx
+                .update(userRecords)
+                .set({ avatar: user.avatar ?? null, totpSecret: user.totp_secret ?? null })
+                .where(eq(userRecords.id, req.user.id))
+                .returning({ id: userRecords.id });
+              if (!updated) throw new Error(`User ${req.user.id} does not exist`);
+
+              if (importedProviders.length) {
+                await tx
+                  .insert(oauthProviderRecords)
+                  .values(importedProviders.map((provider) => ({ ...provider, userId: req.user.id })));
+              }
+
+              return updated;
+            });
 
             usersImportedToId[id] = updated.id;
 
             continue;
           }
 
-          const created = await createV3User(
-            {
-              username: user.username,
-              password: user.password || null,
-              role,
-              token: createToken(),
-              avatar: user.avatar ?? null,
-              totpSecret: user.totp_secret ?? null,
-            },
-            importedProviders,
-          );
+          const created = await db.transaction(async (tx) => {
+            const [created] = await tx
+              .insert(userRecords)
+              .values({
+                username: user.username,
+                password: user.password || null,
+                role,
+                token: createToken(),
+                avatar: user.avatar ?? null,
+                totpSecret: user.totp_secret ?? null,
+              })
+              .returning({ id: userRecords.id });
+            if (!created) throw new Error('User insert did not return a row');
+
+            if (importedProviders.length) {
+              await tx
+                .insert(oauthProviderRecords)
+                .values(importedProviders.map((provider) => ({ ...provider, userId: created.id })));
+            }
+
+            return created;
+          });
 
           usersImportedToId[id] = created.id;
         }
@@ -229,12 +248,30 @@ export default typedPlugin(
             continue;
           }
 
-          const created = await createV3Folder({
-            userId: user,
-            name: folder.name,
-            public: folder.public,
-            createdAt: parseDate(folder.created_at),
-            fileIds: folder.files.map((file) => filesImportedToId[file]),
+          const fileIds = [...new Set(files)];
+          const created = await db.transaction(async (tx) => {
+            const [created] = await tx
+              .insert(folderRecords)
+              .values({
+                userId: user,
+                name: folder.name,
+                public: folder.public,
+                createdAt: parseDate(folder.created_at),
+              })
+              .returning({ id: folderRecords.id });
+            if (!created) throw new Error('Folder insert did not return a row');
+
+            if (fileIds.length) {
+              const updatedFiles = await tx
+                .update(fileRecords)
+                .set({ folderId: created.id })
+                .where(inArray(fileRecords.id, fileIds))
+                .returning({ id: fileRecords.id });
+              if (updatedFiles.length !== fileIds.length)
+                throw new Error('One or more imported folder files no longer exist');
+            }
+
+            return created;
           });
 
           foldersImportedToId[id] = created.id;

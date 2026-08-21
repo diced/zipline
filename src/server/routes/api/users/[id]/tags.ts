@@ -1,5 +1,6 @@
 import { ApiError } from '@/lib/api/errors';
-import { listTags, Tag } from '@/lib/db/models/tag';
+import { db } from '@/lib/db';
+import { tagColumns, Tag } from '@/lib/db/models/tag';
 import { getUserIdentity } from '@/lib/db/models/user';
 import { canInteract } from '@/lib/role';
 import { administratorMiddleware } from '@/server/middleware/administrator';
@@ -33,7 +34,11 @@ export default typedPlugin(
         if (!user) throw new ApiError(9002);
         if (!canInteract(req.user.role, user.role)) throw new ApiError(9002);
 
-        const tags = await listTags(user.id);
+        const tags = await db.query.tags.findMany({
+          columns: tagColumns,
+          where: { userId: user.id },
+          with: { files: { columns: { id: true } } },
+        });
 
         return res.send(tags);
       },

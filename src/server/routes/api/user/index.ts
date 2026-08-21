@@ -1,7 +1,6 @@
 import { ApiError } from '@/lib/api/errors';
 import { hashPassword, verifyPassword } from '@/lib/crypto';
 import { db } from '@/lib/db';
-import { removeOtherSessions } from '@/lib/db/models/session';
 import {
   getUser,
   updateUser,
@@ -10,14 +9,14 @@ import {
   type UserUpdate,
   userSchema,
 } from '@/lib/db/models/user';
-import { users } from '@/lib/db/schema';
+import { userSessions } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { zStringTrimmed } from '@/lib/validation';
 import { userMiddleware } from '@/server/middleware/user';
 import { getSession, saveSession } from '@/server/session';
 import typedPlugin from '@/server/typedPlugin';
-import { eq } from 'drizzle-orm';
+import { and, eq, ne } from 'drizzle-orm';
 import z from 'zod';
 
 export type ApiUserResponse = {
@@ -96,11 +95,10 @@ export default typedPlugin(
 
         const changingPassword = !!req.body.password;
         if (changingPassword) {
-          const [passwdReq] = await db
-            .select({ password: users.password })
-            .from(users)
-            .where(eq(users.id, req.user.id))
-            .limit(1);
+          const passwdReq = await db.query.users.findFirst({
+            columns: { password: true },
+            where: { id: req.user.id },
+          });
 
           if (!passwdReq) throw new ApiError(1068);
 
@@ -169,7 +167,14 @@ export default typedPlugin(
 
         const user = changingPassword
           ? await db.transaction(async (tx) => {
-              await removeOtherSessions(req.user.id, currentSession.sessionId ?? '', tx);
+              await tx
+                .delete(userSessions)
+                .where(
+                  and(
+                    eq(userSessions.userId, req.user.id),
+                    ne(userSessions.id, currentSession.sessionId ?? ''),
+                  ),
+                );
               return updateUser(req.user.id, data, tx);
             })
           : Object.keys(data).length

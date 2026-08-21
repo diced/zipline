@@ -1,16 +1,16 @@
 import { ApiError } from '@/lib/api/errors';
 import { hashPassword } from '@/lib/crypto';
 import { db } from '@/lib/db';
-import { publicUrlColumns, Url, urlSchema } from '@/lib/db/models/url';
+import { Url, urlSchema } from '@/lib/db/models/url';
 import { urls } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { zStringTrimmed } from '@/lib/validation';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, getColumns } from 'drizzle-orm';
 import z from 'zod';
 
-export type ApiUserUrlsIdResponse = Url;
+export type ApiUserUrlsIdResponse = Omit<Url, 'password'>;
 
 const logger = log('api').c('user').c('urls').c('[id]');
 
@@ -18,13 +18,15 @@ const paramsSchema = z.object({
   id: z.string(),
 });
 
+const { password: _password, ...urlColumns } = getColumns(urls);
+
 async function getUserUrl(id: string, userId: string) {
-  const rows = await db
-    .select(publicUrlColumns)
-    .from(urls)
-    .where(and(eq(urls.id, id), eq(urls.userId, userId)))
-    .limit(1);
-  return rows[0] ?? null;
+  return (
+    (await db.query.urls.findFirst({
+      columns: { password: false },
+      where: { id, userId },
+    })) ?? null
+  );
 }
 
 export const PATH = '/api/user/urls/:id';
@@ -106,7 +108,7 @@ export default typedPlugin(
                 .update(urls)
                 .set(changes)
                 .where(and(eq(urls.id, id), eq(urls.userId, req.user.id)))
-                .returning(publicUrlColumns)
+                .returning(urlColumns)
             )[0]
           : url;
         if (!updatedUrl) throw new ApiError(9002);
@@ -138,7 +140,7 @@ export default typedPlugin(
           await db
             .delete(urls)
             .where(and(eq(urls.id, id), eq(urls.userId, req.user.id)))
-            .returning(publicUrlColumns)
+            .returning(urlColumns)
         )[0];
         if (!deletedUrl) throw new ApiError(9002);
 

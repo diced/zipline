@@ -1,8 +1,9 @@
 import { createId } from '@paralleldrive/cuid2';
+import type { Json } from 'drizzle-orm';
+import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 import {
   bigint,
   boolean,
-  foreignKey,
   index,
   integer,
   jsonb,
@@ -20,9 +21,10 @@ import {
   userFilesQuotaValues,
 } from './enums';
 
-export type JsonPrimitive = boolean | number | string | null;
-export type JsonValue = JsonPrimitive | JsonValue[] | { [key: string]: JsonValue | undefined };
-export type ExternalLink = { name: string; url: string };
+type ExternalLink = { name: string; url: string };
+export type IncompleteFileMetadata = {
+  file: { filename: string; type: string; id: string };
+};
 
 export const role = pgEnum('Role', roleValues);
 export const oauthProviderType = pgEnum('OAuthProviderType', oauthProviderTypeValues);
@@ -62,10 +64,9 @@ export const zipline = pgTable('Zipline', {
   filesRoute: text('filesRoute').default('/u').notNull(),
   filesLength: integer('filesLength').default(6).notNull(),
   filesDefaultFormat: text('filesDefaultFormat').default('random').notNull(),
-  // Prisma's PostgreSQL list columns are nullable in the physical catalog.
-  filesDisabledTypes: text('filesDisabledTypes').array().default([]),
+  filesDisabledTypes: text('filesDisabledTypes').array().default([]).notNull(),
   filesDisabledTypesDefault: text('filesDisabledTypesDefault'),
-  filesDisabledExtensions: text('filesDisabledExtensions').array(),
+  filesDisabledExtensions: text('filesDisabledExtensions').array().default([]).notNull(),
   filesMaxFileSize: text('filesMaxFileSize').default('100mb').notNull(),
   filesDefaultExpiration: text('filesDefaultExpiration'),
   filesMaxExpiration: text('filesMaxExpiration'),
@@ -126,8 +127,8 @@ export const zipline = pgTable('Zipline', {
   oauthDiscordClientId: text('oauthDiscordClientId'),
   oauthDiscordClientSecret: text('oauthDiscordClientSecret'),
   oauthDiscordRedirectUri: text('oauthDiscordRedirectUri'),
-  oauthDiscordAllowedIds: text('oauthDiscordAllowedIds').array().default([]),
-  oauthDiscordDeniedIds: text('oauthDiscordDeniedIds').array().default([]),
+  oauthDiscordAllowedIds: text('oauthDiscordAllowedIds').array().default([]).notNull(),
+  oauthDiscordDeniedIds: text('oauthDiscordDeniedIds').array().default([]).notNull(),
 
   oauthGoogleClientId: text('oauthGoogleClientId'),
   oauthGoogleClientSecret: text('oauthGoogleClientSecret'),
@@ -155,7 +156,7 @@ export const zipline = pgTable('Zipline', {
   ratelimitMax: integer('ratelimitMax').default(10).notNull(),
   ratelimitWindow: integer('ratelimitWindow'),
   ratelimitAdminBypass: boolean('ratelimitAdminBypass').default(true).notNull(),
-  ratelimitAllowList: text('ratelimitAllowList').array(),
+  ratelimitAllowList: text('ratelimitAllowList').array().default([]).notNull(),
 
   httpWebhookOnUpload: text('httpWebhookOnUpload'),
   httpWebhookOnShorten: text('httpWebhookOnShorten'),
@@ -168,13 +169,13 @@ export const zipline = pgTable('Zipline', {
   discordOnUploadUsername: text('discordOnUploadUsername'),
   discordOnUploadAvatarUrl: text('discordOnUploadAvatarUrl'),
   discordOnUploadContent: text('discordOnUploadContent'),
-  discordOnUploadEmbed: jsonb('discordOnUploadEmbed').$type<JsonValue>(),
+  discordOnUploadEmbed: jsonb('discordOnUploadEmbed').$type<Json>(),
 
   discordOnShortenWebhookUrl: text('discordOnShortenWebhookUrl'),
   discordOnShortenUsername: text('discordOnShortenUsername'),
   discordOnShortenAvatarUrl: text('discordOnShortenAvatarUrl'),
   discordOnShortenContent: text('discordOnShortenContent'),
-  discordOnShortenEmbed: jsonb('discordOnShortenEmbed').$type<JsonValue>(),
+  discordOnShortenEmbed: jsonb('discordOnShortenEmbed').$type<Json>(),
 
   pwaEnabled: boolean('pwaEnabled').default(false).notNull(),
   pwaTitle: text('pwaTitle').default('Zipline').notNull(),
@@ -183,7 +184,7 @@ export const zipline = pgTable('Zipline', {
   pwaThemeColor: text('pwaThemeColor').default('#000000').notNull(),
   pwaBackgroundColor: text('pwaBackgroundColor').default('#000000').notNull(),
 
-  domains: text('domains').array().default([]),
+  domains: text('domains').array().default([]).notNull(),
 });
 
 export const users = pgTable(
@@ -197,7 +198,7 @@ export const users = pgTable(
     avatar: text('avatar'),
     token: text('token').notNull(),
     role: role('role').default('USER').notNull(),
-    view: jsonb('view').$type<Record<string, JsonValue | undefined>>().default({}).notNull(),
+    view: jsonb('view').$type<Record<string, Json | undefined>>().default({}).notNull(),
     totpSecret: text('totpSecret'),
   },
   (table) => [
@@ -206,35 +207,26 @@ export const users = pgTable(
   ],
 );
 
-export const folders = pgTable(
-  'Folder',
-  {
-    id: id(),
-    createdAt: createdAt(),
-    updatedAt: updatedAt(),
-    name: text('name').notNull(),
-    public: boolean('public').default(false).notNull(),
-    allowUploads: boolean('allowUploads').default(false).notNull(),
-    parentId: text('parentId'),
-    userId: text('userId').notNull(),
-  },
-  (table) => [
-    foreignKey({
+export const folders = pgTable('Folder', {
+  id: id(),
+  createdAt: createdAt(),
+  updatedAt: updatedAt(),
+  name: text('name').notNull(),
+  public: boolean('public').default(false).notNull(),
+  allowUploads: boolean('allowUploads').default(false).notNull(),
+  parentId: text('parentId').references((): AnyPgColumn => folders.id, {
+    name: 'Folder_parentId_fkey',
+    onDelete: 'set null',
+    onUpdate: 'cascade',
+  }),
+  userId: text('userId')
+    .notNull()
+    .references(() => users.id, {
       name: 'Folder_userId_fkey',
-      columns: [table.userId],
-      foreignColumns: [users.id],
-    })
-      .onDelete('cascade')
-      .onUpdate('cascade'),
-    foreignKey({
-      name: 'Folder_parentId_fkey',
-      columns: [table.parentId],
-      foreignColumns: [table.id],
-    })
-      .onDelete('set null')
-      .onUpdate('cascade'),
-  ],
-);
+      onDelete: 'cascade',
+      onUpdate: 'cascade',
+    }),
+});
 
 export const files = pgTable(
   'File',
@@ -252,73 +244,55 @@ export const files = pgTable(
     favorite: boolean('favorite').default(false).notNull(),
     password: text('password'),
     anonymous: boolean('anonymous').default(false).notNull(),
-    userId: text('userId'),
-    folderId: text('folderId'),
+    userId: text('userId').references(() => users.id, {
+      name: 'File_userId_fkey',
+      onDelete: 'set null',
+      onUpdate: 'cascade',
+    }),
+    folderId: text('folderId').references(() => folders.id, {
+      name: 'File_folderId_fkey',
+      onDelete: 'set null',
+      onUpdate: 'cascade',
+    }),
   },
   (table) => [
     index('File_name_idx').on(table.name),
     index('File_userId_size_idx').on(table.userId, table.size),
     index('File_folderId_createdAt_idx').on(table.folderId, table.createdAt),
-    foreignKey({
-      name: 'File_userId_fkey',
-      columns: [table.userId],
-      foreignColumns: [users.id],
-    })
-      .onDelete('set null')
-      .onUpdate('cascade'),
-    foreignKey({
-      name: 'File_folderId_fkey',
-      columns: [table.folderId],
-      foreignColumns: [folders.id],
-    })
-      .onDelete('set null')
-      .onUpdate('cascade'),
   ],
 );
 
-export const exports = pgTable(
-  'Export',
-  {
-    id: id(),
-    createdAt: createdAt(),
-    updatedAt: updatedAt(),
-    completed: boolean('completed').default(false).notNull(),
-    path: text('path').notNull(),
-    files: integer('files').notNull(),
-    size: text('size').notNull(),
-    userId: text('userId').notNull(),
-  },
-  (table) => [
-    foreignKey({
+export const exports = pgTable('Export', {
+  id: id(),
+  createdAt: createdAt(),
+  updatedAt: updatedAt(),
+  completed: boolean('completed').default(false).notNull(),
+  path: text('path').notNull(),
+  files: integer('files').notNull(),
+  size: text('size').notNull(),
+  userId: text('userId')
+    .notNull()
+    .references(() => users.id, {
       name: 'Export_userId_fkey',
-      columns: [table.userId],
-      foreignColumns: [users.id],
-    })
-      .onDelete('cascade')
-      .onUpdate('cascade'),
-  ],
-);
+      onDelete: 'cascade',
+      onUpdate: 'cascade',
+    }),
+});
 
-export const userSessions = pgTable(
-  'UserSession',
-  {
-    id: text('id').primaryKey(),
-    createdAt: createdAt(),
-    ua: text('ua').notNull(),
-    client: text('client').notNull(),
-    device: text('device').notNull(),
-    userId: text('userId').notNull(),
-  },
-  (table) => [
-    foreignKey({
+export const userSessions = pgTable('UserSession', {
+  id: text('id').primaryKey(),
+  createdAt: createdAt(),
+  ua: text('ua').notNull(),
+  client: text('client').notNull(),
+  device: text('device').notNull(),
+  userId: text('userId')
+    .notNull()
+    .references(() => users.id, {
       name: 'UserSession_userId_fkey',
-      columns: [table.userId],
-      foreignColumns: [users.id],
-    })
-      .onDelete('cascade')
-      .onUpdate('cascade'),
-  ],
-);
+      onDelete: 'cascade',
+      onUpdate: 'cascade',
+    }),
+});
 
 export const userQuotas = pgTable(
   'UserQuota',
@@ -330,41 +304,30 @@ export const userQuotas = pgTable(
     maxBytes: text('maxBytes'),
     maxFiles: integer('maxFiles'),
     maxUrls: integer('maxUrls'),
-    userId: text('userId'),
-  },
-  (table) => [
-    uniqueIndex('UserQuota_userId_key').on(table.userId),
-    foreignKey({
+    userId: text('userId').references(() => users.id, {
       name: 'UserQuota_userId_fkey',
-      columns: [table.userId],
-      foreignColumns: [users.id],
-    })
-      .onDelete('cascade')
-      .onUpdate('cascade'),
-  ],
+      onDelete: 'cascade',
+      onUpdate: 'cascade',
+    }),
+  },
+  (table) => [uniqueIndex('UserQuota_userId_key').on(table.userId)],
 );
 
-export const userPasskeys = pgTable(
-  'UserPasskey',
-  {
-    id: id(),
-    createdAt: createdAt(),
-    updatedAt: updatedAt(),
-    lastUsed: timestamp('lastUsed', { precision: 3, mode: 'date' }),
-    name: text('name').notNull(),
-    reg: jsonb('reg').$type<Record<string, JsonValue | undefined>>().notNull(),
-    userId: text('userId').notNull(),
-  },
-  (table) => [
-    foreignKey({
+export const userPasskeys = pgTable('UserPasskey', {
+  id: id(),
+  createdAt: createdAt(),
+  updatedAt: updatedAt(),
+  lastUsed: timestamp('lastUsed', { precision: 3, mode: 'date' }),
+  name: text('name').notNull(),
+  reg: jsonb('reg').$type<Record<string, Json | undefined>>().notNull(),
+  userId: text('userId')
+    .notNull()
+    .references(() => users.id, {
       name: 'UserPasskey_userId_fkey',
-      columns: [table.userId],
-      foreignColumns: [users.id],
-    })
-      .onDelete('cascade')
-      .onUpdate('cascade'),
-  ],
-);
+      onDelete: 'cascade',
+      onUpdate: 'cascade',
+    }),
+});
 
 export const oauthProviders = pgTable(
   'OAuthProvider',
@@ -372,23 +335,20 @@ export const oauthProviders = pgTable(
     id: id(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
-    userId: text('userId').notNull(),
+    userId: text('userId')
+      .notNull()
+      .references(() => users.id, {
+        name: 'OAuthProvider_userId_fkey',
+        onDelete: 'restrict',
+        onUpdate: 'cascade',
+      }),
     provider: oauthProviderType('provider').notNull(),
     username: text('username').notNull(),
     accessToken: text('accessToken').notNull(),
     refreshToken: text('refreshToken'),
     oauthId: text('oauthId'),
   },
-  (table) => [
-    uniqueIndex('OAuthProvider_provider_oauthId_key').on(table.provider, table.oauthId),
-    foreignKey({
-      name: 'OAuthProvider_userId_fkey',
-      columns: [table.userId],
-      foreignColumns: [users.id],
-    })
-      .onDelete('restrict')
-      .onUpdate('cascade'),
-  ],
+  (table) => [uniqueIndex('OAuthProvider_provider_oauthId_key').on(table.provider, table.oauthId)],
 );
 
 export const thumbnails = pgTable(
@@ -398,42 +358,33 @@ export const thumbnails = pgTable(
     createdAt: createdAt(),
     updatedAt: updatedAt(),
     path: text('path').notNull(),
-    fileId: text('fileId').notNull(),
+    fileId: text('fileId')
+      .notNull()
+      .references(() => files.id, {
+        name: 'Thumbnail_fileId_fkey',
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+      }),
   },
-  (table) => [
-    uniqueIndex('Thumbnail_fileId_key').on(table.fileId),
-    foreignKey({
-      name: 'Thumbnail_fileId_fkey',
-      columns: [table.fileId],
-      foreignColumns: [files.id],
-    })
-      .onDelete('cascade')
-      .onUpdate('cascade'),
-  ],
+  (table) => [uniqueIndex('Thumbnail_fileId_key').on(table.fileId)],
 );
 
-export const incompleteFiles = pgTable(
-  'IncompleteFile',
-  {
-    id: id(),
-    createdAt: createdAt(),
-    updatedAt: updatedAt(),
-    status: incompleteFileStatus('status').notNull(),
-    chunksTotal: integer('chunksTotal').notNull(),
-    chunksComplete: integer('chunksComplete').notNull(),
-    metadata: jsonb('metadata').$type<Record<string, JsonValue | undefined>>().notNull(),
-    userId: text('userId').notNull(),
-  },
-  (table) => [
-    foreignKey({
+export const incompleteFiles = pgTable('IncompleteFile', {
+  id: id(),
+  createdAt: createdAt(),
+  updatedAt: updatedAt(),
+  status: incompleteFileStatus('status').notNull(),
+  chunksTotal: integer('chunksTotal').notNull(),
+  chunksComplete: integer('chunksComplete').notNull(),
+  metadata: jsonb('metadata').$type<IncompleteFileMetadata>().notNull(),
+  userId: text('userId')
+    .notNull()
+    .references(() => users.id, {
       name: 'IncompleteFile_userId_fkey',
-      columns: [table.userId],
-      foreignColumns: [users.id],
-    })
-      .onDelete('cascade')
-      .onUpdate('cascade'),
-  ],
-);
+      onDelete: 'cascade',
+      onUpdate: 'cascade',
+    }),
+});
 
 export const tags = pgTable(
   'Tag',
@@ -443,18 +394,13 @@ export const tags = pgTable(
     updatedAt: updatedAt(),
     name: text('name').notNull(),
     color: text('color').notNull(),
-    userId: text('userId'),
-  },
-  (table) => [
-    uniqueIndex('Tag_name_key').on(table.name),
-    foreignKey({
+    userId: text('userId').references(() => users.id, {
       name: 'Tag_userId_fkey',
-      columns: [table.userId],
-      foreignColumns: [users.id],
-    })
-      .onDelete('set null')
-      .onUpdate('cascade'),
-  ],
+      onDelete: 'set null',
+      onUpdate: 'cascade',
+    }),
+  },
+  (table) => [uniqueIndex('Tag_name_key').on(table.name)],
 );
 
 export const urls = pgTable(
@@ -470,25 +416,20 @@ export const urls = pgTable(
     maxViews: integer('maxViews'),
     password: text('password'),
     enabled: boolean('enabled').default(true).notNull(),
-    userId: text('userId'),
-  },
-  (table) => [
-    uniqueIndex('Url_code_vanity_key').on(table.code, table.vanity),
-    foreignKey({
+    userId: text('userId').references(() => users.id, {
       name: 'Url_userId_fkey',
-      columns: [table.userId],
-      foreignColumns: [users.id],
-    })
-      .onDelete('set null')
-      .onUpdate('cascade'),
-  ],
+      onDelete: 'set null',
+      onUpdate: 'cascade',
+    }),
+  },
+  (table) => [uniqueIndex('Url_code_vanity_key').on(table.code, table.vanity)],
 );
 
 export const metrics = pgTable('Metric', {
   id: id(),
   createdAt: createdAt(),
   updatedAt: updatedAt(),
-  data: jsonb('data').$type<Record<string, JsonValue | undefined>>().notNull(),
+  data: jsonb('data').$type<Record<string, Json | undefined>>().notNull(),
 });
 
 export const invites = pgTable(
@@ -501,58 +442,40 @@ export const invites = pgTable(
     code: text('code').notNull(),
     uses: integer('uses').default(0).notNull(),
     maxUses: integer('maxUses'),
-    inviterId: text('inviterId').notNull(),
+    inviterId: text('inviterId')
+      .notNull()
+      .references(() => users.id, {
+        name: 'Invite_inviterId_fkey',
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+      }),
   },
-  (table) => [
-    uniqueIndex('Invite_code_key').on(table.code),
-    foreignKey({
-      name: 'Invite_inviterId_fkey',
-      columns: [table.inviterId],
-      foreignColumns: [users.id],
-    })
-      .onDelete('cascade')
-      .onUpdate('cascade'),
-  ],
+  (table) => [uniqueIndex('Invite_code_key').on(table.code)],
 );
 
 export const filesToTags = pgTable(
   '_FileToTag',
   {
-    fileId: text('A').notNull(),
-    tagId: text('B').notNull(),
+    fileId: text('A')
+      .notNull()
+      .references(() => files.id, {
+        name: '_FileToTag_A_fkey',
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+      }),
+    tagId: text('B')
+      .notNull()
+      .references(() => tags.id, {
+        name: '_FileToTag_B_fkey',
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+      }),
   },
   (table) => [
     primaryKey({ name: '_FileToTag_AB_pkey', columns: [table.fileId, table.tagId] }),
     index('_FileToTag_B_index').on(table.tagId),
-    foreignKey({
-      name: '_FileToTag_A_fkey',
-      columns: [table.fileId],
-      foreignColumns: [files.id],
-    })
-      .onDelete('cascade')
-      .onUpdate('cascade'),
-    foreignKey({
-      name: '_FileToTag_B_fkey',
-      columns: [table.tagId],
-      foreignColumns: [tags.id],
-    })
-      .onDelete('cascade')
-      .onUpdate('cascade'),
   ],
 );
 
 export type Zipline = typeof zipline.$inferSelect;
-export type User = typeof users.$inferSelect;
-export type Folder = typeof folders.$inferSelect;
-export type File = typeof files.$inferSelect;
-export type Export = typeof exports.$inferSelect;
-export type UserSession = typeof userSessions.$inferSelect;
-export type UserQuota = typeof userQuotas.$inferSelect;
-export type UserPasskey = typeof userPasskeys.$inferSelect;
-export type OAuthProvider = typeof oauthProviders.$inferSelect;
 export type Thumbnail = typeof thumbnails.$inferSelect;
-export type IncompleteFile = typeof incompleteFiles.$inferSelect;
-export type Tag = typeof tags.$inferSelect;
-export type Url = typeof urls.$inferSelect;
-export type Metric = typeof metrics.$inferSelect;
-export type Invite = typeof invites.$inferSelect;

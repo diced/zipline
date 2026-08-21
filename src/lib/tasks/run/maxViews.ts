@@ -4,9 +4,8 @@ import { bytes } from '@/lib/bytes';
 import { config } from '@/lib/config';
 import { db } from '@/lib/db';
 import { removeFiles } from '@/lib/db/models/file';
-import { removeUrls } from '@/lib/db/models/url';
 import { files as fileRecords, urls as urlRecords } from '@/lib/db/schema';
-import { and, gte, isNotNull } from 'drizzle-orm';
+import { and, gte, inArray, isNotNull } from 'drizzle-orm';
 
 export default function maxViews() {
   return async function (this: IntervalTask) {
@@ -43,18 +42,24 @@ export default function maxViews() {
       }
     }
 
-    const [fileCount, urlCount] = await db.transaction(async (tx) =>
-      Promise.all([
-        removeFiles(
-          files.map((f) => f.id),
-          tx,
-        ),
-        removeUrls(
-          urls.map((u) => u.id),
-          tx,
-        ),
-      ]),
-    );
+    const [fileCount, urlCount] = await db.transaction(async (tx) => {
+      const fileCount = await removeFiles(
+        files.map((file) => file.id),
+        tx,
+      );
+      const deletedUrls = urls.length
+        ? await tx
+            .delete(urlRecords)
+            .where(
+              inArray(
+                urlRecords.id,
+                urls.map((url) => url.id),
+              ),
+            )
+            .returning({ id: urlRecords.id })
+        : [];
+      return [fileCount, deletedUrls.length];
+    });
 
     if (fileCount)
       this.logger.info(`deleted ${fileCount} files due to max views`, {

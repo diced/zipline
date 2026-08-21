@@ -1,13 +1,7 @@
 import { ApiError } from '@/lib/api/errors';
 import { db } from '@/lib/db';
-import { File, fileSchema, formatFiles, listFiles } from '@/lib/db/models/file';
-import {
-  Folder,
-  formatFolder,
-  getPublicFolder,
-  getPublicParentChain,
-  publicFolderSchema,
-} from '@/lib/db/models/folder';
+import { File, fileColumns, filePasswordExtra, fileSchema, formatFiles } from '@/lib/db/models/file';
+import { Folder, getPublicFolder, getPublicParentChain, publicFolderSchema } from '@/lib/db/models/folder';
 import { files as fileTable } from '@/lib/db/schema';
 import { paginationQs } from '@/lib/validation';
 import typedPlugin from '@/server/typedPlugin';
@@ -78,25 +72,23 @@ export default typedPlugin(
         const pages = total === 0 ? 0 : Math.ceil(total / perpage);
 
         const files = formatFiles(
-          await listFiles({
-            password: true,
-            tags: false,
+          await db.query.files.findMany({
+            columns: fileColumns,
+            extras: filePasswordExtra,
             where: { folderId: folder.id },
             orderBy: (file, { asc, desc }) => (order === 'asc' ? asc(file[sortBy]) : desc(file[sortBy])),
             offset: (Number(page) - 1) * perpage,
             limit: perpage,
+            with: { thumbnail: { columns: { path: true } } },
           }),
-          true,
         );
 
         if (folder.parentId) {
           folder.parent = await getPublicParentChain(folder.parentId);
         }
 
-        const cleanedFolder = publicFolderSchema.parse(formatFolder(folder, true));
-
         return res.send({
-          folder: cleanedFolder,
+          folder,
           page: files,
           total,
           pages,

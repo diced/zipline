@@ -1,6 +1,5 @@
 import { userPasskeys } from '@/lib/db/schema';
-import { getTableColumns } from 'drizzle-orm';
-import { createSelectSchema } from 'drizzle-zod';
+import { createSelectSchema } from 'drizzle-orm/zod';
 import { z } from 'zod';
 
 const byteSchema = z.number().int().min(0).max(255);
@@ -26,7 +25,4 @@ export const passkeyRegSchema = z.object({
 export type PasskeyReg = z.infer<typeof passkeyRegSchema>;
 
 export const userPasskeySchema = createSelectSchema(userPasskeys, { reg: z.unknown() });
-export type UserPasskey = typeof userPasskeys.$inferSelect;
-
-const { reg: _reg, ...publicPasskeyColumns } = getTableColumns(userPasskeys);
-export { publicPasskeyColumns };
+export type UserPasskey = z.infer<typeof userPasskeySchema>;

@@ -1,4 +1,12 @@
-import { File, formatFiles, fileSchema, listFiles } from '@/lib/db/models/file';
+import { db } from '@/lib/db';
+import {
+  File,
+  fileColumns,
+  filePasswordExtra,
+  fileRelations,
+  fileSchema,
+  formatFiles,
+} from '@/lib/db/models/file';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
 import z from 'zod';
@@ -27,11 +35,13 @@ export default typedPlugin(
         const { take } = req.query;
 
         const files = formatFiles(
-          await listFiles({
-            password: true,
+          await db.query.files.findMany({
+            columns: fileColumns,
+            extras: filePasswordExtra,
             where: { userId: req.user.id },
             orderBy: { createdAt: 'desc' },
             limit: take,
+            with: fileRelations,
           }),
         );
 

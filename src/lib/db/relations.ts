@@ -3,10 +3,7 @@ import * as schema from './schema';
 
 export const relations = defineRelations(schema, (r) => ({
   users: {
-    quota: r.one.userQuotas({
-      from: r.users.id,
-      to: r.userQuotas.userId,
-    }),
+    quota: r.one.userQuotas(),
     passkeys: r.many.userPasskeys(),
     sessions: r.many.userSessions(),
     files: r.many.files(),
@@ -75,10 +72,7 @@ export const relations = defineRelations(schema, (r) => ({
       from: r.files.folderId,
       to: r.folders.id,
     }),
-    thumbnail: r.one.thumbnails({
-      from: r.files.id,
-      to: r.thumbnails.fileId,
-    }),
+    thumbnail: r.one.thumbnails(),
     tags: r.many.tags({
       from: r.files.id.through(r.filesToTags.fileId),
       to: r.tags.id.through(r.filesToTags.tagId),
@@ -96,10 +90,7 @@ export const relations = defineRelations(schema, (r) => ({
       from: r.tags.userId,
       to: r.users.id,
     }),
-    files: r.many.files({
-      from: r.tags.id.through(r.filesToTags.tagId),
-      to: r.files.id.through(r.filesToTags.fileId),
-    }),
+    files: r.many.files(),
   },
   urls: {
     user: r.one.users({

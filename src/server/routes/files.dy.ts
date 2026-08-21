@@ -1,4 +1,7 @@
-import { getFileByName } from '@/lib/db/models/file';
+import { config } from '@/lib/config';
+import { db } from '@/lib/db';
+import { escapeLike } from '@/lib/db/utils';
+import { sanitizeFilename } from '@/lib/fs';
 import { userViewSchema } from '@/lib/db/models/user';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { rawFileHandler } from './raw/[id]';
@@ -17,7 +20,20 @@ export async function filesRoute(
   res: FastifyReply,
 ) {
   const { id } = req.params;
-  const file = await getFileByName(id, 'route');
+  const name = sanitizeFilename(id);
+  if (!name) return res.callNotFound();
+
+  const query = {
+    with: { user: { columns: { view: true } } },
+  } as const;
+  let file = await db.query.files.findFirst({ ...query, where: { name } });
+  if (!file && config.files.extensionlessUrls && !name.includes('.')) {
+    file = await db.query.files.findFirst({
+      ...query,
+      where: { name: { like: `${escapeLike(name)}.%` } },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
   if (!file) return res.callNotFound();
   const view = file.user ? userViewSchema.parse(file.user.view) : null;
 

@@ -4,9 +4,8 @@ import { bytes } from '@/lib/bytes';
 import { config } from '@/lib/config';
 import { hashPassword } from '@/lib/crypto';
 import { db } from '@/lib/db';
-import { removeFile, type FileInsert, updateFile } from '@/lib/db/models/file';
+import { removeFile, type FileInsert } from '@/lib/db/models/file';
 import { getFolderMetadata } from '@/lib/db/models/folder';
-import { incompleteFileSchema } from '@/lib/db/models/incompleteFile';
 import { files as fileTable, incompleteFiles, users as userTable } from '@/lib/db/schema';
 import { getUser } from '@/lib/db/models/user';
 import { sanitizeFilename } from '@/lib/fs';
@@ -21,9 +20,10 @@ import { join } from 'path';
 import { createWorker } from '@/lib/worker';
 import { ApiUploadResponse } from '.';
 import type { DomainDbRequest, DomainDbResponse } from '@/offload/proxiedDb';
-import { eq, sql } from 'drizzle-orm';
+import { eq, getColumns, sql } from 'drizzle-orm';
 
 const logger = log('api').c('upload').c('partial');
+const { password: _password, userId: _userId, ...uploadFileColumns } = getColumns(fileTable);
 
 const PARTIAL_TIMEOUT = 30 * 60_000;
 const MAX_PARTIALS = 4;
@@ -342,7 +342,7 @@ export default typedPlugin(
                   throw new ApiError(5002, typeof quotaCheck === 'string' ? quotaCheck : undefined);
               }
 
-              const [created] = await tx.insert(fileTable).values(data).returning();
+              const [created] = await tx.insert(fileTable).values(data).returning(uploadFileColumns);
               if (!created) throw new Error('File insert did not return a row');
               return created;
             });
@@ -392,7 +392,7 @@ export default typedPlugin(
                 {
                   const [created] = await db.insert(incompleteFiles).values(message.payload).returning();
                   if (!created) throw new Error('Incomplete file insert did not return a row');
-                  result = incompleteFileSchema.parse(created);
+                  result = created;
                 }
                 break;
               case 'incomplete.increment':
@@ -405,7 +405,7 @@ export default typedPlugin(
                     })
                     .where(eq(incompleteFiles.id, message.payload.id))
                     .returning();
-                  result = updated ? incompleteFileSchema.parse(updated) : null;
+                  result = updated ?? null;
                 }
                 break;
               case 'incomplete.status':
@@ -415,11 +415,18 @@ export default typedPlugin(
                     .set({ status: message.payload.status })
                     .where(eq(incompleteFiles.id, message.payload.id))
                     .returning();
-                  result = updated ? incompleteFileSchema.parse(updated) : null;
+                  result = updated ?? null;
                 }
                 break;
               case 'file.finalizePartial':
-                result = await updateFile(message.payload.id, message.payload.changes);
+                result =
+                  (
+                    await db
+                      .update(fileTable)
+                      .set(message.payload.changes)
+                      .where(eq(fileTable.id, message.payload.id))
+                      .returning(uploadFileColumns)
+                  )[0] ?? null;
                 await deletePartial(partialIdentifier, false);
                 break;
               case 'file.delete': {
@@ -439,7 +446,7 @@ export default typedPlugin(
             worker.postMessage({
               type: 'db-response',
               id: message.id,
-              result: JSON.stringify(result),
+              result,
             } satisfies DomainDbResponse);
           });
 
