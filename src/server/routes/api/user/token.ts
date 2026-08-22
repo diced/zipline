@@ -3,10 +3,12 @@ import { config } from '@/lib/config';
 import { createToken, encryptToken } from '@/lib/crypto';
 import { db } from '@/lib/db';
 import { updateUser, type User, userSchema } from '@/lib/db/models/user';
+import { users } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
+import { eq } from 'drizzle-orm';
 import z from 'zod';
 
 export type ApiUserTokenResponse = {
@@ -34,12 +36,13 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const user = await db.query.users.findFirst({
-          columns: { token: true },
-          where: { id: req.user.id },
-        });
+        const [user] = await db
+          .select({ token: users.token })
+          .from(users)
+          .where(eq(users.id, req.user.id))
+          .limit(1);
 
-        if (!user || !user.token) {
+        if (!user?.token) {
           logger.warn('something went very wrong! user not found or token not found', {
             userId: req.user.id,
           });
