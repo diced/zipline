@@ -3,13 +3,7 @@ import { config } from '@/lib/config';
 import { createToken, hashPassword } from '@/lib/crypto';
 import { db } from '@/lib/db';
 import { Role } from '@/lib/db/enums';
-import {
-  getUserSummary,
-  listUsers,
-  usernameExists,
-  type LimitedUser,
-  limitedUserSchema,
-} from '@/lib/db/models/user';
+import { getUserSummary, limitedUserSchema, listUsers, type LimitedUser } from '@/lib/db/models/user';
 import { users } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';

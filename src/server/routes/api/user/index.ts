@@ -1,14 +1,7 @@
 import { ApiError } from '@/lib/api/errors';
 import { hashPassword, verifyPassword } from '@/lib/crypto';
 import { db } from '@/lib/db';
-import {
-  getUser,
-  updateUser,
-  usernameExists,
-  type User,
-  type UserUpdate,
-  userSchema,
-} from '@/lib/db/models/user';
+import { getUser, updateUser, userSchema, type User, type UserUpdate } from '@/lib/db/models/user';
 import { users, userSessions } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
