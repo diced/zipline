@@ -2,7 +2,7 @@ import { ApiError } from '@/lib/api/errors';
 import { db } from '@/lib/db';
 import { File, fileColumns, filePasswordExtra, fileSchema, formatFiles } from '@/lib/db/models/file';
 import { Folder, getPublicFolder, getPublicParentChain, publicFolderSchema } from '@/lib/db/models/folder';
-import { files as fileTable } from '@/lib/db/schema';
+import { files } from '@/lib/db/schema';
 import { paginationQs } from '@/lib/validation';
 import typedPlugin from '@/server/typedPlugin';
 import { eq } from 'drizzle-orm';
@@ -67,21 +67,20 @@ export default typedPlugin(
           });
         }
 
-        const where = eq(fileTable.folderId, folder.id);
-        const total = await db.$count(fileTable, where);
+        const where = eq(files.folderId, folder.id);
+        const total = await db.$count(files, where);
         const pages = total === 0 ? 0 : Math.ceil(total / perpage);
 
-        const files = formatFiles(
-          await db.query.files.findMany({
-            columns: fileColumns,
-            extras: filePasswordExtra,
-            where: { folderId: folder.id },
-            orderBy: (file, { asc, desc }) => (order === 'asc' ? asc(file[sortBy]) : desc(file[sortBy])),
-            offset: (Number(page) - 1) * perpage,
-            limit: perpage,
-            with: { thumbnail: { columns: { path: true } } },
-          }),
-        );
+        const rows = await db.query.files.findMany({
+          columns: fileColumns,
+          extras: filePasswordExtra,
+          where: { folderId: folder.id },
+          orderBy: (file, { asc, desc }) => (order === 'asc' ? asc(file[sortBy]) : desc(file[sortBy])),
+          offset: (Number(page) - 1) * perpage,
+          limit: perpage,
+          with: { thumbnail: { columns: { path: true } } },
+        });
+        const folderFiles = formatFiles(rows);
 
         if (folder.parentId) {
           folder.parent = await getPublicParentChain(folder.parentId);
@@ -89,7 +88,7 @@ export default typedPlugin(
 
         return res.send({
           folder,
-          page: files,
+          page: folderFiles,
           total,
           pages,
         });

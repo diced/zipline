@@ -10,7 +10,7 @@ import {
 } from '@/lib/db/models/file';
 import { getFolderWithOwner } from '@/lib/db/models/folder';
 import { getUserIdentity } from '@/lib/db/models/user';
-import { files as fileTable, tags as tagTable } from '@/lib/db/schema';
+import { files, tags } from '@/lib/db/schema';
 import { containsText } from '@/lib/db/utils';
 import { canInteract, canManage } from '@/lib/role';
 import { paginationQs } from '@/lib/validation';
@@ -88,7 +88,7 @@ export default typedPlugin(
         });
         const incompleteIds = incompleteFiles.map((file) => file.metadata.file.id);
 
-        const sharedConditions = (file: typeof fileTable) => {
+        const sharedConditions = (file: typeof files) => {
           const conditions: SQL[] = [eq(file.userId, user.id)];
           if (filter === 'dashboard') {
             conditions.push(
@@ -120,13 +120,13 @@ export default typedPlugin(
             }
 
             const ownedTagCount = await db.$count(
-              tagTable,
-              and(eq(tagTable.userId, user.id), inArray(tagTable.id, tagIds)),
+              tags,
+              and(eq(tags.userId, user.id), inArray(tags.id, tagIds)),
             );
             if (ownedTagCount !== tagIds.length) throw new ApiError(1032);
           }
 
-          const searchConditions = (file: typeof fileTable) => {
+          const searchConditions = (file: typeof files) => {
             const conditions = sharedConditions(file);
             if (searchField !== 'tags') {
               const searchColumn = {
@@ -172,10 +172,10 @@ export default typedPlugin(
           });
         }
 
-        const where = and(...sharedConditions(fileTable));
-        const total = await db.$count(fileTable, where);
+        const where = and(...sharedConditions(files));
+        const total = await db.$count(files, where);
 
-        const files = formatFiles(
+        const filePage = formatFiles(
           await db.query.files.findMany({
             columns: fileColumns,
             extras: filePasswordExtra,
@@ -188,7 +188,7 @@ export default typedPlugin(
         );
 
         return res.send({
-          page: files,
+          page: filePage,
           total,
           pages: Math.ceil(total / perpage),
         });

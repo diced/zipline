@@ -1,18 +1,18 @@
+import { ApiError } from '@/lib/api/errors';
 import { config } from '@/lib/config';
 import { createToken } from '@/lib/crypto';
 import { db } from '@/lib/db';
 import { type OAuthProviderType } from '@/lib/db/enums';
-import { createUser, getUser, getUserBySession, usernameExists } from '@/lib/db/models/user';
-import { oauthProviders } from '@/lib/db/schema';
+import { createUser, getUser, getUserBySession, type User } from '@/lib/db/models/user';
+import { oauthProviders, users } from '@/lib/db/schema';
 import { isPostgresError } from '@/lib/db/utils';
 import Logger, { log } from '@/lib/logger';
 import { findProvider } from '@/lib/oauth/providers';
+import { parseOAuthState } from '@/lib/oauth/state';
+import { and, eq } from 'drizzle-orm';
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import fastifyPlugin from 'fastify-plugin';
 import { getSession, saveSession, ZiplineIronSession } from '../session';
-import { parseOAuthState } from '@/lib/oauth/state';
-import { ApiError } from '@/lib/api/errors';
-import { eq } from 'drizzle-orm';
 
 export type OAuthQuery = {
   state?: string;
@@ -65,11 +65,17 @@ async function oauthPlugin(fastify: FastifyInstance) {
       response: safeOAuthResponse(response),
     });
 
-    const existingOauth = await db.query.oauthProviders.findFirst({
-      columns: { id: true, userId: true },
-      where: { provider, oauthId: response.user_id },
-    });
-    const existingUser = await usernameExists(response.username);
+    const [existingOauth] = await db
+      .select({ id: oauthProviders.id, userId: oauthProviders.userId })
+      .from(oauthProviders)
+      .where(and(eq(oauthProviders.provider, provider), eq(oauthProviders.oauthId, response.user_id)))
+      .limit(1);
+
+    const [existingUser] = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.username, response.username))
+      .limit(1);
 
     const state = parseOAuthState(query.state);
     if (!state) throw new ApiError(1064);
@@ -86,7 +92,8 @@ async function oauthPlugin(fastify: FastifyInstance) {
     delete session.oauthState;
     await session.save();
 
-    const user = session.sessionId ? await getUserBySession(session.sessionId) : null;
+    let user: User | null = null;
+    if (session.sessionId) user = await getUserBySession(session.sessionId);
     const userOauth = findProvider(provider, user?.oauthProviders ?? []);
 
     if (state.mode === 'link') {

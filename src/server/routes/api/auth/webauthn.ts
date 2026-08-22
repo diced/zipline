@@ -145,7 +145,8 @@ export default typedPlugin(
             .where(sql`${userPasskeys.reg} #>> '{webauthn,id}' = ${response.id}`)
             .limit(1)
         )[0];
-        const user = passkey ? await getUser(passkey.userId) : null;
+        let user: User | null = null;
+        if (passkey) user = await getUser(passkey.userId);
         if (!passkey || !user) {
           logger.warn('invalid webauthn attempt', {
             req: webauthnChallengeId,

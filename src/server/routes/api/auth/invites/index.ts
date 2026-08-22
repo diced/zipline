@@ -84,11 +84,11 @@ export default typedPlugin(
         preHandler: [userMiddleware, administratorMiddleware],
       },
       async (_, res) => {
-        return res.send(
-          await db.query.invites.findMany({
-            with: { inviter: { columns: { username: true, id: true, role: true } } },
-          }),
-        );
+        const list = await db.query.invites.findMany({
+          with: { inviter: { columns: { username: true, id: true, role: true } } },
+        });
+
+        return res.send(list);
       },
     );
   },

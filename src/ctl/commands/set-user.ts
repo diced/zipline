@@ -1,12 +1,22 @@
 import { hashPassword } from '@/lib/crypto';
 import { db } from '@/lib/db';
-import { getUserIdentity, type UserUpdate } from '@/lib/db/models/user';
+import { getUserIdentity } from '@/lib/db/models/user';
 import { users } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
-const SUPPORTED_FIELDS = ['username', 'password', 'role', 'avatar', 'token', 'totpSecret'];
+import { createUpdateSchema } from 'drizzle-orm/zod';
+
+const userUpdateSchema = createUpdateSchema(users).pick({
+  username: true,
+  password: true,
+  role: true,
+  avatar: true,
+  token: true,
+  totpSecret: true,
+});
+const supportedFields = new Set(Object.keys(userUpdateSchema.shape));
 
 export async function setUser(property: string, value: string, { id }: { id: string }) {
-  if (!SUPPORTED_FIELDS.includes(property)) return console.error('Unsupported field:', property);
+  if (!supportedFields.has(property)) return console.error('Unsupported field:', property);
 
   const user = await getUserIdentity(id);
 
@@ -25,10 +35,8 @@ export async function setUser(property: string, value: string, { id }: { id: str
     parsed = value.toUpperCase();
   }
 
-  await db
-    .update(users)
-    .set({ [property]: parsed } as UserUpdate)
-    .where(eq(users.id, id));
+  const update = userUpdateSchema.parse({ [property]: parsed });
+  await db.update(users).set(update).where(eq(users.id, id));
 
   if (property === 'password') parsed = '*********';
 

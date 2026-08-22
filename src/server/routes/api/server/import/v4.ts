@@ -2,17 +2,17 @@ import { ApiError } from '@/lib/api/errors';
 import { createToken } from '@/lib/crypto';
 import { db } from '@/lib/db';
 import {
-  files as fileRecords,
+  files,
   filesToTags,
-  folders as folderRecords,
-  invites as inviteRecords,
-  metrics as metricRecords,
-  oauthProviders as oauthProviderRecords,
-  tags as tagRecords,
-  urls as urlRecords,
-  userPasskeys as passkeyRecords,
-  userQuotas as quotaRecords,
-  users as userRecords,
+  folders,
+  invites,
+  metrics,
+  oauthProviders,
+  tags,
+  urls,
+  userPasskeys,
+  userQuotas,
+  users,
 } from '@/lib/db/schema';
 import { sanitizeFilename } from '@/lib/fs';
 import { export4Schema } from '@/lib/import/version4/validateExport';
@@ -88,9 +88,9 @@ export default typedPlugin(
           }
 
           const [existing] = await db
-            .select({ id: userRecords.id })
-            .from(userRecords)
-            .where(or(eq(userRecords.username, user.username), eq(userRecords.id, user.id)))
+            .select({ id: users.id })
+            .from(users)
+            .where(or(eq(users.username, user.username), eq(users.id, user.id)))
             .limit(1);
 
           if (!mergeCurrent && existing) {
@@ -104,14 +104,14 @@ export default typedPlugin(
 
           if (mergeCurrent) {
             const [updated] = await db
-              .update(userRecords)
+              .update(users)
               .set({
                 avatar: user.avatar ?? null,
                 totpSecret: user.totpSecret ?? null,
                 view: user.view,
               })
-              .where(eq(userRecords.id, req.user.id))
-              .returning({ id: userRecords.id });
+              .where(eq(users.id, req.user.id))
+              .returning({ id: users.id });
             if (!updated) throw new Error(`User ${req.user.id} does not exist`);
 
             importedUsers[user.id] = updated.id;
@@ -120,7 +120,7 @@ export default typedPlugin(
           }
 
           const [created] = await db
-            .insert(userRecords)
+            .insert(users)
             .values({
               username: user.username,
               password: user.password ?? null,
@@ -131,7 +131,7 @@ export default typedPlugin(
               token: createToken(),
               createdAt: new Date(user.createdAt),
             })
-            .returning({ id: userRecords.id });
+            .returning({ id: users.id });
           if (!created) throw new Error('User insert did not return a row');
 
           importedUsers[user.id] = created.id;
@@ -153,16 +153,16 @@ export default typedPlugin(
           }
 
           const [existing] = await db
-            .select({ id: oauthProviderRecords.id })
-            .from(oauthProviderRecords)
+            .select({ id: oauthProviders.id })
+            .from(oauthProviders)
             .where(
               oauthProvider.oauthId === undefined
-                ? eq(oauthProviderRecords.provider, oauthProvider.provider)
+                ? eq(oauthProviders.provider, oauthProvider.provider)
                 : and(
-                    eq(oauthProviderRecords.provider, oauthProvider.provider),
+                    eq(oauthProviders.provider, oauthProvider.provider),
                     oauthProvider.oauthId === null
-                      ? isNull(oauthProviderRecords.oauthId)
-                      : eq(oauthProviderRecords.oauthId, oauthProvider.oauthId),
+                      ? isNull(oauthProviders.oauthId)
+                      : eq(oauthProviders.oauthId, oauthProvider.oauthId),
                   ),
             )
             .limit(1);
@@ -177,7 +177,7 @@ export default typedPlugin(
           }
 
           const [created] = await db
-            .insert(oauthProviderRecords)
+            .insert(oauthProviders)
             .values({
               provider: oauthProvider.provider,
               oauthId: oauthProvider.oauthId,
@@ -186,7 +186,7 @@ export default typedPlugin(
               refreshToken: oauthProvider.refreshToken ?? null,
               userId,
             })
-            .returning({ id: oauthProviderRecords.id });
+            .returning({ id: oauthProviders.id });
           if (!created) throw new Error('OAuth provider insert did not return a row');
 
           importedOauthProviders[oauthProvider.id] = created.id;
@@ -208,9 +208,9 @@ export default typedPlugin(
           }
 
           const [existing] = await db
-            .select({ id: quotaRecords.id })
-            .from(quotaRecords)
-            .where(eq(quotaRecords.userId, userId))
+            .select({ id: userQuotas.id })
+            .from(userQuotas)
+            .where(eq(userQuotas.userId, userId))
             .limit(1);
 
           if (existing) {
@@ -223,7 +223,7 @@ export default typedPlugin(
           }
 
           const [created] = await db
-            .insert(quotaRecords)
+            .insert(userQuotas)
             .values({
               filesQuota: quota.filesQuota,
               maxBytes: quota.maxBytes ?? null,
@@ -232,7 +232,7 @@ export default typedPlugin(
               userId,
               createdAt: new Date(quota.createdAt),
             })
-            .returning({ id: quotaRecords.id });
+            .returning({ id: userQuotas.id });
           if (!created) throw new Error('Quota insert did not return a row');
 
           importedQuotas[quota.id] = created.id;
@@ -254,9 +254,9 @@ export default typedPlugin(
           }
 
           const [existing] = await db
-            .select({ id: passkeyRecords.id })
-            .from(passkeyRecords)
-            .where(and(eq(passkeyRecords.name, passkey.name), eq(passkeyRecords.userId, userId)))
+            .select({ id: userPasskeys.id })
+            .from(userPasskeys)
+            .where(and(eq(userPasskeys.name, passkey.name), eq(userPasskeys.userId, userId)))
             .limit(1);
 
           if (existing) {
@@ -269,9 +269,9 @@ export default typedPlugin(
           }
 
           const [created] = await db
-            .insert(passkeyRecords)
+            .insert(userPasskeys)
             .values({ name: passkey.name, reg: passkey.reg, userId })
-            .returning({ id: passkeyRecords.id });
+            .returning({ id: userPasskeys.id });
           if (!created) throw new Error('Passkey insert did not return a row');
 
           importedPasskeys[passkey.id] = created.id;
@@ -294,9 +294,9 @@ export default typedPlugin(
           }
 
           const [existing] = await db
-            .select({ id: folderRecords.id })
-            .from(folderRecords)
-            .where(and(eq(folderRecords.name, folder.name), eq(folderRecords.userId, userId)))
+            .select({ id: folders.id })
+            .from(folders)
+            .where(and(eq(folders.name, folder.name), eq(folders.userId, userId)))
             .limit(1);
 
           if (existing) {
@@ -309,7 +309,7 @@ export default typedPlugin(
           }
 
           const [created] = await db
-            .insert(folderRecords)
+            .insert(folders)
             .values({
               userId,
               name: folder.name,
@@ -317,7 +317,7 @@ export default typedPlugin(
               public: folder.public,
               createdAt: new Date(folder.createdAt),
             })
-            .returning({ id: folderRecords.id });
+            .returning({ id: folders.id });
           if (!created) throw new Error('Folder insert did not return a row');
 
           importedFolders[folder.id] = created.id;
@@ -333,10 +333,10 @@ export default typedPlugin(
 
           if (newFolderId && newParentId) {
             const [updated] = await db
-              .update(folderRecords)
+              .update(folders)
               .set({ parentId: newParentId })
-              .where(eq(folderRecords.id, newFolderId))
-              .returning({ id: folderRecords.id });
+              .where(eq(folders.id, newFolderId))
+              .returning({ id: folders.id });
             if (!updated) throw new Error(`Folder ${newFolderId} does not exist`);
           } else {
             logger.warn('failed to set parent for folder', {
@@ -362,9 +362,9 @@ export default typedPlugin(
           }
 
           const [existing] = await db
-            .select({ id: fileRecords.id })
-            .from(fileRecords)
-            .where(eq(fileRecords.name, file.name))
+            .select({ id: files.id })
+            .from(files)
+            .where(eq(files.name, file.name))
             .limit(1);
 
           if (existing) {
@@ -388,7 +388,7 @@ export default typedPlugin(
           }
 
           const [created] = await db
-            .insert(fileRecords)
+            .insert(files)
             .values({
               userId,
               name: sanitizedFilename,
@@ -403,7 +403,7 @@ export default typedPlugin(
               favorite: file.favorite ?? false,
               password: file.password ?? null,
             })
-            .returning({ id: fileRecords.id });
+            .returning({ id: files.id });
           if (!created) throw new Error('File insert did not return a row');
 
           importedFiles[file.id] = created.id;
@@ -423,13 +423,13 @@ export default typedPlugin(
           }
 
           const [existing] = await db
-            .select({ id: tagRecords.id })
-            .from(tagRecords)
+            .select({ id: tags.id })
+            .from(tags)
             .where(
               and(
-                eq(tagRecords.name, tag.name),
-                eq(tagRecords.userId, userId),
-                eq(tagRecords.createdAt, new Date(tag.createdAt)),
+                eq(tags.name, tag.name),
+                eq(tags.userId, userId),
+                eq(tags.createdAt, new Date(tag.createdAt)),
               ),
             )
             .limit(1);
@@ -453,9 +453,9 @@ export default typedPlugin(
 
           const created = await db.transaction(async (tx) => {
             const [created] = await tx
-              .insert(tagRecords)
+              .insert(tags)
               .values({ name: tag.name, color: tag.color ?? '#000000', userId })
-              .returning({ id: tagRecords.id });
+              .returning({ id: tags.id });
             if (!created) throw new Error('Tag insert did not return a row');
 
             if (fileIds.length) {
@@ -485,9 +485,9 @@ export default typedPlugin(
           }
 
           const [existing] = await db
-            .select({ id: urlRecords.id })
-            .from(urlRecords)
-            .where(and(eq(urlRecords.code, url.code), eq(urlRecords.userId, userId)))
+            .select({ id: urls.id })
+            .from(urls)
+            .where(and(eq(urls.code, url.code), eq(urls.userId, userId)))
             .limit(1);
 
           if (existing) {
@@ -500,7 +500,7 @@ export default typedPlugin(
           }
 
           const [created] = await db
-            .insert(urlRecords)
+            .insert(urls)
             .values({
               userId,
               destination: url.destination,
@@ -512,7 +512,7 @@ export default typedPlugin(
               createdAt: new Date(url.createdAt),
               password: url.password ?? null,
             })
-            .returning({ id: urlRecords.id });
+            .returning({ id: urls.id });
           if (!created) throw new Error('URL insert did not return a row');
 
           importedUrls[url.id] = created.id;
@@ -534,9 +534,9 @@ export default typedPlugin(
           }
 
           const [existing] = await db
-            .select({ id: inviteRecords.id })
-            .from(inviteRecords)
-            .where(and(eq(inviteRecords.code, invite.code), eq(inviteRecords.inviterId, inviterId)))
+            .select({ id: invites.id })
+            .from(invites)
+            .where(and(eq(invites.code, invite.code), eq(invites.inviterId, inviterId)))
             .limit(1);
 
           if (existing) {
@@ -549,7 +549,7 @@ export default typedPlugin(
           }
 
           const [created] = await db
-            .insert(inviteRecords)
+            .insert(invites)
             .values({
               code: invite.code,
               uses: invite.uses,
@@ -558,7 +558,7 @@ export default typedPlugin(
               createdAt: new Date(invite.createdAt),
               expiresAt: invite.expiresAt ? new Date(invite.expiresAt) : null,
             })
-            .returning({ id: inviteRecords.id });
+            .returning({ id: invites.id });
           if (!created) throw new Error('Invite insert did not return a row');
 
           importedInvites[invite.id] = created.id;
@@ -566,18 +566,19 @@ export default typedPlugin(
 
         logger.debug('imported invites', { invites: importedInvites });
 
-        const importedMetrics = export4.data.metrics.length
-          ? await db
-              .insert(metricRecords)
-              .values(
-                export4.data.metrics.map((metric) => ({
-                  createdAt: new Date(metric.createdAt),
-                  data: metric.data,
-                })),
-              )
-              .returning({ id: metricRecords.id })
-          : [];
-        const metricCount = importedMetrics.length;
+        let metricCount = 0;
+        if (export4.data.metrics.length) {
+          const importedMetrics = await db
+            .insert(metrics)
+            .values(
+              export4.data.metrics.map((metric) => ({
+                createdAt: new Date(metric.createdAt),
+                data: metric.data,
+              })),
+            )
+            .returning({ id: metrics.id });
+          metricCount = importedMetrics.length;
+        }
         logger.debug('imported metrics', { count: metricCount });
 
         const response = {

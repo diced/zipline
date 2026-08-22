@@ -2,7 +2,6 @@ import { bytes } from '@/lib/bytes';
 import { Config } from '@/lib/config/validate';
 import { getDatasource } from '@/lib/datasource';
 import { S3Datasource } from '@/lib/datasource/S3';
-import { IncompleteFile } from '@/lib/db/models/incompleteFile';
 import { log } from '@/lib/logger';
 import { randomCharacters } from '@/lib/random';
 import { UploadOptions } from '@/lib/uploader/parseHeaders';
@@ -203,7 +202,7 @@ async function runComplete(id: string, size: number) {
   });
 }
 
-async function failPartial(config: Config, incompleteFile: IncompleteFile) {
+async function failPartial(config: Config, incompleteFile: { id: string }) {
   logger.error('failing incomplete file', { id: incompleteFile.id });
 
   await dbProxy('file.delete', { id: file.id });

@@ -1,13 +1,7 @@
 import { ApiError } from '@/lib/api/errors';
 import { createToken } from '@/lib/crypto';
 import { db } from '@/lib/db';
-import {
-  files as fileRecords,
-  folders as folderRecords,
-  oauthProviders as oauthProviderRecords,
-  urls as urlRecords,
-  users as userRecords,
-} from '@/lib/db/schema';
+import { files, folders, oauthProviders, urls, users } from '@/lib/db/schema';
 import { sanitizeFilename } from '@/lib/fs';
 import { export3Schema } from '@/lib/import/version3/validateExport';
 import { log } from '@/lib/logger';
@@ -31,7 +25,7 @@ const serverImportSchema = z.object({
 const parseDate = (date: string) => (isNaN(Date.parse(date)) ? new Date() : new Date(date));
 
 type ImportOauthProvider = Pick<
-  typeof oauthProviderRecords.$inferInsert,
+  typeof oauthProviders.$inferInsert,
   'provider' | 'accessToken' | 'refreshToken' | 'oauthId' | 'username'
 >;
 
@@ -66,8 +60,8 @@ export default typedPlugin(
 
         const usersImportedToId: Record<string, string> = {};
 
-        const users = Object.entries(export3.users);
-        for (const [id, user] of users) {
+        const userEntries = Object.entries(export3.users);
+        for (const [id, user] of userEntries) {
           let importFrom = false;
           if (req.body.importFromUser && id === req.body.importFromUser) {
             logger.info('importing to current user', {
@@ -82,9 +76,9 @@ export default typedPlugin(
             (user.super_administrator && 'SUPERADMIN') || (user.administrator && 'ADMIN') || 'USER';
 
           const [existing] = await db
-            .select({ id: userRecords.id })
-            .from(userRecords)
-            .where(eq(userRecords.username, user.username))
+            .select({ id: users.id })
+            .from(users)
+            .where(eq(users.username, user.username))
             .limit(1);
 
           if (!importFrom && existing) {
@@ -99,12 +93,12 @@ export default typedPlugin(
           const importedProviders: ImportOauthProvider[] = [];
           for (const provider of user.oauth) {
             const [existing] = await db
-              .select({ id: oauthProviderRecords.id })
-              .from(oauthProviderRecords)
+              .select({ id: oauthProviders.id })
+              .from(oauthProviders)
               .where(
                 provider.oauth_id === null
-                  ? isNull(oauthProviderRecords.oauthId)
-                  : eq(oauthProviderRecords.oauthId, provider.oauth_id),
+                  ? isNull(oauthProviders.oauthId)
+                  : eq(oauthProviders.oauthId, provider.oauth_id),
               )
               .limit(1);
 
@@ -129,15 +123,15 @@ export default typedPlugin(
           if (importFrom) {
             const updated = await db.transaction(async (tx) => {
               const [updated] = await tx
-                .update(userRecords)
+                .update(users)
                 .set({ avatar: user.avatar ?? null, totpSecret: user.totp_secret ?? null })
-                .where(eq(userRecords.id, req.user.id))
-                .returning({ id: userRecords.id });
+                .where(eq(users.id, req.user.id))
+                .returning({ id: users.id });
               if (!updated) throw new Error(`User ${req.user.id} does not exist`);
 
               if (importedProviders.length) {
                 await tx
-                  .insert(oauthProviderRecords)
+                  .insert(oauthProviders)
                   .values(importedProviders.map((provider) => ({ ...provider, userId: req.user.id })));
               }
 
@@ -151,7 +145,7 @@ export default typedPlugin(
 
           const created = await db.transaction(async (tx) => {
             const [created] = await tx
-              .insert(userRecords)
+              .insert(users)
               .values({
                 username: user.username,
                 password: user.password || null,
@@ -160,12 +154,12 @@ export default typedPlugin(
                 avatar: user.avatar ?? null,
                 totpSecret: user.totp_secret ?? null,
               })
-              .returning({ id: userRecords.id });
+              .returning({ id: users.id });
             if (!created) throw new Error('User insert did not return a row');
 
             if (importedProviders.length) {
               await tx
-                .insert(oauthProviderRecords)
+                .insert(oauthProviders)
                 .values(importedProviders.map((provider) => ({ ...provider, userId: created.id })));
             }
 
@@ -188,9 +182,9 @@ export default typedPlugin(
           }
 
           const [existing] = await db
-            .select({ id: fileRecords.id })
-            .from(fileRecords)
-            .where(eq(fileRecords.name, file.name))
+            .select({ id: files.id })
+            .from(files)
+            .where(eq(files.name, file.name))
             .limit(1);
 
           if (existing) {
@@ -209,7 +203,7 @@ export default typedPlugin(
           }
 
           const [created] = await db
-            .insert(fileRecords)
+            .insert(files)
             .values({
               userId: user,
               name: sanitizedFilename,
@@ -223,7 +217,7 @@ export default typedPlugin(
               favorite: file.favorite || false,
               password: file.password || null,
             })
-            .returning({ id: fileRecords.id });
+            .returning({ id: files.id });
           if (!created) throw new Error('File insert did not return a row');
 
           filesImportedToId[id] = created.id;
@@ -241,32 +235,32 @@ export default typedPlugin(
             continue;
           }
 
-          const files = folder.files.map((file) => filesImportedToId[file]).filter(Boolean);
-          if (files.length !== folder.files.length) {
+          const mappedFileIds = folder.files.map((file) => filesImportedToId[file]).filter(Boolean);
+          if (mappedFileIds.length !== folder.files.length) {
             logger.warn('failed to find all files for folder, skipping', { folder: id });
 
             continue;
           }
 
-          const fileIds = [...new Set(files)];
+          const fileIds = [...new Set(mappedFileIds)];
           const created = await db.transaction(async (tx) => {
             const [created] = await tx
-              .insert(folderRecords)
+              .insert(folders)
               .values({
                 userId: user,
                 name: folder.name,
                 public: folder.public,
                 createdAt: parseDate(folder.created_at),
               })
-              .returning({ id: folderRecords.id });
+              .returning({ id: folders.id });
             if (!created) throw new Error('Folder insert did not return a row');
 
             if (fileIds.length) {
               const updatedFiles = await tx
-                .update(fileRecords)
+                .update(files)
                 .set({ folderId: created.id })
-                .where(inArray(fileRecords.id, fileIds))
-                .returning({ id: fileRecords.id });
+                .where(inArray(files.id, fileIds))
+                .returning({ id: files.id });
               if (updatedFiles.length !== fileIds.length)
                 throw new Error('One or more imported folder files no longer exist');
             }
@@ -290,9 +284,9 @@ export default typedPlugin(
           }
 
           const [existing] = await db
-            .select({ id: urlRecords.id })
-            .from(urlRecords)
-            .where(eq(urlRecords.code, url.code))
+            .select({ id: urls.id })
+            .from(urls)
+            .where(eq(urls.code, url.code))
             .limit(1);
 
           if (existing) {
@@ -305,7 +299,7 @@ export default typedPlugin(
           }
 
           const [created] = await db
-            .insert(urlRecords)
+            .insert(urls)
             .values({
               userId: user,
               destination: url.destination,
@@ -315,7 +309,7 @@ export default typedPlugin(
               views: url.views || 0,
               createdAt: parseDate(url.created_at),
             })
-            .returning({ id: urlRecords.id });
+            .returning({ id: urls.id });
           if (!created) throw new Error('URL insert did not return a row');
 
           urlsImportedToId[id] = created.id;

@@ -103,16 +103,11 @@ async function findUser(where: UserWhere, client: DbClient): Promise<User | null
 }
 
 export async function getUserIdentity(id: string, client: DbClient = db) {
-  return (
-    (await client.query.users.findFirst({
-      columns: { id: true, username: true, role: true },
-      where: { id },
-    })) ?? null
-  );
-}
-
-export async function usernameExists(username: string, client: DbClient = db) {
-  return !!(await client.query.users.findFirst({ columns: { id: true }, where: { username } }));
+  const user = await client.query.users.findFirst({
+    columns: { id: true, username: true, role: true },
+    where: { id },
+  });
+  return user ?? null;
 }
 
 export async function getUser(id: string, client: DbClient = db) {
@@ -134,18 +129,13 @@ export async function getUserByToken(token: string, client: DbClient = db) {
 }
 
 export async function getUserBySession(sessionId: string, client: DbClient = db): Promise<User | null> {
-  const session = await client.query.userSessions.findFirst({
-    columns: {},
-    where: { id: sessionId },
-    with: {
-      user: {
-        columns: publicUserColumns,
-        extras: { totpEnabled },
-        with: userRelations,
-      },
-    },
+  const user = await client.query.users.findFirst({
+    columns: publicUserColumns,
+    extras: { totpEnabled },
+    where: { sessions: { id: sessionId } },
+    with: userRelations,
   });
-  return session ? parseView(session.user) : null;
+  return user ? parseView(user) : null;
 }
 
 export async function getUserSummary(id: string, client: DbClient = db) {

@@ -226,7 +226,7 @@ async function folderAncestors(parentId: string | null, publicOnly = false, clie
         false as "cycle"
       from ${folders}
       where ${folders.id} = ${parentId}
-        ${publicOnly ? sql`and ${folders.public} = true` : sql``}
+        ${sql`and ${folders.public} = true`.if(publicOnly)}
 
       union all
 
@@ -243,7 +243,7 @@ async function folderAncestors(parentId: string | null, publicOnly = false, clie
       inner join "folderAncestors" as "current"
         on "parent"."id" = "current"."parentId"
       where not "current"."cycle"
-        ${publicOnly ? sql`and "parent"."public" = true` : sql``}
+        ${sql`and "parent"."public" = true`.if(publicOnly)}
     )
     select "id", "name", "parentId", "public", "userId", "depth", "cycle"
     from "folderAncestors"

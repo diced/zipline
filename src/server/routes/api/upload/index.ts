@@ -16,7 +16,7 @@ import { db } from '@/lib/db';
 import type { FileInsert } from '@/lib/db/models/file';
 import { getFolderMetadata } from '@/lib/db/models/folder';
 import { getUser } from '@/lib/db/models/user';
-import { files as fileTable, users as userTable } from '@/lib/db/schema';
+import { files, users } from '@/lib/db/schema';
 import { sanitizeFilename } from '@/lib/fs';
 import { removeGps } from '@/lib/gps';
 import { log } from '@/lib/logger';
@@ -46,7 +46,7 @@ export type ApiUploadResponse = {
 };
 
 const logger = log('api').c('upload');
-const { password: _password, userId: _userId, ...uploadFileColumns } = getColumns(fileTable);
+const { password: _password, userId: _userId, ...uploadFileColumns } = getColumns(files);
 
 export const PATH = '/api/upload';
 export default typedPlugin(
@@ -108,11 +108,11 @@ export default typedPlugin(
           if (!ownsFolder && !folder.allowUploads) throw new ApiError(req.user ? 3011 : 3002);
         }
 
-        let files: SavedMultipartFile[] = [];
+        let multipartFiles: SavedMultipartFile[] = [];
         try {
-          const res = await req.saveRequestFiles({ tmpdir: config.core.tempDirectory });
+          const reqFiles = await req.saveRequestFiles({ tmpdir: config.core.tempDirectory });
 
-          files = res.files;
+          multipartFiles = reqFiles.files;
         } catch (e) {
           logger.warn('error parsing multipart/form-data request', {
             error: e instanceof Error ? e.message : e,
@@ -121,14 +121,15 @@ export default typedPlugin(
           if (e instanceof Error && e.message.startsWith('Multipart:')) throw new ApiError(1061);
         }
 
-        if (!files.length) throw new ApiError(1062);
+        if (!multipartFiles.length) throw new ApiError(1062);
 
-        const totalFileSize = files.reduce((acc, x) => acc + x.file.bytesRead, 0);
+        const totalFileSize = multipartFiles.reduce((acc, x) => acc + x.file.bytesRead, 0);
 
         // use quota of user if anonymous
-        const quotaUser = req.user ? req.user : folder?.userId ? await getUser(folder.userId) : null;
+        let quotaUser = req.user ? req.user : null;
+        if (!quotaUser && folder?.userId) quotaUser = await getUser(folder.userId);
 
-        const quotaCheck = await checkQuota(quotaUser, totalFileSize, files.length);
+        const quotaCheck = await checkQuota(quotaUser, totalFileSize, multipartFiles.length);
         if (quotaCheck !== true)
           throw new ApiError(5002, typeof quotaCheck === 'string' ? quotaCheck : undefined);
 
@@ -137,7 +138,7 @@ export default typedPlugin(
           ...(options.deletesAt && {
             deletesAt: options.deletesAt === 'never' ? 'never' : options.deletesAt.toISOString(),
           }),
-          ...(config.files.assumeMimetypes && { assumedMimetypes: Array(files.length) }),
+          ...(config.files.assumeMimetypes && { assumedMimetypes: Array(multipartFiles.length) }),
         };
 
         const domain = getDomain(
@@ -146,7 +147,7 @@ export default typedPlugin(
           req.headers.host,
         );
 
-        logger.debug('uploading files', { files: files.map((x) => x.filename) });
+        logger.debug('uploading files', { files: multipartFiles.map((x) => x.filename) });
 
         const reservedNames = new Set<string>();
         const format = options.format || config.files.defaultFormat;
@@ -158,8 +159,8 @@ export default typedPlugin(
           originalName?: string;
         }[] = [];
 
-        for (let i = 0; i < files.length; i++) {
-          const file = files[i];
+        for (let i = 0; i < multipartFiles.length; i++) {
+          const file = multipartFiles[i];
           const extension = getExtension(file.filename, options.overrides?.extension);
 
           if (config.files.disabledExtensions.includes(extension))
@@ -260,7 +261,8 @@ export default typedPlugin(
           };
         });
 
-        const password = options.password ? await hashPassword(options.password) : undefined;
+        let password: string | undefined;
+        if (options.password) password = await hashPassword(options.password);
         const uploads = prepared.map((item) => {
           const { file, fileName, extension, mimetype, size, compressed, removedGps, originalName } = item;
 
@@ -285,11 +287,7 @@ export default typedPlugin(
 
         const fileUploads = await db.transaction(async (tx) => {
           if (quotaUser?.quota) {
-            await tx
-              .select({ id: userTable.id })
-              .from(userTable)
-              .where(eq(userTable.id, quotaUser.id))
-              .for('update');
+            await tx.select({ id: users.id }).from(users).where(eq(users.id, quotaUser.id)).for('update');
 
             const quotaCheck = await checkQuota(
               quotaUser,
@@ -303,7 +301,7 @@ export default typedPlugin(
 
           const created = [];
           for (const upload of uploads) {
-            const [file] = await tx.insert(fileTable).values(upload.data).returning(uploadFileColumns);
+            const [file] = await tx.insert(files).values(upload.data).returning(uploadFileColumns);
             if (!file) throw new Error('File insert did not return a row');
             created.push(file);
           }

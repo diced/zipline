@@ -8,7 +8,7 @@ import ffmpeg from '@/lib/ffmpeg';
 import { createWriteStream, existsSync, readFileSync, unlinkSync } from 'fs';
 import { join } from 'path';
 import { isMainThread, parentPort, workerData } from 'worker_threads';
-import { dbProxy } from './proxiedDb';
+import { dbProxy, type DomainDbResponse } from './proxiedDb';
 
 export type ThumbnailWorkerData = {
   id: string;
@@ -124,27 +124,15 @@ async function generate(config: Config, datasource: Datasource, ids: string[]) {
     const thumbnail = await genThumbnail(tmpFile, thumbnailTmpFile);
     if (!thumbnail || thumbnail.length === 0) continue;
 
-    await datasource.delete(name(`.thumbnail.${file.id}`));
-    await datasource.put(name(`.thumbnail.${file.id}`), thumbnail, {
+    const thumbnailPath = name(`.thumbnail.${file.id}`);
+    await datasource.delete(thumbnailPath);
+    await datasource.put(thumbnailPath, thumbnail, {
       mimetype: formatMimes[config.features.thumbnails.format] || 'image/jpeg',
     });
 
-    const existingThumbnail = await dbProxy('thumbnail.byFile', { fileId: file.id });
+    const record = await dbProxy('thumbnail.upsert', { fileId: file.id, path: thumbnailPath });
 
-    let t;
-    if (!existingThumbnail) {
-      t = await dbProxy('thumbnail.create', {
-        fileId: file.id,
-        path: name(`.thumbnail.${file.id}`),
-      });
-    } else {
-      t = await dbProxy('thumbnail.touch', {
-        id: existingThumbnail.id,
-        createdAt: new Date(),
-      });
-    }
-
-    if (t) logger.info('generated thumbnail', { id: t.id, fileId: file.id, size: bytes(thumbnail.length) });
+    logger.info('generated thumbnail', { id: record.id, fileId: file.id, size: bytes(thumbnail.length) });
   }
 }
 
@@ -154,12 +142,9 @@ async function main() {
   const datasource = global.__datasource__;
 
   parentPort!.on('message', async (message) => {
-    const { type, data } = message as {
-      type: 0 | 1 | 'response';
-      data?: string[];
-    };
-
-    if (type === 'response') return;
+    const workerMessage = message as { type: 0 | 1; data?: string[] } | DomainDbResponse;
+    if (workerMessage.type === 'db-response') return;
+    const { type, data } = workerMessage;
 
     switch (type) {
       case 0:

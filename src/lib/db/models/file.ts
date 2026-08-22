@@ -2,7 +2,7 @@ import { config } from '@/lib/config';
 import { db, type DbClient } from '@/lib/db';
 import { files } from '@/lib/db/schema';
 import { formatRootUrl } from '@/lib/url';
-import { and, eq, inArray, sql } from 'drizzle-orm';
+import { and, eq, inArray, isNotNull } from 'drizzle-orm';
 import { createSelectSchema } from 'drizzle-orm/zod';
 import { z } from 'zod';
 import { tagColumns, tagSchema } from './tag';
@@ -13,8 +13,7 @@ export type FileUpdate = Partial<Omit<FileInsert, 'id' | 'createdAt' | 'updatedA
 export const fileColumns = { userId: false, password: false } as const;
 
 export const filePasswordExtra = {
-  password: (file: typeof files) =>
-    sql<boolean | null>`case when ${file.password} is null then null else true end`,
+  password: (file: typeof files) => isNotNull(file.password).mapWith(Boolean).as('password'),
 } as const;
 
 export const fileRelations = {
@@ -82,7 +81,7 @@ export const fileSchema = createSelectSchema(files, {
   updatedAt: (schema) => z.union([schema, z.string()]),
   deletesAt: (schema) => z.union([schema, z.string()]),
   maxViews: (schema) => schema.optional(),
-  password: (schema) => z.union([schema, z.boolean()]).optional(),
+  password: z.boolean().nullable().optional(),
   anonymous: (schema) => schema.optional(),
 })
   .omit({ userId: true })

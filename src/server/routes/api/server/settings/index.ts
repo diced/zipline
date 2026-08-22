@@ -129,7 +129,8 @@ export default typedPlugin(
         const settings = await db.query.zipline.findFirst({ columns: { id: true } });
         if (!settings) throw new ApiError(4010);
 
-        const themes = (await readThemes()).map((x) => x.id);
+        const availableThemes = await readThemes();
+        const themes = availableThemes.map((theme) => theme.id);
 
         const settingsBodySchema = z
           .object({

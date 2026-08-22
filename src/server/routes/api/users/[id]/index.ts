@@ -11,7 +11,7 @@ import {
   type UserUpdate,
   limitedUserSchema,
 } from '@/lib/db/models/user';
-import { files as filesTable, oauthProviders, urls, userQuotas, users } from '@/lib/db/schema';
+import { files, oauthProviders, urls, userQuotas, users } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { canInteract } from '@/lib/role';
 import { zStringTrimmed } from '@/lib/validation';
@@ -193,16 +193,16 @@ export default typedPlugin(
         if (!canInteract(req.user.role, user.role)) throw new ApiError(3009);
 
         if (req.body.delete) {
-          const files = await db
-            .select({ name: filesTable.name })
-            .from(filesTable)
-            .where(eq(filesTable.userId, user.id));
+          const fileEntries = await db
+            .select({ name: files.name })
+            .from(files)
+            .where(eq(files.userId, user.id));
 
           const [filesDeleted, urlsDeleted] = await db.transaction(async (tx) => {
             const deletedFiles = await tx
-              .delete(filesTable)
-              .where(eq(filesTable.userId, user.id))
-              .returning({ id: filesTable.id });
+              .delete(files)
+              .where(eq(files.userId, user.id))
+              .returning({ id: files.id });
             const deletedUrls = await tx
               .delete(urls)
               .where(eq(urls.userId, user.id))
@@ -210,12 +210,12 @@ export default typedPlugin(
             return [deletedFiles.length, deletedUrls.length] as const;
           });
 
-          logger.debug(`preparing to delete ${files.length} files from datasource`, {
+          logger.debug(`preparing to delete ${fileEntries.length} files from datasource`, {
             username: user.username,
           });
 
-          for (let i = 0; i !== files.length; ++i) {
-            await datasource.delete(files[i].name);
+          for (let i = 0; i !== fileEntries.length; ++i) {
+            await datasource.delete(fileEntries[i].name);
           }
 
           logger.info(`${req.user.username} deleted another user's files & urls`, {

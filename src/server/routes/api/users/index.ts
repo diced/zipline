@@ -10,7 +10,7 @@ import {
   type LimitedUser,
   limitedUserSchema,
 } from '@/lib/db/models/user';
-import { users as userTable } from '@/lib/db/schema';
+import { users } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { canInteract, interactableRoles } from '@/lib/role';
@@ -18,6 +18,7 @@ import { zQsBoolean, zStringTrimmed } from '@/lib/validation';
 import { administratorMiddleware } from '@/server/middleware/administrator';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
+import { eq } from 'drizzle-orm';
 import { readFile } from 'fs/promises';
 import { z } from 'zod';
 
@@ -49,13 +50,13 @@ export default typedPlugin(
       async (req, res) => {
         const roles = interactableRoles(req.user.role);
 
-        const users = await listUsers({
+        const userList = await listUsers({
           roles,
           excludeId: req.query.noincl ? req.user.id : undefined,
           avatar: true,
         });
 
-        return res.send(users);
+        return res.send(userList);
       },
     );
 
@@ -82,7 +83,8 @@ export default typedPlugin(
       async (req, res) => {
         const { username, password, avatar, role } = req.body;
 
-        if (await usernameExists(username)) throw new ApiError(1040);
+        const [usernameTaken] = await db.select().from(users).where(eq(users.username, username)).limit(1);
+        if (usernameTaken) throw new ApiError(1040);
 
         let avatar64 = null;
 
@@ -99,7 +101,7 @@ export default typedPlugin(
         if (role && !canInteract(req.user.role, role)) throw new ApiError(3008);
 
         const [created] = await db
-          .insert(userTable)
+          .insert(users)
           .values({
             username,
             password: await hashPassword(password),
@@ -107,7 +109,7 @@ export default typedPlugin(
             avatar: avatar64 ?? null,
             token: createToken(),
           })
-          .returning({ id: userTable.id });
+          .returning({ id: users.id });
         if (!created) throw new Error('User insert did not return a row');
         const user = await getUserSummary(created.id);
         if (!user) throw new Error('Inserted user could not be read back');

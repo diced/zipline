@@ -1,7 +1,7 @@
 import { datasource } from '../datasource';
 import { db } from '../db';
 import { removeFile } from '../db/models/file';
-import { files as fileTable } from '../db/schema';
+import { files } from '../db/schema';
 import { log } from '../logger';
 import { eq } from 'drizzle-orm';
 
@@ -16,16 +16,16 @@ export async function requerySize({
 }): Promise<string> {
   logger.info('preparing to requery size of all files', { forceDelete, forceUpdate });
 
-  const files = await db
-    .select({ id: fileTable.id, name: fileTable.name })
-    .from(fileTable)
-    .where(forceUpdate ? undefined : eq(fileTable.size, 0));
-  logger.info('found files to requery size', { count: files.length });
+  const rows = await db
+    .select({ id: files.id, name: files.name })
+    .from(files)
+    .where(forceUpdate ? undefined : eq(files.size, 0));
+  logger.info('found files to requery size', { count: rows.length });
 
   let notFound = false;
 
-  for (let i = 0; i !== files.length; ++i) {
-    const file = files[i];
+  for (let i = 0; i !== rows.length; ++i) {
+    const file = rows[i];
 
     if (!(await datasource.get(file.name))) {
       if (forceDelete) {
@@ -47,7 +47,7 @@ export async function requerySize({
       logger.info('file has a size of 0 bytes', { id: file.id, name: file.name });
     } else {
       logger.info('file has a size', { id: file.id, name: file.name, size });
-      await db.update(fileTable).set({ size }).where(eq(fileTable.id, file.id));
+      await db.update(files).set({ size }).where(eq(files.id, file.id));
     }
   }
 

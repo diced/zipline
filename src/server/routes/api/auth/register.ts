@@ -1,18 +1,18 @@
-import { ApiError } from '@/lib/api/errors';
 import { ziplineClientParseSchema } from '@/lib/api/detect';
+import { ApiError } from '@/lib/api/errors';
 import { config } from '@/lib/config';
 import { createToken, hashPassword } from '@/lib/crypto';
 import { db } from '@/lib/db';
-import { createUser, usernameExists, userSchema } from '@/lib/db/models/user';
-import { invites } from '@/lib/db/schema';
+import { createUser, userSchema } from '@/lib/db/models/user';
+import { invites, users } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
+import { zStringTrimmed } from '@/lib/validation';
 import { getSession, saveSession } from '@/server/session';
 import typedPlugin from '@/server/typedPlugin';
+import { and, eq, gt, isNull, lt, or, sql } from 'drizzle-orm';
 import z from 'zod';
 import { ApiLoginResponse } from './login';
-import { zStringTrimmed } from '@/lib/validation';
-import { and, eq, gt, isNull, lt, or, sql } from 'drizzle-orm';
 
 export type ApiAuthRegisterResponse = ApiLoginResponse;
 
@@ -51,7 +51,8 @@ export default typedPlugin(
         if (code && !config.invites.enabled) throw new ApiError(1036);
         if (!code && !config.features.userRegistration) throw new ApiError(1037);
 
-        if (await usernameExists(username)) throw new ApiError(1039);
+        const [usernameTaken] = await db.select().from(users).where(eq(users.username, username)).limit(1);
+        if (usernameTaken) throw new ApiError(1039);
 
         const hashedPassword = await hashPassword(password);
         const token = createToken();

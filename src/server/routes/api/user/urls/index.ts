@@ -3,7 +3,7 @@ import { config } from '@/lib/config';
 import { hashPassword } from '@/lib/crypto';
 import { db } from '@/lib/db';
 import { Url, urlSchema } from '@/lib/db/models/url';
-import { urls as urlRecords, users } from '@/lib/db/schema';
+import { urls, users } from '@/lib/db/schema';
 import { containsText } from '@/lib/db/utils';
 import { log } from '@/lib/logger';
 import { randomCharacters } from '@/lib/random';
@@ -23,10 +23,10 @@ export type ApiUserUrlsResponse =
 
 export const PATH = '/api/user/urls';
 const logger = log('api').c('user').c('urls');
-const { password: _password, ...urlColumns } = getColumns(urlRecords);
+const { password: _password, ...urlColumns } = getColumns(urls);
 const urlListColumns = {
   ...urlColumns,
-  password: isNotNull(urlRecords.password).mapWith(Boolean).as('password'),
+  password: isNotNull(urls.password).mapWith(Boolean).as('password'),
 };
 
 export default typedPlugin(
@@ -98,23 +98,25 @@ export default typedPlugin(
           : undefined;
 
         if (vanity) {
-          if ((await db.$count(urlRecords, eq(urlRecords.vanity, vanity))) > 0) throw new ApiError(1042);
+          const vanityCount = await db.$count(urls, eq(urls.vanity, vanity));
+          if (vanityCount > 0) throw new ApiError(1042);
         }
 
         let code, existingCode;
         do {
           code = randomCharacters(config.urls.length);
-          existingCode = (await db.$count(urlRecords, eq(urlRecords.code, code))) > 0;
+          const codeCount = await db.$count(urls, eq(urls.code, code));
+          existingCode = codeCount > 0;
         } while (existingCode);
 
         const url = await db.transaction(async (tx) => {
           await tx.select({ id: users.id }).from(users).where(eq(users.id, req.user.id)).for('update');
 
-          const count = await tx.$count(urlRecords, eq(urlRecords.userId, req.user.id));
+          const count = await tx.$count(urls, eq(urls.userId, req.user.id));
           if (req.user.quota?.maxUrls && count + 1 > req.user.quota.maxUrls) return null;
 
           const [created] = await tx
-            .insert(urlRecords)
+            .insert(urls)
             .values({
               userId: req.user.id,
               destination,
@@ -191,19 +193,18 @@ export default typedPlugin(
         let search;
         if (searchQuery) {
           const searchColumn = {
-            destination: urlRecords.destination,
-            vanity: urlRecords.vanity,
-            code: urlRecords.code,
+            destination: urls.destination,
+            vanity: urls.vanity,
+            code: urls.code,
           }[searchField];
           search = containsText(searchColumn, searchQuery);
         }
 
-        return res.send(
-          await db
-            .select(urlListColumns)
-            .from(urlRecords)
-            .where(and(eq(urlRecords.userId, req.user.id), search)),
-        );
+        const urlList = await db
+          .select(urlListColumns)
+          .from(urls)
+          .where(and(eq(urls.userId, req.user.id), search));
+        return res.send(urlList);
       },
     );
   },

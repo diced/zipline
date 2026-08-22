@@ -1,6 +1,6 @@
 import { db } from '@/lib/db';
 import { IncompleteFile, incompleteFileSchema } from '@/lib/db/models/incompleteFile';
-import { incompleteFiles as incompleteFileTable } from '@/lib/db/schema';
+import { incompleteFiles } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { userMiddleware } from '@/server/middleware/user';
@@ -28,11 +28,11 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const incompleteFiles = await db.query.incompleteFiles.findMany({
+        const pendingFiles = await db.query.incompleteFiles.findMany({
           where: { userId: req.user.id },
         });
 
-        return res.send(incompleteFiles);
+        return res.send(pendingFiles);
       },
     );
 
@@ -55,26 +55,21 @@ export default typedPlugin(
         ...secondlyRatelimit(1),
       },
       async (req, res) => {
-        const removed = req.body.id.length
-          ? await db
-              .delete(incompleteFileTable)
-              .where(
-                and(
-                  eq(incompleteFileTable.userId, req.user.id),
-                  inArray(incompleteFileTable.id, req.body.id),
-                ),
-              )
-              .returning({ id: incompleteFileTable.id })
-          : [];
+        let removed: { id: string }[] = [];
+        if (req.body.id.length)
+          removed = await db
+            .delete(incompleteFiles)
+            .where(and(eq(incompleteFiles.userId, req.user.id), inArray(incompleteFiles.id, req.body.id)))
+            .returning({ id: incompleteFiles.id });
         const count = removed.length;
-        const incompleteFiles = { count };
+        const result = { count };
 
         logger.info('incomplete files deleted', {
-          count: incompleteFiles.count,
+          count: result.count,
           user: req.user.username,
         });
 
-        return res.send(incompleteFiles);
+        return res.send(result);
       },
     );
   },

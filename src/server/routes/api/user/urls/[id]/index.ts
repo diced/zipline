@@ -21,12 +21,11 @@ const paramsSchema = z.object({
 const { password: _password, ...urlColumns } = getColumns(urls);
 
 async function getUserUrl(id: string, userId: string) {
-  return (
-    (await db.query.urls.findFirst({
-      columns: { password: false },
-      where: { id, userId },
-    })) ?? null
-  );
+  const url = await db.query.urls.findFirst({
+    columns: { password: false },
+    where: { id, userId },
+  });
+  return url ?? null;
 }
 
 export const PATH = '/api/user/urls/:id';
@@ -92,7 +91,8 @@ export default typedPlugin(
         }
 
         if (req.body.vanity) {
-          if ((await db.$count(urls, eq(urls.vanity, req.body.vanity))) > 0) throw new ApiError(1041);
+          const vanityCount = await db.$count(urls, eq(urls.vanity, req.body.vanity));
+          if (vanityCount > 0) throw new ApiError(1041);
         }
 
         const changes = {
@@ -102,16 +102,16 @@ export default typedPlugin(
           ...(req.body.destination !== undefined && { destination: req.body.destination }),
           ...(req.body.enabled !== undefined && { enabled: req.body.enabled }),
         };
-        const updatedUrl = Object.keys(changes).length
-          ? (
-              await db
-                .update(urls)
-                .set(changes)
-                .where(and(eq(urls.id, id), eq(urls.userId, req.user.id)))
-                .returning(urlColumns)
-            )[0]
-          : url;
-        if (!updatedUrl) throw new ApiError(9002);
+        let updatedUrl = url;
+        if (Object.keys(changes).length) {
+          const [updated] = await db
+            .update(urls)
+            .set(changes)
+            .where(and(eq(urls.id, id), eq(urls.userId, req.user.id)))
+            .returning(urlColumns);
+          if (!updated) throw new ApiError(9002);
+          updatedUrl = updated;
+        }
 
         logger.info(`${req.user.username} updated URL ${updatedUrl.id}`, {
           updated: Object.keys(req.body),
@@ -136,12 +136,10 @@ export default typedPlugin(
       async (req, res) => {
         const { id } = req.params;
 
-        const deletedUrl = (
-          await db
-            .delete(urls)
-            .where(and(eq(urls.id, id), eq(urls.userId, req.user.id)))
-            .returning(urlColumns)
-        )[0];
+        const [deletedUrl] = await db
+          .delete(urls)
+          .where(and(eq(urls.id, id), eq(urls.userId, req.user.id)))
+          .returning(urlColumns);
         if (!deletedUrl) throw new ApiError(9002);
 
         logger.info(`${req.user.username} deleted URL ${deletedUrl.id}`, {

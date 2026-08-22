@@ -96,11 +96,12 @@ export default typedPlugin(
         }
 
         if (files) {
-          const filesAdd = (await getFilesWithUser(files)).filter((file) => file.userId === req.user.id);
+          const selectedFiles = await getFilesWithUser(files);
+          const ownedFiles = selectedFiles.filter((file) => file.userId === req.user.id);
 
-          if (!filesAdd.length) throw new ApiError(1026);
+          if (!ownedFiles.length) throw new ApiError(1026);
 
-          files = filesAdd.map((f) => f.id);
+          files = ownedFiles.map((file) => file.id);
         }
 
         const folder = await createFolder(

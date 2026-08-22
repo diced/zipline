@@ -1,8 +1,9 @@
 import { config } from '@/lib/config';
 import { db } from '@/lib/db';
+import { filePasswordExtra } from '@/lib/db/models/file';
+import { userViewSchema } from '@/lib/db/models/user';
 import { escapeLike } from '@/lib/db/utils';
 import { sanitizeFilename } from '@/lib/fs';
-import { userViewSchema } from '@/lib/db/models/user';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { rawFileHandler } from './raw/[id]';
 
@@ -24,6 +25,8 @@ export async function filesRoute(
   if (!name) return res.callNotFound();
 
   const query = {
+    columns: { name: true, type: true },
+    extras: filePasswordExtra,
     with: { user: { columns: { view: true } } },
   } as const;
   let file = await db.query.files.findFirst({ ...query, where: { name } });

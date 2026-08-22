@@ -69,7 +69,8 @@ export default typedPlugin(
           if (invalids.length > 0)
             throw new ApiError(3014, `You don't have the permission to modify files[${invalids.join(', ')}]`);
 
-          const resp = { count: await updateFiles(files, { favorite }) };
+          const count = await updateFiles(files, { favorite });
+          const resp = { count };
 
           if (resp.count === 0) throw new ApiError(1028);
 
@@ -86,7 +87,8 @@ export default typedPlugin(
         const f = await getOwnedFolder(folder, req.user.id);
         if (!f) throw new ApiError(4001);
 
-        const resp = { count: await updateFiles(files, { folderId: folder }, req.user.id) };
+        const count = await updateFiles(files, { folderId: folder }, req.user.id);
+        const resp = { count };
 
         if (resp.count === 0) throw new ApiError(4006);
 
@@ -149,7 +151,8 @@ export default typedPlugin(
           });
         }
 
-        const resp = { count: await removeFiles(files) };
+        const count = await removeFiles(files);
+        const resp = { count };
 
         if (resp.count === 0) throw new ApiError(1027);
 

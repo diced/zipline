@@ -86,7 +86,8 @@ async function adoptPrismaDatabase(client: Client, baseline: MigrationMeta) {
     await assertCompletePrismaMigrationHistory(client);
     await createDrizzleMigrationTable(client);
 
-    if (await hasDrizzleMigrationHistory(client)) {
+    const hasMigrationHistory = await hasDrizzleMigrationHistory(client);
+    if (hasMigrationHistory) {
       throw new Error('Drizzle migration history appeared while preparing the Prisma baseline');
     }
 
@@ -114,7 +115,8 @@ export async function runMigrations() {
   const connectionString = getDatabaseUrl();
   logger.debug('ensuring database exists');
 
-  if (await ensureDatabaseExists(connectionString)) logger.info('database created');
+  const databaseCreated = await ensureDatabaseExists(connectionString);
+  if (databaseCreated) logger.info('database created');
 
   const migrations = readMigrationFiles(migrationConfig);
   const baseline = migrations[0];
@@ -128,25 +130,30 @@ export async function runMigrations() {
     await acquireMigrationLock(client);
     lockAcquired = true;
 
-    if (!(await hasDrizzleMigrationHistory(client)) && (await hasPrismaMigrationHistory(client))) {
-      logger.info('validating existing Prisma database before Drizzle handoff');
-      try {
-        await adoptPrismaDatabase(client, baseline);
-      } catch (error) {
-        throw new Error(
-          `cannot safely hand off this Prisma database to Drizzle: ${(error as Error).message}. ` +
-            'Repair it with the previous Zipline release before upgrading; no baseline was recorded.',
-          { cause: error },
-        );
+    const hasDrizzleHistory = await hasDrizzleMigrationHistory(client);
+    if (!hasDrizzleHistory) {
+      const hasPrismaHistory = await hasPrismaMigrationHistory(client);
+      if (hasPrismaHistory) {
+        logger.info('validating existing Prisma database before Drizzle handoff');
+        try {
+          await adoptPrismaDatabase(client, baseline);
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error);
+          throw new Error(
+            `cannot safely hand off this Prisma database to Drizzle: ${message}. ` +
+              'Repair it with the previous Zipline release before upgrading; no baseline was recorded.',
+            { cause: error },
+          );
+        }
+        logger.info('existing Prisma database recorded at the Drizzle baseline');
       }
-      logger.info('existing Prisma database recorded at the Drizzle baseline');
     }
 
     logger.debug('applying Drizzle migrations');
     await migrate(drizzle({ client }), migrationConfig);
     logger.debug('Drizzle migrations complete');
   } catch (error) {
-    logger.error(error as Error);
+    logger.error(error instanceof Error ? error : new Error(String(error)));
     throw error;
   } finally {
     try {

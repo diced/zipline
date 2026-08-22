@@ -1,7 +1,8 @@
 import { ApiError } from '@/lib/api/errors';
 import { db } from '@/lib/db';
 import { tagColumns, Tag, tagSchema } from '@/lib/db/models/tag';
-import { tags as tagTable } from '@/lib/db/schema';
+import { tags } from '@/lib/db/schema';
+import { isPostgresError } from '@/lib/db/utils';
 import { log } from '@/lib/logger';
 import { zStringTrimmed } from '@/lib/validation';
 import { userMiddleware } from '@/server/middleware/user';
@@ -66,9 +67,9 @@ export default typedPlugin(
         const { id } = req.params;
 
         const [deleted] = await db
-          .delete(tagTable)
-          .where(and(eq(tagTable.id, id), eq(tagTable.userId, req.user.id)))
-          .returning({ id: tagTable.id });
+          .delete(tags)
+          .where(and(eq(tags.id, id), eq(tags.userId, req.user.id)))
+          .returning({ id: tags.id });
         if (!deleted) throw new ApiError(9002);
 
         logger.info('tag deleted', {
@@ -111,28 +112,27 @@ export default typedPlugin(
         });
         if (!existingTag) throw new ApiError(9002);
 
-        if (name) {
-          const existing = await db.query.tags.findFirst({ columns: { id: true }, where: { name } });
-
-          if (existing) throw new ApiError(1034);
-        }
-
         const changes = { ...(name && { name }), ...(color && { color }) };
         let tag = existingTag;
         if (Object.keys(changes).length) {
-          const [updated] = await db
-            .update(tagTable)
-            .set(changes)
-            .where(eq(tagTable.id, existingTag.id))
-            .returning({
-              id: tagTable.id,
-              createdAt: tagTable.createdAt,
-              updatedAt: tagTable.updatedAt,
-              name: tagTable.name,
-              color: tagTable.color,
-            });
-          if (!updated) throw new ApiError(9002);
-          tag = { ...updated, files: existingTag.files };
+          try {
+            const [updated] = await db
+              .update(tags)
+              .set(changes)
+              .where(eq(tags.id, existingTag.id))
+              .returning({
+                id: tags.id,
+                createdAt: tags.createdAt,
+                updatedAt: tags.updatedAt,
+                name: tags.name,
+                color: tags.color,
+              });
+            if (!updated) throw new ApiError(9002);
+            tag = { ...updated, files: existingTag.files };
+          } catch (error) {
+            if (isPostgresError(error, '23505')) throw new ApiError(1034);
+            throw error;
+          }
         }
 
         logger.info('tag updated', {

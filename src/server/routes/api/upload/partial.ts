@@ -6,7 +6,7 @@ import { hashPassword } from '@/lib/crypto';
 import { db } from '@/lib/db';
 import { removeFile, type FileInsert } from '@/lib/db/models/file';
 import { getFolderMetadata } from '@/lib/db/models/folder';
-import { files as fileTable, incompleteFiles, users as userTable } from '@/lib/db/schema';
+import { files, incompleteFiles, users } from '@/lib/db/schema';
 import { getUser } from '@/lib/db/models/user';
 import { sanitizeFilename } from '@/lib/fs';
 import { log } from '@/lib/logger';
@@ -23,7 +23,7 @@ import type { DomainDbRequest, DomainDbResponse } from '@/offload/proxiedDb';
 import { eq, getColumns, sql } from 'drizzle-orm';
 
 const logger = log('api').c('upload').c('partial');
-const { password: _password, userId: _userId, ...uploadFileColumns } = getColumns(fileTable);
+const { password: _password, userId: _userId, ...uploadFileColumns } = getColumns(files);
 
 const PARTIAL_TIMEOUT = 30 * 60_000;
 const MAX_PARTIALS = 4;
@@ -84,15 +84,15 @@ function activePartials(actorKey: string) {
 
 function quotaReservations(quotaUserId: string) {
   let size = 0;
-  let files = 0;
+  let count = 0;
   for (const partial of partialsCache.values()) {
     if (partial.quotaUserId !== quotaUserId || partial.finalized) continue;
 
     size += partial.total;
-    files++;
+    count++;
   }
 
-  return { size, files };
+  return { size, files: count };
 }
 
 async function deletePartial(identifier: string, deleteFiles = true) {
@@ -186,7 +186,8 @@ export default typedPlugin(
         }
 
         // use quota of folder owner for anonymous uploads
-        const quotaUser = req.user ? req.user : folder?.userId ? await getUser(folder.userId) : null;
+        let quotaUser = req.user ? req.user : null;
+        if (!quotaUser && folder?.userId) quotaUser = await getUser(folder.userId);
 
         const actorKey = req.user ? `user:${req.user.id}` : `anonymous:${folder?.id ?? 'unknown'}:${req.ip}`;
 
@@ -224,9 +225,10 @@ export default typedPlugin(
 
         if (!cache) throw new ApiError(1003);
 
-        let files;
+        let multipartFiles;
         try {
-          ({ files } = await req.saveRequestFiles({ tmpdir: config.core.tempDirectory }));
+          const requestFiles = await req.saveRequestFiles({ tmpdir: config.core.tempDirectory });
+          multipartFiles = requestFiles.files;
         } catch (error) {
           await deletePartial(options.partial.identifier);
           throw error;
@@ -237,7 +239,7 @@ export default typedPlugin(
           ...(options.deletesAt && {
             deletesAt: options.deletesAt === 'never' ? 'never' : options.deletesAt.toISOString(),
           }),
-          ...(config.files.assumeMimetypes && { assumedMimetypes: Array(files.length) }),
+          ...(config.files.assumeMimetypes && { assumedMimetypes: Array(multipartFiles.length) }),
         };
 
         const domain = getDomain(
@@ -248,14 +250,14 @@ export default typedPlugin(
 
         logger.debug('saving partial files', {
           partial: options.partial,
-          files: files.map((x) => x.filename),
+          files: multipartFiles.map((x) => x.filename),
         });
 
-        if (files.length !== 1) {
+        if (multipartFiles.length !== 1) {
           await deletePartial(options.partial.identifier);
-          throw new ApiError(files.length > 1 ? 1005 : 1062);
+          throw new ApiError(multipartFiles.length > 1 ? 1005 : 1062);
         }
-        const file = files[0];
+        const file = multipartFiles[0];
         const fileSize = file.file.bytesRead;
 
         if (end - start !== fileSize) {
@@ -316,7 +318,10 @@ export default typedPlugin(
             userId: req.user ? req.user.id : options.folder ? folder?.userId : undefined,
           };
 
-          if (options.password) data.password = await hashPassword(options.password);
+          if (options.password) {
+            const password = await hashPassword(options.password);
+            data.password = password;
+          }
           if (options.maxViews) data.maxViews = options.maxViews;
           if (folder) data.folderId = folder.id;
           if (options.addOriginalName) {
@@ -331,18 +336,14 @@ export default typedPlugin(
           try {
             fileUpload = await db.transaction(async (tx) => {
               if (quotaUser?.quota) {
-                await tx
-                  .select({ id: userTable.id })
-                  .from(userTable)
-                  .where(eq(userTable.id, quotaUser.id))
-                  .for('update');
+                await tx.select({ id: users.id }).from(users).where(eq(users.id, quotaUser.id)).for('update');
 
                 const quotaCheck = await checkQuota(quotaUser, total, 1, tx);
                 if (quotaCheck !== true)
                   throw new ApiError(5002, typeof quotaCheck === 'string' ? quotaCheck : undefined);
               }
 
-              const [created] = await tx.insert(fileTable).values(data).returning(uploadFileColumns);
+              const [created] = await tx.insert(files).values(data).returning(uploadFileColumns);
               if (!created) throw new Error('File insert did not return a row');
               return created;
             });
@@ -385,69 +386,87 @@ export default typedPlugin(
 
           worker.on('message', async (message: DomainDbRequest) => {
             if (message.type !== 'db') return;
-            let result: unknown = null;
 
-            switch (message.command) {
-              case 'incomplete.create':
-                {
-                  const [created] = await db.insert(incompleteFiles).values(message.payload).returning();
-                  if (!created) throw new Error('Incomplete file insert did not return a row');
-                  result = created;
-                }
-                break;
-              case 'incomplete.increment':
-                {
+            try {
+              let result: unknown = null;
+
+              switch (message.command) {
+                case 'incomplete.create':
+                  {
+                    const [created] = await db
+                      .insert(incompleteFiles)
+                      .values(message.payload)
+                      .returning({ id: incompleteFiles.id });
+                    if (!created) throw new Error('Incomplete file insert did not return a row');
+                    result = created;
+                  }
+                  break;
+                case 'incomplete.increment':
+                  {
+                    const [updated] = await db
+                      .update(incompleteFiles)
+                      .set({
+                        chunksComplete: sql`${incompleteFiles.chunksComplete} + 1`,
+                        status: message.payload.status,
+                      })
+                      .where(eq(incompleteFiles.id, message.payload.id))
+                      .returning({ id: incompleteFiles.id });
+                    result = updated ?? null;
+                  }
+                  break;
+                case 'incomplete.status':
+                  {
+                    const [updated] = await db
+                      .update(incompleteFiles)
+                      .set({ status: message.payload.status })
+                      .where(eq(incompleteFiles.id, message.payload.id))
+                      .returning({ id: incompleteFiles.id });
+                    result = updated ?? null;
+                  }
+                  break;
+                case 'file.finalizePartial': {
                   const [updated] = await db
-                    .update(incompleteFiles)
-                    .set({
-                      chunksComplete: sql`${incompleteFiles.chunksComplete} + 1`,
-                      status: message.payload.status,
-                    })
-                    .where(eq(incompleteFiles.id, message.payload.id))
-                    .returning();
+                    .update(files)
+                    .set(message.payload.changes)
+                    .where(eq(files.id, message.payload.id))
+                    .returning(uploadFileColumns);
                   result = updated ?? null;
+                  await deletePartial(partialIdentifier, false);
+                  break;
                 }
-                break;
-              case 'incomplete.status':
-                {
-                  const [updated] = await db
-                    .update(incompleteFiles)
-                    .set({ status: message.payload.status })
-                    .where(eq(incompleteFiles.id, message.payload.id))
-                    .returning();
-                  result = updated ?? null;
+                case 'file.delete': {
+                  const deleted = await removeFile(message.payload.id);
+                  result = deleted ? { id: deleted.id } : null;
+                  break;
                 }
-                break;
-              case 'file.finalizePartial':
-                result =
-                  (
-                    await db
-                      .update(fileTable)
-                      .set(message.payload.changes)
-                      .where(eq(fileTable.id, message.payload.id))
-                      .returning(uploadFileColumns)
-                  )[0] ?? null;
-                await deletePartial(partialIdentifier, false);
-                break;
-              case 'file.delete': {
-                const deleted = await removeFile(message.payload.id);
-                result = deleted ? { id: deleted.id } : null;
-                break;
+                case 'user.uploadContext':
+                  result = await getUser(message.payload.id);
+                  break;
+                default:
+                  throw new Error(`Unsupported partial worker database command: ${message.command}`);
               }
-              case 'user.uploadContext':
-                result = await getUser(message.payload.id);
-                break;
-              default:
-                logger.error('unsupported partial worker database command', {
-                  command: message.command,
-                });
-            }
 
-            worker.postMessage({
-              type: 'db-response',
-              id: message.id,
-              result,
-            } satisfies DomainDbResponse);
+              worker.postMessage({
+                type: 'db-response',
+                id: message.id,
+                ok: true,
+                result,
+              } satisfies DomainDbResponse);
+            } catch (error) {
+              worker.postMessage({
+                type: 'db-response',
+                id: message.id,
+                ok: false,
+                error:
+                  error instanceof Error
+                    ? {
+                        name: error.name,
+                        message: error.message,
+                        ...(error.stack && { stack: error.stack }),
+                      }
+                    : { name: 'Error', message: String(error) },
+              } satisfies DomainDbResponse);
+            }
           });
 
           worker.once('exit', () => {

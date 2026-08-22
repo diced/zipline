@@ -196,8 +196,8 @@ export default typedPlugin(
             const targetFolder = await getFolderWithOwner(targetFolderId);
             if (!targetFolder) throw new ApiError(4008);
             if (!canManage(req.user, targetFolder.user)) throw new ApiError(4008, undefined, 403);
-            if ((await getParentStatus(folderId, targetFolderId, targetFolder.userId)) === 'cycle')
-              throw new ApiError(1016);
+            const status = await getParentStatus(folderId, targetFolderId, targetFolder.userId);
+            if (status === 'cycle') throw new ApiError(1016);
           }
 
           try {

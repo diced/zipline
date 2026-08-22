@@ -43,7 +43,8 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        return res.send(await queryUserStats(req.user.id));
+        const stats = await queryUserStats(req.user.id);
+        return res.send(stats);
       },
     );
   },

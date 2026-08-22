@@ -3,7 +3,7 @@ import { config, reloadSettings } from '@/lib/config';
 import { getDatasource } from '@/lib/datasource';
 import { db } from '@/lib/db';
 import { getOwnedFolder } from '@/lib/db/models/folder';
-import { files as fileTable, users } from '@/lib/db/schema';
+import { files, users } from '@/lib/db/schema';
 import { guess } from '@/lib/mimes';
 import { eq } from 'drizzle-orm';
 import { statSync } from 'fs';
@@ -54,15 +54,15 @@ export async function importDir(
     if (!exists) return console.error('Folder not found:', folder);
   }
 
-  const files = await readdir(fullPath);
+  const dirents = await readdir(fullPath);
+  const filenames = dirents.filter((filename) => !parse(filename).base.startsWith('.thumbnail'));
   const data = [];
 
-  for (let i = 0; i !== files.length; ++i) {
-    const info = parse(files[i]);
-    if (info.base.startsWith('.thumbnail')) continue;
+  for (let i = 0; i !== filenames.length; ++i) {
+    const info = parse(filenames[i]);
 
     const mime = await guess(info.ext.replace('.', ''));
-    const { size } = statSync(join(fullPath, files[i]));
+    const { size } = statSync(join(fullPath, filenames[i]));
 
     data.push({
       name: info.base,
@@ -74,9 +74,11 @@ export async function importDir(
   }
 
   if (!skipDb) {
-    const created = data.length
-      ? await db.insert(fileTable).values(data).returning({ id: fileTable.id })
-      : [];
+    let created: { id: string }[] = [];
+    if (data.length) {
+      const insertedFiles = await db.insert(files).values(data).returning({ id: files.id });
+      created = insertedFiles;
+    }
     console.log(`Inserted ${created.length} files into the database.`);
   }
 
@@ -97,7 +99,7 @@ export async function importDir(
 
     const start = process.hrtime();
 
-    await datasource.put(data[i].name, join(fullPath, files[i]), {
+    await datasource.put(data[i].name, join(fullPath, filenames[i]), {
       mimetype: data[i].type ?? 'application/octet-stream',
       noDelete: true,
     });
@@ -114,7 +116,7 @@ export async function importDir(
     completed += data[i].size;
 
     console.log(
-      `Uploaded ${data[i].name} in ${timeStr} (${bytes(data[i].size)}) ${i + 1}/${files.length} ${bytes(completed)}/${bytes(totalSize)} ${uploadSpeedStr}`,
+      `Uploaded ${data[i].name} in ${timeStr} (${bytes(data[i].size)}) ${i + 1}/${filenames.length} ${bytes(completed)}/${bytes(totalSize)} ${uploadSpeedStr}`,
     );
 
     ++imported;

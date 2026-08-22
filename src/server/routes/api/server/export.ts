@@ -1,14 +1,6 @@
 import { ApiError } from '@/lib/api/errors';
 import { db } from '@/lib/db';
-import {
-  files as fileRecords,
-  folders as folderRecords,
-  invites as inviteRecords,
-  metrics as metricRecords,
-  thumbnails as thumbnailRecords,
-  urls as urlRecords,
-  users as userRecords,
-} from '@/lib/db/schema';
+import { files, folders, invites, metrics, thumbnails, urls, users } from '@/lib/db/schema';
 import { Export4, export4Schema } from '@/lib/import/version4/validateExport';
 import { log } from '@/lib/logger';
 import { administratorMiddleware } from '@/server/middleware/administrator';
@@ -60,23 +52,32 @@ export default typedPlugin(
         if (req.user.role !== 'SUPERADMIN') throw new ApiError(3015);
 
         if (req.query.counts) {
-          const [users, files, urls, folders, invites, thumbnails, metrics] = await Promise.all([
-            db.$count(userRecords),
-            db.$count(fileRecords),
-            db.$count(urlRecords),
-            db.$count(folderRecords),
-            db.$count(inviteRecords),
-            db.$count(thumbnailRecords),
-            db.$count(metricRecords),
-          ]);
+          const [userCount, fileCount, urlCount, folderCount, inviteCount, thumbnailCount, metricCount] =
+            await Promise.all([
+              db.$count(users),
+              db.$count(files),
+              db.$count(urls),
+              db.$count(folders),
+              db.$count(invites),
+              db.$count(thumbnails),
+              db.$count(metrics),
+            ]);
 
-          return res.send({ users, files, urls, folders, invites, thumbnails, metrics });
+          return res.send({
+            users: userCount,
+            files: fileCount,
+            urls: urlCount,
+            folders: folderCount,
+            invites: inviteCount,
+            thumbnails: thumbnailCount,
+            metrics: metricCount,
+          });
         }
 
         logger.debug('exporting server data', { format: '4', requester: req.user.username });
 
-        const settingsTable = await db.query.zipline.findFirst();
-        if (!settingsTable) throw new ApiError(1023);
+        const settings = await db.query.zipline.findFirst();
+        if (!settings) throw new ApiError(1023);
 
         const env = Object.fromEntries(
           Object.entries(process.env).filter(
@@ -103,7 +104,7 @@ export default typedPlugin(
             },
           },
           data: {
-            settings: settingsTable,
+            settings,
 
             users: [],
             userPasskeys: [],
@@ -120,7 +121,7 @@ export default typedPlugin(
           },
         };
 
-        const users = await db.query.users.findMany({
+        const userRows = await db.query.users.findMany({
           with: {
             passkeys: true,
             quota: true,
@@ -132,7 +133,7 @@ export default typedPlugin(
           },
         });
 
-        for (const user of users) {
+        for (const user of userRows) {
           export4.data.users.push({
             createdAt: user.createdAt.toISOString(),
             id: user.id,
@@ -232,9 +233,9 @@ export default typedPlugin(
           }
         }
 
-        const files = await db.select().from(fileRecords);
+        const fileRows = await db.select().from(files);
 
-        for (const file of files) {
+        for (const file of fileRows) {
           if (!file.userId)
             logger.warn('file has no user associated with it, still exporting...', {
               fileId: file.id,
@@ -258,9 +259,9 @@ export default typedPlugin(
           });
         }
 
-        const thumbnails = await db.select().from(thumbnailRecords);
+        const thumbnailRows = await db.select().from(thumbnails);
 
-        for (const thumbnail of thumbnails) {
+        for (const thumbnail of thumbnailRows) {
           export4.data.thumbnails.push({
             createdAt: thumbnail.createdAt.toISOString(),
             id: thumbnail.id,
@@ -272,9 +273,9 @@ export default typedPlugin(
         }
 
         if (req.query.nometrics === undefined) {
-          const metrics = await db.select().from(metricRecords);
+          const metricRows = await db.select().from(metrics);
 
-          export4.data.metrics = metrics.map((metric) => ({
+          export4.data.metrics = metricRows.map((metric) => ({
             createdAt: metric.createdAt.toISOString(),
             id: metric.id,
             data: metric.data,

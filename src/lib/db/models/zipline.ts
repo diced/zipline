@@ -26,7 +26,7 @@ export async function ensureSettingsRow(client: DbClient = db) {
   const existing = await client.query.zipline.findFirst();
   if (existing) return existing;
 
-  const created = (await client.insert(zipline).values(initialSettings).returning())[0];
+  const [created] = await client.insert(zipline).values(initialSettings).returning();
   if (!created) throw new Error('Failed to create the Zipline settings row');
   return created;
 }
@@ -44,7 +44,8 @@ export async function ensureSettings(client: DbClient = db): Promise<DatabaseSet
   const settings = await getSettings(client);
   if (settings) return settings;
 
-  return settingsFromRow(await ensureSettingsRow(client));
+  const settingsRow = await ensureSettingsRow(client);
+  return settingsFromRow(settingsRow);
 }
 
 export async function updateSettings(
@@ -52,7 +53,7 @@ export async function updateSettings(
   values: DatabaseSettingsUpdate,
   client: DbClient = db,
 ): Promise<DatabaseSettings | null> {
-  const updated = (await client.update(zipline).set(values).where(eq(zipline.id, settingsId)).returning())[0];
+  const [updated] = await client.update(zipline).set(values).where(eq(zipline.id, settingsId)).returning();
 
   return updated ? settingsFromRow(updated) : null;
 }

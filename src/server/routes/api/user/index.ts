@@ -9,7 +9,7 @@ import {
   type UserUpdate,
   userSchema,
 } from '@/lib/db/models/user';
-import { userSessions } from '@/lib/db/schema';
+import { users, userSessions } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { zStringTrimmed } from '@/lib/validation';
@@ -90,7 +90,12 @@ export default typedPlugin(
       },
       async (req, res) => {
         if (req.body.username) {
-          if (await usernameExists(req.body.username)) throw new ApiError(1038);
+          const [usernameTaken] = await db
+            .select()
+            .from(users)
+            .where(eq(users.username, req.body.username))
+            .limit(1);
+          if (usernameTaken) throw new ApiError(1038);
         }
 
         const changingPassword = !!req.body.password;
@@ -165,21 +170,24 @@ export default typedPlugin(
           }),
         };
 
-        const user = changingPassword
-          ? await db.transaction(async (tx) => {
-              await tx
-                .delete(userSessions)
-                .where(
-                  and(
-                    eq(userSessions.userId, req.user.id),
-                    ne(userSessions.id, currentSession.sessionId ?? ''),
-                  ),
-                );
-              return updateUser(req.user.id, data, tx);
-            })
-          : Object.keys(data).length
-            ? await updateUser(req.user.id, data)
-            : await getUser(req.user.id);
+        let user: User | null;
+        if (changingPassword) {
+          user = await db.transaction(async (tx) => {
+            await tx
+              .delete(userSessions)
+              .where(
+                and(
+                  eq(userSessions.userId, req.user.id),
+                  ne(userSessions.id, currentSession.sessionId ?? ''),
+                ),
+              );
+            return updateUser(req.user.id, data, tx);
+          });
+        } else if (Object.keys(data).length) {
+          user = await updateUser(req.user.id, data);
+        } else {
+          user = await getUser(req.user.id);
+        }
         if (!user) throw new ApiError(1068);
 
         await saveSession(currentSession, user, false);

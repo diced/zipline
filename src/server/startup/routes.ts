@@ -27,16 +27,19 @@ export async function registerRoutes(server: FastifyInstance, mode: string) {
   if (config.files.route === '/' && config.urls.route === '/') {
     logger.debug('files & urls route = /, using catch-all route');
 
-    server.get<{ Params: { id: string } }>('/:id', async (req, res) => {
-      const { id } = req.params;
+    server.get<{ Params: { id: string }; Querystring: { token?: string; download?: string } }>(
+      '/:id',
+      async (req, res) => {
+        const { id } = req.params;
 
-      if (id === '') return res.callNotFound();
-      else if (id === 'dashboard') return res.callNotFound(); // todo render dashboard
+        if (id === '') return res.callNotFound();
+        else if (id === 'dashboard') return res.callNotFound(); // todo render dashboard
 
-      if ((await db.$count(urls, or(eq(urls.code, id), eq(urls.vanity, id)))) > 0)
-        return urlsRoute(req as any, res);
-      else return filesRoute(req as any, res);
-    });
+        const urlCount = await db.$count(urls, or(eq(urls.code, id), eq(urls.vanity, id)));
+        if (urlCount > 0) return urlsRoute(req, res);
+        else return filesRoute(req, res);
+      },
+    );
   } else {
     server.get(config.files.route === '/' ? '/:id' : `${config.files.route}/:id`, filesRoute);
     server.get(config.urls.route === '/' ? '/:id' : `${config.urls.route}/:id`, urlsRoute);

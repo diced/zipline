@@ -12,7 +12,7 @@ import {
   removeFile,
   type FileUpdate,
 } from '@/lib/db/models/file';
-import { files as fileTable, filesToTags, tags as tagTable } from '@/lib/db/schema';
+import { files, filesToTags, tags } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { canInteract } from '@/lib/role';
 import { zValidatePath } from '@/lib/validation';
@@ -111,8 +111,8 @@ export default typedPlugin(
         if (req.body.tags !== undefined) {
           const ownerId = req.user.id !== file.user?.id ? (file.user?.id ?? req.user.id) : req.user.id;
           const tagCount = await db.$count(
-            tagTable,
-            and(eq(tagTable.userId, ownerId), inArray(tagTable.id, req.body.tags)),
+            tags,
+            and(eq(tags.userId, ownerId), inArray(tags.id, req.body.tags)),
           );
 
           if (tagCount !== req.body.tags.length) throw new ApiError(1032);
@@ -137,10 +137,10 @@ export default typedPlugin(
         const newFile = await db.transaction(async (tx) => {
           if (Object.keys(data).length) {
             const [updated] = await tx
-              .update(fileTable)
+              .update(files)
               .set(data)
-              .where(eq(fileTable.id, file.id))
-              .returning({ id: fileTable.id });
+              .where(eq(files.id, file.id))
+              .returning({ id: files.id });
             if (!updated) return null;
           }
 
