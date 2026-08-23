@@ -87,9 +87,8 @@ async function adoptPrismaDatabase(client: Client, baseline: MigrationMeta) {
     await createDrizzleMigrationTable(client);
 
     const hasMigrationHistory = await hasDrizzleMigrationHistory(client);
-    if (hasMigrationHistory) {
+    if (hasMigrationHistory)
       throw new Error('Drizzle migration history appeared while preparing the Prisma baseline');
-    }
 
     const table = `${escapeIdentifier(migrationsSchema)}.${escapeIdentifier(migrationsTable)}`;
     await client.query(
@@ -131,27 +130,24 @@ export async function runMigrations() {
     lockAcquired = true;
 
     const hasDrizzleHistory = await hasDrizzleMigrationHistory(client);
-    if (!hasDrizzleHistory) {
-      const hasPrismaHistory = await hasPrismaMigrationHistory(client);
-      if (hasPrismaHistory) {
-        logger.info('validating existing Prisma database before Drizzle handoff');
-        try {
-          await adoptPrismaDatabase(client, baseline);
-        } catch (error) {
-          const message = error instanceof Error ? error.message : String(error);
-          throw new Error(
-            `cannot safely hand off this Prisma database to Drizzle: ${message}. ` +
-              'Repair it with the previous Zipline release before upgrading; no baseline was recorded.',
-            { cause: error },
-          );
-        }
-        logger.info('existing Prisma database recorded at the Drizzle baseline');
+    const hasPrismaHistory = await hasPrismaMigrationHistory(client);
+
+    if (!hasDrizzleHistory && hasPrismaHistory) {
+      try {
+        await adoptPrismaDatabase(client, baseline);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+
+        throw new Error(
+          `cannot safely migrate from prisma to drizzle: ${message}. To resolve this, repair the database with the previous (latest before this) Zipline release before upgrading; no baseline was recorded.`,
+          { cause: error },
+        );
       }
     }
 
-    logger.debug('applying Drizzle migrations');
+    logger.debug('applying migrations');
     await migrate(drizzle({ client }), migrationConfig);
-    logger.debug('Drizzle migrations complete');
+    logger.debug('migrations complete');
   } catch (error) {
     logger.error(error instanceof Error ? error : new Error(String(error)));
     throw error;

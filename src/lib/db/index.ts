@@ -7,6 +7,7 @@ import { relations } from './relations';
 
 const building = !!process.env.ZIPLINE_BUILD;
 const logger = log('db');
+
 type Database = NodePgDatabase<typeof relations>;
 type Transaction = NodePgTransaction<typeof relations>;
 export type DbClient = Database | Transaction;
@@ -23,7 +24,6 @@ export function getDatabaseUrl() {
   const username = encodeURIComponent(vars.DATABASE_USERNAME);
   const password = encodeURIComponent(vars.DATABASE_PASSWORD);
   return `postgresql://${username}:${password}@${vars.DATABASE_HOST}:${vars.DATABASE_PORT}/${vars.DATABASE_NAME}`;
-}
 
 export function postgresConnectionConfig(connectionString: string): PoolConfig {
   const url = new URL(connectionString);
@@ -39,11 +39,7 @@ export function postgresConnectionConfig(connectionString: string): PoolConfig {
 }
 
 function queryLogger() {
-  const value = process.env.ZIPLINE_DB_LOG;
-  if (!value) return undefined;
-
-  const levels = value.split(',').map((level) => level.trim().toLowerCase());
-  if (value !== 'true' && !levels.includes('query')) return undefined;
+  if (!process.env.ZIPLINE_DB_LOG) return undefined;
 
   return {
     logQuery(query: string, params: unknown[]) {

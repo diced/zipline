@@ -298,10 +298,10 @@ Zipline uses [Drizzle ORM](https://orm.drizzle.team/) for its database schema an
 After changing `src/lib/db/schema.ts`, generate a migration with Drizzle Kit. Zipline applies committed migrations automatically on startup.
 
 ```bash
-pnpm db:generate
+pnpm db:migrate
 ```
 
-To apply committed migrations manually, run `pnpm db:migrate`. If you wish to push schema changes directly without generating a migration file, use `db:prototype`; this is only recommended for local prototyping and should not be used in production.
+This command only creates a migration file; Zipline applies committed migrations when it starts. If you wish to push schema changes directly without generating a migration file, use `db:prototype`; this is only recommended for local prototyping and should not be used in production.
 
 ```bash
 pnpm db:prototype
