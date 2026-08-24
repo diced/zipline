@@ -344,7 +344,8 @@ export default typedPlugin(
               }
 
               const [created] = await tx.insert(files).values(data).returning(uploadFileColumns);
-              if (!created) throw new Error('File insert did not return a row');
+              if (!created) throw new ApiError(9005);
+
               return created;
             });
           } catch (error) {

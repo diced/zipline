@@ -20,7 +20,7 @@ import {
   verifyRegistrationResponse,
 } from '@simplewebauthn/server';
 import { FastifyReply, FastifyRequest } from 'fastify';
-import { and, eq } from 'drizzle-orm';
+import { and, desc, eq } from 'drizzle-orm';
 import z from 'zod';
 
 export type ApiUserMfaPasskeyResponse = User | User['passkeys'];
@@ -45,17 +45,24 @@ export default typedPlugin(
         schema: {
           description: 'List all registered passkey credentials for the authenticated user.',
           response: {
-            200: z.array(userPasskeySchema.omit({ reg: true })),
+            200: z.array(userPasskeySchema.omit({ reg: true, userId: true })),
           },
           tags: ['auth'],
         },
         preHandler: [userMiddleware, passkeysEnabledHandler],
       },
       async (req, res) => {
-        const passkeys = await db.query.userPasskeys.findMany({
-          columns: { reg: false },
-          where: { userId: req.user.id },
-        });
+        const passkeys = await db
+          .select({
+            id: userPasskeys.id,
+            createdAt: userPasskeys.createdAt,
+            updatedAt: userPasskeys.updatedAt,
+            lastUsed: userPasskeys.lastUsed,
+            name: userPasskeys.name,
+          })
+          .from(userPasskeys)
+          .where(eq(userPasskeys.userId, req.user.id))
+          .orderBy(desc(userPasskeys.lastUsed));
 
         return res.send(passkeys);
       },
@@ -78,6 +85,7 @@ export default typedPlugin(
           .select({ reg: userPasskeys.reg })
           .from(userPasskeys)
           .where(eq(userPasskeys.userId, req.user.id));
+
         const existingPasskeys = registrations.flatMap((passkey) => {
           const parsed = passkeyRegSchema.safeParse(passkey.reg);
           return parsed.success ? [parsed.data] : [];
@@ -176,7 +184,7 @@ export default typedPlugin(
               lastUsed: new Date(),
             })
             .returning({ id: userPasskeys.id });
-          if (!created) throw new Error('Passkey insert did not return a row');
+          if (!created) throw new ApiError(9005);
 
           return getUser(req.user.id, tx);
         });
@@ -214,9 +222,11 @@ export default typedPlugin(
             .delete(userPasskeys)
             .where(and(eq(userPasskeys.userId, req.user.id), eq(userPasskeys.id, id)))
             .returning({ id: userPasskeys.id });
-          if (!deleted) throw new Error(`Passkey ${id} does not belong to user ${req.user.id}`);
+
+          if (!deleted) throw new ApiError(1070);
           return getUser(req.user.id, tx);
         });
+
         if (!user) throw new ApiError(2001);
 
         logger.info('user deleted a passkey', {

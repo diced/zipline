@@ -1,3 +1,4 @@
+import { ApiError } from '@/lib/api/errors';
 import { config } from '@/lib/config';
 import { db } from '@/lib/db';
 import { Invite, inviteSchema } from '@/lib/db/models/invite';
@@ -52,13 +53,13 @@ export default typedPlugin(
               inviterId: req.user.id,
             })
             .returning({ id: invites.id });
-          if (!created) throw new Error('Invite insert did not return a row');
+          if (!created) throw new ApiError(9005);
 
           const invite = await tx.query.invites.findFirst({
             where: { id: created.id },
             with: { inviter: { columns: { username: true, id: true, role: true } } },
           });
-          if (!invite) throw new Error('Inserted invite could not be read back');
+          if (!invite) throw new ApiError(9005);
           return invite;
         });
 

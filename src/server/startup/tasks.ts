@@ -1,5 +1,5 @@
 import { db } from '@/lib/db';
-import { thumbnails } from '@/lib/db/schema';
+import { files, thumbnails } from '@/lib/db/schema';
 import { Tasks } from '@/lib/tasks';
 import cleanThumbnails from '@/lib/tasks/run/cleanThumbnails';
 import clearInvites from '@/lib/tasks/run/clearInvites';
@@ -8,6 +8,7 @@ import maxViews from '@/lib/tasks/run/maxViews';
 import metrics from '@/lib/tasks/run/metrics';
 import thumbnailTask from '@/lib/tasks/run/thumbnails';
 import type { DomainDbRequest, DomainDbResponse } from '@/offload/proxiedDb';
+import { eq } from 'drizzle-orm';
 import type { FastifyInstance } from 'fastify';
 import ms, { StringValue } from 'ms';
 import type { Worker } from 'worker_threads';
@@ -47,10 +48,17 @@ export function startTasks(server: FastifyInstance) {
             let result: unknown = null;
             switch (message.command) {
               case 'file.thumbnailSource': {
-                const file = await db.query.files.findFirst({
-                  columns: { id: true, name: true, type: true, size: true },
-                  where: { id: message.payload.id },
-                });
+                const [file] = await db
+                  .select({
+                    id: files.id,
+                    name: files.name,
+                    type: files.type,
+                    size: files.size,
+                  })
+                  .from(files)
+                  .where(eq(files.id, message.payload.id))
+                  .limit(1);
+
                 result = file ?? null;
                 break;
               }

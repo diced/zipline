@@ -127,7 +127,7 @@ export default typedPlugin(
                 .set({ avatar: user.avatar ?? null, totpSecret: user.totp_secret ?? null })
                 .where(eq(users.id, req.user.id))
                 .returning({ id: users.id });
-              if (!updated) throw new Error(`User ${req.user.id} does not exist`);
+              if (!updated) throw new ApiError(9005);
 
               if (importedProviders.length) {
                 await tx
@@ -155,7 +155,7 @@ export default typedPlugin(
                 totpSecret: user.totp_secret ?? null,
               })
               .returning({ id: users.id });
-            if (!created) throw new Error('User insert did not return a row');
+            if (!created) throw new ApiError(9005);
 
             if (importedProviders.length) {
               await tx
@@ -218,7 +218,7 @@ export default typedPlugin(
               password: file.password || null,
             })
             .returning({ id: files.id });
-          if (!created) throw new Error('File insert did not return a row');
+          if (!created) throw new ApiError(9005);
 
           filesImportedToId[id] = created.id;
         }
@@ -253,7 +253,7 @@ export default typedPlugin(
                 createdAt: parseDate(folder.created_at),
               })
               .returning({ id: folders.id });
-            if (!created) throw new Error('Folder insert did not return a row');
+            if (!created) throw new ApiError(9005);
 
             if (fileIds.length) {
               const updatedFiles = await tx
@@ -261,8 +261,7 @@ export default typedPlugin(
                 .set({ folderId: created.id })
                 .where(inArray(files.id, fileIds))
                 .returning({ id: files.id });
-              if (updatedFiles.length !== fileIds.length)
-                throw new Error('One or more imported folder files no longer exist');
+              if (updatedFiles.length !== fileIds.length) throw new ApiError(9005);
             }
 
             return created;
@@ -310,7 +309,7 @@ export default typedPlugin(
               createdAt: parseDate(url.created_at),
             })
             .returning({ id: urls.id });
-          if (!created) throw new Error('URL insert did not return a row');
+          if (!created) throw new ApiError(9005);
 
           urlsImportedToId[id] = created.id;
         }

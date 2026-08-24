@@ -1,6 +1,6 @@
 import { ApiError } from '@/lib/api/errors';
 import { db } from '@/lib/db';
-import { files, folders, invites, metrics, thumbnails, urls, users } from '@/lib/db/schema';
+import { files, folders, invites, metrics, thumbnails, urls, users, zipline } from '@/lib/db/schema';
 import { Export4, export4Schema } from '@/lib/import/version4/validateExport';
 import { log } from '@/lib/logger';
 import { administratorMiddleware } from '@/server/middleware/administrator';
@@ -76,7 +76,7 @@ export default typedPlugin(
 
         logger.debug('exporting server data', { format: '4', requester: req.user.username });
 
-        const settings = await db.query.zipline.findFirst();
+        const [settings] = await db.select().from(zipline).limit(1);
         if (!settings) throw new ApiError(1023);
 
         const env = Object.fromEntries(

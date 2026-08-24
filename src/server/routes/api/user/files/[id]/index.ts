@@ -120,7 +120,7 @@ export default typedPlugin(
 
         if (req.body.name !== undefined && req.body.name !== file.name) {
           const name = req.body.name!;
-          const existingFile = await db.query.files.findFirst({ columns: { id: true }, where: { name } });
+          const [existingFile] = await db.select({ id: files.id }).from(files).where(eq(files.name, name));
 
           if (existingFile && existingFile.id !== file.id) throw new ApiError(1014);
 

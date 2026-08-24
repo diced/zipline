@@ -78,7 +78,7 @@ export default typedPlugin(
       async (req, res) => {
         const token = createToken();
         const user = await updateUser(req.user.id, { token });
-        if (!user) throw new ApiError(9004);
+        if (!user) throw new ApiError(9005);
 
         logger.info('user reset their token', {
           user: user.username,

@@ -162,7 +162,7 @@ export default typedPlugin(
             size: '0',
           })
           .returning({ id: exports.id });
-        if (!exportDb) throw new ApiError(9004);
+        if (!exportDb) throw new ApiError(9005);
 
         const writeStream = createWriteStream(exportPath);
 
@@ -195,8 +195,7 @@ export default typedPlugin(
             .set({ completed: true, size: exportStats.size.toString() })
             .where(eq(exports.id, exportDb.id))
             .returning({ id: exports.id });
-          if (!completed)
-            throw new ApiError(9002, 'export was not found when trying to mark it as completed');
+          if (!completed) throw new ApiError(9005);
         }
 
         writeStream.on('close', () => {

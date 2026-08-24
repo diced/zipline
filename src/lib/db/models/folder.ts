@@ -1,3 +1,4 @@
+import { ApiError } from '@/lib/api/errors';
 import { db, type DbClient } from '@/lib/db';
 import { files, folders } from '@/lib/db/schema';
 import { and, eq, inArray, sql } from 'drizzle-orm';
@@ -141,7 +142,7 @@ export async function getPublicFolder(identifier: string, client: DbClient = db)
 export async function createFolder(data: FolderInsert, fileIds: string[] = []) {
   return db.transaction(async (tx) => {
     const [row] = await tx.insert(folders).values(data).returning({ id: folders.id });
-    if (!row) throw new Error('Folder insert did not return a row');
+    if (!row) throw new ApiError(9005);
 
     if (fileIds.length) {
       await tx
@@ -155,7 +156,7 @@ export async function createFolder(data: FolderInsert, fileIds: string[] = []) {
       extras: folderCountExtra,
       with: { parent: { columns: folderParentColumns }, files: folderFilesConfig },
     });
-    if (!created) throw new Error('Inserted folder could not be read back');
+    if (!created) throw new ApiError(9005);
 
     return created;
   });

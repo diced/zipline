@@ -118,7 +118,7 @@ async function oauthPlugin(fastify: FastifyInstance) {
             oauthId: response.user_id,
           })
           .returning({ id: oauthProviders.id });
-        if (!createdProvider) throw new Error('OAuth provider insert did not return a row');
+        if (!createdProvider) throw new ApiError(9005);
 
         await saveSession(session, user, false);
 
@@ -135,6 +135,7 @@ async function oauthPlugin(fastify: FastifyInstance) {
           error: e,
         });
 
+        if (e instanceof ApiError && e.code === 9005) throw e;
         throw new ApiError(1063);
       }
     } else if (user && userOauth) {
@@ -148,7 +149,7 @@ async function oauthPlugin(fastify: FastifyInstance) {
         })
         .where(eq(oauthProviders.id, userOauth.id))
         .returning({ id: oauthProviders.id });
-      if (!updated) throw new Error(`OAuth provider ${userOauth.id} no longer exists`);
+      if (!updated) throw new ApiError(9005);
 
       await saveSession(session, user, false);
 
@@ -170,7 +171,7 @@ async function oauthPlugin(fastify: FastifyInstance) {
           })
           .where(eq(oauthProviders.id, existingOauth.id))
           .returning({ id: oauthProviders.id });
-        if (!updated) throw new Error(`OAuth provider ${existingOauth.id} no longer exists`);
+        if (!updated) throw new ApiError(9005);
 
         return getUser(existingOauth.userId, tx);
       });
@@ -207,6 +208,7 @@ async function oauthPlugin(fastify: FastifyInstance) {
           },
           tx,
         );
+
         const [createdProvider] = await tx
           .insert(oauthProviders)
           .values({
@@ -218,7 +220,8 @@ async function oauthPlugin(fastify: FastifyInstance) {
             oauthId: response.user_id,
           })
           .returning({ id: oauthProviders.id });
-        if (!createdProvider) throw new Error('OAuth provider insert did not return a row');
+        if (!createdProvider) throw new ApiError(9005);
+
         return created;
       });
 

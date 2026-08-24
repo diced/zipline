@@ -180,7 +180,7 @@ export default typedPlugin(
           })
           .where(eq(userPasskeys.id, passkey.id))
           .returning({ id: userPasskeys.id });
-        if (!updated) throw new ApiError(9002);
+        if (!updated) throw new ApiError(9005);
 
         logger.info('user logged in with passkey', {
           user: user.username,

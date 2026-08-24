@@ -104,10 +104,10 @@ export default typedPlugin(
             token: createToken(),
           })
           .returning({ id: users.id });
-        if (!created) throw new ApiError(9004);
+        if (!created) throw new ApiError(9005);
 
         const user = await getUserSummary(created.id);
-        if (!user) throw new ApiError(9002);
+        if (!user) throw new ApiError(9005);
 
         logger.info(`${req.user.username} created a new user`, {
           username: user.username,

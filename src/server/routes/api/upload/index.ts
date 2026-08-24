@@ -302,7 +302,7 @@ export default typedPlugin(
           const created = [];
           for (const upload of uploads) {
             const [file] = await tx.insert(files).values(upload.data).returning(uploadFileColumns);
-            if (!file) throw new Error('File insert did not return a row');
+            if (!file) throw new ApiError(9005);
             created.push(file);
           }
 

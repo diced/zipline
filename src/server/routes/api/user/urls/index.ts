@@ -123,7 +123,8 @@ export default typedPlugin(
               enabled,
             })
             .returning(urlColumns);
-          if (!created) throw new Error('URL insert did not return a row');
+          if (!created) throw new ApiError(9005);
+
           return created;
         });
         if (!url)

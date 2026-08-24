@@ -1,3 +1,4 @@
+import { ApiError } from '@/lib/api/errors';
 import { db, type DbClient } from '@/lib/db';
 import type { Role } from '@/lib/db/enums';
 import { users } from '@/lib/db/schema';
@@ -181,9 +182,11 @@ export async function listUserDetails(
 
 export async function createUser(data: UserInsert, client: DbClient = db) {
   const [inserted] = await client.insert(users).values(data).returning({ id: users.id });
-  if (!inserted) throw new Error('User insert did not return a row');
+  if (!inserted) throw new ApiError(9005);
+
   const created = await getUser(inserted.id, client);
-  if (!created) throw new Error('Inserted user could not be read back');
+  if (!created) throw new ApiError(9005);
+
   return created;
 }
 

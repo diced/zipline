@@ -112,7 +112,7 @@ export default typedPlugin(
               })
               .where(eq(users.id, req.user.id))
               .returning({ id: users.id });
-            if (!updated) throw new Error(`User ${req.user.id} does not exist`);
+            if (!updated) throw new ApiError(9005);
 
             importedUsers[user.id] = updated.id;
 
@@ -132,7 +132,7 @@ export default typedPlugin(
               createdAt: new Date(user.createdAt),
             })
             .returning({ id: users.id });
-          if (!created) throw new Error('User insert did not return a row');
+          if (!created) throw new ApiError(9005);
 
           importedUsers[user.id] = created.id;
         }
@@ -187,7 +187,7 @@ export default typedPlugin(
               userId,
             })
             .returning({ id: oauthProviders.id });
-          if (!created) throw new Error('OAuth provider insert did not return a row');
+          if (!created) throw new ApiError(9005);
 
           importedOauthProviders[oauthProvider.id] = created.id;
         }
@@ -233,7 +233,7 @@ export default typedPlugin(
               createdAt: new Date(quota.createdAt),
             })
             .returning({ id: userQuotas.id });
-          if (!created) throw new Error('Quota insert did not return a row');
+          if (!created) throw new ApiError(9005);
 
           importedQuotas[quota.id] = created.id;
         }
@@ -272,7 +272,7 @@ export default typedPlugin(
             .insert(userPasskeys)
             .values({ name: passkey.name, reg: passkey.reg, userId })
             .returning({ id: userPasskeys.id });
-          if (!created) throw new Error('Passkey insert did not return a row');
+          if (!created) throw new ApiError(9005);
 
           importedPasskeys[passkey.id] = created.id;
         }
@@ -318,7 +318,7 @@ export default typedPlugin(
               createdAt: new Date(folder.createdAt),
             })
             .returning({ id: folders.id });
-          if (!created) throw new Error('Folder insert did not return a row');
+          if (!created) throw new ApiError(9005);
 
           importedFolders[folder.id] = created.id;
 
@@ -337,7 +337,7 @@ export default typedPlugin(
               .set({ parentId: newParentId })
               .where(eq(folders.id, newFolderId))
               .returning({ id: folders.id });
-            if (!updated) throw new Error(`Folder ${newFolderId} does not exist`);
+            if (!updated) throw new ApiError(9005);
           } else {
             logger.warn('failed to set parent for folder', {
               folder: oldFolderId,
@@ -404,7 +404,7 @@ export default typedPlugin(
               password: file.password ?? null,
             })
             .returning({ id: files.id });
-          if (!created) throw new Error('File insert did not return a row');
+          if (!created) throw new ApiError(9005);
 
           importedFiles[file.id] = created.id;
         }
@@ -456,7 +456,7 @@ export default typedPlugin(
               .insert(tags)
               .values({ name: tag.name, color: tag.color ?? '#000000', userId })
               .returning({ id: tags.id });
-            if (!created) throw new Error('Tag insert did not return a row');
+            if (!created) throw new ApiError(9005);
 
             if (fileIds.length) {
               await tx.insert(filesToTags).values(fileIds.map((fileId) => ({ fileId, tagId: created.id })));
@@ -513,7 +513,7 @@ export default typedPlugin(
               password: url.password ?? null,
             })
             .returning({ id: urls.id });
-          if (!created) throw new Error('URL insert did not return a row');
+          if (!created) throw new ApiError(9005);
 
           importedUrls[url.id] = created.id;
         }
@@ -559,7 +559,7 @@ export default typedPlugin(
               expiresAt: invite.expiresAt ? new Date(invite.expiresAt) : null,
             })
             .returning({ id: invites.id });
-          if (!created) throw new Error('Invite insert did not return a row');
+          if (!created) throw new ApiError(9005);
 
           importedInvites[invite.id] = created.id;
         }

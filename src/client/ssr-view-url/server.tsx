@@ -8,6 +8,7 @@ import { ZiplineTheme } from '@/lib/theme';
 import { FastifyRequest } from 'fastify';
 import { eq, or, sql } from 'drizzle-orm';
 import { createRoutes } from './routes';
+import { ApiError } from '@/lib/api/errors';
 
 export async function render(
   {
@@ -72,7 +73,7 @@ export async function render(
     .set({ views: sql`${urls.views} + 1` })
     .where(eq(urls.id, urlEntry.id))
     .returning({ id: urls.id });
-  if (!updated) throw new Error(`URL ${urlEntry.id} disappeared before its view could be recorded`);
+  if (!updated) throw new ApiError(9005);
 
   if (publicUrl.destination) {
     return {

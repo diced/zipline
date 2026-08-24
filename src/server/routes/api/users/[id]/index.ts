@@ -143,7 +143,7 @@ export default typedPlugin(
               })
               .onConflictDoUpdate({ target: userQuotas.userId, set: finalQuota })
               .returning({ id: userQuotas.id });
-            if (!savedQuota) throw new Error('User quota upsert did not return a row');
+            if (!savedQuota) throw new ApiError(9005);
           }
 
           if (Object.keys(update).length) {
