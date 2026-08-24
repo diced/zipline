@@ -1,5 +1,7 @@
 import type { Client } from 'pg';
 
+// this file handles old prisma migrations, and ensures that they all exist
+
 const expectedPrismaMigrations = [
   ['20241228224006_init', 'a72fe2b56b4487aa1ef746af16b4c55f273c1dd7bd1df37c92e184ab84d70c99'],
   [
