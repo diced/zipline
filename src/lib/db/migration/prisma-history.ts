@@ -64,7 +64,6 @@ type PrismaMigrationRow = {
   migration_name: string;
   checksum: string;
   finished: boolean;
-  rolled_back: boolean;
   applied_steps_count: number;
 };
 
@@ -81,18 +80,15 @@ export async function assertCompletePrismaMigrationHistory(client: Client) {
       migration_name,
       checksum,
       finished_at IS NOT NULL AS finished,
-      rolled_back_at IS NOT NULL AS rolled_back,
       applied_steps_count
     FROM public._prisma_migrations
-    ORDER BY migration_name, started_at
+    WHERE rolled_back_at IS NULL
   `);
 
   const expected = new Map<string, string>(expectedPrismaMigrations);
   const successful = new Set<string>();
 
   for (const row of result.rows) {
-    if (row.rolled_back) continue;
-
     const expectedChecksum = expected.get(row.migration_name);
     if (!expectedChecksum) throw new Error(`found unknown applied migration ${row.migration_name}`);
     if (row.checksum !== expectedChecksum) {

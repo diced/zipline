@@ -2,7 +2,6 @@ import { readDbVars } from '@/lib/config/read/env';
 import { log } from '@/lib/logger';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import type { NodePgDatabase, NodePgTransaction } from 'drizzle-orm/node-postgres';
-import type { PoolConfig } from 'pg';
 import { relations } from './relations';
 
 const building = !!process.env.ZIPLINE_BUILD;
@@ -26,19 +25,6 @@ export function getDatabaseUrl() {
   return `postgresql://${username}:${password}@${vars.DATABASE_HOST}:${vars.DATABASE_PORT}/${vars.DATABASE_NAME}`;
 }
 
-export function postgresConnectionConfig(connectionString: string): PoolConfig {
-  const url = new URL(connectionString);
-  const configuredOptions = url.searchParams.get('options')?.trim();
-  const timezoneOption = '-c timezone=UTC';
-
-  url.searchParams.set(
-    'options',
-    configuredOptions ? `${configuredOptions} ${timezoneOption}` : timezoneOption,
-  );
-
-  return { connectionString: url.toString() };
-}
-
 function queryLogger() {
   if (!process.env.ZIPLINE_DB_LOG) return undefined;
 
@@ -54,7 +40,7 @@ function createDatabase() {
   logger.info('connecting to database');
 
   return drizzle({
-    connection: postgresConnectionConfig(connectionString),
+    connection: connectionString,
     relations,
     logger: queryLogger(),
   });
