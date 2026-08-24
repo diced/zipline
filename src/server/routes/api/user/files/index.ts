@@ -1,35 +1,32 @@
 import { ApiError } from '@/lib/api/errors';
 import { db } from '@/lib/db';
-import {
-  File,
-  fileColumns,
-  filePasswordExtra,
-  fileRelations,
-  fileSchema,
-  formatFiles,
-} from '@/lib/db/models/file';
+import { fileColumns, filePasswordExtra, fileRelations, fileSchema, formatFiles } from '@/lib/db/models/file';
 import { getFolderWithOwner } from '@/lib/db/models/folder';
 import { getUserIdentity } from '@/lib/db/models/user';
-import { files, tags } from '@/lib/db/schema';
+import { files, incompleteFiles, tags } from '@/lib/db/schema';
 import { containsText } from '@/lib/db/utils';
 import { canInteract, canManage } from '@/lib/role';
 import { paginationQs } from '@/lib/validation';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
-import { and, eq, inArray, like, notInArray, or, type SQL } from 'drizzle-orm';
+import { and, eq, inArray, like, ne, notInArray, or, sql } from 'drizzle-orm';
 import z from 'zod';
 
-export type FileSearchField = 'name' | 'originalName' | 'type' | 'tags' | 'id';
+const searchFieldSchema = z.enum(['name', 'originalName', 'type', 'tags', 'id']);
+const responseSchema = z.object({
+  page: z.array(fileSchema),
+  search: z
+    .object({
+      field: searchFieldSchema,
+      query: z.union([z.string(), z.array(z.string())]),
+    })
+    .optional(),
+  total: z.number().optional(),
+  pages: z.number().optional(),
+});
 
-export type ApiUserFilesResponse = {
-  page: File[];
-  search?: {
-    field: FileSearchField;
-    query: string | string[];
-  };
-  total?: number;
-  pages?: number;
-};
+export type FileSearchField = z.infer<typeof searchFieldSchema>;
+export type ApiUserFilesResponse = z.infer<typeof responseSchema>;
 
 export const PATH = '/api/user/files';
 export default typedPlugin(
@@ -41,23 +38,13 @@ export default typedPlugin(
           description:
             'List, filter, and search files for the authenticated user (or another user if permitted).',
           querystring: paginationQs.extend({
-            searchField: z.enum(['name', 'originalName', 'type', 'tags', 'id']).optional().default('name'),
+            searchField: searchFieldSchema.optional().default('name'),
             searchQuery: z.string().optional(),
             id: z.string().optional(),
             folder: z.string().optional(),
           }),
           response: {
-            200: z.object({
-              page: z.array(fileSchema),
-              search: z
-                .object({
-                  field: z.enum(['name', 'originalName', 'type', 'tags', 'id']),
-                  query: z.union([z.string(), z.array(z.string())]),
-                })
-                .optional(),
-              total: z.number().optional(),
-              pages: z.number().optional(),
-            }),
+            200: responseSchema,
           },
           tags: ['auth'],
         },
@@ -66,126 +53,82 @@ export default typedPlugin(
       async (req, res) => {
         const user = await getUserIdentity(req.query.id ?? req.user.id);
 
-        if (user && user.id !== req.user.id && !canInteract(req.user.role, user.role))
+        if (!user || (user.id !== req.user.id && !canInteract(req.user.role, user.role)))
           throw new ApiError(9002);
-        if (!user) throw new ApiError(9002);
 
         const { perpage, searchQuery, searchField, page, filter, favorite, sortBy, order, folder } =
           req.query;
 
-        let folderId: string | null = null;
+        let folderId: string | undefined;
         if (folder) {
-          const f = await getFolderWithOwner(folder);
-          if (!f) throw new ApiError(9002);
-          if (!canManage(req.user, f.user)) throw new ApiError(9002);
+          const targetFolder = await getFolderWithOwner(folder);
+          if (!targetFolder || !canManage(req.user, targetFolder.user)) throw new ApiError(9002);
 
-          folderId = f.id;
+          folderId = targetFolder.id;
         }
 
-        const incompleteFiles = await db.query.incompleteFiles.findMany({
-          columns: { metadata: true },
-          where: { userId: user.id, status: { ne: 'COMPLETE' } },
+        const incompleteIds = db
+          .select({ id: sql<string>`${incompleteFiles.metadata}->'file'->>'id'` })
+          .from(incompleteFiles)
+          .where(and(eq(incompleteFiles.userId, user.id), ne(incompleteFiles.status, 'COMPLETE')));
+
+        let tagIds: string[] = [];
+        if (searchQuery && searchField === 'tags') {
+          tagIds = searchQuery
+            .split(',')
+            .map((tag) => tag.trim())
+            .filter((tag) => tag);
+
+          if (!tagIds.length) return res.send({ page: [], search: { field: searchField, query: tagIds } });
+
+          const ownedTagCount = await db.$count(
+            tags,
+            and(eq(tags.userId, user.id), inArray(tags.id, tagIds)),
+          );
+          if (ownedTagCount !== tagIds.length) throw new ApiError(1032);
+        }
+
+        const fileFilter = (file: typeof files) =>
+          and(
+            eq(file.userId, user.id),
+            filter === 'dashboard'
+              ? or(
+                  like(file.type, 'image/%'),
+                  like(file.type, 'video/%'),
+                  like(file.type, 'audio/%'),
+                  like(file.type, 'text/%'),
+                )
+              : undefined,
+            favorite && filter !== 'all' ? eq(file.favorite, true) : undefined,
+            folderId ? eq(file.folderId, folderId) : undefined,
+            notInArray(file.id, incompleteIds),
+            searchQuery && searchField !== 'tags' ? containsText(file[searchField], searchQuery) : undefined,
+          )!;
+
+        const fileRows = await db.query.files.findMany({
+          columns: fileColumns,
+          extras: searchQuery ? undefined : filePasswordExtra,
+          where: {
+            RAW: fileFilter,
+            AND: tagIds.map((id) => ({ tags: { id } })),
+          },
+          orderBy: (file, { asc, desc }) => (order === 'asc' ? asc(file[sortBy]) : desc(file[sortBy])),
+          offset: (page - 1) * perpage,
+          limit: perpage,
+          with: fileRelations,
         });
-        const incompleteIds = incompleteFiles.map((file) => file.metadata.file.id);
+        const filePage = formatFiles(fileRows);
 
-        const sharedConditions = (file: typeof files) => {
-          const conditions: SQL[] = [eq(file.userId, user.id)];
-          if (filter === 'dashboard') {
-            conditions.push(
-              or(
-                like(file.type, 'image/%'),
-                like(file.type, 'video/%'),
-                like(file.type, 'audio/%'),
-                like(file.type, 'text/%'),
-              )!,
-            );
-          }
-          if (favorite && filter !== 'all') conditions.push(eq(file.favorite, true));
-          if (folderId) conditions.push(eq(file.folderId, folderId));
-          if (incompleteIds.length) conditions.push(notInArray(file.id, incompleteIds));
-          return conditions;
-        };
-
-        if (searchQuery) {
-          let tagIds: string[] = [];
-
-          if (searchField === 'tags') {
-            tagIds = searchQuery
-              .split(',')
-              .map((tag) => tag.trim())
-              .filter((tag) => tag);
-
-            if (!tagIds.length) {
-              return res.send({ page: [], search: { field: searchField, query: tagIds } });
-            }
-
-            const ownedTagCount = await db.$count(
-              tags,
-              and(eq(tags.userId, user.id), inArray(tags.id, tagIds)),
-            );
-            if (ownedTagCount !== tagIds.length) throw new ApiError(1032);
-          }
-
-          const searchConditions = (file: typeof files) => {
-            const conditions = sharedConditions(file);
-            if (searchField !== 'tags') {
-              const searchColumn = {
-                id: file.id,
-                name: file.name,
-                originalName: file.originalName,
-                type: file.type,
-              }[searchField];
-              conditions.push(containsText(searchColumn, searchQuery));
-            }
-            return and(...conditions)!;
-          };
-
-          const similarityResult = await db.query.files.findMany({
-            columns: fileColumns,
-            where:
-              searchField === 'tags'
-                ? {
-                    AND: [
-                      { RAW: (file) => searchConditions(file) },
-                      ...tagIds.map((tagId) => ({ tags: { id: tagId } })),
-                    ],
-                  }
-                : { RAW: (file) => searchConditions(file) },
-            orderBy: (file, { asc, desc }) => (order === 'asc' ? asc(file[sortBy]) : desc(file[sortBy])),
-            offset: (Number(page) - 1) * perpage,
-            limit: perpage,
-            with: fileRelations,
-          });
-
+        if (searchQuery)
           return res.send({
-            page: formatFiles(similarityResult),
+            page: filePage,
             search: {
               field: searchField,
-              query:
-                searchField === 'tags'
-                  ? searchQuery
-                      .split(',')
-                      .map((tag) => tag.trim())
-                      .filter((tag) => tag)
-                  : searchQuery,
+              query: searchField === 'tags' ? tagIds : searchQuery,
             },
           });
-        }
 
-        const where = and(...sharedConditions(files));
-        const total = await db.$count(files, where);
-
-        const filePage = formatFiles(
-          await db.query.files.findMany({
-            columns: fileColumns,
-            extras: filePasswordExtra,
-            where: { RAW: (file) => and(...sharedConditions(file))! },
-            orderBy: (file, { asc, desc }) => (order === 'asc' ? asc(file[sortBy]) : desc(file[sortBy])),
-            offset: (Number(page) - 1) * perpage,
-            limit: perpage,
-            with: fileRelations,
-          }),
-        );
+        const total = await db.$count(files, fileFilter(files));
 
         return res.send({
           page: filePage,

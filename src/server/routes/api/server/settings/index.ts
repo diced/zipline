@@ -7,6 +7,7 @@ import { safeConfig } from '@/lib/config/safe';
 import { MAX_SAFE_TIMEOUT_MS, MIME_REGEX } from '@/lib/config/validate';
 import { db } from '@/lib/db';
 import { getSettings, updateSettings } from '@/lib/db/models/zipline';
+import { zipline } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { RESERVED_ROUTES } from '@/lib/reservedRoutes';
@@ -126,7 +127,7 @@ export default typedPlugin(
       async (req, res) => {
         if (req.user.role !== 'SUPERADMIN') throw new ApiError(3015);
 
-        const settings = await db.query.zipline.findFirst({ columns: { id: true } });
+        const [settings] = await db.select({ id: zipline.id }).from(zipline).limit(1);
         if (!settings) throw new ApiError(4010);
 
         const availableThemes = await readThemes();

@@ -138,13 +138,12 @@ export default typedPlugin(
         const cachedOptions = OPTIONS_CACHE.get(webauthnChallengeId);
         if (!cachedOptions) throw new ApiError(1048);
 
-        const passkey = (
-          await db
-            .select()
-            .from(userPasskeys)
-            .where(sql`${userPasskeys.reg} #>> '{webauthn,id}' = ${response.id}`)
-            .limit(1)
-        )[0];
+        const [passkey] = await db
+          .select()
+          .from(userPasskeys)
+          .where(sql`${userPasskeys.reg} #>> '{webauthn,id}' = ${response.id}`)
+          .limit(1);
+
         let user: User | null = null;
         if (passkey) user = await getUser(passkey.userId);
         if (!passkey || !user) {
@@ -205,7 +204,7 @@ export default typedPlugin(
           })
           .where(eq(userPasskeys.id, passkey.id))
           .returning({ id: userPasskeys.id });
-        if (!updated) throw new Error(`Passkey ${passkey.id} no longer exists`);
+        if (!updated) throw new ApiError(9002);
 
         logger.info('user logged in with passkey', {
           user: user.username,

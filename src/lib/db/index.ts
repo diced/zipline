@@ -24,6 +24,7 @@ export function getDatabaseUrl() {
   const username = encodeURIComponent(vars.DATABASE_USERNAME);
   const password = encodeURIComponent(vars.DATABASE_PASSWORD);
   return `postgresql://${username}:${password}@${vars.DATABASE_HOST}:${vars.DATABASE_PORT}/${vars.DATABASE_NAME}`;
+}
 
 export function postgresConnectionConfig(connectionString: string): PoolConfig {
   const url = new URL(connectionString);
