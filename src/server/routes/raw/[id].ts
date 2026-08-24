@@ -1,20 +1,19 @@
 import { verifyAccessToken } from '@/lib/accessToken';
+import { setContentSecurity } from '@/lib/api/contentSecurity';
 import { ApiError } from '@/lib/api/errors';
 import { parseRange } from '@/lib/api/range';
 import { config } from '@/lib/config';
 import { datasource } from '@/lib/datasource';
+import { db } from '@/lib/db';
 import { removeFile } from '@/lib/db/models/file';
-import { escapeLike } from '@/lib/db/utils';
+import { files } from '@/lib/db/schema';
 import { sanitizeFilename } from '@/lib/fs';
 import { log } from '@/lib/logger';
 import { guess } from '@/lib/mimes';
-import { setContentSecurity } from '@/lib/api/contentSecurity';
 import { TimedCache } from '@/lib/timedCache';
 import typedPlugin from '@/server/typedPlugin';
+import { desc, eq, sql } from 'drizzle-orm';
 import { FastifyReply, FastifyRequest } from 'fastify';
-import { db } from '@/lib/db';
-import { files } from '@/lib/db/schema';
-import { eq, sql } from 'drizzle-orm';
 
 const VIEW_WINDOW = 5 * 1000;
 const viewsCache = new TimedCache<string, number>(VIEW_WINDOW);
@@ -67,12 +66,16 @@ export const rawFileHandler = async (
       .send(buf);
   }
 
-  let file = await db.query.files.findFirst({ where: { name: idSanitized } });
+  const [fileReq] = await db.select().from(files).where(eq(files.name, idSanitized)).limit(1);
+  let file = fileReq;
   if (!file && config.files.extensionlessUrls && !idSanitized.includes('.')) {
-    file = await db.query.files.findFirst({
-      where: { name: { like: `${escapeLike(idSanitized)}.%` } },
-      orderBy: { createdAt: 'desc' },
-    });
+    const [fileReq] = await db
+      .select()
+      .from(files)
+      .where(sql`${files.name} LIKE ${sql`${idSanitized}.%`}`)
+      .orderBy(desc(files.createdAt))
+      .limit(1);
+    file = fileReq;
   }
   if (!file) return res.callNotFound();
 

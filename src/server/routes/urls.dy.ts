@@ -1,4 +1,5 @@
 import { verifyAccessToken } from '@/lib/accessToken';
+import { ApiError } from '@/lib/api/errors';
 import { config } from '@/lib/config';
 import { db } from '@/lib/db';
 import { urls } from '@/lib/db/schema';
@@ -55,7 +56,7 @@ export async function urlsRoute(
     .set({ views: sql`${urls.views} + 1` })
     .where(eq(urls.id, url.id))
     .returning({ id: urls.id });
-  if (!updated) throw new Error(`URL ${url.id} disappeared before its view could be recorded`);
+  if (!updated) throw new ApiError(9002);
 
   return res.redirect(url.destination);
 }

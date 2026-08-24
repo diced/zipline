@@ -104,9 +104,10 @@ export default typedPlugin(
             token: createToken(),
           })
           .returning({ id: users.id });
-        if (!created) throw new Error('User insert did not return a row');
+        if (!created) throw new ApiError(9004);
+
         const user = await getUserSummary(created.id);
-        if (!user) throw new Error('Inserted user could not be read back');
+        if (!user) throw new ApiError(9002);
 
         logger.info(`${req.user.username} created a new user`, {
           username: user.username,

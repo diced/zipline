@@ -24,10 +24,6 @@ export type ApiUserUrlsResponse =
 export const PATH = '/api/user/urls';
 const logger = log('api').c('user').c('urls');
 const { password: _password, ...urlColumns } = getColumns(urls);
-const urlListColumns = {
-  ...urlColumns,
-  password: isNotNull(urls.password).mapWith(Boolean).as('password'),
-};
 
 export default typedPlugin(
   async (server) => {
@@ -201,7 +197,10 @@ export default typedPlugin(
         }
 
         const urlList = await db
-          .select(urlListColumns)
+          .select({
+            ...urlColumns,
+            password: isNotNull(urls.password).mapWith(Boolean).as('password'),
+          })
           .from(urls)
           .where(and(eq(urls.userId, req.user.id), search));
         return res.send(urlList);

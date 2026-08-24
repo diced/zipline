@@ -109,6 +109,7 @@ export default typedPlugin(
 
           const current = await getUser(req.user.id, tx);
           if (!current) throw new ApiError(1069);
+
           return current;
         });
 
@@ -137,10 +138,11 @@ export default typedPlugin(
       async (req, res) => {
         if (!req.user.totpEnabled) throw new ApiError(1053);
 
-        const current = await db.query.users.findFirst({
-          columns: { totpSecret: true },
-          where: { id: req.user.id },
-        });
+        const [current] = await db
+          .select({ totpSecret: users.totpSecret })
+          .from(users)
+          .where(eq(users.id, req.user.id));
+
         if (!current?.totpSecret) throw new ApiError(1053);
 
         const { code } = req.body;

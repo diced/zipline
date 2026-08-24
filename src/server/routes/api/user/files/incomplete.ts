@@ -7,6 +7,7 @@ import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
 import z from 'zod';
 import { and, eq, inArray } from 'drizzle-orm';
+import { ApiError } from '@/lib/api/errors';
 
 export type ApiUserFilesIncompleteResponse = IncompleteFile[] | { count: number };
 
@@ -28,9 +29,10 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const pendingFiles = await db.query.incompleteFiles.findMany({
-          where: { userId: req.user.id },
-        });
+        const pendingFiles = await db
+          .select()
+          .from(incompleteFiles)
+          .where(eq(incompleteFiles.userId, req.user.id));
 
         return res.send(pendingFiles);
       },
@@ -55,21 +57,21 @@ export default typedPlugin(
         ...secondlyRatelimit(1),
       },
       async (req, res) => {
-        let removed: { id: string }[] = [];
-        if (req.body.id.length)
-          removed = await db
-            .delete(incompleteFiles)
-            .where(and(eq(incompleteFiles.userId, req.user.id), inArray(incompleteFiles.id, req.body.id)))
-            .returning({ id: incompleteFiles.id });
+        if (!req.body.id.length) throw new ApiError(1027);
+
+        let removed: { id: string }[] = await db
+          .delete(incompleteFiles)
+          .where(and(eq(incompleteFiles.userId, req.user.id), inArray(incompleteFiles.id, req.body.id)))
+          .returning({ id: incompleteFiles.id });
+
         const count = removed.length;
-        const result = { count };
 
         logger.info('incomplete files deleted', {
-          count: result.count,
+          count,
           user: req.user.username,
         });
 
-        return res.send(result);
+        return res.send({ count });
       },
     );
   },

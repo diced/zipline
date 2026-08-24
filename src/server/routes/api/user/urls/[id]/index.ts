@@ -20,14 +20,6 @@ const paramsSchema = z.object({
 
 const { password: _password, ...urlColumns } = getColumns(urls);
 
-async function getUserUrl(id: string, userId: string) {
-  const url = await db.query.urls.findFirst({
-    columns: { password: false },
-    where: { id, userId },
-  });
-  return url ?? null;
-}
-
 export const PATH = '/api/user/urls/:id';
 export default typedPlugin(
   async (server) => {
@@ -46,7 +38,10 @@ export default typedPlugin(
       async (req, res) => {
         const { id } = req.params;
 
-        const url = await getUserUrl(id, req.user.id);
+        const [url] = await db
+          .select(urlColumns)
+          .from(urls)
+          .where(and(eq(urls.id, id), eq(urls.userId, req.user.id)));
         if (!url) throw new ApiError(9002);
 
         return res.send(url);
@@ -75,7 +70,10 @@ export default typedPlugin(
       async (req, res) => {
         const { id } = req.params;
 
-        const url = await getUserUrl(id, req.user.id);
+        const [url] = await db
+          .select(urlColumns)
+          .from(urls)
+          .where(and(eq(urls.id, id), eq(urls.userId, req.user.id)));
 
         if (!url) throw new ApiError(9002);
 
@@ -102,6 +100,7 @@ export default typedPlugin(
           ...(req.body.destination !== undefined && { destination: req.body.destination }),
           ...(req.body.enabled !== undefined && { enabled: req.body.enabled }),
         };
+
         let updatedUrl = url;
         if (Object.keys(changes).length) {
           const [updated] = await db
@@ -109,6 +108,7 @@ export default typedPlugin(
             .set(changes)
             .where(and(eq(urls.id, id), eq(urls.userId, req.user.id)))
             .returning(urlColumns);
+
           if (!updated) throw new ApiError(9002);
           updatedUrl = updated;
         }
