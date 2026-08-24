@@ -2,19 +2,11 @@ import { userPasskeys } from '@/lib/db/schema';
 import { createSelectSchema } from 'drizzle-orm/zod';
 import { z } from 'zod';
 
-const byteSchema = z.number().int().min(0).max(255);
-
 export const passkeyRegSchema = z.object({
   webauthn: z.object({
     webAuthnUserID: z.string(),
     id: z.string(),
-    publicKey: z.union([
-      z.string(),
-      z.array(byteSchema),
-      z.record(z.string(), byteSchema),
-      z.object({ $type: z.literal('Bytes'), value: z.string() }),
-      z.object({ type: z.literal('Buffer'), data: z.array(byteSchema) }),
-    ]),
+    publicKey: z.string(),
     counter: z.number(),
     transports: z.array(z.string()).optional(),
     deviceType: z.string().optional(),

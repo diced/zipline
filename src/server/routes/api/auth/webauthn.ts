@@ -3,7 +3,7 @@ import { ziplineClientParseSchema } from '@/lib/api/detect';
 import { config } from '@/lib/config';
 import { createToken } from '@/lib/crypto';
 import { db } from '@/lib/db';
-import { passkeyRegSchema, type PasskeyReg } from '@/lib/db/models/passkey';
+import { passkeyRegSchema } from '@/lib/db/models/passkey';
 import { getUser, type User, userSchema } from '@/lib/db/models/user';
 import { userPasskeys } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
@@ -33,31 +33,6 @@ export type ApiAuthWebauthnOptionsResponse = {
 const logger = log('api').c('auth').c('webauthn');
 
 const OPTIONS_CACHE = new TimedCache<string, PublicKeyCredentialRequestOptionsJSON>(2 * 60_000);
-
-function decodePublicKey(value: PasskeyReg['webauthn']['publicKey']): Uint8Array<ArrayBuffer> {
-  if (typeof value === 'string') return Uint8Array.from(Buffer.from(value, 'base64'));
-  if (Array.isArray(value)) return Uint8Array.from(value);
-  if ('$type' in value && value.$type === 'Bytes' && 'value' in value && typeof value.value === 'string') {
-    return Uint8Array.from(Buffer.from(value.value, 'base64'));
-  }
-  if ('type' in value && value.type === 'Buffer' && 'data' in value && Array.isArray(value.data)) {
-    return Uint8Array.from(value.data);
-  }
-
-  const bytes = Object.entries(value)
-    .filter(
-      (entry): entry is [string, number] =>
-        /^\d+$/.test(entry[0]) &&
-        typeof entry[1] === 'number' &&
-        Number.isInteger(entry[1]) &&
-        entry[1] >= 0 &&
-        entry[1] <= 255,
-    )
-    .sort(([left], [right]) => Number(left) - Number(right))
-    .map(([, byte]) => byte);
-  if (!bytes.length) throw new Error('Passkey public key is not a recognized byte encoding');
-  return Uint8Array.from(bytes);
-}
 
 export const PATH = '/api/auth/webauthn';
 export default typedPlugin(
@@ -163,6 +138,7 @@ export default typedPlugin(
           throw new ApiError(1060);
         }
         const reg = parsedReg.data;
+        const publicKey = Uint8Array.from(Buffer.from(reg.webauthn.publicKey, 'base64'));
 
         OPTIONS_CACHE.delete(webauthnChallengeId);
 
@@ -176,7 +152,7 @@ export default typedPlugin(
             credential: {
               id: reg.webauthn.id,
               counter: reg.webauthn.counter,
-              publicKey: decodePublicKey(reg.webauthn.publicKey),
+              publicKey,
             },
           });
         } catch (e) {
