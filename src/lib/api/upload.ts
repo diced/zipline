@@ -47,6 +47,7 @@ export async function checkQuota(
     .select({ count: count(), size: sum(files.size) })
     .from(files)
     .where(eq(files.userId, user.id));
+
   const usage = { count: rows[0]?.count ?? 0, size: Number(rows[0]?.size ?? 0) };
   if (user.quota.filesQuota === 'BY_BYTES') {
     if (usage.size + newSize > bytes(user.quota.maxBytes!))
@@ -77,6 +78,7 @@ export function getDomain(
 
 async function fileNamesExist(names: string[]) {
   if (!names.length) return false;
+
   const rows = await db.select({ id: files.id }).from(files).where(inArray(files.name, names)).limit(1);
   return rows.length > 0;
 }

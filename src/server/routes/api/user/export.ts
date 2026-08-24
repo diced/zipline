@@ -10,7 +10,7 @@ import { secondlyRatelimit } from '@/lib/ratelimits';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
 import archiver from 'archiver';
-import { and, eq, getColumns } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { createWriteStream } from 'fs';
 import { rm, stat } from 'fs/promises';
 import { join } from 'path';
@@ -162,7 +162,8 @@ export default typedPlugin(
             size: '0',
           })
           .returning({ id: exports.id });
-        if (!exportDb) throw new Error('Export insert did not return a row');
+        if (!exportDb) throw new ApiError(9004);
+
         const writeStream = createWriteStream(exportPath);
 
         const zip = archiver('zip', {
@@ -194,7 +195,8 @@ export default typedPlugin(
             .set({ completed: true, size: exportStats.size.toString() })
             .where(eq(exports.id, exportDb.id))
             .returning({ id: exports.id });
-          if (!completed) throw new Error(`Export ${exportDb.id} disappeared before it could be completed`);
+          if (!completed)
+            throw new ApiError(9002, 'export was not found when trying to mark it as completed');
         }
 
         writeStream.on('close', () => {

@@ -24,9 +24,7 @@ function findInvalidTargets(
   const indices: number[] = [];
 
   for (let i = 0; i !== roles.length; ++i) {
-    if (!canManage(current, roles[i])) {
-      indices.push(i);
-    }
+    if (!canManage(current, roles[i])) indices.push(i);
   }
 
   return indices;
@@ -70,16 +68,14 @@ export default typedPlugin(
             throw new ApiError(3014, `You don't have the permission to modify files[${invalids.join(', ')}]`);
 
           const count = await updateFiles(files, { favorite });
-          const resp = { count };
+          if (count === 0) throw new ApiError(1028);
 
-          if (resp.count === 0) throw new ApiError(1028);
-
-          logger.info(`${req.user.username} ${favorite ? 'favorited' : 'unfavorited'} ${resp.count} files`, {
+          logger.info(`${req.user.username} ${favorite ? 'favorited' : 'unfavorited'} ${count} files`, {
             user: req.user.id,
             owners: toFavoriteFiles.map((f) => f.userId),
           });
 
-          return res.send(resp);
+          return res.send({ count });
         }
 
         if (!folder) throw new ApiError(1020);
@@ -88,17 +84,15 @@ export default typedPlugin(
         if (!f) throw new ApiError(4001);
 
         const count = await updateFiles(files, { folderId: folder }, req.user.id);
-        const resp = { count };
+        if (count === 0) throw new ApiError(4006);
 
-        if (resp.count === 0) throw new ApiError(4006);
-
-        logger.info(`${req.user.username} moved ${resp.count} files to ${f.name}`, {
+        logger.info(`${req.user.username} moved ${count} files to ${f.name}`, {
           user: req.user.id,
           folderId: f.id,
         });
 
         return res.send({
-          ...resp,
+          count,
           name: f.name,
         });
       },
@@ -152,16 +146,14 @@ export default typedPlugin(
         }
 
         const count = await removeFiles(files);
-        const resp = { count };
+        if (count === 0) throw new ApiError(1027);
 
-        if (resp.count === 0) throw new ApiError(1027);
-
-        logger.info(`${req.user.username} deleted ${resp.count} files`, {
+        logger.info(`${req.user.username} deleted ${count} files`, {
           user: req.user.id,
           owners: toDeleteFiles.map((f) => f.userId),
         });
 
-        return res.send(resp);
+        return res.send({ count });
       },
     );
   },

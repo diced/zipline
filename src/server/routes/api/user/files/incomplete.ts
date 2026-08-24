@@ -59,19 +59,17 @@ export default typedPlugin(
       async (req, res) => {
         if (!req.body.id.length) throw new ApiError(1027);
 
-        let removed: { id: string }[] = await db
+        const removed = await db
           .delete(incompleteFiles)
           .where(and(eq(incompleteFiles.userId, req.user.id), inArray(incompleteFiles.id, req.body.id)))
           .returning({ id: incompleteFiles.id });
 
-        const count = removed.length;
-
         logger.info('incomplete files deleted', {
-          count,
+          count: removed.length,
           user: req.user.username,
         });
 
-        return res.send({ count });
+        return res.send({ count: removed.length });
       },
     );
   },
