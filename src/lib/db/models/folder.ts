@@ -74,13 +74,11 @@ export async function listFolders(
   options: { root?: boolean; parentId?: string; includeFiles?: boolean } = {},
   client: DbClient = db,
 ) {
-  const where = {
-    AND: [
-      { userId },
-      ...(options.root ? [{ parentId: { isNull: true as const } }] : []),
-      ...(options.parentId ? [{ parentId: options.parentId }] : []),
-    ],
-  };
+  let parentId;
+  if (options.parentId) parentId = options.parentId;
+  else if (options.root) parentId = { isNull: true as const };
+
+  const where = { userId, parentId };
 
   if (options.includeFiles) {
     return client.query.folders.findMany({
