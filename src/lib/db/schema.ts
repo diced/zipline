@@ -31,11 +31,10 @@ export const oauthProviderType = pgEnum('OAuthProviderType', oauthProviderTypeVa
 export const userFilesQuota = pgEnum('UserFilesQuota', userFilesQuotaValues);
 export const incompleteFileStatus = pgEnum('IncompleteFileStatus', incompleteFileStatusValues);
 
-const id = () => text('id').notNull().$defaultFn(createId);
-const createdAt = () =>
-  timestamp('createdAt', { precision: 3, mode: 'date', withTimezone: true }).defaultNow().notNull();
+const id = () => text().notNull().$defaultFn(createId);
+const createdAt = () => timestamp({ precision: 3, mode: 'date', withTimezone: true }).defaultNow().notNull();
 const updatedAt = () =>
-  timestamp('updatedAt', { precision: 3, mode: 'date', withTimezone: true })
+  timestamp({ precision: 3, mode: 'date', withTimezone: true })
     .notNull()
     .$onUpdate(() => new Date());
 
@@ -46,148 +45,148 @@ export const zipline = pgTable(
     createdAt: createdAt(),
     updatedAt: updatedAt(),
 
-    firstSetup: boolean('firstSetup').default(true).notNull(),
+    firstSetup: boolean().default(true).notNull(),
 
-    coreReturnHttpsUrls: boolean('coreReturnHttpsUrls').default(false).notNull(),
-    coreDefaultDomain: text('coreDefaultDomain'),
-    coreTempDirectory: text('coreTempDirectory').notNull(),
-    coreTrustProxy: boolean('coreTrustProxy').default(false).notNull(),
+    coreReturnHttpsUrls: boolean().default(false).notNull(),
+    coreDefaultDomain: text(),
+    coreTempDirectory: text().notNull(),
+    coreTrustProxy: boolean().default(false).notNull(),
 
-    chunksEnabled: boolean('chunksEnabled').default(true).notNull(),
-    chunksMax: text('chunksMax').default('95mb').notNull(),
-    chunksSize: text('chunksSize').default('25mb').notNull(),
+    chunksEnabled: boolean().default(true).notNull(),
+    chunksMax: text().default('95mb').notNull(),
+    chunksSize: text().default('25mb').notNull(),
 
-    tasksDeleteInterval: text('tasksDeleteInterval').default('30m').notNull(),
-    tasksClearInvitesInterval: text('tasksClearInvitesInterval').default('30m').notNull(),
-    tasksMaxViewsInterval: text('tasksMaxViewsInterval').default('30m').notNull(),
-    tasksThumbnailsInterval: text('tasksThumbnailsInterval').default('30m').notNull(),
-    tasksMetricsInterval: text('tasksMetricsInterval').default('30m').notNull(),
-    tasksCleanThumbnailsInterval: text('tasksCleanThumbnailsInterval').default('1d').notNull(),
+    tasksDeleteInterval: text().default('30m').notNull(),
+    tasksClearInvitesInterval: text().default('30m').notNull(),
+    tasksMaxViewsInterval: text().default('30m').notNull(),
+    tasksThumbnailsInterval: text().default('30m').notNull(),
+    tasksMetricsInterval: text().default('30m').notNull(),
+    tasksCleanThumbnailsInterval: text().default('1d').notNull(),
 
-    filesRoute: text('filesRoute').default('/u').notNull(),
-    filesLength: integer('filesLength').default(6).notNull(),
-    filesDefaultFormat: text('filesDefaultFormat').default('random').notNull(),
-    filesDisabledTypes: text('filesDisabledTypes').array().default([]).notNull(),
-    filesDisabledTypesDefault: text('filesDisabledTypesDefault'),
-    filesDisabledExtensions: text('filesDisabledExtensions').array().default([]).notNull(),
-    filesMaxFileSize: text('filesMaxFileSize').default('100mb').notNull(),
-    filesDefaultExpiration: text('filesDefaultExpiration'),
-    filesMaxExpiration: text('filesMaxExpiration'),
-    filesAssumeMimetypes: boolean('filesAssumeMimetypes').default(false).notNull(),
-    filesDefaultDateFormat: text('filesDefaultDateFormat').default('YYYY-MM-DD_HH:mm:ss').notNull(),
-    filesRemoveGpsMetadata: boolean('filesRemoveGpsMetadata').default(false).notNull(),
-    filesRandomWordsNumAdjectives: integer('filesRandomWordsNumAdjectives').default(2).notNull(),
-    filesRandomWordsSeparator: text('filesRandomWordsSeparator').default('-').notNull(),
-    filesDefaultCompressionFormat: text('filesDefaultCompressionFormat').default('jpg'),
-    filesMaxFilesPerUpload: integer('filesMaxFilesPerUpload').default(1000).notNull(),
-    filesExtensionlessUrls: boolean('filesExtensionlessUrls').default(false).notNull(),
+    filesRoute: text().default('/u').notNull(),
+    filesLength: integer().default(6).notNull(),
+    filesDefaultFormat: text().default('random').notNull(),
+    filesDisabledTypes: text().array().default([]).notNull(),
+    filesDisabledTypesDefault: text(),
+    filesDisabledExtensions: text().array().default([]).notNull(),
+    filesMaxFileSize: text().default('100mb').notNull(),
+    filesDefaultExpiration: text(),
+    filesMaxExpiration: text(),
+    filesAssumeMimetypes: boolean().default(false).notNull(),
+    filesDefaultDateFormat: text().default('YYYY-MM-DD_HH:mm:ss').notNull(),
+    filesRemoveGpsMetadata: boolean().default(false).notNull(),
+    filesRandomWordsNumAdjectives: integer().default(2).notNull(),
+    filesRandomWordsSeparator: text().default('-').notNull(),
+    filesDefaultCompressionFormat: text().default('jpg'),
+    filesMaxFilesPerUpload: integer().default(1000).notNull(),
+    filesExtensionlessUrls: boolean().default(false).notNull(),
 
-    urlsRoute: text('urlsRoute').default('/go').notNull(),
-    urlsLength: integer('urlsLength').default(6).notNull(),
+    urlsRoute: text().default('/go').notNull(),
+    urlsLength: integer().default(6).notNull(),
 
-    featuresImageCompression: boolean('featuresImageCompression').default(true).notNull(),
-    featuresRobotsTxt: boolean('featuresRobotsTxt').default(true).notNull(),
-    featuresHealthcheck: boolean('featuresHealthcheck').default(true).notNull(),
-    featuresUserRegistration: boolean('featuresUserRegistration').default(false).notNull(),
-    featuresOauthRegistration: boolean('featuresOauthRegistration').default(false).notNull(),
-    featuresDeleteOnMaxViews: boolean('featuresDeleteOnMaxViews').default(true).notNull(),
+    featuresImageCompression: boolean().default(true).notNull(),
+    featuresRobotsTxt: boolean().default(true).notNull(),
+    featuresHealthcheck: boolean().default(true).notNull(),
+    featuresUserRegistration: boolean().default(false).notNull(),
+    featuresOauthRegistration: boolean().default(false).notNull(),
+    featuresDeleteOnMaxViews: boolean().default(true).notNull(),
 
-    featuresThumbnailsEnabled: boolean('featuresThumbnailsEnabled').default(true).notNull(),
-    featuresThumbnailsNumberThreads: integer('featuresThumbnailsNumberThreads').default(4).notNull(),
-    featuresThumbnailsFormat: text('featuresThumbnailsFormat').default('jpg').notNull(),
-    featuresThumbnailsInstantaneous: boolean('featuresThumbnailsInstantaneous').default(false).notNull(),
+    featuresThumbnailsEnabled: boolean().default(true).notNull(),
+    featuresThumbnailsNumberThreads: integer().default(4).notNull(),
+    featuresThumbnailsFormat: text().default('jpg').notNull(),
+    featuresThumbnailsInstantaneous: boolean().default(false).notNull(),
 
-    featuresMetricsEnabled: boolean('featuresMetricsEnabled').default(true).notNull(),
-    featuresMetricsAdminOnly: boolean('featuresMetricsAdminOnly').default(false).notNull(),
-    featuresMetricsShowUserSpecific: boolean('featuresMetricsShowUserSpecific').default(true).notNull(),
+    featuresMetricsEnabled: boolean().default(true).notNull(),
+    featuresMetricsAdminOnly: boolean().default(false).notNull(),
+    featuresMetricsShowUserSpecific: boolean().default(true).notNull(),
 
-    featuresVersionChecking: boolean('featuresVersionChecking').default(true).notNull(),
+    featuresVersionChecking: boolean().default(true).notNull(),
 
-    invitesEnabled: boolean('invitesEnabled').default(true).notNull(),
-    invitesLength: integer('invitesLength').default(6).notNull(),
+    invitesEnabled: boolean().default(true).notNull(),
+    invitesLength: integer().default(6).notNull(),
 
-    websiteTitle: text('websiteTitle').default('Zipline').notNull(),
-    websiteTitleLogo: text('websiteTitleLogo'),
-    websiteExternalLinks: jsonb('websiteExternalLinks')
+    websiteTitle: text().default('Zipline').notNull(),
+    websiteTitleLogo: text(),
+    websiteExternalLinks: jsonb()
       .$type<ExternalLink[]>()
       .default([
         { name: 'GitHub', url: 'https://github.com/diced/zipline' },
         { name: 'Documentation', url: 'https://zipline.diced.sh/' },
       ])
       .notNull(),
-    websiteLoginBackground: text('websiteLoginBackground'),
-    websiteLoginBackgroundBlur: boolean('websiteLoginBackgroundBlur').default(true).notNull(),
-    websiteDefaultAvatar: text('websiteDefaultAvatar'),
-    websiteTos: text('websiteTos'),
+    websiteLoginBackground: text(),
+    websiteLoginBackgroundBlur: boolean().default(true).notNull(),
+    websiteDefaultAvatar: text(),
+    websiteTos: text(),
 
-    websiteThemeDefault: text('websiteThemeDefault').default('system').notNull(),
-    websiteThemeDark: text('websiteThemeDark').default('builtin:dark_gray').notNull(),
-    websiteThemeLight: text('websiteThemeLight').default('builtin:light_gray').notNull(),
+    websiteThemeDefault: text().default('system').notNull(),
+    websiteThemeDark: text().default('builtin:dark_gray').notNull(),
+    websiteThemeLight: text().default('builtin:light_gray').notNull(),
 
-    oauthBypassLocalLogin: boolean('oauthBypassLocalLogin').default(false).notNull(),
-    oauthLoginOnly: boolean('oauthLoginOnly').default(false).notNull(),
+    oauthBypassLocalLogin: boolean().default(false).notNull(),
+    oauthLoginOnly: boolean().default(false).notNull(),
 
-    oauthDiscordClientId: text('oauthDiscordClientId'),
-    oauthDiscordClientSecret: text('oauthDiscordClientSecret'),
-    oauthDiscordRedirectUri: text('oauthDiscordRedirectUri'),
-    oauthDiscordAllowedIds: text('oauthDiscordAllowedIds').array().default([]).notNull(),
-    oauthDiscordDeniedIds: text('oauthDiscordDeniedIds').array().default([]).notNull(),
+    oauthDiscordClientId: text(),
+    oauthDiscordClientSecret: text(),
+    oauthDiscordRedirectUri: text(),
+    oauthDiscordAllowedIds: text().array().default([]).notNull(),
+    oauthDiscordDeniedIds: text().array().default([]).notNull(),
 
-    oauthGoogleClientId: text('oauthGoogleClientId'),
-    oauthGoogleClientSecret: text('oauthGoogleClientSecret'),
-    oauthGoogleRedirectUri: text('oauthGoogleRedirectUri'),
+    oauthGoogleClientId: text(),
+    oauthGoogleClientSecret: text(),
+    oauthGoogleRedirectUri: text(),
 
-    oauthGithubClientId: text('oauthGithubClientId'),
-    oauthGithubClientSecret: text('oauthGithubClientSecret'),
-    oauthGithubRedirectUri: text('oauthGithubRedirectUri'),
+    oauthGithubClientId: text(),
+    oauthGithubClientSecret: text(),
+    oauthGithubRedirectUri: text(),
 
-    oauthOidcClientId: text('oauthOidcClientId'),
-    oauthOidcClientSecret: text('oauthOidcClientSecret'),
-    oauthOidcAuthorizeUrl: text('oauthOidcAuthorizeUrl'),
-    oauthOidcTokenUrl: text('oauthOidcTokenUrl'),
-    oauthOidcUserinfoUrl: text('oauthOidcUserinfoUrl'),
-    oauthOidcRedirectUri: text('oauthOidcRedirectUri'),
+    oauthOidcClientId: text(),
+    oauthOidcClientSecret: text(),
+    oauthOidcAuthorizeUrl: text(),
+    oauthOidcTokenUrl: text(),
+    oauthOidcUserinfoUrl: text(),
+    oauthOidcRedirectUri: text(),
 
-    mfaTotpEnabled: boolean('mfaTotpEnabled').default(false).notNull(),
-    mfaTotpIssuer: text('mfaTotpIssuer').default('Zipline').notNull(),
+    mfaTotpEnabled: boolean().default(false).notNull(),
+    mfaTotpIssuer: text().default('Zipline').notNull(),
 
-    mfaPasskeysEnabled: boolean('mfaPasskeysEnabled').default(false).notNull(),
-    mfaPasskeysRpID: text('mfaPasskeysRpID'),
-    mfaPasskeysOrigin: text('mfaPasskeysOrigin'),
+    mfaPasskeysEnabled: boolean().default(false).notNull(),
+    mfaPasskeysRpID: text(),
+    mfaPasskeysOrigin: text(),
 
-    ratelimitEnabled: boolean('ratelimitEnabled').default(true).notNull(),
-    ratelimitMax: integer('ratelimitMax').default(10).notNull(),
-    ratelimitWindow: integer('ratelimitWindow'),
-    ratelimitAdminBypass: boolean('ratelimitAdminBypass').default(true).notNull(),
-    ratelimitAllowList: text('ratelimitAllowList').array().default([]).notNull(),
+    ratelimitEnabled: boolean().default(true).notNull(),
+    ratelimitMax: integer().default(10).notNull(),
+    ratelimitWindow: integer(),
+    ratelimitAdminBypass: boolean().default(true).notNull(),
+    ratelimitAllowList: text().array().default([]).notNull(),
 
-    httpWebhookOnUpload: text('httpWebhookOnUpload'),
-    httpWebhookOnShorten: text('httpWebhookOnShorten'),
+    httpWebhookOnUpload: text(),
+    httpWebhookOnShorten: text(),
 
-    discordWebhookUrl: text('discordWebhookUrl'),
-    discordUsername: text('discordUsername'),
-    discordAvatarUrl: text('discordAvatarUrl'),
+    discordWebhookUrl: text(),
+    discordUsername: text(),
+    discordAvatarUrl: text(),
 
-    discordOnUploadWebhookUrl: text('discordOnUploadWebhookUrl'),
-    discordOnUploadUsername: text('discordOnUploadUsername'),
-    discordOnUploadAvatarUrl: text('discordOnUploadAvatarUrl'),
-    discordOnUploadContent: text('discordOnUploadContent'),
-    discordOnUploadEmbed: jsonb('discordOnUploadEmbed').$type<Json>(),
+    discordOnUploadWebhookUrl: text(),
+    discordOnUploadUsername: text(),
+    discordOnUploadAvatarUrl: text(),
+    discordOnUploadContent: text(),
+    discordOnUploadEmbed: jsonb().$type<Json>(),
 
-    discordOnShortenWebhookUrl: text('discordOnShortenWebhookUrl'),
-    discordOnShortenUsername: text('discordOnShortenUsername'),
-    discordOnShortenAvatarUrl: text('discordOnShortenAvatarUrl'),
-    discordOnShortenContent: text('discordOnShortenContent'),
-    discordOnShortenEmbed: jsonb('discordOnShortenEmbed').$type<Json>(),
+    discordOnShortenWebhookUrl: text(),
+    discordOnShortenUsername: text(),
+    discordOnShortenAvatarUrl: text(),
+    discordOnShortenContent: text(),
+    discordOnShortenEmbed: jsonb().$type<Json>(),
 
-    pwaEnabled: boolean('pwaEnabled').default(false).notNull(),
-    pwaTitle: text('pwaTitle').default('Zipline').notNull(),
-    pwaShortName: text('pwaShortName').default('Zipline').notNull(),
-    pwaDescription: text('pwaDescription').default('Zipline').notNull(),
-    pwaThemeColor: text('pwaThemeColor').default('#000000').notNull(),
-    pwaBackgroundColor: text('pwaBackgroundColor').default('#000000').notNull(),
+    pwaEnabled: boolean().default(false).notNull(),
+    pwaTitle: text().default('Zipline').notNull(),
+    pwaShortName: text().default('Zipline').notNull(),
+    pwaDescription: text().default('Zipline').notNull(),
+    pwaThemeColor: text().default('#000000').notNull(),
+    pwaBackgroundColor: text().default('#000000').notNull(),
 
-    domains: text('domains').array().default([]).notNull(),
+    domains: text().array().default([]).notNull(),
   },
   (table) => [primaryKey({ name: 'zipline_pkey', columns: [table.id] })],
 );
@@ -198,13 +197,13 @@ export const users = pgTable(
     id: id(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
-    username: text('username').notNull(),
-    password: text('password'),
-    avatar: text('avatar'),
-    token: text('token').notNull(),
-    role: role('role').default('USER').notNull(),
-    view: jsonb('view').$type<Record<string, Json | undefined>>().default({}).notNull(),
-    totpSecret: text('totpSecret'),
+    username: text().notNull(),
+    password: text(),
+    avatar: text(),
+    token: text().notNull(),
+    role: role().default('USER').notNull(),
+    view: jsonb().$type<Record<string, Json | undefined>>().default({}).notNull(),
+    totpSecret: text(),
   },
   (table) => [
     primaryKey({ name: 'user_pkey', columns: [table.id] }),
@@ -219,15 +218,15 @@ export const folders = pgTable(
     id: id(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
-    name: text('name').notNull(),
-    public: boolean('public').default(false).notNull(),
-    allowUploads: boolean('allowUploads').default(false).notNull(),
-    parentId: text('parentId').references((): AnyPgColumn => folders.id, {
+    name: text().notNull(),
+    public: boolean().default(false).notNull(),
+    allowUploads: boolean().default(false).notNull(),
+    parentId: text().references((): AnyPgColumn => folders.id, {
       name: 'folder_parent_id_fkey',
       onDelete: 'set null',
       onUpdate: 'cascade',
     }),
-    userId: text('userId')
+    userId: text()
       .notNull()
       .references(() => users.id, {
         name: 'folder_user_id_fkey',
@@ -248,22 +247,22 @@ export const files = pgTable(
     id: id(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
-    deletesAt: timestamp('deletesAt', { precision: 3, mode: 'date', withTimezone: true }),
-    name: text('name').notNull(),
-    originalName: text('originalName'),
-    size: bigint('size', { mode: 'number' }).notNull(),
-    type: text('type').notNull(),
-    views: integer('views').default(0).notNull(),
-    maxViews: integer('maxViews'),
-    favorite: boolean('favorite').default(false).notNull(),
-    password: text('password'),
-    anonymous: boolean('anonymous').default(false).notNull(),
-    userId: text('userId').references(() => users.id, {
+    deletesAt: timestamp({ precision: 3, mode: 'date', withTimezone: true }),
+    name: text().notNull(),
+    originalName: text(),
+    size: bigint({ mode: 'number' }).notNull(),
+    type: text().notNull(),
+    views: integer().default(0).notNull(),
+    maxViews: integer(),
+    favorite: boolean().default(false).notNull(),
+    password: text(),
+    anonymous: boolean().default(false).notNull(),
+    userId: text().references(() => users.id, {
       name: 'file_user_id_fkey',
       onDelete: 'set null',
       onUpdate: 'cascade',
     }),
-    folderId: text('folderId').references(() => folders.id, {
+    folderId: text().references(() => folders.id, {
       name: 'file_folder_id_fkey',
       onDelete: 'set null',
       onUpdate: 'cascade',
@@ -284,11 +283,11 @@ export const exports = pgTable(
     id: id(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
-    completed: boolean('completed').default(false).notNull(),
-    path: text('path').notNull(),
-    files: integer('files').notNull(),
-    size: text('size').notNull(),
-    userId: text('userId')
+    completed: boolean().default(false).notNull(),
+    path: text().notNull(),
+    files: integer().notNull(),
+    size: text().notNull(),
+    userId: text()
       .notNull()
       .references(() => users.id, {
         name: 'export_user_id_fkey',
@@ -302,12 +301,12 @@ export const exports = pgTable(
 export const userSessions = pgTable(
   'UserSession',
   {
-    id: text('id').notNull(),
+    id: text().notNull(),
     createdAt: createdAt(),
-    ua: text('ua').notNull(),
-    client: text('client').notNull(),
-    device: text('device').notNull(),
-    userId: text('userId')
+    ua: text().notNull(),
+    client: text().notNull(),
+    device: text().notNull(),
+    userId: text()
       .notNull()
       .references(() => users.id, {
         name: 'user_session_user_id_fkey',
@@ -327,11 +326,11 @@ export const userQuotas = pgTable(
     id: id(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
-    filesQuota: userFilesQuota('filesQuota').notNull(),
-    maxBytes: text('maxBytes'),
-    maxFiles: integer('maxFiles'),
-    maxUrls: integer('maxUrls'),
-    userId: text('userId').references(() => users.id, {
+    filesQuota: userFilesQuota().notNull(),
+    maxBytes: text(),
+    maxFiles: integer(),
+    maxUrls: integer(),
+    userId: text().references(() => users.id, {
       name: 'user_quota_user_id_fkey',
       onDelete: 'cascade',
       onUpdate: 'cascade',
@@ -349,10 +348,10 @@ export const userPasskeys = pgTable(
     id: id(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
-    lastUsed: timestamp('lastUsed', { precision: 3, mode: 'date', withTimezone: true }),
-    name: text('name').notNull(),
-    reg: jsonb('reg').$type<Record<string, Json | undefined>>().notNull(),
-    userId: text('userId')
+    lastUsed: timestamp({ precision: 3, mode: 'date', withTimezone: true }),
+    name: text().notNull(),
+    reg: jsonb().$type<Record<string, Json | undefined>>().notNull(),
+    userId: text()
       .notNull()
       .references(() => users.id, {
         name: 'user_passkey_user_id_fkey',
@@ -372,18 +371,18 @@ export const oauthProviders = pgTable(
     id: id(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
-    userId: text('userId')
+    userId: text()
       .notNull()
       .references(() => users.id, {
         name: 'oauth_provider_user_id_fkey',
         onDelete: 'restrict',
         onUpdate: 'cascade',
       }),
-    provider: oauthProviderType('provider').notNull(),
-    username: text('username').notNull(),
-    accessToken: text('accessToken').notNull(),
-    refreshToken: text('refreshToken'),
-    oauthId: text('oauthId'),
+    provider: oauthProviderType().notNull(),
+    username: text().notNull(),
+    accessToken: text().notNull(),
+    refreshToken: text(),
+    oauthId: text(),
   },
   (table) => [
     primaryKey({ name: 'oauth_provider_pkey', columns: [table.id] }),
@@ -398,8 +397,8 @@ export const thumbnails = pgTable(
     id: id(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
-    path: text('path').notNull(),
-    fileId: text('fileId')
+    path: text().notNull(),
+    fileId: text()
       .notNull()
       .references(() => files.id, {
         name: 'thumbnail_file_id_fkey',
@@ -420,11 +419,11 @@ export const incompleteFiles = pgTable(
     id: id(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
-    status: incompleteFileStatus('status').notNull(),
-    chunksTotal: integer('chunksTotal').notNull(),
-    chunksComplete: integer('chunksComplete').notNull(),
-    metadata: jsonb('metadata').$type<IncompleteFileMetadata>().notNull(),
-    userId: text('userId')
+    status: incompleteFileStatus().notNull(),
+    chunksTotal: integer().notNull(),
+    chunksComplete: integer().notNull(),
+    metadata: jsonb().$type<IncompleteFileMetadata>().notNull(),
+    userId: text()
       .notNull()
       .references(() => users.id, {
         name: 'incomplete_file_user_id_fkey',
@@ -444,9 +443,9 @@ export const tags = pgTable(
     id: id(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
-    name: text('name').notNull(),
-    color: text('color').notNull(),
-    userId: text('userId').references(() => users.id, {
+    name: text().notNull(),
+    color: text().notNull(),
+    userId: text().references(() => users.id, {
       name: 'tag_user_id_fkey',
       onDelete: 'set null',
       onUpdate: 'cascade',
@@ -464,14 +463,14 @@ export const urls = pgTable(
     id: id(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
-    code: text('code').notNull(),
-    vanity: text('vanity'),
-    destination: text('destination').notNull(),
-    views: integer('views').default(0).notNull(),
-    maxViews: integer('maxViews'),
-    password: text('password'),
-    enabled: boolean('enabled').default(true).notNull(),
-    userId: text('userId').references(() => users.id, {
+    code: text().notNull(),
+    vanity: text(),
+    destination: text().notNull(),
+    views: integer().default(0).notNull(),
+    maxViews: integer(),
+    password: text(),
+    enabled: boolean().default(true).notNull(),
+    userId: text().references(() => users.id, {
       name: 'url_user_id_fkey',
       onDelete: 'set null',
       onUpdate: 'cascade',
@@ -490,7 +489,7 @@ export const metrics = pgTable(
     id: id(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
-    data: jsonb('data').$type<Record<string, Json | undefined>>().notNull(),
+    data: jsonb().$type<Record<string, Json | undefined>>().notNull(),
   },
   (table) => [
     primaryKey({ name: 'metric_pkey', columns: [table.id] }),
@@ -504,11 +503,11 @@ export const invites = pgTable(
     id: id(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
-    expiresAt: timestamp('expiresAt', { precision: 3, mode: 'date', withTimezone: true }),
-    code: text('code').notNull(),
-    uses: integer('uses').default(0).notNull(),
-    maxUses: integer('maxUses'),
-    inviterId: text('inviterId')
+    expiresAt: timestamp({ precision: 3, mode: 'date', withTimezone: true }),
+    code: text().notNull(),
+    uses: integer().default(0).notNull(),
+    maxUses: integer(),
+    inviterId: text()
       .notNull()
       .references(() => users.id, {
         name: 'invite_inviter_id_fkey',
