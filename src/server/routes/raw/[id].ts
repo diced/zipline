@@ -7,12 +7,13 @@ import { datasource } from '@/lib/datasource';
 import { db } from '@/lib/db';
 import { removeFile } from '@/lib/db/models/file';
 import { files } from '@/lib/db/schema';
+import { escapeLike } from '@/lib/db/utils';
 import { sanitizeFilename } from '@/lib/fs';
 import { log } from '@/lib/logger';
 import { guess } from '@/lib/mimes';
 import { TimedCache } from '@/lib/timedCache';
 import typedPlugin from '@/server/typedPlugin';
-import { desc, eq, sql } from 'drizzle-orm';
+import { desc, eq, like, sql } from 'drizzle-orm';
 import { FastifyReply, FastifyRequest } from 'fastify';
 
 const VIEW_WINDOW = 5 * 1000;
@@ -72,7 +73,7 @@ export const rawFileHandler = async (
     const [fileReq] = await db
       .select()
       .from(files)
-      .where(sql`${files.name} LIKE ${sql`${idSanitized}.%`}`)
+      .where(like(files.name, `${escapeLike(idSanitized)}.%`))
       .orderBy(desc(files.createdAt))
       .limit(1);
     file = fileReq;
