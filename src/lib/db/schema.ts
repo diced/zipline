@@ -32,9 +32,10 @@ export const userFilesQuota = pgEnum('UserFilesQuota', userFilesQuotaValues);
 export const incompleteFileStatus = pgEnum('IncompleteFileStatus', incompleteFileStatusValues);
 
 const id = () => text('id').primaryKey().$defaultFn(createId);
-const createdAt = () => timestamp('createdAt', { precision: 3, mode: 'date' }).defaultNow().notNull();
+const createdAt = () =>
+  timestamp('createdAt', { precision: 3, mode: 'date', withTimezone: true }).defaultNow().notNull();
 const updatedAt = () =>
-  timestamp('updatedAt', { precision: 3, mode: 'date' })
+  timestamp('updatedAt', { precision: 3, mode: 'date', withTimezone: true })
     .notNull()
     .$onUpdate(() => new Date());
 
@@ -234,7 +235,7 @@ export const files = pgTable(
     id: id(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
-    deletesAt: timestamp('deletesAt', { precision: 3, mode: 'date' }),
+    deletesAt: timestamp('deletesAt', { precision: 3, mode: 'date', withTimezone: true }),
     name: text('name').notNull(),
     originalName: text('originalName'),
     size: bigint('size', { mode: 'number' }).notNull(),
@@ -317,7 +318,7 @@ export const userPasskeys = pgTable('UserPasskey', {
   id: id(),
   createdAt: createdAt(),
   updatedAt: updatedAt(),
-  lastUsed: timestamp('lastUsed', { precision: 3, mode: 'date' }),
+  lastUsed: timestamp('lastUsed', { precision: 3, mode: 'date', withTimezone: true }),
   name: text('name').notNull(),
   reg: jsonb('reg').$type<Record<string, Json | undefined>>().notNull(),
   userId: text('userId')
@@ -438,7 +439,7 @@ export const invites = pgTable(
     id: id(),
     createdAt: createdAt(),
     updatedAt: updatedAt(),
-    expiresAt: timestamp('expiresAt', { precision: 3, mode: 'date' }),
+    expiresAt: timestamp('expiresAt', { precision: 3, mode: 'date', withTimezone: true }),
     code: text('code').notNull(),
     uses: integer('uses').default(0).notNull(),
     maxUses: integer('maxUses'),
