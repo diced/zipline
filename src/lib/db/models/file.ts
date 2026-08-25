@@ -2,7 +2,7 @@ import { config } from '@/lib/config';
 import { db, type DbClient } from '@/lib/db';
 import { files } from '@/lib/db/schema';
 import { formatRootUrl } from '@/lib/url';
-import { and, eq, inArray, isNotNull } from 'drizzle-orm';
+import { and, eq, getColumns, inArray, isNotNull } from 'drizzle-orm';
 import { createSelectSchema } from 'drizzle-orm/zod';
 import { z } from 'zod';
 import { tagColumns, tagSchema } from './tag';
@@ -11,6 +11,8 @@ export type FileInsert = typeof files.$inferInsert;
 export type FileUpdate = Partial<Omit<FileInsert, 'id' | 'createdAt' | 'updatedAt'>>;
 
 export const fileColumns = { userId: false, password: false } as const;
+
+const { password: _password, userId: _userId, ...fileDeleteColumns } = getColumns(files);
 
 export const filePasswordExtra = {
   password: (file: typeof files) => isNotNull(file.password).mapWith(Boolean).as('password'),
@@ -57,7 +59,7 @@ export async function updateFiles(ids: string[], data: FileUpdate, userId?: stri
 }
 
 export async function removeFile(id: string, client: DbClient = db) {
-  const rows = await client.delete(files).where(eq(files.id, id)).returning({ id: files.id });
+  const rows = await client.delete(files).where(eq(files.id, id)).returning(fileDeleteColumns);
 
   return rows[0] ?? null;
 }

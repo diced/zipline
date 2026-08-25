@@ -85,6 +85,7 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
+    "@rolldown/plugin-transform-imports": "^0.1.1",
     "@types/archiver": "^7.0.0",
     "@types/bytes": "^3.1.5",
     "@types/he": "^1.2.3",

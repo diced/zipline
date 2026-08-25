@@ -189,6 +189,9 @@ importers:
         specifier: ^5.0.14
         version: 5.0.14(@types/react@19.2.17)(immer@11.1.16)(react@19.2.7)(use-sync-external-store@1.6.0(react@19.2.7))
     devDependencies:
+      '@rolldown/plugin-transform-imports':
+        specifier: ^0.1.1
+        version: 0.1.1(rolldown@1.1.4)(vite@8.1.3(@types/node@24.12.2)(esbuild@0.27.1)(jiti@2.7.0)(sass@1.101.0)(sugarss@5.0.1(postcss@8.5.16))(tsx@4.23.12)(yaml@2.8.3))
       '@types/archiver':
         specifier: ^7.0.0
         version: 7.0.0
@@ -1780,6 +1783,16 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@rolldown/plugin-transform-imports@0.1.1':
+    resolution: {integrity: sha512-X5HYPM/OxWHNG2fOC1eEESuEoGlA1zGrx2csYmFgwPAH+bUjfllLBQeEQ49+Rk9f0x3Z4L72aU0tpxANy5tD/Q==}
+    engines: {node: '>=22.12.0 || ^24.0.0'}
+    peerDependencies:
+      rolldown: ^1.0.0-rc.13
+      vite: ^8.0.0
+    peerDependenciesMeta:
+      vite:
+        optional: true
+
   '@rolldown/pluginutils@1.0.1':
     resolution: {integrity: sha512-2j9bGt5Jh8hj+vPtgzPtl72j0yRxHAyumoo6TNfAjsLB04UtpSvPbPcDcBMxz7n+9CYB0c1GxQFxYRg2jimqGw==}
 
@@ -3151,6 +3164,9 @@ packages:
   magic-string@0.30.21:
     resolution: {integrity: sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==}
 
+  magic-string@1.2.2:
+    resolution: {integrity: sha512-veT/+7iXrXzT39XnEN4lOxtNl72dMgJ8Lp+5Bd6YcMSWpb0n0MjBM8Uuooi6jgJr8dhUW2swQgBmoZVMni5SVg==}
+
   mantine-datatable@9.3.1:
     resolution: {integrity: sha512-w+KtNCUcNypgmpwYlbYF9zDb0e5gNFE5YI3ZrgE+9ISJxg/8hpmWyprA4YVMbKY8mC80zwOwaKoew5lLx0esoA==}
     peerDependencies:
@@ -3721,6 +3737,15 @@ packages:
 
   rfdc@1.4.1:
     resolution: {integrity: sha512-q1b3N5QkRUWUl7iyylaaj3kOpIT0N2i9MqIEQXP73GVsN9cw3fdx8X63cEmWhJGi2PPCF23Ijp7ktmd39rawIA==}
+
+  rolldown-string@0.3.1:
+    resolution: {integrity: sha512-dv8GOXkYqUQdI0rsXB8hmzO95pKWSuX2eg5/JSJa9czfEVIFuKNR7ZJDfat8LlmD35RAhWY+evS7/wXXqFDfSg==}
+    engines: {node: '>=20.19.0'}
+    peerDependencies:
+      rolldown: '*'
+    peerDependenciesMeta:
+      rolldown:
+        optional: true
 
   rolldown@1.1.4:
     resolution: {integrity: sha512-IjZYiLxZwpnhwhdBH2ugdTGVSdhCQUmLxLoqyjiL0JxYjyRst+5a0P3xfrTxJ5F638j4Mvvw5FAX5XE6eHpXbA==}
@@ -5443,6 +5468,13 @@ snapshots:
   '@rolldown/binding-win32-x64-msvc@1.1.4':
     optional: true
 
+  '@rolldown/plugin-transform-imports@0.1.1(rolldown@1.1.4)(vite@8.1.3(@types/node@24.12.2)(esbuild@0.27.1)(jiti@2.7.0)(sass@1.101.0)(sugarss@5.0.1(postcss@8.5.16))(tsx@4.23.12)(yaml@2.8.3))':
+    dependencies:
+      rolldown: 1.1.4
+      rolldown-string: 0.3.1(rolldown@1.1.4)
+    optionalDependencies:
+      vite: 8.1.3(@types/node@24.12.2)(esbuild@0.27.1)(jiti@2.7.0)(sass@1.101.0)(sugarss@5.0.1(postcss@8.5.16))(tsx@4.23.12)(yaml@2.8.3)
+
   '@rolldown/pluginutils@1.0.1': {}
 
   '@rollup/rollup-android-arm-eabi@4.53.3':
@@ -6572,6 +6604,10 @@ snapshots:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.5
 
+  magic-string@1.2.2:
+    dependencies:
+      '@jridgewell/sourcemap-codec': 1.5.5
+
   mantine-datatable@9.3.1(@mantine/core@9.4.1(@mantine/hooks@9.4.1(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.4.1(react@19.2.7))(clsx@2.1.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
     dependencies:
       '@mantine/core': 9.4.1(@mantine/hooks@9.4.1(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -7095,6 +7131,12 @@ snapshots:
   reusify@1.1.0: {}
 
   rfdc@1.4.1: {}
+
+  rolldown-string@0.3.1(rolldown@1.1.4):
+    dependencies:
+      magic-string: 1.2.2
+    optionalDependencies:
+      rolldown: 1.1.4
 
   rolldown@1.1.4:
     dependencies:

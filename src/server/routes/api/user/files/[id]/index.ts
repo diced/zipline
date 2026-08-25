@@ -194,7 +194,11 @@ export default typedPlugin(
 
         const deleted = await removeFile(file.id);
         if (!deleted) throw new ApiError(4000);
-        const { user: _owner, ...deletedFile } = file;
+        const deletedFile = {
+          ...deleted,
+          thumbnail: file.thumbnail,
+          tags: file.tags,
+        };
 
         await datasource.delete(deletedFile.name);
 
