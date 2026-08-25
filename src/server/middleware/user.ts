@@ -1,5 +1,6 @@
 import { config } from '@/lib/config';
 import { decryptToken } from '@/lib/crypto';
+import { db } from '@/lib/db';
 import { getUserBySession, getUserByToken, type User } from '@/lib/db/models/user';
 import { FastifyReply } from 'fastify';
 import { FastifyRequest } from 'fastify/types/request';
@@ -42,6 +43,7 @@ export function parseUserToken(
 export async function userMiddleware(req: FastifyRequest, res: FastifyReply) {
   const path = req.url.toLowerCase().split('?')[0];
   const upload = ['/api/upload', '/api/upload/partial'].includes(path);
+  const leanUpload = upload && !config.discord?.onUpload && !config.httpWebhook.onUpload;
 
   const anonFolderUpload =
     req.headers['x-zipline-folder'] &&
@@ -55,10 +57,19 @@ export async function userMiddleware(req: FastifyRequest, res: FastifyReply) {
   if (authorization) {
     const token = parseUserToken(authorization);
 
-    const user = await getUserByToken(token);
+    let user;
+    if (leanUpload) {
+      user = await db.query.users.findFirst({
+        columns: { id: true, username: true, role: true },
+        where: { token },
+        with: { quota: true },
+      });
+    } else {
+      user = await getUserByToken(token);
+    }
     if (!user) throw new ApiError(2001);
 
-    req.user = user;
+    req.user = user as User;
 
     return;
   }
@@ -68,8 +79,17 @@ export async function userMiddleware(req: FastifyRequest, res: FastifyReply) {
 
   if (!session.id || !session.sessionId) throw new ApiError(2000);
 
-  const user = await getUserBySession(session.sessionId);
+  let user;
+  if (leanUpload) {
+    user = await db.query.users.findFirst({
+      columns: { id: true, username: true, role: true },
+      where: { sessions: { id: session.sessionId } },
+      with: { quota: true },
+    });
+  } else {
+    user = await getUserBySession(session.sessionId);
+  }
   if (!user) throw new ApiError(2001);
 
-  req.user = user;
+  req.user = user as User;
 }
