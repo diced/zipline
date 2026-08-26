@@ -58,8 +58,8 @@ export default function SettingsGenerators() {
           }
           desc={
             <>
-              This generator requires <Anchor href='https://isharemac.app/'>ishare</Anchor> to be installed on
-              macOS. This uploader is intended for use on macOS only.
+              This generator requires <Anchor href='https://github.com/itoolio/ishare'>ishare</Anchor> to be
+              installed on macOS. This uploader is intended for use on macOS only.
             </>
           }
         />
