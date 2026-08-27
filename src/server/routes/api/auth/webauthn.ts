@@ -2,22 +2,24 @@ import { ApiError } from '@/lib/api/errors';
 import { ziplineClientParseSchema } from '@/lib/api/detect';
 import { config } from '@/lib/config';
 import { createToken } from '@/lib/crypto';
-import { prisma } from '@/lib/db';
-import { User, userSchema, userSelect } from '@/lib/db/models/user';
+import { db } from '@/lib/db';
+import { passkeyRegSchema } from '@/lib/db/models/passkey';
+import { getUser, type User, userSchema } from '@/lib/db/models/user';
+import { userPasskeys } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { TimedCache } from '@/lib/timedCache';
 import { getSession, saveSession } from '@/server/session';
 import typedPlugin from '@/server/typedPlugin';
-import { JsonObject } from '@prisma/client/runtime/client';
 import { AuthenticationResponseJSON } from '@simplewebauthn/browser';
 import {
   generateAuthenticationOptions,
   PublicKeyCredentialRequestOptionsJSON,
   verifyAuthenticationResponse,
 } from '@simplewebauthn/server';
+import { eq, sql } from 'drizzle-orm';
 import z from 'zod';
-import { PasskeyReg, passkeysEnabledHandler } from '../user/mfa/passkey';
+import { passkeysEnabledHandler } from '../user/mfa/passkey';
 
 export type ApiAuthWebauthnResponse = {
   user: User;
@@ -111,20 +113,15 @@ export default typedPlugin(
         const cachedOptions = OPTIONS_CACHE.get(webauthnChallengeId);
         if (!cachedOptions) throw new ApiError(1048);
 
-        const user = await prisma.user.findFirst({
-          where: {
-            passkeys: {
-              some: {
-                reg: {
-                  path: ['webauthn', 'id'],
-                  equals: response.id,
-                },
-              },
-            },
-          },
-          select: userSelect,
-        });
-        if (!user) {
+        const [passkey] = await db
+          .select()
+          .from(userPasskeys)
+          .where(sql`${userPasskeys.reg} #>> '{webauthn,id}' = ${response.id}`)
+          .limit(1);
+
+        let user: User | null = null;
+        if (passkey) user = await getUser(passkey.userId);
+        if (!passkey || !user) {
           logger.warn('invalid webauthn attempt', {
             req: webauthnChallengeId,
           });
@@ -135,19 +132,13 @@ export default typedPlugin(
           throw new ApiError(1052);
         }
 
-        const passkey = user.passkeys.find((pk) => {
-          const webauthn = (pk.reg as JsonObject | null)?.webauthn as { id: string } | undefined;
-          if (!webauthn) return false;
-          return webauthn.id === response.id;
-        });
-
-        if (!passkey) throw new ApiError(1052);
-        const reg = passkey.reg as PasskeyReg;
-
-        if (!reg.webauthn) {
+        const parsedReg = passkeyRegSchema.safeParse(passkey.reg);
+        if (!parsedReg.success) {
           logger.debug('invalid webauthn attempt, legacy passkey found...');
           throw new ApiError(1060);
         }
+        const reg = parsedReg.data;
+        const publicKey = Uint8Array.from(Buffer.from(reg.webauthn.publicKey, 'base64'));
 
         OPTIONS_CACHE.delete(webauthnChallengeId);
 
@@ -161,7 +152,7 @@ export default typedPlugin(
             credential: {
               id: reg.webauthn.id,
               counter: reg.webauthn.counter,
-              publicKey: new Uint8Array(Buffer.from(reg.webauthn.publicKey, 'base64')),
+              publicKey,
             },
           });
         } catch (e) {
@@ -181,15 +172,15 @@ export default typedPlugin(
 
         await saveSession(session, user, false);
 
-        await prisma.userPasskey.update({
-          where: {
-            id: passkey.id,
-          },
-          data: {
+        const [updated] = await db
+          .update(userPasskeys)
+          .set({
             lastUsed: new Date(),
             reg: { webauthn: { ...reg.webauthn, counter: newCounter } },
-          },
-        });
+          })
+          .where(eq(userPasskeys.id, passkey.id))
+          .returning({ id: userPasskeys.id });
+        if (!updated) throw new ApiError(9005);
 
         logger.info('user logged in with passkey', {
           user: user.username,

@@ -1,6 +1,19 @@
 import { ApiError } from '@/lib/api/errors';
 import { createToken } from '@/lib/crypto';
-import { prisma } from '@/lib/db';
+import { db } from '@/lib/db';
+import {
+  files,
+  filesToTags,
+  folders,
+  invites,
+  metrics,
+  oauthProviders,
+  tags,
+  urls,
+  userPasskeys,
+  userQuotas,
+  users,
+} from '@/lib/db/schema';
 import { sanitizeFilename } from '@/lib/fs';
 import { export4Schema } from '@/lib/import/version4/validateExport';
 import { log } from '@/lib/logger';
@@ -9,6 +22,7 @@ import { secondlyRatelimit } from '@/lib/ratelimits';
 import { administratorMiddleware } from '@/server/middleware/administrator';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
+import { and, eq, isNull, or } from 'drizzle-orm';
 import z from 'zod';
 
 export type ApiServerImportV4 = z.infer<typeof serverImportSchema>;
@@ -52,7 +66,6 @@ export default typedPlugin(
           tags: ['auth', 'superadmin'],
         },
         preHandler: [userMiddleware, administratorMiddleware],
-        // 24gb, just in case
         bodyLimit: 24 * 1024 * 1024 * 1024,
         ...secondlyRatelimit(5),
       },
@@ -61,7 +74,6 @@ export default typedPlugin(
 
         const { export4, config: importConfig } = req.body;
 
-        // users
         const importedUsers: Record<string, string> = {};
 
         for (const user of export4.data.users) {
@@ -75,11 +87,11 @@ export default typedPlugin(
             mergeCurrent = true;
           }
 
-          const existing = await prisma.user.findFirst({
-            where: {
-              OR: [{ username: user.username }, { id: user.id }],
-            },
-          });
+          const [existing] = await db
+            .select({ id: users.id })
+            .from(users)
+            .where(or(eq(users.username, user.username), eq(users.id, user.id)))
+            .limit(1);
 
           if (!mergeCurrent && existing) {
             logger.warn('user already exists with a username or id, skipping importing', {
@@ -91,41 +103,42 @@ export default typedPlugin(
           }
 
           if (mergeCurrent) {
-            const updated = await prisma.user.update({
-              where: {
-                id: req.user.id,
-              },
-              data: {
+            const [updated] = await db
+              .update(users)
+              .set({
                 avatar: user.avatar ?? null,
                 totpSecret: user.totpSecret ?? null,
-                view: user.view as any,
-              },
-            });
+                view: user.view,
+              })
+              .where(eq(users.id, req.user.id))
+              .returning({ id: users.id });
+            if (!updated) throw new ApiError(9005);
 
             importedUsers[user.id] = updated.id;
 
             continue;
           }
 
-          const created = await prisma.user.create({
-            data: {
+          const [created] = await db
+            .insert(users)
+            .values({
               username: user.username,
               password: user.password ?? null,
               avatar: user.avatar ?? null,
               role: user.role,
-              view: user.view as any,
+              view: user.view,
               totpSecret: user.totpSecret ?? null,
               token: createToken(),
               createdAt: new Date(user.createdAt),
-            },
-          });
+            })
+            .returning({ id: users.id });
+          if (!created) throw new ApiError(9005);
 
           importedUsers[user.id] = created.id;
         }
 
         logger.debug('imported users', { users: importedUsers });
 
-        // oauth providers from users
         const importedOauthProviders: Record<string, string> = {};
 
         for (const oauthProvider of export4.data.userOauthProviders) {
@@ -139,12 +152,20 @@ export default typedPlugin(
             continue;
           }
 
-          const existing = await prisma.oAuthProvider.findFirst({
-            where: {
-              provider: oauthProvider.provider,
-              oauthId: oauthProvider.oauthId,
-            },
-          });
+          const [existing] = await db
+            .select({ id: oauthProviders.id })
+            .from(oauthProviders)
+            .where(
+              oauthProvider.oauthId === undefined
+                ? eq(oauthProviders.provider, oauthProvider.provider)
+                : and(
+                    eq(oauthProviders.provider, oauthProvider.provider),
+                    oauthProvider.oauthId === null
+                      ? isNull(oauthProviders.oauthId)
+                      : eq(oauthProviders.oauthId, oauthProvider.oauthId),
+                  ),
+            )
+            .limit(1);
 
           if (existing) {
             logger.warn('oauth provider already exists, skipping importing', {
@@ -155,23 +176,24 @@ export default typedPlugin(
             continue;
           }
 
-          const created = await prisma.oAuthProvider.create({
-            data: {
+          const [created] = await db
+            .insert(oauthProviders)
+            .values({
               provider: oauthProvider.provider,
               oauthId: oauthProvider.oauthId,
               username: oauthProvider.username,
               accessToken: oauthProvider.accessToken,
               refreshToken: oauthProvider.refreshToken ?? null,
               userId,
-            },
-          });
+            })
+            .returning({ id: oauthProviders.id });
+          if (!created) throw new ApiError(9005);
 
           importedOauthProviders[oauthProvider.id] = created.id;
         }
 
         logger.debug('imported oauth providers', { oauthProviders: importedOauthProviders });
 
-        // quotas from users
         const importedQuotas: Record<string, string> = {};
 
         for (const quota of export4.data.userQuotas) {
@@ -185,11 +207,11 @@ export default typedPlugin(
             continue;
           }
 
-          const existing = await prisma.userQuota.findFirst({
-            where: {
-              userId,
-            },
-          });
+          const [existing] = await db
+            .select({ id: userQuotas.id })
+            .from(userQuotas)
+            .where(eq(userQuotas.userId, userId))
+            .limit(1);
 
           if (existing) {
             logger.warn('quota already exists for user, skipping importing', {
@@ -200,16 +222,18 @@ export default typedPlugin(
             continue;
           }
 
-          const created = await prisma.userQuota.create({
-            data: {
+          const [created] = await db
+            .insert(userQuotas)
+            .values({
               filesQuota: quota.filesQuota,
               maxBytes: quota.maxBytes ?? null,
               maxFiles: quota.maxFiles ?? null,
               maxUrls: quota.maxUrls ?? null,
               userId,
               createdAt: new Date(quota.createdAt),
-            },
-          });
+            })
+            .returning({ id: userQuotas.id });
+          if (!created) throw new ApiError(9005);
 
           importedQuotas[quota.id] = created.id;
         }
@@ -229,12 +253,11 @@ export default typedPlugin(
             continue;
           }
 
-          const existing = await prisma.userPasskey.findFirst({
-            where: {
-              name: passkey.name,
-              userId,
-            },
-          });
+          const [existing] = await db
+            .select({ id: userPasskeys.id })
+            .from(userPasskeys)
+            .where(and(eq(userPasskeys.name, passkey.name), eq(userPasskeys.userId, userId)))
+            .limit(1);
 
           if (existing) {
             logger.warn('passkey already exists for user, skipping importing', {
@@ -245,20 +268,17 @@ export default typedPlugin(
             continue;
           }
 
-          const created = await prisma.userPasskey.create({
-            data: {
-              name: passkey.name,
-              reg: passkey.reg as any,
-              userId,
-            },
-          });
+          const [created] = await db
+            .insert(userPasskeys)
+            .values({ name: passkey.name, reg: passkey.reg, userId })
+            .returning({ id: userPasskeys.id });
+          if (!created) throw new ApiError(9005);
 
           importedPasskeys[passkey.id] = created.id;
         }
 
         logger.debug('imported passkeys', { passkeys: importedPasskeys });
 
-        // folders - first pass: create all folders without parent relationships
         const importedFolders: Record<string, string> = {};
         const folderParentMap: Record<string, string> = {};
 
@@ -273,12 +293,11 @@ export default typedPlugin(
             continue;
           }
 
-          const existing = await prisma.folder.findFirst({
-            where: {
-              name: folder.name,
-              userId,
-            },
-          });
+          const [existing] = await db
+            .select({ id: folders.id })
+            .from(folders)
+            .where(and(eq(folders.name, folder.name), eq(folders.userId, userId)))
+            .limit(1);
 
           if (existing) {
             logger.warn('folder already exists, skipping importing', {
@@ -289,15 +308,17 @@ export default typedPlugin(
             continue;
           }
 
-          const created = await prisma.folder.create({
-            data: {
+          const [created] = await db
+            .insert(folders)
+            .values({
               userId,
               name: folder.name,
               allowUploads: folder.allowUploads,
               public: folder.public,
               createdAt: new Date(folder.createdAt),
-            },
-          });
+            })
+            .returning({ id: folders.id });
+          if (!created) throw new ApiError(9005);
 
           importedFolders[folder.id] = created.id;
 
@@ -306,16 +327,17 @@ export default typedPlugin(
           }
         }
 
-        // folders - second pass: set parent relationships
         for (const [oldFolderId, oldParentId] of Object.entries(folderParentMap)) {
           const newFolderId = importedFolders[oldFolderId];
           const newParentId = importedFolders[oldParentId];
 
           if (newFolderId && newParentId) {
-            await prisma.folder.update({
-              where: { id: newFolderId },
-              data: { parentId: newParentId },
-            });
+            const [updated] = await db
+              .update(folders)
+              .set({ parentId: newParentId })
+              .where(eq(folders.id, newFolderId))
+              .returning({ id: folders.id });
+            if (!updated) throw new ApiError(9005);
           } else {
             logger.warn('failed to set parent for folder', {
               folder: oldFolderId,
@@ -326,7 +348,6 @@ export default typedPlugin(
 
         logger.debug('imported folders', { folders: importedFolders });
 
-        // files
         const importedFiles: Record<string, string> = {};
 
         for (const file of export4.data.files) {
@@ -340,11 +361,11 @@ export default typedPlugin(
             continue;
           }
 
-          const existing = await prisma.file.findFirst({
-            where: {
-              name: file.name,
-            },
-          });
+          const [existing] = await db
+            .select({ id: files.id })
+            .from(files)
+            .where(eq(files.name, file.name))
+            .limit(1);
 
           if (existing) {
             logger.warn('file already exists, skipping importing', {
@@ -366,8 +387,9 @@ export default typedPlugin(
             });
           }
 
-          const created = await prisma.file.create({
-            data: {
+          const [created] = await db
+            .insert(files)
+            .values({
               userId,
               name: sanitizedFilename,
               size: file.size,
@@ -380,27 +402,37 @@ export default typedPlugin(
               createdAt: new Date(file.createdAt),
               favorite: file.favorite ?? false,
               password: file.password ?? null,
-            },
-          });
+            })
+            .returning({ id: files.id });
+          if (!created) throw new ApiError(9005);
 
           importedFiles[file.id] = created.id;
         }
 
         logger.debug('imported files', { files: importedFiles });
 
-        // tags, mapped to files and users
         const importedTags: Record<string, string> = {};
 
         for (const tag of export4.data.userTags) {
-          const userId = tag.userId ? importedUsers[tag.userId] : null;
+          const userId = tag.userId ? importedUsers[tag.userId] : undefined;
 
-          const existing = await prisma.tag.findFirst({
-            where: {
-              name: tag.name,
-              userId: userId ?? null,
-              createdAt: new Date(tag.createdAt),
-            },
-          });
+          if (!userId) {
+            logger.warn('tag has no user, skipping', { id: tag.id });
+
+            continue;
+          }
+
+          const [existing] = await db
+            .select({ id: tags.id })
+            .from(tags)
+            .where(
+              and(
+                eq(tags.name, tag.name),
+                eq(tags.userId, userId),
+                eq(tags.createdAt, new Date(tag.createdAt)),
+              ),
+            )
+            .limit(1);
 
           if (existing) {
             logger.warn('tag already exists, skipping importing', {
@@ -411,21 +443,26 @@ export default typedPlugin(
             continue;
           }
 
-          if (!userId) {
-            logger.warn('tag has no user, skipping', { id: tag.id });
+          const fileIds = tag.files.flatMap((fileId) => {
+            const importedFileId = importedFiles[fileId];
+            if (importedFileId) return [importedFileId];
 
-            continue;
-          }
+            logger.warn('tag file was not imported, skipping relation', { tag: tag.id, file: fileId });
+            return [];
+          });
 
-          const created = await prisma.tag.create({
-            data: {
-              name: tag.name,
-              color: tag.color ?? '#000000',
-              files: {
-                connect: tag.files.map((fileId) => ({ id: importedFiles[fileId] })),
-              },
-              userId,
-            },
+          const created = await db.transaction(async (tx) => {
+            const [created] = await tx
+              .insert(tags)
+              .values({ name: tag.name, color: tag.color ?? '#000000', userId })
+              .returning({ id: tags.id });
+            if (!created) throw new ApiError(9005);
+
+            if (fileIds.length) {
+              await tx.insert(filesToTags).values(fileIds.map((fileId) => ({ fileId, tagId: created.id })));
+            }
+
+            return created;
           });
 
           importedTags[tag.id] = created.id;
@@ -433,7 +470,6 @@ export default typedPlugin(
 
         logger.debug('imported tags', { tags: importedTags });
 
-        // urls
         const importedUrls: Record<string, string> = {};
 
         for (const url of export4.data.urls) {
@@ -448,12 +484,11 @@ export default typedPlugin(
             continue;
           }
 
-          const existing = await prisma.url.findFirst({
-            where: {
-              code: url.code,
-              userId,
-            },
-          });
+          const [existing] = await db
+            .select({ id: urls.id })
+            .from(urls)
+            .where(and(eq(urls.code, url.code), eq(urls.userId, userId)))
+            .limit(1);
 
           if (existing) {
             logger.warn('url already exists, skipping importing', {
@@ -464,8 +499,9 @@ export default typedPlugin(
             continue;
           }
 
-          const created = await prisma.url.create({
-            data: {
+          const [created] = await db
+            .insert(urls)
+            .values({
               userId,
               destination: url.destination,
               vanity: url.vanity ?? null,
@@ -475,15 +511,15 @@ export default typedPlugin(
               enabled: url.enabled,
               createdAt: new Date(url.createdAt),
               password: url.password ?? null,
-            },
-          });
+            })
+            .returning({ id: urls.id });
+          if (!created) throw new ApiError(9005);
 
           importedUrls[url.id] = created.id;
         }
 
         logger.debug('imported urls', { urls: importedUrls });
 
-        // invites
         const importedInvites: Record<string, string> = {};
 
         for (const invite of export4.data.invites) {
@@ -497,12 +533,11 @@ export default typedPlugin(
             continue;
           }
 
-          const existing = await prisma.invite.findFirst({
-            where: {
-              code: invite.code,
-              inviterId,
-            },
-          });
+          const [existing] = await db
+            .select({ id: invites.id })
+            .from(invites)
+            .where(and(eq(invites.code, invite.code), eq(invites.inviterId, inviterId)))
+            .limit(1);
 
           if (existing) {
             logger.warn('invite already exists, skipping importing', {
@@ -513,31 +548,38 @@ export default typedPlugin(
             continue;
           }
 
-          const created = await prisma.invite.create({
-            data: {
+          const [created] = await db
+            .insert(invites)
+            .values({
               code: invite.code,
               uses: invite.uses,
               maxUses: invite.maxUses ?? null,
               inviterId,
               createdAt: new Date(invite.createdAt),
               expiresAt: invite.expiresAt ? new Date(invite.expiresAt) : null,
-            },
-          });
+            })
+            .returning({ id: invites.id });
+          if (!created) throw new ApiError(9005);
 
           importedInvites[invite.id] = created.id;
         }
 
         logger.debug('imported invites', { invites: importedInvites });
 
-        const metricRes = await prisma.metric.createMany({
-          data: export4.data.metrics.map((metric) => ({
-            createdAt: new Date(metric.createdAt),
-            data: metric.data as any,
-          })),
-        });
-
-        // metrics, through batch
-        logger.debug('imported metrics', { count: metricRes.count });
+        let metricCount = 0;
+        if (export4.data.metrics.length) {
+          const importedMetrics = await db
+            .insert(metrics)
+            .values(
+              export4.data.metrics.map((metric) => ({
+                createdAt: new Date(metric.createdAt),
+                data: metric.data,
+              })),
+            )
+            .returning({ id: metrics.id });
+          metricCount = importedMetrics.length;
+        }
+        logger.debug('imported metrics', { count: metricCount });
 
         const response = {
           imported: {
@@ -550,7 +592,7 @@ export default typedPlugin(
             tags: Object.keys(importedTags).length,
             urls: Object.keys(importedUrls).length,
             invites: Object.keys(importedInvites).length,
-            metrics: metricRes.count,
+            metrics: metricCount,
           },
         };
 

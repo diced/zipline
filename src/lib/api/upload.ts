@@ -1,7 +1,9 @@
 import { extname } from 'path';
+import { db, type DbClient } from '@/lib/db';
+import { files } from '@/lib/db/schema';
 import { User } from '@/lib/db/models/user';
-import { prisma } from '@/lib/db';
 import { bytes } from '@/lib/bytes';
+import { count, eq, inArray, sum } from 'drizzle-orm';
 import { config } from '../config';
 import { Config } from '../config/validate';
 import { sanitizeFilename } from '../fs';
@@ -37,24 +39,24 @@ export async function checkQuota(
   user: Pick<User, 'id' | 'quota'> | null,
   newSize: number,
   fileCount: number,
-  db: Pick<typeof prisma, 'file'> = prisma,
+  client?: DbClient,
 ): Promise<true | string> {
   if (!user?.quota) return true;
 
-  if (user.quota.filesQuota === 'BY_BYTES') {
-    const stats = await db.file.aggregate({
-      where: { userId: user.id },
-      _sum: { size: true },
-    });
+  const rows = await (client ?? db)
+    .select({ count: count(), size: sum(files.size) })
+    .from(files)
+    .where(eq(files.userId, user.id));
 
-    if (Number(stats._sum.size ?? 0n) + newSize > bytes(user.quota.maxBytes!))
+  const usage = { count: rows[0]?.count ?? 0, size: Number(rows[0]?.size ?? 0) };
+  if (user.quota.filesQuota === 'BY_BYTES') {
+    if (usage.size + newSize > bytes(user.quota.maxBytes!))
       return `uploading will exceed your storage quota of ${user.quota.maxBytes}`;
 
     return true;
   }
 
-  const count = await db.file.count({ where: { userId: user.id } });
-  if (count + fileCount > user.quota.maxFiles!)
+  if (usage.count + fileCount > user.quota.maxFiles!)
     return `uploading will exceed your file count quota of ${user.quota.maxFiles} files`;
 
   return true;
@@ -74,6 +76,13 @@ export function getDomain(
   return base + (hostDomain ?? 'localhost');
 }
 
+async function fileNamesExist(names: string[]) {
+  if (!names.length) return false;
+
+  const rows = await db.select({ id: files.id }).from(files).where(inArray(files.name, names)).limit(1);
+  return rows.length > 0;
+}
+
 export async function getFilename(
   format: Config['files']['defaultFormat'],
   originalName: string,
@@ -90,8 +99,7 @@ export async function getFilename(
     const extensions = [...new Set([extension, ...alternateExtensions])];
     let fullFileNames = extensions.map((ext) => `${fileName}${ext}`);
     let existing =
-      fullFileNames.some((name) => reservedNames?.has(name)) ||
-      (await prisma.file.findFirst({ where: { name: { in: fullFileNames } } }));
+      fullFileNames.some((name) => reservedNames?.has(name)) || (await fileNamesExist(fullFileNames));
 
     if (existing && (override || format === 'name')) {
       throw 'file with the same name already exists';
@@ -105,8 +113,7 @@ export async function getFilename(
 
       fullFileNames = extensions.map((ext) => `${fileName}${ext}`);
       existing =
-        fullFileNames.some((name) => reservedNames?.has(name)) ||
-        (await prisma.file.findFirst({ where: { name: { in: fullFileNames } } }));
+        fullFileNames.some((name) => reservedNames?.has(name)) || (await fileNamesExist(fullFileNames));
     }
 
     for (const name of fullFileNames) reservedNames?.add(name);

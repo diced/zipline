@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/db';
+import { queryUserActivityDates } from '@/lib/stats';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
 import dayjs from 'dayjs';
@@ -61,22 +61,7 @@ export default typedPlugin(
           .startOf('day')
           .toDate();
 
-        const [files, sessions] = await Promise.all([
-          prisma.file.findMany({
-            where: {
-              userId: req.user.id,
-              createdAt: { gte: start },
-            },
-            select: { createdAt: true },
-          }),
-          prisma.userSession.findMany({
-            where: {
-              userId: req.user.id,
-              createdAt: { gte: start },
-            },
-            select: { createdAt: true },
-          }),
-        ]);
+        const { uploads: files, logins: sessions } = await queryUserActivityDates(req.user.id, start);
 
         const uploadsByDay = new Map<string, number>();
         const loginsByDay = new Map<string, number>();

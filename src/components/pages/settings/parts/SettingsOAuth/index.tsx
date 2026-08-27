@@ -4,7 +4,7 @@ import { useUserStore } from '@/lib/client/store/user';
 import { fetchApi } from '@/lib/fetchApi';
 import { findProvider } from '@/lib/oauth/providers';
 import { darken } from '@/lib/theme/color';
-import type { OAuthProviderType } from '@/prisma/client';
+import type { OAuthProviderType } from '@/lib/db/enums';
 import { Button, ButtonProps, Paper, SimpleGrid, Text, Title, useMantineTheme } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import {

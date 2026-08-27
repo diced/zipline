@@ -1,12 +1,12 @@
 import { ApiError } from '@/lib/api/errors';
 import { config } from '@/lib/config';
-import { prisma } from '@/lib/db';
+import { db } from '@/lib/db';
 import { Invite } from '@/lib/db/models/invite';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import typedPlugin from '@/server/typedPlugin';
 import z from 'zod';
 
-export type ApiAuthInvitesWebResponse = Invite & {
+export type ApiAuthInvitesWebResponse = Pick<Invite, 'code' | 'maxUses' | 'uses'> & {
   inviter: {
     username: string;
   };
@@ -43,19 +43,10 @@ export default typedPlugin(
         if (!code) return res.send({ invite: null });
         if (!config.invites.enabled) throw new ApiError(9002);
 
-        const invite = await prisma.invite.findFirst({
-          where: {
-            OR: [{ id: code }, { code }],
-          },
-          select: {
-            code: true,
-            maxUses: true,
-            uses: true,
-            expiresAt: true,
-            inviter: {
-              select: { username: true },
-            },
-          },
+        const invite = await db.query.invites.findFirst({
+          columns: { code: true, maxUses: true, uses: true, expiresAt: true },
+          where: { OR: [{ id: code }, { code }] },
+          with: { inviter: { columns: { username: true } } },
         });
 
         if (
@@ -66,9 +57,8 @@ export default typedPlugin(
           throw new ApiError(9002);
         }
 
-        delete (invite as any).expiresAt;
-
-        return res.send({ invite });
+        const { expiresAt: _expiresAt, ...publicInvite } = invite;
+        return res.send({ invite: publicInvite });
       },
     );
   },

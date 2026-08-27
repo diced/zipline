@@ -2,15 +2,24 @@ import { ApiError } from '@/lib/api/errors';
 import { bytes } from '@/lib/bytes';
 import { hashPassword } from '@/lib/crypto';
 import { datasource } from '@/lib/datasource';
-import { prisma } from '@/lib/db';
-import { File, fileSchema, fileSelect } from '@/lib/db/models/file';
+import { db } from '@/lib/db';
+import {
+  File,
+  fileColumns,
+  fileRelations,
+  fileSchema,
+  getFile,
+  removeFile,
+  type FileUpdate,
+} from '@/lib/db/models/file';
+import { files, filesToTags, tags } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { canInteract } from '@/lib/role';
 import { zValidatePath } from '@/lib/validation';
-import { Prisma } from '@/prisma/client';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
 import z from 'zod';
+import { and, eq, inArray } from 'drizzle-orm';
 
 export type ApiUserFilesIdResponse = File;
 
@@ -38,18 +47,14 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const file = await prisma.file.findFirst({
-          where: {
-            OR: [{ id: req.params.id }, { name: req.params.id }],
-          },
-          select: { User: true, ...fileSelect },
-        });
+        const file = await getFile(req.params.id);
         if (!file) throw new ApiError(4000);
 
-        if (req.user.id !== file.User?.id && !canInteract(req.user.role, file.User?.role ?? 'USER'))
+        if (req.user.id !== file.user?.id && !canInteract(req.user.role, file.user?.role ?? 'USER'))
           throw new ApiError(4000);
 
-        return res.send(file);
+        const { user: _owner, ...responseFile } = file;
+        return res.send(responseFile);
       },
     );
 
@@ -78,18 +83,13 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const file = await prisma.file.findFirst({
-          where: {
-            OR: [{ id: req.params.id }, { name: req.params.id }],
-          },
-          select: { User: true, ...fileSelect },
-        });
+        const file = await getFile(req.params.id);
         if (!file) throw new ApiError(4000);
 
-        if (req.user.id !== file.User?.id && !canInteract(req.user.role, file.User?.role ?? 'USER'))
+        if (req.user.id !== file.user?.id && !canInteract(req.user.role, file.user?.role ?? 'USER'))
           throw new ApiError(4000);
 
-        const data: Prisma.FileUpdateInput = {};
+        const data: FileUpdate = {};
 
         if (req.body.favorite !== undefined) data.favorite = req.body.favorite;
         if (req.body.originalName !== undefined) data.originalName = req.body.originalName;
@@ -109,29 +109,18 @@ export default typedPlugin(
         }
 
         if (req.body.tags !== undefined) {
-          const tags = await prisma.tag.findMany({
-            where: {
-              userId: req.user.id !== file.User?.id ? file.User?.id : req.user.id,
-              id: {
-                in: req.body.tags,
-              },
-            },
-          });
+          const ownerId = req.user.id !== file.user?.id ? (file.user?.id ?? req.user.id) : req.user.id;
+          const tagCount = await db.$count(
+            tags,
+            and(eq(tags.userId, ownerId), inArray(tags.id, req.body.tags)),
+          );
 
-          if (tags.length !== req.body.tags.length) throw new ApiError(1032);
-
-          data.tags = {
-            set: req.body.tags.map((tag) => ({ id: tag })),
-          };
+          if (tagCount !== req.body.tags.length) throw new ApiError(1032);
         }
 
         if (req.body.name !== undefined && req.body.name !== file.name) {
           const name = req.body.name!;
-          const existingFile = await prisma.file.findFirst({
-            where: {
-              name,
-            },
-          });
+          const [existingFile] = await db.select({ id: files.id }).from(files).where(eq(files.name, name));
 
           if (existingFile && existingFile.id !== file.id) throw new ApiError(1014);
 
@@ -145,18 +134,39 @@ export default typedPlugin(
           }
         }
 
-        const newFile = await prisma.file.update({
-          where: {
-            id: file.id,
-          },
-          data,
-          select: fileSelect,
+        const newFile = await db.transaction(async (tx) => {
+          if (Object.keys(data).length) {
+            const [updated] = await tx
+              .update(files)
+              .set(data)
+              .where(eq(files.id, file.id))
+              .returning({ id: files.id });
+            if (!updated) return null;
+          }
+
+          if (req.body.tags !== undefined) {
+            await tx.delete(filesToTags).where(eq(filesToTags.fileId, file.id));
+
+            if (req.body.tags.length) {
+              await tx
+                .insert(filesToTags)
+                .values(req.body.tags.map((tagId) => ({ fileId: file.id, tagId })))
+                .onConflictDoNothing();
+            }
+          }
+
+          return tx.query.files.findFirst({
+            columns: fileColumns,
+            where: { id: file.id },
+            with: fileRelations,
+          });
         });
+        if (!newFile) throw new ApiError(4000);
 
         logger.info(`${req.user.username} updated file ${newFile.name}`, {
           updated: Object.keys(req.body),
           id: newFile.id,
-          owner: file.User?.id,
+          owner: file.user?.id,
         });
 
         return res.send(newFile);
@@ -176,31 +186,25 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const file = await prisma.file.findFirst({
-          where: {
-            OR: [{ id: req.params.id }, { name: req.params.id }],
-          },
-          include: {
-            User: true,
-          },
-        });
+        const file = await getFile(req.params.id);
         if (!file) throw new ApiError(4000);
 
-        if (req.user.id !== file.User?.id && !canInteract(req.user.role, file.User?.role ?? 'USER'))
+        if (req.user.id !== file.user?.id && !canInteract(req.user.role, file.user?.role ?? 'USER'))
           throw new ApiError(4000);
 
-        const deletedFile = await prisma.file.delete({
-          where: {
-            id: file.id,
-          },
-          select: fileSelect,
-        });
+        const deleted = await removeFile(file.id);
+        if (!deleted) throw new ApiError(4000);
+        const deletedFile = {
+          ...deleted,
+          thumbnail: file.thumbnail,
+          tags: file.tags,
+        };
 
         await datasource.delete(deletedFile.name);
 
         logger.info(`${req.user.username} deleted file ${deletedFile.name}`, {
           size: bytes(deletedFile.size),
-          owner: file.User?.id,
+          owner: file.user?.id,
         });
 
         return res.send(deletedFile);

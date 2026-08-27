@@ -2,15 +2,23 @@ import { ApiError } from '@/lib/api/errors';
 import { bytes } from '@/lib/bytes';
 import { hashPassword } from '@/lib/crypto';
 import { datasource } from '@/lib/datasource';
-import { prisma } from '@/lib/db';
-import { LimitedUser, limitedUserSchema, limitedUserSelect } from '@/lib/db/models/user';
+import { db } from '@/lib/db';
+import { Role, type UserFilesQuota } from '@/lib/db/enums';
+import {
+  getUserIdentity,
+  getUserSummary,
+  type LimitedUser,
+  type UserUpdate,
+  limitedUserSchema,
+} from '@/lib/db/models/user';
+import { files, oauthProviders, urls, userQuotas, users } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { canInteract } from '@/lib/role';
 import { zStringTrimmed } from '@/lib/validation';
-import { Role, UserFilesQuota } from '@/prisma/client';
 import { administratorMiddleware } from '@/server/middleware/administrator';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
+import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 
 export type ApiUsersIdResponse = LimitedUser;
@@ -38,12 +46,7 @@ export default typedPlugin(
         preHandler: [userMiddleware, administratorMiddleware],
       },
       async (req, res) => {
-        const user = await prisma.user.findUnique({
-          where: {
-            id: req.params.id,
-          },
-          select: limitedUserSelect,
-        });
+        const user = await getUserSummary(req.params.id);
 
         if (!user) throw new ApiError(4009);
         if (!canInteract(req.user.role, user.role)) throw new ApiError(4009);
@@ -81,15 +84,7 @@ export default typedPlugin(
         preHandler: [userMiddleware, administratorMiddleware],
       },
       async (req, res) => {
-        const user = await prisma.user.findUnique({
-          where: {
-            id: req.params.id,
-          },
-          select: {
-            id: true,
-            role: true,
-          },
-        });
+        const user = await getUserIdentity(req.params.id);
         if (!user) throw new ApiError(4009);
         if (!canInteract(req.user.role, user.role)) throw new ApiError(3019);
 
@@ -128,34 +123,41 @@ export default typedPlugin(
           };
         }
 
-        const updatedUser = await prisma.user.update({
-          where: {
-            id: user.id,
-          },
-          data: {
-            ...(username && { username }),
-            ...(password && { password: await hashPassword(password) }),
-            ...(role !== undefined && { role: role || 'USER' }),
-            ...(avatar && { avatar }),
-            ...(finalQuota && {
-              quota: {
-                upsert: {
-                  where: {
-                    userId: user.id,
-                  },
-                  create: {
-                    filesQuota: finalQuota.filesQuota || 'BY_BYTES',
-                    maxFiles: finalQuota.maxFiles ?? null,
-                    maxBytes: finalQuota.maxBytes ?? null,
-                    maxUrls: finalQuota.maxUrls ?? null,
-                  },
-                  update: finalQuota,
-                },
-              },
-            }),
-          },
-          select: limitedUserSelect,
+        const update: UserUpdate = {
+          ...(username && { username }),
+          ...(password && { password: await hashPassword(password) }),
+          ...(role !== undefined && { role: role || 'USER' }),
+          ...(avatar && { avatar }),
+        };
+
+        const updatedUser = await db.transaction(async (tx) => {
+          if (finalQuota) {
+            const [savedQuota] = await tx
+              .insert(userQuotas)
+              .values({
+                userId: user.id,
+                filesQuota: finalQuota.filesQuota || 'BY_BYTES',
+                maxFiles: finalQuota.maxFiles ?? null,
+                maxBytes: finalQuota.maxBytes ?? null,
+                maxUrls: finalQuota.maxUrls ?? null,
+              })
+              .onConflictDoUpdate({ target: userQuotas.userId, set: finalQuota })
+              .returning({ id: userQuotas.id });
+            if (!savedQuota) throw new ApiError(9005);
+          }
+
+          if (Object.keys(update).length) {
+            const [updated] = await tx
+              .update(users)
+              .set(update)
+              .where(eq(users.id, user.id))
+              .returning({ id: users.id });
+            if (!updated) return null;
+          }
+
+          return getUserSummary(user.id, tx);
         });
+        if (!updatedUser) throw new ApiError(4009);
 
         logger.info(`${req.user.username} updated another user`, {
           username: updatedUser.username,
@@ -184,50 +186,36 @@ export default typedPlugin(
         preHandler: [userMiddleware, administratorMiddleware],
       },
       async (req, res) => {
-        const user = await prisma.user.findUnique({
-          where: {
-            id: req.params.id,
-          },
-          select: {
-            id: true,
-            role: true,
-            username: true,
-          },
-        });
+        const user = await getUserIdentity(req.params.id);
 
         if (!user) throw new ApiError(4009);
         if (user.id === req.user.id) throw new ApiError(3010);
         if (!canInteract(req.user.role, user.role)) throw new ApiError(3009);
 
         if (req.body.delete) {
-          const files = await prisma.file.findMany({
-            where: {
-              userId: user.id,
-            },
-            select: {
-              name: true,
-            },
+          const fileEntries = await db
+            .select({ name: files.name })
+            .from(files)
+            .where(eq(files.userId, user.id));
+
+          const [filesDeleted, urlsDeleted] = await db.transaction(async (tx) => {
+            const deletedFiles = await tx
+              .delete(files)
+              .where(eq(files.userId, user.id))
+              .returning({ id: files.id });
+            const deletedUrls = await tx
+              .delete(urls)
+              .where(eq(urls.userId, user.id))
+              .returning({ id: urls.id });
+            return [deletedFiles.length, deletedUrls.length] as const;
           });
 
-          const [{ count: filesDeleted }, { count: urlsDeleted }] = await prisma.$transaction([
-            prisma.file.deleteMany({
-              where: {
-                userId: user.id,
-              },
-            }),
-            prisma.url.deleteMany({
-              where: {
-                userId: user.id,
-              },
-            }),
-          ]);
-
-          logger.debug(`preparing to delete ${files.length} files from datasource`, {
+          logger.debug(`preparing to delete ${fileEntries.length} files from datasource`, {
             username: user.username,
           });
 
-          for (let i = 0; i !== files.length; ++i) {
-            await datasource.delete(files[i].name);
+          for (let i = 0; i !== fileEntries.length; ++i) {
+            await datasource.delete(fileEntries[i].name);
           }
 
           logger.info(`${req.user.username} deleted another user's files & urls`, {
@@ -237,18 +225,16 @@ export default typedPlugin(
           });
         }
 
-        await prisma.oAuthProvider.deleteMany({
-          where: {
-            userId: user.id,
-          },
-        });
+        const deletedUser = await db.transaction(async (tx) => {
+          await tx.delete(oauthProviders).where(eq(oauthProviders.userId, user.id));
 
-        const deletedUser = await prisma.user.delete({
-          where: {
-            id: user.id,
-          },
-          select: limitedUserSelect,
+          const selected = await getUserSummary(user.id, tx);
+          if (!selected) return null;
+
+          const [deleted] = await tx.delete(users).where(eq(users.id, user.id)).returning({ id: users.id });
+          return deleted ? selected : null;
         });
+        if (!deletedUser) throw new ApiError(4009);
 
         logger.info(`${req.user.username} deleted another user`, {
           username: deletedUser.username,

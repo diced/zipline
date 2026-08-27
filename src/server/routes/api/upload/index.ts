@@ -12,9 +12,11 @@ import { COMPRESS_TYPES, compressFile, CompressResult } from '@/lib/compress';
 import { config } from '@/lib/config';
 import { hashPassword } from '@/lib/crypto';
 import { datasource } from '@/lib/datasource';
-import { prisma } from '@/lib/db';
-import { fileSelect } from '@/lib/db/models/file';
-import { userSelect } from '@/lib/db/models/user';
+import { db } from '@/lib/db';
+import type { FileInsert } from '@/lib/db/models/file';
+import { getFolderMetadata } from '@/lib/db/models/folder';
+import { getUser } from '@/lib/db/models/user';
+import { files, users } from '@/lib/db/schema';
 import { sanitizeFilename } from '@/lib/fs';
 import { removeGps } from '@/lib/gps';
 import { log } from '@/lib/logger';
@@ -22,10 +24,10 @@ import { mapConcurrent } from '@/lib/mapConcurrent';
 import { runThumbnailWorkers } from '@/lib/tasks/run/thumbnails';
 import { parseHeaders, UploadHeaders } from '@/lib/uploader/parseHeaders';
 import { onUpload } from '@/lib/webhooks';
-import { Prisma } from '@/prisma/client';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
 import { SavedMultipartFile } from '@fastify/multipart';
+import { eq, getColumns } from 'drizzle-orm';
 import { z } from 'zod';
 
 export type ApiUploadResponse = {
@@ -44,6 +46,7 @@ export type ApiUploadResponse = {
 };
 
 const logger = log('api').c('upload');
+const { password: _password, userId: _userId, ...uploadFileColumns } = getColumns(files);
 
 export const PATH = '/api/upload';
 export default typedPlugin(
@@ -98,22 +101,18 @@ export default typedPlugin(
 
         let folder = null;
         if (options.folder) {
-          folder = await prisma.folder.findFirst({
-            where: {
-              id: options.folder,
-            },
-          });
+          folder = await getFolderMetadata(options.folder);
           if (!folder) throw new ApiError(4001);
 
           const ownsFolder = req.user ? folder.userId === req.user.id : false;
           if (!ownsFolder && !folder.allowUploads) throw new ApiError(req.user ? 3011 : 3002);
         }
 
-        let files: SavedMultipartFile[] = [];
+        let multipartFiles: SavedMultipartFile[] = [];
         try {
-          const res = await req.saveRequestFiles({ tmpdir: config.core.tempDirectory });
+          const reqFiles = await req.saveRequestFiles({ tmpdir: config.core.tempDirectory });
 
-          files = res.files;
+          multipartFiles = reqFiles.files;
         } catch (e) {
           logger.warn('error parsing multipart/form-data request', {
             error: e instanceof Error ? e.message : e,
@@ -122,18 +121,15 @@ export default typedPlugin(
           if (e instanceof Error && e.message.startsWith('Multipart:')) throw new ApiError(1061);
         }
 
-        if (!files.length) throw new ApiError(1062);
+        if (!multipartFiles.length) throw new ApiError(1062);
 
-        const totalFileSize = files.reduce((acc, x) => acc + x.file.bytesRead, 0);
+        const totalFileSize = multipartFiles.reduce((acc, x) => acc + x.file.bytesRead, 0);
 
         // use quota of user if anonymous
-        const quotaUser = req.user
-          ? req.user
-          : folder?.userId
-            ? await prisma.user.findUnique({ where: { id: folder.userId }, select: userSelect })
-            : null;
+        let quotaUser = req.user ? req.user : null;
+        if (!quotaUser && folder?.userId) quotaUser = await getUser(folder.userId);
 
-        const quotaCheck = await checkQuota(quotaUser, totalFileSize, files.length);
+        const quotaCheck = await checkQuota(quotaUser, totalFileSize, multipartFiles.length);
         if (quotaCheck !== true)
           throw new ApiError(5002, typeof quotaCheck === 'string' ? quotaCheck : undefined);
 
@@ -142,7 +138,7 @@ export default typedPlugin(
           ...(options.deletesAt && {
             deletesAt: options.deletesAt === 'never' ? 'never' : options.deletesAt.toISOString(),
           }),
-          ...(config.files.assumeMimetypes && { assumedMimetypes: Array(files.length) }),
+          ...(config.files.assumeMimetypes && { assumedMimetypes: Array(multipartFiles.length) }),
         };
 
         const domain = getDomain(
@@ -151,7 +147,7 @@ export default typedPlugin(
           req.headers.host,
         );
 
-        logger.debug('uploading files', { files: files.map((x) => x.filename) });
+        logger.debug('uploading files', { files: multipartFiles.map((x) => x.filename) });
 
         const reservedNames = new Set<string>();
         const format = options.format || config.files.defaultFormat;
@@ -163,8 +159,8 @@ export default typedPlugin(
           originalName?: string;
         }[] = [];
 
-        for (let i = 0; i < files.length; i++) {
-          const file = files[i];
+        for (let i = 0; i < multipartFiles.length; i++) {
+          const file = multipartFiles[i];
           const extension = getExtension(file.filename, options.overrides?.extension);
 
           if (config.files.disabledExtensions.includes(extension))
@@ -265,22 +261,23 @@ export default typedPlugin(
           };
         });
 
-        const password = options.password ? await hashPassword(options.password) : undefined;
+        let password: string | undefined;
+        if (options.password) password = await hashPassword(options.password);
         const uploads = prepared.map((item) => {
           const { file, fileName, extension, mimetype, size, compressed, removedGps, originalName } = item;
 
-          const data: Prisma.FileCreateInput = {
+          const data: FileInsert = {
             name: `${fileName}${extension}`,
             size,
             type: mimetype,
-            User: { connect: { id: req.user ? req.user.id : options.folder ? folder?.userId : undefined } },
+            userId: req.user ? req.user.id : options.folder ? folder?.userId : undefined,
           };
 
           if (!req.user && folder) data.anonymous = true;
 
           if (options.maxViews) data.maxViews = options.maxViews;
           if (password) data.password = password;
-          if (folder) data.Folder = { connect: { id: folder.id } };
+          if (folder) data.folderId = folder.id;
           if (originalName) data.originalName = originalName;
 
           data.deletesAt = options.deletesAt && options.deletesAt !== 'never' ? options.deletesAt : null;
@@ -288,9 +285,9 @@ export default typedPlugin(
           return { compressed, data, extension, file, removedGps, size };
         });
 
-        const fileUploads = await prisma.$transaction(async (tx) => {
+        const fileUploads = await db.transaction(async (tx) => {
           if (quotaUser?.quota) {
-            await tx.$queryRaw`SELECT "id" FROM "User" WHERE "id" = ${quotaUser.id} FOR UPDATE`;
+            await tx.select({ id: users.id }).from(users).where(eq(users.id, quotaUser.id)).for('update');
 
             const quotaCheck = await checkQuota(
               quotaUser,
@@ -304,12 +301,9 @@ export default typedPlugin(
 
           const created = [];
           for (const upload of uploads) {
-            created.push(
-              await tx.file.create({
-                data: upload.data,
-                select: fileSelect,
-              }),
-            );
+            const [file] = await tx.insert(files).values(upload.data).returning(uploadFileColumns);
+            if (!file) throw new ApiError(9005);
+            created.push(file);
           }
 
           return created;
@@ -360,7 +354,7 @@ export default typedPlugin(
               updatedAt: new Date(),
               role: 'USER',
             },
-            file: fileUpload,
+            file: { ...fileUpload, thumbnail: null, tags: [] },
             link: {
               raw: `${domain}/raw/${encodeURIComponent(fileUpload.name)}`,
               returned: encodeURI(responseUrl),

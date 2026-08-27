@@ -1,6 +1,8 @@
 import z from 'zod';
-import { prisma } from './db';
-import { Metric } from './db/models/metric';
+import { db } from './db';
+import { metricSchema, type Metric } from './db/models/metric';
+import { metrics } from './db/schema';
+import { and, desc, gte, lte, sql } from 'drizzle-orm';
 
 export const metricsPointSchema = z.object({
   id: z.string(),
@@ -15,44 +17,28 @@ export const metricsPointSchema = z.object({
 
 export type MetricsPoint = z.infer<typeof metricsPointSchema>;
 
-export function getMetricsPoints(from?: Date, to?: Date): Promise<MetricsPoint[]> {
-  if (from && to) {
-    return prisma.$queryRaw<MetricsPoint[]>`
-        SELECT
-          id,
-          "createdAt",
-          (data->>'users')::int AS users,
-          (data->>'files')::int AS files,
-          (data->>'fileViews')::int AS "fileViews",
-          (data->>'urls')::int AS urls,
-          (data->>'urlViews')::int AS "urlViews",
-          (data->>'storage')::bigint AS storage
-        FROM "Metric"
-        WHERE "createdAt" >= ${from} AND "createdAt" <= ${to}
-        ORDER BY "createdAt" DESC
-      `;
-  }
-
-  return prisma.$queryRaw<MetricsPoint[]>`
-      SELECT
-        id,
-        "createdAt",
-        (data->>'users')::int AS users,
-        (data->>'files')::int AS files,
-        (data->>'fileViews')::int AS "fileViews",
-        (data->>'urls')::int AS urls,
-        (data->>'urlViews')::int AS "urlViews",
-        (data->>'storage')::bigint AS storage
-      FROM "Metric"
-      ORDER BY "createdAt" DESC
-    `;
+export async function getMetricsPoints(from?: Date, to?: Date): Promise<MetricsPoint[]> {
+  const dateRange = from && to ? and(gte(metrics.createdAt, from), lte(metrics.createdAt, to)) : undefined;
+  return db
+    .select({
+      id: metrics.id,
+      createdAt: metrics.createdAt,
+      users: sql<number>`(${metrics.data}->>'users')::int`,
+      files: sql<number>`(${metrics.data}->>'files')::int`,
+      fileViews: sql<number>`(${metrics.data}->>'fileViews')::int`,
+      urls: sql<number>`(${metrics.data}->>'urls')::int`,
+      urlViews: sql<number>`(${metrics.data}->>'urlViews')::int`,
+      storage: sql<string>`(${metrics.data}->>'storage')::bigint`.mapWith(BigInt),
+    })
+    .from(metrics)
+    .where(dateRange)
+    .orderBy(desc(metrics.createdAt));
 }
 
-export function getLatestMetricsPoint(from?: Date, to?: Date): Promise<Metric | null> {
-  return prisma.metric.findFirst({
-    where: from && to ? { createdAt: { gte: from, lte: to } } : undefined,
-    orderBy: { createdAt: 'desc' },
-  });
+export async function getLatestMetricsPoint(from?: Date, to?: Date): Promise<Metric | null> {
+  const dateRange = from && to ? and(gte(metrics.createdAt, from), lte(metrics.createdAt, to)) : undefined;
+  const [row] = await db.select().from(metrics).where(dateRange).orderBy(desc(metrics.createdAt)).limit(1);
+  return row ? metricSchema.parse(row) : null;
 }
 
 export function downsample(points: MetricsPoint[], max: number = 500): MetricsPoint[] {

@@ -9,9 +9,11 @@ import { verifyAccessToken } from '@/lib/accessToken';
 import { isCode } from '@/lib/code';
 import { config as zConfig } from '@/lib/config';
 import type { Config } from '@/lib/config/validate';
-import { prisma } from '@/lib/db';
-import { findFileByName, File, fileSelect } from '@/lib/db/models/file';
-import { User, userSelect } from '@/lib/db/models/user';
+import { db } from '@/lib/db';
+import { fileRelations } from '@/lib/db/models/file';
+import { getUserSummary } from '@/lib/db/models/user';
+import { escapeLike } from '@/lib/db/utils';
+import { sanitizeFilename } from '@/lib/fs';
 import { parseString } from '@/lib/parser';
 import { parserMetrics } from '@/lib/parser/metrics';
 import { createZiplineSsr } from '@/lib/ssr/createZiplineSsr';
@@ -23,21 +25,26 @@ import { renderToString } from 'react-dom/server';
 import { createStaticHandler, createStaticRouter, StaticRouterProvider } from 'react-router-dom';
 import { createRoutes } from './routes';
 
-export const getFile = async (id: string) =>
-  findFileByName(id, (where, orderBy) =>
-    prisma.file.findFirst({
-      where,
-      ...(orderBy && { orderBy }),
-      select: {
-        ...fileSelect,
-        password: true,
-        userId: true,
-        thumbnail: { select: { path: true } },
-        tags: { select: { id: true, name: true, color: true } },
-        Folder: { select: { id: true, public: true, name: true } },
-      },
-    }),
-  );
+export const getFile = async (id: string) => {
+  const name = sanitizeFilename(id);
+  if (!name) return null;
+
+  const query = {
+    with: {
+      ...fileRelations,
+      folder: { columns: { id: true, name: true, public: true } },
+    },
+  } as const;
+  let file = await db.query.files.findFirst({ ...query, where: { name } });
+  if (!file && zConfig.files.extensionlessUrls && !name.includes('.')) {
+    file = await db.query.files.findFirst({
+      ...query,
+      where: { name: { like: `${escapeLike(name)}.%` } },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+  return file ?? null;
+};
 
 export async function render(
   {
@@ -56,24 +63,15 @@ export async function render(
   const { config: libConfig, reloadSettings } = await import('@/lib/config');
   if (!libConfig) await reloadSettings();
 
-  const file = await getFile(id);
-  if (!file || !file.userId) return { html: 'Not Found', meta: '', status: 404 };
+  const result = await getFile(id);
+  if (!result || !result.userId) return { html: 'Not Found', meta: '', status: 404 };
 
-  if (file.maxViews && file.views >= file.maxViews) return { html: 'Gone', meta: '', status: 410 };
-  if (file.deletesAt && file.deletesAt <= new Date()) return { html: 'Expired', meta: '', status: 410 };
+  if (result.maxViews && result.views >= result.maxViews) return { html: 'Gone', meta: '', status: 410 };
+  if (result.deletesAt && result.deletesAt <= new Date()) return { html: 'Expired', meta: '', status: 410 };
 
-  const user = await prisma.user.findFirst({
-    where: { id: file.userId },
-    select: {
-      ...userSelect,
-      oauthProviders: false,
-      passkeys: false,
-      sessions: false,
-      totpEnabled: false,
-      quota: false,
-    },
-  });
-  if (!user) return { html: 'Not Found', meta: '', status: 404 };
+  const limitedUser = await getUserSummary(result.userId);
+  if (!limitedUser) return { html: 'Not Found', meta: '', status: 404 };
+  const { quota: _quota, ...user } = limitedUser;
 
   let host = req.headers.host || 'localhost';
   const proto = req.headers['x-forwarded-proto'];
@@ -91,16 +89,15 @@ export async function render(
     host = proto === 'https' || zConfig.core.returnHttpsUrls ? `https://${host}` : `http://${host}`;
   }
 
-  const code = await isCode(file.name);
+  const code = await isCode(result.name);
   const themes = await readThemes();
   const metrics = await parserMetrics(user.id);
   const config = { website: { theme: zConfig.website.theme } };
 
   const token = req.query.token;
-  const valid = token && file.password ? verifyAccessToken(token, 'file', file.id) : false;
-  const hasPassword = !!file.password;
-
-  delete (file as any).password;
+  const valid = token && result.password ? verifyAccessToken(token, 'file', result.id) : false;
+  const hasPassword = !!result.password;
+  const { password: _password, ...file } = result;
 
   if (hasPassword) {
     console.log('File is password protected');
@@ -180,8 +177,8 @@ export async function render(
     showRichOg && user?.view?.embedTitle
       ? `<meta property="og:title" content="${stripHtml(
           parseString(user.view.embedTitle, {
-            file: file as unknown as File,
-            user: user as User,
+            file,
+            user,
             ...metrics,
           }) ?? '',
         )}" />`
@@ -189,8 +186,8 @@ export async function render(
     showRichOg && user?.view?.embedDescription
       ? `<meta property="og:description" content="${stripHtml(
           parseString(user.view.embedDescription, {
-            file: file as unknown as File,
-            user: user as User,
+            file,
+            user,
             ...metrics,
           }) ?? '',
         )}" />`
@@ -198,8 +195,8 @@ export async function render(
     showRichOg && user?.view?.embedSiteName
       ? `<meta property="og:site_name" content="${stripHtml(
           parseString(user.view.embedSiteName, {
-            file: file as unknown as File,
-            user: user as User,
+            file,
+            user,
             ...metrics,
           }) ?? '',
         )}" />`
@@ -207,8 +204,8 @@ export async function render(
     showRichOg && user?.view?.embedColor
       ? `<meta property="theme-color" content="${stripHtml(
           parseString(user.view.embedColor, {
-            file: file as unknown as File,
-            user: user as User,
+            file,
+            user,
             ...metrics,
           }) ?? '',
         )}" />`

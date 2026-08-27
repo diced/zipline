@@ -1,7 +1,14 @@
 import { ApiError } from '@/lib/api/errors';
-import { prisma } from '@/lib/db';
-import { fileSelect } from '@/lib/db/models/file';
-import { Folder, cleanFolder, cleanFolders, folderSchema } from '@/lib/db/models/folder';
+import { getFilesWithUser } from '@/lib/db/models/file';
+import {
+  createFolder,
+  getFolderMetadata,
+  Folder,
+  formatFolder,
+  folderSchema,
+  listFolders,
+} from '@/lib/db/models/folder';
+import { getUserIdentity } from '@/lib/db/models/user';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { canInteract } from '@/lib/role';
@@ -40,55 +47,20 @@ export default typedPlugin(
         const { noincl, user: userId, parentId, root } = req.query;
 
         if (userId) {
-          const targetUser = await prisma.user.findUnique({
-            where: {
-              id: userId,
-            },
-          });
+          const targetUser = await getUserIdentity(userId);
 
           if (!targetUser) throw new ApiError(4009);
           if (req.user.id !== targetUser.id && !canInteract(req.user.role, targetUser.role))
             throw new ApiError(4009);
         }
 
-        const folders = await prisma.folder.findMany({
-          where: {
-            userId: userId || req.user.id,
-            ...(root && { parentId: null }),
-            ...(parentId && { parentId }),
-          },
-          orderBy: {
-            createdAt: 'desc',
-          },
-          include: {
-            ...(!noincl && {
-              files: {
-                select: {
-                  ...fileSelect,
-                  password: true,
-                },
-                orderBy: {
-                  createdAt: 'desc',
-                },
-              },
-            }),
-            _count: {
-              select: {
-                children: true,
-                files: true,
-              },
-            },
-            parent: {
-              select: {
-                id: true,
-                name: true,
-                parentId: true,
-              },
-            },
-          },
+        const folders = await listFolders(userId || req.user.id, {
+          root,
+          parentId,
+          includeFiles: !noincl,
         });
 
-        return res.send(cleanFolders(folders as unknown as Folder[]));
+        return res.send(folders.map((folder) => formatFolder(folder)));
       },
     );
 
@@ -117,67 +89,30 @@ export default typedPlugin(
         let files = req.body.files;
 
         if (parentId) {
-          const parentFolder = await prisma.folder.findUnique({
-            where: { id: parentId },
-            select: { id: true, userId: true },
-          });
+          const parentFolder = await getFolderMetadata(parentId);
 
           if (!parentFolder) throw new ApiError(4007);
           if (parentFolder.userId !== req.user.id) throw new ApiError(3003);
         }
 
         if (files) {
-          const filesAdd = await prisma.file.findMany({
-            where: {
-              id: {
-                in: files,
-              },
-              userId: req.user.id,
-            },
-            select: {
-              id: true,
-            },
-          });
+          const selectedFiles = await getFilesWithUser(files);
+          const ownedFiles = selectedFiles.filter((file) => file.userId === req.user.id);
 
-          if (!filesAdd.length) throw new ApiError(1026);
+          if (!ownedFiles.length) throw new ApiError(1026);
 
-          files = filesAdd.map((f) => f.id);
+          files = ownedFiles.map((file) => file.id);
         }
 
-        const folder = await prisma.folder.create({
-          data: {
+        const folder = await createFolder(
+          {
             name,
             userId: req.user.id,
             ...(parentId && { parentId }),
-            ...(files?.length && {
-              files: {
-                connect: files!.map((f) => ({ id: f })),
-              },
-            }),
             public: isPublic ?? false,
           },
-          include: {
-            files: {
-              select: {
-                ...fileSelect,
-                password: true,
-              },
-            },
-            _count: {
-              select: {
-                children: true,
-                files: true,
-              },
-            },
-            parent: {
-              select: {
-                id: true,
-                name: true,
-                parentId: true,
-              },
-            },
-          },
-        });
+          files ?? [],
+        );
 
         logger.info('folder created', {
           folder: folder.name,
@@ -186,7 +121,7 @@ export default typedPlugin(
           parentId: parentId || undefined,
         });
 
-        return res.send(cleanFolder(folder));
+        return res.send(formatFolder(folder));
       },
     );
   },

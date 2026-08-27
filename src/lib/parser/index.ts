@@ -1,13 +1,13 @@
 import { bytes } from '../bytes';
 import { File } from '../db/models/file';
 import { Url } from '../db/models/url';
-import { User } from '../db/models/user';
+import { LimitedUser, User } from '../db/models/user';
 import { ParseValueMetrics } from './metrics';
 
 export type ParseValue = {
   file?: File;
   url?: Partial<Url>;
-  user?: User | Omit<User, 'oauthProviders' | 'passkeys'>;
+  user?: User | LimitedUser;
 
   link?: {
     returned?: string;

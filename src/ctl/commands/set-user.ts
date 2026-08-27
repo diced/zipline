@@ -1,17 +1,28 @@
 import { hashPassword } from '@/lib/crypto';
-import { prisma } from '@/lib/db';
-const SUPPORTED_FIELDS = ['username', 'password', 'role', 'avatar', 'token', 'totpSecret'];
+import { db } from '@/lib/db';
+import { getUserIdentity } from '@/lib/db/models/user';
+import { users } from '@/lib/db/schema';
+import { eq } from 'drizzle-orm';
+import { createUpdateSchema } from 'drizzle-orm/zod';
+
+const userUpdateSchema = createUpdateSchema(users).pick({
+  username: true,
+  password: true,
+  role: true,
+  avatar: true,
+  token: true,
+  totpSecret: true,
+});
+const supportedFields = new Set(Object.keys(userUpdateSchema.shape));
 
 export async function setUser(property: string, value: string, { id }: { id: string }) {
-  if (!SUPPORTED_FIELDS.includes(property)) return console.error('Unsupported field:', property);
+  if (!supportedFields.has(property)) return console.error('Unsupported field:', property);
 
-  const user = await prisma.user.findFirst({
-    where: { id },
-  });
+  const user = await getUserIdentity(id);
 
   if (!user) return console.error('User not found');
 
-  let parsed;
+  let parsed: string | boolean | null = value;
 
   if (value === 'true') parsed = true;
   else if (value === 'false') parsed = false;
@@ -24,12 +35,8 @@ export async function setUser(property: string, value: string, { id }: { id: str
     parsed = value.toUpperCase();
   }
 
-  await prisma.user.update({
-    where: { id },
-    data: {
-      [property]: parsed,
-    },
-  });
+  const update = userUpdateSchema.parse({ [property]: parsed });
+  await db.update(users).set(update).where(eq(users.id, id));
 
   if (property === 'password') parsed = '*********';
 

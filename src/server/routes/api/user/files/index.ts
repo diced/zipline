@@ -1,23 +1,32 @@
 import { ApiError } from '@/lib/api/errors';
-import { prisma } from '@/lib/db';
-import { File, cleanFiles, fileSchema, fileSelect } from '@/lib/db/models/file';
+import { db } from '@/lib/db';
+import { fileColumns, filePasswordExtra, fileRelations, fileSchema, formatFiles } from '@/lib/db/models/file';
+import { getFolderWithOwner } from '@/lib/db/models/folder';
+import { getUserIdentity } from '@/lib/db/models/user';
+import { files, incompleteFiles, tags } from '@/lib/db/schema';
+import { containsText } from '@/lib/db/utils';
 import { canInteract, canManage } from '@/lib/role';
 import { paginationQs } from '@/lib/validation';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
+import { and, eq, inArray, like, ne, notInArray, or, sql } from 'drizzle-orm';
 import z from 'zod';
 
-export type FileSearchField = 'name' | 'originalName' | 'type' | 'tags' | 'id';
+const searchFieldSchema = z.enum(['name', 'originalName', 'type', 'tags', 'id']);
+const responseSchema = z.object({
+  page: z.array(fileSchema),
+  search: z
+    .object({
+      field: searchFieldSchema,
+      query: z.union([z.string(), z.array(z.string())]),
+    })
+    .optional(),
+  total: z.number().optional(),
+  pages: z.number().optional(),
+});
 
-export type ApiUserFilesResponse = {
-  page: File[];
-  search?: {
-    field: FileSearchField;
-    query: string | string[];
-  };
-  total?: number;
-  pages?: number;
-};
+export type FileSearchField = z.infer<typeof searchFieldSchema>;
+export type ApiUserFilesResponse = z.infer<typeof responseSchema>;
 
 export const PATH = '/api/user/files';
 export default typedPlugin(
@@ -29,229 +38,102 @@ export default typedPlugin(
           description:
             'List, filter, and search files for the authenticated user (or another user if permitted).',
           querystring: paginationQs.extend({
-            searchField: z.enum(['name', 'originalName', 'type', 'tags', 'id']).optional().default('name'),
+            searchField: searchFieldSchema.optional().default('name'),
             searchQuery: z.string().optional(),
             id: z.string().optional(),
             folder: z.string().optional(),
           }),
           response: {
-            200: z.object({
-              page: z.array(fileSchema),
-              search: z
-                .object({
-                  field: z.enum(['name', 'originalName', 'type', 'tags', 'id']),
-                  query: z.union([z.string(), z.array(z.string())]),
-                })
-                .optional(),
-              total: z.number().optional(),
-              pages: z.number().optional(),
-            }),
+            200: responseSchema,
           },
           tags: ['auth'],
         },
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const user = await prisma.user.findUnique({
-          where: {
-            id: req.query.id ?? req.user.id,
-          },
-        });
+        const user = await getUserIdentity(req.query.id ?? req.user.id);
 
-        if (user && user.id !== req.user.id && !canInteract(req.user.role, user.role))
+        if (!user || (user.id !== req.user.id && !canInteract(req.user.role, user.role)))
           throw new ApiError(9002);
-        if (!user) throw new ApiError(9002);
 
         const { perpage, searchQuery, searchField, page, filter, favorite, sortBy, order, folder } =
           req.query;
 
-        let folderId: string | null = null;
+        let folderId: string | undefined;
         if (folder) {
-          const f = await prisma.folder.findFirst({
-            where: {
-              id: folder,
-            },
-            include: {
-              User: true,
-            },
-          });
-          if (!f) throw new ApiError(9002);
-          if (!canManage(req.user, f.User)) throw new ApiError(9002);
+          const targetFolder = await getFolderWithOwner(folder);
+          if (!targetFolder || !canManage(req.user, targetFolder.user)) throw new ApiError(9002);
 
-          folderId = f.id;
+          folderId = targetFolder.id;
         }
 
-        const incompleteFiles = await prisma.incompleteFile.findMany({
+        const incompleteIds = db
+          .select({ id: sql<string>`${incompleteFiles.metadata}->'file'->>'id'` })
+          .from(incompleteFiles)
+          .where(and(eq(incompleteFiles.userId, user.id), ne(incompleteFiles.status, 'COMPLETE')));
+
+        let tagIds: string[] = [];
+        if (searchQuery && searchField === 'tags') {
+          tagIds = searchQuery
+            .split(',')
+            .map((tag) => tag.trim())
+            .filter((tag) => tag);
+
+          if (!tagIds.length) return res.send({ page: [], search: { field: searchField, query: tagIds } });
+
+          const ownedTagCount = await db.$count(
+            tags,
+            and(eq(tags.userId, user.id), inArray(tags.id, tagIds)),
+          );
+          if (ownedTagCount !== tagIds.length) throw new ApiError(1032);
+        }
+
+        const fileFilter = (file: typeof files) =>
+          and(
+            eq(file.userId, user.id),
+            filter === 'dashboard'
+              ? or(
+                  like(file.type, 'image/%'),
+                  like(file.type, 'video/%'),
+                  like(file.type, 'audio/%'),
+                  like(file.type, 'text/%'),
+                )
+              : undefined,
+            favorite && filter !== 'all' ? eq(file.favorite, true) : undefined,
+            folderId ? eq(file.folderId, folderId) : undefined,
+            notInArray(file.id, incompleteIds),
+            searchQuery && searchField !== 'tags' ? containsText(file[searchField], searchQuery) : undefined,
+          )!;
+
+        const fileRows = await db.query.files.findMany({
+          columns: fileColumns,
+          extras: searchQuery ? undefined : filePasswordExtra,
           where: {
-            userId: user.id,
-            status: {
-              not: 'COMPLETE',
-            },
+            RAW: fileFilter,
+            AND: tagIds.map((id) => ({ tags: { id } })),
           },
+          orderBy: (file, { asc, desc }) => (order === 'asc' ? asc(file[sortBy]) : desc(file[sortBy])),
+          offset: (page - 1) * perpage,
+          limit: perpage,
+          with: fileRelations,
         });
+        const filePage = formatFiles(fileRows);
 
-        if (searchQuery) {
-          let tagFiles: string[] = [];
-
-          if (searchField === 'tags') {
-            const parsedTags = searchQuery
-              .split(',')
-              .map((tag) => tag.trim())
-              .filter((tag) => tag);
-
-            const foundTags = await prisma.tag.findMany({
-              where: {
-                userId: user.id,
-                id: {
-                  in: searchQuery
-                    .split(',')
-                    .map((tag) => tag.trim())
-                    .filter((tag) => tag),
-                },
-              },
-              include: {
-                files: {
-                  select: {
-                    id: true,
-                  },
-                },
-              },
-            });
-
-            if (foundTags.length !== parsedTags.length) throw new ApiError(1032);
-
-            tagFiles = foundTags
-              .map((tag) => tag.files.map((file) => file.id))
-              .reduce((a, b) => a.filter((c) => b.includes(c)));
-          }
-
-          const similarityResult = await prisma.file.findMany({
-            where: {
-              userId: user.id,
-              ...(filter === 'dashboard' && {
-                OR: [
-                  {
-                    type: { startsWith: 'image/' },
-                  },
-                  {
-                    type: { startsWith: 'video/' },
-                  },
-                  {
-                    type: { startsWith: 'audio/' },
-                  },
-                  {
-                    type: { startsWith: 'text/' },
-                  },
-                ],
-              }),
-              ...(favorite &&
-                filter !== 'all' && {
-                  favorite: true,
-                }),
-              ...(searchField === 'tags'
-                ? {
-                    id: {
-                      in: tagFiles,
-                      notIn: incompleteFiles.map((file) => file.metadata.file.id),
-                    },
-                  }
-                : searchField === 'id'
-                  ? {
-                      id: {
-                        contains: searchQuery,
-                        notIn: incompleteFiles.map((file) => file.metadata.file.id),
-                        mode: 'insensitive',
-                      },
-                    }
-                  : {
-                      [searchField]: {
-                        contains: searchQuery,
-                        mode: 'insensitive',
-                      },
-                      id: {
-                        notIn: incompleteFiles.map((file) => file.metadata.file.id),
-                      },
-                    }),
-              ...(folderId && {
-                folderId,
-              }),
-            },
-            select: fileSelect,
-            orderBy: {
-              [sortBy]: order,
-            },
-            skip: (Number(page) - 1) * perpage,
-            take: perpage,
-          });
-
+        if (searchQuery)
           return res.send({
-            page: cleanFiles(similarityResult),
+            page: filePage,
             search: {
               field: searchField,
-              query:
-                searchField === 'tags'
-                  ? searchQuery
-                      .split(',')
-                      .map((tag) => tag.trim())
-                      .filter((tag) => tag)
-                  : searchQuery,
+              query: searchField === 'tags' ? tagIds : searchQuery,
             },
           });
-        }
 
-        const where = {
-          userId: user.id,
-          ...(filter === 'dashboard' && {
-            OR: [
-              {
-                type: { startsWith: 'image/' },
-              },
-              {
-                type: { startsWith: 'video/' },
-              },
-              {
-                type: { startsWith: 'audio/' },
-              },
-              {
-                type: { startsWith: 'text/' },
-              },
-            ],
-          }),
-          ...(favorite &&
-            filter !== 'all' && {
-              favorite: true,
-            }),
-          id: {
-            notIn: incompleteFiles.map((file) => file.metadata.file.id),
-          },
-          ...(folderId && {
-            folderId,
-          }),
-        };
-
-        const count = await prisma.file.count({
-          where,
-        });
-
-        const files = cleanFiles(
-          await prisma.file.findMany({
-            where,
-            select: {
-              ...fileSelect,
-              password: true,
-            },
-            orderBy: {
-              [sortBy]: order,
-            },
-            skip: (Number(page) - 1) * perpage,
-            take: perpage,
-          }),
-        );
+        const total = await db.$count(files, fileFilter(files));
 
         return res.send({
-          page: files,
-          total: count,
-          pages: Math.ceil(count / perpage),
+          page: filePage,
+          total,
+          pages: Math.ceil(total / perpage),
         });
       },
     );

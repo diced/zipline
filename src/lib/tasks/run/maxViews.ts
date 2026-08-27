@@ -2,40 +2,29 @@ import { datasource } from '@/lib/datasource';
 import { IntervalTask } from '..';
 import { bytes } from '@/lib/bytes';
 import { config } from '@/lib/config';
+import { db } from '@/lib/db';
+import { removeFiles } from '@/lib/db/models/file';
+import { files, urls } from '@/lib/db/schema';
+import { and, gte, inArray, isNotNull } from 'drizzle-orm';
 
-export default function maxViews(prisma: typeof globalThis.__db__) {
+export default function maxViews() {
   return async function (this: IntervalTask) {
-    const files = await prisma.file.findMany({
-      where: {
-        views: {
-          gte: prisma.file.fields.maxViews,
-        },
-      },
-      select: {
-        name: true,
-        id: true,
-        size: true,
-      },
+    const expiredFiles = await db
+      .select({ id: files.id, name: files.name, size: files.size })
+      .from(files)
+      .where(and(isNotNull(files.maxViews), gte(files.views, files.maxViews)));
+
+    this.logger.debug(`found ${expiredFiles.length} expired files`, {
+      files: expiredFiles.map((file) => file.name),
     });
 
-    this.logger.debug(`found ${files.length} expired files`, {
-      files: files.map((f) => f.name),
-    });
+    const expiredUrls = await db
+      .select({ id: urls.id, destination: urls.destination })
+      .from(urls)
+      .where(and(isNotNull(urls.maxViews), gte(urls.views, urls.maxViews)));
 
-    const urls = await prisma.url.findMany({
-      where: {
-        views: {
-          gte: prisma.url.fields.maxViews,
-        },
-      },
-      select: {
-        id: true,
-        destination: true,
-      },
-    });
-
-    this.logger.debug(`found ${urls.length} expired urls`, {
-      dests: urls.map((u) => u.destination),
+    this.logger.debug(`found ${expiredUrls.length} expired urls`, {
+      dests: expiredUrls.map((url) => url.destination),
     });
 
     if (!config.features.deleteOnMaxViews) {
@@ -43,7 +32,7 @@ export default function maxViews(prisma: typeof globalThis.__db__) {
       return;
     }
 
-    for (const file of files) {
+    for (const file of expiredFiles) {
       try {
         await datasource.delete(file.name);
       } catch {
@@ -53,33 +42,36 @@ export default function maxViews(prisma: typeof globalThis.__db__) {
       }
     }
 
-    const fileDelete = prisma.file.deleteMany({
-      where: {
-        id: {
-          in: files.map((f) => f.id),
-        },
-      },
+    const [fileCount, urlCount] = await db.transaction(async (tx) => {
+      const fileCount = await removeFiles(
+        expiredFiles.map((file) => file.id),
+        tx,
+      );
+      let urlCount = 0;
+      if (expiredUrls.length) {
+        const deletedUrls = await tx
+          .delete(urls)
+          .where(
+            inArray(
+              urls.id,
+              expiredUrls.map((url) => url.id),
+            ),
+          )
+          .returning({ id: urls.id });
+        urlCount = deletedUrls.length;
+      }
+      return [fileCount, urlCount];
     });
-
-    const urlDelete = prisma.url.deleteMany({
-      where: {
-        id: {
-          in: urls.map((u) => u.id),
-        },
-      },
-    });
-
-    const [{ count: fileCount }, { count: urlCount }] = await prisma.$transaction([fileDelete, urlDelete]);
 
     if (fileCount)
       this.logger.info(`deleted ${fileCount} files due to max views`, {
-        size: bytes(files.reduce((acc, f) => acc + f.size, 0)),
-        files: files.map((f) => f.name),
+        size: bytes(expiredFiles.reduce((acc, file) => acc + file.size, 0)),
+        files: expiredFiles.map((file) => file.name),
       });
 
     if (urlCount)
       this.logger.info(`deleted ${urlCount} urls due to max views`, {
-        dests: urls.map((u) => u.destination),
+        dests: expiredUrls.map((url) => url.destination),
       });
   };
 }

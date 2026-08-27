@@ -1,9 +1,11 @@
 import { ApiError } from '@/lib/api/errors';
-import { prisma } from '@/lib/db';
-import { File, cleanFiles, fileSchema, fileSelect } from '@/lib/db/models/file';
-import { buildPublicParentChain, cleanFolder, Folder, folderSchema } from '@/lib/db/models/folder';
+import { db } from '@/lib/db';
+import { File, fileColumns, filePasswordExtra, fileSchema, formatFiles } from '@/lib/db/models/file';
+import { Folder, getPublicFolder, getPublicParentChain, publicFolderSchema } from '@/lib/db/models/folder';
+import { files } from '@/lib/db/schema';
 import { paginationQs } from '@/lib/validation';
 import typedPlugin from '@/server/typedPlugin';
+import { eq } from 'drizzle-orm';
 import z from 'zod';
 
 export type ApiServerFolderResponse = {
@@ -34,7 +36,7 @@ export default typedPlugin(
             .partial({ page: true }),
           response: {
             200: z.object({
-              folder: folderSchema.partial(),
+              folder: publicFolderSchema.partial(),
               page: z.array(fileSchema),
               total: z.number(),
               pages: z.number(),
@@ -45,28 +47,7 @@ export default typedPlugin(
       async (req, res) => {
         const { id } = req.params;
 
-        const folder = await prisma.folder.findFirst({
-          where: {
-            OR: [{ id }, { name: id }],
-          },
-          include: {
-            children: {
-              where: { public: true },
-              orderBy: { createdAt: 'desc' },
-              select: {
-                id: true,
-                name: true,
-                createdAt: true,
-                updatedAt: true,
-                public: true,
-                _count: { select: { children: true, files: true } },
-              },
-            },
-            parent: {
-              select: { id: true, name: true, public: true, parentId: true },
-            },
-          },
-        });
+        const folder = await getPublicFolder(id);
 
         if (!folder) throw new ApiError(9002);
         if (!folder.public && !folder.allowUploads) throw new ApiError(9002);
@@ -86,32 +67,28 @@ export default typedPlugin(
           });
         }
 
-        const where = { folderId: folder.id };
-        const total = await prisma.file.count({ where });
+        const where = eq(files.folderId, folder.id);
+        const total = await db.$count(files, where);
         const pages = total === 0 ? 0 : Math.ceil(total / perpage);
 
-        const files = cleanFiles(
-          await prisma.file.findMany({
-            where,
-            select: { ...fileSelect, password: true, tags: false },
-            orderBy: {
-              [sortBy]: order,
-            },
-            skip: (Number(page) - 1) * perpage,
-            take: perpage,
-          }),
-          true,
-        );
+        const rows = await db.query.files.findMany({
+          columns: fileColumns,
+          extras: filePasswordExtra,
+          where: { folderId: folder.id },
+          orderBy: (file, { asc, desc }) => (order === 'asc' ? asc(file[sortBy]) : desc(file[sortBy])),
+          offset: (Number(page) - 1) * perpage,
+          limit: perpage,
+          with: { thumbnail: { columns: { path: true } } },
+        });
+        const folderFiles = formatFiles(rows);
 
         if (folder.parentId) {
-          folder.parent = await buildPublicParentChain(folder.parentId);
+          folder.parent = await getPublicParentChain(folder.parentId);
         }
 
-        const cleanedFolder = cleanFolder(folder, true);
-
         return res.send({
-          folder: cleanedFolder,
-          page: files,
+          folder,
+          page: folderFiles,
           total,
           pages,
         });

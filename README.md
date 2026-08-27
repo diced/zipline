@@ -293,15 +293,15 @@ pnpm start
 
 #### Making changes to the database schema
 
-Zipline uses [prisma](https://www.prisma.io/) as its ORM, and as such, you will need to use the prisma CLI to facilitate any changes to the database schema.
+Zipline uses [Drizzle ORM](https://orm.drizzle.team/) for its database schema and queries.
 
-Once you have made a change to `prisma/schema.prisma`, you can run the script `db:migrate` to generate a migration file. This script doesn't apply the migration, as Zipline handles applying migrations itself on startup.
+After changing `src/lib/db/schema.ts`, generate a migration with Drizzle Kit. Zipline applies committed migrations automatically on startup.
 
 ```bash
 pnpm db:migrate
 ```
 
-If you wish to push changes to the database without generating a migration file, you can run the script `db:prototype`. This is only recommended for testing purposes, and should not be used in production.
+This command only creates a migration file; Zipline applies committed migrations when it starts. If you wish to push schema changes directly without generating a migration file, use `db:prototype`; this is only recommended for local prototyping and should not be used in production.
 
 ```bash
 pnpm db:prototype

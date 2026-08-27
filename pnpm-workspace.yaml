@@ -1,18 +1,12 @@
 allowBuilds:
   '@parcel/watcher': true
-  '@prisma/client': true
-  '@prisma/engines': true
   argon2: true
   esbuild: true
-  prisma: true
   sharp: true
 ignoredBuiltDependencies:
   - unrs-resolver
 onlyBuiltDependencies:
   - '@parcel/watcher'
-  - '@prisma/client'
-  - '@prisma/engines'
   - argon2
   - esbuild
-  - prisma
   - sharp

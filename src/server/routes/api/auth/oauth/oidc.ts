@@ -87,7 +87,6 @@ async function oidcOauth({ code, host, state, session }: OAuthQuery, logger: Log
   return {
     access_token: json.access_token,
     refresh_token: json.refresh_token || null,
-    // many different properties, so we are just gonna go down the list
     username:
       userJson.preferred_username ?? userJson.name ?? userJson.given_name ?? userJson.email ?? userJson.sub,
     user_id: userJson.sub,

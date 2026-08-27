@@ -1,12 +1,14 @@
 import { ApiError } from '@/lib/api/errors';
 import { config } from '@/lib/config';
 import { createToken, encryptToken } from '@/lib/crypto';
-import { prisma } from '@/lib/db';
-import { User, userSchema, userSelect } from '@/lib/db/models/user';
+import { db } from '@/lib/db';
+import { updateUser, type User, userSchema } from '@/lib/db/models/user';
+import { users } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
+import { eq } from 'drizzle-orm';
 import z from 'zod';
 
 export type ApiUserTokenResponse = {
@@ -34,16 +36,13 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const user = await prisma.user.findUnique({
-          where: {
-            id: req.user.id,
-          },
-          select: {
-            token: true,
-          },
-        });
+        const [user] = await db
+          .select({ token: users.token })
+          .from(users)
+          .where(eq(users.id, req.user.id))
+          .limit(1);
 
-        if (!user || !user.token) {
+        if (!user?.token) {
           logger.warn('something went very wrong! user not found or token not found', {
             userId: req.user.id,
           });
@@ -77,18 +76,9 @@ export default typedPlugin(
         },
       },
       async (req, res) => {
-        const user = await prisma.user.update({
-          where: {
-            id: req.user.id,
-          },
-          data: {
-            token: createToken(),
-          },
-          select: {
-            ...userSelect,
-            token: true,
-          },
-        });
+        const token = createToken();
+        const user = await updateUser(req.user.id, { token });
+        if (!user) throw new ApiError(9005);
 
         logger.info('user reset their token', {
           user: user.username,
@@ -96,7 +86,7 @@ export default typedPlugin(
 
         return res.send({
           user,
-          token: encryptToken(user.token, config.core.secret),
+          token: encryptToken(token, config.core.secret),
         });
       },
     );

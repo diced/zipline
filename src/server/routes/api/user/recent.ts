@@ -1,5 +1,12 @@
-import { prisma } from '@/lib/db';
-import { File, cleanFiles, fileSchema, fileSelect } from '@/lib/db/models/file';
+import { db } from '@/lib/db';
+import {
+  File,
+  fileColumns,
+  filePasswordExtra,
+  fileRelations,
+  fileSchema,
+  formatFiles,
+} from '@/lib/db/models/file';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
 import z from 'zod';
@@ -27,19 +34,14 @@ export default typedPlugin(
       async (req, res) => {
         const { take } = req.query;
 
-        const files = cleanFiles(
-          await prisma.file.findMany({
-            where: {
-              userId: req.user.id,
-            },
-            select: {
-              ...fileSelect,
-              password: true,
-            },
-            orderBy: {
-              createdAt: 'desc',
-            },
-            take,
+        const files = formatFiles(
+          await db.query.files.findMany({
+            columns: fileColumns,
+            extras: filePasswordExtra,
+            where: { userId: req.user.id },
+            orderBy: { createdAt: 'desc' },
+            limit: take,
+            with: fileRelations,
           }),
         );
 

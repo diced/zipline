@@ -1,10 +1,11 @@
 import { ApiError } from '@/lib/api/errors';
+import { db } from '@/lib/db';
+import { files, folders, invites, metrics, thumbnails, urls, users, zipline } from '@/lib/db/schema';
 import { Export4, export4Schema } from '@/lib/import/version4/validateExport';
 import { log } from '@/lib/logger';
 import { administratorMiddleware } from '@/server/middleware/administrator';
 import { userMiddleware } from '@/server/middleware/user';
 
-import { prisma } from '@/lib/db';
 import { zQsBoolean } from '@/lib/validation';
 import typedPlugin from '@/server/typedPlugin';
 import { cpus, hostname, platform, release } from 'os';
@@ -20,28 +21,6 @@ const exportCountsSchema = z.object({
   thumbnails: z.number(),
   metrics: z.number(),
 });
-
-type ExportCounts = z.infer<typeof exportCountsSchema>;
-
-async function getCounts(): Promise<ExportCounts> {
-  const users = await prisma.user.count();
-  const files = await prisma.file.count();
-  const urls = await prisma.url.count();
-  const folders = await prisma.folder.count();
-  const invites = await prisma.invite.count();
-  const thumbnails = await prisma.thumbnail.count();
-  const metrics = await prisma.metric.count();
-
-  return {
-    users,
-    files,
-    urls,
-    folders,
-    invites,
-    thumbnails,
-    metrics,
-  };
-}
 
 export type ApiServerExport = Export4;
 
@@ -73,15 +52,32 @@ export default typedPlugin(
         if (req.user.role !== 'SUPERADMIN') throw new ApiError(3015);
 
         if (req.query.counts) {
-          const counts = await getCounts();
+          const [userCount, fileCount, urlCount, folderCount, inviteCount, thumbnailCount, metricCount] =
+            await Promise.all([
+              db.$count(users),
+              db.$count(files),
+              db.$count(urls),
+              db.$count(folders),
+              db.$count(invites),
+              db.$count(thumbnails),
+              db.$count(metrics),
+            ]);
 
-          return res.send(counts);
+          return res.send({
+            users: userCount,
+            files: fileCount,
+            urls: urlCount,
+            folders: folderCount,
+            invites: inviteCount,
+            thumbnails: thumbnailCount,
+            metrics: metricCount,
+          });
         }
 
         logger.debug('exporting server data', { format: '4', requester: req.user.username });
 
-        const settingsTable = await prisma.zipline.findFirst();
-        if (!settingsTable) throw new ApiError(1023);
+        const [settings] = await db.select().from(zipline).limit(1);
+        if (!settings) throw new ApiError(1023);
 
         const env = Object.fromEntries(
           Object.entries(process.env).filter(
@@ -108,7 +104,7 @@ export default typedPlugin(
             },
           },
           data: {
-            settings: settingsTable,
+            settings,
 
             users: [],
             userPasskeys: [],
@@ -125,35 +121,19 @@ export default typedPlugin(
           },
         };
 
-        const users = await prisma.user.findMany({
-          include: {
+        const userRows = await db.query.users.findMany({
+          with: {
             passkeys: true,
             quota: true,
             oauthProviders: true,
             invites: true,
             urls: true,
-            tags: {
-              include: {
-                files: {
-                  select: {
-                    id: true,
-                  },
-                },
-              },
-            },
-            folders: {
-              include: {
-                files: {
-                  select: {
-                    id: true,
-                  },
-                },
-              },
-            },
+            tags: { with: { files: { columns: { id: true } } } },
+            folders: { with: { files: { columns: { id: true } } } },
           },
         });
 
-        for (const user of users) {
+        for (const user of userRows) {
           export4.data.users.push({
             createdAt: user.createdAt.toISOString(),
             id: user.id,
@@ -171,7 +151,7 @@ export default typedPlugin(
               id: passkey.id,
               lastUsed: passkey.lastUsed ? passkey.lastUsed.toISOString() : null,
               name: passkey.name,
-              reg: passkey.reg as Record<string, any>,
+              reg: passkey.reg,
               userId: passkey.userId,
             });
           }
@@ -253,9 +233,9 @@ export default typedPlugin(
           }
         }
 
-        const files = await prisma.file.findMany();
+        const fileRows = await db.select().from(files);
 
-        for (const file of files) {
+        for (const file of fileRows) {
           if (!file.userId)
             logger.warn('file has no user associated with it, still exporting...', {
               fileId: file.id,
@@ -279,9 +259,9 @@ export default typedPlugin(
           });
         }
 
-        const thumbnails = await prisma.thumbnail.findMany();
+        const thumbnailRows = await db.select().from(thumbnails);
 
-        for (const thumbnail of thumbnails) {
+        for (const thumbnail of thumbnailRows) {
           export4.data.thumbnails.push({
             createdAt: thumbnail.createdAt.toISOString(),
             id: thumbnail.id,
@@ -293,12 +273,12 @@ export default typedPlugin(
         }
 
         if (req.query.nometrics === undefined) {
-          const metrics = await prisma.metric.findMany();
+          const metricRows = await db.select().from(metrics);
 
-          export4.data.metrics = metrics.map((metric) => ({
+          export4.data.metrics = metricRows.map((metric) => ({
             createdAt: metric.createdAt.toISOString(),
             id: metric.id,
-            data: metric.data as Record<string, unknown>,
+            data: metric.data,
           }));
         }
 

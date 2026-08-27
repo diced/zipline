@@ -1,13 +1,15 @@
 import { ApiError } from '@/lib/api/errors';
 import { hashPassword, verifyPassword } from '@/lib/crypto';
-import { prisma } from '@/lib/db';
-import { User, userSchema, userSelect } from '@/lib/db/models/user';
+import { db } from '@/lib/db';
+import { getUser, updateUser, userSchema, type User, type UserUpdate } from '@/lib/db/models/user';
+import { users, userSessions } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { zStringTrimmed } from '@/lib/validation';
 import { userMiddleware } from '@/server/middleware/user';
 import { getSession, saveSession } from '@/server/session';
 import typedPlugin from '@/server/typedPlugin';
+import { and, eq, ne } from 'drizzle-orm';
 import z from 'zod';
 
 export type ApiUserResponse = {
@@ -81,21 +83,20 @@ export default typedPlugin(
       },
       async (req, res) => {
         if (req.body.username) {
-          const existing = await prisma.user.findUnique({
-            where: {
-              username: req.body.username,
-            },
-          });
-
-          if (existing) throw new ApiError(1038);
+          const [usernameTaken] = await db
+            .select()
+            .from(users)
+            .where(eq(users.username, req.body.username))
+            .limit(1);
+          if (usernameTaken) throw new ApiError(1038);
         }
 
         const changingPassword = !!req.body.password;
         if (changingPassword) {
-          const passwdReq = await prisma.user.findUnique({
-            where: { id: req.user.id },
-            select: { password: true },
-          });
+          const [passwdReq] = await db
+            .select({ password: users.password })
+            .from(users)
+            .where(eq(users.id, req.user.id));
 
           if (!passwdReq) throw new ApiError(1068);
 
@@ -117,63 +118,70 @@ export default typedPlugin(
 
         const currentSession = await getSession(req, res);
 
-        const user = await prisma.user.update({
-          where: {
-            id: req.user.id,
-          },
-          data: {
-            ...(req.body.username && { username: req.body.username }),
-            ...(req.body.password && { password: await hashPassword(req.body.password) }),
-            ...(changingPassword && {
-              sessions: {
-                deleteMany: {
-                  NOT: { id: currentSession.sessionId ?? '' },
-                },
-              },
-            }),
-            ...(req.body.avatar !== undefined && { avatar: req.body.avatar || null }),
-            ...(req.body.view && {
-              view: {
-                ...req.user.view,
-                ...(req.body.view.enabled !== undefined && { enabled: req.body.view.enabled || false }),
-                ...(req.body.view.disableTextFiles !== undefined && {
-                  disableTextFiles: req.body.view.disableTextFiles || false,
-                }),
-                ...(req.body.view.content !== undefined && { content: req.body.view.content || null }),
-                ...(req.body.view.embed !== undefined && { embed: req.body.view.embed || false }),
-                ...(req.body.view.embedMediaOnly !== undefined && {
-                  embedMediaOnly: (() => {
-                    const embedOn = !!(req.body.view.embed !== undefined
-                      ? req.body.view.embed
-                      : (req.user.view as { embed?: boolean }).embed);
-                    return embedOn ? false : req.body.view.embedMediaOnly || false;
-                  })(),
-                }),
-                ...(req.body.view.embedTitle !== undefined && {
-                  embedTitle: req.body.view.embedTitle || null,
-                }),
-                ...(req.body.view.embedDescription !== undefined && {
-                  embedDescription: req.body.view.embedDescription || null,
-                }),
-                ...(req.body.view.embedColor !== undefined && {
-                  embedColor: req.body.view.embedColor || null,
-                }),
-                ...(req.body.view.embedSiteName !== undefined && {
-                  embedSiteName: req.body.view.embedSiteName || null,
-                }),
-                ...(req.body.view.align !== undefined && { align: req.body.view.align || 'center' }),
-                ...(req.body.view.showMimetype !== undefined && {
-                  showMimetype: req.body.view.showMimetype || false,
-                }),
-                ...(req.body.view.showTags !== undefined && { showTags: req.body.view.showTags || false }),
-                ...(req.body.view.showFolder !== undefined && {
-                  showFolder: req.body.view.showFolder || false,
-                }),
-              },
-            }),
-          },
-          select: userSelect,
-        });
+        const data: UserUpdate = {
+          ...(req.body.username && { username: req.body.username }),
+          ...(req.body.password && { password: await hashPassword(req.body.password) }),
+          ...(req.body.avatar !== undefined && { avatar: req.body.avatar || null }),
+          ...(req.body.view && {
+            view: {
+              ...req.user.view,
+              ...(req.body.view.enabled !== undefined && { enabled: req.body.view.enabled || false }),
+              ...(req.body.view.disableTextFiles !== undefined && {
+                disableTextFiles: req.body.view.disableTextFiles || false,
+              }),
+              ...(req.body.view.content !== undefined && { content: req.body.view.content || null }),
+              ...(req.body.view.embed !== undefined && { embed: req.body.view.embed || false }),
+              ...(req.body.view.embedMediaOnly !== undefined && {
+                embedMediaOnly: (() => {
+                  const embedOn = !!(req.body.view.embed !== undefined
+                    ? req.body.view.embed
+                    : (req.user.view as { embed?: boolean }).embed);
+                  return embedOn ? false : req.body.view.embedMediaOnly || false;
+                })(),
+              }),
+              ...(req.body.view.embedTitle !== undefined && {
+                embedTitle: req.body.view.embedTitle || null,
+              }),
+              ...(req.body.view.embedDescription !== undefined && {
+                embedDescription: req.body.view.embedDescription || null,
+              }),
+              ...(req.body.view.embedColor !== undefined && {
+                embedColor: req.body.view.embedColor || null,
+              }),
+              ...(req.body.view.embedSiteName !== undefined && {
+                embedSiteName: req.body.view.embedSiteName || null,
+              }),
+              ...(req.body.view.align !== undefined && { align: req.body.view.align || 'center' }),
+              ...(req.body.view.showMimetype !== undefined && {
+                showMimetype: req.body.view.showMimetype || false,
+              }),
+              ...(req.body.view.showTags !== undefined && { showTags: req.body.view.showTags || false }),
+              ...(req.body.view.showFolder !== undefined && {
+                showFolder: req.body.view.showFolder || false,
+              }),
+            },
+          }),
+        };
+
+        let user: User | null;
+        if (changingPassword) {
+          user = await db.transaction(async (tx) => {
+            await tx
+              .delete(userSessions)
+              .where(
+                and(
+                  eq(userSessions.userId, req.user.id),
+                  ne(userSessions.id, currentSession.sessionId ?? ''),
+                ),
+              );
+            return updateUser(req.user.id, data, tx);
+          });
+        } else if (Object.keys(data).length) {
+          user = await updateUser(req.user.id, data);
+        } else {
+          user = await getUser(req.user.id);
+        }
+        if (!user) throw new ApiError(1068);
 
         await saveSession(currentSession, user, false);
 

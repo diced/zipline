@@ -1,21 +1,21 @@
 import { detectClient, ZiplineClient } from '@/lib/api/detect';
 import { config } from '@/lib/config';
-import { prisma } from '@/lib/db';
+import { db } from '@/lib/db';
+import { userSessions } from '@/lib/db/schema';
 import { randomCharacters } from '@/lib/random';
 import { fastifyCookie } from '@fastify/cookie';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { IncomingMessage, ServerResponse } from 'http';
 import { getIronSession, type SessionOptions } from 'iron-session';
+import { eq } from 'drizzle-orm';
 import { parseUserToken } from './middleware/user';
 
 const cookieOptions: NonNullable<SessionOptions['cookieOptions']> = {
-  // 2 weeks
   maxAge: 60 * 60 * 24 * 14,
   expires: new Date(Date.now() + 60 * 60 * 24 * 14 * 1000),
   path: '/',
   sameSite: 'lax',
   httpOnly: true,
-  // secure is set in below session functions based on config
 };
 
 export type ZiplineSession = {
@@ -83,36 +83,21 @@ export async function saveSession(
     const sessionId = randomCharacters(32);
     session.sessionId = sessionId;
 
+    const dbSession = {
+      id: sessionId,
+      userId: user.id,
+      client: session.client.client,
+      device: session.client.device,
+      ua: session.client.ua,
+    };
+
     if (overwriteSessions) {
-      await prisma.user.update({
-        where: { id: user.id },
-        data: {
-          sessions: {
-            set: [
-              {
-                id: sessionId,
-                client: session.client.client,
-                device: session.client.device,
-                ua: session.client.ua,
-              },
-            ],
-          },
-        },
+      await db.transaction(async (tx) => {
+        await tx.delete(userSessions).where(eq(userSessions.userId, user.id));
+        await tx.insert(userSessions).values(dbSession);
       });
     } else {
-      await prisma.user.update({
-        where: { id: user.id },
-        data: {
-          sessions: {
-            create: {
-              id: sessionId,
-              client: session.client.client,
-              device: session.client.device,
-              ua: session.client.ua,
-            },
-          },
-        },
-      });
+      await db.insert(userSessions).values(dbSession);
     }
   }
 

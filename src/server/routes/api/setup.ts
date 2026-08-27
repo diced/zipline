@@ -1,12 +1,14 @@
 import { ApiError } from '@/lib/api/errors';
 import { createToken, hashPassword } from '@/lib/crypto';
-import { prisma } from '@/lib/db';
-import { User, userSchema, userSelect } from '@/lib/db/models/user';
-import { getZipline } from '@/lib/db/models/zipline';
+import { db } from '@/lib/db';
+import { createUser, type User, userSchema } from '@/lib/db/models/user';
+import { ensureSettingsRow } from '@/lib/db/models/zipline';
+import { zipline } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { zStringTrimmed } from '@/lib/validation';
 import typedPlugin from '@/server/typedPlugin';
+import { eq } from 'drizzle-orm';
 import z from 'zod';
 
 export type ApiSetupResponse = {
@@ -32,7 +34,7 @@ export default typedPlugin(
         },
       },
       async (_, res) => {
-        const { firstSetup } = await getZipline();
+        const { firstSetup } = await ensureSettingsRow();
         if (!firstSetup) throw new ApiError(9001);
 
         return res.send({ firstSetup });
@@ -58,7 +60,7 @@ export default typedPlugin(
         ...secondlyRatelimit(5),
       },
       async (req, res) => {
-        await getZipline();
+        await ensureSettingsRow();
 
         const { username, password } = req.body;
 
@@ -67,23 +69,23 @@ export default typedPlugin(
 
         logger.info('first setup running');
 
-        const user = await prisma.$transaction(async (tx) => {
-          const claimed = await tx.zipline.updateMany({
-            where: { firstSetup: true },
-            data: { firstSetup: false },
-          });
+        const user = await db.transaction(async (tx) => {
+          const [claimed] = await tx
+            .update(zipline)
+            .set({ firstSetup: false })
+            .where(eq(zipline.firstSetup, true))
+            .returning({ id: zipline.id });
+          if (!claimed) throw new ApiError(9001);
 
-          if (claimed.count === 0) throw new ApiError(9001);
-
-          return tx.user.create({
-            data: {
+          return createUser(
+            {
               username,
               password: hashed,
               role: 'SUPERADMIN',
               token,
             },
-            select: userSelect,
-          });
+            tx,
+          );
         });
 
         logger.info('first setup complete');

@@ -1,6 +1,8 @@
+import { ApiError } from '@/lib/api/errors';
 import { config } from '@/lib/config';
-import { prisma } from '@/lib/db';
-import { Invite, inviteInviterSelect, inviteSchema } from '@/lib/db/models/invite';
+import { db } from '@/lib/db';
+import { Invite, inviteSchema } from '@/lib/db/models/invite';
+import { invites } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { randomCharacters } from '@/lib/random';
 import { secondlyRatelimit } from '@/lib/ratelimits';
@@ -41,16 +43,24 @@ export default typedPlugin(
       async (req, res) => {
         const { expiresAt, maxUses } = req.body;
 
-        const invite = await prisma.invite.create({
-          data: {
-            code: randomCharacters(config.invites.length),
-            expiresAt,
-            maxUses: maxUses ?? null,
-            inviterId: req.user.id,
-          },
-          include: {
-            inviter: inviteInviterSelect,
-          },
+        const invite = await db.transaction(async (tx) => {
+          const [created] = await tx
+            .insert(invites)
+            .values({
+              code: randomCharacters(config.invites.length),
+              expiresAt,
+              maxUses: maxUses ?? null,
+              inviterId: req.user.id,
+            })
+            .returning({ id: invites.id });
+          if (!created) throw new ApiError(9005);
+
+          const invite = await tx.query.invites.findFirst({
+            where: { id: created.id },
+            with: { inviter: { columns: { username: true, id: true, role: true } } },
+          });
+          if (!invite) throw new ApiError(9005);
+          return invite;
         });
 
         logger.info(`${req.user.username} created an invite`, {
@@ -75,13 +85,11 @@ export default typedPlugin(
         preHandler: [userMiddleware, administratorMiddleware],
       },
       async (_, res) => {
-        const invites = await prisma.invite.findMany({
-          include: {
-            inviter: inviteInviterSelect,
-          },
+        const list = await db.query.invites.findMany({
+          with: { inviter: { columns: { username: true, id: true, role: true } } },
         });
 
-        return res.send(invites);
+        return res.send(list);
       },
     );
   },

@@ -1,8 +1,10 @@
+import { metrics } from '@/lib/db/schema';
+import { createSelectSchema } from 'drizzle-orm/zod';
 import { z } from 'zod';
 
 export type MetricData = z.infer<typeof metricDataSchema>;
 
-export const metricDataSchema = z.object({
+const metricDataSchema = z.object({
   users: z.number(),
   files: z.number(),
   fileViews: z.number(),
@@ -33,11 +35,6 @@ export const metricDataSchema = z.object({
   ),
 });
 
-export const metricSchema = z.object({
-  id: z.string(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
-  data: metricDataSchema,
-});
+export const metricSchema = createSelectSchema(metrics, { data: metricDataSchema });
 
 export type Metric = z.infer<typeof metricSchema>;

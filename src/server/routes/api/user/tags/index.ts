@@ -1,6 +1,7 @@
 import { ApiError } from '@/lib/api/errors';
-import { prisma } from '@/lib/db';
-import { Tag, tagSchema, tagSelect } from '@/lib/db/models/tag';
+import { db } from '@/lib/db';
+import { tagColumns, Tag, tagSchema } from '@/lib/db/models/tag';
+import { tags } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { zStringTrimmed } from '@/lib/validation';
@@ -28,14 +29,13 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const tags = await prisma.tag.findMany({
-          where: {
-            userId: req.user.id,
-          },
-          select: tagSelect,
+        const tagList = await db.query.tags.findMany({
+          columns: tagColumns,
+          where: { userId: req.user.id },
+          with: { files: { columns: { id: true } } },
         });
 
-        return res.send(tags);
+        return res.send(tagList);
       },
     );
 
@@ -59,23 +59,19 @@ export default typedPlugin(
       async (req, res) => {
         const { name, color } = req.body;
 
-        const existingTag = await prisma.tag.findFirst({
-          where: {
-            name,
-            userId: req.user.id,
-          },
-        });
-
-        if (existingTag) throw new ApiError(1033);
-
-        const tag = await prisma.tag.create({
-          data: {
-            name,
-            color,
-            userId: req.user.id,
-          },
-          select: tagSelect,
-        });
+        const [row] = await db
+          .insert(tags)
+          .values({ name, color, userId: req.user.id })
+          .onConflictDoNothing({ target: tags.name })
+          .returning({
+            id: tags.id,
+            createdAt: tags.createdAt,
+            updatedAt: tags.updatedAt,
+            name: tags.name,
+            color: tags.color,
+          });
+        if (!row) throw new ApiError(1033);
+        const tag = { ...row, files: [] };
 
         logger.info('tag created', {
           id: tag.id,

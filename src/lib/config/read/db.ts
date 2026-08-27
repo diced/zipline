@@ -1,5 +1,4 @@
-import { prisma } from '@/lib/db';
-import { resolve } from 'path';
+import { ensureSettings } from '@/lib/db/models/zipline';
 
 export const DATABASE_TO_PROP = {
   coreReturnHttpsUrls: 'core.returnHttpsUrls',
@@ -140,28 +139,5 @@ export const DATABASE_TO_PROP = {
 export type DatabaseToPropKey = keyof typeof DATABASE_TO_PROP;
 
 export async function readDatabaseSettings() {
-  let ziplineTable = await prisma.zipline.findFirst({
-    omit: {
-      createdAt: true,
-      updatedAt: true,
-      id: true,
-      firstSetup: true,
-    },
-  });
-
-  if (!ziplineTable) {
-    ziplineTable = await prisma.zipline.create({
-      data: {
-        coreTempDirectory: resolve('./uploads/.tmp'),
-      },
-      omit: {
-        createdAt: true,
-        updatedAt: true,
-        id: true,
-        firstSetup: true,
-      },
-    });
-  }
-
-  return ziplineTable;
+  return ensureSettings();
 }

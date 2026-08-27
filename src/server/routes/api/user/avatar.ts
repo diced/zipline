@@ -1,7 +1,9 @@
 import { ApiError } from '@/lib/api/errors';
-import { prisma } from '@/lib/db';
+import { db } from '@/lib/db';
+import { users } from '@/lib/db/schema';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
+import { eq } from 'drizzle-orm';
 import z from 'zod';
 
 export type ApiUserAvatarResponse = string;
@@ -22,18 +24,15 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const u = await prisma.user.findFirstOrThrow({
-          where: {
-            id: req.user.id,
-          },
-          select: {
-            avatar: true,
-          },
-        });
+        const [user] = await db
+          .select({ avatar: users.avatar })
+          .from(users)
+          .where(eq(users.id, req.user.id))
+          .limit(1);
 
-        if (!u.avatar) throw new ApiError(9002);
+        if (!user?.avatar) throw new ApiError(9002);
 
-        return res.send(u.avatar);
+        return res.send(user.avatar);
       },
     );
   },

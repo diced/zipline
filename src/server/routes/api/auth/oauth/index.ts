@@ -1,9 +1,12 @@
 import { ApiError } from '@/lib/api/errors';
-import { prisma } from '@/lib/db';
-import { OAuthProvider, oauthProviderSchema, oauthProviderSelect } from '@/lib/db/models/user';
+import { db } from '@/lib/db';
+import { type OAuthProvider, oauthProviderSchema } from '@/lib/db/models/oauth';
+import { getUser } from '@/lib/db/models/user';
+import { oauthProviders, users } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
+import { and, eq } from 'drizzle-orm';
 import z from 'zod';
 
 export type ApiAuthOauthResponse = OAuthProvider[];
@@ -43,41 +46,33 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const { password } = (await prisma.user.findFirst({
-          where: {
-            id: req.user.id,
-          },
-          select: {
-            password: true,
-          },
-        }))!;
+        const [creds] = await db
+          .select({ password: users.password })
+          .from(users)
+          .where(eq(users.id, req.user.id))
+          .limit(1);
+
+        if (!creds) throw new ApiError(9002);
+        const { password } = creds;
 
         if (!req.user.oauthProviders.length) throw new ApiError(1030);
         if (req.user.oauthProviders.length === 1 && !password) throw new ApiError(1043);
 
         const { provider } = req.body;
 
-        const providers = await prisma.user.update({
-          where: {
-            id: req.user.id,
-          },
-          data: {
-            oauthProviders: {
-              deleteMany: [{ provider }],
-            },
-          },
-          select: {
-            oauthProviders: {
-              select: oauthProviderSelect,
-            },
-          },
+        const user = await db.transaction(async (tx) => {
+          await tx
+            .delete(oauthProviders)
+            .where(and(eq(oauthProviders.userId, req.user.id), eq(oauthProviders.provider, provider)));
+          return getUser(req.user.id, tx);
         });
+        if (!user) throw new ApiError(9002);
 
         logger.info(`${req.user.username} unlinked an oauth provider`, {
           provider,
         });
 
-        return res.send(providers.oauthProviders);
+        return res.send(user.oauthProviders);
       },
     );
   },

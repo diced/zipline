@@ -1,21 +1,17 @@
 import { bytes } from '@/lib/bytes';
 import { datasource } from '@/lib/datasource';
+import { db } from '@/lib/db';
+import { removeFiles } from '@/lib/db/models/file';
+import { files } from '@/lib/db/schema';
+import { and, isNotNull, lte } from 'drizzle-orm';
 import { IntervalTask } from '..';
 
-export default function deleteFiles(prisma: typeof globalThis.__db__) {
+export default function deleteFiles() {
   return async function (this: IntervalTask) {
-    const expiredFiles = await prisma.file.findMany({
-      where: {
-        deletesAt: {
-          lte: new Date(),
-        },
-      },
-      select: {
-        name: true,
-        id: true,
-        size: true,
-      },
-    });
+    const expiredFiles = await db
+      .select({ id: files.id, name: files.name, size: files.size })
+      .from(files)
+      .where(and(isNotNull(files.deletesAt), lte(files.deletesAt, new Date())));
 
     this.logger.debug(`found ${expiredFiles.length} expired files`, {
       files: expiredFiles.map((f) => f.name),
@@ -31,13 +27,7 @@ export default function deleteFiles(prisma: typeof globalThis.__db__) {
       }
     }
 
-    const { count } = await prisma.file.deleteMany({
-      where: {
-        id: {
-          in: expiredFiles.map((f) => f.id),
-        },
-      },
-    });
+    const count = await removeFiles(expiredFiles.map((f) => f.id));
 
     if (count)
       this.logger.info(`deleted ${count} expired files`, {

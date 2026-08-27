@@ -1,49 +1,21 @@
+import { db } from '@/lib/db';
+import { invites } from '@/lib/db/schema';
+import { and, gte, isNotNull, lte, or } from 'drizzle-orm';
 import { IntervalTask } from '..';
 
-export default function clearInvites(prisma: typeof globalThis.__db__) {
+export default function clearInvites() {
   return async function (this: IntervalTask) {
-    const expiredInvites = await prisma.invite.findMany({
-      where: {
-        expiresAt: {
-          lte: new Date(),
-        },
-      },
-      select: {
-        code: true,
-        id: true,
-        uses: true,
-      },
-    });
+    const now = new Date();
+    const deleted = await db
+      .delete(invites)
+      .where(
+        or(lte(invites.expiresAt, now), and(isNotNull(invites.maxUses), gte(invites.uses, invites.maxUses))),
+      )
+      .returning({ code: invites.code });
 
-    this.logger.debug(`found ${expiredInvites.length} expired invites`, {
-      files: expiredInvites.map((i) => i.code),
-    });
-
-    const maxUsedInvites = await prisma.invite.findMany({
-      where: {
-        uses: {
-          gte: prisma.invite.fields.maxUses,
-        },
-      },
-    });
-
-    this.logger.debug(`found ${maxUsedInvites.length} max used invites`, {
-      files: maxUsedInvites.map((i) => i.code),
-    });
-
-    const toDelete = [...expiredInvites, ...maxUsedInvites];
-
-    const { count } = await prisma.invite.deleteMany({
-      where: {
-        id: {
-          in: toDelete.map((i) => i.id),
-        },
-      },
-    });
-
-    if (count)
-      this.logger.info(`deleted ${count} expired/max used invites`, {
-        codes: toDelete.map((i) => i.code),
+    if (deleted.length)
+      this.logger.info(`deleted ${deleted.length} expired/max used invites`, {
+        codes: deleted.map((invite) => invite.code),
       });
   };
 }

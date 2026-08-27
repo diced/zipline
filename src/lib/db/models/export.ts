@@ -1,14 +1,7 @@
-import z from 'zod';
+import { exports } from '@/lib/db/schema';
+import { createSelectSchema } from 'drizzle-orm/zod';
+import { z } from 'zod';
 
-export const exportSchema = z.object({
-  id: z.string(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
-
-  completed: z.boolean(),
-  path: z.string(),
-  files: z.number(),
-  size: z.string(),
-});
+export const exportSchema = createSelectSchema(exports).omit({ userId: true });
 
 export type Export = z.infer<typeof exportSchema>;

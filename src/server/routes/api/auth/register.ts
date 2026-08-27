@@ -1,16 +1,18 @@
-import { ApiError } from '@/lib/api/errors';
 import { ziplineClientParseSchema } from '@/lib/api/detect';
+import { ApiError } from '@/lib/api/errors';
 import { config } from '@/lib/config';
 import { createToken, hashPassword } from '@/lib/crypto';
-import { prisma } from '@/lib/db';
-import { userSchema, userSelect } from '@/lib/db/models/user';
+import { db } from '@/lib/db';
+import { createUser, userSchema } from '@/lib/db/models/user';
+import { invites, users } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
+import { zStringTrimmed } from '@/lib/validation';
 import { getSession, saveSession } from '@/server/session';
 import typedPlugin from '@/server/typedPlugin';
+import { and, eq, gt, isNull, lt, or, sql } from 'drizzle-orm';
 import z from 'zod';
 import { ApiLoginResponse } from './login';
-import { zStringTrimmed } from '@/lib/validation';
 
 export type ApiAuthRegisterResponse = ApiLoginResponse;
 
@@ -49,60 +51,52 @@ export default typedPlugin(
         if (code && !config.invites.enabled) throw new ApiError(1036);
         if (!code && !config.features.userRegistration) throw new ApiError(1037);
 
-        const oUser = await prisma.user.findUnique({
-          where: {
-            username,
-          },
-        });
-        if (oUser) throw new ApiError(1039);
+        const [usernameTaken] = await db.select().from(users).where(eq(users.username, username)).limit(1);
+        if (usernameTaken) throw new ApiError(1039);
 
         const hashedPassword = await hashPassword(password);
         const token = createToken();
 
-        const createUser = (db: Pick<typeof prisma, 'user'>) =>
-          db.user.create({
-            data: {
+        const result = await db.transaction(async (tx) => {
+          let inviteId: string | undefined;
+          if (code) {
+            const [invite] = await tx
+              .update(invites)
+              .set({ uses: sql`${invites.uses} + 1` })
+              .where(
+                and(
+                  or(eq(invites.id, code), eq(invites.code, code)),
+                  or(isNull(invites.expiresAt), gt(invites.expiresAt, new Date())),
+                  or(isNull(invites.maxUses), lt(invites.uses, invites.maxUses)),
+                ),
+              )
+              .returning({ id: invites.id });
+
+            if (!invite) throw new ApiError(1035);
+            inviteId = invite.id;
+          }
+
+          const user = await createUser(
+            {
               username,
               password: hashedPassword,
               role: 'USER',
               token,
             },
-            select: userSelect,
-          });
+            tx,
+          );
 
-        let user;
-        if (code) {
-          const result = await prisma.$transaction(async (tx) => {
-            const [invite] = await tx.invite.updateManyAndReturn({
-              where: {
-                AND: [
-                  { OR: [{ id: code }, { code }] },
-                  { OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }] },
-                  {
-                    OR: [{ maxUses: null }, { uses: { lt: tx.invite.fields.maxUses } }],
-                  },
-                ],
-              },
-              data: { uses: { increment: 1 } },
-              select: { id: true },
-            });
+          return { inviteId, user };
+        });
 
-            if (!invite) throw new ApiError(1035);
-
-            return { inviteId: invite.id, user: await createUser(tx) };
-          });
-
-          user = result.user;
-
+        if (result.inviteId) {
           logger.info('invite used', {
             user: username,
             invite: result.inviteId,
           });
-        } else {
-          user = await createUser(prisma);
         }
 
-        await saveSession(session, user);
+        await saveSession(session, result.user);
 
         logger.info('user registered successfully', {
           username,
@@ -111,7 +105,7 @@ export default typedPlugin(
         });
 
         return res.send({
-          user,
+          user: result.user,
         });
       },
     );

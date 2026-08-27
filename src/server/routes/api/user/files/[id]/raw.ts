@@ -4,7 +4,8 @@ import { ApiError } from '@/lib/api/errors';
 import { parseRange } from '@/lib/api/range';
 import { config } from '@/lib/config';
 import { datasource } from '@/lib/datasource';
-import { prisma } from '@/lib/db';
+import { db } from '@/lib/db';
+import { removeFile } from '@/lib/db/models/file';
 import { sanitizeFilename } from '@/lib/fs';
 import { log } from '@/lib/logger';
 import { guess } from '@/lib/mimes';
@@ -45,22 +46,19 @@ export default typedPlugin(
         if (!id) throw new ApiError(9002);
 
         if (id.startsWith('.thumbnail')) {
-          const thumbnail = await prisma.thumbnail.findFirst({
-            where: {
-              path: id,
-            },
-            include: {
+          const thumbnail = await db.query.thumbnails.findFirst({
+            where: { path: id },
+            with: {
               file: {
-                include: {
-                  User: true,
-                },
+                columns: { userId: true },
+                with: { user: { columns: { id: true, role: true } } },
               },
             },
           });
 
           if (!thumbnail) throw new ApiError(9002);
           if (thumbnail.file && thumbnail.file.userId !== req.user.id) {
-            if (!canInteract(req.user.role, thumbnail.file.User?.role)) throw new ApiError(9002);
+            if (!canInteract(req.user.role, thumbnail.file.user?.role)) throw new ApiError(9002);
           }
 
           const size = await datasource.size(thumbnail.path);
@@ -78,28 +76,20 @@ export default typedPlugin(
             .send(buf);
         }
 
-        const file = await prisma.file.findFirst({
-          where: {
-            OR: [{ id }, { name: id }],
-          },
-          include: {
-            User: true,
-          },
+        const file = await db.query.files.findFirst({
+          where: { OR: [{ id }, { name: id }] },
+          with: { user: { columns: { role: true } } },
         });
         if (!file) throw new ApiError(9002);
 
         if (file.userId !== req.user.id) {
-          if (!canInteract(req.user.role, file.User?.role)) throw new ApiError(9002);
+          if (!canInteract(req.user.role, file.user?.role)) throw new ApiError(9002);
         }
 
         if (file.deletesAt && file.deletesAt <= new Date()) {
           try {
             await datasource.delete(file.name);
-            await prisma.file.delete({
-              where: {
-                id: file.id,
-              },
-            });
+            await removeFile(file.id);
           } catch (e) {
             logger
               .error('failed to delete file on expiration', {
@@ -116,11 +106,7 @@ export default typedPlugin(
 
           try {
             await datasource.delete(file.name);
-            await prisma.file.delete({
-              where: {
-                id: file.id,
-              },
-            });
+            await removeFile(file.id);
           } catch (e) {
             logger
               .error('failed to delete file on max views', {

@@ -1,8 +1,10 @@
-import { prisma } from '@/lib/db';
+import { db } from '@/lib/db';
+import { userSessions } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { userMiddleware } from '@/server/middleware/user';
 import { getSession } from '@/server/session';
 import typedPlugin from '@/server/typedPlugin';
+import { and, eq } from 'drizzle-orm';
 import z from 'zod';
 
 export type ApiLogoutResponse = {
@@ -31,12 +33,9 @@ export default typedPlugin(
       async (req, res) => {
         const current = await getSession(req, res);
 
-        await prisma.userSession.deleteMany({
-          where: {
-            id: current.sessionId!,
-            userId: req.user.id,
-          },
-        });
+        await db
+          .delete(userSessions)
+          .where(and(eq(userSessions.userId, req.user.id), eq(userSessions.id, current.sessionId!)));
 
         current.destroy();
 

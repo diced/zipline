@@ -1,46 +1,14 @@
+import { ApiError } from '@/lib/api/errors';
+import { db, type DbClient } from '@/lib/db';
+import type { Role } from '@/lib/db/enums';
+import { users } from '@/lib/db/schema';
+import { eq, isNotNull } from 'drizzle-orm';
+import { createSelectSchema } from 'drizzle-orm/zod';
 import { z } from 'zod';
-
-export const oauthProviderSelect = {
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-  userId: true,
-  provider: true,
-  username: true,
-  oauthId: true,
-};
-
-export const userSelect = {
-  id: true,
-  username: true,
-  createdAt: true,
-  updatedAt: true,
-  role: true,
-  view: true,
-  oauthProviders: {
-    select: oauthProviderSelect,
-  },
-  totpEnabled: true,
-  passkeys: true,
-  quota: true,
-  sessions: true,
-};
-
-export const loginUserSelect = {
-  ...userSelect,
-  password: true,
-  totpSecret: true,
-};
-
-export const limitedUserSelect = {
-  id: true,
-  username: true,
-  createdAt: true,
-  updatedAt: true,
-  role: true,
-  view: true,
-  quota: true,
-};
+import { oauthProviderSchema } from './oauth';
+import { userPasskeySchema } from './passkey';
+import { userQuotaSchema } from './quota';
+import { userSessionSchema } from './session';
 
 export const userViewSchema = z
   .object({
@@ -60,77 +28,23 @@ export const userViewSchema = z
   })
   .partial();
 
-export type UserViewSettings = z.infer<typeof userViewSchema>;
-
-export const userSessionSchema = z.object({
-  id: z.string(),
-  createdAt: z.date(),
-  ua: z.string(),
-  client: z.string(),
-  device: z.string(),
-  userId: z.string(),
+const userScalarSchema = createSelectSchema(users, { view: userViewSchema }).pick({
+  id: true,
+  username: true,
+  createdAt: true,
+  updatedAt: true,
+  role: true,
+  view: true,
+  avatar: true,
 });
 
-export type UserSession = z.infer<typeof userSessionSchema>;
-
-export const userQuotaSchema = z.object({
-  id: z.string(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
-  filesQuota: z.enum(['BY_BYTES', 'BY_FILES']),
-  maxBytes: z.string().nullable(),
-  maxFiles: z.number().nullable(),
-  maxUrls: z.number().nullable(),
-  userId: z.string().nullable(),
-});
-
-export type UserQuota = z.infer<typeof userQuotaSchema>;
-
-export const userPasskeySchema = z.object({
-  id: z.string(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
-  lastUsed: z.date().nullable(),
-  name: z.string(),
-  reg: z.any(),
-  userId: z.string(),
-});
-
-export type UserPasskey = z.infer<typeof userPasskeySchema>;
-
-export const oauthProviderSchema = z.object({
-  id: z.string(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
-  userId: z.string(),
-  provider: z.enum(['DISCORD', 'GOOGLE', 'GITHUB', 'OIDC']),
-  username: z.string(),
-  oauthId: z.string().nullable(),
-});
-
-export type OAuthProvider = z.infer<typeof oauthProviderSchema>;
-export type OAuthProviderType = OAuthProvider['provider'];
-
-export const userSchema = z.object({
-  id: z.string(),
-  username: z.string(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
-  role: z.enum(['USER', 'ADMIN', 'SUPERADMIN']),
-  view: userViewSchema,
-
+export const userSchema = userScalarSchema.partial({ avatar: true }).extend({
   sessions: z.array(userSessionSchema),
   oauthProviders: z.array(oauthProviderSchema),
-
   totpEnabled: z.boolean(),
   passkeys: z.array(userPasskeySchema).optional(),
-
   quota: userQuotaSchema.nullable().optional(),
-
-  avatar: z.string().nullable().optional(),
 });
-
-export type User = z.infer<typeof userSchema>;
 
 export const limitedUserSchema = userSchema.omit({
   oauthProviders: true,
@@ -139,4 +53,144 @@ export const limitedUserSchema = userSchema.omit({
   sessions: true,
 });
 
+export type User = z.infer<typeof userSchema>;
 export type LimitedUser = z.infer<typeof limitedUserSchema>;
+type LoginUser = User & Pick<typeof users.$inferSelect, 'password' | 'totpSecret'>;
+
+type UserInsert = typeof users.$inferInsert;
+export type UserUpdate = Partial<Omit<UserInsert, 'id' | 'createdAt' | 'updatedAt'>>;
+type UserWhere = Partial<Pick<typeof users.$inferSelect, 'id' | 'username' | 'token'>>;
+
+const publicUserColumns = {
+  id: true,
+  username: true,
+  createdAt: true,
+  updatedAt: true,
+  role: true,
+  view: true,
+} as const;
+
+const publicUserColumnsWithAvatar = {
+  ...publicUserColumns,
+  avatar: true,
+} as const;
+
+const totpEnabled = (user: typeof users) => isNotNull(user.totpSecret).mapWith(Boolean);
+
+const userRelations = {
+  sessions: true,
+  oauthProviders: {
+    columns: {
+      accessToken: false,
+      refreshToken: false,
+    },
+  },
+  passkeys: true,
+  quota: true,
+} as const;
+
+function parseView<T extends { view: unknown }>(row: T) {
+  return { ...row, view: userViewSchema.parse(row.view) };
+}
+
+async function findUser(where: UserWhere, client: DbClient): Promise<User | null> {
+  const row = await client.query.users.findFirst({
+    columns: publicUserColumns,
+    extras: { totpEnabled },
+    where,
+    with: userRelations,
+  });
+  return row ? parseView(row) : null;
+}
+
+export async function getUserIdentity(id: string, client: DbClient = db) {
+  const user = await client.query.users.findFirst({
+    columns: { id: true, username: true, role: true },
+    where: { id },
+  });
+  return user ?? null;
+}
+
+export async function getUser(id: string, client: DbClient = db) {
+  return findUser({ id }, client);
+}
+
+export async function getLoginUser(username: string, client: DbClient = db): Promise<LoginUser | null> {
+  const row = await client.query.users.findFirst({
+    columns: { ...publicUserColumns, password: true, totpSecret: true },
+    extras: { totpEnabled },
+    where: { username },
+    with: userRelations,
+  });
+  return row ? parseView(row) : null;
+}
+
+export async function getUserByToken(token: string, client: DbClient = db) {
+  return findUser({ token }, client);
+}
+
+export async function getUserBySession(sessionId: string, client: DbClient = db): Promise<User | null> {
+  const user = await client.query.users.findFirst({
+    columns: publicUserColumns,
+    extras: { totpEnabled },
+    where: { sessions: { id: sessionId } },
+    with: userRelations,
+  });
+  return user ? parseView(user) : null;
+}
+
+export async function getUserSummary(id: string, client: DbClient = db) {
+  const row = await client.query.users.findFirst({
+    columns: publicUserColumns,
+    where: { id },
+    with: { quota: true },
+  });
+  return row ? parseView(row) : null;
+}
+
+export async function listUsers(
+  options: { roles?: readonly Role[]; excludeId?: string; avatar?: boolean } = {},
+  client: DbClient = db,
+): Promise<LimitedUser[]> {
+  if (options.roles?.length === 0) return [];
+  const rows = await client.query.users.findMany({
+    columns: options.avatar ? publicUserColumnsWithAvatar : publicUserColumns,
+    where:
+      options.roles || options.excludeId
+        ? {
+            role: options.roles ? { in: [...options.roles] } : undefined,
+            id: options.excludeId ? { ne: options.excludeId } : undefined,
+          }
+        : undefined,
+    with: { quota: true },
+  });
+  return rows.map(parseView);
+}
+
+export async function listUserDetails(
+  options: { id?: string; avatar?: boolean } = {},
+  client: DbClient = db,
+): Promise<User[]> {
+  const rows = await client.query.users.findMany({
+    columns: options.avatar ? publicUserColumnsWithAvatar : publicUserColumns,
+    extras: { totpEnabled },
+    where: options.id ? { id: options.id } : undefined,
+    with: userRelations,
+  });
+  return rows.map(parseView);
+}
+
+export async function createUser(data: UserInsert, client: DbClient = db) {
+  const [inserted] = await client.insert(users).values(data).returning({ id: users.id });
+  if (!inserted) throw new ApiError(9005);
+
+  const created = await getUser(inserted.id, client);
+  if (!created) throw new ApiError(9005);
+
+  return created;
+}
+
+export async function updateUser(id: string, data: UserUpdate, client: DbClient = db) {
+  const [updated] = await client.update(users).set(data).where(eq(users.id, id)).returning({ id: users.id });
+  return updated ? getUser(updated.id, client) : null;
+}

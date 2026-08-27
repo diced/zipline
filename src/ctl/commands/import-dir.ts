@@ -1,8 +1,11 @@
 import { bytes } from '@/lib/bytes';
 import { config, reloadSettings } from '@/lib/config';
 import { getDatasource } from '@/lib/datasource';
-import { prisma } from '@/lib/db';
+import { db } from '@/lib/db';
+import { getOwnedFolder } from '@/lib/db/models/folder';
+import { files, users } from '@/lib/db/schema';
 import { guess } from '@/lib/mimes';
+import { eq } from 'drizzle-orm';
 import { statSync } from 'fs';
 import { mkdir, readdir } from 'fs/promises';
 import { join, parse, resolve } from 'path';
@@ -21,16 +24,19 @@ export async function importDir(
   if (id) {
     userId = id;
   } else {
-    const user = await prisma.user.findFirst({
-      where: { username: 'administrator', role: 'SUPERADMIN' },
-    });
+    const [candidate] = await db
+      .select({ id: users.id, username: users.username, role: users.role })
+      .from(users)
+      .where(eq(users.username, 'administrator'))
+      .limit(1);
+    const user = candidate?.role === 'SUPERADMIN' ? candidate : null;
 
     if (!user) {
-      const firstSuperAdmin = await prisma.user.findFirst({
-        where: {
-          role: 'SUPERADMIN',
-        },
-      });
+      const [firstSuperAdmin] = await db
+        .select({ id: users.id, username: users.username, role: users.role })
+        .from(users)
+        .where(eq(users.role, 'SUPERADMIN'))
+        .limit(1);
 
       if (!firstSuperAdmin) return console.error('No superadmin found or "administrator" user.');
 
@@ -43,25 +49,20 @@ export async function importDir(
   }
 
   if (folder) {
-    const exists = await prisma.folder.findFirst({
-      where: {
-        id: folder,
-        userId,
-      },
-    });
+    const exists = await getOwnedFolder(folder, userId);
 
     if (!exists) return console.error('Folder not found:', folder);
   }
 
-  const files = await readdir(fullPath);
+  const dirents = await readdir(fullPath);
+  const filenames = dirents.filter((filename) => !parse(filename).base.startsWith('.thumbnail'));
   const data = [];
 
-  for (let i = 0; i !== files.length; ++i) {
-    const info = parse(files[i]);
-    if (info.base.startsWith('.thumbnail')) continue;
+  for (let i = 0; i !== filenames.length; ++i) {
+    const info = parse(filenames[i]);
 
     const mime = await guess(info.ext.replace('.', ''));
-    const { size } = statSync(join(fullPath, files[i]));
+    const { size } = statSync(join(fullPath, filenames[i]));
 
     data.push({
       name: info.base,
@@ -73,10 +74,12 @@ export async function importDir(
   }
 
   if (!skipDb) {
-    const { count } = await prisma.file.createMany({
-      data,
-    });
-    console.log(`Inserted ${count} files into the database.`);
+    let created: { id: string }[] = [];
+    if (data.length) {
+      const insertedFiles = await db.insert(files).values(data).returning({ id: files.id });
+      created = insertedFiles;
+    }
+    console.log(`Inserted ${created.length} files into the database.`);
   }
 
   const totalSize = data.reduce((acc, file) => acc + file.size, 0);
@@ -96,7 +99,7 @@ export async function importDir(
 
     const start = process.hrtime();
 
-    await datasource.put(data[i].name, join(fullPath, files[i]), {
+    await datasource.put(data[i].name, join(fullPath, filenames[i]), {
       mimetype: data[i].type ?? 'application/octet-stream',
       noDelete: true,
     });
@@ -113,7 +116,7 @@ export async function importDir(
     completed += data[i].size;
 
     console.log(
-      `Uploaded ${data[i].name} in ${timeStr} (${bytes(data[i].size)}) ${i + 1}/${files.length} ${bytes(completed)}/${bytes(totalSize)} ${uploadSpeedStr}`,
+      `Uploaded ${data[i].name} in ${timeStr} (${bytes(data[i].size)}) ${i + 1}/${filenames.length} ${bytes(completed)}/${bytes(totalSize)} ${uploadSpeedStr}`,
     );
 
     ++imported;

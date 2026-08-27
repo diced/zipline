@@ -1,5 +1,5 @@
-import { Zipline } from '@/prisma/client';
-import { OAuthProviderType, Role, UserFilesQuota } from '@/prisma/enums';
+import { oauthProviderTypeValues, roleValues, userFilesQuotaValues } from '@/lib/db/enums';
+import type { Zipline } from '@/lib/db/schema';
 import { z } from 'zod';
 
 export type Export4 = z.infer<typeof export4Schema>;
@@ -63,7 +63,7 @@ export const export4Schema = z.object({
         username: z.string(),
         password: z.string().nullish(),
         avatar: z.string().nullish(),
-        role: z.enum(Role),
+        role: z.enum(roleValues),
         view: z.record(z.string(), z.any()),
         totpSecret: z.string().nullish(),
       }),
@@ -85,7 +85,7 @@ export const export4Schema = z.object({
       z.object({
         id: z.string(),
         createdAt: z.string().refine((date) => !isNaN(Date.parse(date)), 'Invalid date'),
-        filesQuota: z.enum(UserFilesQuota),
+        filesQuota: z.enum(userFilesQuotaValues),
         maxBytes: z.string().nullish(),
         maxFiles: z.number().nullish(),
         maxUrls: z.number().nullish(),
@@ -96,7 +96,7 @@ export const export4Schema = z.object({
       z.object({
         id: z.string(),
         createdAt: z.string().refine((date) => !isNaN(Date.parse(date)), 'Invalid date'),
-        provider: z.enum(OAuthProviderType),
+        provider: z.enum(oauthProviderTypeValues),
         username: z.string(),
         accessToken: z.string(),
         refreshToken: z.string().nullish(),

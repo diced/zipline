@@ -1,6 +1,6 @@
 import { config } from '@/lib/config';
 import { schema as configSchema } from '@/lib/config/validate';
-import { getZipline } from '@/lib/db/models/zipline';
+import { ensureSettingsRow } from '@/lib/db/models/zipline';
 import enabled from '@/lib/oauth/enabled';
 import { isTruthy } from '@/lib/primitive';
 import typedPlugin from '@/server/typedPlugin';
@@ -65,7 +65,7 @@ export default typedPlugin(
         },
       },
       async (_, res) => {
-        const zipline = await getZipline();
+        const zipline = await ensureSettingsRow();
 
         const response: ApiServerPublicResponse = {
           oauth: {

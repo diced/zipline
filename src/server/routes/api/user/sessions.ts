@@ -1,10 +1,12 @@
 import { ApiError } from '@/lib/api/errors';
-import { prisma } from '@/lib/db';
+import { db } from '@/lib/db';
+import { type UserSession, userSessionSchema } from '@/lib/db/models/session';
+import { userSessions } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
-import { UserSession, userSessionSchema } from '@/lib/db/models/user';
 import { userMiddleware } from '@/server/middleware/user';
 import { getSession } from '@/server/session';
 import typedPlugin from '@/server/typedPlugin';
+import { and, eq, ne } from 'drizzle-orm';
 import z from 'zod';
 
 export type ApiUserSessionsResponse = {
@@ -67,30 +69,17 @@ export default typedPlugin(
         const currentSession = await getSession(req, res);
 
         if (req.body.all) {
-          const user = await prisma.user.update({
-            where: {
-              id: req.user.id,
-            },
-            data: {
-              sessions: {
-                deleteMany: {
-                  NOT: {
-                    id: currentSession.sessionId!,
-                  },
-                },
-              },
-            },
-            include: {
-              sessions: true,
-            },
-          });
+          await db
+            .delete(userSessions)
+            .where(and(eq(userSessions.userId, req.user.id), ne(userSessions.id, currentSession.sessionId!)));
+          const sessions = await db.select().from(userSessions).where(eq(userSessions.userId, req.user.id));
 
           logger.info('user logged out all logged in sessions', {
             user: req.user.username,
           });
 
           return res.send({
-            current: user.sessions.find((session) => session.id === currentSession.sessionId)!,
+            current: sessions.find((session) => session.id === currentSession.sessionId)!,
             other: [],
           });
         }
@@ -98,21 +87,10 @@ export default typedPlugin(
         if (req.body.sessionId === currentSession.sessionId) throw new ApiError(1021);
         if (!req.user.sessions.find((session) => session.id === req.body.sessionId)) throw new ApiError(1031);
 
-        const user = await prisma.user.update({
-          where: {
-            id: req.user.id,
-          },
-          data: {
-            sessions: {
-              delete: {
-                id: req.body.sessionId,
-              },
-            },
-          },
-          include: {
-            sessions: true,
-          },
-        });
+        await db
+          .delete(userSessions)
+          .where(and(eq(userSessions.userId, req.user.id), eq(userSessions.id, req.body.sessionId!)));
+        const sessions = await db.select().from(userSessions).where(eq(userSessions.userId, req.user.id));
 
         logger.info('user logged out of session', {
           user: req.user.username,
@@ -120,8 +98,8 @@ export default typedPlugin(
         });
 
         return res.send({
-          current: user.sessions.find((session) => session.id === currentSession.sessionId) ?? null,
-          other: user.sessions.filter((session) => session.id !== currentSession.sessionId),
+          current: sessions.find((session) => session.id === currentSession.sessionId) ?? null,
+          other: sessions.filter((session) => session.id !== currentSession.sessionId),
         });
       },
     );

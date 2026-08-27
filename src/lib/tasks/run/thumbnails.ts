@@ -1,4 +1,7 @@
+import { db } from '@/lib/db';
 import { IntervalTask, WorkerTask } from '..';
+import { files, thumbnails } from '@/lib/db/schema';
+import { and, gt, like, notInArray } from 'drizzle-orm';
 
 export function runThumbnailWorkers(workers: WorkerTask[], files: string[]) {
   const thumbToWorker: { id: string; worker: number }[] = [];
@@ -26,7 +29,7 @@ export function runThumbnailWorkers(workers: WorkerTask[], files: string[]) {
   }
 }
 
-export default function thumbnails(prisma: typeof globalThis.__db__) {
+export default function thumbnailsTask() {
   return async function (this: IntervalTask, rerun = false) {
     const thumbnailWorkers = this.tasks.tasks.filter(
       (x) => 'worker' in x && x.id.startsWith('thumbnail'),
@@ -36,17 +39,18 @@ export default function thumbnails(prisma: typeof globalThis.__db__) {
 
     if (rerun) this.logger.debug('regenerating thumbnails for all videos');
 
-    const thumbnailNeeded = await prisma.file.findMany({
-      where: {
-        ...(rerun ? {} : { thumbnail: { is: null } }),
-
-        type: {
-          startsWith: 'video/',
-        },
-        size: { gt: 0 },
-      },
-    });
-    if (!thumbnailNeeded.length) return;
+    const thumbnailNeeded = await db
+      .select({ id: files.id })
+      .from(files)
+      .where(
+        and(
+          like(files.type, 'video/%'),
+          gt(files.size, 0),
+          !rerun
+            ? notInArray(files.id, db.select({ fileId: thumbnails.fileId }).from(thumbnails))
+            : undefined,
+        ),
+      );
 
     this.logger.debug(`found ${thumbnailNeeded.length} files that need thumbnails`);
 

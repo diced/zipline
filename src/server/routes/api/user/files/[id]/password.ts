@@ -1,12 +1,14 @@
 import { ApiError } from '@/lib/api/errors';
 import { createAccessToken } from '@/lib/accessToken';
 import { verifyPassword } from '@/lib/crypto';
-import { prisma } from '@/lib/db';
+import { db } from '@/lib/db';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { zStringTrimmed } from '@/lib/validation';
 import typedPlugin from '@/server/typedPlugin';
 import z from 'zod';
+import { files } from '@/lib/db/schema';
+import { eq, or } from 'drizzle-orm';
 
 export type ApiUserFilesIdPasswordResponse = {
   success: boolean;
@@ -40,16 +42,11 @@ export default typedPlugin(
         ...secondlyRatelimit(2),
       },
       async (req, res) => {
-        const file = await prisma.file.findFirst({
-          where: {
-            OR: [{ id: req.params.id }, { name: req.params.id }],
-          },
-          select: {
-            name: true,
-            password: true,
-            id: true,
-          },
-        });
+        const [file] = await db
+          .select({ id: files.id, name: files.name, password: files.password })
+          .from(files)
+          .where(or(eq(files.id, req.params.id), eq(files.name, req.params.id)));
+
         if (!file) throw new ApiError(4000);
         if (!file.password) throw new ApiError(4000);
 

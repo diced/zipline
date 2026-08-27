@@ -68,6 +68,7 @@ export const API_ERRORS = {
   1067: 'Current password is required to set a new password',
   1068: "Couldn't find current password for this account",
   1069: 'TOTP is already enabled',
+  1070: "You don't own this passkey",
 
   // 2xxx, session errors
   2000: 'Invalid login session',
@@ -135,6 +136,7 @@ export const API_ERRORS = {
   9001: 'Forbidden',
   9002: 'Not found',
   9004: 'Internal server error',
+  9005: 'Database operation failed',
 } as const satisfies Record<number, string>;
 
 export type ApiErrorCode = keyof typeof API_ERRORS;
@@ -193,6 +195,7 @@ export class ApiError extends Error {
       9001: 403,
       9002: 404,
       9004: 500,
+      9005: 500,
     }[code as unknown as number];
     if (override) return override;
 

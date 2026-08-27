@@ -1,10 +1,13 @@
-import { prisma } from '@/lib/db';
+import { db } from '@/lib/db';
 import { IncompleteFile, incompleteFileSchema } from '@/lib/db/models/incompleteFile';
+import { incompleteFiles } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
 import z from 'zod';
+import { and, eq, inArray } from 'drizzle-orm';
+import { ApiError } from '@/lib/api/errors';
 
 export type ApiUserFilesIncompleteResponse = IncompleteFile[] | { count: number };
 
@@ -26,13 +29,12 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const incompleteFiles = await prisma.incompleteFile.findMany({
-          where: {
-            userId: req.user.id,
-          },
-        });
+        const pendingFiles = await db
+          .select()
+          .from(incompleteFiles)
+          .where(eq(incompleteFiles.userId, req.user.id));
 
-        return res.send(incompleteFiles);
+        return res.send(pendingFiles);
       },
     );
 
@@ -55,29 +57,19 @@ export default typedPlugin(
         ...secondlyRatelimit(1),
       },
       async (req, res) => {
-        const existingFiles = await prisma.incompleteFile.findMany({
-          where: {
-            id: {
-              in: req.body.id,
-            },
-            userId: req.user.id,
-          },
-        });
+        if (!req.body.id.length) throw new ApiError(1027);
 
-        const incompleteFiles = await prisma.incompleteFile.deleteMany({
-          where: {
-            id: {
-              in: existingFiles.map((x) => x.id),
-            },
-          },
-        });
+        const removed = await db
+          .delete(incompleteFiles)
+          .where(and(eq(incompleteFiles.userId, req.user.id), inArray(incompleteFiles.id, req.body.id)))
+          .returning({ id: incompleteFiles.id });
 
         logger.info('incomplete files deleted', {
-          count: incompleteFiles.count,
+          count: removed.length,
           user: req.user.username,
         });
 
-        return res.send(incompleteFiles);
+        return res.send({ count: removed.length });
       },
     );
   },

@@ -2,14 +2,15 @@ import { ApiError } from '@/lib/api/errors';
 import { bytes } from '@/lib/bytes';
 import { config } from '@/lib/config';
 import { datasource } from '@/lib/datasource';
-import { prisma } from '@/lib/db';
-import { exportSchema } from '@/lib/db/models/export';
+import { db } from '@/lib/db';
+import { Export, exportSchema } from '@/lib/db/models/export';
+import { exports, files } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
-import { Export } from '@/prisma/client';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
 import archiver from 'archiver';
+import { and, eq } from 'drizzle-orm';
 import { createWriteStream } from 'fs';
 import { rm, stat } from 'fs/promises';
 import { join } from 'path';
@@ -45,20 +46,33 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const exports = await prisma.export.findMany({
-          where: { userId: req.user.id },
-        });
-
         if (req.query.id) {
-          const file = exports.find((x) => x.id === req.query.id);
-          if (!file) throw new ApiError(9002);
+          const [file] = await db
+            .select()
+            .from(exports)
+            .where(and(eq(exports.id, req.query.id), eq(exports.userId, req.user.id)))
+            .limit(1);
 
+          if (!file) throw new ApiError(9002);
           if (!file.completed) throw new ApiError(1024);
 
           return res.sendFile(file.path);
         }
 
-        return res.send(exports);
+        const exportList = await db
+          .select({
+            id: exports.id,
+            createdAt: exports.createdAt,
+            updatedAt: exports.updatedAt,
+            completed: exports.completed,
+            files: exports.files,
+            size: exports.size,
+            path: exports.path,
+          })
+          .from(exports)
+          .where(eq(exports.userId, req.user.id));
+
+        return res.send(exportList);
       },
     );
 
@@ -80,12 +94,12 @@ export default typedPlugin(
       async (req, res) => {
         if (!req.query.id) throw new ApiError(1029);
 
-        const exportDb = await prisma.export.findFirst({
-          where: {
-            userId: req.user.id,
-            id: req.query.id,
-          },
-        });
+        const [exportDb] = await db
+          .select({ id: exports.id, path: exports.path })
+          .from(exports)
+          .where(and(eq(exports.id, req.query.id), eq(exports.userId, req.user.id)))
+          .limit(1);
+
         if (!exportDb) throw new ApiError(9002);
 
         const path = join(config.core.tempDirectory, exportDb.path);
@@ -99,7 +113,11 @@ export default typedPlugin(
           );
         }
 
-        await prisma.export.delete({ where: { id: req.query.id } });
+        const [deleted] = await db
+          .delete(exports)
+          .where(and(eq(exports.id, req.query.id), eq(exports.userId, req.user.id)))
+          .returning({ id: exports.id });
+        if (!deleted) throw new ApiError(9002);
 
         logger.info(`deleted export ${exportDb.id}: ${exportDb.path}`);
 
@@ -123,25 +141,29 @@ export default typedPlugin(
         ...secondlyRatelimit(5),
       },
       async (req, res) => {
-        const files = await prisma.file.findMany({
-          where: { userId: req.user.id },
-        });
+        const rows = await db
+          .select({ name: files.name, size: files.size })
+          .from(files)
+          .where(eq(files.userId, req.user.id));
 
-        if (!files.length) throw new ApiError(1025);
+        if (!rows.length) throw new ApiError(1025);
 
-        const exportFileName = `zexport_${req.user.id}_${Date.now()}_${files.length}.zip`;
+        const exportFileName = `zexport_${req.user.id}_${Date.now()}_${rows.length}.zip`;
         const exportPath = join(config.core.tempDirectory, exportFileName);
 
-        logger.debug(`exporting ${req.user.id}`, { exportPath, files: files.length });
+        logger.debug(`exporting ${req.user.id}`, { exportPath, files: rows.length });
 
-        const exportDb = await prisma.export.create({
-          data: {
+        const [exportDb] = await db
+          .insert(exports)
+          .values({
             userId: req.user.id,
             path: exportFileName,
-            files: files.length,
+            files: rows.length,
             size: '0',
-          },
-        });
+          })
+          .returning({ id: exports.id });
+        if (!exportDb) throw new ApiError(9005);
+
         const writeStream = createWriteStream(exportPath);
 
         const zip = archiver('zip', {
@@ -151,7 +173,7 @@ export default typedPlugin(
         zip.pipe(writeStream);
 
         let totalSize = 0;
-        for (const file of files) {
+        for (const file of rows) {
           const stream = await datasource.get(file.name);
           if (!stream) {
             logger.warn(`failed to get file ${file.name}`);
@@ -163,16 +185,22 @@ export default typedPlugin(
           logger.debug('file added to zip', { name: file.name, size: file.size });
         }
 
-        writeStream.on('close', async () => {
+        async function completeExport() {
           logger.debug('exported', { path: exportPath, bytes: zip.pointer() });
           logger.info(`export for ${req.user.id} finished at ${exportPath}`);
 
-          await prisma.export.update({
-            where: { id: exportDb.id },
-            data: {
-              completed: true,
-              size: (await stat(exportPath)).size.toString(),
-            },
+          const exportStats = await stat(exportPath);
+          const [completed] = await db
+            .update(exports)
+            .set({ completed: true, size: exportStats.size.toString() })
+            .where(eq(exports.id, exportDb.id))
+            .returning({ id: exports.id });
+          if (!completed) throw new ApiError(9005);
+        }
+
+        writeStream.on('close', () => {
+          void completeExport().catch((error) => {
+            logger.error('failed to complete export', { error, exportId: exportDb.id });
           });
         });
 

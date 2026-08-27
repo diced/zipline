@@ -1,7 +1,7 @@
 import { config } from '@/lib/config';
 import { decryptToken } from '@/lib/crypto';
-import { prisma } from '@/lib/db';
-import { limitedUserSelect, User, userSelect } from '@/lib/db/models/user';
+import { db } from '@/lib/db';
+import { getUserBySession, getUserByToken, type User } from '@/lib/db/models/user';
 import { FastifyReply } from 'fastify';
 import { FastifyRequest } from 'fastify/types/request';
 import { getSession } from '../session';
@@ -45,7 +45,6 @@ export async function userMiddleware(req: FastifyRequest, res: FastifyReply) {
   const upload = ['/api/upload', '/api/upload/partial'].includes(path);
   const leanUpload = upload && !config.discord?.onUpload && !config.httpWebhook.onUpload;
 
-  // conditions met to allow anonymous folder uploads but later handled in the upload route
   const anonFolderUpload =
     req.headers['x-zipline-folder'] &&
     upload &&
@@ -58,12 +57,16 @@ export async function userMiddleware(req: FastifyRequest, res: FastifyReply) {
   if (authorization) {
     const token = parseUserToken(authorization);
 
-    const user = await prisma.user.findFirst({
-      where: {
-        token,
-      },
-      select: leanUpload ? limitedUserSelect : userSelect,
-    });
+    let user;
+    if (leanUpload) {
+      user = await db.query.users.findFirst({
+        columns: { id: true, username: true, role: true },
+        where: { token },
+        with: { quota: true },
+      });
+    } else {
+      user = await getUserByToken(token);
+    }
     if (!user) throw new ApiError(2001);
 
     req.user = user as User;
@@ -76,16 +79,16 @@ export async function userMiddleware(req: FastifyRequest, res: FastifyReply) {
 
   if (!session.id || !session.sessionId) throw new ApiError(2000);
 
-  const user = await prisma.user.findFirst({
-    where: {
-      sessions: {
-        some: {
-          id: session.sessionId,
-        },
-      },
-    },
-    select: leanUpload ? limitedUserSelect : userSelect,
-  });
+  let user;
+  if (leanUpload) {
+    user = await db.query.users.findFirst({
+      columns: { id: true, username: true, role: true },
+      where: { sessions: { id: session.sessionId } },
+      with: { quota: true },
+    });
+  } else {
+    user = await getUserBySession(session.sessionId);
+  }
   if (!user) throw new ApiError(2001);
 
   req.user = user as User;

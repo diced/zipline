@@ -1,8 +1,10 @@
 import { ApiError } from '@/lib/api/errors';
 import { config } from '@/lib/config';
 import { hashPassword } from '@/lib/crypto';
-import { prisma } from '@/lib/db';
-import { cleanUrlPasswords, Url, urlSchema } from '@/lib/db/models/url';
+import { db } from '@/lib/db';
+import { Url, urlSchema } from '@/lib/db/models/url';
+import { urls, users } from '@/lib/db/schema';
+import { containsText } from '@/lib/db/utils';
 import { log } from '@/lib/logger';
 import { randomCharacters } from '@/lib/random';
 import { RESERVED_ROUTES } from '@/lib/reservedRoutes';
@@ -10,6 +12,7 @@ import { zStringTrimmed } from '@/lib/validation';
 import { onShorten } from '@/lib/webhooks';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
+import { and, eq, getColumns, isNotNull } from 'drizzle-orm';
 import { z } from 'zod';
 
 export type ApiUserUrlsResponse =
@@ -20,6 +23,7 @@ export type ApiUserUrlsResponse =
 
 export const PATH = '/api/user/urls';
 const logger = log('api').c('user').c('urls');
+const { password: _password, ...urlColumns } = getColumns(urls);
 
 export default typedPlugin(
   async (server) => {
@@ -90,48 +94,44 @@ export default typedPlugin(
           : undefined;
 
         if (vanity) {
-          const existingVanity = await prisma.url.findFirst({
-            where: {
-              vanity: vanity,
-            },
-          });
-
-          if (existingVanity) throw new ApiError(1042);
+          const vanityCount = await db.$count(urls, eq(urls.vanity, vanity));
+          if (vanityCount > 0) throw new ApiError(1042);
         }
 
         let code, existingCode;
         do {
           code = randomCharacters(config.urls.length);
-          existingCode = await prisma.url.findFirst({ where: { code } });
+          const codeCount = await db.$count(urls, eq(urls.code, code));
+          existingCode = codeCount > 0;
         } while (existingCode);
 
-        const url = await prisma.$transaction(async (tx) => {
-          await tx.$queryRaw`SELECT "id" FROM "User" WHERE "id" = ${req.user.id} FOR UPDATE`;
+        const url = await db.transaction(async (tx) => {
+          await tx.select({ id: users.id }).from(users).where(eq(users.id, req.user.id)).for('update');
 
-          const countUrls = await tx.url.count({
-            where: { userId: req.user.id },
-          });
-          if (req.user.quota?.maxUrls && countUrls + 1 > req.user.quota.maxUrls)
-            throw new ApiError(
-              3012,
-              `Shortening this URL would exceed your quota of ${req.user.quota.maxUrls} URLs.`,
-            );
+          const count = await tx.$count(urls, eq(urls.userId, req.user.id));
+          if (req.user.quota?.maxUrls && count + 1 > req.user.quota.maxUrls) return null;
 
-          return tx.url.create({
-            data: {
+          const [created] = await tx
+            .insert(urls)
+            .values({
               userId: req.user.id,
-              destination: destination,
+              destination,
               code,
-              ...(vanity && { vanity: vanity }),
-              ...(maxViews && { maxViews: maxViews }),
-              ...(password && { password: password }),
-              ...(enabled !== undefined && { enabled: enabled }),
-            },
-            omit: {
-              password: true,
-            },
-          });
+              vanity,
+              maxViews,
+              password,
+              enabled,
+            })
+            .returning(urlColumns);
+          if (!created) throw new ApiError(9005);
+
+          return created;
         });
+        if (!url)
+          throw new ApiError(
+            3012,
+            `Shortening this URL would exceed your quota of ${req.user.quota?.maxUrls} URLs.`,
+          );
 
         let domain;
         if (returnDomain) {
@@ -179,7 +179,7 @@ export default typedPlugin(
             searchQuery: z.string().min(1).optional(),
           }),
           response: {
-            200: z.array(urlSchema.omit({ password: true })),
+            200: z.array(urlSchema),
           },
         },
         preHandler: [userMiddleware],
@@ -187,30 +187,24 @@ export default typedPlugin(
       async (req, res) => {
         const { searchField, searchQuery } = req.query;
 
+        let search;
         if (searchQuery) {
-          const similarityResult = await prisma.url.findMany({
-            where: {
-              [searchField]: {
-                mode: 'insensitive',
-                contains: searchQuery,
-              },
-              userId: req.user.id,
-            },
-            omit: {
-              password: true,
-            },
-          });
-
-          return res.send(similarityResult);
+          const searchColumn = {
+            destination: urls.destination,
+            vanity: urls.vanity,
+            code: urls.code,
+          }[searchField];
+          search = containsText(searchColumn, searchQuery);
         }
 
-        const urls = await prisma.url.findMany({
-          where: {
-            userId: req.user.id,
-          },
-        });
-
-        return res.send(cleanUrlPasswords(urls));
+        const urlList = await db
+          .select({
+            ...urlColumns,
+            password: isNotNull(urls.password).mapWith(Boolean).as('password'),
+          })
+          .from(urls)
+          .where(and(eq(urls.userId, req.user.id), search));
+        return res.send(urlList);
       },
     );
   },
