@@ -534,7 +534,7 @@ export default function FileTable({
                   </Tooltip>
 
                   <Tooltip label='View file in new tab'>
-                    <Link to={`/view/${file.name}`} target='_blank'>
+                    <Link to={`/view/${encodeURIComponent(file.name)}`} target='_blank'>
                       <ActionIcon color='blue'>
                         <IconExternalLink size='1rem' />
                       </ActionIcon>

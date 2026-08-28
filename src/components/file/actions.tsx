@@ -20,19 +20,19 @@ import {
 import { mutate } from 'swr';
 
 export function viewFile(file: File) {
-  window.open(`/view/${file.name}`, '_blank');
+  window.open(`/view/${encodeURIComponent(file.name)}`, '_blank');
 }
 
 export function downloadFile(file: File) {
-  window.open(`/raw/${file.name}?download=true`, '_blank');
+  window.open(`/raw/${encodeURIComponent(file.name)}?download=true`, '_blank');
 }
 
 export function copyFile(file: File, clipboard: ReturnType<typeof useClipboard>, raw: boolean = false) {
   const url = raw
-    ? getDomain(`/raw/${file.name}`)
+    ? getDomain(`/raw/${encodeURIComponent(file.name)}`)
     : file.url
       ? getDomain(file.url)
-      : getDomain(`/view/${file.name}`);
+      : getDomain(`/view/${encodeURIComponent(file.name)}`);
 
   copyLink(url, clipboard);
 }

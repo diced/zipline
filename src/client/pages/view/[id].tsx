@@ -64,7 +64,9 @@ export default function ViewFileId() {
 
           if (res.ok) {
             const json = (await res.json()) as { token: string };
-            window.location.replace(`/view/${file.name}?token=${encodeURIComponent(json.token)}`);
+            window.location.replace(
+              `/view/${encodeURIComponent(file.name!)}?token=${encodeURIComponent(json.token)}`,
+            );
           } else {
             setPasswordError('Invalid password');
           }
@@ -105,7 +107,7 @@ export default function ViewFileId() {
               size='md'
               variant='outline'
               component={Link}
-              to={`/raw/${file.name}?download=true${token ? `&token=${encodeURIComponent(token)}` : ''}`}
+              to={`/raw/${encodeURIComponent(file.name!)}?download=true${token ? `&token=${encodeURIComponent(token)}` : ''}`}
               target='_blank'
             >
               <IconDownload size='1rem' />
@@ -127,7 +129,7 @@ export default function ViewFileId() {
                       user: user as User,
                       link: {
                         returned: `${host}${formatRootUrl(filesRoute ?? '/u', file.name!)}`,
-                        raw: `${host}/raw/${file.name}`,
+                        raw: `${host}/raw/${encodeURIComponent(file.name!)}`,
                       },
                       ...metrics,
                     }) ?? '',
@@ -195,7 +197,7 @@ export default function ViewFileId() {
                   size='md'
                   variant='outline'
                   component={Link}
-                  to={`/raw/${file.name}${token ? `?token=${encodeURIComponent(token)}` : ''}`}
+                  to={`/raw/${encodeURIComponent(file.name!)}${token ? `?token=${encodeURIComponent(token)}` : ''}`}
                   target='_blank'
                 >
                   <IconExternalLink size='1rem' />
@@ -206,7 +208,7 @@ export default function ViewFileId() {
                   size='md'
                   variant='outline'
                   component={Link}
-                  to={`/raw/${file.name}?download=true${token ? `&token=${encodeURIComponent(token)}` : ''}`}
+                  to={`/raw/${encodeURIComponent(file.name!)}?download=true${token ? `&token=${encodeURIComponent(token)}` : ''}`}
                   target='_blank'
                 >
                   <IconDownload size='1rem' />
@@ -228,7 +230,7 @@ export default function ViewFileId() {
                       file: file as unknown as File,
                       link: {
                         returned: `${host}${formatRootUrl(filesRoute ?? '/u', file.name!)}`,
-                        raw: `${host}/raw/${file.name}`,
+                        raw: `${host}/raw/${encodeURIComponent(file.name!)}`,
                       },
                       user: user as User,
                       ...metrics,

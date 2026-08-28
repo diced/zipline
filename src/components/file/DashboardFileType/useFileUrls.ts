@@ -28,8 +28,11 @@ export default function useFileUrls({ file, token }: { file: DbFile | File; toke
     const thumbnailUrl = thumb ? (user ? `/api/user/files/${thumb}/raw` : `/raw/${thumb}`) : null;
 
     return {
-      fileUrl: appendToken(user ? `/api/user/files/${file.id}/raw` : `/raw/${file.name}`, token),
-      viewUrl: appendToken(`/view/${file.name}`, token),
+      fileUrl: appendToken(
+        user ? `/api/user/files/${file.id}/raw` : `/raw/${encodeURIComponent(file.name)}`,
+        token,
+      ),
+      viewUrl: appendToken(`/view/${encodeURIComponent(file.name)}`, token),
       thumbnailUrl,
     };
   }, [token, blobUrl, file, user]);
