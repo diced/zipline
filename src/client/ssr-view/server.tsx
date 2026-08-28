@@ -218,10 +218,10 @@ export async function render(
     showMediaOg && file.type?.startsWith('image')
       ? `
     <meta property="og:type" content="image" />
-    <meta property="og:image" itemProp="image" content="${host}/raw/${safeFilename}" />
+    <meta property="og:image" itemProp="image" content="${host}/raw/${encodeURIComponent(safeFilename)}" />
     <meta property="og:url" content="${pageUrl}" />
     <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:image" content="${host}/raw/${safeFilename}" />
+    <meta property="twitter:image" content="${host}/raw/${encodeURIComponent(safeFilename)}" />
     ${showRichOg ? `<meta property="twitter:title" content="${safeFilename}" />` : ''}
   `
       : '';
@@ -232,7 +232,7 @@ export async function render(
     ${file.thumbnail ? `<meta property="og:image" content="${host}/raw/${file.thumbnail.path}" />` : ''}
     <meta property="og:type" content="video.other" />
     <meta property="og:url" content="${pageUrl}" />
-    <meta property="og:video:url" content="${host}/raw/${safeFilename}" />
+    <meta property="og:video:url" content="${host}/raw/${encodeURIComponent(safeFilename)}" />
     <meta property="og:video:width" content="1920" />
     <meta property="og:video:height" content="1080" />
   `
@@ -242,8 +242,8 @@ export async function render(
     showMediaOg && file.type?.startsWith('audio')
       ? `
     <meta name="twitter:card" content="player" />
-    <meta name="twitter:player" content="${host}/raw/${safeFilename}" />
-    <meta name="twitter:player:stream" content="${host}/raw/${safeFilename}" />
+    <meta name="twitter:player" content="${host}/raw/${encodeURIComponent(safeFilename)}" />
+    <meta name="twitter:player:stream" content="${host}/raw/${encodeURIComponent(safeFilename)}" />
     <meta name="twitter:player:stream:content_type" content="${safeType}" />
     ${showRichOg ? `<meta name="twitter:title" content="${safeFilename}" />` : ''}
     <meta name="twitter:player:width" content="720" />
@@ -251,8 +251,8 @@ export async function render(
 
     <meta property="og:type" content="music.song" />
     <meta property="og:url" content="${pageUrl}" />
-    <meta property="og:audio" content="${host}/raw/${safeFilename}" />
-    <meta property="og:audio:secure_url" content="${host}/raw/${safeFilename}" />
+    <meta property="og:audio" content="${host}/raw/${encodeURIComponent(safeFilename)}" />
+    <meta property="og:audio:secure_url" content="${host}/raw/${encodeURIComponent(safeFilename)}" />
     <meta property="og:audio:type" content="${safeType}" />
   `
       : '';
