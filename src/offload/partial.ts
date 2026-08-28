@@ -196,7 +196,7 @@ async function runComplete(id: string, size: number) {
     user: userr,
     file: { ...fileUpload, thumbnail: null, tags: [] },
     link: {
-      raw: `${domain}/raw/${fileUpload.name}`,
+      raw: `${domain}/raw/${encodeURIComponent(fileUpload.name)}`,
       returned: responseUrl,
     },
   });

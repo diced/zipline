@@ -326,7 +326,7 @@ export default typedPlugin(
               ? fileUpload.name.slice(0, -extension.length)
               : fileUpload.name;
 
-          const responseUrl = `${domain}${config.files.route === '/' || config.files.route === '' ? '' : `${config.files.route}`}/${urlPath}`;
+          const responseUrl = `${domain}${config.files.route === '/' || config.files.route === '' ? '' : `${config.files.route}`}/${encodeURIComponent(urlPath)}`;
 
           const compressedResponse = compressed
             ? { mimetype: compressed.mimetype, ext: compressed.ext, failed: compressed.failed }
@@ -336,7 +336,7 @@ export default typedPlugin(
             id: fileUpload.id,
             name: fileUpload.name,
             type: fileUpload.type,
-            url: encodeURI(responseUrl),
+            url: responseUrl,
             removedGps: removedGps || undefined,
             compressed: compressedResponse,
           };
@@ -357,7 +357,7 @@ export default typedPlugin(
             file: { ...fileUpload, thumbnail: null, tags: [] },
             link: {
               raw: `${domain}/raw/${encodeURIComponent(fileUpload.name)}`,
-              returned: encodeURI(responseUrl),
+              returned: responseUrl,
             },
           });
 
