@@ -360,7 +360,7 @@ export default typedPlugin(
 
           const responseUrl = `${domain}${
             config.files.route === '/' || config.files.route === '' ? '' : `${config.files.route}`
-          }/${urlPath}`;
+          }/${encodeURIComponent(urlPath)}`;
 
           const worker = createWorker('offload/partial.js', {
             workerData: {
