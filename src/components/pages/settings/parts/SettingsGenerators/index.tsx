@@ -64,6 +64,23 @@ export default function SettingsGenerators() {
           }
         />
         <GeneratorButton
+          name='iTake'
+          icon={
+            <MantineImage
+              width={24}
+              height={24}
+              alt='iTake logo'
+              src='https://raw.githubusercontent.com/SerStars/iTake/refs/heads/main/preview/AppIcon.png'
+            />
+          }
+          desc={
+            <>
+              This generator requires <Anchor href='https://github.com/SerStars/iTake'>iTake</Anchor> to be
+              installed on macOS. This uploader is intended for use on macOS only.
+            </>
+          }
+        />
+        <GeneratorButton
           name='Shell Script'
           icon={<IconPrompt size={24} />}
           desc={
