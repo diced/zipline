@@ -7,14 +7,19 @@ export async function readToDataURL(file: File): Promise<string> {
   });
 }
 
-export async function fetchToDataURL(url?: string) {
+export async function fetchToDataURL(url?: string | null): Promise<string | null> {
   if (!url) return null;
 
-  const res = await fetch(url);
-  if (!res.ok) return null;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return null;
 
-  const arr = await res.arrayBuffer();
-  const base64 = Buffer.from(arr).toString('base64');
+    const arr = await res.arrayBuffer();
+    const base64 = Buffer.from(arr).toString('base64');
 
-  return `data:${res.headers.get('content-type')};base64,${base64}`;
+    return `data:${res.headers.get('content-type')};base64,${base64}`;
+  } catch {
+    // some providers may give non urls so we just return null
+    return null;
+  }
 }
