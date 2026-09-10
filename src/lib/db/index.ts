@@ -1,4 +1,4 @@
-import { readDbVars } from '@/lib/config/read/env';
+import { getDatabaseUrl } from '@/lib/config/read/env';
 import { log } from '@/lib/logger';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import type { NodePgDatabase, NodePgTransaction } from 'drizzle-orm/node-postgres';
@@ -14,15 +14,6 @@ export type DbClient = Database | Transaction;
 declare global {
   // eslint-disable-next-line no-var
   var __db__: Database | undefined;
-}
-
-export function getDatabaseUrl() {
-  const vars = readDbVars();
-  if (vars.DATABASE_URL) return vars.DATABASE_URL;
-
-  const username = encodeURIComponent(vars.DATABASE_USERNAME);
-  const password = encodeURIComponent(vars.DATABASE_PASSWORD);
-  return `postgresql://${username}:${password}@${vars.DATABASE_HOST}:${vars.DATABASE_PORT}/${vars.DATABASE_NAME}`;
 }
 
 function queryLogger() {

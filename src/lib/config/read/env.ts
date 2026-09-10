@@ -189,12 +189,26 @@ export function checkDbVars(): boolean {
   if (process.env.DATABASE_URL) return true;
 
   for (let i = 0; i !== REQUIRED_DB_VARS.length; ++i) {
-    if (process.env[REQUIRED_DB_VARS[i]] === undefined) {
+    // readDbVars() accepts either the variable or its *_FILE variant
+    if (
+      process.env[REQUIRED_DB_VARS[i]] === undefined &&
+      process.env[`${REQUIRED_DB_VARS[i]}_FILE`] === undefined
+    ) {
       return false;
     }
   }
 
   return true;
+}
+
+function buildDatabaseUrl(
+  username: string,
+  password: string,
+  host: string,
+  port: string | number,
+  name: string,
+): string {
+  return `postgresql://${encodeURIComponent(username)}:${encodeURIComponent(password)}@${host}:${port}/${name}`;
 }
 
 export function readDbVars(): Record<string, string> {
@@ -226,6 +240,19 @@ export function readDbVars(): Record<string, string> {
   }
 
   return dbVars;
+}
+
+export function getDatabaseUrl(): string {
+  const vars = readDbVars();
+  if (vars.DATABASE_URL) return vars.DATABASE_URL;
+
+  return buildDatabaseUrl(
+    vars.DATABASE_USERNAME,
+    vars.DATABASE_PASSWORD,
+    vars.DATABASE_HOST,
+    vars.DATABASE_PORT,
+    vars.DATABASE_NAME,
+  );
 }
 
 export function readEnv(): EnvResult {
@@ -270,6 +297,23 @@ export function readEnv(): EnvResult {
       envResult.dbEnv[env.property] = parsed;
     } else {
       envResult.env[env.property] = parsed;
+    }
+  }
+
+  // core.databaseUrl is required by the config schema, but the database can also be
+  // configured through DATABASE_USERNAME/PASSWORD/HOST/PORT/NAME (or their *_FILE
+  // variants). Derive the URL from the values the loop above already parsed so both
+  // forms keep validating; an empty DATABASE_URL falls back like readDbVars() does.
+  if (!envResult.env['core.databaseUrl']) {
+    const { dbEnv } = envResult;
+    const username = dbEnv['core.database.username'];
+    const password = dbEnv['core.database.password'];
+    const host = dbEnv['core.database.host'];
+    const port = dbEnv['core.database.port'];
+    const name = dbEnv['core.database.name'];
+
+    if (username && password && host && port && name) {
+      envResult.env['core.databaseUrl'] = buildDatabaseUrl(username, password, host, port, name);
     }
   }
 
