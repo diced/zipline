@@ -1,4 +1,4 @@
-import { getDatabaseUrl } from '@/lib/db';
+import { getDatabaseUrl } from '@/lib/config/read/env';
 import { isPostgresError } from '@/lib/db/utils';
 import { log } from '@/lib/logger';
 import { drizzle } from 'drizzle-orm/node-postgres';
