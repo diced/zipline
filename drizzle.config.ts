@@ -1,4 +1,5 @@
 import { defineConfig } from 'drizzle-kit';
+import { getPgliteDir } from './src/lib/db/connection';
 
 try {
   process.loadEnvFile('.env');
@@ -18,6 +19,7 @@ function getDatabaseUrl() {
 }
 
 const url = getDatabaseUrl();
+const pgliteDir = url && getPgliteDir(url);
 
 export default defineConfig({
   dialect: 'postgresql',
@@ -25,5 +27,6 @@ export default defineConfig({
   out: './drizzle',
   strict: true,
   verbose: true,
-  ...(url ? { dbCredentials: { url } } : {}),
+  ...(pgliteDir ? { driver: 'pglite' as const } : {}),
+  ...(url ? { dbCredentials: { url: pgliteDir || url } } : {}),
 });

@@ -1,10 +1,12 @@
-import { getDatabaseUrl } from '@/lib/db';
+import { db } from '@/lib/db';
+import { getDatabaseUrl, getPgliteDir } from '@/lib/db/connection';
 import { isPostgresError } from '@/lib/db/utils';
 import { log } from '@/lib/logger';
+import { readMigrationFiles, type MigrationMeta } from 'drizzle-orm/migrator';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
-import { readMigrationFiles, type MigrationMeta } from 'drizzle-orm/migrator';
-import { join } from 'node:path';
+import { migrate as migrateEmbedded } from 'drizzle-orm/pg-core';
+import { join } from 'path';
 import { Client, escapeIdentifier } from 'pg';
 import { assertCompletePrismaMigrationHistory, hasPrismaMigrationHistory } from './prisma-history';
 
@@ -26,18 +28,19 @@ async function ensureDatabaseExists(connectionString: string) {
   }
 
   const url = new URL(connectionString);
-  const databaseName = decodeURIComponent(url.pathname.slice(1));
-  if (!databaseName) throw new Error('DATABASE_URL does not contain a database name');
+  const name = decodeURIComponent(url.pathname.slice(1));
+  if (!name) throw new Error('DATABASE_URL does not contain a database name');
 
   url.pathname = '/postgres';
   const maintenance = new Client({ connectionString: url.toString() });
   try {
     await maintenance.connect();
-    await maintenance.query(`CREATE DATABASE ${escapeIdentifier(databaseName)}`);
+    await maintenance.query(`CREATE DATABASE ${escapeIdentifier(name)}`);
+
     return true;
   } catch (error) {
-    // Another replica may have created it after our initial connection attempt.
     if (isPostgresError(error, '42P04') || isPostgresError(error, '23505')) return false;
+
     throw error;
   } finally {
     await maintenance.end().catch(() => undefined);
@@ -68,7 +71,6 @@ async function prepareDrizzleMigrationTable(client: Client) {
     )
   `);
 
-  // An interrupted pre-RC migration can leave the older, empty three-column table behind.
   await client.query(`ALTER TABLE ${migrationTable} ADD COLUMN IF NOT EXISTS name text`);
   await client.query(
     `ALTER TABLE ${migrationTable} ADD COLUMN IF NOT EXISTS applied_at timestamp with time zone DEFAULT now()`,
@@ -93,6 +95,7 @@ async function adoptPrismaDatabase(client: Client, baseline: MigrationMeta) {
   } catch (error) {
     await client.query('ROLLBACK');
     const message = error instanceof Error ? error.message : String(error);
+
     throw new Error(
       `cannot safely migrate from prisma to drizzle: ${message}. To resolve this, repair the database with the previous (latest before this) Zipline release before upgrading; no baseline was recorded.`,
       { cause: error },
@@ -102,10 +105,19 @@ async function adoptPrismaDatabase(client: Client, baseline: MigrationMeta) {
 
 export async function runMigrations() {
   const connectionString = getDatabaseUrl();
+  if (getPgliteDir(connectionString)) {
+    try {
+      return await migrateEmbedded(readMigrationFiles(migrationConfig), db, migrationConfig);
+    } catch (error) {
+      logger.error(error instanceof Error ? error.message : String(error));
+      process.exit(1);
+    }
+  }
+
   logger.debug('ensuring database exists');
 
-  const databaseCreated = await ensureDatabaseExists(connectionString);
-  if (databaseCreated) logger.info('database created');
+  const dbCreated = await ensureDatabaseExists(connectionString);
+  if (dbCreated) logger.info('database created');
 
   const migrations = readMigrationFiles(migrationConfig);
   const baseline = migrations[0];
