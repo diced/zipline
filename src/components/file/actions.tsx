@@ -6,6 +6,7 @@ import { Folder } from '@/lib/db/models/folder';
 import { fetchApi } from '@/lib/fetchApi';
 import { conditionalWarning } from '@/lib/client/warningModal';
 import { getDomain } from '@/lib/client/webDomain';
+import { formatRootUrl } from '@/lib/url';
 import { useClipboard } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import {
@@ -20,19 +21,19 @@ import {
 import { mutate } from 'swr';
 
 export function viewFile(file: File) {
-  window.open(`/view/${file.name}`, '_blank');
+  window.open(formatRootUrl('/view', file.name), '_blank');
 }
 
 export function downloadFile(file: File) {
-  window.open(`/raw/${file.name}?download=true`, '_blank');
+  window.open(formatRootUrl('/raw', file.name, { download: 'true' }), '_blank');
 }
 
 export function copyFile(file: File, clipboard: ReturnType<typeof useClipboard>, raw: boolean = false) {
   const url = raw
-    ? getDomain(`/raw/${file.name}`)
+    ? getDomain(formatRootUrl('/raw', file.name))
     : file.url
       ? getDomain(file.url)
-      : getDomain(`/view/${file.name}`);
+      : getDomain(formatRootUrl('/view', file.name));
 
   copyLink(url, clipboard);
 }

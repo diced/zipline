@@ -1,7 +1,7 @@
 import ms, { type StringValue } from 'ms';
 import { checkOutput, COMPRESS_TYPES, CompressType } from '../compress';
 import { Config } from '../config/validate';
-import { sanitizeExtension } from '../fs';
+import { sanitizeExtension, sanitizeFilename } from '../fs';
 import { ApiError } from '../api/errors';
 
 type StringBoolean = 'true' | 'false';
@@ -104,6 +104,19 @@ export function parseExpiry(header: string): Date | null {
 
 function throwHeaderError(header: keyof UploadHeaders, message: string): never {
   throw new ApiError(1001, `bad options[${header}]: ${message}`);
+}
+
+function parseFilenameHeader(header: keyof UploadHeaders, value: string): string {
+  let decoded: string;
+  try {
+    decoded = decodeURIComponent(value);
+  } catch {
+    throwHeaderError(header, 'Invalid URL-encoded filename');
+  }
+
+  const filename = sanitizeFilename(decoded);
+  if (!filename) throwHeaderError(header, 'Invalid filename');
+  return filename;
 }
 
 function parsePercent(header: keyof UploadHeaders, percent: string) {
@@ -224,9 +237,7 @@ export function parseHeaders(headers: UploadHeaders, fileConfig: Config['files']
 
   const filename = headers['x-zipline-filename'];
   if (filename) {
-    // checks aren't needed here as they are sanitized later in getFilename
-
-    response.overrides.filename = filename;
+    response.overrides.filename = parseFilenameHeader('x-zipline-filename', filename);
   }
 
   const extension = headers['x-zipline-file-extension'];
@@ -254,7 +265,7 @@ export function parseHeaders(headers: UploadHeaders, fileConfig: Config['files']
       throwHeaderError('content-range', 'Invalid content-range');
 
     response.partial = {
-      filename: headers['x-zipline-p-filename']!,
+      filename: parseFilenameHeader('x-zipline-p-filename', headers['x-zipline-p-filename'] ?? ''),
       contentType: headers['x-zipline-p-content-type']!,
       identifier: headers['x-zipline-p-identifier']!,
       lastchunk: headers['x-zipline-p-lastchunk'] === 'true',

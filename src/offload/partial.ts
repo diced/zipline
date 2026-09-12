@@ -1,4 +1,5 @@
 import { bytes } from '@/lib/bytes';
+import { formatRootUrl } from '@/lib/url';
 import { Config } from '@/lib/config/validate';
 import { getDatasource } from '@/lib/datasource';
 import { S3Datasource } from '@/lib/datasource/S3';
@@ -196,7 +197,7 @@ async function runComplete(id: string, size: number) {
     user: userr,
     file: { ...fileUpload, thumbnail: null, tags: [] },
     link: {
-      raw: `${domain}/raw/${fileUpload.name}`,
+      raw: `${domain}${formatRootUrl('/raw', fileUpload.name)}`,
       returned: responseUrl,
     },
   });

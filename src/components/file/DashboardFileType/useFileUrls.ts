@@ -1,12 +1,7 @@
 import { useUserStore } from '@/lib/client/store/user';
 import type { File as DbFile } from '@/lib/db/models/file';
+import { formatRootUrl } from '@/lib/url';
 import { useMemo } from 'react';
-
-function appendToken(url: string, token?: string | null) {
-  if (!token) return url;
-
-  return `${url}${token ? `?token=${encodeURIComponent(token)}` : ''}`;
-}
 
 export function isDbFile(file: DbFile | File): file is DbFile {
   return typeof globalThis.File !== 'undefined' ? !(file instanceof globalThis.File) : 'thumbnail' in file;
@@ -25,11 +20,17 @@ export default function useFileUrls({ file, token }: { file: DbFile | File; toke
     if (!isDbFile(file)) return { fileUrl: blobUrl ?? '', thumbnailUrl: null, viewUrl: null };
 
     const thumb = file.thumbnail?.path;
-    const thumbnailUrl = thumb ? (user ? `/api/user/files/${thumb}/raw` : `/raw/${thumb}`) : null;
+    const thumbnailUrl = thumb
+      ? user
+        ? `/api/user/files/${thumb}/raw`
+        : formatRootUrl('/raw', thumb)
+      : null;
 
     return {
-      fileUrl: appendToken(user ? `/api/user/files/${file.id}/raw` : `/raw/${file.name}`, token),
-      viewUrl: appendToken(`/view/${file.name}`, token),
+      fileUrl: user
+        ? formatRootUrl(`/api/user/files/${file.id}`, 'raw', { token })
+        : formatRootUrl('/raw', file.name, { token }),
+      viewUrl: formatRootUrl('/view', file.name, { token }),
       thumbnailUrl,
     };
   }, [token, blobUrl, file, user]);
