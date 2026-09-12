@@ -1,9 +1,9 @@
 import { ActionIcon, Button, CopyButton, Paper, Text, useMantineTheme } from '@mantine/core';
 import { IconCheck, IconChevronDown, IconChevronUp, IconClipboardCopy } from '@tabler/icons-react';
 import type { HLJSApi } from 'highlight.js';
+import * as sanitize from 'isomorphic-dompurify';
 import { useEffect, useMemo, useState } from 'react';
 import { Virtuoso } from 'react-virtuoso';
-import { highlightLines } from './highlightLines';
 import './HighlightCode.theme.scss';
 
 export default function HighlightCode({
@@ -25,7 +25,7 @@ export default function HighlightCode({
     import('highlight.js').then((mod) => setHljs(mod.default || mod));
   }, []);
 
-  const lines = code.split('\n');
+  const lines = useMemo(() => code.split('\n'), [code]);
   const isExpandable = !noClamp && lines.length > 50;
   const totalCount = isExpandable && !expanded ? 50 : lines.length;
   const estimatedHeight = Math.min(totalCount * 24, 400);
@@ -36,8 +36,13 @@ export default function HighlightCode({
   }, [hljs, language]);
 
   const hlLines = useMemo(() => {
-    return highlightLines(code, lang, hljs);
-  }, [code, hljs, lang]);
+    if (!hljs) return null;
+    return lines.map((line) =>
+      sanitize.sanitize(hljs.highlight(line || ' ', { language: lang }).value, {
+        USE_PROFILES: { html: true },
+      }),
+    );
+  }, [lines, hljs, lang]);
 
   const rowRenderer = (index: number) => (
     <div
@@ -68,8 +73,10 @@ export default function HighlightCode({
       <code
         className='theme hljs'
         style={{ flex: 1, padding: 0, background: 'none', alignSelf: 'center' }}
-        dangerouslySetInnerHTML={{ __html: hlLines[index] }}
-      />
+        dangerouslySetInnerHTML={hlLines ? { __html: hlLines[index] } : undefined}
+      >
+        {hlLines ? null : lines[index]}
+      </code>
     </div>
   );
 
