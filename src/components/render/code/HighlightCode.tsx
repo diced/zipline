@@ -25,7 +25,7 @@ export default function HighlightCode({
     import('highlight.js').then((mod) => setHljs(mod.default || mod));
   }, []);
 
-  const lines = sanitize.sanitize(code, { USE_PROFILES: { html: true } }).split('\n');
+  const lines = useMemo(() => code.split('\n'), [code]);
   const isExpandable = !noClamp && lines.length > 50;
   const totalCount = isExpandable && !expanded ? 50 : lines.length;
   const estimatedHeight = Math.min(totalCount * 24, 400);
@@ -36,8 +36,12 @@ export default function HighlightCode({
   }, [hljs, language]);
 
   const hlLines = useMemo(() => {
-    if (!hljs) return lines;
-    return lines.map((line) => hljs.highlight(line || ' ', { language: lang }).value);
+    if (!hljs) return null;
+    return lines.map((line) =>
+      sanitize.sanitize(hljs.highlight(line || ' ', { language: lang }).value, {
+        USE_PROFILES: { html: true },
+      }),
+    );
   }, [lines, hljs, lang]);
 
   const rowRenderer = (index: number) => (
@@ -69,8 +73,10 @@ export default function HighlightCode({
       <code
         className='theme hljs'
         style={{ flex: 1, padding: 0, background: 'none', alignSelf: 'center' }}
-        dangerouslySetInnerHTML={{ __html: hlLines[index] }}
-      />
+        dangerouslySetInnerHTML={hlLines ? { __html: hlLines[index] } : undefined}
+      >
+        {hlLines ? null : lines[index]}
+      </code>
     </div>
   );
 
