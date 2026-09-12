@@ -10,6 +10,7 @@ import { useSettingsStore } from '@/lib/client/store/settings';
 import { type File } from '@/lib/db/models/file';
 import { Tag } from '@/lib/db/models/tag';
 import { buildFolderHierarchy } from '@/lib/folderHierarchy';
+import { formatRootUrl } from '@/lib/url';
 import {
   ActionIcon,
   Box,
@@ -534,7 +535,7 @@ export default function FileTable({
                   </Tooltip>
 
                   <Tooltip label='View file in new tab'>
-                    <Link to={`/view/${file.name}`} target='_blank'>
+                    <Link to={formatRootUrl('/view', file.name)} target='_blank'>
                       <ActionIcon color='blue'>
                         <IconExternalLink size='1rem' />
                       </ActionIcon>

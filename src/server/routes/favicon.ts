@@ -27,8 +27,8 @@ const FAVICONS: Record<string, Buffer | null> = {
 export const PATH = '/favicon*';
 export default typedPlugin(
   async (server) => {
-    server.get(PATH, (req, res) => {
-      const filename = sanitizeFilename(req.url.replace('/', ''));
+    server.get<{ Params: { '*': string } }>(PATH, (req, res) => {
+      const filename = sanitizeFilename(`favicon${req.params['*']}`);
       if (!filename) return res.callNotFound();
 
       const buffer = FAVICONS[filename];

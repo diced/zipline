@@ -1,6 +1,6 @@
 import { PathLike } from 'fs';
 import { access } from 'fs/promises';
-import { basename, isAbsolute, normalize, sep } from 'path';
+import { basename, isAbsolute } from 'path';
 
 export async function exists(path: PathLike): Promise<boolean> {
   try {
@@ -12,16 +12,10 @@ export async function exists(path: PathLike): Promise<boolean> {
 }
 
 export function sanitizeFilename(name: string): string | null {
-  const decoded = decodeURIComponent(name);
-  const normalized = normalize(decoded);
+  if (!name || name === '.' || name === '..' || name.includes('\0')) return null;
+  if (name.includes('/') || name.includes('\\') || isAbsolute(name) || basename(name) !== name) return null;
 
-  if (normalized.includes('/') || normalized.includes('\\')) return null;
-
-  if (isAbsolute(normalized)) return null;
-
-  if (normalized.includes('..' + sep) || normalized === '..') return null;
-
-  return basename(normalized);
+  return name;
 }
 
 export function sanitizeExtension(ext: string): string | null {
