@@ -49,7 +49,7 @@ export class LocalDatasource extends Datasource {
     if (!path) throw new Error('Invalid path provided');
 
     // handles path-based writes without duplicating bytes when the source can be consumed
-    if (typeof data === 'string' && data.startsWith('/')) {
+    if (typeof data === 'string') {
       const exists = await existsAndCanRW(data);
       if (!exists)
         throw new Error(
