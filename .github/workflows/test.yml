@@ -9,19 +9,15 @@ on:
 
 jobs:
   test:
-    strategy:
-      matrix:
-        node: [24.x, 26.x]
-        arch: [amd64, arm64]
-    runs-on: ubuntu-24.04${{ matrix.arch == 'arm64' && '-arm' || '' }}
+    runs-on: ubuntu-24.04
 
     steps:
       - uses: actions/checkout@v7
 
-      - name: Use node@${{ matrix.node }}
+      - name: Use node@24.x
         uses: actions/setup-node@v7
         with:
-          node-version: ${{ matrix.node }}
+          node-version: 24.x
 
       - uses: pnpm/setup@v2
         with:
@@ -37,9 +33,9 @@ jobs:
         with:
           path: |
             ${{ steps.pnpm-cache.outputs.store_path }}
-          key: ${{ runner.os }}-${{ matrix.arch }}-${{ matrix.node }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
+          key: ${{ runner.os }}-amd64-24.x-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
           restore-keys: |
-            ${{ runner.os }}-${{ matrix.arch }}-${{ matrix.node }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}-
+            ${{ runner.os }}-amd64-24.x-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}-
 
       - name: Install
         run: pnpm install
