@@ -19,6 +19,7 @@ import { flameshot } from './generators/flameshot';
 import { sharex } from './generators/sharex';
 import { shell } from './generators/shell';
 import { ishare } from './generators/ishare';
+import { itake } from './generators/itake';
 import { Link } from 'react-router-dom';
 
 export type GeneratorOptions = {
@@ -86,6 +87,7 @@ const generators = {
   ShareX: sharex,
   'Shell Script': shell,
   ishare,
+  iTake: itake,
 };
 
 export default function GeneratorButton({
@@ -133,7 +135,7 @@ export default function GeneratorButton({
           <Select
             data={[
               { label: 'Upload File', value: 'file' },
-              { label: 'Shorten URL', value: 'url', disabled: name === 'ishare' },
+              { label: 'Shorten URL', value: 'url', disabled: name === 'ishare' || name === 'iTake' },
             ]}
             description='Select which type of destination you want to generate'
             label='Destination Type'
