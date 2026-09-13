@@ -23,6 +23,7 @@ import { log } from '@/lib/logger';
 import { mapConcurrent } from '@/lib/mapConcurrent';
 import { runThumbnailWorkers } from '@/lib/tasks/run/thumbnails';
 import { parseHeaders, UploadHeaders } from '@/lib/uploader/parseHeaders';
+import { formatRootUrl } from '@/lib/url';
 import { onUpload } from '@/lib/webhooks';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
@@ -326,7 +327,7 @@ export default typedPlugin(
               ? fileUpload.name.slice(0, -extension.length)
               : fileUpload.name;
 
-          const responseUrl = `${domain}${config.files.route === '/' || config.files.route === '' ? '' : `${config.files.route}`}/${urlPath}`;
+          const responseUrl = `${domain}${formatRootUrl(config.files.route, urlPath)}`;
 
           const compressedResponse = compressed
             ? { mimetype: compressed.mimetype, ext: compressed.ext, failed: compressed.failed }
@@ -336,7 +337,7 @@ export default typedPlugin(
             id: fileUpload.id,
             name: fileUpload.name,
             type: fileUpload.type,
-            url: encodeURI(responseUrl),
+            url: responseUrl,
             removedGps: removedGps || undefined,
             compressed: compressedResponse,
           };
@@ -356,8 +357,8 @@ export default typedPlugin(
             },
             file: { ...fileUpload, thumbnail: null, tags: [] },
             link: {
-              raw: `${domain}/raw/${encodeURIComponent(fileUpload.name)}`,
-              returned: encodeURI(responseUrl),
+              raw: `${domain}${formatRootUrl('/raw', fileUpload.name)}`,
+              returned: responseUrl,
             },
           });
 

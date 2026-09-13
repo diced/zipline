@@ -1,0 +1,44 @@
+name: 'Test'
+
+on:
+  push:
+    branches: [v4, trunk]
+  pull_request:
+    branches: [v4, trunk]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Use node@24.x
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24.x
+
+      - uses: pnpm/setup@v2
+        with:
+          install: false
+
+      - name: Get pnpm store directory
+        shell: bash
+        id: pnpm-cache
+        run: |
+          echo "store_path=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v6
+        with:
+          path: |
+            ${{ steps.pnpm-cache.outputs.store_path }}
+          key: ${{ runner.os }}-amd64-24.x-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
+          restore-keys: |
+            ${{ runner.os }}-amd64-24.x-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}-
+
+      - name: Install
+        run: pnpm install
+
+      - name: Test
+        run: pnpm test

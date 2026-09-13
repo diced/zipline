@@ -4,6 +4,7 @@ import { filePasswordExtra } from '@/lib/db/models/file';
 import { userViewSchema } from '@/lib/db/models/user';
 import { escapeLike } from '@/lib/db/utils';
 import { sanitizeFilename } from '@/lib/fs';
+import { formatRootUrl } from '@/lib/url';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { rawFileHandler } from './raw/[id]';
 
@@ -40,7 +41,7 @@ export async function filesRoute(
   if (!file) return res.callNotFound();
   const view = file.user ? userViewSchema.parse(file.user.view) : null;
 
-  const viewUrl = `/view/${encodeURIComponent(file.name)}`;
+  const viewUrl = formatRootUrl('/view', file.name);
 
   if (file.password) return res.redirect(viewUrl);
 

@@ -17,6 +17,7 @@ import { sanitizeFilename } from '@/lib/fs';
 import { parseString } from '@/lib/parser';
 import { parserMetrics } from '@/lib/parser/metrics';
 import { createZiplineSsr } from '@/lib/ssr/createZiplineSsr';
+import { formatMediaUrl } from '@/lib/url';
 import { stripHtml } from '@/lib/stripHtml';
 import type { ZiplineTheme } from '@/lib/theme';
 import { readThemes } from '@/lib/theme/file';
@@ -165,6 +166,7 @@ export async function render(
   const html = renderToString(<StaticRouterProvider context={context} router={router} />);
 
   const safeFilename = stripHtml(file.name);
+  const mediaUrl = formatMediaUrl(host, file.name);
   const safeOriginalName = stripHtml(file.originalName || '');
   const safeType = stripHtml(file.type || '');
 
@@ -218,10 +220,10 @@ export async function render(
     showMediaOg && file.type?.startsWith('image')
       ? `
     <meta property="og:type" content="image" />
-    <meta property="og:image" itemProp="image" content="${host}/raw/${safeFilename}" />
+    <meta property="og:image" itemProp="image" content="${mediaUrl}" />
     <meta property="og:url" content="${pageUrl}" />
     <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:image" content="${host}/raw/${safeFilename}" />
+    <meta property="twitter:image" content="${mediaUrl}" />
     ${showRichOg ? `<meta property="twitter:title" content="${safeFilename}" />` : ''}
   `
       : '';
@@ -229,10 +231,10 @@ export async function render(
   const videoOg =
     showMediaOg && file.type?.startsWith('video')
       ? `
-    ${file.thumbnail ? `<meta property="og:image" content="${host}/raw/${file.thumbnail.path}" />` : ''}
+    ${file.thumbnail ? `<meta property="og:image" content="${formatMediaUrl(host, file.thumbnail.path)}" />` : ''}
     <meta property="og:type" content="video.other" />
     <meta property="og:url" content="${pageUrl}" />
-    <meta property="og:video:url" content="${host}/raw/${safeFilename}" />
+    <meta property="og:video:url" content="${mediaUrl}" />
     <meta property="og:video:width" content="1920" />
     <meta property="og:video:height" content="1080" />
   `
@@ -242,8 +244,8 @@ export async function render(
     showMediaOg && file.type?.startsWith('audio')
       ? `
     <meta name="twitter:card" content="player" />
-    <meta name="twitter:player" content="${host}/raw/${safeFilename}" />
-    <meta name="twitter:player:stream" content="${host}/raw/${safeFilename}" />
+    <meta name="twitter:player" content="${mediaUrl}" />
+    <meta name="twitter:player:stream" content="${mediaUrl}" />
     <meta name="twitter:player:stream:content_type" content="${safeType}" />
     ${showRichOg ? `<meta name="twitter:title" content="${safeFilename}" />` : ''}
     <meta name="twitter:player:width" content="720" />
@@ -251,8 +253,8 @@ export async function render(
 
     <meta property="og:type" content="music.song" />
     <meta property="og:url" content="${pageUrl}" />
-    <meta property="og:audio" content="${host}/raw/${safeFilename}" />
-    <meta property="og:audio:secure_url" content="${host}/raw/${safeFilename}" />
+    <meta property="og:audio" content="${mediaUrl}" />
+    <meta property="og:audio:secure_url" content="${mediaUrl}" />
     <meta property="og:audio:type" content="${safeType}" />
   `
       : '';

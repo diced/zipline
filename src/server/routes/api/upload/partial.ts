@@ -1,6 +1,7 @@
 import { ApiError } from '@/lib/api/errors';
 import { checkQuota, getDomain, getExtension, getFilename, resolveUploadMimetype } from '@/lib/api/upload';
 import { bytes } from '@/lib/bytes';
+import { formatRootUrl } from '@/lib/url';
 import { config } from '@/lib/config';
 import { hashPassword } from '@/lib/crypto';
 import { db } from '@/lib/db';
@@ -358,9 +359,7 @@ export default typedPlugin(
               ? fileUpload.name.slice(0, -extension.length)
               : fileUpload.name;
 
-          const responseUrl = `${domain}${
-            config.files.route === '/' || config.files.route === '' ? '' : `${config.files.route}`
-          }/${urlPath}`;
+          const responseUrl = `${domain}${formatRootUrl(config.files.route, urlPath)}`;
 
           const worker = createWorker('offload/partial.js', {
             workerData: {

@@ -23,6 +23,9 @@ importers:
       '@dnd-kit/utilities':
         specifier: ^3.2.2
         version: 3.2.2(react@19.2.7)
+      '@electric-sql/pglite':
+        specifier: 0.4.6
+        version: 0.4.6
       '@fastify/cookie':
         specifier: ^11.0.2
         version: 11.0.2
@@ -112,7 +115,7 @@ importers:
         version: 5.8.1
       drizzle-orm:
         specifier: 1.0.0-rc.4
-        version: 1.0.0-rc.4(@types/pg@8.15.5)(pg@8.16.3)(zod@4.4.3)
+        version: 1.0.0-rc.4(@electric-sql/pglite@0.4.6)(@types/pg@8.15.5)(pg@8.16.3)(zod@4.4.3)
       fast-glob:
         specifier: ^3.3.3
         version: 3.3.3
@@ -422,6 +425,9 @@ packages:
 
   '@drizzle-team/brocli@0.12.0':
     resolution: {integrity: sha512-mlUE+rZ8CatQekLhnaiN91Iemdd+e2gFKooGlnRB3oPTL3VghLfX24dx7HrzMNeC1JrIB/0kpsfyty3f5HNfxQ==}
+
+  '@electric-sql/pglite@0.4.6':
+    resolution: {integrity: sha512-qmlmfN8UyKCee35qkV0r/MBp+Znl8FjBz7OpoglNvww3GJpw0/DLP0o1ZymvLNmcD5DTLOQdzKPtF8Hd3mdl1w==}
 
   '@emnapi/core@1.11.1':
     resolution: {integrity: sha512-RSvbQmHzdKzNsLYa/wHrbc3KN4sYLKAdPZxqiM2HATqv/SBk2/ENSHpvXGaLOMcsAyz0poEGqkmmKYG3OWiJEQ==}
@@ -4485,6 +4491,8 @@ snapshots:
 
   '@drizzle-team/brocli@0.12.0': {}
 
+  '@electric-sql/pglite@0.4.6': {}
+
   '@emnapi/core@1.11.1':
     dependencies:
       '@emnapi/wasi-threads': 1.2.2
@@ -6116,8 +6124,9 @@ snapshots:
       get-tsconfig: 4.14.2
       jiti: 2.7.0
 
-  drizzle-orm@1.0.0-rc.4(@types/pg@8.15.5)(pg@8.16.3)(zod@4.4.3):
+  drizzle-orm@1.0.0-rc.4(@electric-sql/pglite@0.4.6)(@types/pg@8.15.5)(pg@8.16.3)(zod@4.4.3):
     optionalDependencies:
+      '@electric-sql/pglite': 0.4.6
       '@types/pg': 8.15.5
       pg: 8.16.3
       zod: 4.4.3

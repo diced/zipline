@@ -5,6 +5,7 @@
   "version": "4.7.0",
   "type": "module",
   "scripts": {
+    "test": "node --import tsx --enable-source-maps --test --test-reporter ./src/lib/tests/test-reporter.ts \"tests/**/*.ts\"",
     "build": "tsx scripts/build.ts",
     "dev": "cross-env NODE_ENV=development DEBUG=zipline tsx --import ./src/dotenv.js --enable-source-maps ./src/server",
     "dev:nd": "cross-env NODE_ENV=development tsx --import ./src/dotenv.js --enable-source-maps ./src/server",
@@ -28,6 +29,7 @@
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
+    "@electric-sql/pglite": "0.4.6",
     "@fastify/cookie": "^11.0.2",
     "@fastify/cors": "^11.2.0",
     "@fastify/multipart": "^10.0.0",

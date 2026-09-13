@@ -1,6 +1,7 @@
 import { db } from '@/lib/db';
 import { urls } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
+import { formatRootUrl } from '@/lib/url';
 import { eq, or } from 'drizzle-orm';
 import type { FastifyInstance } from 'fastify';
 import loadRoutes from '../routes';
@@ -13,7 +14,7 @@ export async function registerRoutes(server: FastifyInstance, mode: string) {
   const config = global.__config__;
 
   server.get<{ Params: { id: string } }>('/r/:id', async (req, res) => {
-    return res.redirect('/raw/' + req.params.id, 301);
+    return res.redirect(formatRootUrl('/raw', req.params.id), 301);
   });
 
   server.get<{ Params: { id: string } }>('/view/:id', async (_req, res) => {
