@@ -5,6 +5,7 @@
   "version": "4.7.0",
   "type": "module",
   "scripts": {
+    "test": "node --import tsx --enable-source-maps --test --test-reporter ./src/lib/tests/test-reporter.ts \"tests/**/*.ts\"",
     "build": "tsx scripts/build.ts",
     "dev": "cross-env NODE_ENV=development DEBUG=zipline tsx --import ./src/dotenv.js --enable-source-maps ./src/server",
     "dev:nd": "cross-env NODE_ENV=development tsx --import ./src/dotenv.js --enable-source-maps ./src/server",
