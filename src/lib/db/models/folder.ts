@@ -409,11 +409,13 @@ const folderParentScalarSchema = createSelectSchema(folders).pick({
   parentId: true,
 });
 
-const folderParentSchema: z.ZodType<FolderParent> = z.lazy(() =>
-  folderParentScalarSchema.extend({
-    parent: folderParentSchema.nullable().optional(),
-  }),
-);
+const folderParentSchema: z.ZodType<FolderParent> = z
+  .lazy(() =>
+    folderParentScalarSchema.extend({
+      parent: folderParentSchema.nullable().optional(),
+    }),
+  )
+  .meta({ id: 'FolderParent' });
 
 const folderParentPublicScalarSchema = createSelectSchema(folders).pick({
   public: true,
@@ -422,11 +424,13 @@ const folderParentPublicScalarSchema = createSelectSchema(folders).pick({
   parentId: true,
 });
 
-const folderParentPublicSchema: z.ZodType<FolderParentPublic> = z.lazy(() =>
-  folderParentPublicScalarSchema.extend({
-    parent: folderParentPublicSchema.nullable().optional(),
-  }),
-);
+const folderParentPublicSchema: z.ZodType<FolderParentPublic> = z
+  .lazy(() =>
+    folderParentPublicScalarSchema.extend({
+      parent: folderParentPublicSchema.nullable().optional(),
+    }),
+  )
+  .meta({ id: 'FolderParentPublic' });
 
 const privateFolderChildSchema = folderScalarSchema.extend({
   _count: folderCountSchema.optional(),

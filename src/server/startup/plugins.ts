@@ -7,13 +7,12 @@ import { fastifyMultipart } from '@fastify/multipart';
 import { fastifyRateLimit } from '@fastify/rate-limit';
 import { fastifySensible } from '@fastify/sensible';
 import { fastifyStatic } from '@fastify/static';
-import fastifySwagger from '@fastify/swagger';
 import type { FastifyInstance } from 'fastify';
-import { jsonSchemaTransform, serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod';
-import { version } from '@/lib/version';
+import { serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod';
 import { checkRateLimit } from '../plugins/checkRateLimit';
 import oauthPlugin from '../plugins/oauth';
 import vitePlugin from '../plugins/vite';
+import { registerOpenApi } from './openapi';
 
 const logger = log('server');
 
@@ -23,17 +22,7 @@ export async function registerPlugins(server: FastifyInstance) {
   server.setValidatorCompiler(validatorCompiler);
   server.setSerializerCompiler(serializerCompiler);
 
-  await server.register(fastifySwagger, {
-    openapi: {
-      info: {
-        title: 'Zipline',
-        description: 'Zipline API',
-        version,
-      },
-      servers: [],
-    },
-    transform: jsonSchemaTransform,
-  });
+  await registerOpenApi(server);
 
   await server.register(fastifyCookie, {
     secret: config.core.secret,
