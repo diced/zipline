@@ -4,7 +4,7 @@ ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 
 RUN corepack enable \
-    && apk add --no-cache ffmpeg=8.0.1-r1 tzdata=2026c-r0
+    && apk add --no-cache ffmpeg tzdata
 
 WORKDIR /zipline
 
