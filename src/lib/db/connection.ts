@@ -1,4 +1,4 @@
-import { readDbVars } from '@/lib/config/read/env';
+import { buildDatabaseUrl, readDbVars } from '@/lib/config/read/env';
 import { log } from '@/lib/logger';
 import { fileURLToPath } from 'url';
 
@@ -8,9 +8,13 @@ export function getDatabaseUrl() {
   const vars = readDbVars();
   if (vars.DATABASE_URL) return vars.DATABASE_URL;
 
-  const username = encodeURIComponent(vars.DATABASE_USERNAME);
-  const password = encodeURIComponent(vars.DATABASE_PASSWORD);
-  return `postgresql://${username}:${password}@${vars.DATABASE_HOST}:${vars.DATABASE_PORT}/${vars.DATABASE_NAME}`;
+  return buildDatabaseUrl(
+    vars.DATABASE_USERNAME,
+    vars.DATABASE_PASSWORD,
+    vars.DATABASE_HOST,
+    vars.DATABASE_PORT,
+    vars.DATABASE_NAME,
+  );
 }
 
 export function getPgliteDir(connectionString: string) {
