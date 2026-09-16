@@ -90,6 +90,8 @@ export const discordContent = z
   .nullable()
   .default(null);
 
+export const trustedProxiesSchema = z.array(z.union([z.ipv4(), z.ipv6(), z.cidrv4(), z.cidrv6()]));
+
 export const schema = z.object({
   core: z.object({
     port: z.number().default(3000),
@@ -120,6 +122,7 @@ export const schema = z.object({
       .transform((s) => resolve(s))
       .default(resolve('./uploads/.tmp')),
     trustProxy: z.boolean().default(false),
+    trustedProxies: trustedProxiesSchema.default([]),
 
     databaseUrl: z.url(),
 

@@ -51,6 +51,7 @@ export const zipline = pgTable(
     coreDefaultDomain: text(),
     coreTempDirectory: text().notNull(),
     coreTrustProxy: boolean().default(false).notNull(),
+    coreTrustedProxies: text().array().default([]).notNull(),
 
     chunksEnabled: boolean().default(true).notNull(),
     chunksMax: text().default('95mb').notNull(),

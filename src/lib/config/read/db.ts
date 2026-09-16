@@ -5,6 +5,7 @@ export const DATABASE_TO_PROP = {
   coreDefaultDomain: 'core.defaultDomain',
   coreTempDirectory: 'core.tempDirectory',
   coreTrustProxy: 'core.trustProxy',
+  coreTrustedProxies: 'core.trustedProxies',
 
   chunksMax: 'chunks.max',
   chunksSize: 'chunks.size',

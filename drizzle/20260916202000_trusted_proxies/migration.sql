@@ -1,0 +1,1 @@
+ALTER TABLE "Zipline" ADD COLUMN "coreTrustedProxies" text[] DEFAULT '{}'::text[] NOT NULL;

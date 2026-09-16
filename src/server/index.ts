@@ -52,14 +52,19 @@ async function main() {
 
   await mkdir(config.core.tempDirectory, { recursive: true });
 
+  const trustProxy = config.core.trustProxy ? config.core.trustedProxies : false;
+  if (config.core.trustProxy && config.core.trustedProxies.length === 0) {
+    logger.warn('core.trustedProxies is empty; ignoring forwarded headers and using socket addresses');
+  }
+
   logger.debug('creating server', {
     port: config.core.port,
     hostname: config.core.hostname,
-    trustProxy: config.core.trustProxy,
+    trustProxy,
   });
 
   const server = fastify({
-    trustProxy: config.core.trustProxy,
+    trustProxy,
     routerOptions: {
       maxParamLength: 1024,
     },

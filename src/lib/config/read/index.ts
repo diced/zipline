@@ -14,6 +14,7 @@ export const rawConfig: any = {
     returnHttpsUrls: undefined,
     tempDirectory: undefined,
     trustProxy: undefined,
+    trustedProxies: undefined,
     database: {
       username: undefined,
       password: undefined,

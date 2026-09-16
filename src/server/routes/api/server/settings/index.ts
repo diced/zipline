@@ -4,7 +4,7 @@ import { checkOutput, COMPRESS_TYPES } from '@/lib/compress';
 import { reloadSettings } from '@/lib/config';
 import type { readDatabaseSettings } from '@/lib/config/read/db';
 import { safeConfig } from '@/lib/config/safe';
-import { MAX_SAFE_TIMEOUT_MS, MIME_REGEX } from '@/lib/config/validate';
+import { MAX_SAFE_TIMEOUT_MS, MIME_REGEX, trustedProxiesSchema } from '@/lib/config/validate';
 import { db } from '@/lib/db';
 import { getSettings, updateSettings } from '@/lib/db/models/zipline';
 import { zipline } from '@/lib/db/schema';
@@ -148,6 +148,7 @@ export default typedPlugin(
               .refine((value) => !value || /^[a-z0-9-.]+$/.test(value), 'Invalid domain format'),
             coreReturnHttpsUrls: z.boolean(),
             coreTrustProxy: z.boolean(),
+            coreTrustedProxies: trustedProxiesSchema,
 
             chunksEnabled: z.boolean(),
             chunksMax: zBytes,

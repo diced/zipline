@@ -1,5 +1,5 @@
 import type { Response } from '@/lib/api/response';
-import { Button, LoadingOverlay, Stack, Switch, TextInput } from '@mantine/core';
+import { Button, LoadingOverlay, Stack, Switch, TagsInput, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconDeviceFloppy } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
@@ -26,6 +26,7 @@ function Form({ data, isLoading }: { data: Response['/api/server/settings']; isL
       coreDefaultDomain: data.settings.coreDefaultDomain,
       coreTempDirectory: data.settings.coreTempDirectory,
       coreTrustProxy: data.settings.coreTrustProxy,
+      coreTrustedProxies: data.settings.coreTrustedProxies,
     },
     enhanceGetInputProps: (payload) => ({
       disabled: data.tampered.includes(payload.field) || false,
@@ -54,8 +55,15 @@ function Form({ data, isLoading }: { data: Response['/api/server/settings']; isL
 
         <Switch
           label='Trust Proxies'
-          description='Trust the X-Forwarded-* headers set by proxies. Only enable this if you are behind a trusted proxy (nginx, caddy, etc.). Requires a server restart.'
+          description='Trust X-Forwarded-* headers from the trusted proxies listed below. Requires a server restart.'
           {...form.getInputProps('coreTrustProxy', { type: 'checkbox' })}
+        />
+
+        <TagsInput
+          label='Trusted Proxies'
+          description='Enter the IPv4/IPv6 addresses or CIDRs of your reverse proxies, separated by commas. Only include trusted proxies, not client networks. An empty list ignores forwarded headers and shares rate limits across clients behind the same proxy. Requires a server restart.'
+          placeholder='127.0.0.1, ::1'
+          {...form.getInputProps('coreTrustedProxies')}
         />
 
         <TextInput
