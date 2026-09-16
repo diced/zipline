@@ -13,7 +13,7 @@ import { log } from '@/lib/logger';
 import { guess } from '@/lib/mimes';
 import { TimedCache } from '@/lib/timedCache';
 import typedPlugin from '@/server/typedPlugin';
-import { desc, eq, like, sql } from 'drizzle-orm';
+import { and, desc, eq, like, lt, sql } from 'drizzle-orm';
 import { FastifyReply, FastifyRequest } from 'fastify';
 
 const VIEW_WINDOW = 5 * 1000;
@@ -97,27 +97,33 @@ export const rawFileHandler = async (
 
   const size = file?.size || (await datasource.size(file?.name ?? id));
 
-  // view stuff
+  if (file.maxViews) {
+    const [view] = await db
+      .update(files)
+      .set({ views: sql`${files.views} + 1` })
+      .where(and(eq(files.id, file.id), lt(files.views, files.maxViews)))
+      .returning({ id: files.id });
+
+    if (!view) {
+      if (config.features.deleteOnMaxViews) {
+        try {
+          await datasource.delete(file.name);
+          await removeFile(file.id);
+        } catch (e) {
+          logger.error('failed to delete file on max views', { id: file.id }).error(e as Error);
+        }
+      }
+      return res.callNotFound();
+    }
+  }
+
+  // Deduplicate view statistics only for files without a view limit.
   const now = Date.now();
   const isView = !req.headers.range || req.headers.range.startsWith('bytes=0');
   const key = `${req.ip}-${req.headers['user-agent'] ?? 'unknown'}-${file.id}`;
   const last = viewsCache.get(key) || 0;
 
-  const canCountView = isView && now - last > VIEW_WINDOW;
-  const updatedViews = (file.views || 0) + (canCountView ? 1 : 0);
-
-  // check using future values
-  if (file.maxViews && updatedViews > file.maxViews) {
-    if (config.features.deleteOnMaxViews) {
-      try {
-        await datasource.delete(file.name);
-        await removeFile(file.id);
-      } catch (e) {
-        logger.error('failed to delete file on max views', { id: file.id }).error(e as Error);
-      }
-    }
-    return res.callNotFound();
-  }
+  const canCountView = !file.maxViews && isView && now - last > VIEW_WINDOW;
 
   const countView = async () => {
     if (!file || !canCountView) return;
