@@ -34,9 +34,7 @@ const commonDoubleExts = [
 export function getExtension(filename: string, override?: string) {
   if (override !== undefined) return override;
 
-  const doubleExtension = commonDoubleExts.find((ext) =>
-    filename.toLowerCase().endsWith(ext.toLowerCase()),
-  );
+  const doubleExtension = commonDoubleExts.find((ext) => filename.toLowerCase().endsWith(ext.toLowerCase()));
 
   return doubleExtension ? filename.slice(-doubleExtension.length) : extname(filename);
 }
