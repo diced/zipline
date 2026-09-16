@@ -1,5 +1,12 @@
 import { ApiError } from '@/lib/api/errors';
-import { checkQuota, getDomain, getExtension, getFilename, resolveUploadMimetype } from '@/lib/api/upload';
+import {
+  checkQuota,
+  getDomain,
+  getExtension,
+  getFilename,
+  isExtensionDisabled,
+  resolveUploadMimetype,
+} from '@/lib/api/upload';
 import { bytes } from '@/lib/bytes';
 import { formatRootUrl } from '@/lib/url';
 import { config } from '@/lib/config';
@@ -291,7 +298,7 @@ export default typedPlugin(
 
         if (options.partial.lastchunk) {
           const extension = getExtension(options.partial.filename, options.overrides?.extension);
-          if (config.files.disabledExtensions.includes(extension)) throw new ApiError(1006);
+          if (isExtensionDisabled(extension)) throw new ApiError(1006);
 
           // determine filename
           const format = options.format || config.files.defaultFormat;

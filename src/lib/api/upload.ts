@@ -32,7 +32,20 @@ const commonDoubleExts = [
 ];
 
 export function getExtension(filename: string, override?: string) {
-  return override ?? commonDoubleExts.find((ext) => filename.endsWith(ext)) ?? extname(filename);
+  if (override !== undefined) return override;
+
+  const doubleExtension = commonDoubleExts.find((ext) =>
+    filename.toLowerCase().endsWith(ext.toLowerCase()),
+  );
+
+  return doubleExtension ? filename.slice(-doubleExtension.length) : extname(filename);
+}
+
+export function isExtensionDisabled(extension: string) {
+  const normalize = (ext: string) => ext.trim().replace(/^\./, '').toLowerCase();
+  const normalizedExtension = normalize(extension);
+
+  return config.files.disabledExtensions.some((ext) => normalize(ext) === normalizedExtension);
 }
 
 export async function checkQuota(

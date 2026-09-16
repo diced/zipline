@@ -5,6 +5,7 @@ import {
   getDomain,
   getExtension,
   getFilename,
+  isExtensionDisabled,
   resolveUploadMimetype,
 } from '@/lib/api/upload';
 import { bytes } from '@/lib/bytes';
@@ -164,8 +165,9 @@ export default typedPlugin(
           const file = multipartFiles[i];
           const extension = getExtension(file.filename, options.overrides?.extension);
 
-          if (config.files.disabledExtensions.includes(extension))
+          if (isExtensionDisabled(extension))
             throw new ApiError(1006, `file[${i}]: File extension ${extension} is not allowed`);
+
           if (file.file.bytesRead > bytes(config.files.maxFileSize))
             throw new ApiError(
               5001,
