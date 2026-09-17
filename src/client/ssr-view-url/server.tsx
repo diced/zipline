@@ -6,7 +6,7 @@ import { urls } from '@/lib/db/schema';
 import { renderHtml } from '@/lib/ssr/renderHtml';
 import { ZiplineTheme } from '@/lib/theme';
 import { FastifyRequest } from 'fastify';
-import { eq, or, sql } from 'drizzle-orm';
+import { and, eq, lt, or, sql } from 'drizzle-orm';
 import { createRoutes } from './routes';
 import { ApiError } from '@/lib/api/errors';
 
@@ -71,9 +71,16 @@ export async function render(
   const [updated] = await db
     .update(urls)
     .set({ views: sql`${urls.views} + 1` })
-    .where(eq(urls.id, urlEntry.id))
+    .where(and(eq(urls.id, urlEntry.id), urlEntry.maxViews ? lt(urls.views, urls.maxViews) : undefined))
     .returning({ id: urls.id });
-  if (!updated) throw new ApiError(9005);
+  if (!updated) {
+    if (!urlEntry.maxViews) throw new ApiError(9005);
+
+    if (zConfig.features.deleteOnMaxViews) {
+      await db.delete(urls).where(eq(urls.id, urlEntry.id));
+    }
+    return { html: 'Gone', meta: '', status: 410 };
+  }
 
   if (publicUrl.destination) {
     return {

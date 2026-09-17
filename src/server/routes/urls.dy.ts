@@ -4,7 +4,7 @@ import { config } from '@/lib/config';
 import { db } from '@/lib/db';
 import { urls } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
-import { eq, or, sql } from 'drizzle-orm';
+import { and, eq, lt, or, sql } from 'drizzle-orm';
 import { FastifyReply, FastifyRequest } from 'fastify';
 
 type Params = {
@@ -32,20 +32,6 @@ export async function urlsRoute(
   if (!url) return res.callNotFound();
   if (!url.enabled) return res.callNotFound();
 
-  if (url.maxViews && url.views >= url.maxViews) {
-    if (config.features.deleteOnMaxViews) {
-      await db.delete(urls).where(eq(urls.id, url.id));
-
-      logger.info(`${url.code} deleted due to reaching max views`, {
-        id: url.id,
-        views: url.views,
-        vanity: url.vanity ?? 'none',
-      });
-    }
-
-    return res.callNotFound();
-  }
-
   if (url.password) {
     const valid = verifyAccessToken(token, 'url', url.id);
     if (!valid) return res.redirect(`/view/url/${url.id}`);
@@ -54,9 +40,23 @@ export async function urlsRoute(
   const [updated] = await db
     .update(urls)
     .set({ views: sql`${urls.views} + 1` })
-    .where(eq(urls.id, url.id))
+    .where(and(eq(urls.id, url.id), url.maxViews ? lt(urls.views, urls.maxViews) : undefined))
     .returning({ id: urls.id });
-  if (!updated) throw new ApiError(9002);
+  if (!updated) {
+    if (!url.maxViews) throw new ApiError(9002);
+
+    if (config.features.deleteOnMaxViews) {
+      await db.delete(urls).where(eq(urls.id, url.id));
+
+      logger.info(`${url.code} deleted due to reaching max views`, {
+        id: url.id,
+        views: url.maxViews,
+        vanity: url.vanity ?? 'none',
+      });
+    }
+
+    return res.callNotFound();
+  }
 
   return res.redirect(url.destination);
 }
