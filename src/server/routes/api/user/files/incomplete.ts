@@ -34,7 +34,7 @@ export default typedPlugin(
           .select()
           .from(incompleteFiles)
           .where(eq(incompleteFiles.userId, req.user.id))
-          .orderBy(desc(incompleteFiles.updatedAt), desc(incompleteFiles.id));
+          .orderBy(desc(incompleteFiles.updatedAt));
 
         return res.send(pendingFiles);
       },
