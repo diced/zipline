@@ -6,7 +6,7 @@ import { secondlyRatelimit } from '@/lib/ratelimits';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
 import z from 'zod';
-import { and, eq, inArray } from 'drizzle-orm';
+import { and, desc, eq, inArray } from 'drizzle-orm';
 import { ApiError } from '@/lib/api/errors';
 
 export type ApiUserFilesIncompleteResponse = IncompleteFile[] | { count: number };
@@ -20,7 +20,8 @@ export default typedPlugin(
       PATH,
       {
         schema: {
-          description: 'List incomplete or still-processing file uploads for the authenticated user.',
+          description:
+            'List incomplete or still-processing file uploads for the authenticated user, most recently updated first.',
           response: {
             200: z.array(incompleteFileSchema),
           },
@@ -32,7 +33,8 @@ export default typedPlugin(
         const pendingFiles = await db
           .select()
           .from(incompleteFiles)
-          .where(eq(incompleteFiles.userId, req.user.id));
+          .where(eq(incompleteFiles.userId, req.user.id))
+          .orderBy(desc(incompleteFiles.updatedAt), desc(incompleteFiles.id));
 
         return res.send(pendingFiles);
       },
@@ -42,10 +44,16 @@ export default typedPlugin(
       PATH,
       {
         schema: {
-          description: 'Delete one or more incomplete file records owned by the authenticated user.',
-          body: z.object({
-            id: z.array(z.string()),
-          }),
+          description:
+            'Delete selected incomplete file records or clear all completed records owned by the authenticated user. Uploaded files are not deleted.',
+          body: z.union([
+            z.object({
+              id: z.array(z.string()),
+            }),
+            z.object({
+              completed: z.literal(true),
+            }),
+          ]),
           response: {
             200: z.object({
               count: z.number(),
@@ -57,11 +65,18 @@ export default typedPlugin(
         ...secondlyRatelimit(1),
       },
       async (req, res) => {
-        if (!req.body.id.length) throw new ApiError(1027);
+        if ('id' in req.body && !req.body.id.length) throw new ApiError(1027);
 
         const removed = await db
           .delete(incompleteFiles)
-          .where(and(eq(incompleteFiles.userId, req.user.id), inArray(incompleteFiles.id, req.body.id)))
+          .where(
+            and(
+              eq(incompleteFiles.userId, req.user.id),
+              'id' in req.body
+                ? inArray(incompleteFiles.id, req.body.id)
+                : eq(incompleteFiles.status, 'COMPLETE'),
+            ),
+          )
           .returning({ id: incompleteFiles.id });
 
         logger.info('incomplete files deleted', {

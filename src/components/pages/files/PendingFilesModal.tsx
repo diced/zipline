@@ -1,32 +1,44 @@
+import RelativeDate from '@/components/RelativeDate';
 import { Response } from '@/lib/api/response';
-import { IncompleteFile } from '@/lib/db/models/incompleteFile';
 import { IncompleteFileStatus } from '@/lib/db/enums';
+import { IncompleteFile } from '@/lib/db/models/incompleteFile';
 import { fetchApi } from '@/lib/fetchApi';
-import { Badge, Button, Card, Group, Modal, Paper, Stack, Text } from '@mantine/core';
+import {
+  ActionIcon,
+  Badge,
+  Button,
+  Group,
+  Modal,
+  Paper,
+  ScrollArea,
+  Stack,
+  Text,
+  Tooltip,
+} from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { IconFileDots, IconTrashFilled } from '@tabler/icons-react';
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import useSWR from 'swr';
 import { DashboardFilesModals, DashboardFilesModalsUpdate } from '.';
 
 const badgeMap: Record<IncompleteFileStatus, ReactNode> = {
   PENDING: (
-    <Badge variant='light' color='gray'>
+    <Badge size='xs' variant='light' color='gray'>
       Pending
     </Badge>
   ),
   PROCESSING: (
-    <Badge variant='light' color='yellow'>
+    <Badge size='xs' variant='light' color='yellow'>
       Processing
     </Badge>
   ),
   COMPLETE: (
-    <Badge variant='light' color='green'>
+    <Badge size='xs' variant='light' color='green'>
       Complete
     </Badge>
   ),
   FAILED: (
-    <Badge variant='light' color='red'>
+    <Badge size='xs' variant='light' color='red'>
       Failed
     </Badge>
   ),
@@ -39,76 +51,103 @@ export default function PendingFilesModal({
   modals: DashboardFilesModals;
   setModals: DashboardFilesModalsUpdate;
 }) {
+  const [clearing, setClearing] = useState(false);
   const { data: incompleteFiles, mutate } = useSWR<
     Extract<IncompleteFile[], Response['/api/user/files/incomplete']>
   >('/api/user/files/incomplete');
 
-  const handleDelete = async (incompleteFile: IncompleteFile) => {
-    const { error } = await fetchApi<Response['/api/user/files/incomplete']>(
-      '/api/user/files/incomplete',
-      'DELETE',
-      {
-        id: [incompleteFile.id],
-      },
-    );
+  const handleDelete = async (incompleteFile?: IncompleteFile) => {
+    setClearing(true);
+    try {
+      const { error } = await fetchApi<Response['/api/user/files/incomplete']>(
+        '/api/user/files/incomplete',
+        'DELETE',
+        incompleteFile ? { id: [incompleteFile.id] } : { completed: true },
+      );
 
-    if (error) {
+      if (error) throw new Error(error.error);
+
       showNotification({
-        title: 'Error',
-        message: `Failed to delete pending file: ${error.error}`,
-        color: 'red',
-        icon: <IconFileDots size='1rem' />,
-      });
-    } else {
-      showNotification({
-        message: 'Cleared Pending File!',
+        message: incompleteFile ? 'Cleared Pending File!' : 'Cleared completed files!',
         color: 'green',
         icon: <IconTrashFilled size='1rem' />,
       });
+      await mutate();
+    } catch (error) {
+      showNotification({
+        title: 'Error',
+        message: `Failed to clear ${incompleteFile ? 'pending file' : 'completed files'}: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        color: 'red',
+        icon: <IconFileDots size='1rem' />,
+      });
+    } finally {
+      setClearing(false);
     }
-
-    mutate();
   };
 
   return (
-    <Modal opened={modals.pending} onClose={() => setModals({ pending: false })} title='Pending Files'>
+    <Modal
+      opened={modals.pending}
+      onClose={() => setModals({ pending: false })}
+      title='Pending Files'
+      size='md'
+    >
       <Stack gap='xs'>
-        {incompleteFiles?.map((incompleteFile) => (
-          <Card key={incompleteFile.id} withBorder>
-            <Group justify='space-between'>
-              <Text fw='bolder'>{incompleteFile.metadata.file.filename}</Text>
-              {badgeMap[incompleteFile.status]}
-            </Group>
+        <Group justify='space-between'>
+          <Text size='sm' c='dimmed'>
+            {incompleteFiles?.length ?? 0} file{incompleteFiles?.length === 1 ? '' : 's'}
+          </Text>
+          <Button
+            size='compact-sm'
+            color='red'
+            variant='light'
+            disabled={clearing || !incompleteFiles?.some((file) => file.status === 'COMPLETE')}
+            onClick={() => handleDelete()}
+            leftSection={<IconTrashFilled size='1rem' />}
+          >
+            Clear completed
+          </Button>
+        </Group>
+        {!!incompleteFiles?.length && (
+          <ScrollArea.Autosize mah={400} type='auto'>
+            <Stack gap='xs'>
+              {incompleteFiles.map((inf) => (
+                <Group key={inf.id} justify='space-between' wrap='nowrap' gap='sm'>
+                  <Stack gap={2} flex={1} miw={0}>
+                    <Text size='sm' fw={600} truncate title={inf.metadata.file.filename}>
+                      {inf.metadata.file.filename}
+                    </Text>
 
-            <Group justify='space-between'>
-              <Text size='xs' c='dimmed' fw='bold'>
-                {incompleteFile.metadata.file.type}
-              </Text>
+                    <Text size='xs' c='dimmed'>
+                      {inf.chunksComplete}/{inf.chunksTotal} chunks
+                      {inf.status === 'COMPLETE' && (
+                        <>
+                          , <RelativeDate date={inf.updatedAt} />
+                        </>
+                      )}
+                    </Text>
+                  </Stack>
 
-              <Text size='xs' c='dimmed'>
-                {incompleteFile.chunksComplete} / {incompleteFile.chunksTotal} processed
-              </Text>
-            </Group>
+                  <Group gap='xs' wrap='nowrap'>
+                    {badgeMap[inf.status]}
 
-            <Text size='xs' c='dimmed'>
-              {incompleteFile.id}
-            </Text>
-
-            <Group justify='space-between'>
-              <Button
-                fullWidth
-                size='compact-sm'
-                mt='xs'
-                color='red'
-                variant='light'
-                onClick={() => handleDelete(incompleteFile)}
-                leftSection={<IconTrashFilled size='1rem' />}
-              >
-                Clear
-              </Button>
-            </Group>
-          </Card>
-        ))}
+                    <Tooltip label='Clear entry'>
+                      <ActionIcon
+                        color='red'
+                        variant='outline'
+                        aria-label={`Clear ${inf.metadata.file.filename}`}
+                        disabled={clearing}
+                        onClick={() => handleDelete(inf)}
+                      >
+                        <IconTrashFilled size='1rem' />
+                      </ActionIcon>
+                    </Tooltip>
+                  </Group>
+                </Group>
+              ))}
+            </Stack>
+          </ScrollArea.Autosize>
+        )}
 
         {incompleteFiles?.length === 0 && (
           <Paper withBorder px='sm' py='xs'>
