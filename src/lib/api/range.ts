@@ -5,11 +5,12 @@ export function parseRange(header: string, length: number): [number, number] {
 
   if (range.startsWith('-')) {
     end = length - 1;
-    start = length - 1 - Number(range.substring(1));
+    start = Math.max(0, length - Number(range.substring(1)));
   } else {
-    const [s, e] = range.split('-').map(Number);
-    start = s;
-    end = e || length - 1;
+    const [s, e] = range.split('-');
+    start = Number(s);
+    const parsedEnd = Number(e);
+    end = e?.trim() && !Number.isNaN(parsedEnd) ? parsedEnd : length - 1;
   }
 
   if (end > length - 1) {

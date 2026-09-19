@@ -1,5 +1,17 @@
 import { ApiError } from '@/lib/api/errors';
 import {
+  claimPartial,
+  cleanupClaimedPartial,
+  completePartialChunk,
+  createPartial,
+  deleteOrphanedPartialFiles,
+  deletePartial,
+  finalizePartial,
+  getClaimedPartial,
+  PARTIAL_TIMEOUT,
+  quotaReservations,
+} from '@/lib/api/partial';
+import {
   checkQuota,
   getDomain,
   getExtension,
@@ -8,136 +20,33 @@ import {
   resolveUploadMimetype,
 } from '@/lib/api/upload';
 import { bytes } from '@/lib/bytes';
-import { formatRootUrl } from '@/lib/url';
 import { config } from '@/lib/config';
 import { hashPassword } from '@/lib/crypto';
 import { db } from '@/lib/db';
 import { removeFile, type FileInsert } from '@/lib/db/models/file';
 import { getFolderMetadata } from '@/lib/db/models/folder';
-import { files, incompleteFiles, users } from '@/lib/db/schema';
 import { getUser } from '@/lib/db/models/user';
+import { files, incompleteFiles, users } from '@/lib/db/schema';
 import { sanitizeFilename } from '@/lib/fs';
 import { log } from '@/lib/logger';
-import { randomCharacters } from '@/lib/random';
-import { UploadHeaders, UploadOptions, parseHeaders } from '@/lib/uploader/parseHeaders';
+import { parseHeaders, UploadHeaders } from '@/lib/uploader/parseHeaders';
+import { formatRootUrl } from '@/lib/url';
+import { createWorker } from '@/lib/worker';
+import type { DomainDbRequest, DomainDbResponse } from '@/offload/proxiedDb';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
-import { z } from 'zod';
-import { readdir, rename, rm } from 'fs/promises';
-import { join } from 'path';
-import { createWorker } from '@/lib/worker';
-import { ApiUploadResponse } from '.';
-import type { DomainDbRequest, DomainDbResponse } from '@/offload/proxiedDb';
 import { eq, getColumns, sql } from 'drizzle-orm';
+import { rename } from 'fs/promises';
+import { join } from 'path';
+import { z } from 'zod';
+import { ApiUploadResponse } from '.';
 
 const logger = log('api').c('upload').c('partial');
 const { password: _password, userId: _userId, ...uploadFileColumns } = getColumns(files);
 
-const PARTIAL_TIMEOUT = 30 * 60_000;
-const MAX_PARTIALS = 4;
-
-type PartialCache = {
-  length: number;
-  options: UploadOptions;
-  prefix: string;
-  actorKey: string;
-  quotaUserId: string | null;
-  total: number;
-  finalized: boolean;
-  timeout?: NodeJS.Timeout;
-};
-
-const partialsCache = new Map<string, PartialCache>();
-
-function resetPartialTimeout(identifier: string) {
-  const cache = partialsCache.get(identifier);
-  if (!cache || cache.finalized) return;
-
-  if (cache.timeout) clearTimeout(cache.timeout);
-  cache.timeout = setTimeout(() => {
-    void deletePartial(identifier).catch((error) => {
-      logger.warn('failed to clean up inactive partial upload', { identifier, error });
-    });
-  }, PARTIAL_TIMEOUT);
-  cache.timeout.unref();
-}
-
-function createPartial(options: UploadOptions, actorKey: string, quotaUserId: string | null, total: number) {
-  const identifier = randomCharacters(8);
-
-  const prefix = `zipline_partial_${identifier}_`;
-
-  partialsCache.set(identifier, {
-    length: 0,
-    options,
-    prefix,
-    actorKey,
-    quotaUserId,
-    total,
-    finalized: false,
-  });
-  resetPartialTimeout(identifier);
-
-  return identifier;
-}
-
-function activePartials(actorKey: string) {
-  let count = 0;
-  for (const partial of partialsCache.values()) {
-    if (partial.actorKey === actorKey && ++count >= MAX_PARTIALS) return count;
-  }
-
-  return count;
-}
-
-function quotaReservations(quotaUserId: string) {
-  let size = 0;
-  let count = 0;
-  for (const partial of partialsCache.values()) {
-    if (partial.quotaUserId !== quotaUserId || partial.finalized) continue;
-
-    size += partial.total;
-    count++;
-  }
-
-  return { size, files: count };
-}
-
-async function deletePartial(identifier: string, deleteFiles = true) {
-  const cache = partialsCache.get(identifier);
-  if (!cache) return;
-
-  partialsCache.delete(identifier);
-  if (cache.timeout) clearTimeout(cache.timeout);
-
-  if (deleteFiles) {
-    const tempFiles = await readdir(config.core.tempDirectory);
-    await Promise.all(
-      tempFiles.filter((f) => f.startsWith(cache.prefix)).map((f) => rm(join(config.core.tempDirectory, f))),
-    );
-  }
-}
-
-async function deleteOrphanedPartialFiles() {
-  const tempFiles = await readdir(config.core.tempDirectory);
-  const orphaned = tempFiles.filter((file) => {
-    if (!file.startsWith('zipline_partial_')) return false;
-
-    for (const partial of partialsCache.values()) {
-      if (file.startsWith(partial.prefix)) return false;
-    }
-
-    return true;
-  });
-
-  await Promise.all(orphaned.map((file) => rm(join(config.core.tempDirectory, file), { force: true })));
-
-  if (orphaned.length) logger.info('cleaned up orphaned partial uploads', { files: orphaned.length });
-}
-
 export type ApiUploadPartialResponse = ApiUploadResponse & {
   partialSuccess?: boolean;
-  partialIdentifier?: string;
+  partialToken?: string;
 };
 
 export const PATH = '/api/upload/partial';
@@ -155,9 +64,9 @@ export default typedPlugin(
     orphanCleanup.unref();
     server.addHook('onClose', async () => clearInterval(orphanCleanup));
 
-    const rateLimit = server.rateLimit
-      ? server.rateLimit()
-      : (_req: any, _res: any, next: () => any) => next();
+    server.addHook('onRequestAbort', cleanupClaimedPartial);
+
+    const rateLimit = server.rateLimit?.();
 
     server.post<{
       Headers: UploadHeaders;
@@ -166,13 +75,19 @@ export default typedPlugin(
       {
         schema: {
           description:
-            'Upload a single file in chunks as a partial upload session, using headers to control chunking and resumption.',
+            'Upload a single file in sequential chunks. The first chunk is rate limited. Each non-final chunk returns a single-use partialToken, valid for 30 minutes, which must be sent as x-zipline-p-token on the next chunk.',
           response: {
             200: z.custom<ApiUploadPartialResponse>(),
           },
           tags: ['auth'],
         },
-        preHandler: [userMiddleware, rateLimit],
+        preHandler: [
+          userMiddleware,
+          async (req, res) => {
+            if (!claimPartial(req) && rateLimit) await rateLimit.call(server, req, res);
+          },
+        ],
+        onResponse: cleanupClaimedPartial,
       },
       async (req, res) => {
         const options = parseHeaders(req.headers, config.files);
@@ -181,7 +96,16 @@ export default typedPlugin(
         if (!options.partial.range || options.partial.range.length !== 3) throw new ApiError(1002);
 
         const [start, end, total] = options.partial.range;
-        if (start < 0 || end < start || total < 0 || end > total) throw new ApiError(1002);
+        if (
+          ![start, end, total].every(Number.isSafeInteger) ||
+          start < 0 ||
+          end < start ||
+          end >= total ||
+          options.partial.contentLength !== total ||
+          options.partial.lastchunk !== (end === total - 1)
+        )
+          throw new ApiError(1002);
+
         if (total > bytes(config.files.maxFileSize)) throw new ApiError(5001);
 
         let folder = null;
@@ -197,15 +121,8 @@ export default typedPlugin(
         let quotaUser = req.user ? req.user : null;
         if (!quotaUser && folder?.userId) quotaUser = await getUser(folder.userId);
 
-        const actorKey = req.user ? `user:${req.user.id}` : `anonymous:${folder?.id ?? 'unknown'}:${req.ip}`;
-
-        let cache: PartialCache | undefined;
         if (start === 0) {
-          if (activePartials(actorKey) >= MAX_PARTIALS)
-            throw new ApiError(1003, 'Too many active partial uploads');
-
-          options.partial.identifier = createPartial(options, actorKey, quotaUser?.id ?? null, total);
-          cache = partialsCache.get(options.partial.identifier);
+          options.partial.identifier = createPartial(req, options, quotaUser?.id ?? null, total);
 
           if (quotaUser?.id) {
             const reserved = quotaReservations(quotaUser.id);
@@ -215,32 +132,21 @@ export default typedPlugin(
               throw new ApiError(5002, typeof quotaCheck === 'string' ? quotaCheck : undefined);
             }
           }
-        } else {
-          if (!options.partial.identifier) throw new ApiError(1003);
-
-          cache = partialsCache.get(options.partial.identifier);
-          if (
-            !cache ||
-            cache.actorKey !== actorKey ||
-            cache.options.folder !== options.folder ||
-            cache.total !== total ||
-            cache.finalized
-          )
-            throw new ApiError(1003);
-
-          resetPartialTimeout(options.partial.identifier);
         }
 
-        if (!cache) throw new ApiError(1003);
+        const { identifier, cache } = getClaimedPartial(req);
+        options.partial.identifier = identifier;
 
         let multipartFiles;
         try {
           const requestFiles = await req.saveRequestFiles({ tmpdir: config.core.tempDirectory });
           multipartFiles = requestFiles.files;
         } catch (error) {
-          await deletePartial(options.partial.identifier);
+          await deletePartial(identifier);
           throw error;
         }
+
+        getClaimedPartial(req);
 
         const response: ApiUploadPartialResponse = {
           files: [],
@@ -262,27 +168,27 @@ export default typedPlugin(
         });
 
         if (multipartFiles.length !== 1) {
-          await deletePartial(options.partial.identifier);
+          await deletePartial(identifier);
           throw new ApiError(multipartFiles.length > 1 ? 1005 : 1062);
         }
         const file = multipartFiles[0];
         const fileSize = file.file.bytesRead;
 
-        if (end - start !== fileSize) {
-          await deletePartial(options.partial.identifier);
+        if (end - start + 1 !== fileSize) {
+          await deletePartial(identifier);
           throw new ApiError(1002);
         }
 
         // file is too large so we delete everything
         if (cache.length + fileSize > total) {
-          await deletePartial(options.partial.identifier);
+          await deletePartial(identifier);
           throw new ApiError(5001);
         }
 
         cache.length += fileSize;
 
         if (options.partial.lastchunk && cache.length !== total) {
-          await deletePartial(options.partial.identifier);
+          await deletePartial(identifier);
           throw new ApiError(1002);
         }
 
@@ -357,7 +263,7 @@ export default typedPlugin(
               return created;
             });
           } catch (error) {
-            await deletePartial(options.partial.identifier);
+            await deletePartial(identifier);
             throw error;
           }
 
@@ -385,11 +291,7 @@ export default typedPlugin(
             },
           });
 
-          cache.finalized = true;
-          if (cache.timeout) clearTimeout(cache.timeout);
-          cache.timeout = undefined;
-
-          const partialIdentifier = options.partial.identifier;
+          finalizePartial(req);
 
           worker.on('message', async (message: DomainDbRequest) => {
             if (message.type !== 'db') return;
@@ -438,7 +340,7 @@ export default typedPlugin(
                     .where(eq(files.id, message.payload.id))
                     .returning(uploadFileColumns);
                   result = updated ?? null;
-                  await deletePartial(partialIdentifier, false);
+                  await deletePartial(identifier, false);
                   break;
                 }
                 case 'file.delete': {
@@ -477,9 +379,9 @@ export default typedPlugin(
           });
 
           worker.once('exit', () => {
-            void deletePartial(partialIdentifier).catch((error) => {
+            void deletePartial(identifier).catch((error) => {
               logger.warn('failed to clean up partial upload after worker exit', {
-                identifier: partialIdentifier,
+                identifier,
                 error,
               });
             });
@@ -496,10 +398,7 @@ export default typedPlugin(
 
         response.partialSuccess = true;
 
-        // send an identifier if this is the first chunk for server-side checks
-        if (options.partial.range[0] === 0) {
-          response.partialIdentifier = options.partial.identifier;
-        }
+        response.partialToken = completePartialChunk(req);
 
         return res.send(response);
       },

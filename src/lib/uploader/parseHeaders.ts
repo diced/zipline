@@ -27,7 +27,7 @@ export type UploadHeaders = {
   'content-range'?: string;
   'x-zipline-p-filename'?: string;
   'x-zipline-p-content-type'?: string;
-  'x-zipline-p-identifier'?: string;
+  'x-zipline-p-token'?: string;
   'x-zipline-p-lastchunk'?: StringBoolean;
   'x-zipline-p-content-length'?: string;
 
@@ -60,7 +60,7 @@ export type UploadOptions = {
   partial?: {
     filename: string;
     contentType: string;
-    identifier: string;
+    identifier?: string;
     lastchunk: boolean;
     range: [number, number, number]; // start, end, total
     contentLength: number;
@@ -267,7 +267,6 @@ export function parseHeaders(headers: UploadHeaders, fileConfig: Config['files']
     response.partial = {
       filename: parseFilenameHeader('x-zipline-p-filename', headers['x-zipline-p-filename'] ?? ''),
       contentType: headers['x-zipline-p-content-type']!,
-      identifier: headers['x-zipline-p-identifier']!,
       lastchunk: headers['x-zipline-p-lastchunk'] === 'true',
       range: [start, end, total],
       contentLength: Number(headers['x-zipline-p-content-length']!),
