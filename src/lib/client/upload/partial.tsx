@@ -57,8 +57,6 @@ export async function uploadPartialFiles(
     folder,
   }: UploadHandlers &
     UploadHeadersOptions & {
-      clipboard: { copy: (text: string) => void };
-      clearEphemeral?: () => void;
       config: ReturnType<typeof useConfig>;
     },
 ): Promise<{ files: Response['/api/upload/partial']['files'] } | null> {
@@ -116,8 +114,6 @@ export async function uploadPartialFiles(
 
       const body = new FormData();
       body.append('file', chunks[j].blob);
-
-      setLoading(true);
 
       notifications.update({
         id: 'upload-partial',

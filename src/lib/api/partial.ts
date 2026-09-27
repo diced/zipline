@@ -3,7 +3,6 @@ import { ApiError } from '@/lib/api/errors';
 import { config } from '@/lib/config';
 import { log } from '@/lib/logger';
 import { randomCharacters } from '@/lib/random';
-import type { UploadOptions } from '@/lib/uploader/parseHeaders';
 import type { FastifyRequest } from 'fastify';
 import { readdir, rm } from 'fs/promises';
 import { join } from 'path';
@@ -15,7 +14,7 @@ const MAX_PARTIALS = 4;
 
 type PartialCache = {
   length: number;
-  options: UploadOptions;
+  folder: string | undefined;
   prefix: string;
   actorKey: string;
   quotaUserId: string | null;
@@ -48,7 +47,7 @@ export function claimPartial(req: FastifyRequest): boolean {
     cache.finalized ||
     cache.token !== token ||
     cache.actorKey !== partialActorKey(req, folder) ||
-    cache.options.folder !== folder
+    cache.folder !== folder
   )
     return false;
 
@@ -137,17 +136,17 @@ function resetPartialTimeout(identifier: string) {
 
 export function createPartial(
   req: FastifyRequest,
-  options: UploadOptions,
+  folder: string | undefined,
   quotaUserId: string | null,
   total: number,
 ) {
-  const actorKey = partialActorKey(req, options.folder);
+  const actorKey = partialActorKey(req, folder);
   if (activePartials(actorKey) >= MAX_PARTIALS) throw new ApiError(1003, 'Too many active partial uploads');
 
   const identifier = randomCharacters(8);
   const cache: PartialCache = {
     length: 0,
-    options,
+    folder,
     prefix: `zipline_partial_${identifier}_`,
     actorKey,
     quotaUserId,
@@ -158,8 +157,6 @@ export function createPartial(
   partialsCache.set(identifier, cache);
   claimedPartials.set(req, { identifier, cache });
   resetPartialTimeout(identifier);
-
-  return identifier;
 }
 
 function activePartials(actorKey: string) {

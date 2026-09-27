@@ -3,7 +3,7 @@ export const API_ERRORS = {
   1000: 'Invalid request schema',
   1001: 'Invalid upload options',
   1002: 'Invalid partial upload',
-  1003: 'Partial upload identifier is invalid',
+  1003: 'Partial upload token is invalid',
   1004: 'Partial upload was not detected',
   1005: 'Partial uploads only support one file field',
   1006: 'File extension is not allowed',

@@ -93,7 +93,6 @@ export default typedPlugin(
         const options = parseHeaders(req.headers, config.files);
 
         if (!options.partial) throw new ApiError(1004);
-        if (!options.partial.range || options.partial.range.length !== 3) throw new ApiError(1002);
 
         const [start, end, total] = options.partial.range;
         if (
@@ -122,30 +121,22 @@ export default typedPlugin(
         if (!quotaUser && folder?.userId) quotaUser = await getUser(folder.userId);
 
         if (start === 0) {
-          options.partial.identifier = createPartial(req, options, quotaUser?.id ?? null, total);
+          createPartial(req, options.folder, quotaUser?.id ?? null, total);
 
           if (quotaUser?.id) {
             const reserved = quotaReservations(quotaUser.id);
             const quotaCheck = await checkQuota(quotaUser, reserved.size, reserved.files);
-            if (quotaCheck !== true) {
-              await deletePartial(options.partial.identifier);
+            if (quotaCheck !== true)
               throw new ApiError(5002, typeof quotaCheck === 'string' ? quotaCheck : undefined);
-            }
           }
         }
 
         const { identifier, cache } = getClaimedPartial(req);
         options.partial.identifier = identifier;
 
-        let multipartFiles;
-        try {
-          const requestFiles = await req.saveRequestFiles({ tmpdir: config.core.tempDirectory });
-          multipartFiles = requestFiles.files;
-        } catch (error) {
-          await deletePartial(identifier);
-          throw error;
-        }
+        const { files: multipartFiles } = await req.saveRequestFiles({ tmpdir: config.core.tempDirectory });
 
+        // Reading the body can outlive the session or be interrupted by an abort.
         getClaimedPartial(req);
 
         const response: ApiUploadPartialResponse = {
@@ -167,38 +158,15 @@ export default typedPlugin(
           files: multipartFiles.map((x) => x.filename),
         });
 
-        if (multipartFiles.length !== 1) {
-          await deletePartial(identifier);
-          throw new ApiError(multipartFiles.length > 1 ? 1005 : 1062);
-        }
+        if (multipartFiles.length !== 1) throw new ApiError(multipartFiles.length > 1 ? 1005 : 1062);
         const file = multipartFiles[0];
         const fileSize = file.file.bytesRead;
 
-        if (end - start + 1 !== fileSize) {
-          await deletePartial(identifier);
-          throw new ApiError(1002);
-        }
-
-        // file is too large so we delete everything
-        if (cache.length + fileSize > total) {
-          await deletePartial(identifier);
-          throw new ApiError(5001);
-        }
+        if (end - start + 1 !== fileSize) throw new ApiError(1002);
 
         cache.length += fileSize;
 
-        if (options.partial.lastchunk && cache.length !== total) {
-          await deletePartial(identifier);
-          throw new ApiError(1002);
-        }
-
-        // handle partial stuff
-        const sanitized = sanitizeFilename(
-          `${cache.prefix}${options.partial.range[0]}_${options.partial.range[1]}`,
-        );
-        if (!sanitized) throw new ApiError(1007);
-
-        const tempFile = join(config.core.tempDirectory, sanitized);
+        const tempFile = join(config.core.tempDirectory, `${cache.prefix}${start}_${end}`);
         await rename(file.filepath, tempFile);
         if (req.tmpUploads) req.tmpUploads = req.tmpUploads.filter((path) => path !== file.filepath);
 
@@ -246,26 +214,20 @@ export default typedPlugin(
           }
           if (!req.user && folder) data.anonymous = true;
 
-          let fileUpload;
-          try {
-            fileUpload = await db.transaction(async (tx) => {
-              if (quotaUser?.quota) {
-                await tx.select({ id: users.id }).from(users).where(eq(users.id, quotaUser.id)).for('update');
+          const fileUpload = await db.transaction(async (tx) => {
+            if (quotaUser?.quota) {
+              await tx.select({ id: users.id }).from(users).where(eq(users.id, quotaUser.id)).for('update');
 
-                const quotaCheck = await checkQuota(quotaUser, total, 1, tx);
-                if (quotaCheck !== true)
-                  throw new ApiError(5002, typeof quotaCheck === 'string' ? quotaCheck : undefined);
-              }
+              const quotaCheck = await checkQuota(quotaUser, total, 1, tx);
+              if (quotaCheck !== true)
+                throw new ApiError(5002, typeof quotaCheck === 'string' ? quotaCheck : undefined);
+            }
 
-              const [created] = await tx.insert(files).values(data).returning(uploadFileColumns);
-              if (!created) throw new ApiError(9005);
+            const [created] = await tx.insert(files).values(data).returning(uploadFileColumns);
+            if (!created) throw new ApiError(9005);
 
-              return created;
-            });
-          } catch (error) {
-            await deletePartial(identifier);
-            throw error;
-          }
+            return created;
+          });
 
           const urlPath =
             options.extensionless && config.files.extensionlessUrls
