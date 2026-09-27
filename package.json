@@ -2,7 +2,7 @@
   "name": "zipline",
   "private": true,
   "license": "MIT",
-  "version": "4.7.0",
+  "version": "4.8.0",
   "type": "module",
   "scripts": {
     "test": "node --import tsx --enable-source-maps --test --test-reporter ./src/lib/tests/test-reporter.ts \"tests/**/*.ts\"",
