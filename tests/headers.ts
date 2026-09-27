@@ -107,7 +107,7 @@ test('upload expiration applies defaults and enforces the configured maximum', (
 const partial = {
   'x-zipline-p-filename': 'photo.png',
   'x-zipline-p-content-type': 'image/png',
-  'x-zipline-p-identifier': 'example',
+  'x-zipline-p-token': 'example',
   'x-zipline-p-content-length': '100',
 } as const;
 
@@ -120,7 +120,6 @@ test('partial upload headers preserve chunk metadata', () => {
     {
       filename: 'photo.png',
       contentType: 'image/png',
-      identifier: 'example',
       contentLength: 100,
       range: [0, 50, 100],
       lastchunk: false,

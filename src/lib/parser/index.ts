@@ -51,76 +51,64 @@ export function parseString(str: string, value: ParseValue) {
   const re =
     /\{(?<type>file|url|user|debug|link|metricsUser|metricsZipline)\.(?<prop>\w+)(::(?<mod>(\w+|<|<=|=|>=|>|\^|\$|~|\/)+))?((::(?<mod_tzlocale>\S+?))|(?<mod_check>\[(?<mod_check_true>".*?")\|\|(?<mod_check_false>".*?")\]))?\}/gi;
   let matches: RegExpMatchArray | null;
+  let parsed = '';
+  let previousEnd = 0;
 
   while ((matches = re.exec(str))) {
     if (!matches.groups) continue;
 
     const index = matches.index as number;
+    parsed += str.slice(previousEnd, index);
+    previousEnd = re.lastIndex;
 
     const getV = value[matches.groups.type as keyof ParseValue];
 
     if (!getV) {
-      str = replaceCharsFromString(str, '{unknown_type}', index, re.lastIndex);
-      re.lastIndex = index;
+      parsed += '{unknown_type}';
       continue;
     }
 
     if (['password', 'avatar', 'passkeys', 'oauthProviders', 'tags'].includes(matches.groups.prop)) {
-      str = replaceCharsFromString(str, '{unknown_property}', index, re.lastIndex);
-      re.lastIndex = index;
+      parsed += '{unknown_property}';
       continue;
     }
 
     if (['originalName', 'name'].includes(matches.groups.prop)) {
       const filename = getV[matches.groups.prop as keyof ParseValue['file']];
-      str = replaceCharsFromString(
-        str,
-        modifier(
-          matches.groups.mod || 'string',
-          filename,
-          matches.groups.mod_tzlocale ?? undefined,
-          matches.groups.mod_check_true ?? undefined,
-          matches.groups.mod_check_false ?? undefined,
-          value,
-        ),
-        index,
-        re.lastIndex,
+      parsed += modifier(
+        matches.groups.mod || 'string',
+        filename,
+        matches.groups.mod_tzlocale ?? undefined,
+        matches.groups.mod_check_true ?? undefined,
+        matches.groups.mod_check_false ?? undefined,
+        value,
       );
-      re.lastIndex = index;
       continue;
     }
 
     const v = getV[matches.groups.prop as keyof ParseValue['file'] | keyof ParseValue['user']];
 
     if (v === undefined) {
-      str = replaceCharsFromString(str, '{unknown_property}', index, re.lastIndex);
-      re.lastIndex = index;
+      parsed += '{unknown_property}';
       continue;
     }
 
     if (matches.groups.mod) {
-      str = replaceCharsFromString(
-        str,
-        modifier(
-          matches.groups.mod,
-          v,
-          matches.groups.mod_tzlocale ?? undefined,
-          matches.groups.mod_check_true ?? undefined,
-          matches.groups.mod_check_false ?? undefined,
-          value,
-        ),
-        index,
-        re.lastIndex,
+      parsed += modifier(
+        matches.groups.mod,
+        v,
+        matches.groups.mod_tzlocale ?? undefined,
+        matches.groups.mod_check_true ?? undefined,
+        matches.groups.mod_check_false ?? undefined,
+        value,
       );
-      re.lastIndex = index;
       continue;
     }
 
-    str = replaceCharsFromString(str, v, index, re.lastIndex);
-    re.lastIndex = index;
+    parsed += v;
   }
 
-  return str.replace(/\\n/g, '\n');
+  return (parsed + str.slice(previousEnd)).replace(/\\n/g, '\n');
 }
 
 function modifier(
@@ -430,10 +418,6 @@ function modifier(
   }
 
   return `{unknown_modifier(${mod})}`;
-}
-
-function replaceCharsFromString(str: string, replace: string, start: number, end: number): string {
-  return str.slice(0, start) + replace + str.slice(end);
 }
 
 function toHex(str: string): string {

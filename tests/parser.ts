@@ -2,15 +2,22 @@ import { parseString, type ParseValue } from '@/lib/parser';
 import assert from 'assert/strict';
 import { test } from 'node:test';
 
+const secrets = {
+  password: 'test-password-secret',
+  avatar: 'test-avatar-data',
+  passkey: 'test-passkey-data',
+  oauth: 'test-oauth-data',
+};
+
 function values() {
   return {
     file: { name: 'photo.png', size: 2048, views: 5, createdAt: new Date('2026-01-01T12:30:00Z') },
     user: {
       username: 'Zipline',
-      password: 'password',
-      avatar: 'avatar',
-      passkeys: ['passkey'],
-      oauthProviders: ['oauth'],
+      password: secrets.password,
+      avatar: secrets.avatar,
+      passkeys: [secrets.passkey],
+      oauthProviders: [secrets.oauth],
     },
     link: { returned: 'https://zipline.local/u/photo.png', raw: 'https://zipline.local/raw/photo.png' },
   } as unknown as ParseValue;
@@ -50,10 +57,15 @@ test('templates block direct secret access and redact debug JSON', () => {
   for (const template of ['{debug.json}', '{debug.jsonf}']) {
     const output = parseString(template, input)!;
 
-    for (const secret of ['password', 'avatar', 'passkey', 'oauth'])
-      assert.equal(output.includes(secret), false);
+    for (const secret of Object.values(secrets)) assert.equal(output.includes(secret), false);
 
-    assert.equal(JSON.parse(output).user.username, 'Alice');
+    assert.deepEqual(JSON.parse(output).user, {
+      username: 'Zipline',
+      password: '***',
+      avatar: '***',
+      passkeys: 'passkey registration redacted',
+      oauthProviders: 'oauth providers redacted',
+    });
   }
 });
 
