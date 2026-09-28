@@ -31,7 +31,7 @@ const { t } = useTranslation('files');
 const { t } = useTranslation(['files', 'common']); // needed for t('common:...')
 t('table.columns.name');
 t('bulk.deleted', { count });
-<Trans t={t} i18nKey='help.docs' components={{ link: <Anchor href='...' /> }} />
+<Trans t={t} i18nKey='help.docs' components={{ link: <Anchor href='...' /> }} />;
 ```
 
 Outside components use `i18n.t('files:...')` from `@/lib/i18n`. Never call `t` at module top level; store keys and translate at render time.
