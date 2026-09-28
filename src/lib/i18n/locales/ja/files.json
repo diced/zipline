@@ -1,0 +1,169 @@
+{
+  "page": {
+    "title": "ファイル",
+    "uploadTooltip": "ファイルをアップロード",
+    "moreActions": "その他の操作",
+    "menu": {
+      "manageTags": "タグの管理",
+      "viewPending": "保留中のファイルを表示",
+      "tableOptions": "テーブルのオプション",
+      "searchById": "ID で検索"
+    }
+  },
+  "fields": {
+    "name": "名前",
+    "originalName": "元のファイル名",
+    "tags": "タグ",
+    "type": "種類",
+    "size": "サイズ",
+    "createdAt": "作成日時",
+    "favorite": "お気に入り",
+    "views": "閲覧数",
+    "anonymous": "匿名"
+  },
+  "tableOptions": {
+    "title": "テーブルのオプション",
+    "description": "下のフィールドを選択またはドラッグして、ファイルテーブルビューでの表示、非表示、並び順を変更します。",
+    "reset": "既定値に戻す"
+  },
+  "pending": {
+    "title": "保留中のファイル",
+    "count_other": "{{count}} 個のファイル",
+    "clearCompleted": "完了したものをクリア",
+    "chunks": "チャンク {{complete}}/{{total}}",
+    "clearEntry": "エントリをクリア",
+    "clearEntryLabel": "{{name}} をクリア",
+    "empty": "保留中のファイルはありません",
+    "status": {
+      "pending": "保留中",
+      "processing": "処理中",
+      "complete": "完了",
+      "failed": "失敗"
+    },
+    "notifications": {
+      "clearedOne": "保留中のファイルをクリアしました！",
+      "clearedCompleted": "完了したファイルをクリアしました！",
+      "clearOneFailed": "保留中のファイルをクリアできませんでした: {{error}}",
+      "clearCompletedFailed": "完了したファイルをクリアできませんでした: {{error}}",
+      "unknownError": "不明なエラー"
+    }
+  },
+  "bulk": {
+    "delete": {
+      "title_other": "{{count}} 個のファイルを削除しますか？",
+      "message_other": "{{count}} 個のファイルを削除しようとしています。この操作は元に戻せません。",
+      "loadingTitle": "ファイルを削除しています",
+      "loadingMessage_other": "{{count}} 個のファイルを削除しています",
+      "errorTitle": "ファイルの削除中にエラーが発生しました",
+      "successTitle": "ファイルを削除しました",
+      "successMessage_other": "{{count}} 個のファイルを削除しました"
+    },
+    "favorite": {
+      "title_other": "{{count}} 個のファイルをお気に入りに追加しますか？",
+      "message_other": "{{count}} 個のファイルをお気に入りに追加しようとしています。",
+      "confirm": "お気に入りに追加",
+      "loadingTitle": "お気に入りに追加しています",
+      "loadingMessage_other": "{{count}} 個のファイルをお気に入りに追加しています",
+      "successTitle": "お気に入りに追加しました",
+      "successMessage_other": "{{count}} 個のファイルをお気に入りに追加しました"
+    },
+    "unfavorite": {
+      "title_other": "{{count}} 個のファイルをお気に入りから削除しますか？",
+      "message_other": "{{count}} 個のファイルをお気に入りから削除しようとしています。",
+      "confirm": "お気に入りから削除",
+      "loadingTitle": "お気に入りから削除しています",
+      "loadingMessage_other": "{{count}} 個のファイルをお気に入りから削除しています",
+      "successTitle": "お気に入りから削除しました",
+      "successMessage_other": "{{count}} 個のファイルをお気に入りから削除しました"
+    },
+    "modifyErrorTitle": "ファイルの変更中にエラーが発生しました",
+    "copyLinks": {
+      "title": "リンクをクリップボードにコピーしました",
+      "message_other": "{{count}} 件のリンクをクリップボードにコピーしました"
+    }
+  },
+  "tags": {
+    "title": "タグ",
+    "fileCount_other": "{{count}} 個のファイル",
+    "edit": "タグを編集",
+    "delete": "タグを削除",
+    "empty": "タグがありません。プラスアイコンをクリックして作成してください。",
+    "form": {
+      "name": {
+        "label": "名前",
+        "placeholder": "名前を入力...",
+        "required": "名前は必須です"
+      },
+      "color": {
+        "label": "色",
+        "fromName": "名前に基づいて色を選択",
+        "invalid": "色は # で始める必要があります"
+      }
+    },
+    "create": {
+      "title": "新しいタグの作成",
+      "submit": "タグを作成"
+    },
+    "editModal": {
+      "title": "タグの編集",
+      "submit": "タグを更新"
+    },
+    "notifications": {
+      "createFailed": "タグを作成できませんでした",
+      "created": "タグを作成しました",
+      "createdMessage": "タグ {{name}} を作成しました",
+      "editFailed": "タグを編集できませんでした",
+      "edited": "タグを編集しました",
+      "editedMessage": "タグ {{name}} を編集しました",
+      "deleteFailed": "タグを削除できませんでした: {{error}}",
+      "deleted": "タグを削除しました",
+      "deletedMessage": "タグ {{name}} を削除しました"
+    }
+  },
+  "views": {
+    "favoriteFiles": "お気に入りのファイル",
+    "noFiles": "ファイルが見つかりません",
+    "uploadFile": "ファイルをアップロード",
+    "pagination": "ファイル {{total}} 個中 {{from}}～{{to}} 個目"
+  },
+  "table": {
+    "columns": {
+      "name": "名前",
+      "originalName": "元のファイル名",
+      "tags": "タグ",
+      "type": "種類",
+      "size": "サイズ",
+      "createdAt": "作成日時",
+      "favorite": "お気に入り",
+      "views": "閲覧数",
+      "id": "ID",
+      "anonymous": "匿名",
+      "actions": "操作"
+    },
+    "search": {
+      "name": "名前で検索",
+      "originalName": "元のファイル名で検索",
+      "type": "種類で検索"
+    },
+    "searchById": "ID で検索",
+    "tagsPlaceholder": "タグを 1 つ以上選択",
+    "selection": {
+      "summary_other": "選択内容はページを移動しても保持されます。現在 <b>{{count}}</b> 個のファイルを選択しています。",
+      "delete": "ファイルを削除",
+      "favorite": "お気に入りに追加",
+      "unfavorite": "お気に入りから削除",
+      "copyLinks": "ファイルのリンクをコピー",
+      "addToFolder": "フォルダーに追加...",
+      "clear": "選択を解除"
+    },
+    "noRecords": "ファイルがありません",
+    "recordsPerPage": "1 ページあたりの件数",
+    "actions": {
+      "details": "詳細",
+      "view": "新しいタブでファイルを表示",
+      "copy": "ファイルのリンクをクリップボードにコピー",
+      "download": "ファイルをダウンロード",
+      "delete": "ファイルを削除"
+    }
+  }
+}

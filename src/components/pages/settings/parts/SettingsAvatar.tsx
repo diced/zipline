@@ -26,8 +26,10 @@ import {
   IconX,
 } from '@tabler/icons-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function SettingsAvatar() {
+  const { t } = useTranslation(['settings', 'common']);
   const user = useUserStore((state) => state.user);
 
   const { colorScheme } = useMantineColorScheme();
@@ -57,7 +59,7 @@ export default function SettingsAvatar() {
 
     if (!data && error) {
       notifications.show({
-        title: 'Error while updating avatar',
+        title: t('avatar.notifications.error.title'),
         message: error.error,
         color: 'red',
         icon: <IconPhotoCancel size='1rem' />,
@@ -67,7 +69,7 @@ export default function SettingsAvatar() {
     }
 
     notifications.show({
-      message: 'Avatar updated',
+      message: t('avatar.notifications.updated.message'),
       color: 'green',
       icon: <IconPhoto size='1rem' />,
     });
@@ -84,7 +86,7 @@ export default function SettingsAvatar() {
 
     if (!data && error) {
       notifications.show({
-        title: 'Error while updating avatar',
+        title: t('avatar.notifications.error.title'),
         message: error.error,
         color: 'red',
         icon: <IconPhotoCancel size='1rem' />,
@@ -94,7 +96,7 @@ export default function SettingsAvatar() {
     }
 
     notifications.show({
-      message: 'Avatar updated',
+      message: t('avatar.notifications.updated.message'),
       color: 'green',
       icon: <IconPhoto size='1rem' />,
     });
@@ -106,12 +108,12 @@ export default function SettingsAvatar() {
 
   return (
     <Paper withBorder p='sm'>
-      <Title order={2}>Avatar</Title>
+      <Title order={2}>{t('avatar.title')}</Title>
 
       <Stack gap='sm'>
         <FileInput
           accept='image/*'
-          placeholder='Upload new avatar...'
+          placeholder={t('avatar.placeholder')}
           value={avatar}
           onChange={onAvatarChange}
           leftSection={<IconPhotoUp size='1rem' />}
@@ -119,7 +121,7 @@ export default function SettingsAvatar() {
 
         <Card withBorder shadow='sm'>
           <Text size='sm' c='dimmed'>
-            Preview of {avatar ? 'new' : 'current'} avatar
+            {avatar ? t('avatar.previewNew') : t('avatar.previewCurrent')}
           </Text>
 
           <Button
@@ -128,9 +130,19 @@ export default function SettingsAvatar() {
             color={colorScheme === 'dark' ? 'white' : 'black'}
             leftSection={
               avatarSrc ? (
-                <Avatar src={avatarSrc} radius='sm' size='sm' alt={user?.username ?? 'Proposed avatar'} />
+                <Avatar
+                  src={avatarSrc}
+                  radius='sm'
+                  size='sm'
+                  alt={user?.username ?? t('avatar.proposedAlt')}
+                />
               ) : currentAvatar ? (
-                <Avatar src={currentAvatar} radius='sm' size='sm' alt={user?.username ?? 'User avatar'} />
+                <Avatar
+                  src={currentAvatar}
+                  radius='sm'
+                  size='sm'
+                  alt={user?.username ?? t('avatar.currentAlt')}
+                />
               ) : (
                 <IconSettingsFilled size='1rem' />
               )
@@ -152,12 +164,12 @@ export default function SettingsAvatar() {
                 setAvatarSrc(null);
               }}
             >
-              Cancel
+              {t('common:actions.cancel')}
             </Button>
           )}
           {currentAvatar && (
             <Button leftSection={<IconX size='1rem' />} color='red' onClick={clearAvatar}>
-              Remove Avatar
+              {t('avatar.remove')}
             </Button>
           )}
 
@@ -167,7 +179,7 @@ export default function SettingsAvatar() {
             leftSection={<IconDeviceFloppy size='1rem' />}
             onClick={saveAvatar}
           >
-            Save
+            {t('common:actions.save')}
           </Button>
         </Group>
       </Stack>

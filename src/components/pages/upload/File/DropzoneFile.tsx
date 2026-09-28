@@ -13,6 +13,7 @@ import {
   Text,
 } from '@mantine/core';
 import { IconFileUpload, IconTrashFilled } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
 
 export default function DropzoneFile({
   file,
@@ -23,6 +24,8 @@ export default function DropzoneFile({
   file: File;
   onDelete: () => void;
 }) {
+  const { t } = useTranslation();
+
   if (loading)
     return (
       <Paper withBorder p='md' radius='md' pos='relative'>
@@ -74,7 +77,7 @@ export default function DropzoneFile({
               onClick={onDelete}
               leftSection={<IconTrashFilled size='1rem' />}
             >
-              Remove
+              {t('actions.remove')}
             </Button>
           </Stack>
         </Stack>

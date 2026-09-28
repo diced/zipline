@@ -1,0 +1,137 @@
+{
+  "page": {
+    "title": "文件夹",
+    "titleWithFolder": "文件夹 {{separator}} {{name}}",
+    "createFolder": "新建文件夹",
+    "createSubfolder": "新建子文件夹",
+    "folderFiles": "{{name}} 中的文件",
+    "folderFilesWithCount": "{{name}} 中的文件 ({{files}})"
+  },
+  "create": {
+    "title": "新建文件夹",
+    "titleSubfolder": "新建子文件夹",
+    "name": {
+      "label": "名称",
+      "placeholder": "输入名称...",
+      "required": "名称为必填项"
+    },
+    "public": {
+      "label": "公开",
+      "description": "公开文件夹对所有人可见"
+    }
+  },
+  "uploadsAlert": {
+    "message": "此文件夹允许匿名上传。分享下方的链接，即可让其他人向此文件夹上传文件。",
+    "copy": "复制 URL",
+    "copied": "已复制 URL"
+  },
+  "menu": {
+    "moreActions": "更多操作",
+    "open": "打开文件夹",
+    "move": "移动文件夹",
+    "export": "导出为 ZIP",
+    "makePrivate": "设为私有",
+    "makePublic": "设为公开",
+    "disallowUploads": "禁止匿名上传",
+    "allowUploads": "允许匿名上传",
+    "editName": "编辑名称",
+    "copyUrl": "复制 URL"
+  },
+  "card": {
+    "created": "创建时间：",
+    "updated": "更新时间：",
+    "public": "公开：",
+    "files": "文件：",
+    "subfolders": "子文件夹："
+  },
+  "grid": {
+    "empty": "未找到文件夹",
+    "emptyFolder": "此文件夹为空",
+    "createHint": "创建文件夹后将显示在这里"
+  },
+  "table": {
+    "columns": {
+      "name": "名称",
+      "public": "公开",
+      "uploads": "允许上传？",
+      "created": "创建时间",
+      "updated": "最后更新时间",
+      "actions": "操作"
+    },
+    "subfolders_other": "{{count}} 个子文件夹",
+    "noRecords": "暂无子文件夹",
+    "copyLink": "复制文件夹链接",
+    "delete": "删除文件夹"
+  },
+  "notifications": {
+    "visibilityFailed": "无法修改文件夹可见性",
+    "visibilityEdited": "已修改文件夹可见性",
+    "nowPublic": "{{name}} 现已公开",
+    "nowPrivate": "{{name}} 现已设为私有",
+    "uploadsFailed": "无法修改文件夹上传策略",
+    "uploadsEdited": "已修改文件夹上传策略",
+    "uploadsAllowed": "{{name}} 现在允许匿名上传",
+    "uploadsDisallowed": "{{name}} 不再允许匿名上传"
+  },
+  "delete": {
+    "title": "删除“{{name}}”？",
+    "cannotUndo": "此操作无法撤销。",
+    "containsFilesAndSubfolders": "此文件夹包含 {{files}} 个文件和 {{subfolders}} 个子文件夹。你希望如何处理它们？",
+    "containsFiles": "此文件夹包含 {{files}} 个文件。你希望如何处理它们？",
+    "containsSubfolders": "此文件夹包含 {{subfolders}} 个子文件夹。你希望如何处理它们？",
+    "options": {
+      "root": "将内容移动到根目录",
+      "folder": "将内容移动到其他文件夹",
+      "cascade": "删除子文件夹 (文件移动到根目录)",
+      "cascadeFiles": "删除子文件夹及其中的文件 (级联删除)"
+    },
+    "target": {
+      "label": "目标文件夹",
+      "placeholder": "选择文件夹"
+    },
+    "warningCascade": "警告：这将永久删除此文件夹中的所有子文件夹。其中的文件将与所属文件夹解除关联，并移动到根目录。",
+    "warningCascadeFiles": "警告：这将永久删除此文件夹中的所有子文件夹，以及其中包含的所有文件。这些文件将从存储中移除，且无法恢复。",
+    "confirmCascade": "删除“{{name}}”及其所有子文件夹？",
+    "confirmCascadeFiles": "删除“{{name}}”及其所有子文件夹和文件？",
+    "modalCascade": "所有子文件夹都将被永久删除 (文件将移动到根目录)。此操作无法撤销。",
+    "modalCascadeFiles": "所有子文件夹及其中的所有文件都将从存储中永久删除。此操作无法撤销。",
+    "submit": "删除文件夹",
+    "notifications": {
+      "failed": "无法删除文件夹",
+      "deleted": "文件夹已删除",
+      "deletedMessage": "{{name}} 已删除",
+      "noTarget": "未选择文件夹",
+      "noTargetMessage": "请选择要将内容移动到的文件夹"
+    }
+  },
+  "edit": {
+    "title": "编辑文件夹名称",
+    "label": "新文件夹名称",
+    "placeholder": "输入新文件夹名称...",
+    "required": "名称为必填项",
+    "notifications": {
+      "failed": "更新文件夹名称时出错",
+      "updated": "文件夹名称已更新",
+      "updatedMessage": "文件夹名称已成功更新为 {{name}}"
+    }
+  },
+  "move": {
+    "title": "移动“{{name}}”",
+    "description": "为此文件夹选择目标文件夹。",
+    "root": "/ (根目录)",
+    "destination": {
+      "label": "目标位置",
+      "placeholder": "选择文件夹"
+    },
+    "submit": "移动文件夹",
+    "notifications": {
+      "failed": "无法移动文件夹",
+      "moved": "文件夹已移动",
+      "movedMessage": "{{name}} 已移动"
+    }
+  },
+  "viewFiles": {
+    "title": "{{name}} 中的文件",
+    "found": "找到 {{amount}} 个文件"
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "title": "邀请",
+  "create": {
+    "title": "创建邀请",
+    "expiresAt": {
+      "label": "过期时间",
+      "description": "为此邀请选择有效期，如果希望邀请永不过期，请选择“永不”。",
+      "placeholder": "选择有效期..."
+    },
+    "maxUses": {
+      "label": "最大使用次数",
+      "description": "为此邀请设置最大使用次数，留空则不限次数。",
+      "placeholder": "输入数字..."
+    }
+  },
+  "expirations": {
+    "never": "永不",
+    "minutes30": "30 分钟",
+    "hour1": "1 小时",
+    "hours6": "6 小时",
+    "hours12": "12 小时",
+    "day1": "1 天",
+    "days3": "3 天",
+    "days5": "5 天",
+    "days7": "7 天"
+  },
+  "notifications": {
+    "created": {
+      "title": "邀请已创建",
+      "message": "邀请 {{code}} 已创建。"
+    },
+    "deleteFailed": {
+      "title": "无法删除邀请"
+    },
+    "deleted": {
+      "title": "邀请已删除",
+      "message": "邀请 {{code}} 已删除。"
+    }
+  },
+  "delete": {
+    "message": "确定要删除邀请 {{code}} 吗？此操作无法撤销。",
+    "confirm": "删除 {{code}}"
+  },
+  "card": {
+    "copyUrl": "复制 URL",
+    "showQrCode": "显示二维码",
+    "createdBy": "创建者：",
+    "created": "创建时间：",
+    "expires": "过期时间：",
+    "maxUses": "最大使用次数：",
+    "uses": "已使用次数：",
+    "unlimited": "无限制"
+  },
+  "empty": {
+    "title": "未找到邀请",
+    "description": "创建邀请后将显示在这里。"
+  },
+  "table": {
+    "columns": {
+      "code": "邀请码",
+      "createdBy": "创建者",
+      "created": "创建时间",
+      "updatedAt": "最后更新时间",
+      "expires": "过期时间",
+      "maxUses": "最大使用次数",
+      "uses": "已使用次数",
+      "actions": "操作"
+    },
+    "never": "永不",
+    "unlimited": "无限制",
+    "copyLink": "复制邀请链接",
+    "showQrCode": "显示二维码",
+    "delete": "删除邀请"
+  }
+}

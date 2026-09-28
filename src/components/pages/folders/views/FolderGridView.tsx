@@ -2,6 +2,7 @@ import { Response } from '@/lib/api/response';
 import { Folder } from '@/lib/db/models/folder';
 import { Center, Group, Paper, SimpleGrid, Skeleton, Stack, Text, Title } from '@mantine/core';
 import { IconFolder } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
 import useSWR from 'swr';
 import FolderCard from '../FolderCard';
 
@@ -12,6 +13,7 @@ export default function FolderGridView({
   currentFolderId: string | null;
   onNavigate: (folderId: string | null) => void;
 }) {
+  const { t } = useTranslation('folders');
   const queryParam = currentFolderId ? `?parentId=${currentFolderId}&noincl=true` : '?root=true&noincl=true';
   const { data: folders, isLoading } = useSWR<Extract<Response['/api/user/folders'], Folder[]>>(
     `/api/user/folders${queryParam}`,
@@ -55,10 +57,10 @@ export default function FolderGridView({
             <Stack>
               <Group>
                 <IconFolder size='2rem' />
-                <Title order={2}>No Folders found</Title>
+                <Title order={2}>{t('grid.empty')}</Title>
               </Group>
               <Text size='sm' c='dimmed'>
-                {currentFolderId ? 'This folder is empty' : 'Create a folder to see it here'}
+                {currentFolderId ? t('grid.emptyFolder') : t('grid.createHint')}
               </Text>
             </Stack>
           </Center>

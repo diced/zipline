@@ -1,4 +1,5 @@
 import { Paper, ScrollArea, SimpleGrid, Skeleton, Table, Text } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 
 export function StatsCardsSkeleton() {
   return (
@@ -28,6 +29,8 @@ function SkeletonText() {
 }
 
 export function StatsTablesSkeleton() {
+  const { t } = useTranslation('metrics');
+
   return (
     <>
       <SimpleGrid cols={{ base: 1, md: 2 }}>
@@ -36,10 +39,10 @@ export function StatsTablesSkeleton() {
             <Table highlightOnHover stickyHeader>
               <Table.Thead>
                 <Table.Tr>
-                  <Table.Th>User</Table.Th>
-                  <Table.Th>Files</Table.Th>
-                  <Table.Th>Storage Used</Table.Th>
-                  <Table.Th>Views</Table.Th>
+                  <Table.Th>{t('tables.columns.user')}</Table.Th>
+                  <Table.Th>{t('tables.columns.files')}</Table.Th>
+                  <Table.Th>{t('tables.columns.storageUsed')}</Table.Th>
+                  <Table.Th>{t('tables.columns.views')}</Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
@@ -61,9 +64,9 @@ export function StatsTablesSkeleton() {
             <Table highlightOnHover stickyHeader>
               <Table.Thead>
                 <Table.Tr>
-                  <Table.Th>User</Table.Th>
-                  <Table.Th>URLs</Table.Th>
-                  <Table.Th>Views</Table.Th>
+                  <Table.Th>{t('tables.columns.user')}</Table.Th>
+                  <Table.Th>{t('tables.columns.urls')}</Table.Th>
+                  <Table.Th>{t('tables.columns.views')}</Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
@@ -84,8 +87,8 @@ export function StatsTablesSkeleton() {
             <Table highlightOnHover stickyHeader>
               <Table.Thead>
                 <Table.Tr>
-                  <Table.Th>Type</Table.Th>
-                  <Table.Th>Files</Table.Th>
+                  <Table.Th>{t('tables.columns.type')}</Table.Th>
+                  <Table.Th>{t('tables.columns.files')}</Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>

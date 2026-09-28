@@ -1,6 +1,7 @@
 import { useConfig } from '@/components/ConfigProvider';
 import { Response } from '@/lib/api/response';
 import { bytes } from '@/lib/bytes';
+import i18n from '@/lib/i18n';
 import { notifications } from '@mantine/notifications';
 import { IconFileUpload, IconFileXFilled } from '@tabler/icons-react';
 import { applyUploadHeaders, handleUploadResponse, UploadHandlers, UploadHeadersOptions } from './shared';
@@ -91,7 +92,9 @@ export async function uploadPartialFiles(
     }
 
     const fileLabel =
-      totalFiles > 1 ? `Uploading large file (${i + 1}/${totalFiles})` : 'Uploading large file';
+      totalFiles > 1
+        ? i18n.t('upload:notifications.partial.titleCount', { current: i + 1, total: totalFiles })
+        : i18n.t('upload:notifications.partial.title');
 
     notifications.show({
       id: 'upload-partial',
@@ -118,7 +121,7 @@ export async function uploadPartialFiles(
       notifications.update({
         id: 'upload-partial',
         title: fileLabel,
-        message: `Chunk ${j + 1}/${nChunks}`,
+        message: i18n.t('upload:notifications.partial.chunk', { current: j + 1, total: nChunks }),
         loading: true,
         autoClose: false,
         color: 'blue',
@@ -146,8 +149,11 @@ export async function uploadPartialFiles(
           if (error || !res) {
             notifications.update({
               id: 'upload-partial',
-              title: 'Error uploading file',
-              message: `${file.name}: ${error?.error ?? 'An unknown error occurred'}`,
+              title: i18n.t('upload:notifications.partial.error.title'),
+              message: i18n.t('upload:notifications.partial.error.message', {
+                name: file.name,
+                error: error?.error ?? i18n.t('upload:errors.unknown'),
+              }),
               color: 'red',
               icon: <IconFileXFilled size='1rem' />,
               autoClose: false,
@@ -169,10 +175,16 @@ export async function uploadPartialFiles(
 
             notifications.update({
               id: 'upload-partial',
-              title: isLastFile ? 'Large file uploads complete' : 'Large file offloaded',
+              title: isLastFile
+                ? i18n.t('upload:notifications.partial.complete.title')
+                : i18n.t('upload:notifications.partial.offloaded.title'),
               message: isLastFile
-                ? `Offloaded ${uploadedFiles.length} large file${uploadedFiles.length === 1 ? '' : 's'} for background processing`
-                : `${file.name} offloaded (${i + 1}/${totalFiles})`,
+                ? i18n.t('upload:notifications.partial.complete.message', { count: uploadedFiles.length })
+                : i18n.t('upload:notifications.partial.offloaded.message', {
+                    name: file.name,
+                    current: i + 1,
+                    total: totalFiles,
+                  }),
               color: 'green',
               icon: <IconFileUpload size='1rem' />,
               autoClose: isLastFile,

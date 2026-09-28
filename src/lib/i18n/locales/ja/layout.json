@@ -1,0 +1,124 @@
+{
+  "nav": {
+    "home": "ホーム",
+    "metrics": "メトリクス",
+    "files": "ファイル",
+    "folders": "フォルダー",
+    "upload": "アップロード",
+    "uploadFile": "ファイル",
+    "uploadText": "テキスト",
+    "urls": "短縮 URL",
+    "administrator": "管理者",
+    "adminDashboard": "ダッシュボード",
+    "serverSettings": "設定",
+    "serverActions": "アクション",
+    "users": "ユーザー",
+    "invites": "招待"
+  },
+  "header": {
+    "logoAlt": "Zipline のロゴ",
+    "avatarAlt": "ユーザーのアバター"
+  },
+  "userMenu": {
+    "administratorLabel": "{{username}} (管理者)",
+    "copyToken": "トークンをコピー",
+    "refreshToken": "トークンを更新",
+    "settings": "設定",
+    "serverSettings": "サーバー設定",
+    "logout": "ログアウト",
+    "loggingOut": "ログアウトしています..."
+  },
+  "token": {
+    "cancel": "いいえ、このポップアップを閉じます",
+    "copy": {
+      "title": "トークンをコピーしますか？",
+      "message": "トークンをコピーしてもよろしいですか？トークンを使うと Zipline のすべての機能を操作できます。このトークンは誰とも共有しないでください。"
+    },
+    "copied": {
+      "title": "コピーしました",
+      "message": "トークンをクリップボードにコピーしました。"
+    },
+    "refresh": {
+      "title": "トークンを更新しますか？",
+      "message": "トークンを更新してもよろしいですか？トークンを更新またはリセットすると、そのトークンを使用しているスクリプトやアプリケーションの設定をすべて変更する必要があります。"
+    },
+    "refreshed": {
+      "title": "更新しました",
+      "message": "トークンを更新しました。"
+    }
+  },
+  "version": {
+    "modalTitle": "Zipline のバージョン",
+    "tooltip": "クリックしてバージョンの詳細を表示",
+    "latest": "Zipline の最新バージョンを実行しています。",
+    "unstable": "Zipline の<b>不安定な</b>バージョンを実行しています。アップストリーム版は十分にテストされておらず、バグが含まれている可能性があります。",
+    "outdated": "Zipline の<b>古い</b>バージョンを実行しています。<link>最新バージョン</link>への更新をお勧めします。",
+    "current": "現在のバージョン",
+    "fields": {
+      "version": "バージョン",
+      "commit": "コミット",
+      "upstream": "アップストリーム版",
+      "availableToUpdate": "更新可能"
+    },
+    "latestCommit": "利用可能な最新のコミット",
+    "latestCommitNote": "これはアップストリーム版を実行している場合にのみ表示されます。",
+    "available": "{{tag}} が利用可能です",
+    "changelogs": "変更履歴",
+    "update": "更新"
+  },
+  "qrCode": {
+    "title": "QR コード",
+    "alt": "QR コード",
+    "failed": "QR コードを生成できませんでした。",
+    "format": "形式",
+    "copyUnsupported": "この形式のコピーは一部のブラウザーでサポートされていません。右クリックまたは長押しで画像を通常どおりコピーできます。",
+    "copyImage": "画像をコピー",
+    "copied": "QR コードの画像をクリップボードにコピーしました",
+    "copyFailed": "QR コードの画像をコピーできませんでした"
+  },
+  "domainSelect": {
+    "default": "既定のドメイン",
+    "description": "この値でドメインを上書きします。アップロード時に返されるドメインが変更されます。既定のドメインを使用する場合は空欄のままにしてください。"
+  },
+  "copyLink": {
+    "title": "リンクをコピーしました"
+  },
+  "errors": {
+    "generic": {
+      "title": "エラーが発生しました",
+      "message": "問題が発生しました。しばらくしてからもう一度お試しください。問題が解決しない場合は報告してください。"
+    },
+    "dashboard": {
+      "title": "ダッシュボードのクライアントエラー",
+      "message": "ダッシュボードの読み込み中に問題が発生しました。しばらくしてからもう一度お試しください。問題が解決しない場合は報告してください。"
+    },
+    "reload": {
+      "title": "アップデートがあります",
+      "message": "アプリの新しいバージョンが利用可能です。ページを再読み込みして更新してください。",
+      "button": "ページを再読み込み",
+      "why": "このメッセージが表示される理由",
+      "errorTitle": "動的にインポートされたモジュールを取得できませんでした",
+      "errorMessage": "このエラーは、ページを開いている間にアプリの新しいバージョンがデプロイされた場合に発生することがあります。ページを再読み込みして最新バージョンに更新してください。"
+    }
+  },
+  "notFound": {
+    "message": "ページが見つかりません",
+    "goHome": "ホームに戻る"
+  },
+  "titles": {
+    "settings": "設定",
+    "folders": "フォルダー",
+    "files": "ファイル",
+    "metrics": "メトリクス",
+    "urls": "短縮 URL",
+    "serverSettings": "サーバー設定",
+    "administrator": "管理者",
+    "serverActions": "サーバーアクション",
+    "invites": "招待",
+    "uploadFile": "ファイルのアップロード",
+    "uploadText": "テキストのアップロード",
+    "users": "ユーザー",
+    "userFiles": "{{username}} のファイル",
+    "unknownUserFiles": "ユーザーのファイル"
+  }
+}

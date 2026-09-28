@@ -1,0 +1,36 @@
+{
+  "password": {
+    "title": "Passwort erforderlich",
+    "invalid": "Ungültiges Passwort",
+    "verify": "Bestätigen",
+    "fileDescription": "Diese Datei ist passwortgeschützt. Geben Sie das Passwort ein, um sie anzuzeigen.",
+    "urlDescription": "Dieser Link ist passwortgeschützt. Geben Sie das Passwort ein, um ihn aufzurufen."
+  },
+  "file": {
+    "pageTitle": "Datei anzeigen",
+    "viewFolder": "Ordner anzeigen",
+    "viewRaw": "Rohdatei anzeigen",
+    "download": "Datei herunterladen"
+  },
+  "url": {
+    "redirecting": "Weiterleitung zu <link>{{destination}}</link>"
+  },
+  "folder": {
+    "pageTitle": "Ordner",
+    "subfolders": "Unterordner",
+    "files": "Dateien",
+    "empty": "Dieser Ordner ist leer.",
+    "card": {
+      "files": "Dateien: {{amount}}",
+      "subfolders": "Unterordner: {{amount}}"
+    },
+    "pagination": "Dateien {{from}}–{{to}} von {{total}}"
+  },
+  "folderUpload": {
+    "pageTitle": "In {{name}} hochladen",
+    "pageTitleFallback": "In Ordner hochladen",
+    "title": "Dateien in {{name}} hochladen",
+    "public": "Dieser Ordner ist <link>öffentlich</link>. Jeder mit dem Link kann den Inhalt ansehen und Dateien hochladen.",
+    "private": "Nur der Eigentümer kann den Inhalt dieses Ordners ansehen. Dateien hochladen kann jedoch jeder, und wer Dateien hochgeladen hat, kann über den Link zur jeweiligen Datei weiterhin darauf zugreifen."
+  }
+}

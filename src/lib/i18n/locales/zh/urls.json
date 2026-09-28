@@ -1,0 +1,132 @@
+{
+  "title": "短链接",
+  "create": {
+    "title": "缩短 URL",
+    "url": {
+      "label": "URL",
+      "required": "URL 为必填项",
+      "invalid": "URL 无效"
+    },
+    "vanity": {
+      "label": "自定义名称",
+      "description": "可选，留空则生成随机短码"
+    },
+    "maxViews": {
+      "label": "最大查看次数",
+      "description": "可选，留空则不限制查看次数。"
+    },
+    "domain": {
+      "label": "覆盖域名"
+    },
+    "enabled": {
+      "label": "启用",
+      "description": "允许或禁止访问此短链接"
+    },
+    "password": {
+      "label": "密码",
+      "description": "使用密码保护你的链接"
+    }
+  },
+  "shortened": {
+    "title": "短链接",
+    "open": "在新标签页中打开链接",
+    "copy": "将链接复制到剪贴板"
+  },
+  "notifications": {
+    "shortenFailed": {
+      "title": "无法缩短 URL"
+    },
+    "copied": {
+      "title": "已将短链接复制到剪贴板"
+    },
+    "deleteFailed": {
+      "title": "无法删除短链接"
+    },
+    "deleted": {
+      "title": "短链接已删除",
+      "message": "短链接 {{code}} 已删除"
+    },
+    "removePasswordFailed": {
+      "title": "无法移除密码"
+    },
+    "passwordRemoved": {
+      "title": "密码已移除！",
+      "message": "已移除此短链接的密码。"
+    },
+    "saveFailed": {
+      "title": "无法保存更改"
+    },
+    "saved": {
+      "title": "更改已保存！",
+      "message": "更改已成功保存。"
+    }
+  },
+  "delete": {
+    "message": "确定要删除 {{code}} 吗？此操作无法撤销。",
+    "confirm": "删除“{{code}}”"
+  },
+  "edit": {
+    "title": "正在编辑“{{name}}”",
+    "unknown": "未知",
+    "maxViews": {
+      "label": "最大查看次数",
+      "placeholder": "无限制",
+      "description": "此短链接在被自动删除前允许的最大查看次数。留空则不限制查看次数。"
+    },
+    "vanity": {
+      "label": "自定义名称",
+      "placeholder": "可选",
+      "description": "为短链接设置自定义别名。留空则使用随机生成的短码。"
+    },
+    "destination": {
+      "label": "目标地址"
+    },
+    "enabled": {
+      "label": "启用",
+      "description": "禁止或允许访问此短链接。"
+    },
+    "password": {
+      "label": "密码",
+      "description": "为此短链接设置密码。留空则禁用密码保护。",
+      "remove": "移除密码"
+    },
+    "save": "保存更改"
+  },
+  "card": {
+    "copyShortLink": "复制短链接",
+    "copyDestination": "复制目标地址",
+    "showQrCode": "显示二维码",
+    "views": "查看次数：",
+    "enabled": "已启用：",
+    "created": "创建时间：",
+    "updated": "更新时间：",
+    "destination": "目标地址：",
+    "openDestination": "在新标签页中打开“{{url}}”",
+    "code": "短码："
+  },
+  "empty": {
+    "title": "未找到短链接",
+    "description": "缩短 URL 后将显示在这里"
+  },
+  "table": {
+    "columns": {
+      "code": "短码",
+      "vanity": "自定义名称",
+      "destination": "目标地址",
+      "views": "查看次数",
+      "maxViews": "最大查看次数",
+      "created": "创建时间",
+      "enabled": "已启用",
+      "actions": "操作"
+    },
+    "search": {
+      "code": "按短码搜索",
+      "vanity": "按自定义名称搜索",
+      "destination": "按目标地址搜索"
+    },
+    "copy": "复制短链接",
+    "showQrCode": "显示二维码",
+    "edit": "编辑短链接",
+    "delete": "删除短链接"
+  }
+}

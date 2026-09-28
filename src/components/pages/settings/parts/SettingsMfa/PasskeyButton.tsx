@@ -12,9 +12,11 @@ import {
   startRegistration,
 } from '@simplewebauthn/browser';
 import { IconKey, IconKeyOff, IconTrashFilled } from '@tabler/icons-react';
+import { Trans, useTranslation } from 'react-i18next';
 import { mutate } from 'swr';
 
 export default function PasskeyButton() {
+  const { t } = useTranslation(['settings', 'common']);
   const user = useUserStore((state) => state.user);
   const [pkData, setPkData] = useObjectState<{
     open: boolean;
@@ -49,7 +51,7 @@ export default function PasskeyButton() {
       });
     } catch (e: any) {
       setPkData({
-        error: e.message ?? 'An error occurred while creating a passkey',
+        error: e.message ?? t('mfa.passkeys.createErrorFallback'),
         loading: false,
         savedKey: null,
       });
@@ -77,7 +79,7 @@ export default function PasskeyButton() {
       });
 
       notifications.show({
-        title: 'Error while saving passkey',
+        title: t('mfa.passkeys.notifications.saveError.title'),
         message: error.error,
         color: 'red',
         icon: <IconKeyOff size='1rem' />,
@@ -91,8 +93,8 @@ export default function PasskeyButton() {
       });
 
       notifications.show({
-        title: 'Passkey saved!',
-        message: 'Your passkey has been saved successfully.',
+        title: t('mfa.passkeys.notifications.saved.title'),
+        message: t('mfa.passkeys.notifications.saved.message'),
         color: 'green',
         icon: <IconKey size='1rem' />,
       });
@@ -103,11 +105,11 @@ export default function PasskeyButton() {
 
   const removePasskey = async (passkey: UserPasskey) => {
     modals.openConfirmModal({
-      title: 'Are you sure?',
-      children: `Your browser and device may still show "${passkey.name}" as an option to log in. If you want to remove it, you'll have to do so manually through your device's settings.`,
+      title: t('common:warning.title'),
+      children: t('mfa.passkeys.modals.remove.message', { name: passkey.name }),
       labels: {
-        confirm: `Remove "${passkey.name}"`,
-        cancel: 'Cancel',
+        confirm: t('mfa.passkeys.modals.remove.confirm', { name: passkey.name }),
+        cancel: t('common:actions.cancel'),
       },
       confirmProps: {
         color: 'red',
@@ -119,15 +121,15 @@ export default function PasskeyButton() {
 
         if (error) {
           notifications.show({
-            title: 'Error while removing passkey',
+            title: t('mfa.passkeys.notifications.removeError.title'),
             message: error.error,
             color: 'red',
             icon: <IconKeyOff size='1rem' />,
           });
         } else {
           notifications.show({
-            title: 'Passkey removed!',
-            message: 'Your passkey has been removed successfully.',
+            title: t('mfa.passkeys.notifications.removed.title'),
+            message: t('mfa.passkeys.notifications.removed.message'),
             color: 'green',
             icon: <IconKey size='1rem' />,
           });
@@ -140,7 +142,7 @@ export default function PasskeyButton() {
 
   return (
     <>
-      <Modal title='Manage passkeys' opened={pkData.open} onClose={() => setPkData('open', false)}>
+      <Modal title={t('mfa.passkeys.manage')} opened={pkData.open} onClose={() => setPkData('open', false)}>
         <Stack gap='sm'>
           <>
             {user?.passkeys?.map((passkey, i) => (
@@ -152,17 +154,26 @@ export default function PasskeyButton() {
                   </ActionIcon>
                 </Group>
                 <Text size='sm'>
-                  Passkey created <RelativeDate date={passkey.createdAt} />
-                  {passkey.lastUsed && (
-                    <>
-                      , last used <RelativeDate date={passkey.lastUsed} />.
-                    </>
+                  {passkey.lastUsed ? (
+                    <Trans
+                      t={t}
+                      i18nKey='mfa.passkeys.createdAndUsed'
+                      components={{
+                        created: <RelativeDate date={passkey.createdAt} />,
+                        lastUsed: <RelativeDate date={passkey.lastUsed} />,
+                      }}
+                    />
+                  ) : (
+                    <Trans
+                      t={t}
+                      i18nKey='mfa.passkeys.created'
+                      components={{ created: <RelativeDate date={passkey.createdAt} /> }}
+                    />
                   )}
                 </Text>
                 {!(passkey.reg as Record<string, any>)?.webauthn && (
                   <Text size='xs' mt='xs' c='red'>
-                    Warning: This passkey was created with an older version of Zipline and <b>WILL NOT</b>{' '}
-                    work with this version. Please delete and recreate this passkey to ensure compatibility.
+                    <Trans t={t} i18nKey='mfa.passkeys.legacyWarning' components={{ b: <b /> }} />
                   </Text>
                 )}
               </Paper>
@@ -177,10 +188,10 @@ export default function PasskeyButton() {
             disabled={!!pkData.error}
           >
             {pkData.error
-              ? 'Error while creating a passkey - try again later'
+              ? t('mfa.passkeys.createError')
               : pkData.loading
-                ? 'Loading...'
-                : 'Create a passkey'}
+                ? t('common:status.loading')
+                : t('mfa.passkeys.create')}
           </Button>
           {pkData.error && (
             <Text size='xs' c='red'>
@@ -190,10 +201,10 @@ export default function PasskeyButton() {
 
           {pkData.nameShown && (
             <>
-              <Text size='sm'>Assign a name to this passkey so you can remember it later.</Text>
+              <Text size='sm'>{t('mfa.passkeys.namePrompt')}</Text>
 
               <TextInput
-                placeholder='Passkey name'
+                placeholder={t('mfa.passkeys.namePlaceholder')}
                 value={pkData.name}
                 onChange={(e) => setPkData('name', e.currentTarget.value)}
               />
@@ -204,7 +215,7 @@ export default function PasskeyButton() {
                 color='blue'
                 onClick={handleSavePasskey}
               >
-                Save
+                {t('common:actions.save')}
               </Button>
             </>
           )}
@@ -212,7 +223,7 @@ export default function PasskeyButton() {
       </Modal>
 
       <Button size='sm' leftSection={<IconKey size='1rem' />} onClick={() => setPkData('open', true)}>
-        Manage passkeys
+        {t('mfa.passkeys.manage')}
       </Button>
     </>
   );

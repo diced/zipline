@@ -2,6 +2,7 @@ import type { Response } from '@/lib/api/response';
 import { Button, LoadingOverlay, NumberInput, Select, Stack, Switch, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconDeviceFloppy } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { checkCommaArray, settingsOnSubmit } from '../settingsOnSubmit';
 import useServerSettings from '../useServerSettings';
@@ -19,6 +20,7 @@ export default function Files() {
 
 function Form({ data, isLoading }: { data: Response['/api/server/settings']; isLoading: boolean }) {
   const navigate = useNavigate();
+  const { t } = useTranslation(['serverSettings', 'common']);
 
   const form = useForm({
     initialValues: {
@@ -76,113 +78,113 @@ function Form({ data, isLoading }: { data: Response['/api/server/settings']; isL
     <form onSubmit={form.onSubmit(onSubmit)}>
       <Stack gap='lg'>
         <Switch
-          label='Assume Mimetypes'
-          description='Assume the mimetype of a file for its extension.'
+          label={t('files.assumeMimetypes.label')}
+          description={t('files.assumeMimetypes.description')}
           {...form.getInputProps('filesAssumeMimetypes', { type: 'checkbox' })}
         />
 
         <TextInput
-          label='Disabled Types'
-          description='Mimetypes to disable, separated by commas. It is recommended to have the Assume Mimetypes setting enabled if you are disabling mimetypes, as this will also block files with the corresponding extensions.'
+          label={t('files.disabledTypes.label')}
+          description={t('files.disabledTypes.description')}
           placeholder='text/html, application/javascript'
           {...form.getInputProps('filesDisabledTypes')}
         />
 
         <TextInput
-          label='Default MIME for Disabled Types'
-          description='The default MIME type to use for disabled types. Leave blank to completely block disabled types.'
+          label={t('files.disabledTypesDefault.label')}
+          description={t('files.disabledTypesDefault.description')}
           placeholder='application/octet-stream'
           {...form.getInputProps('filesDisabledTypesDefault')}
         />
 
         <Switch
-          label='Remove GPS Metadata'
-          description='Remove GPS metadata from files.'
+          label={t('files.removeGpsMetadata.label')}
+          description={t('files.removeGpsMetadata.description')}
           {...form.getInputProps('filesRemoveGpsMetadata', { type: 'checkbox' })}
         />
 
         <Switch
-          label='Extensionless URLs'
-          description='Allow file links without the extension (e.g. /u/uuid instead of /u/uuid.png). Upload responses still include the extension.'
+          label={t('files.extensionlessUrls.label')}
+          description={t('files.extensionlessUrls.description')}
           {...form.getInputProps('filesExtensionlessUrls', { type: 'checkbox' })}
         />
 
         <TextInput
-          label='Route'
-          description='The route to use for file uploads. Requires a server restart.'
+          label={t('files.route.label')}
+          description={t('files.route.description')}
           placeholder='/u'
           {...form.getInputProps('filesRoute')}
         />
 
         <NumberInput
-          label='Length'
-          description='The length of the file name (for randomly generated names).'
+          label={t('files.length.label')}
+          description={t('files.length.description')}
           min={1}
           max={64}
           {...form.getInputProps('filesLength')}
         />
 
         <Select
-          label='Default Format'
-          description='The default format to use for file names.'
+          label={t('files.defaultFormat.label')}
+          description={t('files.defaultFormat.description')}
           placeholder='random'
           data={['random', 'date', 'uuid', 'name', 'gfycat']}
           {...form.getInputProps('filesDefaultFormat')}
         />
 
         <TextInput
-          label='Disabled Extensions'
-          description='Extensions to disable, separated by commas.'
+          label={t('files.disabledExtensions.label')}
+          description={t('files.disabledExtensions.description')}
           placeholder='exe, bat, sh'
           {...form.getInputProps('filesDisabledExtensions')}
         />
 
         <TextInput
-          label='Max File Size'
-          description='The maximum file size allowed.'
+          label={t('files.maxFileSize.label')}
+          description={t('files.maxFileSize.description')}
           placeholder='100mb'
           {...form.getInputProps('filesMaxFileSize')}
         />
 
         <TextInput
-          label='Default Date Format'
-          description='The default date format to use.'
+          label={t('files.defaultDateFormat.label')}
+          description={t('files.defaultDateFormat.description')}
           placeholder='YYYY-MM-DD_HH:mm:ss'
           {...form.getInputProps('filesDefaultDateFormat')}
         />
 
         <TextInput
-          label='Default Expiration'
-          description='The default expiration time for files.'
+          label={t('files.defaultExpiration.label')}
+          description={t('files.defaultExpiration.description')}
           placeholder='30d'
           {...form.getInputProps('filesDefaultExpiration')}
         />
 
         <TextInput
-          label='Max Expiration'
-          description='The maximum expiration time allowed for files.'
+          label={t('files.maxExpiration.label')}
+          description={t('files.maxExpiration.description')}
           placeholder='365d'
           {...form.getInputProps('filesMaxExpiration')}
         />
 
         <NumberInput
-          label='Random Words Num Adjectives'
-          description='The number of adjectives to use for the random-words/gfycat format.'
+          label={t('files.randomWordsNumAdjectives.label')}
+          description={t('files.randomWordsNumAdjectives.description')}
           min={1}
           max={10}
           {...form.getInputProps('filesRandomWordsNumAdjectives')}
         />
 
         <TextInput
-          label='Random Words Separator'
-          description='The separator to use for the random-words/gfycat format.'
+          label={t('files.randomWordsSeparator.label')}
+          description={t('files.randomWordsSeparator.description')}
           placeholder='-'
           {...form.getInputProps('filesRandomWordsSeparator')}
         />
 
         <Select
-          label='Default Compression Format'
-          description='The default image compression format to use when only a compression percent is specified.'
+          label={t('files.defaultCompressionFormat.label')}
+          description={t('files.defaultCompressionFormat.description')}
           placeholder='jpg'
           data={[
             { value: 'jpg', label: '.jpg' },
@@ -194,15 +196,15 @@ function Form({ data, isLoading }: { data: Response['/api/server/settings']; isL
         />
 
         <NumberInput
-          label='Max Files Per Upload'
-          description='The maximum number of files allowed per upload. Requires a server restart.'
+          label={t('files.maxFilesPerUpload.label')}
+          description={t('files.maxFilesPerUpload.description')}
           min={1}
           {...form.getInputProps('filesMaxFilesPerUpload')}
         />
       </Stack>
 
       <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
-        Save
+        {t('common:actions.save')}
       </Button>
     </form>
   );

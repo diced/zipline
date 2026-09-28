@@ -4,12 +4,15 @@ import { useUserStore } from '@/lib/client/store/user';
 import { IconDots, IconFiles, IconTrashFilled, IconUserEdit } from '@tabler/icons-react';
 import EditUserModal from './EditUserModal';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { deleteUser } from './actions';
 import RelativeDate from '@/components/RelativeDate';
-import { canInteract, isAdministrator, roleName } from '@/lib/role';
+import { canInteract, isAdministrator } from '@/lib/role';
+import { ROLE_KEYS } from './roleKeys';
 import { Link } from 'react-router-dom';
 
 export default function UserCard({ user }: { user: LimitedUser }) {
+  const { t } = useTranslation(['users', 'common']);
   const currentUser = useUserStore((state) => state.user);
 
   const [opened, setOpen] = useState(false);
@@ -56,7 +59,7 @@ export default function UserCard({ user }: { user: LimitedUser }) {
                     leftSection={<IconUserEdit size='1rem' />}
                     onClick={() => setOpen(true)}
                   >
-                    Edit
+                    {t('common:actions.edit')}
                   </Menu.Item>
                   <Menu.Item
                     disabled={!canInteract(currentUser?.role, user?.role)}
@@ -64,7 +67,7 @@ export default function UserCard({ user }: { user: LimitedUser }) {
                     color='red'
                     onClick={() => deleteUser(user)}
                   >
-                    Delete
+                    {t('common:actions.delete')}
                   </Menu.Item>
                 </Menu.Dropdown>
               </Menu>
@@ -75,16 +78,16 @@ export default function UserCard({ user }: { user: LimitedUser }) {
         <Card.Section inheritPadding py='xs'>
           <Stack gap={1}>
             <Text size='xs' c='dimmed'>
-              <b>Id:</b> {user.id}
+              <b>{t('card.id')}</b> {user.id}
             </Text>
             <Text size='xs' c='dimmed'>
-              <b>Role:</b> {roleName(user.role)}
+              <b>{t('card.role')}</b> {t(ROLE_KEYS[user.role ?? 'USER'])}
             </Text>
             <Text size='xs' c='dimmed'>
-              <b>Created:</b> <RelativeDate date={user.createdAt} />
+              <b>{t('card.created')}</b> <RelativeDate date={user.createdAt} />
             </Text>
             <Text size='xs' c='dimmed'>
-              <b>Updated:</b> <RelativeDate date={user.updatedAt} />
+              <b>{t('card.updated')}</b> <RelativeDate date={user.updatedAt} />
             </Text>
           </Stack>
         </Card.Section>

@@ -8,7 +8,9 @@ import {
   IconVideoPlusFilled,
   TablerIcon,
 } from '@tabler/icons-react';
+import type { ParseKeys } from 'i18next';
 import { ComponentType, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import ClearTemporaryFilesModal from './actions/ClearTemporaryFilesModal';
 import ClearZeroByteFilesModal from './actions/ClearZeroByteFilesModal';
 import GenerateThumbnailsModal from './actions/GenerateThumbnailsModal';
@@ -17,8 +19,8 @@ import RequeryFileSizesModal from './actions/RequeryFileSizesModal';
 
 type ServerAction = {
   id: string;
-  label: string;
-  description: string;
+  labelKey: ParseKeys<'serverActions'>;
+  descriptionKey: ParseKeys<'serverActions'>;
   icon: TablerIcon;
   Modal: ComponentType<{ opened: boolean; onClose: () => void }>;
   superAdminOnly: boolean;
@@ -27,40 +29,40 @@ type ServerAction = {
 const ACTIONS = [
   {
     id: 'import-export',
-    label: 'Import/Export Data',
-    description: 'Allows you to import or export server data and configurations.',
+    labelKey: 'list.importExport.label',
+    descriptionKey: 'list.importExport.description',
     icon: IconDatabasePlus,
     Modal: ImportExportModal,
     superAdminOnly: true,
   },
   {
     id: 'clear-temporary-files',
-    label: 'Clear Temporary Files',
-    description: 'Removes all temporary files from the temporary directory.',
+    labelKey: 'list.clearTemporaryFiles.label',
+    descriptionKey: 'list.clearTemporaryFiles.description',
     icon: IconTrashFilled,
     Modal: ClearTemporaryFilesModal,
     superAdminOnly: false,
   },
   {
     id: 'clear-zero-byte-files',
-    label: 'Clear Zero Byte Files',
-    description: 'Deletes all files with zero bytes from the database and/or storage.',
+    labelKey: 'list.clearZeroByteFiles.label',
+    descriptionKey: 'list.clearZeroByteFiles.description',
     icon: IconTrashFilled,
     Modal: ClearZeroByteFilesModal,
     superAdminOnly: false,
   },
   {
     id: 'requery-file-sizes',
-    label: 'Requery File Sizes',
-    description: 'Recalculates and updates the sizes of all files in the database.',
+    labelKey: 'list.requeryFileSizes.label',
+    descriptionKey: 'list.requeryFileSizes.description',
     icon: IconPlayerPlayFilled,
     Modal: RequeryFileSizesModal,
     superAdminOnly: false,
   },
   {
     id: 'generate-thumbnails',
-    label: 'Generate Thumbnails',
-    description: 'Creates thumbnails for all image and video files that lack them.',
+    labelKey: 'list.generateThumbnails.label',
+    descriptionKey: 'list.generateThumbnails.description',
     icon: IconVideoPlusFilled,
     Modal: GenerateThumbnailsModal,
     superAdminOnly: false,
@@ -70,13 +72,14 @@ const ACTIONS = [
 type ServerActionId = (typeof ACTIONS)[number]['id'];
 
 export default function DashboardServerActions() {
+  const { t } = useTranslation('serverActions');
   const user = useUserStore((state) => state.user);
   const [activeAction, setActiveAction] = useState<ServerActionId | null>(null);
 
   const actions = ACTIONS.filter((action) => !action.superAdminOnly || user?.role === 'SUPERADMIN');
-  const links = actions.map(({ id, label, description, icon }) => ({
-    label,
-    description,
+  const links = actions.map(({ id, labelKey, descriptionKey, icon }) => ({
+    label: t(labelKey),
+    description: t(descriptionKey),
     icon,
     onClick: () => setActiveAction(id),
   }));
@@ -88,10 +91,10 @@ export default function DashboardServerActions() {
       ))}
 
       <Group gap='sm'>
-        <Title order={1}>Server Actions</Title>
+        <Title order={1}>{t('page.title')}</Title>
       </Group>
       <Text c='dimmed' mb='xs'>
-        Useful tools and scripts for server management.
+        {t('page.description')}
       </Text>
       <LinksList links={links} />
     </>

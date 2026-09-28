@@ -1,0 +1,34 @@
+{
+  "actions": {
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "close": "Cerrar",
+    "ok": "Aceptar",
+    "yes": "Sí",
+    "no": "No",
+    "edit": "Editar",
+    "create": "Crear",
+    "copy": "Copiar",
+    "remove": "Quitar",
+    "download": "Descargar",
+    "upload": "Subir",
+    "refresh": "Actualizar",
+    "open": "Abrir",
+    "continue": "Continuar"
+  },
+  "status": {
+    "loading": "Cargando...",
+    "error": "Error",
+    "enabled": "Habilitado"
+  },
+  "warning": {
+    "title": "¿Está seguro?"
+  },
+  "language": {
+    "label": "Idioma"
+  },
+  "table": {
+    "noRecords": "No hay registros"
+  }
+}

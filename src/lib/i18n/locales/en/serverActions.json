@@ -1,0 +1,373 @@
+{
+  "admin": {
+    "title": "Administrator",
+    "links": {
+      "metrics": {
+        "label": "Metrics",
+        "description": "Instance-wide usage graphs and statistics"
+      },
+      "actions": {
+        "label": "Actions",
+        "description": "Maintenance tools and import/export"
+      },
+      "users": {
+        "label": "Users",
+        "description": "Manage users and quotas"
+      },
+      "settings": {
+        "label": "Settings",
+        "description": "Server configuration"
+      },
+      "invites": {
+        "label": "Invites",
+        "description": "Create and manage invite codes"
+      }
+    },
+    "storage": {
+      "title": "Storage",
+      "refresh": "Refresh storage stats",
+      "loadFailed": "Failed to load storage",
+      "used": "{{used}} used"
+    },
+    "version": {
+      "title": "Version",
+      "loadFailed": "Version information could not be loaded."
+    }
+  },
+  "page": {
+    "title": "Server Actions",
+    "description": "Useful tools and scripts for server management."
+  },
+  "list": {
+    "importExport": {
+      "label": "Import/Export Data",
+      "description": "Allows you to import or export server data and configurations."
+    },
+    "clearTemporaryFiles": {
+      "label": "Clear Temporary Files",
+      "description": "Removes all temporary files from the temporary directory."
+    },
+    "clearZeroByteFiles": {
+      "label": "Clear Zero Byte Files",
+      "description": "Deletes all files with zero bytes from the database and/or storage."
+    },
+    "requeryFileSizes": {
+      "label": "Requery File Sizes",
+      "description": "Recalculates and updates the sizes of all files in the database."
+    },
+    "generateThumbnails": {
+      "label": "Generate Thumbnails",
+      "description": "Creates thumbnails for all image and video files that lack them."
+    }
+  },
+  "modals": {
+    "confirmDelete": "Yes, delete",
+    "clearTemporaryFiles": {
+      "body": "This will delete temporary files stored within the temporary directory (defined in the configuration). This should not cause harm unless there are files that are being processed still."
+    },
+    "clearZeroByteFiles": {
+      "body": "This will delete {{count}} files from the database and datasource."
+    },
+    "requeryFileSizes": {
+      "body": "This will requery the size of every file stored within the database. Additionally you can use the options below.",
+      "forceUpdate": {
+        "label": "Force Update",
+        "description": "Force update the size of every file, even if it already has a size set."
+      },
+      "forceDelete": {
+        "label": "Force Delete",
+        "description": "Delete files that are not found in the database, or have a size of 0."
+      },
+      "confirm": "Requery"
+    },
+    "generateThumbnails": {
+      "body": "This will generate thumbnails for all files that do not have a thumbnail set. Additionally you can use the options below.",
+      "rerun": {
+        "label": "Re-run",
+        "description": "Re-run the thumbnail generation for all files regardless of whether they have a thumbnail set."
+      },
+      "confirm": "Generate"
+    }
+  },
+  "importExport": {
+    "title": "Import / Export Data",
+    "import": "Import",
+    "upload": "Upload Export (JSON)",
+    "clear": "Clear Import",
+    "clearAriaLabel": "Clear",
+    "importData": "Import Data",
+    "notifications": {
+      "invalid": {
+        "title": "There were errors with the import"
+      },
+      "settingsFailed": {
+        "title": "Failed to import settings"
+      },
+      "settingsImported": {
+        "title": "Settings imported"
+      }
+    },
+    "export": {
+      "button": "Export Data",
+      "intro": "The export provides a complete snapshot of Zipline’s data and environment. It includes:",
+      "items": {
+        "users": "<b>Users:</b> Account information including usernames, optional passwords, avatars, roles, view settings, and optional TOTP secrets.",
+        "passkeys": "<b>Passkeys:</b> Registered WebAuthn passkeys with creation dates, last-used timestamps, and credential registration data.",
+        "userQuotas": "<b>User Quotas:</b> Quota settings such as max bytes, max files, max URLs, and quota types.",
+        "oauthProviders": "<b>OAuth Providers:</b> Linked OAuth accounts including provider type, tokens, and OAuth IDs.",
+        "userTags": "<b>User Tags:</b> Tags created by users, including names, colors, and associated file IDs.",
+        "files": "<b>Files:</b> Metadata about uploaded files including size, type, timestamps, expiration, views, password protection, owner, and folder association.<i> (Actual file contents are not included.)</i>",
+        "folders": "<b>Folders:</b> Folder metadata including visibility settings, upload permissions, file lists, and ownership.",
+        "urls": "<b>URLs:</b> Metadata for shortened URLs including destinations, vanity codes, view counts, passwords, and user assignments.",
+        "thumbnails": "<b>Thumbnails:</b> Thumbnail path and associated file ID.<i> (Image data is not included.)</i>",
+        "invites": "<b>Invites:</b> Invite codes, creation/expiration dates, and usage counts.",
+        "metrics": "<b>Metrics:</b> System and usage statistics stored internally by Zipline."
+      },
+      "systemIntro": "Additionally, the export includes <b>system-specific information</b>:",
+      "systemItems": {
+        "cpuCount": "<b>CPU Count:</b> The number of available processor cores.",
+        "hostname": "<b>Hostname:</b> The host system’s network identifier.",
+        "architecture": "<b>Architecture:</b> The hardware architecture (e.g., <code>x64</code>, <code>arm64</code>).",
+        "platform": "<b>Platform:</b> The operating system platform (e.g., <code>linux</code>, <code>darwin</code>).",
+        "osRelease": "<b>OS Release:</b> The OS or kernel version.",
+        "env": "<b>Environment Variables:</b> A full snapshot of environment variables at the time of export.",
+        "versions": "<b>Versions:</b> The Zipline version, Node version, and export format version."
+      },
+      "excludeMetrics": {
+        "label": "Exclude Metrics Data",
+        "description": "Exclude system and usage metrics from the export. This can reduce the export file size."
+      },
+      "warning": {
+        "title": "Warning",
+        "message": "This export contains a significant amount of sensitive data, including user accounts, authentication credentials, environment variables, and system metadata. Handle this file securely and do not share it with untrusted parties."
+      },
+      "download": "Download Export"
+    },
+    "v3": {
+      "title": "Import V3 Data",
+      "invalidMessage": "Zipline couldn't validate the import data. Are you sure it's a valid export from Zipline v3? For more details about the error, check the browser console.",
+      "confirm": {
+        "message": "This process will NOT overwrite existing data but will append to it. In case of conflicts, the imported data will be skipped and logged. If using a version 3 export, the entire importing process should be completed immediately after setting up Zipline."
+      },
+      "importing": {
+        "title": "Importing Data",
+        "message": "The export file will be uploaded. This may take a few moments. The process is running in the background and is logged, so you can close this browser tab."
+      },
+      "failed": {
+        "title": "Failed to import data",
+        "message": "An error occurred while importing data. Check the Zipline logs for more details."
+      },
+      "imported": {
+        "title": "Data Imported",
+        "message": "The data has been successfully imported. If there were any conflicts, they have been logged.",
+        "stats": {
+          "users": "<b>Users: </b> {{count}}",
+          "folders": "<b>Folders: </b> {{count}}",
+          "urls": "<b>URLs: </b> {{count}}",
+          "files": "<b>Files: </b> {{count}}"
+        }
+      },
+      "noUsers": {
+        "title": "No users imported",
+        "message": "No users were imported, likely because the export contains usernames that already exist in this Zipline instance. Check the Zipline logs for more details. Files, folders, and URLs may also not have been imported."
+      },
+      "filesImported": {
+        "message": "{{count}} files were imported. Since this import does not copy files, you will need to move the files from the instance where they are stored to the current Zipline instance. The <code>import-dir</code> script may be useful for this if using directory storage. If you are using S3, you can use the same bucket for this instance.",
+        "important": {
+          "title": "Important",
+          "message": "After importing, you should either delete the export file or store it securely, as it contains sensitive information such as passwords and OAuth tokens."
+        },
+        "settings": {
+          "title": "Settings Imported",
+          "message": "Imported settings have been applied, it is advised to reload the page to ensure the settings are applied correctly."
+        },
+        "okay": "Okay"
+      },
+      "importSettings": {
+        "description": "This option allows you to import compatible settings from your instance into this v4 instance."
+      },
+      "userChoose": {
+        "description": "This option allows you to import data from a user in your export into the currently logged-in user, even if both have the same username. Normally, the system skips importing users with usernames that already exist in the database. However, if you've just set up your instance and reused the same username as your old instance, this option enables you to merge data from that user into your logged-in account without needing to delete or replace it. <b>It is recommended to select a user with super-administrator permissions for this operation.</b>"
+      }
+    },
+    "v4": {
+      "title": "Import V4 Data",
+      "invalidMessage": "Zipline couldn't validate the import data. Are you sure it's a valid export from Zipline v4? For more details about the error, check the browser console.",
+      "settingsImportedMessage": "To ensure that all settings take effect, it is recommended to restart Zipline.",
+      "sameInstance": {
+        "title": "Same Instance Detected",
+        "modalBody": "Detected that you are importing data from the same instance as the current running one. You must agree to the warning before proceeding with the import.",
+        "description": "Detected that you are importing data from the same instance as the current running one. Proceeding with this import may lead to data conflicts or overwriting existing data. Please ensure that you understand the implications before continuing.",
+        "agree": "I agree, and understand the implications."
+      },
+      "confirm": {
+        "message": "This process will NOT overwrite existing data but will append to it. In case of conflicts, the imported data will be skipped and logged.",
+        "label": "Yes, import data."
+      },
+      "importing": {
+        "title": "Importing data...",
+        "message": "The export file will be uploaded. This may take a few moments. The import is running in the background and is logged, so you can close this browser tab if you want."
+      },
+      "failed": {
+        "title": "Failed to import data...",
+        "message": "An error occurred while importing data. Check the logs for more details."
+      },
+      "completed": {
+        "title": "Import Completed.",
+        "message": "The import has been completed. To make sure files are properly viewable, make sure that you have configured the datasource correctly to match your previous instance. For example, if you were using local storage before, make sure to set it to the same directory (or same backed up directory) as before. If you are using S3, make sure you are using the same bucket. <br/> <br/>Additionally, it is recommended to restart Zipline to ensure all settings take full effect.",
+        "stats": {
+          "users": "<b>Users: </b>{{count}} imported.",
+          "oauthProviders": "<b>OAuth Providers: </b>{{count}} imported.",
+          "quotas": "<b>Quotas: </b>{{count}} imported.",
+          "passkeys": "<b>Passkeys: </b>{{count}} imported.",
+          "folders": "<b>Folders: </b>{{count}} imported.",
+          "files": "<b>Files: </b>{{count}} imported.",
+          "tags": "<b>Tags: </b>{{count}} imported.",
+          "urls": "<b>URLs: </b>{{count}} imported.",
+          "invites": "<b>Invites: </b>{{count}} imported.",
+          "metrics": "<b>Metrics: </b>{{count}} imported."
+        }
+      },
+      "importSettings": {
+        "description": "Import all settings from your previous instance into this v4 instance.<br/>After importing, it is recommended to restart Zipline for all settings to take full effect.",
+        "show": "Show Settings to be Imported",
+        "hide": "Hide Settings to be Imported"
+      },
+      "userChoose": {
+        "description": "This option allows you to import data from a user in your export into the currently logged-in user, even if both have the same username. Normally, the system skips importing users with usernames that already exist in the system. <br/> <br/> <b>However</b>, if you've just set up your instance and reused the same username as your old instance, this option enables you to merge data from that user into your logged-in account without needing to delete or replace it. <b>It is recommended to select a user with super-administrator permissions for this operation.</b>"
+      }
+    },
+    "importSettings": {
+      "title": "Import settings?",
+      "count": "Import {{count}} settings"
+    },
+    "userChoose": {
+      "title": "Select a user to import data from into the current user.",
+      "superAdministrator": "Super Administrator",
+      "noMerge": {
+        "label": "Do not merge data",
+        "description": "Select this option if you do not want to merge data from any user into the current user."
+      }
+    },
+    "details": {
+      "notice": "This data is not sent to the server. It is parsed and displayed in the browser. Data is only sent to the server when you click the \"Import\" button.",
+      "unknown": "unknown",
+      "version": {
+        "title": "Version Details",
+        "exportVersion": "Export Version:"
+      },
+      "request": {
+        "title": "Request Details",
+        "user": "User:",
+        "at": "At:",
+        "showOs": "Show OS Details",
+        "hideOs": "Hide OS Details",
+        "showEnv": "Show Environment",
+        "hideEnv": "Hide Environment"
+      },
+      "table": {
+        "key": "Key",
+        "value": "Value"
+      },
+      "roles": {
+        "user": "User",
+        "admin": "Admin",
+        "superAdmin": "Super Admin"
+      },
+      "users": {
+        "title": "Users",
+        "empty": "No users found (how?)",
+        "columns": {
+          "id": "ID",
+          "username": "Username",
+          "password": "Password",
+          "passwordQuestion": "Password?",
+          "role": "Role",
+          "oauthProviders": "OAuth Providers",
+          "quota": "Quota",
+          "passkeys": "Passkeys",
+          "admin": "Admin",
+          "superAdmin": "Super Admin",
+          "avatar": "Avatar",
+          "oauth": "Oauth",
+          "totp": "2fa (totp)",
+          "files": "Files"
+        }
+      },
+      "oauthProviders": {
+        "title": "User OAuth Providers",
+        "empty": "No user oauth providers found",
+        "columns": {
+          "user": "User",
+          "provider": "Provider",
+          "oauthUsername": "OAuth Username",
+          "oauthId": "OAuth ID"
+        }
+      },
+      "files": {
+        "title": "Files",
+        "empty": "No files found",
+        "columns": {
+          "name": "Name",
+          "originalName": "Original Name",
+          "type": "Type",
+          "createdAt": "Created At",
+          "password": "Password",
+          "size": "Size",
+          "owner": "Owner",
+          "views": "Views"
+        }
+      },
+      "tags": {
+        "title": "User Tags",
+        "empty": "No user tags found",
+        "columns": {
+          "user": "User",
+          "name": "Name",
+          "files": "Files"
+        }
+      },
+      "folders": {
+        "title": "Folders",
+        "empty": "No folders found",
+        "columns": {
+          "name": "Name",
+          "owner": "Owner",
+          "public": "Public",
+          "createdAt": "Created At",
+          "files": "Files"
+        }
+      },
+      "urls": {
+        "title": "Urls",
+        "empty": "No urls found",
+        "columns": {
+          "code": "Code",
+          "owner": "Owner",
+          "destination": "Destination",
+          "vanity": "Vanity",
+          "password": "Password",
+          "createdAt": "Created At"
+        }
+      },
+      "invites": {
+        "title": "Invites",
+        "empty": "No invites found",
+        "columns": {
+          "code": "Code",
+          "createdBy": "Created By",
+          "createdAt": "Created At",
+          "uses": "Uses"
+        }
+      },
+      "metrics": {
+        "title": "Metrics",
+        "totalEntries": "Total Metrics Entries:",
+        "latestEntry": "Latest Metrics Entry:"
+      },
+      "other": {
+        "title": "Other"
+      }
+    }
+  }
+}

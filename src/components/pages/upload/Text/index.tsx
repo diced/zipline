@@ -16,12 +16,14 @@ import {
   IconUpload,
 } from '@tabler/icons-react';
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useShallow } from 'zustand/shallow';
 import UploadOptionsButton from '../UploadOptionsButton';
 import styles from './index.module.css';
 
 export default function UploadText() {
+  const { t } = useTranslation('upload');
   const clipboard = useClipboard();
   const [options, ephemeral, clearEphemeral] = useUploadOptionsStore(
     useShallow((state) => [state.options, state.ephemeral, state.clearEphemeral]),
@@ -92,7 +94,7 @@ export default function UploadText() {
   return (
     <>
       <Group gap='sm'>
-        <Title order={1}>Upload text</Title>
+        <Title order={1}>{t('text.title')}</Title>
 
         <Button
           variant='outline'
@@ -101,17 +103,17 @@ export default function UploadText() {
           to='/dashboard/files'
           leftSection={<IconFiles size='1rem' />}
         >
-          Go to files
+          {t('actions.goToFiles')}
         </Button>
       </Group>
 
       <Tabs defaultValue='textareas' variant='pills' my='sm'>
         <Tabs.List my='sm'>
           <Tabs.Tab value='textareas' leftSection={<IconCursorText size='1rem' />}>
-            Text
+            {t('text.tabs.text')}
           </Tabs.Tab>
           <Tabs.Tab value='preview' leftSection={<IconEyeFilled size='1rem' />}>
-            Preview
+            {t('text.tabs.preview')}
           </Tabs.Tab>
         </Tabs.List>
 
@@ -152,7 +154,7 @@ export default function UploadText() {
               size='compact-sm'
               leftSection={<IconPlus size='1rem' />}
             >
-              Add text file
+              {t('text.addFile')}
             </Button>
 
             {files.some((file) => file.text.length > 0) && (
@@ -162,7 +164,7 @@ export default function UploadText() {
                 leftSection={<IconTrashFilled size='1rem' />}
                 onClick={() => removeFile(true)}
               >
-                Clear all
+                {t('actions.clearAll')}
               </Button>
             )}
           </Group>
@@ -171,7 +173,7 @@ export default function UploadText() {
         <Tabs.Panel value='preview'>
           {files.map((file, index) => (
             <div key={index}>
-              <Title order={4}>File {index + 1}</Title>
+              <Title order={4}>{t('text.fileHeading', { number: index + 1 })}</Title>
               <Render mode={renderMode(file.lang)} code={file.text} language={file.lang} />
             </div>
           ))}
@@ -186,7 +188,7 @@ export default function UploadText() {
           disabled={files.some((file) => file.text.length === 0) || loading}
           onClick={upload}
         >
-          Upload {files.length} file{files.length !== 1 && 's'} ({bytes(aggSize())})
+          {t('actions.upload', { count: files.length, size: bytes(aggSize()) })}
         </Button>
       </Group>
     </>

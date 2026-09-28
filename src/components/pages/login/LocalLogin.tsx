@@ -1,5 +1,6 @@
 import { Stack, TextInput, PasswordInput, Button } from '@mantine/core';
 import { UseFormReturnType } from '@mantine/form';
+import { useTranslation } from 'react-i18next';
 
 export default function LocalLogin({
   form,
@@ -12,12 +13,14 @@ export default function LocalLogin({
   loading: boolean;
   hasBackground: boolean;
 }) {
+  const { t } = useTranslation('auth');
+
   return (
     <form onSubmit={form.onSubmit((v) => onSubmit(v))}>
       <Stack my='sm'>
         <TextInput
           size='md'
-          placeholder='Enter your username...'
+          placeholder={t('form.username.placeholder')}
           autoComplete='username'
           styles={{
             input: { backgroundColor: hasBackground ? 'transparent' : undefined },
@@ -27,7 +30,7 @@ export default function LocalLogin({
 
         <PasswordInput
           size='md'
-          placeholder='Enter your password...'
+          placeholder={t('form.password.placeholder')}
           autoComplete='current-password'
           styles={{
             input: { backgroundColor: hasBackground ? 'transparent' : undefined },
@@ -42,7 +45,7 @@ export default function LocalLogin({
           loading={loading}
           variant={hasBackground ? 'outline' : 'filled'}
         >
-          Login
+          {t('login.submit')}
         </Button>
       </Stack>
     </form>

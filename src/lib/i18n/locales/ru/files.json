@@ -1,0 +1,217 @@
+{
+  "page": {
+    "title": "Файлы",
+    "uploadTooltip": "Загрузить файл",
+    "moreActions": "Другие действия",
+    "menu": {
+      "manageTags": "Управление тегами",
+      "viewPending": "Файлы в обработке",
+      "tableOptions": "Параметры таблицы",
+      "searchById": "Поиск по ID"
+    }
+  },
+  "fields": {
+    "name": "Имя",
+    "originalName": "Исходное имя",
+    "tags": "Теги",
+    "type": "Тип",
+    "size": "Размер",
+    "createdAt": "Создан",
+    "favorite": "Избранное",
+    "views": "Просмотры",
+    "anonymous": "Анонимно?"
+  },
+  "tableOptions": {
+    "title": "Параметры таблицы",
+    "description": "Выберите и перетащите поля ниже, чтобы показать, скрыть их или изменить их порядок в таблице файлов.",
+    "reset": "Восстановить по умолчанию"
+  },
+  "pending": {
+    "title": "Файлы в обработке",
+    "count_one": "{{count}} файл",
+    "count_few": "{{count}} файла",
+    "count_many": "{{count}} файлов",
+    "count_other": "{{count}} файла",
+    "clearCompleted": "Убрать завершённые",
+    "chunks": "Фрагменты: {{complete}}/{{total}}",
+    "clearEntry": "Убрать запись",
+    "clearEntryLabel": "Убрать {{name}}",
+    "empty": "Нет файлов в обработке",
+    "status": {
+      "pending": "Ожидание",
+      "processing": "Обработка",
+      "complete": "Завершено",
+      "failed": "Ошибка"
+    },
+    "notifications": {
+      "clearedOne": "Файл убран из списка обработки!",
+      "clearedCompleted": "Завершённые файлы убраны из списка!",
+      "clearOneFailed": "Не удалось убрать файл из списка обработки: {{error}}",
+      "clearCompletedFailed": "Не удалось убрать завершённые файлы: {{error}}",
+      "unknownError": "Неизвестная ошибка"
+    }
+  },
+  "bulk": {
+    "delete": {
+      "title_one": "Удалить {{count}} файл?",
+      "title_few": "Удалить {{count}} файла?",
+      "title_many": "Удалить {{count}} файлов?",
+      "title_other": "Удалить {{count}} файла?",
+      "message_one": "Вы собираетесь удалить {{count}} файл. Это действие нельзя отменить.",
+      "message_few": "Вы собираетесь удалить {{count}} файла. Это действие нельзя отменить.",
+      "message_many": "Вы собираетесь удалить {{count}} файлов. Это действие нельзя отменить.",
+      "message_other": "Вы собираетесь удалить {{count}} файла. Это действие нельзя отменить.",
+      "loadingTitle": "Удаление файлов",
+      "loadingMessage_one": "Удаление {{count}} файла",
+      "loadingMessage_few": "Удаление {{count}} файлов",
+      "loadingMessage_many": "Удаление {{count}} файлов",
+      "loadingMessage_other": "Удаление {{count}} файла",
+      "errorTitle": "Ошибка при удалении файлов",
+      "successTitle": "Файлы удалены",
+      "successMessage_one": "Удалён {{count}} файл",
+      "successMessage_few": "Удалено {{count}} файла",
+      "successMessage_many": "Удалено {{count}} файлов",
+      "successMessage_other": "Удалено {{count}} файла"
+    },
+    "favorite": {
+      "title_one": "Добавить {{count}} файл в избранное?",
+      "title_few": "Добавить {{count}} файла в избранное?",
+      "title_many": "Добавить {{count}} файлов в избранное?",
+      "title_other": "Добавить {{count}} файла в избранное?",
+      "message_one": "Вы собираетесь добавить в избранное {{count}} файл.",
+      "message_few": "Вы собираетесь добавить в избранное {{count}} файла.",
+      "message_many": "Вы собираетесь добавить в избранное {{count}} файлов.",
+      "message_other": "Вы собираетесь добавить в избранное {{count}} файла.",
+      "confirm": "Добавить в избранное",
+      "loadingTitle": "Добавление в избранное",
+      "loadingMessage_one": "Добавление {{count}} файла в избранное",
+      "loadingMessage_few": "Добавление {{count}} файлов в избранное",
+      "loadingMessage_many": "Добавление {{count}} файлов в избранное",
+      "loadingMessage_other": "Добавление {{count}} файла в избранное",
+      "successTitle": "Добавлено в избранное",
+      "successMessage_one": "В избранное добавлен {{count}} файл",
+      "successMessage_few": "В избранное добавлено {{count}} файла",
+      "successMessage_many": "В избранное добавлено {{count}} файлов",
+      "successMessage_other": "В избранное добавлено {{count}} файла"
+    },
+    "unfavorite": {
+      "title_one": "Убрать {{count}} файл из избранного?",
+      "title_few": "Убрать {{count}} файла из избранного?",
+      "title_many": "Убрать {{count}} файлов из избранного?",
+      "title_other": "Убрать {{count}} файла из избранного?",
+      "message_one": "Вы собираетесь убрать из избранного {{count}} файл.",
+      "message_few": "Вы собираетесь убрать из избранного {{count}} файла.",
+      "message_many": "Вы собираетесь убрать из избранного {{count}} файлов.",
+      "message_other": "Вы собираетесь убрать из избранного {{count}} файла.",
+      "confirm": "Убрать из избранного",
+      "loadingTitle": "Удаление из избранного",
+      "loadingMessage_one": "Удаление {{count}} файла из избранного",
+      "loadingMessage_few": "Удаление {{count}} файлов из избранного",
+      "loadingMessage_many": "Удаление {{count}} файлов из избранного",
+      "loadingMessage_other": "Удаление {{count}} файла из избранного",
+      "successTitle": "Убрано из избранного",
+      "successMessage_one": "Из избранного убран {{count}} файл",
+      "successMessage_few": "Из избранного убрано {{count}} файла",
+      "successMessage_many": "Из избранного убрано {{count}} файлов",
+      "successMessage_other": "Из избранного убрано {{count}} файла"
+    },
+    "modifyErrorTitle": "Ошибка при изменении файлов",
+    "copyLinks": {
+      "title": "Ссылки скопированы в буфер обмена",
+      "message_one": "В буфер обмена скопирована {{count}} ссылка",
+      "message_few": "В буфер обмена скопировано {{count}} ссылки",
+      "message_many": "В буфер обмена скопировано {{count}} ссылок",
+      "message_other": "В буфер обмена скопировано {{count}} ссылки"
+    }
+  },
+  "tags": {
+    "title": "Теги",
+    "fileCount_one": "{{count}} файл",
+    "fileCount_few": "{{count}} файла",
+    "fileCount_many": "{{count}} файлов",
+    "fileCount_other": "{{count}} файла",
+    "edit": "Изменить тег",
+    "delete": "Удалить тег",
+    "empty": "Тегов нет. Чтобы создать тег, нажмите значок «плюс».",
+    "form": {
+      "name": {
+        "label": "Название",
+        "placeholder": "Введите название…",
+        "required": "Введите название"
+      },
+      "color": {
+        "label": "Цвет",
+        "fromName": "Подобрать цвет по названию",
+        "invalid": "Цвет должен начинаться с #"
+      }
+    },
+    "create": {
+      "title": "Новый тег",
+      "submit": "Создать тег"
+    },
+    "editModal": {
+      "title": "Изменение тега",
+      "submit": "Изменить тег"
+    },
+    "notifications": {
+      "createFailed": "Не удалось создать тег",
+      "created": "Тег создан",
+      "createdMessage": "Создан тег «{{name}}»",
+      "editFailed": "Не удалось изменить тег",
+      "edited": "Тег изменён",
+      "editedMessage": "Тег «{{name}}» изменён",
+      "deleteFailed": "Не удалось удалить тег: {{error}}",
+      "deleted": "Тег удалён",
+      "deletedMessage": "Тег «{{name}}» удалён"
+    }
+  },
+  "views": {
+    "favoriteFiles": "Избранные файлы",
+    "noFiles": "Файлы не найдены",
+    "uploadFile": "Загрузить файл",
+    "pagination": "Файлы {{from}}–{{to}} из {{total}}"
+  },
+  "table": {
+    "columns": {
+      "name": "Имя",
+      "originalName": "Исходное имя",
+      "tags": "Теги",
+      "type": "Тип",
+      "size": "Размер",
+      "createdAt": "Создан",
+      "favorite": "В избранном?",
+      "views": "Просмотры",
+      "id": "ID",
+      "anonymous": "Анонимно?",
+      "actions": "Действия"
+    },
+    "search": {
+      "name": "Поиск по имени",
+      "originalName": "Поиск по исходному имени",
+      "type": "Поиск по типу"
+    },
+    "searchById": "Поиск по ID",
+    "tagsPlaceholder": "Выберите один или несколько тегов",
+    "selection": {
+      "summary_one": "Выбор сохраняется при переходе между страницами. Выбран <b>{{count}}</b> файл.",
+      "summary_few": "Выбор сохраняется при переходе между страницами. Выбрано <b>{{count}}</b> файла.",
+      "summary_many": "Выбор сохраняется при переходе между страницами. Выбрано <b>{{count}}</b> файлов.",
+      "summary_other": "Выбор сохраняется при переходе между страницами. Выбрано <b>{{count}}</b> файла.",
+      "delete": "Удалить файлы",
+      "favorite": "Добавить файлы в избранное",
+      "unfavorite": "Убрать файлы из избранного",
+      "copyLinks": "Копировать ссылки на файлы",
+      "addToFolder": "Добавить в папку…",
+      "clear": "Снять выделение"
+    },
+    "noRecords": "Нет файлов",
+    "recordsPerPage": "Записей на странице",
+    "actions": {
+      "details": "Подробнее",
+      "view": "Открыть файл в новой вкладке",
+      "copy": "Копировать ссылку на файл в буфер обмена",
+      "download": "Скачать файл",
+      "delete": "Удалить файл"
+    }
+  }
+}

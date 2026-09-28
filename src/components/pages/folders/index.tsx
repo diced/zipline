@@ -27,6 +27,7 @@ import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { IconFolderPlus, IconHome, IconPlus, IconShare } from '@tabler/icons-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import useSWR from 'swr';
 import FilesGridView from '../files/views/FilesGridView';
@@ -36,6 +37,7 @@ import FolderGridView from './views/FolderGridView';
 import FolderTableView from './views/FolderTableView';
 
 export default function DashboardFolders() {
+  const { t } = useTranslation(['folders', 'common']);
   const view = useViewStore((state) => state.folders);
   const location = useLocation();
   const navigate = useNavigate();
@@ -63,7 +65,7 @@ export default function DashboardFolders() {
       isPublic: false,
     },
     validate: {
-      name: (value) => (value.length < 1 ? 'Name is required' : null),
+      name: (value) => (value.length < 1 ? t('create.name.required') : null),
     },
   });
 
@@ -130,7 +132,11 @@ export default function DashboardFolders() {
 
   const breadcrumbs = buildBreadcrumbs();
 
-  useTitle(currentFolder ? `Folders ${SEPARATOR} ${currentFolder.name}` : 'Folders');
+  useTitle(
+    currentFolder
+      ? t('page.titleWithFolder', { separator: SEPARATOR, name: currentFolder.name })
+      : t('page.title'),
+  );
 
   useEffect(() => {
     if (!currentFolderId) return;
@@ -147,26 +153,30 @@ export default function DashboardFolders() {
         centered
         opened={open}
         onClose={() => setOpen(false)}
-        title={currentFolderId ? 'Create a subfolder' : 'Create a folder'}
+        title={currentFolderId ? t('create.titleSubfolder') : t('create.title')}
       >
         <form onSubmit={form.onSubmit(onSubmit)}>
           <Stack gap='sm'>
-            <TextInput label='Name' placeholder='Enter a name...' {...form.getInputProps('name')} />
+            <TextInput
+              label={t('create.name.label')}
+              placeholder={t('create.name.placeholder')}
+              {...form.getInputProps('name')}
+            />
             <Switch
-              label='Public'
-              description='Public folders are visible to everyone'
+              label={t('create.public.label')}
+              description={t('create.public.description')}
               {...form.getInputProps('isPublic', { type: 'checkbox' })}
             />
 
             <Button type='submit' variant='outline' leftSection={<IconFolderPlus size='1rem' />}>
-              Create
+              {t('common:actions.create')}
             </Button>
           </Stack>
         </form>
       </Modal>
 
       <Group>
-        <Title>Folders</Title>
+        <Title>{t('page.title')}</Title>
 
         <Button
           variant='outline'
@@ -174,7 +184,7 @@ export default function DashboardFolders() {
           leftSection={<IconPlus size='1rem' />}
           onClick={() => setOpen(true)}
         >
-          Create{currentFolderId ? ' Subfolder' : ' Folder'}
+          {currentFolderId ? t('page.createSubfolder') : t('page.createFolder')}
         </Button>
 
         <GridTableSwitcher type='folders' />
@@ -211,8 +221,7 @@ export default function DashboardFolders() {
               mb='sm'
               styles={{ message: { marginTop: 0 } }}
             >
-              This folder allows anonymous uploads. Share the link below to allow others to let others upload
-              files to this folder.
+              {t('uploadsAlert.message')}
               <br />
               <Anchor href={`/folder/${currentFolder.id}/upload`} target='_blank'>
                 {`${window?.location?.origin ?? ''}/folder/${currentFolder.id}/upload`}
@@ -220,7 +229,7 @@ export default function DashboardFolders() {
               <CopyButton value={`${window?.location?.origin ?? ''}/folder/${currentFolder.id}/upload`}>
                 {({ copied, copy }) => (
                   <Button mx='sm' size='compact-xs' color={copied ? 'teal' : 'blue'} onClick={copy}>
-                    {copied ? 'Copied url' : 'Copy url'}
+                    {copied ? t('uploadsAlert.copied') : t('uploadsAlert.copy')}
                   </Button>
                 )}
               </CopyButton>
@@ -233,8 +242,13 @@ export default function DashboardFolders() {
             onClick={() => setFilesOpen((o) => !o)}
             style={{ cursor: 'pointer', userSelect: 'none' }}
           >
-            {filesOpen ? '▼' : '▶'} {currentFolder.name}&#39;s files{' '}
-            {currentFolder._count ? `(${currentFolder._count.files})` : ''}
+            {filesOpen ? '▼' : '▶'}{' '}
+            {currentFolder._count
+              ? t('page.folderFilesWithCount', {
+                  name: currentFolder.name,
+                  files: currentFolder._count.files,
+                })
+              : t('page.folderFiles', { name: currentFolder.name })}
           </Text>
           <Collapse expanded={filesOpen}>
             {view === 'grid' ? (

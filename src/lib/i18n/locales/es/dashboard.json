@@ -1,0 +1,46 @@
+{
+  "welcome": "Hola de nuevo, <b>{{username}}</b>",
+  "filesUploaded": "Archivos subidos: <b>{{files}}</b>",
+  "quota": {
+    "bytes": "Ha usado <b>{{used}}</b> de <b>{{max}}</b> de almacenamiento",
+    "files": "Ha subido <b>{{files}}</b> de <b>{{max}}</b> archivos permitidos.",
+    "urls": "Ha creado <b>{{urls}}</b> de <b>{{max}}</b> enlaces cortos permitidos."
+  },
+  "recents": {
+    "title": "Archivos recientes",
+    "viewAll": "Ver todos los archivos",
+    "empty": "No tiene archivos recientes. Aquí aparecerán los últimos tres archivos que haya subido."
+  },
+  "stats": {
+    "title": "Estadísticas",
+    "viewMetrics": "Ver métricas de la instancia",
+    "description": "Estas estadísticas se basan únicamente en sus subidas.",
+    "filesUploaded": "Archivos subidos",
+    "favoriteFiles": "Archivos favoritos",
+    "storageUsed": "Almacenamiento usado",
+    "avgStorageUsed": "Almacenamiento medio usado",
+    "fileViews": "Vistas de archivos",
+    "avgFileViews": "Vistas medias por archivo",
+    "linksCreated": "Enlaces cortos creados",
+    "linkViews": "Vistas totales de enlaces cortos"
+  },
+  "fileTypes": {
+    "title": "Tipos de archivo",
+    "columns": {
+      "type": "Tipo de archivo",
+      "count": "Cantidad"
+    }
+  },
+  "activity": {
+    "title": "Actividad",
+    "description": "Sus subidas e inicios de sesión en",
+    "range_one": "el último día",
+    "range_many": "los últimos {{count}} días",
+    "range_other": "los últimos {{count}} días",
+    "uploads": "Subidas",
+    "logins": "Inicios de sesión",
+    "empty": "Aún no hay subidas ni inicios de sesión en este período",
+    "today": "Hoy",
+    "yesterday": "Ayer"
+  }
+}

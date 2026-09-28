@@ -3,6 +3,7 @@ import { Button, Group, Image, Modal, Select, Text, Tooltip } from '@mantine/cor
 import { showNotification } from '@mantine/notifications';
 import { IconClipboardCheck, IconClipboardX, IconCopy, IconDownload } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 type Type = 'image/png' | 'image/jpeg' | 'image/webp';
 
@@ -17,6 +18,7 @@ export default function QRCodeModal({
   onClose: () => void;
   url: string;
 }) {
+  const { t } = useTranslation(['layout', 'common']);
   const [dataUrl, setDataUrl] = useState<string | null>(null);
   const [type, setType] = useState<Type>('image/png');
 
@@ -41,13 +43,13 @@ export default function QRCodeModal({
         }),
       ]);
       showNotification({
-        message: 'QR code image copied to clipboard',
+        message: t('qrCode.copied'),
         color: 'green',
         icon: <IconClipboardCheck size='1rem' />,
       });
     } catch (error) {
       showNotification({
-        title: 'Failed to copy QR code image',
+        title: t('qrCode.copyFailed'),
         message: error instanceof Error ? error.message : String(error),
         color: 'red',
         icon: <IconClipboardX size='1rem' />,
@@ -68,18 +70,18 @@ export default function QRCodeModal({
   };
 
   return (
-    <Modal title='QR Code' opened={opened} onClose={onClose} size='sm' centered>
+    <Modal title={t('qrCode.title')} opened={opened} onClose={onClose} size='sm' centered>
       {dataUrl ? (
-        <Image src={dataUrl} alt='QR Code' />
+        <Image src={dataUrl} alt={t('qrCode.alt')} />
       ) : (
         <Text c='red' ta='center'>
-          Failed to generate QR code.
+          {t('qrCode.failed')}
         </Text>
       )}
 
       <Select
         mt='md'
-        label='Format'
+        label={t('qrCode.format')}
         value={type}
         onChange={(value) => setType(value as Type)}
         data={[
@@ -93,11 +95,7 @@ export default function QRCodeModal({
       {dataUrl && (
         <Group gap='xs' mt='md' grow>
           <Tooltip
-            label={
-              UNSUPPORTED_COPY.includes(type)
-                ? 'Copying this format is not supported in some browsers. You can copy the image normally via right-click or holding it.'
-                : ''
-            }
+            label={UNSUPPORTED_COPY.includes(type) ? t('qrCode.copyUnsupported') : ''}
             hidden={!UNSUPPORTED_COPY.includes(type)}
           >
             <Button
@@ -105,11 +103,11 @@ export default function QRCodeModal({
               leftSection={<IconCopy size='1rem' />}
               disabled={UNSUPPORTED_COPY.includes(type)}
             >
-              Copy Image
+              {t('qrCode.copyImage')}
             </Button>
           </Tooltip>
           <Button onClick={downloadImage} leftSection={<IconDownload size='1rem' />}>
-            Download
+            {t('common:actions.download')}
           </Button>
         </Group>
       )}

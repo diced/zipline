@@ -1,6 +1,7 @@
 import { Response } from '@/lib/api/response';
 import { LimitedUser } from '@/lib/db/models/user';
 import { fetchApi } from '@/lib/fetchApi';
+import i18n from '@/lib/i18n';
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import { IconUserCancel, IconUserMinus } from '@tabler/icons-react';
@@ -9,21 +10,21 @@ import { mutate } from 'swr';
 export async function deleteUser(user: LimitedUser) {
   modals.openConfirmModal({
     centered: true,
-    title: `Delete ${user.username}?`,
-    children: `Are you sure you want to delete ${user.username}? This action cannot be undone.`,
+    title: i18n.t('users:delete.title', { username: user.username }),
+    children: i18n.t('users:delete.message', { username: user.username }),
     labels: {
-      cancel: 'Cancel',
-      confirm: 'Delete',
+      cancel: i18n.t('actions.cancel'),
+      confirm: i18n.t('actions.delete'),
     },
     confirmProps: { color: 'red' },
     onConfirm: () =>
       modals.openConfirmModal({
         centered: true,
-        title: `Delete ${user.username}'s data?`,
-        children: `Would you like to delete ${user.username}'s files and urls? This action cannot be undone.`,
+        title: i18n.t('users:delete.data.title', { username: user.username }),
+        children: i18n.t('users:delete.data.message', { username: user.username }),
         labels: {
-          cancel: 'No, keep everything & only delete user',
-          confirm: 'Yes, delete everything',
+          cancel: i18n.t('users:delete.data.cancel'),
+          confirm: i18n.t('users:delete.data.confirm'),
         },
         confirmProps: { color: 'red' },
         onConfirm: () => handleDeleteUser(user, true),
@@ -40,15 +41,15 @@ async function handleDeleteUser(user: LimitedUser, deleteFiles: boolean = false)
 
   if (error) {
     notifications.show({
-      title: 'Failed to delete user',
+      title: i18n.t('users:notifications.deleteFailed'),
       message: error.error,
       color: 'red',
       icon: <IconUserCancel size='1rem' />,
     });
   } else {
     notifications.show({
-      title: 'User deleted',
-      message: `User ${data?.username} has been deleted`,
+      title: i18n.t('users:notifications.deleted.title'),
+      message: i18n.t('users:notifications.deleted.message', { username: data?.username }),
       color: 'blue',
       icon: <IconUserMinus size='1rem' />,
     });

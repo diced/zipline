@@ -1,0 +1,132 @@
+{
+  "title": "短縮 URL",
+  "create": {
+    "title": "URL の短縮",
+    "url": {
+      "label": "URL",
+      "required": "URL は必須です",
+      "invalid": "URL が正しくありません"
+    },
+    "vanity": {
+      "label": "カスタム名",
+      "description": "任意です。ランダムなコードを生成する場合は空欄のままにしてください"
+    },
+    "maxViews": {
+      "label": "最大閲覧数",
+      "description": "任意です。閲覧数を制限しない場合は空欄のままにしてください。"
+    },
+    "domain": {
+      "label": "ドメインの上書き"
+    },
+    "enabled": {
+      "label": "有効",
+      "description": "この短縮 URL へのアクセスを許可または禁止します"
+    },
+    "password": {
+      "label": "パスワード",
+      "description": "リンクをパスワードで保護します"
+    }
+  },
+  "shortened": {
+    "title": "短縮 URL",
+    "open": "新しいタブでリンクを開く",
+    "copy": "リンクをクリップボードにコピー"
+  },
+  "notifications": {
+    "shortenFailed": {
+      "title": "URL を短縮できませんでした"
+    },
+    "copied": {
+      "title": "URL をクリップボードにコピーしました"
+    },
+    "deleteFailed": {
+      "title": "短縮 URL を削除できませんでした"
+    },
+    "deleted": {
+      "title": "短縮 URL を削除しました",
+      "message": "短縮 URL {{code}} を削除しました"
+    },
+    "removePasswordFailed": {
+      "title": "パスワードを解除できませんでした..."
+    },
+    "passwordRemoved": {
+      "title": "パスワードを解除しました！",
+      "message": "短縮 URL のパスワードを解除しました。"
+    },
+    "saveFailed": {
+      "title": "変更を保存できませんでした..."
+    },
+    "saved": {
+      "title": "変更を保存しました！",
+      "message": "変更を保存しました。"
+    }
+  },
+  "delete": {
+    "message": "{{code}} を削除してもよろしいですか？この操作は元に戻せません。",
+    "confirm": "「{{code}}」を削除"
+  },
+  "edit": {
+    "title": "「{{name}}」を編集中",
+    "unknown": "不明",
+    "maxViews": {
+      "label": "最大閲覧数",
+      "placeholder": "無制限",
+      "description": "この短縮 URL が自動的に削除されるまでの最大クリック数です。閲覧数を制限しない場合は空欄のままにしてください。"
+    },
+    "vanity": {
+      "label": "カスタム名",
+      "placeholder": "任意",
+      "description": "短縮 URL のカスタムエイリアスです。ランダムに生成されたコードを使用する場合は空欄のままにしてください。"
+    },
+    "destination": {
+      "label": "リンク先"
+    },
+    "enabled": {
+      "label": "有効",
+      "description": "この短縮 URL へのアクセスを禁止または許可します。"
+    },
+    "password": {
+      "label": "パスワード",
+      "description": "この短縮 URL にパスワードを設定します。パスワード保護を無効にする場合は空欄のままにしてください。",
+      "remove": "パスワードを解除"
+    },
+    "save": "変更を保存"
+  },
+  "card": {
+    "copyShortLink": "短縮リンクをコピー",
+    "copyDestination": "リンク先をコピー",
+    "showQrCode": "QR コードを表示",
+    "views": "閲覧数:",
+    "enabled": "有効:",
+    "created": "作成日時:",
+    "updated": "更新日時:",
+    "destination": "リンク先:",
+    "openDestination": "新しいタブで「{{url}}」を開く",
+    "code": "コード:"
+  },
+  "empty": {
+    "title": "短縮 URL が見つかりません",
+    "description": "URL を短縮するとここに表示されます"
+  },
+  "table": {
+    "columns": {
+      "code": "コード",
+      "vanity": "カスタム名",
+      "destination": "リンク先",
+      "views": "閲覧数",
+      "maxViews": "最大閲覧数",
+      "created": "作成日時",
+      "enabled": "有効",
+      "actions": "操作"
+    },
+    "search": {
+      "code": "コードで検索",
+      "vanity": "カスタム名で検索",
+      "destination": "リンク先で検索"
+    },
+    "copy": "URL をコピー",
+    "showQrCode": "QR コードを表示",
+    "edit": "短縮 URL を編集",
+    "delete": "短縮 URL を削除"
+  }
+}

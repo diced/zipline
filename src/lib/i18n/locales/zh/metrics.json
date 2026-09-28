@@ -1,0 +1,59 @@
+{
+  "title": "统计",
+  "range": {
+    "change": "更改日期范围",
+    "modalTitle": "更改范围",
+    "fromTo": "{{from}} 至 {{to}}",
+    "presets": {
+      "lastTwoDays": "最近两天",
+      "last7Days": "最近 7 天",
+      "thisMonth": "本月",
+      "lastMonth": "上个月",
+      "thisYear": "今年",
+      "lastYear": "去年"
+    }
+  },
+  "allTime": {
+    "label": "全部时间",
+    "show": "显示全部时间",
+    "slowWarning": "加载时间可能比平时更长。",
+    "viewing": "你正在查看全部时间的统计数据。"
+  },
+  "loadFailed": "无法加载此时间范围内的统计数据。指定的时间范围内可能没有可用数据。:(",
+  "cards": {
+    "files": "文件",
+    "urls": "短链接",
+    "storageUsed": "已用存储空间",
+    "users": "用户",
+    "fileViews": "文件查看次数",
+    "urlViews": "短链接查看次数"
+  },
+  "tables": {
+    "columns": {
+      "user": "用户",
+      "files": "文件",
+      "storageUsed": "已用存储空间",
+      "views": "查看次数",
+      "urls": "短链接",
+      "type": "类型"
+    },
+    "unknownUser": "[未知]"
+  },
+  "graphs": {
+    "count": {
+      "title": "数量"
+    },
+    "views": {
+      "title": "查看次数",
+      "value_other": "{{count}} 次查看"
+    },
+    "storage": {
+      "title": "已用存储空间"
+    },
+    "series": {
+      "files": "文件",
+      "urls": "短链接",
+      "storageUsed": "已用存储空间"
+    }
+  }
+}

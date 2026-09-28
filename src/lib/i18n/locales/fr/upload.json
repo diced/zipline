@@ -1,0 +1,220 @@
+{
+  "actions": {
+    "goToFiles": "Aller aux fichiers",
+    "clearAll": "Tout effacer",
+    "upload_one": "Téléverser {{count}} fichier ({{size}})",
+    "upload_many": "Téléverser {{count}} fichiers ({{size}})",
+    "upload_other": "Téléverser {{count}} fichiers ({{size}})"
+  },
+  "file": {
+    "title": "Téléverser des fichiers",
+    "dropzone": {
+      "title": "Faites glisser des images ici ou cliquez pour sélectionner des fichiers",
+      "paste": "Ou <kbd>{{mod}}</kbd> + <kbd>V</kbd> pour coller des images depuis le presse-papiers",
+      "description": "Joignez autant de fichiers que vous le souhaitez : ils s'afficheront ci-dessous pour vérification avant le téléversement.",
+      "limit": "Limite de <b>{{size}}</b> par fichier"
+    },
+    "progress": {
+      "speed": "{{speed}}/s, temps restant : {{remaining}}",
+      "finalizing": "Finalisation du téléversement…"
+    },
+    "hidden_one": "{{count}} autre fichier masqué",
+    "hidden_many": "{{count}} autres fichiers masqués",
+    "hidden_other": "{{count}} autres fichiers masqués",
+    "showMore": "Afficher plus",
+    "showAll": "Tout afficher",
+    "showAllTooltip": "Cela peut entraîner des problèmes de performances s'il y a beaucoup de fichiers",
+    "notifications": {
+      "pasted": {
+        "message": "Image {{name}} collée depuis le presse-papiers"
+      },
+      "mayFail": {
+        "title": "Le téléversement risque d'échouer",
+        "message": "Le téléversement risque d'échouer, car la taille totale des fichiers que vous essayez de téléverser (hors téléversements partiels) est de <b>{{size}}</b>, ce qui dépasse la limite de <b>{{limit}}</b>"
+      }
+    }
+  },
+  "text": {
+    "title": "Téléverser du texte",
+    "tabs": {
+      "text": "Texte",
+      "preview": "Aperçu"
+    },
+    "addFile": "Ajouter un fichier texte",
+    "fileHeading": "Fichier {{number}}"
+  },
+  "options": {
+    "button": "Options",
+    "title": "Options de téléversement",
+    "description": "Ces options s'appliquent à tous les fichiers que vous téléversez et sont enregistrées dans votre navigateur.",
+    "saved": "enregistré",
+    "default": "Par défaut ({{value}})",
+    "never": "jamais",
+    "clear": "Effacer",
+    "deletesAt": {
+      "label": "Supprimer après",
+      "description": "Le fichier sera automatiquement supprimé au bout de ce délai.",
+      "defaultExpiration": "Le délai d'expiration par défaut est de <b>{{value}}</b> (vous pouvez le remplacer avec l'option ci-dessous).",
+      "setDefault": "Vous pouvez définir un délai d'expiration par défaut dans les <link>paramètres</link>.",
+      "maxExpiration": "Remarque : le délai d'expiration maximal autorisé est de <b>{{value}}</b>."
+    },
+    "expirations": {
+      "never": "Jamais",
+      "minutes5": "5 minutes",
+      "minutes10": "10 minutes",
+      "minutes15": "15 minutes",
+      "minutes30": "30 minutes",
+      "hour1": "1 heure",
+      "hours2": "2 heures",
+      "hours3": "3 heures",
+      "hours4": "4 heures",
+      "hours5": "5 heures",
+      "hours6": "6 heures",
+      "hours8": "8 heures",
+      "hours12": "12 heures",
+      "day1": "1 jour",
+      "days3": "3 jours",
+      "days5": "5 jours",
+      "days7": "7 jours",
+      "week1": "1 semaine",
+      "weeksOneAndHalf": "1,5 semaine",
+      "weeks2": "2 semaines",
+      "weeks3": "3 semaines",
+      "month1": "1 mois (30 jours)",
+      "monthsOneAndHalf": "1,5 mois (~45 jours)",
+      "months2": "2 mois (60 jours)",
+      "months3": "3 mois (90 jours)",
+      "months4": "4 mois (120 jours)",
+      "months6": "6 mois (0,5 an)",
+      "year1": "1 an",
+      "custom": "Besoin de plus de liberté ? Définissez une date et une heure précises via l'API."
+    },
+    "format": {
+      "label": "Format du nom",
+      "description": "Format du nom de fichier à utiliser lors du téléversement de ce fichier. Le champ « Remplacer le nom du fichier » a priorité sur cette valeur.",
+      "random": "Aléatoire",
+      "date": "Date",
+      "name": "Utiliser le nom du fichier",
+      "gfycat": "Nom de style Gfycat"
+    },
+    "compressionFormat": {
+      "label": "Format de compression",
+      "description": "Format de compression d'image à utiliser <b>uniquement lorsqu'un pourcentage de compression est indiqué</b>. Laissez « Par défaut » pour utiliser le format de compression par défaut du serveur."
+    },
+    "compression": {
+      "label": "Compression",
+      "description": "Niveau de compression à appliquer aux images (uniquement). Le format ci-dessus sera utilisé pour compresser les images. Laissez vide pour désactiver la compression."
+    },
+    "maxViews": {
+      "label": "Vues max.",
+      "description": "Nombre maximal de vues des fichiers avant leur suppression. Laissez vide pour ne pas limiter le nombre de vues."
+    },
+    "folder": {
+      "label": "Ajouter à un dossier",
+      "description": "Ajoutez ce fichier à un dossier. Choisissez l'option « / (Racine) » pour ne l'ajouter à aucun dossier. Cette valeur n'est pas enregistrée dans votre navigateur et est effacée après le téléversement.",
+      "placeholder": "Ajouter à un dossier…",
+      "root": "/ (Racine)"
+    },
+    "domain": {
+      "label": "Remplacer le domaine"
+    },
+    "filename": {
+      "label": "Remplacer le nom du fichier",
+      "description": "Remplace le nom du fichier par cette valeur. Laissez vide pour utiliser l'option « Format du nom ». Cette valeur est ignorée si vous téléversez plusieurs fichiers. Elle n'est pas enregistrée dans votre navigateur et est effacée après le téléversement."
+    },
+    "password": {
+      "label": "Mot de passe",
+      "description": "Définissez un mot de passe pour ces fichiers. Laissez vide pour désactiver la protection par mot de passe. Cette valeur n'est pas enregistrée dans votre navigateur et est effacée après le téléversement."
+    },
+    "other": "Autres options",
+    "originalName": {
+      "label": "Ajouter le nom d'origine",
+      "description": "Ajoute le nom de fichier d'origine, pour que le fichier puisse être téléchargé sous ce nom. L'option « Format du nom » reste utilisée pour son nom de fichier."
+    },
+    "extensionless": {
+      "label": "URL sans extension",
+      "description": "Supprime l'extension de fichier de l'URL renvoyée. Le fichier reste accessible avec son extension. Cette option ne fonctionne que si le serveur est configuré pour autoriser les URL sans extension."
+    }
+  },
+  "modal": {
+    "title_one": "{{count}} fichier téléversé",
+    "title_many": "{{count}} fichiers téléversés",
+    "title_other": "{{count}} fichiers téléversés",
+    "open": "Ouvrir le lien dans un nouvel onglet",
+    "copy": "Copier le lien dans le presse-papiers",
+    "pending_one": "Le <link>traitement en arrière-plan</link> de {{count}} fichier volumineux va se poursuivre.",
+    "pending_many": "Le <link>traitement en arrière-plan</link> de {{count}} fichiers volumineux va se poursuivre.",
+    "pending_other": "Le <link>traitement en arrière-plan</link> de {{count}} fichiers volumineux va se poursuivre.",
+    "copyAllTooltip": "Copier tous les liens dans le presse-papiers (un par ligne)",
+    "copyAll": "Copier {{total}} URL dans le presse-papiers",
+    "notifications": {
+      "copied": {
+        "title": "URL copiée dans le presse-papiers"
+      },
+      "copiedAll": {
+        "title": "URL copiées dans le presse-papiers",
+        "message": "Toutes les URL ont été copiées dans le presse-papiers, une par ligne."
+      }
+    }
+  },
+  "errors": {
+    "parse": "Impossible d'analyser la réponse du serveur : {{response}}",
+    "unknown": "Une erreur inconnue s'est produite",
+    "network": "Erreur réseau lors du téléversement des fichiers"
+  },
+  "notifications": {
+    "preparing": {
+      "title_one": "Préparation du fichier",
+      "title_many": "Préparation des fichiers",
+      "title_other": "Préparation des fichiers",
+      "message_one": "Téléversement de {{count}} fichier",
+      "message_many": "Téléversement de {{count}} fichiers",
+      "message_other": "Téléversement de {{count}} fichiers",
+      "messageBatches_one": "Téléversement de {{count}} fichier en {{batches}} lots",
+      "messageBatches_many": "Téléversement de {{count}} fichiers en {{batches}} lots",
+      "messageBatches_other": "Téléversement de {{count}} fichiers en {{batches}} lots"
+    },
+    "uploading": {
+      "batch": "Téléversement du lot {{current}}/{{total}}",
+      "title_one": "Téléversement du fichier",
+      "title_many": "Téléversement des fichiers",
+      "title_other": "Téléversement des fichiers",
+      "message_one": "{{count}} fichier",
+      "message_many": "{{count}} fichiers",
+      "message_other": "{{count}} fichiers"
+    },
+    "complete": {
+      "title": "Téléversement terminé",
+      "titlePartial": "Téléversements standard terminés",
+      "message_one": "{{count}} fichier téléversé",
+      "message_many": "{{count}} fichiers téléversés",
+      "message_other": "{{count}} fichiers téléversés",
+      "startingPartials_one": "Démarrage du téléversement de {{count}} fichier volumineux…",
+      "startingPartials_many": "Démarrage du téléversement de {{count}} fichiers volumineux…",
+      "startingPartials_other": "Démarrage du téléversement de {{count}} fichiers volumineux…",
+      "messagePartial": "{{uploaded}}. {{starting}}"
+    },
+    "error": {
+      "title": "Erreur lors du téléversement des fichiers"
+    },
+    "partial": {
+      "title": "Téléversement d'un fichier volumineux",
+      "titleCount": "Téléversement d'un fichier volumineux ({{current}}/{{total}})",
+      "chunk": "Fragment {{current}}/{{total}}",
+      "error": {
+        "title": "Erreur lors du téléversement du fichier",
+        "message": "{{name}} : {{error}}"
+      },
+      "complete": {
+        "title": "Téléversements de fichiers volumineux terminés",
+        "message_one": "{{count}} fichier volumineux transféré pour traitement en arrière-plan",
+        "message_many": "{{count}} fichiers volumineux transférés pour traitement en arrière-plan",
+        "message_other": "{{count}} fichiers volumineux transférés pour traitement en arrière-plan"
+      },
+      "offloaded": {
+        "title": "Fichier volumineux transféré",
+        "message": "{{name}} transféré ({{current}}/{{total}})"
+      }
+    }
+  }
+}

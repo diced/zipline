@@ -1,0 +1,196 @@
+{
+  "actions": {
+    "goToFiles": "ファイルに移動",
+    "clearAll": "すべてクリア",
+    "upload_other": "{{count}} 個のファイルをアップロード ({{size}})"
+  },
+  "file": {
+    "title": "ファイルのアップロード",
+    "dropzone": {
+      "title": "ここに画像をドラッグするか、クリックしてファイルを選択",
+      "paste": "または <kbd>{{mod}}</kbd> + <kbd>V</kbd> でクリップボードから画像を貼り付け",
+      "description": "ファイルはいくつでも添付できます。アップロード前に下に表示されるので確認してください。",
+      "limit": "1 ファイルあたりの上限: <b>{{size}}</b>"
+    },
+    "progress": {
+      "speed": "{{speed}}/s、残り {{remaining}}",
+      "finalizing": "アップロードを完了しています..."
+    },
+    "hidden_other": "ほか {{count}} 個のファイルを非表示にしています",
+    "showMore": "さらに表示",
+    "showAll": "すべて表示",
+    "showAllTooltip": "ファイルが多い場合、パフォーマンスに問題が生じることがあります",
+    "notifications": {
+      "pasted": {
+        "message": "クリップボードから画像 {{name}} を貼り付けました"
+      },
+      "mayFail": {
+        "title": "アップロードが失敗する可能性があります",
+        "message": "アップロードしようとしているファイル (分割アップロードされないもの) の合計サイズが <b>{{size}}</b> で、上限の <b>{{limit}}</b> を超えているため、アップロードが失敗する可能性があります"
+      }
+    }
+  },
+  "text": {
+    "title": "テキストのアップロード",
+    "tabs": {
+      "text": "テキスト",
+      "preview": "プレビュー"
+    },
+    "addFile": "テキストファイルを追加",
+    "fileHeading": "ファイル {{number}}"
+  },
+  "options": {
+    "button": "オプション",
+    "title": "アップロードのオプション",
+    "description": "これらのオプションはアップロードするすべてのファイルに適用され、ブラウザーに保存されます。",
+    "saved": "保存済み",
+    "default": "既定 ({{value}})",
+    "never": "無期限",
+    "clear": "クリア",
+    "deletesAt": {
+      "label": "有効期限",
+      "description": "この時間が経過すると、ファイルは自動的に削除されます。",
+      "defaultExpiration": "既定の有効期限は <b>{{value}}</b> です (下のオプションで上書きできます)。",
+      "setDefault": "既定の有効期限は<link>設定</link>で指定できます。",
+      "maxExpiration": "注: 許可されている最長の有効期限は <b>{{value}}</b> です。"
+    },
+    "expirations": {
+      "never": "無期限",
+      "minutes5": "5 分",
+      "minutes10": "10 分",
+      "minutes15": "15 分",
+      "minutes30": "30 分",
+      "hour1": "1 時間",
+      "hours2": "2 時間",
+      "hours3": "3 時間",
+      "hours4": "4 時間",
+      "hours5": "5 時間",
+      "hours6": "6 時間",
+      "hours8": "8 時間",
+      "hours12": "12 時間",
+      "day1": "1 日",
+      "days3": "3 日",
+      "days5": "5 日",
+      "days7": "7 日",
+      "week1": "1 週間",
+      "weeksOneAndHalf": "1.5 週間",
+      "weeks2": "2 週間",
+      "weeks3": "3 週間",
+      "month1": "1 か月 (30 日)",
+      "monthsOneAndHalf": "1.5 か月 (約 45 日)",
+      "months2": "2 か月 (60 日)",
+      "months3": "3 か月 (90 日)",
+      "months4": "4 か月 (120 日)",
+      "months6": "6 か月 (0.5 年)",
+      "year1": "1 年",
+      "custom": "さらに細かく指定したい場合は、API で正確な日時を設定できます。"
+    },
+    "format": {
+      "label": "名前の形式",
+      "description": "このファイルをアップロードするときに使用するファイル名の形式です。「ファイル名の上書き」フィールドを指定すると、この値より優先されます。",
+      "random": "ランダム",
+      "date": "日付",
+      "name": "ファイル名を使用",
+      "gfycat": "Gfycat 形式の名前"
+    },
+    "compressionFormat": {
+      "label": "圧縮形式",
+      "description": "<b>圧縮率が指定されている場合にのみ</b>使用する画像の圧縮形式です。サーバーの既定の圧縮形式を使用する場合は「既定」のままにしてください。"
+    },
+    "compression": {
+      "label": "圧縮",
+      "description": "画像にのみ適用する圧縮レベルです。画像の圧縮には上の形式が使用されます。圧縮を無効にする場合は空欄のままにしてください。"
+    },
+    "maxViews": {
+      "label": "最大閲覧数",
+      "description": "ファイルが削除されるまでの最大閲覧数です。閲覧数を制限しない場合は空欄のままにしてください。"
+    },
+    "folder": {
+      "label": "フォルダーに追加",
+      "description": "このファイルをフォルダーに追加します。フォルダーに追加しない場合は「/ (ルート)」オプションを使用してください。この値はブラウザーに保存されず、アップロード後にクリアされます。",
+      "placeholder": "フォルダーに追加...",
+      "root": "/ (ルート)"
+    },
+    "domain": {
+      "label": "ドメインの上書き"
+    },
+    "filename": {
+      "label": "ファイル名の上書き",
+      "description": "この値でファイル名を上書きします。「名前の形式」オプションを使用する場合は空欄のままにしてください。複数のファイルをアップロードする場合、この値は無視されます。この値はブラウザーに保存されず、アップロード後にクリアされます。"
+    },
+    "password": {
+      "label": "パスワード",
+      "description": "これらのファイルにパスワードを設定します。パスワード保護を無効にする場合は空欄のままにしてください。この値はブラウザーに保存されず、アップロード後にクリアされます。"
+    },
+    "other": "その他のオプション",
+    "originalName": {
+      "label": "元のファイル名を追加",
+      "description": "元のファイル名を追加し、ファイルを元の名前でダウンロードできるようにします。ファイル名自体には引き続き「名前の形式」オプションが使用されます。"
+    },
+    "extensionless": {
+      "label": "拡張子なしの URL",
+      "description": "返される URL からファイル拡張子を削除します。拡張子付きでも引き続きファイルにアクセスできます。このオプションは、サーバーが拡張子なしの URL を許可するよう設定されている場合にのみ機能します。"
+    }
+  },
+  "modal": {
+    "title_other": "{{count}} 個のファイルをアップロードしました",
+    "open": "新しいタブでリンクを開く",
+    "copy": "リンクをクリップボードにコピー",
+    "pending_other": "{{count}} 個の大きなファイルは<link>バックグラウンドで処理されます。</link>",
+    "copyAllTooltip": "すべてのリンクをクリップボードにコピー (改行区切り)",
+    "copyAll": "{{total}} 件の URL をクリップボードにコピー",
+    "notifications": {
+      "copied": {
+        "title": "URL をクリップボードにコピーしました"
+      },
+      "copiedAll": {
+        "title": "URL をクリップボードにコピーしました",
+        "message": "すべての URL を改行区切りでクリップボードにコピーしました。"
+      }
+    }
+  },
+  "errors": {
+    "parse": "サーバーの応答を解析できませんでした: {{response}}",
+    "unknown": "不明なエラーが発生しました",
+    "network": "ファイルのアップロード中にネットワークエラーが発生しました"
+  },
+  "notifications": {
+    "preparing": {
+      "title_other": "ファイルを準備しています",
+      "message_other": "{{count}} 個のファイルをアップロードしています",
+      "messageBatches_other": "{{count}} 個のファイルを {{batches}} 回に分けてアップロードしています"
+    },
+    "uploading": {
+      "batch": "バッチ {{current}}/{{total}} をアップロードしています",
+      "title_other": "ファイルをアップロードしています",
+      "message_other": "{{count}} 個のファイル"
+    },
+    "complete": {
+      "title": "アップロードが完了しました",
+      "titlePartial": "通常のアップロードが完了しました",
+      "message_other": "{{count}} 個のファイルをアップロードしました",
+      "startingPartials_other": "{{count}} 個の大きなファイルのアップロードを開始しています...",
+      "messagePartial": "{{uploaded}}。{{starting}}"
+    },
+    "error": {
+      "title": "ファイルのアップロード中にエラーが発生しました"
+    },
+    "partial": {
+      "title": "大きなファイルをアップロードしています",
+      "titleCount": "大きなファイルをアップロードしています ({{current}}/{{total}})",
+      "chunk": "チャンク {{current}}/{{total}}",
+      "error": {
+        "title": "ファイルのアップロード中にエラーが発生しました",
+        "message": "{{name}}: {{error}}"
+      },
+      "complete": {
+        "title": "大きなファイルのアップロードが完了しました",
+        "message_other": "{{count}} 個の大きなファイルをバックグラウンド処理に移行しました"
+      },
+      "offloaded": {
+        "title": "大きなファイルをバックグラウンド処理に移行しました",
+        "message": "{{name}} をバックグラウンド処理に移行しました ({{current}}/{{total}})"
+      }
+    }
+  }
+}

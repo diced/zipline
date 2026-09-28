@@ -1,0 +1,45 @@
+{
+  "welcome": "Willkommen zurück, <b>{{username}}</b>",
+  "filesUploaded": "Hochgeladene Dateien: <b>{{files}}</b>",
+  "quota": {
+    "bytes": "Sie haben <b>{{used}}</b> von <b>{{max}}</b> Speicherplatz belegt",
+    "files": "Sie haben <b>{{files}}</b> von maximal <b>{{max}}</b> Dateien hochgeladen.",
+    "urls": "Sie haben <b>{{urls}}</b> von maximal <b>{{max}}</b> Kurzlinks erstellt."
+  },
+  "recents": {
+    "title": "Neueste Dateien",
+    "viewAll": "Alle Dateien anzeigen",
+    "empty": "Keine kürzlich hochgeladenen Dateien. Hier werden Ihre drei zuletzt hochgeladenen Dateien angezeigt."
+  },
+  "stats": {
+    "title": "Statistiken",
+    "viewMetrics": "Instanzstatistiken anzeigen",
+    "description": "Diese Statistiken beziehen sich nur auf Ihre Uploads.",
+    "filesUploaded": "Hochgeladene Dateien",
+    "favoriteFiles": "Favorisierte Dateien",
+    "storageUsed": "Belegter Speicher",
+    "avgStorageUsed": "Durchschn. belegter Speicher",
+    "fileViews": "Dateiaufrufe",
+    "avgFileViews": "Durchschn. Dateiaufrufe",
+    "linksCreated": "Erstellte Kurzlinks",
+    "linkViews": "Kurzlink-Aufrufe gesamt"
+  },
+  "fileTypes": {
+    "title": "Dateitypen",
+    "columns": {
+      "type": "Dateityp",
+      "count": "Anzahl"
+    }
+  },
+  "activity": {
+    "title": "Aktivität",
+    "description": "Ihre Uploads und Anmeldungen:",
+    "range_one": "Heute",
+    "range_other": "Letzte {{count}} Tage",
+    "uploads": "Uploads",
+    "logins": "Anmeldungen",
+    "empty": "In diesem Zeitraum gibt es noch keine Uploads oder Anmeldungen",
+    "today": "Heute",
+    "yesterday": "Gestern"
+  }
+}

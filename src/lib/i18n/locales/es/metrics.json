@@ -1,0 +1,61 @@
+{
+  "title": "Métricas",
+  "range": {
+    "change": "Cambiar intervalo de fechas",
+    "modalTitle": "Cambiar intervalo",
+    "fromTo": "Del {{from}} al {{to}}",
+    "presets": {
+      "lastTwoDays": "Últimos dos días",
+      "last7Days": "Últimos 7 días",
+      "thisMonth": "Este mes",
+      "lastMonth": "Mes pasado",
+      "thisYear": "Este año",
+      "lastYear": "Año pasado"
+    }
+  },
+  "allTime": {
+    "label": "Todo el historial",
+    "show": "Mostrar todo el historial",
+    "slowWarning": "Esto puede tardar más de lo habitual en cargarse.",
+    "viewing": "Está viendo las estadísticas de todo el historial."
+  },
+  "loadFailed": "No se pudieron cargar las estadísticas de este intervalo de tiempo. Es posible que no haya datos disponibles en el intervalo especificado. :(",
+  "cards": {
+    "files": "Archivos",
+    "urls": "Enlaces cortos",
+    "storageUsed": "Almacenamiento usado",
+    "users": "Usuarios",
+    "fileViews": "Vistas de archivos",
+    "urlViews": "Vistas de enlaces cortos"
+  },
+  "tables": {
+    "columns": {
+      "user": "Usuario",
+      "files": "Archivos",
+      "storageUsed": "Almacenamiento usado",
+      "views": "Vistas",
+      "urls": "Enlaces cortos",
+      "type": "Tipo"
+    },
+    "unknownUser": "[desconocido]"
+  },
+  "graphs": {
+    "count": {
+      "title": "Cantidad"
+    },
+    "views": {
+      "title": "Vistas",
+      "value_one": "{{count}} vista",
+      "value_many": "{{count}} vistas",
+      "value_other": "{{count}} vistas"
+    },
+    "storage": {
+      "title": "Almacenamiento usado"
+    },
+    "series": {
+      "files": "Archivos",
+      "urls": "Enlaces cortos",
+      "storageUsed": "Almacenamiento usado"
+    }
+  }
+}

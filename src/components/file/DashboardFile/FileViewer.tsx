@@ -58,6 +58,7 @@ import {
   IconX,
 } from '@tabler/icons-react';
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import useSWR, { mutate } from 'swr';
 import { useShallow } from 'zustand/shallow';
 
@@ -119,6 +120,7 @@ export default function FileViewer({
   user?: string;
   sequenced?: boolean;
 }) {
+  const { t } = useTranslation(['file', 'common']);
   const clipboard = useClipboard();
   const warnDeletion = useSettingsStore((state) => state.settings.warnDeletion);
   const fileNavButtons = useSettingsStore((state) => state.settings.fileNavButtons);
@@ -172,15 +174,15 @@ export default function FileViewer({
 
     if (error) {
       showNotification({
-        title: 'Failed to save tags',
+        title: t('notifications.saveTagsError.title'),
         message: error.error,
         color: 'red',
         icon: <IconTagsOff size='1rem' />,
       });
     } else {
       showNotification({
-        title: 'Saved tags',
-        message: `Saved ${data!.tags!.length} tags for file ${data!.name}`,
+        title: t('notifications.tagsSaved.title'),
+        message: t('notifications.tagsSaved.message', { count: data!.tags!.length, name: data!.name }),
         color: 'green',
         icon: <IconTags size='1rem' />,
       });
@@ -241,19 +243,19 @@ export default function FileViewer({
           <ActionButton
             Icon={IconPencil}
             onClick={() => setEditFileOpen(true)}
-            tooltip='Edit file details'
+            tooltip={t('actions.editDetails')}
             color='orange'
           />
           <ActionButton
             Icon={IconTrashFilled}
             onClick={() => deleteFile(warnDeletion, file, setOpen)}
-            tooltip='Delete file'
+            tooltip={t('actions.delete')}
             color='red'
           />
           <ActionButton
             Icon={file.favorite ? IconStarFilled : IconStar}
             onClick={() => favoriteFile(file)}
-            tooltip={file.favorite ? 'Unfavorite file' : 'Favorite file'}
+            tooltip={file.favorite ? t('actions.unfavorite') : t('actions.favorite')}
             color={file.favorite ? 'gray' : 'yellow'}
           />
         </>
@@ -262,22 +264,30 @@ export default function FileViewer({
       <ActionButton
         Icon={IconInfoCircle}
         onClick={() => setInfoOpen((v) => !v)}
-        tooltip={infoOpen ? 'Hide details' : 'Show details'}
+        tooltip={infoOpen ? t('actions.hideDetails') : t('actions.showDetails')}
         color={infoOpen ? 'cyan' : 'gray'}
       />
       <ActionButton
         Icon={IconExternalLink}
         onClick={() => viewFile(file)}
-        tooltip='Open in new tab'
+        tooltip={t('actions.openInNewTab')}
         color='blue'
       />
       <ActionButton
         Icon={IconClipboardTypography}
         onClick={() => copyFile(file, clipboard, true)}
-        tooltip='Copy raw file link'
+        tooltip={t('actions.copyRawLink')}
       />
-      <ActionButton Icon={IconCopy} onClick={() => copyFile(file, clipboard)} tooltip='Copy file link' />
-      <ActionButton Icon={IconDownload} onClick={() => downloadFile(file)} tooltip='Download' />
+      <ActionButton
+        Icon={IconCopy}
+        onClick={() => copyFile(file, clipboard)}
+        tooltip={t('actions.copyLink')}
+      />
+      <ActionButton
+        Icon={IconDownload}
+        onClick={() => downloadFile(file)}
+        tooltip={t('common:actions.download')}
+      />
     </ActionIcon.Group>
   ) : null;
 
@@ -291,46 +301,56 @@ export default function FileViewer({
         opened={infoOpen}
         onClose={() => setInfoOpen(false)}
         position='right'
-        title={<Title order={2}>Details</Title>}
+        title={<Title order={2}>{t('details.title')}</Title>}
         radius='md'
         offset={20}
         overlayProps={{ blur: 6 }}
       >
         {file && (
           <Stack gap='md'>
-            <FileStat Icon={IconFileInfo} title='Type' value={file.type} />
-            <FileStat Icon={IconDeviceSdCard} title='Size' value={bytes(file.size)} />
+            <FileStat Icon={IconFileInfo} title={t('stats.type')} value={file.type} />
+            <FileStat Icon={IconDeviceSdCard} title={t('stats.size')} value={bytes(file.size)} />
             <FileStat
               Icon={IconUpload}
-              title='Created at'
+              title={t('stats.createdAt')}
               value={new Date(file.createdAt).toLocaleString()}
             />
             <FileStat
               Icon={IconRefresh}
-              title='Updated at'
+              title={t('stats.updatedAt')}
               value={new Date(file.updatedAt).toLocaleString()}
             />
             {file.deletesAt && !reduce && (
               <FileStat
                 Icon={IconBombFilled}
-                title='Deletes at'
+                title={t('stats.deletesAt')}
                 value={new Date(file.deletesAt).toLocaleString()}
               />
             )}
             <FileStat
               Icon={IconEyeFilled}
-              title='Views'
+              title={t('stats.views')}
               value={file.maxViews ? `${file.views} / ${file.maxViews}` : file.views}
             />
             {file.originalName && (
-              <FileStat Icon={IconTextRecognition} title='Original Name' value={file.originalName} />
+              <FileStat
+                Icon={IconTextRecognition}
+                title={t('stats.originalName')}
+                value={file.originalName}
+              />
             )}
-            {file.anonymous && <FileStat Icon={IconUserQuestion} title='Anonymous' value='Yes' />}
+            {file.anonymous && (
+              <FileStat
+                Icon={IconUserQuestion}
+                title={t('stats.anonymous')}
+                value={t('common:actions.yes')}
+              />
+            )}
             {!reduce && (
               <>
                 <Box>
                   <Title order={4} mb='xs'>
-                    Tags
+                    {t('details.tags.title')}
                   </Title>
                   <Combobox zIndex={90000} store={tagsCombobox} onOptionSubmit={handleValueSelect}>
                     <Combobox.DropdownTarget>
@@ -343,7 +363,7 @@ export default function FileViewer({
                           {values.length > 0 ? (
                             values
                           ) : (
-                            <Input.Placeholder>Pick one or more tags</Input.Placeholder>
+                            <Input.Placeholder>{t('details.tags.placeholder')}</Input.Placeholder>
                           )}
 
                           <Combobox.EventsTarget>
@@ -385,7 +405,7 @@ export default function FileViewer({
                             </Combobox.Option>
                           ))
                         ) : (
-                          <Combobox.Empty>No tags found, create one outside of this menu.</Combobox.Empty>
+                          <Combobox.Empty>{t('details.tags.empty')}</Combobox.Empty>
                         )}
                       </Combobox.Options>
                     </Combobox.Dropdown>
@@ -393,7 +413,7 @@ export default function FileViewer({
                 </Box>
                 <Box>
                   <Title order={4} mb='xs'>
-                    Folder
+                    {t('details.folder.title')}
                   </Title>
                   {file.folderId ? (
                     <Button
@@ -402,9 +422,9 @@ export default function FileViewer({
                       onClick={() => removeFromFolder(file)}
                       fullWidth
                     >
-                      Remove from folder &quot;
-                      {folders?.find((f: { id: string }) => f.id === file.folderId)?.name ?? ''}
-                      &quot;
+                      {t('details.folder.remove', {
+                        name: folders?.find((f: { id: string }) => f.id === file.folderId)?.name ?? '',
+                      })}
                     </Button>
                   ) : (
                     <Combobox zIndex={90000} store={folderCombobox} onOptionSubmit={(v) => handleAdd(v)}>
@@ -429,16 +449,14 @@ export default function FileViewer({
                             folderCombobox.closeDropdown();
                             setSearch('');
                           }}
-                          placeholder='Add to folder...'
+                          placeholder={t('details.folder.placeholder')}
                           rightSectionPointerEvents='none'
                         />
                       </Combobox.Target>
 
                       <Combobox.Dropdown>
                         {folders?.length === 0 && (
-                          <Combobox.Empty>
-                            You have no folders. Start typing to create a new folder for this file.
-                          </Combobox.Empty>
+                          <Combobox.Empty>{t('details.folder.empty')}</Combobox.Empty>
                         )}
 
                         <FolderComboboxOptions
@@ -448,7 +466,7 @@ export default function FileViewer({
                             !folders?.some((f: { name: string }) => f.name === search) &&
                             search.trim().length > 0 ? (
                               <Combobox.Option value='$create'>
-                                + Create folder &quot;{search}&quot;
+                                {t('details.folder.create', { name: search })}
                               </Combobox.Option>
                             ) : null
                           }
@@ -494,7 +512,11 @@ export default function FileViewer({
               </Box>
               <Group gap='sm' wrap='nowrap' style={{ flexShrink: 0 }}>
                 {headerActionGroup}
-                <ActionButton Icon={IconX} tooltip='Close' onClick={() => setOpen(false)} />
+                <ActionButton
+                  Icon={IconX}
+                  tooltip={t('common:actions.close')}
+                  onClick={() => setOpen(false)}
+                />
               </Group>
             </Group>
 
@@ -512,7 +534,7 @@ export default function FileViewer({
                 </Box>
                 <ActionButton
                   Icon={IconX}
-                  tooltip='Close'
+                  tooltip={t('common:actions.close')}
                   onClick={() => setOpen(false)}
                   style={{ flexShrink: 0 }}
                 />
@@ -580,7 +602,7 @@ export default function FileViewer({
                 <>
                   <ActionButton
                     Icon={IconChevronLeft}
-                    tooltip='Previous file'
+                    tooltip={t('actions.previous')}
                     onClick={() => goPrev()}
                     disabled={!hasPrev}
                     hiddenFrom='sm'
@@ -595,7 +617,7 @@ export default function FileViewer({
 
                   <ActionButton
                     Icon={IconChevronRight}
-                    tooltip='Next file'
+                    tooltip={t('actions.next')}
                     onClick={() => goNext()}
                     disabled={!hasNext}
                     hiddenFrom='sm'
@@ -610,7 +632,7 @@ export default function FileViewer({
 
                   <ActionButton
                     Icon={IconChevronLeft}
-                    tooltip='Previous file'
+                    tooltip={t('actions.previous')}
                     onClick={() => goPrev()}
                     disabled={!hasPrev}
                     visibleFrom='sm'
@@ -625,7 +647,7 @@ export default function FileViewer({
 
                   <ActionButton
                     Icon={IconChevronRight}
-                    tooltip='Next file'
+                    tooltip={t('actions.next')}
                     onClick={() => goNext()}
                     disabled={!hasNext}
                     visibleFrom='sm'

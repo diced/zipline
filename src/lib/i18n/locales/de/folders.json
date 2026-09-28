@@ -1,0 +1,138 @@
+{
+  "page": {
+    "title": "Ordner",
+    "titleWithFolder": "Ordner {{separator}} {{name}}",
+    "createFolder": "Ordner erstellen",
+    "createSubfolder": "Unterordner erstellen",
+    "folderFiles": "Dateien in {{name}}",
+    "folderFilesWithCount": "Dateien in {{name}} ({{files}})"
+  },
+  "create": {
+    "title": "Ordner erstellen",
+    "titleSubfolder": "Unterordner erstellen",
+    "name": {
+      "label": "Name",
+      "placeholder": "Namen eingeben …",
+      "required": "Name ist erforderlich"
+    },
+    "public": {
+      "label": "Öffentlich",
+      "description": "Öffentliche Ordner sind für alle sichtbar"
+    }
+  },
+  "uploadsAlert": {
+    "message": "Dieser Ordner erlaubt anonyme Uploads. Teilen Sie den folgenden Link, damit andere Dateien in diesen Ordner hochladen können.",
+    "copy": "URL kopieren",
+    "copied": "URL kopiert"
+  },
+  "menu": {
+    "moreActions": "Weitere Aktionen",
+    "open": "Ordner öffnen",
+    "move": "Ordner verschieben",
+    "export": "Als ZIP exportieren",
+    "makePrivate": "Privat machen",
+    "makePublic": "Öffentlich machen",
+    "disallowUploads": "Anonyme Uploads verbieten",
+    "allowUploads": "Anonyme Uploads erlauben",
+    "editName": "Umbenennen",
+    "copyUrl": "URL kopieren"
+  },
+  "card": {
+    "created": "Erstellt:",
+    "updated": "Aktualisiert:",
+    "public": "Öffentlich:",
+    "files": "Dateien:",
+    "subfolders": "Unterordner:"
+  },
+  "grid": {
+    "empty": "Keine Ordner gefunden",
+    "emptyFolder": "Dieser Ordner ist leer",
+    "createHint": "Erstellen Sie einen Ordner, damit er hier angezeigt wird"
+  },
+  "table": {
+    "columns": {
+      "name": "Name",
+      "public": "Öffentlich",
+      "uploads": "Uploads?",
+      "created": "Erstellt",
+      "updated": "Zuletzt aktualisiert",
+      "actions": "Aktionen"
+    },
+    "subfolders_one": "{{count}} Unterordner",
+    "subfolders_other": "{{count}} Unterordner",
+    "noRecords": "Keine Unterordner",
+    "copyLink": "Ordnerlink kopieren",
+    "delete": "Ordner löschen"
+  },
+  "notifications": {
+    "visibilityFailed": "Sichtbarkeit des Ordners konnte nicht geändert werden",
+    "visibilityEdited": "Sichtbarkeit des Ordners geändert",
+    "nowPublic": "{{name}} ist jetzt öffentlich",
+    "nowPrivate": "{{name}} ist jetzt privat",
+    "uploadsFailed": "Upload-Richtlinie des Ordners konnte nicht geändert werden",
+    "uploadsEdited": "Upload-Richtlinie des Ordners geändert",
+    "uploadsAllowed": "{{name}} erlaubt jetzt anonyme Uploads",
+    "uploadsDisallowed": "{{name}} erlaubt keine anonymen Uploads mehr"
+  },
+  "delete": {
+    "title": "„{{name}}“ löschen?",
+    "cannotUndo": "Diese Aktion kann nicht rückgängig gemacht werden.",
+    "containsFilesAndSubfolders": "Dieser Ordner enthält {{files}} Datei(en) und {{subfolders}} Unterordner. Was möchten Sie damit tun?",
+    "containsFiles": "Dieser Ordner enthält {{files}} Datei(en). Was möchten Sie damit tun?",
+    "containsSubfolders": "Dieser Ordner enthält {{subfolders}} Unterordner. Was möchten Sie damit tun?",
+    "options": {
+      "root": "Inhalt in den Stammordner verschieben",
+      "folder": "Inhalt in einen anderen Ordner verschieben",
+      "cascade": "Unterordner löschen (Dateien werden in den Stammordner verschoben)",
+      "cascadeFiles": "Unterordner samt Dateien löschen (kaskadierend)"
+    },
+    "target": {
+      "label": "Zielordner",
+      "placeholder": "Ordner auswählen"
+    },
+    "warningCascade": "Warnung: Dadurch werden alle Unterordner dieses Ordners endgültig gelöscht. Die Dateien werden von ihren Ordnern gelöst und in den Stammordner verschoben.",
+    "warningCascadeFiles": "Warnung: Dadurch werden alle Unterordner dieses Ordners samt allen darin enthaltenen Dateien endgültig gelöscht. Die Dateien werden aus dem Speicher entfernt und können nicht wiederhergestellt werden.",
+    "confirmCascade": "„{{name}}“ und alle Unterordner löschen?",
+    "confirmCascadeFiles": "„{{name}}“ mit allen Unterordnern und Dateien löschen?",
+    "modalCascade": "Alle Unterordner werden endgültig gelöscht (die Dateien werden in den Stammordner verschoben). Diese Aktion kann nicht rückgängig gemacht werden.",
+    "modalCascadeFiles": "Alle Unterordner und sämtliche darin enthaltenen Dateien werden endgültig aus dem Speicher gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.",
+    "submit": "Ordner löschen",
+    "notifications": {
+      "failed": "Ordner konnte nicht gelöscht werden",
+      "deleted": "Ordner gelöscht",
+      "deletedMessage": "{{name}} wurde gelöscht",
+      "noTarget": "Kein Ordner ausgewählt",
+      "noTargetMessage": "Bitte wählen Sie einen Ordner aus, in den der Inhalt verschoben werden soll"
+    }
+  },
+  "edit": {
+    "title": "Ordner umbenennen",
+    "label": "Neuer Ordnername",
+    "placeholder": "Neuen Ordnernamen eingeben …",
+    "required": "Name ist erforderlich",
+    "notifications": {
+      "failed": "Fehler beim Aktualisieren des Ordnernamens",
+      "updated": "Ordnername aktualisiert",
+      "updatedMessage": "Der Ordner wurde erfolgreich in {{name}} umbenannt"
+    }
+  },
+  "move": {
+    "title": "„{{name}}“ verschieben",
+    "description": "Wählen Sie einen Zielordner für diesen Ordner aus.",
+    "root": "/ (Stammordner)",
+    "destination": {
+      "label": "Ziel",
+      "placeholder": "Ordner auswählen"
+    },
+    "submit": "Ordner verschieben",
+    "notifications": {
+      "failed": "Ordner konnte nicht verschoben werden",
+      "moved": "Ordner verschoben",
+      "movedMessage": "{{name}} wurde verschoben"
+    }
+  },
+  "viewFiles": {
+    "title": "Dateien in {{name}}",
+    "found": "Gefundene Dateien: {{amount}}"
+  }
+}

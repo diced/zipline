@@ -1,0 +1,46 @@
+{
+  "welcome": "Content de vous revoir, <b>{{username}}</b>",
+  "filesUploaded": "Fichiers téléversés : <b>{{files}}</b>",
+  "quota": {
+    "bytes": "Stockage utilisé : <b>{{used}}</b> sur <b>{{max}}</b>",
+    "files": "Fichiers téléversés : <b>{{files}}</b> sur <b>{{max}}</b> autorisés",
+    "urls": "Liens courts créés : <b>{{urls}}</b> sur <b>{{max}}</b> autorisés"
+  },
+  "recents": {
+    "title": "Fichiers récents",
+    "viewAll": "Voir tous les fichiers",
+    "empty": "Vous n'avez aucun fichier récent. Les trois derniers fichiers que vous avez téléversés apparaîtront ici."
+  },
+  "stats": {
+    "title": "Statistiques",
+    "viewMetrics": "Voir les statistiques de l'instance",
+    "description": "Ces statistiques portent uniquement sur vos téléversements.",
+    "filesUploaded": "Fichiers téléversés",
+    "favoriteFiles": "Fichiers favoris",
+    "storageUsed": "Stockage utilisé",
+    "avgStorageUsed": "Stockage moyen par fichier",
+    "fileViews": "Vues des fichiers",
+    "avgFileViews": "Vues moyennes par fichier",
+    "linksCreated": "Liens courts créés",
+    "linkViews": "Vues totales des liens courts"
+  },
+  "fileTypes": {
+    "title": "Types de fichiers",
+    "columns": {
+      "type": "Type de fichier",
+      "count": "Nombre"
+    }
+  },
+  "activity": {
+    "title": "Activité",
+    "description": "Vos téléversements et connexions sur",
+    "range_one": "{{count}} jour",
+    "range_many": "{{count}} jours",
+    "range_other": "{{count}} jours",
+    "uploads": "Téléversements",
+    "logins": "Connexions",
+    "empty": "Aucun téléversement ni aucune connexion sur cette période pour l'instant",
+    "today": "Aujourd'hui",
+    "yesterday": "Hier"
+  }
+}

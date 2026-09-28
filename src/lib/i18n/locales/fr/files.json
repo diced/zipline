@@ -1,0 +1,201 @@
+{
+  "page": {
+    "title": "Fichiers",
+    "uploadTooltip": "Téléverser un fichier",
+    "moreActions": "Plus d'actions",
+    "menu": {
+      "manageTags": "Gérer les étiquettes",
+      "viewPending": "Voir les fichiers en attente",
+      "tableOptions": "Options du tableau",
+      "searchById": "Rechercher par ID"
+    }
+  },
+  "fields": {
+    "name": "Nom",
+    "originalName": "Nom d'origine",
+    "tags": "Étiquettes",
+    "type": "Type",
+    "size": "Taille",
+    "createdAt": "Date de création",
+    "favorite": "Favori",
+    "views": "Vues",
+    "anonymous": "Anonyme ?"
+  },
+  "tableOptions": {
+    "title": "Options du tableau",
+    "description": "Sélectionnez et faites glisser les champs ci-dessous pour les afficher, les masquer ou les réorganiser dans la vue en tableau des fichiers.",
+    "reset": "Rétablir les valeurs par défaut"
+  },
+  "pending": {
+    "title": "Fichiers en attente",
+    "count_one": "{{count}} fichier",
+    "count_many": "{{count}} fichiers",
+    "count_other": "{{count}} fichiers",
+    "clearCompleted": "Effacer les terminés",
+    "chunks": "Fragments : {{complete}}/{{total}}",
+    "clearEntry": "Effacer l'entrée",
+    "clearEntryLabel": "Effacer {{name}}",
+    "empty": "Aucun fichier en attente",
+    "status": {
+      "pending": "En attente",
+      "processing": "En traitement",
+      "complete": "Terminé",
+      "failed": "Échec"
+    },
+    "notifications": {
+      "clearedOne": "Fichier en attente effacé !",
+      "clearedCompleted": "Fichiers terminés effacés !",
+      "clearOneFailed": "Impossible d'effacer le fichier en attente : {{error}}",
+      "clearCompletedFailed": "Impossible d'effacer les fichiers terminés : {{error}}",
+      "unknownError": "Erreur inconnue"
+    }
+  },
+  "bulk": {
+    "delete": {
+      "title_one": "Supprimer {{count}} fichier ?",
+      "title_many": "Supprimer {{count}} fichiers ?",
+      "title_other": "Supprimer {{count}} fichiers ?",
+      "message_one": "Vous êtes sur le point de supprimer {{count}} fichier. Cette action est irréversible.",
+      "message_many": "Vous êtes sur le point de supprimer {{count}} fichiers. Cette action est irréversible.",
+      "message_other": "Vous êtes sur le point de supprimer {{count}} fichiers. Cette action est irréversible.",
+      "loadingTitle": "Suppression des fichiers",
+      "loadingMessage_one": "Suppression de {{count}} fichier",
+      "loadingMessage_many": "Suppression de {{count}} fichiers",
+      "loadingMessage_other": "Suppression de {{count}} fichiers",
+      "errorTitle": "Erreur lors de la suppression des fichiers",
+      "successTitle": "Fichiers supprimés",
+      "successMessage_one": "{{count}} fichier supprimé",
+      "successMessage_many": "{{count}} fichiers supprimés",
+      "successMessage_other": "{{count}} fichiers supprimés"
+    },
+    "favorite": {
+      "title_one": "Ajouter {{count}} fichier aux favoris ?",
+      "title_many": "Ajouter {{count}} fichiers aux favoris ?",
+      "title_other": "Ajouter {{count}} fichiers aux favoris ?",
+      "message_one": "Vous êtes sur le point d'ajouter {{count}} fichier aux favoris.",
+      "message_many": "Vous êtes sur le point d'ajouter {{count}} fichiers aux favoris.",
+      "message_other": "Vous êtes sur le point d'ajouter {{count}} fichiers aux favoris.",
+      "confirm": "Ajouter aux favoris",
+      "loadingTitle": "Ajout des fichiers aux favoris",
+      "loadingMessage_one": "Ajout de {{count}} fichier aux favoris",
+      "loadingMessage_many": "Ajout de {{count}} fichiers aux favoris",
+      "loadingMessage_other": "Ajout de {{count}} fichiers aux favoris",
+      "successTitle": "Fichiers ajoutés aux favoris",
+      "successMessage_one": "{{count}} fichier ajouté aux favoris",
+      "successMessage_many": "{{count}} fichiers ajoutés aux favoris",
+      "successMessage_other": "{{count}} fichiers ajoutés aux favoris"
+    },
+    "unfavorite": {
+      "title_one": "Retirer {{count}} fichier des favoris ?",
+      "title_many": "Retirer {{count}} fichiers des favoris ?",
+      "title_other": "Retirer {{count}} fichiers des favoris ?",
+      "message_one": "Vous êtes sur le point de retirer {{count}} fichier des favoris.",
+      "message_many": "Vous êtes sur le point de retirer {{count}} fichiers des favoris.",
+      "message_other": "Vous êtes sur le point de retirer {{count}} fichiers des favoris.",
+      "confirm": "Retirer des favoris",
+      "loadingTitle": "Retrait des fichiers des favoris",
+      "loadingMessage_one": "Retrait de {{count}} fichier des favoris",
+      "loadingMessage_many": "Retrait de {{count}} fichiers des favoris",
+      "loadingMessage_other": "Retrait de {{count}} fichiers des favoris",
+      "successTitle": "Fichiers retirés des favoris",
+      "successMessage_one": "{{count}} fichier retiré des favoris",
+      "successMessage_many": "{{count}} fichiers retirés des favoris",
+      "successMessage_other": "{{count}} fichiers retirés des favoris"
+    },
+    "modifyErrorTitle": "Erreur lors de la modification des fichiers",
+    "copyLinks": {
+      "title": "Liens copiés dans le presse-papiers",
+      "message_one": "{{count}} lien copié dans le presse-papiers",
+      "message_many": "{{count}} liens copiés dans le presse-papiers",
+      "message_other": "{{count}} liens copiés dans le presse-papiers"
+    }
+  },
+  "tags": {
+    "title": "Étiquettes",
+    "fileCount_one": "{{count}} fichier",
+    "fileCount_many": "{{count}} fichiers",
+    "fileCount_other": "{{count}} fichiers",
+    "edit": "Modifier l'étiquette",
+    "delete": "Supprimer l'étiquette",
+    "empty": "Aucune étiquette. Créez-en une en cliquant sur l'icône plus.",
+    "form": {
+      "name": {
+        "label": "Nom",
+        "placeholder": "Saisissez un nom…",
+        "required": "Le nom est requis"
+      },
+      "color": {
+        "label": "Couleur",
+        "fromName": "Choisir une couleur d'après le nom",
+        "invalid": "La couleur doit commencer par #"
+      }
+    },
+    "create": {
+      "title": "Créer une étiquette",
+      "submit": "Créer l'étiquette"
+    },
+    "editModal": {
+      "title": "Modifier l'étiquette",
+      "submit": "Modifier l'étiquette"
+    },
+    "notifications": {
+      "createFailed": "Impossible de créer l'étiquette",
+      "created": "Étiquette créée",
+      "createdMessage": "Étiquette {{name}} créée",
+      "editFailed": "Impossible de modifier l'étiquette",
+      "edited": "Étiquette modifiée",
+      "editedMessage": "Étiquette {{name}} modifiée",
+      "deleteFailed": "Impossible de supprimer l'étiquette : {{error}}",
+      "deleted": "Étiquette supprimée",
+      "deletedMessage": "Étiquette {{name}} supprimée"
+    }
+  },
+  "views": {
+    "favoriteFiles": "Fichiers favoris",
+    "noFiles": "Aucun fichier trouvé",
+    "uploadFile": "Téléverser un fichier",
+    "pagination": "Fichiers {{from}} - {{to}} sur {{total}}"
+  },
+  "table": {
+    "columns": {
+      "name": "Nom",
+      "originalName": "Nom d'origine",
+      "tags": "Étiquettes",
+      "type": "Type",
+      "size": "Taille",
+      "createdAt": "Date de création",
+      "favorite": "Favori ?",
+      "views": "Vues",
+      "id": "ID",
+      "anonymous": "Anonyme ?",
+      "actions": "Actions"
+    },
+    "search": {
+      "name": "Rechercher par nom",
+      "originalName": "Rechercher par nom d'origine",
+      "type": "Rechercher par type"
+    },
+    "searchById": "Rechercher par ID",
+    "tagsPlaceholder": "Choisissez une ou plusieurs étiquettes",
+    "selection": {
+      "summary_one": "La sélection est conservée d'une page à l'autre. <b>{{count}}</b> fichier sélectionné.",
+      "summary_many": "La sélection est conservée d'une page à l'autre. <b>{{count}}</b> fichiers sélectionnés.",
+      "summary_other": "La sélection est conservée d'une page à l'autre. <b>{{count}}</b> fichiers sélectionnés.",
+      "delete": "Supprimer les fichiers",
+      "favorite": "Ajouter les fichiers aux favoris",
+      "unfavorite": "Retirer les fichiers des favoris",
+      "copyLinks": "Copier les liens des fichiers",
+      "addToFolder": "Ajouter à un dossier…",
+      "clear": "Effacer la sélection"
+    },
+    "noRecords": "Aucun fichier",
+    "recordsPerPage": "Éléments par page",
+    "actions": {
+      "details": "Plus de détails",
+      "view": "Afficher le fichier dans un nouvel onglet",
+      "copy": "Copier le lien du fichier dans le presse-papiers",
+      "download": "Télécharger le fichier",
+      "delete": "Supprimer le fichier"
+    }
+  }
+}

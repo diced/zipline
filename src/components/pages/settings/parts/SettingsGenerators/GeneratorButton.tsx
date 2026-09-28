@@ -20,6 +20,7 @@ import { sharex } from './generators/sharex';
 import { shell } from './generators/shell';
 import { ishare } from './generators/ishare';
 import { itake } from './generators/itake';
+import { Trans, useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
 export type GeneratorOptions = {
@@ -92,13 +93,18 @@ const generators = {
 
 export default function GeneratorButton({
   name,
+  label,
   icon,
   desc,
 }: {
   name: string;
+  // display name, defaults to `name` which is also used as the generator identifier
+  label?: string;
   icon: React.ReactNode;
   desc?: React.ReactNode;
 }) {
+  const { t } = useTranslation(['settings', 'common']);
+  const displayName = label ?? name;
   const [opened, setOpen] = useState(false);
 
   const [generatorType, setGeneratorType] = useState('file');
@@ -115,7 +121,7 @@ export default function GeneratorButton({
 
   const domains = Array.isArray(settingsData?.domains) ? settingsData?.domains.map((d) => String(d)) : [];
   const domainOptions = [
-    { value: '', label: 'Default Domain' },
+    { value: '', label: t('generators.modal.overrideDomain.default') },
     ...domains.map((domain) => ({
       value: domain,
       label: domain,
@@ -124,7 +130,11 @@ export default function GeneratorButton({
 
   return (
     <>
-      <Modal opened={opened} onClose={() => setOpen(false)} title={`Generate ${name} Uploader`}>
+      <Modal
+        opened={opened}
+        onClose={() => setOpen(false)}
+        title={t('generators.modal.title', { name: displayName })}
+      >
         {desc && (
           <Text size='sm' c='dimmed'>
             {desc}
@@ -134,11 +144,15 @@ export default function GeneratorButton({
         <Stack gap='xs' my='sm'>
           <Select
             data={[
-              { label: 'Upload File', value: 'file' },
-              { label: 'Shorten URL', value: 'url', disabled: name === 'ishare' || name === 'iTake' },
+              { label: t('generators.modal.destinationType.options.file'), value: 'file' },
+              {
+                label: t('generators.modal.destinationType.options.url'),
+                value: 'url',
+                disabled: name === 'ishare' || name === 'iTake',
+              },
             ]}
-            description='Select which type of destination you want to generate'
-            label='Destination Type'
+            description={t('generators.modal.destinationType.description')}
+            label={t('generators.modal.destinationType.label')}
             value={generatorType}
             onChange={(value) => setGeneratorType(value ?? 'file')}
             defaultValue='file'
@@ -156,15 +170,15 @@ export default function GeneratorButton({
 
           <Select
             data={[
-              { value: 'default', label: 'Default' },
-              { value: 'random', label: 'Random' },
-              { value: 'date', label: 'Date' },
-              { value: 'uuid', label: 'UUID' },
-              { value: 'name', label: 'Use file name' },
-              { value: 'gfycat', label: 'Gfycat-style name' },
+              { value: 'default', label: t('generators.modal.format.options.default') },
+              { value: 'random', label: t('generators.modal.format.options.random') },
+              { value: 'date', label: t('generators.modal.format.options.date') },
+              { value: 'uuid', label: t('generators.modal.format.options.uuid') },
+              { value: 'name', label: t('generators.modal.format.options.name') },
+              { value: 'gfycat', label: t('generators.modal.format.options.gfycat') },
             ]}
-            label='Name format'
-            description='The file name format to use when uploading files, the "File name" field will override this value.'
+            label={t('generators.modal.format.label')}
+            description={t('generators.modal.format.description')}
             leftSection={<IconWriting size='1rem' />}
             value={options.format}
             onChange={(value) => setOption({ format: (value || 'default') as GeneratorOptions['format'] })}
@@ -181,8 +195,8 @@ export default function GeneratorButton({
           />
 
           <NumberInput
-            label='Compression'
-            description='The compression level to use on images (only). Leave blank to disable compression.'
+            label={t('generators.modal.compression.label')}
+            description={t('generators.modal.compression.description')}
             leftSection={<IconPercentage size='1rem' />}
             max={100}
             min={0}
@@ -192,8 +206,8 @@ export default function GeneratorButton({
           />
 
           <NumberInput
-            label='Max Views'
-            description='The maximum number of views files/urls can have before they are deleted. Leave blank to allow as many views as you want.'
+            label={t('generators.modal.maxViews.label')}
+            description={t('generators.modal.maxViews.description')}
             leftSection={<IconEyeFilled size='1rem' />}
             min={0}
             value={options.maxViews || ''}
@@ -202,8 +216,8 @@ export default function GeneratorButton({
 
           <Select
             data={domainOptions}
-            label='Override Domain'
-            description='Override the domain with this value. This will change the domain returned in your uploads. Leave blank to use the default domain.'
+            label={t('generators.modal.overrideDomain.label')}
+            description={t('generators.modal.overrideDomain.description')}
             leftSection={<IconGlobe size='1rem' />}
             value={options.overrides_returnDomain ?? ''}
             onChange={(value) => setOption({ overrides_returnDomain: value || null })}
@@ -218,14 +232,12 @@ export default function GeneratorButton({
           />
 
           <Text c='dimmed' size='sm'>
-            <b>Other Options</b>
+            <b>{t('generators.modal.otherOptions')}</b>
           </Text>
 
           <Switch
-            label='Add Original Name'
-            description={
-              'Add the original file name, so that the file can be downloaded with the original name. This will still use the "Name Format" option for it\'s file name.'
-            }
+            label={t('generators.modal.addOriginalName.label')}
+            description={t('generators.modal.addOriginalName.description')}
             checked={options.addOriginalName ?? false}
             onChange={(event) => setOption({ addOriginalName: event.currentTarget.checked ?? false })}
             disabled={!onlyFile}
@@ -233,8 +245,8 @@ export default function GeneratorButton({
 
           {settingsData?.files?.extensionlessUrls && (
             <Switch
-              label='Extensionless URL'
-              description='Remove the file extension from the returned URL. The file can still be accessed with its extension. This option will only work if the server is configured to allow extensionless URLs.'
+              label={t('generators.modal.extensionless.label')}
+              description={t('generators.modal.extensionless.description')}
               checked={options.extensionless ?? false}
               onChange={(event) => setOption({ extensionless: event.currentTarget.checked ?? false })}
               disabled={!onlyFile}
@@ -243,8 +255,8 @@ export default function GeneratorButton({
 
           {name === 'ShareX' && (
             <Switch
-              label='Xshare Compatibility'
-              description='If you choose to use the Xshare app on Android, enable this option for compatibility. The generated config will not work with ShareX.'
+              label={t('generators.modal.xshareCompatibility.label')}
+              description={t('generators.modal.xshareCompatibility.description')}
               checked={options.sharex_xshareCompatibility ?? false}
               onChange={(event) => setOption({ sharex_xshareCompatibility: event.currentTarget.checked })}
               disabled={!onlyFile}
@@ -254,11 +266,13 @@ export default function GeneratorButton({
           {isUnixLike && (
             <>
               <Switch
-                label='Enable Wayland Compatibility'
+                label={t('generators.modal.waylandCompatibility.label')}
                 description={
-                  <>
-                    Use <Code>wl-copy</Code> instead of <Code>xclip</Code> for copying to clipboard.
-                  </>
+                  <Trans
+                    t={t}
+                    i18nKey='generators.modal.waylandCompatibility.description'
+                    components={{ code: <Code /> }}
+                  />
                 }
                 checked={options.wl_enableCompatibility ?? false}
                 onChange={(event) =>
@@ -272,11 +286,13 @@ export default function GeneratorButton({
               />
 
               <Switch
-                label='Enable macOS Compatibility'
+                label={t('generators.modal.macCompatibility.label')}
                 description={
-                  <>
-                    Use <Code>pbcopy</Code> instead of <Code>xclip</Code> for copying to clipboard.
-                  </>
+                  <Trans
+                    t={t}
+                    i18nKey='generators.modal.macCompatibility.description'
+                    components={{ code: <Code /> }}
+                  />
                 }
                 checked={options.mac_enableCompatibility ?? false}
                 onChange={(event) =>
@@ -291,16 +307,16 @@ export default function GeneratorButton({
               />
 
               <Switch
-                label='Using a DE other than Gnome, KDE or Sway?'
+                label={t('generators.modal.compositorUnsupported.label')}
                 description={
-                  <>
-                    If using a compositor such as{' '}
-                    <Anchor size='xs' component={Link} to='https://github.com/hyprwm/hyprland'>
-                      Hyprland
-                    </Anchor>
-                    , this option will set the <Code>XDG_CURRENT_DESKTOP=sway</Code> to workaround
-                    Flameshot&apos;s errors on Wayland. This is not needed on Xorg.
-                  </>
+                  <Trans
+                    t={t}
+                    i18nKey='generators.modal.compositorUnsupported.description'
+                    components={{
+                      link: <Anchor size='xs' component={Link} to='https://github.com/hyprwm/hyprland' />,
+                      code: <Code />,
+                    }}
+                  />
                 }
                 checked={options.wl_compositorUnsupported ?? false}
                 onChange={(event) => setOption({ wl_compositorUnsupported: event.currentTarget.checked })}
@@ -309,11 +325,9 @@ export default function GeneratorButton({
 
               <Switch
                 label={
-                  <>
-                    Use <Code>echo</Code> instead of copying to clipboard
-                  </>
+                  <Trans t={t} i18nKey='generators.modal.useEcho.label' components={{ code: <Code /> }} />
                 }
-                description='Just output the url to the terminal instead of copying it to the clipboard.'
+                description={t('generators.modal.useEcho.description')}
                 checked={options.unix_useEcho ?? false}
                 onChange={(event) =>
                   setOption({
@@ -328,8 +342,11 @@ export default function GeneratorButton({
 
           {isUnixLike && (
             <Text c='dimmed' size='sm'>
-              If you are having trouble getting Flameshot to work on Wayland, consult the{' '}
-              <Anchor href='https://zipline.diced.sh/docs/guides/wayland'>Wayland guide</Anchor>.
+              <Trans
+                t={t}
+                i18nKey='generators.modal.waylandHelp'
+                components={{ link: <Anchor href='https://zipline.diced.sh/docs/guides/wayland' /> }}
+              />
             </Text>
           )}
 
@@ -341,13 +358,13 @@ export default function GeneratorButton({
             leftSection={<IconDownload size='1rem' />}
             size='sm'
           >
-            Download
+            {t('common:actions.download')}
           </Button>
         </Stack>
       </Modal>
 
       <Button size='sm' leftSection={icon} onClick={() => setOpen(true)} disabled={isLoading || error}>
-        {name}
+        {displayName}
       </Button>
     </>
   );

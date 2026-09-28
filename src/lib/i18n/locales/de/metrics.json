@@ -1,0 +1,60 @@
+{
+  "title": "Statistiken",
+  "range": {
+    "change": "Zeitraum ändern",
+    "modalTitle": "Zeitraum ändern",
+    "fromTo": "{{from}} bis {{to}}",
+    "presets": {
+      "lastTwoDays": "Letzte zwei Tage",
+      "last7Days": "Letzte 7 Tage",
+      "thisMonth": "Dieser Monat",
+      "lastMonth": "Letzter Monat",
+      "thisYear": "Dieses Jahr",
+      "lastYear": "Letztes Jahr"
+    }
+  },
+  "allTime": {
+    "label": "Gesamter Zeitraum",
+    "show": "Gesamten Zeitraum anzeigen",
+    "slowWarning": "Das Laden kann länger als üblich dauern.",
+    "viewing": "Sie sehen die Statistiken für den gesamten Zeitraum."
+  },
+  "loadFailed": "Die Statistiken für diesen Zeitraum konnten nicht geladen werden. Möglicherweise liegen für den angegebenen Zeitraum keine Daten vor. :(",
+  "cards": {
+    "files": "Dateien",
+    "urls": "Kurzlinks",
+    "storageUsed": "Belegter Speicher",
+    "users": "Benutzer",
+    "fileViews": "Dateiaufrufe",
+    "urlViews": "Kurzlink-Aufrufe"
+  },
+  "tables": {
+    "columns": {
+      "user": "Benutzer",
+      "files": "Dateien",
+      "storageUsed": "Belegter Speicher",
+      "views": "Aufrufe",
+      "urls": "Kurzlinks",
+      "type": "Typ"
+    },
+    "unknownUser": "[unbekannt]"
+  },
+  "graphs": {
+    "count": {
+      "title": "Anzahl"
+    },
+    "views": {
+      "title": "Aufrufe",
+      "value_one": "{{count}} Aufruf",
+      "value_other": "{{count}} Aufrufe"
+    },
+    "storage": {
+      "title": "Belegter Speicher"
+    },
+    "series": {
+      "files": "Dateien",
+      "urls": "Kurzlinks",
+      "storageUsed": "Belegter Speicher"
+    }
+  }
+}

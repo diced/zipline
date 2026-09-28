@@ -1,0 +1,180 @@
+{
+  "notifications": {
+    "deleted": {
+      "title": "文件已删除",
+      "message": "{{name}} 已删除"
+    },
+    "favorited": {
+      "title": "已收藏文件",
+      "message": "已收藏 {{name}}"
+    },
+    "unfavorited": {
+      "title": "已取消收藏文件",
+      "message": "已取消收藏 {{name}}"
+    },
+    "createFolderError": {
+      "title": "创建文件夹时出错"
+    },
+    "folderCreated": {
+      "title": "文件夹已创建",
+      "message": "已创建文件夹 {{folder}}，并添加了 {{name}}"
+    },
+    "removeFromFolderError": {
+      "title": "从文件夹中移除时出错"
+    },
+    "removedFromFolder": {
+      "title": "已从文件夹中移除文件",
+      "message": "已将 {{name}} 从 {{folder}} 中移除"
+    },
+    "addToFolderError": {
+      "title": "添加到文件夹时出错"
+    },
+    "addedToFolder": {
+      "title": "已将文件添加到文件夹",
+      "message": "已将 {{name}} 添加到 {{folder}}"
+    },
+    "addMultipleToFolderError": {
+      "title": "将文件添加到文件夹时出错"
+    },
+    "addedMultipleToFolder": {
+      "title": "已将文件添加到文件夹",
+      "message": "已将 {{count}} 个文件添加到 {{folder}}"
+    },
+    "saveTagsError": {
+      "title": "无法保存标签"
+    },
+    "tagsSaved": {
+      "title": "标签已保存",
+      "message": "已为文件 {{name}} 保存 {{count}} 个标签"
+    },
+    "removePasswordError": {
+      "title": "无法移除密码"
+    },
+    "passwordRemoved": {
+      "title": "密码已移除！",
+      "message": "已移除此文件的密码。"
+    },
+    "saveChangesError": {
+      "title": "无法保存更改"
+    },
+    "changesSaved": {
+      "title": "更改已保存！",
+      "message": "对此文件的更改已保存。"
+    }
+  },
+  "delete": {
+    "confirm": "删除 {{name}}",
+    "message": "确定要删除 {{name}} 吗？此操作无法撤销。"
+  },
+  "contextMenu": {
+    "openInNewTab": "在新标签页中打开",
+    "copyLink": "复制链接",
+    "copyRawLink": "复制原始链接",
+    "favorite": "收藏",
+    "unfavorite": "取消收藏",
+    "removeFromFolder": "从文件夹中移除",
+    "moveToFolder": "移动到文件夹",
+    "searchFolders": "搜索文件夹...",
+    "createNamedFolder": "+ 创建“{{name}}”",
+    "noFolders": "暂无文件夹",
+    "createNewFolder": "+ 新建文件夹",
+    "editDetails": "编辑详细信息"
+  },
+  "createFolderModal": {
+    "title": "新建文件夹",
+    "name": {
+      "label": "文件夹名称",
+      "placeholder": "我的文件夹"
+    }
+  },
+  "stats": {
+    "type": "类型",
+    "size": "大小",
+    "createdAt": "创建时间",
+    "updatedAt": "更新时间",
+    "deletesAt": "删除时间",
+    "views": "查看次数",
+    "originalName": "原始名称",
+    "anonymous": "匿名"
+  },
+  "details": {
+    "title": "详细信息",
+    "tags": {
+      "title": "标签",
+      "placeholder": "选择一个或多个标签",
+      "empty": "未找到标签，请在此菜单之外创建标签。"
+    },
+    "folder": {
+      "title": "文件夹",
+      "remove": "从文件夹“{{name}}”中移除",
+      "placeholder": "添加到文件夹...",
+      "empty": "你还没有文件夹。开始输入即可为此文件新建文件夹。",
+      "create": "+ 创建文件夹“{{name}}”"
+    }
+  },
+  "actions": {
+    "editDetails": "编辑文件详细信息",
+    "delete": "删除文件",
+    "favorite": "收藏文件",
+    "unfavorite": "取消收藏文件",
+    "viewInNewTab": "在新标签页中查看文件",
+    "openInNewTab": "在新标签页中打开",
+    "copyRawLink": "复制原始文件链接",
+    "copyLink": "复制文件链接",
+    "download": "下载文件",
+    "showDetails": "显示详细信息",
+    "hideDetails": "隐藏详细信息",
+    "previous": "上一个文件",
+    "next": "下一个文件"
+  },
+  "edit": {
+    "title": "正在编辑“{{name}}”",
+    "name": {
+      "label": "名称",
+      "description": "重命名文件。"
+    },
+    "maxViews": {
+      "label": "最大查看次数",
+      "placeholder": "无限制",
+      "description": "文件在被删除前允许的最大查看次数。留空则不限制查看次数。"
+    },
+    "originalName": {
+      "label": "原始名称",
+      "description": "添加原始名称。下载此文件时，将使用此“原始名称”，而不是生成的文件名 (如果启用了生成文件名)。"
+    },
+    "type": {
+      "label": "类型",
+      "description": "更改文件的 MIME 类型。除非你清楚自己在做什么，否则<b>请勿更改此值</b>，这可能会影响 Zipline 渲染特定文件类型的方式。"
+    },
+    "password": {
+      "label": "密码",
+      "description": "为此文件设置密码。留空则禁用密码保护。"
+    },
+    "removePassword": "移除密码",
+    "save": "保存更改"
+  },
+  "preview": {
+    "clickToView": "点击查看文件 {{name}}",
+    "clickToViewProtected": "点击查看受保护的 {{name}}",
+    "clickToPlayVideo": "点击播放视频 {{name}}",
+    "clickToPlayAudio": "点击播放音频 {{name}}",
+    "clickToViewText": "点击查看文本 {{name}}",
+    "clickToDownloadCast": "点击下载 asciinema 录制文件 {{name}}",
+    "clickToViewPdf": "点击查看 PDF {{name}}",
+    "clickToViewInNewTab": "点击在新标签页中查看文件 {{name}}",
+    "videoThumbnailAlt": "视频缩略图",
+    "imageAlt": "图片",
+    "loading": "正在加载文件...",
+    "loadError": "加载文件时出错。",
+    "tooBig": "\n...\n文件过大，无法显示。请点击下载图标查看或下载。"
+  },
+  "render": {
+    "renderedThrough": "此文件通过 {{renderer}} 渲染",
+    "canRenderThrough": "此文件可以通过 {{renderer}} 渲染",
+    "showRendered": "显示渲染后的版本",
+    "hideRendered": "隐藏渲染后的版本",
+    "katexError": "KaTeX 错误",
+    "showLess": "收起",
+    "showMore": "显示更多 (还有 {{count}} 行)"
+  }
+}

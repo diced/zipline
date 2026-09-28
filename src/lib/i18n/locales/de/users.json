@@ -1,0 +1,124 @@
+{
+  "title": "Benutzer",
+  "form": {
+    "username": {
+      "label": "Benutzername",
+      "placeholder": "Benutzernamen eingeben …",
+      "required": "Benutzername ist erforderlich"
+    },
+    "password": {
+      "label": "Passwort",
+      "placeholder": "Passwort eingeben …",
+      "required": "Passwort ist erforderlich"
+    },
+    "avatar": {
+      "label": "Profilbild",
+      "placeholder": "Profilbild auswählen …",
+      "clear": "Profilbild entfernen",
+      "invalidType": "Ungültiger Dateityp",
+      "readFailed": "Profilbild konnte nicht gelesen werden"
+    },
+    "role": {
+      "label": "Rolle"
+    }
+  },
+  "roles": {
+    "user": "Benutzer",
+    "administrator": "Administrator",
+    "admin": "Admin",
+    "superAdmin": "Super-Admin"
+  },
+  "create": {
+    "title": "Neuen Benutzer erstellen"
+  },
+  "edit": {
+    "title": "{{username}} bearbeiten",
+    "description": "Leere Felder werden ausgelassen und nicht aktualisiert.",
+    "submit": "Benutzer aktualisieren",
+    "quota": {
+      "title": "Kontingent",
+      "invalidValue": "Ungültiger Wert",
+      "invalidByteFormat": "Ungültiges Byte-Format",
+      "fileType": {
+        "label": "Art des Dateikontingents",
+        "description": "Legt fest, ob das Dateikontingent nach Gesamtgröße in Bytes oder nach Anzahl der Dateien bemessen wird.",
+        "byBytes": "Nach Bytes",
+        "byFiles": "Nach Dateianzahl",
+        "none": "Kein Dateikontingent"
+      },
+      "maxFiles": {
+        "label": "Max. Dateien",
+        "description": "Die maximale Anzahl an Dateien, die der Benutzer hochladen kann.",
+        "placeholder": "Zahl eingeben …"
+      },
+      "maxBytes": {
+        "label": "Max. Bytes",
+        "description": "Die maximale Anzahl an Bytes, die der Benutzer hochladen kann.",
+        "placeholder": "Lesbare Größenangabe eingeben …"
+      },
+      "maxUrls": {
+        "label": "Max. Kurzlinks",
+        "description": "Die maximale Anzahl an Kurzlinks, die der Benutzer erstellen kann. Für unbegrenzt auf 0 belassen.",
+        "placeholder": "Zahl eingeben …"
+      }
+    }
+  },
+  "delete": {
+    "title": "{{username}} löschen?",
+    "message": "Möchten Sie {{username}} wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+    "data": {
+      "title": "Daten von {{username}} löschen?",
+      "message": "Möchten Sie die Dateien und Kurzlinks von {{username}} löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "cancel": "Nein, alles behalten und nur den Benutzer löschen",
+      "confirm": "Ja, alles löschen"
+    }
+  },
+  "notifications": {
+    "createFailed": "Benutzer konnte nicht erstellt werden",
+    "created": {
+      "title": "Benutzer erstellt",
+      "message": "Benutzer {{username}} wurde erstellt"
+    },
+    "editFailed": "Benutzer konnte nicht bearbeitet werden",
+    "edited": {
+      "title": "Benutzer bearbeitet",
+      "message": "Benutzer {{username}} wurde bearbeitet"
+    },
+    "deleteFailed": "Benutzer konnte nicht gelöscht werden",
+    "deleted": {
+      "title": "Benutzer gelöscht",
+      "message": "Benutzer {{username}} wurde gelöscht"
+    }
+  },
+  "card": {
+    "id": "ID:",
+    "role": "Rolle:",
+    "created": "Erstellt:",
+    "updated": "Aktualisiert:"
+  },
+  "table": {
+    "columns": {
+      "avatar": "Profilbild",
+      "username": "Benutzername",
+      "role": "Rolle",
+      "created": "Erstellt",
+      "updated": "Zuletzt aktualisiert",
+      "actions": "Aktionen"
+    },
+    "viewFiles": "Dateien des Benutzers anzeigen",
+    "edit": "Benutzer bearbeiten",
+    "delete": "Benutzer löschen"
+  },
+  "grid": {
+    "empty": {
+      "title": "Keine Benutzer gefunden",
+      "description": "Erstellen Sie einen Benutzer, damit er hier angezeigt wird"
+    }
+  },
+  "viewFiles": {
+    "title": "Dateien von {{username}}",
+    "back": "Zurück zu den Benutzern",
+    "tableOptions": "Tabellenoptionen",
+    "searchById": "Nach ID suchen"
+  }
+}

@@ -8,6 +8,7 @@ import { Button, Combobox, InputBase, Modal, Stack, Text, useCombobox } from '@m
 import { notifications } from '@mantine/notifications';
 import { IconFolderSymlink } from '@tabler/icons-react';
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { mutateFolder } from '../actions';
 
 export default function MoveFolderModal({
@@ -19,6 +20,7 @@ export default function MoveFolderModal({
   opened: boolean;
   onClose: () => void;
 }) {
+  const { t } = useTranslation('folders');
   const [selectedParentId, setSelectedParentId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
@@ -38,7 +40,7 @@ export default function MoveFolderModal({
 
   const getDisplayValue = () => {
     if (selectedParentId === '__root__' || selectedParentId === null) {
-      return '/ (Root)';
+      return t('move.root');
     }
     const selected = folderOptions.find((f) => f.id === selectedParentId);
     return selected?.path || '';
@@ -63,14 +65,14 @@ export default function MoveFolderModal({
 
     if (error) {
       notifications.show({
-        title: 'Failed to move folder',
+        title: t('move.notifications.failed'),
         message: error.error,
         color: 'red',
       });
     } else {
       notifications.show({
-        title: 'Folder moved',
-        message: `${folder.name} has been moved`,
+        title: t('move.notifications.moved'),
+        message: t('move.notifications.movedMessage', { name: folder.name }),
         color: 'green',
       });
       mutateFolder();
@@ -79,10 +81,16 @@ export default function MoveFolderModal({
   };
 
   return (
-    <Modal key={folder.id} centered opened={opened} onClose={onClose} title={`Move "${folder.name}"`}>
+    <Modal
+      key={folder.id}
+      centered
+      opened={opened}
+      onClose={onClose}
+      title={t('move.title', { name: folder.name })}
+    >
       <Stack gap='sm'>
         <Text size='sm' c='dimmed'>
-          Select a destination folder for this folder.
+          {t('move.description')}
         </Text>
 
         <Combobox
@@ -91,15 +99,15 @@ export default function MoveFolderModal({
           onOptionSubmit={(value) => {
             setSelectedParentId(value);
             setSearch(
-              value === '__root__' ? '/ (Root)' : folderOptions.find((f) => f.id === value)?.path || '',
+              value === '__root__' ? t('move.root') : folderOptions.find((f) => f.id === value)?.path || '',
             );
             combobox.closeDropdown();
           }}
         >
           <Combobox.Target>
             <InputBase
-              label='Destination'
-              placeholder='Select a folder'
+              label={t('move.destination.label')}
+              placeholder={t('move.destination.placeholder')}
               rightSection={<Combobox.Chevron />}
               value={search || getDisplayValue()}
               onChange={(event) => {
@@ -127,7 +135,7 @@ export default function MoveFolderModal({
             <FolderComboboxOptions
               folderOptions={folderOptions}
               searchValue={search}
-              additionalOptions={<Combobox.Option value='__root__'>/ (Root)</Combobox.Option>}
+              additionalOptions={<Combobox.Option value='__root__'>{t('move.root')}</Combobox.Option>}
             />
           </Combobox.Dropdown>
         </Combobox>
@@ -138,7 +146,7 @@ export default function MoveFolderModal({
           leftSection={<IconFolderSymlink size='1rem' />}
           variant='outline'
         >
-          Move Folder
+          {t('move.submit')}
         </Button>
       </Stack>
     </Modal>

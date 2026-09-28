@@ -34,12 +34,14 @@ import {
   IconTextCaption,
 } from '@tabler/icons-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { mutate } from 'swr';
 import UrlGridView from './views/UrlGridView';
 import UrlTableView from './views/UrlTableView';
 
 export default function DashboardURLs() {
+  const { t } = useTranslation(['urls', 'common']);
   const clipboard = useClipboard();
   const view = useViewStore((state) => state.urls);
 
@@ -62,12 +64,12 @@ export default function DashboardURLs() {
       domain: '',
     },
     validate: {
-      url: (value) => (value.length < 1 ? 'URL is required' : null),
+      url: (value) => (value.length < 1 ? t('create.url.required') : null),
     },
   });
 
   const onSubmit = async (values: typeof form.values) => {
-    if (URL.canParse(values.url) === false) return form.setFieldError('url', 'Invalid URL');
+    if (URL.canParse(values.url) === false) return form.setFieldError('url', t('create.url.invalid'));
 
     const { data, error } = await fetchApi<
       Extract<
@@ -93,7 +95,7 @@ export default function DashboardURLs() {
 
     if (error) {
       notifications.show({
-        title: 'Failed to shorten URL',
+        title: t('notifications.shortenFailed.title'),
         message: error.error,
         color: 'red',
         icon: <IconLinkOff size='1rem' />,
@@ -107,7 +109,7 @@ export default function DashboardURLs() {
 
         clipboard.copy(data?.url);
         notifications.show({
-          title: 'Copied URL to clipboard',
+          title: t('notifications.copied.title'),
           message: (
             <Anchor component={Link} to={data?.url ?? ''} target='_blank'>
               {data?.url}
@@ -119,7 +121,7 @@ export default function DashboardURLs() {
       };
 
       modals.open({
-        title: 'Shortened URL',
+        title: t('shortened.title'),
         size: 'auto',
         children: (
           <Group justify='space-between'>
@@ -134,13 +136,13 @@ export default function DashboardURLs() {
             </Group>
             <Group justify='right'>
               {data?.enabled && (
-                <Tooltip label='Open link in a new tab'>
+                <Tooltip label={t('shortened.open')}>
                   <ActionIcon onClick={() => open()} variant='filled'>
                     <IconExternalLink size='1rem' />
                   </ActionIcon>
                 </Tooltip>
               )}
-              <Tooltip label='Copy link to clipboard'>
+              <Tooltip label={t('shortened.copy')}>
                 <ActionIcon onClick={() => copy()} variant='filled'>
                   <IconClipboardCopy size='1rem' />
                 </ActionIcon>
@@ -157,56 +159,56 @@ export default function DashboardURLs() {
 
   return (
     <>
-      <Modal centered opened={open} onClose={() => setOpen(false)} title='Shorten URL'>
+      <Modal centered opened={open} onClose={() => setOpen(false)} title={t('create.title')}>
         <form onSubmit={form.onSubmit(onSubmit)}>
           <Stack gap='sm'>
             <TextInput
-              label='URL'
+              label={t('create.url.label')}
               placeholder='https://example.com'
               leftSection={<IconLink size='1rem' />}
               {...form.getInputProps('url')}
             />
             <TextInput
-              label='Vanity'
-              description='Optional field, leave blank to generate a random code'
+              label={t('create.vanity.label')}
+              description={t('create.vanity.description')}
               placeholder='example'
               leftSection={<IconTextCaption size='1rem' />}
               {...form.getInputProps('vanity')}
             />
 
             <NumberInput
-              label='Max views'
-              description='Optional field, leave blank to disable a view limit.'
+              label={t('create.maxViews.label')}
+              description={t('create.maxViews.description')}
               min={0}
               leftSection={<IconEyeFilled size='1rem' />}
               {...form.getInputProps('maxViews')}
             />
 
-            <DomainSelect label='Override Domain' {...form.getInputProps('domain')} />
+            <DomainSelect label={t('create.domain.label')} {...form.getInputProps('domain')} />
 
             <Switch
-              label='Enabled'
-              description='Allow or prevent this URL from being visited'
+              label={t('create.enabled.label')}
+              description={t('create.enabled.description')}
               {...form.getInputProps('enabled', { type: 'checkbox' })}
             />
 
             <PasswordInput
-              label='Password'
-              description='Protect your link with a password'
+              label={t('create.password.label')}
+              description={t('create.password.description')}
               autoComplete='off'
               leftSection={<IconKey size='1rem' />}
               {...form.getInputProps('password')}
             />
 
             <Button type='submit' variant='outline' leftSection={<IconLink size='1rem' />}>
-              Create
+              {t('common:actions.create')}
             </Button>
           </Stack>
         </form>
       </Modal>
 
       <Group>
-        <Title>URLs</Title>
+        <Title>{t('title')}</Title>
 
         <Button
           variant='outline'
@@ -214,7 +216,7 @@ export default function DashboardURLs() {
           leftSection={<IconLinkPlus size='1rem' />}
           onClick={() => setOpen(true)}
         >
-          Create
+          {t('common:actions.create')}
         </Button>
 
         <GridTableSwitcher type='urls' />

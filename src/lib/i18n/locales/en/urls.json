@@ -1,0 +1,132 @@
+{
+  "title": "URLs",
+  "create": {
+    "title": "Shorten URL",
+    "url": {
+      "label": "URL",
+      "required": "URL is required",
+      "invalid": "Invalid URL"
+    },
+    "vanity": {
+      "label": "Vanity",
+      "description": "Optional field, leave blank to generate a random code"
+    },
+    "maxViews": {
+      "label": "Max views",
+      "description": "Optional field, leave blank to disable a view limit."
+    },
+    "domain": {
+      "label": "Override Domain"
+    },
+    "enabled": {
+      "label": "Enabled",
+      "description": "Allow or prevent this URL from being visited"
+    },
+    "password": {
+      "label": "Password",
+      "description": "Protect your link with a password"
+    }
+  },
+  "shortened": {
+    "title": "Shortened URL",
+    "open": "Open link in a new tab",
+    "copy": "Copy link to clipboard"
+  },
+  "notifications": {
+    "shortenFailed": {
+      "title": "Failed to shorten URL"
+    },
+    "copied": {
+      "title": "Copied URL to clipboard"
+    },
+    "deleteFailed": {
+      "title": "Failed to delete url"
+    },
+    "deleted": {
+      "title": "Url deleted",
+      "message": "Url {{code}} has been deleted"
+    },
+    "removePasswordFailed": {
+      "title": "Failed to remove password..."
+    },
+    "passwordRemoved": {
+      "title": "Password removed!",
+      "message": "The password has been removed from the URL."
+    },
+    "saveFailed": {
+      "title": "Failed to save changes..."
+    },
+    "saved": {
+      "title": "Changes saved!",
+      "message": "The changes have been saved successfully."
+    }
+  },
+  "delete": {
+    "message": "Are you sure you want to delete {{code}}? This action cannot be undone.",
+    "confirm": "Delete '{{code}}'"
+  },
+  "edit": {
+    "title": "Editing \"{{name}}\"",
+    "unknown": "unknown",
+    "maxViews": {
+      "label": "Max Views",
+      "placeholder": "Unlimited",
+      "description": "The maximum number of clicks this URL can have before it is automatically deleted. Leave blank to allow as many views as you want."
+    },
+    "vanity": {
+      "label": "Vanity",
+      "placeholder": "Optional",
+      "description": "A custom alias for your URL. Leave blank to use the randomly generated code."
+    },
+    "destination": {
+      "label": "Destination"
+    },
+    "enabled": {
+      "label": "Enabled",
+      "description": "Prevent or allow this URL from being visited."
+    },
+    "password": {
+      "label": "Password",
+      "description": "Set a password for this URL. Leave blank to disable password protection.",
+      "remove": "Remove password"
+    },
+    "save": "Save changes"
+  },
+  "card": {
+    "copyShortLink": "Copy short link",
+    "copyDestination": "Copy destination",
+    "showQrCode": "Show QR code",
+    "views": "Views:",
+    "enabled": "Enabled:",
+    "created": "Created:",
+    "updated": "Updated:",
+    "destination": "Destination:",
+    "openDestination": "Open \"{{url}}\" in a new tab",
+    "code": "Code:"
+  },
+  "empty": {
+    "title": "No URLs found",
+    "description": "Shorten a URL to see them here"
+  },
+  "table": {
+    "columns": {
+      "code": "Code",
+      "vanity": "Vanity",
+      "destination": "Destination",
+      "views": "Views",
+      "maxViews": "Max views",
+      "created": "Created",
+      "enabled": "Enabled",
+      "actions": "Actions"
+    },
+    "search": {
+      "code": "Search by code",
+      "vanity": "Search by vanity",
+      "destination": "Search by destination"
+    },
+    "copy": "Copy URL",
+    "showQrCode": "Show QR Code",
+    "edit": "Edit URL",
+    "delete": "Delete URL"
+  }
+}

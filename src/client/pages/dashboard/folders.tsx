@@ -1,8 +1,10 @@
 import DashboardFolders from '@/components/pages/folders';
 import { useTitle } from '@/lib/client/hooks/useTitle';
+import { useTranslation } from 'react-i18next';
 
 export function Component() {
-  useTitle('Folders');
+  const { t } = useTranslation('layout');
+  useTitle(t('titles.folders'));
 
   return <DashboardFolders />;
 }

@@ -1,0 +1,196 @@
+{
+  "actions": {
+    "goToFiles": "前往文件",
+    "clearAll": "全部清除",
+    "upload_other": "上传 {{count}} 个文件 ({{size}})"
+  },
+  "file": {
+    "title": "上传文件",
+    "dropzone": {
+      "title": "将图片拖到此处，或点击选择文件",
+      "paste": "或按 <kbd>{{mod}}</kbd> + <kbd>V</kbd> 从剪贴板粘贴图片",
+      "description": "可以添加任意数量的文件，它们会显示在下方，供你在上传前检查。",
+      "limit": "单个文件上限为 <b>{{size}}</b>"
+    },
+    "progress": {
+      "speed": "{{speed}}/s，剩余 {{remaining}}",
+      "finalizing": "正在完成上传..."
+    },
+    "hidden_other": "还有 {{count}} 个文件未显示",
+    "showMore": "显示更多",
+    "showAll": "全部显示",
+    "showAllTooltip": "文件较多时可能会导致性能问题",
+    "notifications": {
+      "pasted": {
+        "message": "已从剪贴板粘贴图片 {{name}}"
+      },
+      "mayFail": {
+        "title": "上传可能会失败",
+        "message": "上传可能会失败，因为你要上传的文件 (不含分片上传的文件) 总大小为 <b>{{size}}</b>，超过了 <b>{{limit}}</b> 的限制"
+      }
+    }
+  },
+  "text": {
+    "title": "上传文本",
+    "tabs": {
+      "text": "文本",
+      "preview": "预览"
+    },
+    "addFile": "添加文本文件",
+    "fileHeading": "文件 {{number}}"
+  },
+  "options": {
+    "button": "选项",
+    "title": "上传选项",
+    "description": "这些选项将应用于你上传的所有文件，并保存在浏览器中。",
+    "saved": "已保存",
+    "default": "默认 ({{value}})",
+    "never": "永不",
+    "clear": "清除",
+    "deletesAt": {
+      "label": "删除时间",
+      "description": "文件将在此时间后自动删除。",
+      "defaultExpiration": "默认过期时间为 <b>{{value}}</b> (可以通过下方选项覆盖)。",
+      "setDefault": "你可以在<link>设置</link>中设置默认过期时间。",
+      "maxExpiration": "注意：允许的最长过期时间为 <b>{{value}}</b>。"
+    },
+    "expirations": {
+      "never": "永不",
+      "minutes5": "5 分钟",
+      "minutes10": "10 分钟",
+      "minutes15": "15 分钟",
+      "minutes30": "30 分钟",
+      "hour1": "1 小时",
+      "hours2": "2 小时",
+      "hours3": "3 小时",
+      "hours4": "4 小时",
+      "hours5": "5 小时",
+      "hours6": "6 小时",
+      "hours8": "8 小时",
+      "hours12": "12 小时",
+      "day1": "1 天",
+      "days3": "3 天",
+      "days5": "5 天",
+      "days7": "7 天",
+      "week1": "1 周",
+      "weeksOneAndHalf": "1.5 周",
+      "weeks2": "2 周",
+      "weeks3": "3 周",
+      "month1": "1 个月 (30 天)",
+      "monthsOneAndHalf": "1.5 个月 (约 45 天)",
+      "months2": "2 个月 (60 天)",
+      "months3": "3 个月 (90 天)",
+      "months4": "4 个月 (120 天)",
+      "months6": "6 个月 (半年)",
+      "year1": "1 年",
+      "custom": "需要更灵活的设置？可以通过 API 设置精确的日期和时间。"
+    },
+    "format": {
+      "label": "名称格式",
+      "description": "上传此文件时使用的文件名格式，“覆盖文件名”字段会覆盖此值。",
+      "random": "随机",
+      "date": "日期",
+      "name": "使用文件名",
+      "gfycat": "Gfycat 风格名称"
+    },
+    "compressionFormat": {
+      "label": "压缩格式",
+      "description": "<b>仅在指定了压缩百分比时</b>使用的图片压缩格式。保持为“默认”则使用服务器默认的压缩格式。"
+    },
+    "compression": {
+      "label": "压缩",
+      "description": "对图片使用的压缩级别 (仅限图片)。将使用上方的格式压缩图片。留空则禁用压缩。"
+    },
+    "maxViews": {
+      "label": "最大查看次数",
+      "description": "文件在被删除前允许的最大查看次数。留空则不限制查看次数。"
+    },
+    "folder": {
+      "label": "添加到文件夹",
+      "description": "将此文件添加到文件夹。选择“/ (根目录)”选项则不添加到任何文件夹。此值不会保存到浏览器中，并会在上传后清除。",
+      "placeholder": "添加到文件夹...",
+      "root": "/ (根目录)"
+    },
+    "domain": {
+      "label": "覆盖域名"
+    },
+    "filename": {
+      "label": "覆盖文件名",
+      "description": "使用此值覆盖文件名。留空则使用“名称格式”选项。如果一次上传多个文件，此值将被忽略。此值不会保存到浏览器中，并会在上传后清除。"
+    },
+    "password": {
+      "label": "密码",
+      "description": "为这些文件设置密码。留空则禁用密码保护。此值不会保存到浏览器中，并会在上传后清除。"
+    },
+    "other": "其他选项",
+    "originalName": {
+      "label": "添加原始名称",
+      "description": "添加原始文件名，以便下载文件时使用原始名称。文件本身的文件名仍会使用“名称格式”选项。"
+    },
+    "extensionless": {
+      "label": "无扩展名 URL",
+      "description": "从返回的 URL 中移除文件扩展名。文件仍可通过带扩展名的 URL 访问。此选项仅在服务器配置为允许无扩展名 URL 时生效。"
+    }
+  },
+  "modal": {
+    "title_other": "已上传 {{count}} 个文件",
+    "open": "在新标签页中打开链接",
+    "copy": "将链接复制到剪贴板",
+    "pending_other": "{{count}} 个大文件将<link>在后台完成处理。</link>",
+    "copyAllTooltip": "将所有链接复制到剪贴板 (以换行分隔)",
+    "copyAll": "将 {{total}} 个 URL 复制到剪贴板",
+    "notifications": {
+      "copied": {
+        "title": "已将 URL 复制到剪贴板"
+      },
+      "copiedAll": {
+        "title": "已将所有 URL 复制到剪贴板",
+        "message": "已将所有 URL 复制到剪贴板，以换行分隔。"
+      }
+    }
+  },
+  "errors": {
+    "parse": "无法解析服务器响应：{{response}}",
+    "unknown": "发生未知错误",
+    "network": "上传文件时发生网络错误"
+  },
+  "notifications": {
+    "preparing": {
+      "title_other": "正在准备文件",
+      "message_other": "正在上传 {{count}} 个文件",
+      "messageBatches_other": "正在分 {{batches}} 批上传 {{count}} 个文件"
+    },
+    "uploading": {
+      "batch": "正在上传第 {{current}}/{{total}} 批",
+      "title_other": "正在上传文件",
+      "message_other": "{{count}} 个文件"
+    },
+    "complete": {
+      "title": "上传完成",
+      "titlePartial": "常规上传已完成",
+      "message_other": "已上传 {{count}} 个文件",
+      "startingPartials_other": "正在开始上传 {{count}} 个大文件...",
+      "messagePartial": "{{uploaded}}。{{starting}}"
+    },
+    "error": {
+      "title": "上传文件时出错"
+    },
+    "partial": {
+      "title": "正在上传大文件",
+      "titleCount": "正在上传大文件 ({{current}}/{{total}})",
+      "chunk": "分片 {{current}}/{{total}}",
+      "error": {
+        "title": "上传文件时出错",
+        "message": "{{name}}：{{error}}"
+      },
+      "complete": {
+        "title": "大文件上传完成",
+        "message_other": "已将 {{count}} 个大文件转入后台处理"
+      },
+      "offloaded": {
+        "title": "大文件已转入后台处理",
+        "message": "{{name}} 已转入后台处理 ({{current}}/{{total}})"
+      }
+    }
+  }
+}

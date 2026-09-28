@@ -1,9 +1,12 @@
 import { bytes } from '@/lib/bytes';
 import { Metric } from '@/lib/db/models/metric';
 import { Paper, ScrollArea, SimpleGrid, Table } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 import TypesPieChart from './TypesPieChart';
 
 export default function StatsTables({ latest }: { latest: Metric | null }) {
+  const { t } = useTranslation('metrics');
+
   if (!latest) return null;
 
   const recent = latest;
@@ -18,10 +21,10 @@ export default function StatsTables({ latest }: { latest: Metric | null }) {
             <Table highlightOnHover stickyHeader>
               <Table.Thead>
                 <Table.Tr>
-                  <Table.Th>User</Table.Th>
-                  <Table.Th>Files</Table.Th>
-                  <Table.Th>Storage Used</Table.Th>
-                  <Table.Th>Views</Table.Th>
+                  <Table.Th>{t('tables.columns.user')}</Table.Th>
+                  <Table.Th>{t('tables.columns.files')}</Table.Th>
+                  <Table.Th>{t('tables.columns.storageUsed')}</Table.Th>
+                  <Table.Th>{t('tables.columns.views')}</Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
@@ -29,7 +32,7 @@ export default function StatsTables({ latest }: { latest: Metric | null }) {
                   .sort((a, b) => b.sum - a.sum)
                   .map((count, i) => (
                     <Table.Tr key={i}>
-                      <Table.Td>{count.username ?? '[unknown]'}</Table.Td>
+                      <Table.Td>{count.username ?? t('tables.unknownUser')}</Table.Td>
                       <Table.Td>{count.sum}</Table.Td>
                       <Table.Td>{bytes(count.storage)}</Table.Td>
                       <Table.Td>{count.views}</Table.Td>
@@ -45,9 +48,9 @@ export default function StatsTables({ latest }: { latest: Metric | null }) {
             <Table highlightOnHover stickyHeader>
               <Table.Thead>
                 <Table.Tr>
-                  <Table.Th>User</Table.Th>
-                  <Table.Th>URLs</Table.Th>
-                  <Table.Th>Views</Table.Th>
+                  <Table.Th>{t('tables.columns.user')}</Table.Th>
+                  <Table.Th>{t('tables.columns.urls')}</Table.Th>
+                  <Table.Th>{t('tables.columns.views')}</Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
@@ -55,7 +58,7 @@ export default function StatsTables({ latest }: { latest: Metric | null }) {
                   .sort((a, b) => b.sum - a.sum)
                   .map((count, i) => (
                     <Table.Tr key={i}>
-                      <Table.Td>{count.username ?? '[unknown]'}</Table.Td>
+                      <Table.Td>{count.username ?? t('tables.unknownUser')}</Table.Td>
                       <Table.Td>{count.sum}</Table.Td>
                       <Table.Td>{count.views}</Table.Td>
                     </Table.Tr>
@@ -70,8 +73,8 @@ export default function StatsTables({ latest }: { latest: Metric | null }) {
             <Table highlightOnHover stickyHeader>
               <Table.Thead>
                 <Table.Tr>
-                  <Table.Th>Type</Table.Th>
-                  <Table.Th>Files</Table.Th>
+                  <Table.Th>{t('tables.columns.type')}</Table.Th>
+                  <Table.Th>{t('tables.columns.files')}</Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>

@@ -3,6 +3,7 @@ import type { Url } from '@/lib/db/models/url';
 import { Center, Group, Paper, SimpleGrid, Skeleton, Stack, Text, Title } from '@mantine/core';
 import { IconLink } from '@tabler/icons-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import useSWR from 'swr';
 import EditUrlModal from '../EditUrlModal';
 import UrlCard from '../UrlCard';
@@ -11,6 +12,7 @@ import { formatRootUrl } from '@/lib/url';
 import { useConfig } from '@/components/ConfigProvider';
 
 export default function UrlGridView() {
+  const { t } = useTranslation('urls');
   const config = useConfig();
   const { data: urls, isLoading } = useSWR<Extract<Response['/api/user/urls'], Url[]>>('/api/user/urls');
   const [selectedUrl, setSelectedUrl] = useState<Url | null>(null);
@@ -61,10 +63,10 @@ export default function UrlGridView() {
             <Stack>
               <Group>
                 <IconLink size='2rem' />
-                <Title order={2}>No URLs found</Title>
+                <Title order={2}>{t('empty.title')}</Title>
               </Group>
               <Text size='sm' c='dimmed'>
-                Shorten a URL to see them here
+                {t('empty.description')}
               </Text>
             </Stack>
           </Center>

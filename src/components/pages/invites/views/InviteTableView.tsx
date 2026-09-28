@@ -7,11 +7,13 @@ import { useClipboard } from '@mantine/hooks';
 import { IconCopy, IconQrcode, IconTrashFilled } from '@tabler/icons-react';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import useSWR from 'swr';
 import { copyInviteUrl, deleteInvite } from '../actions';
 import QRCodeModal from '@/components/QRCodeModal';
 
 export default function InviteTableView() {
+  const { t } = useTranslation('invites');
   const clipboard = useClipboard();
   const warnDeletion = useSettingsStore((state) => state.settings.warnDeletion);
 
@@ -51,10 +53,12 @@ export default function InviteTableView() {
         <DataTable
           withTableBorder
           minHeight={200}
+          noRecordsText={t('table.noRecords', { ns: 'common' })}
           records={sorted ?? []}
           columns={[
             {
               accessor: 'code',
+              title: t('table.columns.code'),
               sortable: true,
               render: (invite) => (
                 <Anchor href={`/invite/${invite.code}`} target='_blank'>
@@ -64,42 +68,46 @@ export default function InviteTableView() {
             },
             {
               accessor: 'inviter.username',
-              title: 'Created by',
+              title: t('table.columns.createdBy'),
               sortable: true,
             },
             {
               accessor: 'createdAt',
-              title: 'Created',
+              title: t('table.columns.created'),
               sortable: true,
               render: (invite) => <RelativeDate date={invite.createdAt} />,
             },
             {
               accessor: 'updatedAt',
-              title: 'Last update at',
+              title: t('table.columns.updatedAt'),
               sortable: true,
               render: (invite) => <RelativeDate date={invite.updatedAt} />,
             },
             {
               accessor: 'expiresAt',
-              title: 'Expires',
+              title: t('table.columns.expires'),
               sortable: true,
-              render: (invite) => (invite.expiresAt ? <RelativeDate date={invite.expiresAt} /> : 'Never'),
+              render: (invite) =>
+                invite.expiresAt ? <RelativeDate date={invite.expiresAt} /> : t('table.never'),
             },
             {
               accessor: 'maxUses',
+              title: t('table.columns.maxUses'),
               sortable: true,
-              render: (invite) => (invite.maxUses ? invite.maxUses.toLocaleString() : 'Unlimited'),
+              render: (invite) => (invite.maxUses ? invite.maxUses.toLocaleString() : t('table.unlimited')),
             },
             {
               accessor: 'uses',
+              title: t('table.columns.uses'),
               sortable: true,
             },
             {
               accessor: 'actions',
+              title: t('table.columns.actions'),
               textAlign: 'right',
               render: (invite) => (
                 <Group gap='sm' justify='right' wrap='nowrap'>
-                  <Tooltip label='Copy invite link'>
+                  <Tooltip label={t('table.copyLink')}>
                     <ActionIcon
                       onClick={(e) => {
                         e.stopPropagation();
@@ -109,7 +117,7 @@ export default function InviteTableView() {
                       <IconCopy size='1rem' />
                     </ActionIcon>
                   </Tooltip>
-                  <Tooltip label='Show QR code'>
+                  <Tooltip label={t('table.showQrCode')}>
                     <ActionIcon
                       onClick={(e) => {
                         e.stopPropagation();
@@ -119,7 +127,7 @@ export default function InviteTableView() {
                       <IconQrcode size='1rem' />
                     </ActionIcon>
                   </Tooltip>
-                  <Tooltip label='Delete invite'>
+                  <Tooltip label={t('table.delete')}>
                     <ActionIcon
                       color='red'
                       onClick={(e) => {

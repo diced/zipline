@@ -27,11 +27,13 @@ import {
   IconUserCancel,
 } from '@tabler/icons-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { mutate } from 'swr';
 import useSWR from 'swr';
 import { useShallow } from 'zustand/shallow';
 
 export default function SettingsUser() {
+  const { t } = useTranslation('settings');
   const [user, setUser] = useUserStore(useShallow((state) => [state.user, state.setUser]));
 
   const { data: tokenPayload } = useSWR<Response['/api/user/token']>('/api/user/token');
@@ -39,9 +41,9 @@ export default function SettingsUser() {
   if (!user) {
     return (
       <Paper withBorder p='sm'>
-        <Title order={2}>User</Title>
+        <Title order={2}>{t('user.title')}</Title>
         <Text c='dimmed' size='sm' mt='sm'>
-          Loading…
+          {t('loading')}
         </Text>
       </Paper>
     );
@@ -51,6 +53,7 @@ export default function SettingsUser() {
 }
 
 function Form({ user, setUser, token }: { user: User; setUser: (u: User) => void; token: string }) {
+  const { t } = useTranslation(['settings', 'common']);
   const [tokenShown, setTokenShown] = useState(false);
 
   const form = useForm({
@@ -60,9 +63,9 @@ function Form({ user, setUser, token }: { user: User; setUser: (u: User) => void
       currentPassword: '',
     },
     validate: {
-      username: (value) => (value.length < 1 ? 'Username is required' : null),
+      username: (value) => (value.length < 1 ? t('user.form.username.required') : null),
       currentPassword: (value, values) =>
-        values.password && !value ? 'Enter your current password to change it' : null,
+        values.password && !value ? t('user.form.currentPassword.required') : null,
     },
   });
 
@@ -88,7 +91,7 @@ function Form({ user, setUser, token }: { user: User; setUser: (u: User) => void
         form.setFieldError('currentPassword', error.error);
       } else {
         notifications.show({
-          title: 'Error while updating user',
+          title: t('user.notifications.error.title'),
           message: error.error,
           color: 'red',
           icon: <IconUserCancel size='1rem' />,
@@ -107,7 +110,7 @@ function Form({ user, setUser, token }: { user: User; setUser: (u: User) => void
     mutate('/api/user/token');
     setUser(data.user);
     notifications.show({
-      message: 'User updated',
+      message: t('user.notifications.updated.message'),
       color: 'green',
       icon: <IconCheck size='1rem' />,
     });
@@ -115,7 +118,7 @@ function Form({ user, setUser, token }: { user: User; setUser: (u: User) => void
 
   return (
     <Paper withBorder p='sm'>
-      <Title order={2}>User</Title>
+      <Title order={2}>{t('user.title')}</Title>
       <Text c='dimmed' size='sm' mb='sm'>
         {user.id}
       </Text>
@@ -125,7 +128,7 @@ function Form({ user, setUser, token }: { user: User; setUser: (u: User) => void
           rightSection={
             <CopyButton value={token} timeout={1000}>
               {({ copied, copy }) => (
-                <Tooltip label='Click to copy token'>
+                <Tooltip label={t('user.tokenCopyTooltip')}>
                   <ActionIcon onClick={copy} variant='subtle' color='gray'>
                     {copied ? <IconCheck color='green' size='1rem' /> : <IconCopy size='1rem' />}
                   </ActionIcon>
@@ -135,29 +138,29 @@ function Form({ user, setUser, token }: { user: User; setUser: (u: User) => void
           }
           // @ts-ignore this works trust
           component='span'
-          label='Token'
+          label={t('user.tokenLabel')}
           onClick={() => setTokenShown(true)}
           leftSection={<IconKey size='1rem' />}
         >
-          <ScrollArea scrollbarSize={5}>{tokenShown ? token : '[click to reveal]'}</ScrollArea>
+          <ScrollArea scrollbarSize={5}>{tokenShown ? token : t('user.tokenHidden')}</ScrollArea>
         </TextInput>
 
         <TextInput
-          label='Username'
+          label={t('user.form.username.label')}
           {...form.getInputProps('username')}
           leftSection={<IconUser size='1rem' />}
         />
         <PasswordInput
-          label='Password'
-          description='Leave blank to keep the same password'
+          label={t('user.form.password.label')}
+          description={t('user.form.password.description')}
           autoComplete='new-password'
           {...form.getInputProps('password')}
           leftSection={<IconAsteriskSimple size='1rem' />}
         />
         {form.values.password && (
           <PasswordInput
-            label='Current password'
-            description='Required to change your password.'
+            label={t('user.form.currentPassword.label')}
+            description={t('user.form.currentPassword.description')}
             autoComplete='current-password'
             {...form.getInputProps('currentPassword')}
             leftSection={<IconAsteriskSimple size='1rem' />}
@@ -165,7 +168,7 @@ function Form({ user, setUser, token }: { user: User; setUser: (u: User) => void
         )}
 
         <Button type='submit' mt='md' leftSection={<IconDeviceFloppy size='1rem' />}>
-          Save
+          {t('common:actions.save')}
         </Button>
       </form>
     </Paper>

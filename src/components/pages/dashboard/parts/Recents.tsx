@@ -1,11 +1,13 @@
 import { Response } from '@/lib/api/response';
 import { SimpleGrid, Skeleton, Text } from '@mantine/core';
 import { lazy, Suspense } from 'react';
+import { useTranslation } from 'react-i18next';
 import useSWR from 'swr';
 
 const DashboardFile = lazy(() => import('@/components/file/DashboardFile'));
 
 export default function Recents() {
+  const { t } = useTranslation('dashboard');
   const { data, isLoading } = useSWR<Response['/api/user/recent']>('/api/user/recent');
 
   if (isLoading)
@@ -30,7 +32,7 @@ export default function Recents() {
 
   return (
     <Text size='sm' c='dimmed'>
-      You have no recent files. The last three files you uploaded will appear here.
+      {t('recents.empty')}
     </Text>
   );
 }

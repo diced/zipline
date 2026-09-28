@@ -1,8 +1,10 @@
 import UploadText from '@/components/pages/upload/Text';
 import { useTitle } from '@/lib/client/hooks/useTitle';
+import { useTranslation } from 'react-i18next';
 
 export function Component() {
-  useTitle('Upload Text');
+  const { t } = useTranslation('layout');
+  useTitle(t('titles.uploadText'));
 
   return <UploadText />;
 }

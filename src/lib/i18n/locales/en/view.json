@@ -1,0 +1,36 @@
+{
+  "password": {
+    "title": "Password required",
+    "invalid": "Invalid password",
+    "verify": "Verify",
+    "fileDescription": "This file is password protected, enter password to view it",
+    "urlDescription": "This link is password protected, enter password to view it"
+  },
+  "file": {
+    "pageTitle": "View File",
+    "viewFolder": "View folder",
+    "viewRaw": "View raw file",
+    "download": "Download file"
+  },
+  "url": {
+    "redirecting": "Redirecting to <link>{{destination}}</link>"
+  },
+  "folder": {
+    "pageTitle": "Folder",
+    "subfolders": "Subfolders",
+    "files": "Files",
+    "empty": "This folder is empty.",
+    "card": {
+      "files": "{{amount}} files",
+      "subfolders": "{{amount}} subfolders"
+    },
+    "pagination": "{{from}} - {{to}} / {{total}} files"
+  },
+  "folderUpload": {
+    "pageTitle": "Upload to {{name}}",
+    "pageTitleFallback": "Upload to folder",
+    "title": "Upload files to {{name}}",
+    "public": "This folder is <link>public</link>. Anyone with the link can view its contents and upload files.",
+    "private": "Only the owner can view this folder's contents. However, anyone can upload files, and they can still access their uploaded files if they have the link to the specific file."
+  }
+}

@@ -17,6 +17,7 @@ import {
   IconTrashFilled,
 } from '@tabler/icons-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { copyFolderUrl, editFolderUploads, editFolderVisibility } from './actions';
 import DeleteFolderModal from './modals/DeleteFolderModal';
 import EditFolderNameModal from './modals/EditFolderNameModal';
@@ -31,6 +32,7 @@ export default function FolderCard({
   folder: Folder;
   onNavigate?: (folderId: string | null) => void;
 }) {
+  const { t } = useTranslation(['folders', 'common']);
   const clipboard = useClipboard();
 
   const [viewOpen, setViewOpen] = useState(false);
@@ -79,14 +81,14 @@ export default function FolderCard({
                     leftSection={<IconFolderOpen size='1rem' />}
                     onClick={() => onNavigate(folder.id)}
                   >
-                    Open Folder
+                    {t('menu.open')}
                   </Menu.Item>
                 )}
                 <Menu.Item
                   leftSection={<IconFolderSymlink size='1rem' />}
                   onClick={withoutPropagation(() => setMoveOpen(true))}
                 >
-                  Move Folder
+                  {t('menu.move')}
                 </Menu.Item>
                 <Menu.Item
                   leftSection={<IconFileZip size='1rem' />}
@@ -95,39 +97,39 @@ export default function FolderCard({
                   target='_blank'
                   onClick={withoutPropagation(() => {})}
                 >
-                  Export as ZIP
+                  {t('menu.export')}
                 </Menu.Item>
                 <Menu.Item
                   leftSection={folder.public ? <IconLock size='1rem' /> : <IconLockOpen size='1rem' />}
                   onClick={withoutPropagation(() => editFolderVisibility(folder, !folder.public))}
                 >
-                  {folder.public ? 'Make Private' : 'Make Public'}
+                  {folder.public ? t('menu.makePrivate') : t('menu.makePublic')}
                 </Menu.Item>
                 <Menu.Item
                   leftSection={folder.public ? <IconShareOff size='1rem' /> : <IconShare size='1rem' />}
                   onClick={withoutPropagation(() => editFolderUploads(folder, !folder.allowUploads))}
                 >
-                  {folder.allowUploads ? 'Disallow anonymous uploads' : 'Allow anonymous uploads'}
+                  {folder.allowUploads ? t('menu.disallowUploads') : t('menu.allowUploads')}
                 </Menu.Item>
                 <Menu.Item
                   leftSection={<IconPencil size='1rem' />}
                   onClick={withoutPropagation(() => setEditOpen(true))}
                 >
-                  Edit Name
+                  {t('menu.editName')}
                 </Menu.Item>
                 <Menu.Item
                   leftSection={<IconCopy size='1rem' />}
                   disabled={!folder.public}
                   onClick={withoutPropagation(() => copyFolderUrl(folder, clipboard))}
                 >
-                  Copy URL
+                  {t('menu.copyUrl')}
                 </Menu.Item>
                 <Menu.Item
                   leftSection={<IconTrashFilled size='1rem' />}
                   color='red'
                   onClick={withoutPropagation(() => setDeleteOpen(true))}
                 >
-                  Delete
+                  {t('common:actions.delete')}
                 </Menu.Item>
               </Menu.Dropdown>
             </Menu>
@@ -137,20 +139,20 @@ export default function FolderCard({
         <Card.Section inheritPadding py='xs' onClick={() => onNavigate?.(folder.id)}>
           <Stack gap={1}>
             <Text size='xs' c='dimmed'>
-              <b>Created:</b> <RelativeDate date={folder.createdAt} />
+              <b>{t('card.created')}</b> <RelativeDate date={folder.createdAt} />
             </Text>
             <Text size='xs' c='dimmed'>
-              <b>Updated:</b> <RelativeDate date={folder.updatedAt} />
+              <b>{t('card.updated')}</b> <RelativeDate date={folder.updatedAt} />
             </Text>
             <Text size='xs' c='dimmed'>
-              <b>Public:</b> {folder.public ? 'Yes' : 'No'}
+              <b>{t('card.public')}</b> {folder.public ? t('common:actions.yes') : t('common:actions.no')}
             </Text>
             <Text size='xs' c='dimmed'>
-              <b>Files:</b> {filesCount}
+              <b>{t('card.files')}</b> {filesCount}
             </Text>
             {childrenCount > 0 && (
               <Text size='xs' c='dimmed'>
-                <b>Subfolders:</b> {childrenCount}
+                <b>{t('card.subfolders')}</b> {childrenCount}
               </Text>
             )}
           </Stack>

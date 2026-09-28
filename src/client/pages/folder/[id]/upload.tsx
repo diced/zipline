@@ -4,6 +4,7 @@ import { type Response } from '@/lib/api/response';
 import { SafeConfig } from '@/lib/config/safe';
 import { useTitle } from '@/lib/client/hooks/useTitle';
 import { Anchor, Center, Container, Text } from '@mantine/core';
+import { Trans, useTranslation } from 'react-i18next';
 import { data, Link, Params, useLoaderData } from 'react-router-dom';
 import useSWR from 'swr';
 
@@ -20,6 +21,7 @@ export async function loader({ params }: { params: Params<string> }) {
 }
 
 export function Component() {
+  const { t } = useTranslation('view');
   const { folder } = useLoaderData<typeof loader>();
 
   const { data: config } = useSWR<Response['/api/server/public']>('/api/server/public', {
@@ -29,25 +31,29 @@ export function Component() {
     revalidateIfStale: false,
   });
 
-  useTitle(`Upload to ${folder.name ?? 'folder'}`);
+  useTitle(
+    folder.name != null
+      ? t('folderUpload.pageTitle', { name: folder.name })
+      : t('folderUpload.pageTitleFallback'),
+  );
 
   return (
     <>
       <Container my='lg'>
         <ConfigProvider data={{ config: config as unknown as SafeConfig, codeMap: [] }}>
-          <UploadFile title={`Upload files to ${folder.name}`} folder={folder.id} />
+          <UploadFile title={t('folderUpload.title', { name: folder.name })} folder={folder.id} />
           <Center>
             <Text c='dimmed' ta='center'>
               {folder.public ? (
-                <>
-                  This folder is{' '}
-                  <Anchor component={Link} to={`/folder/${folder.id}`} reloadDocument>
-                    public
-                  </Anchor>
-                  . Anyone with the link can view its contents and upload files.
-                </>
+                <Trans
+                  t={t}
+                  i18nKey='folderUpload.public'
+                  components={{
+                    link: <Anchor component={Link} to={`/folder/${folder.id}`} reloadDocument />,
+                  }}
+                />
               ) : (
-                "Only the owner can view this folder's contents. However, anyone can upload files, and they can still access their uploaded files if they have the link to the specific file."
+                t('folderUpload.private')
               )}
             </Text>
           </Center>

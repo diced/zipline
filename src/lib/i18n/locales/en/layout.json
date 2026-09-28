@@ -1,0 +1,124 @@
+{
+  "nav": {
+    "home": "Home",
+    "metrics": "Metrics",
+    "files": "Files",
+    "folders": "Folders",
+    "upload": "Upload",
+    "uploadFile": "File",
+    "uploadText": "Text",
+    "urls": "URLs",
+    "administrator": "Administrator",
+    "adminDashboard": "Dashboard",
+    "serverSettings": "Settings",
+    "serverActions": "Actions",
+    "users": "Users",
+    "invites": "Invites"
+  },
+  "header": {
+    "logoAlt": "Zipline logo",
+    "avatarAlt": "User avatar"
+  },
+  "userMenu": {
+    "administratorLabel": "{{username}} (Administrator)",
+    "copyToken": "Copy token",
+    "refreshToken": "Refresh token",
+    "settings": "Settings",
+    "serverSettings": "Server Settings",
+    "logout": "Logout",
+    "loggingOut": "Logging out..."
+  },
+  "token": {
+    "cancel": "No, close this popup",
+    "copy": {
+      "title": "Copy token?",
+      "message": "Are you sure you want to copy your token? Your token can interact with all parts of Zipline. Do not share this token with anyone."
+    },
+    "copied": {
+      "title": "Copied",
+      "message": "Your token has been copied to your clipboard."
+    },
+    "refresh": {
+      "title": "Refresh token?",
+      "message": "Are you sure you want to refresh your token? Once you refresh/reset your token, you will need to update any scripts or applications that use your token."
+    },
+    "refreshed": {
+      "title": "Refreshed",
+      "message": "Your token has been refreshed."
+    }
+  },
+  "version": {
+    "modalTitle": "Zipline Version",
+    "tooltip": "Click to view more version information",
+    "latest": "Running the latest version of Zipline.",
+    "unstable": "You are running an <b>unstable</b> version of Zipline. Upstream versions are not fully tested and may contain bugs.",
+    "outdated": "You are running an <b>outdated</b> version of Zipline. It is recommended to update to the <link>latest version</link>.",
+    "current": "Current Version",
+    "fields": {
+      "version": "Version",
+      "commit": "Commit",
+      "upstream": "Upstream?",
+      "availableToUpdate": "Available to update"
+    },
+    "latestCommit": "Latest Commit Available",
+    "latestCommitNote": "This is only visible when running an upstream version.",
+    "available": "{{tag}} is available",
+    "changelogs": "Changelogs",
+    "update": "Update"
+  },
+  "qrCode": {
+    "title": "QR Code",
+    "alt": "QR Code",
+    "failed": "Failed to generate QR code.",
+    "format": "Format",
+    "copyUnsupported": "Copying this format is not supported in some browsers. You can copy the image normally via right-click or holding it.",
+    "copyImage": "Copy Image",
+    "copied": "QR code image copied to clipboard",
+    "copyFailed": "Failed to copy QR code image"
+  },
+  "domainSelect": {
+    "default": "Default domain",
+    "description": "Override the domain with this value. This will change the domain returned in your uploads. Leave blank to use the default domain."
+  },
+  "copyLink": {
+    "title": "Copied link"
+  },
+  "errors": {
+    "generic": {
+      "title": "An error occurred",
+      "message": "Something went wrong. Please try again later, or report this issue if it persists."
+    },
+    "dashboard": {
+      "title": "Dashboard Client Error",
+      "message": "Something went wrong while loading the dashboard. Please try again later, or report this issue if it persists."
+    },
+    "reload": {
+      "title": "Update available",
+      "message": "A new version of the app is available. Please reload the page to update.",
+      "button": "Reload Page",
+      "why": "Why am I seeing this?",
+      "errorTitle": "Failed to fetch dynamically imported module",
+      "errorMessage": "This error can occur when a new version of the app is deployed while you have the page open. Please reload the page to update to the latest version."
+    }
+  },
+  "notFound": {
+    "message": "Page not found",
+    "goHome": "Go home"
+  },
+  "titles": {
+    "settings": "Settings",
+    "folders": "Folders",
+    "files": "Files",
+    "metrics": "Metrics",
+    "urls": "URLs",
+    "serverSettings": "Server Settings",
+    "administrator": "Administrator",
+    "serverActions": "Server Actions",
+    "invites": "Invites",
+    "uploadFile": "Upload File",
+    "uploadText": "Upload Text",
+    "users": "Users",
+    "userFiles": "{{username}}'s files",
+    "unknownUserFiles": "User's files"
+  }
+}

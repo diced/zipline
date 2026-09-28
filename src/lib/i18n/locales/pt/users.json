@@ -1,0 +1,124 @@
+{
+  "title": "Usuários",
+  "form": {
+    "username": {
+      "label": "Nome de usuário",
+      "placeholder": "Digite um nome de usuário...",
+      "required": "O nome de usuário é obrigatório"
+    },
+    "password": {
+      "label": "Senha",
+      "placeholder": "Digite uma senha...",
+      "required": "A senha é obrigatória"
+    },
+    "avatar": {
+      "label": "Avatar",
+      "placeholder": "Selecione um avatar...",
+      "clear": "Remover avatar",
+      "invalidType": "Tipo de arquivo inválido",
+      "readFailed": "Falha ao ler o arquivo do avatar"
+    },
+    "role": {
+      "label": "Função"
+    }
+  },
+  "roles": {
+    "user": "Usuário",
+    "administrator": "Administrador",
+    "admin": "Admin",
+    "superAdmin": "Superadmin"
+  },
+  "create": {
+    "title": "Criar um novo usuário"
+  },
+  "edit": {
+    "title": "Editar {{username}}",
+    "description": "Campos deixados em branco serão ignorados e não serão atualizados.",
+    "submit": "Atualizar usuário",
+    "quota": {
+      "title": "Cota",
+      "invalidValue": "Valor inválido",
+      "invalidByteFormat": "Formato de bytes inválido",
+      "fileType": {
+        "label": "Tipo de cota de arquivos",
+        "description": "Define se a cota de arquivos é calculada pelo total de bytes ou pelo número total de arquivos.",
+        "byBytes": "Por bytes",
+        "byFiles": "Por número de arquivos",
+        "none": "Sem cota de arquivos"
+      },
+      "maxFiles": {
+        "label": "Máx. de arquivos",
+        "description": "Número máximo de arquivos que o usuário pode enviar.",
+        "placeholder": "Digite um número..."
+      },
+      "maxBytes": {
+        "label": "Máx. de bytes",
+        "description": "Número máximo de bytes que o usuário pode enviar.",
+        "placeholder": "Digite um tamanho em formato legível..."
+      },
+      "maxUrls": {
+        "label": "Máx. de links curtos",
+        "description": "Número máximo de links curtos que o usuário pode criar. Deixe 0 para ilimitado.",
+        "placeholder": "Digite um número..."
+      }
+    }
+  },
+  "delete": {
+    "title": "Excluir {{username}}?",
+    "message": "Tem certeza de que deseja excluir {{username}}? Esta ação não pode ser desfeita.",
+    "data": {
+      "title": "Excluir os dados de {{username}}?",
+      "message": "Deseja excluir os arquivos e links curtos de {{username}}? Esta ação não pode ser desfeita.",
+      "cancel": "Não, manter tudo e excluir só o usuário",
+      "confirm": "Sim, excluir tudo"
+    }
+  },
+  "notifications": {
+    "createFailed": "Falha ao criar o usuário",
+    "created": {
+      "title": "Usuário criado",
+      "message": "O usuário {{username}} foi criado"
+    },
+    "editFailed": "Falha ao editar o usuário",
+    "edited": {
+      "title": "Usuário editado",
+      "message": "O usuário {{username}} foi editado"
+    },
+    "deleteFailed": "Falha ao excluir o usuário",
+    "deleted": {
+      "title": "Usuário excluído",
+      "message": "O usuário {{username}} foi excluído"
+    }
+  },
+  "card": {
+    "id": "ID:",
+    "role": "Função:",
+    "created": "Criado em:",
+    "updated": "Atualizado em:"
+  },
+  "table": {
+    "columns": {
+      "avatar": "Avatar",
+      "username": "Nome de usuário",
+      "role": "Função",
+      "created": "Criado em",
+      "updated": "Última atualização",
+      "actions": "Ações"
+    },
+    "viewFiles": "Ver arquivos do usuário",
+    "edit": "Editar usuário",
+    "delete": "Excluir usuário"
+  },
+  "grid": {
+    "empty": {
+      "title": "Nenhum usuário encontrado",
+      "description": "Crie um usuário para vê-lo aqui"
+    }
+  },
+  "viewFiles": {
+    "title": "Arquivos de {{username}}",
+    "back": "Voltar para usuários",
+    "tableOptions": "Opções da tabela",
+    "searchById": "Pesquisar por ID"
+  }
+}

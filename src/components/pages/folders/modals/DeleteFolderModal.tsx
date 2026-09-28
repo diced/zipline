@@ -9,6 +9,7 @@ import { Button, Combobox, InputBase, Modal, Radio, Stack, Text, useCombobox } f
 import { notifications } from '@mantine/notifications';
 import { IconTrashFilled } from '@tabler/icons-react';
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { mutateFolder } from '../actions';
 
 type ChildrenAction = 'root' | 'folder' | 'cascade' | 'cascade-files';
@@ -22,6 +23,7 @@ export default function DeleteFolderModal({
   opened: boolean;
   onClose: () => void;
 }) {
+  const { t } = useTranslation('folders');
   const [loading, setLoading] = useState(false);
   const [childrenAction, setChildrenAction] = useState<ChildrenAction>('root');
   const [targetFolderId, setTargetFolderId] = useState<string | null>(null);
@@ -61,14 +63,14 @@ export default function DeleteFolderModal({
 
     if (error) {
       notifications.show({
-        title: 'Failed to delete folder',
+        title: t('delete.notifications.failed'),
         message: error.error,
         color: 'red',
       });
     } else {
       notifications.show({
-        title: 'Folder deleted',
-        message: `${folder.name} has been deleted`,
+        title: t('delete.notifications.deleted'),
+        message: t('delete.notifications.deletedMessage', { name: folder.name }),
         color: 'green',
       });
       mutateFolder();
@@ -86,8 +88,8 @@ export default function DeleteFolderModal({
       if (childrenAction === 'folder') {
         if (!targetFolderId) {
           notifications.show({
-            title: 'No folder selected',
-            message: 'Please select a folder to move contents to',
+            title: t('delete.notifications.noTarget'),
+            message: t('delete.notifications.noTargetMessage'),
             color: 'red',
           });
           return;
@@ -98,13 +100,14 @@ export default function DeleteFolderModal({
 
     if (hasContent && (childrenAction === 'cascade' || childrenAction === 'cascade-files')) {
       openWarningModal({
-        confirmLabel: `Delete '${folder.name}' and ${childrenAction === 'cascade-files' ? 'all subfolders and files' : 'all subfolders'}?`,
+        confirmLabel:
+          childrenAction === 'cascade-files'
+            ? t('delete.confirmCascadeFiles', { name: folder.name })
+            : t('delete.confirmCascade', { name: folder.name }),
         message: (
           <Stack gap='sm'>
             <Text c='red' fw={500}>
-              {childrenAction === 'cascade-files'
-                ? 'All subfolders and every file within them will be permanently deleted from storage. This action cannot be undone.'
-                : 'All subfolders will be permanently deleted (files will be moved to the root). This action cannot be undone.'}
+              {childrenAction === 'cascade-files' ? t('delete.modalCascadeFiles') : t('delete.modalCascade')}
             </Text>
           </Stack>
         ),
@@ -117,29 +120,34 @@ export default function DeleteFolderModal({
   };
 
   return (
-    <Modal centered opened={opened} onClose={onClose} title={`Delete "${folder.name}"?`}>
+    <Modal centered opened={opened} onClose={onClose} title={t('delete.title', { name: folder.name })}>
       <Stack gap='sm'>
         <Text size='sm' c='red' fw={500}>
-          This action cannot be undone.
+          {t('delete.cannotUndo')}
         </Text>
 
         {hasContent && (
           <>
             <Text size='sm'>
-              This folder contains {hasFiles && `${folder._count?.files} file(s)`}
-              {hasChildren && hasFiles && ' and '}
-              {hasChildren && `${folder._count?.children} subfolder(s)`}. What would you like to do with them?
+              {hasFiles && hasChildren
+                ? t('delete.containsFilesAndSubfolders', {
+                    files: folder._count?.files,
+                    subfolders: folder._count?.children,
+                  })
+                : hasFiles
+                  ? t('delete.containsFiles', { files: folder._count?.files })
+                  : t('delete.containsSubfolders', { subfolders: folder._count?.children })}
             </Text>
 
             <Radio.Group value={childrenAction} onChange={(v) => setChildrenAction(v as ChildrenAction)}>
               <Stack gap='xs'>
-                <Radio value='root' label='Move contents to root folder' />
-                <Radio value='folder' label='Move contents to another folder' />
+                <Radio value='root' label={t('delete.options.root')} />
+                <Radio value='folder' label={t('delete.options.folder')} />
                 <Radio
                   value='cascade'
                   label={
                     <Text size='sm' c='red'>
-                      Delete subfolders (files moved to root)
+                      {t('delete.options.cascade')}
                     </Text>
                   }
                 />
@@ -147,7 +155,7 @@ export default function DeleteFolderModal({
                   value='cascade-files'
                   label={
                     <Text size='sm' c='red'>
-                      Delete subfolders and their files (cascade delete)
+                      {t('delete.options.cascadeFiles')}
                     </Text>
                   }
                 />
@@ -166,8 +174,8 @@ export default function DeleteFolderModal({
               >
                 <Combobox.Target>
                   <InputBase
-                    label='Target Folder'
-                    placeholder='Select a folder'
+                    label={t('delete.target.label')}
+                    placeholder={t('delete.target.placeholder')}
                     rightSection={<Combobox.Chevron />}
                     value={search || getDisplayValue()}
                     onChange={(event) => {
@@ -200,15 +208,13 @@ export default function DeleteFolderModal({
 
             {childrenAction === 'cascade' && (
               <Text size='sm' c='red' fw={500}>
-                Warning: This will permanently delete all subfolders within this folder. Files will be
-                unlinked from their folders and moved to the root.
+                {t('delete.warningCascade')}
               </Text>
             )}
 
             {childrenAction === 'cascade-files' && (
               <Text size='sm' c='red' fw={500}>
-                Warning: This will permanently delete all subfolders within this folder, along with every file
-                contained in them. The files will be removed from storage and cannot be recovered.
+                {t('delete.warningCascadeFiles')}
               </Text>
             )}
           </>
@@ -220,7 +226,7 @@ export default function DeleteFolderModal({
           leftSection={<IconTrashFilled size='1rem' />}
           color='red'
         >
-          Delete Folder
+          {t('delete.submit')}
         </Button>
       </Stack>
     </Modal>

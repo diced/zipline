@@ -1,0 +1,75 @@
+{
+  "title": "Invitations",
+  "create": {
+    "title": "Créer une invitation",
+    "expiresAt": {
+      "label": "Expiration",
+      "description": "Sélectionnez un délai d'expiration pour cette invitation, ou choisissez « Jamais » pour qu'elle n'expire jamais.",
+      "placeholder": "Sélectionnez un délai d'expiration…"
+    },
+    "maxUses": {
+      "label": "Utilisations max.",
+      "description": "Définissez un nombre maximal d'utilisations pour cette invitation, ou laissez vide pour un nombre illimité.",
+      "placeholder": "Saisissez un nombre…"
+    }
+  },
+  "expirations": {
+    "never": "Jamais",
+    "minutes30": "30 minutes",
+    "hour1": "1 heure",
+    "hours6": "6 heures",
+    "hours12": "12 heures",
+    "day1": "1 jour",
+    "days3": "3 jours",
+    "days5": "5 jours",
+    "days7": "7 jours"
+  },
+  "notifications": {
+    "created": {
+      "title": "Invitation créée",
+      "message": "L'invitation {{code}} a été créée."
+    },
+    "deleteFailed": {
+      "title": "Impossible de supprimer l'invitation"
+    },
+    "deleted": {
+      "title": "Invitation supprimée",
+      "message": "L'invitation {{code}} a été supprimée."
+    }
+  },
+  "delete": {
+    "message": "Voulez-vous vraiment supprimer l'invitation {{code}} ? Cette action est irréversible.",
+    "confirm": "Supprimer {{code}}"
+  },
+  "card": {
+    "copyUrl": "Copier l'URL",
+    "showQrCode": "Afficher le code QR",
+    "createdBy": "Créée par :",
+    "created": "Création :",
+    "expires": "Expiration :",
+    "maxUses": "Utilisations max. :",
+    "uses": "Utilisations :",
+    "unlimited": "Illimité"
+  },
+  "empty": {
+    "title": "Aucune invitation trouvée",
+    "description": "Créez une invitation pour la voir ici."
+  },
+  "table": {
+    "columns": {
+      "code": "Code",
+      "createdBy": "Créée par",
+      "created": "Création",
+      "updatedAt": "Dernière mise à jour",
+      "expires": "Expiration",
+      "maxUses": "Utilisations max.",
+      "uses": "Utilisations",
+      "actions": "Actions"
+    },
+    "never": "Jamais",
+    "unlimited": "Illimité",
+    "copyLink": "Copier le lien d'invitation",
+    "showQrCode": "Afficher le code QR",
+    "delete": "Supprimer l'invitation"
+  }
+}

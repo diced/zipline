@@ -1,0 +1,138 @@
+{
+  "page": {
+    "title": "Folders",
+    "titleWithFolder": "Folders {{separator}} {{name}}",
+    "createFolder": "Create Folder",
+    "createSubfolder": "Create Subfolder",
+    "folderFiles": "{{name}}'s files",
+    "folderFilesWithCount": "{{name}}'s files ({{files}})"
+  },
+  "create": {
+    "title": "Create a folder",
+    "titleSubfolder": "Create a subfolder",
+    "name": {
+      "label": "Name",
+      "placeholder": "Enter a name...",
+      "required": "Name is required"
+    },
+    "public": {
+      "label": "Public",
+      "description": "Public folders are visible to everyone"
+    }
+  },
+  "uploadsAlert": {
+    "message": "This folder allows anonymous uploads. Share the link below to allow others to let others upload files to this folder.",
+    "copy": "Copy url",
+    "copied": "Copied url"
+  },
+  "menu": {
+    "moreActions": "More actions",
+    "open": "Open Folder",
+    "move": "Move Folder",
+    "export": "Export as ZIP",
+    "makePrivate": "Make Private",
+    "makePublic": "Make Public",
+    "disallowUploads": "Disallow anonymous uploads",
+    "allowUploads": "Allow anonymous uploads",
+    "editName": "Edit Name",
+    "copyUrl": "Copy URL"
+  },
+  "card": {
+    "created": "Created:",
+    "updated": "Updated:",
+    "public": "Public:",
+    "files": "Files:",
+    "subfolders": "Subfolders:"
+  },
+  "grid": {
+    "empty": "No Folders found",
+    "emptyFolder": "This folder is empty",
+    "createHint": "Create a folder to see it here"
+  },
+  "table": {
+    "columns": {
+      "name": "Name",
+      "public": "Public",
+      "uploads": "Uploads?",
+      "created": "Created",
+      "updated": "Last update at",
+      "actions": "Actions"
+    },
+    "subfolders_one": "{{count}} subfolder",
+    "subfolders_other": "{{count}} subfolders",
+    "noRecords": "No subfolders",
+    "copyLink": "Copy folder link",
+    "delete": "Delete Folder"
+  },
+  "notifications": {
+    "visibilityFailed": "Failed to edit folder visibility",
+    "visibilityEdited": "Folder visibility edited",
+    "nowPublic": "{{name}} is now public",
+    "nowPrivate": "{{name}} is now private",
+    "uploadsFailed": "Failed to edit folder uploads policy",
+    "uploadsEdited": "Folder uploads policy edited",
+    "uploadsAllowed": "{{name}} will now allow anonymous uploads",
+    "uploadsDisallowed": "{{name}} will no longer allow anonymous uploads"
+  },
+  "delete": {
+    "title": "Delete \"{{name}}\"?",
+    "cannotUndo": "This action cannot be undone.",
+    "containsFilesAndSubfolders": "This folder contains {{files}} file(s) and {{subfolders}} subfolder(s). What would you like to do with them?",
+    "containsFiles": "This folder contains {{files}} file(s). What would you like to do with them?",
+    "containsSubfolders": "This folder contains {{subfolders}} subfolder(s). What would you like to do with them?",
+    "options": {
+      "root": "Move contents to root folder",
+      "folder": "Move contents to another folder",
+      "cascade": "Delete subfolders (files moved to root)",
+      "cascadeFiles": "Delete subfolders and their files (cascade delete)"
+    },
+    "target": {
+      "label": "Target Folder",
+      "placeholder": "Select a folder"
+    },
+    "warningCascade": "Warning: This will permanently delete all subfolders within this folder. Files will be unlinked from their folders and moved to the root.",
+    "warningCascadeFiles": "Warning: This will permanently delete all subfolders within this folder, along with every file contained in them. The files will be removed from storage and cannot be recovered.",
+    "confirmCascade": "Delete '{{name}}' and all subfolders?",
+    "confirmCascadeFiles": "Delete '{{name}}' and all subfolders and files?",
+    "modalCascade": "All subfolders will be permanently deleted (files will be moved to the root). This action cannot be undone.",
+    "modalCascadeFiles": "All subfolders and every file within them will be permanently deleted from storage. This action cannot be undone.",
+    "submit": "Delete Folder",
+    "notifications": {
+      "failed": "Failed to delete folder",
+      "deleted": "Folder deleted",
+      "deletedMessage": "{{name}} has been deleted",
+      "noTarget": "No folder selected",
+      "noTargetMessage": "Please select a folder to move contents to"
+    }
+  },
+  "edit": {
+    "title": "Edit folder name",
+    "label": "New folder name",
+    "placeholder": "Enter new folder name...",
+    "required": "Name is required",
+    "notifications": {
+      "failed": "Error while updating folder name",
+      "updated": "Folder name updated",
+      "updatedMessage": "Folder name has been updated successfully to {{name}}"
+    }
+  },
+  "move": {
+    "title": "Move \"{{name}}\"",
+    "description": "Select a destination folder for this folder.",
+    "root": "/ (Root)",
+    "destination": {
+      "label": "Destination",
+      "placeholder": "Select a folder"
+    },
+    "submit": "Move Folder",
+    "notifications": {
+      "failed": "Failed to move folder",
+      "moved": "Folder moved",
+      "movedMessage": "{{name}} has been moved"
+    }
+  },
+  "viewFiles": {
+    "title": "Files in {{name}}",
+    "found": "{{amount}} files found"
+  }
+}

@@ -1,0 +1,373 @@
+{
+  "admin": {
+    "title": "Administrador",
+    "links": {
+      "metrics": {
+        "label": "Métricas",
+        "description": "Gráficos de uso e estatísticas de toda a instância"
+      },
+      "actions": {
+        "label": "Ações",
+        "description": "Ferramentas de manutenção e importação/exportação"
+      },
+      "users": {
+        "label": "Usuários",
+        "description": "Gerencie usuários e cotas"
+      },
+      "settings": {
+        "label": "Configurações",
+        "description": "Configuração do servidor"
+      },
+      "invites": {
+        "label": "Convites",
+        "description": "Crie e gerencie códigos de convite"
+      }
+    },
+    "storage": {
+      "title": "Armazenamento",
+      "refresh": "Atualizar estatísticas de armazenamento",
+      "loadFailed": "Falha ao carregar o armazenamento",
+      "used": "{{used}} usados"
+    },
+    "version": {
+      "title": "Versão",
+      "loadFailed": "Não foi possível carregar as informações da versão."
+    }
+  },
+  "page": {
+    "title": "Ações do servidor",
+    "description": "Ferramentas e scripts úteis para gerenciar o servidor."
+  },
+  "list": {
+    "importExport": {
+      "label": "Importar/exportar dados",
+      "description": "Permite importar ou exportar dados e configurações do servidor."
+    },
+    "clearTemporaryFiles": {
+      "label": "Limpar arquivos temporários",
+      "description": "Remove todos os arquivos temporários do diretório temporário."
+    },
+    "clearZeroByteFiles": {
+      "label": "Limpar arquivos de zero bytes",
+      "description": "Exclui do banco de dados e/ou do armazenamento todos os arquivos com zero bytes."
+    },
+    "requeryFileSizes": {
+      "label": "Recalcular tamanhos de arquivos",
+      "description": "Recalcula e atualiza o tamanho de todos os arquivos no banco de dados."
+    },
+    "generateThumbnails": {
+      "label": "Gerar miniaturas",
+      "description": "Cria miniaturas para todos os arquivos de imagem e vídeo que ainda não as têm."
+    }
+  },
+  "modals": {
+    "confirmDelete": "Sim, excluir",
+    "clearTemporaryFiles": {
+      "body": "Isso excluirá os arquivos temporários armazenados no diretório temporário (definido na configuração). Isso não deve causar problemas, a menos que ainda haja arquivos em processamento."
+    },
+    "clearZeroByteFiles": {
+      "body": "Arquivos que serão excluídos do banco de dados e da fonte de dados: {{count}}."
+    },
+    "requeryFileSizes": {
+      "body": "Isso recalculará o tamanho de cada arquivo armazenado no banco de dados. Você também pode usar as opções abaixo.",
+      "forceUpdate": {
+        "label": "Forçar atualização",
+        "description": "Força a atualização do tamanho de todos os arquivos, mesmo que já tenham um tamanho definido."
+      },
+      "forceDelete": {
+        "label": "Forçar exclusão",
+        "description": "Exclui arquivos que não são encontrados no banco de dados ou que têm tamanho 0."
+      },
+      "confirm": "Recalcular"
+    },
+    "generateThumbnails": {
+      "body": "Isso gerará miniaturas para todos os arquivos que não têm miniatura definida. Você também pode usar as opções abaixo.",
+      "rerun": {
+        "label": "Executar novamente",
+        "description": "Executa novamente a geração de miniaturas para todos os arquivos, tenham eles miniatura definida ou não."
+      },
+      "confirm": "Gerar"
+    }
+  },
+  "importExport": {
+    "title": "Importar/exportar dados",
+    "import": "Importar",
+    "upload": "Enviar exportação (JSON)",
+    "clear": "Limpar importação",
+    "clearAriaLabel": "Limpar",
+    "importData": "Importar dados",
+    "notifications": {
+      "invalid": {
+        "title": "Houve erros na importação"
+      },
+      "settingsFailed": {
+        "title": "Falha ao importar as configurações"
+      },
+      "settingsImported": {
+        "title": "Configurações importadas"
+      }
+    },
+    "export": {
+      "button": "Exportar dados",
+      "intro": "A exportação fornece um retrato completo dos dados e do ambiente do Zipline. Ela inclui:",
+      "items": {
+        "users": "<b>Usuários:</b> informações das contas, incluindo nomes de usuário, senhas (se houver), avatares, funções, configurações de visualização e segredos TOTP (se houver).",
+        "passkeys": "<b>Chaves de acesso:</b> chaves de acesso WebAuthn registradas, com datas de criação, data e hora do último uso e dados de registro das credenciais.",
+        "userQuotas": "<b>Cotas de usuários:</b> configurações de cota, como máx. de bytes, máx. de arquivos, máx. de links curtos e tipos de cota.",
+        "oauthProviders": "<b>Provedores OAuth:</b> contas OAuth vinculadas, incluindo tipo de provedor, tokens e IDs OAuth.",
+        "userTags": "<b>Etiquetas de usuários:</b> etiquetas criadas pelos usuários, incluindo nomes, cores e IDs dos arquivos associados.",
+        "files": "<b>Arquivos:</b> metadados dos arquivos enviados, incluindo tamanho, tipo, datas, expiração, visualizações, proteção por senha, proprietário e pasta associada.<i> (O conteúdo dos arquivos não é incluído.)</i>",
+        "folders": "<b>Pastas:</b> metadados das pastas, incluindo configurações de visibilidade, permissões de envio, listas de arquivos e proprietário.",
+        "urls": "<b>Links curtos:</b> metadados dos links curtos, incluindo destinos, nomes personalizados, contagem de visualizações, senhas e usuários atribuídos.",
+        "thumbnails": "<b>Miniaturas:</b> caminho da miniatura e ID do arquivo associado.<i> (Os dados das imagens não são incluídos.)</i>",
+        "invites": "<b>Convites:</b> códigos de convite, datas de criação/expiração e contagem de usos.",
+        "metrics": "<b>Métricas:</b> estatísticas do sistema e de uso armazenadas internamente pelo Zipline."
+      },
+      "systemIntro": "Além disso, a exportação inclui <b>informações específicas do sistema</b>:",
+      "systemItems": {
+        "cpuCount": "<b>Número de CPUs:</b> quantidade de núcleos de processador disponíveis.",
+        "hostname": "<b>Nome do host:</b> identificador de rede do sistema host.",
+        "architecture": "<b>Arquitetura:</b> arquitetura de hardware (por exemplo, <code>x64</code>, <code>arm64</code>).",
+        "platform": "<b>Plataforma:</b> plataforma do sistema operacional (por exemplo, <code>linux</code>, <code>darwin</code>).",
+        "osRelease": "<b>Versão do SO:</b> versão do sistema operacional ou do kernel.",
+        "env": "<b>Variáveis de ambiente:</b> um retrato completo das variáveis de ambiente no momento da exportação.",
+        "versions": "<b>Versões:</b> versão do Zipline, versão do Node e versão do formato de exportação."
+      },
+      "excludeMetrics": {
+        "label": "Não incluir dados de métricas",
+        "description": "Deixa as métricas do sistema e de uso fora da exportação. Isso pode reduzir o tamanho do arquivo exportado."
+      },
+      "warning": {
+        "title": "Atenção",
+        "message": "Esta exportação contém uma quantidade significativa de dados sensíveis, incluindo contas de usuários, credenciais de autenticação, variáveis de ambiente e metadados do sistema. Guarde este arquivo com segurança e não o compartilhe com terceiros não confiáveis."
+      },
+      "download": "Baixar exportação"
+    },
+    "v3": {
+      "title": "Importar dados da V3",
+      "invalidMessage": "O Zipline não conseguiu validar os dados de importação. Tem certeza de que é uma exportação válida do Zipline v3? Para mais detalhes sobre o erro, verifique o console do navegador.",
+      "confirm": {
+        "message": "Este processo NÃO substituirá os dados existentes, apenas acrescentará novos dados a eles. Em caso de conflito, os dados importados serão ignorados e registrados em log. Ao usar uma exportação da versão 3, todo o processo de importação deve ser concluído logo após a configuração do Zipline."
+      },
+      "importing": {
+        "title": "Importando dados",
+        "message": "O arquivo de exportação será enviado. Isso pode levar alguns instantes. O processo é executado em segundo plano e registrado em log, então você pode fechar esta guia do navegador."
+      },
+      "failed": {
+        "title": "Falha ao importar os dados",
+        "message": "Ocorreu um erro ao importar os dados. Verifique os logs do Zipline para mais detalhes."
+      },
+      "imported": {
+        "title": "Dados importados",
+        "message": "Os dados foram importados com sucesso. Se houve conflitos, eles foram registrados em log.",
+        "stats": {
+          "users": "<b>Usuários: </b> {{count}}",
+          "folders": "<b>Pastas: </b> {{count}}",
+          "urls": "<b>Links curtos: </b> {{count}}",
+          "files": "<b>Arquivos: </b> {{count}}"
+        }
+      },
+      "noUsers": {
+        "title": "Nenhum usuário importado",
+        "message": "Nenhum usuário foi importado, provavelmente porque a exportação contém nomes de usuário que já existem nesta instância do Zipline. Verifique os logs do Zipline para mais detalhes. Arquivos, pastas e links curtos também podem não ter sido importados."
+      },
+      "filesImported": {
+        "message": "Arquivos importados: {{count}}. Como esta importação não copia os arquivos, você precisará movê-los da instância onde estão armazenados para a instância atual do Zipline. O script <code>import-dir</code> pode ser útil para isso se você usar armazenamento em diretório. Se você usa S3, pode usar o mesmo bucket nesta instância.",
+        "important": {
+          "title": "Importante",
+          "message": "Após a importação, exclua o arquivo de exportação ou guarde-o com segurança, pois ele contém informações sensíveis, como senhas e tokens OAuth."
+        },
+        "settings": {
+          "title": "Configurações importadas",
+          "message": "As configurações importadas foram aplicadas. Recomendamos recarregar a página para garantir que elas sejam aplicadas corretamente."
+        },
+        "okay": "OK"
+      },
+      "importSettings": {
+        "description": "Esta opção permite importar configurações compatíveis da sua instância para esta instância v4."
+      },
+      "userChoose": {
+        "description": "Esta opção permite importar os dados de um usuário da sua exportação para o usuário conectado no momento, mesmo que ambos tenham o mesmo nome de usuário. Normalmente, o sistema ignora a importação de usuários cujos nomes já existem no banco de dados. No entanto, se você acabou de configurar sua instância e reutilizou o mesmo nome de usuário da instância antiga, esta opção permite mesclar os dados desse usuário na sua conta conectada sem precisar excluí-la ou substituí-la. <b>Recomendamos selecionar um usuário com permissões de superadministrador para esta operação.</b>"
+      }
+    },
+    "v4": {
+      "title": "Importar dados da V4",
+      "invalidMessage": "O Zipline não conseguiu validar os dados de importação. Tem certeza de que é uma exportação válida do Zipline v4? Para mais detalhes sobre o erro, verifique o console do navegador.",
+      "settingsImportedMessage": "Para garantir que todas as configurações entrem em vigor, recomendamos reiniciar o Zipline.",
+      "sameInstance": {
+        "title": "Mesma instância detectada",
+        "modalBody": "Detectamos que você está importando dados da mesma instância que está em execução. Você precisa aceitar o aviso antes de continuar com a importação.",
+        "description": "Detectamos que você está importando dados da mesma instância que está em execução. Continuar com esta importação pode causar conflitos de dados ou sobrescrever dados existentes. Certifique-se de entender as implicações antes de continuar.",
+        "agree": "Eu concordo e entendo as implicações."
+      },
+      "confirm": {
+        "message": "Este processo NÃO substituirá os dados existentes, apenas acrescentará novos dados a eles. Em caso de conflito, os dados importados serão ignorados e registrados em log.",
+        "label": "Sim, importar dados."
+      },
+      "importing": {
+        "title": "Importando dados...",
+        "message": "O arquivo de exportação será enviado. Isso pode levar alguns instantes. A importação é executada em segundo plano e registrada em log, então você pode fechar esta guia do navegador se quiser."
+      },
+      "failed": {
+        "title": "Falha ao importar os dados...",
+        "message": "Ocorreu um erro ao importar os dados. Verifique os logs para mais detalhes."
+      },
+      "completed": {
+        "title": "Importação concluída.",
+        "message": "A importação foi concluída. Para que os arquivos possam ser visualizados corretamente, verifique se a fonte de dados está configurada de acordo com a instância anterior. Por exemplo, se você usava armazenamento local, defina o mesmo diretório (ou o mesmo diretório de backup) de antes. Se você usa S3, verifique se está usando o mesmo bucket. <br/> <br/>Além disso, recomendamos reiniciar o Zipline para garantir que todas as configurações entrem em vigor.",
+        "stats": {
+          "users": "<b>Usuários importados: </b>{{count}}.",
+          "oauthProviders": "<b>Provedores OAuth importados: </b>{{count}}.",
+          "quotas": "<b>Cotas importadas: </b>{{count}}.",
+          "passkeys": "<b>Chaves de acesso importadas: </b>{{count}}.",
+          "folders": "<b>Pastas importadas: </b>{{count}}.",
+          "files": "<b>Arquivos importados: </b>{{count}}.",
+          "tags": "<b>Etiquetas importadas: </b>{{count}}.",
+          "urls": "<b>Links curtos importados: </b>{{count}}.",
+          "invites": "<b>Convites importados: </b>{{count}}.",
+          "metrics": "<b>Métricas importadas: </b>{{count}}."
+        }
+      },
+      "importSettings": {
+        "description": "Importe todas as configurações da sua instância anterior para esta instância v4.<br/>Após a importação, recomendamos reiniciar o Zipline para que todas as configurações entrem em vigor.",
+        "show": "Mostrar configurações a importar",
+        "hide": "Ocultar configurações a importar"
+      },
+      "userChoose": {
+        "description": "Esta opção permite importar os dados de um usuário da sua exportação para o usuário conectado no momento, mesmo que ambos tenham o mesmo nome de usuário. Normalmente, o sistema ignora a importação de usuários cujos nomes já existem no sistema. <br/> <br/> <b>No entanto</b>, se você acabou de configurar sua instância e reutilizou o mesmo nome de usuário da instância antiga, esta opção permite mesclar os dados desse usuário na sua conta conectada sem precisar excluí-la ou substituí-la. <b>Recomendamos selecionar um usuário com permissões de superadministrador para esta operação.</b>"
+      }
+    },
+    "importSettings": {
+      "title": "Importar configurações?",
+      "count": "Importar configurações ({{count}})"
+    },
+    "userChoose": {
+      "title": "Selecione o usuário cujos dados serão importados para o usuário atual.",
+      "superAdministrator": "Superadministrador",
+      "noMerge": {
+        "label": "Não mesclar dados",
+        "description": "Selecione esta opção se não quiser mesclar os dados de nenhum usuário no usuário atual."
+      }
+    },
+    "details": {
+      "notice": "Estes dados não são enviados ao servidor. Eles são interpretados e exibidos no navegador. Os dados só são enviados ao servidor quando você clica no botão \"Importar\".",
+      "unknown": "desconhecido",
+      "version": {
+        "title": "Detalhes da versão",
+        "exportVersion": "Versão da exportação:"
+      },
+      "request": {
+        "title": "Detalhes da requisição",
+        "user": "Usuário:",
+        "at": "Em:",
+        "showOs": "Mostrar detalhes do SO",
+        "hideOs": "Ocultar detalhes do SO",
+        "showEnv": "Mostrar ambiente",
+        "hideEnv": "Ocultar ambiente"
+      },
+      "table": {
+        "key": "Chave",
+        "value": "Valor"
+      },
+      "roles": {
+        "user": "Usuário",
+        "admin": "Admin",
+        "superAdmin": "Superadmin"
+      },
+      "users": {
+        "title": "Usuários",
+        "empty": "Nenhum usuário encontrado (como?)",
+        "columns": {
+          "id": "ID",
+          "username": "Nome de usuário",
+          "password": "Senha",
+          "passwordQuestion": "Senha?",
+          "role": "Função",
+          "oauthProviders": "Provedores OAuth",
+          "quota": "Cota",
+          "passkeys": "Chaves de acesso",
+          "admin": "Admin",
+          "superAdmin": "Superadmin",
+          "avatar": "Avatar",
+          "oauth": "OAuth",
+          "totp": "2FA (TOTP)",
+          "files": "Arquivos"
+        }
+      },
+      "oauthProviders": {
+        "title": "Provedores OAuth dos usuários",
+        "empty": "Nenhum provedor OAuth de usuário encontrado",
+        "columns": {
+          "user": "Usuário",
+          "provider": "Provedor",
+          "oauthUsername": "Nome de usuário OAuth",
+          "oauthId": "ID OAuth"
+        }
+      },
+      "files": {
+        "title": "Arquivos",
+        "empty": "Nenhum arquivo encontrado",
+        "columns": {
+          "name": "Nome",
+          "originalName": "Nome original",
+          "type": "Tipo",
+          "createdAt": "Criado em",
+          "password": "Senha",
+          "size": "Tamanho",
+          "owner": "Proprietário",
+          "views": "Visualizações"
+        }
+      },
+      "tags": {
+        "title": "Etiquetas de usuários",
+        "empty": "Nenhuma etiqueta de usuário encontrada",
+        "columns": {
+          "user": "Usuário",
+          "name": "Nome",
+          "files": "Arquivos"
+        }
+      },
+      "folders": {
+        "title": "Pastas",
+        "empty": "Nenhuma pasta encontrada",
+        "columns": {
+          "name": "Nome",
+          "owner": "Proprietário",
+          "public": "Pública",
+          "createdAt": "Criada em",
+          "files": "Arquivos"
+        }
+      },
+      "urls": {
+        "title": "Links curtos",
+        "empty": "Nenhum link curto encontrado",
+        "columns": {
+          "code": "Código",
+          "owner": "Proprietário",
+          "destination": "Destino",
+          "vanity": "Nome personalizado",
+          "password": "Senha",
+          "createdAt": "Criado em"
+        }
+      },
+      "invites": {
+        "title": "Convites",
+        "empty": "Nenhum convite encontrado",
+        "columns": {
+          "code": "Código",
+          "createdBy": "Criado por",
+          "createdAt": "Criado em",
+          "uses": "Usos"
+        }
+      },
+      "metrics": {
+        "title": "Métricas",
+        "totalEntries": "Total de registros de métricas:",
+        "latestEntry": "Registro de métricas mais recente:"
+      },
+      "other": {
+        "title": "Outros"
+      }
+    }
+  }
+}

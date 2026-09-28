@@ -5,9 +5,11 @@ import { IconLink } from '@tabler/icons-react';
 import useSWR from 'swr';
 import InviteCard from '../InviteCard';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import QRCodeModal from '@/components/QRCodeModal';
 
 export default function InviteGridView() {
+  const { t } = useTranslation('invites');
   const { data: invites, isLoading } =
     useSWR<Extract<Response['/api/auth/invites'], Invite[]>>('/api/auth/invites');
 
@@ -57,10 +59,10 @@ export default function InviteGridView() {
             <Stack>
               <Group>
                 <IconLink size='2rem' />
-                <Title order={2}>No invites found</Title>
+                <Title order={2}>{t('empty.title')}</Title>
               </Group>
               <Text size='sm' c='dimmed'>
-                Create an invite to see them here.
+                {t('empty.description')}
               </Text>
             </Stack>
           </Center>

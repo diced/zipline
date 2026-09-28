@@ -1,0 +1,75 @@
+{
+  "title": "招待",
+  "create": {
+    "title": "招待の作成",
+    "expiresAt": {
+      "label": "有効期限",
+      "description": "この招待の有効期限を選択してください。期限を設けない場合は「無期限」を選択してください。",
+      "placeholder": "有効期限を選択..."
+    },
+    "maxUses": {
+      "label": "最大使用回数",
+      "description": "この招待の最大使用回数を設定します。無制限にする場合は空欄のままにしてください。",
+      "placeholder": "数値を入力..."
+    }
+  },
+  "expirations": {
+    "never": "無期限",
+    "minutes30": "30 分",
+    "hour1": "1 時間",
+    "hours6": "6 時間",
+    "hours12": "12 時間",
+    "day1": "1 日",
+    "days3": "3 日",
+    "days5": "5 日",
+    "days7": "7 日"
+  },
+  "notifications": {
+    "created": {
+      "title": "招待を作成しました",
+      "message": "招待 {{code}} を作成しました。"
+    },
+    "deleteFailed": {
+      "title": "招待を削除できませんでした"
+    },
+    "deleted": {
+      "title": "招待を削除しました",
+      "message": "招待 {{code}} を削除しました。"
+    }
+  },
+  "delete": {
+    "message": "招待 {{code}} を削除してもよろしいですか？この操作は元に戻せません。",
+    "confirm": "{{code}} を削除"
+  },
+  "card": {
+    "copyUrl": "URL をコピー",
+    "showQrCode": "QR コードを表示",
+    "createdBy": "作成者:",
+    "created": "作成日時:",
+    "expires": "有効期限:",
+    "maxUses": "最大使用回数:",
+    "uses": "使用回数:",
+    "unlimited": "無制限"
+  },
+  "empty": {
+    "title": "招待が見つかりません",
+    "description": "招待を作成するとここに表示されます。"
+  },
+  "table": {
+    "columns": {
+      "code": "コード",
+      "createdBy": "作成者",
+      "created": "作成日時",
+      "updatedAt": "最終更新日時",
+      "expires": "有効期限",
+      "maxUses": "最大使用回数",
+      "uses": "使用回数",
+      "actions": "操作"
+    },
+    "never": "無期限",
+    "unlimited": "無制限",
+    "copyLink": "招待リンクをコピー",
+    "showQrCode": "QR コードを表示",
+    "delete": "招待を削除"
+  }
+}

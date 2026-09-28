@@ -1,0 +1,549 @@
+{
+  "sections": {
+    "core": {
+      "name": "コア",
+      "description": "サーバーの全般的な設定"
+    },
+    "chunks": {
+      "name": "チャンク",
+      "description": "分割アップロード"
+    },
+    "discord": {
+      "name": "Discord",
+      "description": "Discord Webhook との連携"
+    },
+    "domains": {
+      "name": "ドメイン",
+      "description": "カスタムドメインを追加"
+    },
+    "features": {
+      "name": "機能",
+      "description": "さまざまな機能を設定"
+    },
+    "files": {
+      "name": "ファイル",
+      "description": "ファイルのアップロードに関する設定"
+    },
+    "httpWebhook": {
+      "name": "HTTP Webhook",
+      "description": "特定のイベント発生時に URL へ POST リクエストを送信"
+    },
+    "invites": {
+      "name": "招待",
+      "description": "招待に関する設定"
+    },
+    "mfa": {
+      "name": "多要素認証",
+      "description": "パスキーと TOTP 認証の有効化または無効化"
+    },
+    "oauth": {
+      "name": "OAuth",
+      "description": "認証に使用する OAuth プロバイダーを設定"
+    },
+    "pwa": {
+      "name": "PWA",
+      "description": "プログレッシブ Web アプリの設定"
+    },
+    "ratelimit": {
+      "name": "レート制限",
+      "description": "API のレート制限を設定"
+    },
+    "tasks": {
+      "name": "タスク",
+      "description": "バックグラウンドタスクの実行間隔"
+    },
+    "urls": {
+      "name": "URL 短縮",
+      "description": "URL 短縮に関する設定"
+    },
+    "website": {
+      "name": "Web サイト",
+      "description": "タイトルや説明など Web サイトに関する設定"
+    },
+    "settings": {
+      "name": "サーバー設定"
+    }
+  },
+  "invalidSection": "設定のセクションが無効です",
+  "environmentOverrides": {
+    "title": "環境変数による上書き",
+    "description": "一部の設定は環境変数で管理されているため、ここでは変更できません。"
+  },
+  "notifications": {
+    "saveFailed": {
+      "title": "設定を保存できませんでした"
+    },
+    "saved": {
+      "message": "設定を保存しました"
+    }
+  },
+  "core": {
+    "returnHttpsUrls": {
+      "label": "HTTPS の URL を返す",
+      "description": "HTTPS プロトコルの URL を返します。"
+    },
+    "trustProxy": {
+      "label": "プロキシを信頼",
+      "description": "下に記載した信頼済みプロキシからの X-Forwarded-* ヘッダーを信頼します。サーバーの再起動が必要です。"
+    },
+    "trustedProxies": {
+      "label": "信頼済みプロキシ",
+      "description": "リバースプロキシの IPv4/IPv6 アドレスまたは CIDR をカンマ区切りで入力します。クライアントのネットワークではなく、信頼できるプロキシのみを含めてください。リストが空の場合、転送ヘッダーは無視され、同じプロキシの背後にあるクライアント間でレート制限が共有されます。サーバーの再起動が必要です。"
+    },
+    "defaultDomain": {
+      "label": "既定のドメイン",
+      "description": "URL の生成時に使用するドメインです。この値にプロトコルを含めないでください。"
+    },
+    "tempDirectory": {
+      "label": "一時ディレクトリ",
+      "description": "一時ファイルを保存するディレクトリです。パスが無効な場合、一部の機能が動作しなくなる可能性があります。サーバーの再起動が必要です。"
+    }
+  },
+  "chunks": {
+    "enabled": {
+      "label": "チャンクを有効化",
+      "description": "分割アップロードを有効にします。"
+    },
+    "max": {
+      "label": "最大チャンクサイズ",
+      "description": "チャンクに分割されるまでのアップロードの最大サイズです。"
+    },
+    "size": {
+      "label": "チャンクサイズ",
+      "description": "各チャンクのサイズです。"
+    }
+  },
+  "discord": {
+    "main": {
+      "webhookUrl": {
+        "label": "Webhook URL",
+        "description": "通知の送信先となる Discord の Webhook URL です"
+      },
+      "username": {
+        "label": "ユーザー名",
+        "description": "通知の送信者として表示するユーザー名です"
+      },
+      "avatarUrl": {
+        "label": "アバターの URL",
+        "description": "Webhook のアバターです"
+      }
+    },
+    "onUpload": {
+      "title": "アップロード時"
+    },
+    "onShorten": {
+      "title": "短縮時"
+    },
+    "notification": {
+      "webhookUrl": {
+        "label": "Webhook URL",
+        "description": "通知の送信先となる Discord の Webhook URL です。空欄の場合は、メインの Webhook URL が使用されます"
+      },
+      "username": {
+        "label": "ユーザー名",
+        "description": "通知の送信者として表示するユーザー名です。空欄の場合は、メインのユーザー名が使用されます"
+      },
+      "avatarUrl": {
+        "label": "アバターの URL",
+        "description": "Webhook のアバターです。空欄の場合は、メインのアバターが使用されます"
+      },
+      "content": {
+        "label": "内容",
+        "description": "通知の内容です。空欄でもかまいませんが、内容と埋め込みのいずれかのフィールドは入力する必要があります"
+      },
+      "embed": {
+        "label": "埋め込み",
+        "description": "通知を埋め込みとして送信します。下でさらに細かくカスタマイズできるようになります。"
+      }
+    },
+    "embed": {
+      "title": {
+        "label": "タイトル",
+        "description": "埋め込みのタイトルです"
+      },
+      "description": {
+        "label": "説明",
+        "description": "埋め込みの説明です"
+      },
+      "footer": {
+        "label": "フッター",
+        "description": "埋め込みのフッターです"
+      },
+      "color": {
+        "label": "色",
+        "description": "埋め込みの色です"
+      },
+      "thumbnail": {
+        "label": "サムネイル",
+        "description": "埋め込みにサムネイルを表示します (画像の場合はファイル自体が表示されます)"
+      },
+      "imageOrVideo": {
+        "label": "画像/動画",
+        "description": "埋め込みに画像または動画を表示します"
+      },
+      "timestamp": {
+        "label": "タイムスタンプ",
+        "description": "埋め込みにタイムスタンプを表示します"
+      },
+      "url": {
+        "label": "URL",
+        "description": "タイトルをクリック可能にし、ファイルの URL にリンクします"
+      }
+    }
+  },
+  "domains": {
+    "input": {
+      "description": "ドメイン名を入力"
+    },
+    "errors": {
+      "exists": "このドメインは既に存在します",
+      "updateFailed": "ドメインを更新できませんでした"
+    },
+    "table": {
+      "columns": {
+        "domain": "ドメイン"
+      }
+    },
+    "empty": "ドメインはまだ追加されていません。"
+  },
+  "features": {
+    "imageCompression": {
+      "label": "画像の圧縮",
+      "description": "ユーザーが画像を圧縮できるようにします。"
+    },
+    "robotsTxt": {
+      "description": "/robots.txt を有効にして検索エンジンのクローラーをブロックします。サーバーの再起動が必要です。"
+    },
+    "healthcheck": {
+      "label": "ヘルスチェック",
+      "description": "稼働状況の監視用にヘルスチェックのルートを有効にします。サーバーの再起動が必要です。"
+    },
+    "userRegistration": {
+      "label": "ユーザー登録",
+      "description": "ユーザーがサーバーでアカウントを登録できるようにします。"
+    },
+    "oauthRegistration": {
+      "label": "OAuth 登録",
+      "description": "ユーザーが OAuth プロバイダーを使用してアカウントを登録できるようにします。"
+    },
+    "deleteOnMaxViews": {
+      "label": "最大閲覧数で削除",
+      "description": "ファイルや短縮 URL が最大閲覧数に達すると自動的に削除します。サーバーの再起動が必要です。"
+    },
+    "metricsEnabled": {
+      "label": "メトリクスを有効化",
+      "description": "サーバーのメトリクスを有効にします。サーバーの再起動が必要です。"
+    },
+    "metricsAdminOnly": {
+      "label": "メトリクスを管理者のみに限定",
+      "description": "メトリクスの表示に管理者権限を必要とします。"
+    },
+    "metricsShowUserSpecific": {
+      "label": "ユーザー別のメトリクスを表示",
+      "description": "すべてのユーザーについて、ユーザーごとのメトリクスを表示します。"
+    },
+    "dividers": {
+      "thumbnails": "サムネイル",
+      "versionChecking": "バージョンチェック"
+    },
+    "thumbnailsEnabled": {
+      "label": "サムネイルを有効化",
+      "description": "動画のサムネイル生成を有効にします。サーバーの再起動が必要です。"
+    },
+    "thumbnailsInstantaneous": {
+      "label": "サムネイルを即時生成",
+      "description": "タスクの実行を待たずに、ファイルのアップロード直後にサムネイルを生成します。"
+    },
+    "thumbnailsNumberThreads": {
+      "label": "サムネイル生成のスレッド数",
+      "description": "サムネイルの生成に使用するスレッド数です。通常は CPU のスレッド数を指定します。サーバーの再起動が必要です。",
+      "placeholder": "数値を入力..."
+    },
+    "thumbnailsFormat": {
+      "label": "サムネイルの形式",
+      "description": "サムネイルの出力形式です。サーバーの再起動が必要です。"
+    },
+    "versionChecking": {
+      "label": "バージョンチェック",
+      "description": "GitHub で更新を確認し、すべてのユーザーのサイドバーに状況を表示します。"
+    }
+  },
+  "files": {
+    "assumeMimetypes": {
+      "label": "MIME タイプを推測",
+      "description": "ファイルの MIME タイプを拡張子から推測します。"
+    },
+    "disabledTypes": {
+      "label": "無効にする MIME タイプ",
+      "description": "無効にする MIME タイプをカンマ区切りで指定します。MIME タイプを無効にする場合は、対応する拡張子のファイルもブロックされるように「MIME タイプを推測」設定を有効にすることをお勧めします。"
+    },
+    "disabledTypesDefault": {
+      "label": "無効な MIME タイプの既定値",
+      "description": "無効にした MIME タイプに使用する既定の MIME タイプです。無効にした MIME タイプを完全にブロックする場合は空欄のままにしてください。"
+    },
+    "removeGpsMetadata": {
+      "label": "GPS メタデータを削除",
+      "description": "ファイルから GPS メタデータを削除します。"
+    },
+    "extensionlessUrls": {
+      "label": "拡張子なしの URL",
+      "description": "拡張子なしのファイルリンクを許可します (例: /u/uuid.png の代わりに /u/uuid)。アップロードの応答には引き続き拡張子が含まれます。"
+    },
+    "route": {
+      "label": "パス",
+      "description": "アップロードしたファイルの URL に使用するパスです。サーバーの再起動が必要です。"
+    },
+    "length": {
+      "label": "長さ",
+      "description": "ファイル名の長さです (ランダムに生成される名前の場合)。"
+    },
+    "defaultFormat": {
+      "label": "既定の形式",
+      "description": "ファイル名に使用する既定の形式です。"
+    },
+    "disabledExtensions": {
+      "label": "無効にする拡張子",
+      "description": "無効にする拡張子をカンマ区切りで指定します。"
+    },
+    "maxFileSize": {
+      "label": "最大ファイルサイズ",
+      "description": "許可される最大のファイルサイズです。"
+    },
+    "defaultDateFormat": {
+      "label": "既定の日付形式",
+      "description": "使用する既定の日付形式です。"
+    },
+    "defaultExpiration": {
+      "label": "既定の有効期限",
+      "description": "ファイルの既定の有効期限です。"
+    },
+    "maxExpiration": {
+      "label": "最長の有効期限",
+      "description": "ファイルに許可される最長の有効期限です。"
+    },
+    "randomWordsNumAdjectives": {
+      "label": "ランダム単語の形容詞の数",
+      "description": "random-words/gfycat 形式で使用する形容詞の数です。"
+    },
+    "randomWordsSeparator": {
+      "label": "ランダム単語の区切り文字",
+      "description": "random-words/gfycat 形式で使用する区切り文字です。"
+    },
+    "defaultCompressionFormat": {
+      "label": "既定の圧縮形式",
+      "description": "圧縮率のみが指定された場合に使用する、既定の画像圧縮形式です。"
+    },
+    "maxFilesPerUpload": {
+      "label": "1 回のアップロードあたりの最大ファイル数",
+      "description": "1 回のアップロードで許可されるファイルの最大数です。サーバーの再起動が必要です。"
+    }
+  },
+  "httpWebhook": {
+    "onUpload": {
+      "label": "アップロード時",
+      "description": "ファイルがアップロードされたときに POST リクエストを送信する URL です。"
+    },
+    "onShorten": {
+      "label": "短縮時",
+      "description": "URL が短縮されたときに POST リクエストを送信する URL です。"
+    }
+  },
+  "invites": {
+    "enabled": {
+      "label": "招待を有効化",
+      "description": "招待リンクによる新規ユーザーの登録を有効にします。"
+    },
+    "length": {
+      "label": "長さ",
+      "description": "招待コードの長さです。"
+    }
+  },
+  "mfa": {
+    "passkeysEnabled": {
+      "label": "パスキー",
+      "description": "スマートフォンやセキュリティキーなどの WebAuthn パスキーを使用した、パスワードなしのログインを有効にします。"
+    },
+    "passkeysRpId": {
+      "label": "リライングパーティ ID",
+      "description": "WebAuthn パスキーに使用するリライングパーティ ID (RP ID) です。"
+    },
+    "passkeysOrigin": {
+      "label": "オリジン",
+      "description": "WebAuthn パスキーに使用するオリジンです。"
+    },
+    "totpEnabled": {
+      "label": "TOTP を有効化",
+      "description": "認証アプリを使用した時間ベースのワンタイムパスワードを有効にします。"
+    },
+    "totpIssuer": {
+      "label": "発行者",
+      "description": "TOTP トークンに使用する発行者です。"
+    }
+  },
+  "oauth": {
+    "intro": "OAuth を機能させるには、<link>機能</link>セクションで「OAuth 登録」設定を有効にする必要があります。問題がある場合は、保存後に Zipline を再起動してみてください。",
+    "bypassLocalLogin": {
+      "label": "ローカルログインをスキップ",
+      "description": "ローカルのログインページをスキップして OAuth プロバイダーにリダイレクトします。有効なプロバイダーが 1 つの場合にのみ機能します。"
+    },
+    "loginOnly": {
+      "label": "ログインのみ",
+      "description": "OAuth による新規登録を無効にし、ログインのみを許可します。たとえば、既存のユーザーはプロバイダーを連携できます。"
+    },
+    "provider": {
+      "clientId": "{{provider}} クライアント ID",
+      "clientSecret": "{{provider}} クライアントシークレット",
+      "redirectUrl": {
+        "label": "{{provider}} リダイレクト URL",
+        "description": "ログイン時にホストの代わりに使用するリダイレクト URL です。Zipline が生成する URL が正しく機能する場合は不要です。"
+      }
+    },
+    "discord": {
+      "allowedIds": {
+        "label": "Discord の許可 ID",
+        "description": "ログインを許可する Discord ユーザー ID のカンマ区切りリストです。許可リストを無効にする場合は空欄のままにしてください。"
+      },
+      "deniedIds": {
+        "label": "Discord の拒否 ID",
+        "description": "ログインを拒否する Discord ユーザー ID のカンマ区切りリストです。拒否リストを無効にする場合は空欄のままにしてください。"
+      }
+    },
+    "oidc": {
+      "authorizeUrl": "OIDC 認可 URL",
+      "tokenUrl": "OIDC トークン URL",
+      "userinfoUrl": "OIDC ユーザー情報 URL"
+    }
+  },
+  "pwa": {
+    "intro": "PWA を有効にした後、ページを再読み込みすると変更が反映されます。",
+    "enabled": {
+      "label": "PWA を有効化",
+      "description": "ユーザーが Zipline の PWA をデバイスにインストールできるようにします。"
+    },
+    "title": {
+      "label": "タイトル",
+      "description": "PWA のタイトルです"
+    },
+    "shortName": {
+      "label": "短い名前",
+      "description": "PWA の短い名前です"
+    },
+    "description": {
+      "label": "説明",
+      "description": "PWA の説明です"
+    },
+    "themeColor": {
+      "label": "テーマカラー",
+      "description": "PWA のテーマカラーです"
+    },
+    "backgroundColor": {
+      "label": "背景色",
+      "description": "PWA の背景色です"
+    }
+  },
+  "ratelimit": {
+    "intro": "すべてのオプションは、再起動後に反映されます。",
+    "enabled": {
+      "label": "レート制限を有効化",
+      "description": "サーバーのレート制限を有効にします。"
+    },
+    "adminBypass": {
+      "label": "管理者を除外",
+      "description": "管理者をレート制限の対象外にします。"
+    },
+    "max": {
+      "label": "最大リクエスト数",
+      "description": "時間枠内で許可されるリクエストの最大数です。時間枠が設定されていない場合は、制限に達するまでのリクエストの最大数になります。"
+    },
+    "window": {
+      "label": "時間枠",
+      "description": "最大リクエスト数を許可する時間枠 (秒) です。"
+    },
+    "allowList": {
+      "label": "許可リスト",
+      "description": "レート制限の対象外とする IP アドレスのカンマ区切りリストです。"
+    }
+  },
+  "tasks": {
+    "intro": "すべてのオプションは、再起動後に反映されます。値を <code>0</code> に設定するとタスクは無効になります。",
+    "deleteInterval": {
+      "label": "ファイル削除の間隔",
+      "description": "期限切れのファイルを確認して削除する頻度です。"
+    },
+    "clearInvitesInterval": {
+      "label": "招待クリアの間隔",
+      "description": "期限切れまたは使用済みの招待を確認してクリアする頻度です。"
+    },
+    "maxViewsInterval": {
+      "label": "最大閲覧数チェックの間隔",
+      "description": "最大閲覧数に達したファイルを確認して削除する頻度です。"
+    },
+    "thumbnailsInterval": {
+      "label": "サムネイル生成の間隔",
+      "description": "動画ファイルを確認してサムネイルを生成する頻度です。"
+    },
+    "cleanThumbnailsInterval": {
+      "label": "サムネイル整理の間隔",
+      "description": "ファイルシステムまたはデータベースから孤立したサムネイルを確認して削除する頻度です。"
+    },
+    "metricsInterval": {
+      "label": "メトリクス収集の間隔",
+      "description": "メトリクスのデータを収集する頻度です。値を小さくするとメトリクスがより最新の状態になりますが、CPU 使用率が高くなる可能性があります。"
+    }
+  },
+  "urls": {
+    "route": {
+      "label": "パス",
+      "description": "短縮 URL に使用するパスです。サーバーの再起動が必要です。"
+    },
+    "length": {
+      "label": "長さ",
+      "description": "短縮 URL の長さです (ランダムに生成される名前の場合)。"
+    }
+  },
+  "website": {
+    "title": {
+      "label": "タイトル",
+      "description": "ブラウザーのタブと画面上部に表示される Web サイトのタイトルです。"
+    },
+    "titleLogo": {
+      "label": "タイトルのロゴ",
+      "description": "タイトルのロゴに使用する URL です。タイトルの左側に配置されます。"
+    },
+    "externalLinks": {
+      "label": "外部リンク",
+      "description": "フッターに表示する外部リンクです。\"name\" と \"url\" プロパティを持つオブジェクトの配列形式で、有効な JSON である必要があります。例: [{\"name\": \"GitHub\", \"url\": \"https://github.com/diced/zipline\"}]"
+    },
+    "errors": {
+      "invalidJson": "JSON が無効です"
+    },
+    "loginBackground": {
+      "label": "ログイン画面の背景",
+      "description": "ログイン画面の背景に使用する URL です。"
+    },
+    "loginBackgroundBlur": {
+      "label": "ログイン画面の背景のぼかし",
+      "description": "ログイン画面の背景をぼかすかどうかを指定します。"
+    },
+    "defaultAvatar": {
+      "label": "既定のアバター",
+      "description": "既定のアバターに使用するパスです。URL ではなく、画像へのパスを指定する必要があります。"
+    },
+    "tos": {
+      "label": "利用規約",
+      "description": "利用規約に使用する Markdown (.md) ファイルへのパスです。"
+    },
+    "defaultTheme": {
+      "label": "既定のテーマ",
+      "description": "Web サイトで使用する既定のテーマです。"
+    },
+    "darkTheme": {
+      "label": "ダークテーマ",
+      "description": "既定のテーマが「システム」の場合に Web サイトで使用するダークテーマです。"
+    },
+    "lightTheme": {
+      "label": "ライトテーマ",
+      "description": "既定のテーマが「システム」の場合に Web サイトで使用するライトテーマです。"
+    }
+  }
+}

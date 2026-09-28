@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react';
 
 import 'katex/dist/katex.min.css';
 import { Alert, Paper } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 
 export default function KaTeX({ tex }: { tex: string }) {
+  const { t } = useTranslation('file');
   const [html, setHtml] = useState('');
   const [error, setError] = useState<any>(null);
 
@@ -20,7 +22,7 @@ export default function KaTeX({ tex }: { tex: string }) {
 
   if (error) {
     return (
-      <Alert color='red' title='KaTeX error'>
+      <Alert color='red' title={t('render.katexError')}>
         {error.toString()}
       </Alert>
     );

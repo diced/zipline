@@ -1,9 +1,11 @@
 import type { File as DbFile } from '@/lib/db/models/file';
+import i18n from '@/lib/i18n';
 import useSWR from 'swr';
 import { isDbFile } from './useFileUrls';
 
 const MAX_BYTES = 1 * 1024 * 1024;
-const FILE_BIG = '\n...\nThe file is too big to display click the download icon to view/download it.';
+// resolved at read time so the notice follows the active language
+const fileBig = () => i18n.t('file:preview.tooBig');
 
 async function readBlobText(file: File) {
   const raw = await new Promise<string>((resolve, reject) => {
@@ -13,7 +15,7 @@ async function readBlobText(file: File) {
     reader.readAsText(file);
   });
 
-  return raw.length > MAX_BYTES ? raw.slice(0, MAX_BYTES) + FILE_BIG : raw;
+  return raw.length > MAX_BYTES ? raw.slice(0, MAX_BYTES) + fileBig() : raw;
 }
 
 async function readText(fileUrl: string) {
@@ -50,7 +52,7 @@ export default function useFileContent({
 
       if (file.size > MAX_BYTES) {
         const text = await readText(fileUrl);
-        return text + FILE_BIG;
+        return text + fileBig();
       }
 
       return readText(fileUrl);
@@ -61,7 +63,7 @@ export default function useFileContent({
     },
   );
 
-  if (error) return 'Error loading file.';
+  if (error) return i18n.t('file:preview.loadError');
 
   return data ?? '';
 }

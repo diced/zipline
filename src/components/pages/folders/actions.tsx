@@ -2,6 +2,7 @@ import { Response } from '@/lib/api/response';
 import { copyLink } from '@/lib/client/copyLink';
 import { Folder } from '@/lib/db/models/folder';
 import { fetchApi } from '@/lib/fetchApi';
+import i18n from '@/lib/i18n';
 import { getDomain } from '@/lib/client/webDomain';
 import { useClipboard } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
@@ -24,15 +25,17 @@ export async function editFolderVisibility(folder: Folder, isPublic: boolean) {
 
   if (error) {
     notifications.show({
-      title: 'Failed to edit folder visibility',
+      title: i18n.t('folders:notifications.visibilityFailed'),
       message: error.error,
       color: 'red',
       icon: <IconFolderOff size='1rem' />,
     });
   } else {
     notifications.show({
-      title: 'Folder visibility edited',
-      message: `${data?.name} is now ${isPublic ? 'public' : 'private'}`,
+      title: i18n.t('folders:notifications.visibilityEdited'),
+      message: isPublic
+        ? i18n.t('folders:notifications.nowPublic', { name: data?.name })
+        : i18n.t('folders:notifications.nowPrivate', { name: data?.name }),
       color: 'green',
       icon: <IconCheck size='1rem' />,
     });
@@ -52,15 +55,17 @@ export async function editFolderUploads(folder: Folder, allowUploads: boolean) {
 
   if (error) {
     notifications.show({
-      title: 'Failed to edit folder uploads policy',
+      title: i18n.t('folders:notifications.uploadsFailed'),
       message: error.error,
       color: 'red',
       icon: <IconFolderOff size='1rem' />,
     });
   } else {
     notifications.show({
-      title: 'Folder uploads policy edited',
-      message: `${data?.name} will ${allowUploads ? 'now' : 'no longer'} allow anonymous uploads`,
+      title: i18n.t('folders:notifications.uploadsEdited'),
+      message: allowUploads
+        ? i18n.t('folders:notifications.uploadsAllowed', { name: data?.name })
+        : i18n.t('folders:notifications.uploadsDisallowed', { name: data?.name }),
       color: 'green',
       icon: <IconCheck size='1rem' />,
     });

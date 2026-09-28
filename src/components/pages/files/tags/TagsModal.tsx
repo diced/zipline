@@ -6,6 +6,7 @@ import { ActionIcon, Group, Modal, Paper, Stack, Text, Title, Tooltip } from '@m
 import { showNotification } from '@mantine/notifications';
 import { IconPencil, IconPlus, IconTagOff, IconTrashFilled } from '@tabler/icons-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import useSWR from 'swr';
 import { DashboardFilesModals, DashboardFilesModalsUpdate } from '..';
 import CreateTagModal from './CreateTagModal';
@@ -19,6 +20,7 @@ export default function TagsModals({
   modals: DashboardFilesModals;
   setModals: DashboardFilesModalsUpdate;
 }) {
+  const { t } = useTranslation(['files', 'common']);
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
 
@@ -29,15 +31,15 @@ export default function TagsModals({
 
     if (error) {
       showNotification({
-        title: 'Error',
-        message: `Failed to delete tag: ${error.error}`,
+        title: t('common:status.error'),
+        message: t('tags.notifications.deleteFailed', { error: error.error }),
         color: 'red',
         icon: <IconTagOff size='1rem' />,
       });
     } else {
       showNotification({
-        title: 'Deleted tag',
-        message: `Deleted tag ${tag.name}`,
+        title: t('tags.notifications.deleted'),
+        message: t('tags.notifications.deletedMessage', { name: tag.name }),
         color: 'green',
         icon: <IconTrashFilled size='1rem' />,
       });
@@ -57,7 +59,7 @@ export default function TagsModals({
         onClose={() => setModals({ tags: false })}
         title={
           <Group>
-            <Title>Tags</Title>
+            <Title>{t('tags.title')}</Title>
             <ActionIcon variant='outline' onClick={() => setCreateModalOpen(true)}>
               <IconPlus size='1rem' />
             </ActionIcon>
@@ -73,18 +75,18 @@ export default function TagsModals({
                   <TagPill tag={tag} />
 
                   <Text size='sm' c='dimmed'>
-                    {tag.files!.length} file{tag.files!.length === 1 ? '' : 's'}
+                    {t('tags.fileCount', { count: tag.files!.length })}
                   </Text>
                 </Group>
 
                 <Group>
-                  <Tooltip label='Edit tag'>
+                  <Tooltip label={t('tags.edit')}>
                     <ActionIcon variant='outline' onClick={() => setSelectedTag(tag)}>
                       <IconPencil size='1rem' />
                     </ActionIcon>
                   </Tooltip>
 
-                  <Tooltip label='Delete tag'>
+                  <Tooltip label={t('tags.delete')}>
                     <ActionIcon variant='outline' color='red' onClick={() => handleDelete(tag)}>
                       <IconTrashFilled size='1rem' />
                     </ActionIcon>
@@ -95,7 +97,7 @@ export default function TagsModals({
 
           {tags?.length === 0 && (
             <Paper withBorder px='sm' py='xs'>
-              No tags. Create one by clicking the plus icon.
+              {t('tags.empty')}
             </Paper>
           )}
         </Stack>

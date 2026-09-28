@@ -1,0 +1,132 @@
+{
+  "title": "Enlaces cortos",
+  "create": {
+    "title": "Acortar URL",
+    "url": {
+      "label": "URL",
+      "required": "La URL es obligatoria",
+      "invalid": "URL no válida"
+    },
+    "vanity": {
+      "label": "Nombre personalizado",
+      "description": "Campo opcional. Déjelo en blanco para generar un código aleatorio"
+    },
+    "maxViews": {
+      "label": "Vistas máx.",
+      "description": "Campo opcional. Déjelo en blanco para no establecer un límite de vistas."
+    },
+    "domain": {
+      "label": "Reemplazar dominio"
+    },
+    "enabled": {
+      "label": "Habilitado",
+      "description": "Permite o impide que se visite este enlace corto"
+    },
+    "password": {
+      "label": "Contraseña",
+      "description": "Proteja su enlace con una contraseña"
+    }
+  },
+  "shortened": {
+    "title": "URL acortada",
+    "open": "Abrir enlace en una pestaña nueva",
+    "copy": "Copiar enlace al portapapeles"
+  },
+  "notifications": {
+    "shortenFailed": {
+      "title": "No se pudo acortar la URL"
+    },
+    "copied": {
+      "title": "URL copiada al portapapeles"
+    },
+    "deleteFailed": {
+      "title": "No se pudo eliminar el enlace corto"
+    },
+    "deleted": {
+      "title": "Enlace corto eliminado",
+      "message": "Se eliminó el enlace corto {{code}}"
+    },
+    "removePasswordFailed": {
+      "title": "No se pudo quitar la contraseña..."
+    },
+    "passwordRemoved": {
+      "title": "¡Contraseña quitada!",
+      "message": "Se quitó la contraseña del enlace corto."
+    },
+    "saveFailed": {
+      "title": "No se pudieron guardar los cambios..."
+    },
+    "saved": {
+      "title": "¡Cambios guardados!",
+      "message": "Los cambios se guardaron correctamente."
+    }
+  },
+  "delete": {
+    "message": "¿Está seguro de que desea eliminar {{code}}? Esta acción no se puede deshacer.",
+    "confirm": "Eliminar \"{{code}}\""
+  },
+  "edit": {
+    "title": "Editando \"{{name}}\"",
+    "unknown": "desconocido",
+    "maxViews": {
+      "label": "Vistas máx.",
+      "placeholder": "Ilimitadas",
+      "description": "El número máximo de clics que puede tener este enlace corto antes de eliminarse automáticamente. Déjelo en blanco para permitir vistas ilimitadas."
+    },
+    "vanity": {
+      "label": "Nombre personalizado",
+      "placeholder": "Opcional",
+      "description": "Un alias personalizado para su enlace corto. Déjelo en blanco para usar el código generado aleatoriamente."
+    },
+    "destination": {
+      "label": "Destino"
+    },
+    "enabled": {
+      "label": "Habilitado",
+      "description": "Impide o permite que se visite este enlace corto."
+    },
+    "password": {
+      "label": "Contraseña",
+      "description": "Establezca una contraseña para este enlace corto. Déjelo en blanco para deshabilitar la protección con contraseña.",
+      "remove": "Quitar contraseña"
+    },
+    "save": "Guardar cambios"
+  },
+  "card": {
+    "copyShortLink": "Copiar enlace corto",
+    "copyDestination": "Copiar destino",
+    "showQrCode": "Mostrar código QR",
+    "views": "Vistas:",
+    "enabled": "Habilitado:",
+    "created": "Creado:",
+    "updated": "Actualizado:",
+    "destination": "Destino:",
+    "openDestination": "Abrir \"{{url}}\" en una pestaña nueva",
+    "code": "Código:"
+  },
+  "empty": {
+    "title": "No se encontraron enlaces cortos",
+    "description": "Acorte una URL para verla aquí"
+  },
+  "table": {
+    "columns": {
+      "code": "Código",
+      "vanity": "Nombre personalizado",
+      "destination": "Destino",
+      "views": "Vistas",
+      "maxViews": "Vistas máx.",
+      "created": "Creado",
+      "enabled": "Habilitado",
+      "actions": "Acciones"
+    },
+    "search": {
+      "code": "Buscar por código",
+      "vanity": "Buscar por nombre personalizado",
+      "destination": "Buscar por destino"
+    },
+    "copy": "Copiar URL",
+    "showQrCode": "Mostrar código QR",
+    "edit": "Editar enlace corto",
+    "delete": "Eliminar enlace corto"
+  }
+}

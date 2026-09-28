@@ -13,6 +13,7 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconDeviceFloppy } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { settingsOnSubmit } from '../settingsOnSubmit';
 import useServerSettings from '../useServerSettings';
@@ -32,6 +33,7 @@ export default function Discord() {
 
 function Form({ data, isLoading }: { data: Response['/api/server/settings']; isLoading: boolean }) {
   const navigate = useNavigate();
+  const { t } = useTranslation(['serverSettings', 'common']);
 
   const formMain = useForm({
     initialValues: {
@@ -138,55 +140,55 @@ function Form({ data, isLoading }: { data: Response['/api/server/settings']; isL
     <>
       <form onSubmit={formMain.onSubmit(onSubmitMain)}>
         <TextInput
-          label='Webhook URL'
-          description='The Discord webhook URL to send notifications to'
+          label={t('discord.main.webhookUrl.label')}
+          description={t('discord.main.webhookUrl.description')}
           placeholder='https://discord.com/api/webhooks/...'
           {...formMain.getInputProps('discordWebhookUrl')}
         />
 
         <SimpleGrid mt='md' cols={{ base: 1, md: 2 }} spacing='lg'>
           <TextInput
-            label='Username'
-            description='The username to send notifications as'
+            label={t('discord.main.username.label')}
+            description={t('discord.main.username.description')}
             {...formMain.getInputProps('discordUsername')}
           />
 
           <TextInput
-            label='Avatar URL'
-            description='The avatar for the webhook'
+            label={t('discord.main.avatarUrl.label')}
+            description={t('discord.main.avatarUrl.description')}
             placeholder='https://example.com/avatar.png'
             {...formMain.getInputProps('discordAvatarUrl')}
           />
         </SimpleGrid>
 
         <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
-          Save
+          {t('common:actions.save')}
         </Button>
       </form>
 
       <SimpleGrid mt='md' cols={{ base: 1, md: 2 }} spacing='lg'>
         <Paper withBorder p='sm'>
-          <Title order={3}>On Upload</Title>
+          <Title order={3}>{t('discord.onUpload.title')}</Title>
 
           <form onSubmit={formOnUpload.onSubmit(onSubmitNotif('upload'))}>
             <TextInput
               mt='md'
-              label='Webhook URL'
-              description='The Discord webhook URL to send notifications to. If this is left blank, the main webhook url will be used'
+              label={t('discord.notification.webhookUrl.label')}
+              description={t('discord.notification.webhookUrl.description')}
               placeholder='https://discord.com/api/webhooks/...'
               {...formOnUpload.getInputProps('discordOnUploadWebhookUrl')}
             />
 
             <SimpleGrid mt='md' cols={{ base: 1, md: 2 }} spacing='lg'>
               <TextInput
-                label='Username'
-                description='The username to send notifications as. If this is left blank, the main username will be used'
+                label={t('discord.notification.username.label')}
+                description={t('discord.notification.username.description')}
                 {...formOnUpload.getInputProps('discordOnUploadUsername')}
               />
 
               <TextInput
-                label='Avatar URL'
-                description='The avatar for the webhook. If this is left blank, the main avatar will be used'
+                label={t('discord.notification.avatarUrl.label')}
+                description={t('discord.notification.avatarUrl.description')}
                 placeholder='https://example.com/avatar.png'
                 {...formOnUpload.getInputProps('discordOnUploadAvatarUrl')}
               />
@@ -194,8 +196,8 @@ function Form({ data, isLoading }: { data: Response['/api/server/settings']; isL
 
             <Textarea
               mt='md'
-              label='Content'
-              description='The content of the notification. This can be blank, but at least one of the content or embed fields must be filled out'
+              label={t('discord.notification.content.label')}
+              description={t('discord.notification.content.description')}
               minRows={1}
               maxRows={7}
               {...formOnUpload.getInputProps('discordOnUploadContent')}
@@ -203,8 +205,8 @@ function Form({ data, isLoading }: { data: Response['/api/server/settings']; isL
 
             <Switch
               mt='md'
-              label='Embed'
-              description='Send the notification as an embed. This will allow for more customization below.'
+              label={t('discord.notification.embed.label')}
+              description={t('discord.notification.embed.description')}
               {...formOnUpload.getInputProps('discordOnUploadEmbed', { type: 'checkbox' })}
             />
 
@@ -212,50 +214,50 @@ function Form({ data, isLoading }: { data: Response['/api/server/settings']; isL
               <Paper withBorder p='sm' mt='md'>
                 <SimpleGrid cols={{ base: 1, md: 2 }} spacing='lg'>
                   <TextInput
-                    label='Title'
-                    description='The title of the embed'
+                    label={t('discord.embed.title.label')}
+                    description={t('discord.embed.title.description')}
                     {...formOnUpload.getInputProps('discordOnUploadEmbedTitle')}
                   />
 
                   <TextInput
-                    label='Description'
-                    description='The description of the embed'
+                    label={t('discord.embed.description.label')}
+                    description={t('discord.embed.description.description')}
                     {...formOnUpload.getInputProps('discordOnUploadEmbedDescription')}
                   />
 
                   <TextInput
-                    label='Footer'
-                    description='The footer of the embed'
+                    label={t('discord.embed.footer.label')}
+                    description={t('discord.embed.footer.description')}
                     {...formOnUpload.getInputProps('discordOnUploadEmbedFooter')}
                   />
 
                   <ColorInput
-                    label='Color'
-                    description='The color of the embed'
+                    label={t('discord.embed.color.label')}
+                    description={t('discord.embed.color.description')}
                     {...formOnUpload.getInputProps('discordOnUploadEmbedColor')}
                   />
 
                   <Switch
-                    label='Thumbnail'
-                    description="Show the thumbnail (it will show the file if it's an image) in the embed"
+                    label={t('discord.embed.thumbnail.label')}
+                    description={t('discord.embed.thumbnail.description')}
                     {...formOnUpload.getInputProps('discordOnUploadEmbedThumbnail', { type: 'checkbox' })}
                   />
 
                   <Switch
-                    label='Image/Video'
-                    description='Show the image or video in the embed'
+                    label={t('discord.embed.imageOrVideo.label')}
+                    description={t('discord.embed.imageOrVideo.description')}
                     {...formOnUpload.getInputProps('discordOnUploadEmbedImageOrVideo', { type: 'checkbox' })}
                   />
 
                   <Switch
-                    label='Timestamp'
-                    description='Show the timestamp in the embed'
+                    label={t('discord.embed.timestamp.label')}
+                    description={t('discord.embed.timestamp.description')}
                     {...formOnUpload.getInputProps('discordOnUploadEmbedTimestamp', { type: 'checkbox' })}
                   />
 
                   <Switch
-                    label='URL'
-                    description='Makes the title clickable and links to the URL of the file'
+                    label={t('discord.embed.url.label')}
+                    description={t('discord.embed.url.description')}
                     {...formOnUpload.getInputProps('discordOnUploadEmbedUrl', { type: 'checkbox' })}
                   />
                 </SimpleGrid>
@@ -263,33 +265,33 @@ function Form({ data, isLoading }: { data: Response['/api/server/settings']; isL
             </Collapse>
 
             <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
-              Save
+              {t('common:actions.save')}
             </Button>
           </form>
         </Paper>
 
         <Paper withBorder p='sm'>
-          <Title order={3}>On Shorten</Title>
+          <Title order={3}>{t('discord.onShorten.title')}</Title>
 
           <form onSubmit={formOnShorten.onSubmit(onSubmitNotif('shorten'))}>
             <TextInput
               mt='md'
-              label='Webhook URL'
-              description='The Discord webhook URL to send notifications to. If this is left blank, the main webhook url will be used'
+              label={t('discord.notification.webhookUrl.label')}
+              description={t('discord.notification.webhookUrl.description')}
               placeholder='https://discord.com/api/webhooks/...'
               {...formOnShorten.getInputProps('discordOnShortenWebhookUrl')}
             />
 
             <SimpleGrid mt='md' cols={{ base: 1, md: 2 }} spacing='lg'>
               <TextInput
-                label='Username'
-                description='The username to send notifications as. If this is left blank, the main username will be used'
+                label={t('discord.notification.username.label')}
+                description={t('discord.notification.username.description')}
                 {...formOnShorten.getInputProps('discordOnShortenUsername')}
               />
 
               <TextInput
-                label='Avatar URL'
-                description='The avatar for the webhook. If this is left blank, the main avatar will be used'
+                label={t('discord.notification.avatarUrl.label')}
+                description={t('discord.notification.avatarUrl.description')}
                 placeholder='https://example.com/avatar.png'
                 {...formOnShorten.getInputProps('discordOnShortenAvatarUrl')}
               />
@@ -297,8 +299,8 @@ function Form({ data, isLoading }: { data: Response['/api/server/settings']; isL
 
             <Textarea
               mt='md'
-              label='Content'
-              description='The content of the notification. This can be blank, but at least one of the content or embed fields must be filled out'
+              label={t('discord.notification.content.label')}
+              description={t('discord.notification.content.description')}
               minRows={1}
               maxRows={7}
               {...formOnShorten.getInputProps('discordOnShortenContent')}
@@ -306,8 +308,8 @@ function Form({ data, isLoading }: { data: Response['/api/server/settings']; isL
 
             <Switch
               mt='md'
-              label='Embed'
-              description='Send the notification as an embed. This will allow for more customization below.'
+              label={t('discord.notification.embed.label')}
+              description={t('discord.notification.embed.description')}
               {...formOnShorten.getInputProps('discordOnShortenEmbed', { type: 'checkbox' })}
             />
 
@@ -315,38 +317,38 @@ function Form({ data, isLoading }: { data: Response['/api/server/settings']; isL
               <Paper withBorder p='sm' mt='md'>
                 <SimpleGrid cols={{ base: 1, md: 2 }} spacing='lg'>
                   <TextInput
-                    label='Title'
-                    description='The title of the embed'
+                    label={t('discord.embed.title.label')}
+                    description={t('discord.embed.title.description')}
                     {...formOnShorten.getInputProps('discordOnShortenEmbedTitle')}
                   />
 
                   <TextInput
-                    label='Description'
-                    description='The description of the embed'
+                    label={t('discord.embed.description.label')}
+                    description={t('discord.embed.description.description')}
                     {...formOnShorten.getInputProps('discordOnShortenEmbedDescription')}
                   />
 
                   <TextInput
-                    label='Footer'
-                    description='The footer of the embed'
+                    label={t('discord.embed.footer.label')}
+                    description={t('discord.embed.footer.description')}
                     {...formOnShorten.getInputProps('discordOnShortenEmbedFooter')}
                   />
 
                   <ColorInput
-                    label='Color'
-                    description='The color of the embed'
+                    label={t('discord.embed.color.label')}
+                    description={t('discord.embed.color.description')}
                     {...formOnShorten.getInputProps('discordOnShortenEmbedColor')}
                   />
 
                   <Switch
-                    label='Timestamp'
-                    description='Show the timestamp in the embed'
+                    label={t('discord.embed.timestamp.label')}
+                    description={t('discord.embed.timestamp.description')}
                     {...formOnShorten.getInputProps('discordOnShortenEmbedTimestamp', { type: 'checkbox' })}
                   />
 
                   <Switch
-                    label='URL'
-                    description='Makes the title clickable and links to the URL of the file'
+                    label={t('discord.embed.url.label')}
+                    description={t('discord.embed.url.description')}
                     {...formOnShorten.getInputProps('discordOnShortenEmbedUrl', { type: 'checkbox' })}
                   />
                 </SimpleGrid>
@@ -354,7 +356,7 @@ function Form({ data, isLoading }: { data: Response['/api/server/settings']; isL
             </Collapse>
 
             <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
-              Save
+              {t('common:actions.save')}
             </Button>
           </form>
         </Paper>

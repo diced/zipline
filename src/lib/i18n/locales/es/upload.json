@@ -1,0 +1,220 @@
+{
+  "actions": {
+    "goToFiles": "Ir a archivos",
+    "clearAll": "Borrar todo",
+    "upload_one": "Subir {{count}} archivo ({{size}})",
+    "upload_many": "Subir {{count}} archivos ({{size}})",
+    "upload_other": "Subir {{count}} archivos ({{size}})"
+  },
+  "file": {
+    "title": "Subir archivos",
+    "dropzone": {
+      "title": "Arrastre imágenes aquí o haga clic para seleccionar archivos",
+      "paste": "O presione <kbd>{{mod}}</kbd> + <kbd>V</kbd> para pegar imágenes del portapapeles",
+      "description": "Adjunte todos los archivos que quiera; aparecerán abajo para que los revise antes de subirlos.",
+      "limit": "Límite de <b>{{size}}</b> por archivo"
+    },
+    "progress": {
+      "speed": "{{speed}}/s, tiempo restante: {{remaining}}",
+      "finalizing": "Finalizando subida(s)..."
+    },
+    "hidden_one": "Otro archivo oculto",
+    "hidden_many": "Otros {{count}} archivos ocultos",
+    "hidden_other": "Otros {{count}} archivos ocultos",
+    "showMore": "Mostrar más",
+    "showAll": "Mostrar todos",
+    "showAllTooltip": "Esto puede afectar al rendimiento si hay muchos archivos",
+    "notifications": {
+      "pasted": {
+        "message": "Imagen {{name}} pegada desde el portapapeles"
+      },
+      "mayFail": {
+        "title": "Es posible que la subida falle",
+        "message": "Es posible que la subida falle porque el tamaño total de los archivos que intenta subir (excluidos los de subida parcial) es de <b>{{size}}</b>, lo que supera el límite de <b>{{limit}}</b>"
+      }
+    }
+  },
+  "text": {
+    "title": "Subir texto",
+    "tabs": {
+      "text": "Texto",
+      "preview": "Vista previa"
+    },
+    "addFile": "Agregar archivo de texto",
+    "fileHeading": "Archivo {{number}}"
+  },
+  "options": {
+    "button": "Opciones",
+    "title": "Opciones de subida",
+    "description": "Estas opciones se aplicarán a todos los archivos que suba y se guardan en su navegador.",
+    "saved": "guardado",
+    "default": "Predeterminado ({{value}})",
+    "never": "nunca",
+    "clear": "Borrar",
+    "deletesAt": {
+      "label": "Eliminar después de",
+      "description": "El archivo se eliminará automáticamente cuando transcurra este tiempo.",
+      "defaultExpiration": "El tiempo de expiración predeterminado es <b>{{value}}</b> (puede cambiarlo con la opción siguiente).",
+      "setDefault": "Puede establecer un tiempo de expiración predeterminado en la <link>configuración</link>.",
+      "maxExpiration": "Nota: la expiración máxima permitida es <b>{{value}}</b>."
+    },
+    "expirations": {
+      "never": "Nunca",
+      "minutes5": "5 minutos",
+      "minutes10": "10 minutos",
+      "minutes15": "15 minutos",
+      "minutes30": "30 minutos",
+      "hour1": "1 hora",
+      "hours2": "2 horas",
+      "hours3": "3 horas",
+      "hours4": "4 horas",
+      "hours5": "5 horas",
+      "hours6": "6 horas",
+      "hours8": "8 horas",
+      "hours12": "12 horas",
+      "day1": "1 día",
+      "days3": "3 días",
+      "days5": "5 días",
+      "days7": "7 días",
+      "week1": "1 semana",
+      "weeksOneAndHalf": "1 semana y media",
+      "weeks2": "2 semanas",
+      "weeks3": "3 semanas",
+      "month1": "1 mes (30 días)",
+      "monthsOneAndHalf": "1 mes y medio (~45 días)",
+      "months2": "2 meses (60 días)",
+      "months3": "3 meses (90 días)",
+      "months4": "4 meses (120 días)",
+      "months6": "6 meses (medio año)",
+      "year1": "1 año",
+      "custom": "¿Necesita más flexibilidad? Establezca una fecha y hora exactas mediante la API."
+    },
+    "format": {
+      "label": "Formato de nombre",
+      "description": "El formato de nombre de archivo que se usará al subir este archivo. El campo \"Reemplazar nombre de archivo\" tiene prioridad sobre este valor.",
+      "random": "Aleatorio",
+      "date": "Fecha",
+      "name": "Usar nombre de archivo",
+      "gfycat": "Nombre estilo Gfycat"
+    },
+    "compressionFormat": {
+      "label": "Formato de compresión",
+      "description": "El formato de compresión de imágenes que se usará <b>solo cuando se especifique un porcentaje de compresión</b>. Déjelo en \"Predeterminado\" para usar el formato de compresión predeterminado del servidor."
+    },
+    "compression": {
+      "label": "Compresión",
+      "description": "El nivel de compresión que se aplicará (solo) a las imágenes. Las imágenes se comprimirán con el formato anterior. Déjelo en blanco para deshabilitar la compresión."
+    },
+    "maxViews": {
+      "label": "Vistas máx.",
+      "description": "El número máximo de vistas que pueden tener los archivos antes de eliminarse. Déjelo en blanco para permitir vistas ilimitadas."
+    },
+    "folder": {
+      "label": "Agregar a una carpeta",
+      "description": "Agregue este archivo a una carpeta. Use la opción \"/ (Raíz)\" para no agregarlo a ninguna carpeta. Este valor no se guarda en su navegador y se borra después de la subida.",
+      "placeholder": "Agregar a una carpeta...",
+      "root": "/ (Raíz)"
+    },
+    "domain": {
+      "label": "Reemplazar dominio"
+    },
+    "filename": {
+      "label": "Reemplazar nombre de archivo",
+      "description": "Reemplace el nombre de archivo por este valor. Déjelo en blanco para usar la opción \"Formato de nombre\". Este valor se ignora si sube más de un archivo. Este valor no se guarda en su navegador y se borra después de la subida."
+    },
+    "password": {
+      "label": "Contraseña",
+      "description": "Establezca una contraseña para estos archivos. Déjelo en blanco para deshabilitar la protección con contraseña. Este valor no se guarda en su navegador y se borra después de la subida."
+    },
+    "other": "Otras opciones",
+    "originalName": {
+      "label": "Agregar nombre original",
+      "description": "Agrega el nombre original del archivo para que se pueda descargar con ese nombre. El nombre del archivo seguirá usando la opción \"Formato de nombre\"."
+    },
+    "extensionless": {
+      "label": "URL sin extensión",
+      "description": "Quita la extensión del archivo de la URL devuelta. Se podrá seguir accediendo al archivo con su extensión. Esta opción solo funciona si el servidor está configurado para permitir URL sin extensión."
+    }
+  },
+  "modal": {
+    "title_one": "{{count}} archivo subido",
+    "title_many": "{{count}} archivos subidos",
+    "title_other": "{{count}} archivos subidos",
+    "open": "Abrir enlace en una pestaña nueva",
+    "copy": "Copiar enlace al portapapeles",
+    "pending_one": "{{count}} archivo grande terminará de <link>procesarse en segundo plano.</link>",
+    "pending_many": "{{count}} archivos grandes terminarán de <link>procesarse en segundo plano.</link>",
+    "pending_other": "{{count}} archivos grandes terminarán de <link>procesarse en segundo plano.</link>",
+    "copyAllTooltip": "Copiar todos los enlaces al portapapeles (uno por línea)",
+    "copyAll": "Copiar {{total}} URL al portapapeles",
+    "notifications": {
+      "copied": {
+        "title": "URL copiada al portapapeles"
+      },
+      "copiedAll": {
+        "title": "URL copiadas al portapapeles",
+        "message": "Se copiaron todas las URL al portapapeles, una por línea."
+      }
+    }
+  },
+  "errors": {
+    "parse": "No se pudo analizar la respuesta del servidor: {{response}}",
+    "unknown": "Se produjo un error desconocido",
+    "network": "Error de red al subir los archivos"
+  },
+  "notifications": {
+    "preparing": {
+      "title_one": "Preparando archivo",
+      "title_many": "Preparando archivos",
+      "title_other": "Preparando archivos",
+      "message_one": "Subiendo {{count}} archivo",
+      "message_many": "Subiendo {{count}} archivos",
+      "message_other": "Subiendo {{count}} archivos",
+      "messageBatches_one": "Subiendo {{count}} archivo en {{batches}} lotes",
+      "messageBatches_many": "Subiendo {{count}} archivos en {{batches}} lotes",
+      "messageBatches_other": "Subiendo {{count}} archivos en {{batches}} lotes"
+    },
+    "uploading": {
+      "batch": "Subiendo lote {{current}}/{{total}}",
+      "title_one": "Subiendo archivo",
+      "title_many": "Subiendo archivos",
+      "title_other": "Subiendo archivos",
+      "message_one": "{{count}} archivo",
+      "message_many": "{{count}} archivos",
+      "message_other": "{{count}} archivos"
+    },
+    "complete": {
+      "title": "Subida completada",
+      "titlePartial": "Subidas normales completadas",
+      "message_one": "Se subió {{count}} archivo",
+      "message_many": "Se subieron {{count}} archivos",
+      "message_other": "Se subieron {{count}} archivos",
+      "startingPartials_one": "Iniciando la subida de {{count}} archivo grande...",
+      "startingPartials_many": "Iniciando la subida de {{count}} archivos grandes...",
+      "startingPartials_other": "Iniciando la subida de {{count}} archivos grandes...",
+      "messagePartial": "{{uploaded}}. {{starting}}"
+    },
+    "error": {
+      "title": "Error al subir los archivos"
+    },
+    "partial": {
+      "title": "Subiendo archivo grande",
+      "titleCount": "Subiendo archivo grande ({{current}}/{{total}})",
+      "chunk": "Fragmento {{current}}/{{total}}",
+      "error": {
+        "title": "Error al subir el archivo",
+        "message": "{{name}}: {{error}}"
+      },
+      "complete": {
+        "title": "Subidas de archivos grandes completadas",
+        "message_one": "Se envió {{count}} archivo grande para su procesamiento en segundo plano",
+        "message_many": "Se enviaron {{count}} archivos grandes para su procesamiento en segundo plano",
+        "message_other": "Se enviaron {{count}} archivos grandes para su procesamiento en segundo plano"
+      },
+      "offloaded": {
+        "title": "Archivo grande enviado a segundo plano",
+        "message": "{{name}} enviado ({{current}}/{{total}})"
+      }
+    }
+  }
+}

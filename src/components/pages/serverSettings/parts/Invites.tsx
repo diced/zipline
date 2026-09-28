@@ -2,6 +2,7 @@ import type { Response } from '@/lib/api/response';
 import { Button, LoadingOverlay, NumberInput, Stack, Switch } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconDeviceFloppy } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { settingsOnSubmit } from '../settingsOnSubmit';
 import useServerSettings from '../useServerSettings';
@@ -19,6 +20,7 @@ export default function Invites() {
 
 function Form({ data, isLoading }: { data: Response['/api/server/settings']; isLoading: boolean }) {
   const navigate = useNavigate();
+  const { t } = useTranslation(['serverSettings', 'common']);
 
   const form = useForm({
     initialValues: {
@@ -39,14 +41,14 @@ function Form({ data, isLoading }: { data: Response['/api/server/settings']; isL
     <form onSubmit={form.onSubmit(onSubmit)}>
       <Stack gap='lg'>
         <Switch
-          label='Enable Invites'
-          description='Enable the use of invite links to register new users.'
+          label={t('invites.enabled.label')}
+          description={t('invites.enabled.description')}
           {...form.getInputProps('invitesEnabled', { type: 'checkbox' })}
         />
 
         <NumberInput
-          label='Length'
-          description='The length of the invite code.'
+          label={t('invites.length.label')}
+          description={t('invites.length.description')}
           placeholder='6'
           min={1}
           max={64}
@@ -55,7 +57,7 @@ function Form({ data, isLoading }: { data: Response['/api/server/settings']; isL
       </Stack>
 
       <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
-        Save
+        {t('common:actions.save')}
       </Button>
     </form>
   );

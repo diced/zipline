@@ -3,6 +3,7 @@ import { IconCheck, IconChevronDown, IconChevronUp, IconClipboardCopy } from '@t
 import type { HLJSApi } from 'highlight.js';
 import * as sanitize from 'isomorphic-dompurify';
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Virtuoso } from 'react-virtuoso';
 import './HighlightCode.theme.scss';
 
@@ -17,6 +18,7 @@ export default function HighlightCode({
   code: string;
   scrollParent?: HTMLElement | null;
 }) {
+  const { t } = useTranslation('file');
   const theme = useMantineTheme();
   const [expanded, setExpanded] = useState(false);
   const [hljs, setHljs] = useState<HLJSApi | null>(null);
@@ -124,7 +126,7 @@ export default function HighlightCode({
             zIndex: 10,
           }}
         >
-          {expanded ? 'Show Less' : `Show More (${lines.length - 50} more lines)`}
+          {expanded ? t('render.showLess') : t('render.showMore', { count: lines.length - 50 })}
         </Button>
       )}
     </Paper>

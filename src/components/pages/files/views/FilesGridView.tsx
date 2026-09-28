@@ -16,6 +16,7 @@ import {
 import { IconFilesOff, IconFileUpload } from '@tabler/icons-react';
 import { parseAsInteger, useQueryState } from 'nuqs';
 import { lazy, Suspense, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useShallow } from 'zustand/shallow';
 import { useApiPagination } from '../useApiPagination';
@@ -25,6 +26,7 @@ const DashboardFileModal = lazy(() => import('@/components/file/DashboardFile/Da
 const PER_PAGE_OPTIONS = [9, 12, 15, 30, 45, 60];
 
 export default function Files({ id, folderId }: { id?: string; folderId?: string }) {
+  const { t } = useTranslation('files');
   const [page, setPage] = useQueryState('page', parseAsInteger.withDefault(1));
   const [perpage, setPerpage] = useQueryState('perpage', parseAsInteger.withDefault(15));
 
@@ -86,7 +88,7 @@ export default function Files({ id, folderId }: { id?: string; folderId?: string
               <Stack>
                 <Group>
                   <IconFilesOff size='2rem' />
-                  <Title order={2}>No files found</Title>
+                  <Title order={2}>{t('views.noFiles')}</Title>
                 </Group>
                 {!id && (
                   <Button
@@ -96,7 +98,7 @@ export default function Files({ id, folderId }: { id?: string; folderId?: string
                     component={Link}
                     to='/dashboard/upload/file'
                   >
-                    Upload a file
+                    {t('views.uploadFile')}
                   </Button>
                 )}
               </Stack>
@@ -106,7 +108,7 @@ export default function Files({ id, folderId }: { id?: string; folderId?: string
       </SimpleGrid>
 
       <Group justify='space-between' align='center' mt='md'>
-        <Text size='sm'>{`${from} - ${to} / ${totalRecords} files`}</Text>
+        <Text size='sm'>{t('views.pagination', { from, to, total: totalRecords })}</Text>
 
         <Group gap='sm'>
           <Select

@@ -5,35 +5,36 @@ import { ActionIcon, Button, Group, Paper, ScrollArea, Table, Text, Title, Toolt
 import { modals } from '@mantine/modals';
 import { showNotification } from '@mantine/notifications';
 import { IconDownload, IconPlus, IconTrashFilled } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import useSWR from 'swr';
 
 export default function SettingsExports() {
+  const { t } = useTranslation(['settings', 'common']);
   const { data, isLoading, mutate } = useSWR<Response['/api/user/export']>('/api/user/export', {
     refreshInterval: 5000,
   });
 
   const handleNewExport = async () => {
     modals.openConfirmModal({
-      title: 'New export?',
-      children:
-        'Are you sure you want to start a new export? If you have a lot of files, this may take a while.',
+      title: t('exports.modals.new.title'),
+      children: t('exports.modals.new.message'),
       onConfirm: async () => {
         await fetch('/api/user/export', {
           method: 'POST',
         });
 
         showNotification({
-          title: 'Export started',
-          message: 'Export has been started, you can check its status in the table below',
+          title: t('exports.notifications.started.title'),
+          message: t('exports.notifications.started.message'),
           color: 'blue',
           loading: true,
         });
         mutate();
       },
       labels: {
-        cancel: 'Cancel',
-        confirm: 'Start export',
+        cancel: t('common:actions.cancel'),
+        confirm: t('exports.modals.new.confirm'),
       },
     });
   };
@@ -44,7 +45,7 @@ export default function SettingsExports() {
     });
 
     showNotification({
-      message: 'Export has been deleted',
+      message: t('exports.notifications.deleted.message'),
       color: 'red',
     });
 
@@ -53,7 +54,7 @@ export default function SettingsExports() {
 
   return (
     <Paper withBorder p='sm'>
-      <Title order={2}>Export Files</Title>
+      <Title order={2}>{t('exports.title')}</Title>
 
       <Button
         mt='sm'
@@ -62,12 +63,12 @@ export default function SettingsExports() {
         onClick={handleNewExport}
         leftSection={<IconPlus size='1rem' />}
       >
-        New Export
+        {t('exports.new')}
       </Button>
 
       {data?.length === 0 ? (
         <Paper p='sm' mt='sm' withBorder>
-          No exports found. Click the button above to start a new export.
+          {t('exports.empty')}
         </Paper>
       ) : (
         <ScrollArea.Autosize mah={500} type='auto'>
@@ -75,10 +76,10 @@ export default function SettingsExports() {
             <Table highlightOnHover stickyHeader>
               <Table.Thead>
                 <Table.Tr>
-                  <Table.Th>ID</Table.Th>
-                  <Table.Th>Started</Table.Th>
-                  <Table.Th>Files</Table.Th>
-                  <Table.Th>Size</Table.Th>
+                  <Table.Th>{t('exports.table.id')}</Table.Th>
+                  <Table.Th>{t('exports.table.started')}</Table.Th>
+                  <Table.Th>{t('exports.table.files')}</Table.Th>
+                  <Table.Th>{t('exports.table.size')}</Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
@@ -86,7 +87,11 @@ export default function SettingsExports() {
                   <Table.Tr key={exportDb.id}>
                     <Table.Td maw={140}>
                       <Tooltip
-                        label={`${exportDb.id} is ${exportDb.completed ? 'completed' : 'in progress'}`}
+                        label={
+                          exportDb.completed
+                            ? t('exports.table.completed', { id: exportDb.id })
+                            : t('exports.table.inProgress', { id: exportDb.id })
+                        }
                       >
                         <Text
                           style={{ textOverflow: 'ellipsis', overflow: 'hidden' }}

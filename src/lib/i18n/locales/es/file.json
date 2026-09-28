@@ -1,0 +1,180 @@
+{
+  "notifications": {
+    "deleted": {
+      "title": "Archivo eliminado",
+      "message": "Se eliminó {{name}}"
+    },
+    "favorited": {
+      "title": "Archivo marcado como favorito",
+      "message": "{{name}} se marcó como favorito"
+    },
+    "unfavorited": {
+      "title": "Archivo quitado de favoritos",
+      "message": "{{name}} se quitó de favoritos"
+    },
+    "createFolderError": {
+      "title": "Error al crear la carpeta"
+    },
+    "folderCreated": {
+      "title": "Carpeta creada",
+      "message": "Se creó {{folder}} con {{name}}"
+    },
+    "removeFromFolderError": {
+      "title": "Error al quitar de la carpeta"
+    },
+    "removedFromFolder": {
+      "title": "Archivo quitado de la carpeta",
+      "message": "{{name}} se quitó de {{folder}}"
+    },
+    "addToFolderError": {
+      "title": "Error al agregar a la carpeta"
+    },
+    "addedToFolder": {
+      "title": "Archivo agregado a la carpeta",
+      "message": "{{name}} se agregó a {{folder}}"
+    },
+    "addMultipleToFolderError": {
+      "title": "Error al agregar los archivos a la carpeta"
+    },
+    "addedMultipleToFolder": {
+      "title": "Archivos agregados a la carpeta",
+      "message": "Archivos agregados a {{folder}}: {{count}}"
+    },
+    "saveTagsError": {
+      "title": "No se pudieron guardar las etiquetas"
+    },
+    "tagsSaved": {
+      "title": "Etiquetas guardadas",
+      "message": "Etiquetas guardadas para el archivo {{name}}: {{count}}"
+    },
+    "removePasswordError": {
+      "title": "No se pudo quitar la contraseña..."
+    },
+    "passwordRemoved": {
+      "title": "¡Contraseña quitada!",
+      "message": "Se quitó la contraseña del archivo."
+    },
+    "saveChangesError": {
+      "title": "No se pudieron guardar los cambios..."
+    },
+    "changesSaved": {
+      "title": "¡Cambios guardados!",
+      "message": "Se guardaron los cambios del archivo."
+    }
+  },
+  "delete": {
+    "confirm": "Eliminar {{name}}",
+    "message": "¿Está seguro de que desea eliminar {{name}}? Esta acción no se puede deshacer."
+  },
+  "contextMenu": {
+    "openInNewTab": "Abrir en una pestaña nueva",
+    "copyLink": "Copiar enlace",
+    "copyRawLink": "Copiar enlace sin procesar",
+    "favorite": "Marcar como favorito",
+    "unfavorite": "Quitar de favoritos",
+    "removeFromFolder": "Quitar de la carpeta",
+    "moveToFolder": "Mover a una carpeta",
+    "searchFolders": "Buscar carpetas...",
+    "createNamedFolder": "+ Crear \"{{name}}\"",
+    "noFolders": "Aún no hay carpetas",
+    "createNewFolder": "+ Crear carpeta nueva",
+    "editDetails": "Editar detalles"
+  },
+  "createFolderModal": {
+    "title": "Crear carpeta",
+    "name": {
+      "label": "Nombre de la carpeta",
+      "placeholder": "Mi carpeta"
+    }
+  },
+  "stats": {
+    "type": "Tipo",
+    "size": "Tamaño",
+    "createdAt": "Fecha de creación",
+    "updatedAt": "Fecha de actualización",
+    "deletesAt": "Fecha de eliminación",
+    "views": "Vistas",
+    "originalName": "Nombre original",
+    "anonymous": "Anónimo"
+  },
+  "details": {
+    "title": "Detalles",
+    "tags": {
+      "title": "Etiquetas",
+      "placeholder": "Elija una o varias etiquetas",
+      "empty": "No se encontraron etiquetas. Cree una fuera de este menú."
+    },
+    "folder": {
+      "title": "Carpeta",
+      "remove": "Quitar de la carpeta \"{{name}}\"",
+      "placeholder": "Agregar a una carpeta...",
+      "empty": "No tiene carpetas. Empiece a escribir para crear una carpeta nueva para este archivo.",
+      "create": "+ Crear carpeta \"{{name}}\""
+    }
+  },
+  "actions": {
+    "editDetails": "Editar detalles del archivo",
+    "delete": "Eliminar archivo",
+    "favorite": "Marcar archivo como favorito",
+    "unfavorite": "Quitar archivo de favoritos",
+    "viewInNewTab": "Ver archivo en una pestaña nueva",
+    "openInNewTab": "Abrir en una pestaña nueva",
+    "copyRawLink": "Copiar enlace del archivo sin procesar",
+    "copyLink": "Copiar enlace del archivo",
+    "download": "Descargar archivo",
+    "showDetails": "Mostrar detalles",
+    "hideDetails": "Ocultar detalles",
+    "previous": "Archivo anterior",
+    "next": "Archivo siguiente"
+  },
+  "edit": {
+    "title": "Editando \"{{name}}\"",
+    "name": {
+      "label": "Nombre",
+      "description": "Cambie el nombre del archivo."
+    },
+    "maxViews": {
+      "label": "Vistas máx.",
+      "placeholder": "Ilimitadas",
+      "description": "El número máximo de vistas que puede tener este archivo antes de eliminarse. Déjelo en blanco para permitir vistas ilimitadas."
+    },
+    "originalName": {
+      "label": "Nombre original",
+      "description": "Agregue un nombre original. Al descargar este archivo, se usará este \"nombre original\" en lugar del nombre de archivo generado (si se eligió)."
+    },
+    "type": {
+      "label": "Tipo",
+      "description": "Cambie el tipo MIME de un archivo. <b>NO CAMBIE ESTE VALOR</b> a menos que sepa lo que hace; puede alterar la forma en que Zipline muestra determinados tipos de archivo."
+    },
+    "password": {
+      "label": "Contraseña",
+      "description": "Establezca una contraseña para este archivo. Déjelo en blanco para deshabilitar la protección con contraseña."
+    },
+    "removePassword": "Quitar contraseña",
+    "save": "Guardar cambios"
+  },
+  "preview": {
+    "clickToView": "Haga clic para ver el archivo {{name}}",
+    "clickToViewProtected": "Haga clic para ver el archivo protegido {{name}}",
+    "clickToPlayVideo": "Haga clic para reproducir el video {{name}}",
+    "clickToPlayAudio": "Haga clic para reproducir el audio {{name}}",
+    "clickToViewText": "Haga clic para ver el texto {{name}}",
+    "clickToDownloadCast": "Haga clic para descargar la grabación de asciinema {{name}}",
+    "clickToViewPdf": "Haga clic para ver el PDF {{name}}",
+    "clickToViewInNewTab": "Haga clic para ver el archivo {{name}} en una pestaña nueva",
+    "videoThumbnailAlt": "Miniatura del video",
+    "imageAlt": "Imagen",
+    "loading": "Cargando archivo...",
+    "loadError": "Error al cargar el archivo.",
+    "tooBig": "\n...\nEl archivo es demasiado grande para mostrarlo. Haga clic en el icono de descarga para verlo o descargarlo."
+  },
+  "render": {
+    "renderedThrough": "Este archivo se renderiza mediante {{renderer}}",
+    "canRenderThrough": "Este archivo se puede renderizar mediante {{renderer}}",
+    "showRendered": "Mostrar versión renderizada",
+    "hideRendered": "Ocultar versión renderizada",
+    "katexError": "Error de KaTeX",
+    "showLess": "Mostrar menos",
+    "showMore": "Mostrar más (líneas restantes: {{count}})"
+  }
+}

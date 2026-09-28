@@ -1,119 +1,87 @@
 import { Alert, Box, Button, List, Modal, Code, Group, Divider, Checkbox, Pill } from '@mantine/core';
 import { IconAlertCircle, IconDownload } from '@tabler/icons-react';
 import { useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
+
+const EXPORT_ITEMS = [
+  'importExport.export.items.users',
+  'importExport.export.items.passkeys',
+  'importExport.export.items.userQuotas',
+  'importExport.export.items.oauthProviders',
+  'importExport.export.items.userTags',
+  'importExport.export.items.files',
+  'importExport.export.items.folders',
+  'importExport.export.items.urls',
+  'importExport.export.items.thumbnails',
+  'importExport.export.items.invites',
+  'importExport.export.items.metrics',
+] as const;
+
+const EXPORT_SYSTEM_ITEMS = [
+  'importExport.export.systemItems.cpuCount',
+  'importExport.export.systemItems.hostname',
+  'importExport.export.systemItems.architecture',
+  'importExport.export.systemItems.platform',
+  'importExport.export.systemItems.osRelease',
+  'importExport.export.systemItems.env',
+  'importExport.export.systemItems.versions',
+] as const;
 
 export default function ExportButton() {
+  const { t } = useTranslation(['serverActions', 'common']);
   const [open, setOpen] = useState(false);
 
   const [noMetrics, setNoMetrics] = useState(false);
 
   return (
     <>
-      <Modal opened={open} onClose={() => setOpen(false)} size='lg' title='Are you sure?'>
+      <Modal opened={open} onClose={() => setOpen(false)} size='lg' title={t('common:warning.title')}>
         <Box px='sm'>
-          <p>The export provides a complete snapshot of Zipline’s data and environment. It includes:</p>
+          <p>{t('importExport.export.intro')}</p>
 
           <List>
-            <List.Item>
-              <b>Users:</b> Account information including usernames, optional passwords, avatars, roles, view
-              settings, and optional TOTP secrets.
-            </List.Item>
-
-            <List.Item>
-              <b>Passkeys:</b> Registered WebAuthn passkeys with creation dates, last-used timestamps, and
-              credential registration data.
-            </List.Item>
-
-            <List.Item>
-              <b>User Quotas:</b> Quota settings such as max bytes, max files, max URLs, and quota types.
-            </List.Item>
-
-            <List.Item>
-              <b>OAuth Providers:</b> Linked OAuth accounts including provider type, tokens, and OAuth IDs.
-            </List.Item>
-
-            <List.Item>
-              <b>User Tags:</b> Tags created by users, including names, colors, and associated file IDs.
-            </List.Item>
-
-            <List.Item>
-              <b>Files:</b> Metadata about uploaded files including size, type, timestamps, expiration, views,
-              password protection, owner, and folder association.
-              <i> (Actual file contents are not included.)</i>
-            </List.Item>
-
-            <List.Item>
-              <b>Folders:</b> Folder metadata including visibility settings, upload permissions, file lists,
-              and ownership.
-            </List.Item>
-
-            <List.Item>
-              <b>URLs:</b> Metadata for shortened URLs including destinations, vanity codes, view counts,
-              passwords, and user assignments.
-            </List.Item>
-
-            <List.Item>
-              <b>Thumbnails:</b> Thumbnail path and associated file ID.
-              <i> (Image data is not included.)</i>
-            </List.Item>
-
-            <List.Item>
-              <b>Invites:</b> Invite codes, creation/expiration dates, and usage counts.
-            </List.Item>
-
-            <List.Item>
-              <b>Metrics:</b> System and usage statistics stored internally by Zipline.
-            </List.Item>
+            {EXPORT_ITEMS.map((key) => (
+              <List.Item key={key}>
+                <Trans t={t} i18nKey={key} components={{ b: <b />, i: <i /> }} />
+              </List.Item>
+            ))}
           </List>
 
           <p>
-            Additionally, the export includes <b>system-specific information</b>:
+            <Trans t={t} i18nKey='importExport.export.systemIntro' components={{ b: <b /> }} />
           </p>
 
           <List>
-            <List.Item>
-              <b>CPU Count:</b> The number of available processor cores.
-            </List.Item>
-            <List.Item>
-              <b>Hostname:</b> The host system’s network identifier.
-            </List.Item>
-            <List.Item>
-              <b>Architecture:</b> The hardware architecture (e.g., <Code>x64</Code>, <Code>arm64</Code>).
-            </List.Item>
-            <List.Item>
-              <b>Platform:</b> The operating system platform (e.g., <Code>linux</Code>, <Code>darwin</Code>).
-            </List.Item>
-            <List.Item>
-              <b>OS Release:</b> The OS or kernel version.
-            </List.Item>
-            <List.Item>
-              <b>Environment Variables:</b> A full snapshot of environment variables at the time of export.
-            </List.Item>
-            <List.Item>
-              <b>Versions:</b> The Zipline version, Node version, and export format version.
-            </List.Item>
+            {EXPORT_SYSTEM_ITEMS.map((key) => (
+              <List.Item key={key}>
+                <Trans t={t} i18nKey={key} components={{ b: <b />, code: <Code /> }} />
+              </List.Item>
+            ))}
           </List>
 
           <Divider my='md' />
 
           <Checkbox
-            label='Exclude Metrics Data'
-            description='Exclude system and usage metrics from the export. This can reduce the export file size.'
+            label={t('importExport.export.excludeMetrics.label')}
+            description={t('importExport.export.excludeMetrics.description')}
             checked={noMetrics}
             onChange={() => setNoMetrics((val) => !val)}
           />
 
           <Divider my='md' />
 
-          <Alert color='red' icon={<IconAlertCircle size='1rem' />} title='Warning' my='md'>
-            This export contains a significant amount of sensitive data, including user accounts,
-            authentication credentials, environment variables, and system metadata. Handle this file securely
-            and do not share it with untrusted parties.
+          <Alert
+            color='red'
+            icon={<IconAlertCircle size='1rem' />}
+            title={t('importExport.export.warning.title')}
+            my='md'
+          >
+            {t('importExport.export.warning.message')}
           </Alert>
 
           <Group grow my='md'>
             <Button onClick={() => setOpen(false)} color='red'>
-              Cancel
+              {t('common:actions.cancel')}
             </Button>
             <Button
               component='a'
@@ -123,7 +91,7 @@ export default function ExportButton() {
               leftSection={<IconDownload size='1rem' />}
               onClick={() => setOpen(false)}
             >
-              Download Export
+              {t('importExport.export.download')}
             </Button>
           </Group>
         </Box>
@@ -136,7 +104,7 @@ export default function ExportButton() {
         leftSection={<IconDownload size='1rem' />}
         rightSection={<Pill>V4</Pill>}
       >
-        Export Data
+        {t('importExport.export.button')}
       </Button>
     </>
   );

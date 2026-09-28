@@ -28,6 +28,7 @@ import {
   IconDeviceFloppy,
   IconFileX,
 } from '@tabler/icons-react';
+import { Trans, useTranslation } from 'react-i18next';
 import { mutate } from 'swr';
 import { useShallow } from 'zustand/shallow';
 
@@ -38,14 +39,15 @@ const alignIcons: Record<string, React.ReactNode> = {
 };
 
 export default function SettingsFileView() {
+  const { t } = useTranslation('settings');
   const [user, setUser] = useUserStore(useShallow((state) => [state.user, state.setUser]));
 
   if (!user) {
     return (
       <Paper withBorder p='sm'>
-        <Title order={2}>Viewing Files</Title>
+        <Title order={2}>{t('fileView.title')}</Title>
         <Text c='dimmed' mt='xs'>
-          Loading…
+          {t('loading')}
         </Text>
       </Paper>
     );
@@ -55,6 +57,7 @@ export default function SettingsFileView() {
 }
 
 function Form({ user, setUser }: { user: User; setUser: (u: User) => void }) {
+  const { t } = useTranslation(['settings', 'common']);
   const form = useForm({
     initialValues: {
       enabled: user.view.enabled || false,
@@ -96,7 +99,7 @@ function Form({ user, setUser }: { user: User; setUser: (u: User) => void }) {
 
     if (!data && error) {
       notifications.show({
-        title: 'Error while updating view settings',
+        title: t('fileView.notifications.error.title'),
         message: error.error,
         color: 'red',
         icon: <IconFileX size='1rem' />,
@@ -108,7 +111,7 @@ function Form({ user, setUser }: { user: User; setUser: (u: User) => void }) {
     mutate('/api/user');
     setUser(data.user);
     notifications.show({
-      message: 'View settings updated',
+      message: t('fileView.notifications.updated.message'),
       color: 'green',
       icon: <IconCheck size='1rem' />,
     });
@@ -116,53 +119,56 @@ function Form({ user, setUser }: { user: User; setUser: (u: User) => void }) {
 
   return (
     <Paper withBorder p='sm'>
-      <Title order={2}>Viewing Files</Title>
+      <Title order={2}>{t('fileView.title')}</Title>
       <Text c='dimmed' mt='xs'>
-        All text fields support using{' '}
-        <Anchor target='_blank' href='https://zipline.diced.sh/docs/guides/variables/'>
-          variables.
-        </Anchor>
+        <Trans
+          t={t}
+          i18nKey='fileView.variablesHint'
+          components={{
+            link: <Anchor target='_blank' href='https://zipline.diced.sh/docs/guides/variables/' />,
+          }}
+        />
       </Text>
       <Stack gap='sm' mt='xs'>
         <form onSubmit={form.onSubmit(onSubmit)}>
           <SimpleGrid cols={{ base: 1, md: 2 }} spacing='sm' mb='xs'>
             <Switch
-              label='Disable text files'
-              description='Disable viewing text files through view-routes. This has no effect on other file types and will work even if view-routes are disabled.'
+              label={t('fileView.disableTextFiles.label')}
+              description={t('fileView.disableTextFiles.description')}
               {...form.getInputProps('disableTextFiles', { type: 'checkbox' })}
             />
 
             <Switch
-              label='Enable View Routes'
-              description='Enable viewing files through customizable view-routes'
+              label={t('fileView.enabled.label')}
+              description={t('fileView.enabled.description')}
               {...form.getInputProps('enabled', { type: 'checkbox' })}
             />
 
             <Switch
-              label='Show mimetype'
-              description='Show the mimetype of the file in the view-route'
+              label={t('fileView.showMimetype.label')}
+              description={t('fileView.showMimetype.description')}
               disabled={!form.values.enabled}
               {...form.getInputProps('showMimetype', { type: 'checkbox' })}
             />
 
             <Switch
-              label='Show tags'
-              description="Show the file's tags in the view-route"
+              label={t('fileView.showTags.label')}
+              description={t('fileView.showTags.description')}
               disabled={!form.values.enabled}
               {...form.getInputProps('showTags', { type: 'checkbox' })}
             />
 
             <Switch
-              label='Show folder'
-              description='Show the name/link of the folder if possible in the view-route'
+              label={t('fileView.showFolder.label')}
+              description={t('fileView.showFolder.description')}
               disabled={!form.values.enabled}
               {...form.getInputProps('showFolder', { type: 'checkbox' })}
             />
           </SimpleGrid>
 
           <Textarea
-            label='View Content'
-            description='Change the content within view-routes. Most HTML is valid, while the use of JavaScript is unavailable.'
+            label={t('fileView.content.label')}
+            description={t('fileView.content.description')}
             disabled={!form.values.enabled}
             mb='xs'
             minRows={5}
@@ -171,12 +177,12 @@ function Form({ user, setUser }: { user: User; setUser: (u: User) => void }) {
           />
 
           <Select
-            label='View Content Alignment'
-            description='Change the alignment of the content within view-routes'
+            label={t('fileView.align.label')}
+            description={t('fileView.align.description')}
             data={[
-              { value: 'left', label: 'Left' },
-              { value: 'center', label: 'Center' },
-              { value: 'right', label: 'Right' },
+              { value: 'left', label: t('fileView.align.options.left') },
+              { value: 'center', label: t('fileView.align.options.center') },
+              { value: 'right', label: t('fileView.align.options.right') },
             ]}
             renderOption={({ option }) => (
               <Group gap='xs'>
@@ -191,8 +197,8 @@ function Form({ user, setUser }: { user: User; setUser: (u: User) => void }) {
           <Divider my='sm' />
 
           <Switch
-            label='Enable Embed'
-            description='Enable the following embed properties. These properties take advantage of OpenGraph tags. View routes will need to be enabled for this to work.'
+            label={t('fileView.embed.label')}
+            description={t('fileView.embed.description')}
             disabled={!form.values.enabled}
             my='xs'
             {...form.getInputProps('embed', { type: 'checkbox' })}
@@ -205,8 +211,8 @@ function Form({ user, setUser }: { user: User; setUser: (u: User) => void }) {
           />
 
           <Switch
-            label='Media-only link preview'
-            description='When embeds are off, still add OpenGraph image/video tags so Discord and similar apps unfurl the media only (no custom title, description, or site name). The URL you paste stays in the message as plain text.'
+            label={t('fileView.embedMediaOnly.label')}
+            description={t('fileView.embedMediaOnly.description')}
             disabled={!form.values.enabled || form.values.embed}
             my='xs'
             {...form.getInputProps('embedMediaOnly', { type: 'checkbox' })}
@@ -214,22 +220,22 @@ function Form({ user, setUser }: { user: User; setUser: (u: User) => void }) {
 
           <SimpleGrid cols={{ base: 1, md: 2 }} spacing='sm'>
             <TextInput
-              label='Embed Title'
+              label={t('fileView.embedTitle.label')}
               disabled={!form.values.embed || !form.values.enabled}
               {...form.getInputProps('embedTitle')}
             />
             <TextInput
-              label='Embed Description'
+              label={t('fileView.embedDescription.label')}
               disabled={!form.values.embed || !form.values.enabled}
               {...form.getInputProps('embedDescription')}
             />
             <TextInput
-              label='Embed Site Name'
+              label={t('fileView.embedSiteName.label')}
               disabled={!form.values.embed || !form.values.enabled}
               {...form.getInputProps('embedSiteName')}
             />
             <ColorInput
-              label='Embed Color'
+              label={t('fileView.embedColor.label')}
               disabled={!form.values.embed || !form.values.enabled}
               {...form.getInputProps('embedColor')}
             />
@@ -237,7 +243,7 @@ function Form({ user, setUser }: { user: User; setUser: (u: User) => void }) {
 
           <Group justify='left' mt='sm'>
             <Button type='submit' leftSection={<IconDeviceFloppy size='1rem' />}>
-              Save
+              {t('common:actions.save')}
             </Button>
           </Group>
         </form>

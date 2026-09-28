@@ -1,0 +1,124 @@
+{
+  "title": "Users",
+  "form": {
+    "username": {
+      "label": "Username",
+      "placeholder": "Enter a username...",
+      "required": "Username is required"
+    },
+    "password": {
+      "label": "Password",
+      "placeholder": "Enter a password...",
+      "required": "Password is required"
+    },
+    "avatar": {
+      "label": "Avatar",
+      "placeholder": "Select an avatar...",
+      "clear": "Clear avatar",
+      "invalidType": "Invalid file type",
+      "readFailed": "Failed to read avatar file"
+    },
+    "role": {
+      "label": "Role"
+    }
+  },
+  "roles": {
+    "user": "User",
+    "administrator": "Administrator",
+    "admin": "Admin",
+    "superAdmin": "Super Admin"
+  },
+  "create": {
+    "title": "Create a new user"
+  },
+  "edit": {
+    "title": "Edit {{username}}",
+    "description": "Any fields that are blank will be omitted, and will not be updated.",
+    "submit": "Update user",
+    "quota": {
+      "title": "Quota",
+      "invalidValue": "Invalid value",
+      "invalidByteFormat": "Invalid byte format",
+      "fileType": {
+        "label": "File Quota Type",
+        "description": "Whether to set a quota on files by total bytes or the total number of files.",
+        "byBytes": "By Bytes",
+        "byFiles": "By File Count",
+        "none": "No Files Quota"
+      },
+      "maxFiles": {
+        "label": "Max Files",
+        "description": "The maximum number of files the user can upload.",
+        "placeholder": "Enter a number..."
+      },
+      "maxBytes": {
+        "label": "Max Bytes",
+        "description": "The maximum number of bytes the user can upload.",
+        "placeholder": "Enter a human readable byte-format..."
+      },
+      "maxUrls": {
+        "label": "Max URLs",
+        "description": "The maximum number of URLs the user can create. Leave as 0 for unlimited.",
+        "placeholder": "Enter a number..."
+      }
+    }
+  },
+  "delete": {
+    "title": "Delete {{username}}?",
+    "message": "Are you sure you want to delete {{username}}? This action cannot be undone.",
+    "data": {
+      "title": "Delete {{username}}'s data?",
+      "message": "Would you like to delete {{username}}'s files and urls? This action cannot be undone.",
+      "cancel": "No, keep everything & only delete user",
+      "confirm": "Yes, delete everything"
+    }
+  },
+  "notifications": {
+    "createFailed": "Failed to create user",
+    "created": {
+      "title": "User created",
+      "message": "User {{username}} has been created"
+    },
+    "editFailed": "Failed to edit user",
+    "edited": {
+      "title": "User edited",
+      "message": "User {{username}} has been edited"
+    },
+    "deleteFailed": "Failed to delete user",
+    "deleted": {
+      "title": "User deleted",
+      "message": "User {{username}} has been deleted"
+    }
+  },
+  "card": {
+    "id": "Id:",
+    "role": "Role:",
+    "created": "Created:",
+    "updated": "Updated:"
+  },
+  "table": {
+    "columns": {
+      "avatar": "Avatar",
+      "username": "Username",
+      "role": "Role",
+      "created": "Created",
+      "updated": "Last updated",
+      "actions": "Actions"
+    },
+    "viewFiles": "View user's files",
+    "edit": "Edit user",
+    "delete": "Delete user"
+  },
+  "grid": {
+    "empty": {
+      "title": "No users found",
+      "description": "Create a user to see them here"
+    }
+  },
+  "viewFiles": {
+    "title": "{{username}}'s files",
+    "back": "Back to users",
+    "tableOptions": "Table Options",
+    "searchById": "Search by ID"
+  }
+}

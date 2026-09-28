@@ -1,0 +1,34 @@
+{
+  "actions": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "close": "Close",
+    "ok": "OK",
+    "yes": "Yes",
+    "no": "No",
+    "edit": "Edit",
+    "create": "Create",
+    "copy": "Copy",
+    "remove": "Remove",
+    "download": "Download",
+    "upload": "Upload",
+    "refresh": "Refresh",
+    "open": "Open",
+    "continue": "Continue"
+  },
+  "status": {
+    "loading": "Loading...",
+    "error": "Error",
+    "enabled": "Enabled"
+  },
+  "warning": {
+    "title": "Are you sure?"
+  },
+  "language": {
+    "label": "Language"
+  },
+  "table": {
+    "noRecords": "No records"
+  }
+}

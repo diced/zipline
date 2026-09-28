@@ -1,0 +1,124 @@
+{
+  "title": "Usuarios",
+  "form": {
+    "username": {
+      "label": "Nombre de usuario",
+      "placeholder": "Escriba un nombre de usuario...",
+      "required": "El nombre de usuario es obligatorio"
+    },
+    "password": {
+      "label": "Contraseña",
+      "placeholder": "Escriba una contraseña...",
+      "required": "La contraseña es obligatoria"
+    },
+    "avatar": {
+      "label": "Avatar",
+      "placeholder": "Seleccione un avatar...",
+      "clear": "Borrar avatar",
+      "invalidType": "Tipo de archivo no válido",
+      "readFailed": "No se pudo leer el archivo del avatar"
+    },
+    "role": {
+      "label": "Rol"
+    }
+  },
+  "roles": {
+    "user": "Usuario",
+    "administrator": "Administrador",
+    "admin": "Admin",
+    "superAdmin": "Superadmin"
+  },
+  "create": {
+    "title": "Crear un usuario nuevo"
+  },
+  "edit": {
+    "title": "Editar a {{username}}",
+    "description": "Los campos que estén en blanco se omitirán y no se actualizarán.",
+    "submit": "Actualizar usuario",
+    "quota": {
+      "title": "Cuota",
+      "invalidValue": "Valor no válido",
+      "invalidByteFormat": "Formato de bytes no válido",
+      "fileType": {
+        "label": "Tipo de cuota de archivos",
+        "description": "Si la cuota de archivos se establece por el total de bytes o por el número total de archivos.",
+        "byBytes": "Por bytes",
+        "byFiles": "Por número de archivos",
+        "none": "Sin cuota de archivos"
+      },
+      "maxFiles": {
+        "label": "Máximo de archivos",
+        "description": "El número máximo de archivos que puede subir el usuario.",
+        "placeholder": "Escriba un número..."
+      },
+      "maxBytes": {
+        "label": "Máximo de bytes",
+        "description": "El número máximo de bytes que puede subir el usuario.",
+        "placeholder": "Escriba un tamaño en formato legible..."
+      },
+      "maxUrls": {
+        "label": "Máximo de enlaces cortos",
+        "description": "El número máximo de enlaces cortos que puede crear el usuario. Deje 0 para no establecer límite.",
+        "placeholder": "Escriba un número..."
+      }
+    }
+  },
+  "delete": {
+    "title": "¿Eliminar a {{username}}?",
+    "message": "¿Está seguro de que desea eliminar a {{username}}? Esta acción no se puede deshacer.",
+    "data": {
+      "title": "¿Eliminar los datos de {{username}}?",
+      "message": "¿Desea eliminar los archivos y enlaces cortos de {{username}}? Esta acción no se puede deshacer.",
+      "cancel": "No, conservar todo y eliminar solo el usuario",
+      "confirm": "Sí, eliminar todo"
+    }
+  },
+  "notifications": {
+    "createFailed": "No se pudo crear el usuario",
+    "created": {
+      "title": "Usuario creado",
+      "message": "Se creó el usuario {{username}}"
+    },
+    "editFailed": "No se pudo editar el usuario",
+    "edited": {
+      "title": "Usuario editado",
+      "message": "Se editó el usuario {{username}}"
+    },
+    "deleteFailed": "No se pudo eliminar el usuario",
+    "deleted": {
+      "title": "Usuario eliminado",
+      "message": "Se eliminó el usuario {{username}}"
+    }
+  },
+  "card": {
+    "id": "ID:",
+    "role": "Rol:",
+    "created": "Creado:",
+    "updated": "Actualizado:"
+  },
+  "table": {
+    "columns": {
+      "avatar": "Avatar",
+      "username": "Nombre de usuario",
+      "role": "Rol",
+      "created": "Creado",
+      "updated": "Última actualización",
+      "actions": "Acciones"
+    },
+    "viewFiles": "Ver archivos del usuario",
+    "edit": "Editar usuario",
+    "delete": "Eliminar usuario"
+  },
+  "grid": {
+    "empty": {
+      "title": "No se encontraron usuarios",
+      "description": "Cree un usuario para verlo aquí"
+    }
+  },
+  "viewFiles": {
+    "title": "Archivos de {{username}}",
+    "back": "Volver a usuarios",
+    "tableOptions": "Opciones de tabla",
+    "searchById": "Buscar por ID"
+  }
+}

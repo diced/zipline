@@ -1,0 +1,34 @@
+{
+  "actions": {
+    "cancel": "取消",
+    "save": "保存",
+    "delete": "删除",
+    "close": "关闭",
+    "ok": "确定",
+    "yes": "是",
+    "no": "否",
+    "edit": "编辑",
+    "create": "创建",
+    "copy": "复制",
+    "remove": "移除",
+    "download": "下载",
+    "upload": "上传",
+    "refresh": "刷新",
+    "open": "打开",
+    "continue": "继续"
+  },
+  "status": {
+    "loading": "正在加载...",
+    "error": "错误",
+    "enabled": "已启用"
+  },
+  "warning": {
+    "title": "你确定吗？"
+  },
+  "language": {
+    "label": "语言"
+  },
+  "table": {
+    "noRecords": "暂无记录"
+  }
+}

@@ -1,0 +1,384 @@
+{
+  "title": "Paramètres",
+  "loading": "Chargement…",
+  "user": {
+    "title": "Utilisateur",
+    "tokenCopyTooltip": "Cliquez pour copier le jeton",
+    "tokenLabel": "Jeton",
+    "tokenHidden": "[cliquez pour afficher]",
+    "form": {
+      "username": {
+        "label": "Nom d'utilisateur",
+        "required": "Le nom d'utilisateur est requis"
+      },
+      "password": {
+        "label": "Mot de passe",
+        "description": "Laissez vide pour conserver le mot de passe actuel"
+      },
+      "currentPassword": {
+        "label": "Mot de passe actuel",
+        "description": "Requis pour modifier votre mot de passe.",
+        "required": "Saisissez votre mot de passe actuel pour le modifier"
+      }
+    },
+    "notifications": {
+      "error": {
+        "title": "Erreur lors de la mise à jour de l'utilisateur"
+      },
+      "updated": {
+        "message": "Utilisateur mis à jour"
+      }
+    }
+  },
+  "avatar": {
+    "title": "Avatar",
+    "placeholder": "Téléverser un nouvel avatar…",
+    "previewNew": "Aperçu du nouvel avatar",
+    "previewCurrent": "Aperçu de l'avatar actuel",
+    "proposedAlt": "Avatar proposé",
+    "currentAlt": "Avatar de l'utilisateur",
+    "remove": "Supprimer l'avatar",
+    "notifications": {
+      "error": {
+        "title": "Erreur lors de la mise à jour de l'avatar"
+      },
+      "updated": {
+        "message": "Avatar mis à jour"
+      }
+    }
+  },
+  "sessions": {
+    "title": "Sessions",
+    "summary": "Sessions ouvertes sur d'autres appareils : {{amount}}",
+    "view": "Voir les sessions",
+    "logoutBrowser": "Se déconnecter de ce navigateur",
+    "logoutAll": "Se déconnecter de tous les appareils",
+    "empty": "Aucune autre session trouvée",
+    "table": {
+      "client": "Client",
+      "device": "Appareil",
+      "loggedInAt": "Date de connexion"
+    },
+    "modals": {
+      "logoutAll": {
+        "title": "Se déconnecter de tous les appareils ?",
+        "message": "Voulez-vous vraiment vous déconnecter de tous les appareils ? Toutes vos sessions seront fermées, sauf celle de l'appareil actuel.",
+        "confirm": "Se déconnecter"
+      },
+      "logoutDevice": {
+        "title": "Se déconnecter de l'appareil ?",
+        "message": "Voulez-vous vraiment vous déconnecter de cet appareil ?",
+        "confirm": "Se déconnecter"
+      }
+    },
+    "notifications": {
+      "loggedOutAll": "Déconnexion de tous les appareils effectuée",
+      "loggedOutDevice": "Appareil déconnecté"
+    }
+  },
+  "dashboard": {
+    "title": "Paramètres du tableau de bord",
+    "description": "Ces paramètres sont enregistrés automatiquement dans votre <b>navigateur.</b>",
+    "disableMediaPreview": {
+      "label": "Désactiver l'aperçu des médias",
+      "description": "Désactive l'aperçu des fichiers dans le tableau de bord. Cela peut aider à économiser des données et à accélérer le tableau de bord si vous avez beaucoup de fichiers multimédias, mais cela désactive aussi la visionneuse de fichiers et affiche une icône de fichier générique au lieu d'un aperçu pour les fichiers pris en charge."
+    },
+    "mediaAutoMuted": {
+      "label": "Couper le son des aperçus vidéo et audio",
+      "description": "Lorsque cette option est activée, la vidéo et l'audio de la visionneuse de fichiers démarrent automatiquement sans le son. Si elle est désactivée, la lecture du son est tentée immédiatement. Les navigateurs peuvent bloquer la lecture automatique avec le son tant que vous n'avez pas interagi avec la page."
+    },
+    "warnDeletion": {
+      "label": "Avertir avant suppression",
+      "description": "Affiche un avertissement lors d'une suppression. Si cette option est désactivée, les fichiers, liens courts, etc. seront supprimés sans avertissement préalable ! Les dossiers, les utilisateurs et les opérations groupées font exception à cette règle : un avertissement s'affiche toujours avant leur suppression."
+    },
+    "fileNavButtons": {
+      "label": "Boutons de navigation entre fichiers",
+      "description": "Affiche les boutons Précédent/Suivant à droite et à gauche de la visionneuse de fichiers pour passer facilement d'un fichier à l'autre."
+    },
+    "homeShowRecents": {
+      "label": "Afficher les éléments récents",
+      "description": "Affiche les téléversements et connexions récents sur la page d'accueil."
+    },
+    "homeShowActivity": {
+      "label": "Afficher l'activité",
+      "description": "Affiche votre activité récente sous forme de graphique sur la page d'accueil."
+    },
+    "homeShowTypes": {
+      "label": "Afficher les types de fichiers",
+      "description": "Affiche le tableau des types de fichiers sur la page d'accueil."
+    },
+    "fileViewer": {
+      "label": "Visionneuse de fichiers",
+      "description": "Choisissez la visionneuse qui s'ouvre lorsque vous cliquez sur un fichier.",
+      "options": {
+        "fullscreen": "Plein écran (bêta)",
+        "default": "Par défaut (fenêtre modale)"
+      }
+    },
+    "domain": {
+      "label": "Domaine par défaut",
+      "description": "Définit le domaine par défaut utilisé pour les liens copiés dans tout le tableau de bord. Laissez vide ou sélectionnez « Domaine par défaut » pour utiliser le domaine actuel qui sert le tableau de bord."
+    },
+    "theme": {
+      "label": "Thème",
+      "description": "Thème à utiliser pour le tableau de bord. Ce changement est uniquement visuel, dans votre navigateur, et ne modifie pas le thème des autres utilisateurs.",
+      "system": "Système"
+    },
+    "themeDark": {
+      "label": "Thème sombre",
+      "description": "Thème à utiliser pour le tableau de bord lorsque votre système est en mode sombre."
+    },
+    "themeLight": {
+      "label": "Thème clair",
+      "description": "Thème à utiliser pour le tableau de bord lorsque votre système est en mode clair."
+    }
+  },
+  "fileView": {
+    "title": "Affichage des fichiers",
+    "variablesHint": "Tous les champs de texte prennent en charge les <link>variables.</link>",
+    "disableTextFiles": {
+      "label": "Désactiver les fichiers texte",
+      "description": "Désactive l'affichage des fichiers texte via les routes d'affichage. Cela n'a aucun effet sur les autres types de fichiers et fonctionne même si les routes d'affichage sont désactivées."
+    },
+    "enabled": {
+      "label": "Activer les routes d'affichage",
+      "description": "Active l'affichage des fichiers via des routes d'affichage personnalisables"
+    },
+    "showMimetype": {
+      "label": "Afficher le type MIME",
+      "description": "Affiche le type MIME du fichier dans la route d'affichage"
+    },
+    "showTags": {
+      "label": "Afficher les étiquettes",
+      "description": "Affiche les étiquettes du fichier dans la route d'affichage"
+    },
+    "showFolder": {
+      "label": "Afficher le dossier",
+      "description": "Affiche si possible le nom ou le lien du dossier dans la route d'affichage"
+    },
+    "content": {
+      "label": "Contenu de l'affichage",
+      "description": "Modifie le contenu des routes d'affichage. La plupart du HTML est accepté, mais JavaScript n'est pas disponible."
+    },
+    "align": {
+      "label": "Alignement du contenu",
+      "description": "Modifie l'alignement du contenu dans les routes d'affichage",
+      "options": {
+        "left": "Gauche",
+        "center": "Centre",
+        "right": "Droite"
+      }
+    },
+    "embed": {
+      "label": "Activer l'intégration",
+      "description": "Active les propriétés d'intégration ci-dessous. Elles s'appuient sur les balises OpenGraph. Les routes d'affichage doivent être activées pour que cela fonctionne."
+    },
+    "embedMediaOnly": {
+      "label": "Aperçu du lien limité au média",
+      "description": "Lorsque les intégrations sont désactivées, ajoute tout de même les balises OpenGraph d'image et de vidéo pour que Discord et les applications similaires affichent uniquement le média (sans titre, description ni nom de site personnalisés). L'URL que vous collez reste dans le message sous forme de texte brut."
+    },
+    "embedTitle": {
+      "label": "Titre de l'intégration"
+    },
+    "embedDescription": {
+      "label": "Description de l'intégration"
+    },
+    "embedSiteName": {
+      "label": "Nom du site de l'intégration"
+    },
+    "embedColor": {
+      "label": "Couleur de l'intégration"
+    },
+    "notifications": {
+      "error": {
+        "title": "Erreur lors de la mise à jour des paramètres d'affichage"
+      },
+      "updated": {
+        "message": "Paramètres d'affichage mis à jour"
+      }
+    }
+  },
+  "oauth": {
+    "description": "Gérez vos fournisseurs OAuth associés.",
+    "link": "Associer un compte {{provider}}",
+    "unlink": "Dissocier le compte {{provider}}",
+    "notifications": {
+      "unlinkFailed": {
+        "title": "Impossible de dissocier le compte"
+      },
+      "unlinked": {
+        "title": "Compte dissocié",
+        "message": "Votre compte {{provider}} a été dissocié."
+      }
+    }
+  },
+  "mfa": {
+    "title": "Authentification multifacteur",
+    "description": "Configurez la 2FA ou des clés d'accès pour ajouter une couche de sécurité supplémentaire à votre compte.",
+    "totp": {
+      "enable": "Activer la 2FA",
+      "disable": "Désactiver la 2FA",
+      "modal": {
+        "enableTitle": "Activer l'authentification à deux facteurs",
+        "disableTitle": "Désactiver l'authentification à deux facteurs",
+        "disableInstructions": "Saisissez ci-dessous le code à 6 chiffres de votre application d'authentification pour confirmer la désactivation de la 2FA.",
+        "step1": "<b>Étape 1</b> Ouvrez ou téléchargez une application d'authentification qui prend en charge la lecture de codes QR ou la saisie manuelle de code. Parmi les options populaires : <twofas>2FAs</twofas>, <google>Google Authenticator</google>, <microsoft>Microsoft Authenticator</microsoft> et <apple>l'app Mots de passe d'Apple</apple>.",
+        "step2": "<b>Étape 2</b> Scannez le code QR ci-dessous avec votre application d'authentification pour activer la 2FA.",
+        "qrAlt": "code QR {{secret}}",
+        "manualEntry": "Si vous ne pouvez pas scanner le code QR, saisissez manuellement le code suivant dans votre application d'authentification : <code>{{secret}}</code>",
+        "step3": "<b>Étape 3</b> Saisissez ci-dessous le code à 6 chiffres de votre application d'authentification pour confirmer la configuration de la 2FA."
+      },
+      "invalidPin": "Code non valide",
+      "notifications": {
+        "enabled": {
+          "title": "2FA activée",
+          "message": "La 2FA a bien été activée sur votre compte."
+        },
+        "disabled": {
+          "title": "2FA désactivée",
+          "message": "La 2FA a bien été désactivée sur votre compte."
+        }
+      }
+    },
+    "passkeys": {
+      "manage": "Gérer les clés d'accès",
+      "created": "Clé d'accès créée <created />",
+      "createdAndUsed": "Clé d'accès créée <created />, dernière utilisation <lastUsed />.",
+      "legacyWarning": "Attention : cette clé d'accès a été créée avec une ancienne version de Zipline et <b>NE FONCTIONNERA PAS</b> avec cette version. Supprimez-la puis recréez-la pour garantir la compatibilité.",
+      "create": "Créer une clé d'accès",
+      "createError": "Erreur lors de la création de la clé d'accès. Réessayez plus tard.",
+      "createErrorFallback": "Une erreur s'est produite lors de la création de la clé d'accès",
+      "namePrompt": "Donnez un nom à cette clé d'accès pour la reconnaître plus tard.",
+      "namePlaceholder": "Nom de la clé d'accès",
+      "modals": {
+        "remove": {
+          "message": "Votre navigateur et votre appareil peuvent encore proposer « {{name}} » comme option de connexion. Pour la supprimer, vous devrez le faire manuellement dans les paramètres de votre appareil.",
+          "confirm": "Supprimer « {{name}} »"
+        }
+      },
+      "notifications": {
+        "saveError": {
+          "title": "Erreur lors de l'enregistrement de la clé d'accès"
+        },
+        "saved": {
+          "title": "Clé d'accès enregistrée !",
+          "message": "Votre clé d'accès a bien été enregistrée."
+        },
+        "removeError": {
+          "title": "Erreur lors de la suppression de la clé d'accès"
+        },
+        "removed": {
+          "title": "Clé d'accès supprimée !",
+          "message": "Votre clé d'accès a bien été supprimée."
+        }
+      }
+    }
+  },
+  "exports": {
+    "title": "Exports de fichiers",
+    "new": "Nouvel export",
+    "empty": "Aucun export trouvé. Cliquez sur le bouton ci-dessus pour lancer un nouvel export.",
+    "table": {
+      "id": "ID",
+      "started": "Début",
+      "files": "Fichiers",
+      "size": "Taille",
+      "completed": "{{id}} est terminé",
+      "inProgress": "{{id}} est en cours"
+    },
+    "modals": {
+      "new": {
+        "title": "Nouvel export ?",
+        "message": "Voulez-vous vraiment lancer un nouvel export ? Si vous avez beaucoup de fichiers, cela peut prendre un certain temps.",
+        "confirm": "Lancer l'export"
+      }
+    },
+    "notifications": {
+      "started": {
+        "title": "Export lancé",
+        "message": "L'export a été lancé. Vous pouvez suivre son état dans le tableau ci-dessous"
+      },
+      "deleted": {
+        "message": "L'export a été supprimé"
+      }
+    }
+  },
+  "generators": {
+    "title": "Générer des configurations de téléversement",
+    "description": "Générez des scripts pour les outils de téléversement. Les générateurs Flameshot et Script shell ne sont pris en charge que sous Linux et macOS.",
+    "logoAlt": "Logo de {{name}}",
+    "shellScript": "Script shell",
+    "desc": {
+      "flameshot": "Pour utiliser ce script, vous devez avoir installé <flameshotLink>Flameshot</flameshotLink>, <curlLink><code>curl</code></curlLink>, <jqLink><code>jq</code></jqLink> et <xclipLink><code>xclip</code> (Linux uniquement)</xclipLink>. Ce script est destiné uniquement à Linux et macOS (voir les options ci-dessous).",
+      "ishare": "Ce générateur nécessite que <link>ishare</link> soit installé sur macOS. Cet outil de téléversement est destiné uniquement à macOS.",
+      "itake": "Ce générateur nécessite que <link>iTake</link> soit installé sur macOS. Cet outil de téléversement est destiné uniquement à macOS.",
+      "shell": "Pour utiliser ce script, vous devez avoir installé <code>bash</code>, <curlLink><code>curl</code></curlLink>, <fileLink><code>file</code></fileLink>, <jqLink><code>jq</code></jqLink> et <xclipLink><code>xclip</code> (Linux uniquement)</xclipLink>. Ce script est destiné uniquement à Linux et macOS (voir les options ci-dessous)."
+    },
+    "modal": {
+      "title": "Générer une configuration {{name}}",
+      "destinationType": {
+        "label": "Type de destination",
+        "description": "Sélectionnez le type de destination à générer",
+        "options": {
+          "file": "Téléverser un fichier",
+          "url": "Raccourcir une URL"
+        }
+      },
+      "format": {
+        "label": "Format du nom",
+        "description": "Format du nom de fichier à utiliser lors du téléversement de fichiers. Le champ « Nom du fichier » a priorité sur cette valeur.",
+        "options": {
+          "default": "Par défaut",
+          "random": "Aléatoire",
+          "date": "Date",
+          "uuid": "UUID",
+          "name": "Utiliser le nom du fichier",
+          "gfycat": "Nom de style Gfycat"
+        }
+      },
+      "compression": {
+        "label": "Compression",
+        "description": "Niveau de compression à appliquer aux images (uniquement). Laissez vide pour désactiver la compression."
+      },
+      "maxViews": {
+        "label": "Vues max.",
+        "description": "Nombre maximal de vues des fichiers ou liens courts avant leur suppression. Laissez vide pour ne pas limiter le nombre de vues."
+      },
+      "overrideDomain": {
+        "label": "Remplacer le domaine",
+        "description": "Remplace le domaine par cette valeur. Le domaine renvoyé dans vos téléversements sera modifié en conséquence. Laissez vide pour utiliser le domaine par défaut.",
+        "default": "Domaine par défaut"
+      },
+      "otherOptions": "Autres options",
+      "addOriginalName": {
+        "label": "Ajouter le nom d'origine",
+        "description": "Ajoute le nom de fichier d'origine, pour que le fichier puisse être téléchargé sous ce nom. L'option « Format du nom » reste utilisée pour son nom de fichier."
+      },
+      "extensionless": {
+        "label": "URL sans extension",
+        "description": "Supprime l'extension de fichier de l'URL renvoyée. Le fichier reste accessible avec son extension. Cette option ne fonctionne que si le serveur est configuré pour autoriser les URL sans extension."
+      },
+      "xshareCompatibility": {
+        "label": "Compatibilité Xshare",
+        "description": "Si vous utilisez l'application Xshare sur Android, activez cette option pour assurer la compatibilité. La configuration générée ne fonctionnera pas avec ShareX."
+      },
+      "waylandCompatibility": {
+        "label": "Activer la compatibilité Wayland",
+        "description": "Utilise <code>wl-copy</code> au lieu de <code>xclip</code> pour copier dans le presse-papiers."
+      },
+      "macCompatibility": {
+        "label": "Activer la compatibilité macOS",
+        "description": "Utilise <code>pbcopy</code> au lieu de <code>xclip</code> pour copier dans le presse-papiers."
+      },
+      "compositorUnsupported": {
+        "label": "Environnement de bureau autre que Gnome, KDE ou Sway ?",
+        "description": "Si vous utilisez un compositeur tel que <link>Hyprland</link>, cette option définit <code>XDG_CURRENT_DESKTOP=sway</code> pour contourner les erreurs de Flameshot sous Wayland. Inutile sous Xorg."
+      },
+      "useEcho": {
+        "label": "Utiliser <code>echo</code> au lieu de copier dans le presse-papiers",
+        "description": "Affiche simplement l'URL dans le terminal au lieu de la copier dans le presse-papiers."
+      },
+      "waylandHelp": "Si vous avez du mal à faire fonctionner Flameshot sous Wayland, consultez le <link>guide Wayland</link>."
+    }
+  }
+}

@@ -1,8 +1,10 @@
+import LanguageSelect from '@/components/LanguageSelect';
 import { Response } from '@/lib/api/response';
 import { fetchApi } from '@/lib/fetchApi';
 import useUser from '@/lib/client/hooks/useUser';
 import { useTitle } from '@/lib/client/hooks/useTitle';
 import {
+  Box,
   Button,
   Center,
   Checkbox,
@@ -20,6 +22,7 @@ import { useForm } from '@mantine/form';
 import { notifications, showNotification } from '@mantine/notifications';
 import { IconLogin, IconPlus, IconUserPlus, IconX } from '@tabler/icons-react';
 import { useEffect } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import useSWR, { mutate } from 'swr';
 import GenericError from '../../error/GenericError';
@@ -27,7 +30,8 @@ import { getWebClient } from '@/lib/api/detect';
 import { ApiError } from '@/lib/api/errors';
 
 export function Component() {
-  useTitle('Register');
+  const { t } = useTranslation('auth');
+  useTitle(t('register.pageTitle'));
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -67,8 +71,8 @@ export function Component() {
       tos: false,
     },
     validate: {
-      username: (value) => (value.length >= 1 ? null : 'Username is required'),
-      password: (value) => (value.length >= 1 ? null : 'Password is required'),
+      username: (value) => (value.length >= 1 ? null : t('form.username.required')),
+      password: (value) => (value.length >= 1 ? null : t('form.password.required')),
     },
     enhanceGetInputProps: ({ field }) => ({
       name: field,
@@ -87,7 +91,7 @@ export function Component() {
     const { username, password, tos } = values;
 
     if (tos === false && config!.website.tos) {
-      form.setFieldError('tos', 'You must agree to the Terms of Service to continue');
+      form.setFieldError('tos', t('register.tosRequired'));
       return;
     }
 
@@ -106,10 +110,10 @@ export function Component() {
 
     if (error) {
       if (ApiError.check(error, 1039)) {
-        form.setFieldError('username', 'Username is taken');
+        form.setFieldError('username', t('form.username.taken'));
       } else {
         notifications.show({
-          title: 'Failed to register',
+          title: t('register.failed'),
           message: error.error,
           color: 'red',
           icon: <IconX size='1rem' />,
@@ -117,8 +121,8 @@ export function Component() {
       }
     } else {
       notifications.show({
-        title: 'Complete!',
-        message: `Your "${data?.user?.username}" account has been created.`,
+        title: t('register.complete.title'),
+        message: t('register.complete.message', { username: data?.user?.username }),
         color: 'green',
         icon: <IconPlus size='1rem' />,
       });
@@ -137,8 +141,8 @@ export function Component() {
   if (!config || configError) {
     return (
       <GenericError
-        title='Error loading configuration'
-        message='Could not load server configuration...'
+        title={t('register.configError.title')}
+        message={t('register.configError.message')}
         details={configError}
       />
     );
@@ -148,7 +152,7 @@ export function Component() {
     if (inviteError) {
       showNotification({
         id: 'invalid-invite',
-        message: 'Invalid or expired invite. Please try again later.',
+        message: t('register.invalidInvite'),
         color: 'red',
       });
 
@@ -165,7 +169,7 @@ export function Component() {
       {config.website.loginBackground && (
         <Image
           src={config.website.loginBackground}
-          alt='Background'
+          alt={t('register.backgroundAlt')}
           style={{
             position: 'absolute',
             top: 0,
@@ -205,12 +209,20 @@ export function Component() {
 
         {invite && (
           <Text ta='center' size='sm' c='dimmed'>
-            You’ve been invited to join <b>{config?.website?.title ?? 'Zipline'}</b>
-            {invite.inviter && (
-              <>
-                {' '}
-                by <b>{invite.inviter.username}</b>
-              </>
+            {invite.inviter ? (
+              <Trans
+                t={t}
+                i18nKey='register.invitedBy'
+                values={{ title: config?.website?.title ?? 'Zipline', inviter: invite.inviter.username }}
+                components={{ b: <b /> }}
+              />
+            ) : (
+              <Trans
+                t={t}
+                i18nKey='register.invited'
+                values={{ title: config?.website?.title ?? 'Zipline' }}
+                components={{ b: <b /> }}
+              />
             )}
           </Text>
         )}
@@ -219,7 +231,7 @@ export function Component() {
           <Stack my='sm'>
             <TextInput
               size='md'
-              placeholder='Enter your username...'
+              placeholder={t('form.username.placeholder')}
               autoComplete='username'
               styles={{
                 input: {
@@ -231,7 +243,7 @@ export function Component() {
 
             <PasswordInput
               size='md'
-              placeholder='Enter your password...'
+              placeholder={t('form.password.placeholder')}
               autoComplete='new-password'
               styles={{
                 input: {
@@ -245,10 +257,11 @@ export function Component() {
               <Checkbox
                 label={
                   <Text size='xs'>
-                    I agree to the{' '}
-                    <Link to='/auth/tos' target='_blank'>
-                      Terms of Service
-                    </Link>
+                    <Trans
+                      t={t}
+                      i18nKey='register.tosAgree'
+                      components={{ link: <Link to='/auth/tos' target='_blank' /> }}
+                    />
                   </Text>
                 }
                 required
@@ -263,13 +276,13 @@ export function Component() {
               variant={config.website.loginBackground ? 'outline' : 'filled'}
               leftSection={<IconUserPlus size='1rem' />}
             >
-              Register
+              {t('register.submit')}
             </Button>
           </Stack>
         </form>
 
         <Stack my='xs'>
-          <Divider label='or' />
+          <Divider label={t('or')} />
           <Button
             component={Link}
             to='/auth/login'
@@ -278,10 +291,14 @@ export function Component() {
             variant='outline'
             leftSection={<IconLogin size='1rem' />}
           >
-            Login
+            {t('register.login')}
           </Button>
         </Stack>
       </Paper>
+
+      <Box pos='fixed' top='var(--mantine-spacing-md)' right='var(--mantine-spacing-md)'>
+        <LanguageSelect />
+      </Box>
     </Center>
   );
 }

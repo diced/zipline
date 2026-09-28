@@ -2,6 +2,7 @@ import { Folder } from '@/lib/db/models/folder';
 import { Alert, Anchor, Button, CopyButton, Group, Modal, SimpleGrid, Skeleton, Text } from '@mantine/core';
 import { IconShare } from '@tabler/icons-react';
 import { lazy, Suspense } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const DashboardFile = lazy(() => import('@/components/file/DashboardFile'));
 
@@ -14,12 +15,14 @@ export default function ViewFilesModal({
   opened: boolean;
   onClose: () => void;
 }) {
+  const { t } = useTranslation('folders');
+
   return (
     <Modal
       size='auto'
       zIndex={100}
       centered
-      title={`Files in ${folder?.name}`}
+      title={t('viewFiles.title', { name: folder?.name })}
       opened={opened}
       onClose={onClose}
     >
@@ -30,8 +33,7 @@ export default function ViewFilesModal({
           mb='sm'
           styles={{ message: { marginTop: 0 } }}
         >
-          This folder allows anonymous uploads. Share the link below to allow others to let others upload
-          files to this folder.
+          {t('uploadsAlert.message')}
           <br />
           <Anchor href={`/folder/${folder.id}/upload`} target='_blank'>
             {`${window?.location?.origin ?? ''}/folder/${folder.id}/upload`}
@@ -39,7 +41,7 @@ export default function ViewFilesModal({
           <CopyButton value={`${window?.location?.origin ?? ''}/folder/${folder.id}/upload`}>
             {({ copied, copy }) => (
               <Button mx='sm' size='compact-xs' color={copied ? 'teal' : 'blue'} onClick={copy}>
-                {copied ? 'Copied url' : 'Copy url'}
+                {copied ? t('uploadsAlert.copied') : t('uploadsAlert.copy')}
               </Button>
             )}
           </CopyButton>
@@ -70,7 +72,7 @@ export default function ViewFilesModal({
           {folder?.id}
         </Text>
         <Text size='sm' c='dimmed'>
-          {folder?.files?.length} files found
+          {t('viewFiles.found', { amount: folder?.files?.length ?? '' })}
         </Text>
       </Group>
     </Modal>

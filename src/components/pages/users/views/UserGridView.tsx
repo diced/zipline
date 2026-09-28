@@ -1,10 +1,12 @@
 import { LimitedUser } from '@/lib/db/models/user';
 import { Center, Group, Paper, SimpleGrid, Skeleton, Stack, Text, Title } from '@mantine/core';
 import { IconFilesOff } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
 import useSWR from 'swr';
 import UserCard from '../UserCard';
 
 export default function UserGridView() {
+  const { t } = useTranslation('users');
   const { data: users, isLoading } = useSWR<LimitedUser[]>('/api/users?noincl=true');
 
   return (
@@ -45,10 +47,10 @@ export default function UserGridView() {
             <Stack>
               <Group>
                 <IconFilesOff size='2rem' />
-                <Title order={2}>No users found</Title>
+                <Title order={2}>{t('grid.empty.title')}</Title>
               </Group>
               <Text size='sm' c='dimmed'>
-                Create a user to see them here
+                {t('grid.empty.description')}
               </Text>
             </Stack>
           </Center>

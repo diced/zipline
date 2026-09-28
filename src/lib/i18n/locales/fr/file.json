@@ -1,0 +1,180 @@
+{
+  "notifications": {
+    "deleted": {
+      "title": "Fichier supprimé",
+      "message": "{{name}} a été supprimé"
+    },
+    "favorited": {
+      "title": "Fichier ajouté aux favoris",
+      "message": "{{name}} a été ajouté aux favoris"
+    },
+    "unfavorited": {
+      "title": "Fichier retiré des favoris",
+      "message": "{{name}} a été retiré des favoris"
+    },
+    "createFolderError": {
+      "title": "Erreur lors de la création du dossier"
+    },
+    "folderCreated": {
+      "title": "Dossier créé",
+      "message": "Le dossier {{folder}} a été créé avec {{name}}"
+    },
+    "removeFromFolderError": {
+      "title": "Erreur lors du retrait du dossier"
+    },
+    "removedFromFolder": {
+      "title": "Fichier retiré du dossier",
+      "message": "{{name}} a été retiré de {{folder}}"
+    },
+    "addToFolderError": {
+      "title": "Erreur lors de l'ajout au dossier"
+    },
+    "addedToFolder": {
+      "title": "Fichier ajouté au dossier",
+      "message": "{{name}} a été ajouté à {{folder}}"
+    },
+    "addMultipleToFolderError": {
+      "title": "Erreur lors de l'ajout des fichiers au dossier"
+    },
+    "addedMultipleToFolder": {
+      "title": "Fichiers ajoutés au dossier",
+      "message": "{{count}} fichier(s) ajouté(s) à {{folder}}"
+    },
+    "saveTagsError": {
+      "title": "Impossible d'enregistrer les étiquettes"
+    },
+    "tagsSaved": {
+      "title": "Étiquettes enregistrées",
+      "message": "Étiquettes enregistrées pour le fichier {{name}} : {{count}}"
+    },
+    "removePasswordError": {
+      "title": "Impossible de supprimer le mot de passe…"
+    },
+    "passwordRemoved": {
+      "title": "Mot de passe supprimé !",
+      "message": "Le mot de passe du fichier a été supprimé."
+    },
+    "saveChangesError": {
+      "title": "Impossible d'enregistrer les modifications…"
+    },
+    "changesSaved": {
+      "title": "Modifications enregistrées !",
+      "message": "Les modifications du fichier ont été enregistrées."
+    }
+  },
+  "delete": {
+    "confirm": "Supprimer {{name}}",
+    "message": "Voulez-vous vraiment supprimer {{name}} ? Cette action est irréversible."
+  },
+  "contextMenu": {
+    "openInNewTab": "Ouvrir dans un nouvel onglet",
+    "copyLink": "Copier le lien",
+    "copyRawLink": "Copier le lien brut",
+    "favorite": "Ajouter aux favoris",
+    "unfavorite": "Retirer des favoris",
+    "removeFromFolder": "Retirer du dossier",
+    "moveToFolder": "Déplacer vers un dossier",
+    "searchFolders": "Rechercher des dossiers…",
+    "createNamedFolder": "+ Créer « {{name}} »",
+    "noFolders": "Aucun dossier pour l'instant",
+    "createNewFolder": "+ Créer un dossier",
+    "editDetails": "Modifier les détails"
+  },
+  "createFolderModal": {
+    "title": "Créer un dossier",
+    "name": {
+      "label": "Nom du dossier",
+      "placeholder": "Mon dossier"
+    }
+  },
+  "stats": {
+    "type": "Type",
+    "size": "Taille",
+    "createdAt": "Date de création",
+    "updatedAt": "Date de modification",
+    "deletesAt": "Date de suppression",
+    "views": "Vues",
+    "originalName": "Nom d'origine",
+    "anonymous": "Anonyme"
+  },
+  "details": {
+    "title": "Détails",
+    "tags": {
+      "title": "Étiquettes",
+      "placeholder": "Choisissez une ou plusieurs étiquettes",
+      "empty": "Aucune étiquette trouvée. Créez-en une en dehors de ce menu."
+    },
+    "folder": {
+      "title": "Dossier",
+      "remove": "Retirer du dossier « {{name}} »",
+      "placeholder": "Ajouter à un dossier…",
+      "empty": "Vous n'avez aucun dossier. Commencez à saisir un nom pour créer un dossier pour ce fichier.",
+      "create": "+ Créer le dossier « {{name}} »"
+    }
+  },
+  "actions": {
+    "editDetails": "Modifier les détails du fichier",
+    "delete": "Supprimer le fichier",
+    "favorite": "Ajouter le fichier aux favoris",
+    "unfavorite": "Retirer le fichier des favoris",
+    "viewInNewTab": "Afficher le fichier dans un nouvel onglet",
+    "openInNewTab": "Ouvrir dans un nouvel onglet",
+    "copyRawLink": "Copier le lien brut du fichier",
+    "copyLink": "Copier le lien du fichier",
+    "download": "Télécharger le fichier",
+    "showDetails": "Afficher les détails",
+    "hideDetails": "Masquer les détails",
+    "previous": "Fichier précédent",
+    "next": "Fichier suivant"
+  },
+  "edit": {
+    "title": "Modification de « {{name}} »",
+    "name": {
+      "label": "Nom",
+      "description": "Renommer le fichier."
+    },
+    "maxViews": {
+      "label": "Vues max.",
+      "placeholder": "Illimité",
+      "description": "Nombre maximal de vues de ce fichier avant sa suppression. Laissez vide pour ne pas limiter le nombre de vues."
+    },
+    "originalName": {
+      "label": "Nom d'origine",
+      "description": "Ajoutez un nom d'origine. Lors du téléchargement, le fichier portera ce « nom d'origine » au lieu du nom de fichier généré (le cas échéant)."
+    },
+    "type": {
+      "label": "Type",
+      "description": "Modifiez le type MIME d'un fichier. <b>NE MODIFIEZ PAS CETTE VALEUR</b> sauf si vous savez ce que vous faites : cela peut perturber la façon dont Zipline affiche certains types de fichiers."
+    },
+    "password": {
+      "label": "Mot de passe",
+      "description": "Définissez un mot de passe pour ce fichier. Laissez vide pour désactiver la protection par mot de passe."
+    },
+    "removePassword": "Supprimer le mot de passe",
+    "save": "Enregistrer les modifications"
+  },
+  "preview": {
+    "clickToView": "Cliquez pour afficher le fichier {{name}}",
+    "clickToViewProtected": "Cliquez pour afficher le fichier protégé {{name}}",
+    "clickToPlayVideo": "Cliquez pour lire la vidéo {{name}}",
+    "clickToPlayAudio": "Cliquez pour lire l'audio {{name}}",
+    "clickToViewText": "Cliquez pour afficher le texte {{name}}",
+    "clickToDownloadCast": "Cliquez pour télécharger l'enregistrement asciinema {{name}}",
+    "clickToViewPdf": "Cliquez pour afficher le PDF {{name}}",
+    "clickToViewInNewTab": "Cliquez pour afficher le fichier {{name}} dans un nouvel onglet",
+    "videoThumbnailAlt": "Miniature de la vidéo",
+    "imageAlt": "Image",
+    "loading": "Chargement du fichier…",
+    "loadError": "Erreur lors du chargement du fichier.",
+    "tooBig": "\n...\nLe fichier est trop volumineux pour être affiché. Cliquez sur l'icône de téléchargement pour l'afficher ou le télécharger."
+  },
+  "render": {
+    "renderedThrough": "Ce fichier est rendu avec {{renderer}}",
+    "canRenderThrough": "Ce fichier peut être rendu avec {{renderer}}",
+    "showRendered": "Afficher la version rendue",
+    "hideRendered": "Masquer la version rendue",
+    "katexError": "Erreur KaTeX",
+    "showLess": "Afficher moins",
+    "showMore": "Afficher plus (lignes restantes : {{count}})"
+  }
+}

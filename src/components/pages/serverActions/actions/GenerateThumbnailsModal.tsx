@@ -4,6 +4,7 @@ import { Button, Group, Modal, Stack, Switch } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { IconVideoOff } from '@tabler/icons-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function GenerateThumbnailsModal({
   opened,
@@ -12,6 +13,7 @@ export default function GenerateThumbnailsModal({
   opened: boolean;
   onClose: () => void;
 }) {
+  const { t } = useTranslation(['serverActions', 'common']);
   const [rerun, setRerun] = useState(false);
 
   const handle = async () => {
@@ -34,16 +36,13 @@ export default function GenerateThumbnailsModal({
   };
 
   return (
-    <Modal title='Are you sure?' opened={opened} onClose={onClose}>
+    <Modal title={t('common:warning.title')} opened={opened} onClose={onClose}>
       <Stack mb='md'>
-        <span>
-          This will generate thumbnails for all files that do not have a thumbnail set. Additionally you can
-          use the options below.
-        </span>
+        <span>{t('modals.generateThumbnails.body')}</span>
 
         <Switch
-          label='Re-run'
-          description='Re-run the thumbnail generation for all files regardless of whether they have a thumbnail set.'
+          label={t('modals.generateThumbnails.rerun.label')}
+          description={t('modals.generateThumbnails.rerun.description')}
           checked={rerun}
           onChange={() => setRerun((val) => !val)}
           color='red'
@@ -51,9 +50,9 @@ export default function GenerateThumbnailsModal({
       </Stack>
 
       <Group justify='flex-end'>
-        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={onClose}>{t('common:actions.cancel')}</Button>
         <Button color='red' onClick={handle}>
-          Generate
+          {t('modals.generateThumbnails.confirm')}
         </Button>
       </Group>
     </Modal>

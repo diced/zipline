@@ -1,0 +1,208 @@
+{
+  "actions": {
+    "goToFiles": "Zu den Dateien",
+    "clearAll": "Alle entfernen",
+    "upload_one": "{{count}} Datei hochladen ({{size}})",
+    "upload_other": "{{count}} Dateien hochladen ({{size}})"
+  },
+  "file": {
+    "title": "Dateien hochladen",
+    "dropzone": {
+      "title": "Bilder hierher ziehen oder klicken, um Dateien auszuwählen",
+      "paste": "Oder <kbd>{{mod}}</kbd> + <kbd>V</kbd> drücken, um Bilder aus der Zwischenablage einzufügen",
+      "description": "Fügen Sie beliebig viele Dateien hinzu. Sie werden unten angezeigt, damit Sie sie vor dem Hochladen prüfen können.",
+      "limit": "Max. <b>{{size}}</b> pro Datei"
+    },
+    "progress": {
+      "speed": "{{speed}}/s, noch {{remaining}}",
+      "finalizing": "Upload(s) werden abgeschlossen …"
+    },
+    "hidden_one": "{{count}} weitere Datei ausgeblendet",
+    "hidden_other": "{{count}} weitere Dateien ausgeblendet",
+    "showMore": "Mehr anzeigen",
+    "showAll": "Alle anzeigen",
+    "showAllTooltip": "Bei sehr vielen Dateien kann dies die Leistung beeinträchtigen",
+    "notifications": {
+      "pasted": {
+        "message": "Bild {{name}} aus der Zwischenablage eingefügt"
+      },
+      "mayFail": {
+        "title": "Upload könnte fehlschlagen",
+        "message": "Der Upload könnte fehlschlagen, da die Gesamtgröße der Dateien, die Sie hochladen möchten (ohne Teil-Uploads), <b>{{size}}</b> beträgt und damit das Limit von <b>{{limit}}</b> überschreitet"
+      }
+    }
+  },
+  "text": {
+    "title": "Text hochladen",
+    "tabs": {
+      "text": "Text",
+      "preview": "Vorschau"
+    },
+    "addFile": "Textdatei hinzufügen",
+    "fileHeading": "Datei {{number}}"
+  },
+  "options": {
+    "button": "Optionen",
+    "title": "Upload-Optionen",
+    "description": "Diese Optionen gelten für alle Dateien, die Sie hochladen, und werden in Ihrem Browser gespeichert.",
+    "saved": "gespeichert",
+    "default": "Standard ({{value}})",
+    "never": "nie",
+    "clear": "Zurücksetzen",
+    "deletesAt": {
+      "label": "Löschen nach",
+      "description": "Die Datei wird nach Ablauf dieser Zeit automatisch gelöscht.",
+      "defaultExpiration": "Die Standard-Ablaufzeit beträgt <b>{{value}}</b> (Sie können sie mit der folgenden Option überschreiben).",
+      "setDefault": "Eine Standard-Ablaufzeit können Sie in den <link>Einstellungen</link> festlegen.",
+      "maxExpiration": "Hinweis: Die maximal zulässige Ablaufzeit beträgt <b>{{value}}</b>."
+    },
+    "expirations": {
+      "never": "Nie",
+      "minutes5": "5 Minuten",
+      "minutes10": "10 Minuten",
+      "minutes15": "15 Minuten",
+      "minutes30": "30 Minuten",
+      "hour1": "1 Stunde",
+      "hours2": "2 Stunden",
+      "hours3": "3 Stunden",
+      "hours4": "4 Stunden",
+      "hours5": "5 Stunden",
+      "hours6": "6 Stunden",
+      "hours8": "8 Stunden",
+      "hours12": "12 Stunden",
+      "day1": "1 Tag",
+      "days3": "3 Tage",
+      "days5": "5 Tage",
+      "days7": "7 Tage",
+      "week1": "1 Woche",
+      "weeksOneAndHalf": "1,5 Wochen",
+      "weeks2": "2 Wochen",
+      "weeks3": "3 Wochen",
+      "month1": "1 Monat (30 Tage)",
+      "monthsOneAndHalf": "1,5 Monate (~45 Tage)",
+      "months2": "2 Monate (60 Tage)",
+      "months3": "3 Monate (90 Tage)",
+      "months4": "4 Monate (120 Tage)",
+      "months6": "6 Monate (ein halbes Jahr)",
+      "year1": "1 Jahr",
+      "custom": "Mehr Flexibilität nötig? Legen Sie über die API ein genaues Datum und eine genaue Uhrzeit fest."
+    },
+    "format": {
+      "label": "Namensformat",
+      "description": "Das Format für den Dateinamen beim Hochladen dieser Datei. Das Feld „Dateiname überschreiben“ hat Vorrang vor diesem Wert.",
+      "random": "Zufällig",
+      "date": "Datum",
+      "name": "Dateinamen verwenden",
+      "gfycat": "Name im Gfycat-Stil"
+    },
+    "compressionFormat": {
+      "label": "Komprimierungsformat",
+      "description": "Das Bildkomprimierungsformat, das <b>nur bei Angabe eines Komprimierungsgrads in Prozent</b> verwendet wird. Belassen Sie „Standard“, um das Standard-Komprimierungsformat des Servers zu verwenden."
+    },
+    "compression": {
+      "label": "Komprimierung",
+      "description": "Die Komprimierungsstufe für Bilder (nur für Bilder). Zum Komprimieren wird das oben gewählte Format verwendet. Leer lassen, um die Komprimierung zu deaktivieren."
+    },
+    "maxViews": {
+      "label": "Max. Aufrufe",
+      "description": "Maximale Anzahl an Aufrufen, bevor die Dateien gelöscht werden. Leer lassen, um beliebig viele Aufrufe zuzulassen."
+    },
+    "folder": {
+      "label": "Zu Ordner hinzufügen",
+      "description": "Fügen Sie diese Datei einem Ordner hinzu. Wählen Sie „/ (Stammordner)“, um die Datei keinem Ordner hinzuzufügen. Dieser Wert wird nicht im Browser gespeichert und nach dem Hochladen zurückgesetzt.",
+      "placeholder": "Zu Ordner hinzufügen …",
+      "root": "/ (Stammordner)"
+    },
+    "domain": {
+      "label": "Domain überschreiben"
+    },
+    "filename": {
+      "label": "Dateiname überschreiben",
+      "description": "Überschreibt den Dateinamen mit diesem Wert. Leer lassen, um die Option „Namensformat“ zu verwenden. Dieser Wert wird ignoriert, wenn Sie mehr als eine Datei hochladen. Er wird nicht im Browser gespeichert und nach dem Hochladen zurückgesetzt."
+    },
+    "password": {
+      "label": "Passwort",
+      "description": "Legen Sie ein Passwort für diese Dateien fest. Leer lassen, um den Passwortschutz zu deaktivieren. Dieser Wert wird nicht im Browser gespeichert und nach dem Hochladen zurückgesetzt."
+    },
+    "other": "Weitere Optionen",
+    "originalName": {
+      "label": "Originalnamen hinzufügen",
+      "description": "Speichert den ursprünglichen Dateinamen, damit die Datei unter diesem Namen heruntergeladen werden kann. Für den Dateinamen selbst wird weiterhin die Option „Namensformat“ verwendet."
+    },
+    "extensionless": {
+      "label": "URL ohne Dateiendung",
+      "description": "Entfernt die Dateiendung aus der zurückgegebenen URL. Die Datei ist weiterhin auch mit Endung erreichbar. Diese Option funktioniert nur, wenn der Server URLs ohne Dateiendung zulässt."
+    }
+  },
+  "modal": {
+    "title_one": "{{count}} Datei hochgeladen",
+    "title_other": "{{count}} Dateien hochgeladen",
+    "open": "Link in neuem Tab öffnen",
+    "copy": "Link in die Zwischenablage kopieren",
+    "pending_one": "{{count}} große Datei wird <link>im Hintergrund fertig verarbeitet.</link>",
+    "pending_other": "{{count}} große Dateien werden <link>im Hintergrund fertig verarbeitet.</link>",
+    "copyAllTooltip": "Alle Links in die Zwischenablage kopieren (durch Zeilenumbrüche getrennt)",
+    "copyAll": "Alle URLs in die Zwischenablage kopieren ({{total}})",
+    "notifications": {
+      "copied": {
+        "title": "URL in die Zwischenablage kopiert"
+      },
+      "copiedAll": {
+        "title": "URLs in die Zwischenablage kopiert",
+        "message": "Alle URLs wurden durch Zeilenumbrüche getrennt in die Zwischenablage kopiert."
+      }
+    }
+  },
+  "errors": {
+    "parse": "Serverantwort konnte nicht verarbeitet werden: {{response}}",
+    "unknown": "Ein unbekannter Fehler ist aufgetreten",
+    "network": "Netzwerkfehler beim Hochladen der Dateien"
+  },
+  "notifications": {
+    "preparing": {
+      "title_one": "Datei wird vorbereitet",
+      "title_other": "Dateien werden vorbereitet",
+      "message_one": "{{count}} Datei wird hochgeladen",
+      "message_other": "{{count}} Dateien werden hochgeladen",
+      "messageBatches_one": "{{count}} Datei wird in {{batches}} Stapeln hochgeladen",
+      "messageBatches_other": "{{count}} Dateien werden in {{batches}} Stapeln hochgeladen"
+    },
+    "uploading": {
+      "batch": "Stapel {{current}}/{{total}} wird hochgeladen",
+      "title_one": "Datei wird hochgeladen",
+      "title_other": "Dateien werden hochgeladen",
+      "message_one": "{{count}} Datei",
+      "message_other": "{{count}} Dateien"
+    },
+    "complete": {
+      "title": "Upload abgeschlossen",
+      "titlePartial": "Reguläre Uploads abgeschlossen",
+      "message_one": "{{count}} Datei hochgeladen",
+      "message_other": "{{count}} Dateien hochgeladen",
+      "startingPartials_one": "Upload von {{count}} großer Datei wird gestartet …",
+      "startingPartials_other": "Upload von {{count}} großen Dateien wird gestartet …",
+      "messagePartial": "{{uploaded}}. {{starting}}"
+    },
+    "error": {
+      "title": "Fehler beim Hochladen der Dateien"
+    },
+    "partial": {
+      "title": "Große Datei wird hochgeladen",
+      "titleCount": "Große Datei wird hochgeladen ({{current}}/{{total}})",
+      "chunk": "Chunk {{current}}/{{total}}",
+      "error": {
+        "title": "Fehler beim Hochladen der Datei",
+        "message": "{{name}}: {{error}}"
+      },
+      "complete": {
+        "title": "Uploads großer Dateien abgeschlossen",
+        "message_one": "{{count}} große Datei zur Verarbeitung im Hintergrund übergeben",
+        "message_other": "{{count}} große Dateien zur Verarbeitung im Hintergrund übergeben"
+      },
+      "offloaded": {
+        "title": "Große Datei übergeben",
+        "message": "{{name}} übergeben ({{current}}/{{total}})"
+      }
+    }
+  }
+}

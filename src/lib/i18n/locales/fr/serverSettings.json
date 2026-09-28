@@ -1,0 +1,549 @@
+{
+  "sections": {
+    "core": {
+      "name": "Général",
+      "description": "Paramètres généraux du serveur"
+    },
+    "chunks": {
+      "name": "Fragments",
+      "description": "Téléversement partiel"
+    },
+    "discord": {
+      "name": "Discord",
+      "description": "Intégration des webhooks Discord"
+    },
+    "domains": {
+      "name": "Domaines",
+      "description": "Ajouter des domaines personnalisés"
+    },
+    "features": {
+      "name": "Fonctionnalités",
+      "description": "Configurer diverses fonctionnalités"
+    },
+    "files": {
+      "name": "Fichiers",
+      "description": "Paramètres de téléversement des fichiers"
+    },
+    "httpWebhook": {
+      "name": "Webhook HTTP",
+      "description": "Envoyer des requêtes POST à une URL lors de certains événements"
+    },
+    "invites": {
+      "name": "Invitations",
+      "description": "Paramètres des invitations"
+    },
+    "mfa": {
+      "name": "Authentification multifacteur",
+      "description": "Activer ou désactiver les clés d'accès et l'authentification TOTP"
+    },
+    "oauth": {
+      "name": "OAuth",
+      "description": "Configurer les fournisseurs OAuth pour l'authentification"
+    },
+    "pwa": {
+      "name": "PWA",
+      "description": "Paramètres de l'application web progressive"
+    },
+    "ratelimit": {
+      "name": "Limitation de débit",
+      "description": "Configurer les limites de débit de l'API"
+    },
+    "tasks": {
+      "name": "Tâches",
+      "description": "Intervalles des tâches en arrière-plan"
+    },
+    "urls": {
+      "name": "Raccourcissement d'URL",
+      "description": "Configurer le raccourcissement d'URL"
+    },
+    "website": {
+      "name": "Site web",
+      "description": "Paramètres du site, comme le titre et la description"
+    },
+    "settings": {
+      "name": "Paramètres du serveur"
+    }
+  },
+  "invalidSection": "Section de paramètres non valide",
+  "environmentOverrides": {
+    "title": "Paramètres imposés par l'environnement",
+    "description": "Certains paramètres sont gérés par des variables d'environnement et ne peuvent pas être modifiés ici."
+  },
+  "notifications": {
+    "saveFailed": {
+      "title": "Impossible d'enregistrer les paramètres"
+    },
+    "saved": {
+      "message": "Paramètres enregistrés"
+    }
+  },
+  "core": {
+    "returnHttpsUrls": {
+      "label": "Renvoyer des URL HTTPS",
+      "description": "Renvoie les URL avec le protocole HTTPS."
+    },
+    "trustProxy": {
+      "label": "Faire confiance aux proxys",
+      "description": "Fait confiance aux en-têtes X-Forwarded-* provenant des proxys de confiance listés ci-dessous. Nécessite un redémarrage du serveur."
+    },
+    "trustedProxies": {
+      "label": "Proxys de confiance",
+      "description": "Saisissez les adresses IPv4/IPv6 ou les plages CIDR de vos proxys inverses, séparées par des virgules. N'incluez que des proxys de confiance, pas les réseaux des clients. Avec une liste vide, les en-têtes transférés sont ignorés et les limites de débit sont partagées entre tous les clients situés derrière un même proxy. Nécessite un redémarrage du serveur."
+    },
+    "defaultDomain": {
+      "label": "Domaine par défaut",
+      "description": "Domaine à utiliser pour générer les URL. Cette valeur ne doit pas inclure le protocole."
+    },
+    "tempDirectory": {
+      "label": "Répertoire temporaire",
+      "description": "Répertoire de stockage des fichiers temporaires. Si le chemin n'est pas valide, certaines fonctions risquent de ne plus fonctionner. Nécessite un redémarrage du serveur."
+    }
+  },
+  "chunks": {
+    "enabled": {
+      "label": "Activer les fragments",
+      "description": "Active les téléversements fragmentés."
+    },
+    "max": {
+      "label": "Taille max. avant fragmentation",
+      "description": "Taille maximale d'un téléversement avant son découpage en fragments."
+    },
+    "size": {
+      "label": "Taille des fragments",
+      "description": "Taille de chaque fragment."
+    }
+  },
+  "discord": {
+    "main": {
+      "webhookUrl": {
+        "label": "URL du webhook",
+        "description": "URL du webhook Discord auquel envoyer les notifications"
+      },
+      "username": {
+        "label": "Nom d'utilisateur",
+        "description": "Nom d'utilisateur sous lequel envoyer les notifications"
+      },
+      "avatarUrl": {
+        "label": "URL de l'avatar",
+        "description": "Avatar du webhook"
+      }
+    },
+    "onUpload": {
+      "title": "Lors d'un téléversement"
+    },
+    "onShorten": {
+      "title": "Lors d'un raccourcissement"
+    },
+    "notification": {
+      "webhookUrl": {
+        "label": "URL du webhook",
+        "description": "URL du webhook Discord auquel envoyer les notifications. Si ce champ est vide, l'URL du webhook principal est utilisée"
+      },
+      "username": {
+        "label": "Nom d'utilisateur",
+        "description": "Nom d'utilisateur sous lequel envoyer les notifications. Si ce champ est vide, le nom d'utilisateur principal est utilisé"
+      },
+      "avatarUrl": {
+        "label": "URL de l'avatar",
+        "description": "Avatar du webhook. Si ce champ est vide, l'avatar principal est utilisé"
+      },
+      "content": {
+        "label": "Contenu",
+        "description": "Contenu de la notification. Ce champ peut rester vide, mais au moins l'un des champs contenu ou intégration doit être rempli"
+      },
+      "embed": {
+        "label": "Intégration",
+        "description": "Envoie la notification sous forme d'intégration, ce qui permet davantage de personnalisation ci-dessous."
+      }
+    },
+    "embed": {
+      "title": {
+        "label": "Titre",
+        "description": "Titre de l'intégration"
+      },
+      "description": {
+        "label": "Description",
+        "description": "Description de l'intégration"
+      },
+      "footer": {
+        "label": "Pied de page",
+        "description": "Pied de page de l'intégration"
+      },
+      "color": {
+        "label": "Couleur",
+        "description": "Couleur de l'intégration"
+      },
+      "thumbnail": {
+        "label": "Miniature",
+        "description": "Affiche la miniature dans l'intégration (le fichier lui-même s'il s'agit d'une image)"
+      },
+      "imageOrVideo": {
+        "label": "Image/Vidéo",
+        "description": "Affiche l'image ou la vidéo dans l'intégration"
+      },
+      "timestamp": {
+        "label": "Horodatage",
+        "description": "Affiche l'horodatage dans l'intégration"
+      },
+      "url": {
+        "label": "URL",
+        "description": "Rend le titre cliquable, avec un lien vers l'URL du fichier"
+      }
+    }
+  },
+  "domains": {
+    "input": {
+      "description": "Saisissez un nom de domaine"
+    },
+    "errors": {
+      "exists": "Ce domaine existe déjà",
+      "updateFailed": "Impossible de mettre à jour les domaines"
+    },
+    "table": {
+      "columns": {
+        "domain": "Domaine"
+      }
+    },
+    "empty": "Aucun domaine ajouté pour l'instant."
+  },
+  "features": {
+    "imageCompression": {
+      "label": "Compression d'images",
+      "description": "Permet aux utilisateurs de compresser les images."
+    },
+    "robotsTxt": {
+      "description": "Active un fichier /robots.txt pour bloquer les robots d'indexation. Nécessite un redémarrage du serveur."
+    },
+    "healthcheck": {
+      "label": "Contrôle d'état",
+      "description": "Active une route de contrôle d'état pour la surveillance de la disponibilité. Nécessite un redémarrage du serveur."
+    },
+    "userRegistration": {
+      "label": "Inscription des utilisateurs",
+      "description": "Permet aux utilisateurs de créer un compte sur le serveur."
+    },
+    "oauthRegistration": {
+      "label": "Inscription via OAuth",
+      "description": "Permet aux utilisateurs de créer un compte via des fournisseurs OAuth."
+    },
+    "deleteOnMaxViews": {
+      "label": "Supprimer une fois les vues max. atteintes",
+      "description": "Supprime automatiquement les fichiers et liens courts qui atteignent le nombre maximal de vues. Nécessite un redémarrage du serveur."
+    },
+    "metricsEnabled": {
+      "label": "Activer les statistiques",
+      "description": "Active les statistiques du serveur. Nécessite un redémarrage du serveur."
+    },
+    "metricsAdminOnly": {
+      "label": "Statistiques réservées aux admins",
+      "description": "Seuls les administrateurs peuvent consulter les statistiques."
+    },
+    "metricsShowUserSpecific": {
+      "label": "Afficher les statistiques par utilisateur",
+      "description": "Affiche les statistiques propres à chaque utilisateur, pour tous les utilisateurs."
+    },
+    "dividers": {
+      "thumbnails": "Miniatures",
+      "versionChecking": "Vérification des versions"
+    },
+    "thumbnailsEnabled": {
+      "label": "Activer les miniatures",
+      "description": "Active la génération de miniatures pour les vidéos. Nécessite un redémarrage du serveur."
+    },
+    "thumbnailsInstantaneous": {
+      "label": "Miniatures instantanées",
+      "description": "Génère les miniatures immédiatement après le téléversement d'un fichier, sans attendre l'exécution de la tâche."
+    },
+    "thumbnailsNumberThreads": {
+      "label": "Nombre de threads pour les miniatures",
+      "description": "Nombre de threads à utiliser pour la génération des miniatures, en général le nombre de threads du processeur. Nécessite un redémarrage du serveur.",
+      "placeholder": "Saisissez un nombre…"
+    },
+    "thumbnailsFormat": {
+      "label": "Format des miniatures",
+      "description": "Format de sortie des miniatures. Nécessite un redémarrage du serveur."
+    },
+    "versionChecking": {
+      "label": "Vérification des versions",
+      "description": "Interroge GitHub pour rechercher des mises à jour et affiche leur état dans la barre latérale pour tous les utilisateurs."
+    }
+  },
+  "files": {
+    "assumeMimetypes": {
+      "label": "Déduire les types MIME",
+      "description": "Déduit le type MIME d'un fichier à partir de son extension."
+    },
+    "disabledTypes": {
+      "label": "Types désactivés",
+      "description": "Types MIME à désactiver, séparés par des virgules. Si vous désactivez des types MIME, il est recommandé d'activer le paramètre « Déduire les types MIME », car les fichiers portant les extensions correspondantes seront alors également bloqués."
+    },
+    "disabledTypesDefault": {
+      "label": "Type MIME par défaut des types désactivés",
+      "description": "Type MIME par défaut à utiliser pour les types désactivés. Laissez vide pour bloquer complètement les types désactivés."
+    },
+    "removeGpsMetadata": {
+      "label": "Supprimer les métadonnées GPS",
+      "description": "Supprime les métadonnées GPS des fichiers."
+    },
+    "extensionlessUrls": {
+      "label": "URL sans extension",
+      "description": "Autorise les liens de fichiers sans extension (par ex. /u/uuid au lieu de /u/uuid.png). Les réponses de téléversement incluent toujours l'extension."
+    },
+    "route": {
+      "label": "Route",
+      "description": "Route à utiliser pour les téléversements de fichiers. Nécessite un redémarrage du serveur."
+    },
+    "length": {
+      "label": "Longueur",
+      "description": "Longueur du nom de fichier (pour les noms générés aléatoirement)."
+    },
+    "defaultFormat": {
+      "label": "Format par défaut",
+      "description": "Format par défaut des noms de fichiers."
+    },
+    "disabledExtensions": {
+      "label": "Extensions désactivées",
+      "description": "Extensions à désactiver, séparées par des virgules."
+    },
+    "maxFileSize": {
+      "label": "Taille de fichier max.",
+      "description": "Taille de fichier maximale autorisée."
+    },
+    "defaultDateFormat": {
+      "label": "Format de date par défaut",
+      "description": "Format de date à utiliser par défaut."
+    },
+    "defaultExpiration": {
+      "label": "Expiration par défaut",
+      "description": "Délai d'expiration par défaut des fichiers."
+    },
+    "maxExpiration": {
+      "label": "Expiration max.",
+      "description": "Délai d'expiration maximal autorisé pour les fichiers."
+    },
+    "randomWordsNumAdjectives": {
+      "label": "Nombre d'adjectifs (mots aléatoires)",
+      "description": "Nombre d'adjectifs à utiliser pour le format mots aléatoires/gfycat."
+    },
+    "randomWordsSeparator": {
+      "label": "Séparateur (mots aléatoires)",
+      "description": "Séparateur à utiliser pour le format mots aléatoires/gfycat."
+    },
+    "defaultCompressionFormat": {
+      "label": "Format de compression par défaut",
+      "description": "Format de compression d'image utilisé par défaut lorsque seul un pourcentage de compression est indiqué."
+    },
+    "maxFilesPerUpload": {
+      "label": "Fichiers max. par téléversement",
+      "description": "Nombre maximal de fichiers autorisés par téléversement. Nécessite un redémarrage du serveur."
+    }
+  },
+  "httpWebhook": {
+    "onUpload": {
+      "label": "Lors d'un téléversement",
+      "description": "URL à laquelle envoyer une requête POST lorsqu'un fichier est téléversé."
+    },
+    "onShorten": {
+      "label": "Lors d'un raccourcissement",
+      "description": "URL à laquelle envoyer une requête POST lorsqu'une URL est raccourcie."
+    }
+  },
+  "invites": {
+    "enabled": {
+      "label": "Activer les invitations",
+      "description": "Autorise l'utilisation de liens d'invitation pour inscrire de nouveaux utilisateurs."
+    },
+    "length": {
+      "label": "Longueur",
+      "description": "Longueur du code d'invitation."
+    }
+  },
+  "mfa": {
+    "passkeysEnabled": {
+      "label": "Clés d'accès",
+      "description": "Active la connexion sans mot de passe à l'aide de clés d'accès WebAuthn, comme votre téléphone, des clés de sécurité, etc."
+    },
+    "passkeysRpId": {
+      "label": "ID de la partie de confiance",
+      "description": "ID de la partie de confiance (RP ID) à utiliser pour les clés d'accès WebAuthn."
+    },
+    "passkeysOrigin": {
+      "label": "Origine",
+      "description": "Origine à utiliser pour les clés d'accès WebAuthn."
+    },
+    "totpEnabled": {
+      "label": "Activer le TOTP",
+      "description": "Active les mots de passe à usage unique basés sur le temps, via une application d'authentification."
+    },
+    "totpIssuer": {
+      "label": "Émetteur",
+      "description": "Émetteur à utiliser pour les jetons TOTP."
+    }
+  },
+  "oauth": {
+    "intro": "Pour qu'OAuth fonctionne, le paramètre « Inscription via OAuth » doit être activé dans la section <link>Fonctionnalités</link>. En cas de problème, essayez de redémarrer Zipline après l'enregistrement.",
+    "bypassLocalLogin": {
+      "label": "Ignorer la connexion locale",
+      "description": "Ignore la page de connexion locale et redirige vers le fournisseur OAuth. Ne fonctionne que si un seul fournisseur est activé."
+    },
+    "loginOnly": {
+      "label": "Connexion uniquement",
+      "description": "Désactive l'inscription et n'autorise que la connexion via OAuth. Les utilisateurs existants peuvent par exemple associer des fournisseurs."
+    },
+    "provider": {
+      "clientId": "ID client {{provider}}",
+      "clientSecret": "Secret client {{provider}}",
+      "redirectUrl": {
+        "label": "URL de redirection {{provider}}",
+        "description": "URL de redirection à utiliser à la place de l'hôte lors de la connexion. Inutile si l'URL générée par Zipline fonctionne comme prévu."
+      }
+    },
+    "discord": {
+      "allowedIds": {
+        "label": "ID Discord autorisés",
+        "description": "Liste, séparée par des virgules, des ID d'utilisateurs Discord autorisés à se connecter. Laissez vide pour désactiver la liste d'autorisation."
+      },
+      "deniedIds": {
+        "label": "ID Discord refusés",
+        "description": "Liste, séparée par des virgules, des ID d'utilisateurs Discord interdits de connexion. Laissez vide pour désactiver la liste de refus."
+      }
+    },
+    "oidc": {
+      "authorizeUrl": "URL d'autorisation OIDC",
+      "tokenUrl": "URL du jeton OIDC",
+      "userinfoUrl": "URL Userinfo OIDC"
+    }
+  },
+  "pwa": {
+    "intro": "Actualisez la page après avoir activé la PWA pour voir les changements.",
+    "enabled": {
+      "label": "PWA activée",
+      "description": "Permet aux utilisateurs d'installer la PWA Zipline sur leurs appareils."
+    },
+    "title": {
+      "label": "Titre",
+      "description": "Titre de la PWA"
+    },
+    "shortName": {
+      "label": "Nom court",
+      "description": "Nom court de la PWA"
+    },
+    "description": {
+      "label": "Description",
+      "description": "Description de la PWA"
+    },
+    "themeColor": {
+      "label": "Couleur du thème",
+      "description": "Couleur du thème de la PWA"
+    },
+    "backgroundColor": {
+      "label": "Couleur d'arrière-plan",
+      "description": "Couleur d'arrière-plan de la PWA"
+    }
+  },
+  "ratelimit": {
+    "intro": "Toutes les options nécessitent un redémarrage pour prendre effet.",
+    "enabled": {
+      "label": "Activer la limitation de débit",
+      "description": "Active la limitation de débit sur le serveur."
+    },
+    "adminBypass": {
+      "label": "Exemption des admins",
+      "description": "Permet aux admins de contourner la limitation de débit."
+    },
+    "max": {
+      "label": "Requêtes max.",
+      "description": "Nombre maximal de requêtes autorisées dans la fenêtre. Si aucune fenêtre n'est définie, il s'agit du nombre maximal de requêtes avant d'atteindre la limite."
+    },
+    "window": {
+      "label": "Fenêtre",
+      "description": "Durée de la fenêtre, en secondes, pendant laquelle le nombre max. de requêtes est autorisé."
+    },
+    "allowList": {
+      "label": "Liste d'autorisation",
+      "description": "Liste, séparée par des virgules, d'adresses IP exemptées de la limitation de débit."
+    }
+  },
+  "tasks": {
+    "intro": "Toutes les options nécessitent un redémarrage pour prendre effet. Une valeur de <code>0</code> désactive la tâche.",
+    "deleteInterval": {
+      "label": "Intervalle de suppression des fichiers",
+      "description": "Fréquence de vérification et de suppression des fichiers expirés."
+    },
+    "clearInvitesInterval": {
+      "label": "Intervalle de nettoyage des invitations",
+      "description": "Fréquence de vérification et de suppression des invitations expirées ou utilisées."
+    },
+    "maxViewsInterval": {
+      "label": "Intervalle des vues max.",
+      "description": "Fréquence de vérification et de suppression des fichiers ayant atteint le nombre max. de vues."
+    },
+    "thumbnailsInterval": {
+      "label": "Intervalle des miniatures",
+      "description": "Fréquence de vérification et de génération des miniatures des fichiers vidéo."
+    },
+    "cleanThumbnailsInterval": {
+      "label": "Intervalle de nettoyage des miniatures",
+      "description": "Fréquence de vérification et de suppression des miniatures orphelines dans le système de fichiers ou la base de données."
+    },
+    "metricsInterval": {
+      "label": "Intervalle des statistiques",
+      "description": "Fréquence de collecte des données statistiques. Une valeur plus faible donne des statistiques plus à jour, mais peut augmenter l'utilisation du processeur."
+    }
+  },
+  "urls": {
+    "route": {
+      "label": "Route",
+      "description": "Route à utiliser pour les liens courts. Nécessite un redémarrage du serveur."
+    },
+    "length": {
+      "label": "Longueur",
+      "description": "Longueur des liens courts (pour les noms générés aléatoirement)."
+    }
+  },
+  "website": {
+    "title": {
+      "label": "Titre",
+      "description": "Titre du site web, affiché dans les onglets du navigateur et en haut de page."
+    },
+    "titleLogo": {
+      "label": "Logo du titre",
+      "description": "URL du logo du titre. Il est placé à gauche du titre."
+    },
+    "externalLinks": {
+      "label": "Liens externes",
+      "description": "Liens externes à afficher dans le pied de page. La valeur doit être du JSON valide, sous la forme d'un tableau d'objets ayant les propriétés \"name\" et \"url\". Par exemple : [{\"name\": \"GitHub\", \"url\": \"https://github.com/diced/zipline\"}]"
+    },
+    "errors": {
+      "invalidJson": "JSON non valide"
+    },
+    "loginBackground": {
+      "label": "Arrière-plan de connexion",
+      "description": "URL de l'image d'arrière-plan de la page de connexion."
+    },
+    "loginBackgroundBlur": {
+      "label": "Flou de l'arrière-plan de connexion",
+      "description": "Indique s'il faut flouter l'arrière-plan de la page de connexion."
+    },
+    "defaultAvatar": {
+      "label": "Avatar par défaut",
+      "description": "Chemin de l'avatar par défaut. Il doit s'agir d'un chemin vers une image, et non d'une URL."
+    },
+    "tos": {
+      "label": "Conditions d'utilisation",
+      "description": "Chemin vers un fichier Markdown (.md) contenant les conditions d'utilisation."
+    },
+    "defaultTheme": {
+      "label": "Thème par défaut",
+      "description": "Thème par défaut du site web."
+    },
+    "darkTheme": {
+      "label": "Thème sombre",
+      "description": "Thème sombre à utiliser pour le site web lorsque le thème par défaut est « system »."
+    },
+    "lightTheme": {
+      "label": "Thème clair",
+      "description": "Thème clair à utiliser pour le site web lorsque le thème par défaut est « system »."
+    }
+  }
+}

@@ -33,6 +33,7 @@ import {
   IconWorldPlus,
 } from '@tabler/icons-react';
 import { lazy, Suspense, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import useSWR from 'swr';
 
@@ -52,133 +53,142 @@ const Tasks = lazy(() => import('./parts/Tasks'));
 const Urls = lazy(() => import('./parts/Urls'));
 const Website = lazy(() => import('./parts/Website'));
 
-const InvalidSettingsSection = () => <Text>Invalid settings section</Text>;
+function InvalidSettingsSection() {
+  const { t } = useTranslation('serverSettings');
+
+  return <Text>{t('invalidSection')}</Text>;
+}
 
 const SETTINGS_COMPONENTS = {
   core: {
     component: Core,
-    name: 'Core',
+    nameKey: 'sections.core.name',
     key: 'core',
-    desc: 'General server settings',
+    descriptionKey: 'sections.core.description',
     Icon: IconDatabase,
   },
   chunks: {
     component: Chunks,
-    name: 'Chunks',
+    nameKey: 'sections.chunks.name',
     key: 'chunks',
-    desc: 'Partial uploading',
+    descriptionKey: 'sections.chunks.description',
     Icon: IconLayoutGrid,
   },
   discord: {
     component: Discord,
-    name: 'Discord',
+    nameKey: 'sections.discord.name',
     key: 'discord',
-    desc: 'Discord webhook integration',
+    descriptionKey: 'sections.discord.description',
     Icon: IconBrandDiscordFilled,
   },
   domains: {
     component: Domains,
-    name: 'Domains',
+    nameKey: 'sections.domains.name',
     key: 'domains',
-    desc: 'Add custom domains',
+    descriptionKey: 'sections.domains.description',
     Icon: IconWorldPlus,
   },
   features: {
     component: Features,
-    name: 'Features',
+    nameKey: 'sections.features.name',
     key: 'features',
-    desc: 'Configure various features',
+    descriptionKey: 'sections.features.description',
     Icon: IconAdjustmentsHorizontalFilled,
   },
   files: {
     component: Files,
-    name: 'Files',
+    nameKey: 'sections.files.name',
     key: 'files',
-    desc: 'File uploading settings',
+    descriptionKey: 'sections.files.description',
     Icon: IconFiles,
   },
   httpWebhook: {
     component: HttpWebhook,
-    name: 'HTTP Webhook',
+    nameKey: 'sections.httpWebhook.name',
     key: 'httpWebhook',
-    desc: 'Send POST requests to a URL on certain events',
+    descriptionKey: 'sections.httpWebhook.description',
     Icon: IconHttpPost,
   },
   invites: {
     component: Invites,
-    name: 'Invites',
+    nameKey: 'sections.invites.name',
     key: 'invites',
-    desc: 'Invite settings',
+    descriptionKey: 'sections.invites.description',
     Icon: IconTagsFilled,
   },
   mfa: {
     component: Mfa,
-    name: 'Multi-Factor Authentication',
+    nameKey: 'sections.mfa.name',
     key: 'mfa',
-    desc: 'Enable or disable passkeys and TOTP authentication',
+    descriptionKey: 'sections.mfa.description',
     Icon: IconAuth2fa,
   },
   oauth: {
     component: Oauth,
-    name: 'OAuth',
+    nameKey: 'sections.oauth.name',
     key: 'oauth',
-    desc: 'Configure OAuth providers for authentication',
+    descriptionKey: 'sections.oauth.description',
     Icon: IconKeyFilled,
   },
   pwa: {
     component: PWA,
-    name: 'PWA',
+    nameKey: 'sections.pwa.name',
     key: 'pwa',
-    desc: 'Progressive Web App settings',
+    descriptionKey: 'sections.pwa.description',
     Icon: IconAppWindowFilled,
   },
   ratelimit: {
     component: Ratelimit,
-    name: 'Rate Limit',
+    nameKey: 'sections.ratelimit.name',
     key: 'ratelimit',
-    desc: 'Configure API rate limits',
+    descriptionKey: 'sections.ratelimit.description',
     Icon: IconClockPause,
   },
   tasks: {
     component: Tasks,
-    name: 'Tasks',
+    nameKey: 'sections.tasks.name',
     key: 'tasks',
-    desc: 'Background task intervals',
+    descriptionKey: 'sections.tasks.description',
     Icon: IconSubtask,
   },
   urls: {
     component: Urls,
-    name: 'URL Shortening',
+    nameKey: 'sections.urls.name',
     key: 'urls',
-    desc: 'Configure URL shortening settings',
+    descriptionKey: 'sections.urls.description',
     Icon: IconLink,
   },
   website: {
     component: Website,
-    name: 'Website',
+    nameKey: 'sections.website.name',
     key: 'website',
-    desc: 'Website related settings like title and description',
+    descriptionKey: 'sections.website.description',
     Icon: IconClickFilled,
   },
 
   // placeholder
   settings: {
     component: null,
-    name: 'Server Settings',
+    nameKey: 'sections.settings.name',
     key: '',
-    desc: '',
+    descriptionKey: null,
     Icon: null,
   },
-};
+} as const;
 
-export const SETTINGS_EXTERNAL_LINKS = Object.values(SETTINGS_COMPONENTS)
-  .filter((setting) => setting.component !== null)
-  .map((setting) => ({
-    label: setting.name,
-    description: setting.desc,
-    href: `/dashboard/admin/settings/${setting.key}`,
-    icon: setting.Icon ? setting.Icon : IconAdjustmentsHorizontalFilled,
-  }));
+// labelKey / descriptionKey are keys in the 'serverSettings' namespace, translate them at render time
+export const SETTINGS_EXTERNAL_LINKS = Object.values(SETTINGS_COMPONENTS).flatMap((setting) =>
+  setting.component !== null && setting.descriptionKey !== null
+    ? [
+        {
+          labelKey: setting.nameKey,
+          descriptionKey: setting.descriptionKey,
+          href: `/dashboard/admin/settings/${setting.key}`,
+          icon: setting.Icon ? setting.Icon : IconAdjustmentsHorizontalFilled,
+        },
+      ]
+    : [],
+);
 
 const SETTINGS_PART_KEYS = Object.keys(SETTINGS_COMPONENTS)
   .filter((key) => key !== 'settings')
@@ -187,6 +197,7 @@ const SETTINGS_PART_KEYS = Object.keys(SETTINGS_COMPONENTS)
 export default function DashboardServerSettings() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { t } = useTranslation('serverSettings');
 
   const { data } = useSWR<Response['/api/server/settings']>('/api/server/settings');
 
@@ -267,7 +278,9 @@ export default function DashboardServerSettings() {
   const setting = SETTINGS_COMPONENTS[part as keyof typeof SETTINGS_COMPONENTS];
   const SettingsComponent = setting.component ?? InvalidSettingsSection;
 
-  useTitle(setting.name);
+  const settingName = t(setting.nameKey);
+
+  useTitle(settingName);
 
   return (
     <>
@@ -277,7 +290,7 @@ export default function DashboardServerSettings() {
             <IconArrowBack size='1rem' />
           </ActionIcon>
         )}
-        <Title order={1}>{setting.name}</Title>
+        <Title order={1}>{settingName}</Title>
       </Group>
 
       {(data?.tampered?.length ?? 0) > 0 && (
@@ -292,13 +305,13 @@ export default function DashboardServerSettings() {
             >
               <Box miw={0}>
                 <Group gap='xs'>
-                  <Text fw={600}>Environment overrides</Text>
+                  <Text fw={600}>{t('environmentOverrides.title')}</Text>
                   <Badge color='orange' variant='light' size='sm'>
                     {data!.tampered.length}
                   </Badge>
                 </Group>
                 <Text c='dimmed' size='sm'>
-                  Some settings are managed by environment variables and cannot be changed here.
+                  {t('environmentOverrides.description')}
                 </Text>
               </Box>
             </Accordion.Control>
@@ -336,7 +349,14 @@ export default function DashboardServerSettings() {
         </Box>
       ) : (
         <Box my='sm'>
-          <LinksList links={SETTINGS_EXTERNAL_LINKS} />
+          <LinksList
+            links={SETTINGS_EXTERNAL_LINKS.map(({ labelKey, descriptionKey, href, icon }) => ({
+              label: t(labelKey),
+              description: t(descriptionKey),
+              href,
+              icon,
+            }))}
+          />
         </Box>
       )}
     </>

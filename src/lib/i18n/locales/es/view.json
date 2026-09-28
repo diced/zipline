@@ -1,0 +1,36 @@
+{
+  "password": {
+    "title": "Se requiere contraseña",
+    "invalid": "Contraseña no válida",
+    "verify": "Verificar",
+    "fileDescription": "Este archivo está protegido con contraseña. Escriba la contraseña para verlo",
+    "urlDescription": "Este enlace está protegido con contraseña. Escriba la contraseña para verlo"
+  },
+  "file": {
+    "pageTitle": "Ver archivo",
+    "viewFolder": "Ver carpeta",
+    "viewRaw": "Ver archivo sin procesar",
+    "download": "Descargar archivo"
+  },
+  "url": {
+    "redirecting": "Redirigiendo a <link>{{destination}}</link>"
+  },
+  "folder": {
+    "pageTitle": "Carpeta",
+    "subfolders": "Subcarpetas",
+    "files": "Archivos",
+    "empty": "Esta carpeta está vacía.",
+    "card": {
+      "files": "Archivos: {{amount}}",
+      "subfolders": "Subcarpetas: {{amount}}"
+    },
+    "pagination": "Archivos {{from}} - {{to}} de {{total}}"
+  },
+  "folderUpload": {
+    "pageTitle": "Subir a {{name}}",
+    "pageTitleFallback": "Subir a la carpeta",
+    "title": "Subir archivos a {{name}}",
+    "public": "Esta carpeta es <link>pública</link>. Cualquier persona con el enlace puede ver su contenido y subir archivos.",
+    "private": "Solo el propietario puede ver el contenido de esta carpeta. Sin embargo, cualquier persona puede subir archivos y seguir accediendo a los archivos que subió si tiene el enlace a cada uno de ellos."
+  }
+}

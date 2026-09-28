@@ -1,0 +1,384 @@
+{
+  "title": "Einstellungen",
+  "loading": "Wird geladen …",
+  "user": {
+    "title": "Benutzer",
+    "tokenCopyTooltip": "Klicken, um das Token zu kopieren",
+    "tokenLabel": "Token",
+    "tokenHidden": "[zum Anzeigen klicken]",
+    "form": {
+      "username": {
+        "label": "Benutzername",
+        "required": "Benutzername ist erforderlich"
+      },
+      "password": {
+        "label": "Passwort",
+        "description": "Leer lassen, um das bisherige Passwort beizubehalten"
+      },
+      "currentPassword": {
+        "label": "Aktuelles Passwort",
+        "description": "Erforderlich, um Ihr Passwort zu ändern.",
+        "required": "Geben Sie Ihr aktuelles Passwort ein, um es zu ändern"
+      }
+    },
+    "notifications": {
+      "error": {
+        "title": "Fehler beim Aktualisieren des Benutzers"
+      },
+      "updated": {
+        "message": "Benutzer aktualisiert"
+      }
+    }
+  },
+  "avatar": {
+    "title": "Profilbild",
+    "placeholder": "Neues Profilbild hochladen …",
+    "previewNew": "Vorschau des neuen Profilbilds",
+    "previewCurrent": "Vorschau des aktuellen Profilbilds",
+    "proposedAlt": "Neues Profilbild",
+    "currentAlt": "Profilbild des Benutzers",
+    "remove": "Profilbild entfernen",
+    "notifications": {
+      "error": {
+        "title": "Fehler beim Aktualisieren des Profilbilds"
+      },
+      "updated": {
+        "message": "Profilbild aktualisiert"
+      }
+    }
+  },
+  "sessions": {
+    "title": "Sitzungen",
+    "summary": "Weitere Geräte, auf denen Sie angemeldet sind: {{amount}}",
+    "view": "Sitzungen anzeigen",
+    "logoutBrowser": "In diesem Browser abmelden",
+    "logoutAll": "Auf allen Geräten abmelden",
+    "empty": "Keine weiteren Sitzungen gefunden",
+    "table": {
+      "client": "Client",
+      "device": "Gerät",
+      "loggedInAt": "Angemeldet am"
+    },
+    "modals": {
+      "logoutAll": {
+        "title": "Auf allen Geräten abmelden?",
+        "message": "Möchten Sie sich wirklich auf allen Geräten abmelden? Sie werden auf allen Geräten außer dem aktuellen abgemeldet.",
+        "confirm": "Abmelden"
+      },
+      "logoutDevice": {
+        "title": "Gerät abmelden?",
+        "message": "Möchten Sie sich auf diesem Gerät wirklich abmelden?",
+        "confirm": "Abmelden"
+      }
+    },
+    "notifications": {
+      "loggedOutAll": "Auf allen Geräten abgemeldet",
+      "loggedOutDevice": "Gerät abgemeldet"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard-Einstellungen",
+    "description": "Diese Einstellungen werden automatisch in Ihrem <b>Browser</b> gespeichert.",
+    "disableMediaPreview": {
+      "label": "Medienvorschau deaktivieren",
+      "description": "Deaktiviert die Vorschau von Dateien im Dashboard. Bei vielen Mediendateien kann das Datenvolumen sparen und das Dashboard beschleunigen. Allerdings wird dadurch auch der Dateibetrachter deaktiviert, und für unterstützte Dateien wird statt einer Vorschau ein allgemeines Dateisymbol angezeigt."
+    },
+    "mediaAutoMuted": {
+      "label": "Video- und Audiovorschau stummschalten",
+      "description": "Wenn aktiviert, werden Video und Audio im Dateibetrachter automatisch stumm abgespielt. Ist diese Option deaktiviert, wird versucht, den Ton sofort wiederzugeben. Browser blockieren die automatische Wiedergabe mit Ton unter Umständen, bis Sie mit der Seite interagiert haben."
+    },
+    "warnDeletion": {
+      "label": "Vor dem Löschen warnen",
+      "description": "Zeigt beim Löschen eine Warnung an. Ist diese Option deaktiviert, werden Dateien, Kurzlinks usw. ohne vorherige Warnung gelöscht! Ordner, Benutzer und Massenaktionen sind von dieser Regel ausgenommen und zeigen vor dem Löschen immer eine Warnung an."
+    },
+    "fileNavButtons": {
+      "label": "Schaltflächen zur Dateinavigation",
+      "description": "Zeigt rechts und links im Dateibetrachter Schaltflächen für „Zurück“ und „Weiter“ an, um bequem zwischen Dateien zu wechseln."
+    },
+    "homeShowRecents": {
+      "label": "Neueste Dateien anzeigen",
+      "description": "Zeigt die neuesten Uploads und Anmeldungen auf der Startseite an."
+    },
+    "homeShowActivity": {
+      "label": "Aktivität anzeigen",
+      "description": "Zeigt Ihre letzten Aktivitäten als Diagramm auf der Startseite an."
+    },
+    "homeShowTypes": {
+      "label": "Dateitypen anzeigen",
+      "description": "Zeigt die Tabelle der Dateitypen auf der Startseite an."
+    },
+    "fileViewer": {
+      "label": "Dateibetrachter",
+      "description": "Wählen Sie, welcher Dateibetrachter sich beim Klick auf eine Datei öffnet.",
+      "options": {
+        "fullscreen": "Vollbild (Beta)",
+        "default": "Standard (Dialog)"
+      }
+    },
+    "domain": {
+      "label": "Standarddomain",
+      "description": "Legt die Standarddomain für kopierte Links im gesamten Dashboard fest. Leer lassen oder „Standarddomain“ auswählen, um die aktuelle Domain zu verwenden, über die das Dashboard bereitgestellt wird."
+    },
+    "theme": {
+      "label": "Design",
+      "description": "Das Design des Dashboards. Dies ändert nur die Darstellung in Ihrem Browser und nicht das Design anderer Benutzer.",
+      "system": "System"
+    },
+    "themeDark": {
+      "label": "Dunkles Design",
+      "description": "Das Design des Dashboards, wenn Ihr System den dunklen Modus verwendet."
+    },
+    "themeLight": {
+      "label": "Helles Design",
+      "description": "Das Design des Dashboards, wenn Ihr System den hellen Modus verwendet."
+    }
+  },
+  "fileView": {
+    "title": "Dateiansicht",
+    "variablesHint": "Alle Textfelder unterstützen <link>Variablen.</link>",
+    "disableTextFiles": {
+      "label": "Textdateien deaktivieren",
+      "description": "Deaktiviert die Anzeige von Textdateien über Ansichtsrouten. Dies hat keine Auswirkung auf andere Dateitypen und funktioniert auch, wenn Ansichtsrouten deaktiviert sind."
+    },
+    "enabled": {
+      "label": "Ansichtsrouten aktivieren",
+      "description": "Aktiviert die Anzeige von Dateien über anpassbare Ansichtsrouten"
+    },
+    "showMimetype": {
+      "label": "MIME-Typ anzeigen",
+      "description": "Zeigt den MIME-Typ der Datei in der Ansichtsroute an"
+    },
+    "showTags": {
+      "label": "Tags anzeigen",
+      "description": "Zeigt die Tags der Datei in der Ansichtsroute an"
+    },
+    "showFolder": {
+      "label": "Ordner anzeigen",
+      "description": "Zeigt nach Möglichkeit den Namen bzw. Link des Ordners in der Ansichtsroute an"
+    },
+    "content": {
+      "label": "Inhalt der Ansicht",
+      "description": "Ändert den Inhalt innerhalb von Ansichtsrouten. HTML ist größtenteils zulässig, JavaScript kann jedoch nicht verwendet werden."
+    },
+    "align": {
+      "label": "Ausrichtung des Inhalts",
+      "description": "Ändert die Ausrichtung des Inhalts innerhalb von Ansichtsrouten",
+      "options": {
+        "left": "Links",
+        "center": "Zentriert",
+        "right": "Rechts"
+      }
+    },
+    "embed": {
+      "label": "Einbettung aktivieren",
+      "description": "Aktiviert die folgenden Einbettungseigenschaften. Diese nutzen OpenGraph-Tags. Dafür müssen Ansichtsrouten aktiviert sein."
+    },
+    "embedMediaOnly": {
+      "label": "Linkvorschau nur mit Medien",
+      "description": "Wenn Einbettungen deaktiviert sind, werden trotzdem OpenGraph-Tags für Bild und Video hinzugefügt, sodass Discord und ähnliche Apps nur das Medium anzeigen (ohne eigenen Titel, eigene Beschreibung oder eigenen Seitennamen). Die eingefügte URL bleibt als reiner Text in der Nachricht stehen."
+    },
+    "embedTitle": {
+      "label": "Titel der Einbettung"
+    },
+    "embedDescription": {
+      "label": "Beschreibung der Einbettung"
+    },
+    "embedSiteName": {
+      "label": "Seitenname der Einbettung"
+    },
+    "embedColor": {
+      "label": "Farbe der Einbettung"
+    },
+    "notifications": {
+      "error": {
+        "title": "Fehler beim Aktualisieren der Ansichtseinstellungen"
+      },
+      "updated": {
+        "message": "Ansichtseinstellungen aktualisiert"
+      }
+    }
+  },
+  "oauth": {
+    "description": "Verwalten Sie Ihre verbundenen OAuth-Anbieter.",
+    "link": "Konto bei {{provider}} verknüpfen",
+    "unlink": "Verknüpfung mit {{provider}} aufheben",
+    "notifications": {
+      "unlinkFailed": {
+        "title": "Verknüpfung konnte nicht aufgehoben werden"
+      },
+      "unlinked": {
+        "title": "Verknüpfung aufgehoben",
+        "message": "Die Verknüpfung mit Ihrem Konto bei {{provider}} wurde aufgehoben."
+      }
+    }
+  },
+  "mfa": {
+    "title": "Mehrstufige Authentifizierung",
+    "description": "Richten Sie 2FA oder Passkeys ein, um Ihr Konto zusätzlich abzusichern.",
+    "totp": {
+      "enable": "2FA aktivieren",
+      "disable": "2FA deaktivieren",
+      "modal": {
+        "enableTitle": "Zwei-Faktor-Authentifizierung aktivieren",
+        "disableTitle": "Zwei-Faktor-Authentifizierung deaktivieren",
+        "disableInstructions": "Geben Sie unten den 6-stelligen Code aus Ihrer Authentifizierungs-App ein, um das Deaktivieren von 2FA zu bestätigen.",
+        "step1": "<b>Schritt 1</b> Öffnen Sie eine Authentifizierungs-App, die das Scannen von QR-Codes oder die manuelle Codeeingabe unterstützt, oder laden Sie eine herunter. Beliebte Optionen sind <twofas>2FAs</twofas>, <google>Google Authenticator</google>, <microsoft>Microsoft Authenticator</microsoft> und <apple>Apple Passwörter</apple>.",
+        "step2": "<b>Schritt 2</b> Scannen Sie den folgenden QR-Code mit Ihrer Authentifizierungs-App, um 2FA zu aktivieren.",
+        "qrAlt": "QR-Code {{secret}}",
+        "manualEntry": "Falls Sie den QR-Code nicht scannen können, geben Sie den folgenden Code manuell in Ihre Authentifizierungs-App ein: <code>{{secret}}</code>",
+        "step3": "<b>Schritt 3</b> Geben Sie unten den 6-stelligen Code aus Ihrer Authentifizierungs-App ein, um die Einrichtung von 2FA zu bestätigen."
+      },
+      "invalidPin": "Ungültiger Code",
+      "notifications": {
+        "enabled": {
+          "title": "2FA aktiviert",
+          "message": "Sie haben 2FA für Ihr Konto erfolgreich aktiviert."
+        },
+        "disabled": {
+          "title": "2FA deaktiviert",
+          "message": "Sie haben 2FA für Ihr Konto erfolgreich deaktiviert."
+        }
+      }
+    },
+    "passkeys": {
+      "manage": "Passkeys verwalten",
+      "created": "Passkey <created /> erstellt",
+      "createdAndUsed": "Passkey <created /> erstellt, zuletzt <lastUsed /> verwendet.",
+      "legacyWarning": "Warnung: Dieser Passkey wurde mit einer älteren Version von Zipline erstellt und funktioniert mit dieser Version <b>NICHT</b>. Bitte löschen Sie diesen Passkey und erstellen Sie ihn neu, um die Kompatibilität sicherzustellen.",
+      "create": "Passkey erstellen",
+      "createError": "Fehler beim Erstellen eines Passkeys – bitte versuchen Sie es später erneut",
+      "createErrorFallback": "Beim Erstellen eines Passkeys ist ein Fehler aufgetreten",
+      "namePrompt": "Geben Sie diesem Passkey einen Namen, damit Sie ihn später wiedererkennen.",
+      "namePlaceholder": "Name des Passkeys",
+      "modals": {
+        "remove": {
+          "message": "Ihr Browser und Ihr Gerät zeigen „{{name}}“ möglicherweise weiterhin als Anmeldeoption an. Wenn Sie ihn entfernen möchten, müssen Sie das manuell in den Einstellungen Ihres Geräts tun.",
+          "confirm": "„{{name}}“ entfernen"
+        }
+      },
+      "notifications": {
+        "saveError": {
+          "title": "Fehler beim Speichern des Passkeys"
+        },
+        "saved": {
+          "title": "Passkey gespeichert!",
+          "message": "Ihr Passkey wurde erfolgreich gespeichert."
+        },
+        "removeError": {
+          "title": "Fehler beim Entfernen des Passkeys"
+        },
+        "removed": {
+          "title": "Passkey entfernt!",
+          "message": "Ihr Passkey wurde erfolgreich entfernt."
+        }
+      }
+    }
+  },
+  "exports": {
+    "title": "Dateien exportieren",
+    "new": "Neuer Export",
+    "empty": "Keine Exporte gefunden. Klicken Sie auf die Schaltfläche oben, um einen neuen Export zu starten.",
+    "table": {
+      "id": "ID",
+      "started": "Gestartet",
+      "files": "Dateien",
+      "size": "Größe",
+      "completed": "{{id}} ist abgeschlossen",
+      "inProgress": "{{id}} wird ausgeführt"
+    },
+    "modals": {
+      "new": {
+        "title": "Neuen Export starten?",
+        "message": "Möchten Sie wirklich einen neuen Export starten? Bei vielen Dateien kann dies eine Weile dauern.",
+        "confirm": "Export starten"
+      }
+    },
+    "notifications": {
+      "started": {
+        "title": "Export gestartet",
+        "message": "Der Export wurde gestartet. Den Status können Sie in der Tabelle unten verfolgen"
+      },
+      "deleted": {
+        "message": "Der Export wurde gelöscht"
+      }
+    }
+  },
+  "generators": {
+    "title": "Uploader generieren",
+    "description": "Generieren Sie Skripte für Upload-Tools. Die Generatoren für Flameshot und Shell-Skripte werden nur unter Linux und macOS unterstützt.",
+    "logoAlt": "Logo von {{name}}",
+    "shellScript": "Shell-Skript",
+    "desc": {
+      "flameshot": "Für dieses Skript müssen <flameshotLink>Flameshot</flameshotLink>, <curlLink><code>curl</code></curlLink>, <jqLink><code>jq</code></jqLink> und <xclipLink><code>xclip</code> (nur Linux)</xclipLink> installiert sein. Dieses Skript ist nur für Linux und macOS vorgesehen (siehe Optionen unten).",
+      "ishare": "Für diesen Generator muss <link>ishare</link> unter macOS installiert sein. Dieser Uploader ist nur für macOS vorgesehen.",
+      "itake": "Für diesen Generator muss <link>iTake</link> unter macOS installiert sein. Dieser Uploader ist nur für macOS vorgesehen.",
+      "shell": "Für dieses Skript müssen <code>bash</code>, <curlLink><code>curl</code></curlLink>, <fileLink><code>file</code></fileLink>, <jqLink><code>jq</code></jqLink> und <xclipLink><code>xclip</code> (nur Linux)</xclipLink> installiert sein. Dieses Skript ist nur für Linux und macOS vorgesehen (siehe Optionen unten)."
+    },
+    "modal": {
+      "title": "Uploader für {{name}} generieren",
+      "destinationType": {
+        "label": "Zieltyp",
+        "description": "Wählen Sie aus, für welche Art von Ziel generiert werden soll",
+        "options": {
+          "file": "Datei hochladen",
+          "url": "URL kürzen"
+        }
+      },
+      "format": {
+        "label": "Namensformat",
+        "description": "Das Format für Dateinamen beim Hochladen. Das Feld „Dateiname“ hat Vorrang vor diesem Wert.",
+        "options": {
+          "default": "Standard",
+          "random": "Zufällig",
+          "date": "Datum",
+          "uuid": "UUID",
+          "name": "Dateinamen verwenden",
+          "gfycat": "Name im Gfycat-Stil"
+        }
+      },
+      "compression": {
+        "label": "Komprimierung",
+        "description": "Die Komprimierungsstufe für Bilder (nur für Bilder). Leer lassen, um die Komprimierung zu deaktivieren."
+      },
+      "maxViews": {
+        "label": "Max. Aufrufe",
+        "description": "Maximale Anzahl an Aufrufen, bevor Dateien bzw. Kurzlinks gelöscht werden. Leer lassen, um beliebig viele Aufrufe zuzulassen."
+      },
+      "overrideDomain": {
+        "label": "Domain überschreiben",
+        "description": "Überschreibt die Domain mit diesem Wert. Dadurch ändert sich die Domain, die für Ihre Uploads zurückgegeben wird. Leer lassen, um die Standarddomain zu verwenden.",
+        "default": "Standarddomain"
+      },
+      "otherOptions": "Weitere Optionen",
+      "addOriginalName": {
+        "label": "Originalnamen hinzufügen",
+        "description": "Speichert den ursprünglichen Dateinamen, damit die Datei unter diesem Namen heruntergeladen werden kann. Für den Dateinamen selbst wird weiterhin die Option „Namensformat“ verwendet."
+      },
+      "extensionless": {
+        "label": "URL ohne Dateiendung",
+        "description": "Entfernt die Dateiendung aus der zurückgegebenen URL. Die Datei ist weiterhin auch mit Endung erreichbar. Diese Option funktioniert nur, wenn der Server URLs ohne Dateiendung zulässt."
+      },
+      "xshareCompatibility": {
+        "label": "Xshare-Kompatibilität",
+        "description": "Wenn Sie die App Xshare unter Android verwenden, aktivieren Sie diese Option für die Kompatibilität. Die generierte Konfiguration funktioniert dann nicht mit ShareX."
+      },
+      "waylandCompatibility": {
+        "label": "Wayland-Kompatibilität aktivieren",
+        "description": "Verwendet <code>wl-copy</code> statt <code>xclip</code> zum Kopieren in die Zwischenablage."
+      },
+      "macCompatibility": {
+        "label": "macOS-Kompatibilität aktivieren",
+        "description": "Verwendet <code>pbcopy</code> statt <code>xclip</code> zum Kopieren in die Zwischenablage."
+      },
+      "compositorUnsupported": {
+        "label": "Andere Desktopumgebung als Gnome, KDE oder Sway?",
+        "description": "Bei Verwendung eines Compositors wie <link>Hyprland</link> setzt diese Option <code>XDG_CURRENT_DESKTOP=sway</code>, um Fehler von Flameshot unter Wayland zu umgehen. Unter Xorg ist dies nicht erforderlich."
+      },
+      "useEcho": {
+        "label": "<code>echo</code> statt Kopieren in die Zwischenablage verwenden",
+        "description": "Gibt die URL nur im Terminal aus, statt sie in die Zwischenablage zu kopieren."
+      },
+      "waylandHelp": "Wenn Flameshot unter Wayland nicht funktioniert, lesen Sie den <link>Wayland-Leitfaden</link>."
+    }
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "title": "Convites",
+  "create": {
+    "title": "Criar um convite",
+    "expiresAt": {
+      "label": "Expira em",
+      "description": "Selecione quando este convite expira ou escolha \"Nunca\" para que ele nunca expire.",
+      "placeholder": "Selecione a expiração..."
+    },
+    "maxUses": {
+      "label": "Usos máx.",
+      "description": "Defina um número máximo de usos para este convite ou deixe em branco para usos ilimitados.",
+      "placeholder": "Digite um número..."
+    }
+  },
+  "expirations": {
+    "never": "Nunca",
+    "minutes30": "30 minutos",
+    "hour1": "1 hora",
+    "hours6": "6 horas",
+    "hours12": "12 horas",
+    "day1": "1 dia",
+    "days3": "3 dias",
+    "days5": "5 dias",
+    "days7": "7 dias"
+  },
+  "notifications": {
+    "created": {
+      "title": "Convite criado",
+      "message": "O convite {{code}} foi criado."
+    },
+    "deleteFailed": {
+      "title": "Falha ao excluir o convite"
+    },
+    "deleted": {
+      "title": "Convite excluído",
+      "message": "O convite {{code}} foi excluído."
+    }
+  },
+  "delete": {
+    "message": "Tem certeza de que deseja excluir o convite {{code}}? Esta ação não pode ser desfeita.",
+    "confirm": "Excluir {{code}}"
+  },
+  "card": {
+    "copyUrl": "Copiar URL",
+    "showQrCode": "Mostrar código QR",
+    "createdBy": "Criado por:",
+    "created": "Criado em:",
+    "expires": "Expira em:",
+    "maxUses": "Usos máx.:",
+    "uses": "Usos:",
+    "unlimited": "Ilimitado"
+  },
+  "empty": {
+    "title": "Nenhum convite encontrado",
+    "description": "Crie um convite para vê-lo aqui."
+  },
+  "table": {
+    "columns": {
+      "code": "Código",
+      "createdBy": "Criado por",
+      "created": "Criado em",
+      "updatedAt": "Última atualização",
+      "expires": "Expira em",
+      "maxUses": "Usos máx.",
+      "uses": "Usos",
+      "actions": "Ações"
+    },
+    "never": "Nunca",
+    "unlimited": "Ilimitado",
+    "copyLink": "Copiar link do convite",
+    "showQrCode": "Mostrar código QR",
+    "delete": "Excluir convite"
+  }
+}

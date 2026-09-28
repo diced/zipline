@@ -1,0 +1,124 @@
+{
+  "nav": {
+    "home": "Startseite",
+    "metrics": "Statistiken",
+    "files": "Dateien",
+    "folders": "Ordner",
+    "upload": "Hochladen",
+    "uploadFile": "Datei",
+    "uploadText": "Text",
+    "urls": "Kurzlinks",
+    "administrator": "Administrator",
+    "adminDashboard": "Dashboard",
+    "serverSettings": "Einstellungen",
+    "serverActions": "Aktionen",
+    "users": "Benutzer",
+    "invites": "Einladungen"
+  },
+  "header": {
+    "logoAlt": "Zipline-Logo",
+    "avatarAlt": "Profilbild des Benutzers"
+  },
+  "userMenu": {
+    "administratorLabel": "{{username}} (Administrator)",
+    "copyToken": "Token kopieren",
+    "refreshToken": "Token erneuern",
+    "settings": "Einstellungen",
+    "serverSettings": "Servereinstellungen",
+    "logout": "Abmelden",
+    "loggingOut": "Abmeldung läuft …"
+  },
+  "token": {
+    "cancel": "Nein, Fenster schließen",
+    "copy": {
+      "title": "Token kopieren?",
+      "message": "Möchten Sie Ihr Token wirklich kopieren? Mit Ihrem Token kann auf alle Bereiche von Zipline zugegriffen werden. Geben Sie dieses Token an niemanden weiter."
+    },
+    "copied": {
+      "title": "Kopiert",
+      "message": "Ihr Token wurde in die Zwischenablage kopiert."
+    },
+    "refresh": {
+      "title": "Token erneuern?",
+      "message": "Möchten Sie Ihr Token wirklich erneuern? Nach dem Erneuern bzw. Zurücksetzen müssen Sie alle Skripte und Anwendungen aktualisieren, die Ihr Token verwenden."
+    },
+    "refreshed": {
+      "title": "Erneuert",
+      "message": "Ihr Token wurde erneuert."
+    }
+  },
+  "version": {
+    "modalTitle": "Zipline-Version",
+    "tooltip": "Klicken, um weitere Versionsinformationen anzuzeigen",
+    "latest": "Sie verwenden die neueste Version von Zipline.",
+    "unstable": "Sie verwenden eine <b>instabile</b> Version von Zipline. Upstream-Versionen sind nicht vollständig getestet und können Fehler enthalten.",
+    "outdated": "Sie verwenden eine <b>veraltete</b> Version von Zipline. Es wird empfohlen, auf die <link>neueste Version</link> zu aktualisieren.",
+    "current": "Aktuelle Version",
+    "fields": {
+      "version": "Version",
+      "commit": "Commit",
+      "upstream": "Upstream?",
+      "availableToUpdate": "Aktualisierung möglich"
+    },
+    "latestCommit": "Neuester verfügbarer Commit",
+    "latestCommitNote": "Dies wird nur bei Verwendung einer Upstream-Version angezeigt.",
+    "available": "{{tag}} ist verfügbar",
+    "changelogs": "Änderungsprotokolle",
+    "update": "Aktualisieren"
+  },
+  "qrCode": {
+    "title": "QR-Code",
+    "alt": "QR-Code",
+    "failed": "QR-Code konnte nicht erstellt werden.",
+    "format": "Format",
+    "copyUnsupported": "Das Kopieren in diesem Format wird von einigen Browsern nicht unterstützt. Sie können das Bild wie gewohnt per Rechtsklick oder durch langes Drücken kopieren.",
+    "copyImage": "Bild kopieren",
+    "copied": "QR-Code-Bild in die Zwischenablage kopiert",
+    "copyFailed": "QR-Code-Bild konnte nicht kopiert werden"
+  },
+  "domainSelect": {
+    "default": "Standarddomain",
+    "description": "Überschreibt die Domain mit diesem Wert. Dadurch ändert sich die Domain, die für Ihre Uploads zurückgegeben wird. Leer lassen, um die Standarddomain zu verwenden."
+  },
+  "copyLink": {
+    "title": "Link kopiert"
+  },
+  "errors": {
+    "generic": {
+      "title": "Ein Fehler ist aufgetreten",
+      "message": "Etwas ist schiefgelaufen. Bitte versuchen Sie es später erneut oder melden Sie das Problem, falls es weiterhin besteht."
+    },
+    "dashboard": {
+      "title": "Clientfehler im Dashboard",
+      "message": "Beim Laden des Dashboards ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut oder melden Sie das Problem, falls es weiterhin besteht."
+    },
+    "reload": {
+      "title": "Update verfügbar",
+      "message": "Eine neue Version der App ist verfügbar. Bitte laden Sie die Seite neu, um sie zu aktualisieren.",
+      "button": "Seite neu laden",
+      "why": "Warum wird mir das angezeigt?",
+      "errorTitle": "Dynamisch importiertes Modul konnte nicht abgerufen werden",
+      "errorMessage": "Dieser Fehler kann auftreten, wenn eine neue Version der App bereitgestellt wird, während Sie die Seite geöffnet haben. Bitte laden Sie die Seite neu, um auf die neueste Version zu aktualisieren."
+    }
+  },
+  "notFound": {
+    "message": "Seite nicht gefunden",
+    "goHome": "Zur Startseite"
+  },
+  "titles": {
+    "settings": "Einstellungen",
+    "folders": "Ordner",
+    "files": "Dateien",
+    "metrics": "Statistiken",
+    "urls": "Kurzlinks",
+    "serverSettings": "Servereinstellungen",
+    "administrator": "Administrator",
+    "serverActions": "Serveraktionen",
+    "invites": "Einladungen",
+    "uploadFile": "Datei hochladen",
+    "uploadText": "Text hochladen",
+    "users": "Benutzer",
+    "userFiles": "Dateien von {{username}}",
+    "unknownUserFiles": "Dateien des Benutzers"
+  }
+}

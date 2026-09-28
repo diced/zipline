@@ -19,6 +19,7 @@ import {
 } from '@tabler/icons-react';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import useSWR from 'swr';
 import { copyFolderUrl, editFolderUploads, editFolderVisibility } from '../actions';
 import DeleteFolderModal from '../modals/DeleteFolderModal';
@@ -44,12 +45,13 @@ function FolderDotsMenu({
   setMoveOpen: (folder: Folder) => void;
   setEditNameOpen: (folder: Folder) => void;
 }) {
+  const { t } = useTranslation(['folders', 'common']);
   const [opened, setOpened] = useState(false);
 
   return (
     <Menu shadow='md' width={200} opened={opened} onChange={setOpened}>
       <Menu.Target>
-        <Tooltip label='More actions'>
+        <Tooltip label={t('menu.moreActions')}>
           <ActionIcon onClick={withoutPropagation(() => setOpened((o) => !o))}>
             <IconDots size='1rem' />
           </ActionIcon>
@@ -62,14 +64,14 @@ function FolderDotsMenu({
             leftSection={<IconFolderOpen size='1rem' />}
             onClick={withoutPropagation(() => onNavigate(folder.id!))}
           >
-            Open Folder
+            {t('menu.open')}
           </Menu.Item>
         )}
         <Menu.Item
           leftSection={<IconFolderSymlink size='1rem' />}
           onClick={withoutPropagation(() => setMoveOpen(folder))}
         >
-          Move Folder
+          {t('menu.move')}
         </Menu.Item>
         <Menu.Item
           leftSection={<IconFileZip size='1rem' />}
@@ -78,32 +80,32 @@ function FolderDotsMenu({
           target='_blank'
           onClick={withoutPropagation(() => {})}
         >
-          Export as ZIP
+          {t('menu.export')}
         </Menu.Item>
         <Menu.Item
           leftSection={folder.public ? <IconLock size='1rem' /> : <IconLockOpen size='1rem' />}
           onClick={withoutPropagation(() => editFolderVisibility(folder, !folder.public))}
         >
-          {folder.public ? 'Make Private' : 'Make Public'}
+          {folder.public ? t('menu.makePrivate') : t('menu.makePublic')}
         </Menu.Item>
         <Menu.Item
           leftSection={folder.public ? <IconShareOff size='1rem' /> : <IconShare size='1rem' />}
           onClick={withoutPropagation(() => editFolderUploads(folder, !folder.allowUploads))}
         >
-          {folder.allowUploads ? 'Disallow anonymous uploads' : 'Allow anonymous uploads'}
+          {folder.allowUploads ? t('menu.disallowUploads') : t('menu.allowUploads')}
         </Menu.Item>
         <Menu.Item
           leftSection={<IconPencil size='1rem' />}
           onClick={withoutPropagation(() => setEditNameOpen(folder))}
         >
-          Edit Name
+          {t('menu.editName')}
         </Menu.Item>
         <Menu.Item
           leftSection={<IconTrashFilled size='1rem' />}
           color='red'
           onClick={withoutPropagation(() => setDeleteOpen(folder))}
         >
-          Delete
+          {t('common:actions.delete')}
         </Menu.Item>
       </Menu.Dropdown>
     </Menu>
@@ -117,6 +119,7 @@ export default function FolderTableView({
   currentFolderId: string | null;
   onNavigate: (folderId: string | null) => void;
 }) {
+  const { t } = useTranslation('folders');
   const clipboard = useClipboard();
 
   const queryParam = currentFolderId ? `?parentId=${currentFolderId}&noincl=true` : '?root=true&noincl=true';
@@ -173,10 +176,11 @@ export default function FolderTableView({
           records={sorted ?? []}
           onRowClick={({ record }) => onNavigate(record.id)}
           rowStyle={() => ({ cursor: 'pointer' })}
-          noRecordsText='No subfolders'
+          noRecordsText={t('table.noRecords')}
           columns={[
             {
               accessor: 'name',
+              title: t('table.columns.name'),
               sortable: true,
               render: (folder) => (
                 <Group gap='xs'>
@@ -184,7 +188,7 @@ export default function FolderTableView({
                   <Text>{folder.name}</Text>
                   {(folder._count?.children ?? 0) > 0 && (
                     <Badge size='xs' variant='light'>
-                      {folder._count?.children} subfolder{(folder._count?.children ?? 0) > 1 ? 's' : ''}
+                      {t('table.subfolders', { count: folder._count?.children ?? 0 })}
                     </Badge>
                   )}
                 </Group>
@@ -192,29 +196,31 @@ export default function FolderTableView({
             },
             {
               accessor: 'public',
+              title: t('table.columns.public'),
               sortable: true,
               render: (folder) => <Checkbox checked={folder.public} readOnly />,
             },
             {
               accessor: 'allowUploads',
-              title: 'Uploads?',
+              title: t('table.columns.uploads'),
               sortable: true,
               render: (folder) => <Checkbox checked={folder.allowUploads} readOnly />,
             },
             {
               accessor: 'createdAt',
-              title: 'Created',
+              title: t('table.columns.created'),
               sortable: true,
               render: (folder) => <RelativeDate date={folder.createdAt} />,
             },
             {
               accessor: 'updatedAt',
-              title: 'Last update at',
+              title: t('table.columns.updated'),
               sortable: true,
               render: (folder) => <RelativeDate date={folder.updatedAt} />,
             },
             {
               accessor: 'actions',
+              title: t('table.columns.actions'),
               textAlign: 'right',
               render: (folder) => (
                 <Group gap='sm' justify='right' wrap='nowrap'>
@@ -226,7 +232,7 @@ export default function FolderTableView({
                     setEditNameOpen={setEditNameOpen}
                   />
 
-                  <Tooltip label='Copy folder link'>
+                  <Tooltip label={t('table.copyLink')}>
                     <ActionIcon
                       onClick={(e) => {
                         e.stopPropagation();
@@ -237,7 +243,7 @@ export default function FolderTableView({
                       <IconCopy size='1rem' />
                     </ActionIcon>
                   </Tooltip>
-                  <Tooltip label='Delete Folder'>
+                  <Tooltip label={t('table.delete')}>
                     <ActionIcon
                       color='red'
                       onClick={(e) => {

@@ -1,3 +1,4 @@
+import LanguageSelect from '@/components/LanguageSelect';
 import { type Response } from '@/lib/api/response';
 import { fetchApi } from '@/lib/fetchApi';
 import { useTitle } from '@/lib/client/hooks/useTitle';
@@ -19,6 +20,7 @@ import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { IconArrowBackUp, IconArrowForwardUp, IconCheck, IconX } from '@tabler/icons-react';
 import { useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { redirect, useNavigate } from 'react-router-dom';
 import { mutate } from 'swr';
 
@@ -46,7 +48,8 @@ export async function loader() {
 }
 
 export function Component() {
-  useTitle('Setup');
+  const { t } = useTranslation(['auth', 'common']);
+  useTitle(t('setup.pageTitle'));
 
   const navigate = useNavigate();
 
@@ -62,8 +65,8 @@ export function Component() {
       password: '',
     },
     validate: {
-      username: (value) => (value.length >= 1 ? null : 'Username is required'),
-      password: (value) => (value.length >= 1 ? null : 'Password is required'),
+      username: (value) => (value.length >= 1 ? null : t('form.username.required')),
+      password: (value) => (value.length >= 1 ? null : t('form.password.required')),
     },
     enhanceGetInputProps: ({ field }) => ({
       name: field,
@@ -80,7 +83,7 @@ export function Component() {
 
     if (error) {
       notifications.show({
-        title: 'Error',
+        title: t('common:status.error'),
         message: error.error,
         color: 'red',
         icon: <IconX size='1rem' />,
@@ -90,8 +93,8 @@ export function Component() {
       setActive(2);
     } else {
       notifications.show({
-        title: 'Setup complete!',
-        message: 'Logging in to new user...',
+        title: t('setup.complete.title'),
+        message: t('setup.complete.loggingIn'),
         color: 'green',
         loading: true,
       });
@@ -103,7 +106,7 @@ export function Component() {
 
       if (error) {
         notifications.show({
-          title: 'Error',
+          title: t('common:status.error'),
           message: error.error,
           color: 'red',
           icon: <IconX size='1rem' />,
@@ -120,47 +123,60 @@ export function Component() {
 
   return (
     <>
+      <Group justify='flex-end' mx='sm' mt='sm'>
+        <LanguageSelect />
+      </Group>
+
       <Paper withBorder p='xs' m='sm'>
         <Stepper active={active} onStepClick={setActive} m='md'>
-          <Stepper.Step label='Welcome!' description='Setup Zipline'>
-            <Title>Welcome to Zipline!</Title>
+          <Stepper.Step
+            label={t('setup.steps.welcome.label')}
+            description={t('setup.steps.welcome.description')}
+          >
+            <Title>{t('setup.welcome.title')}</Title>
             <SimpleGrid spacing='md' cols={{ base: 1, sm: 1 }}>
               <Paper withBorder p='sm' my='sm' h='100%'>
-                <Title order={2}>Documentation</Title>
-                <Text>Here are a couple of useful documentation links to get you started with Zipline:</Text>
+                <Title order={2}>{t('setup.welcome.docs.title')}</Title>
+                <Text>{t('setup.welcome.docs.intro')}</Text>
 
                 <Stack mt='xs'>
-                  <LinkToDoc href='https://zipline.diced.sh/docs/config' title='Configuration'>
-                    Configuring Zipline to your needs
+                  <LinkToDoc
+                    href='https://zipline.diced.sh/docs/config'
+                    title={t('setup.welcome.docs.config.title')}
+                  >
+                    {t('setup.welcome.docs.config.description')}
                   </LinkToDoc>
 
-                  <LinkToDoc href='https://zipline.diced.sh/docs/migrate' title='Migrate from v3 to v4'>
-                    Upgrading from a previous version of Zipline
+                  <LinkToDoc
+                    href='https://zipline.diced.sh/docs/migrate'
+                    title={t('setup.welcome.docs.migrate.title')}
+                  >
+                    {t('setup.welcome.docs.migrate.description')}
                   </LinkToDoc>
                 </Stack>
               </Paper>
 
               <Paper withBorder p='sm' my='sm' h='100%'>
-                <Title order={2}>Configuration</Title>
+                <Title order={2}>{t('setup.welcome.config.title')}</Title>
 
                 <Text>
-                  Most of Zipline&apos;s configuration is now managed through the dashboard. Once you login as
-                  a super-admin, you can click on your username in the top right corner and select
-                  &quot;Server Settings&quot; to configure your instance. The only exception to this is a few
-                  sensitive environment variables that must be set in order for Zipline to run. To change
-                  this, depending on the setup, you can either edit the <Code>.env</Code> or{' '}
-                  <Code>docker-compose.yml</Code> file.
+                  <Trans t={t} i18nKey='setup.welcome.config.body' components={{ code: <Code /> }} />
                 </Text>
 
                 <Text>
-                  To see all of the available environment variables, please refer to the documentation{' '}
-                  <Anchor
-                    href='https://zipline.diced.sh/docs/config'
-                    target='_blank'
-                    rel='noopener noreferrer'
-                  >
-                    here.
-                  </Anchor>
+                  <Trans
+                    t={t}
+                    i18nKey='setup.welcome.config.envVars'
+                    components={{
+                      link: (
+                        <Anchor
+                          href='https://zipline.diced.sh/docs/config'
+                          target='_blank'
+                          rel='noopener noreferrer'
+                        />
+                      ),
+                    }}
+                  />
                 </Text>
               </Paper>
             </SimpleGrid>
@@ -173,23 +189,26 @@ export function Component() {
               variant='default'
               onClick={nextStep}
             >
-              Continue
+              {t('common:actions.continue')}
             </Button>
           </Stepper.Step>
-          <Stepper.Step label='Create user' description='Create a super-admin account'>
+          <Stepper.Step
+            label={t('setup.steps.createUser.label')}
+            description={t('setup.steps.createUser.description')}
+          >
             <Stack gap='lg'>
-              <Title order={2}>Create your super-admin account</Title>
+              <Title order={2}>{t('setup.createUser.title')}</Title>
 
               <TextInput
-                label='Username'
-                placeholder='Enter a username...'
+                label={t('form.username.label')}
+                placeholder={t('setup.createUser.usernamePlaceholder')}
                 autoComplete='username'
                 {...form.getInputProps('username')}
               />
 
               <PasswordInput
-                label='Password'
-                placeholder='Enter a password...'
+                label={t('form.password.label')}
+                placeholder={t('setup.createUser.passwordPlaceholder')}
                 autoComplete='new-password'
                 {...form.getInputProps('password')}
               />
@@ -202,7 +221,7 @@ export function Component() {
                 variant='default'
                 onClick={prevStep}
               >
-                Back
+                {t('setup.back')}
               </Button>
 
               <Button
@@ -212,17 +231,14 @@ export function Component() {
                 onClick={nextStep}
                 disabled={!form.isValid()}
               >
-                Continue
+                {t('common:actions.continue')}
               </Button>
             </Group>
           </Stepper.Step>
           <Stepper.Completed>
-            <Title order={2}>Setup complete!</Title>
+            <Title order={2}>{t('setup.complete.title')}</Title>
 
-            <Text>
-              Clicking &quot;Finish&quot; below will create your super-admin account and log you in. You will
-              be redirected to the dashboard shortly after that.
-            </Text>
+            <Text>{t('setup.complete.body')}</Text>
             <Group justify='space-between' my='lg'>
               <Button
                 leftSection={<IconArrowBackUp size='1.25rem' />}
@@ -231,7 +247,7 @@ export function Component() {
                 onClick={prevStep}
                 loading={loading}
               >
-                Back
+                {t('setup.back')}
               </Button>
 
               <Button
@@ -241,7 +257,7 @@ export function Component() {
                 loading={loading}
                 onClick={() => form.onSubmit(onSubmit)()}
               >
-                Finish
+                {t('setup.finish')}
               </Button>
             </Group>
           </Stepper.Completed>

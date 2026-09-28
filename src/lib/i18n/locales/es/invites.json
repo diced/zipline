@@ -1,0 +1,75 @@
+{
+  "title": "Invitaciones",
+  "create": {
+    "title": "Crear una invitación",
+    "expiresAt": {
+      "label": "Expiración",
+      "description": "Seleccione cuándo expira esta invitación, o elija \"Nunca\" si no desea que expire.",
+      "placeholder": "Seleccione una expiración..."
+    },
+    "maxUses": {
+      "label": "Usos máx.",
+      "description": "Establezca un número máximo de usos para esta invitación, o déjelo en blanco para permitir usos ilimitados.",
+      "placeholder": "Escriba un número..."
+    }
+  },
+  "expirations": {
+    "never": "Nunca",
+    "minutes30": "30 minutos",
+    "hour1": "1 hora",
+    "hours6": "6 horas",
+    "hours12": "12 horas",
+    "day1": "1 día",
+    "days3": "3 días",
+    "days5": "5 días",
+    "days7": "7 días"
+  },
+  "notifications": {
+    "created": {
+      "title": "Invitación creada",
+      "message": "Se creó la invitación {{code}}."
+    },
+    "deleteFailed": {
+      "title": "No se pudo eliminar la invitación"
+    },
+    "deleted": {
+      "title": "Invitación eliminada",
+      "message": "Se eliminó la invitación {{code}}."
+    }
+  },
+  "delete": {
+    "message": "¿Está seguro de que desea eliminar la invitación {{code}}? Esta acción no se puede deshacer.",
+    "confirm": "Eliminar {{code}}"
+  },
+  "card": {
+    "copyUrl": "Copiar URL",
+    "showQrCode": "Mostrar código QR",
+    "createdBy": "Creada por:",
+    "created": "Creada:",
+    "expires": "Expira:",
+    "maxUses": "Usos máx.:",
+    "uses": "Usos:",
+    "unlimited": "Ilimitados"
+  },
+  "empty": {
+    "title": "No se encontraron invitaciones",
+    "description": "Cree una invitación para verla aquí."
+  },
+  "table": {
+    "columns": {
+      "code": "Código",
+      "createdBy": "Creada por",
+      "created": "Creada",
+      "updatedAt": "Última actualización",
+      "expires": "Expira",
+      "maxUses": "Usos máx.",
+      "uses": "Usos",
+      "actions": "Acciones"
+    },
+    "never": "Nunca",
+    "unlimited": "Ilimitados",
+    "copyLink": "Copiar enlace de invitación",
+    "showQrCode": "Mostrar código QR",
+    "delete": "Eliminar invitación"
+  }
+}

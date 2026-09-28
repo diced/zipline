@@ -2,6 +2,7 @@ import type { Response } from '@/lib/api/response';
 import { Button, JsonInput, LoadingOverlay, Stack, Switch, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconDeviceFloppy } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { settingsOnSubmit } from '../settingsOnSubmit';
 import useServerSettings from '../useServerSettings';
@@ -19,6 +20,7 @@ export default function Website() {
 
 function Form({ data, isLoading }: { data: Response['/api/server/settings']; isLoading: boolean }) {
   const navigate = useNavigate();
+  const { t } = useTranslation(['serverSettings', 'common']);
 
   const form = useForm({
     initialValues: {
@@ -50,7 +52,7 @@ function Form({ data, isLoading }: { data: Response['/api/server/settings']; isL
       try {
         sendValues.websiteExternalLinks = JSON.parse(values.websiteExternalLinks);
       } catch {
-        form.setFieldError('websiteExternalLinks', 'Invalid JSON');
+        form.setFieldError('websiteExternalLinks', t('website.errors.invalidJson'));
       }
     }
 
@@ -83,22 +85,22 @@ function Form({ data, isLoading }: { data: Response['/api/server/settings']; isL
     <form onSubmit={form.onSubmit(onSubmit)}>
       <Stack gap='lg'>
         <TextInput
-          label='Title'
-          description='The title of the website in browser tabs and at the top.'
+          label={t('website.title.label')}
+          description={t('website.title.description')}
           placeholder='Zipline'
           {...form.getInputProps('websiteTitle')}
         />
 
         <TextInput
-          label='Title Logo'
-          description='The URL to use for the title logo. This is placed to the left of the title.'
+          label={t('website.titleLogo.label')}
+          description={t('website.titleLogo.description')}
           placeholder='https://example.com/logo.png'
           {...form.getInputProps('websiteTitleLogo')}
         />
 
         <JsonInput
-          label='External Links'
-          description='The external links to show in the footer. This must be valid JSON in the format of an array of objects with "name" and "url" properties. For example: [{"name": "GitHub", "url": "https://github.com/diced/zipline"}]'
+          label={t('website.externalLinks.label')}
+          description={t('website.externalLinks.description')}
           formatOnBlur
           minRows={1}
           maxRows={7}
@@ -115,55 +117,55 @@ function Form({ data, isLoading }: { data: Response['/api/server/settings']; isL
         />
 
         <TextInput
-          label='Login Background'
-          description='The URL to use for the login background.'
+          label={t('website.loginBackground.label')}
+          description={t('website.loginBackground.description')}
           placeholder='https://example.com/background.png'
           {...form.getInputProps('websiteLoginBackground')}
         />
 
         <Switch
-          label='Login Background Blur'
-          description='Whether to blur the login background.'
+          label={t('website.loginBackgroundBlur.label')}
+          description={t('website.loginBackgroundBlur.description')}
           {...form.getInputProps('websiteLoginBackgroundBlur', { type: 'checkbox' })}
         />
 
         <TextInput
-          label='Default Avatar'
-          description='The path to use for the default avatar. This must be a path to an image, not a URL.'
+          label={t('website.defaultAvatar.label')}
+          description={t('website.defaultAvatar.description')}
           placeholder='/zipline/avatar.png'
           {...form.getInputProps('websiteDefaultAvatar')}
         />
 
         <TextInput
-          label='Terms of Service'
-          description='Path to a Markdown (.md) file to use for the terms of service.'
+          label={t('website.tos.label')}
+          description={t('website.tos.description')}
           placeholder='/zipline/TOS.md'
           {...form.getInputProps('websiteTos')}
         />
 
         <TextInput
-          label='Default Theme'
-          description='The default theme to use for the website.'
+          label={t('website.defaultTheme.label')}
+          description={t('website.defaultTheme.description')}
           placeholder='system'
           {...form.getInputProps('websiteThemeDefault')}
         />
 
         <TextInput
-          label='Dark Theme'
-          description='The dark theme to use for the website when the default theme is "system".'
+          label={t('website.darkTheme.label')}
+          description={t('website.darkTheme.description')}
           placeholder='builtin:dark_gray'
           {...form.getInputProps('websiteThemeDark')}
         />
 
         <TextInput
-          label='Light Theme'
-          description='The light theme to use for the website when the default theme is "system".'
+          label={t('website.lightTheme.label')}
+          description={t('website.lightTheme.description')}
           placeholder='builtin:light_gray'
           {...form.getInputProps('websiteThemeLight')}
         />
       </Stack>
       <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
-        Save
+        {t('common:actions.save')}
       </Button>
     </form>
   );

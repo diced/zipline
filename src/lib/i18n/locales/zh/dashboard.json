@@ -1,0 +1,44 @@
+{
+  "welcome": "欢迎回来，<b>{{username}}</b>",
+  "filesUploaded": "你已上传 <b>{{files}}</b> 个文件。",
+  "quota": {
+    "bytes": "你已使用 <b>{{used}}</b> 存储空间，上限为 <b>{{max}}</b>",
+    "files": "你已上传 <b>{{files}}</b> 个文件，上限为 <b>{{max}}</b> 个。",
+    "urls": "你已创建 <b>{{urls}}</b> 个短链接，上限为 <b>{{max}}</b> 个。"
+  },
+  "recents": {
+    "title": "最近的文件",
+    "viewAll": "查看所有文件",
+    "empty": "暂无最近的文件。你最近上传的三个文件将显示在这里。"
+  },
+  "stats": {
+    "title": "统计信息",
+    "viewMetrics": "查看实例统计",
+    "description": "这些统计数据仅基于你的上传。",
+    "filesUploaded": "已上传文件",
+    "favoriteFiles": "收藏的文件",
+    "storageUsed": "已用存储空间",
+    "avgStorageUsed": "平均已用存储空间",
+    "fileViews": "文件查看次数",
+    "avgFileViews": "平均文件查看次数",
+    "linksCreated": "已创建短链接",
+    "linkViews": "短链接总查看次数"
+  },
+  "fileTypes": {
+    "title": "文件类型",
+    "columns": {
+      "type": "文件类型",
+      "count": "数量"
+    }
+  },
+  "activity": {
+    "title": "活动",
+    "description": "你的上传和登录记录，时间范围为最近",
+    "range_other": "{{count}} 天",
+    "uploads": "上传",
+    "logins": "登录",
+    "empty": "此时间段内暂无上传或登录记录",
+    "today": "今天",
+    "yesterday": "昨天"
+  }
+}

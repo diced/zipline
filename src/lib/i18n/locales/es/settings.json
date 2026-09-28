@@ -1,0 +1,384 @@
+{
+  "title": "Configuración",
+  "loading": "Cargando…",
+  "user": {
+    "title": "Usuario",
+    "tokenCopyTooltip": "Haga clic para copiar el token",
+    "tokenLabel": "Token",
+    "tokenHidden": "[haga clic para mostrar]",
+    "form": {
+      "username": {
+        "label": "Nombre de usuario",
+        "required": "El nombre de usuario es obligatorio"
+      },
+      "password": {
+        "label": "Contraseña",
+        "description": "Déjelo en blanco para mantener la contraseña actual"
+      },
+      "currentPassword": {
+        "label": "Contraseña actual",
+        "description": "Necesaria para cambiar la contraseña.",
+        "required": "Escriba su contraseña actual para cambiarla"
+      }
+    },
+    "notifications": {
+      "error": {
+        "title": "Error al actualizar el usuario"
+      },
+      "updated": {
+        "message": "Usuario actualizado"
+      }
+    }
+  },
+  "avatar": {
+    "title": "Avatar",
+    "placeholder": "Subir un nuevo avatar...",
+    "previewNew": "Vista previa del nuevo avatar",
+    "previewCurrent": "Vista previa del avatar actual",
+    "proposedAlt": "Avatar propuesto",
+    "currentAlt": "Avatar del usuario",
+    "remove": "Quitar avatar",
+    "notifications": {
+      "error": {
+        "title": "Error al actualizar el avatar"
+      },
+      "updated": {
+        "message": "Avatar actualizado"
+      }
+    }
+  },
+  "sessions": {
+    "title": "Sesiones",
+    "summary": "Otros dispositivos con la sesión iniciada: {{amount}}",
+    "view": "Ver sesiones",
+    "logoutBrowser": "Cerrar sesión en este navegador",
+    "logoutAll": "Cerrar sesión en todos los dispositivos",
+    "empty": "No se encontraron otras sesiones",
+    "table": {
+      "client": "Cliente",
+      "device": "Dispositivo",
+      "loggedInAt": "Inicio de sesión"
+    },
+    "modals": {
+      "logoutAll": {
+        "title": "¿Cerrar sesión en todos los dispositivos?",
+        "message": "¿Está seguro de que desea cerrar sesión en todos los dispositivos? Se cerrará la sesión en todos los dispositivos excepto en el actual.",
+        "confirm": "Cerrar sesión"
+      },
+      "logoutDevice": {
+        "title": "¿Cerrar sesión en el dispositivo?",
+        "message": "¿Está seguro de que desea cerrar sesión en este dispositivo?",
+        "confirm": "Cerrar sesión"
+      }
+    },
+    "notifications": {
+      "loggedOutAll": "Se cerró la sesión en todos los dispositivos",
+      "loggedOutDevice": "Se cerró la sesión en el dispositivo"
+    }
+  },
+  "dashboard": {
+    "title": "Configuración del panel",
+    "description": "Esta configuración se guarda automáticamente en su <b>navegador.</b>",
+    "disableMediaPreview": {
+      "label": "Deshabilitar vista previa multimedia",
+      "description": "Deshabilita las vistas previas de archivos en el panel. Esto puede ayudar a ahorrar datos y agilizar el panel si tiene muchos archivos multimedia, pero también deshabilitará el visor de archivos y mostrará un icono de archivo genérico en lugar de una vista previa para los archivos compatibles."
+    },
+    "mediaAutoMuted": {
+      "label": "Silenciar vistas previas de video y audio",
+      "description": "Si está habilitado, el video y el audio del visor de archivos se reproducen automáticamente sin sonido. Si lo deshabilita, se intentará reproducir el sonido de inmediato. Los navegadores pueden bloquear la reproducción automática con sonido hasta que interactúe con la página."
+    },
+    "warnDeletion": {
+      "label": "Avisar al eliminar",
+      "description": "Muestra una advertencia al eliminar elementos. Si está deshabilitado, los archivos, enlaces cortos, etc. se eliminarán sin previo aviso. Las carpetas, los usuarios y las operaciones masivas están exentos de esta regla y siempre mostrarán una advertencia antes de eliminar nada."
+    },
+    "fileNavButtons": {
+      "label": "Botones de navegación de archivos",
+      "description": "Muestra los botones Anterior/Siguiente a la izquierda y a la derecha del visor de archivos para desplazarse fácilmente entre archivos."
+    },
+    "homeShowRecents": {
+      "label": "Mostrar recientes",
+      "description": "Muestra las subidas e inicios de sesión recientes en la página de inicio."
+    },
+    "homeShowActivity": {
+      "label": "Mostrar actividad",
+      "description": "Muestra su actividad reciente como un gráfico en la página de inicio."
+    },
+    "homeShowTypes": {
+      "label": "Mostrar tipos de archivo",
+      "description": "Muestra la tabla de tipos de archivo en la página de inicio."
+    },
+    "fileViewer": {
+      "label": "Visor de archivos",
+      "description": "Elija qué visor de archivos se abre al hacer clic en un archivo.",
+      "options": {
+        "fullscreen": "Pantalla completa (beta)",
+        "default": "Predeterminado (ventana modal)"
+      }
+    },
+    "domain": {
+      "label": "Dominio predeterminado",
+      "description": "Establece el dominio predeterminado que se usa para los enlaces copiados en todo el panel. Déjelo en blanco o seleccione \"Dominio predeterminado\" para usar el dominio actual desde el que se sirve el panel."
+    },
+    "theme": {
+      "label": "Tema",
+      "description": "El tema que se usa en el panel. Es solo un cambio visual en su navegador y no cambia el tema para los demás usuarios.",
+      "system": "Sistema"
+    },
+    "themeDark": {
+      "label": "Tema oscuro",
+      "description": "El tema que se usa en el panel cuando su sistema está en modo oscuro."
+    },
+    "themeLight": {
+      "label": "Tema claro",
+      "description": "El tema que se usa en el panel cuando su sistema está en modo claro."
+    }
+  },
+  "fileView": {
+    "title": "Visualización de archivos",
+    "variablesHint": "Todos los campos de texto admiten el uso de <link>variables.</link>",
+    "disableTextFiles": {
+      "label": "Deshabilitar archivos de texto",
+      "description": "Deshabilita la visualización de archivos de texto mediante las rutas de visualización. No afecta a otros tipos de archivo y funciona aunque las rutas de visualización estén deshabilitadas."
+    },
+    "enabled": {
+      "label": "Habilitar rutas de visualización",
+      "description": "Permite ver los archivos mediante rutas de visualización personalizables"
+    },
+    "showMimetype": {
+      "label": "Mostrar tipo MIME",
+      "description": "Muestra el tipo MIME del archivo en la ruta de visualización"
+    },
+    "showTags": {
+      "label": "Mostrar etiquetas",
+      "description": "Muestra las etiquetas del archivo en la ruta de visualización"
+    },
+    "showFolder": {
+      "label": "Mostrar carpeta",
+      "description": "Muestra el nombre o el enlace de la carpeta en la ruta de visualización, si es posible"
+    },
+    "content": {
+      "label": "Contenido de la vista",
+      "description": "Cambia el contenido de las rutas de visualización. Se admite la mayor parte del HTML, pero no se puede usar JavaScript."
+    },
+    "align": {
+      "label": "Alineación del contenido de la vista",
+      "description": "Cambia la alineación del contenido de las rutas de visualización",
+      "options": {
+        "left": "Izquierda",
+        "center": "Centro",
+        "right": "Derecha"
+      }
+    },
+    "embed": {
+      "label": "Habilitar inserción",
+      "description": "Habilita las siguientes propiedades de inserción. Estas propiedades aprovechan las etiquetas OpenGraph. Para que funcione, las rutas de visualización deben estar habilitadas."
+    },
+    "embedMediaOnly": {
+      "label": "Vista previa de enlace solo con multimedia",
+      "description": "Cuando la inserción está deshabilitada, se siguen agregando las etiquetas OpenGraph de imagen y video para que Discord y aplicaciones similares muestren solo el contenido multimedia (sin título, descripción ni nombre del sitio personalizados). La URL que pegue se mantiene en el mensaje como texto sin formato."
+    },
+    "embedTitle": {
+      "label": "Título de la inserción"
+    },
+    "embedDescription": {
+      "label": "Descripción de la inserción"
+    },
+    "embedSiteName": {
+      "label": "Nombre del sitio de la inserción"
+    },
+    "embedColor": {
+      "label": "Color de la inserción"
+    },
+    "notifications": {
+      "error": {
+        "title": "Error al actualizar la configuración de visualización"
+      },
+      "updated": {
+        "message": "Configuración de visualización actualizada"
+      }
+    }
+  },
+  "oauth": {
+    "description": "Administre sus proveedores de OAuth conectados.",
+    "link": "Vincular cuenta de {{provider}}",
+    "unlink": "Desvincular cuenta de {{provider}}",
+    "notifications": {
+      "unlinkFailed": {
+        "title": "No se pudo desvincular la cuenta"
+      },
+      "unlinked": {
+        "title": "Cuenta desvinculada",
+        "message": "Se desvinculó su cuenta de {{provider}}."
+      }
+    }
+  },
+  "mfa": {
+    "title": "Autenticación multifactor",
+    "description": "Configure la 2FA o llaves de acceso para agregar una capa adicional de seguridad a su cuenta.",
+    "totp": {
+      "enable": "Habilitar 2FA",
+      "disable": "Deshabilitar 2FA",
+      "modal": {
+        "enableTitle": "Habilitar la autenticación en dos pasos",
+        "disableTitle": "Deshabilitar la autenticación en dos pasos",
+        "disableInstructions": "Escriba a continuación el código de 6 dígitos de su aplicación de autenticación para confirmar que desea deshabilitar la 2FA.",
+        "step1": "<b>Paso 1</b> Abra o descargue una aplicación de autenticación que admita el escaneo de códigos QR o la escritura manual de códigos. Algunas opciones populares son <twofas>2FAs</twofas>, <google>Google Authenticator</google>, <microsoft>Microsoft Authenticator</microsoft> y <apple>Contraseñas de Apple</apple>.",
+        "step2": "<b>Paso 2</b> Escanee el siguiente código QR con su aplicación de autenticación para habilitar la 2FA.",
+        "qrAlt": "código QR {{secret}}",
+        "manualEntry": "Si no puede escanear el código QR, puede escribir manualmente el siguiente código en su aplicación de autenticación: <code>{{secret}}</code>",
+        "step3": "<b>Paso 3</b> Escriba a continuación el código de 6 dígitos de su aplicación de autenticación para confirmar la configuración de la 2FA."
+      },
+      "invalidPin": "PIN no válido",
+      "notifications": {
+        "enabled": {
+          "title": "2FA habilitada",
+          "message": "Ha habilitado correctamente la 2FA en su cuenta."
+        },
+        "disabled": {
+          "title": "2FA deshabilitada",
+          "message": "Ha deshabilitado correctamente la 2FA en su cuenta."
+        }
+      }
+    },
+    "passkeys": {
+      "manage": "Administrar llaves de acceso",
+      "created": "Llave de acceso creada <created />",
+      "createdAndUsed": "Llave de acceso creada <created />; último uso <lastUsed />.",
+      "legacyWarning": "Advertencia: esta llave de acceso se creó con una versión anterior de Zipline y <b>NO</b> funcionará con esta versión. Elimínela y vuelva a crearla para garantizar la compatibilidad.",
+      "create": "Crear una llave de acceso",
+      "createError": "Error al crear la llave de acceso. Vuelva a intentarlo más tarde",
+      "createErrorFallback": "Se produjo un error al crear la llave de acceso",
+      "namePrompt": "Asigne un nombre a esta llave de acceso para poder reconocerla más adelante.",
+      "namePlaceholder": "Nombre de la llave de acceso",
+      "modals": {
+        "remove": {
+          "message": "Es posible que su navegador y su dispositivo sigan mostrando \"{{name}}\" como opción para iniciar sesión. Si desea quitarla, tendrá que hacerlo manualmente desde la configuración de su dispositivo.",
+          "confirm": "Quitar \"{{name}}\""
+        }
+      },
+      "notifications": {
+        "saveError": {
+          "title": "Error al guardar la llave de acceso"
+        },
+        "saved": {
+          "title": "¡Llave de acceso guardada!",
+          "message": "Su llave de acceso se guardó correctamente."
+        },
+        "removeError": {
+          "title": "Error al quitar la llave de acceso"
+        },
+        "removed": {
+          "title": "¡Llave de acceso quitada!",
+          "message": "Su llave de acceso se quitó correctamente."
+        }
+      }
+    }
+  },
+  "exports": {
+    "title": "Exportar archivos",
+    "new": "Nueva exportación",
+    "empty": "No se encontraron exportaciones. Haga clic en el botón de arriba para iniciar una nueva exportación.",
+    "table": {
+      "id": "ID",
+      "started": "Inicio",
+      "files": "Archivos",
+      "size": "Tamaño",
+      "completed": "{{id}} se completó",
+      "inProgress": "{{id}} está en curso"
+    },
+    "modals": {
+      "new": {
+        "title": "¿Nueva exportación?",
+        "message": "¿Está seguro de que desea iniciar una nueva exportación? Si tiene muchos archivos, puede tardar un tiempo.",
+        "confirm": "Iniciar exportación"
+      }
+    },
+    "notifications": {
+      "started": {
+        "title": "Exportación iniciada",
+        "message": "Se inició la exportación. Puede consultar su estado en la tabla de abajo"
+      },
+      "deleted": {
+        "message": "Se eliminó la exportación"
+      }
+    }
+  },
+  "generators": {
+    "title": "Generar clientes de subida",
+    "description": "Genere scripts para herramientas de subida. Los generadores de Flameshot y de script de shell solo son compatibles con Linux y macOS.",
+    "logoAlt": "Logotipo de {{name}}",
+    "shellScript": "Script de shell",
+    "desc": {
+      "flameshot": "Para usar este script, necesita tener instalados <flameshotLink>Flameshot</flameshotLink>, <curlLink><code>curl</code></curlLink>, <jqLink><code>jq</code></jqLink> y <xclipLink><code>xclip</code> (solo Linux)</xclipLink>. Este script está pensado para usarse solo en Linux y macOS (consulte las opciones a continuación).",
+      "ishare": "Este generador requiere tener <link>ishare</link> instalado en macOS. Este cliente de subida está pensado para usarse solo en macOS.",
+      "itake": "Este generador requiere tener <link>iTake</link> instalado en macOS. Este cliente de subida está pensado para usarse solo en macOS.",
+      "shell": "Para usar este script, necesita tener instalados <code>bash</code>, <curlLink><code>curl</code></curlLink>, <fileLink><code>file</code></fileLink>, <jqLink><code>jq</code></jqLink> y <xclipLink><code>xclip</code> (solo Linux)</xclipLink>. Este script está pensado para usarse solo en Linux y macOS (consulte las opciones a continuación)."
+    },
+    "modal": {
+      "title": "Generar cliente de subida para {{name}}",
+      "destinationType": {
+        "label": "Tipo de destino",
+        "description": "Seleccione el tipo de destino que desea generar",
+        "options": {
+          "file": "Subir archivo",
+          "url": "Acortar URL"
+        }
+      },
+      "format": {
+        "label": "Formato de nombre",
+        "description": "El formato de nombre de archivo que se usará al subir archivos. El campo \"Nombre de archivo\" reemplaza este valor.",
+        "options": {
+          "default": "Predeterminado",
+          "random": "Aleatorio",
+          "date": "Fecha",
+          "uuid": "UUID",
+          "name": "Usar nombre de archivo",
+          "gfycat": "Nombre estilo Gfycat"
+        }
+      },
+      "compression": {
+        "label": "Compresión",
+        "description": "El nivel de compresión que se aplicará (solo) a las imágenes. Déjelo en blanco para deshabilitar la compresión."
+      },
+      "maxViews": {
+        "label": "Vistas máx.",
+        "description": "El número máximo de vistas que pueden tener los archivos o enlaces cortos antes de eliminarse. Déjelo en blanco para permitir vistas ilimitadas."
+      },
+      "overrideDomain": {
+        "label": "Reemplazar dominio",
+        "description": "Reemplace el dominio por este valor. Esto cambiará el dominio que se devuelve en sus subidas. Déjelo en blanco para usar el dominio predeterminado.",
+        "default": "Dominio predeterminado"
+      },
+      "otherOptions": "Otras opciones",
+      "addOriginalName": {
+        "label": "Agregar nombre original",
+        "description": "Agrega el nombre original del archivo para que se pueda descargar con ese nombre. El nombre del archivo seguirá usando la opción \"Formato de nombre\"."
+      },
+      "extensionless": {
+        "label": "URL sin extensión",
+        "description": "Quita la extensión del archivo de la URL devuelta. Se podrá seguir accediendo al archivo con su extensión. Esta opción solo funciona si el servidor está configurado para permitir URL sin extensión."
+      },
+      "xshareCompatibility": {
+        "label": "Compatibilidad con Xshare",
+        "description": "Si va a usar la aplicación Xshare en Android, habilite esta opción para garantizar la compatibilidad. La configuración generada no funcionará con ShareX."
+      },
+      "waylandCompatibility": {
+        "label": "Habilitar compatibilidad con Wayland",
+        "description": "Usa <code>wl-copy</code> en lugar de <code>xclip</code> para copiar al portapapeles."
+      },
+      "macCompatibility": {
+        "label": "Habilitar compatibilidad con macOS",
+        "description": "Usa <code>pbcopy</code> en lugar de <code>xclip</code> para copiar al portapapeles."
+      },
+      "compositorUnsupported": {
+        "label": "¿Usa un entorno de escritorio distinto de Gnome, KDE o Sway?",
+        "description": "Si usa un compositor como <link>Hyprland</link>, esta opción establecerá <code>XDG_CURRENT_DESKTOP=sway</code> para evitar los errores de Flameshot en Wayland. No es necesario en Xorg."
+      },
+      "useEcho": {
+        "label": "Usar <code>echo</code> en lugar de copiar al portapapeles",
+        "description": "Solo muestra la URL en la terminal en lugar de copiarla al portapapeles."
+      },
+      "waylandHelp": "Si tiene problemas para que Flameshot funcione en Wayland, consulte la <link>guía de Wayland</link>."
+    }
+  }
+}

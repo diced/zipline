@@ -1,0 +1,60 @@
+{
+  "title": "Metrics",
+  "range": {
+    "change": "Change Date Range",
+    "modalTitle": "Change range",
+    "fromTo": "{{from}} to {{to}}",
+    "presets": {
+      "lastTwoDays": "Last two days",
+      "last7Days": "Last 7 days",
+      "thisMonth": "This month",
+      "lastMonth": "Last month",
+      "thisYear": "This year",
+      "lastYear": "Last year"
+    }
+  },
+  "allTime": {
+    "label": "All Time",
+    "show": "Show All Time",
+    "slowWarning": "This may take longer than usual to load.",
+    "viewing": "You are viewing all time stats."
+  },
+  "loadFailed": "Failed to load statistics for this time range. There may be no data available within the time range specified. :(",
+  "cards": {
+    "files": "Files",
+    "urls": "URLs",
+    "storageUsed": "Storage Used",
+    "users": "Users",
+    "fileViews": "File Views",
+    "urlViews": "URL Views"
+  },
+  "tables": {
+    "columns": {
+      "user": "User",
+      "files": "Files",
+      "storageUsed": "Storage Used",
+      "views": "Views",
+      "urls": "URLs",
+      "type": "Type"
+    },
+    "unknownUser": "[unknown]"
+  },
+  "graphs": {
+    "count": {
+      "title": "Count"
+    },
+    "views": {
+      "title": "Views",
+      "value_one": "{{count}} view",
+      "value_other": "{{count}} views"
+    },
+    "storage": {
+      "title": "Storage Used"
+    },
+    "series": {
+      "files": "Files",
+      "urls": "URLs",
+      "storageUsed": "Storage Used"
+    }
+  }
+}
