@@ -135,7 +135,7 @@
   },
   "fileView": {
     "title": "Viewing Files",
-    "variablesHint": "All text fields support using <link>variables.</link>",
+    "variablesHint": "All text fields support using <anchor>variables.</anchor>",
     "disableTextFiles": {
       "label": "Disable text files",
       "description": "Disable viewing text files through view-routes. This has no effect on other file types and will work even if view-routes are disabled."
@@ -310,8 +310,8 @@
     "shellScript": "Shell Script",
     "desc": {
       "flameshot": "To use this script, you need <flameshotLink>Flameshot</flameshotLink>, <curlLink><code>curl</code></curlLink>, <jqLink><code>jq</code></jqLink>, and <xclipLink><code>xclip</code> (linux only)</xclipLink> installed. This script is intended for use on Linux and macOS only (see options below).",
-      "ishare": "This generator requires <link>ishare</link> to be installed on macOS. This uploader is intended for use on macOS only.",
-      "itake": "This generator requires <link>iTake</link> to be installed on macOS. This uploader is intended for use on macOS only.",
+      "ishare": "This generator requires <anchor>ishare</anchor> to be installed on macOS. This uploader is intended for use on macOS only.",
+      "itake": "This generator requires <anchor>iTake</anchor> to be installed on macOS. This uploader is intended for use on macOS only.",
       "shell": "To use this script, you need <code>bash</code>, <curlLink><code>curl</code></curlLink>, <fileLink><code>file</code></fileLink>, <jqLink><code>jq</code></jqLink>, and <xclipLink><code>xclip</code> (linux only)</xclipLink> installed. This script is intended for use on Linux and macOS only (see options below)."
     },
     "modal": {
@@ -372,13 +372,13 @@
       },
       "compositorUnsupported": {
         "label": "Using a DE other than Gnome, KDE or Sway?",
-        "description": "If using a compositor such as <link>Hyprland</link>, this option will set the <code>XDG_CURRENT_DESKTOP=sway</code> to workaround Flameshot's errors on Wayland. This is not needed on Xorg."
+        "description": "If using a compositor such as <anchor>Hyprland</anchor>, this option will set the <code>XDG_CURRENT_DESKTOP=sway</code> to workaround Flameshot's errors on Wayland. This is not needed on Xorg."
       },
       "useEcho": {
         "label": "Use <code>echo</code> instead of copying to clipboard",
         "description": "Just output the url to the terminal instead of copying it to the clipboard."
       },
-      "waylandHelp": "If you are having trouble getting Flameshot to work on Wayland, consult the <link>Wayland guide</link>."
+      "waylandHelp": "If you are having trouble getting Flameshot to work on Wayland, consult the <anchor>Wayland guide</anchor>."
     }
   }
 }

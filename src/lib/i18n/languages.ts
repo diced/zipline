@@ -2,7 +2,6 @@ export const LANGUAGES = ['en', 'zh', 'ja', 'fr', 'de', 'es', 'pt', 'ru'] as con
 export type Language = (typeof LANGUAGES)[number];
 
 export const DEFAULT_LANGUAGE: Language = 'en';
-export const LANGUAGE_STORAGE_KEY = 'zipline-language';
 
 // native names are intentionally not translated, so a user can always find their own language
 export const LANGUAGE_NAMES: Record<Language, string> = {

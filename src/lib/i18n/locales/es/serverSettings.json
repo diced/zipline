@@ -381,7 +381,7 @@
     }
   },
   "oauth": {
-    "intro": "Para que OAuth funcione, la opción \"Registro con OAuth\" debe estar habilitada en la sección <link>Funciones</link>. Si tiene problemas, intente reiniciar Zipline después de guardar.",
+    "intro": "Para que OAuth funcione, la opción \"Registro con OAuth\" debe estar habilitada en la sección <anchor>Funciones</anchor>. Si tiene problemas, intente reiniciar Zipline después de guardar.",
     "bypassLocalLogin": {
       "label": "Omitir inicio de sesión local",
       "description": "Omite la página de inicio de sesión local y redirige al proveedor de OAuth. Solo funciona si hay un único proveedor habilitado."

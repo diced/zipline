@@ -1,5 +1,6 @@
 import { Anchor, Code, Modal, Text } from '@mantine/core';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import SafeTrans from '@/components/SafeTrans';
 
 export default function SecureWarningModal({
   returnHttps,
@@ -17,18 +18,18 @@ export default function SecureWarningModal({
       <Text>{returnHttps ? t('secureWarning.insecureClient') : t('secureWarning.insecureServer')}</Text>
       <Text mt='md'>
         {returnHttps ? (
-          <Trans t={t} i18nKey='secureWarning.resolveClient' components={{ code: <Code /> }} />
+          <SafeTrans t={t} i18nKey='secureWarning.resolveClient' components={{ code: <Code /> }} />
         ) : (
-          <Trans t={t} i18nKey='secureWarning.resolveServer' components={{ code: <Code /> }} />
+          <SafeTrans t={t} i18nKey='secureWarning.resolveServer' components={{ code: <Code /> }} />
         )}
       </Text>
 
       <Text mt='md'>
-        <Trans
+        <SafeTrans
           t={t}
           i18nKey='secureWarning.restart'
           components={{
-            link: (
+            anchor: (
               <Anchor
                 underline='always'
                 href='https://zipline.diced.sh/docs/config/settings#more-about-return-https-urls'

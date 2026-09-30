@@ -20,7 +20,8 @@ import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { IconArrowBackUp, IconArrowForwardUp, IconCheck, IconX } from '@tabler/icons-react';
 import { useState } from 'react';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import SafeTrans from '@/components/SafeTrans';
 import { redirect, useNavigate } from 'react-router-dom';
 import { mutate } from 'swr';
 
@@ -160,15 +161,15 @@ export function Component() {
                 <Title order={2}>{t('setup.welcome.config.title')}</Title>
 
                 <Text>
-                  <Trans t={t} i18nKey='setup.welcome.config.body' components={{ code: <Code /> }} />
+                  <SafeTrans t={t} i18nKey='setup.welcome.config.body' components={{ code: <Code /> }} />
                 </Text>
 
                 <Text>
-                  <Trans
+                  <SafeTrans
                     t={t}
                     i18nKey='setup.welcome.config.envVars'
                     components={{
-                      link: (
+                      anchor: (
                         <Anchor
                           href='https://zipline.diced.sh/docs/config'
                           target='_blank'

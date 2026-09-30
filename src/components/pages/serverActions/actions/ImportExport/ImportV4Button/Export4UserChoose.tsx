@@ -1,6 +1,7 @@
 import { Export4 } from '@/lib/import/version4/validateExport';
 import { Avatar, Box, Group, Radio, Stack, Text } from '@mantine/core';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import SafeTrans from '@/components/SafeTrans';
 
 export default function Export4UserChoose({
   export4,
@@ -17,7 +18,11 @@ export default function Export4UserChoose({
     <Box my='lg'>
       <Text size='md'>{t('importExport.userChoose.title')}</Text>
       <Text size='sm' c='dimmed'>
-        <Trans t={t} i18nKey='importExport.v4.userChoose.description' components={{ br: <br />, b: <b /> }} />
+        <SafeTrans
+          t={t}
+          i18nKey='importExport.v4.userChoose.description'
+          components={{ br: <br />, b: <b /> }}
+        />
       </Text>
 
       <Radio.Group value={importFrom} onChange={(value) => setImportFrom(value)} name='importFrom'>

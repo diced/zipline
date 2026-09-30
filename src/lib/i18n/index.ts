@@ -6,17 +6,10 @@ import 'dayjs/locale/ja';
 import 'dayjs/locale/pt-br';
 import 'dayjs/locale/ru';
 import 'dayjs/locale/zh-cn';
+import { useSettingsStore } from '@/lib/client/store/settings';
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import {
-  DAYJS_LOCALES,
-  DEFAULT_LANGUAGE,
-  isLanguage,
-  Language,
-  LANGUAGE_STORAGE_KEY,
-  LANGUAGES,
-  matchLanguage,
-} from './languages';
+import { DAYJS_LOCALES, DEFAULT_LANGUAGE, isLanguage, Language, LANGUAGES, matchLanguage } from './languages';
 import { Resources, resources } from './resources';
 
 declare module 'i18next' {
@@ -27,12 +20,8 @@ declare module 'i18next' {
 }
 
 function readStoredLanguage(): Language | null {
-  try {
-    const stored = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
-    return isLanguage(stored) ? stored : null;
-  } catch {
-    return null;
-  }
+  const stored = useSettingsStore.getState().settings.language;
+  return isLanguage(stored) ? stored : null;
 }
 
 // the server always renders english, the browser picks: stored choice > browser languages > english
@@ -62,13 +51,15 @@ function applyLanguage(lng: string) {
 
 // only an explicit choice is persisted, so auto-detection keeps following the browser until then
 export function setLanguage(lng: Language) {
+  const changed = i18n.changeLanguage(lng);
+
   try {
-    window.localStorage.setItem(LANGUAGE_STORAGE_KEY, lng);
+    useSettingsStore.getState().update('language', lng);
   } catch {
-    // storage may be unavailable (private mode, blocked site data), the choice then lasts for this page only
+    // storage may be full or blocked, the choice then lasts for this page only
   }
 
-  return i18n.changeLanguage(lng);
+  return changed;
 }
 
 export function currentLanguage(): Language {

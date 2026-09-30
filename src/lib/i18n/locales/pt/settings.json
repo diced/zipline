@@ -135,7 +135,7 @@
   },
   "fileView": {
     "title": "Visualização de arquivos",
-    "variablesHint": "Todos os campos de texto aceitam <link>variáveis.</link>",
+    "variablesHint": "Todos os campos de texto aceitam <anchor>variáveis.</anchor>",
     "disableTextFiles": {
       "label": "Desativar arquivos de texto",
       "description": "Desativa a visualização de arquivos de texto pelas rotas de visualização. Isso não afeta outros tipos de arquivo e funciona mesmo se as rotas de visualização estiverem desativadas."
@@ -310,8 +310,8 @@
     "shellScript": "Script de shell",
     "desc": {
       "flameshot": "Para usar este script, você precisa ter instalados o <flameshotLink>Flameshot</flameshotLink>, <curlLink><code>curl</code></curlLink>, <jqLink><code>jq</code></jqLink> e <xclipLink><code>xclip</code> (somente Linux)</xclipLink>. Este script se destina apenas a Linux e macOS (veja as opções abaixo).",
-      "ishare": "Este gerador requer que o <link>ishare</link> esteja instalado no macOS. Esta configuração de envio se destina apenas ao macOS.",
-      "itake": "Este gerador requer que o <link>iTake</link> esteja instalado no macOS. Esta configuração de envio se destina apenas ao macOS.",
+      "ishare": "Este gerador requer que o <anchor>ishare</anchor> esteja instalado no macOS. Esta configuração de envio se destina apenas ao macOS.",
+      "itake": "Este gerador requer que o <anchor>iTake</anchor> esteja instalado no macOS. Esta configuração de envio se destina apenas ao macOS.",
       "shell": "Para usar este script, você precisa ter instalados <code>bash</code>, <curlLink><code>curl</code></curlLink>, <fileLink><code>file</code></fileLink>, <jqLink><code>jq</code></jqLink> e <xclipLink><code>xclip</code> (somente Linux)</xclipLink>. Este script se destina apenas a Linux e macOS (veja as opções abaixo)."
     },
     "modal": {
@@ -372,13 +372,13 @@
       },
       "compositorUnsupported": {
         "label": "Você usa um ambiente de desktop diferente de GNOME, KDE ou Sway?",
-        "description": "Se você usa um compositor como o <link>Hyprland</link>, esta opção define <code>XDG_CURRENT_DESKTOP=sway</code> para contornar os erros do Flameshot no Wayland. Isso não é necessário no Xorg."
+        "description": "Se você usa um compositor como o <anchor>Hyprland</anchor>, esta opção define <code>XDG_CURRENT_DESKTOP=sway</code> para contornar os erros do Flameshot no Wayland. Isso não é necessário no Xorg."
       },
       "useEcho": {
         "label": "Usar <code>echo</code> em vez de copiar para a área de transferência",
         "description": "Apenas exibe a URL no terminal em vez de copiá-la para a área de transferência."
       },
-      "waylandHelp": "Se estiver com problemas para fazer o Flameshot funcionar no Wayland, consulte o <link>guia do Wayland</link>."
+      "waylandHelp": "Se estiver com problemas para fazer o Flameshot funcionar no Wayland, consulte o <anchor>guia do Wayland</anchor>."
     }
   }
 }

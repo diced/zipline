@@ -381,7 +381,7 @@
     }
   },
   "oauth": {
-    "intro": "Pour qu'OAuth fonctionne, le paramètre « Inscription via OAuth » doit être activé dans la section <link>Fonctionnalités</link>. En cas de problème, essayez de redémarrer Zipline après l'enregistrement.",
+    "intro": "Pour qu'OAuth fonctionne, le paramètre « Inscription via OAuth » doit être activé dans la section <anchor>Fonctionnalités</anchor>. En cas de problème, essayez de redémarrer Zipline après l'enregistrement.",
     "bypassLocalLogin": {
       "label": "Ignorer la connexion locale",
       "description": "Ignore la page de connexion locale et redirige vers le fournisseur OAuth. Ne fonctionne que si un seul fournisseur est activé."

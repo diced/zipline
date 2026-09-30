@@ -135,7 +135,7 @@
   },
   "fileView": {
     "title": "Просмотр файлов",
-    "variablesHint": "Во всех текстовых полях можно использовать <link>переменные.</link>",
+    "variablesHint": "Во всех текстовых полях можно использовать <anchor>переменные.</anchor>",
     "disableTextFiles": {
       "label": "Отключить текстовые файлы",
       "description": "Не открывать текстовые файлы на страницах просмотра. Не влияет на другие типы файлов и действует, даже если страницы просмотра отключены."
@@ -310,8 +310,8 @@
     "shellScript": "Shell-скрипт",
     "desc": {
       "flameshot": "Для работы этого скрипта необходимо установить <flameshotLink>Flameshot</flameshotLink>, <curlLink><code>curl</code></curlLink>, <jqLink><code>jq</code></jqLink> и <xclipLink><code>xclip</code> (только Linux)</xclipLink>. Скрипт предназначен только для Linux и macOS (см. параметры ниже).",
-      "ishare": "Для этого генератора в macOS должно быть установлено приложение <link>ishare</link>. Этот загрузчик предназначен только для macOS.",
-      "itake": "Для этого генератора в macOS должно быть установлено приложение <link>iTake</link>. Этот загрузчик предназначен только для macOS.",
+      "ishare": "Для этого генератора в macOS должно быть установлено приложение <anchor>ishare</anchor>. Этот загрузчик предназначен только для macOS.",
+      "itake": "Для этого генератора в macOS должно быть установлено приложение <anchor>iTake</anchor>. Этот загрузчик предназначен только для macOS.",
       "shell": "Для работы этого скрипта необходимо установить <code>bash</code>, <curlLink><code>curl</code></curlLink>, <fileLink><code>file</code></fileLink>, <jqLink><code>jq</code></jqLink> и <xclipLink><code>xclip</code> (только Linux)</xclipLink>. Скрипт предназначен только для Linux и macOS (см. параметры ниже)."
     },
     "modal": {
@@ -372,13 +372,13 @@
       },
       "compositorUnsupported": {
         "label": "Используете окружение рабочего стола, отличное от GNOME, KDE и Sway?",
-        "description": "Если вы используете композитор, например <link>Hyprland</link>, этот параметр задаст <code>XDG_CURRENT_DESKTOP=sway</code>, чтобы обойти ошибки Flameshot в Wayland. В Xorg это не требуется."
+        "description": "Если вы используете композитор, например <anchor>Hyprland</anchor>, этот параметр задаст <code>XDG_CURRENT_DESKTOP=sway</code>, чтобы обойти ошибки Flameshot в Wayland. В Xorg это не требуется."
       },
       "useEcho": {
         "label": "Использовать <code>echo</code> вместо копирования в буфер обмена",
         "description": "Просто выводить ссылку в терминал, а не копировать её в буфер обмена."
       },
-      "waylandHelp": "Если Flameshot не работает в Wayland, обратитесь к <link>руководству по Wayland</link>."
+      "waylandHelp": "Если Flameshot не работает в Wayland, обратитесь к <anchor>руководству по Wayland</anchor>."
     }
   }
 }

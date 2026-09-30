@@ -13,7 +13,8 @@ import {
   Tooltip,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import SafeTrans from '@/components/SafeTrans';
 
 function DataDisplay({
   items,
@@ -75,15 +76,15 @@ export function VersionInfo({ version }: { version: VersionData }) {
       {version.isLatest && <Text>{t('version.latest')}</Text>}
       {version.isUpstream && (
         <Text>
-          <Trans t={t} i18nKey='version.unstable' components={{ b: <b /> }} />
+          <SafeTrans t={t} i18nKey='version.unstable' components={{ b: <b /> }} />
         </Text>
       )}
       {!version.isLatest && !version.isUpstream && version.isRelease && (
         <Text>
-          <Trans
+          <SafeTrans
             t={t}
             i18nKey='version.outdated'
-            components={{ b: <b />, link: <Anchor href={version.latest.url} /> }}
+            components={{ b: <b />, anchor: <Anchor href={version.latest.url} /> }}
           />
         </Text>
       )}

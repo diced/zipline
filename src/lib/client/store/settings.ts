@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import type { Language } from '@/lib/i18n/languages';
 
 export type SettingsStore = {
   settings: {
@@ -15,6 +16,8 @@ export type SettingsStore = {
     homeShowRecents: boolean;
     homeShowActivity: boolean;
     homeShowTypes: boolean;
+    // empty until the user picks a language, the browser language is used meanwhile
+    language: '' | Language;
   };
 
   update: <K extends keyof SettingsStore['settings']>(key: K, value: SettingsStore['settings'][K]) => void;
@@ -33,6 +36,7 @@ const defaultSettings: SettingsStore['settings'] = {
   homeShowRecents: true,
   homeShowActivity: true,
   homeShowTypes: true,
+  language: '',
 };
 
 export const useSettingsStore = create<SettingsStore>()(

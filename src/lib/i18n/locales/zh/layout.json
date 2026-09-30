@@ -52,7 +52,7 @@
     "tooltip": "点击查看更多版本信息",
     "latest": "正在运行最新版本的 Zipline。",
     "unstable": "你正在运行<b>不稳定</b>版本的 Zipline。上游版本未经充分测试，可能存在错误。",
-    "outdated": "你正在运行<b>过时</b>版本的 Zipline。建议更新到<link>最新版本</link>。",
+    "outdated": "你正在运行<b>过时</b>版本的 Zipline。建议更新到<anchor>最新版本</anchor>。",
     "current": "当前版本",
     "fields": {
       "version": "版本",

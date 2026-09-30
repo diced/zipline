@@ -381,7 +381,7 @@
     }
   },
   "oauth": {
-    "intro": "Para que o OAuth funcione, a opção \"Cadastro via OAuth\" precisa estar ativada na seção <link>Recursos</link>. Se houver problemas, tente reiniciar o Zipline depois de salvar.",
+    "intro": "Para que o OAuth funcione, a opção \"Cadastro via OAuth\" precisa estar ativada na seção <anchor>Recursos</anchor>. Se houver problemas, tente reiniciar o Zipline depois de salvar.",
     "bypassLocalLogin": {
       "label": "Ignorar login local",
       "description": "Pula a página de login local e redireciona para o provedor OAuth. Isso só funciona com um único provedor ativado."

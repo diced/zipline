@@ -1,7 +1,8 @@
 import { Anchor, Code, Group, Paper, Text, Title, Image as MantineImage } from '@mantine/core';
 import { IconPrompt } from '@tabler/icons-react';
 import GeneratorButton from './GeneratorButton';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import SafeTrans from '@/components/SafeTrans';
 import { Link } from 'react-router-dom';
 
 export default function SettingsGenerators() {
@@ -37,7 +38,7 @@ export default function SettingsGenerators() {
             />
           }
           desc={
-            <Trans
+            <SafeTrans
               t={t}
               i18nKey='generators.desc.flameshot'
               components={{
@@ -61,10 +62,10 @@ export default function SettingsGenerators() {
             />
           }
           desc={
-            <Trans
+            <SafeTrans
               t={t}
               i18nKey='generators.desc.ishare'
-              components={{ link: <Anchor href='https://github.com/itoolio/ishare' /> }}
+              components={{ anchor: <Anchor href='https://github.com/itoolio/ishare' /> }}
             />
           }
         />
@@ -79,10 +80,10 @@ export default function SettingsGenerators() {
             />
           }
           desc={
-            <Trans
+            <SafeTrans
               t={t}
               i18nKey='generators.desc.itake'
-              components={{ link: <Anchor href='https://github.com/SerStars/iTake' /> }}
+              components={{ anchor: <Anchor href='https://github.com/SerStars/iTake' /> }}
             />
           }
         />
@@ -91,7 +92,7 @@ export default function SettingsGenerators() {
           label={t('generators.shellScript')}
           icon={<IconPrompt size={24} />}
           desc={
-            <Trans
+            <SafeTrans
               t={t}
               i18nKey='generators.desc.shell'
               components={{

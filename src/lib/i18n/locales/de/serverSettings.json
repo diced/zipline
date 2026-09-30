@@ -381,7 +381,7 @@
     }
   },
   "oauth": {
-    "intro": "Damit OAuth funktioniert, muss die Einstellung „OAuth-Registrierung“ im Bereich <link>Funktionen</link> aktiviert sein. Starten Sie Zipline bei Problemen nach dem Speichern neu.",
+    "intro": "Damit OAuth funktioniert, muss die Einstellung „OAuth-Registrierung“ im Bereich <anchor>Funktionen</anchor> aktiviert sein. Starten Sie Zipline bei Problemen nach dem Speichern neu.",
     "bypassLocalLogin": {
       "label": "Lokale Anmeldung überspringen",
       "description": "Überspringt die lokale Anmeldeseite und leitet direkt zum OAuth-Anbieter weiter. Funktioniert nur, wenn genau ein Anbieter aktiviert ist."

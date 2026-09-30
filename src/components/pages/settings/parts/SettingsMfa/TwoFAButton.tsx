@@ -19,7 +19,8 @@ import { useMediaQuery } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { IconShieldLockFilled } from '@tabler/icons-react';
 import { useState } from 'react';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import SafeTrans from '@/components/SafeTrans';
 import { Link } from 'react-router-dom';
 import useSWR, { mutate } from 'swr';
 import { useShallow } from 'zustand/shallow';
@@ -131,7 +132,7 @@ export default function TwoFAButton() {
           ) : (
             <>
               <Text size='sm' c='dimmed'>
-                <Trans
+                <SafeTrans
                   t={t}
                   i18nKey='mfa.totp.modal.step1'
                   components={{
@@ -163,7 +164,7 @@ export default function TwoFAButton() {
               </Text>
 
               <Text size='sm' c='dimmed'>
-                <Trans t={t} i18nKey='mfa.totp.modal.step2' components={{ b: <b /> }} />
+                <SafeTrans t={t} i18nKey='mfa.totp.modal.step2' components={{ b: <b /> }} />
               </Text>
 
               <Box pos='relative'>
@@ -184,7 +185,7 @@ export default function TwoFAButton() {
               </Box>
 
               <Text size='sm' c='dimmed'>
-                <Trans
+                <SafeTrans
                   t={t}
                   i18nKey='mfa.totp.modal.manualEntry'
                   values={{ secret: mfaData?.secret ?? '' }}
@@ -193,7 +194,7 @@ export default function TwoFAButton() {
               </Text>
 
               <Text size='sm' c='dimmed'>
-                <Trans t={t} i18nKey='mfa.totp.modal.step3' components={{ b: <b /> }} />
+                <SafeTrans t={t} i18nKey='mfa.totp.modal.step3' components={{ b: <b /> }} />
               </Text>
             </>
           )}

@@ -8,7 +8,7 @@ The dashboard and public pages are translated with [i18next](https://www.i18next
 
 The language is picked in this order:
 
-1. The explicit choice saved in `localStorage` under `zipline-language` (only written when a user picks a language from the switcher).
+1. The explicit choice saved as `language` in the persisted settings store (_src/lib/client/store/settings.ts_), only set when a user picks a language from the switcher.
 2. The first entry of `navigator.languages` whose primary subtag is supported (`zh-TW` -> `zh`, `pt-BR` -> `pt`).
 3. English.
 
@@ -31,8 +31,10 @@ const { t } = useTranslation('files');
 const { t } = useTranslation(['files', 'common']); // needed for t('common:...')
 t('table.columns.name');
 t('bulk.deleted', { count });
-<Trans t={t} i18nKey='help.docs' components={{ link: <Anchor href='...' /> }} />;
+<SafeTrans t={t} i18nKey='help.docs' components={{ anchor: <Anchor href='...' /> }} />;
 ```
+
+Use `SafeTrans` (_src/components/SafeTrans.tsx_), never `Trans` from `react-i18next` directly: it escapes interpolated values so user data can never be parsed as markup. Do not name a tag after an HTML void element (`link`, `img`, `input`, ...), the parser treats those as empty and drops their content, `<br/>` being the only intended one.
 
 Outside components use `i18n.t('files:...')` from `@/lib/i18n`. Never call `t` at module top level; store keys and translate at render time.
 

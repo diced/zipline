@@ -381,7 +381,7 @@
     }
   },
   "oauth": {
-    "intro": "For OAuth to work, the \"OAuth Registration\" setting must be enabled in the <link>Features</link> section. If you have issues, try restarting Zipline after saving.",
+    "intro": "For OAuth to work, the \"OAuth Registration\" setting must be enabled in the <anchor>Features</anchor> section. If you have issues, try restarting Zipline after saving.",
     "bypassLocalLogin": {
       "label": "Bypass Local Login",
       "description": "Skips the local login page and redirects to the OAuth provider, this will only work with one provider enabled."

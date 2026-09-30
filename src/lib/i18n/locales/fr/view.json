@@ -13,7 +13,7 @@
     "download": "Télécharger le fichier"
   },
   "url": {
-    "redirecting": "Redirection vers <link>{{destination}}</link>"
+    "redirecting": "Redirection vers <anchor>{{destination}}</anchor>"
   },
   "folder": {
     "pageTitle": "Dossier",
@@ -30,7 +30,7 @@
     "pageTitle": "Téléverser dans {{name}}",
     "pageTitleFallback": "Téléverser dans le dossier",
     "title": "Téléverser des fichiers dans {{name}}",
-    "public": "Ce dossier est <link>public</link>. Toute personne disposant du lien peut consulter son contenu et y téléverser des fichiers.",
+    "public": "Ce dossier est <anchor>public</anchor>. Toute personne disposant du lien peut consulter son contenu et y téléverser des fichiers.",
     "private": "Seul le propriétaire peut consulter le contenu de ce dossier. Cependant, tout le monde peut y téléverser des fichiers, et chacun garde l'accès aux fichiers qu'il a téléversés s'il dispose du lien vers le fichier en question."
   }
 }

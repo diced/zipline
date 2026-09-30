@@ -22,7 +22,8 @@ import { useForm } from '@mantine/form';
 import { notifications, showNotification } from '@mantine/notifications';
 import { IconLogin, IconPlus, IconUserPlus, IconX } from '@tabler/icons-react';
 import { useEffect } from 'react';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import SafeTrans from '@/components/SafeTrans';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import useSWR, { mutate } from 'swr';
 import GenericError from '../../error/GenericError';
@@ -210,14 +211,14 @@ export function Component() {
         {invite && (
           <Text ta='center' size='sm' c='dimmed'>
             {invite.inviter ? (
-              <Trans
+              <SafeTrans
                 t={t}
                 i18nKey='register.invitedBy'
                 values={{ title: config?.website?.title ?? 'Zipline', inviter: invite.inviter.username }}
                 components={{ b: <b /> }}
               />
             ) : (
-              <Trans
+              <SafeTrans
                 t={t}
                 i18nKey='register.invited'
                 values={{ title: config?.website?.title ?? 'Zipline' }}
@@ -257,10 +258,10 @@ export function Component() {
               <Checkbox
                 label={
                   <Text size='xs'>
-                    <Trans
+                    <SafeTrans
                       t={t}
                       i18nKey='register.tosAgree'
-                      components={{ link: <Link to='/auth/tos' target='_blank' /> }}
+                      components={{ anchor: <Link to='/auth/tos' target='_blank' /> }}
                     />
                   </Text>
                 }

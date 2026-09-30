@@ -55,7 +55,7 @@
       "label": "Excluir após",
       "description": "O arquivo será excluído automaticamente após esse período.",
       "defaultExpiration": "O tempo de expiração padrão é <b>{{value}}</b> (você pode substituí-lo com a opção abaixo).",
-      "setDefault": "Você pode definir um tempo de expiração padrão nas <link>configurações</link>.",
+      "setDefault": "Você pode definir um tempo de expiração padrão nas <anchor>configurações</anchor>.",
       "maxExpiration": "Observação: a expiração máxima permitida é <b>{{value}}</b>."
     },
     "expirations": {
@@ -142,9 +142,9 @@
     "title_other": "{{count}} arquivos enviados",
     "open": "Abrir link em nova guia",
     "copy": "Copiar link para a área de transferência",
-    "pending_one": "{{count}} arquivo grande terminará o <link>processamento em segundo plano.</link>",
-    "pending_many": "{{count}} arquivos grandes terminarão o <link>processamento em segundo plano.</link>",
-    "pending_other": "{{count}} arquivos grandes terminarão o <link>processamento em segundo plano.</link>",
+    "pending_one": "{{count}} arquivo grande terminará o <anchor>processamento em segundo plano.</anchor>",
+    "pending_many": "{{count}} arquivos grandes terminarão o <anchor>processamento em segundo plano.</anchor>",
+    "pending_other": "{{count}} arquivos grandes terminarão o <anchor>processamento em segundo plano.</anchor>",
     "copyAllTooltip": "Copiar todos os links para a área de transferência (separados por quebra de linha)",
     "copyAll": "Copiar todas as URLs ({{total}}) para a área de transferência",
     "notifications": {

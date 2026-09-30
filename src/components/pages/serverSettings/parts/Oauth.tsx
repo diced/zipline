@@ -13,7 +13,8 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconDeviceFloppy } from '@tabler/icons-react';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import SafeTrans from '@/components/SafeTrans';
 import { Link, useNavigate } from 'react-router-dom';
 import { settingsOnSubmit } from '../settingsOnSubmit';
 import useServerSettings from '../useServerSettings';
@@ -102,10 +103,10 @@ function Form({ data, isLoading }: { data: Response['/api/server/settings']; isL
   return (
     <>
       <Text size='sm' c='dimmed' mb='md'>
-        <Trans
+        <SafeTrans
           t={t}
           i18nKey='oauth.intro'
-          components={{ link: <Anchor component={Link} to='/dashboard/admin/settings/features' /> }}
+          components={{ anchor: <Anchor component={Link} to='/dashboard/admin/settings/features' /> }}
         />
       </Text>
 

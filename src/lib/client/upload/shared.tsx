@@ -8,7 +8,7 @@ import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import { IconClipboardCopy, IconExternalLink } from '@tabler/icons-react';
 import { Dispatch, SetStateAction } from 'react';
-import { Trans } from 'react-i18next';
+import SafeTrans from '@/components/SafeTrans';
 import { Link } from 'react-router-dom';
 import { UploadProgress } from './useProgress';
 
@@ -162,12 +162,12 @@ export function showUploadModal(
         </Stack>
         {pendingCount > 0 && (
           <Text size='sm' c='dimmed' mt='sm'>
-            <Trans
+            <SafeTrans
               ns='upload'
               i18nKey='modal.pending'
               count={pendingCount}
               components={{
-                link: (
+                anchor: (
                   <Anchor
                     component={Link}
                     to='/dashboard/files?pending=true'

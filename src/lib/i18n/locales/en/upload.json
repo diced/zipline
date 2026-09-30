@@ -53,7 +53,7 @@
       "label": "Deletes at",
       "description": "The file will automatically delete itself after this time.",
       "defaultExpiration": "The default expiration time is <b>{{value}}</b> (you can override this with the below option).",
-      "setDefault": "You can set a default expiration time in the <link>settings</link>.",
+      "setDefault": "You can set a default expiration time in the <anchor>settings</anchor>.",
       "maxExpiration": "Note: maximum allowed expiration is <b>{{value}}</b>."
     },
     "expirations": {
@@ -139,8 +139,8 @@
     "title_other": "Uploaded {{count}} files",
     "open": "Open link in a new tab",
     "copy": "Copy link to clipboard",
-    "pending_one": "{{count}} large file will finish <link>processing in the background.</link>",
-    "pending_other": "{{count}} large files will finish <link>processing in the background.</link>",
+    "pending_one": "{{count}} large file will finish <anchor>processing in the background.</anchor>",
+    "pending_other": "{{count}} large files will finish <anchor>processing in the background.</anchor>",
     "copyAllTooltip": "Copy all links to clipboard (separated by a new line)",
     "copyAll": "Copy {{total}} URLs to clipboard",
     "notifications": {

@@ -1,7 +1,8 @@
 import { Alert, Box, Button, List, Modal, Code, Group, Divider, Checkbox, Pill } from '@mantine/core';
 import { IconAlertCircle, IconDownload } from '@tabler/icons-react';
 import { useState } from 'react';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import SafeTrans from '@/components/SafeTrans';
 
 const EXPORT_ITEMS = [
   'importExport.export.items.users',
@@ -42,19 +43,19 @@ export default function ExportButton() {
           <List>
             {EXPORT_ITEMS.map((key) => (
               <List.Item key={key}>
-                <Trans t={t} i18nKey={key} components={{ b: <b />, i: <i /> }} />
+                <SafeTrans t={t} i18nKey={key} components={{ b: <b />, i: <i /> }} />
               </List.Item>
             ))}
           </List>
 
           <p>
-            <Trans t={t} i18nKey='importExport.export.systemIntro' components={{ b: <b /> }} />
+            <SafeTrans t={t} i18nKey='importExport.export.systemIntro' components={{ b: <b /> }} />
           </p>
 
           <List>
             {EXPORT_SYSTEM_ITEMS.map((key) => (
               <List.Item key={key}>
-                <Trans t={t} i18nKey={key} components={{ b: <b />, code: <Code /> }} />
+                <SafeTrans t={t} i18nKey={key} components={{ b: <b />, code: <Code /> }} />
               </List.Item>
             ))}
           </List>

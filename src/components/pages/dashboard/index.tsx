@@ -15,7 +15,8 @@ import {
   IconStarFilled,
 } from '@tabler/icons-react';
 import { lazy, Suspense } from 'react';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import SafeTrans from '@/components/SafeTrans';
 import { Link } from 'react-router-dom';
 import useSWR from 'swr';
 
@@ -33,7 +34,7 @@ export default function DashboardHome() {
   return (
     <>
       <Title>
-        <Trans
+        <SafeTrans
           t={t}
           i18nKey='welcome'
           values={{ username: user?.username ?? '' }}
@@ -43,7 +44,7 @@ export default function DashboardHome() {
 
       <Skeleton visible={statsLoading} animate>
         <Text size='sm' c='dimmed'>
-          <Trans
+          <SafeTrans
             t={t}
             i18nKey='filesUploaded'
             values={{ files: statsLoading ? '...' : stats?.filesUploaded }}
@@ -81,14 +82,14 @@ export default function DashboardHome() {
       {user?.quota && (user.quota.maxBytes || user.quota.maxFiles) ? (
         <Text size='sm' c='dimmed'>
           {user.quota.filesQuota === 'BY_BYTES' ? (
-            <Trans
+            <SafeTrans
               t={t}
               i18nKey='quota.bytes'
               values={{ used: statsLoading ? '...' : bytes(stats!.storageUsed), max: user.quota.maxBytes }}
               components={{ b: <b /> }}
             />
           ) : (
-            <Trans
+            <SafeTrans
               t={t}
               i18nKey='quota.files'
               values={{ files: statsLoading ? '...' : stats?.filesUploaded, max: user.quota.maxFiles }}
@@ -99,7 +100,7 @@ export default function DashboardHome() {
       ) : null}
       {user?.quota && user.quota.maxUrls ? (
         <Text size='sm' c='dimmed'>
-          <Trans
+          <SafeTrans
             t={t}
             i18nKey='quota.urls'
             values={{ urls: statsLoading ? '...' : stats?.urlsCreated, max: user.quota.maxUrls }}

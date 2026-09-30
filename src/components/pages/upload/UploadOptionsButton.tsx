@@ -37,7 +37,8 @@ import {
 import ms from 'ms';
 import { useEffect, useMemo, useState } from 'react';
 import i18n from '@/lib/i18n';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import SafeTrans from '@/components/SafeTrans';
 import { Link } from 'react-router-dom';
 import useSWR from 'swr';
 import { useShallow } from 'zustand/shallow';
@@ -177,22 +178,22 @@ export default function UploadOptionsButton({ folder, numFiles }: { folder?: str
               <>
                 {t('options.deletesAt.description')}{' '}
                 {config.files.defaultExpiration ? (
-                  <Trans
+                  <SafeTrans
                     t={t}
                     i18nKey='options.deletesAt.defaultExpiration'
                     values={{ value: config.files.defaultExpiration }}
                     components={{ b: <b /> }}
                   />
                 ) : (
-                  <Trans
+                  <SafeTrans
                     t={t}
                     i18nKey='options.deletesAt.setDefault'
-                    components={{ link: <Link to='/dashboard/admin/settings' /> }}
+                    components={{ anchor: <Link to='/dashboard/admin/settings' /> }}
                   />
                 )}
                 {settingsData?.files?.maxExpiration ? (
                   <div style={{ marginTop: 6, color: 'var(--mantine-color-dimmed)' }}>
-                    <Trans
+                    <SafeTrans
                       t={t}
                       i18nKey='options.deletesAt.maxExpiration'
                       values={{ value: settingsData.files.maxExpiration }}
@@ -270,7 +271,7 @@ export default function UploadOptionsButton({ folder, numFiles }: { folder?: str
               </>
             }
             description={
-              <Trans t={t} i18nKey='options.compressionFormat.description' components={{ b: <b /> }} />
+              <SafeTrans t={t} i18nKey='options.compressionFormat.description' components={{ b: <b /> }} />
             }
             leftSection={<IconFileInfo size='1rem' />}
             value={options.imageCompressionFormat || 'default'}

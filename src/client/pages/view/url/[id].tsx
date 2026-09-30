@@ -1,7 +1,8 @@
 import { useSsrData } from '@/components/ZiplineSSRProvider';
 import { Anchor, Button, Modal, PasswordInput } from '@mantine/core';
 import { useEffect, useState } from 'react';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import SafeTrans from '@/components/SafeTrans';
 
 export default function ViewUrlId() {
   const data = useSsrData<{
@@ -66,11 +67,11 @@ export default function ViewUrlId() {
     </Modal>
   ) : (
     <p>
-      <Trans
+      <SafeTrans
         t={t}
         i18nKey='url.redirecting'
         values={{ destination: url.destination! }}
-        components={{ link: <Anchor href={url.destination!} /> }}
+        components={{ anchor: <Anchor href={url.destination!} /> }}
       />
     </p>
   );

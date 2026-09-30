@@ -55,7 +55,7 @@
       "label": "Eliminar después de",
       "description": "El archivo se eliminará automáticamente cuando transcurra este tiempo.",
       "defaultExpiration": "El tiempo de expiración predeterminado es <b>{{value}}</b> (puede cambiarlo con la opción siguiente).",
-      "setDefault": "Puede establecer un tiempo de expiración predeterminado en la <link>configuración</link>.",
+      "setDefault": "Puede establecer un tiempo de expiración predeterminado en la <anchor>configuración</anchor>.",
       "maxExpiration": "Nota: la expiración máxima permitida es <b>{{value}}</b>."
     },
     "expirations": {
@@ -142,9 +142,9 @@
     "title_other": "{{count}} archivos subidos",
     "open": "Abrir enlace en una pestaña nueva",
     "copy": "Copiar enlace al portapapeles",
-    "pending_one": "{{count}} archivo grande terminará de <link>procesarse en segundo plano.</link>",
-    "pending_many": "{{count}} archivos grandes terminarán de <link>procesarse en segundo plano.</link>",
-    "pending_other": "{{count}} archivos grandes terminarán de <link>procesarse en segundo plano.</link>",
+    "pending_one": "{{count}} archivo grande terminará de <anchor>procesarse en segundo plano.</anchor>",
+    "pending_many": "{{count}} archivos grandes terminarán de <anchor>procesarse en segundo plano.</anchor>",
+    "pending_other": "{{count}} archivos grandes terminarán de <anchor>procesarse en segundo plano.</anchor>",
     "copyAllTooltip": "Copiar todos los enlaces al portapapeles (uno por línea)",
     "copyAll": "Copiar {{total}} URL al portapapeles",
     "notifications": {

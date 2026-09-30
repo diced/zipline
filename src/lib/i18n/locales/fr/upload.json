@@ -55,7 +55,7 @@
       "label": "Supprimer après",
       "description": "Le fichier sera automatiquement supprimé au bout de ce délai.",
       "defaultExpiration": "Le délai d'expiration par défaut est de <b>{{value}}</b> (vous pouvez le remplacer avec l'option ci-dessous).",
-      "setDefault": "Vous pouvez définir un délai d'expiration par défaut dans les <link>paramètres</link>.",
+      "setDefault": "Vous pouvez définir un délai d'expiration par défaut dans les <anchor>paramètres</anchor>.",
       "maxExpiration": "Remarque : le délai d'expiration maximal autorisé est de <b>{{value}}</b>."
     },
     "expirations": {
@@ -142,9 +142,9 @@
     "title_other": "{{count}} fichiers téléversés",
     "open": "Ouvrir le lien dans un nouvel onglet",
     "copy": "Copier le lien dans le presse-papiers",
-    "pending_one": "Le <link>traitement en arrière-plan</link> de {{count}} fichier volumineux va se poursuivre.",
-    "pending_many": "Le <link>traitement en arrière-plan</link> de {{count}} fichiers volumineux va se poursuivre.",
-    "pending_other": "Le <link>traitement en arrière-plan</link> de {{count}} fichiers volumineux va se poursuivre.",
+    "pending_one": "Le <anchor>traitement en arrière-plan</anchor> de {{count}} fichier volumineux va se poursuivre.",
+    "pending_many": "Le <anchor>traitement en arrière-plan</anchor> de {{count}} fichiers volumineux va se poursuivre.",
+    "pending_other": "Le <anchor>traitement en arrière-plan</anchor> de {{count}} fichiers volumineux va se poursuivre.",
     "copyAllTooltip": "Copier tous les liens dans le presse-papiers (un par ligne)",
     "copyAll": "Copier {{total}} URL dans le presse-papiers",
     "notifications": {

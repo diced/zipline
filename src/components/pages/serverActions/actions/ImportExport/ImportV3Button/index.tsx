@@ -19,7 +19,8 @@ import {
   IconX,
 } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import SafeTrans from '@/components/SafeTrans';
 import Export3Details from './Export3Details';
 import Export3ImportSettings from './Export3ImportSettings';
 import Export3UserChoose from './Export3UserChoose';
@@ -153,7 +154,7 @@ export default function ImportV3Button() {
                 {t('importExport.v3.imported.message')}{' '}
                 <Stack gap={2}>
                   <div>
-                    <Trans
+                    <SafeTrans
                       t={t}
                       i18nKey='importExport.v3.imported.stats.users'
                       values={{ count: Object.keys(data?.users ?? {}).length }}
@@ -161,7 +162,7 @@ export default function ImportV3Button() {
                     />
                   </div>
                   <div>
-                    <Trans
+                    <SafeTrans
                       t={t}
                       i18nKey='importExport.v3.imported.stats.folders'
                       values={{ count: Object.keys(data?.folders ?? {}).length }}
@@ -169,7 +170,7 @@ export default function ImportV3Button() {
                     />
                   </div>
                   <div>
-                    <Trans
+                    <SafeTrans
                       t={t}
                       i18nKey='importExport.v3.imported.stats.urls'
                       values={{ count: Object.keys(data?.urls ?? {}).length }}
@@ -177,7 +178,7 @@ export default function ImportV3Button() {
                     />
                   </div>
                   <div>
-                    <Trans
+                    <SafeTrans
                       t={t}
                       i18nKey='importExport.v3.imported.stats.files'
                       values={{ count: Object.keys(data?.files ?? {}).length }}
@@ -209,7 +210,7 @@ export default function ImportV3Button() {
               children: (
                 <>
                   <p>
-                    <Trans
+                    <SafeTrans
                       t={t}
                       i18nKey='importExport.v3.filesImported.message'
                       values={{ count: Object.keys(data?.files ?? {}).length }}

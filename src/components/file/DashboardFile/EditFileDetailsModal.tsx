@@ -5,7 +5,8 @@ import { Button, Divider, Modal, NumberInput, PasswordInput, Stack, TextInput } 
 import { showNotification } from '@mantine/notifications';
 import { IconEye, IconKey, IconPencil, IconPencilOff, IconTrashFilled } from '@tabler/icons-react';
 import { useEffect } from 'react';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import SafeTrans from '@/components/SafeTrans';
 import { mutateFiles } from '../actions';
 
 export default function EditFileDetailsModal({
@@ -155,7 +156,7 @@ export default function EditFileDetailsModal({
 
         <TextInput
           label={t('edit.type.label')}
-          description={<Trans t={t} i18nKey='edit.type.description' components={{ b: <b /> }} />}
+          description={<SafeTrans t={t} i18nKey='edit.type.description' components={{ b: <b /> }} />}
           value={formData.type ?? ''}
           onChange={(event) =>
             setFormData(

@@ -20,7 +20,8 @@ import { sharex } from './generators/sharex';
 import { shell } from './generators/shell';
 import { ishare } from './generators/ishare';
 import { itake } from './generators/itake';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import SafeTrans from '@/components/SafeTrans';
 import { Link } from 'react-router-dom';
 
 export type GeneratorOptions = {
@@ -268,7 +269,7 @@ export default function GeneratorButton({
               <Switch
                 label={t('generators.modal.waylandCompatibility.label')}
                 description={
-                  <Trans
+                  <SafeTrans
                     t={t}
                     i18nKey='generators.modal.waylandCompatibility.description'
                     components={{ code: <Code /> }}
@@ -288,7 +289,7 @@ export default function GeneratorButton({
               <Switch
                 label={t('generators.modal.macCompatibility.label')}
                 description={
-                  <Trans
+                  <SafeTrans
                     t={t}
                     i18nKey='generators.modal.macCompatibility.description'
                     components={{ code: <Code /> }}
@@ -309,11 +310,11 @@ export default function GeneratorButton({
               <Switch
                 label={t('generators.modal.compositorUnsupported.label')}
                 description={
-                  <Trans
+                  <SafeTrans
                     t={t}
                     i18nKey='generators.modal.compositorUnsupported.description'
                     components={{
-                      link: <Anchor size='xs' component={Link} to='https://github.com/hyprwm/hyprland' />,
+                      anchor: <Anchor size='xs' component={Link} to='https://github.com/hyprwm/hyprland' />,
                       code: <Code />,
                     }}
                   />
@@ -325,7 +326,7 @@ export default function GeneratorButton({
 
               <Switch
                 label={
-                  <Trans t={t} i18nKey='generators.modal.useEcho.label' components={{ code: <Code /> }} />
+                  <SafeTrans t={t} i18nKey='generators.modal.useEcho.label' components={{ code: <Code /> }} />
                 }
                 description={t('generators.modal.useEcho.description')}
                 checked={options.unix_useEcho ?? false}
@@ -342,10 +343,10 @@ export default function GeneratorButton({
 
           {isUnixLike && (
             <Text c='dimmed' size='sm'>
-              <Trans
+              <SafeTrans
                 t={t}
                 i18nKey='generators.modal.waylandHelp'
-                components={{ link: <Anchor href='https://zipline.diced.sh/docs/guides/wayland' /> }}
+                components={{ anchor: <Anchor href='https://zipline.diced.sh/docs/guides/wayland' /> }}
               />
             </Text>
           )}

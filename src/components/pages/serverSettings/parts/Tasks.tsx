@@ -2,7 +2,8 @@ import type { Response } from '@/lib/api/response';
 import { Button, Code, LoadingOverlay, Stack, Text, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconDeviceFloppy } from '@tabler/icons-react';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import SafeTrans from '@/components/SafeTrans';
 import { useNavigate } from 'react-router-dom';
 import { settingsOnSubmit } from '../settingsOnSubmit';
 import useServerSettings from '../useServerSettings';
@@ -41,7 +42,7 @@ function Form({ data, isLoading }: { data: Response['/api/server/settings']; isL
   return (
     <>
       <Text size='sm' c='dimmed' mb='md'>
-        <Trans t={t} i18nKey='tasks.intro' components={{ code: <Code /> }} />
+        <SafeTrans t={t} i18nKey='tasks.intro' components={{ code: <Code /> }} />
       </Text>
 
       <form onSubmit={form.onSubmit(onSubmit)}>

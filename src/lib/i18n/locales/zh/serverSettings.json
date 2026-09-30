@@ -381,7 +381,7 @@
     }
   },
   "oauth": {
-    "intro": "要使 OAuth 正常工作，必须在<link>功能</link>分区中启用“OAuth 注册”设置。如果遇到问题，请在保存后尝试重启 Zipline。",
+    "intro": "要使 OAuth 正常工作，必须在<anchor>功能</anchor>分区中启用“OAuth 注册”设置。如果遇到问题，请在保存后尝试重启 Zipline。",
     "bypassLocalLogin": {
       "label": "跳过本地登录",
       "description": "跳过本地登录页面，直接重定向到 OAuth 提供方。仅在只启用了一个提供方时有效。"

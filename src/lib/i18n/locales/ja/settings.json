@@ -135,7 +135,7 @@
   },
   "fileView": {
     "title": "ファイルの表示",
-    "variablesHint": "すべてのテキストフィールドで<link>変数</link>を使用できます。",
+    "variablesHint": "すべてのテキストフィールドで<anchor>変数</anchor>を使用できます。",
     "disableTextFiles": {
       "label": "テキストファイルを無効化",
       "description": "表示ルートでのテキストファイルの表示を無効にします。ほかの種類のファイルには影響せず、表示ルートが無効な場合でも機能します。"
@@ -310,8 +310,8 @@
     "shellScript": "シェルスクリプト",
     "desc": {
       "flameshot": "このスクリプトを使用するには、<flameshotLink>Flameshot</flameshotLink>、<curlLink><code>curl</code></curlLink>、<jqLink><code>jq</code></jqLink>、<xclipLink><code>xclip</code> (Linux のみ)</xclipLink> がインストールされている必要があります。このスクリプトは Linux と macOS 専用です (下のオプションを参照)。",
-      "ishare": "このジェネレーターを使用するには、macOS に <link>ishare</link> がインストールされている必要があります。このアップローダーは macOS 専用です。",
-      "itake": "このジェネレーターを使用するには、macOS に <link>iTake</link> がインストールされている必要があります。このアップローダーは macOS 専用です。",
+      "ishare": "このジェネレーターを使用するには、macOS に <anchor>ishare</anchor> がインストールされている必要があります。このアップローダーは macOS 専用です。",
+      "itake": "このジェネレーターを使用するには、macOS に <anchor>iTake</anchor> がインストールされている必要があります。このアップローダーは macOS 専用です。",
       "shell": "このスクリプトを使用するには、<code>bash</code>、<curlLink><code>curl</code></curlLink>、<fileLink><code>file</code></fileLink>、<jqLink><code>jq</code></jqLink>、<xclipLink><code>xclip</code> (Linux のみ)</xclipLink> がインストールされている必要があります。このスクリプトは Linux と macOS 専用です (下のオプションを参照)。"
     },
     "modal": {
@@ -372,13 +372,13 @@
       },
       "compositorUnsupported": {
         "label": "Gnome、KDE、Sway 以外のデスクトップ環境を使用していますか？",
-        "description": "<link>Hyprland</link> などのコンポジターを使用している場合、このオプションは <code>XDG_CURRENT_DESKTOP=sway</code> を設定し、Wayland 上での Flameshot のエラーを回避します。Xorg では不要です。"
+        "description": "<anchor>Hyprland</anchor> などのコンポジターを使用している場合、このオプションは <code>XDG_CURRENT_DESKTOP=sway</code> を設定し、Wayland 上での Flameshot のエラーを回避します。Xorg では不要です。"
       },
       "useEcho": {
         "label": "クリップボードにコピーする代わりに <code>echo</code> を使用",
         "description": "URL をクリップボードにコピーせず、ターミナルに出力するだけにします。"
       },
-      "waylandHelp": "Wayland で Flameshot がうまく動作しない場合は、<link>Wayland ガイド</link>を参照してください。"
+      "waylandHelp": "Wayland で Flameshot がうまく動作しない場合は、<anchor>Wayland ガイド</anchor>を参照してください。"
     }
   }
 }

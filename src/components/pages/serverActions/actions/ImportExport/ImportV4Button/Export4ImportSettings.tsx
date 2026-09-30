@@ -1,7 +1,8 @@
 import { Export4 } from '@/lib/import/version4/validateExport';
 import { Box, Button, Checkbox, Collapse, Group, Paper, Table, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import SafeTrans from '@/components/SafeTrans';
 
 export default function Export4ImportSettings({
   export4,
@@ -25,7 +26,7 @@ export default function Export4ImportSettings({
     <Box my='lg'>
       <Text size='md'>{t('importExport.importSettings.title')}</Text>
       <Text size='sm' c='dimmed'>
-        <Trans t={t} i18nKey='importExport.v4.importSettings.description' components={{ br: <br /> }} />
+        <SafeTrans t={t} i18nKey='importExport.v4.importSettings.description' components={{ br: <br /> }} />
       </Text>
 
       <Button my='xs' onClick={toggleSettings} size='compact-xs'>

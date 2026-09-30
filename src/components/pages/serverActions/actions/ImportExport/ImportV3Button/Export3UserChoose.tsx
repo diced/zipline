@@ -1,6 +1,7 @@
 import { Export3 } from '@/lib/import/version3/validateExport';
 import { Avatar, Box, Group, Radio, Stack, Text } from '@mantine/core';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import SafeTrans from '@/components/SafeTrans';
 
 export default function Export3UserChoose({
   export3,
@@ -18,7 +19,7 @@ export default function Export3UserChoose({
     <Box my='lg'>
       <Text size='md'>{t('importExport.userChoose.title')}</Text>
       <Text size='sm' c='dimmed'>
-        <Trans t={t} i18nKey='importExport.v3.userChoose.description' components={{ b: <b /> }} />
+        <SafeTrans t={t} i18nKey='importExport.v3.userChoose.description' components={{ b: <b /> }} />
       </Text>
 
       <Radio.Group value={importFrom} onChange={(value) => setImportFrom(value)} name='importFrom'>

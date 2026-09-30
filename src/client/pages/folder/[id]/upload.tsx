@@ -4,7 +4,8 @@ import { type Response } from '@/lib/api/response';
 import { SafeConfig } from '@/lib/config/safe';
 import { useTitle } from '@/lib/client/hooks/useTitle';
 import { Anchor, Center, Container, Text } from '@mantine/core';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import SafeTrans from '@/components/SafeTrans';
 import { data, Link, Params, useLoaderData } from 'react-router-dom';
 import useSWR from 'swr';
 
@@ -45,11 +46,11 @@ export function Component() {
           <Center>
             <Text c='dimmed' ta='center'>
               {folder.public ? (
-                <Trans
+                <SafeTrans
                   t={t}
                   i18nKey='folderUpload.public'
                   components={{
-                    link: <Anchor component={Link} to={`/folder/${folder.id}`} reloadDocument />,
+                    anchor: <Anchor component={Link} to={`/folder/${folder.id}`} reloadDocument />,
                   }}
                 />
               ) : (

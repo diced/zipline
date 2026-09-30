@@ -51,7 +51,7 @@
       "label": "有効期限",
       "description": "この時間が経過すると、ファイルは自動的に削除されます。",
       "defaultExpiration": "既定の有効期限は <b>{{value}}</b> です (下のオプションで上書きできます)。",
-      "setDefault": "既定の有効期限は<link>設定</link>で指定できます。",
+      "setDefault": "既定の有効期限は<anchor>設定</anchor>で指定できます。",
       "maxExpiration": "注: 許可されている最長の有効期限は <b>{{value}}</b> です。"
     },
     "expirations": {
@@ -136,7 +136,7 @@
     "title_other": "{{count}} 個のファイルをアップロードしました",
     "open": "新しいタブでリンクを開く",
     "copy": "リンクをクリップボードにコピー",
-    "pending_other": "{{count}} 個の大きなファイルは<link>バックグラウンドで処理されます。</link>",
+    "pending_other": "{{count}} 個の大きなファイルは<anchor>バックグラウンドで処理されます。</anchor>",
     "copyAllTooltip": "すべてのリンクをクリップボードにコピー (改行区切り)",
     "copyAll": "{{total}} 件の URL をクリップボードにコピー",
     "notifications": {

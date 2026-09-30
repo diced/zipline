@@ -39,6 +39,24 @@ const tokens = (value: string) =>
     ...[...value.matchAll(/<\/?([\w-]+)\s*\/?>/g)].map((m) => `<${m[1]}>`),
   ].sort();
 
+// the <Trans> parser treats these names as childless, so "<link>text</link>" would render the text outside the component
+const VOID_ELEMENTS = [
+  'area',
+  'base',
+  'br',
+  'col',
+  'embed',
+  'hr',
+  'img',
+  'input',
+  'link',
+  'meta',
+  'param',
+  'source',
+  'track',
+  'wbr',
+];
+
 const namespaces = readdirSync(join(LOCALES_DIR, DEFAULT_LANGUAGE))
   .filter((file) => file.endsWith('.json'))
   .map((file) => file.slice(0, -'.json'.length));
@@ -51,6 +69,20 @@ test('browser language tags resolve to a supported language by their primary sub
   assert.equal(matchLanguage('en_US'), 'en');
   assert.equal(matchLanguage('DE'), 'de');
   assert.equal(matchLanguage('it-IT'), null);
+});
+
+test('no translation wraps text in a tag named after an HTML void element', () => {
+  for (const lng of LANGUAGES) {
+    for (const ns of readdirSync(join(LOCALES_DIR, lng)).map((file) => file.slice(0, -'.json'.length))) {
+      for (const [key, value] of Object.entries(readNamespace(lng, ns))) {
+        for (const [tag, name] of value.matchAll(/<\/?([\w-]+)\s*\/?>/g)) {
+          if (!VOID_ELEMENTS.includes(name)) continue;
+          // a self-closing <br/> is the only intended use of a void element
+          assert.ok(name === 'br' && tag.endsWith('/>'), `${lng}/${ns}:${key} uses <${name}> as a tag`);
+        }
+      }
+    }
+  }
 });
 
 test('every supported language has a locale directory and no unknown directory exists', () => {

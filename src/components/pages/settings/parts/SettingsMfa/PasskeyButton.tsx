@@ -12,7 +12,8 @@ import {
   startRegistration,
 } from '@simplewebauthn/browser';
 import { IconKey, IconKeyOff, IconTrashFilled } from '@tabler/icons-react';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import SafeTrans from '@/components/SafeTrans';
 import { mutate } from 'swr';
 
 export default function PasskeyButton() {
@@ -155,7 +156,7 @@ export default function PasskeyButton() {
                 </Group>
                 <Text size='sm'>
                   {passkey.lastUsed ? (
-                    <Trans
+                    <SafeTrans
                       t={t}
                       i18nKey='mfa.passkeys.createdAndUsed'
                       components={{
@@ -164,7 +165,7 @@ export default function PasskeyButton() {
                       }}
                     />
                   ) : (
-                    <Trans
+                    <SafeTrans
                       t={t}
                       i18nKey='mfa.passkeys.created'
                       components={{ created: <RelativeDate date={passkey.createdAt} /> }}
@@ -173,7 +174,7 @@ export default function PasskeyButton() {
                 </Text>
                 {!(passkey.reg as Record<string, any>)?.webauthn && (
                   <Text size='xs' mt='xs' c='red'>
-                    <Trans t={t} i18nKey='mfa.passkeys.legacyWarning' components={{ b: <b /> }} />
+                    <SafeTrans t={t} i18nKey='mfa.passkeys.legacyWarning' components={{ b: <b /> }} />
                   </Text>
                 )}
               </Paper>

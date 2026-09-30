@@ -34,7 +34,8 @@ import {
   IconCircleKeyFilled,
 } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import SafeTrans from '@/components/SafeTrans';
 import { Link, useNavigate } from 'react-router-dom';
 import useSWR from 'swr';
 import GenericError from '../../error/GenericError';
@@ -172,10 +173,10 @@ export default function Login() {
       {isHttps && !config.returnHttps && (
         <Box pos='absolute' top={10} left='50%' style={{ transform: 'translateX(-50%)' }}>
           <Text size='sm' c='red' ta='center'>
-            <Trans
+            <SafeTrans
               t={t}
               i18nKey='login.insecureServer'
-              components={{ b: <b />, link: <Anchor onClick={() => setSecureModal(true)} /> }}
+              components={{ b: <b />, anchor: <Anchor onClick={() => setSecureModal(true)} /> }}
             />
           </Text>
         </Box>
@@ -184,10 +185,10 @@ export default function Login() {
       {!isHttps && config.returnHttps && (
         <Box pos='absolute' top={10} left='50%' style={{ transform: 'translateX(-50%)' }}>
           <Text size='sm' c='red' ta='center'>
-            <Trans
+            <SafeTrans
               t={t}
               i18nKey='login.insecureClient'
-              components={{ b: <b />, link: <Anchor onClick={() => setSecureModal(true)} /> }}
+              components={{ b: <b />, anchor: <Anchor onClick={() => setSecureModal(true)} /> }}
             />
           </Text>
         </Box>
@@ -272,10 +273,12 @@ export default function Login() {
 
                 {config.features.userRegistration && (
                   <Text ta='center' mt='md'>
-                    <Trans
+                    <SafeTrans
                       t={t}
                       i18nKey='login.noAccount'
-                      components={{ link: <Anchor component={Link} to='/auth/register' c='blue' fw={500} /> }}
+                      components={{
+                        anchor: <Anchor component={Link} to='/auth/register' c='blue' fw={500} />,
+                      }}
                     />
                   </Text>
                 )}

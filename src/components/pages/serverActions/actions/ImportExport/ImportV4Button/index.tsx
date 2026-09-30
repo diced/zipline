@@ -7,7 +7,8 @@ import { modals } from '@mantine/modals';
 import { showNotification, updateNotification } from '@mantine/notifications';
 import { IconDatabaseImport, IconDatabaseOff, IconUpload, IconX } from '@tabler/icons-react';
 import { Fragment, useEffect, useState } from 'react';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import SafeTrans from '@/components/SafeTrans';
 import { mutate } from 'swr';
 import Export4Details from './Export4Details';
 import Export4ImportSettings from './Export4ImportSettings';
@@ -160,12 +161,12 @@ export default function ImportV4Button() {
             title: t('importExport.v4.completed.title'),
             children: (
               <Text size='md'>
-                <Trans t={t} i18nKey='importExport.v4.completed.message' components={{ br: <br /> }} />
+                <SafeTrans t={t} i18nKey='importExport.v4.completed.message' components={{ br: <br /> }} />
                 <br /> <br />
                 {IMPORTED_STATS.map(([key, stat], i) => (
                   <Fragment key={key}>
                     {i > 0 && <br />}
-                    <Trans
+                    <SafeTrans
                       t={t}
                       i18nKey={key}
                       values={{ count: data.imported[stat] }}

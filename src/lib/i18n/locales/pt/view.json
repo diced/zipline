@@ -13,7 +13,7 @@
     "download": "Baixar arquivo"
   },
   "url": {
-    "redirecting": "Redirecionando para <link>{{destination}}</link>"
+    "redirecting": "Redirecionando para <anchor>{{destination}}</anchor>"
   },
   "folder": {
     "pageTitle": "Pasta",
@@ -30,7 +30,7 @@
     "pageTitle": "Enviar para {{name}}",
     "pageTitleFallback": "Enviar para a pasta",
     "title": "Enviar arquivos para {{name}}",
-    "public": "Esta pasta é <link>pública</link>. Qualquer pessoa com o link pode ver o conteúdo dela e enviar arquivos.",
+    "public": "Esta pasta é <anchor>pública</anchor>. Qualquer pessoa com o link pode ver o conteúdo dela e enviar arquivos.",
     "private": "Somente o proprietário pode ver o conteúdo desta pasta. No entanto, qualquer pessoa pode enviar arquivos, e quem enviou ainda poderá acessar os próprios arquivos se tiver o link de cada um deles."
   }
 }

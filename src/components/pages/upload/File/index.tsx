@@ -25,7 +25,8 @@ import { useClipboard, useColorScheme } from '@mantine/hooks';
 import { notifications, showNotification } from '@mantine/notifications';
 import { IconDeviceSdCard, IconFiles, IconTrashFilled, IconUpload, IconX } from '@tabler/icons-react';
 import { useCallback, useEffect, useState } from 'react';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import SafeTrans from '@/components/SafeTrans';
 import { Link } from 'react-router-dom';
 import { useShallow } from 'zustand/shallow';
 import UploadOptionsButton from '../UploadOptionsButton';
@@ -91,7 +92,7 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
           color: 'yellow',
           icon: <IconDeviceSdCard size='1rem' />,
           message: (
-            <Trans
+            <SafeTrans
               t={t}
               i18nKey='file.notifications.mayFail.message'
               values={{ size: bytes(size), limit: bytes(bytes(config.files.maxFileSize)) }}
@@ -201,7 +202,7 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
               {t('file.dropzone.title')}
             </Text>
             <Text size='sm' inline mt='xs'>
-              <Trans
+              <SafeTrans
                 t={t}
                 i18nKey='file.dropzone.paste'
                 values={{ mod: isMac ? '⌘' : 'Ctrl' }}
@@ -212,7 +213,7 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
               {t('file.dropzone.description')}
             </Text>
             <Text size='sm' c='dimmed' mt={7}>
-              <Trans
+              <SafeTrans
                 t={t}
                 i18nKey='file.dropzone.limit'
                 values={{ size: bytes(bytes(config.files.maxFileSize)) }}

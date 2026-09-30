@@ -28,7 +28,8 @@ import {
   IconDeviceFloppy,
   IconFileX,
 } from '@tabler/icons-react';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import SafeTrans from '@/components/SafeTrans';
 import { mutate } from 'swr';
 import { useShallow } from 'zustand/shallow';
 
@@ -121,11 +122,11 @@ function Form({ user, setUser }: { user: User; setUser: (u: User) => void }) {
     <Paper withBorder p='sm'>
       <Title order={2}>{t('fileView.title')}</Title>
       <Text c='dimmed' mt='xs'>
-        <Trans
+        <SafeTrans
           t={t}
           i18nKey='fileView.variablesHint'
           components={{
-            link: <Anchor target='_blank' href='https://zipline.diced.sh/docs/guides/variables/' />,
+            anchor: <Anchor target='_blank' href='https://zipline.diced.sh/docs/guides/variables/' />,
           }}
         />
       </Text>

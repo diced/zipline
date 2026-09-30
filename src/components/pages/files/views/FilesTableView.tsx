@@ -43,7 +43,8 @@ import {
 import { DataTable } from 'mantine-datatable';
 import { parseAsInteger, useQueryState } from 'nuqs';
 import { lazy, useEffect, useMemo, useReducer, useState } from 'react';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import SafeTrans from '@/components/SafeTrans';
 import { Link } from 'react-router-dom';
 import useSWR from 'swr';
 import { useShallow } from 'zustand/shallow';
@@ -425,7 +426,7 @@ export default function FileTable({
         <Collapse expanded={selectedFiles.length > 0}>
           <Paper withBorder p='sm' my='sm'>
             <Text size='sm' c='dimmed' mb='xs'>
-              <Trans
+              <SafeTrans
                 t={t}
                 i18nKey='table.selection.summary'
                 count={selectedFiles.length}

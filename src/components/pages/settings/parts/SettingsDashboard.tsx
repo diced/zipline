@@ -3,7 +3,8 @@ import { useThemes } from '@/components/ThemeProvider';
 import { useSettingsStore } from '@/lib/client/store/settings';
 import { Group, Paper, Select, Stack, Switch, Text, Title } from '@mantine/core';
 import { IconMoonFilled, IconPaintFilled, IconSunFilled } from '@tabler/icons-react';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import SafeTrans from '@/components/SafeTrans';
 import { useShallow } from 'zustand/shallow';
 
 const renderThemeOption =
@@ -36,7 +37,7 @@ export default function SettingsDashboard() {
     <Paper withBorder p='sm' h='100%'>
       <Title order={2}>{t('dashboard.title')}</Title>
       <Text size='sm' c='dimmed' mt={3}>
-        <Trans t={t} i18nKey='dashboard.description' components={{ b: <b /> }} />
+        <SafeTrans t={t} i18nKey='dashboard.description' components={{ b: <b /> }} />
       </Text>
 
       <Stack gap='sm' my='xs'>

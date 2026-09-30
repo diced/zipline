@@ -53,7 +53,7 @@
       "label": "Löschen nach",
       "description": "Die Datei wird nach Ablauf dieser Zeit automatisch gelöscht.",
       "defaultExpiration": "Die Standard-Ablaufzeit beträgt <b>{{value}}</b> (Sie können sie mit der folgenden Option überschreiben).",
-      "setDefault": "Eine Standard-Ablaufzeit können Sie in den <link>Einstellungen</link> festlegen.",
+      "setDefault": "Eine Standard-Ablaufzeit können Sie in den <anchor>Einstellungen</anchor> festlegen.",
       "maxExpiration": "Hinweis: Die maximal zulässige Ablaufzeit beträgt <b>{{value}}</b>."
     },
     "expirations": {
@@ -139,8 +139,8 @@
     "title_other": "{{count}} Dateien hochgeladen",
     "open": "Link in neuem Tab öffnen",
     "copy": "Link in die Zwischenablage kopieren",
-    "pending_one": "{{count}} große Datei wird <link>im Hintergrund fertig verarbeitet.</link>",
-    "pending_other": "{{count}} große Dateien werden <link>im Hintergrund fertig verarbeitet.</link>",
+    "pending_one": "{{count}} große Datei wird <anchor>im Hintergrund fertig verarbeitet.</anchor>",
+    "pending_other": "{{count}} große Dateien werden <anchor>im Hintergrund fertig verarbeitet.</anchor>",
     "copyAllTooltip": "Alle Links in die Zwischenablage kopieren (durch Zeilenumbrüche getrennt)",
     "copyAll": "Alle URLs in die Zwischenablage kopieren ({{total}})",
     "notifications": {

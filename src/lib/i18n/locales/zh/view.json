@@ -13,7 +13,7 @@
     "download": "下载文件"
   },
   "url": {
-    "redirecting": "正在重定向到 <link>{{destination}}</link>"
+    "redirecting": "正在重定向到 <anchor>{{destination}}</anchor>"
   },
   "folder": {
     "pageTitle": "文件夹",
@@ -30,7 +30,7 @@
     "pageTitle": "上传到 {{name}}",
     "pageTitleFallback": "上传到文件夹",
     "title": "上传文件到 {{name}}",
-    "public": "此文件夹为<link>公开</link>状态。任何拥有链接的人都可以查看其内容并上传文件。",
+    "public": "此文件夹为<anchor>公开</anchor>状态。任何拥有链接的人都可以查看其内容并上传文件。",
     "private": "只有所有者可以查看此文件夹的内容。不过，任何人都可以上传文件，并且只要拥有具体文件的链接，仍然可以访问自己上传的文件。"
   }
 }

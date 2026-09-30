@@ -51,7 +51,7 @@
       "label": "删除时间",
       "description": "文件将在此时间后自动删除。",
       "defaultExpiration": "默认过期时间为 <b>{{value}}</b> (可以通过下方选项覆盖)。",
-      "setDefault": "你可以在<link>设置</link>中设置默认过期时间。",
+      "setDefault": "你可以在<anchor>设置</anchor>中设置默认过期时间。",
       "maxExpiration": "注意：允许的最长过期时间为 <b>{{value}}</b>。"
     },
     "expirations": {
@@ -136,7 +136,7 @@
     "title_other": "已上传 {{count}} 个文件",
     "open": "在新标签页中打开链接",
     "copy": "将链接复制到剪贴板",
-    "pending_other": "{{count}} 个大文件将<link>在后台完成处理。</link>",
+    "pending_other": "{{count}} 个大文件将<anchor>在后台完成处理。</anchor>",
     "copyAllTooltip": "将所有链接复制到剪贴板 (以换行分隔)",
     "copyAll": "将 {{total}} 个 URL 复制到剪贴板",
     "notifications": {

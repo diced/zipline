@@ -52,7 +52,7 @@
     "tooltip": "Cliquez pour afficher plus d'informations sur la version",
     "latest": "Vous utilisez la dernière version de Zipline.",
     "unstable": "Vous utilisez une version <b>instable</b> de Zipline. Les versions upstream ne sont pas entièrement testées et peuvent contenir des bogues.",
-    "outdated": "Vous utilisez une version <b>obsolète</b> de Zipline. Il est recommandé de passer à la <link>dernière version</link>.",
+    "outdated": "Vous utilisez une version <b>obsolète</b> de Zipline. Il est recommandé de passer à la <anchor>dernière version</anchor>.",
     "current": "Version actuelle",
     "fields": {
       "version": "Version",

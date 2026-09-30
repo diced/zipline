@@ -13,7 +13,7 @@
     "download": "Datei herunterladen"
   },
   "url": {
-    "redirecting": "Weiterleitung zu <link>{{destination}}</link>"
+    "redirecting": "Weiterleitung zu <anchor>{{destination}}</anchor>"
   },
   "folder": {
     "pageTitle": "Ordner",
@@ -30,7 +30,7 @@
     "pageTitle": "In {{name}} hochladen",
     "pageTitleFallback": "In Ordner hochladen",
     "title": "Dateien in {{name}} hochladen",
-    "public": "Dieser Ordner ist <link>öffentlich</link>. Jeder mit dem Link kann den Inhalt ansehen und Dateien hochladen.",
+    "public": "Dieser Ordner ist <anchor>öffentlich</anchor>. Jeder mit dem Link kann den Inhalt ansehen und Dateien hochladen.",
     "private": "Nur der Eigentümer kann den Inhalt dieses Ordners ansehen. Dateien hochladen kann jedoch jeder, und wer Dateien hochgeladen hat, kann über den Link zur jeweiligen Datei weiterhin darauf zugreifen."
   }
 }
