@@ -1,0 +1,61 @@
+{
+  "title": "Statistiques",
+  "range": {
+    "change": "Modifier la période",
+    "modalTitle": "Modifier la période",
+    "fromTo": "Du {{from}} au {{to}}",
+    "presets": {
+      "lastTwoDays": "Deux derniers jours",
+      "last7Days": "7 derniers jours",
+      "thisMonth": "Ce mois-ci",
+      "lastMonth": "Mois dernier",
+      "thisYear": "Cette année",
+      "lastYear": "Année dernière"
+    }
+  },
+  "allTime": {
+    "label": "Toute la période",
+    "show": "Afficher toute la période",
+    "slowWarning": "Le chargement peut prendre plus de temps que d'habitude.",
+    "viewing": "Vous consultez les statistiques sur toute la période."
+  },
+  "loadFailed": "Impossible de charger les statistiques pour cette période. Il n'y a peut-être aucune donnée disponible sur la période indiquée. :(",
+  "cards": {
+    "files": "Fichiers",
+    "urls": "Liens courts",
+    "storageUsed": "Stockage utilisé",
+    "users": "Utilisateurs",
+    "fileViews": "Vues des fichiers",
+    "urlViews": "Vues des liens courts"
+  },
+  "tables": {
+    "columns": {
+      "user": "Utilisateur",
+      "files": "Fichiers",
+      "storageUsed": "Stockage utilisé",
+      "views": "Vues",
+      "urls": "Liens courts",
+      "type": "Type"
+    },
+    "unknownUser": "[inconnu]"
+  },
+  "graphs": {
+    "count": {
+      "title": "Nombre"
+    },
+    "views": {
+      "title": "Vues",
+      "value_one": "{{count}} vue",
+      "value_many": "{{count}} vues",
+      "value_other": "{{count}} vues"
+    },
+    "storage": {
+      "title": "Stockage utilisé"
+    },
+    "series": {
+      "files": "Fichiers",
+      "urls": "Liens courts",
+      "storageUsed": "Stockage utilisé"
+    }
+  }
+}

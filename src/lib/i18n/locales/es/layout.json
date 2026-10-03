@@ -1,0 +1,124 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "metrics": "Métricas",
+    "files": "Archivos",
+    "folders": "Carpetas",
+    "upload": "Subir",
+    "uploadFile": "Archivo",
+    "uploadText": "Texto",
+    "urls": "Enlaces cortos",
+    "administrator": "Administrador",
+    "adminDashboard": "Panel",
+    "serverSettings": "Configuración",
+    "serverActions": "Acciones",
+    "users": "Usuarios",
+    "invites": "Invitaciones"
+  },
+  "header": {
+    "logoAlt": "Logotipo de Zipline",
+    "avatarAlt": "Avatar del usuario"
+  },
+  "userMenu": {
+    "administratorLabel": "{{username}} (Administrador)",
+    "copyToken": "Copiar token",
+    "refreshToken": "Regenerar token",
+    "settings": "Configuración",
+    "serverSettings": "Configuración del servidor",
+    "logout": "Cerrar sesión",
+    "loggingOut": "Cerrando sesión..."
+  },
+  "token": {
+    "cancel": "No, cerrar esta ventana",
+    "copy": {
+      "title": "¿Copiar token?",
+      "message": "¿Está seguro de que desea copiar su token? Su token puede interactuar con todas las partes de Zipline. No lo comparta con nadie."
+    },
+    "copied": {
+      "title": "Copiado",
+      "message": "Su token se copió al portapapeles."
+    },
+    "refresh": {
+      "title": "¿Regenerar token?",
+      "message": "¿Está seguro de que desea regenerar su token? Una vez que lo regenere o restablezca, tendrá que actualizar todos los scripts o aplicaciones que lo usen."
+    },
+    "refreshed": {
+      "title": "Regenerado",
+      "message": "Su token se regeneró."
+    }
+  },
+  "version": {
+    "modalTitle": "Versión de Zipline",
+    "tooltip": "Haga clic para ver más información sobre la versión",
+    "latest": "Está ejecutando la versión más reciente de Zipline.",
+    "unstable": "Está ejecutando una versión <b>inestable</b> de Zipline. Las versiones upstream no se han probado por completo y pueden contener errores.",
+    "outdated": "Está ejecutando una versión <b>desactualizada</b> de Zipline. Se recomienda actualizar a la <anchor>versión más reciente</anchor>.",
+    "current": "Versión actual",
+    "fields": {
+      "version": "Versión",
+      "commit": "Commit",
+      "upstream": "¿Upstream?",
+      "availableToUpdate": "Actualización disponible"
+    },
+    "latestCommit": "Último commit disponible",
+    "latestCommitNote": "Solo se muestra al ejecutar una versión upstream.",
+    "available": "{{tag}} está disponible",
+    "changelogs": "Registros de cambios",
+    "update": "Actualizar"
+  },
+  "qrCode": {
+    "title": "Código QR",
+    "alt": "Código QR",
+    "failed": "No se pudo generar el código QR.",
+    "format": "Formato",
+    "copyUnsupported": "Algunos navegadores no admiten copiar este formato. Puede copiar la imagen de la forma habitual haciendo clic derecho sobre ella o manteniéndola presionada.",
+    "copyImage": "Copiar imagen",
+    "copied": "Imagen del código QR copiada al portapapeles",
+    "copyFailed": "No se pudo copiar la imagen del código QR"
+  },
+  "domainSelect": {
+    "default": "Dominio predeterminado",
+    "description": "Reemplace el dominio por este valor. Esto cambiará el dominio que se devuelve en sus subidas. Déjelo en blanco para usar el dominio predeterminado."
+  },
+  "copyLink": {
+    "title": "Enlace copiado"
+  },
+  "errors": {
+    "generic": {
+      "title": "Se produjo un error",
+      "message": "Algo salió mal. Vuelva a intentarlo más tarde o informe del problema si persiste."
+    },
+    "dashboard": {
+      "title": "Error del cliente del panel",
+      "message": "Algo salió mal al cargar el panel. Vuelva a intentarlo más tarde o informe del problema si persiste."
+    },
+    "reload": {
+      "title": "Actualización disponible",
+      "message": "Hay una nueva versión de la aplicación disponible. Recargue la página para actualizar.",
+      "button": "Recargar página",
+      "why": "¿Por qué veo esto?",
+      "errorTitle": "No se pudo obtener el módulo importado dinámicamente",
+      "errorMessage": "Este error puede producirse cuando se implementa una nueva versión de la aplicación mientras tiene la página abierta. Recargue la página para actualizar a la versión más reciente."
+    }
+  },
+  "notFound": {
+    "message": "Página no encontrada",
+    "goHome": "Ir al inicio"
+  },
+  "titles": {
+    "settings": "Configuración",
+    "folders": "Carpetas",
+    "files": "Archivos",
+    "metrics": "Métricas",
+    "urls": "Enlaces cortos",
+    "serverSettings": "Configuración del servidor",
+    "administrator": "Administrador",
+    "serverActions": "Acciones del servidor",
+    "invites": "Invitaciones",
+    "uploadFile": "Subir archivo",
+    "uploadText": "Subir texto",
+    "users": "Usuarios",
+    "userFiles": "Archivos de {{username}}",
+    "unknownUserFiles": "Archivos del usuario"
+  }
+}

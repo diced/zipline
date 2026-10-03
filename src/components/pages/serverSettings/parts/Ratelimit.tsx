@@ -2,6 +2,7 @@ import type { Response } from '@/lib/api/response';
 import { Button, LoadingOverlay, NumberInput, Stack, Switch, Text, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconDeviceFloppy } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { settingsOnSubmit } from '../settingsOnSubmit';
 import useServerSettings from '../useServerSettings';
@@ -19,6 +20,7 @@ export default function Ratelimit() {
 
 function Form({ data, isLoading }: { data: Response['/api/server/settings']; isLoading: boolean }) {
   const navigate = useNavigate();
+  const { t } = useTranslation(['serverSettings', 'common']);
 
   const form = useForm<{
     ratelimitEnabled: boolean;
@@ -65,49 +67,49 @@ function Form({ data, isLoading }: { data: Response['/api/server/settings']; isL
   return (
     <>
       <Text size='sm' c='dimmed' mb='md'>
-        All options require a restart to take effect.
+        {t('ratelimit.intro')}
       </Text>
 
       <form onSubmit={form.onSubmit(onSubmit)}>
         <Stack gap='lg'>
           <Switch
-            label='Enable Ratelimit'
-            description='Enable ratelimiting for the server.'
+            label={t('ratelimit.enabled.label')}
+            description={t('ratelimit.enabled.description')}
             {...form.getInputProps('ratelimitEnabled', { type: 'checkbox' })}
           />
 
           <Switch
-            label='Admin Bypass'
-            description='Allow admins to bypass the ratelimit.'
+            label={t('ratelimit.adminBypass.label')}
+            description={t('ratelimit.adminBypass.description')}
             {...form.getInputProps('ratelimitAdminBypass', { type: 'checkbox' })}
           />
 
           <NumberInput
-            label='Max Requests'
-            description='The maximum number of requests allowed within the window. If no window is set, this is the maximum number of requests until it reaches the limit.'
+            label={t('ratelimit.max.label')}
+            description={t('ratelimit.max.description')}
             placeholder='10'
             min={1}
             {...form.getInputProps('ratelimitMax')}
           />
 
           <NumberInput
-            label='Window'
-            description='The window in seconds to allow the max requests.'
+            label={t('ratelimit.window.label')}
+            description={t('ratelimit.window.description')}
             placeholder='60'
             min={1}
             {...form.getInputProps('ratelimitWindow')}
           />
 
           <TextInput
-            label='Allow List'
-            description='A comma-separated list of IP addresses to bypass the ratelimit.'
+            label={t('ratelimit.allowList.label')}
+            description={t('ratelimit.allowList.description')}
             placeholder='192.168.1.1, 127.0.0.1, 0.0.0.0'
             {...form.getInputProps('ratelimitAllowList')}
           />
         </Stack>
 
         <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
-          Save
+          {t('common:actions.save')}
         </Button>
       </form>
     </>

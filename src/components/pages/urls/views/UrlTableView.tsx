@@ -4,6 +4,7 @@ import { Url } from '@/lib/db/models/url';
 import { ActionIcon, Anchor, Box, Checkbox, Group, TextInput, Tooltip } from '@mantine/core';
 import { DataTable, DataTableSortStatus } from 'mantine-datatable';
 import { useEffect, useMemo, useReducer, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import useSWR from 'swr';
 import { copyUrl, deleteUrl } from '../actions';
 import { IconCopy, IconPencil, IconQrcode, IconTrashFilled } from '@tabler/icons-react';
@@ -15,10 +16,10 @@ import EditUrlModal from '../EditUrlModal';
 import QRCodeModal from '@/components/QRCodeModal';
 
 const NAMES = {
-  code: 'Code',
-  vanity: 'Vanity',
-  destination: 'Destination',
-};
+  code: { label: 'table.columns.code', placeholder: 'table.search.code' },
+  vanity: { label: 'table.columns.vanity', placeholder: 'table.search.vanity' },
+  destination: { label: 'table.columns.destination', placeholder: 'table.search.destination' },
+} as const;
 
 function SearchFilter({
   setSearchField,
@@ -35,6 +36,8 @@ function SearchFilter({
   setSearchQuery: (...args: any) => void;
   field: 'code' | 'vanity' | 'destination';
 }) {
+  const { t } = useTranslation('urls');
+
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchField(field);
     setSearchQuery({
@@ -45,8 +48,8 @@ function SearchFilter({
 
   return (
     <TextInput
-      label={NAMES[field]}
-      placeholder={`Search by ${NAMES[field].toLowerCase()}`}
+      label={t(NAMES[field].label)}
+      placeholder={t(NAMES[field].placeholder)}
       value={searchQuery[field]}
       onChange={onChange}
       variant='filled'
@@ -73,6 +76,7 @@ const fetcher = async ({ searchQuery, searchField }: { searchQuery?: string; sea
 };
 
 export default function UrlTableView() {
+  const { t } = useTranslation('urls');
   const config = useConfig();
   const clipboard = useClipboard();
 
@@ -157,10 +161,12 @@ export default function UrlTableView() {
         <DataTable
           withTableBorder
           minHeight={200}
+          noRecordsText={t('table.noRecords', { ns: 'common' })}
           records={sorted ?? []}
           columns={[
             {
               accessor: 'code',
+              title: t('table.columns.code'),
               sortable: true,
               filter: (
                 <SearchFilter
@@ -182,6 +188,7 @@ export default function UrlTableView() {
             },
             {
               accessor: 'vanity',
+              title: t('table.columns.vanity'),
               sortable: true,
               filter: (
                 <SearchFilter
@@ -207,6 +214,7 @@ export default function UrlTableView() {
             },
             {
               accessor: 'destination',
+              title: t('table.columns.destination'),
               sortable: true,
               render: (url) => (
                 <Anchor href={url.destination} target='_blank' rel='noreferrer'>
@@ -225,31 +233,34 @@ export default function UrlTableView() {
             },
             {
               accessor: 'views',
+              title: t('table.columns.views'),
               sortable: true,
             },
             {
               accessor: 'maxViews',
+              title: t('table.columns.maxViews'),
               sortable: true,
               render: (url) => (url.maxViews ? url.maxViews : ''),
             },
             {
               accessor: 'createdAt',
-              title: 'Created',
+              title: t('table.columns.created'),
               sortable: true,
               render: (url) => <RelativeDate date={url.createdAt} />,
             },
             {
               accessor: 'enabled',
-              title: 'Enabled',
+              title: t('table.columns.enabled'),
               sortable: true,
               render: (url) => <Checkbox checked={url.enabled} />,
             },
             {
               accessor: 'actions',
+              title: t('table.columns.actions'),
               textAlign: 'right',
               render: (url) => (
                 <Group gap='sm' justify='right' wrap='nowrap'>
-                  <Tooltip label='Copy URL'>
+                  <Tooltip label={t('table.copy')}>
                     <ActionIcon
                       onClick={(e) => {
                         e.stopPropagation();
@@ -259,7 +270,7 @@ export default function UrlTableView() {
                       <IconCopy size='1rem' />
                     </ActionIcon>
                   </Tooltip>
-                  <Tooltip label='Show QR Code'>
+                  <Tooltip label={t('table.showQrCode')}>
                     <ActionIcon
                       onClick={(e) => {
                         e.stopPropagation();
@@ -269,7 +280,7 @@ export default function UrlTableView() {
                       <IconQrcode size='1rem' />
                     </ActionIcon>
                   </Tooltip>
-                  <Tooltip label='Edit URL'>
+                  <Tooltip label={t('table.edit')}>
                     <ActionIcon
                       onClick={(e) => {
                         e.stopPropagation();
@@ -279,7 +290,7 @@ export default function UrlTableView() {
                       <IconPencil size='1rem' />
                     </ActionIcon>
                   </Tooltip>
-                  <Tooltip label='Delete URL'>
+                  <Tooltip label={t('table.delete')}>
                     <ActionIcon
                       color='red'
                       onClick={(e) => {

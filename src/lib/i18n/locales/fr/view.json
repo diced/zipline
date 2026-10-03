@@ -1,0 +1,36 @@
+{
+  "password": {
+    "title": "Mot de passe requis",
+    "invalid": "Mot de passe incorrect",
+    "verify": "Vérifier",
+    "fileDescription": "Ce fichier est protégé par un mot de passe. Saisissez-le pour afficher le fichier.",
+    "urlDescription": "Ce lien est protégé par un mot de passe. Saisissez-le pour ouvrir le lien."
+  },
+  "file": {
+    "pageTitle": "Afficher le fichier",
+    "viewFolder": "Afficher le dossier",
+    "viewRaw": "Afficher le fichier brut",
+    "download": "Télécharger le fichier"
+  },
+  "url": {
+    "redirecting": "Redirection vers <anchor>{{destination}}</anchor>"
+  },
+  "folder": {
+    "pageTitle": "Dossier",
+    "subfolders": "Sous-dossiers",
+    "files": "Fichiers",
+    "empty": "Ce dossier est vide.",
+    "card": {
+      "files": "Fichiers : {{amount}}",
+      "subfolders": "Sous-dossiers : {{amount}}"
+    },
+    "pagination": "Fichiers {{from}} - {{to}} sur {{total}}"
+  },
+  "folderUpload": {
+    "pageTitle": "Téléverser dans {{name}}",
+    "pageTitleFallback": "Téléverser dans le dossier",
+    "title": "Téléverser des fichiers dans {{name}}",
+    "public": "Ce dossier est <anchor>public</anchor>. Toute personne disposant du lien peut consulter son contenu et y téléverser des fichiers.",
+    "private": "Seul le propriétaire peut consulter le contenu de ce dossier. Cependant, tout le monde peut y téléverser des fichiers, et chacun garde l'accès aux fichiers qu'il a téléversés s'il dispose du lien vers le fichier en question."
+  }
+}

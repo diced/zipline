@@ -1,0 +1,180 @@
+{
+  "notifications": {
+    "deleted": {
+      "title": "Datei gelöscht",
+      "message": "{{name}} wurde gelöscht"
+    },
+    "favorited": {
+      "title": "Zu Favoriten hinzugefügt",
+      "message": "{{name}} wurde zu den Favoriten hinzugefügt"
+    },
+    "unfavorited": {
+      "title": "Aus Favoriten entfernt",
+      "message": "{{name}} wurde aus den Favoriten entfernt"
+    },
+    "createFolderError": {
+      "title": "Fehler beim Erstellen des Ordners"
+    },
+    "folderCreated": {
+      "title": "Ordner erstellt",
+      "message": "{{folder}} wurde mit {{name}} erstellt"
+    },
+    "removeFromFolderError": {
+      "title": "Fehler beim Entfernen aus dem Ordner"
+    },
+    "removedFromFolder": {
+      "title": "Datei aus Ordner entfernt",
+      "message": "{{name}} wurde aus {{folder}} entfernt"
+    },
+    "addToFolderError": {
+      "title": "Fehler beim Hinzufügen zum Ordner"
+    },
+    "addedToFolder": {
+      "title": "Datei zu Ordner hinzugefügt",
+      "message": "{{name}} wurde zu {{folder}} hinzugefügt"
+    },
+    "addMultipleToFolderError": {
+      "title": "Fehler beim Hinzufügen der Dateien zum Ordner"
+    },
+    "addedMultipleToFolder": {
+      "title": "Dateien zu Ordner hinzugefügt",
+      "message": "{{count}} Datei(en) zu {{folder}} hinzugefügt"
+    },
+    "saveTagsError": {
+      "title": "Tags konnten nicht gespeichert werden"
+    },
+    "tagsSaved": {
+      "title": "Tags gespeichert",
+      "message": "Gespeicherte Tags für die Datei {{name}}: {{count}}"
+    },
+    "removePasswordError": {
+      "title": "Passwort konnte nicht entfernt werden …"
+    },
+    "passwordRemoved": {
+      "title": "Passwort entfernt!",
+      "message": "Das Passwort wurde von der Datei entfernt."
+    },
+    "saveChangesError": {
+      "title": "Änderungen konnten nicht gespeichert werden …"
+    },
+    "changesSaved": {
+      "title": "Änderungen gespeichert!",
+      "message": "Die Änderungen an der Datei wurden gespeichert."
+    }
+  },
+  "delete": {
+    "confirm": "{{name}} löschen",
+    "message": "Möchten Sie {{name}} wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden."
+  },
+  "contextMenu": {
+    "openInNewTab": "In neuem Tab öffnen",
+    "copyLink": "Link kopieren",
+    "copyRawLink": "Link zur Rohdatei kopieren",
+    "favorite": "Zu Favoriten hinzufügen",
+    "unfavorite": "Aus Favoriten entfernen",
+    "removeFromFolder": "Aus Ordner entfernen",
+    "moveToFolder": "In Ordner verschieben",
+    "searchFolders": "Ordner suchen …",
+    "createNamedFolder": "+ „{{name}}“ erstellen",
+    "noFolders": "Noch keine Ordner",
+    "createNewFolder": "+ Neuen Ordner erstellen",
+    "editDetails": "Details bearbeiten"
+  },
+  "createFolderModal": {
+    "title": "Ordner erstellen",
+    "name": {
+      "label": "Ordnername",
+      "placeholder": "Mein Ordner"
+    }
+  },
+  "stats": {
+    "type": "Typ",
+    "size": "Größe",
+    "createdAt": "Erstellt am",
+    "updatedAt": "Aktualisiert am",
+    "deletesAt": "Wird gelöscht am",
+    "views": "Aufrufe",
+    "originalName": "Originalname",
+    "anonymous": "Anonym"
+  },
+  "details": {
+    "title": "Details",
+    "tags": {
+      "title": "Tags",
+      "placeholder": "Ein oder mehrere Tags auswählen",
+      "empty": "Keine Tags gefunden. Erstellen Sie ein Tag außerhalb dieses Menüs."
+    },
+    "folder": {
+      "title": "Ordner",
+      "remove": "Aus Ordner „{{name}}“ entfernen",
+      "placeholder": "Zu Ordner hinzufügen …",
+      "empty": "Sie haben keine Ordner. Beginnen Sie mit der Eingabe, um einen neuen Ordner für diese Datei zu erstellen.",
+      "create": "+ Ordner „{{name}}“ erstellen"
+    }
+  },
+  "actions": {
+    "editDetails": "Dateidetails bearbeiten",
+    "delete": "Datei löschen",
+    "favorite": "Datei zu Favoriten hinzufügen",
+    "unfavorite": "Datei aus Favoriten entfernen",
+    "viewInNewTab": "Datei in neuem Tab anzeigen",
+    "openInNewTab": "In neuem Tab öffnen",
+    "copyRawLink": "Link zur Rohdatei kopieren",
+    "copyLink": "Dateilink kopieren",
+    "download": "Datei herunterladen",
+    "showDetails": "Details einblenden",
+    "hideDetails": "Details ausblenden",
+    "previous": "Vorherige Datei",
+    "next": "Nächste Datei"
+  },
+  "edit": {
+    "title": "„{{name}}“ bearbeiten",
+    "name": {
+      "label": "Name",
+      "description": "Datei umbenennen."
+    },
+    "maxViews": {
+      "label": "Max. Aufrufe",
+      "placeholder": "Unbegrenzt",
+      "description": "Maximale Anzahl an Aufrufen, bevor diese Datei gelöscht wird. Leer lassen, um beliebig viele Aufrufe zuzulassen."
+    },
+    "originalName": {
+      "label": "Originalname",
+      "description": "Fügen Sie einen Originalnamen hinzu. Beim Herunterladen erhält die Datei dann diesen „Originalnamen“ statt des (sofern gewählt) generierten Dateinamens."
+    },
+    "type": {
+      "label": "Typ",
+      "description": "Ändert den MIME-Typ der Datei. <b>ÄNDERN SIE DIESEN WERT NICHT</b>, wenn Sie nicht genau wissen, was Sie tun. Andernfalls kann Zipline bestimmte Dateitypen möglicherweise nicht mehr korrekt darstellen."
+    },
+    "password": {
+      "label": "Passwort",
+      "description": "Legen Sie ein Passwort für diese Datei fest. Leer lassen, um den Passwortschutz zu deaktivieren."
+    },
+    "removePassword": "Passwort entfernen",
+    "save": "Änderungen speichern"
+  },
+  "preview": {
+    "clickToView": "Klicken, um die Datei {{name}} anzuzeigen",
+    "clickToViewProtected": "Klicken, um die geschützte Datei {{name}} anzuzeigen",
+    "clickToPlayVideo": "Klicken, um das Video {{name}} abzuspielen",
+    "clickToPlayAudio": "Klicken, um die Audiodatei {{name}} abzuspielen",
+    "clickToViewText": "Klicken, um den Text {{name}} anzuzeigen",
+    "clickToDownloadCast": "Klicken, um den asciinema-Cast {{name}} herunterzuladen",
+    "clickToViewPdf": "Klicken, um das PDF {{name}} anzuzeigen",
+    "clickToViewInNewTab": "Klicken, um die Datei {{name}} in einem neuen Tab anzuzeigen",
+    "videoThumbnailAlt": "Vorschaubild des Videos",
+    "imageAlt": "Bild",
+    "loading": "Datei wird geladen …",
+    "loadError": "Fehler beim Laden der Datei.",
+    "tooBig": "\n...\nDie Datei ist zu groß für die Anzeige. Klicken Sie auf das Download-Symbol, um sie anzuzeigen bzw. herunterzuladen."
+  },
+  "render": {
+    "renderedThrough": "Diese Datei wird mit {{renderer}} dargestellt",
+    "canRenderThrough": "Diese Datei kann mit {{renderer}} dargestellt werden",
+    "showRendered": "Gerenderte Version anzeigen",
+    "hideRendered": "Gerenderte Version ausblenden",
+    "katexError": "KaTeX-Fehler",
+    "showLess": "Weniger anzeigen",
+    "showMore": "Mehr anzeigen (weitere Zeilen: {{count}})"
+  }
+}

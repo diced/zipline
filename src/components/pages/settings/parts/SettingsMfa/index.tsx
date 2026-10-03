@@ -2,15 +2,17 @@ import { Group, Paper, Text, Title } from '@mantine/core';
 import PasskeyButton from './PasskeyButton';
 import TwoFAButton from './TwoFAButton';
 import { useConfig } from '@/components/ConfigProvider';
+import { useTranslation } from 'react-i18next';
 
 export default function SettingsMfa() {
   const config = useConfig();
+  const { t } = useTranslation('settings');
 
   return (
     <Paper withBorder p='sm'>
-      <Title order={2}>Multi-Factor Authentication</Title>
+      <Title order={2}>{t('mfa.title')}</Title>
       <Text size='sm' c='dimmed' mt={3}>
-        Setup 2FA or passkeys to add an extra layer of security to your account.
+        {t('mfa.description')}
       </Text>
 
       <Group mt='xs'>

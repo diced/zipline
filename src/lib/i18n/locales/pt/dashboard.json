@@ -1,0 +1,46 @@
+{
+  "welcome": "Que bom ter você de volta, <b>{{username}}</b>",
+  "filesUploaded": "Arquivos enviados: <b>{{files}}</b>.",
+  "quota": {
+    "bytes": "Você usou <b>{{used}}</b> de <b>{{max}}</b> de armazenamento",
+    "files": "Você enviou <b>{{files}}</b> de <b>{{max}}</b> arquivos permitidos.",
+    "urls": "Você criou <b>{{urls}}</b> de <b>{{max}}</b> links curtos permitidos."
+  },
+  "recents": {
+    "title": "Arquivos recentes",
+    "viewAll": "Ver todos os arquivos",
+    "empty": "Você não tem arquivos recentes. Os três últimos arquivos que você enviar aparecerão aqui."
+  },
+  "stats": {
+    "title": "Estatísticas",
+    "viewMetrics": "Ver métricas da instância",
+    "description": "Estas estatísticas consideram apenas os seus envios.",
+    "filesUploaded": "Arquivos enviados",
+    "favoriteFiles": "Arquivos favoritos",
+    "storageUsed": "Armazenamento usado",
+    "avgStorageUsed": "Média de armazenamento usado",
+    "fileViews": "Visualizações de arquivos",
+    "avgFileViews": "Média de visualizações por arquivo",
+    "linksCreated": "Links curtos criados",
+    "linkViews": "Total de visualizações de links curtos"
+  },
+  "fileTypes": {
+    "title": "Tipos de arquivo",
+    "columns": {
+      "type": "Tipo de arquivo",
+      "count": "Quantidade"
+    }
+  },
+  "activity": {
+    "title": "Atividade",
+    "description": "Seus envios e logins no período de",
+    "range_one": "{{count}} dia",
+    "range_many": "{{count}} dias",
+    "range_other": "{{count}} dias",
+    "uploads": "Envios",
+    "logins": "Logins",
+    "empty": "Nenhum envio ou login neste período ainda",
+    "today": "Hoje",
+    "yesterday": "Ontem"
+  }
+}

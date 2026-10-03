@@ -3,6 +3,7 @@ import { ActionIcon, LoadingOverlay, Paper, Table, Text, TextInput } from '@mant
 import { useForm } from '@mantine/form';
 import { IconPlus, IconTrash } from '@tabler/icons-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { settingsOnSubmit } from '../settingsOnSubmit';
 import useServerSettings from '../useServerSettings';
@@ -20,6 +21,7 @@ export default function Domains() {
 
 function Form({ data }: { data: Response['/api/server/settings'] }) {
   const navigate = useNavigate();
+  const { t } = useTranslation('serverSettings');
   const [submitting, setSubmitting] = useState(false);
 
   const form = useForm({
@@ -38,7 +40,7 @@ function Form({ data }: { data: Response['/api/server/settings'] }) {
       const error = await submitSettings({ domains: nextDomains });
       if (!error) form.setFieldValue('domains', '');
     } catch (err: any) {
-      form.setFieldError('domains', err?.message ?? err?.error ?? 'Failed to update domains');
+      form.setFieldError('domains', err?.message ?? err?.error ?? t('domains.errors.updateFailed'));
     } finally {
       setSubmitting(false);
     }
@@ -50,7 +52,7 @@ function Form({ data }: { data: Response['/api/server/settings'] }) {
     const domain = form.values.domains.trim();
     if (!domain) return;
 
-    if (domains.includes(domain)) return form.setFieldError('domains', 'This domain already exists');
+    if (domains.includes(domain)) return form.setFieldError('domains', t('domains.errors.exists'));
 
     await updateDomains([...domains, domain]);
   };
@@ -65,7 +67,7 @@ function Form({ data }: { data: Response['/api/server/settings'] }) {
 
       <form onSubmit={addDomain}>
         <TextInput
-          description='Enter a domain name'
+          description={t('domains.input.description')}
           placeholder='example.com'
           rightSection={
             <ActionIcon type='submit' variant='transparent' disabled={submitting}>
@@ -81,7 +83,7 @@ function Form({ data }: { data: Response['/api/server/settings'] }) {
           <Table highlightOnHover>
             <Table.Thead>
               <Table.Tr>
-                <Table.Th>Domain</Table.Th>
+                <Table.Th>{t('domains.table.columns.domain')}</Table.Th>
                 <Table.Th w={30}></Table.Th>
               </Table.Tr>
             </Table.Thead>
@@ -105,7 +107,7 @@ function Form({ data }: { data: Response['/api/server/settings'] }) {
         </Paper>
       ) : (
         <Text mt='md' c='dimmed'>
-          No domains added yet.
+          {t('domains.empty')}
         </Text>
       )}
     </>

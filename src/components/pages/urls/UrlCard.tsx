@@ -7,6 +7,7 @@ import { useClipboard } from '@mantine/hooks';
 import { IconCopy, IconDots, IconPencil, IconQrcode, IconTrashFilled } from '@tabler/icons-react';
 import { copyUrl, deleteUrl } from './actions';
 import { useSettingsStore } from '@/lib/client/store/settings';
+import { useTranslation } from 'react-i18next';
 
 export default function UrlCard({
   url,
@@ -17,6 +18,7 @@ export default function UrlCard({
   setSelectedUrl: (url: Url) => void;
   setQrOpen: (url: Url) => void;
 }) {
+  const { t } = useTranslation(['urls', 'common']);
   const config = useConfig();
   const clipboard = useClipboard();
 
@@ -54,26 +56,26 @@ export default function UrlCard({
                   leftSection={<IconCopy size='1rem' />}
                   onClick={() => copyUrl(url, config, clipboard)}
                 >
-                  Copy short link
+                  {t('card.copyShortLink')}
                 </Menu.Item>
                 <Menu.Item
                   leftSection={<IconCopy size='1rem' />}
                   onClick={() => clipboard.copy(url.destination.trim())}
                 >
-                  Copy destination
+                  {t('card.copyDestination')}
                 </Menu.Item>
                 <Menu.Item leftSection={<IconQrcode size='1rem' />} onClick={() => setQrOpen(url)}>
-                  Show QR code
+                  {t('card.showQrCode')}
                 </Menu.Item>
                 <Menu.Item leftSection={<IconPencil size='1rem' />} onClick={() => setSelectedUrl(url)}>
-                  Edit
+                  {t('common:actions.edit')}
                 </Menu.Item>
                 <Menu.Item
                   leftSection={<IconTrashFilled size='1rem' />}
                   color='red'
                   onClick={() => deleteUrl(warnDeletion, url)}
                 >
-                  Delete
+                  {t('common:actions.delete')}
                 </Menu.Item>
               </Menu.Dropdown>
             </Menu>
@@ -83,20 +85,20 @@ export default function UrlCard({
         <Card.Section inheritPadding py='xs'>
           <Stack gap={1}>
             <Text size='xs' c='dimmed'>
-              <b>Views:</b> {url.views.toLocaleString()}
+              <b>{t('card.views')}</b> {url.views.toLocaleString()}
             </Text>
             <Text size='xs' c='dimmed'>
-              <b>Enabled:</b> {url.enabled ? 'Yes' : 'No'}
+              <b>{t('card.enabled')}</b> {url.enabled ? t('common:actions.yes') : t('common:actions.no')}
             </Text>
             <Text size='xs' c='dimmed'>
-              <b>Created:</b> <RelativeDate date={url.createdAt} />
+              <b>{t('card.created')}</b> <RelativeDate date={url.createdAt} />
             </Text>
             <Text size='xs' c='dimmed'>
-              <b>Updated:</b> <RelativeDate date={url.updatedAt} />
+              <b>{t('card.updated')}</b> <RelativeDate date={url.updatedAt} />
             </Text>
             <Text size='xs' c='dimmed'>
-              <b>Destination:</b>{' '}
-              <Tooltip label={`Open "${trimUrl(50, url.destination.trim())}" in a new tab`}>
+              <b>{t('card.destination')}</b>{' '}
+              <Tooltip label={t('card.openDestination', { url: trimUrl(50, url.destination.trim()) })}>
                 <Anchor href={url.destination} target='_blank' rel='noopener noreferrer'>
                   {trimUrl(30, url.destination.trim())}
                 </Anchor>
@@ -104,7 +106,7 @@ export default function UrlCard({
             </Text>
             {url.vanity && (
               <Text size='xs' c='dimmed'>
-                <b>Code:</b>{' '}
+                <b>{t('card.code')}</b>{' '}
                 <Anchor target='_blank' href={formatRootUrl(config.urls.route, url.code)}>
                   {url.code}
                 </Anchor>

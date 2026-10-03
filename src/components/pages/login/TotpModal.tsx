@@ -1,6 +1,7 @@
 import { Modal, Center, PinInput, Text, Group, Button } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { IconX, IconShieldQuestion } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
 
 export default function TotpModal({
   state,
@@ -13,10 +14,11 @@ export default function TotpModal({
   onVerify: () => void;
   onCancel: () => void;
 }) {
+  const { t } = useTranslation(['auth', 'common']);
   const mobile = useMediaQuery('(max-width: 600px)');
 
   return (
-    <Modal onClose={onCancel} title='Enter code' opened={state.open} withCloseButton={false}>
+    <Modal onClose={onCancel} title={t('totp.title')} opened={state.open} withCloseButton={false}>
       <form onSubmit={onVerify}>
         <Center>
           <PinInput
@@ -38,7 +40,7 @@ export default function TotpModal({
 
         <Group mt='sm' grow>
           <Button leftSection={<IconX size='1rem' />} color='red' variant='outline' onClick={onCancel}>
-            Cancel
+            {t('common:actions.cancel')}
           </Button>
           <Button
             leftSection={<IconShieldQuestion size='1rem' />}
@@ -46,7 +48,7 @@ export default function TotpModal({
             onClick={onVerify}
             type='submit'
           >
-            Verify
+            {t('totp.verify')}
           </Button>
         </Group>
       </form>

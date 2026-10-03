@@ -1,3 +1,4 @@
+import LanguageSelect from '@/components/LanguageSelect';
 import DashboardFileType from '@/components/file/DashboardFileType';
 import TagPill from '@/components/pages/files/tags/TagPill';
 import { useSsrData } from '@/components/ZiplineSSRProvider';
@@ -24,6 +25,7 @@ import {
 import { IconDownload, IconExternalLink, IconInfoCircleFilled } from '@tabler/icons-react';
 import * as sanitize from 'isomorphic-dompurify';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import type { getFile } from '../../ssr-view/server';
 
@@ -39,19 +41,20 @@ type SsrData = {
 };
 
 export default function ViewFileId() {
+  const { t } = useTranslation('view');
   const data = useSsrData<SsrData>();
   const [passwordValue, setPassword] = useState<string>('');
   const [passwordError, setPasswordError] = useState<string>('');
   const [detailsOpen, setDetailsOpen] = useState<boolean>(false);
 
-  useTitle(data?.file.originalName ?? data?.file.name ?? 'View File');
+  useTitle(data?.file.originalName ?? data?.file.name ?? t('file.pageTitle'));
 
   if (!data) return null;
 
   const { file, password, code, user, host, metrics, filesRoute, token } = data;
 
   return password && !token ? (
-    <Modal onClose={() => {}} opened={true} withCloseButton={false} centered title='Password required'>
+    <Modal onClose={() => {}} opened={true} withCloseButton={false} centered title={t('password.title')}>
       <form
         onSubmit={async (e) => {
           e.preventDefault();
@@ -66,12 +69,12 @@ export default function ViewFileId() {
             const json = (await res.json()) as { token: string };
             window.location.replace(formatRootUrl('/view', file.name!, { token: json.token }));
           } else {
-            setPasswordError('Invalid password');
+            setPasswordError(t('password.invalid'));
           }
         }}
       >
         <PasswordInput
-          description='This file is password protected, enter password to view it'
+          description={t('password.fileDescription')}
           required
           mb='sm'
           value={passwordValue}
@@ -86,7 +89,7 @@ export default function ViewFileId() {
           type='submit'
           disabled={passwordValue.trim().length === 0}
         >
-          Verify
+          {t('password.verify')}
         </Button>
       </form>
     </Modal>
@@ -110,6 +113,8 @@ export default function ViewFileId() {
             >
               <IconDownload size='1rem' />
             </ActionIcon>
+
+            <LanguageSelect />
           </Group>
         </Group>
       </Paper>
@@ -166,7 +171,7 @@ export default function ViewFileId() {
               {user?.view!.showFolder &&
                 file.folder &&
                 (file.folder.public ? (
-                  <Tooltip label='View folder'>
+                  <Tooltip label={t('file.viewFolder')}>
                     <Anchor
                       component={Link}
                       ml='sm'
@@ -189,30 +194,34 @@ export default function ViewFileId() {
               )}
             </Group>
 
-            <ActionIcon.Group>
-              <Tooltip label='View raw file'>
-                <ActionIcon
-                  size='md'
-                  variant='outline'
-                  component={Link}
-                  to={formatRootUrl('/raw', file.name!, { token })}
-                  target='_blank'
-                >
-                  <IconExternalLink size='1rem' />
-                </ActionIcon>
-              </Tooltip>
-              <Tooltip label='Download file'>
-                <ActionIcon
-                  size='md'
-                  variant='outline'
-                  component={Link}
-                  to={formatRootUrl('/raw', file.name!, { download: 'true', token })}
-                  target='_blank'
-                >
-                  <IconDownload size='1rem' />
-                </ActionIcon>
-              </Tooltip>
-            </ActionIcon.Group>
+            <Group gap='xs'>
+              <ActionIcon.Group>
+                <Tooltip label={t('file.viewRaw')}>
+                  <ActionIcon
+                    size='md'
+                    variant='outline'
+                    component={Link}
+                    to={formatRootUrl('/raw', file.name!, { token })}
+                    target='_blank'
+                  >
+                    <IconExternalLink size='1rem' />
+                  </ActionIcon>
+                </Tooltip>
+                <Tooltip label={t('file.download')}>
+                  <ActionIcon
+                    size='md'
+                    variant='outline'
+                    component={Link}
+                    to={formatRootUrl('/raw', file.name!, { download: 'true', token })}
+                    target='_blank'
+                  >
+                    <IconDownload size='1rem' />
+                  </ActionIcon>
+                </Tooltip>
+              </ActionIcon.Group>
+
+              <LanguageSelect />
+            </Group>
           </Group>
 
           <DashboardFileType allowZoom file={file as unknown as File} token={token} show />

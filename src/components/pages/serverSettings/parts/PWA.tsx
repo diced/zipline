@@ -2,6 +2,7 @@ import type { Response } from '@/lib/api/response';
 import { Button, ColorInput, Group, LoadingOverlay, Stack, Switch, Text, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconDeviceFloppy, IconRefresh } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { settingsOnSubmit } from '../settingsOnSubmit';
 import useServerSettings from '../useServerSettings';
@@ -19,6 +20,7 @@ export default function PWA() {
 
 function Form({ data, isLoading }: { data: Response['/api/server/settings']; isLoading: boolean }) {
   const navigate = useNavigate();
+  const { t } = useTranslation(['serverSettings', 'common']);
 
   const form = useForm({
     initialValues: {
@@ -58,58 +60,58 @@ function Form({ data, isLoading }: { data: Response['/api/server/settings']; isL
   return (
     <>
       <Text size='sm' c='dimmed' mb='md'>
-        Refresh the page after enabling PWA to see any changes.
+        {t('pwa.intro')}
       </Text>
 
       <form onSubmit={form.onSubmit(onSubmit)}>
         <Stack gap='lg'>
           <Switch
-            label='PWA Enabled'
-            description='Allow users to install the Zipline PWA on their devices.'
+            label={t('pwa.enabled.label')}
+            description={t('pwa.enabled.description')}
             {...form.getInputProps('pwaEnabled', { type: 'checkbox' })}
           />
 
           <TextInput
-            label='Title'
-            description='The title for the PWA'
+            label={t('pwa.title.label')}
+            description={t('pwa.title.description')}
             placeholder='Zipline'
             {...form.getInputProps('pwaTitle')}
           />
 
           <TextInput
-            label='Short Name'
-            description='The short name for the PWA'
+            label={t('pwa.shortName.label')}
+            description={t('pwa.shortName.description')}
             placeholder='Zipline'
             {...form.getInputProps('pwaShortName')}
           />
 
           <TextInput
-            label='Description'
-            description='The description for the PWA'
+            label={t('pwa.description.label')}
+            description={t('pwa.description.description')}
             placeholder='Zipline'
             {...form.getInputProps('pwaDescription')}
           />
 
           <ColorInput
-            label='Theme Color'
-            description='The theme color for the PWA'
+            label={t('pwa.themeColor.label')}
+            description={t('pwa.themeColor.description')}
             placeholder='#000000'
             {...form.getInputProps('pwaThemeColor')}
           />
 
           <ColorInput
-            label='Background Color'
-            description='The background color for the PWA'
+            label={t('pwa.backgroundColor.label')}
+            description={t('pwa.backgroundColor.description')}
             placeholder='#ffffff'
             {...form.getInputProps('pwaBackgroundColor')}
           />
         </Stack>
         <Group mt='md'>
           <Button type='submit' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
-            Save
+            {t('common:actions.save')}
           </Button>
           <Button onClick={() => window.location.reload()} leftSection={<IconRefresh size='1rem' />}>
-            Refresh
+            {t('common:actions.refresh')}
           </Button>
         </Group>
       </form>

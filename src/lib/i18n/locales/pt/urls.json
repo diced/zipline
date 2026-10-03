@@ -1,0 +1,132 @@
+{
+  "title": "Links curtos",
+  "create": {
+    "title": "Encurtar URL",
+    "url": {
+      "label": "URL",
+      "required": "A URL é obrigatória",
+      "invalid": "URL inválida"
+    },
+    "vanity": {
+      "label": "Nome personalizado",
+      "description": "Campo opcional. Deixe em branco para gerar um código aleatório"
+    },
+    "maxViews": {
+      "label": "Visualizações máx.",
+      "description": "Campo opcional. Deixe em branco para não limitar as visualizações."
+    },
+    "domain": {
+      "label": "Substituir domínio"
+    },
+    "enabled": {
+      "label": "Ativado",
+      "description": "Permite ou impede o acesso a este link curto"
+    },
+    "password": {
+      "label": "Senha",
+      "description": "Proteja seu link com uma senha"
+    }
+  },
+  "shortened": {
+    "title": "Link curto",
+    "open": "Abrir link em nova guia",
+    "copy": "Copiar link para a área de transferência"
+  },
+  "notifications": {
+    "shortenFailed": {
+      "title": "Falha ao encurtar a URL"
+    },
+    "copied": {
+      "title": "URL copiada para a área de transferência"
+    },
+    "deleteFailed": {
+      "title": "Falha ao excluir o link curto"
+    },
+    "deleted": {
+      "title": "Link curto excluído",
+      "message": "O link curto {{code}} foi excluído"
+    },
+    "removePasswordFailed": {
+      "title": "Falha ao remover a senha..."
+    },
+    "passwordRemoved": {
+      "title": "Senha removida!",
+      "message": "A senha foi removida do link curto."
+    },
+    "saveFailed": {
+      "title": "Falha ao salvar as alterações..."
+    },
+    "saved": {
+      "title": "Alterações salvas!",
+      "message": "As alterações foram salvas com sucesso."
+    }
+  },
+  "delete": {
+    "message": "Tem certeza de que deseja excluir {{code}}? Esta ação não pode ser desfeita.",
+    "confirm": "Excluir \"{{code}}\""
+  },
+  "edit": {
+    "title": "Editando \"{{name}}\"",
+    "unknown": "desconhecido",
+    "maxViews": {
+      "label": "Visualizações máx.",
+      "placeholder": "Ilimitado",
+      "description": "Número máximo de cliques que este link curto pode receber antes de ser excluído automaticamente. Deixe em branco para permitir visualizações ilimitadas."
+    },
+    "vanity": {
+      "label": "Nome personalizado",
+      "placeholder": "Opcional",
+      "description": "Um nome personalizado para o seu link curto. Deixe em branco para usar o código gerado aleatoriamente."
+    },
+    "destination": {
+      "label": "Destino"
+    },
+    "enabled": {
+      "label": "Ativado",
+      "description": "Impede ou permite o acesso a este link curto."
+    },
+    "password": {
+      "label": "Senha",
+      "description": "Define uma senha para este link curto. Deixe em branco para desativar a proteção por senha.",
+      "remove": "Remover senha"
+    },
+    "save": "Salvar alterações"
+  },
+  "card": {
+    "copyShortLink": "Copiar link curto",
+    "copyDestination": "Copiar destino",
+    "showQrCode": "Mostrar código QR",
+    "views": "Visualizações:",
+    "enabled": "Ativado:",
+    "created": "Criado em:",
+    "updated": "Atualizado em:",
+    "destination": "Destino:",
+    "openDestination": "Abrir \"{{url}}\" em nova guia",
+    "code": "Código:"
+  },
+  "empty": {
+    "title": "Nenhum link curto encontrado",
+    "description": "Encurte uma URL para vê-la aqui"
+  },
+  "table": {
+    "columns": {
+      "code": "Código",
+      "vanity": "Nome personalizado",
+      "destination": "Destino",
+      "views": "Visualizações",
+      "maxViews": "Visualizações máx.",
+      "created": "Criado em",
+      "enabled": "Ativado",
+      "actions": "Ações"
+    },
+    "search": {
+      "code": "Pesquisar por código",
+      "vanity": "Pesquisar por nome personalizado",
+      "destination": "Pesquisar por destino"
+    },
+    "copy": "Copiar URL",
+    "showQrCode": "Mostrar código QR",
+    "edit": "Editar link curto",
+    "delete": "Excluir link curto"
+  }
+}

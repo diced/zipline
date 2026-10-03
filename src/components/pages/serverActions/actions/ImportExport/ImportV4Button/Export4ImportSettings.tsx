@@ -1,6 +1,8 @@
 import { Export4 } from '@/lib/import/version4/validateExport';
 import { Box, Button, Checkbox, Collapse, Group, Paper, Table, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { useTranslation } from 'react-i18next';
+import SafeTrans from '@/components/SafeTrans';
 
 export default function Export4ImportSettings({
   export4,
@@ -11,6 +13,7 @@ export default function Export4ImportSettings({
   setImportSettings: (importSettings: boolean) => void;
   importSettings: boolean;
 }) {
+  const { t } = useTranslation('serverActions');
   const [showSettings, { toggle: toggleSettings }] = useDisclosure(false);
 
   const filteredSettings = Object.fromEntries(
@@ -21,15 +24,13 @@ export default function Export4ImportSettings({
 
   return (
     <Box my='lg'>
-      <Text size='md'>Import settings?</Text>
+      <Text size='md'>{t('importExport.importSettings.title')}</Text>
       <Text size='sm' c='dimmed'>
-        Import all settings from your previous instance into this v4 instance.
-        <br />
-        After importing, it is recommended to restart Zipline for all settings to take full effect.
+        <SafeTrans t={t} i18nKey='importExport.v4.importSettings.description' components={{ br: <br /> }} />
       </Text>
 
       <Button my='xs' onClick={toggleSettings} size='compact-xs'>
-        {showSettings ? 'Hide' : 'Show'} Settings to be Imported
+        {showSettings ? t('importExport.v4.importSettings.hide') : t('importExport.v4.importSettings.show')}
       </Button>
 
       <Collapse expanded={showSettings}>
@@ -37,8 +38,8 @@ export default function Export4ImportSettings({
           <Table>
             <Table.Thead>
               <Table.Tr>
-                <Table.Th w={300}>Key</Table.Th>
-                <Table.Th>Value</Table.Th>
+                <Table.Th w={300}>{t('importExport.details.table.key')}</Table.Th>
+                <Table.Th>{t('importExport.details.table.value')}</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
@@ -57,7 +58,7 @@ export default function Export4ImportSettings({
         </Paper>
 
         <Button my='xs' onClick={toggleSettings} size='compact-xs'>
-          {showSettings ? 'Hide' : 'Show'} Settings to be Imported
+          {showSettings ? t('importExport.v4.importSettings.hide') : t('importExport.v4.importSettings.show')}
         </Button>
       </Collapse>
 
@@ -69,7 +70,9 @@ export default function Export4ImportSettings({
       >
         <Group wrap='nowrap' align='flex-start'>
           <Checkbox.Indicator m='md' />
-          <Text my='sm'>Import {Object.keys(filteredSettings).length} settings</Text>
+          <Text my='sm'>
+            {t('importExport.importSettings.count', { count: Object.keys(filteredSettings).length })}
+          </Text>
         </Group>
       </Checkbox.Card>
     </Box>

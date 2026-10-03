@@ -19,11 +19,14 @@ import {
   IconX,
 } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import SafeTrans from '@/components/SafeTrans';
 import Export3Details from './Export3Details';
 import Export3ImportSettings from './Export3ImportSettings';
 import Export3UserChoose from './Export3UserChoose';
 
 export default function ImportV3Button() {
+  const { t } = useTranslation(['serverActions', 'common']);
   const [open, setOpen] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [export3, setExport3] = useState<Export3 | null>(null);
@@ -46,9 +49,8 @@ export default function ImportV3Button() {
     if (!validated.success) {
       console.error('Failed to validate import data', validated);
       showNotification({
-        title: 'There were errors with the import',
-        message:
-          "Zipline couldn't validate the import data. Are you sure it's a valid export from Zipline v3? For more details about the error, check the browser console.",
+        title: t('importExport.notifications.invalid.title'),
+        message: t('importExport.v3.invalidMessage'),
         color: 'red',
         icon: <IconDatabaseOff size='1rem' />,
         autoClose: 10000,
@@ -81,7 +83,7 @@ export default function ImportV3Button() {
 
     if (error) {
       showNotification({
-        title: 'Failed to import settings',
+        title: t('importExport.notifications.settingsFailed.title'),
         message: error.issues
           ? error.issues.map((x: { message: string }) => x.message).join('\n')
           : error.error,
@@ -89,7 +91,7 @@ export default function ImportV3Button() {
       });
     } else {
       showNotification({
-        message: 'Settings imported',
+        message: t('importExport.notifications.settingsImported.title'),
         color: 'green',
         icon: <IconDeviceFloppy size='1rem' />,
       });
@@ -98,18 +100,16 @@ export default function ImportV3Button() {
 
   const handleImport = async () => {
     modals.openConfirmModal({
-      title: 'Are you sure?',
-      children:
-        'This process will NOT overwrite existing data but will append to it. In case of conflicts, the imported data will be skipped and logged. If using a version 3 export, the entire importing process should be completed immediately after setting up Zipline.',
+      title: t('common:warning.title'),
+      children: t('importExport.v3.confirm.message'),
       labels: {
-        cancel: 'Cancel',
-        confirm: 'Import Data',
+        cancel: t('common:actions.cancel'),
+        confirm: t('importExport.importData'),
       },
       onConfirm: async () => {
         showNotification({
-          title: 'Importing Data',
-          message:
-            'The export file will be uploaded. This may take a few moments. The process is running in the background and is logged, so you can close this browser tab.',
+          title: t('importExport.v3.importing.title'),
+          message: t('importExport.v3.importing.message'),
           color: 'blue',
           autoClose: 10000,
           id: 'importing-data',
@@ -137,10 +137,8 @@ export default function ImportV3Button() {
 
         if (error) {
           updateNotification({
-            title: 'Failed to import data',
-            message:
-              error.error ??
-              'An error occurred while importing data. Check the Zipline logs for more details.',
+            title: t('importExport.v3.failed.title'),
+            message: error.error ?? t('importExport.v3.failed.message'),
             color: 'red',
             icon: <IconDatabaseOff size='1rem' />,
             autoClose: 10000,
@@ -149,23 +147,43 @@ export default function ImportV3Button() {
           return;
         } else {
           updateNotification({
-            title: 'Data Imported',
+            title: t('importExport.v3.imported.title'),
             loading: false,
             message: (
               <>
-                The data has been successfully imported. If there were any conflicts, they have been logged.{' '}
+                {t('importExport.v3.imported.message')}{' '}
                 <Stack gap={2}>
                   <div>
-                    <b>Users: </b> {Object.keys(data?.users ?? {}).length}
+                    <SafeTrans
+                      t={t}
+                      i18nKey='importExport.v3.imported.stats.users'
+                      values={{ count: Object.keys(data?.users ?? {}).length }}
+                      components={{ b: <b /> }}
+                    />
                   </div>
                   <div>
-                    <b>Folders: </b> {Object.keys(data?.folders ?? {}).length}
+                    <SafeTrans
+                      t={t}
+                      i18nKey='importExport.v3.imported.stats.folders'
+                      values={{ count: Object.keys(data?.folders ?? {}).length }}
+                      components={{ b: <b /> }}
+                    />
                   </div>
                   <div>
-                    <b>URLs: </b> {Object.keys(data?.urls ?? {}).length}
+                    <SafeTrans
+                      t={t}
+                      i18nKey='importExport.v3.imported.stats.urls'
+                      values={{ count: Object.keys(data?.urls ?? {}).length }}
+                      components={{ b: <b /> }}
+                    />
                   </div>
                   <div>
-                    <b>Files: </b> {Object.keys(data?.files ?? {}).length}{' '}
+                    <SafeTrans
+                      t={t}
+                      i18nKey='importExport.v3.imported.stats.files'
+                      values={{ count: Object.keys(data?.files ?? {}).length }}
+                      components={{ b: <b /> }}
+                    />{' '}
                   </div>
                 </Stack>
               </>
@@ -178,9 +196,8 @@ export default function ImportV3Button() {
 
           if (Object.keys(data?.users ?? {}).length === 0) {
             showNotification({
-              title: 'No users imported',
-              message:
-                'No users were imported, likely because the export contains usernames that already exist in this Zipline instance. Check the Zipline logs for more details. Files, folders, and URLs may also not have been imported.',
+              title: t('importExport.v3.noUsers.title'),
+              message: t('importExport.v3.noUsers.message'),
               color: 'orange',
               icon: <IconExclamationMark size='1rem' />,
               autoClose: 5000,
@@ -189,15 +206,16 @@ export default function ImportV3Button() {
 
           if (Object.keys(data?.files ?? {}).length > 0) {
             modals.open({
-              title: 'Are you sure?',
+              title: t('common:warning.title'),
               children: (
                 <>
                   <p>
-                    {Object.keys(data?.files ?? {}).length} files were imported. Since this import does not
-                    copy files, you will need to move the files from the instance where they are stored to the
-                    current Zipline instance. The <Code>import-dir</Code> script may be useful for this if
-                    using directory storage. If you are using S3, you can use the same bucket for this
-                    instance.
+                    <SafeTrans
+                      t={t}
+                      i18nKey='importExport.v3.filesImported.message'
+                      values={{ count: Object.keys(data?.files ?? {}).length }}
+                      components={{ code: <Code /> }}
+                    />
                   </p>
 
                   <Alert
@@ -205,10 +223,9 @@ export default function ImportV3Button() {
                     color='red'
                     variant='outline'
                     icon={<IconExclamationMark size='1rem' />}
-                    title='Important'
+                    title={t('importExport.v3.filesImported.important.title')}
                   >
-                    After importing, you should either delete the export file or store it securely, as it
-                    contains sensitive information such as passwords and OAuth tokens.
+                    {t('importExport.v3.filesImported.important.message')}
                   </Alert>
 
                   {settingsEnv && (
@@ -217,10 +234,9 @@ export default function ImportV3Button() {
                       color='green'
                       variant='outline'
                       icon={<IconExclamationMark size='1rem' />}
-                      title='Settings Imported'
+                      title={t('importExport.v3.filesImported.settings.title')}
                     >
-                      Imported settings have been applied, it is advised to reload the page to ensure the
-                      settings are applied correctly.
+                      {t('importExport.v3.filesImported.settings.message')}
                     </Alert>
                   )}
 
@@ -232,7 +248,7 @@ export default function ImportV3Button() {
                     fullWidth
                     leftSection={<IconCheck size='1rem' />}
                   >
-                    Okay
+                    {t('importExport.v3.filesImported.okay')}
                   </Button>
                 </>
               ),
@@ -260,7 +276,7 @@ export default function ImportV3Button() {
 
   return (
     <>
-      <Modal opened={open} onClose={() => setOpen(false)} title='Import V3 Data' size='xl'>
+      <Modal opened={open} onClose={() => setOpen(false)} title={t('importExport.v3.title')} size='xl'>
         {export3 ? (
           <Button
             onClick={() => {
@@ -269,12 +285,12 @@ export default function ImportV3Button() {
             }}
             color='red'
             variant='filled'
-            aria-label='Clear'
+            aria-label={t('importExport.clearAriaLabel')}
             mb='xs'
             leftSection={<IconX size='1rem' />}
             fullWidth
           >
-            Clear Import
+            {t('importExport.clear')}
           </Button>
         ) : (
           <FileButton onChange={setFile} accept='application/json'>
@@ -287,7 +303,7 @@ export default function ImportV3Button() {
                   leftSection={<IconUpload size='1rem' />}
                   fullWidth
                 >
-                  Upload Export (JSON)
+                  {t('importExport.upload')}
                 </Button>
               </>
             )}
@@ -308,13 +324,13 @@ export default function ImportV3Button() {
 
         {export3 && (
           <Button onClick={handleImport} fullWidth leftSection={<IconDatabaseImport size='1rem' />} mt='xs'>
-            Import Data
+            {t('importExport.importData')}
           </Button>
         )}
       </Modal>
 
       <Button size='xl' rightSection={<Pill>V3</Pill>} onClick={() => setOpen(true)}>
-        Import{' '}
+        {t('importExport.import')}{' '}
       </Button>
     </>
   );

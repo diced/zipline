@@ -1,0 +1,59 @@
+{
+  "title": "メトリクス",
+  "range": {
+    "change": "期間を変更",
+    "modalTitle": "期間の変更",
+    "fromTo": "{{from}}～{{to}}",
+    "presets": {
+      "lastTwoDays": "過去 2 日間",
+      "last7Days": "過去 7 日間",
+      "thisMonth": "今月",
+      "lastMonth": "先月",
+      "thisYear": "今年",
+      "lastYear": "昨年"
+    }
+  },
+  "allTime": {
+    "label": "全期間",
+    "show": "全期間を表示",
+    "slowWarning": "読み込みに通常より時間がかかる場合があります。",
+    "viewing": "全期間の統計を表示しています。"
+  },
+  "loadFailed": "この期間の統計を読み込めませんでした。指定した期間内に利用可能なデータがない可能性があります。",
+  "cards": {
+    "files": "ファイル",
+    "urls": "短縮 URL",
+    "storageUsed": "ストレージ使用量",
+    "users": "ユーザー",
+    "fileViews": "ファイルの閲覧数",
+    "urlViews": "短縮 URL の閲覧数"
+  },
+  "tables": {
+    "columns": {
+      "user": "ユーザー",
+      "files": "ファイル",
+      "storageUsed": "ストレージ使用量",
+      "views": "閲覧数",
+      "urls": "短縮 URL",
+      "type": "種類"
+    },
+    "unknownUser": "[不明]"
+  },
+  "graphs": {
+    "count": {
+      "title": "件数"
+    },
+    "views": {
+      "title": "閲覧数",
+      "value_other": "閲覧 {{count}} 回"
+    },
+    "storage": {
+      "title": "ストレージ使用量"
+    },
+    "series": {
+      "files": "ファイル",
+      "urls": "短縮 URL",
+      "storageUsed": "ストレージ使用量"
+    }
+  }
+}

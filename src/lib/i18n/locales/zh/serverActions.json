@@ -1,0 +1,373 @@
+{
+  "admin": {
+    "title": "管理员",
+    "links": {
+      "metrics": {
+        "label": "统计",
+        "description": "整个实例的使用情况图表和统计数据"
+      },
+      "actions": {
+        "label": "操作",
+        "description": "维护工具与导入/导出"
+      },
+      "users": {
+        "label": "用户",
+        "description": "管理用户和配额"
+      },
+      "settings": {
+        "label": "设置",
+        "description": "服务器配置"
+      },
+      "invites": {
+        "label": "邀请",
+        "description": "创建和管理邀请码"
+      }
+    },
+    "storage": {
+      "title": "存储",
+      "refresh": "刷新存储统计",
+      "loadFailed": "无法加载存储信息",
+      "used": "已使用 {{used}}"
+    },
+    "version": {
+      "title": "版本",
+      "loadFailed": "无法加载版本信息。"
+    }
+  },
+  "page": {
+    "title": "服务器操作",
+    "description": "用于管理服务器的实用工具和脚本。"
+  },
+  "list": {
+    "importExport": {
+      "label": "导入/导出数据",
+      "description": "导入或导出服务器数据和配置。"
+    },
+    "clearTemporaryFiles": {
+      "label": "清除临时文件",
+      "description": "移除临时目录中的所有临时文件。"
+    },
+    "clearZeroByteFiles": {
+      "label": "清除零字节文件",
+      "description": "从数据库和/或存储中删除所有大小为零字节的文件。"
+    },
+    "requeryFileSizes": {
+      "label": "重新查询文件大小",
+      "description": "重新计算并更新数据库中所有文件的大小。"
+    },
+    "generateThumbnails": {
+      "label": "生成缩略图",
+      "description": "为所有缺少缩略图的图片和视频文件创建缩略图。"
+    }
+  },
+  "modals": {
+    "confirmDelete": "是，删除",
+    "clearTemporaryFiles": {
+      "body": "这将删除存储在临时目录 (在配置中定义) 中的临时文件。除非仍有文件正在处理，否则不会造成影响。"
+    },
+    "clearZeroByteFiles": {
+      "body": "这将从数据库和数据源中删除 {{count}} 个文件。"
+    },
+    "requeryFileSizes": {
+      "body": "这将重新查询数据库中存储的每个文件的大小。你还可以使用下方的选项。",
+      "forceUpdate": {
+        "label": "强制更新",
+        "description": "强制更新每个文件的大小，即使该文件已设置大小。"
+      },
+      "forceDelete": {
+        "label": "强制删除",
+        "description": "删除在数据库中找不到或大小为 0 的文件。"
+      },
+      "confirm": "重新查询"
+    },
+    "generateThumbnails": {
+      "body": "这将为所有尚未设置缩略图的文件生成缩略图。你还可以使用下方的选项。",
+      "rerun": {
+        "label": "重新运行",
+        "description": "为所有文件重新生成缩略图，无论其是否已设置缩略图。"
+      },
+      "confirm": "生成"
+    }
+  },
+  "importExport": {
+    "title": "导入/导出数据",
+    "import": "导入",
+    "upload": "上传导出文件 (JSON)",
+    "clear": "清除导入",
+    "clearAriaLabel": "清除",
+    "importData": "导入数据",
+    "notifications": {
+      "invalid": {
+        "title": "导入数据存在错误"
+      },
+      "settingsFailed": {
+        "title": "无法导入设置"
+      },
+      "settingsImported": {
+        "title": "设置已导入"
+      }
+    },
+    "export": {
+      "button": "导出数据",
+      "intro": "导出文件包含 Zipline 数据和运行环境的完整快照，其中包括：",
+      "items": {
+        "users": "<b>用户：</b>账户信息，包括用户名、密码 (可选)、头像、角色、查看设置和 TOTP 密钥 (可选)。",
+        "passkeys": "<b>通行密钥：</b>已注册的 WebAuthn 通行密钥，包括创建日期、上次使用时间戳和凭据注册数据。",
+        "userQuotas": "<b>用户配额：</b>配额设置，例如最大字节数、最大文件数、最大短链接数和配额类型。",
+        "oauthProviders": "<b>OAuth 提供方：</b>已关联的 OAuth 账户，包括提供方类型、令牌和 OAuth ID。",
+        "userTags": "<b>用户标签：</b>用户创建的标签，包括名称、颜色和关联的文件 ID。",
+        "files": "<b>文件：</b>已上传文件的元数据，包括大小、类型、时间戳、过期时间、查看次数、密码保护、所有者和所属文件夹。<i>(不包含实际文件内容。)</i>",
+        "folders": "<b>文件夹：</b>文件夹元数据，包括可见性设置、上传权限、文件列表和所有者。",
+        "urls": "<b>短链接：</b>短链接的元数据，包括目标地址、自定义名称、查看次数、密码和所属用户。",
+        "thumbnails": "<b>缩略图：</b>缩略图路径和关联的文件 ID。<i>(不包含图片数据。)</i>",
+        "invites": "<b>邀请：</b>邀请码、创建/过期日期和使用次数。",
+        "metrics": "<b>统计：</b>Zipline 内部存储的系统和使用情况统计数据。"
+      },
+      "systemIntro": "此外，导出文件还包含<b>系统相关信息</b>：",
+      "systemItems": {
+        "cpuCount": "<b>CPU 数量：</b>可用的处理器核心数。",
+        "hostname": "<b>主机名：</b>主机系统的网络标识符。",
+        "architecture": "<b>架构：</b>硬件架构 (例如 <code>x64</code>、<code>arm64</code>)。",
+        "platform": "<b>平台：</b>操作系统平台 (例如 <code>linux</code>、<code>darwin</code>)。",
+        "osRelease": "<b>系统版本：</b>操作系统或内核版本。",
+        "env": "<b>环境变量：</b>导出时所有环境变量的完整快照。",
+        "versions": "<b>版本：</b>Zipline 版本、Node 版本和导出格式版本。"
+      },
+      "excludeMetrics": {
+        "label": "排除统计数据",
+        "description": "从导出中排除系统和使用情况统计数据，可以减小导出文件的大小。"
+      },
+      "warning": {
+        "title": "警告",
+        "message": "此导出文件包含大量敏感数据，包括用户账户、身份验证凭据、环境变量和系统元数据。请妥善保管此文件，不要与不受信任的人分享。"
+      },
+      "download": "下载导出文件"
+    },
+    "v3": {
+      "title": "导入 V3 数据",
+      "invalidMessage": "Zipline 无法验证导入数据。确定这是 Zipline v3 的有效导出文件吗？有关错误的详细信息，请查看浏览器控制台。",
+      "confirm": {
+        "message": "此过程不会覆盖现有数据，而是追加数据。如果发生冲突，将跳过导入的数据并记录日志。如果使用的是 v3 导出文件，应在设置好 Zipline 后立即完成整个导入过程。"
+      },
+      "importing": {
+        "title": "正在导入数据",
+        "message": "即将上传导出文件，这可能需要一些时间。该过程在后台运行并会记录日志，因此你可以关闭此浏览器标签页。"
+      },
+      "failed": {
+        "title": "无法导入数据",
+        "message": "导入数据时发生错误。请查看 Zipline 日志了解详情。"
+      },
+      "imported": {
+        "title": "数据已导入",
+        "message": "数据已成功导入。如果存在冲突，已记录到日志中。",
+        "stats": {
+          "users": "<b>用户：</b>{{count}}",
+          "folders": "<b>文件夹：</b>{{count}}",
+          "urls": "<b>短链接：</b>{{count}}",
+          "files": "<b>文件：</b>{{count}}"
+        }
+      },
+      "noUsers": {
+        "title": "未导入任何用户",
+        "message": "未导入任何用户，可能是因为导出文件中的用户名在此 Zipline 实例中已存在。请查看 Zipline 日志了解详情。文件、文件夹和短链接也可能未被导入。"
+      },
+      "filesImported": {
+        "message": "已导入 {{count}} 个文件。由于此导入不会复制文件本身，你需要将文件从原存储实例移动到当前 Zipline 实例。如果使用目录存储，<code>import-dir</code> 脚本可能会有所帮助。如果使用 S3，可以让此实例使用同一个存储桶。",
+        "important": {
+          "title": "重要",
+          "message": "导入完成后，应删除导出文件或妥善保管，因为其中包含密码和 OAuth 令牌等敏感信息。"
+        },
+        "settings": {
+          "title": "设置已导入",
+          "message": "导入的设置已应用，建议重新加载页面以确保设置正确生效。"
+        },
+        "okay": "好的"
+      },
+      "importSettings": {
+        "description": "此选项可将原实例中兼容的设置导入到此 v4 实例。"
+      },
+      "userChoose": {
+        "description": "此选项可将导出文件中某个用户的数据导入到当前登录的用户，即使两者用户名相同。通常，系统会跳过用户名已存在于数据库中的用户。但如果你刚刚设置好实例并沿用了旧实例的用户名，此选项可以让你将该用户的数据合并到当前登录的账户中，而无需删除或替换该账户。<b>建议为此操作选择具有超级管理员权限的用户。</b>"
+      }
+    },
+    "v4": {
+      "title": "导入 V4 数据",
+      "invalidMessage": "Zipline 无法验证导入数据。确定这是 Zipline v4 的有效导出文件吗？有关错误的详细信息，请查看浏览器控制台。",
+      "settingsImportedMessage": "为确保所有设置生效，建议重启 Zipline。",
+      "sameInstance": {
+        "title": "检测到同一实例",
+        "modalBody": "检测到你正在从当前运行的同一实例导入数据。继续导入前，你必须同意此警告。",
+        "description": "检测到你正在从当前运行的同一实例导入数据。继续导入可能导致数据冲突或覆盖现有数据。请确保在继续之前了解可能的后果。",
+        "agree": "我同意，并了解可能的后果。"
+      },
+      "confirm": {
+        "message": "此过程不会覆盖现有数据，而是追加数据。如果发生冲突，将跳过导入的数据并记录日志。",
+        "label": "是，导入数据。"
+      },
+      "importing": {
+        "title": "正在导入数据...",
+        "message": "即将上传导出文件，这可能需要一些时间。导入在后台运行并会记录日志，因此如有需要，你可以关闭此浏览器标签页。"
+      },
+      "failed": {
+        "title": "无法导入数据",
+        "message": "导入数据时发生错误。请查看日志了解详情。"
+      },
+      "completed": {
+        "title": "导入完成。",
+        "message": "导入已完成。为确保文件可以正常查看，请确认已正确配置数据源，使其与之前的实例一致。例如，如果之前使用本地存储，请确保将其设置为与之前相同的目录 (或相同目录的备份)。如果使用 S3，请确保使用同一个存储桶。<br/> <br/>此外，建议重启 Zipline 以确保所有设置完全生效。",
+        "stats": {
+          "users": "<b>用户：</b>已导入 {{count}} 个。",
+          "oauthProviders": "<b>OAuth 提供方：</b>已导入 {{count}} 个。",
+          "quotas": "<b>配额：</b>已导入 {{count}} 个。",
+          "passkeys": "<b>通行密钥：</b>已导入 {{count}} 个。",
+          "folders": "<b>文件夹：</b>已导入 {{count}} 个。",
+          "files": "<b>文件：</b>已导入 {{count}} 个。",
+          "tags": "<b>标签：</b>已导入 {{count}} 个。",
+          "urls": "<b>短链接：</b>已导入 {{count}} 个。",
+          "invites": "<b>邀请：</b>已导入 {{count}} 个。",
+          "metrics": "<b>统计：</b>已导入 {{count}} 条。"
+        }
+      },
+      "importSettings": {
+        "description": "将原实例中的所有设置导入到此 v4 实例。<br/>导入后，建议重启 Zipline 以确保所有设置完全生效。",
+        "show": "显示要导入的设置",
+        "hide": "隐藏要导入的设置"
+      },
+      "userChoose": {
+        "description": "此选项可将导出文件中某个用户的数据导入到当前登录的用户，即使两者用户名相同。通常，系统会跳过用户名已存在于系统中的用户。<br/> <br/> <b>但是</b>，如果你刚刚设置好实例并沿用了旧实例的用户名，此选项可以让你将该用户的数据合并到当前登录的账户中，而无需删除或替换该账户。<b>建议为此操作选择具有超级管理员权限的用户。</b>"
+      }
+    },
+    "importSettings": {
+      "title": "导入设置？",
+      "count": "导入 {{count}} 项设置"
+    },
+    "userChoose": {
+      "title": "选择一个用户，将其数据导入到当前用户。",
+      "superAdministrator": "超级管理员",
+      "noMerge": {
+        "label": "不合并数据",
+        "description": "如果不想将任何用户的数据合并到当前用户，请选择此选项。"
+      }
+    },
+    "details": {
+      "notice": "这些数据不会发送到服务器，仅在浏览器中解析和显示。只有点击“导入”按钮后，数据才会发送到服务器。",
+      "unknown": "未知",
+      "version": {
+        "title": "版本详情",
+        "exportVersion": "导出版本："
+      },
+      "request": {
+        "title": "请求详情",
+        "user": "用户：",
+        "at": "时间：",
+        "showOs": "显示操作系统详情",
+        "hideOs": "隐藏操作系统详情",
+        "showEnv": "显示环境变量",
+        "hideEnv": "隐藏环境变量"
+      },
+      "table": {
+        "key": "键",
+        "value": "值"
+      },
+      "roles": {
+        "user": "用户",
+        "admin": "管理员",
+        "superAdmin": "超级管理员"
+      },
+      "users": {
+        "title": "用户",
+        "empty": "未找到用户 (怎么会这样？)",
+        "columns": {
+          "id": "ID",
+          "username": "用户名",
+          "password": "密码",
+          "passwordQuestion": "有密码？",
+          "role": "角色",
+          "oauthProviders": "OAuth 提供方",
+          "quota": "配额",
+          "passkeys": "通行密钥",
+          "admin": "管理员",
+          "superAdmin": "超级管理员",
+          "avatar": "头像",
+          "oauth": "OAuth",
+          "totp": "2FA (TOTP)",
+          "files": "文件"
+        }
+      },
+      "oauthProviders": {
+        "title": "用户 OAuth 提供方",
+        "empty": "未找到用户 OAuth 提供方",
+        "columns": {
+          "user": "用户",
+          "provider": "提供方",
+          "oauthUsername": "OAuth 用户名",
+          "oauthId": "OAuth ID"
+        }
+      },
+      "files": {
+        "title": "文件",
+        "empty": "未找到文件",
+        "columns": {
+          "name": "名称",
+          "originalName": "原始名称",
+          "type": "类型",
+          "createdAt": "创建时间",
+          "password": "密码",
+          "size": "大小",
+          "owner": "所有者",
+          "views": "查看次数"
+        }
+      },
+      "tags": {
+        "title": "用户标签",
+        "empty": "未找到用户标签",
+        "columns": {
+          "user": "用户",
+          "name": "名称",
+          "files": "文件"
+        }
+      },
+      "folders": {
+        "title": "文件夹",
+        "empty": "未找到文件夹",
+        "columns": {
+          "name": "名称",
+          "owner": "所有者",
+          "public": "公开",
+          "createdAt": "创建时间",
+          "files": "文件"
+        }
+      },
+      "urls": {
+        "title": "短链接",
+        "empty": "未找到短链接",
+        "columns": {
+          "code": "短码",
+          "owner": "所有者",
+          "destination": "目标地址",
+          "vanity": "自定义名称",
+          "password": "密码",
+          "createdAt": "创建时间"
+        }
+      },
+      "invites": {
+        "title": "邀请",
+        "empty": "未找到邀请",
+        "columns": {
+          "code": "邀请码",
+          "createdBy": "创建者",
+          "createdAt": "创建时间",
+          "uses": "已使用次数"
+        }
+      },
+      "metrics": {
+        "title": "统计",
+        "totalEntries": "统计条目总数：",
+        "latestEntry": "最新统计条目："
+      },
+      "other": {
+        "title": "其他"
+      }
+    }
+  }
+}

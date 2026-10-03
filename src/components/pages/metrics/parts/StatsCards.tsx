@@ -11,6 +11,7 @@ import {
   IconUsers,
   Icon as TablerIcon,
 } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
 import { percentChange } from '../statsHelpers';
 
 function StatCard({
@@ -70,6 +71,8 @@ function StatCard({
 }
 
 export default function StatsCards({ points }: { points: MetricsPoint[] }) {
+  const { t } = useTranslation('metrics');
+
   if (!points.length) return null;
 
   const recent = points[0];
@@ -84,18 +87,28 @@ export default function StatsCards({ points }: { points: MetricsPoint[] }) {
       }}
       mb='sm'
     >
-      <StatCard title='Files' first={recent.files} last={last.files} Icon={IconFiles} />
-      <StatCard title='URLs' first={recent.urls} last={last.urls} Icon={IconLink} />
+      <StatCard title={t('cards.files')} first={recent.files} last={last.files} Icon={IconFiles} />
+      <StatCard title={t('cards.urls')} first={recent.urls} last={last.urls} Icon={IconLink} />
       <StatCard
-        title='Storage Used'
+        title={t('cards.storageUsed')}
         first={recent.storage}
         last={last.storage}
         formatter={bytes}
         Icon={IconDatabase}
       />
-      <StatCard title='Users' first={recent.users} last={last.users} Icon={IconUsers} />
-      <StatCard title='File Views' first={recent.fileViews} last={last.fileViews} Icon={IconEyeFilled} />
-      <StatCard title='URL Views' first={recent.urlViews} last={last.urlViews} Icon={IconEyeFilled} />
+      <StatCard title={t('cards.users')} first={recent.users} last={last.users} Icon={IconUsers} />
+      <StatCard
+        title={t('cards.fileViews')}
+        first={recent.fileViews}
+        last={last.fileViews}
+        Icon={IconEyeFilled}
+      />
+      <StatCard
+        title={t('cards.urlViews')}
+        first={recent.urlViews}
+        last={last.urlViews}
+        Icon={IconEyeFilled}
+      />
     </SimpleGrid>
   );
 }

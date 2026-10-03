@@ -1,0 +1,137 @@
+{
+  "page": {
+    "title": "フォルダー",
+    "titleWithFolder": "フォルダー {{separator}} {{name}}",
+    "createFolder": "フォルダーを作成",
+    "createSubfolder": "サブフォルダーを作成",
+    "folderFiles": "{{name}} のファイル",
+    "folderFilesWithCount": "{{name}} のファイル ({{files}})"
+  },
+  "create": {
+    "title": "フォルダーの作成",
+    "titleSubfolder": "サブフォルダーの作成",
+    "name": {
+      "label": "名前",
+      "placeholder": "名前を入力...",
+      "required": "名前は必須です"
+    },
+    "public": {
+      "label": "公開",
+      "description": "公開フォルダーは誰でも表示できます"
+    }
+  },
+  "uploadsAlert": {
+    "message": "このフォルダーでは匿名でのアップロードが許可されています。下のリンクを共有すると、ほかの人がこのフォルダーにファイルをアップロードできるようになります。",
+    "copy": "URL をコピー",
+    "copied": "URL をコピーしました"
+  },
+  "menu": {
+    "moreActions": "その他の操作",
+    "open": "フォルダーを開く",
+    "move": "フォルダーを移動",
+    "export": "ZIP としてエクスポート",
+    "makePrivate": "非公開にする",
+    "makePublic": "公開する",
+    "disallowUploads": "匿名でのアップロードを禁止",
+    "allowUploads": "匿名でのアップロードを許可",
+    "editName": "名前を編集",
+    "copyUrl": "URL をコピー"
+  },
+  "card": {
+    "created": "作成日時:",
+    "updated": "更新日時:",
+    "public": "公開:",
+    "files": "ファイル:",
+    "subfolders": "サブフォルダー:"
+  },
+  "grid": {
+    "empty": "フォルダーが見つかりません",
+    "emptyFolder": "このフォルダーは空です",
+    "createHint": "フォルダーを作成するとここに表示されます"
+  },
+  "table": {
+    "columns": {
+      "name": "名前",
+      "public": "公開",
+      "uploads": "アップロード許可",
+      "created": "作成日時",
+      "updated": "最終更新日時",
+      "actions": "操作"
+    },
+    "subfolders_other": "{{count}} 個のサブフォルダー",
+    "noRecords": "サブフォルダーがありません",
+    "copyLink": "フォルダーのリンクをコピー",
+    "delete": "フォルダーを削除"
+  },
+  "notifications": {
+    "visibilityFailed": "フォルダーの公開設定を変更できませんでした",
+    "visibilityEdited": "フォルダーの公開設定を変更しました",
+    "nowPublic": "{{name}} を公開しました",
+    "nowPrivate": "{{name}} を非公開にしました",
+    "uploadsFailed": "フォルダーのアップロードポリシーを変更できませんでした",
+    "uploadsEdited": "フォルダーのアップロードポリシーを変更しました",
+    "uploadsAllowed": "{{name}} で匿名でのアップロードを許可しました",
+    "uploadsDisallowed": "{{name}} で匿名でのアップロードを禁止しました"
+  },
+  "delete": {
+    "title": "「{{name}}」を削除しますか？",
+    "cannotUndo": "この操作は元に戻せません。",
+    "containsFilesAndSubfolders": "このフォルダーには {{files}} 個のファイルと {{subfolders}} 個のサブフォルダーが含まれています。これらをどうしますか？",
+    "containsFiles": "このフォルダーには {{files}} 個のファイルが含まれています。これらをどうしますか？",
+    "containsSubfolders": "このフォルダーには {{subfolders}} 個のサブフォルダーが含まれています。これらをどうしますか？",
+    "options": {
+      "root": "内容をルートフォルダーに移動",
+      "folder": "内容を別のフォルダーに移動",
+      "cascade": "サブフォルダーを削除 (ファイルはルートに移動)",
+      "cascadeFiles": "サブフォルダーとそのファイルを削除 (一括削除)"
+    },
+    "target": {
+      "label": "移動先フォルダー",
+      "placeholder": "フォルダーを選択"
+    },
+    "warningCascade": "警告: このフォルダー内のすべてのサブフォルダーが完全に削除されます。ファイルはフォルダーから外され、ルートに移動されます。",
+    "warningCascadeFiles": "警告: このフォルダー内のすべてのサブフォルダーが、その中のすべてのファイルとともに完全に削除されます。ファイルはストレージから削除され、復元できません。",
+    "confirmCascade": "「{{name}}」とすべてのサブフォルダーを削除しますか？",
+    "confirmCascadeFiles": "「{{name}}」とすべてのサブフォルダーおよびファイルを削除しますか？",
+    "modalCascade": "すべてのサブフォルダーが完全に削除されます (ファイルはルートに移動されます)。この操作は元に戻せません。",
+    "modalCascadeFiles": "すべてのサブフォルダーとその中のすべてのファイルがストレージから完全に削除されます。この操作は元に戻せません。",
+    "submit": "フォルダーを削除",
+    "notifications": {
+      "failed": "フォルダーを削除できませんでした",
+      "deleted": "フォルダーを削除しました",
+      "deletedMessage": "{{name}} を削除しました",
+      "noTarget": "フォルダーが選択されていません",
+      "noTargetMessage": "内容の移動先フォルダーを選択してください"
+    }
+  },
+  "edit": {
+    "title": "フォルダー名の編集",
+    "label": "新しいフォルダー名",
+    "placeholder": "新しいフォルダー名を入力...",
+    "required": "名前は必須です",
+    "notifications": {
+      "failed": "フォルダー名の更新中にエラーが発生しました",
+      "updated": "フォルダー名を更新しました",
+      "updatedMessage": "フォルダー名を {{name}} に更新しました"
+    }
+  },
+  "move": {
+    "title": "「{{name}}」を移動",
+    "description": "このフォルダーの移動先フォルダーを選択してください。",
+    "root": "/ (ルート)",
+    "destination": {
+      "label": "移動先",
+      "placeholder": "フォルダーを選択"
+    },
+    "submit": "フォルダーを移動",
+    "notifications": {
+      "failed": "フォルダーを移動できませんでした",
+      "moved": "フォルダーを移動しました",
+      "movedMessage": "{{name}} を移動しました"
+    }
+  },
+  "viewFiles": {
+    "title": "{{name}} 内のファイル",
+    "found": "{{amount}} 個のファイルが見つかりました"
+  }
+}

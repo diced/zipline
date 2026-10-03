@@ -1,5 +1,6 @@
 import { Export3, V3_COMPATIBLE_SETTINGS } from '@/lib/import/version3/validateExport';
 import { Box, Checkbox, Group, Text } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 
 export default function Export3ImportSettings({
   export3,
@@ -10,13 +11,14 @@ export default function Export3ImportSettings({
   setImportSettings: (importSettings: boolean) => void;
   importSettings: boolean;
 }) {
+  const { t } = useTranslation('serverActions');
   const commonSettings = Object.keys(V3_COMPATIBLE_SETTINGS).filter((key) => key in export3.request.env);
 
   return (
     <Box my='lg'>
-      <Text size='md'>Import settings?</Text>
+      <Text size='md'>{t('importExport.importSettings.title')}</Text>
       <Text size='sm' c='dimmed'>
-        This option allows you to import compatible settings from your instance into this v4 instance.
+        {t('importExport.v3.importSettings.description')}
       </Text>
 
       <Checkbox.Card
@@ -27,7 +29,7 @@ export default function Export3ImportSettings({
       >
         <Group wrap='nowrap' align='flex-start'>
           <Checkbox.Indicator m='md' />
-          <Text my='sm'>Import {commonSettings.length} settings</Text>
+          <Text my='sm'>{t('importExport.importSettings.count', { count: commonSettings.length })}</Text>
         </Group>
       </Checkbox.Card>
     </Box>

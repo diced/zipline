@@ -2,6 +2,7 @@ import type { Response } from '@/lib/api/response';
 import { Button, LoadingOverlay, Stack, Switch, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconDeviceFloppy } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { settingsOnSubmit } from '../settingsOnSubmit';
 import useServerSettings from '../useServerSettings';
@@ -19,6 +20,7 @@ export default function Chunks() {
 
 function Form({ data, isLoading }: { data: Response['/api/server/settings']; isLoading: boolean }) {
   const navigate = useNavigate();
+  const { t } = useTranslation(['serverSettings', 'common']);
 
   const form = useForm({
     initialValues: {
@@ -40,22 +42,22 @@ function Form({ data, isLoading }: { data: Response['/api/server/settings']; isL
     <form onSubmit={form.onSubmit(onSubmit)}>
       <Stack gap='lg'>
         <Switch
-          label='Enable Chunks'
-          description='Enable chunked uploads.'
+          label={t('chunks.enabled.label')}
+          description={t('chunks.enabled.description')}
           {...form.getInputProps('chunksEnabled', { type: 'checkbox' })}
         />
 
         <TextInput
-          label='Max Chunk Size'
-          description='Maximum size of an upload before it is split into chunks.'
+          label={t('chunks.max.label')}
+          description={t('chunks.max.description')}
           placeholder='95mb'
           disabled={!form.values.chunksEnabled}
           {...form.getInputProps('chunksMax')}
         />
 
         <TextInput
-          label='Chunk Size'
-          description='Size of each chunk.'
+          label={t('chunks.size.label')}
+          description={t('chunks.size.description')}
           placeholder='25mb'
           disabled={!form.values.chunksEnabled}
           {...form.getInputProps('chunksSize')}
@@ -63,7 +65,7 @@ function Form({ data, isLoading }: { data: Response['/api/server/settings']; isL
       </Stack>
 
       <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
-        Save
+        {t('common:actions.save')}
       </Button>
     </form>
   );

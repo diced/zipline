@@ -1,0 +1,549 @@
+{
+  "sections": {
+    "core": {
+      "name": "核心",
+      "description": "常规服务器设置"
+    },
+    "chunks": {
+      "name": "分片",
+      "description": "分片上传"
+    },
+    "discord": {
+      "name": "Discord",
+      "description": "Discord Webhook 集成"
+    },
+    "domains": {
+      "name": "域名",
+      "description": "添加自定义域名"
+    },
+    "features": {
+      "name": "功能",
+      "description": "配置各项功能"
+    },
+    "files": {
+      "name": "文件",
+      "description": "文件上传设置"
+    },
+    "httpWebhook": {
+      "name": "HTTP Webhook",
+      "description": "在特定事件发生时向 URL 发送 POST 请求"
+    },
+    "invites": {
+      "name": "邀请",
+      "description": "邀请设置"
+    },
+    "mfa": {
+      "name": "多重身份验证",
+      "description": "启用或禁用通行密钥和 TOTP 验证"
+    },
+    "oauth": {
+      "name": "OAuth",
+      "description": "配置用于身份验证的 OAuth 提供方"
+    },
+    "pwa": {
+      "name": "PWA",
+      "description": "渐进式 Web 应用设置"
+    },
+    "ratelimit": {
+      "name": "速率限制",
+      "description": "配置 API 速率限制"
+    },
+    "tasks": {
+      "name": "任务",
+      "description": "后台任务运行间隔"
+    },
+    "urls": {
+      "name": "URL 缩短",
+      "description": "配置 URL 缩短设置"
+    },
+    "website": {
+      "name": "网站",
+      "description": "标题、描述等网站相关设置"
+    },
+    "settings": {
+      "name": "服务器设置"
+    }
+  },
+  "invalidSection": "无效的设置分区",
+  "environmentOverrides": {
+    "title": "环境变量覆盖",
+    "description": "部分设置由环境变量管理，无法在此处更改。"
+  },
+  "notifications": {
+    "saveFailed": {
+      "title": "无法保存设置"
+    },
+    "saved": {
+      "message": "设置已保存"
+    }
+  },
+  "core": {
+    "returnHttpsUrls": {
+      "label": "返回 HTTPS URL",
+      "description": "返回使用 HTTPS 协议的 URL。"
+    },
+    "trustProxy": {
+      "label": "信任代理",
+      "description": "信任来自下方所列受信任代理的 X-Forwarded-* 标头。需要重启服务器。"
+    },
+    "trustedProxies": {
+      "label": "受信任的代理",
+      "description": "输入反向代理的 IPv4/IPv6 地址或 CIDR，以逗号分隔。只填写受信任的代理，不要填写客户端网络。列表为空时将忽略转发标头，且同一代理后的所有客户端将共享速率限制。需要重启服务器。"
+    },
+    "defaultDomain": {
+      "label": "默认域名",
+      "description": "生成 URL 时使用的域名。此值不应包含协议。"
+    },
+    "tempDirectory": {
+      "label": "临时目录",
+      "description": "存储临时文件的目录。如果路径无效，部分功能可能无法正常工作。需要重启服务器。"
+    }
+  },
+  "chunks": {
+    "enabled": {
+      "label": "启用分片",
+      "description": "启用分片上传。"
+    },
+    "max": {
+      "label": "分片上传阈值",
+      "description": "上传文件超过此大小时将被拆分为分片。"
+    },
+    "size": {
+      "label": "分片大小",
+      "description": "每个分片的大小。"
+    }
+  },
+  "discord": {
+    "main": {
+      "webhookUrl": {
+        "label": "Webhook URL",
+        "description": "接收通知的 Discord Webhook URL"
+      },
+      "username": {
+        "label": "用户名",
+        "description": "发送通知时使用的用户名"
+      },
+      "avatarUrl": {
+        "label": "头像 URL",
+        "description": "Webhook 使用的头像"
+      }
+    },
+    "onUpload": {
+      "title": "上传时"
+    },
+    "onShorten": {
+      "title": "缩短时"
+    },
+    "notification": {
+      "webhookUrl": {
+        "label": "Webhook URL",
+        "description": "接收通知的 Discord Webhook URL。留空则使用主 Webhook URL"
+      },
+      "username": {
+        "label": "用户名",
+        "description": "发送通知时使用的用户名。留空则使用主用户名"
+      },
+      "avatarUrl": {
+        "label": "头像 URL",
+        "description": "Webhook 使用的头像。留空则使用主头像"
+      },
+      "content": {
+        "label": "内容",
+        "description": "通知的内容。可以留空，但内容和嵌入卡片字段至少要填写一项"
+      },
+      "embed": {
+        "label": "嵌入卡片",
+        "description": "以嵌入卡片形式发送通知，可以在下方进行更多自定义。"
+      }
+    },
+    "embed": {
+      "title": {
+        "label": "标题",
+        "description": "嵌入卡片的标题"
+      },
+      "description": {
+        "label": "描述",
+        "description": "嵌入卡片的描述"
+      },
+      "footer": {
+        "label": "页脚",
+        "description": "嵌入卡片的页脚"
+      },
+      "color": {
+        "label": "颜色",
+        "description": "嵌入卡片的颜色"
+      },
+      "thumbnail": {
+        "label": "缩略图",
+        "description": "在嵌入卡片中显示缩略图 (如果文件是图片，则显示文件本身)"
+      },
+      "imageOrVideo": {
+        "label": "图片/视频",
+        "description": "在嵌入卡片中显示图片或视频"
+      },
+      "timestamp": {
+        "label": "时间戳",
+        "description": "在嵌入卡片中显示时间戳"
+      },
+      "url": {
+        "label": "URL",
+        "description": "使标题可点击，并链接到文件的 URL"
+      }
+    }
+  },
+  "domains": {
+    "input": {
+      "description": "输入域名"
+    },
+    "errors": {
+      "exists": "此域名已存在",
+      "updateFailed": "无法更新域名"
+    },
+    "table": {
+      "columns": {
+        "domain": "域名"
+      }
+    },
+    "empty": "尚未添加域名。"
+  },
+  "features": {
+    "imageCompression": {
+      "label": "图片压缩",
+      "description": "允许用户压缩图片。"
+    },
+    "robotsTxt": {
+      "description": "启用 /robots.txt 以阻止搜索引擎爬虫。需要重启服务器。"
+    },
+    "healthcheck": {
+      "label": "健康检查",
+      "description": "启用用于可用性监控的健康检查路由。需要重启服务器。"
+    },
+    "userRegistration": {
+      "label": "用户注册",
+      "description": "允许用户在此服务器上注册账户。"
+    },
+    "oauthRegistration": {
+      "label": "OAuth 注册",
+      "description": "允许用户通过 OAuth 提供方注册账户。"
+    },
+    "deleteOnMaxViews": {
+      "label": "达到最大查看次数时删除",
+      "description": "文件或短链接达到最大查看次数后自动删除。需要重启服务器。"
+    },
+    "metricsEnabled": {
+      "label": "启用统计",
+      "description": "为服务器启用统计功能。需要重启服务器。"
+    },
+    "metricsAdminOnly": {
+      "label": "仅管理员可查看统计",
+      "description": "只有管理员才能查看统计。"
+    },
+    "metricsShowUserSpecific": {
+      "label": "显示各用户统计",
+      "description": "为所有用户显示每个用户各自的统计数据。"
+    },
+    "dividers": {
+      "thumbnails": "缩略图",
+      "versionChecking": "版本检查"
+    },
+    "thumbnailsEnabled": {
+      "label": "启用缩略图",
+      "description": "为视频生成缩略图。需要重启服务器。"
+    },
+    "thumbnailsInstantaneous": {
+      "label": "即时生成缩略图",
+      "description": "文件上传后立即生成缩略图，而不是等待任务运行。"
+    },
+    "thumbnailsNumberThreads": {
+      "label": "缩略图线程数",
+      "description": "生成缩略图时使用的线程数，通常为 CPU 线程数。需要重启服务器。",
+      "placeholder": "输入数字..."
+    },
+    "thumbnailsFormat": {
+      "label": "缩略图格式",
+      "description": "缩略图的输出格式。需要重启服务器。"
+    },
+    "versionChecking": {
+      "label": "版本检查",
+      "description": "从 GitHub 查询更新，并在侧边栏中向所有用户显示状态。"
+    }
+  },
+  "files": {
+    "assumeMimetypes": {
+      "label": "推断 MIME 类型",
+      "description": "根据文件扩展名推断文件的 MIME 类型。"
+    },
+    "disabledTypes": {
+      "label": "禁用的类型",
+      "description": "要禁用的 MIME 类型，以逗号分隔。禁用 MIME 类型时，建议同时启用“推断 MIME 类型”设置，这样也会拦截具有相应扩展名的文件。"
+    },
+    "disabledTypesDefault": {
+      "label": "禁用类型的默认 MIME",
+      "description": "禁用类型使用的默认 MIME 类型。留空则完全拦截禁用的类型。"
+    },
+    "removeGpsMetadata": {
+      "label": "移除 GPS 元数据",
+      "description": "移除文件中的 GPS 元数据。"
+    },
+    "extensionlessUrls": {
+      "label": "无扩展名 URL",
+      "description": "允许使用不带扩展名的文件链接 (例如 /u/uuid 而不是 /u/uuid.png)。上传响应中仍会包含扩展名。"
+    },
+    "route": {
+      "label": "路由",
+      "description": "文件上传使用的路由。需要重启服务器。"
+    },
+    "length": {
+      "label": "长度",
+      "description": "文件名的长度 (适用于随机生成的名称)。"
+    },
+    "defaultFormat": {
+      "label": "默认格式",
+      "description": "文件名使用的默认格式。"
+    },
+    "disabledExtensions": {
+      "label": "禁用的扩展名",
+      "description": "要禁用的扩展名，以逗号分隔。"
+    },
+    "maxFileSize": {
+      "label": "最大文件大小",
+      "description": "允许的最大文件大小。"
+    },
+    "defaultDateFormat": {
+      "label": "默认日期格式",
+      "description": "使用的默认日期格式。"
+    },
+    "defaultExpiration": {
+      "label": "默认过期时间",
+      "description": "文件的默认过期时间。"
+    },
+    "maxExpiration": {
+      "label": "最长过期时间",
+      "description": "文件允许的最长过期时间。"
+    },
+    "randomWordsNumAdjectives": {
+      "label": "随机词形容词数量",
+      "description": "random-words/gfycat 格式使用的形容词数量。"
+    },
+    "randomWordsSeparator": {
+      "label": "随机词分隔符",
+      "description": "random-words/gfycat 格式使用的分隔符。"
+    },
+    "defaultCompressionFormat": {
+      "label": "默认压缩格式",
+      "description": "仅指定了压缩百分比时使用的默认图片压缩格式。"
+    },
+    "maxFilesPerUpload": {
+      "label": "单次上传最大文件数",
+      "description": "每次上传允许的最大文件数量。需要重启服务器。"
+    }
+  },
+  "httpWebhook": {
+    "onUpload": {
+      "label": "上传时",
+      "description": "上传文件时接收 POST 请求的 URL。"
+    },
+    "onShorten": {
+      "label": "缩短时",
+      "description": "缩短 URL 时接收 POST 请求的 URL。"
+    }
+  },
+  "invites": {
+    "enabled": {
+      "label": "启用邀请",
+      "description": "允许使用邀请链接注册新用户。"
+    },
+    "length": {
+      "label": "长度",
+      "description": "邀请码的长度。"
+    }
+  },
+  "mfa": {
+    "passkeysEnabled": {
+      "label": "通行密钥",
+      "description": "允许使用 WebAuthn 通行密钥 (例如手机、安全密钥等) 进行无密码登录。"
+    },
+    "passkeysRpId": {
+      "label": "依赖方 ID",
+      "description": "WebAuthn 通行密钥使用的依赖方 ID (RP ID)。"
+    },
+    "passkeysOrigin": {
+      "label": "源",
+      "description": "WebAuthn 通行密钥使用的源 (Origin)。"
+    },
+    "totpEnabled": {
+      "label": "启用 TOTP",
+      "description": "允许通过身份验证器应用使用基于时间的一次性密码。"
+    },
+    "totpIssuer": {
+      "label": "颁发者",
+      "description": "TOTP 令牌使用的颁发者名称。"
+    }
+  },
+  "oauth": {
+    "intro": "要使 OAuth 正常工作，必须在<anchor>功能</anchor>分区中启用“OAuth 注册”设置。如果遇到问题，请在保存后尝试重启 Zipline。",
+    "bypassLocalLogin": {
+      "label": "跳过本地登录",
+      "description": "跳过本地登录页面，直接重定向到 OAuth 提供方。仅在只启用了一个提供方时有效。"
+    },
+    "loginOnly": {
+      "label": "仅限登录",
+      "description": "禁止注册，只允许通过 OAuth 登录，例如已有用户仍可关联提供方。"
+    },
+    "provider": {
+      "clientId": "{{provider}} 客户端 ID",
+      "clientSecret": "{{provider}} 客户端密钥",
+      "redirectUrl": {
+        "label": "{{provider}} 重定向 URL",
+        "description": "登录时代替主机地址使用的重定向 URL。如果 Zipline 生成的 URL 能正常工作，则无需设置。"
+      }
+    },
+    "discord": {
+      "allowedIds": {
+        "label": "Discord 允许的 ID",
+        "description": "允许登录的 Discord 用户 ID 列表，以逗号分隔。留空则禁用允许列表。"
+      },
+      "deniedIds": {
+        "label": "Discord 拒绝的 ID",
+        "description": "禁止登录的 Discord 用户 ID 列表，以逗号分隔。留空则禁用拒绝列表。"
+      }
+    },
+    "oidc": {
+      "authorizeUrl": "OIDC 授权 URL",
+      "tokenUrl": "OIDC 令牌 URL",
+      "userinfoUrl": "OIDC 用户信息 URL"
+    }
+  },
+  "pwa": {
+    "intro": "启用 PWA 后，请刷新页面以查看更改。",
+    "enabled": {
+      "label": "启用 PWA",
+      "description": "允许用户在其设备上安装 Zipline PWA。"
+    },
+    "title": {
+      "label": "标题",
+      "description": "PWA 的标题"
+    },
+    "shortName": {
+      "label": "简称",
+      "description": "PWA 的简称"
+    },
+    "description": {
+      "label": "描述",
+      "description": "PWA 的描述"
+    },
+    "themeColor": {
+      "label": "主题颜色",
+      "description": "PWA 的主题颜色"
+    },
+    "backgroundColor": {
+      "label": "背景颜色",
+      "description": "PWA 的背景颜色"
+    }
+  },
+  "ratelimit": {
+    "intro": "所有选项都需要重启后才能生效。",
+    "enabled": {
+      "label": "启用速率限制",
+      "description": "为服务器启用速率限制。"
+    },
+    "adminBypass": {
+      "label": "管理员不受限制",
+      "description": "允许管理员绕过速率限制。"
+    },
+    "max": {
+      "label": "最大请求数",
+      "description": "时间窗口内允许的最大请求数。如果未设置时间窗口，则为达到限制前允许的最大请求数。"
+    },
+    "window": {
+      "label": "时间窗口",
+      "description": "允许最大请求数的时间窗口，以秒为单位。"
+    },
+    "allowList": {
+      "label": "允许列表",
+      "description": "可绕过速率限制的 IP 地址列表，以逗号分隔。"
+    }
+  },
+  "tasks": {
+    "intro": "所有选项都需要重启后才能生效。将值设置为 <code>0</code> 将禁用该任务。",
+    "deleteInterval": {
+      "label": "删除文件间隔",
+      "description": "检查并删除过期文件的频率。"
+    },
+    "clearInvitesInterval": {
+      "label": "清理邀请间隔",
+      "description": "检查并清理已过期或已使用邀请的频率。"
+    },
+    "maxViewsInterval": {
+      "label": "最大查看次数检查间隔",
+      "description": "检查并删除已达到最大查看次数的文件的频率。"
+    },
+    "thumbnailsInterval": {
+      "label": "缩略图生成间隔",
+      "description": "检查并为视频文件生成缩略图的频率。"
+    },
+    "cleanThumbnailsInterval": {
+      "label": "缩略图清理间隔",
+      "description": "检查并从文件系统或数据库中删除孤立缩略图的频率。"
+    },
+    "metricsInterval": {
+      "label": "统计间隔",
+      "description": "收集统计数据的频率。设置较小的值可以获得更及时的统计数据，但可能会增加 CPU 占用。"
+    }
+  },
+  "urls": {
+    "route": {
+      "label": "路由",
+      "description": "短链接使用的路由。需要重启服务器。"
+    },
+    "length": {
+      "label": "长度",
+      "description": "短链接的长度 (适用于随机生成的名称)。"
+    }
+  },
+  "website": {
+    "title": {
+      "label": "标题",
+      "description": "显示在浏览器标签页和页面顶部的网站标题。"
+    },
+    "titleLogo": {
+      "label": "标题徽标",
+      "description": "标题徽标使用的 URL。徽标显示在标题左侧。"
+    },
+    "externalLinks": {
+      "label": "外部链接",
+      "description": "显示在页脚中的外部链接。必须是有效的 JSON，格式为包含 \"name\" 和 \"url\" 属性的对象数组。例如：[{\"name\": \"GitHub\", \"url\": \"https://github.com/diced/zipline\"}]"
+    },
+    "errors": {
+      "invalidJson": "JSON 无效"
+    },
+    "loginBackground": {
+      "label": "登录背景",
+      "description": "登录背景使用的 URL。"
+    },
+    "loginBackgroundBlur": {
+      "label": "登录背景模糊",
+      "description": "是否模糊登录背景。"
+    },
+    "defaultAvatar": {
+      "label": "默认头像",
+      "description": "默认头像使用的路径。必须是图片的路径，而不是 URL。"
+    },
+    "tos": {
+      "label": "服务条款",
+      "description": "用作服务条款的 Markdown (.md) 文件路径。"
+    },
+    "defaultTheme": {
+      "label": "默认主题",
+      "description": "网站使用的默认主题。"
+    },
+    "darkTheme": {
+      "label": "深色主题",
+      "description": "默认主题为 \"system\" 时网站使用的深色主题。"
+    },
+    "lightTheme": {
+      "label": "浅色主题",
+      "description": "默认主题为 \"system\" 时网站使用的浅色主题。"
+    }
+  }
+}

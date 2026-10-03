@@ -1,0 +1,45 @@
+{
+  "welcome": "Welcome back, <b>{{username}}</b>",
+  "filesUploaded": "You have <b>{{files}}</b> files uploaded.",
+  "quota": {
+    "bytes": "You have used <b>{{used}}</b> out of <b>{{max}}</b> of storage",
+    "files": "You have uploaded <b>{{files}}</b> files out of <b>{{max}}</b> files allowed.",
+    "urls": "You have created <b>{{urls}}</b> links out of <b>{{max}}</b> links allowed."
+  },
+  "recents": {
+    "title": "Recent files",
+    "viewAll": "View all files",
+    "empty": "You have no recent files. The last three files you uploaded will appear here."
+  },
+  "stats": {
+    "title": "Stats",
+    "viewMetrics": "View instance metrics",
+    "description": "These statistics are based on your uploads only.",
+    "filesUploaded": "Files uploaded",
+    "favoriteFiles": "Favorite files",
+    "storageUsed": "Storage used",
+    "avgStorageUsed": "Average storage used",
+    "fileViews": "File views",
+    "avgFileViews": "Average file views",
+    "linksCreated": "Links created",
+    "linkViews": "Total link views"
+  },
+  "fileTypes": {
+    "title": "File types",
+    "columns": {
+      "type": "File Type",
+      "count": "Count"
+    }
+  },
+  "activity": {
+    "title": "Activity",
+    "description": "Your uploads and logins over the last",
+    "range_one": "{{count}} day",
+    "range_other": "{{count}} days",
+    "uploads": "Uploads",
+    "logins": "Logins",
+    "empty": "No uploads or logins in this period yet",
+    "today": "Today",
+    "yesterday": "Yesterday"
+  }
+}

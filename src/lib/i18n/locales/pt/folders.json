@@ -1,0 +1,139 @@
+{
+  "page": {
+    "title": "Pastas",
+    "titleWithFolder": "Pastas {{separator}} {{name}}",
+    "createFolder": "Criar pasta",
+    "createSubfolder": "Criar subpasta",
+    "folderFiles": "Arquivos de {{name}}",
+    "folderFilesWithCount": "Arquivos de {{name}} ({{files}})"
+  },
+  "create": {
+    "title": "Criar uma pasta",
+    "titleSubfolder": "Criar uma subpasta",
+    "name": {
+      "label": "Nome",
+      "placeholder": "Digite um nome...",
+      "required": "O nome é obrigatório"
+    },
+    "public": {
+      "label": "Pública",
+      "description": "Pastas públicas ficam visíveis para todos"
+    }
+  },
+  "uploadsAlert": {
+    "message": "Esta pasta permite envios anônimos. Compartilhe o link abaixo para que outras pessoas possam enviar arquivos para esta pasta.",
+    "copy": "Copiar URL",
+    "copied": "URL copiada"
+  },
+  "menu": {
+    "moreActions": "Mais ações",
+    "open": "Abrir pasta",
+    "move": "Mover pasta",
+    "export": "Exportar como ZIP",
+    "makePrivate": "Tornar privada",
+    "makePublic": "Tornar pública",
+    "disallowUploads": "Bloquear envios anônimos",
+    "allowUploads": "Permitir envios anônimos",
+    "editName": "Editar nome",
+    "copyUrl": "Copiar URL"
+  },
+  "card": {
+    "created": "Criada em:",
+    "updated": "Atualizada em:",
+    "public": "Pública:",
+    "files": "Arquivos:",
+    "subfolders": "Subpastas:"
+  },
+  "grid": {
+    "empty": "Nenhuma pasta encontrada",
+    "emptyFolder": "Esta pasta está vazia",
+    "createHint": "Crie uma pasta para vê-la aqui"
+  },
+  "table": {
+    "columns": {
+      "name": "Nome",
+      "public": "Pública",
+      "uploads": "Envios?",
+      "created": "Criada em",
+      "updated": "Última atualização",
+      "actions": "Ações"
+    },
+    "subfolders_one": "{{count}} subpasta",
+    "subfolders_many": "{{count}} subpastas",
+    "subfolders_other": "{{count}} subpastas",
+    "noRecords": "Nenhuma subpasta",
+    "copyLink": "Copiar link da pasta",
+    "delete": "Excluir pasta"
+  },
+  "notifications": {
+    "visibilityFailed": "Falha ao alterar a visibilidade da pasta",
+    "visibilityEdited": "Visibilidade da pasta alterada",
+    "nowPublic": "{{name}} agora é pública",
+    "nowPrivate": "{{name}} agora é privada",
+    "uploadsFailed": "Falha ao alterar a política de envios da pasta",
+    "uploadsEdited": "Política de envios da pasta alterada",
+    "uploadsAllowed": "{{name}} agora permite envios anônimos",
+    "uploadsDisallowed": "{{name}} não permite mais envios anônimos"
+  },
+  "delete": {
+    "title": "Excluir \"{{name}}\"?",
+    "cannotUndo": "Esta ação não pode ser desfeita.",
+    "containsFilesAndSubfolders": "Esta pasta contém {{files}} arquivo(s) e {{subfolders}} subpasta(s). O que você deseja fazer com eles?",
+    "containsFiles": "Esta pasta contém {{files}} arquivo(s). O que você deseja fazer com eles?",
+    "containsSubfolders": "Esta pasta contém {{subfolders}} subpasta(s). O que você deseja fazer com elas?",
+    "options": {
+      "root": "Mover o conteúdo para a pasta raiz",
+      "folder": "Mover o conteúdo para outra pasta",
+      "cascade": "Excluir subpastas (arquivos movidos para a raiz)",
+      "cascadeFiles": "Excluir subpastas e os arquivos delas (exclusão em cascata)"
+    },
+    "target": {
+      "label": "Pasta de destino",
+      "placeholder": "Selecione uma pasta"
+    },
+    "warningCascade": "Atenção: isso excluirá permanentemente todas as subpastas desta pasta. Os arquivos serão desvinculados das pastas e movidos para a raiz.",
+    "warningCascadeFiles": "Atenção: isso excluirá permanentemente todas as subpastas desta pasta, junto com todos os arquivos contidos nelas. Os arquivos serão removidos do armazenamento e não poderão ser recuperados.",
+    "confirmCascade": "Excluir \"{{name}}\" e todas as subpastas?",
+    "confirmCascadeFiles": "Excluir \"{{name}}\" e todas as subpastas e arquivos?",
+    "modalCascade": "Todas as subpastas serão excluídas permanentemente (os arquivos serão movidos para a raiz). Esta ação não pode ser desfeita.",
+    "modalCascadeFiles": "Todas as subpastas e todos os arquivos contidos nelas serão excluídos permanentemente do armazenamento. Esta ação não pode ser desfeita.",
+    "submit": "Excluir pasta",
+    "notifications": {
+      "failed": "Falha ao excluir a pasta",
+      "deleted": "Pasta excluída",
+      "deletedMessage": "{{name}} foi excluída",
+      "noTarget": "Nenhuma pasta selecionada",
+      "noTargetMessage": "Selecione uma pasta para onde mover o conteúdo"
+    }
+  },
+  "edit": {
+    "title": "Editar nome da pasta",
+    "label": "Novo nome da pasta",
+    "placeholder": "Digite o novo nome da pasta...",
+    "required": "O nome é obrigatório",
+    "notifications": {
+      "failed": "Erro ao atualizar o nome da pasta",
+      "updated": "Nome da pasta atualizado",
+      "updatedMessage": "O nome da pasta foi atualizado para {{name}}"
+    }
+  },
+  "move": {
+    "title": "Mover \"{{name}}\"",
+    "description": "Selecione uma pasta de destino para esta pasta.",
+    "root": "/ (Raiz)",
+    "destination": {
+      "label": "Destino",
+      "placeholder": "Selecione uma pasta"
+    },
+    "submit": "Mover pasta",
+    "notifications": {
+      "failed": "Falha ao mover a pasta",
+      "moved": "Pasta movida",
+      "movedMessage": "{{name}} foi movida"
+    }
+  },
+  "viewFiles": {
+    "title": "Arquivos em {{name}}",
+    "found": "Arquivos encontrados: {{amount}}"
+  }
+}

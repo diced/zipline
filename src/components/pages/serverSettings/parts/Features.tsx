@@ -11,6 +11,7 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconDeviceFloppy } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { settingsOnSubmit } from '../settingsOnSubmit';
 import useServerSettings from '../useServerSettings';
@@ -28,6 +29,7 @@ export default function Features() {
 
 function Form({ data, isLoading }: { data: Response['/api/server/settings']; isLoading: boolean }) {
   const navigate = useNavigate();
+  const { t } = useTranslation(['serverSettings', 'common']);
 
   const form = useForm({
     initialValues: {
@@ -60,86 +62,86 @@ function Form({ data, isLoading }: { data: Response['/api/server/settings']; isL
     <form onSubmit={form.onSubmit(onSubmit)}>
       <Stack gap='lg'>
         <Switch
-          label='Image Compression'
-          description='Allows the ability for users to compress images.'
+          label={t('features.imageCompression.label')}
+          description={t('features.imageCompression.description')}
           {...form.getInputProps('featuresImageCompression', { type: 'checkbox' })}
         />
 
         <Switch
           label='/robots.txt'
-          description='Enables a /robots.txt to stop search crawlers. Requires a server restart.'
+          description={t('features.robotsTxt.description')}
           {...form.getInputProps('featuresRobotsTxt', { type: 'checkbox' })}
         />
 
         <Switch
-          label='Healthcheck'
-          description='Enables a healthcheck route for uptime monitoring. Requires a server restart.'
+          label={t('features.healthcheck.label')}
+          description={t('features.healthcheck.description')}
           {...form.getInputProps('featuresHealthcheck', { type: 'checkbox' })}
         />
 
         <Switch
-          label='User Registration'
-          description='Allows users to register an account on the server.'
+          label={t('features.userRegistration.label')}
+          description={t('features.userRegistration.description')}
           {...form.getInputProps('featuresUserRegistration', { type: 'checkbox' })}
         />
 
         <Switch
-          label='OAuth Registration'
-          description='Allows users to register an account using OAuth providers.'
+          label={t('features.oauthRegistration.label')}
+          description={t('features.oauthRegistration.description')}
           {...form.getInputProps('featuresOauthRegistration', { type: 'checkbox' })}
         />
 
         <Switch
-          label='Delete on Max Views'
-          description='Automatically deletes files/urls after they reach the maximum view count. Requires a server restart.'
+          label={t('features.deleteOnMaxViews.label')}
+          description={t('features.deleteOnMaxViews.description')}
           {...form.getInputProps('featuresDeleteOnMaxViews', { type: 'checkbox' })}
         />
 
         <Switch
-          label='Enable Metrics'
-          description='Enables metrics for the server. Requires a server restart.'
+          label={t('features.metricsEnabled.label')}
+          description={t('features.metricsEnabled.description')}
           {...form.getInputProps('featuresMetricsEnabled', { type: 'checkbox' })}
         />
 
         <Switch
-          label='Admin Only Metrics'
-          description='Requires an administrator to view metrics.'
+          label={t('features.metricsAdminOnly.label')}
+          description={t('features.metricsAdminOnly.description')}
           {...form.getInputProps('featuresMetricsAdminOnly', { type: 'checkbox' })}
         />
 
         <Switch
-          label='Show User Specific Metrics'
-          description='Shows metrics specific to each user, for all users.'
+          label={t('features.metricsShowUserSpecific.label')}
+          description={t('features.metricsShowUserSpecific.description')}
           {...form.getInputProps('featuresMetricsShowUserSpecific', { type: 'checkbox' })}
         />
 
-        <Divider label='Thumbnails' />
+        <Divider label={t('features.dividers.thumbnails')} />
 
         <SimpleGrid cols={{ base: 1, md: 2 }} spacing='lg'>
           <Switch
-            label='Enable Thumbnails'
-            description='Enables thumbnail generation for images. Requires a server restart.'
+            label={t('features.thumbnailsEnabled.label')}
+            description={t('features.thumbnailsEnabled.description')}
             {...form.getInputProps('featuresThumbnailsEnabled', { type: 'checkbox' })}
           />
           <Switch
-            label='Instantaneous Thumbnails'
-            description='Generates thumbnails immediately after a file is uploaded, instead of waiting for the task to run.'
+            label={t('features.thumbnailsInstantaneous.label')}
+            description={t('features.thumbnailsInstantaneous.description')}
             {...form.getInputProps('featuresThumbnailsInstantaneous', { type: 'checkbox' })}
           />
         </SimpleGrid>
 
         <NumberInput
-          label='Thumbnails Number Threads'
-          description='Number of threads to use for thumbnail generation, usually the number of CPU threads. Requires a server restart.'
-          placeholder='Enter a number...'
+          label={t('features.thumbnailsNumberThreads.label')}
+          description={t('features.thumbnailsNumberThreads.description')}
+          placeholder={t('features.thumbnailsNumberThreads.placeholder')}
           min={1}
           max={16}
           {...form.getInputProps('featuresThumbnailsNumberThreads')}
         />
 
         <Select
-          label='Thumbnails Format'
-          description='The output format for thumbnails. Requires a server restart.'
+          label={t('features.thumbnailsFormat.label')}
+          description={t('features.thumbnailsFormat.description')}
           data={[
             { value: 'jpg', label: '.jpg' },
             { value: 'png', label: '.png' },
@@ -148,17 +150,17 @@ function Form({ data, isLoading }: { data: Response['/api/server/settings']; isL
           {...form.getInputProps('featuresThumbnailsFormat')}
         />
 
-        <Divider label='Version Checking' />
+        <Divider label={t('features.dividers.versionChecking')} />
 
         <Switch
-          label='Version Checking'
-          description='Query GitHub for updates and display the status on the sidebar to all users.'
+          label={t('features.versionChecking.label')}
+          description={t('features.versionChecking.description')}
           {...form.getInputProps('featuresVersionChecking', { type: 'checkbox' })}
         />
       </Stack>
 
       <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
-        Save
+        {t('common:actions.save')}
       </Button>
     </form>
   );

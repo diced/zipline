@@ -10,6 +10,7 @@ import {
   IconTags,
 } from '@tabler/icons-react';
 import { parseAsBoolean, useQueryStates } from 'nuqs';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import PendingFilesModal from './PendingFilesModal';
 import TagsModal from './tags/TagsModal';
@@ -36,6 +37,7 @@ export function useModals() {
 export type DashboardFilesModalsUpdate = ReturnType<typeof useModals>[1];
 
 export default function DashboardFiles() {
+  const { t } = useTranslation('files');
   const view = useViewStore((state) => state.files);
 
   const [modals, setModals] = useModals();
@@ -46,9 +48,9 @@ export default function DashboardFiles() {
       <PendingFilesModal modals={modals} setModals={setModals} />
 
       <Group>
-        <Title>Files</Title>
+        <Title>{t('page.title')}</Title>
 
-        <Tooltip label='Upload a file'>
+        <Tooltip label={t('page.uploadTooltip')}>
           <Link to='/dashboard/upload/file'>
             <ActionIcon variant='outline'>
               <IconFileUpload size='1rem' />
@@ -58,7 +60,7 @@ export default function DashboardFiles() {
 
         <Menu>
           <Menu.Target>
-            <Tooltip label='More actions'>
+            <Tooltip label={t('page.moreActions')}>
               <ActionIcon variant='outline'>
                 <IconDots size='1rem' />
               </ActionIcon>
@@ -69,28 +71,28 @@ export default function DashboardFiles() {
               leftSection={<IconTags size='1rem' />}
               onClick={() => setModals({ tags: !modals.tags })}
             >
-              Manage Tags
+              {t('page.menu.manageTags')}
             </Menu.Item>
             <Menu.Item
               leftSection={<IconFileDots size='1rem' />}
               onClick={() => setModals({ pending: !modals.pending })}
             >
-              View Pending Files
+              {t('page.menu.viewPending')}
             </Menu.Item>
             {view === 'table' && (
               <>
-                <Menu.Label>Table Options</Menu.Label>
+                <Menu.Label>{t('page.menu.tableOptions')}</Menu.Label>
                 <Menu.Item
                   leftSection={<IconGridPatternFilled size='1rem' />}
                   onClick={() => setModals({ idSearch: !modals.idSearch })}
                 >
-                  Search by ID
+                  {t('page.menu.searchById')}
                 </Menu.Item>
                 <Menu.Item
                   leftSection={<IconTableOptions size='1rem' />}
                   onClick={() => setModals({ table: !modals.table })}
                 >
-                  Table Options
+                  {t('page.menu.tableOptions')}
                 </Menu.Item>
               </>
             )}

@@ -1,3 +1,4 @@
+import i18n from '@/lib/i18n';
 import { Anchor } from '@mantine/core';
 import type { useClipboard } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
@@ -8,7 +9,7 @@ export function copyLink(url: string, clipboard: ReturnType<typeof useClipboard>
   clipboard.copy(url);
 
   notifications.show({
-    title: 'Copied link',
+    title: i18n.t('layout:copyLink.title'),
     message: (
       <Anchor component={Link} to={target}>
         {url}

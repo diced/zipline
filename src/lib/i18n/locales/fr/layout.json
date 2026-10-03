@@ -1,0 +1,124 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "metrics": "Statistiques",
+    "files": "Fichiers",
+    "folders": "Dossiers",
+    "upload": "Téléverser",
+    "uploadFile": "Fichier",
+    "uploadText": "Texte",
+    "urls": "Liens courts",
+    "administrator": "Administration",
+    "adminDashboard": "Tableau de bord",
+    "serverSettings": "Paramètres",
+    "serverActions": "Actions",
+    "users": "Utilisateurs",
+    "invites": "Invitations"
+  },
+  "header": {
+    "logoAlt": "Logo de Zipline",
+    "avatarAlt": "Avatar de l'utilisateur"
+  },
+  "userMenu": {
+    "administratorLabel": "{{username}} (administrateur)",
+    "copyToken": "Copier le jeton",
+    "refreshToken": "Régénérer le jeton",
+    "settings": "Paramètres",
+    "serverSettings": "Paramètres du serveur",
+    "logout": "Se déconnecter",
+    "loggingOut": "Déconnexion…"
+  },
+  "token": {
+    "cancel": "Non, fermer cette fenêtre",
+    "copy": {
+      "title": "Copier le jeton ?",
+      "message": "Voulez-vous vraiment copier votre jeton ? Votre jeton peut interagir avec toutes les parties de Zipline. Ne le partagez avec personne."
+    },
+    "copied": {
+      "title": "Copié",
+      "message": "Votre jeton a été copié dans le presse-papiers."
+    },
+    "refresh": {
+      "title": "Régénérer le jeton ?",
+      "message": "Voulez-vous vraiment régénérer votre jeton ? Une fois le jeton régénéré, vous devrez mettre à jour tous les scripts et applications qui l'utilisent."
+    },
+    "refreshed": {
+      "title": "Régénéré",
+      "message": "Votre jeton a été régénéré."
+    }
+  },
+  "version": {
+    "modalTitle": "Version de Zipline",
+    "tooltip": "Cliquez pour afficher plus d'informations sur la version",
+    "latest": "Vous utilisez la dernière version de Zipline.",
+    "unstable": "Vous utilisez une version <b>instable</b> de Zipline. Les versions upstream ne sont pas entièrement testées et peuvent contenir des bogues.",
+    "outdated": "Vous utilisez une version <b>obsolète</b> de Zipline. Il est recommandé de passer à la <anchor>dernière version</anchor>.",
+    "current": "Version actuelle",
+    "fields": {
+      "version": "Version",
+      "commit": "Commit",
+      "upstream": "Upstream ?",
+      "availableToUpdate": "Mise à jour disponible"
+    },
+    "latestCommit": "Dernier commit disponible",
+    "latestCommitNote": "Visible uniquement avec une version upstream.",
+    "available": "{{tag}} est disponible",
+    "changelogs": "Notes de version",
+    "update": "Mettre à jour"
+  },
+  "qrCode": {
+    "title": "Code QR",
+    "alt": "Code QR",
+    "failed": "Impossible de générer le code QR.",
+    "format": "Format",
+    "copyUnsupported": "Certains navigateurs ne permettent pas de copier ce format. Vous pouvez copier l'image normalement avec un clic droit ou un appui prolongé.",
+    "copyImage": "Copier l'image",
+    "copied": "Image du code QR copiée dans le presse-papiers",
+    "copyFailed": "Impossible de copier l'image du code QR"
+  },
+  "domainSelect": {
+    "default": "Domaine par défaut",
+    "description": "Remplace le domaine par cette valeur. Le domaine renvoyé dans vos téléversements sera modifié en conséquence. Laissez vide pour utiliser le domaine par défaut."
+  },
+  "copyLink": {
+    "title": "Lien copié"
+  },
+  "errors": {
+    "generic": {
+      "title": "Une erreur s'est produite",
+      "message": "Un problème est survenu. Réessayez plus tard ou signalez le problème s'il persiste."
+    },
+    "dashboard": {
+      "title": "Erreur client du tableau de bord",
+      "message": "Un problème est survenu lors du chargement du tableau de bord. Réessayez plus tard ou signalez le problème s'il persiste."
+    },
+    "reload": {
+      "title": "Mise à jour disponible",
+      "message": "Une nouvelle version de l'application est disponible. Rechargez la page pour la mettre à jour.",
+      "button": "Recharger la page",
+      "why": "Pourquoi ce message ?",
+      "errorTitle": "Impossible de charger un module importé dynamiquement",
+      "errorMessage": "Cette erreur peut se produire lorsqu'une nouvelle version de l'application est déployée alors que la page est ouverte. Rechargez la page pour passer à la dernière version."
+    }
+  },
+  "notFound": {
+    "message": "Page introuvable",
+    "goHome": "Retour à l'accueil"
+  },
+  "titles": {
+    "settings": "Paramètres",
+    "folders": "Dossiers",
+    "files": "Fichiers",
+    "metrics": "Statistiques",
+    "urls": "Liens courts",
+    "serverSettings": "Paramètres du serveur",
+    "administrator": "Administration",
+    "serverActions": "Actions du serveur",
+    "invites": "Invitations",
+    "uploadFile": "Téléverser un fichier",
+    "uploadText": "Téléverser du texte",
+    "users": "Utilisateurs",
+    "userFiles": "Fichiers de {{username}}",
+    "unknownUserFiles": "Fichiers de l'utilisateur"
+  }
+}

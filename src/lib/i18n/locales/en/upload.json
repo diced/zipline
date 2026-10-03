@@ -1,0 +1,208 @@
+{
+  "actions": {
+    "goToFiles": "Go to files",
+    "clearAll": "Clear all",
+    "upload_one": "Upload {{count}} file ({{size}})",
+    "upload_other": "Upload {{count}} files ({{size}})"
+  },
+  "file": {
+    "title": "Upload files",
+    "dropzone": {
+      "title": "Drag images here or click to select files",
+      "paste": "Or <kbd>{{mod}}</kbd> + <kbd>V</kbd> to paste images from clipboard",
+      "description": "Attach as many files as you like, they will show up below to review before uploading.",
+      "limit": "<b>{{size}}</b> limit per file"
+    },
+    "progress": {
+      "speed": "{{speed}}/s, {{remaining}} remaining",
+      "finalizing": "Finalizing upload(s)..."
+    },
+    "hidden_one": "{{count}} more file hidden",
+    "hidden_other": "{{count}} more files hidden",
+    "showMore": "Show more",
+    "showAll": "Show all",
+    "showAllTooltip": "This may cause performance issues if there are a lot of files",
+    "notifications": {
+      "pasted": {
+        "message": "Image {{name}} pasted from clipboard"
+      },
+      "mayFail": {
+        "title": "Upload may fail",
+        "message": "The upload may fail because the total size of the files (that are not being partially uploaded) you are trying to upload is <b>{{size}}</b>, which is larger than the limit of <b>{{limit}}</b>"
+      }
+    }
+  },
+  "text": {
+    "title": "Upload text",
+    "tabs": {
+      "text": "Text",
+      "preview": "Preview"
+    },
+    "addFile": "Add text file",
+    "fileHeading": "File {{number}}"
+  },
+  "options": {
+    "button": "Options",
+    "title": "Upload Options",
+    "description": "These options will be applied to all files you upload and are saved in your browser.",
+    "saved": "saved",
+    "default": "Default ({{value}})",
+    "never": "never",
+    "clear": "Clear",
+    "deletesAt": {
+      "label": "Deletes at",
+      "description": "The file will automatically delete itself after this time.",
+      "defaultExpiration": "The default expiration time is <b>{{value}}</b> (you can override this with the below option).",
+      "setDefault": "You can set a default expiration time in the <anchor>settings</anchor>.",
+      "maxExpiration": "Note: maximum allowed expiration is <b>{{value}}</b>."
+    },
+    "expirations": {
+      "never": "Never",
+      "minutes5": "5 minutes",
+      "minutes10": "10 minutes",
+      "minutes15": "15 minutes",
+      "minutes30": "30 minutes",
+      "hour1": "1 hour",
+      "hours2": "2 hours",
+      "hours3": "3 hours",
+      "hours4": "4 hours",
+      "hours5": "5 hours",
+      "hours6": "6 hours",
+      "hours8": "8 hours",
+      "hours12": "12 hours",
+      "day1": "1 day",
+      "days3": "3 days",
+      "days5": "5 days",
+      "days7": "7 days",
+      "week1": "1 week",
+      "weeksOneAndHalf": "1.5 weeks",
+      "weeks2": "2 weeks",
+      "weeks3": "3 weeks",
+      "month1": "1 month (30 days)",
+      "monthsOneAndHalf": "1.5 months (~45 days)",
+      "months2": "2 months (60 days)",
+      "months3": "3 months (90 days)",
+      "months4": "4 months (120 days)",
+      "months6": "6 months (0.5 year)",
+      "year1": "1 year",
+      "custom": "Need more freedom? Set an exact date and time through the API."
+    },
+    "format": {
+      "label": "Name Format",
+      "description": "The file name format to use when uploading this file, the \"File name\" field will override this value.",
+      "random": "Random",
+      "date": "Date",
+      "name": "Use file name",
+      "gfycat": "Gfycat-style name"
+    },
+    "compressionFormat": {
+      "label": "Compression Format",
+      "description": "The image compression format to use <b>only when a compression percent is specified</b>. Leave at \"default\" to use the server default compression format."
+    },
+    "compression": {
+      "label": "Compression",
+      "description": "The compression level to use on images (only). The above format will be used to compress images. Leave blank to disable compression."
+    },
+    "maxViews": {
+      "label": "Max Views",
+      "description": "The maximum number of views the files can have before they are deleted. Leave blank to allow as many views as you want."
+    },
+    "folder": {
+      "label": "Add to a Folder",
+      "description": "Add this file to a folder. Use the \"/ (Root)\" option to not add the file to a folder. This value is not saved to your browser, and is cleared after uploading.",
+      "placeholder": "Add to folder...",
+      "root": "/ (Root)"
+    },
+    "domain": {
+      "label": "Override Domain"
+    },
+    "filename": {
+      "label": "Override File Name",
+      "description": "Override the file name with this value. Leave blank to use the \"Name Format\" option. This value is ignored if you are uploading more than one file. This value is not saved to your browser, and is cleared after uploading."
+    },
+    "password": {
+      "label": "Password",
+      "description": "Set a password for these files. Leave blank to disable password protection. This value is not saved to your browser, and is cleared after uploading."
+    },
+    "other": "Other Options",
+    "originalName": {
+      "label": "Add Original Name",
+      "description": "Add the original file name, so that the file can be downloaded with the original name. This will still use the \"Name Format\" option for its file name."
+    },
+    "extensionless": {
+      "label": "Extensionless URL",
+      "description": "Remove the file extension from the returned URL. The file can still be accessed with its extension. This option will only work if the server is configured to allow extensionless URLs."
+    }
+  },
+  "modal": {
+    "title_one": "Uploaded {{count}} file",
+    "title_other": "Uploaded {{count}} files",
+    "open": "Open link in a new tab",
+    "copy": "Copy link to clipboard",
+    "pending_one": "{{count}} large file will finish <anchor>processing in the background.</anchor>",
+    "pending_other": "{{count}} large files will finish <anchor>processing in the background.</anchor>",
+    "copyAllTooltip": "Copy all links to clipboard (separated by a new line)",
+    "copyAll": "Copy {{total}} URLs to clipboard",
+    "notifications": {
+      "copied": {
+        "title": "Copied URL to clipboard"
+      },
+      "copiedAll": {
+        "title": "Copied URLs to clipboard",
+        "message": "Copied all URLs to clipboard separated by a new line."
+      }
+    }
+  },
+  "errors": {
+    "parse": "Failed to parse server response: {{response}}",
+    "unknown": "An unknown error occurred",
+    "network": "Network error while uploading files"
+  },
+  "notifications": {
+    "preparing": {
+      "title_one": "Preparing file",
+      "title_other": "Preparing files",
+      "message_one": "Uploading {{count}} file",
+      "message_other": "Uploading {{count}} files",
+      "messageBatches_one": "Uploading {{count}} file in {{batches}} batches",
+      "messageBatches_other": "Uploading {{count}} files in {{batches}} batches"
+    },
+    "uploading": {
+      "batch": "Uploading batch {{current}}/{{total}}",
+      "title_one": "Uploading file",
+      "title_other": "Uploading files",
+      "message_one": "{{count}} file",
+      "message_other": "{{count}} files"
+    },
+    "complete": {
+      "title": "Upload complete",
+      "titlePartial": "Regular uploads complete",
+      "message_one": "Uploaded {{count}} file",
+      "message_other": "Uploaded {{count}} files",
+      "startingPartials_one": "Starting {{count}} large file upload...",
+      "startingPartials_other": "Starting {{count}} large file uploads...",
+      "messagePartial": "{{uploaded}}. {{starting}}"
+    },
+    "error": {
+      "title": "Error uploading files"
+    },
+    "partial": {
+      "title": "Uploading large file",
+      "titleCount": "Uploading large file ({{current}}/{{total}})",
+      "chunk": "Chunk {{current}}/{{total}}",
+      "error": {
+        "title": "Error uploading file",
+        "message": "{{name}}: {{error}}"
+      },
+      "complete": {
+        "title": "Large file uploads complete",
+        "message_one": "Offloaded {{count}} large file for background processing",
+        "message_other": "Offloaded {{count}} large files for background processing"
+      },
+      "offloaded": {
+        "title": "Large file offloaded",
+        "message": "{{name}} offloaded ({{current}}/{{total}})"
+      }
+    }
+  }
+}

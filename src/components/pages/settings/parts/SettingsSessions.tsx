@@ -6,9 +6,11 @@ import { modals } from '@mantine/modals';
 import { showNotification } from '@mantine/notifications';
 import { IconLogout, IconTrashFilled, IconUsers } from '@tabler/icons-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import useSWR from 'swr';
 
 export default function SettingsSessions() {
+  const { t } = useTranslation(['settings', 'common']);
   const logout = useLogout();
 
   const { data, isLoading, mutate } = useSWR<Response['/api/user/sessions']>('/api/user/sessions');
@@ -17,9 +19,8 @@ export default function SettingsSessions() {
 
   const handleLogOutOfAllDevices = async () => {
     modals.openConfirmModal({
-      title: 'Log out of all devices?',
-      children:
-        'Are you sure you want to log out of all devices? This will log you out of all devices except the current one.',
+      title: t('sessions.modals.logoutAll.title'),
+      children: t('sessions.modals.logoutAll.message'),
       onConfirm: async () => {
         const { error } = await fetchApi('/api/user/sessions', 'DELETE', {
           all: true,
@@ -27,7 +28,7 @@ export default function SettingsSessions() {
 
         if (!error) {
           showNotification({
-            message: 'Logged out of all devices',
+            message: t('sessions.notifications.loggedOutAll'),
             color: 'blue',
             icon: <IconLogout size='1rem' />,
           });
@@ -35,16 +36,16 @@ export default function SettingsSessions() {
         mutate();
       },
       labels: {
-        cancel: 'Cancel',
-        confirm: 'Log out',
+        cancel: t('common:actions.cancel'),
+        confirm: t('sessions.modals.logoutAll.confirm'),
       },
     });
   };
 
   const handleLogOutOfDevice = async (sessionId: string) => {
     modals.openConfirmModal({
-      title: 'Log out of device?',
-      children: 'Are you sure you want to log out of this device?',
+      title: t('sessions.modals.logoutDevice.title'),
+      children: t('sessions.modals.logoutDevice.message'),
       onConfirm: async () => {
         const { error } = await fetchApi('/api/user/sessions', 'DELETE', {
           sessionId,
@@ -52,7 +53,7 @@ export default function SettingsSessions() {
 
         if (!error) {
           showNotification({
-            message: 'Logged out of device',
+            message: t('sessions.notifications.loggedOutDevice'),
             color: 'blue',
             icon: <IconLogout size='1rem' />,
           });
@@ -60,8 +61,8 @@ export default function SettingsSessions() {
         mutate();
       },
       labels: {
-        cancel: 'Cancel',
-        confirm: 'Log out',
+        cancel: t('common:actions.cancel'),
+        confirm: t('sessions.modals.logoutDevice.confirm'),
       },
     });
   };
@@ -81,15 +82,15 @@ export default function SettingsSessions() {
 
   return (
     <>
-      <Modal title='Sessions' opened={open} onClose={() => setOpen(false)} size='lg'>
+      <Modal title={t('sessions.title')} opened={open} onClose={() => setOpen(false)} size='lg'>
         <Paper withBorder>
           {data?.other?.length ? (
             <Table>
               <Table.Thead>
                 <Table.Tr>
-                  <Table.Th>Client</Table.Th>
-                  <Table.Th>Device</Table.Th>
-                  <Table.Th>Logged in at</Table.Th>
+                  <Table.Th>{t('sessions.table.client')}</Table.Th>
+                  <Table.Th>{t('sessions.table.device')}</Table.Th>
+                  <Table.Th>{t('sessions.table.loggedInAt')}</Table.Th>
                   <Table.Th></Table.Th>
                 </Table.Tr>
               </Table.Thead>
@@ -97,7 +98,7 @@ export default function SettingsSessions() {
             </Table>
           ) : (
             <Text c='dimmed' p='md'>
-              No other sessions found
+              {t('sessions.empty')}
             </Text>
           )}
         </Paper>
@@ -109,16 +110,18 @@ export default function SettingsSessions() {
           onClick={handleLogOutOfAllDevices}
           disabled={!data?.other?.length}
         >
-          Log out of all devices
+          {t('sessions.logoutAll')}
         </Button>
       </Modal>
 
       <Paper withBorder p='sm'>
-        <Title order={2}>Sessions</Title>
+        <Title order={2}>{t('sessions.title')}</Title>
 
         <Skeleton visible={isLoading} animate mt='sm'>
           <Text c='dimmed'>
-            You are currently logged into {isLoading ? '...' : (data?.other?.length ?? '...')} other devices
+            {t('sessions.summary', {
+              amount: isLoading ? '...' : (data?.other?.length ?? '...'),
+            })}
           </Text>
         </Skeleton>
 
@@ -134,11 +137,11 @@ export default function SettingsSessions() {
             disabled={isLoading || !data?.other?.length}
             leftSection={<IconUsers size='1rem' />}
           >
-            View sessions
+            {t('sessions.view')}
           </Button>
 
           <Button color='yellow' onClick={logout} leftSection={<IconLogout size='1rem' />}>
-            Log out of this browser
+            {t('sessions.logoutBrowser')}
           </Button>
         </SimpleGrid>
       </Paper>

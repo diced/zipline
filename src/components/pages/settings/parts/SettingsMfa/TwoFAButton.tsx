@@ -19,11 +19,14 @@ import { useMediaQuery } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { IconShieldLockFilled } from '@tabler/icons-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import SafeTrans from '@/components/SafeTrans';
 import { Link } from 'react-router-dom';
 import useSWR, { mutate } from 'swr';
 import { useShallow } from 'zustand/shallow';
 
 export default function TwoFAButton() {
+  const { t } = useTranslation('settings');
   const size = useMediaQuery('(max-width: 600px)') ? 'sm' : 'xl';
   const [user, setUser] = useUserStore(useShallow((state) => [state.user, state.setUser]));
 
@@ -46,7 +49,7 @@ export default function TwoFAButton() {
   const [pinError, setPinError] = useState('');
 
   const enable2fa = async (pin: string) => {
-    if (pin.length !== 6) return setPinError('Invalid pin');
+    if (pin.length !== 6) return setPinError(t('mfa.totp.invalidPin'));
 
     const { data, error } = await fetchApi<Extract<Response['/api/user/mfa/totp'], User>>(
       '/api/user/mfa/totp',
@@ -67,8 +70,8 @@ export default function TwoFAButton() {
       setUser(data);
 
       notifications.show({
-        title: '2FA Enabled',
-        message: 'You have successfully enabled 2FA on your account.',
+        title: t('mfa.totp.notifications.enabled.title'),
+        message: t('mfa.totp.notifications.enabled.message'),
         color: 'green',
         icon: <IconShieldLockFilled size='1rem' />,
       });
@@ -76,7 +79,7 @@ export default function TwoFAButton() {
   };
 
   const disable2fa = async (pin: string) => {
-    if (pin.length !== 6) return setPinError('Invalid pin');
+    if (pin.length !== 6) return setPinError(t('mfa.totp.invalidPin'));
 
     const { data, error } = await fetchApi<Extract<Response['/api/user/mfa/totp'], User>>(
       '/api/user/mfa/totp',
@@ -96,8 +99,8 @@ export default function TwoFAButton() {
       setUser(data);
 
       notifications.show({
-        title: '2FA Disabled',
-        message: 'You have successfully disabled 2FA on your account.',
+        title: t('mfa.totp.notifications.disabled.title'),
+        message: t('mfa.totp.notifications.disabled.message'),
         color: 'green',
         icon: <IconShieldLockFilled size='1rem' />,
       });
@@ -116,7 +119,7 @@ export default function TwoFAButton() {
   return (
     <>
       <Modal
-        title={user?.totpEnabled ? 'Disable Two-Factor Authentication' : 'Enable Two-Factor Authentication'}
+        title={user?.totpEnabled ? t('mfa.totp.modal.disableTitle') : t('mfa.totp.modal.enableTitle')}
         opened={totpOpen}
         onClose={() => setTotpOpen(false)}
         size='md'
@@ -124,45 +127,44 @@ export default function TwoFAButton() {
         <Stack gap='sm'>
           {user?.totpEnabled ? (
             <Text size='sm' c='dimmed'>
-              Enter the 6-digit code from your authenticator app below to confirm disabling 2FA.
+              {t('mfa.totp.modal.disableInstructions')}
             </Text>
           ) : (
             <>
               <Text size='sm' c='dimmed'>
-                <b>Step 1</b> Open/download an authenticator that supports QR code scanning or manual code
-                entry. Popular options include{' '}
-                <Anchor component={Link} to='https://2fas.com/' target='_blank'>
-                  2FAs
-                </Anchor>
-                ,{' '}
-                <Anchor
-                  component={Link}
-                  to='https://support.google.com/accounts/answer/1066447'
-                  target='_blank'
-                >
-                  Google Authenticator
-                </Anchor>
-                ,{' '}
-                <Anchor
-                  component={Link}
-                  to='https://www.microsoft.com/en-us/security/mobile-authenticator-app'
-                  target='_blank'
-                >
-                  Microsoft Authenticator
-                </Anchor>
-                , and{' '}
-                <Anchor
-                  component={Link}
-                  to='https://support.apple.com/guide/iphone/automatically-fill-in-verification-codes-ipha6173c19f/ios'
-                  target='_blank'
-                >
-                  Apple Passwords
-                </Anchor>
-                .
+                <SafeTrans
+                  t={t}
+                  i18nKey='mfa.totp.modal.step1'
+                  components={{
+                    b: <b />,
+                    twofas: <Anchor component={Link} to='https://2fas.com/' target='_blank' />,
+                    google: (
+                      <Anchor
+                        component={Link}
+                        to='https://support.google.com/accounts/answer/1066447'
+                        target='_blank'
+                      />
+                    ),
+                    microsoft: (
+                      <Anchor
+                        component={Link}
+                        to='https://www.microsoft.com/en-us/security/mobile-authenticator-app'
+                        target='_blank'
+                      />
+                    ),
+                    apple: (
+                      <Anchor
+                        component={Link}
+                        to='https://support.apple.com/guide/iphone/automatically-fill-in-verification-codes-ipha6173c19f/ios'
+                        target='_blank'
+                      />
+                    ),
+                  }}
+                />
               </Text>
 
               <Text size='sm' c='dimmed'>
-                <b>Step 2</b> Scan the QR code below with your authenticator app to enable 2FA.
+                <SafeTrans t={t} i18nKey='mfa.totp.modal.step2' components={{ b: <b /> }} />
               </Text>
 
               <Box pos='relative'>
@@ -172,18 +174,27 @@ export default function TwoFAButton() {
                   </Box>
                 ) : (
                   <Center>
-                    <Image h={180} w={180} src={mfaData?.qrcode} alt={'qr code ' + mfaData?.secret} />
+                    <Image
+                      h={180}
+                      w={180}
+                      src={mfaData?.qrcode}
+                      alt={t('mfa.totp.modal.qrAlt', { secret: mfaData?.secret ?? '' })}
+                    />
                   </Center>
                 )}
               </Box>
 
               <Text size='sm' c='dimmed'>
-                If you can&apos;t scan the QR code, you can manually enter the following code into your
-                authenticator app: <Code>{mfaData?.secret ?? ''}</Code>
+                <SafeTrans
+                  t={t}
+                  i18nKey='mfa.totp.modal.manualEntry'
+                  values={{ secret: mfaData?.secret ?? '' }}
+                  components={{ code: <Code /> }}
+                />
               </Text>
 
               <Text size='sm' c='dimmed'>
-                <b>Step 3</b> Enter the 6-digit code from your authenticator app below to confirm 2FA setup.
+                <SafeTrans t={t} i18nKey='mfa.totp.modal.step3' components={{ b: <b /> }} />
               </Text>
             </>
           )}
@@ -216,7 +227,7 @@ export default function TwoFAButton() {
         color={user?.totpEnabled ? 'red' : undefined}
         onClick={() => setTotpOpen(true)}
       >
-        {user?.totpEnabled ? 'Disable 2FA' : 'Enable 2FA'}
+        {user?.totpEnabled ? t('mfa.totp.disable') : t('mfa.totp.enable')}
       </Button>
     </>
   );

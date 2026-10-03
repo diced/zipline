@@ -1,4 +1,5 @@
 import { Response } from '@/lib/api/response';
+import i18n from '@/lib/i18n';
 import { copyLink } from '@/lib/client/copyLink';
 import { Invite } from '@/lib/db/models/invite';
 import { fetchApi } from '@/lib/fetchApi';
@@ -11,9 +12,9 @@ import { mutate } from 'swr';
 
 export async function deleteInvite(warnDeletion: boolean, invite: Invite) {
   conditionalWarning(warnDeletion, {
-    message: `Are you sure you want to delete invite ${invite.code}? This action cannot be undone.`,
+    message: i18n.t('invites:delete.message', { code: invite.code }),
     onConfirm: () => handleDeleteInvite(invite),
-    confirmLabel: `Delete ${invite.code}`,
+    confirmLabel: i18n.t('invites:delete.confirm', { code: invite.code }),
   });
 }
 
@@ -30,15 +31,15 @@ async function handleDeleteInvite(invite: Invite) {
 
   if (error) {
     notifications.show({
-      title: 'Failed to delete invite',
+      title: i18n.t('invites:notifications.deleteFailed.title'),
       message: error.error,
       color: 'red',
       icon: <IconTagOff size='1rem' />,
     });
   } else {
     notifications.show({
-      title: 'Invite deleted',
-      message: `Invite ${data?.code} has been deleted.`,
+      title: i18n.t('invites:notifications.deleted.title'),
+      message: i18n.t('invites:notifications.deleted.message', { code: data?.code }),
       color: 'green',
       icon: <IconCheck size='1rem' />,
     });

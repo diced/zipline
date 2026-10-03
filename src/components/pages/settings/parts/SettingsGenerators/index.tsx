@@ -1,49 +1,54 @@
 import { Anchor, Code, Group, Paper, Text, Title, Image as MantineImage } from '@mantine/core';
 import { IconPrompt } from '@tabler/icons-react';
 import GeneratorButton from './GeneratorButton';
+import { useTranslation } from 'react-i18next';
+import SafeTrans from '@/components/SafeTrans';
 import { Link } from 'react-router-dom';
 
 export default function SettingsGenerators() {
+  const { t } = useTranslation('settings');
+
   return (
     <Paper withBorder p='sm'>
-      <Title order={2}>Generate Uploaders</Title>
+      <Title order={2}>{t('generators.title')}</Title>
       <Text size='sm' c='dimmed' mt={3}>
-        Generate scripts for upload tools. The Flameshot and Shell Script generators are supported on only
-        Linux and macOS.
+        {t('generators.description')}
       </Text>
 
       <Group mt='xs'>
         <GeneratorButton
           name='ShareX'
           icon={
-            <img width={24} height={24} alt='sharex logo' src='https://getsharex.com/img/ShareX_Logo.svg' />
+            <img
+              width={24}
+              height={24}
+              alt={t('generators.logoAlt', { name: 'sharex' })}
+              src='https://getsharex.com/img/ShareX_Logo.svg'
+            />
           }
         />
         <GeneratorButton
           name='Flameshot'
           icon={
-            <img width={24} height={24} alt='flameshot logo' src='https://flameshot.org/flameshot-icon.svg' />
+            <img
+              width={24}
+              height={24}
+              alt={t('generators.logoAlt', { name: 'flameshot' })}
+              src='https://flameshot.org/flameshot-icon.svg'
+            />
           }
           desc={
-            <>
-              To use this script, you need{' '}
-              <Anchor component={Link} to='https://flameshot.org'>
-                Flameshot
-              </Anchor>
-              ,{' '}
-              <Anchor component={Link} to='https://curl.se/'>
-                <Code>curl</Code>
-              </Anchor>
-              ,{' '}
-              <Anchor component={Link} to='https://github.com/stedolan/jq'>
-                <Code>jq</Code>
-              </Anchor>
-              , and{' '}
-              <Anchor component={Link} to='https://github.com/astrand/xclip'>
-                <Code>xclip</Code> (linux only)
-              </Anchor>{' '}
-              installed. This script is intended for use on Linux and macOS only (see options below).
-            </>
+            <SafeTrans
+              t={t}
+              i18nKey='generators.desc.flameshot'
+              components={{
+                flameshotLink: <Anchor component={Link} to='https://flameshot.org' />,
+                curlLink: <Anchor component={Link} to='https://curl.se/' />,
+                jqLink: <Anchor component={Link} to='https://github.com/stedolan/jq' />,
+                xclipLink: <Anchor component={Link} to='https://github.com/astrand/xclip' />,
+                code: <Code />,
+              }}
+            />
           }
         />
         <GeneratorButton
@@ -52,15 +57,16 @@ export default function SettingsGenerators() {
             <MantineImage
               width={24}
               height={24}
-              alt='ishare logo'
+              alt={t('generators.logoAlt', { name: 'ishare' })}
               src='https://raw.githubusercontent.com/itoolio/ishare/refs/tags/v4.2.5/ishare/Util/Assets.xcassets/AppIcon.appiconset/AppIcon-128.png'
             />
           }
           desc={
-            <>
-              This generator requires <Anchor href='https://github.com/itoolio/ishare'>ishare</Anchor> to be
-              installed on macOS. This uploader is intended for use on macOS only.
-            </>
+            <SafeTrans
+              t={t}
+              i18nKey='generators.desc.ishare'
+              components={{ anchor: <Anchor href='https://github.com/itoolio/ishare' /> }}
+            />
           }
         />
         <GeneratorButton
@@ -69,40 +75,34 @@ export default function SettingsGenerators() {
             <MantineImage
               width={24}
               height={24}
-              alt='iTake logo'
+              alt={t('generators.logoAlt', { name: 'iTake' })}
               src='https://raw.githubusercontent.com/SerStars/iTake/refs/heads/main/preview/AppIcon.png'
             />
           }
           desc={
-            <>
-              This generator requires <Anchor href='https://github.com/SerStars/iTake'>iTake</Anchor> to be
-              installed on macOS. This uploader is intended for use on macOS only.
-            </>
+            <SafeTrans
+              t={t}
+              i18nKey='generators.desc.itake'
+              components={{ anchor: <Anchor href='https://github.com/SerStars/iTake' /> }}
+            />
           }
         />
         <GeneratorButton
           name='Shell Script'
+          label={t('generators.shellScript')}
           icon={<IconPrompt size={24} />}
           desc={
-            <>
-              To use this script, you need <Code>bash</Code>,{' '}
-              <Anchor component={Link} to='https://curl.se/'>
-                <Code>curl</Code>
-              </Anchor>
-              ,{' '}
-              <Anchor component={Link} to='https://darwinsys.com/file/'>
-                <Code>file</Code>
-              </Anchor>
-              ,{' '}
-              <Anchor component={Link} to='https://github.com/stedolan/jq'>
-                <Code>jq</Code>
-              </Anchor>
-              , and{' '}
-              <Anchor component={Link} to='https://github.com/astrand/xclip'>
-                <Code>xclip</Code> (linux only)
-              </Anchor>{' '}
-              installed. This script is intended for use on Linux and macOS only (see options below).
-            </>
+            <SafeTrans
+              t={t}
+              i18nKey='generators.desc.shell'
+              components={{
+                curlLink: <Anchor component={Link} to='https://curl.se/' />,
+                fileLink: <Anchor component={Link} to='https://darwinsys.com/file/' />,
+                jqLink: <Anchor component={Link} to='https://github.com/stedolan/jq' />,
+                xclipLink: <Anchor component={Link} to='https://github.com/astrand/xclip' />,
+                code: <Code />,
+              }}
+            />
           }
         />
       </Group>

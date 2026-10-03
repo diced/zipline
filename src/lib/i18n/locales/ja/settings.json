@@ -1,0 +1,384 @@
+{
+  "title": "設定",
+  "loading": "読み込み中...",
+  "user": {
+    "title": "ユーザー",
+    "tokenCopyTooltip": "クリックしてトークンをコピー",
+    "tokenLabel": "トークン",
+    "tokenHidden": "[クリックして表示]",
+    "form": {
+      "username": {
+        "label": "ユーザー名",
+        "required": "ユーザー名は必須です"
+      },
+      "password": {
+        "label": "パスワード",
+        "description": "パスワードを変更しない場合は空欄のままにしてください"
+      },
+      "currentPassword": {
+        "label": "現在のパスワード",
+        "description": "パスワードを変更するには入力が必要です。",
+        "required": "パスワードを変更するには現在のパスワードを入力してください"
+      }
+    },
+    "notifications": {
+      "error": {
+        "title": "ユーザーの更新中にエラーが発生しました"
+      },
+      "updated": {
+        "message": "ユーザーを更新しました"
+      }
+    }
+  },
+  "avatar": {
+    "title": "アバター",
+    "placeholder": "新しいアバターをアップロード...",
+    "previewNew": "新しいアバターのプレビュー",
+    "previewCurrent": "現在のアバターのプレビュー",
+    "proposedAlt": "新しいアバター",
+    "currentAlt": "ユーザーのアバター",
+    "remove": "アバターを削除",
+    "notifications": {
+      "error": {
+        "title": "アバターの更新中にエラーが発生しました"
+      },
+      "updated": {
+        "message": "アバターを更新しました"
+      }
+    }
+  },
+  "sessions": {
+    "title": "セッション",
+    "summary": "現在、ほかに {{amount}} 台のデバイスでログインしています",
+    "view": "セッションを表示",
+    "logoutBrowser": "このブラウザーからログアウト",
+    "logoutAll": "すべてのデバイスからログアウト",
+    "empty": "ほかのセッションはありません",
+    "table": {
+      "client": "クライアント",
+      "device": "デバイス",
+      "loggedInAt": "ログイン日時"
+    },
+    "modals": {
+      "logoutAll": {
+        "title": "すべてのデバイスからログアウトしますか？",
+        "message": "すべてのデバイスからログアウトしてもよろしいですか？現在のデバイスを除くすべてのデバイスからログアウトします。",
+        "confirm": "ログアウト"
+      },
+      "logoutDevice": {
+        "title": "デバイスからログアウトしますか？",
+        "message": "このデバイスからログアウトしてもよろしいですか？",
+        "confirm": "ログアウト"
+      }
+    },
+    "notifications": {
+      "loggedOutAll": "すべてのデバイスからログアウトしました",
+      "loggedOutDevice": "デバイスからログアウトしました"
+    }
+  },
+  "dashboard": {
+    "title": "ダッシュボードの設定",
+    "description": "これらの設定は<b>ブラウザー</b>に自動的に保存されます。",
+    "disableMediaPreview": {
+      "label": "メディアのプレビューを無効化",
+      "description": "ダッシュボードでのファイルのプレビューを無効にします。メディアファイルが多い場合はデータ通信量の節約やダッシュボードの高速化に役立ちますが、ファイルビューアーも無効になり、対応するファイルではプレビューの代わりに汎用のファイルアイコンが表示されます。"
+    },
+    "mediaAutoMuted": {
+      "label": "動画と音声のプレビューをミュート",
+      "description": "有効にすると、ファイルビューアーの動画と音声はミュート状態で自動再生されます。無効にすると、すぐに音声付きで再生しようとします。ページを操作するまで、ブラウザーがミュートなしの自動再生をブロックする場合があります。"
+    },
+    "warnDeletion": {
+      "label": "削除時に警告",
+      "description": "削除する前に警告を表示します。無効にすると、ファイルや短縮 URL などは事前の警告なしに削除されます。フォルダー、ユーザー、一括操作はこの設定の対象外で、削除する前に必ず警告が表示されます。"
+    },
+    "fileNavButtons": {
+      "label": "ファイルのナビゲーションボタン",
+      "description": "ファイルビューアーの左右に前後のファイルへ移動するボタンを表示し、ファイル間を簡単に移動できるようにします。"
+    },
+    "homeShowRecents": {
+      "label": "最近の項目を表示",
+      "description": "ホーム画面に最近のアップロードとログインを表示します。"
+    },
+    "homeShowActivity": {
+      "label": "アクティビティを表示",
+      "description": "ホーム画面に最近のアクティビティをグラフで表示します。"
+    },
+    "homeShowTypes": {
+      "label": "ファイルの種類を表示",
+      "description": "ホーム画面にファイルの種類の表を表示します。"
+    },
+    "fileViewer": {
+      "label": "ファイルビューアー",
+      "description": "ファイルをクリックしたときに開くファイルビューアーを選択します。",
+      "options": {
+        "fullscreen": "全画面 (ベータ)",
+        "default": "既定 (モーダル)"
+      }
+    },
+    "domain": {
+      "label": "既定のドメイン",
+      "description": "ダッシュボード内でコピーするリンクに使用する既定のドメインを設定します。ダッシュボードを配信している現在のドメインを使用する場合は、空欄のままにするか「既定のドメイン」を選択してください。"
+    },
+    "theme": {
+      "label": "テーマ",
+      "description": "ダッシュボードで使用するテーマです。このブラウザーでの表示のみが変わり、ほかのユーザーのテーマは変わりません。",
+      "system": "システム"
+    },
+    "themeDark": {
+      "label": "ダークテーマ",
+      "description": "システムがダークモードのときにダッシュボードで使用するテーマです。"
+    },
+    "themeLight": {
+      "label": "ライトテーマ",
+      "description": "システムがライトモードのときにダッシュボードで使用するテーマです。"
+    }
+  },
+  "fileView": {
+    "title": "ファイルの表示",
+    "variablesHint": "すべてのテキストフィールドで<anchor>変数</anchor>を使用できます。",
+    "disableTextFiles": {
+      "label": "テキストファイルを無効化",
+      "description": "表示ルートでのテキストファイルの表示を無効にします。ほかの種類のファイルには影響せず、表示ルートが無効な場合でも機能します。"
+    },
+    "enabled": {
+      "label": "表示ルートを有効化",
+      "description": "カスタマイズ可能な表示ルートでのファイルの表示を有効にします"
+    },
+    "showMimetype": {
+      "label": "MIME タイプを表示",
+      "description": "表示ルートにファイルの MIME タイプを表示します"
+    },
+    "showTags": {
+      "label": "タグを表示",
+      "description": "表示ルートにファイルのタグを表示します"
+    },
+    "showFolder": {
+      "label": "フォルダーを表示",
+      "description": "可能な場合、表示ルートにフォルダーの名前またはリンクを表示します"
+    },
+    "content": {
+      "label": "表示内容",
+      "description": "表示ルート内のコンテンツを変更します。ほとんどの HTML を使用できますが、JavaScript は使用できません。"
+    },
+    "align": {
+      "label": "表示内容の配置",
+      "description": "表示ルート内のコンテンツの配置を変更します",
+      "options": {
+        "left": "左揃え",
+        "center": "中央揃え",
+        "right": "右揃え"
+      }
+    },
+    "embed": {
+      "label": "埋め込みを有効化",
+      "description": "以下の埋め込みプロパティを有効にします。これらのプロパティは OpenGraph タグを利用します。機能させるには表示ルートを有効にする必要があります。"
+    },
+    "embedMediaOnly": {
+      "label": "メディアのみのリンクプレビュー",
+      "description": "埋め込みが無効な場合でも OpenGraph の画像/動画タグを追加し、Discord などのアプリでメディアのみを展開表示させます (カスタムのタイトル、説明、サイト名は表示されません)。貼り付けた URL はプレーンテキストとしてメッセージに残ります。"
+    },
+    "embedTitle": {
+      "label": "埋め込みのタイトル"
+    },
+    "embedDescription": {
+      "label": "埋め込みの説明"
+    },
+    "embedSiteName": {
+      "label": "埋め込みのサイト名"
+    },
+    "embedColor": {
+      "label": "埋め込みの色"
+    },
+    "notifications": {
+      "error": {
+        "title": "表示設定の更新中にエラーが発生しました"
+      },
+      "updated": {
+        "message": "表示設定を更新しました"
+      }
+    }
+  },
+  "oauth": {
+    "description": "連携している OAuth プロバイダーを管理します。",
+    "link": "{{provider}} アカウントを連携",
+    "unlink": "{{provider}} アカウントの連携を解除",
+    "notifications": {
+      "unlinkFailed": {
+        "title": "アカウントの連携を解除できませんでした"
+      },
+      "unlinked": {
+        "title": "アカウントの連携を解除しました",
+        "message": "{{provider}} アカウントの連携を解除しました。"
+      }
+    }
+  },
+  "mfa": {
+    "title": "多要素認証",
+    "description": "2FA またはパスキーを設定して、アカウントのセキュリティを強化します。",
+    "totp": {
+      "enable": "2FA を有効化",
+      "disable": "2FA を無効化",
+      "modal": {
+        "enableTitle": "二要素認証の有効化",
+        "disableTitle": "二要素認証の無効化",
+        "disableInstructions": "2FA を無効にするには、認証アプリに表示される 6 桁のコードを下に入力してください。",
+        "step1": "<b>ステップ 1</b> QR コードのスキャンまたはコードの手動入力に対応した認証アプリを開くか、ダウンロードします。よく使われるアプリには <twofas>2FAs</twofas>、<google>Google Authenticator</google>、<microsoft>Microsoft Authenticator</microsoft>、<apple>Apple の「パスワード」App</apple> などがあります。",
+        "step2": "<b>ステップ 2</b> 2FA を有効にするには、認証アプリで下の QR コードをスキャンします。",
+        "qrAlt": "QR コード {{secret}}",
+        "manualEntry": "QR コードをスキャンできない場合は、次のコードを認証アプリに手動で入力できます: <code>{{secret}}</code>",
+        "step3": "<b>ステップ 3</b> 2FA の設定を確定するには、認証アプリに表示される 6 桁のコードを下に入力します。"
+      },
+      "invalidPin": "PIN が正しくありません",
+      "notifications": {
+        "enabled": {
+          "title": "2FA を有効にしました",
+          "message": "アカウントの 2FA を有効にしました。"
+        },
+        "disabled": {
+          "title": "2FA を無効にしました",
+          "message": "アカウントの 2FA を無効にしました。"
+        }
+      }
+    },
+    "passkeys": {
+      "manage": "パスキーの管理",
+      "created": "<created />に作成",
+      "createdAndUsed": "<created />に作成、最終使用は<lastUsed />です。",
+      "legacyWarning": "警告: このパスキーは古いバージョンの Zipline で作成されたため、このバージョンでは<b>動作しません</b>。互換性を確保するため、このパスキーを削除して作成し直してください。",
+      "create": "パスキーを作成",
+      "createError": "パスキーの作成中にエラーが発生しました。しばらくしてからもう一度お試しください",
+      "createErrorFallback": "パスキーの作成中にエラーが発生しました",
+      "namePrompt": "後で識別できるように、このパスキーに名前を付けてください。",
+      "namePlaceholder": "パスキー名",
+      "modals": {
+        "remove": {
+          "message": "ブラウザーやデバイスには、ログインの選択肢として「{{name}}」が引き続き表示される場合があります。削除するには、デバイスの設定から手動で削除する必要があります。",
+          "confirm": "「{{name}}」を削除"
+        }
+      },
+      "notifications": {
+        "saveError": {
+          "title": "パスキーの保存中にエラーが発生しました"
+        },
+        "saved": {
+          "title": "パスキーを保存しました！",
+          "message": "パスキーを保存しました。"
+        },
+        "removeError": {
+          "title": "パスキーの削除中にエラーが発生しました"
+        },
+        "removed": {
+          "title": "パスキーを削除しました！",
+          "message": "パスキーを削除しました。"
+        }
+      }
+    }
+  },
+  "exports": {
+    "title": "ファイルのエクスポート",
+    "new": "新規エクスポート",
+    "empty": "エクスポートがありません。上のボタンをクリックして新しいエクスポートを開始してください。",
+    "table": {
+      "id": "ID",
+      "started": "開始日時",
+      "files": "ファイル",
+      "size": "サイズ",
+      "completed": "{{id}} は完了しました",
+      "inProgress": "{{id}} は処理中です"
+    },
+    "modals": {
+      "new": {
+        "title": "新しいエクスポートを開始しますか？",
+        "message": "新しいエクスポートを開始してもよろしいですか？ファイルが多い場合は時間がかかることがあります。",
+        "confirm": "エクスポートを開始"
+      }
+    },
+    "notifications": {
+      "started": {
+        "title": "エクスポートを開始しました",
+        "message": "エクスポートを開始しました。下の表で状況を確認できます"
+      },
+      "deleted": {
+        "message": "エクスポートを削除しました"
+      }
+    }
+  },
+  "generators": {
+    "title": "アップローダーの生成",
+    "description": "アップロードツール用のスクリプトを生成します。Flameshot とシェルスクリプトのジェネレーターは Linux と macOS でのみサポートされています。",
+    "logoAlt": "{{name}} のロゴ",
+    "shellScript": "シェルスクリプト",
+    "desc": {
+      "flameshot": "このスクリプトを使用するには、<flameshotLink>Flameshot</flameshotLink>、<curlLink><code>curl</code></curlLink>、<jqLink><code>jq</code></jqLink>、<xclipLink><code>xclip</code> (Linux のみ)</xclipLink> がインストールされている必要があります。このスクリプトは Linux と macOS 専用です (下のオプションを参照)。",
+      "ishare": "このジェネレーターを使用するには、macOS に <anchor>ishare</anchor> がインストールされている必要があります。このアップローダーは macOS 専用です。",
+      "itake": "このジェネレーターを使用するには、macOS に <anchor>iTake</anchor> がインストールされている必要があります。このアップローダーは macOS 専用です。",
+      "shell": "このスクリプトを使用するには、<code>bash</code>、<curlLink><code>curl</code></curlLink>、<fileLink><code>file</code></fileLink>、<jqLink><code>jq</code></jqLink>、<xclipLink><code>xclip</code> (Linux のみ)</xclipLink> がインストールされている必要があります。このスクリプトは Linux と macOS 専用です (下のオプションを参照)。"
+    },
+    "modal": {
+      "title": "{{name}} アップローダーの生成",
+      "destinationType": {
+        "label": "送信先の種類",
+        "description": "生成する送信先の種類を選択してください",
+        "options": {
+          "file": "ファイルのアップロード",
+          "url": "URL の短縮"
+        }
+      },
+      "format": {
+        "label": "名前の形式",
+        "description": "ファイルをアップロードするときに使用するファイル名の形式です。ファイル名を個別に指定した場合は、そちらが優先されます。",
+        "options": {
+          "default": "既定",
+          "random": "ランダム",
+          "date": "日付",
+          "uuid": "UUID",
+          "name": "ファイル名を使用",
+          "gfycat": "Gfycat 形式の名前"
+        }
+      },
+      "compression": {
+        "label": "圧縮",
+        "description": "画像にのみ適用する圧縮レベルです。圧縮を無効にする場合は空欄のままにしてください。"
+      },
+      "maxViews": {
+        "label": "最大閲覧数",
+        "description": "ファイルや短縮 URL が削除されるまでの最大閲覧数です。閲覧数を制限しない場合は空欄のままにしてください。"
+      },
+      "overrideDomain": {
+        "label": "ドメインの上書き",
+        "description": "この値でドメインを上書きします。アップロード時に返されるドメインが変更されます。既定のドメインを使用する場合は空欄のままにしてください。",
+        "default": "既定のドメイン"
+      },
+      "otherOptions": "その他のオプション",
+      "addOriginalName": {
+        "label": "元のファイル名を追加",
+        "description": "元のファイル名を追加し、ファイルを元の名前でダウンロードできるようにします。ファイル名自体には引き続き「名前の形式」オプションが使用されます。"
+      },
+      "extensionless": {
+        "label": "拡張子なしの URL",
+        "description": "返される URL からファイル拡張子を削除します。拡張子付きでも引き続きファイルにアクセスできます。このオプションは、サーバーが拡張子なしの URL を許可するよう設定されている場合にのみ機能します。"
+      },
+      "xshareCompatibility": {
+        "label": "Xshare との互換性",
+        "description": "Android で Xshare アプリを使用する場合は、互換性のためにこのオプションを有効にしてください。生成された設定は ShareX では動作しません。"
+      },
+      "waylandCompatibility": {
+        "label": "Wayland との互換性を有効化",
+        "description": "クリップボードへのコピーに <code>xclip</code> ではなく <code>wl-copy</code> を使用します。"
+      },
+      "macCompatibility": {
+        "label": "macOS との互換性を有効化",
+        "description": "クリップボードへのコピーに <code>xclip</code> ではなく <code>pbcopy</code> を使用します。"
+      },
+      "compositorUnsupported": {
+        "label": "Gnome、KDE、Sway 以外のデスクトップ環境を使用していますか？",
+        "description": "<anchor>Hyprland</anchor> などのコンポジターを使用している場合、このオプションは <code>XDG_CURRENT_DESKTOP=sway</code> を設定し、Wayland 上での Flameshot のエラーを回避します。Xorg では不要です。"
+      },
+      "useEcho": {
+        "label": "クリップボードにコピーする代わりに <code>echo</code> を使用",
+        "description": "URL をクリップボードにコピーせず、ターミナルに出力するだけにします。"
+      },
+      "waylandHelp": "Wayland で Flameshot がうまく動作しない場合は、<anchor>Wayland ガイド</anchor>を参照してください。"
+    }
+  }
+}

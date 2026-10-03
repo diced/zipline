@@ -1,5 +1,6 @@
 import { Response } from '@/lib/api/response';
 import { UploadOptionsStore } from '@/lib/client/store/uploadOptions';
+import i18n from '@/lib/i18n';
 import { ErrorBody } from '@/lib/response';
 import { ActionIcon, Anchor, Button, Group, Stack, Text, Tooltip } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
@@ -7,6 +8,7 @@ import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import { IconClipboardCopy, IconExternalLink } from '@tabler/icons-react';
 import { Dispatch, SetStateAction } from 'react';
+import SafeTrans from '@/components/SafeTrans';
 import { Link } from 'react-router-dom';
 import { UploadProgress } from './useProgress';
 
@@ -42,7 +44,7 @@ export function handleUploadResponse<R = Response['/api/upload']>(
         data: null,
         error: {
           statusCode: xml.status,
-          error: `Failed to parse server response: ${xml.responseText}`,
+          error: i18n.t('upload:errors.parse', { response: xml.responseText }),
         },
       };
     }
@@ -61,7 +63,7 @@ export function handleUploadResponse<R = Response['/api/upload']>(
       data: null,
       error: {
         statusCode: 500,
-        error: `Failed to parse server response: ${xml.responseText}`,
+        error: i18n.t('upload:errors.parse', { response: xml.responseText }),
       },
     };
   }
@@ -112,7 +114,7 @@ export function showUploadModal(
     clipboard.copy(files[i].url);
 
     notifications.show({
-      title: 'Copied URL to clipboard',
+      title: i18n.t('upload:modal.notifications.copied.title'),
       message: (
         <Anchor component={Link} to={files[i].url} target='_blank'>
           {files[i].url}
@@ -126,7 +128,7 @@ export function showUploadModal(
   const pendingCount = files.filter((file) => file.pending).length;
 
   modals.open({
-    title: `Uploaded ${files.length} file${files.length > 1 ? 's' : ''}`,
+    title: i18n.t('upload:modal.title', { count: files.length }),
     size: 'auto',
     children: (
       <>
@@ -144,12 +146,12 @@ export function showUploadModal(
                 </Anchor>
               </Group>
               <Group justify='right'>
-                <Tooltip label='Open link in a new tab'>
+                <Tooltip label={i18n.t('upload:modal.open')}>
                   <ActionIcon onClick={() => open(i)} variant='filled' color={actionIconColor}>
                     <IconExternalLink size='1rem' />
                   </ActionIcon>
                 </Tooltip>
-                <Tooltip label='Copy link to clipboard'>
+                <Tooltip label={i18n.t('upload:modal.copy')}>
                   <ActionIcon onClick={() => copy(i)} variant='filled' color={actionIconColor}>
                     <IconClipboardCopy size='1rem' />
                   </ActionIcon>
@@ -160,21 +162,31 @@ export function showUploadModal(
         </Stack>
         {pendingCount > 0 && (
           <Text size='sm' c='dimmed' mt='sm'>
-            {pendingCount} large file{pendingCount === 1 ? '' : 's'} will finish{' '}
-            <Anchor component={Link} to='/dashboard/files?pending=true' onClick={() => modals.closeAll()}>
-              processing in the background.
-            </Anchor>
+            <SafeTrans
+              ns='upload'
+              i18nKey='modal.pending'
+              count={pendingCount}
+              components={{
+                anchor: (
+                  <Anchor
+                    component={Link}
+                    to='/dashboard/files?pending=true'
+                    onClick={() => modals.closeAll()}
+                  />
+                ),
+              }}
+            />
           </Text>
         )}
         {showCopyAll && files.length > 1 && (
           <Group justify='right'>
-            <Tooltip label='Copy all links to clipboard (seperated by a new line)'>
+            <Tooltip label={i18n.t('upload:modal.copyAllTooltip')}>
               <Button
                 onClick={() => {
                   clipboard.copy(files.map((file) => file.url).join('\n'));
                   notifications.show({
-                    title: 'Copied URLs to clipboard',
-                    message: 'Copied all URLs to clipboard seperated by a new line.',
+                    title: i18n.t('upload:modal.notifications.copiedAll.title'),
+                    message: i18n.t('upload:modal.notifications.copiedAll.message'),
                     color: 'blue',
                     icon: <IconClipboardCopy size='1rem' />,
                   });
@@ -186,7 +198,7 @@ export function showUploadModal(
                 fullWidth
                 leftSection={<IconClipboardCopy size='1rem' />}
               >
-                Copy {files.length} URLs to clipboard
+                {i18n.t('upload:modal.copyAll', { total: files.length })}
               </Button>
             </Tooltip>
           </Group>

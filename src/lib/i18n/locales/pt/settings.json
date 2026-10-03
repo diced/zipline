@@ -1,0 +1,384 @@
+{
+  "title": "Configurações",
+  "loading": "Carregando…",
+  "user": {
+    "title": "Usuário",
+    "tokenCopyTooltip": "Clique para copiar o token",
+    "tokenLabel": "Token",
+    "tokenHidden": "[clique para revelar]",
+    "form": {
+      "username": {
+        "label": "Nome de usuário",
+        "required": "O nome de usuário é obrigatório"
+      },
+      "password": {
+        "label": "Senha",
+        "description": "Deixe em branco para manter a senha atual"
+      },
+      "currentPassword": {
+        "label": "Senha atual",
+        "description": "Necessária para alterar sua senha.",
+        "required": "Digite sua senha atual para alterá-la"
+      }
+    },
+    "notifications": {
+      "error": {
+        "title": "Erro ao atualizar o usuário"
+      },
+      "updated": {
+        "message": "Usuário atualizado"
+      }
+    }
+  },
+  "avatar": {
+    "title": "Avatar",
+    "placeholder": "Enviar novo avatar...",
+    "previewNew": "Pré-visualização do novo avatar",
+    "previewCurrent": "Pré-visualização do avatar atual",
+    "proposedAlt": "Avatar proposto",
+    "currentAlt": "Avatar do usuário",
+    "remove": "Remover avatar",
+    "notifications": {
+      "error": {
+        "title": "Erro ao atualizar o avatar"
+      },
+      "updated": {
+        "message": "Avatar atualizado"
+      }
+    }
+  },
+  "sessions": {
+    "title": "Sessões",
+    "summary": "Outros dispositivos conectados: {{amount}}",
+    "view": "Ver sessões",
+    "logoutBrowser": "Sair deste navegador",
+    "logoutAll": "Sair de todos os dispositivos",
+    "empty": "Nenhuma outra sessão encontrada",
+    "table": {
+      "client": "Cliente",
+      "device": "Dispositivo",
+      "loggedInAt": "Login em"
+    },
+    "modals": {
+      "logoutAll": {
+        "title": "Sair de todos os dispositivos?",
+        "message": "Tem certeza de que deseja sair de todos os dispositivos? A sessão será encerrada em todos os dispositivos, exceto neste.",
+        "confirm": "Sair"
+      },
+      "logoutDevice": {
+        "title": "Sair do dispositivo?",
+        "message": "Tem certeza de que deseja sair deste dispositivo?",
+        "confirm": "Sair"
+      }
+    },
+    "notifications": {
+      "loggedOutAll": "Você saiu de todos os dispositivos",
+      "loggedOutDevice": "Você saiu do dispositivo"
+    }
+  },
+  "dashboard": {
+    "title": "Configurações do painel",
+    "description": "Estas configurações são salvas automaticamente no seu <b>navegador.</b>",
+    "disableMediaPreview": {
+      "label": "Desativar pré-visualização de mídia",
+      "description": "Desativa as pré-visualizações de arquivos no painel. Isso pode ajudar a economizar dados e deixar o painel mais rápido se você tiver muitos arquivos de mídia, mas também desativa o visualizador de arquivos e mostra um ícone de arquivo genérico em vez da pré-visualização dos arquivos compatíveis."
+    },
+    "mediaAutoMuted": {
+      "label": "Silenciar pré-visualizações de vídeo e áudio",
+      "description": "Quando ativado, vídeos e áudios no visualizador de arquivos são reproduzidos automaticamente sem som. Se desativado, o som será reproduzido imediatamente, se possível. Os navegadores podem bloquear a reprodução automática com som até que você interaja com a página."
+    },
+    "warnDeletion": {
+      "label": "Avisar ao excluir",
+      "description": "Mostra um aviso ao excluir itens. Quando desativado, arquivos, links curtos etc. serão excluídos sem aviso prévio! Pastas, usuários e ações em massa são exceções a esta regra e sempre exibirão um aviso antes de qualquer exclusão."
+    },
+    "fileNavButtons": {
+      "label": "Botões de navegação entre arquivos",
+      "description": "Mostra os botões de anterior/próximo nas laterais do visualizador de arquivos para navegar facilmente entre os arquivos."
+    },
+    "homeShowRecents": {
+      "label": "Mostrar recentes",
+      "description": "Mostra os envios e logins recentes na página inicial."
+    },
+    "homeShowActivity": {
+      "label": "Mostrar atividade",
+      "description": "Mostra sua atividade recente em um gráfico na página inicial."
+    },
+    "homeShowTypes": {
+      "label": "Mostrar tipos de arquivo",
+      "description": "Mostra a tabela de tipos de arquivo na página inicial."
+    },
+    "fileViewer": {
+      "label": "Visualizador de arquivos",
+      "description": "Escolha qual visualizador de arquivos é aberto quando você clica em um arquivo.",
+      "options": {
+        "fullscreen": "Tela cheia (beta)",
+        "default": "Padrão (janela modal)"
+      }
+    },
+    "domain": {
+      "label": "Domínio padrão",
+      "description": "Define o domínio padrão usado nos links copiados em todo o painel. Deixe em branco ou selecione \"Domínio padrão\" para usar o domínio atual em que o painel está sendo acessado."
+    },
+    "theme": {
+      "label": "Tema",
+      "description": "Tema usado no painel. Esta é apenas uma alteração visual no seu navegador e não altera o tema para outros usuários.",
+      "system": "Sistema"
+    },
+    "themeDark": {
+      "label": "Tema escuro",
+      "description": "Tema usado no painel quando o sistema está no modo escuro."
+    },
+    "themeLight": {
+      "label": "Tema claro",
+      "description": "Tema usado no painel quando o sistema está no modo claro."
+    }
+  },
+  "fileView": {
+    "title": "Visualização de arquivos",
+    "variablesHint": "Todos os campos de texto aceitam <anchor>variáveis.</anchor>",
+    "disableTextFiles": {
+      "label": "Desativar arquivos de texto",
+      "description": "Desativa a visualização de arquivos de texto pelas rotas de visualização. Isso não afeta outros tipos de arquivo e funciona mesmo se as rotas de visualização estiverem desativadas."
+    },
+    "enabled": {
+      "label": "Ativar rotas de visualização",
+      "description": "Ativa a visualização de arquivos por rotas de visualização personalizáveis"
+    },
+    "showMimetype": {
+      "label": "Mostrar tipo MIME",
+      "description": "Mostra o tipo MIME do arquivo na rota de visualização"
+    },
+    "showTags": {
+      "label": "Mostrar etiquetas",
+      "description": "Mostra as etiquetas do arquivo na rota de visualização"
+    },
+    "showFolder": {
+      "label": "Mostrar pasta",
+      "description": "Mostra o nome/link da pasta na rota de visualização, se possível"
+    },
+    "content": {
+      "label": "Conteúdo da visualização",
+      "description": "Altera o conteúdo das rotas de visualização. A maior parte do HTML é aceita, mas não é possível usar JavaScript."
+    },
+    "align": {
+      "label": "Alinhamento do conteúdo da visualização",
+      "description": "Altera o alinhamento do conteúdo nas rotas de visualização",
+      "options": {
+        "left": "Esquerda",
+        "center": "Centro",
+        "right": "Direita"
+      }
+    },
+    "embed": {
+      "label": "Ativar incorporação",
+      "description": "Ativa as propriedades de incorporação a seguir. Essas propriedades usam tags OpenGraph. As rotas de visualização precisam estar ativadas para que isso funcione."
+    },
+    "embedMediaOnly": {
+      "label": "Pré-visualização de link só com mídia",
+      "description": "Com a incorporação desativada, ainda adiciona as tags OpenGraph de imagem/vídeo para que o Discord e aplicativos semelhantes exibam apenas a mídia (sem título, descrição ou nome do site personalizados). A URL colada continua na mensagem como texto simples."
+    },
+    "embedTitle": {
+      "label": "Título da incorporação"
+    },
+    "embedDescription": {
+      "label": "Descrição da incorporação"
+    },
+    "embedSiteName": {
+      "label": "Nome do site da incorporação"
+    },
+    "embedColor": {
+      "label": "Cor da incorporação"
+    },
+    "notifications": {
+      "error": {
+        "title": "Erro ao atualizar as configurações de visualização"
+      },
+      "updated": {
+        "message": "Configurações de visualização atualizadas"
+      }
+    }
+  },
+  "oauth": {
+    "description": "Gerencie seus provedores OAuth conectados.",
+    "link": "Vincular conta {{provider}}",
+    "unlink": "Desvincular conta {{provider}}",
+    "notifications": {
+      "unlinkFailed": {
+        "title": "Falha ao desvincular a conta"
+      },
+      "unlinked": {
+        "title": "Conta desvinculada",
+        "message": "Sua conta {{provider}} foi desvinculada."
+      }
+    }
+  },
+  "mfa": {
+    "title": "Autenticação multifator",
+    "description": "Configure a 2FA ou chaves de acesso para adicionar uma camada extra de segurança à sua conta.",
+    "totp": {
+      "enable": "Ativar 2FA",
+      "disable": "Desativar 2FA",
+      "modal": {
+        "enableTitle": "Ativar autenticação em dois fatores",
+        "disableTitle": "Desativar autenticação em dois fatores",
+        "disableInstructions": "Digite abaixo o código de 6 dígitos do seu aplicativo autenticador para confirmar a desativação da 2FA.",
+        "step1": "<b>Passo 1</b> Abra ou baixe um aplicativo autenticador que permita ler códigos QR ou inserir códigos manualmente. Opções populares incluem <twofas>2FAs</twofas>, <google>Google Authenticator</google>, <microsoft>Microsoft Authenticator</microsoft> e <apple>Senhas da Apple</apple>.",
+        "step2": "<b>Passo 2</b> Leia o código QR abaixo com seu aplicativo autenticador para ativar a 2FA.",
+        "qrAlt": "código QR {{secret}}",
+        "manualEntry": "Se não conseguir ler o código QR, você pode inserir manualmente o seguinte código no seu aplicativo autenticador: <code>{{secret}}</code>",
+        "step3": "<b>Passo 3</b> Digite abaixo o código de 6 dígitos do seu aplicativo autenticador para confirmar a configuração da 2FA."
+      },
+      "invalidPin": "Código inválido",
+      "notifications": {
+        "enabled": {
+          "title": "2FA ativada",
+          "message": "Você ativou a 2FA na sua conta."
+        },
+        "disabled": {
+          "title": "2FA desativada",
+          "message": "Você desativou a 2FA na sua conta."
+        }
+      }
+    },
+    "passkeys": {
+      "manage": "Gerenciar chaves de acesso",
+      "created": "Chave de acesso criada <created />",
+      "createdAndUsed": "Chave de acesso criada <created />, usada pela última vez <lastUsed />.",
+      "legacyWarning": "Atenção: esta chave de acesso foi criada com uma versão mais antiga do Zipline e <b>NÃO FUNCIONARÁ</b> com esta versão. Exclua e crie novamente esta chave de acesso para garantir a compatibilidade.",
+      "create": "Criar uma chave de acesso",
+      "createError": "Erro ao criar a chave de acesso. Tente novamente mais tarde",
+      "createErrorFallback": "Ocorreu um erro ao criar a chave de acesso",
+      "namePrompt": "Dê um nome a esta chave de acesso para identificá-la depois.",
+      "namePlaceholder": "Nome da chave de acesso",
+      "modals": {
+        "remove": {
+          "message": "Seu navegador e seu dispositivo ainda podem mostrar \"{{name}}\" como opção de login. Para removê-la, você precisará fazer isso manualmente nas configurações do dispositivo.",
+          "confirm": "Remover \"{{name}}\""
+        }
+      },
+      "notifications": {
+        "saveError": {
+          "title": "Erro ao salvar a chave de acesso"
+        },
+        "saved": {
+          "title": "Chave de acesso salva!",
+          "message": "Sua chave de acesso foi salva com sucesso."
+        },
+        "removeError": {
+          "title": "Erro ao remover a chave de acesso"
+        },
+        "removed": {
+          "title": "Chave de acesso removida!",
+          "message": "Sua chave de acesso foi removida com sucesso."
+        }
+      }
+    }
+  },
+  "exports": {
+    "title": "Exportar arquivos",
+    "new": "Nova exportação",
+    "empty": "Nenhuma exportação encontrada. Clique no botão acima para iniciar uma nova exportação.",
+    "table": {
+      "id": "ID",
+      "started": "Iniciada em",
+      "files": "Arquivos",
+      "size": "Tamanho",
+      "completed": "{{id}} foi concluída",
+      "inProgress": "{{id}} está em andamento"
+    },
+    "modals": {
+      "new": {
+        "title": "Nova exportação?",
+        "message": "Tem certeza de que deseja iniciar uma nova exportação? Se você tiver muitos arquivos, isso pode demorar um pouco.",
+        "confirm": "Iniciar exportação"
+      }
+    },
+    "notifications": {
+      "started": {
+        "title": "Exportação iniciada",
+        "message": "A exportação foi iniciada. Você pode acompanhar o status dela na tabela abaixo"
+      },
+      "deleted": {
+        "message": "A exportação foi excluída"
+      }
+    }
+  },
+  "generators": {
+    "title": "Gerar configurações de envio",
+    "description": "Gere scripts para ferramentas de envio. Os geradores do Flameshot e de script de shell são compatíveis apenas com Linux e macOS.",
+    "logoAlt": "Logotipo do {{name}}",
+    "shellScript": "Script de shell",
+    "desc": {
+      "flameshot": "Para usar este script, você precisa ter instalados o <flameshotLink>Flameshot</flameshotLink>, <curlLink><code>curl</code></curlLink>, <jqLink><code>jq</code></jqLink> e <xclipLink><code>xclip</code> (somente Linux)</xclipLink>. Este script se destina apenas a Linux e macOS (veja as opções abaixo).",
+      "ishare": "Este gerador requer que o <anchor>ishare</anchor> esteja instalado no macOS. Esta configuração de envio se destina apenas ao macOS.",
+      "itake": "Este gerador requer que o <anchor>iTake</anchor> esteja instalado no macOS. Esta configuração de envio se destina apenas ao macOS.",
+      "shell": "Para usar este script, você precisa ter instalados <code>bash</code>, <curlLink><code>curl</code></curlLink>, <fileLink><code>file</code></fileLink>, <jqLink><code>jq</code></jqLink> e <xclipLink><code>xclip</code> (somente Linux)</xclipLink>. Este script se destina apenas a Linux e macOS (veja as opções abaixo)."
+    },
+    "modal": {
+      "title": "Gerar configuração de envio: {{name}}",
+      "destinationType": {
+        "label": "Tipo de destino",
+        "description": "Selecione o tipo de destino que deseja gerar",
+        "options": {
+          "file": "Enviar arquivo",
+          "url": "Encurtar URL"
+        }
+      },
+      "format": {
+        "label": "Formato do nome",
+        "description": "Formato do nome de arquivo usado ao enviar arquivos. O campo \"Nome do arquivo\" tem prioridade sobre este valor.",
+        "options": {
+          "default": "Padrão",
+          "random": "Aleatório",
+          "date": "Data",
+          "uuid": "UUID",
+          "name": "Usar nome do arquivo",
+          "gfycat": "Nome no estilo Gfycat"
+        }
+      },
+      "compression": {
+        "label": "Compressão",
+        "description": "Nível de compressão aplicado (somente) a imagens. Deixe em branco para desativar a compressão."
+      },
+      "maxViews": {
+        "label": "Visualizações máx.",
+        "description": "Número máximo de visualizações que arquivos/links curtos podem ter antes de serem excluídos. Deixe em branco para permitir visualizações ilimitadas."
+      },
+      "overrideDomain": {
+        "label": "Substituir domínio",
+        "description": "Substitui o domínio por este valor. Isso altera o domínio retornado nos seus envios. Deixe em branco para usar o domínio padrão.",
+        "default": "Domínio padrão"
+      },
+      "otherOptions": "Outras opções",
+      "addOriginalName": {
+        "label": "Adicionar nome original",
+        "description": "Adiciona o nome original do arquivo, para que ele possa ser baixado com esse nome. O nome do arquivo em si continuará seguindo a opção \"Formato do nome\"."
+      },
+      "extensionless": {
+        "label": "URL sem extensão",
+        "description": "Remove a extensão do arquivo da URL retornada. O arquivo ainda poderá ser acessado com a extensão. Esta opção só funciona se o servidor estiver configurado para permitir URLs sem extensão."
+      },
+      "xshareCompatibility": {
+        "label": "Compatibilidade com Xshare",
+        "description": "Se você usa o aplicativo Xshare no Android, ative esta opção para garantir a compatibilidade. A configuração gerada não funcionará com o ShareX."
+      },
+      "waylandCompatibility": {
+        "label": "Ativar compatibilidade com Wayland",
+        "description": "Usa <code>wl-copy</code> em vez de <code>xclip</code> para copiar para a área de transferência."
+      },
+      "macCompatibility": {
+        "label": "Ativar compatibilidade com macOS",
+        "description": "Usa <code>pbcopy</code> em vez de <code>xclip</code> para copiar para a área de transferência."
+      },
+      "compositorUnsupported": {
+        "label": "Você usa um ambiente de desktop diferente de GNOME, KDE ou Sway?",
+        "description": "Se você usa um compositor como o <anchor>Hyprland</anchor>, esta opção define <code>XDG_CURRENT_DESKTOP=sway</code> para contornar os erros do Flameshot no Wayland. Isso não é necessário no Xorg."
+      },
+      "useEcho": {
+        "label": "Usar <code>echo</code> em vez de copiar para a área de transferência",
+        "description": "Apenas exibe a URL no terminal em vez de copiá-la para a área de transferência."
+      },
+      "waylandHelp": "Se estiver com problemas para fazer o Flameshot funcionar no Wayland, consulte o <anchor>guia do Wayland</anchor>."
+    }
+  }
+}

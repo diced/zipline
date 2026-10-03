@@ -1,4 +1,4 @@
-import { FieldSettings, NAMES, useFileTableSettingsStore } from '@/lib/client/store/fileTableSettings';
+import { FieldSettings, useFileTableSettingsStore } from '@/lib/client/store/fileTableSettings';
 import {
   closestCenter,
   DndContext,
@@ -12,9 +12,23 @@ import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-
 import { CSS } from '@dnd-kit/utilities';
 import { Button, Checkbox, Group, Modal, Paper, Text } from '@mantine/core';
 import { IconGripVertical } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
 import { useShallow } from 'zustand/shallow';
 
+export const FIELD_NAME_KEYS = {
+  name: 'fields.name',
+  originalName: 'fields.originalName',
+  tags: 'fields.tags',
+  type: 'fields.type',
+  size: 'fields.size',
+  createdAt: 'fields.createdAt',
+  favorite: 'fields.favorite',
+  views: 'fields.views',
+  anonymous: 'fields.anonymous',
+} as const satisfies Record<FieldSettings['field'], string>;
+
 function SortableTableField({ item }: { item: FieldSettings }) {
+  const { t } = useTranslation('files');
   const setVisible = useFileTableSettingsStore((state) => state.setVisible);
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -36,13 +50,14 @@ function SortableTableField({ item }: { item: FieldSettings }) {
 
         <Checkbox checked={item.visible} onChange={() => setVisible(item.field, !item.visible)} />
 
-        <Text>{NAMES[item.field]}</Text>
+        <Text>{t(FIELD_NAME_KEYS[item.field])}</Text>
       </Group>
     </Paper>
   );
 }
 
 export default function TableEditModal({ opened, onClose }: { opened: boolean; onClose: () => void }) {
+  const { t } = useTranslation('files');
   const [fields, setIndex, reset] = useFileTableSettingsStore(
     useShallow((state) => [state.fields, state.setIndex, state.reset]),
   );
@@ -62,9 +77,9 @@ export default function TableEditModal({ opened, onClose }: { opened: boolean; o
   };
 
   return (
-    <Modal opened={opened} onClose={onClose} title='Table Options' centered>
+    <Modal opened={opened} onClose={onClose} title={t('tableOptions.title')} centered>
       <Text mb='md' size='sm' c='dimmed'>
-        Select and drag fields below to make them appear/disappear/reorder in the file table view.
+        {t('tableOptions.description')}
       </Text>
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
@@ -81,7 +96,7 @@ export default function TableEditModal({ opened, onClose }: { opened: boolean; o
       </DndContext>
 
       <Button fullWidth color='red' onClick={() => reset()} variant='light' mt='md'>
-        Reset to Default
+        {t('tableOptions.reset')}
       </Button>
     </Modal>
   );

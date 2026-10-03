@@ -1,0 +1,124 @@
+{
+  "title": "Utilisateurs",
+  "form": {
+    "username": {
+      "label": "Nom d'utilisateur",
+      "placeholder": "Saisissez un nom d'utilisateur…",
+      "required": "Le nom d'utilisateur est requis"
+    },
+    "password": {
+      "label": "Mot de passe",
+      "placeholder": "Saisissez un mot de passe…",
+      "required": "Le mot de passe est requis"
+    },
+    "avatar": {
+      "label": "Avatar",
+      "placeholder": "Sélectionnez un avatar…",
+      "clear": "Retirer l'avatar",
+      "invalidType": "Type de fichier non valide",
+      "readFailed": "Impossible de lire le fichier de l'avatar"
+    },
+    "role": {
+      "label": "Rôle"
+    }
+  },
+  "roles": {
+    "user": "Utilisateur",
+    "administrator": "Administrateur",
+    "admin": "Admin",
+    "superAdmin": "Super admin"
+  },
+  "create": {
+    "title": "Créer un utilisateur"
+  },
+  "edit": {
+    "title": "Modifier {{username}}",
+    "description": "Les champs laissés vides seront ignorés et ne seront pas mis à jour.",
+    "submit": "Mettre à jour l'utilisateur",
+    "quota": {
+      "title": "Quota",
+      "invalidValue": "Valeur non valide",
+      "invalidByteFormat": "Format de taille non valide",
+      "fileType": {
+        "label": "Type de quota de fichiers",
+        "description": "Indique si le quota de fichiers porte sur le nombre total d'octets ou sur le nombre total de fichiers.",
+        "byBytes": "Par octets",
+        "byFiles": "Par nombre de fichiers",
+        "none": "Aucun quota de fichiers"
+      },
+      "maxFiles": {
+        "label": "Fichiers max.",
+        "description": "Nombre maximal de fichiers que l'utilisateur peut téléverser.",
+        "placeholder": "Saisissez un nombre…"
+      },
+      "maxBytes": {
+        "label": "Octets max.",
+        "description": "Nombre maximal d'octets que l'utilisateur peut téléverser.",
+        "placeholder": "Saisissez une taille lisible…"
+      },
+      "maxUrls": {
+        "label": "Liens courts max.",
+        "description": "Nombre maximal de liens courts que l'utilisateur peut créer. Laissez 0 pour un nombre illimité.",
+        "placeholder": "Saisissez un nombre…"
+      }
+    }
+  },
+  "delete": {
+    "title": "Supprimer {{username}} ?",
+    "message": "Voulez-vous vraiment supprimer {{username}} ? Cette action est irréversible.",
+    "data": {
+      "title": "Supprimer les données de {{username}} ?",
+      "message": "Voulez-vous supprimer les fichiers et les liens courts de {{username}} ? Cette action est irréversible.",
+      "cancel": "Non, tout conserver et supprimer uniquement l'utilisateur",
+      "confirm": "Oui, tout supprimer"
+    }
+  },
+  "notifications": {
+    "createFailed": "Impossible de créer l'utilisateur",
+    "created": {
+      "title": "Utilisateur créé",
+      "message": "L'utilisateur {{username}} a été créé"
+    },
+    "editFailed": "Impossible de modifier l'utilisateur",
+    "edited": {
+      "title": "Utilisateur modifié",
+      "message": "L'utilisateur {{username}} a été modifié"
+    },
+    "deleteFailed": "Impossible de supprimer l'utilisateur",
+    "deleted": {
+      "title": "Utilisateur supprimé",
+      "message": "L'utilisateur {{username}} a été supprimé"
+    }
+  },
+  "card": {
+    "id": "ID :",
+    "role": "Rôle :",
+    "created": "Création :",
+    "updated": "Mise à jour :"
+  },
+  "table": {
+    "columns": {
+      "avatar": "Avatar",
+      "username": "Nom d'utilisateur",
+      "role": "Rôle",
+      "created": "Création",
+      "updated": "Dernière mise à jour",
+      "actions": "Actions"
+    },
+    "viewFiles": "Voir les fichiers de l'utilisateur",
+    "edit": "Modifier l'utilisateur",
+    "delete": "Supprimer l'utilisateur"
+  },
+  "grid": {
+    "empty": {
+      "title": "Aucun utilisateur trouvé",
+      "description": "Créez un utilisateur pour le voir ici"
+    }
+  },
+  "viewFiles": {
+    "title": "Fichiers de {{username}}",
+    "back": "Retour aux utilisateurs",
+    "tableOptions": "Options du tableau",
+    "searchById": "Rechercher par ID"
+  }
+}

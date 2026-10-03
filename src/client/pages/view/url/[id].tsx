@@ -1,6 +1,8 @@
 import { useSsrData } from '@/components/ZiplineSSRProvider';
 import { Anchor, Button, Modal, PasswordInput } from '@mantine/core';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import SafeTrans from '@/components/SafeTrans';
 
 export default function ViewUrlId() {
   const data = useSsrData<{
@@ -8,6 +10,7 @@ export default function ViewUrlId() {
     password?: boolean;
     token?: string | null;
   }>();
+  const { t } = useTranslation('view');
   const [passwordValue, setPassword] = useState<string>('');
   const [passwordError, setPasswordError] = useState<string>('');
 
@@ -23,7 +26,7 @@ export default function ViewUrlId() {
   const { url, token } = data;
 
   return password && !token ? (
-    <Modal onClose={() => {}} opened={true} withCloseButton={false} centered title='Password required'>
+    <Modal onClose={() => {}} opened={true} withCloseButton={false} centered title={t('password.title')}>
       <form
         onSubmit={async (e) => {
           e.preventDefault();
@@ -38,12 +41,12 @@ export default function ViewUrlId() {
             const json = (await res.json()) as { token: string };
             window.location.replace(`/view/url/${url.id}?token=${encodeURIComponent(json.token)}`);
           } else {
-            setPasswordError('Invalid password');
+            setPasswordError(t('password.invalid'));
           }
         }}
       >
         <PasswordInput
-          description='This link is password protected, enter password to view it'
+          description={t('password.urlDescription')}
           required
           mb='sm'
           value={passwordValue}
@@ -58,13 +61,18 @@ export default function ViewUrlId() {
           type='submit'
           disabled={passwordValue.trim().length === 0}
         >
-          Verify
+          {t('password.verify')}
         </Button>
       </form>
     </Modal>
   ) : (
     <p>
-      Redirecting to <Anchor href={url.destination!}>{url.destination!}</Anchor>
+      <SafeTrans
+        t={t}
+        i18nKey='url.redirecting'
+        values={{ destination: url.destination! }}
+        components={{ anchor: <Anchor href={url.destination!} /> }}
+      />
     </p>
   );
 }

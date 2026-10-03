@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useConfig } from './ConfigProvider';
 import { Select, TextInput } from '@mantine/core';
 import { IconGlobe } from '@tabler/icons-react';
@@ -7,6 +8,7 @@ export default function DomainSelect({
   onChange,
   ...props
 }: React.ComponentProps<typeof Select> & { onChange?: (value: string) => void }) {
+  const { t } = useTranslation('layout');
   const config = useConfig();
 
   const domains = useMemo(() => {
@@ -18,7 +20,7 @@ export default function DomainSelect({
   }, [config]);
 
   const selectData = [
-    { value: '', label: 'Default domain' },
+    { value: '', label: t('domainSelect.default') },
     ...domains.map((domain) => ({
       value: domain,
       label: domain,
@@ -28,7 +30,7 @@ export default function DomainSelect({
   if (domains.length === 0)
     return (
       <TextInput
-        description='Override the domain with this value. This will change the domain returned in your uploads. Leave blank to use the default domain.'
+        description={t('domainSelect.description')}
         leftSection={<IconGlobe size='1rem' />}
         placeholder='example.com'
         {...(onChange
@@ -43,7 +45,7 @@ export default function DomainSelect({
   return (
     <Select
       data={selectData}
-      description='Override the domain with this value. This will change the domain returned in your uploads. Leave blank to use the default domain.'
+      description={t('domainSelect.description')}
       leftSection={<IconGlobe size='1rem' />}
       {...(onChange
         ? {

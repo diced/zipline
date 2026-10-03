@@ -1,0 +1,185 @@
+{
+  "page": {
+    "title": "Dateien",
+    "uploadTooltip": "Datei hochladen",
+    "moreActions": "Weitere Aktionen",
+    "menu": {
+      "manageTags": "Tags verwalten",
+      "viewPending": "Ausstehende Dateien anzeigen",
+      "tableOptions": "Tabellenoptionen",
+      "searchById": "Nach ID suchen"
+    }
+  },
+  "fields": {
+    "name": "Name",
+    "originalName": "Originalname",
+    "tags": "Tags",
+    "type": "Typ",
+    "size": "Größe",
+    "createdAt": "Erstellt am",
+    "favorite": "Favorit",
+    "views": "Aufrufe",
+    "anonymous": "Anonym?"
+  },
+  "tableOptions": {
+    "title": "Tabellenoptionen",
+    "description": "Wählen Sie unten Felder aus und ziehen Sie sie, um sie in der Tabellenansicht der Dateien ein- oder auszublenden oder neu anzuordnen.",
+    "reset": "Auf Standard zurücksetzen"
+  },
+  "pending": {
+    "title": "Ausstehende Dateien",
+    "count_one": "{{count}} Datei",
+    "count_other": "{{count}} Dateien",
+    "clearCompleted": "Abgeschlossene entfernen",
+    "chunks": "{{complete}}/{{total}} Chunks",
+    "clearEntry": "Eintrag entfernen",
+    "clearEntryLabel": "{{name}} entfernen",
+    "empty": "Keine ausstehenden Dateien",
+    "status": {
+      "pending": "Ausstehend",
+      "processing": "Wird verarbeitet",
+      "complete": "Abgeschlossen",
+      "failed": "Fehlgeschlagen"
+    },
+    "notifications": {
+      "clearedOne": "Ausstehende Datei entfernt!",
+      "clearedCompleted": "Abgeschlossene Dateien entfernt!",
+      "clearOneFailed": "Ausstehende Datei konnte nicht entfernt werden: {{error}}",
+      "clearCompletedFailed": "Abgeschlossene Dateien konnten nicht entfernt werden: {{error}}",
+      "unknownError": "Unbekannter Fehler"
+    }
+  },
+  "bulk": {
+    "delete": {
+      "title_one": "{{count}} Datei löschen?",
+      "title_other": "{{count}} Dateien löschen?",
+      "message_one": "Sie sind dabei, {{count}} Datei zu löschen. Diese Aktion kann nicht rückgängig gemacht werden.",
+      "message_other": "Sie sind dabei, {{count}} Dateien zu löschen. Diese Aktion kann nicht rückgängig gemacht werden.",
+      "loadingTitle": "Dateien werden gelöscht",
+      "loadingMessage_one": "{{count}} Datei wird gelöscht",
+      "loadingMessage_other": "{{count}} Dateien werden gelöscht",
+      "errorTitle": "Fehler beim Löschen der Dateien",
+      "successTitle": "Dateien gelöscht",
+      "successMessage_one": "{{count}} Datei gelöscht",
+      "successMessage_other": "{{count}} Dateien gelöscht"
+    },
+    "favorite": {
+      "title_one": "{{count}} Datei zu Favoriten hinzufügen?",
+      "title_other": "{{count}} Dateien zu Favoriten hinzufügen?",
+      "message_one": "Sie sind dabei, {{count}} Datei zu den Favoriten hinzuzufügen.",
+      "message_other": "Sie sind dabei, {{count}} Dateien zu den Favoriten hinzuzufügen.",
+      "confirm": "Zu Favoriten hinzufügen",
+      "loadingTitle": "Dateien werden zu Favoriten hinzugefügt",
+      "loadingMessage_one": "{{count}} Datei wird zu Favoriten hinzugefügt",
+      "loadingMessage_other": "{{count}} Dateien werden zu Favoriten hinzugefügt",
+      "successTitle": "Zu Favoriten hinzugefügt",
+      "successMessage_one": "{{count}} Datei zu Favoriten hinzugefügt",
+      "successMessage_other": "{{count}} Dateien zu Favoriten hinzugefügt"
+    },
+    "unfavorite": {
+      "title_one": "{{count}} Datei aus Favoriten entfernen?",
+      "title_other": "{{count}} Dateien aus Favoriten entfernen?",
+      "message_one": "Sie sind dabei, {{count}} Datei aus den Favoriten zu entfernen.",
+      "message_other": "Sie sind dabei, {{count}} Dateien aus den Favoriten zu entfernen.",
+      "confirm": "Aus Favoriten entfernen",
+      "loadingTitle": "Dateien werden aus Favoriten entfernt",
+      "loadingMessage_one": "{{count}} Datei wird aus Favoriten entfernt",
+      "loadingMessage_other": "{{count}} Dateien werden aus Favoriten entfernt",
+      "successTitle": "Aus Favoriten entfernt",
+      "successMessage_one": "{{count}} Datei aus Favoriten entfernt",
+      "successMessage_other": "{{count}} Dateien aus Favoriten entfernt"
+    },
+    "modifyErrorTitle": "Fehler beim Ändern der Dateien",
+    "copyLinks": {
+      "title": "Links in die Zwischenablage kopiert",
+      "message_one": "{{count}} Link in die Zwischenablage kopiert",
+      "message_other": "{{count}} Links in die Zwischenablage kopiert"
+    }
+  },
+  "tags": {
+    "title": "Tags",
+    "fileCount_one": "{{count}} Datei",
+    "fileCount_other": "{{count}} Dateien",
+    "edit": "Tag bearbeiten",
+    "delete": "Tag löschen",
+    "empty": "Keine Tags. Klicken Sie auf das Plus-Symbol, um ein Tag zu erstellen.",
+    "form": {
+      "name": {
+        "label": "Name",
+        "placeholder": "Namen eingeben …",
+        "required": "Name ist erforderlich"
+      },
+      "color": {
+        "label": "Farbe",
+        "fromName": "Farbe anhand des Namens wählen",
+        "invalid": "Die Farbe muss mit # beginnen"
+      }
+    },
+    "create": {
+      "title": "Neues Tag erstellen",
+      "submit": "Tag erstellen"
+    },
+    "editModal": {
+      "title": "Tag bearbeiten",
+      "submit": "Tag speichern"
+    },
+    "notifications": {
+      "createFailed": "Tag konnte nicht erstellt werden",
+      "created": "Tag erstellt",
+      "createdMessage": "Tag {{name}} wurde erstellt",
+      "editFailed": "Tag konnte nicht bearbeitet werden",
+      "edited": "Tag bearbeitet",
+      "editedMessage": "Tag {{name}} wurde bearbeitet",
+      "deleteFailed": "Tag konnte nicht gelöscht werden: {{error}}",
+      "deleted": "Tag gelöscht",
+      "deletedMessage": "Tag {{name}} wurde gelöscht"
+    }
+  },
+  "views": {
+    "favoriteFiles": "Favorisierte Dateien",
+    "noFiles": "Keine Dateien gefunden",
+    "uploadFile": "Datei hochladen",
+    "pagination": "Dateien {{from}}–{{to}} von {{total}}"
+  },
+  "table": {
+    "columns": {
+      "name": "Name",
+      "originalName": "Originalname",
+      "tags": "Tags",
+      "type": "Typ",
+      "size": "Größe",
+      "createdAt": "Erstellt am",
+      "favorite": "Favorit?",
+      "views": "Aufrufe",
+      "id": "ID",
+      "anonymous": "Anonym?",
+      "actions": "Aktionen"
+    },
+    "search": {
+      "name": "Nach Namen suchen",
+      "originalName": "Nach Originalnamen suchen",
+      "type": "Nach Typ suchen"
+    },
+    "searchById": "Nach ID suchen",
+    "tagsPlaceholder": "Ein oder mehrere Tags auswählen",
+    "selection": {
+      "summary_one": "Die Auswahl bleibt beim Seitenwechsel erhalten. Aktuell ausgewählt: <b>{{count}}</b> Datei.",
+      "summary_other": "Die Auswahl bleibt beim Seitenwechsel erhalten. Aktuell ausgewählt: <b>{{count}}</b> Dateien.",
+      "delete": "Dateien löschen",
+      "favorite": "Dateien zu Favoriten hinzufügen",
+      "unfavorite": "Dateien aus Favoriten entfernen",
+      "copyLinks": "Dateilinks kopieren",
+      "addToFolder": "Zu Ordner hinzufügen …",
+      "clear": "Auswahl aufheben"
+    },
+    "noRecords": "Keine Dateien",
+    "recordsPerPage": "Einträge pro Seite",
+    "actions": {
+      "details": "Weitere Details",
+      "view": "Datei in neuem Tab anzeigen",
+      "copy": "Dateilink in die Zwischenablage kopieren",
+      "download": "Datei herunterladen",
+      "delete": "Datei löschen"
+    }
+  }
+}

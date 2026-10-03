@@ -17,32 +17,17 @@ import {
 } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { IconFileDots, IconTrashFilled } from '@tabler/icons-react';
-import { ReactNode, useState } from 'react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import useSWR from 'swr';
 import { DashboardFilesModals, DashboardFilesModalsUpdate } from '.';
 
-const badgeMap: Record<IncompleteFileStatus, ReactNode> = {
-  PENDING: (
-    <Badge size='xs' variant='light' color='gray'>
-      Pending
-    </Badge>
-  ),
-  PROCESSING: (
-    <Badge size='xs' variant='light' color='yellow'>
-      Processing
-    </Badge>
-  ),
-  COMPLETE: (
-    <Badge size='xs' variant='light' color='green'>
-      Complete
-    </Badge>
-  ),
-  FAILED: (
-    <Badge size='xs' variant='light' color='red'>
-      Failed
-    </Badge>
-  ),
-};
+const badgeMap = {
+  PENDING: { color: 'gray', label: 'pending.status.pending' },
+  PROCESSING: { color: 'yellow', label: 'pending.status.processing' },
+  COMPLETE: { color: 'green', label: 'pending.status.complete' },
+  FAILED: { color: 'red', label: 'pending.status.failed' },
+} as const satisfies Record<IncompleteFileStatus, { color: string; label: string }>;
 
 export default function PendingFilesModal({
   modals,
@@ -51,6 +36,7 @@ export default function PendingFilesModal({
   modals: DashboardFilesModals;
   setModals: DashboardFilesModalsUpdate;
 }) {
+  const { t } = useTranslation(['files', 'common']);
   const [clearing, setClearing] = useState(false);
   const { data: incompleteFiles, mutate } = useSWR<
     Extract<IncompleteFile[], Response['/api/user/files/incomplete']>
@@ -68,15 +54,22 @@ export default function PendingFilesModal({
       if (error) throw new Error(error.error);
 
       showNotification({
-        message: incompleteFile ? 'Cleared Pending File!' : 'Cleared completed files!',
+        message: incompleteFile
+          ? t('pending.notifications.clearedOne')
+          : t('pending.notifications.clearedCompleted'),
         color: 'green',
         icon: <IconTrashFilled size='1rem' />,
       });
       await mutate();
     } catch (error) {
       showNotification({
-        title: 'Error',
-        message: `Failed to clear ${incompleteFile ? 'pending file' : 'completed files'}: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        title: t('common:status.error'),
+        message: t(
+          incompleteFile
+            ? 'pending.notifications.clearOneFailed'
+            : 'pending.notifications.clearCompletedFailed',
+          { error: error instanceof Error ? error.message : t('pending.notifications.unknownError') },
+        ),
         color: 'red',
         icon: <IconFileDots size='1rem' />,
       });
@@ -89,13 +82,13 @@ export default function PendingFilesModal({
     <Modal
       opened={modals.pending}
       onClose={() => setModals({ pending: false })}
-      title='Pending Files'
+      title={t('pending.title')}
       size='md'
     >
       <Stack gap='xs'>
         <Group justify='space-between'>
           <Text size='sm' c='dimmed'>
-            {incompleteFiles?.length ?? 0} file{incompleteFiles?.length === 1 ? '' : 's'}
+            {t('pending.count', { count: incompleteFiles?.length ?? 0 })}
           </Text>
           <Button
             size='compact-sm'
@@ -105,7 +98,7 @@ export default function PendingFilesModal({
             onClick={() => handleDelete()}
             leftSection={<IconTrashFilled size='1rem' />}
           >
-            Clear completed
+            {t('pending.clearCompleted')}
           </Button>
         </Group>
         {!!incompleteFiles?.length && (
@@ -119,7 +112,7 @@ export default function PendingFilesModal({
                     </Text>
 
                     <Text size='xs' c='dimmed'>
-                      {inf.chunksComplete}/{inf.chunksTotal} chunks
+                      {t('pending.chunks', { complete: inf.chunksComplete, total: inf.chunksTotal })}
                       {inf.status === 'COMPLETE' && (
                         <>
                           , <RelativeDate date={inf.updatedAt} />
@@ -129,13 +122,15 @@ export default function PendingFilesModal({
                   </Stack>
 
                   <Group gap='xs' wrap='nowrap'>
-                    {badgeMap[inf.status]}
+                    <Badge size='xs' variant='light' color={badgeMap[inf.status].color}>
+                      {t(badgeMap[inf.status].label)}
+                    </Badge>
 
-                    <Tooltip label='Clear entry'>
+                    <Tooltip label={t('pending.clearEntry')}>
                       <ActionIcon
                         color='red'
                         variant='outline'
-                        aria-label={`Clear ${inf.metadata.file.filename}`}
+                        aria-label={t('pending.clearEntryLabel', { name: inf.metadata.file.filename })}
                         disabled={clearing}
                         onClick={() => handleDelete(inf)}
                       >
@@ -151,7 +146,7 @@ export default function PendingFilesModal({
 
         {incompleteFiles?.length === 0 && (
           <Paper withBorder px='sm' py='xs'>
-            No pending files
+            {t('pending.empty')}
           </Paper>
         )}
       </Stack>

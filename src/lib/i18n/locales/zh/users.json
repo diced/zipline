@@ -1,0 +1,124 @@
+{
+  "title": "用户",
+  "form": {
+    "username": {
+      "label": "用户名",
+      "placeholder": "输入用户名...",
+      "required": "用户名为必填项"
+    },
+    "password": {
+      "label": "密码",
+      "placeholder": "输入密码...",
+      "required": "密码为必填项"
+    },
+    "avatar": {
+      "label": "头像",
+      "placeholder": "选择头像...",
+      "clear": "清除头像",
+      "invalidType": "文件类型无效",
+      "readFailed": "无法读取头像文件"
+    },
+    "role": {
+      "label": "角色"
+    }
+  },
+  "roles": {
+    "user": "用户",
+    "administrator": "管理员",
+    "admin": "管理员",
+    "superAdmin": "超级管理员"
+  },
+  "create": {
+    "title": "创建新用户"
+  },
+  "edit": {
+    "title": "编辑 {{username}}",
+    "description": "留空的字段将被忽略，不会更新。",
+    "submit": "更新用户",
+    "quota": {
+      "title": "配额",
+      "invalidValue": "值无效",
+      "invalidByteFormat": "字节格式无效",
+      "fileType": {
+        "label": "文件配额类型",
+        "description": "按总字节数还是按文件总数设置文件配额。",
+        "byBytes": "按字节数",
+        "byFiles": "按文件数量",
+        "none": "无文件配额"
+      },
+      "maxFiles": {
+        "label": "最大文件数",
+        "description": "该用户最多可以上传的文件数量。",
+        "placeholder": "输入数字..."
+      },
+      "maxBytes": {
+        "label": "最大字节数",
+        "description": "该用户最多可以上传的字节数。",
+        "placeholder": "输入易读的字节格式..."
+      },
+      "maxUrls": {
+        "label": "最大短链接数",
+        "description": "该用户最多可以创建的短链接数量。设为 0 表示不限制。",
+        "placeholder": "输入数字..."
+      }
+    }
+  },
+  "delete": {
+    "title": "删除 {{username}}？",
+    "message": "确定要删除 {{username}} 吗？此操作无法撤销。",
+    "data": {
+      "title": "删除 {{username}} 的数据？",
+      "message": "是否要删除 {{username}} 的文件和短链接？此操作无法撤销。",
+      "cancel": "否，保留所有数据，仅删除用户",
+      "confirm": "是，全部删除"
+    }
+  },
+  "notifications": {
+    "createFailed": "无法创建用户",
+    "created": {
+      "title": "用户已创建",
+      "message": "用户 {{username}} 已创建"
+    },
+    "editFailed": "无法编辑用户",
+    "edited": {
+      "title": "用户已更新",
+      "message": "用户 {{username}} 已更新"
+    },
+    "deleteFailed": "无法删除用户",
+    "deleted": {
+      "title": "用户已删除",
+      "message": "用户 {{username}} 已删除"
+    }
+  },
+  "card": {
+    "id": "ID：",
+    "role": "角色：",
+    "created": "创建时间：",
+    "updated": "更新时间："
+  },
+  "table": {
+    "columns": {
+      "avatar": "头像",
+      "username": "用户名",
+      "role": "角色",
+      "created": "创建时间",
+      "updated": "最后更新时间",
+      "actions": "操作"
+    },
+    "viewFiles": "查看用户的文件",
+    "edit": "编辑用户",
+    "delete": "删除用户"
+  },
+  "grid": {
+    "empty": {
+      "title": "未找到用户",
+      "description": "创建用户后将显示在这里"
+    }
+  },
+  "viewFiles": {
+    "title": "{{username}} 的文件",
+    "back": "返回用户列表",
+    "tableOptions": "表格选项",
+    "searchById": "按 ID 搜索"
+  }
+}

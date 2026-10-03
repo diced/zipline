@@ -23,6 +23,22 @@
     "prefer-const": "error",
     "prefer-rest-params": "error",
     "prefer-spread": "error",
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          {
+            "name": "react-i18next",
+            "importNames": ["Trans"],
+            "message": "Use SafeTrans from @/components/SafeTrans, it escapes interpolated values."
+          },
+          {
+            "name": "react-i18next/TransWithoutContext",
+            "message": "Use SafeTrans from @/components/SafeTrans, it escapes interpolated values."
+          }
+        ]
+      }
+    ],
 
     "typescript/ban-ts-comment": "off",
     "typescript/no-explicit-any": "off",

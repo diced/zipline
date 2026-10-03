@@ -15,11 +15,13 @@ import { IconFileUpload, IconFilesOff } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 import { useApiPagination } from '../useApiPagination';
 import { lazy, Suspense } from 'react';
+import { useTranslation } from 'react-i18next';
 import { parseAsInteger, useQueryState } from 'nuqs';
 
 const DashboardFile = lazy(() => import('@/components/file/DashboardFile'));
 
 export default function FavoriteFiles() {
+  const { t } = useTranslation('files');
   const [page, setPage] = useQueryState('fpage', parseAsInteger.withDefault(1));
 
   const { data, isLoading } = useApiPagination({
@@ -35,7 +37,7 @@ export default function FavoriteFiles() {
   return (
     <Accordion variant='separated' my='xs'>
       <Accordion.Item value='favorite'>
-        <Accordion.Control>Favorite Files</Accordion.Control>
+        <Accordion.Control>{t('views.favoriteFiles')}</Accordion.Control>
 
         <Accordion.Panel>
           <SimpleGrid
@@ -64,7 +66,7 @@ export default function FavoriteFiles() {
                   <Stack>
                     <Group>
                       <IconFilesOff size='2rem' />
-                      <Title order={2}>No files found</Title>
+                      <Title order={2}>{t('views.noFiles')}</Title>
                     </Group>
                     <Button
                       variant='outline'
@@ -73,7 +75,7 @@ export default function FavoriteFiles() {
                       component={Link}
                       to='/dashboard/upload/file'
                     >
-                      Upload a file
+                      {t('views.uploadFile')}
                     </Button>
                   </Stack>
                 </Center>

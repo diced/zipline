@@ -1,0 +1,180 @@
+{
+  "notifications": {
+    "deleted": {
+      "title": "ファイルを削除しました",
+      "message": "{{name}} を削除しました"
+    },
+    "favorited": {
+      "title": "お気に入りに追加しました",
+      "message": "{{name}} をお気に入りに追加しました"
+    },
+    "unfavorited": {
+      "title": "お気に入りから削除しました",
+      "message": "{{name}} をお気に入りから削除しました"
+    },
+    "createFolderError": {
+      "title": "フォルダーの作成中にエラーが発生しました"
+    },
+    "folderCreated": {
+      "title": "フォルダーを作成しました",
+      "message": "{{name}} を含むフォルダー {{folder}} を作成しました"
+    },
+    "removeFromFolderError": {
+      "title": "フォルダーから外す際にエラーが発生しました"
+    },
+    "removedFromFolder": {
+      "title": "ファイルをフォルダーから外しました",
+      "message": "{{name}} を {{folder}} から外しました"
+    },
+    "addToFolderError": {
+      "title": "フォルダーへの追加中にエラーが発生しました"
+    },
+    "addedToFolder": {
+      "title": "ファイルをフォルダーに追加しました",
+      "message": "{{name}} を {{folder}} に追加しました"
+    },
+    "addMultipleToFolderError": {
+      "title": "ファイルをフォルダーに追加する際にエラーが発生しました"
+    },
+    "addedMultipleToFolder": {
+      "title": "ファイルをフォルダーに追加しました",
+      "message": "{{count}} 個のファイルを {{folder}} に追加しました"
+    },
+    "saveTagsError": {
+      "title": "タグを保存できませんでした"
+    },
+    "tagsSaved": {
+      "title": "タグを保存しました",
+      "message": "ファイル {{name}} のタグを {{count}} 個保存しました"
+    },
+    "removePasswordError": {
+      "title": "パスワードを解除できませんでした..."
+    },
+    "passwordRemoved": {
+      "title": "パスワードを解除しました！",
+      "message": "ファイルのパスワードを解除しました。"
+    },
+    "saveChangesError": {
+      "title": "変更を保存できませんでした..."
+    },
+    "changesSaved": {
+      "title": "変更を保存しました！",
+      "message": "ファイルへの変更を保存しました。"
+    }
+  },
+  "delete": {
+    "confirm": "{{name}} を削除",
+    "message": "{{name}} を削除してもよろしいですか？この操作は元に戻せません。"
+  },
+  "contextMenu": {
+    "openInNewTab": "新しいタブで開く",
+    "copyLink": "リンクをコピー",
+    "copyRawLink": "直接リンクをコピー",
+    "favorite": "お気に入りに追加",
+    "unfavorite": "お気に入りから削除",
+    "removeFromFolder": "フォルダーから外す",
+    "moveToFolder": "フォルダーに移動",
+    "searchFolders": "フォルダーを検索...",
+    "createNamedFolder": "+「{{name}}」を作成",
+    "noFolders": "フォルダーはまだありません",
+    "createNewFolder": "+ 新しいフォルダーを作成",
+    "editDetails": "詳細を編集"
+  },
+  "createFolderModal": {
+    "title": "フォルダーの作成",
+    "name": {
+      "label": "フォルダー名",
+      "placeholder": "マイフォルダー"
+    }
+  },
+  "stats": {
+    "type": "種類",
+    "size": "サイズ",
+    "createdAt": "作成日時",
+    "updatedAt": "更新日時",
+    "deletesAt": "削除予定日時",
+    "views": "閲覧数",
+    "originalName": "元のファイル名",
+    "anonymous": "匿名"
+  },
+  "details": {
+    "title": "詳細",
+    "tags": {
+      "title": "タグ",
+      "placeholder": "タグを 1 つ以上選択",
+      "empty": "タグが見つかりません。このメニューの外で作成してください。"
+    },
+    "folder": {
+      "title": "フォルダー",
+      "remove": "フォルダー「{{name}}」から外す",
+      "placeholder": "フォルダーに追加...",
+      "empty": "フォルダーがありません。入力を始めると、このファイル用の新しいフォルダーを作成できます。",
+      "create": "+ フォルダー「{{name}}」を作成"
+    }
+  },
+  "actions": {
+    "editDetails": "ファイルの詳細を編集",
+    "delete": "ファイルを削除",
+    "favorite": "ファイルをお気に入りに追加",
+    "unfavorite": "ファイルをお気に入りから削除",
+    "viewInNewTab": "新しいタブでファイルを表示",
+    "openInNewTab": "新しいタブで開く",
+    "copyRawLink": "ファイルの直接リンクをコピー",
+    "copyLink": "ファイルのリンクをコピー",
+    "download": "ファイルをダウンロード",
+    "showDetails": "詳細を表示",
+    "hideDetails": "詳細を非表示",
+    "previous": "前のファイル",
+    "next": "次のファイル"
+  },
+  "edit": {
+    "title": "「{{name}}」を編集中",
+    "name": {
+      "label": "名前",
+      "description": "ファイルの名前を変更します。"
+    },
+    "maxViews": {
+      "label": "最大閲覧数",
+      "placeholder": "無制限",
+      "description": "このファイルが削除されるまでの最大閲覧数です。閲覧数を制限しない場合は空欄のままにしてください。"
+    },
+    "originalName": {
+      "label": "元のファイル名",
+      "description": "元のファイル名を追加します。このファイルをダウンロードすると、生成されたファイル名 (選択した場合) の代わりに、この「元のファイル名」でダウンロードされます。"
+    },
+    "type": {
+      "label": "種類",
+      "description": "ファイルの MIME タイプを変更します。内容を理解していない限り、<b>この値は変更しないでください</b>。Zipline が特定のファイル形式を表示する方法に影響する可能性があります。"
+    },
+    "password": {
+      "label": "パスワード",
+      "description": "このファイルにパスワードを設定します。パスワード保護を無効にする場合は空欄のままにしてください。"
+    },
+    "removePassword": "パスワードを解除",
+    "save": "変更を保存"
+  },
+  "preview": {
+    "clickToView": "クリックしてファイル {{name}} を表示",
+    "clickToViewProtected": "クリックして保護されたファイル {{name}} を表示",
+    "clickToPlayVideo": "クリックして動画 {{name}} を再生",
+    "clickToPlayAudio": "クリックして音声 {{name}} を再生",
+    "clickToViewText": "クリックしてテキスト {{name}} を表示",
+    "clickToDownloadCast": "クリックして asciinema キャスト {{name}} をダウンロード",
+    "clickToViewPdf": "クリックして PDF {{name}} を表示",
+    "clickToViewInNewTab": "クリックして新しいタブでファイル {{name}} を表示",
+    "videoThumbnailAlt": "動画のサムネイル",
+    "imageAlt": "画像",
+    "loading": "ファイルを読み込んでいます...",
+    "loadError": "ファイルの読み込み中にエラーが発生しました。",
+    "tooBig": "\n...\nファイルが大きすぎるため表示できません。ダウンロードアイコンをクリックして表示またはダウンロードしてください。"
+  },
+  "render": {
+    "renderedThrough": "このファイルは {{renderer}} でレンダリングされています",
+    "canRenderThrough": "このファイルは {{renderer}} でレンダリングできます",
+    "showRendered": "レンダリング結果を表示",
+    "hideRendered": "レンダリング結果を非表示",
+    "katexError": "KaTeX エラー",
+    "showLess": "折りたたむ",
+    "showMore": "さらに表示 (残り {{count}} 行)"
+  }
+}

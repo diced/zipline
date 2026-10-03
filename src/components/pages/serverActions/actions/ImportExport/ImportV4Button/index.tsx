@@ -6,14 +6,30 @@ import { Button, FileButton, Modal, Pill, Text } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import { showNotification, updateNotification } from '@mantine/notifications';
 import { IconDatabaseImport, IconDatabaseOff, IconUpload, IconX } from '@tabler/icons-react';
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import SafeTrans from '@/components/SafeTrans';
 import { mutate } from 'swr';
 import Export4Details from './Export4Details';
 import Export4ImportSettings from './Export4ImportSettings';
 import Export4UserChoose from './Export4UserChoose';
 import Export4WarningSameInstance, { detectSameInstance } from './Export4WarningSameInstance';
 
+const IMPORTED_STATS = [
+  ['importExport.v4.completed.stats.users', 'users'],
+  ['importExport.v4.completed.stats.oauthProviders', 'oauthProviders'],
+  ['importExport.v4.completed.stats.quotas', 'quotas'],
+  ['importExport.v4.completed.stats.passkeys', 'passkeys'],
+  ['importExport.v4.completed.stats.folders', 'folders'],
+  ['importExport.v4.completed.stats.files', 'files'],
+  ['importExport.v4.completed.stats.tags', 'tags'],
+  ['importExport.v4.completed.stats.urls', 'urls'],
+  ['importExport.v4.completed.stats.invites', 'invites'],
+  ['importExport.v4.completed.stats.metrics', 'metrics'],
+] as const;
+
 export default function ImportV4Button() {
+  const { t } = useTranslation(['serverActions', 'common']);
   const [open, setOpen] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [export4, setExport4] = useState<Export4 | null>(null);
@@ -39,9 +55,8 @@ export default function ImportV4Button() {
     if (!validated.success) {
       console.error('Failed to validate import data', validated);
       showNotification({
-        title: 'There were errors with the import',
-        message:
-          "Zipline couldn't validate the import data. Are you sure it's a valid export from Zipline v4? For more details about the error, check the browser console.",
+        title: t('importExport.notifications.invalid.title'),
+        message: t('importExport.v4.invalidMessage'),
         color: 'red',
         icon: <IconDatabaseOff size='1rem' />,
         autoClose: 10000,
@@ -64,7 +79,7 @@ export default function ImportV4Button() {
 
     if (error) {
       showNotification({
-        title: 'Failed to import settings',
+        title: t('importExport.notifications.settingsFailed.title'),
         message: error.issues
           ? error.issues.map((x: { message: string }) => x.message).join('\n')
           : error.error,
@@ -72,8 +87,8 @@ export default function ImportV4Button() {
       });
     } else {
       showNotification({
-        title: 'Settings imported',
-        message: 'To ensure that all settings take effect, it is recommended to restart Zipline.',
+        title: t('importExport.notifications.settingsImported.title'),
+        message: t('importExport.v4.settingsImportedMessage'),
         color: 'green',
       });
 
@@ -89,28 +104,25 @@ export default function ImportV4Button() {
     if (isSameInstance && !sameInstanceAgree) {
       modals.openContextModal({
         modal: 'alert',
-        title: 'Same Instance Detected',
+        title: t('importExport.v4.sameInstance.title'),
         innerProps: {
-          modalBody:
-            'Detected that you are importing data from the same instance as the current running one. You must agree to the warning before proceeding with the import.',
+          modalBody: t('importExport.v4.sameInstance.modalBody'),
         },
       });
       return;
     }
 
     modals.openConfirmModal({
-      title: 'Are you sure?',
-      children:
-        'This process will NOT overwrite existing data but will append to it. In case of conflicts, the imported data will be skipped and logged.',
+      title: t('common:warning.title'),
+      children: t('importExport.v4.confirm.message'),
       labels: {
-        confirm: 'Yes, import data.',
-        cancel: 'Cancel',
+        confirm: t('importExport.v4.confirm.label'),
+        cancel: t('common:actions.cancel'),
       },
       onConfirm: async () => {
         showNotification({
-          title: 'Importing data...',
-          message:
-            'The export file will be uploaded. This amy take a few moments. The import is running in the background and is logged, so you can close this browser tab if you want.',
+          title: t('importExport.v4.importing.title'),
+          message: t('importExport.v4.importing.message'),
           color: 'blue',
           autoClose: 5000,
           id: 'importing-data',
@@ -135,9 +147,8 @@ export default function ImportV4Button() {
 
         if (error) {
           updateNotification({
-            title: 'Failed to import data...',
-            message:
-              error.error ?? 'An error occurred while importing data. Check the logs for more details.',
+            title: t('importExport.v4.failed.title'),
+            message: error.error ?? t('importExport.v4.failed.message'),
             color: 'red',
             icon: <IconDatabaseOff size='1rem' />,
             id: 'importing-data',
@@ -147,45 +158,22 @@ export default function ImportV4Button() {
           if (!data) return;
 
           modals.open({
-            title: 'Import Completed.',
+            title: t('importExport.v4.completed.title'),
             children: (
               <Text size='md'>
-                The import has been completed. To make sure files are properly viewable, make sure that you
-                have configured the datasource correctly to match your previous instance. For example, if you
-                were using local storage before, make sure to set it to the same directory (or same backed up
-                directory) as before. If you are using S3, make sure you are using the same bucket. <br />{' '}
-                <br />
-                Additionally, it is recommended to restart Zipline to ensure all settings take full effect.
+                <SafeTrans t={t} i18nKey='importExport.v4.completed.message' components={{ br: <br /> }} />
                 <br /> <br />
-                <b>Users: </b>
-                {data.imported.users} imported.
-                <br />
-                <b>OAuth Providers: </b>
-                {data.imported.oauthProviders} imported.
-                <br />
-                <b>Quotas: </b>
-                {data.imported.quotas} imported.
-                <br />
-                <b>Passkeys: </b>
-                {data.imported.passkeys} imported.
-                <br />
-                <b>Folders: </b>
-                {data.imported.folders} imported.
-                <br />
-                <b>Files: </b>
-                {data.imported.files} imported.
-                <br />
-                <b>Tags: </b>
-                {data.imported.tags} imported.
-                <br />
-                <b>URLs: </b>
-                {data.imported.urls} imported.
-                <br />
-                <b>Invites: </b>
-                {data.imported.invites} imported.
-                <br />
-                <b>Metrics: </b>
-                {data.imported.metrics} imported.
+                {IMPORTED_STATS.map(([key, stat], i) => (
+                  <Fragment key={key}>
+                    {i > 0 && <br />}
+                    <SafeTrans
+                      t={t}
+                      i18nKey={key}
+                      values={{ count: data.imported[stat] }}
+                      components={{ b: <b /> }}
+                    />
+                  </Fragment>
+                ))}
               </Text>
             ),
           });
@@ -211,7 +199,7 @@ export default function ImportV4Button() {
 
   return (
     <>
-      <Modal opened={open} onClose={() => setOpen(false)} title='Import V4 Data' size='xl'>
+      <Modal opened={open} onClose={() => setOpen(false)} title={t('importExport.v4.title')} size='xl'>
         {export4 ? (
           <Button
             onClick={() => {
@@ -220,12 +208,12 @@ export default function ImportV4Button() {
             }}
             color='red'
             variant='filled'
-            aria-label='Clear'
+            aria-label={t('importExport.clearAriaLabel')}
             mb='xs'
             leftSection={<IconX size='1rem' />}
             fullWidth
           >
-            Clear Import
+            {t('importExport.clear')}
           </Button>
         ) : (
           <FileButton onChange={setFile} accept='application/json'>
@@ -238,7 +226,7 @@ export default function ImportV4Button() {
                   leftSection={<IconUpload size='1rem' />}
                   fullWidth
                 >
-                  Upload Export (JSON)
+                  {t('importExport.upload')}
                 </Button>
               </>
             )}
@@ -264,13 +252,13 @@ export default function ImportV4Button() {
 
         {export4 && (
           <Button onClick={handleImport} fullWidth leftSection={<IconDatabaseImport size='1rem' />} mt='xs'>
-            Import Data
+            {t('importExport.importData')}
           </Button>
         )}
       </Modal>
 
       <Button size='xl' rightSection={<Pill>V4</Pill>} onClick={() => setOpen(true)}>
-        Import
+        {t('importExport.import')}
       </Button>
     </>
   );

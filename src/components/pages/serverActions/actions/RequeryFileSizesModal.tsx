@@ -4,8 +4,10 @@ import { Button, Group, Modal, Stack, Switch } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { IconFileSearch } from '@tabler/icons-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function RequeryFileSizesModal({ opened, onClose }: { opened: boolean; onClose: () => void }) {
+  const { t } = useTranslation(['serverActions', 'common']);
   const [forceUpdate, setForceUpdate] = useState(false);
   const [forceDelete, setForceDelete] = useState(false);
 
@@ -32,24 +34,21 @@ export default function RequeryFileSizesModal({ opened, onClose }: { opened: boo
   };
 
   return (
-    <Modal title='Are you sure?' opened={opened} onClose={onClose}>
+    <Modal title={t('common:warning.title')} opened={opened} onClose={onClose}>
       <Stack mb='md'>
-        <span>
-          This will requery the size of every file stored within the database. Additionally you can use the
-          options below.
-        </span>
+        <span>{t('modals.requeryFileSizes.body')}</span>
 
         <Switch
-          label='Force Update'
-          description='Force update the size of every file, even if it already has a size set.'
+          label={t('modals.requeryFileSizes.forceUpdate.label')}
+          description={t('modals.requeryFileSizes.forceUpdate.description')}
           checked={forceUpdate}
           onChange={() => setForceUpdate((val) => !val)}
           color='red'
         />
 
         <Switch
-          label='Force Delete'
-          description='Delete files that are not found in the database, or have a size of 0.'
+          label={t('modals.requeryFileSizes.forceDelete.label')}
+          description={t('modals.requeryFileSizes.forceDelete.description')}
           checked={forceDelete}
           onChange={() => setForceDelete((val) => !val)}
           color='red'
@@ -57,9 +56,9 @@ export default function RequeryFileSizesModal({ opened, onClose }: { opened: boo
       </Stack>
 
       <Group justify='flex-end'>
-        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={onClose}>{t('common:actions.cancel')}</Button>
         <Button color='red' onClick={handle}>
-          Requery
+          {t('modals.requeryFileSizes.confirm')}
         </Button>
       </Group>
     </Modal>

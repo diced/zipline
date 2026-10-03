@@ -3,6 +3,7 @@ import { fetchApi } from '@/lib/fetchApi';
 import { Button, Group, Modal, Text } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { IconTrashFilled } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
 import useSWR from 'swr';
 
 export default function ClearZeroByteFilesModal({
@@ -12,6 +13,7 @@ export default function ClearZeroByteFilesModal({
   opened: boolean;
   onClose: () => void;
 }) {
+  const { t } = useTranslation(['serverActions', 'common']);
   const { data } = useSWR<Response['/api/server/clear_zeros']>('/api/server/clear_zeros');
 
   const handle = async () => {
@@ -31,13 +33,13 @@ export default function ClearZeroByteFilesModal({
   };
 
   return (
-    <Modal title='Are you sure?' opened={opened} onClose={onClose}>
-      <Text>This will delete {data?.files?.length ?? 0} files from the database and datasource.</Text>
+    <Modal title={t('common:warning.title')} opened={opened} onClose={onClose}>
+      <Text>{t('modals.clearZeroByteFiles.body', { count: data?.files?.length ?? 0 })}</Text>
 
       <Group justify='flex-end' mt='md'>
-        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={onClose}>{t('common:actions.cancel')}</Button>
         <Button color='red' onClick={handle}>
-          Yes, delete
+          {t('modals.confirmDelete')}
         </Button>
       </Group>
     </Modal>

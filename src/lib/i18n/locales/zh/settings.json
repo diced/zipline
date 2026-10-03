@@ -1,0 +1,384 @@
+{
+  "title": "设置",
+  "loading": "正在加载...",
+  "user": {
+    "title": "用户",
+    "tokenCopyTooltip": "点击复制令牌",
+    "tokenLabel": "令牌",
+    "tokenHidden": "[点击显示]",
+    "form": {
+      "username": {
+        "label": "用户名",
+        "required": "用户名为必填项"
+      },
+      "password": {
+        "label": "密码",
+        "description": "留空则保持密码不变"
+      },
+      "currentPassword": {
+        "label": "当前密码",
+        "description": "更改密码时必须填写。",
+        "required": "请输入当前密码以更改密码"
+      }
+    },
+    "notifications": {
+      "error": {
+        "title": "更新用户时出错"
+      },
+      "updated": {
+        "message": "用户信息已更新"
+      }
+    }
+  },
+  "avatar": {
+    "title": "头像",
+    "placeholder": "上传新头像...",
+    "previewNew": "新头像预览",
+    "previewCurrent": "当前头像预览",
+    "proposedAlt": "新头像",
+    "currentAlt": "用户头像",
+    "remove": "移除头像",
+    "notifications": {
+      "error": {
+        "title": "更新头像时出错"
+      },
+      "updated": {
+        "message": "头像已更新"
+      }
+    }
+  },
+  "sessions": {
+    "title": "会话",
+    "summary": "已登录的其他设备数：{{amount}}",
+    "view": "查看会话",
+    "logoutBrowser": "在此浏览器上退出登录",
+    "logoutAll": "在所有设备上退出登录",
+    "empty": "未找到其他会话",
+    "table": {
+      "client": "客户端",
+      "device": "设备",
+      "loggedInAt": "登录时间"
+    },
+    "modals": {
+      "logoutAll": {
+        "title": "在所有设备上退出登录？",
+        "message": "确定要在所有设备上退出登录吗？除当前设备外，你将在其他所有设备上退出登录。",
+        "confirm": "退出登录"
+      },
+      "logoutDevice": {
+        "title": "在此设备上退出登录？",
+        "message": "确定要在此设备上退出登录吗？",
+        "confirm": "退出登录"
+      }
+    },
+    "notifications": {
+      "loggedOutAll": "已在所有设备上退出登录",
+      "loggedOutDevice": "已在此设备上退出登录"
+    }
+  },
+  "dashboard": {
+    "title": "控制台设置",
+    "description": "这些设置会自动保存在你的<b>浏览器中。</b>",
+    "disableMediaPreview": {
+      "label": "禁用媒体预览",
+      "description": "禁用控制台中的文件预览。如果你有大量媒体文件，这有助于节省流量并加快控制台的速度，但同时也会禁用文件查看器，并对支持预览的文件显示通用文件图标而不是预览。"
+    },
+    "mediaAutoMuted": {
+      "label": "静音播放视频和音频预览",
+      "description": "启用后，文件查看器中的视频和音频将静音自动播放。关闭此选项后会尝试立即播放声音。在你与页面交互之前，浏览器可能会阻止有声自动播放。"
+    },
+    "warnDeletion": {
+      "label": "删除前警告",
+      "description": "删除内容时显示警告。禁用后，文件、短链接等将直接删除，不会事先警告！文件夹、用户和批量操作不受此规则影响，删除前始终会发出警告。"
+    },
+    "fileNavButtons": {
+      "label": "文件导航按钮",
+      "description": "在文件查看器的左右两侧显示“上一个/下一个”按钮，方便在文件之间切换。"
+    },
+    "homeShowRecents": {
+      "label": "显示最近记录",
+      "description": "在首页显示最近的上传和登录记录。"
+    },
+    "homeShowActivity": {
+      "label": "显示活动",
+      "description": "在首页以图表形式显示你最近的活动。"
+    },
+    "homeShowTypes": {
+      "label": "显示文件类型",
+      "description": "在首页显示文件类型表格。"
+    },
+    "fileViewer": {
+      "label": "文件查看器",
+      "description": "选择点击文件时打开哪种文件查看器。",
+      "options": {
+        "fullscreen": "全屏 (测试版)",
+        "default": "默认 (弹窗)"
+      }
+    },
+    "domain": {
+      "label": "默认域名",
+      "description": "设置在控制台中任意位置复制链接时使用的默认域名。留空或选择“默认域名”则使用当前提供控制台服务的域名。"
+    },
+    "theme": {
+      "label": "主题",
+      "description": "控制台使用的主题。此设置仅改变你浏览器中的显示效果，不会更改其他用户的主题。",
+      "system": "跟随系统"
+    },
+    "themeDark": {
+      "label": "深色主题",
+      "description": "系统处于深色模式时控制台使用的主题。"
+    },
+    "themeLight": {
+      "label": "浅色主题",
+      "description": "系统处于浅色模式时控制台使用的主题。"
+    }
+  },
+  "fileView": {
+    "title": "文件查看",
+    "variablesHint": "所有文本字段都支持使用<anchor>变量。</anchor>",
+    "disableTextFiles": {
+      "label": "禁用文本文件",
+      "description": "禁止通过查看路由查看文本文件。此设置不影响其他文件类型，即使禁用了查看路由也会生效。"
+    },
+    "enabled": {
+      "label": "启用查看路由",
+      "description": "允许通过可自定义的查看路由查看文件"
+    },
+    "showMimetype": {
+      "label": "显示 MIME 类型",
+      "description": "在查看路由中显示文件的 MIME 类型"
+    },
+    "showTags": {
+      "label": "显示标签",
+      "description": "在查看路由中显示文件的标签"
+    },
+    "showFolder": {
+      "label": "显示文件夹",
+      "description": "在可能的情况下，在查看路由中显示文件夹的名称或链接"
+    },
+    "content": {
+      "label": "查看页内容",
+      "description": "更改查看路由中的内容。支持大部分 HTML，但不能使用 JavaScript。"
+    },
+    "align": {
+      "label": "查看页内容对齐方式",
+      "description": "更改查看路由中内容的对齐方式",
+      "options": {
+        "left": "左对齐",
+        "center": "居中",
+        "right": "右对齐"
+      }
+    },
+    "embed": {
+      "label": "启用嵌入卡片",
+      "description": "启用以下嵌入卡片属性。这些属性基于 OpenGraph 标记实现。需要启用查看路由才能生效。"
+    },
+    "embedMediaOnly": {
+      "label": "仅媒体链接预览",
+      "description": "关闭嵌入卡片时，仍会添加 OpenGraph 图片/视频标记，使 Discord 等应用只展开媒体内容 (不含自定义标题、描述或网站名称)。你粘贴的 URL 会以纯文本形式保留在消息中。"
+    },
+    "embedTitle": {
+      "label": "嵌入卡片标题"
+    },
+    "embedDescription": {
+      "label": "嵌入卡片描述"
+    },
+    "embedSiteName": {
+      "label": "嵌入卡片网站名称"
+    },
+    "embedColor": {
+      "label": "嵌入卡片颜色"
+    },
+    "notifications": {
+      "error": {
+        "title": "更新查看设置时出错"
+      },
+      "updated": {
+        "message": "查看设置已更新"
+      }
+    }
+  },
+  "oauth": {
+    "description": "管理已关联的 OAuth 提供方。",
+    "link": "关联 {{provider}} 账户",
+    "unlink": "取消关联 {{provider}} 账户",
+    "notifications": {
+      "unlinkFailed": {
+        "title": "无法取消关联账户"
+      },
+      "unlinked": {
+        "title": "已取消关联账户",
+        "message": "你的 {{provider}} 账户已取消关联。"
+      }
+    }
+  },
+  "mfa": {
+    "title": "多重身份验证",
+    "description": "设置 2FA 或通行密钥，为你的账户增加一层额外的安全保护。",
+    "totp": {
+      "enable": "启用 2FA",
+      "disable": "禁用 2FA",
+      "modal": {
+        "enableTitle": "启用双重验证",
+        "disableTitle": "禁用双重验证",
+        "disableInstructions": "在下方输入身份验证器应用中的 6 位验证码，以确认禁用 2FA。",
+        "step1": "<b>第 1 步</b> 打开或下载一款支持扫描二维码或手动输入代码的身份验证器。常用的有 <twofas>2FAs</twofas>、<google>Google 身份验证器</google>、<microsoft>Microsoft Authenticator</microsoft> 和 <apple>Apple 密码</apple>。",
+        "step2": "<b>第 2 步</b> 使用身份验证器应用扫描下方二维码以启用 2FA。",
+        "qrAlt": "二维码 {{secret}}",
+        "manualEntry": "如果无法扫描二维码，可以在身份验证器应用中手动输入以下代码：<code>{{secret}}</code>",
+        "step3": "<b>第 3 步</b> 在下方输入身份验证器应用中的 6 位验证码，以确认完成 2FA 设置。"
+      },
+      "invalidPin": "验证码无效",
+      "notifications": {
+        "enabled": {
+          "title": "已启用 2FA",
+          "message": "你已成功为账户启用 2FA。"
+        },
+        "disabled": {
+          "title": "已禁用 2FA",
+          "message": "你已成功为账户禁用 2FA。"
+        }
+      }
+    },
+    "passkeys": {
+      "manage": "管理通行密钥",
+      "created": "通行密钥创建于 <created />",
+      "createdAndUsed": "通行密钥创建于 <created />，上次使用于 <lastUsed />。",
+      "legacyWarning": "警告：此通行密钥由旧版本的 Zipline 创建，在此版本中<b>无法使用</b>。请删除并重新创建此通行密钥以确保兼容。",
+      "create": "创建通行密钥",
+      "createError": "创建通行密钥时出错，请稍后重试",
+      "createErrorFallback": "创建通行密钥时发生错误",
+      "namePrompt": "为此通行密钥指定一个名称，方便日后识别。",
+      "namePlaceholder": "通行密钥名称",
+      "modals": {
+        "remove": {
+          "message": "你的浏览器和设备可能仍会将“{{name}}”显示为登录选项。如需移除，请在设备设置中手动操作。",
+          "confirm": "移除“{{name}}”"
+        }
+      },
+      "notifications": {
+        "saveError": {
+          "title": "保存通行密钥时出错"
+        },
+        "saved": {
+          "title": "通行密钥已保存！",
+          "message": "你的通行密钥已成功保存。"
+        },
+        "removeError": {
+          "title": "移除通行密钥时出错"
+        },
+        "removed": {
+          "title": "通行密钥已移除！",
+          "message": "你的通行密钥已成功移除。"
+        }
+      }
+    }
+  },
+  "exports": {
+    "title": "导出文件",
+    "new": "新建导出",
+    "empty": "未找到导出记录。点击上方按钮开始新的导出。",
+    "table": {
+      "id": "ID",
+      "started": "开始时间",
+      "files": "文件",
+      "size": "大小",
+      "completed": "{{id}} 已完成",
+      "inProgress": "{{id}} 正在进行中"
+    },
+    "modals": {
+      "new": {
+        "title": "新建导出？",
+        "message": "确定要开始新的导出吗？如果文件较多，可能需要一些时间。",
+        "confirm": "开始导出"
+      }
+    },
+    "notifications": {
+      "started": {
+        "title": "导出已开始",
+        "message": "导出已开始，可以在下方表格中查看其状态"
+      },
+      "deleted": {
+        "message": "导出已删除"
+      }
+    }
+  },
+  "generators": {
+    "title": "生成上传器",
+    "description": "为上传工具生成脚本。Flameshot 和 Shell 脚本生成器仅支持 Linux 和 macOS。",
+    "logoAlt": "{{name}} 徽标",
+    "shellScript": "Shell 脚本",
+    "desc": {
+      "flameshot": "使用此脚本需要安装 <flameshotLink>Flameshot</flameshotLink>、<curlLink><code>curl</code></curlLink>、<jqLink><code>jq</code></jqLink> 和 <xclipLink><code>xclip</code> (仅限 Linux)</xclipLink>。此脚本仅适用于 Linux 和 macOS (请参阅下方选项)。",
+      "ishare": "此生成器需要在 macOS 上安装 <anchor>ishare</anchor>。此上传器仅适用于 macOS。",
+      "itake": "此生成器需要在 macOS 上安装 <anchor>iTake</anchor>。此上传器仅适用于 macOS。",
+      "shell": "使用此脚本需要安装 <code>bash</code>、<curlLink><code>curl</code></curlLink>、<fileLink><code>file</code></fileLink>、<jqLink><code>jq</code></jqLink> 和 <xclipLink><code>xclip</code> (仅限 Linux)</xclipLink>。此脚本仅适用于 Linux 和 macOS (请参阅下方选项)。"
+    },
+    "modal": {
+      "title": "生成 {{name}} 上传器",
+      "destinationType": {
+        "label": "目标类型",
+        "description": "选择要生成的目标类型",
+        "options": {
+          "file": "上传文件",
+          "url": "缩短 URL"
+        }
+      },
+      "format": {
+        "label": "名称格式",
+        "description": "上传文件时使用的文件名格式，“文件名”字段会覆盖此值。",
+        "options": {
+          "default": "默认",
+          "random": "随机",
+          "date": "日期",
+          "uuid": "UUID",
+          "name": "使用文件名",
+          "gfycat": "Gfycat 风格名称"
+        }
+      },
+      "compression": {
+        "label": "压缩",
+        "description": "对图片使用的压缩级别 (仅限图片)。留空则禁用压缩。"
+      },
+      "maxViews": {
+        "label": "最大查看次数",
+        "description": "文件或短链接在被删除前允许的最大查看次数。留空则不限制查看次数。"
+      },
+      "overrideDomain": {
+        "label": "覆盖域名",
+        "description": "使用此值覆盖域名，这会更改上传后返回的链接中的域名。留空则使用默认域名。",
+        "default": "默认域名"
+      },
+      "otherOptions": "其他选项",
+      "addOriginalName": {
+        "label": "添加原始名称",
+        "description": "添加原始文件名，以便下载文件时使用原始名称。文件本身的文件名仍会使用“名称格式”选项。"
+      },
+      "extensionless": {
+        "label": "无扩展名 URL",
+        "description": "从返回的 URL 中移除文件扩展名。文件仍可通过带扩展名的 URL 访问。此选项仅在服务器配置为允许无扩展名 URL 时生效。"
+      },
+      "xshareCompatibility": {
+        "label": "Xshare 兼容",
+        "description": "如果你在 Android 上使用 Xshare 应用，请启用此选项以确保兼容。生成的配置将无法用于 ShareX。"
+      },
+      "waylandCompatibility": {
+        "label": "启用 Wayland 兼容",
+        "description": "使用 <code>wl-copy</code> 代替 <code>xclip</code> 复制到剪贴板。"
+      },
+      "macCompatibility": {
+        "label": "启用 macOS 兼容",
+        "description": "使用 <code>pbcopy</code> 代替 <code>xclip</code> 复制到剪贴板。"
+      },
+      "compositorUnsupported": {
+        "label": "使用 Gnome、KDE 或 Sway 以外的桌面环境？",
+        "description": "如果使用 <anchor>Hyprland</anchor> 等合成器，此选项会设置 <code>XDG_CURRENT_DESKTOP=sway</code>，以规避 Flameshot 在 Wayland 上的错误。在 Xorg 上无需此设置。"
+      },
+      "useEcho": {
+        "label": "使用 <code>echo</code> 代替复制到剪贴板",
+        "description": "直接将 URL 输出到终端，而不是复制到剪贴板。"
+      },
+      "waylandHelp": "如果无法在 Wayland 上正常使用 Flameshot，请参阅 <anchor>Wayland 指南</anchor>。"
+    }
+  }
+}

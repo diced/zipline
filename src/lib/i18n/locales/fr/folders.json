@@ -1,0 +1,139 @@
+{
+  "page": {
+    "title": "Dossiers",
+    "titleWithFolder": "Dossiers {{separator}} {{name}}",
+    "createFolder": "Créer un dossier",
+    "createSubfolder": "Créer un sous-dossier",
+    "folderFiles": "Fichiers de {{name}}",
+    "folderFilesWithCount": "Fichiers de {{name}} ({{files}})"
+  },
+  "create": {
+    "title": "Créer un dossier",
+    "titleSubfolder": "Créer un sous-dossier",
+    "name": {
+      "label": "Nom",
+      "placeholder": "Saisissez un nom…",
+      "required": "Le nom est requis"
+    },
+    "public": {
+      "label": "Public",
+      "description": "Les dossiers publics sont visibles par tout le monde"
+    }
+  },
+  "uploadsAlert": {
+    "message": "Ce dossier autorise les téléversements anonymes. Partagez le lien ci-dessous pour permettre à d'autres personnes d'y téléverser des fichiers.",
+    "copy": "Copier l'URL",
+    "copied": "URL copiée"
+  },
+  "menu": {
+    "moreActions": "Plus d'actions",
+    "open": "Ouvrir le dossier",
+    "move": "Déplacer le dossier",
+    "export": "Exporter en ZIP",
+    "makePrivate": "Rendre privé",
+    "makePublic": "Rendre public",
+    "disallowUploads": "Interdire les téléversements anonymes",
+    "allowUploads": "Autoriser les téléversements anonymes",
+    "editName": "Modifier le nom",
+    "copyUrl": "Copier l'URL"
+  },
+  "card": {
+    "created": "Création :",
+    "updated": "Mise à jour :",
+    "public": "Public :",
+    "files": "Fichiers :",
+    "subfolders": "Sous-dossiers :"
+  },
+  "grid": {
+    "empty": "Aucun dossier trouvé",
+    "emptyFolder": "Ce dossier est vide",
+    "createHint": "Créez un dossier pour le voir ici"
+  },
+  "table": {
+    "columns": {
+      "name": "Nom",
+      "public": "Public",
+      "uploads": "Téléversements ?",
+      "created": "Création",
+      "updated": "Dernière mise à jour",
+      "actions": "Actions"
+    },
+    "subfolders_one": "{{count}} sous-dossier",
+    "subfolders_many": "{{count}} sous-dossiers",
+    "subfolders_other": "{{count}} sous-dossiers",
+    "noRecords": "Aucun sous-dossier",
+    "copyLink": "Copier le lien du dossier",
+    "delete": "Supprimer le dossier"
+  },
+  "notifications": {
+    "visibilityFailed": "Impossible de modifier la visibilité du dossier",
+    "visibilityEdited": "Visibilité du dossier modifiée",
+    "nowPublic": "{{name}} est désormais public",
+    "nowPrivate": "{{name}} est désormais privé",
+    "uploadsFailed": "Impossible de modifier la règle de téléversement du dossier",
+    "uploadsEdited": "Règle de téléversement du dossier modifiée",
+    "uploadsAllowed": "{{name}} autorise désormais les téléversements anonymes",
+    "uploadsDisallowed": "{{name}} n'autorise plus les téléversements anonymes"
+  },
+  "delete": {
+    "title": "Supprimer « {{name}} » ?",
+    "cannotUndo": "Cette action est irréversible.",
+    "containsFilesAndSubfolders": "Ce dossier contient {{files}} fichier(s) et {{subfolders}} sous-dossier(s). Que voulez-vous en faire ?",
+    "containsFiles": "Ce dossier contient {{files}} fichier(s). Que voulez-vous en faire ?",
+    "containsSubfolders": "Ce dossier contient {{subfolders}} sous-dossier(s). Que voulez-vous en faire ?",
+    "options": {
+      "root": "Déplacer le contenu vers le dossier racine",
+      "folder": "Déplacer le contenu vers un autre dossier",
+      "cascade": "Supprimer les sous-dossiers (fichiers déplacés à la racine)",
+      "cascadeFiles": "Supprimer les sous-dossiers et leurs fichiers (suppression en cascade)"
+    },
+    "target": {
+      "label": "Dossier cible",
+      "placeholder": "Sélectionnez un dossier"
+    },
+    "warningCascade": "Attention : tous les sous-dossiers de ce dossier seront définitivement supprimés. Les fichiers seront détachés de leurs dossiers et déplacés à la racine.",
+    "warningCascadeFiles": "Attention : tous les sous-dossiers de ce dossier seront définitivement supprimés, ainsi que tous les fichiers qu'ils contiennent. Les fichiers seront retirés du stockage et ne pourront pas être récupérés.",
+    "confirmCascade": "Supprimer « {{name}} » et tous ses sous-dossiers ?",
+    "confirmCascadeFiles": "Supprimer « {{name}} », tous ses sous-dossiers et leurs fichiers ?",
+    "modalCascade": "Tous les sous-dossiers seront définitivement supprimés (les fichiers seront déplacés à la racine). Cette action est irréversible.",
+    "modalCascadeFiles": "Tous les sous-dossiers et tous les fichiers qu'ils contiennent seront définitivement supprimés du stockage. Cette action est irréversible.",
+    "submit": "Supprimer le dossier",
+    "notifications": {
+      "failed": "Impossible de supprimer le dossier",
+      "deleted": "Dossier supprimé",
+      "deletedMessage": "{{name}} a été supprimé",
+      "noTarget": "Aucun dossier sélectionné",
+      "noTargetMessage": "Sélectionnez un dossier vers lequel déplacer le contenu"
+    }
+  },
+  "edit": {
+    "title": "Modifier le nom du dossier",
+    "label": "Nouveau nom du dossier",
+    "placeholder": "Saisissez le nouveau nom du dossier…",
+    "required": "Le nom est requis",
+    "notifications": {
+      "failed": "Erreur lors de la mise à jour du nom du dossier",
+      "updated": "Nom du dossier mis à jour",
+      "updatedMessage": "Le dossier a bien été renommé en {{name}}"
+    }
+  },
+  "move": {
+    "title": "Déplacer « {{name}} »",
+    "description": "Sélectionnez un dossier de destination pour ce dossier.",
+    "root": "/ (Racine)",
+    "destination": {
+      "label": "Destination",
+      "placeholder": "Sélectionnez un dossier"
+    },
+    "submit": "Déplacer le dossier",
+    "notifications": {
+      "failed": "Impossible de déplacer le dossier",
+      "moved": "Dossier déplacé",
+      "movedMessage": "{{name}} a été déplacé"
+    }
+  },
+  "viewFiles": {
+    "title": "Fichiers dans {{name}}",
+    "found": "Fichiers trouvés : {{amount}}"
+  }
+}

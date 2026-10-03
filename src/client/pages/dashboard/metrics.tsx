@@ -1,5 +1,6 @@
 import DashboardMetrics from '@/components/pages/metrics';
 import { useTitle } from '@/lib/client/hooks/useTitle';
+import { useTranslation } from 'react-i18next';
 import { isAdministrator } from '@/lib/role';
 import { redirect } from 'react-router-dom';
 
@@ -20,7 +21,8 @@ export async function loader() {
 }
 
 export function Component() {
-  useTitle('Metrics');
+  const { t } = useTranslation('layout');
+  useTitle(t('titles.metrics'));
 
   return <DashboardMetrics />;
 }

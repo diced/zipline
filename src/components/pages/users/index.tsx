@@ -22,11 +22,13 @@ import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { IconPhotoMinus, IconUserCancel, IconUserPlus } from '@tabler/icons-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { mutate } from 'swr';
 import UserGridView from './views/UserGridView';
 import UserTableView from './views/UserTableView';
 
 export default function DashboardUsers() {
+  const { t } = useTranslation(['users', 'common']);
   const currentUser = useUserStore((state) => state.user);
   const view = useViewStore((state) => state.users);
   const [open, setOpen] = useState(false);
@@ -44,8 +46,8 @@ export default function DashboardUsers() {
       avatar: null,
     },
     validate: {
-      username: (value) => (value.length < 1 ? 'Username is required' : null),
-      password: (value) => (value.length < 1 ? 'Password is required' : null),
+      username: (value) => (value.length < 1 ? t('form.username.required') : null),
+      password: (value) => (value.length < 1 ? t('form.password.required') : null),
     },
     enhanceGetInputProps: ({ field }) => ({
       name: field,
@@ -55,7 +57,8 @@ export default function DashboardUsers() {
   const onSubmit = async (values: typeof form.values) => {
     let avatar64: string | null = null;
     if (values.avatar) {
-      if (!values.avatar.type.startsWith('image/')) return form.setFieldError('avatar', 'Invalid file type');
+      if (!values.avatar.type.startsWith('image/'))
+        return form.setFieldError('avatar', t('form.avatar.invalidType'));
 
       try {
         const res = await readToDataURL(values.avatar);
@@ -63,7 +66,7 @@ export default function DashboardUsers() {
       } catch (e) {
         console.error(e);
 
-        return form.setFieldError('avatar', 'Failed to read avatar file');
+        return form.setFieldError('avatar', t('form.avatar.readFailed'));
       }
     }
 
@@ -76,15 +79,15 @@ export default function DashboardUsers() {
 
     if (error) {
       notifications.show({
-        title: 'Failed to create user',
+        title: t('notifications.createFailed'),
         message: error.error,
         color: 'red',
         icon: <IconUserCancel size='1rem' />,
       });
     } else {
       notifications.show({
-        title: 'User created',
-        message: `User ${data?.username} has been created`,
+        title: t('notifications.created.title'),
+        message: t('notifications.created.message', { username: data?.username }),
         color: 'blue',
         icon: <IconUserPlus size='1rem' />,
       });
@@ -97,26 +100,26 @@ export default function DashboardUsers() {
 
   return (
     <>
-      <Modal centered opened={open} onClose={() => setOpen(false)} title='Create a new user'>
+      <Modal centered opened={open} onClose={() => setOpen(false)} title={t('create.title')}>
         <form onSubmit={form.onSubmit(onSubmit)}>
           <Stack gap='sm'>
             <TextInput
-              label='Username'
-              placeholder='Enter a username...'
+              label={t('form.username.label')}
+              placeholder={t('form.username.placeholder')}
               autoComplete='username'
               {...form.getInputProps('username')}
             />
             <PasswordInput
-              label='Password'
-              placeholder='Enter a password...'
+              label={t('form.password.label')}
+              placeholder={t('form.password.placeholder')}
               autoComplete='new-password'
               {...form.getInputProps('password')}
             />
             <FileInput
-              label='Avatar'
-              placeholder='Select an avatar...'
+              label={t('form.avatar.label')}
+              placeholder={t('form.avatar.placeholder')}
               rightSection={
-                <Tooltip label='Clear avatar'>
+                <Tooltip label={t('form.avatar.clear')}>
                   <ActionIcon
                     variant='transparent'
                     disabled={!form.values.avatar}
@@ -130,13 +133,13 @@ export default function DashboardUsers() {
             />
 
             <Select
-              label='Role'
+              label={t('form.role.label')}
               defaultValue={'USER'}
               data={[
-                { value: 'USER', label: 'User' },
+                { value: 'USER', label: t('roles.user') },
                 {
                   value: 'ADMIN',
-                  label: 'Administrator',
+                  label: t('roles.administrator'),
                   disabled: !canInteract(currentUser?.role, 'ADMIN'),
                 },
               ]}
@@ -144,14 +147,14 @@ export default function DashboardUsers() {
             />
 
             <Button type='submit' variant='outline' leftSection={<IconUserPlus size='1rem' />}>
-              Create
+              {t('common:actions.create')}
             </Button>
           </Stack>
         </form>
       </Modal>
 
       <Group>
-        <Title>Users</Title>
+        <Title>{t('title')}</Title>
 
         <Button
           variant='outline'
@@ -159,7 +162,7 @@ export default function DashboardUsers() {
           leftSection={<IconUserPlus size='1rem' />}
           onClick={() => setOpen(true)}
         >
-          Create
+          {t('common:actions.create')}
         </Button>
 
         <GridTableSwitcher type='users' />

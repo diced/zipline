@@ -2,9 +2,11 @@ import { Response } from '@/lib/api/response';
 import { bytes } from '@/lib/bytes';
 import { Button, Group, Paper, Progress, Skeleton, Stack, Text, Title, Tooltip } from '@mantine/core';
 import { IconDatabase, IconRefresh } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
 import useSWR from 'swr';
 
 export function Storage() {
+  const { t } = useTranslation('serverActions');
   const {
     data: status,
     isLoading,
@@ -17,10 +19,10 @@ export function Storage() {
       <Group justify='space-between' mb='sm'>
         <Group gap='xs'>
           <IconDatabase size='1.2rem' />
-          <Title order={3}>Storage</Title>
+          <Title order={3}>{t('admin.storage.title')}</Title>
         </Group>
 
-        <Tooltip label='Refresh storage stats'>
+        <Tooltip label={t('admin.storage.refresh')}>
           <Button variant='subtle' size='compact-sm' onClick={() => mutate()} loading={isLoading}>
             <IconRefresh size='1rem' />
           </Button>
@@ -35,7 +37,7 @@ export function Storage() {
         </Stack>
       ) : error ? (
         <Text size='sm' c='red'>
-          Failed to load storage
+          {t('admin.storage.loadFailed')}
         </Text>
       ) : status ? (
         <Stack gap='sm'>
@@ -70,7 +72,7 @@ export function Storage() {
           ) : (
             <>
               <Text size='xs' c='dimmed'>
-                {bytes(status.storage.used)} used
+                {t('admin.storage.used', { used: bytes(status.storage.used) })}
               </Text>
             </>
           )}

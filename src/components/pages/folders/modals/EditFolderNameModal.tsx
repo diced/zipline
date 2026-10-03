@@ -6,6 +6,7 @@ import { useForm } from '@mantine/form';
 import { showNotification } from '@mantine/notifications';
 import { IconPencil } from '@tabler/icons-react';
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { mutateFolder } from '../actions';
 
 export default function EditFolderNameModal({
@@ -17,12 +18,13 @@ export default function EditFolderNameModal({
   onClose: () => void;
   opened: boolean;
 }) {
+  const { t } = useTranslation(['folders', 'common']);
   const form = useForm({
     initialValues: {
       name: '',
     },
     validate: {
-      name: (value) => (value.trim() === '' ? 'Name is required' : null),
+      name: (value) => (value.trim() === '' ? t('edit.required') : null),
     },
   });
 
@@ -39,14 +41,14 @@ export default function EditFolderNameModal({
 
     if (error) {
       showNotification({
-        title: 'Error while updating folder name',
+        title: t('edit.notifications.failed'),
         message: error.error,
       });
     } else {
       mutateFolder();
       showNotification({
-        title: 'Folder name updated',
-        message: 'Folder name has been updated successfully to ' + data?.name,
+        title: t('edit.notifications.updated'),
+        message: t('edit.notifications.updatedMessage', { name: data?.name }),
       });
       onClose();
     }
@@ -59,17 +61,17 @@ export default function EditFolderNameModal({
   }, [folder, opened]);
 
   return (
-    <Modal opened={opened} onClose={onClose} title='Edit folder name'>
+    <Modal opened={opened} onClose={onClose} title={t('edit.title')}>
       <form onSubmit={form.onSubmit(onSubmit)}>
         <Stack>
           <TextInput
-            placeholder='Enter new folder name...'
-            label='New folder name'
+            placeholder={t('edit.placeholder')}
+            label={t('edit.label')}
             {...form.getInputProps('name')}
           />
 
           <Button type='submit' color='blue' fullWidth leftSection={<IconPencil size='1rem' />}>
-            Save
+            {t('common:actions.save')}
           </Button>
         </Stack>
       </form>

@@ -2,6 +2,8 @@ import type { Response } from '@/lib/api/response';
 import { Button, Code, LoadingOverlay, Stack, Text, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconDeviceFloppy } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
+import SafeTrans from '@/components/SafeTrans';
 import { useNavigate } from 'react-router-dom';
 import { settingsOnSubmit } from '../settingsOnSubmit';
 import useServerSettings from '../useServerSettings';
@@ -19,6 +21,7 @@ export default function Tasks() {
 
 function Form({ data, isLoading }: { data: Response['/api/server/settings']; isLoading: boolean }) {
   const navigate = useNavigate();
+  const { t } = useTranslation(['serverSettings', 'common']);
 
   const form = useForm({
     initialValues: {
@@ -39,56 +42,56 @@ function Form({ data, isLoading }: { data: Response['/api/server/settings']; isL
   return (
     <>
       <Text size='sm' c='dimmed' mb='md'>
-        All options require a restart to take effect. Setting a value of <Code>0</Code> will disable the task.
+        <SafeTrans t={t} i18nKey='tasks.intro' components={{ code: <Code /> }} />
       </Text>
 
       <form onSubmit={form.onSubmit(onSubmit)}>
         <Stack gap='lg'>
           <TextInput
-            label='Delete Files Interval'
-            description='How often to check and delete expired files.'
+            label={t('tasks.deleteInterval.label')}
+            description={t('tasks.deleteInterval.description')}
             placeholder='30m'
             {...form.getInputProps('tasksDeleteInterval')}
           />
 
           <TextInput
-            label='Clear Invites Interval'
-            description='How often to check and clear expired/used invites.'
+            label={t('tasks.clearInvitesInterval.label')}
+            description={t('tasks.clearInvitesInterval.description')}
             placeholder='30m'
             {...form.getInputProps('tasksClearInvitesInterval')}
           />
 
           <TextInput
-            label='Max Views Interval'
-            description='How often to check and delete files that have reached max views.'
+            label={t('tasks.maxViewsInterval.label')}
+            description={t('tasks.maxViewsInterval.description')}
             placeholder='30m'
             {...form.getInputProps('tasksMaxViewsInterval')}
           />
 
           <TextInput
-            label='Thumbnails Interval'
-            description='How often to check and generate thumbnails for video files.'
+            label={t('tasks.thumbnailsInterval.label')}
+            description={t('tasks.thumbnailsInterval.description')}
             placeholder='30m'
             {...form.getInputProps('tasksThumbnailsInterval')}
           />
 
           <TextInput
-            label='Clean Thumbnails Interval'
-            description='How often to check and delete orphaned thumbnails from the filesystem or database.'
+            label={t('tasks.cleanThumbnailsInterval.label')}
+            description={t('tasks.cleanThumbnailsInterval.description')}
             placeholder='1d'
             {...form.getInputProps('tasksCleanThumbnailsInterval')}
           />
 
           <TextInput
-            label='Metrics Interval'
-            description='How often to collect metrics data. Setting this to a lower value will give you more up-to-date metrics, but may increase CPU usage.'
+            label={t('tasks.metricsInterval.label')}
+            description={t('tasks.metricsInterval.description')}
             placeholder='30m'
             {...form.getInputProps('tasksMetricsInterval')}
           />
         </Stack>
 
         <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
-          Save
+          {t('common:actions.save')}
         </Button>
       </form>
     </>

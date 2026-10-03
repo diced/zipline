@@ -5,9 +5,11 @@ import { Button, Divider, Modal, NumberInput, PasswordInput, Stack, Switch, Text
 import { showNotification } from '@mantine/notifications';
 import { IconEye, IconKey, IconPencil, IconPencilOff, IconTrashFilled } from '@tabler/icons-react';
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { mutate } from 'swr';
 
 export default function EditUrlModal({ url, onClose }: { url: Url | null; onClose: () => void }) {
+  const { t } = useTranslation('urls');
   const [urlData, setUrlData] = useObjectState<{
     maxViews: number | null;
     vanity: string | null;
@@ -43,15 +45,15 @@ export default function EditUrlModal({ url, onClose }: { url: Url | null; onClos
 
     if (error) {
       showNotification({
-        title: 'Failed to remove password...',
+        title: t('notifications.removePasswordFailed.title'),
         message: error.error,
         color: 'red',
         icon: <IconPencilOff size='1rem' />,
       });
     } else {
       showNotification({
-        title: 'Password removed!',
-        message: 'The password has been removed from the URL.',
+        title: t('notifications.passwordRemoved.title'),
+        message: t('notifications.passwordRemoved.message'),
         color: 'green',
         icon: <IconPencil size='1rem' />,
       });
@@ -88,15 +90,15 @@ export default function EditUrlModal({ url, onClose }: { url: Url | null; onClos
 
     if (error) {
       showNotification({
-        title: 'Failed to save changes...',
+        title: t('notifications.saveFailed.title'),
         message: error.error,
         color: 'red',
         icon: <IconPencilOff size='1rem' />,
       });
     } else {
       showNotification({
-        title: 'Changes saved!',
-        message: 'The changes have been saved successfully.',
+        title: t('notifications.saved.title'),
+        message: t('notifications.saved.message'),
         color: 'green',
         icon: <IconPencil size='1rem' />,
       });
@@ -108,12 +110,16 @@ export default function EditUrlModal({ url, onClose }: { url: Url | null; onClos
   };
 
   return (
-    <Modal title={`Editing "${url?.vanity ?? url?.code ?? 'unknown'}"`} opened={!!url} onClose={onClose}>
+    <Modal
+      title={t('edit.title', { name: url?.vanity ?? url?.code ?? t('edit.unknown') })}
+      opened={!!url}
+      onClose={onClose}
+    >
       <Stack gap='xs' my='sm'>
         <NumberInput
-          label='Max Views'
-          placeholder='Unlimited'
-          description='The maximum number of clicks this URL can have before it is automatically deleted. Leave blank to allow as many views as you want.'
+          label={t('edit.maxViews.label')}
+          placeholder={t('edit.maxViews.placeholder')}
+          description={t('edit.maxViews.description')}
           value={urlData.maxViews || ''}
           onChange={(value) => setUrlData('maxViews', value === '' ? null : Number(value))}
           min={0}
@@ -121,9 +127,9 @@ export default function EditUrlModal({ url, onClose }: { url: Url | null; onClos
         />
 
         <TextInput
-          label='Vanity'
-          placeholder='Optional'
-          description='A custom alias for your URL. Leave blank to use the randomly generated code.'
+          label={t('edit.vanity.label')}
+          placeholder={t('edit.vanity.placeholder')}
+          description={t('edit.vanity.description')}
           value={urlData.vanity || ''}
           onChange={(event) =>
             setUrlData(
@@ -134,7 +140,7 @@ export default function EditUrlModal({ url, onClose }: { url: Url | null; onClos
         />
 
         <TextInput
-          label='Destination'
+          label={t('edit.destination.label')}
           placeholder='https://example.com'
           value={urlData.destination || ''}
           onChange={(event) =>
@@ -146,8 +152,8 @@ export default function EditUrlModal({ url, onClose }: { url: Url | null; onClos
         />
 
         <Switch
-          label='Enabled'
-          description='Prevent or allow this URL from being visited.'
+          label={t('edit.enabled.label')}
+          description={t('edit.enabled.description')}
           checked={urlData.enabled}
           onChange={(event) => setUrlData('enabled', event.currentTarget.checked)}
         />
@@ -161,12 +167,12 @@ export default function EditUrlModal({ url, onClose }: { url: Url | null; onClos
             leftSection={<IconTrashFilled size='1rem' />}
             onClick={handleRemovePassword}
           >
-            Remove password
+            {t('edit.password.remove')}
           </Button>
         ) : (
           <PasswordInput
-            label='Password'
-            description='Set a password for this URL. Leave blank to disable password protection.'
+            label={t('edit.password.label')}
+            description={t('edit.password.description')}
             value={urlData.password ?? ''}
             autoComplete='off'
             onChange={(event) =>
@@ -182,7 +188,7 @@ export default function EditUrlModal({ url, onClose }: { url: Url | null; onClos
         <Divider />
 
         <Button onClick={handleSave} leftSection={<IconPencil size='1rem' />}>
-          Save changes
+          {t('edit.save')}
         </Button>
       </Stack>
     </Modal>

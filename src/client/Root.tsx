@@ -1,3 +1,4 @@
+import '@/lib/i18n';
 import { ContextModalProps, ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';
 import { Outlet } from 'react-router-dom';
@@ -7,16 +8,21 @@ import { type ZiplineTheme } from '@/lib/theme';
 import { type Config } from '@/lib/config/validate';
 import { Button, Text } from '@mantine/core';
 import { NuqsAdapter } from 'nuqs/adapters/react-router/v7';
+import { useTranslation } from 'react-i18next';
 
-const AlertModal = ({ context, id, innerProps }: ContextModalProps<{ modalBody: string }>) => (
-  <>
-    <Text size='sm'>{innerProps.modalBody}</Text>
+const AlertModal = ({ context, id, innerProps }: ContextModalProps<{ modalBody: string }>) => {
+  const { t } = useTranslation();
 
-    <Button fullWidth mt='md' onClick={() => context.closeModal(id)}>
-      OK
-    </Button>
-  </>
-);
+  return (
+    <>
+      <Text size='sm'>{innerProps.modalBody}</Text>
+
+      <Button fullWidth mt='md' onClick={() => context.closeModal(id)}>
+        {t('actions.ok')}
+      </Button>
+    </>
+  );
+};
 
 const contextModals = {
   alert: AlertModal,

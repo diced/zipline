@@ -15,6 +15,7 @@ import {
   IconCircleKeyFilled,
   IconUserExclamation,
 } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
 import { mutate } from 'swr';
 
 import styles from './index.module.css';
@@ -34,7 +35,8 @@ const names = {
 };
 
 function OAuthButton({ provider, linked }: { provider: OAuthProviderType; linked: boolean }) {
-  const t = useMantineTheme();
+  const theme = useMantineTheme();
+  const { t } = useTranslation('settings');
 
   const unlink = async () => {
     const { error } = await fetchApi<Response['/api/auth/oauth']>('/api/auth/oauth', 'DELETE', {
@@ -43,15 +45,15 @@ function OAuthButton({ provider, linked }: { provider: OAuthProviderType; linked
 
     if (error) {
       notifications.show({
-        title: 'Failed to unlink account',
+        title: t('oauth.notifications.unlinkFailed.title'),
         message: error.error,
         color: 'red',
         icon: <IconUserExclamation size='1rem' />,
       });
     } else {
       notifications.show({
-        title: 'Account unlinked',
-        message: `Your ${names[provider]} account has been unlinked.`,
+        title: t('oauth.notifications.unlinked.title'),
+        message: t('oauth.notifications.unlinked.message', { provider: names[provider] }),
         color: 'green',
         icon: <IconCheck size='1rem' />,
       });
@@ -65,7 +67,7 @@ function OAuthButton({ provider, linked }: { provider: OAuthProviderType; linked
     leftSection: icons[provider],
     color: linked ? 'red' : `${provider.toLowerCase()}.0`,
     style: {
-      '--z-bol-color': darken(t.colors?.[provider.toLowerCase()]?.[0] ?? '', 0.2, t),
+      '--z-bol-color': darken(theme.colors?.[provider.toLowerCase()]?.[0] ?? '', 0.2, theme),
     },
     className: !linked ? styles.button : undefined,
     styles: {
@@ -78,17 +80,18 @@ function OAuthButton({ provider, linked }: { provider: OAuthProviderType; linked
 
   return linked ? (
     <Button {...baseProps} onClick={unlink}>
-      Unlink {names[provider]} account
+      {t('oauth.unlink', { provider: names[provider] })}
     </Button>
   ) : (
     <Button {...baseProps} component={'a'} href={`/api/auth/oauth/${provider.toLowerCase()}?state=link`}>
-      Link {names[provider]} account
+      {t('oauth.link', { provider: names[provider] })}
     </Button>
   );
 }
 
 export default function SettingsOAuth() {
   const config = useConfig();
+  const { t } = useTranslation('settings');
 
   const user = useUserStore((state) => state.user);
 
@@ -101,7 +104,7 @@ export default function SettingsOAuth() {
     <Paper withBorder p='sm'>
       <Title order={2}>OAuth</Title>
       <Text size='sm' c='dimmed' mt={3}>
-        Manage your connected OAuth providers.
+        {t('oauth.description')}
       </Text>
 
       <SimpleGrid mt='xs' cols={{ base: 1, md: 2 }} spacing='lg'>

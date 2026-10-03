@@ -1,0 +1,220 @@
+{
+  "actions": {
+    "goToFiles": "Ir para arquivos",
+    "clearAll": "Limpar tudo",
+    "upload_one": "Enviar {{count}} arquivo ({{size}})",
+    "upload_many": "Enviar {{count}} arquivos ({{size}})",
+    "upload_other": "Enviar {{count}} arquivos ({{size}})"
+  },
+  "file": {
+    "title": "Enviar arquivos",
+    "dropzone": {
+      "title": "Arraste imagens para cá ou clique para selecionar arquivos",
+      "paste": "Ou pressione <kbd>{{mod}}</kbd> + <kbd>V</kbd> para colar imagens da área de transferência",
+      "description": "Anexe quantos arquivos quiser. Eles aparecerão abaixo para você revisar antes do envio.",
+      "limit": "Limite de <b>{{size}}</b> por arquivo"
+    },
+    "progress": {
+      "speed": "{{speed}}/s, faltam {{remaining}}",
+      "finalizing": "Finalizando envios..."
+    },
+    "hidden_one": "Mais {{count}} arquivo oculto",
+    "hidden_many": "Mais {{count}} arquivos ocultos",
+    "hidden_other": "Mais {{count}} arquivos ocultos",
+    "showMore": "Mostrar mais",
+    "showAll": "Mostrar tudo",
+    "showAllTooltip": "Isso pode causar problemas de desempenho se houver muitos arquivos",
+    "notifications": {
+      "pasted": {
+        "message": "Imagem {{name}} colada da área de transferência"
+      },
+      "mayFail": {
+        "title": "O envio pode falhar",
+        "message": "O envio pode falhar porque o tamanho total dos arquivos que você está tentando enviar (sem contar os de envio parcial) é de <b>{{size}}</b>, acima do limite de <b>{{limit}}</b>"
+      }
+    }
+  },
+  "text": {
+    "title": "Enviar texto",
+    "tabs": {
+      "text": "Texto",
+      "preview": "Pré-visualização"
+    },
+    "addFile": "Adicionar arquivo de texto",
+    "fileHeading": "Arquivo {{number}}"
+  },
+  "options": {
+    "button": "Opções",
+    "title": "Opções de envio",
+    "description": "Estas opções serão aplicadas a todos os arquivos que você enviar e ficam salvas no seu navegador.",
+    "saved": "salvo",
+    "default": "Padrão ({{value}})",
+    "never": "nunca",
+    "clear": "Limpar",
+    "deletesAt": {
+      "label": "Excluir após",
+      "description": "O arquivo será excluído automaticamente após esse período.",
+      "defaultExpiration": "O tempo de expiração padrão é <b>{{value}}</b> (você pode substituí-lo com a opção abaixo).",
+      "setDefault": "Você pode definir um tempo de expiração padrão nas <anchor>configurações</anchor>.",
+      "maxExpiration": "Observação: a expiração máxima permitida é <b>{{value}}</b>."
+    },
+    "expirations": {
+      "never": "Nunca",
+      "minutes5": "5 minutos",
+      "minutes10": "10 minutos",
+      "minutes15": "15 minutos",
+      "minutes30": "30 minutos",
+      "hour1": "1 hora",
+      "hours2": "2 horas",
+      "hours3": "3 horas",
+      "hours4": "4 horas",
+      "hours5": "5 horas",
+      "hours6": "6 horas",
+      "hours8": "8 horas",
+      "hours12": "12 horas",
+      "day1": "1 dia",
+      "days3": "3 dias",
+      "days5": "5 dias",
+      "days7": "7 dias",
+      "week1": "1 semana",
+      "weeksOneAndHalf": "1,5 semana",
+      "weeks2": "2 semanas",
+      "weeks3": "3 semanas",
+      "month1": "1 mês (30 dias)",
+      "monthsOneAndHalf": "1,5 mês (~45 dias)",
+      "months2": "2 meses (60 dias)",
+      "months3": "3 meses (90 dias)",
+      "months4": "4 meses (120 dias)",
+      "months6": "6 meses (0,5 ano)",
+      "year1": "1 ano",
+      "custom": "Precisa de mais flexibilidade? Defina uma data e hora exatas pela API."
+    },
+    "format": {
+      "label": "Formato do nome",
+      "description": "Formato do nome de arquivo usado ao enviar este arquivo. O campo \"Substituir nome do arquivo\" tem prioridade sobre este valor.",
+      "random": "Aleatório",
+      "date": "Data",
+      "name": "Usar nome do arquivo",
+      "gfycat": "Nome no estilo Gfycat"
+    },
+    "compressionFormat": {
+      "label": "Formato de compressão",
+      "description": "Formato de compressão de imagem usado <b>somente quando uma porcentagem de compressão é especificada</b>. Deixe em \"Padrão\" para usar o formato de compressão padrão do servidor."
+    },
+    "compression": {
+      "label": "Compressão",
+      "description": "Nível de compressão aplicado (somente) a imagens. O formato acima será usado para comprimir as imagens. Deixe em branco para desativar a compressão."
+    },
+    "maxViews": {
+      "label": "Visualizações máx.",
+      "description": "Número máximo de visualizações que os arquivos podem ter antes de serem excluídos. Deixe em branco para permitir visualizações ilimitadas."
+    },
+    "folder": {
+      "label": "Adicionar a uma pasta",
+      "description": "Adiciona este arquivo a uma pasta. Use a opção \"/ (Raiz)\" para não adicionar o arquivo a nenhuma pasta. Este valor não é salvo no navegador e é limpo após o envio.",
+      "placeholder": "Adicionar à pasta...",
+      "root": "/ (Raiz)"
+    },
+    "domain": {
+      "label": "Substituir domínio"
+    },
+    "filename": {
+      "label": "Substituir nome do arquivo",
+      "description": "Substitui o nome do arquivo por este valor. Deixe em branco para usar a opção \"Formato do nome\". Este valor é ignorado se você enviar mais de um arquivo. Ele não é salvo no navegador e é limpo após o envio."
+    },
+    "password": {
+      "label": "Senha",
+      "description": "Define uma senha para estes arquivos. Deixe em branco para desativar a proteção por senha. Este valor não é salvo no navegador e é limpo após o envio."
+    },
+    "other": "Outras opções",
+    "originalName": {
+      "label": "Adicionar nome original",
+      "description": "Adiciona o nome original do arquivo, para que ele possa ser baixado com esse nome. O nome do arquivo em si continuará seguindo a opção \"Formato do nome\"."
+    },
+    "extensionless": {
+      "label": "URL sem extensão",
+      "description": "Remove a extensão do arquivo da URL retornada. O arquivo ainda poderá ser acessado com a extensão. Esta opção só funciona se o servidor estiver configurado para permitir URLs sem extensão."
+    }
+  },
+  "modal": {
+    "title_one": "{{count}} arquivo enviado",
+    "title_many": "{{count}} arquivos enviados",
+    "title_other": "{{count}} arquivos enviados",
+    "open": "Abrir link em nova guia",
+    "copy": "Copiar link para a área de transferência",
+    "pending_one": "{{count}} arquivo grande terminará o <anchor>processamento em segundo plano.</anchor>",
+    "pending_many": "{{count}} arquivos grandes terminarão o <anchor>processamento em segundo plano.</anchor>",
+    "pending_other": "{{count}} arquivos grandes terminarão o <anchor>processamento em segundo plano.</anchor>",
+    "copyAllTooltip": "Copiar todos os links para a área de transferência (separados por quebra de linha)",
+    "copyAll": "Copiar todas as URLs ({{total}}) para a área de transferência",
+    "notifications": {
+      "copied": {
+        "title": "URL copiada para a área de transferência"
+      },
+      "copiedAll": {
+        "title": "URLs copiadas para a área de transferência",
+        "message": "Todas as URLs foram copiadas para a área de transferência, separadas por quebra de linha."
+      }
+    }
+  },
+  "errors": {
+    "parse": "Falha ao interpretar a resposta do servidor: {{response}}",
+    "unknown": "Ocorreu um erro desconhecido",
+    "network": "Erro de rede ao enviar arquivos"
+  },
+  "notifications": {
+    "preparing": {
+      "title_one": "Preparando arquivo",
+      "title_many": "Preparando arquivos",
+      "title_other": "Preparando arquivos",
+      "message_one": "Enviando {{count}} arquivo",
+      "message_many": "Enviando {{count}} arquivos",
+      "message_other": "Enviando {{count}} arquivos",
+      "messageBatches_one": "Enviando {{count}} arquivo em {{batches}} lotes",
+      "messageBatches_many": "Enviando {{count}} arquivos em {{batches}} lotes",
+      "messageBatches_other": "Enviando {{count}} arquivos em {{batches}} lotes"
+    },
+    "uploading": {
+      "batch": "Enviando lote {{current}}/{{total}}",
+      "title_one": "Enviando arquivo",
+      "title_many": "Enviando arquivos",
+      "title_other": "Enviando arquivos",
+      "message_one": "{{count}} arquivo",
+      "message_many": "{{count}} arquivos",
+      "message_other": "{{count}} arquivos"
+    },
+    "complete": {
+      "title": "Envio concluído",
+      "titlePartial": "Envios comuns concluídos",
+      "message_one": "{{count}} arquivo enviado",
+      "message_many": "{{count}} arquivos enviados",
+      "message_other": "{{count}} arquivos enviados",
+      "startingPartials_one": "Iniciando o envio de {{count}} arquivo grande...",
+      "startingPartials_many": "Iniciando o envio de {{count}} arquivos grandes...",
+      "startingPartials_other": "Iniciando o envio de {{count}} arquivos grandes...",
+      "messagePartial": "{{uploaded}}. {{starting}}"
+    },
+    "error": {
+      "title": "Erro ao enviar arquivos"
+    },
+    "partial": {
+      "title": "Enviando arquivo grande",
+      "titleCount": "Enviando arquivo grande ({{current}}/{{total}})",
+      "chunk": "Bloco {{current}}/{{total}}",
+      "error": {
+        "title": "Erro ao enviar o arquivo",
+        "message": "{{name}}: {{error}}"
+      },
+      "complete": {
+        "title": "Envios de arquivos grandes concluídos",
+        "message_one": "{{count}} arquivo grande encaminhado para processamento em segundo plano",
+        "message_many": "{{count}} arquivos grandes encaminhados para processamento em segundo plano",
+        "message_other": "{{count}} arquivos grandes encaminhados para processamento em segundo plano"
+      },
+      "offloaded": {
+        "title": "Arquivo grande encaminhado para segundo plano",
+        "message": "{{name}} encaminhado ({{current}}/{{total}})"
+      }
+    }
+  }
+}

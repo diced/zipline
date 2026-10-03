@@ -1,3 +1,4 @@
+import i18n from '@/lib/i18n';
 import { modals } from '@mantine/modals';
 
 type WarningModalOptions = {
@@ -8,9 +9,9 @@ type WarningModalOptions = {
 
 export function openWarningModal(options: WarningModalOptions) {
   modals.openConfirmModal({
-    title: 'Are you sure?',
+    title: i18n.t('warning.title'),
     labels: {
-      cancel: 'Cancel',
+      cancel: i18n.t('actions.cancel'),
       confirm: options.confirmLabel,
     },
     children: options.message,

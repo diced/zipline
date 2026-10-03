@@ -1,3 +1,4 @@
+import '@/lib/i18n';
 import { verifyAccessToken } from '@/lib/accessToken';
 import { config as zConfig } from '@/lib/config';
 import { Config } from '@/lib/config/validate';

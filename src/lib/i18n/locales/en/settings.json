@@ -1,0 +1,384 @@
+{
+  "title": "Settings",
+  "loading": "Loading…",
+  "user": {
+    "title": "User",
+    "tokenCopyTooltip": "Click to copy token",
+    "tokenLabel": "Token",
+    "tokenHidden": "[click to reveal]",
+    "form": {
+      "username": {
+        "label": "Username",
+        "required": "Username is required"
+      },
+      "password": {
+        "label": "Password",
+        "description": "Leave blank to keep the same password"
+      },
+      "currentPassword": {
+        "label": "Current password",
+        "description": "Required to change your password.",
+        "required": "Enter your current password to change it"
+      }
+    },
+    "notifications": {
+      "error": {
+        "title": "Error while updating user"
+      },
+      "updated": {
+        "message": "User updated"
+      }
+    }
+  },
+  "avatar": {
+    "title": "Avatar",
+    "placeholder": "Upload new avatar...",
+    "previewNew": "Preview of new avatar",
+    "previewCurrent": "Preview of current avatar",
+    "proposedAlt": "Proposed avatar",
+    "currentAlt": "User avatar",
+    "remove": "Remove Avatar",
+    "notifications": {
+      "error": {
+        "title": "Error while updating avatar"
+      },
+      "updated": {
+        "message": "Avatar updated"
+      }
+    }
+  },
+  "sessions": {
+    "title": "Sessions",
+    "summary": "You are currently logged into {{amount}} other devices",
+    "view": "View sessions",
+    "logoutBrowser": "Log out of this browser",
+    "logoutAll": "Log out of all devices",
+    "empty": "No other sessions found",
+    "table": {
+      "client": "Client",
+      "device": "Device",
+      "loggedInAt": "Logged in at"
+    },
+    "modals": {
+      "logoutAll": {
+        "title": "Log out of all devices?",
+        "message": "Are you sure you want to log out of all devices? This will log you out of all devices except the current one.",
+        "confirm": "Log out"
+      },
+      "logoutDevice": {
+        "title": "Log out of device?",
+        "message": "Are you sure you want to log out of this device?",
+        "confirm": "Log out"
+      }
+    },
+    "notifications": {
+      "loggedOutAll": "Logged out of all devices",
+      "loggedOutDevice": "Logged out of device"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard Settings",
+    "description": "These settings are saved automatically in your <b>browser.</b>",
+    "disableMediaPreview": {
+      "label": "Disable Media Preview",
+      "description": "Disable previews of files in the dashboard. This may help to save data and speed up the dashboard if you have a lot of media files, but it will also disable the file viewer and show a generic file icon instead of a preview for supported files."
+    },
+    "mediaAutoMuted": {
+      "label": "Mute video and audio previews",
+      "description": "When enabled, video and audio in the file viewer autoplay muted. Turning this off tries to play sound immediately. Browsers may block unmuted autoplay until you interact with the page."
+    },
+    "warnDeletion": {
+      "label": "Warn on deletion",
+      "description": "Show a warning when deleting stuff. When this is disabled, files, urls, etc will be deleted with no prior warning! Folders, users, and bulk-transactions are exempt from this rule and will always warn you before deleting anything."
+    },
+    "fileNavButtons": {
+      "label": "File navigation buttons",
+      "description": "Show previous/next on the right and left of the file viewer to easily navigate between files."
+    },
+    "homeShowRecents": {
+      "label": "Show recents",
+      "description": "Show recent uploads and logins on the home page."
+    },
+    "homeShowActivity": {
+      "label": "Show activity",
+      "description": "Show your recent activity as a graph on the home page."
+    },
+    "homeShowTypes": {
+      "label": "Show file types",
+      "description": "Show the file types table on the home page."
+    },
+    "fileViewer": {
+      "label": "File viewer",
+      "description": "Choose which file viewer opens when you click a file.",
+      "options": {
+        "fullscreen": "Fullscreen (beta)",
+        "default": "Default (modal)"
+      }
+    },
+    "domain": {
+      "label": "Default Domain",
+      "description": "Set the default domain used for copied links anywhere in the dashboard. Leave blank or select \"Default domain\" to use the current domain that serves the dashboard."
+    },
+    "theme": {
+      "label": "Theme",
+      "description": "The theme to use for the dashboard. This is only a visual change on your browser and does not change the theme for other users.",
+      "system": "System"
+    },
+    "themeDark": {
+      "label": "Dark Theme",
+      "description": "The theme to use for the dashboard when your system is in dark mode."
+    },
+    "themeLight": {
+      "label": "Light Theme",
+      "description": "The theme to use for the dashboard when your system is in light mode."
+    }
+  },
+  "fileView": {
+    "title": "Viewing Files",
+    "variablesHint": "All text fields support using <anchor>variables.</anchor>",
+    "disableTextFiles": {
+      "label": "Disable text files",
+      "description": "Disable viewing text files through view-routes. This has no effect on other file types and will work even if view-routes are disabled."
+    },
+    "enabled": {
+      "label": "Enable View Routes",
+      "description": "Enable viewing files through customizable view-routes"
+    },
+    "showMimetype": {
+      "label": "Show mimetype",
+      "description": "Show the mimetype of the file in the view-route"
+    },
+    "showTags": {
+      "label": "Show tags",
+      "description": "Show the file's tags in the view-route"
+    },
+    "showFolder": {
+      "label": "Show folder",
+      "description": "Show the name/link of the folder if possible in the view-route"
+    },
+    "content": {
+      "label": "View Content",
+      "description": "Change the content within view-routes. Most HTML is valid, while the use of JavaScript is unavailable."
+    },
+    "align": {
+      "label": "View Content Alignment",
+      "description": "Change the alignment of the content within view-routes",
+      "options": {
+        "left": "Left",
+        "center": "Center",
+        "right": "Right"
+      }
+    },
+    "embed": {
+      "label": "Enable Embed",
+      "description": "Enable the following embed properties. These properties take advantage of OpenGraph tags. View routes will need to be enabled for this to work."
+    },
+    "embedMediaOnly": {
+      "label": "Media-only link preview",
+      "description": "When embeds are off, still add OpenGraph image/video tags so Discord and similar apps unfurl the media only (no custom title, description, or site name). The URL you paste stays in the message as plain text."
+    },
+    "embedTitle": {
+      "label": "Embed Title"
+    },
+    "embedDescription": {
+      "label": "Embed Description"
+    },
+    "embedSiteName": {
+      "label": "Embed Site Name"
+    },
+    "embedColor": {
+      "label": "Embed Color"
+    },
+    "notifications": {
+      "error": {
+        "title": "Error while updating view settings"
+      },
+      "updated": {
+        "message": "View settings updated"
+      }
+    }
+  },
+  "oauth": {
+    "description": "Manage your connected OAuth providers.",
+    "link": "Link {{provider}} account",
+    "unlink": "Unlink {{provider}} account",
+    "notifications": {
+      "unlinkFailed": {
+        "title": "Failed to unlink account"
+      },
+      "unlinked": {
+        "title": "Account unlinked",
+        "message": "Your {{provider}} account has been unlinked."
+      }
+    }
+  },
+  "mfa": {
+    "title": "Multi-Factor Authentication",
+    "description": "Setup 2FA or passkeys to add an extra layer of security to your account.",
+    "totp": {
+      "enable": "Enable 2FA",
+      "disable": "Disable 2FA",
+      "modal": {
+        "enableTitle": "Enable Two-Factor Authentication",
+        "disableTitle": "Disable Two-Factor Authentication",
+        "disableInstructions": "Enter the 6-digit code from your authenticator app below to confirm disabling 2FA.",
+        "step1": "<b>Step 1</b> Open/download an authenticator that supports QR code scanning or manual code entry. Popular options include <twofas>2FAs</twofas>, <google>Google Authenticator</google>, <microsoft>Microsoft Authenticator</microsoft>, and <apple>Apple Passwords</apple>.",
+        "step2": "<b>Step 2</b> Scan the QR code below with your authenticator app to enable 2FA.",
+        "qrAlt": "qr code {{secret}}",
+        "manualEntry": "If you can't scan the QR code, you can manually enter the following code into your authenticator app: <code>{{secret}}</code>",
+        "step3": "<b>Step 3</b> Enter the 6-digit code from your authenticator app below to confirm 2FA setup."
+      },
+      "invalidPin": "Invalid pin",
+      "notifications": {
+        "enabled": {
+          "title": "2FA Enabled",
+          "message": "You have successfully enabled 2FA on your account."
+        },
+        "disabled": {
+          "title": "2FA Disabled",
+          "message": "You have successfully disabled 2FA on your account."
+        }
+      }
+    },
+    "passkeys": {
+      "manage": "Manage passkeys",
+      "created": "Passkey created <created />",
+      "createdAndUsed": "Passkey created <created />, last used <lastUsed />.",
+      "legacyWarning": "Warning: This passkey was created with an older version of Zipline and <b>WILL NOT</b> work with this version. Please delete and recreate this passkey to ensure compatibility.",
+      "create": "Create a passkey",
+      "createError": "Error while creating a passkey - try again later",
+      "createErrorFallback": "An error occurred while creating a passkey",
+      "namePrompt": "Assign a name to this passkey so you can remember it later.",
+      "namePlaceholder": "Passkey name",
+      "modals": {
+        "remove": {
+          "message": "Your browser and device may still show \"{{name}}\" as an option to log in. If you want to remove it, you'll have to do so manually through your device's settings.",
+          "confirm": "Remove \"{{name}}\""
+        }
+      },
+      "notifications": {
+        "saveError": {
+          "title": "Error while saving passkey"
+        },
+        "saved": {
+          "title": "Passkey saved!",
+          "message": "Your passkey has been saved successfully."
+        },
+        "removeError": {
+          "title": "Error while removing passkey"
+        },
+        "removed": {
+          "title": "Passkey removed!",
+          "message": "Your passkey has been removed successfully."
+        }
+      }
+    }
+  },
+  "exports": {
+    "title": "Export Files",
+    "new": "New Export",
+    "empty": "No exports found. Click the button above to start a new export.",
+    "table": {
+      "id": "ID",
+      "started": "Started",
+      "files": "Files",
+      "size": "Size",
+      "completed": "{{id}} is completed",
+      "inProgress": "{{id}} is in progress"
+    },
+    "modals": {
+      "new": {
+        "title": "New export?",
+        "message": "Are you sure you want to start a new export? If you have a lot of files, this may take a while.",
+        "confirm": "Start export"
+      }
+    },
+    "notifications": {
+      "started": {
+        "title": "Export started",
+        "message": "Export has been started, you can check its status in the table below"
+      },
+      "deleted": {
+        "message": "Export has been deleted"
+      }
+    }
+  },
+  "generators": {
+    "title": "Generate Uploaders",
+    "description": "Generate scripts for upload tools. The Flameshot and Shell Script generators are supported on only Linux and macOS.",
+    "logoAlt": "{{name}} logo",
+    "shellScript": "Shell Script",
+    "desc": {
+      "flameshot": "To use this script, you need <flameshotLink>Flameshot</flameshotLink>, <curlLink><code>curl</code></curlLink>, <jqLink><code>jq</code></jqLink>, and <xclipLink><code>xclip</code> (linux only)</xclipLink> installed. This script is intended for use on Linux and macOS only (see options below).",
+      "ishare": "This generator requires <anchor>ishare</anchor> to be installed on macOS. This uploader is intended for use on macOS only.",
+      "itake": "This generator requires <anchor>iTake</anchor> to be installed on macOS. This uploader is intended for use on macOS only.",
+      "shell": "To use this script, you need <code>bash</code>, <curlLink><code>curl</code></curlLink>, <fileLink><code>file</code></fileLink>, <jqLink><code>jq</code></jqLink>, and <xclipLink><code>xclip</code> (linux only)</xclipLink> installed. This script is intended for use on Linux and macOS only (see options below)."
+    },
+    "modal": {
+      "title": "Generate {{name}} Uploader",
+      "destinationType": {
+        "label": "Destination Type",
+        "description": "Select which type of destination you want to generate",
+        "options": {
+          "file": "Upload File",
+          "url": "Shorten URL"
+        }
+      },
+      "format": {
+        "label": "Name format",
+        "description": "The file name format to use when uploading files, the \"File name\" field will override this value.",
+        "options": {
+          "default": "Default",
+          "random": "Random",
+          "date": "Date",
+          "uuid": "UUID",
+          "name": "Use file name",
+          "gfycat": "Gfycat-style name"
+        }
+      },
+      "compression": {
+        "label": "Compression",
+        "description": "The compression level to use on images (only). Leave blank to disable compression."
+      },
+      "maxViews": {
+        "label": "Max Views",
+        "description": "The maximum number of views files/urls can have before they are deleted. Leave blank to allow as many views as you want."
+      },
+      "overrideDomain": {
+        "label": "Override Domain",
+        "description": "Override the domain with this value. This will change the domain returned in your uploads. Leave blank to use the default domain.",
+        "default": "Default Domain"
+      },
+      "otherOptions": "Other Options",
+      "addOriginalName": {
+        "label": "Add Original Name",
+        "description": "Add the original file name, so that the file can be downloaded with the original name. This will still use the \"Name Format\" option for it's file name."
+      },
+      "extensionless": {
+        "label": "Extensionless URL",
+        "description": "Remove the file extension from the returned URL. The file can still be accessed with its extension. This option will only work if the server is configured to allow extensionless URLs."
+      },
+      "xshareCompatibility": {
+        "label": "Xshare Compatibility",
+        "description": "If you choose to use the Xshare app on Android, enable this option for compatibility. The generated config will not work with ShareX."
+      },
+      "waylandCompatibility": {
+        "label": "Enable Wayland Compatibility",
+        "description": "Use <code>wl-copy</code> instead of <code>xclip</code> for copying to clipboard."
+      },
+      "macCompatibility": {
+        "label": "Enable macOS Compatibility",
+        "description": "Use <code>pbcopy</code> instead of <code>xclip</code> for copying to clipboard."
+      },
+      "compositorUnsupported": {
+        "label": "Using a DE other than Gnome, KDE or Sway?",
+        "description": "If using a compositor such as <anchor>Hyprland</anchor>, this option will set the <code>XDG_CURRENT_DESKTOP=sway</code> to workaround Flameshot's errors on Wayland. This is not needed on Xorg."
+      },
+      "useEcho": {
+        "label": "Use <code>echo</code> instead of copying to clipboard",
+        "description": "Just output the url to the terminal instead of copying it to the clipboard."
+      },
+      "waylandHelp": "If you are having trouble getting Flameshot to work on Wayland, consult the <anchor>Wayland guide</anchor>."
+    }
+  }
+}

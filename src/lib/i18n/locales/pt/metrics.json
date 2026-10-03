@@ -1,0 +1,61 @@
+{
+  "title": "Métricas",
+  "range": {
+    "change": "Alterar período",
+    "modalTitle": "Alterar período",
+    "fromTo": "{{from}} a {{to}}",
+    "presets": {
+      "lastTwoDays": "Últimos dois dias",
+      "last7Days": "Últimos 7 dias",
+      "thisMonth": "Este mês",
+      "lastMonth": "Mês passado",
+      "thisYear": "Este ano",
+      "lastYear": "Ano passado"
+    }
+  },
+  "allTime": {
+    "label": "Todo o período",
+    "show": "Mostrar todo o período",
+    "slowWarning": "O carregamento pode demorar mais que o normal.",
+    "viewing": "Você está vendo as estatísticas de todo o período."
+  },
+  "loadFailed": "Falha ao carregar as estatísticas deste período. Talvez não haja dados disponíveis no período especificado. :(",
+  "cards": {
+    "files": "Arquivos",
+    "urls": "Links curtos",
+    "storageUsed": "Armazenamento usado",
+    "users": "Usuários",
+    "fileViews": "Visualizações de arquivos",
+    "urlViews": "Visualizações de links curtos"
+  },
+  "tables": {
+    "columns": {
+      "user": "Usuário",
+      "files": "Arquivos",
+      "storageUsed": "Armazenamento usado",
+      "views": "Visualizações",
+      "urls": "Links curtos",
+      "type": "Tipo"
+    },
+    "unknownUser": "[desconhecido]"
+  },
+  "graphs": {
+    "count": {
+      "title": "Quantidade"
+    },
+    "views": {
+      "title": "Visualizações",
+      "value_one": "{{count}} visualização",
+      "value_many": "{{count}} visualizações",
+      "value_other": "{{count}} visualizações"
+    },
+    "storage": {
+      "title": "Armazenamento usado"
+    },
+    "series": {
+      "files": "Arquivos",
+      "urls": "Links curtos",
+      "storageUsed": "Armazenamento usado"
+    }
+  }
+}

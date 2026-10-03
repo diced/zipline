@@ -1,0 +1,132 @@
+{
+  "title": "Liens courts",
+  "create": {
+    "title": "Raccourcir une URL",
+    "url": {
+      "label": "URL",
+      "required": "L'URL est requise",
+      "invalid": "URL non valide"
+    },
+    "vanity": {
+      "label": "Nom personnalisé",
+      "description": "Champ facultatif, laissez vide pour générer un code aléatoire"
+    },
+    "maxViews": {
+      "label": "Vues max.",
+      "description": "Champ facultatif, laissez vide pour ne pas limiter le nombre de vues."
+    },
+    "domain": {
+      "label": "Remplacer le domaine"
+    },
+    "enabled": {
+      "label": "Activé",
+      "description": "Autoriser ou empêcher l'accès à ce lien court"
+    },
+    "password": {
+      "label": "Mot de passe",
+      "description": "Protégez votre lien avec un mot de passe"
+    }
+  },
+  "shortened": {
+    "title": "URL raccourcie",
+    "open": "Ouvrir le lien dans un nouvel onglet",
+    "copy": "Copier le lien dans le presse-papiers"
+  },
+  "notifications": {
+    "shortenFailed": {
+      "title": "Impossible de raccourcir l'URL"
+    },
+    "copied": {
+      "title": "URL copiée dans le presse-papiers"
+    },
+    "deleteFailed": {
+      "title": "Impossible de supprimer le lien court"
+    },
+    "deleted": {
+      "title": "Lien court supprimé",
+      "message": "Le lien court {{code}} a été supprimé"
+    },
+    "removePasswordFailed": {
+      "title": "Impossible de supprimer le mot de passe…"
+    },
+    "passwordRemoved": {
+      "title": "Mot de passe supprimé !",
+      "message": "Le mot de passe du lien court a été supprimé."
+    },
+    "saveFailed": {
+      "title": "Impossible d'enregistrer les modifications…"
+    },
+    "saved": {
+      "title": "Modifications enregistrées !",
+      "message": "Les modifications ont bien été enregistrées."
+    }
+  },
+  "delete": {
+    "message": "Voulez-vous vraiment supprimer {{code}} ? Cette action est irréversible.",
+    "confirm": "Supprimer « {{code}} »"
+  },
+  "edit": {
+    "title": "Modification de « {{name}} »",
+    "unknown": "inconnu",
+    "maxViews": {
+      "label": "Vues max.",
+      "placeholder": "Illimité",
+      "description": "Nombre maximal de clics sur ce lien court avant sa suppression automatique. Laissez vide pour ne pas limiter le nombre de vues."
+    },
+    "vanity": {
+      "label": "Nom personnalisé",
+      "placeholder": "Facultatif",
+      "description": "Un alias personnalisé pour votre lien court. Laissez vide pour utiliser le code généré aléatoirement."
+    },
+    "destination": {
+      "label": "Destination"
+    },
+    "enabled": {
+      "label": "Activé",
+      "description": "Empêcher ou autoriser l'accès à ce lien court."
+    },
+    "password": {
+      "label": "Mot de passe",
+      "description": "Définissez un mot de passe pour ce lien court. Laissez vide pour désactiver la protection par mot de passe.",
+      "remove": "Supprimer le mot de passe"
+    },
+    "save": "Enregistrer les modifications"
+  },
+  "card": {
+    "copyShortLink": "Copier le lien court",
+    "copyDestination": "Copier la destination",
+    "showQrCode": "Afficher le code QR",
+    "views": "Vues :",
+    "enabled": "Activé :",
+    "created": "Création :",
+    "updated": "Mise à jour :",
+    "destination": "Destination :",
+    "openDestination": "Ouvrir « {{url}} » dans un nouvel onglet",
+    "code": "Code :"
+  },
+  "empty": {
+    "title": "Aucun lien court trouvé",
+    "description": "Raccourcissez une URL pour la voir ici"
+  },
+  "table": {
+    "columns": {
+      "code": "Code",
+      "vanity": "Nom personnalisé",
+      "destination": "Destination",
+      "views": "Vues",
+      "maxViews": "Vues max.",
+      "created": "Création",
+      "enabled": "Activé",
+      "actions": "Actions"
+    },
+    "search": {
+      "code": "Rechercher par code",
+      "vanity": "Rechercher par nom personnalisé",
+      "destination": "Rechercher par destination"
+    },
+    "copy": "Copier l'URL",
+    "showQrCode": "Afficher le code QR",
+    "edit": "Modifier le lien court",
+    "delete": "Supprimer le lien court"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "password": {
+    "title": "Senha necessária",
+    "invalid": "Senha inválida",
+    "verify": "Verificar",
+    "fileDescription": "Este arquivo é protegido por senha. Digite a senha para visualizá-lo",
+    "urlDescription": "Este link é protegido por senha. Digite a senha para visualizá-lo"
+  },
+  "file": {
+    "pageTitle": "Ver arquivo",
+    "viewFolder": "Ver pasta",
+    "viewRaw": "Ver arquivo bruto",
+    "download": "Baixar arquivo"
+  },
+  "url": {
+    "redirecting": "Redirecionando para <anchor>{{destination}}</anchor>"
+  },
+  "folder": {
+    "pageTitle": "Pasta",
+    "subfolders": "Subpastas",
+    "files": "Arquivos",
+    "empty": "Esta pasta está vazia.",
+    "card": {
+      "files": "Arquivos: {{amount}}",
+      "subfolders": "Subpastas: {{amount}}"
+    },
+    "pagination": "Arquivos {{from}} - {{to}} de {{total}}"
+  },
+  "folderUpload": {
+    "pageTitle": "Enviar para {{name}}",
+    "pageTitleFallback": "Enviar para a pasta",
+    "title": "Enviar arquivos para {{name}}",
+    "public": "Esta pasta é <anchor>pública</anchor>. Qualquer pessoa com o link pode ver o conteúdo dela e enviar arquivos.",
+    "private": "Somente o proprietário pode ver o conteúdo desta pasta. No entanto, qualquer pessoa pode enviar arquivos, e quem enviou ainda poderá acessar os próprios arquivos se tiver o link de cada um deles."
+  }
+}

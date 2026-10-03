@@ -1,0 +1,124 @@
+{
+  "nav": {
+    "home": "首页",
+    "metrics": "统计",
+    "files": "文件",
+    "folders": "文件夹",
+    "upload": "上传",
+    "uploadFile": "文件",
+    "uploadText": "文本",
+    "urls": "短链接",
+    "administrator": "管理员",
+    "adminDashboard": "控制台",
+    "serverSettings": "设置",
+    "serverActions": "操作",
+    "users": "用户",
+    "invites": "邀请"
+  },
+  "header": {
+    "logoAlt": "Zipline 徽标",
+    "avatarAlt": "用户头像"
+  },
+  "userMenu": {
+    "administratorLabel": "{{username}} (管理员)",
+    "copyToken": "复制令牌",
+    "refreshToken": "刷新令牌",
+    "settings": "设置",
+    "serverSettings": "服务器设置",
+    "logout": "退出登录",
+    "loggingOut": "正在退出登录..."
+  },
+  "token": {
+    "cancel": "不，关闭此弹窗",
+    "copy": {
+      "title": "复制令牌？",
+      "message": "确定要复制你的令牌吗？令牌可以操作 Zipline 的所有功能，请勿与任何人分享。"
+    },
+    "copied": {
+      "title": "已复制",
+      "message": "令牌已复制到剪贴板。"
+    },
+    "refresh": {
+      "title": "刷新令牌？",
+      "message": "确定要刷新你的令牌吗？刷新或重置令牌后，需要更新所有使用该令牌的脚本或应用程序。"
+    },
+    "refreshed": {
+      "title": "已刷新",
+      "message": "令牌已刷新。"
+    }
+  },
+  "version": {
+    "modalTitle": "Zipline 版本",
+    "tooltip": "点击查看更多版本信息",
+    "latest": "正在运行最新版本的 Zipline。",
+    "unstable": "你正在运行<b>不稳定</b>版本的 Zipline。上游版本未经充分测试，可能存在错误。",
+    "outdated": "你正在运行<b>过时</b>版本的 Zipline。建议更新到<anchor>最新版本</anchor>。",
+    "current": "当前版本",
+    "fields": {
+      "version": "版本",
+      "commit": "提交",
+      "upstream": "上游版本？",
+      "availableToUpdate": "可更新"
+    },
+    "latestCommit": "最新可用提交",
+    "latestCommitNote": "仅在运行上游版本时显示。",
+    "available": "{{tag}} 现已可用",
+    "changelogs": "更新日志",
+    "update": "更新"
+  },
+  "qrCode": {
+    "title": "二维码",
+    "alt": "二维码",
+    "failed": "无法生成二维码。",
+    "format": "格式",
+    "copyUnsupported": "部分浏览器不支持复制此格式。你可以通过右键点击或长按图片来正常复制。",
+    "copyImage": "复制图片",
+    "copied": "二维码图片已复制到剪贴板",
+    "copyFailed": "无法复制二维码图片"
+  },
+  "domainSelect": {
+    "default": "默认域名",
+    "description": "使用此值覆盖域名，这会更改上传后返回的链接中的域名。留空则使用默认域名。"
+  },
+  "copyLink": {
+    "title": "已复制链接"
+  },
+  "errors": {
+    "generic": {
+      "title": "发生错误",
+      "message": "出现了问题。请稍后重试，如果问题仍然存在，请报告此问题。"
+    },
+    "dashboard": {
+      "title": "控制台客户端错误",
+      "message": "加载控制台时出现问题。请稍后重试，如果问题仍然存在，请报告此问题。"
+    },
+    "reload": {
+      "title": "有可用更新",
+      "message": "应用有新版本可用，请重新加载页面以完成更新。",
+      "button": "重新加载页面",
+      "why": "为什么会看到此消息？",
+      "errorTitle": "无法获取动态导入的模块",
+      "errorMessage": "如果在你打开页面期间部署了新版本的应用，就可能出现此错误。请重新加载页面以更新到最新版本。"
+    }
+  },
+  "notFound": {
+    "message": "找不到页面",
+    "goHome": "返回首页"
+  },
+  "titles": {
+    "settings": "设置",
+    "folders": "文件夹",
+    "files": "文件",
+    "metrics": "统计",
+    "urls": "短链接",
+    "serverSettings": "服务器设置",
+    "administrator": "管理员",
+    "serverActions": "服务器操作",
+    "invites": "邀请",
+    "uploadFile": "上传文件",
+    "uploadText": "上传文本",
+    "users": "用户",
+    "userFiles": "{{username}} 的文件",
+    "unknownUserFiles": "用户的文件"
+  }
+}

@@ -1,4 +1,5 @@
 import { Response } from '@/lib/api/response';
+import i18n from '@/lib/i18n';
 import { copyLink } from '@/lib/client/copyLink';
 import type { SafeConfig } from '@/lib/config/safe';
 import { Url } from '@/lib/db/models/url';
@@ -13,9 +14,9 @@ import { mutate } from 'swr';
 
 export async function deleteUrl(warnDeletion: boolean, url: Url) {
   conditionalWarning(warnDeletion, {
-    message: `Are you sure you want to delete ${url.code ?? url.vanity}? This action cannot be undone.`,
+    message: i18n.t('urls:delete.message', { code: url.code ?? url.vanity }),
     onConfirm: () => handleDeleteUrl(url),
-    confirmLabel: `Delete '${url.code ?? url.vanity}'`,
+    confirmLabel: i18n.t('urls:delete.confirm', { code: url.code ?? url.vanity }),
   });
 }
 
@@ -33,15 +34,15 @@ async function handleDeleteUrl(url: Url) {
 
   if (error) {
     notifications.show({
-      title: 'Failed to delete url',
+      title: i18n.t('urls:notifications.deleteFailed.title'),
       message: error.error,
       color: 'red',
       icon: <IconLinkOff size='1rem' />,
     });
   } else {
     notifications.show({
-      title: 'Url deleted',
-      message: `Url ${data?.code ?? data?.vanity} has been deleted`,
+      title: i18n.t('urls:notifications.deleted.title'),
+      message: i18n.t('urls:notifications.deleted.message', { code: data?.code ?? data?.vanity }),
       color: 'green',
       icon: <IconCheck size='1rem' />,
     });

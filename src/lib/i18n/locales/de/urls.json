@@ -1,0 +1,132 @@
+{
+  "title": "Kurzlinks",
+  "create": {
+    "title": "URL kürzen",
+    "url": {
+      "label": "URL",
+      "required": "URL ist erforderlich",
+      "invalid": "Ungültige URL"
+    },
+    "vanity": {
+      "label": "Wunschname",
+      "description": "Optional. Leer lassen, um einen zufälligen Code zu generieren"
+    },
+    "maxViews": {
+      "label": "Max. Aufrufe",
+      "description": "Optional. Leer lassen, um kein Aufruflimit festzulegen."
+    },
+    "domain": {
+      "label": "Domain überschreiben"
+    },
+    "enabled": {
+      "label": "Aktiviert",
+      "description": "Aufrufen dieses Kurzlinks erlauben oder verhindern"
+    },
+    "password": {
+      "label": "Passwort",
+      "description": "Schützen Sie Ihren Link mit einem Passwort"
+    }
+  },
+  "shortened": {
+    "title": "Kurzlink erstellt",
+    "open": "Link in neuem Tab öffnen",
+    "copy": "Link in die Zwischenablage kopieren"
+  },
+  "notifications": {
+    "shortenFailed": {
+      "title": "URL konnte nicht gekürzt werden"
+    },
+    "copied": {
+      "title": "Kurzlink in die Zwischenablage kopiert"
+    },
+    "deleteFailed": {
+      "title": "Kurzlink konnte nicht gelöscht werden"
+    },
+    "deleted": {
+      "title": "Kurzlink gelöscht",
+      "message": "Kurzlink {{code}} wurde gelöscht"
+    },
+    "removePasswordFailed": {
+      "title": "Passwort konnte nicht entfernt werden …"
+    },
+    "passwordRemoved": {
+      "title": "Passwort entfernt!",
+      "message": "Das Passwort wurde vom Kurzlink entfernt."
+    },
+    "saveFailed": {
+      "title": "Änderungen konnten nicht gespeichert werden …"
+    },
+    "saved": {
+      "title": "Änderungen gespeichert!",
+      "message": "Die Änderungen wurden erfolgreich gespeichert."
+    }
+  },
+  "delete": {
+    "message": "Möchten Sie {{code}} wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+    "confirm": "„{{code}}“ löschen"
+  },
+  "edit": {
+    "title": "„{{name}}“ bearbeiten",
+    "unknown": "unbekannt",
+    "maxViews": {
+      "label": "Max. Aufrufe",
+      "placeholder": "Unbegrenzt",
+      "description": "Maximale Anzahl an Klicks, bevor dieser Kurzlink automatisch gelöscht wird. Leer lassen, um beliebig viele Aufrufe zuzulassen."
+    },
+    "vanity": {
+      "label": "Wunschname",
+      "placeholder": "Optional",
+      "description": "Ein eigener Alias für Ihren Kurzlink. Leer lassen, um den zufällig generierten Code zu verwenden."
+    },
+    "destination": {
+      "label": "Ziel"
+    },
+    "enabled": {
+      "label": "Aktiviert",
+      "description": "Aufrufen dieses Kurzlinks verhindern oder erlauben."
+    },
+    "password": {
+      "label": "Passwort",
+      "description": "Legen Sie ein Passwort für diesen Kurzlink fest. Leer lassen, um den Passwortschutz zu deaktivieren.",
+      "remove": "Passwort entfernen"
+    },
+    "save": "Änderungen speichern"
+  },
+  "card": {
+    "copyShortLink": "Kurzlink kopieren",
+    "copyDestination": "Ziel kopieren",
+    "showQrCode": "QR-Code anzeigen",
+    "views": "Aufrufe:",
+    "enabled": "Aktiviert:",
+    "created": "Erstellt:",
+    "updated": "Aktualisiert:",
+    "destination": "Ziel:",
+    "openDestination": "„{{url}}“ in neuem Tab öffnen",
+    "code": "Code:"
+  },
+  "empty": {
+    "title": "Keine Kurzlinks gefunden",
+    "description": "Kürzen Sie eine URL, damit sie hier angezeigt wird"
+  },
+  "table": {
+    "columns": {
+      "code": "Code",
+      "vanity": "Wunschname",
+      "destination": "Ziel",
+      "views": "Aufrufe",
+      "maxViews": "Max. Aufrufe",
+      "created": "Erstellt",
+      "enabled": "Aktiviert",
+      "actions": "Aktionen"
+    },
+    "search": {
+      "code": "Nach Code suchen",
+      "vanity": "Nach Wunschnamen suchen",
+      "destination": "Nach Ziel suchen"
+    },
+    "copy": "Kurzlink kopieren",
+    "showQrCode": "QR-Code anzeigen",
+    "edit": "Kurzlink bearbeiten",
+    "delete": "Kurzlink löschen"
+  }
+}

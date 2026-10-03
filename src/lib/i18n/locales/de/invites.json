@@ -1,0 +1,75 @@
+{
+  "title": "Einladungen",
+  "create": {
+    "title": "Einladung erstellen",
+    "expiresAt": {
+      "label": "Ablaufzeit",
+      "description": "Wählen Sie eine Ablaufzeit für diese Einladung aus oder wählen Sie „Nie“, wenn die Einladung nicht ablaufen soll.",
+      "placeholder": "Ablaufzeit auswählen …"
+    },
+    "maxUses": {
+      "label": "Max. Verwendungen",
+      "description": "Legen Sie fest, wie oft diese Einladung höchstens verwendet werden kann, oder lassen Sie das Feld für unbegrenzte Verwendungen leer.",
+      "placeholder": "Zahl eingeben …"
+    }
+  },
+  "expirations": {
+    "never": "Nie",
+    "minutes30": "30 Minuten",
+    "hour1": "1 Stunde",
+    "hours6": "6 Stunden",
+    "hours12": "12 Stunden",
+    "day1": "1 Tag",
+    "days3": "3 Tage",
+    "days5": "5 Tage",
+    "days7": "7 Tage"
+  },
+  "notifications": {
+    "created": {
+      "title": "Einladung erstellt",
+      "message": "Die Einladung {{code}} wurde erstellt."
+    },
+    "deleteFailed": {
+      "title": "Einladung konnte nicht gelöscht werden"
+    },
+    "deleted": {
+      "title": "Einladung gelöscht",
+      "message": "Die Einladung {{code}} wurde gelöscht."
+    }
+  },
+  "delete": {
+    "message": "Möchten Sie die Einladung {{code}} wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+    "confirm": "{{code}} löschen"
+  },
+  "card": {
+    "copyUrl": "URL kopieren",
+    "showQrCode": "QR-Code anzeigen",
+    "createdBy": "Erstellt von:",
+    "created": "Erstellt:",
+    "expires": "Läuft ab:",
+    "maxUses": "Max. Verwendungen:",
+    "uses": "Verwendungen:",
+    "unlimited": "Unbegrenzt"
+  },
+  "empty": {
+    "title": "Keine Einladungen gefunden",
+    "description": "Erstellen Sie eine Einladung, damit sie hier angezeigt wird."
+  },
+  "table": {
+    "columns": {
+      "code": "Code",
+      "createdBy": "Erstellt von",
+      "created": "Erstellt",
+      "updatedAt": "Zuletzt aktualisiert",
+      "expires": "Läuft ab",
+      "maxUses": "Max. Verwendungen",
+      "uses": "Verwendungen",
+      "actions": "Aktionen"
+    },
+    "never": "Nie",
+    "unlimited": "Unbegrenzt",
+    "copyLink": "Einladungslink kopieren",
+    "showQrCode": "QR-Code anzeigen",
+    "delete": "Einladung löschen"
+  }
+}

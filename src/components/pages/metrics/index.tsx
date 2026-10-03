@@ -3,6 +3,7 @@ import { DatePicker } from '@mantine/dates';
 import { IconCalendarSearch, IconCalendarTime } from '@tabler/icons-react';
 import dayjs from 'dayjs';
 import { lazy, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { StatsCardsSkeleton, StatsTablesSkeleton } from './parts/Skeletons';
 import { useApiStats } from './useStats';
 
@@ -13,6 +14,7 @@ const StatsCards = lazy(() => import('./parts/StatsCards'));
 const StatsTables = lazy(() => import('./parts/StatsTables'));
 
 export default function DashboardMetrics() {
+  const { t } = useTranslation(['metrics', 'common']);
   const today = dayjs();
 
   const [dateRange, setDateRange] = useState<[string | null, string | null]>([
@@ -41,7 +43,7 @@ export default function DashboardMetrics() {
 
   return (
     <>
-      <Modal title='Change range' opened={open} onClose={() => setOpen(false)} size='auto'>
+      <Modal title={t('range.modalTitle')} opened={open} onClose={() => setOpen(false)} size='auto'>
         <Paper withBorder style={{ minHeight: 300 }}>
           <DatePicker
             type='range'
@@ -52,33 +54,33 @@ export default function DashboardMetrics() {
             presets={[
               {
                 value: [today.subtract(2, 'day').format('YYYY-MM-DD'), today.format('YYYY-MM-DD')],
-                label: 'Last two days',
+                label: t('range.presets.lastTwoDays'),
               },
               {
                 value: [today.subtract(7, 'day').format('YYYY-MM-DD'), today.format('YYYY-MM-DD')],
-                label: 'Last 7 days',
+                label: t('range.presets.last7Days'),
               },
               {
                 value: [today.startOf('month').format('YYYY-MM-DD'), today.format('YYYY-MM-DD')],
-                label: 'This month',
+                label: t('range.presets.thisMonth'),
               },
               {
                 value: [
                   today.subtract(1, 'month').startOf('month').format('YYYY-MM-DD'),
                   today.subtract(1, 'month').endOf('month').format('YYYY-MM-DD'),
                 ],
-                label: 'Last month',
+                label: t('range.presets.lastMonth'),
               },
               {
                 value: [today.startOf('year').format('YYYY-MM-DD'), today.format('YYYY-MM-DD')],
-                label: 'This year',
+                label: t('range.presets.thisYear'),
               },
               {
                 value: [
                   today.subtract(1, 'year').startOf('year').format('YYYY-MM-DD'),
                   today.subtract(1, 'year').endOf('year').format('YYYY-MM-DD'),
                 ],
-                label: 'Last year',
+                label: t('range.presets.lastYear'),
               },
             ]}
           />
@@ -86,34 +88,38 @@ export default function DashboardMetrics() {
 
         <Group mt='lg'>
           <Button fullWidth onClick={() => setOpen(false)}>
-            Close
+            {t('common:actions.close')}
           </Button>
         </Group>
       </Modal>
 
       <Group>
-        <Title>Metrics</Title>
+        <Title>{t('title')}</Title>
         <Button
           size='compact-sm'
           variant='outline'
           leftSection={<IconCalendarSearch size='1rem' />}
           onClick={() => setOpen(true)}
         >
-          Change Date Range
+          {t('range.change')}
         </Button>
         {!allTime ? (
           <Text size='sm' c='dimmed'>
-            {dateRange[0] ? new Date(dateRange[0]).toLocaleDateString() : '—'}
-            {dateRange[1] ? ` to ${new Date(dateRange[1]).toLocaleDateString()}` : ''}
+            {dateRange[1]
+              ? t('range.fromTo', {
+                  from: dateRange[0] ? new Date(dateRange[0]).toLocaleDateString() : '—',
+                  to: new Date(dateRange[1]).toLocaleDateString(),
+                })
+              : dateRange[0]
+                ? new Date(dateRange[0]).toLocaleDateString()
+                : '—'}
           </Text>
         ) : (
           <Text size='sm' c='dimmed'>
-            All Time
+            {t('allTime.label')}
           </Text>
         )}
-        <Tooltip
-          label={!allTime ? 'This may take longer than usual to load.' : 'You are viewing all time stats.'}
-        >
+        <Tooltip label={!allTime ? t('allTime.slowWarning') : t('allTime.viewing')}>
           <Button
             size='compact-sm'
             variant='outline'
@@ -121,7 +127,7 @@ export default function DashboardMetrics() {
             onClick={() => showAllTime()}
             disabled={allTime}
           >
-            Show All Time
+            {t('allTime.show')}
           </Button>
         </Tooltip>
       </Group>
@@ -146,8 +152,7 @@ export default function DashboardMetrics() {
           </div>
         ) : (
           <Text size='sm' c='red'>
-            Failed to load statistics for this time range. There may be no data available within the time
-            range specified. :(
+            {t('loadFailed')}
           </Text>
         )}
       </Box>

@@ -1,0 +1,124 @@
+{
+  "nav": {
+    "home": "Início",
+    "metrics": "Métricas",
+    "files": "Arquivos",
+    "folders": "Pastas",
+    "upload": "Enviar",
+    "uploadFile": "Arquivo",
+    "uploadText": "Texto",
+    "urls": "Links curtos",
+    "administrator": "Administrador",
+    "adminDashboard": "Painel",
+    "serverSettings": "Configurações",
+    "serverActions": "Ações",
+    "users": "Usuários",
+    "invites": "Convites"
+  },
+  "header": {
+    "logoAlt": "Logotipo do Zipline",
+    "avatarAlt": "Avatar do usuário"
+  },
+  "userMenu": {
+    "administratorLabel": "{{username}} (Administrador)",
+    "copyToken": "Copiar token",
+    "refreshToken": "Atualizar token",
+    "settings": "Configurações",
+    "serverSettings": "Configurações do servidor",
+    "logout": "Sair",
+    "loggingOut": "Saindo..."
+  },
+  "token": {
+    "cancel": "Não, fechar esta janela",
+    "copy": {
+      "title": "Copiar token?",
+      "message": "Tem certeza de que deseja copiar seu token? Seu token pode interagir com todas as partes do Zipline. Não compartilhe este token com ninguém."
+    },
+    "copied": {
+      "title": "Copiado",
+      "message": "Seu token foi copiado para a área de transferência."
+    },
+    "refresh": {
+      "title": "Atualizar token?",
+      "message": "Tem certeza de que deseja atualizar seu token? Depois de atualizar ou redefinir seu token, você precisará atualizar todos os scripts e aplicativos que o utilizam."
+    },
+    "refreshed": {
+      "title": "Atualizado",
+      "message": "Seu token foi atualizado."
+    }
+  },
+  "version": {
+    "modalTitle": "Versão do Zipline",
+    "tooltip": "Clique para ver mais informações sobre a versão",
+    "latest": "Você está usando a versão mais recente do Zipline.",
+    "unstable": "Você está usando uma versão <b>instável</b> do Zipline. Versões upstream não são totalmente testadas e podem conter bugs.",
+    "outdated": "Você está usando uma versão <b>desatualizada</b> do Zipline. Recomendamos atualizar para a <anchor>versão mais recente</anchor>.",
+    "current": "Versão atual",
+    "fields": {
+      "version": "Versão",
+      "commit": "Commit",
+      "upstream": "Versão upstream?",
+      "availableToUpdate": "Atualização disponível"
+    },
+    "latestCommit": "Commit mais recente disponível",
+    "latestCommitNote": "Isto só é exibido ao usar uma versão upstream.",
+    "available": "{{tag}} está disponível",
+    "changelogs": "Notas de versão",
+    "update": "Atualizar"
+  },
+  "qrCode": {
+    "title": "Código QR",
+    "alt": "Código QR",
+    "failed": "Falha ao gerar o código QR.",
+    "format": "Formato",
+    "copyUnsupported": "Alguns navegadores não permitem copiar este formato. Você pode copiar a imagem normalmente clicando com o botão direito ou mantendo-a pressionada.",
+    "copyImage": "Copiar imagem",
+    "copied": "Imagem do código QR copiada para a área de transferência",
+    "copyFailed": "Falha ao copiar a imagem do código QR"
+  },
+  "domainSelect": {
+    "default": "Domínio padrão",
+    "description": "Substitui o domínio por este valor. Isso altera o domínio retornado nos seus envios. Deixe em branco para usar o domínio padrão."
+  },
+  "copyLink": {
+    "title": "Link copiado"
+  },
+  "errors": {
+    "generic": {
+      "title": "Ocorreu um erro",
+      "message": "Algo deu errado. Tente novamente mais tarde ou relate o problema se ele persistir."
+    },
+    "dashboard": {
+      "title": "Erro do cliente no painel",
+      "message": "Algo deu errado ao carregar o painel. Tente novamente mais tarde ou relate o problema se ele persistir."
+    },
+    "reload": {
+      "title": "Atualização disponível",
+      "message": "Uma nova versão do aplicativo está disponível. Recarregue a página para atualizar.",
+      "button": "Recarregar página",
+      "why": "Por que estou vendo isto?",
+      "errorTitle": "Falha ao buscar o módulo importado dinamicamente",
+      "errorMessage": "Este erro pode ocorrer quando uma nova versão do aplicativo é implantada enquanto a página está aberta. Recarregue a página para atualizar para a versão mais recente."
+    }
+  },
+  "notFound": {
+    "message": "Página não encontrada",
+    "goHome": "Ir para o início"
+  },
+  "titles": {
+    "settings": "Configurações",
+    "folders": "Pastas",
+    "files": "Arquivos",
+    "metrics": "Métricas",
+    "urls": "Links curtos",
+    "serverSettings": "Configurações do servidor",
+    "administrator": "Administrador",
+    "serverActions": "Ações do servidor",
+    "invites": "Convites",
+    "uploadFile": "Enviar arquivo",
+    "uploadText": "Enviar texto",
+    "users": "Usuários",
+    "userFiles": "Arquivos de {{username}}",
+    "unknownUserFiles": "Arquivos do usuário"
+  }
+}

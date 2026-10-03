@@ -1,5 +1,7 @@
 import { Export3 } from '@/lib/import/version3/validateExport';
 import { Avatar, Box, Group, Radio, Stack, Text } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
+import SafeTrans from '@/components/SafeTrans';
 
 export default function Export3UserChoose({
   export3,
@@ -10,18 +12,14 @@ export default function Export3UserChoose({
   setImportFrom: (importFrom: string) => void;
   importFrom: string;
 }) {
+  const { t } = useTranslation('serverActions');
   const users = Object.entries(export3.users);
 
   return (
     <Box my='lg'>
-      <Text size='md'>Select a user to import data from into the current user.</Text>
+      <Text size='md'>{t('importExport.userChoose.title')}</Text>
       <Text size='sm' c='dimmed'>
-        This option allows you to import data from a user in your export into the currently logged-in user,
-        even if both have the same username. Normally, the system skips importing users with usernames that
-        already exist in the database. However, if you&apos;ve just set up your instance and reused the same
-        username as your old instance, this option enables you to merge data from that user into your
-        logged-in account without needing to delete or replace it.{' '}
-        <b>It is recommended to select a user with super-administrator permissions for this operation.</b>
+        <SafeTrans t={t} i18nKey='importExport.v3.userChoose.description' components={{ b: <b /> }} />
       </Text>
 
       <Radio.Group value={importFrom} onChange={(value) => setImportFrom(value)} name='importFrom'>
@@ -34,7 +32,7 @@ export default function Export3UserChoose({
                 <Text my='sm'>{user.username}</Text>{' '}
                 {user.super_administrator && (
                   <Text c='red' size='xs' mb='xs'>
-                    Super Administrator
+                    {t('importExport.userChoose.superAdministrator')}
                   </Text>
                 )}
               </Stack>
@@ -46,9 +44,9 @@ export default function Export3UserChoose({
           <Group wrap='nowrap' align='flex-start'>
             <Radio.Indicator m='md' />
             <Stack gap={0}>
-              <Text my='sm'>Do not merge data</Text>{' '}
+              <Text my='sm'>{t('importExport.userChoose.noMerge.label')}</Text>{' '}
               <Text c='dimmed' size='xs' mb='xs'>
-                Select this option if you do not want to merge data from any user into the current user.
+                {t('importExport.userChoose.noMerge.description')}
               </Text>
             </Stack>
           </Group>

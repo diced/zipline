@@ -4,6 +4,7 @@ import { copyLink } from '@/lib/client/copyLink';
 import type { File } from '@/lib/db/models/file';
 import { Folder } from '@/lib/db/models/folder';
 import { fetchApi } from '@/lib/fetchApi';
+import i18n from '@/lib/i18n';
 import { conditionalWarning } from '@/lib/client/warningModal';
 import { getDomain } from '@/lib/client/webDomain';
 import { formatRootUrl } from '@/lib/url';
@@ -40,8 +41,8 @@ export function copyFile(file: File, clipboard: ReturnType<typeof useClipboard>,
 
 export async function deleteFile(warnDeletion: boolean, file: File, setOpen: (open: boolean) => void) {
   conditionalWarning(warnDeletion, {
-    confirmLabel: `Delete ${file.name}`,
-    message: `Are you sure you want to delete ${file.name}? This action cannot be undone.`,
+    confirmLabel: i18n.t('file:delete.confirm', { name: file.name }),
+    message: i18n.t('file:delete.message', { name: file.name }),
     onConfirm: () => handleDeleteFile(file, setOpen),
   });
 }
@@ -51,15 +52,15 @@ export async function handleDeleteFile(file: File, setOpen: (open: boolean) => v
 
   if (error) {
     notifications.show({
-      title: 'Error',
+      title: i18n.t('common:status.error'),
       message: error.error,
       color: 'red',
       icon: <IconTrashXFilled size='1rem' />,
     });
   } else {
     notifications.show({
-      title: 'File deleted',
-      message: `${file.name} has been deleted`,
+      title: i18n.t('file:notifications.deleted.title'),
+      message: i18n.t('file:notifications.deleted.message', { name: file.name }),
       color: 'green',
       icon: <IconTrashFilled size='1rem' />,
     });
@@ -81,15 +82,19 @@ export async function favoriteFile(file: File) {
 
   if (error) {
     notifications.show({
-      title: 'Error',
+      title: i18n.t('common:status.error'),
       message: error.error,
       color: 'red',
       icon: <IconStar size='1rem' />,
     });
   } else {
     notifications.show({
-      title: `File ${data!.favorite ? 'favorited' : 'unfavorited'}`,
-      message: `${file.name} has been ${data!.favorite ? 'favorited' : 'unfavorited'}`,
+      title: data!.favorite
+        ? i18n.t('file:notifications.favorited.title')
+        : i18n.t('file:notifications.unfavorited.title'),
+      message: data!.favorite
+        ? i18n.t('file:notifications.favorited.message', { name: file.name })
+        : i18n.t('file:notifications.unfavorited.message', { name: file.name }),
       color: 'yellow',
       icon: <IconStarFilled size='1rem' />,
     });
@@ -109,15 +114,15 @@ export async function createFolderAndAdd(file: File, folderName: string | null) 
   );
   if (error) {
     notifications.show({
-      title: 'Error while creating folder',
+      title: i18n.t('file:notifications.createFolderError.title'),
       message: error.error,
       color: 'red',
       icon: <IconFolderOff size='1rem' />,
     });
   } else {
     notifications.show({
-      title: 'Folder created',
-      message: `${data!.name} has been created with ${file.name}`,
+      title: i18n.t('file:notifications.folderCreated.title'),
+      message: i18n.t('file:notifications.folderCreated.message', { folder: data!.name, name: file.name }),
       color: 'green',
       icon: <IconFolderPlus size='1rem' />,
     });
@@ -135,15 +140,18 @@ export async function removeFromFolder(file: File) {
 
   if (error) {
     notifications.show({
-      title: 'Error while removing from folder',
+      title: i18n.t('file:notifications.removeFromFolderError.title'),
       message: error.error,
       color: 'red',
       icon: <IconFolderOff size='1rem' />,
     });
   } else {
     notifications.show({
-      title: 'File removed from folder',
-      message: `${file.name} has been removed from ${data?.folder.name}`,
+      title: i18n.t('file:notifications.removedFromFolder.title'),
+      message: i18n.t('file:notifications.removedFromFolder.message', {
+        name: file.name,
+        folder: `${data?.folder.name}`,
+      }),
       color: 'green',
       icon: <IconFolderMinus size='1rem' />,
     });
@@ -166,15 +174,15 @@ export async function addToFolder(file: File, folderId: string | null) {
 
   if (error) {
     notifications.show({
-      title: 'Error while adding to folder',
+      title: i18n.t('file:notifications.addToFolderError.title'),
       message: error.error,
       color: 'red',
       icon: <IconFolderOff size='1rem' />,
     });
   } else {
     notifications.show({
-      title: 'File added to folder',
-      message: `${file.name} has been added to ${data!.name}`,
+      title: i18n.t('file:notifications.addedToFolder.title'),
+      message: i18n.t('file:notifications.addedToFolder.message', { name: file.name, folder: data!.name }),
       color: 'green',
       icon: <IconFolderPlus size='1rem' />,
     });
@@ -198,15 +206,18 @@ export async function addMultipleToFolder(files: File[], folderId: string | null
 
   if (error) {
     notifications.show({
-      title: 'Error while adding files to folder',
+      title: i18n.t('file:notifications.addMultipleToFolderError.title'),
       message: error.error,
       color: 'red',
       icon: <IconFolderOff size='1rem' />,
     });
   } else {
     notifications.show({
-      title: 'Files added to folder',
-      message: `${data!.count} file(s) have been added to ${data!.name}`,
+      title: i18n.t('file:notifications.addedMultipleToFolder.title'),
+      message: i18n.t('file:notifications.addedMultipleToFolder.message', {
+        count: data!.count,
+        folder: data!.name,
+      }),
       color: 'green',
       icon: <IconFolderPlus size='1rem' />,
     });

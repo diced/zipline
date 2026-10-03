@@ -1,0 +1,180 @@
+{
+  "notifications": {
+    "deleted": {
+      "title": "File deleted",
+      "message": "{{name}} has been deleted"
+    },
+    "favorited": {
+      "title": "File favorited",
+      "message": "{{name}} has been favorited"
+    },
+    "unfavorited": {
+      "title": "File unfavorited",
+      "message": "{{name}} has been unfavorited"
+    },
+    "createFolderError": {
+      "title": "Error while creating folder"
+    },
+    "folderCreated": {
+      "title": "Folder created",
+      "message": "{{folder}} has been created with {{name}}"
+    },
+    "removeFromFolderError": {
+      "title": "Error while removing from folder"
+    },
+    "removedFromFolder": {
+      "title": "File removed from folder",
+      "message": "{{name}} has been removed from {{folder}}"
+    },
+    "addToFolderError": {
+      "title": "Error while adding to folder"
+    },
+    "addedToFolder": {
+      "title": "File added to folder",
+      "message": "{{name}} has been added to {{folder}}"
+    },
+    "addMultipleToFolderError": {
+      "title": "Error while adding files to folder"
+    },
+    "addedMultipleToFolder": {
+      "title": "Files added to folder",
+      "message": "{{count}} file(s) have been added to {{folder}}"
+    },
+    "saveTagsError": {
+      "title": "Failed to save tags"
+    },
+    "tagsSaved": {
+      "title": "Saved tags",
+      "message": "Saved {{count}} tags for file {{name}}"
+    },
+    "removePasswordError": {
+      "title": "Failed to remove password..."
+    },
+    "passwordRemoved": {
+      "title": "Password removed!",
+      "message": "The password has been removed from the file."
+    },
+    "saveChangesError": {
+      "title": "Failed to save changes..."
+    },
+    "changesSaved": {
+      "title": "Changes saved!",
+      "message": "The changes to the file have been saved."
+    }
+  },
+  "delete": {
+    "confirm": "Delete {{name}}",
+    "message": "Are you sure you want to delete {{name}}? This action cannot be undone."
+  },
+  "contextMenu": {
+    "openInNewTab": "Open in new tab",
+    "copyLink": "Copy link",
+    "copyRawLink": "Copy raw link",
+    "favorite": "Favorite",
+    "unfavorite": "Unfavorite",
+    "removeFromFolder": "Remove from folder",
+    "moveToFolder": "Move to folder",
+    "searchFolders": "Search folders...",
+    "createNamedFolder": "+ Create \"{{name}}\"",
+    "noFolders": "No folders yet",
+    "createNewFolder": "+ Create new folder",
+    "editDetails": "Edit details"
+  },
+  "createFolderModal": {
+    "title": "Create folder",
+    "name": {
+      "label": "Folder name",
+      "placeholder": "My folder"
+    }
+  },
+  "stats": {
+    "type": "Type",
+    "size": "Size",
+    "createdAt": "Created at",
+    "updatedAt": "Updated at",
+    "deletesAt": "Deletes at",
+    "views": "Views",
+    "originalName": "Original Name",
+    "anonymous": "Anonymous"
+  },
+  "details": {
+    "title": "Details",
+    "tags": {
+      "title": "Tags",
+      "placeholder": "Pick one or more tags",
+      "empty": "No tags found, create one outside of this menu."
+    },
+    "folder": {
+      "title": "Folder",
+      "remove": "Remove from folder \"{{name}}\"",
+      "placeholder": "Add to folder...",
+      "empty": "You have no folders. Start typing to create a new folder for this file.",
+      "create": "+ Create folder \"{{name}}\""
+    }
+  },
+  "actions": {
+    "editDetails": "Edit file details",
+    "delete": "Delete file",
+    "favorite": "Favorite file",
+    "unfavorite": "Unfavorite file",
+    "viewInNewTab": "View file in a new tab",
+    "openInNewTab": "Open in new tab",
+    "copyRawLink": "Copy raw file link",
+    "copyLink": "Copy file link",
+    "download": "Download file",
+    "showDetails": "Show details",
+    "hideDetails": "Hide details",
+    "previous": "Previous file",
+    "next": "Next file"
+  },
+  "edit": {
+    "title": "Editing \"{{name}}\"",
+    "name": {
+      "label": "Name",
+      "description": "Rename the file."
+    },
+    "maxViews": {
+      "label": "Max Views",
+      "placeholder": "Unlimited",
+      "description": "The maximum number of views this file can have before it is deleted. Leave blank to allow as many views as you want."
+    },
+    "originalName": {
+      "label": "Original Name",
+      "description": "Add an original name. When downloading this file, instead of using the generated file name (if chosen), it will download with this \"original name\" instead."
+    },
+    "type": {
+      "label": "Type",
+      "description": "Change a file's mimetype. <b>DO NOT CHANGE THIS VALUE</b> unless you know what you are doing, this can mess with how Zipline renders specific file types."
+    },
+    "password": {
+      "label": "Password",
+      "description": "Set a password for this file. Leave blank to disable password protection."
+    },
+    "removePassword": "Remove Password",
+    "save": "Save changes"
+  },
+  "preview": {
+    "clickToView": "Click to view file {{name}}",
+    "clickToViewProtected": "Click to view protected {{name}}",
+    "clickToPlayVideo": "Click to play video {{name}}",
+    "clickToPlayAudio": "Click to play audio {{name}}",
+    "clickToViewText": "Click to view text {{name}}",
+    "clickToDownloadCast": "Click to download asciinema cast {{name}}",
+    "clickToViewPdf": "Click to view PDF {{name}}",
+    "clickToViewInNewTab": "Click to view file {{name}} in a new tab",
+    "videoThumbnailAlt": "Video thumbnail",
+    "imageAlt": "Image",
+    "loading": "Loading file...",
+    "loadError": "Error loading file.",
+    "tooBig": "\n...\nThe file is too big to display click the download icon to view/download it."
+  },
+  "render": {
+    "renderedThrough": "This file is rendered through {{renderer}}",
+    "canRenderThrough": "This file can be rendered through {{renderer}}",
+    "showRendered": "Show rendered version",
+    "hideRendered": "Hide rendered version",
+    "katexError": "KaTeX error",
+    "showLess": "Show Less",
+    "showMore": "Show More ({{count}} more lines)"
+  }
+}

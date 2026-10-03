@@ -13,6 +13,8 @@ import {
   Tooltip,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { useTranslation } from 'react-i18next';
+import SafeTrans from '@/components/SafeTrans';
 
 function DataDisplay({
   items,
@@ -67,43 +69,47 @@ function VersionButton({ text, children, href }: { href: string; text: string; c
 type VersionData = NonNullable<ReturnType<typeof useVersion>['version']>;
 
 export function VersionInfo({ version }: { version: VersionData }) {
+  const { t } = useTranslation(['layout', 'common']);
+
   return (
     <>
-      {version.isLatest && <Text>Running the latest version of Zipline.</Text>}
+      {version.isLatest && <Text>{t('version.latest')}</Text>}
       {version.isUpstream && (
         <Text>
-          You are running an <b>unstable</b> version of Zipline. Upstream versions are not fully tested and
-          may contain bugs.
+          <SafeTrans t={t} i18nKey='version.unstable' components={{ b: <b /> }} />
         </Text>
       )}
       {!version.isLatest && !version.isUpstream && version.isRelease && (
         <Text>
-          You are running an <b>outdated</b> version of Zipline. It is recommended to update to the{' '}
-          <Anchor href={version.latest.url}>latest version</Anchor>.
+          <SafeTrans
+            t={t}
+            i18nKey='version.outdated'
+            components={{ b: <b />, anchor: <Anchor href={version.latest.url} /> }}
+          />
         </Text>
       )}
 
       <Indicator processing position='middle-end' inline offset={-15} color='red' disabled={version.isLatest}>
         <Title order={3} my='sm'>
-          Current Version
+          {t('version.current')}
         </Title>
       </Indicator>
 
       <DataDisplay
         items={[
           {
-            label: 'Version',
+            label: t('version.fields.version'),
             value: version.version.tag!,
             href: `https://github.com/diced/zipline/releases/${version.version.tag}`,
           },
           {
-            label: 'Commit',
+            label: t('version.fields.commit'),
             value: version.version.sha!.slice(0, 7)!,
             href: `https://github.com/diced/zipline/commit/${version.version.sha}`,
           },
           {
-            label: 'Upstream?',
-            value: version.isUpstream ? 'Yes' : 'No',
+            label: t('version.fields.upstream'),
+            value: version.isUpstream ? t('common:actions.yes') : t('common:actions.no'),
             color: version.isUpstream ? 'orange' : 'green',
           },
         ]}
@@ -112,22 +118,22 @@ export function VersionInfo({ version }: { version: VersionData }) {
       {!version.isLatest && version.isUpstream && version.latest.commit && (
         <>
           <Title order={3} mt='sm'>
-            Latest Commit Available
+            {t('version.latestCommit')}
           </Title>
           <Text c='dimmed' size='sm' mb='sm'>
-            This is only visible when running an upstream version.
+            {t('version.latestCommitNote')}
           </Text>
 
           <DataDisplay
             items={[
               {
-                label: 'Commit',
+                label: t('version.fields.commit'),
                 value: version.latest.commit.sha!.slice(0, 7)!,
                 href: `https://github.com/diced/zipline/commit/${version.latest.commit.sha}`,
               },
               {
-                label: 'Available to update',
-                value: version.latest.commit.pull ? 'Yes' : 'No',
+                label: t('version.fields.availableToUpdate'),
+                value: version.latest.commit.pull ? t('common:actions.yes') : t('common:actions.no'),
                 color: version.latest.commit.pull ? 'green' : 'red',
               },
             ]}
@@ -138,14 +144,17 @@ export function VersionInfo({ version }: { version: VersionData }) {
       {!version.isLatest && version.isRelease && (
         <>
           <Title order={3} mt='sm'>
-            {version.latest.tag} is available
+            {t('version.available', { tag: version.latest.tag })}
           </Title>
 
-          <VersionButton text='Changelogs' href={version.latest.url}>
+          <VersionButton text={t('version.changelogs')} href={version.latest.url}>
             {version.latest.tag}
           </VersionButton>
 
-          <VersionButton text='Update' href='https://zipline.diced.sh/docs/get-started/docker#updating'>
+          <VersionButton
+            text={t('version.update')}
+            href='https://zipline.diced.sh/docs/get-started/docker#updating'
+          >
             {version.latest.tag}
           </VersionButton>
         </>
@@ -155,6 +164,7 @@ export function VersionInfo({ version }: { version: VersionData }) {
 }
 
 export default function VersionBadge() {
+  const { t } = useTranslation('layout');
   const { version, isLoading } = useVersion();
   const [opened, { open, close }] = useDisclosure(false);
 
@@ -163,11 +173,11 @@ export default function VersionBadge() {
 
   return (
     <>
-      <Modal title='Zipline Version' opened={opened} onClose={close} size='lg'>
+      <Modal title={t('version.modalTitle')} opened={opened} onClose={close} size='lg'>
         <VersionInfo version={version} />
       </Modal>
 
-      <Tooltip label='Click to view more version information'>
+      <Tooltip label={t('version.tooltip')}>
         <Badge
           onClick={open}
           style={{ cursor: 'pointer', textTransform: 'unset' }}

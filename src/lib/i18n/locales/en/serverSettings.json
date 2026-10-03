@@ -1,0 +1,549 @@
+{
+  "sections": {
+    "core": {
+      "name": "Core",
+      "description": "General server settings"
+    },
+    "chunks": {
+      "name": "Chunks",
+      "description": "Partial uploading"
+    },
+    "discord": {
+      "name": "Discord",
+      "description": "Discord webhook integration"
+    },
+    "domains": {
+      "name": "Domains",
+      "description": "Add custom domains"
+    },
+    "features": {
+      "name": "Features",
+      "description": "Configure various features"
+    },
+    "files": {
+      "name": "Files",
+      "description": "File uploading settings"
+    },
+    "httpWebhook": {
+      "name": "HTTP Webhook",
+      "description": "Send POST requests to a URL on certain events"
+    },
+    "invites": {
+      "name": "Invites",
+      "description": "Invite settings"
+    },
+    "mfa": {
+      "name": "Multi-Factor Authentication",
+      "description": "Enable or disable passkeys and TOTP authentication"
+    },
+    "oauth": {
+      "name": "OAuth",
+      "description": "Configure OAuth providers for authentication"
+    },
+    "pwa": {
+      "name": "PWA",
+      "description": "Progressive Web App settings"
+    },
+    "ratelimit": {
+      "name": "Rate Limit",
+      "description": "Configure API rate limits"
+    },
+    "tasks": {
+      "name": "Tasks",
+      "description": "Background task intervals"
+    },
+    "urls": {
+      "name": "URL Shortening",
+      "description": "Configure URL shortening settings"
+    },
+    "website": {
+      "name": "Website",
+      "description": "Website related settings like title and description"
+    },
+    "settings": {
+      "name": "Server Settings"
+    }
+  },
+  "invalidSection": "Invalid settings section",
+  "environmentOverrides": {
+    "title": "Environment overrides",
+    "description": "Some settings are managed by environment variables and cannot be changed here."
+  },
+  "notifications": {
+    "saveFailed": {
+      "title": "Failed to save settings"
+    },
+    "saved": {
+      "message": "Settings saved"
+    }
+  },
+  "core": {
+    "returnHttpsUrls": {
+      "label": "Return HTTPS URLs",
+      "description": "Return URLs with HTTPS protocol."
+    },
+    "trustProxy": {
+      "label": "Trust Proxies",
+      "description": "Trust X-Forwarded-* headers from the trusted proxies listed below. Requires a server restart."
+    },
+    "trustedProxies": {
+      "label": "Trusted Proxies",
+      "description": "Enter the IPv4/IPv6 addresses or CIDRs of your reverse proxies, separated by commas. Only include trusted proxies, not client networks. An empty list ignores forwarded headers and shares rate limits across clients behind the same proxy. Requires a server restart."
+    },
+    "defaultDomain": {
+      "label": "Default Domain",
+      "description": "The domain to use when generating URLs. This value should not include the protocol."
+    },
+    "tempDirectory": {
+      "label": "Temporary Directory",
+      "description": "The directory to store temporary files. If the path is invalid, certain functions may break. Requires a server restart."
+    }
+  },
+  "chunks": {
+    "enabled": {
+      "label": "Enable Chunks",
+      "description": "Enable chunked uploads."
+    },
+    "max": {
+      "label": "Max Chunk Size",
+      "description": "Maximum size of an upload before it is split into chunks."
+    },
+    "size": {
+      "label": "Chunk Size",
+      "description": "Size of each chunk."
+    }
+  },
+  "discord": {
+    "main": {
+      "webhookUrl": {
+        "label": "Webhook URL",
+        "description": "The Discord webhook URL to send notifications to"
+      },
+      "username": {
+        "label": "Username",
+        "description": "The username to send notifications as"
+      },
+      "avatarUrl": {
+        "label": "Avatar URL",
+        "description": "The avatar for the webhook"
+      }
+    },
+    "onUpload": {
+      "title": "On Upload"
+    },
+    "onShorten": {
+      "title": "On Shorten"
+    },
+    "notification": {
+      "webhookUrl": {
+        "label": "Webhook URL",
+        "description": "The Discord webhook URL to send notifications to. If this is left blank, the main webhook url will be used"
+      },
+      "username": {
+        "label": "Username",
+        "description": "The username to send notifications as. If this is left blank, the main username will be used"
+      },
+      "avatarUrl": {
+        "label": "Avatar URL",
+        "description": "The avatar for the webhook. If this is left blank, the main avatar will be used"
+      },
+      "content": {
+        "label": "Content",
+        "description": "The content of the notification. This can be blank, but at least one of the content or embed fields must be filled out"
+      },
+      "embed": {
+        "label": "Embed",
+        "description": "Send the notification as an embed. This will allow for more customization below."
+      }
+    },
+    "embed": {
+      "title": {
+        "label": "Title",
+        "description": "The title of the embed"
+      },
+      "description": {
+        "label": "Description",
+        "description": "The description of the embed"
+      },
+      "footer": {
+        "label": "Footer",
+        "description": "The footer of the embed"
+      },
+      "color": {
+        "label": "Color",
+        "description": "The color of the embed"
+      },
+      "thumbnail": {
+        "label": "Thumbnail",
+        "description": "Show the thumbnail (it will show the file if it's an image) in the embed"
+      },
+      "imageOrVideo": {
+        "label": "Image/Video",
+        "description": "Show the image or video in the embed"
+      },
+      "timestamp": {
+        "label": "Timestamp",
+        "description": "Show the timestamp in the embed"
+      },
+      "url": {
+        "label": "URL",
+        "description": "Makes the title clickable and links to the URL of the file"
+      }
+    }
+  },
+  "domains": {
+    "input": {
+      "description": "Enter a domain name"
+    },
+    "errors": {
+      "exists": "This domain already exists",
+      "updateFailed": "Failed to update domains"
+    },
+    "table": {
+      "columns": {
+        "domain": "Domain"
+      }
+    },
+    "empty": "No domains added yet."
+  },
+  "features": {
+    "imageCompression": {
+      "label": "Image Compression",
+      "description": "Allows the ability for users to compress images."
+    },
+    "robotsTxt": {
+      "description": "Enables a /robots.txt to stop search crawlers. Requires a server restart."
+    },
+    "healthcheck": {
+      "label": "Healthcheck",
+      "description": "Enables a healthcheck route for uptime monitoring. Requires a server restart."
+    },
+    "userRegistration": {
+      "label": "User Registration",
+      "description": "Allows users to register an account on the server."
+    },
+    "oauthRegistration": {
+      "label": "OAuth Registration",
+      "description": "Allows users to register an account using OAuth providers."
+    },
+    "deleteOnMaxViews": {
+      "label": "Delete on Max Views",
+      "description": "Automatically deletes files/urls after they reach the maximum view count. Requires a server restart."
+    },
+    "metricsEnabled": {
+      "label": "Enable Metrics",
+      "description": "Enables metrics for the server. Requires a server restart."
+    },
+    "metricsAdminOnly": {
+      "label": "Admin Only Metrics",
+      "description": "Requires an administrator to view metrics."
+    },
+    "metricsShowUserSpecific": {
+      "label": "Show User Specific Metrics",
+      "description": "Shows metrics specific to each user, for all users."
+    },
+    "dividers": {
+      "thumbnails": "Thumbnails",
+      "versionChecking": "Version Checking"
+    },
+    "thumbnailsEnabled": {
+      "label": "Enable Thumbnails",
+      "description": "Enables thumbnail generation for videos. Requires a server restart."
+    },
+    "thumbnailsInstantaneous": {
+      "label": "Instantaneous Thumbnails",
+      "description": "Generates thumbnails immediately after a file is uploaded, instead of waiting for the task to run."
+    },
+    "thumbnailsNumberThreads": {
+      "label": "Thumbnails Number Threads",
+      "description": "Number of threads to use for thumbnail generation, usually the number of CPU threads. Requires a server restart.",
+      "placeholder": "Enter a number..."
+    },
+    "thumbnailsFormat": {
+      "label": "Thumbnails Format",
+      "description": "The output format for thumbnails. Requires a server restart."
+    },
+    "versionChecking": {
+      "label": "Version Checking",
+      "description": "Query GitHub for updates and display the status on the sidebar to all users."
+    }
+  },
+  "files": {
+    "assumeMimetypes": {
+      "label": "Assume Mimetypes",
+      "description": "Assume the mimetype of a file for its extension."
+    },
+    "disabledTypes": {
+      "label": "Disabled Types",
+      "description": "Mimetypes to disable, separated by commas. It is recommended to have the Assume Mimetypes setting enabled if you are disabling mimetypes, as this will also block files with the corresponding extensions."
+    },
+    "disabledTypesDefault": {
+      "label": "Default MIME for Disabled Types",
+      "description": "The default MIME type to use for disabled types. Leave blank to completely block disabled types."
+    },
+    "removeGpsMetadata": {
+      "label": "Remove GPS Metadata",
+      "description": "Remove GPS metadata from files."
+    },
+    "extensionlessUrls": {
+      "label": "Extensionless URLs",
+      "description": "Allow file links without the extension (e.g. /u/uuid instead of /u/uuid.png). Upload responses still include the extension."
+    },
+    "route": {
+      "label": "Route",
+      "description": "The route to use for file uploads. Requires a server restart."
+    },
+    "length": {
+      "label": "Length",
+      "description": "The length of the file name (for randomly generated names)."
+    },
+    "defaultFormat": {
+      "label": "Default Format",
+      "description": "The default format to use for file names."
+    },
+    "disabledExtensions": {
+      "label": "Disabled Extensions",
+      "description": "Extensions to disable, separated by commas."
+    },
+    "maxFileSize": {
+      "label": "Max File Size",
+      "description": "The maximum file size allowed."
+    },
+    "defaultDateFormat": {
+      "label": "Default Date Format",
+      "description": "The default date format to use."
+    },
+    "defaultExpiration": {
+      "label": "Default Expiration",
+      "description": "The default expiration time for files."
+    },
+    "maxExpiration": {
+      "label": "Max Expiration",
+      "description": "The maximum expiration time allowed for files."
+    },
+    "randomWordsNumAdjectives": {
+      "label": "Random Words Num Adjectives",
+      "description": "The number of adjectives to use for the random-words/gfycat format."
+    },
+    "randomWordsSeparator": {
+      "label": "Random Words Separator",
+      "description": "The separator to use for the random-words/gfycat format."
+    },
+    "defaultCompressionFormat": {
+      "label": "Default Compression Format",
+      "description": "The default image compression format to use when only a compression percent is specified."
+    },
+    "maxFilesPerUpload": {
+      "label": "Max Files Per Upload",
+      "description": "The maximum number of files allowed per upload. Requires a server restart."
+    }
+  },
+  "httpWebhook": {
+    "onUpload": {
+      "label": "On Upload",
+      "description": "The URL to send a POST request to when a file is uploaded."
+    },
+    "onShorten": {
+      "label": "On Shorten",
+      "description": "The URL to send a POST request to when a URL is shortened."
+    }
+  },
+  "invites": {
+    "enabled": {
+      "label": "Enable Invites",
+      "description": "Enable the use of invite links to register new users."
+    },
+    "length": {
+      "label": "Length",
+      "description": "The length of the invite code."
+    }
+  },
+  "mfa": {
+    "passkeysEnabled": {
+      "label": "Passkeys",
+      "description": "Enable the use of passwordless login with the use of WebAuthn passkeys like your phone, security keys, etc."
+    },
+    "passkeysRpId": {
+      "label": "Relying Party ID",
+      "description": "The Relying Party ID (RP ID) to use for WebAuthn passkeys."
+    },
+    "passkeysOrigin": {
+      "label": "Origin",
+      "description": "The Origin to use for WebAuthn passkeys."
+    },
+    "totpEnabled": {
+      "label": "Enable TOTP",
+      "description": "Enable Time-based One-Time Passwords with the use of an authenticator app."
+    },
+    "totpIssuer": {
+      "label": "Issuer",
+      "description": "The issuer to use for the TOTP token."
+    }
+  },
+  "oauth": {
+    "intro": "For OAuth to work, the \"OAuth Registration\" setting must be enabled in the <anchor>Features</anchor> section. If you have issues, try restarting Zipline after saving.",
+    "bypassLocalLogin": {
+      "label": "Bypass Local Login",
+      "description": "Skips the local login page and redirects to the OAuth provider, this will only work with one provider enabled."
+    },
+    "loginOnly": {
+      "label": "Login Only",
+      "description": "Disables registration and only allows login with OAuth, existing users can link providers for example."
+    },
+    "provider": {
+      "clientId": "{{provider}} Client ID",
+      "clientSecret": "{{provider}} Client Secret",
+      "redirectUrl": {
+        "label": "{{provider}} Redirect URL",
+        "description": "The redirect URL to use instead of the host when logging in. This is not required if the URL generated by Zipline works as intended."
+      }
+    },
+    "discord": {
+      "allowedIds": {
+        "label": "Discord Allowed IDs",
+        "description": "A comma-separated list of Discord user IDs that are allowed to log in. Leave empty to disable allow list."
+      },
+      "deniedIds": {
+        "label": "Discord Denied IDs",
+        "description": "A comma-separated list of Discord user IDs that are denied from logging in. Leave empty to disable deny list."
+      }
+    },
+    "oidc": {
+      "authorizeUrl": "OIDC Authorize URL",
+      "tokenUrl": "OIDC Token URL",
+      "userinfoUrl": "OIDC Userinfo URL"
+    }
+  },
+  "pwa": {
+    "intro": "Refresh the page after enabling PWA to see any changes.",
+    "enabled": {
+      "label": "PWA Enabled",
+      "description": "Allow users to install the Zipline PWA on their devices."
+    },
+    "title": {
+      "label": "Title",
+      "description": "The title for the PWA"
+    },
+    "shortName": {
+      "label": "Short Name",
+      "description": "The short name for the PWA"
+    },
+    "description": {
+      "label": "Description",
+      "description": "The description for the PWA"
+    },
+    "themeColor": {
+      "label": "Theme Color",
+      "description": "The theme color for the PWA"
+    },
+    "backgroundColor": {
+      "label": "Background Color",
+      "description": "The background color for the PWA"
+    }
+  },
+  "ratelimit": {
+    "intro": "All options require a restart to take effect.",
+    "enabled": {
+      "label": "Enable Ratelimit",
+      "description": "Enable ratelimiting for the server."
+    },
+    "adminBypass": {
+      "label": "Admin Bypass",
+      "description": "Allow admins to bypass the ratelimit."
+    },
+    "max": {
+      "label": "Max Requests",
+      "description": "The maximum number of requests allowed within the window. If no window is set, this is the maximum number of requests until it reaches the limit."
+    },
+    "window": {
+      "label": "Window",
+      "description": "The window in seconds to allow the max requests."
+    },
+    "allowList": {
+      "label": "Allow List",
+      "description": "A comma-separated list of IP addresses to bypass the ratelimit."
+    }
+  },
+  "tasks": {
+    "intro": "All options require a restart to take effect. Setting a value of <code>0</code> will disable the task.",
+    "deleteInterval": {
+      "label": "Delete Files Interval",
+      "description": "How often to check and delete expired files."
+    },
+    "clearInvitesInterval": {
+      "label": "Clear Invites Interval",
+      "description": "How often to check and clear expired/used invites."
+    },
+    "maxViewsInterval": {
+      "label": "Max Views Interval",
+      "description": "How often to check and delete files that have reached max views."
+    },
+    "thumbnailsInterval": {
+      "label": "Thumbnails Interval",
+      "description": "How often to check and generate thumbnails for video files."
+    },
+    "cleanThumbnailsInterval": {
+      "label": "Clean Thumbnails Interval",
+      "description": "How often to check and delete orphaned thumbnails from the filesystem or database."
+    },
+    "metricsInterval": {
+      "label": "Metrics Interval",
+      "description": "How often to collect metrics data. Setting this to a lower value will give you more up-to-date metrics, but may increase CPU usage."
+    }
+  },
+  "urls": {
+    "route": {
+      "label": "Route",
+      "description": "The route to use for short URLs. Requires a server restart."
+    },
+    "length": {
+      "label": "Length",
+      "description": "The length of the short URL (for randomly generated names)."
+    }
+  },
+  "website": {
+    "title": {
+      "label": "Title",
+      "description": "The title of the website in browser tabs and at the top."
+    },
+    "titleLogo": {
+      "label": "Title Logo",
+      "description": "The URL to use for the title logo. This is placed to the left of the title."
+    },
+    "externalLinks": {
+      "label": "External Links",
+      "description": "The external links to show in the footer. This must be valid JSON in the format of an array of objects with \"name\" and \"url\" properties. For example: [{\"name\": \"GitHub\", \"url\": \"https://github.com/diced/zipline\"}]"
+    },
+    "errors": {
+      "invalidJson": "Invalid JSON"
+    },
+    "loginBackground": {
+      "label": "Login Background",
+      "description": "The URL to use for the login background."
+    },
+    "loginBackgroundBlur": {
+      "label": "Login Background Blur",
+      "description": "Whether to blur the login background."
+    },
+    "defaultAvatar": {
+      "label": "Default Avatar",
+      "description": "The path to use for the default avatar. This must be a path to an image, not a URL."
+    },
+    "tos": {
+      "label": "Terms of Service",
+      "description": "Path to a Markdown (.md) file to use for the terms of service."
+    },
+    "defaultTheme": {
+      "label": "Default Theme",
+      "description": "The default theme to use for the website."
+    },
+    "darkTheme": {
+      "label": "Dark Theme",
+      "description": "The dark theme to use for the website when the default theme is \"system\"."
+    },
+    "lightTheme": {
+      "label": "Light Theme",
+      "description": "The light theme to use for the website when the default theme is \"system\"."
+    }
+  }
+}

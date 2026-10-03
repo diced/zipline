@@ -1,6 +1,7 @@
 import { Alert, Button, Flex, Text } from '@mantine/core';
 import { IconEyeFilled } from '@tabler/icons-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import KaTeX from './KaTeX';
 import Markdown from './Markdown';
 import HighlightCode from './code/HighlightCode';
@@ -15,6 +16,8 @@ export function RenderAlert({
   state: boolean;
   change: (s: boolean) => void;
 }) {
+  const { t } = useTranslation('file');
+
   return (
     <Alert
       icon={<IconEyeFilled size='1rem' />}
@@ -24,13 +27,11 @@ export function RenderAlert({
     >
       <Flex align='center' justify='space-between' wrap='wrap' gap='md'>
         <Text style={{ flex: 1, minWidth: '200px' }}>
-          {!state
-            ? `This file is rendered through ${renderer}`
-            : `This file can be rendered through ${renderer}`}
+          {!state ? t('render.renderedThrough', { renderer }) : t('render.canRenderThrough', { renderer })}
         </Text>
 
         <Button size='compact-sm' onClick={() => change(!state)} w={{ base: '100%', xs: 'auto' }}>
-          {state ? 'Show' : 'Hide'} rendered version
+          {state ? t('render.showRendered') : t('render.hideRendered')}
         </Button>
       </Flex>
     </Alert>

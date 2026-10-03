@@ -4,11 +4,15 @@ import { useSettingsStore } from '@/lib/client/store/settings';
 import { useUserStore } from '@/lib/client/store/user';
 import { ZiplineTheme, findTheme, themeComponents } from '@/lib/theme';
 import dark_blue from '@/lib/theme/builtins/dark_blue.theme.json' with { type: 'json' };
+import { DAYJS_LOCALES } from '@/lib/i18n/languages';
+import { currentLanguage } from '@/lib/i18n';
 import { MantineProvider, createTheme } from '@mantine/core';
+import { DatesProvider } from '@mantine/dates';
 import { useColorScheme } from '@mantine/hooks';
 import { createContext, useContext } from 'react';
 import useSWR from 'swr';
 import { useShallow } from 'zustand/shallow';
+import { useTranslation } from 'react-i18next';
 
 const ThemeContext = createContext<{
   themes: ZiplineTheme[];
@@ -47,6 +51,8 @@ export default function ThemeProvider({
     useShallow((state) => [state.settings.theme, state.settings.themeDark, state.settings.themeLight]),
   );
   const systemTheme = useColorScheme();
+  const { i18n } = useTranslation();
+  const dayjsLocale = i18n.resolvedLanguage ? DAYJS_LOCALES[currentLanguage()] : 'en';
   const currentTheme = user ? userTheme : (defaultTheme?.default ?? 'system');
 
   let theme = findTheme(currentTheme, themes);
@@ -76,7 +82,7 @@ export default function ThemeProvider({
             ...themeComponents(theme),
           })}
         >
-          {children}
+          <DatesProvider settings={{ locale: dayjsLocale }}>{children}</DatesProvider>
         </MantineProvider>
       </ThemeContext.Provider>
     </>

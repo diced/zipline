@@ -1,0 +1,201 @@
+{
+  "page": {
+    "title": "Archivos",
+    "uploadTooltip": "Subir un archivo",
+    "moreActions": "Más acciones",
+    "menu": {
+      "manageTags": "Administrar etiquetas",
+      "viewPending": "Ver archivos pendientes",
+      "tableOptions": "Opciones de tabla",
+      "searchById": "Buscar por ID"
+    }
+  },
+  "fields": {
+    "name": "Nombre",
+    "originalName": "Nombre original",
+    "tags": "Etiquetas",
+    "type": "Tipo",
+    "size": "Tamaño",
+    "createdAt": "Fecha de creación",
+    "favorite": "Favorito",
+    "views": "Vistas",
+    "anonymous": "¿Anónimo?"
+  },
+  "tableOptions": {
+    "title": "Opciones de tabla",
+    "description": "Seleccione y arrastre los campos siguientes para mostrarlos, ocultarlos o reordenarlos en la vista de tabla de archivos.",
+    "reset": "Restablecer valores predeterminados"
+  },
+  "pending": {
+    "title": "Archivos pendientes",
+    "count_one": "{{count}} archivo",
+    "count_many": "{{count}} archivos",
+    "count_other": "{{count}} archivos",
+    "clearCompleted": "Borrar completados",
+    "chunks": "{{complete}}/{{total}} fragmentos",
+    "clearEntry": "Borrar entrada",
+    "clearEntryLabel": "Borrar {{name}}",
+    "empty": "No hay archivos pendientes",
+    "status": {
+      "pending": "Pendiente",
+      "processing": "Procesando",
+      "complete": "Completado",
+      "failed": "Fallido"
+    },
+    "notifications": {
+      "clearedOne": "¡Archivo pendiente borrado!",
+      "clearedCompleted": "¡Archivos completados borrados!",
+      "clearOneFailed": "No se pudo borrar el archivo pendiente: {{error}}",
+      "clearCompletedFailed": "No se pudieron borrar los archivos completados: {{error}}",
+      "unknownError": "Error desconocido"
+    }
+  },
+  "bulk": {
+    "delete": {
+      "title_one": "¿Eliminar {{count}} archivo?",
+      "title_many": "¿Eliminar {{count}} archivos?",
+      "title_other": "¿Eliminar {{count}} archivos?",
+      "message_one": "Está a punto de eliminar {{count}} archivo. Esta acción no se puede deshacer.",
+      "message_many": "Está a punto de eliminar {{count}} archivos. Esta acción no se puede deshacer.",
+      "message_other": "Está a punto de eliminar {{count}} archivos. Esta acción no se puede deshacer.",
+      "loadingTitle": "Eliminando archivos",
+      "loadingMessage_one": "Eliminando {{count}} archivo",
+      "loadingMessage_many": "Eliminando {{count}} archivos",
+      "loadingMessage_other": "Eliminando {{count}} archivos",
+      "errorTitle": "Error al eliminar los archivos",
+      "successTitle": "Archivos eliminados",
+      "successMessage_one": "Se eliminó {{count}} archivo",
+      "successMessage_many": "Se eliminaron {{count}} archivos",
+      "successMessage_other": "Se eliminaron {{count}} archivos"
+    },
+    "favorite": {
+      "title_one": "¿Marcar {{count}} archivo como favorito?",
+      "title_many": "¿Marcar {{count}} archivos como favoritos?",
+      "title_other": "¿Marcar {{count}} archivos como favoritos?",
+      "message_one": "Está a punto de marcar {{count}} archivo como favorito.",
+      "message_many": "Está a punto de marcar {{count}} archivos como favoritos.",
+      "message_other": "Está a punto de marcar {{count}} archivos como favoritos.",
+      "confirm": "Marcar como favorito",
+      "loadingTitle": "Marcando archivos como favoritos",
+      "loadingMessage_one": "Marcando {{count}} archivo como favorito",
+      "loadingMessage_many": "Marcando {{count}} archivos como favoritos",
+      "loadingMessage_other": "Marcando {{count}} archivos como favoritos",
+      "successTitle": "Archivos marcados como favoritos",
+      "successMessage_one": "Se marcó {{count}} archivo como favorito",
+      "successMessage_many": "Se marcaron {{count}} archivos como favoritos",
+      "successMessage_other": "Se marcaron {{count}} archivos como favoritos"
+    },
+    "unfavorite": {
+      "title_one": "¿Quitar {{count}} archivo de favoritos?",
+      "title_many": "¿Quitar {{count}} archivos de favoritos?",
+      "title_other": "¿Quitar {{count}} archivos de favoritos?",
+      "message_one": "Está a punto de quitar {{count}} archivo de favoritos.",
+      "message_many": "Está a punto de quitar {{count}} archivos de favoritos.",
+      "message_other": "Está a punto de quitar {{count}} archivos de favoritos.",
+      "confirm": "Quitar de favoritos",
+      "loadingTitle": "Quitando archivos de favoritos",
+      "loadingMessage_one": "Quitando {{count}} archivo de favoritos",
+      "loadingMessage_many": "Quitando {{count}} archivos de favoritos",
+      "loadingMessage_other": "Quitando {{count}} archivos de favoritos",
+      "successTitle": "Archivos quitados de favoritos",
+      "successMessage_one": "Se quitó {{count}} archivo de favoritos",
+      "successMessage_many": "Se quitaron {{count}} archivos de favoritos",
+      "successMessage_other": "Se quitaron {{count}} archivos de favoritos"
+    },
+    "modifyErrorTitle": "Error al modificar los archivos",
+    "copyLinks": {
+      "title": "Enlaces copiados al portapapeles",
+      "message_one": "Se copió {{count}} enlace al portapapeles",
+      "message_many": "Se copiaron {{count}} enlaces al portapapeles",
+      "message_other": "Se copiaron {{count}} enlaces al portapapeles"
+    }
+  },
+  "tags": {
+    "title": "Etiquetas",
+    "fileCount_one": "{{count}} archivo",
+    "fileCount_many": "{{count}} archivos",
+    "fileCount_other": "{{count}} archivos",
+    "edit": "Editar etiqueta",
+    "delete": "Eliminar etiqueta",
+    "empty": "No hay etiquetas. Cree una haciendo clic en el icono de suma.",
+    "form": {
+      "name": {
+        "label": "Nombre",
+        "placeholder": "Escriba un nombre...",
+        "required": "El nombre es obligatorio"
+      },
+      "color": {
+        "label": "Color",
+        "fromName": "Elegir un color a partir del nombre",
+        "invalid": "El color debe empezar por #"
+      }
+    },
+    "create": {
+      "title": "Crear etiqueta nueva",
+      "submit": "Crear etiqueta"
+    },
+    "editModal": {
+      "title": "Editar etiqueta",
+      "submit": "Editar etiqueta"
+    },
+    "notifications": {
+      "createFailed": "No se pudo crear la etiqueta",
+      "created": "Etiqueta creada",
+      "createdMessage": "Se creó la etiqueta {{name}}",
+      "editFailed": "No se pudo editar la etiqueta",
+      "edited": "Etiqueta editada",
+      "editedMessage": "Se editó la etiqueta {{name}}",
+      "deleteFailed": "No se pudo eliminar la etiqueta: {{error}}",
+      "deleted": "Etiqueta eliminada",
+      "deletedMessage": "Se eliminó la etiqueta {{name}}"
+    }
+  },
+  "views": {
+    "favoriteFiles": "Archivos favoritos",
+    "noFiles": "No se encontraron archivos",
+    "uploadFile": "Subir un archivo",
+    "pagination": "Archivos {{from}} - {{to}} de {{total}}"
+  },
+  "table": {
+    "columns": {
+      "name": "Nombre",
+      "originalName": "Nombre original",
+      "tags": "Etiquetas",
+      "type": "Tipo",
+      "size": "Tamaño",
+      "createdAt": "Fecha de creación",
+      "favorite": "¿Favorito?",
+      "views": "Vistas",
+      "id": "ID",
+      "anonymous": "¿Anónimo?",
+      "actions": "Acciones"
+    },
+    "search": {
+      "name": "Buscar por nombre",
+      "originalName": "Buscar por nombre original",
+      "type": "Buscar por tipo"
+    },
+    "searchById": "Buscar por ID",
+    "tagsPlaceholder": "Elija una o varias etiquetas",
+    "selection": {
+      "summary_one": "La selección se mantiene al cambiar de página. Hay <b>{{count}}</b> archivo seleccionado.",
+      "summary_many": "La selección se mantiene al cambiar de página. Hay <b>{{count}}</b> archivos seleccionados.",
+      "summary_other": "La selección se mantiene al cambiar de página. Hay <b>{{count}}</b> archivos seleccionados.",
+      "delete": "Eliminar archivos",
+      "favorite": "Marcar archivos como favoritos",
+      "unfavorite": "Quitar archivos de favoritos",
+      "copyLinks": "Copiar enlaces de archivos",
+      "addToFolder": "Agregar a una carpeta...",
+      "clear": "Borrar selección"
+    },
+    "noRecords": "No hay archivos",
+    "recordsPerPage": "Registros por página",
+    "actions": {
+      "details": "Más detalles",
+      "view": "Ver archivo en una pestaña nueva",
+      "copy": "Copiar enlace del archivo al portapapeles",
+      "download": "Descargar archivo",
+      "delete": "Eliminar archivo"
+    }
+  }
+}

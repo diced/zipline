@@ -5,8 +5,10 @@ import { startAuthentication } from '@simplewebauthn/browser';
 import { fetchApi } from '@/lib/fetchApi';
 import { notifications } from '@mantine/notifications';
 import { getWebClient } from '@/lib/api/detect';
+import { useTranslation } from 'react-i18next';
 
 export default function PasskeyAuthButton({ onAuthSuccess }: { onAuthSuccess: (data: any) => void }) {
+  const { t } = useTranslation('auth');
   const [loading, setLoading] = useState(false);
   const [errored, setErrored] = useState(false);
 
@@ -28,7 +30,7 @@ export default function PasskeyAuthButton({ onAuthSuccess }: { onAuthSuccess: (d
     } catch (e: any) {
       setErrored(true);
       setTimeout(() => setErrored(false), 3000);
-      notifications.show({ title: 'Auth Failed', message: e.message, color: 'red' });
+      notifications.show({ title: t('passkey.failed'), message: e.message, color: 'red' });
     } finally {
       setLoading(false);
     }
@@ -44,7 +46,7 @@ export default function PasskeyAuthButton({ onAuthSuccess }: { onAuthSuccess: (d
       color={errored ? 'red' : undefined}
       loading={loading}
     >
-      Login with passkey
+      {t('passkey.button')}
     </Button>
   );
 }

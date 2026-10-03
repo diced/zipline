@@ -1,0 +1,124 @@
+{
+  "title": "ユーザー",
+  "form": {
+    "username": {
+      "label": "ユーザー名",
+      "placeholder": "ユーザー名を入力...",
+      "required": "ユーザー名は必須です"
+    },
+    "password": {
+      "label": "パスワード",
+      "placeholder": "パスワードを入力...",
+      "required": "パスワードは必須です"
+    },
+    "avatar": {
+      "label": "アバター",
+      "placeholder": "アバターを選択...",
+      "clear": "アバターをクリア",
+      "invalidType": "ファイルの種類が無効です",
+      "readFailed": "アバターのファイルを読み込めませんでした"
+    },
+    "role": {
+      "label": "ロール"
+    }
+  },
+  "roles": {
+    "user": "ユーザー",
+    "administrator": "管理者",
+    "admin": "管理者",
+    "superAdmin": "スーパー管理者"
+  },
+  "create": {
+    "title": "新しいユーザーの作成"
+  },
+  "edit": {
+    "title": "{{username}} を編集",
+    "description": "空欄のフィールドは無視され、更新されません。",
+    "submit": "ユーザーを更新",
+    "quota": {
+      "title": "クォータ",
+      "invalidValue": "値が無効です",
+      "invalidByteFormat": "バイト形式が無効です",
+      "fileType": {
+        "label": "ファイルクォータの種類",
+        "description": "ファイルのクォータを合計バイト数で設定するか、ファイルの総数で設定するかを選択します。",
+        "byBytes": "バイト数",
+        "byFiles": "ファイル数",
+        "none": "ファイルクォータなし"
+      },
+      "maxFiles": {
+        "label": "最大ファイル数",
+        "description": "ユーザーがアップロードできるファイルの最大数です。",
+        "placeholder": "数値を入力..."
+      },
+      "maxBytes": {
+        "label": "最大バイト数",
+        "description": "ユーザーがアップロードできる最大バイト数です。",
+        "placeholder": "単位付きのサイズを入力..."
+      },
+      "maxUrls": {
+        "label": "最大短縮 URL 数",
+        "description": "ユーザーが作成できる短縮 URL の最大数です。無制限にする場合は 0 のままにしてください。",
+        "placeholder": "数値を入力..."
+      }
+    }
+  },
+  "delete": {
+    "title": "{{username}} を削除しますか？",
+    "message": "{{username}} を削除してもよろしいですか？この操作は元に戻せません。",
+    "data": {
+      "title": "{{username}} のデータを削除しますか？",
+      "message": "{{username}} のファイルと短縮 URL を削除しますか？この操作は元に戻せません。",
+      "cancel": "いいえ、データは残してユーザーのみ削除します",
+      "confirm": "はい、すべて削除します"
+    }
+  },
+  "notifications": {
+    "createFailed": "ユーザーを作成できませんでした",
+    "created": {
+      "title": "ユーザーを作成しました",
+      "message": "ユーザー {{username}} を作成しました"
+    },
+    "editFailed": "ユーザーを編集できませんでした",
+    "edited": {
+      "title": "ユーザーを編集しました",
+      "message": "ユーザー {{username}} を編集しました"
+    },
+    "deleteFailed": "ユーザーを削除できませんでした",
+    "deleted": {
+      "title": "ユーザーを削除しました",
+      "message": "ユーザー {{username}} を削除しました"
+    }
+  },
+  "card": {
+    "id": "ID:",
+    "role": "ロール:",
+    "created": "作成日時:",
+    "updated": "更新日時:"
+  },
+  "table": {
+    "columns": {
+      "avatar": "アバター",
+      "username": "ユーザー名",
+      "role": "ロール",
+      "created": "作成日時",
+      "updated": "最終更新日時",
+      "actions": "操作"
+    },
+    "viewFiles": "ユーザーのファイルを表示",
+    "edit": "ユーザーを編集",
+    "delete": "ユーザーを削除"
+  },
+  "grid": {
+    "empty": {
+      "title": "ユーザーが見つかりません",
+      "description": "ユーザーを作成するとここに表示されます"
+    }
+  },
+  "viewFiles": {
+    "title": "{{username}} のファイル",
+    "back": "ユーザー一覧に戻る",
+    "tableOptions": "テーブルのオプション",
+    "searchById": "ID で検索"
+  }
+}

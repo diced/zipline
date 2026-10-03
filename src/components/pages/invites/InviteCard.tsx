@@ -4,6 +4,7 @@ import { useSettingsStore } from '@/lib/client/store/settings';
 import { ActionIcon, Anchor, Card, Group, Menu, Stack, Text } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { IconCopy, IconDots, IconQrcode, IconTrashFilled } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
 import { copyInviteUrl, deleteInvite } from './actions';
 
 export default function InviteCard({
@@ -13,6 +14,7 @@ export default function InviteCard({
   invite: Invite;
   setQrOpen: (invite: Invite) => void;
 }) {
+  const { t } = useTranslation(['invites', 'common']);
   const clipboard = useClipboard();
 
   const warnDeletion = useSettingsStore((state) => state.settings.warnDeletion);
@@ -40,17 +42,17 @@ export default function InviteCard({
                   leftSection={<IconCopy size='1rem' />}
                   onClick={() => copyInviteUrl(invite, clipboard)}
                 >
-                  Copy URL
+                  {t('card.copyUrl')}
                 </Menu.Item>
                 <Menu.Item leftSection={<IconQrcode size='1rem' />} onClick={() => setQrOpen(invite)}>
-                  Show QR Code
+                  {t('card.showQrCode')}
                 </Menu.Item>
                 <Menu.Item
                   leftSection={<IconTrashFilled size='1rem' />}
                   color='red'
                   onClick={() => deleteInvite(warnDeletion, invite)}
                 >
-                  Delete
+                  {t('common:actions.delete')}
                 </Menu.Item>
               </Menu.Dropdown>
             </Menu>
@@ -60,21 +62,21 @@ export default function InviteCard({
         <Card.Section inheritPadding py='xs'>
           <Stack gap={1}>
             <Text size='xs' c='dimmed'>
-              <b>Created By:</b> {invite.inviter!.username}
+              <b>{t('card.createdBy')}</b> {invite.inviter!.username}
             </Text>
             <Text size='xs' c='dimmed'>
-              <b>Created:</b> <RelativeDate date={invite.createdAt} />
+              <b>{t('card.created')}</b> <RelativeDate date={invite.createdAt} />
             </Text>
             {invite.expiresAt && (
               <Text size='xs' c='dimmed'>
-                <b>Expires:</b> <RelativeDate date={invite.expiresAt} />
+                <b>{t('card.expires')}</b> <RelativeDate date={invite.expiresAt} />
               </Text>
             )}
             <Text size='xs' c='dimmed'>
-              <b>Max Uses:</b> {invite.maxUses ?? 'Unlimited'}
+              <b>{t('card.maxUses')}</b> {invite.maxUses ?? t('card.unlimited')}
             </Text>
             <Text size='xs' c='dimmed'>
-              <b>Uses:</b> {invite.uses.toLocaleString()}
+              <b>{t('card.uses')}</b> {invite.uses.toLocaleString()}
             </Text>
           </Stack>
         </Card.Section>

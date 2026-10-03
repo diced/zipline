@@ -1,6 +1,7 @@
 import { Export4 } from '@/lib/import/version4/validateExport';
 import { useUserStore } from '@/lib/client/store/user';
 import { Box, Checkbox, Group, Text } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 
 export function detectSameInstance(export4?: Export4 | null, currentUserId?: string) {
   if (!export4) return false;
@@ -19,6 +20,7 @@ export default function Export4WarningSameInstance({
   sameInstanceAgree: boolean;
   setSameInstanceAgree: (sameInstanceAgree: boolean) => void;
 }) {
+  const { t } = useTranslation('serverActions');
   const currentUserId = useUserStore((state) => state.user?.id);
   const isSameInstance = detectSameInstance(export4, currentUserId);
 
@@ -27,12 +29,10 @@ export default function Export4WarningSameInstance({
   return (
     <Box my='lg'>
       <Text size='md' c='red'>
-        Same Instance Detected
+        {t('importExport.v4.sameInstance.title')}
       </Text>
       <Text size='sm' c='dimmed'>
-        Detected that you are importing data from the same instance as the current running one. Proceeding
-        with this import may lead to data conflicts or overwriting existing data. Please ensure that you
-        understand the implications before continuing.
+        {t('importExport.v4.sameInstance.description')}
       </Text>
 
       <Checkbox.Card
@@ -43,7 +43,7 @@ export default function Export4WarningSameInstance({
       >
         <Group wrap='nowrap' align='flex-start'>
           <Checkbox.Indicator m='md' />
-          <Text my='sm'>I agree, and understand the implications.</Text>
+          <Text my='sm'>{t('importExport.v4.sameInstance.agree')}</Text>
         </Group>
       </Checkbox.Card>
     </Box>

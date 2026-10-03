@@ -5,6 +5,8 @@ import { Button, Divider, Modal, NumberInput, PasswordInput, Stack, TextInput } 
 import { showNotification } from '@mantine/notifications';
 import { IconEye, IconKey, IconPencil, IconPencilOff, IconTrashFilled } from '@tabler/icons-react';
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import SafeTrans from '@/components/SafeTrans';
 import { mutateFiles } from '../actions';
 
 export default function EditFileDetailsModal({
@@ -16,6 +18,7 @@ export default function EditFileDetailsModal({
   file: File | null;
   onClose: () => void;
 }) {
+  const { t } = useTranslation('file');
   const [formData, setFormData] = useObjectState<{
     name: string;
     maxViews: number | null;
@@ -61,15 +64,15 @@ export default function EditFileDetailsModal({
 
     if (error) {
       showNotification({
-        title: 'Failed to remove password...',
+        title: t('notifications.removePasswordError.title'),
         message: error.error,
         color: 'red',
         icon: <IconPencilOff size='1rem' />,
       });
     } else {
       showNotification({
-        title: 'Password removed!',
-        message: 'The password has been removed from the file.',
+        title: t('notifications.passwordRemoved.title'),
+        message: t('notifications.passwordRemoved.message'),
         color: 'green',
         icon: <IconPencil size='1rem' />,
       });
@@ -99,15 +102,15 @@ export default function EditFileDetailsModal({
 
     if (error) {
       showNotification({
-        title: 'Failed to save changes...',
+        title: t('notifications.saveChangesError.title'),
         message: error.error,
         color: 'red',
         icon: <IconPencilOff size='1rem' />,
       });
     } else {
       showNotification({
-        title: 'Changes saved!',
-        message: 'The changes to the file have been saved.',
+        title: t('notifications.changesSaved.title'),
+        message: t('notifications.changesSaved.message'),
         color: 'green',
         icon: <IconPencil size='1rem' />,
       });
@@ -120,19 +123,19 @@ export default function EditFileDetailsModal({
   };
 
   return (
-    <Modal zIndex={400} title={`Editing "${file.name}"`} onClose={onClose} opened={open}>
+    <Modal zIndex={400} title={t('edit.title', { name: file.name })} onClose={onClose} opened={open}>
       <Stack gap='xs' my='sm'>
         <TextInput
-          label='Name'
-          description='Rename the file.'
+          label={t('edit.name.label')}
+          description={t('edit.name.description')}
           value={formData.name}
           onChange={(event) => setFormData('name', event.currentTarget.value.trim())}
         />
 
         <NumberInput
-          label='Max Views'
-          placeholder='Unlimited'
-          description='The maximum number of views this file can have before it is deleted. Leave blank to allow as many views as you want.'
+          label={t('edit.maxViews.label')}
+          placeholder={t('edit.maxViews.placeholder')}
+          description={t('edit.maxViews.description')}
           min={0}
           value={formData.maxViews || ''}
           onChange={(value) => setFormData('maxViews', value === '' ? null : Number(value))}
@@ -140,8 +143,8 @@ export default function EditFileDetailsModal({
         />
 
         <TextInput
-          label='Original Name'
-          description='Add an original name. When downloading this file, instead of using the generated file name (if chosen), it will download with this "original name" instead.'
+          label={t('edit.originalName.label')}
+          description={t('edit.originalName.description')}
           value={formData.originalName ?? ''}
           onChange={(event) =>
             setFormData(
@@ -152,13 +155,8 @@ export default function EditFileDetailsModal({
         />
 
         <TextInput
-          label='Type'
-          description={
-            <>
-              Change a file&apos;s mimetype. <b>DO NOT CHANGE THIS VALUE</b> unless you know what you are
-              doing, this can mess with how Zipline renders specific file types.
-            </>
-          }
+          label={t('edit.type.label')}
+          description={<SafeTrans t={t} i18nKey='edit.type.description' components={{ b: <b /> }} />}
           value={formData.type ?? ''}
           onChange={(event) =>
             setFormData(
@@ -178,12 +176,12 @@ export default function EditFileDetailsModal({
             leftSection={<IconTrashFilled size='1rem' />}
             onClick={handleRemovePassword}
           >
-            Remove Password
+            {t('edit.removePassword')}
           </Button>
         ) : (
           <PasswordInput
-            label='Password'
-            description='Set a password for this file. Leave blank to disable password protection.'
+            label={t('edit.password.label')}
+            description={t('edit.password.description')}
             value={formData.password ?? ''}
             autoComplete='off'
             onChange={(event) =>
@@ -199,7 +197,7 @@ export default function EditFileDetailsModal({
         <Divider />
 
         <Button onClick={handleSave} leftSection={<IconPencil size='1rem' />}>
-          Save changes
+          {t('edit.save')}
         </Button>
       </Stack>
     </Modal>

@@ -1,0 +1,44 @@
+{
+  "welcome": "おかえりなさい、<b>{{username}}</b> さん",
+  "filesUploaded": "アップロード済みのファイルは <b>{{files}}</b> 個です。",
+  "quota": {
+    "bytes": "ストレージ <b>{{max}}</b> のうち <b>{{used}}</b> を使用しています",
+    "files": "許可されている <b>{{max}}</b> 個のファイルのうち、<b>{{files}}</b> 個をアップロード済みです。",
+    "urls": "許可されている <b>{{max}}</b> 件のリンクのうち、<b>{{urls}}</b> 件を作成済みです。"
+  },
+  "recents": {
+    "title": "最近のファイル",
+    "viewAll": "すべてのファイルを表示",
+    "empty": "最近のファイルはありません。最近アップロードした 3 個のファイルがここに表示されます。"
+  },
+  "stats": {
+    "title": "統計",
+    "viewMetrics": "インスタンスのメトリクスを表示",
+    "description": "これらの統計は、ご自身のアップロードのみを対象としています。",
+    "filesUploaded": "アップロードしたファイル",
+    "favoriteFiles": "お気に入りのファイル",
+    "storageUsed": "ストレージ使用量",
+    "avgStorageUsed": "平均ストレージ使用量",
+    "fileViews": "ファイルの閲覧数",
+    "avgFileViews": "ファイルの平均閲覧数",
+    "linksCreated": "作成したリンク",
+    "linkViews": "リンクの総閲覧数"
+  },
+  "fileTypes": {
+    "title": "ファイルの種類",
+    "columns": {
+      "type": "ファイルの種類",
+      "count": "件数"
+    }
+  },
+  "activity": {
+    "title": "アクティビティ",
+    "description": "アップロードとログインの推移: 過去",
+    "range_other": "{{count}} 日間",
+    "uploads": "アップロード",
+    "logins": "ログイン",
+    "empty": "この期間のアップロードやログインはまだありません",
+    "today": "今日",
+    "yesterday": "昨日"
+  }
+}

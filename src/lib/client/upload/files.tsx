@@ -1,4 +1,5 @@
 import { Response } from '@/lib/api/response';
+import i18n from '@/lib/i18n';
 import { notifications } from '@mantine/notifications';
 import { IconFileUpload, IconFileXFilled } from '@tabler/icons-react';
 import { UploadProgress } from './useProgress';
@@ -72,11 +73,11 @@ export async function uploadFiles(
 
   notifications.show({
     id: 'upload',
-    title: `Preparing file${files.length > 1 ? 's' : ''}`,
+    title: i18n.t('upload:notifications.preparing.title', { count: files.length }),
     message:
       batches > 1
-        ? `Uploading ${files.length} file${files.length > 1 ? 's' : ''} in ${batches} batche${batches > 1 ? 's' : ''}`
-        : `Uploading ${files.length} file${files.length > 1 ? 's' : ''}`,
+        ? i18n.t('upload:notifications.preparing.messageBatches', { count: files.length, batches })
+        : i18n.t('upload:notifications.preparing.message', { count: files.length }),
     loading: true,
     autoClose: false,
   });
@@ -111,7 +112,7 @@ export async function uploadFiles(
         () => {
           const { data: res, error } = handleUploadResponse<Response['/api/upload']>(req);
 
-          if (error || !res) return reject(new Error(error?.error ?? 'An unknown error occurred'));
+          if (error || !res) return reject(new Error(error?.error ?? i18n.t('upload:errors.unknown')));
 
           resolve(res);
         },
@@ -119,7 +120,7 @@ export async function uploadFiles(
       );
 
       req.addEventListener('error', () => {
-        reject(new Error('Network error while uploading files'));
+        reject(new Error(i18n.t('upload:errors.network')));
       });
 
       req.open('POST', '/api/upload');
@@ -138,9 +139,9 @@ export async function uploadFiles(
       notifications.update({
         title:
           batches > 1
-            ? `Uploading batch ${batchIndex + 1}/${batches}`
-            : `Uploading file${batchFiles.length > 1 ? 's' : ''}`,
-        message: `${batchFiles.length} file${batchFiles.length > 1 ? 's' : ''}`,
+            ? i18n.t('upload:notifications.uploading.batch', { current: batchIndex + 1, total: batches })
+            : i18n.t('upload:notifications.uploading.title', { count: batchFiles.length }),
+        message: i18n.t('upload:notifications.uploading.message', { count: batchFiles.length }),
         loading: true,
         autoClose: false,
         id: 'upload',
@@ -155,11 +156,17 @@ export async function uploadFiles(
 
     notifications.update({
       id: 'upload',
-      title: partialCount > 0 ? 'Regular uploads complete' : 'Upload complete',
+      title:
+        partialCount > 0
+          ? i18n.t('upload:notifications.complete.titlePartial')
+          : i18n.t('upload:notifications.complete.title'),
       message:
         partialCount > 0
-          ? `Uploaded ${files.length} file${files.length === 1 ? '' : 's'}. Starting ${partialCount} large file upload${partialCount === 1 ? '' : 's'}...`
-          : `Uploaded ${files.length} file${files.length === 1 ? '' : 's'}`,
+          ? i18n.t('upload:notifications.complete.messagePartial', {
+              uploaded: i18n.t('upload:notifications.complete.message', { count: files.length }),
+              starting: i18n.t('upload:notifications.complete.startingPartials', { count: partialCount }),
+            })
+          : i18n.t('upload:notifications.complete.message', { count: files.length }),
       color: 'green',
       icon: <IconFileUpload size='1rem' />,
       autoClose: true,
@@ -180,8 +187,8 @@ export async function uploadFiles(
   } catch (error) {
     notifications.update({
       id: 'upload',
-      title: 'Error uploading files',
-      message: error instanceof Error ? error.message : 'An unknown error occurred',
+      title: i18n.t('upload:notifications.error.title'),
+      message: error instanceof Error ? error.message : i18n.t('upload:errors.unknown'),
       color: 'red',
       icon: <IconFileXFilled size='1rem' />,
       autoClose: true,

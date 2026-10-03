@@ -3,7 +3,9 @@ import { ChartTooltip, LineChart } from '@mantine/charts';
 import { Box, Group, Paper, Select, Skeleton, Text, Title } from '@mantine/core';
 import { IconChartAreaLine, IconLogin2, IconUpload } from '@tabler/icons-react';
 import dayjs from 'dayjs';
+import type { TFunction } from 'i18next';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import useSWR from 'swr';
 
 const CHART_HEIGHT = 260;
@@ -24,17 +26,18 @@ function parseChartDate(value: unknown): dayjs.Dayjs | null {
   return null;
 }
 
-function formatDayLabel(value: unknown) {
+function formatDayLabel(value: unknown, t: TFunction<'dashboard'>) {
   const d = parseChartDate(value);
   if (!d) return '';
 
   const today = dayjs().startOf('day');
-  if (d.isSame(today, 'day')) return 'Today';
-  if (d.isSame(today.subtract(1, 'day'), 'day')) return 'Yesterday';
+  if (d.isSame(today, 'day')) return t('activity.today');
+  if (d.isSame(today.subtract(1, 'day'), 'day')) return t('activity.yesterday');
   return d.format('MMM D');
 }
 
 export default function ActivityChart() {
+  const { t } = useTranslation('dashboard');
   const [days, setDays] = useState(14);
   const { data, isLoading } = useSWR<Response['/api/user/activity']>('/api/user/activity?days=' + days);
 
@@ -72,20 +75,20 @@ export default function ActivityChart() {
       <Group justify='space-between' align='flex-start' mb='lg' wrap='nowrap'>
         <Box>
           <Title order={3} fw={600}>
-            Activity
+            {t('activity.title')}
           </Title>
           <Group gap='xs' style={{ alignItems: 'center' }}>
             <Text size='sm' c='dimmed' mt={4}>
-              Your uploads and logins over the last{' '}
+              {t('activity.description')}{' '}
             </Text>
             <Select
               value={String(days)}
               onChange={(v) => setDays(Number(v))}
               data={[
-                { value: '1', label: '1 day' },
-                { value: '7', label: '7 days' },
-                { value: '14', label: '14 days' },
-                { value: '30', label: '30 days' },
+                { value: '1', label: t('activity.range', { count: 1 }) },
+                { value: '7', label: t('activity.range', { count: 7 }) },
+                { value: '14', label: t('activity.range', { count: 14 }) },
+                { value: '30', label: t('activity.range', { count: 30 }) },
               ]}
               size='0.4rem'
               variant='filled'
@@ -121,7 +124,7 @@ export default function ActivityChart() {
             <IconUpload size='1rem' style={{ opacity: 0.85 }} color='var(--mantine-primary-color-filled)' />
             <Box>
               <Text size='xs' c='dimmed' lh={1.2}>
-                Uploads
+                {t('activity.uploads')}
               </Text>
               <Text size='sm' fw={600} lh={1.3}>
                 {data.totals.uploads}
@@ -132,7 +135,7 @@ export default function ActivityChart() {
             <IconLogin2 size='1rem' style={{ opacity: 0.65 }} color='var(--mantine-color-gray-5)' />
             <Box>
               <Text size='xs' c='dimmed' lh={1.2}>
-                Logins
+                {t('activity.logins')}
               </Text>
               <Text size='sm' fw={600} lh={1.3}>
                 {data.totals.logins}
@@ -147,7 +150,7 @@ export default function ActivityChart() {
           <Group align='center' justify='center' h='100%'>
             <IconChartAreaLine size='1.75rem' style={{ opacity: 0.35 }} />
             <Text size='sm' c='dimmed'>
-              No uploads or logins in this period yet
+              {t('activity.empty')}
             </Text>
           </Group>
         </Paper>
@@ -167,19 +170,19 @@ export default function ActivityChart() {
           series={[
             {
               name: 'uploads',
-              label: 'Uploads',
+              label: t('activity.uploads'),
               color: 'var(--mantine-primary-color-filled)',
             },
             {
               name: 'logins',
-              label: 'Logins',
+              label: t('activity.logins'),
               color: 'gray.5',
             },
           ]}
           xAxisProps={{
             tickMargin: 12,
             minTickGap: 32,
-            tickFormatter: (v) => formatDayLabel(v),
+            tickFormatter: (v) => formatDayLabel(v, t),
           }}
           yAxisProps={{
             width: 36,
@@ -188,11 +191,15 @@ export default function ActivityChart() {
           tooltipProps={{
             content: ({ label, payload }) => (
               <ChartTooltip
-                label={formatDayLabel(label) || '—'}
+                label={formatDayLabel(label, t) || '—'}
                 payload={payload}
                 series={[
-                  { name: 'uploads', label: 'Uploads', color: 'var(--mantine-primary-color-filled)' },
-                  { name: 'logins', label: 'Logins', color: 'gray.5' },
+                  {
+                    name: 'uploads',
+                    label: t('activity.uploads'),
+                    color: 'var(--mantine-primary-color-filled)',
+                  },
+                  { name: 'logins', label: t('activity.logins'), color: 'gray.5' },
                 ]}
               />
             ),

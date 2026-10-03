@@ -2,6 +2,7 @@ import type { Response } from '@/lib/api/response';
 import { Button, LoadingOverlay, Stack, Switch, TagsInput, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconDeviceFloppy } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { settingsOnSubmit } from '../settingsOnSubmit';
 import useServerSettings from '../useServerSettings';
@@ -19,6 +20,7 @@ export default function Core() {
 
 function Form({ data, isLoading }: { data: Response['/api/server/settings']; isLoading: boolean }) {
   const navigate = useNavigate();
+  const { t } = useTranslation(['serverSettings', 'common']);
 
   const form = useForm({
     initialValues: {
@@ -48,41 +50,41 @@ function Form({ data, isLoading }: { data: Response['/api/server/settings']; isL
       <Stack gap='lg'>
         <Switch
           mt='md'
-          label='Return HTTPS URLs'
-          description='Return URLs with HTTPS protocol.'
+          label={t('core.returnHttpsUrls.label')}
+          description={t('core.returnHttpsUrls.description')}
           {...form.getInputProps('coreReturnHttpsUrls', { type: 'checkbox' })}
         />
 
         <Switch
-          label='Trust Proxies'
-          description='Trust X-Forwarded-* headers from the trusted proxies listed below. Requires a server restart.'
+          label={t('core.trustProxy.label')}
+          description={t('core.trustProxy.description')}
           {...form.getInputProps('coreTrustProxy', { type: 'checkbox' })}
         />
 
         <TagsInput
-          label='Trusted Proxies'
-          description='Enter the IPv4/IPv6 addresses or CIDRs of your reverse proxies, separated by commas. Only include trusted proxies, not client networks. An empty list ignores forwarded headers and shares rate limits across clients behind the same proxy. Requires a server restart.'
+          label={t('core.trustedProxies.label')}
+          description={t('core.trustedProxies.description')}
           placeholder='127.0.0.1, ::1'
           {...form.getInputProps('coreTrustedProxies')}
         />
 
         <TextInput
-          label='Default Domain'
-          description='The domain to use when generating URLs. This value should not include the protocol.'
+          label={t('core.defaultDomain.label')}
+          description={t('core.defaultDomain.description')}
           placeholder='example.com'
           {...form.getInputProps('coreDefaultDomain')}
         />
 
         <TextInput
-          label='Temporary Directory'
-          description='The directory to store temporary files. If the path is invalid, certain functions may break. Requires a server restart.'
+          label={t('core.tempDirectory.label')}
+          description={t('core.tempDirectory.description')}
           placeholder='/tmp/zipline'
           {...form.getInputProps('coreTempDirectory')}
         />
       </Stack>
 
       <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
-        Save
+        {t('common:actions.save')}
       </Button>
     </form>
   );

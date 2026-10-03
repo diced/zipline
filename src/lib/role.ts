@@ -27,16 +27,3 @@ export function interactableRoles(current?: Role): Role[] {
   if (current === 'ADMIN') return ['USER'];
   return [];
 }
-
-export function roleName(role?: Role) {
-  switch (role) {
-    case 'USER':
-      return 'User';
-    case 'ADMIN':
-      return 'Admin';
-    case 'SUPERADMIN':
-      return 'Super Admin';
-    default:
-      return 'User';
-  }
-}

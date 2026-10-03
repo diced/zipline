@@ -1,0 +1,36 @@
+{
+  "password": {
+    "title": "パスワードが必要です",
+    "invalid": "パスワードが正しくありません",
+    "verify": "確認",
+    "fileDescription": "このファイルはパスワードで保護されています。表示するにはパスワードを入力してください",
+    "urlDescription": "このリンクはパスワードで保護されています。表示するにはパスワードを入力してください"
+  },
+  "file": {
+    "pageTitle": "ファイルの表示",
+    "viewFolder": "フォルダーを表示",
+    "viewRaw": "ファイルを直接表示",
+    "download": "ファイルをダウンロード"
+  },
+  "url": {
+    "redirecting": "<anchor>{{destination}}</anchor> にリダイレクトしています"
+  },
+  "folder": {
+    "pageTitle": "フォルダー",
+    "subfolders": "サブフォルダー",
+    "files": "ファイル",
+    "empty": "このフォルダーは空です。",
+    "card": {
+      "files": "ファイル {{amount}} 個",
+      "subfolders": "サブフォルダー {{amount}} 個"
+    },
+    "pagination": "ファイル {{total}} 個中 {{from}}～{{to}} 個目"
+  },
+  "folderUpload": {
+    "pageTitle": "{{name}} へのアップロード",
+    "pageTitleFallback": "フォルダーへのアップロード",
+    "title": "{{name}} にファイルをアップロード",
+    "public": "このフォルダーは<anchor>公開</anchor>されています。リンクを知っている人は誰でも内容を表示し、ファイルをアップロードできます。",
+    "private": "このフォルダーの内容を表示できるのは所有者のみです。ただし、誰でもファイルをアップロードでき、個々のファイルへのリンクがあれば自分がアップロードしたファイルにアクセスできます。"
+  }
+}

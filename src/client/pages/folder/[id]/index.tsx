@@ -1,3 +1,4 @@
+import LanguageSelect from '@/components/LanguageSelect';
 import { useApiPagination } from '@/components/pages/files/useApiPagination';
 import { type Response } from '@/lib/api/response';
 import { useTitle } from '@/lib/client/hooks/useTitle';
@@ -7,6 +8,7 @@ import { FolderBreadcrumb } from '@/lib/folderHierarchy';
 import {
   ActionIcon,
   Anchor,
+  Box,
   Breadcrumbs,
   Card,
   Container,
@@ -21,6 +23,7 @@ import {
 } from '@mantine/core';
 import { IconFolder, IconUpload } from '@tabler/icons-react';
 import { lazy, Suspense, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, Params, useLoaderData, useNavigate, useSearchParams } from 'react-router-dom';
 import { useShallow } from 'zustand/shallow';
 import { useQueryState, parseAsInteger } from 'nuqs';
@@ -45,6 +48,8 @@ export async function loader({ params, request }: { params: Params<string>; requ
 }
 
 function PublicFolderCard({ folder }: { folder: Partial<Folder> }) {
+  const { t } = useTranslation('view');
+
   return (
     <Link to={`/folder/${folder.id}`} style={{ textDecoration: 'none' }}>
       <Card withBorder shadow='sm' style={{ cursor: 'pointer' }}>
@@ -57,11 +62,11 @@ function PublicFolderCard({ folder }: { folder: Partial<Folder> }) {
         <Card.Section inheritPadding py='xs'>
           <Stack gap={2}>
             <Text size='xs' c='dimmed'>
-              {folder._count?.files ?? 0} files
+              {t('folder.card.files', { amount: folder._count?.files ?? 0 })}
             </Text>
             {(folder._count?.children ?? 0) > 0 && (
               <Text size='xs' c='dimmed'>
-                {folder._count?.children} subfolders
+                {t('folder.card.subfolders', { amount: folder._count?.children })}
               </Text>
             )}
           </Stack>
@@ -74,6 +79,7 @@ function PublicFolderCard({ folder }: { folder: Partial<Folder> }) {
 const PER_PAGE_OPTIONS = [9, 12, 15, 30, 45];
 
 export function Component() {
+  const { t } = useTranslation('view');
   const { initial } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
 
@@ -97,7 +103,7 @@ export function Component() {
   const totalRecords = data?.total ?? 0;
   const cachedPages = data?.pages ?? 0;
 
-  useTitle(folder.name ?? 'Folder');
+  useTitle(folder.name ?? t('folder.pageTitle'));
 
   const buildBreadcrumbs = () => {
     const items: FolderBreadcrumb[] = [];
@@ -164,12 +170,16 @@ export function Component() {
               </ActionIcon>
             </Link>
           )}
+
+          <Box ml='auto'>
+            <LanguageSelect />
+          </Box>
         </Group>
 
         {children.length > 0 && (
           <>
             <Title order={3} mt='md' mb='sm'>
-              Subfolders
+              {t('folder.subfolders')}
             </Title>
             <SimpleGrid
               cols={{
@@ -190,7 +200,7 @@ export function Component() {
         {(files.length ?? 0) > 0 && (
           <>
             <Title order={3} mt='md' mb='sm'>
-              Files
+              {t('folder.files')}
             </Title>
             <SimpleGrid
               cols={{
@@ -211,12 +221,12 @@ export function Component() {
 
         {children.length === 0 && totalRecords === 0 && (
           <Text c='dimmed' mt='md'>
-            This folder is empty.
+            {t('folder.empty')}
           </Text>
         )}
 
         <Group justify='space-between' align='center' mt='md'>
-          <Text size='sm'>{`${from} - ${to} / ${totalRecords} files`}</Text>
+          <Text size='sm'>{t('folder.pagination', { from, to, total: totalRecords })}</Text>
 
           <Group gap='sm'>
             <Select

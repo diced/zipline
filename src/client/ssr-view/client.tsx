@@ -1,3 +1,4 @@
+import '@/lib/i18n';
 import '@mantine/charts/styles.css';
 import '@mantine/core/styles.css';
 import '@mantine/dates/styles.css';

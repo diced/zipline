@@ -1,0 +1,201 @@
+{
+  "page": {
+    "title": "Arquivos",
+    "uploadTooltip": "Enviar um arquivo",
+    "moreActions": "Mais ações",
+    "menu": {
+      "manageTags": "Gerenciar etiquetas",
+      "viewPending": "Ver arquivos pendentes",
+      "tableOptions": "Opções da tabela",
+      "searchById": "Pesquisar por ID"
+    }
+  },
+  "fields": {
+    "name": "Nome",
+    "originalName": "Nome original",
+    "tags": "Etiquetas",
+    "type": "Tipo",
+    "size": "Tamanho",
+    "createdAt": "Criado em",
+    "favorite": "Favorito",
+    "views": "Visualizações",
+    "anonymous": "Anônimo?"
+  },
+  "tableOptions": {
+    "title": "Opções da tabela",
+    "description": "Selecione e arraste os campos abaixo para mostrá-los, ocultá-los ou reordená-los na visualização em tabela dos arquivos.",
+    "reset": "Redefinir para o padrão"
+  },
+  "pending": {
+    "title": "Arquivos pendentes",
+    "count_one": "{{count}} arquivo",
+    "count_many": "{{count}} arquivos",
+    "count_other": "{{count}} arquivos",
+    "clearCompleted": "Remover concluídos",
+    "chunks": "Blocos: {{complete}}/{{total}}",
+    "clearEntry": "Remover entrada",
+    "clearEntryLabel": "Remover {{name}}",
+    "empty": "Nenhum arquivo pendente",
+    "status": {
+      "pending": "Pendente",
+      "processing": "Processando",
+      "complete": "Concluído",
+      "failed": "Falhou"
+    },
+    "notifications": {
+      "clearedOne": "Arquivo pendente removido!",
+      "clearedCompleted": "Arquivos concluídos removidos!",
+      "clearOneFailed": "Falha ao remover o arquivo pendente: {{error}}",
+      "clearCompletedFailed": "Falha ao remover os arquivos concluídos: {{error}}",
+      "unknownError": "Erro desconhecido"
+    }
+  },
+  "bulk": {
+    "delete": {
+      "title_one": "Excluir {{count}} arquivo?",
+      "title_many": "Excluir {{count}} arquivos?",
+      "title_other": "Excluir {{count}} arquivos?",
+      "message_one": "Você está prestes a excluir {{count}} arquivo. Esta ação não pode ser desfeita.",
+      "message_many": "Você está prestes a excluir {{count}} arquivos. Esta ação não pode ser desfeita.",
+      "message_other": "Você está prestes a excluir {{count}} arquivos. Esta ação não pode ser desfeita.",
+      "loadingTitle": "Excluindo arquivos",
+      "loadingMessage_one": "Excluindo {{count}} arquivo",
+      "loadingMessage_many": "Excluindo {{count}} arquivos",
+      "loadingMessage_other": "Excluindo {{count}} arquivos",
+      "errorTitle": "Erro ao excluir arquivos",
+      "successTitle": "Arquivos excluídos",
+      "successMessage_one": "{{count}} arquivo excluído",
+      "successMessage_many": "{{count}} arquivos excluídos",
+      "successMessage_other": "{{count}} arquivos excluídos"
+    },
+    "favorite": {
+      "title_one": "Favoritar {{count}} arquivo?",
+      "title_many": "Favoritar {{count}} arquivos?",
+      "title_other": "Favoritar {{count}} arquivos?",
+      "message_one": "Você está prestes a adicionar {{count}} arquivo aos favoritos.",
+      "message_many": "Você está prestes a adicionar {{count}} arquivos aos favoritos.",
+      "message_other": "Você está prestes a adicionar {{count}} arquivos aos favoritos.",
+      "confirm": "Favoritar",
+      "loadingTitle": "Adicionando arquivos aos favoritos",
+      "loadingMessage_one": "Adicionando {{count}} arquivo aos favoritos",
+      "loadingMessage_many": "Adicionando {{count}} arquivos aos favoritos",
+      "loadingMessage_other": "Adicionando {{count}} arquivos aos favoritos",
+      "successTitle": "Arquivos favoritados",
+      "successMessage_one": "{{count}} arquivo adicionado aos favoritos",
+      "successMessage_many": "{{count}} arquivos adicionados aos favoritos",
+      "successMessage_other": "{{count}} arquivos adicionados aos favoritos"
+    },
+    "unfavorite": {
+      "title_one": "Remover {{count}} arquivo dos favoritos?",
+      "title_many": "Remover {{count}} arquivos dos favoritos?",
+      "title_other": "Remover {{count}} arquivos dos favoritos?",
+      "message_one": "Você está prestes a remover {{count}} arquivo dos favoritos.",
+      "message_many": "Você está prestes a remover {{count}} arquivos dos favoritos.",
+      "message_other": "Você está prestes a remover {{count}} arquivos dos favoritos.",
+      "confirm": "Remover dos favoritos",
+      "loadingTitle": "Removendo arquivos dos favoritos",
+      "loadingMessage_one": "Removendo {{count}} arquivo dos favoritos",
+      "loadingMessage_many": "Removendo {{count}} arquivos dos favoritos",
+      "loadingMessage_other": "Removendo {{count}} arquivos dos favoritos",
+      "successTitle": "Arquivos removidos dos favoritos",
+      "successMessage_one": "{{count}} arquivo removido dos favoritos",
+      "successMessage_many": "{{count}} arquivos removidos dos favoritos",
+      "successMessage_other": "{{count}} arquivos removidos dos favoritos"
+    },
+    "modifyErrorTitle": "Erro ao modificar arquivos",
+    "copyLinks": {
+      "title": "Links copiados para a área de transferência",
+      "message_one": "{{count}} link copiado para a área de transferência",
+      "message_many": "{{count}} links copiados para a área de transferência",
+      "message_other": "{{count}} links copiados para a área de transferência"
+    }
+  },
+  "tags": {
+    "title": "Etiquetas",
+    "fileCount_one": "{{count}} arquivo",
+    "fileCount_many": "{{count}} arquivos",
+    "fileCount_other": "{{count}} arquivos",
+    "edit": "Editar etiqueta",
+    "delete": "Excluir etiqueta",
+    "empty": "Nenhuma etiqueta. Crie uma clicando no ícone de adição.",
+    "form": {
+      "name": {
+        "label": "Nome",
+        "placeholder": "Digite um nome...",
+        "required": "O nome é obrigatório"
+      },
+      "color": {
+        "label": "Cor",
+        "fromName": "Escolher uma cor com base no nome",
+        "invalid": "A cor deve começar com #"
+      }
+    },
+    "create": {
+      "title": "Criar nova etiqueta",
+      "submit": "Criar etiqueta"
+    },
+    "editModal": {
+      "title": "Editar etiqueta",
+      "submit": "Editar etiqueta"
+    },
+    "notifications": {
+      "createFailed": "Falha ao criar a etiqueta",
+      "created": "Etiqueta criada",
+      "createdMessage": "Etiqueta {{name}} criada",
+      "editFailed": "Falha ao editar a etiqueta",
+      "edited": "Etiqueta editada",
+      "editedMessage": "Etiqueta {{name}} editada",
+      "deleteFailed": "Falha ao excluir a etiqueta: {{error}}",
+      "deleted": "Etiqueta excluída",
+      "deletedMessage": "Etiqueta {{name}} excluída"
+    }
+  },
+  "views": {
+    "favoriteFiles": "Arquivos favoritos",
+    "noFiles": "Nenhum arquivo encontrado",
+    "uploadFile": "Enviar um arquivo",
+    "pagination": "Arquivos {{from}} - {{to}} de {{total}}"
+  },
+  "table": {
+    "columns": {
+      "name": "Nome",
+      "originalName": "Nome original",
+      "tags": "Etiquetas",
+      "type": "Tipo",
+      "size": "Tamanho",
+      "createdAt": "Criado em",
+      "favorite": "Favorito?",
+      "views": "Visualizações",
+      "id": "ID",
+      "anonymous": "Anônimo?",
+      "actions": "Ações"
+    },
+    "search": {
+      "name": "Pesquisar por nome",
+      "originalName": "Pesquisar por nome original",
+      "type": "Pesquisar por tipo"
+    },
+    "searchById": "Pesquisar por ID",
+    "tagsPlaceholder": "Escolha uma ou mais etiquetas",
+    "selection": {
+      "summary_one": "As seleções são mantidas ao mudar de página. <b>{{count}}</b> arquivo selecionado no momento.",
+      "summary_many": "As seleções são mantidas ao mudar de página. <b>{{count}}</b> arquivos selecionados no momento.",
+      "summary_other": "As seleções são mantidas ao mudar de página. <b>{{count}}</b> arquivos selecionados no momento.",
+      "delete": "Excluir arquivos",
+      "favorite": "Favoritar arquivos",
+      "unfavorite": "Remover arquivos dos favoritos",
+      "copyLinks": "Copiar links dos arquivos",
+      "addToFolder": "Adicionar à pasta...",
+      "clear": "Limpar seleção"
+    },
+    "noRecords": "Nenhum arquivo",
+    "recordsPerPage": "Registros por página",
+    "actions": {
+      "details": "Mais detalhes",
+      "view": "Ver arquivo em nova guia",
+      "copy": "Copiar link do arquivo para a área de transferência",
+      "download": "Baixar arquivo",
+      "delete": "Excluir arquivo"
+    }
+  }
+}

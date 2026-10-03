@@ -1,0 +1,139 @@
+{
+  "page": {
+    "title": "Carpetas",
+    "titleWithFolder": "Carpetas {{separator}} {{name}}",
+    "createFolder": "Crear carpeta",
+    "createSubfolder": "Crear subcarpeta",
+    "folderFiles": "Archivos de {{name}}",
+    "folderFilesWithCount": "Archivos de {{name}} ({{files}})"
+  },
+  "create": {
+    "title": "Crear una carpeta",
+    "titleSubfolder": "Crear una subcarpeta",
+    "name": {
+      "label": "Nombre",
+      "placeholder": "Escriba un nombre...",
+      "required": "El nombre es obligatorio"
+    },
+    "public": {
+      "label": "Pública",
+      "description": "Las carpetas públicas son visibles para todos"
+    }
+  },
+  "uploadsAlert": {
+    "message": "Esta carpeta permite subidas anónimas. Comparta el siguiente enlace para que otras personas puedan subir archivos a esta carpeta.",
+    "copy": "Copiar URL",
+    "copied": "URL copiada"
+  },
+  "menu": {
+    "moreActions": "Más acciones",
+    "open": "Abrir carpeta",
+    "move": "Mover carpeta",
+    "export": "Exportar como ZIP",
+    "makePrivate": "Hacer privada",
+    "makePublic": "Hacer pública",
+    "disallowUploads": "No permitir subidas anónimas",
+    "allowUploads": "Permitir subidas anónimas",
+    "editName": "Editar nombre",
+    "copyUrl": "Copiar URL"
+  },
+  "card": {
+    "created": "Creada:",
+    "updated": "Actualizada:",
+    "public": "Pública:",
+    "files": "Archivos:",
+    "subfolders": "Subcarpetas:"
+  },
+  "grid": {
+    "empty": "No se encontraron carpetas",
+    "emptyFolder": "Esta carpeta está vacía",
+    "createHint": "Cree una carpeta para verla aquí"
+  },
+  "table": {
+    "columns": {
+      "name": "Nombre",
+      "public": "Pública",
+      "uploads": "¿Subidas?",
+      "created": "Creada",
+      "updated": "Última actualización",
+      "actions": "Acciones"
+    },
+    "subfolders_one": "{{count}} subcarpeta",
+    "subfolders_many": "{{count}} subcarpetas",
+    "subfolders_other": "{{count}} subcarpetas",
+    "noRecords": "No hay subcarpetas",
+    "copyLink": "Copiar enlace de la carpeta",
+    "delete": "Eliminar carpeta"
+  },
+  "notifications": {
+    "visibilityFailed": "No se pudo cambiar la visibilidad de la carpeta",
+    "visibilityEdited": "Visibilidad de la carpeta modificada",
+    "nowPublic": "{{name}} ahora es pública",
+    "nowPrivate": "{{name}} ahora es privada",
+    "uploadsFailed": "No se pudo cambiar la política de subidas de la carpeta",
+    "uploadsEdited": "Política de subidas de la carpeta modificada",
+    "uploadsAllowed": "{{name}} ahora permite subidas anónimas",
+    "uploadsDisallowed": "{{name}} ya no permite subidas anónimas"
+  },
+  "delete": {
+    "title": "¿Eliminar \"{{name}}\"?",
+    "cannotUndo": "Esta acción no se puede deshacer.",
+    "containsFilesAndSubfolders": "Esta carpeta contiene {{files}} archivo(s) y {{subfolders}} subcarpeta(s). ¿Qué desea hacer con ellos?",
+    "containsFiles": "Esta carpeta contiene {{files}} archivo(s). ¿Qué desea hacer con ellos?",
+    "containsSubfolders": "Esta carpeta contiene {{subfolders}} subcarpeta(s). ¿Qué desea hacer con ellas?",
+    "options": {
+      "root": "Mover el contenido a la carpeta raíz",
+      "folder": "Mover el contenido a otra carpeta",
+      "cascade": "Eliminar subcarpetas (los archivos se mueven a la raíz)",
+      "cascadeFiles": "Eliminar subcarpetas y sus archivos (eliminación en cascada)"
+    },
+    "target": {
+      "label": "Carpeta de destino",
+      "placeholder": "Seleccione una carpeta"
+    },
+    "warningCascade": "Advertencia: se eliminarán de forma permanente todas las subcarpetas de esta carpeta. Los archivos se desvincularán de sus carpetas y se moverán a la raíz.",
+    "warningCascadeFiles": "Advertencia: se eliminarán de forma permanente todas las subcarpetas de esta carpeta, junto con todos los archivos que contienen. Los archivos se quitarán del almacenamiento y no se podrán recuperar.",
+    "confirmCascade": "¿Eliminar \"{{name}}\" y todas sus subcarpetas?",
+    "confirmCascadeFiles": "¿Eliminar \"{{name}}\" y todas sus subcarpetas y archivos?",
+    "modalCascade": "Todas las subcarpetas se eliminarán de forma permanente (los archivos se moverán a la raíz). Esta acción no se puede deshacer.",
+    "modalCascadeFiles": "Todas las subcarpetas y todos los archivos que contienen se eliminarán de forma permanente del almacenamiento. Esta acción no se puede deshacer.",
+    "submit": "Eliminar carpeta",
+    "notifications": {
+      "failed": "No se pudo eliminar la carpeta",
+      "deleted": "Carpeta eliminada",
+      "deletedMessage": "Se eliminó {{name}}",
+      "noTarget": "No se seleccionó ninguna carpeta",
+      "noTargetMessage": "Seleccione una carpeta a la que mover el contenido"
+    }
+  },
+  "edit": {
+    "title": "Editar nombre de la carpeta",
+    "label": "Nuevo nombre de la carpeta",
+    "placeholder": "Escriba el nuevo nombre de la carpeta...",
+    "required": "El nombre es obligatorio",
+    "notifications": {
+      "failed": "Error al actualizar el nombre de la carpeta",
+      "updated": "Nombre de la carpeta actualizado",
+      "updatedMessage": "El nombre de la carpeta se cambió correctamente a {{name}}"
+    }
+  },
+  "move": {
+    "title": "Mover \"{{name}}\"",
+    "description": "Seleccione una carpeta de destino para esta carpeta.",
+    "root": "/ (Raíz)",
+    "destination": {
+      "label": "Destino",
+      "placeholder": "Seleccione una carpeta"
+    },
+    "submit": "Mover carpeta",
+    "notifications": {
+      "failed": "No se pudo mover la carpeta",
+      "moved": "Carpeta movida",
+      "movedMessage": "Se movió {{name}}"
+    }
+  },
+  "viewFiles": {
+    "title": "Archivos en {{name}}",
+    "found": "Archivos encontrados: {{amount}}"
+  }
+}

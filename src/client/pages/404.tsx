@@ -1,9 +1,11 @@
 import { useTitle } from '@/lib/client/hooks/useTitle';
 import { Button, Center, Stack, Text, Title } from '@mantine/core';
 import { IconArrowLeft } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
 export default function FourOhFour() {
+  const { t } = useTranslation('layout');
   useTitle('404');
 
   return (
@@ -11,7 +13,7 @@ export default function FourOhFour() {
       <Stack>
         <Title order={1}>404</Title>
         <Text c='dimmed' mt='-md'>
-          Page not found
+          {t('notFound.message')}
         </Text>
 
         <Button
@@ -21,7 +23,7 @@ export default function FourOhFour() {
           fullWidth
           leftSection={<IconArrowLeft size='1rem' />}
         >
-          Go home
+          {t('notFound.goHome')}
         </Button>
       </Stack>
     </Center>

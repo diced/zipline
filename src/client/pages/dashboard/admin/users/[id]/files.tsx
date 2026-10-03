@@ -1,5 +1,6 @@
 import ViewUserFiles from '@/components/pages/users/ViewUserFiles';
 import { useTitle } from '@/lib/client/hooks/useTitle';
+import { useTranslation } from 'react-i18next';
 import { Params, redirect, useLoaderData } from 'react-router-dom';
 
 export async function loader({ params }: { params: Params<string> }) {
@@ -13,8 +14,9 @@ export async function loader({ params }: { params: Params<string> }) {
 }
 
 export function Component() {
+  const { t } = useTranslation('layout');
   const { user } = useLoaderData<typeof loader>();
-  useTitle(`${user ? user.username : 'User'}'s files`);
+  useTitle(user ? t('titles.userFiles', { username: user.username }) : t('titles.unknownUserFiles'));
 
   return <ViewUserFiles />;
 }

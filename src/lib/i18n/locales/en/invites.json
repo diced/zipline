@@ -1,0 +1,75 @@
+{
+  "title": "Invites",
+  "create": {
+    "title": "Create an invite",
+    "expiresAt": {
+      "label": "Expires at",
+      "description": "Select an expiration for this invite, or choose \"never\" if you want the invite to never expire.",
+      "placeholder": "Select an expiration..."
+    },
+    "maxUses": {
+      "label": "Max uses",
+      "description": "Set a maximum number of uses for this invite, or leave blank for unlimited uses.",
+      "placeholder": "Enter a number..."
+    }
+  },
+  "expirations": {
+    "never": "Never",
+    "minutes30": "30 minutes",
+    "hour1": "1 hour",
+    "hours6": "6 hours",
+    "hours12": "12 hours",
+    "day1": "1 day",
+    "days3": "3 days",
+    "days5": "5 days",
+    "days7": "7 days"
+  },
+  "notifications": {
+    "created": {
+      "title": "Invite created",
+      "message": "Invite {{code}} has been created."
+    },
+    "deleteFailed": {
+      "title": "Failed to delete invite"
+    },
+    "deleted": {
+      "title": "Invite deleted",
+      "message": "Invite {{code}} has been deleted."
+    }
+  },
+  "delete": {
+    "message": "Are you sure you want to delete invite {{code}}? This action cannot be undone.",
+    "confirm": "Delete {{code}}"
+  },
+  "card": {
+    "copyUrl": "Copy URL",
+    "showQrCode": "Show QR Code",
+    "createdBy": "Created By:",
+    "created": "Created:",
+    "expires": "Expires:",
+    "maxUses": "Max Uses:",
+    "uses": "Uses:",
+    "unlimited": "Unlimited"
+  },
+  "empty": {
+    "title": "No invites found",
+    "description": "Create an invite to see them here."
+  },
+  "table": {
+    "columns": {
+      "code": "Code",
+      "createdBy": "Created by",
+      "created": "Created",
+      "updatedAt": "Last update at",
+      "expires": "Expires",
+      "maxUses": "Max uses",
+      "uses": "Uses",
+      "actions": "Actions"
+    },
+    "never": "Never",
+    "unlimited": "Unlimited",
+    "copyLink": "Copy invite link",
+    "showQrCode": "Show QR code",
+    "delete": "Delete invite"
+  }
+}

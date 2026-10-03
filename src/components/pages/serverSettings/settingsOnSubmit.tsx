@@ -1,5 +1,6 @@
 import { Response } from '@/lib/api/response';
 import { fetchApi } from '@/lib/fetchApi';
+import i18n from '@/lib/i18n';
 import { showNotification } from '@mantine/notifications';
 import { mutate } from 'swr';
 import { IconDeviceFloppy } from '@tabler/icons-react';
@@ -32,7 +33,7 @@ export function settingsOnSubmit(navigate: NavigateFunction, form: ReturnType<ty
 
     if (error) {
       showNotification({
-        title: 'Failed to save settings',
+        title: i18n.t('serverSettings:notifications.saveFailed.title'),
         message: error.issues
           ? error.issues.map((x: { message: string }) => x.message).join('\n')
           : error.error,
@@ -50,7 +51,7 @@ export function settingsOnSubmit(navigate: NavigateFunction, form: ReturnType<ty
       return error;
     } else {
       showNotification({
-        message: 'Settings saved',
+        message: i18n.t('serverSettings:notifications.saved.message'),
         color: 'green',
         icon: <IconDeviceFloppy size='1rem' />,
       });

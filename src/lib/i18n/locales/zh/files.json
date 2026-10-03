@@ -1,0 +1,169 @@
+{
+  "page": {
+    "title": "文件",
+    "uploadTooltip": "上传文件",
+    "moreActions": "更多操作",
+    "menu": {
+      "manageTags": "管理标签",
+      "viewPending": "查看待处理文件",
+      "tableOptions": "表格选项",
+      "searchById": "按 ID 搜索"
+    }
+  },
+  "fields": {
+    "name": "名称",
+    "originalName": "原始名称",
+    "tags": "标签",
+    "type": "类型",
+    "size": "大小",
+    "createdAt": "创建时间",
+    "favorite": "收藏",
+    "views": "查看次数",
+    "anonymous": "匿名？"
+  },
+  "tableOptions": {
+    "title": "表格选项",
+    "description": "选择并拖动下方的字段，以在文件表格视图中显示、隐藏字段或调整其顺序。",
+    "reset": "恢复默认"
+  },
+  "pending": {
+    "title": "待处理文件",
+    "count_other": "{{count}} 个文件",
+    "clearCompleted": "清除已完成",
+    "chunks": "{{complete}}/{{total}} 个分片",
+    "clearEntry": "清除条目",
+    "clearEntryLabel": "清除 {{name}}",
+    "empty": "暂无待处理的文件",
+    "status": {
+      "pending": "待处理",
+      "processing": "处理中",
+      "complete": "已完成",
+      "failed": "失败"
+    },
+    "notifications": {
+      "clearedOne": "已清除待处理文件！",
+      "clearedCompleted": "已清除已完成的文件！",
+      "clearOneFailed": "无法清除待处理文件：{{error}}",
+      "clearCompletedFailed": "无法清除已完成的文件：{{error}}",
+      "unknownError": "未知错误"
+    }
+  },
+  "bulk": {
+    "delete": {
+      "title_other": "删除 {{count}} 个文件？",
+      "message_other": "你即将删除 {{count}} 个文件。此操作无法撤销。",
+      "loadingTitle": "正在删除文件",
+      "loadingMessage_other": "正在删除 {{count}} 个文件",
+      "errorTitle": "删除文件时出错",
+      "successTitle": "已删除文件",
+      "successMessage_other": "已删除 {{count}} 个文件"
+    },
+    "favorite": {
+      "title_other": "收藏 {{count}} 个文件？",
+      "message_other": "你即将收藏 {{count}} 个文件。",
+      "confirm": "收藏",
+      "loadingTitle": "正在收藏文件",
+      "loadingMessage_other": "正在收藏 {{count}} 个文件",
+      "successTitle": "已收藏文件",
+      "successMessage_other": "已收藏 {{count}} 个文件"
+    },
+    "unfavorite": {
+      "title_other": "取消收藏 {{count}} 个文件？",
+      "message_other": "你即将取消收藏 {{count}} 个文件。",
+      "confirm": "取消收藏",
+      "loadingTitle": "正在取消收藏文件",
+      "loadingMessage_other": "正在取消收藏 {{count}} 个文件",
+      "successTitle": "已取消收藏文件",
+      "successMessage_other": "已取消收藏 {{count}} 个文件"
+    },
+    "modifyErrorTitle": "修改文件时出错",
+    "copyLinks": {
+      "title": "已将链接复制到剪贴板",
+      "message_other": "已将 {{count}} 个链接复制到剪贴板"
+    }
+  },
+  "tags": {
+    "title": "标签",
+    "fileCount_other": "{{count}} 个文件",
+    "edit": "编辑标签",
+    "delete": "删除标签",
+    "empty": "暂无标签。点击加号图标创建一个。",
+    "form": {
+      "name": {
+        "label": "名称",
+        "placeholder": "输入名称...",
+        "required": "名称为必填项"
+      },
+      "color": {
+        "label": "颜色",
+        "fromName": "根据名称选择颜色",
+        "invalid": "颜色必须以 # 开头"
+      }
+    },
+    "create": {
+      "title": "新建标签",
+      "submit": "创建标签"
+    },
+    "editModal": {
+      "title": "编辑标签",
+      "submit": "保存标签"
+    },
+    "notifications": {
+      "createFailed": "无法创建标签",
+      "created": "已创建标签",
+      "createdMessage": "已创建标签 {{name}}",
+      "editFailed": "无法编辑标签",
+      "edited": "已编辑标签",
+      "editedMessage": "已编辑标签 {{name}}",
+      "deleteFailed": "无法删除标签：{{error}}",
+      "deleted": "已删除标签",
+      "deletedMessage": "已删除标签 {{name}}"
+    }
+  },
+  "views": {
+    "favoriteFiles": "收藏的文件",
+    "noFiles": "未找到文件",
+    "uploadFile": "上传文件",
+    "pagination": "第 {{from}} - {{to}} 个，共 {{total}} 个文件"
+  },
+  "table": {
+    "columns": {
+      "name": "名称",
+      "originalName": "原始名称",
+      "tags": "标签",
+      "type": "类型",
+      "size": "大小",
+      "createdAt": "创建时间",
+      "favorite": "收藏？",
+      "views": "查看次数",
+      "id": "ID",
+      "anonymous": "匿名？",
+      "actions": "操作"
+    },
+    "search": {
+      "name": "按名称搜索",
+      "originalName": "按原始名称搜索",
+      "type": "按类型搜索"
+    },
+    "searchById": "按 ID 搜索",
+    "tagsPlaceholder": "选择一个或多个标签",
+    "selection": {
+      "summary_other": "切换页面时会保留已选内容。当前已选择 <b>{{count}}</b> 个文件。",
+      "delete": "删除文件",
+      "favorite": "收藏文件",
+      "unfavorite": "取消收藏文件",
+      "copyLinks": "复制文件链接",
+      "addToFolder": "添加到文件夹...",
+      "clear": "清除选择"
+    },
+    "noRecords": "暂无文件",
+    "recordsPerPage": "每页记录数",
+    "actions": {
+      "details": "更多详细信息",
+      "view": "在新标签页中查看文件",
+      "copy": "将文件链接复制到剪贴板",
+      "download": "下载文件",
+      "delete": "删除文件"
+    }
+  }
+}

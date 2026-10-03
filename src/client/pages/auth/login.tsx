@@ -1,3 +1,4 @@
+import LanguageSelect from '@/components/LanguageSelect';
 import ExternalAuthButton from '@/components/pages/login/ExternalAuthButton';
 import LocalLogin from '@/components/pages/login/LocalLogin';
 import PasskeyAuthButton from '@/components/pages/login/PasskeyAuthButton';
@@ -33,13 +34,16 @@ import {
   IconCircleKeyFilled,
 } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import SafeTrans from '@/components/SafeTrans';
 import { Link, useNavigate } from 'react-router-dom';
 import useSWR from 'swr';
 import GenericError from '../../error/GenericError';
 import { eitherTrue } from '@/lib/primitive';
 
 export default function Login() {
-  useTitle('Login');
+  const { t } = useTranslation(['auth', 'common']);
+  useTitle(t('login.pageTitle'));
 
   const query = new URLSearchParams(location.search);
   const navigate = useNavigate();
@@ -88,8 +92,8 @@ export default function Login() {
   const form = useForm({
     initialValues: { username: '', password: '' },
     validate: {
-      username: (v) => (v.length >= 1 ? null : 'Username is required'),
-      password: (v) => (v.length >= 1 ? null : 'Password is required'),
+      username: (v) => (v.length >= 1 ? null : t('form.username.required')),
+      password: (v) => (v.length >= 1 ? null : t('form.password.required')),
     },
   });
 
@@ -110,17 +114,17 @@ export default function Login() {
 
     if (error) {
       if (ApiError.check(error, 1044)) {
-        form.setFieldError('username', 'Invalid username');
-        form.setFieldError('password', 'Invalid password');
+        form.setFieldError('username', t('form.username.invalid'));
+        form.setFieldError('password', t('form.password.invalid'));
       } else {
-        setTotp('error', error.error || 'Login failed');
+        setTotp('error', error.error || t('login.failed'));
       }
       setTotp('disabled', false);
     } else if (data?.totp) {
       setTotp({ open: true, disabled: false });
     } else {
       showNotification({
-        message: 'Logging in...',
+        message: t('login.loggingIn'),
         icon: <IconCheck size='1rem' />,
         autoClose: 700,
       });
@@ -135,7 +139,14 @@ export default function Login() {
   };
 
   if (configLoading || !config) return <LoadingOverlay visible />;
-  if (configError) return <GenericError title='Error' message='Config load failed' details={configError} />;
+  if (configError)
+    return (
+      <GenericError
+        title={t('common:status.error')}
+        message={t('login.configLoadFailed')}
+        details={configError}
+      />
+    );
 
   const hasBg = !!config.website.loginBackground;
 
@@ -162,8 +173,11 @@ export default function Login() {
       {isHttps && !config.returnHttps && (
         <Box pos='absolute' top={10} left='50%' style={{ transform: 'translateX(-50%)' }}>
           <Text size='sm' c='red' ta='center'>
-            You are accessing this instance through a <b>secure</b> context but the server is not configured
-            to use HTTPS. Click <Anchor onClick={() => setSecureModal(true)}> here</Anchor> to learn more.
+            <SafeTrans
+              t={t}
+              i18nKey='login.insecureServer'
+              components={{ b: <b />, anchor: <Anchor onClick={() => setSecureModal(true)} /> }}
+            />
           </Text>
         </Box>
       )}
@@ -171,9 +185,11 @@ export default function Login() {
       {!isHttps && config.returnHttps && (
         <Box pos='absolute' top={10} left='50%' style={{ transform: 'translateX(-50%)' }}>
           <Text size='sm' c='red' ta='center'>
-            You are accessing this instance through an <b>insecure</b> context but the server is configured to
-            use HTTPS. This may cause issues when logging in. Click{' '}
-            <Anchor onClick={() => setSecureModal(true)}> here</Anchor> to learn more.
+            <SafeTrans
+              t={t}
+              i18nKey='login.insecureClient'
+              components={{ b: <b />, anchor: <Anchor onClick={() => setSecureModal(true)} /> }}
+            />
           </Text>
         </Box>
       )}
@@ -225,7 +241,7 @@ export default function Login() {
               config.features.userRegistration,
             ) && (
               <>
-                <Divider label='or' />
+                <Divider label={t('or')} />
 
                 {config.mfa.passkeys && browserSupportsWebAuthn() && (
                   <PasskeyAuthButton onAuthSuccess={mutate} />
@@ -257,10 +273,13 @@ export default function Login() {
 
                 {config.features.userRegistration && (
                   <Text ta='center' mt='md'>
-                    Don&apos;t have an account?{' '}
-                    <Anchor component={Link} to='/auth/register' c='blue' fw={500}>
-                      Register
-                    </Anchor>
+                    <SafeTrans
+                      t={t}
+                      i18nKey='login.noAccount'
+                      components={{
+                        anchor: <Anchor component={Link} to='/auth/register' c='blue' fw={500} />,
+                      }}
+                    />
                   </Text>
                 )}
               </>
@@ -268,6 +287,10 @@ export default function Login() {
           </Stack>
         </Paper>
       </Center>
+
+      <Box pos='fixed' top='var(--mantine-spacing-md)' right='var(--mantine-spacing-md)'>
+        <LanguageSelect />
+      </Box>
     </>
   );
 }

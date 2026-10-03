@@ -8,11 +8,13 @@ import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { IconPlus, IconTagOff } from '@tabler/icons-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { mutate } from 'swr';
 import InviteGridView from './views/InviteGridView';
 import InviteTableView from './views/InviteTableView';
 
 export default function DashboardInvites() {
+  const { t } = useTranslation(['invites', 'common']);
   const view = useViewStore((state) => state.invites);
   const [open, setOpen] = useState(false);
 
@@ -46,8 +48,8 @@ export default function DashboardInvites() {
       });
     } else {
       notifications.show({
-        title: 'Invite created',
-        message: `Invite ${data?.code} has been created.`,
+        title: t('notifications.created.title'),
+        message: t('notifications.created.message', { code: data?.code }),
         color: 'green',
         icon: <IconPlus size='1rem' />,
       });
@@ -60,23 +62,23 @@ export default function DashboardInvites() {
 
   return (
     <>
-      <Modal centered opened={open} onClose={() => setOpen(false)} title='Create an invite'>
+      <Modal centered opened={open} onClose={() => setOpen(false)} title={t('create.title')}>
         <form onSubmit={form.onSubmit(onSubmit)}>
           <Stack gap='sm'>
             <Select
-              label='Expires at'
-              description='Select an expiration for this invite, or choose "never" if you want the invite to never expire.'
-              placeholder='Select an expiration...'
+              label={t('create.expiresAt.label')}
+              description={t('create.expiresAt.description')}
+              placeholder={t('create.expiresAt.placeholder')}
               data={[
-                { value: 'never', label: 'Never' },
-                { value: '30min', label: '30 minutes' },
-                { value: '1h', label: '1 hour' },
-                { value: '6h', label: '6 hours' },
-                { value: '12h', label: '12 hours' },
-                { value: '1d', label: '1 day' },
-                { value: '3d', label: '3 days' },
-                { value: '5d', label: '5 days' },
-                { value: '7d', label: '7 days' },
+                { value: 'never', label: t('expirations.never') },
+                { value: '30min', label: t('expirations.minutes30') },
+                { value: '1h', label: t('expirations.hour1') },
+                { value: '6h', label: t('expirations.hours6') },
+                { value: '12h', label: t('expirations.hours12') },
+                { value: '1d', label: t('expirations.day1') },
+                { value: '3d', label: t('expirations.days3') },
+                { value: '5d', label: t('expirations.days5') },
+                { value: '7d', label: t('expirations.days7') },
               ]}
               comboboxProps={{
                 withinPortal: true,
@@ -89,22 +91,22 @@ export default function DashboardInvites() {
               {...form.getInputProps('expiresAt')}
             />
             <NumberInput
-              label='Max uses'
-              description='Set a maximum number of uses for this invite, or leave blank for unlimited uses.'
-              placeholder='Enter a number...'
+              label={t('create.maxUses.label')}
+              description={t('create.maxUses.description')}
+              placeholder={t('create.maxUses.placeholder')}
               min={1}
               {...form.getInputProps('maxUses')}
             />
 
             <Button type='submit' variant='outline' fullWidth leftSection={<IconPlus size='1rem' />}>
-              Create
+              {t('common:actions.create')}
             </Button>
           </Stack>
         </form>
       </Modal>
 
       <Group>
-        <Title>Invites</Title>
+        <Title>{t('title')}</Title>
 
         <Button
           variant='outline'
@@ -112,7 +114,7 @@ export default function DashboardInvites() {
           leftSection={<IconPlus size='1rem' />}
           onClick={() => setOpen(true)}
         >
-          Create
+          {t('common:actions.create')}
         </Button>
 
         <GridTableSwitcher type='invites' />

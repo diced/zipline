@@ -2,6 +2,7 @@ import type { Response } from '@/lib/api/response';
 import { Button, LoadingOverlay, Stack, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { IconDeviceFloppy } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { settingsOnSubmit } from '../settingsOnSubmit';
 import useServerSettings from '../useServerSettings';
@@ -19,6 +20,7 @@ export default function HttpWebhook() {
 
 function Form({ data, isLoading }: { data: Response['/api/server/settings']; isLoading: boolean }) {
   const navigate = useNavigate();
+  const { t } = useTranslation(['serverSettings', 'common']);
 
   const form = useForm({
     initialValues: {
@@ -48,22 +50,22 @@ function Form({ data, isLoading }: { data: Response['/api/server/settings']; isL
     <form onSubmit={form.onSubmit(onSubmit)}>
       <Stack gap='lg'>
         <TextInput
-          label='On Upload'
-          description='The URL to send a POST request to when a file is uploaded.'
+          label={t('httpWebhook.onUpload.label')}
+          description={t('httpWebhook.onUpload.description')}
           placeholder='https://example.com/upload'
           {...form.getInputProps('httpWebhookOnUpload')}
         />
 
         <TextInput
-          label='On Shorten'
-          description='The URL to send a POST request to when a URL is shortened.'
+          label={t('httpWebhook.onShorten.label')}
+          description={t('httpWebhook.onShorten.description')}
           placeholder='https://example.com/shorten'
           {...form.getInputProps('httpWebhookOnShorten')}
         />
       </Stack>
 
       <Button type='submit' mt='md' loading={isLoading} leftSection={<IconDeviceFloppy size='1rem' />}>
-        Save
+        {t('common:actions.save')}
       </Button>
     </form>
   );

@@ -1,0 +1,180 @@
+{
+  "notifications": {
+    "deleted": {
+      "title": "Arquivo excluído",
+      "message": "{{name}} foi excluído"
+    },
+    "favorited": {
+      "title": "Arquivo favoritado",
+      "message": "{{name}} foi adicionado aos favoritos"
+    },
+    "unfavorited": {
+      "title": "Arquivo removido dos favoritos",
+      "message": "{{name}} foi removido dos favoritos"
+    },
+    "createFolderError": {
+      "title": "Erro ao criar a pasta"
+    },
+    "folderCreated": {
+      "title": "Pasta criada",
+      "message": "A pasta {{folder}} foi criada com {{name}}"
+    },
+    "removeFromFolderError": {
+      "title": "Erro ao remover da pasta"
+    },
+    "removedFromFolder": {
+      "title": "Arquivo removido da pasta",
+      "message": "{{name}} foi removido de {{folder}}"
+    },
+    "addToFolderError": {
+      "title": "Erro ao adicionar à pasta"
+    },
+    "addedToFolder": {
+      "title": "Arquivo adicionado à pasta",
+      "message": "{{name}} foi adicionado a {{folder}}"
+    },
+    "addMultipleToFolderError": {
+      "title": "Erro ao adicionar arquivos à pasta"
+    },
+    "addedMultipleToFolder": {
+      "title": "Arquivos adicionados à pasta",
+      "message": "Arquivos adicionados a {{folder}}: {{count}}"
+    },
+    "saveTagsError": {
+      "title": "Falha ao salvar as etiquetas"
+    },
+    "tagsSaved": {
+      "title": "Etiquetas salvas",
+      "message": "Etiquetas salvas no arquivo {{name}}: {{count}}"
+    },
+    "removePasswordError": {
+      "title": "Falha ao remover a senha..."
+    },
+    "passwordRemoved": {
+      "title": "Senha removida!",
+      "message": "A senha foi removida do arquivo."
+    },
+    "saveChangesError": {
+      "title": "Falha ao salvar as alterações..."
+    },
+    "changesSaved": {
+      "title": "Alterações salvas!",
+      "message": "As alterações no arquivo foram salvas."
+    }
+  },
+  "delete": {
+    "confirm": "Excluir {{name}}",
+    "message": "Tem certeza de que deseja excluir {{name}}? Esta ação não pode ser desfeita."
+  },
+  "contextMenu": {
+    "openInNewTab": "Abrir em nova guia",
+    "copyLink": "Copiar link",
+    "copyRawLink": "Copiar link bruto",
+    "favorite": "Favoritar",
+    "unfavorite": "Remover dos favoritos",
+    "removeFromFolder": "Remover da pasta",
+    "moveToFolder": "Mover para pasta",
+    "searchFolders": "Pesquisar pastas...",
+    "createNamedFolder": "+ Criar \"{{name}}\"",
+    "noFolders": "Nenhuma pasta ainda",
+    "createNewFolder": "+ Criar nova pasta",
+    "editDetails": "Editar detalhes"
+  },
+  "createFolderModal": {
+    "title": "Criar pasta",
+    "name": {
+      "label": "Nome da pasta",
+      "placeholder": "Minha pasta"
+    }
+  },
+  "stats": {
+    "type": "Tipo",
+    "size": "Tamanho",
+    "createdAt": "Criado em",
+    "updatedAt": "Atualizado em",
+    "deletesAt": "Exclusão em",
+    "views": "Visualizações",
+    "originalName": "Nome original",
+    "anonymous": "Anônimo"
+  },
+  "details": {
+    "title": "Detalhes",
+    "tags": {
+      "title": "Etiquetas",
+      "placeholder": "Escolha uma ou mais etiquetas",
+      "empty": "Nenhuma etiqueta encontrada. Crie uma fora deste menu."
+    },
+    "folder": {
+      "title": "Pasta",
+      "remove": "Remover da pasta \"{{name}}\"",
+      "placeholder": "Adicionar à pasta...",
+      "empty": "Você não tem pastas. Comece a digitar para criar uma nova pasta para este arquivo.",
+      "create": "+ Criar pasta \"{{name}}\""
+    }
+  },
+  "actions": {
+    "editDetails": "Editar detalhes do arquivo",
+    "delete": "Excluir arquivo",
+    "favorite": "Favoritar arquivo",
+    "unfavorite": "Remover arquivo dos favoritos",
+    "viewInNewTab": "Ver arquivo em nova guia",
+    "openInNewTab": "Abrir em nova guia",
+    "copyRawLink": "Copiar link do arquivo bruto",
+    "copyLink": "Copiar link do arquivo",
+    "download": "Baixar arquivo",
+    "showDetails": "Mostrar detalhes",
+    "hideDetails": "Ocultar detalhes",
+    "previous": "Arquivo anterior",
+    "next": "Próximo arquivo"
+  },
+  "edit": {
+    "title": "Editando \"{{name}}\"",
+    "name": {
+      "label": "Nome",
+      "description": "Renomeia o arquivo."
+    },
+    "maxViews": {
+      "label": "Visualizações máx.",
+      "placeholder": "Ilimitado",
+      "description": "Número máximo de visualizações que este arquivo pode ter antes de ser excluído. Deixe em branco para permitir visualizações ilimitadas."
+    },
+    "originalName": {
+      "label": "Nome original",
+      "description": "Adiciona um nome original. Ao baixar este arquivo, em vez do nome gerado (se houver), ele será baixado com este \"nome original\"."
+    },
+    "type": {
+      "label": "Tipo",
+      "description": "Altera o tipo MIME do arquivo. <b>NÃO ALTERE ESTE VALOR</b> a menos que saiba o que está fazendo, pois isso pode afetar a forma como o Zipline exibe determinados tipos de arquivo."
+    },
+    "password": {
+      "label": "Senha",
+      "description": "Define uma senha para este arquivo. Deixe em branco para desativar a proteção por senha."
+    },
+    "removePassword": "Remover senha",
+    "save": "Salvar alterações"
+  },
+  "preview": {
+    "clickToView": "Clique para ver o arquivo {{name}}",
+    "clickToViewProtected": "Clique para ver o arquivo protegido {{name}}",
+    "clickToPlayVideo": "Clique para reproduzir o vídeo {{name}}",
+    "clickToPlayAudio": "Clique para reproduzir o áudio {{name}}",
+    "clickToViewText": "Clique para ver o texto {{name}}",
+    "clickToDownloadCast": "Clique para baixar a gravação do asciinema {{name}}",
+    "clickToViewPdf": "Clique para ver o PDF {{name}}",
+    "clickToViewInNewTab": "Clique para ver o arquivo {{name}} em nova guia",
+    "videoThumbnailAlt": "Miniatura do vídeo",
+    "imageAlt": "Imagem",
+    "loading": "Carregando arquivo...",
+    "loadError": "Erro ao carregar o arquivo.",
+    "tooBig": "\n...\nO arquivo é grande demais para ser exibido. Clique no ícone de download para visualizá-lo ou baixá-lo."
+  },
+  "render": {
+    "renderedThrough": "Este arquivo é renderizado com {{renderer}}",
+    "canRenderThrough": "Este arquivo pode ser renderizado com {{renderer}}",
+    "showRendered": "Mostrar versão renderizada",
+    "hideRendered": "Ocultar versão renderizada",
+    "katexError": "Erro do KaTeX",
+    "showLess": "Mostrar menos",
+    "showMore": "Mostrar mais (linhas ocultas: {{count}})"
+  }
+}

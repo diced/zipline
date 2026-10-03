@@ -2,9 +2,11 @@ import { MetricsPoint } from '@/lib/metrics';
 import { ChartTooltip, LineChart } from '@mantine/charts';
 import { Paper, Title } from '@mantine/core';
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { defaultChartProps, formatChartDate, sortByCreatedAt } from '../statsHelpers';
 
 export default function FilesUrlsCountGraph({ points }: { points: MetricsPoint[] }) {
+  const { t } = useTranslation('metrics');
   const data = useMemo(
     () =>
       sortByCreatedAt(points).map((point) => ({
@@ -17,19 +19,19 @@ export default function FilesUrlsCountGraph({ points }: { points: MetricsPoint[]
 
   return (
     <Paper radius='md' withBorder p='sm'>
-      <Title order={3}>Count</Title>
+      <Title order={3}>{t('graphs.count.title')}</Title>
 
       <LineChart
         data={data}
         series={[
           {
             name: 'files',
-            label: 'Files',
+            label: t('graphs.series.files'),
             color: 'blue',
           },
           {
             name: 'urls',
-            label: 'URLs',
+            label: t('graphs.series.urls'),
             color: 'green',
           },
         ]}
@@ -42,8 +44,8 @@ export default function FilesUrlsCountGraph({ points }: { points: MetricsPoint[]
               label={formatChartDate(label)}
               payload={payload}
               series={[
-                { name: 'files', label: 'Files' },
-                { name: 'urls', label: 'URLs' },
+                { name: 'files', label: t('graphs.series.files') },
+                { name: 'urls', label: t('graphs.series.urls') },
               ]}
             />
           ),

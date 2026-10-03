@@ -1,0 +1,185 @@
+{
+  "page": {
+    "title": "Files",
+    "uploadTooltip": "Upload a file",
+    "moreActions": "More actions",
+    "menu": {
+      "manageTags": "Manage Tags",
+      "viewPending": "View Pending Files",
+      "tableOptions": "Table Options",
+      "searchById": "Search by ID"
+    }
+  },
+  "fields": {
+    "name": "Name",
+    "originalName": "Original Name",
+    "tags": "Tags",
+    "type": "Type",
+    "size": "Size",
+    "createdAt": "Created At",
+    "favorite": "Favorite",
+    "views": "Views",
+    "anonymous": "Anonymous?"
+  },
+  "tableOptions": {
+    "title": "Table Options",
+    "description": "Select and drag fields below to make them appear/disappear/reorder in the file table view.",
+    "reset": "Reset to Default"
+  },
+  "pending": {
+    "title": "Pending Files",
+    "count_one": "{{count}} file",
+    "count_other": "{{count}} files",
+    "clearCompleted": "Clear completed",
+    "chunks": "{{complete}}/{{total}} chunks",
+    "clearEntry": "Clear entry",
+    "clearEntryLabel": "Clear {{name}}",
+    "empty": "No pending files",
+    "status": {
+      "pending": "Pending",
+      "processing": "Processing",
+      "complete": "Complete",
+      "failed": "Failed"
+    },
+    "notifications": {
+      "clearedOne": "Cleared Pending File!",
+      "clearedCompleted": "Cleared completed files!",
+      "clearOneFailed": "Failed to clear pending file: {{error}}",
+      "clearCompletedFailed": "Failed to clear completed files: {{error}}",
+      "unknownError": "Unknown error"
+    }
+  },
+  "bulk": {
+    "delete": {
+      "title_one": "Delete {{count}} file?",
+      "title_other": "Delete {{count}} files?",
+      "message_one": "You are about to delete {{count}} file. This action cannot be undone.",
+      "message_other": "You are about to delete {{count}} files. This action cannot be undone.",
+      "loadingTitle": "Deleting files",
+      "loadingMessage_one": "Deleting {{count}} file",
+      "loadingMessage_other": "Deleting {{count}} files",
+      "errorTitle": "Error while deleting files",
+      "successTitle": "Deleted files",
+      "successMessage_one": "Deleted {{count}} file",
+      "successMessage_other": "Deleted {{count}} files"
+    },
+    "favorite": {
+      "title_one": "Favorite {{count}} file?",
+      "title_other": "Favorite {{count}} files?",
+      "message_one": "You are about to favorite {{count}} file.",
+      "message_other": "You are about to favorite {{count}} files.",
+      "confirm": "Favorite",
+      "loadingTitle": "Favoriting files",
+      "loadingMessage_one": "Favoriting {{count}} file",
+      "loadingMessage_other": "Favoriting {{count}} files",
+      "successTitle": "Favorited files",
+      "successMessage_one": "Favorited {{count}} file",
+      "successMessage_other": "Favorited {{count}} files"
+    },
+    "unfavorite": {
+      "title_one": "Unfavorite {{count}} file?",
+      "title_other": "Unfavorite {{count}} files?",
+      "message_one": "You are about to unfavorite {{count}} file.",
+      "message_other": "You are about to unfavorite {{count}} files.",
+      "confirm": "Unfavorite",
+      "loadingTitle": "Unfavoriting files",
+      "loadingMessage_one": "Unfavoriting {{count}} file",
+      "loadingMessage_other": "Unfavoriting {{count}} files",
+      "successTitle": "Unfavorited files",
+      "successMessage_one": "Unfavorited {{count}} file",
+      "successMessage_other": "Unfavorited {{count}} files"
+    },
+    "modifyErrorTitle": "Error while modifying files",
+    "copyLinks": {
+      "title": "Copied links to clipboard",
+      "message_one": "Copied {{count}} link to clipboard",
+      "message_other": "Copied {{count}} links to clipboard"
+    }
+  },
+  "tags": {
+    "title": "Tags",
+    "fileCount_one": "{{count}} file",
+    "fileCount_other": "{{count}} files",
+    "edit": "Edit tag",
+    "delete": "Delete tag",
+    "empty": "No tags. Create one by clicking the plus icon.",
+    "form": {
+      "name": {
+        "label": "Name",
+        "placeholder": "Enter a name...",
+        "required": "Name is required"
+      },
+      "color": {
+        "label": "Color",
+        "fromName": "Choose a color based on the name",
+        "invalid": "Color must start with #"
+      }
+    },
+    "create": {
+      "title": "Create new tag",
+      "submit": "Create tag"
+    },
+    "editModal": {
+      "title": "Edit tag",
+      "submit": "Edit tag"
+    },
+    "notifications": {
+      "createFailed": "Failed to create tag",
+      "created": "Created tag",
+      "createdMessage": "Created tag {{name}}",
+      "editFailed": "Failed to edit tag",
+      "edited": "Edited tag",
+      "editedMessage": "Edited tag {{name}}",
+      "deleteFailed": "Failed to delete tag: {{error}}",
+      "deleted": "Deleted tag",
+      "deletedMessage": "Deleted tag {{name}}"
+    }
+  },
+  "views": {
+    "favoriteFiles": "Favorite Files",
+    "noFiles": "No files found",
+    "uploadFile": "Upload a file",
+    "pagination": "{{from}} - {{to}} / {{total}} files"
+  },
+  "table": {
+    "columns": {
+      "name": "Name",
+      "originalName": "Original name",
+      "tags": "Tags",
+      "type": "Type",
+      "size": "Size",
+      "createdAt": "Created at",
+      "favorite": "Favorite?",
+      "views": "Views",
+      "id": "Id",
+      "anonymous": "Anonymous?",
+      "actions": "Actions"
+    },
+    "search": {
+      "name": "Search by name",
+      "originalName": "Search by original name",
+      "type": "Search by type"
+    },
+    "searchById": "Search by ID",
+    "tagsPlaceholder": "Pick one or more tags",
+    "selection": {
+      "summary_one": "Selections are saved across page changes. Currently selected <b>{{count}}</b> file.",
+      "summary_other": "Selections are saved across page changes. Currently selected <b>{{count}}</b> files.",
+      "delete": "Delete files",
+      "favorite": "Favorite files",
+      "unfavorite": "Unfavorite files",
+      "copyLinks": "Copy file links",
+      "addToFolder": "Add to folder...",
+      "clear": "Clear selection"
+    },
+    "noRecords": "No files",
+    "recordsPerPage": "Records per page",
+    "actions": {
+      "details": "More details",
+      "view": "View file in new tab",
+      "copy": "Copy file link to clipboard",
+      "download": "Download file",
+      "delete": "Delete file"
+    }
+  }
+}
