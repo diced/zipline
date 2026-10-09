@@ -5,6 +5,7 @@ import 'dayjs/locale/fr';
 import 'dayjs/locale/ja';
 import 'dayjs/locale/pt-br';
 import 'dayjs/locale/ru';
+import 'dayjs/locale/tr';
 import 'dayjs/locale/zh-cn';
 import { useSettingsStore } from '@/lib/client/store/settings';
 import i18n from 'i18next';

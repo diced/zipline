@@ -1,0 +1,110 @@
+{
+  "nav": {
+    "home": "Ana sayfa",
+    "metrics": "Metrikler",
+    "files": "Dosyalar",
+    "folders": "Klasörler",
+    "upload": "Yükle",
+    "uploadFile": "Dosya",
+    "uploadText": "Metin",
+    "urls": "URL'ler",
+    "administrator": "Yönetici",
+    "adminDashboard": "Gösterge paneli",
+    "serverSettings": "Ayarlar",
+    "serverActions": "İşlemler",
+    "users": "Kullanıcılar",
+    "invites": "Davetler"
+  },
+  "header": {
+    "logoAlt": "Zipline logosu",
+    "avatarAlt": "Kullanıcı avatarı"
+  },
+  "userMenu": {
+    "administratorLabel": "{{username}} (Yönetici)",
+    "copyToken": "Token'ı kopyala",
+    "refreshToken": "Token'ı yenile",
+    "settings": "Ayarlar",
+    "serverSettings": "Sunucu ayarları",
+    "logout": "Çıkış yap",
+    "loggingOut": "Çıkış yapılıyor..."
+  },
+  "token": {
+    "cancel": "Hayır, pencereyi kapat",
+    "copy": {
+      "title": "Token kopyalansın mı?",
+      "message": "Token'ınızı kopyalamak istediğinizden emin misiniz? Token'ınız Zipline'ın tüm bölümleriyle etkileşime girebilir. Bu token'ı kimseyle paylaşmayın."
+    },
+    "copied": {
+      "title": "Kopyalandı",
+      "message": "Token'ınız panoya kopyalandı."
+    },
+    "refresh": {
+      "title": "Token yenilensin mi?",
+      "message": "Token'ınızı yenilemek istediğinizden emin misiniz? Token'ı yeniledikten veya sıfırladıktan sonra token'ınızı kullanan betikleri ve uygulamaları güncellemeniz gerekir."
+    },
+    "refreshed": {
+      "title": "Yenilendi",
+      "message": "Token'ınız yenilendi."
+    }
+  },
+  "version": {
+    "modalTitle": "Zipline sürümü",
+    "tooltip": "Daha fazla sürüm bilgisi için tıklayın",
+    "latest": "Zipline'ın en güncel sürümünü kullanıyorsunuz.",
+    "unstable": "Zipline'ın <b>kararsız</b> bir sürümünü kullanıyorsunuz. Üst sürümler tamamen test edilmemiş olabilir ve hatalar içerebilir.",
+    "outdated": "Zipline'ın <b>eski</b> bir sürümünü kullanıyorsunuz. <anchor>En son sürüme</anchor> güncellemeniz önerilir.",
+    "current": "Mevcut sürüm",
+    "fields": {
+      "version": "Sürüm",
+      "commit": "Commit",
+      "upstream": "Upstream?",
+      "availableToUpdate": "Güncellenebilir"
+    },
+    "latestCommit": "Kullanılabilir son commit",
+    "available": "{{tag}} kullanılabilir",
+    "changelogs": "Değişiklik günlüğü",
+    "update": "Güncelle"
+  },
+  "qrCode": {
+    "title": "QR kodu",
+    "alt": "QR kodu",
+    "failed": "QR kodu oluşturulamadı.",
+    "format": "Biçim",
+    "copyImage": "Görseli kopyala",
+    "copied": "QR kodu görseli panoya kopyalandı",
+    "copyFailed": "QR kodu görseli kopyalanamadı"
+  },
+  "copyLink": { "title": "Bağlantı kopyalandı" },
+  "errors": {
+    "generic": {
+      "title": "Bir hata oluştu",
+      "message": "Bir şeyler ters gitti. Lütfen daha sonra tekrar deneyin veya sorun devam ederse bildirin."
+    },
+    "reload": {
+      "title": "Güncelleme mevcut",
+      "message": "Uygulamanın yeni bir sürümü mevcut. Güncellemek için sayfayı yeniden yükleyin.",
+      "button": "Sayfayı yeniden yükle",
+      "why": "Bunu neden görüyorum?"
+    }
+  },
+  "notFound": {
+    "message": "Sayfa bulunamadı",
+    "goHome": "Ana sayfaya dön"
+  },
+  "titles": {
+    "settings": "Ayarlar",
+    "folders": "Klasörler",
+    "files": "Dosyalar",
+    "metrics": "Metrikler",
+    "urls": "URL'ler",
+    "serverSettings": "Sunucu ayarları",
+    "administrator": "Yönetici",
+    "serverActions": "Sunucu işlemleri",
+    "invites": "Davetler",
+    "uploadFile": "Dosya yükle",
+    "uploadText": "Metin yükle",
+    "users": "Kullanıcılar",
+    "userFiles": "{{username}} kullanıcısının dosyaları",
+    "unknownUserFiles": "Kullanıcının dosyaları"
+  }
+}

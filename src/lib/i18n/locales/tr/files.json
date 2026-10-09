@@ -1,0 +1,22 @@
+{
+  "page": {
+    "title": "Dosyalar",
+    "uploadTooltip": "Dosya yükle",
+    "moreActions": "Diğer işlemler",
+    "menu": {
+      "manageTags": "Etiketleri yönet",
+      "viewPending": "Bekleyen dosyaları görüntüle",
+      "tableOptions": "Tablo seçenekleri",
+      "searchById": "ID ile ara"
+    }
+  },
+  "fields": {
+    "name": "Ad",
+    "originalName": "Özgün ad",
+    "tags": "Etiketler",
+    "type": "Tür",
+    "size": "Boyut",
+    "createdAt": "Oluşturulma tarihi",
+    "favorite": "Favori"
+  }
+}

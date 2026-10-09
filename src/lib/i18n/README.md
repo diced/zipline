@@ -4,7 +4,7 @@ The dashboard and public pages are translated with [i18next](https://www.i18next
 
 ## Languages
 
-`en` (source), `zh` (Simplified Chinese), `ja`, `fr`, `de`, `es`, `pt` (Brazilian conventions), `ru`. The list lives in `languages.ts`.
+`en` (source), `zh` (Simplified Chinese), `ja`, `fr`, `de`, `es`, `pt` (Brazilian conventions), `ru`, `tr` (Turkish). The list lives in `languages.ts`.
 
 The language is picked in this order:
 

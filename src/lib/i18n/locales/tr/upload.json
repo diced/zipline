@@ -1,0 +1,21 @@
+{
+  "actions": {
+    "goToFiles": "Dosyalara git",
+    "clearAll": "Tümünü temizle",
+    "upload_one": "{{count}} dosya yükle ({{size}})",
+    "upload_other": "{{count}} dosya yükle ({{size}})"
+  },
+  "file": {
+    "title": "Dosya yükle",
+    "dropzone": {
+      "title": "Görselleri buraya sürükleyin veya dosya seçmek için tıklayın",
+      "paste": "Ya da panodan görsel yapıştırmak için <kbd>{{mod}}</kbd> + <kbd>V</kbd> tuşlarına basın",
+      "description": "İstediğiniz kadar dosya ekleyebilirsiniz; yüklemeden önce aşağıda gözden geçirmeniz için gösterilir.",
+      "limit": "Dosya başına <b>{{size}}</b> sınırı"
+    },
+    "progress": {
+      "speed": "{{speed}}/sn, {{remaining}} kaldı",
+      "finalizing": "Yüklemeler tamamlanıyor..."
+    }
+  }
+}

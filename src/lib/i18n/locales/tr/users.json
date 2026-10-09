@@ -1,0 +1,22 @@
+{
+  "title": "Kullanıcılar",
+  "form": {
+    "username": {
+      "label": "Kullanıcı adı",
+      "placeholder": "Bir kullanıcı adı girin...",
+      "required": "Kullanıcı adı gerekli"
+    },
+    "password": {
+      "label": "Parola",
+      "placeholder": "Bir parola girin...",
+      "required": "Parola gerekli"
+    },
+    "avatar": {
+      "label": "Avatar",
+      "placeholder": "Bir avatar seçin...",
+      "clear": "Avatarı temizle",
+      "invalidType": "Geçersiz dosya türü",
+      "readFailed": "Avatar okunamadı"
+    }
+  }
+}

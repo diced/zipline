@@ -1,0 +1,20 @@
+{
+  "notifications": {
+    "deleted": {
+      "title": "Dosya silindi",
+      "message": "{{name}} silindi"
+    },
+    "favorited": {
+      "title": "Dosya favorilere eklendi",
+      "message": "{{name}} favorilere eklendi"
+    },
+    "unfavorited": {
+      "title": "Dosya favorilerden çıkarıldı",
+      "message": "{{name}} favorilerden çıkarıldı"
+    },
+    "folderCreated": {
+      "title": "Klasör oluşturuldu",
+      "message": "{{name}} ile {{folder}} oluşturuldu"
+    }
+  }
+}

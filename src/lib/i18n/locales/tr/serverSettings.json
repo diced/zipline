@@ -1,0 +1,24 @@
+{
+  "sections": {
+    "core": {
+      "name": "Temel",
+      "description": "Genel sunucu ayarları"
+    },
+    "chunks": {
+      "name": "Parçalar",
+      "description": "Parçalı yükleme"
+    },
+    "discord": {
+      "name": "Discord",
+      "description": "Discord webhook entegrasyonu"
+    },
+    "domains": {
+      "name": "Alan adları",
+      "description": "Özel alan adları ekleyin"
+    },
+    "features": {
+      "name": "Özellikler",
+      "description": "İsteğe bağlı özellikleri etkinleştirin veya devre dışı bırakın"
+    }
+  }
+}

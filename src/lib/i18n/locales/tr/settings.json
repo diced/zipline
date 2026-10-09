@@ -1,0 +1,24 @@
+{
+  "title": "Ayarlar",
+  "loading": "Yükleniyor…",
+  "user": {
+    "title": "Kullanıcı",
+    "tokenCopyTooltip": "Kopyalamak için tıklayın",
+    "tokenLabel": "Token",
+    "tokenHidden": "[göstermek için tıklayın]",
+    "form": {
+      "username": {
+        "label": "Kullanıcı adı",
+        "required": "Kullanıcı adı gerekli"
+      },
+      "password": {
+        "label": "Parola",
+        "description": "Aynı parolayı korumak için boş bırakın"
+      },
+      "currentPassword": {
+        "label": "Mevcut parola",
+        "description": "Parolanızı değiştirmek için gereklidir."
+      }
+    }
+  }
+}

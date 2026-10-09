@@ -1,0 +1,22 @@
+{
+  "title": "URL'ler",
+  "create": {
+    "title": "URL'yi kısalt",
+    "url": {
+      "label": "URL",
+      "required": "URL gerekli",
+      "invalid": "Geçersiz URL"
+    },
+    "vanity": {
+      "label": "Özel ad",
+      "description": "İsteğe bağlıdır; rastgele kod oluşturmak için boş bırakın"
+    },
+    "maxViews": {
+      "label": "Maksimum görüntüleme",
+      "description": "İsteğe bağlıdır; görüntüleme sınırı olmaması için boş bırakın."
+    },
+    "domain": {
+      "label": "Alan adını geçersiz kıl"
+    }
+  }
+}

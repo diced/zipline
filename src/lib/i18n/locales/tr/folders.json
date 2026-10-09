@@ -1,0 +1,23 @@
+{
+  "page": {
+    "title": "Klasörler",
+    "titleWithFolder": "Klasörler {{separator}} {{name}}",
+    "createFolder": "Klasör oluştur",
+    "createSubfolder": "Alt klasör oluştur",
+    "folderFiles": "{{name}} kullanıcısının dosyaları",
+    "folderFilesWithCount": "{{name}} kullanıcısının dosyaları ({{files}})"
+  },
+  "create": {
+    "title": "Klasör oluştur",
+    "titleSubfolder": "Alt klasör oluştur",
+    "name": {
+      "label": "Ad",
+      "placeholder": "Bir ad girin...",
+      "required": "Ad gerekli"
+    },
+    "public": {
+      "label": "Genel",
+      "description": "Genel klasörler herkes tarafından görülebilir"
+    }
+  }
+}

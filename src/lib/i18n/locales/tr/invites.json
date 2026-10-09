@@ -1,0 +1,22 @@
+{
+  "title": "Davetler",
+  "create": {
+    "title": "Davet oluştur",
+    "expiresAt": {
+      "label": "Son kullanma tarihi",
+      "description": "Bu davetin ne zaman sona ereceğini seçin veya hiç sona ermemesi için \"asla\" seçeneğini belirleyin.",
+      "placeholder": "Son kullanma tarihi seçin..."
+    },
+    "maxUses": {
+      "label": "Maksimum kullanım",
+      "description": "Maksimum kullanım sayısını belirleyin veya sınırsız kullanım için boş bırakın.",
+      "placeholder": "Bir sayı girin..."
+    }
+  },
+  "expirations": {
+    "never": "Asla",
+    "minutes30": "30 dakika",
+    "hour1": "1 saat",
+    "hours6": "6 saat"
+  }
+}
