@@ -1,4 +1,3 @@
-import LanguageSelect from '@/components/LanguageSelect';
 import DashboardFileType from '@/components/file/DashboardFileType';
 import TagPill from '@/components/pages/files/tags/TagPill';
 import { useSsrData } from '@/components/ZiplineSSRProvider';
@@ -113,8 +112,6 @@ export default function ViewFileId() {
             >
               <IconDownload size='1rem' />
             </ActionIcon>
-
-            <LanguageSelect />
           </Group>
         </Group>
       </Paper>
@@ -219,8 +216,6 @@ export default function ViewFileId() {
                   </ActionIcon>
                 </Tooltip>
               </ActionIcon.Group>
-
-              <LanguageSelect />
             </Group>
           </Group>
 
