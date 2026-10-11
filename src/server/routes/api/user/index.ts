@@ -1,7 +1,14 @@
 import { ApiError } from '@/lib/api/errors';
 import { hashPassword, verifyPassword } from '@/lib/crypto';
 import { db } from '@/lib/db';
-import { getUser, updateUser, userSchema, type User, type UserUpdate } from '@/lib/db/models/user';
+import {
+  getUser,
+  updateUser,
+  userSchema,
+  userQuickLinksSchema,
+  type User,
+  type UserUpdate,
+} from '@/lib/db/models/user';
 import { users, userSessions } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
@@ -45,12 +52,14 @@ export default typedPlugin(
       PATH,
       {
         schema: {
-          description: "Update the current user's profile, credentials, avatar, and view settings.",
+          description:
+            "Update the current user's profile, credentials, avatar, view settings, and dashboard quick links.",
           body: z.object({
             username: zStringTrimmed.optional(),
             password: zStringTrimmed.optional(),
             currentPassword: z.string().optional(),
             avatar: z.string().nullish(),
+            quickLinks: userQuickLinksSchema.optional(),
             view: z
               .object({
                 content: z.string().nullish(),
@@ -122,6 +131,7 @@ export default typedPlugin(
           ...(req.body.username && { username: req.body.username }),
           ...(req.body.password && { password: await hashPassword(req.body.password) }),
           ...(req.body.avatar !== undefined && { avatar: req.body.avatar || null }),
+          ...(req.body.quickLinks !== undefined && { quickLinks: req.body.quickLinks }),
           ...(req.body.view && {
             view: {
               ...req.user.view,

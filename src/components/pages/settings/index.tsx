@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 const SettingsAvatar = lazy(() => import('./parts/SettingsAvatar'));
 const SettingsDashboard = lazy(() => import('./parts/SettingsDashboard'));
+const SettingsQuickLinks = lazy(() => import('./parts/SettingsQuickLinks'));
 const SettingsFileView = lazy(() => import('./parts/SettingsFileView'));
 const SettingsGenerators = lazy(() => import('./parts/SettingsGenerators'));
 const SettingsMfa = lazy(() => import('./parts/SettingsMfa'));
@@ -35,6 +36,8 @@ export default function DashboardSettings() {
         </Stack>
 
         <SettingsFileView />
+
+        <SettingsQuickLinks />
 
         {eitherTrue(
           config.oauthEnabled.discord,

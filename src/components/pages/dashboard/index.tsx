@@ -4,6 +4,8 @@ import type { Response } from '@/lib/api/response';
 import { bytes } from '@/lib/bytes';
 import useLogin from '@/lib/client/hooks/useLogin';
 import { useSettingsStore } from '@/lib/client/store/settings';
+import { getAvailableQuickLinks } from '@/lib/quickLinks';
+import { QUICK_LINKS_ICONS } from '@/lib/client/quickLinks';
 import { isAdministrator } from '@/lib/role';
 import { Button, Group, Paper, ScrollArea, SimpleGrid, Skeleton, Table, Text, Title } from '@mantine/core';
 import {
@@ -12,6 +14,7 @@ import {
   IconFiles,
   IconGraphFilled,
   IconLink,
+  IconQuestionMark,
   IconStarFilled,
 } from '@tabler/icons-react';
 import { lazy, Suspense } from 'react';
@@ -24,12 +27,17 @@ const ActivityChart = lazy(() => import('./parts/ActivityChart'));
 const Recents = lazy(() => import('./parts/Recents'));
 
 export default function DashboardHome() {
-  const { t } = useTranslation('dashboard');
+  const { t } = useTranslation(['dashboard', 'layout']);
   const { user } = useLogin();
   const { homeShowActivity, homeShowRecents, homeShowTypes } = useSettingsStore((state) => state.settings);
   const { data: stats, isLoading: statsLoading } = useSWR<Response['/api/user/stats']>('/api/user/stats');
 
   const config = useConfig();
+  const availableQuickLinks = getAvailableQuickLinks(config, user?.role);
+  const quickLinks = (user?.quickLinks ?? []).flatMap((id) => {
+    const link = availableQuickLinks.find((item) => item.id === id);
+    return link ? [link] : [];
+  });
 
   return (
     <>
@@ -52,6 +60,23 @@ export default function DashboardHome() {
           />
         </Text>
       </Skeleton>
+
+      {quickLinks.length > 0 && (
+        <Group gap='xs' mt='sm' grow>
+          {quickLinks.map((link) => (
+            <Button
+              key={link.id}
+              component={Link}
+              to={link.path}
+              variant='filled'
+              size='lg'
+              leftSection={QUICK_LINKS_ICONS[link.id] || <IconQuestionMark size='1rem' />}
+            >
+              {t(`layout:titles.${link.id}`)}
+            </Button>
+          ))}
+        </Group>
+      )}
 
       {homeShowRecents && (
         <Suspense

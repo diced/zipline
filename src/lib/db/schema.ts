@@ -1,5 +1,6 @@
 import { createId } from '@paralleldrive/cuid2';
 import type { Json } from 'drizzle-orm';
+import type { QuickLinkId } from '@/lib/quickLinks';
 import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 import {
   bigint,
@@ -205,6 +206,7 @@ export const users = pgTable(
     token: text().notNull(),
     role: role().default('USER').notNull(),
     view: jsonb().$type<Record<string, Json | undefined>>().default({}).notNull(),
+    quickLinks: jsonb().$type<QuickLinkId[]>().default([]).notNull(),
     totpSecret: text(),
   },
   (table) => [
