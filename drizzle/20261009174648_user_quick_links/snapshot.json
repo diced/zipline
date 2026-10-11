@@ -2,47 +2,28 @@
   "version": "8",
   "dialect": "postgres",
   "id": "bd0b82e0-04dc-4dbd-8242-f52d875e3d90",
-  "prevIds": [
-    "1ad87eb7-76d1-4e41-9700-db83fb5d4124"
-  ],
+  "prevIds": ["1ad87eb7-76d1-4e41-9700-db83fb5d4124"],
   "ddl": [
     {
-      "values": [
-        "PENDING",
-        "PROCESSING",
-        "COMPLETE",
-        "FAILED"
-      ],
+      "values": ["PENDING", "PROCESSING", "COMPLETE", "FAILED"],
       "name": "IncompleteFileStatus",
       "entityType": "enums",
       "schema": "public"
     },
     {
-      "values": [
-        "DISCORD",
-        "GOOGLE",
-        "GITHUB",
-        "OIDC"
-      ],
+      "values": ["DISCORD", "GOOGLE", "GITHUB", "OIDC"],
       "name": "OAuthProviderType",
       "entityType": "enums",
       "schema": "public"
     },
     {
-      "values": [
-        "USER",
-        "ADMIN",
-        "SUPERADMIN"
-      ],
+      "values": ["USER", "ADMIN", "SUPERADMIN"],
       "name": "Role",
       "entityType": "enums",
       "schema": "public"
     },
     {
-      "values": [
-        "BY_BYTES",
-        "BY_FILES"
-      ],
+      "values": ["BY_BYTES", "BY_FILES"],
       "name": "UserFilesQuota",
       "entityType": "enums",
       "schema": "public"
@@ -3713,14 +3694,10 @@
     },
     {
       "nameExplicit": true,
-      "columns": [
-        "userId"
-      ],
+      "columns": ["userId"],
       "schemaTo": "public",
       "tableTo": "User",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "name": "export_user_id_fkey",
@@ -3730,14 +3707,10 @@
     },
     {
       "nameExplicit": true,
-      "columns": [
-        "userId"
-      ],
+      "columns": ["userId"],
       "schemaTo": "public",
       "tableTo": "User",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "SET NULL",
       "name": "file_user_id_fkey",
@@ -3747,14 +3720,10 @@
     },
     {
       "nameExplicit": true,
-      "columns": [
-        "folderId"
-      ],
+      "columns": ["folderId"],
       "schemaTo": "public",
       "tableTo": "Folder",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "SET NULL",
       "name": "file_folder_id_fkey",
@@ -3764,14 +3733,10 @@
     },
     {
       "nameExplicit": true,
-      "columns": [
-        "A"
-      ],
+      "columns": ["A"],
       "schemaTo": "public",
       "tableTo": "File",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "name": "file_to_tag_file_id_fkey",
@@ -3781,14 +3746,10 @@
     },
     {
       "nameExplicit": true,
-      "columns": [
-        "B"
-      ],
+      "columns": ["B"],
       "schemaTo": "public",
       "tableTo": "Tag",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "name": "file_to_tag_tag_id_fkey",
@@ -3798,14 +3759,10 @@
     },
     {
       "nameExplicit": true,
-      "columns": [
-        "parentId"
-      ],
+      "columns": ["parentId"],
       "schemaTo": "public",
       "tableTo": "Folder",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "SET NULL",
       "name": "folder_parent_id_fkey",
@@ -3815,14 +3772,10 @@
     },
     {
       "nameExplicit": true,
-      "columns": [
-        "userId"
-      ],
+      "columns": ["userId"],
       "schemaTo": "public",
       "tableTo": "User",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "name": "folder_user_id_fkey",
@@ -3832,14 +3785,10 @@
     },
     {
       "nameExplicit": true,
-      "columns": [
-        "userId"
-      ],
+      "columns": ["userId"],
       "schemaTo": "public",
       "tableTo": "User",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "name": "incomplete_file_user_id_fkey",
@@ -3849,14 +3798,10 @@
     },
     {
       "nameExplicit": true,
-      "columns": [
-        "inviterId"
-      ],
+      "columns": ["inviterId"],
       "schemaTo": "public",
       "tableTo": "User",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "name": "invite_inviter_id_fkey",
@@ -3866,14 +3811,10 @@
     },
     {
       "nameExplicit": true,
-      "columns": [
-        "userId"
-      ],
+      "columns": ["userId"],
       "schemaTo": "public",
       "tableTo": "User",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "RESTRICT",
       "name": "oauth_provider_user_id_fkey",
@@ -3883,14 +3824,10 @@
     },
     {
       "nameExplicit": true,
-      "columns": [
-        "userId"
-      ],
+      "columns": ["userId"],
       "schemaTo": "public",
       "tableTo": "User",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "SET NULL",
       "name": "tag_user_id_fkey",
@@ -3900,14 +3837,10 @@
     },
     {
       "nameExplicit": true,
-      "columns": [
-        "fileId"
-      ],
+      "columns": ["fileId"],
       "schemaTo": "public",
       "tableTo": "File",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "name": "thumbnail_file_id_fkey",
@@ -3917,14 +3850,10 @@
     },
     {
       "nameExplicit": true,
-      "columns": [
-        "userId"
-      ],
+      "columns": ["userId"],
       "schemaTo": "public",
       "tableTo": "User",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "SET NULL",
       "name": "url_user_id_fkey",
@@ -3934,14 +3863,10 @@
     },
     {
       "nameExplicit": true,
-      "columns": [
-        "userId"
-      ],
+      "columns": ["userId"],
       "schemaTo": "public",
       "tableTo": "User",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "name": "user_passkey_user_id_fkey",
@@ -3951,14 +3876,10 @@
     },
     {
       "nameExplicit": true,
-      "columns": [
-        "userId"
-      ],
+      "columns": ["userId"],
       "schemaTo": "public",
       "tableTo": "User",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "name": "user_quota_user_id_fkey",
@@ -3968,14 +3889,10 @@
     },
     {
       "nameExplicit": true,
-      "columns": [
-        "userId"
-      ],
+      "columns": ["userId"],
       "schemaTo": "public",
       "tableTo": "User",
-      "columnsTo": [
-        "id"
-      ],
+      "columnsTo": ["id"],
       "onUpdate": "CASCADE",
       "onDelete": "CASCADE",
       "name": "user_session_user_id_fkey",
@@ -3984,9 +3901,7 @@
       "table": "UserSession"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": true,
       "name": "export_pkey",
       "entityType": "pks",
@@ -3994,9 +3909,7 @@
       "table": "Export"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": true,
       "name": "file_pkey",
       "entityType": "pks",
@@ -4004,10 +3917,7 @@
       "table": "File"
     },
     {
-      "columns": [
-        "A",
-        "B"
-      ],
+      "columns": ["A", "B"],
       "nameExplicit": true,
       "name": "file_to_tag_pkey",
       "entityType": "pks",
@@ -4015,9 +3925,7 @@
       "table": "_FileToTag"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": true,
       "name": "folder_pkey",
       "entityType": "pks",
@@ -4025,9 +3933,7 @@
       "table": "Folder"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": true,
       "name": "incomplete_file_pkey",
       "entityType": "pks",
@@ -4035,9 +3941,7 @@
       "table": "IncompleteFile"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": true,
       "name": "invite_pkey",
       "entityType": "pks",
@@ -4045,9 +3949,7 @@
       "table": "Invite"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": true,
       "name": "metric_pkey",
       "entityType": "pks",
@@ -4055,9 +3957,7 @@
       "table": "Metric"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": true,
       "name": "oauth_provider_pkey",
       "entityType": "pks",
@@ -4065,9 +3965,7 @@
       "table": "OAuthProvider"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": true,
       "name": "tag_pkey",
       "entityType": "pks",
@@ -4075,9 +3973,7 @@
       "table": "Tag"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": true,
       "name": "thumbnail_pkey",
       "entityType": "pks",
@@ -4085,9 +3981,7 @@
       "table": "Thumbnail"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": true,
       "name": "url_pkey",
       "entityType": "pks",
@@ -4095,9 +3989,7 @@
       "table": "Url"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": true,
       "name": "user_passkey_pkey",
       "entityType": "pks",
@@ -4105,9 +3997,7 @@
       "table": "UserPasskey"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": true,
       "name": "user_quota_pkey",
       "entityType": "pks",
@@ -4115,9 +4005,7 @@
       "table": "UserQuota"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": true,
       "name": "user_session_pkey",
       "entityType": "pks",
@@ -4125,9 +4013,7 @@
       "table": "UserSession"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": true,
       "name": "user_pkey",
       "entityType": "pks",
@@ -4135,9 +4021,7 @@
       "table": "User"
     },
     {
-      "columns": [
-        "id"
-      ],
+      "columns": ["id"],
       "nameExplicit": true,
       "name": "zipline_pkey",
       "entityType": "pks",

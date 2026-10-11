@@ -1,13 +1,11 @@
 import { ApiError } from '@/lib/api/errors';
 import { createAccessToken } from '@/lib/accessToken';
 import { verifyPassword } from '@/lib/crypto';
-import { db } from '@/lib/db';
-import { urls } from '@/lib/db/schema';
+import { getUrl } from '@/lib/db/models/url';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { zStringTrimmed } from '@/lib/validation';
 import typedPlugin from '@/server/typedPlugin';
-import { eq, or } from 'drizzle-orm';
 import z from 'zod';
 
 export type ApiUserUrlsIdPasswordResponse = {
@@ -41,11 +39,7 @@ export default typedPlugin(
         ...secondlyRatelimit(2),
       },
       async (req, res) => {
-        const [url] = await db
-          .select({ id: urls.id, password: urls.password })
-          .from(urls)
-          .where(or(eq(urls.id, req.params.id), eq(urls.code, req.params.id), eq(urls.vanity, req.params.id)))
-          .limit(1);
+        const url = await getUrl(req.params.id);
         if (!url) throw new ApiError(9002);
         if (!url.password) throw new ApiError(9002);
 

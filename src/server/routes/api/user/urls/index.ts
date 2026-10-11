@@ -2,8 +2,8 @@ import { ApiError } from '@/lib/api/errors';
 import { config } from '@/lib/config';
 import { hashPassword } from '@/lib/crypto';
 import { db } from '@/lib/db';
-import { Url, urlSchema } from '@/lib/db/models/url';
-import { urls, users } from '@/lib/db/schema';
+import { Url, urlSchema, createUrlId, lockUrls, urlIdentifiersExist } from '@/lib/db/models/url';
+import { urls } from '@/lib/db/schema';
 import { containsText } from '@/lib/db/utils';
 import { log } from '@/lib/logger';
 import { randomCharacters } from '@/lib/random';
@@ -93,20 +93,15 @@ export default typedPlugin(
           ? await hashPassword(req.headers['x-zipline-password'])
           : undefined;
 
-        if (vanity) {
-          const vanityCount = await db.$count(urls, eq(urls.vanity, vanity));
-          if (vanityCount > 0) throw new ApiError(1042);
-        }
-
-        let code, existingCode;
-        do {
-          code = randomCharacters(config.urls.length);
-          const codeCount = await db.$count(urls, eq(urls.code, code));
-          existingCode = codeCount > 0;
-        } while (existingCode);
-
         const url = await db.transaction(async (tx) => {
-          await tx.select({ id: users.id }).from(users).where(eq(users.id, req.user.id)).for('update');
+          await lockUrls(tx);
+          if (vanity && (await urlIdentifiersExist([vanity], tx))) throw new ApiError(1042);
+
+          let code: string;
+          do {
+            code = randomCharacters(config.urls.length);
+          } while (await urlIdentifiersExist([code], tx));
+          const id = await createUrlId(tx);
 
           const count = await tx.$count(urls, eq(urls.userId, req.user.id));
           if (req.user.quota?.maxUrls && count + 1 > req.user.quota.maxUrls) return null;
@@ -114,6 +109,7 @@ export default typedPlugin(
           const [created] = await tx
             .insert(urls)
             .values({
+              id,
               userId: req.user.id,
               destination,
               code,

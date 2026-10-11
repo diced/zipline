@@ -14,7 +14,7 @@ import { config } from '@/lib/config';
 import { hashPassword } from '@/lib/crypto';
 import { datasource } from '@/lib/datasource';
 import { db } from '@/lib/db';
-import type { FileInsert } from '@/lib/db/models/file';
+import { removeFiles, type FileInsert } from '@/lib/db/models/file';
 import { getFolderMetadata } from '@/lib/db/models/folder';
 import { getUser } from '@/lib/db/models/user';
 import { files, users } from '@/lib/db/schema';
@@ -312,6 +312,8 @@ export default typedPlugin(
           return created;
         });
 
+        const storedFiles = new Set<string>();
+
         response.files = await mapConcurrent(uploads, 4, async (upload, uploadIndex) => {
           const { compressed, extension, file, removedGps } = upload;
           const fileUpload = fileUploads[uploadIndex];
@@ -320,6 +322,7 @@ export default typedPlugin(
           await datasource.put(fileUpload.name, storageData, {
             mimetype: fileUpload.type,
           });
+          storedFiles.add(fileUpload.id);
           if (typeof storageData === 'string' && datasource.name === 'local' && req.tmpUploads) {
             req.tmpUploads = req.tmpUploads.filter((path) => path !== storageData);
           }
@@ -365,6 +368,18 @@ export default typedPlugin(
           });
 
           return responseFile;
+        }).catch(async (error) => {
+          const failedIds = fileUploads.filter((file) => !storedFiles.has(file.id)).map((file) => file.id);
+
+          try {
+            await removeFiles(failedIds);
+          } catch (cleanupError) {
+            logger.error('failed to remove unsuccessful upload records', {
+              files: failedIds,
+              error: cleanupError,
+            });
+          }
+          throw error;
         });
 
         if (options.noJson)
