@@ -73,7 +73,16 @@ export default typedPlugin(
             originalName: z.string().trim().min(1).optional().transform(zValidatePath),
             type: z.string().min(1).optional(),
             tags: z.array(z.string()).optional(),
-            name: z.string().trim().min(1).optional().transform(zValidatePath),
+            name: z
+              .string()
+              .trim()
+              .min(1)
+              .refine(
+                (name) => !name.toLowerCase().startsWith('.thumbnail'),
+                'File name uses a reserved prefix.',
+              )
+              .optional()
+              .transform(zValidatePath),
             anonymous: z.boolean().optional(),
           }),
           response: {
