@@ -3,6 +3,7 @@ import { formatRootUrl } from '@/lib/url';
 import { Config } from '@/lib/config/validate';
 import { getDatasource } from '@/lib/datasource';
 import { S3Datasource } from '@/lib/datasource/S3';
+import { removeGps } from '@/lib/gps';
 import { log } from '@/lib/logger';
 import { randomCharacters } from '@/lib/random';
 import { UploadOptions } from '@/lib/uploader/parseHeaders';
@@ -86,10 +87,7 @@ async function main() {
     },
   });
 
-  finalPath =
-    config.datasource.type === 'local'
-      ? join(config.datasource.local!.directory, file.filename)
-      : join(config.core.tempDirectory, randomCharacters(16));
+  finalPath = join(config.core.tempDirectory, randomCharacters(16));
 
   const fd = await open(finalPath, 'w');
   await fd.close();
@@ -130,15 +128,22 @@ async function main() {
     }
   }
 
-  const finalSize = await stat(finalPath).then((s) => s.size);
+  let finalSize: number;
+  try {
+    if (file.type.startsWith('image/') && config.files.removeGpsMetadata) {
+      const removed = removeGps(finalPath);
+      if (removed) logger.c('gps').debug(`removed gps metadata from ${file.filename}`);
+    }
 
-  if (config.datasource.type === 's3') {
-    logger.debug('starting multipart upload process for s3');
+    finalSize = await stat(finalPath).then((s) => s.size);
 
-    const bodyStream = createReadStream(finalPath);
-    const s3datasource = datasource as S3Datasource;
+    if (config.datasource.type === 'local') {
+      await datasource.put(file.filename, finalPath, { mimetype: file.type });
+    } else if (config.datasource.type === 's3') {
+      logger.debug('starting multipart upload process for s3');
 
-    try {
+      const bodyStream = createReadStream(finalPath);
+      const s3datasource = datasource as S3Datasource;
       const upload = new Upload({
         client: s3datasource.client,
         params: {
@@ -155,13 +160,13 @@ async function main() {
       await upload.done();
 
       await rm(finalPath);
-    } catch (e) {
-      logger.error('error while uploading multipart file');
-      console.error(e);
-      await failPartial(config, incompleteFile);
-
-      process.exit(1);
     }
+  } catch (e) {
+    logger.error('error while processing or storing partial upload');
+    console.error(e);
+    await failPartial(config, incompleteFile);
+
+    process.exit(1);
   }
 
   await dbProxy('incomplete.status', {
