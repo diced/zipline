@@ -24,7 +24,7 @@ export interface WorkerTask<Data = any> extends Task {
 
 export interface IntervalTask extends Task {
   interval: number;
-  func: () => void;
+  func: () => void | Promise<void>;
 
   timeout?: NodeJS.Timeout;
 }
@@ -50,7 +50,7 @@ export class Tasks {
         this.logger.debug('running first run', {
           id: task.id,
         });
-        (task as IntervalTask).func.bind(task)();
+        void this.runInterval(task as IntervalTask);
 
         this.startInterval(task as IntervalTask);
       } else if ('path' in task) {
@@ -72,6 +72,16 @@ export class Tasks {
     }
 
     return;
+  }
+
+  private async runInterval(task: IntervalTask): Promise<void> {
+    try {
+      await task.func.call(task);
+    } catch (error) {
+      task.logger.error('task failed', {
+        error: error instanceof Error ? (error.stack ?? error.message) : String(error),
+      });
+    }
   }
 
   private startInterval(task: IntervalTask) {
@@ -97,7 +107,9 @@ export class Tasks {
 
     task.started = true;
 
-    const timeout = setInterval(task.func.bind(task), task.interval);
+    const timeout = setInterval(() => {
+      void this.runInterval(task);
+    }, task.interval);
     task.timeout = timeout;
 
     this.logger.debug('started interval task', {
@@ -140,12 +152,14 @@ export class Tasks {
     });
   }
 
-  public interval(id: string, interval: number, func: () => void, start: boolean = false): void {
+  public interval(id: string, interval: number, func: IntervalTask['func'], start: boolean = false): void {
     const len = this.tasks.push({
       id,
       interval,
       func,
       started: false,
+      logger: this.logger.c(id),
+      tasks: this,
     } as IntervalTask);
 
     if (start) this.startInterval(this.tasks[len - 1] as IntervalTask);
