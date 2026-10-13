@@ -135,23 +135,17 @@ export default typedPlugin(
               : undefined,
         };
 
-        if (req.headers.range) {
-          const [start, end] = parseRange(req.headers.range, size);
-          if (start >= size || end >= size) {
-            const buf = await datasource.get(file.name);
-            if (!buf) throw new ApiError(9002);
-
+        if (req.headers.range !== undefined) {
+          const range = parseRange(req.headers.range, size);
+          if (!range) {
             return res
-              .type(contentType)
-              .headers({
-                'Content-Length': size,
-                ...commonHeaders,
-              })
+              .headers({ 'Content-Range': `bytes */${size}`, 'Content-Length': 0 })
               .status(416)
-              .send(buf);
+              .send();
           }
 
-          const buf = await datasource.range(file.name, start || 0, end);
+          const [start, end] = range;
+          const buf = await datasource.range(file.name, start, end);
           if (!buf) throw new ApiError(9002);
 
           return res

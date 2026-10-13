@@ -1,21 +1,17 @@
-export function parseRange(header: string, length: number): [number, number] {
-  const range = header.trim().substring(6);
+export function parseRange(header: string, length: number): [number, number] | null {
+  const range = /^bytes=(\d*)-(\d*)$/i.exec(header.trim());
+  if (!range || (!range[1] && !range[2]) || !Number.isSafeInteger(length) || length <= 0) return null;
 
-  let start, end;
+  const first = Number(range[1]);
+  const last = range[2] ? Number(range[2]) : length - 1;
+  if (!Number.isSafeInteger(first) || !Number.isSafeInteger(last)) return null;
 
-  if (range.startsWith('-')) {
-    end = length - 1;
-    start = Math.max(0, length - Number(range.substring(1)));
-  } else {
-    const [s, e] = range.split('-');
-    start = Number(s);
-    const parsedEnd = Number(e);
-    end = e?.trim() && !Number.isNaN(parsedEnd) ? parsedEnd : length - 1;
+  if (!range[1]) {
+    if (last === 0) return null;
+    return [Math.max(0, length - last), length - 1];
   }
 
-  if (end > length - 1) {
-    end = length - 1;
-  }
+  if (first >= length || first > last) return null;
 
-  return [start, end];
+  return [first, Math.min(last, length - 1)];
 }
