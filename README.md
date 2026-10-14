@@ -175,6 +175,12 @@ See [migration](https://zipline.diced.sh/docs/migrate) for more information.
 
 Contributions of any kind are welcome, whether they are bug reports, pull requests, or feature requests.
 
+## Translations
+
+<a href="https://wl.diced.sh/engage/zipline/"><img src="https://wl.diced.sh/widget/zipline/multi-auto.svg" alt="Translation status"></a>
+
+If you would like to help translate Zipline, please check out our [Weblate](https://wl.diced.sh). Sign in through GitHub, and then start making translations.
+
 ## Bug Reports
 
 Create an issue on GitHub and use the template, please include the following (if one of them is not applicable to the issue then it's not needed):
