@@ -413,6 +413,8 @@ export default function UploadOptionsButton({ folder, numFiles }: { folder?: str
             description={t('options.filename.description')}
             leftSection={<IconFileInfo size='1rem' />}
             value={ephemeral.filename ?? ''}
+            name='zipline-upload-filename'
+            autoComplete='off'
             onChange={(event) =>
               setEphemeral(
                 'filename',
@@ -427,7 +429,7 @@ export default function UploadOptionsButton({ folder, numFiles }: { folder?: str
             description={t('options.password.description')}
             leftSection={<IconKey size='1rem' />}
             value={ephemeral.password ?? ''}
-            autoComplete='off'
+            autoComplete='new-password'
             onChange={(event) =>
               setEphemeral(
                 'password',
