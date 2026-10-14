@@ -68,6 +68,7 @@ test('browser language tags resolve to a supported language by their primary sub
   assert.equal(matchLanguage('es-419'), 'es');
   assert.equal(matchLanguage('en_US'), 'en');
   assert.equal(matchLanguage('DE'), 'de');
+  assert.equal(matchLanguage('tr-TR'), 'tr');
   assert.equal(matchLanguage('it-IT'), null);
 });
 

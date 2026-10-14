@@ -1,4 +1,4 @@
-export const LANGUAGES = ['en', 'zh', 'ja', 'fr', 'de', 'es', 'pt', 'ru'] as const;
+export const LANGUAGES = ['en', 'zh', 'ja', 'fr', 'de', 'es', 'pt', 'ru', 'tr'] as const;
 export type Language = (typeof LANGUAGES)[number];
 
 export const DEFAULT_LANGUAGE: Language = 'en';
@@ -13,6 +13,7 @@ export const LANGUAGE_NAMES: Record<Language, string> = {
   es: 'Español',
   pt: 'Português',
   ru: 'Русский',
+  tr: 'Türkçe',
 };
 
 export const DAYJS_LOCALES: Record<Language, string> = {
@@ -24,6 +25,7 @@ export const DAYJS_LOCALES: Record<Language, string> = {
   es: 'es',
   pt: 'pt-br',
   ru: 'ru',
+  tr: 'tr',
 };
 
 export function isLanguage(value: unknown): value is Language {

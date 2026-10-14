@@ -1,0 +1,34 @@
+{
+  "actions": {
+    "cancel": "İptal",
+    "save": "Kaydet",
+    "delete": "Sil",
+    "close": "Kapat",
+    "ok": "Tamam",
+    "yes": "Evet",
+    "no": "Hayır",
+    "edit": "Düzenle",
+    "create": "Oluştur",
+    "copy": "Kopyala",
+    "remove": "Kaldır",
+    "download": "İndir",
+    "upload": "Yükle",
+    "refresh": "Yenile",
+    "open": "Aç",
+    "continue": "Devam et"
+  },
+  "status": {
+    "loading": "Yükleniyor…",
+    "error": "Hata",
+    "enabled": "Etkin"
+  },
+  "warning": {
+    "title": "Emin misiniz?"
+  },
+  "language": {
+    "label": "Dil"
+  },
+  "table": {
+    "noRecords": "Kayıt yok"
+  }
+}

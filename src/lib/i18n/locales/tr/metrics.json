@@ -1,0 +1,56 @@
+{
+  "title": "Metrikler",
+  "range": {
+    "change": "Tarih aralığını değiştir",
+    "modalTitle": "Aralığı değiştir",
+    "fromTo": "{{from}} - {{to}}",
+    "presets": {
+      "lastTwoDays": "Son iki gün",
+      "last7Days": "Son 7 gün",
+      "thisMonth": "Bu ay",
+      "lastMonth": "Geçen ay",
+      "thisYear": "Bu yıl",
+      "lastYear": "Geçen yıl"
+    }
+  },
+  "allTime": {
+    "label": "Tüm zamanlar",
+    "show": "Tüm zamanı göster",
+    "slowWarning": "Yüklenmesi normalden uzun sürebilir.",
+    "viewing": "Tüm zamanlara ait istatistikleri görüntülüyorsun."
+  },
+  "loadFailed": "Bu tarih aralığı için istatistikler yüklenemedi. Belirtilen aralıkta veri bulunmuyor olabilir. :(",
+  "cards": {
+    "files": "Dosyalar",
+    "urls": "URL'ler",
+    "storageUsed": "Kullanılan depolama",
+    "users": "Kullanıcılar",
+    "fileViews": "Dosya görüntülemeleri",
+    "urlViews": "URL görüntülemeleri"
+  },
+  "tables": {
+    "columns": {
+      "user": "Kullanıcı",
+      "files": "Dosyalar",
+      "storageUsed": "Kullanılan depolama",
+      "views": "Görüntülemeler",
+      "urls": "URL'ler",
+      "type": "Tür"
+    },
+    "unknownUser": "[bilinmeyen]"
+  },
+  "graphs": {
+    "count": { "title": "Sayı" },
+    "views": {
+      "title": "Görüntülemeler",
+      "value_one": "{{count}} görüntüleme",
+      "value_other": "{{count}} görüntüleme"
+    },
+    "storage": { "title": "Kullanılan depolama" },
+    "series": {
+      "files": "Dosyalar",
+      "urls": "URL'ler",
+      "storageUsed": "Kullanılan depolama"
+    }
+  }
+}

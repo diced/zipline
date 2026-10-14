@@ -1,0 +1,22 @@
+{
+  "welcome": "Tekrar hoş geldin, <b>{{username}}</b>",
+  "filesUploaded": "<b>{{files}}</b> dosya yükledin.",
+  "quota": {
+    "bytes": "<b>{{max}}</b> depolama alanının <b>{{used}}</b> kadarını kullandın",
+    "files": "İzin verilen <b>{{max}}</b> dosyanın <b>{{files}}</b> tanesini yükledin.",
+    "urls": "İzin verilen <b>{{max}}</b> bağlantının <b>{{urls}}</b> tanesini oluşturdun."
+  },
+  "recents": {
+    "title": "Son dosyalar",
+    "viewAll": "Tüm dosyaları görüntüle",
+    "empty": "Yakın zamanda yüklediğin dosya yok. Yüklediğin son üç dosya burada görünecek."
+  },
+  "stats": {
+    "title": "İstatistikler",
+    "viewMetrics": "Sunucu metriklerini görüntüle",
+    "description": "Bu istatistikler yalnızca yüklemelerine dayanır.",
+    "filesUploaded": "Yüklenen dosyalar",
+    "favoriteFiles": "Favori dosyalar",
+    "storageUsed": "Kullanılan depolama alanı"
+  }
+}

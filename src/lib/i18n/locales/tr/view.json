@@ -1,0 +1,36 @@
+{
+  "password": {
+    "title": "Parola gerekli",
+    "invalid": "Geçersiz parola",
+    "verify": "Doğrula",
+    "fileDescription": "Bu dosya parola korumalı. Görüntülemek için parolayı girin.",
+    "urlDescription": "Bu bağlantı parola korumalı. Görüntülemek için parolayı girin."
+  },
+  "file": {
+    "pageTitle": "Dosyayı görüntüle",
+    "viewFolder": "Klasörü görüntüle",
+    "viewRaw": "Ham dosyayı görüntüle",
+    "download": "Dosyayı indir"
+  },
+  "url": {
+    "redirecting": "<anchor>{{destination}}</anchor> adresine yönlendiriliyor"
+  },
+  "folder": {
+    "pageTitle": "Klasör",
+    "subfolders": "Alt klasörler",
+    "files": "Dosyalar",
+    "empty": "Bu klasör boş.",
+    "card": {
+      "files": "{{amount}} dosya",
+      "subfolders": "{{amount}} alt klasör"
+    },
+    "pagination": "{{from}} - {{to}} / {{total}} dosya"
+  },
+  "folderUpload": {
+    "pageTitle": "{{name}} klasörüne yükle",
+    "pageTitleFallback": "Klasöre yükle",
+    "title": "{{name}} klasörüne dosya yükle",
+    "public": "Bu klasör <anchor>genel</anchor>. Bağlantıya sahip herkes içeriği görüntüleyebilir ve dosya yükleyebilir.",
+    "private": "Bu klasörün içeriğini yalnızca sahibi görebilir. Ancak herkes dosya yükleyebilir ve yüklediği dosyalara özel bağlantıyla erişebilir."
+  }
+}

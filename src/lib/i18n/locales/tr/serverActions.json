@@ -1,0 +1,23 @@
+{
+  "admin": {
+    "title": "Yönetici",
+    "links": {
+      "metrics": {
+        "label": "Metrikler",
+        "description": "Sunucu genelindeki kullanım grafikleri ve istatistikleri"
+      },
+      "actions": {
+        "label": "İşlemler",
+        "description": "Bakım araçları ve içe/dışa aktarma"
+      },
+      "users": {
+        "label": "Kullanıcılar",
+        "description": "Kullanıcıları ve kotaları yönetin"
+      },
+      "settings": {
+        "label": "Ayarlar",
+        "description": "Sunucu yapılandırması"
+      }
+    }
+  }
+}
