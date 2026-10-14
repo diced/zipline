@@ -34,6 +34,9 @@
   },
   "text": {
     "title": "Upload text",
+    "language": "Language",
+    "removeFile": "Remove file {{number}}",
+    "emptyPreview": "No text",
     "tabs": {
       "text": "Text",
       "preview": "Preview"

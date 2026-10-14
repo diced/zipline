@@ -3,11 +3,12 @@ import { verifyAccessToken } from '@/lib/accessToken';
 import { config as zConfig } from '@/lib/config';
 import { Config } from '@/lib/config/validate';
 import { db } from '@/lib/db';
+import { getUrl } from '@/lib/db/models/url';
 import { urls } from '@/lib/db/schema';
 import { renderHtml } from '@/lib/ssr/renderHtml';
 import { ZiplineTheme } from '@/lib/theme';
 import { FastifyRequest } from 'fastify';
-import { and, eq, lt, or, sql } from 'drizzle-orm';
+import { and, eq, lt, sql } from 'drizzle-orm';
 import { createRoutes } from './routes';
 import { ApiError } from '@/lib/api/errors';
 
@@ -29,18 +30,7 @@ export async function render(
   const { config: libConfig, reloadSettings } = await import('@/lib/config');
   if (!libConfig) await reloadSettings();
 
-  const [urlEntry] = await db
-    .select({
-      id: urls.id,
-      password: urls.password,
-      destination: urls.destination,
-      maxViews: urls.maxViews,
-      views: urls.views,
-      enabled: urls.enabled,
-    })
-    .from(urls)
-    .where(or(eq(urls.vanity, id), eq(urls.code, id), eq(urls.id, id)))
-    .limit(1);
+  const urlEntry = await getUrl(id);
 
   if (!urlEntry || !urlEntry.enabled) return { html: 'Not Found', meta: '', status: 404 };
 
@@ -54,7 +44,13 @@ export async function render(
   const token = req.query.token;
   const valid = token && urlEntry.password ? verifyAccessToken(token, 'url', urlEntry.id) : false;
   const hasPassword = !!urlEntry.password;
-  const { password: _password, ...publicUrl } = urlEntry;
+  const publicUrl = {
+    id: urlEntry.id,
+    destination: urlEntry.destination,
+    maxViews: urlEntry.maxViews,
+    views: urlEntry.views,
+    enabled: urlEntry.enabled,
+  };
 
   const data = {
     url: publicUrl,

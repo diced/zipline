@@ -2,9 +2,10 @@ import { verifyAccessToken } from '@/lib/accessToken';
 import { ApiError } from '@/lib/api/errors';
 import { config } from '@/lib/config';
 import { db } from '@/lib/db';
+import { getUrl } from '@/lib/db/models/url';
 import { urls } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
-import { and, eq, lt, or, sql } from 'drizzle-orm';
+import { and, eq, lt, sql } from 'drizzle-orm';
 import { FastifyReply, FastifyRequest } from 'fastify';
 
 type Params = {
@@ -24,11 +25,7 @@ export async function urlsRoute(
   const { id } = req.params;
   const { token } = req.query;
 
-  const [url] = await db
-    .select()
-    .from(urls)
-    .where(or(eq(urls.code, id), eq(urls.vanity, id), eq(urls.id, id)))
-    .limit(1);
+  const url = await getUrl(id);
   if (!url) return res.callNotFound();
   if (!url.enabled) return res.callNotFound();
 

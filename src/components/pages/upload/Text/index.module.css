@@ -1,4 +1,19 @@
+.editor {
+  overflow: hidden;
+}
+
+.editor:focus-within {
+  border-color: var(--mantine-primary-color-filled);
+}
+
 .textarea textarea {
-  font-family: monospace;
-  height: 25vh;
+  font-family: var(--mantine-font-family-monospace);
+  line-height: 1.5;
+  height: clamp(180px, 25vh, 320px);
+  min-height: 120px;
+  padding: var(--mantine-spacing-xs);
+}
+
+.preview {
+  overflow-wrap: anywhere;
 }

@@ -1,6 +1,7 @@
 import { ApiError } from '@/lib/api/errors';
 import { createToken } from '@/lib/crypto';
 import { db } from '@/lib/db';
+import { createUrlId, lockUrls, urlIdentifiersExist } from '@/lib/db/models/url';
 import { files, folders, oauthProviders, urls, users } from '@/lib/db/schema';
 import { sanitizeFilename } from '@/lib/fs';
 import { export3Schema } from '@/lib/import/version3/validateExport';
@@ -49,13 +50,17 @@ export default typedPlugin(
           },
           tags: ['auth', 'superadmin'],
         },
-        preHandler: [userMiddleware, administratorMiddleware],
+        onRequest: [
+          userMiddleware,
+          administratorMiddleware,
+          async (req) => {
+            if (req.user.role !== 'SUPERADMIN') throw new ApiError(3015);
+          },
+        ],
         bodyLimit: 24 * 1024 * 1024 * 1024,
         ...secondlyRatelimit(5),
       },
       async (req, res) => {
-        if (req.user.role !== 'SUPERADMIN') throw new ApiError(3015);
-
         const { export3 } = req.body;
 
         const usersImportedToId: Record<string, string> = {};
@@ -282,34 +287,30 @@ export default typedPlugin(
             continue;
           }
 
-          const [existing] = await db
-            .select({ id: urls.id })
-            .from(urls)
-            .where(eq(urls.code, url.code))
-            .limit(1);
+          const created = await db.transaction(async (tx) => {
+            await lockUrls(tx);
+            if (await urlIdentifiersExist([url.code, ...(url.vanity ? [url.vanity] : [])], tx)) return null;
 
-          if (existing) {
-            logger.warn('url already exists, skipping importing', {
-              id,
-              conflict: existing.id,
-            });
-
+            const [created] = await tx
+              .insert(urls)
+              .values({
+                id: await createUrlId(tx),
+                userId: user,
+                destination: url.destination,
+                vanity: url.vanity || null,
+                code: url.code,
+                maxViews: url.max_views || null,
+                views: url.views || 0,
+                createdAt: parseDate(url.created_at),
+              })
+              .returning({ id: urls.id });
+            if (!created) throw new ApiError(9005);
+            return created;
+          });
+          if (!created) {
+            logger.warn('identifier already exists, skipping importing', { id });
             continue;
           }
-
-          const [created] = await db
-            .insert(urls)
-            .values({
-              userId: user,
-              destination: url.destination,
-              vanity: url.vanity || null,
-              code: url.code,
-              maxViews: url.max_views || null,
-              views: url.views || 0,
-              createdAt: parseDate(url.created_at),
-            })
-            .returning({ id: urls.id });
-          if (!created) throw new ApiError(9005);
 
           urlsImportedToId[id] = created.id;
         }

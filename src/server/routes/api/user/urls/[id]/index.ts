@@ -1,7 +1,7 @@
 import { ApiError } from '@/lib/api/errors';
 import { hashPassword } from '@/lib/crypto';
 import { db } from '@/lib/db';
-import { Url, urlSchema } from '@/lib/db/models/url';
+import { Url, urlSchema, lockUrls, urlIdentifiersExist } from '@/lib/db/models/url';
 import { urls } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { zStringTrimmed } from '@/lib/validation';
@@ -88,11 +88,6 @@ export default typedPlugin(
           }
         }
 
-        if (req.body.vanity) {
-          const vanityCount = await db.$count(urls, eq(urls.vanity, req.body.vanity));
-          if (vanityCount > 0) throw new ApiError(1041);
-        }
-
         const changes = {
           ...(req.body.vanity !== undefined && { vanity: req.body.vanity }),
           ...(req.body.password !== undefined && { password }),
@@ -103,11 +98,19 @@ export default typedPlugin(
 
         let updatedUrl = url;
         if (Object.keys(changes).length) {
-          const [updated] = await db
-            .update(urls)
-            .set(changes)
-            .where(and(eq(urls.id, id), eq(urls.userId, req.user.id)))
-            .returning(urlColumns);
+          const updated = await db.transaction(async (tx) => {
+            await lockUrls(tx);
+            if (req.body.vanity && (await urlIdentifiersExist([req.body.vanity], tx, id)))
+              throw new ApiError(1041);
+
+            const [updated] = await tx
+              .update(urls)
+              .set(changes)
+              .where(and(eq(urls.id, id), eq(urls.userId, req.user.id)))
+              .returning(urlColumns);
+
+            return updated;
+          });
 
           if (!updated) throw new ApiError(9002);
           updatedUrl = updated;

@@ -230,7 +230,7 @@ export default typedPlugin(
           });
 
           const urlPath =
-            options.extensionless && config.files.extensionlessUrls
+            options.extensionless && config.files.extensionlessUrls && extension
               ? fileUpload.name.slice(0, -extension.length)
               : fileUpload.name;
 

@@ -96,6 +96,13 @@ export const rawFileHandler = async (
   }
 
   const size = file?.size || (await datasource.size(file?.name ?? id));
+  const range = req.headers.range !== undefined ? parseRange(req.headers.range, size) : undefined;
+  if (range === null) {
+    return res
+      .headers({ 'Content-Range': `bytes */${size}`, 'Content-Length': 0 })
+      .status(416)
+      .send();
+  }
 
   if (file.maxViews) {
     const [view] = await db
@@ -142,29 +149,9 @@ export const rawFileHandler = async (
   const fileType = file?.type || 'application/octet-stream';
   const contentType = fileType.startsWith('text/') ? `${fileType}; charset=utf-8` : fileType;
 
-  if (req.headers.range) {
-    const [start, end] = parseRange(req.headers.range, size);
-    if (start >= size || end >= size) {
-      const buf = await datasource.get(file?.name ?? id);
-      if (!buf) return res.callNotFound();
-
-      await countView();
-
-      return res
-        .type(contentType)
-        .headers({
-          'Content-Length': size,
-          ...(file?.originalName
-            ? {
-                'Content-Disposition': `${download ? 'attachment; ' : ''}filename*=utf-8''${encodeURIComponent(file.originalName)}`,
-              }
-            : download && { 'Content-Disposition': 'attachment;' }),
-        })
-        .status(416)
-        .send(buf);
-    }
-
-    const buf = await datasource.range(file?.name ?? id, start || 0, end);
+  if (range) {
+    const [start, end] = range;
+    const buf = await datasource.range(file?.name ?? id, start, end);
     if (!buf) return res.callNotFound();
 
     await countView();

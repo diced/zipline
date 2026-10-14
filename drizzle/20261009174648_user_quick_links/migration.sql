@@ -1,0 +1,1 @@
+ALTER TABLE "User" ADD COLUMN "quickLinks" jsonb DEFAULT '[]' NOT NULL;

@@ -127,6 +127,9 @@ export async function getFilename(
         fullFileNames.some((name) => reservedNames?.has(name)) || (await fileNamesExist(fullFileNames));
     }
 
+    if (fullFileNames.some((name) => name.toLowerCase().startsWith('.thumbnail')))
+      throw 'file name uses a reserved prefix';
+
     for (const name of fullFileNames) reservedNames?.add(name);
     return fileName;
   } catch (e) {

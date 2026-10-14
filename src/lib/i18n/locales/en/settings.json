@@ -76,6 +76,12 @@
       "loggedOutDevice": "Logged out of device"
     }
   },
+  "quickLinks": {
+    "title": "Quick links",
+    "description": "Add links to the top of the home page for quick access to stuff.",
+    "reorder": "Reorder {{name}}",
+    "saveError": "Could not save quick links."
+  },
   "dashboard": {
     "title": "Dashboard Settings",
     "description": "These settings are saved automatically in your <b>browser.</b>",

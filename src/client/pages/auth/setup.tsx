@@ -1,40 +1,28 @@
 import LanguageSelect from '@/components/LanguageSelect';
-import { type Response } from '@/lib/api/response';
+import type { Response as ApiResponse } from '@/lib/api/response';
 import { fetchApi } from '@/lib/fetchApi';
 import { useTitle } from '@/lib/client/hooks/useTitle';
+import { useUserStore } from '@/lib/client/store/user';
 import {
   Anchor,
   Button,
-  Code,
+  Container,
   Group,
+  Loader,
   Paper,
   PasswordInput,
-  SimpleGrid,
   Stack,
-  Stepper,
   Text,
   TextInput,
   Title,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
-import { IconArrowBackUp, IconArrowForwardUp, IconCheck, IconX } from '@tabler/icons-react';
+import { IconLogin, IconUserPlus, IconX } from '@tabler/icons-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import SafeTrans from '@/components/SafeTrans';
-import { redirect, useNavigate } from 'react-router-dom';
+import { Link, redirect, useNavigate } from 'react-router-dom';
 import { mutate } from 'swr';
-
-function LinkToDoc({ href, title, children }: { href: string; title: string; children: React.ReactNode }) {
-  return (
-    <Text>
-      <Anchor href={href} target='_blank' rel='noopener noreferrer'>
-        {title}
-      </Anchor>{' '}
-      {children}
-    </Text>
-  );
-}
 
 export async function loader() {
   const res = await fetch('/api/server/public');
@@ -53,218 +41,132 @@ export function Component() {
   useTitle(t('setup.pageTitle'));
 
   const navigate = useNavigate();
-
-  const [active, setActive] = useState(0);
-  const nextStep = () => setActive((current) => (current < 3 ? current + 1 : current));
-  const prevStep = () => setActive((current) => (current > 0 ? current - 1 : current));
-
+  const setUser = useUserStore((state) => state.setUser);
   const [loading, setLoading] = useState(false);
+  const [created, setCreated] = useState(false);
 
   const form = useForm({
-    initialValues: {
-      username: '',
-      password: '',
-    },
+    initialValues: { username: '', password: '', confirmPassword: '' },
     validate: {
-      username: (value) => (value.length >= 1 ? null : t('form.username.required')),
-      password: (value) => (value.length >= 1 ? null : t('form.password.required')),
+      username: (value) => (value.trim() ? null : t('form.username.required')),
+      password: (value) => (value.trim() ? null : t('form.password.required')),
+      confirmPassword: (value, values) => (value === values.password ? null : t('setup.passwordMismatch')),
     },
-    enhanceGetInputProps: ({ field }) => ({
-      name: field,
-    }),
+    enhanceGetInputProps: ({ field }) => ({ name: field }),
   });
 
   const onSubmit = async (values: typeof form.values) => {
+    if (loading || created) return;
     setLoading(true);
+    const credentials = { username: values.username.trim(), password: values.password.trim() };
 
-    const { error } = await fetchApi('/api/setup', 'POST', {
-      username: values.username,
-      password: values.password,
-    });
+    try {
+      const setup = await fetchApi<ApiResponse['/api/setup']>('/api/setup', 'POST', credentials);
+      if (setup.error || !setup.data?.user) throw new Error(setup.error?.error ?? t('setup.failure'));
 
-    if (error) {
+      setCreated(true);
+
+      await mutate<ApiResponse['/api/server/public']>(
+        '/api/server/public',
+        (config) => (config ? { ...config, firstSetup: false } : config),
+        { revalidate: false },
+      );
+
+      const login = await fetchApi<ApiResponse['/api/auth/login']>('/api/auth/login', 'POST', credentials);
+      if (login.error || !login.data?.user) throw new Error(login.error?.error ?? t('login.failed'));
+
+      setUser(login.data.user);
+
+      await mutate('/api/user', login.data, { revalidate: false });
+      navigate('/dashboard', { replace: true });
+    } catch (error) {
       notifications.show({
         title: t('common:status.error'),
-        message: error.error,
+        message: error instanceof Error ? error.message : t('setup.failure'),
         color: 'red',
         icon: <IconX size='1rem' />,
       });
-
+    } finally {
       setLoading(false);
-      setActive(2);
-    } else {
-      notifications.show({
-        title: t('setup.complete.title'),
-        message: t('setup.complete.loggingIn'),
-        color: 'green',
-        loading: true,
-      });
-
-      const { data, error } = await fetchApi<Response['/api/auth/login']>('/api/auth/login', 'POST', {
-        username: values.username,
-        password: values.password,
-      });
-
-      if (error) {
-        notifications.show({
-          title: t('common:status.error'),
-          message: error.error,
-          color: 'red',
-          icon: <IconX size='1rem' />,
-        });
-
-        setLoading(false);
-        setActive(2);
-      } else {
-        mutate('/api/user', data as Response['/api/user']);
-        navigate('/dashboard');
-      }
     }
   };
 
   return (
-    <>
-      <Group justify='flex-end' mx='sm' mt='sm'>
-        <LanguageSelect />
-      </Group>
-
-      <Paper withBorder p='xs' m='sm'>
-        <Stepper active={active} onStepClick={setActive} m='md'>
-          <Stepper.Step
-            label={t('setup.steps.welcome.label')}
-            description={t('setup.steps.welcome.description')}
-          >
-            <Title>{t('setup.welcome.title')}</Title>
-            <SimpleGrid spacing='md' cols={{ base: 1, sm: 1 }}>
-              <Paper withBorder p='sm' my='sm' h='100%'>
-                <Title order={2}>{t('setup.welcome.docs.title')}</Title>
-                <Text>{t('setup.welcome.docs.intro')}</Text>
-
-                <Stack mt='xs'>
-                  <LinkToDoc
-                    href='https://zipline.diced.sh/docs/config'
-                    title={t('setup.welcome.docs.config.title')}
-                  >
-                    {t('setup.welcome.docs.config.description')}
-                  </LinkToDoc>
-
-                  <LinkToDoc
-                    href='https://zipline.diced.sh/docs/migrate'
-                    title={t('setup.welcome.docs.migrate.title')}
-                  >
-                    {t('setup.welcome.docs.migrate.description')}
-                  </LinkToDoc>
-                </Stack>
-              </Paper>
-
-              <Paper withBorder p='sm' my='sm' h='100%'>
-                <Title order={2}>{t('setup.welcome.config.title')}</Title>
-
-                <Text>
-                  <SafeTrans t={t} i18nKey='setup.welcome.config.body' components={{ code: <Code /> }} />
-                </Text>
-
-                <Text>
-                  <SafeTrans
-                    t={t}
-                    i18nKey='setup.welcome.config.envVars'
-                    components={{
-                      anchor: (
-                        <Anchor
-                          href='https://zipline.diced.sh/docs/config'
-                          target='_blank'
-                          rel='noopener noreferrer'
-                        />
-                      ),
-                    }}
-                  />
-                </Text>
-              </Paper>
-            </SimpleGrid>
-
-            <Button
-              mt='xl'
-              fullWidth
-              rightSection={<IconArrowForwardUp size='1.25rem' />}
-              size='lg'
-              variant='default'
-              onClick={nextStep}
-            >
-              {t('common:actions.continue')}
-            </Button>
-          </Stepper.Step>
-          <Stepper.Step
-            label={t('setup.steps.createUser.label')}
-            description={t('setup.steps.createUser.description')}
-          >
-            <Stack gap='lg'>
-              <Title order={2}>{t('setup.createUser.title')}</Title>
-
-              <TextInput
-                label={t('form.username.label')}
-                placeholder={t('setup.createUser.usernamePlaceholder')}
-                autoComplete='username'
-                {...form.getInputProps('username')}
-              />
-
-              <PasswordInput
-                label={t('form.password.label')}
-                placeholder={t('setup.createUser.passwordPlaceholder')}
-                autoComplete='new-password'
-                {...form.getInputProps('password')}
-              />
-            </Stack>
-
-            <Group justify='space-between' my='lg'>
-              <Button
-                leftSection={<IconArrowBackUp size='1.25rem' />}
-                size='lg'
-                variant='default'
-                onClick={prevStep}
-              >
-                {t('setup.back')}
-              </Button>
-
-              <Button
-                rightSection={<IconArrowForwardUp size='1.25rem' />}
-                size='lg'
-                variant='default'
-                onClick={nextStep}
-                disabled={!form.isValid()}
-              >
-                {t('common:actions.continue')}
-              </Button>
+    <Container size='xs' my={{ base: 'md', sm: 'xl' }} px={{ base: 'xs', sm: 'md' }}>
+      <Paper withBorder p={{ base: 'md', sm: 'xl' }}>
+        <Stack gap='lg'>
+          <div>
+            <Group justify='space-between' align='flex-start' gap='sm' wrap='nowrap'>
+              <Title order={1} miw={0} textWrap='balance'>
+                {created ? t('setup.complete.title') : t('setup.title')}
+              </Title>
+              <LanguageSelect />
             </Group>
-          </Stepper.Step>
-          <Stepper.Completed>
-            <Title order={2}>{t('setup.complete.title')}</Title>
+            <Text size='sm' c='dimmed' mt={4}>
+              {created ? t('setup.accountCreated') : t('setup.description')}
+            </Text>
+          </div>
 
-            <Text>{t('setup.complete.body')}</Text>
-            <Group justify='space-between' my='lg'>
-              <Button
-                leftSection={<IconArrowBackUp size='1.25rem' />}
-                size='lg'
-                variant='default'
-                onClick={prevStep}
-                loading={loading}
-              >
-                {t('setup.back')}
+          {created ? (
+            loading ? (
+              <Group component='output' gap='sm'>
+                <Loader size='sm' />
+                <Text size='sm'>{t('setup.complete.loggingIn')}</Text>
+              </Group>
+            ) : (
+              <Button component={Link} to='/auth/login?local=true' leftSection={<IconLogin size='1rem' />}>
+                {t('login.submit')}
               </Button>
+            )
+          ) : (
+            <form onSubmit={form.onSubmit(onSubmit)}>
+              <Stack gap='sm'>
+                <TextInput
+                  label={t('form.username.label')}
+                  placeholder={t('setup.createUser.usernamePlaceholder')}
+                  autoComplete='username'
+                  disabled={loading}
+                  {...form.getInputProps('username')}
+                />
+                <PasswordInput
+                  label={t('form.password.label')}
+                  placeholder={t('setup.createUser.passwordPlaceholder')}
+                  autoComplete='new-password'
+                  disabled={loading}
+                  {...form.getInputProps('password')}
+                />
+                <PasswordInput
+                  label={t('setup.confirmPassword')}
+                  autoComplete='new-password'
+                  disabled={loading}
+                  {...form.getInputProps('confirmPassword')}
+                />
+                <Button
+                  type='submit'
+                  size='md'
+                  fullWidth
+                  mt='xs'
+                  loading={loading}
+                  leftSection={<IconUserPlus size='1rem' />}
+                >
+                  {t('setup.submit')}
+                </Button>
+              </Stack>
+            </form>
+          )}
 
-              <Button
-                rightSection={<IconCheck size='1.25rem' />}
-                size='lg'
-                variant='default'
-                loading={loading}
-                onClick={() => form.onSubmit(onSubmit)()}
-              >
-                {t('setup.finish')}
-              </Button>
-            </Group>
-          </Stepper.Completed>
-        </Stepper>
+          <Anchor
+            size='sm'
+            ta='center'
+            href='https://zipline.diced.sh/docs/config'
+            target='_blank'
+            rel='noopener noreferrer'
+          >
+            {t('setup.welcome.docs.title')}
+          </Anchor>
+        </Stack>
       </Paper>
-    </>
+    </Container>
   );
 }
 

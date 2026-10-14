@@ -27,7 +27,8 @@ export async function requerySize({
   for (let i = 0; i !== rows.length; ++i) {
     const file = rows[i];
 
-    if (!(await datasource.get(file.name))) {
+    const stream = await datasource.get(file.name);
+    if (!stream) {
       if (forceDelete) {
         logger.info("deleting file from database because it's not in the datasource", {
           id: file.id,
@@ -41,6 +42,11 @@ export async function requerySize({
       notFound = true;
       continue;
     }
+
+    stream.on('error', (error) => {
+      logger.error('error closing file stream', { id: file.id, name: file.name, error: error.message });
+    });
+    stream.destroy();
 
     const size = await datasource.size(file.name);
     if (size === 0) {
