@@ -31,18 +31,12 @@ test('parseRange handles single-byte files', () => {
   }
 });
 
-test('parseRange leaves a zero-length suffix unsatisfiable', () => {
-  assert.deepEqual(parseRange('bytes=-0', 100), [100, 99]);
+test('parseRange rejects a zero-length suffix', () => {
+  assert.equal(parseRange('bytes=-0', 100), null);
 });
 
-for (const [header, expected] of [
-  ['bytes=20-10', [20, 10]],
-  ['bytes=x-10', [NaN, 10]],
-  ['bytes=0-NaN', [0, 99]],
-  ['bytes=0-1,5-6', [0, 99]],
-  ['items=0-10', [0, 10]],
-] as const) {
-  test(`parseRange currently parses ${header} without validation`, () => {
-    assert.deepEqual(parseRange(header, 100), expected);
+for (const header of ['bytes=20-10', 'bytes=x-10', 'bytes=0-NaN', 'bytes=0-1,5-6', 'items=0-10']) {
+  test(`parseRange rejects unsupported or invalid range ${header}`, () => {
+    assert.equal(parseRange(header, 100), null);
   });
 }
