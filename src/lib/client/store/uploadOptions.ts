@@ -53,6 +53,19 @@ export type UploadOptionsStore = {
   changes: () => number;
 };
 
+export const persistUploadOptions = (state: UploadOptionsStore) => ({ options: state.options });
+
+export const mergeUploadOptions = (
+  persistedState: any,
+  currentState: UploadOptionsStore,
+): UploadOptionsStore => ({
+  ...currentState,
+  options: {
+    ...currentState.options,
+    ...persistedState?.options,
+  },
+});
+
 export const useUploadOptionsStore = create<UploadOptionsStore>()(
   subscribeWithSelector(
     persist(
@@ -101,20 +114,8 @@ export const useUploadOptionsStore = create<UploadOptionsStore>()(
       }),
       {
         name: 'zipline-upload-options',
-        merge: (persistedState: any, currentState) => {
-          return {
-            ...currentState,
-            ...persistedState,
-            options: {
-              ...currentState.options,
-              ...persistedState?.options,
-            },
-            ephemeral: {
-              ...currentState.ephemeral,
-              ...persistedState?.ephemeral,
-            },
-          };
-        },
+        partialize: persistUploadOptions,
+        merge: mergeUploadOptions,
       },
     ),
   ),
