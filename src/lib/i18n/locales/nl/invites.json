@@ -1,0 +1,75 @@
+{
+  "title": "Uitnodigingen",
+  "create": {
+    "title": "Een uitnodiging aanmaken",
+    "expiresAt": {
+      "label": "Verloopt op",
+      "description": "Selecteer wanneer deze uitnodiging verloopt, of kies \"nooit\" als je wilt dat de uitnodiging nooit verloopt.",
+      "placeholder": "Selecteer een vervaltijd..."
+    },
+    "maxUses": {
+      "label": "Maximaal aantal keren te gebruiken",
+      "description": "Stel in hoe vaak deze uitnodiging maximaal kan worden gebruikt, of laat dit leeg voor onbeperkt gebruik.",
+      "placeholder": "Voer een getal in..."
+    }
+  },
+  "expirations": {
+    "never": "Nooit",
+    "minutes30": "30 minuten",
+    "hour1": "1 uur",
+    "hours6": "6 uur",
+    "hours12": "12 uur",
+    "day1": "1 dag",
+    "days3": "3 dagen",
+    "days5": "5 dagen",
+    "days7": "7 dagen"
+  },
+  "notifications": {
+    "created": {
+      "title": "Uitnodiging aangemaakt",
+      "message": "Uitnodiging {{code}} is aangemaakt."
+    },
+    "deleteFailed": {
+      "title": "Uitnodiging verwijderen mislukt"
+    },
+    "deleted": {
+      "title": "Uitnodiging verwijderd",
+      "message": "Uitnodiging {{code}} is verwijderd."
+    }
+  },
+  "delete": {
+    "message": "Weet je zeker dat je uitnodiging {{code}} wilt verwijderen? Dit kan niet ongedaan worden gemaakt.",
+    "confirm": "{{code}} verwijderen"
+  },
+  "card": {
+    "copyUrl": "URL kopiëren",
+    "showQrCode": "QR-code tonen",
+    "createdBy": "Aangemaakt door:",
+    "created": "Aangemaakt:",
+    "expires": "Verloopt:",
+    "maxUses": "Maximaal aantal keren te gebruiken:",
+    "uses": "Aantal keren gebruikt:",
+    "unlimited": "Onbeperkt"
+  },
+  "empty": {
+    "title": "Geen uitnodigingen gevonden",
+    "description": "Maak een uitnodiging aan om deze hier te zien."
+  },
+  "table": {
+    "columns": {
+      "code": "Code",
+      "createdBy": "Aangemaakt door",
+      "created": "Aangemaakt",
+      "updatedAt": "Laatst bijgewerkt op",
+      "expires": "Verloopt",
+      "maxUses": "Maximaal aantal keren te gebruiken",
+      "uses": "Aantal keren gebruikt",
+      "actions": "Acties"
+    },
+    "never": "Nooit",
+    "unlimited": "Onbeperkt",
+    "copyLink": "Uitnodigingslink kopiëren",
+    "showQrCode": "QR-code tonen",
+    "delete": "Uitnodiging verwijderen"
+  }
+}

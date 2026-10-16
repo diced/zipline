@@ -1,0 +1,180 @@
+{
+  "notifications": {
+    "deleted": {
+      "title": "Bestand verwijderd",
+      "message": "{{name}} is verwijderd"
+    },
+    "favorited": {
+      "title": "Bestand toegevoegd aan favorieten",
+      "message": "{{name}} is toegevoegd aan favorieten"
+    },
+    "unfavorited": {
+      "title": "Bestand verwijderd uit favorieten",
+      "message": "{{name}} is verwijderd uit favorieten"
+    },
+    "createFolderError": {
+      "title": "Fout bij het aanmaken van de map"
+    },
+    "folderCreated": {
+      "title": "Map aangemaakt",
+      "message": "{{folder}} is aangemaakt met {{name}}"
+    },
+    "removeFromFolderError": {
+      "title": "Fout bij het verwijderen uit de map"
+    },
+    "removedFromFolder": {
+      "title": "Bestand uit map verwijderd",
+      "message": "{{name}} is uit {{folder}} verwijderd"
+    },
+    "addToFolderError": {
+      "title": "Fout bij het toevoegen aan de map"
+    },
+    "addedToFolder": {
+      "title": "Bestand aan map toegevoegd",
+      "message": "{{name}} is toegevoegd aan {{folder}}"
+    },
+    "addMultipleToFolderError": {
+      "title": "Fout bij het toevoegen van bestanden aan de map"
+    },
+    "addedMultipleToFolder": {
+      "title": "Bestanden aan map toegevoegd",
+      "message": "{{count}} bestand(en) toegevoegd aan {{folder}}"
+    },
+    "saveTagsError": {
+      "title": "Tags opslaan mislukt"
+    },
+    "tagsSaved": {
+      "title": "Tags opgeslagen",
+      "message": "{{count}} tags opgeslagen voor bestand {{name}}"
+    },
+    "removePasswordError": {
+      "title": "Wachtwoord verwijderen mislukt..."
+    },
+    "passwordRemoved": {
+      "title": "Wachtwoord verwijderd!",
+      "message": "Het wachtwoord is van het bestand verwijderd."
+    },
+    "saveChangesError": {
+      "title": "Wijzigingen opslaan mislukt..."
+    },
+    "changesSaved": {
+      "title": "Wijzigingen opgeslagen!",
+      "message": "De wijzigingen aan het bestand zijn opgeslagen."
+    }
+  },
+  "delete": {
+    "confirm": "{{name}} verwijderen",
+    "message": "Weet je zeker dat je {{name}} wilt verwijderen? Dit kan niet ongedaan worden gemaakt."
+  },
+  "contextMenu": {
+    "openInNewTab": "Openen in nieuw tabblad",
+    "copyLink": "Link kopiëren",
+    "copyRawLink": "Link naar onbewerkt bestand kopiëren",
+    "favorite": "Toevoegen aan favorieten",
+    "unfavorite": "Verwijderen uit favorieten",
+    "removeFromFolder": "Uit map verwijderen",
+    "moveToFolder": "Verplaatsen naar map",
+    "searchFolders": "Mappen zoeken...",
+    "createNamedFolder": "+ \"{{name}}\" aanmaken",
+    "noFolders": "Nog geen mappen",
+    "createNewFolder": "+ Nieuwe map aanmaken",
+    "editDetails": "Details bewerken"
+  },
+  "createFolderModal": {
+    "title": "Map aanmaken",
+    "name": {
+      "label": "Mapnaam",
+      "placeholder": "Mijn map"
+    }
+  },
+  "stats": {
+    "type": "Type",
+    "size": "Grootte",
+    "createdAt": "Aangemaakt op",
+    "updatedAt": "Bijgewerkt op",
+    "deletesAt": "Wordt verwijderd op",
+    "views": "Weergaven",
+    "originalName": "Oorspronkelijke naam",
+    "anonymous": "Anoniem"
+  },
+  "details": {
+    "title": "Details",
+    "tags": {
+      "title": "Tags",
+      "placeholder": "Kies een of meer tags",
+      "empty": "Geen tags gevonden. Maak een tag aan buiten dit menu."
+    },
+    "folder": {
+      "title": "Map",
+      "remove": "Verwijderen uit map \"{{name}}\"",
+      "placeholder": "Toevoegen aan map...",
+      "empty": "Je hebt nog geen mappen. Begin met typen om een nieuwe map voor dit bestand aan te maken.",
+      "create": "+ Map \"{{name}}\" aanmaken"
+    }
+  },
+  "actions": {
+    "editDetails": "Bestandsdetails bewerken",
+    "delete": "Bestand verwijderen",
+    "favorite": "Bestand toevoegen aan favorieten",
+    "unfavorite": "Bestand verwijderen uit favorieten",
+    "viewInNewTab": "Bestand bekijken in nieuw tabblad",
+    "openInNewTab": "Openen in nieuw tabblad",
+    "copyRawLink": "Link naar onbewerkt bestand kopiëren",
+    "copyLink": "Bestandslink kopiëren",
+    "download": "Bestand downloaden",
+    "showDetails": "Details tonen",
+    "hideDetails": "Details verbergen",
+    "previous": "Vorig bestand",
+    "next": "Volgend bestand"
+  },
+  "edit": {
+    "title": "\"{{name}}\" bewerken",
+    "name": {
+      "label": "Naam",
+      "description": "Wijzig de naam van het bestand."
+    },
+    "maxViews": {
+      "label": "Maximaal aantal weergaven",
+      "placeholder": "Onbeperkt",
+      "description": "Het maximale aantal weergaven voordat dit bestand wordt verwijderd. Laat dit leeg voor een onbeperkt aantal weergaven."
+    },
+    "originalName": {
+      "label": "Oorspronkelijke naam",
+      "description": "Voeg een oorspronkelijke naam toe. Als deze optie is geselecteerd, krijgt het bestand bij het downloaden deze naam in plaats van de gegenereerde bestandsnaam."
+    },
+    "type": {
+      "label": "Type",
+      "description": "Wijzig het MIME-type van een bestand. <b>WIJZIG DEZE WAARDE NIET</b> tenzij je weet wat je doet. Dit kan beïnvloeden hoe Zipline bepaalde bestandstypen weergeeft."
+    },
+    "password": {
+      "label": "Wachtwoord",
+      "description": "Stel een wachtwoord in voor dit bestand. Laat dit leeg om wachtwoordbeveiliging uit te schakelen."
+    },
+    "removePassword": "Wachtwoord verwijderen",
+    "save": "Wijzigingen opslaan"
+  },
+  "preview": {
+    "clickToView": "Klik om bestand {{name}} te bekijken",
+    "clickToViewProtected": "Klik om het beveiligde bestand {{name}} te bekijken",
+    "clickToPlayVideo": "Klik om video {{name}} af te spelen",
+    "clickToPlayAudio": "Klik om audio {{name}} af te spelen",
+    "clickToViewText": "Klik om tekst {{name}} te bekijken",
+    "clickToDownloadCast": "Klik om asciinema-opname {{name}} te downloaden",
+    "clickToViewPdf": "Klik om PDF {{name}} te bekijken",
+    "clickToViewInNewTab": "Klik om bestand {{name}} in een nieuw tabblad te bekijken",
+    "videoThumbnailAlt": "Videominiatuur",
+    "imageAlt": "Afbeelding",
+    "loading": "Bestand laden...",
+    "tooBig": "\n...\nHet bestand is te groot om weer te geven. Klik op het downloadpictogram om het te bekijken/downloaden.",
+    "loadError": "Fout bij het laden van het bestand."
+  },
+  "render": {
+    "renderedThrough": "Dit bestand wordt weergegeven via {{renderer}}",
+    "canRenderThrough": "Dit bestand kan worden weergegeven via {{renderer}}",
+    "showRendered": "Weergegeven versie tonen",
+    "hideRendered": "Weergegeven versie verbergen",
+    "katexError": "KaTeX-fout",
+    "showLess": "Minder tonen",
+    "showMore": "Meer tonen (nog {{count}} regels)"
+  }
+}

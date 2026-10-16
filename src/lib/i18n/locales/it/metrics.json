@@ -1,0 +1,61 @@
+{
+  "title": "Metriche",
+  "range": {
+    "change": "Cambia intervallo di date",
+    "modalTitle": "Cambia intervallo",
+    "fromTo": "Da {{from}} a {{to}}",
+    "presets": {
+      "lastTwoDays": "Ultimi due giorni",
+      "last7Days": "Ultimi 7 giorni",
+      "thisMonth": "Questo mese",
+      "lastMonth": "Mese scorso",
+      "thisYear": "Quest'anno",
+      "lastYear": "Anno scorso"
+    }
+  },
+  "allTime": {
+    "label": "Tutto il Tempo",
+    "show": "Mostra Tutto il Tempo",
+    "slowWarning": "Questo potrebbe richiedere più tempo del solito per caricarsi.",
+    "viewing": "Stai visualizzando le statistiche di tutto il tempo."
+  },
+  "loadFailed": "Impossibile caricare le statistiche per questo intervallo di tempo. Potrebbe non esserci alcun dato disponibile nell'intervallo di tempo specificato. :(",
+  "cards": {
+    "files": "File",
+    "urls": "URL",
+    "storageUsed": "Memoria Utilizzata",
+    "users": "Utenti",
+    "fileViews": "Visualizzazioni File",
+    "urlViews": "Visualizzazioni URL"
+  },
+  "tables": {
+    "columns": {
+      "user": "Utente",
+      "files": "File",
+      "storageUsed": "Memoria Utilizzata",
+      "views": "Visualizzazioni",
+      "urls": "URL",
+      "type": "Tipo"
+    },
+    "unknownUser": "[sconosciuto]"
+  },
+  "graphs": {
+    "count": {
+      "title": "Numero"
+    },
+    "views": {
+      "title": "Visualizzazioni",
+      "value_one": "{{count}} visualizzazione",
+      "value_many": "{{count}} visualizzazioni",
+      "value_other": "{{count}} visualizzazioni"
+    },
+    "storage": {
+      "title": "Memoria Utilizzata"
+    },
+    "series": {
+      "files": "File",
+      "urls": "URL",
+      "storageUsed": "Memoria Utilizzata"
+    }
+  }
+}

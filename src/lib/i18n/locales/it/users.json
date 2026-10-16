@@ -1,0 +1,124 @@
+{
+  "form": {
+    "username": {
+      "label": "Nome Utente",
+      "required": "Il nome utente è richiesto",
+      "placeholder": "Inserisci un nome utente..."
+    },
+    "password": {
+      "label": "Password",
+      "required": "La password è richiesta",
+      "placeholder": "Inserisci una password..."
+    },
+    "avatar": {
+      "label": "Avatar",
+      "placeholder": "Seleziona un avatar...",
+      "clear": "Rimuovi avatar",
+      "invalidType": "Tipo di file non valido",
+      "readFailed": "Impossibile leggere il file dell'avatar"
+    },
+    "role": {
+      "label": "Ruolo"
+    }
+  },
+  "table": {
+    "columns": {
+      "actions": "Azioni",
+      "created": "Creato",
+      "avatar": "Avatar",
+      "username": "Nome Utente",
+      "role": "Ruolo",
+      "updated": "Ultimo aggiornamento"
+    },
+    "viewFiles": "Visualizza i file dell'utente",
+    "edit": "Modifica utente",
+    "delete": "Elimina utente"
+  },
+  "card": {
+    "created": "Creato:",
+    "updated": "Aggiornato:",
+    "id": "Id:",
+    "role": "Ruolo:"
+  },
+  "title": "Utenti",
+  "roles": {
+    "user": "Utente",
+    "administrator": "Admin",
+    "admin": "Admin",
+    "superAdmin": "Super Admin"
+  },
+  "create": {
+    "title": "Crea un nuovo utente"
+  },
+  "edit": {
+    "title": "Modifica {{username}}",
+    "description": "Qualsiasi campo lasciato vuoto verrà ignorato e non aggiornato.",
+    "submit": "Aggiorna utente",
+    "quota": {
+      "title": "Quota",
+      "invalidValue": "Valore non valido",
+      "invalidByteFormat": "Formato byte non valido",
+      "fileType": {
+        "label": "Tipo di quota dei file",
+        "description": "Se impostare una quota sui file in base al totale dei byte o al numero totale di file.",
+        "byBytes": "In base ai byte",
+        "byFiles": "In base al numero di file",
+        "none": "Nessuna quota sui file"
+      },
+      "maxFiles": {
+        "label": "File Massimi",
+        "description": "Il numero massimo di file che l'utente può caricare.",
+        "placeholder": "Inserisci un numero..."
+      },
+      "maxBytes": {
+        "label": "Byte Massimi",
+        "description": "Il numero massimo di byte che l'utente può caricare.",
+        "placeholder": "Inserisci un formato byte leggibile..."
+      },
+      "maxUrls": {
+        "label": "URL Massimi",
+        "description": "Il numero massimo di URL che l'utente può creare. Lascia 0 per illimitati.",
+        "placeholder": "Inserisci un numero..."
+      }
+    }
+  },
+  "delete": {
+    "title": "Elimina {{username}}?",
+    "message": "Sei sicuro di voler eliminare {{username}}? Questa azione non può essere annullata.",
+    "data": {
+      "title": "Elimina i dati di {{username}}?",
+      "message": "Vuoi eliminare i file e gli URL di {{username}}? Questa azione non può essere annullata.",
+      "cancel": "No, mantieni tutto e elimina solo l'utente",
+      "confirm": "Sì, elimina tutto"
+    }
+  },
+  "notifications": {
+    "createFailed": "Impossibile creare l'utente",
+    "created": {
+      "title": "Utente creato",
+      "message": "L'utente {{username}} è stato creato"
+    },
+    "editFailed": "Impossibile modificare l'utente",
+    "edited": {
+      "title": "Utente modificato",
+      "message": "L'utente {{username}} è stato modificato"
+    },
+    "deleteFailed": "Impossibile eliminare l'utente",
+    "deleted": {
+      "title": "Utente eliminato",
+      "message": "L'utente {{username}} è stato eliminato"
+    }
+  },
+  "grid": {
+    "empty": {
+      "title": "Nessun utente trovato",
+      "description": "Crea un utente per vederlo qui"
+    }
+  },
+  "viewFiles": {
+    "title": "File di {{username}}",
+    "back": "Torna agli utenti",
+    "tableOptions": "Opzioni tabella",
+    "searchById": "Cerca per ID"
+  }
+}
