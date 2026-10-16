@@ -1,0 +1,60 @@
+{
+  "title": "Statistieken",
+  "range": {
+    "change": "Datumbereik wijzigen",
+    "modalTitle": "Bereik wijzigen",
+    "fromTo": "{{from}} tot {{to}}",
+    "presets": {
+      "lastTwoDays": "Afgelopen twee dagen",
+      "last7Days": "Afgelopen 7 dagen",
+      "thisMonth": "Deze maand",
+      "lastMonth": "Vorige maand",
+      "thisYear": "Dit jaar",
+      "lastYear": "Vorig jaar"
+    }
+  },
+  "allTime": {
+    "slowWarning": "Het laden kan langer duren dan normaal.",
+    "label": "Gehele periode",
+    "show": "Gehele periode tonen",
+    "viewing": "Je bekijkt statistieken over de gehele periode."
+  },
+  "cards": {
+    "urls": "URL’s",
+    "files": "Bestanden",
+    "users": "Gebruikers",
+    "storageUsed": "Gebruikte opslagruimte",
+    "fileViews": "Bestandsweergaven",
+    "urlViews": "URL-weergaven"
+  },
+  "loadFailed": "Statistieken voor deze periode laden mislukt. Mogelijk zijn er geen gegevens beschikbaar voor de opgegeven periode. :(",
+  "tables": {
+    "columns": {
+      "storageUsed": "Gebruikte opslagruimte",
+      "user": "Gebruiker",
+      "files": "Bestanden",
+      "views": "Weergaven",
+      "urls": "URL’s",
+      "type": "Type"
+    },
+    "unknownUser": "[onbekend]"
+  },
+  "graphs": {
+    "count": {
+      "title": "Aantal"
+    },
+    "views": {
+      "title": "Weergaven",
+      "value_one": "{{count}} weergave",
+      "value_other": "{{count}} weergaven"
+    },
+    "storage": {
+      "title": "Gebruikte opslagruimte"
+    },
+    "series": {
+      "files": "Bestanden",
+      "urls": "URL’s",
+      "storageUsed": "Gebruikte opslagruimte"
+    }
+  }
+}

@@ -1,0 +1,180 @@
+{
+  "notifications": {
+    "deleted": {
+      "title": "File eliminato",
+      "message": "{{name}} è stato eliminato"
+    },
+    "favorited": {
+      "title": "File aggiunto ai preferiti",
+      "message": "{{name}} è stato aggiunto ai preferiti"
+    },
+    "unfavorited": {
+      "title": "File rimosso dai preferiti",
+      "message": "{{name}} è stato rimosso dai preferiti"
+    },
+    "createFolderError": {
+      "title": "Errore durante la creazione della cartella"
+    },
+    "folderCreated": {
+      "title": "Cartella creata",
+      "message": "{{folder}} è stata creata con il nome {{name}}"
+    },
+    "removeFromFolderError": {
+      "title": "Errore durante la rimozione dalla cartella"
+    },
+    "removedFromFolder": {
+      "title": "File rimosso dalla cartella",
+      "message": "{{name}} è stato rimosso da {{folder}}"
+    },
+    "addToFolderError": {
+      "title": "Errore durante l'aggiunta alla cartella"
+    },
+    "addedToFolder": {
+      "title": "File aggiunto alla cartella",
+      "message": "{{name}} è stato aggiunto a {{folder}}"
+    },
+    "addMultipleToFolderError": {
+      "title": "Errore durante l'aggiunta dei file alla cartella"
+    },
+    "addedMultipleToFolder": {
+      "title": "File aggiunti alla cartella",
+      "message": "{{count}} file sono stati aggiunti a {{folder}}"
+    },
+    "saveTagsError": {
+      "title": "Errore durante il salvataggio dei tag"
+    },
+    "tagsSaved": {
+      "title": "Tag salvati",
+      "message": "Salvati {{count}} tag per il file {{name}}"
+    },
+    "removePasswordError": {
+      "title": "Errore durante la rimozione della password..."
+    },
+    "passwordRemoved": {
+      "title": "Password rimossa!",
+      "message": "La password è stata rimossa dal file."
+    },
+    "saveChangesError": {
+      "title": "Errore durante il salvataggio delle modifiche..."
+    },
+    "changesSaved": {
+      "title": "Modifiche salvate!",
+      "message": "Le modifiche al file sono state salvate."
+    }
+  },
+  "delete": {
+    "confirm": "Elimina {{name}}",
+    "message": "Procedere con l'eliminazione di {{name}}? Questa azione non può essere annullata."
+  },
+  "contextMenu": {
+    "openInNewTab": "Apri in una nuova scheda",
+    "copyLink": "Copia link",
+    "copyRawLink": "Copia link diretto",
+    "favorite": "Aggiungi ai preferiti",
+    "unfavorite": "Rimuovi dai preferiti",
+    "removeFromFolder": "Rimuovi dalla cartella",
+    "moveToFolder": "Sposta nella cartella",
+    "searchFolders": "Cerca cartelle...",
+    "createNamedFolder": "+ Crea \"{{name}}\"",
+    "noFolders": "Ancora nessuna cartella",
+    "createNewFolder": "+ Crea nuova cartella",
+    "editDetails": "Modifica dettagli"
+  },
+  "createFolderModal": {
+    "title": "Crea cartella",
+    "name": {
+      "label": "Nome cartella",
+      "placeholder": "La mia cartella"
+    }
+  },
+  "stats": {
+    "type": "Tipo",
+    "size": "Dimensione",
+    "createdAt": "Creato il",
+    "updatedAt": "Aggiornato il",
+    "deletesAt": "Eliminato il",
+    "views": "Visualizzazioni",
+    "originalName": "Nome originale",
+    "anonymous": "Anonimo"
+  },
+  "details": {
+    "title": "Dettagli",
+    "tags": {
+      "title": "Tags",
+      "placeholder": "Seleziona uno o più tag",
+      "empty": "Nessun tag trovato, creane uno al di fuori di questo menù."
+    },
+    "folder": {
+      "title": "Cartella",
+      "remove": "Rimuovi dalla cartella \"{{name}}\"",
+      "placeholder": "Aggiungi alla cartella...",
+      "empty": "Non hai cartelle. Inizia a scrivere per creare una nuova cartella per questo file.",
+      "create": "+ Crea cartella \"{{name}}\""
+    }
+  },
+  "actions": {
+    "editDetails": "Modifica i dettagli del file",
+    "delete": "Elimina file",
+    "favorite": "Aggiungi file ai preferiti",
+    "unfavorite": "Rimuovi file dai preferiti",
+    "viewInNewTab": "Visualizza il file in una nuova scheda",
+    "openInNewTab": "Apri in una nuova scheda",
+    "copyRawLink": "Copia link diretto del file",
+    "copyLink": "Copia link del file",
+    "download": "Scarica file",
+    "showDetails": "Mostra dettagli",
+    "hideDetails": "Nascondi dettagli",
+    "previous": "File precedente",
+    "next": "File successivo"
+  },
+  "edit": {
+    "title": "Modifica \"{{name}}\"",
+    "name": {
+      "label": "Nome",
+      "description": "Rinomina il file."
+    },
+    "maxViews": {
+      "label": "Visualizzazioni massime",
+      "placeholder": "Illimitate",
+      "description": "Il numero massimo di visualizzazioni che questo file può avere prima di essere eliminato. Lascia vuoto per consentire quante visualizzazioni desideri."
+    },
+    "originalName": {
+      "label": "Nome originale",
+      "description": "Aggiungi un nome originale. Quando scarichi questo file, invece di utilizzare il nome del file generato (se scelto), verrà scaricato con questo \"nome originale\"."
+    },
+    "type": {
+      "label": "Tipo",
+      "description": "Modifica il mimetype di un file. <b>NON MODIFICARE QUESTO VALORE</b> a meno che tu non sappia cosa stai facendo, questo può compromettere il modo in cui Zipline rende tipi di file specifici."
+    },
+    "password": {
+      "label": "Password",
+      "description": "Imposta una password per questo file. Lascia vuoto per disabilitare la protezione tramite password."
+    },
+    "removePassword": "Rimuovi password",
+    "save": "Salva le modifiche"
+  },
+  "preview": {
+    "clickToView": "Clicca per visualizzare il file {{name}}",
+    "clickToViewProtected": "Clicca per visualizzare il file protetto {{name}}",
+    "clickToPlayVideo": "Clicca per riprodurre il video {{name}}",
+    "clickToPlayAudio": "Clicca per riprodurre l'audio {{name}}",
+    "clickToViewText": "Clicca per visualizzare il testo {{name}}",
+    "clickToDownloadCast": "Clicca per scaricare la registrazione asciinema {{name}}",
+    "clickToViewPdf": "Clicca per visualizzare il PDF {{name}}",
+    "clickToViewInNewTab": "Clicca per visualizzare il file {{name}} in una nuova scheda",
+    "videoThumbnailAlt": "Miniatura del video",
+    "imageAlt": "Immagine",
+    "loading": "Caricamento del file...",
+    "loadError": "Errore durante il caricamento del file.",
+    "tooBig": "\n...\nIl file è troppo grande per essere visualizzato, clicca sull'icona di download per visualizzarlo/scaricarlo."
+  },
+  "render": {
+    "renderedThrough": "Questo file è reso tramite {{renderer}}",
+    "canRenderThrough": "Questo file può essere reso tramite {{renderer}}",
+    "showRendered": "Mostra versione resa",
+    "hideRendered": "Nascondi versione resa",
+    "katexError": "Errore KaTeX",
+    "showLess": "Mostra meno",
+    "showMore": "Mostra altro (altre {{count}} righe)"
+  }
+}

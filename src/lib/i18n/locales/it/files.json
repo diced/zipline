@@ -1,0 +1,201 @@
+{
+  "page": {
+    "title": "File",
+    "uploadTooltip": "Carica un file",
+    "moreActions": "Altre azioni",
+    "menu": {
+      "manageTags": "Gestisci tag",
+      "viewPending": "Visualizza file in sospeso",
+      "tableOptions": "Opzioni tabella",
+      "searchById": "Cerca per ID"
+    }
+  },
+  "fields": {
+    "name": "Nome",
+    "originalName": "Nome Originale",
+    "tags": "Tags",
+    "type": "Tipo",
+    "size": "Dimensione",
+    "createdAt": "Creato il",
+    "favorite": "Preferito",
+    "views": "Visualizzazioni",
+    "anonymous": "Anonimo?"
+  },
+  "tableOptions": {
+    "title": "Opzioni tabella",
+    "description": "Seleziona e trascina i campi qui sotto per farli apparire/scomparire/riordinare nella visualizzazione della tabella dei file.",
+    "reset": "Ripristina predefiniti"
+  },
+  "pending": {
+    "title": "File in sospeso",
+    "clearCompleted": "Cancella completati",
+    "chunks": "{{complete}}/{{total}} pezzi",
+    "clearEntry": "Cancella voce",
+    "clearEntryLabel": "Cancella {{name}}",
+    "empty": "Nessun file in sospeso",
+    "status": {
+      "pending": "In sospeso",
+      "processing": "In elaborazione",
+      "complete": "Completato",
+      "failed": "Fallito"
+    },
+    "notifications": {
+      "clearedOne": "File in sospeso cancellato!",
+      "clearedCompleted": "File completati cancellati!",
+      "clearOneFailed": "Impossibile cancellare il file in sospeso: {{error}}",
+      "clearCompletedFailed": "Impossibile cancellare i file completati: {{error}}",
+      "unknownError": "Errore sconosciuto"
+    },
+    "count_one": "{{count}} file",
+    "count_many": "{{count}} file",
+    "count_other": "{{count}} file"
+  },
+  "bulk": {
+    "delete": {
+      "loadingTitle": "Eliminazione file",
+      "errorTitle": "Errore durante l'eliminazione dei file",
+      "successTitle": "File eliminati",
+      "title_one": "Eliminare {{count}} file?",
+      "title_many": "Eliminare {{count}} file?",
+      "title_other": "Eliminare {{count}} file?",
+      "loadingMessage_one": "Eliminazione di {{count}} file",
+      "loadingMessage_many": "Eliminazione di {{count}} file",
+      "loadingMessage_other": "Eliminazione di {{count}} file",
+      "message_one": "Stai per eliminare {{count}} file. Questa azione non può essere annullata.",
+      "message_many": "Stai per eliminare {{count}} file. Questa azione non può essere annullata.",
+      "message_other": "Stai per eliminare {{count}} file. Questa azione non può essere annullata.",
+      "successMessage_one": "Eliminato {{count}} file",
+      "successMessage_many": "Eliminati {{count}} file",
+      "successMessage_other": "Eliminati {{count}} file"
+    },
+    "favorite": {
+      "confirm": "Aggiungi ai preferiti",
+      "loadingTitle": "Aggiunta ai preferiti dei file",
+      "successTitle": "File aggiunti ai preferiti",
+      "loadingMessage_one": "Aggiunta ai preferiti di {{count}} file",
+      "loadingMessage_many": "Aggiunta ai preferiti di {{count}} file",
+      "loadingMessage_other": "Aggiunta ai preferiti di {{count}} file",
+      "title_one": "Aggiungere ai preferiti {{count}} file?",
+      "title_many": "Aggiungere ai preferiti {{count}} file?",
+      "title_other": "Aggiungere ai preferiti {{count}} file?",
+      "message_one": "Stai per aggiungere ai preferiti {{count}} file.",
+      "message_many": "Stai per aggiungere ai preferiti {{count}} file.",
+      "message_other": "Stai per aggiungere ai preferiti {{count}} file.",
+      "successMessage_one": "Aggiunto ai preferiti {{count}} file",
+      "successMessage_many": "Aggiunti ai preferiti {{count}} file",
+      "successMessage_other": "Aggiunti ai preferiti {{count}} file"
+    },
+    "unfavorite": {
+      "confirm": "Rimuovi dai preferiti",
+      "loadingTitle": "Rimozione dai preferiti dei file",
+      "successTitle": "File rimossi dai preferiti",
+      "message_one": "Stai per rimuovere dai preferiti {{count}} file.",
+      "message_many": "Stai per rimuovere dai preferiti {{count}} file.",
+      "message_other": "Stai per rimuovere dai preferiti {{count}} file.",
+      "title_one": "Rimuovere dai preferiti {{count}} file?",
+      "title_many": "Rimuovere dai preferiti {{count}} file?",
+      "title_other": "Rimuovere dai preferiti {{count}} file?",
+      "loadingMessage_one": "Rimozione dai preferiti di {{count}} file",
+      "loadingMessage_many": "Rimozione dai preferiti di {{count}} file",
+      "loadingMessage_other": "Rimozione dai preferiti di {{count}} file",
+      "successMessage_one": "Rimosso dai preferiti {{count}} file",
+      "successMessage_many": "Rimossi dai preferiti {{count}} file",
+      "successMessage_other": "Rimossi dai preferiti {{count}} file"
+    },
+    "modifyErrorTitle": "Errore durante la modifica dei file",
+    "copyLinks": {
+      "title": "Link copiati negli appunti",
+      "message_one": "Copiato {{count}} link negli appunti",
+      "message_many": "Copiati {{count}} link negli appunti",
+      "message_other": "Copiati {{count}} link negli appunti"
+    }
+  },
+  "tags": {
+    "title": "Tags",
+    "edit": "Modifica tag",
+    "delete": "Elimina tag",
+    "empty": "Nessun tag. Creane uno cliccando sull'icona più.",
+    "form": {
+      "name": {
+        "label": "Nome",
+        "placeholder": "Inserisci un nome...",
+        "required": "Il nome è richiesto"
+      },
+      "color": {
+        "label": "Colore",
+        "fromName": "Scegli un colore in base al nome",
+        "invalid": "Il colore deve iniziare con #"
+      }
+    },
+    "create": {
+      "title": "Crea nuovo tag",
+      "submit": "Crea tag"
+    },
+    "editModal": {
+      "title": "Modifica tag",
+      "submit": "Modifica tag"
+    },
+    "notifications": {
+      "createFailed": "Creazione del tag fallita",
+      "created": "Tag creato",
+      "createdMessage": "Tag {{name}} creato",
+      "editFailed": "Modifica del tag fallita",
+      "edited": "Tag modificato",
+      "editedMessage": "Tag {{name}} modificato",
+      "deleteFailed": "Eliminazione del tag fallita: {{error}}",
+      "deleted": "Tag eliminato",
+      "deletedMessage": "Tag {{name}} eliminato"
+    },
+    "fileCount_one": "{{count}} file",
+    "fileCount_many": "{{count}} file",
+    "fileCount_other": "{{count}} file"
+  },
+  "views": {
+    "favoriteFiles": "File preferiti",
+    "noFiles": "Nessun file trovato",
+    "uploadFile": "Carica un file",
+    "pagination": "{{from}} - {{to}} / {{total}} file"
+  },
+  "table": {
+    "columns": {
+      "name": "Nome",
+      "originalName": "Nome originale",
+      "tags": "Tags",
+      "type": "Tipo",
+      "size": "Dimensione",
+      "createdAt": "Creato il",
+      "favorite": "Preferito?",
+      "views": "Visualizzazioni",
+      "id": "Id",
+      "anonymous": "Anonimo?",
+      "actions": "Azioni"
+    },
+    "search": {
+      "name": "Cerca per nome",
+      "originalName": "Cerca per nome originale",
+      "type": "Cerca per tipo"
+    },
+    "searchById": "Cerca per ID",
+    "tagsPlaceholder": "Seleziona uno o più tag",
+    "selection": {
+      "delete": "Elimina file",
+      "favorite": "Aggiungi ai preferiti",
+      "unfavorite": "Rimuovi dai preferiti",
+      "copyLinks": "Copia link dei file",
+      "addToFolder": "Aggiungi alla cartella...",
+      "clear": "Cancella selezione",
+      "summary_one": "Le selezioni vengono salvate durante i cambi di pagina. Attualmente selezionato <b>{{count}}</b> file.",
+      "summary_many": "Le selezioni vengono salvate durante i cambi di pagina. Attualmente selezionati <b>{{count}}</b> file.",
+      "summary_other": "Le selezioni vengono salvate durante i cambi di pagina. Attualmente selezionati <b>{{count}}</b> file."
+    },
+    "noRecords": "Nessun file",
+    "recordsPerPage": "File per pagina",
+    "actions": {
+      "details": "Altri dettagli",
+      "view": "Visualizza il file in una nuova scheda",
+      "copy": "Copia il link del file negli appunti",
+      "download": "Scarica file",
+      "delete": "Elimina file"
+    }
+  }
+}

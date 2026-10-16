@@ -1,0 +1,46 @@
+{
+  "welcome": "Lieti di rivederti, <b>{{username}}</b>",
+  "filesUploaded": "Hai caricato <b>{{files}}</b> file.",
+  "quota": {
+    "bytes": "Hai usato <b>{{used}}</b> su <b>{{max}}</b> di memoria",
+    "files": "Hai caricato <b>{{files}}</b> file su <b>{{max}}</b> file consentiti.",
+    "urls": "Hai creato <b>{{urls}}</b> link su <b>{{max}}</b> link consentiti."
+  },
+  "recents": {
+    "title": "File recenti",
+    "viewAll": "Visualizza tutti i file",
+    "empty": "Non hai file recenti. Gli ultimi tre file che hai caricato appariranno qui."
+  },
+  "stats": {
+    "title": "Statistiche",
+    "viewMetrics": "Visualizza le metriche dell'istanza",
+    "description": "Queste statistiche si basano solo sui tuoi caricamenti.",
+    "filesUploaded": "File caricati",
+    "favoriteFiles": "File preferiti",
+    "storageUsed": "Memoria usata",
+    "avgStorageUsed": "Memoria media utilizzata",
+    "fileViews": "Visualizzazioni dei file",
+    "avgFileViews": "Visualizzazioni medie dei file",
+    "linksCreated": "Link creati",
+    "linkViews": "Visualizzazioni totali dei link"
+  },
+  "fileTypes": {
+    "title": "Tipi di file",
+    "columns": {
+      "type": "Tipo di file",
+      "count": "Numero"
+    }
+  },
+  "activity": {
+    "title": "Attività",
+    "description": "I tuoi caricamenti e accessi negli ultimi",
+    "uploads": "Caricamenti",
+    "logins": "Accessi",
+    "empty": "Nessun caricamento o accesso in questo periodo",
+    "today": "Oggi",
+    "yesterday": "Ieri",
+    "range_one": "{{count}} giorno",
+    "range_many": "{{count}} giorni",
+    "range_other": "{{count}} giorni"
+  }
+}

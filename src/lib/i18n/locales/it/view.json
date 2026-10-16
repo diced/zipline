@@ -1,0 +1,36 @@
+{
+  "password": {
+    "title": "La password è richiesta",
+    "invalid": "Password non valida",
+    "verify": "Verifica",
+    "fileDescription": "Questo file è protetto da password, inserisci la password per visualizzarlo",
+    "urlDescription": "Questo link è protetto da password, inserisci la password per visualizzarlo"
+  },
+  "file": {
+    "pageTitle": "Visualizza File",
+    "viewFolder": "Visualizza cartella",
+    "viewRaw": "Visualizza file diretto",
+    "download": "Scarica file"
+  },
+  "url": {
+    "redirecting": "Reindirizzamento a <anchor>{{destination}}</anchor>"
+  },
+  "folder": {
+    "pageTitle": "Cartella",
+    "subfolders": "Sottocartelle",
+    "files": "File",
+    "empty": "Questa cartella è vuota.",
+    "card": {
+      "files": "{{amount}} file",
+      "subfolders": "{{amount}} sottocartelle"
+    },
+    "pagination": "{{from}} - {{to}} / {{total}} file"
+  },
+  "folderUpload": {
+    "pageTitle": "Carica in {{name}}",
+    "pageTitleFallback": "Carica nella cartella",
+    "title": "Carica file in {{name}}",
+    "public": "Questa cartella è <anchor>pubblica</anchor>. Chiunque abbia il link può visualizzarne il contenuto e caricare file.",
+    "private": "Solo chi possiede la cartella può visualizzarne il contenuto. Tuttavia, chiunque può caricare file e può comunque accedere ai file caricati se ha il link al file specifico."
+  }
+}

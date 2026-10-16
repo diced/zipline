@@ -1,0 +1,34 @@
+{
+  "actions": {
+    "cancel": "Annuleren",
+    "save": "Opslaan",
+    "delete": "Verwijderen",
+    "close": "Sluiten",
+    "yes": "Ja",
+    "no": "Nee",
+    "edit": "Bewerken",
+    "create": "Aanmaken",
+    "copy": "Kopiëren",
+    "remove": "Verwijderen",
+    "download": "Downloaden",
+    "upload": "Uploaden",
+    "refresh": "Verversen",
+    "open": "Openen",
+    "continue": "Doorgaan",
+    "ok": "OK"
+  },
+  "status": {
+    "loading": "Laden...",
+    "error": "Fout",
+    "enabled": "Ingeschakeld"
+  },
+  "warning": {
+    "title": "Weet je het zeker?"
+  },
+  "language": {
+    "label": "Taal"
+  },
+  "table": {
+    "noRecords": "Geen gegevens"
+  }
+}

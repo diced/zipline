@@ -1,0 +1,132 @@
+{
+  "notifications": {
+    "passwordRemoved": {
+      "title": "Password rimossa!",
+      "message": "La password è stata rimossa dall'URL."
+    },
+    "shortenFailed": {
+      "title": "Impossibile accorciare l'URL"
+    },
+    "copied": {
+      "title": "URL copiato negli appunti"
+    },
+    "deleteFailed": {
+      "title": "Impossibile eliminare l'URL"
+    },
+    "deleted": {
+      "title": "URL eliminato",
+      "message": "L'URL {{code}} è stato eliminato"
+    },
+    "removePasswordFailed": {
+      "title": "Impossibile rimuovere la password..."
+    },
+    "saveFailed": {
+      "title": "Impossibile salvare le modifiche..."
+    },
+    "saved": {
+      "title": "Modifiche salvate!",
+      "message": "Le modifiche sono state salvate con successo."
+    }
+  },
+  "edit": {
+    "title": "Modifica \"{{name}}\"",
+    "maxViews": {
+      "label": "Visualizzazioni massime",
+      "placeholder": "Illimitate",
+      "description": "Il numero massimo di click che questo URL può avere prima di essere eliminato automaticamente. Lascia vuoto per consentire quante visualizzazioni desideri."
+    },
+    "password": {
+      "label": "Password",
+      "description": "Imposta una password per questo URL. Lascia vuoto per disabilitare la protezione tramite password.",
+      "remove": "Rimuovi la password"
+    },
+    "save": "Salva le modifiche",
+    "unknown": "sconosciuto",
+    "vanity": {
+      "label": "Vanità",
+      "placeholder": "Opzionale",
+      "description": "Un alias personalizzato per il tuo URL. Lascia vuoto per utilizzare il codice generato casualmente."
+    },
+    "destination": {
+      "label": "Destinazione"
+    },
+    "enabled": {
+      "label": "Abilitato",
+      "description": "Impedisci o consenti la visita di questo URL."
+    }
+  },
+  "table": {
+    "columns": {
+      "views": "Visualizzazioni",
+      "actions": "Azioni",
+      "created": "Creato",
+      "code": "Codice",
+      "vanity": "Vanità",
+      "destination": "Destinazione",
+      "maxViews": "Visualizzazioni massime",
+      "enabled": "Abilitato"
+    },
+    "search": {
+      "code": "Cerca per codice",
+      "vanity": "Cerca per vanità",
+      "destination": "Cerca per destinazione"
+    },
+    "copy": "Copia URL",
+    "showQrCode": "Mostra QR Code",
+    "edit": "Modifica URL",
+    "delete": "Elimina URL"
+  },
+  "card": {
+    "created": "Creato:",
+    "updated": "Aggiornato:",
+    "copyShortLink": "Copia link accorciato",
+    "copyDestination": "Copia destinazione",
+    "showQrCode": "Mostra QR Code",
+    "views": "Visualizzazioni:",
+    "enabled": "Abilitato:",
+    "destination": "Destinazione:",
+    "openDestination": "Apri \"{{url}}\" in una nuova scheda",
+    "code": "Codice:"
+  },
+  "title": "URL",
+  "create": {
+    "title": "Accorcia URL",
+    "url": {
+      "label": "URL",
+      "required": "L'URL è richiesto",
+      "invalid": "URL non valido"
+    },
+    "vanity": {
+      "label": "Vanità",
+      "description": "Campo opzionale, lascia vuoto per generare un codice casuale"
+    },
+    "maxViews": {
+      "label": "Visualizzazioni massime",
+      "description": "Campo opzionale, lascia vuoto per disabilitare il limite di visualizzazioni."
+    },
+    "domain": {
+      "label": "Sovrascrivi Dominio"
+    },
+    "enabled": {
+      "label": "Abilitato",
+      "description": "Consenti o impedisci la visita di questo URL"
+    },
+    "password": {
+      "label": "Password",
+      "description": "Proteggi il tuo link con una password"
+    }
+  },
+  "shortened": {
+    "title": "URL Accorciato",
+    "open": "Apri il link in una nuova scheda",
+    "copy": "Copia il link negli appunti"
+  },
+  "delete": {
+    "message": "Sei sicuro di voler eliminare {{code}}? Questa azione non può essere annullata.",
+    "confirm": "Elimina '{{code}}'"
+  },
+  "empty": {
+    "title": "Nessun URL trovato",
+    "description": "Accorcia un URL per vederlo qui"
+  }
+}

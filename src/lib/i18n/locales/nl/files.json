@@ -1,0 +1,185 @@
+{
+  "page": {
+    "title": "Bestanden",
+    "uploadTooltip": "Een bestand uploaden",
+    "moreActions": "Meer acties",
+    "menu": {
+      "manageTags": "Tags beheren",
+      "viewPending": "Bestanden in afwachting bekijken",
+      "tableOptions": "Tabelopties",
+      "searchById": "Zoeken op ID"
+    }
+  },
+  "fields": {
+    "name": "Naam",
+    "originalName": "Oorspronkelijke naam",
+    "tags": "Tags",
+    "type": "Type",
+    "size": "Grootte",
+    "createdAt": "Aangemaakt op",
+    "favorite": "Favoriet",
+    "views": "Weergaven",
+    "anonymous": "Anoniem?"
+  },
+  "tableOptions": {
+    "title": "Tabelopties",
+    "description": "Selecteer en versleep de onderstaande velden om ze in de bestandstabel te tonen, te verbergen of te verplaatsen.",
+    "reset": "Standaardinstellingen herstellen"
+  },
+  "pending": {
+    "title": "Bestanden in afwachting",
+    "count_one": "{{count}} bestand",
+    "count_other": "{{count}} bestanden",
+    "clearCompleted": "Voltooide items wissen",
+    "chunks": "{{complete}}/{{total}} delen",
+    "clearEntry": "Item wissen",
+    "clearEntryLabel": "{{name}} wissen",
+    "empty": "Geen bestanden in afwachting",
+    "status": {
+      "pending": "In afwachting",
+      "processing": "Bezig met verwerken",
+      "complete": "Voltooid",
+      "failed": "Mislukt"
+    },
+    "notifications": {
+      "clearedOne": "Bestand in afwachting gewist!",
+      "clearedCompleted": "Voltooide bestanden gewist!",
+      "clearOneFailed": "Bestand in afwachting wissen mislukt: {{error}}",
+      "clearCompletedFailed": "Voltooide bestanden wissen mislukt: {{error}}",
+      "unknownError": "Onbekende fout"
+    }
+  },
+  "bulk": {
+    "delete": {
+      "title_one": "{{count}} bestand verwijderen?",
+      "title_other": "{{count}} bestanden verwijderen?",
+      "message_one": "Je staat op het punt {{count}} bestand te verwijderen. Dit kan niet ongedaan worden gemaakt.",
+      "message_other": "Je staat op het punt {{count}} bestanden te verwijderen. Dit kan niet ongedaan worden gemaakt.",
+      "loadingTitle": "Bestanden verwijderen",
+      "loadingMessage_one": "{{count}} bestand verwijderen",
+      "loadingMessage_other": "{{count}} bestanden verwijderen",
+      "errorTitle": "Fout bij het verwijderen van bestanden",
+      "successTitle": "Bestanden verwijderd",
+      "successMessage_one": "{{count}} bestand verwijderd",
+      "successMessage_other": "{{count}} bestanden verwijderd"
+    },
+    "favorite": {
+      "title_one": "{{count}} bestand toevoegen aan favorieten?",
+      "title_other": "{{count}} bestanden toevoegen aan favorieten?",
+      "message_one": "Je staat op het punt {{count}} bestand toe te voegen aan favorieten.",
+      "message_other": "Je staat op het punt {{count}} bestanden toe te voegen aan favorieten.",
+      "confirm": "Toevoegen aan favorieten",
+      "loadingTitle": "Bestanden toevoegen aan favorieten",
+      "loadingMessage_one": "{{count}} bestand toevoegen aan favorieten",
+      "loadingMessage_other": "{{count}} bestanden toevoegen aan favorieten",
+      "successTitle": "Bestanden toegevoegd aan favorieten",
+      "successMessage_one": "{{count}} bestand toegevoegd aan favorieten",
+      "successMessage_other": "{{count}} bestanden toegevoegd aan favorieten"
+    },
+    "unfavorite": {
+      "title_one": "{{count}} bestand verwijderen uit favorieten?",
+      "title_other": "{{count}} bestanden verwijderen uit favorieten?",
+      "message_one": "Je staat op het punt {{count}} bestand uit favorieten te verwijderen.",
+      "message_other": "Je staat op het punt {{count}} bestanden uit favorieten te verwijderen.",
+      "confirm": "Verwijderen uit favorieten",
+      "loadingTitle": "Bestanden verwijderen uit favorieten",
+      "loadingMessage_one": "{{count}} bestand verwijderen uit favorieten",
+      "loadingMessage_other": "{{count}} bestanden verwijderen uit favorieten",
+      "successTitle": "Bestanden verwijderd uit favorieten",
+      "successMessage_one": "{{count}} bestand verwijderd uit favorieten",
+      "successMessage_other": "{{count}} bestanden verwijderd uit favorieten"
+    },
+    "modifyErrorTitle": "Fout bij het wijzigen van bestanden",
+    "copyLinks": {
+      "title": "Links naar klembord gekopieerd",
+      "message_one": "{{count}} link naar klembord gekopieerd",
+      "message_other": "{{count}} links naar klembord gekopieerd"
+    }
+  },
+  "tags": {
+    "title": "Tags",
+    "fileCount_one": "{{count}} bestand",
+    "fileCount_other": "{{count}} bestanden",
+    "edit": "Tag bewerken",
+    "delete": "Tag verwijderen",
+    "empty": "Geen tags. Maak er een aan door op het pluspictogram te klikken.",
+    "form": {
+      "name": {
+        "label": "Naam",
+        "placeholder": "Voer een naam in...",
+        "required": "Naam is verplicht"
+      },
+      "color": {
+        "label": "Kleur",
+        "fromName": "Kies een kleur op basis van de naam",
+        "invalid": "Kleur moet beginnen met #"
+      }
+    },
+    "create": {
+      "title": "Nieuwe tag aanmaken",
+      "submit": "Tag aanmaken"
+    },
+    "editModal": {
+      "title": "Tag bewerken",
+      "submit": "Tag bewerken"
+    },
+    "notifications": {
+      "createFailed": "Tag aanmaken mislukt",
+      "created": "Tag aangemaakt",
+      "createdMessage": "Tag {{name}} aangemaakt",
+      "editFailed": "Tag bewerken mislukt",
+      "edited": "Tag bewerkt",
+      "editedMessage": "Tag {{name}} bewerkt",
+      "deleteFailed": "Tag verwijderen mislukt: {{error}}",
+      "deleted": "Tag verwijderd",
+      "deletedMessage": "Tag {{name}} verwijderd"
+    }
+  },
+  "views": {
+    "favoriteFiles": "Favoriete bestanden",
+    "noFiles": "Geen bestanden gevonden",
+    "uploadFile": "Een bestand uploaden",
+    "pagination": "{{from}} - {{to}} / {{total}} bestanden"
+  },
+  "table": {
+    "columns": {
+      "name": "Naam",
+      "originalName": "Oorspronkelijke naam",
+      "tags": "Tags",
+      "type": "Type",
+      "size": "Grootte",
+      "createdAt": "Aangemaakt op",
+      "favorite": "Favoriet?",
+      "views": "Weergaven",
+      "id": "Id",
+      "anonymous": "Anoniem?",
+      "actions": "Acties"
+    },
+    "search": {
+      "name": "Zoeken op naam",
+      "originalName": "Zoeken op oorspronkelijke naam",
+      "type": "Zoeken op type"
+    },
+    "searchById": "Zoeken op ID",
+    "tagsPlaceholder": "Kies een of meer tags",
+    "selection": {
+      "summary_one": "Selecties blijven behouden bij het wisselen van pagina. Momenteel is <b>{{count}}</b> bestand geselecteerd.",
+      "summary_other": "Selecties blijven behouden bij het wisselen van pagina. Momenteel zijn <b>{{count}}</b> bestanden geselecteerd.",
+      "delete": "Bestanden verwijderen",
+      "favorite": "Bestanden toevoegen aan favorieten",
+      "unfavorite": "Bestanden verwijderen uit favorieten",
+      "copyLinks": "Bestandslinks kopiëren",
+      "addToFolder": "Toevoegen aan map...",
+      "clear": "Selectie wissen"
+    },
+    "noRecords": "Geen bestanden",
+    "recordsPerPage": "Items per pagina",
+    "actions": {
+      "details": "Meer details",
+      "view": "Bestand bekijken in nieuw tabblad",
+      "copy": "Bestandslink naar klembord kopiëren",
+      "download": "Bestand downloaden",
+      "delete": "Bestand verwijderen"
+    }
+  }
+}

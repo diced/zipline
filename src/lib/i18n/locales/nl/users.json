@@ -1,0 +1,16 @@
+{
+  "form": {
+    "username": {
+      "placeholder": "Voer een gebruikersnaam in...",
+      "required": "Gebruikersnaam is vereist"
+    },
+    "password": {
+      "label": "Wachtwoord",
+      "placeholder": "Voer een wachtwoord in...",
+      "required": "Wachtwoord is verplicht"
+    },
+    "avatar": {
+      "label": "Avatar"
+    }
+  }
+}

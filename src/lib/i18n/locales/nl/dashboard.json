@@ -1,0 +1,45 @@
+{
+  "welcome": "Welkom terug, <b>{{username}}</b>",
+  "filesUploaded": "Je hebt <b>{{files}}</b> bestanden geüpload.",
+  "quota": {
+    "bytes": "Je hebt <b>{{used}}</b> van de <b>{{max}}</b> opslagruimte gebruikt",
+    "files": "Je hebt <b>{{files}}</b> van de maximaal <b>{{max}}</b> toegestane bestanden geüpload.",
+    "urls": "Je hebt <b>{{urls}}</b> van de maximaal <b>{{max}}</b> toegestane links aangemaakt."
+  },
+  "recents": {
+    "title": "Recente bestanden",
+    "viewAll": "Bekijk alle bestanden",
+    "empty": "Je hebt geen recente bestanden. De laatste drie bestanden die je hebt geüpload, worden hier weergegeven."
+  },
+  "stats": {
+    "title": "Statistieken",
+    "viewMetrics": "Instantiestatistieken bekijken",
+    "description": "Deze statistieken zijn alleen gebaseerd op je eigen uploads.",
+    "filesUploaded": "Bestanden geüpload",
+    "favoriteFiles": "Favoriete bestanden",
+    "storageUsed": "Gebruikte opslagruimte",
+    "avgStorageUsed": "Gemiddeld gebruikte opslagruimte",
+    "fileViews": "Bestandsweergaven",
+    "avgFileViews": "Gemiddeld aantal bestandsweergaven",
+    "linksCreated": "Links aangemaakt",
+    "linkViews": "Totaal aantal linkweergaven"
+  },
+  "fileTypes": {
+    "title": "Bestandstypen",
+    "columns": {
+      "type": "Bestandstype",
+      "count": "Aantal"
+    }
+  },
+  "activity": {
+    "title": "Activiteit",
+    "description": "Je uploads en aanmeldingen van de afgelopen",
+    "range_one": "{{count}} dag",
+    "range_other": "{{count}} dagen",
+    "uploads": "Uploads",
+    "today": "Vandaag",
+    "yesterday": "Gisteren",
+    "empty": "Nog geen uploads of aanmeldingen in deze periode",
+    "logins": "Aanmeldingen"
+  }
+}

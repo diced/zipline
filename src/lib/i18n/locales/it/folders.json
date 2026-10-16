@@ -1,0 +1,139 @@
+{
+  "table": {
+    "columns": {
+      "name": "Nome",
+      "actions": "Azioni",
+      "public": "Pubblica",
+      "uploads": "Caricamenti?",
+      "created": "Creato",
+      "updated": "Aggiornata il"
+    },
+    "noRecords": "Nessuna sottocartella",
+    "copyLink": "Copia link della cartella",
+    "delete": "Elimina cartella",
+    "subfolders_one": "{{count}} sottocartella",
+    "subfolders_many": "{{count}} sottocartelle",
+    "subfolders_other": "{{count}} sottocartelle"
+  },
+  "page": {
+    "title": "Cartelle",
+    "titleWithFolder": "Cartelle {{separator}} {{name}}",
+    "createFolder": "Crea Cartella",
+    "createSubfolder": "Crea Sottocartella",
+    "folderFiles": "File di {{name}}",
+    "folderFilesWithCount": "File di {{name}} ({{files}})"
+  },
+  "create": {
+    "title": "Crea una cartella",
+    "titleSubfolder": "Crea una sottocartella",
+    "name": {
+      "label": "Nome",
+      "placeholder": "Inserisci un nome...",
+      "required": "Il nome è richiesto"
+    },
+    "public": {
+      "label": "Pubblica",
+      "description": "Le cartelle pubbliche sono visibili a tutti"
+    }
+  },
+  "uploadsAlert": {
+    "message": "Questa cartella consente caricamenti anonimi. Condividi il link qui sotto per permettere ad altri di caricare file in questa cartella.",
+    "copy": "Copia URL",
+    "copied": "URL copiato"
+  },
+  "menu": {
+    "moreActions": "Altre azioni",
+    "open": "Apri cartella",
+    "move": "Sposta cartella",
+    "export": "Esporta come ZIP",
+    "makePrivate": "Rendi privata",
+    "makePublic": "Rendi pubblica",
+    "disallowUploads": "Vieta caricamenti anonimi",
+    "allowUploads": "Consenti caricamenti anonimi",
+    "editName": "Modifica nome",
+    "copyUrl": "Copia URL"
+  },
+  "card": {
+    "created": "Creato:",
+    "updated": "Aggiornato:",
+    "public": "Pubblica:",
+    "files": "File:",
+    "subfolders": "Sottocartelle:"
+  },
+  "grid": {
+    "empty": "Nessuna cartella trovata",
+    "emptyFolder": "Questa cartella è vuota",
+    "createHint": "Crea una cartella per vederla qui"
+  },
+  "notifications": {
+    "visibilityFailed": "Impossibile modificare la visibilità della cartella",
+    "visibilityEdited": "Visibilità della cartella modificata",
+    "nowPublic": "{{name}} è ora pubblica",
+    "nowPrivate": "{{name}} è ora privata",
+    "uploadsFailed": "Impossibile modificare la politica di caricamento della cartella",
+    "uploadsEdited": "Politica di caricamento della cartella modificata",
+    "uploadsAllowed": "{{name}} consentirà ora caricamenti anonimi",
+    "uploadsDisallowed": "{{name}} non consentirà più caricamenti anonimi"
+  },
+  "delete": {
+    "title": "Eliminare \"{{name}}\"?",
+    "cannotUndo": "Questa azione non può essere annullata.",
+    "containsFilesAndSubfolders": "Questa cartella contiene {{files}} file e {{subfolders}} sottocartelle. Cosa vuoi fare con essi?",
+    "containsFiles": "Questa cartella contiene {{files}} file. Cosa vuoi fare con essi?",
+    "containsSubfolders": "Questa cartella contiene {{subfolders}} sottocartelle. Cosa vuoi fare con esse?",
+    "options": {
+      "root": "Sposta i contenuti nella cartella principale",
+      "folder": "Sposta i contenuti in un'altra cartella",
+      "cascade": "Elimina sottocartelle (i file verranno spostati nella cartella principale)",
+      "cascadeFiles": "Elimina sottocartelle e i loro file (eliminazione a cascata)"
+    },
+    "target": {
+      "label": "Cartella di destinazione",
+      "placeholder": "Seleziona una cartella"
+    },
+    "warningCascade": "Attenzione: Questo eliminerà permanentemente tutte le sottocartelle all'interno di questa cartella. I file verranno scollegati dalle loro cartelle e spostati nella cartella principale.",
+    "warningCascadeFiles": "Attenzione: Questo eliminerà permanentemente tutte le sottocartelle all'interno di questa cartella, insieme a tutti i file in esse contenuti. I file verranno rimossi dalla memoria e non potranno essere recuperati.",
+    "confirmCascade": "Eliminare '{{name}}' e tutte le sottocartelle?",
+    "confirmCascadeFiles": "Eliminare '{{name}}' e tutte le sottocartelle e i file?",
+    "modalCascade": "Tutte le sottocartelle verranno eliminate permanentemente (i file verranno spostati nella cartella principale). Questa azione non può essere annullata.",
+    "modalCascadeFiles": "Tutte le sottocartelle e tutti i file in esse contenuti verranno eliminati permanentemente dalla memoria. Questa azione non può essere annullata.",
+    "submit": "Elimina cartella",
+    "notifications": {
+      "failed": "Impossibile eliminare la cartella",
+      "deleted": "Cartella eliminata",
+      "deletedMessage": "{{name}} è stata eliminata",
+      "noTarget": "Nessuna cartella selezionata",
+      "noTargetMessage": "Seleziona una cartella in cui spostare i contenuti"
+    }
+  },
+  "edit": {
+    "title": "Modifica il nome della cartella",
+    "label": "Nuovo nome della cartella",
+    "placeholder": "Inserisci il nuovo nome della cartella...",
+    "required": "Il nome è richiesto",
+    "notifications": {
+      "failed": "Impossibile aggiornare il nome della cartella",
+      "updated": "Nome della cartella aggiornato",
+      "updatedMessage": "Il nome della cartella è stato aggiornato con successo in {{name}}"
+    }
+  },
+  "move": {
+    "title": "Sposta \"{{name}}\"",
+    "description": "Seleziona una cartella di destinazione per questa cartella.",
+    "root": "/ (Root)",
+    "destination": {
+      "label": "Destinazione",
+      "placeholder": "Seleziona una cartella"
+    },
+    "submit": "Sposta Cartella",
+    "notifications": {
+      "failed": "Impossibile spostare la cartella",
+      "moved": "Cartella spostata",
+      "movedMessage": "{{name}} è stata spostata"
+    }
+  },
+  "viewFiles": {
+    "title": "File in {{name}}",
+    "found": "{{amount}} file trovati"
+  }
+}

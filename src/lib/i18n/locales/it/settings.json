@@ -1,0 +1,390 @@
+{
+  "title": "Impostazioni",
+  "loading": "Caricamento…",
+  "user": {
+    "title": "Utente",
+    "tokenCopyTooltip": "Clicca per copiare il token",
+    "tokenLabel": "Token",
+    "tokenHidden": "[clicca per rivelare]",
+    "form": {
+      "username": {
+        "label": "Nome Utente",
+        "required": "Il nome utente è richiesto"
+      },
+      "password": {
+        "label": "Password",
+        "description": "Lascia vuoto per mantenere la stessa password"
+      },
+      "currentPassword": {
+        "label": "Password attuale",
+        "description": "Richiesta per cambiare la password.",
+        "required": "Inserisci la tua password attuale per cambiarla"
+      }
+    },
+    "notifications": {
+      "error": {
+        "title": "Errore durante l'aggiornamento dell'utente"
+      },
+      "updated": {
+        "message": "Utente aggiornato"
+      }
+    }
+  },
+  "avatar": {
+    "title": "Avatar",
+    "placeholder": "Carica un nuovo avatar...",
+    "previewNew": "Anteprima del nuovo avatar",
+    "previewCurrent": "Anteprima dell'avatar attuale",
+    "proposedAlt": "Avatar proposto",
+    "currentAlt": "Avatar dell'utente",
+    "remove": "Rimuovi Avatar",
+    "notifications": {
+      "error": {
+        "title": "Errore durante l'aggiornamento dell'avatar"
+      },
+      "updated": {
+        "message": "Avatar aggiornato"
+      }
+    }
+  },
+  "sessions": {
+    "title": "Sessioni",
+    "summary": "Attualmente hai effettuato l'accesso su altri {{amount}} dispositivi",
+    "view": "Visualizza sessioni",
+    "logoutBrowser": "Disconnettiti da questo browser",
+    "logoutAll": "Disconnettiti da tutti i dispositivi",
+    "empty": "Nessun'altra sessione trovata",
+    "table": {
+      "client": "Client",
+      "device": "Dispositivo",
+      "loggedInAt": "Accesso effettuato il"
+    },
+    "modals": {
+      "logoutAll": {
+        "title": "Disconnettersi da tutti i dispositivi?",
+        "message": "Sei sicuro di voler disconnetterti da tutti i dispositivi? Questo revocherà l'accesso su tutti i dispositivi tranne quello attuale.",
+        "confirm": "Disconnettiti"
+      },
+      "logoutDevice": {
+        "title": "Disconnettersi da questo dispositivo?",
+        "message": "Sei sicuro di voler disconnetterti da questo dispositivo?",
+        "confirm": "Disconnettiti"
+      }
+    },
+    "notifications": {
+      "loggedOutAll": "Disconnessione avvenuta su tutti i dispositivi",
+      "loggedOutDevice": "Disconnessione avvenuta dal dispositivo"
+    }
+  },
+  "quickLinks": {
+    "title": "Collegamenti rapidi",
+    "description": "Aggiungi collegamenti nella parte superiore della home page per un accesso rapido alle cose.",
+    "reorder": "Riorganizza {{name}}",
+    "saveError": "Impossibile salvare i collegamenti rapidi."
+  },
+  "dashboard": {
+    "title": "Impostazioni della Dashboard",
+    "description": "Queste impostazioni vengono salvate automaticamente nel tuo <b>browser.</b>",
+    "disableMediaPreview": {
+      "label": "Disabilita Anteprima Media",
+      "description": "Disabilita le anteprime dei file nella dashboard. Questo può aiutare a risparmiare dati e velocizzare la dashboard se hai molti file multimediali, ma disabiliterà anche il visualizzatore di file e mostrerà un'icona generica invece di un'anteprima per i file supportati."
+    },
+    "mediaAutoMuted": {
+      "label": "Disattiva audio e video nelle anteprime",
+      "description": "Quando abilitato, i video e l'audio nel visualizzatore di file vengono riprodotti automaticamente senza audio. Disattivando questa opzione si tenterà di riprodurre immediatamente il suono. I browser potrebbero bloccare la riproduzione automatica non silenziata fino a quando non interagisci con la pagina."
+    },
+    "warnDeletion": {
+      "label": "Avviso alla cancellazione",
+      "description": "Mostra un avviso quando si eliminano elementi. Quando questa opzione è disabilitata, file, URL, ecc. verranno eliminati senza alcun avviso! Cartelle, utenti e transazioni di massa sono esenti da questa regola e ti avviseranno sempre prima di eliminare qualsiasi cosa."
+    },
+    "fileNavButtons": {
+      "label": "Pulsanti di navigazione dei file",
+      "description": "Mostra precedente/successivo a destra e a sinistra del visualizzatore di file per navigare facilmente tra i file."
+    },
+    "homeShowRecents": {
+      "label": "Mostra recenti",
+      "description": "Mostra caricamenti e accessi recenti nella home page."
+    },
+    "homeShowActivity": {
+      "label": "Mostra attività",
+      "description": "Mostra la tua attività recente come grafico nella home page."
+    },
+    "homeShowTypes": {
+      "label": "Mostra tipi di file",
+      "description": "Mostra la tabella dei tipi di file nella home page."
+    },
+    "fileViewer": {
+      "label": "Visualizzatore di file",
+      "description": "Scegli quale visualizzatore di file si apre quando fai clic su un file.",
+      "options": {
+        "fullscreen": "Schermo intero (beta)",
+        "default": "Predefinito (modal)"
+      }
+    },
+    "domain": {
+      "label": "Dominio Predefinito",
+      "description": "Imposta il dominio predefinito utilizzato per i link copiati in qualsiasi punto della dashboard. Lascia vuoto o seleziona \"Dominio predefinito\" per utilizzare il dominio corrente che serve la dashboard."
+    },
+    "theme": {
+      "label": "Tema",
+      "description": "Il tema da utilizzare per la dashboard. Questo è solo un cambiamento visivo sul tuo browser e non cambia il tema per altri utenti.",
+      "system": "Sistema"
+    },
+    "themeDark": {
+      "label": "Tema Scuro",
+      "description": "Il tema da utilizzare per la dashboard quando il tuo sistema è in modalità scura."
+    },
+    "themeLight": {
+      "label": "Tema Chiaro",
+      "description": "Il tema da utilizzare per la dashboard quando il tuo sistema è in modalità chiara."
+    }
+  },
+  "fileView": {
+    "title": "Visualizzazione dei file",
+    "variablesHint": "Tutti i campi di testo supportano l'uso di <anchor>variabili.</anchor>",
+    "disableTextFiles": {
+      "label": "Disabilita i file di testo",
+      "description": "Disabilita la visualizzazione dei file di testo tramite le routes di visualizzazione. Questo non ha effetto sugli altri tipi di file e funzionerà anche se le routes di visualizzazione sono disabilitate."
+    },
+    "enabled": {
+      "label": "Abilita le routes di visualizzazione",
+      "description": "Abilita la visualizzazione dei file tramite routes di visualizzazione personalizzabili"
+    },
+    "showMimetype": {
+      "label": "Mostra il mimetype",
+      "description": "Mostra il mimetype del file nella view-route"
+    },
+    "showTags": {
+      "label": "Mostra i tag",
+      "description": "Mostra i tag del file nella view-route"
+    },
+    "showFolder": {
+      "label": "Mostra la cartella",
+      "description": "Mostra il nome/link della cartella, se possibile, nella view-route"
+    },
+    "content": {
+      "label": "Visualizza contenuto",
+      "description": "Modifica il contenuto all'interno delle routes di visualizzazione. La maggior parte dell'HTML è valida, mentre l'uso di JavaScript non è disponibile."
+    },
+    "align": {
+      "label": "Allineamento del contenuto",
+      "description": "Modifica l'allineamento del contenuto all'interno delle routes di visualizzazione",
+      "options": {
+        "left": "Sinistra",
+        "center": "Centro",
+        "right": "Destra"
+      }
+    },
+    "embed": {
+      "label": "Abilita Embed",
+      "description": "Abilita le seguenti proprietà di embed. Queste proprietà sfruttano i tag OpenGraph. Le routes di visualizzazione dovranno essere abilitate affinché questo funzioni."
+    },
+    "embedMediaOnly": {
+      "label": "Anteprima link solo media",
+      "description": "Quando gli embed sono disattivati, aggiungi comunque i tag OpenGraph per immagini/video in modo che Discord e app simili visualizzino solo i media (nessun titolo, descrizione o nome del sito personalizzato). L'URL che incolli rimane nel messaggio come testo normale."
+    },
+    "embedTitle": {
+      "label": "Titolo dell'embed"
+    },
+    "embedDescription": {
+      "label": "Descrizione dell'embed"
+    },
+    "embedSiteName": {
+      "label": "Nome del sito dell'embed"
+    },
+    "embedColor": {
+      "label": "Colore dell'embed"
+    },
+    "notifications": {
+      "error": {
+        "title": "Errore durante l'aggiornamento delle impostazioni della visualizzazione"
+      },
+      "updated": {
+        "message": "Impostazioni della visualizzazione aggiornate"
+      }
+    }
+  },
+  "oauth": {
+    "description": "Gestisci i provider OAuth collegati.",
+    "link": "Collega account {{provider}}",
+    "unlink": "Scollega account {{provider}}",
+    "notifications": {
+      "unlinkFailed": {
+        "title": "Impossibile scollegare l'account"
+      },
+      "unlinked": {
+        "title": "Account scollegato",
+        "message": "Il tuo account {{provider}} è stato scollegato."
+      }
+    }
+  },
+  "mfa": {
+    "title": "Autenticazione a Più Fattori",
+    "description": "Configura 2FA o passkey per aggiungere un ulteriore livello di sicurezza al tuo account.",
+    "totp": {
+      "enable": "Abilita 2FA",
+      "disable": "Disabilita 2FA",
+      "modal": {
+        "enableTitle": "Abilita l'autenticazione a due fattori",
+        "disableTitle": "Disabilita l'autenticazione a due fattori",
+        "disableInstructions": "Inserisci il codice a 6 cifre della tua app di autenticazione qui sotto per confermare la disabilitazione della 2FA.",
+        "step1": "<b>Passo 1</b> Apri/scarica un'app di autenticazione che supporti la scansione di codici QR o l'inserimento manuale del codice. Le opzioni più popolari includono <twofas>2FAs</twofas>, <google>Google Authenticator</google>, <microsoft>Microsoft Authenticator</microsoft> e <apple>Apple Passwords</apple>.",
+        "step2": "<b>Passo 2</b> Scansiona il codice QR qui sotto con la tua app di autenticazione per abilitare la 2FA.",
+        "qrAlt": "qr code {{secret}}",
+        "manualEntry": "Se non puoi scansionare il codice QR, puoi inserire manualmente il seguente codice nella tua app di autenticazione: <code>{{secret}}</code>",
+        "step3": "<b>Passo 3</b> Inserisci il codice a 6 cifre della tua app di autenticazione qui sotto per confermare la configurazione della 2FA."
+      },
+      "invalidPin": "Pin non valido",
+      "notifications": {
+        "enabled": {
+          "title": "2FA Abilitata",
+          "message": "Hai abilitato correttamente la 2FA sul tuo account."
+        },
+        "disabled": {
+          "title": "2FA Disabilitata",
+          "message": "Hai disabilitato correttamente la 2FA sul tuo account."
+        }
+      }
+    },
+    "passkeys": {
+      "manage": "Gestisci Passkey",
+      "created": "Passkey creata <created />",
+      "createdAndUsed": "Passkey creata <created />, ultima utilizzata il <lastUsed />.",
+      "legacyWarning": "Attenzione: questa passkey è stata creata con una versione precedente di Zipline e <b>NON FUNZIONERÀ</b> con questa versione. Elimina e ricrea questa passkey per garantire la compatibilità.",
+      "create": "Crea una passkey",
+      "createError": "Errore durante la creazione della passkey - riprova più tardi",
+      "createErrorFallback": "Si è verificato un errore durante la creazione della passkey",
+      "namePrompt": "Assegna un nome a questa passkey in modo da poterla ricordare in seguito.",
+      "namePlaceholder": "Nome della passkey",
+      "modals": {
+        "remove": {
+          "message": "Il tuo browser e il tuo dispositivo potrebbero ancora mostrare \"{{name}}\" come opzione per accedere. Se vuoi rimuoverla, dovrai farlo manualmente tramite le impostazioni del tuo dispositivo.",
+          "confirm": "Rimuovi \"{{name}}\""
+        }
+      },
+      "notifications": {
+        "saveError": {
+          "title": "Errore durante il salvataggio della passkey"
+        },
+        "saved": {
+          "title": "Passkey salvata!",
+          "message": "La tua passkey è stata salvata correttamente."
+        },
+        "removeError": {
+          "title": "Errore durante la rimozione della passkey"
+        },
+        "removed": {
+          "title": "Passkey rimossa!",
+          "message": "La tua passkey è stata rimossa correttamente."
+        }
+      }
+    }
+  },
+  "exports": {
+    "title": "Esporta File",
+    "new": "Nuova Esportazione",
+    "empty": "Nessuna esportazione trovata. Clicca il pulsante sopra per avviare una nuova esportazione.",
+    "table": {
+      "id": "ID",
+      "started": "Avviata",
+      "files": "File",
+      "size": "Dimensione",
+      "completed": "{{id}} completata",
+      "inProgress": "{{id}} in corso"
+    },
+    "modals": {
+      "new": {
+        "title": "Nuova esportazione?",
+        "message": "Sei sicuro di voler avviare una nuova esportazione? Se hai molti file, potrebbe volerci un po' di tempo.",
+        "confirm": "Avvia esportazione"
+      }
+    },
+    "notifications": {
+      "started": {
+        "title": "Esportazione avviata",
+        "message": "L'esportazione è stata avviata, puoi controllarne lo stato nella tabella qui sotto"
+      },
+      "deleted": {
+        "message": "L'esportazione è stata eliminata"
+      }
+    }
+  },
+  "generators": {
+    "title": "Genera Uploader",
+    "description": "Genera script per gli strumenti di caricamento. I generatori Flameshot e Shell Script sono supportati solo su Linux e macOS.",
+    "logoAlt": "Logo di {{name}}",
+    "shellScript": "Shell Script",
+    "desc": {
+      "flameshot": "Per utilizzare questo script, è necessario avere installato <flameshotLink>Flameshot</flameshotLink>, <curlLink><code>curl</code></curlLink>, <jqLink><code>jq</code></jqLink> e <xclipLink><code>xclip</code> (solo Linux)</xclipLink>. Questo script è destinato all'uso solo su Linux e macOS (vedi le opzioni sotto).",
+      "ishare": "Questo generatore richiede che <anchor>ishare</anchor> sia installato su macOS. Questo uploader è destinato all'uso solo su macOS.",
+      "itake": "Questo generatore richiede che <anchor>iTake</anchor> sia installato su macOS. Questo uploader è destinato all'uso solo su macOS.",
+      "shell": "Per utilizzare questo script, è necessario avere installato <code>bash</code>, <curlLink><code>curl</code></curlLink>, <fileLink><code>file</code></fileLink>, <jqLink><code>jq</code></jqLink> e <xclipLink><code>xclip</code> (solo Linux)</xclipLink>. Questo script è destinato all'uso solo su Linux e macOS (vedi le opzioni sotto)."
+    },
+    "modal": {
+      "title": "Genera Uploader {{name}}",
+      "destinationType": {
+        "label": "Tipo di destinazione",
+        "description": "Seleziona il tipo di destinazione che vuoi generare",
+        "options": {
+          "file": "Carica File",
+          "url": "Accorcia URL"
+        }
+      },
+      "format": {
+        "label": "Formato del nome",
+        "description": "Il formato del nome del file da utilizzare durante il caricamento dei file, il campo \"Nome file\" sovrascriverà questo valore.",
+        "options": {
+          "default": "Predefinito",
+          "random": "Casuale",
+          "date": "Data",
+          "uuid": "UUID",
+          "name": "Usa il nome del file",
+          "gfycat": "Nome in stile Gfycat"
+        }
+      },
+      "compression": {
+        "label": "Compressione",
+        "description": "Il livello di compressione da utilizzare sulle immagini (solo). Lascia vuoto per disabilitare la compressione."
+      },
+      "maxViews": {
+        "label": "Visualizzazioni massime",
+        "description": "Il numero massimo di visualizzazioni che i file/gli URL possono avere prima di essere eliminati. Lascia vuoto per consentire quante visualizzazioni vuoi."
+      },
+      "overrideDomain": {
+        "label": "Sovrascrivi Dominio",
+        "description": "Sovrascrivi il dominio con questo valore. Questo cambierà il dominio restituito nei tuoi caricamenti. Lascia vuoto per utilizzare il dominio predefinito.",
+        "default": "Dominio Predefinito"
+      },
+      "otherOptions": "Altre Opzioni",
+      "addOriginalName": {
+        "label": "Aggiungi Nome Originale",
+        "description": "Aggiungi il nome originale del file, in modo che il file possa essere scaricato con il nome originale. Verrà comunque utilizzata l'opzione \"Formato del nome\" per il nome del file."
+      },
+      "extensionless": {
+        "label": "URL senza Estensione",
+        "description": "Rimuovi l'estensione del file dall'URL restituito. Il file può comunque essere accessibile con la sua estensione. Questa opzione funzionerà solo se il server è configurato per consentire URL senza estensione."
+      },
+      "xshareCompatibility": {
+        "label": "Compatibilità Xshare",
+        "description": "Se scegli di utilizzare l'app Xshare su Android, abilita questa opzione per la compatibilità. La configurazione generata non funzionerà con ShareX."
+      },
+      "waylandCompatibility": {
+        "label": "Abilita Compatibilità Wayland",
+        "description": "Usa <code>wl-copy</code> invece di <code>xclip</code> per copiare negli appunti."
+      },
+      "macCompatibility": {
+        "label": "Abilita Compatibilità macOS",
+        "description": "Usa <code>pbcopy</code> invece di <code>xclip</code> per copiare negli appunti."
+      },
+      "compositorUnsupported": {
+        "label": "Usi un DE diverso da Gnome, KDE o Sway?",
+        "description": "Se utilizzi un compositore come <anchor>Hyprland</anchor>, questa opzione imposterà <code>XDG_CURRENT_DESKTOP=sway</code> per aggirare gli errori di Flameshot su Wayland. Non è necessario su Xorg."
+      },
+      "useEcho": {
+        "label": "Usa <code>echo</code> invece di copiare negli appunti",
+        "description": "Mostra semplicemente l'URL nel terminale invece di copiarlo negli appunti."
+      },
+      "waylandHelp": "Se hai problemi a far funzionare Flameshot su Wayland, consulta la <anchor>guida a Wayland</anchor>."
+    }
+  }
+}
