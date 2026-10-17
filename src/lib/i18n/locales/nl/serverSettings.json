@@ -1,0 +1,215 @@
+{
+  "sections": {
+    "core": {
+      "name": "Kern",
+      "description": "Algemene serverinstellingen"
+    },
+    "chunks": {
+      "name": "Delen",
+      "description": "Uploaden in delen"
+    },
+    "discord": {
+      "name": "Discord",
+      "description": "Discord-webhookintegratie"
+    },
+    "domains": {
+      "name": "Domeinen",
+      "description": "Aangepaste domeinen toevoegen"
+    },
+    "features": {
+      "name": "Functies",
+      "description": "Verschillende functies instellen"
+    },
+    "files": {
+      "name": "Bestanden",
+      "description": "Instellingen voor bestandsuploads"
+    },
+    "httpWebhook": {
+      "name": "HTTP-webhook",
+      "description": "POST-aanvragen naar een URL sturen bij bepaalde gebeurtenissen"
+    },
+    "invites": {
+      "name": "Uitnodigingen",
+      "description": "Uitnodigingsinstellingen"
+    },
+    "mfa": {
+      "name": "Multifactorauthenticatie",
+      "description": "Passkeys en TOTP-authenticatie in- of uitschakelen"
+    },
+    "oauth": {
+      "name": "OAuth",
+      "description": "OAuth-providers voor authenticatie instellen"
+    },
+    "pwa": {
+      "name": "PWA",
+      "description": "Instellingen voor progressieve webapps"
+    },
+    "ratelimit": {
+      "name": "Verzoeklimiet",
+      "description": "API-verzoeklimieten instellen"
+    },
+    "tasks": {
+      "name": "Taken",
+      "description": "Intervallen voor achtergrondtaken"
+    },
+    "urls": {
+      "name": "URL-verkorting",
+      "description": "Instellingen voor URL-verkorting configureren"
+    },
+    "website": {
+      "name": "Website",
+      "description": "Website-instellingen zoals titel en beschrijving"
+    },
+    "settings": {
+      "name": "Serverinstellingen"
+    }
+  },
+  "invalidSection": "Ongeldige instellingenrubriek",
+  "environmentOverrides": {
+    "title": "Overschrijvingen door omgevingsvariabelen",
+    "description": "Sommige instellingen worden beheerd via omgevingsvariabelen en kunnen hier niet worden gewijzigd."
+  },
+  "notifications": {
+    "saveFailed": {
+      "title": "Instellingen opslaan mislukt"
+    },
+    "saved": {
+      "message": "Instellingen opgeslagen"
+    }
+  },
+  "core": {
+    "returnHttpsUrls": {
+      "label": "HTTPS-URL’s teruggeven",
+      "description": "Geef URL’s terug met het HTTPS-protocol."
+    },
+    "trustProxy": {
+      "label": "Proxy’s vertrouwen",
+      "description": "Vertrouw X-Forwarded-*-headers van de hieronder vermelde vertrouwde proxy’s. Vereist een herstart van de server."
+    },
+    "trustedProxies": {
+      "label": "Vertrouwde proxy’s",
+      "description": "Voer de IPv4/IPv6-adressen of CIDR-bereiken van je reverseproxy’s in, gescheiden door komma’s. Neem alleen vertrouwde proxy’s op, geen clientnetwerken. Bij een lege lijst worden doorgestuurde headers genegeerd en delen clients achter dezelfde proxy de verzoeklimieten. Vereist een herstart van de server."
+    },
+    "defaultDomain": {
+      "label": "Standaarddomein",
+      "description": "Het domein dat wordt gebruikt bij het genereren van URL’s. Deze waarde mag geen protocol bevatten."
+    },
+    "tempDirectory": {
+      "label": "Tijdelijke map",
+      "description": "De map waarin tijdelijke bestanden worden opgeslagen. Als het pad ongeldig is, werken bepaalde functies mogelijk niet. Vereist een herstart van de server."
+    }
+  },
+  "chunks": {
+    "enabled": {
+      "label": "Uploaden in delen",
+      "description": "Uploaden in delen inschakelen."
+    },
+    "max": {
+      "label": "Maximale deelgrootte",
+      "description": "Maximale grootte van een upload voordat deze in delen wordt opgesplitst."
+    },
+    "size": {
+      "label": "Deelgrootte",
+      "description": "Grootte van elk deel."
+    }
+  },
+  "discord": {
+    "main": {
+      "webhookUrl": {
+        "label": "Webhook-URL",
+        "description": "De URL van de Discord-webhook waarnaar meldingen worden verzonden"
+      },
+      "username": {
+        "label": "Gebruikersnaam",
+        "description": "De gebruikersnaam waaronder meldingen worden verzonden"
+      },
+      "avatarUrl": {
+        "label": "Avatar-URL",
+        "description": "De avatar voor de webhook"
+      }
+    },
+    "onUpload": {
+      "title": "Bij uploaden"
+    },
+    "onShorten": {
+      "title": "Bij verkorten"
+    },
+    "notification": {
+      "webhookUrl": {
+        "description": "De URL van de Discord-webhook waarnaar meldingen worden verzonden. Als je dit leeg laat, wordt de URL van de standaard webhook gebruikt",
+        "label": "Webhook-URL"
+      },
+      "username": {
+        "label": "Gebruikersnaam",
+        "description": "De gebruikersnaam waaronder meldingen worden verzonden. Als je dit leeg laat, wordt de standaard gebruikersnaam gebruikt"
+      },
+      "avatarUrl": {
+        "label": "Avatar-URL",
+        "description": "De avatar voor de webhook. Als je dit leeg laat, wordt de standaard avatar gebruikt"
+      },
+      "content": {
+        "label": "Inhoud",
+        "description": "De inhoud van de melding. Dit mag leeg zijn, maar ten minste één van de velden voor inhoud of een ingesloten bericht moet worden ingevuld"
+      },
+      "embed": {
+        "label": "Ingesloten bericht",
+        "description": "Verzend de melding als een ingesloten bericht. Dit biedt hieronder meer aanpassingsmogelijkheden."
+      }
+    },
+    "embed": {
+      "title": {
+        "label": "Titel",
+        "description": "De titel van het ingesloten bericht"
+      },
+      "description": {
+        "label": "Beschrijving",
+        "description": "De beschrijving van het ingesloten bericht"
+      },
+      "footer": {
+        "label": "Voettekst",
+        "description": "De voettekst van het ingesloten bericht"
+      },
+      "color": {
+        "label": "Kleur",
+        "description": "De kleur van het ingesloten bericht"
+      },
+      "thumbnail": {
+        "label": "Miniatuur",
+        "description": "Toon de miniatuur (of het bestand zelf als het een afbeelding is) in het ingesloten bericht"
+      },
+      "imageOrVideo": {
+        "label": "Afbeelding/Video",
+        "description": "Toon de afbeelding of video in het ingesloten bericht"
+      },
+      "timestamp": {
+        "label": "Tijdstempel",
+        "description": "Toon het tijdstempel in het ingesloten bericht"
+      },
+      "url": {
+        "label": "URL",
+        "description": "Maakt de titel aanklikbaar en verwijst naar de URL van het bestand"
+      }
+    }
+  },
+  "domains": {
+    "input": {
+      "description": "Voer een domeinnaam in"
+    },
+    "errors": {
+      "exists": "Dit domein bestaat al",
+      "updateFailed": "Domeinen bijwerken mislukt"
+    },
+    "table": {
+      "columns": {
+        "domain": "Domein"
+      }
+    },
+    "empty": "Nog geen domeinen toegevoegd."
+  },
+  "features": {
+    "imageCompression": {
+      "label": "Afbeeldingscompressie",
+      "description": "Hiermee kunnen gebruikers afbeeldingen comprimeren."
+    }
+  }
+}

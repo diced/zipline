@@ -1,0 +1,124 @@
+{
+  "nav": {
+    "home": "Home",
+    "metrics": "Metriche",
+    "files": "File",
+    "folders": "Cartelle",
+    "upload": "Carica",
+    "uploadFile": "File",
+    "uploadText": "Testo",
+    "urls": "URL",
+    "administrator": "Amministrazione",
+    "adminDashboard": "Dashboard",
+    "serverSettings": "Impostazioni",
+    "serverActions": "Azioni",
+    "users": "Utenti",
+    "invites": "Inviti"
+  },
+  "header": {
+    "logoAlt": "Logo di Zipline",
+    "avatarAlt": "Avatar dell'utente"
+  },
+  "userMenu": {
+    "administratorLabel": "{{username}} (Admin)",
+    "copyToken": "Copia token",
+    "refreshToken": "Aggiorna token",
+    "settings": "Impostazioni",
+    "serverSettings": "Impostazioni server",
+    "logout": "Esci",
+    "loggingOut": "Uscita in corso..."
+  },
+  "token": {
+    "cancel": "No, chiudi questo popup",
+    "copy": {
+      "title": "Copia token?",
+      "message": "Sei sicuro di voler copiare il tuo token? Il tuo token può interagire con tutte le parti di Zipline. Non condividere questo token con nessuno."
+    },
+    "copied": {
+      "title": "Copiato",
+      "message": "Il tuo token è stato copiato negli appunti."
+    },
+    "refresh": {
+      "title": "Aggiorna token?",
+      "message": "Sei sicuro di voler aggiornare il tuo token? Una volta aggiornato/reimpostato il tuo token, dovrai aggiornare eventuali script o applicazioni che utilizzano il tuo token."
+    },
+    "refreshed": {
+      "title": "Aggiornato",
+      "message": "Il tuo token è stato aggiornato."
+    }
+  },
+  "version": {
+    "modalTitle": "Versione di Zipline",
+    "tooltip": "Clicca per visualizzare ulteriori informazioni sulla versione",
+    "latest": "Stai usando l'ultima versione di Zipline.",
+    "unstable": "Stai usando una versione <b>instabile</b> di Zipline. Le versioni upstream non sono completamente testate e potrebbero contenere bug.",
+    "outdated": "Stai usando una versione <b>obsoleta</b> di Zipline. Si consiglia di aggiornare all'<anchor>ultima versione</anchor>.",
+    "current": "Versione corrente",
+    "fields": {
+      "version": "Versione",
+      "commit": "Commit",
+      "upstream": "Upstream?",
+      "availableToUpdate": "Disponibile per l'aggiornamento"
+    },
+    "latestCommit": "Ultimo Commit Disponibile",
+    "latestCommitNote": "Questo è visibile solo quando si esegue una versione upstream.",
+    "available": "{{tag}} è disponibile",
+    "changelogs": "Changelogs",
+    "update": "Aggiorna"
+  },
+  "qrCode": {
+    "title": "QR Code",
+    "alt": "QR Code",
+    "failed": "Impossibile generare il QR code.",
+    "format": "Formato",
+    "copyUnsupported": "Copiare questo formato non è supportato in alcuni browser. Puoi copiare l'immagine normalmente tramite click destro del mouse o tenendo premuto.",
+    "copyImage": "Copia Immagine",
+    "copied": "Immagine del QR code copiata negli appunti",
+    "copyFailed": "Impossibile copiare l'immagine del QR code"
+  },
+  "domainSelect": {
+    "default": "Dominio predefinito",
+    "description": "Sostituisci il dominio con questo valore. Questo cambierà il dominio restituito nei tuoi caricamenti. Lascia vuoto per usare il dominio predefinito."
+  },
+  "copyLink": {
+    "title": "Link Copiato"
+  },
+  "errors": {
+    "generic": {
+      "title": "Si è verificato un errore",
+      "message": "Qualcosa è andato storto. Si prega di riprovare più tardi, o segnala questo problema se persiste."
+    },
+    "dashboard": {
+      "title": "Errore del Client della Dashboard",
+      "message": "Qualcosa è andato storto durante il caricamento della dashboard. Si prega di riprovare più tardi, o segnala questo problema se persiste."
+    },
+    "reload": {
+      "title": "Aggiornamento Disponibile",
+      "message": "È disponibile una nuova versione dell'app. Si prega di ricaricare la pagina per aggiornare.",
+      "button": "Ricarica Pagina",
+      "why": "Perché sto vedendo questo?",
+      "errorTitle": "Impossibile recuperare il modulo importato dinamicamente",
+      "errorMessage": "Questo errore può verificarsi quando una nuova versione dell'app viene rilasciata mentre hai la pagina aperta. Si prega di ricaricare la pagina per aggiornare all'ultima versione."
+    }
+  },
+  "notFound": {
+    "message": "Pagina non trovata",
+    "goHome": "Vai alla home"
+  },
+  "titles": {
+    "settings": "Impostazioni",
+    "folders": "Cartelle",
+    "files": "File",
+    "metrics": "Metriche",
+    "urls": "URL",
+    "serverSettings": "Impostazioni del Server",
+    "administrator": "Amministratore",
+    "serverActions": "Azioni del Server",
+    "invites": "Inviti",
+    "uploadFile": "Carica File",
+    "uploadText": "Carica Testo",
+    "users": "Utenti",
+    "userFiles": "File di {{username}}",
+    "unknownUserFiles": "File dell'utente"
+  }
+}

@@ -1,0 +1,138 @@
+{
+  "page": {
+    "title": "Mappen",
+    "titleWithFolder": "Mappen {{separator}} {{name}}",
+    "createFolder": "Map aanmaken",
+    "createSubfolder": "Submap aanmaken",
+    "folderFiles": "Bestanden van {{name}}",
+    "folderFilesWithCount": "Bestanden van {{name}} ({{files}})"
+  },
+  "create": {
+    "title": "Een map aanmaken",
+    "titleSubfolder": "Een submap aanmaken",
+    "name": {
+      "label": "Naam",
+      "placeholder": "Voer een naam in...",
+      "required": "Naam is verplicht"
+    },
+    "public": {
+      "label": "Openbaar",
+      "description": "Openbare mappen zijn voor iedereen zichtbaar"
+    }
+  },
+  "uploadsAlert": {
+    "message": "Deze map staat anonieme uploads toe. Deel de onderstaande link zodat anderen bestanden naar deze map kunnen uploaden.",
+    "copy": "URL kopiëren",
+    "copied": "URL gekopieerd"
+  },
+  "menu": {
+    "moreActions": "Meer acties",
+    "open": "Map openen",
+    "move": "Map verplaatsen",
+    "export": "Exporteren als ZIP",
+    "makePrivate": "Privé maken",
+    "makePublic": "Openbaar maken",
+    "disallowUploads": "Anonieme uploads niet toestaan",
+    "allowUploads": "Anonieme uploads toestaan",
+    "editName": "Naam bewerken",
+    "copyUrl": "URL kopiëren"
+  },
+  "card": {
+    "created": "Aangemaakt:",
+    "updated": "Bijgewerkt:",
+    "public": "Openbaar:",
+    "files": "Bestanden:",
+    "subfolders": "Submappen:"
+  },
+  "grid": {
+    "empty": "Geen mappen gevonden",
+    "emptyFolder": "Deze map is leeg",
+    "createHint": "Maak een map aan om deze hier te zien"
+  },
+  "table": {
+    "columns": {
+      "name": "Naam",
+      "public": "Openbaar",
+      "uploads": "Uploads?",
+      "created": "Aangemaakt",
+      "updated": "Laatst bijgewerkt op",
+      "actions": "Acties"
+    },
+    "subfolders_one": "{{count}} submap",
+    "subfolders_other": "{{count}} submappen",
+    "noRecords": "Geen submappen",
+    "copyLink": "Maplink kopiëren",
+    "delete": "Map verwijderen"
+  },
+  "notifications": {
+    "visibilityFailed": "Zichtbaarheid van map wijzigen mislukt",
+    "visibilityEdited": "Zichtbaarheid van map gewijzigd",
+    "nowPublic": "{{name}} is nu openbaar",
+    "nowPrivate": "{{name}} is nu privé",
+    "uploadsFailed": "Uploadbeleid van map wijzigen mislukt",
+    "uploadsEdited": "Uploadbeleid van map gewijzigd",
+    "uploadsAllowed": "{{name}} staat nu anonieme uploads toe",
+    "uploadsDisallowed": "{{name}} staat geen anonieme uploads meer toe"
+  },
+  "delete": {
+    "title": "\"{{name}}\" verwijderen?",
+    "cannotUndo": "Dit kan niet ongedaan worden gemaakt.",
+    "containsFilesAndSubfolders": "Deze map bevat {{files}} bestand(en) en {{subfolders}} submap(pen). Wat wil je ermee doen?",
+    "containsFiles": "Deze map bevat {{files}} bestand(en). Wat wil je ermee doen?",
+    "containsSubfolders": "Deze map bevat {{subfolders}} submap(pen). Wat wil je ermee doen?",
+    "options": {
+      "root": "Inhoud naar hoofdmap verplaatsen",
+      "folder": "Inhoud naar een andere map verplaatsen",
+      "cascade": "Submappen verwijderen (bestanden worden naar de hoofdmap verplaatst)",
+      "cascadeFiles": "Submappen en hun bestanden verwijderen (cascaderend verwijderen)"
+    },
+    "target": {
+      "label": "Doelmap",
+      "placeholder": "Selecteer een map"
+    },
+    "warningCascade": "Waarschuwing: Hiermee verwijder je alle submappen in deze map definitief. Bestanden worden losgekoppeld van hun mappen en naar de hoofdmap verplaatst.",
+    "warningCascadeFiles": "Waarschuwing: Hiermee verwijder je alle submappen in deze map definitief, inclusief alle bestanden die ze bevatten. De bestanden worden uit de opslag verwijderd en kunnen niet worden hersteld.",
+    "confirmCascade": "'{{name}}' en alle submappen verwijderen?",
+    "confirmCascadeFiles": "'{{name}}' en alle submappen en bestanden verwijderen?",
+    "modalCascade": "Alle submappen worden definitief verwijderd (bestanden worden naar de hoofdmap verplaatst). Dit kan niet ongedaan worden gemaakt.",
+    "modalCascadeFiles": "Alle submappen en alle bestanden daarin worden definitief uit de opslag verwijderd. Dit kan niet ongedaan worden gemaakt.",
+    "submit": "Map verwijderen",
+    "notifications": {
+      "failed": "Map verwijderen mislukt",
+      "deleted": "Map verwijderd",
+      "deletedMessage": "{{name}} is verwijderd",
+      "noTarget": "Geen map geselecteerd",
+      "noTargetMessage": "Selecteer een map om de inhoud naartoe te verplaatsen"
+    }
+  },
+  "edit": {
+    "title": "Mapnaam bewerken",
+    "label": "Nieuwe mapnaam",
+    "placeholder": "Voer een nieuwe mapnaam in...",
+    "required": "Naam is verplicht",
+    "notifications": {
+      "failed": "Fout bij het bijwerken van de mapnaam",
+      "updated": "Mapnaam bijgewerkt",
+      "updatedMessage": "De mapnaam is bijgewerkt naar {{name}}"
+    }
+  },
+  "move": {
+    "title": "\"{{name}}\" verplaatsen",
+    "description": "Selecteer een doelmap voor deze map.",
+    "root": "/ (Hoofdmap)",
+    "destination": {
+      "label": "Bestemming",
+      "placeholder": "Selecteer een map"
+    },
+    "submit": "Map verplaatsen",
+    "notifications": {
+      "failed": "Map verplaatsen mislukt",
+      "moved": "Map verplaatst",
+      "movedMessage": "{{name}} is verplaatst"
+    }
+  },
+  "viewFiles": {
+    "title": "Bestanden in {{name}}",
+    "found": "{{amount}} bestanden gevonden"
+  }
+}

@@ -1,0 +1,223 @@
+{
+  "actions": {
+    "goToFiles": "Vai ai file",
+    "clearAll": "Cancella tutto",
+    "upload_one": "Carica {{count}} file ({{size}})",
+    "upload_many": "Carica {{count}} file ({{size}})",
+    "upload_other": "Carica {{count}} file ({{size}})"
+  },
+  "file": {
+    "title": "Carica file",
+    "dropzone": {
+      "title": "Trascina le immagini qui o clicca per selezionare i file",
+      "paste": "Oppure <kbd>{{mod}}</kbd> + <kbd>V</kbd> per incollare le immagini dagli appunti",
+      "description": "Allega tutti i file che desideri, verranno mostrati qui sotto per la revisione prima del caricamento.",
+      "limit": "Limite di <b>{{size}}</b> per file"
+    },
+    "progress": {
+      "speed": "{{speed}}/s, {{remaining}} rimanenti",
+      "finalizing": "Finalizzazione del caricamento..."
+    },
+    "showMore": "Mostra di più",
+    "showAll": "Mostra tutto",
+    "showAllTooltip": "Questo potrebbe causare problemi di prestazioni se ci sono molti file",
+    "notifications": {
+      "pasted": {
+        "message": "Immagine {{name}} incollata dagli appunti"
+      },
+      "mayFail": {
+        "title": "Il caricamento potrebbe fallire",
+        "message": "Il caricamento potrebbe fallire perché la dimensione totale dei file (che non vengono caricati parzialmente) che stai cercando di caricare è <b>{{size}}</b>, che è maggiore del limite di <b>{{limit}}</b>"
+      }
+    },
+    "hidden_one": "{{count}} altro file nascosto",
+    "hidden_many": "altri {{count}} file nascosti",
+    "hidden_other": "altri {{count}} file nascosti"
+  },
+  "text": {
+    "title": "Carica testo",
+    "language": "Lingua",
+    "removeFile": "Rimuovi file {{number}}",
+    "emptyPreview": "Nessun testo",
+    "tabs": {
+      "text": "Testo",
+      "preview": "Anteprima"
+    },
+    "addFile": "Aggiungi file di testo",
+    "fileHeading": "File {{number}}"
+  },
+  "options": {
+    "button": "Opzioni",
+    "title": "Opzioni di caricamento",
+    "description": "Queste opzioni verranno applicate a tutti i file che carichi e vengono salvate nel tuo browser.",
+    "saved": "salvato",
+    "default": "Predefinito ({{value}})",
+    "never": "mai",
+    "clear": "Cancella",
+    "deletesAt": {
+      "label": "Elimina il",
+      "description": "Il file verrà eliminato automaticamente dopo questo periodo.",
+      "defaultExpiration": "Il tempo di scadenza predefinito è <b>{{value}}</b> (puoi sovrascriverlo con l'opzione sottostante).",
+      "setDefault": "Puoi impostare un tempo di scadenza predefinito nelle <anchor>impostazioni</anchor>.",
+      "maxExpiration": "Nota: la scadenza massima consentita è <b>{{value}}</b>."
+    },
+    "expirations": {
+      "never": "Mai",
+      "minutes5": "5 minuti",
+      "minutes10": "10 minuti",
+      "minutes15": "15 minuti",
+      "minutes30": "30 minuti",
+      "hour1": "1 ora",
+      "hours2": "2 ore",
+      "hours3": "3 ore",
+      "hours4": "4 ore",
+      "hours5": "5 ore",
+      "hours6": "6 ore",
+      "hours8": "8 ore",
+      "hours12": "12 ore",
+      "day1": "1 giorno",
+      "days3": "3 giorni",
+      "days5": "5 giorni",
+      "days7": "7 giorni",
+      "week1": "1 settimana",
+      "weeksOneAndHalf": "1,5 settimane",
+      "weeks2": "2 settimane",
+      "weeks3": "3 settimane",
+      "month1": "1 mese (30 giorni)",
+      "monthsOneAndHalf": "1,5 mesi (~45 giorni)",
+      "months2": "2 mesi (60 giorni)",
+      "months3": "3 mesi (90 giorni)",
+      "months4": "4 mesi (120 giorni)",
+      "months6": "6 mesi (0,5 anni)",
+      "year1": "1 anno",
+      "custom": "Hai bisogno di maggiore libertà? Imposta una data e un'ora esatte tramite l'API."
+    },
+    "format": {
+      "label": "Formato del nome",
+      "description": "Il formato del nome del file da utilizzare durante il caricamento di questo file, il campo \"Nome file\" sovrascriverà questo valore.",
+      "random": "Casuale",
+      "date": "Data",
+      "name": "Usa il nome del file",
+      "gfycat": "Nome in stile Gfycat"
+    },
+    "compressionFormat": {
+      "label": "Formato di compressione",
+      "description": "Il formato di compressione dell'immagine da utilizzare <b>solo quando è specificata una percentuale di compressione</b>. Lasciare su \"predefinito\" per utilizzare il formato di compressione predefinito del server."
+    },
+    "compression": {
+      "label": "Compressione",
+      "description": "Il livello di compressione da utilizzare sulle immagini (solo). Il formato sopra sarà utilizzato per comprimere le immagini. Lasciare vuoto per disabilitare la compressione."
+    },
+    "maxViews": {
+      "label": "Visualizzazioni massime",
+      "description": "Il numero massimo di visualizzazioni che i file possono avere prima di essere eliminati. Lasciare vuoto per consentire quante visualizzazioni si desidera."
+    },
+    "folder": {
+      "label": "Aggiungi a una cartella",
+      "description": "Aggiungi questo file a una cartella. Utilizza l'opzione \"/ (Root)\" per non aggiungere il file a una cartella. Questo valore non viene salvato nel tuo browser e viene cancellato dopo il caricamento.",
+      "placeholder": "Aggiungi alla cartella...",
+      "root": "/ (Root)"
+    },
+    "domain": {
+      "label": "Sovrascrivi dominio"
+    },
+    "filename": {
+      "label": "Sovrascrivi Nome del File",
+      "description": "Sovrascrivi il nome del file con questo valore. Lasciare vuoto per utilizzare l'opzione \"Formato del nome\". Questo valore viene ignorato se stai caricando più di un file. Questo valore non viene salvato nel tuo browser e viene cancellato dopo il caricamento."
+    },
+    "password": {
+      "label": "Password",
+      "description": "Imposta una password per questi file. Lasciare vuoto per disabilitare la protezione tramite password. Questo valore non viene salvato nel tuo browser e viene cancellato dopo il caricamento."
+    },
+    "other": "Altre Opzioni",
+    "originalName": {
+      "label": "Aggiungi Nome Originale",
+      "description": "Aggiungi il nome originale del file, in modo che il file possa essere scaricato con il nome originale. Verrà comunque utilizzata l'opzione \"Formato del nome\" per il nome del file."
+    },
+    "extensionless": {
+      "label": "URL senza estensione",
+      "description": "Rimuovi l'estensione del file dall'URL restituito. Il file può comunque essere accessibile con la sua estensione. Questa opzione funzionerà solo se il server è configurato per consentire URL senza estensione."
+    }
+  },
+  "modal": {
+    "open": "Apri il link in una nuova scheda",
+    "copy": "Copia il link negli appunti",
+    "copyAllTooltip": "Copia tutti i link negli appunti (separati da una nuova riga)",
+    "copyAll": "Copia {{total}} URL negli appunti",
+    "notifications": {
+      "copied": {
+        "title": "URL copiato negli appunti"
+      },
+      "copiedAll": {
+        "title": "URL copiati negli appunti",
+        "message": "Tutti gli URL sono stati copiati negli appunti, separati da una nuova riga."
+      }
+    },
+    "title_one": "Caricato {{count}} file",
+    "title_many": "Caricati {{count}} file",
+    "title_other": "Caricati {{count}} file",
+    "pending_one": "{{count}} file di grandi dimensioni terminerà <anchor>l'elaborazione in background.</anchor>",
+    "pending_many": "{{count}} file di grandi dimensioni termineranno <anchor>l'elaborazione in background.</anchor>",
+    "pending_other": "{{count}} file di grandi dimensioni termineranno <anchor>l'elaborazione in background.</anchor>"
+  },
+  "errors": {
+    "parse": "Impossibile analizzare la risposta del server: {{response}}",
+    "unknown": "Si è verificato un errore sconosciuto",
+    "network": "Errore di rete durante il caricamento dei file"
+  },
+  "notifications": {
+    "uploading": {
+      "batch": "Caricamento del gruppo {{current}}/{{total}}",
+      "title_one": "Caricamento del file",
+      "title_many": "Caricamento dei file",
+      "title_other": "Caricamento dei file",
+      "message_one": "{{count}} file",
+      "message_many": "{{count}} file",
+      "message_other": "{{count}} file"
+    },
+    "complete": {
+      "title": "Caricamento completato",
+      "titlePartial": "Caricamenti regolari completati",
+      "messagePartial": "{{uploaded}}. {{starting}}",
+      "message_one": "Caricato {{count}} file",
+      "message_many": "Caricati {{count}} file",
+      "message_other": "Caricati {{count}} file",
+      "startingPartials_one": "Avvio del caricamento di {{count}} file di grandi dimensioni...",
+      "startingPartials_many": "Avvio del caricamento di {{count}} file di grandi dimensioni...",
+      "startingPartials_other": "Avvio del caricamento di {{count}} file di grandi dimensioni..."
+    },
+    "error": {
+      "title": "Errore durante il caricamento dei file"
+    },
+    "partial": {
+      "title": "Caricamento di un file di grandi dimensioni",
+      "titleCount": "Caricamento di un file di grandi dimensioni ({{current}}/{{total}})",
+      "chunk": "Blocco {{current}}/{{total}}",
+      "error": {
+        "title": "Errore durante il caricamento del file",
+        "message": "{{name}}: {{error}}"
+      },
+      "complete": {
+        "title": "Caricamento dei file di grandi dimensioni completato",
+        "message_one": "Deferito {{count}} file di grandi dimensioni per l'elaborazione in background",
+        "message_many": "Deferiti {{count}} file di grandi dimensioni per l'elaborazione in background",
+        "message_other": "Deferiti {{count}} file di grandi dimensioni per l'elaborazione in background"
+      },
+      "offloaded": {
+        "title": "File di grandi dimensioni deferito",
+        "message": "{{name}} deferito ({{current}}/{{total}})"
+      }
+    },
+    "preparing": {
+      "title_one": "Preparazione del file",
+      "title_many": "Preparazione dei file",
+      "title_other": "Preparazione dei file",
+      "message_one": "Caricamento di {{count}} file",
+      "message_many": "Caricamento di {{count}} file",
+      "message_other": "Caricamento di {{count}} file",
+      "messageBatches_one": "Caricamento di {{count}} file in {{batches}} gruppi",
+      "messageBatches_many": "Caricamento di {{count}} file in {{batches}} gruppi",
+      "messageBatches_other": "Caricamento di {{count}} file in {{batches}} gruppi"
+    }
+  }
+}

@@ -1,0 +1,124 @@
+{
+  "nav": {
+    "home": "Start",
+    "metrics": "Statistieken",
+    "files": "Bestanden",
+    "folders": "Mappen",
+    "upload": "Uploaden",
+    "uploadFile": "Bestand",
+    "uploadText": "Tekst",
+    "urls": "URL’s",
+    "administrator": "Beheerder",
+    "adminDashboard": "Dashboard",
+    "serverSettings": "Instellingen",
+    "serverActions": "Acties",
+    "users": "Gebruikers",
+    "invites": "Uitnodigingen"
+  },
+  "header": {
+    "logoAlt": "Zipline-logo",
+    "avatarAlt": "Gebruikersavatar"
+  },
+  "userMenu": {
+    "administratorLabel": "{{username}} (Beheerder)",
+    "copyToken": "Token kopiëren",
+    "refreshToken": "Token vernieuwen",
+    "settings": "Instellingen",
+    "serverSettings": "Serverinstellingen",
+    "logout": "Uitloggen",
+    "loggingOut": "Uitloggen..."
+  },
+  "token": {
+    "cancel": "Nee, sluit deze pop-up",
+    "copy": {
+      "title": "Token kopiëren?",
+      "message": "Weet je zeker dat je je token wilt kopiëren? Je token kan met alle onderdelen van Zipline communiceren. Deel dit token met niemand."
+    },
+    "copied": {
+      "title": "Gekopieerd",
+      "message": "Je token is naar je klembord gekopieerd."
+    },
+    "refresh": {
+      "title": "Token vernieuwen?",
+      "message": "Weet je zeker dat je je token wilt vernieuwen? Zodra je je token vernieuwt/reset, moet je alle scripts of toepassingen bijwerken die je token gebruiken."
+    },
+    "refreshed": {
+      "title": "Vernieuwd",
+      "message": "Je token is vernieuwd."
+    }
+  },
+  "version": {
+    "modalTitle": "Zipline-versie",
+    "tooltip": "Klik om meer versie-informatie te bekijken",
+    "latest": "De nieuwste versie van Zipline wordt gebruikt.",
+    "unstable": "Je gebruikt een <b>onstabiele</b> versie van Zipline. Upstream-versies zijn niet volledig getest en kunnen bugs bevatten.",
+    "outdated": "Je gebruikt een <b>verouderde</b> versie van Zipline. Het wordt aanbevolen om bij te werken naar de <anchor>nieuwste versie</anchor>.",
+    "current": "Huidige versie",
+    "fields": {
+      "version": "Versie",
+      "commit": "Commit",
+      "upstream": "Upstream?",
+      "availableToUpdate": "Beschikbaar om bij te werken"
+    },
+    "latestCommit": "Nieuwste beschikbare commit",
+    "latestCommitNote": "Dit is alleen zichtbaar wanneer je een upstream-versie gebruikt.",
+    "available": "{{tag}} is beschikbaar",
+    "changelogs": "Wijzigingslogboeken",
+    "update": "Bijwerken"
+  },
+  "qrCode": {
+    "title": "QR-code",
+    "alt": "QR-code",
+    "failed": "QR-code genereren mislukt.",
+    "format": "Formaat",
+    "copyUnsupported": "Het kopiëren van dit formaat wordt niet in alle browsers ondersteund. Je kunt de afbeelding op de gebruikelijke manier kopiëren door er met de rechtermuisknop op te klikken of deze ingedrukt te houden.",
+    "copyImage": "Afbeelding kopiëren",
+    "copied": "QR-codeafbeelding naar klembord gekopieerd",
+    "copyFailed": "QR-codeafbeelding kopiëren mislukt"
+  },
+  "domainSelect": {
+    "default": "Standaarddomein",
+    "description": "Overschrijf het domein met deze waarde. Hiermee wijzig je het domein dat bij je uploads wordt teruggegeven. Laat dit leeg om het standaarddomein te gebruiken."
+  },
+  "copyLink": {
+    "title": "Link gekopieerd"
+  },
+  "errors": {
+    "generic": {
+      "title": "Er is een fout opgetreden",
+      "message": "Er is iets misgegaan. Probeer het later opnieuw of meld dit probleem als het blijft optreden."
+    },
+    "dashboard": {
+      "title": "Clientfout in het dashboard",
+      "message": "Er is iets misgegaan bij het laden van het dashboard. Probeer het later opnieuw of meld dit probleem als het blijft optreden."
+    },
+    "reload": {
+      "title": "Update beschikbaar",
+      "message": "Er is een nieuwe versie van de app beschikbaar. Herlaad de pagina om bij te werken.",
+      "button": "Pagina herladen",
+      "why": "Waarom zie ik dit?",
+      "errorTitle": "Dynamisch geïmporteerde module ophalen mislukt",
+      "errorMessage": "Deze fout kan optreden wanneer een nieuwe versie van de app wordt uitgerold terwijl je de pagina open hebt. Herlaad de pagina om bij te werken naar de nieuwste versie."
+    }
+  },
+  "notFound": {
+    "message": "Pagina niet gevonden",
+    "goHome": "Naar de startpagina"
+  },
+  "titles": {
+    "settings": "Instellingen",
+    "folders": "Mappen",
+    "files": "Bestanden",
+    "metrics": "Statistieken",
+    "urls": "URL’s",
+    "serverSettings": "Serverinstellingen",
+    "administrator": "Beheerder",
+    "serverActions": "Serveracties",
+    "invites": "Uitnodigingen",
+    "uploadFile": "Bestand uploaden",
+    "uploadText": "Tekst uploaden",
+    "users": "Gebruikers",
+    "userFiles": "Bestanden van {{username}}",
+    "unknownUserFiles": "Bestanden van gebruiker"
+  }
+}

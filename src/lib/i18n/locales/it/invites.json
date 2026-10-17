@@ -1,0 +1,75 @@
+{
+  "title": "Inviti",
+  "create": {
+    "title": "Crea un invito",
+    "expiresAt": {
+      "label": "Scade il",
+      "description": "Seleziona una scadenza per questo invito, oppure scegli \"mai\" se vuoi che l'invito non scada mai.",
+      "placeholder": "Seleziona una scadenza..."
+    },
+    "maxUses": {
+      "label": "Utilizzi massimi",
+      "description": "Imposta un numero massimo di utilizzi per questo invito, oppure lascia vuoto per utilizzi illimitati.",
+      "placeholder": "Inserisci un numero..."
+    }
+  },
+  "table": {
+    "columns": {
+      "actions": "Azioni",
+      "created": "Creato",
+      "code": "Codice",
+      "createdBy": "Creato da",
+      "updatedAt": "Aggiornato il",
+      "expires": "Scade",
+      "maxUses": "Utilizzi massimi",
+      "uses": "Utilizzi"
+    },
+    "never": "Mai",
+    "unlimited": "Illimitati",
+    "copyLink": "Copia link invito",
+    "showQrCode": "Mostra QR Code",
+    "delete": "Elimina invito"
+  },
+  "card": {
+    "created": "Creato:",
+    "copyUrl": "Copia URL",
+    "showQrCode": "Mostra QR Code",
+    "createdBy": "Creato da:",
+    "expires": "Scade:",
+    "maxUses": "Utilizzi massimi:",
+    "uses": "Utilizzi:",
+    "unlimited": "Illimitati"
+  },
+  "expirations": {
+    "never": "Mai",
+    "minutes30": "30 minuti",
+    "hour1": "1 ora",
+    "hours6": "6 ore",
+    "hours12": "12 ore",
+    "day1": "1 giorno",
+    "days3": "3 giorni",
+    "days5": "5 giorni",
+    "days7": "7 giorni"
+  },
+  "notifications": {
+    "created": {
+      "title": "Invito creato",
+      "message": "L'invito {{code}} è stato creato."
+    },
+    "deleteFailed": {
+      "title": "Impossibile eliminare l'invito"
+    },
+    "deleted": {
+      "title": "Invito eliminato",
+      "message": "L'invito {{code}} è stato eliminato."
+    }
+  },
+  "delete": {
+    "message": "Sei sicuro di voler eliminare l'invito {{code}}? Questa azione non può essere annullata.",
+    "confirm": "Elimina {{code}}"
+  },
+  "empty": {
+    "title": "Nessun invito trovato",
+    "description": "Crea un invito per vederlo qui."
+  }
+}

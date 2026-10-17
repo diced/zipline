@@ -1,0 +1,373 @@
+{
+  "admin": {
+    "title": "Beheerder",
+    "links": {
+      "metrics": {
+        "label": "Statistieken",
+        "description": "Gebruiksgrafieken en statistieken voor de gehele instantie"
+      },
+      "actions": {
+        "label": "Acties",
+        "description": "Onderhoudshulpmiddelen en import/export"
+      },
+      "users": {
+        "label": "Gebruikers",
+        "description": "Gebruikers en quota beheren"
+      },
+      "settings": {
+        "label": "Instellingen",
+        "description": "Serverconfiguratie"
+      },
+      "invites": {
+        "label": "Uitnodigingen",
+        "description": "Uitnodigingscodes aanmaken en beheren"
+      }
+    },
+    "storage": {
+      "title": "Opslag",
+      "refresh": "Opslagstatistieken vernieuwen",
+      "loadFailed": "Opslag laden mislukt",
+      "used": "{{used}} gebruikt"
+    },
+    "version": {
+      "title": "Versie",
+      "loadFailed": "Versie-informatie kon niet worden geladen."
+    }
+  },
+  "page": {
+    "title": "Serveracties",
+    "description": "Handige hulpmiddelen en scripts voor serverbeheer."
+  },
+  "list": {
+    "importExport": {
+      "label": "Gegevens importeren/exporteren",
+      "description": "Hiermee kun je servergegevens en configuraties importeren of exporteren."
+    },
+    "clearTemporaryFiles": {
+      "label": "Tijdelijke bestanden wissen",
+      "description": "Verwijdert alle tijdelijke bestanden uit de tijdelijke map."
+    },
+    "clearZeroByteFiles": {
+      "label": "Bestanden van nul bytes wissen",
+      "description": "Verwijdert alle bestanden van nul bytes uit de database en/of opslag."
+    },
+    "requeryFileSizes": {
+      "label": "Bestandsgroottes opnieuw opvragen",
+      "description": "Berekent de groottes van alle bestanden in de database opnieuw en werkt ze bij."
+    },
+    "generateThumbnails": {
+      "description": "Maakt miniaturen voor alle afbeeldings- en videobestanden die er nog geen hebben.",
+      "label": "Miniaturen genereren"
+    }
+  },
+  "modals": {
+    "confirmDelete": "Ja, verwijderen",
+    "clearTemporaryFiles": {
+      "body": "Hiermee verwijder je tijdelijke bestanden uit de tijdelijke map (opgegeven in de configuratie). Dit zou geen problemen moeten veroorzaken, tenzij er nog bestanden worden verwerkt."
+    },
+    "clearZeroByteFiles": {
+      "body": "Hiermee verwijder je {{count}} bestanden uit de database en gegevensbron."
+    },
+    "requeryFileSizes": {
+      "body": "Hiermee vraag je de grootte van elk bestand in de database opnieuw op. Daarnaast kun je de onderstaande opties gebruiken.",
+      "forceUpdate": {
+        "label": "Bijwerken forceren",
+        "description": "Werk de grootte van elk bestand geforceerd bij, ook als er al een grootte is ingesteld."
+      },
+      "forceDelete": {
+        "label": "Verwijderen forceren",
+        "description": "Verwijder bestanden die niet in de database worden gevonden of een grootte van 0 hebben."
+      },
+      "confirm": "Opnieuw opvragen"
+    },
+    "generateThumbnails": {
+      "body": "Hiermee genereer je miniaturen voor alle bestanden waarvoor geen miniatuur is ingesteld. Daarnaast kun je de onderstaande opties gebruiken.",
+      "rerun": {
+        "label": "Opnieuw uitvoeren",
+        "description": "Genereer de miniaturen opnieuw voor alle bestanden, ongeacht of er al een miniatuur is ingesteld."
+      },
+      "confirm": "Genereren"
+    }
+  },
+  "importExport": {
+    "title": "Gegevens importeren / exporteren",
+    "import": "Importeren",
+    "upload": "Export uploaden (JSON)",
+    "clear": "Import wissen",
+    "clearAriaLabel": "Wissen",
+    "importData": "Gegevens importeren",
+    "notifications": {
+      "invalid": {
+        "title": "Er zijn fouten opgetreden bij de import"
+      },
+      "settingsFailed": {
+        "title": "Instellingen importeren mislukt"
+      },
+      "settingsImported": {
+        "title": "Instellingen geïmporteerd"
+      }
+    },
+    "export": {
+      "button": "Gegevens exporteren",
+      "intro": "De export biedt een volledige momentopname van de gegevens en omgeving van Zipline. Deze bevat:",
+      "items": {
+        "users": "<b>Gebruikers:</b> Accountgegevens, waaronder gebruikersnamen, optionele wachtwoorden, avatars, rollen, weergave-instellingen en optionele TOTP-geheimen.",
+        "passkeys": "<b>Passkeys:</b> Geregistreerde WebAuthn-passkeys met aanmaakdatums, tijdstempels van het laatste gebruik en registratiegegevens van de inloggegevens.",
+        "userQuotas": "<b>Gebruikersquota:</b> Quota-instellingen, zoals het maximale aantal bytes, bestanden en URL’s, en quotatypen.",
+        "oauthProviders": "<b>OAuth-providers:</b> Gekoppelde OAuth-accounts, inclusief providertype, tokens en OAuth-ID’s.",
+        "userTags": "<b>Gebruikerstags:</b> Tags die door gebruikers zijn aangemaakt, inclusief namen, kleuren en bijbehorende bestands-ID’s.",
+        "files": "<b>Bestanden:</b> Metagegevens over geüploade bestanden, waaronder grootte, type, tijdstempels, vervaltijd, weergaven, wachtwoordbeveiliging, eigenaar en mapkoppeling.<i> (De daadwerkelijke bestandsinhoud wordt niet opgenomen.)</i>",
+        "folders": "<b>Mappen:</b> Metagegevens van mappen, waaronder zichtbaarheidsinstellingen, uploadrechten, bestandslijsten en eigendom.",
+        "urls": "<b>URL’s:</b> Metagegevens van verkorte URL’s, waaronder bestemmingen, aangepaste codes, weergaveaantallen, wachtwoorden en gebruikerstoewijzingen.",
+        "thumbnails": "<b>Miniaturen:</b> Miniatuurpad en bijbehorende bestands-ID.<i> (Afbeeldingsgegevens worden niet opgenomen.)</i>",
+        "invites": "<b>Uitnodigingen:</b> Uitnodigingscodes, aanmaak-/vervaldatums en gebruiksaantallen.",
+        "metrics": "<b>Statistieken:</b> Systeem- en gebruiksstatistieken die intern door Zipline worden opgeslagen."
+      },
+      "systemIntro": "Daarnaast bevat de export <b>systeemspecifieke informatie</b>:",
+      "systemItems": {
+        "cpuCount": "<b>Aantal CPU-kernen:</b> Het aantal beschikbare processorkernen.",
+        "hostname": "<b>Hostnaam:</b> De netwerkidentificatie van het hostsysteem.",
+        "architecture": "<b>Architectuur:</b> De hardwarearchitectuur (bijv. <code>x64</code>, <code>arm64</code>).",
+        "platform": "<b>Platform:</b> Het besturingssysteemplatform (bijv. <code>linux</code>, <code>darwin</code>).",
+        "osRelease": "<b>OS-versie:</b> De versie van het besturingssysteem of de kernel.",
+        "env": "<b>Omgevingsvariabelen:</b> Een volledige momentopname van de omgevingsvariabelen op het moment van exporteren.",
+        "versions": "<b>Versies:</b> De Zipline-versie, Node-versie en versie van het exportformaat."
+      },
+      "excludeMetrics": {
+        "label": "Statistische gegevens uitsluiten",
+        "description": "Sluit systeem- en gebruiksstatistieken uit van de export. Dit kan het exportbestand kleiner maken."
+      },
+      "warning": {
+        "title": "Waarschuwing",
+        "message": "Deze export bevat een aanzienlijke hoeveelheid gevoelige gegevens, waaronder gebruikersaccounts, authenticatiegegevens, omgevingsvariabelen en systeemmetagegevens. Bewaar dit bestand veilig en deel het niet met onbetrouwbare partijen."
+      },
+      "download": "Export downloaden"
+    },
+    "v3": {
+      "title": "V3-gegevens importeren",
+      "invalidMessage": "Zipline kon de importgegevens niet valideren. Weet je zeker dat dit een geldige export uit Zipline v3 is? Bekijk de browserconsole voor meer informatie over de fout.",
+      "confirm": {
+        "message": "Dit proces overschrijft bestaande gegevens NIET, maar voegt gegevens toe. Bij conflicten worden de geïmporteerde gegevens overgeslagen en gelogd. Als je een export uit versie 3 gebruikt, moet het volledige importproces direct na het instellen van Zipline worden voltooid."
+      },
+      "importing": {
+        "title": "Gegevens importeren",
+        "message": "Het exportbestand wordt geüpload. Dit kan even duren. Het proces draait op de achtergrond en wordt gelogd, dus je kunt dit browsertabblad sluiten."
+      },
+      "failed": {
+        "title": "Gegevens importeren mislukt",
+        "message": "Er is een fout opgetreden bij het importeren van gegevens. Bekijk de Zipline-logboeken voor meer informatie."
+      },
+      "imported": {
+        "title": "Gegevens geïmporteerd",
+        "message": "De gegevens zijn succesvol geïmporteerd. Eventuele conflicten zijn gelogd.",
+        "stats": {
+          "users": "<b>Gebruikers: </b> {{count}}",
+          "folders": "<b>Mappen: </b> {{count}}",
+          "urls": "<b>URL’s: </b> {{count}}",
+          "files": "<b>Bestanden: </b> {{count}}"
+        }
+      },
+      "noUsers": {
+        "title": "Geen gebruikers geïmporteerd",
+        "message": "Er zijn geen gebruikers geïmporteerd, waarschijnlijk omdat de export gebruikersnamen bevat die al bestaan in deze Zipline-instantie. Bekijk de Zipline-logboeken voor meer informatie. Bestanden, mappen en URL’s zijn mogelijk ook niet geïmporteerd."
+      },
+      "filesImported": {
+        "message": "Er zijn {{count}} bestanden geïmporteerd. Omdat deze import geen bestanden kopieert, moet je de bestanden van de instantie waar ze zijn opgeslagen naar de huidige Zipline-instantie verplaatsen. Het script <code>import-dir</code> kan hierbij handig zijn als je mapopslag gebruikt. Als je S3 gebruikt, kun je voor deze instantie dezelfde bucket gebruiken.",
+        "important": {
+          "title": "Belangrijk",
+          "message": "Na het importeren moet je het exportbestand verwijderen of veilig bewaren, omdat het gevoelige informatie bevat, zoals wachtwoorden en OAuth-tokens."
+        },
+        "settings": {
+          "title": "Instellingen geïmporteerd",
+          "message": "De geïmporteerde instellingen zijn toegepast. Het wordt aanbevolen de pagina te herladen om ervoor te zorgen dat de instellingen correct worden toegepast."
+        },
+        "okay": "Oké"
+      },
+      "importSettings": {
+        "description": "Met deze optie kun je compatibele instellingen uit je instantie importeren in deze v4-instantie."
+      },
+      "userChoose": {
+        "description": "Met deze optie kun je gegevens van een gebruiker uit je export importeren naar de momenteel ingelogde gebruiker, ook als beide dezelfde gebruikersnaam hebben. Normaal gesproken slaat het systeem gebruikers over van wie de gebruikersnaam al in de database bestaat. Als je je instantie echter net hebt ingesteld en dezelfde gebruikersnaam hebt gebruikt als in je oude instantie, kun je met deze optie de gegevens van die gebruiker samenvoegen met je ingelogde account zonder dat je het hoeft te verwijderen of vervangen. <b>Het wordt aanbevolen voor deze handeling een gebruiker met superbeheerdersrechten te selecteren.</b>"
+      }
+    },
+    "v4": {
+      "title": "V4-gegevens importeren",
+      "invalidMessage": "Zipline kon de importgegevens niet valideren. Weet je zeker dat dit een geldige export uit Zipline v4 is? Bekijk de browserconsole voor meer informatie over de fout.",
+      "settingsImportedMessage": "Om ervoor te zorgen dat alle instellingen van kracht worden, wordt aanbevolen Zipline opnieuw op te starten.",
+      "sameInstance": {
+        "modalBody": "Er is gedetecteerd dat je gegevens importeert uit dezelfde instantie als de momenteel actieve. Je moet akkoord gaan met de waarschuwing voordat je doorgaat met importeren.",
+        "title": "Dezelfde instantie gedetecteerd",
+        "description": "Er is gedetecteerd dat je gegevens importeert uit dezelfde instantie als de momenteel actieve. Doorgaan met deze import kan leiden tot gegevensconflicten of het overschrijven van bestaande gegevens. Zorg dat je de gevolgen begrijpt voordat je doorgaat.",
+        "agree": "Ik ga akkoord en begrijp de gevolgen."
+      },
+      "confirm": {
+        "message": "Dit proces overschrijft bestaande gegevens NIET, maar voegt gegevens toe. Bij conflicten worden de geïmporteerde gegevens overgeslagen en gelogd.",
+        "label": "Ja, gegevens importeren."
+      },
+      "importing": {
+        "title": "Gegevens importeren...",
+        "message": "Het exportbestand wordt geüpload. Dit kan even duren. De import draait op de achtergrond en wordt gelogd, dus je kunt dit browsertabblad sluiten als je wilt."
+      },
+      "failed": {
+        "message": "Er is een fout opgetreden bij het importeren van gegevens. Bekijk de logboeken voor meer informatie.",
+        "title": "Gegevens importeren mislukt..."
+      },
+      "completed": {
+        "title": "Import voltooid.",
+        "message": "De import is voltooid. Zorg ervoor dat de gegevensbron correct is ingesteld en overeenkomt met je vorige instantie, zodat bestanden goed kunnen worden bekeken. Als je bijvoorbeeld eerder lokale opslag gebruikte, stel dan dezelfde map (of dezelfde map uit een back-up) in als voorheen. Als je S3 gebruikt, zorg dan dat je dezelfde bucket gebruikt. <br/> <br/>Daarnaast wordt aanbevolen Zipline opnieuw op te starten, zodat alle instellingen volledig van kracht worden.",
+        "stats": {
+          "users": "<b>Gebruikers: </b>{{count}} geïmporteerd.",
+          "passkeys": "<b>Passkeys: </b>{{count}} geïmporteerd.",
+          "oauthProviders": "<b>OAuth-providers: </b>{{count}} geïmporteerd.",
+          "quotas": "<b>Quota: </b>{{count}} geïmporteerd.",
+          "folders": "<b>Mappen: </b>{{count}} geïmporteerd.",
+          "tags": "<b>Tags: </b>{{count}} geïmporteerd.",
+          "files": "<b>Bestanden: </b>{{count}} geïmporteerd.",
+          "urls": "<b>URL’s: </b>{{count}} geïmporteerd.",
+          "invites": "<b>Uitnodigingen: </b>{{count}} geïmporteerd.",
+          "metrics": "<b>Statistieken: </b>{{count}} geïmporteerd."
+        }
+      },
+      "importSettings": {
+        "description": "Importeer alle instellingen uit je vorige instantie in deze v4-instantie.<br/>Na het importeren wordt aanbevolen Zipline opnieuw op te starten, zodat alle instellingen volledig van kracht worden.",
+        "show": "Te importeren instellingen tonen",
+        "hide": "Te importeren instellingen verbergen"
+      },
+      "userChoose": {
+        "description": "Met deze optie kun je gegevens van een gebruiker uit je export importeren naar de momenteel ingelogde gebruiker, ook als beide dezelfde gebruikersnaam hebben. Normaal gesproken slaat het systeem gebruikers over van wie de gebruikersnaam al in het systeem bestaat. <br/> <br/> Als je je instantie <b>echter</b> net hebt ingesteld en dezelfde gebruikersnaam hebt gebruikt als in je oude instantie, kun je met deze optie de gegevens van die gebruiker samenvoegen met je ingelogde account zonder dat je het hoeft te verwijderen of vervangen. <b>Het wordt aanbevolen voor deze handeling een gebruiker met superbeheerdersrechten te selecteren.</b>"
+      }
+    },
+    "userChoose": {
+      "title": "Selecteer een gebruiker van wie je de gegevens naar de huidige gebruiker wilt importeren.",
+      "superAdministrator": "Superbeheerder",
+      "noMerge": {
+        "label": "Gegevens niet samenvoegen",
+        "description": "Selecteer deze optie als je geen gegevens van een gebruiker wilt samenvoegen met de huidige gebruiker."
+      }
+    },
+    "importSettings": {
+      "count": "{{count}} instellingen importeren",
+      "title": "Instellingen importeren?"
+    },
+    "details": {
+      "notice": "Deze gegevens worden niet naar de server verzonden. Ze worden in de browser verwerkt en weergegeven. Gegevens worden pas naar de server verzonden wanneer je op de knop \"Importeren\" klikt.",
+      "unknown": "onbekend",
+      "version": {
+        "title": "Versiedetails",
+        "exportVersion": "Exportversie:"
+      },
+      "request": {
+        "showOs": "OS-details tonen",
+        "hideOs": "OS-details verbergen",
+        "at": "Op:",
+        "title": "Aanvraagdetails",
+        "user": "Gebruiker:",
+        "showEnv": "Omgeving tonen",
+        "hideEnv": "Omgeving verbergen"
+      },
+      "table": {
+        "value": "Waarde",
+        "key": "Sleutel"
+      },
+      "roles": {
+        "user": "Gebruiker",
+        "superAdmin": "Superbeheerder",
+        "admin": "Beheerder"
+      },
+      "users": {
+        "title": "Gebruikers",
+        "empty": "Geen gebruikers gevonden (hoe dan?)",
+        "columns": {
+          "id": "ID",
+          "username": "Gebruikersnaam",
+          "password": "Wachtwoord",
+          "passwordQuestion": "Wachtwoord?",
+          "oauthProviders": "OAuth-providers",
+          "quota": "Quota",
+          "role": "Rol",
+          "superAdmin": "Superbeheerder",
+          "passkeys": "Passkeys",
+          "admin": "Beheerder",
+          "avatar": "Avatar",
+          "totp": "2FA (TOTP)",
+          "oauth": "OAuth",
+          "files": "Bestanden"
+        }
+      },
+      "oauthProviders": {
+        "empty": "Geen OAuth-providers van gebruikers gevonden",
+        "title": "OAuth-providers van gebruikers",
+        "columns": {
+          "user": "Gebruiker",
+          "provider": "Provider",
+          "oauthId": "OAuth-ID",
+          "oauthUsername": "OAuth-gebruikersnaam"
+        }
+      },
+      "files": {
+        "title": "Bestanden",
+        "empty": "Geen bestanden gevonden",
+        "columns": {
+          "name": "Naam",
+          "originalName": "Oorspronkelijke naam",
+          "size": "Grootte",
+          "type": "Type",
+          "createdAt": "Aangemaakt op",
+          "password": "Wachtwoord",
+          "owner": "Eigenaar",
+          "views": "Weergaven"
+        }
+      },
+      "tags": {
+        "title": "Gebruikerstags",
+        "columns": {
+          "user": "Gebruiker",
+          "name": "Naam",
+          "files": "Bestanden"
+        },
+        "empty": "Geen gebruikerstags gevonden"
+      },
+      "folders": {
+        "columns": {
+          "owner": "Eigenaar",
+          "public": "Openbaar",
+          "name": "Naam",
+          "createdAt": "Aangemaakt op",
+          "files": "Bestanden"
+        },
+        "title": "Mappen",
+        "empty": "Geen mappen gevonden"
+      },
+      "urls": {
+        "title": "URL’s",
+        "columns": {
+          "code": "Code",
+          "destination": "Bestemming",
+          "owner": "Eigenaar",
+          "password": "Wachtwoord",
+          "vanity": "Aangepaste code",
+          "createdAt": "Aangemaakt op"
+        },
+        "empty": "Geen URL’s gevonden"
+      },
+      "invites": {
+        "columns": {
+          "createdAt": "Aangemaakt op",
+          "code": "Code",
+          "uses": "Aantal keren gebruikt",
+          "createdBy": "Aangemaakt door"
+        },
+        "title": "Uitnodigingen",
+        "empty": "Geen uitnodigingen gevonden"
+      },
+      "metrics": {
+        "title": "Statistieken",
+        "totalEntries": "Totaal aantal statistiekitems:",
+        "latestEntry": "Laatste statistiekitem:"
+      },
+      "other": {
+        "title": "Overig"
+      }
+    }
+  }
+}
