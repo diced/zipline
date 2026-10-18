@@ -32,6 +32,8 @@ import { useTranslation } from 'react-i18next';
 import SafeTrans from '@/components/SafeTrans';
 import { mutate } from 'swr';
 import { useShallow } from 'zustand/shallow';
+import { defaultDiscordComponentEmbed, discordComponentEmbedSchema } from '@/lib/discordComponentEmbed';
+import DiscordComponentEmbedBuilder from './DiscordComponentEmbedBuilder';
 
 const alignIcons: Record<string, React.ReactNode> = {
   left: <IconAlignLeft size='1rem' />,
@@ -74,6 +76,7 @@ function Form({ user, setUser }: { user: User; setUser: (u: User) => void }) {
       showMimetype: user.view.showMimetype || false,
       showTags: user.view.showTags || false,
       showFolder: user.view.showFolder || false,
+      discordComponentEmbed: user.view.discordComponentEmbed || defaultDiscordComponentEmbed(),
     },
   });
 
@@ -92,7 +95,19 @@ function Form({ user, setUser }: { user: User; setUser: (u: User) => void }) {
       showMimetype: values.showMimetype,
       showTags: values.showTags,
       showFolder: values.showFolder,
+      discordComponentEmbed: values.discordComponentEmbed,
     };
+
+    const componentEmbed = discordComponentEmbedSchema.safeParse(values.discordComponentEmbed);
+    if (!componentEmbed.success) {
+      notifications.show({
+        title: t('fileView.notifications.componentEmbedError.title'),
+        message: componentEmbed.error.issues[0]?.message,
+        color: 'red',
+        icon: <IconFileX size='1rem' />,
+      });
+      return;
+    }
 
     const { data, error } = await fetchApi<Response['/api/user']>('/api/user', 'PATCH', {
       view,
@@ -241,6 +256,14 @@ function Form({ user, setUser }: { user: User; setUser: (u: User) => void }) {
               {...form.getInputProps('embedColor')}
             />
           </SimpleGrid>
+
+          <Divider my='sm' />
+
+          <DiscordComponentEmbedBuilder
+            disabled={!form.values.enabled}
+            value={form.values.discordComponentEmbed}
+            onChange={(value) => form.setFieldValue('discordComponentEmbed', value)}
+          />
 
           <Group justify='left' mt='sm'>
             <Button type='submit' leftSection={<IconDeviceFloppy size='1rem' />}>

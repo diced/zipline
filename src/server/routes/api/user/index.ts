@@ -13,6 +13,7 @@ import { users, userSessions } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { zStringTrimmed } from '@/lib/validation';
+import { discordComponentEmbedSchema } from '@/lib/discordComponentEmbed';
 import { userMiddleware } from '@/server/middleware/user';
 import { getSession, saveSession } from '@/server/session';
 import typedPlugin from '@/server/typedPlugin';
@@ -69,6 +70,7 @@ export default typedPlugin(
                 embedDescription: z.string().nullish(),
                 embedColor: z.string().nullish(),
                 embedSiteName: z.string().nullish(),
+                discordComponentEmbed: discordComponentEmbedSchema.nullish(),
                 enabled: z.boolean().optional(),
                 disableTextFiles: z.boolean().optional(),
                 align: z.enum(['left', 'center', 'right']).optional(),
@@ -160,6 +162,9 @@ export default typedPlugin(
               }),
               ...(req.body.view.embedSiteName !== undefined && {
                 embedSiteName: req.body.view.embedSiteName || null,
+              }),
+              ...(req.body.view.discordComponentEmbed !== undefined && {
+                discordComponentEmbed: req.body.view.discordComponentEmbed || null,
               }),
               ...(req.body.view.align !== undefined && { align: req.body.view.align || 'center' }),
               ...(req.body.view.showMimetype !== undefined && {
