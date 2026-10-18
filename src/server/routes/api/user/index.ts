@@ -142,7 +142,20 @@ export default typedPlugin(
                 disableTextFiles: req.body.view.disableTextFiles || false,
               }),
               ...(req.body.view.content !== undefined && { content: req.body.view.content || null }),
-              ...(req.body.view.embed !== undefined && { embed: req.body.view.embed || false }),
+              ...((req.body.view.embed !== undefined ||
+                req.body.view.discordComponentEmbed !== undefined) && {
+                embed: (() => {
+                  const componentEmbedOn = !!(req.body.view.discordComponentEmbed !== undefined
+                    ? req.body.view.discordComponentEmbed?.enabled
+                    : req.user.view.discordComponentEmbed?.enabled);
+
+                  if (componentEmbedOn) return false;
+
+                  return req.body.view.embed !== undefined
+                    ? req.body.view.embed || false
+                    : req.user.view.embed || false;
+                })(),
+              }),
               ...(req.body.view.embedMediaOnly !== undefined && {
                 embedMediaOnly: (() => {
                   const embedOn = !!(req.body.view.embed !== undefined

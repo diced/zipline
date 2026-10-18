@@ -66,7 +66,7 @@ function Form({ user, setUser }: { user: User; setUser: (u: User) => void }) {
       enabled: user.view.enabled || false,
       disableTextFiles: user.view.disableTextFiles || false,
       content: user.view.content || '',
-      embed: user.view.embed || false,
+      embed: user.view.discordComponentEmbed?.enabled ? false : user.view.embed || false,
       embedMediaOnly: user.view.embedMediaOnly || false,
       embedTitle: user.view.embedTitle || '',
       embedDescription: user.view.embedDescription || '',
@@ -84,7 +84,7 @@ function Form({ user, setUser }: { user: User; setUser: (u: User) => void }) {
     const view = {
       enabled: values.enabled,
       disableTextFiles: values.disableTextFiles,
-      embed: values.embed,
+      embed: values.discordComponentEmbed.enabled ? false : values.embed,
       embedMediaOnly: values.embed ? false : values.embedMediaOnly,
       content: values.content.trim() || null,
       embedTitle: values.embedTitle.trim() || null,
@@ -215,7 +215,7 @@ function Form({ user, setUser }: { user: User; setUser: (u: User) => void }) {
           <Switch
             label={t('fileView.embed.label')}
             description={t('fileView.embed.description')}
-            disabled={!form.values.enabled}
+            disabled={!form.values.enabled || form.values.discordComponentEmbed.enabled}
             my='xs'
             {...form.getInputProps('embed', { type: 'checkbox' })}
             onChange={(event) => {
@@ -262,7 +262,12 @@ function Form({ user, setUser }: { user: User; setUser: (u: User) => void }) {
           <DiscordComponentEmbedBuilder
             disabled={!form.values.enabled}
             value={form.values.discordComponentEmbed}
-            onChange={(value) => form.setFieldValue('discordComponentEmbed', value)}
+            onChange={(value) => {
+              form.setFieldValue('discordComponentEmbed', value);
+              if (value.enabled) {
+                form.setFieldValue('embed', false);
+              }
+            }}
           />
 
           <Group justify='left' mt='sm'>
