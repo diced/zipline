@@ -10,7 +10,14 @@ import 'dayjs/locale/zh-cn';
 import { useSettingsStore } from '@/lib/client/store/settings';
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import { DAYJS_LOCALES, DEFAULT_LANGUAGE, isLanguage, Language, LANGUAGES, matchLanguage } from './languages';
+import {
+  getDayjsLocale,
+  DEFAULT_LANGUAGE,
+  isLanguage,
+  Language,
+  LANGUAGES,
+  matchLanguage,
+} from './languages';
 import { Resources, resources } from './resources';
 
 declare module 'i18next' {
@@ -46,7 +53,7 @@ export function detectLanguage(): Language {
 function applyLanguage(lng: string) {
   const language = isLanguage(lng) ? lng : DEFAULT_LANGUAGE;
 
-  dayjs.locale(DAYJS_LOCALES[language]);
+  dayjs.locale(getDayjsLocale(language));
   if (typeof document !== 'undefined') document.documentElement.lang = language;
 }
 

@@ -173,13 +173,19 @@ See [migration](https://zipline.diced.sh/docs/migrate) for more information.
 
 # Contributing
 
-Contributions of any kind are welcome, whether they are bug reports, pull requests, or feature requests.
+Bug reports, feature requests, code pull requests, and translations are welcome. See below for how to contribute.
 
 ## Translations
 
 <a href="https://wl.diced.sh/engage/zipline/"><img src="https://wl.diced.sh/widget/zipline/multi-auto.svg" alt="Translation status"></a>
 
-If you would like to help translate Zipline, please check out our [Weblate](https://wl.diced.sh). Sign in through GitHub, and then start making translations.
+Translations are managed through [Weblate](https://wl.diced.sh). Sign in through
+GitHub to add or improve translations. **Translation pull requests are not accep
+ted; please submit translation changes through Weblate.**
+
+English is the source language, and untranslated text falls back to English. Preserve placeholders such as `{{count}}`, markup tags, and the plural forms required by your language.
+
+For code contributions, add new source strings to `src/lib/i18n/locales/en/<namespace>.json` and use `SafeTrans` for translated markup instead of `Trans` directly. Run `pnpm test` to check translation keys, placeholders, tags, and plural forms.
 
 ## Bug Reports
 

@@ -4,7 +4,7 @@ import { useSettingsStore } from '@/lib/client/store/settings';
 import { useUserStore } from '@/lib/client/store/user';
 import { ZiplineTheme, findTheme, themeComponents } from '@/lib/theme';
 import dark_blue from '@/lib/theme/builtins/dark_blue.theme.json' with { type: 'json' };
-import { DAYJS_LOCALES } from '@/lib/i18n/languages';
+import { getDayjsLocale } from '@/lib/i18n/languages';
 import { currentLanguage } from '@/lib/i18n';
 import { MantineProvider, createTheme } from '@mantine/core';
 import { DatesProvider } from '@mantine/dates';
@@ -52,7 +52,7 @@ export default function ThemeProvider({
   );
   const systemTheme = useColorScheme();
   const { i18n } = useTranslation();
-  const dayjsLocale = i18n.resolvedLanguage ? DAYJS_LOCALES[currentLanguage()] : 'en';
+  const dayjsLocale = i18n.resolvedLanguage ? getDayjsLocale(currentLanguage()) : 'en';
   const currentTheme = user ? userTheme : (defaultTheme?.default ?? 'system');
 
   let theme = findTheme(currentTheme, themes);
