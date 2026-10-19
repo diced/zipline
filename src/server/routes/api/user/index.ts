@@ -13,6 +13,7 @@ import { users, userSessions } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { zStringTrimmed } from '@/lib/validation';
+import { discordComponentEmbedSchema } from '@/lib/discordComponentEmbed';
 import { userMiddleware } from '@/server/middleware/user';
 import { getSession, saveSession } from '@/server/session';
 import typedPlugin from '@/server/typedPlugin';
@@ -69,6 +70,7 @@ export default typedPlugin(
                 embedDescription: z.string().nullish(),
                 embedColor: z.string().nullish(),
                 embedSiteName: z.string().nullish(),
+                discordComponentEmbed: discordComponentEmbedSchema.nullish(),
                 enabled: z.boolean().optional(),
                 disableTextFiles: z.boolean().optional(),
                 align: z.enum(['left', 'center', 'right']).optional(),
@@ -140,7 +142,20 @@ export default typedPlugin(
                 disableTextFiles: req.body.view.disableTextFiles || false,
               }),
               ...(req.body.view.content !== undefined && { content: req.body.view.content || null }),
-              ...(req.body.view.embed !== undefined && { embed: req.body.view.embed || false }),
+              ...((req.body.view.embed !== undefined ||
+                req.body.view.discordComponentEmbed !== undefined) && {
+                embed: (() => {
+                  const componentEmbedOn = !!(req.body.view.discordComponentEmbed !== undefined
+                    ? req.body.view.discordComponentEmbed?.enabled
+                    : req.user.view.discordComponentEmbed?.enabled);
+
+                  if (componentEmbedOn) return false;
+
+                  return req.body.view.embed !== undefined
+                    ? req.body.view.embed || false
+                    : req.user.view.embed || false;
+                })(),
+              }),
               ...(req.body.view.embedMediaOnly !== undefined && {
                 embedMediaOnly: (() => {
                   const embedOn = !!(req.body.view.embed !== undefined
@@ -160,6 +175,9 @@ export default typedPlugin(
               }),
               ...(req.body.view.embedSiteName !== undefined && {
                 embedSiteName: req.body.view.embedSiteName || null,
+              }),
+              ...(req.body.view.discordComponentEmbed !== undefined && {
+                discordComponentEmbed: req.body.view.discordComponentEmbed || null,
               }),
               ...(req.body.view.align !== undefined && { align: req.body.view.align || 'center' }),
               ...(req.body.view.showMimetype !== undefined && {

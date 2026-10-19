@@ -195,9 +195,59 @@
     "embedColor": {
       "label": "Embed Color"
     },
+    "componentEmbed": {
+      "label": "Enable Discord Components V2",
+      "description": "Replace Discord's standard link preview with a custom Components V2 layout. The OpenGraph settings above remain as a fallback.",
+      "limits": "Discord allows one root container, up to 40 total components, up to 10 gallery items, and a 3,000-byte payload. Empty or oversized layouts are not added to the page.",
+      "configure": "Configure components",
+      "modalTitle": "Discord Components V2",
+      "componentCount_one": "{{count}} component configured",
+      "componentCount_other": "{{count}} components configured",
+      "reorder": "Reorder {{type}}",
+      "addComponent": "Component type",
+      "add": "Add component",
+      "addButton": "Add button",
+      "addMedia": "Add media",
+      "addText": "Add text",
+      "removeButton": "Remove button",
+      "removeMedia": "Remove media",
+      "removeText": "Remove text",
+      "removeComponent": "Remove component",
+      "buttonNumber": "Button {{number}}",
+      "mediaNumber": "Media {{number}}",
+      "textNumber": "Text {{number}}",
+      "fields": {
+        "id": "Component ID",
+        "idDescription": "Optional numeric identifier",
+        "buttonUrl": "Button URL",
+        "buttonLabel": "Button label",
+        "emojiName": "Emoji",
+        "emojiNameDescription": "A Unicode emoji, or the name of a custom emoji",
+        "emojiId": "Custom emoji ID",
+        "disabled": "Disabled",
+        "animatedEmoji": "Animated custom emoji",
+        "markdown": "Markdown content",
+        "markdownDescription": "Discord markdown and Zipline variables are supported",
+        "divider": "Show divider",
+        "spacing": "Spacing",
+        "small": "Small",
+        "large": "Large",
+        "mediaUrl": "Media URL",
+        "altText": "Alternative text",
+        "spoiler": "Spoiler",
+        "accessory": "Section accessory",
+        "linkButton": "Link button",
+        "thumbnail": "Thumbnail",
+        "accentColor": "Container accent color",
+        "containerSpoiler": "Mark the entire container as a spoiler"
+      }
+    },
     "notifications": {
       "error": {
         "title": "Error while updating view settings"
+      },
+      "componentEmbedError": {
+        "title": "Invalid Discord component embed"
       },
       "updated": {
         "message": "View settings updated"
