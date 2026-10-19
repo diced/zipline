@@ -8,7 +8,7 @@
       },
       "actions": {
         "label": "Acties",
-        "description": "Onderhoudshulpmiddelen en import/export"
+        "description": "Hulpmiddelen voor onderhoud en import/export"
       },
       "users": {
         "label": "Gebruikers",
@@ -31,7 +31,7 @@
     },
     "version": {
       "title": "Versie",
-      "loadFailed": "Versie-informatie kon niet worden geladen."
+      "loadFailed": "Informatie over de versie kon niet worden geladen."
     }
   },
   "page": {
@@ -128,7 +128,7 @@
         "cpuCount": "<b>Aantal CPU-kernen:</b> Het aantal beschikbare processorkernen.",
         "hostname": "<b>Hostnaam:</b> De netwerkidentificatie van het hostsysteem.",
         "architecture": "<b>Architectuur:</b> De hardwarearchitectuur (bijv. <code>x64</code>, <code>arm64</code>).",
-        "platform": "<b>Platform:</b> Het besturingssysteemplatform (bijv. <code>linux</code>, <code>darwin</code>).",
+        "platform": "<b>Platform:</b> Het platform van het besturingssysteem (bijv. <code>linux</code>, <code>darwin</code>).",
         "osRelease": "<b>OS-versie:</b> De versie van het besturingssysteem of de kernel.",
         "env": "<b>Omgevingsvariabelen:</b> Een volledige momentopname van de omgevingsvariabelen op het moment van exporteren.",
         "versions": "<b>Versies:</b> De Zipline-versie, Node-versie en versie van het exportformaat."
@@ -139,7 +139,7 @@
       },
       "warning": {
         "title": "Waarschuwing",
-        "message": "Deze export bevat een aanzienlijke hoeveelheid gevoelige gegevens, waaronder gebruikersaccounts, authenticatiegegevens, omgevingsvariabelen en systeemmetagegevens. Bewaar dit bestand veilig en deel het niet met onbetrouwbare partijen."
+        "message": "Deze export bevat veel gevoelige gegevens, waaronder gebruikersaccounts, authenticatiegegevens, omgevingsvariabelen en systeemmetagegevens. Bewaar dit bestand veilig en deel het niet met onbetrouwbare partijen."
       },
       "download": "Export downloaden"
     },
@@ -179,7 +179,7 @@
         },
         "settings": {
           "title": "Instellingen geïmporteerd",
-          "message": "De geïmporteerde instellingen zijn toegepast. Het wordt aanbevolen de pagina te herladen om ervoor te zorgen dat de instellingen correct worden toegepast."
+          "message": "De geïmporteerde instellingen zijn toegepast. Herlaad de pagina bij voorkeur om ervoor te zorgen dat de instellingen goed worden toegepast."
         },
         "okay": "Oké"
       },
@@ -187,13 +187,13 @@
         "description": "Met deze optie kun je compatibele instellingen uit je instantie importeren in deze v4-instantie."
       },
       "userChoose": {
-        "description": "Met deze optie kun je gegevens van een gebruiker uit je export importeren naar de momenteel ingelogde gebruiker, ook als beide dezelfde gebruikersnaam hebben. Normaal gesproken slaat het systeem gebruikers over van wie de gebruikersnaam al in de database bestaat. Als je je instantie echter net hebt ingesteld en dezelfde gebruikersnaam hebt gebruikt als in je oude instantie, kun je met deze optie de gegevens van die gebruiker samenvoegen met je ingelogde account zonder dat je het hoeft te verwijderen of vervangen. <b>Het wordt aanbevolen voor deze handeling een gebruiker met superbeheerdersrechten te selecteren.</b>"
+        "description": "Met deze optie importeer je gegevens van een gebruiker uit je export naar het account waarmee je bent ingelogd, ook als beide accounts dezelfde gebruikersnaam hebben. Normaal slaat het systeem gebruikers over als hun gebruikersnaam al in de database staat. Als je je instantie net hebt ingesteld met dezelfde gebruikersnaam als in je oude instantie, kun je de gegevens van die gebruiker samenvoegen met je ingelogde account zonder het te verwijderen of te vervangen. <b>Kies voor deze handeling bij voorkeur een gebruiker met superbeheerdersrechten.</b>"
       }
     },
     "v4": {
       "title": "V4-gegevens importeren",
       "invalidMessage": "Zipline kon de importgegevens niet valideren. Weet je zeker dat dit een geldige export uit Zipline v4 is? Bekijk de browserconsole voor meer informatie over de fout.",
-      "settingsImportedMessage": "Om ervoor te zorgen dat alle instellingen van kracht worden, wordt aanbevolen Zipline opnieuw op te starten.",
+      "settingsImportedMessage": "Start Zipline bij voorkeur opnieuw op, zodat alle instellingen van kracht worden.",
       "sameInstance": {
         "modalBody": "Er is gedetecteerd dat je gegevens importeert uit dezelfde instantie als de momenteel actieve. Je moet akkoord gaan met de waarschuwing voordat je doorgaat met importeren.",
         "title": "Dezelfde instantie gedetecteerd",
@@ -229,12 +229,12 @@
         }
       },
       "importSettings": {
-        "description": "Importeer alle instellingen uit je vorige instantie in deze v4-instantie.<br/>Na het importeren wordt aanbevolen Zipline opnieuw op te starten, zodat alle instellingen volledig van kracht worden.",
+        "description": "Importeer alle instellingen uit je vorige instantie in deze v4-instantie.<br/>Start Zipline na het importeren bij voorkeur opnieuw op, zodat alle instellingen volledig van kracht worden.",
         "show": "Te importeren instellingen tonen",
         "hide": "Te importeren instellingen verbergen"
       },
       "userChoose": {
-        "description": "Met deze optie kun je gegevens van een gebruiker uit je export importeren naar de momenteel ingelogde gebruiker, ook als beide dezelfde gebruikersnaam hebben. Normaal gesproken slaat het systeem gebruikers over van wie de gebruikersnaam al in het systeem bestaat. <br/> <br/> Als je je instantie <b>echter</b> net hebt ingesteld en dezelfde gebruikersnaam hebt gebruikt als in je oude instantie, kun je met deze optie de gegevens van die gebruiker samenvoegen met je ingelogde account zonder dat je het hoeft te verwijderen of vervangen. <b>Het wordt aanbevolen voor deze handeling een gebruiker met superbeheerdersrechten te selecteren.</b>"
+        "description": "Met deze optie importeer je gegevens van een gebruiker uit je export naar het account waarmee je bent ingelogd, ook als beide accounts dezelfde gebruikersnaam hebben. Normaal slaat het systeem gebruikers over als hun gebruikersnaam al in het systeem staat. <br/> <br/> Als je je instantie <b>echter</b> net hebt ingesteld met dezelfde gebruikersnaam als in je oude instantie, kun je de gegevens van die gebruiker samenvoegen met je ingelogde account zonder het te verwijderen of te vervangen. <b>Kies voor deze handeling bij voorkeur een gebruiker met superbeheerdersrechten.</b>"
       }
     },
     "userChoose": {
@@ -260,7 +260,7 @@
         "showOs": "OS-details tonen",
         "hideOs": "OS-details verbergen",
         "at": "Op:",
-        "title": "Aanvraagdetails",
+        "title": "Verzoekdetails",
         "user": "Gebruiker:",
         "showEnv": "Omgeving tonen",
         "hideEnv": "Omgeving verbergen"

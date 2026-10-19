@@ -2,7 +2,8 @@
   "form": {
     "username": {
       "placeholder": "Voer een gebruikersnaam in...",
-      "required": "Gebruikersnaam is vereist"
+      "required": "Gebruikersnaam is verplicht",
+      "label": "Gebruikersnaam"
     },
     "password": {
       "label": "Wachtwoord",
@@ -10,7 +11,114 @@
       "required": "Wachtwoord is verplicht"
     },
     "avatar": {
-      "label": "Avatar"
+      "label": "Avatar",
+      "placeholder": "Kies een avatar...",
+      "clear": "Avatar wissen",
+      "invalidType": "Ongeldig bestandstype",
+      "readFailed": "Avatarbestand lezen mislukt"
+    },
+    "role": {
+      "label": "Rol"
     }
+  },
+  "title": "Gebruikers",
+  "roles": {
+    "user": "Gebruiker",
+    "administrator": "Beheerder",
+    "admin": "Beheerder",
+    "superAdmin": "Superbeheerder"
+  },
+  "create": {
+    "title": "Een nieuwe gebruiker aanmaken"
+  },
+  "edit": {
+    "title": "{{username}} bewerken",
+    "description": "Lege velden worden overgeslagen en niet bijgewerkt.",
+    "submit": "Gebruiker bijwerken",
+    "quota": {
+      "title": "Quota",
+      "invalidValue": "Ongeldige waarde",
+      "invalidByteFormat": "Ongeldig byteformaat",
+      "fileType": {
+        "label": "Type quotum voor bestanden",
+        "description": "Bepaalt of het bestandsquotum geldt voor het totale aantal bytes of het totale aantal bestanden.",
+        "byBytes": "Op bytes",
+        "byFiles": "Op aantal bestanden",
+        "none": "Geen bestandsquotum"
+      },
+      "maxFiles": {
+        "label": "Maximaal aantal bestanden",
+        "description": "Het maximale aantal bestanden dat de gebruiker kan uploaden.",
+        "placeholder": "Voer een getal in..."
+      },
+      "maxBytes": {
+        "label": "Maximaal aantal bytes",
+        "description": "Het maximale aantal bytes dat de gebruiker kan uploaden.",
+        "placeholder": "Voer een leesbaar byteformaat in..."
+      },
+      "maxUrls": {
+        "label": "Maximaal aantal URL’s",
+        "description": "Het maximale aantal URL’s dat de gebruiker kan aanmaken. Laat dit op 0 staan voor onbeperkt.",
+        "placeholder": "Voer een getal in..."
+      }
+    }
+  },
+  "delete": {
+    "title": "{{username}} verwijderen?",
+    "message": "Weet je zeker dat je {{username}} wilt verwijderen? Dit kan niet ongedaan worden gemaakt.",
+    "data": {
+      "title": "Gegevens van {{username}} verwijderen?",
+      "message": "Wil je de bestanden en URL’s van {{username}} verwijderen? Dit kan niet ongedaan worden gemaakt.",
+      "cancel": "Nee, alles behouden en alleen de gebruiker verwijderen",
+      "confirm": "Ja, alles verwijderen"
+    }
+  },
+  "notifications": {
+    "createFailed": "Gebruiker aanmaken mislukt",
+    "created": {
+      "title": "Gebruiker aangemaakt",
+      "message": "Gebruiker {{username}} is aangemaakt"
+    },
+    "editFailed": "Gebruiker bewerken mislukt",
+    "edited": {
+      "title": "Gebruiker bewerkt",
+      "message": "Gebruiker {{username}} is bewerkt"
+    },
+    "deleteFailed": "Gebruiker verwijderen mislukt",
+    "deleted": {
+      "title": "Gebruiker verwijderd",
+      "message": "Gebruiker {{username}} is verwijderd"
+    }
+  },
+  "card": {
+    "id": "Id:",
+    "role": "Rol:",
+    "created": "Aangemaakt:",
+    "updated": "Bijgewerkt:"
+  },
+  "table": {
+    "columns": {
+      "avatar": "Avatar",
+      "username": "Gebruikersnaam",
+      "role": "Rol",
+      "created": "Aangemaakt",
+      "updated": "Laatst bijgewerkt",
+      "actions": "Acties"
+    },
+    "viewFiles": "Bestanden van de gebruiker bekijken",
+    "edit": "Gebruiker bewerken",
+    "delete": "Gebruiker verwijderen"
+  },
+  "grid": {
+    "empty": {
+      "title": "Geen gebruikers gevonden",
+      "description": "Maak een gebruiker aan om deze hier te zien"
+    }
+  },
+  "viewFiles": {
+    "title": "Bestanden van {{username}}",
+    "back": "Terug naar gebruikers",
+    "tableOptions": "Tabelopties",
+    "searchById": "Zoeken op ID"
   }
 }

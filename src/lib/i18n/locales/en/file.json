@@ -166,7 +166,7 @@
     "imageAlt": "Image",
     "loading": "Loading file...",
     "loadError": "Error loading file.",
-    "tooBig": "\n...\nThe file is too big to display click the download icon to view/download it."
+    "tooBig": "\n...\nThe file is too big to display, click the download icon to view/download it."
   },
   "render": {
     "renderedThrough": "This file is rendered through {{renderer}}",

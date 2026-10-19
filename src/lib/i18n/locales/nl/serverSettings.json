@@ -1,7 +1,7 @@
 {
   "sections": {
     "core": {
-      "name": "Kern",
+      "name": "Algemeen",
       "description": "Algemene serverinstellingen"
     },
     "chunks": {
@@ -26,14 +26,14 @@
     },
     "httpWebhook": {
       "name": "HTTP-webhook",
-      "description": "POST-aanvragen naar een URL sturen bij bepaalde gebeurtenissen"
+      "description": "POST-verzoeken naar een URL sturen bij bepaalde gebeurtenissen"
     },
     "invites": {
       "name": "Uitnodigingen",
       "description": "Uitnodigingsinstellingen"
     },
     "mfa": {
-      "name": "Multifactorauthenticatie",
+      "name": "Authenticatie met meerdere factoren",
       "description": "Passkeys en TOTP-authenticatie in- of uitschakelen"
     },
     "oauth": {
@@ -54,11 +54,11 @@
     },
     "urls": {
       "name": "URL-verkorting",
-      "description": "Instellingen voor URL-verkorting configureren"
+      "description": "Instellingen voor URL-verkorting aanpassen"
     },
     "website": {
       "name": "Website",
-      "description": "Website-instellingen zoals titel en beschrijving"
+      "description": "Instellingen voor de website, zoals titel en beschrijving"
     },
     "settings": {
       "name": "Serverinstellingen"
@@ -91,7 +91,7 @@
       "description": "Voer de IPv4/IPv6-adressen of CIDR-bereiken van je reverseproxy’s in, gescheiden door komma’s. Neem alleen vertrouwde proxy’s op, geen clientnetwerken. Bij een lege lijst worden doorgestuurde headers genegeerd en delen clients achter dezelfde proxy de verzoeklimieten. Vereist een herstart van de server."
     },
     "defaultDomain": {
-      "label": "Standaarddomein",
+      "label": "Standaard domein",
       "description": "Het domein dat wordt gebruikt bij het genereren van URL’s. Deze waarde mag geen protocol bevatten."
     },
     "tempDirectory": {
@@ -149,11 +149,11 @@
       },
       "content": {
         "label": "Inhoud",
-        "description": "De inhoud van de melding. Dit mag leeg zijn, maar ten minste één van de velden voor inhoud of een ingesloten bericht moet worden ingevuld"
+        "description": "De inhoud van de melding. Dit mag leeg blijven, maar je moet minstens één veld voor de inhoud of het ingesloten bericht invullen"
       },
       "embed": {
         "label": "Ingesloten bericht",
-        "description": "Verzend de melding als een ingesloten bericht. Dit biedt hieronder meer aanpassingsmogelijkheden."
+        "description": "Verzend de melding als een ingesloten bericht. Je kunt dit hieronder verder aanpassen."
       }
     },
     "embed": {
@@ -183,7 +183,7 @@
       },
       "timestamp": {
         "label": "Tijdstempel",
-        "description": "Toon het tijdstempel in het ingesloten bericht"
+        "description": "Toon de tijdstempel in het ingesloten bericht"
       },
       "url": {
         "label": "URL",
@@ -210,6 +210,344 @@
     "imageCompression": {
       "label": "Afbeeldingscompressie",
       "description": "Hiermee kunnen gebruikers afbeeldingen comprimeren."
+    },
+    "robotsTxt": {
+      "description": "Schakelt /robots.txt in om zoekrobots tegen te houden. Vereist een herstart van de server."
+    },
+    "healthcheck": {
+      "label": "Statuscontrole",
+      "description": "Schakelt een route voor statuscontrole in om de beschikbaarheid te bewaken. Vereist een herstart van de server."
+    },
+    "userRegistration": {
+      "label": "Gebruikersregistratie",
+      "description": "Hiermee kunnen gebruikers een account op de server aanmaken."
+    },
+    "oauthRegistration": {
+      "label": "Registreren via OAuth",
+      "description": "Hiermee kunnen gebruikers een account aanmaken via OAuth-providers."
+    },
+    "deleteOnMaxViews": {
+      "label": "Verwijderen bij maximaal aantal weergaven",
+      "description": "Verwijdert bestanden/URL’s automatisch zodra ze het maximale aantal weergaven bereiken. Vereist een herstart van de server."
+    },
+    "metricsEnabled": {
+      "label": "Statistieken inschakelen",
+      "description": "Schakelt statistieken voor de server in. Vereist een herstart van de server."
+    },
+    "metricsAdminOnly": {
+      "label": "Statistieken alleen voor beheerders",
+      "description": "Alleen beheerders kunnen de statistieken bekijken."
+    },
+    "metricsShowUserSpecific": {
+      "label": "Statistieken per gebruiker tonen",
+      "description": "Toont statistieken per gebruiker voor alle gebruikers."
+    },
+    "dividers": {
+      "thumbnails": "Miniaturen",
+      "versionChecking": "Versiecontrole"
+    },
+    "thumbnailsEnabled": {
+      "label": "Miniaturen inschakelen",
+      "description": "Schakelt het maken van miniaturen voor video’s in. Vereist een herstart van de server."
+    },
+    "thumbnailsInstantaneous": {
+      "label": "Directe miniaturen",
+      "description": "Maakt miniaturen direct nadat een bestand is geüpload, in plaats van te wachten tot de taak wordt uitgevoerd."
+    },
+    "thumbnailsNumberThreads": {
+      "label": "Aantal threads voor miniaturen",
+      "description": "Aantal threads voor het maken van miniaturen, meestal het aantal CPU-threads. Vereist een herstart van de server.",
+      "placeholder": "Voer een getal in..."
+    },
+    "thumbnailsFormat": {
+      "label": "Formaat van miniaturen",
+      "description": "Het uitvoerformaat voor miniaturen. Vereist een herstart van de server."
+    },
+    "versionChecking": {
+      "label": "Versiecontrole",
+      "description": "Controleert GitHub op updates en toont de status in de zijbalk aan alle gebruikers."
+    }
+  },
+  "files": {
+    "assumeMimetypes": {
+      "label": "MIME-types afleiden",
+      "description": "Leidt het MIME-type van een bestand af uit de extensie."
+    },
+    "disabledTypes": {
+      "label": "Uitgeschakelde typen",
+      "description": "MIME-types die worden uitgeschakeld, gescheiden door komma’s. Schakel bij voorkeur ook de instelling MIME-types afleiden in, zodat bestanden met de bijbehorende extensies ook worden geblokkeerd."
+    },
+    "disabledTypesDefault": {
+      "label": "Standaard MIME-type voor uitgeschakelde typen",
+      "description": "Het standaard MIME-type voor uitgeschakelde typen. Laat dit leeg om uitgeschakelde typen volledig te blokkeren."
+    },
+    "removeGpsMetadata": {
+      "label": "GPS-metagegevens verwijderen",
+      "description": "Verwijdert GPS-metagegevens uit bestanden."
+    },
+    "extensionlessUrls": {
+      "label": "URL’s zonder extensie",
+      "description": "Staat bestandslinks zonder extensie toe (bijv. /u/uuid in plaats van /u/uuid.png). Uploadantwoorden bevatten nog steeds de extensie."
+    },
+    "route": {
+      "label": "Route",
+      "description": "De route voor bestandsuploads. Vereist een herstart van de server."
+    },
+    "length": {
+      "label": "Lengte",
+      "description": "De lengte van de bestandsnaam (voor willekeurig gegenereerde namen)."
+    },
+    "defaultFormat": {
+      "label": "Standaard formaat",
+      "description": "Het standaard formaat voor bestandsnamen."
+    },
+    "disabledExtensions": {
+      "label": "Uitgeschakelde extensies",
+      "description": "Extensies die worden uitgeschakeld, gescheiden door komma’s."
+    },
+    "maxFileSize": {
+      "label": "Maximale bestandsgrootte",
+      "description": "De maximaal toegestane bestandsgrootte."
+    },
+    "defaultDateFormat": {
+      "label": "Standaard datumformaat",
+      "description": "Het standaard datumformaat dat wordt gebruikt."
+    },
+    "defaultExpiration": {
+      "label": "Standaard vervaltijd",
+      "description": "De standaard vervaltijd voor bestanden."
+    },
+    "maxExpiration": {
+      "label": "Maximale vervaltijd",
+      "description": "De maximaal toegestane vervaltijd voor bestanden."
+    },
+    "randomWordsNumAdjectives": {
+      "label": "Willekeurige woorden: aantal bijvoeglijke naamwoorden",
+      "description": "Het aantal bijvoeglijke naamwoorden voor het formaat random-words/gfycat."
+    },
+    "randomWordsSeparator": {
+      "label": "Scheidingsteken voor willekeurige woorden",
+      "description": "Het scheidingsteken voor het formaat random-words/gfycat."
+    },
+    "defaultCompressionFormat": {
+      "label": "Standaard compressieformaat",
+      "description": "Het standaard formaat voor afbeeldingscompressie als alleen een compressiepercentage is opgegeven."
+    },
+    "maxFilesPerUpload": {
+      "label": "Maximaal aantal bestanden per upload",
+      "description": "Het maximaal toegestane aantal bestanden per upload. Vereist een herstart van de server."
+    }
+  },
+  "httpWebhook": {
+    "onUpload": {
+      "label": "Bij uploaden",
+      "description": "De URL waarnaar een POST-verzoek wordt verzonden als een bestand wordt geüpload."
+    },
+    "onShorten": {
+      "label": "Bij verkorten",
+      "description": "De URL waarnaar een POST-verzoek wordt verzonden als een URL wordt verkort."
+    }
+  },
+  "invites": {
+    "enabled": {
+      "label": "Uitnodigingen inschakelen",
+      "description": "Schakelt uitnodigingslinks in om nieuwe gebruikers te registreren."
+    },
+    "length": {
+      "label": "Lengte",
+      "description": "De lengte van de uitnodigingscode."
+    }
+  },
+  "mfa": {
+    "passkeysEnabled": {
+      "label": "Passkeys",
+      "description": "Maakt inloggen zonder wachtwoord mogelijk met WebAuthn-passkeys, bijvoorbeeld via je telefoon, beveiligingssleutels, enz."
+    },
+    "passkeysRpId": {
+      "label": "Relying Party ID",
+      "description": "De Relying Party ID (RP ID) voor WebAuthn-passkeys."
+    },
+    "passkeysOrigin": {
+      "label": "Oorsprong",
+      "description": "De oorsprong voor WebAuthn-passkeys."
+    },
+    "totpEnabled": {
+      "label": "TOTP inschakelen",
+      "description": "Schakelt tijdgebonden eenmalige wachtwoorden in via een authenticatieapp."
+    },
+    "totpIssuer": {
+      "label": "Uitgever",
+      "description": "De uitgever voor het TOTP-token."
+    }
+  },
+  "oauth": {
+    "intro": "Om OAuth te gebruiken, moet de instelling \"Registreren via OAuth\" zijn ingeschakeld in het onderdeel <anchor>Functies</anchor>. Probeer bij problemen Zipline opnieuw op te starten na het opslaan.",
+    "bypassLocalLogin": {
+      "label": "Lokaal inloggen overslaan",
+      "description": "Slaat de lokale inlogpagina over en stuurt door naar de OAuth-provider. Dit werkt alleen als één provider is ingeschakeld."
+    },
+    "loginOnly": {
+      "label": "Alleen inloggen",
+      "description": "Voorkomt dat nieuwe accounts via OAuth worden aangemaakt. Bestaande gebruikers kunnen nog steeds inloggen of providers koppelen."
+    },
+    "provider": {
+      "clientId": "Client-ID voor {{provider}}",
+      "clientSecret": "Clientgeheim voor {{provider}}",
+      "redirectUrl": {
+        "label": "Doorstuur-URL voor {{provider}}",
+        "description": "De doorstuur-URL die bij het inloggen wordt gebruikt in plaats van de host. Dit is niet nodig als de door Zipline gegenereerde URL goed werkt."
+      }
+    },
+    "discord": {
+      "allowedIds": {
+        "label": "Toegestane ID’s voor Discord",
+        "description": "Een lijst met gebruikers-ID’s van Discord die mogen inloggen, gescheiden door komma’s. Laat dit leeg om de lijst met toegestane gebruikers uit te schakelen."
+      },
+      "deniedIds": {
+        "label": "Geweigerde ID’s voor Discord",
+        "description": "Een lijst met gebruikers-ID’s van Discord die niet mogen inloggen, gescheiden door komma’s. Laat dit leeg om de lijst met geweigerde gebruikers uit te schakelen."
+      }
+    },
+    "oidc": {
+      "authorizeUrl": "OIDC-URL voor autorisatie",
+      "tokenUrl": "OIDC-URL voor tokens",
+      "userinfoUrl": "OIDC-URL voor gebruikersgegevens",
+      "endSessionUrl": {
+        "label": "OIDC-URL om de sessie te beëindigen",
+        "description": "De end_session_endpoint van je OIDC-provider. Laat dit leeg om alleen uit te loggen bij Zipline."
+      }
+    }
+  },
+  "pwa": {
+    "intro": "Vernieuw de pagina na het inschakelen van PWA om de wijzigingen te zien.",
+    "enabled": {
+      "label": "PWA ingeschakeld",
+      "description": "Hiermee kunnen gebruikers de Zipline-PWA op hun apparaten installeren."
+    },
+    "title": {
+      "label": "Titel",
+      "description": "De titel van de PWA"
+    },
+    "shortName": {
+      "label": "Korte naam",
+      "description": "De korte naam van de PWA"
+    },
+    "description": {
+      "label": "Beschrijving",
+      "description": "De beschrijving van de PWA"
+    },
+    "themeColor": {
+      "label": "Themakleur",
+      "description": "De themakleur van de PWA"
+    },
+    "backgroundColor": {
+      "label": "Achtergrondkleur",
+      "description": "De achtergrondkleur van de PWA"
+    }
+  },
+  "ratelimit": {
+    "intro": "Alle opties vereisen een herstart voordat ze van kracht worden.",
+    "enabled": {
+      "label": "Verzoeklimiet inschakelen",
+      "description": "Schakelt de verzoeklimiet voor de server in."
+    },
+    "adminBypass": {
+      "label": "Uitzondering voor beheerders",
+      "description": "Staat beheerders toe de verzoeklimiet te omzeilen."
+    },
+    "max": {
+      "label": "Maximaal aantal verzoeken",
+      "description": "Het maximaal toegestane aantal verzoeken binnen de periode. Als geen periode is ingesteld, is dit het maximale aantal verzoeken voordat de limiet wordt bereikt."
+    },
+    "window": {
+      "label": "Periode",
+      "description": "De periode in seconden waarin het maximale aantal verzoeken is toegestaan."
+    },
+    "allowList": {
+      "label": "Toegestane IP-adressen",
+      "description": "IP-adressen waarvoor de verzoeklimiet niet geldt, gescheiden door komma’s."
+    }
+  },
+  "tasks": {
+    "intro": "Alle opties vereisen een herstart voordat ze van kracht worden. Met de waarde <code>0</code> schakel je de taak uit.",
+    "deleteInterval": {
+      "label": "Bestanden verwijderen: interval",
+      "description": "Hoe vaak wordt gecontroleerd op verlopen bestanden en deze worden verwijderd."
+    },
+    "clearInvitesInterval": {
+      "label": "Uitnodigingen wissen: interval",
+      "description": "Hoe vaak wordt gecontroleerd op verlopen/gebruikte uitnodigingen en deze worden gewist."
+    },
+    "maxViewsInterval": {
+      "label": "Maximaal aantal weergaven: interval",
+      "description": "Hoe vaak wordt gecontroleerd op bestanden die het maximale aantal weergaven hebben bereikt en deze worden verwijderd."
+    },
+    "thumbnailsInterval": {
+      "label": "Miniaturen maken: interval",
+      "description": "Hoe vaak wordt gecontroleerd op videobestanden en hiervoor miniaturen worden gemaakt."
+    },
+    "cleanThumbnailsInterval": {
+      "label": "Miniaturen opschonen: interval",
+      "description": "Hoe vaak miniaturen zonder gekoppeld bestand worden opgespoord en uit het bestandssysteem of de database worden verwijderd."
+    },
+    "metricsInterval": {
+      "label": "Statistieken verzamelen: interval",
+      "description": "Hoe vaak statistieken worden verzameld. Een lagere waarde geeft actuelere statistieken, maar kan het CPU-gebruik verhogen."
+    }
+  },
+  "urls": {
+    "route": {
+      "label": "Route",
+      "description": "De route voor korte URL’s. Vereist een herstart van de server."
+    },
+    "length": {
+      "label": "Lengte",
+      "description": "De lengte van de korte URL (voor willekeurig gegenereerde namen)."
+    }
+  },
+  "website": {
+    "title": {
+      "label": "Titel",
+      "description": "De titel van de website in browsertabbladen en bovenaan de pagina."
+    },
+    "titleLogo": {
+      "label": "Logo bij de titel",
+      "description": "De URL voor het logo bij de titel. Dit wordt links van de titel geplaatst."
+    },
+    "externalLinks": {
+      "label": "Externe links",
+      "description": "De externe links in de voettekst. Dit moet geldige JSON zijn: een array met objecten met de eigenschappen \"name\" en \"url\". Bijvoorbeeld: [{\"name\": \"GitHub\", \"url\": \"https://github.com/diced/zipline\"}]"
+    },
+    "errors": {
+      "invalidJson": "Ongeldige JSON"
+    },
+    "loginBackground": {
+      "label": "Inlogachtergrond",
+      "description": "De URL voor de inlogachtergrond."
+    },
+    "loginBackgroundBlur": {
+      "label": "Inlogachtergrond vervagen",
+      "description": "Of de inlogachtergrond wordt vervaagd."
+    },
+    "defaultAvatar": {
+      "label": "Standaard avatar",
+      "description": "Het pad voor de standaard avatar. Dit moet een pad naar een afbeelding zijn, geen URL."
+    },
+    "tos": {
+      "label": "Servicevoorwaarden",
+      "description": "Pad naar een Markdownbestand (.md) voor de servicevoorwaarden."
+    },
+    "defaultTheme": {
+      "label": "Standaard thema",
+      "description": "Het standaard thema voor de website."
+    },
+    "darkTheme": {
+      "label": "Donker thema",
+      "description": "Het donkere thema voor de website als het standaard thema \"system\" is."
+    },
+    "lightTheme": {
+      "label": "Licht thema",
+      "description": "Het lichte thema voor de website als het standaard thema \"system\" is."
     }
   }
 }

@@ -21,7 +21,7 @@
     }
   },
   "uploadsAlert": {
-    "message": "This folder allows anonymous uploads. Share the link below to allow others to let others upload files to this folder.",
+    "message": "This folder allows anonymous uploads. Share the link below to allow others to upload files to this folder.",
     "copy": "Copy url",
     "copied": "Copied url"
   },

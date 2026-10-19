@@ -1,1 +1,211 @@
-{}
+{
+  "actions": {
+    "goToFiles": "Naar bestanden",
+    "clearAll": "Alles wissen",
+    "upload_one": "{{count}} bestand uploaden ({{size}})",
+    "upload_other": "{{count}} bestanden uploaden ({{size}})"
+  },
+  "file": {
+    "title": "Bestanden uploaden",
+    "dropzone": {
+      "title": "Sleep afbeeldingen hierheen of klik om bestanden te kiezen",
+      "paste": "Of <kbd>{{mod}}</kbd> + <kbd>V</kbd> om afbeeldingen van het klembord te plakken",
+      "description": "Voeg zoveel bestanden toe als je wilt. Ze verschijnen hieronder, zodat je ze kunt controleren voordat je ze uploadt.",
+      "limit": "Limiet van <b>{{size}}</b> per bestand"
+    },
+    "progress": {
+      "speed": "{{speed}}/s, nog {{remaining}}",
+      "finalizing": "Upload(s) afronden..."
+    },
+    "hidden_one": "Nog {{count}} bestand verborgen",
+    "hidden_other": "Nog {{count}} bestanden verborgen",
+    "showMore": "Meer tonen",
+    "showAll": "Alles tonen",
+    "showAllTooltip": "Dit kan prestatieproblemen veroorzaken als er veel bestanden zijn",
+    "notifications": {
+      "pasted": {
+        "message": "Afbeelding {{name}} geplakt van het klembord"
+      },
+      "mayFail": {
+        "title": "Upload kan mislukken",
+        "message": "De upload kan mislukken omdat de bestanden die je probeert te uploaden (en die niet in delen worden geüpload) samen <b>{{size}}</b> groot zijn. Dat is meer dan de limiet van <b>{{limit}}</b>"
+      }
+    }
+  },
+  "text": {
+    "title": "Tekst uploaden",
+    "language": "Taal",
+    "removeFile": "Bestand {{number}} verwijderen",
+    "emptyPreview": "Geen tekst",
+    "tabs": {
+      "text": "Tekst",
+      "preview": "Voorbeeld"
+    },
+    "addFile": "Tekstbestand toevoegen",
+    "fileHeading": "Bestand {{number}}"
+  },
+  "options": {
+    "button": "Opties",
+    "title": "Uploadopties",
+    "description": "Deze opties worden toegepast op alle bestanden die je uploadt en worden opgeslagen in je browser.",
+    "saved": "opgeslagen",
+    "default": "Standaard ({{value}})",
+    "never": "nooit",
+    "clear": "Wissen",
+    "deletesAt": {
+      "label": "Wordt verwijderd op",
+      "description": "Het bestand wordt na dit tijdstip automatisch verwijderd.",
+      "defaultExpiration": "De standaard vervaltijd is <b>{{value}}</b> (je kunt deze met de onderstaande optie wijzigen).",
+      "setDefault": "Je kunt een standaard vervaltijd instellen in de <anchor>instellingen</anchor>.",
+      "maxExpiration": "Let op: de maximaal toegestane vervaltijd is <b>{{value}}</b>."
+    },
+    "expirations": {
+      "never": "Nooit",
+      "minutes5": "5 minuten",
+      "minutes10": "10 minuten",
+      "minutes15": "15 minuten",
+      "minutes30": "30 minuten",
+      "hour1": "1 uur",
+      "hours2": "2 uur",
+      "hours3": "3 uur",
+      "hours4": "4 uur",
+      "hours5": "5 uur",
+      "hours6": "6 uur",
+      "hours8": "8 uur",
+      "hours12": "12 uur",
+      "day1": "1 dag",
+      "days3": "3 dagen",
+      "days5": "5 dagen",
+      "days7": "7 dagen",
+      "week1": "1 week",
+      "weeksOneAndHalf": "Anderhalve week",
+      "weeks2": "2 weken",
+      "weeks3": "3 weken",
+      "month1": "1 maand (30 dagen)",
+      "monthsOneAndHalf": "Anderhalve maand (~45 dagen)",
+      "months2": "2 maanden (60 dagen)",
+      "months3": "3 maanden (90 dagen)",
+      "months4": "4 maanden (120 dagen)",
+      "months6": "6 maanden (½ jaar)",
+      "year1": "1 jaar",
+      "custom": "Meer vrijheid nodig? Stel een exacte datum en tijd in via de API."
+    },
+    "format": {
+      "label": "Naamindeling",
+      "description": "De naamindeling voor dit bestand. Het veld \"Bestandsnaam\" overschrijft deze waarde.",
+      "random": "Willekeurig",
+      "date": "Datum",
+      "name": "Bestandsnaam gebruiken",
+      "gfycat": "Naam in de stijl van Gfycat"
+    },
+    "compressionFormat": {
+      "label": "Compressieformaat",
+      "description": "Dit formaat wordt gebruikt voor afbeeldingscompressie, <b>alleen als een compressiepercentage is opgegeven</b>. Laat dit op \"standaard\" staan om het standaard compressieformaat van de server te gebruiken."
+    },
+    "compression": {
+      "label": "Compressie",
+      "description": "Het compressieniveau voor (alleen) afbeeldingen. Het bovenstaande formaat wordt gebruikt om afbeeldingen te comprimeren. Laat dit leeg om compressie uit te schakelen."
+    },
+    "maxViews": {
+      "label": "Maximaal aantal weergaven",
+      "description": "Het maximale aantal weergaven voordat bestanden worden verwijderd. Laat dit leeg voor een onbeperkt aantal weergaven."
+    },
+    "folder": {
+      "label": "Toevoegen aan een map",
+      "description": "Voeg dit bestand toe aan een map. Kies \"/ (Hoofdmap)\" om het bestand niet aan een map toe te voegen. Deze waarde wordt niet opgeslagen in je browser en wordt na het uploaden gewist.",
+      "placeholder": "Toevoegen aan map...",
+      "root": "/ (Hoofdmap)"
+    },
+    "domain": {
+      "label": "Domein overschrijven"
+    },
+    "filename": {
+      "label": "Bestandsnaam overschrijven",
+      "description": "Gebruik deze waarde als bestandsnaam. Laat dit leeg om de optie \"Naamindeling\" te gebruiken. Deze waarde wordt genegeerd als je meerdere bestanden uploadt. De waarde wordt niet opgeslagen in je browser en wordt na het uploaden gewist."
+    },
+    "password": {
+      "label": "Wachtwoord",
+      "description": "Stel een wachtwoord in voor deze bestanden. Laat dit leeg om wachtwoordbeveiliging uit te schakelen. Deze waarde wordt niet opgeslagen in je browser en wordt na het uploaden gewist."
+    },
+    "other": "Overige opties",
+    "originalName": {
+      "label": "Oorspronkelijke naam toevoegen",
+      "description": "Voegt de oorspronkelijke bestandsnaam toe, zodat het bestand met die naam kan worden gedownload. De optie \"Naamindeling\" blijft de bestandsnaam bepalen."
+    },
+    "extensionless": {
+      "label": "URL zonder extensie",
+      "description": "Verwijdert de bestandsextensie uit de teruggegeven URL. Het bestand blijft bereikbaar met de extensie. Deze optie werkt alleen als de server URL’s zonder extensie toestaat."
+    }
+  },
+  "modal": {
+    "title_one": "{{count}} bestand geüpload",
+    "title_other": "{{count}} bestanden geüpload",
+    "open": "Link openen in een nieuw tabblad",
+    "copy": "Link naar klembord kopiëren",
+    "pending_one": "{{count}} groot bestand wordt verder <anchor>op de achtergrond verwerkt.</anchor>",
+    "pending_other": "{{count}} grote bestanden worden verder <anchor>op de achtergrond verwerkt.</anchor>",
+    "copyAllTooltip": "Alle links naar het klembord kopiëren (elk op een nieuwe regel)",
+    "copyAll": "{{total}} URL’s naar klembord kopiëren",
+    "notifications": {
+      "copied": {
+        "title": "URL naar klembord gekopieerd"
+      },
+      "copiedAll": {
+        "title": "URL’s naar klembord gekopieerd",
+        "message": "Alle URL’s zijn naar het klembord gekopieerd, elk op een nieuwe regel."
+      }
+    }
+  },
+  "errors": {
+    "parse": "Kan het antwoord van de server niet verwerken: {{response}}",
+    "unknown": "Er is een onbekende fout opgetreden",
+    "network": "Netwerkfout bij het uploaden van bestanden"
+  },
+  "notifications": {
+    "preparing": {
+      "title_one": "Bestand voorbereiden",
+      "title_other": "Bestanden voorbereiden",
+      "message_one": "{{count}} bestand uploaden",
+      "message_other": "{{count}} bestanden uploaden",
+      "messageBatches_one": "{{count}} bestand uploaden in {{batches}} groepen",
+      "messageBatches_other": "{{count}} bestanden uploaden in {{batches}} groepen"
+    },
+    "uploading": {
+      "batch": "Groep {{current}}/{{total}} uploaden",
+      "title_one": "Bestand uploaden",
+      "title_other": "Bestanden uploaden",
+      "message_one": "{{count}} bestand",
+      "message_other": "{{count}} bestanden"
+    },
+    "complete": {
+      "title": "Upload voltooid",
+      "titlePartial": "Normale uploads voltooid",
+      "message_one": "{{count}} bestand geüpload",
+      "message_other": "{{count}} bestanden geüpload",
+      "startingPartials_one": "Upload van {{count}} groot bestand starten...",
+      "startingPartials_other": "Upload van {{count}} grote bestanden starten...",
+      "messagePartial": "{{uploaded}}. {{starting}}"
+    },
+    "error": {
+      "title": "Fout bij het uploaden van bestanden"
+    },
+    "partial": {
+      "title": "Groot bestand uploaden",
+      "titleCount": "Groot bestand uploaden ({{current}}/{{total}})",
+      "chunk": "Deel {{current}}/{{total}}",
+      "error": {
+        "title": "Fout bij het uploaden van het bestand",
+        "message": "{{name}}: {{error}}"
+      },
+      "complete": {
+        "title": "Uploads van grote bestanden voltooid",
+        "message_one": "{{count}} groot bestand overgedragen voor verwerking op de achtergrond",
+        "message_other": "{{count}} grote bestanden overgedragen voor verwerking op de achtergrond"
+      },
+      "offloaded": {
+        "title": "Groot bestand overgedragen",
+        "message": "{{name}} overgedragen ({{current}}/{{total}})"
+      }
+    }
+  }
+}

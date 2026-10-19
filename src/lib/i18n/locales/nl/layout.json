@@ -16,7 +16,7 @@
     "invites": "Uitnodigingen"
   },
   "header": {
-    "logoAlt": "Zipline-logo",
+    "logoAlt": "Logo van Zipline",
     "avatarAlt": "Gebruikersavatar"
   },
   "userMenu": {
@@ -40,7 +40,7 @@
     },
     "refresh": {
       "title": "Token vernieuwen?",
-      "message": "Weet je zeker dat je je token wilt vernieuwen? Zodra je je token vernieuwt/reset, moet je alle scripts of toepassingen bijwerken die je token gebruiken."
+      "message": "Weet je zeker dat je je token wilt vernieuwen? Zodra je je token vernieuwt of opnieuw instelt, moet je alle scripts of apps bijwerken die je token gebruiken."
     },
     "refreshed": {
       "title": "Vernieuwd",
@@ -48,11 +48,11 @@
     }
   },
   "version": {
-    "modalTitle": "Zipline-versie",
-    "tooltip": "Klik om meer versie-informatie te bekijken",
-    "latest": "De nieuwste versie van Zipline wordt gebruikt.",
-    "unstable": "Je gebruikt een <b>onstabiele</b> versie van Zipline. Upstream-versies zijn niet volledig getest en kunnen bugs bevatten.",
-    "outdated": "Je gebruikt een <b>verouderde</b> versie van Zipline. Het wordt aanbevolen om bij te werken naar de <anchor>nieuwste versie</anchor>.",
+    "modalTitle": "Versie van Zipline",
+    "tooltip": "Klik om meer informatie over de versie te bekijken",
+    "latest": "Je gebruikt de nieuwste versie van Zipline.",
+    "unstable": "Je gebruikt een <b>onstabiele</b> versie van Zipline. Upstreamversies zijn niet volledig getest en kunnen bugs bevatten.",
+    "outdated": "Je gebruikt een <b>verouderde</b> versie van Zipline. We raden aan om bij te werken naar de <anchor>nieuwste versie</anchor>.",
     "current": "Huidige versie",
     "fields": {
       "version": "Versie",
@@ -61,9 +61,9 @@
       "availableToUpdate": "Beschikbaar om bij te werken"
     },
     "latestCommit": "Nieuwste beschikbare commit",
-    "latestCommitNote": "Dit is alleen zichtbaar wanneer je een upstream-versie gebruikt.",
+    "latestCommitNote": "Dit is alleen zichtbaar als je een upstreamversie gebruikt.",
     "available": "{{tag}} is beschikbaar",
-    "changelogs": "Wijzigingslogboeken",
+    "changelogs": "Wijzigingsoverzichten",
     "update": "Bijwerken"
   },
   "qrCode": {
@@ -71,14 +71,14 @@
     "alt": "QR-code",
     "failed": "QR-code genereren mislukt.",
     "format": "Formaat",
-    "copyUnsupported": "Het kopiëren van dit formaat wordt niet in alle browsers ondersteund. Je kunt de afbeelding op de gebruikelijke manier kopiëren door er met de rechtermuisknop op te klikken of deze ingedrukt te houden.",
+    "copyUnsupported": "Sommige browsers ondersteunen het kopiëren van dit formaat niet. Je kunt de afbeelding gewoon kopiëren door er met de rechtermuisknop op te klikken of deze ingedrukt te houden.",
     "copyImage": "Afbeelding kopiëren",
     "copied": "QR-codeafbeelding naar klembord gekopieerd",
     "copyFailed": "QR-codeafbeelding kopiëren mislukt"
   },
   "domainSelect": {
-    "default": "Standaarddomein",
-    "description": "Overschrijf het domein met deze waarde. Hiermee wijzig je het domein dat bij je uploads wordt teruggegeven. Laat dit leeg om het standaarddomein te gebruiken."
+    "default": "Standaard domein",
+    "description": "Gebruik deze waarde als domein. Dit verandert het domein dat je bij je uploads terugkrijgt. Laat dit leeg om het standaard domein te gebruiken."
   },
   "copyLink": {
     "title": "Link gekopieerd"

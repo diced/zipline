@@ -1,1 +1,390 @@
-{}
+{
+  "title": "Instellingen",
+  "loading": "Laden…",
+  "user": {
+    "title": "Gebruiker",
+    "tokenCopyTooltip": "Klik om het token te kopiëren",
+    "tokenLabel": "Token",
+    "tokenHidden": "[klik om te tonen]",
+    "form": {
+      "username": {
+        "label": "Gebruikersnaam",
+        "required": "Gebruikersnaam is verplicht"
+      },
+      "password": {
+        "label": "Wachtwoord",
+        "description": "Laat dit leeg om hetzelfde wachtwoord te behouden"
+      },
+      "currentPassword": {
+        "label": "Huidig wachtwoord",
+        "description": "Verplicht om je wachtwoord te wijzigen.",
+        "required": "Voer je huidige wachtwoord in om het te wijzigen"
+      }
+    },
+    "notifications": {
+      "error": {
+        "title": "Fout bij het bijwerken van de gebruiker"
+      },
+      "updated": {
+        "message": "Gebruiker bijgewerkt"
+      }
+    }
+  },
+  "avatar": {
+    "title": "Avatar",
+    "placeholder": "Nieuwe avatar uploaden...",
+    "previewNew": "Voorbeeld van de nieuwe avatar",
+    "previewCurrent": "Voorbeeld van de huidige avatar",
+    "proposedAlt": "Voorgestelde avatar",
+    "currentAlt": "Gebruikersavatar",
+    "remove": "Avatar verwijderen",
+    "notifications": {
+      "error": {
+        "title": "Fout bij het bijwerken van de avatar"
+      },
+      "updated": {
+        "message": "Avatar bijgewerkt"
+      }
+    }
+  },
+  "sessions": {
+    "title": "Sessies",
+    "summary": "Je bent momenteel ingelogd op {{amount}} andere apparaten",
+    "view": "Sessies bekijken",
+    "logoutBrowser": "Uitloggen in deze browser",
+    "logoutAll": "Uitloggen op alle apparaten",
+    "empty": "Geen andere sessies gevonden",
+    "table": {
+      "client": "Client",
+      "device": "Apparaat",
+      "loggedInAt": "Ingelogd op"
+    },
+    "modals": {
+      "logoutAll": {
+        "title": "Uitloggen op alle apparaten?",
+        "message": "Weet je zeker dat je op alle apparaten wilt uitloggen? Je wordt uitgelogd op alle apparaten behalve het huidige.",
+        "confirm": "Uitloggen"
+      },
+      "logoutDevice": {
+        "title": "Uitloggen op dit apparaat?",
+        "message": "Weet je zeker dat je op dit apparaat wilt uitloggen?",
+        "confirm": "Uitloggen"
+      }
+    },
+    "notifications": {
+      "loggedOutAll": "Uitgelogd op alle apparaten",
+      "loggedOutDevice": "Uitgelogd op het apparaat"
+    }
+  },
+  "quickLinks": {
+    "title": "Snelle links",
+    "description": "Voeg links bovenaan de startpagina toe om snel toegang te krijgen tot onderdelen.",
+    "reorder": "Volgorde van {{name}} wijzigen",
+    "saveError": "Kan de snelle links niet opslaan."
+  },
+  "dashboard": {
+    "title": "Dashboardinstellingen",
+    "description": "Deze instellingen worden automatisch opgeslagen in je <b>browser.</b>",
+    "disableMediaPreview": {
+      "label": "Mediavoorbeelden uitschakelen",
+      "description": "Schakelt voorbeelden van bestanden in het dashboard uit. Dit kan data besparen en het dashboard sneller maken als je veel mediabestanden hebt. Het schakelt ook de bestandsweergave uit en toont een algemeen bestandspictogram in plaats van een voorbeeld bij ondersteunde bestanden."
+    },
+    "mediaAutoMuted": {
+      "label": "Video- en audiovoorbeelden dempen",
+      "description": "Als dit is ingeschakeld, worden video en audio in de bestandsweergave automatisch zonder geluid afgespeeld. Bij uitschakelen wordt geprobeerd direct geluid af te spelen. Browsers kunnen automatisch afspelen met geluid blokkeren totdat je iets op de pagina doet."
+    },
+    "warnDeletion": {
+      "label": "Waarschuwen bij verwijderen",
+      "description": "Toont een waarschuwing bij het verwijderen van items. Als dit is uitgeschakeld, worden bestanden, URL’s, enz. zonder waarschuwing vooraf verwijderd! Bij mappen, gebruikers en bewerkingen op meerdere items krijg je altijd een waarschuwing voordat iets wordt verwijderd."
+    },
+    "fileNavButtons": {
+      "label": "Navigatieknoppen voor bestanden",
+      "description": "Toont vorige/volgende rechts en links van de bestandsweergave om makkelijk tussen bestanden te wisselen."
+    },
+    "homeShowRecents": {
+      "label": "Recente items tonen",
+      "description": "Toont recente uploads en aanmeldingen op de startpagina."
+    },
+    "homeShowActivity": {
+      "label": "Activiteit tonen",
+      "description": "Toont je recente activiteit als grafiek op de startpagina."
+    },
+    "homeShowTypes": {
+      "label": "Bestandstypen tonen",
+      "description": "Toont de tabel met bestandstypen op de startpagina."
+    },
+    "fileViewer": {
+      "label": "Bestandsweergave",
+      "description": "Kies hoe bestanden worden weergegeven als je erop klikt.",
+      "options": {
+        "fullscreen": "Volledig scherm (bèta)",
+        "default": "Standaard (dialoogvenster)"
+      }
+    },
+    "domain": {
+      "label": "Standaard domein",
+      "description": "Stel het standaard domein in voor links die je in het dashboard kopieert. Laat dit leeg of kies \"Standaard domein\" om het huidige domein van het dashboard te gebruiken."
+    },
+    "theme": {
+      "label": "Thema",
+      "description": "Het thema voor het dashboard. Dit verandert alleen de weergave in jouw browser en niet het thema voor andere gebruikers.",
+      "system": "Systeem"
+    },
+    "themeDark": {
+      "label": "Donker thema",
+      "description": "Het thema voor het dashboard als je systeem in de donkere modus staat."
+    },
+    "themeLight": {
+      "label": "Licht thema",
+      "description": "Het thema voor het dashboard als je systeem in de lichte modus staat."
+    }
+  },
+  "fileView": {
+    "title": "Bestanden bekijken",
+    "variablesHint": "Alle tekstvelden ondersteunen <anchor>variabelen.</anchor>",
+    "disableTextFiles": {
+      "label": "Tekstbestanden uitschakelen",
+      "description": "Schakelt het bekijken van tekstbestanden via weergaveroutes uit. Dit heeft geen invloed op andere bestandstypen en werkt ook als weergaveroutes zijn uitgeschakeld."
+    },
+    "enabled": {
+      "label": "Weergaveroutes inschakelen",
+      "description": "Maakt het bekijken van bestanden via aanpasbare weergaveroutes mogelijk"
+    },
+    "showMimetype": {
+      "label": "MIME-type tonen",
+      "description": "Toont het MIME-type van het bestand in de weergaveroute"
+    },
+    "showTags": {
+      "label": "Tags tonen",
+      "description": "Toont de tags van het bestand in de weergaveroute"
+    },
+    "showFolder": {
+      "label": "Map tonen",
+      "description": "Toont waar mogelijk de naam/link van de map in de weergaveroute"
+    },
+    "content": {
+      "label": "Inhoud van de weergave",
+      "description": "Wijzig de inhoud van weergaveroutes. De meeste HTML is toegestaan, maar JavaScript kan niet worden gebruikt."
+    },
+    "align": {
+      "label": "Uitlijning van de inhoud",
+      "description": "Wijzig de uitlijning van de inhoud van weergaveroutes",
+      "options": {
+        "left": "Links",
+        "center": "Midden",
+        "right": "Rechts"
+      }
+    },
+    "embed": {
+      "label": "Ingesloten bericht inschakelen",
+      "description": "Schakelt de onderstaande eigenschappen van het ingesloten bericht in. Deze gebruiken OpenGraph-tags. Hiervoor moeten weergaveroutes zijn ingeschakeld."
+    },
+    "embedMediaOnly": {
+      "label": "Linkvoorbeeld met alleen media",
+      "description": "Voegt ook als ingesloten berichten zijn uitgeschakeld OpenGraph-tags voor afbeeldingen/video’s toe. Zo tonen Discord en vergelijkbare apps alleen de media (zonder aangepaste titel, beschrijving of sitenaam). De geplakte URL blijft als gewone tekst in het bericht staan."
+    },
+    "embedTitle": {
+      "label": "Titel van het ingesloten bericht"
+    },
+    "embedDescription": {
+      "label": "Beschrijving van het ingesloten bericht"
+    },
+    "embedSiteName": {
+      "label": "Sitenaam van het ingesloten bericht"
+    },
+    "embedColor": {
+      "label": "Kleur van het ingesloten bericht"
+    },
+    "notifications": {
+      "error": {
+        "title": "Fout bij het bijwerken van de weergave-instellingen"
+      },
+      "updated": {
+        "message": "Weergave-instellingen bijgewerkt"
+      }
+    }
+  },
+  "oauth": {
+    "description": "Beheer je gekoppelde OAuth-providers.",
+    "link": "Account van {{provider}} koppelen",
+    "unlink": "Account van {{provider}} ontkoppelen",
+    "notifications": {
+      "unlinkFailed": {
+        "title": "Account ontkoppelen mislukt"
+      },
+      "unlinked": {
+        "title": "Account ontkoppeld",
+        "message": "Je account bij {{provider}} is ontkoppeld."
+      }
+    }
+  },
+  "mfa": {
+    "title": "Authenticatie met meerdere factoren",
+    "description": "Stel 2FA of passkeys in om je account extra te beveiligen.",
+    "totp": {
+      "enable": "2FA inschakelen",
+      "disable": "2FA uitschakelen",
+      "modal": {
+        "enableTitle": "Authenticatie met twee factoren inschakelen",
+        "disableTitle": "Authenticatie met twee factoren uitschakelen",
+        "disableInstructions": "Voer hieronder de code van 6 cijfers uit je authenticatieapp in om het uitschakelen van 2FA te bevestigen.",
+        "step1": "<b>Stap 1</b> Open/download een authenticatieapp die het scannen van QR-codes of het handmatig invoeren van codes ondersteunt. Veelgebruikte opties zijn <twofas>2FAs</twofas>, <google>Google Authenticator</google>, <microsoft>Microsoft Authenticator</microsoft> en <apple>Apple Wachtwoorden</apple>.",
+        "step2": "<b>Stap 2</b> Scan de onderstaande QR-code met je authenticatieapp om 2FA in te schakelen.",
+        "qrAlt": "QR-code {{secret}}",
+        "manualEntry": "Als je de QR-code niet kunt scannen, kun je de volgende code handmatig invoeren in je authenticatieapp: <code>{{secret}}</code>",
+        "step3": "<b>Stap 3</b> Voer hieronder de code van 6 cijfers uit je authenticatieapp in om het instellen van 2FA te bevestigen."
+      },
+      "invalidPin": "Ongeldige code",
+      "notifications": {
+        "enabled": {
+          "title": "2FA ingeschakeld",
+          "message": "Je hebt 2FA voor je account ingeschakeld."
+        },
+        "disabled": {
+          "title": "2FA uitgeschakeld",
+          "message": "Je hebt 2FA voor je account uitgeschakeld."
+        }
+      }
+    },
+    "passkeys": {
+      "manage": "Passkeys beheren",
+      "created": "Passkey aangemaakt <created />",
+      "createdAndUsed": "Passkey aangemaakt <created />, voor het laatst gebruikt <lastUsed />.",
+      "legacyWarning": "Waarschuwing: Deze passkey is aangemaakt met een oudere versie van Zipline en <b>ZAL NIET</b> werken met deze versie. Verwijder deze passkey en maak hem opnieuw aan zodat hij met deze versie werkt.",
+      "create": "Een passkey aanmaken",
+      "createError": "Fout bij het aanmaken van een passkey - probeer het later opnieuw",
+      "createErrorFallback": "Er is een fout opgetreden bij het aanmaken van een passkey",
+      "namePrompt": "Geef deze passkey een naam zodat je hem later kunt herkennen.",
+      "namePlaceholder": "Naam van de passkey",
+      "modals": {
+        "remove": {
+          "message": "Je browser en apparaat kunnen \"{{name}}\" nog steeds als inlogoptie tonen. Als je die wilt verwijderen, moet je dat handmatig doen via de instellingen van je apparaat.",
+          "confirm": "\"{{name}}\" verwijderen"
+        }
+      },
+      "notifications": {
+        "saveError": {
+          "title": "Fout bij het opslaan van de passkey"
+        },
+        "saved": {
+          "title": "Passkey opgeslagen!",
+          "message": "Je passkey is opgeslagen."
+        },
+        "removeError": {
+          "title": "Fout bij het verwijderen van de passkey"
+        },
+        "removed": {
+          "title": "Passkey verwijderd!",
+          "message": "Je passkey is verwijderd."
+        }
+      }
+    }
+  },
+  "exports": {
+    "title": "Bestanden exporteren",
+    "new": "Nieuwe export",
+    "empty": "Geen exports gevonden. Klik op de knop hierboven om een nieuwe export te starten.",
+    "table": {
+      "id": "ID",
+      "started": "Gestart",
+      "files": "Bestanden",
+      "size": "Grootte",
+      "completed": "{{id}} is voltooid",
+      "inProgress": "{{id}} wordt uitgevoerd"
+    },
+    "modals": {
+      "new": {
+        "title": "Nieuwe export?",
+        "message": "Weet je zeker dat je een nieuwe export wilt starten? Als je veel bestanden hebt, kan dit even duren.",
+        "confirm": "Export starten"
+      }
+    },
+    "notifications": {
+      "started": {
+        "title": "Export gestart",
+        "message": "De export is gestart. Je kunt de status in de onderstaande tabel bekijken"
+      },
+      "deleted": {
+        "message": "De export is verwijderd"
+      }
+    }
+  },
+  "generators": {
+    "title": "Uploaders genereren",
+    "description": "Genereer scripts voor uploadhulpmiddelen. De generators voor Flameshot en shellscripts worden alleen ondersteund op Linux en macOS.",
+    "logoAlt": "Logo van {{name}}",
+    "shellScript": "Shellscript",
+    "desc": {
+      "flameshot": "Om dit script te gebruiken, moeten <flameshotLink>Flameshot</flameshotLink>, <curlLink><code>curl</code></curlLink>, <jqLink><code>jq</code></jqLink> en <xclipLink><code>xclip</code> (alleen Linux)</xclipLink> zijn geïnstalleerd. Dit script is alleen bedoeld voor Linux en macOS (zie de opties hieronder).",
+      "ishare": "Voor deze generator moet <anchor>ishare</anchor> op macOS zijn geïnstalleerd. Deze uploader is alleen bedoeld voor macOS.",
+      "itake": "Voor deze generator moet <anchor>iTake</anchor> op macOS zijn geïnstalleerd. Deze uploader is alleen bedoeld voor macOS.",
+      "shell": "Om dit script te gebruiken, moeten <code>bash</code>, <curlLink><code>curl</code></curlLink>, <fileLink><code>file</code></fileLink>, <jqLink><code>jq</code></jqLink> en <xclipLink><code>xclip</code> (alleen Linux)</xclipLink> zijn geïnstalleerd. Dit script is alleen bedoeld voor Linux en macOS (zie de opties hieronder)."
+    },
+    "modal": {
+      "title": "Uploader voor {{name}} genereren",
+      "destinationType": {
+        "label": "Type bestemming",
+        "description": "Kies welk type bestemming je wilt genereren",
+        "options": {
+          "file": "Bestand uploaden",
+          "url": "URL verkorten"
+        }
+      },
+      "format": {
+        "label": "Naamindeling",
+        "description": "De naamindeling voor geüploade bestanden. Het veld \"Bestandsnaam\" overschrijft deze waarde.",
+        "options": {
+          "default": "Standaard",
+          "random": "Willekeurig",
+          "date": "Datum",
+          "uuid": "UUID",
+          "name": "Bestandsnaam gebruiken",
+          "gfycat": "Naam in de stijl van Gfycat"
+        }
+      },
+      "compression": {
+        "label": "Compressie",
+        "description": "Het compressieniveau voor (alleen) afbeeldingen. Laat dit leeg om compressie uit te schakelen."
+      },
+      "maxViews": {
+        "label": "Maximaal aantal weergaven",
+        "description": "Het maximale aantal weergaven voordat bestanden/URL’s worden verwijderd. Laat dit leeg voor een onbeperkt aantal weergaven."
+      },
+      "overrideDomain": {
+        "label": "Domein overschrijven",
+        "description": "Gebruik deze waarde als domein. Dit verandert het domein dat je bij je uploads terugkrijgt. Laat dit leeg om het standaard domein te gebruiken.",
+        "default": "Standaard domein"
+      },
+      "otherOptions": "Overige opties",
+      "addOriginalName": {
+        "label": "Oorspronkelijke naam toevoegen",
+        "description": "Voegt de oorspronkelijke bestandsnaam toe, zodat het bestand met die naam kan worden gedownload. De optie \"Naamindeling\" blijft de bestandsnaam bepalen."
+      },
+      "extensionless": {
+        "label": "URL zonder extensie",
+        "description": "Verwijdert de bestandsextensie uit de teruggegeven URL. Het bestand blijft bereikbaar met de extensie. Deze optie werkt alleen als de server URL’s zonder extensie toestaat."
+      },
+      "xshareCompatibility": {
+        "label": "Compatibiliteit met Xshare",
+        "description": "Als je Xshare op Android gebruikt, schakel dan deze optie in voor compatibiliteit. De gegenereerde configuratie werkt niet met ShareX."
+      },
+      "waylandCompatibility": {
+        "label": "Compatibiliteit met Wayland inschakelen",
+        "description": "Gebruikt <code>wl-copy</code> in plaats van <code>xclip</code> om naar het klembord te kopiëren."
+      },
+      "macCompatibility": {
+        "label": "Compatibiliteit met macOS inschakelen",
+        "description": "Gebruikt <code>pbcopy</code> in plaats van <code>xclip</code> om naar het klembord te kopiëren."
+      },
+      "compositorUnsupported": {
+        "label": "Gebruik je een andere desktopomgeving dan Gnome, KDE of Sway?",
+        "description": "Als je een compositor zoals <anchor>Hyprland</anchor> gebruikt, stelt deze optie <code>XDG_CURRENT_DESKTOP=sway</code> in om fouten van Flameshot op Wayland te omzeilen. Dit is niet nodig op Xorg."
+      },
+      "useEcho": {
+        "label": "<code>echo</code> gebruiken in plaats van naar het klembord kopiëren",
+        "description": "Toont de URL alleen in de terminal in plaats van deze naar het klembord te kopiëren."
+      },
+      "waylandHelp": "Als je problemen hebt met Flameshot op Wayland, raadpleeg dan de <anchor>handleiding voor Wayland</anchor>."
+    }
+  }
+}
