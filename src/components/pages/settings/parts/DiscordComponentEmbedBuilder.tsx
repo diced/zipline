@@ -4,10 +4,12 @@ import {
   Button,
   ColorInput,
   Group,
+  Modal,
   NumberInput,
   Paper,
   Select,
   SimpleGrid,
+  ScrollArea,
   Stack,
   Switch,
   Text,
@@ -15,9 +17,26 @@ import {
   TextInput,
   Tooltip,
 } from '@mantine/core';
-import { IconArrowDown, IconArrowUp, IconInfoCircle, IconPlus, IconTrash } from '@tabler/icons-react';
+import {
+  closestCenter,
+  DndContext,
+  type DragEndEvent,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { IconGripVertical, IconInfoCircle, IconPlus, IconSettings, IconTrash } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import type {
   DiscordButton,
   DiscordComponentEmbed,
@@ -415,9 +434,77 @@ function ComponentEditor({
   );
 }
 
-export default function DiscordComponentEmbedBuilder({ value, disabled, onChange }: Props) {
+function SortableComponent({
+  sortId,
+  value,
+  canRemove,
+  onChange,
+  onRemove,
+}: {
+  sortId: string;
+  value: DiscordComponentEmbedChild;
+  canRemove: boolean;
+  onChange: (value: DiscordComponentEmbedChild) => void;
+  onRemove: () => void;
+}) {
   const { t } = useTranslation('settings');
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: sortId,
+  });
+
+  return (
+    <Paper
+      withBorder
+      p='sm'
+      ref={setNodeRef}
+      style={{
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+      }}
+    >
+      <Group justify='space-between' mb='sm'>
+        <Group gap='xs'>
+          <ActionIcon
+            variant='subtle'
+            style={{ cursor: 'grab', touchAction: 'none' }}
+            aria-label={t('fileView.componentEmbed.reorder', { type: componentLabels[value.type] })}
+            {...attributes}
+            {...listeners}
+          >
+            <IconGripVertical size='1rem' />
+          </ActionIcon>
+          <Text fw={700}>{componentLabels[value.type]}</Text>
+        </Group>
+        <Tooltip label={t('fileView.componentEmbed.removeComponent')}>
+          <ActionIcon
+            color='red'
+            variant='subtle'
+            aria-label={t('fileView.componentEmbed.removeComponent')}
+            disabled={!canRemove}
+            onClick={onRemove}
+          >
+            <IconTrash size='1rem' />
+          </ActionIcon>
+        </Tooltip>
+      </Group>
+      <ComponentEditor value={value} onChange={onChange} />
+    </Paper>
+  );
+}
+
+export default function DiscordComponentEmbedBuilder({ value, disabled, onChange }: Props) {
+  const { t } = useTranslation(['settings', 'common']);
   const [componentType, setComponentType] = useState<string | null>('10');
+  const [opened, setOpened] = useState(false);
+  const nextComponentKey = useRef(value.components.length);
+  const [componentKeys, setComponentKeys] = useState(() =>
+    value.components.map((_, index) => `component-${index}`),
+  );
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
 
   const updateComponent = (index: number, component: DiscordComponentEmbedChild) => {
     onChange({
@@ -426,12 +513,30 @@ export default function DiscordComponentEmbedBuilder({ value, disabled, onChange
     });
   };
 
-  const moveComponent = (index: number, direction: -1 | 1) => {
-    const components = [...value.components];
-    const target = index + direction;
-    if (target < 0 || target >= components.length) return;
-    [components[index], components[target]] = [components[target], components[index]];
-    onChange({ ...value, components });
+  const handleDragEnd = ({ active, over }: DragEndEvent) => {
+    if (!over || active.id === over.id) return;
+
+    const from = componentKeys.indexOf(String(active.id));
+    const to = componentKeys.indexOf(String(over.id));
+    if (from === -1 || to === -1) return;
+
+    setComponentKeys(arrayMove(componentKeys, from, to));
+    onChange({ ...value, components: arrayMove(value.components, from, to) });
+  };
+
+  const removeComponent = (index: number) => {
+    setComponentKeys(componentKeys.filter((_, itemIndex) => itemIndex !== index));
+    onChange({
+      ...value,
+      components: value.components.filter((_, itemIndex) => itemIndex !== index),
+    });
+  };
+
+  const addComponent = () => {
+    if (!componentType || value.components.length >= 39) return;
+
+    setComponentKeys([...componentKeys, `component-${nextComponentKey.current++}`]);
+    onChange({ ...value, components: [...value.components, newComponent(componentType)] });
   };
 
   return (
@@ -445,93 +550,90 @@ export default function DiscordComponentEmbedBuilder({ value, disabled, onChange
       />
 
       {value.enabled && !disabled ? (
-        <Paper withBorder p='sm'>
-          <Stack gap='sm'>
-            <Alert icon={<IconInfoCircle size='1rem' />}>{t('fileView.componentEmbed.limits')}</Alert>
-            <SimpleGrid cols={{ base: 1, md: 2 }} spacing='sm'>
-              <ColorInput
-                label={t('fileView.componentEmbed.fields.accentColor')}
-                value={value.accentColor ?? ''}
-                onChange={(accentColor) => onChange({ ...value, accentColor })}
-              />
-              <IdInput value={value.id} onChange={(id) => onChange({ ...value, id })} />
-            </SimpleGrid>
-            <Switch
-              label={t('fileView.componentEmbed.fields.containerSpoiler')}
-              checked={!!value.spoiler}
-              onChange={(event) => onChange({ ...value, spoiler: event.currentTarget.checked })}
-            />
+        <>
+          <Group justify='space-between'>
+            <Text size='sm' c='dimmed'>
+              {t('fileView.componentEmbed.componentCount', { count: value.components.length })}
+            </Text>
+            <Button
+              variant='light'
+              leftSection={<IconSettings size='1rem' />}
+              onClick={() => setOpened(true)}
+            >
+              {t('fileView.componentEmbed.configure')}
+            </Button>
+          </Group>
 
-            {value.components.map((component, index) => (
-              <Paper withBorder p='sm' key={index}>
-                <Group justify='space-between' mb='sm'>
-                  <Text fw={700}>{componentLabels[component.type]}</Text>
-                  <Group gap={4}>
-                    <Tooltip label={t('fileView.componentEmbed.moveUp')}>
-                      <ActionIcon
-                        variant='subtle'
-                        disabled={index === 0}
-                        onClick={() => moveComponent(index, -1)}
-                      >
-                        <IconArrowUp size='1rem' />
-                      </ActionIcon>
-                    </Tooltip>
-                    <Tooltip label={t('fileView.componentEmbed.moveDown')}>
-                      <ActionIcon
-                        variant='subtle'
-                        disabled={index === value.components.length - 1}
-                        onClick={() => moveComponent(index, 1)}
-                      >
-                        <IconArrowDown size='1rem' />
-                      </ActionIcon>
-                    </Tooltip>
-                    <Tooltip label={t('fileView.componentEmbed.removeComponent')}>
-                      <ActionIcon
-                        color='red'
-                        variant='subtle'
-                        disabled={value.components.length === 1}
-                        onClick={() =>
-                          onChange({
-                            ...value,
-                            components: value.components.filter((_, itemIndex) => itemIndex !== index),
-                          })
-                        }
-                      >
-                        <IconTrash size='1rem' />
-                      </ActionIcon>
-                    </Tooltip>
-                  </Group>
-                </Group>
-                <ComponentEditor value={component} onChange={(next) => updateComponent(index, next)} />
-              </Paper>
-            ))}
-
-            <Group align='end'>
-              <Select
-                label={t('fileView.componentEmbed.addComponent')}
-                data={[
-                  { value: '10', label: componentLabels[10] },
-                  { value: '9', label: componentLabels[9] },
-                  { value: '12', label: componentLabels[12] },
-                  { value: '14', label: componentLabels[14] },
-                  { value: '1', label: componentLabels[1] },
-                ]}
-                value={componentType}
-                onChange={setComponentType}
+          <Modal
+            opened={opened}
+            onClose={() => setOpened(false)}
+            title={t('fileView.componentEmbed.modalTitle')}
+            size='xl'
+            centered
+            scrollAreaComponent={ScrollArea.Autosize}
+          >
+            <Stack gap='sm'>
+              <Alert icon={<IconInfoCircle size='1rem' />}>{t('fileView.componentEmbed.limits')}</Alert>
+              <SimpleGrid cols={{ base: 1, md: 2 }} spacing='sm'>
+                <ColorInput
+                  label={t('fileView.componentEmbed.fields.accentColor')}
+                  value={value.accentColor ?? ''}
+                  onChange={(accentColor) => onChange({ ...value, accentColor })}
+                />
+                <IdInput value={value.id} onChange={(id) => onChange({ ...value, id })} />
+              </SimpleGrid>
+              <Switch
+                label={t('fileView.componentEmbed.fields.containerSpoiler')}
+                checked={!!value.spoiler}
+                onChange={(event) => onChange({ ...value, spoiler: event.currentTarget.checked })}
               />
-              <Button
-                leftSection={<IconPlus size='1rem' />}
-                disabled={!componentType || value.components.length >= 39}
-                onClick={() =>
-                  componentType &&
-                  onChange({ ...value, components: [...value.components, newComponent(componentType)] })
-                }
-              >
-                {t('fileView.componentEmbed.add')}
-              </Button>
-            </Group>
-          </Stack>
-        </Paper>
+
+              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                <SortableContext items={componentKeys} strategy={verticalListSortingStrategy}>
+                  <Stack gap='sm'>
+                    {value.components.map((component, index) => (
+                      <SortableComponent
+                        key={componentKeys[index]}
+                        sortId={componentKeys[index]}
+                        value={component}
+                        canRemove={value.components.length > 1}
+                        onChange={(next) => updateComponent(index, next)}
+                        onRemove={() => removeComponent(index)}
+                      />
+                    ))}
+                  </Stack>
+                </SortableContext>
+              </DndContext>
+
+              <Group align='end'>
+                <Select
+                  label={t('fileView.componentEmbed.addComponent')}
+                  data={[
+                    { value: '10', label: componentLabels[10] },
+                    { value: '9', label: componentLabels[9] },
+                    { value: '12', label: componentLabels[12] },
+                    { value: '14', label: componentLabels[14] },
+                    { value: '1', label: componentLabels[1] },
+                  ]}
+                  value={componentType}
+                  onChange={setComponentType}
+                />
+                <Button
+                  leftSection={<IconPlus size='1rem' />}
+                  disabled={!componentType || value.components.length >= 39}
+                  onClick={addComponent}
+                >
+                  {t('fileView.componentEmbed.add')}
+                </Button>
+              </Group>
+              <Group justify='flex-end'>
+                <Button variant='default' onClick={() => setOpened(false)}>
+                  {t('common:actions.close')}
+                </Button>
+              </Group>
+            </Stack>
+          </Modal>
+        </>
       ) : null}
     </Stack>
   );
