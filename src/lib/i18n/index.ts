@@ -1,18 +1,21 @@
+import { useSettingsStore } from '@/lib/client/store/settings';
 import dayjs from 'dayjs';
 import 'dayjs/locale/de';
 import 'dayjs/locale/es';
 import 'dayjs/locale/fr';
+import 'dayjs/locale/it';
 import 'dayjs/locale/ja';
+import 'dayjs/locale/nl';
 import 'dayjs/locale/pt-br';
+import 'dayjs/locale/ro';
 import 'dayjs/locale/ru';
 import 'dayjs/locale/tr';
 import 'dayjs/locale/zh-cn';
-import { useSettingsStore } from '@/lib/client/store/settings';
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import {
-  getDayjsLocale,
   DEFAULT_LANGUAGE,
+  getDayjsLocale,
   isLanguage,
   Language,
   LANGUAGES,

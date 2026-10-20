@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Language } from '@/lib/i18n/languages';
 
+export type UploadBehavior = 'disabled' | 'review' | 'upload';
+
 export type SettingsStore = {
   settings: {
     disableMediaPreview: boolean;
@@ -16,6 +18,8 @@ export type SettingsStore = {
     homeShowRecents: boolean;
     homeShowActivity: boolean;
     homeShowTypes: boolean;
+    fileDropBehavior: UploadBehavior;
+    filePasteBehavior: UploadBehavior;
     // empty until the user picks a language, the browser language is used meanwhile
     language: '' | Language;
   };
@@ -36,6 +40,8 @@ const defaultSettings: SettingsStore['settings'] = {
   homeShowRecents: true,
   homeShowActivity: true,
   homeShowTypes: true,
+  fileDropBehavior: 'review',
+  filePasteBehavior: 'review',
   language: '',
 };
 

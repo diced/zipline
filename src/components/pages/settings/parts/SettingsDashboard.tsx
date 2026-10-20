@@ -1,10 +1,10 @@
 import DomainSelect from '@/components/DomainSelect';
+import SafeTrans from '@/components/SafeTrans';
 import { useThemes } from '@/components/ThemeProvider';
-import { useSettingsStore } from '@/lib/client/store/settings';
+import { useSettingsStore, type UploadBehavior } from '@/lib/client/store/settings';
 import { Group, Paper, Select, Stack, Switch, Text, Title } from '@mantine/core';
 import { IconMoonFilled, IconPaintFilled, IconSunFilled } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
-import SafeTrans from '@/components/SafeTrans';
 import { useShallow } from 'zustand/shallow';
 
 const renderThemeOption =
@@ -26,6 +26,11 @@ export default function SettingsDashboard() {
   const [settings, update] = useSettingsStore(useShallow((state) => [state.settings, state.update]));
   const themes = useThemes();
   const { t } = useTranslation('settings');
+  const uploadBehaviors = [
+    { value: 'disabled', label: t('dashboard.uploadBehavior.disabled') },
+    { value: 'review', label: t('dashboard.uploadBehavior.review') },
+    { value: 'upload', label: t('dashboard.uploadBehavior.upload') },
+  ];
 
   const sortedThemes = themes.sort((a, b) => {
     if (a.colorScheme === 'light' && b.colorScheme === 'dark') return -1;
@@ -87,6 +92,24 @@ export default function SettingsDashboard() {
             onChange={(event) => update('homeShowTypes', event.currentTarget.checked)}
           />
         </Stack>
+
+        <Select
+          label={t('dashboard.fileDropBehavior.label')}
+          description={t('dashboard.fileDropBehavior.description')}
+          data={uploadBehaviors}
+          value={settings.fileDropBehavior}
+          onChange={(value) => update('fileDropBehavior', (value as UploadBehavior) ?? 'review')}
+          allowDeselect={false}
+        />
+
+        <Select
+          label={t('dashboard.filePasteBehavior.label')}
+          description={t('dashboard.filePasteBehavior.description')}
+          data={uploadBehaviors}
+          value={settings.filePasteBehavior}
+          onChange={(value) => update('filePasteBehavior', (value as UploadBehavior) ?? 'review')}
+          allowDeselect={false}
+        />
 
         <Select
           label={t('dashboard.fileViewer.label')}

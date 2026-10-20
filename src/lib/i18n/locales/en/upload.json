@@ -207,5 +207,15 @@
         "message": "{{name}} offloaded ({{current}}/{{total}})"
       }
     }
+  },
+  "global": {
+    "dropUpload": "Drop files to upload now",
+    "dropReview": "Drop files to review before uploading",
+    "savedOptions": "Your current upload options will be used.",
+    "reviewMessage": "Review your files on the upload page before uploading.",
+    "textQueued": "Text ready to upload",
+    "textReviewMessage": "Review your text on the upload page before uploading.",
+    "queued_one": "{{count}} file ready to upload",
+    "queued_other": "{{count}} files ready to upload"
   }
 }

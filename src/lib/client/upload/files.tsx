@@ -1,7 +1,11 @@
+import SafeTrans from '@/components/SafeTrans';
 import { Response } from '@/lib/api/response';
+import { bytes } from '@/lib/bytes';
+import type { SafeConfig } from '@/lib/config/safe';
 import i18n from '@/lib/i18n';
 import { notifications } from '@mantine/notifications';
-import { IconFileUpload, IconFileXFilled } from '@tabler/icons-react';
+import { IconDeviceSdCard, IconFileUpload, IconFileXFilled } from '@tabler/icons-react';
+import { uploadPartialFiles } from './partial';
 import { UploadProgress } from './useProgress';
 import {
   applyUploadHeaders,
@@ -14,6 +18,61 @@ import {
 // even if the server supports x parts per request, browser might lag hella so limit to 500 per req
 // "poor mans chunking" if all the files are less than the chunk limit lol
 const FILES_PER_REQUEST = 500;
+
+export async function uploadFileBatch(
+  files: File[],
+  { config, ...context }: UploadContextHandlers & UploadHeadersOptions & { config: SafeConfig },
+) {
+  const maxBytes = config.chunks.enabled && bytes(config.chunks.max);
+  const partialUploads = maxBytes ? files.filter((file) => file.size >= maxBytes) : [];
+  const normalUploads = maxBytes ? files.filter((file) => file.size < maxBytes) : files;
+
+  let uploadedNormal: Awaited<ReturnType<typeof uploadFiles>> = null;
+  let uploadedPartial: Awaited<ReturnType<typeof uploadPartialFiles>> = null;
+
+  if (normalUploads.length > 0) {
+    const size = normalUploads.reduce((acc, file) => acc + file.size, 0);
+    if (size > bytes(config.files.maxFileSize)) {
+      notifications.show({
+        title: i18n.t('upload:file.notifications.mayFail.title'),
+        color: 'yellow',
+        icon: <IconDeviceSdCard size='1rem' />,
+        message: (
+          <SafeTrans
+            ns='upload'
+            i18nKey='file.notifications.mayFail.message'
+            values={{ size: bytes(size), limit: bytes(bytes(config.files.maxFileSize)) }}
+            components={{ b: <b /> }}
+          />
+        ),
+      });
+    }
+
+    uploadedNormal = await uploadFiles(normalUploads, {
+      ...context,
+      partials: partialUploads.length,
+      showResult: false,
+    });
+  }
+
+  if (
+    partialUploads.length > 0 &&
+    (normalUploads.length === 0 || uploadedNormal?.files.length === normalUploads.length)
+  ) {
+    uploadedPartial = await uploadPartialFiles(partialUploads, { ...context, config });
+  }
+
+  const allFiles = [...(uploadedNormal?.files ?? []), ...(uploadedPartial?.files ?? [])];
+  if (allFiles.length > 0) {
+    showUploadModal(allFiles, {
+      clipboard: context.clipboard,
+      clearEphemeral: () => {
+        if (allFiles.length === files.length) context.clearEphemeral();
+      },
+      showCopyAll: true,
+    });
+  }
+}
 
 function progressTracker() {
   const alpha = 0.2;
@@ -36,7 +95,7 @@ function progressTracker() {
       lastTime = now;
     }
 
-    const percent = Math.round((loaded / total) * 100);
+    const percent = total === 0 ? 100 : Math.round((loaded / total) * 100);
 
     const remainingBytes = total - loaded;
     const remaining = resSpeed > 0 ? remainingBytes / resSpeed : 0;
@@ -61,9 +120,10 @@ export async function uploadFiles(
     ephemeral,
     folder,
     partials,
-  }: UploadContextHandlers & UploadHeadersOptions,
+    showResult = true,
+  }: UploadContextHandlers & UploadHeadersOptions & { showResult?: boolean },
 ): Promise<{ files: Response['/api/upload']['files'] } | null> {
-  setLoading(true);
+  setLoading?.(true);
   setProgress({ percent: 0, remaining: 0, speed: 0 });
 
   const partialCount = partials || 0;
@@ -122,15 +182,20 @@ export async function uploadFiles(
       req.addEventListener('error', () => {
         reject(new Error(i18n.t('upload:errors.network')));
       });
+      req.addEventListener('abort', () => {
+        reject(new Error(i18n.t('upload:errors.network')));
+      });
 
       req.open('POST', '/api/upload');
       applyUploadHeaders(req, { options, ephemeral, folder });
       req.send(body);
     });
 
+  const uploadedFiles: Response['/api/upload']['files'] = [];
+  let complete = false;
+
   try {
     let completedBytes = 0;
-    const uploadedFiles: Response['/api/upload']['files'] = [];
 
     for (let start = 0, batchIndex = 0; start < files.length; start += FILES_PER_REQUEST, batchIndex++) {
       const batchFiles = files.slice(start, start + FILES_PER_REQUEST);
@@ -149,10 +214,13 @@ export async function uploadFiles(
 
       const res = await uploadBatch(batchFiles, completedBytes);
       uploadedFiles.push(...res.files);
+      setFiles((prev) => prev.filter((file) => !batchFiles.includes(file)));
 
       completedBytes += batchBytes;
       setProgress(tracker(completedBytes, aggBytes));
     }
+
+    complete = true;
 
     notifications.update({
       id: 'upload',
@@ -172,18 +240,6 @@ export async function uploadFiles(
       autoClose: true,
       loading: false,
     });
-
-    setFiles((prev) => prev.filter((file) => !files.includes(file)));
-
-    if (partialCount === 0) {
-      showUploadModal(uploadedFiles, {
-        clipboard,
-        clearEphemeral,
-        showCopyAll: true,
-      });
-    }
-
-    return { files: uploadedFiles };
   } catch (error) {
     notifications.update({
       id: 'upload',
@@ -195,14 +251,24 @@ export async function uploadFiles(
       loading: false,
     });
 
-    setLoading(false);
+    setLoading?.(false);
     setProgress({ percent: 0, remaining: 0, speed: 0 });
-
-    return null;
   } finally {
     if (!partials) {
-      setLoading(false);
+      setLoading?.(false);
       setProgress({ percent: 0, remaining: 0, speed: 0 });
     }
   }
+
+  if (showResult && uploadedFiles.length > 0) {
+    showUploadModal(uploadedFiles, {
+      clipboard,
+      clearEphemeral: () => {
+        if (complete) clearEphemeral();
+      },
+      showCopyAll: true,
+    });
+  }
+
+  return uploadedFiles.length > 0 ? { files: uploadedFiles } : null;
 }

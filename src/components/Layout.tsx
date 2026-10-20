@@ -55,6 +55,7 @@ import type { dashboardLoader } from '../client/routes';
 import ConfigProvider from './ConfigProvider';
 import LanguageSelect from './LanguageSelect';
 import VersionBadge from './VersionBadge';
+import DashboardUpload from './upload/DashboardUpload';
 import { SETTINGS_EXTERNAL_LINKS } from './pages/serverSettings';
 
 type NavLinks = {
@@ -310,151 +311,163 @@ export default function Layout() {
   };
 
   return (
-    <AppShell
-      navbar={{ breakpoint: 'sm', width: { sm: 200, lg: 230 }, collapsed: { mobile: !opened } }}
-      header={{ height: 60 }}
-      footer={{ height: { base: 0.1 } }}
-    >
-      <AppShell.Header px='md'>
-        <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
-          <Burger
-            opened={opened}
-            onClick={() => setOpened((o) => !o)}
-            size='sm'
-            color={theme.colors.gray[6]}
-            mr='xl'
-            hiddenFrom='sm'
-            bdrs='md'
-          />
+    <ConfigProvider data={loaderData}>
+      <DashboardUpload>
+        <AppShell
+          navbar={{ breakpoint: 'sm', width: { sm: 200, lg: 230 }, collapsed: { mobile: !opened } }}
+          header={{ height: 60 }}
+          footer={{ height: { base: 0.1 } }}
+        >
+          <AppShell.Header px='md'>
+            <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
+              <Burger
+                opened={opened}
+                onClick={() => setOpened((o) => !o)}
+                size='sm'
+                color={theme.colors.gray[6]}
+                mr='xl'
+                hiddenFrom='sm'
+                bdrs='md'
+              />
 
-          {config.website.titleLogo && (
-            <Avatar src={config.website.titleLogo} alt={t('header.logoAlt')} radius='sm' size='md' mr='md' />
-          )}
-
-          <Title visibleFrom='sm' lineClamp={1} size={32}>
-            {config.website.title.trim()}
-          </Title>
-
-          <Group gap='xs' wrap='nowrap' style={{ marginLeft: 'auto' }}>
-            <LanguageSelect />
-
-            <Menu shadow='md' width={200}>
-              <Menu.Target>
-                <Button
-                  variant='transparent'
-                  color={colorScheme === 'dark' ? 'white' : 'black'}
-                  leftSection={
-                    avatar ? (
-                      <Avatar
-                        src={avatar}
-                        radius='sm'
-                        size='sm'
-                        alt={user?.username ?? t('header.avatarAlt')}
-                      />
-                    ) : (
-                      <IconSettingsFilled size='1rem' />
-                    )
-                  }
-                  rightSection={<IconChevronDown size='0.7rem' />}
-                  size='sm'
-                >
-                  {user?.username}
-                </Button>
-              </Menu.Target>
-
-              <Menu.Dropdown>
-                <Menu.Label>
-                  {isAdministrator(user?.role)
-                    ? t('userMenu.administratorLabel', { username: user?.username })
-                    : user?.username}
-                </Menu.Label>
-
-                <Menu.Item leftSection={<IconClipboardCopy size='1rem' />} onClick={copyToken}>
-                  {t('userMenu.copyToken')}
-                </Menu.Item>
-                <Menu.Item color='red' leftSection={<IconRefreshDot size='1rem' />} onClick={refreshToken}>
-                  {t('userMenu.refreshToken')}
-                </Menu.Item>
-                <Menu.Divider />
-
-                <Menu.Item
-                  leftSection={<IconSettingsFilled size='1rem' />}
-                  component={Link}
-                  to='/dashboard/settings'
-                  prefetch='intent'
-                >
-                  {t('userMenu.settings')}
-                </Menu.Item>
-
-                {user?.role === 'SUPERADMIN' && (
-                  <Menu.Item
-                    leftSection={<IconAdjustments size='1rem' />}
-                    component={Link}
-                    to='/dashboard/admin/settings'
-                    prefetch='intent'
-                  >
-                    {t('userMenu.serverSettings')}
-                  </Menu.Item>
-                )}
-
-                <Menu.Divider />
-                <Menu.Item color='red' leftSection={<IconLogout size='1rem' />} onClick={logout}>
-                  {t('userMenu.logout')}
-                </Menu.Item>
-              </Menu.Dropdown>
-            </Menu>
-          </Group>
-        </div>
-      </AppShell.Header>
-
-      <AppShell.Navbar hidden={!opened} zIndex={90}>
-        <Title hiddenFrom='sm' size={24} m='sm' style={{ marginBottom: 20 }}>
-          {config.website.title.trim()}
-        </Title>
-        <Divider hiddenFrom='sm' />
-
-        <ScrollArea mah='calc(100vh - 200px)'>
-          {renderLinks(
-            buildNavLinks(t),
-            location.pathname,
-            user as Response['/api/user']['user'],
-            config,
-            navigate,
-          )}
-        </ScrollArea>
-
-        <div style={{ marginTop: 'auto' }}>
-          <VersionBadge />
-
-          <Divider />
-
-          <ScrollArea mah='auto'>
-            <Box>
-              {config.website.externalLinks.map(({ name, url }, i) => (
-                <NavLink
-                  key={i}
-                  label={name}
-                  leftSection={<IconExternalLink size='1rem' />}
-                  variant='light'
-                  component={Link}
-                  to={url}
-                  target='_blank'
+              {config.website.titleLogo && (
+                <Avatar
+                  src={config.website.titleLogo}
+                  alt={t('header.logoAlt')}
+                  radius='sm'
+                  size='md'
+                  mr='md'
                 />
-              ))}
-            </Box>
-          </ScrollArea>
-        </div>
-      </AppShell.Navbar>
+              )}
 
-      <AppShell.Main>
-        <ConfigProvider data={loaderData}>
-          <Paper withBorder m='md' p='xs' radius='md'>
-            <Outlet />
-          </Paper>
-        </ConfigProvider>
-      </AppShell.Main>
+              <Title visibleFrom='sm' lineClamp={1} size={32}>
+                {config.website.title.trim()}
+              </Title>
 
-      <AppShell.Footer display='none' />
-    </AppShell>
+              <Group gap='xs' wrap='nowrap' style={{ marginLeft: 'auto' }}>
+                <LanguageSelect />
+
+                <Menu shadow='md' width={200}>
+                  <Menu.Target>
+                    <Button
+                      variant='transparent'
+                      color={colorScheme === 'dark' ? 'white' : 'black'}
+                      leftSection={
+                        avatar ? (
+                          <Avatar
+                            src={avatar}
+                            radius='sm'
+                            size='sm'
+                            alt={user?.username ?? t('header.avatarAlt')}
+                          />
+                        ) : (
+                          <IconSettingsFilled size='1rem' />
+                        )
+                      }
+                      rightSection={<IconChevronDown size='0.7rem' />}
+                      size='sm'
+                    >
+                      {user?.username}
+                    </Button>
+                  </Menu.Target>
+
+                  <Menu.Dropdown>
+                    <Menu.Label>
+                      {isAdministrator(user?.role)
+                        ? t('userMenu.administratorLabel', { username: user?.username })
+                        : user?.username}
+                    </Menu.Label>
+
+                    <Menu.Item leftSection={<IconClipboardCopy size='1rem' />} onClick={copyToken}>
+                      {t('userMenu.copyToken')}
+                    </Menu.Item>
+                    <Menu.Item
+                      color='red'
+                      leftSection={<IconRefreshDot size='1rem' />}
+                      onClick={refreshToken}
+                    >
+                      {t('userMenu.refreshToken')}
+                    </Menu.Item>
+                    <Menu.Divider />
+
+                    <Menu.Item
+                      leftSection={<IconSettingsFilled size='1rem' />}
+                      component={Link}
+                      to='/dashboard/settings'
+                      prefetch='intent'
+                    >
+                      {t('userMenu.settings')}
+                    </Menu.Item>
+
+                    {user?.role === 'SUPERADMIN' && (
+                      <Menu.Item
+                        leftSection={<IconAdjustments size='1rem' />}
+                        component={Link}
+                        to='/dashboard/admin/settings'
+                        prefetch='intent'
+                      >
+                        {t('userMenu.serverSettings')}
+                      </Menu.Item>
+                    )}
+
+                    <Menu.Divider />
+                    <Menu.Item color='red' leftSection={<IconLogout size='1rem' />} onClick={logout}>
+                      {t('userMenu.logout')}
+                    </Menu.Item>
+                  </Menu.Dropdown>
+                </Menu>
+              </Group>
+            </div>
+          </AppShell.Header>
+
+          <AppShell.Navbar hidden={!opened} zIndex={90}>
+            <Title hiddenFrom='sm' size={24} m='sm' style={{ marginBottom: 20 }}>
+              {config.website.title.trim()}
+            </Title>
+            <Divider hiddenFrom='sm' />
+
+            <ScrollArea mah='calc(100vh - 200px)'>
+              {renderLinks(
+                buildNavLinks(t),
+                location.pathname,
+                user as Response['/api/user']['user'],
+                config,
+                navigate,
+              )}
+            </ScrollArea>
+
+            <div style={{ marginTop: 'auto' }}>
+              <VersionBadge />
+
+              <Divider />
+
+              <ScrollArea mah='auto'>
+                <Box>
+                  {config.website.externalLinks.map(({ name, url }, i) => (
+                    <NavLink
+                      key={i}
+                      label={name}
+                      leftSection={<IconExternalLink size='1rem' />}
+                      variant='light'
+                      component={Link}
+                      to={url}
+                      target='_blank'
+                    />
+                  ))}
+                </Box>
+              </ScrollArea>
+            </div>
+          </AppShell.Navbar>
+
+          <AppShell.Main>
+            <Paper withBorder m='md' p='xs' radius='md'>
+              <Outlet />
+            </Paper>
+          </AppShell.Main>
+
+          <AppShell.Footer display='none' />
+        </AppShell>
+      </DashboardUpload>
+    </ConfigProvider>
   );
 }

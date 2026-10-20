@@ -3,6 +3,7 @@ import Render from '@/components/render/Render';
 import { renderMode } from '@/components/render/renderMode';
 import { bytes } from '@/lib/bytes';
 import { uploadFiles } from '@/lib/client/upload/files';
+import { createTextFiles } from '@/lib/client/upload/text';
 import useMultiTextFiles from '@/lib/client/upload/useMultiTextFiles';
 import { useUploadOptionsStore } from '@/lib/client/store/uploadOptions';
 import {
@@ -29,7 +30,7 @@ import { useShallow } from 'zustand/shallow';
 import UploadOptionsButton from '../UploadOptionsButton';
 import styles from './index.module.css';
 
-export default function UploadText() {
+export default function UploadText({ initialText }: { initialText?: string }) {
   const { t } = useTranslation('upload');
   const clipboard = useClipboard();
   const [options, ephemeral, clearEphemeral] = useUploadOptionsStore(
@@ -37,7 +38,7 @@ export default function UploadText() {
   );
 
   const [loading, setLoading] = useState(false);
-  const [files, selected, { setFile, addFile, removeFile }] = useMultiTextFiles();
+  const [files, selected, { setFile, addFile, removeFile }] = useMultiTextFiles(initialText);
 
   const codeMap = useCodeMap();
 
@@ -78,16 +79,7 @@ export default function UploadText() {
   );
 
   const upload = async () => {
-    const fileBlobs = files.map((file) => {
-      const blob = new Blob([file.text], {
-        type: codeMap.find((meta) => meta.ext === file.lang)?.mime,
-      });
-
-      return new File([blob], `text.${file.lang}`, {
-        type: blob.type,
-        lastModified: Date.now(),
-      });
-    });
+    const fileBlobs = createTextFiles(files, codeMap);
 
     await uploadFiles(fileBlobs, {
       clipboard,

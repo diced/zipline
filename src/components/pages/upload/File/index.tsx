@@ -1,10 +1,8 @@
 import { useConfig } from '@/components/ConfigProvider';
+import SafeTrans from '@/components/SafeTrans';
+import { useFileUpload } from '@/components/upload/FileUploadProvider';
 import { bytes } from '@/lib/bytes';
-import { useUploadOptionsStore } from '@/lib/client/store/uploadOptions';
-import { uploadFiles } from '@/lib/client/upload/files';
-import { uploadPartialFiles } from '@/lib/client/upload/partial';
-import { showUploadModal } from '@/lib/client/upload/shared';
-import { useProgress } from '@/lib/client/upload/useProgress';
+import { getPastedContent } from '@/lib/client/upload/paste';
 import { humanizeDuration } from '@/lib/relativeTime';
 import {
   Button,
@@ -21,14 +19,12 @@ import {
   useMantineTheme,
 } from '@mantine/core';
 import { Dropzone } from '@mantine/dropzone';
-import { useClipboard, useColorScheme } from '@mantine/hooks';
-import { notifications, showNotification } from '@mantine/notifications';
-import { IconDeviceSdCard, IconFiles, IconTrashFilled, IconUpload, IconX } from '@tabler/icons-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useColorScheme } from '@mantine/hooks';
+import { showNotification } from '@mantine/notifications';
+import { IconFiles, IconTrashFilled, IconUpload, IconX } from '@tabler/icons-react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import SafeTrans from '@/components/SafeTrans';
 import { Link } from 'react-router-dom';
-import { useShallow } from 'zustand/shallow';
 import UploadOptionsButton from '../UploadOptionsButton';
 import DropzoneFile from './DropzoneFile';
 
@@ -38,119 +34,36 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
   const { t } = useTranslation('upload');
   const theme = useMantineTheme();
   const colorScheme = useColorScheme();
-  const clipboard = useClipboard();
   const config = useConfig();
+  const { files, setFiles, progress, loading, upload } = useFileUpload();
+  const [visibleCount, setVisibleCount] = useState(initialVisible);
 
   const isMac = typeof navigator !== 'undefined' && navigator.userAgent.includes('Macintosh');
-
-  const [options, ephemeral, clearEphemeral] = useUploadOptionsStore(
-    useShallow((state) => [state.options, state.ephemeral, state.clearEphemeral]),
-  );
-
-  const [files, setFiles] = useState<File[]>([]);
-  const [visibleCount, setVisibleCount] = useState(initialVisible);
-  const [progress, setProgress] = useProgress();
-  const [dropLoading, setLoading] = useState(false);
 
   const visibleFiles = files.slice(0, visibleCount);
   const hiddenFiles = Math.max(0, files.length - visibleFiles.length);
 
-  const aggSize = useCallback(() => files.reduce((acc, file) => acc + file.size, 0), [files]);
+  const aggSize = files.reduce((acc, file) => acc + file.size, 0);
 
-  const handlePaste = useCallback(
-    (e: ClipboardEvent) => {
-      if (!e.clipboardData) return;
-      for (let i = 0; i !== e.clipboardData.items.length; ++i) {
-        if (!e.clipboardData.items[i].type.startsWith('image')) return;
-        const blob = e.clipboardData.items[i].getAsFile();
-        if (!blob) return;
-        setFiles((prev) => [...prev, blob]);
-        setVisibleCount(initialVisible);
+  useEffect(() => {
+    const handlePaste = (event: ClipboardEvent) => {
+      const files = getPastedContent(event)?.files.filter((file) => file.type.startsWith('image/')) ?? [];
+      if (files.length === 0) return;
+
+      event.preventDefault();
+      setFiles((prev) => [...prev, ...files]);
+      setVisibleCount(initialVisible);
+      for (const file of files) {
         showNotification({
-          message: t('file.notifications.pasted.message', { name: blob.name }),
+          message: t('file.notifications.pasted.message', { name: file.name }),
           color: 'blue',
         });
       }
-    },
-    [t],
-  );
+    };
 
-  const upload = async () => {
-    const maxBytes = config.chunks.enabled && bytes(config.chunks.max);
-    const partialUploads: File[] = maxBytes ? files.filter((file) => file.size >= maxBytes) : [];
-    const normalUploads: File[] = maxBytes ? files.filter((file) => file.size < maxBytes) : files;
-    const hasBoth = normalUploads.length > 0 && partialUploads.length > 0;
-
-    let uploadedNormal: Awaited<ReturnType<typeof uploadFiles>> = null;
-    let uploadedPartial: Awaited<ReturnType<typeof uploadPartialFiles>> = null;
-
-    if (normalUploads.length > 0) {
-      const size = normalUploads.reduce((acc, file) => acc + file.size, 0);
-      if (size > bytes(config.files.maxFileSize)) {
-        notifications.show({
-          title: t('file.notifications.mayFail.title'),
-          color: 'yellow',
-          icon: <IconDeviceSdCard size='1rem' />,
-          message: (
-            <SafeTrans
-              t={t}
-              i18nKey='file.notifications.mayFail.message'
-              values={{ size: bytes(size), limit: bytes(bytes(config.files.maxFileSize)) }}
-              components={{ b: <b /> }}
-            />
-          ),
-        });
-      }
-
-      uploadedNormal = await uploadFiles(normalUploads, {
-        setFiles,
-        setLoading,
-        setProgress,
-        clipboard,
-        clearEphemeral,
-        options,
-        ephemeral,
-        folder,
-        partials: partialUploads.length,
-      });
-    }
-
-    if (partialUploads.length > 0 && (!hasBoth || uploadedNormal)) {
-      uploadedPartial = await uploadPartialFiles(partialUploads, {
-        setFiles,
-        setLoading,
-        setProgress,
-        options,
-        ephemeral,
-        config,
-        folder,
-      });
-    }
-
-    const allFiles = [...(uploadedNormal?.files ?? []), ...(uploadedPartial?.files ?? [])];
-    if (allFiles.length > 0 && (hasBoth || partialUploads.length > 0))
-      showUploadModal(allFiles, { clipboard, clearEphemeral, showCopyAll: true });
-  };
-
-  useEffect(() => {
     document.addEventListener('paste', handlePaste);
-    return () => {
-      document.removeEventListener('paste', handlePaste);
-    };
-  }, [handlePaste]);
-
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (files.length > 0) {
-        e.preventDefault();
-      }
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
-  }, [files.length]);
+    return () => document.removeEventListener('paste', handlePaste);
+  }, [setFiles, t]);
 
   if (!config) return null;
 
@@ -178,8 +91,8 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
           setVisibleCount(initialVisible);
         }}
         my='sm'
-        loading={dropLoading}
-        disabled={dropLoading}
+        loading={loading}
+        disabled={loading}
         style={{ zIndex: 1 }}
       >
         <Group justify='center' gap='xl' style={{ minHeight: rem(220), pointerEvents: 'none' }}>
@@ -257,7 +170,7 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
         {visibleFiles.map((file, i) => (
           <Grid.Col span={3} key={i}>
             <DropzoneFile
-              loading={dropLoading}
+              loading={loading}
               file={file}
               onDelete={() => setFiles((prev) => prev.filter((_, j) => i !== j))}
             />
@@ -273,16 +186,16 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
           <Button
             size='compact-sm'
             variant='light'
-            disabled={dropLoading}
+            disabled={loading}
             onClick={() => setVisibleCount((prev) => Math.min(files.length, prev + initialVisible))}
           >
             {t('file.showMore')}
           </Button>
-          <Tooltip label={t('file.showAllTooltip')} hidden={dropLoading}>
+          <Tooltip label={t('file.showAllTooltip')} hidden={loading}>
             <Button
               size='compact-sm'
               variant='subtle'
-              disabled={dropLoading}
+              disabled={loading}
               onClick={() => setVisibleCount(files.length)}
             >
               {t('file.showAll')}
@@ -296,7 +209,7 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
           variant='outline'
           color='red'
           leftSection={<IconTrashFilled size='1rem' />}
-          disabled={files.length === 0 || dropLoading}
+          disabled={files.length === 0 || loading}
           onClick={() => {
             setFiles([]);
             setVisibleCount(initialVisible);
@@ -308,10 +221,10 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
         <Button
           variant='outline'
           leftSection={<IconUpload size='1rem' />}
-          disabled={files.length === 0 || dropLoading}
-          onClick={upload}
+          disabled={files.length === 0 || loading}
+          onClick={() => void upload(files)}
         >
-          {t('actions.upload', { count: files.length, size: bytes(aggSize()) })}
+          {t('actions.upload', { count: files.length, size: bytes(aggSize) })}
         </Button>
       </Group>
     </>

@@ -1,5 +1,6 @@
 import ConfigProvider from '@/components/ConfigProvider';
 import UploadFile from '@/components/pages/upload/File';
+import FileUploadProvider from '@/components/upload/FileUploadProvider';
 import { type Response } from '@/lib/api/response';
 import { SafeConfig } from '@/lib/config/safe';
 import { useTitle } from '@/lib/client/hooks/useTitle';
@@ -42,7 +43,9 @@ export function Component() {
     <>
       <Container my='lg'>
         <ConfigProvider data={{ config: config as unknown as SafeConfig, codeMap: [] }}>
-          <UploadFile title={t('folderUpload.title', { name: folder.name })} folder={folder.id} />
+          <FileUploadProvider folder={folder.id}>
+            <UploadFile title={t('folderUpload.title', { name: folder.name })} folder={folder.id} />
+          </FileUploadProvider>
           <Center>
             <Text c='dimmed' ta='center'>
               {folder.public ? (

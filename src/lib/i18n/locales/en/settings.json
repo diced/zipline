@@ -137,6 +137,19 @@
     "themeLight": {
       "label": "Light Theme",
       "description": "The theme to use for the dashboard when your system is in light mode."
+    },
+    "fileDropBehavior": {
+      "label": "File drop behavior",
+      "description": "Choose what happens when you drop files on dashboard pages outside the upload pages. Immediate uploads use your current upload options."
+    },
+    "filePasteBehavior": {
+      "label": "Paste behavior",
+      "description": "Choose what happens when you paste files or text on dashboard pages outside text fields and upload pages. Immediate uploads use your current upload options."
+    },
+    "uploadBehavior": {
+      "disabled": "Disabled",
+      "review": "Open upload page",
+      "upload": "Upload immediately"
     }
   },
   "fileView": {

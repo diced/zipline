@@ -1,5 +1,4 @@
-import useObjectState from '@/lib/client/hooks/useObjectState';
-import { useCallback } from 'react';
+import { useState } from 'react';
 
 export type UploadProgress = {
   percent: number;
@@ -14,14 +13,5 @@ export const initialState: UploadProgress = {
 };
 
 export function useProgress() {
-  const [progress, updateProgress] = useObjectState<UploadProgress>(initialState);
-
-  const setProgress = useCallback(
-    (next: UploadProgress) => {
-      updateProgress(next);
-    },
-    [updateProgress],
-  );
-
-  return [progress, setProgress] as const;
+  return useState<UploadProgress>(initialState);
 }

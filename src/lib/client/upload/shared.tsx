@@ -1,3 +1,4 @@
+import SafeTrans from '@/components/SafeTrans';
 import { Response } from '@/lib/api/response';
 import { UploadOptionsStore } from '@/lib/client/store/uploadOptions';
 import i18n from '@/lib/i18n';
@@ -8,7 +9,6 @@ import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import { IconClipboardCopy, IconExternalLink } from '@tabler/icons-react';
 import { Dispatch, SetStateAction } from 'react';
-import SafeTrans from '@/components/SafeTrans';
 import { Link } from 'react-router-dom';
 import { UploadProgress } from './useProgress';
 
@@ -21,7 +21,7 @@ export type UploadHeadersOptions = {
 
 export type UploadHandlers = {
   setProgress: (o: UploadProgress) => void;
-  setLoading: Dispatch<SetStateAction<boolean>>;
+  setLoading?: Dispatch<SetStateAction<boolean>>;
   setFiles: Dispatch<SetStateAction<File[]>>;
 };
 
