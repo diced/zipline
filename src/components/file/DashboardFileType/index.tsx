@@ -251,10 +251,10 @@ export default function DashboardFileType({
         <Placeholder text={t('preview.clickToViewText', { name: file.name })} Icon={fileIcon(file.type)} />
       );
 
-    if (fileContent.trim() === '') {
+    if (fileContent === undefined) {
       return (
         <LoadingOverlay
-          visible={fileContent.trim() === ''}
+          visible
           loaderProps={{
             children: (
               <>

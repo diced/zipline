@@ -8,20 +8,15 @@ const MAX_BYTES = 1 * 1024 * 1024;
 const fileBig = () => i18n.t('file:preview.tooBig');
 
 async function readBlobText(file: File) {
-  const raw = await new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onerror = () => reject(new Error('Failed to read file'));
-    reader.onload = () => resolve((reader.result ?? '') as string);
-    reader.readAsText(file);
-  });
+  const raw = await file.slice(0, MAX_BYTES).text();
 
-  return raw.length > MAX_BYTES ? raw.slice(0, MAX_BYTES) + fileBig() : raw;
+  return file.size > MAX_BYTES ? raw + fileBig() : raw;
 }
 
 async function readText(fileUrl: string) {
   const res = await fetch(fileUrl, {
     headers: {
-      Range: `bytes=0-${MAX_BYTES}`,
+      Range: `bytes=0-${MAX_BYTES - 1}`,
     },
   });
 
@@ -42,13 +37,13 @@ export default function useFileContent({
     () => {
       if (!enabled) return null;
 
-      if (isDbFile(file)) return ['dbfile', file.id] as const;
+      if (isDbFile(file)) return ['dbfile', file.id, fileUrl] as const;
 
-      const f = file as File;
-      return ['blobfile', f.name] as const;
+      return ['blobfile', file] as const;
     },
     async () => {
       if (!isDbFile(file)) return readBlobText(file as File);
+      if (file.size === 0) return '';
 
       if (file.size > MAX_BYTES) {
         const text = await readText(fileUrl);
@@ -65,5 +60,5 @@ export default function useFileContent({
 
   if (error) return i18n.t('file:preview.loadError');
 
-  return data ?? '';
+  return data;
 }
