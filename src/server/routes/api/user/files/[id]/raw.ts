@@ -50,16 +50,20 @@ export default typedPlugin(
             where: { path: id },
             with: {
               file: {
-                columns: { userId: true },
+                columns: { userId: true, deletesAt: true, maxViews: true, views: true },
                 with: { user: { columns: { id: true, role: true } } },
               },
             },
           });
 
-          if (!thumbnail) throw new ApiError(9002);
-          if (thumbnail.file && thumbnail.file.userId !== req.user.id) {
-            if (!canInteract(req.user.role, thumbnail.file.user?.role)) throw new ApiError(9002);
+          if (!thumbnail?.file) throw new ApiError(9002);
+          const { file } = thumbnail;
+          if (file.userId !== req.user.id) {
+            if (!canInteract(req.user.role, file.user?.role)) throw new ApiError(9002);
           }
+
+          if (file.deletesAt && file.deletesAt <= new Date()) throw new ApiError(9002);
+          if (file.maxViews && file.views >= file.maxViews) throw new ApiError(9002);
 
           const size = await datasource.size(thumbnail.path);
           if (!size) throw new ApiError(9002);

@@ -48,9 +48,14 @@ export const rawFileHandler = async (
   if (id.startsWith('.thumbnail')) {
     const thumbnail = await db.query.thumbnails.findFirst({
       where: { path: idSanitized, file: { password: { isNull: true } } },
+      with: { file: { columns: { deletesAt: true, maxViews: true, views: true } } },
     });
 
-    if (!thumbnail) return res.callNotFound();
+    if (!thumbnail?.file) return res.callNotFound();
+
+    const { file } = thumbnail;
+    if (file.deletesAt && file.deletesAt <= new Date()) return res.callNotFound();
+    if (file.maxViews && file.views >= file.maxViews) return res.callNotFound();
 
     const size = await datasource.size(thumbnail.path);
     if (!size) return res.callNotFound();
