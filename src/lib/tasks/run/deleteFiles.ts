@@ -17,9 +17,11 @@ export default function deleteFiles() {
       files: expiredFiles.map((f) => f.name),
     });
 
+    const deletedFiles: typeof expiredFiles = [];
     for (const file of expiredFiles) {
       try {
         await datasource.delete(file.name);
+        deletedFiles.push(file);
       } catch {
         this.logger.error('failed to delete file from datasource', {
           file: file.name,
@@ -27,12 +29,12 @@ export default function deleteFiles() {
       }
     }
 
-    const count = await removeFiles(expiredFiles.map((f) => f.id));
+    const count = await removeFiles(deletedFiles.map((f) => f.id));
 
     if (count)
       this.logger.info(`deleted ${count} expired files`, {
-        size: bytes(expiredFiles.reduce((acc, f) => acc + f.size, 0)),
-        files: expiredFiles.map((f) => f.name),
+        size: bytes(deletedFiles.reduce((acc, f) => acc + f.size, 0)),
+        files: deletedFiles.map((f) => f.name),
       });
   };
 }

@@ -32,9 +32,11 @@ export default function maxViews() {
       return;
     }
 
+    const deletedFiles: typeof expiredFiles = [];
     for (const file of expiredFiles) {
       try {
         await datasource.delete(file.name);
+        deletedFiles.push(file);
       } catch {
         this.logger.error('failed to delete file from datasource', {
           file: file.name,
@@ -44,7 +46,7 @@ export default function maxViews() {
 
     const [fileCount, urlCount] = await db.transaction(async (tx) => {
       const fileCount = await removeFiles(
-        expiredFiles.map((file) => file.id),
+        deletedFiles.map((file) => file.id),
         tx,
       );
       let urlCount = 0;
@@ -65,8 +67,8 @@ export default function maxViews() {
 
     if (fileCount)
       this.logger.info(`deleted ${fileCount} files due to max views`, {
-        size: bytes(expiredFiles.reduce((acc, file) => acc + file.size, 0)),
-        files: expiredFiles.map((file) => file.name),
+        size: bytes(deletedFiles.reduce((acc, file) => acc + file.size, 0)),
+        files: deletedFiles.map((file) => file.name),
       });
 
     if (urlCount)
