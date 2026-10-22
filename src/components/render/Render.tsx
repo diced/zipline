@@ -58,7 +58,11 @@ export default function Render({
         <>
           <RenderAlert renderer='KaTeX' state={highlight} change={(s) => setHighlight(s)} />
 
-          {highlight ? <HighlightCode language={language} code={code} {...props} /> : <KaTeX tex={code} />}
+          {highlight ? (
+            <HighlightCode language={language} code={code} {...props} />
+          ) : (
+            <KaTeX tex={code} unframed={props.unframed} />
+          )}
         </>
       );
     case RenderMode.Markdown:
@@ -66,7 +70,11 @@ export default function Render({
         <>
           <RenderAlert renderer='Markdown' state={highlight} change={(s) => setHighlight(s)} />
 
-          {highlight ? <HighlightCode language={language} code={code} {...props} /> : <Markdown md={code} />}
+          {highlight ? (
+            <HighlightCode language={language} code={code} {...props} />
+          ) : (
+            <Markdown md={code} unframed={props.unframed} />
+          )}
         </>
       );
     default:

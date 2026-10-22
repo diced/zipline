@@ -1,50 +1,69 @@
-import { ActionIcon, Button, CopyButton, Paper, Text, useMantineTheme } from '@mantine/core';
+import {
+  ActionIcon,
+  Box,
+  Button,
+  CopyButton,
+  Paper,
+  Text,
+  useComputedColorScheme,
+  useMantineTheme,
+} from '@mantine/core';
 import { IconCheck, IconChevronDown, IconChevronUp, IconClipboardCopy } from '@tabler/icons-react';
-import type { HLJSApi } from 'highlight.js';
-import * as sanitize from 'isomorphic-dompurify';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Virtuoso } from 'react-virtuoso';
-import './HighlightCode.theme.scss';
+import type { highlight } from './highlight';
 
 export default function HighlightCode({
   language,
   code,
   noClamp,
   scrollParent,
+  unframed,
 }: {
   noClamp?: boolean;
   language: string;
   code: string;
   scrollParent?: HTMLElement | null;
+  unframed?: boolean;
 }) {
   const { t } = useTranslation('file');
   const theme = useMantineTheme();
+  const colorScheme = useComputedColorScheme('light');
   const [expanded, setExpanded] = useState(false);
-  const [hljs, setHljs] = useState<HLJSApi | null>(null);
+  const [highlighted, setHighlighted] = useState<{
+    code: string;
+    language: string;
+    colorScheme: 'light' | 'dark';
+    tokens: Awaited<ReturnType<typeof highlight>>;
+  } | null>(null);
 
   useEffect(() => {
-    import('highlight.js').then((mod) => setHljs(mod.default || mod));
-  }, []);
+    let cancelled = false;
+
+    import('./highlight')
+      .then(({ highlight }) => (cancelled ? null : highlight(code, language, colorScheme)))
+      .then((tokens) => {
+        if (!cancelled) setHighlighted({ code, language, colorScheme, tokens });
+      })
+      .catch((error) => {
+        if (!cancelled) console.error('Failed to highlight code', error);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [code, language, colorScheme]);
 
   const lines = useMemo(() => code.split('\n'), [code]);
   const isExpandable = !noClamp && lines.length > 50;
   const totalCount = isExpandable && !expanded ? 50 : lines.length;
   const estimatedHeight = Math.min(totalCount * 24, 400);
 
-  const lang = useMemo(() => {
-    if (!hljs) return 'plaintext';
-    return hljs.getLanguage(language) ? language : 'plaintext';
-  }, [hljs, language]);
-
-  const hlLines = useMemo(() => {
-    if (!hljs) return null;
-    return lines.map((line) =>
-      sanitize.sanitize(hljs.highlight(line || ' ', { language: lang }).value, {
-        USE_PROFILES: { html: true },
-      }),
-    );
-  }, [lines, hljs, lang]);
+  const tokens =
+    highlighted?.code === code && highlighted.language === language && highlighted.colorScheme === colorScheme
+      ? highlighted.tokens
+      : null;
 
   const rowRenderer = (index: number) => (
     <div
@@ -72,18 +91,37 @@ export default function HighlightCode({
         {index + 1}
       </Text>
 
-      <code
-        className='theme hljs'
-        style={{ flex: 1, padding: 0, background: 'none', alignSelf: 'center' }}
-        dangerouslySetInnerHTML={hlLines ? { __html: hlLines[index] } : undefined}
-      >
-        {hlLines ? null : lines[index]}
+      <code style={{ flex: 1, padding: 0, background: 'none', alignSelf: 'center' }}>
+        {tokens
+          ? tokens[index]?.map((token, tokenIndex) => (
+              <span
+                key={tokenIndex}
+                style={{
+                  color: token.color,
+                  backgroundColor: token.bgColor,
+                  fontStyle: (token.fontStyle ?? 0) & 1 ? 'italic' : undefined,
+                  fontWeight: (token.fontStyle ?? 0) & 2 ? 'bold' : undefined,
+                  textDecoration: (token.fontStyle ?? 0) & 4 ? 'underline' : undefined,
+                }}
+              >
+                {token.content}
+              </span>
+            ))
+          : lines[index]}
       </code>
     </div>
   );
 
+  const Container = unframed ? Box : Paper;
+
   return (
-    <Paper withBorder p='xs' my='md' pos='relative' style={{ overflow: 'hidden' }}>
+    <Container
+      {...(!unframed && { withBorder: true })}
+      p='xs'
+      my={unframed ? 0 : 'md'}
+      pos='relative'
+      style={{ overflow: 'hidden' }}
+    >
       <CopyButton value={code}>
         {({ copied, copy }) => (
           <ActionIcon
@@ -129,6 +167,6 @@ export default function HighlightCode({
           {expanded ? t('render.showLess') : t('render.showMore', { count: lines.length - 50 })}
         </Button>
       )}
-    </Paper>
+    </Container>
   );
 }

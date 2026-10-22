@@ -165,9 +165,7 @@ export async function resolveUploadMimetype(
   context?: string,
 ): Promise<{ mimetype: string; assumed: boolean; remapped: boolean }> {
   const declaredMimetype = normalizeMimetype(originalMimetype) ?? 'application/octet-stream';
-  const assumedMimetype = config.files.assumeMimetypes
-    ? normalizeMimetype(await guess(extension.substring(1)))
-    : null;
+  const assumedMimetype = config.files.assumeMimetypes ? normalizeMimetype(await guess(extension, '')) : null;
   const assumed = assumedMimetype !== null;
   const resolvedMimetype = assumedMimetype ?? declaredMimetype;
   const enforced = enforceMimetypePolicy(resolvedMimetype, context);

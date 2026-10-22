@@ -5,7 +5,7 @@ export enum RenderMode {
 }
 
 export function renderMode(extension: string) {
-  switch (extension) {
+  switch (extension.toLowerCase()) {
     case 'tex':
     case 'katex':
       return RenderMode.Katex;

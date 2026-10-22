@@ -10,6 +10,7 @@ import { formatRootUrl } from '@/lib/url';
 import {
   ActionIcon,
   Anchor,
+  Box,
   Button,
   Center,
   Collapse,
@@ -45,6 +46,7 @@ export default function ViewFileId() {
   const [passwordValue, setPassword] = useState<string>('');
   const [passwordError, setPasswordError] = useState<string>('');
   const [detailsOpen, setDetailsOpen] = useState<boolean>(false);
+  const [scrollParent, setScrollParent] = useState<HTMLDivElement | null>(null);
 
   useTitle(data?.file.originalName ?? data?.file.name ?? t('file.pageTitle'));
 
@@ -93,8 +95,8 @@ export default function ViewFileId() {
       </form>
     </Modal>
   ) : code ? (
-    <>
-      <Paper withBorder style={{ borderTop: 0, borderLeft: 0, borderRight: 0 }}>
+    <Box h='100dvh' style={{ display: 'flex', flexDirection: 'column' }}>
+      <Paper withBorder radius={0} style={{ borderTop: 0, borderLeft: 0, borderRight: 0, flexShrink: 0 }}>
         <Group justify='space-between' py={5} px='xs'>
           <Text c='dimmed'>{file.originalName ?? file.name}</Text>
 
@@ -116,7 +118,7 @@ export default function ViewFileId() {
         </Group>
       </Paper>
 
-      <Collapse expanded={detailsOpen}>
+      <Collapse expanded={detailsOpen} style={{ flexShrink: 0, maxHeight: '50%', overflowY: 'auto' }}>
         <Paper m='md' p='md' withBorder>
           {user?.view!.content && (
             <Typography>
@@ -145,10 +147,18 @@ export default function ViewFileId() {
         </Paper>
       </Collapse>
 
-      <Center m='sm'>
-        <DashboardFileType file={file as unknown as File} token={token} show code={code} fullscreen />
-      </Center>
-    </>
+      <Box ref={setScrollParent} pos='relative' style={{ flex: 1, minHeight: 0, overflow: 'auto' }}>
+        <DashboardFileType
+          file={file as unknown as File}
+          token={token}
+          show
+          code={code}
+          fullscreen
+          unframed
+          scrollParent={scrollParent}
+        />
+      </Box>
+    </Box>
   ) : (
     <>
       <Center h='100%'>
