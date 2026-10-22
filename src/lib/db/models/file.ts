@@ -2,7 +2,7 @@ import { config } from '@/lib/config';
 import { db, type DbClient } from '@/lib/db';
 import { files } from '@/lib/db/schema';
 import { formatRootUrl } from '@/lib/url';
-import { and, eq, getColumns, inArray, isNotNull } from 'drizzle-orm';
+import { and, eq, getColumns, inArray, isNotNull, sql } from 'drizzle-orm';
 import { createSelectSchema } from 'drizzle-orm/zod';
 import { z } from 'zod';
 import { tagColumns, tagSchema } from './tag';
@@ -27,6 +27,10 @@ const fileOwnerRelations = {
   ...fileRelations,
   user: { columns: { id: true, role: true } },
 } as const;
+
+export async function lockFiles(client: DbClient) {
+  await client.execute(sql`lock table ${files} in share row exclusive mode`);
+}
 
 export async function getFile(identifier: string, client: DbClient = db) {
   const row = await client.query.files.findFirst({

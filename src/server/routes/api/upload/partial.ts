@@ -23,7 +23,7 @@ import { bytes } from '@/lib/bytes';
 import { config } from '@/lib/config';
 import { hashPassword } from '@/lib/crypto';
 import { db } from '@/lib/db';
-import { removeFile, type FileInsert } from '@/lib/db/models/file';
+import { lockFiles, removeFile, type FileInsert } from '@/lib/db/models/file';
 import { getFolderMetadata } from '@/lib/db/models/folder';
 import { getUser } from '@/lib/db/models/user';
 import { files, incompleteFiles, users } from '@/lib/db/schema';
@@ -174,27 +174,14 @@ export default typedPlugin(
           const extension = getExtension(options.partial.filename, options.overrides?.extension);
           if (isExtensionDisabled(extension)) throw new ApiError(1006);
 
-          // determine filename
           const format = options.format || config.files.defaultFormat;
-          let fileName: string;
-          try {
-            fileName = await getFilename(
-              format,
-              options.partial.filename,
-              extension,
-              options.overrides?.filename,
-            );
-          } catch (error) {
-            throw new ApiError(1009, String(error));
-          }
 
           // determine mimetype
           const { assumed, mimetype } = await resolveUploadMimetype(options.partial.contentType, extension);
 
           if (config.files.assumeMimetypes) response.assumedMimetypes![0] = assumed;
 
-          const data: FileInsert = {
-            name: `${fileName}${extension}`,
+          const data: Omit<FileInsert, 'name'> = {
             size: total,
             type: mimetype,
             userId: req.user ? req.user.id : options.folder ? folder?.userId : undefined,
@@ -215,6 +202,8 @@ export default typedPlugin(
           if (!req.user && folder) data.anonymous = true;
 
           const fileUpload = await db.transaction(async (tx) => {
+            await lockFiles(tx);
+
             if (quotaUser?.quota) {
               await tx.select({ id: users.id }).from(users).where(eq(users.id, quotaUser.id)).for('update');
 
@@ -223,7 +212,23 @@ export default typedPlugin(
                 throw new ApiError(5002, typeof quotaCheck === 'string' ? quotaCheck : undefined);
             }
 
-            const [created] = await tx.insert(files).values(data).returning(uploadFileColumns);
+            let fileName: string;
+            try {
+              fileName = await getFilename(
+                format,
+                options.partial!.filename,
+                extension,
+                options.overrides?.filename,
+                tx,
+              );
+            } catch (error) {
+              throw new ApiError(1009, String(error));
+            }
+
+            const [created] = await tx
+              .insert(files)
+              .values({ ...data, name: `${fileName}${extension}` })
+              .returning(uploadFileColumns);
             if (!created) throw new ApiError(9005);
 
             return created;

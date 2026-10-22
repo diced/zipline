@@ -14,7 +14,7 @@ import { config } from '@/lib/config';
 import { hashPassword } from '@/lib/crypto';
 import { datasource } from '@/lib/datasource';
 import { db } from '@/lib/db';
-import { removeFiles, type FileInsert } from '@/lib/db/models/file';
+import { lockFiles, removeFiles, type FileInsert } from '@/lib/db/models/file';
 import { getFolderMetadata } from '@/lib/db/models/folder';
 import { getUser } from '@/lib/db/models/user';
 import { files, users } from '@/lib/db/schema';
@@ -151,11 +151,9 @@ export default typedPlugin(
 
         logger.debug('uploading files', { files: multipartFiles.map((x) => x.filename) });
 
-        const reservedNames = new Set<string>();
         const format = options.format || config.files.defaultFormat;
         const filesBefore: {
           file: SavedMultipartFile;
-          fileName: string;
           extension: string;
           mimetype: string;
           originalName?: string;
@@ -179,24 +177,6 @@ export default typedPlugin(
 
           if (config.files.assumeMimetypes) response.assumedMimetypes![i] = assumed;
 
-          const cmpExt =
-            mimetype.startsWith('image/') && options.imageCompression
-              ? `.${options.imageCompression.type === 'jpeg' ? 'jpg' : (options.imageCompression.type ?? 'jpg')}`
-              : null;
-          let fileName: string;
-          try {
-            fileName = await getFilename(
-              format,
-              file.filename,
-              extension,
-              options.overrides?.filename,
-              reservedNames,
-              cmpExt && cmpExt !== extension ? [cmpExt] : [],
-            );
-          } catch (error) {
-            throw new ApiError(1009, `file[${i}]: ${String(error)}`);
-          }
-
           let originalName: string | undefined;
           if (options.addOriginalName) {
             try {
@@ -211,7 +191,6 @@ export default typedPlugin(
 
           filesBefore.push({
             file,
-            fileName,
             extension,
             mimetype,
             originalName,
@@ -220,7 +199,7 @@ export default typedPlugin(
 
         // todo: maybe make configurable?
         const prepared = await mapConcurrent(filesBefore, 4, async (item, i) => {
-          const { file, fileName, extension, mimetype, originalName } = item;
+          const { file, extension, mimetype, originalName } = item;
 
           // compress the image if requested
           let compressed;
@@ -254,7 +233,6 @@ export default typedPlugin(
 
           return {
             file,
-            fileName,
             extension: compressed ? `.${compressed.ext}` : extension,
             mimetype: storedMimetype,
             size: compressed?.buffer.length ?? file.file.bytesRead,
@@ -267,10 +245,9 @@ export default typedPlugin(
         let password: string | undefined;
         if (options.password) password = await hashPassword(options.password);
         const uploads = prepared.map((item) => {
-          const { file, fileName, extension, mimetype, size, compressed, removedGps, originalName } = item;
+          const { file, extension, mimetype, size, compressed, removedGps, originalName } = item;
 
-          const data: FileInsert = {
-            name: `${fileName}${extension}`,
+          const data: Omit<FileInsert, 'name'> = {
             size,
             type: mimetype,
             userId: req.user ? req.user.id : options.folder ? folder?.userId : undefined,
@@ -289,6 +266,8 @@ export default typedPlugin(
         });
 
         const fileUploads = await db.transaction(async (tx) => {
+          await lockFiles(tx);
+
           if (quotaUser?.quota) {
             await tx.select({ id: users.id }).from(users).where(eq(users.id, quotaUser.id)).for('update');
 
@@ -303,8 +282,24 @@ export default typedPlugin(
           }
 
           const created = [];
-          for (const upload of uploads) {
-            const [file] = await tx.insert(files).values(upload.data).returning(uploadFileColumns);
+          for (const [i, upload] of uploads.entries()) {
+            let fileName: string;
+            try {
+              fileName = await getFilename(
+                format,
+                upload.file.filename,
+                upload.extension,
+                options.overrides?.filename,
+                tx,
+              );
+            } catch (error) {
+              throw new ApiError(1009, `file[${i}]: ${String(error)}`);
+            }
+
+            const [file] = await tx
+              .insert(files)
+              .values({ ...upload.data, name: `${fileName}${upload.extension}` })
+              .returning(uploadFileColumns);
             if (!file) throw new ApiError(9005);
             created.push(file);
           }

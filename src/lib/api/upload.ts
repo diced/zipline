@@ -3,7 +3,7 @@ import { db, type DbClient } from '@/lib/db';
 import { files } from '@/lib/db/schema';
 import { User } from '@/lib/db/models/user';
 import { bytes } from '@/lib/bytes';
-import { count, eq, inArray, sum } from 'drizzle-orm';
+import { count, eq, sum } from 'drizzle-orm';
 import { config } from '../config';
 import { Config } from '../config/validate';
 import { sanitizeFilename } from '../fs';
@@ -87,10 +87,8 @@ export function getDomain(
   return base + (hostDomain ?? 'localhost');
 }
 
-async function fileNamesExist(names: string[]) {
-  if (!names.length) return false;
-
-  const rows = await db.select({ id: files.id }).from(files).where(inArray(files.name, names)).limit(1);
+async function fileNameExists(name: string, client: DbClient) {
+  const rows = await client.select({ id: files.id }).from(files).where(eq(files.name, name)).limit(1);
   return rows.length > 0;
 }
 
@@ -99,18 +97,14 @@ export async function getFilename(
   originalName: string,
   extension: string,
   override?: string,
-  reservedNames?: Set<string>,
-  alternateExtensions: string[] = [],
+  client: DbClient = db,
 ): Promise<string> {
   try {
     let fileName = override ? sanitizeFilename(override) : formatFileName(format, originalName);
 
     if (!fileName) throw 'invalid file name';
 
-    const extensions = [...new Set([extension, ...alternateExtensions])];
-    let fullFileNames = extensions.map((ext) => `${fileName}${ext}`);
-    let existing =
-      fullFileNames.some((name) => reservedNames?.has(name)) || (await fileNamesExist(fullFileNames));
+    let existing = await fileNameExists(`${fileName}${extension}`, client);
 
     if (existing && (override || format === 'name')) {
       throw 'file with the same name already exists';
@@ -118,19 +112,16 @@ export async function getFilename(
 
     let dateIncrement = 1;
 
-    while (existing && (format === 'random' || format === 'date')) {
+    while (existing) {
       fileName = formatFileName(format, originalName, dateIncrement++);
       if (!fileName) throw 'invalid file name';
 
-      fullFileNames = extensions.map((ext) => `${fileName}${ext}`);
-      existing =
-        fullFileNames.some((name) => reservedNames?.has(name)) || (await fileNamesExist(fullFileNames));
+      existing = await fileNameExists(`${fileName}${extension}`, client);
     }
 
-    if (fullFileNames.some((name) => name.toLowerCase().startsWith('.thumbnail')))
+    if (`${fileName}${extension}`.toLowerCase().startsWith('.thumbnail'))
       throw 'file name uses a reserved prefix';
 
-    for (const name of fullFileNames) reservedNames?.add(name);
     return fileName;
   } catch (e) {
     logger.warn(`error generating file name: ${e}`);
