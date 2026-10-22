@@ -4,7 +4,7 @@ import { getFolderMetadata, getOwnedTree, type FolderTree } from '@/lib/db/model
 import { log } from '@/lib/logger';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
-import archiver, { Archiver } from 'archiver';
+import { ZipArchive, type Archiver } from 'archiver';
 import z from 'zod';
 
 export type ApiUserFoldersIdExportResponse = null;
@@ -76,7 +76,7 @@ export default typedPlugin(
           `attachment; filename="${sanitized}"; filename*=UTF-8''${encodeURIComponent(dl)}`,
         );
 
-        const zip = archiver('zip', {
+        const zip = new ZipArchive({
           zlib: { level: 9 },
         });
 

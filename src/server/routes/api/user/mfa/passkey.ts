@@ -12,7 +12,7 @@ import { zStringTrimmed } from '@/lib/validation';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
 import {
-  AuthenticatorTransportFuture,
+  AuthenticatorTransport,
   generateRegistrationOptions,
   PublicKeyCredentialCreationOptionsJSON,
   PublicKeyCredentialDescriptorJSON,
@@ -108,7 +108,7 @@ export default typedPlugin(
               ({
                 id: webauthn.id,
                 type: 'public-key',
-                transports: (webauthn.transports as AuthenticatorTransportFuture[]) ?? undefined,
+                transports: (webauthn.transports as AuthenticatorTransport[]) ?? undefined,
               }) satisfies PublicKeyCredentialDescriptorJSON,
           ),
         });

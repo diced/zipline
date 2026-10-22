@@ -1,5 +1,5 @@
-import he from 'he';
+import { encode } from 'he';
 
 export function stripHtml(html: string): string {
-  return he.encode(html);
+  return encode(html);
 }

@@ -31,6 +31,8 @@ export default function DashboardMetrics() {
     all: allTime,
   });
 
+  const [maxDate] = useState(() => new Date());
+
   const handleDateChange = (value: [string | null, string | null]) => {
     setAllTime(false);
     setDateRange(value);
@@ -50,7 +52,7 @@ export default function DashboardMetrics() {
             value={dateRange}
             onChange={handleDateChange}
             allowSingleDateInRange={false}
-            maxDate={new Date()}
+            maxDate={maxDate}
             presets={[
               {
                 value: [today.subtract(2, 'day').format('YYYY-MM-DD'), today.format('YYYY-MM-DD')],

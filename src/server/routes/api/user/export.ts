@@ -9,7 +9,7 @@ import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
-import archiver from 'archiver';
+import { ZipArchive } from 'archiver';
 import { and, eq } from 'drizzle-orm';
 import { createWriteStream } from 'fs';
 import { rm, stat } from 'fs/promises';
@@ -166,7 +166,7 @@ export default typedPlugin(
 
         const writeStream = createWriteStream(exportPath);
 
-        const zip = archiver('zip', {
+        const zip = new ZipArchive({
           zlib: { level: 9 },
         });
 
