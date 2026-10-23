@@ -4,11 +4,11 @@
     "title": "Een uitnodiging aanmaken",
     "expiresAt": {
       "label": "Verloopt op",
-      "description": "Selecteer wanneer deze uitnodiging verloopt, of kies \"nooit\" als je wilt dat de uitnodiging nooit verloopt.",
-      "placeholder": "Selecteer een vervaltijd..."
+      "description": "Kies wanneer deze uitnodiging verloopt, of kies \"nooit\" als de uitnodiging niet mag verlopen.",
+      "placeholder": "Kies een vervaltijd..."
     },
     "maxUses": {
-      "label": "Maximaal aantal keren te gebruiken",
+      "label": "Maximaal aantal keer",
       "description": "Stel in hoe vaak deze uitnodiging maximaal kan worden gebruikt, of laat dit leeg voor onbeperkt gebruik.",
       "placeholder": "Voer een getal in..."
     }
@@ -47,7 +47,7 @@
     "createdBy": "Aangemaakt door:",
     "created": "Aangemaakt:",
     "expires": "Verloopt:",
-    "maxUses": "Maximaal aantal keren te gebruiken:",
+    "maxUses": "Maximaal aantal keer:",
     "uses": "Aantal keren gebruikt:",
     "unlimited": "Onbeperkt"
   },
@@ -62,7 +62,7 @@
       "created": "Aangemaakt",
       "updatedAt": "Laatst bijgewerkt op",
       "expires": "Verloopt",
-      "maxUses": "Maximaal aantal keren te gebruiken",
+      "maxUses": "Maximaal aantal keer",
       "uses": "Aantal keren gebruikt",
       "actions": "Acties"
     },

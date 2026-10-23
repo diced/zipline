@@ -421,7 +421,7 @@
       "otherOptions": "Other Options",
       "addOriginalName": {
         "label": "Add Original Name",
-        "description": "Add the original file name, so that the file can be downloaded with the original name. This will still use the \"Name Format\" option for it's file name."
+        "description": "Add the original file name, so that the file can be downloaded with the original name. This will still use the \"Name Format\" option for its file name."
       },
       "extensionless": {
         "label": "Extensionless URL",

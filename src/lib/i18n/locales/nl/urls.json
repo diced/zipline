@@ -1,1 +1,132 @@
-{}
+{
+  "title": "URL’s",
+  "create": {
+    "title": "URL verkorten",
+    "url": {
+      "label": "URL",
+      "required": "URL is verplicht",
+      "invalid": "Ongeldige URL"
+    },
+    "vanity": {
+      "label": "Aangepaste code",
+      "description": "Optioneel veld. Laat dit leeg om een willekeurige code te genereren"
+    },
+    "maxViews": {
+      "label": "Maximaal aantal weergaven",
+      "description": "Optioneel veld. Laat dit leeg voor een onbeperkt aantal weergaven."
+    },
+    "domain": {
+      "label": "Domein overschrijven"
+    },
+    "enabled": {
+      "label": "Ingeschakeld",
+      "description": "Sta bezoeken aan deze URL toe of blokkeer ze"
+    },
+    "password": {
+      "label": "Wachtwoord",
+      "description": "Beveilig je link met een wachtwoord"
+    }
+  },
+  "shortened": {
+    "title": "Verkorte URL",
+    "open": "Link openen in een nieuw tabblad",
+    "copy": "Link naar klembord kopiëren"
+  },
+  "notifications": {
+    "shortenFailed": {
+      "title": "URL verkorten mislukt"
+    },
+    "copied": {
+      "title": "URL naar klembord gekopieerd"
+    },
+    "deleteFailed": {
+      "title": "URL verwijderen mislukt"
+    },
+    "deleted": {
+      "title": "URL verwijderd",
+      "message": "URL {{code}} is verwijderd"
+    },
+    "removePasswordFailed": {
+      "title": "Wachtwoord verwijderen mislukt..."
+    },
+    "passwordRemoved": {
+      "title": "Wachtwoord verwijderd!",
+      "message": "Het wachtwoord is van de URL verwijderd."
+    },
+    "saveFailed": {
+      "title": "Wijzigingen opslaan mislukt..."
+    },
+    "saved": {
+      "title": "Wijzigingen opgeslagen!",
+      "message": "De wijzigingen zijn opgeslagen."
+    }
+  },
+  "delete": {
+    "message": "Weet je zeker dat je {{code}} wilt verwijderen? Dit kan niet ongedaan worden gemaakt.",
+    "confirm": "'{{code}}' verwijderen"
+  },
+  "edit": {
+    "title": "\"{{name}}\" bewerken",
+    "unknown": "onbekend",
+    "maxViews": {
+      "label": "Maximaal aantal weergaven",
+      "placeholder": "Onbeperkt",
+      "description": "Het maximale aantal klikken voordat deze URL automatisch wordt verwijderd. Laat dit leeg voor een onbeperkt aantal weergaven."
+    },
+    "vanity": {
+      "label": "Aangepaste code",
+      "placeholder": "Optioneel",
+      "description": "Een aangepaste alias voor je URL. Laat dit leeg om de willekeurig gegenereerde code te gebruiken."
+    },
+    "destination": {
+      "label": "Bestemming"
+    },
+    "enabled": {
+      "label": "Ingeschakeld",
+      "description": "Blokkeer bezoeken aan deze URL of sta ze toe."
+    },
+    "password": {
+      "label": "Wachtwoord",
+      "description": "Stel een wachtwoord in voor deze URL. Laat dit leeg om wachtwoordbeveiliging uit te schakelen.",
+      "remove": "Wachtwoord verwijderen"
+    },
+    "save": "Wijzigingen opslaan"
+  },
+  "card": {
+    "copyShortLink": "Korte link kopiëren",
+    "copyDestination": "Bestemming kopiëren",
+    "showQrCode": "QR-code tonen",
+    "views": "Weergaven:",
+    "enabled": "Ingeschakeld:",
+    "created": "Aangemaakt:",
+    "updated": "Bijgewerkt:",
+    "destination": "Bestemming:",
+    "openDestination": "\"{{url}}\" openen in een nieuw tabblad",
+    "code": "Code:"
+  },
+  "empty": {
+    "title": "Geen URL’s gevonden",
+    "description": "Verkort een URL om deze hier te zien"
+  },
+  "table": {
+    "columns": {
+      "code": "Code",
+      "vanity": "Aangepaste code",
+      "destination": "Bestemming",
+      "views": "Weergaven",
+      "maxViews": "Maximaal aantal weergaven",
+      "created": "Aangemaakt",
+      "enabled": "Ingeschakeld",
+      "actions": "Acties"
+    },
+    "search": {
+      "code": "Zoeken op code",
+      "vanity": "Zoeken op aangepaste code",
+      "destination": "Zoeken op bestemming"
+    },
+    "copy": "URL kopiëren",
+    "showQrCode": "QR-code tonen",
+    "edit": "URL bewerken",
+    "delete": "URL verwijderen"
+  }
+}

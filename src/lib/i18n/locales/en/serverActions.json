@@ -289,8 +289,8 @@
           "admin": "Admin",
           "superAdmin": "Super Admin",
           "avatar": "Avatar",
-          "oauth": "Oauth",
-          "totp": "2fa (totp)",
+          "oauth": "OAuth",
+          "totp": "2FA (TOTP)",
           "files": "Files"
         }
       },

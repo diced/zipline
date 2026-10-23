@@ -2,7 +2,7 @@
   "password": {
     "title": "Wachtwoord verplicht",
     "invalid": "Onjuist wachtwoord",
-    "verify": "Verifiëren",
+    "verify": "Controleren",
     "fileDescription": "Dit bestand is beveiligd met een wachtwoord. Voer het wachtwoord in om het te bekijken",
     "urlDescription": "Deze link is beveiligd met een wachtwoord. Voer het wachtwoord in om deze te bekijken"
   },
@@ -28,7 +28,7 @@
     "public": "Deze map is <anchor>openbaar</anchor>. Iedereen met de link kan de inhoud bekijken en bestanden uploaden.",
     "pageTitle": "Uploaden naar {{name}}",
     "pageTitleFallback": "Uploaden naar map",
-    "private": "Alleen de eigenaar kan de inhoud van deze map bekijken. Iedereen kan echter bestanden uploaden en de eigen geüploade bestanden blijven bekijken via de link naar het betreffende bestand."
+    "private": "Alleen de eigenaar kan de inhoud van deze map bekijken. Iedereen kan wel bestanden uploaden en de eigen uploads blijven bekijken via de link naar het betreffende bestand."
   },
   "url": {
     "redirecting": "Doorsturen naar <anchor>{{destination}}</anchor>"
