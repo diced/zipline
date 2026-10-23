@@ -110,7 +110,7 @@
     "postcss-preset-mantine": "^1.18.0",
     "postcss-simple-vars": "^7.0.1",
     "sass": "^1.106.1",
-    "tsc-alias": "^1.9.8",
+    "tsc-alias": "1.9.1",
     "tsup": "^9.0.0",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2"
