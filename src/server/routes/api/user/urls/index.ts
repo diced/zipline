@@ -2,7 +2,14 @@ import { ApiError } from '@/lib/api/errors';
 import { config } from '@/lib/config';
 import { hashPassword } from '@/lib/crypto';
 import { db } from '@/lib/db';
-import { Url, urlSchema, createUrlId, lockUrls, urlIdentifiersExist } from '@/lib/db/models/url';
+import {
+  Url,
+  urlSchema,
+  createUrlId,
+  discordUrlPreviewModeSchema,
+  lockUrls,
+  urlIdentifiersExist,
+} from '@/lib/db/models/url';
 import { urls } from '@/lib/db/schema';
 import { containsText } from '@/lib/db/utils';
 import { log } from '@/lib/logger';
@@ -14,6 +21,7 @@ import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
 import { and, eq, getColumns, isNotNull } from 'drizzle-orm';
 import { z } from 'zod';
+import { discordComponentEmbedSchema, serializeDiscordComponentEmbed } from '@/lib/discordComponentEmbed';
 
 export type ApiUserUrlsResponse =
   | Url[]
@@ -55,6 +63,8 @@ export default typedPlugin(
               .nullish(),
             destination: z.httpUrl().min(1),
             enabled: z.boolean().optional(),
+            discordPreviewMode: discordUrlPreviewModeSchema.optional(),
+            discordComponentEmbed: discordComponentEmbedSchema.nullish(),
           }),
           headers: z.object({
             'x-zipline-max-views': z.coerce.number().min(1).optional(),
@@ -77,7 +87,20 @@ export default typedPlugin(
         preHandler: [userMiddleware, rateLimit],
       },
       async (req, res) => {
-        const { vanity, destination, enabled } = req.body;
+        const { vanity, destination, enabled, discordPreviewMode, discordComponentEmbed } = req.body;
+        if (discordPreviewMode === 'components' && !discordComponentEmbed?.enabled) {
+          throw new ApiError(1000, 'A valid enabled Components V2 layout is required.');
+        }
+        if (
+          discordPreviewMode === 'components' &&
+          !serializeDiscordComponentEmbed(discordComponentEmbed, {
+            url: { destination },
+            user: req.user,
+            link: { returned: 'https://zipline.example/go/link', raw: destination },
+          })
+        ) {
+          throw new ApiError(1000, 'The Components V2 layout is invalid or exceeds Discord limits.');
+        }
         const noJson = req.headers['x-zipline-no-json'];
 
         let returnDomain;
@@ -117,6 +140,8 @@ export default typedPlugin(
               maxViews,
               password,
               enabled,
+              discordPreviewMode,
+              discordComponentEmbed,
             })
             .returning(urlColumns);
           if (!created) throw new ApiError(9005);

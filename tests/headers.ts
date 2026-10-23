@@ -29,6 +29,41 @@ test('upload headers decode once and preserve literal percent-encoded text', () 
   );
 });
 
+test('upload headers accept a Components V2 file preview', () => {
+  const componentEmbed = {
+    enabled: true,
+    components: [{ type: 10 as const, content: '## {file.name}' }],
+  };
+  const options = parseHeaders(
+    {
+      'x-zipline-discord-preview-mode': 'components',
+      'x-zipline-discord-component-embed': encodeURIComponent(JSON.stringify(componentEmbed)),
+    },
+    config.files,
+  );
+
+  assert.equal(options.discordPreviewMode, 'components');
+  assert.deepEqual(options.discordComponentEmbed, componentEmbed);
+});
+
+test('upload headers require a valid enabled layout for Components V2 previews', () => {
+  assert.throws(
+    () => parseHeaders({ 'x-zipline-discord-preview-mode': 'components' }, config.files),
+    ApiError,
+  );
+  assert.throws(
+    () =>
+      parseHeaders(
+        {
+          'x-zipline-discord-preview-mode': 'components',
+          'x-zipline-discord-component-embed': '%not-json',
+        },
+        config.files,
+      ),
+    ApiError,
+  );
+});
+
 test('upload compression accepts boundary percentages and rejects out-of-range values', () => {
   for (const percent of ['0', '100'])
     assert.equal(

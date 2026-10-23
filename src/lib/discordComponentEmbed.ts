@@ -138,6 +138,49 @@ export const defaultDiscordComponentEmbed = (): DiscordComponentEmbed => ({
   ],
 });
 
+export const defaultDiscordUrlComponentEmbed = (): DiscordComponentEmbed => ({
+  enabled: true,
+  accentColor: '',
+  spoiler: false,
+  components: [
+    {
+      type: 10,
+      content: '## [Open shortened link]({link.returned})\n{url.destination}',
+    },
+  ],
+});
+
+export function prepareDiscordComponentEmbedForFile(
+  config: DiscordComponentEmbed | null | undefined,
+  mimetype: string,
+): DiscordComponentEmbed | null | undefined {
+  if (!config || mimetype.startsWith('image/') || mimetype.startsWith('video/')) return config;
+
+  const components = config.components.flatMap<DiscordComponentEmbedChild>((component) => {
+    if (component.type === 12) {
+      const items = component.items.filter((item) => !item.url.includes('{link.raw}'));
+      return items.length ? [{ ...component, items }] : [];
+    }
+
+    if (
+      component.type === 9 &&
+      component.accessory.type === 11 &&
+      component.accessory.url.includes('{link.raw}')
+    ) {
+      return [
+        {
+          ...component,
+          accessory: { type: 2, url: '{link.returned}', label: 'Open file' },
+        },
+      ];
+    }
+
+    return [component];
+  });
+
+  return components.length ? { ...config, components } : null;
+}
+
 const parsed = (value: string | undefined, parseValue: ParseValue) =>
   value ? (parseString(value, parseValue) ?? '') : '';
 
@@ -278,14 +321,15 @@ function isValidBuiltPayload(payload: BuiltChild[]) {
     }
     if (
       component.type === 1 &&
-      component.components.some((button) => !button.url || (!button.label && !button.emoji))
+      component.components.some((button) => !isHttpUrl(button.url) || (!button.label && !button.emoji))
     ) {
       return false;
     }
     if (component.type === 9) {
       if (component.components.some((text) => !text.content)) return false;
       const accessory = component.accessory;
-      if (accessory.type === 2 && (!accessory.url || (!accessory.label && !accessory.emoji))) return false;
+      if (accessory.type === 2 && (!isHttpUrl(accessory.url) || (!accessory.label && !accessory.emoji)))
+        return false;
       if (accessory.type === 11 && !isHttpUrl(accessory.media.url)) return false;
     }
   }

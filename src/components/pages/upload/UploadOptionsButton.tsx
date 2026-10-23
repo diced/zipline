@@ -39,6 +39,7 @@ import { useEffect, useMemo, useState } from 'react';
 import i18n from '@/lib/i18n';
 import { useTranslation } from 'react-i18next';
 import SafeTrans from '@/components/SafeTrans';
+import DiscordComponentEmbedBuilder from '@/components/pages/settings/parts/DiscordComponentEmbedBuilder';
 import { Link } from 'react-router-dom';
 import useSWR from 'swr';
 import { useShallow } from 'zustand/shallow';
@@ -435,6 +436,39 @@ export default function UploadOptionsButton({ folder, numFiles }: { folder?: str
               )
             }
           />
+
+          <Select
+            label={
+              <>
+                {t('options.discordPreview.label')}{' '}
+                {options.discordPreviewMode !== 'default' ? (
+                  <Badge variant='outline' size='xs'>
+                    {t('options.saved')}
+                  </Badge>
+                ) : null}
+              </>
+            }
+            description={t('options.discordPreview.description')}
+            data={[
+              { value: 'default', label: t('options.discordPreview.default') },
+              { value: 'components', label: t('options.discordPreview.components') },
+              { value: 'none', label: t('options.discordPreview.none') },
+            ]}
+            value={options.discordPreviewMode}
+            onChange={(value) =>
+              setOption('discordPreviewMode', (value as 'default' | 'components' | 'none') || 'default')
+            }
+            comboboxProps={{ withinPortal: true }}
+          />
+
+          {options.discordPreviewMode === 'components' ? (
+            <DiscordComponentEmbedBuilder
+              value={options.discordComponentEmbed}
+              disabled={false}
+              showEnabledToggle={false}
+              onChange={(value) => setOption('discordComponentEmbed', { ...value, enabled: true })}
+            />
+          ) : null}
 
           <Text c='dimmed' size='sm'>
             <b>{t('options.other')}</b>

@@ -1,12 +1,24 @@
-import { Url } from '@/lib/db/models/url';
+import { type DiscordUrlPreviewMode, Url } from '@/lib/db/models/url';
 import { fetchApi } from '@/lib/fetchApi';
 import useObjectState from '@/lib/client/hooks/useObjectState';
-import { Button, Divider, Modal, NumberInput, PasswordInput, Stack, Switch, TextInput } from '@mantine/core';
+import {
+  Button,
+  Divider,
+  Modal,
+  NumberInput,
+  PasswordInput,
+  Select,
+  Stack,
+  Switch,
+  TextInput,
+} from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import { IconEye, IconKey, IconPencil, IconPencilOff, IconTrashFilled } from '@tabler/icons-react';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { mutate } from 'swr';
+import DiscordComponentEmbedBuilder from '@/components/pages/settings/parts/DiscordComponentEmbedBuilder';
+import { defaultDiscordUrlComponentEmbed, type DiscordComponentEmbed } from '@/lib/discordComponentEmbed';
 
 export default function EditUrlModal({ url, onClose }: { url: Url | null; onClose: () => void }) {
   const { t } = useTranslation('urls');
@@ -16,12 +28,16 @@ export default function EditUrlModal({ url, onClose }: { url: Url | null; onClos
     destination: string | null;
     enabled: boolean;
     password: string | null;
+    discordPreviewMode: DiscordUrlPreviewMode;
+    discordComponentEmbed: DiscordComponentEmbed;
   }>({
     maxViews: url?.maxViews ?? null,
     vanity: url?.vanity ?? null,
     destination: url?.destination ?? null,
     enabled: url?.enabled ?? true,
     password: '',
+    discordPreviewMode: url?.discordPreviewMode ?? 'destination',
+    discordComponentEmbed: url?.discordComponentEmbed ?? defaultDiscordUrlComponentEmbed(),
   });
 
   useEffect(() => {
@@ -32,6 +48,8 @@ export default function EditUrlModal({ url, onClose }: { url: Url | null; onClos
         destination: url.destination,
         enabled: url.enabled,
         password: '',
+        discordPreviewMode: url.discordPreviewMode,
+        discordComponentEmbed: url.discordComponentEmbed ?? defaultDiscordUrlComponentEmbed(),
       });
     }
   }, [url]);
@@ -73,6 +91,8 @@ export default function EditUrlModal({ url, onClose }: { url: Url | null; onClos
       vanity?: string;
       destination?: string;
       enabled?: boolean;
+      discordPreviewMode?: DiscordUrlPreviewMode;
+      discordComponentEmbed?: DiscordComponentEmbed | null;
     } = {};
 
     if (urlData.maxViews === null) data['maxViews'] = null;
@@ -85,6 +105,14 @@ export default function EditUrlModal({ url, onClose }: { url: Url | null; onClos
     if (urlData.destination !== null && urlData.destination !== url.destination)
       data['destination'] = urlData.destination?.trim();
     if (urlData.enabled !== url.enabled) data['enabled'] = urlData.enabled;
+    if (urlData.discordPreviewMode !== url.discordPreviewMode)
+      data['discordPreviewMode'] = urlData.discordPreviewMode;
+    if (
+      urlData.discordPreviewMode === 'components' ||
+      JSON.stringify(urlData.discordComponentEmbed) !== JSON.stringify(url.discordComponentEmbed)
+    ) {
+      data['discordComponentEmbed'] = urlData.discordComponentEmbed;
+    }
 
     const { error } = await fetchApi(`/api/user/urls/${url.id}`, 'PATCH', data);
 
@@ -157,6 +185,32 @@ export default function EditUrlModal({ url, onClose }: { url: Url | null; onClos
           checked={urlData.enabled}
           onChange={(event) => setUrlData('enabled', event.currentTarget.checked)}
         />
+
+        <Select
+          label={t('edit.discordPreview.label')}
+          description={t('edit.discordPreview.description')}
+          data={[
+            { value: 'destination', label: t('edit.discordPreview.options.destination') },
+            { value: 'components', label: t('edit.discordPreview.options.components') },
+            { value: 'none', label: t('edit.discordPreview.options.none') },
+          ]}
+          value={urlData.discordPreviewMode}
+          onChange={(value) =>
+            setUrlData('discordPreviewMode', (value as DiscordUrlPreviewMode | null) ?? 'destination')
+          }
+          allowDeselect={false}
+        />
+
+        {urlData.discordPreviewMode === 'components' ? (
+          <DiscordComponentEmbedBuilder
+            key={url?.id}
+            value={urlData.discordComponentEmbed}
+            disabled={false}
+            context='url'
+            showEnabledToggle={false}
+            onChange={(value) => setUrlData('discordComponentEmbed', value)}
+          />
+        ) : null}
 
         <Divider />
 
