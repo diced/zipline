@@ -10,6 +10,7 @@ export const LANGUAGE_NAMES = {
   tr: 'Türkçe',
   nl: 'Nederlands',
   it: 'Italiano',
+  ro: 'Română',
 } as const;
 
 export type Language = keyof typeof LANGUAGE_NAMES;
