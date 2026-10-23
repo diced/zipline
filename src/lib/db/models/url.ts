@@ -4,8 +4,17 @@ import { createId } from '@paralleldrive/cuid2';
 import { and, inArray, ne, or, sql } from 'drizzle-orm';
 import { createSelectSchema } from 'drizzle-orm/zod';
 import { z } from 'zod';
+import { discordComponentEmbedSchema } from '@/lib/discordComponentEmbed';
+import { discordUrlPreviewModeSchema } from '@/lib/urlPreview';
 
-export const urlSchema = createSelectSchema(urls, { password: z.boolean() }).extend({
+export { discordUrlPreviewModeSchema } from '@/lib/urlPreview';
+export type { DiscordUrlPreviewMode } from '@/lib/urlPreview';
+
+export const urlSchema = createSelectSchema(urls, {
+  password: z.boolean(),
+  discordPreviewMode: discordUrlPreviewModeSchema,
+  discordComponentEmbed: discordComponentEmbedSchema.nullable(),
+}).extend({
   similarity: z.number().optional(),
 });
 

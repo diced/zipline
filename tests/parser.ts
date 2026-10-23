@@ -69,6 +69,16 @@ test('templates block direct secret access and redact debug JSON', () => {
   }
 });
 
+test('templates only build debug context when a debug variable is used', () => {
+  const input = values();
+
+  assert.equal(parseString('{user.username}', input), 'Zipline');
+  assert.equal(input.debug, undefined);
+
+  assert.ok(parseString('{debug.json}', input));
+  assert.ok((input as ParseValue).debug?.json);
+});
+
 test('filenames containing template syntax remain literal data', () => {
   const input = values();
   input.file!.name = '{user.username}.png';

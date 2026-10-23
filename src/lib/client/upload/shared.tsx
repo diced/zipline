@@ -84,6 +84,15 @@ export function applyUploadHeaders(
   options.addOriginalName && req.setRequestHeader('x-zipline-original-name', 'true');
   options.extensionless && req.setRequestHeader('x-zipline-extensionless', 'true');
   options.overrides_returnDomain && req.setRequestHeader('x-zipline-domain', options.overrides_returnDomain);
+  if (options.discordPreviewMode !== 'default') {
+    req.setRequestHeader('x-zipline-discord-preview-mode', options.discordPreviewMode);
+  }
+  if (options.discordPreviewMode === 'components') {
+    req.setRequestHeader(
+      'x-zipline-discord-component-embed',
+      encodeURIComponent(JSON.stringify(options.discordComponentEmbed)),
+    );
+  }
 
   ephemeral.password && req.setRequestHeader('x-zipline-password', ephemeral.password);
   ephemeral.filename && req.setRequestHeader('x-zipline-filename', encodeURIComponent(ephemeral.filename));

@@ -3,6 +3,8 @@ import { checkOutput, COMPRESS_TYPES, CompressType } from '../compress';
 import { Config } from '../config/validate';
 import { sanitizeExtension, sanitizeFilename } from '../fs';
 import { ApiError } from '../api/errors';
+import { discordComponentEmbedSchema, type DiscordComponentEmbed } from '../discordComponentEmbed';
+import { discordFilePreviewModeSchema, type DiscordFilePreviewMode } from '../urlPreview';
 
 type StringBoolean = 'true' | 'false';
 
@@ -17,6 +19,8 @@ export type UploadHeaders = {
   'x-zipline-no-json'?: StringBoolean;
   'x-zipline-original-name'?: StringBoolean;
   'x-zipline-extensionless'?: StringBoolean;
+  'x-zipline-discord-preview-mode'?: DiscordFilePreviewMode;
+  'x-zipline-discord-component-embed'?: string;
 
   'x-zipline-folder'?: string;
 
@@ -42,6 +46,8 @@ export type UploadOptions = {
   noJson?: boolean;
   addOriginalName?: boolean;
   extensionless?: boolean;
+  discordPreviewMode?: DiscordFilePreviewMode;
+  discordComponentEmbed?: DiscordComponentEmbed;
 
   imageCompression?: {
     type?: CompressType;
@@ -229,6 +235,36 @@ export function parseHeaders(headers: UploadHeaders, fileConfig: Config['files']
 
   const extensionless = headers['x-zipline-extensionless'];
   if (extensionless) response.extensionless = extensionless === 'true';
+
+  const discordPreviewMode = headers['x-zipline-discord-preview-mode'];
+  if (discordPreviewMode) {
+    const parsedMode = discordFilePreviewModeSchema.safeParse(discordPreviewMode);
+    if (!parsedMode.success)
+      throwHeaderError('x-zipline-discord-preview-mode', 'Invalid Discord preview mode');
+    response.discordPreviewMode = parsedMode.data;
+  }
+
+  const discordComponentEmbed = headers['x-zipline-discord-component-embed'];
+  if (discordComponentEmbed) {
+    let decoded: unknown;
+    try {
+      decoded = JSON.parse(decodeURIComponent(discordComponentEmbed));
+    } catch {
+      throwHeaderError('x-zipline-discord-component-embed', 'Invalid encoded JSON');
+    }
+
+    const parsedEmbed = discordComponentEmbedSchema.safeParse(decoded);
+    if (!parsedEmbed.success || !parsedEmbed.data.enabled)
+      throwHeaderError('x-zipline-discord-component-embed', 'Invalid Components V2 layout');
+    response.discordComponentEmbed = parsedEmbed.data;
+  }
+
+  if (response.discordPreviewMode === 'components' && !response.discordComponentEmbed) {
+    throwHeaderError(
+      'x-zipline-discord-component-embed',
+      'A Components V2 layout is required when Components V2 is selected',
+    );
+  }
 
   const folder = headers['x-zipline-folder'];
   if (folder) response.folder = folder;
