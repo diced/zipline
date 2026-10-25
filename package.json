@@ -2,7 +2,7 @@
   "name": "zipline",
   "private": true,
   "license": "MIT",
-  "version": "4.8.1",
+  "version": "4.8.2",
   "type": "module",
   "scripts": {
     "test": "node --import tsx --enable-source-maps --test --test-reporter ./src/lib/tests/test-reporter.ts \"tests/**/*.ts\"",
@@ -30,6 +30,8 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@electric-sql/pglite": "0.5.11",
+    "@electric-sql/pglite-pg17": "npm:@electric-sql/pglite@0.4.6",
+    "@electric-sql/pglite-tools": "0.4.11",
     "@fastify/cookie": "^11.1.3",
     "@fastify/cors": "^11.3.1",
     "@fastify/multipart": "^10.1.4",

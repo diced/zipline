@@ -3,6 +3,7 @@ import { drizzle, type NodePgQueryResultHKT } from 'drizzle-orm/node-postgres';
 import type { PgAsyncDatabase, PgAsyncTransaction } from 'drizzle-orm/pg-core';
 import { drizzle as drizzlePglite, type PgliteQueryResultHKT } from 'drizzle-orm/pglite';
 import { getDatabaseUrl, getPgliteDir } from './connection';
+import { createPglite } from './pglite';
 import { relations } from './relations';
 
 const building = !!process.env.ZIPLINE_BUILD;
@@ -34,7 +35,7 @@ function createDatabase(): Database {
   logger.info('connecting to database');
 
   return directory
-    ? drizzlePglite({ connection: directory, relations, logger: queryLogger() })
+    ? drizzlePglite({ client: createPglite(directory), relations, logger: queryLogger() })
     : drizzle({ connection: connectionString, relations, logger: queryLogger() });
 }
 
