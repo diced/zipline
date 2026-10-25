@@ -6,6 +6,7 @@ import { setUser } from './commands/set-user';
 import { importDir } from './commands/import-dir';
 import { exportConfig } from './commands/export-config';
 import { migratePglite } from './commands/migrate-pglite';
+import { upgradePglite } from './commands/upgrade-pglite';
 
 const cli = new Command();
 
@@ -60,5 +61,11 @@ cli
   .option('--source <url>', 'PostgreSQL source URL (defaults to DATABASE_URL or DATABASE_* variables)')
   .summary('copy an upgraded PostgreSQL database to a new PGlite directory; stop Zipline before cutover')
   .action(migratePglite);
+
+cli
+  .command('upgrade-pglite')
+  .option('--source <url>', 'PGlite source URL (defaults to DATABASE_URL)')
+  .summary('upgrade PGlite in place, retaining the old database; stop Zipline first')
+  .action(upgradePglite);
 
 cli.parse();
