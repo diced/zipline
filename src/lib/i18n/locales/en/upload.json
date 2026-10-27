@@ -127,6 +127,13 @@
       "label": "Password",
       "description": "Set a password for these files. Leave blank to disable password protection. This value is not saved to your browser, and is cleared after uploading."
     },
+    "discordPreview": {
+      "label": "Discord link preview",
+      "description": "Choose how links for these uploads appear in Discord. Custom Components V2 settings are saved in this browser for future uploads.",
+      "default": "Use Viewing Files settings",
+      "components": "Custom Components V2",
+      "none": "No embed"
+    },
     "other": "Other Options",
     "originalName": {
       "label": "Add Original Name",

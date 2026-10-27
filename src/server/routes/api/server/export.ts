@@ -216,6 +216,8 @@ export default typedPlugin(
               maxViews: url.maxViews,
               password: url.password,
               enabled: url.enabled,
+              discordPreviewMode: url.discordPreviewMode,
+              discordComponentEmbed: url.discordComponentEmbed,
               userId: url.userId,
             });
           }
@@ -254,6 +256,8 @@ export default typedPlugin(
             views: file.views,
             maxViews: file.maxViews,
             password: file.password,
+            discordPreviewMode: file.discordPreviewMode,
+            discordComponentEmbed: file.discordComponentEmbed,
             userId: file.userId,
             folderId: file.folderId,
           });

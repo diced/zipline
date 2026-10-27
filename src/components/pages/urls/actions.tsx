@@ -23,7 +23,8 @@ export async function deleteUrl(warnDeletion: boolean, url: Url) {
 export function copyUrl(url: Url, config: SafeConfig, clipboard: ReturnType<typeof useClipboard>) {
   const urlFormatted = getDomain(formatRootUrl(config.urls.route, url.vanity ?? url.code));
 
-  copyLink(urlFormatted, clipboard);
+  const copiedUrl = url.discordPreviewMode === 'none' ? `<${urlFormatted}>` : urlFormatted;
+  copyLink(copiedUrl, clipboard, urlFormatted);
 }
 
 async function handleDeleteUrl(url: Url) {

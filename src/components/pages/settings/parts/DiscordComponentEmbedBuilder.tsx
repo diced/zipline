@@ -47,6 +47,8 @@ type Props = {
   value: DiscordComponentEmbed;
   disabled: boolean;
   onChange: (value: DiscordComponentEmbed) => void;
+  context?: 'file' | 'url';
+  showEnabledToggle?: boolean;
 };
 
 const componentLabels: Record<DiscordComponentEmbedChild['type'], string> = {
@@ -59,22 +61,29 @@ const componentLabels: Record<DiscordComponentEmbedChild['type'], string> = {
 
 const newButton = (): DiscordButton => ({ type: 2, url: '{link.returned}', label: 'Open' });
 
-function newComponent(type: string): DiscordComponentEmbedChild {
+function newComponent(type: string, context: 'file' | 'url'): DiscordComponentEmbedChild {
+  const title =
+    context === 'url'
+      ? '## [Open shortened link]({link.returned})\n{url.destination}'
+      : '## [{file.name}]({link.returned})';
+  const mediaUrl = context === 'url' ? 'https://example.com/image.png' : '{link.raw}';
+  const description = context === 'url' ? 'Custom image' : '{file.name}';
+
   switch (Number(type)) {
     case 1:
       return { type: 1, components: [newButton()] };
     case 9:
       return {
         type: 9,
-        components: [{ type: 10, content: '## [{file.name}]({link.returned})' }],
+        components: [{ type: 10, content: title }],
         accessory: newButton(),
       };
     case 12:
-      return { type: 12, items: [{ url: '{link.raw}', description: '{file.name}' }] };
+      return { type: 12, items: [{ url: mediaUrl, description }] };
     case 14:
       return { type: 14, divider: true, spacing: 1 };
     default:
-      return { type: 10, content: '## [{file.name}]({link.returned})' };
+      return { type: 10, content: title };
   }
 }
 
@@ -153,9 +162,11 @@ function ButtonEditor({
 function ComponentEditor({
   value,
   onChange,
+  context,
 }: {
   value: DiscordComponentEmbedChild;
   onChange: (value: DiscordComponentEmbedChild) => void;
+  context: 'file' | 'url';
 }) {
   const { t } = useTranslation('settings');
 
@@ -269,6 +280,7 @@ function ComponentEditor({
               <TextInput
                 required
                 label={t('fileView.componentEmbed.fields.mediaUrl')}
+                description={t('fileView.componentEmbed.fields.mediaUrlDescription')}
                 value={item.url}
                 onChange={(event) =>
                   onChange({
@@ -311,7 +323,15 @@ function ComponentEditor({
           variant='light'
           leftSection={<IconPlus size='1rem' />}
           disabled={value.items.length >= 10}
-          onClick={() => onChange({ ...value, items: [...value.items, { url: '{link.raw}' }] })}
+          onClick={() =>
+            onChange({
+              ...value,
+              items: [
+                ...value.items,
+                { url: context === 'url' ? 'https://example.com/image.png' : '{link.raw}' },
+              ],
+            })
+          }
         >
           {t('fileView.componentEmbed.addMedia')}
         </Button>
@@ -392,7 +412,13 @@ function ComponentEditor({
           onChange({
             ...value,
             accessory:
-              type === '11' ? { type: 11, url: '{link.raw}', description: '{file.name}' } : newButton(),
+              type === '11'
+                ? {
+                    type: 11,
+                    url: context === 'url' ? 'https://example.com/image.png' : '{link.raw}',
+                    description: context === 'url' ? 'Custom image' : '{file.name}',
+                  }
+                : newButton(),
           })
         }
       />
@@ -403,6 +429,7 @@ function ComponentEditor({
           <TextInput
             required
             label={t('fileView.componentEmbed.fields.mediaUrl')}
+            description={t('fileView.componentEmbed.fields.mediaUrlDescription')}
             value={thumbnail.url}
             onChange={(event) =>
               onChange({ ...value, accessory: { ...thumbnail, url: event.currentTarget.value } })
@@ -440,12 +467,14 @@ function SortableComponent({
   canRemove,
   onChange,
   onRemove,
+  context,
 }: {
   sortId: string;
   value: DiscordComponentEmbedChild;
   canRemove: boolean;
   onChange: (value: DiscordComponentEmbedChild) => void;
   onRemove: () => void;
+  context: 'file' | 'url';
 }) {
   const { t } = useTranslation('settings');
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -488,12 +517,18 @@ function SortableComponent({
           </ActionIcon>
         </Tooltip>
       </Group>
-      <ComponentEditor value={value} onChange={onChange} />
+      <ComponentEditor value={value} onChange={onChange} context={context} />
     </Paper>
   );
 }
 
-export default function DiscordComponentEmbedBuilder({ value, disabled, onChange }: Props) {
+export default function DiscordComponentEmbedBuilder({
+  value,
+  disabled,
+  onChange,
+  context = 'file',
+  showEnabledToggle = true,
+}: Props) {
   const { t } = useTranslation(['settings', 'common']);
   const [componentType, setComponentType] = useState<string | null>('10');
   const [opened, setOpened] = useState(false);
@@ -536,20 +571,22 @@ export default function DiscordComponentEmbedBuilder({ value, disabled, onChange
     if (!componentType || value.components.length >= 39) return;
 
     setComponentKeys([...componentKeys, `component-${nextComponentKey.current++}`]);
-    onChange({ ...value, components: [...value.components, newComponent(componentType)] });
+    onChange({ ...value, components: [...value.components, newComponent(componentType, context)] });
   };
 
   return (
     <Stack gap='sm'>
-      <Switch
-        label={t('fileView.componentEmbed.label')}
-        description={t('fileView.componentEmbed.description')}
-        disabled={disabled}
-        checked={value.enabled}
-        onChange={(event) => onChange({ ...value, enabled: event.currentTarget.checked })}
-      />
+      {showEnabledToggle ? (
+        <Switch
+          label={t('fileView.componentEmbed.label')}
+          description={t('fileView.componentEmbed.description')}
+          disabled={disabled}
+          checked={value.enabled}
+          onChange={(event) => onChange({ ...value, enabled: event.currentTarget.checked })}
+        />
+      ) : null}
 
-      {value.enabled && !disabled ? (
+      {(value.enabled || !showEnabledToggle) && !disabled ? (
         <>
           <Group justify='space-between'>
             <Text size='sm' c='dimmed'>
@@ -599,6 +636,7 @@ export default function DiscordComponentEmbedBuilder({ value, disabled, onChange
                         canRemove={value.components.length > 1}
                         onChange={(next) => updateComponent(index, next)}
                         onRemove={() => removeComponent(index)}
+                        context={context}
                       />
                     ))}
                   </Stack>

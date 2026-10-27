@@ -246,6 +246,7 @@
         "small": "Small",
         "large": "Large",
         "mediaUrl": "Media URL",
+        "mediaUrlDescription": "Use a direct HTTP(S) image URL or a supported Zipline variable.",
         "altText": "Alternative text",
         "spoiler": "Spoiler",
         "accessory": "Section accessory",

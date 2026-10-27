@@ -1,6 +1,19 @@
 import { create } from 'zustand';
 import { persist, subscribeWithSelector } from 'zustand/middleware';
 import type { Config } from '@/lib/config/validate';
+import { defaultDiscordComponentEmbed, type DiscordComponentEmbed } from '@/lib/discordComponentEmbed';
+
+const defaultUploadDiscordComponentEmbed = (): DiscordComponentEmbed => {
+  const base = defaultDiscordComponentEmbed();
+  return {
+    ...base,
+    enabled: true,
+    components: [
+      ...base.components,
+      { type: 12, items: [{ url: '{link.raw}', description: '{file.name}' }] },
+    ],
+  };
+};
 
 export const defaultUploadOptions: UploadOptionsStore['options'] = {
   deletesAt: 'default',
@@ -11,6 +24,8 @@ export const defaultUploadOptions: UploadOptionsStore['options'] = {
   addOriginalName: false,
   extensionless: false,
   overrides_returnDomain: null,
+  discordPreviewMode: 'default',
+  discordComponentEmbed: defaultUploadDiscordComponentEmbed(),
 };
 
 export const defaultEphemeralOptions: UploadOptionsStore['ephemeral'] = {
@@ -29,6 +44,8 @@ export type UploadOptionsStore = {
     addOriginalName: boolean | null;
     extensionless: boolean | null;
     overrides_returnDomain: string | null;
+    discordPreviewMode: 'default' | 'components' | 'none';
+    discordComponentEmbed: DiscordComponentEmbed;
   };
 
   ephemeral: {
@@ -94,8 +111,11 @@ export const useUploadOptionsStore = create<UploadOptionsStore>()(
           const { options, ephemeral } = get();
           return (
             // @ts-ignore
-            Object.keys(options).filter((v) => options[v] !== defaultUploadOptions[v]).length +
-            Object.values(ephemeral).filter((v) => v !== null).length
+            Object.keys(options).filter(
+              (v) =>
+                v !== 'discordComponentEmbed' &&
+                options[v as keyof typeof options] !== defaultUploadOptions[v as keyof typeof options],
+            ).length + Object.values(ephemeral).filter((v) => v !== null).length
           );
         },
       }),

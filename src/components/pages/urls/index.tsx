@@ -12,6 +12,7 @@ import {
   Modal,
   NumberInput,
   PasswordInput,
+  Select,
   Stack,
   Switch,
   Text,
@@ -39,6 +40,9 @@ import { Link } from 'react-router-dom';
 import { mutate } from 'swr';
 import UrlGridView from './views/UrlGridView';
 import UrlTableView from './views/UrlTableView';
+import DiscordComponentEmbedBuilder from '@/components/pages/settings/parts/DiscordComponentEmbedBuilder';
+import { defaultDiscordUrlComponentEmbed, type DiscordComponentEmbed } from '@/lib/discordComponentEmbed';
+import type { DiscordUrlPreviewMode } from '@/lib/db/models/url';
 
 export default function DashboardURLs() {
   const { t } = useTranslation(['urls', 'common']);
@@ -54,6 +58,8 @@ export default function DashboardURLs() {
     password: string;
     enabled: boolean;
     domain: '' | string;
+    discordPreviewMode: DiscordUrlPreviewMode;
+    discordComponentEmbed: DiscordComponentEmbed;
   }>({
     initialValues: {
       url: '',
@@ -62,6 +68,8 @@ export default function DashboardURLs() {
       password: '',
       enabled: true,
       domain: '',
+      discordPreviewMode: 'destination',
+      discordComponentEmbed: defaultDiscordUrlComponentEmbed(),
     },
     validate: {
       url: (value) => (value.length < 1 ? t('create.url.required') : null),
@@ -85,6 +93,9 @@ export default function DashboardURLs() {
         destination: values.url,
         vanity: values.vanity.trim() || null,
         enabled: values.enabled ?? true,
+        discordPreviewMode: values.discordPreviewMode,
+        discordComponentEmbed:
+          values.discordPreviewMode === 'components' ? values.discordComponentEmbed : null,
       },
       {
         ...(values.maxViews !== '' && { 'x-zipline-max-views': String(values.maxViews) }),
@@ -107,7 +118,7 @@ export default function DashboardURLs() {
       const copy = () => {
         if (!values.enabled) return;
 
-        clipboard.copy(data?.url);
+        clipboard.copy(values.discordPreviewMode === 'none' ? `<${data?.url}>` : data?.url);
         notifications.show({
           title: t('notifications.copied.title'),
           message: (
@@ -191,6 +202,34 @@ export default function DashboardURLs() {
               description={t('create.enabled.description')}
               {...form.getInputProps('enabled', { type: 'checkbox' })}
             />
+
+            <Select
+              label={t('create.discordPreview.label')}
+              description={t('create.discordPreview.description')}
+              data={[
+                { value: 'destination', label: t('create.discordPreview.options.destination') },
+                { value: 'components', label: t('create.discordPreview.options.components') },
+                { value: 'none', label: t('create.discordPreview.options.none') },
+              ]}
+              value={form.values.discordPreviewMode}
+              onChange={(value) =>
+                form.setFieldValue(
+                  'discordPreviewMode',
+                  (value as DiscordUrlPreviewMode | null) ?? 'destination',
+                )
+              }
+              allowDeselect={false}
+            />
+
+            {form.values.discordPreviewMode === 'components' ? (
+              <DiscordComponentEmbedBuilder
+                value={form.values.discordComponentEmbed}
+                disabled={false}
+                context='url'
+                showEnabledToggle={false}
+                onChange={(value) => form.setFieldValue('discordComponentEmbed', value)}
+              />
+            ) : null}
 
             <PasswordInput
               label={t('create.password.label')}

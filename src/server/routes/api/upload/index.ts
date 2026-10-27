@@ -256,6 +256,8 @@ export default typedPlugin(
           if (!req.user && folder) data.anonymous = true;
 
           if (options.maxViews) data.maxViews = options.maxViews;
+          if (options.discordPreviewMode) data.discordPreviewMode = options.discordPreviewMode;
+          if (options.discordComponentEmbed) data.discordComponentEmbed = options.discordComponentEmbed;
           if (password) data.password = password;
           if (folder) data.folderId = folder.id;
           if (originalName) data.originalName = originalName;

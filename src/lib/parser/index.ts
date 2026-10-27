@@ -1,7 +1,7 @@
 import { bytes } from '../bytes';
-import { File } from '../db/models/file';
-import { Url } from '../db/models/url';
-import { LimitedUser, User } from '../db/models/user';
+import type { File } from '../db/models/file';
+import type { Url } from '../db/models/url';
+import type { LimitedUser, User } from '../db/models/user';
 import { ParseValueMetrics } from './metrics';
 
 export type ParseValue = {
@@ -30,23 +30,26 @@ export function parseString(str: string, value: ParseValue) {
     if (key === 'password' || key === 'avatar') return '***';
     if (key === 'reg' || key === 'passkeys') return 'passkey registration redacted';
     if (key === 'oauthProviders') return 'oauth providers redacted';
+    if (key === 'discordComponentEmbed') return 'component embed redacted';
 
     return value;
   };
 
-  const data = {
-    file: value.file || null,
-    url: value.url || null,
-    user: value.user || null,
-    link: value.link || null,
-    metricsUser: value.metricsUser,
-    metricsZipline: value.metricsZipline,
-  };
+  if (!value.debug && /\{debug\.(?:json|jsonf)(?:::|\})/i.test(str)) {
+    const data = {
+      file: value.file || null,
+      url: value.url || null,
+      user: value.user || null,
+      link: value.link || null,
+      metricsUser: value.metricsUser,
+      metricsZipline: value.metricsZipline,
+    };
 
-  value.debug = {
-    json: JSON.stringify(data, replacer),
-    jsonf: JSON.stringify(data, replacer, 2),
-  };
+    value.debug = {
+      json: JSON.stringify(data, replacer),
+      jsonf: JSON.stringify(data, replacer, 2),
+    };
+  }
 
   const re =
     /\{(?<type>file|url|user|debug|link|metricsUser|metricsZipline)\.(?<prop>\w+)(::(?<mod>(\w+|<|<=|=|>=|>|\^|\$|~|\/)+))?((::(?<mod_tzlocale>\S+?))|(?<mod_check>\[(?<mod_check_true>".*?")\|\|(?<mod_check_false>".*?")\]))?\}/gi;

@@ -192,6 +192,8 @@ export default typedPlugin(
             data.password = password;
           }
           if (options.maxViews) data.maxViews = options.maxViews;
+          if (options.discordPreviewMode) data.discordPreviewMode = options.discordPreviewMode;
+          if (options.discordComponentEmbed) data.discordComponentEmbed = options.discordComponentEmbed;
           if (folder) data.folderId = folder.id;
           if (options.addOriginalName) {
             const sanitizedOG = sanitizeFilename(options.partial.filename);

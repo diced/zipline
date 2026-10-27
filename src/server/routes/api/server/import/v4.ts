@@ -407,6 +407,8 @@ export default typedPlugin(
               createdAt: new Date(file.createdAt),
               favorite: file.favorite ?? false,
               password: file.password ?? null,
+              discordPreviewMode: file.discordPreviewMode ?? null,
+              discordComponentEmbed: file.discordComponentEmbed ?? null,
             })
             .returning({ id: files.id });
           if (!created) throw new ApiError(9005);
@@ -504,6 +506,8 @@ export default typedPlugin(
                 maxViews: url.maxViews ?? null,
                 views: url.views,
                 enabled: url.enabled,
+                discordPreviewMode: url.discordPreviewMode ?? 'destination',
+                discordComponentEmbed: url.discordComponentEmbed ?? null,
                 createdAt: new Date(url.createdAt),
                 password: url.password ?? null,
               })

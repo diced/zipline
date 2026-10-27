@@ -25,6 +25,15 @@
     "password": {
       "label": "Password",
       "description": "Protect your link with a password"
+    },
+    "discordPreview": {
+      "label": "Discord link preview",
+      "description": "Choose what Discord displays when this shortened URL is shared.",
+      "options": {
+        "destination": "Use destination preview",
+        "components": "Custom Components V2",
+        "none": "No preview"
+      }
     }
   },
   "shortened": {
@@ -84,6 +93,15 @@
     "enabled": {
       "label": "Enabled",
       "description": "Prevent or allow this URL from being visited."
+    },
+    "discordPreview": {
+      "label": "Discord link preview",
+      "description": "No preview also copies the link surrounded by angle brackets so Discord suppresses embeds immediately.",
+      "options": {
+        "destination": "Use destination preview",
+        "components": "Custom Components V2",
+        "none": "No preview"
+      }
     },
     "password": {
       "label": "Password",
