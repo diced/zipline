@@ -1,7 +1,10 @@
-import type { User } from '@/lib/db/models/user';
+import DiscordComponentEmbedBuilder from '@/components/DiscordComponentEmbedBuilder';
+import SafeTrans from '@/components/SafeTrans';
 import { Response } from '@/lib/api/response';
-import { fetchApi } from '@/lib/fetchApi';
 import { useUserStore } from '@/lib/client/store/user';
+import type { User } from '@/lib/db/models/user';
+import { defaultDiscordComponentEmbed, discordComponentEmbedSchema } from '@/lib/discord';
+import { fetchApi } from '@/lib/fetchApi';
 import {
   Anchor,
   Button,
@@ -29,11 +32,8 @@ import {
   IconFileX,
 } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
-import SafeTrans from '@/components/SafeTrans';
 import { mutate } from 'swr';
 import { useShallow } from 'zustand/shallow';
-import { defaultDiscordComponentEmbed, discordComponentEmbedSchema } from '@/lib/discordComponentEmbed';
-import DiscordComponentEmbedBuilder from './DiscordComponentEmbedBuilder';
 
 const alignIcons: Record<string, React.ReactNode> = {
   left: <IconAlignLeft size='1rem' />,
@@ -81,11 +81,12 @@ function Form({ user, setUser }: { user: User; setUser: (u: User) => void }) {
   });
 
   const onSubmit = async (values: typeof form.values) => {
+    const embed = !values.discordComponentEmbed.enabled && values.embed;
     const view = {
       enabled: values.enabled,
       disableTextFiles: values.disableTextFiles,
-      embed: values.discordComponentEmbed.enabled ? false : values.embed,
-      embedMediaOnly: values.embed ? false : values.embedMediaOnly,
+      embed,
+      embedMediaOnly: !embed && values.embedMediaOnly,
       content: values.content.trim() || null,
       embedTitle: values.embedTitle.trim() || null,
       embedDescription: values.embedDescription.trim() || null,
@@ -101,7 +102,7 @@ function Form({ user, setUser }: { user: User; setUser: (u: User) => void }) {
     const componentEmbed = discordComponentEmbedSchema.safeParse(values.discordComponentEmbed);
     if (!componentEmbed.success) {
       notifications.show({
-        title: t('fileView.notifications.componentEmbedError.title'),
+        title: t('componentBuilder.notifications.invalidLayout.title'),
         message: componentEmbed.error.issues[0]?.message,
         color: 'red',
         icon: <IconFileX size='1rem' />,

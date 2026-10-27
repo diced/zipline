@@ -5,8 +5,12 @@ import { db } from '@/lib/db';
 import { getUrl } from '@/lib/db/models/url';
 import { getUserSummary } from '@/lib/db/models/user';
 import { urls } from '@/lib/db/schema';
-import { serializeDiscordComponentEmbed } from '@/lib/discordComponentEmbed';
-import { createComponentPreviewHtml, createNoPreviewHtml, isDiscordCrawler } from '@/lib/discordUrlPreview';
+import {
+  serializeDiscordComponentEmbed,
+  createComponentPreviewHtml,
+  createNoPreviewHtml,
+  isDiscordCrawler,
+} from '@/lib/discord';
 import { log } from '@/lib/logger';
 import { and, eq, lt, sql } from 'drizzle-orm';
 import { FastifyReply, FastifyRequest } from 'fastify';

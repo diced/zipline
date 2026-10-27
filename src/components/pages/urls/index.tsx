@@ -1,8 +1,14 @@
+import DiscordComponentEmbedBuilder from '@/components/DiscordComponentEmbedBuilder';
 import DomainSelect from '@/components/DomainSelect';
 import GridTableSwitcher from '@/components/GridTableSwitcher';
 import { Response } from '@/lib/api/response';
 import { useViewStore } from '@/lib/client/store/view';
 import { Url } from '@/lib/db/models/url';
+import {
+  defaultDiscordUrlComponentEmbed,
+  type DiscordComponentEmbed,
+  type DiscordUrlPreviewMode,
+} from '@/lib/discord';
 import { fetchApi } from '@/lib/fetchApi';
 import {
   ActionIcon,
@@ -40,9 +46,6 @@ import { Link } from 'react-router-dom';
 import { mutate } from 'swr';
 import UrlGridView from './views/UrlGridView';
 import UrlTableView from './views/UrlTableView';
-import DiscordComponentEmbedBuilder from '@/components/pages/settings/parts/DiscordComponentEmbedBuilder';
-import { defaultDiscordUrlComponentEmbed, type DiscordComponentEmbed } from '@/lib/discordComponentEmbed';
-import type { DiscordUrlPreviewMode } from '@/lib/db/models/url';
 
 export default function DashboardURLs() {
   const { t } = useTranslation(['urls', 'common']);
@@ -213,10 +216,7 @@ export default function DashboardURLs() {
               ]}
               value={form.values.discordPreviewMode}
               onChange={(value) =>
-                form.setFieldValue(
-                  'discordPreviewMode',
-                  (value as DiscordUrlPreviewMode | null) ?? 'destination',
-                )
+                form.setFieldValue('discordPreviewMode', (value as DiscordUrlPreviewMode) ?? 'destination')
               }
               allowDeselect={false}
             />
@@ -224,7 +224,6 @@ export default function DashboardURLs() {
             {form.values.discordPreviewMode === 'components' ? (
               <DiscordComponentEmbedBuilder
                 value={form.values.discordComponentEmbed}
-                disabled={false}
                 context='url'
                 showEnabledToggle={false}
                 onChange={(value) => form.setFieldValue('discordComponentEmbed', value)}

@@ -3,7 +3,7 @@ import { db, type DbClient } from '@/lib/db';
 import type { Role } from '@/lib/db/enums';
 import { users } from '@/lib/db/schema';
 import { QUICK_LINKS } from '@/lib/quickLinks';
-import { discordComponentEmbedSchema } from '@/lib/discordComponentEmbed';
+import { discordComponentEmbedSchema } from '@/lib/discord';
 import { eq, isNotNull } from 'drizzle-orm';
 import { createSelectSchema } from 'drizzle-orm/zod';
 import { z } from 'zod';

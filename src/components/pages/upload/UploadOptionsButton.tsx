@@ -1,10 +1,13 @@
 import { useConfig } from '@/components/ConfigProvider';
+import DiscordComponentEmbedBuilder from '@/components/DiscordComponentEmbedBuilder';
 import DomainSelect from '@/components/DomainSelect';
+import SafeTrans from '@/components/SafeTrans';
 import FolderComboboxOptions from '@/components/folders/FolderComboboxOptions';
 import { Response } from '@/lib/api/response';
-import { buildFolderHierarchy } from '@/lib/folderHierarchy';
 import { useFolders } from '@/lib/client/hooks/useFolders';
-import { useUploadOptionsStore } from '@/lib/client/store/uploadOptions';
+import { useUploadOptionsStore, type UploadOptionsStore } from '@/lib/client/store/uploadOptions';
+import { buildFolderHierarchy } from '@/lib/folderHierarchy';
+import i18n from '@/lib/i18n';
 import {
   Badge,
   Button,
@@ -33,13 +36,9 @@ import {
   IconTrashFilled,
   IconWriting,
 } from '@tabler/icons-react';
-
 import ms from 'ms';
 import { useEffect, useMemo, useState } from 'react';
-import i18n from '@/lib/i18n';
 import { useTranslation } from 'react-i18next';
-import SafeTrans from '@/components/SafeTrans';
-import DiscordComponentEmbedBuilder from '@/components/pages/settings/parts/DiscordComponentEmbedBuilder';
 import { Link } from 'react-router-dom';
 import useSWR from 'swr';
 import { useShallow } from 'zustand/shallow';
@@ -456,7 +455,10 @@ export default function UploadOptionsButton({ folder, numFiles }: { folder?: str
             ]}
             value={options.discordPreviewMode}
             onChange={(value) =>
-              setOption('discordPreviewMode', (value as 'default' | 'components' | 'none') || 'default')
+              setOption(
+                'discordPreviewMode',
+                (value as UploadOptionsStore['options']['discordPreviewMode']) || 'default',
+              )
             }
             comboboxProps={{ withinPortal: true }}
           />
@@ -464,7 +466,6 @@ export default function UploadOptionsButton({ folder, numFiles }: { folder?: str
           {options.discordPreviewMode === 'components' ? (
             <DiscordComponentEmbedBuilder
               value={options.discordComponentEmbed}
-              disabled={false}
               showEnabledToggle={false}
               onChange={(value) => setOption('discordComponentEmbed', { ...value, enabled: true })}
             />

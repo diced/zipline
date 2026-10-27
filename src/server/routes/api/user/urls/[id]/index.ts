@@ -1,13 +1,12 @@
+import {
+  validateDiscordUrlPreview,
+  discordComponentEmbedSchema,
+  discordUrlPreviewModeSchema,
+} from '@/lib/discord';
 import { ApiError } from '@/lib/api/errors';
 import { hashPassword } from '@/lib/crypto';
 import { db } from '@/lib/db';
-import {
-  Url,
-  urlSchema,
-  discordUrlPreviewModeSchema,
-  lockUrls,
-  urlIdentifiersExist,
-} from '@/lib/db/models/url';
+import { Url, urlSchema, lockUrls, urlIdentifiersExist } from '@/lib/db/models/url';
 import { urls } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { zStringTrimmed } from '@/lib/validation';
@@ -15,7 +14,6 @@ import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
 import { and, eq, getColumns } from 'drizzle-orm';
 import z from 'zod';
-import { discordComponentEmbedSchema, serializeDiscordComponentEmbed } from '@/lib/discordComponentEmbed';
 
 export type ApiUserUrlsIdResponse = Omit<Url, 'password'>;
 
@@ -86,25 +84,7 @@ export default typedPlugin(
 
         if (!url) throw new ApiError(9002);
 
-        const nextPreviewMode = req.body.discordPreviewMode ?? url.discordPreviewMode;
-        const nextComponentEmbed =
-          req.body.discordComponentEmbed === undefined
-            ? url.discordComponentEmbed
-            : req.body.discordComponentEmbed;
-        if (nextPreviewMode === 'components' && !nextComponentEmbed?.enabled) {
-          throw new ApiError(1000, 'A valid enabled Components V2 layout is required.');
-        }
-        const nextDestination = req.body.destination ?? url.destination;
-        if (
-          nextPreviewMode === 'components' &&
-          !serializeDiscordComponentEmbed(nextComponentEmbed, {
-            url: { ...url, destination: nextDestination },
-            user: req.user,
-            link: { returned: 'https://zipline.example/go/link', raw: nextDestination },
-          })
-        ) {
-          throw new ApiError(1000, 'The Components V2 layout is invalid or exceeds Discord limits.');
-        }
+        validateDiscordUrlPreview({ ...url, ...req.body }, req.user);
 
         let password: string | null | undefined = undefined;
         if (req.body.password !== undefined) {

@@ -1,5 +1,15 @@
+import { ApiError } from '@/lib/api/errors';
+import type { Url } from '@/lib/db/models/url';
+import type { User } from '@/lib/db/models/user';
 import { parseString, type ParseValue } from '@/lib/parser';
+import { encode } from 'he';
 import { z } from 'zod';
+
+export const discordUrlPreviewModeSchema = z.enum(['destination', 'components', 'none']);
+export type DiscordUrlPreviewMode = z.infer<typeof discordUrlPreviewModeSchema>;
+
+export const discordFilePreviewModeSchema = z.enum(['components', 'none']);
+export type DiscordFilePreviewMode = z.infer<typeof discordFilePreviewModeSchema>;
 
 const componentIdSchema = z.number().int().min(0).max(2_147_483_647).optional();
 
@@ -24,15 +34,18 @@ const textDisplaySchema = z
   })
   .strict();
 
-const thumbnailSchema = z
+const mediaGalleryItemSchema = z
   .object({
-    type: z.literal(11),
-    id: componentIdSchema,
     url: z.string().max(2_048),
     description: z.string().max(1_024).optional(),
     spoiler: z.boolean().optional(),
   })
   .strict();
+
+const thumbnailSchema = mediaGalleryItemSchema.extend({
+  type: z.literal(11),
+  id: componentIdSchema,
+});
 
 const sectionSchema = z
   .object({
@@ -40,14 +53,6 @@ const sectionSchema = z
     id: componentIdSchema,
     components: z.array(textDisplaySchema).min(1).max(3),
     accessory: z.discriminatedUnion('type', [discordButtonSchema, thumbnailSchema]),
-  })
-  .strict();
-
-const mediaGalleryItemSchema = z
-  .object({
-    url: z.string().max(2_048),
-    description: z.string().max(1_024).optional(),
-    spoiler: z.boolean().optional(),
   })
   .strict();
 
@@ -95,6 +100,7 @@ export const discordComponentEmbedSchema = z
   .strict();
 
 export type DiscordButton = z.infer<typeof discordButtonSchema>;
+export type DiscordMedia = z.infer<typeof mediaGalleryItemSchema>;
 export type DiscordComponentEmbedChild = z.infer<typeof discordComponentEmbedChildSchema>;
 export type DiscordComponentEmbed = z.infer<typeof discordComponentEmbedSchema>;
 
@@ -126,29 +132,39 @@ type BuiltChild =
     }
   | { type: 14; id?: number; divider?: false; spacing?: 2 };
 
-export const defaultDiscordComponentEmbed = (): DiscordComponentEmbed => ({
-  enabled: false,
-  accentColor: '',
-  spoiler: false,
-  components: [
-    {
-      type: 10,
-      content: '## [{file.name}]({link.returned})\n{file.type} • {file.size::bytes}',
-    },
-  ],
-});
+export function defaultDiscordComponentEmbed(): DiscordComponentEmbed {
+  return {
+    enabled: false,
+    accentColor: '',
+    spoiler: false,
+    components: [
+      {
+        type: 10,
+        content: '## [{file.name}]({link.returned})\n{file.type} • {file.size::bytes}',
+      },
+    ],
+  };
+}
 
-export const defaultDiscordUrlComponentEmbed = (): DiscordComponentEmbed => ({
-  enabled: true,
-  accentColor: '',
-  spoiler: false,
-  components: [
-    {
-      type: 10,
-      content: '## [Open shortened link]({link.returned})\n{url.destination}',
-    },
-  ],
-});
+export function defaultDiscordUrlComponentEmbed(): DiscordComponentEmbed {
+  return {
+    ...defaultDiscordComponentEmbed(),
+    enabled: true,
+    components: [{ type: 10, content: '## [Open shortened link]({link.returned})\n{url.destination}' }],
+  };
+}
+
+export function defaultUploadDiscordComponentEmbed(): DiscordComponentEmbed {
+  const base = defaultDiscordComponentEmbed();
+  return {
+    ...base,
+    enabled: true,
+    components: [
+      ...base.components,
+      { type: 12, items: [{ url: '{link.raw}', description: '{file.name}' }] },
+    ],
+  };
+}
 
 export function prepareDiscordComponentEmbedForFile(
   config: DiscordComponentEmbed | null | undefined,
@@ -159,6 +175,7 @@ export function prepareDiscordComponentEmbedForFile(
   const components = config.components.flatMap<DiscordComponentEmbedChild>((component) => {
     if (component.type === 12) {
       const items = component.items.filter((item) => !item.url.includes('{link.raw}'));
+
       return items.length ? [{ ...component, items }] : [];
     }
 
@@ -166,14 +183,13 @@ export function prepareDiscordComponentEmbedForFile(
       component.type === 9 &&
       component.accessory.type === 11 &&
       component.accessory.url.includes('{link.raw}')
-    ) {
+    )
       return [
         {
           ...component,
           accessory: { type: 2, url: '{link.returned}', label: 'Open file' },
         },
       ];
-    }
 
     return [component];
   });
@@ -181,8 +197,12 @@ export function prepareDiscordComponentEmbedForFile(
   return components.length ? { ...config, components } : null;
 }
 
-const parsed = (value: string | undefined, parseValue: ParseValue) =>
-  value ? (parseString(value, parseValue) ?? '') : '';
+function parsed(value: string | undefined, parseValue: ParseValue) {
+  if (!value) return '';
+
+  const parsedValue = parseString(value, parseValue);
+  return parsedValue === null ? '' : parsedValue;
+}
 
 function buildButton(button: DiscordButton, parseValue: ParseValue): BuiltButton {
   const label = parsed(button.label, parseValue);
@@ -208,6 +228,16 @@ function buildButton(button: DiscordButton, parseValue: ParseValue): BuiltButton
   };
 }
 
+function buildMedia(media: DiscordMedia, parseValue: ParseValue) {
+  const description = parsed(media.description, parseValue);
+
+  return {
+    media: { url: parsed(media.url, parseValue) },
+    ...(description && { description }),
+    ...(media.spoiler && { spoiler: true }),
+  };
+}
+
 function buildChild(component: DiscordComponentEmbedChild, parseValue: ParseValue): BuiltChild {
   const id = component.id !== undefined ? { id: component.id } : {};
 
@@ -219,10 +249,6 @@ function buildChild(component: DiscordComponentEmbedChild, parseValue: ParseValu
         components: component.components.map((button) => buildButton(button, parseValue)),
       };
     case 9:
-      const description = parsed(
-        component.accessory.type === 11 ? component.accessory.description : undefined,
-        parseValue,
-      );
       return {
         type: 9,
         ...id,
@@ -237,9 +263,7 @@ function buildChild(component: DiscordComponentEmbedChild, parseValue: ParseValu
             : {
                 type: 11,
                 ...(component.accessory.id !== undefined && { id: component.accessory.id }),
-                media: { url: parsed(component.accessory.url, parseValue) },
-                ...(description && { description }),
-                ...(component.accessory.spoiler && { spoiler: true }),
+                ...buildMedia(component.accessory, parseValue),
               },
       };
     case 10:
@@ -248,14 +272,7 @@ function buildChild(component: DiscordComponentEmbedChild, parseValue: ParseValu
       return {
         type: 12,
         ...id,
-        items: component.items.map((item) => {
-          const description = parsed(item.description, parseValue);
-          return {
-            media: { url: parsed(item.url, parseValue) },
-            ...(description && { description }),
-            ...(item.spoiler && { spoiler: true }),
-          };
-        }),
+        items: component.items.map((item) => buildMedia(item, parseValue)),
       };
     case 14:
       return {
@@ -280,6 +297,7 @@ function componentCount(config: DiscordComponentEmbed) {
 
 function hasUniqueIds(config: DiscordComponentEmbed) {
   const used = new Set<number>();
+
   const add = (id?: number) => {
     if (!id) return true;
     if (used.has(id)) return false;
@@ -288,16 +306,17 @@ function hasUniqueIds(config: DiscordComponentEmbed) {
   };
 
   if (!add(config.id)) return false;
+
   for (const component of config.components) {
     if (!add(component.id)) return false;
     if (component.type === 1 && component.components.some((button) => !add(button.id))) return false;
     if (
       component.type === 9 &&
       (component.components.some((text) => !add(text.id)) || !add(component.accessory.id))
-    ) {
+    )
       return false;
-    }
   }
+
   return true;
 }
 
@@ -319,17 +338,20 @@ function isValidBuiltPayload(payload: BuiltChild[]) {
       galleryItems += component.items.length;
       if (component.items.some((item) => !isHttpUrl(item.media.url))) return false;
     }
+
     if (
       component.type === 1 &&
       component.components.some((button) => !isHttpUrl(button.url) || (!button.label && !button.emoji))
-    ) {
+    )
       return false;
-    }
+
     if (component.type === 9) {
       if (component.components.some((text) => !text.content)) return false;
       const accessory = component.accessory;
+
       if (accessory.type === 2 && (!isHttpUrl(accessory.url) || (!accessory.label && !accessory.emoji)))
         return false;
+
       if (accessory.type === 11 && !isHttpUrl(accessory.media.url)) return false;
     }
   }
@@ -344,9 +366,8 @@ export function serializeDiscordComponentEmbed(config: unknown, parseValue: Pars
     !result.data.enabled ||
     componentCount(result.data) > 40 ||
     !hasUniqueIds(result.data)
-  ) {
+  )
     return null;
-  }
 
   const components = result.data.components.map((component) => buildChild(component, parseValue));
   if (!isValidBuiltPayload(components)) return null;
@@ -372,4 +393,40 @@ export function serializeDiscordComponentEmbed(config: unknown, parseValue: Pars
     .replaceAll('\u2029', '\\u2029');
 
   return new TextEncoder().encode(json).byteLength <= 3_000 ? json : null;
+}
+
+export function validateDiscordUrlPreview(
+  url: Partial<Omit<Url, 'password'>> & Pick<Url, 'destination'>,
+  user: User,
+) {
+  if (url.discordPreviewMode !== 'components') return;
+  if (!url.discordComponentEmbed?.enabled)
+    throw new ApiError(1000, 'A valid enabled Components V2 layout is required.');
+
+  const preview = serializeDiscordComponentEmbed(url.discordComponentEmbed, {
+    url,
+    user,
+    link: { returned: 'https://zipline.example/go/link', raw: url.destination },
+  });
+
+  if (!preview) throw new ApiError(1000, 'The Components V2 layout is invalid or exceeds Discord limits.');
+}
+
+export function isDiscordCrawler(userAgent?: string) {
+  return /(?:Discordbot|Discord-Embedded-App-SDK)/i.test(userAgent ?? '');
+}
+
+export function createNoPreviewHtml() {
+  return '<!doctype html><html><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow,noarchive"></head><body></body></html>';
+}
+
+export function createComponentPreviewHtml(
+  shortUrl: string,
+  destination: string,
+  componentEmbed: string | null,
+) {
+  const safeUrl = encode(shortUrl, { useNamedReferences: false });
+  const safeDestination = encode(destination, { useNamedReferences: false });
+
+  return `<!doctype html><html><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"><meta property="og:title" content="Shortened URL"><meta property="og:description" content="${safeDestination}"><meta property="og:url" content="${safeUrl}">${componentEmbed ? `<script id="discord:component-embed" type="application/json">${componentEmbed}</script>` : ''}</head><body></body></html>`;
 }

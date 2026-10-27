@@ -1,6 +1,12 @@
-import { type DiscordUrlPreviewMode, Url } from '@/lib/db/models/url';
-import { fetchApi } from '@/lib/fetchApi';
+import DiscordComponentEmbedBuilder from '@/components/DiscordComponentEmbedBuilder';
 import useObjectState from '@/lib/client/hooks/useObjectState';
+import { Url } from '@/lib/db/models/url';
+import {
+  defaultDiscordUrlComponentEmbed,
+  type DiscordComponentEmbed,
+  type DiscordUrlPreviewMode,
+} from '@/lib/discord';
+import { fetchApi } from '@/lib/fetchApi';
 import {
   Button,
   Divider,
@@ -17,8 +23,6 @@ import { IconEye, IconKey, IconPencil, IconPencilOff, IconTrashFilled } from '@t
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { mutate } from 'swr';
-import DiscordComponentEmbedBuilder from '@/components/pages/settings/parts/DiscordComponentEmbedBuilder';
-import { defaultDiscordUrlComponentEmbed, type DiscordComponentEmbed } from '@/lib/discordComponentEmbed';
 
 export default function EditUrlModal({ url, onClose }: { url: Url | null; onClose: () => void }) {
   const { t } = useTranslation('urls');
@@ -109,7 +113,8 @@ export default function EditUrlModal({ url, onClose }: { url: Url | null; onClos
       data['discordPreviewMode'] = urlData.discordPreviewMode;
     if (
       urlData.discordPreviewMode === 'components' ||
-      JSON.stringify(urlData.discordComponentEmbed) !== JSON.stringify(url.discordComponentEmbed)
+      JSON.stringify(urlData.discordComponentEmbed) !==
+        JSON.stringify(url.discordComponentEmbed ?? defaultDiscordUrlComponentEmbed())
     ) {
       data['discordComponentEmbed'] = urlData.discordComponentEmbed;
     }
@@ -205,7 +210,6 @@ export default function EditUrlModal({ url, onClose }: { url: Url | null; onClos
           <DiscordComponentEmbedBuilder
             key={url?.id}
             value={urlData.discordComponentEmbed}
-            disabled={false}
             context='url'
             showEnabledToggle={false}
             onChange={(value) => setUrlData('discordComponentEmbed', value)}

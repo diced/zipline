@@ -1,4 +1,4 @@
-import { createComponentPreviewHtml, createNoPreviewHtml, isDiscordCrawler } from '@/lib/discordUrlPreview';
+import { createComponentPreviewHtml, createNoPreviewHtml, isDiscordCrawler } from '@/lib/discord';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 

@@ -1,19 +1,11 @@
+import type { Config } from '@/lib/config/validate';
+import {
+  defaultUploadDiscordComponentEmbed,
+  type DiscordComponentEmbed,
+  type DiscordFilePreviewMode,
+} from '@/lib/discord';
 import { create } from 'zustand';
 import { persist, subscribeWithSelector } from 'zustand/middleware';
-import type { Config } from '@/lib/config/validate';
-import { defaultDiscordComponentEmbed, type DiscordComponentEmbed } from '@/lib/discordComponentEmbed';
-
-const defaultUploadDiscordComponentEmbed = (): DiscordComponentEmbed => {
-  const base = defaultDiscordComponentEmbed();
-  return {
-    ...base,
-    enabled: true,
-    components: [
-      ...base.components,
-      { type: 12, items: [{ url: '{link.raw}', description: '{file.name}' }] },
-    ],
-  };
-};
 
 export const defaultUploadOptions: UploadOptionsStore['options'] = {
   deletesAt: 'default',
@@ -44,7 +36,7 @@ export type UploadOptionsStore = {
     addOriginalName: boolean | null;
     extensionless: boolean | null;
     overrides_returnDomain: string | null;
-    discordPreviewMode: 'default' | 'components' | 'none';
+    discordPreviewMode: 'default' | DiscordFilePreviewMode;
     discordComponentEmbed: DiscordComponentEmbed;
   };
 
@@ -110,7 +102,6 @@ export const useUploadOptionsStore = create<UploadOptionsStore>()(
         changes: () => {
           const { options, ephemeral } = get();
           return (
-            // @ts-ignore
             Object.keys(options).filter(
               (v) =>
                 v !== 'discordComponentEmbed' &&

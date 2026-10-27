@@ -1,10 +1,14 @@
 import ms, { type StringValue } from 'ms';
+import { ApiError } from '../api/errors';
 import { checkOutput, COMPRESS_TYPES, CompressType } from '../compress';
 import { Config } from '../config/validate';
+import {
+  discordComponentEmbedSchema,
+  type DiscordComponentEmbed,
+  discordFilePreviewModeSchema,
+  type DiscordFilePreviewMode,
+} from '../discord';
 import { sanitizeExtension, sanitizeFilename } from '../fs';
-import { ApiError } from '../api/errors';
-import { discordComponentEmbedSchema, type DiscordComponentEmbed } from '../discordComponentEmbed';
-import { discordFilePreviewModeSchema, type DiscordFilePreviewMode } from '../urlPreview';
 
 type StringBoolean = 'true' | 'false';
 

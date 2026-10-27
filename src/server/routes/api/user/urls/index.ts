@@ -1,15 +1,13 @@
+import {
+  validateDiscordUrlPreview,
+  discordComponentEmbedSchema,
+  discordUrlPreviewModeSchema,
+} from '@/lib/discord';
 import { ApiError } from '@/lib/api/errors';
 import { config } from '@/lib/config';
 import { hashPassword } from '@/lib/crypto';
 import { db } from '@/lib/db';
-import {
-  Url,
-  urlSchema,
-  createUrlId,
-  discordUrlPreviewModeSchema,
-  lockUrls,
-  urlIdentifiersExist,
-} from '@/lib/db/models/url';
+import { Url, urlSchema, createUrlId, lockUrls, urlIdentifiersExist } from '@/lib/db/models/url';
 import { urls } from '@/lib/db/schema';
 import { containsText } from '@/lib/db/utils';
 import { log } from '@/lib/logger';
@@ -21,7 +19,6 @@ import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
 import { and, eq, getColumns, isNotNull } from 'drizzle-orm';
 import { z } from 'zod';
-import { discordComponentEmbedSchema, serializeDiscordComponentEmbed } from '@/lib/discordComponentEmbed';
 
 export type ApiUserUrlsResponse =
   | Url[]
@@ -88,19 +85,8 @@ export default typedPlugin(
       },
       async (req, res) => {
         const { vanity, destination, enabled, discordPreviewMode, discordComponentEmbed } = req.body;
-        if (discordPreviewMode === 'components' && !discordComponentEmbed?.enabled) {
-          throw new ApiError(1000, 'A valid enabled Components V2 layout is required.');
-        }
-        if (
-          discordPreviewMode === 'components' &&
-          !serializeDiscordComponentEmbed(discordComponentEmbed, {
-            url: { destination },
-            user: req.user,
-            link: { returned: 'https://zipline.example/go/link', raw: destination },
-          })
-        ) {
-          throw new ApiError(1000, 'The Components V2 layout is invalid or exceeds Discord limits.');
-        }
+        validateDiscordUrlPreview(req.body, req.user);
+
         const noJson = req.headers['x-zipline-no-json'];
 
         let returnDomain;

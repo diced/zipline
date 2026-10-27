@@ -4,7 +4,7 @@ import {
   prepareDiscordComponentEmbedForFile,
   serializeDiscordComponentEmbed,
   type DiscordComponentEmbed,
-} from '@/lib/discordComponentEmbed';
+} from '@/lib/discord';
 import type { ParseValue } from '@/lib/parser';
 import assert from 'assert/strict';
 import { test } from 'node:test';

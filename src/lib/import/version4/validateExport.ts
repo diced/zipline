@@ -1,8 +1,11 @@
 import { oauthProviderTypeValues, roleValues, userFilesQuotaValues } from '@/lib/db/enums';
 import type { Zipline } from '@/lib/db/schema';
+import {
+  discordComponentEmbedSchema,
+  discordFilePreviewModeSchema,
+  discordUrlPreviewModeSchema,
+} from '@/lib/discord';
 import { z } from 'zod';
-import { discordComponentEmbedSchema } from '@/lib/discordComponentEmbed';
-import { discordFilePreviewModeSchema, discordUrlPreviewModeSchema } from '@/lib/urlPreview';
 
 export type Export4 = z.infer<typeof export4Schema>;
 

@@ -14,18 +14,15 @@ import { db } from '@/lib/db';
 import { fileRelations } from '@/lib/db/models/file';
 import { getUserSummary } from '@/lib/db/models/user';
 import { escapeLike } from '@/lib/db/utils';
+import { prepareDiscordComponentEmbedForFile, serializeDiscordComponentEmbed } from '@/lib/discord';
 import { sanitizeFilename } from '@/lib/fs';
 import { parseString } from '@/lib/parser';
 import { parserMetrics } from '@/lib/parser/metrics';
 import { createZiplineSsr } from '@/lib/ssr/createZiplineSsr';
-import { formatMediaUrl } from '@/lib/url';
 import { stripHtml } from '@/lib/stripHtml';
-import {
-  prepareDiscordComponentEmbedForFile,
-  serializeDiscordComponentEmbed,
-} from '@/lib/discordComponentEmbed';
 import type { ZiplineTheme } from '@/lib/theme';
 import { readThemes } from '@/lib/theme/file';
+import { formatMediaUrl } from '@/lib/url';
 import { FastifyRequest } from 'fastify';
 import { renderToString } from 'react-dom/server';
 import { createStaticHandler, createStaticRouter, StaticRouterProvider } from 'react-router-dom';
@@ -189,14 +186,10 @@ export async function render(
     },
   );
 
-  const showRichOg =
-    viewEnabled && !previewDisabled && file.discordPreviewMode !== 'components' && !!user.view.embed;
+  const showDefaultPreview = viewEnabled && !previewDisabled && file.discordPreviewMode !== 'components';
+  const showRichOg = showDefaultPreview && !!user.view.embed;
   const showMediaOg =
-    viewEnabled &&
-    !previewDisabled &&
-    (file.discordPreviewMode === 'components'
-      ? !!discordComponentEmbed
-      : !!user.view.embed || !!user.view.embedMediaOnly || !!discordComponentEmbed);
+    !!discordComponentEmbed || (showDefaultPreview && (!!user.view.embed || !!user.view.embedMediaOnly));
 
   const richMeta = [
     showRichOg && user?.view?.embedTitle

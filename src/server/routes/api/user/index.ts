@@ -10,10 +10,10 @@ import {
   type UserUpdate,
 } from '@/lib/db/models/user';
 import { users, userSessions } from '@/lib/db/schema';
+import { discordComponentEmbedSchema } from '@/lib/discord';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { zStringTrimmed } from '@/lib/validation';
-import { discordComponentEmbedSchema } from '@/lib/discordComponentEmbed';
 import { userMiddleware } from '@/server/middleware/user';
 import { getSession, saveSession } from '@/server/session';
 import typedPlugin from '@/server/typedPlugin';
@@ -129,6 +129,9 @@ export default typedPlugin(
 
         const currentSession = await getSession(req, res);
 
+        const view = { ...req.user.view, ...req.body.view };
+        const embed = !view.discordComponentEmbed?.enabled && !!view.embed;
+
         const data: UserUpdate = {
           ...(req.body.username && { username: req.body.username }),
           ...(req.body.password && { password: await hashPassword(req.body.password) }),
@@ -144,25 +147,10 @@ export default typedPlugin(
               ...(req.body.view.content !== undefined && { content: req.body.view.content || null }),
               ...((req.body.view.embed !== undefined ||
                 req.body.view.discordComponentEmbed !== undefined) && {
-                embed: (() => {
-                  const componentEmbedOn = !!(req.body.view.discordComponentEmbed !== undefined
-                    ? req.body.view.discordComponentEmbed?.enabled
-                    : req.user.view.discordComponentEmbed?.enabled);
-
-                  if (componentEmbedOn) return false;
-
-                  return req.body.view.embed !== undefined
-                    ? req.body.view.embed || false
-                    : req.user.view.embed || false;
-                })(),
+                embed,
               }),
               ...(req.body.view.embedMediaOnly !== undefined && {
-                embedMediaOnly: (() => {
-                  const embedOn = !!(req.body.view.embed !== undefined
-                    ? req.body.view.embed
-                    : (req.user.view as { embed?: boolean }).embed);
-                  return embedOn ? false : req.body.view.embedMediaOnly || false;
-                })(),
+                embedMediaOnly: !embed && !!req.body.view.embedMediaOnly,
               }),
               ...(req.body.view.embedTitle !== undefined && {
                 embedTitle: req.body.view.embedTitle || null,
