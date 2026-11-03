@@ -52,7 +52,7 @@ export function parseString(str: string, value: ParseValue) {
   }
 
   const re =
-    /\{(?<type>file|url|user|debug|link|metricsUser|metricsZipline)\.(?<prop>\w+)(::(?<mod>(\w+|<|<=|=|>=|>|\^|\$|~|\/)+))?((::(?<mod_tzlocale>\S+?))|(?<mod_check>\[(?<mod_check_true>".*?")\|\|(?<mod_check_false>".*?")\]))?\}/gi;
+    /\{(?<type>file|url|user|debug|link|metricsUser|metricsZipline)\.(?<prop>\w+)(::(?<mod>[\w<>=^$~/]+))?((::(?<mod_tzlocale>\S+?))|(?<mod_check>\[(?<mod_check_true>".*?")\|\|(?<mod_check_false>".*?")\]))?\}/gi;
   let matches: RegExpMatchArray | null;
   let parsed = '';
   let previousEnd = 0;
