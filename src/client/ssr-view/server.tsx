@@ -19,16 +19,16 @@ import { sanitizeFilename } from '@/lib/fs';
 import { parseString } from '@/lib/parser';
 import { parserMetrics } from '@/lib/parser/metrics';
 import { createZiplineSsr } from '@/lib/ssr/createZiplineSsr';
+import { createViewFileData } from '@/lib/ssr/viewData';
 import { stripHtml } from '@/lib/stripHtml';
 import type { ZiplineTheme } from '@/lib/theme';
-import { readThemes } from '@/lib/theme/file';
 import { formatMediaUrl } from '@/lib/url';
-import { FastifyRequest } from 'fastify';
+import type { FastifyRequest } from 'fastify';
 import { renderToString } from 'react-dom/server';
 import { createStaticHandler, createStaticRouter, StaticRouterProvider } from 'react-router-dom';
 import { createRoutes } from './routes';
 
-export const getFile = async (id: string) => {
+async function getFile(id: string) {
   const name = sanitizeFilename(id);
   if (!name) return null;
 
@@ -47,10 +47,11 @@ export const getFile = async (id: string) => {
     });
   }
   return file ?? null;
-};
+}
 
 export async function render(
   {
+    themes,
     defaultTheme,
     req,
   }: {
@@ -92,64 +93,24 @@ export async function render(
     host = proto === 'https' || zConfig.core.returnHttpsUrls ? `https://${host}` : `http://${host}`;
   }
 
-  const code = await isCode(result.name);
-  const themes = await readThemes();
-  const metrics = await parserMetrics(user.id);
-  const config = { website: { theme: zConfig.website.theme } };
-
-  const token = req.query.token;
-  const valid = token && result.password ? verifyAccessToken(token, 'file', result.id) : false;
-  const hasPassword = !!result.password;
+  const token =
+    req.query.token && result.password && verifyAccessToken(req.query.token, 'file', result.id)
+      ? req.query.token
+      : null;
+  const requiresPassword = !!result.password && !token;
+  const code = requiresPassword ? false : await isCode(result.name);
+  const metrics = requiresPassword ? undefined : await parserMetrics(user.id);
   const { password: _password, ...file } = result;
 
-  if (hasPassword) {
-    console.log('File is password protected');
-    if (!valid) {
-      const data = {
-        file: { id: file.id, name: file.name, type: file.type },
-        password: true,
-        code,
-        user,
-        host,
-        themes,
-        metrics,
-        config,
-      };
-
-      const routes = createRoutes(themes, defaultTheme);
-      const { query } = createStaticHandler(routes);
-      const context = await query(
-        new Request('http://client' + url, {
-          method: 'GET',
-          headers: new Headers({ accept: 'text/html' }),
-        }),
-      );
-
-      if (context instanceof Response) {
-        return context;
-      }
-      const router = createStaticRouter(routes, context);
-      const html = renderToString(<StaticRouterProvider context={context} router={router} />);
-
-      return {
-        html,
-        meta: `<title>Password Protected</title>\n${createZiplineSsr(data)}`,
-      };
-    }
-  }
-
-  const data = {
-    file,
-    password: hasPassword,
-    token: valid ? token : null,
+  const data = createViewFileData({
+    file: result,
+    token,
     code,
     user,
     host,
-    themes,
     metrics,
     filesRoute: zConfig.files.route,
-    config,
-  };
+  });
 
   const routes = createRoutes(themes, defaultTheme);
   const { query } = createStaticHandler(routes);
@@ -166,6 +127,13 @@ export async function render(
 
   const router = createStaticRouter(routes, context);
   const html = renderToString(<StaticRouterProvider context={context} router={router} />);
+
+  if (data.requiresPassword) {
+    return {
+      html,
+      meta: `<title>Password Protected</title>\n${createZiplineSsr(data)}`,
+    };
+  }
 
   const safeFilename = stripHtml(file.name);
   const mediaUrl = formatMediaUrl(host, file.name);

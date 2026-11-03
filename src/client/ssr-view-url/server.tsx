@@ -1,16 +1,18 @@
 import '@/lib/i18n';
+
 import { verifyAccessToken } from '@/lib/accessToken';
+import { ApiError } from '@/lib/api/errors';
 import { config as zConfig } from '@/lib/config';
-import { Config } from '@/lib/config/validate';
+import type { Config } from '@/lib/config/validate';
 import { db } from '@/lib/db';
 import { getUrl } from '@/lib/db/models/url';
 import { urls } from '@/lib/db/schema';
 import { renderHtml } from '@/lib/ssr/renderHtml';
-import { ZiplineTheme } from '@/lib/theme';
-import { FastifyRequest } from 'fastify';
+import type { ViewUrlData } from '@/lib/ssr/viewData';
+import type { ZiplineTheme } from '@/lib/theme';
+import type { FastifyRequest } from 'fastify';
 import { and, eq, lt, sql } from 'drizzle-orm';
 import { createRoutes } from './routes';
-import { ApiError } from '@/lib/api/errors';
 
 export async function render(
   {
@@ -43,26 +45,16 @@ export async function render(
 
   const token = req.query.token;
   const valid = token && urlEntry.password ? verifyAccessToken(token, 'url', urlEntry.id) : false;
-  const hasPassword = !!urlEntry.password;
-  const publicUrl = {
-    id: urlEntry.id,
-    destination: urlEntry.destination,
-    maxViews: urlEntry.maxViews,
-    views: urlEntry.views,
-    enabled: urlEntry.enabled,
-  };
-
-  const data = {
-    url: publicUrl,
-    password: hasPassword,
-    token: valid ? token : null,
+  const requiresPassword = !!urlEntry.password && !valid;
+  const data: ViewUrlData = {
+    requiresPassword,
+    url: requiresPassword ? { id: urlEntry.id } : { id: urlEntry.id, destination: urlEntry.destination },
   };
 
   const routes = createRoutes(themes, defaultTheme);
 
-  if (hasPassword && !valid) {
-    const { destination: _destination, ...protectedUrl } = publicUrl;
-    return renderHtml(routes, { url, data: { ...data, url: protectedUrl }, status: 403 });
+  if (requiresPassword) {
+    return renderHtml(routes, { url, data, status: 403 });
   }
 
   const [updated] = await db
@@ -79,11 +71,11 @@ export async function render(
     return { html: 'Gone', meta: '', status: 410 };
   }
 
-  if (publicUrl.destination) {
+  if (urlEntry.destination) {
     return {
       html: '',
       meta: '',
-      redirect: publicUrl.destination,
+      redirect: urlEntry.destination,
       status: 301,
     };
   }
