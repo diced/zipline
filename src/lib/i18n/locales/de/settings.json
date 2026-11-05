@@ -78,7 +78,7 @@
   },
   "dashboard": {
     "title": "Dashboard-Einstellungen",
-    "description": "Diese Einstellungen werden automatisch in Ihrem <b>Browser</b> gespeichert.",
+    "description": "Diese Einstellungen werden automatisch in Ihrem <b>browser.</b> gespeichert.",
     "disableMediaPreview": {
       "label": "Medienvorschau deaktivieren",
       "description": "Deaktiviert die Vorschau von Dateien im Dashboard. Bei vielen Mediendateien kann das Datenvolumen sparen und das Dashboard beschleunigen. Allerdings wird dadurch auch der Dateibetrachter deaktiviert, und für unterstützte Dateien wird statt einer Vorschau ein allgemeines Dateisymbol angezeigt."
@@ -131,6 +131,19 @@
     "themeLight": {
       "label": "Helles Design",
       "description": "Das Design des Dashboards, wenn Ihr System den hellen Modus verwendet."
+    },
+    "fileDropBehavior": {
+      "label": "Verhalten beim Ablegen von Dateien",
+      "description": "Lege fest, was passiert, wenn Dateien auf Dashboard Seiten außerhalb der Upload Seiten abgelegt werden. Beim sofortigen Hochladen werden aktuellen Upload Optionen verwendet."
+    },
+    "filePasteBehavior": {
+      "label": "Verhalten beim Einfügen",
+      "description": "Lege fest, was passiert, wenn Dateien oder Text auf Dashboard Seiten außerhalb von Textfeldern und Upload Seiten eingefügt werden. Beim sofortigen Hochladen werden aktuellen Upload Optionen verwendet."
+    },
+    "uploadBehavior": {
+      "disabled": "Deaktiviert",
+      "review": "Upload Seite öffnen",
+      "upload": "Sofort hochladen"
     }
   },
   "fileView": {
@@ -380,5 +393,11 @@
       },
       "waylandHelp": "Wenn Flameshot unter Wayland nicht funktioniert, lesen Sie den <anchor>Wayland-Leitfaden</anchor>."
     }
+  },
+  "quickLinks": {
+    "title": "Schnellzugriffe",
+    "description": "Fügen Sie oben auf der Startseite Links für den schnellen Zugriff hinzu.",
+    "reorder": "{{name}} neu anordnen",
+    "saveError": "Schnellzugriffe konnten nicht gespeichert werden."
   }
 }

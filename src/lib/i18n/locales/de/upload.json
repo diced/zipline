@@ -39,7 +39,10 @@
       "preview": "Vorschau"
     },
     "addFile": "Textdatei hinzufügen",
-    "fileHeading": "Datei {{number}}"
+    "fileHeading": "Datei {{number}}",
+    "language": "Sprache",
+    "removeFile": "Datei {{number}} entfernen",
+    "emptyPreview": "Kein Text"
   },
   "options": {
     "button": "Optionen",
@@ -204,5 +207,15 @@
         "message": "{{name}} übergeben ({{current}}/{{total}})"
       }
     }
+  },
+  "global": {
+    "dropUpload": "Dateien hierher ziehen und sofort hochladen",
+    "dropReview": "Dateien hierher ziehen, um vor dem Upload überprüfen",
+    "savedOptions": "Die aktuellen Upload Optionen werden verwendet.",
+    "reviewMessage": "Dateien vor dem Hochladen auf der Upload Seite prüfen.",
+    "textQueued": "Text bereit zum Hochladen",
+    "textReviewMessage": "Text vor dem Hochladen auf der Upload Seite prüfen.",
+    "queued_one": "eine Datei bereit zum Hochladen",
+    "queued_other": "{{count}} Dateien bereit zum Hochladen"
   }
 }

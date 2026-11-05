@@ -411,7 +411,11 @@
     "oidc": {
       "authorizeUrl": "OIDC-Autorisierungs-URL",
       "tokenUrl": "OIDC-Token-URL",
-      "userinfoUrl": "OIDC-Userinfo-URL"
+      "userinfoUrl": "OIDC-Userinfo-URL",
+      "endSessionUrl": {
+        "description": "Der end_session_endpoint Ihres OIDC-Anbieters. Lassen Sie dieses Feld leer, um sich nur von Zipline abzumelden.",
+        "label": "OIDC End Session URL"
+      }
     }
   },
   "pwa": {
@@ -476,7 +480,7 @@
     },
     "maxViewsInterval": {
       "label": "Intervall für max. Aufrufe",
-      "description": "Wie oft Dateien gesucht und gelöscht werden, die die maximale Anzahl an Aufrufen erreicht haben."
+      "description": "Intervall zum Prüfen und Löschen von Dateien, die ihre maximale Aufrufzahl erreicht haben."
     },
     "thumbnailsInterval": {
       "label": "Intervall für Vorschaubilder",
