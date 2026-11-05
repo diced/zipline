@@ -15,7 +15,7 @@ export default function GridTableSwitcher({ type }: { type: Exclude<keyof ViewSt
           value: 'grid',
           label: (
             <Center>
-              <IconLayoutGrid />
+              <IconLayoutGrid size='1rem' />
             </Center>
           ),
         },
@@ -23,7 +23,7 @@ export default function GridTableSwitcher({ type }: { type: Exclude<keyof ViewSt
           value: 'table',
           label: (
             <Center>
-              <IconLayoutList />
+              <IconLayoutList size='1rem' />
             </Center>
           ),
         },

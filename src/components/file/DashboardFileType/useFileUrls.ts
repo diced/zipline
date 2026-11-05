@@ -1,13 +1,13 @@
 import { useUserStore } from '@/lib/client/store/user';
-import type { File as DbFile } from '@/lib/db/models/file';
+import type { FilePreview } from '@/lib/db/models/file';
 import { formatRootUrl } from '@/lib/url';
 import { useMemo } from 'react';
 
-export function isDbFile(file: DbFile | File): file is DbFile {
+export function isDbFile(file: FilePreview | File): file is FilePreview {
   return typeof globalThis.File !== 'undefined' ? !(file instanceof globalThis.File) : 'thumbnail' in file;
 }
 
-export default function useFileUrls({ file, token }: { file: DbFile | File; token?: string | null }): {
+export default function useFileUrls({ file, token }: { file: FilePreview | File; token?: string | null }): {
   fileUrl: string;
   thumbnailUrl: string | null;
   viewUrl: string | null;

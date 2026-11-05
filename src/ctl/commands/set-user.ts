@@ -1,7 +1,7 @@
 import { hashPassword } from '@/lib/crypto';
 import { db } from '@/lib/db';
 import { getUserIdentity } from '@/lib/db/models/user';
-import { users } from '@/lib/db/schema';
+import { users, userSessions } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 import { createUpdateSchema } from 'drizzle-orm/zod';
 
@@ -36,7 +36,10 @@ export async function setUser(property: string, value: string, { id }: { id: str
   }
 
   const update = userUpdateSchema.parse({ [property]: parsed });
-  await db.update(users).set(update).where(eq(users.id, id));
+  await db.transaction(async (tx) => {
+    await tx.update(users).set(update).where(eq(users.id, id));
+    if (property === 'password') await tx.delete(userSessions).where(eq(userSessions.userId, id));
+  });
 
   if (property === 'password') parsed = '*********';
 

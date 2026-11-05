@@ -11,7 +11,7 @@ import {
   type UserUpdate,
   limitedUserSchema,
 } from '@/lib/db/models/user';
-import { files, oauthProviders, urls, userQuotas, users } from '@/lib/db/schema';
+import { files, oauthProviders, urls, userQuotas, users, userSessions } from '@/lib/db/schema';
 import { log } from '@/lib/logger';
 import { canInteract } from '@/lib/role';
 import { zStringTrimmed } from '@/lib/validation';
@@ -154,6 +154,8 @@ export default typedPlugin(
               .returning({ id: users.id });
             if (!updated) return null;
           }
+
+          if (password) await tx.delete(userSessions).where(eq(userSessions.userId, user.id));
 
           return getUserSummary(user.id, tx);
         });

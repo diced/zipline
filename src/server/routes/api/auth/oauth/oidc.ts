@@ -1,7 +1,7 @@
 import { ApiError, RedirectError } from '@/lib/api/errors';
-import { fetchToDataURL } from '@/lib/base64';
 import { config } from '@/lib/config';
 import Logger from '@/lib/logger';
+import { fetchOidcAvatar } from '@/lib/oauth/avatar';
 import enabled from '@/lib/oauth/enabled';
 import { generatePKCEChallenge, generatePKCEVerifier } from '@/lib/oauth/pkce';
 import { oidcAuthorizeURL, oidcUser } from '@/lib/oauth/providers';
@@ -90,7 +90,7 @@ async function oidcOauth(
       userJson.sub,
     ].find((name) => typeof name === 'string' && name.trim()),
     user_id: userJson.sub,
-    avatar: await fetchToDataURL(userJson.picture ?? null),
+    avatar: await fetchOidcAvatar(userJson.picture, config.oauth.oidc.userinfoUrl!),
   };
 }
 

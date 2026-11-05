@@ -1,4 +1,4 @@
-import type { File as DbFile } from '@/lib/db/models/file';
+import type { FilePreview } from '@/lib/db/models/file';
 import i18n from '@/lib/i18n';
 import useSWR from 'swr';
 import { isDbFile } from './useFileUrls';
@@ -30,7 +30,7 @@ export default function useFileContent({
   fileUrl,
 }: {
   enabled: boolean;
-  file: DbFile | File;
+  file: FilePreview | File;
   fileUrl: string;
 }) {
   const { data, error } = useSWR<string>(

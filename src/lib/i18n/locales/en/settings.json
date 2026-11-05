@@ -1,6 +1,13 @@
 {
   "title": "Settings",
   "loading": "Loading…",
+  "tabs": {
+    "account": "Account",
+    "dashboard": "Dashboard",
+    "fileView": "File views",
+    "security": "Security",
+    "tools": "Uploaders & exports"
+  },
   "user": {
     "title": "User",
     "tokenCopyTooltip": "Click to copy token",
@@ -85,6 +92,12 @@
   "dashboard": {
     "title": "Dashboard Settings",
     "description": "These settings are saved automatically in your <b>browser.</b>",
+    "sections": {
+      "appearance": "Appearance",
+      "uploads": "Uploads and links",
+      "files": "Files and previews",
+      "home": "Home page"
+    },
     "disableMediaPreview": {
       "label": "Disable Media Preview",
       "description": "Disable previews of files in the dashboard. This may help to save data and speed up the dashboard if you have a lot of media files, but it will also disable the file viewer and show a generic file icon instead of a preview for supported files."
