@@ -330,19 +330,32 @@ export default function Layout() {
                 bdrs='md'
               />
 
-              {config.website.titleLogo && (
-                <Avatar
-                  src={config.website.titleLogo}
-                  alt={t('header.logoAlt')}
-                  radius='sm'
-                  size='md'
-                  mr='md'
-                />
-              )}
+              <Box
+                component={Link}
+                to='/dashboard'
+                aria-label={config.website.title.trim()}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  minWidth: 0,
+                  color: 'inherit',
+                  textDecoration: 'none',
+                }}
+              >
+                {config.website.titleLogo && (
+                  <Avatar
+                    src={config.website.titleLogo}
+                    alt={t('header.logoAlt')}
+                    radius='sm'
+                    size='md'
+                    mr='md'
+                  />
+                )}
 
-              <Title visibleFrom='sm' lineClamp={1} size={32}>
-                {config.website.title.trim()}
-              </Title>
+                <Title lineClamp={1} fz={{ base: 22, sm: 32 }}>
+                  {config.website.title.trim()}
+                </Title>
+              </Box>
 
               <Group gap='xs' wrap='nowrap' style={{ marginLeft: 'auto' }}>
                 <LanguageSelect />
