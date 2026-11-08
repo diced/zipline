@@ -1,6 +1,5 @@
 import { bytes } from '@/lib/bytes';
 import { config, reloadSettings } from '@/lib/config';
-import { getDatasource } from '@/lib/datasource';
 import { db } from '@/lib/db';
 import { getOwnedFolder } from '@/lib/db/models/folder';
 import { files, users } from '@/lib/db/schema';
@@ -12,7 +11,7 @@ import { join, parse, resolve } from 'path';
 
 export async function importDir(
   directory: string,
-  { id, folder, skipDb }: { id?: string; folder?: string; skipDb?: boolean },
+  { id, folder, skipDb, skipDs }: { id?: string; folder?: string; skipDb?: boolean; skipDs?: boolean },
 ) {
   const fullPath = resolve(directory);
   if (!statSync(fullPath).isDirectory()) return console.error('Not a directory:', directory);
@@ -82,6 +81,8 @@ export async function importDir(
     console.log(`Inserted ${created.length} files into the database.`);
   }
 
+  if (skipDs) process.exit(0);
+
   const totalSize = data.reduce((acc, file) => acc + file.size, 0);
   let completed = 0;
   let imported = 0;
@@ -89,7 +90,8 @@ export async function importDir(
   if (config.datasource.type === 'local')
     await mkdir(config.datasource.local!.directory, { recursive: true });
 
-  const datasource = getDatasource(config);
+  const { datasource: currentDatasource, getDatasource } = await import('@/lib/datasource');
+  const datasource = currentDatasource ?? getDatasource(config);
   if (!datasource) return console.error('No datasource configured');
 
   for (let i = 0; i !== data.length; ++i) {

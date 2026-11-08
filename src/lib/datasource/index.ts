@@ -45,7 +45,7 @@ datasource = global.__datasource__;
 if (!global.__datasource__ && !datasource && isMainThread) {
   import('../config/index.js')
     .then(({ config }) => {
-      getDatasource(config);
+      if (!global.__datasource__) getDatasource(config);
     })
     .catch((error) => {
       console.error('Failed to initialize datasource:', error);
