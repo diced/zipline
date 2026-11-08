@@ -5,6 +5,8 @@ import { log } from '@/lib/logger';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
 import { ZipArchive, type Archiver } from 'archiver';
+import { Readable } from 'stream';
+import { pipeline } from 'stream/promises';
 import z from 'zod';
 
 export type ApiUserFoldersIdExportResponse = null;
@@ -16,24 +18,32 @@ async function addFolderToZip(
   folder: FolderTree,
   basePath: string,
   logger: ReturnType<typeof log>,
+  streams: Readable[],
 ): Promise<number> {
   let fileCount = 0;
 
   for (const file of folder.files) {
     const stream = await datasource.get(file.name);
+    if (zip.destroyed) {
+      stream?.destroy();
+      return fileCount;
+    }
+
     if (!stream) {
       logger.warn('failed to get file stream for folder export', { file: file.id, folder: folder.id });
       continue;
     }
 
     const filePath = basePath ? `${basePath}/${file.name}` : file.name;
+    streams.push(stream);
+    stream.once('error', (error) => zip.destroy(error));
     zip.append(stream, { name: filePath });
     fileCount++;
   }
 
   for (const child of folder.children) {
     const childPath = basePath ? `${basePath}/${child.name}` : child.name;
-    fileCount += await addFolderToZip(zip, child, childPath, logger);
+    fileCount += await addFolderToZip(zip, child, childPath, logger, streams);
   }
 
   return fileCount;
@@ -80,29 +90,45 @@ export default typedPlugin(
           zlib: { level: 9 },
         });
 
-        zip.pipe(res.raw);
+        const streams: Readable[] = [];
+        let failed = false;
+        function failExport(error: unknown) {
+          if (failed) return;
+          failed = true;
 
-        const fileCount = await addFolderToZip(zip, folderTree, '', logger);
-
-        if (fileCount === 0) {
-          logger.warn('folder export has no files, aborting.', { folder: folder.id });
-
+          logger.error('error during folder export zip creation', { folder: id }).error(error as Error);
           zip.abort();
+          zip.destroy();
+          for (const stream of streams) stream.destroy();
+          res.raw.destroy();
         }
 
-        zip.on('error', (err) => {
-          logger.error('error during folder export zip creation', { folder: folder.id }).error(err as Error);
-        });
+        const completed = pipeline(zip, res.raw);
+        void completed.catch(failExport);
 
-        zip.on('finish', () => {
+        try {
+          const fileCount = await addFolderToZip(zip, folderTree, '', logger, streams);
+          if (failed) return;
+
+          if (fileCount === 0) {
+            logger.warn('folder export has no files, aborting.', { folder: folder.id });
+
+            zip.abort();
+            await completed;
+            return;
+          }
+
+          await zip.finalize();
+          await completed;
+
           logger.info(`folder export completed: ${folder.name}`, {
             user: req.user.id,
             folder: folder.id,
             files: fileCount,
           });
-        });
-
-        await zip.finalize();
+        } catch (error) {
+          failExport(error);
+        }
       },
     );
   },

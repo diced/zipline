@@ -14,6 +14,8 @@ import { and, eq } from 'drizzle-orm';
 import { createWriteStream } from 'fs';
 import { rm, stat } from 'fs/promises';
 import { join } from 'path';
+import { Readable } from 'stream';
+import { finished, pipeline } from 'stream/promises';
 import z from 'zod';
 
 export type ApiUserExportResponse = {
@@ -170,19 +172,34 @@ export default typedPlugin(
           zlib: { level: 9 },
         });
 
-        zip.pipe(writeStream);
+        const streams: Readable[] = [];
+        let cleanup: Promise<void> | undefined;
 
-        let totalSize = 0;
-        for (const file of rows) {
-          const stream = await datasource.get(file.name);
-          if (!stream) {
-            logger.warn(`failed to get file ${file.name}`);
-            continue;
-          }
+        function failExport(error: unknown): Promise<void> {
+          if (cleanup) return cleanup;
 
-          zip.append(stream, { name: file.name });
-          totalSize += file.size;
-          logger.debug('file added to zip', { name: file.name, size: file.size });
+          logger.error('export failed', { error, exportId: exportDb.id });
+          zip.abort();
+          zip.destroy();
+
+          for (const stream of streams) stream.destroy();
+          writeStream.destroy();
+
+          cleanup = (async () => {
+            await finished(writeStream).catch(() => {});
+
+            const results = await Promise.allSettled([
+              rm(exportPath, { force: true }),
+              db.delete(exports).where(eq(exports.id, exportDb.id)),
+            ]);
+
+            for (const result of results) {
+              if (result.status === 'rejected')
+                logger.error('failed to clean up export', { error: result.reason, exportId: exportDb.id });
+            }
+          })();
+
+          return cleanup;
         }
 
         async function completeExport() {
@@ -198,21 +215,38 @@ export default typedPlugin(
           if (!completed) throw new ApiError(9005);
         }
 
-        writeStream.on('close', () => {
-          void completeExport().catch((error) => {
-            logger.error('failed to complete export', { error, exportId: exportDb.id });
-          });
-        });
+        void pipeline(zip, writeStream).then(completeExport).catch(failExport);
 
-        zip.on('error', (err) => {
-          logger.error('export zip error', { err, exportId: exportDb.id });
-        });
+        try {
+          let totalSize = 0;
+          for (const file of rows) {
+            const stream = await datasource.get(file.name);
+            if (cleanup) {
+              stream?.destroy();
+              throw new Error('Export was aborted');
+            }
 
-        zip.finalize();
+            if (!stream) {
+              logger.warn(`failed to get file ${file.name}`);
+              continue;
+            }
 
-        logger.info(`export for ${req.user.id} started`, { totalSize: bytes(totalSize) });
+            streams.push(stream);
+            stream.once('error', (error) => zip.destroy(error));
+            zip.append(stream, { name: file.name });
+            totalSize += file.size;
+            logger.debug('file added to zip', { name: file.name, size: file.size });
+          }
 
-        return res.send({ running: true });
+          void zip.finalize().catch(failExport);
+
+          logger.info(`export for ${req.user.id} started`, { totalSize: bytes(totalSize) });
+
+          return res.send({ running: true });
+        } catch (error) {
+          await failExport(error);
+          throw error;
+        }
       },
     );
   },

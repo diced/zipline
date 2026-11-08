@@ -1,4 +1,5 @@
 import {
+  AbortMultipartUploadCommand,
   CompleteMultipartUploadCommand,
   CopyObjectCommand,
   CreateMultipartUploadCommand,
@@ -7,6 +8,8 @@ import {
   GetObjectCommand,
   HeadObjectCommand,
   ListObjectsV2Command,
+  NoSuchKey,
+  NotFound,
   PutObjectCommand,
   S3Client,
   UploadPartCopyCommand,
@@ -25,6 +28,10 @@ import { Datasource, ListOptions, PutOptions } from './Datasource';
 
 function isOk(code: number) {
   return code >= 200 && code < 300;
+}
+
+function isMissingObject(error: unknown) {
+  return error instanceof NoSuchKey || error instanceof NotFound;
 }
 
 export class S3Datasource extends Datasource {
@@ -101,44 +108,34 @@ export class S3Datasource extends Datasource {
       });
 
       const writeRes = await this.client.send(putObject);
-      if (!isOk(writeRes.$metadata.httpStatusCode || 0)) {
-        this.logger
-          .error(
-            'there was an error while testing write access',
-            writeRes.$metadata as Record<string, unknown>,
-          )
-          .error('zipline will now exit');
-        process.exit(1);
-      }
+      if (!isOk(writeRes.$metadata.httpStatusCode || 0))
+        throw new Error(
+          `S3 access test write failed with status ${writeRes.$metadata.httpStatusCode ?? 'unknown'}`,
+        );
 
       const readRes = await this.client.send(readObject);
-      if (!isOk(readRes.$metadata.httpStatusCode || 0)) {
-        this.logger
-          .error('there was an error while testing read access', readRes.$metadata as Record<string, unknown>)
-          .error('zipline will now exit');
-        process.exit(1);
-      }
+      await readRes.Body?.transformToWebStream().cancel();
+      if (!isOk(readRes.$metadata.httpStatusCode || 0))
+        throw new Error(
+          `S3 access test read failed with status ${readRes.$metadata.httpStatusCode ?? 'unknown'}`,
+        );
+      if (!readRes.Body) throw new Error('S3 access test read returned no body');
 
       const deleteRes = await this.client.send(deleteObject);
-      if (!isOk(deleteRes.$metadata.httpStatusCode || 0)) {
-        this.logger
-          .error(
-            'there was an error while testing write access',
-            deleteRes.$metadata as Record<string, unknown>,
-          )
-          .error('zipline will now exit');
-        process.exit(1);
-      }
+      if (!isOk(deleteRes.$metadata.httpStatusCode || 0))
+        throw new Error(
+          `S3 access test delete failed with status ${deleteRes.$metadata.httpStatusCode ?? 'unknown'}`,
+        );
 
       this.logger.debug('access test successful');
+      this.logger.debug(`able to read/write bucket ${this.options.bucket}`);
     } catch (e) {
-      console.error(e);
       this.logger
-        .error('there was an error while testing access', e as Record<string, unknown>)
+        .error('there was an error while testing access', {
+          error: e instanceof Error ? e.message : e,
+        })
         .error('zipline will now exit');
       process.exit(1);
-    } finally {
-      this.logger.debug(`able to read/write bucket ${this.options.bucket}`);
     }
   }
 
@@ -152,19 +149,19 @@ export class S3Datasource extends Datasource {
       const res = await this.client.send(command);
 
       if (!isOk(res.$metadata.httpStatusCode || 0)) {
-        this.logger.error(
-          'there was an error while getting object',
-          res.$metadata as Record<string, unknown>,
-        );
-
-        return null;
+        await res.Body?.transformToWebStream().cancel();
+        throw new Error(`S3 get failed with status ${res.$metadata.httpStatusCode ?? 'unknown'}`);
       }
+      if (!res.Body) throw new Error('S3 get returned no body');
 
-      return Readable.fromWeb(res.Body!.transformToWebStream() as ReadableStream<any>);
+      return Readable.fromWeb(res.Body.transformToWebStream() as ReadableStream<any>);
     } catch (e) {
-      this.logger.error('there was an error while getting object', e as Record<string, unknown>);
+      if (isMissingObject(e)) return null;
 
-      return null;
+      this.logger.error('there was an error while getting object', {
+        error: e instanceof Error ? e.message : e,
+      });
+      throw e;
     }
   }
 
@@ -206,11 +203,12 @@ export class S3Datasource extends Datasource {
       });
       const res = await this.client.send(command);
 
-      if (!isOk(res.$metadata.httpStatusCode || 0)) {
+      if (!isOk(res.$metadata.httpStatusCode || 0))
         throw new Error(`S3 put failed with status ${res.$metadata.httpStatusCode ?? 'unknown'}`);
-      }
     } catch (e) {
-      this.logger.error('there was an error while putting object', e as Record<string, unknown>);
+      this.logger.error('there was an error while putting object', {
+        error: e instanceof Error ? e.message : e,
+      });
       throw e;
     }
   }
@@ -219,6 +217,13 @@ export class S3Datasource extends Datasource {
     let command: DeleteObjectCommand | DeleteObjectsCommand;
 
     if (Array.isArray(file)) {
+      if (!file.length) return;
+
+      if (file.length > 1000) {
+        for (let i = 0; i < file.length; i += 1000) await this.delete(file.slice(i, i + 1000));
+        return;
+      }
+
       command = new DeleteObjectsCommand({
         Bucket: this.options.bucket,
         Delete: {
@@ -235,13 +240,22 @@ export class S3Datasource extends Datasource {
     try {
       const res = await this.client.send(command as never);
 
-      if (!isOk(res.$metadata.httpStatusCode || 0)) {
-        this.logger.error('there was an error while deleting object');
-        this.logger.error('error metadata', res.$metadata as Record<string, unknown>);
+      if (!isOk(res.$metadata.httpStatusCode || 0))
+        throw new Error(`S3 delete failed with status ${res.$metadata.httpStatusCode ?? 'unknown'}`);
+
+      if ('Errors' in res && res.Errors?.length) {
+        const errors = res.Errors.map(
+          (error) => `${error.Key}: ${error.Code} (${error.Message ?? 'unknown error'})`,
+        );
+        throw new Error(`S3 delete failed: ${errors.join(', ')}`);
       }
     } catch (e) {
-      this.logger.error('there was an error while deleting object');
-      this.logger.error('error metadata', e as Record<string, unknown>);
+      if (!Array.isArray(file) && isMissingObject(e)) return;
+
+      this.logger.error('there was an error while deleting object', {
+        error: e instanceof Error ? e.message : e,
+      });
+      throw e;
     }
   }
 
@@ -254,75 +268,43 @@ export class S3Datasource extends Datasource {
     try {
       const res = await this.client.send(command);
 
-      if (!isOk(res.$metadata.httpStatusCode || 0)) {
-        this.logger.error('there was an error while getting object');
-        this.logger.error('error metadata', res.$metadata as Record<string, unknown>);
+      if (!isOk(res.$metadata.httpStatusCode || 0))
+        throw new Error(`S3 size failed with status ${res.$metadata.httpStatusCode ?? 'unknown'}`);
+      if (
+        typeof res.ContentLength !== 'number' ||
+        !Number.isSafeInteger(res.ContentLength) ||
+        res.ContentLength < 0
+      )
+        throw new Error('S3 size returned an invalid content length');
 
-        return 0;
-      }
-
-      return Number(res.ContentLength);
+      return res.ContentLength;
     } catch (e) {
-      this.logger.error('there was an error while getting object');
-      this.logger.error('error metadata', e as Record<string, unknown>);
+      if (isMissingObject(e)) return 0;
 
-      return 0;
+      this.logger.error('there was an error while getting object size', {
+        error: e instanceof Error ? e.message : e,
+      });
+      throw e;
     }
   }
 
   public async totalSize(): Promise<number> {
     let total = 0;
-    let continuationToken: string | undefined;
 
-    try {
-      do {
-        const res = await this.client.send(
-          new ListObjectsV2Command({
-            Bucket: this.options.bucket,
-            Prefix: this.options.subdirectory ?? undefined,
-            ContinuationToken: continuationToken,
-          }),
-        );
+    for await (const objects of this.listObjects()) {
+      for (const obj of objects) {
+        if (typeof obj.Size !== 'number' || !Number.isSafeInteger(obj.Size) || obj.Size < 0)
+          throw new Error('S3 list returned an invalid object size');
 
-        if (!isOk(res.$metadata.httpStatusCode || 0)) {
-          this.logger.error('there was an error while listing objects');
-          this.logger.error('error metadata', res.$metadata as Record<string, unknown>);
-
-          return 0;
-        }
-
-        total += res.Contents?.reduce((acc, obj) => acc + Number(obj.Size ?? 0), 0) ?? 0;
-        continuationToken = res.IsTruncated ? res.NextContinuationToken : undefined;
-      } while (continuationToken);
-
-      return total;
-    } catch (e) {
-      this.logger.error('there was an error while listing objects');
-      this.logger.error('error metadata', e as Record<string, unknown>);
-
-      return 0;
+        total += obj.Size;
+      }
     }
+
+    return total;
   }
 
   public async clear(): Promise<void> {
-    const command = new DeleteObjectsCommand({
-      Bucket: this.options.bucket,
-      Delete: {
-        Objects: [],
-      },
-    });
-
-    try {
-      const res = await this.client.send(command);
-
-      if (!isOk(res.$metadata.httpStatusCode || 0)) {
-        this.logger.error('there was an error while deleting objects');
-        this.logger.error('error metadata', res.$metadata as Record<string, unknown>);
-      }
-    } catch (e) {
-      this.logger.error('there was an error while deleting objects');
-      this.logger.error('error metadata', e as Record<string, unknown>);
-    }
+    await this.delete(await this.list());
   }
 
   public async range(file: string, start: number, end: number): Promise<Readable> {
@@ -336,166 +318,138 @@ export class S3Datasource extends Datasource {
       const res = await this.client.send(command);
 
       if (res.$metadata.httpStatusCode !== 206) {
-        this.logger.error('there was an error while getting object range');
-        this.logger.error('error metadata', res.$metadata as Record<string, unknown>);
-
-        return Readable.fromWeb(new ReadableStream());
+        await res.Body?.transformToWebStream().cancel();
+        throw new Error(`S3 range failed with status ${res.$metadata.httpStatusCode ?? 'unknown'}`);
       }
+      if (!res.Body) throw new Error('S3 range returned no body');
 
-      return Readable.fromWeb(res.Body!.transformToWebStream() as ReadableStream<any>);
+      return Readable.fromWeb(res.Body.transformToWebStream() as ReadableStream<any>);
     } catch (e) {
-      this.logger.error('there was an error while getting object range');
-      this.logger.error('error metadata', e as Record<string, unknown>);
-
-      return Readable.fromWeb(new ReadableStream());
+      this.logger.error('there was an error while getting object range', {
+        error: e instanceof Error ? e.message : e,
+      });
+      throw e;
     }
   }
 
   public async rename(from: string, to: string): Promise<void> {
-    const size = await this.size(from);
-
-    if (size !== 0 && size > 5 * 1024 * 1024 * 1024) {
-      this.logger.debug('object larger than 5GB, using multipart copy for rename', { from, to, size });
-
-      const createCommand = new CreateMultipartUploadCommand({
-        Bucket: this.options.bucket,
-        Key: this.key(to),
-      });
-
-      let uploadId: string;
-      try {
-        const createRes = await this.client.send(createCommand);
-        if (!isOk(createRes.$metadata.httpStatusCode || 0)) {
-          this.logger.error('there was an error while initiating multipart upload');
-          this.logger.error('error metadata', createRes.$metadata as Record<string, unknown>);
-          throw new Error('Failed to initiate multipart upload');
-        }
-
-        if (!createRes.UploadId) {
-          this.logger.error('no upload ID returned while initiating multipart upload');
-          throw new Error('Failed to initiate multipart upload');
-        }
-
-        uploadId = createRes.UploadId;
-      } catch (e) {
-        this.logger.error('there was an error while initiating multipart upload');
-        this.logger.error('error metadata', e as Record<string, unknown>);
-
-        throw new Error('Failed to initiate multipart upload');
+    try {
+      if (from === to) {
+        const res = await this.client.send(
+          new HeadObjectCommand({ Bucket: this.options.bucket, Key: this.key(from) }),
+        );
+        if (!isOk(res.$metadata.httpStatusCode || 0))
+          throw new Error(`S3 rename failed with status ${res.$metadata.httpStatusCode ?? 'unknown'}`);
+        return;
       }
 
-      const partSize = 5 * 1024 * 1024;
-      const eTags = [];
+      const size = await this.size(from);
+      const copySource = `${this.options.bucket}/${this.key(from)}`
+        .split('/')
+        .map(encodeURIComponent)
+        .join('/');
 
-      for (let start = 0, part = 1; start < size; start += partSize, part++) {
-        const end = Math.min(start + partSize - 1, size - 1);
+      if (size > 5 * 1024 * 1024 * 1024) {
+        this.logger.debug('object larger than 5GB, using multipart copy for rename', { from, to, size });
 
-        const uploadPartCopyCommand = new UploadPartCopyCommand({
-          Bucket: this.options.bucket,
-          Key: this.key(to),
-          CopySource: this.options.bucket + '/' + this.key(from),
-          CopySourceRange: `bytes=${start}-${end}`,
-          PartNumber: part,
-          UploadId: uploadId,
-        });
-
+        let uploadId: string | undefined;
         try {
-          const copyRes = await this.client.send(uploadPartCopyCommand);
-          if (!isOk(copyRes.$metadata.httpStatusCode || 0)) {
-            this.logger.error('there was an error while copying part of the object');
-            this.logger.error('error metadata', copyRes.$metadata as Record<string, unknown>);
-            throw new Error('Failed to copy part of the object');
+          const createRes = await this.client.send(
+            new CreateMultipartUploadCommand({
+              Bucket: this.options.bucket,
+              Key: this.key(to),
+            }),
+          );
+          uploadId = createRes.UploadId;
+          if (!isOk(createRes.$metadata.httpStatusCode || 0))
+            throw new Error(
+              `S3 multipart copy creation failed with status ${createRes.$metadata.httpStatusCode ?? 'unknown'}`,
+            );
+          if (!uploadId) throw new Error('S3 multipart copy returned no upload ID');
+
+          const partSize = 5 * 1024 * 1024;
+          const eTags = [];
+
+          for (let start = 0, part = 1; start < size; start += partSize, part++) {
+            const end = Math.min(start + partSize - 1, size - 1);
+            const copyRes = await this.client.send(
+              new UploadPartCopyCommand({
+                Bucket: this.options.bucket,
+                Key: this.key(to),
+                CopySource: copySource,
+                CopySourceRange: `bytes=${start}-${end}`,
+                PartNumber: part,
+                UploadId: uploadId,
+              }),
+            );
+            if (!isOk(copyRes.$metadata.httpStatusCode || 0))
+              throw new Error(
+                `S3 multipart copy part failed with status ${copyRes.$metadata.httpStatusCode ?? 'unknown'}`,
+              );
+            if (!copyRes.CopyPartResult?.ETag) throw new Error('S3 multipart copy part returned no ETag');
+
+            eTags.push({ ETag: copyRes.CopyPartResult.ETag, PartNumber: part });
           }
 
-          eTags.push({ ETag: copyRes.CopyPartResult?.ETag, PartNumber: part });
+          const completeRes = await this.client.send(
+            new CompleteMultipartUploadCommand({
+              Bucket: this.options.bucket,
+              Key: this.key(to),
+              UploadId: uploadId,
+              MultipartUpload: { Parts: eTags },
+            }),
+          );
+          if (!isOk(completeRes.$metadata.httpStatusCode || 0))
+            throw new Error(
+              `S3 multipart copy completion failed with status ${completeRes.$metadata.httpStatusCode ?? 'unknown'}`,
+            );
         } catch (e) {
-          this.logger.error('there was an error while renaming object using multipart copy');
-          this.logger.error('error metadata', e as Record<string, unknown>);
-
-          throw new Error('Failed to rename object using multipart copy');
+          if (uploadId) {
+            try {
+              const abortRes = await this.client.send(
+                new AbortMultipartUploadCommand({
+                  Bucket: this.options.bucket,
+                  Key: this.key(to),
+                  UploadId: uploadId,
+                }),
+              );
+              if (!isOk(abortRes.$metadata.httpStatusCode || 0))
+                throw new Error(
+                  `S3 multipart copy abort failed with status ${abortRes.$metadata.httpStatusCode ?? 'unknown'}`,
+                );
+            } catch (error) {
+              this.logger.error('failed to abort multipart copy', {
+                error: error instanceof Error ? error.message : error,
+              });
+            }
+          }
+          throw e;
         }
+      } else {
+        const copyRes = await this.client.send(
+          new CopyObjectCommand({
+            Bucket: this.options.bucket,
+            Key: this.key(to),
+            CopySource: copySource,
+          }),
+        );
+        if (!isOk(copyRes.$metadata.httpStatusCode || 0))
+          throw new Error(`S3 copy failed with status ${copyRes.$metadata.httpStatusCode ?? 'unknown'}`);
+        if (!copyRes.CopyObjectResult?.ETag) throw new Error('S3 copy returned no ETag');
       }
 
-      const completeMultipartUploadCommand = new CompleteMultipartUploadCommand({
-        Bucket: this.options.bucket,
-        Key: this.key(to),
-        UploadId: uploadId,
-        MultipartUpload: {
-          Parts: eTags,
-        },
-      });
-
-      try {
-        const completeRes = await this.client.send(completeMultipartUploadCommand);
-        if (!isOk(completeRes.$metadata.httpStatusCode || 0)) {
-          this.logger.error('there was an error while completing multipart upload');
-          this.logger.error('error metadata', completeRes.$metadata as Record<string, unknown>);
-          throw new Error('Failed to complete multipart upload');
-        }
-      } catch (e) {
-        this.logger.error('there was an error while completing multipart upload');
-        this.logger.error('error metadata', e as Record<string, unknown>);
-
-        throw new Error('Failed to complete multipart upload');
-      }
-
-      const deleteCommand = new DeleteObjectCommand({
-        Bucket: this.options.bucket,
-        Key: this.key(from),
-      });
-
-      try {
-        const deleteRes = await this.client.send(deleteCommand);
-        if (!isOk(deleteRes.$metadata.httpStatusCode || 0)) {
-          this.logger.error('there was an error while deleting old object');
-          this.logger.error('error metadata', deleteRes.$metadata as Record<string, unknown>);
-          throw new Error('Failed to delete old object');
-        }
-      } catch (e) {
-        this.logger.error('there was an error while deleting old object');
-        this.logger.error('error metadata', e as Record<string, unknown>);
-
-        throw new Error('Failed to delete old object');
-      }
-
-      return;
-    }
-
-    const copyCommand = new CopyObjectCommand({
-      Bucket: this.options.bucket,
-      Key: this.key(to),
-      CopySource: this.options.bucket + '/' + this.key(from),
-    });
-
-    const deleteCommand = new DeleteObjectCommand({
-      Bucket: this.options.bucket,
-      Key: this.key(from),
-    });
-
-    try {
-      const copyRes = await this.client.send(copyCommand);
-      if (!isOk(copyRes.$metadata.httpStatusCode || 0)) {
-        this.logger.error('there was an error while copying object');
-        this.logger.error('error metadata', copyRes.$metadata as Record<string, unknown>);
-        throw new Error('Failed to copy object');
-      }
-
-      const deleteRes = await this.client.send(deleteCommand);
-      if (!isOk(deleteRes.$metadata.httpStatusCode || 0)) {
-        this.logger.error('there was an error while deleting old object');
-        this.logger.error('error metadata', deleteRes.$metadata as Record<string, unknown>);
-        throw new Error('Failed to delete old object');
-      }
+      await this.delete(from);
     } catch (e) {
-      this.logger.error('there was an error while renaming object');
-      this.logger.error('error metadata', e as Record<string, unknown>);
-
-      throw new Error('Failed to rename object');
+      this.logger.error('there was an error while renaming object', {
+        error: e instanceof Error ? e.message : e,
+      });
+      throw e;
     }
   }
 
-  public async list(options: ListOptions = { prefix: '' }): Promise<string[]> {
-    const files: string[] = [];
+  private async *listObjects(prefix = '', delimiter?: string) {
+    const storagePrefix = this.key('');
+    const continuationTokens = new Set<string>();
     let continuationToken: string | undefined;
 
     try {
@@ -503,36 +457,47 @@ export class S3Datasource extends Datasource {
         const res = await this.client.send(
           new ListObjectsV2Command({
             Bucket: this.options.bucket,
-            Prefix: this.key(options.prefix || ''),
-            Delimiter: this.options.subdirectory ? undefined : '/',
+            Prefix: this.key(prefix),
+            Delimiter: delimiter,
             ContinuationToken: continuationToken,
           }),
         );
 
-        if (!isOk(res.$metadata.httpStatusCode || 0)) {
-          this.logger.error('there was an error while listing objects');
-          this.logger.error('error metadata', res.$metadata as Record<string, unknown>);
+        if (!isOk(res.$metadata.httpStatusCode || 0))
+          throw new Error(`S3 list failed with status ${res.$metadata.httpStatusCode ?? 'unknown'}`);
 
-          return [];
-        }
-
-        for (const obj of res.Contents ?? []) {
-          if (this.options.subdirectory) {
-            files.push(obj.Key!.replace(this.options.subdirectory + '/', ''));
-          } else {
-            files.push(obj.Key!);
-          }
-        }
+        for (const obj of res.Contents ?? [])
+          if (typeof obj.Key !== 'string' || !obj.Key.startsWith(storagePrefix))
+            throw new Error('S3 list returned an invalid object key');
 
         continuationToken = res.IsTruncated ? res.NextContinuationToken : undefined;
+        if (res.IsTruncated) {
+          if (!continuationToken || continuationTokens.has(continuationToken))
+            throw new Error('S3 list returned an invalid continuation token');
+
+          continuationTokens.add(continuationToken);
+        }
+
+        yield res.Contents ?? [];
       } while (continuationToken);
-
-      return files;
     } catch (e) {
-      this.logger.error('there was an error while listing objects');
-      this.logger.error('error metadata', e as Record<string, unknown>);
-
-      return [];
+      this.logger.error('there was an error while listing objects', {
+        error: e instanceof Error ? e.message : e,
+      });
+      throw e;
     }
+  }
+
+  public async list(options: ListOptions = { prefix: '' }): Promise<string[]> {
+    const files: string[] = [];
+    const storagePrefix = this.key('');
+
+    for await (const objects of this.listObjects(
+      options.prefix || '',
+      this.options.subdirectory ? undefined : '/',
+    ))
+      for (const obj of objects) files.push(obj.Key!.slice(storagePrefix.length));
+
+    return files;
   }
 }
