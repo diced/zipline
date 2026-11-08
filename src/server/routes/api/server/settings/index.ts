@@ -1,14 +1,14 @@
 import { ApiError } from '@/lib/api/errors';
 import { bytes } from '@/lib/bytes';
 import { checkOutput, COMPRESS_TYPES } from '@/lib/compress';
-import { config, reloadSettings } from '@/lib/config';
+import { applySettings, prepareSettings } from '@/lib/config';
 import { DATABASE_TO_PROP, type readDatabaseSettings } from '@/lib/config/read/db';
-import { getProperty } from '@/lib/config/read/transform';
 import { safeConfig } from '@/lib/config/safe';
 import {
+  schema as configSchema,
+  discordContent,
   MAX_SAFE_TIMEOUT_MS,
   MIME_REGEX,
-  schema as configSchema,
   trustedProxiesSchema,
 } from '@/lib/config/validate';
 import { db } from '@/lib/db';
@@ -35,10 +35,10 @@ export type ApiServerSettingsWebResponse = {
   config: ReturnType<typeof safeConfig>;
   codeMap: { ext: string; mime: string; name: string }[];
 };
-const jsonTransform = (value: any, ctx: z.RefinementCtx) => {
+const jsonTransform = (value: unknown, ctx: z.RefinementCtx) => {
   if (typeof value !== 'string') return value;
   try {
-    return JSON.parse(value);
+    return JSON.parse(value) as unknown;
   } catch {
     ctx.addIssue({ code: 'custom', message: 'Invalid JSON' });
     return z.NEVER;
@@ -46,49 +46,51 @@ const jsonTransform = (value: any, ctx: z.RefinementCtx) => {
 };
 
 const zMs = zStringTrimmed.refine(
-  (value) => ms((value ?? '0') as StringValue) > 0,
+  (value) => value.length > 0 && ms(value as StringValue) > 0,
   'Value must be greater than 0',
 );
 const zBytes = zStringTrimmed.refine((value) => bytes(value) > 0, 'Value must be greater than 0');
 
 const zIntervalMs = zStringTrimmed
-  .refine((value) => ms((value ?? '0') as StringValue) >= 0, 'Value must be greater than or equal to 0')
   .refine(
-    (value) => ms(value as StringValue) <= MAX_SAFE_TIMEOUT_MS,
+    (value) => value.length > 0 && ms(value as StringValue) >= 0,
+    'Value must be greater than or equal to 0',
+  )
+  .refine(
+    (value) => value.length > 0 && ms(value as StringValue) <= MAX_SAFE_TIMEOUT_MS,
     `Value must be less than or equal to ${MAX_SAFE_TIMEOUT_MS}ms`,
   );
 
-const discordEmbed = z
-  .union([
-    z
-      .object({
-        title: z.string().nullable().default(null),
-        description: z.string().nullable().default(null),
-        footer: z.string().nullable().default(null),
-        color: z
-          .string()
-          .regex(/^#?([a-f0-9]{6}|[a-f0-9]{3})$/)
-          .nullable()
-          .default(null),
-        thumbnail: z.boolean().default(false),
-        imageOrVideo: z.boolean().default(false),
-        timestamp: z.boolean().default(false),
-        url: z.boolean().default(false),
-      })
-      .transform((value) => (Object.keys(value || {}).length ? value : null)),
-    z.string(),
-  ])
-  .nullable()
-  .transform(jsonTransform)
-  .transform((value) =>
-    typeof value === 'object' ? (Object.keys(value || {}).length ? value : null) : value,
-  );
+const discordEmbed = z.preprocess(jsonTransform, discordContent.unwrap().unwrap().shape.embed);
 
 const logger = log('api').c('server').c('settings');
+
+function invalidSettings(error: z.ZodError) {
+  const issues = error.issues.map((issue) => {
+    const path = issue.path.join('.');
+    const fields = Object.entries(DATABASE_TO_PROP)
+      .filter(
+        ([field, property]) =>
+          issue.path[0] === field ||
+          path === property ||
+          path.startsWith(`${property}.`) ||
+          property.startsWith(`${path}.`),
+      )
+      .map(([field]) => field);
+
+    return { ...issue, path: fields.length ? fields : issue.path };
+  });
+
+  logger.warn('invalid settings update', { issues });
+
+  return new ApiError(1022).add('issues', issues);
+}
 
 export const PATH = '/api/server/settings';
 export default typedPlugin(
   async (server) => {
+    let pendingUpdate = Promise.resolve();
+
     server.get(
       PATH,
       {
@@ -133,9 +135,6 @@ export default typedPlugin(
       async (req, res) => {
         if (req.user.role !== 'SUPERADMIN') throw new ApiError(3015);
 
-        const [settings] = await db.select({ id: zipline.id }).from(zipline).limit(1);
-        if (!settings) throw new ApiError(4010);
-
         const availableThemes = await readThemes();
         const themes = availableThemes.map((theme) => theme.id);
 
@@ -174,30 +173,33 @@ export default typedPlugin(
                 (value) => !RESERVED_ROUTES.some((route) => value.startsWith(route)),
                 'Provided route is reserved',
               ),
-            filesLength: z.number().min(1).max(64),
+            filesLength: z.number().int().min(1).max(64),
             filesDisabledTypes: z.array(z.string().regex(MIME_REGEX, 'Invalid MIME type')),
             filesDisabledTypesDefault: z.string().regex(MIME_REGEX, 'Invalid MIME type').nullable(),
-            filesDefaultFormat: z.enum(['random', 'date', 'uuid', 'name', 'gfycat']),
+            filesDefaultFormat: z.enum(['random', 'date', 'uuid', 'name', 'gfycat', 'random-words']),
             filesDisabledExtensions: z
-              .union([
-                z.array(z.string().refine((s) => !s.startsWith('.'), 'extension can\'t include "."')),
-                z.string(),
-              ])
+              .union([z.array(z.string()), z.string()])
               .transform((value) =>
-                typeof value === 'string' ? value.split(',').map((ext) => ext.trim()) : value,
-              ),
+                typeof value === 'string'
+                  ? value
+                      .split(',')
+                      .map((ext) => ext.trim())
+                      .filter(Boolean)
+                  : value,
+              )
+              .pipe(z.array(z.string().refine((s) => !s.startsWith('.'), 'extension can\'t include "."'))),
             filesMaxFileSize: zBytes,
             filesDefaultExpiration: zMs.nullable(),
             filesMaxExpiration: zMs.nullable(),
             filesAssumeMimetypes: z.boolean(),
             filesDefaultDateFormat: z.string(),
             filesRemoveGpsMetadata: z.boolean(),
-            filesRandomWordsNumAdjectives: z.number().min(1).max(20),
+            filesRandomWordsNumAdjectives: z.number().int().min(1).max(20),
             filesRandomWordsSeparator: z.string(),
             filesDefaultCompressionFormat: z
               .enum(COMPRESS_TYPES)
               .refine((v) => checkOutput(v), 'System does not support outputting this image format.'),
-            filesMaxFilesPerUpload: z.number().min(1).max(2147483647),
+            filesMaxFilesPerUpload: z.number().int().min(1).max(2147483647),
             filesExtensionlessUrls: z.boolean(),
 
             urlsRoute: z
@@ -207,7 +209,7 @@ export default typedPlugin(
                 (value) => !RESERVED_ROUTES.some((route) => value.startsWith(route)),
                 'Provided route is reserved',
               ),
-            urlsLength: z.number().min(1).max(64),
+            urlsLength: z.number().int().min(1).max(64),
 
             featuresImageCompression: z.boolean(),
             featuresRobotsTxt: z.boolean(),
@@ -219,6 +221,7 @@ export default typedPlugin(
             featuresThumbnailsEnabled: z.boolean(),
             featuresThumbnailsNumberThreads: z
               .number()
+              .int()
               .min(1)
               .max(
                 cpus().length,
@@ -234,21 +237,11 @@ export default typedPlugin(
             featuresVersionChecking: z.boolean(),
 
             invitesEnabled: z.boolean(),
-            invitesLength: z.number().min(1).max(64),
+            invitesLength: z.number().int().min(1).max(64),
 
             websiteTitle: z.string(),
             websiteTitleLogo: z.url().nullable(),
-            websiteExternalLinks: z
-              .union([
-                z.array(
-                  z.object({
-                    name: z.string(),
-                    url: z.url(),
-                  }),
-                ),
-                z.string(),
-              ])
-              .transform(jsonTransform),
+            websiteExternalLinks: z.preprocess(jsonTransform, configSchema.shape.website.shape.externalLinks),
             websiteLoginBackground: z.url().nullable(),
             websiteLoginBackgroundBlur: z.boolean(),
             websiteDefaultAvatar: z
@@ -355,8 +348,8 @@ export default typedPlugin(
               .nullable(),
 
             ratelimitEnabled: z.boolean(),
-            ratelimitMax: z.number().refine((value) => value > 0, 'Value must be greater than 0'),
-            ratelimitWindow: z.number().nullable(),
+            ratelimitMax: z.number().int().min(1).max(2147483647),
+            ratelimitWindow: z.number().int().min(0).max(2147483647).nullable(),
             ratelimitAdminBypass: z.boolean(),
             ratelimitAllowList: z
               .union([z.array(z.string()), z.string()])
@@ -388,121 +381,70 @@ export default typedPlugin(
             pwaThemeColor: z.string().regex(/^#?([a-f0-9]{6}|[a-f0-9]{3})$/, 'Invalid Color'),
             pwaBackgroundColor: z.string().regex(/^#?([a-f0-9]{6}|[a-f0-9]{3})/, 'Invalid Color'),
 
-            domains: z.union([
-              z.array(
-                z
-                  .string()
-                  .regex(
-                    /^(?:[a-zA-Z0-9_](?:[a-zA-Z0-9_-]{0,61}[a-zA-Z0-9_])?\.)+[a-zA-Z]{2,63}$/i,
-                    'Invalid Domain',
-                  ),
+            domains: z
+              .union([z.array(z.string()), z.string()])
+              .transform((value) =>
+                typeof value === 'string'
+                  ? value
+                      .split(',')
+                      .map((domain) => domain.trim())
+                      .filter(Boolean)
+                  : value,
+              )
+              .pipe(
+                z.array(
+                  z
+                    .string()
+                    .regex(
+                      /^(?:[a-zA-Z0-9_](?:[a-zA-Z0-9_-]{0,61}[a-zA-Z0-9_])?\.)+[a-zA-Z]{2,63}$/i,
+                      'Invalid Domain',
+                    ),
+                ),
               ),
-              z.string().transform((value) => value.split(',').map((s) => s.trim())),
-            ]),
           })
           .partial()
-          .superRefine((data, ctx) => {
-            const providers = {
-              discord: ['oauthDiscordClientId', 'oauthDiscordClientSecret', 'oauthDiscordRedirectUri'],
-              google: ['oauthGoogleClientId', 'oauthGoogleClientSecret', 'oauthGoogleRedirectUri'],
-              github: ['oauthGithubClientId', 'oauthGithubClientSecret', 'oauthGithubRedirectUri'],
-              oidc: [
-                'oauthOidcClientId',
-                'oauthOidcClientSecret',
-                'oauthOidcAuthorizeUrl',
-                'oauthOidcTokenUrl',
-                'oauthOidcUserinfoUrl',
-                'oauthOidcEndSessionUrl',
-                'oauthOidcRedirectUri',
-              ],
-            } satisfies Record<string, (keyof Settings)[]>;
-
-            for (const [provider, fields] of Object.entries(providers)) {
-              if (!fields.some((field) => data[field] !== undefined)) continue;
-
-              const values = Object.fromEntries(
-                fields.map((field) => {
-                  const value =
-                    data[field] !== undefined && !global.__tamperedConfig__?.includes(field)
-                      ? data[field]
-                      : getProperty(config, DATABASE_TO_PROP[field]);
-
-                  return [DATABASE_TO_PROP[field].split('.')[2], value ?? undefined];
-                }),
-              );
-
-              if (
-                !configSchema.shape.oauth.shape[provider as keyof typeof providers].safeParse(values).success
-              ) {
-                ctx.addIssue({
-                  code: 'custom',
-                  message: `${provider} oauth fields are incomplete`,
-                  path: fields,
-                });
-              }
-            }
-          })
-          .refine((data) => !data.ratelimitWindow || (data.ratelimitMax && data.ratelimitMax > 0), {
-            message: 'ratelimitMax must be set if ratelimitWindow is set',
-            path: ['ratelimitMax'],
-          })
-          .superRefine((data, ctx) => {
-            if (!data.filesDefaultExpiration || !data.filesMaxExpiration) return;
-
-            const def = ms(data.filesDefaultExpiration as StringValue);
-            const max = ms(data.filesMaxExpiration as StringValue);
-
-            if (def > max) {
-              ctx.addIssue({
-                code: 'custom',
-                message: 'filesDefaultExpiration must be less than or equal to filesMaxExpiration',
-                path: ['filesDefaultExpiration'],
-              });
-            }
-          })
-          .superRefine((data, ctx) => {
-            if (data.mfaPasskeysEnabled) {
-              if (!data.mfaPasskeysRpID || data.mfaPasskeysRpID.length === 0) {
-                ctx.addIssue({
-                  path: ['mfaPasskeysRpID'],
-                  message: 'RP ID is required when passkeys are enabled',
-                  code: 'custom',
-                });
-              }
-
-              if (!data.mfaPasskeysOrigin || data.mfaPasskeysOrigin.length === 0) {
-                ctx.addIssue({
-                  path: ['mfaPasskeysOrigin'],
-                  message: 'Origin is required when passkeys are enabled',
-                  code: 'custom',
-                });
-              }
-            }
-          })
           .refine((data) => Object.keys(data).length > 0, {
             message: 'No settings provided to update',
           });
 
         const result = settingsBodySchema.safeParse(req.body);
-        if (!result.success) {
-          logger.warn('invalid settings update', {
-            issues: result.error.issues,
+        if (!result.success) throw invalidSettings(result.error);
+
+        const update = pendingUpdate.then(async () => {
+          const updated = await db.transaction(async (tx) => {
+            const [settings] = await tx.select().from(zipline).limit(1).for('update');
+            if (!settings) throw new ApiError(4010);
+
+            let prepared;
+            try {
+              prepared = await prepareSettings({ ...settings, ...result.data });
+            } catch (error) {
+              if (error instanceof z.ZodError) throw invalidSettings(error);
+              throw error;
+            }
+
+            const newSettings = await updateSettings(settings.id, result.data, tx);
+            if (!newSettings) throw new ApiError(4010);
+
+            return { settings: newSettings, prepared };
           });
 
-          throw new ApiError(1022).add('issues', result.error.issues);
-        }
+          applySettings(updated.prepared);
+          return updated;
+        });
 
-        const newSettings = await updateSettings(settings.id, result.data);
-        if (!newSettings) throw new ApiError(4010);
-
-        await reloadSettings();
+        pendingUpdate = update.then(
+          () => undefined,
+          () => undefined,
+        );
+        const updated = await update;
 
         logger.info('settings updated', {
           updated: Object.keys(result.data),
           by: req.user.username,
         });
 
-        return res.send({ settings: newSettings, tampered: global.__tamperedConfig__ || [] });
+        return res.send({ settings: updated.settings, tampered: updated.prepared.tampered });
       },
     );
   },

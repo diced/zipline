@@ -63,6 +63,21 @@ const intervalSchema = (defaultValue: string) =>
     .default(defaultValue)
     .refine(validateInterval, `Value must be less than or equal to ${MAX_SAFE_TIMEOUT_MS}ms`);
 
+function expirationMs(value: string): number | undefined {
+  try {
+    const duration = ms(value as StringValue);
+    return Number.isFinite(duration) && duration > 0 ? duration : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+const expirationSchema = z
+  .string()
+  .refine((value) => expirationMs(value) !== undefined, 'Value must be greater than 0')
+  .nullable()
+  .default(null);
+
 export const discordContent = z
   .object({
     webhookUrl: z.url().nullable().default(null),
@@ -92,7 +107,7 @@ export const discordContent = z
 
 export const trustedProxiesSchema = z.array(z.union([z.ipv4(), z.ipv6(), z.cidrv4(), z.cidrv6()]));
 
-export const schema = z.object({
+const configSchema = z.object({
   core: z.object({
     port: z.number().default(3000),
     hostname: z.string().default('0.0.0.0'),
@@ -168,8 +183,8 @@ export const schema = z.object({
     disabledTypesDefault: z.string().nullable().default(null),
     disabledExtensions: z.array(z.string()).default([]),
     maxFileSize: z.string().default('100mb'),
-    defaultExpiration: z.string().nullable().default(null),
-    maxExpiration: z.string().nullable().default(null),
+    defaultExpiration: expirationSchema,
+    maxExpiration: expirationSchema,
     assumeMimetypes: z.boolean().default(false),
     defaultDateFormat: z.string().default('YYYY-MM-DD_HH:mm:ss'),
     removeGpsMetadata: z.boolean().default(false),
@@ -425,6 +440,42 @@ export const schema = z.object({
   }),
 });
 
+export const schema = configSchema.superRefine((config, ctx) => {
+  if (config.mfa.passkeys.enabled) {
+    if (!config.mfa.passkeys.rpID)
+      ctx.addIssue({
+        code: 'custom',
+        message: 'RP ID is required when passkeys are enabled',
+        path: ['mfa', 'passkeys', 'rpID'],
+      });
+
+    if (!config.mfa.passkeys.origin)
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Origin is required when passkeys are enabled',
+        path: ['mfa', 'passkeys', 'origin'],
+      });
+  }
+
+  if (config.ratelimit.window && config.ratelimit.max <= 0)
+    ctx.addIssue({
+      code: 'custom',
+      message: 'ratelimitMax must be set if ratelimitWindow is set',
+      path: ['ratelimit', 'max'],
+    });
+
+  const defaultExpiration = config.files.defaultExpiration
+    ? expirationMs(config.files.defaultExpiration)
+    : undefined;
+  const maxExpiration = config.files.maxExpiration ? expirationMs(config.files.maxExpiration) : undefined;
+  if (defaultExpiration !== undefined && maxExpiration !== undefined && defaultExpiration > maxExpiration)
+    ctx.addIssue({
+      code: 'custom',
+      message: 'filesDefaultExpiration must be less than or equal to filesMaxExpiration',
+      path: ['files', 'defaultExpiration'],
+    });
+});
+
 export type Config = z.infer<typeof schema>;
 
 const logger = log('config').c('validate');
@@ -446,7 +497,7 @@ export function validateConfigObject(env: ParsedConfig): Config {
       handleError(error);
     }
 
-    process.exit(1);
+    throw validated.error;
   }
 
   logger.debug('reloaded config');

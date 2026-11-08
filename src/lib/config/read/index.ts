@@ -3,7 +3,7 @@ import { DATABASE_TO_PROP, DatabaseToPropKey, readDatabaseSettings } from './db'
 import { readEnv } from './env';
 import { setProperty } from './transform';
 
-export type ParsedConfig = ReturnType<typeof read>;
+export type ParsedConfig = Awaited<ReturnType<typeof read>>['config'];
 
 export const rawConfig: any = {
   core: {
@@ -154,28 +154,21 @@ export const rawConfig: any = {
 
 const logger = log('config').c('read');
 
-export async function read() {
-  const database = (await readDatabaseSettings()) as Record<string, any>;
+export async function read(settings?: Awaited<ReturnType<typeof readDatabaseSettings>>) {
+  const database = structuredClone(settings ?? (await readDatabaseSettings())) as Record<string, any>;
   const { dbEnv, env } = readEnv();
-
-  if (global.__tamperedConfig__) {
-    global.__tamperedConfig__ = [];
-  }
+  const tampered: string[] = [];
 
   // this overwrites database settings with provided env vars if they exist
   for (const [propPath, val] of Object.entries(dbEnv)) {
     const col = Object.entries(DATABASE_TO_PROP).find(([_colName, path]) => path === propPath)?.[0];
     if (col) {
       database[col] = val;
-      if (!global.__tamperedConfig__) {
-        global.__tamperedConfig__ = [];
-      }
-
-      global.__tamperedConfig__.push(col);
+      tampered.push(col);
     }
   }
 
-  logger.debug('overridden db settings from env vars', { overridden: global.__tamperedConfig__ });
+  logger.debug('overridden db settings from env vars', { overridden: tampered });
 
   const raw = structuredClone(rawConfig);
 
@@ -200,5 +193,5 @@ export async function read() {
     setProperty(raw, key, value);
   }
 
-  return raw;
+  return { config: raw, tampered };
 }

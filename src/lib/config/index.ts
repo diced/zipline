@@ -1,5 +1,6 @@
 import { readFile } from 'fs/promises';
 import { read } from './read';
+import type { readDatabaseSettings } from './read/db';
 import { validateConfigObject, Config } from './validate';
 import { log } from '../logger';
 
@@ -16,23 +17,32 @@ declare global {
   var __cachedConfigValues__: Partial<CachedConfig>;
 }
 
-const reloadSettings = async () => {
-  config = global.__config__ = validateConfigObject((await read()) as any);
+async function prepareSettings(settings?: Awaited<ReturnType<typeof readDatabaseSettings>>) {
+  const { config: parsed, tampered } = await read(settings);
+  const validated = validateConfigObject(parsed);
+  const cachedValues: Partial<CachedConfig> = { tos: null };
 
-  if (!global.__cachedConfigValues__) {
-    global.__cachedConfigValues__ = {};
-
-    if (config.website.tos) {
-      try {
-        const tos = await readFile(config.website.tos, 'utf-8');
-        global.__cachedConfigValues__.tos = tos;
-      } catch {
-        log('config').error('failed to read tos', { path: config.website.tos });
-      }
+  if (validated.website?.tos) {
+    try {
+      cachedValues.tos = await readFile(validated.website.tos, 'utf-8');
+    } catch {
+      log('config').error('failed to read tos', { path: validated.website.tos });
     }
   }
-};
+
+  return { config: validated, tampered, cachedValues };
+}
+
+function applySettings(settings: Awaited<ReturnType<typeof prepareSettings>>) {
+  config = global.__config__ = settings.config;
+  global.__tamperedConfig__ = settings.tampered;
+  global.__cachedConfigValues__ = settings.cachedValues;
+}
+
+async function reloadSettings() {
+  applySettings(await prepareSettings());
+}
 
 config = global.__config__;
 
-export { config, reloadSettings };
+export { applySettings, config, prepareSettings, reloadSettings };

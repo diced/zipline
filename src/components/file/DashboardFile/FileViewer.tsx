@@ -149,23 +149,64 @@ export default function FileViewer({
 
   const tagsCombobox = useCombobox();
 
-  const [value, setValue] = useState<string[]>(() => file?.tags?.map((x) => x.id) ?? []);
+  const fileTags = useMemo(() => file?.tags?.map((tag) => tag.id) ?? [], [file?.tags]);
+  const [tagState, setTagState] = useState(() => ({
+    fileId: file?.id,
+    fileTags,
+    open,
+    value: fileTags,
+    dirty: false,
+  }));
+  const value = tagState.fileId === file?.id ? tagState.value : fileTags;
+
+  if (tagState.fileId !== file?.id || tagState.fileTags !== fileTags || tagState.open !== open) {
+    const dirty = tagState.fileId === file?.id && tagState.dirty && open;
+    setTagState({
+      fileId: file?.id,
+      fileTags,
+      open,
+      value: dirty ? tagState.value : fileTags,
+      dirty,
+    });
+  }
 
   const handleValueSelect = (val: string) => {
-    setValue((current) => (current.includes(val) ? current.filter((v) => v !== val) : [...current, val]));
+    if (!file) return;
+
+    setTagState((current) => {
+      const value = current.fileId === file.id ? current.value : fileTags;
+      return {
+        ...current,
+        fileId: file.id,
+        value: value.includes(val) ? value.filter((v) => v !== val) : [...value, val],
+        dirty: true,
+      };
+    });
   };
 
   const handleValueRemove = (val: string) => {
-    setValue((current) => current.filter((v) => v !== val));
+    if (!file) return;
+
+    setTagState((current) => ({
+      ...current,
+      fileId: file.id,
+      value: (current.fileId === file.id ? current.value : fileTags).filter((v) => v !== val),
+      dirty: true,
+    }));
   };
 
   const handleTagsUpdate = async () => {
-    if (value.length === file?.tags?.length && value.every((v) => file?.tags?.map((x) => x.id).includes(v))) {
+    if (!file || tagState.fileId !== file.id || !tagState.dirty) return;
+
+    if (value.length === fileTags.length && value.every((v) => fileTags.includes(v))) {
+      setTagState((current) =>
+        current.fileId === file.id && current.value === value ? { ...current, dirty: false } : current,
+      );
       return;
     }
 
     const { data, error } = await fetchApi<Response['/api/user/files/[id]']>(
-      `/api/user/files/${file!.id}`,
+      `/api/user/files/${file.id}`,
       'PATCH',
       {
         tags: value,
@@ -180,6 +221,10 @@ export default function FileViewer({
         icon: <IconTagsOff size='1rem' />,
       });
     } else {
+      setTagState((current) =>
+        current.fileId === file.id && current.value === value ? { ...current, dirty: false } : current,
+      );
+
       showNotification({
         title: t('notifications.tagsSaved.title'),
         message: t('notifications.tagsSaved.message', { count: data!.tags!.length, name: data!.name }),
