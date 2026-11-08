@@ -83,13 +83,9 @@ test('upload max views accepts positive integers', () => {
   assert.equal(parseHeaders({ 'x-zipline-max-views': '10' }, config.files).maxViews, 10);
 });
 
-for (const [value, expected] of [
-  ['-1', -1],
-  ['1.5', 1.5],
-  ['Infinity', Infinity],
-] as const) {
-  test(`upload max views parses numeric value ${value} without enforcing count limits`, () => {
-    assert.equal(parseHeaders({ 'x-zipline-max-views': value }, config.files).maxViews, expected);
+for (const value of ['-1', '1.5', 'Infinity']) {
+  test(`upload max views rejects invalid count ${value}`, () => {
+    assert.throws(() => parseHeaders({ 'x-zipline-max-views': value }, config.files), ApiError);
   });
 }
 
@@ -98,7 +94,8 @@ for (const value of ['nope', 'NaN']) {
     assert.throws(() => parseHeaders({ 'x-zipline-max-views': value }, config.files), {
       name: 'Error',
       code: 1001,
-      message: 'bad options[x-zipline-max-views]: Invalid max views (NaN)',
+      message:
+        'bad options[x-zipline-max-views]: Invalid max views (must be an integer between 0 and 2147483647)',
     });
   });
 }

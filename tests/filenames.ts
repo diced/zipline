@@ -10,9 +10,9 @@ test('original-name formatting rejects unsafe uploaded filenames', () => {
     assert.equal(formatFileName('name', name), null);
 });
 
-test('original-name formatting preserves hidden names and strips only the final extension', () => {
+test('original-name formatting preserves hidden names and strips the full extension', () => {
   assert.equal(formatFileName('name', '.hidden'), '.hidden');
-  assert.equal(formatFileName('name', 'archive.tar.gz'), 'archive.tar');
+  assert.equal(formatFileName('name', 'archive.tar.gz'), 'archive');
   assert.equal(formatFileName('name', 'résumé.pdf'), 'résumé');
 });
 

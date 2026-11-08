@@ -226,7 +226,11 @@ export function parseHeaders(headers: UploadHeaders, fileConfig: Config['files']
   const maxViews = headers['x-zipline-max-views'];
   if (maxViews) {
     const num = Number(maxViews);
-    if (isNaN(num)) throwHeaderError('x-zipline-max-views', 'Invalid max views (NaN)');
+    if (!Number.isInteger(num) || num < 0 || num > 2_147_483_647)
+      throwHeaderError(
+        'x-zipline-max-views',
+        'Invalid max views (must be an integer between 0 and 2147483647)',
+      );
 
     response.maxViews = num;
   }

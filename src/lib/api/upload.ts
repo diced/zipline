@@ -1,4 +1,3 @@
-import { extname } from 'path';
 import { db, type DbClient } from '@/lib/db';
 import { files } from '@/lib/db/schema';
 import { User } from '@/lib/db/models/user';
@@ -12,32 +11,9 @@ import { guess, normalizeMimetype } from '../mimes';
 import { log } from '../logger';
 import { ApiError } from './errors';
 
+export { getExtension } from '../fs';
+
 const logger = log('upload');
-
-const commonDoubleExts = [
-  '.tar.gz',
-  '.tar.xz',
-  '.tar.bz2',
-  '.tar.lz',
-  '.tar.lzma',
-  '.tar.Z',
-  '.tar.7z',
-  '.zip.gz',
-  '.zip.xz',
-  '.rar.gz',
-  '.log.gz',
-  '.csv.gz',
-  '.pdf.gz',
-  // feel free to PR more
-];
-
-export function getExtension(filename: string, override?: string) {
-  if (override !== undefined) return override;
-
-  const doubleExtension = commonDoubleExts.find((ext) => filename.toLowerCase().endsWith(ext.toLowerCase()));
-
-  return doubleExtension ? filename.slice(-doubleExtension.length) : extname(filename);
-}
 
 export function isExtensionDisabled(extension: string) {
   const normalize = (ext: string) => ext.trim().replace(/^\./, '').toLowerCase();

@@ -1,9 +1,8 @@
 import { randomUUID } from 'crypto';
 import dayjs from 'dayjs';
-import { parse } from 'path';
 import { config } from '../config';
 import { Config } from '../config/validate';
-import { sanitizeFilename } from '../fs';
+import { getExtension, sanitizeFilename } from '../fs';
 import { randomCharacters } from '../random';
 import { randomWords } from './randomWords';
 
@@ -25,7 +24,7 @@ export function formatFileName(
       const sanitized = sanitizeFilename(originalName);
       if (!sanitized) return null;
 
-      return parse(sanitized).name;
+      return sanitized.slice(0, sanitized.length - getExtension(sanitized).length);
     case 'random-words':
     case 'gfycat':
       return randomWords(config.files.randomWordsNumAdjectives, config.files.randomWordsSeparator);
