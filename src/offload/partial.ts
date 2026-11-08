@@ -12,7 +12,7 @@ import { Upload } from '@aws-sdk/lib-storage';
 import { createReadStream, createWriteStream } from 'fs';
 import { open, readdir, rm, stat } from 'fs/promises';
 import { join } from 'path';
-import { isMainThread, workerData } from 'worker_threads';
+import { isMainThread, parentPort, workerData } from 'worker_threads';
 import { dbProxy } from './proxiedDb';
 
 export type PartialWorkerData = {
@@ -175,6 +175,8 @@ async function main() {
   });
 
   await runComplete(file.id, finalSize);
+
+  parentPort!.close();
 }
 
 async function runComplete(id: string, size: number) {

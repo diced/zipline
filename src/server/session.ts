@@ -13,7 +13,6 @@ import { parseUserToken } from './middleware/user';
 
 const cookieOptions: NonNullable<SessionOptions['cookieOptions']> = {
   maxAge: 60 * 60 * 24 * 14,
-  expires: new Date(Date.now() + 60 * 60 * 24 * 14 * 1000),
   path: '/',
   sameSite: 'lax',
   httpOnly: true,
