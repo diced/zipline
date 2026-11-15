@@ -4,6 +4,7 @@ import { log } from '../logger';
 import { ParsedConfig } from './read';
 import { PROP_TO_ENV } from './read/env';
 import { checkOutput, COMPRESS_TYPES } from '../compress';
+import { MAX_INT32 } from '../primitive';
 import ms, { StringValue } from 'ms';
 
 declare global {
@@ -48,20 +49,18 @@ declare global {
 
 export const MIME_REGEX = /^[a-zA-Z0-9!#$&^_\-+.]+\/[a-zA-Z0-9!#$&^_\-+.]+$/i;
 
-export const MAX_SAFE_TIMEOUT_MS = 2147483647;
-
 export function validateInterval(value: string): boolean {
   const intervalMs = ms(value as StringValue);
   if (typeof intervalMs !== 'number') return false;
 
-  return intervalMs <= MAX_SAFE_TIMEOUT_MS;
+  return intervalMs <= MAX_INT32;
 }
 
 const intervalSchema = (defaultValue: string) =>
   z
     .string()
     .default(defaultValue)
-    .refine(validateInterval, `Value must be less than or equal to ${MAX_SAFE_TIMEOUT_MS}ms`);
+    .refine(validateInterval, `Value must be less than or equal to ${MAX_INT32}ms`);
 
 function expirationMs(value: string): number | undefined {
   try {
@@ -194,7 +193,7 @@ const configSchema = z.object({
       .enum(COMPRESS_TYPES)
       .default('jpg')
       .refine((v) => checkOutput(v), 'System does not support outputting this image format.'),
-    maxFilesPerUpload: z.number().max(2147483647).min(1).default(1000),
+    maxFilesPerUpload: z.number().max(MAX_INT32).min(1).default(1000),
     extensionlessUrls: z.boolean().default(false),
   }),
   urls: z.object({

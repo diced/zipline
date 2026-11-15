@@ -1,3 +1,4 @@
+import { MAX_INT32 } from '@/lib/primitive';
 import type { DiscordButton, DiscordComponentEmbedChild, DiscordMedia } from '@/lib/discord';
 import {
   ActionIcon,
@@ -58,7 +59,7 @@ export function IdInput({
       description={t('componentBuilder.fields.idDescription')}
       value={value ?? ''}
       min={0}
-      max={2_147_483_647}
+      max={MAX_INT32}
       allowDecimal={false}
       onChange={(next) => onChange(typeof next === 'number' ? next : undefined)}
     />

@@ -1,4 +1,5 @@
 import { ApiError } from '@/lib/api/errors';
+import { MAX_INT32 } from '@/lib/primitive';
 import type { Url } from '@/lib/db/models/url';
 import type { User } from '@/lib/db/models/user';
 import { parseString, type ParseValue } from '@/lib/parser';
@@ -11,7 +12,7 @@ export type DiscordUrlPreviewMode = z.infer<typeof discordUrlPreviewModeSchema>;
 export const discordFilePreviewModeSchema = z.enum(['components', 'none']);
 export type DiscordFilePreviewMode = z.infer<typeof discordFilePreviewModeSchema>;
 
-const componentIdSchema = z.number().int().min(0).max(2_147_483_647).optional();
+const componentIdSchema = z.number().int().min(0).max(MAX_INT32).optional();
 
 export const discordButtonSchema = z
   .object({

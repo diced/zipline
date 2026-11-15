@@ -7,10 +7,10 @@ import { safeConfig } from '@/lib/config/safe';
 import {
   schema as configSchema,
   discordContent,
-  MAX_SAFE_TIMEOUT_MS,
   MIME_REGEX,
   trustedProxiesSchema,
 } from '@/lib/config/validate';
+import { MAX_INT32 } from '@/lib/primitive';
 import { db } from '@/lib/db';
 import { getSettings, updateSettings } from '@/lib/db/models/zipline';
 import { zipline } from '@/lib/db/schema';
@@ -57,8 +57,8 @@ const zIntervalMs = zStringTrimmed
     'Value must be greater than or equal to 0',
   )
   .refine(
-    (value) => value.length > 0 && ms(value as StringValue) <= MAX_SAFE_TIMEOUT_MS,
-    `Value must be less than or equal to ${MAX_SAFE_TIMEOUT_MS}ms`,
+    (value) => value.length > 0 && ms(value as StringValue) <= MAX_INT32,
+    `Value must be less than or equal to ${MAX_INT32}ms`,
   );
 
 const discordEmbed = z.preprocess(jsonTransform, discordContent.unwrap().unwrap().shape.embed);
@@ -199,7 +199,7 @@ export default typedPlugin(
             filesDefaultCompressionFormat: z
               .enum(COMPRESS_TYPES)
               .refine((v) => checkOutput(v), 'System does not support outputting this image format.'),
-            filesMaxFilesPerUpload: z.number().int().min(1).max(2147483647),
+            filesMaxFilesPerUpload: z.number().int().min(1).max(MAX_INT32),
             filesExtensionlessUrls: z.boolean(),
 
             urlsRoute: z
@@ -348,8 +348,8 @@ export default typedPlugin(
               .nullable(),
 
             ratelimitEnabled: z.boolean(),
-            ratelimitMax: z.number().int().min(1).max(2147483647),
-            ratelimitWindow: z.number().int().min(0).max(2147483647).nullable(),
+            ratelimitMax: z.number().int().min(1).max(MAX_INT32),
+            ratelimitWindow: z.number().int().min(0).max(MAX_INT32).nullable(),
             ratelimitAdminBypass: z.boolean(),
             ratelimitAllowList: z
               .union([z.array(z.string()), z.string()])

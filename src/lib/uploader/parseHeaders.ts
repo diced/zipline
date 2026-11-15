@@ -2,6 +2,7 @@ import ms, { type StringValue } from 'ms';
 import { ApiError } from '../api/errors';
 import { checkOutput, COMPRESS_TYPES, CompressType } from '../compress';
 import { Config } from '../config/validate';
+import { MAX_INT32 } from '../primitive';
 import {
   discordComponentEmbedSchema,
   type DiscordComponentEmbed,
@@ -226,10 +227,10 @@ export function parseHeaders(headers: UploadHeaders, fileConfig: Config['files']
   const maxViews = headers['x-zipline-max-views'];
   if (maxViews) {
     const num = Number(maxViews);
-    if (!Number.isInteger(num) || num < 0 || num > 2_147_483_647)
+    if (!Number.isInteger(num) || num < 0 || num > MAX_INT32)
       throwHeaderError(
         'x-zipline-max-views',
-        'Invalid max views (must be an integer between 0 and 2147483647)',
+        `Invalid max views (must be an integer between 0 and ${MAX_INT32})`,
       );
 
     response.maxViews = num;

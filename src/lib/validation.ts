@@ -1,4 +1,5 @@
 import z from 'zod';
+import { MAX_INT32 } from './primitive';
 import { sanitizeFilename } from './fs';
 
 export function zValidatePath(val: string | undefined, ctx: z.RefinementCtx) {
@@ -23,8 +24,8 @@ export const zStringTrimmed = z.string().trim().min(1);
 export const zQsBoolean = z.enum(['true', 'false']).transform((val) => val === 'true');
 
 export const paginationQs = z.object({
-  page: z.coerce.number(),
-  perpage: z.coerce.number().default(15),
+  page: z.coerce.number().int().min(1).max(MAX_INT32),
+  perpage: z.coerce.number().int().min(1).max(100).default(15),
   filter: z.enum(['dashboard', 'none', 'all']).optional().default('none'),
   favorite: zQsBoolean.default(false).optional(),
   sortBy: z

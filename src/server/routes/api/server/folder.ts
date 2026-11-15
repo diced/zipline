@@ -53,7 +53,7 @@ export default typedPlugin(
         if (!folder.public && !folder.allowUploads) throw new ApiError(9002);
 
         const { page, perpage, sortBy, order } = req.query;
-        if ((!page && folder.allowUploads) || !folder.public) {
+        if ((page === undefined && folder.allowUploads) || !folder.public) {
           return res.send({
             folder: {
               id: folder.id,
@@ -76,7 +76,7 @@ export default typedPlugin(
           extras: filePasswordExtra,
           where: { folderId: folder.id },
           orderBy: (file, { asc, desc }) => (order === 'asc' ? asc(file[sortBy]) : desc(file[sortBy])),
-          offset: (Number(page) - 1) * perpage,
+          offset: ((page ?? 1) - 1) * perpage,
           limit: perpage,
           with: { thumbnail: { columns: { path: true } } },
         });

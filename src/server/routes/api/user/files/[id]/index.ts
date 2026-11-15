@@ -212,25 +212,29 @@ export default typedPlugin(
         preHandler: [userMiddleware],
       },
       async (req, res) => {
-        const file = await getFile(req.params.id);
-        if (!file) throw new ApiError(4000);
+        const { deletedFile, owner } = await db.transaction(async (tx) => {
+          await lockFiles(tx);
 
-        if (req.user.id !== file.user?.id && !canInteract(req.user.role, file.user?.role ?? 'USER'))
-          throw new ApiError(4000);
+          const file = await getFile(req.params.id, tx);
+          if (!file) throw new ApiError(4000);
 
-        const deleted = await removeFile(file.id);
-        if (!deleted) throw new ApiError(4000);
-        const deletedFile = {
-          ...deleted,
-          thumbnail: file.thumbnail,
-          tags: file.tags,
-        };
+          if (req.user.id !== file.user?.id && !canInteract(req.user.role, file.user?.role ?? 'USER'))
+            throw new ApiError(4000);
 
-        await datasource.delete(deletedFile.name);
+          await datasource.delete(file.name);
+
+          const deleted = await removeFile(file.id, tx);
+          if (!deleted) throw new ApiError(4000);
+
+          return {
+            deletedFile: { ...deleted, thumbnail: file.thumbnail, tags: file.tags },
+            owner: file.user?.id,
+          };
+        });
 
         logger.info(`${req.user.username} deleted file ${deletedFile.name}`, {
           size: bytes(deletedFile.size),
-          owner: file.user?.id,
+          owner,
         });
 
         return res.send(deletedFile);
