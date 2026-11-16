@@ -3,6 +3,7 @@ import { datasource } from '@/lib/datasource';
 import { getFilesWithUser, removeFiles, updateFiles } from '@/lib/db/models/file';
 import { getOwnedFolder } from '@/lib/db/models/folder';
 import { Role } from '@/lib/db/enums';
+import { isThumbnail } from '@/lib/fs';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { canManage } from '@/lib/role';
@@ -136,11 +137,10 @@ export default typedPlugin(
           throw new ApiError(3013, `You don't have the permission to delete files[${invalids.join(', ')}]`);
 
         if (delete_datasourceFiles) {
-          for (let i = 0; i !== toDeleteFiles.length; ++i) {
-            await datasource.delete(toDeleteFiles[i].name);
-          }
+          const datasourceFiles = toDeleteFiles.filter((file) => !isThumbnail(file.name));
+          for (const file of datasourceFiles) await datasource.delete(file.name);
 
-          logger.info(`${req.user.username} deleted ${toDeleteFiles.length} files from datasource`, {
+          logger.info(`${req.user.username} deleted ${datasourceFiles.length} files from datasource`, {
             user: req.user.id,
           });
         }

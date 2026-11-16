@@ -2,13 +2,13 @@ import { verifyAccessToken } from '@/lib/accessToken';
 import { setContentSecurity } from '@/lib/api/contentSecurity';
 import { ApiError } from '@/lib/api/errors';
 import { parseRange } from '@/lib/api/range';
+import { sendThumbnail } from '@/lib/api/thumbnail';
 import { config } from '@/lib/config';
 import { datasource } from '@/lib/datasource';
 import { db } from '@/lib/db';
 import { removeFile } from '@/lib/db/models/file';
-import { sanitizeFilename } from '@/lib/fs';
+import { isThumbnail, sanitizeFilename } from '@/lib/fs';
 import { log } from '@/lib/logger';
-import { guess } from '@/lib/mimes';
 import { canInteract } from '@/lib/role';
 import { zQsBoolean } from '@/lib/validation';
 import { userMiddleware } from '@/server/middleware/user';
@@ -45,46 +45,18 @@ export default typedPlugin(
         const id = sanitizeFilename(req.params.id);
         if (!id) throw new ApiError(9002);
 
-        if (id.startsWith('.thumbnail')) {
-          const thumbnail = await db.query.thumbnails.findFirst({
-            where: { path: id },
-            with: {
-              file: {
-                columns: { userId: true, deletesAt: true, maxViews: true, views: true },
-                with: { user: { columns: { id: true, role: true } } },
-              },
-            },
-          });
-
-          if (!thumbnail?.file) throw new ApiError(9002);
-          const { file } = thumbnail;
-          if (file.userId !== req.user.id) {
-            if (!canInteract(req.user.role, file.user?.role)) throw new ApiError(9002);
-          }
-
-          if (file.deletesAt && file.deletesAt <= new Date()) throw new ApiError(9002);
-          if (file.maxViews && file.views >= file.maxViews) throw new ApiError(9002);
-
-          const size = await datasource.size(thumbnail.path);
-          if (!size) throw new ApiError(9002);
-
-          const buf = await datasource.get(thumbnail.path);
-          if (!buf) throw new ApiError(9002);
-
-          return res
-            .type(await guess(thumbnail.path.replace('.thumbnail-', '').split('.').pop() || 'jpg'))
-            .headers({
-              'Content-Length': size,
-            })
-            .status(200)
-            .send(buf);
-        }
+        if (isThumbnail(id)) return sendThumbnail(id, res, { token, user: req.user });
 
         const file = await db.query.files.findFirst({
           where: { OR: [{ id }, { name: id }] },
           with: { user: { columns: { role: true } } },
         });
         if (!file) throw new ApiError(9002);
+
+        if (isThumbnail(file.name)) {
+          res.header('Cache-Control', 'no-store');
+          throw new ApiError(9002);
+        }
 
         if (file.userId !== req.user.id) {
           if (!canInteract(req.user.role, file.user?.role)) throw new ApiError(9002);

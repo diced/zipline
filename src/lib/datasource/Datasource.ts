@@ -1,6 +1,6 @@
 import { Readable } from 'stream';
 
-export type PutOptions = { mimetype?: string; noDelete?: boolean };
+export type PutOptions = { mimetype?: string; noDelete?: boolean; partSize?: number };
 export type ListOptions = { prefix: string };
 
 export abstract class Datasource {

@@ -1,20 +1,32 @@
-import { bytes } from '@/lib/bytes';
 import { Config } from '@/lib/config/validate';
-import { getDatasource } from '@/lib/datasource';
-import { Datasource } from '@/lib/datasource/Datasource';
+import { datasource, getDatasource } from '@/lib/datasource';
+import type { files } from '@/lib/db/schema';
+import { isThumbnail } from '@/lib/fs';
 import { log } from '@/lib/logger';
 import { randomCharacters } from '@/lib/random';
 import ffmpeg from '@/lib/ffmpeg';
-import { createWriteStream, existsSync, readFileSync, unlinkSync } from 'fs';
+import { createWriteStream } from 'fs';
+import { readFile, rm } from 'fs/promises';
 import { join } from 'path';
+import { pipeline } from 'stream/promises';
 import { isMainThread, parentPort, workerData } from 'worker_threads';
-import { dbProxy, type DomainDbResponse } from './proxiedDb';
 
 export type ThumbnailWorkerData = {
   id: string;
   enabled: boolean;
   config: Config;
 };
+
+export type ThumbnailSource = Pick<typeof files.$inferSelect, 'id' | 'name' | 'type' | 'size' | 'updatedAt'>;
+
+export type ThumbnailWorkerMessage = {
+  type: 'generated';
+  source: ThumbnailSource;
+  path: string;
+  size: number;
+};
+
+export type ThumbnailWorkerRequest = { type: 0; data: ThumbnailSource[] } | { type: 1 };
 
 const { id, enabled, config } = workerData as ThumbnailWorkerData;
 
@@ -32,6 +44,8 @@ if (!enabled) {
 
 logger.debug('started thumbnail worker');
 
+getDatasource(config);
+
 const formatMimes = {
   jpg: 'image/jpeg',
   png: 'image/png',
@@ -44,7 +58,7 @@ function name(str: string) {
   return `${str}.${config.features.thumbnails.format}`;
 }
 
-function genThumbnail(input: string, output: string): Promise<Buffer | undefined> {
+function genThumbnail(input: string, output: string): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     ffmpeg(input)
       .videoFilters('thumbnail')
@@ -70,29 +84,15 @@ function genThumbnail(input: string, output: string): Promise<Buffer | undefined
         reject(err);
       })
       .on('end', () => {
-        if (!existsSync(output)) {
-          logger.error('expected thumbnail file does not exist', { thumbnailTmp: output });
-          unlinkSync(input);
-          return resolve(undefined);
-        }
-
-        const buffer = readFileSync(output);
-
-        unlinkSync(output);
-        unlinkSync(input);
-        logger.debug('removed temporary files', { file: input, thumbnail: output });
-
-        resolve(buffer);
+        readFile(output).then(resolve, reject);
       })
       .run();
   });
 }
 
-async function generate(config: Config, datasource: Datasource, ids: string[]) {
-  for (const id of ids) {
-    const file = await dbProxy('file.thumbnailSource', { id });
-
-    if (!file) continue;
+async function generate(files: ThumbnailSource[]) {
+  for (const file of files) {
+    if (isThumbnail(file.name)) continue;
     if (!file.type.startsWith('video/')) {
       logger.debug('received file that is not a video, skipping', { id: file.id, type: file.type });
       continue;
@@ -105,66 +105,70 @@ async function generate(config: Config, datasource: Datasource, ids: string[]) {
       continue;
     }
 
-    const stream = await datasource.get(file.name);
-    if (!stream) {
-      logger.debug('could not read file from datasource, skipping', { id: file.id });
-      continue;
-    }
-
     const tmpFile = join(config.core.tempDirectory, `zthumbnail_${file.id}_${workerId}.tmp`);
-    const writeStream = createWriteStream(tmpFile);
-    await new Promise((resolve, reject) => {
-      stream.pipe(writeStream);
-      stream.on('error', reject);
-      writeStream.on('error', reject);
-      writeStream.on('finish', resolve as any);
-    });
-
     const thumbnailTmpFile = join(config.core.tempDirectory, name(`zthumbnail_${file.id}_${workerId}`));
-    const thumbnail = await genThumbnail(tmpFile, thumbnailTmpFile);
-    if (!thumbnail || thumbnail.length === 0) continue;
+    const thumbnailPath = name(`.thumbnail.${file.id}.${randomCharacters(16)}`);
+    let removeThumbnail = false;
+    try {
+      const stream = await datasource.get(file.name);
+      if (!stream) {
+        logger.debug('could not read file from datasource, skipping', { id: file.id });
+        continue;
+      }
 
-    const thumbnailPath = name(`.thumbnail.${file.id}`);
-    await datasource.delete(thumbnailPath);
-    await datasource.put(thumbnailPath, thumbnail, {
-      mimetype: formatMimes[config.features.thumbnails.format] || 'image/jpeg',
-    });
+      await pipeline(stream, createWriteStream(tmpFile));
 
-    const record = await dbProxy('thumbnail.upsert', { fileId: file.id, path: thumbnailPath });
+      const thumbnail = await genThumbnail(tmpFile, thumbnailTmpFile);
+      if (thumbnail.length === 0) continue;
 
-    logger.info('generated thumbnail', { id: record.id, fileId: file.id, size: bytes(thumbnail.length) });
+      removeThumbnail = true;
+      await datasource.put(thumbnailPath, thumbnail, {
+        mimetype: formatMimes[config.features.thumbnails.format],
+      });
+
+      parentPort!.postMessage({
+        type: 'generated',
+        source: file,
+        path: thumbnailPath,
+        size: thumbnail.length,
+      });
+
+      removeThumbnail = false;
+    } catch (error) {
+      logger.error('thumbnail generation failed', { id: file.id, error });
+    } finally {
+      if (removeThumbnail)
+        await datasource.delete(thumbnailPath).catch((error) => {
+          logger.warn('failed to remove unpublished thumbnail', { path: thumbnailPath, error });
+        });
+
+      const cleanup = await Promise.allSettled([
+        rm(tmpFile, { force: true }),
+        rm(thumbnailTmpFile, { force: true }),
+      ]);
+
+      for (const result of cleanup) {
+        if (result.status === 'rejected')
+          logger.warn('failed to remove temporary thumbnail file', { id: file.id, error: result.reason });
+      }
+    }
   }
 }
 
-async function main() {
-  getDatasource(config);
-
-  const datasource = global.__datasource__;
-
-  parentPort!.on('message', async (message) => {
-    const workerMessage = message as { type: 0 | 1; data?: string[] } | DomainDbResponse;
-    if (workerMessage.type === 'db-response') return;
-    const { type, data } = workerMessage;
-
-    switch (type) {
-      case 0:
-        logger.debug('received thumbnail generation request', { ids: data });
-        try {
-          await generate(config, datasource, data!);
-        } catch (err) {
-          logger.error('thumbnail generation failed', {
-            err: err instanceof Error ? err.message : String(err),
-          });
-        }
-        break;
-      case 1:
+let pending = Promise.resolve();
+parentPort!.on('message', (message: ThumbnailWorkerRequest) => {
+  pending = pending
+    .then(async () => {
+      if (message.type === 1) {
         logger.debug('received kill request');
-        process.exit(0);
-      default:
-        logger.error('unknown message type', { type, message });
-        break;
-    }
-  });
-}
+        parentPort!.close();
+        return;
+      }
 
-main();
+      logger.debug('received thumbnail generation request', { ids: message.data.map((file) => file.id) });
+      await generate(message.data);
+    })
+    .catch((error) => {
+      logger.error('thumbnail generation failed', { error });
+    });
+});

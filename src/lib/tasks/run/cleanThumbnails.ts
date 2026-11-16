@@ -1,7 +1,8 @@
 import { datasource } from '@/lib/datasource';
 import { db } from '@/lib/db';
+import { lockFiles } from '@/lib/db/models/file';
 import { thumbnails } from '@/lib/db/schema';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { IntervalTask } from '..';
 
 export default function cleanThumbnails() {
@@ -9,24 +10,49 @@ export default function cleanThumbnails() {
     const fsThumbnails = await datasource.list({ prefix: '.thumbnail.' });
     const dbThumbnails = await db.select({ id: thumbnails.id, path: thumbnails.path }).from(thumbnails);
 
-    const paths = new Set(dbThumbnails.map((t) => t.path));
-    const fsOrphaned = fsThumbnails.filter((path) => !paths.has(path));
+    const dbPaths = new Set(dbThumbnails.map((t) => t.path));
+    const fsOrphaned = fsThumbnails.filter((path) => !dbPaths.has(path));
+    let fsDeleted = 0;
 
     for (const path of fsOrphaned) {
       try {
-        await datasource.delete(path);
+        const deleted = await db.transaction(async (tx) => {
+          await lockFiles(tx);
+
+          const [thumbnail] = await tx
+            .select({ id: thumbnails.id })
+            .from(thumbnails)
+            .where(eq(thumbnails.path, path))
+            .limit(1);
+          if (thumbnail) return false;
+
+          await datasource.delete(path);
+          return true;
+        });
+        if (!deleted) continue;
+
+        fsDeleted++;
         this.logger.info('deleted orphaned thumbnail', { path });
       } catch (err) {
         this.logger.error('failed to delete orphaned thumbnail', { path, error: err });
       }
     }
 
-    const fs = new Set(fsThumbnails);
-    const dbOrphaned = dbThumbnails.filter((t) => !fs.has(t.path));
+    const fsPaths = new Set(fsThumbnails);
+    const dbOrphaned = dbThumbnails.filter((t) => !fsPaths.has(t.path));
+    let dbDeleted = 0;
 
     for (const thumb of dbOrphaned) {
       try {
-        await db.delete(thumbnails).where(eq(thumbnails.id, thumb.id));
+        if (await datasource.size(thumb.path)) continue;
+
+        const deleted = await db
+          .delete(thumbnails)
+          .where(and(eq(thumbnails.id, thumb.id), eq(thumbnails.path, thumb.path)))
+          .returning({ id: thumbnails.id });
+        if (!deleted.length) continue;
+
+        dbDeleted++;
         this.logger.info('deleted orphaned thumbnail from database', { path: thumb.path });
       } catch (err) {
         this.logger.error('failed to delete orphaned thumbnail from database', {
@@ -39,11 +65,11 @@ export default function cleanThumbnails() {
     this.logger.debug('thumbnail cleanup complete', {
       fsChecked: fsThumbnails.length,
       dbChecked: dbThumbnails.length,
-      fsDeleted: fsOrphaned.length,
-      dbDeleted: dbOrphaned.length,
+      fsDeleted,
+      dbDeleted,
       totals: {
-        fs: fsThumbnails.length - fsOrphaned.length,
-        db: dbThumbnails.length - dbOrphaned.length,
+        fs: fsThumbnails.length - fsDeleted,
+        db: dbThumbnails.length - dbDeleted,
       },
     });
   };

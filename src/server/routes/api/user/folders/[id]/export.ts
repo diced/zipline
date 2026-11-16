@@ -1,6 +1,7 @@
 import { ApiError } from '@/lib/api/errors';
 import { datasource } from '@/lib/datasource';
 import { getFolderMetadata, getOwnedTree, type FolderTree } from '@/lib/db/models/folder';
+import { isThumbnail } from '@/lib/fs';
 import { log } from '@/lib/logger';
 import { userMiddleware } from '@/server/middleware/user';
 import typedPlugin from '@/server/typedPlugin';
@@ -23,6 +24,8 @@ async function addFolderToZip(
   let fileCount = 0;
 
   for (const file of folder.files) {
+    if (isThumbnail(file.name)) continue;
+
     const stream = await datasource.get(file.name);
     if (zip.destroyed) {
       stream?.destroy();

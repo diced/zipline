@@ -390,10 +390,12 @@ export default typedPlugin(
             files: response.files.length,
           });
 
-          const fileIds = response.files.map((x) => x.id);
-
           const thumbnailWorkers = server.tasks.workersBy('thumbnail');
-          if (thumbnailWorkers.length) runThumbnailWorkers(thumbnailWorkers, fileIds);
+          try {
+            runThumbnailWorkers(thumbnailWorkers, fileUploads);
+          } catch (error) {
+            logger.error('failed to schedule thumbnails', { error });
+          }
         }
 
         return res.send(response);

@@ -3,6 +3,7 @@ import { datasource } from '@/lib/datasource';
 import { db } from '@/lib/db';
 import { removeFiles } from '@/lib/db/models/file';
 import { files } from '@/lib/db/schema';
+import { isThumbnail } from '@/lib/fs';
 import { and, isNotNull, lte } from 'drizzle-orm';
 import { IntervalTask } from '..';
 
@@ -20,7 +21,7 @@ export default function deleteFiles() {
     const deletedFiles: typeof expiredFiles = [];
     for (const file of expiredFiles) {
       try {
-        await datasource.delete(file.name);
+        if (!isThumbnail(file.name)) await datasource.delete(file.name);
         deletedFiles.push(file);
       } catch {
         this.logger.error('failed to delete file from datasource', {

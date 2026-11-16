@@ -5,6 +5,7 @@ import { datasource } from '@/lib/datasource';
 import { db } from '@/lib/db';
 import { Export, exportSchema } from '@/lib/db/models/export';
 import { exports, files } from '@/lib/db/schema';
+import { isThumbnail } from '@/lib/fs';
 import { log } from '@/lib/logger';
 import { secondlyRatelimit } from '@/lib/ratelimits';
 import { userMiddleware } from '@/server/middleware/user';
@@ -220,6 +221,8 @@ export default typedPlugin(
         try {
           let totalSize = 0;
           for (const file of rows) {
+            if (isThumbnail(file.name)) continue;
+
             const stream = await datasource.get(file.name);
             if (cleanup) {
               stream?.destroy();

@@ -22,8 +22,8 @@ export default function useFileUrls({ file, token }: { file: FilePreview | File;
     const thumb = file.thumbnail?.path;
     const thumbnailUrl = thumb
       ? user
-        ? `/api/user/files/${thumb}/raw`
-        : formatRootUrl('/raw', thumb)
+        ? formatRootUrl(`/api/user/files/${encodeURIComponent(thumb)}`, 'raw', { token })
+        : formatRootUrl('/raw', thumb, { token })
       : null;
 
     return {

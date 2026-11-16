@@ -2,15 +2,15 @@ import { verifyAccessToken } from '@/lib/accessToken';
 import { setContentSecurity } from '@/lib/api/contentSecurity';
 import { ApiError } from '@/lib/api/errors';
 import { parseRange } from '@/lib/api/range';
+import { sendThumbnail } from '@/lib/api/thumbnail';
 import { config } from '@/lib/config';
 import { datasource } from '@/lib/datasource';
 import { db } from '@/lib/db';
 import { removeFile } from '@/lib/db/models/file';
 import { files } from '@/lib/db/schema';
 import { escapeLike } from '@/lib/db/utils';
-import { sanitizeFilename } from '@/lib/fs';
+import { isThumbnail, sanitizeFilename } from '@/lib/fs';
 import { log } from '@/lib/logger';
-import { guess } from '@/lib/mimes';
 import { TimedCache } from '@/lib/timedCache';
 import typedPlugin from '@/server/typedPlugin';
 import { and, desc, eq, like, lt, sql } from 'drizzle-orm';
@@ -45,32 +45,7 @@ export const rawFileHandler = async (
   const idSanitized = sanitizeFilename(id);
   if (!idSanitized) return res.callNotFound();
 
-  if (id.startsWith('.thumbnail')) {
-    const thumbnail = await db.query.thumbnails.findFirst({
-      where: { path: idSanitized, file: { password: { isNull: true } } },
-      with: { file: { columns: { deletesAt: true, maxViews: true, views: true } } },
-    });
-
-    if (!thumbnail?.file) return res.callNotFound();
-
-    const { file } = thumbnail;
-    if (file.deletesAt && file.deletesAt <= new Date()) return res.callNotFound();
-    if (file.maxViews && file.views >= file.maxViews) return res.callNotFound();
-
-    const size = await datasource.size(thumbnail.path);
-    if (!size) return res.callNotFound();
-
-    const buf = await datasource.get(thumbnail.path);
-    if (!buf) return res.callNotFound();
-
-    return res
-      .type(await guess(thumbnail.path.replace('.thumbnail-', '').split('.').pop() || 'jpg'))
-      .headers({
-        'Content-Length': size,
-      })
-      .status(200)
-      .send(buf);
-  }
+  if (isThumbnail(idSanitized)) return sendThumbnail(idSanitized, res, { token });
 
   const [fileReq] = await db.select().from(files).where(eq(files.name, idSanitized)).limit(1);
   let file = fileReq;
@@ -84,6 +59,11 @@ export const rawFileHandler = async (
     file = fileReq;
   }
   if (!file) return res.callNotFound();
+
+  if (isThumbnail(file.name)) {
+    res.header('Cache-Control', 'no-store');
+    return res.callNotFound();
+  }
 
   if (file?.deletesAt && file.deletesAt <= new Date()) {
     try {

@@ -34,6 +34,10 @@ function isMissingObject(error: unknown) {
   return error instanceof NoSuchKey || error instanceof NotFound;
 }
 
+function isMissingUpload(error: unknown) {
+  return error instanceof Error && error.name === 'NoSuchUpload';
+}
+
 export class S3Datasource extends Datasource {
   name = 's3';
   client: S3Client;
@@ -158,40 +162,59 @@ export class S3Datasource extends Datasource {
     } catch (e) {
       if (isMissingObject(e)) return null;
 
-      this.logger.error('there was an error while getting object', {
-        error: e instanceof Error ? e.message : e,
-      });
-      throw e;
+      this.handleError(e, 'getting object', file);
     }
   }
 
   public async put(file: string, data: Buffer | string, options: PutOptions = {}): Promise<void> {
     try {
-      if (typeof data === 'string') {
-        const size = await stat(data).then((file) => file.size);
-        if (size > 25 * 1024 * 1024) {
-          // 25mb
-          this.logger.debug('putting object with multipart upload', { file, key: this.key(file) });
+      if (
+        options.partSize !== undefined ||
+        (typeof data === 'string' && (await stat(data)).size > 25 * 1024 * 1024)
+      ) {
+        this.logger.debug('putting object with multipart upload', { file, key: this.key(file) });
 
-          try {
-            const upload = new Upload({
-              client: this.client,
-              params: {
-                Bucket: this.options.bucket,
-                Key: this.key(file),
-                Body: createReadStream(data),
-                ...(options.mimetype ? { ContentType: options.mimetype } : {}),
-              },
-              leavePartsOnError: false,
-            });
+        const stream = typeof data === 'string' ? createReadStream(data) : undefined;
+        let upload: Upload | undefined;
+        try {
+          upload = new Upload({
+            client: this.client,
+            params: {
+              Bucket: this.options.bucket,
+              Key: this.key(file),
+              Body: stream ?? data,
+              ...(options.mimetype ? { ContentType: options.mimetype } : {}),
+            },
+            partSize: options.partSize,
+            leavePartsOnError: true,
+          });
 
-            await upload.done();
-            return;
-          } catch (error) {
-            this.logger.warn('multipart upload failed, retrying with a single request', {
-              error: error instanceof Error ? error.message : error,
-            });
-          }
+          await upload.done();
+          return;
+        } catch (error) {
+          if (upload?.uploadId)
+            await this.client
+              .send(
+                new AbortMultipartUploadCommand({
+                  Bucket: this.options.bucket,
+                  Key: this.key(file),
+                  UploadId: upload.uploadId,
+                }),
+              )
+              .catch((abortError) => {
+                if (isMissingUpload(abortError)) return;
+                this.logger.warn('failed to abort multipart upload', {
+                  file,
+                  error: abortError instanceof Error ? abortError.message : abortError,
+                });
+              });
+          if (options.partSize !== undefined) throw error;
+
+          this.logger.warn('multipart upload failed, retrying with a single request', {
+            error: error instanceof Error ? error.message : error,
+          });
+        } finally {
+          stream?.destroy();
         }
       }
 
@@ -206,10 +229,7 @@ export class S3Datasource extends Datasource {
       if (!isOk(res.$metadata.httpStatusCode || 0))
         throw new Error(`S3 put failed with status ${res.$metadata.httpStatusCode ?? 'unknown'}`);
     } catch (e) {
-      this.logger.error('there was an error while putting object', {
-        error: e instanceof Error ? e.message : e,
-      });
-      throw e;
+      this.handleError(e, 'putting object', file);
     }
   }
 
@@ -252,10 +272,7 @@ export class S3Datasource extends Datasource {
     } catch (e) {
       if (!Array.isArray(file) && isMissingObject(e)) return;
 
-      this.logger.error('there was an error while deleting object', {
-        error: e instanceof Error ? e.message : e,
-      });
-      throw e;
+      this.handleError(e, 'deleting object', file);
     }
   }
 
@@ -281,10 +298,7 @@ export class S3Datasource extends Datasource {
     } catch (e) {
       if (isMissingObject(e)) return 0;
 
-      this.logger.error('there was an error while getting object size', {
-        error: e instanceof Error ? e.message : e,
-      });
-      throw e;
+      this.handleError(e, 'getting object size', file);
     }
   }
 
@@ -294,7 +308,11 @@ export class S3Datasource extends Datasource {
     for await (const objects of this.listObjects()) {
       for (const obj of objects) {
         if (typeof obj.Size !== 'number' || !Number.isSafeInteger(obj.Size) || obj.Size < 0)
-          throw new Error('S3 list returned an invalid object size');
+          this.handleError(
+            new Error('S3 list returned an invalid object size'),
+            'getting total object size',
+            obj.Key,
+          );
 
         total += obj.Size;
       }
@@ -325,10 +343,7 @@ export class S3Datasource extends Datasource {
 
       return Readable.fromWeb(res.Body.transformToWebStream() as ReadableStream<any>);
     } catch (e) {
-      this.logger.error('there was an error while getting object range', {
-        error: e instanceof Error ? e.message : e,
-      });
-      throw e;
+      this.handleError(e, 'getting object range', file);
     }
   }
 
@@ -418,9 +433,10 @@ export class S3Datasource extends Datasource {
                   `S3 multipart copy abort failed with status ${abortRes.$metadata.httpStatusCode ?? 'unknown'}`,
                 );
             } catch (error) {
-              this.logger.error('failed to abort multipart copy', {
-                error: error instanceof Error ? error.message : error,
-              });
+              if (!isMissingUpload(error))
+                this.logger.error('failed to abort multipart copy', {
+                  error: error instanceof Error ? error.message : error,
+                });
             }
           }
           throw e;
@@ -440,10 +456,7 @@ export class S3Datasource extends Datasource {
 
       await this.delete(from);
     } catch (e) {
-      this.logger.error('there was an error while renaming object', {
-        error: e instanceof Error ? e.message : e,
-      });
-      throw e;
+      this.handleError(e, 'renaming object', from);
     }
   }
 
@@ -481,10 +494,7 @@ export class S3Datasource extends Datasource {
         yield res.Contents ?? [];
       } while (continuationToken);
     } catch (e) {
-      this.logger.error('there was an error while listing objects', {
-        error: e instanceof Error ? e.message : e,
-      });
-      throw e;
+      this.handleError(e, 'listing objects', prefix || undefined);
     }
   }
 
@@ -499,5 +509,18 @@ export class S3Datasource extends Datasource {
       for (const obj of objects) files.push(obj.Key!.slice(storagePrefix.length));
 
     return files;
+  }
+
+  private handleError(error: unknown, action: string, file?: string | string[]): never {
+    const details = {
+      ...(file !== undefined ? { file } : {}),
+      error: error instanceof Error ? error.message : String(error),
+    };
+
+    if (isMissingObject(error)) this.logger.warn(`object not found while ${action}`, details);
+    else if (isMissingUpload(error)) this.logger.warn(`multipart upload not found while ${action}`, details);
+    else this.logger.error(`there was an error while ${action}`, details);
+
+    throw error;
   }
 }

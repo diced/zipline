@@ -1,6 +1,7 @@
 import { config } from '@/lib/config';
 import { db, type DbClient } from '@/lib/db';
 import { files } from '@/lib/db/schema';
+import { isThumbnail } from '@/lib/fs';
 import { formatRootUrl } from '@/lib/url';
 import { and, eq, getColumns, inArray, isNotNull, sql } from 'drizzle-orm';
 import { createSelectSchema } from 'drizzle-orm/zod';
@@ -38,6 +39,8 @@ export async function getFile(identifier: string, client: DbClient = db) {
     where: { OR: [{ id: identifier }, { name: identifier }] },
     with: fileOwnerRelations,
   });
+  if (row && isThumbnail(row.name)) return null;
+
   return row ?? null;
 }
 

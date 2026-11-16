@@ -1,232 +1,99 @@
-import { bytes } from '@/lib/bytes';
-import { formatRootUrl } from '@/lib/url';
-import { Config } from '@/lib/config/validate';
-import { getDatasource } from '@/lib/datasource';
-import { S3Datasource } from '@/lib/datasource/S3';
 import { removeGps } from '@/lib/gps';
 import { log } from '@/lib/logger';
-import { randomCharacters } from '@/lib/random';
-import { UploadOptions } from '@/lib/uploader/parseHeaders';
-import { onUpload } from '@/lib/webhooks';
-import { Upload } from '@aws-sdk/lib-storage';
 import { createReadStream, createWriteStream } from 'fs';
-import { open, readdir, rm, stat } from 'fs/promises';
+import { readdir, rm, stat } from 'fs/promises';
 import { join } from 'path';
+import { pipeline } from 'stream/promises';
 import { isMainThread, parentPort, workerData } from 'worker_threads';
-import { dbProxy } from './proxiedDb';
 
 export type PartialWorkerData = {
-  user: {
-    id: string;
-  };
-  file: {
-    id: string;
-    filename: string;
-    type: string;
-  };
-  options: UploadOptions;
-  domain: string;
-  responseUrl: string;
-  config: Config;
+  file: { name: string; type: string };
+  directory: string;
+  identifier: string;
+  size: number;
+  temporaryPath: string;
+  removeGpsMetadata: boolean;
+  enabled: boolean;
 };
 
-const { user, file, options, responseUrl, domain, config } = workerData as PartialWorkerData;
-const logger = log('tasks').c('partial').c(file.filename);
+export type PartialWorkerMessage =
+  | { type: 'started'; chunksTotal: number }
+  | { type: 'progress'; chunksComplete: number }
+  | { type: 'complete'; size: number }
+  | { type: 'failure'; error: string };
+
+const { file, directory, identifier, size, temporaryPath, removeGpsMetadata, enabled } =
+  workerData as PartialWorkerData;
+const logger = log('tasks').c('partial').c(file.name);
 
 if (isMainThread) {
   logger.error("partial upload worker can't run on the main thread");
   process.exit(1);
 }
 
-if (!options.partial) {
-  logger.error('no partial upload options provided');
-  process.exit(1);
+function send(message: PartialWorkerMessage) {
+  parentPort!.postMessage(message);
 }
-
-if (!options.partial.lastchunk) {
-  logger.error('no last chunk provided');
-  process.exit(1);
-}
-
-let finalPath: string | undefined;
-
-main();
 
 async function main() {
-  global.__config__ = config;
+  try {
+    if (!enabled) throw new Error('Chunks are not enabled');
 
-  getDatasource(config);
+    const prefix = `zipline_partial_${identifier}_`;
+    const partials = await readdir(directory);
+    const readChunks = partials
+      .filter((file) => file.startsWith(prefix) && /^\d+_\d+$/.test(file.slice(prefix.length)))
+      .map((file) => {
+        const [, , , start, end] = file.split('_');
+        return { file, start: Number(start), end: Number(end) };
+      })
+      .sort((a, b) => a.start - b.start);
 
-  if (!config.chunks.enabled) {
-    logger.error('chunks are not enabled');
-    process.exit(1);
-  }
+    let offset = 0;
+    for (const chunk of readChunks) {
+      if (chunk.start !== offset || !Number.isSafeInteger(chunk.end) || chunk.end < chunk.start)
+        throw new Error('Partial upload has missing or invalid chunks');
+      offset = chunk.end + 1;
+    }
+    if (offset !== size) throw new Error('Partial upload does not match its expected size');
 
-  const datasource = global.__datasource__;
+    send({ type: 'started', chunksTotal: readChunks.length });
+    logger.debug('started partial upload worker', { chunks: readChunks.length });
 
-  logger.debug('started partial upload worker');
+    for (let i = 0; i !== readChunks.length; ++i) {
+      const chunk = readChunks[i];
+      const chunkPath = join(directory, chunk.file);
 
-  const partials = await readdir(config.core.tempDirectory).then((files) =>
-    files.filter((file) => file.startsWith(`zipline_partial_${options.partial!.identifier}`)),
-  );
-
-  const readChunks = partials
-    .map((file) => {
-      const [, , , start, end] = file.split('_');
-      return { file, start: Number(start), end: Number(end) };
-    })
-    .sort((a, b) => a.start - b.start);
-
-  const incompleteFile = await dbProxy('incomplete.create', {
-    chunksTotal: readChunks.length,
-    chunksComplete: 0,
-    status: 'PENDING',
-    userId: user.id,
-    metadata: {
-      file,
-    },
-  });
-
-  finalPath = join(config.core.tempDirectory, randomCharacters(16));
-
-  const fd = await open(finalPath, 'w');
-  await fd.close();
-
-  for (let i = 0; i !== readChunks.length; ++i) {
-    const chunk = readChunks[i];
-
-    const chunkPath = join(config.core.tempDirectory, chunk.file);
-
-    try {
-      await new Promise<void>((resolve, reject) => {
-        const readStream = createReadStream(chunkPath);
-        const writeStream = createWriteStream(finalPath!, { start: chunk.start, flags: 'r+' });
-
-        readStream.pipe(writeStream);
-
-        writeStream.on('finish', resolve);
-
-        writeStream.on('error', reject);
-      });
-
+      await pipeline(
+        createReadStream(chunkPath),
+        createWriteStream(temporaryPath, { start: chunk.start, flags: i === 0 ? 'w' : 'r+' }),
+      );
       await rm(chunkPath);
-      await dbProxy('incomplete.increment', {
-        id: incompleteFile.id,
-        status: 'PROCESSING',
-      });
+      send({ type: 'progress', chunksComplete: i + 1 });
 
       logger.debug(`wrote chunk ${i + 1}/${readChunks.length}`, {
         start: chunk.start,
         end: chunk.end,
       });
-    } catch (e) {
-      logger.error('error while combining chunks');
-      console.error(e);
-      await failPartial(config, incompleteFile);
-
-      process.exit(1);
-    }
-  }
-
-  let finalSize: number;
-  try {
-    if (file.type.startsWith('image/') && config.files.removeGpsMetadata) {
-      const removed = removeGps(finalPath);
-      if (removed) logger.c('gps').debug(`removed gps metadata from ${file.filename}`);
     }
 
-    finalSize = await stat(finalPath).then((s) => s.size);
+    if ((await stat(temporaryPath)).size !== size)
+      throw new Error('Combined partial upload does not match its expected size');
 
-    if (config.datasource.type === 'local') {
-      await datasource.put(file.filename, finalPath, { mimetype: file.type });
-    } else if (config.datasource.type === 's3') {
-      logger.debug('starting multipart upload process for s3');
-
-      const bodyStream = createReadStream(finalPath);
-      const s3datasource = datasource as S3Datasource;
-      const upload = new Upload({
-        client: s3datasource.client,
-        params: {
-          Bucket: s3datasource.options.bucket,
-          Key: s3datasource.key(file.filename),
-          Body: bodyStream,
-        },
-        partSize: bytes(config.chunks.size),
-        leavePartsOnError: false,
-      });
-
-      upload.on('httpUploadProgress', (progress) => logger.debug('s3 MultipartUpload', { ...progress }));
-
-      await upload.done();
-
-      await rm(finalPath);
+    if (file.type.startsWith('image/') && removeGpsMetadata) {
+      const removed = removeGps(temporaryPath);
+      if (removed) logger.c('gps').debug(`removed gps metadata from ${file.name}`);
     }
-  } catch (e) {
-    logger.error('error while processing or storing partial upload');
-    console.error(e);
-    await failPartial(config, incompleteFile);
 
-    process.exit(1);
+    send({ type: 'complete', size: (await stat(temporaryPath)).size });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    logger.error('partial upload failed', { error: message });
+    send({ type: 'failure', error: message });
+    process.exitCode = 1;
+  } finally {
+    parentPort!.close();
   }
-
-  await dbProxy('incomplete.status', {
-    id: incompleteFile.id,
-    status: 'COMPLETE',
-  });
-
-  await runComplete(file.id, finalSize);
-
-  parentPort!.close();
 }
 
-async function runComplete(id: string, size: number) {
-  const userr = await dbProxy('user.uploadContext', { id: user.id });
-  if (!userr) return;
-
-  const fileUpload = await dbProxy('file.finalizePartial', {
-    id,
-    changes: {
-      size,
-      ...(options.maxViews && { maxViews: options.maxViews }),
-      ...(options.deletesAt && options.deletesAt !== 'never'
-        ? { deletesAt: options.deletesAt }
-        : { deletesAt: null }),
-    },
-  });
-  if (!fileUpload) return;
-
-  logger.info(`${userr.username} uploaded ${fileUpload.name}`, {
-    size: bytes(fileUpload.size),
-    partial: true,
-  });
-
-  await onUpload(config, {
-    user: userr,
-    file: { ...fileUpload, thumbnail: null, tags: [] },
-    link: {
-      raw: `${domain}${formatRootUrl('/raw', fileUpload.name)}`,
-      returned: responseUrl,
-    },
-  });
-}
-
-async function failPartial(config: Config, incompleteFile: { id: string }) {
-  logger.error('failing incomplete file', { id: incompleteFile.id });
-
-  await dbProxy('file.delete', { id: file.id });
-
-  const partials = await readdir(config.core.tempDirectory).then((files) =>
-    files.filter((file) => file.startsWith(`zipline_partial_${options.partial!.identifier}`)),
-  );
-  await Promise.all(partials.map((file) => rm(join(config.core.tempDirectory, file)).catch(() => {})));
-  if (finalPath) {
-    try {
-      await rm(finalPath);
-    } catch {}
-  }
-
-  return dbProxy('incomplete.status', {
-    id: incompleteFile.id,
-    status: 'FAILED',
-  });
-}
+void main();

@@ -38,6 +38,10 @@ export function getExtension(filename: string, override?: string) {
   return doubleExtension ? filename.slice(-doubleExtension.length) : extname(filename);
 }
 
+export function isThumbnail(name: string): boolean {
+  return name.toLowerCase().startsWith('.thumbnail');
+}
+
 export function sanitizeFilename(name: string): string | null {
   if (!name || name === '.' || name === '..' || name.includes('\0')) return null;
   if (name.includes('/') || name.includes('\\') || isAbsolute(name) || basename(name) !== name) return null;

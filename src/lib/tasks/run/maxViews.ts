@@ -5,6 +5,7 @@ import { config } from '@/lib/config';
 import { db } from '@/lib/db';
 import { removeFiles } from '@/lib/db/models/file';
 import { files, urls } from '@/lib/db/schema';
+import { isThumbnail } from '@/lib/fs';
 import { and, gt, gte, inArray } from 'drizzle-orm';
 
 export default function maxViews() {
@@ -35,7 +36,7 @@ export default function maxViews() {
     const deletedFiles: typeof expiredFiles = [];
     for (const file of expiredFiles) {
       try {
-        await datasource.delete(file.name);
+        if (!isThumbnail(file.name)) await datasource.delete(file.name);
         deletedFiles.push(file);
       } catch {
         this.logger.error('failed to delete file from datasource', {
