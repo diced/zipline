@@ -1,6 +1,6 @@
 import { config } from '@/lib/config';
 import { db } from '@/lib/db';
-import { filePasswordExtra } from '@/lib/db/models/file';
+import { filePasswordExtra, getRenamedFileName } from '@/lib/db/models/file';
 import { userViewSchema } from '@/lib/db/models/user';
 import { escapeLike } from '@/lib/db/utils';
 import { sanitizeFilename } from '@/lib/fs';
@@ -38,7 +38,12 @@ export async function filesRoute(
       orderBy: { createdAt: 'desc' },
     });
   }
-  if (!file) return res.callNotFound();
+  if (!file) {
+    const renamed = await getRenamedFileName(name);
+    if (renamed) return res.redirect(formatRootUrl(config.files.route, renamed, req.query), 302);
+
+    return res.callNotFound();
+  }
   const view = file.user ? userViewSchema.parse(file.user.view) : null;
 
   const viewUrl = formatRootUrl('/view', file.name);

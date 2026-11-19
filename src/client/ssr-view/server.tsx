@@ -11,7 +11,7 @@ import { isCode } from '@/lib/code';
 import { config as zConfig } from '@/lib/config';
 import type { Config } from '@/lib/config/validate';
 import { db } from '@/lib/db';
-import { fileRelations } from '@/lib/db/models/file';
+import { fileRelations, getRenamedFileName } from '@/lib/db/models/file';
 import { getUserSummary } from '@/lib/db/models/user';
 import { escapeLike } from '@/lib/db/utils';
 import { prepareDiscordComponentEmbedForFile, serializeDiscordComponentEmbed } from '@/lib/discord';
@@ -22,7 +22,7 @@ import { createZiplineSsr } from '@/lib/ssr/createZiplineSsr';
 import { createViewFileData } from '@/lib/ssr/viewData';
 import { stripHtml } from '@/lib/stripHtml';
 import type { ZiplineTheme } from '@/lib/theme';
-import { formatMediaUrl } from '@/lib/url';
+import { formatMediaUrl, formatRootUrl } from '@/lib/url';
 import type { FastifyRequest } from 'fastify';
 import { renderToString } from 'react-dom/server';
 import { createStaticHandler, createStaticRouter, StaticRouterProvider } from 'react-router-dom';
@@ -68,7 +68,16 @@ export async function render(
   if (!libConfig) await reloadSettings();
 
   const result = await getFile(id);
-  if (!result || !result.userId) return { html: 'Not Found', meta: '', status: 404 };
+  if (!result) {
+    const name = sanitizeFilename(id);
+    const renamed = name ? await getRenamedFileName(name) : null;
+    if (renamed) {
+      return { html: '', meta: '', status: 302, redirect: formatRootUrl('/view', renamed, req.query) };
+    }
+
+    return { html: 'Not Found', meta: '', status: 404 };
+  }
+  if (!result.userId) return { html: 'Not Found', meta: '', status: 404 };
 
   if (result.maxViews && result.views >= result.maxViews) return { html: 'Gone', meta: '', status: 410 };
   if (result.deletesAt && result.deletesAt <= new Date()) return { html: 'Expired', meta: '', status: 410 };

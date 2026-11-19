@@ -134,7 +134,10 @@ export default typedPlugin(
           if (req.body.name !== undefined) {
             await lockFiles(tx);
 
-            const [current] = await tx.select({ name: files.name }).from(files).where(eq(files.id, file.id));
+            const [current] = await tx
+              .select({ name: files.name, previousNames: files.previousNames })
+              .from(files)
+              .where(eq(files.id, file.id));
             if (!current) return null;
             currentName = current.name;
 
@@ -147,6 +150,10 @@ export default typedPlugin(
               if (existing) throw new ApiError(1014);
 
               data.name = req.body.name;
+              data.previousNames = [
+                ...current.previousNames.filter((name) => name !== req.body.name),
+                currentName,
+              ];
             }
           }
 
