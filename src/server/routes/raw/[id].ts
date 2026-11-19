@@ -5,13 +5,14 @@ import { parseRange } from '@/lib/api/range';
 import { config } from '@/lib/config';
 import { datasource } from '@/lib/datasource';
 import { db } from '@/lib/db';
-import { removeFile } from '@/lib/db/models/file';
+import { getRenamedFileName, removeFile } from '@/lib/db/models/file';
 import { files } from '@/lib/db/schema';
 import { escapeLike } from '@/lib/db/utils';
 import { sanitizeFilename } from '@/lib/fs';
 import { log } from '@/lib/logger';
 import { guess } from '@/lib/mimes';
 import { TimedCache } from '@/lib/timedCache';
+import { formatRootUrl } from '@/lib/url';
 import typedPlugin from '@/server/typedPlugin';
 import { and, desc, eq, like, lt, sql } from 'drizzle-orm';
 import { FastifyReply, FastifyRequest } from 'fastify';
@@ -83,7 +84,12 @@ export const rawFileHandler = async (
       .limit(1);
     file = fileReq;
   }
-  if (!file) return res.callNotFound();
+  if (!file) {
+    const renamed = await getRenamedFileName(idSanitized);
+    if (renamed) return res.redirect(formatRootUrl('/raw', renamed, req.query), 302);
+
+    return res.callNotFound();
+  }
 
   if (file?.deletesAt && file.deletesAt <= new Date()) {
     try {

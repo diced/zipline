@@ -255,6 +255,7 @@ export const files = pgTable(
     deletesAt: timestamp({ precision: 3, mode: 'date', withTimezone: true }),
     name: text().notNull(),
     originalName: text(),
+    previousNames: text().array().default([]).notNull(),
     size: bigint({ mode: 'number' }).notNull(),
     type: text().notNull(),
     views: integer().default(0).notNull(),
@@ -278,6 +279,7 @@ export const files = pgTable(
   (table) => [
     primaryKey({ name: 'file_pkey', columns: [table.id] }),
     index('file_name_idx').on(table.name),
+    index('file_previous_names_idx').using('gin', table.previousNames),
     index('file_user_id_size_idx').on(table.userId, table.size),
     index('file_user_id_created_at_idx').on(table.userId, table.createdAt),
     index('file_folder_id_created_at_idx').on(table.folderId, table.createdAt),

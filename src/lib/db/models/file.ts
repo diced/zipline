@@ -2,7 +2,7 @@ import { config } from '@/lib/config';
 import { db, type DbClient } from '@/lib/db';
 import { files } from '@/lib/db/schema';
 import { formatRootUrl } from '@/lib/url';
-import { and, eq, getColumns, inArray, isNotNull, sql } from 'drizzle-orm';
+import { and, arrayContains, desc, eq, getColumns, inArray, isNotNull, sql } from 'drizzle-orm';
 import { createSelectSchema } from 'drizzle-orm/zod';
 import { z } from 'zod';
 import { tagColumns, tagSchema } from './tag';
@@ -10,9 +10,14 @@ import { tagColumns, tagSchema } from './tag';
 export type FileInsert = typeof files.$inferInsert;
 export type FileUpdate = Partial<Omit<FileInsert, 'id' | 'createdAt' | 'updatedAt'>>;
 
-export const fileColumns = { userId: false, password: false } as const;
+export const fileColumns = { userId: false, password: false, previousNames: false } as const;
 
-const { password: _password, userId: _userId, ...fileDeleteColumns } = getColumns(files);
+const {
+  password: _password,
+  userId: _userId,
+  previousNames: _previousNames,
+  ...fileDeleteColumns
+} = getColumns(files);
 
 export const filePasswordExtra = {
   password: (file: typeof files) => isNotNull(file.password).mapWith(Boolean).as('password'),
@@ -39,6 +44,18 @@ export async function getFile(identifier: string, client: DbClient = db) {
     with: fileOwnerRelations,
   });
   return row ?? null;
+}
+
+// current name of a file that used to be called `name`; the most recently updated file wins if
+// several have used it
+export async function getRenamedFileName(name: string, client: DbClient = db) {
+  const [row] = await client
+    .select({ name: files.name })
+    .from(files)
+    .where(arrayContains(files.previousNames, [name]))
+    .orderBy(desc(files.updatedAt))
+    .limit(1);
+  return row?.name ?? null;
 }
 
 export async function getFilesWithUser(ids: string[], client: DbClient = db) {
@@ -90,7 +107,7 @@ export const fileSchema = createSelectSchema(files, {
   password: z.boolean().nullable().optional(),
   anonymous: (schema) => schema.optional(),
 })
-  .omit({ userId: true })
+  .omit({ userId: true, previousNames: true })
   .extend({
     thumbnail: z.object({ path: z.string() }).nullable(),
     tags: z.array(tagSchema).optional(),
