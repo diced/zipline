@@ -258,11 +258,6 @@ export default function FileTable({
     } catch {}
   };
 
-  const searching =
-    searchQuery.name.trim() !== '' ||
-    searchQuery.originalName.trim() !== '' ||
-    searchQuery.type.trim() !== '';
-
   const { data, isLoading } = useApiPagination({
     page,
     perpage,
