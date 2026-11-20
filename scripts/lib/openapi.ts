@@ -47,6 +47,31 @@ export function prepareOpenApiSpec(spec: OpenAPIV3.Document): OpenAPIV3.Document
   spec.components.responses ??= {};
   spec.components.schemas.ApiError = ERROR_SCHEMA;
 
+  // These routes stream multipart bodies, so their request schemas cannot be
+  // attached to Fastify without changing how the uploads are parsed.
+  for (const [path, multiple] of [
+    ['/api/upload', true],
+    ['/api/upload/partial', false],
+  ] as const) {
+    const operation = spec.paths[path]?.post;
+    if (!operation || operation.requestBody) continue;
+
+    const file: OpenAPIV3.SchemaObject = { type: 'string', format: 'binary' };
+    operation.requestBody = {
+      required: true,
+      description: multiple ? 'One or more files to upload.' : 'A single chunk of the file to upload.',
+      content: {
+        'multipart/form-data': {
+          schema: {
+            type: 'object',
+            required: ['file'],
+            properties: { file: multiple ? { type: 'array', items: file, minItems: 1 } : file },
+          },
+        },
+      },
+    };
+  }
+
   for (const range of ['4XX', '5XX'] as const) {
     const examples = Object.fromEntries(
       ALL_ERRORS.filter((entry) => Math.floor(entry.statusCode / 100) === Number(range[0])).map((entry) => [
