@@ -613,12 +613,12 @@ export default function FileTable({
             },
           ]}
           fetching={isLoading}
-          totalRecords={searching ? data?.page.length : (data?.total ?? 0)}
-          recordsPerPage={searching ? undefined : perpage}
-          onRecordsPerPageChange={searching ? undefined : setPerpage}
-          recordsPerPageOptions={searching ? undefined : PER_PAGE_OPTIONS}
-          page={searching ? undefined : page}
-          onPageChange={searching ? undefined : setPage}
+          totalRecords={data?.total ?? 0}
+          recordsPerPage={perpage}
+          onRecordsPerPageChange={setPerpage}
+          recordsPerPageOptions={PER_PAGE_OPTIONS}
+          page={page}
+          onPageChange={setPage}
           sortStatus={{
             columnAccessor: sort,
             direction: order,

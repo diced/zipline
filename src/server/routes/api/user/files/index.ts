@@ -119,16 +119,18 @@ export default typedPlugin(
         });
         const filePage = formatFiles(fileRows);
 
+        const total = await db.$count(files, fileFilter(files));
+
         if (searchQuery)
           return res.send({
             page: filePage,
+            total,
+            pages: Math.ceil(total / perpage),
             search: {
               field: searchField,
               query: searchField === 'tags' ? tagIds : searchQuery,
             },
           });
-
-        const total = await db.$count(files, fileFilter(files));
 
         return res.send({
           page: filePage,
