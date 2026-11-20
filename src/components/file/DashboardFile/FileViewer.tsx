@@ -1,81 +1,45 @@
-import FolderComboboxOptions from '@/components/folders/FolderComboboxOptions';
-import TagPill from '@/components/pages/files/tags/TagPill';
-import { Response } from '@/lib/api/response';
 import { bytes } from '@/lib/bytes';
-import { useFolders } from '@/lib/client/hooks/useFolders';
 import { useFileNavStore } from '@/lib/client/store/fileNav';
 import { useSettingsStore } from '@/lib/client/store/settings';
 import { File } from '@/lib/db/models/file';
-import { Tag } from '@/lib/db/models/tag';
-import { fetchApi } from '@/lib/fetchApi';
-import { buildFolderHierarchy } from '@/lib/folderHierarchy';
 import {
   ActionIcon,
   ActionIconProps,
   Box,
-  Button,
-  Checkbox,
-  Combobox,
   Drawer,
   Group,
-  Input,
-  InputBase,
   Paper,
-  Pill,
-  PillsInput,
   Stack,
   Text,
   Title,
   Tooltip,
-  useCombobox,
 } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
-import { showNotification } from '@mantine/notifications';
 import {
   Icon,
-  IconBombFilled,
   IconChevronLeft,
   IconChevronRight,
   IconClipboardTypography,
   IconCopy,
-  IconDeviceSdCard,
   IconDownload,
   IconExternalLink,
-  IconEyeFilled,
-  IconFileInfo,
-  IconFolderMinus,
   IconInfoCircle,
   IconPencil,
-  IconRefresh,
   IconStar,
   IconStarFilled,
-  IconTags,
-  IconTagsOff,
-  IconTextRecognition,
   IconTrashFilled,
-  IconUpload,
-  IconUserQuestion,
   IconX,
 } from '@tabler/icons-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import useSWR, { mutate } from 'swr';
 import { useShallow } from 'zustand/shallow';
 
 import DashboardFileType from '../DashboardFileType';
-import {
-  addToFolder,
-  copyFile,
-  createFolderAndAdd,
-  deleteFile,
-  downloadFile,
-  favoriteFile,
-  mutateFiles,
-  removeFromFolder,
-  viewFile,
-} from '../actions';
+import { copyFile, deleteFile, downloadFile, favoriteFile, viewFile } from '../actions';
 import EditFileDetailsModal from './EditFileDetailsModal';
-import FileStat from './FileStat';
+import FileFolderPicker from './FileFolderPicker';
+import FileStats from './FileStats';
+import FileTags, { useFileTags } from './FileTags';
 
 function ActionButton({
   Icon,
@@ -125,125 +89,7 @@ export default function FileViewer({
   const warnDeletion = useSettingsStore((state) => state.settings.warnDeletion);
   const fileNavButtons = useSettingsStore((state) => state.settings.fileNavButtons);
 
-  const { data: folders } = useFolders(user);
-
-  const folderOptions = useMemo(() => {
-    if (!folders) return [];
-    return buildFolderHierarchy(folders);
-  }, [folders]);
-
-  const folderCombobox = useCombobox();
-  const [search, setSearch] = useState('');
-
-  const handleAdd = async (value: string) => {
-    if (value === '$create') {
-      await createFolderAndAdd(file!, search.trim());
-    } else {
-      await addToFolder(file!, value);
-    }
-  };
-
-  const { data: tags } = useSWR<Extract<Response['/api/user/tags'], Tag[]>>(
-    user ? `/api/users/${user}/tags` : '/api/user/tags',
-  );
-
-  const tagsCombobox = useCombobox();
-
-  const fileTags = useMemo(() => file?.tags?.map((tag) => tag.id) ?? [], [file?.tags]);
-  const [tagState, setTagState] = useState(() => ({
-    fileId: file?.id,
-    fileTags,
-    open,
-    value: fileTags,
-    dirty: false,
-  }));
-  const value = tagState.fileId === file?.id ? tagState.value : fileTags;
-
-  if (tagState.fileId !== file?.id || tagState.fileTags !== fileTags || tagState.open !== open) {
-    const dirty = tagState.fileId === file?.id && tagState.dirty && open;
-    setTagState({
-      fileId: file?.id,
-      fileTags,
-      open,
-      value: dirty ? tagState.value : fileTags,
-      dirty,
-    });
-  }
-
-  const handleValueSelect = (val: string) => {
-    if (!file) return;
-
-    setTagState((current) => {
-      const value = current.fileId === file.id ? current.value : fileTags;
-      return {
-        ...current,
-        fileId: file.id,
-        value: value.includes(val) ? value.filter((v) => v !== val) : [...value, val],
-        dirty: true,
-      };
-    });
-  };
-
-  const handleValueRemove = (val: string) => {
-    if (!file) return;
-
-    setTagState((current) => ({
-      ...current,
-      fileId: file.id,
-      value: (current.fileId === file.id ? current.value : fileTags).filter((v) => v !== val),
-      dirty: true,
-    }));
-  };
-
-  const handleTagsUpdate = async () => {
-    if (!file || tagState.fileId !== file.id || !tagState.dirty) return;
-
-    if (value.length === fileTags.length && value.every((v) => fileTags.includes(v))) {
-      setTagState((current) =>
-        current.fileId === file.id && current.value === value ? { ...current, dirty: false } : current,
-      );
-      return;
-    }
-
-    const { data, error } = await fetchApi<Response['/api/user/files/[id]']>(
-      `/api/user/files/${file.id}`,
-      'PATCH',
-      {
-        tags: value,
-      },
-    );
-
-    if (error) {
-      showNotification({
-        title: t('notifications.saveTagsError.title'),
-        message: error.error,
-        color: 'red',
-        icon: <IconTagsOff size='1rem' />,
-      });
-    } else {
-      setTagState((current) =>
-        current.fileId === file.id && current.value === value ? { ...current, dirty: false } : current,
-      );
-
-      showNotification({
-        title: t('notifications.tagsSaved.title'),
-        message: t('notifications.tagsSaved.message', { count: data!.tags!.length, name: data!.name }),
-        color: 'green',
-        icon: <IconTags size='1rem' />,
-      });
-    }
-
-    mutateFiles();
-    mutate('/api/user/tags');
-  };
-
-  const triggerSave = async () => {
-    tagsCombobox.closeDropdown();
-
-    handleTagsUpdate();
-  };
-
-  const values = value.map((id) => <TagPill key={id} tag={tags?.find((t) => t.id === id) || null} />);
+  const tagsEditor = useFileTags(file, open, user);
 
   const [editFileOpen, setEditFileOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
@@ -353,173 +199,11 @@ export default function FileViewer({
       >
         {file && (
           <Stack gap='md'>
-            <FileStat Icon={IconFileInfo} title={t('stats.type')} value={file.type} />
-            <FileStat Icon={IconDeviceSdCard} title={t('stats.size')} value={bytes(file.size)} />
-            <FileStat
-              Icon={IconUpload}
-              title={t('stats.createdAt')}
-              value={new Date(file.createdAt).toLocaleString()}
-            />
-            <FileStat
-              Icon={IconRefresh}
-              title={t('stats.updatedAt')}
-              value={new Date(file.updatedAt).toLocaleString()}
-            />
-            {file.deletesAt && !reduce && (
-              <FileStat
-                Icon={IconBombFilled}
-                title={t('stats.deletesAt')}
-                value={new Date(file.deletesAt).toLocaleString()}
-              />
-            )}
-            <FileStat
-              Icon={IconEyeFilled}
-              title={t('stats.views')}
-              value={file.maxViews ? `${file.views} / ${file.maxViews}` : file.views}
-            />
-            {file.originalName && (
-              <FileStat
-                Icon={IconTextRecognition}
-                title={t('stats.originalName')}
-                value={file.originalName}
-              />
-            )}
-            {file.anonymous && (
-              <FileStat
-                Icon={IconUserQuestion}
-                title={t('stats.anonymous')}
-                value={t('common:actions.yes')}
-              />
-            )}
+            <FileStats file={file} reduce={reduce} />
             {!reduce && (
               <>
-                <Box>
-                  <Title order={4} mb='xs'>
-                    {t('details.tags.title')}
-                  </Title>
-                  <Combobox zIndex={90000} store={tagsCombobox} onOptionSubmit={handleValueSelect}>
-                    <Combobox.DropdownTarget>
-                      <PillsInput
-                        onBlur={() => triggerSave()}
-                        pointer
-                        onClick={() => tagsCombobox.openDropdown()}
-                      >
-                        <Pill.Group>
-                          {values.length > 0 ? (
-                            values
-                          ) : (
-                            <Input.Placeholder>{t('details.tags.placeholder')}</Input.Placeholder>
-                          )}
-
-                          <Combobox.EventsTarget>
-                            <PillsInput.Field
-                              type='hidden'
-                              onFocus={() => tagsCombobox.openDropdown()}
-                              onBlur={() => tagsCombobox.closeDropdown()}
-                              onKeyDown={(event) => {
-                                if (
-                                  event.key === 'Backspace' &&
-                                  value.length > 0 &&
-                                  event.currentTarget.value === ''
-                                ) {
-                                  event.preventDefault();
-                                  handleValueRemove(value[value.length - 1]);
-                                }
-                              }}
-                            />
-                          </Combobox.EventsTarget>
-                        </Pill.Group>
-                      </PillsInput>
-                    </Combobox.DropdownTarget>
-
-                    <Combobox.Dropdown>
-                      <Combobox.Options>
-                        {tags?.length ? (
-                          tags.map((tag) => (
-                            <Combobox.Option value={tag.id} key={tag.id} active={value.includes(tag.id)}>
-                              <Group gap='sm'>
-                                <Checkbox
-                                  checked={value.includes(tag.id)}
-                                  onChange={() => {}}
-                                  aria-hidden
-                                  tabIndex={-1}
-                                  style={{ pointerEvents: 'none' }}
-                                />
-                                <TagPill tag={tag} />
-                              </Group>
-                            </Combobox.Option>
-                          ))
-                        ) : (
-                          <Combobox.Empty>{t('details.tags.empty')}</Combobox.Empty>
-                        )}
-                      </Combobox.Options>
-                    </Combobox.Dropdown>
-                  </Combobox>
-                </Box>
-                <Box>
-                  <Title order={4} mb='xs'>
-                    {t('details.folder.title')}
-                  </Title>
-                  {file.folderId ? (
-                    <Button
-                      color='red'
-                      leftSection={<IconFolderMinus size='1rem' />}
-                      onClick={() => removeFromFolder(file)}
-                      fullWidth
-                    >
-                      {t('details.folder.remove', {
-                        name: folders?.find((f: { id: string }) => f.id === file.folderId)?.name ?? '',
-                      })}
-                    </Button>
-                  ) : (
-                    <Combobox zIndex={90000} store={folderCombobox} onOptionSubmit={(v) => handleAdd(v)}>
-                      <Combobox.Target>
-                        <InputBase
-                          rightSection={<Combobox.Chevron />}
-                          value={search}
-                          onChange={(event) => {
-                            folderCombobox.openDropdown();
-                            folderCombobox.updateSelectedOptionIndex();
-                            setSearch(event.currentTarget.value);
-                          }}
-                          onClick={() => {
-                            folderCombobox.openDropdown();
-                            setSearch('');
-                          }}
-                          onFocus={() => {
-                            folderCombobox.openDropdown();
-                            setSearch('');
-                          }}
-                          onBlur={() => {
-                            folderCombobox.closeDropdown();
-                            setSearch('');
-                          }}
-                          placeholder={t('details.folder.placeholder')}
-                          rightSectionPointerEvents='none'
-                        />
-                      </Combobox.Target>
-
-                      <Combobox.Dropdown>
-                        {folders?.length === 0 && (
-                          <Combobox.Empty>{t('details.folder.empty')}</Combobox.Empty>
-                        )}
-
-                        <FolderComboboxOptions
-                          folderOptions={folderOptions}
-                          searchValue={search}
-                          additionalOptions={
-                            !folders?.some((f: { name: string }) => f.name === search) &&
-                            search.trim().length > 0 ? (
-                              <Combobox.Option value='$create'>
-                                {t('details.folder.create', { name: search })}
-                              </Combobox.Option>
-                            ) : null
-                          }
-                        />
-                      </Combobox.Dropdown>
-                    </Combobox>
-                  )}
-                </Box>
+                <FileTags editor={tagsEditor} />
+                <FileFolderPicker file={file} user={user} />
               </>
             )}
           </Stack>
