@@ -69,6 +69,11 @@ export const API_ERRORS = {
   1068: "Couldn't find current password for this account",
   1069: 'TOTP is already enabled',
   1070: "You don't own this passkey",
+  1071: 'API key not found',
+  1072: 'API key does not have permission for this request',
+  1073: 'File request is closed',
+  1074: 'File request limit exceeded',
+  1075: 'File type is not accepted by this request',
 
   // 2xxx, session errors
   2000: 'Invalid login session',
@@ -112,6 +117,7 @@ export const API_ERRORS = {
   4009: 'User not found',
   4010: 'No settings table found',
   4011: 'Thumbnails task not found',
+  4012: 'File request not found',
 
   // 5xxx, constraint
   5000: 'File size exceeds the configured limit',

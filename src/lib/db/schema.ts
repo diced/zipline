@@ -1,4 +1,5 @@
 import type { DiscordComponentEmbed, DiscordFilePreviewMode, DiscordUrlPreviewMode } from '@/lib/discord';
+import type { ApiKeyScope } from '@/lib/apiKey';
 import type { QuickLinkId } from '@/lib/quickLinks';
 import { createId } from '@paralleldrive/cuid2';
 import type { Json } from 'drizzle-orm';
@@ -217,6 +218,69 @@ export const users = pgTable(
   ],
 );
 
+export const apiKeys = pgTable(
+  'ApiKey',
+  {
+    id: id(),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+    name: text().notNull(),
+    prefix: text().notNull(),
+    secretHash: text().notNull(),
+    scopes: text().array().$type<ApiKeyScope>().notNull(),
+    expiresAt: timestamp({ precision: 3, mode: 'date', withTimezone: true }),
+    lastUsedAt: timestamp({ precision: 3, mode: 'date', withTimezone: true }),
+    revokedAt: timestamp({ precision: 3, mode: 'date', withTimezone: true }),
+    userId: text()
+      .notNull()
+      .references(() => users.id, {
+        name: 'api_key_user_id_fkey',
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+      }),
+  },
+  (table) => [
+    primaryKey({ name: 'api_key_pkey', columns: [table.id] }),
+    uniqueIndex('api_key_prefix_key').on(table.prefix),
+    uniqueIndex('api_key_secret_hash_key').on(table.secretHash),
+    index('api_key_user_id_created_at_idx').on(table.userId, table.createdAt),
+  ],
+);
+
+export const fileRequests = pgTable(
+  'FileRequest',
+  {
+    id: id(),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+    name: text().notNull(),
+    description: text(),
+    enabled: boolean().default(true).notNull(),
+    password: text(),
+    expiresAt: timestamp({ precision: 3, mode: 'date', withTimezone: true }),
+    maxFiles: integer(),
+    maxBytes: bigint({ mode: 'number' }),
+    allowedTypes: text().array().default([]).notNull(),
+    folderId: text().references(() => folders.id, {
+      name: 'file_request_folder_id_fkey',
+      onDelete: 'set null',
+      onUpdate: 'cascade',
+    }),
+    userId: text()
+      .notNull()
+      .references(() => users.id, {
+        name: 'file_request_user_id_fkey',
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+      }),
+  },
+  (table) => [
+    primaryKey({ name: 'file_request_pkey', columns: [table.id] }),
+    index('file_request_user_id_created_at_idx').on(table.userId, table.createdAt),
+    index('file_request_folder_id_idx').on(table.folderId),
+  ],
+);
+
 export const folders = pgTable(
   'Folder',
   {
@@ -274,6 +338,11 @@ export const files = pgTable(
       onDelete: 'set null',
       onUpdate: 'cascade',
     }),
+    fileRequestId: text().references(() => fileRequests.id, {
+      name: 'file_file_request_id_fkey',
+      onDelete: 'set null',
+      onUpdate: 'cascade',
+    }),
   },
   (table) => [
     primaryKey({ name: 'file_pkey', columns: [table.id] }),
@@ -281,6 +350,7 @@ export const files = pgTable(
     index('file_user_id_size_idx').on(table.userId, table.size),
     index('file_user_id_created_at_idx').on(table.userId, table.createdAt),
     index('file_folder_id_created_at_idx').on(table.folderId, table.createdAt),
+    index('file_file_request_id_created_at_idx').on(table.fileRequestId, table.createdAt),
   ],
 );
 

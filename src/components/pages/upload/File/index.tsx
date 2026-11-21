@@ -30,7 +30,15 @@ import DropzoneFile from './DropzoneFile';
 
 const initialVisible = 24;
 
-export default function UploadFile({ title, folder }: { title?: string; folder?: string }) {
+export default function UploadFile({
+  title,
+  folder,
+  fileRequest,
+}: {
+  title?: string;
+  folder?: string;
+  fileRequest?: boolean;
+}) {
   const { t } = useTranslation('upload');
   const theme = useMantineTheme();
   const colorScheme = useColorScheme();
@@ -72,7 +80,7 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
       <Group gap='sm'>
         <Title order={1}>{title ?? t('file.title')}</Title>
 
-        {!folder && (
+        {!folder && !fileRequest && (
           <Button
             variant='outline'
             size='compact-sm'
@@ -217,7 +225,7 @@ export default function UploadFile({ title, folder }: { title?: string; folder?:
         >
           {t('actions.clearAll')}
         </Button>
-        <UploadOptionsButton folder={folder} numFiles={files.length} />
+        {!fileRequest && <UploadOptionsButton folder={folder} numFiles={files.length} />}
         <Button
           variant='outline'
           leftSection={<IconUpload size='1rem' />}

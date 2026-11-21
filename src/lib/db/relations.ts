@@ -14,6 +14,27 @@ export const relations = defineRelations(schema, (r) => ({
     oauthProviders: r.many.oauthProviders(),
     incompleteFiles: r.many.incompleteFiles(),
     exports: r.many.exports(),
+    apiKeys: r.many.apiKeys(),
+    fileRequests: r.many.fileRequests(),
+  },
+  apiKeys: {
+    user: r.one.users({
+      from: r.apiKeys.userId,
+      to: r.users.id,
+      optional: false,
+    }),
+  },
+  fileRequests: {
+    user: r.one.users({
+      from: r.fileRequests.userId,
+      to: r.users.id,
+      optional: false,
+    }),
+    folder: r.one.folders({
+      from: r.fileRequests.folderId,
+      to: r.folders.id,
+    }),
+    files: r.many.files(),
   },
   userQuotas: {
     user: r.one.users({
@@ -62,6 +83,7 @@ export const relations = defineRelations(schema, (r) => ({
     }),
     children: r.many.folders({ alias: 'FolderToFolder' }),
     files: r.many.files(),
+    fileRequests: r.many.fileRequests(),
   },
   files: {
     user: r.one.users({
@@ -71,6 +93,10 @@ export const relations = defineRelations(schema, (r) => ({
     folder: r.one.folders({
       from: r.files.folderId,
       to: r.folders.id,
+    }),
+    fileRequest: r.one.fileRequests({
+      from: r.files.fileRequestId,
+      to: r.fileRequests.id,
     }),
     thumbnail: r.one.thumbnails(),
     tags: r.many.tags({

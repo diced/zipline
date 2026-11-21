@@ -24,6 +24,7 @@ import { hashPassword } from '@/lib/crypto';
 import { db } from '@/lib/db';
 import { lockFiles, type FileInsert } from '@/lib/db/models/file';
 import { getFolderMetadata } from '@/lib/db/models/folder';
+import { getFileRequestUploadContext, validateFileRequestUpload } from '@/lib/db/models/fileRequest';
 import { getUser } from '@/lib/db/models/user';
 import { files, incompleteFiles, users } from '@/lib/db/schema';
 import { sanitizeFilename } from '@/lib/fs';
@@ -104,8 +105,14 @@ export default typedPlugin(
 
         if (total > bytes(config.files.maxFileSize)) throw new ApiError(5001);
 
+        const fileRequest = options.fileRequest
+          ? await getFileRequestUploadContext(options.fileRequest.id, options.fileRequest.token)
+          : null;
+
         let folder = null;
-        if (options.folder) {
+        if (fileRequest?.folderId) {
+          folder = await getFolderMetadata(fileRequest.folderId);
+        } else if (options.folder) {
           folder = await getFolderMetadata(options.folder);
           if (!folder) throw new ApiError(4001);
 
@@ -115,10 +122,11 @@ export default typedPlugin(
 
         // use quota of folder owner for anonymous uploads
         let quotaUser = req.user ? req.user : null;
+        if (fileRequest) quotaUser = await getUser(fileRequest.userId);
         if (!quotaUser && folder?.userId) quotaUser = await getUser(folder.userId);
 
         if (start === 0) {
-          createPartial(req, options.folder, quotaUser?.id ?? null, total);
+          createPartial(req, fileRequest?.folderId ?? options.folder, quotaUser?.id ?? null, total);
 
           if (quotaUser?.id) {
             const reserved = quotaReservations(quotaUser.id);
@@ -181,7 +189,8 @@ export default typedPlugin(
           const data: Omit<FileInsert, 'name'> = {
             size: total,
             type: mimetype,
-            userId: req.user ? req.user.id : options.folder ? folder?.userId : undefined,
+            userId:
+              fileRequest?.userId ?? (req.user ? req.user.id : options.folder ? folder?.userId : undefined),
           };
 
           if (options.password) {
@@ -192,16 +201,25 @@ export default typedPlugin(
           if (options.discordPreviewMode) data.discordPreviewMode = options.discordPreviewMode;
           if (options.discordComponentEmbed) data.discordComponentEmbed = options.discordComponentEmbed;
           if (folder) data.folderId = folder.id;
+          if (fileRequest) data.fileRequestId = fileRequest.id;
           if (options.addOriginalName) {
             const sanitizedOG = sanitizeFilename(options.partial.filename);
             if (!sanitizedOG) throw new ApiError(1008);
 
             data.originalName = sanitizedOG;
           }
-          if (!req.user && folder) data.anonymous = true;
+          if (fileRequest || (!req.user && folder)) data.anonymous = true;
 
           const { fileUpload, incompleteFile } = await db.transaction(async (tx) => {
             await lockFiles(tx);
+
+            if (fileRequest) {
+              await validateFileRequestUpload(
+                fileRequest.id,
+                [{ size: total, type: mimetype, filename: options.partial!.filename }],
+                tx,
+              );
+            }
 
             if (quotaUser?.quota) {
               await tx.select({ id: users.id }).from(users).where(eq(users.id, quotaUser.id)).for('update');
@@ -260,10 +278,13 @@ export default typedPlugin(
             onComplete(file) {
               if (!quotaUser) return;
 
-              logger.info(`${quotaUser.username} uploaded ${file.name}`, {
-                size: bytes(file.size),
-                partial: true,
-              });
+              logger.info(
+                `${fileRequest ? '[file request upload]' : quotaUser.username} uploaded ${file.name}`,
+                {
+                  size: bytes(file.size),
+                  partial: true,
+                },
+              );
               onUpload(config, {
                 user: quotaUser,
                 file: { ...file, thumbnail: null, tags: [] },

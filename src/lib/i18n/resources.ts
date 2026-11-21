@@ -14,6 +14,7 @@ import type invites from './locales/en/invites.json';
 import type users from './locales/en/users.json';
 import type dashboard from './locales/en/dashboard.json';
 import type metrics from './locales/en/metrics.json';
+import type fileRequests from './locales/en/fileRequests.json';
 import type { Language } from './languages';
 
 // english is the source of truth, every other language is a (possibly partial) translation of it
@@ -34,6 +35,7 @@ export type Resources = {
   users: typeof users;
   dashboard: typeof dashboard;
   metrics: typeof metrics;
+  fileRequests: typeof fileRequests;
 };
 
 export type Namespace = keyof Resources;

@@ -159,6 +159,20 @@ test('partial upload headers preserve chunk metadata', () => {
   );
 });
 
+test('file request headers override folder destinations and preserve the access token', () => {
+  const parsed = parseHeaders(
+    {
+      'x-zipline-folder': 'untrusted-folder',
+      'x-zipline-file-request': 'request-id',
+      'x-zipline-file-request-token': 'access-token',
+    },
+    config.files,
+  );
+
+  assert.equal(parsed.folder, undefined);
+  assert.deepEqual(parsed.fileRequest, { id: 'request-id', token: 'access-token' });
+});
+
 for (const range of ['bytes x-50/100', 'bytes 0-1.5/100', 'bytes 0-50/Infinity', 'bytes 0-50']) {
   test(`partial upload headers reject ranges without three integers: ${range}`, () => {
     assert.throws(() => parseHeaders({ ...partial, 'content-range': range }, config.files), {

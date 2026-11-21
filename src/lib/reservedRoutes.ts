@@ -6,6 +6,7 @@ export const RESERVED_ROUTES = [
   '/r',
   '/invite',
   '/view',
+  '/request',
   '/robots.txt',
   '/manifest.json',
   '/favicon.ico',

@@ -16,6 +16,7 @@ export type UploadHeadersOptions = {
   options: UploadOptionsStore['options'];
   ephemeral: UploadOptionsStore['ephemeral'];
   folder?: string;
+  fileRequest?: { id: string; token?: string };
   partials?: number;
 };
 
@@ -71,7 +72,7 @@ export function handleUploadResponse<R = Response['/api/upload']>(
 
 export function applyUploadHeaders(
   req: XMLHttpRequest,
-  { options, ephemeral, folder }: UploadHeadersOptions,
+  { options, ephemeral, folder, fileRequest }: UploadHeadersOptions,
 ) {
   options.deletesAt !== 'default' && req.setRequestHeader('x-zipline-deletes-at', options.deletesAt);
   options.format !== 'default' && req.setRequestHeader('x-zipline-format', options.format);
@@ -97,7 +98,10 @@ export function applyUploadHeaders(
   ephemeral.password && req.setRequestHeader('x-zipline-password', ephemeral.password);
   ephemeral.filename && req.setRequestHeader('x-zipline-filename', encodeURIComponent(ephemeral.filename));
 
-  if (folder) {
+  if (fileRequest) {
+    req.setRequestHeader('x-zipline-file-request', fileRequest.id);
+    if (fileRequest.token) req.setRequestHeader('x-zipline-file-request-token', fileRequest.token);
+  } else if (folder) {
     req.setRequestHeader('x-zipline-folder', folder);
   } else if (ephemeral.folderId) {
     req.setRequestHeader('x-zipline-folder', ephemeral.folderId);

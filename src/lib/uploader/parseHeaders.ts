@@ -28,6 +28,8 @@ export type UploadHeaders = {
   'x-zipline-discord-component-embed'?: string;
 
   'x-zipline-folder'?: string;
+  'x-zipline-file-request'?: string;
+  'x-zipline-file-request-token'?: string;
 
   'x-zipline-filename'?: string;
   'x-zipline-domain'?: string;
@@ -66,6 +68,7 @@ export type UploadOptions = {
   };
 
   folder?: string;
+  fileRequest?: { id: string; token?: string };
 
   // partials
   partial?: {
@@ -277,6 +280,15 @@ export function parseHeaders(headers: UploadHeaders, fileConfig: Config['files']
 
   const folder = headers['x-zipline-folder'];
   if (folder) response.folder = folder;
+
+  const fileRequest = headers['x-zipline-file-request'];
+  if (fileRequest) {
+    response.fileRequest = {
+      id: fileRequest,
+      token: headers['x-zipline-file-request-token'],
+    };
+    response.folder = undefined;
+  }
 
   response.overrides = {};
 

@@ -1,0 +1,80 @@
+{
+  "title": "File Requests",
+  "description": "Create upload-only links for collecting files without exposing a folder or your dashboard.",
+  "create": "Create request",
+  "copy": "Copy link",
+  "copied": "Copied",
+  "edit": "Edit request",
+  "loadError": "File requests could not be loaded",
+  "receivedFiles": "Files received",
+  "receivedSize": "Storage used",
+  "destination": "Destination",
+  "protection": "Access",
+  "passwordProtected": "Password protected",
+  "linkOnly": "Anyone with the link",
+  "status": {
+    "open": "Open",
+    "closed": "Closed",
+    "expired": "Expired",
+    "full": "Full"
+  },
+  "empty": {
+    "title": "No file requests",
+    "description": "Create a private upload link when you need files from a client, friend, or teammate. They cannot browse anything already stored in Zipline."
+  },
+  "form": {
+    "createTitle": "Create file request",
+    "editTitle": "Edit file request",
+    "name": "Request name",
+    "namePlaceholder": "Project assets",
+    "nameRequired": "Enter a name for this request",
+    "description": "Instructions",
+    "descriptionHelp": "Tell uploaders what to send. This appears on the public page.",
+    "folder": "Destination folder",
+    "folderHelp": "Received files go here. The folder contents stay private.",
+    "rootFolder": "No folder",
+    "maxFiles": "Maximum files",
+    "maxSize": "Maximum total size",
+    "optionalLimit": "Leave blank for no request-specific limit.",
+    "allowedTypes": "Allowed file types",
+    "allowedTypesHelp": "Comma-separated extensions or MIME types. Leave blank to accept any type.",
+    "expiresAt": "Expiration",
+    "expiresAtHelp": "Leave blank to keep this request open until you close it.",
+    "password": "Password",
+    "passwordHelp": "Optional. Uploaders must enter this before sending files.",
+    "passwordEditHelp": "Leave blank to keep the current password.",
+    "removePassword": "Remove the current password",
+    "enabled": "Accept uploads",
+    "create": "Create request",
+    "save": "Save changes"
+  },
+  "delete": {
+    "button": "Delete request",
+    "title": "Delete {{name}}?",
+    "description": "The link will stop working. Files already received will stay in your account.",
+    "confirm": "Delete request"
+  },
+  "notifications": {
+    "saveFailed": "File request could not be saved",
+    "deleteFailed": "File request could not be deleted",
+    "created": "File request created",
+    "updated": "File request updated",
+    "deleted": "File request deleted"
+  },
+  "public": {
+    "pageTitle": "Upload files to {{name}}",
+    "uploadTitle": "Choose files to send",
+    "filesReceived": "Files received",
+    "sizeReceived": "Storage used",
+    "acceptedTypes": "Accepted types",
+    "anyType": "Any file type",
+    "closedTitle": "This request is closed",
+    "closedDescription": "The owner is no longer accepting files through this link.",
+    "passwordTitle": "Password required",
+    "passwordDescription": "Enter the password provided by the request owner.",
+    "passwordRequired": "Enter the request password",
+    "passwordInvalid": "That password is incorrect",
+    "unlock": "Continue",
+    "privacy": "This page accepts uploads only. It does not show files or folders stored in Zipline."
+  }
+}

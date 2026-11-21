@@ -1,5 +1,9 @@
 import { useConfig } from '@/components/ConfigProvider';
-import { useUploadOptionsStore } from '@/lib/client/store/uploadOptions';
+import {
+  defaultEphemeralOptions,
+  defaultUploadOptions,
+  useUploadOptionsStore,
+} from '@/lib/client/store/uploadOptions';
 import { uploadFileBatch } from '@/lib/client/upload/files';
 import { initialState, useProgress, type UploadProgress } from '@/lib/client/upload/useProgress';
 import { useClipboard } from '@mantine/hooks';
@@ -27,9 +31,11 @@ export function useFileUpload() {
 export default function FileUploadProvider({
   children,
   folder,
+  fileRequest,
 }: {
   children: React.ReactNode;
   folder?: string;
+  fileRequest?: { id: string; token?: string };
 }) {
   const config = useConfig();
   const clipboard = useClipboard();
@@ -43,7 +49,9 @@ export default function FileUploadProvider({
     (batch: File[]) => {
       if (batch.length === 0) return Promise.resolve();
 
-      const { options, ephemeral } = useUploadOptionsStore.getState();
+      const stored = useUploadOptionsStore.getState();
+      const options = fileRequest ? { ...defaultUploadOptions, addOriginalName: true } : stored.options;
+      const ephemeral = fileRequest ? defaultEphemeralOptions : stored.ephemeral;
       setPendingUploads((count) => count + 1);
 
       const next = queue.current.then(async () => {
@@ -53,6 +61,7 @@ export default function FileUploadProvider({
             options,
             ephemeral,
             folder,
+            fileRequest,
             clipboard,
             setFiles,
             setProgress,
@@ -76,7 +85,7 @@ export default function FileUploadProvider({
       queue.current = next;
       return next;
     },
-    [config, clipboard, folder, setProgress, t],
+    [config, clipboard, fileRequest, folder, setProgress, t],
   );
 
   useEffect(() => {
