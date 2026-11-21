@@ -23,6 +23,7 @@ import { ApiStatsResponse } from '@/server/routes/api/stats';
 import { ApiUploadResponse } from '@/server/routes/api/upload';
 import { ApiUploadPartialResponse } from '@/server/routes/api/upload/partial';
 import { ApiUserResponse } from '@/server/routes/api/user';
+import { ApiUserApiKeysResponse } from '@/server/routes/api/user/api-keys';
 import { ApiUserExportResponse } from '@/server/routes/api/user/export';
 import { ApiUserFilesResponse } from '@/server/routes/api/user/files';
 import { ApiUserFilesIdResponse } from '@/server/routes/api/user/files/[id]';
@@ -58,6 +59,7 @@ export type Response = {
   '/api/auth/login': ApiLoginResponse;
   '/api/auth/logout': ApiLogoutResponse;
   '/api/user/mfa/passkey': ApiUserMfaPasskeyResponse;
+  '/api/user/api-keys': ApiUserApiKeysResponse;
   '/api/user/mfa/totp': ApiUserMfaTotpResponse;
   '/api/user/folders/[id]': ApiUserFoldersIdResponse;
   '/api/user/folders': ApiUserFoldersResponse;

@@ -14,6 +14,14 @@ export const relations = defineRelations(schema, (r) => ({
     oauthProviders: r.many.oauthProviders(),
     incompleteFiles: r.many.incompleteFiles(),
     exports: r.many.exports(),
+    apiKeys: r.many.apiKeys(),
+  },
+  apiKeys: {
+    user: r.one.users({
+      from: r.apiKeys.userId,
+      to: r.users.id,
+      optional: false,
+    }),
   },
   userQuotas: {
     user: r.one.users({

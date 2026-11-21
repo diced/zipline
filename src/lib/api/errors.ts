@@ -69,6 +69,8 @@ export const API_ERRORS = {
   1068: "Couldn't find current password for this account",
   1069: 'TOTP is already enabled',
   1070: "You don't own this passkey",
+  1071: 'API key not found',
+  1072: 'API key does not have permission for this request',
 
   // 2xxx, session errors
   2000: 'Invalid login session',

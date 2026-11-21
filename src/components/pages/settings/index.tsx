@@ -16,6 +16,7 @@ const SettingsUser = lazy(() => import('./parts/SettingsUser'));
 const SettingsExports = lazy(() => import('./parts/SettingsExports'));
 const SettingsSessions = lazy(() => import('./parts/SettingsSessions'));
 const SettingsOAuth = lazy(() => import('./parts/SettingsOAuth'));
+const SettingsApiKeys = lazy(() => import('./parts/SettingsApiKeys'));
 
 const DASHBOARD_SETTINGS_TABS = [
   { value: 'account', Icon: IconUser },
@@ -84,6 +85,7 @@ export default function DashboardSettings() {
               <Stack gap='md'>
                 {eitherTrue(config.mfa.totp.enabled, config.mfa.passkeys.enabled) && <SettingsMfa />}
                 <SettingsSessions />
+                <SettingsApiKeys />
                 {eitherTrue(
                   config.oauthEnabled.discord,
                   config.oauthEnabled.github,

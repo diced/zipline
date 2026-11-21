@@ -1,15 +1,26 @@
 import { config } from '@/lib/config';
 import { decryptToken } from '@/lib/crypto';
 import { db } from '@/lib/db';
-import { getUserBySession, getUserByToken, type User } from '@/lib/db/models/user';
+import { getUser, getUserBySession, getUserByToken, type User } from '@/lib/db/models/user';
 import { FastifyReply } from 'fastify';
 import { FastifyRequest } from 'fastify/types/request';
 import { getSession } from '../session';
 import { ApiError } from '@/lib/api/errors';
+import {
+  apiKeyHashesMatch,
+  type ApiKeyScope,
+  hashApiKeyToken,
+  parseApiKeyToken,
+  requiredApiKeyScope,
+} from '@/lib/apiKey';
+import { apiKeys } from '@/lib/db/schema';
+import { eq } from 'drizzle-orm';
 
 declare module 'fastify' {
   export interface FastifyRequest {
     user: User;
+    apiKey?: { id: string; scopes: ApiKeyScope[] };
+    authentication: 'apiKey' | 'token' | 'session';
   }
 }
 
@@ -55,6 +66,48 @@ export async function userMiddleware(req: FastifyRequest, res: FastifyReply) {
   const authorization = req.headers.authorization;
 
   if (authorization) {
+    const parsedApiKey = parseApiKeyToken(authorization);
+    if (parsedApiKey) {
+      const apiKey = await db.query.apiKeys.findFirst({
+        columns: {
+          id: true,
+          secretHash: true,
+          scopes: true,
+          expiresAt: true,
+          revokedAt: true,
+          userId: true,
+        },
+        where: { prefix: parsedApiKey.prefix },
+      });
+
+      if (
+        !apiKey ||
+        apiKey.revokedAt ||
+        (apiKey.expiresAt && apiKey.expiresAt <= new Date()) ||
+        !apiKeyHashesMatch(apiKey.secretHash, hashApiKeyToken(parsedApiKey.token))
+      ) {
+        throw new ApiError(2001);
+      }
+
+      const requiredScope = requiredApiKeyScope(req.method, path);
+      if (!requiredScope || !apiKey.scopes.includes(requiredScope)) throw new ApiError(1072);
+
+      const user = leanUpload
+        ? await db.query.users.findFirst({
+            columns: { id: true, username: true, role: true },
+            where: { id: apiKey.userId },
+            with: { quota: true },
+          })
+        : await getUser(apiKey.userId);
+      if (!user) throw new ApiError(2001);
+
+      await db.update(apiKeys).set({ lastUsedAt: new Date() }).where(eq(apiKeys.id, apiKey.id));
+      req.user = user as User;
+      req.apiKey = { id: apiKey.id, scopes: apiKey.scopes as ApiKeyScope[] };
+      req.authentication = 'apiKey';
+      return;
+    }
+
     const token = parseUserToken(authorization);
 
     let user;
@@ -70,6 +123,7 @@ export async function userMiddleware(req: FastifyRequest, res: FastifyReply) {
     if (!user) throw new ApiError(2001);
 
     req.user = user as User;
+    req.authentication = 'token';
 
     return;
   }
@@ -92,4 +146,9 @@ export async function userMiddleware(req: FastifyRequest, res: FastifyReply) {
   if (!user) throw new ApiError(2001);
 
   req.user = user as User;
+  req.authentication = 'session';
+}
+
+export async function sessionOnlyMiddleware(req: FastifyRequest) {
+  if (req.authentication !== 'session') throw new ApiError(9001);
 }
