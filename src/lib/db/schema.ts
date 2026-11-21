@@ -1,4 +1,5 @@
 import type { DiscordComponentEmbed, DiscordFilePreviewMode, DiscordUrlPreviewMode } from '@/lib/discord';
+import type { ApiKeyScope } from '@/lib/apiKey';
 import type { QuickLinkId } from '@/lib/quickLinks';
 import { createId } from '@paralleldrive/cuid2';
 import type { Json } from 'drizzle-orm';
@@ -214,6 +215,35 @@ export const users = pgTable(
     primaryKey({ name: 'user_pkey', columns: [table.id] }),
     uniqueIndex('user_username_key').on(table.username),
     uniqueIndex('user_token_key').on(table.token),
+  ],
+);
+
+export const apiKeys = pgTable(
+  'ApiKey',
+  {
+    id: id(),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+    name: text().notNull(),
+    prefix: text().notNull(),
+    secretHash: text().notNull(),
+    scopes: text().array().$type<ApiKeyScope>().notNull(),
+    expiresAt: timestamp({ precision: 3, mode: 'date', withTimezone: true }),
+    lastUsedAt: timestamp({ precision: 3, mode: 'date', withTimezone: true }),
+    revokedAt: timestamp({ precision: 3, mode: 'date', withTimezone: true }),
+    userId: text()
+      .notNull()
+      .references(() => users.id, {
+        name: 'api_key_user_id_fkey',
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+      }),
+  },
+  (table) => [
+    primaryKey({ name: 'api_key_pkey', columns: [table.id] }),
+    uniqueIndex('api_key_prefix_key').on(table.prefix),
+    uniqueIndex('api_key_secret_hash_key').on(table.secretHash),
+    index('api_key_user_id_created_at_idx').on(table.userId, table.createdAt),
   ],
 );
 

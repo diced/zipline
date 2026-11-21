@@ -83,6 +83,83 @@
       "loggedOutDevice": "Logged out of device"
     }
   },
+  "apiKeys": {
+    "title": "API keys",
+    "description": "Create keys for uploaders and integrations without sharing your account token.",
+    "loadError": "API keys could not be loaded",
+    "prefix": "Key prefix: {{prefix}}",
+    "lastUsed": "Last used {{date}}",
+    "neverUsed": "Never used",
+    "expires": "Expires {{date}}",
+    "neverExpires": "No expiration",
+    "groups": {
+      "files": "Files",
+      "urls": "Short URLs"
+    },
+    "scopes": {
+      "files:read": {
+        "label": "Read files",
+        "description": "List files, folders, tags, and file details.",
+        "short": "Files: read"
+      },
+      "files:write": {
+        "label": "Manage files",
+        "description": "Upload, update, move, and delete files, folders, and tags.",
+        "short": "Files: write"
+      },
+      "urls:read": {
+        "label": "Read short URLs",
+        "description": "List short URLs and view their settings.",
+        "short": "URLs: read"
+      },
+      "urls:write": {
+        "label": "Manage short URLs",
+        "description": "Create, update, and delete short URLs.",
+        "short": "URLs: write"
+      }
+    },
+    "status": {
+      "active": "Active",
+      "expired": "Expired",
+      "revoked": "Revoked"
+    },
+    "empty": {
+      "title": "No API keys",
+      "description": "Create a key when an uploader or integration needs limited access to your account."
+    },
+    "create": {
+      "button": "Create key",
+      "title": "Create API key",
+      "name": "Name",
+      "nameDescription": "Use a name that identifies the app or device.",
+      "namePlaceholder": "Desktop uploader",
+      "nameRequired": "Enter a name for this key",
+      "permissions": "Permissions",
+      "permissionsDescription": "Select only the access this integration needs.",
+      "scopeRequired": "Select at least one permission",
+      "expiresAt": "Expiration",
+      "expiresAtDescription": "Leave blank to keep this key active until you revoke it.",
+      "submit": "Create key"
+    },
+    "secret": {
+      "title": "API key created",
+      "warning": "Copy this key now",
+      "description": "Zipline stores only a secure hash. This key cannot be shown again.",
+      "copy": "Copy API key",
+      "copied": "Copied"
+    },
+    "revoke": {
+      "button": "Revoke key",
+      "title": "Revoke {{name}}?",
+      "message": "Apps using this key will lose access immediately. This cannot be undone.",
+      "confirm": "Revoke key"
+    },
+    "notifications": {
+      "createFailed": "API key could not be created",
+      "revokeFailed": "API key could not be revoked",
+      "revoked": "API key revoked"
+    }
+  },
   "quickLinks": {
     "title": "Quick links",
     "description": "Add links to the top of the home page for quick access to stuff.",
