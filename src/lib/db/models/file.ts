@@ -11,9 +11,14 @@ import { tagColumns, tagSchema } from './tag';
 export type FileInsert = typeof files.$inferInsert;
 export type FileUpdate = Partial<Omit<FileInsert, 'id' | 'createdAt' | 'updatedAt'>>;
 
-export const fileColumns = { userId: false, password: false } as const;
+export const fileColumns = { userId: false, password: false, fileRequestId: false } as const;
 
-const { password: _password, userId: _userId, ...fileDeleteColumns } = getColumns(files);
+const {
+  password: _password,
+  userId: _userId,
+  fileRequestId: _fileRequestId,
+  ...fileDeleteColumns
+} = getColumns(files);
 
 export const filePasswordExtra = {
   password: (file: typeof files) => isNotNull(file.password).mapWith(Boolean).as('password'),
@@ -93,7 +98,7 @@ export const fileSchema = createSelectSchema(files, {
   password: z.boolean().nullable().optional(),
   anonymous: (schema) => schema.optional(),
 })
-  .omit({ userId: true })
+  .omit({ userId: true, fileRequestId: true })
   .extend({
     thumbnail: z.object({ path: z.string() }).nullable(),
     tags: z.array(tagSchema).optional(),

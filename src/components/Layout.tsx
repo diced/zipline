@@ -32,6 +32,7 @@ import {
   IconClipboardCopy,
   IconExternalLink,
   IconFileText,
+  IconFileArrowRight,
   IconFileUpload,
   IconFiles,
   IconFolder,
@@ -120,6 +121,12 @@ const buildNavLinks = (t: TFunction<['layout', 'common', 'serverSettings']>): Na
     icon: <IconLink size='1rem' />,
     active: (path: string) => path === '/dashboard/urls',
     href: '/dashboard/urls',
+  },
+  {
+    label: t('nav.requests'),
+    icon: <IconFileArrowRight size='1rem' />,
+    active: (path: string) => path === '/dashboard/requests',
+    href: '/dashboard/requests',
   },
   {
     label: t('nav.administrator'),

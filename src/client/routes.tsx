@@ -62,6 +62,7 @@ export const router = createBrowserRouter([
                   { path: 'files', lazy: () => import('./pages/dashboard/files') },
                   { path: 'folders/*', lazy: () => import('./pages/dashboard/folders') },
                   { path: 'urls', lazy: () => import('./pages/dashboard/urls') },
+                  { path: 'requests', lazy: () => import('./pages/dashboard/requests') },
                   { path: 'upload/file', lazy: () => import('./pages/dashboard/upload/file') },
                   { path: 'upload/text', lazy: () => import('./pages/dashboard/upload/text') },
 
@@ -89,6 +90,10 @@ export const router = createBrowserRouter([
                 ],
               },
             ],
+          },
+          {
+            path: 'request/:id',
+            lazy: () => import('./pages/request/[id]'),
           },
           {
             path: 'folder/:id',

@@ -63,6 +63,9 @@ export async function userMiddleware(req: FastifyRequest, res: FastifyReply) {
     !req.cookies['zipline_session'];
   if (anonFolderUpload) return;
 
+  const anonFileRequestUpload = req.headers['x-zipline-file-request'] && upload && !req.headers.authorization;
+  if (anonFileRequestUpload) return;
+
   const authorization = req.headers.authorization;
 
   if (authorization) {

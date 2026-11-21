@@ -16,6 +16,7 @@ import { datasource } from '@/lib/datasource';
 import { db } from '@/lib/db';
 import { lockFiles, removeFiles, type FileInsert } from '@/lib/db/models/file';
 import { getFolderMetadata } from '@/lib/db/models/folder';
+import { getFileRequestUploadContext, validateFileRequestUpload } from '@/lib/db/models/fileRequest';
 import { getUser } from '@/lib/db/models/user';
 import { files, users } from '@/lib/db/schema';
 import { sanitizeFilename } from '@/lib/fs';
@@ -101,8 +102,14 @@ export default typedPlugin(
 
         if (options.partial) throw new ApiError(1001, 'bad options, receieved: partial upload');
 
+        const fileRequest = options.fileRequest
+          ? await getFileRequestUploadContext(options.fileRequest.id, options.fileRequest.token)
+          : null;
+
         let folder = null;
-        if (options.folder) {
+        if (fileRequest?.folderId) {
+          folder = await getFolderMetadata(fileRequest.folderId);
+        } else if (options.folder) {
           folder = await getFolderMetadata(options.folder);
           if (!folder) throw new ApiError(4001);
 
@@ -129,6 +136,7 @@ export default typedPlugin(
 
         // use quota of user if anonymous
         let quotaUser = req.user ? req.user : null;
+        if (fileRequest) quotaUser = await getUser(fileRequest.userId);
         if (!quotaUser && folder?.userId) quotaUser = await getUser(folder.userId);
 
         const quotaCheck = await checkQuota(quotaUser, totalFileSize, multipartFiles.length);
@@ -250,16 +258,18 @@ export default typedPlugin(
           const data: Omit<FileInsert, 'name'> = {
             size,
             type: mimetype,
-            userId: req.user ? req.user.id : options.folder ? folder?.userId : undefined,
+            userId:
+              fileRequest?.userId ?? (req.user ? req.user.id : options.folder ? folder?.userId : undefined),
           };
 
-          if (!req.user && folder) data.anonymous = true;
+          if (fileRequest || (!req.user && folder)) data.anonymous = true;
 
           if (options.maxViews) data.maxViews = options.maxViews;
           if (options.discordPreviewMode) data.discordPreviewMode = options.discordPreviewMode;
           if (options.discordComponentEmbed) data.discordComponentEmbed = options.discordComponentEmbed;
           if (password) data.password = password;
           if (folder) data.folderId = folder.id;
+          if (fileRequest) data.fileRequestId = fileRequest.id;
           if (originalName) data.originalName = originalName;
 
           data.deletesAt = options.deletesAt && options.deletesAt !== 'never' ? options.deletesAt : null;
@@ -269,6 +279,18 @@ export default typedPlugin(
 
         const fileUploads = await db.transaction(async (tx) => {
           await lockFiles(tx);
+
+          if (fileRequest) {
+            await validateFileRequestUpload(
+              fileRequest.id,
+              prepared.map((item) => ({
+                size: item.size,
+                type: item.mimetype,
+                filename: item.file.filename,
+              })),
+              tx,
+            );
+          }
 
           if (quotaUser?.quota) {
             await tx.select({ id: users.id }).from(users).where(eq(users.id, quotaUser.id)).for('update');
@@ -345,18 +367,27 @@ export default typedPlugin(
           };
 
           logger.info(
-            `${req.user ? req.user.username : '[anonymous folder upload]'} uploaded ${fileUpload.name}`,
+            `${
+              fileRequest
+                ? '[file request upload]'
+                : req.user
+                  ? req.user.username
+                  : '[anonymous folder upload]'
+            } uploaded ${fileUpload.name}`,
             { size: bytes(fileUpload.size), ip: req.ip },
           );
 
           onUpload(config, {
-            user: req.user ?? {
-              id: 'anonymous',
-              username: 'anonymous',
-              createdAt: new Date(),
-              updatedAt: new Date(),
-              role: 'USER',
-            },
+            user:
+              fileRequest && quotaUser
+                ? quotaUser
+                : (req.user ?? {
+                    id: 'anonymous',
+                    username: 'anonymous',
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    role: 'USER',
+                  }),
             file: { ...fileUpload, thumbnail: null, tags: [] },
             link: {
               raw: `${domain}${formatRootUrl('/raw', fileUpload.name)}`,
